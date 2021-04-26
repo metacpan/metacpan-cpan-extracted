@@ -9,26 +9,32 @@ use Moo 1.000000;
 use Devel::StrictMode;
 use IO::Socket 1.18 ();
 use MooX::TypeTiny;
+use Ref::Util qw/ is_plain_hashref /;
 use Scalar::Util qw/ refaddr /;
 use Sub::Quote qw/ quote_sub /;
 use Sub::Util 1.40 qw/ set_subname /;
-use Net::Statsd::Lite::Types -types;
+use Types::Common::Numeric 1.004000 qw/ IntRange NumRange PositiveInt PositiveOrZeroInt PositiveOrZeroNum /;
+use Types::Common::String qw/ NonEmptySimpleStr SimpleStr /;
+use Types::Standard qw/ Bool Enum InstanceOf Int StrMatch /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v0.4.10';
+# RECOMMEND PREREQ: Ref::Util::XS
+# RECOMMEND PREREQ: Type::Tiny::XS
+
+our $VERSION = 'v0.6.0';
 
 
 has host => (
     is      => 'ro',
-    isa     => Str,
+    isa     => NonEmptySimpleStr,
     default => '127.0.0.1',
 );
 
 
 has port => (
     is      => 'ro',
-    isa     => Port,
+    isa     => IntRange[ 0, 65535 ],
     default => 8125,
 );
 
@@ -42,7 +48,7 @@ has proto => (
 
 has prefix => (
     is      => 'ro',
-    isa     => Str,
+    isa     => SimpleStr,
     default => '',
 );
 
@@ -58,7 +64,7 @@ my %Buffers;
 
 has max_buffer_size => (
     is      => 'ro',
-    isa     => PosInt,
+    isa     => PositiveInt,
     default => 512,
 );
 
@@ -82,12 +88,12 @@ BEGIN {
     my $class = __PACKAGE__;
 
     my %PROTOCOL = (
-        set_add   => [ '|s',  Str, ],
+        set_add   => [ '|s',  SimpleStr, ],
         counter   => [ '|c',  Int, 1 ],
-        gauge     => [ '|g',  Gauge | PosInt ],
-        histogram => [ '|h',  PosNum ],
-        meter     => [ '|m',  PosInt ],
-        timing    => [ '|ms', PosNum, 1 ],
+        gauge     => [ '|g',  StrMatch[ qr{\A[\-\+]?[0-9]+\z} ] ],
+        histogram => [ '|h',  PositiveOrZeroNum ],
+        meter     => [ '|m',  PositiveOrZeroNum ],
+        timing    => [ '|ms', PositiveOrZeroNum, 1 ],
     );
 
     foreach my $name ( keys %PROTOCOL ) {
@@ -95,18 +101,24 @@ BEGIN {
         my $type = $PROTOCOL{$name}[1];
         my $rate = $PROTOCOL{$name}[2];
 
-        my $code =
-          defined $rate
-          ? q{ my ($self, $metric, $value, $rate) = @_; }
-          : q{ my ($self, $metric, $value) = @_; };
+        my $code = q{ my ($self, $metric, $value, $opts) = @_; };
+
+        if (defined $rate) {
+            $code .= q[ $opts = { rate => $opts // 1 } unless is_plain_hashref($opts); ] .
+                     q[ my $rate = $opts->{rate}; ]
+        }
+        else {
+            $code .= q[ $opts //= {}; ];
+        }
 
         if (STRICT) {
 
             $code .= $type->inline_assert('$value');
 
-            $code .=
-              q/ if (defined $rate) { / . Rate->inline_assert('$rate') . ' }'
-              if defined $rate;
+            if (defined $rate) {
+                my $range = NumRange[0,1];
+                $code .= $range->inline_assert('$rate') . ';';
+            }
         }
 
         my $tmpl = $PROTOCOL{$name}[0];
@@ -114,14 +126,14 @@ BEGIN {
         if ( defined $rate ) {
 
             $code .= q/ if ((defined $rate) && ($rate<1)) {
-                     $self->_record( $tmpl . '|@' . $rate, $metric, $value )
+                     $self->record_metric( $tmpl . '|@' . $rate, $metric, $value, $opts )
                         if rand() <= $rate;
                    } else {
-                     $self->_record( $tmpl, $metric, $value ); } /;
+                     $self->record_metric( $tmpl, $metric, $value, $opts ); } /;
         }
         else {
 
-            $code .= q{$self->_record( $tmpl, $metric, $value );};
+            $code .= q{$self->record_metric( $tmpl, $metric, $value, $opts );};
 
         }
 
@@ -144,16 +156,17 @@ BEGIN {
 }
 
 sub increment {
-    my ( $self, $metric, $rate ) = @_;
-    $self->counter( $metric, 1, $rate );
+    my ( $self, $metric, $opts ) = @_;
+    $self->counter( $metric, 1, $opts );
 }
 
 sub decrement {
-    my ( $self, $metric, $rate ) = @_;
-    $self->counter( $metric, -1, $rate );
+    my ( $self, $metric, $opts ) = @_;
+    $self->counter( $metric, -1, $opts );
 }
 
-sub _record {
+
+sub record_metric {
     my ( $self, $suffix, $metric, $value ) = @_;
 
     my $data = $self->prefix . $metric . ':' . $value . $suffix . "\n";
@@ -195,6 +208,8 @@ sub DEMOLISH {
     return if $is_global;
 
     $self->flush;
+
+    delete $Buffers{ refaddr $self };
 }
 
 
@@ -212,7 +227,7 @@ Net::Statsd::Lite - A lightweight StatsD client that supports multimetric packet
 
 =head1 VERSION
 
-version v0.4.10
+version v0.6.0
 
 =head1 SYNOPSIS
 
@@ -297,10 +312,13 @@ Specifies the maximum buffer size. It defaults to C<512>.
 
 =head2 C<counter>
 
-  $stats->counter( $metric, $value, $rate );
+  $stats->counter( $metric, $value, $opts );
 
 This adds the C<$value> to the counter specified by the C<$metric>
 name.
+
+C<$opts> can be a hash reference with the C<rate> key, or a simple
+scalar with the C<$rate>.
 
 If a C<$rate> is specified and less than 1, then a sampling rate will
 be added. C<$rate> must be between 0 and 1.
@@ -312,23 +330,23 @@ L<Etsy::StatsD> or L<Net::Statsd::Client>.
 
 =head2 C<increment>
 
-  $stats->increment( $metric, $rate );
+  $stats->increment( $metric, $opts );
 
 This is an alias for
 
-  $stats->counter( $metric, 1, $rate );
+  $stats->counter( $metric, 1, $opts );
 
 =head2 C<decrement>
 
-  $stats->decrement( $metric, $rate );
+  $stats->decrement( $metric, $opts );
 
 This is an alias for
 
-  $stats->counter( $metric, -1, $rate );
+  $stats->counter( $metric, -1, $opts );
 
-=head2 C<metric>
+=head2 C<meter>
 
-  $stats->metric( $metric, $value );
+  $stats->meter( $metric, $value, $opts );
 
 This is a counter that only accepts positive (increasing) values. It
 is appropriate for counters that will never decrease (e.g. the number
@@ -337,7 +355,7 @@ many StatsD daemons.
 
 =head2 C<gauge>
 
-  $stats->gauge( $metric, $value );
+  $stats->gauge( $metric, $value, $opts );
 
 A gauge can be thought of as a counter that is maintained by the
 client instead of the daemon, where C<$value> is a positive integer.
@@ -349,7 +367,7 @@ by that amount.
 
 =head2 C<timing>
 
-  $stats->timing( $metric, $value, $rate );
+  $stats->timing( $metric, $value, $opts );
 
 This logs a "timing" in milliseconds, so that statistics about the
 metric can be gathered. The C<$value> must be positive number,
@@ -358,6 +376,9 @@ although the specification recommends that integers be used.
 In actually, any values can be logged, and this is often used as a
 generic histogram for non-timing values (especially since many StatsD
 daemons do not support the L</histogram> metric type).
+
+C<$opts> can be a hash reference with a C<rate> key, or a simple
+scalar with the C<$rate>.
 
 If a C<$rate> is specified and less than 1, then a sampling rate will
 be added. C<$rate> must be between 0 and 1.  Note that sampling
@@ -370,7 +391,7 @@ L<Net::Statsd::Client>.
 
 =head2 C<histogram>
 
-  $stats->histogram( $metric, $value );
+  $stats->histogram( $metric, $value, $opts );
 
 This logs a value so that statistics about the metric can be
 gathered. The C<$value> must be a positive number, although the
@@ -381,10 +402,21 @@ L</timing> for the same effect.
 
 =head2 C<set_add>
 
-  $stats->set_add( $metric, $string );
+  $stats->set_add( $metric, $string, $opts );
 
 This adds the the C<$string> to a set, for logging the number of
 unique things, e.g. IP addresses or usernames.
+
+=head2 record_metric
+
+This is an internal method for sending the data to the server.
+
+  $stats->record_metric( $suffix, $metric, $value, $opts );
+
+This was renamed and documented in v0.5.0 to to simplify subclassing
+that supports extensions to statsd, such as tagging.
+
+See the discussion of tagging extensions below.
 
 =head2 C<flush>
 
@@ -397,6 +429,25 @@ If this module is first loaded in C<STRICT> mode, then the values and
 rate arguments will be checked that they are the correct type.
 
 See L<Devel::StrictMode> for more information.
+
+=head1 TAGGING EXTENSIONS
+
+This class does not support tagging out-of-the box. But tagging can be
+added easily to a subclass, for example, L<DogStatsd|https://www.datadoghq.com/> tagging can be added
+using something like
+
+  use Moo 1.000000;
+  extends 'Net::Statsd::Lite';
+
+  around record_metric => sub {
+      my ( $next, $self, $suffix, $metric, $value, $opts ) = @_;
+
+      if ( my $tags = $opts->{tags} ) {
+          $suffix .= "|#" . join ",", map { s/|//g; $_ } @$tags;
+      }
+
+      $self->$next( $suffix, $metric, $value, $opts );
+  };
 
 =head1 SEE ALSO
 
@@ -443,7 +494,7 @@ Toby Inkster <tobyink@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018-2020 by Robert Rothenberg.
+This software is Copyright (c) 2018-2021 by Robert Rothenberg.
 
 This is free software, licensed under:
 

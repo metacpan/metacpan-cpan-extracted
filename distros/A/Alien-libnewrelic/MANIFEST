@@ -13,6 +13,7 @@ dist.ini
 lib/Alien/libnewrelic.pm
 maint/cip-before-install
 patch/clang-fallthrough.diff
+patch/header-guard.diff
 patch/hostname.diff
 patch/macos.diff
 patch/notice-error-with-stacktrace.diff

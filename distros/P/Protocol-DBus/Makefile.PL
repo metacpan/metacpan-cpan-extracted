@@ -37,7 +37,9 @@ WriteMakefile1(
 
         # Perl 5.10.1 ships 1.82, which mishandles
         # abstract-namespace Linux sockets.
-        'Socket' => 1.87,
+        # … and pre-2.011 mishandled UNIX socket length
+        # on cygwin.
+        'Socket' => 2.011,
     },
 
     TEST_REQUIRES => {

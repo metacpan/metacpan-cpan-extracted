@@ -1,5 +1,10 @@
 Revision history for Smartcat-App
 
+0.0.10  2021-04-22 22:05:04 UTC
+        - Fix `pull` command for projects with folders for a single file
+        - Fix `push` command for projects with folders on Win32
+        - Fix `push` command with --delete-not-existing option for non .po files
+
 0.0.9  2021-03-29 14:34:29 UTC
         - Bugfixes for UTF-8 filename support
 

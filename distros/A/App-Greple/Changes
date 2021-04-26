@@ -1,5 +1,15 @@
 Revision history for Perl application 'greple'.
 
+8.4301 2021-04-24T02:37:35Z
+
+    [ -dfn related update ]
+    - Use STDERR->printflush for status update.
+    - Use VT100 ESC 7/8 save/restore cursor sequence.
+
+8.43 2021-04-04T02:28:49Z
+
+    - Update Regions.pm to include generic &filter_regions.
+
 8.4201 2021-03-25T09:25:54Z
 
     - Require Getopt::EX 1.22.1 for -Mline module to work.

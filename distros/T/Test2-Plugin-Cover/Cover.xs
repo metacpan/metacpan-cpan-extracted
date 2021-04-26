@@ -12,47 +12,93 @@ Perl_ppaddr_t orig_sysopenhandler;
 // The performance impact of fetching it each time is significant, so avoid it
 // if we can.
 #ifdef USE_ITHREADS
-#define fetch_touched AV *touched = get_av("Test2::Plugin::Cover::TOUCHED", GV_ADDMULTI);
-#define fetch_opened  HV *opened  = get_av("Test2::Plugin::Cover::OPENED",  GV_ADDMULTI);
+#define fetch_report HV *report = get_hv("Test2::Plugin::Cover::REPORT", GV_ADDMULTI);
 #else
-AV *touched;
-AV *opened;
-#define fetch_touched NOOP
-#define fetch_opened NOOP
+HV *report;
+#define fetch_report NOOP
 #endif
 
 #define fetch_from SV *from = get_sv("Test2::Plugin::Cover::FROM", 0);
+#define fetch_root SV *root = get_sv("Test2::Plugin::Cover::ROOT", 0);
+
+void add_entry(char *fname, STRLEN fnamelen, char *sname, STRLEN snamelen) {
+    fetch_report;
+    HV *file = NULL;
+    SV **existing_file = hv_fetch(report, fname, fnamelen, 0);
+    if (existing_file) {
+        file = (HV *)SvRV(*existing_file);
+    }
+    else {
+        file = newHV();
+        hv_store(report, fname, fnamelen, newRV_inc((SV *)file), 0);
+    }
+
+    HV *sub = NULL;
+    SV **existing_sub = hv_fetch(file, sname, snamelen, 0);
+    if (existing_sub) {
+        sub = (HV *)SvRV(*existing_sub);
+    }
+    else {
+        sub = newHV();
+        hv_store(file, sname, snamelen, newRV_inc((SV *)sub), 0);
+    }
+
+    fetch_from;
+    if (!(from && SvOK(from))) {
+        from = newSVpv("*", 1);
+    }
+    else {
+        from = sv_mortalcopy(from);
+        SvREFCNT_inc(from);
+    }
+
+    if (!hv_exists_ent(sub, from, 0)) {
+        hv_store_ent(sub, from, from, 0);
+    }
+
+    return;
+}
 
 static OP* my_subhandler(pTHX) {
     dSP;
     OP* out = orig_subhandler(aTHX);
 
     if (out != NULL && (out->op_type == OP_NEXTSTATE || out->op_type == OP_DBSTATE)) {
-        SV *subname = NULL;
+        char *fname = CopFILE(cCOPx(out));
+        STRLEN namelen = strlen(fname);
+
+        // Check for absolute paths and reject them. This is a very
+        // unix-oriented optimization.
+        if (!strncmp(fname, "/", 1)) {
+            fetch_root;
+
+            if (root != NULL && SvPOK(root)) {
+                STRLEN len;
+                char *rt = NULL;
+                rt = SvPV(root, len);
+
+                if (namelen < len) return out;
+
+                if (strncmp(fname, rt, len)) {
+                    return out;
+                }
+            }
+        }
+
+        char *subname = NULL;
+        STRLEN sublen = 0;
 
         GV *my_gv = sub_to_gv(aTHX_ *SP);
         if (my_gv != NULL) {
-            subname = newSVpv(GvNAME(my_gv), 0);
+            subname = GvNAME(my_gv);
+            sublen = strlen(subname);
+        }
+        else {
+            subname = "*";
+            sublen = 1;
         }
 
-        HV *item = newHV();
-
-        SV *file = newSVpv(CopFILE(cCOPx(out)), 0);
-        hv_store(item, "file", 4, file, 0);
-
-        fetch_from;
-        if (from && SvOK(from)) {
-            SV *from_val = sv_mortalcopy(from);
-            SvREFCNT_inc(from_val);
-            hv_store(item, "called_by", 9, from_val, 0);
-        }
-
-        if (subname) {
-            hv_store(item, "sub_name", 8, subname, 0);
-        }
-
-        fetch_touched;
-        av_push(touched, newRV((SV *)item));
+        add_entry(fname, namelen, subname, sublen);
     }
 
     return out;
@@ -135,22 +181,14 @@ static GV *sub_to_gv(pTHX_ SV *sv) {
     return NULL;
 }
 
-void _sv_file_handler(SV *file) {
-    if (file != NULL && SvPOKp(file)) {
-        fetch_opened;
+void _sv_file_handler(SV *filename) {
+    if (filename == NULL) return;
+    if (!SvPOKp(filename)) return;
 
-        AV *item = newAV();
-        av_push(item, file);
-        SvREFCNT_inc(file);
-        av_push(opened, newRV((SV *)item));
+    STRLEN namelen = 0;
+    char *fname = SvPV(filename, namelen);
 
-        fetch_from;
-        if (from && SvOK(from)) {
-            SV *from_val = sv_mortalcopy(from);
-            SvREFCNT_inc(from_val);
-            av_push(item, from_val);
-        }
-    }
+    add_entry(fname, namelen, "<>", 2);
 }
 
 static OP* my_openhandler(pTHX) {
@@ -187,10 +225,8 @@ BOOT:
     {
         //Initialize the global files HV, but only if we are not a threaded perl
 #ifndef USE_ITHREADS
-        touched = get_av("Test2::Plugin::Cover::TOUCHED", GV_ADDMULTI);
-        opened  = get_av("Test2::Plugin::Cover::OPENED",  GV_ADDMULTI);
-        SvREFCNT_inc(touched);
-        SvREFCNT_inc(opened);
+        report = get_hv("Test2::Plugin::Cover::REPORT", GV_ADDMULTI);
+        SvREFCNT_inc(report);
 #endif
 
         orig_subhandler = PL_ppaddr[OP_ENTERSUB];

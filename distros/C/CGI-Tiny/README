@@ -7,10 +7,11 @@ SYNOPSIS
       #!/usr/bin/perl
       use strict;
       use warnings;
+      use utf8;
       use CGI::Tiny;
     
       cgi {
-        my ($cgi) = @_;
+        my $cgi = $_;
         $cgi->set_error_handler(sub {
           my ($cgi, $error) = @_;
           warn $error;
@@ -23,8 +24,8 @@ SYNOPSIS
         } elsif ($method eq 'POST') {
           $fribble = $cgi->body_param('fribble');
         } else {
-          $cgi->set_response_status(405);
-          return $cgi->render;
+          $cgi->set_response_status(405)->render;
+          exit;
         }
         die "Invalid fribble parameter" unless length $fribble;
         $cgi->render(json => {fribble => $fribble});
@@ -34,7 +35,8 @@ DESCRIPTION
 
     CGI::Tiny provides a modern interface to write CGI
     <https://en.wikipedia.org/wiki/Common_Gateway_Interface> scripts to
-    dynamically respond to HTTP requests. It is intended to be:
+    dynamically respond to HTTP requests as defined in RFC 3875
+    <https://tools.ietf.org/html/rfc3875>. It is intended to be:
 
       * Minimal
 
@@ -69,6 +71,15 @@ DESCRIPTION
       and templating, and doesn't impose unnecessary constraints to reading
       input or rendering output.
 
+    Most applications are better written in a PSGI-compatible framework
+    (e.g. Dancer2 or Mojolicious) and deployed in a persistent application
+    server so that the application does not have to start up again every
+    time it receives a request. CGI::Tiny, and the CGI protocol in general,
+    is only suited for restricted deployment environments that can only run
+    CGI scripts, or applications that don't need to scale.
+
+    See "COMPARISON TO CGI.PM".
+
     This module's interface is currently EXPERIMENTAL and may be changed
     incompatibly if needed.
 
@@ -78,16 +89,16 @@ USAGE
     default.
 
       cgi {
-        my ($cgi) = @_;
+        my $cgi = $_;
         # set up error handling on $cgi
         # inspect request data via $cgi
         # set response headers if needed via $cgi
         # render response data with $cgi->render
       };
 
-    The code block is immediately run and passed a CGI::Tiny object, which
-    "METHODS" can be called on to read request information and render a
-    response.
+    The code block is immediately run with $_ set to a CGI::Tiny object,
+    which "METHODS" can be called on to read request information and render
+    a response.
 
     If an exception is thrown within the code block, or the code block does
     not render a response, it will run the handler set by
@@ -95,10 +106,39 @@ USAGE
     and (if nothing has been rendered yet) render a 500 Internal Server
     Error.
 
+    Note that the cgi block's current implementation as a regular exported
+    subroutine is an implementation detail, and future implementations
+    reserve the right to provide it as an XSUB or keyword for performance
+    reasons. You should not rely on @_ to be set, and you should not use
+    return to exit the block; use exit to end a CGI script early after
+    rendering a response.
+
 EXTENDING
 
     CGI::Tiny is a minimal interface to the CGI protocol, but can be
     extended with the use of other CPAN modules.
+
+ Fatpacking
+
+    App::FatPacker can be used to pack CGI::Tiny, as well as any other
+    pure-perl dependencies, into a CGI script so that it can be deployed to
+    other systems without having to install the dependencies there. As a
+    bonus, this means the script doesn't have to load those modules
+    separately from disk on every execution.
+
+    Just keep in mind that the script will have to be repacked to update
+    those dependencies, and CGI scripts greatly benefit from efficient XS
+    tools which cannot be packed this way.
+
+      $ fatpack pack script.source.cgi > script.cgi
+
+    To pack in optional modules, such as JSON support for Perls older than
+    5.14:
+
+      $ fatpack trace --use=JSON::PP script.source.cgi
+      $ fatpack packlists-for $(cat fatpacker.trace) > packlists
+      $ fatpack tree $(cat packlists)
+      $ fatpack file script.source.cgi > script.cgi
 
  JSON
 
@@ -124,7 +164,7 @@ EXTENDING
       use Data::Section::Simple 'get_data_section';
     
       cgi {
-        my ($cgi) = @_;
+        my $cgi = $_;
         my $foo = $cgi->query_param('foo');
         my $tx = Text::Xslate->new(path => ['templates'], cache => 0);
     
@@ -153,7 +193,7 @@ EXTENDING
       use Mojo::Loader 'data_section';
     
       cgi {
-        my ($cgi) = @_;
+        my $cgi = $_;
         my $foo = $cgi->query_param('foo');
         my $mt = Mojo::Template->new(auto_escape => 1, vars => 1);
     
@@ -180,6 +220,7 @@ EXTENDING
       #!/usr/bin/perl
       use strict;
       use warnings;
+      use utf8;
       use CGI::Tiny;
       use Routes::Tiny;
     
@@ -202,7 +243,7 @@ EXTENDING
       );
     
       cgi {
-        my ($cgi) = @_;
+        my $cgi = $_;
     
         my $routes = Routes::Tiny->new;
         # /script.cgi/foo
@@ -214,8 +255,7 @@ EXTENDING
         if (defined(my $match = $routes->match($cgi->path, method => $cgi->method))) {
           $dispatch{$match->name}->($cgi, $match->captures);
         } else {
-          $cgi->set_response_status(404);
-          $cgi->render(text => 'Not Found');
+          $cgi->set_response_status(404)->render(text => 'Not Found');
         }
       };
 
@@ -243,28 +283,25 @@ METHODS
 
     Exceptions may occur before or after response headers have been
     rendered, so error handlers should render some response if
-    "headers_rendered" is false. If no response has been rendered after the
-    error handler completes, the default 500 Internal Server Error response
-    will be rendered.
+    "headers_rendered" is false.
 
-  request_body_limit
-
-      my $limit = $cgi->request_body_limit;
-
-    Limit in bytes for parsing a request body into memory, defaults to the
-    value of the CGI_TINY_REQUEST_BODY_LIMIT environment variable or
-    16777216 (16 MiB). Since the request body is not parsed until needed,
-    methods that parse the whole request body into memory like "body" will
-    set the response status to 413 Payload Too Large and throw an exception
-    if the content length is over the limit. A value of 0 will remove the
-    limit (not recommended unless you have other safeguards on memory
-    usage).
+    If the error handler itself throws an exception, that error and the
+    original error will be emitted as a warning. If no response has been
+    rendered after the error handler completes or dies, the default 500
+    Internal Server Error response will be rendered.
 
   set_request_body_limit
 
       $cgi = $cgi->set_request_body_limit(16*1024*1024);
 
-    Sets "request_body_limit".
+    Sets the limit in bytes for parsing a request body into memory. If not
+    set, defaults to the value of the CGI_TINY_REQUEST_BODY_LIMIT
+    environment variable or 16777216 (16 MiB). Since the request body is
+    not parsed until needed, methods that parse the whole request body into
+    memory like "body" will set the response status to 413 Payload Too
+    Large and throw an exception if the content length is over the limit. A
+    value of 0 will remove the limit (not recommended unless you have other
+    safeguards on memory usage).
 
   set_input_handle
 
@@ -318,9 +355,23 @@ METHODS
 
   server_software
 
-      my $type   = $cgi->content_type;   # CONTENT_TYPE
-      my $method = $cgi->request_method; # REQUEST_METHOD
-      my $port   = $cgi->server_port;    # SERVER_PORT
+      my $auth_type      = $cgi->auth_type;         # AUTH_TYPE
+      my $content_length = $cgi->content_length;    # CONTENT_LENGTH
+      my $content_type   = $cgi->content_type;      # CONTENT_TYPE
+      my $gateway        = $cgi->gateway_interface; # GATEWAY_INTERFACE
+      my $path           = $cgi->path_info;         # PATH_INFO
+      my $file_path      = $cgi->path_translated;   # PATH_TRANSLATED
+      my $query          = $cgi->query_string;      # QUERY_STRING
+      my $remote_addr    = $cgi->remote_addr;       # REMOTE_ADDR
+      my $remote_host    = $cgi->remote_host;       # REMOTE_HOST
+      my $remote_ident   = $cgi->remote_ident;      # REMOTE_IDENT
+      my $remote_user    = $cgi->remote_user;       # REMOTE_USER
+      my $method         = $cgi->request_method;    # REQUEST_METHOD
+      my $script_name    = $cgi->script_name;       # SCRIPT_NAME
+      my $hostname       = $cgi->server_name;       # SERVER_NAME
+      my $port           = $cgi->server_port;       # SERVER_PORT
+      my $protocol       = $cgi->server_protocol;   # SERVER_PROTOCOL
+      my $server         = $cgi->server_software;   # SERVER_SOFTWARE
 
     Access to request meta-variables
     <https://tools.ietf.org/html/rfc3875#section-4.1> of the equivalent
@@ -339,19 +390,18 @@ METHODS
 
     Short aliases for a few request meta-variables.
 
-  query_pairs
-
-      my $pairs = $cgi->query_pairs;
-
-    Retrieve URL query string parameters as an array reference of
-    two-element array references.
-
   query_params
 
-      my $params = $cgi->query_params;
+      my $pairs = $cgi->query_params;
 
-    Retrieve URL query string parameters as a hash reference. If a
-    parameter name is passed multiple times, its value will be an array
+    Retrieve URL query string parameters as an ordered array reference of
+    name/value pairs, represented as two-element array references.
+
+  query_param_names
+
+      my $arrayref = $cgi->query_param_names;
+
+    Retrieve URL query string parameter names as an unsorted array
     reference.
 
   query_param
@@ -359,15 +409,15 @@ METHODS
       my $value = $cgi->query_param('foo');
 
     Retrieve value of a named URL query string parameter. If the parameter
-    name is passed multiple times, returns the last value. Use
+    name was passed multiple times, returns the last value. Use
     "query_param_array" to get multiple values of a parameter.
 
   query_param_array
 
       my $arrayref = $cgi->query_param_array('foo');
 
-    Retrieve values of a named URL query string parameter as an array
-    reference.
+    Retrieve values of a named URL query string parameter as an ordered
+    array reference.
 
   headers
 
@@ -378,11 +428,38 @@ METHODS
 
   header
 
-      my $value = $cgi->header('Accept');
+      my $value = $cgi->header('Accept-Language');
 
     Retrieve the value of a request header by name (case insensitive). CGI
     request headers can only contain a single value, which may be combined
     from multiple values.
+
+  cookies
+
+      my $pairs = $cgi->cookies;
+
+    Retrieve request cookies as an ordered array reference of name/value
+    pairs, represented as two-element array references.
+
+  cookie_names
+
+      my $arrayref = $cgi->cookie_names;
+
+    Retrieve request cookie names as an unsorted array reference.
+
+  cookie
+
+      my $value = $cgi->cookie('foo');
+
+    Retrieve the value of a request cookie by name. If multiple cookies
+    were passed with the same name, returns the last value. Use
+    "cookie_array" to get multiple values of a cookie name.
+
+  cookie_array
+
+      my $arrayref = $cgi->cookie_array('foo');
+
+    Retrieve values of a request cookie name as an ordered array reference.
 
   body
 
@@ -391,49 +468,54 @@ METHODS
     Retrieve the request body as bytes.
 
     Note that this will read the whole request body into memory, so make
-    sure the "request_body_limit" can fit well within the available memory.
-
-  body_pairs
-
-      my $pairs = $cgi->body_pairs;
-
-    Retrieve x-www-form-urlencoded body parameters as an array reference of
-    two-element array references.
-
-    Note that this will read the whole request body into memory, so make
-    sure the "request_body_limit" can fit well within the available memory.
+    sure the "set_request_body_limit" can fit well within the available
+    memory.
 
   body_params
 
-      my $params = $cgi->body_params;
+      my $pairs = $cgi->body_params;
 
-    Retrieve x-www-form-urlencoded body parameters as a hash reference. If
-    a parameter name is passed multiple times, its value will be an array
-    reference.
+    Retrieve x-www-form-urlencoded body parameters as an ordered array
+    reference of name/value pairs, represented as two-element array
+    references.
 
     Note that this will read the whole request body into memory, so make
-    sure the "request_body_limit" can fit well within the available memory.
+    sure the "set_request_body_limit" can fit well within the available
+    memory.
+
+  body_param_names
+
+      my $arrayref = $cgi->body_param_names;
+
+    Retrieve x-www-form-urlencoded body parameter names as an unsorted
+    array reference.
+
+    Note that this will read the whole request body into memory, so make
+    sure the "set_request_body_limit" can fit well within the available
+    memory.
 
   body_param
 
       my $value = $cgi->body_param('foo');
 
     Retrieve value of a named x-www-form-urlencoded body parameter. If the
-    parameter name is passed multiple times, returns the last value. Use
+    parameter name was passed multiple times, returns the last value. Use
     "body_param_array" to get multiple values of a parameter.
 
     Note that this will read the whole request body into memory, so make
-    sure the "request_body_limit" can fit well within the available memory.
+    sure the "set_request_body_limit" can fit well within the available
+    memory.
 
   body_param_array
 
       my $arrayref = $cgi->body_param_array('foo');
 
     Retrieve values of a named x-www-form-urlencoded body parameter as an
-    array reference.
+    ordered array reference.
 
     Note that this will read the whole request body into memory, so make
-    sure the "request_body_limit" can fit well within the available memory.
+    sure the "set_request_body_limit" can fit well within the available
+    memory.
 
   body_json
 
@@ -442,31 +524,60 @@ METHODS
     Decode an application/json request body from UTF-8-encoded JSON.
 
     Note that this will read the whole request body into memory, so make
-    sure the "request_body_limit" can fit well within the available memory.
+    sure the "set_request_body_limit" can fit well within the available
+    memory.
 
  Response
+
+  set_nph
+
+      $cgi = $cgi->set_nph(1);
+
+    If set to a true value before rendering response headers, CGI::Tiny
+    will act as a NPH (Non-Parsed Header)
+    <https://tools.ietf.org/html/rfc3875#section-5> script and render full
+    HTTP response headers. This may be required for some CGI servers, or
+    enable unbuffered responses or HTTP extensions not supported by the CGI
+    server.
+
+    No effect after response headers have been rendered.
 
   set_response_status
 
       $cgi = $cgi->set_response_status(404);
+      $cgi = $cgi->set_response_status('500 Internal Server Error');
 
-    Sets the response HTTP status code. No effect after response headers
-    have been rendered. The CGI protocol assumes a status of 200 OK if no
-    response status is set.
+    Sets the response HTTP status code. A full status string including a
+    human-readable message will be used as-is. A bare status code must be a
+    known HTTP status code
+    <https://www.iana.org/assignments/http-status-codes/http-status-codes.xhtml>
+    and will have the standard human-readable message appended.
+
+    No effect after response headers have been rendered.
+
+    The CGI protocol assumes a status of 200 OK if no response status is
+    set.
 
   set_response_content_type
 
       $cgi = $cgi->set_response_content_type('application/xml');
 
-    Sets the response Content-Type header, to override autodetection. No
-    effect after response headers have been rendered.
+    Sets the response Content-Type header, to override autodetection in
+    "render". No effect after response headers have been rendered.
+
+  set_response_charset
+
+      $cgi = $cgi->set_response_charset('UTF-8');
+
+    Set charset to use when rendering text, html, or xml response data,
+    defaults to UTF-8.
 
   add_response_header
 
       $cgi = $cgi->add_response_header('Content-Disposition' => 'attachment');
 
-    Adds a response header. No effect after response headers have been
-    rendered.
+    Adds a custom response header. No effect after response headers have
+    been rendered.
 
     Note that header names are case insensitive and CGI::Tiny does not
     attempt to deduplicate or munge headers that have been added manually.
@@ -474,18 +585,82 @@ METHODS
     the same header multiple times will result in multiple instances of
     that response header.
 
-  response_charset
+  add_response_cookie
 
-      my $charset = $cgi->response_charset;
+      $cgi = $cgi->add_response_cookie($name => $value,
+        Expires   => 'Sun, 06 Nov 1994 08:49:37 GMT',
+        HttpOnly  => 1,
+        'Max-Age' => 3600,
+        Path      => '/foo',
+        SameSite  => 'Strict',
+        Secure    => 1,
+      );
 
-    Charset to use when rendering text, html, or xml response data,
-    defaults to UTF-8.
+    Adds a Set-Cookie response header. No effect after response headers
+    have been rendered.
 
-  set_response_charset
+    Note that cookie values should only consist of ASCII characters and may
+    not contain any control characters, space characters, or the characters
+    ",;\. More complex values can be encoded to UTF-8 and base64 for
+    transport.
 
-      $cgi = $cgi->set_response_charset('UTF-8');
+      use Unicode::UTF8 'encode_utf8';
+      use MIME::Base64 'encode_base64';
+      my $encoded_value = encode_base64 encode_utf8($value), '';
+      $cgi->add_response_cookie(foo => $encoded_value, %attrs);
+    
+      use Unicode::UTF8 'decode_utf8';
+      use MIME::Base64 'decode_base64';
+      my $value = decode_utf8 decode_base64 $cgi->cookie('foo');
 
-    Sets "response_charset".
+    Data structures can be encoded to JSON and base64 for transport.
+
+      use Cpanel::JSON::XS 'encode_json';
+      use MIME::Base64 'encode_base64';
+      my $encoded_value = encode_base64 encode_json(\%hash), '';
+      $cgi->add_response_cookie(foo => $encoded_value, %attrs);
+    
+      use Cpanel::JSON::XS 'decode_json';
+      use MIME::Base64 'decode_base64';
+      my $hashref = decode_json decode_base64 $cgi->cookie('foo');
+
+    Optional cookie attributes are specified in key-value pairs after the
+    cookie name and value. Cookie attribute names are case-insensitive.
+
+    Domain
+
+      Domain for which cookie is valid.
+
+    Expires
+
+      Expiration date string for cookie. "epoch_to_date" can be used to
+      generate the appropriate date string format.
+
+    HttpOnly
+
+      If set to a true value, the cookie will be restricted from
+      client-side scripts.
+
+    Max-Age
+
+      Max age of cookie before it expires, in seconds, as an alternative to
+      specifying Expires.
+
+    Path
+
+      URL path for which cookie is valid.
+
+    SameSite
+
+      Strict to restrict the cookie to requests from the same site, Lax to
+      allow it additionally in certain cross-site requests. This attribute
+      is currently part of a draft specification so its handling may
+      change, but it is supported by most browsers.
+
+    Secure
+
+      If set to a true value, the cookie will be restricted to HTTPS
+      requests.
 
   headers_rendered
 
@@ -515,14 +690,50 @@ METHODS
     there is no more appropriate value.
 
     html, xml, or text data is expected to be decoded characters, and will
-    be encoded according to "response_charset". json data will be encoded
-    to UTF-8.
+    be encoded according to "set_response_charset" (UTF-8 by default).
+    Unicode::UTF8 will be used for efficient UTF-8 encoding if available.
 
-    redirect will print a redirection header if response headers have not
-    yet been rendered, and will set a response status of 302 if none has
-    been set by "set_response_status". It will not set a Content-Type
-    response header. If response headers have already been rendered a
-    warning will be emitted.
+    json data structures will be encoded to JSON and UTF-8.
+
+    redirect will set a Location header if response headers have not yet
+    been rendered, and will set a response status of 302 if none has been
+    set by "set_response_status". It will not set a Content-Type response
+    header. If response headers have already been rendered a warning will
+    be emitted.
+
+    The Date response header will be set to the current time as an HTTP
+    date string if not set manually.
+
+FUNCTIONS
+
+    The following convenience functions are provided but not exported.
+
+ epoch_to_date
+
+      my $date = CGI::Tiny::epoch_to_date $epoch;
+
+    Convert a Unix epoch timestamp, such as returned by time, to a RFC 1123
+    HTTP date string suitable for use in HTTP headers such as Date and
+    Expires.
+
+ date_to_epoch
+
+      my $epoch = CGI::Tiny::date_to_epoch $date;
+
+    Parse a RFC 1123 HTTP date string to a Unix epoch timestamp. For
+    compatibility as required by RFC 7231
+    <https://tools.ietf.org/html/rfc7231#section-7.1.1.1>, legacy RFC 850
+    and ANSI C asctime date formats are also recognized. Returns undef if
+    the string does not parse as any of these formats.
+
+      # RFC 1123
+      my $epoch = CGI::Tiny::date_to_epoch 'Sun, 06 Nov 1994 08:49:37 GMT';
+    
+      # RFC 850
+      my $epoch = CGI::Tiny::date_to_epoch 'Sunday, 06-Nov-94 08:49:37 GMT';
+    
+      # asctime
+      my $epoch = CGI::Tiny::date_to_epoch 'Sun Nov  6 08:49:37 1994';
 
 ENVIRONMENT
 
@@ -531,7 +742,88 @@ ENVIRONMENT
 
  CGI_TINY_REQUEST_BODY_LIMIT
 
-    Default value for "request_body_limit".
+    Default value for "set_request_body_limit".
+
+COMPARISON TO CGI.PM
+
+    Traditionally, the CGI module (referred to as CGI.pm to differentiate
+    it from the CGI protocol) has been used to write Perl CGI scripts. This
+    module fills a similar need but has a number of interface differences
+    to be aware of.
+
+      * There is no global CGI::Tiny object; the object is constructed for
+      the scope of the cgi block, only reads request data from the
+      environment once it is accessed, and once the block completes
+      (normally or abnormally), it ensures that a valid response is
+      rendered to avoid gateway errors.
+
+      * Instead of global variables like $CGI::POST_MAX, global behavior
+      settings are applied to the CGI::Tiny object inside the cgi block.
+
+      * Exceptions within the cgi block are handled by default by rendering
+      a server error response and emitting the error as a warning. This can
+      be customized with "set_error_handler".
+
+      * Request query and body parameter accessors in CGI::Tiny are not
+      context sensitive, as context sensitivity can lead to surprising
+      behavior and vulnerabilities
+      <https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2014-1572>.
+      "query_param" and "body_param" always return a single value, and
+      "query_param_array" and "body_param_array" must be used to retrieve
+      multi-value parameters. CGI::Tiny also does not have a
+      method-sensitive param accessor; query or body parameters must be
+      accessed specifically.
+
+      * CGI::Tiny decodes request query and body parameters from UTF-8 to
+      Unicode characters automatically, and "render" provides methods to
+      encode response data from Unicode characters to UTF-8 by default.
+
+      * In CGI.pm, response headers must be printed manually before any
+      response data is printed to avoid malformed responses. In CGI::Tiny,
+      the "render" method is used to print response data, and automatically
+      prints response headers the first time it is called. redirect
+      responses are also handled by "render".
+
+      * In CGI::Tiny, a custom response status is set by calling
+      "set_response_status" before the first "render", which only requires
+      the status code and will add the appropriate human-readable status
+      message itself.
+
+      * Response setters are distinct methods from request accessors in
+      CGI::Tiny. "content_type", "header", and "cookie" are used to access
+      request data, and "set_response_content_type", "add_response_header",
+      and "add_response_cookie" are used to set response headers for the
+      pending response before the first call to "render".
+
+      * CGI::Tiny does not provide any HTML generation helpers, as this
+      functionality is much better implemented by other robust
+      implementations on CPAN; see "Templating".
+
+      * CGI::Tiny does not do any implicit encoding of cookie values or the
+      Expires header or cookie attribute. The "epoch_to_date" convenience
+      function is provided to render appropriate Expires date values.
+
+    There are a number of alternatives to CGI.pm but they do not
+    sufficiently address the design issues; primarily, none of them
+    gracefully handle exceptions or failure to render a response, and
+    several of them have no features for rendering responses.
+
+      * CGI::Simple shares all of the interface design problems of CGI.pm,
+      though it does not reimplement the HTML generation helpers.
+
+      * CGI::Thin is ancient and only implements parsing of request query
+      or body parameters, without decoding them from UTF-8 bytes.
+
+      * CGI::Minimal has context-sensitive parameter accessors, and only
+      implements parsing of request query/body parameters (without decoding
+      them from UTF-8 bytes) and uploads.
+
+      * CGI::Lite has context-sensitive parameter accessors, and only
+      implements parsing of request query/body parameters (without decoding
+      them from UTF-8 bytes), uploads, and cookies.
+
+      * CGI::Easy has a robust interface, but pre-parses all request
+      information.
 
 CAVEATS
 
@@ -540,18 +832,17 @@ CAVEATS
     filehandles. CGI::Tiny does not prevent you from messing with these
     interfaces directly, but it may result in confusion.
 
-    Most applications are better written in a PSGI-compatible framework
-    (e.g. Dancer2 or Mojolicious) and deployed in a persistent application
-    server so that the application does not have to start up again every
-    time it receives a request.
+    CGI::Tiny eschews certain sanity checking for performance reasons. For
+    example, Content-Type and other header values set for the response
+    should only contain ASCII text with no control characters, but
+    CGI::Tiny does not verify this (though it does verify they do not
+    contain newline characters to protect against HTTP response splitting).
 
 TODO
 
       * Uploads/multipart request
 
-      * Cookies
-
-      * NPH
+      * Debugging tools
 
 BUGS
 

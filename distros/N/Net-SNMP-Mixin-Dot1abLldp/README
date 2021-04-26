@@ -1,30 +1,32 @@
 NAME
+
     Net::SNMP::Mixin::Dot1abLldp - mixin class for the Link Layer Discovery
     Protocol
 
 SYNOPSIS
+
     A Net::SNMP mixin class for LLDP (Link Layer Discovery Protocol) based
     info.
 
       use Net::SNMP;
       use Net::SNMP::Mixin;
-
+    
       #...
-
+    
       my $session = Net::SNMP->session( -hostname => 'foo.bar.com' );
-
+    
       $session->mixer('Net::SNMP::Mixin::Dot1abLldp');
       $session->init_mixins;
       snmp_dispatcher();
       $session->init_ok();
       die $session->errors if $session->errors;
-
+    
       printf "Local ChassisID: %s\n",
         $session->get_lldp_local_system_data->{lldpLocChassisId};
-
+    
       $lldp_loc_port_tbl = $session->get_lldp_loc_port_table;
       $lldp_rem_tbl      = $session->get_lldp_rem_table;
-
+    
       foreach $lport ( keys %$lldp_rem_tbl ) {
         foreach $idx ( keys %{ $lldp_rem_tbl->{$lport} } ) {
           my $lldpRemSysName   = $lldp_rem_tbl->{$lport}{$idx}{lldpRemSysName};
@@ -32,26 +34,29 @@ SYNOPSIS
           my $lldpRemPortDesc  = $lldp_rem_tbl->{$lport}{$idx}{lldpRemPortDesc};
           my $lldpRemChassisId = $lldp_rem_tbl->{$lport}{$idx}{lldpRemChassisId};
           my $ldesc            = $lldp_loc_port_tbl->{$lport}{lldpLocPortDesc};
-
+    
           printf "$lport:$ldesc => $lldpRemSysName:$lldpRemPortId:$lldpRemPortDesc:$lldpRemChassisId\n";
         }
       }
 
 DESCRIPTION
+
     With this mixin it's simple to explore the Layer-2 topologie of the
     network.
 
     The LLDP (Link Layer Discovery Protocol) is an IEEE (Draft?) standard
-    for vendor-independent Layer-2 discovery, similar to the proprietary CDP
-    (Cisco Discovery Protocol) from Cisco. It's defined in the IEEE 802.1AB
-    documents, therefore the name of this module.
+    for vendor-independent Layer-2 discovery, similar to the proprietary
+    CDP (Cisco Discovery Protocol) from Cisco. It's defined in the IEEE
+    802.1AB documents, therefore the name of this module.
 
-    This mixin reads data from the lldpLocalSystemData, lldpLocPortTable and
-    the lldpRemTable out of the LLDP-MIB. At least these values are in the
-    mandatory set of the LLDP-MIB.
+    This mixin reads data from the lldpLocalSystemData, lldpLocPortTable
+    and the lldpRemTable out of the LLDP-MIB. At least these values are in
+    the mandatory set of the LLDP-MIB.
 
 MIXIN METHODS
-  OBJ->get_lldp_local_system_data()
+
+ OBJ->get_lldp_local_system_data()
+
     Returns the LLDP lldpLocalSystemData group as a hash reference:
 
       {
@@ -63,7 +68,8 @@ MIXIN METHODS
         lldpLocSysCapEnabled    => BITS,
       }
 
-  OBJ->get_lldp_loc_port_table()
+ OBJ->get_lldp_loc_port_table()
+
     Returns the LLDP lldp_loc_port_table as a hash reference. The table is
     indexed by the LLDP local port numbers:
 
@@ -75,8 +81,8 @@ MIXIN METHODS
          }
       }
 
-    The LLDP portnumber isn't necessarily the ifIndex of the switch. See the
-    TEXTUAL-CONVENTION from the LLDP-MIB:
+    The LLDP portnumber isn't necessarily the ifIndex of the switch. See
+    the TEXTUAL-CONVENTION from the LLDP-MIB:
 
       "A port number has no mandatory relationship to an
       InterfaceIndex object (of the interfaces MIB, IETF RFC 2863).
@@ -91,7 +97,8 @@ MIXIN METHODS
     See also the Net::SNMP::Mixin::Dot1dBase for a mixin to get the mapping
     between the ifIndexes and the dot1dBasePorts if needed.
 
-  OBJ->map_lldp_loc_portid2portnum()
+ OBJ->map_lldp_loc_portid2portnum()
+
     Returns a hash reference with local portIds to local portNums:
 
       {
@@ -100,10 +107,12 @@ MIXIN METHODS
         ...
       }
 
-  OBJ->get_lldp_rem_table()
+ OBJ->get_lldp_rem_table()
+
     Returns the LLDP lldp_rem_table as a hash reference. The table is
     indexed by the LLDP local port numbers on which the remote system
-    information is received and an index for multiple neighbors on one port:
+    information is received and an index for multiple neighbors on one
+    port:
 
       {
         lldpRemLocalPortNum => {
@@ -122,56 +131,70 @@ MIXIN METHODS
       }
 
 INITIALIZATION
-  OBJ->_init($reload)
-    Fetch the LLDP related snmp values from the host. Don't call this method
-    direct!
+
+ OBJ->_init($reload)
+
+    Fetch the LLDP related snmp values from the host. Don't call this
+    method direct!
 
 PRIVATE METHODS
+
     Only for developers or maintainers.
 
-  _fetch_lldp_local_system_data($session)
+ _fetch_lldp_local_system_data($session)
+
     Fetch the local system data from the lldpMIB once during object
     initialization.
 
-  _lldp_local_system_data_cb($session)
+ _lldp_local_system_data_cb($session)
+
     The callback for _fetch_lldp_local_system_data.
 
-  _fetch_lldp_loc_port_tbl($session)
+ _fetch_lldp_loc_port_tbl($session)
+
     Fetch the lldpLocPortTable once during object initialization.
 
-  _lldp_loc_port_tbl_cb($session)
+ _lldp_loc_port_tbl_cb($session)
+
     The callback for _fetch_lldp_loc_port_tbl_cb().
 
-  _fetch_lldp_rem_tbl($session)
+ _fetch_lldp_rem_tbl($session)
+
     Fetch the lldpRemTable once during object initialization.
 
-  _lldp_rem_tbl_cb($session)
+ _lldp_rem_tbl_cb($session)
+
     The callback for _fetch_lldp_rem_tbl_cb().
 
 SEE ALSO
+
     Net::SNMP::Mixin::Dot1dBase
 
 REQUIREMENTS
+
     Net::SNMP, Net::SNMP::Mixin
 
 BUGS, PATCHES & FIXES
+
     There are no known bugs at the time of this release. However, if you
     spot a bug or are experiencing difficulties that are not explained
     within the POD documentation, please submit a bug to the RT system (see
     link below). However, it would help greatly if you are able to pinpoint
     problems or even supply a patch.
 
-    Fixes are dependant upon their severity and my availablity. Should a fix
-    not be forthcoming, please feel free to (politely) remind me by sending
-    an email to gaissmai@cpan.org .
+    Fixes are dependant upon their severity and my availablity. Should a
+    fix not be forthcoming, please feel free to (politely) remind me by
+    sending an email to gaissmai@cpan.org .
 
       RT: http://rt.cpan.org/Public/Dist/Display.html?Name=Net-SNMP-Mixin-Dot1abLldp
 
 AUTHOR
+
     Karl Gaissmaier <karl.gaissmaier at uni-ulm.de>
 
 COPYRIGHT & LICENSE
-    Copyright 2008-2018 Karl Gaissmaier, all rights reserved.
+
+    Copyright 2008-2021 Karl Gaissmaier, all rights reserved.
 
     This program is free software; you can redistribute it and/or modify it
     under the same terms as Perl itself.

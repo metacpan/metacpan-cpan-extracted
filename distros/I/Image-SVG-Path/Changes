@@ -1,5 +1,9 @@
 Revision history for perl module Image::SVG::Path
 
+0.35 2021-04-26
+
+* Improved parsing of flags in arc elements
+
 0.34 2020-11-24
 
 * Reset drawing after every move so that paths with multiple sub-paths

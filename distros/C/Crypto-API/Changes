@@ -3,3 +3,13 @@
 
 2021-04-19 - v0.02
     + Update the tests backward compatible
+
+
+2021-04-21 - v0.03
+    + dev can set default value for request
+
+    + dev can define an argument is required
+
+    + dev can test the request object in the test their test suit
+
+    + in response, the defined _others fields will be added to the result under $row->{_others} in order to have a clear cut, which is mapped and which is undefined.

@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use 5.010;
+use 5.012;
 
 package MY::orderedhash;
 require Tie::Hash;
@@ -453,13 +453,7 @@ sub setup_environment
 	$DISTNAME = "Prima-$ver1.$ver2-$flavor-$REVISION.$PATCHLEVEL.$SUBVERSION";
 	printlog "Build: $DISTNAME\n";
 
-	if ( $cygwin and $] > 5.010 ) {
-		# 5.10 was shipped with a hack in ExtUtils/Liblist/Kid.pm where having auto/Prima.dll was ok
-		# 5.14 is not patched that way, do it ourselves
-		$cygwin_fake_Slib = 'SlibPrima' . ( $Config{lib_ext} || '.a' );
-	} else {
-		$cygwin_fake_Slib = '';
-	}
+	$cygwin_fake_Slib = 'SlibPrima' . ( $Config{lib_ext} || '.a' );
 	$PKGCONFIG = 'pkg-config';
 }
 
@@ -893,6 +887,26 @@ EOF
 	$DEFINES{__INLINE__} = '';
 }
 
+sub find_glibc
+{
+	printlog "Checking for glibc... ";
+	my $rc = compile_and_run( <<'GLIBC');
+#include <stdio.h>
+int
+main()
+{
+#ifdef __GLIBC__
+	printf("1\n");
+#else
+	printf("0\n");
+#endif
+	return 0;
+}
+GLIBC
+	printlog ($rc ? "yes\n" : "no\n");
+	$DEFINES{HAS_GLIBC} = 1 if $rc;
+}
+
 sub setup_compiler
 {
 	printlog "Compiler: $compiler_type\n";
@@ -1048,6 +1062,7 @@ sub setup_defines
 		have_type( "BOOLEAN", "windows.h");
 	}
 	find_inline();
+	find_glibc;
 }
 
 sub setup_dl_loadflags
@@ -1777,7 +1792,7 @@ sub setup_codecs
 	my @codecs;
 	my @builtin_codecs;
 	while ( <img/codec_*.c>) {
-		if ( m/codec_(bmp)/) {
+		if ( m/codec_(bmp|X11)/) {
 			push @builtin_codecs, $1;
 		} else {
 			push @codecs, $_;
@@ -1787,7 +1802,7 @@ sub setup_codecs
 	my @codec_libpath = $Config{installsitearch};
 	my @warn_codecs;
 	my $webp_version;
-	for my $cx ( @codecs) {
+	CODEC: for my $cx ( @codecs) {
 		my @inc;
 		my $foundlib;
 		$cx =~ m/codec_(.*)\.c$/i;
@@ -1797,10 +1812,7 @@ sub setup_codecs
 		# graphic libs have .pc files. But if it can, it helps greatly with dll hell.
 		if ( $use_pkgconfig ) {
 			my $found;
-			if ( $codec eq 'X11') {
-				$DEFINES{EMULATE_X11_CODEC} = 1 unless pkgconfig('x11');
-				$found = 1;
-			} elsif ( $codec eq 'webp') {
+			if ( $codec eq 'webp') {
 				if (pkgconfig('libwebp') && pkgconfig('libwebpdemux') && pkgconfig('libwebpmux')) {
 					$found = 1;
 					$webp_version = $1 * 0x10000 + $2 * 0x100 + $3
@@ -1851,14 +1863,20 @@ sub setup_codecs
 
 			printlog "yes";
 			if ($codec eq 'webp') {
+				my @addlib;
 				for my $lib2 ('webpdemux', 'webmux') {
 					if ( defined find_lib($lib2,join('', @inc), '', @codec_libpath)) {
-						unshift( @LIBS, $lib2) unless $libs{$lib2};
+						push @addlib, $lib2 unless $libs{$lib2};
 					} else {
 						printlog ", but $lib2 not found, skipping\n";
-						next;
+						@addlib = ();
+						pop @ACTIVE_CODECS;
+						$PASSIVE_CODECS{$fn} = 1;
+						pop @LIBPATH if defined $foundlib and length $foundlib;
+						next CODEC;
 					}
 				}
+				unshift( @LIBS, @addlib );
 			}
 			# In gcc, order of libs matters. libXpm requires libgdi32, and
 			# has to be mentioned _after_ it to work.
@@ -2311,11 +2329,9 @@ sub command_bindist
 	}
 	if ($^O eq 'cygwin') {
 		system "strip $DISTNAME/auto/Prima/Prima.$Config{dlext}" ; # it's 27 MB!
-		if ( $] > 5.010 ) {
-			$cygwin_fake_Slib = 'SlibPrima' . ( $Config{lib_ext} || '.a' );
-			open F, '>', "$DISTNAME/auto/Prima/$cygwin_fake_Slib";
-			close F;
-		}
+		$cygwin_fake_Slib = 'SlibPrima' . ( $Config{lib_ext} || '.a' );
+		open F, '>', "$DISTNAME/auto/Prima/$cygwin_fake_Slib";
+		close F;
 	}
 
 	my $zipname = "$DISTNAME.zip";
@@ -2579,6 +2595,6 @@ WriteMakefile(
 	},
         test => {TESTS => 't/*/*.t'},
 	clean             => { FILES => "@target_clean" },
-	MIN_PERL_VERSION  => 5.010,
+	MIN_PERL_VERSION  => 5.012,
 );
 

@@ -620,8 +620,7 @@ sub predicate_cb1
 
 # Test an incorrect spec
 {
-    eval { my $pred = HTML::Widgets::NavMenu::Predicate->new(
-            'spec' => [], ); };
+    eval { my $pred = HTML::Widgets::NavMenu::Predicate->new( 'spec' => [], ); };
 
     # TEST
     like( $@, qr{^Unknown spec type}, "Exception should be thrown." );

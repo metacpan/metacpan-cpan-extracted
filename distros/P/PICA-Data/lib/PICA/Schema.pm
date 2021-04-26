@@ -1,7 +1,7 @@
 package PICA::Schema;
 use v5.14.1;
 
-our $VERSION = '1.16';
+our $VERSION = '1.17';
 
 use Exporter 'import';
 our @EXPORT_OK = qw(field_identifier check_value clean_pica);
@@ -90,6 +90,9 @@ sub check_field {
         }
     }
 
+    my $failed = check_annotation($field, %opts);
+    return PICA::Error->new($failed) if $failed;
+
     if ($opts{ignore_subfields}) {
         return ();
     }
@@ -99,6 +102,7 @@ sub check_field {
         my $order;
         my %sfcounter;
         my (undef, undef, @subfields) = @$field;
+        pop @subfields if @subfields % 2;
 
         while (@subfields) {
             my ($code, $value) = splice @subfields, 0, 2;
@@ -145,6 +149,23 @@ sub check_field {
     }
 
     return %errors ? PICA::Error->new($field, subfields => \%errors) : ();
+}
+
+sub check_annotation {
+    my ($field, %options) = @_;
+
+    my (undef, undef, @subfields) = @$field;
+
+    if (@subfields % 2) {
+        return "Field annotation not allowed"
+            if defined $options{annotated} && !$options{annotation};
+
+        return "Annotation must not be non-alphanumeric character"
+            if pop(@subfields) !~ /^[^A-Za-z0-9]\z/;
+    }
+    elsif ($options{annotated}) {
+        return "Missing field annotation";
+    }
 }
 
 sub check_value {
@@ -275,16 +296,19 @@ sub clean_pica {
             }
         }
 
-        continue if $options{ignore_subfields};
+        my $msg = check_annotation($field, %options);
+        $error->($msg, $field) if $msg;
 
+        next if $options{ignore_subfields};
+
+        pop @sf if @sf % 2;
         while (@sf) {
-            my $code  = shift @sf;
-            my $value = shift @sf;
+            my ($code, $value) = splice @sf, 0, 2;
 
             $error->("Malformed PICA subfield: $code", $field)
                 if $code !~ /^[_A-Za-z0-9]$/;
             $error->("PICA subfield \$$code must be non-empty string", $field)
-                if $value !~ /^./;
+                if $value !~ /^./ && !$options{allow_empty_subfields};
         }
     }
 
@@ -367,6 +391,10 @@ Don't report deprecated codes.
 
 Don't report deprecated fields, subfields, and codes.
 
+=item allow_empty_subfields
+
+Don't report subfields with empty string values.
+
 =item ignore_subfield_order
 
 Don't report errors resulting on wrong subfield order.
@@ -374,6 +402,11 @@ Don't report errors resulting on wrong subfield order.
 =item ignore_subfields
 
 Don't check subfields at all.
+
+=item annotated
+
+Require or forbid annotated fields if set to true or false.
+Otherwise just check whether given annotation is a valid character.
 
 =back
 

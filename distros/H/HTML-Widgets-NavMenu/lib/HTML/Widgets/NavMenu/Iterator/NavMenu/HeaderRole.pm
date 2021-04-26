@@ -1,5 +1,5 @@
 package HTML::Widgets::NavMenu::Iterator::NavMenu::HeaderRole;
-$HTML::Widgets::NavMenu::Iterator::NavMenu::HeaderRole::VERSION = '1.0801';
+$HTML::Widgets::NavMenu::Iterator::NavMenu::HeaderRole::VERSION = '1.0900';
 use strict;
 use warnings;
 
@@ -9,7 +9,7 @@ __PACKAGE__->mk_acc_ref(
     [
         qw(
             _was_role
-            )
+        )
     ]
 );
 
@@ -78,7 +78,7 @@ for the HeaderRole sub-class.
 
 =head1 VERSION
 
-version 1.0801
+version 1.0900
 
 =head1 OVER-RIDED METHODS
 

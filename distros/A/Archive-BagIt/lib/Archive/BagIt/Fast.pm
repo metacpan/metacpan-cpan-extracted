@@ -7,7 +7,7 @@ use Time::HiRes qw(time);
 use Moo;
 extends "Archive::BagIt";
 
-our $VERSION = '0.072'; # VERSION
+our $VERSION = '0.073'; # VERSION
 
 
 has 'digest_callback' => (
@@ -29,11 +29,19 @@ has 'digest_callback' => (
             my $data;
             if ($filesize < $MMAP_MIN ) {
                 sysread $fh, $data, $filesize;
-                $digest = $digestobj->_digest->add($data)->hexdigest;
+                Net::SSLeay::EVP_DigestUpdate($digestobj->_digest, $data);
+                my $result = Net::SSLeay::EVP_DigestFinal($digestobj->_digest);
+                Net::SSLeay::EVP_MD_CTX_destroy($digestobj->_digest);
+                delete $digestobj->{_digest};
+                $digest = unpack('H*', $result);
             }
             elsif ( $filesize < 1500000000) {
                 IO::AIO::mmap $data, $filesize, IO::AIO::PROT_READ, IO::AIO::MAP_SHARED, $fh or croak "mmap: $!";
-                $digest = $digestobj->_digest->add($data)->hexdigest;
+                Net::SSLeay::EVP_DigestUpdate($digestobj->_digest, $data);
+                my $result = Net::SSLeay::EVP_DigestFinal($digestobj->_digest);
+                Net::SSLeay::EVP_MD_CTX_destroy($digestobj->_digest);
+                delete $digestobj->{_digest};
+                $digest = unpack('H*', $result);
             }
             else {
                 $digest = $digestobj->get_hash_string($fh);
@@ -62,7 +70,7 @@ Archive::BagIt::Fast
 
 =head1 VERSION
 
-version 0.072
+version 0.073
 
 =head1 NAME
 

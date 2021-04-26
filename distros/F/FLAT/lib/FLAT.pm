@@ -6,17 +6,88 @@ use FLAT::Regex;
 use FLAT::DFA;
 use Carp;
 
-use vars '$VERSION';
-$VERSION = 0.9;
+our $VERSION = q{1.0.3};
 
 =head1 NAME
 
 FLAT - Formal Language & Automata Toolkit
 
+=head2 Name Change Possibility
+
+Future releases of this module may very well reflect a name change
+that is considered to me more I<normal> for Perl modules. When this was
+originally written (2006), the original author was not very well versed
+in the idiomatic aspects of C<PERL>.
+
 =head1 SYNOPSIS
 
 FLAT.pm is the base class of all regular language objects. For more
 information, see other POD pages.
+
+=head1 DESCRIPTION
+
+This module provides an interface for manipulating the formal language
+concept of Regular Expressions, which are used to describe Regular
+Languages, and their equivalent forms of Automata.
+
+It's notable that this module supports, in addition to the traditional
+Regular Expression operators, the C<shuffle> operator (see [1]). This
+is expressed as an ampersand, C<&>. In addition to this, logical symbols
+may be multiple characters. This leads to some interesting applications.
+
+While the module can do a lot, i.e.:
+
+=over 4
+
+=item * parse a regular expression (RE) (of the formal regular language
+variety)
+
+=item * convert a RE to a NFA (and similarly, a I<shuffle> of two regular
+languages to a I<parallel> NFA (PFA))
+
+=item * convert a PFA to a NFA (note, PFAs are equivalent to PetriNets
+(see [2], L<Graph::PetriNet>)
+
+=item * convert a NFA to a DFA
+
+=item * convert a DFA to a minimal DFA
+
+=item * generate strings that may be accepted by a DFA
+
+=back
+
+It is still missing some capabilities that one would expect:
+
+=over 4
+
+=item * generate equivalent REs from a NFA or DFA
+
+=item * provide targeted conversion of PFAs, NFAs, DFAs to their more
+explicit state forms; this is particularly interested to have in the case
+of the PFA.
+
+=item * provide targeted serialization of PREs (REs with a shuffle)
+using direct, explicit manuplation of the AST produced by the parser
+
+=item * provide other interesting graph-based manipulations that might
+prove useful, particular when applied to a graph that represents some
+form of a finite automata (FA)
+
+=back
+
+In addition to the above deficiencies, application of this toolkit in
+interesting areas would naturally generate ideas for new and interesting
+capabilities.
+
+=head2 Sequential Consistency and PREs
+
+Valid strings accepted by the shuffle of one or more regular languages is
+necessarily I<sequentially consistent>. This results from the conversions
+to a DFA that may be traversed inorder to discover valid string paths
+necessarily obeys the total ordering constraints of each constituent
+language of the two being shuffled; and the partial ordering that results
+among valid string accepted by both (see [2] for more on how PetriNets
+fit in).
 
 =head1 USAGE
 
@@ -123,17 +194,17 @@ see the POD pages for a specific representation.
 
 Returns a regular language object that is the union, intersection,
 concatenation, or symmetric difference of $lang1 ... $langN, respectively.
-The return value will have the same representation (regex, NFA, or DFA) 
+The return value will have the same representation (regex, NFA, or DFA)
 as $lang1.
 
 =item $lang1-E<gt>difference($lang2)
 
-Returns a regular language object that is the set difference of $lang1 and
-$lang2. Equivalent to
+Returns a regular language object that is the set difference of $lang1
+and $lang2. Equivalent to
 
   $lang1->intersect($lang2->complement)
 
-The return value will have the same representation (regex, NFA, or DFA) 
+The return value will have the same representation (regex, NFA, or DFA)
 as $lang1.
 
 =item $lang-E<gt>kleene
@@ -179,8 +250,7 @@ representations of the same language.
 
 =item $lang1-E<gt>is_subset_of($lang2)
 
-Returns a boolean value indicating whether $lang1 is a subset of
-$lang2.
+Returns a boolean value indicating whether $lang1 is a subset of $lang2.
 
 =item $lang-E<gt>contains($string)
 
@@ -191,17 +261,22 @@ represented by $lang.
 
 =head1 AUTHORS & ACKNOWLEDGEMENTS
 
-FLAT is written by Mike Rosulek E<lt>mike at mikero dot comE<gt> and Brett 
-Estrade E<lt>estradb at gmail dot comE<gt>.
-
-The initial version (FLAT::Legacy) by Brett Estrade was work towards an MS 
-thesis at the University of Southern Mississippi.
+FLAT is written by Mike Rosulek E<lt>mike at mikero dot comE<gt> and B.
+Estarde E<lt>estradb at gmail dot comE<gt>.
 
 =head1 LICENSE
 
-This module is free software; you can redistribute it and/or modify it under
-the same terms as Perl itself.
+This module is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
 
-=head1 MORE INFO
+=head1 REFERENCES
 
-Please visit the Wiki at http://www.0x743.com/flat
+=over 4
+
+=item 1. Introduction to Automata Theory, Languages, and Computation;
+John E. Hopcroft, Rajeev Motwani, Jeffrey D. Ullman
+
+=item 2.Parallel Finite Automata for Modeling Concurrent Software
+Systems (1994); P. David Stotts , William Pugh
+
+=back

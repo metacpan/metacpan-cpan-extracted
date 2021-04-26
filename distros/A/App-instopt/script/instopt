@@ -1,7 +1,7 @@
 #!perl
 
-our $DATE = '2021-04-03'; # DATE
-our $VERSION = '0.017'; # VERSION
+our $DATE = '2021-04-24'; # DATE
+our $VERSION = '0.019'; # VERSION
 
 use 5.010;
 use strict;
@@ -63,7 +63,7 @@ instopt - Download and install software
 
 =head1 VERSION
 
-This document describes version 0.017 of instopt (from Perl distribution App-instopt), released on 2021-04-03.
+This document describes version 0.019 of instopt (from Perl distribution App-instopt), released on 2021-04-24.
 
 =head1 SYNOPSIS
 
@@ -743,6 +743,10 @@ List of available configuration parameters:
 Specify additional command-line options.
 
 =head1 FILES
+
+F<instopt.version> - This file is written in the hardlinked installed software
+directory to mark which version the software is. Unlike with symlinking, when
+hardlinking there is no straightforward way to know the version.
 
 F<~/.config/instopt.conf>
 

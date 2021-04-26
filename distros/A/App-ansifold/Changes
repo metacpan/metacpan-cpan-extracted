@@ -1,5 +1,10 @@
 Revision history for `ansifold' command.
 
+1.0801 2021-04-26T08:13:50Z
+
+    - Remove uninitialized variable error.
+    - Add test code.
+
 1.08 2021-04-07T14:18:48Z
 
     - Option --expand, -x takes optional tabstop width.

@@ -27,7 +27,7 @@ resources:
   bugtracker: https://github.com/perlancar/perl-Pod-Weaver-Plugin-Acme-CPANModules/issues
   homepage: https://metacpan.org/release/Pod-Weaver-Plugin-Acme-CPANModules
   repository: git://github.com/perlancar/perl-Pod-Weaver-Plugin-Acme-CPANModules.git
-version: '0.006'
+version: '0.007'
 x_Dist_Zilla:
   perl:
     version: '5.030000'

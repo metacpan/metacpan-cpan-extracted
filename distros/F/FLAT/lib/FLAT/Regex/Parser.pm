@@ -7,8 +7,7 @@ use strict;
 use Parse::RecDescent;
 use FLAT::Regex::Op;
 
-use vars '$CHAR';
-$CHAR = qr{ [A-Za-z0-9_\$\#] | \[[^\]]*\] }x;
+our $CHAR = qr{ [A-Za-z0-9_\$\#\%\@\;\:\-\^] | \[[^\]]*\] }x;
 
 sub new {
     my $pkg = shift;

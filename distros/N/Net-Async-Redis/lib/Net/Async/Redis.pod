@@ -21,12 +21,9 @@ Net::Async::Redis - talk to Redis servers via L<IO::Async>
     use IO::Async::Loop;
     my $loop = IO::Async::Loop->new;
     $loop->add(my $redis = Net::Async::Redis->new);
-    (async sub {
-     await $redis->connect;
-     my $value = await $redis->get('some_key');
-     $value ||= await $redis->set(some_key => 'some_value');
-     print "Value: $value";
-    })->()->get;
+    my $value = await $redis->get('some_key');
+    $value ||= await $redis->set(some_key => 'some_value');
+    print "Value: $value\n";
 
     # You can also use ->then chaining, see L<Future> for more details
     $redis->connect->then(sub {
@@ -38,12 +35,6 @@ Net::Async::Redis - talk to Redis servers via L<IO::Async>
     })->on_done(sub {
         print "Value: " . shift;
     })->get;
-
-    # ... or with Future::AsyncAwait (recommended)
-    await $redis->connect;
-    my $value = await $redis->get('some_key');
-    $value ||= await $redis->set(some_key => 'some_value');
-    print "Value: $value";
 
 =head1 DESCRIPTION
 
@@ -66,7 +57,7 @@ Current features include:
 
 =over 4
 
-=item * L<all commands|https://redis.io/commands> as of 6.2 (February 2021), see L<https://redis.io/commands> for the methods and parameters
+=item * L<all commands|https://redis.io/commands> as of 6.2 (April 2021), see L<https://redis.io/commands> for the methods and parameters
 
 =item * L<pub/sub support|https://redis.io/topics/pubsub>, see L</METHODS - Subscriptions>
 
@@ -94,25 +85,22 @@ add this to an L<IO::Async::Loop>:
 
 then connect to the server:
 
-    $redis->connect
-        ->then(sub {
-            # You could achieve a similar result by passing client_name in
-            # constructor or ->connect parameters
-            $redis->client_setname("example client")
-        })->get;
+    use Future::AsyncAwait;
+    await $redis->connect;
+    # You could achieve a similar result by passing client_name in
+    # constructor or ->connect parameters
+    await $redis->client_setname("example client");
 
 =head2 Key-value handling
 
 One of the most common Redis scenarios is as a key/value store. The L</get> and L</set>
 methods are typically used here:
 
- $redis->set(some_key => 'some value')
-  ->then(sub {
-   $redis->get('some_key')
-  })->on_done(sub {
-   my ($value) = @_;
-   print "Read back value [$value]\n";
-  })->retain;
+    use Future::AsyncAwait;
+    await $redis->connect;
+    $redis->set(some_key => 'some value');
+    my ($value) = await $redis->get('some_key');
+    print "Read back value [$value]\n";
 
 See the next section for more information on what these methods are actually returning.
 
@@ -377,6 +365,13 @@ L<Net::Async::Redis::Commands/get> requests.
 
 See L<https://redis.io/topics/client-side-caching> for more details on this feature.
 
+=head2 clientside_cache_events
+
+A L<Ryu::Source> which emits key names as they are invalidated.
+
+With client-side caching enabled, can be used to monitor which keys
+are changing.
+
 =head2 client_side_cache_ready
 
 Returns a L<Future> representing the client-side cache connection status,
@@ -482,6 +477,11 @@ Factory method for creating new L<Future> instances.
 Returns the L<Net::Async::Redis::Protocol> instance used for
 encoding and decoding messages.
 
+=head2 enable_clientside_cache
+
+Used internally to prepare for client-side caching: subscribes to the
+invalidation events.
+
 =head2 _init
 
 =head2 _add_to_loop
@@ -544,6 +544,8 @@ tests and feedback:
 =item * C<@eyadof>
 
 =item * Nael Alolwani
+
+=item * Marc Frank
 
 =back
 

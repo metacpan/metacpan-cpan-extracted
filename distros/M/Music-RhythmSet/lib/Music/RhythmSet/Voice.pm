@@ -4,7 +4,7 @@
 # ttl times
 
 package Music::RhythmSet::Voice;
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 use 5.24.0;
 use warnings;

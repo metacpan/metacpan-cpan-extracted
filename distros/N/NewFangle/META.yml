@@ -7,14 +7,14 @@ build_requires:
   Test2::Tools::JSON::Pointer: '0'
   Test2::V0: '0.000060'
   YAML: '0'
-  perl: '5.020'
+  perl: '5.014'
 configure_requires:
   ExtUtils::MakeMaker: '0'
   FFI::CheckLib: '0.27'
   FFI::Platypus::Type::PtrObject: '0.02'
-  perl: '5.020'
+  perl: '5.014'
 dynamic_config: 1
-generated_by: 'Dist::Zilla version 6.015, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.017, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -30,14 +30,14 @@ requires:
   FFI::Platypus::Memory: '0'
   JSON::MaybeXS: '0'
   Ref::Util: '0'
-  perl: '5.020'
+  perl: '5.014'
 resources:
   IRC: irc://irc.perl.org/#native
-  bugtracker: https://github.com/plicease/NewFangle/issues
+  bugtracker: https://github.com/uperl/NewFangle/issues
   homepage: https://metacpan.org/pod/NewFangle
-  repository: git://github.com/plicease/NewFangle.git
-version: '0.04'
-x_generated_by_perl: v5.33.3
+  repository: git://github.com/uperl/NewFangle.git
+version: '0.05'
+x_generated_by_perl: v5.33.9
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'
 x_use_unsafe_inc: 0

@@ -1,14 +1,16 @@
 package Pod::Weaver::Plugin::Acme::CPANModules;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-12-27'; # DATE
+our $DATE = '2021-02-18'; # DATE
 our $DIST = 'Pod-Weaver-Plugin-Acme-CPANModules'; # DIST
-our $VERSION = '0.006'; # VERSION
+our $VERSION = '0.007'; # VERSION
 
 use 5.010001;
 use Moose;
 with 'Pod::Weaver::Role::AddTextToSection';
 with 'Pod::Weaver::Role::Section';
+
+has entry_description_code => (is=>'rw');
 
 use Pod::From::Acme::CPANModules qw(gen_pod_from_acme_cpanmodules);
 
@@ -45,6 +47,7 @@ sub _process_module {
     my $res = gen_pod_from_acme_cpanmodules(
         module => $package,
         _raw=>1,
+        ($self->entry_description_code ? (entry_description_code => $self->entry_description_code) : ()),
     );
 
     for my $section (sort keys %{$res->{pod}}) {
@@ -150,13 +153,14 @@ Pod::Weaver::Plugin::Acme::CPANModules - Plugin to use when building Acme::CPANM
 
 =head1 VERSION
 
-This document describes version 0.006 of Pod::Weaver::Plugin::Acme::CPANModules (from Perl distribution Pod-Weaver-Plugin-Acme-CPANModules), released on 2020-12-27.
+This document describes version 0.007 of Pod::Weaver::Plugin::Acme::CPANModules (from Perl distribution Pod-Weaver-Plugin-Acme-CPANModules), released on 2021-02-18.
 
 =head1 SYNOPSIS
 
 In your F<weaver.ini>:
 
  [-Acme::CPANModules]
+ ;entry_description_code = "Website URL: <" . $_->{website_url} . ">\n\n";
 
 =head1 DESCRIPTION
 
@@ -175,6 +179,14 @@ tool), etc.
 =back
 
 =for Pod::Coverage weave_section
+
+=head1 CONFIGURATION
+
+=head2 entry_description_code
+
+Optional. Perl code to produce the description POD. If not specified, will use
+default template for the description POD, i.e. entry's C<description> property,
+plus C<rating>, C<alternative_modules> if available.
 
 =head1 HOMEPAGE
 
@@ -204,7 +216,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020, 2019, 2018 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2020, 2019, 2018 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

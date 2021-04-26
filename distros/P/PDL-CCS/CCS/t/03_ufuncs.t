@@ -18,6 +18,7 @@ use PDL::CCS::Nd;
 
 use version;
 my $HAVE_PDL_2_014 = version->parse($PDL::VERSION) >= version->parse("2.014");
+my $HAVE_PDL_2_039 = version->parse($PDL::VERSION) >= version->parse("2.039");
 
 ##--------------------------------------------------------------
 ## ufunc test
@@ -51,7 +52,7 @@ sub test_ufunc {
 
   if ($ufunc_name =~ /_ind$/) {
     ##-- hack: adjust $dense_rc for maximum_ind, minimum_ind
-    $dense_rc->where( $a->index2d($dense_rc,sequence($a->dim(1))) == $missing ) .= -1;
+    $dense_rc->where( $a->index2d($dense_rc,sequence($a->dim(1))) == $missing_val ) .= -1;
   } elsif ($ufunc_name =~ /qsorti$/) {
     ##-- hack: adjust $dense_rc for qsorti()
     my $ccs_mask = $dense_rc->zeroes;
@@ -63,6 +64,14 @@ sub test_ufunc {
   ##-- check output type
  SKIP: {
     skip("${label}:type - only for PDL >= v2.014",1) if (!$HAVE_PDL_2_014);
+
+    # bandover,borover type-checks fail again as of PDL v2.039
+    #  + see http://www.cpantesters.org/cpan/report/9ea0e2bc-a3e5-11eb-8917-5f9a624ac675
+    #    # Failed test 'bandover:missing=0:type'
+    #    # at /local/home/moocow/work/diss/perl/public/PDL-CCS/t/common.plt line 11.
+    #    #       got: 'indx'
+    #    #  expected: 'longlong'
+    skip("${label}:type - not b*over in PDL >= v2.039 ",1) if ($HAVE_PDL_2_039 && $ufunc_name =~ /^b(?:and|or)over$/);
     isok("${label}:type", $ccs_rc->type, $dense_rc->type);
   }
 

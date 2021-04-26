@@ -1,0 +1,200 @@
+<opt>
+  <id>123</id>
+  <holdingsRecords2>
+    <id>697448a8-a428-11ea-b7fc-94e55e224816</id>
+    <acquisitionFormat></acquisitionFormat>
+    <acquisitionMethod></acquisitionMethod>
+    <bareHoldingsItems>
+      <id>69746298-a428-11ea-b7fc-94e55e224816</id>
+      <accessionNumber></accessionNumber>
+      <barcode>01234567890</barcode>
+      <chronology>29</chronology>
+      <copyNumber>1</copyNumber>
+      <descriptionOfPieces></descriptionOfPieces>
+      <discoverySuppress></discoverySuppress>
+      <effectiveCallNumberComponents>
+        <callNumber>HD1131.S860 1989</callNumber>
+        <prefix>123</prefix>
+        <suffix>abc</suffix>
+        <typeId>95467209-6d7b-468b-94df-0f5d7ad2747d</typeId>
+      </effectiveCallNumberComponents>
+      <electronicAccess>
+        <linkText></linkText>
+        <materialsSpecification></materialsSpecification>
+        <publicNote>Access E-Book</publicNote>
+        <relationshipId>f5d0068e-6272-458e-8a81-b85e7b9a14aa</relationshipId>
+        <uri>https://ezproxy.simmons.edu/login?url=http://www.jstor.org/stable/10.2307/j.ctt24hc08</uri>
+      </electronicAccess>
+      <enumeration>42</enumeration>
+      <hrid>item12345</hrid>
+      <inTransitDestinationServicePointId></inTransitDestinationServicePointId>
+      <itemDamagedStatusDate></itemDamagedStatusDate>
+      <itemDamagedStatusId></itemDamagedStatusId>
+      <itemIdentifier></itemIdentifier>
+      <itemLevelCallNumber>G1046.C3 .L56 2009eb</itemLevelCallNumber>
+      <itemLevelCallNumberPrefix></itemLevelCallNumberPrefix>
+      <itemLevelCallNumberSuffix></itemLevelCallNumberSuffix>
+      <itemLevelCallNumberTypeId>95467209-6d7b-468b-94df-0f5d7ad2747d</itemLevelCallNumberTypeId>
+      <metadata></metadata>
+      <missingPieces></missingPieces>
+      <missingPiecesDate></missingPiecesDate>
+      <numberOfMissingPieces></numberOfMissingPieces>
+      <numberOfPieces></numberOfPieces>
+      <permanentLocationId></permanentLocationId>
+      <status>
+        <name>Missing</name>
+      </status>
+      <temporaryLoanTypeId></temporaryLoanTypeId>
+      <temporaryLocation>
+        <name>Online Library Resources</name>
+        <campus>
+          <name>Main Campus</name>
+          <code>SIMC</code>
+          <id>ad802880-d3c1-47ea-84d9-5f6574ec72a2</id>
+          <institutionId>abc7866d-e53f-4da1-bcc0-84535a9a832e</institutionId>
+        </campus>
+        <campusId>ad802880-d3c1-47ea-84d9-5f6574ec72a2</campusId>
+        <code>elere</code>
+        <description></description>
+        <discoveryDisplayName>Online Library Resources</discoveryDisplayName>
+        <id>b681f0f3-c5d3-434f-8c15-db3d8b074c43</id>
+        <institution>
+          <name>Simmons University</name>
+          <code>SIM</code>
+          <id>abc7866d-e53f-4da1-bcc0-84535a9a832e</id>
+        </institution>
+        <institutionId>abc7866d-e53f-4da1-bcc0-84535a9a832e</institutionId>
+        <isActive>1</isActive>
+        <library>
+          <name>Simmons &amp; Wentworth Library</name>
+          <code>SIM</code>
+          <id>2805564c-b9e2-45ba-9c6f-670b11b808e2</id>
+        </library>
+        <libraryId>2805564c-b9e2-45ba-9c6f-670b11b808e2</libraryId>
+        <metadata>
+          <createdByUserId>7a16958e-af23-5002-8191-d7a96f5f8070</createdByUserId>
+          <createdByUsername></createdByUsername>
+          <createdDate>2020-06-01T16:29:19.798+0000</createdDate>
+          <updatedByUserId>7a16958e-af23-5002-8191-d7a96f5f8070</updatedByUserId>
+          <updatedByUsername></updatedByUsername>
+          <updatedDate>2020-06-01T16:29:19.798+0000</updatedDate>
+        </metadata>
+        <primaryServicePoint>7c5abc9f-f3d7-4856-b8d7-6712462ca007</primaryServicePoint>
+        <primaryServicePointObject>
+          <name>Online</name>
+          <code>Online</code>
+          <description></description>
+          <discoveryDisplayName>Online</discoveryDisplayName>
+          <id>7c5abc9f-f3d7-4856-b8d7-6712462ca007</id>
+          <pickupLocation>0</pickupLocation>
+          <shelvingLagTime>0</shelvingLagTime>
+        </primaryServicePointObject>
+        <servicePointIds>7c5abc9f-f3d7-4856-b8d7-6712462ca007</servicePointIds>
+        <servicePoints>
+          <name>Online</name>
+          <code>Online</code>
+          <description></description>
+          <discoveryDisplayName>Online</discoveryDisplayName>
+          <id>7c5abc9f-f3d7-4856-b8d7-6712462ca007</id>
+          <pickupLocation>0</pickupLocation>
+          <shelvingLagTime>0</shelvingLagTime>
+        </servicePoints>
+      </temporaryLocation>
+      <temporaryLocationId>b681f0f3-c5d3-434f-8c15-db3d8b074c43</temporaryLocationId>
+      <volume>1</volume>
+      <yearCaption>a</yearCaption>
+      <yearCaption>b</yearCaption>
+    </bareHoldingsItems>
+    <callNumber>G1046.C3 .L56 2009eb</callNumber>
+    <callNumberPrefix></callNumberPrefix>
+    <callNumberSuffix></callNumberSuffix>
+    <callNumberTypeId>95467209-6d7b-468b-94df-0f5d7ad2747d</callNumberTypeId>
+    <copyNumber>3</copyNumber>
+    <digitizationPolicy></digitizationPolicy>
+    <discoverySuppress></discoverySuppress>
+    <electronicAccess>
+      <linkText></linkText>
+      <materialsSpecification></materialsSpecification>
+      <publicNote>Access E-Book</publicNote>
+      <relationshipId>f5d0068e-6272-458e-8a81-b85e7b9a14aa</relationshipId>
+      <uri>https://ezproxy.simmons.edu/login?url=http://www.jstor.org/stable/10.2307/j.ctt24hc08</uri>
+    </electronicAccess>
+    <holdingsTypeId></holdingsTypeId>
+    <hrid>b2245518-elere</hrid>
+    <illPolicyId></illPolicyId>
+    <instanceId>2ff48cb6-a41c-11ea-8d99-9ee25e224816</instanceId>
+    <metadata></metadata>
+    <notes>
+      <holdingsNoteType>
+        <name>Public</name>
+        <id>8d0a5eca-25de-4391-81a9-236eeefdd20b</id>
+        <source>folio</source>
+      </holdingsNoteType>
+      <holdingsNoteTypeId>8d0a5eca-25de-4391-81a9-236eeefdd20b</holdingsNoteTypeId>
+      <note>All Cretans are liars</note>
+      <staffOnly>0</staffOnly>
+    </notes>
+    <numberOfItems></numberOfItems>
+    <permanentLocation>
+      <name>UC/HP/ASR/SciASR</name>
+      <campus>
+        <name>Hyde Park (HP)</name>
+        <code>HP</code>
+        <id>73ba8e58-e4d8-55d8-8689-8f2e783d826a</id>
+        <institutionId>b89ebc30-fcd0-57c0-abcf-f460dc0697cf</institutionId>
+      </campus>
+      <campusId>73ba8e58-e4d8-55d8-8689-8f2e783d826a</campusId>
+      <code>UC/HP/ASR/SciASR</code>
+      <description>Mansueto</description>
+      <discoveryDisplayName>Mansueto</discoveryDisplayName>
+      <id>ca3135b3-8e56-55c4-aff7-5e75454df8da</id>
+      <institution>
+        <name>University of Chicago (UC)</name>
+        <code>UC</code>
+        <id>b89ebc30-fcd0-57c0-abcf-f460dc0697cf</id>
+      </institution>
+      <institutionId>b89ebc30-fcd0-57c0-abcf-f460dc0697cf</institutionId>
+      <isActive>1</isActive>
+      <library>
+        <name>Mansueto Library (ASR)</name>
+        <code>ASR</code>
+        <id>027e7793-3696-5341-b122-5dcfc81d5bc2</id>
+      </library>
+      <libraryId>027e7793-3696-5341-b122-5dcfc81d5bc2</libraryId>
+      <metadata>
+        <createdByUserId>20d7e268-242c-554b-805d-7e8a9b83920d</createdByUserId>
+        <createdByUsername></createdByUsername>
+        <createdDate>2021-03-19T18:45:29.892+00:00</createdDate>
+        <updatedByUserId>20d7e268-242c-554b-805d-7e8a9b83920d</updatedByUserId>
+        <updatedByUsername></updatedByUsername>
+        <updatedDate>2021-03-19T18:45:29.892+00:00</updatedDate>
+      </metadata>
+      <primaryServicePoint>130d8bff-bdbd-4dc5-a4ac-6d970f4918ff</primaryServicePoint>
+      <primaryServicePointObject>
+        <name>Mansueto Library</name>
+        <code>MANSUETO</code>
+        <description></description>
+        <discoveryDisplayName>Mansueto Library</discoveryDisplayName>
+        <id>130d8bff-bdbd-4dc5-a4ac-6d970f4918ff</id>
+        <pickupLocation>1</pickupLocation>
+        <shelvingLagTime>1440</shelvingLagTime>
+      </primaryServicePointObject>
+      <servicePointIds>130d8bff-bdbd-4dc5-a4ac-6d970f4918ff</servicePointIds>
+      <servicePoints>
+        <name>Mansueto Library</name>
+        <code>MANSUETO</code>
+        <description></description>
+        <discoveryDisplayName>Mansueto Library</discoveryDisplayName>
+        <id>130d8bff-bdbd-4dc5-a4ac-6d970f4918ff</id>
+        <pickupLocation>1</pickupLocation>
+        <shelvingLagTime>1440</shelvingLagTime>
+      </servicePoints>
+    </permanentLocation>
+    <permanentLocationId>ca3135b3-8e56-55c4-aff7-5e75454df8da</permanentLocationId>
+    <receiptStatus></receiptStatus>
+    <receivingHistory></receivingHistory>
+    <retentionPolicy></retentionPolicy>
+    <shelvingTitle>The Amazing Adventures of Captain Gladys &quot;Stoat&quot; Pamphlet and Her Intrepid Spaniel Stig Among the Giant Pygmies of Beccles</shelvingTitle>
+    <temporaryLocationId></temporaryLocationId>
+  </holdingsRecords2>
+</opt>

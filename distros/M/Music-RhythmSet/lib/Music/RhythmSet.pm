@@ -4,7 +4,7 @@
 # various utility functions
 
 package Music::RhythmSet;
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 use 5.24.0;
 use warnings;
@@ -193,9 +193,9 @@ sub from_string {
     }
 
     # this complication is to make changes to the replay log more atomic
-    # given that the above can die mid-parse. this array can be sparse
-    # (e.g. if four voices already exist and the input only has records
-    # for voices 0 and 2)
+    # given that the above can die mid-parse. the newplay array can be
+    # sparse e.g. if four voices already exist and the input only has
+    # records for voices 0 and 2
     for my $id ( 0 .. $#newplay ) {
         push $voices->[$id]->replay->@*, $newplay[$id]->@* if defined $newplay[$id];
     }

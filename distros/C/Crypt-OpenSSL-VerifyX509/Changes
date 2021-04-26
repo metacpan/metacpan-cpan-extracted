@@ -1,0 +1,49 @@
+Revision history for Crypt-OpenSSL-VerifyX509
+
+0.14 2021-04-23
+
+  First release since 2011, new maintainer
+
+  [Changes since 0.10]
+  - Fix for OpenSSL 1.1.0 compilation issues
+  - Minor fixes to tests, builds and updated certificates
+
+  [Change Log]
+  - TBD     Update version and changes
+  - c51858f Update META files
+
+0.13-TRIAL 2021-04-22
+
+  [Changes since 0.10]
+  - Fix for OpenSSL 1.1.0 compilation issues
+  - Minor fixes to test and updated certificates
+
+  [Change Log]
+  - af69709 Update version and changes
+  - f80888a Add provides to meta
+
+0.12-TRIAL 2021-04-21
+
+  [Change Log]
+  - 1f08cff Update version and changes
+  - 9797d86 Ignore SIGNATURE file
+  - 8c0bac2 Merge pull request #2 from timlegge/github-actions
+  - 1654db1 Fix issues in actions
+  - d7273fc Improve tests and update certs
+  - 2652b42 Add extra dependencies
+  - 671f39d Add Module::Install to repo
+  - c625bb3 Add github actions for testing
+  - b695818 Fix minor release issues add Changes file
+
+0.11-TRIAL - 2021-04-20
+
+  [New Maintainer]
+  - Timothy Legge <timlegge@gmail.com>
+
+  [Updates since 0.10]
+  - Fix for OpenSSL 1.1.0 compilation issues
+  - Minor updates to build
+
+0.10 - 2011-01-18
+
+  Initial Release

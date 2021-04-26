@@ -4,7 +4,7 @@
       "Pawel Murias <pawelmurias@gmail.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "unknown"
    ],
@@ -27,6 +27,7 @@
       },
       "configure" : {
          "requires" : {
+            "Devel::CheckLib" : "0.92",
             "ExtUtils::CppGuess" : "0.19",
             "ExtUtils::MakeMaker" : "6.64"
          }
@@ -51,6 +52,6 @@
       },
       "x_IRC" : "irc://irc.perl.org/#v8"
    },
-   "version" : "0.09",
-   "x_serialization_backend" : "JSON::PP version 4.00"
+   "version" : "0.10",
+   "x_serialization_backend" : "JSON::PP version 4.04"
 }

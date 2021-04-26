@@ -3,11 +3,10 @@ package Net::Z3950::FOLIO::OPACXMLRecord;
 use strict;
 use warnings;
 
-use Net::Z3950::FOLIO::HoldingsRecords qw(makeHoldingsRecords);
-
 
 sub makeOPACXMLRecord {
-    my($ihi, $marc) = @_;
+    my($rec) = @_;
+    my $marc = $rec->marcRecord();
     my $marcXML = $marc->as_xml_record();
 
     # The first line of $marcXML is an XML declaration, and there
@@ -18,7 +17,7 @@ sub makeOPACXMLRecord {
     # Indent to fit into the record nicely
     $marcXML =~ s/^/    /gm;
 
-    my $holdingsObjects = makeHoldingsRecords($ihi->{holdingsRecords2}, $marc);
+    my $holdingsObjects = $rec->holdings($marc);
     my $holdingsRecords = _resolveHoldingsToXML($holdingsObjects);
 
     return _makeXMLElement(0, 'opacRecord', (

@@ -10,7 +10,7 @@ use parent qw(
     IO::Async::Notifier
 );
 
-our $VERSION = '3.011'; # VERSION
+our $VERSION = '3.012'; # VERSION
 
 =encoding utf8
 
@@ -57,7 +57,7 @@ proxy routing dæmon, or a service mesh such as L<https://istio.io/|istio>.
 no indirect;
 use Syntax::Keyword::Try;
 use Future::AsyncAwait;
-use Future::Utils qw(fmap_void);
+use Future::Utils qw(fmap_void fmap_concat);
 use List::BinarySearch::XS qw(binsearch);
 use List::UtilsBy qw(nsort_by);
 use List::Util qw(first);
@@ -87,6 +87,19 @@ BEGIN {
         )
     ) =~ tr/1/1/;
 }
+
+our @CONFIG_KEYS = qw(
+    auth
+    pipeline_depth
+    stream_read_len
+    stream_write_len
+    on_disconnect
+    client_name
+    opentracing
+    protocol
+    hashrefs
+    client_side_cache_size
+);
 
 =head1 METHODS
 
@@ -122,6 +135,69 @@ async sub bootstrap {
     } finally {
         $redis->remove_from_parent if $redis;
     }
+}
+
+=head2 clientside_cache_events
+
+Provides combined stream of clientside-cache events from all known Redis primary nodes.
+
+=cut
+
+sub clientside_cache_events {
+    my ($self) = @_;
+    $self->{clientside_cache_events} ||= do {
+        $self->ryu->source;
+    };
+}
+
+=head2 watch_keyspace
+
+L<Net::Async::Redis/watch_keyspace> support for gathering notifications
+from all known nodes.
+
+=cut
+
+async sub watch_keyspace {
+    my ($self, $pattern) = @_;
+    my @sub = await fmap_concat {
+        $_->primary_connection->then(sub {
+            shift->watch_keyspace($pattern);
+        });
+    } foreach => [$self->{nodes}->@*], concurrent => 4;
+
+    my $combined = Net::Async::Redis::Subscription->new(
+        redis   => $self,
+        channel => $pattern
+    );
+
+    $combined->events->emit_from(@sub);
+    return $combined;
+}
+
+=head1 METHODS - Internal
+
+=cut
+
+async sub node_connection_established {
+    my ($self, $node, $redis) = @_;
+    $self->clientside_cache_events->emit_from($redis->clientside_cache_events) if $redis->is_client_side_cache_enabled;
+    return;
+}
+
+sub node_config {
+    my ($self) = @_;
+    return %{$self}{grep exists $self->{$_}, @CONFIG_KEYS};
+}
+
+sub configure {
+    my ($self, %args) = @_;
+    for (@CONFIG_KEYS) {
+        $self->{$_} = delete $args{$_} if exists $args{$_};
+    }
+    die 'invalid protocol requested: ' . $self->{protocol} if defined $self->{protocol} and not $self->{protocol} =~ /^resp[23]$/;
+
+    die 'hashref support requires RESP3 (Redis version 6+)' if defined $self->{protocol} and $self->{protocol} eq 'resp2' and $self->{hashrefs};
+    return $self->next::method(%args);
 }
 
 sub _init {
@@ -219,6 +295,13 @@ sub node_by_host_port {
     return $node;
 }
 
+=head2 register_moved_slot
+
+When we get MOVED error we will use this
+sub to rebuild the slot cache
+
+=cut
+
 async sub register_moved_slot {
     my ($self, $slot, $host_port) = @_;
     my ($host, $port) = split /:/, $host_port;
@@ -246,6 +329,14 @@ async sub register_moved_slot {
     return $node;
 }
 
+=head2 apply_slots_from_instance
+
+Connect to a random instance in the cluster
+and execute CLUSTER SLOTS to get information
+about the slots and their distribution.
+
+=cut
+
 async sub apply_slots_from_instance {
     my ($self, $redis) = @_;
     my ($slots) = await $redis->cluster_slots;
@@ -253,7 +344,11 @@ async sub apply_slots_from_instance {
 
     my @nodes;
     for my $slot_data (nsort_by { $_->[0] } $slots->@*) {
-        my $node = Net::Async::Redis::Cluster::Node->from_arrayref($slot_data);
+        my $node = Net::Async::Redis::Cluster::Node->from_arrayref(
+            $slot_data,
+            cluster => $self,
+            $self->node_config
+        );
         $log->tracef(
             'Node %s (%s) handles slots %d-%d and has %d replica(s) - %s',
             $node->id,
@@ -270,11 +365,19 @@ async sub apply_slots_from_instance {
     $self->replace_nodes(\@nodes);
 }
 
+=head2 execute_command
+
+Lookup the correct node for the key then execute the command on that node,
+if there is a mismatch between our slot hashes and Redis's hashes
+we will attempt to rebuild the slot hashes and try again
+
+=cut
+
 async sub execute_command {
     my ($self, @cmd) = @_;
     $log->tracef('Will execute %s on cluster', join(' ', @cmd));
     my $k;
-    if($cmd[0] eq 'XREADGROUP') {
+    if($cmd[0] eq 'XREADGROUP' or $cmd[0] eq 'XREAD') {
         my ($idx) = grep { $cmd[$_] eq 'STREAMS' } 0..$#cmd;
         $k = $cmd[$idx + 1];
     } else {
@@ -299,6 +402,22 @@ async sub execute_command {
         my ($moved, $slot, $host_port) = split ' ', $e;
         await $self->register_moved_slot($slot => $host_port);
         return await $self->execute_command(@cmd);
+    }
+}
+
+=head2 ryu
+
+A L<Ryu::Async> instance for source/sink creation.
+
+=cut
+
+sub ryu {
+    my ($self) = @_;
+    $self->{ryu} ||= do {
+        $self->add_child(
+            my $ryu = Ryu::Async->new
+        );
+        $ryu
     }
 }
 

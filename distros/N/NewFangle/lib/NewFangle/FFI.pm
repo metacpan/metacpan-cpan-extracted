@@ -1,8 +1,8 @@
-package NewFangle::FFI 0.04 {
+package NewFangle::FFI 0.05 {
 
   use strict;
   use warnings;
-  use 5.020;
+  use 5.014;
   use FFI::CheckLib 0.27 ();
   use FFI::Platypus 1.26;
   use FFI::C 0.08;
@@ -37,7 +37,7 @@ package NewFangle::FFI 0.04 {
 
   FFI::C->ffi($ffi);
 
-  package NewFangle::NewrelicLoglevel 0.04 {
+  package NewFangle::NewrelicLoglevel 0.05 {
     FFI::C->enum([
       'error',
       'warning',
@@ -46,14 +46,14 @@ package NewFangle::FFI 0.04 {
     ], { prefix => 'NEWRELIC_LOG_' });
   }
 
-  package NewFangle::NewrelicTransactionTracerThreshold 0.04 {
+  package NewFangle::NewrelicTransactionTracerThreshold 0.05 {
     FFI::C->enum([
       'is_apdex_failing',
       'is_over_duration',
     ], { prefix => 'NEWRELIC_THRESHOLD_' });
   }
 
-  package NewFangle::NewrelicTtRecordsql 0.04 {
+  package NewFangle::NewrelicTtRecordsql 0.05 {
     FFI::C->enum([
       'off',
       'raw',
@@ -61,7 +61,7 @@ package NewFangle::FFI 0.04 {
     ], { prefix => 'NEWRELIC_SQL_' });
   }
 
-  package NewFangle::DatastoreReporting 0.04 {
+  package NewFangle::DatastoreReporting 0.05 {
     FFI::C->struct([
       enabled      => 'bool',
       record_sql   => 'newrelic_tt_recordsql_t',
@@ -69,7 +69,7 @@ package NewFangle::FFI 0.04 {
     ]);
   };
 
-  package NewFangle::NewrelicTransactionTracerConfig 0.04 {
+  package NewFangle::NewrelicTransactionTracerConfig 0.05 {
     FFI::C->struct([
       enabled                  => 'bool',
       threshold                => 'newrelic_transaction_tracer_threshold_t',
@@ -79,26 +79,26 @@ package NewFangle::FFI 0.04 {
     ]);
   }
 
-  package NewFangle::NewrelicDatastoreSegmentConfig 0.04 {
+  package NewFangle::NewrelicDatastoreSegmentConfig 0.05 {
     FFI::C->struct([
       instance_reporting      => 'bool',
       database_name_reporting => 'bool',
     ]);
   }
 
-  package NewFangle::NewrelicDistributedTracingConfig 0.04 {
+  package NewFangle::NewrelicDistributedTracingConfig 0.05 {
     FFI::C->struct([
       enabled => 'bool',
     ]);
   }
 
-  package NewFangle::NewrelicSpanEventConfig 0.04 {
+  package NewFangle::NewrelicSpanEventConfig 0.05 {
     FFI::C->struct([
       enabled => 'bool',
     ]);
   }
 
-  package NewFangle::NewrelicAppConfig 0.04 {
+  package NewFangle::NewrelicAppConfig 0.05 {
     FFI::C->struct([
       app_name            => 'string(255)',
       license_key         => 'string(255)',
@@ -128,7 +128,7 @@ NewFangle::FFI - Private class for NewFangle.pm
 
 =head1 VERSION
 
-version 0.04
+version 0.05
 
 =head1 SYNOPSIS
 

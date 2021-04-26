@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    version 0.17
+    version 0.18
 
 SYNOPSIS
 
@@ -62,6 +62,11 @@ OPTIONS
  --metacpan_url
 
     The URL to use for metacpan.
+
+ --branch | -b
+
+    Default branch. As on 0.18 this is main by default. Previously the old
+    git default was used.
 
  --help | -h
 

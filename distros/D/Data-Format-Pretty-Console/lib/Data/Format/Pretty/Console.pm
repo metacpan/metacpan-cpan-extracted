@@ -1,7 +1,7 @@
 package Data::Format::Pretty::Console;
 
-our $DATE = '2017-07-10'; # DATE
-our $VERSION = '0.38'; # VERSION
+our $DATE = '2021-04-23'; # DATE
+our $VERSION = '0.390'; # VERSION
 
 use 5.010001;
 use strict;
@@ -268,7 +268,7 @@ sub _format_list {
         if ($ENV{COLUMNS}) {
             $termcols = $ENV{COLUMNS};
         } elsif (eval { require Term::Size; 1 }) {
-            ($termcols, $termrows) = Term::Size::chars();
+            ($termcols, $termrows) = Term::Size::chars(*STDOUT{IO});
         } else {
             # sane default, on windows we need to offset by 1 because printing
             # at the rightmost column will cause cursor to move down one line.
@@ -485,7 +485,7 @@ Data::Format::Pretty::Console - Pretty-print data structure for console output
 
 =head1 VERSION
 
-This document describes version 0.38 of Data::Format::Pretty::Console (from Perl distribution Data-Format-Pretty-Console), released on 2017-07-10.
+This document describes version 0.390 of Data::Format::Pretty::Console (from Perl distribution Data-Format-Pretty-Console), released on 2021-04-23.
 
 =head1 SYNOPSIS
 
@@ -705,7 +705,7 @@ Source repository is at L<https://github.com/perlancar/perl-Data-Format-Pretty-C
 
 =head1 BUGS
 
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Data-Format-Pretty-Console>
+Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-Data-Format-Pretty-Console/issues>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
@@ -723,7 +723,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017, 2016, 2015, 2014, 2013, 2012, 2011, 2010 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2017, 2016, 2015, 2014, 2013, 2012, 2011, 2010 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

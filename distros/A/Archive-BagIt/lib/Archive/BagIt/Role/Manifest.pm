@@ -314,7 +314,7 @@ Archive::BagIt::Role::Manifest - A role that handles all manifest files for a sp
 
 =head1 VERSION
 
-version 0.072
+version 0.073
 
 =head2 calc_digests($bagit, $digestobj, $filenames_ref, $opts)
 

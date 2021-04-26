@@ -4,11 +4,9 @@ use warnings;
 use strict;
 use 5.008003;
 
-our $VERSION = '1.730';
+our $VERSION = '1.731';
 use Exporter 'import';
 our @EXPORT_OK = qw( choose );
-
-use Carp qw( croak carp );
 
 use Term::Choose::Constants       qw( :keys :index WIDTH_CURSOR );
 use Term::Choose::LineFold        qw( line_fold print_columns cut_to_printwidth );
@@ -33,10 +31,10 @@ BEGIN {
 sub new {
     my $class = shift;
     my ( $opt ) = @_;
-    croak "new: called with " . @_ . " arguments - 0 or 1 arguments expected" if @_ > 1;
+    die "new: called with " . @_ . " arguments - 0 or 1 arguments expected" if @_ > 1;
     my $instance_defaults = _defaults();
     if ( defined $opt ) {
-        croak "new: the (optional) argument must be a HASH reference" if ref $opt ne 'HASH';
+        die "new: the (optional) argument must be a HASH reference" if ref $opt ne 'HASH';
         validate_options( _valid_options(), $opt );
         for my $key ( keys %$opt ) {
             $instance_defaults->{$key} = $opt->{$key} if defined $opt->{$key};
@@ -239,10 +237,10 @@ sub choose {
 sub __choose {
     my $self = shift;
     my ( $orig_list_ref, $opt ) = @_;
-    croak "choose: called with " . @_ . " arguments - 1 or 2 arguments expected" if @_ < 1 || @_ > 2;
-    croak "choose: the first argument must be an ARRAY reference" if ref $orig_list_ref ne 'ARRAY';
+    die "choose: called with " . @_ . " arguments - 1 or 2 arguments expected" if @_ < 1 || @_ > 2;
+    die "choose: the first argument must be an ARRAY reference" if ref $orig_list_ref ne 'ARRAY';
     if ( defined $opt ) {
-        croak "choose: the (optional) second argument must be a HASH reference" if ref $opt ne 'HASH';
+        die "choose: the (optional) second argument must be a HASH reference" if ref $opt ne 'HASH';
         validate_options( _valid_options(), $opt );
         for my $key ( keys %$opt ) {
             $self->{$key} = $opt->{$key} if defined $opt->{$key};
@@ -294,7 +292,7 @@ sub __choose {
         my $key = $self->__get_key();
         if ( ! defined $key ) {
             $self->__reset_term( 1 );
-            carp "EOT: $!";
+            warn "EOT: $!";
             return;
         }
         $self->{pressed_key} = $key;
@@ -518,7 +516,7 @@ sub __choose {
             }
         }
         elsif ( $key == VK_END || $key == CONTROL_E ) {
-            if ( $self->{order} == 1 && $self->{rest} ) {
+            if ( $self->{order} == 1 && $self->{idx_of_last_col_in_last_row} < $#{$self->{rc2idx}[0]} ) {
                 if (    $self->{pos}[ROW] == $#{$self->{rc2idx}} - 1
                      && $self->{pos}[COL] == $#{$self->{rc2idx}[$self->{pos}[ROW]]}
                 ) {
@@ -569,7 +567,7 @@ sub __choose {
                 next GET_KEY;
             }
             my $opt_index = $self->{index} || $self->{ll};
-            my $idx = $self->{rc2idx}[$self->{pos}[ROW]][$self->{pos}[COL]];
+            my $list_idx = $self->{rc2idx}[$self->{pos}[ROW]][$self->{pos}[COL]];
             if ( ! defined $self->{wantarray} ) {
                 $self->__reset_term( 1 );
                 return;
@@ -586,7 +584,7 @@ sub __choose {
                 }
                 if ( defined $self->{meta_items} && ! $self->{marked}[$self->{pos}[ROW]][$self->{pos}[COL]] ) {
                     for my $meta_item ( @{$self->{meta_items}} ) {
-                        if ( $meta_item == $idx ) {
+                        if ( $meta_item == $list_idx ) {
                             $self->{marked}[$self->{pos}[ROW]][$self->{pos}[COL]] = 1;
                             last;
                         }
@@ -597,18 +595,18 @@ sub __choose {
                 return $opt_index ? @$chosen : @{$orig_list_ref}[@$chosen];
             }
             else {
-                my $chosen = $opt_index ? $idx : $orig_list_ref->[$idx];
+                my $chosen = $opt_index ? $list_idx : $orig_list_ref->[$list_idx];
                 $self->__reset_term( 1 );
                 return $chosen;
             }
         }
         elsif ( $key == KEY_SPACE ) {
             if ( $self->{wantarray} ) {
-                my $idx = $self->{rc2idx}[$self->{pos}[ROW]][$self->{pos}[COL]];
+                my $list_idx = $self->{rc2idx}[$self->{pos}[ROW]][$self->{pos}[COL]];
                 my $locked = 0;
                 if ( defined $self->{no_spacebar} || defined $self->{meta_items} ) {
                     for my $no_spacebar ( @{$self->{no_spacebar}||[]}, @{$self->{meta_items}||[]} ) {
-                        if ( $idx == $no_spacebar ) {
+                        if ( $list_idx == $no_spacebar ) {
                             ++$locked;
                             last;
                         }
@@ -739,10 +737,10 @@ sub __prepare_page_number {
 
 
 sub __set_cell {
-    my ( $self, $idx ) = @_;
+    my ( $self, $list_idx ) = @_;
     LOOP: for my $i ( 0 .. $#{$self->{rc2idx}} ) {
         for my $j ( 0 .. $#{$self->{rc2idx}[$i]} ) {
-            if ( $idx == $self->{rc2idx}[$i][$j] ) {
+            if ( $list_idx == $self->{rc2idx}[$i][$j] ) {
                 $self->{pos} = [ $i, $j ];
                 last LOOP;
             }
@@ -994,8 +992,8 @@ sub __current_layout {
     my $all_in_first_row;
     if ( $self->{layout} <= 1 && ! $self->{ll} ) {
         my $firstrow_w = 0;
-        for my $idx ( 0 .. $#{$self->{list}} ) {
-            $firstrow_w += $self->{length}[$idx] + $self->{pad};
+        for my $list_idx ( 0 .. $#{$self->{list}} ) {
+            $firstrow_w += $self->{length}[$list_idx] + $self->{pad};
             if ( $firstrow_w - $self->{pad} > $self->{avail_width} ) {
                 $firstrow_w = 0;
                 last;
@@ -1022,13 +1020,14 @@ sub __list_idx2rc {
     my ( $self ) = @_;
     my $layout = $self->{current_layout};
     $self->{rc2idx} = [];
-    $self->{rest} = 0;
     if ( $layout == -1 ) {
         $self->{rc2idx}[0] = [ 0 .. $#{$self->{list}} ];
+        $self->{idx_of_last_col_in_last_row} = $#{$self->{list}};
     }
     elsif ( $layout == 3 ) {
-        for my $idx ( 0 .. $#{$self->{list}} ) {
-            $self->{rc2idx}[$idx][0] = $idx;
+        for my $list_idx ( 0 .. $#{$self->{list}} ) {
+            $self->{rc2idx}[$list_idx][0] = $list_idx;
+            $self->{idx_of_last_col_in_last_row} = 0;
         }
     }
     else {
@@ -1047,14 +1046,14 @@ sub __list_idx2rc {
         # order
         my $cols_per_row = int( $tmp_avail_width / $self->{col_width_plus} );
         $cols_per_row = 1 if $cols_per_row < 1;
-        $self->{rest} = @{$self->{list}} % $cols_per_row;
+        $self->{idx_of_last_col_in_last_row} = ( @{$self->{list}} % $cols_per_row || $cols_per_row ) - 1;
         if ( $self->{order} == 1 ) {
             my $rows = int( ( @{$self->{list}} - 1 + $cols_per_row ) / $cols_per_row );
             my @rearranged_idx;
             my $begin = 0;
-            my $end = $rows - 1;
+            my $end = $rows - 1 ;
             for my $c ( 0 .. $cols_per_row - 1 ) {
-                --$end if $self->{rest} && $c >= $self->{rest};
+                --$end if $c > $self->{idx_of_last_col_in_last_row};
                 $rearranged_idx[$c] = [ $begin .. $end ];
                 $begin = $end + 1;
                 $end = $begin + $rows - 1;
@@ -1062,7 +1061,7 @@ sub __list_idx2rc {
             for my $r ( 0 .. $rows - 1 ) {
                 my @temp_idx;
                 for my $c ( 0 .. $cols_per_row - 1 ) {
-                    next if $r == $rows - 1 && $self->{rest} && $c >= $self->{rest};
+                    next if $r == $rows - 1 && $c > $self->{idx_of_last_col_in_last_row};
                     push @temp_idx, $rearranged_idx[$c][$r];
                 }
                 push @{$self->{rc2idx}}, \@temp_idx;
@@ -1088,35 +1087,44 @@ sub __marked_idx2rc {
     my ( $self, $list_of_indexes, $boolean ) = @_;
     my $last_list_idx = $#{$self->{list}};
     if ( $self->{current_layout} == 3 ) {
-        for my $idx ( @$list_of_indexes ) {
-            next if $idx > $last_list_idx;
-            $self->{marked}[$idx][0] = $boolean;
+        for my $list_idx ( @$list_of_indexes ) {
+            if ( $list_idx > $last_list_idx ) {
+                next;
+            }
+            $self->{marked}[$list_idx][0] = $boolean;
         }
         return;
     }
     my ( $row, $col );
     my $cols_per_row = @{$self->{rc2idx}[0]};
     if ( $self->{order} == 0 ) {
-        for my $idx ( @$list_of_indexes ) {
-            next if $idx > $last_list_idx;
-            $row = int( $idx / $cols_per_row );
-            $col = $idx % $cols_per_row;
+        for my $list_idx ( @$list_of_indexes ) {
+            if ( $list_idx > $last_list_idx ) {
+                next;
+            }
+            $row = int( $list_idx / $cols_per_row );
+            $col = $list_idx % $cols_per_row;
             $self->{marked}[$row][$col] = $boolean;
         }
     }
     elsif ( $self->{order} == 1 ) {
         my $rows_per_col = @{$self->{rc2idx}};
-        my $end_last_full_col = $rows_per_col * ( $self->{rest} || $cols_per_row );
-        for my $idx ( @$list_of_indexes ) {
-            next if $idx > $last_list_idx;
-            if ( $idx <= $end_last_full_col ) {
-                $row = $idx % $rows_per_col;
-                $col = int( $idx / $rows_per_col );
+        my $col_count_last_row = $self->{idx_of_last_col_in_last_row} + 1;
+        my $last_list_idx_in_cols_full = $rows_per_col * $col_count_last_row - 1;
+        my $first_list_idx_in_cols_short = $last_list_idx_in_cols_full + 1;
+
+        for my $list_idx ( @$list_of_indexes ) {
+            if ( $list_idx > $last_list_idx ) {
+                next;
+            }
+            if ( $list_idx < $last_list_idx_in_cols_full ) {
+                $row = $list_idx % $rows_per_col;
+                $col = int( $list_idx / $rows_per_col );
             }
             else {
                 my $rows_per_col_short = $rows_per_col - 1;
-                $row = ( $idx - $end_last_full_col ) % $rows_per_col_short;
-                $col = int( ( $idx - $self->{rest} ) / $rows_per_col_short );
+                $row = ( $list_idx - $first_list_idx_in_cols_short ) % $rows_per_col_short;
+                $col = int( ( $list_idx - $col_count_last_row ) / $rows_per_col_short );
             }
             $self->{marked}[$row][$col] = $boolean;
         }
@@ -1126,12 +1134,12 @@ sub __marked_idx2rc {
 
 sub __marked_rc2idx {
     my ( $self ) = @_;
-    my $idx = [];
+    my $list_idx = [];
     if ( $self->{order} == 1 ) {
         for my $col ( 0 .. $#{$self->{rc2idx}[0]} ) {
             for my $row ( 0 .. $#{$self->{rc2idx}} ) {
                 if ( $self->{marked}[$row][$col] ) {
-                    push @$idx, $self->{rc2idx}[$row][$col];
+                    push @$list_idx, $self->{rc2idx}[$row][$col];
                 }
             }
         }
@@ -1140,12 +1148,12 @@ sub __marked_rc2idx {
         for my $row ( 0 .. $#{$self->{rc2idx}} ) {
             for my $col ( 0 .. $#{$self->{rc2idx}[$row]} ) {
                 if ( $self->{marked}[$row][$col] ) {
-                    push @$idx, $self->{rc2idx}[$row][$col];
+                    push @$list_idx, $self->{rc2idx}[$row][$col];
                 }
             }
         }
     }
-    return $idx;
+    return $list_idx;
 }
 
 
@@ -1164,7 +1172,7 @@ Term::Choose - Choose items from a list interactively.
 
 =head1 VERSION
 
-Version 1.730
+Version 1.731
 
 =cut
 
@@ -1746,11 +1754,11 @@ This option has only meaning in list context.
 
 =head1 ERROR HANDLING
 
-=head2 croak
+=head2 die
 
 C<new|choose> dies if passed invalid arguments.
 
-=head2 carp
+=head2 warn
 
 If pressing a key results in an undefined value C<choose> warns with C<EOT: $!> and returns I<undef> or an empty list in
 list context.

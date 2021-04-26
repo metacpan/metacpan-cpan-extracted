@@ -1,10 +1,68 @@
 ==================================================
-Changes from 2019-10-26 00:00:00 +0000 to present.
+Changes from 2020-04-22 00:00:00 +0000 to present.
 ==================================================
 
 ------------------------------------------
-version 1.0.6 at 2020-10-25 09:16:28 +0000
+version 1.0.7 at 2021-04-22 21:24:56 +0000
 ------------------------------------------
+
+  Change: 8698ff9def6985e80adff6c97cf9d0693b48ce79
+  Author: Vincent Danjean <Vincent.Danjean@ens-lyon.org>
+  Date : 2021-04-22 23:21:54 +0000
+
+    new version 
+
+  Change: 33482d43681c716f145d28a071fd7c8e45bc5376
+  Author: Vincent Danjean <Vincent.Danjean@ens-lyon.org>
+  Date : 2021-04-22 23:21:54 +0000
+
+    Update references 
+
+  Change: fd71bccda4d843432d885b7391392eb5b1ef9ac5
+  Author: Vincent Danjean <Vincent.Danjean@ens-lyon.org>
+  Date : 2021-04-22 23:21:54 +0000
+
+    Always use strings
+
+    Else, comparaison to the reference sometimes fails. Data::Dumper is
+    not constant when it prints numbers (sometimes they are printed as
+    number, sometimes as strings) 
+
+  Change: 25b66f81ac14b00d2aca4c32ba3e91fd44219932
+  Author: Vincent Danjean <Vincent.Danjean@ens-lyon.org>
+  Date : 2021-04-22 23:07:35 +0000
+
+    Add support for MD RAID containers 
+
+  Change: b1d1f2f162e2db1b4fc14c0a4da0349b7f75b71a
+  Author: Vincent Danjean <Vincent.Danjean@ens-lyon.org>
+  Date : 2021-01-01 14:32:47 +0000
+
+    Fix correspondance between sas2ircu disks and linux block disks 
+
+  Change: 2f8e2e7966c1bbe31a657da2c4ae637b97a5629d
+  Author: Vincent Danjean <Vincent.Danjean@ens-lyon.org>
+  Date : 2021-01-01 14:10:48 +0000
+
+    sas2ircu: correctly handle direct disks 
+
+  Change: a83472db531f172596ed98ae33dde5a55319dfdf
+  Author: Vincent Danjean <Vincent.Danjean@ens-lyon.org>
+  Date : 2021-01-01 14:09:48 +0000
+
+    Add support for disk that are not partitionned 
+
+  Change: aee5e23b30f3a53e012183f1e387790f9377736e
+  Author: Vincent Danjean <Vincent.Danjean@ens-lyon.org>
+  Date : 2021-01-01 14:08:19 +0000
+
+    Typo and indent 
+
+  Change: b3fd1b2fb7a7a1a533d1441c8fee0bd0338a7028
+  Author: Vincent Danjean <Vincent.Danjean@ens-lyon.org>
+  Date : 2021-01-01 14:04:42 +0000
+
+    Code refactoring 
 
   Change: 9f5496a5fbb1aea50d80ca951ef3acbfe8b8316d
   Author: Vincent Danjean <Vincent.Danjean@ens-lyon.org>

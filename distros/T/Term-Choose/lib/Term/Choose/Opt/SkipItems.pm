@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.008003;
 
-our $VERSION = '1.730';
+our $VERSION = '1.731';
 
 use Term::Choose::Constants qw( :keys :index );
 
@@ -178,7 +178,7 @@ sub __next_valid_down {
     my $last_row = $#{$self->{rc2idx}};
     my $row = $self->{pos}[ROW];
     my $col = $self->{pos}[COL];
-    if ( $self->{rest} && $col >= $self->{rest} ) {
+    if ( $col > $self->{idx_of_last_col_in_last_row} ) {
         $last_row--;
     }
     while ( ++$row <= $last_row ) {
@@ -278,7 +278,7 @@ sub __next_valid_id_up_or_down {
     my $end = $self->{last_page_row};
     my $row = $self->{pos}[ROW];
     my $col = $self->{pos}[COL];
-    if ( $end == $#{$self->{rc2idx}} && $self->{rest} && $col >= $self->{rest} ) {
+    if ( $end == $#{$self->{rc2idx}} && $col > $self->{idx_of_last_col_in_last_row} ) {
         $end--;
     }
     my ( $row_up, $row_down ) = ( $row, $row );

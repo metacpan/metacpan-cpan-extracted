@@ -1,5 +1,8 @@
 Revision history for Music-RhythmSet
 
+0.03    2021-04-22
+        Switch tests from Test::Most to Test2::V0. Better test coverage.
+
 0.02    2021-03-16
         Improve the next callback docs. Add the pattern_from()
         utility method.

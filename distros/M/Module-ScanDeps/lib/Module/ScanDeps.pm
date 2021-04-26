@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use vars qw( $VERSION @EXPORT @EXPORT_OK @ISA $CurrentPackage @IncludeLibs $ScanFileRE );
 
-$VERSION   = '1.30';
+$VERSION   = '1.31';
 @EXPORT    = qw( scan_deps scan_deps_runtime );
 @EXPORT_OK = qw( scan_line scan_chunk add_deps scan_deps_runtime path_to_inc_name );
 
@@ -363,6 +363,7 @@ my %Preload = (
         IO/Pipe.pm          IO/Socket.pm        IO/Dir.pm
     )],
     'IO/Socket.pm'                      => [qw( IO/Socket/UNIX.pm )],
+    'IUP.pm'                            => 'sub',
     'JSON.pm'                           => sub {
         # add JSON/PP*.pm, JSON/PP/*.pm
         # and ignore other JSON::* modules (e.g. JSON/Syck.pm, JSON/Any.pm);
@@ -406,6 +407,7 @@ my %Preload = (
     'Module/Pluggable.pm'               => sub {
         _glob_in_inc('$CurrentPackage/Plugin', 1);
     },
+    'Moo.pm'                            => [qw( Class/XSAccessor.pm )],
     'Moose.pm'                          => sub {
         _glob_in_inc('Moose', 1),
         _glob_in_inc('Class/MOP', 1),
@@ -524,6 +526,8 @@ my %Preload = (
         _glob_in_inc('XML/Parser/Encodings', 1),
     },
     'XML/SAX.pm'                        => [qw( XML/SAX/ParserDetails.ini ) ],
+    'XML/Twig.pm'                       => [qw( URI.pm )],      # or URI::File or LWP
+    'XML/Twig/XPath.pm'                 => [qw( XML/XPathEngine.pm XML/XPath.pm )],
     'XMLRPC/Lite.pm'                    => sub {
         _glob_in_inc('XMLRPC/Transport', 1);
     },
@@ -1017,8 +1021,11 @@ sub scan_chunk {
             my @mods;
             push @mods, qw( PerlIO.pm PerlIO/encoding.pm Encode.pm ), _find_encoding($1)
                 if $args =~ /:encoding\((.*?)\)/;
-            push @mods, qw( PerlIO.pm PerlIO/via.pm )
-                if $args =~ /:via\(/;
+            while ($args =~ /:(\w+)(?:\((.*?)\))?/g) {
+                push @mods, "PerlIO/$1.pm";
+                push @mods, "Encode.pm", _find_encoding($2) if $1 eq "encoding";
+            }
+            push @mods, "PerlIO.pm" if @mods;
             return \@mods if @mods;
         }
         if (/\b(?:en|de)code\(\s*['"]?([-\w]+)/) {

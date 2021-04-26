@@ -26,7 +26,7 @@ use constant SYNST => [ qw( LDAP_SYNC_PRESENT LDAP_SYNC_ADD LDAP_SYNC_MODIFY LDA
 =head1 METHODS
 
 Each loadable module must provide at least two method: the
-cosntructor B<new> and runtime method B<run>.
+constructor B<new> and runtime method B<run>.
 
 =head2 new
 

@@ -1,6 +1,6 @@
 # Before `make install' is performed this script should be runnable with
 # `make test'. After `make install' it should work as `perl Crypt-X509.t'
-use Test::More tests => 70;
+use Test::More tests => 71;
 use Math::BigInt;
 BEGIN { use_ok('Crypt::X509') }
 
@@ -21,12 +21,18 @@ is( join( ':', @{ $decoded2->ExtKeyUsage } ), "clientAuth:emailProtection", 'Ext
 # this has also to work twice
 is( join( ':', @{ $decoded2->KeyUsage } ), "critical:digitalSignature:keyEncipherment:dataEncipherment", 'Keyusagecheck again' );
 is( join( ':', @{ $decoded2->ExtKeyUsage } ), "clientAuth:emailProtection", 'Extkeyusagecheck again' );
-is( join( ',', @{ $decoded2->Subject } ), "E=alexander.jung\@allianz.de,C=DE,O=Allianz Group,CN=Alexander Jung", 'Subject parsed' );
+is( join( ',', @{ $decoded2->Subject } ), "emailAddress=alexander.jung\@allianz.de,C=DE,O=Allianz Group,CN=Alexander Jung", 'Subject parsed' );
 is( $decoded2->subject_country, "DE",                         "Subject_country" );
 is( $decoded2->subject_state,   undef,                        "Subject_state" );
 is( $decoded2->subject_org,     "Allianz Group",              "Subject_org" );
 is( $decoded2->subject_ou,      undef,                        "Subject_ou" );
 is( $decoded2->subject_email,   "alexander.jung\@allianz.de", "Subject_email" );
+is_deeply( $decoded2->SubjectRaw, [
+	{'type' => '1.2.840.113549.1.9.1','value' => 'alexander.jung@allianz.de','format' => 'ia5String'},
+	{'type' => '2.5.4.6','value' => 'DE','format' => 'printableString'},
+	{'type' => '2.5.4.10','value' => 'Allianz Group','format' => 'printableString'},
+	{'type' => '2.5.4.3','value' => 'Alexander Jung','format' => 'printableString'}
+]);
 is( join( ',', @{ $decoded2->Issuer } ), "C=DE,O=Allianz Group,CN=Allianz Dresdner CA", "Issuer Parsed");
 is( $decoded2->issuer_cn,           "Allianz Dresdner CA",  "Issuer_cn" );
 is( $decoded2->issuer_country,      "DE",                   "Isssuer_country" );
@@ -40,6 +46,7 @@ is( length( $decoded2->pubkey ),    140,                    "Pubkey length" );
 is( length( $decoded2->signature ), 256,                    "Signature Length" );
 is( join( ',', @{ $decoded2->SubjectAltName } ), "rfc822Name=alexander.jung\@allianz.de", 'SubjectAltName parsed' );
 is_deeply( $decoded2->DecodedSubjectAltNames, [[{rfc822Name => 'alexander.jung@allianz.de'}]], 'DecodedSubjectAltName parsed' );
+
 
 $cert = loadcert('t/aj2.cer');
 $decoded3 = Crypt::X509->new( cert => $cert );

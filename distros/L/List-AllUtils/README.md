@@ -4,7 +4,7 @@ List::AllUtils - Combines List::Util, List::SomeUtils and List::UtilsBy in one b
 
 # VERSION
 
-version 0.18
+version 0.19
 
 # SYNOPSIS
 
@@ -31,11 +31,19 @@ Note that all function documentation has been shamelessly copied from
 
 Recently, [List::Util](https://metacpan.org/pod/List%3A%3AUtil) has started including some of the subs that used to
 only be in [List::SomeUtils](https://metacpan.org/pod/List%3A%3ASomeUtils). Similarly, [List::SomeUtils](https://metacpan.org/pod/List%3A%3ASomeUtils) has some small
-overlap with [List::UtilsBy](https://metacpan.org/pod/List%3A%3AUtilsBy). `List::AllUtils` always favors the subroutine
-provided by [List::Util](https://metacpan.org/pod/List%3A%3AUtil), [List::SomeUtils](https://metacpan.org/pod/List%3A%3ASomeUtils) or [List::UtilsBy](https://metacpan.org/pod/List%3A%3AUtilsBy) in that
-order.
+overlap with [List::UtilsBy](https://metacpan.org/pod/List%3A%3AUtilsBy).
 
-The docs below come from [List::Util](https://metacpan.org/pod/List%3A%3AUtil) 1.54, [List::SomeUtils](https://metacpan.org/pod/List%3A%3ASomeUtils) 0.58, and
+`List::AllUtils` use to always favors the subroutine provided by
+[List::Util](https://metacpan.org/pod/List%3A%3AUtil), [List::SomeUtils](https://metacpan.org/pod/List%3A%3ASomeUtils) or [List::UtilsBy](https://metacpan.org/pod/List%3A%3AUtilsBy) in that order. However,
+as of [List::Util](https://metacpan.org/pod/List%3A%3AUtil) 1.56, it included some functions, `mesh` and `zip` with
+the same name as [List::SomeUtils](https://metacpan.org/pod/List%3A%3ASomeUtils) functions, but different behavior.
+
+So going forward, we will always prefer backwards compatibility. This means
+that `mesh` and `zip` will always come from [List::SomeUtils](https://metacpan.org/pod/List%3A%3ASomeUtils). If other
+incompatible functions are added to [List::Util](https://metacpan.org/pod/List%3A%3AUtil), those will also be skipped
+in favor of the [List::SomeUtils](https://metacpan.org/pod/List%3A%3ASomeUtils) version.
+
+The docs below come from [List::Util](https://metacpan.org/pod/List%3A%3AUtil) 1.56, [List::SomeUtils](https://metacpan.org/pod/List%3A%3ASomeUtils) 0.58, and
 [List::UtilsBy](https://metacpan.org/pod/List%3A%3AUtilsBy) 0.11.
 
 # WHAT IS EXPORTED?
@@ -271,7 +279,8 @@ _Since version 1.26._
 
 Similar to ["sum"](#sum), except this returns 0 when given an empty list, rather
 than `undef`.
-&#x3d;head1 KEY/VALUE PAIR LIST FUNCTIONS
+
+# KEY/VALUE PAIR LIST FUNCTIONS
 
 The following set of functions, all inspired by [List::Pairwise](https://metacpan.org/pod/List%3A%3APairwise), consume an
 even-sized list of pairs. The pairs may be key/value associations from a hash,
@@ -513,6 +522,28 @@ The `undef` value is treated by this function as distinct from the empty
 string, and no warning will be produced. It is left as-is in the returned
 list. Subsequent `undef` values are still considered identical to the first,
 and will be removed.
+
+## uniqint
+
+    my @subset = uniqint @values
+
+_Since version 1.55._
+
+Filters a list of values to remove subsequent duplicates, as judged by an
+integer numerical equality test. Preserves the order of unique elements, and
+retains the first value of any duplicate set. Values in the returned list will
+be coerced into integers.
+
+    my $count = uniqint @values
+
+In scalar context, returns the number of elements that would have been
+returned as a list.
+
+Note that `undef` is treated much as other numerical operations treat it; it
+compares equal to zero but additionally produces a warning if such warnings
+are enabled (`use warnings 'uninitialized';`). In addition, an `undef` in
+the returned list is coerced into a numerical zero, so that the entire list of
+values returned by `uniqint` are well-behaved as integers.
 
 ## uniqnum
 
@@ -1475,7 +1506,7 @@ Dave Rolsky <autarch@urth.org>
 
 # COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2020 by Dave Rolsky.
+This software is Copyright (c) 2021 by Dave Rolsky.
 
 This is free software, licensed under:
 

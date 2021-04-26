@@ -1,5 +1,5 @@
 package Util::Medley::Simple::List;
-$Util::Medley::Simple::List::VERSION = '0.059';
+$Util::Medley::Simple::List::VERSION = '0.060';
 #
 # Moose::Exporter exports everything into your namespace.  This
 # approach allows for importing individual functions.
@@ -11,7 +11,7 @@ Util::Medley::Simple::List - an exporter module for Util::Medley::List
 
 =head1 VERSION
 
-version 0.059
+version 0.060
 
 =cut
 

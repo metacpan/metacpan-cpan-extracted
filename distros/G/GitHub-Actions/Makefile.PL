@@ -16,4 +16,13 @@ WriteMakefile(
                                  "Test::Output" => 0},
               dist                => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
               clean               => { FILES => 'GitHub-Actions-*' },
+              META_MERGE => {
+                            'meta-spec' => { version => 2 },
+                            repository  => {
+                                type => 'git',
+                                url  => 'https://github.com/JJ/perl-GitHub-Actions/',
+                                web  => 'https://github.com/JJ/perl-GitHub-Actions/',
+                            },
+                            bugtracker  => { web => 'https://github.com/JJ/perl-GitHub-Actions/issues' },
+                           },
 );

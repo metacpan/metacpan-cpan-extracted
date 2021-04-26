@@ -1,0 +1,75 @@
+NAME
+    App::SQLiteUtils - Utilities related to SQLite
+
+VERSION
+    This document describes version 0.002 of App::SQLiteUtils (from Perl
+    distribution App-SQLiteUtils), released on 2021-01-21.
+
+DESCRIPTION
+    This distribution includes several utilities:
+
+    *   list-sqlite-columns
+
+    *   list-sqlite-tables
+
+FUNCTIONS
+  list_sqlite_columns
+    Usage:
+
+     list_sqlite_columns(%args) -> any
+
+    See also the ".schema" and ".fullschema" meta-command of the "sqlite3"
+    CLI.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   db_file* => *filename*
+
+    *   table* => *str*
+
+    Return value: (any)
+
+  list_sqlite_tables
+    Usage:
+
+     list_sqlite_tables(%args) -> any
+
+    See also the ".tables" meta-command of the "sqlite3" CLI.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   db_file* => *filename*
+
+    Return value: (any)
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/App-SQLiteUtils>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-App-SQLiteUtils>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://github.com/perlancar/perl-App-SQLiteUtils/issues>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    App::DBIUtils
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2021 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

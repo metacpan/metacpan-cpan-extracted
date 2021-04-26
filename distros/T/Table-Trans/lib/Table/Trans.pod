@@ -34,13 +34,13 @@ produces output
     蛙
 
 
-(This example is included as L<F<synopsis.pl>|https://fastapi.metacpan.org/source/BKB/Table-Trans-0.01/examples/synopsis.pl> in the distribution.)
+(This example is included as L<F<synopsis.pl>|https://fastapi.metacpan.org/source/BKB/Table-Trans-0.02/examples/synopsis.pl> in the distribution.)
 
 
 =head1 VERSION
 
-This documents version 0.01 of Table-Trans
-corresponding to L<git commit b6d3415ea2143ca67e2c17c266aed0439bafb429|https://github.com/benkasminbullock/table-trans/commit/b6d3415ea2143ca67e2c17c266aed0439bafb429> released on Tue Feb 16 10:56:49 2021 +0900.
+This documents version 0.02 of Table-Trans
+corresponding to L<git commit 8c0335f2bc7f5d3202e5b327780915a9c5e74120|https://github.com/benkasminbullock/table-trans/commit/8c0335f2bc7f5d3202e5b327780915a9c5e74120> released on Thu Apr 22 15:22:34 2021 +0900.
 
 =head1 DESCRIPTION
 
@@ -48,6 +48,15 @@ This module provides simple translation storage based on the
 L<Table::Readable> format.
 
 =head1 FUNCTIONS
+
+=head2 add_trans
+
+    add_trans ($trans, "$Bin/lang/translations.txt");
+
+Add translations to C<$trans> from another file. This is like
+L</read_trans> but it enables you to use more than one file of
+translations. If there are two translations with the same C<id> value,
+it prints a warning.
 
 =head2 get_lang_name
 
@@ -76,6 +85,13 @@ in your template, then run it with
     }
 
 to produce similar outputs in three languages.
+
+=head2 get_single_trans
+
+    my $label = get_single_trans ($trans, $id, $lang);
+
+Given C<$trans> as read by L</read_trans>, get a single translation of
+C<$id> for C<$lang>.
 
 =head2 read_trans
 

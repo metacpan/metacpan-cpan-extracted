@@ -26,6 +26,8 @@ my $build = Module::Build->new(
          x_IRC => "irc://irc.perl.org/#io-async",
       },
    },
+
+   extra_compiler_flags => [qw( -Iinclude )],
 );
 
 XS::Parse::Keyword::Builder->extend_module_build( $build );

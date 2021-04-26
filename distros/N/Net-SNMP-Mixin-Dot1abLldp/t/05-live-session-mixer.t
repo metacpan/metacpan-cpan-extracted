@@ -49,11 +49,11 @@ SKIP: {
 
   eval { $session->init_mixins };
   ok( !$@, 'init_mixins without error' );
-  ok( $session->init_ok('Net::SNMP::Mixin::Dot1abLldp'), 'initialization successful completetd' );
+  ok( $session->init_ok('Net::SNMP::Mixin::Dot1abLldp'), 'initialization successful completed' );
 
   eval { $session->init_mixins(1) };
   ok( !$@, 'already initialized but reload forced' );
-  ok( $session->init_ok('Net::SNMP::Mixin::Dot1abLldp'), 'initialization successful completetd' );
+  ok( $session->init_ok('Net::SNMP::Mixin::Dot1abLldp'), 'initialization successful completed' );
 
   eval { $session->init_mixins };
   like(
@@ -101,12 +101,12 @@ SKIP: {
   eval { $session->init_mixins };
   ok( !$@, 'init_mixins without error' );
   snmp_dispatcher();
-  ok( $session->init_ok('Net::SNMP::Mixin::Dot1abLldp'), 'initialization successful completetd' );
+  ok( $session->init_ok('Net::SNMP::Mixin::Dot1abLldp'), 'initialization successful completed' );
 
   eval { $session->init_mixins(1) };
   ok( !$@, 'already initialized but reload forced' );
   snmp_dispatcher();
-  ok( $session->init_ok('Net::SNMP::Mixin::Dot1abLldp'), 'initialization successful completetd' );
+  ok( $session->init_ok('Net::SNMP::Mixin::Dot1abLldp'), 'initialization successful completed' );
 
   eval { $lldp_local_system_data = $session->get_lldp_local_system_data };
   ok( !$@, 'get_lldp_local_system_data' );

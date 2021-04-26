@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 #
-# Copyright (C) 2010-2020 National Marrow Donor Program. All rights reserved.
+# Copyright (C) 2010-2021 National Marrow Donor Program. All rights reserved.
 #
 # For a description of this module, please refer to the POD documentation
 # embedded at the bottom of the file (e.g. perldoc EMDIS::ECS::FileBackedMessage).
@@ -11,7 +11,7 @@ use EMDIS::ECS qw($ECS_CFG $ECS_NODE_TBL $FILEMODE $VERSION ecs_is_configured
            format_datetime format_doc_filename format_msg_filename
            log_debug log_info log_warn log_error log_fatal
            send_amqp_message send_encrypted_message send_email
-           dequote trim);
+           dequote trim is_yes);
 use Fcntl qw(:DEFAULT :flock);
 use File::Basename;
 use File::Spec::Functions qw(catdir catfile);
@@ -739,8 +739,8 @@ sub send_this_message
     if($num_parts == 1)
     {
         # read all data, send single email message
-        $err = "Unable to position file pointer for file $this->{filename}" .
-            " to position $this->{data_offset}: $!"
+        $err = "send_this_message(): Unable to position file pointer for " .
+            "file $this->{filename} to position $this->{data_offset}: $!"
             unless seek $this->{file_handle}, $this->{data_offset}, 0;
 
         if(not $err)
@@ -765,12 +765,16 @@ sub send_this_message
                 # don't encrypt meta-message
                 if(is_yes($cfg->ENABLE_AMQP) and exists $node->{amqp_addr_meta} and $node->{amqp_addr_meta}) {
                     # send meta-message via AMQP (if indicated by node config)
-                    return send_amqp_message(
+                    $err = send_amqp_message(
                         $node->{amqp_addr_meta},
                         $subject,
                         $node,
                         $custom_headers,
                         $all_data);
+                }
+                elsif(is_yes($node->{amqp_only})) {
+                    $err = "send_this_message(): Unable to send email META message " .
+                        "to node $rcv_node_id: amqp_only selected.";
                 }
                 else {
                     $err = send_email($node->{addr}, $subject, undef, $all_data);
@@ -811,8 +815,8 @@ sub send_this_message
         {
             my $part_offset = $this->{data_offset} +
                 ($part_num -1) * $msg_part_size;
-            $err = "Unable to position file pointer for file " .
-                "$this->{filename} to position $this->{data_offset}: $!"
+            $err = "send_this_message(): Unable to position file pointer for " .
+                "file $this->{filename} to position $this->{data_offset}: $!"
                 unless seek $this->{file_handle}, $part_offset, 0;
 
             if(not $err)
@@ -933,7 +937,7 @@ THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
 WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF 
 MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
 
-Copyright (C) 2010-2020 National Marrow Donor Program. All rights reserved.
+Copyright (C) 2010-2021 National Marrow Donor Program. All rights reserved.
 
 See LICENSE file for license details.
 

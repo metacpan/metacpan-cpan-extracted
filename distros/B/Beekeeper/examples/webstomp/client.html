@@ -1,0 +1,77 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+<script language="Javascript" type="text/javascript" src="config.js"></script>
+<script language="Javascript" type="text/javascript" src="js/stomp.js"></script>
+<script language="Javascript" type="text/javascript" src="js/beekeeper.js"></script>
+<script language="Javascript" type="text/javascript" src="js/calculator.js"></script>
+<script language="Javascript" type="text/javascript">
+
+var calc = new Calculator;
+calc.connect();
+
+</script>
+<style type="text/css">
+
+body {
+    padding: 10px; 
+    font-size: 11pt; 
+    font-family: sans-serif;
+}
+
+#results {
+    overflow: auto; 
+    height: 300px; 
+    width: 500px;
+    margin: 6px;
+    font-family: sans-serif;
+    border: solid 2px #6699CC;
+    border-radius: 6px;
+}
+
+#results div {
+    border: solid 1px #CCCCCC;
+    border-radius: 6px;
+    padding: 6px;
+    margin: 3px;
+}
+
+#results .error {
+    background-color: #FFA0A0;
+}
+
+#results .info {
+    background-color: #FFFFA0;
+}
+
+#expr {
+    font-size: 12pt; font-family: sans-serif;
+    width: 380px;
+    color: #000000;
+    padding: 6px; 
+    margin: 6px;
+    border: solid 2px #6699CC;
+    border-radius: 6px;
+}
+ 
+#send {
+    font-size: 12pt; font-family: sans-serif;
+    width: 80px;
+    color: #000000;
+    padding: 6px; 
+    margin: 6px;
+    border: solid 2px #6699CC;
+    background-color: #6699CC;
+    border-radius: 6px;
+}
+
+</style>
+</head>
+
+<body>
+<input type="text" id="expr" value="2 + 2" />
+<input type="button" id="send" value=" = " onclick="calc.eval_expr()" />
+<div id="results"></div>
+</body>
+</html>

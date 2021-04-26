@@ -8,7 +8,7 @@ libeav - Email Address Validation Library
 
 =head1 SYNOPSIS
 
-#include <eav.h>
+B<#include E<lt>eav.hE<gt>>
 
 =over
 
@@ -164,6 +164,59 @@ B<EAV_TLD_SPONSORED> |
 B<EAV_TLD_SPECIAL>.
 
 =back
+
+=head2 Accessing result information
+
+After calling the function B<eav_is_email()> you may observe the
+B<eav-E<gt>result> value for requesting additional result information.
+The B<result> field is the B<eav_result_t> structure with
+the next fields:
+
+    struct eav_result_t {
+        bool is_ipv4;
+        bool is_ipv6;
+        bool is_domain;
+        int rc;
+        #ifdef HAVE_IDNKIT
+            idn_result_t idn_rc;
+        #else
+            int idn_rc;
+        #endif
+        #ifdef EAV_EXTRA
+            char *lpart;
+            char *domain;
+        #endif
+    };
+
+The description of the fields is shown below:
+
+=over
+
+=item B<is_ipv4> - domain-part is a IPv4 address
+
+=item B<is_ipv6> - domain-part is a IPv6 address
+
+=item B<is_domain> - domain-part is a domain
+
+=item B<rc> - result code, review B<eav.h> for details
+
+=item B<idn_rc> - idn-library-specific result code
+
+=back
+
+When compiled with I<-DEAV_EXTRA> you may access for additional
+fields:
+
+=over
+
+=item B<lpart> - a string value of local-part
+
+=item B<domain> - a string value of domain-part
+
+=back
+
+A common concept is when the B<eav_is_email()> check is failed,
+when values of fields above either false or B<NULL> if applicable.
 
 =head1 HIGH-LEVEL API FUNCTIONS
 

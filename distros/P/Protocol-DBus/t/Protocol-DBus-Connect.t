@@ -17,11 +17,7 @@ use Protocol::DBus::Connect ();
 my $dir = File::Temp::tempdir( CLEANUP => 1 );
 my $path = File::Spec->catfile( $dir, 'socket' );
 
-socket my $s, Socket::AF_UNIX(), Socket::SOCK_STREAM(), 0;
-my $addr = Socket::pack_sockaddr_un($path);
-bind $s, $addr;
-
-listen( $s, 1 );
+my $s = _create_server($path);
 
 alarm 30;
 
@@ -30,7 +26,7 @@ my $pid = fork or do {
         accept( my $new, $s );
         syswrite $new, 'q';
     };
-    sleep;
+
     exit;
 };
 
@@ -52,6 +48,10 @@ SKIP: {
 
     skip "Your OS ($^O) doesn’t report getpeername() … ?", 1 if !$peername;
 
+    # Accommodate https://rt.cpan.org/Public/Bug/Display.html?id=135262
+    my $need_len = length Socket::pack_sockaddr_un('hi');
+    $peername = pack "a$need_len", $peername;
+
     my $peerpath = Socket::unpack_sockaddr_un($peername);
 
     $peerpath =~ tr<\0><>d;
@@ -71,6 +71,18 @@ is(
     '… and a piece of data is transferred as expected',
 );
 
-kill 'QUIT', $pid;
-
 done_testing();
+
+#----------------------------------------------------------------------
+
+sub _create_server {
+    my ($path) = @_;
+
+    socket my $s, Socket::AF_UNIX(), Socket::SOCK_STREAM(), 0;
+    my $addr = Socket::pack_sockaddr_un($path);
+    bind $s, $addr;
+
+    listen( $s, 1 );
+
+    return $s;
+}

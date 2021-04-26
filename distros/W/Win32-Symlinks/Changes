@@ -1,0 +1,13 @@
+Revision history for Win32-Symlinks
+
+0.03	2021-04-24
+		First public version.
+0.04	2021-04-24
+		Fixing issues with POD and Makefile.PL
+0.06	2021-04-24
+		Improvements to documentation.
+		Fix of bug that appeared in the test smokers for Perl 5.18 x86
+0.08	2021-04-25
+		Removed unnecessary dependency to Perlmazing
+		Updated prereqs in Makefile.PL
+		Updated test files to run without Perlmazing

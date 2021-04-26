@@ -1,5 +1,6 @@
 Build.PL
 Changes
+include/dispatchop.h
 lib/Syntax/Keyword/Match.pm
 lib/Syntax/Keyword/Match.xs
 LICENSE
@@ -14,4 +15,6 @@ t/01match-regexp.t
 t/01match-streq.t
 t/10context.t
 t/11ordering.t
+t/20experimental-dispatch.t
+t/21experimental-dispatch-isa.t
 t/99pod.t

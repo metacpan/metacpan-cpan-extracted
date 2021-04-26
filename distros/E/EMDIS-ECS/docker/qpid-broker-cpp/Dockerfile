@@ -13,11 +13,16 @@
 #
 # 2) Build a "perlecs/qpid-broker-cpp" Docker image based on the Dockerfile, e.g.
 #
-#    docker build -t perlecs/qpid-broker-cpp:0.42-1 .
+#    docker build -t perlecs/qpid-broker-cpp:0.43-1 .
+#
+#    Alternatively, use --build-arg to override the GENERATE_NEW_CERTFILES
+#    environment variable at build time.
+#
+#    docker build --build-arg GENERATE_NEW_CERTFILES=YES -t perlecs/qpid-broker-cpp:0.43-1 .
 #
 # 3) Run a Docker container based on the image, e.g.
 #
-#    docker run --rm --name=perlecs_qpid_broker_cpp --expose 5671 --expose 5672 perlecs/qpid-broker-cpp:0.42-1
+#    docker run --rm --name=perlecs_qpid_broker_cpp --expose 5671 --expose 5672 perlecs/qpid-broker-cpp:0.43-1
 #
 # 4) If needed, start a separate bash shell within the running container and
 #    use it to execute commands such as qpid-stat and qpid-config, e.g.
@@ -26,7 +31,8 @@
 #    bash-4.2$ qpid-stat -q -b 'amqps://admin/password@localhost:5671' --sasl-mechanism PLAIN
 #    bash-4.2$ qpid-config -b 'amqps://admin/password@localhost:5671' --sasl-mechanism PLAIN add queue emdis.yy.msg --durable
 #
-# 5) If needed, copy tarball containing CA and client certificate files, e.g.
+# 5) If needed (i.e. if GENERATE_NEW_CERTFILES=YES), copy tarball containing
+#    CA and client certificate files, e.g.
 #
 #    docker cp perlecs_qpid_broker_cpp:/var/lib/qpidd/certificates.tar.gz .
 #
@@ -35,7 +41,7 @@
 FROM centos:7
 LABEL Maintainer="Joel Schneider <joel@joelschneider.net>" \
       Description="Apache Qpid Broker-CPP" \
-      Version="0.42"
+      Version="0.43"
 
 # install deltarpm, and update installed packages
 RUN yum -y install deltarpm.x86_64

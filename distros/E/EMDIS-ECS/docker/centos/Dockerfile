@@ -11,12 +11,12 @@
 #
 # 2) Build a "perlecs/centos" Docker image based on the Dockerfile.
 #
-#    docker build -t perlecs/centos:0.42-1 .
+#    docker build -t perlecs/centos:0.43-1 .
 #
 # 3) Generate a Docker container based on the image, and run an interactive
 #    bash shell within the container.
 #
-#    docker run --rm -it --name=perlecs_centos  perlecs/centos:0.42-1 /bin/bash
+#    docker run --rm -it --name=perlecs_centos  perlecs/centos:0.43-1 /bin/bash
 #
 # 4) Configure Perl ECS within the docker container.  For example, use
 #    "ecs_setup" to generate an ecs.cfg configuration file, "ecstool" to
@@ -34,7 +34,7 @@
 FROM centos:7
 LABEL Maintainer="Joel Schneider <joel@joelschneider.net>"
 LABEL Description="EMDIS::ECS (Perl ECS) on CentOS"
-LABEL Version="0.42"
+LABEL Version="0.43"
 
 # install deltarpm, and update installed packages
 RUN yum -y install deltarpm.x86_64

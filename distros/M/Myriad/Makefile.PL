@@ -48,7 +48,7 @@ my %WriteMakefileArgs = (
     "Net::Async::HTTP" => "0.48",
     "Net::Async::HTTP::Server" => "0.13",
     "Net::Async::OpenTracing" => "1.000",
-    "Net::Async::Redis" => "3.011",
+    "Net::Async::Redis" => "3.012",
     "Net::Async::SMTP" => "0.002",
     "Object::Pad" => "0.37",
     "OpenTracing::Any" => "1.003",
@@ -86,7 +86,7 @@ my %WriteMakefileArgs = (
     "Test::More" => "0.98",
     "Test::NoTabs" => 0
   },
-  "VERSION" => "0.001",
+  "VERSION" => "0.002",
   "test" => {
     "TESTS" => "t/*.t t/RPC/*.t t/transport/*.t"
   }
@@ -127,7 +127,7 @@ my %FallbackPrereqs = (
   "Net::Async::HTTP" => "0.48",
   "Net::Async::HTTP::Server" => "0.13",
   "Net::Async::OpenTracing" => "1.000",
-  "Net::Async::Redis" => "3.011",
+  "Net::Async::Redis" => "3.012",
   "Net::Async::SMTP" => "0.002",
   "Object::Pad" => "0.37",
   "OpenTracing::Any" => "1.003",

@@ -1,5 +1,5 @@
 package Util::Medley::Simple::DateTime;
-$Util::Medley::Simple::DateTime::VERSION = '0.059';
+$Util::Medley::Simple::DateTime::VERSION = '0.060';
 #
 # Moose::Exporter exports everything into your namespace.  This
 # approach allows for importing individual functions.
@@ -11,7 +11,7 @@ Util::Medley::Simple::DateTime - an exporter module for Util::Medley::DateTime
 
 =head1 VERSION
 
-version 0.059
+version 0.060
 
 =cut
 

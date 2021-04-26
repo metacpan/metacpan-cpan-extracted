@@ -2,7 +2,7 @@ package Myriad::Service::Storage;
 
 use Myriad::Class;
 
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 our $AUTHORITY = 'cpan:DERIV'; # AUTHORITY
 
 =encoding utf8

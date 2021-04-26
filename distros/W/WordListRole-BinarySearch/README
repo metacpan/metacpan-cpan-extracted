@@ -3,9 +3,9 @@ NAME
     search
 
 VERSION
-    This document describes version 0.004 of WordListRole::BinarySearch
+    This document describes version 0.005 of WordListRole::BinarySearch
     (from Perl distribution WordListRole-BinarySearch), released on
-    2020-05-23.
+    2021-04-25.
 
 SYNOPSIS
      use Role::Tiny;
@@ -44,7 +44,7 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2020 by perlancar@cpan.org.
+    This software is copyright (c) 2021 by perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

@@ -6,10 +6,14 @@ use Carp;
 use curry;
 use IO::Select;
 use IO::Socket;
+use Module::Load qw/ load /;
 use Net::EmptyPort qw/ empty_port /;
 use Socket qw/ SOCK_DGRAM /;
 
-use Net::Statsd::Lite;
+has class => (
+    is      => 'ro',
+    default => 'Net::Statsd::Lite',
+);
 
 has proto => (
     is      => 'ro',
@@ -38,7 +42,7 @@ has autoflush => (
 
 has timeout => (
     is      => 'ro',
-    default => 2,
+    default => 10,
 );
 
 has input => (
@@ -114,7 +118,9 @@ sub test_udp {
     }
     if ( defined $pid ) {
 
-        my $client = Net::Statsd::Lite->new(
+        load( my $class = $self->class );
+
+        my $client = $class->new(
             port            => $port,
             host            => $self->host,
             proto           => $self->proto,

@@ -27,14 +27,14 @@ sub new {
 }
 
 sub singleton {
-    my ($class, $char) = @_;
+    my ( $class, $char ) = @_;
     my $nfa = $class->new;
 
-    if (not defined $char) {
+    if ( not defined $char ) {
         $nfa->add_states(1);
         $nfa->set_starting(0);
     }
-    elsif ($char eq "") {
+    elsif ( $char eq "" ) {
         $nfa->add_states(1);
         $nfa->set_starting(0);
         $nfa->set_accepting(0);
@@ -43,44 +43,44 @@ sub singleton {
         $nfa->add_states(2);
         $nfa->set_starting(0);
         $nfa->set_accepting(1);
-        $nfa->set_transition(0, 1, $char);
+        $nfa->set_transition( 0, 1, $char );
     }
     return $nfa;
 }
 
-sub as_nfa {$_[0]->clone}
+sub as_nfa { $_[0]->clone }
 
 sub union {
-    my @nfas = map {$_->as_nfa} @_;
+    my @nfas   = map { $_->as_nfa } @_;
     my $result = $nfas[0]->clone;
-    $result->_swallow($_) for @nfas[1 .. $#nfas];
+    $result->_swallow($_) for @nfas[ 1 .. $#nfas ];
     $result;
 }
 
 sub concat {
-    my @nfas = map {$_->as_nfa} @_;
+    my @nfas = map { $_->as_nfa } @_;
 
     my $result   = $nfas[0]->clone;
-    my @newstate = ([$result->get_states]);
+    my @newstate = ( [ $result->get_states ] );
     my @start    = $result->get_starting;
 
-    for (1 .. $#nfas) {
-        push @newstate, [$result->_swallow($nfas[$_])];
+    for ( 1 .. $#nfas ) {
+        push @newstate, [ $result->_swallow( $nfas[$_] ) ];
     }
 
-    $result->unset_accepting($result->get_states);
-    $result->unset_starting($result->get_states);
+    $result->unset_accepting( $result->get_states );
+    $result->unset_starting( $result->get_states );
     $result->set_starting(@start);
 
-    for my $nfa_id (1 .. $#nfas) {
-        for my $s1 ($nfas[$nfa_id - 1]->get_accepting) {
-            for my $s2 ($nfas[$nfa_id]->get_starting) {
-                $result->set_transition($newstate[$nfa_id - 1][$s1], $newstate[$nfa_id][$s2], "");
+    for my $nfa_id ( 1 .. $#nfas ) {
+        for my $s1 ( $nfas[ $nfa_id - 1 ]->get_accepting ) {
+            for my $s2 ( $nfas[$nfa_id]->get_starting ) {
+                $result->set_transition( $newstate[ $nfa_id - 1 ][$s1], $newstate[$nfa_id][$s2], "" );
             }
         }
     }
 
-    $result->set_accepting(@{$newstate[-1]}[$nfas[-1]->get_accepting]);
+    $result->set_accepting( @{ $newstate[-1] }[ $nfas[-1]->get_accepting ] );
 
     $result;
 }
@@ -88,18 +88,18 @@ sub concat {
 sub kleene {
     my $result = $_[0]->clone;
 
-    my ($newstart, $newfinal) = $result->add_states(2);
+    my ( $newstart, $newfinal ) = $result->add_states(2);
 
-    $result->set_transition($newstart, $_, "") for $result->get_starting;
-    $result->unset_starting($result->get_starting);
+    $result->set_transition( $newstart, $_, "" ) for $result->get_starting;
+    $result->unset_starting( $result->get_starting );
     $result->set_starting($newstart);
 
-    $result->set_transition($_, $newfinal, "") for $result->get_accepting;
-    $result->unset_accepting($result->get_accepting);
+    $result->set_transition( $_, $newfinal, "" ) for $result->get_accepting;
+    $result->unset_accepting( $result->get_accepting );
     $result->set_accepting($newfinal);
 
-    $result->set_transition($newstart, $newfinal, "");
-    $result->set_transition($newfinal, $newstart, "");
+    $result->set_transition( $newstart, $newfinal, "" );
+    $result->set_transition( $newfinal, $newstart, "" );
 
     $result;
 }
@@ -111,8 +111,8 @@ sub reverse {
     my @start = $self->get_starting;
     my @final = $self->get_accepting;
 
-    $self->unset_accepting($self->get_states);
-    $self->unset_starting($self->get_states);
+    $self->unset_accepting( $self->get_states );
+    $self->unset_starting( $self->get_states );
 
     $self->set_accepting(@start);
     $self->set_starting(@final);
@@ -126,11 +126,11 @@ sub is_empty {
     my $self = shift;
 
     my @queue = $self->get_starting;
-    my %seen = map {$_ => 1} @queue;
+    my %seen  = map { $_ => 1 } @queue;
 
     while (@queue) {
-        return 0 if grep {$self->is_accepting($_)} @queue;
-        @queue = grep {!$seen{$_}++} $self->successors(\@queue);
+        return 0 if grep { $self->is_accepting($_) } @queue;
+        @queue = grep { !$seen{$_}++ } $self->successors( \@queue );
     }
     return 1;
 }
@@ -142,77 +142,77 @@ sub is_finite {
     return 1 if @alphabet == 0;
 
     my @queue = $self->get_starting;
-    my %seen = map {$_ => 1} @queue;
+    my %seen  = map { $_ => 1 } @queue;
 
     while (@queue) {
-        @queue = grep {!$seen{$_}++} $self->successors(\@queue);
+        @queue = grep { !$seen{$_}++ } $self->successors( \@queue );
     }
 
-    for my $s (grep {$self->is_accepting($_)} keys %seen) {
+    for my $s ( grep { $self->is_accepting($_) } keys %seen ) {
         @queue = $self->epsilon_closure($s);
-        %seen = map {$_ => 1} @queue;
+        %seen  = map { $_ => 1 } @queue;
 
         while (@queue) {
-            my @next = $self->epsilon_closure($self->successors(\@queue, \@alphabet));
+            my @next = $self->epsilon_closure( $self->successors( \@queue, \@alphabet ) );
 
-            return 0 if grep {$s eq $_} @next;
-            @queue = grep {!$seen{$_}++} @next;
+            return 0 if grep { $s eq $_ } @next;
+            @queue = grep { !$seen{$_}++ } @next;
         }
     }
     return 1;
 }
 
 sub epsilon_closure {
-    my ($self, @states) = @_;
-    my %seen = map {$_ => 1} @states;
+    my ( $self, @states ) = @_;
+    my %seen  = map { $_ => 1 } @states;
     my @queue = @states;
 
     while (@queue) {
-        @queue = grep {!$seen{$_}++} $self->successors(\@queue, "");
+        @queue = grep { !$seen{$_}++ } $self->successors( \@queue, "" );
     }
 
     keys %seen;
 }
 
 sub contains {
-    my ($self, $string) = @_;
+    my ( $self, $string ) = @_;
 
-    my @active = $self->epsilon_closure($self->get_starting);
-    for my $char (split //, $string) {
+    my @active = $self->epsilon_closure( $self->get_starting );
+    for my $char ( split //, $string ) {
         return 0 if !@active;
-        @active = $self->epsilon_closure($self->successors(\@active, $char));
+        @active = $self->epsilon_closure( $self->successors( \@active, $char ) );
     }
-    return !!grep {$self->is_accepting($_)} @active;
+    return !!grep { $self->is_accepting($_) } @active;
 }
 
 sub trace {
-    my ($self, $string) = @_;
+    my ( $self, $string ) = @_;
 
-    my @trace = ([$self->epsilon_closure($self->get_starting)]);
+    my @trace = ( [ $self->epsilon_closure( $self->get_starting ) ] );
 
-    for my $char (split //, $string) {
-        push @trace, [$self->epsilon_closure($self->successors($trace[-1], $char))];
+    for my $char ( split //, $string ) {
+        push @trace, [ $self->epsilon_closure( $self->successors( $trace[-1], $char ) ) ];
     }
     return @trace;
 }
 ############
 
 sub _extend_alphabet {
-    my ($self, @alpha) = @_;
+    my ( $self, @alpha ) = @_;
 
-    my %alpha = map {$_ => 1} @alpha;
+    my %alpha = map { $_ => 1 } @alpha;
     delete $alpha{$_} for $self->alphabet;
 
     return if not keys %alpha;
 
     my $trash = $self->add_states(1);
-    for my $state ($self->get_states) {
+    for my $state ( $self->get_states ) {
         next if $state eq $trash;
-        for my $char (keys %alpha) {
-            $self->add_transition($state, $trash, $char);
+        for my $char ( keys %alpha ) {
+            $self->add_transition( $state, $trash, $char );
         }
     }
-    $self->add_transition($trash, $trash, $self->alphabet);
+    $self->add_transition( $trash, $trash, $self->alphabet );
 }
 
 ######## transformations
@@ -229,31 +229,31 @@ sub as_dfa {
     my $result = FLAT::DFA->new;
     my %subset;
 
-    my %final = map {$_ => 1} $self->get_accepting;
-    my @start = sort {$a <=> $b} $self->epsilon_closure($self->get_starting);
+    my %final = map  { $_ => 1 } $self->get_accepting;
+    my @start = sort { $a <=> $b } $self->epsilon_closure( $self->get_starting );
 
-    my $start = $subset{_SET_ID(@start)} = $result->add_states(1);
+    my $start = $subset{ _SET_ID(@start) } = $result->add_states(1);
     $result->set_starting($start);
 
     $result->set_accepting($start)
-        if grep $_, @final{@start};
+      if grep $_, @final{@start};
 
-    my @queue = (\@start);
+    my @queue = ( \@start );
     while (@queue) {
-        my @states = @{shift @queue};
-        my $S      = $subset{_SET_ID(@states)};
+        my @states = @{ shift @queue };
+        my $S      = $subset{ _SET_ID(@states) };
 
-        for my $symb ($self->alphabet) {
-            my @to = $self->epsilon_closure($self->successors(\@states, $symb));
+        for my $symb ( $self->alphabet ) {
+            my @to = $self->epsilon_closure( $self->successors( \@states, $symb ) );
 
-            if (not exists $subset{_SET_ID(@to)}) {
+            if ( not exists $subset{ _SET_ID(@to) } ) {
                 push @queue, \@to;
-                my $T = $subset{_SET_ID(@to)} = $result->add_states(1);
+                my $T = $subset{ _SET_ID(@to) } = $result->add_states(1);
                 $result->set_accepting($T)
-                    if grep $_, @final{@to};
+                  if grep $_, @final{@to};
             }
 
-            $result->add_transition($S, $subset{_SET_ID(@to)}, $symb);
+            $result->add_transition( $S, $subset{ _SET_ID(@to) }, $symb );
         }
     }
 
@@ -274,20 +274,21 @@ sub as_undirected {
         my $s = $_;
         foreach (@symbols) {
             my $a = $_;
+
             # foreach state, get all nodes connected to it; ignore symbols and
             # treat transitions simply as directed
-            push(@{$edges{$s}}, $self->successors($s, $a));
-            foreach ($self->successors($s, $a)) {
-                push(@{$edges{$_}}, $s);
+            push( @{ $edges{$s} }, $self->successors( $s, $a ) );
+            foreach ( $self->successors( $s, $a ) ) {
+                push( @{ $edges{$_} }, $s );
             }
         }
     }
-    my @lines = (($#states + 1));
-    foreach (sort {$a <=> $b;} (keys(%edges))) {    #<-- iterate over numerically sorted list of keys
-        @{$edges{$_}} = sort {$a <=> $b;} $self->array_unique(@{$edges{$_}});    #<- make items unique and sort numerically
-        push(@lines, sprintf("%s(%s):%s", $_, ($#{$edges{$_}} + 1), join(' ', @{$edges{$_}})));
+    my @lines = ( ( $#states + 1 ) );
+    foreach ( sort { $a <=> $b; } ( keys(%edges) ) ) {    #<-- iterate over numerically sorted list of keys
+        @{ $edges{$_} } = sort { $a <=> $b; } $self->array_unique( @{ $edges{$_} } );    #<- make items unique and sort numerically
+        push( @lines, sprintf( "%s(%s):%s", $_, ( $#{ $edges{$_} } + 1 ), join( ' ', @{ $edges{$_} } ) ) );
     }
-    return join("\n", @lines);
+    return join( "\n", @lines );
 }
 
 # Format that Dr. Sukhamay KUNDU likes to use in his assignments :)
@@ -303,39 +304,35 @@ sub as_digraph {
         my @edges = ();
         foreach (@symbols) {
             my $a = $_;
+
             # foreach state, get all nodes connected to it; ignore symbols and
             # treat transitions simply as directed
-            push(@edges, $self->successors($s, $a));
+            push( @edges, $self->successors( $s, $a ) );
         }
-        @edges = sort {$a <=> $b;} $self->array_unique(@edges);    #<- make items unique and sort numerically
-        push(@lines, sprintf("%s(%s): %s", $s, ($#edges + 1), join(' ', @edges)));
+        @edges = sort { $a <=> $b; } $self->array_unique(@edges);    #<- make items unique and sort numerically
+        push( @lines, sprintf( "%s(%s): %s", $s, ( $#edges + 1 ), join( ' ', @edges ) ) );
     }
-    return sprintf("%s\n%s", ($#states + 1), join("\n", @lines));
+    return sprintf( "%s\n%s", ( $#states + 1 ), join( "\n", @lines ) );
 }
 
 # Graph Description Language, aiSee, etc
 sub as_gdl {
     my $self = shift;
 
-    my @states = map {
-        sprintf qq{node: { title:"%s" shape:circle borderstyle: %s}\n},
-            $_,
-            ($self->is_accepting($_) ? "double bordercolor: red" : "solid")
-    } $self->get_states;
+    my @states = map { sprintf qq{node: { title:"%s" shape:circle borderstyle: %s}\n}, $_, ( $self->is_accepting($_) ? "double bordercolor: red" : "solid" ) } $self->get_states;
 
     my @trans;
-    for my $s1 ($self->get_states) {
-        for my $s2 ($self->get_states) {
-            my $t = $self->get_transition($s1, $s2);
+    for my $s1 ( $self->get_states ) {
+        for my $s2 ( $self->get_states ) {
+            my $t = $self->get_transition( $s1, $s2 );
 
-            if (defined $t) {
-                push @trans, sprintf qq[edge: { source: "%s" target: "%s" label: "%s" arrowstyle: line }\n],
-                    $s1, $s2, $t->as_string;
+            if ( defined $t ) {
+                push @trans, sprintf qq[edge: { source: "%s" target: "%s" label: "%s" arrowstyle: line }\n], $s1, $s2, $t->as_string;
             }
         }
     }
 
-    return sprintf "graph: {\ndisplay_edge_labels: yes\n\n%s\n%s}\n", join("", @states), join("", @trans);
+    return sprintf "graph: {\ndisplay_edge_labels: yes\n\n%s\n%s}\n", join( "", @states ), join( "", @trans );
 }
 
 # JFLAP, for importing into it
@@ -351,29 +348,20 @@ END
   </automaton>
 </structure>
 END
-    my @states = map {
-        sprintf(
-            qq{\n     <state id="%s" name="%s">\n%s%s    </state>\n},
-            $_, $_,
-            ($self->is_starting($_)  ? "      <initial/>\n" : ''),
-            ($self->is_accepting($_) ? "      <final/>\n"   : '')
-            )
-    } $self->get_states;
+    my @states = map { sprintf( qq{\n     <state id="%s" name="%s">\n%s%s    </state>\n}, $_, $_, ( $self->is_starting($_) ? "      <initial/>\n" : '' ), ( $self->is_accepting($_) ? "      <final/>\n" : '' ) ) } $self->get_states;
     my @trans;
-    for my $s1 ($self->get_states) {
-        for my $s2 ($self->get_states) {
-            my $t = $self->get_transition($s1, $s2);
-            if (defined $t) {
+    for my $s1 ( $self->get_states ) {
+        for my $s2 ( $self->get_states ) {
+            my $t = $self->get_transition( $s1, $s2 );
+            if ( defined $t ) {
                 my $label = $t->as_string;
-                $label = ($label eq 'epsilon') ? '<read/>' : sprintf("<read>%s</read>", $label);
-                push @trans,
-                    sprintf("\n    <transition>\n      <from>%s</from>\n      <to>%s</to>\n      %s\n    </transition>\n",
-                    $s1, $s2, $label);
+                $label = ( $label eq 'epsilon' ) ? '<read/>' : sprintf( "<read>%s</read>", $label );
+                push @trans, sprintf( "\n    <transition>\n      <from>%s</from>\n      <to>%s</to>\n      %s\n    </transition>\n", $s1, $s2, $label );
             }
         }
     }
 
-    return sprintf("%s\n\n%s\n%s%s\n", $XMLstart, join("", @states), join("", @trans), $XMLend);
+    return sprintf( "%s\n\n%s\n%s%s\n", $XMLstart, join( "", @states ), join( "", @trans ), $XMLend );
 }
 
 # Graphviz: dot, etc
@@ -381,50 +369,45 @@ END
 sub as_graphviz {
     my $self = shift;
 
-    my @states = map {
-        sprintf qq{%s [label="%s",shape=%s]\n},
-            $_,
-            ($self->is_starting($_)  ? "start ($_)"   : "$_"),
-            ($self->is_accepting($_) ? "doublecircle" : "circle")
-    } $self->get_states;
+    my @states = map { sprintf qq{%s [label="%s",shape=%s]\n}, $_, ( $self->is_starting($_) ? "start ($_)" : "$_" ), ( $self->is_accepting($_) ? "doublecircle" : "circle" ) } $self->get_states;
 
     my @trans;
-    for my $s1 ($self->get_states) {
-        for my $s2 ($self->get_states) {
-            my $t = $self->get_transition($s1, $s2);
+    for my $s1 ( $self->get_states ) {
+        for my $s2 ( $self->get_states ) {
+            my $t = $self->get_transition( $s1, $s2 );
 
-            if (defined $t) {
+            if ( defined $t ) {
                 push @trans, sprintf qq[%s -> %s [label="%s"]\n], $s1, $s2, $t->as_string;
             }
         }
     }
 
-    return sprintf "digraph G {\ngraph [rankdir=LR]\n\n%s\n%s}\n", join("", @states), join("", @trans);
+    return sprintf "digraph G {\ngraph [rankdir=LR]\n\n%s\n%s}\n", join( "", @states ), join( "", @trans );
 }
 ## undirected
 sub as_undirected_graphviz {
     my $self = shift;
 
-    my @states = map {sprintf qq{%s [label="%s",shape=%s]\n}, $_, ("$_"), ("circle")} $self->get_states;
+    my @states = map { sprintf qq{%s [label="%s",shape=%s]\n}, $_, ("$_"), ("circle") } $self->get_states;
 
     my @trans;
-    for my $s1 ($self->get_states) {
-        for my $s2 ($self->get_states) {
-            my $t = $self->get_transition($s1, $s2);
+    for my $s1 ( $self->get_states ) {
+        for my $s2 ( $self->get_states ) {
+            my $t = $self->get_transition( $s1, $s2 );
 
-            if (defined $t) {
+            if ( defined $t ) {
                 push @trans, sprintf qq[%s -- %s\n], $s1, $s2, $t->as_string;
             }
         }
     }
 
-    return sprintf "graph G {\ngraph [rankdir=LR]\n\n%s\n%s}\n", join("", @states), join("", @trans);
+    return sprintf "graph G {\ngraph [rankdir=LR]\n\n%s\n%s}\n", join( "", @states ), join( "", @trans );
 }
 
 #### end formatted output section - probably deserves its own module
 
 sub _SET_ID {
-    return join "\0", sort {$a <=> $b} @_;
+    return join "\0", sort { $a <=> $b } @_;
 }
 
 sub as_summary {
@@ -433,35 +416,35 @@ sub as_summary {
     $out .= sprintf("States         : ");
     my @start;
     my @final;
-    foreach ($self->get_states()) {
+    foreach ( $self->get_states() ) {
         $out .= sprintf "'$_' ";
-        if ($self->is_starting($_)) {
-            push(@start, $_);
+        if ( $self->is_starting($_) ) {
+            push( @start, $_ );
         }
-        if ($self->is_accepting($_)) {
-            push(@final, $_);
+        if ( $self->is_accepting($_) ) {
+            push( @final, $_ );
         }
     }
-    $out .= sprintf("\nStart State    : '%s'\n", join('', @start));
+    $out .= sprintf( "\nStart State    : '%s'\n", join( '', @start ) );
     $out .= sprintf("Final State(s) : ");
     foreach (@final) {
         $out .= sprintf "'$_' ";
     }
     $out .= sprintf("\nAlphabet       : ");
-    foreach ($self->alphabet()) {
+    foreach ( $self->alphabet() ) {
         $out .= sprintf "'$_' ";
     }
     $out .= sprintf("\nTransitions    :\n");
     my @trans;
-    for my $s1 ($self->get_states) {
-        for my $s2 ($self->get_states) {
-            my $t = $self->get_transition($s1, $s2);
-            if (defined $t) {
+    for my $s1 ( $self->get_states ) {
+        for my $s2 ( $self->get_states ) {
+            my $t = $self->get_transition( $s1, $s2 );
+            if ( defined $t ) {
                 push @trans, sprintf qq[%s -> %s on "%s"\n], $s1, $s2, $t->as_string;
             }
         }
     }
-    $out .= join('', @trans);
+    $out .= join( '', @trans );
     return $out;
 }
 
@@ -529,12 +512,7 @@ It is useful for manually validating what the FA looks like.
 =head1 AUTHORS & ACKNOWLEDGEMENTS
 
 FLAT is written by Mike Rosulek E<lt>mike at mikero dot comE<gt> and 
-Brett Estrade E<lt>estradb at gmail dot comE<gt>.
-
-The initial version (FLAT::Legacy) by Brett Estrade was work towards an 
-MS thesis at the University of Southern Mississippi.
-
-Please visit the Wiki at http://www.0x743.com/flat
+B. Estarde E<lt>estradb at gmail dot comE<gt>.
 
 =head1 LICENSE
 

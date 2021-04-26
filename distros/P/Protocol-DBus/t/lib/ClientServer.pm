@@ -6,6 +6,8 @@ use warnings;
 use Test::More;
 use Test::SharedFork;
 
+use File::Spec;
+
 use Socket;
 
 use MockDBusServer;
@@ -31,14 +33,17 @@ sub do_tests {
 }
 
 sub can_socket_msghdr {
-    return do {
-        my $pid = fork or do {
-            exit( eval { require Socket::MsgHdr; 1 } ? 0 : 1 );
-        };
+    for my $dir (@INC) {
+        my $path = File::Spec->catfile($dir, 'Socket', 'MsgHdr.pm');
 
-        waitpid $pid, 0;
-        !$?;
-    };
+        next if !-e $path;
+
+        diag "Socket::MsgHdr found! ($path)";
+        return 1;
+    }
+
+    diag "Socket::MsgHdr is not available.";
+    return 0;
 }
 
 sub _run {

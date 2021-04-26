@@ -6,13 +6,14 @@ use warnings;
 
 use Test::More;
 
-plan tests => 3 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 4 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'App/ColorThemeUtils.pm'
 );
 
 my @scripts = (
+    'script/list-color-theme-items',
     'script/list-color-theme-modules',
     'script/show-color-theme-swatch'
 );

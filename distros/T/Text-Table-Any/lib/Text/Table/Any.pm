@@ -1,9 +1,9 @@
 package Text::Table::Any;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-03-03'; # DATE
+our $DATE = '2021-04-26'; # DATE
 our $DIST = 'Text-Table-Any'; # DIST
-our $VERSION = '0.102'; # VERSION
+our $VERSION = '0.104'; # VERSION
 
 #IFUNBUILT
 # # use 5.010001;
@@ -28,6 +28,7 @@ our @BACKENDS = qw(
                       Text::Table::Org
                       Text::Table::Paragraph
                       Text::Table::Sprintf
+                      Text::Table::TickitWidget
                       Text::Table::Tiny
                       Text::Table::TinyBorderStyle
                       Text::Table::TinyColor
@@ -57,7 +58,13 @@ sub table {
     my $header_row    = $params{header_row} // 1;
     my $separate_rows = $params{separate_rows} // 0;
 
-    if ($backend eq 'Text::Table::Tiny') {
+    if ($backend eq 'Text::Table::TickitWidget') {
+        require Text::Table::TickitWidget;
+        return Text::Table::TickitWidget::table(
+            rows => $rows,
+            header_row => $header_row,
+        ) . "\n";
+    } elsif ($backend eq 'Text::Table::Tiny') {
         require Text::Table::Tiny;
         return Text::Table::Tiny::table(
             rows => $rows,
@@ -262,7 +269,7 @@ Text::Table::Any - Generate text table using one of several backends
 
 =head1 VERSION
 
-This document describes version 0.102 of Text::Table::Any (from Perl distribution Text-Table-Any), released on 2021-03-03.
+This document describes version 0.104 of Text::Table::Any (from Perl distribution Text-Table-Any), released on 2021-04-26.
 
 =head1 SYNOPSIS
 
@@ -423,6 +430,8 @@ Optional. Pick a backend module. Supported backends:
 =item * Text::Table::Paragraph
 
 =item * Text::Table::Sprintf
+
+=item * Text::Table::TickitWidget
 
 =item * Text::Table::Tiny
 

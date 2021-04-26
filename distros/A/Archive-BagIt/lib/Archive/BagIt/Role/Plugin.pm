@@ -39,7 +39,7 @@ Archive::BagIt::Role::Plugin - A role that handles plugin loading
 
 =head1 VERSION
 
-version 0.072
+version 0.073
 
 =head1 AVAILABILITY
 

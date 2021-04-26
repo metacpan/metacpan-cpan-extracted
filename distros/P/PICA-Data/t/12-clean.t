@@ -22,9 +22,18 @@ check(['42'], ['PICA field must be array reference'], 'report malformed field');
 check([['300A','a','0','0']], ["Malformed PICA tag: 300A", "Malformed occurrence: a"], 
     'report malformed tags and occurrences');
 
-check([['300A','','?']],
+check([['300A','','?', '']],
       ["Malformed PICA tag: 300A", "Malformed PICA subfield: ?", "PICA subfield \$? must be non-empty string"],
       'report malformed subfields');
+
+check([['123A','','a', 'b', 'a']],
+    ["Annotation must not be non-alphanumeric character"], 'report invalid annotation');
+
+check([['123A','','a', 'b', 'a']],
+    ["Field annotation not allowed"], 'report unwanted annotation', annotated => 0);
+
+check([['123A','','a', 'b']],
+    ["Missing field annotation"], 'report missing annotation', annotated => 1);
 
 check([['234A',$_,'a','x']], [], 'be lax on occurrences')
     for '', undef, 0, 1, '1', '999'; 

@@ -1,5 +1,9 @@
 Revision history for this software.
 
+0.18  2021-04-24 00:00:00
+  - fix confess() messages
+  - created by INABA Hitoshi
+
 0.17  2021-03-31 00:00:00
   - removes local from UTF8::R2::chr()
   - _list_all_ASCII_by_hyphen() uses CORE::ord()

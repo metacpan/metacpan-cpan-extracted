@@ -1,0 +1,15 @@
+Changes for FLAT
+
+1.0.0         2021-04-22 14:30:51-04:00 America/New_York 
+              - reboot forgot previous releases
+              - cleaned up release
+              - removed cruft, bins
+
+1.0.1         2021-04-23 14:30:51-04:00 America/New_York 
+              - maintenance release
+
+1.0.2         2021-04-23 14:30:52-04:00 America/New_York 
+              - maintenance release
+
+1.0.3         2021-04-24 14:30:52-04:00 America/New_York 
+              - added extra characters to cast

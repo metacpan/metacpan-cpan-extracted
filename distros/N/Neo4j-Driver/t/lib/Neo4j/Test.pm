@@ -38,7 +38,7 @@ sub driver_maybe {
 	}
 	
 	if ($ENV{TEST_NEO4J_NETMODULE}) {
-		eval "require $ENV{TEST_NEO4J_NETMODULE}; 1" or die $@;
+		eval "require $ENV{TEST_NEO4J_NETMODULE}; 1";
 		$driver->config(net_module => $ENV{TEST_NEO4J_NETMODULE});
 	}
 	

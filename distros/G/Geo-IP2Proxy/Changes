@@ -1,5 +1,9 @@
 Revision history for Perl extension Geo::IP2Proxy
 
+3.20  Mon April 26 16:00:00 2021
+      Added new function "getProvider"
+      Added new function "Geo::IP2Proxy::get_last_error_message()"
+
 3.10  Fri July 17 16:00:00 2020
       Fixed MIT license in description
 

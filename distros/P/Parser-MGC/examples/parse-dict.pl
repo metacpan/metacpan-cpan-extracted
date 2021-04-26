@@ -6,16 +6,19 @@ use warnings;
 package DictParser;
 use base qw( Parser::MGC );
 
+use Feature::Compat::Try;
+
 sub parse
 {
    my $self = shift;
 
    $self->any_of(
-      sub { $self->token_int },
-
-      sub { $self->token_string },
+      'token_int',
+      'token_string',
 
       sub { $self->committed_scope_of( "{", 'parse_dict', "}" ) },
+
+      sub { $self->commit; $self->fail( "Expected integer, string, or dictionary" ) },
    );
 }
 
@@ -28,6 +31,7 @@ sub parse_dict
       my $key = $self->token_ident;
 
       $self->expect( ":" );
+      $self->commit;
 
       $ret{$key} = $self->parse;
    } );
@@ -41,10 +45,13 @@ if( !caller ) {
    my $parser = __PACKAGE__->new;
 
    while( defined( my $line = <STDIN> ) ) {
-      my $ret = eval { $parser->from_string( $line ) };
-      print $@ and next if $@;
-
-      print Dumper( $ret );
+      try {
+         my $ret = $parser->from_string( $line );
+         print Dumper( $ret );
+      }
+      catch ( $e ) {
+         print $e;
+      }
    }
 }
 

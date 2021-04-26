@@ -25,6 +25,7 @@ sub filtered_codecs2all
 package Prima::Dialog::ImageOpenDialog;
 use vars qw( @ISA);
 @ISA = qw(Prima::Dialog::OpenDialog);
+use Prima::sys::FS;
 
 {
 my %RNT = (
@@ -130,7 +131,7 @@ sub update_preview
 	return unless defined $x;
 
 	$x = $self-> directory . $x;
-	return unless -f $x;
+	return unless _f $x;
 
 	$x = Prima::Icon-> load( $x,
 		loadExtras => 1,
@@ -514,7 +515,7 @@ information.
 	return unless $img;
 	print "$_:$img->{extras}->{$_}\n" for sort keys %{$img-> {extras}};
 
-=for podview <img src="imagedlg.gif" cut=1>
+=for podview <img src="imagedlg.gif">
 
 =for html <p><img src="https://raw.githubusercontent.com/dk/Prima/master/pod/Prima/imagedlg.gif">
 

@@ -1,5 +1,12 @@
 Revision history for Syntax-Keyword-Match
 
+0.03    2021-04-21
+        [CHANGES]
+         * Added :experimental(dispatch) feature for more efficient runtime
+           of large constant dispatch cases
+         * Unit-test that operation on objects with overloaded comparison
+           operators works correctly
+
 0.02    2021-04-17
         [CHANGES]
          * Support `isa` and `=~` operator

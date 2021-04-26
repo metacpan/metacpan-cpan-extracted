@@ -1,5 +1,8 @@
 Revision history for Perl extension SVG.
 
+2.86  2021.04.22 MANWAR
+      - Replace last use of "vars" with "our", thanks @JRaspass.
+
 2.85  2020.07.02 MANWAR
       - Minor documentation fix, thanks @polettix.
       - Fixed broken author test (xt/author).

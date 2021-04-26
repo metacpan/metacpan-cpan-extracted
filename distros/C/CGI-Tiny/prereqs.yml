@@ -6,9 +6,12 @@ runtime:
     Exporter: '5.57'
     IO::Handle: 0
     JSON::PP: 0
+    Time::Local: 0
   recommends:
     Cpanel::JSON::XS: '4.09'
+    Unicode::UTF8: 0
 test:
   requires:
-    Test::More: '0.96'
+    File::Temp: 0
     MIME::Base64: 0
+    Test::More: '0.96'

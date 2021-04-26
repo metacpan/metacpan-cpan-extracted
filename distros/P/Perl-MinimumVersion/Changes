@@ -1,5 +1,15 @@
 Revision history for Perl module Perl::MinimumVersion
 
+1.40 2021-04-21
+    - No changes from 1.39
+
+1.39 2021-04-11 (TRIAL RELEASE)
+    - Features enabled via the 'experimental' pragma are now recognized (GH#5)
+    - Depend on PPIx::Utils instead of Perl::Critic::Utils (GH#6)
+    - Recognize several new features and their minimum required Perl versions (GH#10, GH#20)
+      - 'say', 'smartmatch', 'postderef', 'postderef_qq', 'signatures',
+        'refaliasing', 'bitwise', 'declared_refs', 'isa', 'indirect'
+
 1.38 2014-08-22
     - The doc for Perl::MinimumVersion now mentions perlver in both
       the DESCRIPTION and SEE ALSO sections. RT#98262 from pagenyon++.

@@ -27,13 +27,6 @@
 
 Core PDL; /* Struct holding pointers to shared C routines */
 
-#ifdef FOO
-Core *pdl__Core_get_Core() /* INTERNAL TO CORE! DONT CALL FROM OUTSIDE */
-{
-	return PDL;
-}
-#endif
-
 int pdl_debugging=0;
 int pdl_autopthread_targ   = 0; /* No auto-pthreading unless set using the set_autopthread_targ */
 int pdl_autopthread_actual = 0;
@@ -90,103 +83,6 @@ static void pdl_freedata (pdl *a) {
 	}
 }
 
-#ifdef FOOFOO_PROPAGATE_BADFLAG
-
-/*
- * this seems to cause an infinite loop in between tests 42 & 43 of
- * t/bad.t - ie
- *
- * $x = sequence( byte, 2, 3 );
- * $y = $x->slice("(1),:");
- * my $mask = sequence( byte, 2, 3 );
- * $mask = $mask->setbadif( ($mask % 3) == 2 );
- * print "a,b == ", $x->badflag, ",", $y->badflag, "\n";
- * $x->inplace->copybad( $mask );                          <-- think this is the call
- * print "a,b == ", $x->badflag, ",", $y->badflag, "\n";
- * print "$x $y\n";
- * ok( $y->badflag, 1 );
- *
- */
-
-/* used by propagate_badflag() */
-
-void propagate_badflag_children( pdl *it, int newval ) {
-    PDL_DECL_CHILDLOOP(it)
-    PDL_START_CHILDLOOP(it)
-    {
-	pdl_trans *trans = PDL_CHILDLOOP_THISCHILD(it);
-	int i;
-
-	for( i = trans->vtable->nparents;
-	     i < trans->vtable->npdls;
-	     i++ ) {
-
-	    pdl *child = trans->pdls[i];
-
-	    if ( newval ) child->state |=  PDL_BADVAL;
-            else          child->state &= ~PDL_BADVAL;
-
-	    /* make sure we propagate to grandchildren, etc */
-	    propagate_badflag_children( child, newval );
-
-        } /* for: i */
-    }
-    PDL_END_CHILDLOOP(it)
-} /* propagate_badflag_children */
-
-/* used by propagate_badflag() */
-
-void propagate_badflag_parents( pdl *it ) {
-    PDL_DECL_CHILDLOOP(it)
-    PDL_START_CHILDLOOP(it)
-    {
-	pdl_trans *trans = PDL_CHILDLOOP_THISCHILD(it);
-	int i;
-
-	for( i = 0;
-	     i < trans->vtable->nparents;
-	     i++ ) {
-
-	    pdl *parent = trans->pdls[i];
-
-	    /* only sets allowed here */
-	    parent->state |= PDL_BADVAL;
-
-	    /* make sure we propagate to grandparents, etc */
-	    propagate_badflag_parents( parent );
-
-        } /* for: i */
-    }
-    PDL_END_CHILDLOOP(it)
-} /* propagate_badflag_parents */
-
-/*
- * we want to change the bad flag of the children
- * (newval = 1 means set flag, 0 means clear it).
- * If newval == 1, then we also loop through the
- * parents, setting their bad flag
- *
- * thanks to Christian Soeller for this
- */
-
-void propagate_badflag( pdl *it, int newval ) {
-   /* only do anything if the flag has changed - do we need this check ? */
-   if ( newval ) {
-      if ( (it->state & PDL_BADVAL) == 0 ) {
-         propagate_badflag_parents( it );
-         propagate_badflag_children( it, newval );
-      }
-   } else {
-      if ( (it->state & PDL_BADVAL) > 0 ) {
-         propagate_badflag_children( it, newval );
-      }
-
-   }
-
-} /* propagate_badflag */
-
-#else        /* FOOFOO_PROPAGATE_BADFLAG */
-
 /* newval = 1 means set flag, 0 means clear it */
 /* thanks to Christian Soeller for this */
 
@@ -212,8 +108,6 @@ void propagate_badflag( pdl *it, int newval ) {
     }
     PDL_END_CHILDLOOP(it)
 } /* propagate_badflag */
-
-#endif    /* FOOFOO_PROPAGATE_BADFLAG */
 
 void propagate_badvalue( pdl *it ) {
     PDL_DECL_CHILDLOOP(it)
@@ -606,21 +500,12 @@ SV *
 sclr_c(it)
    pdl* it
    PREINIT:
-	PDL_Indx nullp = 0;
-	PDL_Indx dummyd = 1;
-	PDL_Indx dummyi = 1;
 	PDL_Anyval result = { -1, 0 };
    CODE:
         /* get the first element of a piddle and return as
          * Perl scalar (autodetect suitable type IV or NV)
          */
-        pdl_make_physvaffine( it );
-	if (it->nvals < 1)
-           croak("piddle must have at least one element");
-	/* offs = PDL_REPROFFS(it); */
-        /* result = pdl_get_offs(PDL_REPRP(it),offs); */
-        result=pdl_at(PDL_REPRP(it), it->datatype, &nullp, &dummyd,
-        &dummyi, PDL_REPROFFS(it),1);
+        result = pdl_at0(it);
         ANYVAL_TO_SV(RETVAL, result);
 
     OUTPUT:
@@ -697,10 +582,7 @@ at_bad_c(x,position)
 #if BADVAL_USENAN
    /* do we have to bother about NaN's? */
         ( ( x->datatype < PDL_F && ANYVAL_EQ_ANYVAL(result, pdl_get_badvalue(x->datatype)) ) ||
-          ( x->datatype == PDL_CF && !(isfinite(crealf(result.value.G)) || isfinite(cimagf(result.value.G))) ) ||
-          ( x->datatype == PDL_CD && !(isfinite(creal(result.value.C)) || isfinite(cimag(result.value.C))) ) ||
-          ( x->datatype == PDL_F && !isfinite(result.value.F) ) ||
-          ( x->datatype == PDL_D && !isfinite(result.value.D) )
+          ANYVAL_ISNAN(result)
         )
 #else
         ANYVAL_EQ_ANYVAL( result, pdl_get_badvalue( x->datatype ) )
@@ -775,11 +657,10 @@ listref_c(x)
 
    int badflag = (x->state & PDL_BADVAL) > 0;
    if (
+      badflag
 #if BADVAL_USENAN
     /* do we have to bother about NaN's? */
-      badflag && x->datatype < PDL_F
-#else
-      badflag
+      && x->datatype < PDL_F
 #endif
    ) {
       pdl_badval = pdl_get_pdl_badvalue( x );
@@ -799,10 +680,7 @@ listref_c(x)
       if ( badflag && 
 #if BADVAL_USENAN
         ( ( x->datatype < PDL_F && ANYVAL_EQ_ANYVAL(pdl_val, pdl_badval) ) ||
-          ( x->datatype == PDL_CF && !(isfinite(crealf(pdl_val.value.G)) || isfinite(cimagf(pdl_val.value.G))) ) ||
-          ( x->datatype == PDL_CD && !(isfinite(creal(pdl_val.value.C)) || isfinite(cimag(pdl_val.value.C))) ) ||
-          ( x->datatype == PDL_F && !isfinite(pdl_val.value.F) ) ||
-          ( x->datatype == PDL_D && !isfinite(pdl_val.value.D) ) )
+          ANYVAL_ISNAN(pdl_val) )
 #else
         ANYVAL_EQ_ANYVAL(pdl_val, pdl_badval)
 #endif
@@ -887,6 +765,7 @@ BOOT:
    PDL.unpackdims  = pdl_unpackdims;
    PDL.setdims     = pdl_setdims;
    PDL.grow        = pdl_grow;
+   PDL.at0         = pdl_at0;
    PDL.flushcache  = NULL;
    PDL.reallocdims = pdl_reallocdims;
    PDL.reallocthreadids = pdl_reallocthreadids;
@@ -925,6 +804,8 @@ BOOT:
 
    PDL.NaN_float  = union_nan_float.f;
    PDL.NaN_double = union_nan_double.d;
+   PDL.NaN_cfloat  = union_nan_float.f + I*union_nan_float.f;
+   PDL.NaN_cdouble = union_nan_double.d + I*union_nan_double.d;
    PDL.propagate_badflag = propagate_badflag;
    PDL.propagate_badvalue = propagate_badvalue;
    PDL.get_pdl_badvalue = pdl_get_pdl_badvalue;

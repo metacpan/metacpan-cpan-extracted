@@ -1,5 +1,23 @@
 Revision history for Net-Async-Redis
 
+3.012     2021-04-22 21:26:23+08:00 Asia/Kuala_Lumpur
+    New features:
+
+    - automatic connection and queuing is now more reliable, you should only
+    need `await $redis->connected` in a few cases now
+    - acess to client-side invalidation events, for implementing observables
+    - enable keyspace notifications in cluster mode
+
+    Bugs fixed:
+
+    - various issues with client-side caching resolved
+    - in cluster mode, XREAD could fail due to incorrect node lookup for key
+    (Github #23, thanks to Marc Frank for the patch)
+    - the stream read/write lengths were using the same internal key,
+    so any changes to one value would affect the other as well
+    - XINFO was mapping to the wrong key in cluster mode, thanks to Eyad for
+    catching and fixing this
+
 3.011     2021-02-03 03:43:05+08:00 Asia/Kuala_Lumpur
     New features:
 

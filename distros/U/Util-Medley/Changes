@@ -1,9 +1,32 @@
 ==================================================
-Changes from 2020-04-20 00:00:00 +0000 to present.
+Changes from 2020-04-23 00:00:00 +0000 to present.
 ==================================================
 
 ------------------------------------------
-version 0.059 at 2021-04-20 22:08:41 +0000
+version 0.060 at 2021-04-23 21:59:02 +0000
+------------------------------------------
+
+  Change: fe08d3ab84776dc2f5aeebd87c2229950f1ad676
+  Author: John Gravatt <john.gravatt@act.org>
+  Date : 2021-04-23 16:57:30 +0000
+
+    added actions: cache-get-expires-at, cache-get-keys,
+    cache-get-namespaces, cache-get-root-dir to the medley cli 
+
+  Change: 7b663c7cb30f4796b082ae946a4d00cc1249070f
+  Author: John Gravatt <john.gravatt@act.org>
+  Date : 2021-04-23 16:56:03 +0000
+
+    added methods getNamespaces and getExpiresAt to Util::Medley::Cache 
+
+  Change: b5834ac5e3191a83712fba253dd008715def9b8e
+  Author: John Gravatt <john.gravatt@act.org>
+  Date : 2021-04-23 16:55:12 +0000
+
+    added optional withTZ flag to Util::Medley::DateTime::localDateTime() 
+
+------------------------------------------
+version 0.059 at 2021-04-20 22:08:23 +0000
 ------------------------------------------
 
   Change: 9ef385d0ae2de19ed5db05e2997ecb06e1c4738c

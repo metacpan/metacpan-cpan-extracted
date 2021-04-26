@@ -61,7 +61,7 @@ Modules and code layout
 
       * Myriad::Storage::PostgreSQL
 
-      * Myriad::Storage::Perl
+      * Myriad::Storage::Memory
 
     Additional transport mechanisms may be available, see CPAN for details.
 
@@ -77,7 +77,7 @@ Modules and code layout
 
       * Myriad::RPC::PostgreSQL
 
-      * Myriad::RPC::Perl
+      * Myriad::RPC::Memory
 
     Additional transport mechanisms may be available, see CPAN for details.
 
@@ -92,7 +92,7 @@ Modules and code layout
 
       * Myriad::Subscription::PostgreSQL
 
-      * Myriad::Subscription::Perl
+      * Myriad::Subscription::Memory
 
     Additional transport mechanisms may be available, see CPAN for details.
 
@@ -109,7 +109,7 @@ Modules and code layout
 
       * Myriad::Transport::PostgreSQL
 
-      * Myriad::Transport::Perl
+      * Myriad::Transport::Memory
 
     which deal with the lower-level interaction with the protocol,
     connection management and so on. More details on that can be found in
@@ -168,9 +168,9 @@ METHODS
     The Net::Async::Redis (or compatible) instance used for service
     coördination.
 
- perl_transport
+ memory_transport
 
-    The Myriad::Transport::Perl instance.
+    The Myriad::Transport::Memory instance.
 
  rpc
 

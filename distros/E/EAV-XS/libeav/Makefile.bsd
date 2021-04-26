@@ -25,7 +25,7 @@ MANDIR ?= $(DATAROOTDIR)/man
 
 MAJOR_VERSION = 0
 MINOR_VERSION = 2
-PATCH_VERSION = 2
+PATCH_VERSION = 3
 VERSION = $(MAJOR_VERSION).$(MINOR_VERSION).$(PATCH_VERSION)
 
 DLL_EXT ?= so
@@ -190,6 +190,7 @@ check: ${DLL_TARGET}
 	RFC6531_FOLLOW_RFC20="${RFC6531_FOLLOW_RFC20}" \
 	${MAKE} -f Makefile.bsd -C tests check
 
+docs: man
 man:
 	env _defs="${DEFS}" \
 	_libs="${LIBS}" \

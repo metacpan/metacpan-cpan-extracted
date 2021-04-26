@@ -99,7 +99,7 @@ Point to an EXECUTABLE file. (absolute or relative to the plan directory):
       ]
     }
 
-See [APP::JESP::Driver#apply\_script](https://metacpan.org/pod/APP::JESP::Driver#apply_script) to see what environment the script is being run in. Note that the script
+See [APP::JESP::Driver#apply\_script](https://metacpan.org/pod/APP%3A%3AJESP%3A%3ADriver%23apply_script) to see what environment the script is being run in. Note that the script
 needs to be executable by the current user to be detected as a script.
 
 # COMPATIBILITY
@@ -130,7 +130,7 @@ without colliding with the Meta data management transaction.
 
 ## Your own driver
 
-Should you want to write your own driver, simply extend [App::JESP::Driver](https://metacpan.org/pod/App::JESP::Driver)
+Should you want to write your own driver, simply extend [App::JESP::Driver](https://metacpan.org/pod/App%3A%3AJESP%3A%3ADriver)
 and implement any method you like (most likely you will want apply\_sql).
 
 To use your driver, simply give its class to the constuctor:
@@ -146,8 +146,8 @@ Or if you prefer to build an instance yourself:
 
 Over the years as a developer, I have used at least three ways of managing SQL patches.
 The ad-hoc way with a hand-rolled system which is painful to re-implement,
-the [DBIx::Class::Migration](https://metacpan.org/pod/DBIx::Class::Migration) way which I didn't like at all, and more recently
-[App::Sqitch](https://metacpan.org/pod/App::Sqitch) which I sort of like.
+the [DBIx::Class::Migration](https://metacpan.org/pod/DBIx%3A%3AClass%3A%3AMigration) way which I didn't like at all, and more recently
+[App::Sqitch](https://metacpan.org/pod/App%3A%3ASqitch) which I sort of like.
 
 All these systems somehow just manage to do the job, but unless they are very complicated (there
 are no limits to hand-rolled complications..) they all fail to provide a sensible
@@ -193,7 +193,7 @@ Here are some design principles this package is attempting to implement:
 - Programmable
 
     It's great to have a convenient command line tool to work and deploy patches, but maybe
-    your development process, or your code layout is a bit different. If you use [App::JESP](https://metacpan.org/pod/App::JESP)
+    your development process, or your code layout is a bit different. If you use [App::JESP](https://metacpan.org/pod/App%3A%3AJESP)
     from Perl, it should be easy to embed and run it yourself.
 
 - What about reverting?
@@ -219,7 +219,7 @@ Usage:
 
 ## status
 
-Returns the list of [App::JESP::Patch](https://metacpan.org/pod/App::JESP::Patch) with their application Datetime if this is known.
+Returns the list of [App::JESP::Patch](https://metacpan.org/pod/App%3A%3AJESP%3A%3APatch) with their application Datetime if this is known.
 This will ALSO return the orphans (patches that are recorded as applied but not in the plan).
 
 Usage:

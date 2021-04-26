@@ -1,6 +1,10 @@
 Revision history for Term::Choose
 
 
+1.731   2021-04-25
+    - Replace 'croak' with 'die' and 'carp' with 'warn'.
+    - Code refactoring.
+
 1.730   2021-04-06
     - Removed deprecated option name 'footer_string'.
     - New experimental option 'skip_items'.

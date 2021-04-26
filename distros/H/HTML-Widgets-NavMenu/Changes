@@ -1,5 +1,9 @@
 Revision history for Perl extension HTML::Widgets::NavMenu.
 
+1.0900  2021-04-25
+    - Add the experimental coords_stop option.
+        - false by default.
+
 1.0801  2020-07-03
     - Fix and re-enable the PerlCritic test on tidyall.
 

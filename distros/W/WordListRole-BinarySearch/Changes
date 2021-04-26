@@ -1,3 +1,10 @@
+0.005   2021-04-25  Released-By: PERLANCAR; Urgency: high
+
+	- [bugfix] Previous version doesn't work because it didn't use
+	  File::SortedSeek properly plus we need to use something like
+	  File::SortedSeek::PERLANCAR to start searching from __DATA__.
+
+
 0.004   2020-05-23  Released-By: PERLANCAR; Urgency: medium
 
 	- Adjust to WordList 0.7.0+.

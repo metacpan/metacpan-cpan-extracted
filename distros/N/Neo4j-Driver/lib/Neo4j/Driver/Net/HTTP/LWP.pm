@@ -5,7 +5,7 @@ use utf8;
 
 package Neo4j::Driver::Net::HTTP::LWP;
 # ABSTRACT: HTTP agent adapter for libwww-perl
-$Neo4j::Driver::Net::HTTP::LWP::VERSION = '0.22';
+$Neo4j::Driver::Net::HTTP::LWP::VERSION = '0.23';
 
 use Carp qw(croak);
 our @CARP_NOT = qw(Neo4j::Driver::Net::HTTP);
@@ -45,7 +45,10 @@ sub new {
 	if ($uri->scheme eq 'https') {
 		croak "HTTPS does not support unencrypted communication; use HTTP" if defined $driver->{tls} && ! $driver->{tls};
 		$agent->ssl_opts( verify_hostname => 1 );
-		$agent->ssl_opts( SSL_ca_file => $driver->{tls_ca} ) if defined $driver->{tls_ca};
+		if (defined( my $tls_ca = $driver->{tls_ca} )) {
+			croak "tls_ca file '$driver->{tls_ca}' can't be used: $!" if ! open(my $fh, '<', $tls_ca);
+			$agent->ssl_opts( SSL_ca_file => $tls_ca );
+		}
 	}
 	else {
 		croak "HTTP does not support encrypted communication; use HTTPS" if $driver->{tls};
@@ -83,7 +86,7 @@ sub http_header {
 
 sub fetch_event {
 	my ($self) = @_;
-	$self->{buffer} = [split m/\n/, $self->fetch_all] unless defined $self->{buffer};
+	$self->{buffer} = [grep { length } split m/\n|\x{1e}/, $self->fetch_all] unless defined $self->{buffer};
 	return shift @{$self->{buffer}};
 }
 
@@ -132,7 +135,7 @@ Neo4j::Driver::Net::HTTP::LWP - HTTP agent adapter for libwww-perl
 
 =head1 VERSION
 
-version 0.22
+version 0.23
 
 =head1 SYNOPSIS
 

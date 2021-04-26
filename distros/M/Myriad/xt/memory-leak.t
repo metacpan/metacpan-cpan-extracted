@@ -9,14 +9,14 @@ use Future;
 use Future::AsyncAwait;
 use Test::More;
 use Test::MemoryGrowth;
-use Myriad::Storage::Implementation::Perl;
+use Myriad::Storage::Implementation::Memory;
 
 use IO::Async::Test;
 use IO::Async::Loop;
 
 my $loop = IO::Async::Loop->new;
 testing_loop( $loop );
-for my $class (qw(Myriad::Storage::Implementation::Perl)) {
+for my $class (qw(Myriad::Storage::Implementation::Memory)) {
     subtest $class => sub {
         $loop->add(
             my $storage = new_ok($class)

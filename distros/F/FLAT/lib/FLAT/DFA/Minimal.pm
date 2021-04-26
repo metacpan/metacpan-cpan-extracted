@@ -64,9 +64,9 @@ constructing and finally returning the FLAT::DFA:Minimal obect.
 =head1 AUTHORS & ACKNOWLEDGEMENTS
 
 FLAT is written by Mike Rosulek E<lt>mike at mikero dot comE<gt> and 
-Brett Estrade E<lt>estradb at gmail dot comE<gt>.
+B. Estarde E<lt>estradb at gmail dot comE<gt>.
 
-The initial version (FLAT::Legacy) by Brett Estrade was work towards an 
+The initial version (FLAT::Legacy) by B. Estarde was work towards an 
 MS thesis at the University of Southern Mississippi.
 
 Please visit the Wiki at http://www.0x743.com/flat

@@ -1,9 +1,9 @@
 package ArrayData::Test::Source::Iterator;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-04-20'; # DATE
+our $DATE = '2021-04-25'; # DATE
 our $DIST = 'ArrayDataRoles-Standard'; # DIST
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.004'; # VERSION
 
 use 5.010001;
 use strict;
@@ -43,7 +43,7 @@ ArrayData::Test::Source::Iterator - A test ArrayData module
 
 =head1 VERSION
 
-This document describes version 0.002 of ArrayData::Test::Source::Iterator (from Perl distribution ArrayDataRoles-Standard), released on 2021-04-20.
+This document describes version 0.004 of ArrayData::Test::Source::Iterator (from Perl distribution ArrayDataRoles-Standard), released on 2021-04-25.
 
 =head1 SYNOPSIS
 
@@ -88,7 +88,7 @@ Source repository is at L<https://github.com/perlancar/perl-ArrayDataRoles-Stand
 
 =head1 BUGS
 
-Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-ArrayDataRoles-Standard/issues>
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=ArrayDataRoles-Standard>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired

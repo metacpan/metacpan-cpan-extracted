@@ -14,6 +14,7 @@ docker/qpid-broker-cpp/certfiles.tar.gz
 docker/qpid-broker-cpp/Dockerfile
 docker/qpid-broker-cpp/generate_ca_and_certfiles.sh
 docker/ubuntu/Dockerfile
+docker/ubuntu/README_GPG
 generate_pdf.sh
 lib/EMDIS/ECS.pm
 lib/EMDIS/ECS/Config.pm

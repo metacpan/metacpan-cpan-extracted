@@ -18,14 +18,13 @@ no_index:
     - t
     - inc
 requires:
-  Carp: '0'
   Data::Dumper: '0'
   Exporter: '0'
   List::Util: '1.33'
   Scalar::Util: '0'
-  Term::Choose: '1.730'
-  Term::Choose::Util: '0.121'
-  Term::Form: '0.530'
+  Term::Choose: '1.731'
+  Term::Choose::Util: '0.123'
+  Term::Form: '0.532'
   constant: '0'
   perl: '5.008003'
   strict: '0'
@@ -33,5 +32,5 @@ requires:
 resources:
   bugtracker: https://github.com/kuerbis/Term-TablePrint/issues
   repository: https://github.com/kuerbis/Term-TablePrint.git
-version: '0.131'
+version: '0.132'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

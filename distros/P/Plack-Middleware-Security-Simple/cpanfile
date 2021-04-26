@@ -48,4 +48,5 @@ on 'develop' => sub {
   requires "Test::Pod::LinkCheck" => "0";
   requires "Test::Portability::Files" => "0";
   requires "Test::TrailingSpace" => "0.0203";
+  requires "Test::Vars" => "0.015";
 };

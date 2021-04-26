@@ -73,14 +73,14 @@ static bool probe_piece(pTHX_ SV *argsv, size_t *argidx, const struct XSParseKey
     case XS_PARSE_KEYWORD_LITERALSTR:
       len = lex_probe_str(piece->u.str);
       if(!len)
-        return false;
+        return FALSE;
 
       lex_read_to(PL_parser->bufptr + len);
       lex_read_space(0);
-      return true;
+      return TRUE;
 
     case XS_PARSE_KEYWORD_FAILURE:
-      croak(piece->u.str);
+      croak("%s", piece->u.str);
       NOT_REACHED;
   }
 
@@ -219,7 +219,7 @@ static void parse_piece(pTHX_ SV *argsv, size_t *argidx, const struct XSParseKey
     }
 
     case XS_PARSE_KEYWORD_FAILURE:
-      croak(piece->u.str);
+      croak("%s", piece->u.str);
       NOT_REACHED;
 
     case XS_PARSE_KEYWORD_PARENSCOPE:

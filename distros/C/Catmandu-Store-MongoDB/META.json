@@ -73,7 +73,7 @@
          "web" : "https://github.com/LibreCat/Catmandu-Store-MongoDB"
       }
    },
-   "version" : "0.0803",
+   "version" : "0.0805",
    "x_contributors" : [
       "Johann Rolschewski <jorol@cpan.org>",
       "Nicolas Franck <nicolas.franck@ugent.be>",
@@ -81,8 +81,8 @@
       "Nicolas Steenlant <nicolas.steenlant@ugent.be>",
       "Patrick Hochstenbach <patrick.hochstenbach@ugent.be>"
    ],
-   "x_generated_by_perl" : "v5.28.1",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.08",
+   "x_generated_by_perl" : "v5.30.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.25",
    "x_static_install" : 0
 }
 

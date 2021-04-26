@@ -1,5 +1,9 @@
 Revision history for Perl module WWW::LinkRot
 
+0.02 2021-04-23
+
+- nofiles option for html_report function
+
 0.01 2021-03-08
 
 - Initial version

@@ -1,4 +1,4 @@
-# regather
+# ![UMI](https://github.com/z-eos/regather/raw/master/regather-logo.png) **REGATHER**
 
 **regather** is a syncrepl consumer to generate ( *re gather* ) files on LDAP synrepl events.
 
@@ -6,9 +6,10 @@ It uses Net::LDAP(3) to do all LDAP related stuff and Template(3) to generate fi
 
 regather has plugin structure and allows to perform any desired action, based on event data
 
-now it has these two plugins:
+plugins now available
 * configfile
 * nsupdate
+* script
 
 As example, regather, on LDAP event can
 * create/re-write/delete OpenVPN client config file/s
@@ -16,7 +17,8 @@ As example, regather, on LDAP event can
 * create/re-write/delete sieve script for mail user.
 * nsupdate DNS zones
 * create/re-write/delete mail domain maildir directory in IMAP4 space, on domain binding to IMAP server LDAP configuration (todo)
+* pass LDAP object as set of environmental variables to a script
 
-In theory it is possible to adopt regather to do anything you want on LDAP syncrepl event.
+All this allow you to adopt regather to do anything you want on LDAP syncrepl event.
 
-Copyright (c) 2020 [Zeus Panchenko](https://github.com/z-eos)
+Copyright (c) 2021 [Zeus Panchenko](https://github.com/z-eos)

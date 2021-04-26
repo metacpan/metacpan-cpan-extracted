@@ -10,10 +10,10 @@ my $cql_mapping = +{
     default_index    => "all",
     indexes          => {
         subject_1 => {filter => ["lowercase"], op => {'=' => 1}},
-        subject_2 => {op => {'=' => {filter => ["lowercase"]}}},
-        subject_3 => {cb => ["T", "filter_subject"], op => {'=' => 1}},
-        subject_4 => {op => {'=' => {cb => ["T", "filter_subject"]}}},
-        all       => {
+        subject_2 => {op     => {'=' => {filter => ["lowercase"]}}},
+        subject_3 => {cb     => ["T", "filter_subject"], op => {'=' => 1}},
+        subject_4 => {op     => {'=' => {cb => ["T", "filter_subject"]}}},
+        all => {
             op => {
                 '='     => 1,
                 'exact' => 1,

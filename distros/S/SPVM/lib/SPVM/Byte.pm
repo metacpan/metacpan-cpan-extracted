@@ -2,8 +2,6 @@ package SPVM::Byte;
 
 1;
 
-# Check document 2019/07/23 almost ok.
-
 =head1 NAME
 
 SPVM::Byte - Byte object
@@ -13,13 +11,15 @@ SPVM::Byte - Byte object
   use SPVM::Byte;
   
   my $byte_object = SPVM::Byte->new(5);
-  my $byte_value = $byte_object->val;
+  my $byte_value = $byte_object->value;
 
 =head1 DESCRIPTION
 
-L<SPVM::Byte> object stores a C<byte> value.
+L<SPVM::Byte> object holds a byte type value.
 
-This object is immutable.
+This object is immutable and its value cannot be changed.
+
+L<SPVM::Byte> is automatically loaded just after the program starts.
 
 =head1 STATIC METHODS
 
@@ -27,12 +27,12 @@ This object is immutable.
 
   sub new : SPVM::Byte ($value : byte)
 
-Create a new L<SPVM::Byte> object with specific C<byte> value.
+Create a new L<SPVM::Byte> object with a C<byte> value.
 
 =head1 INSTANCE METHODS
 
-=head2 val
+=head2 value
 
-  sub val : byte ($self : self)
+  sub value : byte ($self : self)
 
 Get a C<byte> value.

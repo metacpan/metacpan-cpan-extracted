@@ -1,10 +1,11 @@
+[![Actions Status](https://github.com/kaz-utashiro/greple/workflows/test/badge.svg)](https://github.com/kaz-utashiro/greple/actions) [![MetaCPAN Release](https://badge.fury.io/pl/App-Greple.svg)](https://metacpan.org/release/App-Greple)
 # NAME
 
 greple - extensible grep with lexical expression and region control
 
 # VERSION
 
-Version 8.4201
+Version 8.4301
 
 # SYNOPSIS
 

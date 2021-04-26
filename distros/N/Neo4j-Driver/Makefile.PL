@@ -7,7 +7,7 @@ use 5.010;
 use ExtUtils::MakeMaker 6.64;
 
 my %WriteMakefileArgs = (
-  "ABSTRACT" => "Perl Neo4j driver for Bolt and HTTP",
+  "ABSTRACT" => "Neo4j community graph database driver for Bolt and HTTP",
   "AUTHOR" => "Arne Johannessen <ajnn\@cpan.org>",
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => "6.64"
@@ -35,7 +35,7 @@ my %WriteMakefileArgs = (
     "Test::More" => "0.96",
     "Test::Warnings" => 0
   },
-  "VERSION" => "0.22",
+  "VERSION" => "0.23",
   "test" => {
     "TESTS" => "t/*.t"
   }

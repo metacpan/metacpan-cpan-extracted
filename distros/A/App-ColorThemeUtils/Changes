@@ -1,3 +1,10 @@
+0.010   2021-01-20  Released-By: PERLANCAR; Urgency: medium
+
+	- Add CLI: list-color-theme-items.
+
+	- Mention show-colors-from-theme.
+
+
 0.009   2020-06-19  Released-By: PERLANCAR; Urgency: medium
 
 	- [cli list-color-theme-modules] Now only show ColorTheme::*

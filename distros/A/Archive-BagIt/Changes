@@ -1,10 +1,46 @@
 ==================================================
-Changes from 2020-01-27 00:00:00 +0000 to present.
+Changes from 2020-04-23 00:00:00 +0000 to present.
 ==================================================
 
 ------------------------------------------
-version 0.072 at 2021-01-26 08:45:55 +0000
+version 0.073 at 2021-04-23 09:52:17 +0000
 ------------------------------------------
+
+  Change: 29e2832beda604262e46c18ebf605ff10f3a946b
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2021-04-23 10:44:41 +0000
+
+    - added missed init 
+
+  Change: dddf40d7ef2be253ae35cd07fa51b28667b74933
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2021-04-20 17:28:50 +0000
+
+    Released 0.073-TRIAL 
+
+  Change: ae2050c06d3065b1871ed54ad79b8d79af78c74a
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2021-04-20 17:26:30 +0000
+
+    - changed to use NET::SSLeay instead Digest::MD5 and Digest::SHA,
+
+    because impressive boost in checksum calculation, because openssl
+
+    delivers highly optimized digest implementaions. As an example,
+
+    a bag with size of 15GB validated in 84s (with Net::SSLeay)
+
+    instead 134s (with Digest::) on my system 
+
+------------------------------------------
+version 0.072 at 2021-01-26 08:46:15 +0000
+------------------------------------------
+
+  Change: fc3392e338c8712d6a56b39a76dbc2309653176d
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2021-01-26 09:46:15 +0000
+
+    Released 0.072 
 
   Change: af0350517a9c7b98fc546e43140ed0a3aaeb9125
   Author: Andreas Romeyke <art1@andreas-romeyke.de>
@@ -1295,425 +1331,6 @@ version 0.056 at 2020-06-24 11:09:30 +0000
 
     Comment out debugging statement. 
 
-------------------------------------------
-version 0.055 at 2020-04-15 09:44:51 +0000
-------------------------------------------
-
-  Change: ff3c7955f12c45132a5f38232e19e679a5079ab8
-  Author: Andreas Romeyke <art1@andreas-romeyke.de>
-  Date : 2020-04-15 11:44:51 +0000
-
-    - release changes by dzil 
-
-  Change: 4bebb7558d0cb1f0e33886ce089ab5016c3d4ae3
-  Author: Andreas Romeyke <art1@andreas-romeyke.de>
-  Date : 2020-03-26 12:29:47 +0000
-
-    - fix problem when manifest files contains empty lines 
-
-  Change: fcbcc8adb1abbe0e7319a3efeddcc6d7d2e53b57
-  Author: Andreas Romeyke <art1@andreas-romeyke.de>
-  Date : 2020-03-19 13:42:27 +0000
-
-    - fixed some "dzil xtest"-warnings 
-
-  Change: c485b5de09540fdca9d431308db44ea700059ac8
-  Author: Andreas Romeyke <art1@andreas-romeyke.de>
-  Date : 2020-03-19 10:50:26 +0000
-
-    - removed t/boilerplate.t because no boilerplates still exist 
-
-  Change: d39c4bf12297712a1ac5d58f10d9f2351d67f0df
-  Author: Andreas Romeyke <art1@andreas-romeyke.de>
-  Date : 2020-03-18 15:06:30 +0000
-
-    - fixed POD of email adresses 
-
-  Change: 111926bb8175e8b1fd845f65c4ab6ca7681c92d2
-  Author: Andreas Romeyke <art1@andreas-romeyke.de>
-  Date : 2020-03-18 15:04:45 +0000
-
-    - adapted PODs 
-
-  Change: a878e5d944b263d2f09f711da05fb0fc312d5ddc
-  Author: Andreas Romeyke <art1@andreas-romeyke.de>
-  Date : 2020-03-18 14:07:50 +0000
-
-    - fixed date 
-
-  Change: ec00568c609fd0575b499495fe9c9a9fbf6c77f6
-  Author: Andreas Romeyke <art1@andreas-romeyke.de>
-  Date : 2020-03-18 14:06:43 +0000
-
-    - updated version - updated author section - added contributor
-    section - added info about development and issues - removed
-    duplicated and contradicted sections 
-
-  Change: ccd8017a60655f7bdc20e8577eb9cc5f8d623ffa
-  Author: Andreas Romeyke <art1@andreas-romeyke.de>
-  Date : 2020-03-18 14:06:17 +0000
-
-    - enhanced 
-
-  Change: 817f956037de47903978d710a919e26bc9c01ec5
-  Author: Andreas Romeyke <art1@andreas-romeyke.de>
-  Date : 2020-03-05 14:05:41 +0000
-
-    - bugfix, fixed matching 
-
-  Change: 964e188df862897ac406a52970a5cf96d2d133c7
-  Author: Andreas Romeyke <art1@andreas-romeyke.de>
-  Date : 2020-03-05 13:16:55 +0000
-
-    - added real world example 
-
-  Change: 343de80f4c37e2cc1fd4efc6dcd37d3c57d39dd7
-  Author: Andreas Romeyke <art1@andreas-romeyke.de>
-  Date : 2020-03-05 12:25:42 +0000
-
-    - refactoring, using __build_xxxmanifest_entries() to avoid code
-    duplication - __build_xxxmanifest_entries() handles dotbagit
-    structure 
-
-  Change: 106c88ca78806317eabd001bd225b393d8d100db
-  Author: Andreas Romeyke <art1@andreas-romeyke.de>
-  Date : 2020-03-05 12:24:14 +0000
-
-    - fixed testcase 
-
-  Change: 7fd6db083774e76114a07eda922f7afbeef059f2
-  Author: Andreas Romeyke <art1@andreas-romeyke.de>
-  Date : 2020-03-04 17:49:02 +0000
-
-    - disabled debugging code 
-
-  Change: 859156f905228967a0fe7840867447a8009a4b4c
-  Author: Andreas Romeyke <art1@andreas-romeyke.de>
-  Date : 2020-03-04 17:47:09 +0000
-
-    - fixed problem if manifest algorithm does not exist 
-
-  Change: b7b21a7813a02b8bbcf36614e4b0d3775a0ac81d
-  Author: Andreas Romeyke <art1@andreas-romeyke.de>
-  Date : 2020-03-04 17:43:39 +0000
-
-    - fixed warning 
-
-  Change: 092052fa3075b2a910adbb4f1aee0425f2523c95
-  Author: Andreas Romeyke <art1@andreas-romeyke.de>
-  Date : 2020-03-04 17:42:26 +0000
-
-    - changed internals to reflect xxxmanifest-entries for an unlimited
-    set of algorithms - added _verify_XXX_manifests() as base for
-    tagmanifest-XXX.txt and manifest-XXX.txt validation - verify_bag()
-    verify all manifest-files 
-
-  Change: 494e71d5a1d7cb181a92a053ff0e55daca3a6def
-  Author: Andreas Romeyke <art1@andreas-romeyke.de>
-  Date : 2020-03-04 17:39:20 +0000
-
-    - added testsuite for verify_bag() 
-
-  Change: 0be206784aa7c734875da4d6a496ae0414a60f5c
-  Author: Andreas Romeyke <art1@andreas-romeyke.de>
-  Date : 2020-02-17 12:57:27 +0000
-
-    - fixed some perlcritic warnings 
-
-  Change: a21cde71ce07fd98fbf30cecaad39d4c7a162fe7
-  Author: Andreas Romeyke <art1@andreas-romeyke.de>
-  Date : 2020-02-17 11:36:57 +0000
-
-    - added check if key contains a colon - enhanced testcases 
-
-  Change: a998d50089f2f07b013fcfff147367fec79cdeda
-  Author: Andreas Romeyke <art1@andreas-romeyke.de>
-  Date : 2020-02-17 11:27:07 +0000
-
-    - enhanced test with value containing a colon 
-
-  Change: 580d89d030ee2bb9765fcfaaf585a84dfddcb9e0
-  Author: Andreas Romeyke <art1@andreas-romeyke.de>
-  Date : 2020-02-17 11:13:20 +0000
-
-    - added _add_or_replace_bag_info() - added
-    _replace_bag_info_by_first_match() - added testcases 
-
-  Change: 58d6aa7181d56aacee61aaa6276d1ff78ec8f30c
-  Author: Andreas Romeyke <art1@andreas-romeyke.de>
-  Date : 2020-02-17 10:13:59 +0000
-
-    - revert filtering - fixed each problem 
-
-  Change: cbcf3fb1c1964712d6e9edc0e429e6212fbc94e8
-  Author: Andreas Romeyke <art1@andreas-romeyke.de>
-  Date : 2020-02-13 14:54:17 +0000
-
-    - rfc does not allow reordering of bag-info.txt entries 
-
-  Change: 2998a3574301ec9356f353fec354e58d3fcff92e
-  Author: Andreas Romeyke <art1@andreas-romeyke.de>
-  Date : 2020-02-13 14:34:07 +0000
-
-    - store() should return 1 
-
-  Change: 380a3233e3957e11f0ed1c182f471041e4f1d636
-  Author: Andreas Romeyke <art1@andreas-romeyke.de>
-  Date : 2020-02-13 14:03:59 +0000
-
-    - added some checks to avoid wrong use of make_bag() - added
-    store()-method 
-
-  Change: 82e4382a19618d7376b49db169e2199351bbe912
-  Author: Andreas Romeyke <art1@andreas-romeyke.de>
-  Date : 2020-02-13 13:38:36 +0000
-
-    - added filter if recreate a bag to avoid duplicates in bag-info.txt 
-
-  Change: a267325ec25697c26f406670fad1acb3c965bc7d
-  Author: Andreas Romeyke <art1@andreas-romeyke.de>
-  Date : 2020-02-13 13:29:28 +0000
-
-    - fixed sorting of $self->bag_info 
-
-  Change: 14f48e373e74bc08431d291f137289e97130227d
-  Author: Andreas Romeyke <art1@andreas-romeyke.de>
-  Date : 2020-02-13 13:29:02 +0000
-
-    - added testcase for __sort_bag_info() 
-
-  Change: 3ea5cfc0e1f832801efceecbab0c2f036de40daf
-  Author: Andreas Romeyke <art1@andreas-romeyke.de>
-  Date : 2020-02-13 13:08:36 +0000
-
-    - extracted sorting to __sort_bag_info() - using correct sort in
-    create_baginfo() 
-
-  Change: 9f33cb38bf9b1f3638a2213c3a8deb7aa0d207fb
-  Author: Andreas Romeyke <art1@andreas-romeyke.de>
-  Date : 2020-02-13 12:45:35 +0000
-
-    - entries in bag-info.txt read sorted 
-
-  Change: 2cbc8276e45a358151fe610a3fb3df15119c9ab9
-  Author: Andreas Romeyke <art1@andreas-romeyke.de>
-  Date : 2020-02-13 10:43:55 +0000
-
-    - revert baginfo-access, because it triggers a file read via builder 
-
-  Change: f69255cf19c7c830f29efa0c3b4ab3e1b7b84d90
-  Author: Andreas Romeyke <art1@andreas-romeyke.de>
-  Date : 2020-02-13 09:17:56 +0000
-
-    - bag_info should be writeable to add more entries 
-
-  Change: 01a82d0ccb4af35ec67a00e999e1f84ed9e20c47
-  Author: Andreas Romeyke <art1@andreas-romeyke.de>
-  Date : 2020-02-13 09:03:27 +0000
-
-    - use a more generic URL in Bag-Software-Agent - sort the keys in
-    bag-info.txt 
-
-  Change: 1838ff3ba33bebf42cf184a287975536df35c01a
-  Author: Andreas Romeyke <art1@andreas-romeyke.de>
-  Date : 2020-02-10 17:43:26 +0000
-
-    - added bag_info_by_key() 
-
-  Change: 874069e2ae82ed6200c5ec64506f785b65105a16
-  Author: Andreas Romeyke <art1@andreas-romeyke.de>
-  Date : 2020-02-10 15:36:37 +0000
-
-    - added comment 
-
-  Change: 008ffdb45f96195318127d8864ba6b725f50f03a
-  Author: Andreas Romeyke <art1@andreas-romeyke.de>
-  Date : 2020-02-10 15:28:37 +0000
-
-    - added bag-info.txt parsing - added related testcases 
-
-  Change: c9976ff7d8617670fd3565fa113553ba3d0f7a3f
-  Author: Andreas Romeyke <art1@andreas-romeyke.de>
-  Date : 2020-02-10 11:08:19 +0000
-
-    - bugfix, scanned only first level of payload-dir, but deep
-    structures should be scanned correctly 
-
-  Change: 6adf4311717e19a46d82e85bdca8bbba8f2642c0
-  Author: Andreas Romeyke <art1@andreas-romeyke.de>
-  Date : 2020-02-10 10:34:44 +0000
-
-    - added testcase for deep directory-structure of payload 
-
-  Change: 9f2e1e0cfac0451350a7b2494d1fb2a63c422997
-  Author: Andreas Romeyke <art1@andreas-romeyke.de>
-  Date : 2020-02-07 13:21:26 +0000
-
-    - refactoring, moved create_bagit() from Role/Manifest.pm to Base.pm
-    - refactoring, moved create_baginfo() from Role/Manifest.pm to
-    Base.pm - added calc_payload_oxum() - added calc_bagsize() 
-
-  Change: eaaa5b0fb6ebd84aecc1052ad9808473ce1d0372
-  Author: Andreas Romeyke <art1@andreas-romeyke.de>
-  Date : 2020-02-07 10:40:01 +0000
-
-    - added pod description for load_plugins 
-
-  Change: fb881eeab7284b62c445bb698b4314878a3a2155
-  Author: Andreas Romeyke <art1@andreas-romeyke.de>
-  Date : 2020-02-07 10:31:17 +0000
-
-    - fix, to support all loaded fixity-plugins to create
-    manifest-xxx.txt and tag-manifest-xxx.txt files - changed to support
-    that all non-payload files must be listed in tag-manifest-xxx.txt
-    files 
-
-  Change: e0a4ade5a59c624ba04a588240af2403bc1bed52
-  Author: Andreas Romeyke <art1@andreas-romeyke.de>
-  Date : 2020-02-05 13:39:51 +0000
-
-    - fixed outdated perl convention for 'keys' on references 
-
-  Change: f70e50720851ac6959ca9ffa2e894a79dd70c972
-  Author: Andreas Romeyke <art1@andreas-romeyke.de>
-  Date : 2020-02-05 13:37:51 +0000
-
-    - added comments - fixed _build_manifest_entries() using relative
-    paths - improved error reporting 
-
-  Change: 9c328c313fd77f5354811f9d0c89471495d3b485
-  Author: Andreas Romeyke <art1@andreas-romeyke.de>
-  Date : 2020-01-31 10:17:27 +0000
-
-    - updated to 0.055 
-
-  Change: 4bd0726b8d4ec37ae52a0b3d0418ba8bd940acf4
-  Author: Andreas Romeyke <art1@andreas-romeyke.de>
-  Date : 2019-12-13 12:56:13 +0000
-
-    - added support for BagIt 1.0 in Archive::BagIt::Base - added sha512
-    algorithm in Archive::BagIt::Plugin::Algorithm::*
-
-    and Archive::BagIt::Role::Manifest 
-
-  Change: 6e7afbf3c1f5dc1088945c7bc67be86190fc5450
-  Author: Robert Schmidt <rjeschmi@gmail.com>
-  Date : 2015-02-22 21:08:57 +0000
-
-    Merge pull request #7 from mbeijen/warnings
-
-    Added 'use warnings;' to Archive::Bagit::Fast 
-
-  Change: c81a548fb8d7546d091d9f3ca58219af860147a5
-  Author: Michiel Beijen <michiel.beijen@gmail.com>
-  Date : 2015-02-22 12:44:59 +0000
-
-    Added 'use warnings;' to Archive::Bagit::Fast 
-
-  Change: 78acadc97f623041954c587d70062aa5f9b03438
-  Author: Robert Schmidt <rjeschmi@gmail.com>
-  Date : 2015-02-03 08:51:32 +0000
-
-    Merge pull request #6 from mbeijen/pod-format
-
-    Fixed POD formatting - text rendered as code 
-
-  Change: 4d360bb52350152b8df61ce6ceb15874ae96076a
-  Author: Michiel Beijen <michiel.beijen@gmail.com>
-  Date : 2015-02-01 21:36:14 +0000
-
-    Fixed POD formatting - text rendered as code 
-
-  Change: e07bd9ef460cd78ee5f9bd4efc50098621a55f48
-  Author: Robert Schmidt <rjeschmi@gmail.com>
-  Date : 2015-01-03 20:46:15 +0000
-
-    modifying roles a bit to handle plugin registration a bit cleaner 
-
-  Change: dbb914278c5d42fed897a8a5f6af328771383f83
-  Author: Robert Schmidt <rjeschmi@gmail.com>
-  Date : 2015-01-02 21:22:30 +0000
-
-    merging back some changes for utf8 support 
-
-  Change: aa7b1ce722e0d87e9478451b9fdd2799f294821e
-  Author: Robert Schmidt <rjeschmi@gmail.com>
-  Date : 2014-12-20 21:41:33 +0000
-
-    Released 0.053-TRIAL 
-
-  Change: 6894c116c52e2d023bd39f652709527b463e2053
-  Author: Robert Schmidt <rjeschmi@gmail.com>
-  Date : 2014-12-20 21:40:35 +0000
-
-    using encoding(utf8) instead to satisfy perl critic 
-
-  Change: c4f5be85d25e37d8f506246e597c76a8a915ac7c
-  Author: Robert Schmidt <rjeschmi@gmail.com>
-  Date : 2014-12-20 21:38:09 +0000
-
-    using encoding(utf8) instead to satisfy perl critic 
-
-  Change: 4979483a47fb4a25db385b4bf3a3e6293442e7d1
-  Author: Robert Schmidt <rjeschmi@gmail.com>
-  Date : 2014-12-20 21:33:05 +0000
-
-    removing some files that aren't working in tests 
-
-  Change: b9c523348de7b88a76667e1805c7b54c938f141c
-  Author: Robert Schmidt <rjeschmi@gmail.com>
-  Date : 2014-12-05 22:08:11 +0000
-
-    updating changes 
-
-  Change: a4f6dfaa0be386f1869f2387969a6d3dc50d53c6
-  Author: Robert Schmidt <rjeschmi@gmail.com>
-  Date : 2014-12-05 22:05:49 +0000
-
-    working utf8 release closing #5 
-
-  Change: 94d1a87db5b8d71124080152de0087ebdf44c91d
-  Author: Robert Schmidt <rjeschmi@gmail.com>
-  Date : 2014-12-05 21:53:04 +0000
-
-    more utf handling such for #5 
-
-  Change: 0a92ef845651037ddc1b3c8eb70cfe7efe8bc05f
-  Author: Robert Schmidt <rjeschmi@gmail.com>
-  Date : 2014-12-05 21:07:30 +0000
-
-    adding some utf8 files 
-
-  Change: 11f7b1098b2a235efc7adbd9ca42bf1e98fd814c
-  Author: Robert Schmidt <rjeschmi@gmail.com>
-  Date : 2014-12-05 20:07:51 +0000
-
-    creating the diff plugin 
-
-  Change: d5c7a08d3d30450f50fd36f882f4a2bf41ddbb09
-  Author: Robert Schmidt <rjeschmi@gmail.com>
-  Date : 2014-12-01 15:56:47 +0000
-
-    move functions moved to plugins 
-
-  Change: 781ed93f244674c4fac596fc9936d02cb2fa9cea
-  Author: Robert Schmidt <rjeschmi@gmail.com>
-  Date : 2014-11-29 19:04:38 +0000
-
-    Moving more to Moose, more plugins 
-
-  Change: 9d56ec8593ec79ec27ab8cd7b413b55d8d4eaa8b
-  Author: Robert Schmidt <rjeschmi@gmail.com>
-  Date : 2014-11-27 22:23:34 +0000
-
-    some new roles and plugins 
-
-  Change: d88fee672b171f0d458f06abc98c76f9d86a34a0
-  Author: Robert Schmidt <rjeschmi@gmail.com>
-  Date : 2014-11-26 09:31:58 +0000
-
-    Adding a plugin structure 
-
-================================================
-Plus 9 releases after 2020-01-27 00:00:00 +0000.
-================================================
+=================================================
+Plus 10 releases after 2020-04-23 00:00:00 +0000.
+=================================================

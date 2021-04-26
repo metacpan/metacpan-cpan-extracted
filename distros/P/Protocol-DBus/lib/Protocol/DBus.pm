@@ -3,7 +3,7 @@ package Protocol::DBus;
 use strict;
 use warnings;
 
-our $VERSION = '0.16';
+our $VERSION = '0.17';
 
 =encoding utf8
 
@@ -66,6 +66,12 @@ See L<the example|/EXAMPLE USING MANUALLY-WRITTEN EVENT LOOP> below.
 
 =head1 DESCRIPTION
 
+=begin html
+
+<a href='https://coveralls.io/github/FGasper/p5-Protocol-DBus?branch=master'><img src='https://coveralls.io/repos/github/FGasper/p5-Protocol-DBus/badge.svg?branch=master' alt='Coverage Status' /></a>
+
+=end html
+
 This is an original, pure-Perl implementation of client messaging logic for
 L<the D-Bus protocol|https://dbus.freedesktop.org/doc/dbus-specification.html>.
 
@@ -105,7 +111,7 @@ though, such as:
 
 =item * Net::DBus discerns how to send a method call via D-Bus introspection.
 While handy, this costs extra network overhead and requires an XML parser.
-With Protocol::DBus you give a signature directly to send a method call,
+With Protocol::DBus you give a signature directly to send a method call.
 
 =item * Protocol::DBus can work smoothly with any event system you like,
 including custom-written ones. (The distribution ships with connectors for
@@ -136,7 +142,7 @@ authentication time.
 
 =item * Certain OSes may require L<Socket::MsgHdr> in order to authenticate
 via a UNIX socket. (Linux, notably, does not.) It depends if your OS can
-send local socket credentials without using C<sendmsg(2)>.
+send local socket credentials without using L<sendmsg(2)>.
 
 =item * EXTERNAL and DBUS_COOKIE_SHA1 authentications are supported.
 

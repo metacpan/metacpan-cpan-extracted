@@ -17,6 +17,7 @@ loader.
 use strict;
 use warnings;
 use diagnostics;
+use feature 'state';
 
 use Carp;
 use File::Basename;
@@ -51,20 +52,20 @@ ldap_sync_add_modify and ldap_sync_delete
 =cut
 
 sub new {
-    my ($class, $command, @args) = @_;
-    croak __PACKAGE__ . ': command not supplied' unless $command;
-    my $modname = __PACKAGE__ . '::' . $command;
-    my $modpath = $modname;
-    $modpath =~ s{::}{/}g;
-    $modpath .= '.pm';
-    my $cmd = eval { require $modpath; $modname->new(@args) };
-    if ($@) {
-	if ($@ =~ /Can't locate $modpath/) {
-	    die __PACKAGE__ . ": unknown command: $command\n"
-	}
-	croak __PACKAGE__ . ': ERROR: ' . $@;
+  my ($class, $command, @args) = @_;
+  croak __PACKAGE__ . ': command not supplied' unless $command;
+  my $modname = __PACKAGE__ . '::' . $command;
+  my $modpath = $modname;
+  $modpath =~ s{::}{/}g;
+  $modpath .= '.pm';
+  my $cmd = eval { require $modpath; $modname->new(@args) };
+  if ( $@ ) {
+    if ($@ =~ /Can't locate $modpath/) {
+      die __PACKAGE__ . ": unknown command: $command\n"
     }
-    return $cmd;
+    croak __PACKAGE__ . ': ERROR: ' . $@;
+  }
+  return $cmd;
 }
 
 =head2 names
@@ -80,19 +81,23 @@ usable.
 sub names {
   my $self = shift;
   my @classpath = split(/::/, $self);
-  return
+  state $return //= {
     map { $_->[0] => $_->[1] }
-    map { my $name     = basename($_);
-	  my $filename = File::Spec->catfile(@classpath, $name);
-	  if (exists($INC{$filename})) {
-	    ()
-	  } else {
-	    eval { require $filename; };
-	    $name =~ s/\.pm$//;
-	    $@ ? () : [$name, $_];
-	  }
-	}
-    sort map { glob File::Spec->catfile($_, @classpath,	'*.pm') } @INC;
+    map {
+      my $name     = basename($_);
+      my $filename = File::Spec->catfile(@classpath, $name);
+      if (exists($INC{$filename})) {
+	()
+      } else {
+	eval { require $filename; };
+	$name =~ s/\.pm$//;
+	$@ ? () : [$name, $_];
+      }
+    }
+    sort map { glob File::Spec->catfile($_, @classpath,	'*.pm') } @INC
+  };
+
+  return %$return;
 }
 
 ######################################################################

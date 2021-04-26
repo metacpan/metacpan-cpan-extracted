@@ -47,13 +47,13 @@ my $service = new Net::Z3950::FOLIO('etc/config');
 ok(defined $service, 'made FOLIO service object');
 my $session = new Net::Z3950::FOLIO::Session($service, 'dummy');
 ok(defined $session, 'made FOLIO session object');
-$session->reload_config_file();
+$session->reloadConfigFile();
 ok(defined $session, 'loaded session config file');
 
 foreach my $test (@tests) {
     my($input, $output) = @$test;
 
-    my $result = $session->sortspecs2cql($input);
+    my $result = $session->sortSpecs2CQL($input);
     ok(defined $result, "translated sort-spec");
     is($result, $output, "generated correct sortspec: $output");
 }

@@ -10,7 +10,7 @@ __PACKAGE__->mk_accessors(
     qw(
         _results
         _data
-        )
+    )
 );
 
 sub _init

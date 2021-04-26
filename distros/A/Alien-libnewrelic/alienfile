@@ -22,6 +22,7 @@ share {
     '%{patch} -p1 < %{.install.patch}/hostname.diff',
     # https://github.com/newrelic/c-sdk/pull/25/commits/75852032b5565e7a0c6aa59715c9e52028ce0a93
     '%{patch} -p1 < %{.install.patch}/clang-fallthrough.diff',
+    '%{patch} -p1 < %{.install.patch}/header-guard.diff',
   );
   push @patch, '%{patch} -p1 < %{.install.patch}/macos.diff' if $^O eq 'darwin';
 

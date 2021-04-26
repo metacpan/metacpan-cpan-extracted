@@ -1,5 +1,5 @@
 package HTML::Widgets::NavMenu::HeaderRole;
-$HTML::Widgets::NavMenu::HeaderRole::VERSION = '1.0801';
+$HTML::Widgets::NavMenu::HeaderRole::VERSION = '1.0900';
 use strict;
 use warnings;
 
@@ -30,7 +30,7 @@ sub-class
 
 =head1 VERSION
 
-version 1.0801
+version 1.0900
 
 =head1 DESCRIPTION
 

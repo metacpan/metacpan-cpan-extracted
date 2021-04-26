@@ -1,0 +1,86 @@
+LDR 02110cas a2200457 a 4500
+001     1099086
+003     ICU
+005     X/Y0X/Y807X/YX/YX/Y7X/Y8X/Y6.9
+008     [9]0[1]0[1]6d[1][9]8[5]200uilugr        s0    0eng u
+010    _a87644138
+035    _a(ICU)BID13370939
+035    _a(OCoLC)16512509
+040    _aDLC
+       _cDLC
+       _dICU
+042    _alc
+043    _an-us-il
+050 00 _aTD224.I3
+       _bI58b
+082 00 _a363.7/39456/09773
+       _219
+245 00 _aIllinois w*ter qu*lity report.
+260    _aSpringfield :
+       _bIllinois Environmental Protection Agency, Division of Water Pollution Control, Planning Section,
+       _c1985-
+300    _av. :
+       _bill. (some col.) ;
+       _c28 cm.
+310    _aAnnual,
+       _b<2002>-
+321    _aBiennial,
+       _b1984/1985-
+362 0  _a1984/1985-
+550    _aIssued by: Illinois. Division of Water Pollution Control. Planning Section, 1984/85-1988/89; Illinois. Bureau of Water, 1990/91-
+650  0 _aWater quality
+       _zIllinois
+       _vPeriodicals.
+650  0 _aWater
+       _xPollution
+       _zIllinois
+       _vPeriodicals.
+650  7 _aWater
+       _xPollution.
+       _2fast
+       _0http://id.worldcat.org/fast/fst01171279
+650  7 _aWater quality.
+       _2fast
+       _0http://id.worldcat.org/fast/fst01171832
+651  7 _aIllinois.
+       _2fast
+       _0http://id.worldcat.org/fast/fst01205143
+655  7 _aPeriodicals.
+       _2fast
+       _0http://id.worldcat.org/fast/fst01411641
+710 1  _aIllinois.
+       _bDivision of Water Pollution Control.
+       _bPlanning Section.
+710 1  _aIllinois.
+       _bEnvironmental Protection Agency.
+       _bBureau of Water
+780 00 _aIllinois. Division of Water Pollution Control. Monitoring Unit.
+       _tIllinois water quality report
+       _w(DLC) 87644157
+       _w(OCoLC)12630732
+       _w(ICU)1120972
+785 00 _tIllinois integrated water quality report and section 303(d) list ...
+       _w(ICU)6816045
+850    _aDLC
+856 41 _uhttp://www.epa.state.il.us/water/water-quality/
+900    _aICU:91175093
+       _bOST:72
+       _cHST:500
+       _dCopy:1
+900    _ao1019373x
+       _bOST:72
+       _dCopy:1
+903    _aHathi
+       _rETAS
+999 ff _i4b993242-9221-5113-8135-620b27f6cdf9
+       _s2a7da507-6bf7-55c3-8b82-3edf0e331a9f
+952    _t3
+       _b01234567890
+       _c29
+       _e42
+       _hMain HD1131.S860 1989
+       _k123
+       _lUC/HP/ASR/SciASR
+       _mabc
+       _v1
+       _ya, b

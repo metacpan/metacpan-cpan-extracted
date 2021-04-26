@@ -243,6 +243,7 @@ my @prereq = (
            'Term::ReadKey'       => 2.34,      #for perldl shell
            'Text::Balanced'      => 1.89,      # for PDL::NiceSlice
            'autodie'             => 0,         # for PDL::Graphics::LUT, Centos 7 doesn't have
+           'Math::Complex'       => 0,
 	  );
 
 # add OpenGL version dependency for CPAN to follow
@@ -414,8 +415,12 @@ ppm : doctest ppd
 EOT
 
 $text .= "\n" . ::coretarget($self);
-my $coretest = join ' ', map File::Spec->catfile('t', $_),
-  qw(core.t ops.t bad.t nat_complex.t);
+my $coretest = join ' ', map File::Spec->catfile('t', $_.'.t'), qw(
+  01-pptest autoload bad basic bool clump config constructor core croak lvalue
+  math matrix matrixops nat_complex ops-bitwise ops pdl_from_string
+  pp_croaking pp_line_numbers primitive pthread reduce
+  slice subclass thread thread_def ufunc
+);
 $text .= <<EOF;
 
 coretest : core

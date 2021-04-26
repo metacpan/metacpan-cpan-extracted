@@ -18,7 +18,6 @@ no_index:
     - t
     - inc
 requires:
-  Carp: '0'
   Cwd: '0'
   Encode: '0'
   Encode::Locale: '0'
@@ -27,12 +26,12 @@ requires:
   File::HomeDir: '0'
   File::Spec::Functions: '0'
   List::Util: '1.33'
-  Term::Choose: '1.711'
+  Term::Choose: '1.731'
   perl: '5.008003'
   strict: '0'
   warnings: '0'
 resources:
   bugtracker: https://github.com/kuerbis/Term-Choose-Util/issues
   repository: https://github.com/kuerbis/Term-Choose-Util
-version: '0.122'
+version: '0.123'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

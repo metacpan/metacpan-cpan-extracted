@@ -221,6 +221,7 @@ typedef struct _WinGuts
 	Handle         dragTarget;         // last successful drop
 	WORD           language_id;        // default shaping language
 	char           language_descr[32];
+	Bool           application_stop_signal;
 } WinGuts, *PWinGuts;
 
 typedef struct _WindowData
@@ -588,7 +589,6 @@ LRESULT CALLBACK    generic_view_handler     ( HWND win, UINT  msg, WPARAM mp1, 
 
 extern int          arc_completion( double * angleStart, double * angleEnd, int * needFigure);
 extern Bool         add_font_to_hash( const PFont key, const PFont font, Bool addSizeEntry);
-extern void         adjust_line_end( int  x1, int  y1, int * x2, int * y2, Bool forth);
 extern void         cm_squeeze_palette( PRGBColor source, int srcColors, PRGBColor dest, int destColors);
 extern Bool         create_font_hash( void);
 extern Bool         cursor_update( Handle self);
@@ -647,13 +647,13 @@ extern HRGN         region_create( Handle mask);
 extern WCHAR *      alloc_utf8_to_wchar( const char * utf8, int length, int * mb_len);
 extern WCHAR *      alloc_utf8_to_wchar_visual( const char * utf8, int length, int * mb_len);
 extern WCHAR *      alloc_ascii_to_wchar( const char * text, int length);
+extern char *       alloc_wchar_to_utf8( WCHAR * src, int * len );
 extern void         wchar2char( char * dest, WCHAR * src, int lim);
 extern void         char2wchar( WCHAR * dest, char * src, int lim);
 extern int          apcUpdateWindow( HWND wnd );
 extern void         reset_system_fonts(void);
 extern void         register_mapper_fonts(void);
 extern void         dpi_change(void);
-extern Bool         set_dwm_blur( HWND win, int enable, HRGN mask, int transition_on_maximized);
 extern Bool         is_dwm_enabled(void);
 extern Bool         dnd_clipboard_create(void);
 extern void         dnd_clipboard_destroy(void);

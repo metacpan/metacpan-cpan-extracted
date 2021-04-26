@@ -100,13 +100,6 @@ compared to [Devel::Cover](https://metacpan.org/pod/Devel%3A%3ACover). This is n
     # Arrayref of files covered so far
     my $covered_files = Test2::Plugin::Cover->files;
 
-    # A mapping of what subs were called in which files
-    my $subs_called = Test2::Plugin::Cover->submap;
-
-    # A mapping of what files were opened, and where possible what section of
-    # the test triggered the opening.
-    my $openmap = Test2::Plugin::Cover->openmap;
-
 ## COMMAND LINE
 
 You can tell prove to use the module this way:
@@ -233,54 +226,6 @@ Please see the `set_from()` documentation for details on values.
 
     The list of files will be sorted alphabetically, and duplicates will be
     removed.
-
-    If a root path is provided it **MUST** be a [Path::Tiny](https://metacpan.org/pod/Path%3A%3ATiny) instance. This path
-    will be used to filter out any files not under the root directory.
-
-- $hashref = $class->submap()
-- $hashref = $class->submap(root => $path)
-
-    Returns a structure like this:
-
-        { Source => { subname => \@called_by }
-
-    Example:
-
-        {
-            'SomeModule.pm' => {
-                # The wildcard is used when a proper sub name cannot be determined
-                '*' => { ... },
-
-                'subname' => [
-                    '*',     # The wildcard is used when no 'called by' can be determined
-                    $FROM_A,
-                    $FROM_B,
-                    ...
-                ],
-            },
-            ...
-        }
-
-    If a root path is provided it **MUST** be a [Path::Tiny](https://metacpan.org/pod/Path%3A%3ATiny) instance. This path
-    will be used to filter out any files not under the root directory.
-
-- $hashref = $class->openmap()
-- $hashref = $class->openmap(root => $path)
-
-    Returns a structure like this:
-
-        {
-            # the items in this list can be anything, strings, numbers,
-            # data structures, etc.
-            # A naive attempt is made to avoid duplicates in this list,
-            # so the same string or reference will not appear twice, but 2
-            # different references with identical contents may appear.
-            "some_file.ext" => [
-                '*',        # The wildcard is used when no 'called by' can be determined
-                $FROM_A,
-                $FROM_b,
-            ],
-        }
 
     If a root path is provided it **MUST** be a [Path::Tiny](https://metacpan.org/pod/Path%3A%3ATiny) instance. This path
     will be used to filter out any files not under the root directory.

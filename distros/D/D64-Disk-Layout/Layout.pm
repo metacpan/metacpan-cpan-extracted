@@ -52,12 +52,12 @@ use strict;
 use utf8;
 use warnings;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 use base qw(D64::Disk::Layout::Base);
 use Carp qw(carp croak);
 use D64::Disk::Layout::Sector;
-use List::MoreUtils qw(arrayify zip6);
+use List::MoreUtils qw(zip6);
 
 # Number of bytes per sector storage:
 our $bytes_per_sector = 256;
@@ -158,7 +158,7 @@ sub sectors {
       $self->sector_data($track, $sector, $data);
     }
   }
-  my @sector_layouts = arrayify $self->tracks();
+  my @sector_layouts = map { @{$_} } $self->tracks();
   return @sector_layouts;
 }
 
@@ -265,7 +265,7 @@ Pawel Krol, E<lt>pawelkrol@cpan.orgE<gt>.
 
 =head1 VERSION
 
-Version 0.02 (2021-01-13)
+Version 0.03 (2021-04-24)
 
 =head1 COPYRIGHT AND LICENSE
 

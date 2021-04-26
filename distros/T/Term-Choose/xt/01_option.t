@@ -9,11 +9,6 @@ use lib 'lib';
 use Term::Choose qw( choose );
 
 
-plan( skip_all => "Failed test 'Illegal division by zero at lib/Term/Choose.pm line 889. - terminal height" );
-
-
-__DATA__
-
 no warnings 'redefine';
 sub Term::Choose::__get_key { sleep 0.01; return 0x0d };
 
@@ -34,17 +29,20 @@ my $choices = [ '', 0, undef, 1, 2, 3, 'aa' .. 'zz', '☻☮☺', "\x{263a}\x{26
 my $d;
 
 my $int = {
-    beep         => [ 0, 1 ],
-    clear_screen => [ 0, 1 ],
-    hide_cursor  => [ 0, 1 ],
-    index        => [ 0, 1 ],
-    alignment    => [ 0, 1, 2 ],
-    layout       => [ 0, 1, 2, 3 ],
-    mouse        => [ 0, 1, 2, 3, 4 ],
-    order        => [ 0, 1 ],
-    page         => [ 0, 1 ],
+    beep                => [ 0, 1 ],
+    clear_screen        => [ 0, 1 ],
+    codepage_mapping    => [ 0, 1 ],
+    hide_cursor         => [ 0, 1 ],
+    index               => [ 0, 1 ],
+    mouse               => [ 0, 1 ],
+    order               => [ 0, 1 ],
+    page                => [ 0, 1 ],
+    alignment           => [ 0, 1, 2 ],
+    color               => [ 0, 1, 2 ],
+    f3                  => [ 0, 1, 2 ],
+    include_highlighted => [ 0, 1, 2 ],
+    layout              => [ 0, 1, 2, 3 ],
 };
-
 
 for my $opt ( sort keys %$int ) {
     for my $val ( @{$int->{$opt}}, undef ) {
@@ -82,10 +80,13 @@ for my $opt ( sort keys %$zero_or_greater ) {
 
 
 my $string = {
-    empty  => '',
-    info   => '',
-    prompt => '',
-    undef  => '',
+    empty               => '',
+    footer              => '',
+    info                => '',
+    prompt              => '',
+    skip_items          => '',
+    undef               => '',
+    busy_string         => '',
 };
 my @val_string = ( 0, 'Hello' x 50, '', ' ', '☻☮☺', "\x{263a}\x{263b}", '한글', undef, 'æða' );
 my $fail;
@@ -96,25 +97,29 @@ for my $opt ( sort keys %$string ) {
 }
 
 
-my $tabs_prompt = {
+my $tabs = {
+    tabs_info   => 'Array_Int',
     tabs_prompt => 'Array_Int',
 };
-my @val_tabs_prompt = ( [ 2, 4 ], [ 8 ], [], undef );
+my @val_tabs = ( [ 2, 4 ], [ 8 ], [], undef );
 
-for my $opt ( sort keys %$tabs_prompt ) {
-    for my $val ( @val_tabs_prompt ) {
+for my $opt ( sort keys %$tabs ) {
+    for my $val ( @val_tabs ) {
         ok( ! defined( exception { $d = choose( $choices, { $opt => $val } ) } ) );
     }
 }
 
 
-my $no_spacebar = {
-    no_spacebar => 'Array_Int',
-};
-my @val_no_spacebar = ( [ 0, 1, 2, 100, 999999 ], [ 1 ], undef );
+my $list_opt = {
+    mark                => 'Array_Int',
+    meta_items          => 'Array_Int',
+    no_spacebar         => 'Array_Int',
 
-for my $opt ( sort keys %$no_spacebar ) {
-    for my $val ( @val_no_spacebar ) {
+};
+my @val_list_opt = ( [ 0, 1, 2, 100, 999999 ], [ 1 ], undef );
+
+for my $opt ( sort keys %$list_opt ) {
+    for my $val ( @val_list_opt ) {
         ok( ! defined( exception { $d = choose( $choices, { $opt => $val } ) } ) );
     }
 }

@@ -11,9 +11,9 @@
 
 use 5.24.0;
 use Data::Dumper;
-use Test::Most tests => 73;
+use Test2::V0;
 
-my $deeply = \&eq_or_diff;
+plan(73);
 
 use Music::RhythmSet::Util qw(write_midi);
 use Music::RhythmSet::Voice;
@@ -27,8 +27,10 @@ sub domidi {
     my ( $file, $fn ) = @_;
     unlink $file if -f $file;
     $fn->($file);
-    local $Test::Builder::Level = $Test::Builder::Level + 1;
+    # $Test::Builder::Level (see Test2::Manual::Tooling::Nesting)
+    my $ctx = context();
     ok( -f $file );
+    $ctx->release;
     push @playback, $file;
 }
 
@@ -54,11 +56,12 @@ EOLY
 
 # ->clone, and optional arguments to to_ly
 {
-    lives_ok {
-        my $x = Music::RhythmSet::Voice->new;
-        $x->replay(undef);
-        $x->clone;
-    };
+    ok( lives {
+            my $x = Music::RhythmSet::Voice->new;
+            $x->replay(undef);
+            $x->clone;
+        }
+    );
 
     my $v2 = $voice->clone( newid => 42 );
     is( $v2->to_ly( maxm => 1, dur => 8, note => 'bes', rest => 's' ), <<'MORLOCK');
@@ -68,7 +71,7 @@ MORLOCK
 
     my $ref = $v2->replay;
     $ref->[0][0] = 'was it a deep clone?';
-    $deeply->( $voice->replay, $replay );
+    is( $voice->replay, $replay );
 
     # never was set in the original object
     my $v3 = $voice->clone;
@@ -94,44 +97,44 @@ EOLY
 
     my $v2 = Music::RhythmSet::Voice->new->from_string($str);
     # from_string only populates the replay log
-    $deeply->(
-        $v2->replay, [ [ [ 1, 1, 0 ], 2 ], [ [ 1, 1, 1 ], 1 ], [ [ 0, 1 ], 3 ] ]
-    );
+    is( $v2->replay, [ [ [ 1, 1, 0 ], 2 ], [ [ 1, 1, 1 ], 1 ], [ [ 0, 1 ], 3 ] ] );
 
     # comment to ignore
     $str .= "# this is the end\n";
-    lives_ok { $v2 = Music::RhythmSet::Voice->new->from_string($str) };
+    ok( lives { $v2 = Music::RhythmSet::Voice->new->from_string($str) } );
 
     my $v3 = $voice->clone( newid => 7 );
     $str = $v3->to_string( maxm => 4, rs => "\r", sep => ' ' );
     is( $str, "0 7 xx. 2\r6 7 xxx 1\r9 7 .x 1\r" );
 
     $v2 = Music::RhythmSet::Voice->new->from_string( $str, rs => "\r", sep => ' ' );
-    $deeply->(
-        $v2->replay, [ [ [ 1, 1, 0 ], 2 ], [ [ 1, 1, 1 ], 1 ], [ [ 0, 1 ], 1 ] ]
-    );
+    is( $v2->replay, [ [ [ 1, 1, 0 ], 2 ], [ [ 1, 1, 1 ], 1 ], [ [ 0, 1 ], 1 ] ] );
 
     $str = "  # noise to follow\r\r  \r" . $str;
-    lives_ok {
-        $v2 = Music::RhythmSet::Voice->new->from_string( $str, rs => "\r", sep => ' ' )
-    };
+    ok( lives {
+            $v2 = Music::RhythmSet::Voice->new->from_string( $str, rs => "\r", sep => ' ' )
+        }
+    );
 
     # "divisor" makes sense for the to_string beat-count field so was
     # copied over from the "changes" method. also testing the new
     # "whitespace runs in by default" of from_string
-    lives_ok {
-        $v2 = Music::RhythmSet::Voice->new( id => 0 )
-          ->from_string("0  0   x.x.x...x...x...    16\n256    0   x...x.x.x...x...    8")
-    };
+    ok( lives {
+            $v2 =
+              Music::RhythmSet::Voice->new( id => 0 )
+              ->from_string(
+                "0  0   x.x.x...x...x...    16\n256    0   x...x.x.x...x...    8")
+        }
+    );
     is( $v2->to_string( divisor => 16 ),
         "0\t0\tx.x.x...x...x...\t16\n16\t0\tx...x.x.x...x...\t8\n" );
 
-    dies_ok { $v2->from_string } qr/need a string/;
-    dies_ok { $v2->from_string('') } qr/need a string/;
-    dies_ok { $v2->from_string('x') } qr/invalid record/;
-    dies_ok { $v2->from_string("0\t0\t\t42") } qr/invalid record/;
-    dies_ok { $v2->from_string("0\t0\tinvalid\t42") } qr/invalid record/;
-    dies_ok { $v2->from_string("0\t0\tx..\tbadttl") } qr/invalid record/;
+    like( dies { $v2->from_string },                      qr/need a string/ );
+    like( dies { $v2->from_string('') },                  qr/need a string/ );
+    like( dies { $v2->from_string('x') },                 qr/invalid record/ );
+    like( dies { $v2->from_string("0\t0\t\t42") },        qr/invalid record/ );
+    like( dies { $v2->from_string("0\t0\tinvalid\t42") }, qr/invalid record/ );
+    like( dies { $v2->from_string("0\t0\tx..\tbadttl") }, qr/invalid record/ );
 }
 
 # ->advance (and thus the next callback)
@@ -148,7 +151,7 @@ EOLY
             } elsif ( $param{measure} == 6 ) {
                 return [qw/0 0 1/], 2;
             } else {
-                diag Dumper \%param;
+                diag( Dumper \%param );
                 die "should not be reached";
             }
         }
@@ -156,16 +159,16 @@ EOLY
     is( $v2->measure, 0 );
     is( $v2->ttl,     0 );
 
-    lives_ok { $v2->advance(6) };
+    ok( lives { $v2->advance(6) } );
 
     is( $v2->measure, 6 );
-    $deeply->( $v2->replay, $replay );
+    is( $v2->replay,  $replay );
 
-    $deeply->( $v2->pattern, [qw/0 1/] );
-    is( $v2->ttl, 1 );
+    is( $v2->pattern, [qw/0 1/] );
+    is( $v2->ttl,     1 );
 
-    lives_ok { $v2->advance };
-    $deeply->( $v2->pattern, [qw/0 0 1/] );
+    ok( lives { $v2->advance } );
+    is( $v2->pattern, [qw/0 0 1/] );
     is( $v2->measure, 7 );
     is( $v2->ttl,     2 );
 }
@@ -200,10 +203,12 @@ sub track_stats {
 
 sub audit_track {
     my ( $fn, $stats ) = @_;
-    local $Test::Builder::Level = $Test::Builder::Level + 1;
     my $track;
-    lives_ok { $track = $fn->() };
-    $deeply->( track_stats($track), $stats );
+    # $Test::Builder::Level (see Test2::Manual::Tooling::Nesting)
+    my $ctx = context();
+    ok( lives { $track = $fn->() } );
+    is( track_stats($track), $stats );
+    $ctx->release;
     return $track;
 }
 
@@ -336,72 +341,82 @@ write_midi( 't/silence-ci.midi', $track );
 # test various conditions to up the coverage; run
 #   ./Build testcover
 # to see what is being missed
-lives_ok { Music::RhythmSet::Voice->new( ttl     => 0 ) };
-lives_ok { Music::RhythmSet::Voice->new( pattern => [1] ) };
-dies_ok {
-    Music::RhythmSet::Voice->new( pattern => undef, ttl => 0 )
-}
-qr/invalid ttl/;
-dies_ok {
-    Music::RhythmSet::Voice->new( pattern => undef, ttl => 42 )
-}
-qr/invalid pattern/;
-dies_ok {
-    Music::RhythmSet::Voice->new( pattern => [], ttl => 42 )
-}
-qr/invalid pattern/;
-dies_ok {
-    Music::RhythmSet::Voice->new( pattern => [1], ttl => 0 )
-}
-qr/invalid ttl/;
-dies_ok {
-    Music::RhythmSet::Voice->new( pattern => {}, ttl => 42 )
-}
-qr/invalid pattern/;
+ok( lives { Music::RhythmSet::Voice->new( ttl     => 0 ) } );
+ok( lives { Music::RhythmSet::Voice->new( pattern => [1] ) } );
+like(
+    dies {
+        Music::RhythmSet::Voice->new( pattern => undef, ttl => 0 )
+    },
+    qr/invalid ttl/
+);
+like(
+    dies {
+        Music::RhythmSet::Voice->new( pattern => undef, ttl => 42 )
+    },
+    qr/invalid pattern/
+);
+like(
+    dies {
+        Music::RhythmSet::Voice->new( pattern => [], ttl => 42 )
+    },
+    qr/invalid pattern/
+);
+like(
+    dies {
+        Music::RhythmSet::Voice->new( pattern => [1], ttl => 0 )
+    },
+    qr/invalid ttl/
+);
+like(
+    dies {
+        Music::RhythmSet::Voice->new( pattern => {}, ttl => 42 )
+    },
+    qr/invalid pattern/
+);
 
 # no or an invalid 'next' callback
 $voice = Music::RhythmSet::Voice->new;
-dies_ok { $voice->advance } qr/no next callback/;
+like( dies { $voice->advance }, qr/no next callback/ );
 $voice->next( {} );
-dies_ok { $voice->advance } qr/no next callback/;
+like( dies { $voice->advance }, qr/no next callback/ );
 
 # invalid return values from a 'next' callback
 $voice->next( sub { [1], -5000 } );
-dies_ok { $voice->advance } qr/invalid ttl/;
+like( dies { $voice->advance }, qr/invalid ttl/ );
 $voice->next( sub { undef, 42 } );
-dies_ok { $voice->advance } qr/invalid pattern/;
+like( dies { $voice->advance }, qr/no pattern set/ );
 $voice->next( sub { {}, 42 } );
-dies_ok { $voice->advance } qr/invalid pattern/;
+like( dies { $voice->advance }, qr/no pattern set/ );
 $voice->next( sub { [], 42 } );
-dies_ok { $voice->advance } qr/invalid pattern/;
+like( dies { $voice->advance }, qr/no pattern set/ );
 
 # ->clone does some error checking
 $voice = Music::RhythmSet::Voice->new( ttl => 42 );
 $voice->pattern( {} );
-dies_ok { $voice->clone } qr/invalid pattern/;
+like( dies { $voice->clone }, qr/invalid pattern/ );
 $voice->pattern( [] );
-dies_ok { $voice->clone } qr/invalid pattern/;
+like( dies { $voice->clone }, qr/invalid pattern/ );
 $voice->pattern( [1] );
 $voice->replay( {} );
-dies_ok { $voice->clone } qr/replay must be/;
+like( dies { $voice->clone }, qr/replay must be/ );
 $voice->replay( [ {}, {} ] );
-dies_ok { $voice->clone( newid => 99 ) } qr/replay array must contain/;
+like( dies { $voice->clone( newid => 99 ) }, qr/replay array must contain/ );
 
 # replay log is no bueno, or empty (did you forget to call ->advance to
 # populate it? asking for a friend)
 $voice = Music::RhythmSet::Voice->new;
 $voice->replay(undef);
-dies_ok { $voice->to_ly } qr/empty replay log/;
-dies_ok { $voice->to_midi } qr/empty replay log/;
-dies_ok { $voice->to_string } qr/empty replay log/;
+like( dies { $voice->to_ly },     qr/empty replay log/ );
+like( dies { $voice->to_midi },   qr/empty replay log/ );
+like( dies { $voice->to_string }, qr/empty replay log/ );
 $voice->replay( {} );
-dies_ok { $voice->to_ly } qr/empty replay log/;
-dies_ok { $voice->to_midi } qr/empty replay log/;
-dies_ok { $voice->to_string } qr/empty replay log/;
+like( dies { $voice->to_ly },     qr/empty replay log/ );
+like( dies { $voice->to_midi },   qr/empty replay log/ );
+like( dies { $voice->to_string }, qr/empty replay log/ );
 $voice->replay( [] );
-dies_ok { $voice->to_ly } qr/empty replay log/;
-dies_ok { $voice->to_midi } qr/empty replay log/;
-dies_ok { $voice->to_string } qr/empty replay log/;
+like( dies { $voice->to_ly },     qr/empty replay log/ );
+like( dies { $voice->to_midi },   qr/empty replay log/ );
+like( dies { $voice->to_string }, qr/empty replay log/ );
 
 if ( defined $ENV{AUTHOR_TEST_JMATES_MIDI} ) {
     diag "playback ...";

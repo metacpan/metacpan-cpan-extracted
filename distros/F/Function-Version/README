@@ -1,0 +1,56 @@
+NAME
+
+    Function::Version - Define and use different function versions
+
+SYNOPSIS
+
+      use Function::Version;
+    
+      # Define two versions of load() and dump()
+      my $defn = Function::Version
+                   ->def('load', '1.5', sub { "load v1.5: $_[0]" })
+                   ->def('load', '1.6', sub { "load v1.6: $_[0]" })
+                   ->def('dump', '1.5', sub { "dump v1.5: $_[0]" })
+                   ->def('dump', '1.6', sub { "dump v1.6: $_[0]" })
+                   ;
+    
+      my $load = $defn->func('load')          # Select load() v1.5
+                      ->ver('1.5');
+      my $dump = $defn->func('dump')          # Select dump() v1.6
+                      ->ver('1.6');
+    
+                                              # Call with arguments
+      say $load->with('vista');               # load v1.5: vista
+      say $dump->with('gems');                # dump v1.6: gems
+    
+      say $load->ver('1.6')                   # Use other versions
+               ->with('hobbits');             # load v1.6: hobbits
+    
+                                              # Version does not revert
+      say $load->with('ring');                # load v1.6: ring
+    
+      say $dump->func('load')                 # Using other function dies
+               ->with('hobbits');             # Error: Assigned to dump()
+
+DESCRIPTION
+
+    This module provides a simple way to define and use different function
+    versions.
+
+    One use case is when deploying changes to an application. Being able to
+    select the function based on a version number is useful to roll-back or
+    roll-forward changes.
+
+AUTHOR
+
+    Hoe Kit CHEW <hoekit@gmail.com>
+
+COPYRIGHT
+
+    Copyright 2021- Hoe Kit CHEW
+
+LICENSE
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

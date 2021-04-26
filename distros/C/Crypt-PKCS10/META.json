@@ -58,7 +58,7 @@
    "provides" : {
       "Crypt::PKCS10" : {
          "file" : "lib/Crypt/PKCS10.pm",
-         "version" : "2.001"
+         "version" : "2.002"
       }
    },
    "release_status" : "stable",
@@ -72,13 +72,15 @@
          "web" : "https://github.com/openxpki/Crypt-PKCS10"
       }
    },
-   "version" : "2.001",
+   "version" : "2.002",
    "x_contributors" : [
       "Gideon Knocke <gideonknocke@googlemail.com>",
       "Gideon Knocke <root@develop.localdomain>",
       "Martin Bartosch <m.bartosch@cynops.de>",
       "Oliver Welter <github@oliwel.de>",
+      "Oliver Welter <owelter@whiterabbitsecurity.com>",
       "Scott Hardin <scott@hnsc.de>",
+      "Scott Hardin <shardin@whiterabbitsecurity.com>",
       "Timothe Litt <litt@acm.org>",
       "Timothe Litt <tlhackque@cpan.org>",
       "Timothe Litt <tlhackque@yahoo.com>",

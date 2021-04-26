@@ -2,6 +2,7 @@
   "foo": 42,
   "bar": 3,
   "graphqlQuery": "dummy.graphql-query",
+  "nologin": 1,
   "indexMap": {
     "1": "author",
     "4": "title"

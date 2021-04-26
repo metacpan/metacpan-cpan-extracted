@@ -6,6 +6,8 @@ use warnings;
 package PodParser;
 use base qw( Parser::MGC );
 
+use Feature::Compat::Try;
+
 sub parse
 {
    my $self = shift;
@@ -28,10 +30,13 @@ if( !caller ) {
    my $parser = __PACKAGE__->new;
 
    while( defined( my $line = <STDIN> ) ) {
-      my $ret = eval { $parser->from_string( $line ) };
-      print $@ and next if $@;
-
-      print Dumper( $ret );
+      try {
+         my $ret = $parser->from_string( $line );
+         print Dumper( $ret );
+      }
+      catch ( $e ) {
+         print $e;
+      }
    }
 }
 

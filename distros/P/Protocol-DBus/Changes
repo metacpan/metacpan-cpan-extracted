@@ -1,6 +1,27 @@
 Revision history for Perl module Protocol::DBus
 
-0.16 22 June 2020
+0.17
+- BUG FIX: Fix errant remove() in Mojo.pm DESTROY handler.
+- BUG FIX: Fix nonblocking mode on pre-5.14 perls.
+- BUG FIX: Prevent inadvertent event loop stoppage after initialize()
+  in Mojo.pm.
+- BUG FIX: Make write buffering no longer auto-resume().
+- BUG FIX: Fix memory leaks (and detection thereof) in event loop interfaces.
+- Make event loops defer polling until at least one initialize() has run.
+- Increase test coverage.
+- Require a new enough Socket.pm to fix RT86613.
+- Work around an apparent Devel::Cover bug.
+  (https://github.com/pjcj/Devel--Cover/issues/276)
+- Work around Socket.pm’s misbehavior on Cygwin.
+  (https://rt.cpan.org/Public/Bug/Display.html?id=135262)
+- Fix race conditions in unhandled-failure tests.
+- Make tests aware of OSes that need Socket::MsgHdr (and skip accordingly).
+- Skip tests on pre-8.15 Mojo. (Avoids bug w/ Promise->new())
+- Test suite now passes on Windows … for what that’s worth!
+- Fix typo in UNIX FDs example. (Thank you, Max Maischein!)
+- Trivial documentation tweaks.
+
+0.16 Mon 22 June 2020
 - BUG FIX: Typo in write-congestion logic in Mojo.pm.
 - Add pause(), resume(), and get_unique_bus_name() to EventMessenger.
 - Fix race conditions in uncaught-failure tests.

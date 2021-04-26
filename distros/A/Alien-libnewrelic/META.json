@@ -26,7 +26,7 @@
             "Alien::Build" : "1.19",
             "Alien::Build::MM" : "0.32",
             "ExtUtils::MakeMaker" : "6.52",
-            "perl" : "5.020"
+            "perl" : "5.014"
          }
       },
       "develop" : {
@@ -53,7 +53,7 @@
       "runtime" : {
          "requires" : {
             "Alien::Base" : "0.038",
-            "perl" : "5.020"
+            "perl" : "5.014"
          }
       },
       "test" : {
@@ -61,24 +61,24 @@
             "Test2::V0" : "0.000060",
             "Test::Alien" : "0",
             "Test::Alien::Diag" : "0",
-            "perl" : "5.020"
+            "perl" : "5.014"
          }
       }
    },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://github.com/plicease/Alien-libnewrelic/issues"
+         "web" : "https://github.com/uperl/Alien-libnewrelic/issues"
       },
       "homepage" : "https://metacpan.org/pod/Alien::libnewrelic",
       "repository" : {
          "type" : "git",
-         "url" : "git://github.com/plicease/Alien-libnewrelic.git",
-         "web" : "https://github.com/plicease/Alien-libnewrelic"
+         "url" : "git://github.com/uperl/Alien-libnewrelic.git",
+         "web" : "https://github.com/uperl/Alien-libnewrelic"
       },
       "x_IRC" : "irc://irc.perl.org/#native"
    },
-   "version" : "0.06",
+   "version" : "0.07",
    "x_alienfile" : {
       "generated_by" : "Dist::Zilla::Plugin::AlienBuild version 0.31",
       "requires" : {
@@ -94,8 +94,8 @@
          "system" : {}
       }
    },
-   "x_generated_by_perl" : "v5.33.4",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.25",
+   "x_generated_by_perl" : "v5.33.9",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.26",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later",
    "x_use_unsafe_inc" : 0
 }

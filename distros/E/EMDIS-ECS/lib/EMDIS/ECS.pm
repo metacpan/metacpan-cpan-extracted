@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 #
-# Copyright (C) 2002-2020 National Marrow Donor Program. All rights reserved.
+# Copyright (C) 2002-2021 National Marrow Donor Program. All rights reserved.
 #
 # For a description of this module, please refer to the POD documentation
 # embedded at the bottom of the file (e.g. perldoc EMDIS::ECS).
@@ -33,7 +33,7 @@ BEGIN
 }
 
 # module/package version
-$VERSION = '0.42';
+$VERSION = '0.43';
 
 # file creation mode (octal, a la chmod)
 $FILEMODE = 0660;
@@ -825,19 +825,19 @@ sub send_encrypted_message
                 if not $node->{amqp_addr_meta} and is_yes($node->{amqp_only});
             $amqp_addr = $node->{amqp_addr_meta};
         }
+        elsif($subject =~ /^[^:]+:[^:]+:[0123456789]+:DOC/io) {
+            return "EMDIS::ECS::send_encrypted_message(): unable to send " .
+                "AMQP document to node " . $node->{node} . ": amqp_only " .
+                "selected, but amqp_addr_doc not configured."
+                if not $node->{amqp_addr_doc} and is_yes($node->{amqp_only});
+            $amqp_addr = $node->{amqp_addr_doc};
+        }
         elsif($subject =~ /^[^:]+:[^:]+:[0123456789]+/io) {
             return "EMDIS::ECS::send_encrypted_message(): unable to send " .
                 "AMQP regular message to node " . $node->{node} . ": amqp_only " .
                 "selected, but amqp_addr_msg not configured."
                 if not $node->{amqp_addr_msg} and is_yes($node->{amqp_only});
             $amqp_addr = $node->{amqp_addr_msg};
-        }
-        elsif($subject =~ /^[^:]+:[^:]+:DOC$/io) {
-            return "EMDIS::ECS::send_encrypted_message(): unable to send " .
-                "AMQP document to node " . $node->{node} . ": amqp_only " .
-                "selected, but amqp_addr_doc not configured."
-                if not $node->{amqp_addr_doc} and is_yes($node->{amqp_only});
-            $amqp_addr = $node->{amqp_addr_doc};
         }
         elsif(is_yes($node->{amqp_only})) {
             return "EMDIS::ECS::send_encrypted_message(): unable to send " .
@@ -1540,7 +1540,6 @@ The PGP or GnuPG userid of this ECS node.
 =item I<amqp_addr_doc>
 
 Name of AMQP queue to use when sending ECS document messages to this node.
-(Note:  document exchange is not yet implemented.)
 
 =item I<amqp_addr_meta>
 
@@ -1898,7 +1897,7 @@ THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
 WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF 
 MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
 
-Copyright (C) 2002-2020, National Marrow Donor Program. All rights reserved.
+Copyright (C) 2002-2021, National Marrow Donor Program. All rights reserved.
 
 See LICENSE file for license details.
 

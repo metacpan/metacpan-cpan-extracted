@@ -12,7 +12,7 @@ require XSLoader;
 our @ISA = qw(Exporter);
 our @EXPORT_OK = qw(minify);
 
-our $VERSION = 'v0.3.7';
+our $VERSION = 'v0.3.8';
 
 XSLoader::load( "Text::Minify::XS", $VERSION );
 
@@ -30,7 +30,7 @@ Text::Minify::XS - Simple text minification
 
 =head1 VERSION
 
-version v0.3.7
+version v0.3.8
 
 =head1 SYNOPSIS
 
@@ -62,6 +62,7 @@ It does the following:
 =back
 
 It does not recognise any form of markup, comments or text quoting.
+Nor does it remove extra whitespace in the middle of the line.
 
 =head1 KNOWN ISSUES
 
@@ -81,6 +82,8 @@ UTF-8.
 =head1 SEE ALSO
 
 L<String::Strip>
+
+L<String::Util>
 
 L<Text::Trim>
 

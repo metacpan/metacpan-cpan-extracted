@@ -40,7 +40,7 @@ $dbus->get_message();
 my $recv_name = $dbus->get_unique_bus_name();
 
 my $pid = fork or do {
-    my $dbus = my $dbus = $> ? Protocol::DBus::Client::login_session() ? Protocol::DBus::Client::system();
+    my $dbus = $> ? Protocol::DBus::Client::login_session() : Protocol::DBus::Client::system();
 
     $dbus->initialize();
 

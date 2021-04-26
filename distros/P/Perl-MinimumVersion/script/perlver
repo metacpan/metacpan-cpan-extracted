@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 
 package perlver;
-$perlver::VERSION = '1.38';
+$perlver::VERSION = '1.40';
 =pod
 
 =head1 NAME

@@ -11,7 +11,7 @@ package CP932IBM::R2;
 use 5.00503;    # Universal Consensus 1998 for primetools
 # use 5.008001; # Lancaster Consensus 2013 for toolchains
 
-$VERSION = '0.06';
+$VERSION = '0.07';
 $VERSION = $VERSION;
 
 use strict;
@@ -74,18 +74,7 @@ Following subroutines and tied hash variable provide UTF-8 semantics for us.
                                                                        not supports POSIX character class (like an [:alpha:])
                                                                        (such as \N{GREEK SMALL LETTER EPSILON}, \N{greek:epsilon}, or \N{epsilon})
                                                                        not supports character properties (like \p{PROP} and \P{PROP})
-
-                           Special Escapes in Regex                    Support Perl Version
-                           --------------------------------------------------------------------------------------------------
-                           $mb{qr/ \x{Unicode} /}                      since perl 5.006
-                           $mb{qr/ [^ ... ] /}                         since perl 5.008  ** CAUTION ** perl 5.006 cannot this
-                           $mb{qr/ \h /}                               since perl 5.010
-                           $mb{qr/ \v /}                               since perl 5.010
-                           $mb{qr/ \H /}                               since perl 5.010
-                           $mb{qr/ \V /}                               since perl 5.010
-                           $mb{qr/ \R /}                               since perl 5.010
-                           $mb{qr/ \N /}                               since perl 5.012
-
+                           See UTF8::R2 document for more information
   ------------------------------------------------------------------------------------------------------------------------------------------
   s/before/after/imsxoegr  s<$mb{qr/before/imsxo}><after>egr
   ------------------------------------------------------------------------------------------------------------------------------------------

@@ -3,7 +3,7 @@ package Myriad::Storage::Implementation::Redis;
 use strict;
 use warnings;
 
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 our $AUTHORITY = 'cpan:DERIV'; # AUTHORITY
 
 use Future::AsyncAwait;
@@ -122,6 +122,21 @@ Returns a L<Ryu::Source> which will emit the current and all subsequent values.
 
 method observe ($k) {
     return $redis->subscribe($self->apply_prefix($k));
+}
+
+=head2 observe_namespace
+
+Observe and entire namespace.
+
+=cut
+
+async method watch_keyspace ($keyspace) {
+    my $sub = await $redis->watch_keyspace($self->apply_prefix($keyspace));
+    my $pattern = STORAGE_PREFIX . '\.';
+    return $sub->map(sub {
+        $_ =~ s/$pattern//;
+        return $_;
+    });
 }
 
 =head2 push

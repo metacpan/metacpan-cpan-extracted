@@ -116,7 +116,7 @@ sub execute {
 
     my ( @upload, @obsolete, @update, @skip );
     push @{
-        !$self->_check_if_files_are_empty( $ts_files{$_} )
+        exists $ts_files{$_} && !$self->_check_if_files_are_empty( $ts_files{$_} )
         ? defined $documents{$_} ? \@update : \@upload
         : defined $documents{$_} ? \@obsolete : \@skip
       },

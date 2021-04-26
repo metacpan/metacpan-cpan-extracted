@@ -183,6 +183,47 @@ if (1) {
   }
 }
 
+if (1) {
+    for my $example (0 .. $#$examples) {
+    #for my $example (1) {
+ 	#for my $threshold (qw(0.1 0.5 0.7 1) ) {
+  	    my $a = $examples->[$example]->[0];
+  	    my $b = $examples->[$example]->[1];
+
+  	    my $lcs = LCS::Similar->LCS($a,$b,);
+  	    #my $lcs = LCS::Similar->LCS($a,$b,);
+  	    my $all_lcs = LCS->allLCS($a,$b);
+
+  	    if (1) {
+  		    cmp_deeply(
+    	            $lcs,
+    	            any(
+                    	$lcs,
+                    	supersetof( @{$all_lcs} )
+    	            ),
+    	            "Example $example, Threshold undef"
+  	         );
+  	    }
+
+  	    if (1) {
+            	my $aligned = LCS->lcs2align($a,$b,$lcs);
+    	        for my $chunk (@$aligned) {
+      	        print 'a: ',$chunk->[0],"\n";
+      	        print 'b: ',$chunk->[1],"\n";
+      	        print "\n";
+    	        }
+  	    }
+
+  	    if (0) {
+    	        local $Data::Dumper::Deepcopy = 1;
+    	        print STDERR Data::Dumper->Dump([$all_lcs],[qw(allLCS)]),"\n";
+            	print STDERR Data::Dumper->Dump([$lcs],[qw(LCS)]),"\n";
+  	    }
+
+    }
+}
+
+
 if (2) {
   for my $example (0 .. $#$examples2) {
   #for my $example ($examples->[3]) {

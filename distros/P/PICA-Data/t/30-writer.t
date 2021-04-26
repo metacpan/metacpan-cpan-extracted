@@ -5,7 +5,7 @@ use utf8;
 use Test::More;
 use Test::XML;
 
-use PICA::Data qw(pica_writer pica_parser);
+use PICA::Data qw(pica_writer pica_parser pica_string);
 use PICA::Writer::Plain;
 use PICA::Writer::Plus;
 use PICA::Writer::XML;
@@ -278,6 +278,24 @@ FIELDS
     $writer->end;
 
     is do {local (@ARGV, $/) = $filename; <>}, "001A/01\n123A\n";
+}
+
+{
+    my %tests = (
+        "  123A \$xy\n\n" => [["123A",undef,"x","y"," "]],
+        "? 123A \$xy\n\n" => [["123A",undef,"x","y","?"]]
+    );
+
+    while (my ($plain, $record) = each %tests) {
+        is pica_string($record), $plain, 'write annotated PICA';
+        # TODO: test round-trip parsing
+    }
+
+    is pica_string([["123A",undef,"x","y"]], "plain", annotated => 1),
+      "  123A \$xy\n\n", "ensure annotation";
+
+    is pica_string([["123A",undef,"x","y"," "]], "plain", annotated => 0),
+      "123A \$xy\n\n", "ignore annotation";
 }
 
 done_testing;

@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2021 -- leonerd@leonerd.org.uk
 
-package XS::Parse::Keyword 0.01;
+package XS::Parse::Keyword 0.02;
 
 use v5.14;
 use warnings;
@@ -62,14 +62,21 @@ are invoked in the given order.
    bool (*permit) (pTHX_ void *hookdata);
 
 Called by the installed keyword parser hook which is used to handle keywords
-registered by L</register_xs_parse_keyword>. This hook stage should inspect
-whether the keyword is permitted at this time and return true only if the
-keyword is permitted.
+registered by L</register_xs_parse_keyword>.
 
 As a shortcut for the common case, the C<permit_hintkey> may point to a string
 to look up from the hints hash. If the given key name is not found in the
 hints hash then the keyword is not permitted. If the key is present then the
 C<permit> function is invoked as normal.
+
+If not rejected by a hint key that was not found in the hints hash, the
+function part of the stage is called next and should inspect whether the
+keyword is permitted at this time perhaps by inspecting other lexical clues,
+and return true only if the keyword is permitted.
+
+Both the string and the function are optional. Either or both may be present.
+If neither is present then the keyword is always permitted - which is likely
+not what you wanted to do.
 
 =head2 The C<check> Stage
 
@@ -186,20 +193,22 @@ an optree in the I<op> field.
 I<atomic, emits sv.>
 
 A bareword identifier name is expected, and passed as an SV containing a PV
-in the I<sv> field.
+in the I<sv> field. An identifier is not permitted to contain a double colon
+(C<::>).
 
 =head2 XPK_PACKAGENAME
 
 I<atomic, emits sv.>
 
 A bareword package name is expected, and passed as an SV containing a PV in
-the I<sv> field.
+the I<sv> field. A package name is similar to an identifier, except it permits
+double colons in the middle.
 
 =head2 XPK_COLON
 
 I<atomic, emits nothing.>
 
-A literal colon character (C<:>) is expected. An argument is not passed here.
+A literal colon character (C<:>) is expected. No argument value is passed.
 
 =head2 XPK_STRING
 
@@ -207,13 +216,13 @@ I<atomic, can probe, emits nothing.>
 
    XPK_STRING("literal")
 
-A literal string match is expected. An argument is not passed here.
+A literal string match is expected. No argument value is passed.
 
 This form should generally be avoided if at all possible, because it is very
 easy to abuse to make syntaxes which confuse humans and code tools alike.
 Generally it is best reserved just for the first component of a
-C<XPK_REPEATED> sequence, to provide a "secondary keyword" that such a
-repeated item can look out for.
+C<XPK_OPTIONAL> or C<XPK_REPEATED> sequence, to provide a "secondary keyword"
+that such a repeated item can look out for.
 
 =head2 XPK_OPTIONAL
 
@@ -240,12 +249,12 @@ number of repeats it found. The first piece type within must support probe.
 
 I<structural, emits i.>
 
-   XPK_CHOICE(choices ...)
+   XPK_CHOICE(options ...)
 
 A structural type which expects to find one of a number of alternative
-choices. An ordered list of alternatives is provided, all of which must
-support probe. This will pass an argument whose I<i> field gives the index of
-the first choice that was accepted.
+options. An ordered list of types is provided, all of which must support
+probe. This will pass an argument whose I<i> field gives the index of the
+first choice that was accepted. The first option takes the value 0.
 
 It is not an error if no choice matches. At that point, the I<i> field will be
 set to -1.
@@ -265,6 +274,8 @@ A structural type similar to C<XPK_CHOICE>, except that each choice type is
 followed by an element of type C<XPK_TAG> which gives an integer. It is that
 integer value, rather than the positional index of the choice within the list,
 which is passed in the I<i> field.
+
+   XPK_TAG(value)
 
 =head2 XPK_PARENSCOPE
 

@@ -10,7 +10,7 @@ require Exporter;
 our @ISA = qw(Exporter);
 our @EXPORT_OK = qw(format_pretty);
 
-our $VERSION = '0.38'; # VERSION
+our $VERSION = '0.390'; # VERSION
 
 sub content_type { "text/plain" }
 
@@ -36,7 +36,7 @@ Data::Format::Pretty::SimpleText - Pretty-print data structure as simple text
 
 =head1 VERSION
 
-This document describes version 0.38 of Data::Format::Pretty::SimpleText (from Perl distribution Data-Format-Pretty-Console), released on 2017-07-10.
+This document describes version 0.390 of Data::Format::Pretty::SimpleText (from Perl distribution Data-Format-Pretty-Console), released on 2021-04-23.
 
 =head1 SYNOPSIS
 
@@ -82,7 +82,7 @@ Source repository is at L<https://github.com/perlancar/perl-Data-Format-Pretty-C
 
 =head1 BUGS
 
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Data-Format-Pretty-Console>
+Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-Data-Format-Pretty-Console/issues>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
@@ -98,7 +98,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017, 2016, 2015, 2014, 2013, 2012, 2011, 2010 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2017, 2016, 2015, 2014, 2013, 2012, 2011, 2010 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

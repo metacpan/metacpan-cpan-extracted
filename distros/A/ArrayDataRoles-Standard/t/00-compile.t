@@ -14,11 +14,11 @@ my @module_files = (
     'ArrayData/Test/Source/Array.pm',
     'ArrayData/Test/Source/DBI.pm',
     'ArrayData/Test/Source/Iterator.pm',
-    'ArrayData/Test/Source/LinesDATA.pm',
+    'ArrayData/Test/Source/LinesInDATA.pm',
     'ArrayDataRole/Source/Array.pm',
     'ArrayDataRole/Source/DBI.pm',
     'ArrayDataRole/Source/Iterator.pm',
-    'ArrayDataRole/Source/LinesDATA.pm',
+    'ArrayDataRole/Source/LinesInDATA.pm',
     'ArrayDataRoles/Standard.pm'
 );
 

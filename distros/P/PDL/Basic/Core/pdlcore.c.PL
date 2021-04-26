@@ -98,6 +98,7 @@ for my $type (types()) {
 !WITH!SUBS!
 }
 
+print OUT sprintf qq{#line %d "%s"\n}, __LINE__ + 2,  __FILE__;
 print OUT <<'!NO!SUBS!';
 
     default:
@@ -126,11 +127,13 @@ int pdl_whichdatatype (IV nv) {
 
 for my $type (types()) {
    my ($sym,$ctype) = map $type->$_, qw/sym ctype/;
+   print OUT sprintf qq{#line %d "%s"\n}, __LINE__ + 2,  __FILE__;
    print OUT << "!WITH!SUBS!";
         TESTTYPE($sym,$ctype)
 !WITH!SUBS!
 }
 
+print OUT sprintf qq{#line %d "%s"\n}, __LINE__ + 2,  __FILE__;
 print OUT <<'!NO!SUBS!';
 
         croak("Something's gone wrong: %ld cannot be converted by whichdatatype", nv);
@@ -198,7 +201,7 @@ pdl* SvPDLV ( SV* sv ) {
    PDL_Indx fake[1];
    SV *sv2;
 
-   if ( !SvROK(sv) ) {  
+   if ( !SvROK(sv) ) {
       /* The scalar is not a ref, so we can use direct conversion. */
 
       SV *dat;
@@ -228,6 +231,7 @@ pdl* SvPDLV ( SV* sv ) {
 ##########
 # If badvals and usenan are true, we default NaNs to type double. 
 if ( $usenan ) {
+    print OUT sprintf qq{#line %d "%s"\n}, __LINE__ + 2,  __FILE__;
     print OUT q{
       /*
        * default NaN/Infs to double
@@ -240,12 +244,14 @@ if ( $usenan ) {
       }
    }
 } else {
+   print OUT sprintf qq{#line %d "%s"\n}, __LINE__ + 2,  __FILE__;
    print OUT q{
         datatype = pdl_whichdatatype_double(tmp_NV);
 
    }
 }
 
+print OUT sprintf qq{#line %d "%s"\n}, __LINE__ + 2,  __FILE__;
 print OUT <<'!NO!SUBS!';
         ANYVAL_FROM_CTYPE(data, datatype, tmp_NV);
      } /* end of Perl Double case for data type */
@@ -261,11 +267,34 @@ print OUT <<'!NO!SUBS!';
 
    } /* End of scalar case */
 
+   if(sv_derived_from(sv, "Math::Complex")) {
+      dSP;
+      int count, i;
+      NV retval;
+      double vals[2];
+      char *meths[] = { "Re", "Im" };
+      PDL_Anyval data;
+      ENTER; SAVETMPS;
+      for (i = 0; i < 2; i++) {
+        PUSHMARK(sp); XPUSHs(sv); PUTBACK;
+        count = perl_call_method(meths[i], G_SCALAR);
+        SPAGAIN;
+        if (count != 1) croak("Failed Math::Complex method '%s'", meths[i]);
+        retval = POPn;
+        vals[i] = (double)retval;
+        PUTBACK;
+      }
+      FREETMPS; LEAVE;
+      ret = pdl_new();  /* Scratch pdl */
+      data.type = PDL_CD;
+      data.value.C = (PDL_CDouble)(vals[0] + I * vals[1]);
+      pdl_makescratchhash(ret, data);
+      return ret;
+   }
+
    /* If execution reaches here, then sv is NOT a scalar
     * (i.e. it is a ref).
     */
-
-
 
    if(SvTYPE(SvRV(sv)) == SVt_PVHV) {
         HV *hash = (HV*)SvRV(sv);
@@ -811,10 +840,11 @@ pdl* pdl_from_array(AV* av, AV* dims, int type, pdl* p)
 # pdl_setav calls...
 #
   for my $t (types()) {
-    my ($type, $t2) = map $t->$_, qw(sym shortctype);
+    my ($type, $t2, $ppsym) = map $t->$_, qw(sym shortctype ppsym);
+    print OUT sprintf qq{#line %d "%s"\n}, __LINE__ + 2,  __FILE__;
     print OUT <<"!WITH!SUBS!";
   case $type:
-    pdl_setav_$t2(p->data,av,pdims,ndims,level, undefval.value.$PDL::Types::typehash{$type}->{ppsym}, p);
+    pdl_setav_$t2(p->data,av,pdims,ndims,level, undefval.value.$ppsym, p);
     break;
 
 !WITH!SUBS!
@@ -824,6 +854,7 @@ pdl* pdl_from_array(AV* av, AV* dims, int type, pdl* p)
 # Back to your regularly scheduled C code emission...
 ########
 
+  print OUT sprintf qq{#line %d "%s"\n}, __LINE__ + 2,  __FILE__;
   print OUT <<'!NO!SUBS!';
   default:
     croak("pdl_from_array: internal error: got type %d",type);
@@ -872,6 +903,7 @@ pdl* pdl_from_array(AV* av, AV* dims, int type, pdl* p)
 
 for my $type ( map $_->shortctype, types() ) {
 
+print OUT sprintf qq{#line %d "%s"\n}, __LINE__ + 2,  __FILE__;
 print OUT <<"!WITH!SUBS!";
 
 PDL_Indx pdl_kludge_copy_$type(PDL_Indx poff, // Offset into the dest data array
@@ -935,10 +967,11 @@ PDL_Indx pdl_kludge_copy_$type(PDL_Indx poff, // Offset into the dest data array
 	    my $comp_for_nan =
 	          $inner_type->usenan
 	          # if not equal, check if both are NaN
-	        ? "( !isfinite( (($ctype *)pptr)[i] ) && !isfinite(source_badval.value.$ppsym) )"
+	        ? '('.$inner_type->isnan("(($ctype *)pptr)[i]") .' && '.$inner_type->isnan("source_badval.value.$ppsym").')'
 	          # otherwise it must be false
 	        : '0';
 
+        print OUT sprintf qq{#line %d "%s"\n}, __LINE__ + 2,  __FILE__;
         print OUT <<"!WITH!SUBS!";
 
       case ${switch_type}:
@@ -977,6 +1010,7 @@ PDL_Indx pdl_kludge_copy_$type(PDL_Indx poff, // Offset into the dest data array
 
         } # end of foreach in the perl generator code
 
+      print OUT sprintf qq{#line %d "%s"\n}, __LINE__ + 2,  __FILE__;
       print OUT <<"!WITH!SUBS!";
     default:
       croak("Internal error - please submit a bug report at https://github.com/PDLPorters/pdl/issues:\\n  pdl_kludge_copy: unknown datatype of %d.",(int)(source_pdl->datatype));

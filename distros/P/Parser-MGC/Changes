@@ -1,5 +1,15 @@
 Revision history for Parser-MGC
 
+0.19    2021-04-23
+        [CHANGES]
+         * Document how to generate more helpful error messages from ->any_of
+         * More helpful error message if ->from_file fails (RT134841)
+         * Improved performance of ->skip_ws (RT74779)
+         * Added a JSON-like parser example
+
+        [BUGFIXES]
+         * Fix spelling and syntax errors in documentation (RT134842, RT134843)
+
 0.18    2021-03-27
         [CHANGES]
          * Repack tarball without stale `Makefile.PL`

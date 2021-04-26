@@ -41,7 +41,7 @@ is extracted from the NAME section of its pod.
 
 sub run {
   my $self = shift;
-  print "\nAvailable plugins are:\n";
+  print "\nPlugins available:\n\n";
   my %names = App::Regather::Plugin->names;
   my ($s, @res);
   while ( my ($k, $v) = each %names ) {
@@ -54,12 +54,13 @@ sub run {
 	      -exitstatus => 'NOEXIT');
     close $fh;
     my (undef,$descr) = split("\n", $s||'');
-    $descr = '    ' . $k unless ($descr);
-    push @res, "$descr, App::Regather::Plugin::$k(3)\n";
-
+    $descr = $k unless ($descr);
+    my ($l,$r) = split / - /, $descr;
+    push @res, sprintf("%-15s: %s, App::Regather::Plugin::$k(3)\n", $l, $r);
   }
 
   print $_ foreach (sort @res);
+  print "\n";
 }
 
 ######################################################################

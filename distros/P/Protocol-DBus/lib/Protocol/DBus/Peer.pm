@@ -333,6 +333,12 @@ Same interface as L<IO::Handle>’s method of the same name.
 sub blocking {
     my $self = shift;
 
+    # require() is needed on pre-5.14 perls:
+    if ($^V lt v5.14) {
+        local ($@, $!);
+        require IO::File;
+    }
+
     return $self->{'_socket'}->blocking(@_);
 }
 

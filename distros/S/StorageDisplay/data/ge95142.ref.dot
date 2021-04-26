@@ -2,7 +2,7 @@ digraph "machine"{
 	rankdir=LR;
 	{ "@Part: sda" [
 		label=<<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0">
-				<TR> <TD COLSPAN="2">DELL PERC H710P</TD> </TR><TR><TD >/dev/sda<BR/>Label: gpt<BR/>Size: 2.73 TiB</TD>    <TD BGCOLOR="lightgrey">
+				<TR> <TD COLSPAN="2">DELL PERC H710P</TD> </TR><TR><TD >/dev/sda<BR/>Model: PERC_H710P<BR/>Serial: 6d4ae5208fc820002369966275967490<BR/>Label: gpt<BR/>Size: 2.73 TiB</TD>    <TD BGCOLOR="lightgrey">
 				<TABLE >
 					<TR>
 						<TD bgcolor="green">
@@ -37,7 +37,7 @@ digraph "machine"{
 	]; }
 	{ "@Part: sdb" [
 		label=<<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0">
-				<TR> <TD COLSPAN="2">DELL PERC H710P</TD> </TR><TR><TD >/dev/sdb<BR/>Label: gpt<BR/>Size: 2.73 TiB</TD>    <TD BGCOLOR="lightgrey">
+				<TR> <TD COLSPAN="2">DELL PERC H710P</TD> </TR><TR><TD >/dev/sdb<BR/>Model: PERC_H710P<BR/>Serial: 6d4ae5208fc820002369a7340fd8b826<BR/>Label: gpt<BR/>Size: 2.73 TiB</TD>    <TD BGCOLOR="lightgrey">
 				<TABLE >
 					<TR>
 						<TD bgcolor="green">
@@ -67,7 +67,7 @@ digraph "machine"{
 	]; }
 	{ "@Part: sdc" [
 		label=<<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0">
-				<TR> <TD COLSPAN="2">DELL PERC H710P</TD> </TR><TR><TD >/dev/sdc<BR/>Label: gpt<BR/>Size: 5.46 TiB</TD>    <TD BGCOLOR="lightgrey">
+				<TR> <TD COLSPAN="2">DELL PERC H710P</TD> </TR><TR><TD >/dev/sdc<BR/>Model: PERC_H710P<BR/>Serial: 6d4ae5208fc8200025e7e4eea0fcd8a6<BR/>Label: gpt<BR/>Size: 5.46 TiB</TD>    <TD BGCOLOR="lightgrey">
 				<TABLE >
 					<TR>
 						<TD bgcolor="green">
@@ -150,8 +150,8 @@ digraph "machine"{
 				style=striped;fillcolor="pink;0.064425.2:green"
 			]; }
 			{ "LVM@vgchu@PV@sdc1" [
-				label="PV: /dev/sdc1\nSize: 5.46 TiB\nFree: 1.46 TiB\nUsed: 4.00 TiB";
-				style=striped;fillcolor="pink;0.733131.2:green"
+				label="PV: /dev/sdc1\nSize: 5.46 TiB\nFree: 467 GiB\nUsed: 5.00 TiB";
+				style=striped;fillcolor="pink;0.916414.2:green"
 			]; }
 			label="vgchu's PVs";
 		}
@@ -163,7 +163,7 @@ digraph "machine"{
 				fillcolor="yellow"
 			]; }
 			{ "dm-7" [
-				label="LV: kvm-hera-disk2\nSize: 4.00 TiB";
+				label="LV: kvm-hera-disk2\nSize: 5.00 TiB";
 				fillcolor="yellow"
 			]; }
 			{ "dm-0" [
@@ -172,8 +172,8 @@ digraph "machine"{
 			]; }
 			label="vgchu's LVs";
 		}
-		label="LVM: vgchu\nSize: 6.37 TiB\nFree: 2.31 TiB";
-		style=striped;fillcolor="pink;0.637588.2:green"
+		label="LVM: vgchu\nSize: 6.37 TiB\nFree: 1.31 TiB";
+		style=striped;fillcolor="pink;0.794684.2:green"
 	}
 	subgraph "cluster_@LSIMegacli@0" {
 		style=filled;
@@ -260,11 +260,11 @@ digraph "machine"{
 		fillcolor=lightgrey;
 		node [style=filled,color=white,fillcolor=lightgrey,shape=rectangle];
 		{ "@FS@/" [
-			label="/\nDevice: /dev/vgchu/root\next4\nSize: 9.72 GiB\nFree: 2.86 GiB\nUsed: 6.34 GiB";
-			style=striped;fillcolor="pink;0.705692.2:green"
+			label="/\nDevice: /dev/vgchu/root\next4\nSize: 9.72 GiB\nFree: 2.28 GiB\nUsed: 6.92 GiB";
+			style=striped;fillcolor="pink;0.765154.2:green"
 		]; }
 		{ "@FS@/boot/efi" [
-			label="/boot/efi\nDevice: /dev/sda1\nvfat\nSize: 477 GiB\nFree: 477 GiB\nUsed: 5.38 MiB";
+			label="/boot/efi\nDevice: /dev/sda1\nvfat\nSize: 477 GiB\nFree: 477 GiB\nUsed: 5.41 MiB";
 			style=striped;fillcolor="pink;0.000011.2:green"
 		]; }
 		label="Mounted FS and swap";

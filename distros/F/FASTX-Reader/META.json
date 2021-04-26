@@ -38,15 +38,15 @@
    "provides" : {
       "FASTX::PE" : {
          "file" : "lib/FASTX/PE.pm",
-         "version" : "v1.0.4"
+         "version" : "v1.0.5"
       },
       "FASTX::Reader" : {
          "file" : "lib/FASTX/Reader.pm",
-         "version" : "v1.0.4"
+         "version" : "v1.0.5"
       },
       "FASTX::ScriptHelper" : {
          "file" : "lib/FASTX/ScriptHelper.pm",
-         "version" : "v1.0.4"
+         "version" : "v1.0.5"
       }
    },
    "release_status" : "stable",
@@ -55,7 +55,7 @@
          "url" : "https://github.com/telatin/FASTQ-Parser"
       }
    },
-   "version" : "1.0.4",
+   "version" : "1.0.5",
    "x_generated_by_perl" : "v5.22.1",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.10",
    "x_spdx_expression" : "MIT"

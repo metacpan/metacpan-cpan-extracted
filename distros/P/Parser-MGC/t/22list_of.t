@@ -27,6 +27,23 @@ sub parse
    $self->list_of( ",", 'token_int' );
 }
 
+package TestParser3;
+use base qw( Parser::MGC );
+
+sub parse
+{
+   my $self = shift;
+
+   $self->list_of( ":", 'parse_inner' );
+}
+
+sub parse_inner
+{
+   my $self = shift;
+
+   return ( "(", $self->token_int, ")" );
+}
+
 package main;
 
 my $parser = TestParser->new;
@@ -39,5 +56,8 @@ is_deeply( $parser->from_string( "7, 8" ), [ 7, 8 ], '"7, 8"' );
 is_deeply( $parser->from_string( "10,11,12," ), [ 10, 11, 12 ], '"10,11,12,"' );
 
 is_deeply( TestParser2->new->from_string( "13,14" ), [ 13, 14 ], '"13,14" as method name' );
+
+# List-context
+is_deeply( TestParser3->new->from_string( "20:25" ), [qw[ ( 20 ) ( 25 ) ]], '20:25 in list context' );
 
 done_testing;

@@ -10,7 +10,7 @@ use v5.14;
 # Module implementation here
 our %github;
 
-our @EXPORT = qw( %github set_output set_env);
+our @EXPORT = qw( %github set_output set_env debug error set_failed);
 
 BEGIN {
   for my $k ( keys(%ENV) ) {
@@ -20,7 +20,7 @@ BEGIN {
     }
   }
 }
-use version; our $VERSION = qv('0.0.4');
+use version; our $VERSION = qv('0.0.5');
 
 sub set_output {
   carp "Need name and value" unless @_;
@@ -36,6 +36,35 @@ sub set_env {
   close $fh;
 }
 
+sub debug {
+  my $debug_message = shift;
+  say "::debug::$debug_message";
+}
+
+sub error {
+  my $error_message = shift;
+  say "::error::$error_message"
+}
+
+sub error_on_file {
+  my $error_message = shift;
+  my ($file, $line, $col ) = @_;
+  my $message = "::error";
+  say "Message so far $message";
+  if ( $file ) {
+    my @data;
+    push( @data, "file=$file") if $file;
+    push( @data, "line=$line") if $line;
+    push( @data, "col=$col") if $col;
+    $message .= " ".join(",", @data );
+  }
+  say "$message::$error_message"
+}
+
+sub set_failed {
+  error( @_ );
+  exit( 1);
+}
 
 "Action!"; # Magic true value required at end of module
 __END__
@@ -53,7 +82,7 @@ This document describes GitHub::Actions version 0.0.3
 =head1 SYNOPSIS
 
     use GitHub::Actions;
-    use v5,14;
+    use v5.14;
 
     # %github contains all GITHUB_* environment variables
     for my $g (keys %github ) {
@@ -105,6 +134,23 @@ This is equivalent to L<setting an environment variable|https://docs.github.com/
 
 Equivalent to L<C<set_output>|https://docs.github.com/en/free-pro-team@latest/actions/reference/workflow-commands-for-github-actions#setting-an-output-parameter>
 
+=head2 debug( $debug_message )
+
+Equivalent to L<C<debug>|https://docs.github.com/en/free-pro-team@latest/actions/reference/workflow-commands-for-github-actions#setting-a-debug-message>
+
+=head2 error( $error_message )
+
+Equivalent to L<C<error>|https://docs.github.com/en/free-pro-team@latest/actions/reference/workflow-commands-for-github-actions#setting-an-error-message>, prints an error message.
+
+=head2 error_on_file( $error_message, $file, $line, $col )
+
+Equivalent to L<C<error>|https://docs.github.com/en/free-pro-team@latest/actions/reference/workflow-commands-for-github-actions#setting-an-error-message>, prints an error message with file and line info
+
+=head2 set_failed( $error_message )
+
+Exits with an error status of 1 after setting the error message.
+
+
 =head1 CONFIGURATION AND ENVIRONMENT
 
 GitHub::Actions requires no configuration files or environment
@@ -137,7 +183,7 @@ Please report any bugs or feature requests to L<https://github.com/JJ/perl-GitHu
 
 =head1 AUTHOR
 
-JJ Merelo  C<< <jmerelo@CPAN.org> >>
+JJ Merelo  C<< <jmerelo@CPAN.org> >>. Many thanks to RENEEB and Gabor Szabo for their help with test and metadata.
 
 
 =head1 LICENCE AND COPYRIGHT

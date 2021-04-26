@@ -22,7 +22,7 @@ use Encode ();
 use MIME::Base64;
 use Scalar::Util ();
 
-our $VERSION = '2.001';
+our $VERSION = '2.002';
 
 my $apiVersion = undef;  # 0 for compatibility.  1 for prefered
 my $error;
@@ -339,6 +339,8 @@ sub oid2name {
 sub _oid2name {
     my $class = shift;
     my( $oid ) = @_;
+
+    return unless($oid);
 
     if( exists $oids{$oid} ) {
 	$oid = $oids{$oid};
@@ -741,6 +743,9 @@ ASN1
 	$parser->decode( $der ) or
 	  confess( "decode: " . $parser->error .
 		   "Cannot handle input or missing ASN.1 definitions" );
+
+    $self->{certificationRequestInfo}{subject_raw}
+        = $top->{certificationRequestInfo}{subject};
 
     $self->{certificationRequestInfo}{subject}
         = $self->_convert_rdn( $top->{certificationRequestInfo}{subject} );
@@ -1172,6 +1177,28 @@ sub subject {
     return $subj;
 }
 
+
+sub subjectRaw {
+
+    my $self = shift;
+    my @subject;
+    foreach my $rdn (@{$self->{certificationRequestInfo}{subject_raw}}) {
+        my @sequence = map {
+            $_->{format} = (keys %{$_->{value}})[0];
+            $_->{value} = (values %{$_->{value}})[0];
+            $_;
+        } @{$rdn};
+        if (scalar @sequence > 1) {
+            push @subject, \@sequence;
+        } else {
+            push @subject, $sequence[0];
+        }
+    }
+    return \@subject;
+
+}
+
+
 sub subjectAltName {
     my $self = shift;
     my( $type ) = @_;
@@ -1262,7 +1289,7 @@ sub subjectPublicKeyParams {
 
         my $par = $self->_init( 'eccName' );
         $rv->{curve} = $par->decode( $self->{certificationRequestInfo}{subjectPKInfo}{algorithm}{parameters} );
-        $rv->{curve} = $self->_oid2name( $rv->{curve} );
+        $rv->{curve} = $self->_oid2name( $rv->{curve} ) if ($rv->{curve});
     } elsif( $at eq 'dsa' ) {
         $rv->{keytype} = 'DSA';
         my $par = $self->_init( 'dsaKey' );
@@ -2047,6 +2074,59 @@ In scalar context, returns the subject as a string in the form C</componentName=
 In array context, returns an array of C<(componentName, [values])> pairs.  Abbreviations are not used.
 
 Note that the order of components in a name is significant.
+
+
+=head3 subjectRaw
+
+Returns the subjects RDNs as sequence of hashes without OID any mapping applied.
+
+The result is an array ref where each item is a hash:
+
+    [
+        {
+        'format' => 'ia5String',
+        'value' => 'Org',
+        'type' => '0.9.2342.19200300.100.1.25'
+        },
+        {
+        'format' => 'utf8String',
+        'value' => 'ACME',
+        'type' => '2.5.4.10'
+        },
+        {
+        'format' => 'utf8String',
+        'type' => '2.5.4.3',
+        'value' => 'Foobar'
+        }
+    ]
+
+If a component contains a SET, the component will become an array on the
+second level, too:
+
+    [
+        {
+        'format' => 'ia5String',
+        'value' => 'Org',
+        'type' => '0.9.2342.19200300.100.1.25'
+        },
+        {
+        'format' => 'utf8String',
+        'value' => 'ACME',
+        'type' => '2.5.4.10'
+        },
+        [
+            {
+                'format' => 'utf8String',
+                'type' => '2.5.4.3',
+                'value' => 'Foobar'
+            },
+            {
+                'format' => 'utf8String',
+                'type' => '0.9.2342.19200300.100.1.1',
+                'value' => 'foobar'
+            }
+        ]
+    ];
 
 =head3 commonName
 

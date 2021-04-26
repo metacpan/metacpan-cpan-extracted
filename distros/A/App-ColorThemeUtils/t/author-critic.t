@@ -15,7 +15,7 @@ use warnings;
 
 use Test::Perl::Critic (-profile => "") x!! -e "";
 
-my $filenames = ['lib/App/ColorThemeUtils.pm','script/list-color-theme-modules','script/show-color-theme-swatch'];
+my $filenames = ['lib/App/ColorThemeUtils.pm','script/list-color-theme-items','script/list-color-theme-modules','script/show-color-theme-swatch'];
 unless ($filenames && @$filenames) {
     $filenames = -d "blib" ? ["blib"] : ["lib"];
 }

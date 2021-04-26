@@ -1,5 +1,14 @@
 Revision history for Text-Minify-XS:
 
+v0.3.8    2021-04-21 16:46:53+01:00 Europe/London
+  [Documentation]
+  - Updated SEE ALSO section.
+
+  - Updated description of what this module does not do.
+
+  [Tests]
+  - Added more author tests.
+
 v0.3.7    2021-02-18 16:53:32+00:00 Europe/London
   [Enhancements]
   - The function will die rather than return undef if there is a

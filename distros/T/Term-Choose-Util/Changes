@@ -1,6 +1,10 @@
 Revision history for Term::Choose::Util
 
 
+0.123   2021-04-25
+        - Replace 'croak' with 'die'.
+        - 'choose_a_number': new option 'default_number'.
+
 0.122   2021-01-01
         - Add bugracker info to the Makefile.PL.
         - Update year copyright.

@@ -90,7 +90,7 @@ diag( "Skipping $sslver tests: no support\n" ) if( $sslver );
 undef $sslver;
 
 subtest 'Basic functions' => sub {
-    plan tests => 40;
+    plan tests => 41;
 
     use_ok('Crypt::PKCS10') or BAIL_OUT( "Can't load Crypt::PKCS10" );
 
@@ -205,6 +205,42 @@ _KEYPEM_
 
     is( scalar $decoded->subject, '/DC=org/DC=OpenSSL/DC=users/CN=test/UID=123456/emailAddress=test@test.com',
 	'subject()' );
+
+    is_deeply( $decoded->subjectRaw, [
+          {
+            'value' => 'org',
+            'type' => '0.9.2342.19200300.100.1.25',
+            'format' => 'ia5String'
+          },
+          {
+            'value' => 'OpenSSL',
+            'type' => '0.9.2342.19200300.100.1.25',
+            'format' => 'ia5String'
+          },
+          {
+            'type' => '0.9.2342.19200300.100.1.25',
+            'value' => 'users',
+            'format' => 'ia5String'
+          },
+          [
+            {
+              'format' => 'utf8String',
+              'type' => '2.5.4.3',
+              'value' => 'test'
+            },
+            {
+              'format' => 'utf8String',
+              'type' => '0.9.2342.19200300.100.1.1',
+              'value' => '123456'
+            }
+          ],
+          {
+            'format' => 'ia5String',
+            'value' => 'test@test.com',
+            'type' => '1.2.840.113549.1.9.1'
+          }
+        ],
+	    'subjectRaw()' );
 
     is( scalar $decoded->userID, '123456', 'userID accessor autoloaded' );
 
@@ -596,7 +632,7 @@ subtest 'oid mapping' => sub {
 
     is( Crypt::PKCS10->oid2name( '2.5.4.51' ), 'houseIdentifier', 'oid2name main table' );
     is( Crypt::PKCS10->oid2name( '1.3.6.1.5.5.7.3.8' ), 'timeStamping', 'oid2name extKeyUsages' );
-    is( Crypt::PKCS10->oid2name( '0' ), '0', 'oid2name returns oid if not registered' );
+    is( Crypt::PKCS10->oid2name( '0' ), undef, 'oid2name returns oid if not registered' );
 
 };
 

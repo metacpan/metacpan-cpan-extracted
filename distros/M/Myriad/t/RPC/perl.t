@@ -14,8 +14,8 @@ use Log::Any::Adapter qw(Stderr), log_level => 'info';
 
 # Myriad::RPC should be included to load exceptions
 use Myriad::RPC;
-use Myriad::Transport::Perl;
-use Myriad::RPC::Implementation::Perl;
+use Myriad::Transport::Memory;
+use Myriad::RPC::Implementation::Memory;
 
 my $loop = IO::Async::Loop->new;
 
@@ -30,8 +30,8 @@ my $message_args = {
 };
 
 $loop->add(my $ryu = Ryu::Async->new);
-$loop->add(my $transport = Myriad::Transport::Perl->new());
-$loop->add(my $rpc = Myriad::RPC::Implementation::Perl->new(transport => $transport));
+$loop->add(my $transport = Myriad::Transport::Memory->new());
+$loop->add(my $rpc = Myriad::RPC::Implementation::Memory->new(transport => $transport));
 
 isa_ok($rpc, 'IO::Async::Notifier');
 

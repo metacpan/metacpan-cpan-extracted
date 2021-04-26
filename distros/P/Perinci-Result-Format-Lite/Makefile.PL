@@ -23,8 +23,7 @@ my %WriteMakefileArgs = (
     "JSON::PP" => 0,
     "List::Util" => "1.45",
     "Sort::BySpec" => "0.03",
-    "Text::Table::Any" => "0.096",
-    "Text::Table::Tiny" => 0,
+    "Text::Table::Sprintf" => 0,
     "strict" => 0,
     "warnings" => 0
   },
@@ -35,7 +34,7 @@ my %WriteMakefileArgs = (
     "Test::More" => "0.98",
     "Test::Needs" => 0
   },
-  "VERSION" => "0.278",
+  "VERSION" => "0.279",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -54,8 +53,7 @@ my %FallbackPrereqs = (
   "Sort::BySpec" => "0.03",
   "Test::More" => "0.98",
   "Test::Needs" => 0,
-  "Text::Table::Any" => "0.096",
-  "Text::Table::Tiny" => 0,
+  "Text::Table::Sprintf" => 0,
   "strict" => 0,
   "warnings" => 0
 );

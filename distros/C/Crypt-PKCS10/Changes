@@ -1,3 +1,5 @@
+2.002 2021-04-26T09:41:32Z
+
 2.001 2018-12-14T10:22:00Z
 
   - Bump version to work around string sorting (i.e. "1.11" < "1.9")

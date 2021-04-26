@@ -1,5 +1,11 @@
 Revision history for RT-Extension-Announce
 
+1.04 2021-04-23
+ - Add bootstrap style for RT 5
+ - Localize toggle link text
+ - Fix the logic to determine if we need </tbody> or not
+ - Drop unused RTAnnounceAdvancedMode code
+
 1.03 2020-07-20
  - Add RT 5 support
 

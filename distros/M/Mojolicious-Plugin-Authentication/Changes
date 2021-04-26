@@ -1,5 +1,20 @@
 Revision history for Mojolicious-Plugin-Authentication
 
+1.36      2021-04-21 21:25:29 BST
+
+    No changes from previous release
+
+1.35      2021-03-03 21:33:37 GMT (TRIAL RELEASE)
+
+    * Changes:
+      * Moved dependency specification to cpanfile.
+      * Distribution should now be installable from the repository as-is
+
+1.34      2020-08-03 22:02:52+01:00 Europe/London (TRIAL RELEASE)
+
+    * New:
+      * Support async callbacks with "_p" appended
+
 1.33      2018-04-22 00:05:05+01:00 Europe/London
 
     * Fixed:

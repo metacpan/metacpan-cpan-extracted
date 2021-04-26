@@ -5,7 +5,7 @@ use warnings;
 
 use 5.010;
 
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 our $AUTHORITY = 'cpan:DERIV'; # AUTHORITY
 
 =head1 NAME

@@ -1,5 +1,5 @@
 package App::JESP::Colorizer;
-$App::JESP::Colorizer::VERSION = '0.015';
+$App::JESP::Colorizer::VERSION = '0.016';
 use Moose;
 
 has 'jesp' => ( is => 'ro' , isa => 'App::JESP', required => 1);

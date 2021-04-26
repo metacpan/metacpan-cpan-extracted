@@ -1,5 +1,11 @@
 Revision history for Perl module Table::Trans
 
+0.02 2021-04-22
+
+- use "read_json" to read JSON files
+- "add_trans" function documented and made to work
+- "get_single_trans" function documented and exported on demand
+
 0.01 2021-02-10
 
 - Initial version

@@ -1,0 +1,11 @@
+0.015.1 2021-04-25  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+        - [build] Rebuild with updated Sort::Sub::pod_section_ala_perlancar
+          (0.086) to sort POD sections more appropriately.
+
+
+0.015.0 2021-04-25  Released-By: PERLANCAR
+
+        - First release, forked from File::SortedSeek 0.015.

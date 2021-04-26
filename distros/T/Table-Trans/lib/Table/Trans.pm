@@ -9,6 +9,7 @@ our @EXPORT_OK = qw/
     add_trans
     get_lang_name
     get_lang_trans
+    get_single_trans
     read_trans
     trans_to_json_file
     write_trans
@@ -16,7 +17,7 @@ our @EXPORT_OK = qw/
 our %EXPORT_TAGS = (
     all => \@EXPORT_OK,
 );
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 use Table::Readable '0.05', qw!read_table read_table_hash!;
 use JSON::Create 'write_json';
@@ -27,10 +28,10 @@ my %lang2name;
 sub add_trans
 {
     my ($trans, $file) = @_;
-    my $trans2 = read_trans_table ($file);
+    my $trans2 = read_trans ($file);
     for my $id (keys %$trans2) {
 	if ($trans->{$id}) {
-	    warn "$id is duplicated.\n";
+	    warn "$file: $id is duplicated.\n";
 	}
 	else {
 	    $trans->{$id} = $trans2->{$id};

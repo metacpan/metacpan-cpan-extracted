@@ -1,5 +1,10 @@
 Revision history for App-cpangitify
 
+0.18      2021-04-22 02:29:50 -0600
+  - Added --branch | -b option (gh#12)
+  - New repositories are now created with the default branch of main (gh#12)
+  - Moved to new GitHub org
+
 0.17      2017-08-08 12:41:51 -0400
   - Update for API interface change (?) allow author email
     address as either a scalar or array reference.

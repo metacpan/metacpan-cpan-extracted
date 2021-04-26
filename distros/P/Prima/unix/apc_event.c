@@ -2175,6 +2175,12 @@ x_flush(void)
 static struct timeval *
 select_timeout(struct timeval * timeout)
 {
+	if ( guts. application_stop_signal ) {
+		timeout-> tv_sec = 0;
+		timeout-> tv_usec = 0;
+		return timeout;
+	}
+
 	if ( !guts. oldest) return NULL;
 
 	gettimeofday( timeout, NULL);
@@ -2235,7 +2241,7 @@ prima_one_loop_round( int wait, Bool careOfApplication)
 		}
 		if ( wait == WAIT_NEVER || ( events > 0 && wait == WAIT_IF_NONE))
 			return true;
-		if ( !application || guts. applicationClose)
+		if ( !application || guts. applicationClose || guts. application_stop_signal)
 			return false;
 		if ( events == 0 )
 			break;

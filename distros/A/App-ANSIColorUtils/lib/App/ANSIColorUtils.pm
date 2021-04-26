@@ -3,7 +3,7 @@ package App::ANSIColorUtils;
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2021-01-20'; # DATE
 our $DIST = 'App-ANSIColorUtils'; # DIST
-our $VERSION = '0.009'; # VERSION
+our $VERSION = '0.010'; # VERSION
 
 use 5.010001;
 use strict;
@@ -70,27 +70,33 @@ sub show_colors {
 
     my %args = @_;
 
+    my @colornames;
+    my @colorcodes;
+    if ($args{_colors_hash}) {
+        @colornames  = sort keys %{ $args{_colors_hash} };
+        @colorcodes = map { $args{_colors_hash}{$_} } @colornames;
+    } else {
+        @colornames = @colorcodes = @{ $args{colors} };
+    }
+
     my @rows;
-    my $j = -1;
-    for my $name (@{ $args{colors} }) {
-        $j++;
-        my $code;
-        if ($name =~ /\A[0-9A-fa-f]{6}\z/) {
-            $code = $name;
-        } else {
-            $code = $codes->{$name}; defined $code or die "Unknown color name '$name'";
+    for my $j (0 .. $#colornames) {
+        my $colorname = $colornames[$j];
+        my $colorcode = $colorcodes[$j];
+        unless ($colorcode =~ /\A[0-9A-fa-f]{6}\z/) {
+            $colorcode = $codes->{$colorcode}; defined $colorcode or die "Unknown color name '$colorcode'";
         }
-        my $ansifg = Color::ANSI::Util::ansifg($code);
-        my $ansibg = Color::ANSI::Util::ansibg($code);
+        my $ansifg = Color::ANSI::Util::ansifg($colorcode);
+        my $ansibg = Color::ANSI::Util::ansibg($colorcode);
         push @rows, {
-            name => $name,
-            rgb_code => $code,
+            name => $colorname,
+            rgb_code => $colorcode,
             ansi_fg_code => Data::Dmp::dmp($ansifg),
             ansi_bg_code => Data::Dmp::dmp($ansibg),
             fg =>
-                $ansifg . "This is text with foreground color $name (#$code)" . Color::ANSI::Util::ansi_reset(1) . "\n" .
-                $ansifg . "\e[1m" . "This is text with foreground color $name (#$code) + BOLD" . Color::ANSI::Util::ansi_reset(1) . "\n",
-            bg => $ansibg . Color::ANSI::Util::ansifg(Color::RGB::Util::rgb_is_light($code) ? "000000":"ffffff") . "This is text with background color $name (#$code)" . Color::ANSI::Util::ansi_reset(1),
+                $ansifg . "This is text with foreground color $colorname (#$colorcode)" . Color::ANSI::Util::ansi_reset(1) . "\n" .
+                $ansifg . "\e[1m" . "This is text with foreground color $colorname (#$colorcode) + BOLD" . Color::ANSI::Util::ansi_reset(1) . "\n",
+            bg => $ansibg . Color::ANSI::Util::ansifg(Color::RGB::Util::rgb_is_light($colorcode) ? "000000":"ffffff") . "This is text with background color $colorname (#$colorcode)" . Color::ANSI::Util::ansi_reset(1),
         };
     }
     [200, "OK", \@rows];
@@ -115,6 +121,38 @@ sub show_colors_from_scheme {
 
     my $table = $mod->NamesRgbTable;
     show_colors(colors => [sort keys %$table]);
+}
+
+$SPEC{show_colors_from_theme} = {
+    v => 1.1,
+    summary => 'Show colors from a ColorTheme scheme',
+    args => {
+        theme => {
+            schema => 'perl::colortheme::modname_with_optional_args*',
+            req => 1,
+            pos => 0,
+        },
+    },
+};
+sub show_colors_from_theme {
+    require Module::Load::Util;
+
+    my %args = @_;
+    my $mod = $args{theme}; $mod = "ColorTheme::$mod" unless $mod =~ /^ColorTheme::/;
+    my $theme = Module::Load::Util::instantiate_class_with_optional_args($mod);
+
+    my @item_names = $theme->list_items;
+    my %colors;
+    for my $item ($theme->list_items) {
+        my $k = $item;
+        my $v = $theme->get_item_color($item);
+        if (ref $v) {
+            $k = "$k (hash or coderef)";
+            $v = "ffffff";
+        }
+        $colors{$k} = $v;
+    }
+    show_colors(_colors_hash =>\%colors);
 }
 
 $SPEC{show_assigned_rgb_colors} = {
@@ -287,7 +325,7 @@ App::ANSIColorUtils - Utilities related to ANSI color
 
 =head1 VERSION
 
-This document describes version 0.009 of App::ANSIColorUtils (from Perl distribution App-ANSIColorUtils), released on 2021-01-20.
+This document describes version 0.010 of App::ANSIColorUtils (from Perl distribution App-ANSIColorUtils), released on 2021-01-20.
 
 =head1 DESCRIPTION
 
@@ -326,6 +364,8 @@ This distributions provides the following command-line utilities:
 =item * L<show-colors>
 
 =item * L<show-colors-from-scheme>
+
+=item * L<show-colors-from-theme>
 
 =item * L<show-rand-rgb-colors>
 
@@ -452,6 +492,38 @@ Arguments ('*' denotes required arguments):
 =over 4
 
 =item * B<scheme>* => I<perl::colorscheme::modname>
+
+
+=back
+
+Returns an enveloped result (an array).
+
+First element (status) is an integer containing HTTP status code
+(200 means OK, 4xx caller error, 5xx function error). Second element
+(msg) is a string containing error message, or 'OK' if status is
+200. Third element (payload) is optional, the actual result. Fourth
+element (meta) is called result metadata and is optional, a hash
+that contains extra information.
+
+Return value:  (any)
+
+
+
+=head2 show_colors_from_theme
+
+Usage:
+
+ show_colors_from_theme(%args) -> [status, msg, payload, meta]
+
+Show colors from a ColorTheme scheme.
+
+This function is not exported.
+
+Arguments ('*' denotes required arguments):
+
+=over 4
+
+=item * B<theme>* => I<perl::colortheme::modname_with_optional_args>
 
 
 =back

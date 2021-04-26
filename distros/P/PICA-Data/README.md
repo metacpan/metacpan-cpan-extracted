@@ -135,6 +135,10 @@ Create a PICA writer object (see [PICA::Writer::Base](https://metacpan.org/pod/P
 - [PICA::Writer::PPXML](https://metacpan.org/pod/PICA::Writer::PPXML) for type `ppxml` (PicaPlus-XML)
 - [PICA::Writer::Fields](https://metacpan.org/pod/PICA::Writer::Fields) for type `fields` (summary of used fields and subfields)
 
+## pica\_string( $record \[, $type \[, @options\] \] )
+
+Stringify a record with given writer (`plain` as default) and options.
+
 ## pica\_path( $path )
 
 Equivalent to [PICA::Path](https://metacpan.org/pod/PICA::Path)->new($path).
@@ -227,7 +231,8 @@ record objects:
 
 ## string( \[ $type \] )
 
-Serialize PICA record in a given format (`plain` by default).
+Serialize PICA record in a given format (`plain` by default). This method can
+also be used as function `pica_string`.
 
 # CONTRIBUTORS
 

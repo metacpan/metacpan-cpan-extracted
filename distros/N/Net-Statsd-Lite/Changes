@@ -1,8 +1,69 @@
 Revision history for Net-Statsd-Lite
 
+v0.6.0    2021-04-25 23:07:35+01:00 Europe/London
+  [Enhancements]
+  - All measurement methods take an optional `$opts` hashref that can
+    be used to pass additiona information, such as tags.
+
+  - Removed the use of custom type library.
+
+  [Bug Fixes]
+  - Updated DEMOLISH method to delete buffer afterflush.
+
+  [Incompatabilities]
+  - Renamed internal `_record` method to `record_metric`.
+
+  [Documentation]
+  - Documented `record_metric` method for subclassing.
+
+  - Documented how to extend this to support tagging.
+
+  - Fixed typo for `meter` method name.
+
+  - Fixed typos in Changes.
+
+  - Updated copyright year.
+
+  [Tests]
+  - Added more author tests.
+
+  - Increased timeout for tests.
+
+v0.5.2    2021-04-24 11:59:55+01:00 Europe/London (TRIAL RELEASE)
+  [Enhancements]
+  - Removed the use of custom type library.
+
+v0.5.1    2021-04-22 16:33:03+01:00 Europe/London (TRIAL RELEASE)
+  [Bug Fixes]
+  - Updated DEMOLISH method to delete buffer after flush.
+
+  [Tests]
+  - Increased timeout for tests.
+
+v0.5.0    2021-04-22 00:30:57+01:00 Europe/London (TRIAL RELEASE)
+  [Enhancements]
+  - All measurement methods take an optional `$opts` hashref that can
+    be used to pass additiona information, such as tags.
+
+  - Renamed internal `_record` method to `record_metric`.
+
+  [Documentation]
+  - Documented `record_metric` method for subclassing.
+
+  - Documented how to extend this to support tagging.
+
+  - Updated copyright year.
+
+  - Fixed typo for `meter` method name.
+
+  - Fixed typos in Changes.
+
+  [Tests]
+  - Add more author tests.
+
 v0.4.10   2020-07-31 14:52:09+01:00 Europe/London
   [Documentation]
-  - Update copyright year.
+  - Updated copyright year.
 
   [Toolchain]
   - Add core modules in the prerequisites.

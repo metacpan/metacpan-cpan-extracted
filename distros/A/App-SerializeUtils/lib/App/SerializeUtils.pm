@@ -4,7 +4,7 @@ use 5.010001;
 use strict;
 use warnings;
 
-our $VERSION = '0.163'; # VERSION
+our $VERSION = '0.164'; # VERSION
 
 1;
 # ABSTRACT: Utilities for serialization tasks
@@ -21,7 +21,7 @@ App::SerializeUtils - Utilities for serialization tasks
 
 =head1 VERSION
 
-This document describes version 0.163 of App::SerializeUtils (from Perl distribution App-SerializeUtils), released on 2020-06-06.
+This document describes version 0.164 of App::SerializeUtils (from Perl distribution App-SerializeUtils), released on 2021-04-22.
 
 =head1 SYNOPSIS
 
@@ -164,7 +164,7 @@ Source repository is at L<https://github.com/perlancar/perl-App-SerializeUtils>.
 
 =head1 BUGS
 
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-SerializeUtils>
+Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-App-SerializeUtils/issues>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
@@ -190,7 +190,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020, 2018, 2017, 2015, 2014, 2013, 2011 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2020, 2018, 2017, 2015, 2014, 2013, 2011 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

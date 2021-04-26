@@ -123,7 +123,7 @@ method will be some object the application can use to inspect the syntax.
 
 =head2 Indicating Failure
 
-While the basic methods such as C<expect> and the varions token methods will
+While the basic methods such as C<expect> and the various token methods will
 indicate a failure automatically, there may be cases in the grammar that more
 logic is required by the parser. If this logic wishes to indicate a failure in
 the input and cause back-tracking to occur, it can use the C<fail> method.
@@ -270,7 +270,7 @@ the opening marker, a parser step to handle the contents of the body, and the
 closing marker. It expects to find each of these in sequence, and returns the
 value that the inner parsing step returned.
 
-However, what makes it more intersting is that during execution of the inner
+However, what makes it more interesting is that during execution of the inner
 parsing step, the basic token functions all take into account the closing
 marker. No token function will return a result if the stream now looks like
 the scope closing marker. Instead, they'll all fail claiming to be at the end
@@ -284,7 +284,7 @@ values surrounded by braces.
     $self->scope_of( "{", sub { $self->parse_expression_list }, "}" );
  }
 
-During execution of the inner call to C<parse_expression_list>, any occurance
+During execution of the inner call to C<parse_expression_list>, any occurence
 in the stream of the C<}> marker will appear to be the end of the stream,
 causing the inner call to stop at hopefully the right place (barring other
 syntax errors), and terminating correctly.

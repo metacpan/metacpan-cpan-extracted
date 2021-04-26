@@ -59,6 +59,7 @@ my %WriteMakefileArgs = (
     "Moose" => 0,
     "Moose::Role" => 0,
     "Number::Format" => 0,
+    "POSIX" => 0,
     "Path::Iterator::Rule" => 0,
     "Scalar::Util" => 0,
     "Scalar::Util::Numeric" => 0,
@@ -83,7 +84,7 @@ my %WriteMakefileArgs = (
     "File::RandomGenerator" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.059",
+  "VERSION" => "0.060",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -124,6 +125,7 @@ my %FallbackPrereqs = (
   "Moose" => 0,
   "Moose::Role" => 0,
   "Number::Format" => 0,
+  "POSIX" => 0,
   "Path::Iterator::Rule" => 0,
   "Scalar::Util" => 0,
   "Scalar::Util::Numeric" => 0,

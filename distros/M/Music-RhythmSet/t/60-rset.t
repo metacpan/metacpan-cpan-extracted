@@ -1,15 +1,15 @@
 #!perl
-
 use 5.24.0;
-use Test::Most tests => 62;
-my $deeply = \&eq_or_diff;
+use Test2::V0;
+
+plan(63);
 
 use Music::RhythmSet;
 use Scalar::Util qw(refaddr);
 
 my $set = Music::RhythmSet->new;
 
-$deeply->( $set->voices, [] );
+is( $set->voices, [] );
 
 $set->stash("foo");
 is( $set->stash, "foo" );
@@ -43,13 +43,13 @@ for my $v ( $set->voices->@* ) {
 }
 
 # ->advance can croak in RhythmSet.pm and also in Voice.pm
-lives_ok { $set->advance( 1, foo => 'bar' ) };
+ok( lives { $set->advance( 1, foo => 'bar' ) } );
 
 is( $foo, 'bar' );
 ok( defined $next_set and refaddr($set) eq refaddr($next_set) );
-$deeply->( $pattern, [qw/1 0/] );
+is( $pattern, [qw/1 0/] );
 
-lives_ok { $set->advance };
+ok( lives { $set->advance } );
 is( $measure, 1 );    # first measure is 0
 
 for my $v ( $set->voices->@* ) {
@@ -61,12 +61,10 @@ for my $v ( $set->voices->@* ) {
     is( $v->measure, 42 );
 }
 
-$deeply->(
-    $set->to_ly( maxm => 1 ),
+is( $set->to_ly( maxm => 1 ),
     [ "  % v0 .x 1\n  r16 c16\n", "  % v1 x. 1\n  c16 r16\n" ],
 );
-$deeply->(
-    $set->to_ly(
+is( $set->to_ly(
         maxm  => 1,
         note  => 'd',
         rest  => 's',
@@ -76,18 +74,19 @@ $deeply->(
 );
 
 my $opus;
-lives_ok { $opus = $set->to_midi( maxm => 1 ) };
+ok( lives { $opus = $set->to_midi( maxm => 1 ) } );
 ok( defined $opus and $opus->tracks == 2 );
 
-lives_ok {
-    $opus = $set->to_midi(
-        maxm   => 1,
-        format => 0,
-        ticks  => 89,
-        chan   => 3,
-        track  => [ {}, { chan => 4 } ],
-    )
-};
+ok( lives {
+        $opus = $set->to_midi(
+            maxm   => 1,
+            format => 0,
+            ticks  => 89,
+            chan   => 3,
+            track  => [ {}, { chan => 4 } ],
+        )
+    }
+);
 ok( defined $opus and $opus->tracks == 2 );
 # however, you probably do not want format 0 with multiple tracks; the
 # MIDI players I have do not like that
@@ -114,11 +113,11 @@ is( $chan[1], 4 );
     my $ns = Music::RhythmSet->new->from_string($str);
     is( scalar $ns->voices->@*, 2 );
     # from_string only populates the replay log
-    $deeply->( $ns->voices->[0]->replay, [ [ [ 0, 1 ], 1 ] ] );
-    $deeply->( $ns->voices->[1]->replay, [ [ [ 1, 0 ], 1 ] ] );
+    is( $ns->voices->[0]->replay, [ [ [ 0, 1 ], 1 ] ] );
+    is( $ns->voices->[1]->replay, [ [ [ 1, 0 ], 1 ] ] );
 
     $str = "\n\n   \n" . $str;
-    lives_ok { $ns = Music::RhythmSet->new->from_string($str) };
+    ok( lives { $ns = Music::RhythmSet->new->from_string($str) } );
 
     $str = $set->to_string( maxm => 1, sep => ' ', rs => "\r" );
     is( $str, "0 0 .x 1\r0 1 x. 1\r" );
@@ -126,33 +125,37 @@ is( $chan[1], 4 );
     is( scalar $ns->voices->@*, 2 );
 
     $str .= "\r   # EOS\r";
-    lives_ok {
-        $ns = Music::RhythmSet->new->from_string( $str, sep => ' ', rs => "\r" )
-    };
+    ok( lives {
+            $ns = Music::RhythmSet->new->from_string( $str, sep => ' ', rs => "\r" )
+        }
+    );
 
-    dies_ok { $ns->from_string } qr/need a string/;
-    dies_ok { $ns->from_string('') } qr/need a string/;
-    dies_ok { $ns->from_string('x') } qr/invalid record/;
-    dies_ok { $ns->from_string("0\t\tx..\t42") } qr/invalid record/;
-    dies_ok { $ns->from_string("0\tbadid\tx..\t42") } qr/invalid record/;
-    dies_ok { $ns->from_string("0\t99\tx..\t42") } qr/ID out of range/;
-    dies_ok { $ns->from_string("0\t0\t\t42") } qr/invalid record/;
-    dies_ok { $ns->from_string("0\t0\tinvalid\t42") } qr/invalid record/;
-    dies_ok { $ns->from_string("0\t0\tx..\tbadttl") } qr/invalid record/;
+    # sparse read: only populate voice 1 and not voice 0
+    ok( lives { $ns->from_string("0 1 xx. 4") } );
+
+    like( dies { $ns->from_string },                      qr/need a string/ );
+    like( dies { $ns->from_string('') },                  qr/need a string/ );
+    like( dies { $ns->from_string('x') },                 qr/invalid record/ );
+    like( dies { $ns->from_string("0\t\tx..\t42") },      qr/invalid record/ );
+    like( dies { $ns->from_string("0\tbadid\tx..\t42") }, qr/invalid record/ );
+    like( dies { $ns->from_string("0\t99\tx..\t42") },    qr/ID out of range/ );
+    like( dies { $ns->from_string("0\t0\t\t42") },        qr/invalid record/ );
+    like( dies { $ns->from_string("0\t0\tinvalid\t42") }, qr/invalid record/ );
+    like( dies { $ns->from_string("0\t0\tx..\tbadttl") }, qr/invalid record/ );
 }
 
 # ->clone
 my $newset;
-lives_ok { $newset = $set->clone };
+ok( lives { $newset = $set->clone } );
 ok( $newset->voices->@* == 2 );
 ok( refaddr( $set->voices->[$_] ) ne refaddr( $newset->voices->[$_] ) )
   for 0 .. 1;
-$deeply->( $newset->voices->[0]->pattern, [qw/0 1/] );
-$deeply->( $newset->voices->[1]->pattern, [qw/1 0/] );
+is( $newset->voices->[0]->pattern, [qw/0 1/] );
+is( $newset->voices->[1]->pattern, [qw/1 0/] );
 
-dies_ok { $set->add } qr/nothing to add/;
-dies_ok { $set->add(undef) } qr/nothing to add/;
-dies_ok { $set->add( [] ) } qr/invalid voice parameters/;
+like( dies { $set->add },        qr/nothing to add/ );
+like( dies { $set->add(undef) }, qr/invalid voice parameters/ );
+like( dies { $set->add( [] ) },  qr/invalid voice parameters/ );
 
 # ->changes, two-beat measures in two voices
 my @measures;
@@ -176,9 +179,8 @@ $set = Music::RhythmSet->new->add(
     },
 );
 
-$deeply->( \@measures, [ 0, 2, 3 ] );
-$deeply->(
-    \@args,
+is( \@measures, [ 0, 2, 3 ] );
+is( \@args,
     # voice 0 -- ttl 3, always same pattern
     [   [   [ 0, [ 1, 1 ], "xx", 1,     undef ],    # changed
             [ 2, [ 1, 1 ], "xx", undef, undef ],    # -- other voice
@@ -208,9 +210,8 @@ $set = Music::RhythmSet->new->add(
     # that stack
     voice => sub { push @args, [@_] },
 );
-$deeply->( \@measures, [ 0, 1, 2 ] );
-$deeply->(
-    \@args,
+is( \@measures, [ 0, 1, 2 ] );
+is( \@args,
     [   [ 0, 0, [1], "x", 1, undef ],
         [ 1, 0, [0], ".", 1, undef ],
         [ 2, 0, [1], "x", 1, undef ],
@@ -218,19 +219,28 @@ $deeply->(
 );
 
 # need the two mandatory callbacks
-dies_ok { $set->changes };
-dies_ok {
-    $set->changes( header => sub { "foo" } )
-};
-dies_ok {
-    $set->changes( voice => {}, header => sub { "foo" } )
-};
-dies_ok {
-    $set->changes( voice => sub { "foo" }, header => {} )
-};
+like( dies { $set->changes }, qr/need header callback/ );
+like(
+    dies {
+        $set->changes( header => sub { "foo" } )
+    },
+    qr/need voice callback/
+);
+like(
+    dies {
+        $set->changes( voice => {}, header => sub { "foo" } )
+    },
+    qr/need voice callback/
+);
+like(
+    dies {
+        $set->changes( voice => sub { "foo" }, header => {} )
+    },
+    qr/need header callback/
+);
 
 # voicel, sugar for ->new->add(...)
 $set = Music::RhythmSet->new( voicel => [ { pattern => [ 1, 0, 1 ] } ] );
-$deeply->( $set->voices->[0]->pattern, [ 1, 0, 1 ] );
-dies_ok { Music::RhythmSet->new( voicel => undef ) };
-dies_ok { Music::RhythmSet->new( voicel => {} ) };
+is( $set->voices->[0]->pattern, [ 1, 0, 1 ] );
+like( dies { Music::RhythmSet->new( voicel => undef ) }, qr/invalid voicel/ );
+like( dies { Music::RhythmSet->new( voicel => {} ) },    qr/invalid voicel/ );

@@ -40,7 +40,7 @@ use App::Regather::Plugin;
 use constant SYNST => [ qw( LDAP_SYNC_PRESENT LDAP_SYNC_ADD LDAP_SYNC_MODIFY LDAP_SYNC_DELETE ) ];
 
 # my @DAEMONARGS = ($0, @ARGV);
-our $VERSION   = '0.80.03';
+our $VERSION   = '0.81.02';
 
 sub new {
   my $class = shift;
@@ -80,6 +80,11 @@ sub new {
 			 foreground => $self->{_opt}{fg},
 			 colors     => $self->{_opt}{colors} );
 
+  if ( $self->{_opt}{plugin_list} ) {
+    App::Regather::Plugin->new( 'list' )->run;
+    exit 0;
+  }
+
   $self->{_opt}{cf} = new
     App::Regather::Config ( filename => $self->{_opt}{config},
 			    logger   => $self->{_opt}{l},
@@ -111,11 +116,6 @@ sub new {
   if ( $self->{_opt}{ch} ) {
     $self->{_opt}{cf}->config_help;
     exit 1;
-  }
-
-  if ( $self->{_opt}{plugin_list} ) {
-    App::Regather::Plugin->new( 'list' )->run;
-    exit 0;
   }
 
   return $self;
@@ -177,6 +177,14 @@ sub run {
 	@svc_map = ();
       }
     }
+
+    push @{$cfgattrs}, '*'
+      if $self->cf->get('service', $i, 'all_attr') != 0;
+
+    $self->l->cc( pr => 'warning', ls => [ __PACKAGE__, $i, ],
+		  fm => "%s: no LDAP attribute to process is mapped for service `%s`" )
+      if $self->cf->get('service', $i, 'all_attr') == 0 && scalar @svc_map == 0;
+
   }
 
   @{$tmp} = sort @{[ @{$cfgattrs}, qw( associatedDomain

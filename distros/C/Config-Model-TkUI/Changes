@@ -1,3 +1,10 @@
+1.374 2021-04-21
+
+  UI improvements:
+    * Improve behavior when filtering elements to display. Element
+      filter now works better when used with "hide empty element" or
+      "show only custom" options.
+
 1.373 2021-01-07
 
   UI improvements:

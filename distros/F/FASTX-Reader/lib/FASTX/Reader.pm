@@ -5,7 +5,7 @@ use Carp qw(confess);
 use Data::Dumper;
 $Data::Dumper::Sortkeys = 1;
 use File::Basename;
-$FASTX::Reader::VERSION = '1.0.4';
+$FASTX::Reader::VERSION = '1.0.5';
 require Exporter;
 our @ISA = qw(Exporter);
 #ABSTRACT: A simple module to parse FASTA and FASTQ files, supporting compressed files and paired-ends.
@@ -88,49 +88,7 @@ sub new {
 
 }
 
-
-# sub _Flevorin_getRead {
-#   my $self   = shift;
-#   my $fh = $self->{fh};
-
-#   return undef if (defined $self->{status} and $self->{status} == 0);
-
-#   #  my $aux = $self->{aux};
-#   my $curpos = $self->{curpos};
-#   my $return;
-#   my $seq;
-#   my $dim = -s $fh;
-
-#   return if ( $curpos == $dim);
-
-#   seek($fh, $curpos, 0);
-
-#   # Nome sequenza e commento
-#   while (<$fh>) {
-#     chomp;
-#     if (substr($_, 0, 1) eq '>' || substr($_, 0, 1) eq '@') {
-#       my ($name, $comm) = /^.(\S+)(?:\s+)(.+)/ ? ($1, $2) : /^.(\S+)/ ? ($1, '') : ('', '');
-#       $return->{name} = $name;
-#       $return->{comment} = $comm;
-#       last;
-#     }
-#   }
-
-#   # Sequenza
-#   while (<$fh>) {
-#   chomp;
-#   my $c = substr($_, 0, 1);
-#   if ($c eq '>' || $c eq '@' || $c eq '+') {
-#   last;
-#   }
-#   $self->{curpos} = tell;
-#   $seq .= $_;
-#   }
-#   $return->{seq} = $seq;
-
-#   return $return;
-# }
-
+ 
 sub getRead {
   my $self   = shift;
   #tate $self->{line};
@@ -461,7 +419,7 @@ FASTX::Reader - A simple module to parse FASTA and FASTQ files, supporting compr
 
 =head1 VERSION
 
-version 1.0.4
+version 1.0.5
 
 =head1 SYNOPSIS
 
@@ -476,6 +434,11 @@ version 1.0.4
 
 =head1 BUILD TEST
 
+=for html <p>
+<a href="https://github.com/telatin/FASTQ-Parser/actions/workflows/perl-test.yml" title="CI tests">
+<img src="https://github.com/telatin/FASTQ-Parser/actions/workflows/perl-test.yml/badge.svg" alt="CI Badge"></a></p>
+
+The GitHub repository is tested with a L<GitHub Action|[![CI](https://github.com/telatin/FASTQ-Parser/actions/workflows/perl-test.yml/badge.svg)](https://github.com/telatin/FASTQ-Parser/actions/workflows/perl-test.yml)>.
 Every CPAN release is tested by the L<CPAN testers grid|http://matrix.cpantesters.org/?dist=FASTX-Reader>.
 
 =head1 METHODS

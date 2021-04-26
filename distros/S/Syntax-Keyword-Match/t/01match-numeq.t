@@ -65,4 +65,26 @@ use Syntax::Keyword::Match;
    ok( $ok, 'Constant non-literal parses' );
 }
 
+# overloaded '==' operator
+{
+   my $equal;
+   package Greedy {
+      use overload '==' => sub { $equal };
+   }
+
+   sub greedy_is_ten
+   {
+      match(bless [], "Greedy" : ==) {
+         case(10) { return "YES" }
+         default  { return "NO" }
+      }
+   }
+
+   $equal = 1;
+   is( greedy_is_ten, "YES", 'Greedy is 10 when set' );
+
+   $equal = 0;
+   is( greedy_is_ten, "NO", 'Greedy is not 10 when unset' );
+}
+
 done_testing;

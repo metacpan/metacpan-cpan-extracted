@@ -6,9 +6,9 @@ use Test::Exception;
 use Test::More 0.98;
 
 use Role::Tiny;
-use ArrayData::Test::Source::LinesDATA;
+use ArrayData::Test::Source::LinesInDATA;
 
-my $t = ArrayData::Test::Source::LinesDATA->new;
+my $t = ArrayData::Test::Source::LinesInDATA->new;
 Role::Tiny->apply_roles_to_object($t, 'Role::TinyCommons::Collection::PickItems::Iterator');
 
 # minimal for now

@@ -234,6 +234,58 @@ In array context, returns an array of `(componentName, [values])` pairs.  Abbrev
 
 Note that the order of components in a name is significant.
 
+### subjectRaw
+
+Returns the subjects RDNs as sequence of hashes without OID any mapping applied.
+
+The result is an array ref where each item is a hash:
+
+    [
+        {
+        'format' => 'ia5String',
+        'value' => 'Org',
+        'type' => '0.9.2342.19200300.100.1.25'
+        },
+        {
+        'format' => 'utf8String',
+        'value' => 'ACME',
+        'type' => '2.5.4.10'
+        },
+        {
+        'format' => 'utf8String',
+        'type' => '2.5.4.3',
+        'value' => 'Foobar'
+        }
+    ]
+
+If a component contains a SET, the component will become an array on the
+second level, too:
+
+    [
+        {
+        'format' => 'ia5String',
+        'value' => 'Org',
+        'type' => '0.9.2342.19200300.100.1.25'
+        },
+        {
+        'format' => 'utf8String',
+        'value' => 'ACME',
+        'type' => '2.5.4.10'
+        },
+        [
+            {
+                'format' => 'utf8String',
+                'type' => '2.5.4.3',
+                'value' => 'Foobar'
+            },
+            {
+                'format' => 'utf8String',
+                'type' => '0.9.2342.19200300.100.1.1',
+                'value' => 'foobar'
+            }
+        ]
+    ];
+
 ### commonName
 
 Returns the common name(s) from the subject.

@@ -2,22 +2,23 @@ package Image::CairoSVG;
 use warnings;
 use strict;
 
-our $VERSION = '0.12';
+our $VERSION = '0.13';
 
 # Core modules
 use Carp qw/carp croak/;
 use ExtUtils::ParseXS::Utilities 'trim_whitespace';
 use Math::Trig;
 use Scalar::Util 'looks_like_number';
-use XML::Parser;
 
 # Installed modules
+use XML::Parser;
 use Cairo;
 use Graphics::ColorNames::WWW;
 use Image::SVG::Path qw/extract_path_info create_path_string/;
 
 our $default_surface_type = 'argb32';
 our $default_surface_size = 100;
+our @defaultrgb = (0, 0, 0);
 
 sub new
 {
@@ -204,7 +205,7 @@ sub handle_start
 	;
     }
     elsif ($tag eq 'g') {
-	$self->{attr} = \%attr;
+	$self->g (%attr);
     }
     elsif ($tag eq 'polyline') {
 	$self->polyline (%attr);
@@ -218,6 +219,11 @@ sub handle_start
 
     # http://www.princexml.com/doc/7.1/svg/
     # g, rect, circle, ellipse, line, path, text, tspan
+}
+
+sub g
+{
+    my ($self, %attr) = @_;
 }
 
 sub rect
@@ -594,6 +600,15 @@ sub do_svg_attr
 	$stroke_width = svg_units ($stroke_width);
 	$cr->set_line_width ($stroke_width);
     }
+    my $linecap = $attr{"stroke-linecap"};
+    if ($linecap) {
+	$cr->set_line_cap ($linecap);
+    }
+    my $linejoin = $attr{"stroke-linejoin"};
+    if ($linejoin) {
+	$cr->set_line_join ($linejoin);
+    }
+
     if ($fill && $fill ne 'none') {
 	if ($stroke && $stroke ne 'none') {
 	    $self->set_colour ($fill);
@@ -620,7 +635,6 @@ sub do_svg_attr
 my $gcwtable;
 # Only warn once if the module fails.
 my $gcwtablefailed;
-my @defaultrgb = (0, 0, 0);
 
 sub name2colour
 {

@@ -7,6 +7,8 @@ use autodie;
 use Test::More;
 use Test::FailWarnings;
 
+plan skip_all => 'Fails on Windows :-(' if $^O eq 'MSWin32';
+
 use File::Spec;
 use File::Temp;
 

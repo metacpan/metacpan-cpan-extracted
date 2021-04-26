@@ -12,6 +12,7 @@ lib/Config/Model/Tk/AnyViewer.pm
 lib/Config/Model/Tk/CheckListEditor.pm
 lib/Config/Model/Tk/CheckListViewer.pm
 lib/Config/Model/Tk/CmeDialog.pm
+lib/Config/Model/Tk/Filter.pm
 lib/Config/Model/Tk/HashEditor.pm
 lib/Config/Model/Tk/HashViewer.pm
 lib/Config/Model/Tk/LeafEditor.pm
@@ -44,6 +45,8 @@ lib/Config/Model/TkUI.pm
 t/author-critic.t
 t/config-model-ui.t
 t/config-model-wizard.t
+t/filter-test.yml
+t/filter.t
 t/lib/Config/Model/models/Master.pl
 t/pod.t
 weaver.ini

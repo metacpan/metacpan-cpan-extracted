@@ -8,7 +8,7 @@ use App::cpangitify;
 
 # PODNAME: cpangitify
 # ABSTRACT: Convert cpan distribution from BackPAN to a git repository
-our $VERSION = '0.17'; # VERSION
+our $VERSION = '0.18'; # VERSION
 
 
 exit App::cpangitify->main(@ARGV);
@@ -25,7 +25,7 @@ cpangitify - Convert cpan distribution from BackPAN to a git repository
 
 =head1 VERSION
 
-version 0.17
+version 0.18
 
 =head1 SYNOPSIS
 
@@ -83,6 +83,11 @@ The URL to use for BackPAN
 
 The URL to use for metacpan.
 
+=head2 --branch | -b
+
+Default branch.  As on 0.18 this is C<main> by default.  Previously the old
+git default was used.
+
 =head2 --help | -h
 
 Print out help and exit.
@@ -113,7 +118,7 @@ Here are some similar projects:
 
 L<Git::CPAN::Patch>
 
-Comes with a C<git cpan import> which does something similar.  With this 
+Comes with a C<git cpan import> which does something similar.  With this
 incantation I was able to get a repository for L<YAML> (including history,
 but without authors and without the correct dates):
 
@@ -122,9 +127,9 @@ but without authors and without the correct dates):
  % git cpan import --backpan YAML
  % git merge remotes/cpan/master
 
-One advantage here over C<cpangitify> is that you should then later be able to 
-import/merge future CPAN releases into yours.  L<Git::CPAN::Patch> also has a bunch of 
-other useful tools for creating and submitting patches and may be worth 
+One advantage here over C<cpangitify> is that you should then later be able to
+import/merge future CPAN releases into yours.  L<Git::CPAN::Patch> also has a bunch of
+other useful tools for creating and submitting patches and may be worth
 checking out.
 
 If you do an internet search for this sort of thing you may see references
@@ -133,7 +138,7 @@ L<Git::CPAN::Patch> anymore (I believe C<git-import> with the C<--backpan>
 option is the equivalent).
 
 In general C<cpangitify> is a one trick poney (though good at that one thing),
-and L<Git::CPAN::Patch> is a Batman's utility belt with documentation that 
+and L<Git::CPAN::Patch> is a Batman's utility belt with documentation that
 (for me at least) is pretty impenetrable.
 
 =item
@@ -148,8 +153,8 @@ L<ggoosen's cpan2git|https://github.com/ggoossen/cpan2git>
 
 =back
 
-The reason I am not using the latter two is that they are designed to 
-mirror the whole of CPAN/BackPAN, but I'm mostly just interested in one 
+The reason I am not using the latter two is that they are designed to
+mirror the whole of CPAN/BackPAN, but I'm mostly just interested in one
 or two distributions here and there.
 
 =head1 AUTHOR

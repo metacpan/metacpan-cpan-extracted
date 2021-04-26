@@ -27,5 +27,5 @@ requires:
   PDL: '0'
   PDL::VectorValued: v1.0.4
   Test::More: '0'
-version: v1.23.13
+version: v1.23.14
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

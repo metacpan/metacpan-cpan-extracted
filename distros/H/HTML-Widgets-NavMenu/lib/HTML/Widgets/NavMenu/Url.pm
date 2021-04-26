@@ -1,5 +1,5 @@
 package HTML::Widgets::NavMenu::Url;
-$HTML::Widgets::NavMenu::Url::VERSION = '1.0801';
+$HTML::Widgets::NavMenu::Url::VERSION = '1.0900';
 use strict;
 use warnings;
 
@@ -11,7 +11,7 @@ __PACKAGE__->mk_acc_ref(
             _url
             _is_dir
             _mode
-            )
+        )
     ]
 );
 
@@ -155,7 +155,7 @@ HTML::Widgets::NavMenu::Url - URL manipulation class.
 
 =head1 VERSION
 
-version 1.0801
+version 1.0900
 
 =head1 SYNOPSIS
 

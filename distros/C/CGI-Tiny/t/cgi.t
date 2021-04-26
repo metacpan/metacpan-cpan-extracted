@@ -4,6 +4,7 @@ use utf8;
 use CGI::Tiny;
 use Test::More;
 use Encode 'decode';
+use File::Temp;
 use JSON::PP 'decode_json', 'encode_json';
 use MIME::Base64 'encode_base64';
 
@@ -16,16 +17,22 @@ my @env_keys = qw(
 );
 
 sub _parse_response {
-  my ($response) = @_;
+  my ($response, $nph) = @_;
   my ($headers_str, $body) = split /\r\n\r\n/, $response, 2;
-  my %headers;
+  my (%headers, $start_line, $response_status);
   foreach my $header (split /\r\n/, $headers_str) {
-    my ($name, $value) = split /:\s*/, $header;
+    if ($nph and !defined $start_line) {
+      $start_line = $header;
+      ($response_status) = $start_line =~ m/^\S+\s+([0-9]+.*)$/;
+      next;
+    }
+    my ($name, $value) = split /:\s*/, $header, 2;
+    $response_status = $value if !$nph and lc $name eq 'status';
     push @{$headers{lc $name}}, $value;
   }
   $_ = $_->[0] for grep { @$_ == 1 } values %headers;
-  my $response_status = defined $headers{status} ? $headers{status} : '200 OK';
-  return {headers => \%headers, body => $body, status => $response_status};
+  $response_status = '200 OK' if !$nph and !defined $response_status;
+  return {start_line => $start_line, headers => \%headers, body => $body, status => $response_status};
 }
 
 subtest 'Empty response' => sub {
@@ -38,10 +45,9 @@ subtest 'Empty response' => sub {
   open my $out_fh, '>', \my $out_data or die "failed to open handle for output: $!";
 
   cgi {
-    my ($cgi) = @_;
-    $cgi->set_input_handle($in_fh);
-    $cgi->set_output_handle($out_fh);
-    $cgi->render;
+    $_->set_input_handle($in_fh);
+    $_->set_output_handle($out_fh);
+    $_->render;
   };
 
   ok length($out_data), 'response rendered';
@@ -49,6 +55,8 @@ subtest 'Empty response' => sub {
   ok defined($response->{headers}{'content-type'}), 'Content-Type set';
   is $response->{headers}{'content-type'}, 'application/octet-stream', 'right content type';
   like $response->{status}, qr/^200\b/, '200 response status';
+  ok defined($response->{headers}{date}), 'Date set';
+  ok defined(CGI::Tiny::date_to_epoch $response->{headers}{date}), 'valid HTTP date';
   ok !length($response->{body}), 'empty response body';
 };
 
@@ -63,13 +71,131 @@ subtest 'No render' => sub {
 
   my $error;
   cgi {
-    my ($cgi) = @_;
-    $cgi->set_error_handler(sub { $error = $_[1] });
-    $cgi->set_input_handle($in_fh);
-    $cgi->set_output_handle($out_fh);
+    $_->set_error_handler(sub { $error = $_[1] });
+    $_->set_input_handle($in_fh);
+    $_->set_output_handle($out_fh);
   };
 
   ok defined($error), 'error logged';
+  ok length($out_data), 'response rendered';
+  my $response = _parse_response($out_data);
+  ok defined($response->{headers}{'content-type'}), 'Content-Type set';
+  like $response->{status}, qr/^5[0-9]{2}\b/, '500 response status';
+};
+
+subtest 'No render (object lost)' => sub {
+  local @ENV{@env_keys} = ('')x@env_keys;
+  local $ENV{PATH_INFO} = '/';
+  local $ENV{REQUEST_METHOD} = 'GET';
+  local $ENV{SCRIPT_NAME} = '/';
+  local $ENV{SERVER_PROTOCOL} = 'HTTP/1.0';
+  open my $in_fh, '<', \(my $in_data = '') or die "failed to open handle for input: $!";
+  open my $out_fh, '>', \my $out_data or die "failed to open handle for output: $!";
+
+  my $error;
+  cgi {
+    $_->set_error_handler(sub { $error = $_[1] });
+    $_->set_input_handle($in_fh);
+    $_->set_output_handle($out_fh);
+    undef $_;
+  };
+
+  ok defined($error), 'error logged';
+  ok length($out_data), 'response rendered';
+  my $response = _parse_response($out_data);
+  ok defined($response->{headers}{'content-type'}), 'Content-Type set';
+  like $response->{status}, qr/^5[0-9]{2}\b/, '500 response status';
+};
+
+subtest 'No render (object not destroyed)' => sub {
+  local @ENV{@env_keys} = ('')x@env_keys;
+  local $ENV{PATH_INFO} = '/';
+  local $ENV{REQUEST_METHOD} = 'GET';
+  local $ENV{SCRIPT_NAME} = '/';
+  local $ENV{SERVER_PROTOCOL} = 'HTTP/1.0';
+  open my $in_fh, '<', \(my $in_data = '') or die "failed to open handle for input: $!";
+  open my $out_fh, '>', \my $out_data or die "failed to open handle for output: $!";
+
+  my $error;
+  my $persist_cgi;
+  cgi {
+    $_->set_error_handler(sub { $error = $_[1] });
+    $_->set_input_handle($in_fh);
+    $_->set_output_handle($out_fh);
+    $persist_cgi = $_;
+  };
+
+  ok defined($error), 'error logged';
+  ok length($out_data), 'response rendered';
+  my $response = _parse_response($out_data);
+  ok defined($response->{headers}{'content-type'}), 'Content-Type set';
+  like $response->{status}, qr/^5[0-9]{2}\b/, '500 response status';
+};
+
+subtest 'No render (premature exit)' => sub {
+  my $outfile = File::Temp->new;
+  my $errfile = File::Temp->new;
+  my $pid = fork;
+  plan skip_all => "fork failed: $!" unless defined $pid;
+  unless ($pid) {
+    local @ENV{@env_keys} = ('')x@env_keys;
+    local $ENV{PATH_INFO} = '/';
+    local $ENV{REQUEST_METHOD} = 'GET';
+    local $ENV{SCRIPT_NAME} = '/';
+    local $ENV{SERVER_PROTOCOL} = 'HTTP/1.0';
+    open my $in_fh, '<', \(my $in_data = '') or die "failed to open handle for input: $!";
+
+    cgi {
+      $_->set_error_handler(sub { print $errfile $_[1] });
+      $_->set_input_handle($in_fh);
+      $_->set_output_handle($outfile);
+      exit;
+    };
+    exit;
+  }
+  waitpid $pid, 0;
+
+  seek $errfile, 0, 0;
+  my $error = do { local $/; readline $errfile };
+  ok length($error), 'error logged';
+  seek $outfile, 0, 0;
+  my $out_data = do { local $/; readline $outfile };
+  ok length($out_data), 'response rendered';
+  my $response = _parse_response($out_data);
+  ok defined($response->{headers}{'content-type'}), 'Content-Type set';
+  like $response->{status}, qr/^5[0-9]{2}\b/, '500 response status';
+};
+
+subtest 'No render (premature exit with persistent object)' => sub {
+  my $outfile = File::Temp->new;
+  my $errfile = File::Temp->new;
+  my $pid = fork;
+  plan skip_all => "fork failed: $!" unless defined $pid;
+  unless ($pid) {
+    local @ENV{@env_keys} = ('')x@env_keys;
+    local $ENV{PATH_INFO} = '/';
+    local $ENV{REQUEST_METHOD} = 'GET';
+    local $ENV{SCRIPT_NAME} = '/';
+    local $ENV{SERVER_PROTOCOL} = 'HTTP/1.0';
+    open my $in_fh, '<', \(my $in_data = '') or die "failed to open handle for input: $!";
+
+    my $persist_cgi;
+    cgi {
+      $_->set_error_handler(sub { print $errfile $_[1] });
+      $_->set_input_handle($in_fh);
+      $_->set_output_handle($outfile);
+      $persist_cgi = $_;
+      exit;
+    };
+    exit;
+  }
+  waitpid $pid, 0;
+
+  seek $errfile, 0, 0;
+  my $error = do { local $/; readline $errfile };
+  ok length($error), 'error logged';
+  seek $outfile, 0, 0;
+  my $out_data = do { local $/; readline $outfile };
   ok length($out_data), 'response rendered';
   my $response = _parse_response($out_data);
   ok defined($response->{headers}{'content-type'}), 'Content-Type set';
@@ -87,10 +213,9 @@ subtest 'Exception before render' => sub {
 
   my ($error, $headers_rendered);
   cgi {
-    my ($cgi) = @_;
-    $cgi->set_error_handler(sub { $error = $_[1]; $headers_rendered = $_[0]->headers_rendered; });
-    $cgi->set_input_handle($in_fh);
-    $cgi->set_output_handle($out_fh);
+    $_->set_error_handler(sub { $error = $_[1]; $headers_rendered = $_[0]->headers_rendered; });
+    $_->set_input_handle($in_fh);
+    $_->set_output_handle($out_fh);
     die 'Error 42';
   };
 
@@ -114,11 +239,10 @@ subtest 'Exception after render' => sub {
 
   my ($error, $headers_rendered);
   cgi {
-    my ($cgi) = @_;
-    $cgi->set_error_handler(sub { $error = $_[1]; $headers_rendered = $_[0]->headers_rendered; });
-    $cgi->set_input_handle($in_fh);
-    $cgi->set_output_handle($out_fh);
-    $cgi->render;
+    $_->set_error_handler(sub { $error = $_[1]; $headers_rendered = $_[0]->headers_rendered; });
+    $_->set_input_handle($in_fh);
+    $_->set_output_handle($out_fh);
+    $_->render;
     die 'Error 42';
   };
 
@@ -144,13 +268,12 @@ subtest 'Excessive request body' => sub {
 
   my $error;
   cgi {
-    my ($cgi) = @_;
-    $cgi->set_error_handler(sub { $error = $_[1] });
-    $cgi->set_request_body_limit(100);
-    $cgi->set_input_handle($in_fh);
-    $cgi->set_output_handle($out_fh);
-    my $body = $cgi->body;
-    $cgi->render(data => $body);
+    $_->set_error_handler(sub { $error = $_[1] });
+    $_->set_request_body_limit(100);
+    $_->set_input_handle($in_fh);
+    $_->set_output_handle($out_fh);
+    my $body = $_->body;
+    $_->render(data => $body);
   };
 
   ok defined($error), 'error logged';
@@ -170,11 +293,10 @@ subtest 'Not found' => sub {
   open my $out_fh, '>', \my $out_data or die "failed to open handle for output: $!";
 
   cgi {
-    my ($cgi) = @_;
-    $cgi->set_input_handle($in_fh);
-    $cgi->set_output_handle($out_fh);
-    $cgi->set_response_status(404);
-    $cgi->render(text => '');
+    $_->set_input_handle($in_fh);
+    $_->set_output_handle($out_fh);
+    $_->set_response_status(404);
+    $_->render(text => '');
   };
 
   ok length($out_data), 'response rendered';
@@ -196,10 +318,9 @@ subtest 'Data response' => sub {
 
   my $data = "\x01\x02\x03\x04\r\n\xFF";
   cgi {
-    my ($cgi) = @_;
-    $cgi->set_input_handle($in_fh);
-    $cgi->set_output_handle($out_fh);
-    $cgi->render(data => $data);
+    $_->set_input_handle($in_fh);
+    $_->set_output_handle($out_fh);
+    $_->render(data => $data);
   };
 
   ok length($out_data), 'response rendered';
@@ -221,10 +342,9 @@ subtest 'Text response' => sub {
 
   my $text = "♥☃";
   cgi {
-    my ($cgi) = @_;
-    $cgi->set_input_handle($in_fh);
-    $cgi->set_output_handle($out_fh);
-    $cgi->render(text => $text);
+    $_->set_input_handle($in_fh);
+    $_->set_output_handle($out_fh);
+    $_->render(text => $text);
   };
 
   ok length($out_data), 'response rendered';
@@ -246,11 +366,10 @@ subtest 'Text response (UTF-16LE)' => sub {
 
   my $text = "♥☃";
   cgi {
-    my ($cgi) = @_;
-    $cgi->set_input_handle($in_fh);
-    $cgi->set_output_handle($out_fh);
-    $cgi->set_response_charset('UTF-16LE');
-    $cgi->render(text => $text);
+    $_->set_input_handle($in_fh);
+    $_->set_output_handle($out_fh);
+    $_->set_response_charset('UTF-16LE');
+    $_->render(text => $text);
   };
 
   ok length($out_data), 'response rendered';
@@ -272,10 +391,9 @@ subtest 'HTML response' => sub {
 
   my $html = "<html><head><title>♥</title></head><body><p>☃&nbsp;&amp;</p></body></html>";
   cgi {
-    my ($cgi) = @_;
-    $cgi->set_input_handle($in_fh);
-    $cgi->set_output_handle($out_fh);
-    $cgi->render(html => $html);
+    $_->set_input_handle($in_fh);
+    $_->set_output_handle($out_fh);
+    $_->render(html => $html);
   };
 
   ok length($out_data), 'response rendered';
@@ -297,10 +415,9 @@ subtest 'XML response' => sub {
 
   my $xml = "<items><item>♥</item><item>☃&nbsp;&amp;</item></items>";
   cgi {
-    my ($cgi) = @_;
-    $cgi->set_input_handle($in_fh);
-    $cgi->set_output_handle($out_fh);
-    $cgi->render(xml => $xml);
+    $_->set_input_handle($in_fh);
+    $_->set_output_handle($out_fh);
+    $_->render(xml => $xml);
   };
 
   ok length($out_data), 'response rendered';
@@ -322,10 +439,9 @@ subtest 'JSON response' => sub {
 
   my $ref = {stuff => ['and', '♥']};
   cgi {
-    my ($cgi) = @_;
-    $cgi->set_input_handle($in_fh);
-    $cgi->set_output_handle($out_fh);
-    $cgi->render(json => $ref);
+    $_->set_input_handle($in_fh);
+    $_->set_output_handle($out_fh);
+    $_->render(json => $ref);
   };
 
   ok length($out_data), 'response rendered';
@@ -347,10 +463,9 @@ subtest 'Redirect response' => sub {
 
   my $url = '/foo';
   cgi {
-    my ($cgi) = @_;
-    $cgi->set_input_handle($in_fh);
-    $cgi->set_output_handle($out_fh);
-    $cgi->render(redirect => $url);
+    $_->set_input_handle($in_fh);
+    $_->set_output_handle($out_fh);
+    $_->render(redirect => $url);
   };
 
   ok length($out_data), 'response rendered';
@@ -358,6 +473,8 @@ subtest 'Redirect response' => sub {
   ok !defined($response->{headers}{'content-type'}), 'Content-Type not set';
   is $response->{headers}{location}, $url, 'Location set';
   like $response->{status}, qr/^302\b/, '302 response status';
+  ok defined($response->{headers}{date}), 'Date set';
+  ok defined(CGI::Tiny::date_to_epoch $response->{headers}{date}), 'valid HTTP date';
   ok !length($response->{body}), 'empty response body';
 };
 
@@ -374,14 +491,18 @@ subtest 'Response headers' => sub {
     ['X-Test', 'some value'],
     ['X-test', 'another value'],
   );
+  my @cookies = (
+    ['foo', 'bar', Domain => 'example.com', HttpOnly => 1, 'Max-Age' => 3600, Path => '/test', SameSite => 'Strict', Secure => 1],
+    ['x', '', Expires => 'Sun, 06 Nov 1994 08:49:37 GMT', HttpOnly => 0, SameSite => 'Lax', Secure => 0],
+  );
   cgi {
-    my ($cgi) = @_;
-    $cgi->set_input_handle($in_fh);
-    $cgi->set_output_handle($out_fh);
-    $cgi->add_response_header(@$_) for @headers;
-    $cgi->set_response_content_type('image/gif');
-    $cgi->set_response_status(202);
-    $cgi->render;
+    $_->set_input_handle($in_fh);
+    $_->set_output_handle($out_fh);
+    foreach my $header (@headers) { $_->add_response_header(@$header) }
+    foreach my $cookie (@cookies) { $_->add_response_cookie(@$cookie) }
+    $_->set_response_content_type('image/gif');
+    $_->set_response_status(202);
+    $_->render;
   };
 
   ok length($out_data), 'response rendered';
@@ -390,6 +511,9 @@ subtest 'Response headers' => sub {
   is $response->{headers}{'content-type'}, 'image/gif', 'right content type';
   like $response->{status}, qr/^202\b/, '202 response status';
   is_deeply $response->{headers}{'x-test'}, ['some value', 'another value'], 'right custom headers';
+  is_deeply $response->{headers}{'set-cookie'},
+    ['foo=bar; Domain=example.com; HttpOnly; Max-Age=3600; Path=/test; SameSite=Strict; Secure',
+     'x=; Expires=Sun, 06 Nov 1994 08:49:37 GMT; SameSite=Lax'], 'right Set-Cookie headers';
 };
 
 subtest 'Query parameters' => sub {
@@ -397,7 +521,6 @@ subtest 'Query parameters' => sub {
   local $ENV{PATH_INFO} = '/';
   my $query_string = 'c=42&b=1+2%26&%E2%98%83=%25&c=foo';
   my @query_pairs = (['c', 42], ['b', '1 2&'], ['☃', '%'], ['c', 'foo']);
-  my $query_hash = {c => [42, 'foo'], b => '1 2&', '☃' => '%'};
   local $ENV{QUERY_STRING} = $query_string;
   local $ENV{REQUEST_METHOD} = 'GET';
   local $ENV{SCRIPT_NAME} = '/';
@@ -405,26 +528,25 @@ subtest 'Query parameters' => sub {
   open my $in_fh, '<', \(my $in_data = '') or die "failed to open handle for input: $!";
   open my $out_fh, '>', \my $out_data or die "failed to open handle for output: $!";
 
-  my ($params, $pairs, $param_snowman, $param_c_array);
+  my ($params, $param_names, $param_snowman, $param_c_array);
   cgi {
-    my ($cgi) = @_;
-    $cgi->set_input_handle($in_fh);
-    $cgi->set_output_handle($out_fh);
-    $params = $cgi->query_params;
-    $pairs = $cgi->query_pairs;
-    $param_snowman = $cgi->query_param('☃');
-    $param_c_array = $cgi->query_param_array('c');
-    $cgi->render;
+    $_->set_input_handle($in_fh);
+    $_->set_output_handle($out_fh);
+    $params = $_->query_params;
+    $param_names = $_->query_param_names;
+    $param_snowman = $_->query_param('☃');
+    $param_c_array = $_->query_param_array('c');
+    $_->render;
   };
 
   ok length($out_data), 'response rendered';
   my $response = _parse_response($out_data);
   ok defined($response->{headers}{'content-type'}), 'Content-Type set';
   like $response->{status}, qr/^200\b/, '200 response status';
-  is_deeply $params, $query_hash, 'right query params';
-  is_deeply $pairs, \@query_pairs, 'right query pairs';
+  is_deeply $params, \@query_pairs, 'right query pairs';
+  is_deeply [sort @$param_names], [sort 'c', 'b', '☃'], 'right query param names';
   is $param_snowman, '%', 'right query param value';
-  is_deeply $param_c_array, $query_hash->{c}, 'right query param values array';
+  is_deeply $param_c_array, [42, 'foo'], 'right query param values array';
 };
 
 subtest 'Body parameters' => sub {
@@ -434,33 +556,31 @@ subtest 'Body parameters' => sub {
   local $ENV{SCRIPT_NAME} = '/';
   local $ENV{SERVER_PROTOCOL} = 'HTTP/1.0';
   my $body_string = 'c=42&b=1+2%26&%E2%98%83=%25&c=foo';
-  my $body_hash = {c => [42, 'foo'], b => '1 2&', '☃' => '%'};
   my @body_pairs = (['c', 42], ['b', '1 2&'], ['☃', '%'], ['c', 'foo']);
   local $ENV{CONTENT_TYPE} = 'application/x-www-form-urlencoded';
   local $ENV{CONTENT_LENGTH} = length $body_string;
   open my $in_fh, '<', \$body_string or die "failed to open handle for input: $!";
   open my $out_fh, '>', \my $out_data or die "failed to open handle for output: $!";
 
-  my ($params, $pairs, $param_snowman, $param_c_array);
+  my ($params, $param_names, $param_snowman, $param_c_array);
   cgi {
-    my ($cgi) = @_;
-    $cgi->set_input_handle($in_fh);
-    $cgi->set_output_handle($out_fh);
-    $params = $cgi->body_params;
-    $pairs = $cgi->body_pairs;
-    $param_snowman = $cgi->body_param('☃');
-    $param_c_array = $cgi->body_param_array('c');
-    $cgi->render;
+    $_->set_input_handle($in_fh);
+    $_->set_output_handle($out_fh);
+    $params = $_->body_params;
+    $param_names = $_->body_param_names;
+    $param_snowman = $_->body_param('☃');
+    $param_c_array = $_->body_param_array('c');
+    $_->render;
   };
 
   ok length($out_data), 'response rendered';
   my $response = _parse_response($out_data);
   ok defined($response->{headers}{'content-type'}), 'Content-Type set';
   like $response->{status}, qr/^200\b/, '200 response status';
-  is_deeply $params, $body_hash, 'right body params';
-  is_deeply $pairs, \@body_pairs, 'right body pairs';
+  is_deeply $params, \@body_pairs, 'right body pairs';
+  is_deeply [sort @$param_names], [sort 'c', 'b', '☃'], 'right body param names';
   is $param_snowman, '%', 'right body param value';
-  is_deeply $param_c_array, $body_hash->{c}, 'right body param values array';
+  is_deeply $param_c_array, [42, 'foo'], 'right body param values array';
 };
 
 subtest 'Body JSON' => sub {
@@ -478,11 +598,10 @@ subtest 'Body JSON' => sub {
 
   my ($json_data);
   cgi {
-    my ($cgi) = @_;
-    $cgi->set_input_handle($in_fh);
-    $cgi->set_output_handle($out_fh);
-    $json_data = $cgi->body_json;
-    $cgi->render;
+    $_->set_input_handle($in_fh);
+    $_->set_output_handle($out_fh);
+    $json_data = $_->body_json;
+    $_->render;
   };
 
   ok length($out_data), 'response rendered';
@@ -521,14 +640,13 @@ subtest 'Request meta-variables and headers' => sub {
 
   my ($headers, $auth_header, $content_length_header, %vars);
   cgi {
-    my ($cgi) = @_;
-    $cgi->set_input_handle($in_fh);
-    $cgi->set_output_handle($out_fh);
-    $vars{$_} = $cgi->$_ for (map { lc } @env_keys), qw(method path query);
-    $headers = $cgi->headers;
-    $auth_header = $cgi->header('Authorization');
-    $content_length_header = $cgi->header('Content-Length');
-    $cgi->render;
+    $_->set_input_handle($in_fh);
+    $_->set_output_handle($out_fh);
+    foreach my $key ((map { lc } @env_keys), qw(method path query)) { $vars{$key} = $_->$key }
+    $headers = $_->headers;
+    $auth_header = $_->header('Authorization');
+    $content_length_header = $_->header('Content-Length');
+    $_->render;
   };
 
   ok length($out_data), 'response rendered';
@@ -560,6 +678,95 @@ subtest 'Request meta-variables and headers' => sub {
   is $headers->{'content-type'}, 'text/plain;charset=UTF-8', 'right Content-Type header';
   is $auth_header, "Basic $auth_str", 'right Authorization header';
   is $content_length_header, length($text), 'right Content-Length header';
+};
+
+subtest 'Cookies' => sub {
+  local @ENV{@env_keys} = ('')x@env_keys;
+  local $ENV{PATH_INFO} = '/';
+  local $ENV{REQUEST_METHOD} = 'GET';
+  local $ENV{SCRIPT_NAME} = '/';
+  local $ENV{SERVER_PROTOCOL} = 'HTTP/1.0';
+  local $ENV{HTTP_COOKIE} = 'a=b; c=42; x=; a=c';
+  open my $in_fh, '<', \(my $in_data = '') or die "failed to open handle for input: $!";
+  open my $out_fh, '>', \my $out_data or die "failed to open handle for output: $!";
+
+  my ($cookies, $cookie_names, $a_cookie, $a_cookies, $b_cookie);
+  cgi {
+    $_->set_input_handle($in_fh);
+    $_->set_output_handle($out_fh);
+    $cookies = $_->cookies;
+    $cookie_names = $_->cookie_names;
+    $a_cookie = $_->cookie('a');
+    $a_cookies = $_->cookie_array('a');
+    $b_cookie = $_->cookie('b');
+    $_->render;
+  };
+
+  ok length($out_data), 'response rendered';
+  my $response = _parse_response($out_data);
+  ok defined($response->{headers}{'content-type'}), 'Content-Type set';
+  like $response->{status}, qr/^200\b/, '200 response status';
+  is_deeply $cookies, [['a', 'b'], ['c', 42], ['x', ''], ['a', 'c']], 'right cookies';
+  is_deeply [sort @$cookie_names], [sort 'a', 'c', 'x'], 'right cookie names';
+  is $a_cookie, 'c', 'right cookie value';
+  is_deeply $a_cookies, ['b', 'c'], 'right cookie values';
+  ok !defined $b_cookie, 'no cookie value';
+};
+
+subtest 'NPH response' => sub {
+  local @ENV{@env_keys} = ('')x@env_keys;
+  local $ENV{PATH_INFO} = '/';
+  local $ENV{REQUEST_METHOD} = 'GET';
+  local $ENV{SCRIPT_NAME} = '/';
+  local $ENV{SERVER_PROTOCOL} = 'HTTP/1.0';
+  local $ENV{SERVER_SOFTWARE} = "CGI::Tiny/$CGI::Tiny::VERSION";
+  open my $in_fh, '<', \(my $in_data = '') or die "failed to open handle for input: $!";
+  open my $out_fh, '>', \my $out_data or die "failed to open handle for output: $!";
+
+  cgi {
+    $_->set_input_handle($in_fh);
+    $_->set_output_handle($out_fh);
+    $_->set_nph(1);
+    $_->render;
+  };
+
+  ok length($out_data), 'response rendered';
+  my $response = _parse_response($out_data, 1);
+  like $response->{start_line}, qr/^HTTP\/1.0\b/, 'right start line';
+  ok defined($response->{headers}{'content-type'}), 'Content-Type set';
+  is $response->{headers}{'content-type'}, 'application/octet-stream', 'right content type';
+  is $response->{headers}{server}, "CGI::Tiny/$CGI::Tiny::VERSION", 'right Server header';
+  like $response->{status}, qr/^200\b/, '200 response status';
+  ok defined($response->{headers}{date}), 'Date set';
+  ok defined(CGI::Tiny::date_to_epoch $response->{headers}{date}), 'valid HTTP date';
+  ok !length($response->{body}), 'empty response body';
+};
+
+subtest 'NPH error response' => sub {
+  local @ENV{@env_keys} = ('')x@env_keys;
+  local $ENV{PATH_INFO} = '/';
+  local $ENV{REQUEST_METHOD} = 'GET';
+  local $ENV{SCRIPT_NAME} = '/';
+  local $ENV{SERVER_PROTOCOL} = 'HTTP/1.0';
+  open my $in_fh, '<', \(my $in_data = '') or die "failed to open handle for input: $!";
+  open my $out_fh, '>', \my $out_data or die "failed to open handle for output: $!";
+
+  cgi {
+    $_->set_input_handle($in_fh);
+    $_->set_output_handle($out_fh);
+    $_->set_nph(1);
+    $_->set_response_status(404);
+    $_->set_response_content_type('text/plain');
+    $_->render;
+  };
+
+  ok length($out_data), 'response rendered';
+  my $response = _parse_response($out_data, 1);
+  like $response->{start_line}, qr/^HTTP\/1.0\b/, 'right start line';
+  ok defined($response->{headers}{'content-type'}), 'Content-Type set';
+  is $response->{headers}{'content-type'}, 'text/plain', 'right content type';
+  like $response->{status}, qr/^404\b/, '404 response status';
+  ok !length($response->{body}), 'empty response body';
 };
 
 done_testing;

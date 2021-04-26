@@ -65,6 +65,17 @@ Usage:
   $log->errorf('Unable to bootstrap the Redis cluster: %s', $@);
  }
 
+=head2 clientside_cache_events
+
+Provides combined stream of clientside-cache events from all known Redis primary nodes.
+
+=head2 watch_keyspace
+
+L<Net::Async::Redis/watch_keyspace> support for gathering notifications
+from all known nodes.
+
+=head1 METHODS - Internal
+
 =head2 hash_slot_for_key
 
 Calculates the CRC16 hash slot for the given key.
@@ -84,6 +95,27 @@ Returns a list of the currently-configured nodes.
 
 Returns the appropriate L<Net::Async::Redis::Cluster::Node|node> for the given hash key (slot).
 
+=head2 register_moved_slot
+
+When we get MOVED error we will use this
+sub to rebuild the slot cache
+
+=head2 apply_slots_from_instance
+
+Connect to a random instance in the cluster
+and execute CLUSTER SLOTS to get information
+about the slots and their distribution.
+
+=head2 execute_command
+
+Lookup the correct node for the key then execute the command on that node,
+if there is a mismatch between our slot hashes and Redis's hashes
+we will attempt to rebuild the slot hashes and try again
+
+=head2 ryu
+
+A L<Ryu::Async> instance for source/sink creation.
+
 =head1 INHERITED METHODS
 
 =over 4
@@ -94,7 +126,7 @@ L<acl_cat|Net::Async::Redis::Commands/acl_cat>, L<acl_deluser|Net::Async::Redis:
 
 =item L<IO::Async::Notifier>
 
-L<add_child|IO::Async::Notifier/add_child>, L<adopt_future|IO::Async::Notifier/adopt_future>, L<adopted_futures|IO::Async::Notifier/adopted_futures>, L<can_event|IO::Async::Notifier/can_event>, L<children|IO::Async::Notifier/children>, L<configure|IO::Async::Notifier/configure>, L<configure_unknown|IO::Async::Notifier/configure_unknown>, L<debug_printf|IO::Async::Notifier/debug_printf>, L<get_loop|IO::Async::Notifier/get_loop>, L<invoke_error|IO::Async::Notifier/invoke_error>, L<invoke_event|IO::Async::Notifier/invoke_event>, L<loop|IO::Async::Notifier/loop>, L<make_event_cb|IO::Async::Notifier/make_event_cb>, L<maybe_invoke_event|IO::Async::Notifier/maybe_invoke_event>, L<maybe_make_event_cb|IO::Async::Notifier/maybe_make_event_cb>, L<new|IO::Async::Notifier/new>, L<notifier_name|IO::Async::Notifier/notifier_name>, L<parent|IO::Async::Notifier/parent>, L<remove_child|IO::Async::Notifier/remove_child>, L<remove_from_parent|IO::Async::Notifier/remove_from_parent>
+L<add_child|IO::Async::Notifier/add_child>, L<adopt_future|IO::Async::Notifier/adopt_future>, L<adopted_futures|IO::Async::Notifier/adopted_futures>, L<can_event|IO::Async::Notifier/can_event>, L<children|IO::Async::Notifier/children>, L<configure_unknown|IO::Async::Notifier/configure_unknown>, L<debug_printf|IO::Async::Notifier/debug_printf>, L<get_loop|IO::Async::Notifier/get_loop>, L<invoke_error|IO::Async::Notifier/invoke_error>, L<invoke_event|IO::Async::Notifier/invoke_event>, L<loop|IO::Async::Notifier/loop>, L<make_event_cb|IO::Async::Notifier/make_event_cb>, L<maybe_invoke_event|IO::Async::Notifier/maybe_invoke_event>, L<maybe_make_event_cb|IO::Async::Notifier/maybe_make_event_cb>, L<new|IO::Async::Notifier/new>, L<notifier_name|IO::Async::Notifier/notifier_name>, L<parent|IO::Async::Notifier/parent>, L<remove_child|IO::Async::Notifier/remove_child>, L<remove_from_parent|IO::Async::Notifier/remove_from_parent>
 
 =back
 

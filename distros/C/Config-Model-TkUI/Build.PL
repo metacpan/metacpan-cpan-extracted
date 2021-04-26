@@ -46,7 +46,9 @@ my $build = Module::Build->new
     'Test::Log::Log4perl' => '0',
     'Test::Memory::Cycle' => '0',
     'Test::More' => '0',
-    'Test::Pod' => '1.00'
+    'Test::Pod' => '1.00',
+    'XXX' => '0',
+    'YAML::XS' => '0'
   },
   'configure_requires' => {
     'Module::Build' => '0.34'

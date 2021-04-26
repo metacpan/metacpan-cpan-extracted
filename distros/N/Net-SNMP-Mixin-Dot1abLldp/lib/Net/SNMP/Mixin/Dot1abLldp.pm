@@ -33,8 +33,8 @@ BEGIN {
 }
 
 use Sub::Exporter -setup => {
-  exports   => [@mixin_methods],
-  groups    => { default => [@mixin_methods], },
+  exports => [@mixin_methods],
+  groups  => { default => [@mixin_methods], },
 };
 
 #
@@ -42,13 +42,13 @@ use Sub::Exporter -setup => {
 #
 # from lldpMIB
 use constant {
-  LLDP_LOCAL_SYSTEM_DATA       => '1.0.8802.1.1.2.1.3',
-  LLDP_LOCAL_CASSIS_ID_SUBTYPE => '1.0.8802.1.1.2.1.3.1.0',
-  LLDP_LOCAL_CASSIS_ID         => '1.0.8802.1.1.2.1.3.2.0',
-  LLDP_LOCAL_SYS_NAME          => '1.0.8802.1.1.2.1.3.3.0',
-  LLDP_LOCAL_SYS_DESC          => '1.0.8802.1.1.2.1.3.4.0',
-  LLDP_LOCAL_SYS_CAPA_SUP      => '1.0.8802.1.1.2.1.3.5.0',
-  LLDP_LOCAL_SYS_CAPA_ENA      => '1.0.8802.1.1.2.1.3.6.0',
+  LLDP_LOCAL_SYSTEM_DATA        => '1.0.8802.1.1.2.1.3',
+  LLDP_LOCAL_CHASSIS_ID_SUBTYPE => '1.0.8802.1.1.2.1.3.1.0',
+  LLDP_LOCAL_CHASSIS_ID         => '1.0.8802.1.1.2.1.3.2.0',
+  LLDP_LOCAL_SYS_NAME           => '1.0.8802.1.1.2.1.3.3.0',
+  LLDP_LOCAL_SYS_DESC           => '1.0.8802.1.1.2.1.3.4.0',
+  LLDP_LOCAL_SYS_CAPA_SUP       => '1.0.8802.1.1.2.1.3.5.0',
+  LLDP_LOCAL_SYS_CAPA_ENA       => '1.0.8802.1.1.2.1.3.6.0',
 
   LLDP_LOC_PORT_TABLE      => '1.0.8802.1.1.2.1.3.7',
   LLDP_LOC_PORT_NUM        => '1.0.8802.1.1.2.1.3.7.1.1',
@@ -56,17 +56,17 @@ use constant {
   LLDP_LOC_PORT_ID         => '1.0.8802.1.1.2.1.3.7.1.3',
   LLDP_LOC_PORT_DESC       => '1.0.8802.1.1.2.1.3.7.1.4',
 
-  LLDP_REM_TABLE             => '1.0.8802.1.1.2.1.4.1',
-  LLDP_REM_LOCAL_PORT_NUM    => '1.0.8802.1.1.2.1.4.1.1.2',
-  LLDP_REM_CASSIS_ID_SUBTYPE => '1.0.8802.1.1.2.1.4.1.1.4',
-  LLDP_REM_CASSIS_ID         => '1.0.8802.1.1.2.1.4.1.1.5',
-  LLDP_REM_PORT_ID_SUBTYPE   => '1.0.8802.1.1.2.1.4.1.1.6',
-  LLDP_REM_PORT_ID           => '1.0.8802.1.1.2.1.4.1.1.7',
-  LLDP_REM_PORT_DESC         => '1.0.8802.1.1.2.1.4.1.1.8',
-  LLDP_REM_SYS_NAME          => '1.0.8802.1.1.2.1.4.1.1.9',
-  LLDP_REM_SYS_DESC          => '1.0.8802.1.1.2.1.4.1.1.10',
-  LLDP_REM_SYS_CAPA_SUP      => '1.0.8802.1.1.2.1.4.1.1.11',
-  LLDP_REM_SYS_CAPA_ENA      => '1.0.8802.1.1.2.1.4.1.1.12',
+  LLDP_REM_TABLE              => '1.0.8802.1.1.2.1.4.1',
+  LLDP_REM_LOCAL_PORT_NUM     => '1.0.8802.1.1.2.1.4.1.1.2',
+  LLDP_REM_CHASSIS_ID_SUBTYPE => '1.0.8802.1.1.2.1.4.1.1.4',
+  LLDP_REM_CHASSIS_ID         => '1.0.8802.1.1.2.1.4.1.1.5',
+  LLDP_REM_PORT_ID_SUBTYPE    => '1.0.8802.1.1.2.1.4.1.1.6',
+  LLDP_REM_PORT_ID            => '1.0.8802.1.1.2.1.4.1.1.7',
+  LLDP_REM_PORT_DESC          => '1.0.8802.1.1.2.1.4.1.1.8',
+  LLDP_REM_SYS_NAME           => '1.0.8802.1.1.2.1.4.1.1.9',
+  LLDP_REM_SYS_DESC           => '1.0.8802.1.1.2.1.4.1.1.10',
+  LLDP_REM_SYS_CAPA_SUP       => '1.0.8802.1.1.2.1.4.1.1.11',
+  LLDP_REM_SYS_CAPA_ENA       => '1.0.8802.1.1.2.1.4.1.1.12',
 };
 
 =head1 NAME
@@ -75,7 +75,7 @@ Net::SNMP::Mixin::Dot1abLldp - mixin class for the Link Layer Discovery Protocol
 
 =cut
 
-our $VERSION = '0.17';
+our $VERSION = '0.18';
 
 =head1 SYNOPSIS
 
@@ -141,7 +141,7 @@ Returns the LLDP lldpLocalSystemData group as a hash reference:
 
 sub get_lldp_local_system_data {
   my $session = shift;
-  my $agent = $session->hostname;
+  my $agent   = $session->hostname;
 
   Carp::croak "$agent: '$prefix' not initialized,"
     unless $session->init_ok($prefix);
@@ -185,10 +185,9 @@ See also the L<< Net::SNMP::Mixin::Dot1dBase >> for a mixin to get the mapping b
 
 =cut
 
-
 sub get_lldp_loc_port_table {
   my $session = shift;
-  my $agent = $session->hostname;
+  my $agent   = $session->hostname;
 
   Carp::croak "$agent: '$prefix' not initialized,"
     unless $session->init_ok($prefix);
@@ -335,13 +334,13 @@ Fetch the LLDP related snmp values from the host. Don't call this method direct!
 use constant THIS_INIT_JOBS => 3;
 
 sub _init {
-  my ($session, $reload) = @_;
+  my ( $session, $reload ) = @_;
   my $agent = $session->hostname;
 
   die "$agent: $prefix already initialized and reload not forced.\n"
     if exists get_init_slot($session)->{$prefix}
-      && get_init_slot($session)->{$prefix} == 0
-      && not $reload;
+    && get_init_slot($session)->{$prefix} == 0
+    && not $reload;
 
   # set number of async init jobs for proper initialization
   get_init_slot($session)->{$prefix} = THIS_INIT_JOBS;
@@ -379,20 +378,21 @@ sub _fetch_lldp_local_system_data {
   # result will be true in case of missing values
   # the values are just noSuchObject
   # with get_entries() we get error messages for free
-    
+
   $result = $session->get_entries(
-    -columns    => [ LLDP_LOCAL_SYSTEM_DATA, ],
-    -endindex   => '6.0', # LLDP_LOCAL_SYS_CAPA_ENA
+    -columns  => [ LLDP_LOCAL_SYSTEM_DATA, ],
+    -endindex => '6.0',                         # LLDP_LOCAL_SYS_CAPA_ENA
+    ( $session->version != 0 ? ( -maxrepetitions => 10 ) : () ),
 
     # define callback if in nonblocking mode
     $session->nonblocking ? ( -callback => \&_lldp_local_system_data_cb ) : (),
 
   );
 
-  unless (defined $result) {
-    if (my $err_msg = $session->error) {
-      push_error($session, "$prefix: $err_msg");
-    };
+  unless ( defined $result ) {
+    if ( my $err_msg = $session->error ) {
+      push_error( $session, "$prefix: $err_msg" );
+    }
     return;
   }
 
@@ -414,18 +414,18 @@ sub _lldp_local_system_data_cb {
   my $session = shift;
   my $vbl     = $session->var_bind_list;
 
-  unless (defined $vbl) {
-    if (my $err_msg = $session->error) {
-      push_error($session, "$prefix: $err_msg");
-    };
+  unless ( defined $vbl ) {
+    if ( my $err_msg = $session->error ) {
+      push_error( $session, "$prefix: $err_msg" );
+    }
     return;
   }
 
   $session->{$prefix}{locSysData}{lldpLocChassisIdSubtype} =
-    $vbl->{ LLDP_LOCAL_CASSIS_ID_SUBTYPE() };
+    $vbl->{ LLDP_LOCAL_CHASSIS_ID_SUBTYPE() };
 
   $session->{$prefix}{locSysData}{lldpLocChassisId} =
-    $vbl->{ LLDP_LOCAL_CASSIS_ID() };
+    $vbl->{ LLDP_LOCAL_CHASSIS_ID() };
 
   $session->{$prefix}{locSysData}{lldpLocSysName} =
     $vbl->{ LLDP_LOCAL_SYS_NAME() };
@@ -458,15 +458,16 @@ sub _fetch_lldp_loc_port_tbl {
   # fetch the lldpLocPortTable
   $result = $session->get_table(
     -baseoid => LLDP_LOC_PORT_TABLE,
+    ( $session->version != 0 ? ( -maxrepetitions => 10 ) : () ),
 
     # define callback if in nonblocking mode
     $session->nonblocking ? ( -callback => \&_lldp_loc_port_tbl_cb ) : (),
   );
 
-  unless (defined $result) {
-    if (my $err_msg = $session->error) {
-      push_error($session, "$prefix: $err_msg");
-    };
+  unless ( defined $result ) {
+    if ( my $err_msg = $session->error ) {
+      push_error( $session, "$prefix: $err_msg" );
+    }
     return;
   }
 
@@ -489,11 +490,10 @@ sub _lldp_loc_port_tbl_cb {
   my $session = shift;
   my $vbl     = $session->var_bind_list;
 
-
-  unless (defined $vbl) {
-    if (my $err_msg = $session->error) {
-      push_error($session, "$prefix: $err_msg");
-    };
+  unless ( defined $vbl ) {
+    if ( my $err_msg = $session->error ) {
+      push_error( $session, "$prefix: $err_msg" );
+    }
     return;
   }
 
@@ -527,15 +527,16 @@ sub _fetch_lldp_rem_tbl {
   # fetch the lldpRemTable
   $result = $session->get_table(
     -baseoid => LLDP_REM_TABLE,
+    ( $session->version != 0 ? ( -maxrepetitions => 10 ) : () ),
 
     # define callback if in nonblocking mode
     $session->nonblocking ? ( -callback => \&_lldp_rem_tbl_cb ) : (),
   );
 
-  unless (defined $result) {
-    if (my $err_msg = $session->error) {
-      push_error($session, "$prefix: $err_msg");
-    };
+  unless ( defined $result ) {
+    if ( my $err_msg = $session->error ) {
+      push_error( $session, "$prefix: $err_msg" );
+    }
     return;
   }
 
@@ -558,9 +559,9 @@ sub _lldp_rem_tbl_cb {
   my $session = shift;
   my $vbl     = $session->var_bind_list;
 
-  unless (defined $vbl) {
-    if (my $err_msg = $session->error) {
-      push_error($session, "$prefix: $err_msg");
+  unless ( defined $vbl ) {
+    if ( my $err_msg = $session->error ) {
+      push_error( $session, "$prefix: $err_msg" );
     }
     return;
   }
@@ -603,10 +604,10 @@ sub _lldp_rem_tbl_cb {
   #
 
   $session->{$prefix}{lldpRemTbl}{lldpRemChassisIdSubtype} =
-    idx2val( $vbl, LLDP_REM_CASSIS_ID_SUBTYPE, 1, undef, );
+    idx2val( $vbl, LLDP_REM_CHASSIS_ID_SUBTYPE, 1, undef, );
 
   $session->{$prefix}{lldpRemTbl}{lldpRemChassisId} =
-    idx2val( $vbl, LLDP_REM_CASSIS_ID, 1, undef, );
+    idx2val( $vbl, LLDP_REM_CHASSIS_ID, 1, undef, );
 
   $session->{$prefix}{lldpRemTbl}{lldpRemPortIdSubtype} =
     idx2val( $vbl, LLDP_REM_PORT_ID_SUBTYPE, 1, undef, );
@@ -662,7 +663,7 @@ Karl Gaissmaier <karl.gaissmaier at uni-ulm.de>
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright 2008-2018 Karl Gaissmaier, all rights reserved.
+Copyright 2008-2021 Karl Gaissmaier, all rights reserved.
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

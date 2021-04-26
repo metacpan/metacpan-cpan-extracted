@@ -4,11 +4,10 @@ use warnings;
 use strict;
 use 5.008003;
 
-our $VERSION = '0.531';
+our $VERSION = '0.532';
 use Exporter 'import';
 our @EXPORT_OK = qw( fill_form read_line );
 
-use Carp       qw( croak carp );
 use List::Util qw( any );
 
 use Term::Choose::LineFold        qw( line_fold print_columns cut_to_printwidth );
@@ -37,11 +36,11 @@ sub ReadLine { 'Term::Form' }
 
 sub new {
     my $class = shift;
-    croak "new: called with " . @_ . " arguments - 0 or 1 arguments expected." if @_ > 1;
+    die "new: called with " . @_ . " arguments - 0 or 1 arguments expected." if @_ > 1;
     my ( $opt ) = @_;
     my $instance_defaults = _defaults();
     if ( defined $opt ) {
-        croak "new: The (optional) argument is not a HASH reference." if ref $opt ne 'HASH';
+        die "new: The (optional) argument is not a HASH reference." if ref $opt ne 'HASH';
         validate_options( _valid_options( 'new' ), $opt );
         for my $key ( keys %$opt ) {
             $instance_defaults->{$key} = $opt->{$key} if defined $opt->{$key};
@@ -355,7 +354,7 @@ sub __init_readline {
 
 sub read_line {
     if ( ref $_[0] eq __PACKAGE__ ) {
-        croak "\"read_line\" is a function. The method is called \"readline\"";
+        die "\"read_line\" is a function. The method is called \"readline\"";
     }
     my $ob = __PACKAGE__->new();
     delete $ob->{backup_instance_defaults};
@@ -366,13 +365,13 @@ sub read_line {
 sub readline {
     my ( $self, $prompt, $opt ) = @_;
     $prompt = ''                                         if ! defined $prompt;
-    croak "readline: a reference is not a valid prompt." if ref $prompt;
+    die "readline: a reference is not a valid prompt." if ref $prompt;
     $opt = {}                                            if ! defined $opt;
     if ( ! ref $opt ) {
         $opt = { default => $opt };
     }
     elsif ( ref $opt ne 'HASH' ) {
-        croak "readline: the (optional) second argument must be a string or a HASH reference";
+        die "readline: the (optional) second argument must be a string or a HASH reference";
     }
     if ( %$opt ) {
         validate_options( _valid_options( 'readline' ), $opt );
@@ -434,7 +433,7 @@ sub readline {
         my $char = $self->{plugin}->__get_key_OS();
         if ( ! defined $char ) {
             $self->__reset_term();
-            carp "EOT: $!";
+            warn "EOT: $!";
             return;
         }
         # reset $m->{avail_w} to default:
@@ -1028,10 +1027,10 @@ sub fill_form {
         return $ob->fill_form( @_ );
     }
     my ( $self, $orig_list, $opt ) = @_;
-    croak "'fill_form' called with no argument." if ! defined $orig_list;
-    croak "'fill_form' requires an ARRAY reference as its argument." if ref $orig_list ne 'ARRAY';
+    die "'fill_form' called with no argument." if ! defined $orig_list;
+    die "'fill_form' requires an ARRAY reference as its argument." if ref $orig_list ne 'ARRAY';
     $opt = {} if ! defined $opt;
-    croak "'fill_form': the (optional) second argument must be a HASH reference" if ref $opt ne 'HASH';
+    die "'fill_form': the (optional) second argument must be a HASH reference" if ref $opt ne 'HASH';
     return [] if ! @$orig_list; ##
     if ( %$opt ) {
         validate_options( _valid_options( 'fill_form' ), $opt );
@@ -1136,7 +1135,7 @@ sub fill_form {
         $self->{i}{direction} = 'down';
         if ( ! defined $char ) {
             $self->__reset_term();
-            carp "EOT: $!";
+            warn "EOT: $!";
             return;
         }
         next CHAR if $char == NEXT_get_key;
@@ -1420,7 +1419,7 @@ Term::Form - Read lines from STDIN.
 
 =head1 VERSION
 
-Version 0.531
+Version 0.532
 
 =cut
 

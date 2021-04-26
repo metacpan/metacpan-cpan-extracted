@@ -12,7 +12,7 @@
                                      
 
 
-This is the README for WWW::LinkRot version 0.01.
+This is the README for WWW::LinkRot version 0.02.
 
 WWW::LinkRot is a "module" for the Perl computer programming language, a
 library of computer code to install on a computer.  This document contains
@@ -32,9 +32,31 @@ four sections:
 
 WWW::LinkRot - check web page link rot
 
-Scan HTML pages for links, try to access the links, and make a report.
+Scan HTML files for links, try to access the links, and make a report.
 
 The HTML files need to be in UTF-8 encoding.
+
+This module is intended for people who run web sites to run, for
+example, periodic checks over a large number of HTML files to find all
+of the external links in those files, then given that list of links,
+test each link to make sure that it is actually valid.
+
+The reading function is "get_links" which works on a list containing
+file names such as might be created by a module like "Trav::Dir" or
+"File::Find". It looks for any "https?://" links in the files and
+makes a list.
+
+The list of links may then be checked for validity using
+"check_links" which runs the "get" method of "LWP::UserAgent" on
+them and stores the status. This outputs a JSON file containing the
+link, the status, the location, and the files which contain the link.
+
+The function "html_report" generates an HTML representation of the
+JSON file.
+
+The function "replace" is a batch editing function which inputs a
+list of links and a list of files, then substitutes the redirected
+links (the ones with status 301 or 302) with their replacement.
 
 -----------------------------------------------------------------------------
 
@@ -66,11 +88,11 @@ If you have the App::cpanminus installer, you may prefer
 
     cpanm WWW::LinkRot
 
-To install the module from the source file, WWW-LinkRot-0.01.tar.gz, follow
+To install the module from the source file, WWW-LinkRot-0.02.tar.gz, follow
 this sequence of commands:
 
-    tar xfz WWW-LinkRot-0.01.tar.gz
-    cd WWW-LinkRot-0.01
+    tar xfz WWW-LinkRot-0.02.tar.gz
+    cd WWW-LinkRot-0.02
     perl Makefile.PL
     make
     make install
@@ -95,6 +117,6 @@ repository on github at
 
 -----------------------------------------------------------------------------
 
-This README was written on Mon Mar  8 22:51:15 2021.
+This README was written on Fri Apr 23 08:30:32 2021.
 
 -----------------------------------------------------------------------------

@@ -2,7 +2,7 @@ use warnings;
 
 package Git::Hooks::Test;
 # ABSTRACT: Git::Hooks testing utilities
-$Git::Hooks::Test::VERSION = '3.0.0';
+$Git::Hooks::Test::VERSION = '3.1.0';
 ## no critic (RequireExplicitPackage)
 ## no critic (ErrorHandling::RequireCarping)
 use 5.016;
@@ -167,7 +167,7 @@ sub new_repos {
     my $stderr = $T->child('stderr');
 
     my @result = eval {
-        Git::Repository->run(qw/init -q/, "--template=$tmpldir", $repodir);
+        Git::Repository->run(qw/-c init.defaultBranch=master init -q/, "--template=$tmpldir", $repodir);
 
         my $repo = Git::Repository->new(work_tree => $repodir);
 
@@ -321,7 +321,7 @@ Git::Hooks::Test - Git::Hooks testing utilities
 
 =head1 VERSION
 
-version 3.0.0
+version 3.1.0
 
 =for Pod::Coverage install_hooks new_commit new_repos newdir test_command test_nok test_nok_match test_ok test_ok_match
 
@@ -331,7 +331,7 @@ Gustavo L. de M. Chaves <gnustavo@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by CPQD <www.cpqd.com.br>.
+This software is copyright (c) 2021 by CPQD <www.cpqd.com.br>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -2012,7 +2012,11 @@ STATIC OP *da_ck_rv2cv(pTHX_ OP *o) {
 		PL_expect = XSTATE;
 		tok = yylex();
 		PL_nexttype[PL_nexttoke++] = tok;
-		if (tok == '{') {
+		if (tok == '{'
+#if PERL_COMBI_VERSION >= 5033006
+		    || tok == PERLY_BRACE_OPEN
+#endif
+		    ) {
 			PL_nexttype[PL_nexttoke++] = DO;
 			sv_setpv((SV *) cv, "$");
 			if ((PERL_COMBI_VERSION >= 5021004) ||
@@ -2039,7 +2043,7 @@ STATIC OP *da_ck_rv2cv(pTHX_ OP *o) {
 					PL_bufend+1-PL_bufptr, char);
 				*PL_bufptr = ';';
 				PL_bufend++;
-				SvCUR(PL_linestr)++;
+				SvCUR_set(PL_linestr, SvCUR(PL_linestr)+1);
 			}
 		}
 #if DA_HAVE_LEX_KNOWNEXT
@@ -2068,11 +2072,11 @@ STATIC OP *da_ck_rv2cv(pTHX_ OP *o) {
 				if (len + shift > SvLEN(PL_linestr))
 					len = SvLEN(PL_linestr) - shift;
 				Move(s, s + shift, len, char);
-				SvCUR(PL_linestr) = len + shift - 1;
+				SvCUR_set(PL_linestr, len + shift - 1);
 			} else {
 				STRLEN len = SvCUR(PL_linestr) + shift + 1;
 				Move(s - shift, s, len, char);
-				SvCUR(PL_linestr) += shift;
+				SvCUR_set(PL_linestr, SvCUR(PL_linestr) + shift);
 			}
 			*(PL_bufend = s + SvCUR(PL_linestr)) = '\0';
 			if (start_s < PL_bufptr)

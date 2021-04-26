@@ -32,8 +32,12 @@ $html->eof;
 my %commands_by_group;
 my @commands;
 my %key_finder = (
-    PUBLISH => 1,
+    PUBLISH   => 1,
     SUBSCRIBE => 1,
+    # subscribing to one node is enough in the current cluster design
+    PSUBSCRIBE => 1,
+    # This one is not detected correctly - thankfully it's always XINFO [CONSUMER|GROUP|STREAM] key
+    XINFO     => 2,
 );
 for my $cmd ($html->look_down(_tag => 'span', class => 'command')) {
     my ($txt) = $cmd->parent->attr('href') =~ m{/commands/([\w-]+)$} or die "failed on " . $cmd->as_text;
@@ -53,7 +57,7 @@ for my $cmd ($html->look_down(_tag => 'span', class => 'command')) {
     my @args = $info->{args}->@*;
     if(defined(my $idx = first { $args[$_] =~ /\bkey\b/ } 0..$#args)) {
         warn "have key for $idx";
-        $key_finder{$info->{command}} = (0 + split(' ', $command)) + $idx;
+        $key_finder{$info->{command}} //= (0 + split(' ', $command)) + $idx;
     }
     $info->{summary} =~ s{\.$}{};
     $log->debugf("Adding command %s", $info);
@@ -145,7 +149,7 @@ Tom Molesworth <TEAM@cpan.org>
 
 =head1 LICENSE
 
-Copyright Tom Molesworth 2015-2020. Licensed under the same terms as Perl itself.
+Copyright Tom Molesworth 2015-2021. Licensed under the same terms as Perl itself.
 
 }, {
     commands => \%commands_by_group,

@@ -70,10 +70,15 @@
    },
    "release_status" : "stable",
    "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/david-dick/firefox-marionette/issues"
+      },
       "repository" : {
-         "url" : "https://github.com/david-dick/firefox-marionette"
+         "type" : "git",
+         "url" : "https://github.com/david-dick/firefox-marionette",
+         "web" : "https://github.com/david-dick/firefox-marionette"
       }
    },
-   "version" : "1.01",
+   "version" : "1.03",
    "x_serialization_backend" : "JSON::PP version 4.05"
 }

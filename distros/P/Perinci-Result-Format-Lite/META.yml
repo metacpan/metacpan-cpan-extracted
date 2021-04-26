@@ -27,6 +27,7 @@ recommends:
   JSON::Tiny::Subclassable: '0'
   Number::Format::BigFloat: '0'
   Sort::ByExample: '0'
+  Text::Table::Any: '0.096'
 requires:
   Data::Check::Structure: '0.050'
   Data::Dumper: '0'
@@ -34,16 +35,15 @@ requires:
   JSON::PP: '0'
   List::Util: '1.45'
   Sort::BySpec: '0.03'
-  Text::Table::Any: '0.096'
-  Text::Table::Tiny: '0'
+  Text::Table::Sprintf: '0'
   perl: '5.010001'
   strict: '0'
   warnings: '0'
 resources:
-  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Perinci-Result-Format-Lite
+  bugtracker: https://github.com/perlancar/perl-Perinci-Result-Format-Lite/issues
   homepage: https://metacpan.org/release/Perinci-Result-Format-Lite
   repository: git://github.com/perlancar/perl-Perinci-Result-Format-Lite.git
-version: '0.278'
+version: '0.279'
 x_Dist_Zilla:
   perl:
     version: '5.030000'
@@ -139,7 +139,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::PERLANCAR::MetaResources
       name: '@Author::PERLANCAR/PERLANCAR::MetaResources'
-      version: '0.041'
+      version: '0.042'
     -
       class: Dist::Zilla::Plugin::CheckChangeLog
       name: '@Author::PERLANCAR/CheckChangeLog'

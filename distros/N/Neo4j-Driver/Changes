@@ -1,5 +1,9 @@
 Revision history for Neo4j::Driver
 
+0.23  2021-04-23
+
+ - work around breaking change in Neo4j 4.2.5 Jolt implementation
+
 0.22  2021-02-11
 
  - allow statements to begin with whitespace (fix issue #13)

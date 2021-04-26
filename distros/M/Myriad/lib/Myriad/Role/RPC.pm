@@ -3,7 +3,7 @@ package Myriad::Role::RPC;
 use strict;
 use warnings;
 
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 our $AUTHORITY = 'cpan:DERIV'; # AUTHORITY
 
 no indirect qw(fatal);
@@ -30,7 +30,7 @@ a concrete implementation - instead, see classes such as:
 
 =item * L<Myriad::RPC::Implementation::Redis>
 
-=item * L<Myriad::RPC::Implementation::Perl>
+=item * L<Myriad::RPC::Implementation::Memory>
 
 =back
 

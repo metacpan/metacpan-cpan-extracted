@@ -45,7 +45,7 @@ requires 'Net::Async::OpenTracing', '>= 1.000';
 requires 'Log::Any::Adapter::OpenTracing', '>= 0.001';
 requires 'Metrics::Any::Adapter::DogStatsd', '>= 0.02';
 # Transport
-requires 'Net::Async::Redis', '>= 3.011';
+requires 'Net::Async::Redis', '>= 3.012';
 requires 'Net::Async::HTTP', '>= 0.48';
 requires 'Net::Async::HTTP::Server', '>= 0.13';
 requires 'Net::Async::SMTP', '>= 0.002';

@@ -4,12 +4,11 @@ use warnings;
 use strict;
 use 5.008003;
 
-our $VERSION = '0.122';
+our $VERSION = '0.123';
 use Exporter 'import';
 our @EXPORT_OK = qw( choose_a_directory choose_a_file choose_directories choose_a_number choose_a_subset settings_menu
                      insert_sep get_term_size get_term_width get_term_height unicode_sprintf );
 
-use Carp                  qw( croak );
 use Cwd                   qw( realpath );
 use Encode                qw( decode encode );
 use File::Basename        qw( basename dirname );
@@ -29,7 +28,7 @@ sub new {
     my ( $opt ) = @_;
     my $instance_defaults = _defaults();
     if ( defined $opt ) {
-        croak "Options have to be passed as a HASH reference." if ref $opt ne 'HASH';
+        die "Options have to be passed as a HASH reference." if ref $opt ne 'HASH';
         validate_options( _valid_options( 'new' ), $opt );
         for my $key ( keys %$opt ) {
             $instance_defaults->{$key} = $opt->{$key} if defined $opt->{$key};
@@ -65,7 +64,7 @@ sub __prepare_opt {
     if ( ! defined $opt ) {
         $opt = {};
     }
-    croak "Options have to be passed as a HASH reference." if ref $opt ne 'HASH';
+    die "Options have to be passed as a HASH reference." if ref $opt ne 'HASH';
     if ( %$opt ) {
         my $sub =  ( caller( 1 ) )[3];
         $sub =~ s/^.+::(?:__)?([^:]+)\z/$1/;
@@ -100,6 +99,7 @@ sub _valid_options {
         alignment           => '[ 0 1 2 ]',
         color               => '[ 0 1 2 ]',
         layout              => '[ 0 1 2 3 ]',
+        default_number      => '[ 0-9 ]+',
         mark                => 'Array_Int',
         solo                => 'Array_Int',     # experimental
         tabs_info           => 'Array_Int',
@@ -141,6 +141,7 @@ sub _defaults {
         clear_screen   => 0,
         color          => 0,
         decoded        => 1,
+        #default_number => undef,
         enchanted      => 1,
         hide_cursor    => 1,
         index          => 0,
@@ -188,7 +189,7 @@ sub _routine_options {
         $options = [ @every, qw( init_dir layout order alignment enchanted show_hidden parent_dir decoded show_files filter ) ];
     }
     elsif ( $caller eq 'choose_a_number' ) {
-        $options = [ @every, qw( small_first reset thousands_separator ) ];
+        $options = [ @every, qw( small_first reset thousands_separator default_number ) ];
     }
     elsif ( $caller eq 'choose_a_subset' ) {
         $options = [ @every, qw( layout order alignment enchanted keep_chosen index prefix all_by_default cs_begin cs_end cs_separator mark busy_string solo ) ];
@@ -608,6 +609,15 @@ sub choose_a_number {
     }
     my %numbers;
     my $result;
+    if ( defined $self->{default_number} && length $self->{default_number} <= $digits ) {
+        my $count_zeros = 0;
+        for my $d ( reverse split '', $self->{default_number} ) {
+            $numbers{$count_zeros} = $d * 10 ** $count_zeros;
+            $count_zeros++;
+        }
+        $result = sum( @numbers{keys %numbers} );
+        $result = insert_sep( $result, $self->{thousands_separator} );
+    }
 
     NUMBER: while ( 1 ) {
         my $cs_row;
@@ -647,21 +657,13 @@ sub choose_a_number {
             }
         }
         if ( $range eq $confirm_tmp ) {
-            if ( $self->{thousands_separator} ne '' && defined $result ) {
-                $result =~ s/\Q$self->{thousands_separator}\E//g;
-            }
+            $result = _remove_thousands_separators( $result, $self->{thousands_separator} );
             $self->__restore_defaults();
             return $result;
         }
         my $zeros = ( split /\s*-\s*/, $range )[0];
         $zeros =~ s/^\s*\d//;
-        my $zeros_no_sep;
-        if ( $self->{thousands_separator} eq '' ) {
-            $zeros_no_sep = $zeros;
-        }
-        else {
-            ( $zeros_no_sep = $zeros ) =~ s/\Q$self->{thousands_separator}\E//g;
-        }
+        my $zeros_no_sep = _remove_thousands_separators( $zeros, $self->{thousands_separator} );
         my $count_zeros = length $zeros_no_sep;
         my @choices = $count_zeros ? map( $_ . $zeros, 1 .. 9 ) : ( 0 .. 9 );
         # Choose
@@ -677,12 +679,21 @@ sub choose_a_number {
             delete $numbers{$count_zeros};
         }
         else {
-            $number =~ s/\Q$self->{thousands_separator}\E//g if $self->{thousands_separator} ne '';
-            $numbers{$count_zeros} = $number;
+            $numbers{$count_zeros} = _remove_thousands_separators( $number, $self->{thousands_separator} );
         }
         $result = sum( @numbers{keys %numbers} );
         $result = insert_sep( $result, $self->{thousands_separator} );
     }
+}
+
+
+sub _remove_thousands_separators {
+    my ( $str, $sep ) = @_;
+    # https://stackoverflow.com/questions/13119241/substitution-with-empty-string-unexpected-result
+    if ( defined $str && $sep ne '' ) {
+        $str =~ s/\Q$sep\E//g;
+    }
+    return $str;
 }
 
 
@@ -907,6 +918,7 @@ sub insert_sep {
     return           if ! defined $number;
     return $number   if ! length $number;
     $separator = ',' if ! defined $separator;
+    return $number   if $separator eq '';
     return $number   if $number =~ /\Q$separator\E/;
     $number =~ s/(^[-+]?\d+?(?=(?>(?:\d{3})+)(?!\d))|\G\d{3}(?=\d))/$1$separator/g;
     # http://perldoc.perl.org/perlfaq5.html#How-can-I-output-my-numbers-with-commas-added?
@@ -990,7 +1002,7 @@ Term::Choose::Util - TUI-related functions for selecting directories, files, num
 
 =head1 VERSION
 
-Version 0.122
+Version 0.123
 
 =cut
 
@@ -1280,9 +1292,19 @@ Options:
 
 =item
 
+default_number
+
+Set a default number (unsigned integer in the range of the available numbers).
+
+Default: undef
+
+=item
+
 small_first
 
 Put the small number ranges on top.
+
+Default: off
 
 =item
 

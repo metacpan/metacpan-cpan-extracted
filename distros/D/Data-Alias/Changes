@@ -1,3 +1,10 @@
+version 1.22; 2021-04-22
+
+  * bugfix: use SvCUR_set instead of direct SvCUR assignment to fix
+    compilation problems with -DDEBUGGING builds
+
+  * update for parser changes in v5.33.5-62-gc588171e62
+
 version 1.21; 2017-12-08
 
   * update for context stack changes in Perl 5.23.8

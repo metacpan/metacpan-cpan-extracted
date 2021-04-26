@@ -36,45 +36,42 @@ no_index:
 provides:
   Archive::BagIt:
     file: lib/Archive/BagIt.pm
-    version: '0.072'
+    version: '0.073'
   Archive::BagIt::Base:
     file: lib/Archive/BagIt/Base.pm
-    version: '0.072'
+    version: '0.073'
   Archive::BagIt::Fast:
     file: lib/Archive/BagIt/Fast.pm
-    version: '0.072'
+    version: '0.073'
   Archive::BagIt::Plugin::Algorithm::MD5:
     file: lib/Archive/BagIt/Plugin/Algorithm/MD5.pm
-    version: '0.072'
+    version: '0.073'
   Archive::BagIt::Plugin::Algorithm::SHA512:
     file: lib/Archive/BagIt/Plugin/Algorithm/SHA512.pm
-    version: '0.072'
+    version: '0.073'
   Archive::BagIt::Plugin::Manifest::MD5:
     file: lib/Archive/BagIt/Plugin/Manifest/MD5.pm
-    version: '0.072'
+    version: '0.073'
   Archive::BagIt::Plugin::Manifest::SHA512:
     file: lib/Archive/BagIt/Plugin/Manifest/SHA512.pm
-    version: '0.072'
+    version: '0.073'
   Archive::BagIt::Role::Algorithm:
     file: lib/Archive/BagIt/Role/Algorithm.pm
-    version: '0.072'
+    version: '0.073'
   Archive::BagIt::Role::Manifest:
     file: lib/Archive/BagIt/Role/Manifest.pm
-    version: '0.072'
+    version: '0.073'
   Archive::BagIt::Role::Plugin:
     file: lib/Archive/BagIt/Role/Plugin.pm
-    version: '0.072'
+    version: '0.073'
   Archive::BagIt::Role::Portability:
     file: lib/Archive/BagIt/Role/Portability.pm
-    version: '0.072'
+    version: '0.073'
 recommends:
-  Digest::SHA: '0'
   IO::AIO: '0'
 requires:
   Carp: '0'
   Class::Load: '0'
-  Digest::MD5: '0'
-  Digest::SHA: '0'
   Encode: '0'
   File::Find: '0'
   File::Spec: '0'
@@ -82,6 +79,7 @@ requires:
   List::Util: '1.450'
   Moo: '0'
   Moo::Role: '0'
+  Net::SSLeay: '1.43'
   POSIX: '0'
   Time::HiRes: '0'
   namespace::autoclean: '0'
@@ -92,7 +90,7 @@ requires:
   warnings: '0'
 resources:
   repository: https://art1pirat.spdns.org/art1/Archive-BagIt.git
-version: '0.072'
+version: '0.073'
 x_contributors:
   - 'Andreas Romeyke <art1@andreas-romeyke.de>'
   - 'Michiel Beijen <michiel.beijen@gmail.com>'

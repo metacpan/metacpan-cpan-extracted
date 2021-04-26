@@ -14,9 +14,9 @@ static bool permit_stages(pTHX_ void *hookdata)
 {
   HV *hints = GvHV(PL_hintgv);
   if(hv_fetchs(hints, "t::stages/permitfunc", 0))
-    return true;
+    return TRUE;
 
-  return false;
+  return FALSE;
 }
 
 static void check_stages(pTHX_ void *hookdata)

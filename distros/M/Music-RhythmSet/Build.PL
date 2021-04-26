@@ -13,9 +13,9 @@ my $builder = Module::Build->new(
     release_status     => 'stable',
     configure_requires => { 'Module::Build' => '0.4004', },
     test_requires      => {
-        'MIDI'       => '0',
-        'Test::Most' => '0',
-        'perl'       => '5.24.0',
+        'MIDI'      => '0',
+        'Test2::V0' => '0.000060',
+        'perl'      => '5.24.0',
     },
     requires => {
         'List::GroupingPriorityQueue' => '0',

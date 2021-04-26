@@ -6,6 +6,9 @@ use strict;
 
 use PDL::Config;
 use PDL::Core::Dev;
+use PDL::Types qw(ppdefs_all types);
+my $A = [ppdefs_all()];
+my $AF = [map $_->ppsym, grep !$_->integer, types()]; # all including complex
 my $usenan   = $PDL::Config{BADVAL_USENAN} || 0;
 my $bvalPerPdl = $PDL::Config{BADVAL_PER_PDL} || 0;
 
@@ -30,8 +33,18 @@ if ( $usenan == 0 ) {
     } else {
 	pp_addhdr( "{ 0, 0, 0xc0, 0x7f } };\n\n" );
     }
-    pp_addhdr( "float _nan_float;\ndouble _nan_double;\n\n" );
-    pp_add_boot( " _nan_float = __pdl_nan.__d;\n  _nan_double = (double) __pdl_nan.__d;\n" );
+    pp_addhdr( <<'EOF' );
+float _nan_float;
+double _nan_double;
+complex float _nan_cfloat;
+complex double _nan_cdouble;
+EOF
+    pp_add_boot( <<'EOF' );
+  _nan_float = __pdl_nan.__d;
+  _nan_double = (double) __pdl_nan.__d;
+  _nan_cfloat = __pdl_nan.__d + I*__pdl_nan.__d;
+  _nan_cdouble = (complex double) __pdl_nan.__d + I*__pdl_nan.__d;
+EOF
 
 } # if: $usenan
 
@@ -255,8 +268,7 @@ It returns the final state of the bad-value flag.
 =for bad
 
 This method accepts piddles with or without bad values. It
-returns a Perl scalar with the final bad-value flag, so it
-never returns bad values itself.
+returns a piddle with the final bad-value.
 
 =cut
 
@@ -282,18 +294,12 @@ static pdl* new_pdlscalar(int datatype)
        }
 EOHDR
 
-use PDL::Types;
-my $ntypes = $#PDL::Types::names;
+use PDL::Types qw(types);
 
 my $str;
-foreach my $i ( 0 .. $ntypes ) {
-    my $type = PDL::Type->new( $i );
-    my $ctype = $type->ctype;
-    my $realctype = $type->realctype;
-    my $typesym = $type->symbol;
-
-    my $cname = $type->ctype;
-    $cname =~ s/^PDL_//;
+foreach my $type ( types() ) {
+    my ($i, $ctype, $realctype, $typesym, $cname) =
+      map $type->$_, qw(enum ctype realctype symbol shortctype);
     my $storage = "PDL->bvals.$cname";
 
     my $init_code = << "EOC";
@@ -309,10 +315,7 @@ EOC
     # if UseNaN is true, then we can not change the value used to
     # represent bad elements since it's a NaN. At least, not for
     # for floating point types
-    # - is there a better way of checking for the condition since
-    #   the current one needs to be changed whenever the types are changed
-    #
-    $set_code = "" if $usenan and ($type->ppsym eq "F" or $type->ppsym eq "D" or $type->ppsym eq "C" or $type->ppsym eq "G");
+    $set_code = "" if $usenan and $type->usenan;
 
     $str .=
 "
@@ -364,17 +367,14 @@ _default_badvalue_int${i}()
     RETVAL
 
 ";
-
-
-
-} # foreach: $i = 0 .. $ntypes
+}
 
 pp_addxs( "\n$xshdr\n\n$str\n" );
 
 pp_addpm(<<'!NO!SUBS!');
 
 # note:
-#  if sent a piddle, we have to change it's bad values
+#  if sent a piddle, we have to change its bad values
 #  (but only if it contains bad values)
 #  - there's a slight overhead in that the badflag is
 #    cleared and then set (hence propagating to all
@@ -384,7 +384,6 @@ pp_addpm(<<'!NO!SUBS!');
 #
 sub PDL::badvalue {
     no strict 'refs';
-
     my ( $self, $val ) = @_;
     my $num;
     if ( UNIVERSAL::isa($self,"PDL") ) {
@@ -393,35 +392,22 @@ sub PDL::badvalue {
 	    $self->inplace->setbadtoval( $val );
 	    $self->badflag(1);
 	}
-
 	if ($PDL::Config{BADVAL_PER_PDL}) {
 	    my $name = "PDL::_badvalue_per_pdl_int$num";
-	    if ( defined $val ) {
-		return &{$name}($self, $val )->sclr;
-	    } else {
-		return &{$name}($self, undef)->sclr;
-	    }
+	    return &{$name}($self, $val);
 	}
-
     } elsif ( UNIVERSAL::isa($self,"PDL::Type") ) {
 	$num = $self->enum;
     } else {
         # assume it's a number
         $num = $self;
     }
-
     my $name = "PDL::_badvalue_int$num";
-    if ( defined $val ) {
-	return &{$name}( $val )->sclr;
-    } else {
-	return &{$name}( undef )->sclr;
-    }
-
-} # sub: badvalue()
+    &{$name}( $val );
+}
 
 sub PDL::orig_badvalue {
     no strict 'refs';
-
     my $self = shift;
     my $num;
     if ( UNIVERSAL::isa($self,"PDL") ) {
@@ -432,11 +418,9 @@ sub PDL::orig_badvalue {
         # assume it's a number
         $num = $self;
     }
-
     my $name = "PDL::_default_badvalue_int$num";
     return &${name}();
-
-} # sub: orig_badvalue()
+}
 
 ############################################################
 ############################################################
@@ -482,7 +466,7 @@ same as the input piddle's flag.
        BadCode => 
        '$b() = $ISBAD(a());',
        CopyBadStatusCode => '',
-
+       GenericTypes => $A,
        );
 
 pp_def('isgood' . <<'=cut',
@@ -523,6 +507,7 @@ same as the input piddle's flag.
        BadCode => 
        '$b() = $ISGOOD(a());',
        CopyBadStatusCode => '',
+       GenericTypes => $A,
        );
 
 
@@ -571,6 +556,7 @@ flag set.
         %}
         $b() = cnt;
     },
+    GenericTypes => $A,
 );
 
 pp_def('ngoodover' . <<'=cut',
@@ -617,6 +603,7 @@ flag set.
            if ( $ISGOOD(a()) ) { cnt++; }
         %}
         $b() = cnt;',
+       GenericTypes => $A,
        );
 
 # Generate small ops functions to do entire array
@@ -802,6 +789,7 @@ Also see L</setvaltobad> and L</setnantobad>.
      } else {
         $b() = $a();
      }',
+     GenericTypes => $A,
 ); # pp_def: setbadif
 
 # this is useful because $x->setbadif( $x == 23 )
@@ -869,7 +857,7 @@ Any bad values in the input piddles are copied across to the output piddle.
             $b() = $a();
         }
     ],
-
+    GenericTypes => $A,
 ); # pp_def: setvaltobad
 
 if ($^O =~ /MSWin/) {
@@ -1001,7 +989,7 @@ bad flag is set, it will no
 =cut
 
     HandleBad => 1,
-    GenericTypes => [ 'F', 'D' ],
+    GenericTypes => $AF,
     Inplace => 1,
     CopyBadStatusCode => q{
         /* note: not quite the normal check since set b bad within Code */
@@ -1013,7 +1001,11 @@ bad flag is set, it will no
     Code => q{
         int flag = 0;
         threadloop %{
-            if ( ! isfinite($a()) ) {
+            if (
+              types (FD) %{ !isfinite($a()) %}
+              types (G) %{ !isfinite(crealf($a())) && !isfinite(cimagf($a())) %}
+              types (C) %{ !isfinite(creal($a())) && !isfinite(cimag($a())) %}
+            ) {
                 $SETBAD(b());
                 flag = 1;
             }
@@ -1056,7 +1048,7 @@ operation, it clears the bad flag.
 =cut
     
     HandleBad => 1,
-    GenericTypes => [ 'F', 'D' ],
+    GenericTypes => $AF,
     Inplace => 1,
     CopyBadStatusCode => q{
         /* propagate cleared badflag if inplace */
@@ -1067,7 +1059,7 @@ operation, it clears the bad flag.
     Code => q{
         if ( $ISBAD(a()) ) {
         	/* _nan_xxx set up at top of file */
-            $b() = _nan_$TFD(float,double);
+            $b() = _nan_$TFDGC(float,double,cfloat,cdouble);
         }
         else {
             $b() = $a();
@@ -1128,6 +1120,7 @@ values are copied with no replacement.
         /* always make sure the output is "good" */
         $SETPDLSTATEGOOD(b);
     },
+    GenericTypes => $A,
 ); # pp_def: setbadtoval
 
 pp_def('copybad'.<<'=cut',
@@ -1187,6 +1180,7 @@ its bad value flag set to true.
             $SETPDLSTATEBAD(b);
         }
     },
+    GenericTypes => $A,
 ); # pp_def: copybad
 
 #########################################################

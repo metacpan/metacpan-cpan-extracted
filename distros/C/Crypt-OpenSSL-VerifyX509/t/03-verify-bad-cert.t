@@ -3,7 +3,7 @@ use Crypt::OpenSSL::VerifyX509;
 use Crypt::OpenSSL::X509;
 
 my $v = Crypt::OpenSSL::VerifyX509->new('t/cacert.pem');
-ok($v);
+isa_ok($v, 'Crypt::OpenSSL::VerifyX509');
 
 my $text =<<CERT;
 -----BEGIN CERTIFICATE-----
@@ -33,13 +33,13 @@ hvcNAQEFBQADgYEACgl1sxEPVgsK8sTYCF+OhTIrZ5fhhmCf5kunCWvLeMcTJtNP
 CERT
 
 my $cert = Crypt::OpenSSL::X509->new_from_string($text);
-ok($cert);
+isa_ok($cert, 'Crypt::OpenSSL::X509');
 
 my $ret;
 eval {
         $ret = $v->verify($cert);
 };
-ok($@ =~ /^verify: unable to get local issuer certificate/);
+ok($@ =~ /(verify: certificate has expired)|(verify: unable to get local)|(verify: unknown certificate)/);
 ok(!$ret);
 
 done_testing;

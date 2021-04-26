@@ -99,23 +99,25 @@ sub _initialize {
                 $clear_watchers_cr->();
                 $y->();
             }
+            else {
+                my $current_sub = $$cb_r;
 
-            # It seems unlikely that we’d need a write watch here.
-            # But just in case …
-            elsif ($dbus->init_pending_send()) {
-                $$write_watch_r ||= do {
-
-                    my $current_sub = $$cb_r;
-
-                    AnyEvent->io(
+                if ($dbus->init_pending_send()) {
+                    $$write_watch_r ||= AnyEvent->io(
                         fh => $fileno,
                         poll => 'w',
                         cb => $current_sub,
                     );
-                };
-            }
-            else {
-                undef $$write_watch_r;
+                }
+                else {
+                    undef $$write_watch_r;
+
+                    $$read_watch_r ||= AnyEvent->io(
+                        fh => $fileno,
+                        poll => 'r',
+                        cb => $current_sub,
+                    );
+                }
             }
 
             1;
@@ -129,13 +131,10 @@ sub _initialize {
 
     $cb_r = \$cb;
 
-    $$read_watch_r = AnyEvent->io(
-        fh => $fileno,
-        poll => 'r',
-        cb => $cb,
-    );
+    # Postpone in order to give the caller time to set up promises, etc.
+    AnyEvent::postpone( sub { $cb->() } );
 
-    $cb->();
+    return;
 }
 
 sub _flush_send_queue {
@@ -175,7 +174,7 @@ sub _set_watches_and_create_messenger {
 
         my $read_watch_sr = \$self->{'_read_watch'};
 
-        $self->{'_stop_reading_cr'} = sub {
+        $self->{'_give_up_cr'} = sub {
             $$read_watch_sr = undef;
         };
     }

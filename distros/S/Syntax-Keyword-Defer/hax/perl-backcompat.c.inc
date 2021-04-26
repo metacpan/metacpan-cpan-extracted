@@ -1,5 +1,8 @@
 /* vi: set ft=c inde=: */
 
+#define HAVE_PERL_VERSION(R, V, S) \
+    (PERL_REVISION > (R) || (PERL_REVISION == (R) && (PERL_VERSION > (V) || (PERL_VERSION == (V) && (PERL_SUBVERSION >= (S))))))
+
 #if !HAVE_PERL_VERSION(5, 18, 0)
 typedef AV PADNAMELIST;
 #  define PadlistARRAY(pl)        ((PAD **)AvARRAY(pl))

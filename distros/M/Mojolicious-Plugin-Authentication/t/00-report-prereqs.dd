@@ -1,0 +1,41 @@
+do { my $x = {
+       'configure' => {
+                        'requires' => {
+                                        'ExtUtils::MakeMaker' => '0',
+                                        'perl' => '5.016'
+                                      }
+                      },
+       'develop' => {
+                      'recommends' => {
+                                        'Test::CheckManifest' => '1.31'
+                                      },
+                      'requires' => {
+                                      'File::Spec' => '0',
+                                      'IO::Handle' => '0',
+                                      'IPC::Open3' => '0',
+                                      'Test::CPAN::Changes' => '0.400002',
+                                      'Test::More' => '0',
+                                      'Test::Pod' => '1.41'
+                                    }
+                    },
+       'runtime' => {
+                      'requires' => {
+                                      'Exporter' => '0',
+                                      'Mojolicious' => '8.0',
+                                      'perl' => '5.016'
+                                    }
+                    },
+       'test' => {
+                   'recommends' => {
+                                     'CPAN::Meta' => '2.120900'
+                                   },
+                   'requires' => {
+                                   'ExtUtils::MakeMaker' => '0',
+                                   'File::Spec' => '0',
+                                   'Test::More' => '0.96',
+                                   'perl' => '5.016'
+                                 }
+                 }
+     };
+  $x;
+ }

@@ -1,5 +1,8 @@
 Revision history for LCS::Similar
 
+0.04  2021-04-22 21:58:01 CEST
+        - prefix and suffix optimization
+
 0.03  2015-11-19 06:51:01 CET
         - turn on tests
 

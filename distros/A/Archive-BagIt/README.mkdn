@@ -4,7 +4,7 @@ Archive::BagIt - The main module to handle bags.
 
 # VERSION
 
-version 0.072
+version 0.073
 
 # NAME
 

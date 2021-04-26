@@ -13,7 +13,7 @@ use 5.14.0;
 package StorageDisplay;
 # ABSTRACT: Collect and display storages on linux machines
 
-our $VERSION = '1.0.6'; # VERSION
+our $VERSION = '1.0.7'; # VERSION
 
 1;
 
@@ -532,31 +532,31 @@ sub _allocateBlock {
     my $name=shift;
     my $alloc=shift;
 
-    my $block=$alloc->();
-    foreach my $n ($block->names_str()) {
-        if ($self->has_block($n)) {
-            print STDERR "W: duplicate block name '$n' for ".$block->name.
-                " and ".$self->_block($n)->name."\n";
-        } else {
-            #print STDERR "I: Registering block name '$n' for ".$block->name."\n";
+    if (! $self->has_block($name)) {
+        my $block=$alloc->();
+        foreach my $n ($block->names_str()) {
+            if ($self->has_block($n)) {
+                print STDERR "W: duplicate block name '$n' for ".$block->name.
+                    " and ".$self->_block($n)->name."\n";
+            } else {
+                #print STDERR "I: in $self Registering block name '$n' for ".$block->name."\n";
+            }
+            $self->addBlock($n, $block);
         }
-        $self->addBlock($n, $block);
     }
+    return $self->_block($name);
 }
 
 sub systemBlock {
     my $self=shift;
     my $name=shift;
 
-    if (! $self->has_block($name)) {
-        $self->_allocateBlock(
-            $name, sub {
-                return StorageDisplay::Block::System->new(
-                    $name,
-                    $self);
-            });
-    }
-    return $self->_block($name);
+    return $self->_allocateBlock(
+        $name, sub {
+            return StorageDisplay::Block::System->new(
+                $name,
+                $self);
+        });
 }
 
 sub block {
@@ -566,15 +566,37 @@ sub block {
     if ($name =~m,^/dev/(.*)$,) {
         $name=$1;
     }
-    if (! $self->has_block($name)) {
-        $self->_allocateBlock(
-            $name, sub {
-                return StorageDisplay::Block::NoSystem->new(
-                    'name' => $name,
-                    );
-            });
+    return $self->_allocateBlock(
+        $name, sub {
+            return StorageDisplay::Block::NoSystem->new(
+                'name' => $name,
+                );
+        });
+}
+
+sub blockBySerial {
+    my $self=shift;
+    my $serial=shift;
+
+    foreach my $block ($self->allBlocks()) {
+        #print STDERR "  Testing ", ($block->name), "\n";
+        if (($block->blk_info('SERIAL')//'') eq $serial) {
+            return $block;
+        }
+        if (($block->udev_info('ID_SCSI_SERIAL')//'') eq $serial) {
+            return $block;
+        }
+        # WWN is not always unique :-(
+        #$serial =~ s/^0x//;
+        #if (($block->blk_info('WWN')//'') eq $serial) {
+        #    return $block;
+        #}
+        #if (($block->blk_info('WWN')//'') eq '0x'.$serial) {
+        #    return $block;
+        #}
     }
-    return $self->_block($name);
+    #print STDERR "$serial not found in $self\n";
+    return;
 }
 
 sub _loadAllBlocks {
@@ -728,6 +750,8 @@ sub createElems {
     $self->createLSISASIrcus;
     $self->createFSs;
     $self->createVMs;
+    # Must be last, to avoid to create already existing disks
+    $self->createEmptyDisks;
     $self->computeUsedBlocks;
 }
 
@@ -785,6 +809,34 @@ sub createPartitionTable {
     }
 }
 
+sub createEmptyDisks {
+    my $self = shift;
+    $self->log("Creating not partitionned disks");
+    if (defined($self->get_info('disks-no-part'))) {
+	foreach my $p (sort keys %{$self->get_info('disks-no-part')}) {
+	    $self->createEmptyDisk($p);
+	}
+    }
+}
+
+sub createEmptyDisk {
+    my $self = shift;
+    my $dev = shift;
+    my $block = $self->block($dev);
+    my $elem;
+
+    if ($block->provided) {
+        $self->warn("  $dev already existing");
+        return;
+    }
+
+    $elem = StorageDisplay::Partition::None->new($block, $self);
+    if (!$self->_registerElement($elem)) {
+        $self->error("Cannot register empty disk for ".$block->name);
+        return;
+    }
+}
+
 sub createLVMs {
     my $self = shift;
     $self->log('Creating LVM volume groups');
@@ -818,7 +870,12 @@ sub createMDs {
     my $self = shift;
     $self->log("Creating MD devices");
     for my $devname (sort keys %{$self->get_info('md') // {}}) {
-        my $elem = StorageDisplay::RAID::MD->new($devname, $self);
+        my $elem;
+        if ($self->get_info('md')->{$devname}->{'raid-container'} // 0 eq 1) {
+            $elem = StorageDisplay::RAID::MD::Container->new($devname, $self);
+        } else {
+            $elem = StorageDisplay::RAID::MD->new($devname, $self);
+        }
         if (!$self->_registerElement($elem)) {
             $self->error("Cannot register MD device ".$devname);
             return;
@@ -880,8 +937,14 @@ sub computeUsedBlocks {
         if (scalar(@blocks)>0) {
             foreach my $block (@blocks) {
                 $block->state("used");
+                #print STDERR "Block ", $block->name, " used due to ", $e->name, "\n";
             }
         }
+        #else {
+        #    print STDERR "No providers for ",
+        #        join(",",
+        #             (map { $_->name } $e->consumedBlocks)), "\n";
+        #}
     }
 
 }
@@ -1490,6 +1553,7 @@ sub providedBy {
     if ($self->provided) {
         croak "Duplicate provider for ".$self->name.": ".$self->elem." and ".$elem;
     }
+    #print STDERR "Provider for ".$self->name.": ".$elem."\n";
     $self->_elem($elem);
 }
 
@@ -1530,6 +1594,18 @@ has 'size' => (
     default => -1,
     );
 
+sub blk_info {
+    my $self=shift;
+    my $key=shift;
+    return;
+}
+
+sub udev_info {
+    my $self=shift;
+    my $key=shift;
+    return;
+}
+
 ## function, not method
 sub asname {
     my $block = shift;
@@ -1542,6 +1618,8 @@ sub asname {
     }
     return $blockname;
 }
+
+1;
 
 ##################################################################
 package StorageDisplay::Block::NoSystem;
@@ -1711,7 +1789,7 @@ around 'provideBlock' => sub {
           $b->providedBy($self);
       }
       return $self->$orig(@_);
-  };
+};
 
 has 'label' => (
     is => 'rw',
@@ -1978,10 +2056,15 @@ sub dotStyleTable {
 
 sub dotLabel {
     my $self = shift;
-    return (
-        $self->disk->dname,
-        'Label: '.$self->kind,
-        );
+    my @label = ($self->disk->dname);
+    if (defined($self->disk->blk_info('MODEL'))) {
+        push @label, 'Model: '.$self->disk->blk_info('MODEL');
+    }
+    if (defined($self->disk->blk_info('SERIAL'))) {
+        push @label, 'Serial: '.$self->disk->blk_info('SERIAL');
+    }
+    push @label, 'Label: '.$self->kind;
+    return @label;
 }
 
 sub dotTable {
@@ -2305,6 +2388,71 @@ sub partStyle {
     my $self = shift;
     return 'bgcolor="green"';
 }
+
+1;
+
+##################################################################
+package StorageDisplay::Partition::None;
+
+use Moose;
+use namespace::sweep;
+extends 'StorageDisplay::Elem';
+
+with (
+    'StorageDisplay::Role::HasBlock',
+    'StorageDisplay::Role::Style::WithSize',
+    'StorageDisplay::Role::Style::FromBlockState',
+    );
+
+sub disk {
+    my $self = shift;
+    return $self->block(@_);
+}
+
+around BUILDARGS => sub {
+    my $orig  = shift;
+    my $class = shift;
+    my $block = shift;
+    my $st = shift;
+
+    $st->log({level=>1}, 'Disk with no partition tables on '.$block->dname);
+
+    return $class->$orig(
+        'name' => $block->name,
+        'block' => $block,
+        'provide' => $block,
+        'size' => $st->get_info('lsblk', $block->name, 'size'),
+        @_
+        );
+};
+
+sub BUILD {
+    my $self=shift;
+    my $args=shift;
+    $self->provideBlock($args->{'provide'});
+}
+
+sub dotLabel {
+    my $self = shift;
+    my @label = ($self->disk->dname);
+    if (defined($self->disk->blk_info('MODEL'))) {
+        push @label, 'Model: '.$self->disk->blk_info('MODEL');
+    }
+    if (defined($self->disk->blk_info('SERIAL'))) {
+        push @label, 'Serial: '.$self->disk->blk_info('SERIAL');
+    }
+    return @label;
+}
+
+around 'dotStyleNode' => sub {
+    my $orig = shift;
+    my $self = shift;
+    return (
+        $self->$orig(@_),
+        'style=filled',
+        'shape=rectangle',
+        );
+};
 
 1;
 
@@ -3364,7 +3512,7 @@ has 'raid-devices' => (
     );
 
 around '_add_raid_device' => sub {
-    my $orig  = shift;
+    my $orig = shift;
     my $self = shift;
     my $raid_device = shift;
     my $state = shift;
@@ -3374,7 +3522,37 @@ around '_add_raid_device' => sub {
     return $self->$orig($raid_device);
 };
 
+1;
 
+##################################################################
+package StorageDisplay::RAID::Container;
+use Moose;
+use namespace::sweep;
+extends 'StorageDisplay::RAID';
+
+has 'container-devices' => (
+    traits   => [ 'Array' ],
+    is    => 'ro',
+    isa   => 'ArrayRef[StorageDisplay::RAID::ContainerDevice]',
+    required => 1,
+    default  => sub { return []; },
+    handles  => {
+        '_add_container_device' => 'push',
+            'container_devices' => 'elements',
+    }
+    );
+
+sub _add_raid_device {
+    die "Internal error";
+}
+
+around '_add_container_device' => sub {
+    my $orig = shift;
+    my $self = shift;
+    my $container_device = shift;
+    $self->addChild($container_device);
+    return $self->$orig($container_device);
+};
 
 1;
 
@@ -3485,6 +3663,68 @@ sub dotLabel {
 1;
 
 ###########################################################################
+package StorageDisplay::RAID::ContainerDevice;
+
+use Moose;
+use namespace::sweep;
+extends 'StorageDisplay::RAID::Elem';
+
+with (
+    'StorageDisplay::Role::HasBlock',
+    #'StorageDisplay::Role::Style::Plain',
+    );
+
+has 'container-type' => (
+    is    => 'ro',
+    isa   => 'Str',
+    reader => 'container_type',
+    required => 1,
+    );
+
+around BUILDARGS => sub {
+    my $orig  = shift;
+    my $class = shift;
+    my $raid = shift;
+    my $st = shift;
+    my $block = shift;
+
+    return $class->$orig(
+        $raid, $st,
+        'block' => $block,
+        'name' => $block->name,
+        'consume' => [],
+        @_
+        );
+};
+
+sub BUILD {
+    my $self = shift;
+    my $args = shift;
+
+    #print STDERR "container device ", $self->name, " with providing block ", $self->block->dname,"\n";
+    $self->block->providedBy($self);
+}
+
+sub dotLabel {
+    my $self = shift;
+
+    return (
+        $self->block->dname,
+        #$self->container_type,
+        );
+}
+
+sub dotStyleNode {
+    my $self = shift;
+    return (
+        "shape=oval;",
+        "fillcolor=".$self->statecolor('special').";",
+        );
+};
+
+1;
+
+###########################################################################
 package StorageDisplay::RAID::RaidDevice;
 
 use Moose;
@@ -3567,8 +3807,8 @@ with (
 
 has 'state' => (
     is    => 'ro',
-    isa   => 'Str',
-    required => 1,
+    isa   => 'Maybe[Str]',
+    required => 0,
     );
 
 has 'raiddevice' => (
@@ -3584,14 +3824,18 @@ around BUILDARGS => sub {
     my $st = shift;
     my $devname = shift;
     my $info = shift;
+    my $args = { @_ };
+    my $container_block = $args->{'container-block'};
 
     my $block = $st->block($devname);
+
+    #print STDERR "RAID::Device ", $block->dname, " container ", ($container_block // $block)->dname, "\n";
 
     return $class->$orig(
         $raid, $st,
         'block' => $block,
         'name' => join('@dev@',$raid->name,$block->name),
-        'consume' => [$block],
+        'consume' => [$container_block // $block],
         'state' => $info->{state},
         'raiddevice' => $info->{raiddevice},
         @_
@@ -3606,7 +3850,10 @@ around 'dotStyleNode' => sub {
     my $state = $self->state;
     my $s;
 
-    if ($state =~ /active|Online, Spun Up|OPT/i) {
+    if (not defined($state)) {
+        # devices in RAID containers
+        $s = 'used';
+    } elsif ($state =~ /active|Online, Spun Up|OPT|RDY/i) {
         $s = 'used';
     } elsif ($state =~ /rebuild|RBLD/i) {
         $s = 'warning';
@@ -3629,11 +3876,11 @@ around 'dotStyleNode' => sub {
 
 sub dotLabel {
     my $self = shift;
-
-    return (
-        $self->raiddevice.': '.$self->block->dname,
-        $self->state,
-        );
+    my @label = ($self->raiddevice.': '.$self->block->dname);
+    if (defined($self->state)) {
+        push @label, $self->state;
+    }
+    return @label;
 }
 
 1;
@@ -3673,6 +3920,96 @@ sub dotLabel {
 1;
 
 ##################################################################
+package StorageDisplay::RAID::MD::Container;
+
+use Moose;
+use namespace::sweep;
+extends 'StorageDisplay::RAID::Container';
+
+with(
+    'StorageDisplay::Role::HasBlock',
+    );
+
+around BUILDARGS => sub {
+    my $orig  = shift;
+    my $class = shift;
+    my $devname = shift;
+    my $st = shift;
+
+    #$st->get_infos
+    $st->log({level=>1}, 'MD Container managed by '.$devname);
+
+    my $info = $st->get_info('md', $devname);
+    my $block = $st->block($devname);
+    #print STDERR "MD::Container $devname -> ", $block->dname, "\n";
+
+    return $class->$orig(
+        'name' => join('@','@MD',$block->name),
+        'block' => $block,
+        'consume' => [],
+        'st' => $st,
+        'raid-name' => '', # in case $info has no name
+        %{$info},
+        @_
+        );
+};
+
+sub BUILD {
+    my $self=shift;
+    my $args=shift;
+    my $st = $args->{st};
+
+    my $container_device = StorageDisplay::RAID::ContainerDevice->new(
+        $self, $st,
+        $self->block,
+        'container-type' => $args->{'raid-version'},
+        );
+    $self->_add_container_device($container_device);
+
+    foreach my $dev (sort keys %{$args->{'devices'}}) {
+        my $d = StorageDisplay::RAID::Device->new($self, $st, $dev, $args->{'devices'}->{$dev});
+        $self->_add_device($d);
+        $self->addChild($d);
+    }
+
+    return $self;
+};
+
+has 'raid-version' => (
+    is    => 'ro',
+    isa   => 'Str',
+    required => 1,
+    reader => 'container_type',
+    );
+
+sub dname {
+    my $self=shift;
+    return 'MD: '.$self->block->dname;
+}
+
+sub dotLabel {
+    my $self = shift;
+    return (
+        'Software RAID container',
+        'Type: '.$self->container_type,
+        #$self->disp_size($self->used_dev_size).' used per device',
+        );
+}
+
+sub dotLinks {
+    my $self = shift;
+    # Always one container device for MD RAID
+    my $raidlinkname = ($self->container_devices)[0]->linkname;
+    return (
+        map {
+            $_->linkname.' -> '.$raidlinkname
+        } $self->devices
+    );
+}
+
+1;
+
+##################################################################
 package StorageDisplay::RAID::MD;
 
 use Moose;
@@ -3700,6 +4037,7 @@ around BUILDARGS => sub {
         'block' => $block,
         'consume' => [],
         'st' => $st,
+        'raid-name' => '', # in case $info has no name
         %{$info},
         @_
         );
@@ -3718,8 +4056,17 @@ sub BUILD {
                                                  'state' => $args->{'raid-state'});
     $self->_add_raid_device($raid_device, $state);
 
+    my $container_device_block = undef;
+    if (exists($args->{'raid-container-device'})) {
+        $container_device_block = $st->block($args->{'raid-container-device'});
+        #print STDERR "RAID::MD Container ", $args->{'raid-container-device'}, " -> ",
+        #    $container_device_block->dname, "\n";
+    }
+
     foreach my $dev (sort keys %{$args->{'devices'}}) {
-        my $d = StorageDisplay::RAID::Device->new($self, $st, $dev, $args->{'devices'}->{$dev});
+        my $d = StorageDisplay::RAID::Device->new(
+            $self, $st, $dev, $args->{'devices'}->{$dev},
+            'container-block' => $container_device_block);
         $self->_add_device($d);
         $self->addChild($d);
     }
@@ -4172,6 +4519,20 @@ sub BUILD {
         } else {
             $id=$dev->{'enclosure'}.":".$dev->{'slot'};
             my $devpath = 'LSISASIrcu@'.$id;
+            my $block;
+            {
+                my $serial = $dev->{'serial-no'}//'';
+                if ($serial ne '') {
+                    #print STDERR "Serial for $id is $serial\n";
+                    $block = $st->blockBySerial($serial);
+                }# else { # GUID/WWN is not always unique
+                #    $serial = $dev->{'guid'}//'';
+                #    if ($serial ne '') {
+                #        print STDERR "Guid for $id is $serial\n";
+                #        $block = $st->blockBySerial($serial);
+                #    }
+                #}
+            }
             $d = StorageDisplay::RAID::LSI::SASIrcu::RawDevice->new(
                 $self, $st, $devpath, $dev,
                 'raiddevice' => $id,
@@ -4180,6 +4541,10 @@ sub BUILD {
                 'size' => $dev->{'size'},
                 'slot' => $id,
                 );
+            if (defined($block)) {
+                #print STDERR "$id provide ", $block->name,"\n";
+                $d->provideBlock($block);
+            }
         }
         $self->_add_device($d);
         $self->addChild($d);
@@ -4665,7 +5030,7 @@ StorageDisplay - Collect and display storages on linux machines
 
 =head1 VERSION
 
-version 1.0.6
+version 1.0.7
 
 Replay commands
 

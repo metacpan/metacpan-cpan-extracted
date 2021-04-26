@@ -1,5 +1,5 @@
 package Getopt::EX::Colormap;
-use version; our $VERSION = version->declare("v1.22.1");
+use version; our $VERSION = version->declare("v1.23.0");
 
 use v5.14;
 use warnings;
@@ -146,7 +146,7 @@ sub ansi_numbers {
 			  (?(<P>) \) )			# closing )
 			}
 		      | (?<csi_abbr>[E]) )		# abbreviation
-	     | < (?<name> \w+ )	>			# <colorname>
+	     | < (?<name> \w+ ) >			# <colorname>
 	     | (?<err>  .+ )				# error
 	     )
 	    }xig) {
@@ -241,8 +241,17 @@ my %csi_terminator = (
     RCP => 'u',		# Restore Cursor Position
     );
 
+my %other_sequence = (
+    RIS   => "\ec",	# Reset to Initial State
+    DECSC => "\e7",	# DEC Save Cursor
+    DECRC => "\e8",	# DEC Restore Cursor
+    );
+
 sub csi_code {
     my $name = shift;
+    if (my $seq = $other_sequence{$name}) {
+	return $seq;
+    }
     my $c = $csi_terminator{$name} or do {
 	warn "$name: Unknown ANSI name.\n";
 	return '';
@@ -475,6 +484,12 @@ complicated color setting from command line.
 This module assumes color information is given in two ways: one in
 labeled list, and one in indexed list.
 
+Handler maintains hash and list objects, and labeled colors are stored
+in hash, non-label colors are in list automatically.  User can mix
+both specifications.
+
+=head2 LABELED COLOR
+
 This is an example of labeled list:
 
     --cm 'COMMAND=SE,OMARK=CS,NMARK=MS' \
@@ -493,6 +508,8 @@ and set `R^S' to `OCHANGE' label.
 
     --cm '*CHANGE=R,OCHANGE=+S'
 
+=head2 INDEX COLOR
+
 Indexed list example is like this:
 
     --cm 555/100,555/010,555/001 \
@@ -504,32 +521,35 @@ This is the example of RGB 6x6x6 216 colors specification.  Left
 side of slash is foreground color, and right side is for background.
 This color list is accessed by index.
 
-Handler maintains hash and list objects, and labeled colors are stored
-in hash, non-label colors are in list automatically.  User can mix
-both specifications.
+=head2 CALLING FUNCTIONS
 
 Besides producing ANSI colored text, this module supports calling
 arbitrary function to handle a string.  See L<FUNCTION SPEC> section
 for more detail.
 
+=head2 256 or 24bit COLORS
+
+By default, this library produces ANSI 256 color sequence.  That is
+eight standard colors, eight high intensity colors, 6x6x6 216 colors,
+and grayscales from black to white in 24 steps.  12bit/24bit color is
+converted to 6x6x6 216 color, or greyscale when all values are same.
+
+To produce 24bit RGB color sequence, set C<$RGB24> module variable.
 
 =head1 COLOR SPEC
 
 Color specification is a combination of single uppercase character
-representing 8 colors :
+representing 8 colors, and alternative (usually brighter) colors in
+lowercase :
 
-    R  Red
-    G  Green
-    B  Blue
-    C  Cyan
-    M  Magenta
-    Y  Yellow
-    K  Black
-    W  White
-
-and alternative (usually brighter) colors in lowercase :
-
-    r, g, b, c, m, y, k, w
+    R  r  Red
+    G  g  Green
+    B  b  Blue
+    C  c  Cyan
+    M  m  Magenta
+    Y  y  Yellow
+    K  b  Black
+    W  w  White
 
 or RGB values and 24 grey levels if using ANSI 256 or full color
 terminal :
@@ -542,14 +562,8 @@ terminal :
 
 =over 4
 
-Beginning C<#> can be omitted in 24bit hex RGB notation.
-
-When values are all same in 24bit or 12bit RGB, it is converted to 24
-grey level, otherwise 6x6x6 216 color.
-
-Until version v1.9.0, grey levels were assigned to L00-L23.  In this
-version, L00 and L25 represent black and white, and 24 grey levels are
-assigned to L01-L24.
+Beginning C<#> can be omitted in 24bit hex RGB notation.  So 6
+consecutive digits means 24bit color, and 3 digits means 6x6x6 color.
 
 =back
 
@@ -578,6 +592,7 @@ with other special effects :
     ;    No effect
     /    Toggle foreground/background
     ^    Reset to foreground
+    ~    Cancel following effect
 
 At first the color is considered as foreground, and slash (C</>)
 switches foreground and background.  If multiple colors are given in
@@ -607,9 +622,6 @@ Samples:
     R/G  500/050  #F00/#0F0  FF0000/00FF00  <red>/<green>
     W/w  L03/L20  #333/#ccc  303030/c6c6c6  <dimgrey>/<lightgrey>
 
-24-bit RGB color sequence is supported but disabled by default.  Set
-C<$RGB24> module variable to enable it.
-
 Character "E" is an abbreviation for "{EL}", and it clears the line
 from cursor to the end of the line.  At this time, background color is
 set to the area.  When this code is found in the start sequence, it is
@@ -617,7 +629,7 @@ copied to just before ending reset sequence, with preceding sequence
 if necessary, to keep the effect even when the text is wrapped to
 multiple lines.
 
-Other ANSI CSI sequences are also available in the form of "{NAME}",
+Other ANSI CSI sequences are also available in the form of C<{NAME}>,
 despite there are few reasons to use them.
 
     CUU n   Cursor up
@@ -641,6 +653,13 @@ These name accept following optional numerical parameters, using comma
 (',') or semicolon (';') to separate multiple ones, with optional
 braces.  For example, color spec C<DK/544> can be described as
 C<{SGR1;30;48;5;224}> or more readable C<{SGR(1,30,48,5,224)}>.
+
+Some other escape sequences are supported in the form of C<{NAME}>.
+These sequences do not start with CSI, and take no parameters.
+
+    RIS     Reset to Initial State
+    DECSC   DEC Save Cursor
+    DECRC   DEC Restore Cursor
 
 =head1 COLOR NAMES
 

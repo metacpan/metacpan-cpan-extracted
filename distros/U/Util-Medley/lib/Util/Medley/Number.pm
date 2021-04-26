@@ -1,5 +1,5 @@
 package Util::Medley::Number;
-$Util::Medley::Number::VERSION = '0.059';
+$Util::Medley::Number::VERSION = '0.060';
 use Modern::Perl;
 use Moose;
 use namespace::autoclean;
@@ -13,7 +13,7 @@ Util::Medley::Number - utility methods for working with numbers
 
 =head1 VERSION
 
-version 0.059
+version 0.060
 
 =head1 SYNOPSIS
 

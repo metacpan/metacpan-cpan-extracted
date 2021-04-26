@@ -13,6 +13,7 @@ Basic/Core/Dev.pm
 Basic/Core/Exporter.pm
 Basic/Core/IFiles.pm
 Basic/Core/Makefile.PL
+Basic/Core/Overloads.pm
 Basic/Core/pdl.h.PL
 Basic/Core/pdlapi.c
 Basic/Core/pdlbadvalinit.c.PL
@@ -720,9 +721,9 @@ Perldl2/Script.pm
 Perldl2/TODO
 README
 t/00-report-prereqs.t
+t/01-pptest.t
 t/autoload.t
 t/bad.t
-t/badvalue_scalar_cmp.t
 t/basic.t
 t/bigmem.t
 t/bool.t
@@ -747,7 +748,6 @@ t/pdl_from_string.t
 t/pdlchar.t
 t/pp_croaking.t
 t/pp_line_numbers.t
-t/pptest.t
 t/primitive.t
 t/pthread.t
 t/reduce.t

@@ -9,7 +9,7 @@ require DynaLoader;
 use vars qw($VERSION @ISA $__import @preload $pid);
 @ISA = qw(DynaLoader);
 sub dl_load_flags { 0x00 }
-$VERSION = '1.60';
+$VERSION = '1.61';
 $pid = $$;
 bootstrap Prima $VERSION;
 unless ( UNIVERSAL::can('Prima', 'init')) {
@@ -69,6 +69,7 @@ sub run
 {
 	die "Prima was not properly initialized\n" unless $::application;
 	$::application-> go if $::application-> alive;
+	$::application-> destroy if $::application && $::application-> alive;
 	$::application = undef if $::application and not $::application->alive;
 }
 
@@ -474,6 +475,8 @@ L<Prima::sys::gtk::FileDialog> - GTK file system dialogs
 L<Prima::sys::win32::FileDialog> - Windows file system dialogs
 
 L<Prima::sys::XQuartz> - MacOSX/XQuartz facilities
+
+L<Prima::sys::FS> - unicode-aware core file functions
 
 =item Class information
 

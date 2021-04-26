@@ -27,6 +27,7 @@ use autodie;
 use File::Spec;
 use Locale::PO;
 use Mojo::Loader qw(load_class);
+use Mojo::JSON qw(true false);
 
 =head2 file
 
@@ -179,9 +180,9 @@ DOC
         },
         FRONTEND => {
             _doc => 'Settings for the Web FRONTEND',
-            _vars => [ qw(logo logo_small spinner title initial_plugin company_name company_url company_support
-			  hide_password hide_release hide_company max_width
-			)
+            _vars => [ qw(logo logo_small logo_noscale spinner title initial_plugin company_name company_url company_support
+                          hide_password hide_password_icon hide_release hide_company max_width
+                        )
                      ],
             logo => {
                 _doc => 'url for the logo brand the login sceen',
@@ -201,6 +202,15 @@ DOC
             logo_small => {
                 _doc => 'url for the small logo brand the UI',
             },
+            logo_noscale => {
+                _doc => "don't scale logo on login window",
+                _re => '(yes|no|true|false)',
+                _re_error => 'pick yes or no OR true or false',
+                _sub => sub {
+                    $_[0] = ($_[0] =~ /yes|true/) ? true : false;
+                    return;
+                },
+            },
             spinner => {
                 _doc => 'url for the busy animation spinner gif',
             },
@@ -211,19 +221,40 @@ DOC
                 _doc => 'which tab should be active upon login ?'
             },
             hide_password => {
-	        _doc => 'hide password field on login screen',
-	        _re => '(yes|no)',
-                _re_error => 'pick yes or no',
+                _doc => 'hide password field on login screen',
+                _re => '(yes|no|true|false)',
+                _re_error => 'pick yes or no OR true or false',
+                _sub => sub {
+                    $_[0] = ($_[0] =~ /yes|true/) ? true : false;
+                    return;
+                },
+            },
+            hide_password_icon => {
+                _doc => 'hide password icon on login screen',
+                _re => '(yes|no|true|false)',
+                _re_error => 'pick yes or no OR true or false',
+                _sub => sub {
+                    $_[0] = ($_[0] =~ /yes|true/) ? true : false;
+                    return;
+                },
             },
             hide_release => {
-	        _doc => 'hide release string on login screen',
-	        _re => '(yes|no)',
-                _re_error => 'pick yes or no',
+                _doc => 'hide release string on login screen',
+                _re => '(yes|no|true|false)',
+                _re_error => 'pick yes or no OR true or false',
+                _sub => sub {
+                    $_[0] = ($_[0] =~ /yes|true/) ? true : false;
+                    return;
+                },
             },
             hide_company => {
-	        _doc => 'hide company string on login screen',
-	        _re => '(yes|no)',
-                _re_error => 'pick yes or no',
+                _doc => 'hide company string on login screen',
+                _re => '(yes|no|true|false)',
+                _re_error => 'pick yes or no OR true or false',
+                _sub => sub {
+                    $_[0] = ($_[0] =~ /yes|true/) ? true : false;
+                    return;
+                },
             },
         },
         'FRONTEND-COLORS' => {

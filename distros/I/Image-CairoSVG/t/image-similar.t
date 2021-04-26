@@ -19,7 +19,7 @@ if ($@) {
     plan (skip_all => "Could not load required modules: $@");
 }
 
-for my $f (qw/Technical_college Church/) {
+for my $f (qw/Technical_college Church line/) {
     my $surface = Cairo::ImageSurface->create ('argb32', 400, 400);
     my $cairosvg2 = Image::CairoSVG->new (
 	surface => $surface,

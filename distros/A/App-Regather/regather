@@ -155,10 +155,14 @@ shows version
 
 =head1 EXAMPLES
 
-regather -c /some/regather.conf.config-tiny 
-         -C core.altroot=/tmp/regather-altroot.d 
-         -C core.tt_path=/path/regather.d 
+=over
+
+regather -c /some/regather.conf.config-tiny
+         -C core.altroot=/tmp/regather-altroot.d
+         -C core.tt_path=/path/regather.d
          --colors -f -Fvvv
+
+=back
 
 this does next:
 

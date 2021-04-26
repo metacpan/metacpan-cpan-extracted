@@ -8,37 +8,57 @@ our @ISA         = qw(Exporter);
 our %EXPORT_TAGS = ( 'all' => [qw()] );
 our @EXPORT_OK   = ( @{ $EXPORT_TAGS{'all'} } );
 #our @EXPORT      = qw(error new not_before not_after serial);
-our $VERSION = '0.53';
+our $VERSION = '0.54';
 my $parser = undef;
 my $asn    = undef;
 my $error  = undef;
 our %oid2enchash = (
-                    '1.2.840.113549.1.1.1'  => { 'enc' => 'RSA' },
-                    '1.2.840.113549.1.1.2'  => { 'enc' => 'RSA', 'hash' => 'MD2' },
-                    '1.2.840.113549.1.1.3'  => { 'enc' => 'RSA', 'hash' => 'MD4' },
-                    '1.2.840.113549.1.1.4'  => { 'enc' => 'RSA', 'hash' => 'MD5' },
-                    '1.2.840.113549.1.1.5'  => { 'enc' => 'RSA', 'hash' => 'SHA1' },
-                    '1.2.840.113549.1.1.6'  => { 'enc' => 'OAEP' },
-                    '1.2.840.113549.1.1.11' => { 'enc' => 'RSA', 'hash' => 'SHA256' },
-                    '1.2.840.113549.1.1.12' => { 'enc' => 'RSA', 'hash' => 'SHA384' },
-                    '1.2.840.113549.1.1.13' => { 'enc' => 'RSA', 'hash' => 'SHA512' },
-                    '1.2.840.113549.1.1.14' => { 'enc' => 'RSA', 'hash' => 'SHA224' }
+    '1.2.840.113549.1.1.1'  => { 'enc' => 'RSA' },
+    '1.2.840.113549.1.1.2'  => { 'enc' => 'RSA', 'hash' => 'MD2' },
+    '1.2.840.113549.1.1.3'  => { 'enc' => 'RSA', 'hash' => 'MD4' },
+    '1.2.840.113549.1.1.4'  => { 'enc' => 'RSA', 'hash' => 'MD5' },
+    '1.2.840.113549.1.1.5'  => { 'enc' => 'RSA', 'hash' => 'SHA1' },
+    '1.2.840.113549.1.1.6'  => { 'enc' => 'OAEP' },
+    '1.2.840.113549.1.1.11' => { 'enc' => 'RSA', 'hash' => 'SHA256' },
+    '1.2.840.113549.1.1.12' => { 'enc' => 'RSA', 'hash' => 'SHA384' },
+    '1.2.840.113549.1.1.13' => { 'enc' => 'RSA', 'hash' => 'SHA512' },
+    '1.2.840.113549.1.1.14' => { 'enc' => 'RSA', 'hash' => 'SHA224' },
+    '1.2.840.10045.2.1'     => { 'enc' => 'EC' },
 );
 
 our %oid2attr = (
-                 "2.5.4.3"                    => "CN",
-                 "2.5.4.4"                    => "SN",
-                 "2.5.4.42"                   => "GN",
-                 "2.5.4.5"                    => "serialNumber",
-                 "2.5.4.6"                    => "C",
-                 "2.5.4.7"                    => "L",
-                 "2.5.4.8"                    => "ST",
-                 "2.5.4.10"                   => "O",
-                 "2.5.4.11"                   => "OU",
-                 "1.2.840.113549.1.9.1"       => "E",
-                 "0.9.2342.19200300.100.1.1"  => "UID",
-                 "0.9.2342.19200300.100.1.25" => "DC",
-                 "0.2.262.1.10.7.20"          => "nameDistinguisher"
+    "2.5.4.3"                    => "CN",
+    "2.5.4.4"                    => "SN",
+    "2.5.4.42"                   => "GN",
+    "2.5.4.5"                    => "serialNumber",
+    "2.5.4.6"                    => "C",
+    "2.5.4.7"                    => "L",
+    "2.5.4.8"                    => "ST",
+    '2.5.4.9'                    => 'streetAddress',
+    "2.5.4.10"                   => "O",
+    "2.5.4.11"                   => "OU",
+    "1.2.840.113549.1.9.1"       => "emailAddress",
+    '1.2.840.113549.1.9.2'       => 'unstructuredName',
+    "0.9.2342.19200300.100.1.1"  => "UID",
+    "0.9.2342.19200300.100.1.25" => "DC",
+    "0.2.262.1.10.7.20"          => "nameDistinguisher",
+    '2.5.4.12'    => 'title',
+    '2.5.4.13'    => 'description',
+    '2.5.4.14'    => 'searchGuide',
+    '2.5.4.15'    => 'businessCategory',
+    '2.5.4.16'    => 'postalAddress',
+    '2.5.4.17'    => 'postalCode',
+    '2.5.4.18'    => 'postOfficeBox',
+    '2.5.4.19'    => 'physicalDeliveryOfficeName',
+    '2.5.4.20'    => 'telephoneNumber',
+    '2.5.4.23'    => 'facsimileTelephoneNumber',
+    '2.5.4.41'    => 'name',
+    '2.5.4.43'    => 'initials',
+    '2.5.4.44'    => 'generationQualifier',
+    '2.5.4.45'    => 'uniqueIdentifier',
+    '2.5.4.46'    => 'dnQualifier',
+    '2.5.4.51'    => 'houseIdentifier',
+    '2.5.4.65'    => 'pseudonym',
 );
 
 =head1 NAME
@@ -394,6 +414,26 @@ sub Subject {
     return $subjdn;
 }
 
+
+sub SubjectRaw {
+
+    my $self = shift;
+    my @subject;
+    foreach my $rdn (@{$self->{'tbsCertificate'}->{'subject'}->{'rdnSequence'}}) {
+        my @sequence = map {
+            $_->{format} = (keys %{$_->{value}})[0];
+            $_->{value} = (values %{$_->{value}})[0];
+            $_;
+        } @{$rdn};
+        if (scalar @sequence > 1) {
+            push @subject, \@sequence;
+        } else {
+            push @subject, $sequence[0];
+        }
+    }
+    return \@subject;
+}
+
 sub _subject_part {
     my $self    = shift;
     my $oid     = shift;
@@ -490,7 +530,7 @@ sub subject_cn {
 =head2 subject_email
 
 Returns the string value for subject's email address (= the value with the
-OID 1.2.840.113549.1.9.1 or in DN Syntax everything after C<E=>).
+OID 1.2.840.113549.1.9.1 or in DN Syntax everything after C<emailAddress=>).
 Only the first entry is returned. C<undef> if subject contains no email attribute.
 
 =cut back
@@ -656,7 +696,7 @@ sub KeyUsage {
     ;    # no extensions in certificate
     foreach $ext ( @{$exts} ) {
         if ( $ext->{'extnID'} eq '2.5.29.15' ) {    #OID for keyusage
-            my $parsKeyU = _init('KeyUsage');                           # get a parser for this
+            my $parsKeyU = _init('KeyUsage');         # get a parser for this
             my $keyusage = $parsKeyU->decode( $ext->{'extnValue'} );    # decode the value
             if ( $parsKeyU->error ) {
                 $self->{"_error"} = $parsKeyU->error;
@@ -695,12 +735,12 @@ If the extension is marked critical, this is also reported.
 
 =cut back
 our %oid2extkeyusage = (
-                        '1.3.6.1.5.5.7.3.1' => 'serverAuth',
-                        '1.3.6.1.5.5.7.3.2' => 'clientAuth',
-                        '1.3.6.1.5.5.7.3.3' => 'codeSigning',
-                        '1.3.6.1.5.5.7.3.4' => 'emailProtection',
-                        '1.3.6.1.5.5.7.3.8' => 'timeStamping',
-                        '1.3.6.1.5.5.7.3.9' => 'OCSPSigning',
+      '1.3.6.1.5.5.7.3.1' => 'serverAuth',
+      '1.3.6.1.5.5.7.3.2' => 'clientAuth',
+      '1.3.6.1.5.5.7.3.3' => 'codeSigning',
+      '1.3.6.1.5.5.7.3.4' => 'emailProtection',
+      '1.3.6.1.5.5.7.3.8' => 'timeStamping',
+      '1.3.6.1.5.5.7.3.9' => 'OCSPSigning',
 );
 
 sub ExtKeyUsage {
@@ -712,7 +752,7 @@ sub ExtKeyUsage {
     foreach $ext ( @{$exts} ) {
         if ( $ext->{'extnID'} eq '2.5.29.37' ) {    #OID for ExtKeyUsage
             return $ext->{'oids'} if defined $ext->{'oids'};
-            my $parsExtKeyUsage = _init('ExtKeyUsageSyntax');                         # get a parser for this
+            my $parsExtKeyUsage = _init('ExtKeyUsageSyntax');       # get a parser for this
             my $oids            = $parsExtKeyUsage->decode( $ext->{'extnValue'} );    # decode the value
             if ( $parsExtKeyUsage->error ) {
                 $self->{"_error"} = $parsExtKeyUsage->error;
@@ -749,7 +789,7 @@ sub SubjectAltName {
     ;    # no extensions in certificate
     foreach $ext ( @{$exts} ) {
         if ( $ext->{'extnID'} eq '2.5.29.17' ) {    #OID for SubjectAltName
-            my $parsSubjAlt = _init('SubjectAltName');                        # get a parser for this
+            my $parsSubjAlt = _init('SubjectAltName');      # get a parser for this
             my $altnames    = $parsSubjAlt->decode( $ext->{'extnValue'} );    # decode the value
             if ( $parsSubjAlt->error ) {
                 $self->{"_error"} = $parsSubjAlt->error;
@@ -1037,23 +1077,23 @@ sub CRLDistributionPoints2 {
         if ( $extension->{'extnID'} eq '2.5.29.31' ) {    # OID for ARRAY of cRLDistributionPoints
             my $parser = _init('cRLDistributionPoints');                  # get a parser for CDPs
             my $points = $parser->decode( $extension->{'extnValue'} );    # decode the values (returns an array)
-            for my $each_dp ( @{$points} ) {                              # this loops through multiple "distributionPoint" values
+            for my $each_dp ( @{$points} ) {            # this loops through multiple "distributionPoint" values
                 $dp_cnt++;
                 for my $each_fullName ( @{ $each_dp->{'distributionPoint'}->{'fullName'} } )
-                {                                                         # this loops through multiple "fullName" values
+                {                     # this loops through multiple "fullName" values
                     if ( exists $each_fullName->{directoryName} ) {
 
-                        # found a rdnSequence
-                        my $rdn = join ',', reverse @{ my_CRL_rdn( $each_fullName->{directoryName}->{rdnSequence} ) };
-                        push @{ $CDPs{$dp_cnt} }, "Directory Address: $rdn";
+      # found a rdnSequence
+      my $rdn = join ',', reverse @{ my_CRL_rdn( $each_fullName->{directoryName}->{rdnSequence} ) };
+      push @{ $CDPs{$dp_cnt} }, "Directory Address: $rdn";
                     } elsif ( exists $each_fullName->{uniformResourceIdentifier} ) {
 
-                        # found a URI
-                        push @{ $CDPs{$dp_cnt} }, "URL: " . $each_fullName->{uniformResourceIdentifier};
+      # found a URI
+      push @{ $CDPs{$dp_cnt} }, "URL: " . $each_fullName->{uniformResourceIdentifier};
                     } else {
 
-                        # found some other type of CDP value
-                        # return undef;
+      # found some other type of CDP value
+      # return undef;
                     }
                 }
             }
@@ -1164,7 +1204,7 @@ sub SubjectDirectoryAttributes {
             for my $type ( @{$subject_dir_attrs} ) {
                 for my $value ( @{ $type->{'values'} } ) {
                     for my $key ( keys %{$value} ) {
-                        push @{$attributes}, $type->{'type'} . " = " . $value->{$key} . " ($key)";
+      push @{$attributes}, $type->{'type'} . " = " . $value->{$key} . " ($key)";
                     }
                 }
             }
@@ -1191,7 +1231,7 @@ sub BasicConstraints {
     for $extension ( @{$extensions} ) {
         if ( $extension->{'extnID'} eq '2.5.29.19' ) {    # OID for BasicConstraints
             if ( $extension->{'critical'} ) { push @{$constraints}, "critical"; }    # mark this as critical as appropriate
-            my $parser            = _init('BasicConstraints');                       # get a parser for this
+            my $parser            = _init('BasicConstraints');     # get a parser for this
             my $basic_constraints = $parser->decode( $extension->{'extnValue'} );    # decode the value
             for my $key ( keys %{$basic_constraints} ) {
                 push @{$constraints}, "$key = " . $basic_constraints->{$key};
@@ -1310,14 +1350,14 @@ sub PGPExtension {
         if ( $extension->{'extnID'} eq '1.3.6.1.4.1.3401.8.1.1' ) {    # OID for PGPExtension
             my $parser              = _init('PGPExtension');                # get a parser for this
             my $pgpextension = $parser->decode( $extension->{'extnValue'} );    # decode the value
-                        if ($pgpextension->{version} != 0) {
-                          $self->{"_error"} = sprintf("got PGPExtension version %d. We only know how to deal with v1 (0)", $pgpextension->{version});
-                        } else {
-                          foreach my $timetype ('generalTime', 'utcTime') {
-                            return $pgpextension->{keyCreation}->{$timetype}
-                              if exists $pgpextension->{keyCreation}->{$timetype};
-                          }
-                        }
+      if ($pgpextension->{version} != 0) {
+        $self->{"_error"} = sprintf("got PGPExtension version %d. We only know how to deal with v1 (0)", $pgpextension->{version});
+      } else {
+        foreach my $timetype ('generalTime', 'utcTime') {
+          return $pgpextension->{keyCreation}->{$timetype}
+            if exists $pgpextension->{keyCreation}->{$timetype};
+        }
+      }
         }
     }
     return undef;
@@ -1542,14 +1582,14 @@ SubjectAltName ::= GeneralNames
 GeneralNames ::= SEQUENCE OF GeneralName
 
 GeneralName ::= CHOICE {
-     otherName                       [0]     AnotherName,
-     rfc822Name                      [1]     IA5String,
-     dNSName                         [2]     IA5String,
+     otherName     [0]     AnotherName,
+     rfc822Name    [1]     IA5String,
+     dNSName       [2]     IA5String,
      x400Address                     [3]     ANY, --ORAddress,
      directoryName                   [4]     Name,
      ediPartyName                    [5]     EDIPartyName,
      uniformResourceIdentifier       [6]     IA5String,
-     iPAddress                       [7]     OCTET STRING,
+     iPAddress     [7]     OCTET STRING,
      registeredID                    [8]     OBJECT IDENTIFIER }
 
 EntrustVersionInfo ::= SEQUENCE {
@@ -1588,7 +1628,7 @@ SubjectDirectoryAttributes ::= SEQUENCE OF Attribute
 -- id-ce-basicConstraints OBJECT IDENTIFIER ::=  { id-ce 19 }
 
 BasicConstraints ::= SEQUENCE {
-     cA                      BOOLEAN OPTIONAL, --DEFAULT FALSE,
+     cA    BOOLEAN OPTIONAL, --DEFAULT FALSE,
      pathLenConstraint       INTEGER OPTIONAL }
 
 

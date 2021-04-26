@@ -2,8 +2,6 @@ package SPVM::Long;
 
 1;
 
-# Check document 2019/07/23 almost ok.
-
 =head1 NAME
 
 SPVM::Long - Long object
@@ -13,13 +11,15 @@ SPVM::Long - Long object
   use SPVM::Long;
   
   my $long_object = SPVM::Long->new(5L);
-  my $long_value = $long_object->val;
+  my $long_value = $long_object->value;
 
 =head1 DESCRIPTION
 
 L<SPVM::Long> object stores a C<long> value.
 
-This object is immutable.
+This object is immutable and its value cannot be changed.
+
+L<SPVM::Long> is automatically loaded just after the program starts.
 
 =head1 STATIC METHODS
 
@@ -27,12 +27,12 @@ This object is immutable.
 
   sub new : SPVM::Long ($value : long)
 
-Create a new L<SPVM::Long> object with specific C<long> value.
+Create a new L<SPVM::Long> object with a C<long> value.
 
 =head1 INSTANCE METHODS
 
-=head2 val
+=head2 value
 
-  sub val : long ($self : self)
+  sub value : long ($self : self)
 
 Get a C<long> value.

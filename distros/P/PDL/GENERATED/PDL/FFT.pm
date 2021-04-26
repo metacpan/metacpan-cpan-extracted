@@ -191,7 +191,7 @@ sub PDL::fft {
 	# Convert the first argument to decimal and check for trouble.
 	my $re=$_[0];
 	my $im=$_[1];
-	if ($re->type =~ m/cdouble|cfloat/) {
+	if (!$re->type->real) {
 		$im=cimag($re);
 		$re=creal($re);
 	}
@@ -210,7 +210,7 @@ sub PDL::fft {
 		barf($message);
 	}
 	_fft($re,$im);
-	if ($_[0]->type =~ m/cdouble|cfloat/) {
+	if (!$_[0]->type->real) {
 		$_[0]= $re+ci()*$im;
 	} else {
 		$_[0]=$re,$_[1]=$im;
@@ -241,7 +241,7 @@ sub PDL::ifft {
 	# Convert the first argument to decimal and check for trouble.
 	my $re=$_[0];
 	my $im=$_[1];
-	if ($re->type =~ m/cdouble|cfloat/) {
+	if (!$re->type->real) {
 		$im=cimag($re);
 		$re=creal($re);
 	}
@@ -260,7 +260,7 @@ sub PDL::ifft {
 		barf($message);
 	}
 	_ifft($re,$im);
-	if ($_[0]->type =~ m/cdouble|cfloat/) {
+	if (!$_[0]->type->real) {
 		$_[0]= $re+ci()*$im;
 	} else {
 		$_[0]=$re,$_[1]=$im;
@@ -345,7 +345,7 @@ N-dimensional FFT over all pdl dims of input (inplace)
 sub PDL::fftnd {
     barf "Must have real and imaginary parts for fftnd" if $#_ != 1;
     my ($r,$i) = @_;
-    if ($r->type =~m/cdouble|cfloat/ ) {
+    if (!$r->type->real) {
 	$i=cimag $r;
 	$r=creal $r;
     }
@@ -362,7 +362,7 @@ sub PDL::fftnd {
       $r = $r->mv(0,$n);
       $i = $i->mv(0,$n);
     }
-    if ($_[0]->type =~m/cdouble|cfloat/ ) {
+    if (!$_[0]->type->real) {
 	$_[0]=$r+ci()*$i;
     } else {
 	$_[0] = $r; $_[1] = $i;
@@ -387,7 +387,7 @@ N-dimensional inverse FFT over all pdl dims of input (inplace)
 sub PDL::ifftnd {
     barf "Must have real and imaginary parts for ifftnd" if $#_ != 1;
     my ($r,$i) = @_;
-    if ($r->type =~m/cdouble|cfloat/ ) {
+    if (!$r->type->real) {
 	$r=creal $r;
 	$i=cimag $r;
     }
@@ -404,7 +404,7 @@ sub PDL::ifftnd {
       $r = $r->mv(0,$n);
       $i = $i->mv(0,$n);
     }
-    if ($_[0]->type =~m/cdouble|cfloat/ ) {
+    if (!$_[0]->type->real) {
 	$_[0]=$r+ci()*$i;
     } else {
 	$_[0] = $r; $_[1] = $i;
@@ -472,7 +472,7 @@ sub PDL::fftconvolve {
 sub PDL::fftconvolve_inplace {
     barf "Must have image & kernel for fftconvolve" if $#_ != 1;
     my ($hr, $hi) = @_;
-    if ($hr->type =~m/cdouble|cfloat/) {
+    if (!$hr->type->real) {
 	$hi=cimag($hr);
 	$hr=creal($hr);
     }
@@ -502,7 +502,7 @@ sub PDL::fftconvolve_inplace {
     $hi->clump(-1)->set(0,0.);
     ifftnd($hr,$hi);
     # convert back to complex if input was complex
-    if ($_[0]->type =~m/cdouble|cfloat/) {
+    if (!$_[0]->type->real) {
 	$_[0]=$hr+ci()*$hi;
 	return $_[0];
     } else {

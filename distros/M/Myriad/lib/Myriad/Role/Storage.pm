@@ -3,7 +3,7 @@ package Myriad::Role::Storage;
 use strict;
 use warnings;
 
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 our $AUTHORITY = 'cpan:DERIV'; # AUTHORITY
 
 no indirect qw(fatal);
@@ -41,7 +41,7 @@ a concrete implementation - instead, see classes such as:
 
 =item * L<Myriad::Storage::Implementation::Redis>
 
-=item * L<Myriad::Storage::Implementation::Perl>
+=item * L<Myriad::Storage::Implementation::Memory>
 
 =back
 
@@ -50,7 +50,7 @@ a concrete implementation - instead, see classes such as:
 use Role::Tiny;
 
 our @WRITE_METHODS = qw(set getset push unshift pop shift hash_set hash_add);
-our @READ_METHODS = qw(get observe hash_get hash_keys hash_values hash_exists hash_count hash_as_list);
+our @READ_METHODS = qw(get observe watch_keyspace hash_get hash_keys hash_values hash_exists hash_count hash_as_list);
 
 requires $_ for @WRITE_METHODS;
 requires $_ for @READ_METHODS;

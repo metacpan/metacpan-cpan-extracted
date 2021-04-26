@@ -1,5 +1,10 @@
 Revision history for Alien-libnewrelic
 
+0.07      2021-04-24 09:21:09 -0600
+  - Moved to new GitHub org
+  - Patch to fix header guard included but unreleased in upstream (gh#9)
+  - Add support for Perls 5.14 - 5.18 (gh#10)
+
 0.06      2020-12-10 12:57:40 -0700
   - Patch to allow libnewrelic to build on clang 10 (gh#7)
 

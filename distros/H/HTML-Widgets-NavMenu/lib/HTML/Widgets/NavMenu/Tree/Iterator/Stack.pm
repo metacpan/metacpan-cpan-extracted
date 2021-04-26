@@ -1,5 +1,5 @@
 package HTML::Widgets::NavMenu::Tree::Iterator::Stack;
-$HTML::Widgets::NavMenu::Tree::Iterator::Stack::VERSION = '1.0801';
+$HTML::Widgets::NavMenu::Tree::Iterator::Stack::VERSION = '1.0900';
 use strict;
 use warnings;
 
@@ -89,7 +89,7 @@ HTML::Widgets::NavMenu::Tree::Iterator::Stack - a simple stack class.
 
 =head1 VERSION
 
-version 1.0801
+version 1.0900
 
 =head1 SYNOPSIS
 

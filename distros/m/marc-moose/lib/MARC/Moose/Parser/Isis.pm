@@ -1,5 +1,5 @@
 package MARC::Moose::Parser::Isis;
-$MARC::Moose::Parser::Isis::VERSION = '1.0.42';
+$MARC::Moose::Parser::Isis::VERSION = '1.0.43';
 # ABSTRACT: ISIS records parser
 use Moose;
 
@@ -99,7 +99,7 @@ MARC::Moose::Parser::Isis - ISIS records parser
 
 =head1 VERSION
 
-version 1.0.42
+version 1.0.43
 
 =head1 ATTRIBUTES
 
@@ -141,7 +141,7 @@ Frédéric Demians <f.demians@tamil.fr>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by Frédéric Demians.
+This software is copyright (c) 2021 by Frédéric Demians.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

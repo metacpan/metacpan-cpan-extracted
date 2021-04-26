@@ -182,7 +182,6 @@ void pdl_reallocdims ( pdl *it,int ndims );  /* reallocate dims and incs */
 void pdl_reallocthreadids ( pdl *it,int ndims );  /* reallocate threadids */
 void pdl_resize_defaultincs ( pdl *it );     /* Make incs out of dims */
 void pdl_unpackarray ( HV* hash, char *key, PDL_Indx *dims, int ndims );
-void pdl_print(pdl *it);
 void pdl_dump(pdl *it);
 void pdl_allocdata(pdl *it);
 
@@ -245,11 +244,7 @@ PDL_Indx  pdl_validate_section( PDL_Indx* sec, PDL_Indx* dims,           /* Chec
                            int ndims );
 void pdl_row_plusplus ( PDL_Indx* pos, PDL_Indx* dims,              /* Move down one row */
                         int ndims );
-void pdl_subsection( char *y, char*x, int datatype,      /* Take subsection */
-                 PDL_Indx* sec, PDL_Indx* dims, PDL_Indx *incs, PDL_Indx offset, int* ndims);
-void pdl_insertin( char*y, PDL_Indx* ydims, int nydims,        /* Insert pdl in pdl */
-                   char*x, PDL_Indx* xdims, int nxdims,
-                   int datatype, PDL_Indx* pos);
+PDL_Anyval pdl_at0( pdl* x );
 PDL_Anyval pdl_at( void* x, int datatype, PDL_Indx* pos, PDL_Indx* dims, /* Value at x,y,z,... */
              PDL_Indx *incs, PDL_Indx offset, int ndims);
 void  pdl_set( void* x, int datatype, PDL_Indx* pos, PDL_Indx* dims, /* Set value at x,y,z... */
@@ -282,6 +277,7 @@ struct Core {
     void   (*unpackdims)  ( SV* sv, PDL_Indx *dims,    /* Unpack */
                             int ndims );
     void   (*grow)        ( pdl* a, PDL_Indx newsize); /* Change pdl 'Data' size */
+    PDL_Anyval (*at0)     ( pdl* x );
     void (*flushcache)( pdl *thepdl );	     /* flush cache */
     void (*reallocdims) ( pdl *it,int ndims );  /* reallocate dims and incs */
     void (*reallocthreadids) ( pdl *it,int ndims );
@@ -335,6 +331,8 @@ PDL_Indx (*safe_indterm)(PDL_Indx dsz, PDL_Indx at, char *file, int lineno);
 
 float NaN_float;
 double NaN_double;
+complex float NaN_cfloat;
+complex double NaN_cdouble;
 
 !NO!SUBS!
 
@@ -362,8 +360,6 @@ print OUT <<'!NO!SUBS!';
 };
 
 typedef struct Core Core;
-
-Core *pdl__Core_get_Core(); /* INTERNAL TO CORE! DON'T CALL FROM OUTSIDE */
 
 /* __PDLCORE_H */
 #endif

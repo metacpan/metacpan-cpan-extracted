@@ -6,7 +6,7 @@ use Unicode::UTF8 qw(decode_utf8);
 
 use Myriad::Util::UUID;
 
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 our $AUTHORITY = 'cpan:DERIV'; # AUTHORITY
 
 =head1 NAME
@@ -153,19 +153,19 @@ async method rpc ($rpc, @args) {
 
 async method subscription ($stream, @args) {
     my $remote_service = $self->remote_service;
+    my $uuid = Myriad::Util::UUID::uuid();
+    my $subscription = await $remote_service->subscribe($stream, "$0/$uuid");
+    $log->infof('Subscribing to: %s | %s', $remote_service->service_name, $stream);
     $cmd = {
         code => async sub {
             my $params = shift;
-            my ($remote_service, $stream, $args) = map { $params->{$_} } qw(remote_service stream args);
-            $log->infof('Subscribing to: %s | %s', $remote_service->service_name, $stream);
-            my $uuid = Myriad::Util::UUID::uuid();
-            $remote_service->subscribe($stream, "$0/$uuid")->each(sub {
+            my ($subscription, $args) = @{$params}{qw(subscription args)};
+            $subscription->each(sub {
                 my $info = shift;
-                use Data::Dumper;
-                $log->infof('DATA: %s', decode_utf8(Dumper($info->{data})));
+                $log->infof('Subscription event received: %s', $info->{data});
             })->completed;
         },
-        params => { stream => $stream, args => \@args, remote_service => $remote_service}
+        params => { subscription => $subscription, args => \@args}
     };
 
 }
@@ -181,10 +181,14 @@ async method storage ($action, $key, $extra = undef) {
             my $params = shift;
             my ($remote_service, $action, $key, $extra) = map { $params->{$_} } qw(remote_service action key extra);
 
-            my $response = await $remote_service->storage->$action($key, defined $extra? $extra : () );
-            $log->infof('Storage resposne is: %s', $response);
-            await $myriad->shutdown;
+            try {
+                my $response = await $remote_service->storage->$action($key, $extra // () );
+                $log->infof('Storage resposne is: %s', $response);
+            } catch ($e) {
+                $log->warnf('Error: %s', $e);
+            }
 
+            await $myriad->shutdown;
         },
         params => { action => $action, key => $key, extra => $extra, remote_service => $remote_service} };
 }
@@ -208,4 +212,3 @@ See L<Myriad/CONTRIBUTORS> for full details.
 =head1 LICENSE
 
 Copyright Deriv Group Services Ltd 2020-2021. Licensed under the same terms as Perl itself.
-

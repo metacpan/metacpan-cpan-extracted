@@ -30,6 +30,7 @@ my %WriteMakefileArgs = (
     "script/show-assigned-rgb-colors",
     "script/show-colors",
     "script/show-colors-from-scheme",
+    "script/show-colors-from-theme",
     "script/show-rand-rgb-colors",
     "script/show-text-using-color-gradation"
   ],
@@ -47,6 +48,7 @@ my %WriteMakefileArgs = (
     "Data::Sah::Compiler::perl::TH::int" => 0,
     "Data::Sah::Compiler::perl::TH::str" => 0,
     "Graphics::ColorNamesLite::All" => 0,
+    "Module::Load::Util" => 0,
     "Perinci::CmdLine::Any" => 0,
     "Perinci::CmdLine::Base" => "1.827",
     "Perinci::CmdLine::Classic" => "1.770",
@@ -55,6 +57,7 @@ my %WriteMakefileArgs = (
     "Sah::Schema::color::ansi256" => 0,
     "Sah::Schema::color::rgb24" => 0,
     "Sah::Schema::perl::colorscheme::modname" => 0,
+    "Sah::Schema::perl::colortheme::modname_with_optional_args" => 0,
     "Sah::Schema::posint" => 0,
     "Term::Size" => 0,
     "strict" => 0,
@@ -66,7 +69,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.009",
+  "VERSION" => "0.010",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -87,6 +90,7 @@ my %FallbackPrereqs = (
   "Graphics::ColorNamesLite::All" => 0,
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
+  "Module::Load::Util" => 0,
   "Perinci::CmdLine::Any" => 0,
   "Perinci::CmdLine::Base" => "1.827",
   "Perinci::CmdLine::Classic" => "1.770",
@@ -95,6 +99,7 @@ my %FallbackPrereqs = (
   "Sah::Schema::color::ansi256" => 0,
   "Sah::Schema::color::rgb24" => 0,
   "Sah::Schema::perl::colorscheme::modname" => 0,
+  "Sah::Schema::perl::colortheme::modname_with_optional_args" => 0,
   "Sah::Schema::posint" => 0,
   "Term::Size" => 0,
   "Test::More" => 0,

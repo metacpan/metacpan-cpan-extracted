@@ -2,7 +2,7 @@ NAME
     App::ANSIColorUtils - Utilities related to ANSI color
 
 VERSION
-    This document describes version 0.009 of App::ANSIColorUtils (from Perl
+    This document describes version 0.010 of App::ANSIColorUtils (from Perl
     distribution App-ANSIColorUtils), released on 2021-01-20.
 
 DESCRIPTION
@@ -39,6 +39,8 @@ DESCRIPTION
     *   show-colors
 
     *   show-colors-from-scheme
+
+    *   show-colors-from-theme
 
     *   show-rand-rgb-colors
 
@@ -134,6 +136,30 @@ FUNCTIONS
     Arguments ('*' denotes required arguments):
 
     *   scheme* => *perl::colorscheme::modname*
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (payload) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  show_colors_from_theme
+    Usage:
+
+     show_colors_from_theme(%args) -> [status, msg, payload, meta]
+
+    Show colors from a ColorTheme scheme.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   theme* => *perl::colortheme::modname_with_optional_args*
 
     Returns an enveloped result (an array).
 

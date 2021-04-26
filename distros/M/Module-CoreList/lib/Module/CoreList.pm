@@ -4,7 +4,7 @@ use strict;
 our ( %released, %version, %families, %upstream, %bug_tracker, %deprecated, %delta );
 
 use version;
-our $VERSION = '5.20210320';
+our $VERSION = '5.20210420';
 
 sub PKG_PATTERN () { q#\A[a-zA-Z_][0-9a-zA-Z_]*(?:(::|')[0-9a-zA-Z_]+)*\z# }
 sub _looks_like_invocant ($) { local $@; !!eval { $_[0]->isa(__PACKAGE__) } }
@@ -376,6 +376,7 @@ sub changes_between {
     5.032001 => '2021-01-23',
     5.033007 => '2021-02-20',
     5.033008 => '2021-03-20',
+    5.033009 => '2021-04-20',
   );
 
 for my $version ( sort { $a <=> $b } keys %released ) {
@@ -18450,6 +18451,63 @@ for my $version ( sort { $a <=> $b } keys %released ) {
         removed => {
         }
     },
+    5.033009 => {
+        delta_from => 5.033008,
+        changed => {
+            'B::Op_private'         => '5.033009',
+            'Config'                => '5.033009',
+            'Data::Dumper'          => '2.178',
+            'ExtUtils::Command'     => '7.62',
+            'ExtUtils::Command::MM' => '7.62',
+            'ExtUtils::Liblist'     => '7.62',
+            'ExtUtils::Liblist::Kid'=> '7.62',
+            'ExtUtils::MM'          => '7.62',
+            'ExtUtils::MM_AIX'      => '7.62',
+            'ExtUtils::MM_Any'      => '7.62',
+            'ExtUtils::MM_BeOS'     => '7.62',
+            'ExtUtils::MM_Cygwin'   => '7.62',
+            'ExtUtils::MM_DOS'      => '7.62',
+            'ExtUtils::MM_Darwin'   => '7.62',
+            'ExtUtils::MM_MacOS'    => '7.62',
+            'ExtUtils::MM_NW5'      => '7.62',
+            'ExtUtils::MM_OS2'      => '7.62',
+            'ExtUtils::MM_OS390'    => '7.62',
+            'ExtUtils::MM_QNX'      => '7.62',
+            'ExtUtils::MM_UWIN'     => '7.62',
+            'ExtUtils::MM_Unix'     => '7.62',
+            'ExtUtils::MM_VMS'      => '7.62',
+            'ExtUtils::MM_VOS'      => '7.62',
+            'ExtUtils::MM_Win32'    => '7.62',
+            'ExtUtils::MM_Win95'    => '7.62',
+            'ExtUtils::MY'          => '7.62',
+            'ExtUtils::MakeMaker'   => '7.62',
+            'ExtUtils::MakeMaker::Config'=> '7.62',
+            'ExtUtils::MakeMaker::Locale'=> '7.62',
+            'ExtUtils::MakeMaker::version'=> '7.62',
+            'ExtUtils::MakeMaker::version::regex'=> '7.62',
+            'ExtUtils::Mkbootstrap' => '7.62',
+            'ExtUtils::Mksymlists'  => '7.62',
+            'ExtUtils::ParseXS'     => '3.43',
+            'ExtUtils::ParseXS::Constants'=> '3.43',
+            'ExtUtils::ParseXS::CountLines'=> '3.43',
+            'ExtUtils::ParseXS::Eval'=> '3.43',
+            'ExtUtils::ParseXS::Utilities'=> '3.43',
+            'ExtUtils::Typemaps'    => '3.43',
+            'ExtUtils::Typemaps::Cmd'=> '3.43',
+            'ExtUtils::Typemaps::InputMap'=> '3.43',
+            'ExtUtils::Typemaps::OutputMap'=> '3.43',
+            'ExtUtils::Typemaps::Type'=> '3.43',
+            'ExtUtils::testlib'     => '7.62',
+            'Module::CoreList'      => '5.20210420',
+            'Module::CoreList::Utils'=> '5.20210420',
+            'NEXT'                  => '0.68',
+            'XS::APItest'           => '1.16',
+            'feature'               => '1.64',
+            'perlfaq'               => '5.20210411',
+        },
+        removed => {
+        }
+    },
 );
 
 sub is_core
@@ -19636,6 +19694,13 @@ sub is_core
     },
     5.033008 => {
         delta_from => 5.033007,
+        changed => {
+        },
+        removed => {
+        }
+    },
+    5.033009 => {
+        delta_from => 5.033008,
         changed => {
         },
         removed => {

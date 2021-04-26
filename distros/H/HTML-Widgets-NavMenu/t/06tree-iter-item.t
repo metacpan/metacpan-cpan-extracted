@@ -92,28 +92,28 @@ sub does_throw_exception
         }
     );
 
-    ok( ( !$item->_is_visited() ), "Item is not visited at start" );    # TEST
-    is( $item->_num_subs_to_go(), 4,     "Num subs to go at start" );   # TEST
-    is( $item->_num_subs(),       4,     "Num subs at start" );         # TEST
-    is( $item->_visit(),          "ONE", "First sub" );                 # TEST
-    is( $item->_num_subs_to_go(), 3, "Num subs to go after first visit" )
-        ;                                                               # TEST
-    ok( $item->_is_visited(), "Item is visited after first visit" );    # TEST
-    is( $item->_visit(), "Two", "Second sub" );                         # TEST
-    ok( $item->_is_visited(), "Item is visited after second visit" );   # TEST
-    is( $item->_num_subs_to_go(), 2,        "Num subs to go (3)" );     # TEST
-    is( $item->_num_subs(),       4,        "Num subs at middle" );     # TEST
-    is( $item->_visit(),          "threE3", "Third sub" );              # TEST
-    ok( $item->_is_visited(), "Item is visited after third visit" );    # TEST
-    is( $item->_num_subs_to_go(), 1,     "Num subs to go (4)" );        # TEST
-    is( $item->_visit(),          "4.0", "Fourth sub" );                # TEST
-    ok( $item->_is_visited(), "Item is visited after fourth visit" );   # TEST
-    is( $item->_num_subs_to_go(), 0, "Num subs to go (end)" );          # TEST
-    ok( ( !defined( $item->_visit() ) ), "No more subs" );              # TEST
-    ok( $item->_is_visited(), "Item is visited after no more subs" );   # TEST
-    is( $item->_num_subs_to_go(), 0, "Num subs to go (end 2)" );        # TEST
-    is( $item->_num_subs(),       4, "Num subs at finish" );            # TEST
-    ok( ( !defined( $item->_visit() ) ), "No more subs (2)" );          # TEST
-    is( $item->_node(), "Hello", "item->_node() is correct" );          # TEST
+    ok( ( !$item->_is_visited() ), "Item is not visited at start" );     # TEST
+    is( $item->_num_subs_to_go(), 4,     "Num subs to go at start" );    # TEST
+    is( $item->_num_subs(),       4,     "Num subs at start" );          # TEST
+    is( $item->_visit(),          "ONE", "First sub" );                  # TEST
+    is( $item->_num_subs_to_go(), 3,     "Num subs to go after first visit" )
+        ;                                                                # TEST
+    ok( $item->_is_visited(), "Item is visited after first visit" );     # TEST
+    is( $item->_visit(), "Two", "Second sub" );                          # TEST
+    ok( $item->_is_visited(), "Item is visited after second visit" );    # TEST
+    is( $item->_num_subs_to_go(), 2,        "Num subs to go (3)" );      # TEST
+    is( $item->_num_subs(),       4,        "Num subs at middle" );      # TEST
+    is( $item->_visit(),          "threE3", "Third sub" );               # TEST
+    ok( $item->_is_visited(), "Item is visited after third visit" );     # TEST
+    is( $item->_num_subs_to_go(), 1,     "Num subs to go (4)" );         # TEST
+    is( $item->_visit(),          "4.0", "Fourth sub" );                 # TEST
+    ok( $item->_is_visited(), "Item is visited after fourth visit" );    # TEST
+    is( $item->_num_subs_to_go(), 0, "Num subs to go (end)" );           # TEST
+    ok( ( !defined( $item->_visit() ) ), "No more subs" );               # TEST
+    ok( $item->_is_visited(), "Item is visited after no more subs" );    # TEST
+    is( $item->_num_subs_to_go(), 0, "Num subs to go (end 2)" );         # TEST
+    is( $item->_num_subs(),       4, "Num subs at finish" );             # TEST
+    ok( ( !defined( $item->_visit() ) ), "No more subs (2)" );           # TEST
+    is( $item->_node(), "Hello", "item->_node() is correct" );           # TEST
 
 }

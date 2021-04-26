@@ -580,72 +580,6 @@ apc_cursor_get_visible( Handle self)
 	return X(self)-> flags. cursor_visible;
 }
 
-/* File */
-
-void
-prima_rebuild_watchers( void)
-{
-	int i;
-	PFile f;
-
-	FD_ZERO( &guts.read_set);
-	FD_ZERO( &guts.write_set);
-	FD_ZERO( &guts.excpt_set);
-	FD_SET( guts.connection, &guts.read_set);
-	guts.max_fd = guts.connection;
-	for ( i = 0; i < guts.files->count; i++) {
-		f = (PFile)list_at( guts.files,i);
-		if ( f-> eventMask & feRead) {
-			FD_SET( f->fd, &guts.read_set);
-			if ( f->fd > guts.max_fd)
-				guts.max_fd = f->fd;
-		}
-		if ( f-> eventMask & feWrite) {
-			FD_SET( f->fd, &guts.write_set);
-			if ( f->fd > guts.max_fd)
-				guts.max_fd = f->fd;
-		}
-		if ( f-> eventMask & feException) {
-			FD_SET( f->fd, &guts.excpt_set);
-			if ( f->fd > guts.max_fd)
-				guts.max_fd = f->fd;
-		}
-	}
-}
-
-Bool
-apc_file_attach( Handle self)
-{
-	if ( PFile(self)->fd >= FD_SETSIZE ) return false;
-
-	if ( list_index_of( guts.files, self) >= 0) {
-		prima_rebuild_watchers();
-		return true;
-	}
-	protect_object( self);
-	list_add( guts.files, self);
-	prima_rebuild_watchers();
-	return true;
-}
-
-Bool
-apc_file_detach( Handle self)
-{
-	int i;
-	if (( i = list_index_of( guts.files, self)) >= 0) {
-		list_delete_at( guts.files, i);
-		unprotect_object( self);
-		prima_rebuild_watchers();
-	}
-	return true;
-}
-
-Bool
-apc_file_change_mask( Handle self)
-{
-	return apc_file_attach( self);
-}
-
 int
 apc_pointer_get_state( Handle self)
 {
@@ -868,6 +802,7 @@ apc_show_message( const char * message, Bool utf8)
 		int max;
 
 		apc_sys_get_msg_font( &f);
+		f. pitch = fpDefault;
 		prima_core_font_pick( nilHandle, &f, &f);
 		cf = prima_find_known_font( &f, false, false);
 		if ( !cf || !cf-> id) {
@@ -1161,7 +1096,6 @@ apc_sys_get_value( int v)  /* XXX one big XXX */
 	case svCanUTF8_Output:       return 1;
 	case svCompositeDisplay:     return is_composite_display();
 	case svLayeredWidgets:       return guts. argb_visual. visual != NULL;
-	case svDWM:                  return 0;
 	case svFixedPointerSize:     return
 #ifdef HAVE_X11_XCURSOR_XCURSOR_H
 		0
@@ -1386,60 +1320,6 @@ apc_dl_export(char *path)
 	return true;
 }
 
-PList
-apc_getdir( const char *dirname, Bool is_utf8)
-{
-	DIR *dh;
-	struct dirent *de;
-	PList dirlist = nil;
-	char *type;
-	char path[ 2048];
-	struct stat s;
-
-	if (( dh = opendir( dirname)) && (dirlist = plist_create( 50, 50))) {
-		while (( de = readdir( dh))) {
-			list_add( dirlist, (Handle)duplicate_string( de-> d_name));
-#if defined(DT_REG) && defined(DT_DIR)
-			switch ( de-> d_type) {
-			case DT_FIFO:	type = "fifo";	break;
-			case DT_CHR:	type = "chr";	break;
-			case DT_DIR:	type = "dir";	break;
-			case DT_BLK:	type = "blk";	break;
-			case DT_REG:	type = "reg";	break;
-			case DT_LNK:	type = "lnk";	break;
-			case DT_SOCK:	type = "sock";	break;
-#ifdef DT_WHT
-			case DT_WHT:	type = "wht";	break;
-#endif
-			default:
-#endif
-								snprintf( path, 2047, "%s/%s", dirname, de-> d_name);
-								type = nil;
-								if ( stat( path, &s) == 0) {
-									switch ( s. st_mode & S_IFMT) {
-									case S_IFIFO:        type = "fifo";  break;
-									case S_IFCHR:        type = "chr";   break;
-									case S_IFDIR:        type = "dir";   break;
-									case S_IFBLK:        type = "blk";   break;
-									case S_IFREG:        type = "reg";   break;
-									case S_IFLNK:        type = "lnk";   break;
-									case S_IFSOCK:       type = "sock";  break;
-#ifdef S_IFWHT
-									case S_IFWHT:        type = "wht";   break;
-#endif
-									}
-								}
-								if ( !type)     type = "unknown";
-#if defined(DT_REG) && defined(DT_DIR)
-			}
-#endif
-			list_add( dirlist, (Handle)duplicate_string( type));
-		}
-		closedir( dh);
-	}
-	return dirlist;
-}
-
 void
 prima_rect_union( XRectangle *t, const XRectangle *s)
 {
@@ -1537,11 +1417,6 @@ prima_char2wchar( XChar2b * dest, char * src, int lim)
 	}
 }
 
-char *
-apc_last_error( void )
-{
-	return NULL;
-}
 /* printer stubs */
 
 Bool   apc_prn_create( Handle self) { return false; }
@@ -1578,5 +1453,11 @@ apc_prn_enumerate( Handle self, int * count)
 {
 	*count = 0;
 	return nil;
+}
+
+char *
+apc_last_error( void )
+{
+	return NULL;
 }
 

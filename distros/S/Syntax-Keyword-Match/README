@@ -30,6 +30,17 @@ DESCRIPTION
     which is also experimental. No API or compatbility guarantees are made
     at this time.
 
+Experimental Features
+
+    Some of the features of this module are currently marked as
+    experimental (even within the context that the module itself is
+    experimental). They will provoke warnings in the experimental category,
+    unless silenced.
+
+       use Syntax::Keyword::Match qw( try :experimental(dispatch) );
+    
+       use Syntax::Keyword::Match qw( try :experimental );  # all of the above
+
 KEYWORDS
 
  match
@@ -115,6 +126,13 @@ KEYWORDS
           case($condition) { ... }
           ...
        }
+
+    The :experimental(dispatch) feature selects a more efficient handling
+    of sequences of multiple case blocks with constant expressions. This
+    handling is implemented with a custom operator that will entirely
+    confuse modules like B::Deparse or optree inspectors like coverage
+    tools so is not selected by default, but can be enabled for extra
+    performance in critical sections.
 
  default
 

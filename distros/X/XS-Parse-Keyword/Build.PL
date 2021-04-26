@@ -7,7 +7,7 @@ use Module::Build::with::XSTests;
 my $build = Module::Build::with::XSTests->new(
    module_name => 'XS::Parse::Keyword',
    requires => {
-      'perl' => '5.016', # PL_keyword_plugin, pad_alloc()
+      'perl' => '5.014', # PL_keyword_plugin
    },
    test_requires => {
       'Test::Fatal' => 0,

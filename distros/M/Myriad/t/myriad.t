@@ -66,18 +66,18 @@ subtest "Myriad attributes setting tests" => sub {
 
     # RPC
     my $rpc = $myriad->rpc;
-    isa_ok($metaclass->get_slot('$rpc')->value($myriad), 'Myriad::RPC::Implementation::Perl', 'Myriad RPC is set');
+    isa_ok($metaclass->get_slot('$rpc')->value($myriad), 'Myriad::RPC::Implementation::Memory', 'Myriad RPC is set');
     my $current_notifiers = loop_notifiers($myriad->loop);
-    ok($current_notifiers->{'Myriad::RPC::Implementation::Perl'}, 'RPC is added to loop');
+    ok($current_notifiers->{'Myriad::RPC::Implementation::Memory'}, 'RPC is added to loop');
     my $shutdown_tasks = $metaclass->get_slot('$shutdown_tasks')->value($myriad);
     isa_ok($shutdown_tasks->[-1], 'CODE', 'Added to shutdown tasks');
     is(@$shutdown_tasks, 2, 'Two added shutdown tasks');
 
     # RPC Client
     my $rpc_client = $myriad->rpc_client;
-    isa_ok($rpc_client, 'Myriad::RPC::Client::Implementation::Perl', 'Myriad RPC Client is set');
+    isa_ok($rpc_client, 'Myriad::RPC::Client::Implementation::Memory', 'Myriad RPC Client is set');
     $current_notifiers = loop_notifiers($myriad->loop);
-    ok($current_notifiers->{'Myriad::RPC::Client::Implementation::Perl'}, 'RPC Cleint is added to loop');
+    ok($current_notifiers->{'Myriad::RPC::Client::Implementation::Memory'}, 'RPC Cleint is added to loop');
 
     # HTTP
     my $http = $myriad->http;
@@ -87,13 +87,13 @@ subtest "Myriad attributes setting tests" => sub {
 
     # Subscription
     my $subscription = $myriad->subscription;
-    isa_ok($metaclass->get_slot('$subscription')->value($myriad), 'Myriad::Subscription::Implementation::Perl', 'Myriad Subscription is set');
+    isa_ok($metaclass->get_slot('$subscription')->value($myriad), 'Myriad::Subscription::Implementation::Memory', 'Myriad Subscription is set');
     $current_notifiers = loop_notifiers($myriad->loop);
-    ok($current_notifiers->{'Myriad::Subscription::Implementation::Perl'}, 'Subscription is added to loop');
+    ok($current_notifiers->{'Myriad::Subscription::Implementation::Memory'}, 'Subscription is added to loop');
 
     # Storage
     my $storage = $myriad->storage;
-    isa_ok($metaclass->get_slot('$storage')->value($myriad), 'Myriad::Storage::Implementation::Perl', 'Myriad Storage is set');
+    isa_ok($metaclass->get_slot('$storage')->value($myriad), 'Myriad::Storage::Implementation::Memory', 'Myriad Storage is set');
 
     # Registry and ryu
     isa_ok($myriad->registry, 'Myriad::Registry', 'Myriad::Registry is set');

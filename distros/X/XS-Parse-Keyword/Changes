@@ -1,4 +1,11 @@
 Revision history for XS-Parse-Keyword
 
+0.02    2021-04-21
+        [CHANGES]
+         * Back-compat to perl 5.14
+         * Avoid passing user strings directly to printf, by emitting
+           XPK_FAILURE using croak("%s", str)
+         * Various documentation wording improvements
+
 0.01    2021-04-14
         First version, released on an unsuspecting world.

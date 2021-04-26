@@ -6,3 +6,4 @@ README
 t/bw.t
 t/large_file.t
 META.yml                                 Module meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

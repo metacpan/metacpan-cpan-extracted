@@ -4,8 +4,8 @@ use warnings;
 use utf8;
 
 package Neo4j::Driver;
-# ABSTRACT: Perl Neo4j driver for Bolt and HTTP
-$Neo4j::Driver::VERSION = '0.22';
+# ABSTRACT: Neo4j community graph database driver for Bolt and HTTP
+$Neo4j::Driver::VERSION = '0.23';
 
 use Carp qw(croak);
 
@@ -165,11 +165,11 @@ __END__
 
 =head1 NAME
 
-Neo4j::Driver - Perl Neo4j driver for Bolt and HTTP
+Neo4j::Driver - Neo4j community graph database driver for Bolt and HTTP
 
 =head1 VERSION
 
-version 0.22
+version 0.23
 
 =head1 SYNOPSIS
 

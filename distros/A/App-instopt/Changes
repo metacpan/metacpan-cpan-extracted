@@ -1,3 +1,19 @@
+0.019   2021-04-24  Released-By: PERLANCAR; Urgency: medium
+
+	- [subcommand cleanup-install-dir] [bugfix] Old hash key names were
+          still used.
+
+	- [doc] Document instopt.version in Files.
+
+	- [ux] Tweak log statements' levels.
+
+
+0.018   2021-04-22  Released-By: PERLANCAR; Urgency: high
+
+	- [bugfix] installed_versions is only an array of version numbers,
+	  not a hash of arch => versions.
+
+
 0.017   2021-04-03  Released-By: PERLANCAR; Urgency: medium
 
 	- [bugfix] Didn't access the correct data structure element.

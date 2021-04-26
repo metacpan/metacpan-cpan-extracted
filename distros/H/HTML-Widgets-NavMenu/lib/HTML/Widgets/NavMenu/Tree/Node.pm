@@ -1,5 +1,5 @@
 package HTML::Widgets::NavMenu::Tree::Node;
-$HTML::Widgets::NavMenu::Tree::Node::VERSION = '1.0801';
+$HTML::Widgets::NavMenu::Tree::Node::VERSION = '1.0900';
 use strict;
 use warnings;
 
@@ -10,7 +10,7 @@ __PACKAGE__->mk_acc_ref(
         qw(
             CurrentlyActive expanded hide host li_id role rec_url_type
             separator show_always skip subs text title url url_is_abs url_type
-            )
+        )
     ]
 );
 
@@ -165,7 +165,7 @@ HTML::Widgets::NavMenu::Tree::Node - an iterator for HTML.
 
 =head1 VERSION
 
-version 1.0801
+version 1.0900
 
 =head1 SYNOPSIS
 

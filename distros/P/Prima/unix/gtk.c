@@ -309,6 +309,8 @@ do_events(gpointer data)
 	return gtk_dialog != NULL;
 }
 
+static int ignore_errors(Display *d, XErrorEvent *ev) { return 0; }
+
 static char *
 gtk_openfile( Bool open)
 {
@@ -317,6 +319,10 @@ gtk_openfile( Bool open)
 	int stage = 0;
 
 	if ( gtk_dialog) return NULL; /* we're not reentrant */
+
+	XFlush(DISP);
+	XCHECKPOINT;
+	XSetErrorHandler(ignore_errors);
 
 	gtk_dialog = gtk_file_chooser_dialog_new (
 		gtk_dialog_title_ptr ?
@@ -469,6 +475,10 @@ gtk_openfile( Bool open)
 	gtk_dialog = NULL;
 
 	while ( gtk_events_pending()) gtk_main_iteration();
+
+	XSync(DISP, false);
+	XCHECKPOINT;
+	XSetErrorHandler(guts.main_error_handler);
 
 	return result;
 }
@@ -636,7 +646,7 @@ prima_gtk_application_get_bitmap( Handle self, Handle image, int x, int y, int x
 	}
 
 	/* load */
-	codecs = apc_img_load( image, filename, NULL, NULL, NULL);
+	codecs = apc_img_load( image, filename, false, NULL, NULL, NULL);
 	unlink( filename );
 	if ( !codecs ) {
 		Mdebug("error loading png back\n");

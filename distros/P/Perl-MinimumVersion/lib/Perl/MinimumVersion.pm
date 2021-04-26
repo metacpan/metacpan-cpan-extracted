@@ -1,5 +1,5 @@
 package Perl::MinimumVersion;
-$Perl::MinimumVersion::VERSION = '1.38';
+$Perl::MinimumVersion::VERSION = '1.40';
 =pod
 
 =head1 NAME
@@ -51,9 +51,9 @@ use List::Util          1.20    qw(max first);
 use Params::Util        0.25    ('_INSTANCE', '_CLASS');
 use PPI::Util                   ('_Document');
 use PPI                 1.215   ();
-use Perl::Critic::Utils 1.104   qw{
+use PPIx::Utils                 qw{
 	:classification
-	:ppi
+	:traversal
 };
 use PPIx::Regexp        0.033;
 use Perl::MinimumVersion::Reason ();
@@ -122,7 +122,7 @@ BEGIN {
 	);
 	@CHECKS_RV = ( #subs that return version
 	    '_feature_bundle','_regex','_each_argument','_binmode_2_arg',
-        '_scheduled_blocks',
+        '_scheduled_blocks', '_experimental_bundle'
 	);
 
 	# Predefine some indexes needed by various check methods
@@ -367,7 +367,7 @@ The C<minimum_syntax_version> method will explicitly test only the
 Document's syntax to determine it's minimum version, to the extent
 that this is possible.
 
-It takes an optional parameter of a L<version> object defining the
+It takes an optional parameter of a L<version> object defining
 the lowest known current value. For example, if it is already known
 that it must be 5.006 or higher, then you can provide a param of
 qv(5.006) and the method will not run any of the tests below this
@@ -375,7 +375,7 @@ version. This should provide dramatic speed improvements for
 large and/or complex documents.
 
 The limitations of parsing Perl mean that this method may provide
-artifically low results, but should not artificially high results.
+artificially low results, but should not artificially high results.
 
 For example, if C<minimum_syntax_version> returned 5.006, you can be
 confident it will not run on anything lower, although there is a chance
@@ -578,6 +578,8 @@ sub version_markers {
 
 my %feature =
 (
+    'say'               => '5.10',
+    'smartmatch'        => '5.10',
     'state'             => '5.10',
     'switch'            => '5.10',
     'unicode_strings'   => '5.14',
@@ -587,6 +589,14 @@ my %feature =
     'array_base'        => '5.16', #defined only in 5.16
     'fc'                => '5.16',
     'lexical_subs'      => '5.18',
+    'postderef'         => '5.20',
+    'postderef_qq'      => '5.20',
+    'signatures'        => '5.20',
+    'refaliasing'       => '5.22',
+    'bitwise'           => '5.22',
+    'declared_refs'     => '5.26',
+    'isa'               => '5.32',
+    'indirect'          => '5.32', #defined only in 5.32
 );
 my $feature_regexp = join('|', keys %feature);
 
@@ -612,6 +622,58 @@ sub _feature_bundle {
 		return '';
 	} );
 	return (defined($version)?"$version.0":undef, $obj);
+}
+
+# list copied from experimental.pm v0.021 itself
+my %experimental =
+(
+    array_base      => '5',
+    autoderef       => '5.14',
+    bitwise         => '5.22',
+    const_attr      => '5.22',
+    current_sub     => '5.16',
+    declared_refs   => '5.26',
+    evalbytes       => '5.16',
+    fc              => '5.16',
+    isa             => '5.32',
+    lexical_topic   => '5.10',
+    lexical_subs    => '5.18',
+    postderef       => '5.20',
+    postderef_qq    => '5.20',
+    refaliasing     => '5.22',
+    regex_sets      => '5.18',
+    say             => '5.10',
+    smartmatch      => '5.10',
+    signatures      => '5.20',
+    state           => '5.10',
+    switch          => '5.10',
+    unicode_eval    => '5.16',
+    unicode_strings => '5.12',
+);
+my $experimental_regexp = join('|', keys %experimental);
+sub _experimental_bundle {
+    my ($version, $obj);
+
+    shift->Document->find( sub {
+        return '' unless $_[1]->isa('PPI::Statement::Include') 
+                     and $_[1]->pragma eq 'experimental';
+
+        my @child = $_[1]->schildren;
+        my @args = @child[1..$#child]; # skip 'use', 'experimental' and ';'
+        foreach my $arg (@args) {
+            my $v = 0;
+            $v = $1 if ($arg->content =~ /:(5\.\d+)(?:\.\d+)?/);
+            $v = max($v, $experimental{$1}) if ($arg->content =~ /\b($experimental_regexp)\b/);
+
+            if ($v and $v > ($version || 0) ) {
+                $version = $v;
+                $obj = $_[1];
+            }
+        }
+        return '';
+    } );
+
+    return (defined($version)?"$version.0":undef, $obj);
 }
 
 my %SCHEDULED_BLOCK =
@@ -1115,7 +1177,7 @@ sub _perl_5005_pragmas {
 }
 
 # A number of modules are highly indicative of using techniques
-# that are themselves version-dependant.
+# that are themselves version-dependent.
 sub _perl_5005_modules {
 	shift->Document->find_first( sub {
 		$_[1]->isa('PPI::Statement::Include')

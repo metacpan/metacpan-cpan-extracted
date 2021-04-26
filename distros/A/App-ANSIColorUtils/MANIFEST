@@ -24,6 +24,7 @@ script/show-ansi-color-table
 script/show-assigned-rgb-colors
 script/show-colors
 script/show-colors-from-scheme
+script/show-colors-from-theme
 script/show-rand-rgb-colors
 script/show-text-using-color-gradation
 t/00-compile.t

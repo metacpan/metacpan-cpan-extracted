@@ -1,6 +1,9 @@
 Revision history for Term::Form
 
 
+0.532   2021-04-25
+        - Replace 'croak' with 'die' and 'carp' with 'warn'.
+
 0.531   2021-03-21
         - Experimental option 'section_separators'.
 

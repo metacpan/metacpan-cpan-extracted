@@ -55,14 +55,15 @@ NAME
     Acme::CPANModules::* distribution
 
 VERSION
-    This document describes version 0.006 of
+    This document describes version 0.007 of
     Pod::Weaver::Plugin::Acme::CPANModules (from Perl distribution
-    Pod-Weaver-Plugin-Acme-CPANModules), released on 2020-12-27.
+    Pod-Weaver-Plugin-Acme-CPANModules), released on 2021-02-18.
 
 SYNOPSIS
     In your weaver.ini:
 
      [-Acme::CPANModules]
+     ;entry_description_code = "Website URL: <" . $_->{website_url} . ">\n\n";
 
 DESCRIPTION
     This plugin is used when building Acme::CPANModules::* distributions. It
@@ -75,6 +76,13 @@ DESCRIPTION
 
         e.g. Acme::CPANModules (the convention/standard), cpanmodules (the
         CLI tool), etc.
+
+CONFIGURATION
+  entry_description_code
+    Optional. Perl code to produce the description POD. If not specified,
+    will use default template for the description POD, i.e. entry's
+    "description" property, plus "rating", "alternative_modules" if
+    available.
 
 HOMEPAGE
     Please visit the project's homepage at
@@ -101,7 +109,8 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2020, 2019, 2018 by perlancar@cpan.org.
+    This software is copyright (c) 2021, 2020, 2019, 2018 by
+    perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

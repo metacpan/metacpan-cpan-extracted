@@ -33,7 +33,7 @@ recommends:
   Text::Table::Org: '0'
   Text::Table::Paragraph: '0'
   Text::Table::TSV: '0'
-  Text::Table::Tiny: '0'
+  Text::Table::TickitWidget: '0'
   Text::Table::TinyBorderStyle: '0'
   Text::Table::TinyColor: '0'
   Text::Table::TinyColorWide: '0'
@@ -50,7 +50,7 @@ resources:
   bugtracker: https://github.com/perlancar/perl-Text-Table-Any/issues
   homepage: https://metacpan.org/release/Text-Table-Any
   repository: git://github.com/perlancar/perl-Text-Table-Any.git
-version: '0.102'
+version: '0.104'
 x_Dist_Zilla:
   perl:
     version: '5.030000'
@@ -420,6 +420,10 @@ x_Dist_Zilla:
           type: recommends
       name: RuntimeRecommends
       version: '6.012'
+    -
+      class: Dist::Zilla::Plugin::Extras
+      name: 'lint-prereqs / assume-provided'
+      version: '0.03'
     -
       class: Dist::Zilla::Plugin::Prereqs
       config:

@@ -1,3 +1,7 @@
+v1.23.14 Mon, 26 Apr 2021 14:58:50 +0200 moocow
+	+ skip some b(and|or)over type-check tests to avoid test failures for PDL >= v2.039
+	  - CCS implementations are returning 'indx' type here, dense PDL versions are giving 'longlong' for input type=double
+
 v1.23.13 Thu, 19 Nov 2020 06:54:54 +0100 moocow
 	+ fix RT bug #133772, reported by Sebastiaan Couwenberg (spelling error in POD)
 

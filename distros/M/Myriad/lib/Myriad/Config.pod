@@ -35,6 +35,10 @@ The C<%FULLNAME_FOR> hash maps commandline shortcuts for common parameters.
 
 A registry of configs defined by the services using the C<config > helper.
 
+=head2 ACTIVE_SERVICES_CONFIG
+
+A collection of L<Ryu::Observable> to notify services about updates on the configs values
+
 =head2 parse_subargs
 
 A helper to resolve the correct service config

@@ -1,6 +1,6 @@
 package MARC::Moose::Lint::Checker;
 # ABSTRACT: A Moose::Role to 'lint' biblio record
-$MARC::Moose::Lint::Checker::VERSION = '1.0.42';
+$MARC::Moose::Lint::Checker::VERSION = '1.0.43';
 use Moose::Role;
 
 
@@ -24,7 +24,7 @@ MARC::Moose::Lint::Checker - A Moose::Role to 'lint' biblio record
 
 =head1 VERSION
 
-version 1.0.42
+version 1.0.43
 
 =head1 DESCRIPTION
 
@@ -104,7 +104,7 @@ Frédéric Demians <f.demians@tamil.fr>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by Frédéric Demians.
+This software is copyright (c) 2021 by Frédéric Demians.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

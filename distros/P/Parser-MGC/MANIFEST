@@ -4,6 +4,7 @@ examples/eval-expr.pl
 examples/LICENSE
 examples/parse-bencode.pl
 examples/parse-dict.pl
+examples/parse-jsonlike.pl
 examples/parse-perlstr.pl
 examples/parse-pod.pl
 examples/parse-xml.pl
@@ -43,6 +44,7 @@ t/32exception.t
 t/90ex_bencode.t
 t/90ex_dict.t
 t/90ex_expr.t
+t/90ex_jsonlike.t
 t/90ex_pod.t
 t/90ex_synopsis.t
 t/90ex_xml.t

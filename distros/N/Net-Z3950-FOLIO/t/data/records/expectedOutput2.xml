@@ -37,6 +37,7 @@
           <renewable value="" />
           <onHold value="" />
           <enumAndChron>3 March</enumAndChron>
+          <temporaryLocation>Online Library Resources</temporaryLocation>
         </circulation>
       </circulations>
     </holding>

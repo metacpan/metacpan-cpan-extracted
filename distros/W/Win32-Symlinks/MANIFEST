@@ -1,0 +1,13 @@
+Changes
+lib/Win32/Symlinks.pm
+lib/Win32/Symlinks.xs
+Makefile.PL
+MANIFEST
+README
+t/00-load.t
+t/01-run.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

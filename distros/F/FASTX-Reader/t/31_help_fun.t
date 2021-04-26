@@ -5,7 +5,8 @@ use Test::More;
 use FASTX::ScriptHelper;
 use File::Temp qw/ tempfile tempdir /;
 use Data::Dumper;
-say STDERR "Requesting unpeneded temp file:";
+use File::Spec;
+
 my (undef, $log_filename) = tempfile('HELPERTEST_XXXXXXXX', OPEN => 0);
 
 my %opt = (
@@ -22,7 +23,25 @@ eval {
 };
 ok($@, 'Invalid option: Error managed');
 
-$script->fu_printfasta('Test', undef, 'CAGATA');
-$script->fu_printfasta('Test',undef, 'CAGATA', 'IIIIII');
+my $cpus = $script->cpu_count();
+ok($cpus > 0, "CPUs found: $cpus > 0");
+eval {
+  $script->writelog('Log message');
+};
+ok($@ eq '', "Log written without errors to $log_filename: $@");
 
+do {
+    local *STDOUT;
+
+    # redirect STDOUT to log.txt
+    open (STDOUT, '>>', '/dev/null');
+    eval {
+      $script->fu_printfasta('Test', undef, 'CAGATA');
+      $script->fu_printfasta('Test',undef, 'CAGATA', 'IIIIII');
+    };
+    ok($@ eq '', "Sequences printed to /dev/null $@");
+
+};
+
+unlink "$log_filename";
 done_testing();

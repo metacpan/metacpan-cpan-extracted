@@ -1,5 +1,8 @@
 Revision history for PICA::Data
 
+1.17 2021-04-23T08:16:14Z
+    - Support checking and writing field annotations (#86)
+
 1.16 2021-03-02T16:19:47Z
     - Move clean_pica to PICA::Schema and add add option ignore_subfields
     - Extend method/function field_identifier to occurrence ranges

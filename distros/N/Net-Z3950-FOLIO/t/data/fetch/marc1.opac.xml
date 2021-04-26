@@ -1,0 +1,188 @@
+<opacRecord>
+  <bibliographicRecord>
+    <record
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.loc.gov/MARC21/slim http://www.loc.gov/standards/marcxml/schema/MARC21slim.xsd"
+        xmlns="http://www.loc.gov/MARC21/slim">
+    
+      <leader>01936cas a2200457 a 4500</leader>
+      <controlfield tag="001">1099086</controlfield>
+      <controlfield tag="003">ICU</controlfield>
+      <controlfield tag="005">X/Y0X/Y807X/YX/YX/Y7X/Y8X/Y6.9</controlfield>
+      <controlfield tag="008">[9]0[1]0[1]6d[1][9]8[5]200uilugr        s0    0eng u</controlfield>
+      <datafield tag="010" ind1=" " ind2=" ">
+        <subfield code="a">87644138</subfield>
+      </datafield>
+      <datafield tag="035" ind1=" " ind2=" ">
+        <subfield code="a">(ICU)BID13370939</subfield>
+      </datafield>
+      <datafield tag="035" ind1=" " ind2=" ">
+        <subfield code="a">(OCoLC)16512509</subfield>
+      </datafield>
+      <datafield tag="040" ind1=" " ind2=" ">
+        <subfield code="a">DLC</subfield>
+        <subfield code="c">DLC</subfield>
+        <subfield code="d">ICU</subfield>
+      </datafield>
+      <datafield tag="042" ind1=" " ind2=" ">
+        <subfield code="a">lc</subfield>
+      </datafield>
+      <datafield tag="043" ind1=" " ind2=" ">
+        <subfield code="a">n-us-il</subfield>
+      </datafield>
+      <datafield tag="050" ind1="0" ind2="0">
+        <subfield code="a">TD224.I3</subfield>
+        <subfield code="b">I58b</subfield>
+      </datafield>
+      <datafield tag="082" ind1="0" ind2="0">
+        <subfield code="a">363.7/39456/09773</subfield>
+        <subfield code="2">19</subfield>
+      </datafield>
+      <datafield tag="245" ind1="0" ind2="0">
+        <subfield code="a">Illinois w*ter qu*lity report.</subfield>
+      </datafield>
+      <datafield tag="260" ind1=" " ind2=" ">
+        <subfield code="a">Springfield :</subfield>
+        <subfield code="b">Illinois Environmental Protection Agency, Division of Water Pollution Control, Planning Section,</subfield>
+        <subfield code="c">1985-</subfield>
+      </datafield>
+      <datafield tag="300" ind1=" " ind2=" ">
+        <subfield code="a">v. :</subfield>
+        <subfield code="b">ill. (some col.) ;</subfield>
+        <subfield code="c">28 cm.</subfield>
+      </datafield>
+      <datafield tag="310" ind1=" " ind2=" ">
+        <subfield code="a">Annual,</subfield>
+        <subfield code="b">&lt;2002&gt;-</subfield>
+      </datafield>
+      <datafield tag="321" ind1=" " ind2=" ">
+        <subfield code="a">Biennial,</subfield>
+        <subfield code="b">1984/1985-</subfield>
+      </datafield>
+      <datafield tag="362" ind1="0" ind2=" ">
+        <subfield code="a">1984/1985-</subfield>
+      </datafield>
+      <datafield tag="550" ind1=" " ind2=" ">
+        <subfield code="a">Issued by: Illinois. Division of Water Pollution Control. Planning Section, 1984/85-1988/89; Illinois. Bureau of Water, 1990/91-</subfield>
+      </datafield>
+      <datafield tag="650" ind1=" " ind2="0">
+        <subfield code="a">Water quality</subfield>
+        <subfield code="z">Illinois</subfield>
+        <subfield code="v">Periodicals.</subfield>
+      </datafield>
+      <datafield tag="650" ind1=" " ind2="0">
+        <subfield code="a">Water</subfield>
+        <subfield code="x">Pollution</subfield>
+        <subfield code="z">Illinois</subfield>
+        <subfield code="v">Periodicals.</subfield>
+      </datafield>
+      <datafield tag="650" ind1=" " ind2="7">
+        <subfield code="a">Water</subfield>
+        <subfield code="x">Pollution.</subfield>
+        <subfield code="2">fast</subfield>
+        <subfield code="0">http://id.worldcat.org/fast/fst01171279</subfield>
+      </datafield>
+      <datafield tag="650" ind1=" " ind2="7">
+        <subfield code="a">Water quality.</subfield>
+        <subfield code="2">fast</subfield>
+        <subfield code="0">http://id.worldcat.org/fast/fst01171832</subfield>
+      </datafield>
+      <datafield tag="651" ind1=" " ind2="7">
+        <subfield code="a">Illinois.</subfield>
+        <subfield code="2">fast</subfield>
+        <subfield code="0">http://id.worldcat.org/fast/fst01205143</subfield>
+      </datafield>
+      <datafield tag="655" ind1=" " ind2="7">
+        <subfield code="a">Periodicals.</subfield>
+        <subfield code="2">fast</subfield>
+        <subfield code="0">http://id.worldcat.org/fast/fst01411641</subfield>
+      </datafield>
+      <datafield tag="710" ind1="1" ind2=" ">
+        <subfield code="a">Illinois.</subfield>
+        <subfield code="b">Division of Water Pollution Control.</subfield>
+        <subfield code="b">Planning Section.</subfield>
+      </datafield>
+      <datafield tag="710" ind1="1" ind2=" ">
+        <subfield code="a">Illinois.</subfield>
+        <subfield code="b">Environmental Protection Agency.</subfield>
+        <subfield code="b">Bureau of Water</subfield>
+      </datafield>
+      <datafield tag="780" ind1="0" ind2="0">
+        <subfield code="a">Illinois. Division of Water Pollution Control. Monitoring Unit.</subfield>
+        <subfield code="t">Illinois water quality report</subfield>
+        <subfield code="w">(DLC) 87644157</subfield>
+        <subfield code="w">(OCoLC)12630732</subfield>
+        <subfield code="w">(ICU)1120972</subfield>
+      </datafield>
+      <datafield tag="785" ind1="0" ind2="0">
+        <subfield code="t">Illinois integrated water quality report and section 303(d) list ...</subfield>
+        <subfield code="w">(ICU)6816045</subfield>
+      </datafield>
+      <datafield tag="850" ind1=" " ind2=" ">
+        <subfield code="a">DLC</subfield>
+      </datafield>
+      <datafield tag="856" ind1="4" ind2="1">
+        <subfield code="u">http://www.epa.state.il.us/water/water-quality/</subfield>
+      </datafield>
+      <datafield tag="900" ind1=" " ind2=" ">
+        <subfield code="a">ICU:91175093</subfield>
+        <subfield code="b">OST:72</subfield>
+        <subfield code="c">HST:500</subfield>
+        <subfield code="d">Copy:1</subfield>
+      </datafield>
+      <datafield tag="900" ind1=" " ind2=" ">
+        <subfield code="a">o1019373x</subfield>
+        <subfield code="b">OST:72</subfield>
+        <subfield code="d">Copy:1</subfield>
+      </datafield>
+      <datafield tag="903" ind1=" " ind2=" ">
+        <subfield code="a">Hathi</subfield>
+        <subfield code="r">ETAS</subfield>
+      </datafield>
+      <datafield tag="999" ind1="f" ind2="f">
+        <subfield code="i">4b993242-9221-5113-8135-620b27f6cdf9</subfield>
+        <subfield code="s">2a7da507-6bf7-55c3-8b82-3edf0e331a9f</subfield>
+      </datafield>
+      <datafield tag="952" ind1=" " ind2=" ">
+        <subfield code="t">3</subfield>
+        <subfield code="b">01234567890</subfield>
+        <subfield code="c">29</subfield>
+        <subfield code="e">42</subfield>
+        <subfield code="h">Main HD1131.S860 1989</subfield>
+        <subfield code="k">123</subfield>
+        <subfield code="l">UC/HP/ASR/SciASR</subfield>
+        <subfield code="m">abc</subfield>
+        <subfield code="v">1</subfield>
+        <subfield code="y">a, b</subfield>
+      </datafield>
+    </record>
+  </bibliographicRecord>
+  <holdings>
+    <holding>
+      <typeOfRecord>c</typeOfRecord>
+      <encodingLevel>7</encodingLevel>
+      <receiptAcqStatus>6</receiptAcqStatus>
+      <generalRetention>2</generalRetention>
+      <completeness>i</completeness>
+      <dateOfReport>   s0 </dateOfReport>
+      <nucCode>University of Chicago (UC)</nucCode>
+      <localLocation>Mansueto Library (ASR)</localLocation>
+      <shelvingLocation>UC/HP/ASR/SciASR</shelvingLocation>
+      <callNumber>G1046.C3 .L56 2009eb</callNumber>
+      <shelvingData>The Amazing Adventures of Captain Gladys &quot;Stoat&quot; Pamphlet and Her Intrepid Spaniel Stig Among the Giant Pygmies of Beccles</shelvingData>
+      <copyNumber>3</copyNumber>
+      <publicNote>All Cretans are liars</publicNote>
+      <circulations>
+        <circulation>
+          <availableNow value="0" />
+          <restrictions>Missing</restrictions>
+          <itemId>01234567890</itemId>
+          <renewable value="" />
+          <onHold value="" />
+          <enumAndChron>42 29</enumAndChron>
+          <temporaryLocation>Online Library Resources</temporaryLocation>
+        </circulation>
+      </circulations>
+    </holding>
+  </holdings>
+</opacRecord>

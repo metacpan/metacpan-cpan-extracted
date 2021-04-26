@@ -12,7 +12,7 @@ use Workflow::Validator::HasRequiredField;
 use Workflow::Factory qw( FACTORY );
 use Carp qw(croak);
 
-$Workflow::Action::VERSION = '1.53';
+$Workflow::Action::VERSION = '1.54';
 
 my @PROPS    = qw( name class description );
 my @INTERNAL = qw( _factory );
@@ -166,7 +166,7 @@ Workflow::Action - Base class for Workflow actions
 
 =head1 VERSION
 
-This documentation describes version 1.53 of this package
+This documentation describes version 1.54 of this package
 
 =head1 SYNOPSIS
 
@@ -291,7 +291,7 @@ You can validate it like this:
 
 Subclasses may override this method, but it's not very common. It is
 called when you invoke a method in your Workflow object that returns
-an Action object, for example, methods such as $wf->_get_action will
+an Action object, for example, methods such as $wf->get_action will
 call this method.
 
 B<Your action classes usually subclass directly from Workflow::Action
@@ -383,18 +383,6 @@ current $wf_state. Your milage may vary.
   1;
 
 
-=head2 Private Methods
-
-=head3 init( $workflow, \%params )
-
-init is called in conjuction with the overall workflow initialization.
-
-It sets up the necessary validators based on the on configured actions, input fields and required fields.
-
-=head3 add_field( @fields )
-
-Add one or more L<Workflow::Action::InputField>s to the action.
-
 =head3 required_fields()
 
 Return a list of L<Workflow::Action::InputField> objects that are required.
@@ -407,6 +395,19 @@ Return a list of L<Workflow::Action::InputField> objects that are optional.
 
 Return a list of all L<Workflow::Action::InputField> objects
 associated with this action.
+
+
+=head2 Private Methods
+
+=head3 init( $workflow, \%params )
+
+init is called in conjuction with the overall workflow initialization.
+
+It sets up the necessary validators based on the on configured actions, input fields and required fields.
+
+=head3 add_field( @fields )
+
+Add one or more L<Workflow::Action::InputField>s to the action.
 
 =head3 add_validators( @validator_config )
 

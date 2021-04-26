@@ -92,7 +92,6 @@ sub _initialize {
     my $watch_sr = \$watch;
 
     my $each_time = sub {
-        $$watch_sr->want_writeready(0);
 
         $n->($@) if !eval {
             if ( $dbus->initialize() ) {
@@ -101,7 +100,11 @@ sub _initialize {
                 $y->();
             }
             else {
-                $$watch_sr->want_writeready( $dbus->init_pending_send() );
+                my $write_yn = $dbus->init_pending_send();
+                $$watch_sr->configure(
+                    want_readready => !$write_yn,
+                    want_writeready => $write_yn,
+                );
             }
 
             1;
@@ -113,11 +116,20 @@ sub _initialize {
 
         on_read_ready => $each_time,
         on_write_ready => $each_time,
+
+        # It does work to set the read watcher right away, but only
+        # because poll(POLLIN) gives POLLHUP, which IO::Async interprets
+        # as read-ready. Let’s not depend on that.
+        want_readready => 0,
+        want_writeready => 0,
     );
 
     $loop->add($watch);
 
-    $each_time->();
+    # Defer in order to give the caller time to set up promises, etc.
+    $loop->later($each_time);
+
+    return;
 }
 
 sub _set_watches_and_create_messenger {
@@ -144,7 +156,7 @@ sub _set_watches_and_create_messenger {
 
     my $loop = $self->{'loop'};
 
-    $self->{'_stop_reading_cr'} = sub {
+    $self->{'_give_up_cr'} = sub {
         $loop->remove($$watch_sr);
         $$watch_sr = undef;
     };

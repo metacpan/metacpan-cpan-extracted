@@ -1,7 +1,7 @@
 package Perinci::Result::Format::Lite;
 
-our $DATE = '2020-11-12'; # DATE
-our $VERSION = '0.278'; # VERSION
+our $DATE = '2021-03-08'; # DATE
+our $VERSION = '0.279'; # VERSION
 
 use 5.010001;
 #IFUNBUILT
@@ -349,8 +349,8 @@ sub __gen_table {
             require Text::Table::Any;
             $fres = Text::Table::Any::table(rows=>$data, header_row=>$header_row, backend=>$backend);
         } else {
-            require Text::Table::Tiny;
-            $fres = Text::Table::Tiny::table(rows=>$data, header_row=>$header_row);
+            require Text::Table::Sprintf;
+            $fres = Text::Table::Sprintf::table(rows=>$data, header_row=>$header_row);
         }
         $fres .= "\n" unless $fres =~ /\R\z/ || !length($fres);
         $fres;
@@ -535,7 +535,7 @@ Perinci::Result::Format::Lite - Format enveloped result
 
 =head1 VERSION
 
-This document describes version 0.278 of Perinci::Result::Format::Lite (from Perl distribution Perinci-Result-Format-Lite), released on 2020-11-12.
+This document describes version 0.279 of Perinci::Result::Format::Lite (from Perl distribution Perinci-Result-Format-Lite), released on 2021-03-08.
 
 =head1 SYNOPSIS
 
@@ -553,7 +553,7 @@ This document describes version 0.278 of Perinci::Result::Format::Lite (from Per
 
 If this is set, will render text table using L<Text::Table::Any> (with
 C<backend> set to the value of this environment variable) instead of the default
-L<Text::Table::Tiny>. This is useful if you want to output text table in a
+L<Text::Table::Sprintf>. This is useful if you want to output text table in a
 different format, for example to generate Org tables (make sure
 L<Text::Table::Org> backend is already installed):
 
@@ -581,7 +581,7 @@ Source repository is at L<https://github.com/perlancar/perl-Perinci-Result-Forma
 
 =head1 BUGS
 
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Perinci-Result-Format-Lite>
+Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-Perinci-Result-Format-Lite/issues>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
@@ -599,7 +599,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020, 2018, 2017, 2016, 2015 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2020, 2018, 2017, 2016, 2015 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

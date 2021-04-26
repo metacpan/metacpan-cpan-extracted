@@ -1,5 +1,5 @@
 package Util::Medley::Cache;
-$Util::Medley::Cache::VERSION = '0.059';
+$Util::Medley::Cache::VERSION = '0.060';
 use Modern::Perl;
 use Moose;
 use namespace::autoclean;
@@ -19,7 +19,7 @@ Util::Medley::Cache - Simple caching mechanism.
 
 =head1 VERSION
 
-version 0.059
+version 0.060
 
 =cut
 
@@ -419,6 +419,56 @@ multi method get (Str $key, Str $ns?) {
 	return $self->get(%a);	
 }
 
+=head2 getExpiresAt
+
+Returns the expiration epoch for a given key.
+
+=over
+
+=item usage:
+
+ getExpiresAt($key, [$ns])
+ 
+ getExpiresAt(key => $key, [ns => $ns])
+ 
+=item args:
+
+=over
+
+=item key [Str]
+
+Unique identifier of the cache object.
+
+=item ns [Str]
+
+The cache namespace.  
+
+=back
+
+=back
+
+=cut
+
+multi method getExpiresAt (Str  :$key!,
+                           Str  :$ns) {
+
+    $ns = $self->_getNamespace($ns) if !$ns;
+
+    my $chi = $self->_getChiObject( ns => $ns );
+    return $chi->get_expires_at($key);
+}
+
+multi method getExpiresAt (Str $key,
+                           Str $ns?) {
+
+    my %a;
+    $a{key} = $key;
+    $a{ns} = $ns if $ns;
+    
+    return $self->getExpiresAt(%a);                           	
+}
+                           
+
 =head2 getKeys
 
 Returns a list of cache keys.
@@ -505,6 +555,32 @@ multi method getNamespaceDir (Str $ns?) {
 	return $self->getNamespaceDir(%a);
 }
 
+=head2 getNamespaces
+
+Gets a list of namespaces.
+
+=over
+
+=item usage:
+
+ getNamespaces()
+ 
+=back
+
+=cut
+
+method getNamespaces {
+
+    my %params = (
+        driver    => 'File',
+        root_dir  => $self->rootDir,
+    );
+
+    my $chi = CHI->new(%params);    
+    return $chi->get_namespaces;
+}
+   
+   
 =head2 set
 
 Commits the data object to the cache.
@@ -574,7 +650,9 @@ multi method set (Str $key,
     	
 	return $self->set(%a);            	
 }
-            	
+
+                     
+         	
 ############################################################
 
 method _getChiObject (Str :$ns) {

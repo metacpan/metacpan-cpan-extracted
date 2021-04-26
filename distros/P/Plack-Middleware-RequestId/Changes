@@ -1,23 +1,12 @@
-Revision history for Perl extension Plack::Middleware::RequestId
+## Plack::Middleware::RequestId commit log
 
-0.06    Thu Jun 30 11:36:48 JST 2016
-        - add new option no_http_header
+https://github.com/bayashi/Plack-Middleware-RequestId/commits/main
 
-0.05    Sat May 28 15:02:39 JST 2016
-        - do not use Data::UUID, by default
-        - add new option env_key for store the request id in %ENV
-        - support Perl5.8
+## Tags
 
-0.04    Sun May 22 21:35:26 JST 2016
-        - add force_generate_id option
-        - fix bug: ignore ID in request headers
+https://github.com/bayashi/Plack-Middleware-RequestId/tags
 
-0.03    Fri May 20 10:25:26 JST 2016
-        - improve POD
-        - add new option: psgi_env_key
+## Last Release
 
-0.02    Thu Oct  1 13:12:13 JST 2015
-        - export RequestId to global(you can get $Plack::Middleware::RequestId::request_id)
-
-0.01    Tue Sep 29 13:22:54 JST 2015
-        - original version
+0.07   Sun Apr 25 02:24:33 GMT 2021
+    - https://github.com/bayashi/Plack-Middleware-RequestId/compare/0.06...0.07

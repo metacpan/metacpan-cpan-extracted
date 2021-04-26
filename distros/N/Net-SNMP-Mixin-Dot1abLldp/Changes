@@ -1,5 +1,9 @@
 Revision history for Net-SNMP-Mixin-Dot1abLldp
 
+0.18	Mon, 26 Apr 2021 12:13:12 +0200
+	reduce maxrepeaters for bulk requests
+	fix typo in constants
+
 0.17	Fri, 13 Jul 2018 15:16:14 +0200
 	fiddling with test plan when skip
 

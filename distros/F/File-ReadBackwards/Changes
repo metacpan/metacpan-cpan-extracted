@@ -1,5 +1,13 @@
 Revision history for Perl extension File::ReadBackwards.
 
+1.06
+  - Drop support for Perls prior to 5.6
+  - Fix bug in tests that fail could fail with parallel build
+    (rt#92313, HAARG++)
+  - Fixed typo in documentation (rt#90009, dsteinbrunner++)
+  - Incidentally fixed compatability with Perls that do not have `.` in @INC
+    (rt#121002)
+
 1.05 Sat Jun  4 02:24:35 EDT 2011
 	reordered Changes to be recent at the top
 	rewritten t/large_file.t to skip non-sparse file systems

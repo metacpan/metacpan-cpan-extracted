@@ -7,18 +7,13 @@
 #include "perl.h"
 #include "XSUB.h"
 
-#define HAVE_PERL_VERSION(R, V, S) \
-    (PERL_REVISION > (R) || (PERL_REVISION == (R) && (PERL_VERSION > (V) || (PERL_VERSION == (V) && (PERL_SUBVERSION >= (S))))))
+#include "XSParseKeyword.h"
 
-#ifndef wrap_keyword_plugin
-#  include "wrap_keyword_plugin.c.inc"
-#endif
+#include "perl-backcompat.c.inc"
 
 #ifndef cx_pushblock
 #  include "cx_pushblock.c.inc"
 #endif
-
-#include "perl-backcompat.c.inc"
 
 #include "perl-additions.c.inc"
 
@@ -107,22 +102,13 @@ static void forbid_ops(OP *body)
   }
 }
 
-static int defer_keyword(pTHX_ OP **op)
+static int build_defer(pTHX_ OP **out, XSParseKeywordPiece arg0, void *hookdata)
 {
-  lex_read_space(0);
-
-  if(lex_peek_unichar(0) != '{')
-    croak("Expected defer to be followed by '{'");
-
-  I32 save_ix = block_start(0);
-  OP *body = parse_block(0);
-  body = block_end(save_ix, body);
+  OP *body = arg0.op;
 
   forbid_ops(body);
 
-  lex_read_space(0);
-
-  *op = newLOGOP_CUSTOM(&pp_pushdefer, 0,
+  *out = newLOGOP_CUSTOM(&pp_pushdefer, 0,
     newOP(OP_NULL, 0), body);
 
   /* unlink the terminating condition of 'body' */
@@ -131,28 +117,17 @@ static int defer_keyword(pTHX_ OP **op)
   return KEYWORD_PLUGIN_STMT;
 }
 
-static int (*next_keyword_plugin)(pTHX_ char *, STRLEN, OP **);
+static const struct XSParseKeywordHooks hooks_defer = {
+  .permit_hintkey = "Syntax::Keyword::Defer/defer",
+  .piece1 = XS_PARSE_KEYWORD_BLOCK,
+  .build1 = &build_defer,
+};
 
-static int my_keyword_plugin(pTHX_ char *kw, STRLEN kwlen, OP **op)
-{
-  HV *hints;
-  if(PL_parser && PL_parser->error_count)
-    return (*next_keyword_plugin)(aTHX_ kw, kwlen, op);
-
-  if(!(hints = GvHV(PL_hintgv)))
-    return (*next_keyword_plugin)(aTHX_ kw, kwlen, op);
-
-  if(kwlen == 5 && strEQ(kw, "defer") &&
-      hv_fetchs(hints, "Syntax::Keyword::Defer/defer", 0))
-    return defer_keyword(aTHX_ op);
-
-  if(kwlen == 7 && strEQ(kw, "FINALLY") &&
-      hv_fetchs(hints, "Syntax::Keyword::Defer/finally", 0))
-    /* FINALLY is really the same as defer */
-    return defer_keyword(aTHX_ op);
-
-  return (*next_keyword_plugin)(aTHX_ kw, kwlen, op);
-}
+static const struct XSParseKeywordHooks hooks_finally = {
+  .permit_hintkey = "Syntax::Keyword::Defer/finally",
+  .piece1 = XS_PARSE_KEYWORD_BLOCK,
+  .build1 = &build_defer,
+};
 
 MODULE = Syntax::Keyword::Defer    PACKAGE = Syntax::Keyword::Defer
 
@@ -163,4 +138,7 @@ BOOT:
   XopENTRY_set(&xop_pushdefer, xop_class, OA_LOGOP);
   Perl_custom_op_register(aTHX_ &pp_pushdefer, &xop_pushdefer);
 
-  wrap_keyword_plugin(&my_keyword_plugin, &next_keyword_plugin);
+  boot_xs_parse_keyword(0);
+
+  register_xs_parse_keyword("defer", &hooks_defer, NULL);
+  register_xs_parse_keyword("FINALLY", &hooks_finally, NULL);

@@ -14,11 +14,11 @@ my $request_wrapper = sub
   # TODO options to support 'If-Modified-Since' see PAUSE::Packages
   my($self, $method, $url, $args) = @_;
   my $uri = URI->new($url);
-  
+
   my $ctx = context();
   $ctx->note("HTTP::Tiny $method $url");
-  
-  
+
+
   if($uri->scheme eq 'file')
   {
     tie my %headers, 'Test::HTTPTinyFile::ResponseHeaderTie';
@@ -26,7 +26,7 @@ my $request_wrapper = sub
     $path =~ s{^/([A-Za-z]:)}{$1} if $^O eq 'MSWin32';
     my $result = { url => $url, content => '', headers => \%headers }; # TODO include some headers
     my $content = '';
-    
+
     if($method =~ /(GET|HEAD)/)
     {
       if(-d $path)

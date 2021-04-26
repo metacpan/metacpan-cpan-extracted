@@ -34,4 +34,26 @@ package BClass {}
    ok( $ok, 'Default block executed' );
 }
 
+# overloaded ->isa method
+{
+   my $equal;
+   package Greedy {
+      sub isa { $equal };
+   }
+
+   sub greedy_is_ten
+   {
+      match(bless [], "Greedy" : isa) {
+         case(Ten) { return "YES" }
+         default   { return "NO" }
+      }
+   }
+
+   $equal = 1;
+   is( greedy_is_ten, "YES", 'Greedy is 10 when set' );
+
+   $equal = 0;
+   is( greedy_is_ten, "NO", 'Greedy is not 10 when unset' );
+}
+
 done_testing;

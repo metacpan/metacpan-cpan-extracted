@@ -1,0 +1,28 @@
+# This file is in relaxed JSON format (it allows comments and trailing commas).
+#
+# All worker pools running on this host must be defined here, specifying 
+# which logical bus should be used and which services it will run. In this
+# example only one worker pool (named "test") is defined.
+#
+# Each pool definition must contain the following parameters:
+#
+#  - pool-id : arbitrary identifier of worker pool
+#  - bus-id  : identifier of logical bus used by worker processes
+#  - workers : a map of worker classes and its config hashes
+#
+# To start the worker pool use the "bkpr" command:
+#
+# $ bkpr --pool-id "test" start
+
+[
+    {
+        "pool-id"       : "test",
+        "bus-id"        : "backend",
+        "description"   : "pool of test workers",
+        "use_toybroker" :  1,
+
+        "workers" : {
+            "TestWorker" : { "workers_count" : 8 },
+        },
+    },
+]

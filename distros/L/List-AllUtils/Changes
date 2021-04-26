@@ -1,3 +1,10 @@
+0.19    2021-04-23
+
+- We now prefer the mesh() and zip() functions from List::SomeUtils over the
+  new, incompatible implementations in List::Util 1.56. Fixes GH #12.
+  reported by Greg Oschwald.
+
+
 0.18    2020-09-05
 
 - Switched to GitHub Issues.

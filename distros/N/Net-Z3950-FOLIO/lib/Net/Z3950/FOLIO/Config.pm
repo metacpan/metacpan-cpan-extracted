@@ -18,22 +18,22 @@ sub new {
     my $class = shift();
     my($cfgbase, @extras) = @_;
 
-    my $cfg = compile_config($cfgbase, @extras);
+    my $cfg = _compileConfig($cfgbase, @extras);
     return bless $cfg, $class;
 }
 
 
-sub compile_config {
+sub _compileConfig {
     my($cfgbase, @extras) = @_;
 
-    my $cfg = compile_config_file($cfgbase, undef, MISSING_ERROR);
+    my $cfg = _compileConfigFile($cfgbase, undef, MISSING_ERROR);
 
     my $isFirst = 1;
     while (@extras) {
 	my $extra = shift @extras;
-	my $overlay = compile_config_file($cfgbase, $extra, $isFirst ? MISSING_TENANT : MISSING_FILTER);
+	my $overlay = _compileConfigFile($cfgbase, $extra, $isFirst ? MISSING_TENANT : MISSING_FILTER);
 	$isFirst = 0;
-	merge_config($cfg, $overlay);
+	_mergeConfig($cfg, $overlay);
     }
 
     my $gqlfile = $cfg->{graphqlQuery}
@@ -53,7 +53,7 @@ sub compile_config {
 }
 
 
-sub compile_config_file {
+sub _compileConfigFile {
     my($cfgbase, $cfgsub, $missingAction) = @_;
 
     my $cfgname = $cfgbase . ($cfgsub ? ".$cfgsub" : '') . '.json';
@@ -71,36 +71,36 @@ sub compile_config_file {
     $fh->close();
 
     my $cfg = decode_json($json);
-    expand_variable_references($cfg);
+    _expandVariableReferences($cfg);
     return $cfg;
 }
 
 
-sub expand_variable_references {
+sub _expandVariableReferences {
     my($obj) = @_;
 
     foreach my $key (sort keys %$obj) {
-	$obj->{$key} = expand_single_variable_reference($key, $obj->{$key});
+	$obj->{$key} = _expandSingleVariableReference($key, $obj->{$key});
     }
 
     return $obj;
 }
 
-sub expand_single_variable_reference {
+sub _expandSingleVariableReference {
     my($key, $val) = @_;
 
     if (ref($val) eq 'HASH') {
-	return expand_variable_references($val);
+	return _expandVariableReferences($val);
     } elsif (ref($val) eq 'ARRAY') {
-	return [ map { expand_single_variable_reference($key, $_) } @$val ];
+	return [ map { _expandSingleVariableReference($key, $_) } @$val ];
     } elsif (!ref($val)) {
-	return expand_scalar_variable_reference($key, $val);
+	return _expandScalarVariableReference($key, $val);
     } else {
 	die "non-hash, non-array, non-scalar configuration key '$key'";
     }
 }
 
-sub expand_scalar_variable_reference {
+sub _expandScalarVariableReference {
     my ($key, $val) = @_;
 
     my $orig = $val;
@@ -128,14 +128,14 @@ sub expand_scalar_variable_reference {
 }
 
 
-sub merge_config {
+sub _mergeConfig {
     my($base, $overlay) = @_;
 
     my @known_keys = qw(okapi login indexMap);
     foreach my $key (@known_keys) {
 	if (defined $overlay->{$key}) {
 	    if (ref $base->{$key} eq 'HASH') {
-		merge_hash($base->{$key}, $overlay->{$key});
+		_mergeHash($base->{$key}, $overlay->{$key});
 	    } else {
 		$base->{$key} = $overlay->{$key};
 	    }
@@ -150,7 +150,7 @@ sub merge_config {
 }
 
 
-sub merge_hash {
+sub _mergeHash {
     my($base, $overlay) = @_;
 
     foreach my $key (sort keys %$overlay) {
@@ -291,6 +291,11 @@ The corresponding password, unless overridden by authentication information in t
 
 =back
 
+=head2 C<nologin>
+
+If specified and set to 1, then no login is performed, and the
+C<login> section need not be provided.
+
 =head2 C<indexMap>
 
 Contains any number of elements. The keys are the numbers of BIB-1 use
@@ -423,6 +428,8 @@ Z39.50 record, assigned names that begin with underscores:
 =item C<_callNumberPrefix>
 
 =item C<_callNumberSuffix>
+
+=item C<_holdingsLocation>
 
 =item C<_volume>
 

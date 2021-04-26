@@ -1,3 +1,22 @@
+0.36.3 2021-04-26 08:36:57 +0200 Tobias Oetiker <tobi@oetiker.ch>
+
+ - removed readonly-hack
+
+0.36.2 2021-04-22 15:26:08 +0200 Tobias Oetiker <tobi@oetiker.ch>
+
+ - Convert to boolean in Config.pm
+ - Add YAML default handling
+ - Add defaults
+ - Simplify Login.js check for logo_scale
+
+0.36.1 2021-04-21 08:19:06 +0200 Tobias Oetiker <tobi@oetiker.ch>
+
+ - Allow disabling of logo scaling
+ - Make login window a bit more compact
+ - Remove unnecessary resize callback
+ - Allow hiding of keys logo
+
+
 0.36.0 2021-04-20 09:41:01 +0200 Tobias Oetiker <tobi@oetiker.ch>
 
  - allow for incremental search in selectbox dropdowns

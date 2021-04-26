@@ -25,13 +25,9 @@ t/40build.t
 t/41structures.t
 t/42scopes.t
 t/99pod.t
-t/build.c
 t/build.xs
-t/pieces.c
 t/pieces.xs
-t/stages.c
 t/stages.xs
-t/structures.c
 t/structures.xs
 t/testcase.pm
 XSParseKeyword.h

@@ -31,7 +31,7 @@ do {
 do {
   my $uri = URI::file->new(file(__FILE__)->parent->parent->subdir('corpus')->absolute->stringify);
   $uri->host('localhost');
-  
+
   local $CWD = "$home";
   my $ret;
 
@@ -41,7 +41,7 @@ do {
     '--metacpan_url'      => "$uri/api.metacpan.org/",
     'Foo::Bar',
   );
-  
+
   my $merged = capture_merged { $ret = App::cpangitify->main(@args) };
   is($ret, 0, "% cpangitify @args");
   note $merged;
@@ -92,12 +92,12 @@ sub mycheck
   $git->checkout($tag);
   subtest "version $tag" => sub {
     plan tests => @yes + @no;
-    
+
     foreach my $file (map { $home->file('Foo-Bar', @$_) } @yes)
     {
       ok -e $file, "exists $file";
     }
-    
+
     foreach my $file (map { $home->file('Foo-Bar', @$_) } @no)
     {
       ok !-e $file, "does not exists $file";

@@ -22,7 +22,7 @@ use Ref::Util qw/ is_coderef /;
 use Time::HiRes;
 use Try::Tiny;
 
-our $VERSION = 'v0.4.5';
+our $VERSION = 'v0.4.6';
 
 # Note: You may be able to omit the client if there is a client
 # defined in the environment hash at C<psgix.monitor.statsd>, and the
@@ -46,8 +46,8 @@ sub prepare_app {
                 unless defined $method;
             $self->$attr(
                 sub {
-                    my ($env, @args) = @_;
                     return unless defined $method;
+                    my ($env, @args) = @_;
                     try {
                         $client->$method( grep { defined $_ } @args );
                     }
@@ -82,9 +82,9 @@ sub call {
     return Plack::Util::response_cb(
         $res,
         sub {
-            my $res = shift;
-
             return unless $client;
+
+            my ($res) = @_;
 
             my $rate = $self->sample_rate;
 
@@ -178,7 +178,7 @@ Plack::Middleware::Statsd - send statistics to statsd
 
 =head1 VERSION
 
-version v0.4.5
+version v0.4.6
 
 =head1 SYNOPSIS
 
@@ -456,7 +456,7 @@ Library L<https://www.sciencephoto.com>.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018-2020 by Robert Rothenberg.
+This software is Copyright (c) 2018-2021 by Robert Rothenberg.
 
 This is free software, licensed under:
 

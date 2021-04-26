@@ -11,7 +11,7 @@ use experimental 'signatures';
 
 use Getopt::Long;
 use lib '/opt/functional-perl/lib';    # new stuff, or when fperl_noinstall
-use Chj::xperlfunc qw(xlstat xprintln xprint xgetfile_utf8 xchdir);
+use Chj::xperlfunc qw(xlstat xprintln xprint xgetfile_utf8 xchdir xutime);
 use FP::IOStream qw(xdirectory_paths);
 use FP::Ops qw(string_cmp);
 use FP::List qw(cons null);
@@ -38,7 +38,7 @@ sub usage {
     print STDERR map {"$_\n"} @_ if @_;
     print "$myname command [args]
 
-  Print and read a Perl syntax file containing stat values of all files under
+  Print and read a JSON syntax file containing stat values of all files under
   dirpath, recursively:
 
    { \$path => [ lstat \$path ], ... }
@@ -49,12 +49,22 @@ sub usage {
 
     print-tree \$basedir
 
-        prints the stat values at \$basedir to stdout.
+        print the stat values at \$basedir to stdout.
+
+    print-mtime-fixes \$file1 \$file2
+
+        print which files should be changed to which mtime, assuming
+        that files (also dirs / devices) with the same contents but
+        differing mtime on either side should get the older of the two
+        mtimes.
+
+    apply-mtime-fixes \$dir \$file
+
+        apply the mtime fixes from print-mtime-fixes to \$dir.
 
     repl \$file...
 
         open a repl with the parsed \$file... in \@ts
-
 
   Options:
 
@@ -176,12 +186,19 @@ sub parse_treestat ($path) {
 # files to the older time fixes the synchronisation.
 sub mtime_fixes ($A, $B) {
     my %mtime;
+    my $ignore_same_mtime  = 0;
+    my $ignore_diffcontent = 0;
+    my $ignore_difftype    = 0;
+    my $act_file           = 0;
+    my $act_dir            = 0;
+    my $act_other          = 0;
     for my $k (keys %$A) {
         if (defined(my $b = $$B{$k})) {
             my $a = $$A{$k};
             if ($a->mtime == $b->mtime) {
 
                 # no change to be done
+                $ignore_same_mtime++;
             } else {
                 if ($a->filetype == $b->filetype) {
 
@@ -193,25 +210,66 @@ sub mtime_fixes ($A, $B) {
                     };
                     if ($a->is_file) {
                         if ($a->size == $b->size and $a->hash eq $b->hash) {
+                            $act_file++;
                             &$act
+                        } else {
+
+                            # uh, different contents, can't know what
+                            # to do (shouldn't happen once
+                            # synchronisation was run, but may be if
+                            # both sides had changes)
+                            $ignore_diffcontent++;
                         }
                     } else {
 
                         # Do not try to update symlinks
                         unless ($a->is_link) {
+                            if ($a->is_dir) {
+                                $act_dir++;
+                            } else {
+
+                                # repl;
+                                $act_other++;
+                            }
                             &$act
                         }
                     }
                 } else {
-
-                    # uh, different contents, can't know what to do
-                    # (shouldn't happen once synchronisation was run,
-                    # but may be if both sides had changes)
+                    $ignore_difftype++;
                 }
             }
         }
     }
-    \%mtime
+    {
+        mtimes             => \%mtime,
+        ignore_same_mtime  => $ignore_same_mtime,
+        ignore_difftype    => $ignore_difftype,
+        ignore_diffcontent => $ignore_diffcontent,
+        act_file           => $act_file,
+        act_dir            => $act_dir,
+        act_other          => $act_other,
+    }
+}
+
+sub print_mtime_fixes {
+    @_ == 2 or die "print_mtime_fixes needs 2 arguments";
+    my $json_encoder = JSON->new->utf8(1)->pretty(1)->canonical(1);
+    xprintln $json_encoder->encode(mtime_fixes(map { parse_treestat $_ } @_));
+}
+
+sub apply_mtime_fixes ($dir, $file) {
+    my $hash        = load_json($file);
+    my $mtime_fixes = $hash->{mtimes}
+        // die "missing 'mtimes' key in file '$file'";
+    ref($mtime_fixes) eq "HASH"
+        or die "invalid type of values at 'mtimes' in '$file': $mtime_fixes";
+    for my $relpath (sort keys %$mtime_fixes) {
+        my $mtime    = $mtime_fixes->{$relpath};
+        my $fullpath = "$dir/$relpath";
+        my $s        = xlstat $fullpath;
+        die "is a link: '$fullpath'" if $s->is_link;
+        xutime $s->atime, $mtime, $fullpath;
+    }
 }
 
 sub trees_repl {
@@ -221,9 +279,12 @@ sub trees_repl {
 
 my $command = shift @ARGV;
 
-my $proc
-    = +{ "print-tree" => \&print_tree, "repl" => \&trees_repl, }->{$command}
-    or usage "unknown command '$command'";
+my $proc = +{
+    "print-tree"        => \&print_tree,
+    "repl"              => \&trees_repl,
+    "print-mtime-fixes" => \&print_mtime_fixes,
+    "apply-mtime-fixes" => \&apply_mtime_fixes,
+}->{$command} or usage "unknown command '$command'";
 
 $proc->(@ARGV);
 

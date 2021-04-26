@@ -71,6 +71,7 @@ qx.Class.define("callbackery.ui.Popup", {
                 switch (data.action){
                 case 'wait':
                 case 'dataModified':
+                case 'reloadStatus':
                     break;
                 case 'showMessage':
                 case 'dataSaved':

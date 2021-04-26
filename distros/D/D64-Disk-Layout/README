@@ -1,4 +1,4 @@
-D64::Disk::Layout Version 0.02
+D64::Disk::Layout Version 0.03
 ==============================
 
 D64::Disk::Layout provides a low-level helper class for D64::Disk module,

@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.008003;
 
-our $VERSION = '1.730';
+our $VERSION = '1.731';
 
 use Term::Choose::Constants qw( :index );
 use Term::Choose::Screen    qw( up clear_to_end_of_screen );

@@ -1,5 +1,9 @@
 Revision history for NewFangle},
 
+0.05      2021-04-24 13:08:35 -0600
+  - Moved to new GitHub org
+  - Add support for Perl 5.14 (gh#19)
+
 0.04      2020-12-10 15:27:00 -0700
   - Bump version requirement of Alien::libnewrelic for clang 10 fixes
 

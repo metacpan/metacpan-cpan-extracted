@@ -1,3 +1,29 @@
+0.006     2021-04-25 14:48:30 EDT
+  - Use Unicode::UTF8 for encoding output data if available
+  - query_params, body_params, and cookies methods now return pairs instead of a hashref
+  - Remove query_pairs and body_pairs methods
+  - Add query_param_names, body_param_names, and cookie_names methods
+  - Add cookie_array method to support multiple request cookies with the same name
+
+0.005     2021-04-22 21:11:18 EDT
+  - Separate documentation from code for efficiency
+
+0.004     2021-04-21 21:27:52 EDT
+  - Fork-safety in error handling and cleanup
+  - set_response_status now also accepts a full status string which will be passed as-is
+  - Remove the response_charset method
+  - Prohibit newline characters in response header values to prevent HTTP response splitting vulnerabilities
+
+0.003     2021-04-21 03:31:54 EDT
+  - Add set_nph method and support NPH response mode
+  - Add cookies and cookie methods to parse request cookies
+  - Add add_response_cookie method to set response cookies
+  - Add CGI::Tiny::epoch_to_date and CGI::Tiny::date_to_epoch convenience functions
+  - Set Date header in all responses
+  - Pass the CGI::Tiny object to the cgi block as $_ instead of in @_
+  - Remove the request_body_limit method
+  - Handle when exit is called without rendering a response
+
 0.002     2021-04-19 03:59:16 EDT
   - Remove header_names method
   - Throw an exception if render is called with an unknown type

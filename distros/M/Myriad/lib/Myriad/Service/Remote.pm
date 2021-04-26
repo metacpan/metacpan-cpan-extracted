@@ -1,6 +1,6 @@
 package Myriad::Service::Remote;
 
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 our $AUTHORITY = 'cpan:DERIV'; # AUTHORITY
 
 =encoding utf8
@@ -80,9 +80,9 @@ it subscribes to a channel in the remote service.
 
 =cut
 
-method subscribe ($channel, $client = "remote_service") {
+async method subscribe ($channel, $client = "remote_service") {
    my $sink = $myriad->ryu->sink;
-   $myriad->subscription->create_from_sink(
+   await $myriad->subscription->create_from_sink(
         sink => $sink,
         service => $service_name,
         client => $client,

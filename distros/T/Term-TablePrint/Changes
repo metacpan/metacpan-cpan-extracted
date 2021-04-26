@@ -1,6 +1,9 @@
 Revision history for Term::TablePrint
 
 
+0.132   2021-04-25
+        - Replace 'croak' with 'die'.
+
 0.131   2021-04-06
         - Single table row output: skip separator lines.
 

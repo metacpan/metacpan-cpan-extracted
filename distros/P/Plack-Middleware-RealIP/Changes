@@ -1,5 +1,9 @@
 Revision history for Plack-Middleware-RealIP
 
+0.04    Sun Apr 25 17:37:36 UTC 2021
+          - Support Net::Netmask >= 2.0000 (Joelle Maslak)
+          - Add Github Actions
+
 0.03    Sun Apr  8 00:18:13 PHT 2012
           - Perlcritic fixes
           - Specified MIN_PERL_VERSION in Makefile.PL

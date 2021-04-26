@@ -14,4 +14,19 @@ WriteMakefile(
     ($] >= 5.005 ?
       (ABSTRACT_FROM => 'Layout.pm',
        AUTHOR        => 'Pawel Krol <pawelkrol@cpan.org>') : ()),
+    META_MERGE        => {
+        'meta-spec' => {
+            'version' => 2,
+        },
+        'resources' => {
+            'bugtracker' => {
+                'web' => 'https://github.com/pawelkrol/D64-Disk-Layout/issues',
+            },
+            'repository' => {
+                'type' => 'git',
+                'url'  => 'git://github.com/pawelkrol/D64-Disk-Layout.git',
+                'web'  => 'https://github.com/pawelkrol/D64-Disk-Layout.git',
+            },
+        },
+    },
 );

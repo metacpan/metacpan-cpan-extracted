@@ -9,7 +9,7 @@ use parent qw(
     IO::Async::Notifier
 );
 
-our $VERSION = '3.011';
+our $VERSION = '3.012';
 
 =head1 NAME
 
@@ -22,12 +22,9 @@ Net::Async::Redis - talk to Redis servers via L<IO::Async>
     use IO::Async::Loop;
     my $loop = IO::Async::Loop->new;
     $loop->add(my $redis = Net::Async::Redis->new);
-    (async sub {
-     await $redis->connect;
-     my $value = await $redis->get('some_key');
-     $value ||= await $redis->set(some_key => 'some_value');
-     print "Value: $value";
-    })->()->get;
+    my $value = await $redis->get('some_key');
+    $value ||= await $redis->set(some_key => 'some_value');
+    print "Value: $value\n";
 
     # You can also use ->then chaining, see L<Future> for more details
     $redis->connect->then(sub {
@@ -39,12 +36,6 @@ Net::Async::Redis - talk to Redis servers via L<IO::Async>
     })->on_done(sub {
         print "Value: " . shift;
     })->get;
-
-    # ... or with Future::AsyncAwait (recommended)
-    await $redis->connect;
-    my $value = await $redis->get('some_key');
-    $value ||= await $redis->set(some_key => 'some_value');
-    print "Value: $value";
 
 =head1 DESCRIPTION
 
@@ -67,7 +58,7 @@ Current features include:
 
 =over 4
 
-=item * L<all commands|https://redis.io/commands> as of 6.2 (February 2021), see L<https://redis.io/commands> for the methods and parameters
+=item * L<all commands|https://redis.io/commands> as of 6.2 (April 2021), see L<https://redis.io/commands> for the methods and parameters
 
 =item * L<pub/sub support|https://redis.io/topics/pubsub>, see L</METHODS - Subscriptions>
 
@@ -95,25 +86,22 @@ add this to an L<IO::Async::Loop>:
 
 then connect to the server:
 
-    $redis->connect
-        ->then(sub {
-            # You could achieve a similar result by passing client_name in
-            # constructor or ->connect parameters
-            $redis->client_setname("example client")
-        })->get;
+    use Future::AsyncAwait;
+    await $redis->connect;
+    # You could achieve a similar result by passing client_name in
+    # constructor or ->connect parameters
+    await $redis->client_setname("example client");
 
 =head2 Key-value handling
 
 One of the most common Redis scenarios is as a key/value store. The L</get> and L</set>
 methods are typically used here:
 
- $redis->set(some_key => 'some value')
-  ->then(sub {
-   $redis->get('some_key')
-  })->on_done(sub {
-   my ($value) = @_;
-   print "Read back value [$value]\n";
-  })->retain;
+    use Future::AsyncAwait;
+    await $redis->connect;
+    $redis->set(some_key => 'some value');
+    my ($value) = await $redis->get('some_key');
+    print "Read back value [$value]\n";
 
 See the next section for more information on what these methods are actually returning.
 
@@ -172,6 +160,7 @@ Note that this module uses L<Future::AsyncAwait> internally.
 use mro;
 use Class::Method::Modifiers;
 use Syntax::Keyword::Try;
+use Syntax::Keyword::Dynamically;
 use curry::weak;
 use Future::AsyncAwait;
 use IO::Async::Stream;
@@ -185,7 +174,7 @@ use Metrics::Any qw($metrics), strict => 0;
 use OpenTracing::Any qw($tracer);
 
 use List::Util qw(pairmap);
-use Scalar::Util qw(reftype blessed);
+use Scalar::Util qw(reftype blessed refaddr);
 
 use Net::Async::Redis::Multi;
 use Net::Async::Redis::Subscription;
@@ -310,7 +299,8 @@ sub configure {
         $self->{client_side_cache_size} = delete $args{client_side_cache_size};
         delete $self->{client_side_cache};
         if($self->loop) {
-            $self->remove_child(delete $self->{client_side_connection}) if $self->{client_side_connection};
+            my $conn = delete $self->{client_side_connection};
+            $self->remove_child($conn) if $conn and $conn->parent;
         }
     }
     my $uri = $self->{uri} = URI->new($self->{uri}) unless ref $self->uri;
@@ -378,7 +368,7 @@ See L</stream_read_len>.
 
 =cut
 
-sub stream_write_len { shift->{stream_read_len} //= 1048576 }
+sub stream_write_len { shift->{stream_write_len} //= 1048576 }
 
 =head2 client_name
 
@@ -414,6 +404,7 @@ sub connect : method {
 
     my $auth = $self->{auth};
     $auth //= ($uri->userinfo =~ s{^[^:]*:}{}r) if defined $uri->userinfo;
+    $log->tracef('About to start connection to %s', "$uri");
     $self->{connection} //= $self->loop->connect(
         service => $uri->port // 6379,
         host    => $uri->host,
@@ -449,6 +440,7 @@ sub connect : method {
             die 'ERR unknown command' if $self->{protocol} and $self->{protocol} eq 'resp2';
 
             # Try issuing a HELLO to detect RESP3 or above
+            dynamically $self->{connection_in_progress} = 1;
             await $self->hello(
                 3, defined($auth) ? (
                     qw(AUTH default), $auth
@@ -474,12 +466,33 @@ sub connect : method {
             $proto->{hashrefs} = $self->{hashrefs};
             $proto->{protocol} = $self->{protocol_level};
 
+            dynamically $self->{connection_in_progress} = 1;
             await $self->auth($auth) if defined $auth;
+            dynamically $self->{connection_in_progress} = 1;
             await $self->client_setname($self->client_name) if defined $self->client_name;
         }
 
-        await $self->select($uri->database) if $uri->database;
-        return Future->done;
+        dynamically $self->{connection_in_progress} = 1;
+        if($uri->database) {
+            try {
+                $log->tracef('Select database %s', $uri->database);
+                await $self->select($uri->database);
+            } catch($e) {
+                die 'Failed to switch database on Redis connection - ' . $e;
+            }
+        }
+        if($self->is_client_side_cache_enabled) {
+            try {
+                $log->tracef('Client-side cache requested');
+                await $self->client_side_connection;
+                $log->tracef('Client-side connection established');
+            } catch($e) {
+                die 'This version of Redis does not support clientside caching' if $e =~ /Unknown subcommand .*tracking/i;
+                $log->errorf('Clientside cache setup failure in ->connect - %s', $e);
+                die 'Failed to enable clientside caching on Redis connection - ' . $e;
+            }
+        }
+        return;
     })->on_fail(sub { delete $self->{connection} })
       ->on_cancel(sub { delete $self->{connection} });
 }
@@ -598,7 +611,7 @@ async sub subscribe {
     await $self->next::method(@channels);
     $self->{pubsub} //= 0;
     await Future->wait_all(@pending);
-    $log->tracef('Susbcriptions established, we are go');
+    $log->tracef('Subscriptions established, we are go');
     return @{$self->{subscription_channel}}{@channels};
 }
 
@@ -651,7 +664,7 @@ async sub multi {
         @pending
     ) if @pending;
     await do {
-        local $self->{_is_multi} = 1;
+        dynamically $self->{_is_multi} = 1;
         Net::Async::Redis::Commands::multi($self);
     };
     return await $multi->exec($code)
@@ -659,7 +672,7 @@ async sub multi {
 
 around [qw(discard exec)] => sub {
     my ($code, $self, @args) = @_;
-    local $self->{_is_multi} = 1;
+    dynamically $self->{_is_multi} = 1;
     my $f = $self->$code(@args);
     (shift @{$self->{pending_multi}})->done;
     $f->retain
@@ -682,24 +695,31 @@ async sub client_side_connection {
     if($self->{protocol_level} eq 'resp3') {
         $self->{client_side_cache_ready} = Future->done;
         Scalar::Util::weaken($self->{client_side_connection} = $self);
+        await $self->enable_clientside_cache($self);
         return;
     }
 
-    my $f = $self->{client_side_cache_ready} = $self->loop->new_future;
     $self->{client_side_connection} = my $redis = ref($self)->new(
         host => $self->host,
         port => $self->port,
         auth => $self->{auth},
     );
     $self->add_child($redis);
-    my $id = await $redis->client_id;
-    my $sub = await $redis->subscribe('__redis__:invalidate');
-    $sub->events->each(sub {
-        $log->tracef('Invalidating key %s', $_->payload);
-        $self->client_side_cache->remove($_->payload);
-    });
-    $f->done;
+    await $self->enable_clientside_cache($redis);
     return;
+}
+
+=head2 clientside_cache_events
+
+A L<Ryu::Source> which emits key names as they are invalidated.
+
+With client-side caching enabled, can be used to monitor which keys
+are changing.
+
+=cut
+
+sub clientside_cache_events {
+    shift->{clientside_cache_events} // die 'no client-side cache available yet'
 }
 
 =head2 client_side_cache_ready
@@ -734,7 +754,7 @@ Returns true if the client-side cache is enabled.
 
 =cut
 
-sub is_client_side_cache_enabled { defined shift->{client_side_cache_size} }
+sub is_client_side_cache_enabled { (shift->{client_side_cache_size} // 0) > 0 }
 
 =head2 client_side_cache_size
 
@@ -748,13 +768,39 @@ around get => async sub {
     my ($code, $self, $k) = @_;
     return await $self->$code($k) unless $self->is_client_side_cache_enabled;
 
+    my $cache = $self->client_side_cache;
     $log->tracef('Check cache for [%s]', $k);
-    my $v = $self->client_side_cache->get($k);
-    return $v if defined $v;
+
+    my $v = $cache->get($k);
+    if(ref $v) {
+        $log->tracef('Key [%s] already being requested, joining', $k);
+        return await $v->without_cancel;
+    } else {
+        return $v if exists $cache->{_entries}{$k};
+    }
+
     $log->tracef('Key [%s] was not cached', $k);
-    return await $self->$code($k)->on_done(sub {
-        $self->client_side_cache->set($k => shift)
+    my $f = $self->$code($k);
+    # Set our cache entry regardless of whether it completes
+    # immediately or not...
+    $cache->set(
+        $k => $f
+    );
+    # ... and then rewrite or remove the cache entry once we get a response:
+    $f->on_ready(sub {
+        my $f = shift;
+        if($f->is_done) {
+            # If we had an invalidation message, we may have removed
+            # our cache entry already: we shouldn't cache this value if so.
+            $cache->set($k => $f->get)
+                if exists $cache->{_entries}{$k};
+        } else {
+            # Clear up after any failure or cancellation,
+            # since they may be temporary
+            $cache->remove($k);
+        }
     });
+    return await $f;
 };
 
 
@@ -859,7 +905,8 @@ item, depending on whether we're dealing with subscriptions at the moment.
 
 sub on_message {
     my ($self, $data) = @_;
-    local @{$log->{context}}{qw(redis_remote redis_local)} = ($self->endpoint, $self->local_endpoint);
+    dynamically $log->{context}{redis_remote} = $self->endpoint;
+    dynamically $log->{context}{redis_local} = $self->local_endpoint;
 
     $log->tracef('Incoming message: %s, pending = %s', $data, join ',', map { $_->[0] } $self->{pending}->@*) if $log->is_trace;
 
@@ -911,7 +958,8 @@ Called when there's an error response.
 
 sub on_error_message {
     my ($self, $data) = @_;
-    local @{$log->{context}}{qw(redis_remote redis_local)} = ($self->endpoint, $self->local_endpoint);
+    dynamically $log->{context}{redis_remote} = $self->endpoint;
+    dynamically $log->{context}{redis_local} = $self->local_endpoint;
     $log->tracef('Incoming error message: %s', $data);
 
     my $next = shift @{$self->{pending}} or die "No pending handler";
@@ -962,6 +1010,14 @@ sub handle_pubsub_message {
             $log->warnf('Have message for unknown channel [%s]', $channel);
         }
         $self->bus->invoke_event(message => [ $type, $channel, $payload ]) if exists $self->{bus};
+        return;
+    }
+    if($type =~ /invalidate$/) {
+        my ($channel) = @details;
+        for my $k ($channel->@*) {
+            $log->tracef('have invalidation type %s with channel %s', $type, $k);
+            $self->clientside_cache_events->emit($k);
+        }
         return;
     }
 
@@ -1077,7 +1133,8 @@ sub execute_command {
     $tracer->span_for_future($f) if $self->opentracing;
     $log->tracef("Will have to wait for %d MULTI tx", 0 + @{$self->{pending_multi}}) unless $self->{_is_multi};
     my $code = sub {
-        local @{$log->{context}}{qw(redis_remote redis_local)} = ($self->endpoint, $self->local_endpoint);
+        dynamically $log->{context}{redis_remote} = $self->endpoint;
+        dynamically $log->{context}{redis_local} = $self->local_endpoint;
         my $cmd = join ' ', @cmd;
         $log->tracef('Outgoing [%s]', $cmd);
         my $depth = $self->pipeline_depth;
@@ -1095,9 +1152,18 @@ sub execute_command {
         $self->stream->write($data);
         return $f
     };
-    return $code->()->retain if $self->{stream} and ($self->{is_multi} or 0 == @{$self->{pending_multi}});
+    $log->tracef(
+        'Multi %s with %d pending and connected state %s',
+        $self->{_is_multi},
+        0 + @{$self->{pending_multi}},
+        $self->connected->state,
+    );
     return (
-        $self->{_is_multi}
+        # Is this a command issued during the initial connection phase?
+        $self->{connection_in_progress}
+        ? Future->done
+        # Are we the owner of a current MULTI transaction?
+        : $self->{_is_multi}
         ? $self->connected
         : Future->wait_all(
             $self->connected,
@@ -1120,21 +1186,27 @@ around [qw(xread xreadgroup)] => async sub {
     return $compatible_response;
 };
 
-around [qw(zrange zrangebyscore zrevrange zrevrangebyscore)] => async sub {
-    my ($code, $self, @args) = @_;
-    return await $self->$code(@args) if $self->{hashrefs};
+# These have different behaviours depending on whether we use the RESP3
+# data structures (hashes etc.) or original RESP2 everything-is-an-array.
+for my $method (qw(zrange zrangebyscore zrevrange zrevrangebyscore)) {
+    around $method => async sub {
+        my ($code, $self, @args) = @_;
+        return await $self->$code(@args) if $self->{hashrefs};
 
-    my $response = await $self->$code(@args);
+        my $response = await $self->$code(@args);
+        return $response unless ref $response->[0] eq 'ARRAY';
 
-    if (ref $response->[0] eq 'ARRAY') {
-        my @compatible_response = map { $_->@* } $response->@*;
-        $log->tracef('Transformed resposne of z(rev)range(byscore) into RESP2 format: from %s, to %s', $response, [@compatible_response]);
+        my $compatible_response = [ map { $_->@* } $response->@* ];
+        $log->tracef(
+            'Transformed response of %s into RESP2 format: from %s, to %s',
+            $method,
+            $response,
+            $compatible_response
+        );
 
-        return \@compatible_response;
-    } else {
-        return $response;
-    }
-};
+        return $compatible_response;
+    };
+}
 
 =head2 ryu
 
@@ -1183,6 +1255,43 @@ sub wire_protocol {
     };
 }
 
+=head2 enable_clientside_cache
+
+Used internally to prepare for client-side caching: subscribes to the
+invalidation events.
+
+=cut
+
+async sub enable_clientside_cache {
+    my ($self, $redis) = @_;
+    my $f = $self->{client_side_cache_ready} = $self->loop->new_future;
+    try {
+        $log->tracef('At this point we want an ID');
+        my $id = await $redis->client_id;
+        $log->tracef('Set up :invalidate sub');
+        my $sub = await $redis->subscribe('__redis__:invalidate');
+        $log->tracef('We now have :invalidate');
+        $self->{clientside_cache_events} = $sub->events;
+        $sub->events->each(sub {
+            $log->tracef('Invalidating key %s', $_);
+            $self->client_side_cache->remove($_);
+        });
+
+        # In a multi-connection setup, e.g. RESP2, the notifications need to be
+        # delivered to the subscription connection via `REDIRECT`
+        my @args = refaddr($self) != refaddr($redis)
+        ? (redirect => $id)
+        : ();
+        $log->tracef('Enable client tracking via %s', $self->can('client_tracking'));
+        await $self->client_tracking('on', @args);
+        $f->done;
+    } catch($e) {
+        $f->fail($e) unless $f->is_ready;
+        die $e;
+    }
+    return;
+}
+
 =head2 _init
 
 
@@ -1208,7 +1317,6 @@ sub _init {
 sub _add_to_loop {
     my ($self, $loop) = @_;
     delete $self->{client_side_connection};
-    # $self->client_side_connection->retain if $self->client_side_cache_size;
 }
 
 1;
@@ -1259,6 +1367,8 @@ tests and feedback:
 =item * C<< @eyadof >>
 
 =item * Nael Alolwani
+
+=item * Marc Frank
 
 =back
 

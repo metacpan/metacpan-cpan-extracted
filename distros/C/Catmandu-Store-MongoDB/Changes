@@ -1,5 +1,11 @@
 Revision history for Catmandu-Store-MongoDB
 
+0.0805  2021-04-22 17:36:06 CEST
+  - fix search(limit => 0) corner case
+
+0.0804  2021-04-22 17:11:31 CEST
+  - support estimated_document_count with store estimate_count option
+
 0.0803  2019-06-18 09:54:21 CEST
   - support json encoded sort specification
 

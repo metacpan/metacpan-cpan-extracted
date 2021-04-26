@@ -1,5 +1,5 @@
 package Util::Medley::YAML;
-$Util::Medley::YAML::VERSION = '0.059';
+$Util::Medley::YAML::VERSION = '0.060';
 use Modern::Perl;
 use Moose;
 use namespace::autoclean;
@@ -16,7 +16,7 @@ Util::Medley::YAML - utility YAML methods
 
 =head1 VERSION
 
-version 0.059
+version 0.060
 
 =cut
 

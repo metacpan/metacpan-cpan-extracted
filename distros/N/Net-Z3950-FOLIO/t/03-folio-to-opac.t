@@ -31,7 +31,8 @@ for (my $i = 1; $i <= 2; $i++) {
     my $expected = readFile("t/data/records/expectedOutput$i.xml");
     my $folioJson = readFile("t/data/records/input$i.json");
     my $folioHoldings = decode_json(qq[{ "holdingsRecords2": [ $folioJson ] }]);
-    my $holdingsXml = Net::Z3950::FOLIO::OPACXMLRecord::makeOPACXMLRecord($folioHoldings, $dummyMarc);
+    my $rec = new DummyRecord($folioHoldings, $dummyMarc);
+    my $holdingsXml = Net::Z3950::FOLIO::OPACXMLRecord::makeOPACXMLRecord($rec, $dummyMarc);
     is($holdingsXml, $expected, "generated holdings $i match expected XML");
 }
 
@@ -61,3 +62,29 @@ sub readFile {
     $fh->close();
     return $data;
 }
+
+
+package DummyRecord;
+
+use Net::Z3950::FOLIO::HoldingsRecords qw(makeHoldingsRecords);
+
+sub new {
+    my $class = shift();
+    my($folioHoldings, $marc) = @_;
+
+    return bless {
+	folioHoldings => $folioHoldings,
+	marc => $marc,
+    }, $class;
+}
+
+sub jsonStructure { return shift()->{folioHoldings} }
+sub marcRecord { return shift()->{marc} }
+
+sub holdings {
+    my $this = shift();
+    my($marc) = @_;
+
+    return makeHoldingsRecords($this, $marc)
+};
+

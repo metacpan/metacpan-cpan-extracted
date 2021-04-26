@@ -3,78 +3,96 @@ package LCS::Similar;
 use 5.010001;
 use strict;
 use warnings;
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 #use utf8;
 #use Data::Dumper;
 
 sub new {
-  my $class = shift;
-  # uncoverable condition false
-  bless @_ ? @_ > 1 ? {@_} : {%{$_[0]}} : {}, ref $class || $class;
+    my $class = shift;
+    # uncoverable condition false
+    bless @_ ? @_ > 1 ? {@_} : {%{$_[0]}} : {}, ref $class || $class;
 }
 
 sub LCS {
-  my ($self, $X, $Y, $compare, $threshold) = @_;
+    my ($self, $a, $b, $compare, $threshold) = @_;
 
-  $compare //= sub { $_[0] eq $_[1] };
+    my ($amin, $amax, $bmin, $bmax) = (0, $#$a, 0, $#$b);
 
-  my $m = scalar @$X;
-  my $n = scalar @$Y;
-
-  my $c = [];
-  my ($i,$j);
-  for ($i=0;$i<=$m;$i++) {
-    for ($j=0;$j<=$n;$j++) {
-      $c->[$i][$j]=0;
+    while ($amin <= $amax and $bmin <= $bmax and $a->[$amin] eq $b->[$bmin]) {
+        $amin++;
+        $bmin++;
     }
-  }
-  for ($i=1;$i<=$m;$i++) {
-    for ($j=1;$j<=$n;$j++) {
-      $c->[$i][$j] = $self->max3(
-        &$compare(
-            $X->[$i-1],
-            $Y->[$j-1],
-            $threshold
-          ) + $c->[$i-1][$j-1],
-        $c->[$i][$j-1],
-        $c->[$i-1][$j],
-      );
+    while ($amin <= $amax and $bmin <= $bmax and $a->[$amax] eq $b->[$bmax]) {
+        $amax--;
+        $bmax--;
     }
-  }
-  my $path = $self->_lcs($X,$Y,$c,$m,$n,[],$compare, $threshold);
-  return $path;
+
+    $compare //= sub { $_[0] eq $_[1] };
+
+    #my $m = scalar @$a;
+    my $m = $amax - $amin +1;
+    #my $n = scalar @$b;
+    my $n = $bmax - $bmin +1;
+
+    my $c = [];
+    my ($i,$j);
+    for ($i=0; $i<=$m; $i++) {
+        for ($j=0;$j<=$n;$j++) {
+            $c->[$i][$j]=0;
+        }
+    }
+    for ($i=1; $i<=$m; $i++) { # my $j ($bmin..$bmax)
+        for ($j=1; $j<=$n; $j++) {
+            $c->[$i][$j] = $self->max3(
+                &$compare(
+                    $a->[$amin + $i-1],
+                    $b->[$bmin + $j-1],
+                    $threshold
+                ) + $c->[$i-1][$j-1],
+                $c->[$i][$j-1],
+                $c->[$i-1][$j],
+            );
+        }
+    }
+    my $path = $self->_lcs($a, $b, $amin, $bmin, $c, $m, $n,[],$compare, $threshold);
+    ##return $path;
+    return [
+        map([$_ => $_], 0 .. ($bmin-1)), ## no critic qw(BuiltinFunctions::RequireBlockMap)
+            @$path,
+            map([++$amax => $_], ($bmax+1) .. $#$b) ## no critic qw(BuiltinFunctions::RequireBlockMap)
+    ];
 }
 
 
 sub max { ($_[1] > $_[2]) ? $_[1] : $_[2]; }
 
 sub max3 {
-  ($_[1] >= $_[2])
-    ? ($_[1] >= $_[3]
-      ? $_[1] : $_[3]
-    )
-    : ($_[2] >= $_[3]
-      ? $_[2] : $_[3]
-    );
+    ($_[1] >= $_[2])
+        ? ($_[1] >= $_[3]
+            ? $_[1] : $_[3]
+        )
+        : ($_[2] >= $_[3]
+            ? $_[2] : $_[3]
+        );
 }
 
 sub _lcs {
-  my ($self,$X,$Y,$c,$i,$j,$L,$compare, $threshold) = @_;
+    my ($self, $a, $b, $amin, $bmin, $c, $i, $j, $L, $compare, $threshold) = @_;
 
-  while ($i > 0 && $j > 0) {
-    if ( &$compare($X->[$i-1],$Y->[$j-1], $threshold) ) {
-      unshift @{$L},[$i-1,$j-1];
-      $i--;
-      $j--;
+    while ($i > 0 && $j > 0) {
+        if ( &$compare($a->[$amin + $i-1],$b->[$bmin + $j-1], $threshold) ) {
+            unshift @{$L},[$amin + $i-1, $bmin + $j-1];
+            $i--;
+            $j--;
+        }
+        elsif ( $c->[$i][$j] == $c->[$i-1][$j] ) {
+            $i--;
+        }
+        else {
+            $j--;
+        }
     }
-    elsif ($c->[$i][$j] == $c->[$i-1][$j]) {
-      $i--;
-    }
-    else {
-      $j--;
-    }
-  }
-  return $L;
+    return $L;
 }
 
 1;
@@ -305,7 +323,7 @@ Helmut Wollmersdorfer E<lt>helmut.wollmersdorfer@gmail.comE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright 2015 by Helmut Wollmersdorfer
+Copyright 2015-2021 by Helmut Wollmersdorfer
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

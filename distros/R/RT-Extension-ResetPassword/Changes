@@ -1,5 +1,8 @@
 Revision history for Perl module RT::Extension::ResetPassword
 
+1.11 2021-04-22
+ - Add an option to show all users with a password set
+
 1.10 2021-03-02
  - Provide a way to delete a user's password
  - Display password status on the user admin page

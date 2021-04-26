@@ -1,7 +1,7 @@
 package PICA::Writer::PPXML;
 use v5.14.1;
 
-our $VERSION = '1.16';
+our $VERSION = '1.17';
 
 use Scalar::Util qw(reftype);
 use XML::LibXML;
@@ -22,8 +22,8 @@ sub write_field {
     my $writer = $self->{writer};
 
     $writer->startTag('tag', id => $field->[0], occ => 1 * $field->[1] || "");
-    for (my $i = 2; $i < scalar @$field; $i += 2) {
-        $writer->dataElement('subf', $field->[$i + 1], id => $field->[$i]);
+    for (my $i = 3; $i < scalar @$field; $i += 2) {
+        $writer->dataElement('subf', $field->[$i], id => $field->[$i - 1]);
     }
     $writer->endTag('tag');
 }

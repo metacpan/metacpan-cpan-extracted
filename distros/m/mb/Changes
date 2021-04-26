@@ -1,5 +1,9 @@
 Revision history for this software.
 
+0.27  2021-04-24 00:00:00
+  - fix confess() and cluck() messages
+  - created by INABA Hitoshi
+
 0.26  2021-04-13 00:00:00
   - fix return then /regexp/
   - fix $any->split, etc

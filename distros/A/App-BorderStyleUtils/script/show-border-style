@@ -4,9 +4,9 @@
 # and generated automatically using Perinci::CmdLine::Gen version 0.497
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-01-23'; # DATE
+our $DATE = '2021-04-24'; # DATE
 our $DIST = 'App-BorderStyleUtils'; # DIST
-our $VERSION = '0.008'; # VERSION
+our $VERSION = '0.012'; # VERSION
 
 use 5.010001;
 use strict;
@@ -41,7 +41,7 @@ show-border-style - Show example table with specified border style
 
 =head1 VERSION
 
-This document describes version 0.008 of show-border-style (from Perl distribution App-BorderStyleUtils), released on 2021-01-23.
+This document describes version 0.012 of show-border-style (from Perl distribution App-BorderStyleUtils), released on 2021-04-24.
 
 =head1 SYNOPSIS
 
@@ -50,6 +50,58 @@ Usage:
  % show-border-style [--debug] [--format=name] [--json] [--log-level=level]
      [--(no)naked-res] [--page-result[=program]] [--quiet] [--trace]
      [--verbose] [--view-result[=program]] <style>
+
+Examples:
+
+Show the details for the ASCII::SingleLineDoubleAfterHeader border style:
+
+ % show-border-style ASCII::SingleLineDoubleAfterHeader
+ # Positions for border character
+ 
+  ---------------------------------------------
+  y\x  0    1    2    3    4    5    6    7
+   0  '.'  '-'  '+'  '.'                              <--- top border
+   1  '|'  '|'  '|'                                   <--- header row
+   2  '+'  '='  '+'  '+'  '+'  '+'                    <--- separator between header & data row
+   3  '|'  '|'  '|'                                   <--- data row
+   4  '+'  '-'  '+'  '+'  '+'  '+'  '+'  '+'          <--- separator between data rows
+   5  '`'  '-'  '+'  '''                              <--- bottom border
+ 
+   6  ''  ''  ''  ''                              <--- top border (for case when there is no header row)
+   7  ''  ''  ''  ''                              <--- bottom border (for case when there is header row but no data row)
+  ---------------------------------------------
+ 
+ .--------+--------.     #
+ | header | header |     #
+ +========+========+     #
+ | cell   | cell   |     # Table with header row, without row/column spans
+ +--------+--------+     #
+ | cell   | cell   |     #
+ `--------+--------'     #
+ 
+      #
+ | cell   | cell   |     # Table without header row, with data rows
+ +--------+--------+     #
+ | cell   | cell   |     #
+ `--------+--------'     #
+ 
+ .--------+--------.     #
+ | header | header |     # Table with header row, but without any data row
+      #
+ 
+ .-----------+-----+-----.     #
+ | header    | hea | hea |     #
+ +=====+=====+=====+=====+     #
+ | cel | cel | cell      |     #
+ +-----+-----+-----+-----+     #
+ | cell      | cel | cel |     #
+ +-----------+-----+-----+     # Table with row/column spans
+ | cell      | cell      |     #
+ |           +-----------+     #
+ |           | cell      |     #
+ +-----------+           |     #
+ | cell      |           |     #
+ `-----------+-----------'     #
 
 =head1 OPTIONS
 
@@ -194,7 +246,7 @@ Source repository is at L<https://github.com/perlancar/perl-App-BorderStyleUtils
 
 =head1 BUGS
 
-Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-App-BorderStyleUtils/issues>
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-BorderStyleUtils>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
@@ -206,7 +258,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2020 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -90,6 +90,7 @@ sub change_transform
 	my @cr = $self-> clipRect;
 	my @sc = $self-> scale;
 	my $ro = $self-> rotate;
+	my $rg = $self-> region;
 	$cr[2] -= $cr[0];
 	$cr[3] -= $cr[1];
 	my $doClip = grep { $_ != 0 } @cr;
@@ -111,6 +112,7 @@ sub change_transform
 N $cr[0] $cr[1] M 0 $cr[3] L $cr[2] 0 L 0 $mcr3 L X C
 CLIP
 	$self-> emit("@tp T") if $doTR;
+	$self-> emit($rg-> apply_offset) if $rg && !$doClip;
 	$self-> emit("@sc Z") if $doSC;
 	$self-> emit("$ro R") if $ro != 0;
 	$self-> {changed}-> {$_} = 1 for qw(fill linePattern lineWidth lineJoin lineEnd miterLimit font);
@@ -297,7 +299,7 @@ $extras
 %%EndComments
 
 /d/def load def/,/load load d/~/exch , d/S/show , d/:/gsave , d/;/grestore ,
-d/N/newpath , d/M/moveto , d/L/rlineto , d/X/closepath , d/C/clip ,
+d/N/newpath , d/M/moveto , d/L/rlineto , d/X/closepath , d/C/clip , d/U/curveto ,
 d/T/translate , d/R/rotate , d/Y/glyphshow , d/P/showpage , d/Z/scale , d/I/imagemask ,
 d/@/dup , d/G/setgray , d/A/setrgbcolor , d/l/lineto , d/F/fill ,
 d/FF/findfont , d/XF/scalefont , d/SF/setfont ,
@@ -901,6 +903,79 @@ sub apply_canvas_font
 		$self-> {glyph_font}  = ($f1000->{pitch} == fp::Fixed) ? 'Courier' : 'Helvetica'
 	}
 }
+
+sub new_path
+{
+	return Prima::PS::PostScript::Path->new(@_);
+}
+
+sub region
+{
+	return $_[0]->{region} unless $#_;
+	my ( $self, $region ) = @_;
+	if ( $region && !UNIVERSAL::isa($region, "Prima::PS::PostScript::Region")) {
+		warn "Region is not a Prima::PS::PostScript::Region";
+		return undef;
+	}
+	$self->{clipRect} = [0,0,0,0];
+	$self->{region} = $region;
+	$self-> change_transform;
+}
+
+package
+	Prima::PS::PostScript::Path;
+use base qw(Prima::PS::Drawable::Path);
+
+my %dict = (
+	lineto    => 'l',
+	moveto    => 'M',
+	curveto   => 'U',
+	stroke    => 'O',
+	closepath => 'X',
+	fill_alt  => 'E',
+	fill_wind => 'F',
+);
+
+sub dict { \%dict }
+
+sub set_current_point
+{
+	my ( $self, $x, $y ) = @_;
+	$self-> emit('N') unless $self->{move_is_line};
+	$self-> emit($x, $y, $self->{move_is_line} ? 'l' : 'M');
+	$self-> {move_is_line} = 1;
+}
+
+sub region
+{
+	my ($self, $mode) = @_;
+	my $path = join "\n", @{$self-> entries};
+	$path .= ' X' unless $path =~ /X$/;
+	$path .= ' C';
+	return Prima::PS::PostScript::Region->new( $path );
+}
+
+package
+	Prima::PS::PostScript::Region;
+use base qw(Prima::PS::Drawable::Region);
+
+sub other { UNIVERSAL::isa($_[0], "Prima::PS::PostScript::Region") ? $_[0] : () }
+
+sub equals
+{
+	my $self = shift;
+	my $other = other(shift) or return;
+	return $self->{path} eq $other->{path};
+}
+
+sub combine
+{
+	my $self = shift;
+	my $other = other(shift) or return;
+	$self->{path} .= "\n" . $other->apply_offset;
+}
+
+sub is_empty { shift->{path} !~ /[OF]/ }
 
 1;
 

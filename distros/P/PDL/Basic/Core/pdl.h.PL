@@ -1,14 +1,13 @@
-# -*-perl-*-
-
 use strict;
 use warnings;
-use Config;
-use File::Basename qw(&basename &dirname);
 
 # how many variable types (ie PDL_Byte, ...) are there?
 require './Types.pm';
-my $ntypes = $#PDL::Types::names;
 my $PDL_DATATYPES = PDL::Types::datatypes_header();
+my $typeF = PDL::Type->new('F');
+my $typeD = PDL::Type->new('D');
+my $typeG = PDL::Type->new('G');
+my $typeC = PDL::Type->new('C');
 
 require './Config.pm';
 die "No PDL::Config found" unless %PDL::Config;
@@ -18,9 +17,6 @@ my $file = shift @ARGV;
 print "Extracting $file\n";
 open OUT,">$file" or die "Can't create $file: $!";
 chmod 0644, $file;
-
-# In this section, perl variables will be expanded during extraction.
-# You can use $Config{...} to use Configure variables.
 
 print OUT <<"!GROK!THIS!";
 
@@ -42,6 +38,22 @@ extern int pdl_debugging;
 #define PDLDEBUG_f(a)
 #endif
 
+#define PDL_MAKE_PERL_COMPLEX(output,r,i) { \\
+        dSP; int count; double rval = r, ival = i; SV *ret; \\
+        ENTER; SAVETMPS; PUSHMARK(sp); \\
+        perl_require_pv("PDL/Complex/Overloads.pm"); \\
+        mXPUSHn(rval); \\
+        mXPUSHn(ival); \\
+        PUTBACK; \\
+        count = perl_call_pv("PDL::Complex::Overloads::cplx", G_SCALAR); \\
+        SPAGAIN; \\
+        if (count != 1) croak("Failed to create PDL::Complex::Overloads object (%.9g, %.9g)", rval, ival); \\
+        ret = POPs; \\
+        SvREFCNT_inc(ret); \\
+        output = ret; \\
+        PUTBACK; FREETMPS; LEAVE; \\
+}
+
 #define ANYVAL_TO_SV(outsv,inany) do { switch (inany.type) { \\
                 case PDL_B:   outsv = newSViv( (IV)(inany.value.B) ); break; \\
                 case PDL_S:   outsv = newSViv( (IV)(inany.value.S) ); break; \\
@@ -51,8 +63,8 @@ extern int pdl_debugging;
                 case PDL_LL:  outsv = newSViv( (IV)(inany.value.Q) ); break; \\
                 case PDL_F:   outsv = newSVnv( (NV)(inany.value.F) ); break; \\
                 case PDL_D:   outsv = newSVnv( (NV)(inany.value.D) ); break; \\
-                case PDL_CF:  outsv = newSV( 50 ); sv_setpvf(outsv, "%.9g%+.9gi", crealf(inany.value.G),cimagf(inany.value.G)); break; \\
-                case PDL_CD:  outsv = newSV( 50 ); sv_setpvf(outsv, "%.17g%+.17gi",creal(inany.value.C),cimag(inany.value.C)); break; \\
+                case PDL_CF:  PDL_MAKE_PERL_COMPLEX(outsv, crealf(inany.value.G), cimagf(inany.value.G)); break; \\
+                case PDL_CD:  PDL_MAKE_PERL_COMPLEX(outsv, creal(inany.value.C), cimag(inany.value.C)); break; \\
                 default:      outsv = &PL_sv_undef; \\
             } \\
         } while (0)
@@ -201,8 +213,8 @@ static inline int _anyval_eq_anyval(PDL_Anyval x, PDL_Anyval y) {
                 case PDL_LL:  return (x.value.F                 == (PDL_Float)(y.value.Q)) ? 1 : 0;
                 case PDL_F:   return (x.value.F                 == y.value.F) ? 1 : 0;
                 case PDL_D:   return ((PDL_Double)(x.value.F)   == y.value.D) ? 1 : 0;
-                case PDL_CF:  return ((PDL_CFloat)(x.value.F)   == y.value.G) ? 1 : 0;
-                case PDL_CD:  return ((PDL_CDouble)(x.value.F)  == y.value.C) ? 1 : 0;
+                case PDL_CF:  return (x.value.F                 == y.value.G) ? 1 : 0;
+                case PDL_CD:  return (x.value.F                 == y.value.C) ? 1 : 0;
                 default:      return 0;
             }
         case PDL_D:
@@ -215,35 +227,35 @@ static inline int _anyval_eq_anyval(PDL_Anyval x, PDL_Anyval y) {
                 case PDL_LL:  return (x.value.D                 == (PDL_Double)(y.value.Q)) ? 1 : 0;
                 case PDL_F:   return (x.value.D                 == (PDL_Double)(y.value.F)) ? 1 : 0;
                 case PDL_D:   return (x.value.D                 == y.value.D) ? 1 : 0;
-                case PDL_CF:  return ((PDL_CFloat)(x.value.D)   == y.value.G) ? 1 : 0;
-                case PDL_CD:  return ((PDL_CDouble)(x.value.D)  == y.value.C) ? 1 : 0;
+                case PDL_CF:  return (x.value.D                 == y.value.G) ? 1 : 0;
+                case PDL_CD:  return (x.value.D                 == y.value.C) ? 1 : 0;
                 default:      return 0;
             }
         case PDL_CF:
             switch (y.type) {
-                case PDL_B:   return (x.value.C                 == y.value.B) ? 1 : 0;
-                case PDL_S:   return ((PDL_Short)(x.value.C)    == y.value.S) ? 1 : 0;
-                case PDL_US:  return ((PDL_Ushort)(x.value.C)   == y.value.U) ? 1 : 0;
-                case PDL_L:   return ((PDL_Long)(x.value.C)     == y.value.L) ? 1 : 0;
-                case PDL_IND: return ((PDL_Indx)(x.value.C)     == y.value.N) ? 1 : 0;
-                case PDL_LL:  return ((PDL_LongLong)(x.value.C) == y.value.Q) ? 1 : 0;
-                case PDL_F:   return ((PDL_Float)(x.value.C)    == y.value.F) ? 1 : 0;
-                case PDL_D:   return ((PDL_Double)(x.value.C)   == y.value.D) ? 1 : 0;
-                case PDL_CF:  return ((PDL_CFloat)(x.value.C)   == y.value.G) ? 1 : 0;
-                case PDL_CD:  return (x.value.C                 == y.value.C) ? 1 : 0;
+                case PDL_B:   return (x.value.G                 == (PDL_Float)(y.value.B)) ? 1 : 0;
+                case PDL_S:   return (x.value.G                 == (PDL_Float)(y.value.S)) ? 1 : 0;
+                case PDL_US:  return (x.value.G                 == (PDL_Float)(y.value.U)) ? 1 : 0;
+                case PDL_L:   return (x.value.G                 == (PDL_Float)(y.value.L)) ? 1 : 0;
+                case PDL_IND: return (x.value.G                 == (PDL_Float)(y.value.N)) ? 1 : 0;
+                case PDL_LL:  return (x.value.G                 == (PDL_Float)(y.value.Q)) ? 1 : 0;
+                case PDL_F:   return (x.value.G                 == y.value.F) ? 1 : 0;
+                case PDL_D:   return (x.value.G                 == y.value.D) ? 1 : 0;
+                case PDL_CF:  return (x.value.G                 == y.value.G) ? 1 : 0;
+                case PDL_CD:  return (x.value.G                 == y.value.C) ? 1 : 0;
                 default:      return 0;
             }
         case PDL_CD:
             switch (y.type) {
-                case PDL_B:   return (x.value.C                 == y.value.B) ? 1 : 0;
-                case PDL_S:   return ((PDL_Short)(x.value.C)    == y.value.S) ? 1 : 0;
-                case PDL_US:  return ((PDL_Ushort)(x.value.C)   == y.value.U) ? 1 : 0;
-                case PDL_L:   return ((PDL_Long)(x.value.C)     == y.value.L) ? 1 : 0;
-                case PDL_IND: return ((PDL_Indx)(x.value.C)     == y.value.N) ? 1 : 0;
-                case PDL_LL:  return ((PDL_LongLong)(x.value.C) == y.value.Q) ? 1 : 0;
-                case PDL_F:   return ((PDL_Float)(x.value.C)    == y.value.F) ? 1 : 0;
-                case PDL_D:   return ((PDL_Double)(x.value.C)   == y.value.D) ? 1 : 0;
-                case PDL_CF:  return ((PDL_CDouble)(x.value.B)  == y.value.G) ? 1 : 0;
+                case PDL_B:   return (x.value.C                 == (PDL_CDouble)(y.value.B)) ? 1 : 0;
+                case PDL_S:   return (x.value.C                 == (PDL_CDouble)(y.value.S)) ? 1 : 0;
+                case PDL_US:  return (x.value.C                 == (PDL_CDouble)(y.value.U)) ? 1 : 0;
+                case PDL_L:   return (x.value.C                 == (PDL_CDouble)(y.value.L)) ? 1 : 0;
+                case PDL_IND: return (x.value.C                 == (PDL_CDouble)(y.value.N)) ? 1 : 0;
+                case PDL_LL:  return (x.value.C                 == (PDL_CDouble)(y.value.Q)) ? 1 : 0;
+                case PDL_F:   return (x.value.C                 == (PDL_CDouble)(y.value.F)) ? 1 : 0;
+                case PDL_D:   return (x.value.C                 == y.value.D) ? 1 : 0;
+                case PDL_CF:  return (x.value.C                 == y.value.G) ? 1 : 0;
                 case PDL_CD:  return (x.value.C                 == y.value.C) ? 1 : 0;
                 default:      return 0;
             }
@@ -257,15 +269,23 @@ static inline int _anyval_eq_anyval(PDL_Anyval x, PDL_Anyval y) {
 $mymalloc
 !GROK!THIS!
 
+print OUT <<EOF;
+#define ANYVAL_ISNAN(x) (\\
+  (x).type < PDL_F ? 0 : \\
+  (x).type == PDL_CF ? @{[$typeG->isnan('(x).value.G')]} : \\
+  (x).type == PDL_CD ? @{[$typeC->isnan('(x).value.C')]} : \\
+  (x).type == PDL_F ? @{[$typeF->isnan('(x).value.F')]} : \\
+  (x).type == PDL_D ? @{[$typeD->isnan('(x).value.D')]} : \\
+  (croak("ANYVAL_ISNAN should not get here, had type %d", (x).type), 1) \\
+)
+EOF
+
 # set up the badvalues structure
 # - for binary compatability, this is created whatever the
 #   value of $bvalflag and $usenan
 print OUT "typedef struct badvals {\n";
-foreach my $i ( reverse(0 .. $ntypes) ) {
-    my $name = $PDL::Types::names[$i];
-    my $realctype = $PDL::Types::typehash{$name}->{realctype};
-    my $cname     = $PDL::Types::typehash{$name}->{ctype};
-    $cname =~ s/^PDL_//;
+foreach my $type ( reverse PDL::Types::types() ) {
+    my ($realctype, $cname) = map $type->$_, qw(realctype shortctype);
     printf OUT "   %18s   %s;\n",$realctype,$cname;
     printf OUT "   %18s   default_%s;\n",$realctype,$cname;
 }

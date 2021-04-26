@@ -1,5 +1,9 @@
 Revision log for Perl module "Image::CairoSVG"
 
+0.13 2021-04-26
+
+- Support stroke-linecap and stroke-linejoin attributes
+
 0.12 2021-04-05
 
 - Support named colours using Graphics::ColorNames::WWW

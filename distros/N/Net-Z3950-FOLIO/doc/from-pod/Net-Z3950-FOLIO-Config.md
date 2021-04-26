@@ -120,6 +120,11 @@ Contains two elements, both with string values:
 
     The corresponding password, unless overridden by authentication information in the Z39.50 init request.
 
+## `nologin`
+
+If specified and set to 1, then no login is performed, and the
+`login` section need not be provided.
+
 ## `indexMap`
 
 Contains any number of elements. The keys are the numbers of BIB-1 use
@@ -240,6 +245,7 @@ be mapped into MARC fields. It contains up to five elements:
     - `_callNumber`
     - `_callNumberPrefix`
     - `_callNumberSuffix`
+    - `_holdingsLocation`
     - `_volume`
     - `_yearCaption`
 

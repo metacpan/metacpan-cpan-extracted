@@ -22,7 +22,7 @@ use JSON::Create 'write_json';
 use JSON::Parse 'read_json';
 use Convert::Moji 'make_regex';
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 sub get_links
 {
@@ -48,6 +48,9 @@ sub get_links
 sub check_links
 {
     my ($links, %options) = @_;
+    if (! $links || ref $links ne 'HASH') {
+	carp "Usage: check_links (\%links, %options)";
+    }
     my $out = $options{out};
     my $verbose = $options{verbose};
     my $nook = $options{nook};
@@ -71,16 +74,16 @@ sub check_links
     my $count = 0;
     my @checks;
     for my $link (sort keys %$links) {
-    if ($nook) {
-	if ($skip{$link}) {
-	    if ($verbose) {
-		print "$link was OK last time, skipping\n";
+	if ($nook) {
+	    if ($skip{$link}) {
+		if ($verbose) {
+		    print "$link was OK last time, skipping\n";
+		}
+		# Keep a copy of this link in the output.
+		push @checks, $skip{$link};
+		next;
 	    }
-	    # Keep a copy of this link in the output.
-	    push @checks, $skip{$link};
-	    next;
 	}
-    }
 	my %r = (
 	    link => $link,
 	    files => $links->{$link},
@@ -173,6 +176,9 @@ EOF
 		}
 	    }
 	}
+	if ($options{nofiles}) {
+	    next;
+	}
 	my $files = $row->push ('td');
 	my $filelist = $xlink->{files};
 	if ($filelist) {
@@ -190,7 +196,13 @@ EOF
 		if ($options{strip}) {
 		    $file =~ s!$options{strip}!!;
 		}
-		my $href = "$options{url}/$file";
+		my $href;
+		if ($options{url}) {
+		    $href = "$options{url}/$file";
+		}
+		else {
+		    $href = $file;
+		}
 		$files->push (
 		    'a',
 		    attr => {target => '_blank', href => $href},
@@ -204,27 +216,31 @@ EOF
 
 sub replace
 {
-    my ($links, $files) = @_;
+    my ($links, $files, %options) = @_;
+    my $verbose = $options{verbose};
     my @moved;
     for my $l (keys %$links) {
-#	print "$l\n";
 	my $link = $links->{$l};
 	if ($link->{status} =~ m!^30! && $link->{location}) {
 	    push @moved, $l;
-#	    print "$l\n";
+	    if ($verbose) {
+		print "Link '$l' to be edited.\n";
+	    }
 	}
     }
-#    print "@moved\n";
     my $re = make_regex (@moved);
-#    print "$re\n";
     for my $file (@$files) {
 	my $text = read_text ($file);
 	if ($text =~ s!($re)!$links->{$1}{location}!g) {
-	    print "$file changed $1 $links->{$1}{location}\n";
+	    if ($verbose) {
+		print "Some links in '$file' changed.\n";
+	    }
 	    write_text ($file, $text);
 	}
 	else {
-#	    print "$file unchanged\n";
+	    if ($verbose) {
+		print "'$file' is unchanged, not writing.\n";
+	    }
 	}
     }
 }

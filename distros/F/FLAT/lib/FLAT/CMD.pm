@@ -29,8 +29,8 @@ use parent 'Exporter';    #instead of: use Exporter (); @ISA = 'Exporter';
 use vars qw(@EXPORT $AUTOLOAD);
 
 @EXPORT = qw(compare dump dfa2jflap nfa2jflap dfa2gv nfa2gv pfa2gv dfa2undgv nfa2undgv pfa2undgv dfa2digraph
-    nfa2digraph pfa2digraph dfa2undirected nfa2undirected pfa2undirected random_pre random_re
-    savedfa test help
+  nfa2digraph pfa2digraph dfa2undirected nfa2undirected pfa2undirected random_pre random_re
+  savedfa test help
 );
 
 sub AUTOLOAD {
@@ -38,13 +38,13 @@ sub AUTOLOAD {
     $l =~ s/.*:://;
     my (%EXPORT);
     @EXPORT{@EXPORT} = '';
-    if (exists $EXPORT{$l}) {
+    if ( exists $EXPORT{$l} ) {
         FLAT::CMD->$l(@_);
     }
 }
 
 sub help {
-    print <<END
+    print <<END;
 __________             .__    ___________.____         ___________
 \______   \ ___________|  |   \_   _____/|    |   _____\__    ___/
  |     ___// __ \_  __ \  |    |    __)  |    |   \__  \ |    |   
@@ -115,8 +115,9 @@ END
 # save to a dat file
 sub savedfa {
     my $PRE = shift;
+
     # neat a better way to get input via stdin
-    if (!$PRE) {
+    if ( !$PRE ) {
         while (<>) {
             chomp;
             $PRE = $_;
@@ -128,6 +129,7 @@ sub savedfa {
     use FLAT::NFA;
     use FLAT::DFA;
     use Storable;
+
     # caches results, loads them in if detexted
     my $dfa = FLAT::Regex::WithExtraOps->new($PRE)->as_pfa->as_nfa->as_dfa->as_min_dfa->trim_sinks;
     store $dfa, "$PRE.dat";
@@ -141,11 +143,12 @@ sub test {
     use FLAT::PFA;
     use FLAT::NFA;
     use FLAT::DFA;
+
     # handles multiple strings; first is considered the regex
     if (@_) {
-        my $FA = FLAT::Regex::WithExtraOps->new(shift @_)->as_pfa()->as_nfa->as_dfa();
+        my $FA = FLAT::Regex::WithExtraOps->new( shift @_ )->as_pfa()->as_nfa->as_dfa();
         foreach (@_) {
-            if ($FA->is_valid_string($_)) {
+            if ( $FA->is_valid_string($_) ) {
                 print "(+): $_\n";
             }
             else {
@@ -157,11 +160,11 @@ sub test {
         my $FA;
         while (<STDIN>) {
             chomp;
-            if ($. == 1) {    #<-- uses first line as regex!
+            if ( $. == 1 ) {    #<-- uses first line as regex!
                 $FA = FLAT::Regex::WithExtraOps->new($_)->as_pfa()->as_nfa->as_dfa();
             }
             else {
-                if ($FA->is_valid_string($_)) {
+                if ( $FA->is_valid_string($_) ) {
                     print "(+): $_\n";
                 }
                 else {
@@ -384,6 +387,7 @@ sub dfa2digraph {
     use FLAT::DFA;
     use FLAT::NFA;
     use FLAT::PFA;
+
     # trims sink states from min-dfa since transitions are gone
     if (@_) {
         foreach (@_) {
@@ -455,6 +459,7 @@ sub dfa2undirected {
     use FLAT::DFA;
     use FLAT::NFA;
     use FLAT::PFA;
+
     # trims sink states from min-dfa since transitions are gone
     if (@_) {
         foreach (@_) {
@@ -529,7 +534,7 @@ sub compare {
     my $PFA2 = FLAT::Regex::WithExtraOps->new(shift)->as_pfa();
     my $DFA1 = $PFA1->as_nfa->as_min_dfa;
     my $DFA2 = $PFA2->as_nfa->as_min_dfa;
-    if ($DFA1->equals($DFA2)) {
+    if ( $DFA1->equals($DFA2) ) {
         print "Yes\n";
     }
     else {
@@ -542,10 +547,12 @@ sub compare {
 # perl -MFLAT -e random_pre
 sub random_pre {
     my $and_chance = shift;
+
     # skirt around deep recursion warning annoyance
-    local $SIG{__WARN__} = sub {$_[0] =~ /^Deep recursion/ or warn $_[0]};
+    local $SIG{__WARN__} = sub { $_[0] =~ /^Deep recursion/ or warn $_[0] };
     srand $$;
     my %CMDLINEOPTS = ();
+
     # Percent chance of each operator occuring
     $CMDLINEOPTS{LENGTH} = 32;
     $CMDLINEOPTS{OR}     = 6;
@@ -553,49 +560,52 @@ sub random_pre {
     $CMDLINEOPTS{OPEN}   = 5;
     $CMDLINEOPTS{CLOSE}  = 0;
     $CMDLINEOPTS{n}      = 1;
-    $CMDLINEOPTS{AND}    = 10;                                   #<-- default
-    $CMDLINEOPTS{AND}    = $and_chance if ($and_chance == 0);    #<-- to make it just an re (no shuffle)
+    $CMDLINEOPTS{AND}    = 10;                                     #<-- default
+    $CMDLINEOPTS{AND}    = $and_chance if ( $and_chance == 0 );    #<-- to make it just an re (no shuffle)
 
     my $getRandomChar = sub {
         my $ch = '';
+
         # Get a random character between 0 and 127.
         do {
-            $ch = int(rand 2);
-        } while ($ch !~ m/[a-zA-Z0-9]/);
+            $ch = int( rand 2 );
+        } while ( $ch !~ m/[a-zA-Z0-9]/ );
         return $ch;
     };
 
     my $getRandomRE = sub {
         my $str         = '';
         my @closeparens = ();
-        for (1 .. $CMDLINEOPTS{LENGTH}) {
+        for ( 1 .. $CMDLINEOPTS{LENGTH} ) {
             $str .= $getRandomChar->();
+
             # % chance of an "or"
-            if (int(rand 100) < $CMDLINEOPTS{OR}) {
+            if ( int( rand 100 ) < $CMDLINEOPTS{OR} ) {
                 $str .= "|1";
             }
-            elsif (int(rand 100) < $CMDLINEOPTS{AND}) {
+            elsif ( int( rand 100 ) < $CMDLINEOPTS{AND} ) {
                 $str .= "&0";
             }
-            elsif (int(rand 100) < $CMDLINEOPTS{STAR}) {
+            elsif ( int( rand 100 ) < $CMDLINEOPTS{STAR} ) {
                 $str .= "*1";
             }
-            elsif (int(rand 100) < $CMDLINEOPTS{OPEN}) {
+            elsif ( int( rand 100 ) < $CMDLINEOPTS{OPEN} ) {
                 $str .= "(";
-                push(@closeparens, '0101)');
+                push( @closeparens, '0101)' );
             }
-            elsif (int(rand 100) < $CMDLINEOPTS{CLOSE} && @closeparens) {
+            elsif ( int( rand 100 ) < $CMDLINEOPTS{CLOSE} && @closeparens ) {
                 $str .= pop(@closeparens);
             }
         }
+
         # empty out @closeparens if there are still some left
         if (@closeparens) {
-            $str .= join('', @closeparens);
+            $str .= join( '', @closeparens );
         }
         return $str;
     };
 
-    for (1 .. $CMDLINEOPTS{n}) {
+    for ( 1 .. $CMDLINEOPTS{n} ) {
         print $getRandomRE->(), "\n";
     }
 }
@@ -614,15 +624,9 @@ __END__
 =head1 AUTHORS & ACKNOWLEDGEMENTS
 
 FLAT is written by Mike Rosulek E<lt>mike at mikero dot comE<gt> and 
-Brett Estrade E<lt>estradb at gmail dot comE<gt>.
-
-The initial version (FLAT::Legacy) by Brett Estrade was work towards an 
-MS thesis at the University of Southern Mississippi.
-
-Please visit the Wiki at http://www.0x743.com/flat
+B. Estarde E<lt>estradb at gmail dot comE<gt>.
 
 =head1 LICENSE
 
 This module is free software; you can redistribute it and/or modify it under
 the same terms as Perl itself.
-

@@ -72,7 +72,7 @@ For storage implementations, we have:
 
 =item * L<Myriad::Storage::PostgreSQL>
 
-=item * L<Myriad::Storage::Perl>
+=item * L<Myriad::Storage::Memory>
 
 =back
 
@@ -90,7 +90,7 @@ Details on the request are in L<Myriad::RPC::Request> and the response to be sen
 
 =item * L<Myriad::RPC::PostgreSQL>
 
-=item * L<Myriad::RPC::Perl>
+=item * L<Myriad::RPC::Memory>
 
 =back
 
@@ -108,7 +108,7 @@ Subscription implementations include:
 
 =item * L<Myriad::Subscription::PostgreSQL>
 
-=item * L<Myriad::Subscription::Perl>
+=item * L<Myriad::Subscription::Memory>
 
 =back
 
@@ -126,7 +126,7 @@ Each of these implementations is supposed to separate out the logic from the act
 
 =item * L<Myriad::Transport::PostgreSQL>
 
-=item * L<Myriad::Transport::Perl>
+=item * L<Myriad::Transport::Memory>
 
 =back
 
@@ -185,9 +185,9 @@ modules under that immediate namespace will be loaded
 
 The L<Net::Async::Redis> (or compatible) instance used for service coördination.
 
-=head2 perl_transport
+=head2 memory_transport
 
-The L<Myriad::Transport::Perl> instance.
+The L<Myriad::Transport::Memory> instance.
 
 =head2 rpc
 

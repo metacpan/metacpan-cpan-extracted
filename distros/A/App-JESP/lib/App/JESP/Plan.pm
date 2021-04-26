@@ -1,5 +1,5 @@
 package App::JESP::Plan;
-$App::JESP::Plan::VERSION = '0.015';
+$App::JESP::Plan::VERSION = '0.016';
 use Moose;
 use File::Slurp;
 

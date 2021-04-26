@@ -6,7 +6,7 @@
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2021-01-20'; # DATE
 our $DIST = 'App-ANSIColorUtils'; # DIST
-our $VERSION = '0.009'; # VERSION
+our $VERSION = '0.010'; # VERSION
 
 use 5.010001;
 use strict;
@@ -38,7 +38,7 @@ rgb-to-ansi256-fg-code - Convert RGB to ANSI-256 color escape sequence to change
 
 =head1 VERSION
 
-This document describes version 0.009 of rgb-to-ansi256-fg-code (from Perl distribution App-ANSIColorUtils), released on 2021-01-20.
+This document describes version 0.010 of rgb-to-ansi256-fg-code (from Perl distribution App-ANSIColorUtils), released on 2021-01-20.
 
 =head1 SYNOPSIS
 

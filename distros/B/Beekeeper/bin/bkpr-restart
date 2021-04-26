@@ -1,0 +1,142 @@
+#!/usr/bin/perl -wT
+
+use strict;
+use warnings;
+
+BEGIN {
+
+    unless (eval { require Beekeeper }) {
+        # Modules not installed yet
+        unshift @INC, ($ENV{'PERL5LIB'} =~ m/([^:]+)/g);
+    }
+}
+
+use Beekeeper::Service::Supervisor;
+use Getopt::Long;
+
+my ($opt_host, $opt_pool, $opt_class, $opt_all, $opt_delay, $opt_help);
+
+GetOptions(
+    "Host=s"    => \$opt_host,    # --host
+    "pool=s"    => \$opt_pool,    # --pool
+    "class=s"   => \$opt_class,   # --class
+    "all"       => \$opt_all,     # --all
+    "delay=i"   => \$opt_delay,   # --delay
+    "help"      => \$opt_help,    # --help    
+) or exit;
+
+my $Help = "
+Usage: bkpr-restart [OPTIONS]
+Gracefully restart remote pool of workers.
+
+  -H, --Host  str  restart workers only of specified host
+  -p, --pool  str  restart workers only of specified pool
+  -c, --class str  restart workers only of specified class
+  -a, --all        restart all workers of every host and every pool
+  -d, --delay sec  delay in seconds between restarts
+  -h, --help       display this help and exit
+
+Filters --host, --pool and --class can be combined.
+
+";
+
+if ($opt_help || (!$opt_host && !$opt_pool && !$opt_class && !$opt_all)) {
+    print $Help;
+    exit;
+}
+
+unless ($opt_class) {
+
+    my %args = (
+        host  => $opt_host,
+        pool  => $opt_pool,
+        class => $opt_class,
+        delay => $opt_delay || 2,
+    );
+
+    _confirm(%args) or exit;
+
+    Beekeeper::Service::Supervisor->restart_workers( %args );
+}
+else {
+
+    my %args = (
+        host  => $opt_host,
+        pool  => $opt_pool,
+        delay => $opt_delay || 10,
+    );
+
+    _confirm(%args) or exit;
+
+    Beekeeper::Service::Supervisor->restart_pool( %args );
+}
+
+sub _confirm {
+    my %args = @_;
+    my @opts;
+
+    push @opts, "host $args{host}"   if $args{host};
+    push @opts, "pool $args{pool}"   if $args{pool};
+    push @opts, "class $args{class}" if $args{class};
+
+    my $prompt = (@opts) ? "Restart all workers of " . join(', ', @opts) :
+                           "Restart all workers of every host and every pool";
+
+    print "$prompt? [y/N] ";
+    my $answer = <STDIN>;
+
+    return ($answer eq "y\n") ? 1 : 0;
+}
+
+
+__END__
+
+=head1 NAME
+
+bkpr-restart - Gracefully restart remote pool of workers
+
+=head1 VERSION
+
+Version 0.01
+
+=head1 SYNOPSIS
+
+  Usage: bkpr-restart [OPTIONS]
+  Gracefully restart remote pool of workers.
+  
+    -H, --Host  str  restart workers only of specified host
+    -p, --pool  str  restart workers only of specified pool
+    -c, --class str  restart workers only of specified class
+    -a, --all        restart all workers of every host and every pool
+    -d, --delay sec  delay in seconds between restarts
+    -h, --help       display this help and exit
+  
+  Filters --host, --pool and --class can be combined.
+
+=head1 DESCRIPTION
+
+Signal remote workers to finish their current tasks and restart.
+
+=head1 SEE ALSO
+
+L<Beekeeper::Service::Supervisor>
+
+=encoding utf8
+
+=head1 AUTHOR
+
+José Micó, C<jose.mico@gmail.com>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright 2015 José Micó.
+
+This is free software; you can redistribute it and/or modify it under the same 
+terms as the Perl 5 programming language itself.
+
+This software is distributed in the hope that it will be useful, but it is 
+provided “as is” and without any express or implied warranties. For details, 
+see the full text of the license in the file LICENSE.
+
+=cut
+

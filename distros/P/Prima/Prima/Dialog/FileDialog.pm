@@ -48,6 +48,7 @@ sub save_file
 package Prima::DirectoryListBox;
 use vars qw(@ISA @images);
 @ISA = qw(Prima::ListViewer);
+use Prima::sys::FS;
 
 sub profile_default
 {
@@ -120,12 +121,12 @@ sub on_fontchanged
 	$self-> SUPER::on_fontchanged(@_);
 }
 
-sub on_click
+sub item2path
 {
-	my $self = $_[0];
+	my $self  = shift;
 	my $items = $self-> {items};
 	my $foc = $self-> focusedItem;
-	return if $foc < 0;
+	return undef if $foc < 0;
 	my $newP = '';
 	my $ind = $items-> [$foc]-> {indent};
 	for ( @{$items} ) {
@@ -133,8 +134,32 @@ sub on_click
 	}
 	$newP .= $items-> [$foc]-> {text};
 	$newP .= '/' unless $newP =~ m/[\/\\]$/;
-	$self-> path( $newP);
+	return $newP;
 }
+
+sub on_click
+{
+	my $self = $_[0];
+	return if $self-> focusedItem < 0;
+	$self-> path( $self-> item2path );
+}
+
+sub on_keydown
+{
+	my ( $self, $code, $key, $mod) = @_;
+	return if $mod & km::DeadKey;
+
+	# propagate kb::Enter if unused
+	return if
+		( $mod & ( km::Shift|km::Ctrl|km::Alt)) == 0 &&
+		$key == kb::Enter &&
+		$self-> focusedItem >= 0 &&
+		$self-> item2path eq $self->path
+		;
+
+	$self->SUPER::on_keydown($code, $key, $mod);
+}
+
 
 sub on_drawitem
 {
@@ -208,7 +233,6 @@ sub on_drawitem
 	# $canvas-> color($clrSave);
 }
 
-
 sub recalc_icons
 {
 	my $self = $_[0];
@@ -247,7 +271,7 @@ sub new_directory
 {
 	my $self = shift;
 	my $p = $self-> path;
-	my @fs = Prima::Utils::getdir( $p);
+	my @fs = getdir( $p);
 	unless ( scalar @fs) {
 		$self-> path('.'), return unless $p =~ tr{/\\}{} > 1;
 		$self-> {path} =~ s{[/\\][^/\\]+[/\\]?$}{/};
@@ -265,9 +289,9 @@ sub new_directory
 		next if !$self-> {showDotDirs} && $fs[$i] =~ /^\./;
 		push( @fs1, $fs[ $i]);
 		if ( $fs[ $i + 1] eq 'lnk') {
-			if ( -f $p.$fs[$i]) {
+			if ( _f $p.$fs[$i]) {
 				$fs[ $i + 1] = 'reg';
-			} elsif ( -d _) {
+			} elsif ( _d $p.$fs[$i]) {
 				$fs[ $i + 1] = 'dir';
 			}
 		}
@@ -310,20 +334,7 @@ sub new_directory
 	$::application-> pointer( $oldPointer);
 }
 
-sub safe_abs_path
-{
-	my $p = $_[0];
-	my $warn;
-	local $SIG{__WARN__} = sub {
-		$warn = "@_";
-	};
-	my $was_utf8 = Encode::is_utf8($p);
-	$p = eval { Cwd::abs_path($p) };
-	$@ .= $warn if defined $warn;
-	eval { $p = Encode::decode('utf-8', $p) } if !$@ && $was_utf8;
-
-	return $p;
-}
+sub safe_abs_path { eval { abs_path($_[0]) } }
 
 sub path
 {
@@ -337,7 +348,7 @@ sub path
 	} else {
 		$p = safe_abs_path($p);
 		$p = "." if $@ || !defined $p;
-		$p = "" unless -d $p;
+		$p = "" unless _d $p;
 		$p .= '/' unless $p =~ m/[\/\\]$/;
 	}
 	$_[0]-> {path} = $p;
@@ -671,7 +682,7 @@ sub set_style { $_[0]-> raise_ro('set_style')}
 
 package Prima::Dialog::FileDialog;
 use Prima::MsgBox;
-use Cwd;
+use Prima::sys::FS;
 use vars qw( @ISA);
 @ISA = qw(Prima::Dialog);
 
@@ -756,7 +767,7 @@ sub canonize_mask
 sub canon_path
 {
 	my $p = shift;
-	return Prima::DirectoryListBox::safe_abs_path($p) if -d $p;
+	return Prima::DirectoryListBox::safe_abs_path($p) if _d $p;
 	my $dir = $p;
 	my $fn;
 	if ($dir =~ s{[/\\]([^\\/]+)$}{}) {
@@ -770,7 +781,7 @@ sub canon_path
 	} else {
 		$dir = Prima::DirectoryListBox::safe_abs_path($dir);
 		$dir = "." if $@;
-		$dir = "" unless -d $dir;
+		$dir = "" unless _d $dir;
 		$dir =~ s/(\\|\/)$//;
 	}
 	return "$dir/$fn";
@@ -1007,15 +1018,15 @@ sub Name_KeyDown
 		$path =~ s/(^|\/)[^\/]*$/$1/;
 		$rel_path =~ s/(^|\/)[^\/]*$/$1/;
 		my $residue = substr( $f, length $path);
-		if ( -d $path) {
+		if ( _d $path) {
 			my $i;
-			my @fs = Prima::Utils::getdir( $path);
+			my @fs = getdir( $path);
 			my @completions;
 			my $mask = $dlg-> {mask};
 			for ( $i = 0; $i < scalar @fs; $i += 2) {
 				next if !$dlg-> {showDotFiles} && $fs[$i] =~ /^\./;
 				next if substr( $fs[$i], 0, length $residue) ne $residue;
-				$fs[ $i + 1] = 'dir' if $fs[ $i + 1] eq 'lnk' && -d $path.$fs[$i];
+				$fs[ $i + 1] = 'dir' if $fs[ $i + 1] eq 'lnk' && _d $path.$fs[$i];
 				next if $fs[ $i + 1] ne 'dir' && $fs[$i] !~ /$mask/i;
 				push @completions, $fs[$i] . (( $fs[ $i + 1] eq 'dir') ? '/' : '');
 			}
@@ -1134,7 +1145,9 @@ sub Directory_FontChanged
 	my ( $w, $path) = ( $dc-> width, $self-> Dir-> path);
 	if ( $w < $dc-> get_text_width( $path)) {
 		$path =~ s{(./)}{$1...};
-		while ( $w < $dc-> get_text_width( $path)) { $path =~ s{(./\.\.\.).}{$1}};
+		while ( $w < $dc-> get_text_width( $path)) { 
+			last unless $path =~ s{(./\.\.\.).}{$1};
+		};
 	}
 	$dc-> text( $path);
 }
@@ -1262,7 +1275,8 @@ sub Open_Click
 			$_ = $self-> directory . $_ unless m{^/|[A-Za-z]:};
 			$_ .= '/' if !$unix && m/^[A-Za-z]:$/;
 		}
-		my $pwd = cwd; chdir $self-> directory;
+		my $pwd = getcwd;
+		chdir $self-> directory;
 		$_ = canon_path($_);
 		chdir $pwd;
 	}
@@ -1270,7 +1284,7 @@ sub Open_Click
 	# testing for indirect directory/mask use
 	if ( scalar @files == 1) {
 		# have single directory
-		if ( -d $files[ 0]) {
+		if ( _d $files[ 0]) {
 			my %cont;
 			for ( @{$self-> {filter}}) { $cont{$$_[0]} = $$_[1]};
 			$self-> directory( $files[ 0]);
@@ -1318,15 +1332,15 @@ sub Open_Click
 		for ( split(';', $self-> {filter}-> [$self-> {filterIndex}]-> [1])) {
 			next unless m/^[\*\.]*([^;\.\*]+)/;
 			my $f = $files[0] . '.' . $1;
-			$files[0] = $f, last if !$self-> {openMode} || -f $f;
+			$files[0] = $f, last if !$self-> {openMode} || _f $f;
 		}
 	}
 
 # possible commands recognized, treating names as files
 	for ( @files) {
 		$_ .= $self-> {defaultExt} if $self-> {openMode} && !m{\.[^/]*$};
-		if ( -f $_) {
-			if ( !$self-> {openMode} && $self-> {noReadOnly} && !(-w $_)) {
+		if ( _f $_) {
+			if ( !$self-> {openMode} && $self-> {noReadOnly} && !(_w $_)) {
 				Prima::MsgBox::message_box(
 					$self-> text,
 					"File $_ is read only",
@@ -1349,8 +1363,9 @@ sub Open_Click
 					"File $_ does not exists. Create?",
 					mb::OKCancel|mb::Information
 				) != mb::OK);
-				if ( open FILE, ">$_") {
-					close FILE;
+				my $file;
+				if ( open $file, ">$_") {
+					close $file;
 				} else {
 					Prima::MsgBox::message_box( $self-> text,
 						"Cannot create file $_: $!",
@@ -1361,13 +1376,13 @@ sub Open_Click
 					return;
 				}
 			}
-			if ( $self-> {pathMustExist} and !( -d $dirTo)) {
+			if ( $self-> {pathMustExist} and !( _d $dirTo)) {
 				Prima::MsgBox::message_box( $self-> text, "Directory $dirTo does not exist", mb::OK | mb::Error);
 				$self-> Name-> select_all;
 				$self-> Name-> focus;
 				return;
 			}
-			if ( $self-> {fileMustExist} and !( -f $_)) {
+			if ( $self-> {fileMustExist} and !( _f $_)) {
 				Prima::MsgBox::message_box( $self-> text, "File $_ does not exist", mb::OK | mb::Error);
 				$self-> Name-> select_all;
 				$self-> Name-> focus;
@@ -1375,8 +1390,9 @@ sub Open_Click
 			}
 		}
 		if ( !$self-> {openMode} && !$self-> {noTestFileCreate}) {
-			if ( open FILE, ">>$_") {
-				close FILE;
+			my $file;
+			if ( open $file, ">>$_") {
+				close $file;
 			} else {
 				Prima::MsgBox::message_box( $self-> text, "Cannot create file $_: $!", mb::OK | mb::Error);
 				$self-> Name-> select_all;
@@ -1702,7 +1718,7 @@ Prima::Dialog::FileDialog - File system related widgets and dialogs.
 	$open-> multiSelect(1);
 	print $open-> fileName, " are to be opened\n" if $open-> execute;
 
-=for podview <img src="filedlg.gif" cut=1>
+=for podview <img src="filedlg.gif">
 
 =for html <p><img src="https://raw.githubusercontent.com/dk/Prima/master/pod/Prima/filedlg.gif">
 

@@ -1,5 +1,11 @@
 Revision history for Perl extension D64::Disk::Layout.
 
+0.03  2021-04-24
+    - replace "arrayify" method imported from "List::MoreUtils" module with
+      plain "map" ("arrayify" was causing some difficult to diagnose issues,
+      e.g. "Undefined subroutine &overload::Method called at Layout.pm line
+      165")
+
 0.02  2021-01-13
     - add a dependency on a specific version of "List::MoreUtils" module
       providing "arrayify" and "zip6" functions

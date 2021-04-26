@@ -10,3 +10,4 @@ lib/Crypto/API.pm
 t/00-basic.t
 t/01-api.t
 t/02-mapping-data.t
+t/03-default-value.t

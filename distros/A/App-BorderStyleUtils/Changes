@@ -1,3 +1,28 @@
+0.012   2021-04-24  Released-By: PERLANCAR; Urgency: low
+
+	- No functional changes.
+
+	- [ux] Add an example for each CLI.
+
+
+0.011   2021-02-04  Released-By: PERLANCAR; Urgency: medium
+
+	- [cli show-border-style][ux] Add legends for each row of border
+	  characters.
+
+
+0.010   2021-01-31  Released-By: PERLANCAR; Urgency: medium
+
+	- [cli show-border-style] Update to BorderStyle 2.0.6, show table with
+	  no header row and another without data row.
+
+
+0.009   2021-01-28  Released-By: PERLANCAR; Urgency: medium
+
+	- [cli show-border-style] Show position/indexes of each border
+	  character.
+
+
 0.008   2021-01-23  Released-By: PERLANCAR; Urgency: medium
 
 	- Fix another typo.

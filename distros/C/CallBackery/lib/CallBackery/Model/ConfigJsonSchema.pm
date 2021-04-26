@@ -93,6 +93,14 @@ sub postProcessCfg ($self) {
     my %pluginMap;
     my @fullPluginList;
     my @pluginList;
+    for my $prop (keys %{$schema->{properties}{BACKEND}{properties}}) {
+        my $default = $schema->{properties}{BACKEND}{properties}{$prop}{default};
+        $cfg->{BACKEND}{$prop} //= $default if $default;
+    }
+    for my $prop (keys %{$schema->{properties}{FRONTEND}{properties}}) {
+        my $default = $schema->{properties}{FRONTEND}{properties}{$prop}{default};
+        $cfg->{FRONTEND}{$prop} //= $default if $default;
+    }
     for my $item (@{$cfg->{PLUGIN}}) {
         my ($name) = keys %$item;
         push @fullPluginList, $name;
@@ -223,6 +231,10 @@ properties:
         description: for the small logo brand the UI
         type: string
         format: uri
+      logo_noscale:
+        type: boolean
+        description: don't scale the login window logo
+        default: false
       spinner:
         type: string
         format: uri
@@ -236,12 +248,18 @@ properties:
       hide_password:
         type: boolean
         description: hide password field on login screen
+      hide_password_icon:
+        type: boolean
+        description: hide password dialog icon
+        default: false
       hide_release:
         type: boolean
         description: hide release string on login screen
+        default: false
       hide_company:
         type: boolean
         description: hide company string on login screen
+        default: false
       registration_popup:
         $ref: "#/definitions/plugin"
       passwordreset_popup:

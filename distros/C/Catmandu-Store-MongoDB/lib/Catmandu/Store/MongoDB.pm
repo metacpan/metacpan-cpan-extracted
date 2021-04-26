@@ -2,7 +2,7 @@ package Catmandu::Store::MongoDB;
 
 use Catmandu::Sane;
 
-our $VERSION = '0.0803';
+our $VERSION = '0.0805';
 
 use Moo;
 use Catmandu::Store::MongoDB::Bag;
@@ -12,9 +12,10 @@ use namespace::clean;
 with 'Catmandu::Store';
 with 'Catmandu::Transactional';
 
-has client        => (is => 'lazy');
-has database_name => (is => 'ro', required => 1);
-has database      => (is => 'lazy', handles => [qw(drop)]);
+has client         => (is => 'lazy');
+has database_name  => (is => 'ro', required => 1);
+has database       => (is => 'lazy', handles => [qw(drop)]);
+has estimate_count => (is => 'ro', default => sub {0});
 has session =>
     (is => 'rw', predicate => 1, clearer => 1, writer => 'set_session');
 
@@ -45,7 +46,8 @@ sub BUILD {
         next
             if $key eq 'client'
             || $key eq 'database_name'
-            || $key eq 'database';
+            || $key eq 'database'
+            || $key eq 'estimate_count';
         $self->{_args}{$key} = $args->{$key};
     }
 }
@@ -66,7 +68,7 @@ sub transaction {
 
         @res = $sub->();
 
-        COMMIT: {
+    COMMIT: {
             eval {
                 $session->commit_transaction;
                 1;
@@ -110,6 +112,7 @@ Catmandu::Store::MongoDB - A searchable store backed by MongoDB
     $ catmandu import -v JSON --multiline 1 to MongoDB --database_name bibliography --bag books < books.json
     $ catmandu export MongoDB --database_name bibliography --bag books to YAML
     $ catmandu count MongoDB --database_name bibliography --bag books --query '{"PublicationYear": "1937"}'
+    $ catmandu count MongoDB --database_name bibliography --bag books --query '{"Author": "Jones"}' --sort '{"PublicationYear":1}'
 
     # In perl
     use Catmandu::Store::MongoDB;
@@ -153,6 +156,22 @@ Catmandu::Store::MongoDB - A searchable store backed by MongoDB
 A Catmandu::Store::MongoDB is a Perl package that can store data into
 L<MongoDB> databases. The database as a whole is called a 'store'.
 Databases also have compartments (e.g. tables) called Catmandu::Bag-s.
+
+=head1 CONFIGURATION
+
+=over
+
+=item database_name
+
+MongoDB database name.
+
+=item estimate_count
+
+Use a faster estimated collection document count if true.
+
+=back
+
+All other options are passed on to the MongoDB client.
 
 =head1 METHODS
 

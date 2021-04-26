@@ -1,0 +1,8 @@
+  <div class="form-row">
+    <div class="col-12">
+      <div class="custom-control custom-checkbox">
+        <input type="checkbox" class="custom-control-input checkbox" id="FindUsersWithPassword" name="FindUsersWithPassword" value="1" <% $ARGS{'FindUsersWithPassword'} ? 'checked="checked"': '' %> />
+        <label class="custom-control-label" for="FindUsersWithPassword"><&|/l&>List users with a password set.</&></label>
+      </div>
+    </div>
+  </div>

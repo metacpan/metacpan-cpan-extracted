@@ -533,7 +533,7 @@ Prima::ImageViewer - standard image, icon, and bitmap viewer class.
 	);
 	run Prima;
 
-=for podview <img src="imageviewer.gif" cut=1>
+=for podview <img src="imageviewer.gif">
 
 =for html <p><img src="https://raw.githubusercontent.com/dk/Prima/master/pod/Prima/imageviewer.gif">
 
@@ -721,7 +721,7 @@ property. Example:
     $i-> load('huge.jpg');
     $viewer-> unwatch_load_progress;
 
-Similar functionality is present in L<Prima::ImageDialog>.
+Similar functionality is present in L<Prima::Dialog::ImageDialog>.
 
 =item unwatch_load_progress CLEAR_IMAGE=1
 
@@ -742,6 +742,6 @@ Dmitry Karasik, E<lt>dmitry@karasik.eu.orgE<gt>.
 
 =head1 SEE ALSO
 
-L<Prima>, L<Prima::Image>, L<Prima::ScrollWidget>, L<Prima::ImageDialog>, F<examples/iv.pl>.
+L<Prima>, L<Prima::Image>, L<Prima::ScrollWidget>, L<Prima::Dialog::ImageDialog>, F<examples/iv.pl>.
 
 =cut

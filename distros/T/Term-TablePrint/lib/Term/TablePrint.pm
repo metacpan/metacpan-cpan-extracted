@@ -4,11 +4,10 @@ use warnings;
 use strict;
 use 5.008003;
 
-our $VERSION = '0.131';
+our $VERSION = '0.132';
 use Exporter 'import';
 our @EXPORT_OK = qw( print_table );
 
-use Carp         qw( croak );
 use List::Util   qw( sum none );
 use Scalar::Util qw( looks_like_number );
 
@@ -30,11 +29,11 @@ BEGIN {
 
 sub new {
     my $class = shift;
-    croak "new: called with " . @_ . " arguments - 0 or 1 arguments expected." if @_ > 1;
+    die "new: called with " . @_ . " arguments - 0 or 1 arguments expected." if @_ > 1;
     my ( $opt ) = @_;
     my $instance_defaults = _defaults();
     if ( defined $opt ) {
-        croak "new: The (optional) argument is not a HASH reference." if ref $opt ne 'HASH';
+        die "new: The (optional) argument is not a HASH reference." if ref $opt ne 'HASH';
         validate_options( _valid_options(), $opt );
         for my $key ( keys %$opt ) {
             $instance_defaults->{$key} = $opt->{$key} if defined $opt->{$key};
@@ -130,10 +129,10 @@ sub print_table {
     }
     my $self = shift;
     my ( $orig_table, $opt ) = @_;
-    croak "print_table: called with " . @_ . " arguments - 1 or 2 arguments expected." if @_ < 1 || @_ > 2;
-    croak "print_table: requires an ARRAY reference as its first argument."            if ref $orig_table  ne 'ARRAY';
+    die "print_table: called with " . @_ . " arguments - 1 or 2 arguments expected." if @_ < 1 || @_ > 2;
+    die "print_table: requires an ARRAY reference as its first argument."            if ref $orig_table  ne 'ARRAY';
     if ( defined $opt ) {
-        croak "print_table: the (optional) second argument is not a HASH reference."   if ref $opt ne 'HASH';
+        die "print_table: the (optional) second argument is not a HASH reference."   if ref $opt ne 'HASH';
         validate_options( _valid_options(), $opt );
         for my $key ( keys %$opt ) {
             $self->{$key} = $opt->{$key} if defined $opt->{$key};
@@ -813,7 +812,7 @@ Term::TablePrint - Print a table to the terminal and browse it interactively.
 
 =head1 VERSION
 
-Version 0.131
+Version 0.132
 
 =cut
 

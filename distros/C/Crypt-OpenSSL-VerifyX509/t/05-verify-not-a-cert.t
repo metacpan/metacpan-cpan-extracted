@@ -3,7 +3,7 @@ use Crypt::OpenSSL::VerifyX509;
 use Crypt::OpenSSL::X509;
 
 my $v = Crypt::OpenSSL::VerifyX509->new('t/cacert.pem');
-ok($v);
+isa_ok($v, 'Crypt::OpenSSL::VerifyX509');
 
 my $ret;
 eval {

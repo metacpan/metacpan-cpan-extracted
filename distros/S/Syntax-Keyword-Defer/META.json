@@ -21,11 +21,13 @@
       },
       "configure" : {
          "requires" : {
-            "Module::Build" : "0.4004"
+            "Module::Build" : "0.4004",
+            "XS::Parse::Keyword::Builder" : "0"
          }
       },
       "runtime" : {
          "requires" : {
+            "XS::Parse::Keyword" : "0",
             "perl" : "5.014"
          }
       },
@@ -38,11 +40,11 @@
    "provides" : {
       "Syntax::Keyword::Defer" : {
          "file" : "lib/Syntax/Keyword/Defer.pm",
-         "version" : "0.04"
+         "version" : "0.05"
       },
       "Syntax::Keyword::Finally" : {
          "file" : "lib/Syntax/Keyword/Finally.pm",
-         "version" : "0.04"
+         "version" : "0.05"
       }
    },
    "release_status" : "stable",
@@ -52,6 +54,6 @@
       ],
       "x_IRC" : "irc://irc.perl.org/#io-async"
    },
-   "version" : "0.04",
+   "version" : "0.05",
    "x_serialization_backend" : "JSON::PP version 4.05"
 }

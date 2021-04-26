@@ -8,6 +8,7 @@ SYNOPSIS
         $ catmandu import -v JSON --multiline 1 to MongoDB --database_name bibliography --bag books < books.json
         $ catmandu export MongoDB --database_name bibliography --bag books to YAML
         $ catmandu count MongoDB --database_name bibliography --bag books --query '{"PublicationYear": "1937"}'
+        $ catmandu count MongoDB --database_name bibliography --bag books --query '{"Author": "Jones"}' --sort '{"PublicationYear":1}'
     
         # In perl
         use Catmandu::Store::MongoDB;
@@ -51,6 +52,18 @@ DESCRIPTION
     A Catmandu::Store::MongoDB is a Perl package that can store data into
     MongoDB databases. The database as a whole is called a 'store'.
     Databases also have compartments (e.g. tables) called Catmandu::Bag-s.
+
+CONFIGURATION
+
+    database_name
+
+      MongoDB database name.
+
+    estimate_count
+
+      Use a faster estimated collection document count if true.
+
+    All other options are passed on to the MongoDB client.
 
 METHODS
 

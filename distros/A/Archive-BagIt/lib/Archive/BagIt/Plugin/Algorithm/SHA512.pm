@@ -4,8 +4,13 @@ use strict;
 use warnings;
 use Carp;
 use Moo;
+use Net::SSLeay;
 use namespace::autoclean;
 with 'Archive::BagIt::Role::Algorithm';
+
+sub BEGIN {
+    Net::SSLeay::OpenSSL_add_all_digests();
+}
 
 has '+plugin_name' => (
     is => 'ro',
@@ -27,7 +32,9 @@ has '_digest' => (
 
 sub _build_digest_sha {
     my ($self) = @_;
-    my $digest = Digest::SHA->new("512");
+    my $md  = Net::SSLeay::EVP_get_digestbyname($self->name);
+    my $digest = Net::SSLeay::EVP_MD_CTX_create();
+    Net::SSLeay::EVP_DigestInit($digest, $md);
     return $digest;
 }
 
@@ -36,9 +43,12 @@ sub get_hash_string {
     my $blksize = $self->get_optimal_bufsize($fh);
     my $buffer;
     while (read($fh, $buffer, $blksize)) {
-        $self->_digest->add($buffer);
+        Net::SSLeay::EVP_DigestUpdate($self->_digest, $buffer);
     }
-    return $self->_digest->hexdigest;
+    my $result = Net::SSLeay::EVP_DigestFinal($self->_digest);
+    Net::SSLeay::EVP_MD_CTX_destroy($self->_digest);
+    delete $self->{_digest};
+    return unpack('H*', $result);
 }
 
 sub verify_file {
@@ -64,7 +74,7 @@ Archive::BagIt::Plugin::Algorithm::SHA512 - The default SHA algorithms plugin (d
 
 =head1 VERSION
 
-version 0.072
+version 0.073
 
 =head1 AVAILABILITY
 

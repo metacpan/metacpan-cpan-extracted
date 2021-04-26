@@ -5,6 +5,7 @@ author:
 build_requires:
   ExtUtils::MakeMaker: '0'
   File::Spec: '0'
+  File::Temp: '0'
   MIME::Base64: '0'
   Test::More: '0.96'
 configure_requires:
@@ -27,21 +28,23 @@ no_index:
 provides:
   CGI::Tiny:
     file: lib/CGI/Tiny.pm
-    version: '0.002'
+    version: '0.006'
 recommends:
   Cpanel::JSON::XS: '4.09'
+  Unicode::UTF8: '0'
 requires:
   Carp: '0'
   Encode: '0'
   Exporter: '5.57'
   IO::Handle: '0'
   JSON::PP: '0'
+  Time::Local: '0'
   perl: '5.008001'
 resources:
   bugtracker: https://github.com/Grinnz/CGI-Tiny/issues
   homepage: https://github.com/Grinnz/CGI-Tiny
   repository: https://github.com/Grinnz/CGI-Tiny.git
-version: '0.002'
+version: '0.006'
 x_contributors:
   - 'Dan Book <grinnz@grinnz.com>'
 x_generated_by_perl: v5.32.1

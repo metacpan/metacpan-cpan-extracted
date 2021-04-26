@@ -11,7 +11,7 @@ package mb;
 use 5.00503;    # Universal Consensus 1998 for primetools
 # use 5.008001; # Lancaster Consensus 2013 for toolchains
 
-$VERSION = '0.26';
+$VERSION = '0.27';
 $VERSION = $VERSION;
 
 # internal use
@@ -218,12 +218,11 @@ sub cluck {
     my $i = 0;
     my @cluck = ();
     while (my($package,$filename,$line,$subroutine) = caller($i)) {
-        push @cluck, "[$i] $filename($line) $package"."::$subroutine\n";
+        push @cluck, "[$i] $filename($line) $subroutine\n";
         $i++;
     }
+    print STDERR "\n", @_, "\n";
     print STDERR CORE::reverse @cluck;
-    print STDERR "\n";
-    print STDERR @_;
 }
 
 #---------------------------------------------------------------------
@@ -232,13 +231,12 @@ sub confess {
     my $i = 0;
     my @confess = ();
     while (my($package,$filename,$line,$subroutine) = caller($i)) {
-        push @confess, "[$i] $filename($line) $package"."::$subroutine\n";
+        push @confess, "[$i] $filename($line) $subroutine\n";
         $i++;
     }
+    print STDERR "\n", @_, "\n";
     print STDERR CORE::reverse @confess;
-    print STDERR "\n";
-    print STDERR @_;
-    die "\n";
+    exit;
 }
 
 #---------------------------------------------------------------------

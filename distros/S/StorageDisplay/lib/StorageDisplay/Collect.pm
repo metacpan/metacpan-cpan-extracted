@@ -12,7 +12,7 @@ use warnings;
 package StorageDisplay::Collect;
 # ABSTRACT: modules required to collect data. No dependencies (but perl itself)
 
-our $VERSION = '1.0.6'; # VERSION
+our $VERSION = '1.0.7'; # VERSION
 
 
 use Storable;
@@ -551,14 +551,14 @@ sub collect {
     # Get all infos on system blocks
     # 'lsblk-json-hierarchy' -> Str(json)
     #my $dh=open_cmd_pipe(qw(lsblk --json --bytes --output-all));
-    $dh=$self->open_cmd_pipe(qw(lsblk --json --output), 'name,kname');
+    $dh=$self->open_cmd_pipe(qw(lsblk --all --json --output), 'name,kname');
     $json=join("\n", <$dh>);
     close $dh;
     $infos->{'lsblk-hierarchy'}=$self->lsblkjson2perl($json);
 
     # And keep json infos
     # 'lsblk-json' -> kn -> Str(json)
-    $dh=$self->open_cmd_pipe(qw(lsblk --json --bytes --output-all --list));
+    $dh=$self->open_cmd_pipe(qw(lsblk --all --json --bytes --output-all --list));
     $infos->{'lsblk'}=$self->lsblkjson2perl(join("\n", <$dh>));
     close $dh;
 
@@ -736,8 +736,19 @@ sub collect {
         $dh=$self->open_cmd_pipe_root(qw(parted -m -s), "/dev/".$kn, qw(unit B print free));
         my $state=0;
         my $parted={ 'parts' => [] };
+        my $startline = '';
         while(defined(my $line=<$dh>)) {
             chomp($line);
+            my $multiline = 0;
+            if ($startline ne '') {
+                $line = $startline . $line;
+                $multiline = 1;
+            }
+            if ($line !~ /;$/) {
+                $startline = $line;
+                next;
+            }
+            $startline = '';
             if ($state == 0) {
                 if ($line eq "BYT;") {
                     $state = 1;
@@ -767,6 +778,13 @@ sub collect {
                             'label' => $4,
                             'flags' => $5,
                     };
+                    if ($multiline) {
+                        my $label = $4;
+                        if ($label =~ /^Project-Id.*Content-Transfer-Encoding: 8bit$/) {
+                            # workaround a parted bug with xfs partitions (at least)
+                            $parted->{parts}->[-1]->{'label'}='';
+                        }
+                    }
                     next;
                 }
             }
@@ -918,7 +936,7 @@ sub collect {
             $fs->{$1} = {
                 size => $2,
                 used => $3,
-                free => $2-$3,
+                free => ''.($2-$3),
                 fstype => 'swap',
                 mountpoint => 'SWAP',
             };
@@ -1061,6 +1079,7 @@ sub collect {
         $dh=$self->open_cmd_pipe_root(
             qw(mdadm --misc --detail), '/dev/'.$dev);
         my $l={};
+        my $container=0;
         while(defined(my $line=<$dh>)) {
             chomp($line);
             if ($line =~ /^\s*Array Size :\s*([0-9]+)\s*\(/) {
@@ -1069,20 +1088,39 @@ sub collect {
                 $l->{'used-dev-size'} = $1*1024;
             } elsif ($line =~ /^\s*Raid Level :\s*([^\s].*)/) {
                 $l->{'raid-level'} = $1;
+                if ($1 eq 'container') {
+                    $l->{'raid-container'} = 1;
+                    $container = 1;
+                }
             } elsif ($line =~ /^\s*State : \s*([^\s].*)/) {
                 $l->{'raid-state'} = $1;
+            } elsif ($line =~ /^\s*Version : \s*([^\s].*)/) {
+                $l->{'raid-version'} = $1;
             } elsif ($line =~ /^\s*Name : \s*([^\s]+)\s*/) {
                 $l->{'raid-name'} = $1;
-            } elsif ($line =~ /^\s*Number\s*Major\s*Minor\s*RaidDevice\s*State/) {
+            } elsif ($line =~ /^\s*Member Arrays : \s*([^\s]+.*[^\s])\s*/) {
+                $l->{'raid-member-arrays'} = [ split(/ +/, $1) ];
+            } elsif ($line =~ /^\s*Container : \s*([^\s]+), member ([0-9]+)\s*/) {
+                $l->{'raid-container-device'} = $1;
+                $l->{'raid-container-member'} = $2;
+            } elsif ($line =~ /^\s*Number\s*Major\s*Minor\s*RaidDevice(\s*State)?/) {
                 last;
             }
         }
+
+        my $raid_id = 0;
         while(defined(my $line=<$dh>)) {
             chomp($line);
-            if ($line =~ /^\s*([0-9]+)\s+([0-9]+)\s+([0-9]+)\s+([0-9-]+)\s+([^\s].*[^\s])\s+([^\s]+)$/) {
+            if ((! $container)
+                && $line =~ /^\s*([0-9]+)\s+([0-9]+)\s+([0-9]+)\s+([0-9-]+)\s+([^\s].*[^\s])\s+([^\s]+)$/) {
                 $l->{'devices'}->{$6} = {
                     state => $5,
                     raiddevice => $4,
+                };
+            } elsif ($container
+                     && $line =~ /^\s*(-)\s+([0-9]+)\s+([0-9]+)\s+(-)\s+([^\s]+)$/) {
+                $l->{'devices'}->{$5} = {
+                    raiddevice => $raid_id++,
                 };
             } elsif ($line =~ /^\s*$/) {
             } else {
@@ -1494,7 +1532,11 @@ sub collect {
 package StorageDisplay::Collect::Libvirt;
 
 use is_collector
-    provides => 'libvirt';
+    provides => 'libvirt',
+    depends => {
+        progs => [ 'virsh' ],
+        root => 1,
+};
 
 sub select {
     my $self = shift;
@@ -1602,7 +1644,7 @@ StorageDisplay::Collect - modules required to collect data. No dependencies (but
 
 =head1 VERSION
 
-version 1.0.6
+version 1.0.7
 
 Main class, allows one to register collectors and run them (through the collect method)
 

@@ -186,7 +186,7 @@ static ImgIORequest std_ioreq = {
 };
 
 PList
-apc_img_load( Handle self, char * fileName, PImgIORequest ioreq,  HV * profile, char * error)
+apc_img_load( Handle self, char * fileName, Bool is_utf8, PImgIORequest ioreq,  HV * profile, char * error)
 {
 	dPROFILE;
 	int i, profiles_len = 0, lastFrame = -2, codecID = -1;
@@ -221,12 +221,12 @@ apc_img_load( Handle self, char * fileName, PImgIORequest ioreq,  HV * profile, 
 	if ( !ret) out("Not enough memory")
 
 	fi. errbuf = error ? error : dummy_error_buf;
-	strcpy( fi.errbuf, "Internal error");
+	fi. errbuf[0] = 0;
 
 	/* open file */
 	if ( ioreq == NULL) {
 		memcpy( &sioreq, &std_ioreq, sizeof( sioreq));
-		if (( sioreq. handle = fopen( fileName, "rb")) == NULL)
+		if (( sioreq. handle = prima_open_file( fileName, is_utf8, "rb")) == NULL)
 			out( strerror( errno));
 		fi. req = &sioreq;
 		fi. req_is_stdio = true;
@@ -237,6 +237,7 @@ apc_img_load( Handle self, char * fileName, PImgIORequest ioreq,  HV * profile, 
 		load_mask = IMG_LOAD_FROM_STREAM;
 	}
 	fi. fileName = fileName;
+	fi. is_utf8  = is_utf8;
 	fi. stop = false;
 
 	/* assigning user file profile */
@@ -612,10 +613,12 @@ apc_img_load( Handle self, char * fileName, PImgIORequest ioreq,  HV * profile, 
 	}
 
 EXIT_NOW:;
+	if ( err && fi.errbuf[0] == 0)
+		strcpy(fi.errbuf, fi.wasTruncated ? "Truncated file" : "Internal error");
 	if ( fi. frameCount < 0 && pexist( wantFrames) && pget_i( wantFrames)) {
 		if ( ioreq != NULL)
 			req_seek( ioreq, 0, SEEK_SET);
-		fi. frameCount = apc_img_frame_count( fileName, ioreq);
+		fi. frameCount = apc_img_frame_count( fileName, is_utf8, ioreq);
 	}
 	if ( firstObjectExtras)
 		(void) hv_store( firstObjectExtras, "frames", 6, newSViv( fi. frameCount), 0);
@@ -636,7 +639,7 @@ EXIT_NOW:;
 }
 
 int
-apc_img_frame_count( char * fileName, PImgIORequest ioreq )
+apc_img_frame_count( char * fileName, Bool is_utf8, PImgIORequest ioreq )
 {
 	PImgCodec c = nil;
 	ImgLoadFileInstance fi;
@@ -650,7 +653,7 @@ apc_img_frame_count( char * fileName, PImgIORequest ioreq )
 	/* open file */
 	if ( ioreq == NULL) {
 		memcpy( &sioreq, &std_ioreq, sizeof( sioreq));
-		if (( sioreq. handle = fopen( fileName, "rb")) == NULL)
+		if (( sioreq. handle = prima_open_file( fileName, is_utf8, "rb")) == NULL)
 			goto EXIT_NOW;
 		fi. req = &sioreq;
 		fi. req_is_stdio = true;
@@ -663,6 +666,7 @@ apc_img_frame_count( char * fileName, PImgIORequest ioreq )
 
 	/* assigning request */
 	fi. fileName = fileName;
+	fi. is_utf8  = is_utf8;
 	fi. frameMapSize   = frameMap = 0;
 	fi. frameMap       = &frameMap;
 	fi. loadExtras     = true;
@@ -820,7 +824,7 @@ EXIT_NOW:;
 }
 
 int
-apc_img_save( Handle self, char * fileName, PImgIORequest ioreq, HV * profile, char * error)
+apc_img_save( Handle self, char * fileName, Bool is_utf8, PImgIORequest ioreq, HV * profile, char * error)
 {
 	dPROFILE;
 	int i;
@@ -856,7 +860,7 @@ apc_img_save( Handle self, char * fileName, PImgIORequest ioreq, HV * profile, c
 
 	/* open file */
 	if ( fi. append && ioreq == NULL) {
-		FILE * f = ( FILE *) fopen( fileName, "rb");
+		FILE * f = ( FILE *) prima_open_file( fileName, is_utf8, "rb");
 		if ( !f)
 			fi. append = false;
 		else
@@ -866,7 +870,7 @@ apc_img_save( Handle self, char * fileName, PImgIORequest ioreq, HV * profile, c
 	fi. errbuf = error ? error : dummy_error_buf;
 	if ( ioreq == NULL) {
 		memcpy( &sioreq, &std_ioreq, sizeof( sioreq));
-		if (( sioreq. handle = fopen( fileName, fi. append ? "rb+" : "wb+" )) == NULL)
+		if (( sioreq. handle = prima_open_file( fileName, is_utf8, fi. append ? "rb+" : "wb+" )) == NULL)
 			out( strerror( errno));
 		fi. req = &sioreq;
 		fi. req_is_stdio = true;
@@ -878,6 +882,7 @@ apc_img_save( Handle self, char * fileName, PImgIORequest ioreq, HV * profile, c
 	}
 
 	fi. fileName     = fileName;
+	fi. is_utf8      = is_utf8;
 
 	fi. frameMapSize = xself;
 	if ( pexist( images)) {
@@ -1162,7 +1167,7 @@ EXIT_NOW:;
 	if ( ioreq == NULL && fi. req != NULL && fi. req-> handle != NULL)
 		fclose(( FILE*) fi. req-> handle);
 	if ( err && fileName)
-		unlink( fileName);
+		apc_fs_unlink( fileName, is_utf8 );
 	if ( def)
 		sv_free(( SV *) def);
 	if ( commonHV)

@@ -1,5 +1,5 @@
 package Crypto::API;
-$Crypto::API::VERSION = '0.02';
+$Crypto::API::VERSION = '0.03';
 =head1 NAME
 
 Crypto::API - Universal Plug & Play API
@@ -86,13 +86,13 @@ sub AUTOLOAD {
         die "Can't call method '$function'";
     }
 
-    return $self->_call_function(name => $function, @args);
+    return $self->_call_function(func => $function, @args);
 }
 
 sub _call_function {
     my ($self, %o) = @_;
 
-    my $function = $o{name}
+    my $function = delete $o{func}
         or die "What is the function name??";
 
     my $route_spec_func = "set_$function";
@@ -125,26 +125,77 @@ sub _call_function {
 
     $data ||= {};
 
-    while (my ($my_alias, $to_exchange) = each %$data) {
-        my $attr = $o{$my_alias};
-        my $attr_func = "request_attr_$my_alias";
-        if ($self->can($attr_func)) {
-            $attr = $self->$attr_func($attr);
+    while (my ($my_alias, $setting) = each %$data) {
+        my ($to_exchange, $required, $default);
+
+        if (ref $setting eq 'HASH') {
+            $to_exchange = $setting->{field_name}
+                or die "Missing setting: field_name";
+            ($required, $default) = @$setting{qw(required default)};
         }
-        $mapped_data{$to_exchange} = $attr;
+        else {
+            $to_exchange = $setting;
+        }
+
+        my $value = $o{$my_alias};
+
+        if (!defined $value) {
+            if ($required) {
+                die "Missing argument: $my_alias";
+            }
+            elsif ($default) {
+                if (ref $default eq 'CODE') {
+                    $value = $self->$default($my_alias, $setting);
+                }
+                else {
+                    $value = $default;
+                }
+            }
+        }
+
+        my $format = "request_attr_$my_alias";
+
+        if ($self->can($format)) {
+            $value = $self->$format($value);
+        }
+
+        $mapped_data{$to_exchange} = $value;
     }
 
     if (my $code = $events->{keys}) {
-        my @events_keys = $code->();
-        my @mapped_keys = ();
-        foreach my $my_alias(@events_keys) {
-            my $to_exchange = $data->{$my_alias} || $my_alias;
-            push @mapped_keys, $to_exchange;
+        my @events_keys;
+
+        if (ref $code eq 'CODE') {
+            @events_keys = $code->();
         }
+        elsif (ref $code eq 'ARRAY') {
+            @events_keys = @$code;
+        }
+        else {
+            die "Expected keys is either CODE REF|ARRAY REF";
+        }
+
+        my @mapped_keys = ();
+
+        foreach my $my_alias(@events_keys) {
+            my $setting = $data->{$my_alias} || $my_alias;
+
+            if (ref $setting eq 'HASH') {
+                push @mapped_keys, $setting->{field_name};
+            }
+            else {
+                push @mapped_keys, $setting;
+            }
+        }
+
         $events->{keys} = sub { @mapped_keys };
     }
 
-    $self->$method($path, \%mapped_data, $headers || {}, $events || {});
+    my $debug = $self->$method($path, \%mapped_data, $headers ||= {}, $events ||= {});
+
+    if ($events->{test_request_object}) {
+        return $debug;
+    }
 
     my $resp = $self->json_response;
 
@@ -173,7 +224,7 @@ sub _call_function {
             if ($self->can($attr_func)) {
                 $attr = $self->$attr_func($attr);
             }
-            $mapped_row{$key} = $attr;
+            $mapped_row{_others}{$key} = $attr;
         }
         return %mapped_row;
     };

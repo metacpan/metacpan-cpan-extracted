@@ -43,6 +43,10 @@ typedef SV PADNAME;
 #  define intro_my()             Perl_intro_my(aTHX)
 #endif
 
+#ifndef pad_alloc
+#  define pad_alloc(a,b)         Perl_pad_alloc(aTHX_ a,b)
+#endif
+
 #ifndef CX_CUR
 #  define CX_CUR() (&cxstack[cxstack_ix])
 #endif

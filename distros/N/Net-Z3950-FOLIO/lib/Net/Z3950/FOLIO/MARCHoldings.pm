@@ -3,13 +3,11 @@ package Net::Z3950::FOLIO::MARCHoldings;
 use strict;
 use warnings;
 
-use Net::Z3950::FOLIO::HoldingsRecords qw(makeHoldingsRecords);
-
 
 sub insertMARCHoldings {
-    my($ihi, $marc, $cfg, $barcode) = @_;
+    my($rec, $marc, $cfg, $barcode) = @_;
     my $marcCfg = $cfg->{marcHoldings} || {};
-    my $holdingsObjects = makeHoldingsRecords($ihi->{holdingsRecords2}, $marc);
+    my $holdingsObjects = $rec->holdings($marc);
 
     for (my $i = 0; $i < @$holdingsObjects; $i++) {
 	my $holdingsMap = _listOfPairs2map($holdingsObjects->[$i]);

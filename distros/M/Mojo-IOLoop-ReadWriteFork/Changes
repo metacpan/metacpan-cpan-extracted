@@ -1,5 +1,8 @@
 Revision history for perl distribution Mojo-IOLoop-ReadWriteFork
 
+1.02 2021-04-21T13:01:11+0900
+ - Fix Mojo::Promise->timer require Mojolicious 8.41 #18
+
 1.01 2021-04-11T12:00:35+0900
  - Fix issue in SYNOPSIS
  - Fix Test::Memory::Cycle issues

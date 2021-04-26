@@ -12,7 +12,7 @@ open($fh, '+<ccc.json');
 open($fh, '-<ddd.json');
 open($fh, File::Spec->catfile('dir', 'eee'));
 open($fh, File::Spec->catfile('dir', 'eee'));
-$CLASS->set_from('yyy');
+$CLASS->set_from(['yyy']);
 open($fh, File::Spec->catfile('dir', 'eee'));
 
 my $eee = path(File::Spec->catfile('dir', 'eee'))->relative(path('.'))->stringify();
@@ -31,15 +31,15 @@ like(
     "Got files we (tried to) open",
 );
 
-$data = $CLASS->openmap(root => path('.'));
+$data = $CLASS->data(root => path('.'));
 like(
     $data,
     hash {
-        field 'aaa.json' => ['*'];
-        field 'bbb.json' => ['*'];
-        field 'ccc.json' => ['xxx'];
-        field 'ddd.json' => ['xxx'];
-        field $eee => ['xxx', 'yyy'];
+        field 'aaa.json' => {'<>' => ['*']};
+        field 'bbb.json' => {'<>' => ['*']};
+        field 'ccc.json' => {'<>' => ['xxx']};
+        field 'ddd.json' => {'<>' => ['xxx']};
+        field $eee       => {'<>' => [['yyy'], 'xxx']};
     },
     "Got list of what callers tried to open the files"
 );

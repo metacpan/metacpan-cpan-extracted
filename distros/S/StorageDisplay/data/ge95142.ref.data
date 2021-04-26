@@ -52,18 +52,18 @@ $VAR1 = {
                   },
           'fs' => {
                     '/dev/mapper/vgchu-root' => {
-                                                  'free' => '3071016960',
+                                                  'free' => '2450550784',
                                                   'fstype' => 'ext4',
                                                   'mountpoint' => '/',
                                                   'size' => '10434699264',
-                                                  'used' => '6810034176'
+                                                  'used' => '7430500352'
                                                 },
                     '/dev/sda1' => {
-                                     'free' => '511868043264',
+                                     'free' => '511868010496',
                                      'fstype' => 'vfat',
                                      'mountpoint' => '/boot/efi',
                                      'size' => '511873679360',
-                                     'used' => '5636096'
+                                     'used' => '5668864'
                                    }
                   },
           'libvirt' => {
@@ -105,11 +105,11 @@ $VAR1 = {
                                    'disc-gran' => 0,
                                    'disc-max' => 0,
                                    'disc-zero' => bless( do{\(my $o = 0)}, 'JSON::PP::Boolean' ),
-                                   'fsavail' => '3071025152',
+                                   'fsavail' => '2450563072',
                                    'fssize' => '10434699264',
                                    'fstype' => 'ext4',
-                                   'fsuse%' => '65%',
-                                   'fsused' => '6810025984',
+                                   'fsuse%' => '71%',
+                                   'fsused' => '7430488064',
                                    'group' => undef,
                                    'hctl' => undef,
                                    'hotplug' => do{my $o},
@@ -520,7 +520,7 @@ $VAR1 = {
                                    'rq-size' => 128,
                                    'sched' => undef,
                                    'serial' => undef,
-                                   'size' => '4398046511104',
+                                   'size' => '5497558138880',
                                    'state' => 'running',
                                    'subsystems' => 'block',
                                    'tran' => undef,
@@ -591,11 +591,11 @@ $VAR1 = {
                                    'disc-gran' => 0,
                                    'disc-max' => 0,
                                    'disc-zero' => do{my $o},
-                                   'fsavail' => '511868043264',
+                                   'fsavail' => '511868010496',
                                    'fssize' => '511873679360',
                                    'fstype' => 'vfat',
                                    'fsuse%' => '0%',
-                                   'fsused' => '5636096',
+                                   'fsused' => '5668864',
                                    'group' => undef,
                                    'hctl' => undef,
                                    'hotplug' => do{my $o},
@@ -1102,7 +1102,7 @@ $VAR1 = {
                                                                 'Slot ID' => '[32:0]',
                                                                 'Speed' => '6.0Gb/s',
                                                                 'Status' => 'Online, Spun Up',
-                                                                'Temp' => '34C',
+                                                                'Temp' => '36C',
                                                                 'Type' => 'HDD',
                                                                 'sector size' => 512
                                                               },
@@ -1115,7 +1115,7 @@ $VAR1 = {
                                                                  'Slot ID' => '[32:10]',
                                                                  'Speed' => '6.0Gb/s',
                                                                  'Status' => 'Online, Spun Up',
-                                                                 'Temp' => '32C',
+                                                                 'Temp' => '34C',
                                                                  'Type' => 'HDD',
                                                                  'sector size' => 512
                                                                },
@@ -1129,7 +1129,7 @@ $VAR1 = {
                                                                  'Slot ID' => '[32:11]',
                                                                  'Speed' => '6.0Gb/s',
                                                                  'Status' => 'Hotspare, Spun Up',
-                                                                 'Temp' => '31C',
+                                                                 'Temp' => '33C',
                                                                  'Type' => 'HDD',
                                                                  'sector size' => 512
                                                                },
@@ -1142,7 +1142,7 @@ $VAR1 = {
                                                                 'Slot ID' => '[32:1]',
                                                                 'Speed' => '6.0Gb/s',
                                                                 'Status' => 'Online, Spun Up',
-                                                                'Temp' => '34C',
+                                                                'Temp' => '36C',
                                                                 'Type' => 'HDD',
                                                                 'sector size' => 512
                                                               },
@@ -1156,7 +1156,7 @@ $VAR1 = {
                                                                 'Slot ID' => '[32:2]',
                                                                 'Speed' => '6.0Gb/s',
                                                                 'Status' => 'Unconfigured(good), Spun Up',
-                                                                'Temp' => '34C',
+                                                                'Temp' => '36C',
                                                                 'Type' => 'HDD',
                                                                 'sector size' => 512
                                                               },
@@ -1170,7 +1170,7 @@ $VAR1 = {
                                                                 'Slot ID' => '[32:3]',
                                                                 'Speed' => '6.0Gb/s',
                                                                 'Status' => 'Unconfigured(good), Spun Up',
-                                                                'Temp' => '33C',
+                                                                'Temp' => '35C',
                                                                 'Type' => 'HDD',
                                                                 'sector size' => 512
                                                               },
@@ -1183,7 +1183,7 @@ $VAR1 = {
                                                                 'Slot ID' => '[32:4]',
                                                                 'Speed' => '6.0Gb/s',
                                                                 'Status' => 'Online, Spun Up',
-                                                                'Temp' => '34C',
+                                                                'Temp' => '36C',
                                                                 'Type' => 'HDD',
                                                                 'sector size' => 512
                                                               },
@@ -1196,7 +1196,7 @@ $VAR1 = {
                                                                 'Slot ID' => '[32:5]',
                                                                 'Speed' => '6.0Gb/s',
                                                                 'Status' => 'Online, Spun Up',
-                                                                'Temp' => '34C',
+                                                                'Temp' => '36C',
                                                                 'Type' => 'HDD',
                                                                 'sector size' => 512
                                                               },
@@ -1209,7 +1209,7 @@ $VAR1 = {
                                                                 'Slot ID' => '[32:8]',
                                                                 'Speed' => '6.0Gb/s',
                                                                 'Status' => 'Online, Spun Up',
-                                                                'Temp' => '33C',
+                                                                'Temp' => '35C',
                                                                 'Type' => 'HDD',
                                                                 'sector size' => 512
                                                               },
@@ -1223,7 +1223,7 @@ $VAR1 = {
                                                                 'Slot ID' => '[32:9]',
                                                                 'Speed' => '6.0Gb/s',
                                                                 'Status' => 'Hotspare, Spun Up',
-                                                                'Temp' => '32C',
+                                                                'Temp' => '34C',
                                                                 'Type' => 'HDD',
                                                                 'sector size' => 512
                                                               }
@@ -1461,9 +1461,9 @@ $VAR1 = {
                                                'lv_name' => 'kvm-hera-disk2',
                                                'lv_parent' => '',
                                                'pool_lv' => '',
-                                               'seg_le_ranges' => '/dev/sdc1:0-1048575',
-                                               'seg_pe_ranges' => '/dev/sdc1:0-1048575',
-                                               'seg_size' => '4398046511104B',
+                                               'seg_le_ranges' => '/dev/sdc1:0-1310719',
+                                               'seg_pe_ranges' => '/dev/sdc1:0-1310719',
+                                               'seg_size' => '5497558138880B',
                                                'seg_start' => '0B',
                                                'segtype' => 'linear',
                                                'vg_name' => 'vgchu'
@@ -1527,13 +1527,13 @@ $VAR1 = {
                                              {
                                                'lv_name' => 'kvm-hera-disk2',
                                                'lv_role' => 'public',
-                                               'pv_free' => '1600944865280B',
+                                               'pv_free' => '501433237504B',
                                                'pv_name' => '/dev/sdc1',
                                                'pv_size' => '5998991376384B',
-                                               'pv_used' => '4398046511104B',
-                                               'pvseg_size' => '1048576',
+                                               'pv_used' => '5497558138880B',
+                                               'pvseg_size' => '1310720',
                                                'pvseg_start' => '0',
-                                               'seg_size' => '4398046511104B',
+                                               'seg_size' => '5497558138880B',
                                                'seg_start' => '0B',
                                                'segtype' => 'linear',
                                                'vg_name' => 'vgchu'
@@ -1541,13 +1541,13 @@ $VAR1 = {
                                              {
                                                'lv_name' => '',
                                                'lv_role' => 'public',
-                                               'pv_free' => '1600944865280B',
+                                               'pv_free' => '501433237504B',
                                                'pv_name' => '/dev/sdc1',
                                                'pv_size' => '5998991376384B',
-                                               'pv_used' => '4398046511104B',
-                                               'pvseg_size' => '381695',
-                                               'pvseg_start' => '1048576',
-                                               'seg_size' => '1600944865280B',
+                                               'pv_used' => '5497558138880B',
+                                               'pvseg_size' => '119551',
+                                               'pvseg_start' => '1310720',
+                                               'seg_size' => '501433237504B',
                                                'seg_start' => '0B',
                                                'segtype' => 'free',
                                                'vg_name' => 'vgchu'
@@ -1567,7 +1567,7 @@ $VAR1 = {
                                                                       'data_percent' => '',
                                                                       'lv_name' => 'kvm-hera-disk2',
                                                                       'lv_role' => 'public',
-                                                                      'lv_size' => '4398046511104B',
+                                                                      'lv_size' => '5497558138880B',
                                                                       'origin' => '',
                                                                       'pool_lv' => '',
                                                                       'vg_name' => 'vgchu'
@@ -1591,15 +1591,15 @@ $VAR1 = {
                                                                  'vg_name' => 'vgchu'
                                                                },
                                                 '/dev/sdc1' => {
-                                                                 'pv_free' => '1600944865280B',
+                                                                 'pv_free' => '501433237504B',
                                                                  'pv_name' => '/dev/sdc1',
                                                                  'pv_size' => '5998991376384B',
-                                                                 'pv_used' => '4398046511104B',
+                                                                 'pv_used' => '5497558138880B',
                                                                  'vg_name' => 'vgchu'
                                                                }
                                               },
                                   'vgs-vg' => {
-                                                'vg_free' => '2536517926912B',
+                                                'vg_free' => '1437006299136B',
                                                 'vg_name' => 'vgchu',
                                                 'vg_size' => '6998988947456B'
                                               }
@@ -1655,12 +1655,20 @@ $VAR1 = {
                                                        'start' => '1073741824'
                                                      },
                                                      {
+                                                       'flags' => 'lvm',
+                                                       'id' => '1',
+                                                       'kind' => 'part',
+                                                       'label' => 'disk2pv2',
+                                                       'size' => '1099511627776',
+                                                       'start' => '4398045462528'
+                                                     },
+                                                     {
                                                        'kind' => 'free',
                                                        'size' => '1031680',
-                                                       'start' => '4398045462528'
+                                                       'start' => '5497557090304'
                                                      }
                                                    ],
-                                        'size' => '4398046511104'
+                                        'size' => '5497558138880'
                                       },
                             'sda' => {
                                        'label' => 'DELL PERC H710P',
@@ -1831,21 +1839,21 @@ $VAR1 = {
                                                                 'ID_MODEL_ID' => '0002',
                                                                 'ID_PATH' => 'pci-0000:00:1a.0',
                                                                 'ID_PATH_TAG' => 'pci-0000_00_1a_0',
-                                                                'ID_REVISION' => '0506',
-                                                                'ID_SERIAL' => 'Linux_5.6.0-0.bpo.2-amd64_ehci_hcd_EHCI_Host_Controller_0000:00:1a.0',
+                                                                'ID_REVISION' => '0510',
+                                                                'ID_SERIAL' => 'Linux_5.10.0-0.bpo.4-amd64_ehci_hcd_EHCI_Host_Controller_0000:00:1a.0',
                                                                 'ID_SERIAL_SHORT' => '0000:00:1a.0',
                                                                 'ID_USB_INTERFACES' => ':090000:',
-                                                                'ID_VENDOR' => 'Linux_5.6.0-0.bpo.2-amd64_ehci_hcd',
-                                                                'ID_VENDOR_ENC' => 'Linux\\x205.6.0-0.bpo.2-amd64\\x20ehci_hcd',
+                                                                'ID_VENDOR' => 'Linux_5.10.0-0.bpo.4-amd64_ehci_hcd',
+                                                                'ID_VENDOR_ENC' => 'Linux\\x205.10.0-0.bpo.4-amd64\\x20ehci_hcd',
                                                                 'ID_VENDOR_FROM_DATABASE' => 'Linux Foundation',
                                                                 'ID_VENDOR_ID' => '1d6b',
                                                                 'MAJOR' => '189',
                                                                 'MINOR' => '0',
-                                                                'PRODUCT' => '1d6b/2/506',
+                                                                'PRODUCT' => '1d6b/2/510',
                                                                 'SUBSYSTEM' => 'usb',
                                                                 'TAGS' => ':seat:',
                                                                 'TYPE' => '9/0/0',
-                                                                'USEC_INITIALIZED' => '1625876'
+                                                                'USEC_INITIALIZED' => '1591602'
                                                               },
                                              'name' => 'bus/usb/001/001',
                                              'names' => [
@@ -1882,7 +1890,7 @@ $VAR1 = {
                                                                 'SUBSYSTEM' => 'usb',
                                                                 'TAGS' => ':seat:',
                                                                 'TYPE' => '9/0/1',
-                                                                'USEC_INITIALIZED' => '2097896'
+                                                                'USEC_INITIALIZED' => '2073375'
                                                               },
                                              'name' => 'bus/usb/001/002',
                                              'names' => [
@@ -1920,7 +1928,7 @@ $VAR1 = {
                                                                 'SUBSYSTEM' => 'usb',
                                                                 'TAGS' => ':seat:',
                                                                 'TYPE' => '9/0/0',
-                                                                'USEC_INITIALIZED' => '2500367'
+                                                                'USEC_INITIALIZED' => '2475023'
                                                               },
                                              'name' => 'bus/usb/001/003',
                                              'names' => [
@@ -1954,7 +1962,7 @@ $VAR1 = {
                                                                 'PRODUCT' => '624/249/0',
                                                                 'SUBSYSTEM' => 'usb',
                                                                 'TYPE' => '0/0/0',
-                                                                'USEC_INITIALIZED' => '2983671'
+                                                                'USEC_INITIALIZED' => '2966656'
                                                               },
                                              'name' => 'bus/usb/001/004',
                                              'names' => [
@@ -1978,21 +1986,21 @@ $VAR1 = {
                                                                 'ID_MODEL_ID' => '0002',
                                                                 'ID_PATH' => 'pci-0000:00:1d.0',
                                                                 'ID_PATH_TAG' => 'pci-0000_00_1d_0',
-                                                                'ID_REVISION' => '0506',
-                                                                'ID_SERIAL' => 'Linux_5.6.0-0.bpo.2-amd64_ehci_hcd_EHCI_Host_Controller_0000:00:1d.0',
+                                                                'ID_REVISION' => '0510',
+                                                                'ID_SERIAL' => 'Linux_5.10.0-0.bpo.4-amd64_ehci_hcd_EHCI_Host_Controller_0000:00:1d.0',
                                                                 'ID_SERIAL_SHORT' => '0000:00:1d.0',
                                                                 'ID_USB_INTERFACES' => ':090000:',
-                                                                'ID_VENDOR' => 'Linux_5.6.0-0.bpo.2-amd64_ehci_hcd',
-                                                                'ID_VENDOR_ENC' => 'Linux\\x205.6.0-0.bpo.2-amd64\\x20ehci_hcd',
+                                                                'ID_VENDOR' => 'Linux_5.10.0-0.bpo.4-amd64_ehci_hcd',
+                                                                'ID_VENDOR_ENC' => 'Linux\\x205.10.0-0.bpo.4-amd64\\x20ehci_hcd',
                                                                 'ID_VENDOR_FROM_DATABASE' => 'Linux Foundation',
                                                                 'ID_VENDOR_ID' => '1d6b',
                                                                 'MAJOR' => '189',
                                                                 'MINOR' => '128',
-                                                                'PRODUCT' => '1d6b/2/506',
+                                                                'PRODUCT' => '1d6b/2/510',
                                                                 'SUBSYSTEM' => 'usb',
                                                                 'TAGS' => ':seat:',
                                                                 'TYPE' => '9/0/0',
-                                                                'USEC_INITIALIZED' => '1625926'
+                                                                'USEC_INITIALIZED' => '1591586'
                                                               },
                                              'name' => 'bus/usb/002/001',
                                              'names' => [
@@ -2029,7 +2037,7 @@ $VAR1 = {
                                                                 'SUBSYSTEM' => 'usb',
                                                                 'TAGS' => ':seat:',
                                                                 'TYPE' => '9/0/1',
-                                                                'USEC_INITIALIZED' => '2117724'
+                                                                'USEC_INITIALIZED' => '2085923'
                                                               },
                                              'name' => 'bus/usb/002/002',
                                              'names' => [
@@ -2061,7 +2069,7 @@ $VAR1 = {
                                                                 'PRODUCT' => '17ef/608c/107',
                                                                 'SUBSYSTEM' => 'usb',
                                                                 'TYPE' => '0/0/0',
-                                                                'USEC_INITIALIZED' => '2526830'
+                                                                'USEC_INITIALIZED' => '2497397'
                                                               },
                                              'name' => 'bus/usb/002/003',
                                              'names' => [
@@ -2124,7 +2132,7 @@ $VAR1 = {
                                                      'MINOR' => '0',
                                                      'SUBSYSTEM' => 'block',
                                                      'TAGS' => ':systemd:',
-                                                     'USEC_INITIALIZED' => '2476323'
+                                                     'USEC_INITIALIZED' => '2758925'
                                                    },
                                   'name' => 'dm-0',
                                   'names' => [
@@ -2163,7 +2171,7 @@ $VAR1 = {
                                                      'MINOR' => '1',
                                                      'SUBSYSTEM' => 'block',
                                                      'TAGS' => ':systemd:',
-                                                     'USEC_INITIALIZED' => '8302341'
+                                                     'USEC_INITIALIZED' => '9979827'
                                                    },
                                   'name' => 'dm-1',
                                   'names' => [
@@ -2201,7 +2209,7 @@ $VAR1 = {
                                                      'MINOR' => '2',
                                                      'SUBSYSTEM' => 'block',
                                                      'TAGS' => ':systemd:',
-                                                     'USEC_INITIALIZED' => '8381207'
+                                                     'USEC_INITIALIZED' => '9981268'
                                                    },
                                   'name' => 'dm-2',
                                   'names' => [
@@ -2239,7 +2247,7 @@ $VAR1 = {
                                                      'MINOR' => '3',
                                                      'SUBSYSTEM' => 'block',
                                                      'TAGS' => ':systemd:',
-                                                     'USEC_INITIALIZED' => '8382168'
+                                                     'USEC_INITIALIZED' => '9982470'
                                                    },
                                   'name' => 'dm-3',
                                   'names' => [
@@ -2277,7 +2285,7 @@ $VAR1 = {
                                                      'MINOR' => '4',
                                                      'SUBSYSTEM' => 'block',
                                                      'TAGS' => ':systemd:',
-                                                     'USEC_INITIALIZED' => '8383206'
+                                                     'USEC_INITIALIZED' => '9983057'
                                                    },
                                   'name' => 'dm-4',
                                   'names' => [
@@ -2315,7 +2323,7 @@ $VAR1 = {
                                                      'MINOR' => '5',
                                                      'SUBSYSTEM' => 'block',
                                                      'TAGS' => ':systemd:',
-                                                     'USEC_INITIALIZED' => '8384326'
+                                                     'USEC_INITIALIZED' => '9983969'
                                                    },
                                   'name' => 'dm-5',
                                   'names' => [
@@ -2349,7 +2357,7 @@ $VAR1 = {
                                                      'MINOR' => '6',
                                                      'SUBSYSTEM' => 'block',
                                                      'TAGS' => ':systemd:',
-                                                     'USEC_INITIALIZED' => '8867972'
+                                                     'USEC_INITIALIZED' => '10519133'
                                                    },
                                   'name' => 'dm-6',
                                   'names' => [
@@ -2382,7 +2390,7 @@ $VAR1 = {
                                                      'MINOR' => '7',
                                                      'SUBSYSTEM' => 'block',
                                                      'TAGS' => ':systemd:',
-                                                     'USEC_INITIALIZED' => '8869146'
+                                                     'USEC_INITIALIZED' => '10519850'
                                                    },
                                   'name' => 'dm-7',
                                   'names' => [
@@ -2406,8 +2414,8 @@ $VAR1 = {
                                                           'MAJOR' => '226',
                                                           'MINOR' => '0',
                                                           'SUBSYSTEM' => 'drm',
-                                                          'TAGS' => ':master-of-seat:seat:uaccess:',
-                                                          'USEC_INITIALIZED' => '9095401'
+                                                          'TAGS' => ':seat:uaccess:master-of-seat:',
+                                                          'USEC_INITIALIZED' => '9765898'
                                                         },
                                        'name' => 'dri/card0',
                                        'names' => [
@@ -2428,8 +2436,8 @@ $VAR1 = {
                                                           'MAJOR' => '226',
                                                           'MINOR' => '1',
                                                           'SUBSYSTEM' => 'drm',
-                                                          'TAGS' => ':master-of-seat:seat:uaccess:',
-                                                          'USEC_INITIALIZED' => '11234462'
+                                                          'TAGS' => ':seat:uaccess:master-of-seat:',
+                                                          'USEC_INITIALIZED' => '11556353'
                                                         },
                                        'name' => 'dri/card1',
                                        'names' => [
@@ -2450,8 +2458,8 @@ $VAR1 = {
                                                           'MAJOR' => '226',
                                                           'MINOR' => '2',
                                                           'SUBSYSTEM' => 'drm',
-                                                          'TAGS' => ':master-of-seat:seat:uaccess:',
-                                                          'USEC_INITIALIZED' => '11262922'
+                                                          'TAGS' => ':seat:uaccess:master-of-seat:',
+                                                          'USEC_INITIALIZED' => '11396791'
                                                         },
                                        'name' => 'dri/card2',
                                        'names' => [
@@ -2473,7 +2481,7 @@ $VAR1 = {
                                                                'MINOR' => '128',
                                                                'SUBSYSTEM' => 'drm',
                                                                'TAGS' => ':seat:uaccess:',
-                                                               'USEC_INITIALIZED' => '11233831'
+                                                               'USEC_INITIALIZED' => '11556350'
                                                              },
                                             'name' => 'dri/renderD128',
                                             'names' => [
@@ -2495,7 +2503,7 @@ $VAR1 = {
                                                                'MINOR' => '129',
                                                                'SUBSYSTEM' => 'drm',
                                                                'TAGS' => ':seat:uaccess:',
-                                                               'USEC_INITIALIZED' => '11262599'
+                                                               'USEC_INITIALIZED' => '11396794'
                                                              },
                                             'name' => 'dri/renderD129',
                                             'names' => [
@@ -2515,7 +2523,7 @@ $VAR1 = {
                                                     'MINOR' => '0',
                                                     'SUBSYSTEM' => 'graphics',
                                                     'TAGS' => ':seat:',
-                                                    'USEC_INITIALIZED' => '9095219'
+                                                    'USEC_INITIALIZED' => '9765874'
                                                   },
                                  'name' => 'fb0',
                                  'names' => [
@@ -2649,7 +2657,7 @@ $VAR1 = {
                                                              'MINOR' => '64',
                                                              'SUBSYSTEM' => 'input',
                                                              'TAGS' => ':power-switch:',
-                                                             'USEC_INITIALIZED' => '8105260'
+                                                             'USEC_INITIALIZED' => '9118970'
                                                            },
                                           'name' => 'input/event0',
                                           'names' => [
@@ -2685,7 +2693,7 @@ $VAR1 = {
                                                              'MINOR' => '65',
                                                              'SUBSYSTEM' => 'input',
                                                              'TAGS' => ':power-switch:',
-                                                             'USEC_INITIALIZED' => '8096870'
+                                                             'USEC_INITIALIZED' => '9119013'
                                                            },
                                           'name' => 'input/event1',
                                           'names' => [
@@ -2698,7 +2706,7 @@ $VAR1 = {
                       'input/event10' => {
                                            '_udev_infos' => {
                                                               'DEVNAME' => '/dev/input/event10',
-                                                              'DEVPATH' => '/devices/pci0000:40/0000:40:03.0/0000:43:00.1/sound/card1/input12/event10',
+                                                              'DEVPATH' => '/devices/pci0000:40/0000:40:03.0/0000:43:00.1/sound/card1/input11/event10',
                                                               'ID_INPUT' => '1',
                                                               'ID_INPUT_SWITCH' => '1',
                                                               'ID_PATH' => 'pci-0000:43:00.1',
@@ -2707,18 +2715,18 @@ $VAR1 = {
                                                               'MINOR' => '74',
                                                               'SUBSYSTEM' => 'input',
                                                               'TAGS' => ':power-switch:',
-                                                              'USEC_INITIALIZED' => '9084198'
+                                                              'USEC_INITIALIZED' => '10734677'
                                                             },
                                            'name' => 'input/event10',
                                            'names' => [
                                                         'input/event10'
                                                       ],
-                                           'path' => '/devices/pci0000:40/0000:40:03.0/0000:43:00.1/sound/card1/input12/event10'
+                                           'path' => '/devices/pci0000:40/0000:40:03.0/0000:43:00.1/sound/card1/input11/event10'
                                          },
                       'input/event11' => {
                                            '_udev_infos' => {
                                                               'DEVNAME' => '/dev/input/event11',
-                                                              'DEVPATH' => '/devices/pci0000:40/0000:40:03.0/0000:43:00.1/sound/card1/input14/event11',
+                                                              'DEVPATH' => '/devices/pci0000:40/0000:40:03.0/0000:43:00.1/sound/card1/input12/event11',
                                                               'ID_INPUT' => '1',
                                                               'ID_INPUT_SWITCH' => '1',
                                                               'ID_PATH' => 'pci-0000:43:00.1',
@@ -2727,18 +2735,18 @@ $VAR1 = {
                                                               'MINOR' => '75',
                                                               'SUBSYSTEM' => 'input',
                                                               'TAGS' => ':power-switch:',
-                                                              'USEC_INITIALIZED' => '9048004'
+                                                              'USEC_INITIALIZED' => '10734718'
                                                             },
                                            'name' => 'input/event11',
                                            'names' => [
                                                         'input/event11'
                                                       ],
-                                           'path' => '/devices/pci0000:40/0000:40:03.0/0000:43:00.1/sound/card1/input14/event11'
+                                           'path' => '/devices/pci0000:40/0000:40:03.0/0000:43:00.1/sound/card1/input12/event11'
                                          },
                       'input/event12' => {
                                            '_udev_infos' => {
                                                               'DEVNAME' => '/dev/input/event12',
-                                                              'DEVPATH' => '/devices/pci0000:00/0000:00:02.0/0000:02:00.1/sound/card0/input9/event12',
+                                                              'DEVPATH' => '/devices/pci0000:00/0000:00:02.0/0000:02:00.1/sound/card0/input8/event12',
                                                               'ID_INPUT' => '1',
                                                               'ID_INPUT_SWITCH' => '1',
                                                               'ID_PATH' => 'pci-0000:02:00.1',
@@ -2747,18 +2755,18 @@ $VAR1 = {
                                                               'MINOR' => '76',
                                                               'SUBSYSTEM' => 'input',
                                                               'TAGS' => ':power-switch:',
-                                                              'USEC_INITIALIZED' => '9051936'
+                                                              'USEC_INITIALIZED' => '10842597'
                                                             },
                                            'name' => 'input/event12',
                                            'names' => [
                                                         'input/event12'
                                                       ],
-                                           'path' => '/devices/pci0000:00/0000:00:02.0/0000:02:00.1/sound/card0/input9/event12'
+                                           'path' => '/devices/pci0000:00/0000:00:02.0/0000:02:00.1/sound/card0/input8/event12'
                                          },
                       'input/event13' => {
                                            '_udev_infos' => {
                                                               'DEVNAME' => '/dev/input/event13',
-                                                              'DEVPATH' => '/devices/pci0000:00/0000:00:02.0/0000:02:00.1/sound/card0/input11/event13',
+                                                              'DEVPATH' => '/devices/pci0000:00/0000:00:02.0/0000:02:00.1/sound/card0/input13/event13',
                                                               'ID_INPUT' => '1',
                                                               'ID_INPUT_SWITCH' => '1',
                                                               'ID_PATH' => 'pci-0000:02:00.1',
@@ -2767,18 +2775,18 @@ $VAR1 = {
                                                               'MINOR' => '77',
                                                               'SUBSYSTEM' => 'input',
                                                               'TAGS' => ':power-switch:',
-                                                              'USEC_INITIALIZED' => '9055946'
+                                                              'USEC_INITIALIZED' => '10846517'
                                                             },
                                            'name' => 'input/event13',
                                            'names' => [
                                                         'input/event13'
                                                       ],
-                                           'path' => '/devices/pci0000:00/0000:00:02.0/0000:02:00.1/sound/card0/input11/event13'
+                                           'path' => '/devices/pci0000:00/0000:00:02.0/0000:02:00.1/sound/card0/input13/event13'
                                          },
                       'input/event14' => {
                                            '_udev_infos' => {
                                                               'DEVNAME' => '/dev/input/event14',
-                                                              'DEVPATH' => '/devices/pci0000:00/0000:00:02.0/0000:02:00.1/sound/card0/input13/event14',
+                                                              'DEVPATH' => '/devices/pci0000:00/0000:00:02.0/0000:02:00.1/sound/card0/input14/event14',
                                                               'ID_INPUT' => '1',
                                                               'ID_INPUT_SWITCH' => '1',
                                                               'ID_PATH' => 'pci-0000:02:00.1',
@@ -2787,13 +2795,13 @@ $VAR1 = {
                                                               'MINOR' => '78',
                                                               'SUBSYSTEM' => 'input',
                                                               'TAGS' => ':power-switch:',
-                                                              'USEC_INITIALIZED' => '9048001'
+                                                              'USEC_INITIALIZED' => '10818540'
                                                             },
                                            'name' => 'input/event14',
                                            'names' => [
                                                         'input/event14'
                                                       ],
-                                           'path' => '/devices/pci0000:00/0000:00:02.0/0000:02:00.1/sound/card0/input13/event14'
+                                           'path' => '/devices/pci0000:00/0000:00:02.0/0000:02:00.1/sound/card0/input14/event14'
                                          },
                       'input/event15' => {
                                            '_udev_infos' => {
@@ -2807,7 +2815,7 @@ $VAR1 = {
                                                               'MINOR' => '79',
                                                               'SUBSYSTEM' => 'input',
                                                               'TAGS' => ':power-switch:',
-                                                              'USEC_INITIALIZED' => '9051991'
+                                                              'USEC_INITIALIZED' => '10810537'
                                                             },
                                            'name' => 'input/event15',
                                            'names' => [
@@ -2842,8 +2850,8 @@ $VAR1 = {
                                                              'MAJOR' => '13',
                                                              'MINOR' => '66',
                                                              'SUBSYSTEM' => 'input',
-                                                             'TAGS' => ':power-switch:seat:uaccess:',
-                                                             'USEC_INITIALIZED' => '8072927'
+                                                             'TAGS' => ':seat:power-switch:uaccess:',
+                                                             'USEC_INITIALIZED' => '9111117'
                                                            },
                                           'name' => 'input/event2',
                                           'names' => [
@@ -2881,7 +2889,7 @@ $VAR1 = {
                                                              'MINOR' => '67',
                                                              'SUBSYSTEM' => 'input',
                                                              'TAGS' => ':power-switch:',
-                                                             'USEC_INITIALIZED' => '8089074'
+                                                             'USEC_INITIALIZED' => '9090972'
                                                            },
                                           'name' => 'input/event3',
                                           'names' => [
@@ -2917,7 +2925,7 @@ $VAR1 = {
                                                              'MAJOR' => '13',
                                                              'MINOR' => '68',
                                                              'SUBSYSTEM' => 'input',
-                                                             'USEC_INITIALIZED' => '8124407'
+                                                             'USEC_INITIALIZED' => '9175022'
                                                            },
                                           'name' => 'input/event4',
                                           'names' => [
@@ -2953,7 +2961,7 @@ $VAR1 = {
                                                              'MAJOR' => '13',
                                                              'MINOR' => '69',
                                                              'SUBSYSTEM' => 'input',
-                                                             'USEC_INITIALIZED' => '8148999'
+                                                             'USEC_INITIALIZED' => '9155109'
                                                            },
                                           'name' => 'input/event5',
                                           'names' => [
@@ -2975,7 +2983,7 @@ $VAR1 = {
                                                              'MINOR' => '70',
                                                              'SUBSYSTEM' => 'input',
                                                              'TAGS' => ':power-switch:',
-                                                             'USEC_INITIALIZED' => '8088063'
+                                                             'USEC_INITIALIZED' => '9118514'
                                                            },
                                           'name' => 'input/event6',
                                           'names' => [
@@ -2995,7 +3003,7 @@ $VAR1 = {
                                                              'MAJOR' => '13',
                                                              'MINOR' => '71',
                                                              'SUBSYSTEM' => 'input',
-                                                             'USEC_INITIALIZED' => '8081098'
+                                                             'USEC_INITIALIZED' => '9102495'
                                                            },
                                           'name' => 'input/event7',
                                           'names' => [
@@ -3007,7 +3015,7 @@ $VAR1 = {
                       'input/event8' => {
                                           '_udev_infos' => {
                                                              'DEVNAME' => '/dev/input/event8',
-                                                             'DEVPATH' => '/devices/pci0000:40/0000:40:03.0/0000:43:00.1/sound/card1/input8/event8',
+                                                             'DEVPATH' => '/devices/pci0000:40/0000:40:03.0/0000:43:00.1/sound/card1/input9/event8',
                                                              'ID_INPUT' => '1',
                                                              'ID_INPUT_SWITCH' => '1',
                                                              'ID_PATH' => 'pci-0000:43:00.1',
@@ -3016,13 +3024,13 @@ $VAR1 = {
                                                              'MINOR' => '72',
                                                              'SUBSYSTEM' => 'input',
                                                              'TAGS' => ':power-switch:',
-                                                             'USEC_INITIALIZED' => '9051945'
+                                                             'USEC_INITIALIZED' => '10734715'
                                                            },
                                           'name' => 'input/event8',
                                           'names' => [
                                                        'input/event8'
                                                      ],
-                                          'path' => '/devices/pci0000:40/0000:40:03.0/0000:43:00.1/sound/card1/input8/event8'
+                                          'path' => '/devices/pci0000:40/0000:40:03.0/0000:43:00.1/sound/card1/input9/event8'
                                         },
                       'input/event9' => {
                                           '_udev_infos' => {
@@ -3036,7 +3044,7 @@ $VAR1 = {
                                                              'MINOR' => '73',
                                                              'SUBSYSTEM' => 'input',
                                                              'TAGS' => ':power-switch:',
-                                                             'USEC_INITIALIZED' => '9051988'
+                                                             'USEC_INITIALIZED' => '10746554'
                                                            },
                                           'name' => 'input/event9',
                                           'names' => [
@@ -3072,7 +3080,7 @@ $VAR1 = {
                                                           'MINOR' => '0',
                                                           'SUBSYSTEM' => 'input',
                                                           'TAGS' => ':seat:uaccess:',
-                                                          'USEC_INITIALIZED' => '7981704'
+                                                          'USEC_INITIALIZED' => '9022753'
                                                         },
                                        'name' => 'input/js0',
                                        'names' => [
@@ -3122,7 +3130,7 @@ $VAR1 = {
                                                              'MAJOR' => '13',
                                                              'MINOR' => '32',
                                                              'SUBSYSTEM' => 'input',
-                                                             'USEC_INITIALIZED' => '7994783'
+                                                             'USEC_INITIALIZED' => '9021814'
                                                            },
                                           'name' => 'input/mouse0',
                                           'names' => [
@@ -3158,7 +3166,7 @@ $VAR1 = {
                                                              'MAJOR' => '13',
                                                              'MINOR' => '33',
                                                              'SUBSYSTEM' => 'input',
-                                                             'USEC_INITIALIZED' => '7995647'
+                                                             'USEC_INITIALIZED' => '9019943'
                                                            },
                                           'name' => 'input/mouse1',
                                           'names' => [
@@ -3172,7 +3180,7 @@ $VAR1 = {
                                    '_udev_infos' => {
                                                       'DEVNAME' => '/dev/ipmi0',
                                                       'DEVPATH' => '/devices/platform/dmi-ipmi-si.0/ipmi/ipmi0',
-                                                      'MAJOR' => '244',
+                                                      'MAJOR' => '246',
                                                       'MINOR' => '0',
                                                       'SUBSYSTEM' => 'ipmi'
                                                     },
@@ -3205,7 +3213,7 @@ $VAR1 = {
                                                     'MINOR' => '232',
                                                     'SUBSYSTEM' => 'misc',
                                                     'TAGS' => ':seat:uaccess:',
-                                                    'USEC_INITIALIZED' => '10636630'
+                                                    'USEC_INITIALIZED' => '10880623'
                                                   },
                                  'name' => 'kvm',
                                  'names' => [
@@ -3420,7 +3428,7 @@ $VAR1 = {
                                                      'MAJOR' => '252',
                                                      'MINOR' => '0',
                                                      'SUBSYSTEM' => 'rtc',
-                                                     'USEC_INITIALIZED' => '1557619'
+                                                     'USEC_INITIALIZED' => '1521890'
                                                    },
                                   'name' => 'rtc0',
                                   'names' => [
@@ -3457,7 +3465,7 @@ $VAR1 = {
                                                     'MINOR' => '0',
                                                     'SUBSYSTEM' => 'block',
                                                     'TAGS' => ':systemd:',
-                                                    'USEC_INITIALIZED' => '2107350'
+                                                    'USEC_INITIALIZED' => '2143939'
                                                   },
                                  'name' => 'sda',
                                  'names' => [
@@ -3511,7 +3519,7 @@ $VAR1 = {
                                                      'PARTNAME' => 'EFI',
                                                      'SUBSYSTEM' => 'block',
                                                      'TAGS' => ':systemd:',
-                                                     'USEC_INITIALIZED' => '2276390'
+                                                     'USEC_INITIALIZED' => '2259216'
                                                    },
                                   'name' => 'sda1',
                                   'names' => [
@@ -3571,7 +3579,7 @@ $VAR1 = {
                                                      'SYSTEMD_READY' => '1',
                                                      'SYSTEMD_WANTS' => 'lvm2-pvscan@8:2.service',
                                                      'TAGS' => ':systemd:',
-                                                     'USEC_INITIALIZED' => '2199998'
+                                                     'USEC_INITIALIZED' => '2206528'
                                                    },
                                   'name' => 'sda2',
                                   'names' => [
@@ -3613,7 +3621,7 @@ $VAR1 = {
                                                     'MINOR' => '16',
                                                     'SUBSYSTEM' => 'block',
                                                     'TAGS' => ':systemd:',
-                                                    'USEC_INITIALIZED' => '2123564'
+                                                    'USEC_INITIALIZED' => '2110313'
                                                   },
                                  'name' => 'sdb',
                                  'names' => [
@@ -3670,7 +3678,7 @@ $VAR1 = {
                                                      'SYSTEMD_READY' => '1',
                                                      'SYSTEMD_WANTS' => 'lvm2-pvscan@8:17.service',
                                                      'TAGS' => ':systemd:',
-                                                     'USEC_INITIALIZED' => '2143415'
+                                                     'USEC_INITIALIZED' => '2130228'
                                                    },
                                   'name' => 'sdb1',
                                   'names' => [
@@ -3712,7 +3720,7 @@ $VAR1 = {
                                                     'MINOR' => '32',
                                                     'SUBSYSTEM' => 'block',
                                                     'TAGS' => ':systemd:',
-                                                    'USEC_INITIALIZED' => '1895424'
+                                                    'USEC_INITIALIZED' => '2536867'
                                                   },
                                  'name' => 'sdc',
                                  'names' => [
@@ -3769,7 +3777,7 @@ $VAR1 = {
                                                      'SYSTEMD_READY' => '1',
                                                      'SYSTEMD_WANTS' => 'lvm2-pvscan@8:33.service',
                                                      'TAGS' => ':systemd:',
-                                                     'USEC_INITIALIZED' => '1900377'
+                                                     'USEC_INITIALIZED' => '2541030'
                                                    },
                                   'name' => 'sdc1',
                                   'names' => [
@@ -3836,7 +3844,7 @@ $VAR1 = {
                                                     'MINOR' => '3',
                                                     'SUBSYSTEM' => 'scsi_generic',
                                                     'TAGS' => ':seat:uaccess:',
-                                                    'USEC_INITIALIZED' => '7769799'
+                                                    'USEC_INITIALIZED' => '8884908'
                                                   },
                                  'name' => 'sg3',
                                  'names' => [
@@ -3869,7 +3877,7 @@ $VAR1 = {
                                                               'MINOR' => '19',
                                                               'SUBSYSTEM' => 'sound',
                                                               'TAGS' => ':uaccess:',
-                                                              'USEC_INITIALIZED' => '8737771'
+                                                              'USEC_INITIALIZED' => '10748571'
                                                             },
                                            'name' => 'snd/controlC0',
                                            'names' => [
@@ -3889,7 +3897,7 @@ $VAR1 = {
                                                               'MINOR' => '10',
                                                               'SUBSYSTEM' => 'sound',
                                                               'TAGS' => ':uaccess:',
-                                                              'USEC_INITIALIZED' => '8729650'
+                                                              'USEC_INITIALIZED' => '10537113'
                                                             },
                                            'name' => 'snd/controlC1',
                                            'names' => [
@@ -3906,7 +3914,7 @@ $VAR1 = {
                                                            'MINOR' => '15',
                                                            'SUBSYSTEM' => 'sound',
                                                            'TAGS' => ':uaccess:',
-                                                           'USEC_INITIALIZED' => '8732484'
+                                                           'USEC_INITIALIZED' => '10747447'
                                                          },
                                         'name' => 'snd/hwC0D0',
                                         'names' => [
@@ -3922,7 +3930,7 @@ $VAR1 = {
                                                            'MINOR' => '16',
                                                            'SUBSYSTEM' => 'sound',
                                                            'TAGS' => ':uaccess:',
-                                                           'USEC_INITIALIZED' => '8732479'
+                                                           'USEC_INITIALIZED' => '10747486'
                                                          },
                                         'name' => 'snd/hwC0D1',
                                         'names' => [
@@ -3938,7 +3946,7 @@ $VAR1 = {
                                                            'MINOR' => '17',
                                                            'SUBSYSTEM' => 'sound',
                                                            'TAGS' => ':uaccess:',
-                                                           'USEC_INITIALIZED' => '8732499'
+                                                           'USEC_INITIALIZED' => '10747542'
                                                          },
                                         'name' => 'snd/hwC0D2',
                                         'names' => [
@@ -3954,7 +3962,7 @@ $VAR1 = {
                                                            'MINOR' => '18',
                                                            'SUBSYSTEM' => 'sound',
                                                            'TAGS' => ':uaccess:',
-                                                           'USEC_INITIALIZED' => '8732280'
+                                                           'USEC_INITIALIZED' => '10747692'
                                                          },
                                         'name' => 'snd/hwC0D3',
                                         'names' => [
@@ -3970,7 +3978,7 @@ $VAR1 = {
                                                            'MINOR' => '6',
                                                            'SUBSYSTEM' => 'sound',
                                                            'TAGS' => ':uaccess:',
-                                                           'USEC_INITIALIZED' => '8728132'
+                                                           'USEC_INITIALIZED' => '10536421'
                                                          },
                                         'name' => 'snd/hwC1D0',
                                         'names' => [
@@ -3986,7 +3994,7 @@ $VAR1 = {
                                                            'MINOR' => '7',
                                                            'SUBSYSTEM' => 'sound',
                                                            'TAGS' => ':uaccess:',
-                                                           'USEC_INITIALIZED' => '8728002'
+                                                           'USEC_INITIALIZED' => '10536434'
                                                          },
                                         'name' => 'snd/hwC1D1',
                                         'names' => [
@@ -4002,7 +4010,7 @@ $VAR1 = {
                                                            'MINOR' => '8',
                                                            'SUBSYSTEM' => 'sound',
                                                            'TAGS' => ':uaccess:',
-                                                           'USEC_INITIALIZED' => '8728125'
+                                                           'USEC_INITIALIZED' => '10536591'
                                                          },
                                         'name' => 'snd/hwC1D2',
                                         'names' => [
@@ -4018,7 +4026,7 @@ $VAR1 = {
                                                            'MINOR' => '9',
                                                            'SUBSYSTEM' => 'sound',
                                                            'TAGS' => ':uaccess:',
-                                                           'USEC_INITIALIZED' => '8728234'
+                                                           'USEC_INITIALIZED' => '10536526'
                                                          },
                                         'name' => 'snd/hwC1D3',
                                         'names' => [
@@ -4035,7 +4043,7 @@ $VAR1 = {
                                                              'MINOR' => '11',
                                                              'SUBSYSTEM' => 'sound',
                                                              'TAGS' => ':uaccess:',
-                                                             'USEC_INITIALIZED' => '8731584'
+                                                             'USEC_INITIALIZED' => '10746817'
                                                            },
                                           'name' => 'snd/pcmC0D3p',
                                           'names' => [
@@ -4052,7 +4060,7 @@ $VAR1 = {
                                                              'MINOR' => '12',
                                                              'SUBSYSTEM' => 'sound',
                                                              'TAGS' => ':uaccess:',
-                                                             'USEC_INITIALIZED' => '8731588'
+                                                             'USEC_INITIALIZED' => '10747144'
                                                            },
                                           'name' => 'snd/pcmC0D7p',
                                           'names' => [
@@ -4069,7 +4077,7 @@ $VAR1 = {
                                                              'MINOR' => '13',
                                                              'SUBSYSTEM' => 'sound',
                                                              'TAGS' => ':uaccess:',
-                                                             'USEC_INITIALIZED' => '8731638'
+                                                             'USEC_INITIALIZED' => '10747327'
                                                            },
                                           'name' => 'snd/pcmC0D8p',
                                           'names' => [
@@ -4086,7 +4094,7 @@ $VAR1 = {
                                                              'MINOR' => '14',
                                                              'SUBSYSTEM' => 'sound',
                                                              'TAGS' => ':uaccess:',
-                                                             'USEC_INITIALIZED' => '8731655'
+                                                             'USEC_INITIALIZED' => '10747358'
                                                            },
                                           'name' => 'snd/pcmC0D9p',
                                           'names' => [
@@ -4103,7 +4111,7 @@ $VAR1 = {
                                                              'MINOR' => '2',
                                                              'SUBSYSTEM' => 'sound',
                                                              'TAGS' => ':uaccess:',
-                                                             'USEC_INITIALIZED' => '8728023'
+                                                             'USEC_INITIALIZED' => '10536222'
                                                            },
                                           'name' => 'snd/pcmC1D3p',
                                           'names' => [
@@ -4120,7 +4128,7 @@ $VAR1 = {
                                                              'MINOR' => '3',
                                                              'SUBSYSTEM' => 'sound',
                                                              'TAGS' => ':uaccess:',
-                                                             'USEC_INITIALIZED' => '8727985'
+                                                             'USEC_INITIALIZED' => '10536521'
                                                            },
                                           'name' => 'snd/pcmC1D7p',
                                           'names' => [
@@ -4137,7 +4145,7 @@ $VAR1 = {
                                                              'MINOR' => '4',
                                                              'SUBSYSTEM' => 'sound',
                                                              'TAGS' => ':uaccess:',
-                                                             'USEC_INITIALIZED' => '8728047'
+                                                             'USEC_INITIALIZED' => '10536373'
                                                            },
                                           'name' => 'snd/pcmC1D8p',
                                           'names' => [
@@ -4154,7 +4162,7 @@ $VAR1 = {
                                                              'MINOR' => '5',
                                                              'SUBSYSTEM' => 'sound',
                                                              'TAGS' => ':uaccess:',
-                                                             'USEC_INITIALIZED' => '8728077'
+                                                             'USEC_INITIALIZED' => '10536540'
                                                            },
                                           'name' => 'snd/pcmC1D9p',
                                           'names' => [
@@ -4170,7 +4178,7 @@ $VAR1 = {
                                                           'MINOR' => '33',
                                                           'SUBSYSTEM' => 'sound',
                                                           'TAGS' => ':uaccess:',
-                                                          'USEC_INITIALIZED' => '8130145'
+                                                          'USEC_INITIALIZED' => '9248185'
                                                         },
                                        'name' => 'snd/timer',
                                        'names' => [
@@ -4206,8 +4214,8 @@ $VAR1 = {
                                                     'MINOR' => '0',
                                                     'SUBSYSTEM' => 'block',
                                                     'SYSTEMD_MOUNT_DEVICE_BOUND' => '1',
-                                                    'TAGS' => ':seat:systemd:uaccess:',
-                                                    'USEC_INITIALIZED' => '2250137'
+                                                    'TAGS' => ':seat:uaccess:systemd:',
+                                                    'USEC_INITIALIZED' => '2204522'
                                                   },
                                  'name' => 'sr0',
                                  'names' => [
@@ -5138,7 +5146,7 @@ $VAR1 = {
                                                       'MINOR' => '64',
                                                       'SUBSYSTEM' => 'tty',
                                                       'TAGS' => ':systemd:',
-                                                      'USEC_INITIALIZED' => '7875057'
+                                                      'USEC_INITIALIZED' => '8805046'
                                                     },
                                    'name' => 'ttyS0',
                                    'names' => [
@@ -5154,7 +5162,7 @@ $VAR1 = {
                                                       'MINOR' => '65',
                                                       'SUBSYSTEM' => 'tty',
                                                       'TAGS' => ':systemd:',
-                                                      'USEC_INITIALIZED' => '7874949'
+                                                      'USEC_INITIALIZED' => '8806277'
                                                     },
                                    'name' => 'ttyS1',
                                    'names' => [
@@ -5170,7 +5178,7 @@ $VAR1 = {
                                                       'MINOR' => '66',
                                                       'SUBSYSTEM' => 'tty',
                                                       'TAGS' => ':systemd:',
-                                                      'USEC_INITIALIZED' => '7873823'
+                                                      'USEC_INITIALIZED' => '8799415'
                                                     },
                                    'name' => 'ttyS2',
                                    'names' => [
@@ -5186,7 +5194,7 @@ $VAR1 = {
                                                       'MINOR' => '67',
                                                       'SUBSYSTEM' => 'tty',
                                                       'TAGS' => ':systemd:',
-                                                      'USEC_INITIALIZED' => '7873836'
+                                                      'USEC_INITIALIZED' => '8799701'
                                                     },
                                    'name' => 'ttyS3',
                                    'names' => [
@@ -5549,7 +5557,7 @@ $VAR1 = {
                                        '_udev_infos' => {
                                                           'DEVNAME' => '/dev/watchdog0',
                                                           'DEVPATH' => '/devices/virtual/watchdog/watchdog0',
-                                                          'MAJOR' => '246',
+                                                          'MAJOR' => '245',
                                                           'MINOR' => '0',
                                                           'SUBSYSTEM' => 'watchdog'
                                                         },

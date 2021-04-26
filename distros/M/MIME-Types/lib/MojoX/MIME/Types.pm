@@ -8,7 +8,7 @@
 
 package MojoX::MIME::Types;
 use vars '$VERSION';
-$VERSION = '2.19';
+$VERSION = '2.20';
 
 use Mojo::Base -base;
 

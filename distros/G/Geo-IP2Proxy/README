@@ -1,7 +1,7 @@
 Geo::IP2Proxy
 =============
 
-This Perl module provides fast reverse lookup of IP address to detect VPN servers, open proxies, web proxies, Tor exit nodes, search engine robots, data center ranges and residential proxies using IP2Proxy BIN databases. Other information available includes proxy type, country, state, city,  ISP, domain name, usage type, AS number, AS name, last seen date and threats.
+This Perl module provides fast reverse lookup of IP address to detect VPN servers, open proxies, web proxies, Tor exit nodes, search engine robots, data center ranges and residential proxies using IP2Proxy BIN databases. Other information available includes proxy type, country, state, city,  ISP, domain name, usage type, AS number, AS name, last seen date, threats and provider names.
 
 This pure Perl module uses a file based IP2Proxy .BIN database available at https://www.ip2location.com/database/ip2proxy upon subscription. IP2Proxy supports both IPv4 and IPv6 addressing.
 
@@ -9,7 +9,7 @@ The complete IPv4 and IPv6 proxy database are available at https://www.ip2locati
 
 The IP2Proxy database is being updated in daily basis for greater accuracy.
 
-Free creative-common monthly database with open proxies data only is available at https://lite.ip2location.com
+Free creative-common monthly database with open proxies data only is available at https://lite.ip2location.com at no cost.
 
 
 INSTALLATION
@@ -24,12 +24,12 @@ To install this module type the following:
 
 DEPENDENCIES
 
-The complete IP2Proxy databases (PX1, PX2, PX3, PX4, PX5, PX6, PX7, PX8, PX9 and PX10) are available at https://www.ip2location.com/database/ip2proxy under subscription package.
+The complete IP2Proxy databases (PX1, PX2, PX3, PX4, PX5, PX6, PX7, PX8, PX9, PX10 and PX11) are available at https://www.ip2location.com/database/ip2proxy under subscription package.
 
 
 COPYRIGHT AND LICENCE
 
-Copyright (C) 2020 by IP2Location.com, support@ip2location.com
+Copyright (C) 2021 by IP2Location.com, support@ip2location.com
 
 This library is released under the MIT license. See the LICENSE file for full license information.
 

@@ -9,8 +9,8 @@ use Data::Dump::Partial qw(dumpp);
 use Data::Format::Pretty::Console qw(format_pretty);
 use YAML::Any;
 
-local $ENV{ANSITABLE_BORDER_STYLE} = 'Default::single_ascii';
-local $ENV{ANSITABLE_COLOR_THEME}  = 'Default::no_color';
+local $ENV{ANSITABLE_BORDER_STYLE} = 'ASCII::SingleLine';
+local $ENV{ANSITABLE_COLOR_THEME}  = 'NoColor';
 
 my @data = (
     {

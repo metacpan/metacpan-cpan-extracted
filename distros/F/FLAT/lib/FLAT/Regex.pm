@@ -9,18 +9,18 @@ use FLAT::Regex::Op;
 my $PARSER = FLAT::Regex::Parser->new(qw[ alt concat star ]);
 #### TODO: error checking in the parse
 
-sub _parser {$PARSER}
+sub _parser { $PARSER }
 
 sub new {
-    my ($pkg, $string) = @_;
+    my ( $pkg, $string ) = @_;
     my $result = $pkg->_parser->parse($string)
-        or croak qq[``$string'' is not a valid regular expression];
+      or croak qq[``$string'' is not a valid regular expression];
 
     $pkg->_from_op($result);
 }
 
 sub _from_op {
-    my ($proto, $op) = @_;
+    my ( $proto, $op ) = @_;
     $proto = ref $proto || $proto;    ## I really do want this
 
     bless [$op], $proto;
@@ -37,15 +37,15 @@ sub as_string {
 }
 
 sub as_perl_regex {
-    my ($self, %opts) = @_;
+    my ( $self, %opts ) = @_;
 
     my $fmt = $opts{anchored} ? '(?:\A%s\z)' : '(?:%s)';
     return sprintf $fmt, $self->op->as_perl_regex(0);
 }
 
 sub contains {
-    my ($self, $string) = @_;
-    $string =~ $self->as_perl_regex(anchored => 1);
+    my ( $self, $string ) = @_;
+    $string =~ $self->as_perl_regex( anchored => 1 );
 }
 
 sub as_nfa {
@@ -65,12 +65,12 @@ sub as_regex {
 
 sub union {
     my $self = $_[0];
-    my $op = FLAT::Regex::Op::alt->new(map {$_->as_regex->op} @_);
+    my $op   = FLAT::Regex::Op::alt->new( map { $_->as_regex->op } @_ );
     $self->_from_op($op);
 }
 
 sub intersect {
-    my @dfas = map {$_->as_dfa} @_;
+    my @dfas = map { $_->as_dfa } @_;
     my $self = shift @dfas;
     $self->intersect(@dfas)->as_regex;
 }
@@ -82,13 +82,13 @@ sub complement {
 
 sub concat {
     my $self = $_[0];
-    my $op = FLAT::Regex::Op::concat->new(map {$_->as_regex->op} @_);
+    my $op   = FLAT::Regex::Op::concat->new( map { $_->as_regex->op } @_ );
     $self->_from_op($op);
 }
 
 sub kleene {
     my $self = shift;
-    my $op   = FLAT::Regex::Op::star->new($self->op);
+    my $op   = FLAT::Regex::Op::star->new( $self->op );
     $self->_from_op($op);
 }
 
@@ -182,12 +182,7 @@ will be equal to "(?:foo(?:bar)*)".
 =head1 AUTHORS & ACKNOWLEDGEMENTS
 
 FLAT is written by Mike Rosulek E<lt>mike at mikero dot comE<gt> and 
-Brett Estrade E<lt>estradb at gmail dot comE<gt>.
-
-The initial version (FLAT::Legacy) by Brett Estrade was work towards an 
-MS thesis at the University of Southern Mississippi.
-
-Please visit the Wiki at http://www.0x743.com/flat
+B. Estarde E<lt>estradb at gmail dot comE<gt>.
 
 =head1 LICENSE
 

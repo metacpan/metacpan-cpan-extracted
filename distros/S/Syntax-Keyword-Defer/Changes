@@ -1,5 +1,9 @@
 Revision history for Syntax-Keyword-Defer
 
+0.05    2021-04-21
+        [CHANGES]
+         * Rewrite parsing logic to use XS::Parse::Keyword
+
 0.04    2021-03-25
         [CHANGES]
          * Renamed distribution from Syntax-Keyword-Finally

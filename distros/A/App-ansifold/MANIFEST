@@ -8,5 +8,8 @@ lib/App/ansifold.pm
 minil.toml
 script/ansifold
 t/00_compile.t
+t/01_run.t
+t/02_exec.t
+t/Util.pm
 META.yml
 MANIFEST

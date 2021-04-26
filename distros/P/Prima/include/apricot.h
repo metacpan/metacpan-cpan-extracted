@@ -14,6 +14,9 @@
 			(long int)apc_get_core_version(), (long int)PRIMA_CORE_VERSION )
 
 #include "generic/config.h"
+#if defined(HAS_GLIBC) && !defined(_GNU_SOURCE)
+#	define _GNU_SOURCE
+#endif
 
 #ifdef _MSC_VER
 	#define BROKEN_COMPILER       1
@@ -1512,6 +1515,9 @@ prima_is_utf8_sv( SV * sv);
 extern SV*
 prima_svpv_utf8( const char *text, int is_utf8);
 
+extern FILE*
+prima_open_file( const char *text, Bool is_utf8, const char * mode);
+
 #if PERL_PATCHLEVEL >= 16
 #define prima_utf8_uvchr(_text, _textlen, _charlen) \
 	utf8_to_uvchr_buf(( U8*)(_text), (U8*)(_text) + (_textlen), _charlen)
@@ -1913,8 +1919,6 @@ SV(CanUTF8_Output)
 SV(CompositeDisplay)
 #define   svLayeredWidgets  33
 SV(LayeredWidgets)
-#define   svDWM             34
-SV(DWM)
 #define   svFixedPointerSize 35
 SV(FixedPointerSize)
 #define   svMenuCheckSize   36
@@ -1993,6 +1997,9 @@ apc_application_go( Handle self);
 
 extern Bool
 apc_application_lock( Handle self);
+
+extern Bool
+apc_application_stop( Handle self);
 
 extern Bool
 apc_application_sync( void);
@@ -3969,6 +3976,94 @@ apc_get_user_name( void);
 
 extern PList
 apc_getdir( const char *dirname, Bool is_utf8);
+
+typedef struct {
+	uint32_t dev;
+	uint32_t ino;
+	uint32_t mode;
+	uint32_t nlink;
+	uint32_t uid;
+	uint32_t gid;
+	uint32_t rdev;
+	uint64_t size;
+	int32_t  blksize;
+	int32_t  blocks;
+	float    atim;
+	float    mtim;
+	float    ctim;
+} StatRec, *PStatRec;
+
+typedef struct {
+	Bool      is_utf8, is_active;
+	void *    handle;
+} DirHandleRec, *PDirHandleRec;
+
+extern int
+apc_fs_access(const char *name, Bool is_utf8, int mode, Bool effective);
+
+extern Bool
+apc_fs_chdir(const char *path, Bool is_utf8 );
+
+extern Bool
+apc_fs_chmod( const char *path, Bool is_utf8, int mode);
+
+extern Bool
+apc_fs_closedir( PDirHandleRec dh);
+
+extern char *
+apc_fs_from_local(const char * text, int * len);
+
+extern char*
+apc_fs_getcwd(void);
+
+extern char*
+apc_fs_getenv(const char * varname, Bool is_utf8, Bool * do_free);
+
+extern Bool
+apc_fs_link( const char* oldname, Bool is_old_utf8, const char * newname, Bool is_new_utf8 );
+
+extern Bool
+apc_fs_mkdir( const char* path, Bool is_utf8, int mode);
+
+extern Bool
+apc_fs_opendir( const char *path, PDirHandleRec dh);
+
+extern int
+apc_fs_open_file( const char* path, Bool is_utf8, int flags, int mode);
+
+#define PATH_MAX_UTF8 (PATH_MAX*6)
+extern Bool
+apc_fs_readdir( PDirHandleRec dh, char * entry);
+
+extern Bool
+apc_fs_rename( const char* oldname, Bool is_old_utf8, const char * newname, Bool is_new_utf8 );
+
+extern Bool
+apc_fs_rewinddir( PDirHandleRec dh );
+
+extern Bool
+apc_fs_rmdir( const char* path, Bool is_utf8 );
+
+extern Bool
+apc_fs_seekdir( PDirHandleRec dh, long position );
+
+extern Bool
+apc_fs_setenv(const char * varname, Bool is_name_utf8, const char * value, Bool is_value_utf8);
+
+extern Bool
+apc_fs_stat(const char *name, Bool is_utf8, Bool link, PStatRec statrec);
+
+extern char *
+apc_fs_to_local(const char * text, Bool fail_if_cannot, int * len);
+
+extern long
+apc_fs_telldir( PDirHandleRec dh );
+
+extern Bool
+apc_fs_unlink( const char* path, Bool is_utf8 );
+
+extern Bool
+apc_fs_utime( double atime, double mtime, const char* path, Bool is_utf8 );
 
 extern Bool
 apc_dl_export(char *path);

@@ -19,4 +19,12 @@ use warnings;
         input       => [ [qw/ histogram load 10.316 /], ],
         output      => "foo.load:10.316|h\n",
     },
+    {
+        description => "histogram (subclass)",
+        class       => 'Net::Statsd::Lite::Dog',
+        autoflush   => 1,
+        prefix      => 'bar.',
+        input       => [ [qw/ histogram size 12000 /, { tags => [qw/ env:test bo:baz /] } ] ],
+        output      => "bar.size:12000|h|#env:test,bo:baz\n",
+    },
 ];

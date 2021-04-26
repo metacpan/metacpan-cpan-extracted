@@ -25,16 +25,16 @@ This example converts an SVG into a PNG:
 <p>
 This renders the following image:
 </p>
-<img width="451.271" height="187.542" src='https://fastapi.metacpan.org/source/BKB/Image-CairoSVG-0.12/examples/locust.png'>
+<img width="451.271" height="187.542" src='https://fastapi.metacpan.org/source/BKB/Image-CairoSVG-0.13/examples/locust.png'>
 
 =end html
 
-(This example is included as L<F<synopsis.pl>|https://fastapi.metacpan.org/source/BKB/Image-CairoSVG-0.12/examples/synopsis.pl> in the distribution. The L<input|https://fastapi.metacpan.org/source/BKB/Image-CairoSVG-0.12/examples/locust.svg> and L<output files|https://fastapi.metacpan.org/source/BKB/Image-CairoSVG-0.12/examples/locust.png> are also included.)
+(This example is included as L<F<synopsis.pl>|https://fastapi.metacpan.org/source/BKB/Image-CairoSVG-0.13/examples/synopsis.pl> in the distribution. The L<input|https://fastapi.metacpan.org/source/BKB/Image-CairoSVG-0.13/examples/locust.svg> and L<output files|https://fastapi.metacpan.org/source/BKB/Image-CairoSVG-0.13/examples/locust.png> are also included.)
 
 =head1 VERSION
 
-This documents Image::CairoSVG version 0.12
-corresponding to git commit L<262421853e0fb85894f354cf7ec4a1ff453d7057|https://github.com/benkasminbullock/image-cairosvg/commit/262421853e0fb85894f354cf7ec4a1ff453d7057> released on Mon Apr 5 09:43:05 2021 +0900. 
+This documents Image::CairoSVG version 0.13
+corresponding to git commit L<936c1e0dd68fab143b00a68415f9425dd74e0087|https://github.com/benkasminbullock/image-cairosvg/commit/936c1e0dd68fab143b00a68415f9425dd74e0087> released on Mon Apr 26 13:32:53 2021 +0900. 
 
 =head1 DESCRIPTION
 

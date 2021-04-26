@@ -6,14 +6,13 @@ use open ':std', ':encoding(UTF-8)';
 use Encode qw(decode);
 use File::Find;
 use File::Spec;
-use Digest::MD5;
 use Class::Load qw(load_class);
 use Carp;
 use POSIX qw(strftime);
 use Moo;
 with "Archive::BagIt::Role::Portability";
 
-our $VERSION = '0.072'; # VERSION
+our $VERSION = '0.073'; # VERSION
 
 # ABSTRACT: The main module to handle bags.
 
@@ -956,7 +955,7 @@ Archive::BagIt - The main module to handle bags.
 
 =head1 VERSION
 
-version 0.072
+version 0.073
 
 =head1 NAME
 

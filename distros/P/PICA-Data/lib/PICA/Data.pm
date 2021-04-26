@@ -1,12 +1,12 @@
 package PICA::Data;
 use v5.14.1;
 
-our $VERSION = '1.16';
+our $VERSION = '1.17';
 
 use Exporter 'import';
 our @EXPORT_OK = qw(pica_parser pica_writer pica_path pica_xml_struct
     pica_match pica_values pica_value pica_fields pica_holdings pica_items
-    pica_guess clean_pica);
+    pica_guess clean_pica pica_string);
 our %EXPORT_TAGS = (all => [@EXPORT_OK]);
 
 our $ILN_PATH = PICA::Path->new('101@a');
@@ -148,12 +148,23 @@ sub pica_holdings {
     return \@holdings;
 }
 
+sub pica_string {
+    my ($pica, $type, %options) = @_;
+    my $string = "";
+    $type ||= 'plain';
+    $options{fh} = \$string;
+    $options{start} //= 0;
+    pica_writer($type => %options)->write($pica);
+    return decode('UTF-8', $string);
+}
+
 *fields   = *pica_fields;
 *holdings = *pica_holdings;
 *items    = *pica_items;
 *match    = *pica_match;
 *value    = *pica_value;
 *values   = *pica_values;
+*string   = *pica_string;
 
 use PICA::Parser::XML;
 use PICA::Parser::Plus;
@@ -238,16 +249,6 @@ sub write {
         $writer = pica_writer(@_ ? @_ : 'plain');
     }
     $writer->write($pica);
-}
-
-sub string {
-    my ($pica, $type, %options) = @_;
-    my $string = "";
-    $type ||= 'plain';
-    $options{fh} = \$string;
-    $options{start} //= 0;
-    pica_writer($type => %options)->write($pica);
-    return decode('UTF-8', $string);
 }
 
 sub TO_JSON {
@@ -469,6 +470,10 @@ L<PICA::Writer::Fields> for type C<fields> (summary of used fields and subfields
 
 =back
 
+=head2 pica_string( $record [, $type [, @options] ] )
+
+Stringify a record with given writer (C<plain> as default) and options.
+
 =head2 pica_path( $path )
 
 Equivalent to L<PICA::Path>-E<gt>new($path).
@@ -561,7 +566,8 @@ record objects:
 
 =head2 string( [ $type ] )
 
-Serialize PICA record in a given format (C<plain> by default).
+Serialize PICA record in a given format (C<plain> by default). This method can
+also be used as function C<pica_string>.
 
 =head1 CONTRIBUTORS
 

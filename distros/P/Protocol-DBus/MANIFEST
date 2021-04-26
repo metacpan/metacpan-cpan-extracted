@@ -1,3 +1,6 @@
+.github/workflows/linux.yml
+.github/workflows/macos.yml
+.github/workflows/windows.yml
 .gitignore
 .travis.yml
 Changes
@@ -58,6 +61,7 @@ t/anyevent_uncaught_failure.t
 t/integration.t
 t/ioasync_uncaught_failure.t
 t/lib/ClientServer.pm
+t/lib/DBusSession.pm
 t/lib/MockDBusServer.pm
 t/mojo_uncaught_failure.t
 t/pause_resume.t

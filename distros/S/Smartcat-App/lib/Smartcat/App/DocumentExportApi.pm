@@ -98,7 +98,7 @@ sub export_files {
 
         if ($single_file_export) {
             my $doc  = $docs{ @{ $task->document_ids }[0] };
-            my $name = $doc->name;
+            my $name = $doc->full_path;
             $log->info("Processing document '$name'...");
             my $filepath = get_file_path( $rundata->{project_workdir},
                 $doc->target_language, $name, $rundata->{filetype} );

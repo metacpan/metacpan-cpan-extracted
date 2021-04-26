@@ -6,10 +6,11 @@ build_requires:
   ExtUtils::XSpp: '0.11'
   Test::Number::Delta: '0'
 configure_requires:
+  Devel::CheckLib: '0.92'
   ExtUtils::CppGuess: '0.19'
   ExtUtils::MakeMaker: '6.64'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010'
 license: unknown
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -22,5 +23,5 @@ no_index:
 resources:
   IRC: irc://irc.perl.org/#v8
   repository: http://github.com/dgl/javascript-v8
-version: '0.09'
+version: '0.10'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

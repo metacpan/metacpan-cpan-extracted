@@ -1,0 +1,32 @@
+<%init>
+
+if ( $ARGSRef->{'FindUsersWithPassword'} ) {
+    # The options below align with the values checked by RT::User::HasPassword
+    $UsersObj->Limit(
+        FIELD => 'Password',
+        OPERATOR => '!=',
+        VALUE => '*NO-PASSWORD*',
+        ENTRYAGGREGATOR => 'AND',
+        SUBCLAUSE => 'nopassword',
+    );
+    $UsersObj->Limit(
+        FIELD => 'Password',
+        OPERATOR => '!=',
+        VALUE => '',
+        ENTRYAGGREGATOR => 'AND',
+        SUBCLAUSE => 'nopassword',
+    ) if RT->Config->Get('DatabaseType') ne 'Oracle';
+    $UsersObj->Limit(
+        FIELD => 'Password',
+        OPERATOR => 'IS NOT',
+        VALUE => 'NULL',
+        ENTRYAGGREGATOR => 'AND',
+        SUBCLAUSE => 'nopassword',
+    );
+}
+
+</%init>
+<%args>
+$UsersObj
+$ARGSRef
+</%args>

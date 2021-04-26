@@ -5,7 +5,7 @@ use utf8;
 
 package Neo4j::Driver::Result;
 # ABSTRACT: Result of running a Cypher statement (a stream of records)
-$Neo4j::Driver::Result::VERSION = '0.22';
+$Neo4j::Driver::Result::VERSION = '0.23';
 
 use parent 'Neo4j::Driver::StatementResult';
 
@@ -213,7 +213,7 @@ Neo4j::Driver::Result - Result of running a Cypher statement (a stream of record
 
 =head1 VERSION
 
-version 0.22
+version 0.23
 
 =head1 SYNOPSIS
 

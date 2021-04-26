@@ -39,11 +39,13 @@
             "Test::Pod::Coverage" : "1.08",
             "Test::Pod::LinkCheck" : "0",
             "Test::Portability::Files" : "0",
-            "Test::TrailingSpace" : "0.0203"
+            "Test::TrailingSpace" : "0.0203",
+            "Test::Vars" : "0.015"
          }
       },
       "runtime" : {
          "recommends" : {
+            "Ref::Util::XS" : "0",
             "Type::Tiny::XS" : "0"
          },
          "requires" : {
@@ -51,9 +53,12 @@
             "IO::Socket" : "1.18",
             "Moo" : "1.000000",
             "MooX::TypeTiny" : "0",
+            "Ref::Util" : "0",
             "Scalar::Util" : "0",
             "Sub::Quote" : "0",
             "Sub::Util" : "1.40",
+            "Types::Common::Numeric" : "1.004000",
+            "Types::Common::String" : "0",
             "Types::Standard" : "0",
             "namespace::autoclean" : "0",
             "perl" : "v5.10.0",
@@ -69,6 +74,7 @@
             "Carp" : "0",
             "File::Spec" : "0",
             "IO::Select" : "0",
+            "Module::Load" : "0",
             "Module::Metadata" : "0",
             "Net::EmptyPort" : "0",
             "Socket" : "0",
@@ -87,11 +93,11 @@
    "provides" : {
       "Net::Statsd::Lite" : {
          "file" : "lib/Net/Statsd/Lite.pm",
-         "version" : "v0.4.10"
+         "version" : "v0.6.0"
       },
       "Net::Statsd::Lite::Types" : {
          "file" : "lib/Net/Statsd/Lite/Types.pm",
-         "version" : "v0.4.10"
+         "version" : "v0.6.0"
       }
    },
    "release_status" : "stable",
@@ -106,7 +112,7 @@
          "web" : "https://github.com/robrwo/Net-Statsd-Lite"
       }
    },
-   "version" : "v0.4.10",
+   "version" : "v0.6.0",
    "x_authority" : "cpan:RRWO",
    "x_contributors" : [
       "Michael R. Davis <mrdvt@cpan.org>",

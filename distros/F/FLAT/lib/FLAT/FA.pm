@@ -36,138 +36,139 @@ sub new {
 
 sub get_states {
     my $self = shift;
-    return 0 .. ($self->num_states - 1);
+    return 0 .. ( $self->num_states - 1 );
 }
 
 sub num_states {
     my $self = shift;
-    return scalar @{$self->{STATES}};
+    return scalar @{ $self->{STATES} };
 }
 
 sub is_state {
-    my ($self, $state) = @_;
+    my ( $self, $state ) = @_;
     exists $self->{STATES}->[$state];
 }
 
 sub _assert_states {
-    my ($self, @states) = @_;
+    my ( $self, @states ) = @_;
     for (@states) {
         croak "'$_' is not a state" if not $self->is_state($_);
     }
 }
 
 sub _assert_non_states {
-    my ($self, @states) = @_;
+    my ( $self, @states ) = @_;
     for (@states) {
         croak "There is already a state called '$_'" if $self->is_state($_);
     }
 }
 
 sub delete_states {
-    my ($self, @states) = @_;
+    my ( $self, @states ) = @_;
 
     $self->_assert_states(@states);
 
-    for my $s (sort {$b <=> $a} @states) {
-        $self->_decr_alphabet($_) for @{splice @{$self->{TRANS}}, $s, 1};
+    for my $s ( sort { $b <=> $a } @states ) {
+        $self->_decr_alphabet($_) for @{ splice @{ $self->{TRANS} }, $s, 1 };
 
-        $self->_decr_alphabet(splice @$_, $s, 1) for @{$self->{TRANS}};
+        $self->_decr_alphabet( splice @$_, $s, 1 ) for @{ $self->{TRANS} };
 
-        splice @{$self->{STATES}}, $s, 1;
+        splice @{ $self->{STATES} }, $s, 1;
     }
 }
 
 sub add_states {
-    my ($self, $num) = @_;
+    my ( $self, $num ) = @_;
     my $id = $self->num_states;
 
-    for my $s ($id .. ($id + $num - 1)) {
-        push @$_, undef for @{$self->{TRANS}};
-        push @{$self->{TRANS}}, [(undef) x ($s + 1)];
-        push @{$self->{STATES}},
-            {
+    for my $s ( $id .. ( $id + $num - 1 ) ) {
+        push @$_, undef for @{ $self->{TRANS} };
+        push @{ $self->{TRANS} }, [ (undef) x ( $s + 1 ) ];
+        push @{ $self->{STATES} },
+          {
             starting  => 0,
             accepting => 0
-            };
+          };
     }
 
     return wantarray
-        ? ($id .. ($id + $num - 1))
-        : $id + $num - 1;
+      ? ( $id .. ( $id + $num - 1 ) )
+      : $id + $num - 1;
 }
 
 ##############
 
 sub is_starting {
-    my ($self, $state) = @_;
+    my ( $self, $state ) = @_;
     $self->_assert_states($state);
     return $self->{STATES}[$state]{starting};
 }
 
 sub set_starting {
-    my ($self, @states) = @_;
+    my ( $self, @states ) = @_;
     $self->_assert_states(@states);
     $self->{STATES}[$_]{starting} = 1 for @states;
 }
 
 sub unset_starting {
-    my ($self, @states) = @_;
+    my ( $self, @states ) = @_;
     $self->_assert_states(@states);
     $self->{STATES}[$_]{starting} = 0 for @states;
 }
 
 sub get_starting {
     my $self = shift;
-    return grep {$self->is_starting($_)} $self->get_states;
+    return grep { $self->is_starting($_) } $self->get_states;
 }
 
 ##############
 
 sub is_accepting {
-    my ($self, $state) = @_;
+    my ( $self, $state ) = @_;
     $self->_assert_states($state);
     return $self->{STATES}[$state]{accepting};
 }
 
 sub set_accepting {
-    my ($self, @states) = @_;
+    my ( $self, @states ) = @_;
     $self->_assert_states(@states);
     $self->{STATES}[$_]{accepting} = 1 for @states;
 }
 
 sub unset_accepting {
-    my ($self, @states) = @_;
+    my ( $self, @states ) = @_;
     $self->_assert_states(@states);
     $self->{STATES}[$_]{accepting} = 0 for @states;
 }
 
 sub get_accepting {
     my $self = shift;
-    return grep {$self->is_accepting($_)} $self->get_states;
+    return grep { $self->is_accepting($_) } $self->get_states;
 }
 
 ###############
 
 sub _decr_alphabet {
-    my ($self, $t) = @_;
+    my ( $self, $t ) = @_;
 
     return if not defined $t;
-    for ($t->alphabet) {
+    for ( $t->alphabet ) {
         delete $self->{ALPHA}{$_} if not --$self->{ALPHA}{$_};
+
         # supposed to delete key when _decrement_count returns 0, so need to test this
         delete $self->{ALPHA_BLESSED}{$_} if not $self->{ALPHA_BLESSED}{$_}->_decrement_count;
     }
 }
 
 sub _incr_alphabet {
-    my ($self, $t) = @_;
+    my ( $self, $t ) = @_;
 
     return if not defined $t;
-    for ($t->alphabet) {
+    for ( $t->alphabet ) {
         $self->{ALPHA}{$_}++;
 
-        if (!exists($self->{ALPHA_BLESSED}{$_})) {
-            $self->{ALPHA_BLESSED}{$_} = $self->{ALPHA_CLASS}->new($_)
+        if ( !exists( $self->{ALPHA_BLESSED}{$_} ) ) {
+            $self->{ALPHA_BLESSED}{$_} = $self->{ALPHA_CLASS}->new($_);
         }
         else {
             $self->{ALPHA_BLESSED}{$_}->_increment_count;
@@ -176,8 +177,8 @@ sub _incr_alphabet {
 }
 
 sub set_transition {
-    my ($self, $state1, $state2, @label) = @_;
-    $self->remove_transition($state1, $state2);
+    my ( $self, $state1, $state2, @label ) = @_;
+    $self->remove_transition( $state1, $state2 );
 
     @label = grep defined, @label;
     return if not @label;
@@ -188,15 +189,15 @@ sub set_transition {
 }
 
 sub add_transition {
-    my ($self, $state1, $state2, @label) = @_;
+    my ( $self, $state1, $state2, @label ) = @_;
 
     @label = grep defined, @label;
     return if not @label;
 
-    my $t = $self->get_transition($state1, $state2);
+    my $t = $self->get_transition( $state1, $state2 );
     $self->_decr_alphabet($t);
 
-    if (!$t) {
+    if ( !$t ) {
         $t = $self->{TRANS}[$state1][$state2] = $self->{TRANS_CLASS}->new;
     }
 
@@ -205,16 +206,16 @@ sub add_transition {
 }
 
 sub get_transition {
-    my ($self, $state1, $state2) = @_;
-    $self->_assert_states($state1, $state2);
+    my ( $self, $state1, $state2 ) = @_;
+    $self->_assert_states( $state1, $state2 );
 
     $self->{TRANS}[$state1][$state2];
 }
 
 sub remove_transition {
-    my ($self, $state1, $state2) = @_;
+    my ( $self, $state1, $state2 ) = @_;
 
-    $self->_decr_alphabet($self->{TRANS}[$state1][$state2]);
+    $self->_decr_alphabet( $self->{TRANS}[$state1][$state2] );
     $self->{TRANS}[$state1][$state2] = undef;
 }
 
@@ -224,13 +225,13 @@ sub remove_transition {
 # use array refs.  For example:
 # @NEXT=$self->successors([@nodes],[@symbols]);
 sub successors {
-    my ($self, $state, $symb) = @_;
+    my ( $self, $state, $symb ) = @_;
 
     my @states = ref $state eq 'ARRAY' ? @$state : ($state);
     my @symbs =
-        defined $symb
-        ? (ref $symb eq 'ARRAY' ? @$symb : ($symb))
-        : ();
+      defined $symb
+      ? ( ref $symb eq 'ARRAY' ? @$symb : ($symb) )
+      : ();
 
     $self->_assert_states(@states);
 
@@ -238,7 +239,7 @@ sub successors {
     for my $s (@states) {
         $succ{$_}++ for grep {
             my $t = $self->{TRANS}[$s][$_];
-            defined $t && (@symbs ? $t->does(@symbs) : 1)
+            defined $t && ( @symbs ? $t->does(@symbs) : 1 )
         } $self->get_states;
     }
 
@@ -258,8 +259,8 @@ sub reverse {
     my @start = $self->get_starting;
     my @final = $self->get_accepting;
 
-    $self->unset_accepting($self->get_states);
-    $self->unset_starting($self->get_states);
+    $self->unset_accepting( $self->get_states );
+    $self->unset_starting( $self->get_states );
 
     $self->set_accepting(@start);
     $self->set_starting(@final);
@@ -270,7 +271,7 @@ sub reverse {
 # get an array of all symbols
 sub alphabet {
     my $self = shift;
-    grep length, keys %{$self->{ALPHA}};
+    grep length, keys %{ $self->{ALPHA} };
 }
 
 # give an array of symbols, return the symbols that
@@ -285,13 +286,13 @@ sub prune {
     my $self = shift;
 
     my @queue = $self->get_starting;
-    my %seen = map {$_ => 1} @queue;
+    my %seen  = map { $_ => 1 } @queue;
 
     while (@queue) {
-        @queue = grep {!$seen{$_}++} $self->successors(\@queue);
+        @queue = grep { !$seen{$_}++ } $self->successors( \@queue );
     }
 
-    my @useless = grep {!$seen{$_}} $self->get_states;
+    my @useless = grep { !$seen{$_} } $self->get_states;
     $self->delete_states(@useless);
 
     return @useless;
@@ -302,7 +303,7 @@ sub prune {
 use Storable 'dclone';
 
 sub clone {
-    dclone($_[0]);
+    dclone( $_[0] );
 }
 
 sub _transpose {
@@ -312,25 +313,25 @@ sub _transpose {
     $self->{TRANS} = [
         map {
             my $row = $_;
-            [map {$_->[$row]} @{$self->{TRANS}}]
-            } 0 .. $N
+            [ map { $_->[$row] } @{ $self->{TRANS} } ]
+        } 0 .. $N
     ];
 }
 
 # tests to see if set1 is a subset of set2
 sub array_is_subset {
-    my $self     = shift;
-    my $set1     = shift;
-    my $set2     = shift;
-    $set1 = [ $set1 ] if not ref $set1;
-    $set2 = [ $set2 ] if not ref $set2;
+    my $self = shift;
+    my $set1 = shift;
+    my $set2 = shift;
+    $set1 = [$set1] if not ref $set1;
+    $set2 = [$set2] if not ref $set2;
     my $ok       = 1;
     my %setcount = ();
-    foreach ($self->array_unique(@{$set1}), $self->array_unique(@{$set2})) {
+    foreach ( $self->array_unique( @{$set1} ), $self->array_unique( @{$set2} ) ) {
         $setcount{$_}++;
     }
-    foreach ($self->array_unique(@{$set1})) {
-        if ($setcount{$_} != 2) {
+    foreach ( $self->array_unique( @{$set1} ) ) {
+        if ( $setcount{$_} != 2 ) {
             $ok = 0;
             last;
         }
@@ -352,23 +353,27 @@ sub array_complement {
     my $set1 = shift;
     my $set2 = shift;
     my @ret  = ();
+
     # convert set1 to a hash
-    my %set1hash = map {$_ => 1} @{$set1};
+    my %set1hash = map { $_ => 1 } @{$set1};
+
     # iterate of set2 and test if $set1
-    foreach (@{$set2}) {
-        if (!defined $set1hash{$_}) {
-            push(@ret, $_);
+    foreach ( @{$set2} ) {
+        if ( !defined $set1hash{$_} ) {
+            push( @ret, $_ );
         }
     }
     ## Now do the same using $set2
     # convert set2 to a hash
-    my %set2hash = map {$_ => 1} @{$set2};
+    my %set2hash = map { $_ => 1 } @{$set2};
+
     # iterate of set1 and test if $set1
-    foreach (@{$set1}) {
-        if (!defined $set2hash{$_}) {
-            push(@ret, $_);
+    foreach ( @{$set1} ) {
+        if ( !defined $set2hash{$_} ) {
+            push( @ret, $_ );
         }
     }
+
     # now @ret contains all items in $set1 not in $set 2 and all
     # items in $set2 not in $set1
     return @ret;
@@ -381,12 +386,12 @@ sub array_intersect {
     my $set2     = shift;
     my %setcount = ();
     my @ret      = ();
-    foreach ($self->array_unique(@{$set1})) {
+    foreach ( $self->array_unique( @{$set1} ) ) {
         $setcount{$_}++;
     }
-    foreach ($self->array_unique(@{$set2})) {
+    foreach ( $self->array_unique( @{$set2} ) ) {
         $setcount{$_}++;
-        push(@ret, $_) if ($setcount{$_} > 1);
+        push( @ret, $_ ) if ( $setcount{$_} > 1 );
     }
     return @ret;
 }
@@ -395,34 +400,34 @@ sub array_intersect {
 sub get_valid_symbols {
     my $self    = shift;
     my $symbols = shift;
-    return $self->array_intersect([$self->alphabet()], [@{$symbols}])
+    return $self->array_intersect( [ $self->alphabet() ], [ @{$symbols} ] );
 }
 
 ## add an FA's states & transitions to this FA (as disjoint union)
 sub _swallow {
-    my ($self, $other) = @_;
+    my ( $self, $other ) = @_;
     my $N1 = $self->num_states;
     my $N2 = $other->num_states;
 
-    push @$_, (undef) x $N2 for @{$self->{TRANS}};
+    push @$_, (undef) x $N2 for @{ $self->{TRANS} };
 
-    push @{$self->{TRANS}}, [(undef) x $N1, @{clone $_ }] for @{$other->{TRANS}};
+    push @{ $self->{TRANS} }, [ (undef) x $N1, @{ clone $_ } ] for @{ $other->{TRANS} };
 
-    push @{$self->{STATES}}, @{clone $other->{STATES}};
+    push @{ $self->{STATES} }, @{ clone $other->{STATES} };
 
-    for (keys %{$other->{ALPHA}}) {
+    for ( keys %{ $other->{ALPHA} } ) {
         $self->{ALPHA}{$_} += $other->{ALPHA}{$_};
 
         # towards objects as symbols
-        if (!exists($self->{ALPHA_BLESSED}{$_})) {
+        if ( !exists( $self->{ALPHA_BLESSED}{$_} ) ) {
             $self->{ALPHA_BLESSED}{$_} = $other->{ALPHA_BLESSED}{$_};
         }
         else {
-            $self->{ALPHA_BLESSED}{$_}->_increment_count($other->{ALPHA_BLESSED}{$_}->get_count);
+            $self->{ALPHA_BLESSED}{$_}->_increment_count( $other->{ALPHA_BLESSED}{$_}->get_count );
         }
     }
 
-    return map {$_ + $N1} $other->get_states;
+    return map { $_ + $N1 } $other->get_states;
 }
 
 1;
@@ -574,12 +579,7 @@ Returns an identical copy of $fa.
 =head1 AUTHORS & ACKNOWLEDGEMENTS
 
 FLAT is written by Mike Rosulek E<lt>mike at mikero dot comE<gt> and 
-Brett Estrade E<lt>estradb at gmail dot comE<gt>.
-
-The initial version (FLAT::Legacy) by Brett Estrade was work towards an 
-MS thesis at the University of Southern Mississippi.
-
-Please visit the Wiki at http://www.0x743.com/flat
+B. Estarde E<lt>estradb at gmail dot comE<gt>.
 
 =head1 LICENSE
 

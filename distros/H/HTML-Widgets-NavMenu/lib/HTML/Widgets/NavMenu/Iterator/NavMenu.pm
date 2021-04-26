@@ -1,5 +1,5 @@
 package HTML::Widgets::NavMenu::Iterator::NavMenu;
-$HTML::Widgets::NavMenu::Iterator::NavMenu::VERSION = '1.0801';
+$HTML::Widgets::NavMenu::Iterator::NavMenu::VERSION = '1.0900';
 use strict;
 use warnings;
 
@@ -11,7 +11,7 @@ __PACKAGE__->mk_acc_ref(
     [
         qw(
             _ul_classes
-            )
+        )
     ]
 );
 
@@ -245,7 +245,7 @@ HTML::Widgets::NavMenu::Iterator::NavMenu - navmenu iterator.
 
 =head1 VERSION
 
-version 1.0801
+version 1.0900
 
 =head1 SYNOPSIS
 

@@ -109,3 +109,9 @@ table.announce td.date {
 /*  width: 0px;  */ /* Remove scrollbar space */
 /*  background: #fcc;  */ /* Optional: just make scrollbar invisible */
 }
+
+/* RT 5 */
+
+#toggle_announcements.btn:hover {
+  color: white;
+}

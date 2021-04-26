@@ -817,6 +817,7 @@ apc_application_destroy( Handle self)
 		XCHECKPOINT;
 		hash_delete( guts.windows, (void*)&X_WINDOW, sizeof(X_WINDOW), false);
 	}
+	application = nilHandle;
 	return true;
 }
 
@@ -1011,7 +1012,7 @@ apc_application_get_size( Handle self)
 Box *
 apc_application_get_monitor_rects( Handle self, int * nrects)
 {
-#ifdef HAVE_X11_EXTENSIONS_XRANDR_H
+#if defined(HAVE_X11_EXTENSIONS_XRANDR_H) && (RANDR_MAJOR > 1 || (RANDR_MAJOR == 1 && RANDR_MINOR > 3))
 	XRRScreenResources * sr;
 	Box * ret = nil;
 
@@ -1053,12 +1054,10 @@ apc_application_go( Handle self)
 
 	XNoOp( DISP);
 	XFlush( DISP);
-
-	while ( prima_one_loop_round( WAIT_ALWAYS, true))
+	guts. application_stop_signal = false;
+	while ( !guts. application_stop_signal && prima_one_loop_round( WAIT_ALWAYS, true))
 		;
-
-	if ( application) Object_destroy( application);
-	application = nilHandle;
+	guts. application_stop_signal = false;
 	return true;
 }
 
@@ -1077,6 +1076,14 @@ apc_application_unlock( Handle self)
 }
 
 Bool
+apc_application_stop( Handle self)
+{
+	if ( application == nilHandle ) return false;
+	guts. application_stop_signal = true;
+	return true;
+}
+
+Bool
 apc_application_sync(void)
 {
 	XSync( DISP, false);
@@ -1087,7 +1094,9 @@ Bool
 apc_application_yield( Bool wait_for_event)
 {
 	if (!application) return false;
+	guts. application_stop_signal = false;
 	prima_one_loop_round(wait_for_event ? WAIT_IF_NONE : WAIT_NEVER, true);
+	guts. application_stop_signal = false;
 	XSync( DISP, false);
 	return application != nilHandle && !guts. applicationClose;
 }

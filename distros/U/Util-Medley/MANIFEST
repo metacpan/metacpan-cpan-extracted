@@ -15,6 +15,7 @@ lib/Util/Medley/Cache.pm
 lib/Util/Medley/Crypt.pm
 lib/Util/Medley/DateTime.pm
 lib/Util/Medley/Exec.pm
+lib/Util/Medley/Exec/Cache.pm
 lib/Util/Medley/File.pm
 lib/Util/Medley/File/Zip.pm
 lib/Util/Medley/Hash.pm

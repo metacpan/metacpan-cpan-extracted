@@ -1,0 +1,30 @@
+From f637c6df02767f1d21cd0c4ebefb7cafad3df1cb Mon Sep 17 00:00:00 2001
+From: LesnyRumcajs <LesnyRumcajs@users.noreply.github.com>
+Date: Tue, 29 Dec 2020 13:06:10 +0100
+Subject: [PATCH] Fixed duplicated / incorrect header guard
+
+---
+ include/custom_event.h | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/include/custom_event.h b/include/custom_event.h
+index 3c58570..246a726 100644
+--- a/include/custom_event.h
++++ b/include/custom_event.h
+@@ -4,8 +4,8 @@
+  * @brief Type definitions, constants, and function declarations necessary to
+  * support adding custom events to transactions in the C SDK.
+  */
+-#ifndef LIBNEWRELIC_ATTRIBUTE_H
+-#define LIBNEWRELIC_ATTRIBUTE_H
++#ifndef LIBNEWRELIC_CUSTOM_EVENT_H
++#define LIBNEWRELIC_CUSTOM_EVENT_H
+ 
+ #include "util_object.h"
+ 
+@@ -17,4 +17,4 @@ typedef struct _newrelic_custom_event_t {
+   nrobj_t* attributes;
+ } newrelic_custom_event_t;
+ 
+-#endif /* LIBNEWRELIC_ATTRIBUTE_H */
++#endif /* LIBNEWRELIC_CUSTOM_EVENT_H */

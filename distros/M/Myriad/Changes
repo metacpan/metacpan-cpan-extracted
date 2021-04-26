@@ -1,6 +1,24 @@
 
 Revision history for Myriad
 
+0.002     2021-04-24 16:36:44+08:00 Asia/Kuala_Lumpur
+    [API Changes]
+    - The "perl" transport has been renamed to "memory", for consistency
+      with implementations in other languages
+    - Startup and shutdown calls now receive the `$myriad` instance as the
+      first parameter for convenience, and can be method calls (e.g. Myriad.pm
+      method name) instead of plain coderefs
+
+    [New features]
+    - Subscription to configuration changes via the Redis transport - configuration
+      objects still use Ryu::Observable so this behaviour should be a seamless upgrade
+      for existing code
+
+    [Bugs fixed]
+    - Batch handling had a memory leak, this version should be improved
+      although `await` calls inside a batch method may still exhibit
+      increased memory usage (we expect to address this in the next version)
+
 0.001     2021-04-16 09:25:26+08:00 Asia/Kuala_Lumpur
 
  Initial release.

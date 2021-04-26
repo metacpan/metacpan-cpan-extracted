@@ -4,11 +4,8 @@ use strict;
 use warnings;
 
 use Cpanel::JSON::XS qw(decode_json encode_json);
-use Scalar::Util qw(blessed reftype);
-use XML::Simple;
 use Net::Z3950::FOLIO::Config;
 use Net::Z3950::FOLIO::ResultSet;
-use Net::Z3950::FOLIO::PostProcess qw(postProcess);
 
 
 sub _throw { return Net::Z3950::FOLIO::_throw(@_); }
@@ -26,7 +23,7 @@ sub new {
 }
 
 
-sub reload_config_file {
+sub reloadConfigFile {
     my $this = shift();
     my $ghandle = $this->{ghandle};
 
@@ -47,7 +44,7 @@ sub login {
 	if !defined $username || !defined $password;
 
     my $url = $cfg->{okapi}->{url} . '/bl-users/login';
-    my $req = $this->_make_http_request(POST => $url);
+    my $req = $this->_makeHTTPRequest(POST => $url);
     $req->content(qq[{ "username": "$username", "password": "$password" }]);
     # warn "req=", $req->content();
     my $res = $ghandle->{ua}->request($req);
@@ -59,21 +56,21 @@ sub login {
 }
 
 
-sub rerun_search {
+sub rerunSearch {
     my $this = shift();
     my($setname) = @_;
 
     my $cql = $this->{cql};
-    my $rs = new Net::Z3950::FOLIO::ResultSet($setname, $cql);
+    my $rs = new Net::Z3950::FOLIO::ResultSet($this, $setname, $cql);
     $this->{resultsets}->{$setname} = $rs;
 
     my $chunkSize = $this->{cfg}->{chunkSize} || 10;
-    $this->_do_search($rs, 0, $chunkSize);
-    return $rs->total_count();
+    $this->doSearch($rs, 0, $chunkSize);
+    return $rs->totalCount();
 }
 
 
-sub _do_search {
+sub doSearch {
     my $this = shift();
     my $ghandle = $this->{ghandle};
     my($rs, $offset, $limit) = @_;
@@ -92,7 +89,7 @@ sub _do_search {
 
     my $url = $okapiCfg->{url};
     my $graphqlUrl = $okapiCfg->{graphqlUrl};
-    my $req = $this->_make_http_request(POST => ($graphqlUrl || $url) . '/graphql');
+    my $req = $this->_makeHTTPRequest(POST => ($graphqlUrl || $url) . '/graphql');
     $req->header('X-Okapi-Url' => $url) if $graphqlUrl;
 
     my %variables = ();
@@ -109,7 +106,7 @@ sub _do_search {
     _throw(3, $res->content()) if !$res->is_success();
 
     my $obj = decode_json($res->content());
-    # warn "result: ", Net::Z3950::FOLIO::_pretty_json($obj);
+    # warn "result: ", Net::Z3950::FOLIO::Record::_formatJSON($obj);
     my $data = $obj->{data} or _throw(1, "no data in response");
     my $isi = $data->{instance_storage_instances};
     if (!$isi) {
@@ -117,89 +114,25 @@ sub _do_search {
 	_throw(1, join(', ', map { $_->{message} } @$errors)) if $errors;
 	_throw(1, "no instance_storage_instances in response data");
     }
-    $rs->total_count($isi->{totalRecords} + 0);
-    $rs->insert_records($offset, $isi->{instances});
+    $rs->totalCount($isi->{totalRecords} + 0);
+    $rs->insertRecords($offset, $isi->{instances});
 
     return $rs;
 }
 
 
-sub xml_record {
-    my $this = shift();
-    my($rec) = @_;
-
-    my $xml;
-    {
-	# Sanitize output to remove JSON::PP::Boolean values, which XMLout can't handle
-	_sanitize_tree($rec);
-
-	# I have no idea why this generates an "uninitialized value" warning
-	local $SIG{__WARN__} = sub {};
-	$xml = XMLout($rec, NoAttr => 1);
-    }
-    $xml =~ s/<@/<__/;
-    $xml =~ s/<\/@/<\/__/;
-    return $xml;
-}
-
-
-# This code modified from https://www.perlmonks.org/?node_id=773738
-sub _sanitize_tree {
-    for my $node (@_) {
-	if (!defined($node)) {
-	    next;
-	} elsif (ref($node) eq 'JSON::PP::Boolean') {
-            $node += 0;
-        } elsif (blessed($node)) {
-            die('_sanitize_tree: unexpected object');
-        } elsif (reftype($node)) {
-            if (ref($node) eq 'ARRAY') {
-                _sanitize_tree(@$node);
-            } elsif (ref($node) eq 'HASH') {
-                _sanitize_tree(values(%$node));
-            } else {
-                die('_sanitize_tree: unexpected reference type');
-            }
-        }
-    }
-}
-
-
-sub marc_record {
-    my $this = shift();
-    my($rs, $index1) = @_;
-
-    my $rec = $rs->record($index1-1);
-    my $instanceId = $rec->{id};
-
-    my $marc = $rs->marcRecord($instanceId);
-    if (!defined $marc) {
-	# Fetch a chunk of records that contains the requested one.
-	# contains the requested record.
-	my $index0 = $index1 - 1;
-	my $chunkSize = $this->{cfg}->{chunkSize} || 10;
-	my $chunk = int($index0 / $chunkSize);
-	$this->_insert_records_from_SRS($rs, $chunk * $chunkSize, $chunkSize);
-	$marc = $rs->marcRecord($instanceId);
-	_throw(1, "missing MARC record") if !defined $marc;
-    }
-
-    return $marc;
-}
-
-
-sub _insert_records_from_SRS {
+sub _getSRSRecords {
     my $this = shift();
     my($rs, $offset, $limit) = @_;
 
     my $okapiCfg = $this->{cfg}->{okapi};
-    my $req = $this->_make_http_request(POST => $okapiCfg->{url} . '/source-storage/source-records?idType=INSTANCE');
     my @ids = ();
-    for (my $i = 0; $i < $limit && $offset + $i < $rs->total_count(); $i++) {
+    for (my $i = 0; $i < $limit && $offset + $i < $rs->totalCount(); $i++) {
 	my $rec = $rs->record($offset + $i);
-	push @ids, $rec->{id};
+	push @ids, $rec->id();
     }
 
+    my $req = $this->_makeHTTPRequest(POST => $okapiCfg->{url} . '/source-storage/source-records?idType=INSTANCE');
     $req->content(encode_json(\@ids));
     my $res = $this->{ghandle}->{ua}->request($req);
     my $content = $res->content();
@@ -208,17 +141,7 @@ sub _insert_records_from_SRS {
     # warn "got content ", $content;
     my $json = decode_json($content);
     my $srs = $json->{sourceRecords};
-    my $n = @$srs;
-
-    my %id2rec;
-    for (my $i = 0; $i < $n; $i++) {
-	my $sr = $srs->[$i];
-	my $instanceId = $sr->{externalIdsHolder}->{instanceId};
-	my $record = postProcess(($this->{cfg}->{postProcessing} || {})->{marc}, $sr->{parsedRecord}->{content});
-	$id2rec{$instanceId} = _JSON_to_MARC($record);
-    }
-
-    $rs->insert_marcRecords(\%id2rec);
+    return map { _JSON2MARC($_->{parsedRecord}->{content}) } @$srs;
 }
 
 
@@ -226,7 +149,7 @@ sub _insert_records_from_SRS {
 # MARC::File::JSON), but that uses a different JSON encoding from the
 # one used for FOLIO's SRS records, so we have to do it by hand.
 #
-sub _JSON_to_MARC {
+sub _JSON2MARC {
     my($content) = shift();
 
     my $marc = new MARC::Record();
@@ -260,13 +183,13 @@ sub _JSON_to_MARC {
 }
 
 
-sub sortspecs2cql {
+sub sortSpecs2CQL {
     my $this = shift();
     my($sequence) = @_;
 
     my @res = ();
     foreach my $item (@$sequence) {	
-	push @res, $this->_singleSortspecs2cql($item);
+	push @res, $this->_singleSortSpec2CQL($item);
     }
 
     my $spec = join(' ', @res);
@@ -274,7 +197,7 @@ sub sortspecs2cql {
 }
 
 
-sub _singleSortspecs2cql {
+sub _singleSortSpec2CQL {
     my $this = shift();
     my($item) = @_;
     my $indexMap = $this->{cfg}->{indexMap};
@@ -343,7 +266,7 @@ sub _translateSortParam {
 }
 
 
-sub _make_http_request() {
+sub _makeHTTPRequest() {
     my $this = shift();
     my(%args) = @_;
 

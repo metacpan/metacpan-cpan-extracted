@@ -5,7 +5,7 @@ use utf8;
 
 package Neo4j::Driver::ResultSummary;
 # ABSTRACT: Details about the result of running a statement
-$Neo4j::Driver::ResultSummary::VERSION = '0.22';
+$Neo4j::Driver::ResultSummary::VERSION = '0.23';
 
 use Carp qw(croak);
 
@@ -89,7 +89,7 @@ Neo4j::Driver::ResultSummary - Details about the result of running a statement
 
 =head1 VERSION
 
-version 0.22
+version 0.23
 
 =head1 SYNOPSIS
 

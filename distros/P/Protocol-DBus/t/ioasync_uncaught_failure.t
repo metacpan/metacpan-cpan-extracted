@@ -6,11 +6,23 @@ use warnings;
 use Test::More;
 use Test::FailWarnings;
 
+use Promise::ES6;
+
+use FindBin;
+use lib "$FindBin::Bin/lib";
+use DBusSession;
+
 SKIP: {
     skip 'No IO::Async!', 1 if !eval { require IO::Async::Loop };
 
     my $loop = IO::Async::Loop->new();
     skip 'Loop can’t watch_time()!', 1 if !$loop->can('watch_time');
+
+    DBusSession::skip_if_lack_needed_socket_msghdr(1);
+
+    DBusSession::get_bin_or_skip();
+
+    my $session = DBusSession->new();
 
     require Protocol::DBus::Client::IOAsync;
 
@@ -18,7 +30,7 @@ SKIP: {
         Protocol::DBus::Client::IOAsync::login_session($loop);
     } or skip "Can’t open login session: $@";
 
-    $dbus->initialize()->then(
+    my $dbus_p = $dbus->initialize()->then(
         sub {
             my $msgr = shift;
 
@@ -30,26 +42,36 @@ SKIP: {
 
             syswrite $fh, 'z';
 
-            $msgr->send_signal(
+            return $msgr->send_signal(
                 path => '/what/ever',
                 interface => 'what.ever',
                 member => 'member',
             )->then(
                 sub { diag "signal sent\n" },
                 sub { diag "signal NOT sent\n" },
-            )->finally( sub {
-                $loop->watch_time( after => 0.1, code => sub { $loop->stop } );
-            } );
+            );
         },
         sub {
-            $loop->stop;
             skip "Failed to initialize: $_[0]", 1;
         },
     );
 
+    my $warn_y;
+    my $warn_p = Promise::ES6->new( sub {
+        $warn_y = shift;
+    } );
+
     my @w;
     do {
-        local $SIG{'__WARN__'} = sub { push @w, @_; };
+        local $SIG{'__WARN__'} = sub {
+            $warn_y->();
+            push @w, @_;
+        };
+
+        Promise::ES6->all([$dbus_p, $warn_p])->then( sub {
+            $loop->stop();
+        } );
+
         $loop->run();
     };
 

@@ -3,7 +3,7 @@ package Net::Async::Redis::Commands;
 use strict;
 use warnings;
 
-our $VERSION = '3.011'; # VERSION
+our $VERSION = '3.012'; # VERSION
 
 =head1 NAME
 
@@ -102,6 +102,7 @@ our %KEY_FINDER = (
     'PFADD' => 1,
     'PFCOUNT' => 1,
     'PSETEX' => 1,
+    'PSUBSCRIBE' => 1,
     'PTTL' => 1,
     'PUBLISH' => 1,
     'RENAME' => 1,
@@ -144,7 +145,7 @@ our %KEY_FINDER = (
     'XCLAIM' => 1,
     'XDEL' => 1,
     'XGROUP' => 2,
-    'XINFO' => 1,
+    'XINFO' => 2,
     'XLEN' => 1,
     'XPENDING' => 1,
     'XRANGE' => 1,
@@ -704,6 +705,8 @@ Kill the connection of a client.
 =item * [USER username]
 
 =item * [ADDR ip:port]
+
+=item * [LADDR ip:port]
 
 =item * [SKIPME yes/no]
 

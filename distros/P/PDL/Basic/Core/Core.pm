@@ -342,7 +342,7 @@ PDL constructor - creates new piddle from perl scalars/arrays, piddles, and stri
 
 =for example
 
- $x = pdl [1..10];                    # 1D array
+ $x = pdl [1..10];                    # 1D array of doubles
  $x = pdl ([1..10]);                  # 1D array
  $x = pdl (1,2,3,4);                  # Ditto
  $y = pdl [[1,2,3],[4,5,6]];          # 2D 3x2 array
@@ -360,7 +360,12 @@ PDL constructor - creates new piddle from perl scalars/arrays, piddles, and stri
  $n = pdl indx, [1..5];               # ... can leave off parens
  $n = indx( [1..5] );                 # ... still the same!
 
- $x = pdl([1,2,3],[4,5,6]);           # 2D
+ $n = pdl cdouble, 2, 3;              # native complex numbers, zero imaginary
+ use Math::Complex qw(cplx);
+ $n = pdl cdouble, 2, cplx(2, 1));    # explicit type
+ $n = pdl 2, cplx(2, 1);              # default cdouble if Math::Complex obj
+
+ $x = pdl([[1,2,3],[4,5,6]]);         # 2D
  $x = pdl([1,2,3],[4,5,6]);           # 2D
 
 Note the last two are equivalent - a list is automatically
@@ -710,7 +715,7 @@ need to call L</upd_data> afterward, to make sure that the
 piddle points to the new location of the underlying perl variable.
 
 Calling C<get_dataref> automatically physicalizes your piddle (see
-L<make_physical|/PDL::make_physical>).  You definitely
+L</make_physical>).  You definitely
 don't want to do anything to the SV to truncate or deallocate the
 string, unless you correspondingly call L</reshape> to make the
 PDL match its new data dimension.
@@ -821,7 +826,7 @@ sub warn_non_numeric_op_wrapper {
 				 croak("multielement piddle in conditional expression (see PDL::FAQ questions 6-10 and 6-11)")
 				     unless $_[0]->nelem == 1;
 				 $_[0]->clump(-1)->at(0); },
-		"\"\""  =>  \&PDL::Core::string   );
+		'""'  =>  \&PDL::Core::string   );
 }
 
 sub rswap { if($_[2]) { return @_[1,0]; } else { return @_[0,1]; } }
@@ -976,11 +981,8 @@ sub PDL::Core::new_pdl_from_string {
 
    # I check for invalid characters later, but arbitrary strings of e will
    # pass that check, so I'll check for that here, first.
-#   croak("PDL::Core::new_pdl_from_string: I found consecutive copies of e but\n"
-#      . "  I'm not sure what you mean. You gave me $original_value")
-#      if ($value =~ /ee/i);
    croak("PDL::Core::new_pdl_from_string: found 'e' as part of a larger word in $original_value")
-      if $value =~ /e\p{IsAlpha}/ or $value =~ /\p{IsAlpha}e/;
+      if $value =~ /e\p{IsAlpha}|\p{IsAlpha}e/;
 
    # Only a few characters are allowed in the expression, but we want to allow
    # expressions like 'inf' and 'bad'. As such, convert those values to internal
@@ -992,12 +994,12 @@ sub PDL::Core::new_pdl_from_string {
    #  pi  => eE
    # --( Bad )--
    croak("PDL::Core::new_pdl_from_string: found 'bad' as part of a larger word in $original_value")
-      if $value =~ /bad\B/ or $value =~ /\Bbad/;
+      if $value =~ /bad\B|\Bbad/;
    my ($has_bad) = ($value =~ s/\bbad\b/EE/gi);
    # --( nan )--
    my ($has_nan) = 0;
    croak("PDL::Core::new_pdl_from_string: found 'nan' as part of a larger word in $original_value")
-      if $value =~ /\Bnan/ or $value =~ /nan\B/;
+      if $value =~ /\Bnan|nan\B/;
    $has_nan++ if ($value =~ s/\bnan\b/ee/gi);
    # Strawberry Perl compatibility:
    croak("PDL::Core::new_pdl_from_string: found '1.#IND' as part of a larger word in $original_value")
@@ -1011,11 +1013,11 @@ sub PDL::Core::new_pdl_from_string {
    $has_inf++ if ($value =~ s/1\.\#INF/Ee/gi);
    # Other platforms:
    croak("PDL::Core::new_pdl_from_string: found 'inf' as part of a larger word in $original_value")
-      if $value =~ /inf\B/ or $value =~ /\Binf/;
+      if $value =~ /inf\B|\Binf/;
    $has_inf++ if ($value =~ s/\binf\b/Ee/gi);
    # --( pi )--
    croak("PDL::Core::new_pdl_from_string: found 'pi' as part of a larger word in $original_value")
-      if $value =~ /pi\B/ or $value =~ /\Bpi/;
+      if $value =~ /pi\B|\Bpi/;
    $value =~ s/\bpi\b/eE/gi;
 
    # Some data types do not support nan and inf, so check for and warn or croak,
@@ -1075,7 +1077,7 @@ sub PDL::Core::new_pdl_from_string {
    # these with bad values, but that is more difficult that I like, so I'm just
    # going to disallow that here:
    croak("PDL::Core::new_pdl_from_string: Operations with bad values are not supported")
-      if($value =~ /EE[+\-]/ or $value =~ /[+\-]EE/);
+      if($value =~ /EE[+\-]|[+\-]EE/);
 
    # Check for things that will evaluate as functions and croak if found
    if (my ($disallowed) = ($value =~ /((\D+|\A)[eE]\d+)/)) {
@@ -1123,7 +1125,7 @@ sub PDL::Core::new_pdl_from_string {
 
       # Let's see if we can parse it as an array-of-arrays:
       local $_ = $value;
-      return PDL::Core::parse_basic_string ($inf, $nan, $nnan, $bad);
+      PDL::Core::parse_basic_string($inf, $nan, $nnan, $bad);
    };
 
    # Respect BADVAL_USENAN
@@ -1243,7 +1245,14 @@ sub PDL::new {
    # print "in PDL::new\n";
    my $this = shift;
    return $this->copy if ref($this);
-   my $type = ref($_[0]) eq 'PDL::Type' ? ${shift @_}[0]  : $PDL_D;
+   my $type;
+   if (ref($_[0]) eq 'PDL::Type') {
+     $type = ${shift @_}[0];
+   } elsif (grep UNIVERSAL::isa($_, 'Math::Complex'), @_) {
+     $type = $PDL_CD;
+   } else {
+     $type = $PDL_D;
+   }
    my $value = (@_ >1 ? [@_] : shift);  # ref thyself
 
    unless(defined $value) {
@@ -1763,7 +1772,7 @@ Use explicit threading over specified dimensions (see also L<PDL::Indexing>)
  $x = zeroes 3,4,5;
  $y = $x->thread(2,0);
 
-Same as L</PDL::thread1>, i.e. uses thread id 1.
+Same as L</thread1>, i.e. uses thread id 1.
 
 =cut
 
@@ -2521,7 +2530,7 @@ Various forms of usage,
  pdl> $z = zeroes ushort, 3,2 # Create ushort array
  [ushort() etc. with no arg returns a PDL::Types token]
 
-See also L<new_from_specification|/PDL::new_from_specification>
+See also L</new_from_specification>
 for details on using piddles in the dimensions list.
 
 =cut
@@ -2562,7 +2571,7 @@ construct a one filled piddle
 
  see zeroes() and add one
 
-See also L<new_from_specification|/PDL::new_from_specification>
+See also L</new_from_specification>
 for details on using piddles in the dimensions list.
 
 =cut
@@ -3057,7 +3066,7 @@ sub PDL::set{    # Sets a particular single value
 
 Returns a single value inside a piddle as perl scalar.
 If the piddle is a native complex value (cdouble, cfloat), it will
-be stringified.
+be a L<PDL::Complex::Overloads> object.
 
 =for usage
 

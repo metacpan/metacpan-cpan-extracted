@@ -1,5 +1,5 @@
 package HTML::Widgets::NavMenu::Tree::Iterator;
-$HTML::Widgets::NavMenu::Tree::Iterator::VERSION = '1.0801';
+$HTML::Widgets::NavMenu::Tree::Iterator::VERSION = '1.0900';
 use strict;
 use warnings;
 
@@ -14,7 +14,7 @@ __PACKAGE__->mk_acc_ref(
             coords
             stack
             _top
-            )
+        )
     ]
 );
 
@@ -64,30 +64,24 @@ sub get_new_item
     );
 }
 
-sub _push_into_stack
-{
-    my $self = shift;
-
-    my $node = shift;
-
-    $self->stack()->push(
-        $self->{_top} = $self->get_new_item(
-            {
-                'node'        => $node,
-                'parent_item' => $self->{_top},
-            }
-        )
-    );
-    return;
-}
-
 
 sub traverse
 {
     my $self   = shift;
     my $_items = $self->stack->_items;
 
-    $self->_push_into_stack( $self->get_initial_node() );
+    my $push = sub {
+        push @{$_items},
+            (
+            $self->{_top} = $self->get_new_item(
+                {
+                    'node'        => shift(@_),
+                    'parent_item' => $self->{_top},
+                }
+            )
+            );
+    };
+    $push->( $self->get_initial_node() );
     $self->{_is_root} = ( scalar(@$_items) == 1 );
 
     my $co = $self->coords( [] );
@@ -110,7 +104,7 @@ MAIN_LOOP: while ( my $top_item = $self->{_top} )
         if ( defined($sub_item) )
         {
             push @$co, $top_item->_visited_index();
-            $self->_push_into_stack(
+            $push->(
                 $self->get_node_from_sub(
                     {
                         'item' => $top_item,
@@ -137,10 +131,7 @@ MAIN_LOOP: while ( my $top_item = $self->{_top} )
 
 sub get_node_from_sub
 {
-    my $self = shift;
-    my $args = shift;
-
-    return $args->{'sub'};
+    return $_[1]->{'sub'};
 }
 
 
@@ -215,7 +206,7 @@ HTML::Widgets::NavMenu::Tree::Iterator - an iterator for HTML.
 
 =head1 VERSION
 
-version 1.0801
+version 1.0900
 
 =head1 SYNOPSIS
 

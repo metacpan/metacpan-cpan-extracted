@@ -1,0 +1,209 @@
+#!perl
+
+use strict;
+use warnings;
+
+use App::perlimports::ExportInspector ();
+use Data::Printer;
+use Getopt::Long::Descriptive qw( describe_options );
+use List::Util qw( max );
+use Log::Dispatch ();
+use Pod::Usage qw( pod2usage );
+use Text::SimpleTable::AutoWidth ();
+
+my ( $opts, $usage ) = _options();
+( print $App::perlimports::ExportInspector::VERSION ) && exit
+    if $opts->version;
+( print $usage ) && exit if $opts->help;
+
+if ( $opts->verbose_help ) {
+    print $usage;
+    print pod2usage();
+    exit;
+}
+
+my $logger = Log::Dispatch->new(
+    outputs => [
+        [
+            'Screen',
+            min_level => $opts->log_level,
+            newline   => 1,
+            stderr    => 1
+        ]
+    ]
+);
+
+my $ei = App::perlimports::ExportInspector->new(
+    logger      => $logger,
+    module_name => $opts->module,
+);
+
+my $exports = $ei->explicit_exports;
+
+if ( $ei->is_oo_class ) {
+    print 'Appears to be an Object Oriented class.' . "\n";
+}
+
+if ( !keys %{$exports} ) {
+    print 'No exported symbols found' . "\n";
+    exit(0);
+}
+
+if ( @{ $ei->class_isa } ) {
+    my $t = Text::SimpleTable::AutoWidth->new();
+    $t->captions( ['ISA'] );
+    for my $class ( @{ $ei->class_isa } ) {
+        $t->row($class);
+    }
+    print $t->draw;
+}
+
+if ( @{ $ei->pkg_isa } ) {
+    my $t = Text::SimpleTable::AutoWidth->new();
+    $t->captions( ['Package ISA'] );
+    for my $class ( @{ $ei->pkg_isa } ) {
+        $t->row($class);
+    }
+    print $t->draw;
+}
+
+if ( @{ $ei->at_export_tags } ) {
+    my %tags = %{ $ei->at_export_tags };
+    my @keys = keys %tags;
+
+    my @headings = ( 'Export Tag', 'Exported Symbols' );
+
+    my $col1_width = max map { length($_) } @keys, $headings[0];
+    my $col2_width = max map { length($_) } map ( { @{$_} } values %tags ),
+        $headings[1];
+
+    my $t = Text::SimpleTable->new(
+        [ $col1_width, 'Export Tag' ],
+        [ $col2_width, 'Exported Symbols' ]
+    );
+
+    my $i = 0;
+    for my $key ( sort @keys ) {
+        $t->row( $key, join "\n", sort @{ $tags{$key} } );
+        ++$i;
+        $t->hr if $i < scalar @keys;
+    }
+    print $t->draw;
+}
+
+if ( $ei->has_implicit_exports ) {
+    my $t = Text::SimpleTable::AutoWidth->new();
+    if ( $ei->implicit_export_names_match_values ) {
+        $t->captions( ['Default Exported Symbols'] );
+        for my $symbol ( sort $ei->implicit_export_names ) {
+            $t->row($symbol);
+        }
+    }
+    else {
+        $t->captions( [ 'Default Export Symbol', 'Import Name' ] );
+        for my $key ( sort $ei->implicit_export_names ) {
+            $t->row( $key, $ei->implicit_exports->{$key} );
+        }
+    }
+    print $t->draw;
+    printf( "%i symbols\n", scalar $ei->implicit_export_names );
+}
+
+{
+    my $t = Text::SimpleTable::AutoWidth->new();
+
+    if ( $ei->explicit_export_names_match_values ) {
+        $t->captions( ['All Exportable Symbols'] );
+        for my $symbol ( sort $ei->explicit_export_names ) {
+            $t->row($symbol);
+        }
+    }
+    else {
+        $t->captions( [ 'Explicit Export Symbol', 'Import Name' ] );
+        for my $key ( sort $ei->explicit_export_names ) {
+            $t->row( $key, $exports->{$key} );
+        }
+    }
+    print $t->draw;
+    printf( "%i symbols\n", scalar $ei->explicit_export_names );
+    $logger->debug( np $ei );
+}
+
+if ( @{ $ei->at_export_fail } ) {
+    my $t = Text::SimpleTable::AutoWidth->new();
+    $t->captions( ['@EXPORT_FAIL'] );
+    for my $val ( sort @{ $ei->at_export_fail } ) {
+        $t->row($val);
+    }
+    print $t->draw;
+}
+
+sub _options {
+    return describe_options(
+        'dump-perl-exports %o',
+        [
+            'module|m=s', 'The module to inspect for exports',
+            { required => 1 }
+        ],
+        [],
+        [ 'version', 'Print installed version', { shortcircuit => 1 } ],
+        [
+            'log-level|l=s', 'Print messages to STDERR',
+            { default => 'warning' }
+        ],
+        [ 'help', "Print usage message and exit", { shortcircuit => 1 } ],
+        [
+            'verbose-help', "Print usage message and documentation ",
+            { shortcircuit => 1 }
+        ],
+    );
+}
+
+# PODNAME: dump-perl-exports
+# ABSTRACT: A command line utility for describing what a class exports
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+dump-perl-exports - A command line utility for describing what a class exports
+
+=head1 VERSION
+
+version 0.000002
+
+=head1 SYNOPSIS
+
+Here are a few interesting modules to help you understand the output of
+C<dump-perl-exports>.
+
+    dump-perl-exports POSIX
+
+    dump-perl-exports Getopt::Long
+
+    dump-perl-exports Getopt::Long::Descriptive
+
+    dump-perl-exports Test::More
+
+    dump-perl-exports Test::Most
+
+    dump-perl-exports Moose
+
+    dump-perl-exports Moo
+
+=head1 AUTHOR
+
+Olaf Alders <olaf@wundercounter.com>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2020 by Olaf Alders.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

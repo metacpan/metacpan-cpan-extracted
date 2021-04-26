@@ -35,7 +35,6 @@ data/space_comments.fa
 data/test.fasta
 data/test.fastq
 data/test2.fastq
-demo.log
 dist.ini
 lib/FASTX/PE.pm
 lib/FASTX/Reader.pm

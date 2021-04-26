@@ -70,6 +70,7 @@ rjbs
 specialisations
 thusly
 uniq
+uniqint
 uniqnum
 uniqstr
 unpairs

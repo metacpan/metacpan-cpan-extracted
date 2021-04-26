@@ -1,0 +1,478 @@
+{
+  "fields": [
+    {
+      "001": "1099086"
+    },
+    {
+      "003": "ICU"
+    },
+    {
+      "005": "20180731172816.9"
+    },
+    {
+      "008": "901016d1985200uilugr        s0    0eng u"
+    },
+    {
+      "010": {
+        "subfields": [
+          {
+            "a": "87644138"
+          }
+        ],
+        "ind2": " ",
+        "ind1": " "
+      }
+    },
+    {
+      "035": {
+        "ind1": " ",
+        "subfields": [
+          {
+            "a": "(ICU)BID13370939"
+          }
+        ],
+        "ind2": " "
+      }
+    },
+    {
+      "035": {
+        "ind1": " ",
+        "ind2": " ",
+        "subfields": [
+          {
+            "a": "(OCoLC)16512509"
+          }
+        ]
+      }
+    },
+    {
+      "040": {
+        "ind1": " ",
+        "subfields": [
+          {
+            "a": "DLC"
+          },
+          {
+            "c": "DLC"
+          },
+          {
+            "d": "ICU"
+          }
+        ],
+        "ind2": " "
+      }
+    },
+    {
+      "042": {
+        "ind2": " ",
+        "subfields": [
+          {
+            "a": "lc"
+          }
+        ],
+        "ind1": " "
+      }
+    },
+    {
+      "043": {
+        "ind1": " ",
+        "subfields": [
+          {
+            "a": "n-us-il"
+          }
+        ],
+        "ind2": " "
+      }
+    },
+    {
+      "050": {
+        "ind1": "0",
+        "ind2": "0",
+        "subfields": [
+          {
+            "a": "TD224.I3"
+          },
+          {
+            "b": "I58b"
+          }
+        ]
+      }
+    },
+    {
+      "082": {
+        "ind1": "0",
+        "subfields": [
+          {
+            "a": "363.7/39456/09773"
+          },
+          {
+            "2": "19"
+          }
+        ],
+        "ind2": "0"
+      }
+    },
+    {
+      "245": {
+        "ind1": "0",
+        "subfields": [
+          {
+            "a": "Illinois water quality report."
+          }
+        ],
+        "ind2": "0"
+      }
+    },
+    {
+      "260": {
+        "ind1": " ",
+        "subfields": [
+          {
+            "a": "Springfield :"
+          },
+          {
+            "b": "Illinois Environmental Protection Agency, Division of Water Pollution Control, Planning Section,"
+          },
+          {
+            "c": "1985-"
+          }
+        ],
+        "ind2": " "
+      }
+    },
+    {
+      "300": {
+        "subfields": [
+          {
+            "a": "v. :"
+          },
+          {
+            "b": "ill. (some col.) ;"
+          },
+          {
+            "c": "28 cm."
+          }
+        ],
+        "ind2": " ",
+        "ind1": " "
+      }
+    },
+    {
+      "310": {
+        "ind1": " ",
+        "ind2": " ",
+        "subfields": [
+          {
+            "a": "Annual,"
+          },
+          {
+            "b": "<2002>-"
+          }
+        ]
+      }
+    },
+    {
+      "321": {
+        "ind1": " ",
+        "ind2": " ",
+        "subfields": [
+          {
+            "a": "Biennial,"
+          },
+          {
+            "b": "1984/1985-"
+          }
+        ]
+      }
+    },
+    {
+      "362": {
+        "ind1": "0",
+        "subfields": [
+          {
+            "a": "1984/1985-"
+          }
+        ],
+        "ind2": " "
+      }
+    },
+    {
+      "550": {
+        "ind1": " ",
+        "ind2": " ",
+        "subfields": [
+          {
+            "a": "Issued by: Illinois. Division of Water Pollution Control. Planning Section, 1984/85-1988/89; Illinois. Bureau of Water, 1990/91-"
+          }
+        ]
+      }
+    },
+    {
+      "650": {
+        "ind2": "0",
+        "subfields": [
+          {
+            "a": "Water quality"
+          },
+          {
+            "z": "Illinois"
+          },
+          {
+            "v": "Periodicals."
+          }
+        ],
+        "ind1": " "
+      }
+    },
+    {
+      "650": {
+        "ind1": " ",
+        "ind2": "0",
+        "subfields": [
+          {
+            "a": "Water"
+          },
+          {
+            "x": "Pollution"
+          },
+          {
+            "z": "Illinois"
+          },
+          {
+            "v": "Periodicals."
+          }
+        ]
+      }
+    },
+    {
+      "650": {
+        "ind1": " ",
+        "subfields": [
+          {
+            "a": "Water"
+          },
+          {
+            "x": "Pollution."
+          },
+          {
+            "2": "fast"
+          },
+          {
+            "0": "http://id.worldcat.org/fast/fst01171279"
+          }
+        ],
+        "ind2": "7"
+      }
+    },
+    {
+      "650": {
+        "ind2": "7",
+        "subfields": [
+          {
+            "a": "Water quality."
+          },
+          {
+            "2": "fast"
+          },
+          {
+            "0": "http://id.worldcat.org/fast/fst01171832"
+          }
+        ],
+        "ind1": " "
+      }
+    },
+    {
+      "651": {
+        "ind1": " ",
+        "subfields": [
+          {
+            "a": "Illinois."
+          },
+          {
+            "2": "fast"
+          },
+          {
+            "0": "http://id.worldcat.org/fast/fst01205143"
+          }
+        ],
+        "ind2": "7"
+      }
+    },
+    {
+      "655": {
+        "ind2": "7",
+        "subfields": [
+          {
+            "a": "Periodicals."
+          },
+          {
+            "2": "fast"
+          },
+          {
+            "0": "http://id.worldcat.org/fast/fst01411641"
+          }
+        ],
+        "ind1": " "
+      }
+    },
+    {
+      "710": {
+        "ind2": " ",
+        "subfields": [
+          {
+            "a": "Illinois."
+          },
+          {
+            "b": "Division of Water Pollution Control."
+          },
+          {
+            "b": "Planning Section."
+          }
+        ],
+        "ind1": "1"
+      }
+    },
+    {
+      "710": {
+        "ind1": "1",
+        "subfields": [
+          {
+            "a": "Illinois."
+          },
+          {
+            "b": "Environmental Protection Agency."
+          },
+          {
+            "b": "Bureau of Water"
+          }
+        ],
+        "ind2": " "
+      }
+    },
+    {
+      "780": {
+        "subfields": [
+          {
+            "a": "Illinois. Division of Water Pollution Control. Monitoring Unit."
+          },
+          {
+            "t": "Illinois water quality report"
+          },
+          {
+            "w": "(DLC) 87644157"
+          },
+          {
+            "w": "(OCoLC)12630732"
+          },
+          {
+            "w": "(ICU)1120972"
+          }
+        ],
+        "ind2": "0",
+        "ind1": "0"
+      }
+    },
+    {
+      "785": {
+        "subfields": [
+          {
+            "t": "Illinois integrated water quality report and section 303(d) list ..."
+          },
+          {
+            "w": "(ICU)6816045"
+          }
+        ],
+        "ind2": "0",
+        "ind1": "0"
+      }
+    },
+    {
+      "850": {
+        "ind1": " ",
+        "ind2": " ",
+        "subfields": [
+          {
+            "a": "DLC"
+          }
+        ]
+      }
+    },
+    {
+      "856": {
+        "ind1": "4",
+        "ind2": "1",
+        "subfields": [
+          {
+            "u": "http://www.epa.state.il.us/water/water-quality/"
+          }
+        ]
+      }
+    },
+    {
+      "900": {
+        "ind1": " ",
+        "subfields": [
+          {
+            "a": "ICU:91175093"
+          },
+          {
+            "b": "OST:72"
+          },
+          {
+            "c": "HST:500"
+          },
+          {
+            "d": "Copy:1"
+          }
+        ],
+        "ind2": " "
+      }
+    },
+    {
+      "900": {
+        "subfields": [
+          {
+            "a": "o1019373x"
+          },
+          {
+            "b": "OST:72"
+          },
+          {
+            "d": "Copy:1"
+          }
+        ],
+        "ind2": " ",
+        "ind1": " "
+      }
+    },
+    {
+      "903": {
+        "ind2": " ",
+        "subfields": [
+          {
+            "a": "Hathi"
+          },
+          {
+            "r": "ETAS"
+          }
+        ],
+        "ind1": " "
+      }
+    },
+    {
+      "999": {
+        "ind1": "f",
+        "subfields": [
+          {
+            "i": "4b993242-9221-5113-8135-620b27f6cdf9"
+          },
+          {
+            "s": "2a7da507-6bf7-55c3-8b82-3edf0e331a9f"
+          }
+        ],
+        "ind2": "f"
+      }
+    }
+  ],
+  "leader": "01936cas a2200457 a 4500"
+}

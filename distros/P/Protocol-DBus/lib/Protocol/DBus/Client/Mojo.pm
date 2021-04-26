@@ -87,12 +87,12 @@ sub initialize {
     return _to_mojo( shift()->SUPER::initialize(@_) );
 }
 
-*initialize_p = *initialize;
+*initialize_p = __PACKAGE__->can('initialize');
 
 sub _to_mojo {
     my ($p_es6) = @_;
 
-    return Mojo::Promise->new( sub { $p_es6->then(@_) } )->then( sub {
+    return _PROMISE_CLASS()->new( sub { $p_es6->then(@_) } )->then( sub {
         return bless $_[0], 'Protocol::DBus::Client::Mojo::Messenger';
     } );
 }
@@ -104,7 +104,7 @@ sub _initialize {
 
     my $fileno = $dbus->fileno();
 
-    open my $socket, '+>&=' . $fileno;
+    open my $socket, '+>&=' . $fileno or die "open FD $fileno: $!";
     $self->{'socket'} = $socket;
 
     my $is_write_listening;
@@ -113,8 +113,6 @@ sub _initialize {
 
     my $cb = sub {
         if ( $dbus->initialize() ) {
-            $reactor->remove($socket);
-
             $y->();
         }
 
@@ -127,19 +125,28 @@ sub _initialize {
             };
         }
         else {
+            $is_write_listening = 0;
             $reactor->watch($socket, 1, 0);
         }
     };
 
     $reactor->io( $socket, $cb );
+    $reactor->watch($socket, 0, 0);
 
-    $cb->();
+    # It does work to watch for readability right away, but only
+    # because poll(POLLIN) gives POLLHUP, which Mojo interprets
+    # as read-ready. Let’s not depend on that.
+    $reactor->next_tick($cb);
+
+    return;
 }
 
 sub _flush_send_queue {
-    my ($dbus, $reactor, $socket) = @_;
+    my ($dbus, $reactor, $socket, $read_yn) = @_;
 
-    $dbus->flush_write_queue() && $reactor->watch($socket, 1, 0);
+    my $is_empty = $dbus->flush_write_queue();
+
+    $reactor->watch($socket, $read_yn, !$is_empty);
 
     return;
 }
@@ -156,13 +163,15 @@ sub _set_watches_and_create_messenger {
     my $reactor = Mojo::IOLoop->singleton->reactor();
     my $socket = $self->{'socket'};
 
+    my $paused_r = $self->{'_paused'};
+
     $reactor->io(
         $self->{'socket'},
         sub {
             (undef, my $writable) = @_;
 
             if ($writable) {
-                _flush_send_queue($dbus, $reactor, $socket);
+                _flush_send_queue($dbus, $reactor, $socket, !$$paused_r);
             }
             else {
                 $read_cb->();
@@ -172,13 +181,13 @@ sub _set_watches_and_create_messenger {
 
     $self->_resume();
 
-    $self->{'_stop_reading_cr'} = sub {
+    $self->{'_give_up_cr'} = sub {
         Mojo::IOLoop->singleton->reactor()->remove($socket);
     };
 
     return sub {
         if ($dbus->pending_send()) {
-            _flush_send_queue( $dbus, $reactor, $socket );
+            _flush_send_queue( $dbus, $reactor, $socket, !$$paused_r );
         }
     };
 }
@@ -203,7 +212,12 @@ sub DESTROY {
     my ($self) = @_;
 
     if (my $socket = delete $self->{'socket'}) {
-        Mojo::IOLoop->singleton->reactor()->remove($socket);
+
+        # At global destruction the singleton might already be gone.
+        my $singleton = Mojo::IOLoop->singleton();
+
+        my $reactor = $singleton && $singleton->reactor();
+        $reactor->remove($socket) if $reactor;
     }
 
     $self->SUPER::DESTROY() if $ISA[0]->can('DESTROY');
@@ -220,9 +234,9 @@ use parent 'Protocol::DBus::Client::EventMessenger';
 sub send_call {
     my $p = $_[0]->SUPER::send_call( @_[ 1 .. $#_ ] );
 
-    return Mojo::Promise->new( sub { $p->then(@_) } );
+    return Protocol::DBus::Client::Mojo::_PROMISE_CLASS()->new( sub { $p->then(@_) } );
 }
 
-*send_call_p = *send_call;
+*send_call_p = __PACKAGE__->can('send_call');
 
 1;

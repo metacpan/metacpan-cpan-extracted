@@ -1,5 +1,5 @@
 package HTML::Widgets::NavMenu::Tree::Iterator::Item;
-$HTML::Widgets::NavMenu::Tree::Iterator::Item::VERSION = '1.0801';
+$HTML::Widgets::NavMenu::Tree::Iterator::Item::VERSION = '1.0900';
 use strict;
 use warnings;
 
@@ -13,7 +13,7 @@ __PACKAGE__->mk_acc_ref(
             _sub_idx
             _visited
             _accum_state
-            )
+        )
     ]
 );
 
@@ -106,7 +106,7 @@ HTML::Widgets::NavMenu::Tree::Iterator::Item - an item for the tree iterator.
 
 =head1 VERSION
 
-version 1.0801
+version 1.0900
 
 =head1 SYNOPSIS
 

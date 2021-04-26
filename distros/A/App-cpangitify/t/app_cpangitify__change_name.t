@@ -28,7 +28,7 @@ do {
 do {
   my $uri = URI::file->new(file(__FILE__)->parent->parent->subdir('corpus')->absolute->stringify);
   $uri->host('localhost');
-  
+
   local $CWD = "$home";
   my $ret;
 
@@ -38,7 +38,7 @@ do {
     '--metacpan_url'      => "$uri/api.metacpan.org/",
     'Foo::Bar::Baz', 'Foo::Bar',
   );
-  
+
   my $merged = capture_merged { $ret = App::cpangitify->main(@args) };
   is($ret, 0, "% cpangitify @args");
   note $merged;

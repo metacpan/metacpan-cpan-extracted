@@ -4,7 +4,7 @@ Text::Minify::XS - Simple text minification
 
 # VERSION
 
-version v0.3.7
+version v0.3.8
 
 # SYNOPSIS
 
@@ -33,6 +33,7 @@ It does the following:
 - and changes carriage returns to newlines.
 
 It does not recognise any form of markup, comments or text quoting.
+Nor does it remove extra whitespace in the middle of the line.
 
 # KNOWN ISSUES
 
@@ -52,6 +53,8 @@ UTF-8.
 # SEE ALSO
 
 [String::Strip](https://metacpan.org/pod/String::Strip)
+
+[String::Util](https://metacpan.org/pod/String::Util)
 
 [Text::Trim](https://metacpan.org/pod/Text::Trim)
 

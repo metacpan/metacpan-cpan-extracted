@@ -14,16 +14,14 @@ use Data::Dumper; $Data::Dumper::Indent = 1;
 
 use Net::Z3950::FOLIO::Session;
 use Net::Z3950::FOLIO::OPACXMLRecord qw(makeOPACXMLRecord);
-use Net::Z3950::FOLIO::MARCHoldings qw(insertMARCHoldings);
 use Net::Z3950::FOLIO::RPN;;
 
 
-our $VERSION = '1.9';
+our $VERSION = 'v2.0.0';
 
 
 sub FORMAT_USMARC { '1.2.840.10003.5.10' }
 sub FORMAT_XML { '1.2.840.10003.5.109.10' }
-sub FORMAT_OPAC { '1.2.840.10003.5.102' }
 sub FORMAT_JSON { '1.2.840.10003.5.1000.81.3' }
 sub ATTRSET_BIB1 { '1.2.840.10003.3.1' }
 
@@ -95,8 +93,8 @@ sub getSession {
     if (!$this->{sessions}->{$name}) {
 	my $session = new Net::Z3950::FOLIO::Session($this, $name);
 	$this->{sessions}->{$name} = $session;
-	$session->reload_config_file();
-	$session->login($this->{user}, $this->{pass});
+	$session->reloadConfigFile();
+	$session->login($this->{user}, $this->{pass}) if !$session->{cfg}->{nologin};
     }
 
     return $this->{sessions}->{$name};
@@ -170,7 +168,7 @@ sub _search_handler {
     }
 
     $session->{sortspec} = undef;
-    $args->{HITS} = $session->rerun_search($args->{SETNAME});
+    $args->{HITS} = $session->rerunSearch($args->{SETNAME});
 }
 
 
@@ -182,7 +180,7 @@ sub _fetch_handler {
     _throw(30, $args->{SETNAME}) if !$rs; # Result set does not exist
 
     my $index1 = $args->{OFFSET};
-    _throw(13, $index1) if $index1 < 1 || $index1 > $rs->total_count();
+    _throw(13, $index1) if $index1 < 1 || $index1 > $rs->totalCount();
 
     my $rec = $rs->record($index1-1);
     if (!defined $rec) {
@@ -190,40 +188,40 @@ sub _fetch_handler {
 	# requested one. We'll do this by splitting the whole set into
 	# chunks of the specified size, and fetching the one that
 	# contains the requested record.
+	# XXX Perhaps this should happen inside $rs->record
 	my $index0 = $index1 - 1;
 	my $chunkSize = $session->{cfg}->{chunkSize} || 10;
 	my $chunk = int($index0 / $chunkSize);
-	$session->_do_search($rs, $chunk * $chunkSize, $chunkSize);
+	$session->doSearch($rs, $chunk * $chunkSize, $chunkSize);
 	$rec = $rs->record($index1-1);
 	_throw(1, "missing record") if !defined $rec;
     }
 
     my $comp = lc($args->{COMP} || '');
     my $format = $args->{REQ_FORM};
-    warn "REQ_FORM=$format, COMP=$comp\n";
+    # warn "REQ_FORM=$format, COMP=$comp\n";
 
     my $res;
     if ($format eq FORMAT_JSON) {
-	$res = _pretty_json($rec);
+	$res = $rec->prettyJSON();
 
     } elsif ($format eq FORMAT_XML && $comp eq 'raw') {
 	# Mechanical XML translitation of the JSON response
-	$res = $session->xml_record($rec);
+	$res = $rec->prettyXML();
+
     } elsif ($format eq FORMAT_XML && $comp eq 'usmarc') {
 	# MARCXML made from SRS Marc record
-	my $marc = $session->marc_record($rs, $index1);
+	my $marc = $rec->marcRecord();
 	$res = $marc->as_xml_record();
     } elsif ($format eq FORMAT_XML && $comp eq 'opac') {
 	# OPAC-format XML
-	my $marc = $session->marc_record($rs, $index1);
-	$res = makeOPACXMLRecord($rec, $marc);
+	$res = makeOPACXMLRecord($rec);
     } elsif ($format eq FORMAT_XML) {
 	_throw(25, "XML records available in element-sets: raw, usmarc, opac");
 
     } elsif ($format eq FORMAT_USMARC && (!$comp || $comp eq 'f' || $comp eq 'b')) {
 	# Static USMARC from SRS
-	my $marc = $session->marc_record($rs, $index1);
-	insertMARCHoldings($rec, $marc, $session->{cfg}, $rs->barcode());
+	my $marc = $rec->marcRecord();
 	$res = $marc->as_usmarc();
     } elsif ($format eq FORMAT_USMARC) {
 	_throw(25, "USMARC records available in element-sets: f, b");
@@ -263,11 +261,11 @@ sub _sort_handler {
     my $rs = $session->{resultsets}->{$setname};
     _throw(30, $args->{SETNAME}) if !$rs; # Result set does not exist
 
-    my $cqlSort = $session->sortspecs2cql($args->{SEQUENCE});
+    my $cqlSort = $session->sortSpecs2CQL($args->{SEQUENCE});
     _throw(207, Dumper($args->{SEQUENCE})) if !$cqlSort; # Cannot sort according to sequence
 
     $session->{sortspec} = $cqlSort;
-    $session->rerun_search($args->{OUTPUT});
+    $session->rerunSearch($args->{OUTPUT});
 }
 
 
@@ -302,14 +300,6 @@ sub _throw {
     }
 
     die new ZOOM::Exception($code, undef, $addinfo, $diagset);
-}
-
-
-sub _pretty_json {
-    my($obj) = @_;
-
-    my $coder = Cpanel::JSON::XS->new->ascii->pretty->allow_blessed->sort_by;
-    return $coder->encode($obj);
 }
 
 

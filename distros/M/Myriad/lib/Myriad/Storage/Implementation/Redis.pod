@@ -73,6 +73,10 @@ Observe a specific key.
 
 Returns a L<Ryu::Source> which will emit the current and all subsequent values.
 
+=head2 observe_namespace
+
+Observe and entire namespace.
+
 =head2 push
 
 Takes the following parameters:

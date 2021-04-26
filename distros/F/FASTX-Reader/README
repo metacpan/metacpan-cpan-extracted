@@ -1,5 +1,5 @@
 This archive contains the distribution FASTX-Reader,
-version 1.0.4:
+version 1.0.5:
 
   A simple module to parse FASTA and FASTQ files, supporting compressed files and paired-ends.
 

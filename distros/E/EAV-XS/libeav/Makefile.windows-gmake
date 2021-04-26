@@ -25,7 +25,7 @@ MANDIR ?= $(DATAROOTDIR)/man
 
 MAJOR_VERSION = 0
 MINOR_VERSION = 2
-PATCH_VERSION = 2
+PATCH_VERSION = 3
 VERSION = $(MAJOR_VERSION).$(MINOR_VERSION).$(PATCH_VERSION)
 
 DLL_EXT ?= dll
@@ -172,6 +172,7 @@ $(LIB_TARGET): $(OBJECTS)
 check: $(DLL_TARGET)
 	$(MAKE) -f Makefile.windows-gmake -C tests check
 
+docs: man
 man:
 	$(MAKE) -f Makefile.windows-gmake -C docs VERSION=$(VERSION)
 

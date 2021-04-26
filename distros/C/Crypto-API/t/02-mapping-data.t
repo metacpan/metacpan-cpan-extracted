@@ -65,8 +65,8 @@ my $data = $foo->prices( pair => \%pair );
 
 ok exists $data->{pair};
 ok exists $data->{last_price};
-ok exists $data->{symbol};
-ok exists $data->{time};
+ok exists $data->{_others}{symbol};
+ok exists $data->{_others}{time};
 
 is_deeply $data->{pair}, \%pair;
 like $data->{last_price}, qr/^[\d\.]+$/;

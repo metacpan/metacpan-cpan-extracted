@@ -6,12 +6,12 @@ use Test::Fatal;
 use Scalar::Util qw(looks_like_number);
 
 use Object::Pad;
-use Myriad::Transport::Perl;
+use Myriad::Transport::Memory;
 
 use IO::Async::Loop;
 my $loop = IO::Async::Loop->new();
 
-$loop->add(my $transport = Myriad::Transport::Perl->new());
+$loop->add(my $transport = Myriad::Transport::Memory->new());
 
 subtest 'In-Memory streams tests' => sub {
     my $id = $transport->add_to_stream('stream_1', key => 'value')->get();

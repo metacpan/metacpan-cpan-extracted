@@ -4,7 +4,7 @@ Net::Statsd::Lite - A lightweight StatsD client that supports multimetric packet
 
 # VERSION
 
-version v0.4.10
+version v0.6.0
 
 # SYNOPSIS
 
@@ -87,11 +87,14 @@ Specifies the maximum buffer size. It defaults to `512`.
 ## `counter`
 
 ```
-$stats->counter( $metric, $value, $rate );
+$stats->counter( $metric, $value, $opts );
 ```
 
 This adds the `$value` to the counter specified by the `$metric`
 name.
+
+`$opts` can be a hash reference with the `rate` key, or a simple
+scalar with the `$rate`.
 
 If a `$rate` is specified and less than 1, then a sampling rate will
 be added. `$rate` must be between 0 and 1.
@@ -104,31 +107,31 @@ This is an alias for ["counter"](#counter), for compatability with
 ## `increment`
 
 ```
-$stats->increment( $metric, $rate );
+$stats->increment( $metric, $opts );
 ```
 
 This is an alias for
 
 ```
-$stats->counter( $metric, 1, $rate );
+$stats->counter( $metric, 1, $opts );
 ```
 
 ## `decrement`
 
 ```
-$stats->decrement( $metric, $rate );
+$stats->decrement( $metric, $opts );
 ```
 
 This is an alias for
 
 ```
-$stats->counter( $metric, -1, $rate );
+$stats->counter( $metric, -1, $opts );
 ```
 
-## `metric`
+## `meter`
 
 ```
-$stats->metric( $metric, $value );
+$stats->meter( $metric, $value, $opts );
 ```
 
 This is a counter that only accepts positive (increasing) values. It
@@ -139,7 +142,7 @@ many StatsD daemons.
 ## `gauge`
 
 ```
-$stats->gauge( $metric, $value );
+$stats->gauge( $metric, $value, $opts );
 ```
 
 A gauge can be thought of as a counter that is maintained by the
@@ -153,7 +156,7 @@ by that amount.
 ## `timing`
 
 ```
-$stats->timing( $metric, $value, $rate );
+$stats->timing( $metric, $value, $opts );
 ```
 
 This logs a "timing" in milliseconds, so that statistics about the
@@ -163,6 +166,9 @@ although the specification recommends that integers be used.
 In actually, any values can be logged, and this is often used as a
 generic histogram for non-timing values (especially since many StatsD
 daemons do not support the ["histogram"](#histogram) metric type).
+
+`$opts` can be a hash reference with a `rate` key, or a simple
+scalar with the `$rate`.
 
 If a `$rate` is specified and less than 1, then a sampling rate will
 be added. `$rate` must be between 0 and 1.  Note that sampling
@@ -176,7 +182,7 @@ This is an alias for ["timing"](#timing), for compatability with
 ## `histogram`
 
 ```
-$stats->histogram( $metric, $value );
+$stats->histogram( $metric, $value, $opts );
 ```
 
 This logs a value so that statistics about the metric can be
@@ -189,11 +195,24 @@ This metric type is not supported by many StatsD daemons. You can use
 ## `set_add`
 
 ```
-$stats->set_add( $metric, $string );
+$stats->set_add( $metric, $string, $opts );
 ```
 
 This adds the the `$string` to a set, for logging the number of
 unique things, e.g. IP addresses or usernames.
+
+## record\_metric
+
+This is an internal method for sending the data to the server.
+
+```
+$stats->record_metric( $suffix, $metric, $value, $opts );
+```
+
+This was renamed and documented in v0.5.0 to to simplify subclassing
+that supports extensions to statsd, such as tagging.
+
+See the discussion of tagging extensions below.
 
 ## `flush`
 
@@ -206,6 +225,27 @@ If this module is first loaded in `STRICT` mode, then the values and
 rate arguments will be checked that they are the correct type.
 
 See [Devel::StrictMode](https://metacpan.org/pod/Devel::StrictMode) for more information.
+
+# TAGGING EXTENSIONS
+
+This class does not support tagging out-of-the box. But tagging can be
+added easily to a subclass, for example, [DogStatsd](https://www.datadoghq.com/) tagging can be added
+using something like
+
+```perl
+use Moo 1.000000;
+extends 'Net::Statsd::Lite';
+
+around record_metric => sub {
+    my ( $next, $self, $suffix, $metric, $value, $opts ) = @_;
+
+    if ( my $tags = $opts->{tags} ) {
+        $suffix .= "|#" . join ",", map { s/|//g; $_ } @$tags;
+    }
+
+    $self->$next( $suffix, $metric, $value, $opts );
+};
+```
 
 # SEE ALSO
 
@@ -241,7 +281,7 @@ Library [https://www.sciencephoto.com](https://www.sciencephoto.com).
 
 # COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018-2020 by Robert Rothenberg.
+This software is Copyright (c) 2018-2021 by Robert Rothenberg.
 
 This is free software, licensed under:
 

@@ -1,0 +1,48 @@
+{
+   "abstract" : "unknown",
+   "author" : [
+      "unknown"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "File-ReadBackwards",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/uperl/File-ReadBackwards/issues"
+      },
+      "homepage" : "https://metacpan.org/pod/File::ReadBackwards",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/uperl/File-ReadBackwards.git",
+         "web" : "https://github.com/uperl/File-ReadBackwards"
+      }
+   },
+   "version" : "1.06",
+   "x_serialization_backend" : "JSON::PP version 4.06"
+}

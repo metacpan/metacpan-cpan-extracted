@@ -50,13 +50,13 @@ produces output
             ];
 
 
-(This example is included as L<F<synopsis.pl>|https://fastapi.metacpan.org/source/BKB/Image-SVG-Path-0.34/examples/synopsis.pl> in the distribution.)
+(This example is included as L<F<synopsis.pl>|https://fastapi.metacpan.org/source/BKB/Image-SVG-Path-0.35/examples/synopsis.pl> in the distribution.)
 
 
 =head1 VERSION
 
-This documents version 0.34 of Image-SVG-Path
-corresponding to L<git commit 931e05690ab464fbf610bd664b7b5011062c0cab|https://github.com/benkasminbullock/Image-SVG-Path/commit/931e05690ab464fbf610bd664b7b5011062c0cab> released on Tue Nov 24 14:05:51 2020 +0900.
+This documents version 0.35 of Image-SVG-Path
+corresponding to L<git commit 55af46672c7633ca1f525ffebc5acb5c40b57d8f|https://github.com/benkasminbullock/Image-SVG-Path/commit/55af46672c7633ca1f525ffebc5acb5c40b57d8f> released on Mon Apr 26 21:18:34 2021 +0900.
 
 =head1 DESCRIPTION
 
@@ -102,7 +102,7 @@ produces output
     MOVE TO 148 214.
 
 
-(This example is included as L<F<xml-parser.pl>|https://fastapi.metacpan.org/source/BKB/Image-SVG-Path-0.34/examples/xml-parser.pl> in the distribution.)
+(This example is included as L<F<xml-parser.pl>|https://fastapi.metacpan.org/source/BKB/Image-SVG-Path-0.35/examples/xml-parser.pl> in the distribution.)
 
 
 SVG means "scalable vector graphics" and it is a standard of the W3
@@ -192,7 +192,7 @@ produces output
        type -> closepath
 
 
-(This example is included as L<F<extract-path-info.pl>|https://fastapi.metacpan.org/source/BKB/Image-SVG-Path-0.34/examples/extract-path-info.pl> in the distribution.)
+(This example is included as L<F<extract-path-info.pl>|https://fastapi.metacpan.org/source/BKB/Image-SVG-Path-0.35/examples/extract-path-info.pl> in the distribution.)
 
 
 The return value is a list of hash references. Each hash reference has
@@ -274,7 +274,7 @@ produces output
     M15.160000,91.180000 C16.400000,91.690000 17.650000,91.410000 18.390000,90.150000 C21.260000,85.250000 24.140000,79.250000 26.750000,73.000000 
 
 
-(This example is included as L<F<test-reverse.pl>|https://fastapi.metacpan.org/source/BKB/Image-SVG-Path-0.34/examples/test-reverse.pl> in the distribution.)
+(This example is included as L<F<test-reverse.pl>|https://fastapi.metacpan.org/source/BKB/Image-SVG-Path-0.35/examples/test-reverse.pl> in the distribution.)
 
 
 =head2 create_path_string
@@ -740,6 +740,18 @@ either this or SVG Tiny are in use.
 
 L<CairoSVG|http://cairosvg.org/> is a Python SVG renderer using Cairo.
 
+=item Yann Armelin's SVG Path Editor
+
+L<Yann Armelin's SVG Path Editor|https://yqnn.github.io/svg-path-editor/>
+
+=item SVG Optimizer
+
+L<SVG Optimizer|https://github.com/svg/svgo>
+
+=item SVG Cleaner
+
+L<SVG Cleaner|https://github.com/RazrFalcon/svgcleaner>
+
 =back
 
 =head1 HISTORY
@@ -777,7 +789,7 @@ Ben Bullock, <bkb@cpan.org>
 =head1 COPYRIGHT & LICENCE
 
 This package and associated files are copyright (C) 
-2011-2020
+2011-2021
 Ben Bullock.
 
 You can use, copy, modify and redistribute this package and associated

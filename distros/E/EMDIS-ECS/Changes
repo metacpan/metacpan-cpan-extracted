@@ -482,6 +482,17 @@ Version 0.42, 2020-12-19
 - ECS.pm: revise code to avoid "Experimental keys on scalar is now forbidden"
   error using newer versions of Perl
 
+Version 0.43, 2021-04-21
+========================
+- ECS.pm: in send_encrypted_message(), fix defect causing AMQP document to be
+  sent via regular AMQP message queue
+- FileBackedMessage.pm: in send_this_message(), when sending unencrypted META
+  message, guard against sending via email if node is configured for amqp_only
+- MANIFEST: add docker/ubuntu/README_GPG
+- greenmail/Dockerfile: update to use greenmail/standalone:1.6.3
+- generate updated certfiles.tar.gz files for dockerized test setup
+- adjust various Dockerfile comments
+
 
 Ideas for Future Enhancements
 =============================

@@ -9,7 +9,7 @@ use File::Spec();
 
 my $SEP = File::Spec->catfile('', '');
 
-our $VERSION = '0.000018';
+our $VERSION = '0.000022';
 
 # Directly modifying this is a bad idea, but for the XS to work it needs to be
 # a package var, not a lexical.
@@ -17,11 +17,17 @@ our $FROM = '*';
 my $FROM_MODIFIED = 0;
 my $FROM_MANAGER;
 
-my $ROOT;
+our $ROOT;
+BEGIN { $ROOT = "" . path('.')->realpath }
 
-my %REPORT;
-our @TOUCHED;
-our @OPENED;
+our %REPORT;
+
+my %FILTER = (
+    $0 => 1,
+    __FILE__, 1,
+    File::Spec->rel2abs($0) => 1,
+    File::Spec->rel2abs(__FILE__) => 1,
+);
 
 use XSLoader;
 XSLoader::load(__PACKAGE__, $VERSION);
@@ -41,8 +47,8 @@ sub import {
     }
 
     my $ran = 0;
-    $ROOT = $params{root} if $params{root};
-    $ROOT //= path('.')->realpath;
+    $ROOT = "" . $params{root} if $params{root};
+    $ROOT //= "" . path('.')->realpath;
     my $callback = sub { return if $ran++; $class->report(%params, ctx => $_[0], root => $ROOT) };
 
     test2_add_callback_exit($callback);
@@ -63,14 +69,12 @@ sub reset_from {
 }
 
 sub reset_coverage {
-    @TOUCHED = ();
-    @OPENED  = ();
     %REPORT  = ();
 }
 
-sub set_root { $ROOT = pop };
+sub set_root { $ROOT = "" . pop };
 
-sub get_from   { $FROM }
+sub get_from   { $FROM //= '*' }
 sub set_from   { $FROM_MODIFIED++; $FROM = pop }
 sub clear_from { $FROM = '*' }
 sub was_from_modified { $FROM_MODIFIED ? 1 : 0 }
@@ -81,6 +85,7 @@ sub filter {
     my ($file, %params) = @_;
 
     my $root = $params{root} // path('.')->realpath;
+    $root = path($root);
 
     my $path = $INC{$file} ? path($INC{$file}) : path($file);
     $path = $path->realpath if $path->exists;
@@ -134,14 +139,12 @@ sub extract {
     return;
 }
 
-my %FILTER = (
-    $0 => 1,
-    __FILE__, 1,
+my %HIDDEN_SUBS = (
+    '__ANON__'  => 1,
+    'eval'      => 1,
 );
 
 my %SPECIAL_SUBS = (
-    '__ANON__'  => 1,
-    'eval'      => 1,
     'BEGIN'     => 1,
     'CHECK'     => 1,
     'END'       => 1,
@@ -149,141 +152,60 @@ my %SPECIAL_SUBS = (
     'UNITCHECK' => 1,
 );
 
-sub _process {
-    my $class = shift;
-    my %params = @_;
-
-    my $filter  = $class->can('filter');
-    my $extract = $class->can('extract');
-
-    my $seen  = $REPORT{_seen}  //= {files => {}, touched => {}, opened => {}};
-    my $files = $REPORT{files} //= [];
-    my $submap = $REPORT{submap} //= {};
-    my $openmap = $REPORT{openmap} //= {};
-
-    my @touched = @TOUCHED;
-    my @opened  = @OPENED;
-
-    my $changed = 0;
-    my $handle_file = sub {
-        my ($raw) = @_;
-        return unless $raw;
-
-        my $file = $class->$extract($raw, %params) // return;
-        return if $FILTER{$file};
-
-        my $path = $class->$filter($file, %params) // return;
-        return if $FILTER{$path};
-
-        unless ($seen->{files}->{$file}++) {
-            push @$files => $path;
-            $REPORT{sorted} = 0;
-        }
-
-        return $path;
-    };
-
-    while (my $touch = shift @touched) {
-        my $path = $handle_file->($touch->{file}) or next;
-
-        my $sub_name = $touch->{sub_name};
-
-        my $fmap  = $submap->{$path} //= {};
-        my $fseen = $seen->{touched}->{$path} //= {};
-
-        my $fqsn;
-        if ($sub_name && !$SPECIAL_SUBS{$sub_name}) {
-            $fqsn = $sub_name;
-        }
-        else {
-            $fqsn = '*';
-        }
-
-        my $smap  = $fmap->{$fqsn}  //= [];
-        my $sseen = $fseen->{$fqsn} //= {};
-
-        my $called_by = $touch->{called_by} // '*';
-        push @$smap => $called_by unless $sseen->{$called_by}++;
-    }
-
-    for my $set (@opened) {
-        my ($raw, $called_by) = @$set;
-        my $path = $handle_file->($raw) // next;
-
-        my $oseen = $seen->{opened}->{$path} //= {};
-
-        $called_by //= '*';
-        push @{$openmap->{$path}} => $called_by unless $oseen->{$called_by}++;
-    }
-
-    @TOUCHED = ();
-    @OPENED = ();
-
-    return \%REPORT;
-}
-
-sub _sort {
-    my $class = shift;
-    my %params = @_;
-
-    $class->_process(%params) if @TOUCHED || @OPENED;
-    return if $REPORT{sorted};
-
-    @{$REPORT{files}} = sort @{$REPORT{files}};
-
-    return;
-}
-
 sub files {
     my $class = shift;
     my %params = @_;
 
-    $class->_process(%params) if @TOUCHED || @OPENED;
-    $class->_sort(%params) unless $REPORT{sorted};
+    my $report = $class->_process(%params);
 
-    return $REPORT{files};
+    return [sort keys %$report];
 }
 
-sub submap {
+sub data {
     my $class = shift;
     my %params = @_;
 
-    $class->_process(%params) if @TOUCHED || @OPENED;
+    my $report = $class->_process(%params);
 
-    return $REPORT{submap};
-}
+    my $out = {};
 
-sub openmap {
-    my $class = shift;
-    my %params = @_;
+    for my $file (keys %$report) {
+        my $rval = $report->{$file} // next;
+        my $oval = $out->{$file} = {};
 
-    $class->_process(%params) if @TOUCHED || @OPENED;
+        for my $sub (keys %$rval) {
+            next if $HIDDEN_SUBS{$sub};
 
-    return $REPORT{openmap};
+            my $key = $SPECIAL_SUBS{$sub} ? '*' : $sub;
+            my @add = map { $rval->{$sub}->{$_} } keys %{$rval->{$sub}};
+
+            if ($oval->{$key}) {
+                my %seen;
+                $oval->{$key} = [ sort grep { !$seen{$_}++ } @{$oval->{$key}}, @add ];
+            }
+            else {
+                $oval->{$key} = [ sort @add ];
+            }
+        }
+    }
+
+    return $out;
 }
 
 sub report {
     my $class = shift;
     my %params = @_;
 
-    $class->_process(%params) if @TOUCHED || @OPENED;
-    $class->_sort(%params) unless $REPORT{sorted};
-
-    my $files   = $REPORT{files};
-    my $submap  = $REPORT{submap};
-    my $openmap = $REPORT{openmap};
+    my $data    = $class->data(%params);
+    my $details = "This test covered " . scalar(keys %$data) . " source files.";
     my $type    = $FROM_MODIFIED ? 'split' : 'flat';
-
-    my $details = "This test covered " . @$files . " source files.";
 
     my $ctx   = $params{ctx} // context();
     my $event = $ctx->send_ev2(
         about => {package => __PACKAGE__, details => $details},
 
         coverage => {
-            files        => $files,
-            submap       => $submap,
-            openmap      => $openmap,
+            files        => $data,
             details      => $details,
             test_type    => $type,
             from_manager => $FROM_MANAGER,
@@ -292,12 +214,55 @@ sub report {
         info => [{tag => 'COVERAGE', details => $details, debug => $params{verbose}}],
 
         harness_job_fields => [
-            {name => "files_covered", details => $details, data => {files => $files, submap => $submap, openmap => $openmap}},
+            {name => "files_covered", details => $details, data => $data},
         ],
     );
     $ctx->release unless $params{ctx};
 
     return $event;
+}
+
+sub _process {
+    my $class = shift;
+    my %params = @_;
+
+    my $filter  = $class->can('filter');
+    my $extract = $class->can('extract');
+
+    my %report;
+
+    for my $raw (keys %REPORT) {
+        next unless $raw;
+        next if $FILTER{$raw};
+
+        my $file = $class->$extract($raw, %params) // next;
+        next if $FILTER{$file};
+
+        my $path = $class->$filter($file, %params) // next;
+        next if $FILTER{$path};
+
+        my $from = $REPORT{$raw};
+
+        # Easy
+        if (!$report{$path}) {
+            $report{$path} = $from;
+            next;
+        }
+
+        # Merge
+        my $into = $report{$path};
+
+        for my $sub (keys %$from) {
+            if ($into->{$sub}) {
+                $into->{$sub} = {%{$into->{$sub}}, %{$from->{$sub}}};
+            }
+            else {
+                $into->{$sub} = $from->{$sub};
+            }
+        }
+    }
+
+    return \%report;
 }
 
 1;
@@ -409,13 +374,6 @@ L<Test2::Plugin::Cover> was written to address.
 
     # Arrayref of files covered so far
     my $covered_files = Test2::Plugin::Cover->files;
-
-    # A mapping of what subs were called in which files
-    my $subs_called = Test2::Plugin::Cover->submap;
-
-    # A mapping of what files were opened, and where possible what section of
-    # the test triggered the opening.
-    my $openmap = Test2::Plugin::Cover->openmap;
 
 =head2 COMMAND LINE
 
@@ -546,56 +504,6 @@ This will return an arrayref of all files touched so far.
 
 The list of files will be sorted alphabetically, and duplicates will be
 removed.
-
-If a root path is provided it B<MUST> be a L<Path::Tiny> instance. This path
-will be used to filter out any files not under the root directory.
-
-=item $hashref = $class->submap()
-
-=item $hashref = $class->submap(root => $path)
-
-Returns a structure like this:
-
-    { Source => { subname => \@called_by }
-
-Example:
-
-    {
-        'SomeModule.pm' => {
-            # The wildcard is used when a proper sub name cannot be determined
-            '*' => { ... },
-
-            'subname' => [
-                '*',     # The wildcard is used when no 'called by' can be determined
-                $FROM_A,
-                $FROM_B,
-                ...
-            ],
-        },
-        ...
-    }
-
-If a root path is provided it B<MUST> be a L<Path::Tiny> instance. This path
-will be used to filter out any files not under the root directory.
-
-=item $hashref = $class->openmap()
-
-=item $hashref = $class->openmap(root => $path)
-
-Returns a structure like this:
-
-    {
-        # the items in this list can be anything, strings, numbers,
-        # data structures, etc.
-        # A naive attempt is made to avoid duplicates in this list,
-        # so the same string or reference will not appear twice, but 2
-        # different references with identical contents may appear.
-        "some_file.ext" => [
-            '*',        # The wildcard is used when no 'called by' can be determined
-            $FROM_A,
-            $FROM_b,
-        ],
-    }
 
 If a root path is provided it B<MUST> be a L<Path::Tiny> instance. This path
 will be used to filter out any files not under the root directory.

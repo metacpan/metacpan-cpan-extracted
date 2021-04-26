@@ -4,7 +4,7 @@ use v5.14;
 use warnings;
 use utf8;
 
-our $VERSION = "1.08";
+our $VERSION = "1.0801";
 
 =encoding utf-8
 
@@ -14,7 +14,7 @@ ansifold - fold command handling ANSI terminal sequences
 
 =head1 VERSION
 
-Version 1.08
+Version 1.0801
 
 =head1 SYNOPSIS
 
@@ -98,10 +98,10 @@ rest instead.  So next commands do the same thing.
 
     $ ansifold -nw 6,-4,-1
 
-Option C<-w -1> does nothing effectively.  Using it with B<--expand>
-option implements ANSI/Unicode aware L<expand(1)> command.
+Option C<--width -1> does nothing effectively.  Using it with
+B<--expand> option implements ANSI/Unicode aware L<expand(1)> command.
 
-    $ ansifold -w -1 --expand
+    $ ansifold --expand --width -1
 
 This can be written as this.
 
@@ -129,8 +129,7 @@ and produces output like this:
 
 =head2 SEPARATOR/TERMINATOR
 
-Option B<-n> (or B<--separate> '') eliminates newlines between
-columns.
+Option B<-n> eliminates newlines between columns.
 
     $ LANG=C date | ansifold -w 3,-1,3,-1,2 -n
     WedDec19
@@ -140,18 +139,22 @@ Option B<--separate> set separator string.
     $ echo ABCDEF | ansifold --separate=: -w 1,0,1,0,1,-1
     A::B::C:DEF
 
+Option B<-n> is a short-cut for C<--separate ''>.
+
 Option B<--paragraph> or B<-p> print extra newline after each lines.
 This is convenient when a paragraph is made up of single line, like
 microsoft word document.
 
 =head1 LINE BREAKING
 
+Line break adjustment is supported for ASCII word boundaries.  As for
+Japanese, more complicated prohibition processing is performed.  Use
+option B<-s> to enable everything.
+
 =head2 B<--boundary>=I<word>
 
-Option B<--boundary=word> prohibit to break line in the middle of
-alphanumeric word.  This version also supports line break adjustment,
-mainly to perform Japanese ``KINSOKU'' processing.  Use
-B<--linebreak=all> to enable it.
+Option B<--boundary=word> prohibit breaking line in the middle of
+alpha-numeric word.
 
 =head2 B<--linebreak>=I<all>|I<ruunin>|I<runout>|I<none>
 
@@ -171,7 +174,7 @@ fits to maximum width.
 Maximum width of run-in/run-out characters are defined by B<--runin>
 and B<--runout> option.  Default values are 4.
 
-=head2 B<--smart>
+=head2 B<--smart>, B<-s>
 
 Option B<--smart> (or simply B<-s>) set both B<--boundary=word> and
 B<--linebreak=all>, and enables all smart text formatting capability.
@@ -264,6 +267,17 @@ use Hash::Util qw(lock_keys);
 use Text::ANSI::Fold qw(:constants);
 use Data::Dumper;
 
+my $DEFAULT_WIDTH = 72;
+my $DEFAULT_EXPAND = 0;
+
+##
+## when executed as 'ansiexpand'
+##
+if ($0 =~ /expand$/) {
+    $DEFAULT_WIDTH = -1;
+    $DEFAULT_EXPAND = 1;
+}
+
 my %opt = (
     width     => [],
     boundary  => "none",
@@ -275,7 +289,7 @@ my %opt = (
     linebreak => LINEBREAK_NONE,
     runin     => 4,
     runout    => 4,
-    expand    => undef,
+    expand    => $DEFAULT_EXPAND,
     tabstop   => undef,
     tabhead   => undef,
     tabspace  => undef,
@@ -331,7 +345,6 @@ use Getopt::EX::Long;
 Getopt::Long::Configure("bundling");
 GetOptions(@optargs) || pod2usage();
 
-my $DEFAULT_WIDTH = 72;
 my @width_map;
 my @width_index;
 

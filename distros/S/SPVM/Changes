@@ -1,3 +1,209 @@
+0.0946 2021-04-23
+  - Create SPVM::ArrayUtil module
+  - move the following SPVM::Util methods to SPVM::ArrayUtil
+    copy_object_array
+    copy_byte_array
+    copy_short_array
+    copy_int_array
+    copy_long_array
+    copy_float_array
+    copy_double_array
+    equals_object_array
+    copy_string_array
+    equals_byte_array
+    equals_short_array
+    equals_int_array
+    equals_long_array
+    equals_float_array
+    equals_double_array
+    equals_string_array
+    dump_byte_array
+    dump_short_array
+    dump_int_array
+    dump_long_array
+    dump_unsigned_byte_array
+    dump_unsigned_short_array
+    dump_unsigned_int_array
+    dump_unsigned_long_array
+    dump_float_array
+    dump_double_array
+    memcpy_byte
+    memcpy_short
+    memcpy_int
+    memcpy_long
+    memcpy_float
+    memcpy_double
+    memmove_byte
+    memmove_short
+    memmove_int
+    memmove_long
+    memmove_float
+    memmove_double
+    new_object_array_proto
+    slice_byte
+    slice_short
+    slice_int
+    slice_long
+    slice_float
+    slice_double
+  - move the following SPVM::Util methods to SPVM::StringUtil
+    split
+    chomp_lf
+    chomp_crlf
+    copy_str
+    index
+    isalnum
+    isalpha
+    isblank
+    iscntrl
+    isdigit
+    isgraph
+    islower
+    isprint
+    ispunct
+    isspace
+    isupper
+    isxdigit
+    tolower
+    toupper
+    is_perl_space
+    is_perl_word
+    join
+    lc
+    lcfirst
+    replace
+    replace_all
+    strtoi
+    strtol
+    strtof
+    strtod
+    uc
+    ucfirst
+    rindex
+    contains
+  - remove SPVM::Util->join_object in favor of SPVM::ArrayUtil->dump_object_array
+  - add SPVM::ArrayUtil->dump_object_array
+  - rename SPVM::ArrayUtil->copy_str to SPVM::ArrayUtil->copy_string
+  - rename SPVM::Util to SPVM::NumberUtil
+  - fix bug that le operator means lt.
+  - in eq, ne, gt, ge, lt, le string comparison, undef is treated as most small value
+    and these string comparison operators don't throw a exception.
+  - add SPVM::ArrayUtil->dump_array_string
+  - add SPVM::ArrayUtil->slice_array_string
+  - SPVM::ArrayUtil->copy_byte_array return undef if the argument is undef.
+  - SPVM::ArrayUtil->copy_short_array return undef if the argument is undef.
+  - SPVM::ArrayUtil->copy_int_array return undef if the argument is undef.
+  - SPVM::ArrayUtil->copy_long_array return undef if the argument is undef.
+  - SPVM::ArrayUtil->copy_float_array return undef if the argument is undef.
+  - SPVM::ArrayUtil->copy_double_array return undef if the argument is undef.
+  - SPVM::ArrayUtil->copy_string_array return undef if the argument is undef.
+  - SPVM::ArrayUtil->copy_object_array return undef if the argument is undef.
+0.0945 2021-04-22
+  - rename SPVM::Byte->val to SPVM::Byte->value
+  - rename SPVM::Short->val to SPVM::Short->value
+  - rename SPVM::Int->val to SPVM::Int->value
+  - rename SPVM::Long->val to SPVM::Long->value
+  - rename SPVM::Float->val to SPVM::Float->value
+  - rename SPVM::Double->val to SPVM::Double->value
+  - move SPVM::Util->PI to SPVM::Math->PI
+  - move SPVM::Util->E to SPVM::Math->E
+  - remove SPVM::Math->pi
+  - move SPVM::Util->abs to SPVM::Math->abs
+  - move SPVM::Util->labs to SPVM::Math->labs
+
+0.0944 2021-04-21
+  - Logical Operator become non-expression.
+  - rename SPVM::Util->copy_barray to SPVM::Util->copy_byte_array
+  - rename SPVM::Util->equals_barray to SPVM::Util->equals_byte_array
+  - rename SPVM::Util->copy_sarray to SPVM::Util->copy_short_array
+  - rename SPVM::Util->equals_sarray to SPVM::Util->equals_short_array
+  - rename SPVM::Util->copy_iarray to SPVM::Util->copy_int_array
+  - rename SPVM::Util->equals_iarray to SPVM::Util->equals_int_array
+  - rename SPVM::Util->copy_larray to SPVM::Util->copy_long_array
+  - rename SPVM::Util->equals_larray to SPVM::Util->equals_long_array
+  - rename SPVM::Util->copy_farray to SPVM::Util->copy_float_array
+  - rename SPVM::Util->equals_farray to SPVM::Util->equals_float_array
+  - rename SPVM::Util->copy_darray to SPVM::Util->copy_double_array
+  - rename SPVM::Util->equals_darray to SPVM::Util->equals_double_array
+  - rename SPVM::Util->copy_strarray to SPVM::Util->copy_string_array
+  - rename SPVM::Util->equals_strarray to SPVM::Util->equals_string_array
+  - rename SPVM::Util->copy_oarray to SPVM::Util->copy_object_array
+  - rename SPVM::Util->equals_oarray to SPVM::Util->equals_object_array
+  - rename SPVM::Util->sliceb to SPVM::Util->slice_byte
+  - rename SPVM::Util->slices to SPVM::Util->slice_short
+  - rename SPVM::Util->slicei to SPVM::Util->slice_int
+  - rename SPVM::Util->slicel to SPVM::Util->slice_long
+  - rename SPVM::Util->slicef to SPVM::Util->slice_float
+  - rename SPVM::Util->sliced to SPVM::Util->slice_double
+  - rename SPVM::Util->sliceo to SPVM::Util->slice_object
+  - remove SPVM::Util->reverseb
+  - remove SPVM::Util->reverses
+  - remove SPVM::Util->reversei
+  - remove SPVM::Util->reversel
+  - remove SPVM::Util->reversef
+  - remove SPVM::Util->reversed
+  - remove SPVM::Util->reverseo
+  - rename SPVM::Util->memcpyb to SPVM::Util->memcpy_byte
+  - rename SPVM::Util->memcpys to SPVM::Util->memcpy_short
+  - rename SPVM::Util->memcpyi to SPVM::Util->memcpy_int
+  - rename SPVM::Util->memcpyl to SPVM::Util->memcpy_long
+  - rename SPVM::Util->memcpyf to SPVM::Util->memcpy_float
+  - rename SPVM::Util->memcpyd to SPVM::Util->memcpy_double
+  - rename SPVM::Util->memmoveb to SPVM::Util->memmove_byte
+  - rename SPVM::Util->memmoves to SPVM::Util->memmove_short
+  - rename SPVM::Util->memmovei to SPVM::Util->memmove_int
+  - rename SPVM::Util->memmovel to SPVM::Util->memmove_long
+  - rename SPVM::Util->memmovef to SPVM::Util->memmove_float
+  - rename SPVM::Util->memmoved to SPVM::Util->memmove_double
+  - remove SPVM::Util->joinb
+  - remove SPVM::Util->joins
+  - remove SPVM::Util->joini
+  - remove SPVM::Util->joinl
+  - remove SPVM::Util->joinf
+  - remove SPVM::Util->joind
+  - add SPVM::Util->dump_byte_array
+  - add SPVM::Util->dump_short_array
+  - add SPVM::Util->dump_int_array
+  - add SPVM::Util->dump_long_array
+  - add SPVM::Util->dump_float_array
+  - add SPVM::Util->dump_double_array
+  - add SPVM::Util->dump_unsigned_byte_array
+  - add SPVM::Util->dump_unsigned_short_array
+  - add SPVM::Util->dump_unsigned_int_array
+  - add SPVM::Util->dump_unsigned_long_array
+  - add SPVM::Util->UINT8_MAX
+  - add SPVM::Util->UINT16_MAX
+  - add SPVM::Util->UINT32_MAX
+  - add SPVM::Util->UINT64_MAX
+  - rename SPVM::ArrayUtil->dump_byte_array to SPVM::ArrayUtil->dump_array_byte
+  - rename SPVM::ArrayUtil->dump_short_array to SPVM::ArrayUtil->dump_array_short
+  - rename SPVM::ArrayUtil->dump_int_array to SPVM::ArrayUtil->dump_array_int
+  - rename SPVM::ArrayUtil->dump_long_array to SPVM::ArrayUtil->dump_array_long
+  - rename SPVM::ArrayUtil->dump_float_array to SPVM::ArrayUtil->dump_array_float
+  - rename SPVM::ArrayUtil->dump_double_array to SPVM::ArrayUtil->dump_array_double
+  - rename SPVM::ArrayUtil->dump_object_array to SPVM::ArrayUtil->dump_array_object
+  - rename SPVM::ArrayUtil->dump_unsigned_byte_array to SPVM::ArrayUtil->dump_array_unsigned_byte
+  - rename SPVM::ArrayUtil->dump_unsigned_short_array to SPVM::ArrayUtil->dump_array_unsigned_short
+  - rename SPVM::ArrayUtil->dump_unsigned_int_array to SPVM::ArrayUtil->dump_array_unsigned_int
+  - rename SPVM::ArrayUtil->dump_unsigned_long_array to SPVM::ArrayUtil->dump_array_unsigned_long
+  - rename SPVM::ArrayUtil->copy_byte_array to SPVM::ArrayUtil->copy_array_byte
+  - rename SPVM::ArrayUtil->copy_short_array to SPVM::ArrayUtil->copy_array_short
+  - rename SPVM::ArrayUtil->copy_int_array to SPVM::ArrayUtil->copy_array_int
+  - rename SPVM::ArrayUtil->copy_long_array to SPVM::ArrayUtil->copy_array_long
+  - rename SPVM::ArrayUtil->copy_float_array to SPVM::ArrayUtil->copy_array_float
+  - rename SPVM::ArrayUtil->copy_double_array to SPVM::ArrayUtil->copy_array_double
+  - rename SPVM::ArrayUtil->copy_string_array to SPVM::ArrayUtil->copy_array_string
+  - rename SPVM::ArrayUtil->copy_object_array to SPVM::ArrayUtil->copy_array_object
+  - rename SPVM::ArrayUtil->equals_byte_array to SPVM::ArrayUtil->equals_array_byte
+  - rename SPVM::ArrayUtil->equals_short_array to SPVM::ArrayUtil->equals_array_short
+  - rename SPVM::ArrayUtil->equals_int_array to SPVM::ArrayUtil->equals_array_int
+  - rename SPVM::ArrayUtil->equals_long_array to SPVM::ArrayUtil->equals_array_long
+  - rename SPVM::ArrayUtil->equals_float_array to SPVM::ArrayUtil->equals_array_float
+  - rename SPVM::ArrayUtil->equals_double_array to SPVM::ArrayUtil->equals_array_double
+  - rename SPVM::ArrayUtil->equals_string_array to SPVM::ArrayUtil->equals_array_string
+  - rename SPVM::ArrayUtil->equals_object_array to SPVM::ArrayUtil->equals_array_object
+  - rename SPVM::ArrayUtil->new_object_array_proto to SPVM::ArrayUtil->new_array_proto
+
 0.0943 2021-04-19
   - add <=> and cmp operator
   - add {} array init syntax

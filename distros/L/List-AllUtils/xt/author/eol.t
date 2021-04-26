@@ -11,6 +11,7 @@ my @files = (
     't/00-report-prereqs.dd',
     't/00-report-prereqs.t',
     't/basic.t',
+    't/mesh-zip.t',
     't/prototype.t'
 );
 

@@ -1,4 +1,4 @@
-2213:EXTENSIONS
+2211:EXTENSIONS
 #;application/x-mathcad
 %;application/x-trash
 123;application/vnd.lotus-1-2-3
@@ -70,7 +70,6 @@ MC1;application/vnd.medcalcdata
 MCD;application/vnd.mcd
 MQY;application/vnd.mobius.mqy
 MSL;application/vnd.mobius.msl
-NA;application/vnd.wfa.dpp
 NND;application/vnd.noblenet-directory
 NNS;application/vnd.noblenet-sealer
 NNW;application/vnd.noblenet-web
@@ -163,7 +162,6 @@ ami;application/vnd.amiga.ami
 aml;application/aml
 amr;audio/amr
 amz;audio/x-amzxml
-and;audio/atrac-advanced-lossless
 ani;application/x-navi-animation
 anx;application/x-annodex
 any;application/vnd.mitsubishi.misty-guard.trustweb
@@ -238,7 +236,7 @@ bed;application/vnd.realvnc.bed
 bh2;application/vnd.fujitsu.oasysprs
 bib;text/x-bibtex
 bik;video/vnd.radgamettools.bink
-bin;application/gltf-buffer
+bin;applicatoin/octet-stream
 bk2;video/vnd.radgamettools.bink
 bkm;application/vnd.nervana
 blb;application/x-blorb
@@ -607,7 +605,7 @@ fodg;application/vnd.oasis.opendocument.graphics-flat-xml
 fodp;application/vnd.oasis.opendocument.presentation-flat-xml
 fods;application/vnd.oasis.opendocument.spreadsheet-flat-xml
 fodt;application/vnd.oasis.opendocument.text-flat-xml
-for;image/heic
+for;text/x-fortran
 fpx;application/vnd.netfpx
 frame;application/x-maker
 frl;application/x-freeloader
@@ -662,6 +660,8 @@ gjf;x-chemical/x-gaussian-input
 gl;video/x-gl
 glade;application/x-glade
 glb;model/gltf-binary
+glbin;application/gltf-buffer
+glbuf;application/gltf-buffer
 gltf;model/gltf+json
 gml;application/gml+xml
 gmo;application/x-gettext-translation
@@ -1261,7 +1261,6 @@ opml;text/x-opml
 oprc;application/vnd.palm
 opus;audio/ogg
 or3;application/vnd.lotus-organizer
-or;application/vnd.etsi.asic-e+zip
 ora;image/x-openraster
 orf;image/x-olympus-orf
 org;application/vnd.lotus-organizer
@@ -1759,7 +1758,6 @@ study-inter;application/vnd.vd-study
 stw;application/vnd.sun.xml.writer.template
 sty;text/x-tex
 sub;image/vnd.dvb.subtitle
-subtype;image/heic
 sun;image/x-sun-raster
 sus;application/vnd.sus-calendar
 susp;application/vnd.sus-calendar
@@ -2739,7 +2737,7 @@ x-zip-compressed;zip;
 x-zmachine;z1,z2,z3,z4,z5,z6,z7,z8;
 x-zoo;zoo;
 
-530:application:I:
+531:application:I:
 1d-interleaved-parityfec;;
 3gpdash-qoe-report+xml;;
 3gpp-ims+xml;;
@@ -3249,6 +3247,7 @@ vnd.uplanet.listcmd-wbxml;;
 vnd.uplanet.listcmd;;
 vnd.uplanet.signal;;
 vnd.verimatrix.vcas;;
+vnd.wfa.dpp;;
 vnd.windows.devicepairing;;
 vnd.wmf.bootstrap;;
 vnd.wrq-hp3000-labelled;;
@@ -3271,7 +3270,7 @@ yang-data+xml;;
 yang-patch+json;;
 yang-patch+xml;;
 
-962:application:I:E
+961:application:I:E
 a2l;a2l;
 aml;aml;
 andrew-inset;ez;
@@ -3348,7 +3347,7 @@ font-tdpfr;PFR;
 font-woff;woff;
 geo+json;json,geojson;
 geopackage+sqlite3;gpkg;
-gltf-buffer;bin;
+gltf-buffer;glbin,glbuf;
 gml+xml;xml,gml;
 gzip;gz;
 held+xml;heldxml;
@@ -3665,15 +3664,15 @@ vnd.epson.ssf;ssf;
 vnd.ericsson.quickcall;qcall,qca;
 vnd.espass-espass+zip;espass;
 vnd.eszigno3+xml;es3,et3;
-vnd.etsi.asic-e+zip;asice,or,sce;
-vnd.etsi.asic-s+zip;asics,or,scs;
+vnd.etsi.asic-e+zip;asice,sce;
+vnd.etsi.asic-s+zip;asics,scs;
 vnd.etsi.pstn+xml;xml;
 vnd.etsi.timestamp-token;tst;
 vnd.evolv.ecig.profile;ecigprofile;
 vnd.evolv.ecig.settings;ecig;
 vnd.evolv.ecig.theme;ecigtheme;
 vnd.exstream-empower+zip;mpw;
-vnd.exstream-package;pub,or,pkg;
+vnd.exstream-package;pub,pkg;
 vnd.ezpix-album;ez2;
 vnd.ezpix-package;ez3;
 vnd.fastcopy-disk-image;dim;
@@ -4170,7 +4169,6 @@ vnd.wap.wbxml;wbxml;
 vnd.wap.wmlc;wmlc,wbxml;
 vnd.wap.wmlscriptc;wmlsc;
 vnd.webturbo;wtb;
-vnd.wfa.dpp;NA;
 vnd.wfa.p2p;P2P;
 vnd.wfa.wsc;WSC;
 vnd.wmc;wmc;
@@ -4423,9 +4421,9 @@ aac;adts,aac,loas,ass;
 ac3;ac3;
 amr-wb;awb;base64
 amr;amr;base64
-atrac-advanced-lossless;aal,aa3,and,omg;
-atrac-x;atx,aa3,and,omg;
-atrac3;at3,aa3,and,omg;
+atrac-advanced-lossless;aal,aa3,omg;
+atrac-x;atx,aa3,omg;
+atrac3;at3,aa3,omg;
 basic;au,snd;base64
 dls;dls;
 evrc-qcp;qcp;
@@ -4595,7 +4593,7 @@ vnd.svf;;
 aces;exr;
 avci;avci;
 avcs;avcs;
-avif;avif,heif,heifs,or,hif;
+avif;avif,heif,heifs,hif;
 bmp;bmp,dib,bm;
 cgm;cgm;
 dicom-rle;drle;
@@ -4603,10 +4601,10 @@ emf;emf;
 fits;fits;
 g3fax;g3;
 gif;gif;base64
-heic-sequence;heifs,heics,for;
-heic;heif,heic,for,subtype;
-heif-sequence;heifs,heics,for;
-heif;heif,heic,for,subtype;
+heic-sequence;heics,hif;
+heic;heic,hif;
+heif-sequence;heifs,hif;
+heif;heif,hif;
 hej2k;hej2;
 hsj2;hsj2;
 ief;ief,iefs;base64

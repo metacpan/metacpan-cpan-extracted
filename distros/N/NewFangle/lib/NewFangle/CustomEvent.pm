@@ -1,8 +1,8 @@
-package NewFangle::CustomEvent 0.04 {
+package NewFangle::CustomEvent 0.05 {
 
   use strict;
   use warnings;
-  use 5.020;
+  use 5.014;
   use NewFangle::FFI;
   use Carp ();
 
@@ -42,7 +42,7 @@ NewFangle::CustomEvent - NewRelic custom event class
 
 =head1 VERSION
 
-version 0.04
+version 0.05
 
 =head1 SYNOPSIS
 

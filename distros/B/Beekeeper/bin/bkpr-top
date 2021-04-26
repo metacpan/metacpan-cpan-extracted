@@ -1,0 +1,288 @@
+#!/usr/bin/perl -wT
+
+use strict;
+use warnings;
+
+$ENV{PATH} = '/bin:/usr/bin'; # untaint
+
+BEGIN {
+
+    unless (eval { require Beekeeper }) {
+        # Modules not installed yet
+        unshift @INC, ($ENV{'PERL5LIB'} =~ m/([^:]+)/g);
+    }
+}
+
+use Beekeeper::Service::Supervisor;
+use Term::ReadKey;
+use Getopt::Long;
+
+ReadMode "cbreak";
+END { ReadMode "restore" }
+
+my ($opt_host, $opt_pool, $opt_class, $opt_list, $opt_help);
+
+GetOptions(
+    "host=s"    => \$opt_host,    # --host
+    "pool=s"    => \$opt_pool,    # --pool
+    "class=s"   => \$opt_class,   # --class
+    "list"      => \$opt_list,    # --list
+    "help"      => \$opt_help,    # --help    
+) or exit;
+
+my $Help = "
+Usage: bkpr-top [OPTIONS]
+Display real-time performance metrics of running workers.
+
+  -h, --host  str  display status only of specified host
+  -p, --pool  str  display status only of specified pool
+  -c, --class str  display status only of specified worker class
+  -l, --list       show detailed status of all individual workers
+  -h, --help       display this help and exit
+
+Filters --host, --pool and --class can be combined.
+
+Change sorting field with (M)emory, (C)pu, (L)oad, (N)otifications and (J)obs.
+
+";
+
+if ($opt_help) {
+    print $Help;
+    exit;
+}
+
+if ($opt_list) {
+
+    # Clear the screen
+    print "\033[2J";
+
+    my $printed_lines = 0;
+    my $sort_field = 'pid';
+    my $order_desc = 1;
+    my $scr_size = '';
+
+    my %sort_fields = (
+        'S' => 'class',
+        'P' => 'pool',
+        'H' => 'host',
+        'I' => 'pid',
+        'M' => 'msize',
+        'N' => 'nps',
+        'J' => 'jps',
+        'C' => 'cpu',
+        'L' => 'load',
+    );
+
+    while (1) {
+
+        my $workers = Beekeeper::Service::Supervisor->get_workers_status(
+            host  => $opt_host,
+            pool  => $opt_pool,
+            class => $opt_class,
+        );
+
+        my ($columns) = `tput cols`  =~ m/(\d+)/;
+        my ($lines)   = `tput lines` =~ m/(\d+)/;
+
+        # Clear the screen when dimensions change
+        print "\033[2J" if ($scr_size ne "$columns-$lines");
+        $scr_size = "$columns-$lines";
+
+        my $w = $columns - 60;
+        $w = 0 if $w < 0;
+
+        # Echo title
+        print "\033[0;0H";  # jump to 0,0
+        print "\033[7m";    # reverse
+        printf("%-${w}.${w}s %-8s %-8s %-8s %5s %5s %5s %5s %7s \n",
+               'class','pool','host','pid','mem','nps','jps','cpu','load');
+        print "\033[0m";    # normal
+
+        # Sort
+        my @workers = ($sort_field =~ m/class|pool|host|queue/) ? 
+            sort { ($b->{$sort_field} || '') cmp ($a->{$sort_field} || '') || $a->{pid} <=> $b->{pid} } @$workers :
+            sort { ($a->{$sort_field} || 0 ) <=> ($b->{$sort_field} || 0 ) || $a->{pid} <=> $b->{pid} } @$workers ;
+
+        @workers = reverse @workers if ($order_desc);
+
+        # Limit displayed lines in order to fit screen
+        splice( @workers, $lines - 2 );
+
+        foreach my $worker (@workers) {
+            printf("%-${w}.${w}s %-8s %-8s %-8s %5s %5s %5s %5s %5s %% \n",
+                $worker->{class},
+                $worker->{pool},
+                $worker->{host},
+                $worker->{pid},
+                $worker->{mem} || '-',
+                sprintf("%.0f", $worker->{nps}  + .5) || '0',
+                sprintf("%.0f", $worker->{jps}  + .5) || '0',
+                sprintf("%.0f", $worker->{cpu}  + .5) || '0',
+                sprintf("%.0f", $worker->{load} + .5) || '0',
+            );
+        }
+
+        # Clear old lines at bottom screen
+        print " " x $columns . "\n" for (@workers..$printed_lines-1);
+        $printed_lines = scalar @workers;
+
+        sleep 1;
+
+        my $key = uc( ReadKey(-1) || '');
+        last if ($key eq 'Q');
+        if ($sort_fields{$key}) {
+            $order_desc = ($sort_field eq $sort_fields{$key}) ? !$order_desc : 1;
+            $sort_field = $sort_fields{$key};
+        }
+    }
+}
+else {
+
+    # Clear the screen
+    print "\033[2J";
+
+    my $printed_lines = 0;
+    my $sort_field = 'class';
+    my $order_desc = 1;
+    my $scr_size = '';
+
+    my %sort_fields = (
+        'S' => 'class',
+        'W' => 'count',
+        'N' => 'nps',
+        'J' => 'jps',
+        'C' => 'cpu',
+        'L' => 'load',
+    );
+
+    while (1) {
+
+        my $services = Beekeeper::Service::Supervisor->get_services_status(
+            host  => $opt_host,
+            pool  => $opt_pool,
+            class => $opt_class,
+        );
+
+        foreach my $svc (keys %$services) {
+            $services->{$svc}->{class} = $svc;
+        }
+
+        my @services = values %$services;
+
+        my ($columns) = `tput cols`  =~ m/(\d+)/;
+        my ($lines)   = `tput lines` =~ m/(\d+)/;
+
+        # Clear the screen when dimensions change
+        print "\033[2J" if ($scr_size ne "$columns-$lines");
+        $scr_size = "$columns-$lines";
+
+        my $w = $columns - 48;
+        $w = 0 if $w < 0;
+
+        # Echo title
+        print "\033[0;0H";  # jump to 0,0
+        print "\033[7m";    # reverse
+        printf("%-${w}.${w}s %5s %8s %8s %8s %5s %7s \n",
+               'class','count','MB','nps','jps','cpu','load');
+        print "\033[0m";    # normal
+
+        # Sort
+        @services = ($sort_field =~ m/class/) ? 
+            sort { ($b->{$sort_field} || '') cmp ($a->{$sort_field} || '') } @services :
+            sort { ($a->{$sort_field} || 0 ) <=> ($b->{$sort_field} || 0 ) } @services ;
+
+        @services = reverse @services if ($order_desc);
+
+        # Limit displayed lines in order to fit screen
+        splice( @services, $lines - 2 );
+
+        foreach my $svc (@services) {
+            printf("%-${w}.${w}s %5d %8.1f %8.1f %8.1f %5.0f %5.0f %% \n", 
+                $svc->{class},
+                $svc->{count},
+                $svc->{mem} / 1000,
+                $svc->{nps},
+                $svc->{jps},
+                $svc->{cpu},
+                $svc->{load},
+            );
+        }
+
+        # Clear old lines at bottom screen
+        print " " x $columns, "\n" for (@services..$printed_lines-1);
+        $printed_lines = scalar @services;
+
+        sleep 1;
+
+        my $key = uc( ReadKey(-1) || '');
+        last if ($key eq 'Q');
+        if ($sort_fields{$key}) {
+            $order_desc = ($sort_field eq $sort_fields{$key}) ? !$order_desc : 1;
+            $sort_field = $sort_fields{$key};
+        }
+    }
+}
+
+
+__END__
+
+=head1 NAME
+
+bkpr-top - Display real-time performance metrics of running workers
+
+=head1 VERSION
+
+Version 0.01
+
+=head1 SYNOPSIS
+
+  Usage: bkpr-top [OPTIONS]
+  
+  Display real-time performance metrics of running workers.
+  
+    -h, --host  str  display status only of specified host
+    -p, --pool  str  display status only of specified pool
+    -c, --class str  display status only of specified worker class
+    -l, --list       show detailed status of all individual workers
+    -h, --help       display this help and exit
+  
+  Filters --host, --pool and --class can be combined.
+  
+  Change sorting field with (M)emory, (C)pu, (L)oad, (N)otifications and (J)obs.
+
+=head1 DESCRIPTION
+
+Display in real-time performance metrics of all running workers connected
+to a logic message bus in a 'top' fashion.
+
+ "nps":  number of received notifications per second
+ "jps":  number of processed jobs per second
+ "mem":  resident memory size in KB
+ "cpu":  percentage of cpu load
+ "load": percentage of busy time
+
+Sorting order can be changed pressing keys N, J, M, C and L.
+Pressing Q quits the program.
+
+=head1 SEE ALSO
+
+L<Beekeeper::Service::Supervisor>.
+
+=encoding utf8
+
+=head1 AUTHOR
+
+José Micó, C<jose.mico@gmail.com>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright 2015 José Micó.
+
+This is free software; you can redistribute it and/or modify it under the same 
+terms as the Perl 5 programming language itself.
+
+This software is distributed in the hope that it will be useful, but it is 
+provided “as is” and without any express or implied warranties. For details, 
+see the full text of the license in the file LICENSE.
+
+=cut

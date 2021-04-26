@@ -50,7 +50,7 @@ test_psgi
         is $res->code, HTTP_OK, "HTTP_OK";
     };
 
-    for my $ext (qw/ asp ash aspx ashx axd bat cfm cgi com dll exe jsp jspa lua php php5 pl pm ps1 psh psd1 psm1 sh sht shtml sql /) {
+    for my $ext (qw/ asp ash aspx ashx axd bat cfm cgi com dll do exe jsp jspa lua php php5 pl pm ps1 psh psd1 psm1 sh sht shtml sql /) {
         subtest "blocked (.${ext})" => sub {
             my $req = GET "/some/thing.${ext}";
             my $res = $cb->($req);

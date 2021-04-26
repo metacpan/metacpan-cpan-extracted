@@ -36,7 +36,7 @@ use HTML::Widgets::NavMenu::Url ();
 
 {
     my $from = HTML::Widgets::NavMenu::Url->new( ["hello"], 1, "harddisk", );
-    my $to = HTML::Widgets::NavMenu::Url->new( ["good.html"], 0, );
+    my $to   = HTML::Widgets::NavMenu::Url->new( ["good.html"], 0, );
 
     # TEST
     is( $from->_get_relative_url( $to, 1 ),

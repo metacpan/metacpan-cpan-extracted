@@ -6,6 +6,17 @@ Mark Overmeer.
 TODO:
 	. Add source http://www.ltsw.se/knbase/internet/mime.htp ?
 
+version 2.20: Thu 22 Apr 12:48:35 CEST 2021
+
+	Fixes:
+	- problems with PAUSE cause the previous release to show-up in
+	  the wrong location.  Let's hope this release solves it.
+
+	Changes:
+	- heif/heic/heifs/heics/hif fix [issue #9, Даша Федорова]
+	- no 'and' and 'or' extensions [issue #9, Даша Федорова]
+	- application/octet-stream is better for .bin [issue #10, Даша Федорова]
+
 version 2.19: Fri 16 Apr 11:47:10 CEST 2021
 
 	Improvements:

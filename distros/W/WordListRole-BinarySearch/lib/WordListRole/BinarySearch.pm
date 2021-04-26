@@ -1,9 +1,9 @@
 package WordListRole::BinarySearch;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-05-23'; # DATE
+our $DATE = '2021-04-25'; # DATE
 our $DIST = 'WordListRole-BinarySearch'; # DIST
-our $VERSION = '0.004'; # VERSION
+our $VERSION = '0.005'; # VERSION
 
 use strict 'subs', 'vars';
 use warnings;
@@ -12,7 +12,7 @@ use Role::Tiny;
 sub word_exists {
     no strict 'refs'; # this is required because Role::Tiny forces full stricture
 
-    require File::SortedSeek;
+    require File::SortedSeek::PERLANCAR;
 
     my ($self, $word) = @_;
 
@@ -26,15 +26,16 @@ sub word_exists {
 
     my $tell;
     if ($sort && $sort =~ /num/) {
-        $tell = File::SortedSeek::numeric($fh, $word);
+        $tell = File::SortedSeek::PERLANCAR::numeric   ($fh, $word, undef, $self->{fh_orig_pos});
     } elsif (!$sort) {
-        $tell = File::SortedSeek::alphabetic($fh, $word);
+        $tell = File::SortedSeek::PERLANCAR::alphabetic($fh, $word, undef, $self->{fh_orig_pos});
     } else {
         die "Wordlist is not ascibetically/numerically sort (sort=$sort)";
     }
 
-    chomp(my $line = <$fh>);
-    defined($line) && $line eq $word;
+    return 0 unless File::SortedSeek::PERLANCAR::was_exact();
+    return 0 unless defined $tell;
+    1;
 }
 
 1;
@@ -52,7 +53,7 @@ WordListRole::BinarySearch - Provide word_exists() that uses binary search
 
 =head1 VERSION
 
-This document describes version 0.004 of WordListRole::BinarySearch (from Perl distribution WordListRole-BinarySearch), released on 2020-05-23.
+This document describes version 0.005 of WordListRole::BinarySearch (from Perl distribution WordListRole-BinarySearch), released on 2021-04-25.
 
 =head1 SYNOPSIS
 
@@ -97,7 +98,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by perlancar@cpan.org.
+This software is copyright (c) 2021 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -8,6 +8,7 @@ Makefile.PL
 README
 cpanfile
 dist.ini
+examples/cache-events.pl
 examples/consumer-groups-aa-cluster.pl
 examples/consumer-groups-aa.pl
 examples/consumer-groups.pl

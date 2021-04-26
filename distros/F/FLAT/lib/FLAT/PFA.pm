@@ -26,13 +26,13 @@ sub new {
 
 # Singleton is no different than the NFA singleton
 sub singleton {
-    my ($class, $char) = @_;
+    my ( $class, $char ) = @_;
     my $pfa = $class->new;
-    if (not defined $char) {
+    if ( not defined $char ) {
         $pfa->add_states(1);
         $pfa->set_starting(0);
     }
-    elsif ($char eq "") {
+    elsif ( $char eq "" ) {
         $pfa->add_states(1);
         $pfa->set_starting(0);
         $pfa->set_accepting(0);
@@ -41,16 +41,16 @@ sub singleton {
         $pfa->add_states(2);
         $pfa->set_starting(0);
         $pfa->set_accepting(1);
-        $pfa->set_transition(0, 1, $char);
+        $pfa->set_transition( 0, 1, $char );
     }
     return $pfa;
 }
 
 # attack of the clones
-sub as_pfa {$_[0]->clone()}
+sub as_pfa { $_[0]->clone() }
 
 sub set_starting {
-    my ($self, @states) = @_;
+    my ( $self, @states ) = @_;
     $self->_assert_states(@states);
     $self->{STATES}[$_]{starting} = 1 for @states;
 }
@@ -63,17 +63,17 @@ sub pinch {
     my $self     = shift;
     my $symbol   = shift;
     my @starting = $self->get_starting;
-    if (@starting > 1) {
+    if ( @starting > 1 ) {
         my $newstart = $self->add_states(1);
-        map {$self->add_transition($newstart, $_, $symbol)} @starting;
+        map { $self->add_transition( $newstart, $_, $symbol ) } @starting;
         $self->unset_starting(@starting);
         $self->set_starting($newstart);
     }
     #
     my @accepting = $self->get_accepting;
-    if (@accepting > 1) {
+    if ( @accepting > 1 ) {
         my $newfinal = $self->add_states(1);
-        map {$self->add_transition($_, $newfinal, $symbol)} @accepting;
+        map { $self->add_transition( $_, $newfinal, $symbol ) } @accepting;
         $self->unset_accepting(@accepting);
         $self->set_accepting($newfinal);
     }
@@ -83,9 +83,9 @@ sub pinch {
 # Implement the joining of two PFAs with lambda transitions
 # Note: using epsilon pinches for simplicity
 sub shuffle {
-    my @pfas = map {$_->as_pfa} @_;
+    my @pfas   = map { $_->as_pfa } @_;
     my $result = $pfas[0]->clone;
-    $result->_swallow($_) for @pfas[1 .. $#pfas];
+    $result->_swallow($_) for @pfas[ 1 .. $#pfas ];
     $result->pinch(LAMBDA);
     $result;
 }
@@ -93,64 +93,64 @@ sub shuffle {
 ##############
 
 sub is_tied {
-    my ($self, $state) = @_;
+    my ( $self, $state ) = @_;
     $self->_assert_states($state);
     return $self->{STATES}[$state]{tied};
 }
 
 sub set_tied {
-    my ($self, @states) = @_;
+    my ( $self, @states ) = @_;
     $self->_assert_states(@states);
     $self->{STATES}[$_]{tied} = 1 for @states;
 }
 
 sub unset_tied {
-    my ($self, @states) = @_;
+    my ( $self, @states ) = @_;
     $self->_assert_states(@states);
     $self->{STATES}[$_]{tied} = 0 for @states;
 }
 
 sub get_tied {
     my $self = shift;
-    return grep {$self->is_tied($_)} $self->get_states;
+    return grep { $self->is_tied($_) } $self->get_states;
 }
 
 ##############
 
 # joins two PFAs in a union (or) - no change from NFA
 sub union {
-    my @pfas = map {$_->as_pfa} @_;
+    my @pfas   = map { $_->as_pfa } @_;
     my $result = $pfas[0]->clone;
-    $result->_swallow($_) for @pfas[1 .. $#pfas];
+    $result->_swallow($_) for @pfas[ 1 .. $#pfas ];
     $result->pinch('');
     $result;
 }
 
 # joins two PFAs via concatenation  - no change from NFA
 sub concat {
-    my @pfas = map {$_->as_pfa} @_;
+    my @pfas = map { $_->as_pfa } @_;
 
     my $result   = $pfas[0]->clone;
-    my @newstate = ([$result->get_states]);
+    my @newstate = ( [ $result->get_states ] );
     my @start    = $result->get_starting;
 
-    for (1 .. $#pfas) {
-        push @newstate, [$result->_swallow($pfas[$_])];
+    for ( 1 .. $#pfas ) {
+        push @newstate, [ $result->_swallow( $pfas[$_] ) ];
     }
 
-    $result->unset_accepting($result->get_states);
-    $result->unset_starting($result->get_states);
+    $result->unset_accepting( $result->get_states );
+    $result->unset_starting( $result->get_states );
     $result->set_starting(@start);
 
-    for my $pfa_id (1 .. $#pfas) {
-        for my $s1 ($pfas[$pfa_id - 1]->get_accepting) {
-            for my $s2 ($pfas[$pfa_id]->get_starting) {
-                $result->set_transition($newstate[$pfa_id - 1][$s1], $newstate[$pfa_id][$s2], "");
+    for my $pfa_id ( 1 .. $#pfas ) {
+        for my $s1 ( $pfas[ $pfa_id - 1 ]->get_accepting ) {
+            for my $s2 ( $pfas[$pfa_id]->get_starting ) {
+                $result->set_transition( $newstate[ $pfa_id - 1 ][$s1], $newstate[$pfa_id][$s2], "" );
             }
         }
     }
 
-    $result->set_accepting(@{$newstate[-1]}[$pfas[-1]->get_accepting]);
+    $result->set_accepting( @{ $newstate[-1] }[ $pfas[-1]->get_accepting ] );
 
     $result;
 }
@@ -159,18 +159,18 @@ sub concat {
 sub kleene {
     my $result = $_[0]->clone;
 
-    my ($newstart, $newfinal) = $result->add_states(2);
+    my ( $newstart, $newfinal ) = $result->add_states(2);
 
-    $result->set_transition($newstart, $_, "") for $result->get_starting;
-    $result->unset_starting($result->get_starting);
+    $result->set_transition( $newstart, $_, "" ) for $result->get_starting;
+    $result->unset_starting( $result->get_starting );
     $result->set_starting($newstart);
 
-    $result->set_transition($_, $newfinal, "") for $result->get_accepting;
-    $result->unset_accepting($result->get_accepting);
+    $result->set_transition( $_, $newfinal, "" ) for $result->get_accepting;
+    $result->unset_accepting( $result->get_accepting );
     $result->set_accepting($newfinal);
 
-    $result->set_transition($newstart, $newfinal, "");
-    $result->set_transition($newfinal, $newstart, "");
+    $result->set_transition( $newstart, $newfinal, "" );
+    $result->set_transition( $newfinal, $newstart, "" );
 
     $result;
 }
@@ -178,54 +178,57 @@ sub kleene {
 sub as_nfa {
     my $self   = shift;
     my $result = FLAT::NFA->new();
+
     # Dstates is initially populated with the start state, which
     # is exactly the set of all nodes marked as a starting node
-    my @Dstates = [sort($self->get_starting())];    # I suppose all start states are considered 'tied'
-    my %DONE    = ();                               # |- what about all accepting states? I think so...
-                                                    # the main while loop that ends when @Dstates becomes exhausted
+    my @Dstates = [ sort( $self->get_starting() ) ];    # I suppose all start states are considered 'tied'
+    my %DONE    = ();                                   # |- what about all accepting states? I think so...
+                                                        # the main while loop that ends when @Dstates becomes exhausted
     my %NEW     = ();
     while (@Dstates) {
-        my $current = pop(@Dstates);
-        my $currentid = join(',', @{$current});
-        $DONE{$currentid}++;                        # mark done
-        foreach my $symbol ($self->alphabet(), '') {    # Sigma UNION epsilon
-            if (LAMBDA eq $symbol) {
+        my $current   = pop(@Dstates);
+        my $currentid = join( ',', @{$current} );
+        $DONE{$currentid}++;                              # mark done
+        foreach my $symbol ( $self->alphabet(), '' ) {    # Sigma UNION epsilon
+            if ( LAMBDA eq $symbol ) {
                 my @NEXT = ();
-                my @tmp = $self->successors([@{$current}], $symbol);
+                my @tmp  = $self->successors( [ @{$current} ], $symbol );
                 if (@tmp) {
-                    my @pred = $self->predecessors([@tmp], LAMBDA);
-                    if ($self->array_is_subset([@pred], [@{$current}])) {
-                        push(@NEXT, @tmp, $self->array_complement([@{$current}], [@pred]));
-                        @NEXT = sort($self->array_unique(@NEXT));
-                        my $nextid = join(',', @NEXT);
-                        push(@Dstates, [@NEXT]) if (!exists($DONE{$nextid}));
+                    my @pred = $self->predecessors( [@tmp], LAMBDA );
+                    if ( $self->array_is_subset( [@pred], [ @{$current} ] ) ) {
+                        push( @NEXT, @tmp, $self->array_complement( [ @{$current} ], [@pred] ) );
+                        @NEXT = sort( $self->array_unique(@NEXT) );
+                        my $nextid = join( ',', @NEXT );
+                        push( @Dstates, [@NEXT] ) if ( !exists( $DONE{$nextid} ) );
+
                         # make new states if none exist and track
-                        if (!exists($NEW{$currentid})) {$NEW{$currentid} = $result->add_states(1)}
-                        if (!exists($NEW{$nextid}))    {$NEW{$nextid}    = $result->add_states(1)}
-                        $result->add_transition($NEW{$currentid}, $NEW{$nextid}, '');
+                        if ( !exists( $NEW{$currentid} ) ) { $NEW{$currentid} = $result->add_states(1) }
+                        if ( !exists( $NEW{$nextid} ) )    { $NEW{$nextid}    = $result->add_states(1) }
+                        $result->add_transition( $NEW{$currentid}, $NEW{$nextid}, '' );
                     }
                 }
             }
             else {
-                foreach my $node (@{$current}) {
-                    my @tmp = $self->successors([$node], $symbol);
+                foreach my $node ( @{$current} ) {
+                    my @tmp = $self->successors( [$node], $symbol );
                     foreach my $new (@tmp) {
                         my @NEXT = ();
-                        push(@NEXT, $new, $self->array_complement([@{$current}], [$node]));
-                        @NEXT = sort($self->array_unique(@NEXT));
-                        my $nextid = join(',', @NEXT);
-                        push(@Dstates, [@NEXT]) if (!exists($DONE{$nextid}));
+                        push( @NEXT, $new, $self->array_complement( [ @{$current} ], [$node] ) );
+                        @NEXT = sort( $self->array_unique(@NEXT) );
+                        my $nextid = join( ',', @NEXT );
+                        push( @Dstates, [@NEXT] ) if ( !exists( $DONE{$nextid} ) );
+
                         # make new states if none exist and track
-                        if (!exists($NEW{$currentid})) {$NEW{$currentid} = $result->add_states(1)}
-                        if (!exists($NEW{$nextid}))    {$NEW{$nextid}    = $result->add_states(1)}
-                        $result->add_transition($NEW{$currentid}, $NEW{$nextid}, $symbol);
+                        if ( !exists( $NEW{$currentid} ) ) { $NEW{$currentid} = $result->add_states(1) }
+                        if ( !exists( $NEW{$nextid} ) )    { $NEW{$nextid}    = $result->add_states(1) }
+                        $result->add_transition( $NEW{$currentid}, $NEW{$nextid}, $symbol );
                     }
                 }
             }
         }
     }
-    $result->set_starting($NEW{join(",", sort $self->get_starting())});
-    $result->set_accepting($NEW{join(",", sort $self->get_accepting())});
+    $result->set_starting( $NEW{ join( ",", sort $self->get_starting() ) } );
+    $result->set_accepting( $NEW{ join( ",", sort $self->get_accepting() ) } );
     return $result;
 }
 
@@ -279,12 +282,7 @@ using an epsilon transition.
 =head1 AUTHORS & ACKNOWLEDGEMENTS
 
 FLAT is written by Mike Rosulek E<lt>mike at mikero dot comE<gt> and 
-Brett Estrade E<lt>estradb at gmail dot comE<gt>.
-
-The initial version (FLAT::Legacy) by Brett Estrade was work towards an 
-MS thesis at the University of Southern Mississippi.
-
-Please visit the Wiki at http://www.0x743.com/flat
+B. Estarde E<lt>estradb at gmail dot comE<gt>.
 
 =head1 LICENSE
 

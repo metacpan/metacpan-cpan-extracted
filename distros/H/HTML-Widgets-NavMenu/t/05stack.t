@@ -20,11 +20,11 @@ BEGIN
     # TEST
     ok( ( !$stack->is_empty() ), "is_empty() is not true after filling" );
     $stack->push("TamTam");
-    is( $stack->len(),   3,        "Checking stack len" );       # TEST
-    is( $stack->top(),   "TamTam", "Checking top of stack" );    # TEST
-    is( $stack->item(2), "TamTam", "Checking Item 2" );          # TEST
-    is( $stack->item(1), "World",  "Checking Item 1" );          # TEST
-    is( $stack->item(0), "Hello",  "Checking Item 0" );          # TEST
+    is( $stack->len(),   3,        "Checking stack len" );           # TEST
+    is( $stack->top(),   "TamTam", "Checking top of stack" );        # TEST
+    is( $stack->item(2), "TamTam", "Checking Item 2" );              # TEST
+    is( $stack->item(1), "World",  "Checking Item 1" );              # TEST
+    is( $stack->item(0), "Hello",  "Checking Item 0" );              # TEST
     my $popped_item = $stack->pop();
     is( $popped_item,  "TamTam", "Popped Item" );                    # TEST
     is( $stack->len(), 2,        "Checking stack len" );             # TEST

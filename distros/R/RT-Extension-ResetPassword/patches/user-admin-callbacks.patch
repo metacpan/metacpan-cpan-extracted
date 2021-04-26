@@ -1,0 +1,31 @@
+commit a3ba1f81d3eb057e08636e1fbbd25c24beaae72f
+Author: Jim Brandt <jbrandt@bestpractical.com>
+Date:   Mon Apr 12 17:16:10 2021 -0400
+
+    Add callbacks to user admin index page
+    
+    These allow a developer to add a custom component to the
+    form and then act on it in the init section.
+
+diff --git a/share/html/Admin/Users/index.html b/share/html/Admin/Users/index.html
+index 4bcfc2e95..e819b3393 100644
+--- a/share/html/Admin/Users/index.html
++++ b/share/html/Admin/Users/index.html
+@@ -129,6 +129,8 @@ jQuery(function(){
+     </div>
+   </div>
+ 
++% $m->callback( %ARGS, UsersObj => $users, CallbackName => 'InUsersAdminForm' );
++
+   <div class="form-row">
+     <div class="col-12 text-right">
+       <input type="submit" class="button btn btn-primary" value="<&|/l&>Go!</&>" name="Go" />
+@@ -159,6 +161,8 @@ my $caption;
+ my $users = RT::Users->new( $session{'CurrentUser'} );
+ $users->FindAllRows if $FindDisabledUsers;
+ 
++$m->callback( UsersObj => $users, ARGSRef => \%ARGS, CallbackName => 'Initial' );
++
+ $caption = loc("Users matching search criteria");
+ my @users_queries = ();
+ push @users_queries, { field => $UserField, op => $UserOp, string => $UserString } if length $UserString;

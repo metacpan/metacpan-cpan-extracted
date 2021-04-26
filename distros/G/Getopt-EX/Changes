@@ -1,5 +1,13 @@
 Revision history for Perl extension Getopt-EX
 
+v1.23.0 2021-04-22T16:48:43Z
+
+    - Support some other escape sequences.
+
+	RIS     Reset to Initial State
+	DECSC   DEC Save Cursor
+	DECRC   DEC Restore Cursor
+
 v1.22.1 2021-03-25T04:20:28Z
 
     - Relax argument spec in Func.pm.

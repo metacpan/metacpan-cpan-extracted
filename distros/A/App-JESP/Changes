@@ -1,230 +1,41 @@
 ==================================================
-Changes from 2016-11-16 00:00:00 +0000 to present.
+Changes from 2020-04-22 00:00:00 +0000 to present.
 ==================================================
 
 ------------------------------------------
-version 0.015 at 2017-11-16 11:39:13 +0000
+version 0.016 at 2021-04-22 15:26:33 +0000
 ------------------------------------------
 
-  Change: bd9b66b7b6493870562464b0247aa0a71bba841b
-  Author: Jerome Eteve <jerome@broadbean.com>
-  Date : 2017-11-16 11:35:39 +0000
-
-    Merge branch 'color_status' 
-
-  Change: 4f2b9fdf4c8c72d2e4c926fcb448cdcf02f61011
-  Author: Jerome Eteve <jerome@broadbean.com>
-  Date : 2017-11-16 10:33:25 +0000
-
-    Moved status feedback to main action code 
-
-  Change: d86b619518c4e0e8b6f36521fc9d90a785f44a3c
-  Author: Jerome Eteve <jeteve@users.noreply.github.com>
-  Date : 2017-11-14 12:08:36 +0000
-
-    Merge pull request #6 from manwar/auto-generate-meta-json
-
-    - Auto generate META.json using dzil plugin [MetaJSON]. 
-
-  Change: 5afc2136390a2ff13d1a9e5cbccee4530f85adea
-  Author: Mohammad S Anwar <mohammad.anwar@yahoo.com>
-  Date : 2017-11-13 16:57:56 +0000
-
-    - Auto generate META.json using dzil plugin [MetaJSON]. 
-
-------------------------------------------
-version 0.014 at 2017-11-13 16:32:05 +0000
-------------------------------------------
-
-  Change: 899ea5d5e669483804a5209889da1ab391c07dd4
-  Author: Jerome Eteve <jerome@broadbean.com>
-  Date : 2017-11-13 16:32:05 +0000
+  Change: b1eae2d869c2de84b404b99a08fb7df065207ae4
+  Author: Jerome Eteve <jerome.eteve@gmail.com>
+  Date : 2021-04-22 16:26:18 +0000
 
     Updated README 
 
-  Change: e1459d0428be47e5bd15f64298e613da1c1b9110
-  Author: Jerome Eteve <jeteve@users.noreply.github.com>
-  Date : 2017-11-10 10:16:09 +0000
+  Change: cf87811c66f83fdfceec65a4099be5d42f19bfec
+  Author: Jerome Eteve <jerome.eteve@gmail.com>
+  Date : 2021-04-22 11:40:36 +0000
 
-    Merge pull request #4 from jplindstrom/docs_improvements
+    Removed -w in main script 
 
-    Docs improvements 
+  Change: 1b3740c2e40cfe8c20a6a2cc8b41cf0647b98a8f
+  Author: Jerome Eteve <jerome.eteve@gmail.com>
+  Date : 2021-04-22 11:34:08 +0000
 
-  Change: 764515ed291a5e2faaa0aef2741eb9957823cd7b
-  Author: Jerome Eteve <jeteve@users.noreply.github.com>
-  Date : 2017-11-10 10:15:55 +0000
+    Remove deprecated travis sudo 
 
-    Merge pull request #3 from jplindstrom/allow_relaxed_json
+  Change: a03463483fee410af2c80b0b1d528976a00b00cd
+  Author: Jerome Eteve <jerome.eteve@gmail.com>
+  Date : 2021-04-22 10:47:27 +0000
 
-    allow_relaxed_json: Use relaxed JSON, trailing comma in test plan
-    json 
+    Added deps to String::Truncate 
 
-  Change: d7faa79cdb72698208c60eadeffda62db39806c4
-  Author: Johan Lindstrom <johan.lindstrom@broadbean.com>
-  Date : 2017-11-10 10:07:05 +0000
-
-    docs_improvements: Random doc commit to kick off build again 
-
-  Change: b29f1e39763f82a76a1bc6512960044094419ef6
-  Author: Johan Lindstrom <johan.lindstrom@broadbean.com>
-  Date : 2017-11-10 10:03:25 +0000
-
-    allow_relaxed_json: Move JSON object to attribute on main class 
-
-  Change: de6e12e6da2d73c44c00971c506bde75f1f47ba5
-  Author: Jerome Eteve <jeteve@users.noreply.github.com>
-  Date : 2017-11-10 09:59:39 +0000
-
-    Merge pull request #5 from jplindstrom/fix_travis
-
-    fix_travis: Mysql travis config 
-
-  Change: 91f66a551b1b024dd91caf07aa35b991a82fc5c1
-  Author: Johan Lindstrom <johan.lindstrom@broadbean.com>
-  Date : 2017-11-10 09:49:08 +0000
-
-    fix_travis: Mysql travis config 
-
-  Change: 68385dec42f45365c7153389645ad67e6360fdb5
-  Author: Johan Lindstrom <johan.lindstrom@broadbean.com>
-  Date : 2017-11-08 17:13:56 +0000
-
-    docs_improvements: POD fixes 
-
-  Change: 6b021c6613b878820dfa694bfbdc28c48bda672f
-  Author: Johan Lindstrom <johan.lindstrom@broadbean.com>
-  Date : 2017-11-08 17:13:42 +0000
-
-    docs_improvements: Document JSON relaxed format 
-
-  Change: 7280df953596a63a9843bed8c0f0a850aaa4aaa5
-  Author: Johan Lindstrom <johan.lindstrom@broadbean.com>
-  Date : 2017-11-08 16:57:19 +0000
-
-    allow_relaxed_json: Use relaxed JSON, use trailing comma in test
-    plan.json 
-
-  Change: 1b14f751eecfa081bd4c93d9f3cc00bcb1b9e5d9
-  Author: Johan Lindstrom <johan.lindstrom@broadbean.com>
-  Date : 2017-11-08 16:39:15 +0000
-
-    docs_improvements: Document interactive 
-
-  Change: 75476b548ba10ea5b692c3557475614fefbef9c6
-  Author: Johan Lindstrom <johan.lindstrom@broadbean.com>
-  Date : 2017-11-08 16:18:07 +0000
-
-    docs_improvements: POD 
-
-------------------------------------------
-version 0.013 at 2017-08-17 16:10:22 +0000
-------------------------------------------
-
-  Change: 1a56930d246eb190cd3140ca3478c892c25fb5bf
+  Change: 13ee9030f07616dba37f7cd1f2214aec172f9b40
   Author: Jerome Eteve <jerome@broadbean.com>
-  Date : 2017-08-17 17:10:22 +0000
+  Date : 2018-01-09 23:00:08 +0000
 
-    Colors on deploy 
+    Nicer status format 
 
-  Change: eca63717e214e6bfa75238b3ca1000e90ac29d01
-  Author: Jerome Eteve <jerome@broadbean.com>
-  Date : 2017-08-17 14:21:36 +0000
-
-    Added colors to status 
-
-------------------------------------------
-version 0.012 at 2017-08-16 14:03:01 +0000
-------------------------------------------
-
-  Change: dc181a6814e54b7f06bc8df20e2611ca37afca08
-  Author: Jerome Eteve <jerome@broadbean.com>
-  Date : 2017-08-16 15:03:01 +0000
-
-    Restored compatibility with perl 5.8 
-
-------------------------------------------
-version 0.011 at 2017-08-15 11:10:39 +0000
-------------------------------------------
-
-  Change: 088c2b52b1928fd8a4da624161da582804469ba3
-  Author: Jerome Eteve <jerome@broadbean.com>
-  Date : 2017-08-15 12:10:39 +0000
-
-    Updated README 
-
-  Change: a4bfc2fc79fcedefa9f10ee2194571c7dedbd65e
-  Author: Jerome Eteve <jerome@broadbean.com>
-  Date : 2017-08-15 11:39:14 +0000
-
-    Implement script running 
-
-------------------------------------------
-version 0.010 at 2017-07-20 15:47:47 +0000
-------------------------------------------
-
-  Change: e4cd5ea4b4db2f8e4cf5936b41bb5b4f83fa95af
-  Author: Jerome Eteve <jerome@broadbean.com>
-  Date : 2017-07-20 16:47:47 +0000
-
-    Added status command 
-
-  Change: bda4b3bd235eba25982fbc374e07a3bde776a7c3
-  Author: Jerome Eteve <jerome@broadbean.com>
-  Date : 2017-07-20 15:43:53 +0000
-
-    Quote patches option 
-
-------------------------------------------
-version 0.009 at 2017-07-20 11:28:11 +0000
-------------------------------------------
-
-  Change: 7e57055e8deeaab3e01d13009bde3eb42a7da30c
-  Author: Jerome Eteve <jerome@broadbean.com>
-  Date : 2017-07-20 12:28:11 +0000
-
-    Carp::Always resistent 
-
-------------------------------------------
-version 0.008 at 2017-02-21 10:00:12 +0000
-------------------------------------------
-
-  Change: ccc9b9348eddd8c8e7d372c1dfde1525cfbba799
-  Author: Jerome Eteve <jerome@broadbean.com>
-  Date : 2017-02-21 10:00:12 +0000
-
-    Small doc fixes 
-
-  Change: f311936b7492c5b84fdd42d69274997a29568809
-  Author: Jerome Eteve <jeteve@users.noreply.github.com>
-  Date : 2017-02-21 09:48:44 +0000
-
-    Merge pull request #2 from
-    stuartskelton/abstract_away_where_jesp_is_saved
-
-    Abstract away where JESP is stored, as people dont care where it is. 
-
-  Change: 1653d6e9f8a122865dd2d87e24eeae2ddd52cacd
-  Author: Jerome Eteve <jeteve@users.noreply.github.com>
-  Date : 2017-02-21 09:47:23 +0000
-
-    Merge pull request #1 from stuartskelton/update_readme
-
-    Fixed a couple of issues with the readme. 
-
-  Change: d98e714e48cf20192172f8810f0887d06ddbb77b
-  Author: Stuart Skelton <stuarts@broadbean.com>
-  Date : 2017-02-20 22:10:19 +0000
-
-    Abstract away where JESP is stored, as people dont care where it is.
-
-    only that they can get to it. 
-
-  Change: a512a56ded217cae3b8bd393de4a238ec6c75bdb
-  Author: Stuart Skelton <stuarts@broadbean.com>
-  Date : 2017-02-20 22:08:50 +0000
-
-    Fixed a couple of issues with the readme. 
-
-================================================
-Plus 7 releases after 2016-11-16 00:00:00 +0000.
-================================================
+=================================================
+Plus 15 releases after 2020-04-22 00:00:00 +0000.
+=================================================

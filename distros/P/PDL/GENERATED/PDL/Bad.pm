@@ -216,8 +216,7 @@ It returns the final state of the bad-value flag.
 =for bad
 
 This method accepts piddles with or without bad values. It
-returns a Perl scalar with the final bad-value flag, so it
-never returns bad values itself.
+returns a piddle with the final bad-value.
 
 =cut
 
@@ -233,7 +232,7 @@ sub PDL::check_badflag {
 
 
 # note:
-#  if sent a piddle, we have to change it's bad values
+#  if sent a piddle, we have to change its bad values
 #  (but only if it contains bad values)
 #  - there's a slight overhead in that the badflag is
 #    cleared and then set (hence propagating to all
@@ -243,7 +242,6 @@ sub PDL::check_badflag {
 #
 sub PDL::badvalue {
     no strict 'refs';
-
     my ( $self, $val ) = @_;
     my $num;
     if ( UNIVERSAL::isa($self,"PDL") ) {
@@ -252,35 +250,22 @@ sub PDL::badvalue {
 	    $self->inplace->setbadtoval( $val );
 	    $self->badflag(1);
 	}
-
 	if ($PDL::Config{BADVAL_PER_PDL}) {
 	    my $name = "PDL::_badvalue_per_pdl_int$num";
-	    if ( defined $val ) {
-		return &{$name}($self, $val )->sclr;
-	    } else {
-		return &{$name}($self, undef)->sclr;
-	    }
+	    return &{$name}($self, $val);
 	}
-
     } elsif ( UNIVERSAL::isa($self,"PDL::Type") ) {
 	$num = $self->enum;
     } else {
         # assume it's a number
         $num = $self;
     }
-
     my $name = "PDL::_badvalue_int$num";
-    if ( defined $val ) {
-	return &{$name}( $val )->sclr;
-    } else {
-	return &{$name}( undef )->sclr;
-    }
-
-} # sub: badvalue()
+    &{$name}( $val );
+}
 
 sub PDL::orig_badvalue {
     no strict 'refs';
-
     my $self = shift;
     my $num;
     if ( UNIVERSAL::isa($self,"PDL") ) {
@@ -291,11 +276,9 @@ sub PDL::orig_badvalue {
         # assume it's a number
         $num = $self;
     }
-
     my $name = "PDL::_default_badvalue_int$num";
     return &${name}();
-
-} # sub: orig_badvalue()
+}
 
 ############################################################
 ############################################################

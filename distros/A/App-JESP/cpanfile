@@ -14,6 +14,7 @@ requires 'JSON';
 requires 'Log::Any', '>= 1.040';
 requires 'Moose' , '>= 2.1801';
 requires 'SQL::Abstract', '>= 1.81';
+requires 'String::Truncate', '>= 1.100602';
 requires 'String::ShellQuote', '>= 1.04';
 requires 'Term::ANSIColor', '>= 3.01';
 

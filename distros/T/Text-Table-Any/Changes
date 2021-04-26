@@ -1,3 +1,19 @@
+0.104   2021-04-26  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+	- [dist] Test removing optional prereq Text::Table::Tiny to see its
+	  effect on MetaCPAN, because MetaCPAN still lists Text::Table::Any
+	  in Text::Table::Tiny's reverse dependencies, but it does not list
+	  Text::Table::Any in the revdeps of other optional prereqs (other
+	  backends).
+
+
+0.103   2021-04-25  Released-By: PERLANCAR; Urgency: medium
+
+	- Support backend Text::Table::TickitWidget.
+
+
 0.102   2021-03-03  Released-By: PERLANCAR; Urgency: medium
 
 	- Change default backend from Text::Table::Tiny to

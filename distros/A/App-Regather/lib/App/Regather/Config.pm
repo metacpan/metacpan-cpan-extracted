@@ -683,6 +683,7 @@ sslversion   = STRING
 verify       = STRING
 
 [service ANY]
+all_attr     = NUMBER :default 0
 chmod        = OCTAL  :default 0640
 chown	     = NUMBER :default 1
 ctrl_attr    = STRING :mandatory :array

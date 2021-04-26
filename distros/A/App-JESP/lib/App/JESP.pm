@@ -1,5 +1,5 @@
 package App::JESP;
-$App::JESP::VERSION = '0.015';
+$App::JESP::VERSION = '0.016';
 use Moose;
 
 use App::JESP::Plan;
@@ -12,6 +12,7 @@ use DBIx::Simple;
 use File::Spec;
 use IO::Interactive;
 use Log::Any qw/$log/;
+use String::Truncate;
 
 # Settings
 ## DB Connection attrbutes.
@@ -150,6 +151,7 @@ sub _applied_patches{
     return { $applied_patches_result->map_hashes('id') };
 }
 
+
 sub status{
     my ($self) = @_;
     my $plan_patches = $self->plan()->patches();
@@ -160,9 +162,9 @@ sub status{
     foreach my $plan_patch ( @$plan_patches ){
         if( my $applied_patch = delete $applied_patches->{$plan_patch->id()} ){
             $plan_patch->applied_datetime( $applied_patch->{applied_datetime} );
-            $log->info( $self->colorizer->colored('✔︎', "bold green")."  '".$plan_patch->id()."' - Applied on ".$plan_patch->applied_datetime() );
+            $log->info( $self->colorizer->colored('✔︎', "bold green")."  ".sprintf('%-52s', "'".$plan_patch->id()."'" )." Applied on ".$plan_patch->applied_datetime() );
         }else{
-            $log->info( $self->colorizer->colored('⚠', "bold yellow")."  '".$plan_patch->id()."' - Not applied" );
+            $log->info( $self->colorizer->colored('⚠', "bold yellow")."  ".sprintf('%-52s', "'".$plan_patch->id()."'" )." Not applied (yet?)" );
         }
     }
 
@@ -170,7 +172,7 @@ sub status{
 
     my $plan_orphans =  [ grep{ $_ !~ /^$meta_prefix/ }  keys %$applied_patches ];
     if( @$plan_orphans ){
-        $log->warn($self->colorizer()->colored('⚠︎', "bold red")."  Got orphan patches (patches in meta table but not in plan): ".join(', ' , @$plan_orphans ) );
+        $log->warn($self->colorizer()->colored('⚠︎', "bold red")."  Got orphan patches (patches in meta table but not in plan): ".join(', ' , map{ "'$_'" } @$plan_orphans ) );
     }
 
     return {

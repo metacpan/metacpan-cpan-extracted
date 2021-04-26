@@ -5,7 +5,7 @@ use warnings;
 
 require 5.008_001;
 
-our $VERSION = '0.10';
+our $VERSION = '0.14';
 
 use Crypt::OpenSSL::X509;
 
@@ -49,7 +49,7 @@ whether the CA signs the certificate. This is a useful thing to have
 if you're signing with X509 certificates, but outside of SSL.
 
 A specific example is where you're working with XML signatures, and
-need to verify that the signing certificate is valid. 
+need to verify that the signing certificate is valid.
 
 You could use Crypt::OpenSSL::CA to do this, but it is based on
 Inline::C, which can be troublesome in some situations. This module
@@ -59,7 +59,7 @@ provides an XS alternative for the certificate verify feature.
 
 =head2 new($ca_path)
 
-Constructor. Returns a VerifyX509 instance, set up with the given CA. 
+Constructor. Returns a VerifyX509 instance, set up with the given CA.
 
 Arguments:
 
@@ -77,6 +77,10 @@ Arguments:
 =head1 AUTHOR
 
 Chris Andrews <chrisandrews@venda.com>
+
+=head1 MAINTAINER
+
+Timothy Legge <timlegge@gmail.com>
 
 =head1 COPYRIGHT
 

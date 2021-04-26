@@ -2,7 +2,7 @@
 
 use strict;
 use Test::More;
-use Config ();
+use Config;
 
 use Module::ScanDeps;
 use DynaLoader;
@@ -10,11 +10,11 @@ use File::Temp;
 use Data::Dumper;
 
 plan skip_all => "No dynamic loading available in your version of perl"
-    unless $Config::Config{usedl};
+    unless $Config{usedl};
 
 my @try_mods = qw( File::Glob Data::Dumper List::Util Time::HiRes Compress::Raw::Zlib );
-my @dyna_mods = grep { my $mod = $_; 
-                       eval("require $mod; 1") 
+my @dyna_mods = grep { my $mod = $_;
+                       eval("require $mod; 1")
                        && grep { $_ eq $mod } @DynaLoader::dl_modules
                      } @try_mods;
 plan skip_all => "No dynamic module found (tried @try_mods)"
@@ -35,7 +35,7 @@ foreach my $module (@dyna_mods)
     # cf. DynaLoader.pm
     my @modparts = split(/::/,$module);
     my $modfname = defined &DynaLoader::mod2fname ? DynaLoader::mod2fname(\@modparts) : $modparts[-1];
-    my $auto_path = join('/', 'auto', @modparts, "$modfname.$Config::Config{dlext}");
+    my $auto_path = join('/', 'auto', @modparts, "$modfname.$Config{dlext}");
 
     check_bundle_path(static => $module, $auto_path,
         sub { scan_deps(
@@ -107,7 +107,7 @@ sub check_bundle_path {
        "found some key that looks like it pulled in its shared lib (auto_path=$auto_path)");
 
     # Actually we accept anything that ends with $auto_path.
-    ok($rv->{$entry}{file} =~ m{/\Q$auto_path\E$}, 
+    ok($rv->{$entry}{file} =~ m{/\Q$auto_path\E$},
        "check_bundle_path:$tag for $module: ".
        "the full bundle path we got \"$rv->{$entry}{file}\" looks legit");
 }

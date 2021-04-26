@@ -1,5 +1,5 @@
 package App::JESP::Driver::SQLite;
-$App::JESP::Driver::SQLite::VERSION = '0.015';
+$App::JESP::Driver::SQLite::VERSION = '0.016';
 use Moose;
 extends qw/App::JESP::Driver/;
 

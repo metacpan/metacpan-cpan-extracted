@@ -3,7 +3,7 @@ package Myriad::RPC;
 use strict;
 use warnings;
 
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 our $AUTHORITY = 'cpan:DERIV'; # AUTHORITY
 
 no indirect qw(fatal);
@@ -97,10 +97,10 @@ sub new {
         return Myriad::RPC::Implementation::Redis->new(
             redis   => $myriad->redis,
         );
-    } elsif($transport eq 'perl') {
-        require Myriad::RPC::Implementation::Perl;
-        return Myriad::RPC::Implementation::Perl->new(
-            transport => $myriad->perl_transport,
+    } elsif($transport eq 'memory' or $transport eq 'perl') {
+        require Myriad::RPC::Implementation::Memory;
+        return Myriad::RPC::Implementation::Memory->new(
+            transport => $myriad->memory_transport,
         );
     } else {
         Myriad::Exception::RPC::UnknownTransport->throw;

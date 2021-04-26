@@ -1,3 +1,8 @@
+0.279   2021-03-08  Released-By: PERLANCAR; Urgency: medium
+
+	- Switch from Text::Table::Tiny to Text::Table::Sprintf.
+
+
 0.278   2020-11-12  Released-By: PERLANCAR; Urgency: medium
 
 	- [ux] Use Text::Table::Org as default table backend when inside

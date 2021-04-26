@@ -3,26 +3,36 @@ abstract: 'simple certificate verification'
 author:
   - 'Chris Andrews <chrisandrews@venda.com>'
 build_requires:
-  ExtUtils::MakeMaker: 6.42
-  Test::More: 0.88
+  ExtUtils::MakeMaker: '6.59'
+  File::Slurp: '0'
+  Test::Exception: '0'
+  Test::More: '0.88'
 configure_requires:
-  ExtUtils::MakeMaker: 6.42
-distribution_type: module
-generated_by: 'Module::Install version 1.00'
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Module::Install version 1.19, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: Crypt-OpenSSL-VerifyX509
 no_index:
   directory:
     - inc
     - t
+provides:
+  Crypt::OpenSSL::VerifyX509:
+    file: VerifyX509.pm
+    version: '0.14'
 requires:
-  Crypt::OpenSSL::X509: 0
-  perl: 5.8.1
+  Crypt::OpenSSL::X509: '1.807'
+  perl: '5.008001'
 resources:
   bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=Crypt-OpenSSL-VerifyX509
   license: http://dev.perl.org/licenses
-  repository: http://github.com/chrisa/perl-Crypt-OpenSSL-VerifyX509
-version: 0.10
+  repository: http://github.com/timlegge/perl-Crypt-OpenSSL-VerifyX509
+version: '0.14'
+x_maintainers:
+  - 'Timothy Legge <timlegge@gmail.com>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

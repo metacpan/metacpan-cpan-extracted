@@ -2,7 +2,7 @@ use warnings;
 
 package Git::Hooks::PrepareLog;
 # ABSTRACT: Git::Hooks plugin to prepare commit messages before being edited
-$Git::Hooks::PrepareLog::VERSION = '3.0.0';
+$Git::Hooks::PrepareLog::VERSION = '3.1.0';
 use 5.016;
 use utf8;
 use Log::Any '$log';
@@ -146,7 +146,7 @@ Git::Hooks::PrepareLog - Git::Hooks plugin to prepare commit messages before bei
 
 =head1 VERSION
 
-version 3.0.0
+version 3.1.0
 
 =head1 SYNOPSIS
 
@@ -315,7 +315,7 @@ Gustavo L. de M. Chaves <gnustavo@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by CPQD <www.cpqd.com.br>.
+This software is copyright (c) 2021 by CPQD <www.cpqd.com.br>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -1,6 +1,6 @@
 package MARC::Moose::Reader::File;
 # ABSTRACT: A Moose::Role MARC::Moose::Record reader from a file
-$MARC::Moose::Reader::File::VERSION = '1.0.42';
+$MARC::Moose::Reader::File::VERSION = '1.0.43';
 use Moose::Role;
 
 with 'MARC::Moose::Reader',
@@ -21,7 +21,7 @@ MARC::Moose::Reader::File - A Moose::Role MARC::Moose::Record reader from a file
 
 =head1 VERSION
 
-version 1.0.42
+version 1.0.43
 
 =head1 SEE ALSO
 
@@ -43,7 +43,7 @@ Frédéric Demians <f.demians@tamil.fr>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by Frédéric Demians.
+This software is copyright (c) 2021 by Frédéric Demians.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -10,5 +10,6 @@ subscription_transport: 'config_test'
 rpc_transport: 'config_test'
 storage_transport: 'config_test'
 transport_cluster: 1
+transport_redis_cache: 'config_test'
 transport: 'config_test'
 service_name: 'config_test'

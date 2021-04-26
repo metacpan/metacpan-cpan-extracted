@@ -7,7 +7,7 @@
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model::Tk::LeafEditor 1.373;
+package Config::Model::Tk::LeafEditor 1.374;
 
 use strict;
 use warnings;

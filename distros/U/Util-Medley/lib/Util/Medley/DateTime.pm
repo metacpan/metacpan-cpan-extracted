@@ -1,5 +1,5 @@
 package Util::Medley::DateTime;
-$Util::Medley::DateTime::VERSION = '0.059';
+$Util::Medley::DateTime::VERSION = '0.060';
 use Modern::Perl;
 use Moose;
 use namespace::autoclean;
@@ -11,6 +11,7 @@ use Time::ParseDate;
 use Time::HiRes;
 use DateTime::Format::ISO8601;
 use DateTime::Format::ISO8601::Format;
+use POSIX 'strftime';
 
 use constant SECS_PER_MIN => 60;
 use constant SECS_PER_HOUR => SECS_PER_MIN() * 60;
@@ -22,7 +23,7 @@ Util::Medley::DateTime - Class with various datetime methods.
 
 =head1 VERSION
 
-version 0.059
+version 0.060
 
 =cut
 
@@ -57,6 +58,19 @@ used formats.
 =head1 ATTRIBUTES
 
 none
+
+=cut
+
+has _localTZ => (
+    is      => 'rw',
+    isa     => 'Str',
+    lazy    => 1,
+    builder => '_buildLocalTZ',
+);
+   
+method _buildLocalTZ {   
+    return strftime( "%Z", CORE::localtime());
+}
 
 =head1 METHODS
 
@@ -143,9 +157,9 @@ Returns the local-date-time in the format: YYYY-MM-DD HH:MM:SS.
 
 =item usage:
 
- $dt->localDateTime([time]);
+ $dt->localDateTime([time], [withTZ]);
 
- $dt->localDateTime([epoch => time]);
+ $dt->localDateTime([epoch => time], [withTZ => (0|1)]);
  
 =item args:
 
@@ -157,16 +171,16 @@ Epoch time used to generate date/time string.  Default is now.
 
 =back
 
+=item withTZ [Bool]
+
+Flag indicating to append the local timezone.
+
 =back
    
 =cut
 
-multi method localDateTime (Int :$epoch = time) {
-	
-	return $self->localDateTime($epoch);	
-}
-
-multi method localDateTime (Int $epoch = time) {
+multi method localDateTime (Int  :$epoch = time,
+                            Bool :$withTZ) {
 
     my $l = localtime($epoch);
 
@@ -177,7 +191,21 @@ multi method localDateTime (Int $epoch = time) {
         $l->mday, $l->hour, $l->min, $l->sec
     );
 
+    if ($withTZ) {
+        $str.= sprintf ' %s', $self->_localTZ;
+    }
+    
     return $str;
+}
+
+multi method localDateTime (Int  $epoch = time,
+                            Bool $withTZ?) {
+
+    my %a;
+    $a{epoch} = $epoch if $epoch;
+    $a{withTZ} = 1 if $withTZ;
+   
+    return $self->localDateTime(%a);
 }
 
 

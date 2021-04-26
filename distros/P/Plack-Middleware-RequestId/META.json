@@ -4,28 +4,26 @@
       "Dai Okabayashi <bayashi@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4218",
+   "generated_by" : "Module::Build version 0.4231",
    "license" : [
-      "perl_5"
+      "artistic_2"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Plack-Middleware-RequestId",
    "prereqs" : {
       "build" : {
          "requires" : {
-            "HTTP::Request::Common" : "0",
-            "LWP::UserAgent" : "0",
-            "Plack::Builder" : "0",
-            "Plack::Test" : "0",
-            "Test::More" : "0.88"
+            "Module::Build::Pluggable::CPANfile" : "0.05"
          }
       },
       "configure" : {
          "requires" : {
-            "Module::Build" : "0.38"
+            "Module::Build" : "0.40",
+            "Module::Build::Pluggable" : "0",
+            "Module::Build::Pluggable::CPANfile" : "0.05"
          }
       },
       "runtime" : {
@@ -34,16 +32,24 @@
             "Plack::Middleware" : "0",
             "Plack::Util" : "0",
             "Plack::Util::Accessor" : "0",
-            "perl" : "5.008000",
+            "perl" : "5.008005",
             "strict" : "0",
             "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "HTTP::Request::Common" : "0",
+            "LWP::UserAgent" : "0",
+            "Plack::Builder" : "0",
+            "Plack::Test" : "0"
          }
       }
    },
    "provides" : {
       "Plack::Middleware::RequestId" : {
          "file" : "lib/Plack/Middleware/RequestId.pm",
-         "version" : "0.06"
+         "version" : "0.07"
       }
    },
    "release_status" : "stable",
@@ -52,16 +58,12 @@
          "web" : "http://github.com/bayashi/Plack-Middleware-RequestId/issues"
       },
       "license" : [
-         "http://dev.perl.org/licenses/"
+         "http://www.perlfoundation.org/artistic_license_2_0"
       ],
       "repository" : {
          "url" : "http://github.com/bayashi/Plack-Middleware-RequestId"
-      },
-      "x_IRC" : {
-         "url" : "irc://chat.freenode.org/#bayadev",
-         "web" : "http://webchat.freenode.net/?channels=%23bayadev"
       }
    },
-   "version" : "0.06",
-   "x_serialization_backend" : "JSON::PP version 2.27300"
+   "version" : "0.07",
+   "x_serialization_backend" : "JSON::PP version 4.04"
 }

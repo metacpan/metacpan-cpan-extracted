@@ -10,7 +10,7 @@ use Test::More tests => 2;
 BEGIN { use_ok('Net::Z3950::FOLIO') };
 use Net::Z3950::FOLIO::MARCHoldings qw(insertMARCHoldings);
 
-my $cfg = new Net::Z3950::FOLIO::Config('t/data/config/marcHoldings');
+my $cfg = new Net::Z3950::FOLIO::Config('t/data/config/foo.marcHoldings');
 
 # Values taken from some random USMARC record
 my $dummyMarc = makeDummyMarc();
@@ -19,7 +19,8 @@ for (my $i = 1; $i <= 1; $i++) {
     my $expected = readFile("t/data/records/expectedMarc$i.marc");
     my $folioJson = readFile("t/data/records/input$i.json");
     my $folioHoldings = decode_json(qq[{ "holdingsRecords2": [ $folioJson ] }]);
-    insertMARCHoldings($folioHoldings, $dummyMarc, $cfg);
+    my $rec = new DummyRecord($folioHoldings, $dummyMarc);
+    insertMARCHoldings($rec, $dummyMarc, $cfg);
     my $marcString = $dummyMarc->as_formatted() . "\n";
     is($marcString, $expected, "generated holdings $i match expected MARC");
 }
@@ -52,3 +53,29 @@ sub readFile {
     $fh->close();
     return $data;
 }
+
+
+package DummyRecord;
+
+use Net::Z3950::FOLIO::HoldingsRecords qw(makeHoldingsRecords);
+
+sub new {
+    my $class = shift();
+    my($folioHoldings, $marc) = @_;
+
+    return bless {
+	folioHoldings => $folioHoldings,
+	marc => $marc,
+    }, $class;
+}
+
+sub jsonStructure { return shift()->{folioHoldings} }
+sub marcRecord { return shift()->{marc} }
+
+sub holdings {
+    my $this = shift();
+    my($marc) = @_;
+
+    return makeHoldingsRecords($this, $marc)
+};
+

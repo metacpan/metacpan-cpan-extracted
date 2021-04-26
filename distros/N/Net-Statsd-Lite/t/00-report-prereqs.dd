@@ -18,11 +18,13 @@ do { my $x = {
                                       'Test::Pod::Coverage' => '1.08',
                                       'Test::Pod::LinkCheck' => '0',
                                       'Test::Portability::Files' => '0',
-                                      'Test::TrailingSpace' => '0.0203'
+                                      'Test::TrailingSpace' => '0.0203',
+                                      'Test::Vars' => '0.015'
                                     }
                     },
        'runtime' => {
                       'recommends' => {
+                                        'Ref::Util::XS' => '0',
                                         'Type::Tiny::XS' => '0'
                                       },
                       'requires' => {
@@ -30,9 +32,12 @@ do { my $x = {
                                       'IO::Socket' => '1.18',
                                       'Moo' => '1.000000',
                                       'MooX::TypeTiny' => '0',
+                                      'Ref::Util' => '0',
                                       'Scalar::Util' => '0',
                                       'Sub::Quote' => '0',
                                       'Sub::Util' => '1.40',
+                                      'Types::Common::Numeric' => '1.004000',
+                                      'Types::Common::String' => '0',
                                       'Types::Standard' => '0',
                                       'namespace::autoclean' => '0',
                                       'perl' => 'v5.10.0',
@@ -48,6 +53,7 @@ do { my $x = {
                                    'Carp' => '0',
                                    'File::Spec' => '0',
                                    'IO::Select' => '0',
+                                   'Module::Load' => '0',
                                    'Module::Metadata' => '0',
                                    'Net::EmptyPort' => '0',
                                    'Socket' => '0',

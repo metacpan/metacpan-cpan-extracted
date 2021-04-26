@@ -29,6 +29,7 @@ my @files = (
     't/author-pod-syntax.t',
     't/author-portability.t',
     't/author-ppport.t',
+    't/author-vars.t',
     't/release-check-manifest.t',
     't/release-fixme.t',
     't/release-kwalitee.t',

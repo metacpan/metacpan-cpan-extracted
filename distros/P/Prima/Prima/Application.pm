@@ -353,6 +353,19 @@ Default value: 1
 
 =over
 
+=item Clipboard $CLIPBOARD, $ACTION, $TARGET
+
+With (the only implemented) C<$ACTION> I<copy>, is called whenever another
+application requests clipboard data in format C<$TARGET>. This notification is
+handled internally to optimize image pasting through the cliboard. Since the
+clipboard pasting semantics in Prima is such that data must be supplied to the
+clipboard in advance, before another application can request it, there is a
+problem which format to use. In order to not encode an image or other complex
+data in all possible formats but do that on demand and in the format the other
+application wants, this notification can be used.
+
+Only implemented for X11.
+
 =item CopyImage $CLIPBOARD, $IMAGE
 
 The notification stores C<$IMAGE> in clipboard.
@@ -672,7 +685,6 @@ of C<sv::XXX> constants. The constants are:
 	sv::CompositeDisplay - 1 if system uses double-buffering and alpha composition for the desktop,
 	                       0 if it doesn't, -1 if unknown
 	sv::LayeredWidgets   - 1 if system supports layering
-	sv::DWM              - 1 if system supports DWM API
 	sv::FixedPointerSize - 0 if system doesn't support arbitrary sized pointers and will resize custom icons to the system size
 	sv::MenuCheckSize    - width and height of default menu check icon
 	sv::FriBidi          - 1 if Prima is compiled with libfribidi and full bidi unicode support is available
@@ -696,8 +708,8 @@ The main event loop. Called by
 
 run Prima;
 
-standard code. Returns when the program is about to terminate, or if the
-exception was signaled. In the latter case, the loop can be safely re-started.
+standard code. Returns when the program is about to terminate, if C<stop> was called, or if the
+exception was signaled. In the latter two cases, the loop can be safely re-started.
 
 =item lock
 
@@ -723,6 +735,10 @@ Opens the help viewer window with TOPIC string in
 link POD format ( see L<perlpod> ) - the string is treated
 as "manpage/section", where 'manpage' is the file with POD
 content and 'section' is the topic inside the manpage.
+
+=item stop
+
+Breaks the event loop. The loop can be started again by C<go> thereafter.
 
 =item sync
 

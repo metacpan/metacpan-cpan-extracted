@@ -38,13 +38,15 @@ It would be great to rectify that.
 use Protocol::DBus::Client ();
 use Protocol::DBus::Client::EventMessenger ();
 
+use Scalar::Util ();
+
 #----------------------------------------------------------------------
 
 =head1 INSTANCE METHODS
 
 =head2 $promise = I<OBJ>->initialize()
 
-Returns a promise (L<Promise::ES6> instance) that resolves to a
+Returns a promise that resolves to a
 L<Protocol::DBus::Client::EventMessenger> instance. That object, not
 this one, is what you’ll use to send and receive messages.
 
@@ -53,21 +55,28 @@ this one, is what you’ll use to send and receive messages.
 sub initialize {
     my ($self) = @_;
 
+    my $paused_sr = \$self->{'_paused'};
+
+    my $dbus = $self->{'db'};
+
+    my $weak_self = $self;
+    Scalar::Util::weaken( $weak_self );
+
     return $self->{'_initialize_promise'} ||= $self->{'db'}->_get_promise_class()->new( sub {
         $self->_initialize(@_);
     } )->then( sub {
-        my $post_send_cr = $self->_set_watches_and_create_messenger();
+        my $post_send_cr = $weak_self->_set_watches_and_create_messenger();
 
         return Protocol::DBus::Client::EventMessenger->new(
-            $self->{'db'},
+            $dbus,
             $post_send_cr,
             sub {
-                $self->_pause();
-                $self->{'_paused'} = 1;
+                $weak_self->_pause();
+                $$paused_sr = 1;
             },
             sub {
-                $self->_resume();
-                $self->{'_paused'} = 0;
+                $weak_self->_resume();
+                $$paused_sr = 0;
             },
         );
     } );
@@ -167,7 +176,9 @@ sub _create_get_message_callback {
     my $on_signal_cr_r = $self->{'_on_signal_r'} ||= \do { my $v = undef };
 
     my $on_failure_cr_r = \$self->{'_on_failure'};
-    my $stop_reading_cr_r = \$self->{'_stop_reading_cr'};
+    my $_give_up_cr_r = \$self->{'_give_up_cr'};
+
+    my $paused_r = \$self->{'_paused'};
 
     return sub {
         my $ok = eval {
@@ -184,7 +195,7 @@ sub _create_get_message_callback {
                 # a self-directed signal while this loop was happening,
                 # which caused receipt of messages even after pause()
                 # had been called.
-                last if $self->{'_paused'};
+                last if $$paused_r;
             }
 
             1;
@@ -200,14 +211,14 @@ sub _create_get_message_callback {
                 warn $err;
             }
 
-            $$stop_reading_cr_r->();
+            $$_give_up_cr_r->();
         }
     };
 }
 
 sub DESTROY {
-    if (defined ${^GLOBAL_PHASE} && 'DESTROY' eq ${^GLOBAL_PHASE}) {
-        warn "$_[0] lasted until ${^GLOBAL_PHASE} phase!";
+    if (defined(${^GLOBAL_PHASE}) && 'DESTRUCT' eq ${^GLOBAL_PHASE}) {
+        warn "$_[0] lasted until global destruction!";
     }
 }
 

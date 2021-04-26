@@ -31,26 +31,24 @@ qx.Class.define("callbackery.ui.Login", {
         el.insertInto(form);
 
         this.set({
-            modal                : true,
-            showMinimize         : false,
-            showMaximize         : false,
-            showClose            : false,
-            resizable            : false,
-            allowGrowX: true,
-            allowShrinkX: true,
-            allowGrowY: true,
-            allowShrinkY: true,
-            contentPaddingLeft   : 30,
-            contentPaddingRight  : 30,
-            contentPaddingTop    : 20,
-            contentPaddingBottom : 20,
-            width                : 500,
-            centerOnContainerResize: true,
-            centerOnAppear: true
+            modal                   : true,
+            showMinimize            : false,
+            showMaximize            : false,
+            showClose               : false,
+            resizable               : false,
+            allowGrowX              : true,
+            allowShrinkX            : true,
+            allowGrowY              : true,
+            allowShrinkY            : true,
+            contentPaddingLeft      : 30,
+            contentPaddingRight     : 30,
+            contentPaddingTop       : 20,
+            contentPaddingBottom    : 20,
+            centerOnContainerResize : true,
+            centerOnAppear          : true
         });
         this.getApplicationRoot().addListener('resize',this.__setMaxWidth,this);
         this.__setMaxWidth();
-        this.addListener('resize',() => { this.center()});
         this.getChildControl('captionbar').exclude();
         this.getChildControl('pane').set({
             decorator : new qx.ui.decoration.Decorator().set({
@@ -63,9 +61,8 @@ qx.Class.define("callbackery.ui.Login", {
         var grid = new qx.ui.layout.Grid(10, 10);
         this.setLayout(grid);
         grid.setColumnAlign(1, 'right', 'middle');
-        grid.setColumnFlex(0,2);
-        //grid.setColumnWidth(0, 120);
-        //grid.setColumnWidth(2, 160);
+        let logoScale = ! cfg.logo_noscale;
+        let logoSpan  = logoScale ? 3 : 1; 
         if (cfg.logo){
             this.add(new qx.ui.basic.Image(cfg.logo).set({
                 alignX : 'left',
@@ -73,16 +70,15 @@ qx.Class.define("callbackery.ui.Login", {
                 allowShrinkX: true,
                 allowGrowY: true,
                 allowShrinkY: true,
-                scale: true
-
+                scale: logoScale
             }), {
                 row     : 0,
                 column  : 0,
-                colSpan : 3
+                colSpan : logoSpan
             });
         }
 
-        if (! cfg.hide_password) {
+        if (! cfg.hide_password && ! cfg.hide_password_icon) {
             this.add(new qx.ui.basic.Image("icon/64/status/dialog-password.png").set({
                 alignY : 'top',
                 alignX : 'right',

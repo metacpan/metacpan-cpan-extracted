@@ -1,5 +1,5 @@
 package App::JESP::Driver::mysql;
-$App::JESP::Driver::mysql::VERSION = '0.015';
+$App::JESP::Driver::mysql::VERSION = '0.016';
 use Moose;
 extends qw/App::JESP::Driver/;
 

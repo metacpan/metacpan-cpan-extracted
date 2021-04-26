@@ -3,6 +3,7 @@ use Test::More;
 use PDL::LiteF;
 use Config;
 use PDL::Types;
+use Math::Complex ();
 
 sub tapprox ($$) {
     my ( $x, $y ) = @_;
@@ -74,8 +75,6 @@ $c->hdr->{demo} = "yes";
 is($c->hdr->{demo}, "yes", "hdr before reshape");
 $c->reshape(5,5);
 is($c->hdr->{demo}, "yes", "hdr after reshape");
-
-
 
 # test topdl
 
@@ -308,6 +307,19 @@ SKIP: {
   is($small_pdl->at(0), -8888888888888888888, 'at/2');
   is(PDL::Core::at_c($small_pdl, [1]),  8888888888888888888, 'at_c/2');
   is_deeply($small_pdl->unpdl, [ -8888888888888888888, 8888888888888888888 ], 'unpdl/small_pdl');
+}
+
+{
+my $x = cdouble(2, 3);
+PDL::Core::set_c($x, [1], ci());
+is $x.'', '[2 i]', 'set_c can take piddle value';
+}
+
+{
+my $x = cdouble(2, Math::Complex::i());
+is $x.'', '[2 i]', 'type constructor can take Math::Complex value';
+$x = pdl(Math::Complex::cplx(2, 0), Math::Complex::i());
+is $x.'', '[2 i]', 'pdl defaults to cdouble if Math::Complex values';
 }
 
 {

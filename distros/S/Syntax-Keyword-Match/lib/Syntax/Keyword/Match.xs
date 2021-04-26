@@ -24,6 +24,8 @@
 #  define block_end(floor, op)  Perl_block_end(aTHX_ floor, op)
 #endif
 
+#include "dispatchop.h"
+
 static OP *newPADSVOP(I32 type, I32 flags, PADOFFSET padix)
 {
   OP *op = newOP(type, flags);
@@ -31,61 +33,67 @@ static OP *newPADSVOP(I32 type, I32 flags, PADOFFSET padix)
   return op;
 }
 
-static int build_match(pTHX_ OP **out, XSParseKeywordPiece *args, size_t nargs, void *hookdata)
+static OP *pp_dispatch_numeq(pTHX)
 {
-  /* args:
-   *   [0]: topic expression
-   *   [1]: match type
-   *   [2]: count of cases
-   *   [3,4]: first case
-   *   [4,5]: second case ...
-   *   [3+2*ncases]: true if default exists
-   *   [LAST]: default case if present
-   */
-  OP *topic = args[0].op;
-  OPCODE matchtype = args[1].i;
-  int ncases = args[2].i;
-  bool with_default = args[3 + 2*ncases].i;
-
-  I32 floor_ix = block_start(0);
-  /* The name is totally meaningless and never used, but if we don't set a
-   * name and instead use pad_alloc(SVs_PADTMP) then the peephole optimiser
-   * for aassign will crash
-   */
-  PADOFFSET padix = pad_add_name_pvs("$(Syntax::Keyword::Match/topic)", 0, NULL, NULL);
-
-  topic = op_contextualize(topic, G_SCALAR);
-
-  OP *startop = newBINOP(OP_SASSIGN, 0,
-    topic, newPADSVOP(OP_PADSV, OPf_MOD, padix));
-
-  OP *o = NULL;
-  if(with_default)
-    o = op_scope(args[3 + 2*ncases + 1].op);
-
+  dDISPATCH;
+  dTARGET;
   int idx;
-  for (idx = 1 + 2*ncases; idx > 2; idx -= 2) {
-    /* TODO: forbid the , operator in the case label */
-    OP *caseop = args[idx].op;
-    OP *block  = op_scope(args[idx+1].op);
 
+  for(idx = 0; idx < n_cases; idx++) {
+    SV *val = values[idx];
+
+    /* stolen from core's pp_hot.c / pp_eq() */
+    if((SvIOK_notUV(TARG) && SvIOK_notUV(val)) ?
+        SvIVX(TARG) == SvIVX(val) : (Perl_do_ncmp(aTHX_ TARG, val) == 0))
+      return dispatch[idx];
+  }
+
+  return cDISPATCHOP->op_other;
+}
+
+static OP *pp_dispatch_streq(pTHX)
+{
+  dDISPATCH;
+  dTARGET;
+  int idx;
+
+  for(idx = 0; idx < n_cases; idx++)
+    if(sv_eq(TARG, values[idx]))
+      return dispatch[idx];
+
+  return cDISPATCHOP->op_other;
+}
+
+#ifdef HAVE_OP_ISA
+static OP *pp_dispatch_isa(pTHX)
+{
+  dDISPATCH;
+  dTARGET;
+  int idx;
+
+  for(idx = 0; idx < n_cases; idx++)
+    if(sv_isa_sv(TARG, values[idx]))
+      return dispatch[idx];
+
+  return cDISPATCHOP->op_other;
+}
+#endif
+
+static OP *build_cases(pTHX_ OPCODE matchtype, PADOFFSET padix, size_t n_cases, XSParseKeywordPiece *args, OP *elseop)
+{
+  assert(n_cases);
+
+  if(n_cases == 1) {
+    OP *caseop = args[0].op;
+    OP *block  = op_scope(args[1].op);
     OP *testop = NULL;
 
     switch(matchtype) {
 #ifdef HAVE_OP_ISA
       case OP_ISA:
-        /* bareword class names are permitted */
-        if(caseop->op_type == OP_CONST && caseop->op_private & OPpCONST_BARE)
-          caseop->op_private &= ~(OPpCONST_BARE|OPpCONST_STRICT);
-        /* FALLTHROUGH */
 #endif
       case OP_SEQ:
       case OP_EQ:
-        caseop = op_contextualize(caseop, G_SCALAR);
-        /* TODO:
-         * if(caseop->op_type != OP_CONST) then turn sections of cases into DISPATCHOP
-         */
-
         testop = newBINOP(matchtype, 0,
           newPADSVOP(OP_PADSV, 0, padix), caseop);
         break;
@@ -105,11 +113,153 @@ static int build_match(pTHX_ OP **out, XSParseKeywordPiece *args, size_t nargs, 
 
     assert(testop);
 
-    if(o)
-      o = newCONDOP(0, testop, block, o);
+    if(elseop)
+      return newCONDOP(0, testop, block, elseop);
     else
-      o = newLOGOP(OP_AND, 0, testop, block);
+      return newLOGOP(OP_AND, 0, testop, block);
   }
+
+  int idx;
+  for(idx = 0; idx < n_cases; idx++)
+    assert(args[idx*2].op->op_type == OP_CONST);
+  assert(matchtype != OP_MATCH);
+
+  ENTER;
+
+  SV *valuessv   = newSV(n_cases * sizeof(SV *));
+  SV *dispatchsv = newSV(n_cases * sizeof(OP *));
+  SAVEFREESV(valuessv);
+  SAVEFREESV(dispatchsv);
+
+  SV **values   = (SV **)SvPVX(valuessv);
+  OP **dispatch = (OP **)SvPVX(dispatchsv);
+
+  DISPATCHOP *o = alloc_DISPATCHOP();
+  o->op_type = OP_CUSTOM;
+  o->op_private = 0;
+  o->op_next = NULL;
+#if HAVE_PERL_VERSION(5,26,0)
+  o->op_sibparent = NULL;
+#else
+  o->op_sibling = NULL;
+#endif
+  o->op_targ = padix;
+  o->op_flags = 0;
+
+  switch(matchtype) {
+#ifdef HAVE_OP_ISA
+    case OP_ISA: o->op_ppaddr = &pp_dispatch_isa; break;
+#endif
+    case OP_SEQ: o->op_ppaddr = &pp_dispatch_streq; break;
+    case OP_EQ:  o->op_ppaddr = &pp_dispatch_numeq; break;
+  }
+
+  o->op_first = NULL;
+
+  o->n_cases = n_cases;
+  o->values = values;
+  o->dispatch = dispatch;
+
+  OP *retop = newUNOP(OP_NULL, 0, (OP *)o);
+
+  for(idx = 0; idx < n_cases; idx++) {
+    OP *caseop = args[idx*2].op;
+    OP *block  = op_scope(args[idx*2+1].op);
+
+    values[idx] = SvREFCNT_inc(cSVOPx(caseop)->op_sv);
+    op_free(caseop);
+
+    dispatch[idx] = LINKLIST(block);
+    block->op_next = retop;
+
+    /* TODO: link chain of siblings */
+  }
+
+  if(elseop) {
+    o->op_other = LINKLIST(elseop);
+    elseop->op_next = retop;
+    /* TODO: sibling linkage */
+  }
+  else {
+    o->op_other = retop;
+  }
+
+  /* Steal the SV buffers */
+  SvPVX(valuessv) = NULL; SvLEN(valuessv) = 0;
+  SvPVX(dispatchsv) = NULL; SvLEN(dispatchsv) = 0;
+
+  LEAVE;
+
+  return retop;
+}
+
+static int build_match(pTHX_ OP **out, XSParseKeywordPiece *args, size_t nargs, void *hookdata)
+{
+  /* args:
+   *   [0]: topic expression
+   *   [1]: match type
+   *   [2]: count of cases
+   *   [3,4]: first case
+   *   [4,5]: second case ...
+   *   [3+2*ncases]: true if default exists
+   *   [LAST]: default case if present
+   */
+  OP *topic = args[0].op;
+  OPCODE matchtype = args[1].i;
+  int ncases = args[2].i;
+  bool with_default = args[3 + 2*ncases].i;
+
+  bool use_dispatch = hv_fetchs(GvHV(PL_hintgv), "Syntax::Keyword::Match/experimental(dispatch)", 0);
+
+  I32 floor_ix = block_start(0);
+  /* The name is totally meaningless and never used, but if we don't set a
+   * name and instead use pad_alloc(SVs_PADTMP) then the peephole optimiser
+   * for aassign will crash
+   */
+  PADOFFSET padix = pad_add_name_pvs("$(Syntax::Keyword::Match/topic)", 0, NULL, NULL);
+
+  topic = op_contextualize(topic, G_SCALAR);
+
+  OP *startop = newBINOP(OP_SASSIGN, 0,
+    topic, newPADSVOP(OP_PADSV, OPf_MOD, padix));
+
+  OP *o = NULL;
+  if(with_default)
+    o = op_scope(args[3 + 2*ncases + 1].op);
+
+  int n_consts = 0;
+  int idx;
+  for (idx = 1 + 2*ncases; idx > 2; idx -= 2) {
+    /* TODO: forbid the , operator in the case label */
+    OP *caseop = args[idx].op;
+
+    switch(matchtype) {
+#ifdef HAVE_OP_ISA
+      case OP_ISA:
+        /* bareword class names are permitted */
+        if(caseop->op_type == OP_CONST && caseop->op_private & OPpCONST_BARE)
+          caseop->op_private &= ~(OPpCONST_BARE|OPpCONST_STRICT);
+        /* FALLTHROUGH */
+#endif
+      case OP_SEQ:
+      case OP_EQ:
+        args[idx].op = op_contextualize(caseop, G_SCALAR);
+        if(use_dispatch && caseop->op_type == OP_CONST) {
+          n_consts++;
+          continue;
+        }
+        if(n_consts) {
+          o = build_cases(aTHX_ matchtype, padix, n_consts, args + idx + 2, o);
+          n_consts = 0;
+        }
+        break;
+    }
+
+    o = build_cases(aTHX_ matchtype, padix, 1, args + idx, o);
+  }
+
+  if(n_consts)
+    o = build_cases(aTHX_ matchtype, padix, n_consts, args + idx + 2, o);
 
   *out = block_end(floor_ix, newLISTOP(OP_LINESEQ, 0, startop, o));
 

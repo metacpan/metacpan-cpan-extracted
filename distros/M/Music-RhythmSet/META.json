@@ -32,7 +32,7 @@
       "test" : {
          "requires" : {
             "MIDI" : "0",
-            "Test::Most" : "0",
+            "Test2::V0" : "0.000060",
             "perl" : "v5.24.0"
          }
       }
@@ -40,15 +40,15 @@
    "provides" : {
       "Music::RhythmSet" : {
          "file" : "lib/Music/RhythmSet.pm",
-         "version" : "0.02"
+         "version" : "0.03"
       },
       "Music::RhythmSet::Util" : {
          "file" : "lib/Music/RhythmSet/Util.pm",
-         "version" : "0.02"
+         "version" : "0.03"
       },
       "Music::RhythmSet::Voice" : {
          "file" : "lib/Music/RhythmSet/Voice.pm",
-         "version" : "0.02"
+         "version" : "0.03"
       }
    },
    "release_status" : "stable",
@@ -57,6 +57,6 @@
          "http://opensource.org/licenses/BSD-3-Clause"
       ]
    },
-   "version" : "0.02",
-   "x_serialization_backend" : "JSON::PP version 4.02"
+   "version" : "0.03",
+   "x_serialization_backend" : "JSON::PP version 4.06"
 }

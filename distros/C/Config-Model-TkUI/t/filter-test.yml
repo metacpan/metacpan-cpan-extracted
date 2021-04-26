@@ -1,0 +1,182 @@
+---
+tests:
+  - label: no filter at all
+    load: &basic
+      hcl1:
+        hash_a:
+          foo: bar
+    output:
+      '': show
+      hcl1: ''
+      hcl1 check_list: ''
+      hcl1 hash_a: ''
+      hcl1 hash_a:foo: ''
+      hcl2: ''
+      hcl2 check_list: ''
+      hcl2 hash_a: ''
+      hcld1: ''
+      hcld1 check_list: ''
+      hcld1 hash_a: ''
+      hcld1 hash_b: ''
+  - label: hide empty filter
+    load: *basic
+    input:
+      hide_empty_values: 1
+    output:
+      '': show
+      hcl1: ''
+      hcl1 check_list: hide
+      hcl1 hash_a: ''
+      hcl1 hash_a:foo: ''
+      hcl2: 'hide'
+      hcl2 check_list: hide
+      hcl2 hash_a: 'hide'
+      hcld1: ''
+      # contains default -> not hidden
+      hcld1 check_list: ''
+      hcld1 hash_a: hide
+      hcld1 hash_b: hide
+  - label: show custom values
+    load: *basic
+    input:
+      show_only_custom: 1
+    output:
+      '': show
+      hcl1: ''
+      hcl1 check_list: hide
+      hcl1 hash_a: ''
+      hcl1 hash_a:foo: ''
+      hcl2: 'hide'
+      hcl2 check_list: hide
+      hcl2 hash_a: 'hide'
+      hcld1: hide
+      # contains default but no custom values -> hidden
+      hcld1 check_list: hide
+      hcld1 hash_a: hide
+      hcld1 hash_b: 'hide'
+  - label: checklist and no filter at all
+    load: 
+      hcl1:
+        hash_a:
+          foo: bar
+        check_list: [ A, D ]
+      hcl2:
+        check_list: [ B, C ]
+    output:
+      '': show
+      hcl1: ''
+      hcl1 check_list: ''
+      hcl1 hash_a: ''
+      hcl1 hash_a:foo: ''
+      hcl2: ''
+      hcl2 check_list: ''
+      hcl2 hash_a: ''
+      hcld1: ''
+      hcld1 check_list: ''
+      hcld1 hash_a: ''
+      hcld1 hash_b: ''
+  - label: filter hcl1
+    load: *basic
+    input:
+      elt_filter_value: hcl1
+    output:
+      '': show
+      hcl1: 'show'
+      hcl1 check_list: ''
+      hcl1 hash_a: ''
+      hcl1 hash_a:foo: ''
+      hcl2: hide
+      hcl2 check_list: hide
+      hcl2 hash_a: hide
+      hcld1: hide
+      hcld1 check_list: hide
+      hcld1 hash_a: hide
+      hcld1 hash_b: hide
+  - label: filter hash_a
+    load: *basic
+    input:
+      elt_filter_value: hash_a
+    output:
+      '': show
+      hcl1: 'show'
+      hcl1 check_list: hide
+      hcl1 hash_a: 'show'
+      hcl1 hash_a:foo: ''
+      hcl2: 'show'
+      hcl2 check_list: hide
+      hcl2 hash_a: 'show'
+      hcld1: 'show'
+      hcld1 check_list: hide
+      hcld1 hash_a: 'show'
+      hcld1 hash_b: hide
+  - label: filter hash_b
+    load: *basic
+    input:
+      elt_filter_value: hash_b
+    output:
+      '': show
+      hcl1: hide
+      hcl1 check_list: hide
+      hcl1 hash_a: hide
+      hcl1 hash_a:foo: ''
+      hcl2: hide
+      hcl2 check_list: hide
+      hcl2 hash_a: hide
+      hcld1: 'show'
+      hcld1 check_list: hide
+      hcld1 hash_a: hide
+      hcld1 hash_b: 'show'
+  - label: filter hash_a and non-empty values
+    load: *basic
+    input:
+      elt_filter_value: hash_a
+      hide_empty_values: 1
+    output:
+      '': show
+      hcl1: 'show'
+      hcl1 check_list: 'hide'
+      hcl1 hash_a: 'show'
+      hcl1 hash_a:foo: ''
+      hcl2: 'hide'
+      hcl2 check_list: 'hide'
+      hcl2 hash_a: 'hide'
+      hcld1: 'hide'
+      hcld1 check_list: hide
+      hcld1 hash_a: 'hide'
+      hcld1 hash_b: 'hide'
+  - label: filter hash_b and non-empty values
+    load: *basic
+    input:
+      elt_filter_value: hash_b
+      hide_empty_values: 1
+    output:
+      '': show
+      hcl1: hide
+      hcl1 check_list: hide
+      hcl1 hash_a: hide
+      hcl1 hash_a:foo: ''
+      hcl2: hide
+      hcl2 check_list: hide
+      hcl2 hash_a: hide
+      hcld1: hide
+      hcld1 check_list: hide
+      hcld1 hash_a: hide
+      hcld1 hash_b: hide
+  - label: filter hcl1 and non-empty values
+    load: *basic
+    input:
+      elt_filter_value: hcl1
+      hide_empty_values: 1
+    output:
+      '': show
+      hcl1: 'show'
+      hcl1 check_list: hide
+      hcl1 hash_a: ''
+      hcl1 hash_a:foo: ''
+      hcl2: hide
+      hcl2 check_list: hide
+      hcl2 hash_a: hide
+      hcld1: hide
+      hcld1 check_list: hide
+      hcld1 hash_a: hide
+      hcld1 hash_b: hide

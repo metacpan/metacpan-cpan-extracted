@@ -2,11 +2,11 @@ package Alien::libnewrelic;
 
 use strict;
 use warnings;
-use 5.020;
+use 5.014;
 use base qw( Alien::Base );
 
 # ABSTRACT: Alien to download and install libnewrelic
-our $VERSION = '0.06'; # VERSION
+our $VERSION = '0.07'; # VERSION
 
 
 
@@ -27,7 +27,7 @@ Alien::libnewrelic - Alien to download and install libnewrelic
 
 =head1 VERSION
 
-version 0.06
+version 0.07
 
 =head1 SYNOPSIS
 

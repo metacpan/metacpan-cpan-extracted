@@ -18,7 +18,7 @@ use Plack::Util::Accessor qw( rules handler status );
 
 # RECOMMEND PREREQ: Ref::Util::XS
 
-our $VERSION = 'v0.4.3';
+our $VERSION = 'v0.4.4';
 
 
 sub prepare_app {
@@ -80,7 +80,7 @@ Plack::Middleware::Security::Simple - A simple security filter for Plack
 
 =head1 VERSION
 
-version v0.4.3
+version v0.4.4
 
 =head1 SYNOPSIS
 

@@ -150,7 +150,7 @@ sub xone_nonwhitespace {
 my $HOME = xhome;
 our $maybe_historypath        = "$HOME/.fp-repl_history";
 our $maybe_settingspath       = "$HOME/.fp-repl_settings";
-our $maxHistLen               = 100;
+our $maxHistLen               = 500;
 our $doCatchINT               = 1;
 our $doRepeatWhenEmpty        = 1;
 our $doKeepResultsInVARX      = 1;
@@ -1098,6 +1098,7 @@ sub run {
                                     $history_z++;
                                     redo TRY;
                                 }
+                                mkdir $$self[Maybe_historypath], 0700;
                                 my $f = xtmpfile $path;
                                 $f->xprint($input);
                                 $f->xclose;

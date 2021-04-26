@@ -23,29 +23,40 @@ our @EXPORT = qw(
   are_po_files_empty
 );
 
+sub _get_path_items {
+    my ($project_workdir, $path) = @_;
+
+    my ($project_workdir_volume, $project_workdir_dirs, $project_workdir_name) = splitpath($project_workdir);
+    my ($volume, $dirs, $name) = splitpath($path);
+
+    my @project_workdir_dirs = grep {$_ ne ""} splitdir($project_workdir_dirs);
+    push @project_workdir_dirs, $project_workdir_name if $project_workdir_name ne "";
+
+    my @result = grep {$_ ne ""} splitdir($dirs);
+    foreach (@project_workdir_dirs) {
+        shift @result if $_ eq $result[0];
+    }
+    push @result, $name;
+
+    return @result;
+}
 
 sub get_language_from_ts_filepath {
     my ($project_workdir, $path) = @_;
 
-    my $regexp = $project_workdir . '(' . PATH_SEPARATOR . ')*';
-    $path =~ s/$regexp//;
+    my @path_items = _get_path_items($project_workdir, $path);
 
-    my ($volume, $dirs, $name) = splitpath($path);
-    my @dirs = splitdir($dirs);
-
-    return shift @dirs;
+    return shift @path_items;
 }
 
 
 sub get_ts_file_key {
     my ($project_workdir, $path) = @_;
 
-    my $regexp = $project_workdir . '(' . PATH_SEPARATOR . ')*';
-    $path =~ s/$regexp//;
-    my ($volume, $dirs, $name) = splitpath($path);
-    my @dirs = grep {$_ ne ""} splitdir($dirs);
-    my $language = shift @dirs;
-    my $filepath = @dirs > 0 ? join(PATH_SEPARATOR, @dirs) . PATH_SEPARATOR . $name : $name;
+    my @path_items = _get_path_items($project_workdir, $path);
+
+    my $language = shift @path_items;
+    my $filepath = join(PATH_SEPARATOR, @path_items);
 
     return "$filepath ($language)";
 }
@@ -63,9 +74,7 @@ sub get_document_key {
 sub prepare_document_name {
     my ( $project_workdir, $path, $filetype, $target_language ) = @_;
 
-    my $regexp = $project_workdir . '(' . PATH_SEPARATOR . ')*';
-    $path =~ s/$regexp//;
-
+    $path = join(PATH_SEPARATOR, _get_path_items($project_workdir, $path));
     my ( $filename, $dirs, $ext ) = fileparse( $path, $filetype );
     my @path_items = grep { $_ ne '' } splitdir($dirs);
     shift @path_items;

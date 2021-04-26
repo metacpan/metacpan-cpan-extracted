@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2021 -- leonerd@leonerd.org.uk
 
-package Syntax::Keyword::Match 0.02;
+package Syntax::Keyword::Match 0.03;
 
 use v5.14;
 use warnings;
@@ -44,7 +44,19 @@ This is an initial, experimental implementation. Furthermore, it is built as
 a non-trivial example use-case on top of L<XS::Parse::Keyword>, which is also
 experimental. No API or compatbility guarantees are made at this time.
 
+=head1 Experimental Features
+
+Some of the features of this module are currently marked as experimental (even
+within the context that the module itself is experimental). They will provoke
+warnings in the C<experimental> category, unless silenced.
+
+   use Syntax::Keyword::Match qw( try :experimental(dispatch) );
+
+   use Syntax::Keyword::Match qw( try :experimental );  # all of the above
+
 =cut
+
+my @EXPERIMENTAL = qw( dispatch );
 
 sub import
 {
@@ -53,11 +65,19 @@ sub import
 
    @syms or @syms = ( "match" );
 
-   foreach ( @syms ) {
-      $_ eq "match" or croak "Unrecognised import symbol '$_'";
+   my %syms = map { $_ => 1 } @syms;
 
-      $^H{"Syntax::Keyword::Match/$_"}++;
+   $^H{"Syntax::Keyword::Match/match"}++ if delete $syms{match};
+
+   foreach ( @EXPERIMENTAL ) {
+      $^H{"Syntax::Keyword::Match/experimental($_)"}++ if delete $syms{":experimental($_)"};
    }
+
+   if( delete $syms{":experimental"} ) {
+      $^H{"Syntax::Keyword::Match/experimental($_)"}++ for @EXPERIMENTAL;
+   }
+
+   croak "Unrecognised import symbols @{[ keys %syms ]}" if keys %syms;
 }
 
 =head1 KEYWORDS
@@ -141,6 +161,12 @@ just once at program startup; for example:
       case($condition) { ... }
       ...
    }
+
+The C<:experimental(dispatch)> feature selects a more efficient handling of
+sequences of multiple C<case> blocks with constant expressions. This handling
+is implemented with a custom operator that will entirely confuse modules like
+C<B::Deparse> or optree inspectors like coverage tools so is not selected by
+default, but can be enabled for extra performance in critical sections.
 
 =head2 default
 

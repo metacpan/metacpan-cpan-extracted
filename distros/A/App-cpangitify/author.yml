@@ -11,6 +11,8 @@ pod_spelling_system:
     - cpangitify
     - poney
     - metacpan
+    - Anwar
+    - MANWAR
 
 pod_coverage:
   # format is "Class#method" or "Class", regex allowed

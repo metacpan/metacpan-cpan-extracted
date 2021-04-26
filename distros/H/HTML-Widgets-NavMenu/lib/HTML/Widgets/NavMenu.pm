@@ -1,16 +1,16 @@
 package HTML::Widgets::NavMenu;
-$HTML::Widgets::NavMenu::VERSION = '1.0801';
+$HTML::Widgets::NavMenu::VERSION = '1.0900';
 use strict;
 use warnings;
 
 use 5.012;
 
 package HTML::Widgets::NavMenu::Error;
-$HTML::Widgets::NavMenu::Error::VERSION = '1.0801';
+$HTML::Widgets::NavMenu::Error::VERSION = '1.0900';
 use parent "HTML::Widgets::NavMenu::Object";
 
 package HTML::Widgets::NavMenu::Error::Redirect;
-$HTML::Widgets::NavMenu::Error::Redirect::VERSION = '1.0801';
+$HTML::Widgets::NavMenu::Error::Redirect::VERSION = '1.0900';
 use strict;
 use vars qw(@ISA);
 @ISA = ("HTML::Widgets::NavMenu::Error");
@@ -26,7 +26,7 @@ sub CGIpm_perform_redirect
 }
 
 package HTML::Widgets::NavMenu::NodeDescription;
-$HTML::Widgets::NavMenu::NodeDescription::VERSION = '1.0801';
+$HTML::Widgets::NavMenu::NodeDescription::VERSION = '1.0900';
 use strict;
 
 use parent qw(HTML::Widgets::NavMenu::Object);
@@ -48,13 +48,13 @@ sub _init
 1;
 
 package HTML::Widgets::NavMenu::LeadingPath::Component;
-$HTML::Widgets::NavMenu::LeadingPath::Component::VERSION = '1.0801';
+$HTML::Widgets::NavMenu::LeadingPath::Component::VERSION = '1.0900';
 use vars qw(@ISA);
 
 @ISA = (qw(HTML::Widgets::NavMenu::NodeDescription));
 
 package HTML::Widgets::NavMenu::Iterator::GetCurrentlyActive;
-$HTML::Widgets::NavMenu::Iterator::GetCurrentlyActive::VERSION = '1.0801';
+$HTML::Widgets::NavMenu::Iterator::GetCurrentlyActive::VERSION = '1.0900';
 use parent 'HTML::Widgets::NavMenu::Iterator::Base';
 
 __PACKAGE__->mk_acc_ref(
@@ -65,7 +65,7 @@ __PACKAGE__->mk_acc_ref(
             _ret_coords
             _temp_coords
             _tree
-            )
+        )
     ]
 );
 
@@ -177,6 +177,7 @@ __PACKAGE__->mk_acc_ref(
     [
         qw(
             _current_coords
+            coords_stop
             current_host
             _hosts
             _no_leading_dot
@@ -185,7 +186,7 @@ __PACKAGE__->mk_acc_ref(
             _traversed_tree
             _tree_contents
             _ul_classes
-            )
+        )
     ]
 );
 
@@ -207,6 +208,8 @@ sub _init
 
     $self->_no_leading_dot(
         exists( $args{'no_leading_dot'} ) ? $args{'no_leading_dot'} : 0 );
+
+    $self->coords_stop( $args{coords_stop} || 0 );
 
     return 0;
 }
@@ -530,7 +533,13 @@ sub _get_up_coords
     {
         if ( ( @coords == 1 ) && ( $coords[0] > 0 ) )
         {
-            return [0];
+            my $coords_stop = $self->coords_stop();
+            my $ret         = [0];
+            if ($coords_stop)
+            {
+                $ret = [];
+            }
+            return $ret;
         }
         pop(@coords);
         return \@coords;
@@ -683,9 +692,18 @@ sub _get_leading_path_of_coords
     my $self   = shift;
     my $coords = shift;
 
-    if ( !@$coords )
+    my $coords_stop = $self->coords_stop();
+
+    if ( !$coords_stop )
     {
-        $coords = [0];
+        if ( !@$coords )
+        {
+            $coords = [0];
+        }
+    }
+    if (0)    # ( $coords->[0] == 0 )
+    {
+        $coords = [ @$coords[ 1 .. $#$coords ] ];
     }
 
     my @leading_path;
@@ -722,7 +740,11 @@ COORDS_LOOP:
             }
             );
 
-        if ( ( scalar(@$coords) == 1 ) && ( $coords->[0] == 0 ) )
+        if (
+            $coords_stop
+            ? ( scalar(@$coords) == 0 )
+            : ( ( scalar(@$coords) == 1 ) && ( $coords->[0] == 0 ) )
+            )
         {
             last COORDS_LOOP;
         }
@@ -732,7 +754,15 @@ COORDS_LOOP:
         $coords = $self->_get_up_coords($coords);
     }
 
-    return [ reverse(@leading_path) ];
+    my $p = [ reverse(@leading_path) ];
+    if ($coords_stop)
+    {
+        while ( ( @$p > 1 and $p->[0]->host_url eq $p->[1]->host_url ) )
+        {
+            shift @$p;
+        }
+    }
+    return $p;
 }
 
 sub _get_leading_path
@@ -816,7 +846,7 @@ HTML::Widgets::NavMenu - A Perl Module for Generating HTML Navigation Menus
 
 =head1 VERSION
 
-version 1.0801
+version 1.0900
 
 =head1 SYNOPSIS
 
@@ -963,6 +993,11 @@ When this parameter is set to 1, the object will try to generate URLs that
 do not start with "./" when possible. That way, the generated markup will
 be a little more compact. This option is not enabled by default for
 backwards compatibility, but is highly recommended.
+
+=item coords_stop
+
+Experimental ( Boolean ; defaults to false ). B<TBD:> for use by
+L<https://www.shlomifish.org/meta/site-source/> .
 
 =back
 

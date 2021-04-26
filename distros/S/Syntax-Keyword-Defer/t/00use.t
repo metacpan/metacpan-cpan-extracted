@@ -5,6 +5,6 @@ use warnings;
 
 use Test::More;
 
-use_ok( "Syntax::Keyword::Finally" );
+use_ok( "Syntax::Keyword::Defer" );
 
 done_testing;

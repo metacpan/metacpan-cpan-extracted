@@ -3,6 +3,8 @@
 use strict;
 use warnings;
 
+BEGIN { unshift @INC, '.' }
+
 use inc::Module::Install 0.91;
 use Module::Install::AuthorRequires;
 use Module::Install::AuthorTests;
@@ -17,14 +19,21 @@ sub search_lib {
     }
     my $libbase = 'lib' . substr($lib, 2) . $Config{lib_ext};
     my $libbase_so = 'lib' . substr($lib, 2) . "." . $Config{so};
-    for my $path (split(' ', $Config{libpth})) {
+    my $libbase_cyg = 'lib' . substr($lib, 2) . ".dll" . $Config{lib_ext};
+    my @paths = split(' ', $Config{libpth});
+    push @paths, $ENV{PERL_LIBPATH} if exists $ENV{PERL_LIBPATH};
+    for my $path (@paths) {
         if (-f $path . '/' . $libbase) {
             print "$path/$libbase\n";
             print "Found '$path/$libbase'.\n";
             return $lib;
         } elsif (-f $path . '/' . $libbase_so) {
             print "$path/$libbase_so\n";
-            print "Found `$_/$libbase_so'.\n";
+            print "Found `$path/$libbase_so'.\n";
+            return $lib;
+        } elsif (-f $path . '/' . $libbase_cyg) {
+            print "$path/$libbase_cyg\n";
+            print "Found `$path/$libbase_cyg'.\n";
             return $lib;
         }
     }
@@ -54,20 +63,35 @@ if (-d "/usr/include/openssl") {
 }
 
 cc_lib_links('crypto');
-cc_optimize_flags('-O3 -Wall -Werror');
 
-requires 'Crypt::OpenSSL::X509';
+my $ccflags = '';
+if ($Config::Config{ccname} =~ /gcc/i) {
+  $ccflags =  $ENV{AUTHOR_TESTING} ? '-Wall -Werror': '-Wall';
+} else {
+  $ccflags =  '';
+}
+
+if (($Config::Config{myuname} =~ /sunos|solaris/i) && ($Config::Config{PATCHLEVEL} =~ /5.20/)) {
+    cc_optimize_flags("-O3 -DOPENSSL_API_COMPAT=0x10100000L");
+} else {
+    cc_optimize_flags("-O3 $ccflags -DOPENSSL_API_COMPAT=0x10100000L");
+}
+
+requires 'Crypt::OpenSSL::X509' => '1.807';
 
 author_requires 'Test::NoTabs';
 author_requires 'Test::Pod' => '1.14';
 author_requires 'Test::Pod::Coverage' => '1.04';
 
 test_requires 'Test::More' => '0.88';
+test_requires 'File::Slurp';
+test_requires 'Test::Exception';
 
 resources
      license     => "http://dev.perl.org/licenses",
      bugtracker  => "http://rt.cpan.org/NoAuth/Bugs.html?Dist=Crypt-OpenSSL-VerifyX509",
-     repository  => "http://github.com/chrisa/perl-Crypt-OpenSSL-VerifyX509";
+     repository  => "http://github.com/timlegge/perl-Crypt-OpenSSL-VerifyX509";
+
 
 author_tests 't/author';
 

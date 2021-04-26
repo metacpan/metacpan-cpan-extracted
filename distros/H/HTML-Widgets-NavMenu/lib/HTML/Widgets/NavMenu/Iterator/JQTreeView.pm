@@ -1,5 +1,5 @@
 package HTML::Widgets::NavMenu::Iterator::JQTreeView;
-$HTML::Widgets::NavMenu::Iterator::JQTreeView::VERSION = '1.0801';
+$HTML::Widgets::NavMenu::Iterator::JQTreeView::VERSION = '1.0900';
 use strict;
 use warnings;
 
@@ -88,7 +88,7 @@ TreeView's navigation menus.
 
 =head1 VERSION
 
-version 1.0801
+version 1.0900
 
 =head1 SYNOPSIS
 

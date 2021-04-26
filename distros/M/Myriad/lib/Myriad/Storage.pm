@@ -3,7 +3,7 @@ package Myriad::Storage;
 use strict;
 use warnings;
 
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 our $AUTHORITY = 'cpan:DERIV'; # AUTHORITY
 
 no indirect qw(fatal);
@@ -68,9 +68,9 @@ sub new {
         $STORAGE = Myriad::Storage::Implementation::Redis->new(
             redis   => $myriad->redis,
         );
-    } elsif ($transport eq 'perl') {
-        require Myriad::Storage::Implementation::Perl;
-        $STORAGE = Myriad::Storage::Implementation::Perl->new();
+    } elsif ($transport eq 'memory' or $transport eq 'perl') {
+        require Myriad::Storage::Implementation::Memory;
+        $STORAGE = Myriad::Storage::Implementation::Memory->new();
     } else {
         Myriad::Exception::Storage::UnKnownTransport->throw();
     }

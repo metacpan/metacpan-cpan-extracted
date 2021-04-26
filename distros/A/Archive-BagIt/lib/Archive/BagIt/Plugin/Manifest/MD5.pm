@@ -2,7 +2,6 @@
 package Archive::BagIt::Plugin::Manifest::MD5;
 use strict;
 use warnings;
-use Digest::MD5;
 use Moo;
 with 'Archive::BagIt::Role::Manifest';
 
@@ -40,7 +39,6 @@ sub verify {
     return;
 }
 
-
 1;
 
 __END__
@@ -55,7 +53,7 @@ Archive::BagIt::Plugin::Manifest::MD5 - The role to load md5 plugin (default for
 
 =head1 VERSION
 
-version 0.072
+version 0.073
 
 =head1 AVAILABILITY
 

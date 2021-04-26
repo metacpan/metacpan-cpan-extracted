@@ -1,4 +1,4 @@
-/* this file was auto-generated at 2021-02-12 08:48:25 */
+/* this file was auto-generated at 2021-04-21 18:25:29 */
 
 #include <stdio.h> /* NULL */
 #include "include/eav/auto_tld.h"
@@ -226,7 +226,7 @@ const tld_t tld_list[] = {
     { "cartier", 8, TLD_TYPE_NOT_ASSIGNED },
     { "casa", 5, TLD_TYPE_GENERIC },
     { "case", 5, TLD_TYPE_GENERIC },
-    { "caseih", 7, TLD_TYPE_GENERIC },
+    { "caseih", 7, TLD_TYPE_NOT_ASSIGNED },
     { "cash", 5, TLD_TYPE_GENERIC },
     { "casino", 7, TLD_TYPE_GENERIC },
     { "cat", 4, TLD_TYPE_SPONSORED },
@@ -487,7 +487,7 @@ const tld_t tld_list[] = {
     { "frontier", 9, TLD_TYPE_GENERIC },
     { "ftr", 4, TLD_TYPE_GENERIC },
     { "fujitsu", 8, TLD_TYPE_GENERIC },
-    { "fujixerox", 10, TLD_TYPE_GENERIC },
+    { "fujixerox", 10, TLD_TYPE_NOT_ASSIGNED },
     { "fun", 4, TLD_TYPE_GENERIC },
     { "fund", 5, TLD_TYPE_GENERIC },
     { "furniture", 10, TLD_TYPE_GENERIC },
@@ -885,7 +885,7 @@ const tld_t tld_list[] = {
     { "nadex", 6, TLD_TYPE_NOT_ASSIGNED },
     { "nagoya", 7, TLD_TYPE_GENERIC },
     { "name", 5, TLD_TYPE_GENERIC_RESTRICTED },
-    { "nationwide", 11, TLD_TYPE_GENERIC },
+    { "nationwide", 11, TLD_TYPE_NOT_ASSIGNED },
     { "natura", 7, TLD_TYPE_GENERIC },
     { "navy", 5, TLD_TYPE_GENERIC },
     { "nba", 4, TLD_TYPE_GENERIC },
@@ -898,7 +898,7 @@ const tld_t tld_list[] = {
     { "network", 8, TLD_TYPE_GENERIC },
     { "neustar", 8, TLD_TYPE_GENERIC },
     { "new", 4, TLD_TYPE_GENERIC },
-    { "newholland", 11, TLD_TYPE_GENERIC },
+    { "newholland", 11, TLD_TYPE_NOT_ASSIGNED },
     { "news", 5, TLD_TYPE_GENERIC },
     { "next", 5, TLD_TYPE_GENERIC },
     { "nextdirect", 11, TLD_TYPE_GENERIC },
@@ -946,7 +946,7 @@ const tld_t tld_list[] = {
     { "ong", 4, TLD_TYPE_GENERIC },
     { "onl", 4, TLD_TYPE_GENERIC },
     { "online", 7, TLD_TYPE_GENERIC },
-    { "onyourside", 11, TLD_TYPE_GENERIC },
+    { "onyourside", 11, TLD_TYPE_NOT_ASSIGNED },
     { "ooo", 4, TLD_TYPE_GENERIC },
     { "open", 5, TLD_TYPE_GENERIC },
     { "oracle", 7, TLD_TYPE_GENERIC },

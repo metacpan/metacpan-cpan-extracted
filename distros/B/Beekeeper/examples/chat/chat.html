@@ -1,0 +1,99 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+<script language="Javascript" type="text/javascript" src="js/stomp.js"></script>
+<script language="Javascript" type="text/javascript" src="js/beekeeper.js"></script>
+<script language="Javascript" type="text/javascript" src="js/chat.js"></script>
+<script language="Javascript" type="text/javascript" src="config.js"></script>
+<script language="Javascript" type="text/javascript">
+
+var chat = new Chat;
+chat.connect();
+
+</script>
+<style type="text/css">
+
+body {
+    padding: 10px; 
+    font-size: 11pt; 
+    font-family: sans-serif;
+}
+
+#chat {
+    overflow: auto;
+    height: 300px; 
+    width: 480px;
+    font-family: sans-serif;
+    border: solid 2px #6699CC;
+    border-radius: 4px;
+}
+
+#chat div {
+    border: solid 1px #CCCCCC;
+    border-radius: 6px;
+    padding: 6px;
+    margin: 3px;
+}
+
+#chat .error {
+    background-color: #FFA0A0;
+}
+
+#chat .info {
+    background-color: #FFFFA0;
+}
+
+#chat .ucast {
+    background-color: #A0FFA0;
+}
+
+#cmd {
+    font-size: 12pt; font-family: sans-serif;
+    width: 380px;
+    color: #000000;
+    padding: 6px; 
+    border: solid 2px #6699CC;
+    border-radius: 4px;
+}
+ 
+.send {
+    font-size: 12pt; font-family: sans-serif;
+    width: 80px;
+    color: #000000;
+    padding: 6px; 
+    margin: 6px;
+    border: solid 2px #6699CC;
+    background-color: #6699CC;
+    border-radius: 4px;
+}
+
+#help {
+    padding: 20px;
+}
+
+#help i {
+    color: #333333;
+}
+
+</style>
+</head>
+
+<body>
+<div style="float:left">
+<input type="text" id="username" value="Joe" />
+<input type="password" id="password" value="12345" />
+<input type="button" class="send" value="Login" onclick="chat.login_user()" />
+<div id="chat"></div>
+<input type="text" id="cmd" value="" />
+<input type="button" class="send" value="Send" onclick="chat.exec_command()" />
+</div>
+<div id="help">
+<br/>
+<p><strong>/pm <i>username</i> <i>message</i></strong><br/>Send private message</p>
+<p><strong>/logout</strong><br/>End user session</p>
+<p><strong>/kick <i>username</i></strong><br/>End another user session</p>
+<p><strong>/ping</strong><br/>Measure response time</p>
+</div>
+</body>
+</html>

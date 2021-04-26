@@ -5,7 +5,7 @@ use warnings;
 
 use Digest::SHA qw(sha256_hex);
 
-our $VERSION = '1.10';
+our $VERSION = '1.11';
 
 RT->AddStyleSheets("resetpassword.css");
 
@@ -116,6 +116,13 @@ Works with RT 4.0, 4.2, 4.4, 5.0
 
 May need root permissions
 
+=item Install Patches
+
+For RT 5.0.0 and 5.0.1 only, apply this patch to enable searches for users
+with a password set. See below for details.
+
+    patch -p1 -d /opt/rt5 < patches/user-admin-callbacks.patch
+
 =item C<make initdb>
 
 Only run this the first time you install this module.
@@ -210,6 +217,12 @@ This extension adds a "Password Status" at the bottom of the Access control
 section on the user admin page which shows whether the user currently
 has a password set. The "Delete password" option allows you to clear
 passwords if a user should no longer have access.
+
+For RT 5 only, this extension also adds a checkbox to the user admin
+page that allows you to filter users, displaying only those who have
+a password set. If you disable the C<$AllowUsersWithoutPassword> option,
+this checkbox allows you to see all users who have an existing password
+and would therefore be able to reset their password.
 
 =item C<$CreateNewUserAsPrivileged>
 

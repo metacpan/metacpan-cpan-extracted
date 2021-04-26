@@ -22,7 +22,7 @@ our @EXPORT = qw(
    wordpress
 );
 
-our $VERSION = 'v0.4.3';
+our $VERSION = 'v0.4.4';
 
 
 
@@ -85,7 +85,7 @@ sub require_content {
 
 
 sub script_extensions {
-    my $re = qr{[.](?:as[hp]x?|axd|bat|cfm|cgi|com|dll|exe|jspa?|lua|php5?|p[lm]|ps[dm]?[1h]|sht?|shtml|sql)\b};
+    my $re = qr{[.](?:as[hp]x?|axd|bat|cfm|cgi|com|dll|do|exe|jspa?|lua|php5?|p[lm]|ps[dm]?[1h]|sht?|shtml|sql)\b};
     return (
         PATH_INFO    => $re,
         QUERY_STRING => $re,
@@ -137,7 +137,7 @@ Plack::Middleware::Security::Common - A simple security filter for with common r
 
 =head1 VERSION
 
-version v0.4.3
+version v0.4.4
 
 =head1 SYNOPSIS
 

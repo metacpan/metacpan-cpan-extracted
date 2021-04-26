@@ -4,13 +4,13 @@
       "Karl Gaissmaier <karl.gaissmaier (at) uni-ulm.de>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4218",
+   "generated_by" : "Module::Build version 0.4231",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Net-SNMP-Mixin-Dot1abLldp",
    "prereqs" : {
@@ -37,7 +37,7 @@
    "provides" : {
       "Net::SNMP::Mixin::Dot1abLldp" : {
          "file" : "lib/Net/SNMP/Mixin/Dot1abLldp.pm",
-         "version" : "0.17"
+         "version" : "0.18"
       }
    },
    "release_status" : "stable",
@@ -46,6 +46,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.17",
-   "x_serialization_backend" : "JSON::PP version 2.27400"
+   "version" : "0.18",
+   "x_serialization_backend" : "JSON::PP version 4.02"
 }
