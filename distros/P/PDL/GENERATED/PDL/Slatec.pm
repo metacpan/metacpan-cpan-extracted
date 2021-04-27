@@ -59,7 +59,7 @@ the data contains both "steep" and "flat" sections.
 Interpolation of cumulative probability distribution functions is 
 another application.
 These routines are cryptically named (blame FORTRAN), 
-beginning with 'ch', and accept either float or double piddles. 
+beginning with 'ch', and accept either float or double ndarrays. 
 
 Most of the routines require an integer parameter called C<check>;
 if set to 0, then no checks on the validity of the input data are
@@ -468,7 +468,7 @@ singular value decomposition of a matrix
 =for bad
 
 svdc does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -496,7 +496,7 @@ and estimate the condition number of the matrix.
 =for bad
 
 poco does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -524,7 +524,7 @@ the condition number of the matrix.
 =for bad
 
 geco does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -553,7 +553,7 @@ Factor a matrix using Gaussian elimination.
 =for bad
 
 gefa does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -582,7 +582,7 @@ computed by L</poco>.
 =for bad
 
 podi does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -610,7 +610,7 @@ factors computed by L</geco> or L</gefa>.
 =for bad
 
 gedi does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -638,7 +638,7 @@ factors computed by L</geco> or L</gefa>.
 =for bad
 
 gesl does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -668,7 +668,7 @@ of a REAL SYMMETRIC matrix.
 =for bad
 
 rs does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -700,7 +700,7 @@ are computed and stored in C<wsave()>.
 =for bad
 
 ezffti does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -729,7 +729,7 @@ It will set the bad-value flag of all output piddles if the flag is set for any 
 =for bad
 
 ezfftf does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -758,7 +758,7 @@ It will set the bad-value flag of all output piddles if the flag is set for any 
 =for bad
 
 ezfftb does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -786,7 +786,7 @@ C<c> and C<a()> must be of the same type.
 =for bad
 
 pcoef does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -816,7 +816,7 @@ same type.
 =for bad
 
 pvalue does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -883,7 +883,7 @@ monotonicity (data still valid).
 =for bad
 
 chim does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -913,7 +913,7 @@ Calculate the derivatives of (x,f(x)) using cubic Hermite interpolation.
 Calculate the derivatives at the given points (C<$x,$f>,
 where C<$x> is strictly increasing).
 Control over the boundary conditions is given by the 
-C<$ic> and C<$vc> piddles, and the value of C<$mflag> determines
+C<$ic> and C<$vc> ndarrays, and the value of C<$mflag> determines
 the treatment of points where monotoncity switches
 direction. A simpler, more restricted, interface is available 
 using L</chim>.
@@ -969,9 +969,9 @@ where C<dfloc> is the maximum of the change of C<$f> on this interval
 and its two immediate neighbours.
 If C<$mflag E<lt> 0>, no such control is to be imposed.            
 
-The piddle C<$wk> is only needed for work space. However, I could
+The ndarray C<$wk> is only needed for work space. However, I could
 not get it to work as a temporary variable, so you must supply
-it; it is a 1D piddle with C<2*n> elements.
+it; it is a 1D ndarray with C<2*n> elements.
 
 Error status returned by C<$ierr>:
 
@@ -1026,7 +1026,7 @@ for monotonicity.
 =for bad
 
 chic does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -1057,7 +1057,7 @@ Calculate the derivatives, using cubic spline interpolation,
 at the given points (C<$x,$f>), with the specified
 boundary conditions. 
 Control over the boundary conditions is given by the 
-C<$ic> and C<$vc> piddles.
+C<$ic> and C<$vc> ndarrays.
 The resulting values - C<$x,$f,$d> - can
 be used in all the functions which expect a cubic
 Hermite function.
@@ -1098,9 +1098,9 @@ the first-derivative value is stored in C<vc(1)> for cases 1 and 2.
 The values of C<$vc> need only be set if options 1 or 2 are chosen
 for C<$ic>.
 
-The piddle C<$wk> is only needed for work space. However, I could
+The ndarray C<$wk> is only needed for work space. However, I could
 not get it to work as a temporary variable, so you must supply
-it; it is a 1D piddle with C<2*n> elements.
+it; it is a 1D ndarray with C<2*n> elements.
 
 Error status returned by C<$ierr>:
 
@@ -1146,7 +1146,7 @@ for the interior derivative values.
 =for bad
 
 chsp does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -1216,7 +1216,7 @@ which should never happen.
 =for bad
 
 chfd does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -1281,7 +1281,7 @@ E<gt>0 if extrapolation was performed at C<ierr> points
 =for bad
 
 chfe does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -1359,7 +1359,7 @@ which should never happen.
 =for bad
 
 chia does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -1425,7 +1425,7 @@ Error status returned by C<$ierr>:
 =for bad
 
 chid does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -1452,7 +1452,7 @@ It will set the bad-value flag of all output piddles if the flag is set for any 
 
 Check the given piecewise cubic Hermite function for monotonicity.
 
-The outout piddle C<$ismon> indicates over
+The outout ndarray C<$ismon> indicates over
 which intervals the function is monotonic.
 Set C<check> to 0 to skip checks on the input data.
 
@@ -1519,7 +1519,7 @@ Error status returned by C<$ierr>:
 =for bad
 
 chcm does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -1620,7 +1620,7 @@ Error status returned by C<$ierr>:
 =for bad
 
 chbs does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -1649,7 +1649,7 @@ Fit discrete data in a least squares sense by polynomials
 =for bad
 
 polfit processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut

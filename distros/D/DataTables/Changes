@@ -1,7 +1,15 @@
 Revision history for Perl extension DataTables.
 
+0.08 Mon April 26 20:53 CEST 2021
+	- added Travis CI
+	- fix RT #127254: Undeclared dependency SQL::Abstract::Limit
+	- minor POD improvements
+	- improved makefile: added test modules PR #35
+	- Fix: invalid response data when search request returns empty search result issue #29 / PR #32
+	- allow to return arrays or (new) hashes as DataTables data objects PR #30
+
 0.07 Sat September 29 21:11 CST 2018
-    - Updates to DataTables 1.10 with backwards compatability.
+	- Updates to DataTables 1.10 with backwards compatability.
 
 0.03 Tue July 30 16:54:34 2013
 	- fixed documentation because it looked stupid

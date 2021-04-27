@@ -11,8 +11,7 @@ use testcase "t::pieces";
 BEGIN { $^H{"t::pieces/permit"} = 1; }
 
 {
-   my $ret; # TODO: if we don't do this, we get `$ret never introduced at ...`
-   $ret = pieceanonsub { "sub value" };
+   my $ret = pieceanonsub { "sub value" };
    is( ref $ret, "CODE", 'result of pieceanonsub is CODE reference' );
    is( $ret->(), "sub value", 'result of invoking' );
 }

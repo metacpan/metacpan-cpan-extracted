@@ -1,5 +1,12 @@
 Revision history for Crypt-OpenSSL-VerifyX509
 
+0.15 2021-04-26
+
+  [Change Log]
+  - c5d1a33 Update version and changes
+  - 37ad7c9 Fix rt #135328 test fails on OpenBSD
+  - e884f80 MacOS support and tester
+
 0.14 2021-04-23
 
   First release since 2011, new maintainer
@@ -9,8 +16,8 @@ Revision history for Crypt-OpenSSL-VerifyX509
   - Minor fixes to tests, builds and updated certificates
 
   [Change Log]
-  - TBD     Update version and changes
-  - c51858f Update META files
+  - 798b138 Update version and changes
+  - 94d9649 Update META files
 
 0.13-TRIAL 2021-04-22
 

@@ -1,4 +1,4 @@
-#line 2 "perl-libpng.c.tmpl"
+#line 2 "tmpl/perl-libpng.c.tmpl"
 
 /* This is the main file of Image::PNG::Libpng. This file is included
    in Libpng.xs when compiling. It is separated out from Libpng.xs to
@@ -76,6 +76,17 @@
 
 #define PNG_UINT_16_MAX 65535
 
+typedef struct
+{
+    int gray;
+    int index;
+    int red;
+    int green;
+    int blue;
+    int alpha;
+}
+perl_png_pixel_t;
+
 /* Container for PNG information. This corresponds to an
    "Image::PNG::Libpng" in Perl. */
 
@@ -115,6 +126,16 @@ typedef struct perl_libpng
     /* How much of the data in "image_data" we have read. */
     int read_position;
     unsigned char * all_rows;
+
+    size_t rowbytes;
+    png_uint_32 width;
+    png_uint_32 height;
+    int bit_depth;
+    int color_type;
+    int channels;
+    png_colorp palette;
+    int n_palette;
+
     /* init_io file handle holder, we need this for "create_reader"
        and "create_writer" otherwise our FILE * gets closed by Perl
        when the SV goes out of scope. This holds the SV we got in
@@ -126,11 +147,17 @@ typedef struct perl_libpng
     SV * io_sv;
     /* If the following variable is set to a true value, the module
        prints messages about what it is doing. */
-    int verbosity : 1;
+    unsigned int verbosity : 1;
     /* Has input/output been initiated? We protect ourselves from
        crashes caused by dereferencing the FILE * pointer using
        this. */
-    int init_io_done : 1;
+    unsigned int init_io_done : 1;
+
+    unsigned int row_pointers_ours : 1;
+
+    unsigned int palette_checked : 1;
+
+    unsigned int image_data_ok : 1;
 }
 perl_libpng_t;
 
@@ -228,12 +255,14 @@ perl_png_warning_fn (png_structp png_ptr, png_const_charp warning_msg)
 /* The following is a debugging construction which is usually "off". */
 
 #if 0
-#define GABBLE_IN(x)			\
-    fprintf (stderr, "Get #%d of %s\n", \
+#define GABBLE_IN(x)			       \
+    fprintf (stderr, "%s:%d: Get #%d of %s\n", \
+	     __FILE__, __LINE__,	       \
 	     png->memory_gets, #x)
 
 #define GABBLE_OUT(x)				\
-    fprintf (stderr, "Free #%d of %s\n",	\
+    fprintf (stderr, "%s:%d: Free #%d of %s\n",	\
+	     __FILE__, __LINE__,		\
 	     png->memory_gets, #x)
 #else
 #define GABBLE_IN(x)
@@ -304,8 +333,10 @@ perl_png_create_read_struct ()
 static void free_png (perl_libpng_t * png)
 {
     MESSAGE ("Freeing PNG memory.");
-    if (png->row_pointers) {
+    if (png->row_pointers && png->row_pointers_ours) {
         PERL_PNG_FREE (png->row_pointers);
+	png->row_pointers = 0;
+	png->row_pointers_ours = 0;
     }
     if (png->image_data) {
         PERL_PNG_FREE (png->image_data);
@@ -855,10 +886,10 @@ perl_png_set_tIME (perl_libpng_t * png, SV * input_time)
 int
 perl_png_sig_cmp (SV * png_header, int start, int num_to_check)
 {
-    unsigned char * header;
+    const unsigned char * header;
     STRLEN length;
     int ret_val;
-    header = (unsigned char *) SvPV (png_header, length);
+    header = (const unsigned char *) SvPV (png_header, length);
     ret_val = png_sig_cmp (header, start, num_to_check);
     return ret_val;
 }
@@ -1045,19 +1076,13 @@ perl_png_get_IHDR (perl_libpng_t * png)
     int bit_depth;
     int color_type;
     int interlace_method;
-    /*
-    int compression_method;
-    int filter_method;
-    */
-    /* libpng return value */
-    int status;
     /* The return value. */
     HV * IHDR;
 
     IHDR = newHV ();
-    status = png_get_IHDR (pngi, & width, & height,
-                           & bit_depth, & color_type, & interlace_method,
-                           UNUSED_ZERO_ARG, UNUSED_ZERO_ARG);
+    png_get_IHDR (pngi, & width, & height,
+		  & bit_depth, & color_type, & interlace_method,
+		  UNUSED_ZERO_ARG, UNUSED_ZERO_ARG);
     /*& compression_method, & filter_method);*/
     HASH_STORE_IV (IHDR, width);
     HASH_STORE_IV (IHDR, height);
@@ -1068,6 +1093,10 @@ perl_png_get_IHDR (perl_libpng_t * png)
     HASH_STORE_IV (IHDR, compression_method);
     HASH_STORE_IV (IHDR, filter_method);
     */
+    png->height = height;
+    png->width = width;
+    png->bit_depth = bit_depth;
+    png->color_type = color_type;
     return newRV_noinc ((SV *) IHDR);
 }
 
@@ -1109,6 +1138,10 @@ perl_png_set_IHDR (perl_libpng_t * png, HV * IHDR)
     }
     png_set_IHDR (pngi, width, height, bit_depth, color_type,
                   interlace_method, UNUSED_ZERO_ARG, UNUSED_ZERO_ARG);
+    png->width = width;
+    png->height = height;
+    png->bit_depth = bit_depth;
+    png->color_type = color_type;
 }
 
 
@@ -1230,21 +1263,32 @@ perl_png_colors_to_av (png_colorp colors, int n_colors)
     return perl_colors;
 }
 
+static void
+perl_png_palette (perl_libpng_t * png)
+{
+    int status;
+
+    status = png_get_PLTE (pngi, & png->palette, & png->n_palette);
+    png->palette_checked = 1;
+    if (status != PNG_INFO_PLTE) {
+        png->palette = 0;
+    }
+}
+
 /* Return an array of hashes containing the color values of the palette. */
 
 static SV *
 perl_png_get_PLTE (perl_libpng_t * png)
 {
-    png_colorp colors;
-    int n_colors;
-    png_uint_32 status;
     AV * perl_colors;
 
-    status = png_get_PLTE (pngi, & colors, & n_colors);
-    if (status != PNG_INFO_PLTE) {
+    if (! png->palette_checked) {
+	perl_png_palette (png);
+    }
+    if (! png->palette) {
         return & PL_sv_undef;
     }
-    perl_colors = perl_png_colors_to_av (colors, n_colors);
+    perl_colors = perl_png_colors_to_av (png->palette, png->n_palette);
     return newRV_noinc ((SV *) perl_colors);
 }
 
@@ -1615,7 +1659,7 @@ static SV * perl_png_get_tRNS (perl_libpng_t * png)
     else {
 	HV * trans_hv;
 	trans_hv = newHV ();
-#line 1618 "/usr/home/ben/projects/image-png-libpng/build/../perl-libpng.c"
+#line 1662 "/usr/home/ben/projects/image-png-libpng/build/../perl-libpng.c"
         
 	HASH_STORE_IV_MEMBER (trans_hv, red, trans_values);
 	
@@ -1625,7 +1669,7 @@ static SV * perl_png_get_tRNS (perl_libpng_t * png)
 	
 	HASH_STORE_IV_MEMBER (trans_hv, gray, trans_values);
 	
-#line 1623 "perl-libpng.c.tmpl"
+#line 1667 "tmpl/perl-libpng.c.tmpl"
 	return newRV_noinc ((SV *) trans_hv);
     }
 #else
@@ -1679,7 +1723,7 @@ static void perl_png_set_tRNS (perl_libpng_t * png, SV * tRNS)
 	    croak ("set_tRNS: argument must be a hash reference for non-palette images");
 	}
 	trans_hv = (HV *) SvRV (tRNS);
-#line 1682 "/usr/home/ben/projects/image-png-libpng/build/../perl-libpng.c"
+#line 1726 "/usr/home/ben/projects/image-png-libpng/build/../perl-libpng.c"
         
 	HASH_FETCH_IV_MEMBER (trans_hv, red, (& trans_values));
 	
@@ -1689,7 +1733,7 @@ static void perl_png_set_tRNS (perl_libpng_t * png, SV * tRNS)
 	
 	HASH_FETCH_IV_MEMBER (trans_hv, gray, (& trans_values));
 	
-#line 1681 "perl-libpng.c.tmpl"
+#line 1725 "tmpl/perl-libpng.c.tmpl"
 	num_trans = 1;
 	png_set_tRNS (pngi, trans, num_trans, & trans_values); 
     }
@@ -1717,14 +1761,14 @@ perl_png_spalette_to_hv (png_sPLT_tp spalette)
 	png_sPLT_entry * entry;
 	entry = spalette->entries + i;
 	perl_entry = newHV ();
-#line 1720 "/usr/home/ben/projects/image-png-libpng/build/../perl-libpng.c"
+#line 1764 "/usr/home/ben/projects/image-png-libpng/build/../perl-libpng.c"
 		HASH_STORE_IV_MEMBER (perl_entry, red, entry);
 		HASH_STORE_IV_MEMBER (perl_entry, green, entry);
 		HASH_STORE_IV_MEMBER (perl_entry, blue, entry);
 		HASH_STORE_IV_MEMBER (perl_entry, alpha, entry);
 		HASH_STORE_IV_MEMBER (perl_entry, frequency, entry);
 	
-#line 1713 "perl-libpng.c.tmpl"
+#line 1757 "tmpl/perl-libpng.c.tmpl"
 	av_push (entries, newRV_noinc ((SV *) perl_entry));
     }
     HASH_STORE_AV (perl_spalette, entries);
@@ -1828,14 +1872,14 @@ static void perl_png_set_sPLT (perl_libpng_t * png, AV * sPLT_entries)
 	    }
 	    MESSAGE ("Copying entry %d", j);
 	    e = entry->entries + j;
-#line 1831 "/usr/home/ben/projects/image-png-libpng/build/../perl-libpng.c"
+#line 1875 "/usr/home/ben/projects/image-png-libpng/build/../perl-libpng.c"
  	    	    HASH_FETCH_IV_MEMBER (perl_entry, red, e);
 	    	    HASH_FETCH_IV_MEMBER (perl_entry, green, e);
 	    	    HASH_FETCH_IV_MEMBER (perl_entry, blue, e);
 	    	    HASH_FETCH_IV_MEMBER (perl_entry, alpha, e);
 	    	    HASH_FETCH_IV_MEMBER (perl_entry, frequency, e);
 	    
-#line 1821 "perl-libpng.c.tmpl"
+#line 1865 "tmpl/perl-libpng.c.tmpl"
 	}
     }
     MESSAGE ("Setting the entries");
@@ -2234,9 +2278,9 @@ static SV * perl_png_get_valid (perl_libpng_t * png)
     valid = png_get_valid (pngi, 0xFFFFFFFF);
 #define V(x) \
     (void) hv_store (perl_valid, #x, strlen (#x), newSViv (valid & PNG_INFO_ ## x), 0)
-#line 2237 "/usr/home/ben/projects/image-png-libpng/build/../perl-libpng.c"
+#line 2281 "/usr/home/ben/projects/image-png-libpng/build/../perl-libpng.c"
 V(bKGD);V(cHRM);V(gAMA);V(hIST);V(iCCP);V(IDAT);V(oFFs);V(pCAL);V(pHYs);V(PLTE);V(sBIT);V(sCAL);V(sPLT);V(sRGB);V(tIME);V(tRNS);
-#line 2210 "perl-libpng.c.tmpl"
+#line 2254 "tmpl/perl-libpng.c.tmpl"
 #undef V
 
     return newRV_noinc ((SV *) perl_valid);
@@ -2250,60 +2294,66 @@ V(bKGD);V(cHRM);V(gAMA);V(hIST);V(iCCP);V(IDAT);V(oFFs);V(pCAL);V(pHYs);V(PLTE);
                         |___/                              */
 
 
+static void
+get_check_height (perl_libpng_t * png)
+{
+    png->height = png_get_image_height (pngi);
+    if (png->height == 0) {
+        /* The image we are trying to read has zero height. */
+        croak ("Image has zero height");
+    }
+}
+
 static SV *
-rows_to_av (png_bytepp rows, int rowbytes, int height)
+rows_to_av (perl_libpng_t * png)
 {
     AV * perl_rows;
     int r;
+    STRLEN rb;
 
+    rb = (STRLEN) png->rowbytes;
     perl_rows = newAV ();
-//    MESSAGE ("Making %d scalars.\n", height);
-    for (r = 0; r < height; r++) {
-	SV * row_sv = newSVpv ((char *) rows[r], rowbytes);
-	av_push (perl_rows, row_sv);
+    av_extend (perl_rows, png->height - 1);
+    for (r = 0; r < png->height; r++) {
+	SV * row_sv;
+	const char * c;
+
+	c = (const char *) png->row_pointers[r];
+	row_sv = newSVpv (c, rb);
+	av_store (perl_rows, (SSize_t) r, row_sv);
     }
-//    MESSAGE ("There are %d elements in the array.\n",
-//	     (int) av_len (perl_rows) + 1);
     return newRV_noinc ((SV *) perl_rows);
 }
 
 static SV *
 perl_png_get_rows (perl_libpng_t * png)
 {
-    png_bytepp rows;
-    int rowbytes;
-    int height;
-
     /* Get the information from the PNG. */
 
-    height = png_get_image_height (pngi);
-    if (height == 0) {
-        /* The height of the image is zero. */
-        croak ("Image has zero height");
+    get_check_height (png);
+    if (! png->row_pointers) {
+	png->row_pointers = png_get_rows (pngi);
+	png->row_pointers_ours = 0;
+	if (png->row_pointers == 0) {
+	    /* The image does not have any rows of image data. */
+	    croak ("Image has no rows");
+	}
+	else {
+	    MESSAGE ("Image has some rows");
+	}
     }
-    else {
-        MESSAGE ("Image has height %d\n", height);
-    }
-    rows = png_get_rows (pngi);
-    if (rows == 0) {
-        /* The image does not have any rows of image data. */
-        croak ("Image has no rows");
-    }
-    else {
-        MESSAGE ("Image has some rows");
-    }
-    rowbytes = png_get_rowbytes (pngi);
-    if (rowbytes == 0) {
+    png->rowbytes = png_get_rowbytes (pngi);
+    if (png->rowbytes == 0) {
         /* The rows of image data have zero length. */
         croak ("Image rows have zero length");
     }
     else {
-        MESSAGE ("Image rows are length %d bytes\n", rowbytes);
+        MESSAGE ("Image rows are length %d bytes\n", png->rowbytes);
     }
 
     /* Create Perl stuff to put the row info into. */
 
-    return rows_to_av (rows, rowbytes, height);
+    return rows_to_av (png);
 }
 
 static void
@@ -2314,71 +2364,51 @@ perl_png_read_png (perl_libpng_t * png, int transforms)
     png_read_png (pngi, transforms, 0);
 }
 
-/* Get the row pointers directly. */
-
-static void *
-perl_png_get_row_pointers (perl_libpng_t * png)
-{
-    png_bytepp rows;
-    if (png->row_pointers) {
-        rows = png->row_pointers;
-    }
-    else {
-        rows = png_get_rows (pngi);
-    }
-    return rows;
-}
-
 /* Read the image data into allocated memory */
 
 static SV *
 perl_png_read_image (perl_libpng_t * png)
 {
-    int n_rows;
-    int rowbytes;
     int i;
 
     check_init_io (png);
     png_read_update_info (pngi);
-    n_rows = png_get_image_height (pngi);
-    rowbytes = png_get_rowbytes (pngi);
-    if (! n_rows) {
-        /* The image we are trying to read has zero height. */
-        croak ("Image has zero height");
+    get_check_height (png);
+    png->rowbytes = png_get_rowbytes (pngi);
+    GET_MEMORY (png->row_pointers, png->height, png_bytep);
+    png->row_pointers_ours = 1;
+    GET_MEMORY (png->image_data, png->rowbytes * png->height, png_byte);
+    for (i = 0; i < png->height; i++) {
+        png->row_pointers[i] = png->image_data + png->rowbytes * i;
     }
-    GET_MEMORY (png->row_pointers, n_rows, png_bytep);
-    Newx (png->image_data, rowbytes * n_rows, png_byte);
-    if (! png->image_data) {
-        /* We were refused the memory we want to read the image into. */
-        croak ("Out of memory allocating %d bytes for image",
-                        rowbytes * n_rows);
-    }
-    png->memory_gets++;
-    for (i = 0; i < n_rows; i++) {
-        png->row_pointers[i] = png->image_data + rowbytes * i;
-    }
-    png_set_rows(png->png, png->info, png->row_pointers);
+    png_set_rows(pngi, png->row_pointers);
     png_read_image (png->png, png->row_pointers);
-    return rows_to_av (png->row_pointers, rowbytes, n_rows);
+    return rows_to_av (png);
+}
+
+static int
+bytes_for_bits (int bits)
+{
+    return (bits + 7)/8;
 }
 
 /* Set the rows of the image to "rows". */
 
 static void perl_png_set_rows (perl_libpng_t * png, AV * rows)
 {
-    unsigned char ** row_pointers;
     int i;
     int n_rows;
     png_uint_32 height;
     png_uint_32 width;
     int bit_depth;
     int channels;
-
-    /* All of the following are ignored. */
+    /* Older libpngs, e.g. version 1.2.59, need png_get_IHDR to be
+       passed a valid pointer for "color_type", otherwise png_get_IHDR
+       fails. We don't need it here at all. This is no longer the case
+       for libpng version 1.6.37, but we support the old versions
+       too. */
     int color_type;
-    int interlace_method;
-    int compression_method;
-    int filter_method;
+
     /* libpng return value */
     int status;
     /* Minimum number of bytes we need to store one row. */
@@ -2391,22 +2421,29 @@ static void perl_png_set_rows (perl_libpng_t * png, AV * rows)
     unsigned char * r;
 
     status = png_get_IHDR (pngi, & width, & height,
-                           & bit_depth, & color_type, & interlace_method,
-                           & compression_method, & filter_method);
+                           & bit_depth,
+			   & color_type, /* Unused, see comment above. */
+			   0,
+                           UNUSED_ZERO_ARG, UNUSED_ZERO_ARG);
+    if (status == 0) {
+	/* The return value of png_get_IHDR is either 0 or 1, 0 means
+	   error, 1 means success. */
+	croak ("Image::PNG::Libpng: error from png_get_IHDR");
+    }
+    if (width == 0 || height == 0) {
+	/* This was for catching the bug with png_get_IHDR, it doesn't
+	   do any harm and it might catch another bug later so it can
+	   stay here. */
+	croak ("Image::PNG::Libpng: image width (%u) or height (%u) zero",
+	       (unsigned) width, (unsigned) height);
+    }
 
     channels = png_get_channels (pngi);
-    rbytes = width * bit_depth * channels;
-    if (rbytes % 8 == 0) {
-	rbytes /= 8;
-    }
-    else {
-	rbytes = rbytes / 8 + 1;
-    }
-
+    rbytes = bytes_for_bits (width * bit_depth * channels);
     if (png->row_pointers) {
         /* There was an attempt to set the rows of an image after they
            had already been set. */
-        croak ("Row pointers already set");
+        croak ("This PNG object already contains image data");
     }
     /* Check that this is the same as the height of the image. */
     n_rows = av_len (rows) + 1;
@@ -2416,25 +2453,30 @@ static void perl_png_set_rows (perl_libpng_t * png, AV * rows)
 	       n_rows, height);
     }
     MESSAGE ("%d rows.\n", n_rows);
-    GET_MEMORY (row_pointers, n_rows, unsigned char *);
+    GET_MEMORY (png->row_pointers, n_rows, unsigned char *);
+    png->row_pointers_ours = 1;
     arbytes = height * rbytes;
     GET_MEMORY (ar, arbytes, unsigned char); 
     r = ar;
     for (i = 0; i < n_rows; i++) {
         /* Need to check that this is the same as the width of the image. */
         STRLEN length;
-        SV * row_i;
+	SV ** row_i_ptr;
 	/* The data from Perl's row. */
-	unsigned char * pr;
-        row_i = * av_fetch (rows, i, 0);
-	pr = (unsigned char *) SvPV (row_i, length);
+	const unsigned char * pr;
+
+        row_i_ptr = av_fetch (rows, i, 0);
+	if (! row_i_ptr) {
+	    croak ("NULL pointer at offset %d of rows", i);
+	}
+	pr = (const unsigned char *) SvPV (*row_i_ptr, length);
 	if (length > rbytes) {
 	    warn ("Row %d is %zu bytes, which is too long; truncating to %d",
 		  i, length, rbytes);
 	    length = rbytes;
 	}
 	memcpy (r, pr, length);
-        row_pointers[i] = r;
+        png->row_pointers[i] = r;
         MESSAGE ("Copying row %d, length %d", i, length);
 	r += rbytes;
     }
@@ -2443,10 +2485,7 @@ static void perl_png_set_rows (perl_libpng_t * png, AV * rows)
 	croak ("%s:%d: Mismatch %p != %p", __FILE__, __LINE__,
 	       r, ar + arbytes);
     }
-    png_set_rows (pngi, row_pointers);
-    /* "png" keeps a record of the allocated memory in order to free
-       it. */
-    png->row_pointers = row_pointers;
+    png_set_rows (pngi, png->row_pointers);
     png->all_rows = ar;
 }
 
@@ -2751,7 +2790,7 @@ int perl_png_libpng_supports (const char * what)
 #endif /* PNG_cHRM_XYZ_SUPPORTED */
     }
 
-#line 2754 "/usr/home/ben/projects/image-png-libpng/build/../perl-libpng.c"
+#line 2793 "/usr/home/ben/projects/image-png-libpng/build/../perl-libpng.c"
     if (strcmp (what, "16BIT") == 0) {
 #ifdef PNG_16BIT_SUPPORTED
         return 1;
@@ -3690,7 +3729,7 @@ int perl_png_libpng_supports (const char * what)
         return 0;
 #endif /* zTXt */
     }
-#line 2735 "perl-libpng.c.tmpl"
+#line 2774 "tmpl/perl-libpng.c.tmpl"
 
     /* sCAL is a special case. */
 
@@ -3737,7 +3776,7 @@ static SV * perl_png_get_cHRM (perl_libpng_t * png)
 #ifdef PNG_cHRM_SUPPORTED
     if (VALID (cHRM)) {
         HV * ice;
-#line 3740 "/usr/home/ben/projects/image-png-libpng/build/../perl-libpng.c"
+#line 3779 "/usr/home/ben/projects/image-png-libpng/build/../perl-libpng.c"
         double white_x;
         double white_y;
         double red_x;
@@ -3746,10 +3785,10 @@ static SV * perl_png_get_cHRM (perl_libpng_t * png)
         double green_y;
         double blue_x;
         double blue_y;
-#line 2781 "perl-libpng.c.tmpl"
+#line 2820 "tmpl/perl-libpng.c.tmpl"
         png_get_cHRM (pngi , & white_x, & white_y, & red_x, & red_y, & green_x, & green_y, & blue_x, & blue_y);
         ice = newHV ();
-#line 3752 "/usr/home/ben/projects/image-png-libpng/build/../perl-libpng.c"
+#line 3791 "/usr/home/ben/projects/image-png-libpng/build/../perl-libpng.c"
         (void) hv_store (ice, "white_x", strlen ("white_x"),
                          newSVnv (white_x), 0);
         (void) hv_store (ice, "white_y", strlen ("white_y"),
@@ -3766,7 +3805,7 @@ static SV * perl_png_get_cHRM (perl_libpng_t * png)
                          newSVnv (blue_x), 0);
         (void) hv_store (ice, "blue_y", strlen ("blue_y"),
                          newSVnv (blue_y), 0);
-#line 2790 "perl-libpng.c.tmpl"
+#line 2829 "tmpl/perl-libpng.c.tmpl"
         chrm = newRV_noinc ((SV *) ice);
     }
 #else
@@ -3780,7 +3819,7 @@ static void perl_png_set_cHRM (perl_libpng_t * png, HV * cHRM)
 {
 #ifdef PNG_cHRM_SUPPORTED
     SV ** key_sv_ptr;
-#line 3783 "/usr/home/ben/projects/image-png-libpng/build/../perl-libpng.c"
+#line 3822 "/usr/home/ben/projects/image-png-libpng/build/../perl-libpng.c"
     double white_x = 0.0;
     double white_y = 0.0;
     double red_x = 0.0;
@@ -3821,9 +3860,9 @@ static void perl_png_set_cHRM (perl_libpng_t * png, HV * cHRM)
     if (key_sv_ptr) {
         blue_y = SvNV (* key_sv_ptr);
     }
-#line 2814 "perl-libpng.c.tmpl"
+#line 2853 "tmpl/perl-libpng.c.tmpl"
     png_set_cHRM (pngi, white_x, white_y, red_x, red_y, green_x, green_y, blue_x, blue_y);
-#line 2817 "perl-libpng.c.tmpl"
+#line 2856 "tmpl/perl-libpng.c.tmpl"
 #else
     /* libpng was compiled without this option. */
     UNSUPPORTED(cHRM);
@@ -3841,7 +3880,7 @@ static SV * perl_png_get_cHRM_XYZ (perl_libpng_t * png)
     SV * chrm = & PL_sv_undef; 
     if (VALID (cHRM)) {
         HV * ice;
-#line 3844 "/usr/home/ben/projects/image-png-libpng/build/../perl-libpng.c"
+#line 3883 "/usr/home/ben/projects/image-png-libpng/build/../perl-libpng.c"
         double red_x;
         double red_y;
         double red_z;
@@ -3851,10 +3890,10 @@ static SV * perl_png_get_cHRM_XYZ (perl_libpng_t * png)
         double blue_x;
         double blue_y;
         double blue_z;
-#line 2839 "perl-libpng.c.tmpl"
+#line 2878 "tmpl/perl-libpng.c.tmpl"
         png_get_cHRM_XYZ (pngi , & red_x, & red_y, & red_z, & green_x, & green_y, & green_z, & blue_x, & blue_y, & blue_z);
         ice = newHV ();
-#line 3857 "/usr/home/ben/projects/image-png-libpng/build/../perl-libpng.c"
+#line 3896 "/usr/home/ben/projects/image-png-libpng/build/../perl-libpng.c"
         (void) hv_store (ice, "red_x", strlen ("red_x"),
                          newSVnv (red_x), 0);
         (void) hv_store (ice, "red_y", strlen ("red_y"),
@@ -3873,7 +3912,7 @@ static SV * perl_png_get_cHRM_XYZ (perl_libpng_t * png)
                          newSVnv (blue_y), 0);
         (void) hv_store (ice, "blue_z", strlen ("blue_z"),
                          newSVnv (blue_z), 0);
-#line 2848 "perl-libpng.c.tmpl"
+#line 2887 "tmpl/perl-libpng.c.tmpl"
         chrm = newRV_noinc ((SV *) ice);
     }
     return chrm;
@@ -3882,7 +3921,7 @@ static SV * perl_png_get_cHRM_XYZ (perl_libpng_t * png)
 static void perl_png_set_cHRM_XYZ (perl_libpng_t * png, HV * cHRM_XYZ)
 {
     SV ** key_sv_ptr;
-#line 3885 "/usr/home/ben/projects/image-png-libpng/build/../perl-libpng.c"
+#line 3924 "/usr/home/ben/projects/image-png-libpng/build/../perl-libpng.c"
     double red_x = 0.0;
     double red_y = 0.0;
     double red_z = 0.0;
@@ -3928,9 +3967,9 @@ static void perl_png_set_cHRM_XYZ (perl_libpng_t * png, HV * cHRM_XYZ)
     if (key_sv_ptr) {
         blue_z = SvNV (* key_sv_ptr);
     }
-#line 2867 "perl-libpng.c.tmpl"
+#line 2906 "tmpl/perl-libpng.c.tmpl"
     png_set_cHRM_XYZ (pngi, red_x, red_y, red_z, green_x, green_y, green_z, blue_x, blue_y, blue_z);
-#line 2870 "perl-libpng.c.tmpl"
+#line 2909 "tmpl/perl-libpng.c.tmpl"
 }
 
 #endif /* PNG_cHRM_XYZ_SUPPORTED */
@@ -3956,13 +3995,14 @@ static void perl_png_copy_row_pointers (perl_libpng_t * png, SV * row_pointers)
     crow_pointers = INT2PTR (png_byte **, SvIV (row_pointers));
 
     GET_MEMORY (png->row_pointers, height, png_byte *);
+    png->row_pointers_ours = 1;
     for (i = 0; i < height; i++) {
 	png->row_pointers[i] = crow_pointers[i];
     }
     png_set_rows (pngi, png->row_pointers);
 }
 
-#line 3965 "/usr/home/ben/projects/image-png-libpng/build/../perl-libpng.c"
+#line 4005 "/usr/home/ben/projects/image-png-libpng/build/../perl-libpng.c"
 
 static int
 perl_png_get_image_width (perl_libpng_t * png)
@@ -3976,7 +4016,7 @@ perl_png_get_image_height (perl_libpng_t * png)
     return png_get_image_height (pngi);
 }
 
-#line 2910 "perl-libpng.c.tmpl"
+#line 2950 "tmpl/perl-libpng.c.tmpl"
 
 
 static void
@@ -4036,7 +4076,7 @@ perl_png_get_user_height_max (perl_libpng_t * png)
 #endif
 }
 
-#line 2956 "perl-libpng.c.tmpl"
+#line 2996 "tmpl/perl-libpng.c.tmpl"
 
 static SV *
 perl_png_get_eXIf (perl_libpng_t * png)
@@ -4061,13 +4101,13 @@ perl_png_set_eXIf (perl_libpng_t * png, SV * exif)
 {
 #ifdef PNG_eXIf_SUPPORTED
     png_uint_32 num_exif;
-    png_bytep exif_buf;
+    png_const_bytep exif_buf;
     STRLEN exif_len;
     
-    exif_buf = (png_bytep) SvPV (exif, exif_len);
+    exif_buf = (const png_bytep) SvPV (exif, exif_len);
     num_exif = (png_uint_32) exif_len;
 
-    png_set_eXIf_1 (png->png, png->info, num_exif, exif_buf);
+    png_set_eXIf_1 (png->png, png->info, num_exif, (png_bytep) exif_buf);
 #else /*  PNG_eXIf_SUPPORTED */
     UNSUPPORTED (eXIf);
 #endif /*  PNG_eXIf_SUPPORTED */
@@ -4082,143 +4122,6 @@ perl_png_set_eXIf (perl_libpng_t * png, SV * exif)
   of data we want, and the string value of the data that we
   insert is also accessible by Perl. 
 */
-
-/*
-  A failure of the type "segmentation fault" occurred on Solaris
-  somewhere in the split-alpha.t file, so we're adding lots of
-  debugging/checking code.  2020-12-22 07:25:10
-  http://www.cpantesters.org/cpan/report/f0c81600-43be-11eb-9b1a-56bbc304f86f
-*/
-
-static unsigned char *
-sv_memory (HV * split, char * name, int name_length, int len)
-{
-    SV * sv;
-    unsigned char * retval;
-    STRLEN sv_len;
-
-    sv_len = (STRLEN) len;
-    /* newSVpv with "" and this length caused some kind of problem,
-       detectable on a few people's computers and with valgrind, which
-       said it was an invalid read, so we switched to this method
-       based on Perl source code and the perlguts.  */
-    sv = newSV (sv_len);
-    SvPOK_on (sv);
-    SvCUR_set (sv, sv_len);
-    if (! hv_store (split, name, name_length, sv, 0)) {
-	croak ("%s:%d: hv_store %s, %d bytes failed",
-	       __FILE__, __LINE__, name, len);
-    }
-    retval = (unsigned char *) SvPVX (sv);
-    if (! retval) {
-	croak ("%s:%d: newSVpv/SvPVX %s, %d bytes failed",
-	       __FILE__, __LINE__, name, len);
-    }
-    return retval;
-}
-
-static SV *
-perl_png_split_alpha (perl_libpng_t * png)
-{
-    HV * split;
-    SV * split_ref;
-    png_uint_32 width;
-    png_uint_32 height;
-    int bit_depth;
-    int color_type;
-    int interlace_method;
-    int rowbytes;
-    int datapix;
-    int alphapix;
-    unsigned char * databytes;
-    unsigned char * alphabytes;
-    int i;
-    png_bytepp rows;
-    int bytes;
-    int channels;
-    int colors;
-
-    png_get_IHDR (pngi, & width, & height,
-		  & bit_depth, & color_type, & interlace_method,
-		  UNUSED_ZERO_ARG, UNUSED_ZERO_ARG);
-    rows = png_get_rows (pngi);
-    if (! rows) {
-	croak ("%s:%d: could not retrieve image data from PNG",
-	       __FILE__, __LINE__);
-    }
-    rowbytes = png_get_rowbytes (pngi);
-    if (bit_depth == 8 || bit_depth == 16) {
-	bytes = bit_depth / 8;
-    }
-    else {
-	warn ("Bit depth of %d is not handled by split_alpha", bit_depth);
-	return &PL_sv_undef;
-    }
-    if ((color_type & PNG_COLOR_MASK_ALPHA) == 0) {
-	warn ("Color type %s (%d) has no alpha channel",
-	      perl_png_color_type_name (color_type), color_type);
-	return &PL_sv_undef;
-    }
-    channels = perl_png_color_type_channels (color_type);
-    colors = channels - 1;
-    alphapix = bytes * height * width;
-    datapix = colors * alphapix;
-    split = newHV ();
-    if (! split) {
-	croak ("%s:%d: newHV failed", __FILE__, __LINE__);
-    }
-    alphabytes = sv_memory (split, "alpha", strlen ("alpha"), alphapix);
-    databytes = sv_memory (split, "data", strlen ("data"), datapix);
-    for (i = 0; i < height; i++) {
-	int j;
-	png_bytep row;
-	row = rows[i];
-	if (rowbytes < bytes * channels * width) {
-	    croak ("Unexpected rowbytes %d < %d", rowbytes,
-		   bytes*channels*width);
-	}
-	for (j = 0; j < width; j++) {
-	    int byte;
-	    int o;
-	    int p;
-	    int q;
-	    // Offset into "alphabytes"
-	    o = bytes * (i * width + j);
-	    // Offset into "databytes"
-	    p = colors * o;
-	    // Offset into "row"
-	    q = bytes * channels * j;
-	    for (byte = 0; byte < bytes; byte++) {
-		int c;
-		for (c = 0; c < colors; c++) {
-		    int r;
-		    r = bytes*c + byte;
-		    if (q + r >= rowbytes) {
-			croak ("%s:%d: Overflow %d (q=%d = %d x %d x %d + r=%d) >= rowbytes=%d",
-			       __FILE__, __LINE__, q + r, q, bytes, channels, j, r, rowbytes);
-		    }
-		    if (p + r >= datapix) {
-			croak ("%s:%d: Overflow %d (p=%d + r=%d) >= datapix=%d",
-			       __FILE__, __LINE__, p + r, p, r, datapix);
-		    }
-		    databytes[p + r] = row[q + r];
-		}
-		if (o + byte >= alphapix) {
-		    croak ("%s:%d: Overflow %d (o=%d + byte=%d) >= alphapix=%d",
-			   __FILE__, __LINE__, o + byte, o, byte, alphapix);
-		}
-		if (q + bytes*colors + byte >= rowbytes) {
-		    croak ("%s:%d: Overflow %d (%d + %d x %d + %d) >= %d",
-			   __FILE__, __LINE__,  q + bytes*colors + byte,
-			   q, bytes, colors, byte, rowbytes);
-		}
-		alphabytes[o + byte] = row[q + bytes*colors + byte];
-	    }
-	}
-    }
-    split_ref = newRV_noinc ((SV*) split);
-    return split_ref;
-}
 
 static void
 perl_png_set_back(perl_libpng_t * png, HV * perl_color, int gamma_code,
@@ -4281,6 +4184,290 @@ perl_png_set_quantize (perl_libpng_t * png, AV * palette,
 #else
     UNSUPPORTED(READ_QUANTIZE);
 #endif /* #ifdef PNG_READ_QUANTIZE_SUPPORTED */
+}
+
+
+static void
+perl_png_check_x_y (perl_libpng_t * png, int x, int y)
+{
+    if (x < 0 || y < 0) {
+	croak ("x (%d) or y (%d) < 0", x, y);
+    }
+    if (x >= png->width) {
+	croak ("x (%d) > width %d", x, png->width);
+    }
+    if (y >= png->height) {
+	croak ("y (%d) > height %d", y, png->height);
+    }
+}
+
+static void
+perl_png_get_image_data (perl_libpng_t * png)
+{
+    png_get_IHDR (pngi, &png->width, &png->height,
+		  &png->bit_depth, &png->color_type, 0,
+		  UNUSED_ZERO_ARG, UNUSED_ZERO_ARG);
+    if (!png->row_pointers) {
+    	png->row_pointers = png_get_rows (pngi);
+	png->row_pointers_ours = 0;
+    }
+    png->rowbytes = png_get_rowbytes (pngi);
+    if (png->type != perl_png_read_obj) {
+	warn ("Reading a pixel from a write object");
+    }
+    png->channels = perl_png_color_type_channels (png->color_type);
+    if (png->color_type == PNG_COLOR_TYPE_PALETTE) {
+	if (! png->palette_checked) {
+	    perl_png_palette (png);
+	}
+    }
+    png->image_data_ok = 1;
+}
+
+static void
+palette_to_pixel (perl_libpng_t * png, perl_png_pixel_t * pixel)
+{
+    png_colorp color;
+
+    color = & png->palette[pixel->index];
+    pixel->red = color->red;
+    pixel->green = color->green;
+    pixel->blue = color->blue;
+}
+
+static void
+get_bit_pixel (perl_libpng_t * png, int x, int y, perl_png_pixel_t * pixel)
+{
+    png_bytep row;
+    unsigned int mask;
+    unsigned int shift;
+    unsigned int value;
+    unsigned n;
+    int offset;
+    int b;
+
+    b = png->bit_depth;
+
+    row = png->row_pointers[y];
+    offset = (int) ((x * b) / 8);
+    n = x % (8 / b);
+    shift = 8 - (n+1) * b;
+    mask = 2 * b - 1;
+    value = (row[offset] >> shift) & mask;
+
+    switch (png->color_type) {
+    case PNG_COLOR_TYPE_GRAY:
+	pixel->gray = value;
+	return;
+    case PNG_COLOR_TYPE_PALETTE:
+	pixel->index = value;
+	if (pixel->index >= png->n_palette) {
+	    croak ("index %d > colors in palette %d",
+		   pixel->index, png->n_palette);
+	}
+	palette_to_pixel (png, pixel);
+	return;
+    default:
+	croak ("Bit depth %d and color type %d mismatch",
+	       png->bit_depth, png->color_type);
+    }
+    return;
+}
+
+static int
+sixteen (png_bytep row, int offset)
+{
+    return row[offset] * 256 + row[offset+1];
+}
+
+static void
+get_any_pixel (perl_libpng_t * png, int x, int y,
+	       perl_png_pixel_t * pixel)
+{
+    png_bytep row;
+    int offset;
+
+    if (! png->image_data_ok) {
+	perl_png_get_image_data (png);
+    }
+    perl_png_check_x_y (png, x, y);
+    if (png->bit_depth < 8) {
+	get_bit_pixel (png, x, y, pixel);
+	return;
+    }
+    row = png->row_pointers[y];
+    offset = x * (png->bit_depth / 8) * png->channels;
+    
+    if (png->bit_depth == 8) {
+	switch (png->color_type) {
+	case PNG_COLOR_TYPE_PALETTE:
+	    pixel->index = row[offset];
+	    palette_to_pixel (png, pixel);
+	    break;
+	case PNG_COLOR_TYPE_GRAY_ALPHA:
+	    pixel->alpha = row[offset+1];
+	    /* Fall through. */
+	case PNG_COLOR_TYPE_GRAY:
+	    pixel->gray = row[offset];
+	    break;
+	case PNG_COLOR_TYPE_RGB_ALPHA:
+	    pixel->alpha = row[offset+3];
+	    /* Fall through. */
+	case PNG_COLOR_TYPE_RGB:
+	    pixel->red = row[offset];
+	    pixel->green = row[offset+1];
+	    pixel->blue = row[offset+2];
+	    break;
+	default:
+	    croak ("Unknown color type %d", png->color_type);
+	}
+    }
+    else if (png->bit_depth == 16) {
+	switch (png->color_type) {
+	case PNG_COLOR_TYPE_GRAY_ALPHA:
+	    pixel->alpha = sixteen(row, offset+2);
+	    /* Fall through. */
+	case PNG_COLOR_TYPE_GRAY:
+	    pixel->gray = sixteen(row, offset);
+	    break;
+	case PNG_COLOR_TYPE_RGB_ALPHA:
+	    pixel->alpha = sixteen (row, offset+6);
+	    /* Fall through. */
+	case PNG_COLOR_TYPE_RGB:
+	    pixel->red = sixteen (row, offset);
+	    pixel->green = sixteen (row, offset+2);
+	    pixel->blue = sixteen (row, offset+4);
+	    break;
+	default:
+	    croak ("Unknown color type %d", png->color_type);
+	}
+    }
+    else {
+	croak ("Bit depth %d is not handled", png->bit_depth);
+    }
+}
+
+SV *
+perl_png_get_pixel (perl_libpng_t * png, int x, int y)
+{
+    HV * pixel_hv;
+    perl_png_pixel_t pixel = {0};
+
+    get_any_pixel (png, x, y, & pixel);
+
+    pixel_hv = newHV ();
+    if (png->color_type & PNG_COLOR_MASK_ALPHA) {
+	hv_store (pixel_hv, "alpha", strlen ("alpha"),
+		  newSViv (pixel.alpha), 0);
+    }
+    if ((png->color_type & PNG_COLOR_MASK_COLOR) == 0) {
+	hv_store (pixel_hv, "gray", strlen ("gray"),
+		  newSViv (pixel.gray), 0);
+    }
+    else {
+	hv_store (pixel_hv, "red", strlen ("red"), newSViv (pixel.red), 0);
+	hv_store (pixel_hv, "blue", strlen ("blue"), newSViv (pixel.blue), 0);
+	hv_store (pixel_hv, "green", strlen ("green"), newSViv (pixel.green), 0);
+    }
+    if (png->color_type == PNG_COLOR_TYPE_PALETTE) {
+	hv_store (pixel_hv, "index", strlen ("index"),
+		  newSViv (pixel.index), 0);
+    }
+    return newRV_noinc ((SV *) pixel_hv);
+}
+
+static unsigned char *
+sv_memory (HV * split, char * name, int name_length, int len)
+{
+    SV * sv;
+    unsigned char * retval;
+    STRLEN sv_len;
+
+    sv_len = (STRLEN) len;
+    /* newSVpv with "" and this length caused some kind of problem,
+       detectable on a few people's computers and with valgrind, which
+       said it was an invalid read, so we switched to this method
+       based on Perl source code and the perlguts. In fact newSVpv
+       copies "len" bytes of the string it is given, and I was giving
+       it a zero length string, so that was wrong. */
+    sv = newSV (sv_len);
+    SvPOK_on (sv);
+    SvCUR_set (sv, sv_len);
+    if (! hv_store (split, name, name_length, sv, 0)) {
+	croak ("%s:%d: hv_store %s, %d bytes failed",
+	       __FILE__, __LINE__, name, len);
+    }
+    retval = (unsigned char *) SvPVX (sv);
+    if (! retval) {
+	croak ("%s:%d: newSVpv/SvPVX %s, %d bytes failed",
+	       __FILE__, __LINE__, name, len);
+    }
+    return retval;
+}
+
+static SV *
+perl_png_split_alpha (perl_libpng_t * png)
+{
+    HV * split;
+    SV * split_ref;
+    int datapix;
+    int alphapix;
+    unsigned char * databytes;
+    unsigned char * alphabytes;
+    int i;
+    int bytes;
+    int colors;
+
+    if (! png->image_data_ok) {
+	perl_png_get_image_data (png);
+    }
+    if (png->bit_depth == 8 || png->bit_depth == 16) {
+	bytes = png->bit_depth / 8;
+    }
+    else {
+	warn ("Bit depth of %d is not handled by split_alpha",
+	      png->bit_depth);
+	return &PL_sv_undef;
+    }
+    if ((png->color_type & PNG_COLOR_MASK_ALPHA) == 0) {
+	warn ("Color type %s (%d) has no alpha channel",
+	      perl_png_color_type_name (png->color_type), png->color_type);
+	return &PL_sv_undef;
+    }
+    colors = png->channels - 1;
+    alphapix = bytes * png->height * png->width;
+    datapix = colors * alphapix;
+    split = newHV ();
+    alphabytes = sv_memory (split, "alpha", strlen ("alpha"), alphapix);
+    databytes = sv_memory (split, "data", strlen ("data"), datapix);
+    for (i = 0; i < png->height; i++) {
+	int j;
+	png_bytep row;
+	row = png->row_pointers[i];
+	for (j = 0; j < png->width; j++) {
+	    int byte;
+	    int o;
+	    int p;
+	    int q;
+	    // Offset into "alphabytes"
+	    o = bytes * (i * png->width + j);
+	    // Offset into "databytes"
+	    p = colors * o;
+	    // Offset into "row"
+	    q = bytes * png->channels * j;
+	    for (byte = 0; byte < bytes; byte++) {
+		int c;
+		for (c = 0; c < colors; c++) {
+		    int r;
+		    r = bytes*c + byte;
+		    databytes[p + r] = row[q + r];
+		}
+		alphabytes[o + byte] = row[q + bytes*colors + byte];
+	    }
+	}
+    }
+    split_ref = newRV_noinc ((SV*) split);
+    return split_ref;
 }
 
 #undef pngi

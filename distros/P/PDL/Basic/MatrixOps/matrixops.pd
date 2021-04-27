@@ -731,7 +731,7 @@ pp_def(
               extern void SVD( double *W, double *Z, int nRow, int nCol );
               int sm = $SIZE (m), sn = $SIZE (n), i;
               if (sm<sn) {
-		  barf("svd requires input piddles to have m >= n (you have m=%d and n=%d). Try inputting the transpose.  See the docs for svd.",sm,sn);
+		  barf("svd requires input ndarrays to have m >= n (you have m=%d and n=%d). Try inputting the transpose.  See the docs for svd.",sm,sn);
               }
               double *w, *t, zv;
               t = w = (double *) malloc(sn*(sm+sn)*sizeof(double));
@@ -1163,13 +1163,22 @@ Solve A x = B for matrix A, by back substitution into A's LU decomposition.
   # or with Slatec LINPACK
   use PDL::Slatec;
   gefa($lu=$A->copy, $ipiv=null, $info=null);
-  gesl($lu, $ipiv, $x=$B->xchg(0,1)->copy, 1); # 1 = do transpose - why needed!??
+  # 1 = do transpose because Fortran's idea of rows vs columns
+  gesl($lu, $ipiv, $x=$B->xchg(0,1)->copy, 1);
   $x = $x->inplace->xchg(0,1);
 
   # or with LAPACK
   use PDL::LinearAlgebra::Real;
   getrf($lu=$A->copy, $ipiv=null, $info=null);
   getrs($lu, 1, $x=$B->xchg(0,1)->copy, $ipiv, $info=null); # again, need transpose
+  $x=$x->inplace->xchg(0,1);
+
+  # or with GSL
+  use PDL::GSL::LINALG;
+  LU_decomp(my $lu=$A->copy, my $p=null, my $signum=null);
+  # $B and $x, first dim is because GSL treats as vector, higher dims thread
+  # so we transpose in and back out
+  LU_solve($lu, $p, $B->xchg(0,1), my $x=null);
   $x=$x->inplace->xchg(0,1);
 
   # proof of the pudding is in the eating:

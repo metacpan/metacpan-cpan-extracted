@@ -1,8 +1,8 @@
 use strict;
 use warnings;
-use 5.026;
+use 5.024;
 
-package Dist::Zilla::Plugin::CommentOut 0.04 {
+package Dist::Zilla::Plugin::CommentOut 0.05 {
 
   # ABSTRACT: Comment out code in your scripts and modules
 
@@ -125,7 +125,7 @@ Dist::Zilla::Plugin::CommentOut - Comment out code in your scripts and modules
 
 =head1 VERSION
 
-version 0.04
+version 0.05
 
 =head1 SYNOPSIS
 

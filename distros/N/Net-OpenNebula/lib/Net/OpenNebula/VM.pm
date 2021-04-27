@@ -9,7 +9,7 @@ use strict;
 use warnings;
 
 package Net::OpenNebula::VM;
-$Net::OpenNebula::VM::VERSION = '0.313.0';
+$Net::OpenNebula::VM::VERSION = '0.316.0';
 use Net::OpenNebula::RPC;
 push our @ISA , qw(Net::OpenNebula::RPC);
 

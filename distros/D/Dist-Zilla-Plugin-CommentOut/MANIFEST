@@ -18,7 +18,6 @@ dist.ini
 lib/Dist/Zilla/Plugin/CommentOut.pm
 perlcriticrc
 t/00_diag.t
-t/01_use.t
 t/dist_zilla_plugin_commentout.t
 xt/author/critic.t
 xt/author/eol.t

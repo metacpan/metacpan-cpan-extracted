@@ -17,20 +17,18 @@ delete $ENV{DATAPRINTERRC}; # make sure user rc doesn't interfere
     my $hashsep = '{FINDME}';
 
     my $rcfile = File::Temp->new;
-    print {$rcfile} "{
-        hash_separator => '$hashsep',
-        colored => 0,
-    };";
+    print {$rcfile} "hash_separator = '$hashsep'\ncolored = 0\n";
     $rcfile->flush;
 
     my $filename = $rcfile->filename;
 
     my $template = "[%
-        USE DataPrinter( dp = { rc_file = '$filename' } );
+        USE DataPrinter;
         hash = { a = 1, b = 2 };
         DataPrinter.dump(hash);
     %]";
 
+    $ENV{DATAPRINTERRC} = $filename;
     my $ansi = process_ok($template, {}, 'rc_file template processed ok');
 
     like($ansi, qr/$hashsep/, 'output contains expected hashsep');

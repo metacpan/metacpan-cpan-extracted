@@ -106,11 +106,15 @@ The method here is just a placeholder it should be reimplemented by the service 
 
 =head2 shutdown
 
-Gracefully shut down the service by
+Gracefully shut down the service. At the moment, this means we:
 
-- stop accepting more requests
+=over 4
 
-- finish the pending requests
+=item * stop accepting more requests
+
+=item * finish the pending requests
+
+=back
 
 =head1 INHERITED METHODS
 

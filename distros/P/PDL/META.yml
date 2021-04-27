@@ -38,9 +38,8 @@ requires:
   Filter::Util::Call: '0'
   Inline: '0.83'
   Inline::C: '0.62'
-  List::MoreUtils: '0'
+  List::Util: '0.33'
   Math::Complex: '0'
-  Module::Compile: '0.23'
   OpenGL: '0.70'
   Pod::Parser: '0'
   Pod::Select: '0'
@@ -55,5 +54,5 @@ resources:
   bugtracker: https://github.com/PDLPorters/pdl/issues
   homepage: http://pdl.perl.org/
   repository: git://github.com/PDLPorters/pdl.git
-version: '2.039'
+version: '2.040'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

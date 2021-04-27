@@ -1,0 +1,94 @@
+NAME
+
+    List::Keywords - a selection of list utility keywords
+
+SYNOPSIS
+
+       use List::Keywords 'any';
+    
+       my @boxes = ...;
+    
+       if( any { $_->size > 100 } @boxes ) {
+          say "There are some large boxes here";
+       }
+
+DESCRIPTION
+
+    This module provides keywords that behave (almost) identically to
+    familiar functions from List::Util, but implemented as keyword plugins
+    instead of functions. As a result these run more efficiently,
+    especially in small code cases.
+
+ Blocks vs Anonymous Subs
+
+    In the description above the word "almost" refers to the fact that as
+    this module provides true keywords, the code blocks to them can be
+    parsed as true blocks rather than anonymous functions. As a result,
+    both caller and return will behave rather differently here.
+
+    For example,
+
+       use List::Keywords 'any';
+    
+       sub func {
+          any { say "My caller is ", caller; return "ret" } 1, 2, 3;
+          say "This is never printed";
+       }
+
+    Here, the caller will see func as its caller, and the return statement
+    makes the entire containing function return, so the second line is
+    never printed. The same example written using List::Util will instead
+    print the List::Util::any function as being the caller, before making
+    just that one item return the value, then the message on the second
+    line is printed as normal.
+
+    In regular operation where the code is just performing some test on
+    each item, and does not make use of caller or return, this should not
+    cause any noticable differences.
+
+ Performance
+
+    The following example demonstrates a simple case and shows how the
+    performance differs.
+
+       my @nums = (1 .. 100);
+    
+       my $ret = any { $_ > 50 } @nums;
+
+    When run for 5 seconds each, the following results were obtained on my
+    machine:
+
+       List::Util::any      648083/s
+       List::Keyword/any    816135/s
+
+    The List::Keyword version here ran 26% faster.
+
+KEYWORDS
+
+ any
+
+       $bool = any { CODE } LIST
+
+    Repeatedly calls the block of code, with $_ locally set to successive
+    values from the given list. Returns true and stops at the first item to
+    make the block yield a true value. If no such item exists, returns
+    false.
+
+ all
+
+       $bool = all { CODE } LIST
+
+    Repeatedly calls the block of code, with $_ locally set to successive
+    values from the given list. Returns false and stops at the first item
+    to make the block yield a false value. If no such item exists, returns
+    true.
+
+ACKNOWLEDGEMENTS
+
+    With thanks to Matthew Horsfall (alh) for much assistance with
+    performance optimizations.
+
+AUTHOR
+
+    Paul Evans <leonerd@leonerd.org.uk>
+

@@ -1,0 +1,30 @@
+---
+abstract: 'manipulate the image data part of PNGs'
+author:
+  - 'Ben Bullock <bkb@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Image-PNG-Data
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Image::PNG::Libpng: '0.56'
+  perl: '5.006001'
+resources:
+  X_no_index:
+    file:
+      - t/IPNGDT.pm
+  bugtracker: https://github.com/benkasminbullock/image-png-data/issues
+  repository: git://github.com/benkasminbullock/image-png-data.git
+version: '0.01'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

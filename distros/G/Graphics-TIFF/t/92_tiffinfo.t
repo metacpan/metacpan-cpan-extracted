@@ -70,6 +70,8 @@ is( `$cmd -z -d $file`, `tiffinfo -z -d $file`, '-z -d' );
 # strip '' from around ?, which newer glibc libraries seem to have added
 my $expected = `tiffinfo -? $file 2>&1`;
 $expected =~ s/'\?'/?/xsm;
+# strip a description line added in libtiff 4.3.0
+$expected =~ s/^Display information about TIFF files\R\R//sm;
 is( `$cmd -? $file 2>&1`, $expected, '-?' );
 
 #########################

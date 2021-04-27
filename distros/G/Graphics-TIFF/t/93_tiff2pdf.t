@@ -31,6 +31,10 @@ my $expected = `tiff2pdf -? $tif 2>&1`;
 $expected =~ s/'\?'/?/xsm;
 # strip '-m' option added in tiff-4.2.0
 $expected =~ s/^ -m: .*?\R//ms;
+# strip a description line added in libtiff 4.3.0
+$expected =~ s/^Convert a TIFF image to a PDF document\R\R//sm;
+# adjust options introduction changed in libtiff 4.3.0
+$expected =~ s/^where options are:/options:/sm;
 is( `$cmd -? $tif 2>&1`, $expected, '-?' );
 
 #########################

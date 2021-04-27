@@ -3,7 +3,6 @@ abstract: 'Simple wrapper for explicit JSON Unicode text/UTF-8 byte functions'
 author:
   - 'Tom Molesworth <TEAM@cpan.org>'
 build_requires:
-  Encode: '0'
   ExtUtils::MakeMaker: '0'
   File::Spec: '0'
   IO::Handle: '0'
@@ -11,12 +10,10 @@ build_requires:
   Test::CheckDeps: '0.010'
   Test::Deep: '0'
   Test::More: '0.98'
-  perl: '5.010'
-  utf8: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.017, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -32,16 +29,18 @@ no_index:
 provides:
   JSON::MaybeUTF8:
     file: lib/JSON/MaybeUTF8.pm
-    version: '1.002'
+    version: '2.000'
 requires:
   Exporter: '0'
   JSON::MaybeXS: '0'
   Unicode::UTF8: '0'
-  feature: '0'
   perl: '5.010'
-  strict: '0'
-  warnings: '0'
-version: '1.002'
+resources:
+  bugtracker: https://github.com/team-at-cpan/JSON-MaybeUTF8/issues
+  homepage: https://github.com/team-at-cpan/JSON-MaybeUTF8
+  repository: https://github.com/team-at-cpan/JSON-MaybeUTF8.git
+version: '2.000'
 x_authority: cpan:TEAM
-x_generated_by_perl: v5.28.1
+x_generated_by_perl: v5.32.0
 x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

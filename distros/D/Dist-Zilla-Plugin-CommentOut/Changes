@@ -1,5 +1,8 @@
 Revision history for Dist-Zilla-Plugin-CommentOut
 
+0.05      2021-04-26 19:53:40 -0600
+  - Restore support for Perl 5.24 (gh#3)
+
 0.04      2021-03-31 09:04:46 -0600
   - support begin, end and remove at the same time
   - Drop support for Perls prior to 5.26

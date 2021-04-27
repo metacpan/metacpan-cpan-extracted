@@ -2,7 +2,7 @@ use strict;
 use warnings;
 
 package Net::OpenNebula::RPC;
-$Net::OpenNebula::RPC::VERSION = '0.313.0';
+$Net::OpenNebula::RPC::VERSION = '0.316.0';
 use Data::Dumper;
 
 use constant ONERPC => 'rpc';
@@ -313,8 +313,15 @@ sub _get_instances {
     my $key = $class->ONEPOOLKEY || uc($class->ONERPC);
 
     my @ret = ();
+    my $info = "info";
 
-    my $reply = $self->{rpc}->_rpc("one.$pool.info", @args);
+    # Change VM info by new infoextended if version >= 5.8.x
+    if (($self->{rpc}->version() >= version->new('5.8.0')) and ($pool eq "vmpool")) {
+        $info = 'infoextended';
+        push(@args, [ string => "" ]);
+    };
+
+    my $reply = $self->{rpc}->_rpc("one.$pool.$info", @args);
 
     foreach my $data (@{ $reply->{$key} }) {
         # This is data from pool.info, so it is as complete as individual info

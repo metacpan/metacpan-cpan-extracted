@@ -37,6 +37,38 @@ await $redis->hgetall('clientside.cached.hset');
 await $redis->hset('clientside.cached.hset' => abc => 123);
 await $redis->hset('clientside.cached.hset' => def => 123);
 await $redis->hset('clientside.cached.hset' => ghi => 123);
+
+await $redis->del(
+    'example_stream',
+);
+await $redis->xgroup(
+    CREATE => 'example_stream',
+    primary_group => '0',
+    'MKSTREAM'
+);
+my ($item) = await $redis->xreadgroup(
+    # Wait up to 2 seconds for a message
+    GROUP       => 'primary_group',
+    $$,
+    COUNT       => 1,
+    STREAMS     => 'example_stream',
+    '>'
+);
+
+await $redis->xadd(
+    example_stream => '*',
+    key => 'value',
+);
+my ($item) = await $redis->xread(
+    # Wait up to 2 seconds for a message
+    COUNT       => 1,
+    STREAMS     => 'example_stream',
+    '$',
+);
+await $redis->xadd(
+    example_stream => '*',
+    key => 'value',
+);
 $log->infof('Start loop');
 $loop->run;
 

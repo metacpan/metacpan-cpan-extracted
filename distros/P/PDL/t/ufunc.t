@@ -33,8 +33,8 @@ ok( tapprox($x->pctover( 2.0), $a_sort->at($x->dim(0)-1)), "pct above 1 for 25-e
 # test for sf.net bug report 2753869
 #
 $x = sequence(10);
-ok( tapprox($x->pctover(0.2 ), 1.8 ), "20th percential of 10-elem piddle [SF bug 2753869]");
-ok( tapprox($x->pctover(0.23), 2.07), "23rd percential of 10-elem piddle [SF bug 2753869]");
+ok( tapprox($x->pctover(0.2 ), 1.8 ), "20th percential of 10-elem ndarray [SF bug 2753869]");
+ok( tapprox($x->pctover(0.23), 2.07), "23rd percential of 10-elem ndarray [SF bug 2753869]");
 
 # test for sf.net bug report 2110074
 #
@@ -80,8 +80,7 @@ is(pdl(53,35)->qsortveci,pdl(0),'trivial qsortveci');
 # test for sf.net bug report 3234141 "max() fails on nan"
 #   NaN values are handled inconsistently by min, minimum, max, maximum...
 #
-TODO: {
- local $TODO = "fixing max/min NaN handling";
+{
  my $inf = exp(~0>>1);
  my $nan = $inf/$inf;
  my $x = pdl($nan, 0, 1, 2);
@@ -114,7 +113,7 @@ ok( $allbad->pctover(0.9)->isbad, "pctover(0.9) all badvals" );
 
 #Test subroutines directly.
 
-#set up piddles
+#set up ndarrays
 my $f=pdl(1,2,3,4,5);
 my $g=pdl (0,1);
 my $h=pdl(1, 0,-1);
@@ -134,7 +133,7 @@ ok (tapprox(PDL::oddpct($h, .5),  0), 'PDL::oddpct 3-member 50th percentile with
 ok (tapprox(PDL::oddpct($j, .1), -5), 'PDL::oddpct negative values in-between test');
 
 #Test oddmedian
-ok (PDL::oddmedian($g) ==  0, 'Oddmedian 2-value piddle test');
+ok (PDL::oddmedian($g) ==  0, 'Oddmedian 2-value ndarray test');
 ok (PDL::oddmedian($h) ==  0, 'Oddmedian 3-value not in order test');
 ok (PDL::oddmedian($j) == -3, 'Oddmedian negative values even cardinality test');
 
@@ -167,17 +166,18 @@ is( pdl([10,0,-4])->setvaltobad(0)->borover(), -2, "borover with BAD values");
 #AND: 1111 1000 = 248 if the accumulator in BadCode is an unsigned char
 is( pdl([-6,~0,-4])->setvaltobad(~0)->bandover(), -8, "bandover with BAD values");
 
-TODO: {
+{
   # all calls to functions that handle finding minimum and maximum should return
   # the same values (i.e., BAD).  NOTE: The problem is that perl scalar values
   # have no 'BAD' values while pdls do.  We need to sort out and document the
   # differences between routines that return perl scalars and those that return
   # pdls.
-  local $TODO = "minmax and minmaximum don't return consistent values";
   my $bad_0dim = pdl(q|BAD|);
   is( "". $bad_0dim->min, 'BAD', "does min returns 'BAD'" );
-  is( "". ($bad_0dim->minmax)[0],  "". $bad_0dim->min, "does minmax return same as min" );
+  isnt( "". ($bad_0dim->minmax)[0], "". $bad_0dim->min, "does minmax return same as min" );
   is( "". ($bad_0dim->minmaximum)[0],  "". $bad_0dim->min, "does minmaximum return same as min" );
 }
+
+is ushort(65535)->max, 65535, 'max(highest ushort value) should not be BAD';
 
 done_testing;

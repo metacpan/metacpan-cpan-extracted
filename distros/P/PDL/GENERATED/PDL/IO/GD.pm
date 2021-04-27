@@ -58,7 +58,7 @@ years old at this point (read: stable). If you're feeling frisky, try the new OO
 interface described below.
 
 The general version just provides several image IO utility functions you can use with
-piddle variables. It's deceptively useful, however.
+ndarray variables. It's deceptively useful, however.
 
 =cut
 
@@ -86,7 +86,7 @@ piddle variables. It's deceptively useful, however.
 
   Signature: (byte img(x,y); byte lut(i,j); char* filename)
 
-Writes a 2-d PDL variable out to a PNG file, using the supplied color look-up-table piddle
+Writes a 2-d PDL variable out to a PNG file, using the supplied color look-up-table ndarray
 (hereafter referred to as a LUT).
 
 The LUT contains a line for each value 0-255 with a corresponding R, G, and B value.
@@ -95,7 +95,7 @@ The LUT contains a line for each value 0-255 with a corresponding R, G, and B va
 =for bad
 
 write_png does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -125,7 +125,7 @@ Same as write_png(), except you can specify the compression level (0-9) as the l
 =for bad
 
 write_png_ex does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -155,7 +155,7 @@ This means a larger file on disk, but can contain more than 256 colors.
 =for bad
 
 write_true_png does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -185,7 +185,7 @@ Same as write_true_png(), except you can specify the compression level (0-9) as 
 =for bad
 
 write_true_png_ex does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -206,7 +206,7 @@ Like write_png(), but it assumes the best PNG compression (9).
 
 =for example
 
-  write_png_best( $img(piddle), $lut(piddle), $filename )
+  write_png_best( $img(ndarray), $lut(ndarray), $filename )
 
 =cut
 
@@ -225,7 +225,7 @@ Like write_true_png(), but it assumes the best PNG compression (9).
 
 =for example
 
-  write_true_png_best( $img(piddle), $filename )
+  write_true_png_best( $img(ndarray), $filename )
 
 =cut
 
@@ -244,7 +244,7 @@ sub write_true_png_best
 
 =head2 load_lut( $filename )
 
-Loads a color look up table from an ASCII file. returns a piddle
+Loads a color look up table from an ASCII file. returns an ndarray
 
 =cut
 
@@ -629,7 +629,7 @@ string interpreted as a filename. Thus the following are all equivalent:
 
 If the hash has:
 
- pdl => $pdl_var (lut => $lut_piddle)
+ pdl => $pdl_var (lut => $lut_ndarray)
     Then a new GD is created from that PDL variable.
 
  filename => $file
@@ -652,7 +652,7 @@ Example:
  
  my $gd = PDL::IO::GD->new({ pdl => $pdl_var });
     
- my $gd = PDL::IO::GD->new({ pdl => $pdl_var, lut => $lut_piddle });
+ my $gd = PDL::IO::GD->new({ pdl => $pdl_var, lut => $lut_ndarray });
  
  my $gd = PDL::IO::GD->new({ filename => "image.png" });
  
@@ -696,8 +696,8 @@ sub new
         my @pairs = @_;
         my $Npairs = scalar(@pairs)/2;
 
-        use List::MoreUtils 'none';
-        if( List::MoreUtils::none { ref $pairs[2*$_] } 0..$Npairs-1 ) {
+        use List::Util 'none';
+        if( none { ref $pairs[2*$_] } 0..$Npairs-1 ) {
           # treat the arguments as a hash
           $options = { @pairs }
         }
@@ -826,7 +826,7 @@ EOF
 
 =head2 to_pdl
 
-When you're done playing with your GDImage and want a piddle back, use this function to return one.
+When you're done playing with your GDImage and want an ndarray back, use this function to return one.
 
 =cut
 
@@ -852,11 +852,11 @@ sub to_pdl
     return $pdl;
 } # End of to_pdl()...
 
-=head2 apply_lut( $lut(piddle) )
+=head2 apply_lut( $lut(ndarray) )
 
-Does a $im->ColorAllocate() for and entire LUT piddle at once.
+Does a $im->ColorAllocate() for and entire LUT ndarray at once.
 
-The LUT piddle format is the same as for the general interface above.
+The LUT ndarray format is the same as for the general interface above.
 
 =cut
 

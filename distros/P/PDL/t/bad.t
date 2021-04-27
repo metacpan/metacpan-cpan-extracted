@@ -1,17 +1,14 @@
 use strict;
 use Test::More;
 use PDL::LiteF;
-use PDL::Config;
 use PDL::Math;
+use PDL::Types qw(types);
 use Test::Warn;
 
 # although approx() caches the tolerance value, we
 # use it in every call just to document things
 #
 use constant ABSTOL => 1.0e-4;
-
-my $usenan = $PDL::Config{BADVAL_USENAN} || 0;
-my $perpdl = $PDL::Config{BADVAL_PER_PDL} || 0;
 
 # check default behaviour (ie no bad data)
 # - probably overkill
@@ -22,7 +19,7 @@ is( $x->badflag(), 0, "no badflag" );
 my $y = pdl(4,5,6);
 my $c = $x + $y;
 is( $c->badflag(), 0, "badflag not set in a copy" );
-is( $c->sum(), 21, "sum() works on non bad-flag piddles" );
+is( $c->sum(), 21, "sum() works on non bad-flag ndarrays" );
 
 # is the flag propagated?
 $x->badflag(1);
@@ -72,7 +69,7 @@ $x = pdl(1,2,3,4,5);
 $x->setbadat(2);
 is( PDL::Core::string($x), "[1 2 BAD 4 5]", "setbadat worked" );
 
-# now check that badvalue() changes the piddle
+# now check that badvalue() changes the ndarray
 # (only for integer types)
 $x = convert($x,ushort);
 my $badval = $x->badvalue;
@@ -141,7 +138,7 @@ is( PDL::Core::string( PDL::zcover($x) ), "[BAD 0]", "  and still okay" );
 # 255 is the default bad value for a byte array
 #
 $x = byte(1,2,255,4,5);
-is( $x->median, 4, "median() works on good piddle" );
+is( $x->median, 4, "median() works on good ndarray" );
 $x->badflag(1);
 is( $x->median, 3, "median() works on bad biddle" );
 
@@ -247,15 +244,10 @@ is( $y->badflag, 1, "assgn propagated badflag");
 $x->badflag(0);
 is( $y->badflag, 1, "assgn is not a deep copy for the badflag");
 
-# check that at and sclr return the correct values
-TODO: {
-   $x = pdl q[BAD];
-   local $TODO = 'check that at and sclr return correct values and the same';
-
-   is( PDL::Core::string($x), 'BAD', 'can convert PDL to string' );
-   is( $x->at, 'BAD', 'at() returns BAD for a bad value' );
-   is( $x->sclr, 'BAD', 'sclr() returns BAD for a bad value' );
-}
+$x = pdl q[BAD];
+is( PDL::Core::string($x), 'BAD', 'can convert PDL to string' );
+is( $x->at, 'BAD', 'at() returns BAD for a bad value' );
+isnt( $x->sclr, 'BAD', 'sclr() ignores bad value' );
 
 $x = pdl(0.5,double->badvalue,0);
 $x->badflag(1);
@@ -351,10 +343,10 @@ $x->inplace->setvaltobad( 1 );
 like( PDL::Core::string( $x->clump(-1) ), 
     qr{^\[-?0 BAD 2 3 -?0 BAD 2 3 -?0 BAD]$}, "inplace setvaltobad()" );
 
-# check setvaltobad for non-double piddles
+# check setvaltobad for non-double ndarrays
 my $fa = pdl( float,  1..4) / 3;
 my $da = pdl( double, 1..4) / 3;
-ok( all($fa->setvaltobad(2/3)->isbad == $da->setvaltobad(2/3)->isbad), "setvaltobad for float piddle");
+ok( all($fa->setvaltobad(2/3)->isbad == $da->setvaltobad(2/3)->isbad), "setvaltobad for float ndarray");
 
 # simple test for setnantobad
 # - could have a 1D FITS image containing
@@ -366,56 +358,27 @@ like( PDL::Core::string( $x->clump(-1) ),
 
 # check that we can change the value used to represent
 # missing elements for floating points (earlier tests only did integer types)
-# IF we are not using NaN's
 #
-SKIP: {
-    skip( "Skipped: test only valid when not using NaN's as bad values", 2 )
-      if $usenan;
+is( float->badvalue, float->orig_badvalue, "default bad value for floats matches" );
+is( float->badvalue(23), 23, "changed floating-point bad value" );
+float->badvalue( float->orig_badvalue );
 
-    # perhaps should check that the value can't be changed when NaN's are
-    # being used.
-    #
+$x = sequence(4);
+$x->badvalue(3);
+$x->badflag(1);
+$y = $x->slice('2:3');
+is( $y->badvalue, 3, "can propagate per-ndarray bad value");
+is( $y->sum, 2, "and the propagated value is recognised as bad");
+$x = sequence(4);
+is ($x->badvalue, double->orig_badvalue, "no long-term effects of per-ndarray changes [1]");
 
-    is( float->badvalue, float->orig_badvalue, "default bad value for floats matches" );
-    is( float->badvalue(23), 23, "changed floating-point bad value" );
-    float->badvalue( float->orig_badvalue );
+for my $t (map +([$_, undef], [$_, 'nan']), grep !$_->integer, types()) {
+  my $p = sequence $t->[0], 2;
+  $p->badvalue($t->[1]) if defined $t->[1];
+  $p->setbadat(1);
+  eval {is $p.'', '[0 BAD]', "badvalue works right $t->[0], bv=".explain($->[1])};
+  is $@, '';
 }
-
-SKIP: {
-
-    skip ("Skipped: test only valid when enabling bad values per pdl", 3)
-      unless $perpdl;
-
-    $x = sequence(4);
-    $x->badvalue(3);
-    $x->badflag(1);
-    $y = $x->slice('2:3');
-    is( $y->badvalue, 3, "can propagate per-piddle bad value");
-    is( $y->sum, 2, "and the propagated value is recognised as bad");
-
-    $x = sequence(4);
-    is ($x->badvalue, double->orig_badvalue, "no long-term effects of per-piddle changes [1]");
-
-}
-
-SKIP: {
-    skip ("Skipped: test not valid if per-piddle bad values are used", 1)
-      if $perpdl;
-
-    $x = double(4);
-    double->badvalue(3);
-    is($x->badvalue.'', double->badvalue.'', "no long-term effects of per-piddle changes [2]")
-        or diag explain [$x->badvalue, double->badvalue];
-    double->badvalue(double->orig_badvalue);
-
-}
-
-# At the moment we do not allow per-piddle bad values
-# and the use of NaN's.
-#TODO: {
-#    local $TODO = "Need to work out whan NaN and per-piddle bad values means";
-#    is (0, 1);
-#}
 
 ## Name: "isn't numeric in null operation" warning could be more helpful
 ## <http://sourceforge.net/p/pdl/bugs/332/>
@@ -458,12 +421,6 @@ TODO: {
 	};
 }
 
-if ($usenan) {
-  diag 'terminating as badvalue support only supports NaN badvalues';
-  done_testing;
-  exit;
-}
-
 ## Issue information
 ##
 ## Name: scalar PDL with badvalue always compares BAD with perl scalars
@@ -483,11 +440,8 @@ subtest "Issue example code" => sub {
 	is( "$m", 2, "Mean of [1 2 3] is 2" );
 	is( "$s", 1, "And std. dev is 1" );
 
-	if ($perpdl) {
-	  # to ensure warnings happen if per-PDL
-	  $s->badflag(1);
-	  $s->badvalue(0);
-	}
+	$s->badflag(1);
+	$s->badvalue(0);
 	my @warnings;
 	local $SIG{__WARN__} = sub { push @warnings, @_ };
 	is( "".($s >  0), "1", "is 1 >  0? -> true" );

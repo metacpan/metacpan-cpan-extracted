@@ -121,7 +121,7 @@ info not available
 =for bad
 
 mninit does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -152,7 +152,7 @@ info not available
 =for bad
 
 mn_abre does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -183,7 +183,7 @@ info not available
 =for bad
 
 mn_cierra does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -263,7 +263,7 @@ info not available
 =for bad
 
 mnparm does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -324,7 +324,7 @@ info not available
 =for bad
 
 mnexcm does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -382,7 +382,7 @@ info not available
 =for bad
 
 mnpout does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -430,7 +430,7 @@ info not available
 =for bad
 
 mnstat does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -483,7 +483,7 @@ info not available
 =for bad
 
 mnemat does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -537,7 +537,7 @@ info not available
 =for bad
 
 mnerrs does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -596,7 +596,7 @@ info not available
 =for bad
 
 mncont does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -622,7 +622,7 @@ to be minimized has to receive five arguments
 of parameters currently variable. The second is the gradient
 of the function (which is not necessarily used, see 
 the Minuit documentation). The third is the current value of the
-function. The fourth is a piddle with the values of the parameters. 
+function. The fourth is an ndarray with the values of the parameters. 
 The fifth is an integer flag, which indicates what
 the function is supposed to calculate. The function has to
 return the  values ($fval,$grad), the function value and 
@@ -658,7 +658,7 @@ Example:
 
  sub my_function{
     # the five variables input to the function to be minimized
-    # xval is a piddle containing the current values of the parameters
+    # xval is an ndarray containing the current values of the parameters
     my ($npar,$grad,$fval,$xval,$iflag) = @_;
 
 
@@ -680,14 +680,14 @@ be minimized and the value of the initial steps around these values that the
 minimizer will use for the first variations of the parameters in the search for the minimum.
 There are several optional arguments. One allows assigning names to these parameters which 
 otherwise get names (Par_0, Par_1,....,Par_n) by default. Another two arguments can give
-lower and upper bounds for the parameters via two piddles. If the lower and upper bound for a 
+lower and upper bounds for the parameters via two ndarrays. If the lower and upper bound for a 
 given parameter are both equal to 0 then the parameter is unbound. By default these lower and
-upper bound piddles are set to  zeroes(n), where n is the number of parameters, i.e. the 
+upper bound ndarrays are set to  zeroes(n), where n is the number of parameters, i.e. the 
 parameters are unbound by default. 
 
-The function needs two input variables: a piddle giving the initial values of the
-parameters and another piddle giving the initial steps. An optional reference to a 
-perl array with the  variable names can be passed, as well as piddles
+The function needs two input variables: an ndarray giving the initial values of the
+parameters and another ndarray giving the initial steps. An optional reference to a 
+perl array with the  variable names can be passed, as well as ndarrays
 with upper and lower bounds for the parameters (see example below).
 
 It returns an integer variable which is 0 upon success.
@@ -740,7 +740,7 @@ Example:
 
 The function mn_excm() executes a Minuit command passed as
 a string. The first argument is the command string and an optional
-second argument is a piddle with arguments to the command.
+second argument is an ndarray with arguments to the command.
 The available commands are listed in Chapter 4 of the Minuit 
 manual (see url below).
 
@@ -812,7 +812,7 @@ Usage:
 
 =head2 mn_emat()
 
-The function mn_emat returns the covariance matrix as a piddle.
+The function mn_emat returns the covariance matrix as an ndarray.
 
 =for usage
 
@@ -850,7 +850,7 @@ minimum of the function being minimized with respect to all the other NPAR-2 par
 
 The function takes as input the parameter numbers with respect to which the contour
 is to be determined (two) and the number of points $npt required on the contour (>4).
-It returns an array with piddles $xpt,$ypt containing the coordinates of the contour 
+It returns an array with ndarrays $xpt,$ypt containing the coordinates of the contour 
 and a variable $nfound indicating the number of points actually found in the contour.
 If all goes well $nfound will be equal to $npt, but it can be negative if the input
 arguments are not valid, zero if less than four points have been found or <$npt if the

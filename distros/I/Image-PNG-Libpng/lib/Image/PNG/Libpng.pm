@@ -40,8 +40,8 @@ our @EXPORT_OK = qw/
 	get_pCAL
 	get_pHYs
 	get_palette_max
+	get_pixel
 	get_rgb_to_gray_status
-	get_row_pointers
 	get_rowbytes
 	get_rows
 	get_sBIT
@@ -132,7 +132,6 @@ our @EXPORT_OK = qw/
 	set_unknown_chunks
 	set_user_limits
 	set_verbosity
-	shift
 	sig_cmp
 	split_alpha
 	text_compression_name
@@ -141,10 +140,10 @@ our @EXPORT_OK = qw/
 	write_info
 	write_png
 	write_to_scalar
-	any2gray8
 	copy_png
 	create_reader
 	create_writer
+	get_contents
 	get_internals
 	image_data_diff
 	png_compare
@@ -158,7 +157,7 @@ our %EXPORT_TAGS = (
 );
 
 require XSLoader;
-our $VERSION = '0.56';
+our $VERSION = '0.57';
 
 XSLoader::load('Image::PNG::Libpng', $VERSION);
 
@@ -433,75 +432,37 @@ sub create_writer
     return $png;
 }
 
-# White background for either RGB or grayscale.
+# This is a helper for pnginspect which pulls out the information from
+# a PNG file and sticks it into a hash. 
 
-my %white = (red => 0xff, green => 0xff, blue => 0xff, gray => 0xff);
-
-sub any2gray8
+sub get_contents
 {
-    my ($file, %options) = @_;
-    my $reader = create_reader ($file);
-    $reader->set_verbosity (1);
-    $reader->read_info ();
-    my $ihdr = $reader->get_IHDR ();
-    my $bd = $ihdr->{bit_depth};
-    my $ct = $ihdr->{color_type};
-    if ($bd != 8) {
-	if ($bd == 16) {
-	    $reader->set_scale_16 ();
-	}
-	elsif ($bd < 8) {
-	    # There is no GRAY_ALPHA with less than 8 bits, so don't
-	    # worry about that.
-	    if ($ct == PNG_COLOR_TYPE_GRAY) {
-		$reader->set_expand_gray_1_2_4_to_8 ();
-	    }
-	    elsif ($ct == PNG_COLOR_TYPE_PALETTE) {
-		$reader->set_palette_expand_to_rgb ();
-		$reader->set_rgb_to_gray ();
-	    }
-	    else {
-		croak "Unknown color type $ct and bit-depth $bd combination in $file";
-	    }
+    # The PNG "file" might also be some data pulled from the web and
+    # not saved to a file, so the fields $name and $size in the
+    # argument list might be a URL and the size of a bit of binary
+    # data in Perl's memory.
+    my ($png, $name, $size) = @_;
+    if (! $name) {
+	croak "No name";
+    }
+    if (! $size || $size !~ /^[0-9]+$/) {
+	croak "No size or bad size";
+    }
+    my %contents;
+    $contents{name} = $name;
+    $contents{size} = $size;
+    $contents{ihdr} = $png->get_IHDR ();
+    my $valid = $png->get_valid ();
+    for my $key (%$valid) {
+	if ($key eq 'IDAT') {
+	    $contents{IDAT} = 'OK';
 	}
 	else {
-	    croak "Unknown bit depth $bd in $file";
+	    $contents{$key} = $png->get_chunk ($key);
 	}
     }
-    if ($ct & PNG_COLOR_MASK_ALPHA) {
-	# We need to add a background color.
-	my $bkgd = $reader->get_bKGD ();
-	if ($bkgd) {
-	    $reader->set_background ($bkgd, PNG_BACKGROUND_GAMMA_SCREEN, 1);
-	}
-	elsif ($options{bkgd}) {
-	    $reader->set_background ($bkgd, PNG_BACKGROUND_GAMMA_SCREEN, 1);
-	}
-	else {
-	    $reader->set_background (\%white, PNG_BACKGROUND_GAMMA_SCREEN, 1);
-	}
-    }
-    if ($ct & PNG_COLOR_MASK_COLOR) {
-	$reader->set_rgb_to_gray ();
-    }
-    elsif ($ct == PNG_COLOR_TYPE_PALETTE) {
-	$reader->set_palette_expand_to_rgb ();
-	$reader->set_rgb_to_gray ();
-    }
-    $reader->read_image ();
-    $reader->read_end ();
-    my $rows = $reader->get_rows ();
-    my $wpng = create_write_struct ();
-    my %ihdr = (
-	height => $ihdr->{height},
-	width => $ihdr->{width},
-	color_type => PNG_COLOR_TYPE_GRAY,
-	bit_depth => 8,
-	interlace_type => $ihdr->{interlace_type},
-    );
-    $wpng->set_IHDR (\%ihdr);
-    $wpng->set_rows ($rows);
-    return $wpng;
+    $contents{text} = $png->get_text ();
+    return \%contents;
 }
 
 1;

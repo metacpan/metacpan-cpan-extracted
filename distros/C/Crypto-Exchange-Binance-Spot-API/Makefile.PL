@@ -16,9 +16,10 @@ my %WriteMakefileArgs = (
   "LICENSE" => "restrictive",
   "NAME" => "Crypto::Exchange::Binance::Spot::API",
   "PREREQ_PM" => {
-    "Crypto::Exchange::API" => 0
+    "Crypto::Exchange::API" => 0,
+    "DateTime" => 0
   },
-  "VERSION" => "0.02",
+  "VERSION" => "0.04",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -26,7 +27,8 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
-  "Crypto::Exchange::API" => 0
+  "Crypto::Exchange::API" => 0,
+  "DateTime" => 0
 );
 
 

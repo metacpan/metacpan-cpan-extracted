@@ -108,7 +108,67 @@ SPVM::ArrayUtil - Array Utilities
     my $new_int_obj = SPVM::Int->new($int_obj->value);
     return $new_int_obj;
   });
-  
+
+  # Sort byte array itself by asc order
+  my $nums = [(byte)2, 3, 1];
+  SPVM::Sort->sort_byte($nums, 0, scalar @$nums, sub : int ($self : self, $a : byte, $b : byte) {
+    return $a <=> $b;
+  });
+
+  # Sort short array itself by asc order
+  my $nums = [(short)2, 3, 1];
+  SPVM::Sort->sort_short($nums, 0, scalar @$nums, sub : int ($self : self, $a : short, $b : short) {
+    return $a <=> $b;
+  });
+
+  # Sort int array itself by asc order
+  my $nums = [2, 3, 1];
+  SPVM::Sort->sort_int($nums, 0, scalar @$nums, sub : int ($self : self, $a : int, $b : int) {
+    return $a <=> $b;
+  });
+
+  # Sort long array itself by asc order
+  my $nums = [(long)2, 3, 1];
+  SPVM::Sort->sort_long($nums, 0, scalar @$nums, sub : int ($self : self, $a : long, $b : long) {
+    return $a <=> $b;
+  });
+
+  # Sort float array itself by asc order
+  my $nums = [(float)2, 3, 1];
+  SPVM::Sort->sort_float($nums, 0, scalar @$nums, sub : int ($self : self, $a : float, $b : float) {
+    return $a <=> $b;
+  });
+
+  # Sort double array itself by asc order
+  my $nums = [(double)2, 3, 1];
+  SPVM::Sort->sort_double($nums, 0, scalar @$nums, sub : int ($self : self, $a : double, $b : double) {
+    return $a <=> $b;
+  });
+
+  # Sort string array itself by asc order
+  my $nums = ["11", "1", "2", undef, ""];
+  SPVM::Sort->sort_double($nums, 0, scalar @$nums, sub : int ($self : self, $a : double, $b : double) {
+    return $a <=> $b;
+  });
+
+  # Sort object array itself by asc order
+  my $minimals = new TestCase::Minimal[3];
+  $minimals->[0] = TestCase::Minimal->new;
+  $minimals->[0]{x} = 3;
+  $minimals->[0]{y} = 5;
+  $minimals->[1] = TestCase::Minimal->new;
+  $minimals->[1]{x} = 3;
+  $minimals->[1]{y} = 7;
+  $minimals->[2] = TestCase::Minimal->new;
+  $minimals->[2]{x} = 2;
+  $minimals->[2]{y} = 9;
+  SPVM::Sort->sort_object$minimals, 0, scalar @$minimals, sub : int ($self : self, $object1 : object, $object2 : object) {
+    my $minimal1 = (TestCase::Minimal)$object1;
+    my $minimal2 = (TestCase::Minimal)$object2;
+    
+    return $minimal1->{x} <=> $minimal2->{x} || $minimal1->{y} <=> $minimal2->{y};
+  };
+
 =head1 DESCRIPTION
 
 Array Utilities.
@@ -359,195 +419,217 @@ If string array is undef, return undef.
 
 =head2 memcpy_byte
 
-  sub memcpy_byte : void ($dest_data : byte[], $dest_offset : int, $src_data : byte[], $src_offset : int, $length : int)
+  sub memcpy_byte : void ($dest : byte[], $dest_offset : int, $source : byte[], $source_offset : int, $length : int)
 
 Copy source byte array to destination byte array with the each offset and a length.
 
 If source data range and destination data overlap, the result is not guaranteed.
 
-If source byte array or destination array is undef, a exception occurs.
+Destnation must be defined, otherwise a exception occurs.
 
-If source byte array or destination array is undef, a exception occurs.
+Source must be defined, otherwise a exception occurs.
 
-If length is nagative, a exception occurs.
+Length must be more than or equals to 0, otherwise a exception occurs.
 
-If copy is not in the valid rainge, a exception occurs.
+Destnation offset + length must be within the range of the destnation array, otherwise a exception occurs.
+
+Source offset + length must be within the range of the source array, otherwise a exception occurs.
 
 =head2 memcpy_short
 
-  sub memcpy_short : void ($dest_data : short[], $dest_offset : int, $src_data : short[], $src_offset : int, $length : int)
+  sub memcpy_short : void ($dest : short[], $dest_offset : int, $source : short[], $source_offset : int, $length : int)
 
 Copy source short array to destination short array with the each offset and a length.
 
 If source data range and destination data overlap, the result is not guaranteed.
 
-If source short array or destination array is undef, a exception occurs.
+Destnation must be defined, otherwise a exception occurs.
 
-If source short array or destination array is undef, a exception occurs.
+Source must be defined, otherwise a exception occurs.
 
-If length is nagative, a exception occurs.
+Length must be more than or equals to 0, otherwise a exception occurs.
 
-If copy is not in the valid rainge, a exception occurs.
+Destnation offset + length must be within the range of the destnation array, otherwise a exception occurs.
+
+Source offset + length must be within the range of the source array, otherwise a exception occurs.
 
 =head2 memcpy_int
   
-  sub memcpy_int : void ($dest_data : int[], $dest_offset : int, $src_data : int[], $src_offset : int, $length : int)
+  sub memcpy_int : void ($dest : int[], $dest_offset : int, $source : int[], $source_offset : int, $length : int)
 
 Copy source int array to destination int array with the each offset and a length.
 
-If source data range and destination data overlap, the result is not guaranteed.
+Destnation must be defined, otherwise a exception occurs.
 
-If source int array or destination array is undef, a exception occurs.
+Source must be defined, otherwise a exception occurs.
 
-If source int array or destination array is undef, a exception occurs.
+Length must be more than or equals to 0, otherwise a exception occurs.
 
-If length is nagative, a exception occurs.
+Destnation offset + length must be within the range of the destnation array, otherwise a exception occurs.
 
-If copy is not in the valid rainge, a exception occurs.
+Source offset + length must be within the range of the source array, otherwise a exception occurs.
 
 =head2 memcpy_long
   
-  sub memcpy_long : void ($dest_data : long[], $dest_offset : int, $src_data : long[], $src_offset : int, $length : int)
+  sub memcpy_long : void ($dest : long[], $dest_offset : int, $source : long[], $source_offset : int, $length : int)
 
 Copy source long array to destination long array with the each offset and a length.
 
 If source data range and destination data overlap, the result is not guaranteed.
 
-If source long array or destination array is undef, a exception occurs.
+Destnation must be defined, otherwise a exception occurs.
 
-If source long array or destination array is undef, a exception occurs.
+Source must be defined, otherwise a exception occurs.
 
-If length is nagative, a exception occurs.
+Length must be more than or equals to 0, otherwise a exception occurs.
 
-If copy is not in the valid rainge, a exception occurs.
+Destnation offset + length must be within the range of the destnation array, otherwise a exception occurs.
+
+Source offset + length must be within the range of the source array, otherwise a exception occurs.
 
 =head2 memcpy_float
   
-  sub memcpy_float : void ($dest_data : float[], $dest_offset : int, $src_data : float[], $src_offset : int, $length : int)
+  sub memcpy_float : void ($dest : float[], $dest_offset : int, $source : float[], $source_offset : int, $length : int)
 
 Copy source float array to destination float array with the each offset and a length.
 
 If source data range and destination data overlap, the result is not guaranteed.
 
-If source float array or destination array is undef, a exception occurs.
+Destnation must be defined, otherwise a exception occurs.
 
-If source float array or destination array is undef, a exception occurs.
+Source must be defined, otherwise a exception occurs.
 
-If length is nagative, a exception occurs.
+Length must be more than or equals to 0, otherwise a exception occurs.
 
-If copy is not in the valid rainge, a exception occurs.
+Destnation offset + length must be within the range of the destnation array, otherwise a exception occurs.
+
+Source offset + length must be within the range of the source array, otherwise a exception occurs.
 
 =head2 memcpy_double
   
-  sub memcpy_double : void ($dest_data : double[], $dest_offset : int, $src_data : double[], $src_offset : int, $length : int)
+  sub memcpy_double : void ($dest : double[], $dest_offset : int, $source : double[], $source_offset : int, $length : int)
 
 Copy source double array to destination double array with the each offset and a length.
 
 If source data range and destination data overlap, the result is not guaranteed.
 
-If source double array or destination array is undef, a exception occurs.
+Destnation must be defined, otherwise a exception occurs.
 
-If source double array or destination array is undef, a exception occurs.
+Source must be defined, otherwise a exception occurs.
 
-If length is nagative, a exception occurs.
+Length must be more than or equals to 0, otherwise a exception occurs.
 
-If copy is not in the valid rainge, a exception occurs.
+Destnation offset + length must be within the range of the destnation array, otherwise a exception occurs.
+
+Source offset + length must be within the range of the source array, otherwise a exception occurs.
 
 =head2 memmove_byte
 
-  sub memmove_byte : void ($dest_data : byte[], $dest_offset : int, $src_data : byte[], $src_offset : int, $length : int)
+  sub memmove_byte : void ($dest : byte[], $dest_offset : int, $source : byte[], $source_offset : int, $length : int)
 
 Copy source byte array to destination byte array with the each offset and a length.
 
 Even if source data range and destination data overlap, the result is guaranteed.
 
-If source byte array or destination array is undef, a exception occurs.
+Destnation must be defined, otherwise a exception occurs.
 
-If source byte array or destination array is undef, a exception occurs.
+Source must be defined, otherwise a exception occurs.
 
-If length is nagative, a exception occurs.
+Length must be more than or equals to 0, otherwise a exception occurs.
 
-If copy is not in the valid rainge, a exception occurs.
+Destnation offset + length must be within the range of the destnation array, otherwise a exception occurs.
+
+Source offset + length must be within the range of the source array, otherwise a exception occurs.
 
 =head2 memmove_short
 
-  sub memmove_short : void ($dest_data : short[], $dest_offset : int, $src_data : short[], $src_offset : int, $length : int)
+  memmove_short : void ($dest : short[], $dest_offset : int, $source : short[], $source_offset : int, $length : int)
 
 Copy source short array to destination short array with the each offset and a length.
 
 Even if source data range and destination data overlap, the result is guaranteed.
 
-If source short array or destination array is undef, a exception occurs.
+Destnation must be defined, otherwise a exception occurs.
 
-If source short array or destination array is undef, a exception occurs.
+Source must be defined, otherwise a exception occurs.
 
-If length is nagative, a exception occurs.
+Length must be more than or equals to 0, otherwise a exception occurs.
 
-If copy is not in the valid rainge, a exception occurs.
+Destnation offset + length must be within the range of the destnation array, otherwise a exception occurs.
+
+Source offset + length must be within the range of the source array, otherwise a exception occurs.
 
 =head2 memmove_int
   
-  sub memmove_int : void ($dest_data : int[], $dest_offset : int, $src_data : int[], $src_offset : int, $length : int)
+  memmove_int : void ($dest : int[], $dest_offset : int, $source : int[], $source_offset : int, $length : int)
 
 Copy source int array to destination int array with the each offset and a length.
 
 Even if source data range and destination data overlap, the result is guaranteed.
 
-If source int array or destination array is undef, a exception occurs.
+Destnation must be defined, otherwise a exception occurs.
 
-If source int array or destination array is undef, a exception occurs.
+Source must be defined, otherwise a exception occurs.
 
-If length is nagative, a exception occurs.
+Length must be more than or equals to 0, otherwise a exception occurs.
 
-If copy is not in the valid rainge, a exception occurs.
+Destnation offset + length must be within the range of the destnation array, otherwise a exception occurs.
+
+Source offset + length must be within the range of the source array, otherwise a exception occurs.
 
 =head2 memmove_long
   
-  sub memmove_long : void ($dest_data : long[], $dest_offset : int, $src_data : long[], $src_offset : int, $length : int)
+  memmove_long : void ($dest : long[], $dest_offset : int, $source : long[], $source_offset : int, $length : int)
 
 Copy source long array to destination long array with the each offset and a length.
 
 Even if source data range and destination data overlap, the result is guaranteed.
 
-If source long array or destination array is undef, a exception occurs.
+Destnation must be defined, otherwise a exception occurs.
 
-If source long array or destination array is undef, a exception occurs.
+Source must be defined, otherwise a exception occurs.
 
-If length is nagative, a exception occurs.
+Length must be more than or equals to 0, otherwise a exception occurs.
 
-If copy is not in the valid rainge, a exception occurs.
+Destnation offset + length must be within the range of the destnation array, otherwise a exception occurs.
+
+Source offset + length must be within the range of the source array, otherwise a exception occurs.
 
 =head2 memmove_float
   
-  sub memmove_float : void ($dest_data : float[], $dest_offset : int, $src_data : float[], $src_offset : int, $length : int)
+  sub memmove_float : void ($dest : float[], $dest_offset : int, $source : float[], $source_offset : int, $length : int)
 
 Copy source float array to destination float array with the each offset and a length.
 
 Even if source data range and destination data overlap, the result is guaranteed.
 
-If source float array or destination array is undef, a exception occurs.
+Destnation must be defined, otherwise a exception occurs.
 
-If source float array or destination array is undef, a exception occurs.
+Source must be defined, otherwise a exception occurs.
 
-If length is nagative, a exception occurs.
+Length must be more than or equals to 0, otherwise a exception occurs.
 
-If copy is not in the valid rainge, a exception occurs.
+Destnation offset + length must be within the range of the destnation array, otherwise a exception occurs.
+
+Source offset + length must be within the range of the source array, otherwise a exception occurs.
 
 =head2 memmove_double
   
-  sub memmove_double : void ($dest_data : double[], $dest_offset : int, $src_data : double[], $src_offset : int, $length : int)
+  memmove_double : void ($dest : double[], $dest_offset : int, $source : double[], $source_offset : int, $length : int)
 
 Copy source double array to destination double array with the each offset and a length.
 
 Even if source data range and destination data overlap, the result is guaranteed.
 
-If source double array or destination array is undef, a exception occurs.
+Destnation must be defined, otherwise a exception occurs.
 
-If source double array or destination array is undef, a exception occurs.
+Source must be defined, otherwise a exception occurs.
 
-If length is nagative, a exception occurs.
+Length must be more than or equals to 0, otherwise a exception occurs.
 
-If copy is not in the valid rainge, a exception occurs.
+Destnation offset + length must be within the range of the destnation array, otherwise a exception occurs.
+
+Source offset + length must be within the range of the source array, otherwise a exception occurs.
 
 =head2 new_array_proto
 
@@ -555,9 +637,9 @@ If copy is not in the valid rainge, a exception occurs.
 
 Create a new generic object array as the same type as the given array.
 
-=head2 slice_byte
+=head2 copy_array_range_byte
 
-  sub slice_byte : byte[] ($nums : byte[], $offset : int, $length : int)
+  sub copy_array_range_byte : byte[] ($nums : byte[], $offset : int, $length : int)
   
 Slice elements in the byte array with the start offset and the length.
 
@@ -569,9 +651,9 @@ Length must be more than or equals to 0, othrewise a exception occurs.
 
 Offset + length must not be in the array range, othrewise a exception occurs.
 
-=head2 slice_short
+=head2 copy_array_range_short
 
-  sub slice_short : short[] ($nums : short[], $offset : int, $length : int)
+  sub copy_array_range_short : short[] ($nums : short[], $offset : int, $length : int)
 
 Slice elements in the short array with the start offset and the length.
 
@@ -583,9 +665,9 @@ Length must be more than or equals to 0, othrewise a exception occurs.
 
 Offset + length must not be in the array range, othrewise a exception occurs.
 
-=head2 slice_int
+=head2 copy_array_range_int
 
-  sub slice_int : int[] ($nums : int[], $offset : int, $length : int)
+  sub copy_array_range_int : int[] ($nums : int[], $offset : int, $length : int)
 
 Slice elements in the int array with the start offset and the length.
 
@@ -597,9 +679,9 @@ Length must be more than or equals to 0, othrewise a exception occurs.
 
 Offset + length must not be in the array range, othrewise a exception occurs.
 
-=head2 slice_long
+=head2 copy_array_range_long
 
-  sub slice_long : long[] ($nums : long[], $offset : int, $length : int)
+  sub copy_array_range_long : long[] ($nums : long[], $offset : int, $length : int)
 
 Slice elements in the long array with the start offset and the length.
 
@@ -611,9 +693,9 @@ Length must be more than or equals to 0, othrewise a exception occurs.
 
 Offset + length must not be in the array range, othrewise a exception occurs.
 
-=head2 slice_float
+=head2 copy_array_range_float
 
-  sub slice_float : float[] ($nums : float[], $offset : int, $length : int)
+  sub copy_array_range_float : float[] ($nums : float[], $offset : int, $length : int)
 
 Slice elements in the float array with the start offset and the length.
 
@@ -625,9 +707,9 @@ Length must be more than or equals to 0, othrewise a exception occurs.
 
 Offset + length must not be in the array range, othrewise a exception occurs.
 
-=head2 slice_double
+=head2 copy_array_range_double
 
-  sub slice_double : double[] ($nums : double[], $offset : int, $length : int)
+  sub copy_array_range_double : double[] ($nums : double[], $offset : int, $length : int)
 
 Slice elements in the double array with the start offset and the length.
 
@@ -639,9 +721,9 @@ Length must be more than or equals to 0, othrewise a exception occurs.
 
 Offset + length must not be in the array range, othrewise a exception occurs.
 
-=head2 slice_string
+=head2 copy_array_range_string
   
-  sub slice_string : string[] ($strings : string[], $offset : int, $length : int)
+  sub copy_array_range_string : string[] ($strings : string[], $offset : int, $length : int)
 
 Slice elements in the string array with the start offset and the length.
 
@@ -653,9 +735,9 @@ Length must be more than or equals to 0, othrewise a exception occurs.
 
 Offset + length must not be in the array range, othrewise a exception occurs.
 
-=head2 slice_object
+=head2 copy_array_range_object
 
-  sub slice_object : oarray ($elems : oarray, $offset : int, $length : int)
+  sub copy_array_range_object : oarray ($elems : oarray, $offset : int, $length : int)
 
 Slice elements in the object array with the start offset and the length.
 
@@ -666,3 +748,115 @@ Offset must be in the array range, otherwise a exception occurs.
 Length must be more than or equals to 0, othrewise a exception occurs.
 
 Offset + length must not be in the array range, othrewise a exception occurs.
+
+=head2 sort_byte
+
+    sub sort_byte : void ($nums : byte[], $offset : int, $length : int, $comparator : SPVM::Comparator::Byte)
+
+Sort byte array itself with a offset, a length, and a L<SPVM::Comparator::Byte> comparator.
+
+Array must be not undef. Otherwise a exception occurs.
+
+Offset must be more than or equals to 0. Otherwise a exception occurs.
+
+Length must be more than or equals to 0. Otherwise a exception occurs.
+
+Offset + Length must be in the array range. Otherwise a exception occurs.
+
+=head2 sort_short
+
+    sub sort_short : void ($nums : short[], $offset : int, $length : int, $comparator : SPVM::Comparator::Short)
+
+Sort short array itself with a offset, a length, and a L<SPVM::Comparator::Short> comparator.
+
+Array must be not undef. Otherwise a exception occurs.
+
+Offset must be more than or equals to 0. Otherwise a exception occurs.
+
+Length must be more than or equals to 0. Otherwise a exception occurs.
+
+Offset + Length must be in the array range. Otherwise a exception occurs.
+
+=head2 sort_int
+
+    sub sort_int : void ($nums : int[], $offset : int, $length : int, $comparator : SPVM::Comparator::Int)
+
+Sort int array itself with a offset, a length, and a L<SPVM::Comparator::Int> comparator.
+
+Array must be not undef. Otherwise a exception occurs.
+
+Offset must be more than or equals to 0. Otherwise a exception occurs.
+
+Length must be more than or equals to 0. Otherwise a exception occurs.
+
+Offset + Length must be in the array range. Otherwise a exception occurs.
+
+=head2 sort_long
+
+    sub sort_long : void ($nums : long[], $offset : int, $length : int, $comparator : SPVM::Comparator::Long)
+
+Sort long array itself with a offset, a length, and a L<SPVM::Comparator::Long> comparator.
+
+Array must be not undef. Otherwise a exception occurs.
+
+Offset must be more than or equals to 0. Otherwise a exception occurs.
+
+Length must be more than or equals to 0. Otherwise a exception occurs.
+
+Offset + Length must be in the array range. Otherwise a exception occurs.
+
+=head2 sort_float
+
+    sub sub sort_float : void ($nums : float[], $offset : int, $length : int, $comparator : SPVM::Comparator::Float)
+
+Sort float array itself with a offset, a length, and a L<SPVM::Comparator::Float> comparator.
+
+Array must be not undef. Otherwise a exception occurs.
+
+Offset must be more than or equals to 0. Otherwise a exception occurs.
+
+Length must be more than or equals to 0. Otherwise a exception occurs.
+
+Offset + Length must be in the array range. Otherwise a exception occurs.
+
+=head2 sort_double
+
+    sub sort_double : void ($nums : double[], $offset : int, $length : int, $comparator : SPVM::Comparator::Double)
+
+Sort double array itself with a offset, a length, and a L<SPVM::Comparator::Double> comparator.
+
+Array must be not undef. Otherwise a exception occurs.
+
+Offset must be more than or equals to 0. Otherwise a exception occurs.
+
+Length must be more than or equals to 0. Otherwise a exception occurs.
+
+Offset + Length must be in the array range. Otherwise a exception occurs.
+
+=head2 sort_string
+
+    sub sort_string : void ($nums : string[], $offset : int, $length : int, $comparator : SPVM::Comparator::Double)
+
+Sort string array itself with a offset, a length, and a L<SPVM::Comparator::String> comparator.
+
+Array must be not undef. Otherwise a exception occurs.
+
+Offset must be more than or equals to 0. Otherwise a exception occurs.
+
+Length must be more than or equals to 0. Otherwise a exception occurs.
+
+Offset + Length must be in the array range. Otherwise a exception occurs.
+
+=head2 sort_object
+
+    sub sort_object : void ($objs : oarray, $offset : int, $length : int, $comparator : SPVM::Comparator::Object)
+
+Sort object array itself with a offset, a length, and a L<SPVM::Comparator::Object> comparator.
+
+Array must be not undef. Otherwise a exception occurs.
+
+Offset must be more than or equals to 0. Otherwise a exception occurs.
+
+Length must be more than or equals to 0. Otherwise a exception occurs.
+
+Offset + Length must be in the array range. Otherwise a exception occurs.

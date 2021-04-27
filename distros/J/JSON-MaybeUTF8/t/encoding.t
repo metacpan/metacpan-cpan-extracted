@@ -13,7 +13,7 @@ BEGIN {
 use Test::More;
 use Test::Deep;
 
-use JSON::MaybeUTF8 qw(:v1);
+use JSON::MaybeUTF8 qw(:v2);
 use Encode;
 
 my @cases = (
@@ -28,6 +28,7 @@ while(my ($as_json, $as_perl) = splice @cases, 0, 2) {
         is(encode_json_text($as_perl), $bom_removed, 'string encoding');
         is(encode_json_utf8($as_perl), Encode::encode_utf8($bom_removed), 'UTF-8 encoding');
 
+        cmp_deeply(decode_json_text(format_json_text($as_perl)), $as_perl, 'formatted content roundtrips successfully');
         cmp_deeply(decode_json_text($as_json), $as_perl, 'string decoding');
         my $encoded = Encode::encode_utf8($as_json);
         cmp_deeply(decode_json_utf8($encoded), $as_perl, 'UTF-8 decoding');

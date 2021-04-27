@@ -14,3 +14,4 @@ cpanfile.*
 Crypto-Exchange-Binance-Spot-API-.*
 Dockerfile
 docker-compose.yml
+cpanfile.*

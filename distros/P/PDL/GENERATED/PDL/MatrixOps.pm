@@ -485,8 +485,8 @@ runs across their components.
 
 =for bad
 
-eigens_sym ignores the bad-value flag of the input piddles.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+eigens_sym ignores the bad-value flag of the input ndarrays.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -602,8 +602,8 @@ numbers.  It might be useful to be able to return complex eigenvalues.
 
 =for bad
 
-eigens ignores the bad-value flag of the input piddles.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+eigens ignores the bad-value flag of the input ndarrays.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -724,8 +724,8 @@ orientation of the ellipsoid of transformation:
 
 =for bad
 
-svd ignores the bad-value flag of the input piddles.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+svd ignores the bad-value flag of the input ndarrays.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -1080,13 +1080,22 @@ Solve A x = B for matrix A, by back substitution into A's LU decomposition.
   # or with Slatec LINPACK
   use PDL::Slatec;
   gefa($lu=$A->copy, $ipiv=null, $info=null);
-  gesl($lu, $ipiv, $x=$B->xchg(0,1)->copy, 1); # 1 = do transpose - why needed!??
+  # 1 = do transpose because Fortran's idea of rows vs columns
+  gesl($lu, $ipiv, $x=$B->xchg(0,1)->copy, 1);
   $x = $x->inplace->xchg(0,1);
 
   # or with LAPACK
   use PDL::LinearAlgebra::Real;
   getrf($lu=$A->copy, $ipiv=null, $info=null);
   getrs($lu, 1, $x=$B->xchg(0,1)->copy, $ipiv, $info=null); # again, need transpose
+  $x=$x->inplace->xchg(0,1);
+
+  # or with GSL
+  use PDL::GSL::LINALG;
+  LU_decomp(my $lu=$A->copy, my $p=null, my $signum=null);
+  # $B and $x, first dim is because GSL treats as vector, higher dims thread
+  # so we transpose in and back out
+  LU_solve($lu, $p, $B->xchg(0,1), my $x=null);
   $x=$x->inplace->xchg(0,1);
 
   # proof of the pudding is in the eating:
@@ -1295,8 +1304,8 @@ less opaque interface.
 
 =for bad
 
-simq ignores the bad-value flag of the input piddles.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+simq ignores the bad-value flag of the input ndarrays.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -1328,7 +1337,7 @@ Convert a symmetric square matrix to triangular vector storage.
 =for bad
 
 squaretotri does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut

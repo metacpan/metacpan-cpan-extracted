@@ -17,7 +17,7 @@ delete $ENV{DATAPRINTERRC}; # make sure user rc doesn't interfere
 # 2. check that the dp and hfat parameters are honored
 my $template_header = <<'EOT';
 USE DataPrinter(
-    dp   = { color = { string='blue', number='cyan' } },
+    dp   = { colors = { string='blue', number='cyan' } },
     hfat = { class_prefix = 'test_' },
 );
 EOT

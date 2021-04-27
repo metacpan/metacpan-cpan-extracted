@@ -3,7 +3,7 @@ package Myriad;
 
 use Myriad::Class;
 
-our $VERSION = '0.002';
+our $VERSION = '0.003';
 our $AUTHORITY = 'cpan:DERIV'; # AUTHORITY
 
 =encoding utf8
@@ -608,6 +608,7 @@ Prepare for logging.
 
 method setup_logging () {
     my $level = $config->log_level;
+    STDERR->autoflush(1);
     $level->subscribe(my $code = sub {
         Log::Any::Adapter->import(
             qw(Stderr),

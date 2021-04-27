@@ -15,7 +15,7 @@ use PDL::CCS::Nd;
 use PDL::CCS::IO::FastRaw;
 use strict;
 
-our $VERSION = '1.23.14'; ##-- update with perl-reversion from Perl::Version module
+our $VERSION = '1.23.15'; ##-- update with perl-reversion from Perl::Version module
 our @ISA = ('PDL::Exporter');
 our @EXPORT_OK =
   (

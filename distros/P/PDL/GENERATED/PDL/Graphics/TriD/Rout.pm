@@ -56,9 +56,9 @@ the PDL::Graphics::TriD module. Currently, there are
 
 =for ref
 
-Combine three coordinates into a single piddle.
+Combine three coordinates into a single ndarray.
 
-Combine x, y and z to a single piddle the first dimension
+Combine x, y and z to a single ndarray the first dimension
 of which is 3. This routine does dataflow automatically.
 
 
@@ -66,7 +66,7 @@ of which is 3. This routine does dataflow automatically.
 =for bad
 
 combcoords does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -112,7 +112,7 @@ For definition of the potential, see the actual function.
 =for bad
 
 repulse does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -158,7 +158,7 @@ For definition of the potential, see the actual function.
 =for bad
 
 attract does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -189,7 +189,7 @@ info not available
 =for bad
 
 vrmlcoordsvert does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -209,7 +209,7 @@ It will set the bad-value flag of all output piddles if the flag is set for any 
 =for ref
 
 This is the interface for the pp routine contour_segments_internal
-- it takes 3 piddles as input
+- it takes 3 ndarrays as input
 
 C<$c> is a contour value (or a list of contour values)
 

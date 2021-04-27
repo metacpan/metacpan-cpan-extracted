@@ -1,7 +1,7 @@
 Changes
 Makefile.PL
 MANIFEST
-README
+README.md
 t/00-load-DataTables.t
 t/01-data-tests-sqlite.t
 t/db/datatables_demo_data.sqlite

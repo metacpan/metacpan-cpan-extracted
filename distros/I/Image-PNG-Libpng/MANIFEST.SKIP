@@ -20,7 +20,7 @@ makeitfile$
 doc/.*
 ^pm_to_blib$
 ^memory-test\.pl$
-^unt/unknown-chunk\.t$
+^unt/.*$
 # Scripts for building from libpng source code
 ^util/.*$
 # Examples not ready for cpan

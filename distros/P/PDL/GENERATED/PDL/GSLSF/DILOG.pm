@@ -64,7 +64,7 @@ This is an interface to the Special Function package present in the GNU Scientif
 =for bad
 
 gsl_sf_dilog does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -93,7 +93,7 @@ DiLogarithm(z), for complex argument z = r Exp[i theta].
 =for bad
 
 gsl_sf_complex_dilog does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut

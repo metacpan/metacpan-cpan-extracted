@@ -1,3 +1,9 @@
+0.57 2021-04-27
+
+- Remove export of "shift" causing bugs in dependent modules
+- Remove any2gray (is now in Image::PNG::Data)
+- Remove undocumented "get_row_pointers" method
+
 0.56 2020-12-23
 
 - Fix for memory bug within split_alpha

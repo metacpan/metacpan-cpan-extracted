@@ -1,5 +1,9 @@
 Revision history for JSON-MaybeUTF8
 
+2.000     2021-04-27 17:00:42+08:00 Asia/Kuala_Lumpur
+    [API Changes]
+    - supports a `format_json_text` function for indented JSON
+
 1.002     2019-03-22 13:47:33+08:00 Asia/Kuala_Lumpur
     Strip BOM characters by default in `decode_json_text` and `decode_json_utf8`.
     This is a workaround for https://github.com/rurban/Cpanel-JSON-XS/issues/125

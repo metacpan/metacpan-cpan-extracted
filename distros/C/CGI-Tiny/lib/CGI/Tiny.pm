@@ -7,7 +7,10 @@ use Carp ();
 use IO::Handle ();
 use Exporter 'import';
 
-our $VERSION = '0.006';
+our $VERSION = '0.007';
+
+use constant DEFAULT_REQUEST_BODY_LIMIT => 16777216;
+use constant DEFAULT_REQUEST_BODY_BUFFER => 131072;
 
 our @EXPORT = 'cgi';
 
@@ -165,13 +168,15 @@ sub _handle_error {
   } else {
     warn $error;
   }
-  $cgi->render(text => 'Internal Server Error') unless $cgi->{headers_rendered};
+  $cgi->render(text => $cgi->{response_status}) unless $cgi->{headers_rendered};
 }
 
-sub set_error_handler      { $_[0]{on_error} = $_[1]; $_[0] }
-sub set_request_body_limit { $_[0]{request_body_limit} = $_[1]; $_[0] }
-sub set_input_handle       { $_[0]{input_handle} = $_[1]; $_[0] }
-sub set_output_handle      { $_[0]{output_handle} = $_[1]; $_[0] }
+sub set_error_handler          { $_[0]{on_error} = $_[1]; $_[0] }
+sub set_request_body_buffer    { $_[0]{request_body_buffer} = $_[1]; $_[0] }
+sub set_request_body_limit     { $_[0]{request_body_limit} = $_[1]; $_[0] }
+sub set_multipart_form_charset { $_[0]{multipart_form_charset} = $_[1]; $_[0] }
+sub set_input_handle           { $_[0]{input_handle} = $_[1]; $_[0] }
+sub set_output_handle          { $_[0]{output_handle} = $_[1]; $_[0] }
 
 sub auth_type         { defined $ENV{AUTH_TYPE} ? $ENV{AUTH_TYPE} : '' }
 sub content_length    { defined $ENV{CONTENT_LENGTH} ? $ENV{CONTENT_LENGTH} : '' }
@@ -202,15 +207,14 @@ sub query_param_array { my $p = $_[0]->_query_params->{keyed}; exists $p->{$_[1]
 sub _query_params {
   my ($self) = @_;
   unless (exists $self->{query_params}) {
-    my (@ordered, %keyed);
+    $self->{query_params} = {ordered => \my @ordered, keyed => \my %keyed};
     foreach my $pair (split /[&;]/, $self->query) {
-      my ($key, $value) = split /=/, $pair, 2;
+      my ($name, $value) = split /=/, $pair, 2;
       $value = '' unless defined $value;
-      do { tr/+/ /; s/%([0-9a-fA-F]{2})/chr hex $1/ge; utf8::decode $_ } for $key, $value;
-      push @ordered, [$key, $value];
-      push @{$keyed{$key}}, $value;
+      do { tr/+/ /; s/%([0-9a-fA-F]{2})/chr hex $1/ge; utf8::decode $_ } for $name, $value;
+      push @ordered, [$name, $value];
+      push @{$keyed{$name}}, $value;
     }
-    $self->{query_params} = {ordered => \@ordered, keyed => \%keyed};
   }
   return $self->{query_params};
 }
@@ -257,28 +261,19 @@ sub _cookies {
 
 sub body {
   my ($self) = @_;
-  unless (exists $self->{content}) {
-    $self->{content} = '';
-    my $limit = $self->{request_body_limit};
-    $limit = $ENV{CGI_TINY_REQUEST_BODY_LIMIT} unless defined $limit;
-    $limit = 16777216 unless defined $limit;
-    my $length = $ENV{CONTENT_LENGTH} || 0;
-    if ($limit and $length > $limit) {
-      $self->{response_status} = "413 $HTTP_STATUS{413}" unless $self->{headers_rendered};
-      die "Request body limit exceeded\n";
-    }
-    my $offset = 0;
+  unless (exists $self->{body_content} or exists $self->{body_parts}) {
+    $self->{body_content} = '';
+    my $length = $self->_body_length;
     my $in_fh = defined $self->{input_handle} ? $self->{input_handle} : *STDIN;
     binmode $in_fh;
     while ($length > 0) {
-      my $chunk = 131072;
-      $chunk = $length if $length and $length < $chunk;
-      last unless my $read = read $in_fh, $_[0]{content}, $chunk, $offset;
-      $offset += $read;
+      my $chunk = $self->{request_body_buffer} || $ENV{CGI_TINY_REQUEST_BODY_BUFFER} || DEFAULT_REQUEST_BODY_BUFFER;
+      $chunk = $length if $length < $chunk;
+      last unless my $read = read $in_fh, $self->{body_content}, $chunk, length $self->{body_content};
       $length -= $read;
     }
   }
-  return $self->{content};
+  return $self->{body_content};
 }
 
 sub body_params      { [map { [@$_] } @{$_[0]->_body_params->{ordered}}] }
@@ -289,17 +284,45 @@ sub body_param_array { my $p = $_[0]->_body_params->{keyed}; exists $p->{$_[1]} 
 sub _body_params {
   my ($self) = @_;
   unless (exists $self->{body_params}) {
-    my (@ordered, %keyed);
+    $self->{body_params} = {ordered => \my @ordered, keyed => \my %keyed};
     if ($ENV{CONTENT_TYPE} and $ENV{CONTENT_TYPE} =~ m/^application\/x-www-form-urlencoded\b/i) {
       foreach my $pair (split /&/, $self->body) {
-        my ($key, $value) = split /=/, $pair, 2;
+        my ($name, $value) = split /=/, $pair, 2;
         $value = '' unless defined $value;
-        do { tr/+/ /; s/%([0-9a-fA-F]{2})/chr hex $1/ge; utf8::decode $_ } for $key, $value;
-        push @ordered, [$key, $value];
-        push @{$keyed{$key}}, $value;
+        do { tr/+/ /; s/%([0-9a-fA-F]{2})/chr hex $1/ge; utf8::decode $_ } for $name, $value;
+        push @ordered, [$name, $value];
+        push @{$keyed{$name}}, $value;
+      }
+    } elsif ($ENV{CONTENT_TYPE} and $ENV{CONTENT_TYPE} =~ m/^multipart\/form-data\b/i) {
+      my $default_charset = $self->{multipart_form_charset};
+      $default_charset = 'UTF-8' unless defined $default_charset;
+      foreach my $part (@{$self->_body_multipart}) {
+        next if defined $part->{filename};
+        my ($name, $value, $headers) = @$part{'name','content','headers'};
+        if (uc $default_charset eq 'UTF-8' and do { local $@; eval { require Unicode::UTF8; 1 } }) {
+          $name = Unicode::UTF8::decode_utf8($name);
+        } elsif (length $default_charset) {
+          require Encode;
+          $name = Encode::decode($default_charset, "$name");
+        }
+        if (!defined $headers->{'content-type'} or $headers->{'content-type'} =~ m/^text\/plain\b/i) {
+          my $value_charset = $default_charset;
+          if (defined $headers->{'content-type'}) {
+            if (my ($charset_quoted, $charset_unquoted) = $headers->{'content-type'} =~ m/;\s*charset=(?:"([^"]+)"|([^";]+))/i) {
+              $value_charset = defined $charset_quoted ? $charset_quoted : $charset_unquoted;
+            }
+          }
+          if (uc $value_charset eq 'UTF-8' and do { local $@; eval { require Unicode::UTF8; 1 } }) {
+            $value = Unicode::UTF8::decode_utf8($value);
+          } elsif (length $value_charset) {
+            require Encode;
+            $value = Encode::decode($value_charset, "$value");
+          }
+        }
+        push @ordered, [$name, $value];
+        push @{$keyed{$name}}, $value;
       }
     }
-    $self->{body_params} = {ordered => \@ordered, keyed => \%keyed};
   }
   return $self->{body_params};
 }
@@ -307,13 +330,196 @@ sub _body_params {
 sub body_json {
   my ($self) = @_;
   unless (exists $self->{body_json}) {
+    $self->{body_json} = undef;
     if ($ENV{CONTENT_TYPE} and $ENV{CONTENT_TYPE} =~ m/^application\/json\b/i) {
       $self->{body_json} = $self->_json->decode($self->body);
-    } else {
-      $self->{body_json} = undef;
     }
   }
   return $self->{body_json};
+}
+
+sub body_parts {
+  my ($self) = @_;
+  return [] unless $ENV{CONTENT_TYPE} and $ENV{CONTENT_TYPE} =~ m/^multipart\/form-data\b/i;
+  return [map { +{%$_} } @{$self->_body_multipart}];
+}
+
+sub uploads      { [map { [@$_] } @{$_[0]->_body_uploads->{ordered}}] }
+sub upload_names { [keys %{$_[0]->_body_uploads->{keyed}}] }
+sub upload       { my $u = $_[0]->_body_uploads->{keyed}; exists $u->{$_[1]} ? $u->{$_[1]}[-1] : undef }
+sub upload_array { my $u = $_[0]->_body_uploads->{keyed}; exists $u->{$_[1]} ? [@{$u->{$_[1]}}] : [] }
+
+sub _body_uploads {
+  my ($self) = @_;
+  unless (exists $self->{body_uploads}) {
+    $self->{body_uploads} = {ordered => \my @ordered, keyed => \my %keyed};
+    if ($ENV{CONTENT_TYPE} and $ENV{CONTENT_TYPE} =~ m/^multipart\/form-data\b/i) {
+      my $default_charset = $self->{multipart_form_charset};
+      $default_charset = 'UTF-8' unless defined $default_charset;
+      foreach my $part (@{$self->_body_multipart}) {
+        next unless defined $part->{filename};
+        my ($name, $filename, $file, $size, $headers) = @$part{'name','filename','file','size','headers'};
+        if (uc $default_charset eq 'UTF-8' and do { local $@; eval { require Unicode::UTF8; 1 } }) {
+          $name = Unicode::UTF8::decode_utf8($name);
+          $filename = Unicode::UTF8::decode_utf8($filename);
+        } elsif (length $default_charset) {
+          require Encode;
+          $name = Encode::decode($default_charset, "$name");
+          $filename = Encode::decode($default_charset, "$filename");
+        }
+        my $upload = {
+          filename     => $filename,
+          file         => $file,
+          size         => $size,
+          content_type => $headers->{'content-type'},
+        };
+        push @ordered, [$name, $upload];
+        push @{$keyed{$name}}, $upload;
+      }
+    }
+  }
+  return $self->{body_uploads};
+}
+
+sub _body_length {
+  my ($self) = @_;
+  my $limit = $self->{request_body_limit};
+  $limit = $ENV{CGI_TINY_REQUEST_BODY_LIMIT} unless defined $limit;
+  $limit = DEFAULT_REQUEST_BODY_LIMIT unless defined $limit;
+  my $length = $ENV{CONTENT_LENGTH} || 0;
+  if ($limit and $length > $limit) {
+    $self->{response_status} = "413 $HTTP_STATUS{413}" unless $self->{headers_rendered};
+    die "Request body limit exceeded\n";
+  }
+  return $length;
+}
+
+sub _body_multipart {
+  my ($self) = @_;
+  unless (exists $self->{body_parts}) {
+    $self->{body_parts} = [];
+    my ($boundary_quoted, $boundary_unquoted) = $ENV{CONTENT_TYPE} =~ m/;\s*boundary\s*=\s*(?:"([^"]+)"|([^";]+))/i;
+    my $boundary = defined $boundary_quoted ? $boundary_quoted : $boundary_unquoted;
+    unless (defined $boundary) {
+      $self->{response_status} = "400 $HTTP_STATUS{400}" unless $self->{headers_rendered};
+      die "Malformed multipart/form-data request\n";
+    }
+
+    my ($input, $length);
+    if (exists $self->{body_content}) {
+      $length = length $self->{body_content};
+      $input = \$self->{body_content};
+    } else {
+      $length = $self->_body_length;
+      $input = defined $self->{input_handle} ? $self->{input_handle} : *STDIN;
+      binmode $input;
+    }
+    my $parts = _parse_multipart($input, $length, $boundary, $self->{request_body_buffer});
+    unless (defined $parts) {
+      $self->{response_status} = "400 $HTTP_STATUS{400}" unless $self->{headers_rendered};
+      die "Malformed multipart/form-data request\n";
+    }
+    $self->{body_parts} = $parts;
+  }
+  return $self->{body_parts};
+}
+
+sub _parse_multipart {
+  my ($input, $length, $boundary, $buffer_size) = @_;
+  my $buffer = "\r\n";
+  my (%state, @parts);
+  READER: while ($length > 0) {
+    if (ref $input eq 'SCALAR') {
+      $buffer .= $$input;
+      $length = 0;
+    } else {
+      my $chunk = $buffer_size || $ENV{CGI_TINY_REQUEST_BODY_BUFFER} || DEFAULT_REQUEST_BODY_BUFFER;
+      $chunk = $length if $length < $chunk;
+      last unless my $read = read $input, $buffer, $chunk, length $buffer;
+      $length -= $read;
+    }
+
+    if (!$state{started} and (my $pos = index $buffer, "\r\n--$boundary\r\n") >= 0) {
+      substr $buffer, 0, $pos + length($boundary) + 6, '';
+      $state{started} = 1;
+      push @parts, $state{part} = {headers => {}, name => undef, filename => undef, size => 0};
+    }
+    next unless $state{started}; # read more to find start of multipart data
+
+    while (length $buffer) {
+      if ($state{parsing_body}) {
+        my $append = '';
+        my $pos;
+        if (($pos = index $buffer, "\r\n--$boundary\r\n") >= 0) {
+          $append = substr $buffer, 0, $pos, '';
+          substr $buffer, 0, length($boundary) + 6, '';
+          $state{parsing_body} = 0;
+        } elsif (($pos = index $buffer, "\r\n--$boundary--") >= 0) {
+          $append = substr $buffer, 0, $pos; # no replacement, we're done here
+          $state{parsing_body} = 0;
+          $state{done} = 1;
+        } elsif (length($buffer) > length($boundary) + 6) {
+          $append = substr $buffer, 0, length($buffer) - length($boundary) - 6, '';
+        }
+
+        if (defined $state{part}{filename}) {
+          # create temp file even if empty
+          unless (defined $state{part}{file}) {
+            require File::Temp;
+            $state{part}{file} = File::Temp->new;
+            binmode $state{part}{file};
+          }
+          if (length $append) {
+            $state{part}{file}->print($append);
+            $state{part}{size} += length $append;
+          }
+          unless ($state{parsing_body}) { # finalize temp file
+            $state{part}{file}->flush;
+            seek $state{part}{file}, 0, 0;
+          }
+        } else {
+          $state{part}{content} = '' unless defined $state{part}{content};
+          if (length $append) {
+            $state{part}{content} .= $append;
+            $state{part}{size} += length $append;
+          }
+        }
+
+        last READER if $state{done};         # end of multipart data
+        next READER if $state{parsing_body}; # read more to find end of part
+
+        # new part started
+        push @parts, $state{part} = {headers => {}, name => undef, filename => undef, size => 0};
+      } else { # part headers
+        while ((my $pos = index $buffer, "\r\n") >= 0) {
+          if ($pos == 0) { # end of headers
+            substr $buffer, 0, 2, '';
+            $state{parsing_body} = 1;
+            last;
+          }
+
+          my $header = substr $buffer, 0, $pos + 2, '';
+          my ($name, $value) = split /\s*:\s*/, $header, 2;
+          return undef unless defined $value;
+          $value =~ s/\s*\z//;
+
+          $state{part}{headers}{lc $name} = $value;
+          if (lc $name eq 'content-disposition') {
+            if (my ($name_quoted, $name_unquoted) = $value =~ m/;\s*name\s*=\s*(?:"((?:\\"|[^";])*)"|([^";]*))/i) {
+              $state{part}{name} = defined $name_quoted ? $name_quoted : $name_unquoted;
+            }
+            if (my ($filename_quoted, $filename_unquoted) = $value =~ m/;\s*filename\s*=\s*(?:"((?:\\"|[^"])*)"|([^";]*))/i) {
+              $state{part}{filename} = defined $filename_quoted ? $filename_quoted : $filename_unquoted;
+            }
+          }
+        }
+        next READER unless $state{parsing_body}; # read more to find end of headers
+      }
+    }
+  }
+  return undef unless $state{done};
+
+  return \@parts;
 }
 
 sub set_nph {
@@ -382,7 +588,7 @@ sub add_response_cookie {
       my ($key, $val) = @attrs[$i, $i+1];
       my $has_value = $COOKIE_ATTR_VALUE{lc $key};
       if (!defined $has_value) {
-        Carp::carp "Attempted to set unknown cookie attribute '$key'";
+        Carp::carp "Attempted to set unknown cookie attribute '$key' for HTTP response cookie '$name'";
       } elsif ($has_value) {
         $cookie_str .= "; $key=$val" if defined $val;
       } else {

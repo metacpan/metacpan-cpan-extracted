@@ -468,6 +468,8 @@ lib/SPVM/Comparator/Object.pm
 lib/SPVM/Comparator/Object.spvm
 lib/SPVM/Comparator/Short.pm
 lib/SPVM/Comparator/Short.spvm
+lib/SPVM/Comparator/String.pm
+lib/SPVM/Comparator/String.spvm
 lib/SPVM/Complex_2d.pm
 lib/SPVM/Complex_2d.spvm
 lib/SPVM/Complex_2f.pm
@@ -776,6 +778,7 @@ t/default/lib/TestCase/CompileError/TypeCantBeDetectedUndef.spvm
 t/default/lib/TestCase/CompileError/TypeCantBeDetectedUndefDefault.spvm
 t/default/lib/TestCase/CompileError/UnaryMinus/NotNumeric.spvm
 t/default/lib/TestCase/CompileError/UnaryPlus/NotNumeric.spvm
+t/default/lib/TestCase/CompileError/Use/ImportSubNotFound.spvm
 t/default/lib/TestCase/CompileError/Value/Fields17.spvm
 t/default/lib/TestCase/CompileError/Value/FieldsZero.spvm
 t/default/lib/TestCase/CompileError/Weaken/ArrayNotObject.spvm
@@ -823,7 +826,6 @@ t/default/lib/TestCase/Lib/SPVM/NumberUtil.spvm
 t/default/lib/TestCase/Lib/SPVM/Regex.spvm
 t/default/lib/TestCase/Lib/SPVM/Short.spvm
 t/default/lib/TestCase/Lib/SPVM/ShortList.spvm
-t/default/lib/TestCase/Lib/SPVM/Sort.spvm
 t/default/lib/TestCase/Lib/SPVM/StringBuffer.spvm
 t/default/lib/TestCase/Lib/SPVM/StringList.spvm
 t/default/lib/TestCase/Lib/SPVM/StringUtil.spvm
@@ -945,7 +947,6 @@ t/default/SPVM_NumberUtil.t
 t/default/SPVM_Regex.t
 t/default/SPVM_Short.t
 t/default/SPVM_ShortList.t
-t/default/SPVM_Sort.t
 t/default/SPVM_StringBuffer.t
 t/default/SPVM_StringList.t
 t/default/SPVM_StringUtil.t

@@ -1,5 +1,13 @@
 Changelog for Beam-Wire
 
+1.024     2021-04-26 23:17:42-05:00 America/Chicago
+
+    [Fixed]
+
+    - Fixed calling multiple constructor methods on classes that
+      overload `bool`. Thanks @XSven for reporting this and providing
+      the fix! [Github #73]
+
 1.023     2019-03-23 16:19:26-05:00 America/Chicago
 
     [Added]

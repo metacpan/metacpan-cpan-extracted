@@ -10,11 +10,6 @@ require './Dev.pm'; PDL::Core::Dev->import;
 PDL::Core::Dev::loadmod_Types();
 PDL::Types->import(':All');
 
-# check for bad value support
-require './Config.pm'; # to load the PDL not the Perl one
-die "No PDL::Config found" unless %PDL::Config;
-my $usenan = $PDL::Config{BADVAL_USENAN};
-
 # This forces PL files to create target in same directory as PL file.
 # This is so that make depend always knows where to find PL derivatives.
 chdir(dirname($0));
@@ -110,16 +105,7 @@ print OUT <<'!NO!SUBS!';
 
 
 /* Check minimum datatype required to represent number */
-/* Microsoft compilers do some unbelievable things - hence
-   some #ifdef's inserted by Sisyphus */
-#if defined _MSC_VER && _MSC_VER < 1400
-#define TESTTYPE(b,a) {a foo = nv; a bar = foo; foo += 0; if(nv == bar) return b;}
-#else
 #define TESTTYPE(b,a) {a foo = nv; if(nv == foo) return b;}
-#endif
-#if defined _MSC_VER && _MSC_VER < 1400
-#pragma optimize("", off)
-#endif
 int pdl_whichdatatype (IV nv) {
 !NO!SUBS!
 
@@ -148,14 +134,6 @@ int pdl_whichdatatype_double (NV nv) {
         /* Default return type PDL_Double */
         return PDL_D;
 }
-
-
-#if defined _MSC_VER && _MSC_VER < 1400
-#pragma optimize("", on)
-#endif
-
-
-
 
 /* Make a scratch dataspace for a scalar pdl */
 
@@ -228,28 +206,10 @@ pdl* SvPDLV ( SV* sv ) {
 
 !NO!SUBS!
 
-##########
-# If badvals and usenan are true, we default NaNs to type double. 
-if ( $usenan ) {
-    print OUT sprintf qq{#line %d "%s"\n}, __LINE__ + 2,  __FILE__;
-    print OUT q{
-      /*
-       * default NaN/Infs to double
-       *
-       */
-      if ( isfinite(tmp_NV) == 0 ) {
-        datatype = PDL_D;
-      } else {
+print OUT sprintf qq{#line %d "%s"\n}, __LINE__ + 2,  __FILE__;
+print OUT q{
         datatype = pdl_whichdatatype_double(tmp_NV);
-      }
-   }
-} else {
-   print OUT sprintf qq{#line %d "%s"\n}, __LINE__ + 2,  __FILE__;
-   print OUT q{
-        datatype = pdl_whichdatatype_double(tmp_NV);
-
-   }
-}
+};
 
 print OUT sprintf qq{#line %d "%s"\n}, __LINE__ + 2,  __FILE__;
 print OUT <<'!NO!SUBS!';
@@ -308,10 +268,10 @@ print OUT <<'!NO!SUBS!';
 
         /* This is the magic hook which checks to see if {PDL}
         is a code ref, and if so executes it. It should
-        return a standard piddle. This allows
+        return a standard ndarray. This allows
         all kinds of funky objects to be derived from PDL,
         and allow normal PDL functions to still work so long
-        as the {PDL} code returns a standard piddle on
+        as the {PDL} code returns a standard ndarray on
         demand - KGB */
 
         if (SvROK(*svp) && SvTYPE(SvRV(*svp)) == SVt_PVCV) {
@@ -377,7 +337,7 @@ print OUT <<'!NO!SUBS!';
 
     /* Final check -- make sure it has the right magic number */
     if(ret->magicno != PDL_MAGICNO) {
-        croak("Fatal error: argument is probably not a piddle, or\
+        croak("Fatal error: argument is probably not an ndarray, or\
  magic no overwritten. You're in trouble, guv: %p %p %lu\n",sv2,ret,ret->magicno);
    }
 
@@ -600,11 +560,11 @@ GEN_PDL_BARF_OR_WARN_LEGACY(warn, 1)
  *  Scalars, array refs, and PDLs may be mixed in the incoming AV.
  *
  *  The routine works out the dimensions of a corresponding
- *  piddle (in the AV dims) in reverse notation (vs PDL conventions).
+ *  ndarray (in the AV dims) in reverse notation (vs PDL conventions).
  *
  *  It does not enforce a rectangular array on the input, the idea being that
- *  omitted values will be set to zero or the undefval in the resulting piddle,
- *  i.e. we can make piddles from 'sparse' array refs.
+ *  omitted values will be set to zero or the undefval in the resulting ndarray,
+ *  i.e. we can make ndarrays from 'sparse' array refs.
  *
  *  Empty PDLs are treated like any other dimension -- i.e. their 
  *  0-length dimensions are thrown into the mix just like nonzero 
@@ -812,7 +772,7 @@ pdl* pdl_from_array(AV* av, AV* dims, int type, pdl* p)
 
   {
     /******
-     * Copy the undefval to fill empty spots in the piddle...
+     * Copy the undefval to fill empty spots in the ndarray...
      */
     SV *sv = get_sv("PDL::undefval",0);
     if ((!sv) || (sv==&PL_sv_undef)) {

@@ -52,3 +52,11 @@
 
 2015-01-18 - 0.01
     + First version
+
+
+2021-04-27 - v1.04
+    + New event to not include keys that is defined in the request
+
+    + Simplified the cpan module dep
+
+    + Refresh the tests

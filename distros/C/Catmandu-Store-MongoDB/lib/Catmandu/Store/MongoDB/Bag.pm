@@ -2,7 +2,7 @@ package Catmandu::Store::MongoDB::Bag;
 
 use Catmandu::Sane;
 
-our $VERSION = '0.0805';
+our $VERSION = '0.0806';
 
 use Catmandu::Util qw(:is);
 use Catmandu::Store::MongoDB::Searcher;
@@ -238,13 +238,22 @@ sub search {
         @hits = map {$bag->get($_->{_id})} @hits;
     }
 
+    my $total;
+
+    if (!($query && scalar(keys %$query) > 0) && $self->store->estimate_count)
+    {
+        $total = $self->collection->estimated_document_count();
+    }
+    else {
+        $total = $self->collection->count_documents($query, $self->_options);
+    }
+
     Catmandu::Hits->new(
         {
             start => $start,
             limit => $orig_limit,
-            total =>
-                $self->collection->count_documents($query, $self->_options),
-            hits => \@hits,
+            total => $total,
+            hits  => \@hits,
         }
     );
 }

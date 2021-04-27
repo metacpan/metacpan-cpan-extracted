@@ -4,9 +4,7 @@ use strict;
 use warnings;
 use Carp;
 use PDL::Types ':All';
-use PDL::Config;
 
-my $usenan = $PDL::Config{BADVAL_USENAN} || 0;
 our $macros = <<'EOF';
 #define PDL_REDODIMS(declini, cast, type, flag, name, pdlname) \
   declini name ## _datap = (cast(PDL_REPRP_TRANS(pdlname, flag))); \
@@ -395,7 +393,7 @@ sub do_indterm { my($this,$pdl,$ind,$subst,$context) = @_;
 }
 
 # XXX hacked to create a variable containing the bad value for 
-# this piddle. 
+# this ndarray. 
 # This is a HACK (Doug Burke 07/08/00)
 # XXX
 #
@@ -412,8 +410,7 @@ sub get_xsdatapdecl {
     # assuming we always need this
     # - may not be true - eg if $asgnonly ??
     # - not needed for floating point types when using NaN as bad values
-    $macro = "PDL_REDODIMS_BADVAL" if $this->{BadFlag} and $ptype and
-	!($usenan * $ptype->usenan);
+    $macro = "PDL_REDODIMS_BADVAL" if $this->{BadFlag} and $ptype;
     PDL::PP::pp_line_numbers(__LINE__, "$macro($declini, $cast, $type, $flag, $name, $pdl)");
 }
 

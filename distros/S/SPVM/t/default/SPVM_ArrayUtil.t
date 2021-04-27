@@ -35,57 +35,59 @@ my $nan_re = qr/(nan|ind)/i;
 use SPVM 'TestCase::Lib::SPVM::ArrayUtil';
 use SPVM 'SPVM::ArrayUtil';
 
-# copy_array_object
+
+# Copy
 {
+  # copy_array_byte
+  ok(TestCase::Lib::SPVM::ArrayUtil->test_copy_array_byte);
+
+  # copy_array_short
+  ok(TestCase::Lib::SPVM::ArrayUtil->test_copy_array_short);
+
+  # copy_array_int
+  ok(TestCase::Lib::SPVM::ArrayUtil->test_copy_array_int);
+
+  # copy_array_long
+  ok(TestCase::Lib::SPVM::ArrayUtil->test_copy_array_long);
+
+  # copy_array_float
+  ok(TestCase::Lib::SPVM::ArrayUtil->test_copy_array_float);
+
+  # copy_array_double
+  ok(TestCase::Lib::SPVM::ArrayUtil->test_copy_array_double);
+
+  # copy_array_string
+  ok(TestCase::Lib::SPVM::ArrayUtil->test_copy_array_string);
+  
+  # copy_array_object
   ok(TestCase::Lib::SPVM::ArrayUtil->test_copy_array_object);
 }
 
-# equals_array_object
+# copy_array_range
 {
-  ok(TestCase::Lib::SPVM::ArrayUtil->test_equals_array_object);
-}
+  # copy_array_range_byte
+  ok(TestCase::Lib::SPVM::ArrayUtil->test_copy_array_range_byte);
 
-# memmove_byte
-{
-  ok(TestCase::Lib::SPVM::ArrayUtil->test_memmove_byte);
-}
+  # copy_array_range_short
+  ok(TestCase::Lib::SPVM::ArrayUtil->test_copy_array_range_short);
 
-# memcpy_byte
-{
-  ok(TestCase::Lib::SPVM::ArrayUtil->test_memcpy_byte);
-}
+  # copy_array_range_int
+  ok(TestCase::Lib::SPVM::ArrayUtil->test_copy_array_range_int);
 
-# new_array_proto
-{
-  # slice_byte
-  ok(TestCase::Lib::SPVM::ArrayUtil->test_new_array_proto);
-}
+  # copy_array_range_long
+  ok(TestCase::Lib::SPVM::ArrayUtil->test_copy_array_range_long);
 
-# slice
-{
-  # slice_byte
-  ok(TestCase::Lib::SPVM::ArrayUtil->test_slice_byte);
+  # copy_array_range_float
+  ok(TestCase::Lib::SPVM::ArrayUtil->test_copy_array_range_float);
 
-  # slice_short
-  ok(TestCase::Lib::SPVM::ArrayUtil->test_slice_short);
+  # copy_array_range_double
+  ok(TestCase::Lib::SPVM::ArrayUtil->test_copy_array_range_double);
 
-  # slice_int
-  ok(TestCase::Lib::SPVM::ArrayUtil->test_slice_int);
+  # copy_array_range_double
+  ok(TestCase::Lib::SPVM::ArrayUtil->test_copy_array_range_string);
 
-  # slice_long
-  ok(TestCase::Lib::SPVM::ArrayUtil->test_slice_long);
-
-  # slice_float
-  ok(TestCase::Lib::SPVM::ArrayUtil->test_slice_float);
-
-  # slice_double
-  ok(TestCase::Lib::SPVM::ArrayUtil->test_slice_double);
-
-  # slice_double
-  ok(TestCase::Lib::SPVM::ArrayUtil->test_slice_string);
-
-  # slice_double
-  ok(TestCase::Lib::SPVM::ArrayUtil->test_slice_object);
+  # copy_array_range_double
+  ok(TestCase::Lib::SPVM::ArrayUtil->test_copy_array_range_object);
 }
 
 # dump array
@@ -127,30 +129,47 @@ use SPVM 'SPVM::ArrayUtil';
 
   # equals_array_string
   ok(TestCase::Lib::SPVM::ArrayUtil->test_equals_array_string);
+
+  # equals_array_object
+  ok(TestCase::Lib::SPVM::ArrayUtil->test_equals_array_object);
 }
 
-# Copy
+# memcpy
 {
-  # copy_array_byte
-  ok(TestCase::Lib::SPVM::ArrayUtil->test_copy_array_byte);
+  ok(TestCase::Lib::SPVM::ArrayUtil->test_memcpy_byte);
+  ok(TestCase::Lib::SPVM::ArrayUtil->test_memcpy_short);
+  ok(TestCase::Lib::SPVM::ArrayUtil->test_memcpy_int);
+  ok(TestCase::Lib::SPVM::ArrayUtil->test_memcpy_long);
+  ok(TestCase::Lib::SPVM::ArrayUtil->test_memcpy_float);
+  ok(TestCase::Lib::SPVM::ArrayUtil->test_memcpy_double);
+}
 
-  # copy_array_short
-  ok(TestCase::Lib::SPVM::ArrayUtil->test_copy_array_short);
+# memmove
+{
+  ok(TestCase::Lib::SPVM::ArrayUtil->test_memmove_byte);
+  ok(TestCase::Lib::SPVM::ArrayUtil->test_memmove_short);
+  ok(TestCase::Lib::SPVM::ArrayUtil->test_memmove_int);
+  ok(TestCase::Lib::SPVM::ArrayUtil->test_memmove_long);
+  ok(TestCase::Lib::SPVM::ArrayUtil->test_memmove_float);
+  ok(TestCase::Lib::SPVM::ArrayUtil->test_memmove_double);
+}
 
-  # copy_array_int
-  ok(TestCase::Lib::SPVM::ArrayUtil->test_copy_array_int);
+# new_array_proto
+{
+  # copy_array_range_byte
+  ok(TestCase::Lib::SPVM::ArrayUtil->test_new_array_proto);
+}
 
-  # copy_array_long
-  ok(TestCase::Lib::SPVM::ArrayUtil->test_copy_array_long);
-
-  # copy_array_float
-  ok(TestCase::Lib::SPVM::ArrayUtil->test_copy_array_float);
-
-  # copy_array_double
-  ok(TestCase::Lib::SPVM::ArrayUtil->test_copy_array_double);
-
-  # copy_array_string
-  ok(TestCase::Lib::SPVM::ArrayUtil->test_copy_array_string);
+# sort
+{
+  ok(TestCase::Lib::SPVM::ArrayUtil->sort_byte);
+  ok(TestCase::Lib::SPVM::ArrayUtil->sort_short);
+  ok(TestCase::Lib::SPVM::ArrayUtil->sort_int);
+  ok(TestCase::Lib::SPVM::ArrayUtil->sort_long);
+  ok(TestCase::Lib::SPVM::ArrayUtil->sort_float);
+  ok(TestCase::Lib::SPVM::ArrayUtil->sort_double);
+  ok(TestCase::Lib::SPVM::ArrayUtil->sort_string);
+  ok(TestCase::Lib::SPVM::ArrayUtil->sort_object);
 }
 
 # All object is freed

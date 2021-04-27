@@ -3,6 +3,11 @@ package
 
 use Moo;
 extends 'My::ArgsTest';
+use overload
+    # Test that services with overloads are handled properly while
+    # calling methods.
+    'bool' => sub { "" },
+    ;
 
 sub dies { die }
 

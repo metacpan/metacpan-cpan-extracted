@@ -122,12 +122,13 @@ found, an empty list is retured.
 
 ## `bars( ... )`
 
-    my $bars = $camelid->bars(
-          symbol    => 'MSFT',
-          timeframe => '1Min',
-          start     => Time::Moment->now->with_hour(10),
-          end       => Time::Moment->now->minus_minutes(20)
-      );
+     my %bars = $camelid->bars(
+           symbol    => 'MSFT',
+           timeframe => '1Min',
+           start     => Time::Moment->now->with_hour(10),
+           end       => Time::Moment->now->minus_minutes(20)
+       );
+    
 
 Returns a list of Finance::Alpaca::Struct::Bar objects along with other data.
 
@@ -142,11 +143,8 @@ The following parameters are accepted:
 - `page_token` - Pagination token to contine from
 - `timeframe` - Timeframe for the aggregation. Available values are: `1Min`, `1Hour`, and `1Day`; this is required
 
-The data returned includes the following data:
-
-- `bars` - List of Finance::Alpaca::Struct::Bar objects
-- `next_page_token` - Token that can be used to query the next page
-- `symbol` - Symbol that was queried
+The method returns a hash reference with bar data included as a list under the
+symbol as well as a `next_page_token` for pagination if applicable.
 
 ## `quotes( ... )`
 

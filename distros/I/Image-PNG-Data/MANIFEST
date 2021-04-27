@@ -1,0 +1,28 @@
+Changes
+Data.xs
+image-png-data-perl.c
+inc/CheckForLibPng.pm
+lib/Image/PNG/Data.pm
+lib/Image/PNG/Data.pod
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+options.json
+ppport.h
+README
+t/abc-palette.png
+t/abc.png
+t/alpha-unused.t
+t/any2gray8.t
+t/blue.png
+t/bwpng.t
+t/duck-rabbit.png
+t/image-png-data.t
+t/IPNGDT.pm
+t/life.png
+t/luv.png
+t/qrpng.png
+t/tantei-san.png
+typemap
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

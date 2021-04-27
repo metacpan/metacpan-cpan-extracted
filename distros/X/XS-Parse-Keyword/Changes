@@ -1,5 +1,12 @@
 Revision history for XS-Parse-Keyword
 
+0.03    2021-04-27
+        [BUGFIXES]
+         * Fix the `VAR never introduced at ...` warnings from uses of
+           XPK_BLOCK
+         * Make sure the Builder.pm file is mentioned in META.{yml,json} so
+           CPAN tools can find it
+
 0.02    2021-04-21
         [CHANGES]
          * Back-compat to perl 5.14

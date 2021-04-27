@@ -1,5 +1,5 @@
 package Beam::Wire;
-our $VERSION = '1.023';
+our $VERSION = '1.024';
 # ABSTRACT: Lightweight Dependency Injection Container
 
 #pod =head1 SYNOPSIS
@@ -538,9 +538,9 @@ sub create_service {
             my $return = $m->{return} || q{};
             delete $service_info{args};
             my @args = $self->parse_args( $name, $service_info{class}, $m->{args} );
-            my $invocant = $service || $service_info{class};
+            my $invocant = defined $service ? $service : $service_info{class};
             my $output = $invocant->$method_name( @args );
-            $service = !$service || $return eq 'chain' ? $output
+            $service = !defined $service || $return eq 'chain' ? $output
                      : $service;
         }
     }
@@ -1284,7 +1284,7 @@ Beam::Wire - Lightweight Dependency Injection Container
 
 =head1 VERSION
 
-version 1.023
+version 1.024
 
 =head1 SYNOPSIS
 
@@ -1819,7 +1819,7 @@ mohawk2 <mohawk2@users.noreply.github.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by Doug Bell.
+This software is copyright (c) 2018-2021 by Doug Bell.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

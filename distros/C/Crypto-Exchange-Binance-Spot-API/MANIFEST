@@ -11,3 +11,4 @@ t/001-prices.t
 t/002-balance.t
 t/003-open-orders.t
 t/004-list-all-orders.t
+t/005-buy_sell.t

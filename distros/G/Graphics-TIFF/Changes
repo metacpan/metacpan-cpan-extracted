@@ -1,5 +1,10 @@
 Revision history for Perl extension Graphics::TIFF.
 
+11  Tue, 27 Apr 2021 22:30 +0200
+        - Adapt tests to tiff-4.3.0.
+          Closes RT 135330 (Tests fail with libtiff 4.3.0)
+          Thanks to Petr Písař for the patch.
+
 10  Sun, 11 Apr 2021 22:30 +0200
         - Fix TIFFGetField for TIFFTAG_PREDICTOR
 

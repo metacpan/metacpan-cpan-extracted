@@ -43,9 +43,11 @@ subtest "Test order configuration applying preference" => sub {
     # Set all parameters to test_command_param
     my $comm_test_string = 'test_command_param';
     $defaults{'config_path'} = $config_file;
+    delete $defaults{transport_redis_cache};
     my @command_line = map {('--'.$_, $comm_test_string)} keys %defaults;
     $config = Myriad::Config->new(commandline => \@command_line);
-    is($config->key($_),$comm_test_string, "$_ overridden by commandline options" ) for keys %defaults;
+    is($config->key($_), $comm_test_string, "$_ overridden by commandline options" ) for keys %defaults;
+    done_testing;
 };
 
 subtest "Test other functionality" => sub {
@@ -65,7 +67,8 @@ subtest "Test other functionality" => sub {
 
     # Test that we have updated @INC
     push @before_inc, '/test/path/included';
-    cmp_set(\@INC, \@before_inc, 'Updated @INC with configured path');
+    cmp_set([ @INC ], \@before_inc, 'Updated @INC with configured path');
+    done_testing;
 };
 
 done_testing;

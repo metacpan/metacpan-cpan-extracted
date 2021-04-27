@@ -1,5 +1,8 @@
 Revision history for Catmandu-Store-MongoDB
 
+0.0806  2021-04-27 09:22:37 CEST
+  - honor estimate_count where possible
+
 0.0805  2021-04-22 17:36:06 CEST
   - fix search(limit => 0) corner case
 

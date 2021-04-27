@@ -60,9 +60,9 @@ if (-d "/usr/include/openssl") {
 } elsif (-d "/usr/local/ssl/include") {
 	cc_inc_paths('/usr/local/ssl/include');
 	cc_lib_paths('/usr/local/ssl/lib');
+} elsif (-d "/usr/local/opt/openssl/include") {
+    cc_inc_paths('/usr/local/opt/openssl/include');
 }
-
-cc_lib_links('crypto');
 
 my $ccflags = '';
 if ($Config::Config{ccname} =~ /gcc/i) {
@@ -72,8 +72,12 @@ if ($Config::Config{ccname} =~ /gcc/i) {
 }
 
 if (($Config::Config{myuname} =~ /sunos|solaris/i) && ($Config::Config{PATCHLEVEL} =~ /5.20/)) {
+    cc_lib_links('crypto');
+    cc_optimize_flags("-O3 -DOPENSSL_API_COMPAT=0x10100000L");
+} elsif ($Config::Config{myuname} =~ /darwin/i) {
     cc_optimize_flags("-O3 -DOPENSSL_API_COMPAT=0x10100000L");
 } else {
+    cc_lib_links('crypto');
     cc_optimize_flags("-O3 $ccflags -DOPENSSL_API_COMPAT=0x10100000L");
 }
 

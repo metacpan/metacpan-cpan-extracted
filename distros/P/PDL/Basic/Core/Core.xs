@@ -16,11 +16,6 @@
 #include "pdl.h"      /* Data structure declarations */
 #include "pdlcore.h"  /* Core declarations */
 
-#if !BADVAL_USENAN
-#include <float.h>
-#endif
-#include <limits.h>
-
 /* Return a integer or numeric scalar as appropriate */
 
 #define setflag(reg,flagval,val) (val?(reg |= flagval):(reg &= ~flagval))
@@ -148,22 +143,8 @@ PDL_Anyval pdl_get_badvalue( int datatype ) {
 
 
 PDL_Anyval pdl_get_pdl_badvalue( pdl *it ) {
-    PDL_Anyval retval = { -1, 0 };
-    int datatype;
-
-#if BADVAL_PER_PDL
-    if (it->has_badvalue) {
-        retval = it->badvalue;
-    } else {
-        datatype = it->datatype;
-        retval = pdl_get_badvalue( datatype );
-    }
-#else
-    datatype = it->datatype;
-    retval = pdl_get_badvalue( datatype );
-#endif
-    return retval;
-} /* pdl_get_pdl_badvalue() */
+    return it->has_badvalue ? it->badvalue : pdl_get_badvalue( it->datatype );
+}
 
 MODULE = PDL::Core     PACKAGE = PDL
 
@@ -502,7 +483,7 @@ sclr_c(it)
    PREINIT:
 	PDL_Anyval result = { -1, 0 };
    CODE:
-        /* get the first element of a piddle and return as
+        /* get the first element of an ndarray and return as
          * Perl scalar (autodetect suitable type IV or NV)
          */
         result = pdl_at0(it);
@@ -511,41 +492,6 @@ sclr_c(it)
     OUTPUT:
         RETVAL
 
-
-SV *
-at_c(x,position)
-   pdl*	x
-   SV*	position
-   PREINIT:
-    PDL_Indx * pos;
-    int npos;
-    int ipos;
-    PDL_Anyval result = { -1, 0 };
-   CODE:
-    pdl_make_physvaffine( x );
-
-    pos = pdl_packdims( position, &npos);
-
-    if (pos == NULL || npos < x->ndims)
-       croak("Invalid position");
-
-    /*  allow additional trailing indices
-     *  which must be all zero, i.e. a
-     *  [3,1,5] piddle is treated as an [3,1,5,1,1,1,....]
-     *  infinite dim piddle
-     */
-    for (ipos=x->ndims; ipos<npos; ipos++)
-      if (pos[ipos] != 0)
-         croak("Invalid position");
-
-    result=pdl_at(PDL_REPRP(x), x->datatype, pos, x->dims,
-        (PDL_VAFFOK(x) ? x->vafftrans->incs : x->dimincs), PDL_REPROFFS(x),
-	x->ndims);
-
-    ANYVAL_TO_SV(RETVAL, result);
-
-    OUTPUT:
-     RETVAL
 
 SV *
 at_bad_c(x,position)
@@ -567,8 +513,8 @@ at_bad_c(x,position)
 
     /*  allow additional trailing indices
      *  which must be all zero, i.e. a
-     *  [3,1,5] piddle is treated as an [3,1,5,1,1,1,....]
-     *  infinite dim piddle
+     *  [3,1,5] ndarray is treated as an [3,1,5,1,1,1,....]
+     *  infinite dim ndarray
      */
     for (ipos=x->ndims; ipos<npos; ipos++)
       if (pos[ipos] != 0)
@@ -578,57 +524,14 @@ at_bad_c(x,position)
         (PDL_VAFFOK(x) ? x->vafftrans->incs : x->dimincs), PDL_REPROFFS(x),
 	x->ndims);
    badflag = (x->state & PDL_BADVAL) > 0;
-   if ( badflag &&
-#if BADVAL_USENAN
-   /* do we have to bother about NaN's? */
-        ( ( x->datatype < PDL_F && ANYVAL_EQ_ANYVAL(result, pdl_get_badvalue(x->datatype)) ) ||
-          ANYVAL_ISNAN(result)
-        )
-#else
-        ANYVAL_EQ_ANYVAL( result, pdl_get_badvalue( x->datatype ) )
-#endif
-      ) {
-	 RETVAL = newSVpvn( "BAD", 3 );
-   } else
-
-    ANYVAL_TO_SV(RETVAL, result);
+   if (badflag && ANYVAL_ISBAD(result, x, pdl_get_badvalue(x->datatype)))
+     RETVAL = newSVpvn( "BAD", 3 );
+   else
+     ANYVAL_TO_SV(RETVAL, result);
 
     OUTPUT:
      RETVAL
 
-
-void
-list_c(x)
-	pdl *x
-      PREINIT:
-	PDL_Indx *inds;
-      PDL_Indx *incs;
-      PDL_Indx offs;
-	void *data;
-	int ind;
-	int stop = 0;
-	SV *sv;
-	PPCODE:
-      pdl_make_physvaffine( x );
-	inds = pdl_malloc(sizeof(PDL_Indx) * x->ndims); /* GCC -> on stack :( */
-
-	data = PDL_REPRP(x);
-	incs = (PDL_VAFFOK(x) ? x->vafftrans->incs : x->dimincs);
-	offs = PDL_REPROFFS(x);
-	EXTEND(sp,x->nvals);
-	for(ind=0; ind < x->ndims; ind++) inds[ind] = 0;
-	while(!stop) {
-		PDL_Anyval pdl_val = { -1, 0 };
-		pdl_val = pdl_at( data, x->datatype, inds, x->dims, incs, offs, x->ndims);
-		ANYVAL_TO_SV(sv,pdl_val);
-		PUSHs(sv_2mortal(sv));
-		stop = 1;
-		for(ind = 0; ind < x->ndims; ind++)
-			if(++(inds[ind]) >= x->dims[ind])
-				inds[ind] = 0;
-			else
-				{stop = 0; break;}
-	}
 
 # returns the string 'BAD' if an element is bad
 #
@@ -656,13 +559,7 @@ listref_c(x)
     */
 
    int badflag = (x->state & PDL_BADVAL) > 0;
-   if (
-      badflag
-#if BADVAL_USENAN
-    /* do we have to bother about NaN's? */
-      && x->datatype < PDL_F
-#endif
-   ) {
+   if (badflag) {
       pdl_badval = pdl_get_pdl_badvalue( x );
    }
 
@@ -677,14 +574,7 @@ listref_c(x)
    for(ind=0; ind < x->ndims; ind++) inds[ind] = 0;
    while(!stop) {
       pdl_val = pdl_at( data, x->datatype, inds, x->dims, incs, offs, x->ndims );
-      if ( badflag && 
-#if BADVAL_USENAN
-        ( ( x->datatype < PDL_F && ANYVAL_EQ_ANYVAL(pdl_val, pdl_badval) ) ||
-          ANYVAL_ISNAN(pdl_val) )
-#else
-        ANYVAL_EQ_ANYVAL(pdl_val, pdl_badval)
-#endif
-      ) {
+      if (badflag && ANYVAL_ISBAD(pdl_val, x, pdl_badval)) {
 	 sv = newSVpvn( "BAD", 3 );
       } else {
 	 ANYVAL_TO_SV(sv, pdl_val);
@@ -723,8 +613,8 @@ set_c(x,position,value)
 
     /*  allow additional trailing indices
      *  which must be all zero, i.e. a
-     *  [3,1,5] piddle is treated as an [3,1,5,1,1,1,....]
-     *  infinite dim piddle
+     *  [3,1,5] ndarray is treated as an [3,1,5,1,1,1,....]
+     *  infinite dim ndarray
      */
     for (ipos=x->ndims; ipos<npos; ipos++)
       if (pos[ipos] != 0)
@@ -817,7 +707,7 @@ BOOT:
    sv_setiv(get_sv("PDL::SHARE",TRUE|GV_ADDMULTI), PTR2IV(&PDL));
 }
 
-# make piddle belonging to 'class' and of type 'type'
+# make ndarray belonging to 'class' and of type 'type'
 # from avref 'array_ref' which is checked for being
 # rectangular first
 
@@ -833,7 +723,7 @@ pdl_avref(array_ref, class, type)
      SV* psv;
      pdl* p;
   CODE:
-     /* make a piddle from a Perl array ref */
+     /* make an ndarray from a Perl array ref */
 
      if (!SvROK(array_ref))
        croak("pdl_avref: not a reference");
@@ -853,7 +743,7 @@ pdl_avref(array_ref, class, type)
 
      /* printf("will make type %s\n",class); */
      /*
-	at this stage start making a piddle and populate it with
+	at this stage start making an ndarray and populate it with
 	values from the array (which has already been checked in av_check)
      */
      if (strcmp(class,"PDL") == 0) {
@@ -869,7 +759,7 @@ pdl_avref(array_ref, class, type)
        SPAGAIN;
        psv = POPs;
        PUTBACK;
-       p = SvPDLV(psv); /* and get piddle from returned object */
+       p = SvPDLV(psv); /* and get ndarray from returned object */
        ST(0) = psv;
        pdl_from_array(av,dims,type,p); /* populate ;) */
      }

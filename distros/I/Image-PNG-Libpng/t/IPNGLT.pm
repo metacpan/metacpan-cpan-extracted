@@ -8,13 +8,13 @@ require Exporter;
 our @ISA = qw(Exporter);
 # We just export everything by default, because this is not a user module.
 our @EXPORT = qw/
-		    chunk_ok
-		    fake_wpng
-		    rmfile
-		    round_trip
-		    skip_itxt
-		    skip_old
-		/;
+    chunk_ok
+    fake_wpng
+    rmfile
+    round_trip
+    skip_itxt
+    skip_old
+/;
 use warnings;
 use strict;
 use utf8;

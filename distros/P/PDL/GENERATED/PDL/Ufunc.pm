@@ -75,7 +75,7 @@ use Carp;
 
 Project via product to N-1 dimensions
 
-This function reduces the dimensionality of a piddle
+This function reduces the dimensionality of an ndarray
 by one by taking the product along the 1st dimension.
 
 By using L<xchg|PDL::Slices/xchg> etc. it is possible to use
@@ -96,7 +96,7 @@ I<any> dimension.
 =for bad
 
 prodover processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -123,7 +123,7 @@ It will set the bad-value flag of all output piddles if the flag is set for any 
 
 Project via product to N-1 dimensions
 
-This function reduces the dimensionality of a piddle
+This function reduces the dimensionality of an ndarray
 by one by taking the product along the 1st dimension.
 
 By using L<xchg|PDL::Slices/xchg> etc. it is possible to use
@@ -145,7 +145,7 @@ precision.
 =for bad
 
 cprodover processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -172,7 +172,7 @@ It will set the bad-value flag of all output piddles if the flag is set for any 
 
 Project via product to N-1 dimensions
 
-This function reduces the dimensionality of a piddle
+This function reduces the dimensionality of an ndarray
 by one by taking the product along the 1st dimension.
 
 By using L<xchg|PDL::Slices/xchg> etc. it is possible to use
@@ -194,7 +194,7 @@ precision.
 =for bad
 
 dprodover processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -245,7 +245,7 @@ is the first element of the parameter.
 =for bad
 
 cumuprodover processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -297,7 +297,7 @@ precision.
 =for bad
 
 dcumuprodover processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -324,7 +324,7 @@ It will set the bad-value flag of all output piddles if the flag is set for any 
 
 Project via sum to N-1 dimensions
 
-This function reduces the dimensionality of a piddle
+This function reduces the dimensionality of an ndarray
 by one by taking the sum along the 1st dimension.
 
 By using L<xchg|PDL::Slices/xchg> etc. it is possible to use
@@ -345,7 +345,7 @@ I<any> dimension.
 =for bad
 
 sumover processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -372,7 +372,7 @@ It will set the bad-value flag of all output piddles if the flag is set for any 
 
 Project via sum to N-1 dimensions
 
-This function reduces the dimensionality of a piddle
+This function reduces the dimensionality of an ndarray
 by one by taking the sum along the 1st dimension.
 
 By using L<xchg|PDL::Slices/xchg> etc. it is possible to use
@@ -394,7 +394,7 @@ precision.
 =for bad
 
 csumover processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -421,7 +421,7 @@ It will set the bad-value flag of all output piddles if the flag is set for any 
 
 Project via sum to N-1 dimensions
 
-This function reduces the dimensionality of a piddle
+This function reduces the dimensionality of an ndarray
 by one by taking the sum along the 1st dimension.
 
 By using L<xchg|PDL::Slices/xchg> etc. it is possible to use
@@ -443,7 +443,7 @@ precision.
 =for bad
 
 dsumover processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -494,7 +494,7 @@ is the first element of the parameter.
 =for bad
 
 cumusumover processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -546,7 +546,7 @@ precision.
 =for bad
 
 dcumusumover processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -573,7 +573,7 @@ It will set the bad-value flag of all output piddles if the flag is set for any 
 
 Project via and to N-1 dimensions
 
-This function reduces the dimensionality of a piddle
+This function reduces the dimensionality of an ndarray
 by one by taking the and along the 1st dimension.
 
 By using L<xchg|PDL::Slices/xchg> etc. it is possible to use
@@ -621,7 +621,7 @@ as it will not contain any bad values.
 
 Project via bitwise and to N-1 dimensions
 
-This function reduces the dimensionality of a piddle
+This function reduces the dimensionality of an ndarray
 by one by taking the bitwise and along the 1st dimension.
 
 By using L<xchg|PDL::Slices/xchg> etc. it is possible to use
@@ -669,7 +669,7 @@ as it will not contain any bad values.
 
 Project via bitwise or to N-1 dimensions
 
-This function reduces the dimensionality of a piddle
+This function reduces the dimensionality of an ndarray
 by one by taking the bitwise or along the 1st dimension.
 
 By using L<xchg|PDL::Slices/xchg> etc. it is possible to use
@@ -717,7 +717,7 @@ as it will not contain any bad values.
 
 Project via or to N-1 dimensions
 
-This function reduces the dimensionality of a piddle
+This function reduces the dimensionality of an ndarray
 by one by taking the or along the 1st dimension.
 
 By using L<xchg|PDL::Slices/xchg> etc. it is possible to use
@@ -765,7 +765,7 @@ as it will not contain any bad values.
 
 Project via == 0 to N-1 dimensions
 
-This function reduces the dimensionality of a piddle
+This function reduces the dimensionality of an ndarray
 by one by taking the == 0 along the 1st dimension.
 
 By using L<xchg|PDL::Slices/xchg> etc. it is possible to use
@@ -813,7 +813,7 @@ as it will not contain any bad values.
 
 Project via integral to N-1 dimensions
 
-This function reduces the dimensionality of a piddle
+This function reduces the dimensionality of an ndarray
 by one by taking the integral along the 1st dimension.
 
 By using L<xchg|PDL::Slices/xchg> etc. it is possible to use
@@ -842,8 +842,8 @@ is the natural (and correct) choice for binned data, of course.
 
 =for bad
 
-intover ignores the bad-value flag of the input piddles.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+intover ignores the bad-value flag of the input ndarrays.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -870,7 +870,7 @@ It will set the bad-value flag of all output piddles if the flag is set for any 
 
 Project via average to N-1 dimensions
 
-This function reduces the dimensionality of a piddle
+This function reduces the dimensionality of an ndarray
 by one by taking the average along the 1st dimension.
 
 By using L<xchg|PDL::Slices/xchg> etc. it is possible to use
@@ -891,7 +891,7 @@ I<any> dimension.
 =for bad
 
 average processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -934,7 +934,7 @@ It will set the bad-value flag of all output piddles if the flag is set for any 
 
 Project via average to N-1 dimensions
 
-This function reduces the dimensionality of a piddle
+This function reduces the dimensionality of an ndarray
 by one by taking the average along the 1st dimension.
 
 By using L<xchg|PDL::Slices/xchg> etc. it is possible to use
@@ -956,7 +956,7 @@ precision.
 =for bad
 
 caverage processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -983,7 +983,7 @@ It will set the bad-value flag of all output piddles if the flag is set for any 
 
 Project via average to N-1 dimensions
 
-This function reduces the dimensionality of a piddle
+This function reduces the dimensionality of an ndarray
 by one by taking the average along the 1st dimension.
 
 By using L<xchg|PDL::Slices/xchg> etc. it is possible to use
@@ -1005,7 +1005,7 @@ precision.
 =for bad
 
 daverage processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -1048,7 +1048,7 @@ It will set the bad-value flag of all output piddles if the flag is set for any 
 
 Project via median to N-1 dimensions
 
-This function reduces the dimensionality of a piddle
+This function reduces the dimensionality of an ndarray
 by one by taking the median along the 1st dimension.
 
 By using L<xchg|PDL::Slices/xchg> etc. it is possible to use
@@ -1069,7 +1069,7 @@ I<any> dimension.
 =for bad
 
 medover processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -1096,7 +1096,7 @@ It will set the bad-value flag of all output piddles if the flag is set for any 
 
 Project via oddmedian to N-1 dimensions
 
-This function reduces the dimensionality of a piddle
+This function reduces the dimensionality of an ndarray
 by one by taking the oddmedian along the 1st dimension.
 
 By using L<xchg|PDL::Slices/xchg> etc. it is possible to use
@@ -1125,7 +1125,7 @@ some circumstances.
 =for bad
 
 oddmedover processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -1152,7 +1152,7 @@ It will set the bad-value flag of all output piddles if the flag is set for any 
 
 Project via mode to N-1 dimensions
 
-This function reduces the dimensionality of a piddle
+This function reduces the dimensionality of an ndarray
 by one by taking the mode along the 1st dimension.
 
 By using L<xchg|PDL::Slices/xchg> etc. it is possible to use
@@ -1184,7 +1184,7 @@ BAD is the most common element, the returned value is also BAD.
 =for bad
 
 modeover does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -1212,7 +1212,7 @@ It will set the bad-value flag of all output piddles if the flag is set for any 
 
 Project via percentile to N-1 dimensions
 
-This function reduces the dimensionality of a piddle by one by finding
+This function reduces the dimensionality of an ndarray by one by finding
 the specified percentile (p) along the 1st dimension.  The specified
 percentile must be between 0.0 and 1.0.  When the specified percentile
 falls between data points, the result is interpolated.  Values outside
@@ -1237,7 +1237,7 @@ I<any> dimension.
 =for bad
 
 pctover processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -1263,7 +1263,7 @@ It will set the bad-value flag of all output piddles if the flag is set for any 
 
 Project via percentile to N-1 dimensions
 
-This function reduces the dimensionality of a piddle by one by finding
+This function reduces the dimensionality of an ndarray by one by finding
 the specified percentile along the 1st dimension.  The specified
 percentile must be between 0.0 and 1.0.  When the specified percentile
 falls between two values, the nearest data value is the result.
@@ -1286,7 +1286,7 @@ I<any> dimension.
 =for bad
 
 oddpctover processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -1305,7 +1305,7 @@ It will set the bad-value flag of all output piddles if the flag is set for any 
 
 =for ref
 
-Return the specified percentile of all elements in a piddle. The
+Return the specified percentile of all elements in an ndarray. The
 specified percentile (p) must be between 0.0 and 1.0.  When the
 specified percentile falls between data points, the result is
 interpolated.
@@ -1331,7 +1331,7 @@ sub PDL::pct {
 
 =for ref
 
-Return the specified percentile of all elements in a piddle. The
+Return the specified percentile of all elements in an ndarray. The
 specified percentile must be between 0.0 and 1.0.  When the specified
 percentile falls between two values, the nearest data value is the
 result.
@@ -1357,7 +1357,7 @@ sub PDL::oddpct {
 
 =for ref
 
-Return the average of all elements in a piddle.
+Return the average of all elements in an ndarray.
 
 See the documentation for L</average> for more information.
 
@@ -1384,7 +1384,7 @@ sub PDL::avg {
 
 =for ref
 
-Return the sum of all elements in a piddle.
+Return the sum of all elements in an ndarray.
 
 See the documentation for L</sumover> for more information.
 
@@ -1411,7 +1411,7 @@ sub PDL::sum {
 
 =for ref
 
-Return the product of all elements in a piddle.
+Return the product of all elements in an ndarray.
 
 See the documentation for L</prodover> for more information.
 
@@ -1438,7 +1438,7 @@ sub PDL::prod {
 
 =for ref
 
-Return the average (in double precision) of all elements in a piddle.
+Return the average (in double precision) of all elements in an ndarray.
 
 See the documentation for L</daverage> for more information.
 
@@ -1465,7 +1465,7 @@ sub PDL::davg {
 
 =for ref
 
-Return the sum (in double precision) of all elements in a piddle.
+Return the sum (in double precision) of all elements in an ndarray.
 
 See the documentation for L</dsumover> for more information.
 
@@ -1492,7 +1492,7 @@ sub PDL::dsum {
 
 =for ref
 
-Return the product (in double precision) of all elements in a piddle.
+Return the product (in double precision) of all elements in an ndarray.
 
 See the documentation for L</dprodover> for more information.
 
@@ -1519,7 +1519,7 @@ sub PDL::dprod {
 
 =for ref
 
-Return the check for zero of all elements in a piddle.
+Return the check for zero of all elements in an ndarray.
 
 See the documentation for L</zcover> for more information.
 
@@ -1546,7 +1546,7 @@ sub PDL::zcheck {
 
 =for ref
 
-Return the logical and of all elements in a piddle.
+Return the logical and of all elements in an ndarray.
 
 See the documentation for L</andover> for more information.
 
@@ -1573,7 +1573,7 @@ sub PDL::and {
 
 =for ref
 
-Return the bitwise and of all elements in a piddle.
+Return the bitwise and of all elements in an ndarray.
 
 See the documentation for L</bandover> for more information.
 
@@ -1600,7 +1600,7 @@ sub PDL::band {
 
 =for ref
 
-Return the logical or of all elements in a piddle.
+Return the logical or of all elements in an ndarray.
 
 See the documentation for L</orover> for more information.
 
@@ -1627,7 +1627,7 @@ sub PDL::or {
 
 =for ref
 
-Return the bitwise or of all elements in a piddle.
+Return the bitwise or of all elements in an ndarray.
 
 See the documentation for L</borover> for more information.
 
@@ -1654,7 +1654,7 @@ sub PDL::bor {
 
 =for ref
 
-Return the minimum of all elements in a piddle.
+Return the minimum of all elements in an ndarray.
 
 See the documentation for L</minimum> for more information.
 
@@ -1681,7 +1681,7 @@ sub PDL::min {
 
 =for ref
 
-Return the maximum of all elements in a piddle.
+Return the maximum of all elements in an ndarray.
 
 See the documentation for L</maximum> for more information.
 
@@ -1708,7 +1708,7 @@ sub PDL::max {
 
 =for ref
 
-Return the median of all elements in a piddle.
+Return the median of all elements in an ndarray.
 
 See the documentation for L</medover> for more information.
 
@@ -1735,7 +1735,7 @@ sub PDL::median {
 
 =for ref
 
-Return the mode of all elements in a piddle.
+Return the mode of all elements in an ndarray.
 
 See the documentation for L</modeover> for more information.
 
@@ -1762,7 +1762,7 @@ sub PDL::mode {
 
 =for ref
 
-Return the oddmedian of all elements in a piddle.
+Return the oddmedian of all elements in an ndarray.
 
 See the documentation for L</oddmedover> for more information.
 
@@ -1789,7 +1789,7 @@ sub PDL::oddmedian {
 
 =for ref
 
-Return true if any element in piddle set
+Return true if any element in ndarray set
 
 Useful in conditional expressions:
 
@@ -1811,7 +1811,7 @@ in the check are bad.
 
 =for ref
 
-Return true if all elements in piddle set
+Return true if all elements in ndarray set
 
 Useful in conditional expressions:
 
@@ -1833,16 +1833,17 @@ in the check are bad.
 
 =for ref
 
-Returns an array with minimum and maximum values of a piddle.
+Returns a list with minimum and maximum values of an ndarray.
 
 =for usage
 
  ($mn, $mx) = minmax($pdl);
 
 This routine does I<not> thread over the dimensions of C<$pdl>; 
-it returns the minimum and maximum values of the whole array.
+it returns the minimum and maximum values of the whole ndarray.
 See L</minmaximum> if this is not what is required.
-The two values are returned as Perl scalars similar to min/max.
+The two values are returned as Perl scalars similar to min/max,
+and therefore ignore whether the values are bad.
 
 =for example
 
@@ -1956,7 +1957,7 @@ Bad elements are moved to the end of the array:
 
 Sort a list of vectors lexicographically.
 
-The 0th dimension of the source piddle is dimension in the vector;
+The 0th dimension of the source ndarray is dimension in the vector;
 the 1st dimension is list order.  Higher dimensions are threaded over.
 
 =for example
@@ -2045,7 +2046,7 @@ Vectors with bad components should be moved to the end of the array:
 
 Project via minimum to N-1 dimensions
 
-This function reduces the dimensionality of a piddle
+This function reduces the dimensionality of an ndarray
 by one by taking the minimum along the 1st dimension.
 
 By using L<xchg|PDL::Slices/xchg> etc. it is possible to use
@@ -2066,7 +2067,7 @@ I<any> dimension.
 =for bad
 
 Output is set bad if all elements of the input are bad,
-otherwise the bad flag is cleared for the output piddle.
+otherwise the bad flag is cleared for the output ndarray.
 
 Note that C<NaNs> are considered to be valid values;
 see L<isfinite|PDL::Math/isfinite> and L<badmask|PDL::Math/badmask>
@@ -2099,7 +2100,7 @@ Like minimum but returns the index rather than the value
 =for bad
 
 Output is set bad if all elements of the input are bad,
-otherwise the bad flag is cleared for the output piddle.
+otherwise the bad flag is cleared for the output ndarray.
 
 =cut
 
@@ -2152,7 +2153,7 @@ Not yet been converted to ignore bad values
 
 Project via maximum to N-1 dimensions
 
-This function reduces the dimensionality of a piddle
+This function reduces the dimensionality of an ndarray
 by one by taking the maximum along the 1st dimension.
 
 By using L<xchg|PDL::Slices/xchg> etc. it is possible to use
@@ -2173,7 +2174,7 @@ I<any> dimension.
 =for bad
 
 Output is set bad if all elements of the input are bad,
-otherwise the bad flag is cleared for the output piddle.
+otherwise the bad flag is cleared for the output ndarray.
 
 Note that C<NaNs> are considered to be valid values;
 see L<isfinite|PDL::Math/isfinite> and L<badmask|PDL::Math/badmask>
@@ -2206,7 +2207,7 @@ Like maximum but returns the index rather than the value
 =for bad
 
 Output is set bad if all elements of the input are bad,
-otherwise the bad flag is cleared for the output piddle.
+otherwise the bad flag is cleared for the output ndarray.
 
 =cut
 
@@ -2353,7 +2354,7 @@ Not yet been converted to ignore bad values
 
 =for ref
 
-Find minimum and maximum and their indices for a given piddle;
+Find minimum and maximum and their indices for a given ndarray;
 
 =for usage
 
@@ -2362,13 +2363,13 @@ Find minimum and maximum and their indices for a given piddle;
  pdl> p $min, $max, $min_ind, $max_ind
  [-2 0] [4 3] [0 1] [2 2]
 
-See also L</minmax>, which clumps the piddle together.
+See also L</minmax>, which clumps the ndarray together.
 
 
 
 =for bad
 
-If C<a()> contains only bad data, then the output piddles will
+If C<a()> contains only bad data, then the output ndarrays will
 be set bad, along with their bad flag.
 Otherwise they will have their bad flags cleared,
 since they will not contain any bad values.

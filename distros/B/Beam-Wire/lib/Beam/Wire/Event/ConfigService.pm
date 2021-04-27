@@ -1,5 +1,5 @@
 package Beam::Wire::Event::ConfigService;
-our $VERSION = '1.023';
+our $VERSION = '1.024';
 # ABSTRACT: Event fired when configuring a new service
 
 #pod =head1 SYNOPSIS
@@ -65,7 +65,7 @@ Beam::Wire::Event::ConfigService - Event fired when configuring a new service
 
 =head1 VERSION
 
-version 1.023
+version 1.024
 
 =head1 SYNOPSIS
 
@@ -112,7 +112,7 @@ Al Newkirk <anewkirk@ana.io>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by Doug Bell.
+This software is copyright (c) 2018-2021 by Doug Bell.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -91,8 +91,8 @@ sub home {
 # Commands
 sub command_edit {
   my $self = shift;
-  return $self->_edit_with_editor($_[0]) if @_ and -f $_[0];    # Edit a given file
-  return $self->_mass_edit(@_)           if $self->year or $self->month or !-t STDIN;
+  return $self->_edit_with_editor(App::tt::file->new($_[0])) if @_ and -f $_[0]; # Edit a given file
+  return $self->_mass_edit(@_) if $self->year or $self->month or !-t STDIN;
   return $self->_edit_with_editor;
 }
 
@@ -295,8 +295,9 @@ sub config {
 }
 
 sub _edit_with_editor {
-  my ($self,  $trc_file) = @_;
-  my ($event, $prev) = $trc_file ? ($self->_load($trc_file), 0) : ($self->_get_previous_event, 1);
+  my ($self, $trc_file) = @_;
+  my $prev  = $trc_file ? 0                          : 1;
+  my $event = $prev     ? $self->_get_previous_event : $self->_load($trc_file);
 
   $trc_file = $event->{path} //= 'Not found';
   die "Could not find file to edit. ($event->{path})\n" unless $event->{start};

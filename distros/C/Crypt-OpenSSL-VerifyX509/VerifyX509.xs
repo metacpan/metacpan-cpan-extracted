@@ -125,10 +125,11 @@ verify(store, x509)
     croak("store ctx init: %s", ssl_error());
 
   RETVAL = X509_verify_cert(csc);
-  X509_STORE_CTX_free(csc);
 
   if (!RETVAL)
     croak("verify: %s", ctx_error(csc));
+
+  X509_STORE_CTX_free(csc);
 
   OUTPUT:
   RETVAL

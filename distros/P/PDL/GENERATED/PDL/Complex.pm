@@ -50,12 +50,12 @@ inplace (not yet implemented!!!) and require rectangular form.
 
 While there is a procedural interface available (C<< $x/$y*$c <=> Cmul
 (Cdiv ($x, $y), $c) >>), you can also opt to cast your pdl's into the
-C<PDL::Complex> datatype, which works just like your normal piddles, but
+C<PDL::Complex> datatype, which works just like your normal ndarrays, but
 with all the normal perl operators overloaded.
 
 The latter means that C<sin($x) + $y/$c> will be evaluated using the
 normal rules of complex numbers, while other pdl functions (like C<max>)
-just treat the piddle as a real-valued piddle with a lowest dimension of
+just treat the ndarray as a real-valued ndarray with a lowest dimension of
 size 2, so C<max> will return the maximum of all real and imaginary parts,
 not the "highest" (for some definition)
 
@@ -66,7 +66,7 @@ complex floating-point types, and most functions and modules in the core
 distribution support these as well.
 
 PDL can now handle complex numbers natively as scalars. This has
-the advantage that real and complex valued piddles have the same
+the advantage that real and complex valued ndarrays have the same
 dimensions. Consider this when writing code in the future.
 
 See L<PDL::Ops/ci>, L<PDL::Ops/creal>, L<PDL::Ops/cimag>,
@@ -91,8 +91,8 @@ the fifths roots of 1+1*i (due to threading).
 
 =item *
 
-use C<cplx(real-valued-piddle)> to cast from normal piddles into the
-complex datatype. Use C<real(complex-valued-piddle)> to cast back. This
+use C<cplx(real-valued-ndarray)> to cast from normal ndarrays into the
+complex datatype. Use C<real(complex-valued-ndarray)> to cast back. This
 requires a copy, though.
 
 =item *
@@ -253,9 +253,9 @@ sub i () { $i->copy };
 
 =for ref
 
-Cast a real-valued piddle to the complex datatype.
+Cast a real-valued ndarray to the complex datatype.
 
-The first dimension of the piddle must be of size 2. After this the
+The first dimension of the ndarray must be of size 2. After this the
 usual (complex) arithmetic operators are applied to this pdl, rather
 than the normal elementwise pdl operators.  Dataflow to the complex
 parent works. Use C<sever> on the result if you don't want this.
@@ -268,11 +268,11 @@ parent works. Use C<sever> on the result if you don't want this.
 
 =for ref
 
-Cast a real-valued piddle to the complex datatype I<without> dataflow
+Cast a real-valued ndarray to the complex datatype I<without> dataflow
 and I<inplace>.
 
-Achieved by merely reblessing a piddle. The first dimension of the
-piddle must be of size 2.
+Achieved by merely reblessing an ndarray. The first dimension of the
+ndarray must be of size 2.
 
 =for usage
 
@@ -296,13 +296,13 @@ result if you don't want this.
 
 use Carp;
 sub cplx($) {
-   return $_[0] if UNIVERSAL::isa($_[0],'PDL::Complex'); # NOOP if just piddle
+   return $_[0] if UNIVERSAL::isa($_[0],'PDL::Complex'); # NOOP if just ndarray
    croak "first dimsize must be 2" unless $_[0]->dims > 0 && $_[0]->dim(0) == 2;
    bless $_[0]->slice('');
 }
 
 sub complex($) {
-   return $_[0] if UNIVERSAL::isa($_[0],'PDL::Complex'); # NOOP if just piddle
+   return $_[0] if UNIVERSAL::isa($_[0],'PDL::Complex'); # NOOP if just ndarray
    croak "first dimsize must be 2" unless $_[0]->dims > 0 && $_[0]->dim(0) == 2;
    bless $_[0];
 }
@@ -332,7 +332,7 @@ convert real to complex, assuming an imaginary part of zero
 =for bad
 
 r2C does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -369,7 +369,7 @@ convert imaginary to complex, assuming a real part of zero
 =for bad
 
 i2C does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -398,7 +398,7 @@ convert complex numbers in rectangular form to polar (mod,arg) form. Works inpla
 =for bad
 
 Cr2p does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -427,7 +427,7 @@ convert complex numbers in polar (mod,arg) form to rectangular form. Works inpla
 =for bad
 
 Cp2r does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -468,7 +468,7 @@ complex multiplication
 =for bad
 
 Cmul does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -497,7 +497,7 @@ Project via product to N-1 dimension
 =for bad
 
 Cprodover does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -526,7 +526,7 @@ mixed complex/real multiplication
 =for bad
 
 Cscale does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -555,7 +555,7 @@ complex division
 =for bad
 
 Cdiv does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -586,7 +586,7 @@ Ccmp orders by real first, then by imaginary. Hm, but it is mathematical nonsens
 =for bad
 
 Ccmp does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -615,7 +615,7 @@ complex conjugation. Works inplace
 =for bad
 
 Cconj does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -644,7 +644,7 @@ complex C<abs()> (also known as I<modulus>)
 =for bad
 
 Cabs does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -678,7 +678,7 @@ complex squared C<abs()> (also known I<squared modulus>)
 =for bad
 
 Cabs2 does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -712,7 +712,7 @@ complex argument function ("angle")
 =for bad
 
 Carg does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -746,7 +746,7 @@ BEGIN {*Carg = \&PDL::Complex::Carg;
 =for bad
 
 Csin does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -775,7 +775,7 @@ BEGIN {*Csin = \&PDL::Complex::Csin;
 =for bad
 
 Ccos does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -822,7 +822,7 @@ sub Ctan($) { Csin($_[0]) / Ccos($_[0]) }
 =for bad
 
 Cexp does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -851,7 +851,7 @@ BEGIN {*Cexp = \&PDL::Complex::Cexp;
 =for bad
 
 Clog does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -880,7 +880,7 @@ complex C<pow()> (C<**>-operator)
 =for bad
 
 Cpow does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -909,7 +909,7 @@ Works inplace
 =for bad
 
 Csqrt does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -938,7 +938,7 @@ Works inplace
 =for bad
 
 Casin does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -967,7 +967,7 @@ Works inplace
 =for bad
 
 Cacos does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -1014,7 +1014,7 @@ sub Catan($) {
 =for bad
 
 Csinh does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -1043,7 +1043,7 @@ BEGIN {*Csinh = \&PDL::Complex::Csinh;
 =for bad
 
 Ccosh does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -1072,7 +1072,7 @@ Works inplace
 =for bad
 
 Ctanh does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -1101,7 +1101,7 @@ Works inplace
 =for bad
 
 Casinh does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -1130,7 +1130,7 @@ Works inplace
 =for bad
 
 Cacosh does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -1159,7 +1159,7 @@ Works inplace
 =for bad
 
 Catanh does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -1188,7 +1188,7 @@ compute the projection of a complex number to the riemann sphere. Works inplace
 =for bad
 
 Cproj does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -1217,7 +1217,7 @@ Compute the C<n> roots of C<a>. C<n> must be a positive integer. The result will
 =for bad
 
 Croots does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -1242,7 +1242,7 @@ BEGIN {*Croots = \&PDL::Complex::Croots;
 Return the real or imaginary part of the complex number(s) given.
 
 These are slicing operators, so data flow works. The real and
-imaginary parts are returned as piddles (ref eq PDL).
+imaginary parts are returned as ndarrays (ref eq PDL).
 
 =cut
 
@@ -1269,7 +1269,7 @@ evaluate the polynomial with (real) coefficients C<coeffs> at the (complex) posi
 =for bad
 
 rCpolynomial does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -1458,7 +1458,7 @@ sub cd(;@) {
          PDL::Core::string($self,$format1);
       }
       return "Null" if $self->isnull;
-      return "Empty" if $self->isempty; # Empty piddle
+      return "Empty" if $self->isempty; # Empty ndarray
       local $sep  = $PDL::use_commas ? ", " : "  ";
       local $sep2 = $PDL::use_commas ? ", " : "";
       if ($ndims < 3) {

@@ -1,0 +1,353 @@
+=encoding utf-8
+
+=head1 NAME
+
+Finance::Alpaca::Cookbook - Simple Examples to Get You Started
+
+=head1 Account Examples
+
+=head2 View Account Information
+
+You can see various information about your account, such as the amount of
+buying power available or whether or not it has a L<PDT
+flag|https://forum.alpaca.markets/t/general-trading/2339>.
+
+    my $account = $alpaca->account;
+    print 'Account is currently restricted from trading. ' if $account->trading_blocked;
+    printf '$%f is available as buying power', $account->buying_power;
+
+=head2 View Gain/Loss of Portfolio
+
+You can use the information from the account endpoint to do things like
+calculating the daily profit or loss of your account.
+
+    my $account        = $alpaca->account;
+    my $balance_change = $account->equity - $account->last_equity;
+    printf q[Today's portfolio balance change: $%.4f], $balance_change;
+
+=head1 Assets Examples
+
+Listed instruments can be gathered en mass or individually.
+
+=head2 Get a List of Assets
+
+The C<assets( )> method will return a list of US equities.
+
+    # Get a list of all active assets.
+    my @active_assets = $alpaca->assets( status => 'active' );
+
+    # Filter the assets down to just those that are NASDAQ listed.
+    my @nasdaq_assets = grep { $_->exchange eq 'NASDAQ' } @active_assets;
+
+=head2 See If a Particular Asset is Tradable on Alpaca
+
+    my $asset = $alpaca->asset('AAPL');
+    say $asset->tradable ? 'We can trade AAPL' : 'Asset not found for AAPL';
+
+=head1 Check Market Hours
+
+As important as price data, knowing when and if the market is open is basic
+info to consider.
+
+=head2 See if the Market is Open
+
+You can check if the market is open now, or view what times the market will be
+open or closed on a particular date.
+
+    # Check if the market is open now
+    my $clock = $alpaca->clock;
+    CORE::say 'The market is ' . ( $clock->is_open ? 'open!' : 'closed.' );
+
+    # Check when the market was open on Dec. 1, 2018
+    my $date = Time::Moment->new( year => 2018, month => 12, day => 1 );
+    my ($day) = $alpaca->calendar( start => $date, end => $date );
+    CORE::say sprintf 'The market opened at %s and closed at %s on %s.', $day->open, $day->close,
+        $day->date;
+
+=head1 Market Data Examples
+
+Alpaca provides market data from various sources.
+
+=head2 Get Historical Price and Volume Data
+
+Using the C<bars( )> method, you can see what a stock price was at a particular
+time.
+
+    # Get daily price data for AAPL over the last 5 trading days.
+    my %bars = $alpaca->bars(
+        symbol    => 'AAPL',
+        timeframe => '1Min',
+        start     => Time::Moment->now->with_hour(9)->minus_days(7),
+        end       => Time::Moment->now->minus_minutes(20),
+        limit     => 5
+    );
+
+    # See how much AAPL moved in that timeframe
+    my $start_price    = $bars{AAPL}->[0]->open;
+    my $end_price      = $bars{AAPL}->[-1]->close;
+    my $percent_change = ( $end_price - $start_price ) / $start_price * 100;
+    CORE::say sprintf 'AAPL moved %f%% over the last 5 days.', $percent_change;
+
+=head1 Order Examples
+
+This section contains examples of some of the things you can do with order
+objects through our API. For additional help understanding different types of
+orders and how they behave once they’re placed, please see the L<order
+page|https://alpaca.markets/docs/trading-on-alpaca/orders/>.
+
+=head2 Place New Orders
+
+Submit a market order to buy 1 share of Apple at market price.
+
+    $alpaca->create_order(
+        symbol => 'AAPL',
+        qty    => 1,
+        side   => 'buy',
+        type   => 'market',
+        time_in_force => 'day'
+    );
+
+Submit a limit order to attempt to sell 1 share of AMD at a particular price
+(C<$20.50>) when the market opens.
+
+    $alpaca->create_order(
+        symbol => 'AMD',
+        qty    => 1,
+        side   => 'sell',
+        type   => 'limit',
+        time_in_force => 'opg',
+        limit_price => 20.50,
+    );
+
+=head2 Submit Short Orders
+
+Short orders can also be placed for securities which you do not hold an open
+long position in.
+
+Submit a market order to open a short position of one share
+
+    $alpaca->create_order(
+        symbol => 'TSLA',
+        qty    => 1,
+        side   => 'sell',
+        type   => 'market',
+        time_in_force => 'day'
+    );
+
+Submit a limit order to attempt to grow our short position.
+
+    # First, get an up-to-date price for our symbol...
+    my $symbol = 'TSLA';
+    my $time   = Time::Moment->now;
+    my $symbol_bars = $alpaca->bars(
+        symbol    => $symbol,
+        timeframe => '1Min',
+        limit     => 1,
+        end       => $time,
+        start     => $time->minus_minutes(5)
+    );
+
+    # Submit an order for one share at that price
+    my $order = $alpaca->create_order(
+        symbol        => $symbol,
+        qty           => 1,
+        side          => 'sell',
+        type          => 'limit',
+        time_in_force => 'day',
+        limit_price   => $symbol_bars->{bars}[0]->close
+    );
+
+    # Wait a second for our orders to fill...
+    sleep 1;
+
+    # Check on our position
+    my $position = $alpaca->position($symbol);
+    say 'Short position open for ' . $symbol if $position->qty < 0;
+
+=head2 Use Client Order IDs
+
+Client Order IDs can be used to organize and track specific orders in your
+client program.
+
+    # Submit a market order and assign it a Client Order ID
+    $alpaca->create_order(
+        symbol          => 'AAPL',
+        qty             => 1,
+        side            => 'buy',
+        type            => 'market',
+        time_in_force   => 'day',
+        client_order_id => 'my_first_order'
+    );
+
+    # Get our order using its Client Order ID
+    my $order = $alpaca->order_by_client_id('my_first_order');
+    CORE::say 'Got order ' . $order->id;
+
+=head2 Submit Bracket Orders
+
+Bracket orders allow you to create a chain of orders that react to execution
+and stock price. For more details, go to L<Bracket Order
+Overview|https://alpaca.markets/docs/trading-on-alpaca/orders/#bracket-orders>
+
+    my $symbol = 'AAPL';
+    my $time   = Time::Moment->now;
+    $time = Time::Moment->now->minus_days(1);
+    my $symbol_bars = $alpaca->bars(
+        symbol    => $symbol,
+        timeframe => '1Min',
+        limit     => 1,
+        end       => $time,
+        start     => $time->minus_minutes(5)
+    );
+    my $symbol_price = $symbol_bars->{bars}[0]->close;
+
+    # We could buy a position and add a stop-loss and a take-profit of 5 %
+    $alpaca->create_order(
+        symbol        => $symbol,
+        qty           => 1,
+        side          => 'buy',
+        type          => 'market',
+        time_in_force => 'gtc',
+        order_class   => 'bracket',
+        stop_loss   => { stop_price  => $symbol_price * 0.95, limit_price => $symbol_price * 0.94 },
+        take_profit => { limit_price => $symbol_price * 1.05 }
+    );
+
+    # We could buy a position and just add a stop loss of 5 % (OTO Orders)
+    $alpaca->create_order(
+        symbol        => $symbol,
+        qty           => 1,
+        side          => 'buy',
+        type          => 'market',
+        time_in_force => 'gtc',
+        order_class   => 'oto',
+        stop_loss     => { stop_price => $symbol_price * 0.95 }
+    );
+
+    # We could split it to 2 orders. first buy a stock,
+    # and then add the stop/profit prices (OCO Orders)
+    $alpaca->create_order(
+        symbol        => $symbol,
+        qty           => 1,
+        side          => 'buy',
+        type          => 'limit',
+        time_in_force => 'day',
+        limit_price   => $symbol_price
+    );
+
+    # wait for it to execute and then
+    $alpaca->create_order(
+        symbol        => $symbol,
+        qty           => 1,
+        side          => 'sell',
+        type          => 'limit',
+        time_in_force => 'gtc',
+        order_class   => 'oco',
+        stop_loss     => { stop_price  => $symbol_price * 0.95 },
+        take_profit   => { limit_price => $symbol_price * 1.05 }
+    );
+
+=head2 Submit Trailing Stop Orders
+
+Trailing stop orders allow you to create a stop order that automatically
+changes the stop price allowing you to maximize your profits while still
+protecting your position with a stop price. For more details, go to L<Trailing
+Stop Order
+Overview|https://alpaca.markets/docs/trading-on-alpaca/orders/#trailing-stop-orders>
+
+    # Submit a market order to buy 1 share of Apple at market price
+    $alpaca->create_order(
+        symbol        => 'AAPL',
+        qty           => 1,
+        side          => 'buy',
+        type          => 'market',
+        time_in_force => 'gtc'
+    );
+
+    # Submit a trailing stop order to sell 1 share of Apple at a
+    # trailing stop of
+    $alpaca->create_order(
+        symbol        => 'AAPL',
+        qty           => 1,
+        side          => 'sell',
+        type          => 'trailing_stop',
+        trail_price   => 0.9900, # stop price will be hwm - 0.9900
+        time_in_force => 'gtc'
+    );
+
+    # Alternatively, you could use trail_percent:
+    $alpaca->create_order(
+        symbol        => 'AAPL',
+        qty           => 1,
+        side          => 'sell',
+        type          => 'trailing_stop',
+        trail_percent => 1.0, # stop price will be hwm * 0.99
+        time_in_force => 'gtc'
+    );
+
+=head2 Get a List of Existing Orders
+
+If you’d like to see a list of your existing orders, you can send a get
+request for that!
+
+    my $closed_orders = $alpaca->orders(
+        status => 'closed',
+        limit  => 100,
+        nested => 1
+    );
+    my @closed_aapl_orders = grep { $_->symbol eq 'AAPL' } @$closed_orders;
+
+=head2 Listen for Updates to Orders
+
+You can use Websockets to receive real-time updates about the status of your
+orders as they change.
+
+    my $client_order_id = 'my_client_order_id#' . time();
+    my $stream          = $alpaca->trade_stream(
+        sub ($packet) {
+            CORE::say sprintf '[%s] Order %s @ $%f', $packet->order->symbol,
+                $packet->order->status, $packet->order->filled_avg_price,
+                if $packet->order->client_order_id eq $client_order_id && $packet->event eq 'fill';
+        }
+    );
+    Mojo::IOLoop->timer(
+        5 => sub {
+            my $order = $alpaca->create_order(
+                symbol          => 'MSFT',
+                qty             => .1,
+                side            => 'buy',
+                type            => 'market',
+                time_in_force   => 'day',
+                client_order_id => $client_order_id
+            );
+        }
+    );
+
+=head1 Portfolio Examples
+
+You can view the positions in your portfolio with the following example.
+
+=head2 View Open Positions in Your Portfolio
+
+You can view the positions in your portfolio with the following code. If you
+specify a symbol, you’ll see only your position for the associated stock.
+
+    for my $position ( $camelid->positions ) {
+        say sprintf '%f shares of %s', $position->qty, $position->symbol;
+    }
+
+=head1 LICENSE
+
+Copyright (C) Sanko Robinson.
+
+This library is free software; you can redistribute it and/or modify it under
+the terms found in the Artistic License 2. Other copyrights, terms, and
+conditions may apply to data transmitted through this module.
+
+=head1 AUTHOR
+
+Sanko Robinson E<lt>sanko@cpan.orgE<gt>
+
+=cut
+
+# https://alpaca.markets/docs/api-documentation/how-to/

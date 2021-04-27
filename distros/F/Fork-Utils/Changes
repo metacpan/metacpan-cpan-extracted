@@ -1,5 +1,15 @@
 Changes
 =======
 
+0.04 - 2021 Apr 26
+    - provide more comprehensive example
+
+0.03 - 2021 Apr 26
+    - fix documentation
+
+0.02 - 2021 Apr 26
+    - Update documentation.
+    - Add MYMETA.* files
+
 0.01 - 2014 May 23
     - Initial version.

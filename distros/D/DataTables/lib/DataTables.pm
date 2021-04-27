@@ -11,7 +11,7 @@ use JSON::XS;
 use SQL::Abstract::Limit;
 use JQuery::DataTables::Request;
 
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 
 # Preloaded methods go here.
 
@@ -23,6 +23,7 @@ sub new {
         columns   => undef,
         dbh => undef,
         query => CGI::Simple->new,
+        data_output_format => 'column-id', # or: key-value
         patterns  => {},
         join_clause  => '',
         where_clause  => '',
@@ -71,6 +72,23 @@ sub dbh {
         $self->{dbh} = $ref;
     }
     return $self->{dbh};
+}
+
+
+
+
+sub data_output_format {
+    my $self = shift;
+    my $new_val = shift;
+    
+    if ($new_val) {
+        if( $new_val ne 'column-id' and $new_val ne 'key-value' ) {
+            croak "data_output_format must be one of: column-id, key-value; you sent: $new_val";
+        }else{
+            $self->{data_output_format} = $new_val;
+        }
+    }
+    return $self->{data_output_format};
 }
 
 
@@ -242,31 +260,35 @@ sub table_data {
     my $sEcho = $dt_req->draw;
     my $version = $dt_req->version( \%all_query_parameters );
     
+    my $data_key_name = 'aaData'; # defaults to v1.9
     
     if( $version eq '1.10' ) {
         # new interface
         
+        $data_key_name = 'data';
         %output = (
             "draw" => int($sEcho),
             "recordsTotal" => int($iTotal),
             "recordsFiltered" => int($iFilteredTotal),
-            "aaData" => [],
+            $data_key_name => [],
         );
         
     }else{
         # old interface
         
+        $data_key_name = 'aaData';
         %output = (
             "sEcho" => int($sEcho),
             "iTotalRecords" => int($iTotal),
             "iTotalDisplayRecords" => int($iFilteredTotal),
-            "aaData" => [],
+            $data_key_name => [],
         );
         
     }
 
     my $count = 0;
     my $patterns = $self->patterns;
+    
     while(my @aRow = $result_sth->fetchrow_array) {
         my @row = ();
         for (my $i = 0; $i < @$aColumns; $i++) {
@@ -282,12 +304,15 @@ sub table_data {
 
             push @row, $val;
         }
-        @{$output{'aaData'}}[$count] = [@row];
+        
+        if( $self->data_output_format eq 'column-id' ) {
+            @{$output{$data_key_name}}[$count] = [@row];
+        }else{
+            my %row = map { $aColumns->[$_] => $row[$_] } 0 .. $#row;
+            push @{$output{$data_key_name}}, \%row;
+        }
+        
         $count++;
-    }
-
-    unless($count) {
-        $output{'aaData'} = ''; #we don't want to have 'null'. will break js
     }
 
     return \%output;
@@ -362,17 +387,15 @@ sub _generate_where_clause {
 
 
 
-=comment
-
-convert
-\%where = {key => value, -or => \@ }
-to
-\%where = {-and => [{key => value, -or => \@ }, $plus]}
-
-$plus can be a hashref for SQL::Abstract.
-$plus can also be scalarref (deprecated).
-
-=cut
+#
+# convert
+# \%where = {key => value, -or => \@ }
+# to
+# \%where = {-and => [{key => value, -or => \@ }, $plus]}
+#
+# $plus can be a hashref for SQL::Abstract.
+# $plus can also be scalarref (deprecated).
+#
 
 sub _add_where_clause {
     my $self = shift;
@@ -619,6 +642,79 @@ The name of the column must be the name that you specified in
 "columns". If you used a hashref in columns and specified the "AS" key,
 then you must use the value for that "AS" key.
 
+=head2 data_output_format
+
+The L<DataTables/json> method returns an array of data source objects, one for each row, which will be used by DataTables.
+This can be an array of values, or a key-value-hash as a JSON object.
+
+The C<data_output_format> parameter defines wheter to output an array or a hash.
+
+The default is C<column-id> and returns:
+
+    {
+        "data":[
+            [1,"Gecko","Firefox 1.0","Win 98+ / OSX.2+","1.7","A"]
+        ],
+        "draw":1,
+        "recordsTotal":57,
+        "recordsFiltered":57
+    }
+
+If you (optionally) define the C<column> parameter for your DataTable and use the output format C<column-id>, then it has to have the column indices as names:
+
+    columns: [
+        { data: "0" },
+        { data: "1" },
+        { data: "2" },
+        { data: "3" },
+        { data: "4" },
+        { data: "5" }
+    ]
+
+
+
+Setting C<data_output_format> to C<key-value> will return:
+
+    {
+        "data":[
+            {"platform":"Win 98+ / OSX.2+","browser":"Firefox 1.0","id":1,"engine":"Gecko","version":"1.7","grade":"A"},
+            {"browser":"Firefox 1.5","platform":"Win 98+ / OSX.2+","id":2,"engine":"Gecko","grade":"A","version":"1.8"},
+        ],
+        "draw":1,
+        "recordsFiltered":57,
+        "recordsTotal":57
+    }
+
+Settings C<data_output_format> to C<key-value> will allow a DataTables column definition as follows:
+
+    columns: [
+        { data: "id" },
+        { data: "engine" },
+        { data: "browser" },
+        { data: "platform" },
+        { data: "version" },
+        { data: "grade" }
+    ]
+
+Please note that in legacy DataTables 1.9, the column definition is set by C<aoColumns> like this:
+
+    $(document).ready(function() {
+        var oTable = $('#example').dataTable( {
+            "bProcessing": true,
+            "bServerSide": true,
+            "sAjaxSource": "sources/perlapp.cgi",
+            "aoColumns": [
+                { "mData": "id" },
+                { "mData": "engine" },
+                { "mData": "browser" },
+                { "mData": "platform" },
+                { "mData": "version" },
+                { "mData": "grade" }
+            ]
+        } );
+    } );
+
+
 =head2 dbh
 
     $dt->dbh(DBI->connect(...));
@@ -693,7 +789,7 @@ L<JQuery::DataTables::Request>, a library for handling DataTables request parame
 
 =head1 AUTHOR
 
-Adam Hopkins <lt>srchulo@cpan.org<gt>
+Adam Hopkins E<lt>srchulo@cpan.orgE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 

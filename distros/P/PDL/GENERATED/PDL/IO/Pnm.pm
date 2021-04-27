@@ -124,7 +124,7 @@ C<im> follows I<strictly> the type of C<type>).
 =for bad
 
 pnminraw does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -157,7 +157,7 @@ Read in an ascii pnm file.
 =for bad
 
 pnminascii does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -192,7 +192,7 @@ naturally.
 =for bad
 
 pnmout does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -212,7 +212,7 @@ It will set the bad-value flag of all output piddles if the flag is set for any 
 
 =for ref
 
-Read a pnm (portable bitmap/pixmap, pbm/ppm) file into a piddle.
+Read a pnm (portable bitmap/pixmap, pbm/ppm) file into an ndarray.
 
 =for usage
 
@@ -276,8 +276,8 @@ sub PDL::rpnm {
 
     my ($isrgb,$israw,$params) = (0,0,3);
     $israw = 1 if $magic =~ /P[4-6]/;
-    $isrgb = 1 if $magic =~ /P[3,6]/;
-    if ($magic =~ /P[1,4]/) {  # PBM data
+    $isrgb = 1 if $magic =~ /P[36]/;
+    if ($magic =~ /P[14]/) {  # PBM data
 	$params = 2;
 	$dims[2] = 1; }
 
@@ -380,14 +380,14 @@ sub PDL::wpnm {
     # void context
     my $swap_inplace = $pdl->is_inplace;
 
-    barf "wpnm: unknown format '$type'" if $type !~ /P[P,G,B]M/;
+    barf "wpnm: unknown format '$type'" if $type !~ /P[PGB]M/;
 
     # check the data
     my @Dims = $pdl->dims;
     barf "wpnm: expecting 3D (3,w,h) input"
 	if ($type =~ /PPM/) && (($#Dims != 2) || ($Dims[0] != 3));
     barf "wpnm: expecting 2D (w,h) input"
-	if ($type =~ /P[G,B]M/) && ($#Dims != 1);
+	if ($type =~ /P[GB]M/) && ($#Dims != 1);
     barf "wpnm: user should convert float and double data to appropriate type"
 	if ($pdl->get_datatype == $PDL_F) || ($pdl->get_datatype == $PDL_D);
     barf "wpnm: expecting prescaled data"
@@ -402,7 +402,7 @@ sub PDL::wpnm {
     $magic = $israw ? "P4" : "P1" if $type =~ /PBM/;
     $magic = $israw ? "P5" : "P2" if $type =~ /PGM/;
     $magic = $israw ? "P6" : "P3" if $type =~ /PPM/;
-    $isrgb = 1 if $magic =~ /P[3,6]/;
+    $isrgb = 1 if $magic =~ /P[36]/;
 
     # catch STDERR and sigpipe
     my ($errfh, $efile) = tempfile();
@@ -420,7 +420,7 @@ sub PDL::wpnm {
 
     $max =$pdl->max;
     print "writing ". ($israw ? "raw" : "ascii") .
-      "format with magic $magic\n" if $PDL::debug;
+      "format with magic $magic, max=$max\n" if $PDL::debug;
     # write header
     print PNM "$magic\n";
     print PNM "$Dims[-2] $Dims[-1]\n";

@@ -3,7 +3,7 @@ package Net::Async::Redis::Commands;
 use strict;
 use warnings;
 
-our $VERSION = '3.012'; # VERSION
+our $VERSION = '3.013'; # VERSION
 
 =head1 NAME
 
@@ -1756,12 +1756,6 @@ Query a sorted set representing a geospatial index to fetch members inside an ar
 =item * [ASC|DESC]
 
 =item * [COUNT count [ANY]]
-
-=item * [WITHCOORD]
-
-=item * [WITHDIST]
-
-=item * [WITHHASH]
 
 =item * [STOREDIST]
 

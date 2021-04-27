@@ -18,7 +18,7 @@ my %WriteMakefileArgs = (
   "NAME" => "Pod::Weaver::Plugin::Acme::CPANModules",
   "PREREQ_PM" => {
     "Moose" => 0,
-    "Pod::From::Acme::CPANModules" => "0.005",
+    "Pod::From::Acme::CPANModules" => "0.007",
     "Pod::Weaver::Role::AddTextToSection" => "0.06",
     "Pod::Weaver::Role::Section" => 0,
     "strict" => 0
@@ -29,7 +29,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.007",
+  "VERSION" => "0.008",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -41,7 +41,7 @@ my %FallbackPrereqs = (
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
   "Moose" => 0,
-  "Pod::From::Acme::CPANModules" => "0.005",
+  "Pod::From::Acme::CPANModules" => "0.007",
   "Pod::Weaver::Role::AddTextToSection" => "0.06",
   "Pod::Weaver::Role::Section" => 0,
   "Test::More" => 0,

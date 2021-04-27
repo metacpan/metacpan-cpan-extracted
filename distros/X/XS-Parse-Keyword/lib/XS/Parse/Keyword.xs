@@ -106,7 +106,7 @@ static void parse_piece(pTHX_ SV *argsv, size_t *argidx, const struct XSParseKey
       if(lex_peek_unichar(0) != '{')
         croak("Expected a block");
 
-      I32 save_ix = block_start(0);
+      I32 save_ix = block_start(1);
       OP *body = parse_block(0);
       THISARG.op = block_end(save_ix, body);
       (*argidx)++;

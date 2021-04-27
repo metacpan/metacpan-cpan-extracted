@@ -1,15 +1,18 @@
-Build.PL
 Changelog.ini
-CHANGES
+Changes
 examples/expire-sessions.pl
 examples/expire-set.pl
 lib/CGI/Session/ExpireSessions.pm
+LICENSE
 Makefile.PL
 MANIFEST			This list of files
-META.json
-META.yml
+MANIFEST.SKIP
 README
+t/00.versions.t
+t/00.versions.tx
 t/delete-via-find.t
 t/new-line.t
-t/pod.t
 t/use.t
+xt/author/pod.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

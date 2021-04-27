@@ -4,7 +4,7 @@ use warnings;
 use base 'Template::Plugin';
 
 # ABSTRACT: Template Toolkit dumper plugin using Data::Printer
-our $VERSION = '0.013'; # VERSION
+our $VERSION = '0.014'; # VERSION
 
 use HTML::FromANSI::Tiny ();
 use Hash::Merge::Simple qw< merge >;
@@ -13,6 +13,7 @@ sub new {
     my ($class, $context, $params) = @_;
 
     require Data::Printer;
+    Data::Printer->VERSION(1.0.0);
     my $dp_params = merge( {
             colored => 1,
             return_value => 'dump',
@@ -74,7 +75,7 @@ Template::Plugin::DataPrinter - Template Toolkit dumper plugin using Data::Print
 
 =head1 VERSION
 
-version 0.013
+version 0.014
 
 =head1 SYNOPSIS
 
@@ -203,7 +204,7 @@ Stephen Thirlwall <sdt@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2012 by Stephen Thirlwall.
+This software is copyright (c) 2021 by Stephen Thirlwall.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -64,7 +64,7 @@ This is an interface to the Special Function package present in the GNU Scientif
 =for bad
 
 gsl_sf_hyperg_0F1 does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -93,7 +93,7 @@ Confluent hypergeometric function  for integer parameters. 1F1[a,b,x] = M(a,b,x)
 =for bad
 
 gsl_sf_hyperg_1F1 does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -122,7 +122,7 @@ Confluent hypergeometric function  for integer parameters. U(a,b,x)
 =for bad
 
 gsl_sf_hyperg_U does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -151,7 +151,7 @@ Confluent hypergeometric function  for integer parameters. 2F1[a,b,c,x]
 =for bad
 
 gsl_sf_hyperg_2F1 does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -180,7 +180,7 @@ Gauss hypergeometric function 2F1[aR + I aI, aR - I aI, c, x]
 =for bad
 
 gsl_sf_hyperg_2F1_conj does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -209,7 +209,7 @@ Renormalized Gauss hypergeometric function 2F1[a,b,c,x] / Gamma[c]
 =for bad
 
 gsl_sf_hyperg_2F1_renorm does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -238,7 +238,7 @@ Renormalized Gauss hypergeometric function 2F1[aR + I aI, aR - I aI, c, x] / Gam
 =for bad
 
 gsl_sf_hyperg_2F1_conj_renorm does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -267,7 +267,7 @@ Mysterious hypergeometric function. The series representation is a divergent hyp
 =for bad
 
 gsl_sf_hyperg_2F0 does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut

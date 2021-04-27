@@ -64,7 +64,7 @@ E_1(x) := Re[ Integrate[ Exp[-xt]/t, {t,1,Infinity}] ]
 =for bad
 
 gsl_sf_expint_E1 does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -93,7 +93,7 @@ E_2(x) := Re[ Integrate[ Exp[-xt]/t^2, {t,1,Infity}] ]
 =for bad
 
 gsl_sf_expint_E2 does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -122,7 +122,7 @@ Ei(x) := PV Integrate[ Exp[-t]/t, {t,-x,Infinity}]
 =for bad
 
 gsl_sf_expint_Ei does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -151,7 +151,7 @@ Shi(x) := Integrate[ Sinh[t]/t, {t,0,x}]
 =for bad
 
 gsl_sf_Shi does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -180,7 +180,7 @@ Chi(x) := Re[ M_EULER + log(x) + Integrate[(Cosh[t]-1)/t, {t,0,x}] ]
 =for bad
 
 gsl_sf_Chi does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -209,7 +209,7 @@ Ei_3(x) := Integral[ Exp[-t^3], {t,0,x}]
 =for bad
 
 gsl_sf_expint_3 does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -238,7 +238,7 @@ Si(x) := Integrate[ Sin[t]/t, {t,0,x}]
 =for bad
 
 gsl_sf_Si does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -267,7 +267,7 @@ Ci(x) := -Integrate[ Cos[t]/t, {t,x,Infinity}]
 =for bad
 
 gsl_sf_Ci does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -296,7 +296,7 @@ AtanInt(x) := Integral[ Arctan[t]/t, {t,0,x}]
 =for bad
 
 gsl_sf_atanint does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut

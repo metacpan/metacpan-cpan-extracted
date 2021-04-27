@@ -46,13 +46,16 @@ L<PDL::BadValues>.
 
 =item $PDL::Bad::UseNaN
 
-Set to 1 if PDL was compiled with C<BADVAL_USENAN> set,
-0 otherwise.
+Set to 0 as of PDL 2.040, as no longer available, though NaN can be used
+as a badvalue for a given PDL object.
 
 =item $PDL::Bad::PerPdl
 
-Set to 1 if PDL was compiled with the I<experimental>
-C<BADVAL_PER_PDL> option set, 0 otherwise.
+Set to 1 as of PDL 2.040 as always available.
+
+=item $PDL::Bad::Status
+
+Set to 1 as of PDL 2.035 as always available.
 
 =back
 
@@ -77,7 +80,7 @@ C<BADVAL_PER_PDL> option set, 0 otherwise.
 # really should be constants
 $PDL::Bad::Status = 1;
 $PDL::Bad::UseNaN = 0;
-$PDL::Bad::PerPdl = 0;
+$PDL::Bad::PerPdl = 1;
 
 use strict;
 
@@ -113,19 +116,19 @@ getter/setter for the bad data flag
   $x->badflag(1);      # set bad data flag
   $x->badflag(0);      # unset bad data flag
 
-When called as a setter, this modifies the piddle on which
+When called as a setter, this modifies the ndarray on which
 it is called. This always returns a Perl scalar with the
 final value of the bad flag.
 
 A return value of 1 does not guarantee the presence of
-bad data in a piddle; all it does is say that we need to
+bad data in an ndarray; all it does is say that we need to
 I<check> for the presence of such beasties. To actually
-find out if there are any bad values present in a piddle,
+find out if there are any bad values present in an ndarray,
 use the L</check_badflag> method.
 
 =for bad
 
-This function works with piddles that have bad values. It
+This function works with ndarrays that have bad values. It
 always returns a Perl scalar, so it never returns bad values.
 
 =head2 badvalue
@@ -133,7 +136,7 @@ always returns a Perl scalar, so it never returns bad values.
 =for ref
 
 returns the value used to indicate a missing (or bad) element
-for the given piddle type. You can give it a piddle,
+for the given ndarray type. You can give it an ndarray,
 a PDL::Type object, or one of C<$PDL_B>, C<$PDL_S>, etc.
 
 =for example
@@ -143,17 +146,17 @@ a PDL::Type object, or one of C<$PDL_B>, C<$PDL_S>, etc.
    print "The bad data value for ushort is: ",
       $x->badvalue(), "\n";
 
-This can act as a setter (e.g. C<< $x->badvalue(23) >>)
-if the data type is an integer or C<$PDL::Bad::UseNaN == 0>.
-Note that this B<never touches the data in the piddle>.
+This can act as a setter (e.g. C<< $x->badvalue(23) >>),
+including with the value C<NaN> for floating-point types.
+Note that this B<never touches the data in the ndarray>.
 That is, if C<$x> already has bad values, they will not
 be changed to use the given number and if any elements of
 C<$x> have that value, they will unceremoniously be marked
 as bad data. See L</setvaltobad>, L</setbadtoval>, and
-L</setbadif> for ways to actually modify the data in piddles
+L</setbadif> for ways to actually modify the data in ndarrays
 
 If the C<$PDL::Bad::PerPdl> flag is set then it is possible to
-change the bad value on a per-piddle basis, so
+change the bad value on a per-ndarray basis, so
 
     $x = sequence (10);
     $x->badvalue (3); $x->badflag (1);
@@ -163,13 +166,13 @@ change the bad value on a per-piddle basis, so
 will set $x to be C<[0 1 2 BAD 4 5 6 7 8 9]> and $y to be
 C<[0 1 2 3 BAD 5 6 7 8 9]>. If the flag is not set then both
 $x and $y will be set to C<[0 1 2 3 BAD 5 6 7 8 9]>. Please
-note that the code to support per-piddle bad values is
+note that the code to support per-ndarray bad values is
 I<experimental> in the current release, and it requires that
 you modify the settings under which PDL is compiled.
 
 =for bad
 
-This method does not care if you call it on an input piddle
+This method does not care if you call it on an input ndarray
 that has bad values. It always returns a Perl scalar
 with the current or new bad value.
 
@@ -194,7 +197,7 @@ It also has an I<awful> name.
 
 =for bad
 
-This method does not care if you call it on an input piddle
+This method does not care if you call it on an input ndarray
 that has bad values. It always returns a Perl scalar
 with the original bad value for the associated type.
 
@@ -202,10 +205,10 @@ with the original bad value for the associated type.
 
 =for ref
 
-Clear the bad-value flag of a piddle if it does not
+Clear the bad-value flag of an ndarray if it does not
 contain any bad values
 
-Given a piddle whose bad flag is set, check whether it
+Given an ndarray whose bad flag is set, check whether it
 actually contains any bad values and, if not, clear the flag.
 It returns the final state of the bad-value flag.
 
@@ -215,8 +218,8 @@ It returns the final state of the bad-value flag.
 
 =for bad
 
-This method accepts piddles with or without bad values. It
-returns a piddle with the final bad-value.
+This method accepts ndarrays with or without bad values. It
+returns an ndarray with the final bad-value.
 
 =cut
 
@@ -232,7 +235,7 @@ sub PDL::check_badflag {
 
 
 # note:
-#  if sent a piddle, we have to change its bad values
+#  if sent an ndarray, we have to change its bad values
 #  (but only if it contains bad values)
 #  - there's a slight overhead in that the badflag is
 #    cleared and then set (hence propagating to all
@@ -250,10 +253,8 @@ sub PDL::badvalue {
 	    $self->inplace->setbadtoval( $val );
 	    $self->badflag(1);
 	}
-	if ($PDL::Config{BADVAL_PER_PDL}) {
-	    my $name = "PDL::_badvalue_per_pdl_int$num";
-	    return &{$name}($self, $val);
-	}
+	my $name = "PDL::_badvalue_per_pdl_int$num";
+	return &{$name}($self, $val);
     } elsif ( UNIVERSAL::isa($self,"PDL::Type") ) {
 	$num = $self->enum;
     } else {
@@ -312,9 +313,9 @@ Similar to L<isfinite|PDL::Math/isfinite>.
 
 =for bad
 
-This method works with input piddles that are bad. The output piddle
+This method works with input ndarrays that are bad. The output ndarray
 will never contain bad values, but its bad value flag will be the
-same as the input piddle's flag.
+same as the input ndarray's flag.
 
 
 
@@ -354,9 +355,9 @@ Also see L<isfinite|PDL::Math/isfinite>.
 
 =for bad
 
-This method works with input piddles that are bad. The output piddle
+This method works with input ndarrays that are bad. The output ndarray
 will never contain bad values, but its bad value flag will be the
-same as the input piddle's flag.
+same as the input ndarray's flag.
 
 
 
@@ -382,7 +383,7 @@ same as the input piddle's flag.
 
 Find the number of bad elements along the 1st dimension.
 
-This function reduces the dimensionality of a piddle by one by finding the
+This function reduces the dimensionality of an ndarray by one by finding the
 number of bad elements along the 1st dimension. In this sense it shares
 much in common with the functions defined in L<PDL::Ufunc>. In particular,
 by using L<xchg|PDL::Slices/xchg> and similar dimension rearranging methods,
@@ -398,8 +399,8 @@ it is possible to perform this calculation over I<any> dimension.
 
 =for bad
 
-nbadover processes input values that are bad. The output piddle will not have
-any bad values, but the bad flag will be set if the input piddle had its bad
+nbadover processes input values that are bad. The output ndarray will not have
+any bad values, but the bad flag will be set if the input ndarray had its bad
 flag set.
 
 
@@ -426,7 +427,7 @@ flag set.
 
 Find the number of good elements along the 1st dimension.
 
-This function reduces the dimensionality of a piddle
+This function reduces the dimensionality of an ndarray
 by one by finding the number of good elements
 along the 1st dimension.
 
@@ -443,8 +444,8 @@ I<any> dimension.
 
 =for bad
 
-ngoodover processes input values that are bad. The output piddle will not have
-any bad values, but the bad flag will be set if the input piddle had its bad
+ngoodover processes input values that are bad. The output ndarray will not have
+any bad values, but the bad flag will be set if the input ndarray had its bad
 flag set.
 
 
@@ -482,7 +483,7 @@ sub PDL::ngood {
 
 =for ref
 
-Returns the number of bad values in a piddle
+Returns the number of bad values in an ndarray
 
 =for usage
 
@@ -490,14 +491,14 @@ Returns the number of bad values in a piddle
 
 =for bad
 
-Accepts good and bad input piddles; output is a Perl scalar
+Accepts good and bad input ndarrays; output is a Perl scalar
 and therefore is always good.
 
 =head2 ngood
 
 =for ref
 
-Returns the number of good values in a piddle
+Returns the number of good values in an ndarray
 
 =for usage
 
@@ -505,7 +506,7 @@ Returns the number of good values in a piddle
 
 =for bad
 
-Accepts good and bad input piddles; output is a Perl scalar
+Accepts good and bad input ndarrays; output is a Perl scalar
 and therefore is always good.
 
 =head2 setbadat
@@ -516,10 +517,10 @@ Set the value to bad at a given position.
 
 =for usage
 
- setbadat $piddle, @position
+ setbadat $ndarray, @position
 
 C<@position> is a coordinate list, of size equal to the
-number of dimensions in the piddle.
+number of dimensions in the ndarray.
 This is a wrapper around L<set|PDL::Core/set> and is
 probably mainly useful in test scripts!
 
@@ -537,9 +538,9 @@ probably mainly useful in test scripts!
 
 =for bad
 
-This method can be called on piddles that have bad values.
+This method can be called on ndarrays that have bad values.
 The remainder of the arguments should be Perl scalars indicating
-the position to set as bad. The output piddle will have bad values
+the position to set as bad. The output ndarray will have bad values
 and will have its badflag turned on.
 
 =cut
@@ -584,7 +585,7 @@ copy across the data.
  ]
 
 Unfortunately, this routine can I<not> be run inplace, since the
-current implementation can not handle the same piddle used as
+current implementation can not handle the same ndarray used as
 C<a> and C<mask> (eg C<< $x->inplace->setbadif($x%2) >> fails).
 Even more unfortunate: we can't catch this error and tell you.
 
@@ -593,8 +594,8 @@ Even more unfortunate: we can't catch this error and tell you.
 The output always has its bad flag set, even if it does not contain
 any bad values (use L</check_badflag> to check
 whether there are any bad values in the output). 
-The input piddle can have bad values: any bad values in the input piddles
-are copied across to the output piddle.
+The input ndarray can have bad values: any bad values in the input ndarrays
+are copied across to the output ndarray.
 
 Also see L</setvaltobad> and L</setnantobad>.
 
@@ -638,7 +639,7 @@ if you want to convert NaN/Inf to the bad value.
 The output always has its bad flag set, even if it does not contain
 any bad values (use L</check_badflag> to check
 whether there are any bad values in the output). 
-Any bad values in the input piddles are copied across to the output piddle.
+Any bad values in the input ndarrays are copied across to the output ndarray.
 
 
 
@@ -662,8 +663,8 @@ Any bad values in the input piddles are copied across to the output piddle.
 
 =for ref
 
-Sets NaN/Inf values in the input piddle bad
-(only relevant for floating-point piddles).
+Sets NaN/Inf values in the input ndarray bad
+(only relevant for floating-point ndarrays).
 Can be done inplace.
 
 =for usage
@@ -673,11 +674,11 @@ Can be done inplace.
 
 =for bad
 
-This method can process piddles with bad values: those bad values
-are propagated into the output piddle. Any value that is not finite
-is also set to bad in the output piddle. If all values from the input
-piddle are good and finite, the output piddle will B<not> have its
-bad flag set. One more caveat: if done inplace, and if the input piddle's
+This method can process ndarrays with bad values: those bad values
+are propagated into the output ndarray. Any value that is not finite
+is also set to bad in the output ndarray. If all values from the input
+ndarray are good and finite, the output ndarray will B<not> have its
+bad flag set. One more caveat: if done inplace, and if the input ndarray's
 bad flag is set, it will no
 
 
@@ -704,7 +705,7 @@ bad flag is set, it will no
 
 Sets Bad values to NaN
 
-This is only relevant for floating-point piddles. The input piddle can be
+This is only relevant for floating-point ndarrays. The input ndarray can be
 of any type, but if done inplace, the input must be floating point.
 
 =for usage
@@ -714,9 +715,9 @@ of any type, but if done inplace, the input must be floating point.
 
 =for bad
 
-This method processes input piddles with bad values. The output piddles will
+This method processes input ndarrays with bad values. The output ndarrays will
 not contain bad values (insofar as NaN is not Bad as far as PDL is concerned)
-and the output piddle does not have its bad flag set. As an inplace
+and the output ndarray does not have its bad flag set. As an inplace
 operation, it clears the bad flag.
 
 
@@ -755,7 +756,7 @@ L<badmask|PDL::Math/badmask>.
 =for bad
 
 The output always has its bad flag cleared.
-If the input piddle does not have its bad flag set, then
+If the input ndarray does not have its bad flag set, then
 values are copied with no replacement.
 
 
@@ -780,7 +781,7 @@ values are copied with no replacement.
 
 =for ref
 
-Copies values from one piddle to another, setting them
+Copies values from one ndarray to another, setting them
 bad if they are bad in the supplied mask.
 
 Can be done inplace.
@@ -801,9 +802,9 @@ It is equivalent to:
 
 =for bad
 
-This handles input piddles that are bad. If either C<$x>
+This handles input ndarrays that are bad. If either C<$x>
 or C<$mask> have bad values, those values will be marked
-as bad in the output piddle and the output piddle will have
+as bad in the output ndarray and the output ndarray will have
 its bad value flag set to true.
 
 
@@ -821,44 +822,11 @@ its bad value flag set to true.
 ;
 
 
-=head1 CHANGES
-
-The I<experimental> C<BADVAL_PER_PDL> configuration option,
-which - when set - allows per-piddle bad values, was added
-after the 2.4.2 release of PDL.
-The C<$PDL::Bad::PerPdl> variable can be
-inspected to see if this feature is available.
-
-
-=head1 CONFIGURATION
-
-The way the PDL handles the various bad value settings depends on your
-compile-time configuration settings, as held in C<perldl.conf>.
-
-=over
-
-=item C<$PDL::Config{BADVAL_USENAN}>
-
-Set this configuration option to a true value if you want floating-pont
-numbers to use NaN to represent the bad value. If set to false, you can
-use any number to represent a bad value, which is generally more
-flexible. In the default configuration, this is set to a false value.
-
-=item C<$PDL::Config{BADVAL_PER_PDL}>
-
-Set this configuration option to a true value if you want each of your
-piddles to keep track of their own bad values. This means that for one
-piddle you can set the bad value to zero, while in another piddle you
-can set the bad value to NaN (or any other useful number). This is
-usually set to false.
-
-=back
-
 =head1 AUTHOR
 
 Doug Burke (djburke@cpan.org), 2000, 2001, 2003, 2006.
 
-The per-piddle bad value support is by Heiko Klein (2006).
+The per-ndarray bad value support is by Heiko Klein (2006).
 
 CPAN documentation fixes by David Mertens (2010, 2013).
 

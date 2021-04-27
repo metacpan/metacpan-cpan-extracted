@@ -138,7 +138,7 @@ my @types = (
 # PDL_F *must* be the first non-integer type in this list
 # as there are many places in the code (.c/.xs/.pm/.pd)
 # with tests like this:
-#                        if (piddletype < PDL_F) { ... }
+#                        if (ndarraytype < PDL_F) { ... }
 	      {
 		  identifier => 'F',
 		  pdlctype => 'PDL_Float',
@@ -151,7 +151,8 @@ my @types = (
 		  complexversion=> 'G',
 	          integer=>0,
 	          unsigned=>0,
-	          isnan=>'!isfinite(%1$s)',
+	          isnan=>'isnan(%1$s)',
+	          floatsuffix=>'f',
 	      },
 	      {
 		  identifier => 'D',
@@ -165,7 +166,8 @@ my @types = (
 		  complexversion=> 'C',
 	          integer=>0,
 	          unsigned=>0,
-	          isnan=>'!isfinite(%1$s)',
+	          isnan=>'isnan(%1$s)',
+	          floatsuffix=>'',
 	      },
 # the complex types need to be in the same order as their real
 # counterparts, because the "real" ppforcetype relies on a fixed interval
@@ -186,7 +188,8 @@ my @types = (
 	          realversion=>'F',
 	          integer=>0,
 	          unsigned=>0,
-	          isnan=>'!(isfinite(crealf(%1$s)) || isfinite(cimagf(%1$s)))',
+	          isnan=>'(isnan(crealf(%1$s)) || isnan(cimagf(%1$s)))',
+	          floatsuffix=>'f',
 	      },
 	      {
 		  identifier => 'CD',
@@ -201,7 +204,8 @@ my @types = (
 	          realversion=>'D',
 	          integer=>0,
 	          unsigned=>0,
-	          isnan=>'!(isfinite(creal(%1$s)) || isfinite(cimag(%1$s)))',
+	          isnan=>'(isnan(creal(%1$s)) || isnan(cimag(%1$s)))',
+	          floatsuffix=>'',
 	      },
 	      );
 
@@ -266,7 +270,7 @@ sub gentypehashentry ($$) {
     shortctype => $shortctype,
     realversion => $type->{realversion} || $ppsym,
     complexversion => $type->{complexversion} || (!$type->{real} ? $ppsym : 'G'),
-    (map +($_ => $type->{$_}), @TYPE_VERBATIM, qw(isnan)),
+    (map +($_ => $type->{$_}), @TYPE_VERBATIM, qw(isnan floatsuffix)),
   };
 }
 
@@ -604,7 +608,7 @@ EOD
 =head1 PDL::Type OBJECTS
 
 This module declares one class - C<PDL::Type> - objects of this class
-are returned by the L<type|PDL::Core/type> method of a piddle.  It has
+are returned by the L<type|PDL::Core/type> method of an ndarray.  It has
 several methods, listed below, which provide an easy way to access
 type information:
 
@@ -654,6 +658,11 @@ See L<badvalue routine in PDL::Bad|PDL::Bad/badvalue> for more details.
 Given a string representing a C value, will return a C expression for
 this type that indicates whether that value is NaN.
 
+=item floatsuffix
+
+The string appended to floating-point functions for this floating-point
+type. Dies if called on non-floating-point type.
+
 =cut
 
 =item orig_badvalue
@@ -678,7 +687,7 @@ sub types { @CACHED_TYPES }
         my ($type,$val) = @_;
         return $val if "PDL::Type" eq ref $val;
         if(ref $val and $val->isa('PDL')) {
-            PDL::Core::barf("Can't make a type out of non-scalar piddle $val!")
+            PDL::Core::barf("Can't make a type out of non-scalar ndarray $val!")
               if $val->getndims != 0;
             $val = $val->at;
         }
@@ -703,6 +712,8 @@ sub types { @CACHED_TYPES }
     }
 
     sub isnan { sprintf $_[0][1]{isnan}, $_[1] }
+
+    sub floatsuffix { $_[0][1]{floatsuffix} // 'floatsuffix called on non-float type' }
 
 !NO!SUBS!
 

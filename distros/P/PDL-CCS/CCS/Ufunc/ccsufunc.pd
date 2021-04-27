@@ -5,7 +5,7 @@
 ##======================================================================
 
 use PDL::VectorValued::Dev;
-my $VERSION = '1.23.14'; ##-- update with perl-reversion from Perl::Version module
+my $VERSION = '1.23.15'; ##-- update with perl-reversion from Perl::Version module
 pp_setversion($VERSION);
 
 ##------------------------------------------------------
@@ -385,7 +385,7 @@ ccs_accum_def('bor', 'bitwise "or"',
 				 #GenericTypes => ['B','S','U','L',], ##-- 'Q', 'N'
 				 GenericTypes=>$PDL::CCS::Config::ccsConfig{INT_TYPE_CHRS},
 				},
-	      max_type_perl  => 'ccs_indx',
+	      max_type_perl  => $PDL::CCS::Config::ccsConfig{INT_TYPE_MAX_IONAME},
 	      init_missingOut=>'missingOut = missingVal;',
 	      tmp_addmissing =>'if (nMissing > 0) { tmp = tmp | missingVal; }',
 	      tmp_addval     =>'tmp = (tmp | $nzvalsIn(NnzIn=>nnzii));',
@@ -406,7 +406,7 @@ ccs_accum_def('band', 'bitwise "and"',
 				 #GenericTypes => ['B','S','U','L',], ##-- 'Q', 'N'
 				 GenericTypes=>$PDL::CCS::Config::ccsConfig{INT_TYPE_CHRS},
 				},
-	      max_type_perl  => 'ccs_indx',
+	      max_type_perl  => $PDL::CCS::Config::ccsConfig{INT_TYPE_MAX_IONAME},
 	      init_missingOut=>'missingOut = missingVal;',
 	      tmp_addmissing =>'if (nMissing > 0) { tmp &= missingVal; }',
 	      tmp_addval     =>'tmp = (tmp & $nzvalsIn(NnzIn=>nnzii));',
@@ -493,7 +493,8 @@ require PDL::Bad;
 ccs_accum_def('nbad', 'number of bad values',
 	      extra          =>{HandleBad=>1},
 	      out_type       =>'int+',
-	      max_type_perl  =>'ccs_indx',
+	      max_type_perl  =>'ccs_indx', #$PDL::CCS::Config::ccsConfig{INT_TYPE_MAX_IONAME},
+	      #
 	      #init_missingOut=>'missingOut=$N();',
 	      init_missingOut=>'missingOut=missingVal;', ##-- not really right, but compatible
 	      ($PDL::Bad::Status
@@ -520,7 +521,7 @@ EOMD
 ccs_accum_def('ngood', 'number of good values',
 	      extra          =>{HandleBad=>1},
 	      out_type       =>'int+',
-	      max_type_perl  =>'ccs_indx',
+	      max_type_perl  =>'ccs_indx', #$PDL::CCS::Config::ccsConfig{INT_TYPE_MAX_IONAME},
 	      #init_missingOut=>'missingOut=$N();',
 	      init_missingOut=>'missingOut=missingVal;', ##-- not really right, but compatible
 	      ($PDL::Bad::Status
@@ -546,7 +547,7 @@ EOMD
 ## Operations: Accumulators (Ufuncs): nnz
 ccs_accum_def('nnz', 'number of non-zero values',
 	      out_type       =>'int+',
-	      max_type_perl  =>'ccs_indx',
+	      max_type_perl  =>$PDL::CCS::Config::ccsConfig{INT_TYPE_MAX_IONAME},
 	      #init_missingOut=>'missingOut=$N();',
 	      init_missingOut=>'missingOut=missingVal;', ##-- not really right, but compatible
 	      tmp_addmissing =>'if (nMissing > 0 && missingVal != 0) { tmp += nMissing; }',

@@ -6,7 +6,7 @@ hax/wrap_keyword_plugin.c.inc
 inc/Module/Build/with/XSTests.pm
 lib/XS/Parse/Keyword.pm
 lib/XS/Parse/Keyword.xs
-lib/XS/Parse/Keyword/Builder.pm.PL
+lib/XS/Parse/Keyword/Builder.pm
 LICENSE
 MANIFEST			This list of files
 META.json

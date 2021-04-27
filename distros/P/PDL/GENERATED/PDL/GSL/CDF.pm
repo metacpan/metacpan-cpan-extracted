@@ -107,7 +107,7 @@ These functions compute the cumulative distribution functions P(x), Q(x) and the
 =for bad
 
 gsl_cdf_beta_P processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -136,7 +136,7 @@ It will set the bad-value flag of all output piddles if the flag is set for any 
 =for bad
 
 gsl_cdf_beta_Pinv processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -165,7 +165,7 @@ It will set the bad-value flag of all output piddles if the flag is set for any 
 =for bad
 
 gsl_cdf_beta_Q processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -194,7 +194,7 @@ It will set the bad-value flag of all output piddles if the flag is set for any 
 =for bad
 
 gsl_cdf_beta_Qinv processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -232,7 +232,7 @@ These functions compute the cumulative distribution functions P(k), Q(k) for the
 =for bad
 
 gsl_cdf_binomial_P processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -261,7 +261,7 @@ It will set the bad-value flag of all output piddles if the flag is set for any 
 =for bad
 
 gsl_cdf_binomial_Q processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -299,7 +299,7 @@ These functions compute the cumulative distribution functions P(x), Q(x) and the
 =for bad
 
 gsl_cdf_cauchy_P processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -328,7 +328,7 @@ It will set the bad-value flag of all output piddles if the flag is set for any 
 =for bad
 
 gsl_cdf_cauchy_Pinv processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -357,7 +357,7 @@ It will set the bad-value flag of all output piddles if the flag is set for any 
 =for bad
 
 gsl_cdf_cauchy_Q processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -386,7 +386,7 @@ It will set the bad-value flag of all output piddles if the flag is set for any 
 =for bad
 
 gsl_cdf_cauchy_Qinv processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -424,7 +424,7 @@ These functions compute the cumulative distribution functions P(x), Q(x) and the
 =for bad
 
 gsl_cdf_chisq_P processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -453,7 +453,7 @@ It will set the bad-value flag of all output piddles if the flag is set for any 
 =for bad
 
 gsl_cdf_chisq_Pinv processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -482,7 +482,7 @@ It will set the bad-value flag of all output piddles if the flag is set for any 
 =for bad
 
 gsl_cdf_chisq_Q processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -511,7 +511,7 @@ It will set the bad-value flag of all output piddles if the flag is set for any 
 =for bad
 
 gsl_cdf_chisq_Qinv processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -549,7 +549,7 @@ These functions compute the cumulative distribution functions P(x), Q(x) and the
 =for bad
 
 gsl_cdf_exponential_P processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -578,7 +578,7 @@ It will set the bad-value flag of all output piddles if the flag is set for any 
 =for bad
 
 gsl_cdf_exponential_Pinv processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -607,7 +607,7 @@ It will set the bad-value flag of all output piddles if the flag is set for any 
 =for bad
 
 gsl_cdf_exponential_Q processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -636,7 +636,7 @@ It will set the bad-value flag of all output piddles if the flag is set for any 
 =for bad
 
 gsl_cdf_exponential_Qinv processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -674,7 +674,7 @@ These functions compute the cumulative distribution functions P(x), Q(x) for the
 =for bad
 
 gsl_cdf_exppow_P processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -703,7 +703,7 @@ It will set the bad-value flag of all output piddles if the flag is set for any 
 =for bad
 
 gsl_cdf_exppow_Q processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -741,7 +741,7 @@ These functions compute the cumulative distribution functions P(x), Q(x) and the
 =for bad
 
 gsl_cdf_fdist_P processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -770,7 +770,7 @@ It will set the bad-value flag of all output piddles if the flag is set for any 
 =for bad
 
 gsl_cdf_fdist_Pinv processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -799,7 +799,7 @@ It will set the bad-value flag of all output piddles if the flag is set for any 
 =for bad
 
 gsl_cdf_fdist_Q processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -828,7 +828,7 @@ It will set the bad-value flag of all output piddles if the flag is set for any 
 =for bad
 
 gsl_cdf_fdist_Qinv processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -866,7 +866,7 @@ These functions compute the cumulative distribution functions P(x), Q(x) and the
 =for bad
 
 gsl_cdf_flat_P processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -895,7 +895,7 @@ It will set the bad-value flag of all output piddles if the flag is set for any 
 =for bad
 
 gsl_cdf_flat_Pinv processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -924,7 +924,7 @@ It will set the bad-value flag of all output piddles if the flag is set for any 
 =for bad
 
 gsl_cdf_flat_Q processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -953,7 +953,7 @@ It will set the bad-value flag of all output piddles if the flag is set for any 
 =for bad
 
 gsl_cdf_flat_Qinv processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -991,7 +991,7 @@ These functions compute the cumulative distribution functions P(x), Q(x) and the
 =for bad
 
 gsl_cdf_gamma_P processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -1020,7 +1020,7 @@ It will set the bad-value flag of all output piddles if the flag is set for any 
 =for bad
 
 gsl_cdf_gamma_Pinv processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -1049,7 +1049,7 @@ It will set the bad-value flag of all output piddles if the flag is set for any 
 =for bad
 
 gsl_cdf_gamma_Q processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -1078,7 +1078,7 @@ It will set the bad-value flag of all output piddles if the flag is set for any 
 =for bad
 
 gsl_cdf_gamma_Qinv processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -1116,7 +1116,7 @@ These functions compute the cumulative distribution functions P(x), Q(x) and the
 =for bad
 
 gsl_cdf_gaussian_P processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -1145,7 +1145,7 @@ It will set the bad-value flag of all output piddles if the flag is set for any 
 =for bad
 
 gsl_cdf_gaussian_Pinv processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -1174,7 +1174,7 @@ It will set the bad-value flag of all output piddles if the flag is set for any 
 =for bad
 
 gsl_cdf_gaussian_Q processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -1203,7 +1203,7 @@ It will set the bad-value flag of all output piddles if the flag is set for any 
 =for bad
 
 gsl_cdf_gaussian_Qinv processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -1241,7 +1241,7 @@ These functions compute the cumulative distribution functions P(k), Q(k) for the
 =for bad
 
 gsl_cdf_geometric_P processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -1270,7 +1270,7 @@ It will set the bad-value flag of all output piddles if the flag is set for any 
 =for bad
 
 gsl_cdf_geometric_Q processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -1308,7 +1308,7 @@ These functions compute the cumulative distribution functions P(x), Q(x) and the
 =for bad
 
 gsl_cdf_gumbel1_P processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -1337,7 +1337,7 @@ It will set the bad-value flag of all output piddles if the flag is set for any 
 =for bad
 
 gsl_cdf_gumbel1_Pinv processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -1366,7 +1366,7 @@ It will set the bad-value flag of all output piddles if the flag is set for any 
 =for bad
 
 gsl_cdf_gumbel1_Q processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -1395,7 +1395,7 @@ It will set the bad-value flag of all output piddles if the flag is set for any 
 =for bad
 
 gsl_cdf_gumbel1_Qinv processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -1433,7 +1433,7 @@ These functions compute the cumulative distribution functions P(x), Q(x) and the
 =for bad
 
 gsl_cdf_gumbel2_P processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -1462,7 +1462,7 @@ It will set the bad-value flag of all output piddles if the flag is set for any 
 =for bad
 
 gsl_cdf_gumbel2_Pinv processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -1491,7 +1491,7 @@ It will set the bad-value flag of all output piddles if the flag is set for any 
 =for bad
 
 gsl_cdf_gumbel2_Q processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -1520,7 +1520,7 @@ It will set the bad-value flag of all output piddles if the flag is set for any 
 =for bad
 
 gsl_cdf_gumbel2_Qinv processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -1558,7 +1558,7 @@ These functions compute the cumulative distribution functions P(k), Q(k) for the
 =for bad
 
 gsl_cdf_hypergeometric_P processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -1587,7 +1587,7 @@ It will set the bad-value flag of all output piddles if the flag is set for any 
 =for bad
 
 gsl_cdf_hypergeometric_Q processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -1625,7 +1625,7 @@ These functions compute the cumulative distribution functions P(x), Q(x) and the
 =for bad
 
 gsl_cdf_laplace_P processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -1654,7 +1654,7 @@ It will set the bad-value flag of all output piddles if the flag is set for any 
 =for bad
 
 gsl_cdf_laplace_Pinv processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -1683,7 +1683,7 @@ It will set the bad-value flag of all output piddles if the flag is set for any 
 =for bad
 
 gsl_cdf_laplace_Q processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -1712,7 +1712,7 @@ It will set the bad-value flag of all output piddles if the flag is set for any 
 =for bad
 
 gsl_cdf_laplace_Qinv processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -1750,7 +1750,7 @@ These functions compute the cumulative distribution functions P(x), Q(x) and the
 =for bad
 
 gsl_cdf_logistic_P processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -1779,7 +1779,7 @@ It will set the bad-value flag of all output piddles if the flag is set for any 
 =for bad
 
 gsl_cdf_logistic_Pinv processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -1808,7 +1808,7 @@ It will set the bad-value flag of all output piddles if the flag is set for any 
 =for bad
 
 gsl_cdf_logistic_Q processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -1837,7 +1837,7 @@ It will set the bad-value flag of all output piddles if the flag is set for any 
 =for bad
 
 gsl_cdf_logistic_Qinv processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -1875,7 +1875,7 @@ These functions compute the cumulative distribution functions P(x), Q(x) and the
 =for bad
 
 gsl_cdf_lognormal_P processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -1904,7 +1904,7 @@ It will set the bad-value flag of all output piddles if the flag is set for any 
 =for bad
 
 gsl_cdf_lognormal_Pinv processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -1933,7 +1933,7 @@ It will set the bad-value flag of all output piddles if the flag is set for any 
 =for bad
 
 gsl_cdf_lognormal_Q processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -1962,7 +1962,7 @@ It will set the bad-value flag of all output piddles if the flag is set for any 
 =for bad
 
 gsl_cdf_lognormal_Qinv processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -1991,7 +1991,7 @@ It will set the bad-value flag of all output piddles if the flag is set for any 
 =for bad
 
 gsl_cdf_negative_binomial_P processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -2020,7 +2020,7 @@ It will set the bad-value flag of all output piddles if the flag is set for any 
 =for bad
 
 gsl_cdf_negative_binomial_Q processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -2058,7 +2058,7 @@ These functions compute the cumulative distribution functions P(x), Q(x) and the
 =for bad
 
 gsl_cdf_pareto_P processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -2087,7 +2087,7 @@ It will set the bad-value flag of all output piddles if the flag is set for any 
 =for bad
 
 gsl_cdf_pareto_Pinv processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -2116,7 +2116,7 @@ It will set the bad-value flag of all output piddles if the flag is set for any 
 =for bad
 
 gsl_cdf_pareto_Q processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -2145,7 +2145,7 @@ It will set the bad-value flag of all output piddles if the flag is set for any 
 =for bad
 
 gsl_cdf_pareto_Qinv processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -2183,7 +2183,7 @@ These functions compute the cumulative distribution functions P(k), Q(k) for the
 =for bad
 
 gsl_cdf_pascal_P processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -2212,7 +2212,7 @@ It will set the bad-value flag of all output piddles if the flag is set for any 
 =for bad
 
 gsl_cdf_pascal_Q processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -2250,7 +2250,7 @@ These functions compute the cumulative distribution functions P(k), Q(k) for the
 =for bad
 
 gsl_cdf_poisson_P processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -2279,7 +2279,7 @@ It will set the bad-value flag of all output piddles if the flag is set for any 
 =for bad
 
 gsl_cdf_poisson_Q processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -2317,7 +2317,7 @@ These functions compute the cumulative distribution functions P(x), Q(x) and the
 =for bad
 
 gsl_cdf_rayleigh_P processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -2346,7 +2346,7 @@ It will set the bad-value flag of all output piddles if the flag is set for any 
 =for bad
 
 gsl_cdf_rayleigh_Pinv processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -2375,7 +2375,7 @@ It will set the bad-value flag of all output piddles if the flag is set for any 
 =for bad
 
 gsl_cdf_rayleigh_Q processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -2404,7 +2404,7 @@ It will set the bad-value flag of all output piddles if the flag is set for any 
 =for bad
 
 gsl_cdf_rayleigh_Qinv processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -2442,7 +2442,7 @@ These functions compute the cumulative distribution functions P(x), Q(x) and the
 =for bad
 
 gsl_cdf_tdist_P processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -2471,7 +2471,7 @@ It will set the bad-value flag of all output piddles if the flag is set for any 
 =for bad
 
 gsl_cdf_tdist_Pinv processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -2500,7 +2500,7 @@ It will set the bad-value flag of all output piddles if the flag is set for any 
 =for bad
 
 gsl_cdf_tdist_Q processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -2529,7 +2529,7 @@ It will set the bad-value flag of all output piddles if the flag is set for any 
 =for bad
 
 gsl_cdf_tdist_Qinv processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -2567,7 +2567,7 @@ These functions compute the cumulative distribution functions P(x), Q(x) and the
 =for bad
 
 gsl_cdf_ugaussian_P processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -2596,7 +2596,7 @@ It will set the bad-value flag of all output piddles if the flag is set for any 
 =for bad
 
 gsl_cdf_ugaussian_Pinv processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -2625,7 +2625,7 @@ It will set the bad-value flag of all output piddles if the flag is set for any 
 =for bad
 
 gsl_cdf_ugaussian_Q processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -2654,7 +2654,7 @@ It will set the bad-value flag of all output piddles if the flag is set for any 
 =for bad
 
 gsl_cdf_ugaussian_Qinv processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -2692,7 +2692,7 @@ These functions compute the cumulative distribution functions P(x), Q(x) and the
 =for bad
 
 gsl_cdf_weibull_P processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -2721,7 +2721,7 @@ It will set the bad-value flag of all output piddles if the flag is set for any 
 =for bad
 
 gsl_cdf_weibull_Pinv processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -2750,7 +2750,7 @@ It will set the bad-value flag of all output piddles if the flag is set for any 
 =for bad
 
 gsl_cdf_weibull_Q processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -2779,7 +2779,7 @@ It will set the bad-value flag of all output piddles if the flag is set for any 
 =for bad
 
 gsl_cdf_weibull_Qinv processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut

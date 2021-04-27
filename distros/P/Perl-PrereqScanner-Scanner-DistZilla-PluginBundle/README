@@ -1,0 +1,55 @@
+NAME
+
+    Perl::PrereqScanner::Scanner::DistZilla::PluginBundle - scan for
+    required plugins in Dist::Zilla plugin bundles
+
+VERSION
+
+    version 0.001
+
+DESCRIPTION
+
+    This scanner will look for the following indicators:
+
+      * calls to the add_bundle method
+
+      * calls to the add_plugins method
+
+    Currently this only works for plugin bundles using the
+    Dist::Zilla::Role::PluginBundle::Easy role.
+
+BUGS
+
+    Please report any bugs or feature requests on the bugtracker
+    website
+    https://rt.cpan.org/Public/Dist/Display.html?Name=Perl-PrereqScanner-Scanner-DistZilla-PluginBundle
+    or by email to
+    bug-Perl-PrereqScanner-Scanner-DistZilla-PluginBundle@rt.cpan.org
+    <mailto:bug-Perl-PrereqScanner-Scanner-DistZilla-PluginBundle@rt.cpan.org>.
+
+    When submitting a bug or request, please include a test-file or a
+    patch to an existing test-file that illustrates the bug or
+    desired feature.
+
+AUTHOR
+
+    Asher Gordon <AsDaGo@posteo.net>
+
+COPYRIGHT AND LICENSE
+
+    Copyright (C) 2021 Asher Gordon <AsDaGo@posteo.net>
+
+    This program is free software: you can redistribute it and/or
+    modify it under the terms of the GNU General Public License as
+    published by the Free Software Foundation, either version 3 of
+    the License, or (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+    General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program. If not, see
+    <http://www.gnu.org/licenses/>.
+

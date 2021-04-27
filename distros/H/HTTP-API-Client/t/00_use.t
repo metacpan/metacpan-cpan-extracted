@@ -1,6 +1,7 @@
 use strict;
 use warnings;
-
-use Test::More tests => 1;                      # last test to print
+use Test::More;
 
 use_ok "HTTP::API::Client";
+
+done_testing;

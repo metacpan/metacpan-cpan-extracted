@@ -5,6 +5,7 @@ META.json
 README.md
 cpanfile
 lib/Finance/Alpaca.pm
+lib/Finance/Alpaca/Cookbook.pod
 lib/Finance/Alpaca/DataStream.pm
 lib/Finance/Alpaca/Struct/Account.pm
 lib/Finance/Alpaca/Struct/Activity.pm

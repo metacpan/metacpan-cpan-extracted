@@ -114,19 +114,6 @@ sub getpdl_config {
 	unless exists $PDL_CONFIG{MALLOCDBG}->{$item};
   }
 
-  # filter out incompatible options for the 'bad' code.
-  # At present we can not have the experimental per-piddle
-  # code turned on (the BADVAL_PER_PDL option) and use
-  # NaN's for floating-point bad values (the BADVAL_USENAN
-  # option).
-  #
-  my $flag_use_nan = $PDL_CONFIG{BADVAL_USENAN} || 0;
-  my $flag_per_pdl = $PDL_CONFIG{BADVAL_PER_PDL} || 0;
-  if ( $flag_use_nan and $flag_per_pdl ) {
-      print "WARNING: Setting BADVAL_USENAN=0 as BADVAL_PER_PDL option is set!\n\n";
-      $PDL_CONFIG{BADVAL_USENAN} = 0;
-  }
-
   # create a PDL::Config variable matching the PDL_CONFIG structure
   # and convert yes/no answers to 1/0
   #
@@ -234,8 +221,7 @@ my @prereq = (
 	   'Filter::Simple'      => 0.88,      # for new PDL::NiceSlice
 	   'Inline'              => 0.83,      # fixed ILSM-finding
 	   'Inline::C'           => 0.62,
-           'List::MoreUtils'     => 0,         # for PDL::IO::GD
-	   'Module::Compile'     => 0.23,      # for new PDL::NiceSlice
+           'List::Util'          => '0.33',    # for PDL::IO::GD
 	   'Pod::Parser'         => 0,         # version TBD for PDL::Doc
 	   'Pod::Select'         => 0,         # version TBD for PDL::Doc
            'Scalar::Util'        => 0,

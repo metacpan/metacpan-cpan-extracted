@@ -26,7 +26,7 @@ no_index:
 provides:
   Finance::Alpaca:
     file: lib/Finance/Alpaca.pm
-    version: '0.9900'
+    version: '0.9901'
   Finance::Alpaca::DataStream:
     file: lib/Finance/Alpaca/DataStream.pm
     version: '0.9900'
@@ -89,7 +89,7 @@ resources:
   bugtracker: https://github.com/sanko/Finance-Alpaca/issues
   homepage: https://github.com/sanko/Finance-Alpaca
   repository: git://github.com/sanko/Finance-Alpaca.git
-version: '0.9900'
+version: '0.9901'
 x_authority: cpan:SANKO
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_static_install: 1

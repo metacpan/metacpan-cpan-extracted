@@ -130,8 +130,8 @@ Working on astronomical or solar image data, typical compression ratios of
 
 =for bad
 
-rice_compress ignores the bad-value flag of the input piddles.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+rice_compress ignores the bad-value flag of the input ndarrays.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -200,8 +200,8 @@ Unsquishes a PDL that has been squished by rice_compress.
 
 =for bad
 
-rice_expand ignores the bad-value flag of the input piddles.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+rice_expand ignores the bad-value flag of the input ndarrays.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut

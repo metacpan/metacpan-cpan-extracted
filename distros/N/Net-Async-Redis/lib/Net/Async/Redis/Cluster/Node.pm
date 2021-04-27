@@ -3,7 +3,7 @@ package Net::Async::Redis::Cluster::Node;
 use strict;
 use warnings;
 
-our $VERSION = '3.012'; # VERSION
+our $VERSION = '3.013'; # VERSION
 
 use parent qw(IO::Async::Notifier);
 

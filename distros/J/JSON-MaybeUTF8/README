@@ -51,12 +51,21 @@ DESCRIPTION
     Given a Perl data structure, returns a JSON string composed of Unicode
     characters (in Perl's internal encoding).
 
+ encode_json_text
+
+    Given a Perl data structure, returns a formatted JSON string composed
+    of Unicode characters (in Perl's internal encoding).
+
+    This is functionally identical to "encode_json_text", but with
+    indentation to make it readable, and with defined key ordering which
+    should make it easier to diff two different data structures.
+
 AUTHOR
 
     Tom Molesworth <TEAM@cpan.org>
 
 LICENSE
 
-    Copyright Tom Molesworth 2017. Licensed under the same terms as Perl
-    itself.
+    Copyright Tom Molesworth 2017-2021. Licensed under the same terms as
+    Perl itself.
 

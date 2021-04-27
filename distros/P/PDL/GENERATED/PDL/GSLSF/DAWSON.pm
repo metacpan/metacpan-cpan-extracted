@@ -64,7 +64,7 @@ Dawsons integral: Exp[-x^2] Integral[ Exp[t^2], {t,0,x}]
 =for bad
 
 gsl_sf_dawson does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut

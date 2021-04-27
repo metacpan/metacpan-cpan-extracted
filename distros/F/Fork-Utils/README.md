@@ -5,14 +5,67 @@
     Fork::Utils - set of usefull methods to work with processes and signals
 
 ### SYNOPSIS
+
 ```perl
         use Fork::Utils qw/ safe_exec /;
+        use POSIX ();
 
-        my $result = safe_exec(
-          'code'   => sub { my_super_sub( @_ ); },
-          'args'   => [ @params ],
-          'sigset' => [ qw/ CHLD TERM INT QUIT ALRM / ]
-        );
+    my $sig_action = sub { printf("SIG%s was received\n", $_[0]); };
+
+    $SIG{TERM} = $SIG{INT} = $SIG{QUIT} = $SIG{ALRM} = $sig_action;
+
+    alarm(1);
+
+    my $result = safe_exec(
+        args => [ @params ],
+        code => sub {
+
+            my @args = @_;
+
+            my $pending_sigset = new POSIX::SigSet ();
+
+            sleep(2);
+
+            if ( POSIX::sigpending( $pending_sigset ) == -1 ) {
+              die("sigpending error has occurred");
+            }
+
+            if ( $pending_sigset->ismember( POSIX::SIGTERM ) ) {
+                printf("%s is pending\n", 'SIGTERM');
+            }
+
+            if ( $pending_sigset->ismember( POSIX::SIGINT ) ) {
+                printf("%s is pending\n", 'SIGINT');
+            }
+
+            if ( $pending_sigset->ismember( POSIX::SIGQUIT ) ) {
+                printf("%s is pending\n", 'SIGQUIT');
+            }
+
+            if ( $pending_sigset->ismember( POSIX::SIGALRM ) ) {
+                printf("%s is pending\n", 'SIGALRM');
+            }
+        },
+        sigset => [qw/ ALRM TERM INT QUIT /]
+    );
+
+    if (my $error = $@) {
+        STDERR->print("Error: $error\n");
+    }
+
+    alarm(0);
+
+    printf("Good bye\n")
+```
+
+    The possible output of program is shown below (just press Ctrl+c during the execution to get this certain output):
+
+```text
+    SIGINT is pending
+    SIGALRM is pending
+    SIGINT was received
+    SIGALRM was received
+    Good bye
 ```
 
 ### DESCRIPTION
@@ -34,14 +87,14 @@
     The signal names can be taken from $Config{'sig_names'}.
 
     Returns a result of mentioned code reference as "$code->( @$args )".
-    Be aware that in current implementation this methods can't return the list.
+    Be aware that in current implementation this method can't return the list.
     The return value looks like the one shown below:
 
 ```perl
         my $result = $code->( @$args );
 ```
 
-    In case of any error in the executed code reference tha standard $@
+    In case of any error in the executed code reference the standard $@
     variable will be set.
 
 ###### code

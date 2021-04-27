@@ -23,7 +23,7 @@ use DynaLoader;
 
 =head1 NAME
 
-PDL::Graphics::OpenGLQ - quick routines to plot lots of stuff from piddles.
+PDL::Graphics::OpenGLQ - quick routines to plot lots of stuff from ndarrays.
 
 =head1 SYNOPSIS
 

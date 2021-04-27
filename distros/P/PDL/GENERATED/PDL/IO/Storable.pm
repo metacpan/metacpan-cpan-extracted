@@ -44,7 +44,7 @@ PDL::IO::Storable - helper functions to make PDL usable with Storable
 
 C<Storable> implements object persistence for Perl data structures that can
 contain arbitrary Perl objects. This module implements the relevant methods to
-be able to store and retrieve piddles via Storable.
+be able to store and retrieve ndarrays via Storable.
 
 =head1 FUNCTIONS
 
@@ -59,7 +59,7 @@ use Carp;
     PDL;
 # routines to make PDL work with Storable >= 1.03
 
-# pdlpack() serializes a piddle, while pdlunpack() unserializes it. Earlier
+# pdlpack() serializes an ndarray, while pdlunpack() unserializes it. Earlier
 # versions of PDL didn't control for endianness, type sizes and enumerated type
 # values; this made stored data unportable across different architectures and
 # PDL versions. This is no longer the case, but the reading code is still able
@@ -229,7 +229,7 @@ sub pdlunpack {
 
     # mostly this acts like unpack('Q<'...), but works even if my unpack()
     # doesn't support 'Q'. This also makes sure that my PDL_Indx is large enough
-    # to read this piddle
+    # to read this ndarray
     sub unpack64bit
     {
       my ($count, $pack, $offset) = @_;
@@ -252,7 +252,7 @@ sub pdlunpack {
   }
 
   print "thawing PDL, Dims: [",join(',',@dims),"]\n" if $PDL::verbose;
-  $pdl->make_null; # make this a real piddle -- this is the tricky bit!
+  $pdl->make_null; # make this a real ndarray -- this is the tricky bit!
   $pdl->set_datatype($type);
   $pdl->setdims([@dims]);
   my $dref = $pdl->get_dataref;
@@ -270,7 +270,7 @@ sub STORABLE_freeze {
   my ($self, $cloning) = @_;
 #  return if $cloning;         # Regular default serialization
   return UNIVERSAL::isa($self, "HASH") ? ("",{%$self}) # hash ref -> Storable
-    : (pdlpack $self); # pack the piddle into a long string
+    : (pdlpack $self); # pack the ndarray into a long string
 }
 
 sub STORABLE_thaw {
@@ -294,7 +294,7 @@ sub STORABLE_thaw {
 
 =for ref
 
-store a piddle using L<Storable>
+store an ndarray using L<Storable>
 
 =for example
 
@@ -307,7 +307,7 @@ store a piddle using L<Storable>
 
 =for ref
 
-freeze a piddle using L<Storable>
+freeze an ndarray using L<Storable>
 
 =for example
 

@@ -4,7 +4,7 @@ use Class::Method::Modifiers qw(:all);
 use Sub::Util qw(subname);
 use Myriad::Class extends => qw(IO::Async::Notifier);
 
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.003'; # VERSION
 our $AUTHORITY = 'cpan:DERIV'; # AUTHORITY
 
 =pod

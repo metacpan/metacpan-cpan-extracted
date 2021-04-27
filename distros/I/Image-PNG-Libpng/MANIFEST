@@ -27,6 +27,7 @@ examples/synopsis.pl
 examples/wave.png
 examples/xkcd-out.txt
 examples/xkcd.pl
+get-pixel.pl
 inc/CheckForLibPng.pm
 lib/Image/PNG/Const.pm
 lib/Image/PNG/Libpng.pm
@@ -36,11 +37,12 @@ Makefile.PL
 MANIFEST			This list of files
 MANIFEST.SKIP
 my-xs.h
+nicemake.pl
 perl-libpng.c
 ppport.h
+qrpng-small.png
 README
 script/pnginspect
-t/any2gray8.t
 t/bKGD.t
 t/bogus.t
 t/chrm-xyz.t
@@ -52,6 +54,7 @@ t/compress-level.t
 t/Const.t
 t/copy-all-png.t
 t/daft.t
+t/emoticon.png
 t/exif.t
 t/functions.t
 t/gAMA.t
@@ -246,7 +249,6 @@ t/oFFs.t
 t/pCAL.t
 t/pHYs.t
 t/PLTE.t
-t/qrpng.png
 t/read-from-scalar.t
 t/saru-fs8.png
 t/sBIT.t
@@ -273,7 +275,5 @@ t/transformations.t
 t/tRNS.t
 t/user-limits.t
 typemap
-unt/chunks.png
-unt/logo_icon128.v101.png
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

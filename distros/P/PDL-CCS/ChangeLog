@@ -1,3 +1,10 @@
+v1.23.15 Tue, 27 Apr 2021 13:13:20 +0200 moocow
+	+ added new PDL-2.039 integer-type listing code to Config.PL
+	+ fixed downcasting in b*over methods be PDL-compatible (problem was 'max_int_type' option to ccs_accum_def())
+	+ re-enabled b*over tests skipped in v1.23.14
+	+ added Makefile.PL META_MERGE section pointing to new public github repo moocow-the-bovine/PDL-CCS
+	  - github repo is just a fork of read-only ZDL git mirror of upstream SVN repository
+
 v1.23.14 Mon, 26 Apr 2021 14:58:50 +0200 moocow
 	+ skip some b(and|or)over type-check tests to avoid test failures for PDL >= v2.039
 	  - CCS implementations are returning 'indx' type here, dense PDL versions are giving 'longlong' for input type=double

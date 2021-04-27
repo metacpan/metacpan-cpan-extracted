@@ -218,15 +218,6 @@ OUTPUT:
         RETVAL
 
 
-void *
-perl_png_get_row_pointers (Png)
-        Image::PNG::Libpng  Png
-CODE:
-        RETVAL = perl_png_get_row_pointers (Png);
-OUTPUT:
-        RETVAL
-
-
 SV *
 perl_png_get_rows (Png)
         Image::PNG::Libpng  Png
@@ -967,9 +958,6 @@ CODE:
 #endif /* MNG_FEATURES */
 
 
-
-
-
  # Transform functions which require arguments.
 
 void
@@ -1131,6 +1119,17 @@ CODE:
 OUTPUT:
         RETVAL
 
+SV *
+perl_png_get_pixel (png, x, y)
+	Image::PNG::Libpng png;
+	int x;
+	int y;
+PREINIT:
+CODE:
+	RETVAL = perl_png_get_pixel (png, x, y);
+OUTPUT:
+	RETVAL
+	
 
  # The following automatically generates the get and set functions for
  # the chunks.

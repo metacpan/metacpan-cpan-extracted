@@ -3,7 +3,7 @@ package Myriad::RPC::Client::Implementation::Redis;
 use strict;
 use warnings;
 
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.003'; # VERSION
 our $AUTHORITY = 'cpan:DERIV'; # AUTHORITY
 
 use Myriad::Class extends => qw(IO::Async::Notifier);

@@ -1,5 +1,8 @@
 Revision history for perl distribution App-tt
 
+0.18 2021-04-27T11:09:06+0900
+ - Fix "tt edit file.trc"
+
 0.17 2021-04-09T09:26:26+0900
  - Fix failing tests
 

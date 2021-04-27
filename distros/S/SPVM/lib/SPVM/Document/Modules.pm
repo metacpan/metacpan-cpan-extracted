@@ -10,7 +10,7 @@ List of SPVM Core Modules
 
 =head2 SPVM::ArrayUtil
 
-L<SPVM::ArrayUtil> - 
+L<SPVM::ArrayUtil> - Array Utilities
 
 =head2 SPVM::Byte
 
@@ -22,35 +22,39 @@ L<SPVM::ByteList>
 
 =head2 SPVM::Cloner
 
-L<SPVM::Cloner> - 
+L<SPVM::Cloner> - a callback type to clone a object
 
 =head2 SPVM::Comparator::Byte
 
-L<SPVM::Comparator::Byte> - 
+L<SPVM::Comparator::Byte> - a callback type for byte comparation
 
 =head2 SPVM::Comparator::Short
 
-L<SPVM::Comparator::Short> -
+L<SPVM::Comparator::Short> - a callback type for short comparation
 
 =head2 SPVM::Comparator::Int
 
-L<SPVM::Comparator::Int> - 
+L<SPVM::Comparator::Int> - a callback type for int comparation
 
 =head2 SPVM::Comparator::Long
 
-L<SPVM::Comparator::Long> - 
+L<SPVM::Comparator::Long> - a callback type for long comparation
 
 =head2 SPVM::Comparator::Float
 
-L<SPVM::Comparator::Float> - 
+L<SPVM::Comparator::Float> - a callback type for float comparation
 
 =head2 SPVM::Comparator::Double
 
-L<SPVM::Comparator::Double> - 
+L<SPVM::Comparator::Double> - a callback type for double comparation
+
+=head2 SPVM::Comparator::String
+
+L<SPVM::Comparator::String> - a callback type for string comparation
 
 =head2 SPVM::Comparator::Object
 
-L<SPVM::Comparator::Object> - 
+L<SPVM::Comparator::Object> - a callback type for object comparation
 
 =head2 SPVM::Complex_2d
 
@@ -148,17 +152,13 @@ L<SPVM::Short> - short object
 
 L<SPVM::ShortList> - 
 
-=head2 SPVM::Sort
-
-L<SPVM::Sort> - 
-
 =head2 SPVM::StringBuffer
 
 L<SPVM::StringBuffer> - 
 
 =head2 SPVM::Stringer
 
-L<SPVM::Stringer> - 
+L<SPVM::Stringer> - a callback type to stringify a object
 
 =head2 SPVM::StringList
 

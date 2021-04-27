@@ -10,11 +10,6 @@ our @CARP_NOT;
 
 use strict;
 
-# check for bad value support
-#
-use PDL::Config;
-my $usenan   = $PDL::Config{BADVAL_USENAN} || 0;
-
 sub get_pdls {my($this) = @_; return ($this->{ParNames},$this->{ParObjs});}
 
 # Do the appropriate substitutions in the code.
@@ -296,24 +291,11 @@ sub thisisloop {
 ###########################
 #
 # used by BadAccess code to know when to use NaN support
-# - the output depends on the value of the
-#   BADVAL_USENAN option in perldl.conf
-#   == 1 then we use NaN's
-#      0             PDL.bvals.Float/Double
+# - since 2.040, use per-PDL code
 #
 sub convert {
     my ( $this, $name, $lhs, $rhs, $opcode, $pobj ) = @_;
-    my $ftype_override = exists $this->{ftypes_vars}{$name} ? $this->{ftypes_type} : undef;
-    my $type = $ftype_override || $pobj->adjusted_type($this->{Gencurtype}[-1]);
-    return ($lhs, $rhs) if !($usenan * $type->usenan);
-    return (
-      $lhs,
-      PDL::PP::pp_line_numbers(__LINE__-1, "PDL->bvals.".$type->shortctype)
-    ) if $opcode eq "SETBAD";
-    (
-      PDL::PP::pp_line_numbers(__LINE__-1, "!".$type->isnan($lhs)),
-      "0"
-    );
+    ($lhs, $rhs);
 }
 
 #####################################################################
@@ -690,8 +672,8 @@ sub get_str {my($this) = @_;return "\$$this->[0]($this->[1])"}
 #   $SETBAD($a())     $a()   = a_badval
 #
 # floating point with NaN
-#   $ISBAD($a(n))  -> isfinite($a(n)) == 0
-#   $ISGOOD($a())     isfinite($a())  != 0
+#   $ISBAD($a(n))  -> !isnan($a(n)) == 0
+#   $ISGOOD($a())     !isnan($a())  != 0
 #   $SETBAD($a())     $a()           = PDL->bvals.Float (or .Double)
 #
 # I've also got it so that the $ on the pdl name is not
@@ -716,7 +698,7 @@ sub new {
     # trying to avoid auto creation of hash elements
     my $check = $parent->{ParObjs};
     die "\nIt looks like you have tried a \$${opcode}() macro on an\n" .
-	"  unknown piddle <$name($inds)>\n"
+	"  unknown ndarray <$name($inds)>\n"
 	unless exists($check->{$name}) and defined($check->{$name});
 
     return bless [$opcode, $name, $inds], $type;
@@ -761,8 +743,8 @@ sub get_str {
 #   $SETBADVAR(foo,a)    foo  = a_badval
 #
 # floating point with NaN
-#   $ISBADVAR(foo,a)  -> isfinite(foo) == 0
-#   $ISGOODVAR(foo,a)    isfinite(foo) != 0
+#   $ISBADVAR(foo,a)  -> !isnan(foo) == 0
+#   $ISGOODVAR(foo,a)    !isnan(foo) != 0
 #   $SETBADVAR(foo,a)    foo          = PDL->bvals.Float (or .Double)
 #
 
@@ -776,7 +758,7 @@ sub new {
     # trying to avoid auto creation of hash elements
     my $check = $parent->{ParObjs};
     die "\nIt looks like you have tried a \$${opcode}() macro on an\n" .
-	"  unknown piddle <$name>\n"
+	"  unknown ndarray <$name>\n"
 	unless exists($check->{$name}) and defined($check->{$name});
 
     bless [$opcode, $var_name, $name], $type;
@@ -823,8 +805,8 @@ sub get_str {
 #  etc
 #
 # if we use NaN's, then
-#  $PPISBAD(PARENT,[i])   -> isfinite(PARENT_physdatap[i]) == 0
-#  $PPISGOOD(PARENT,[i])  -> isfinite(PARENT_physdatap[i]) != 0
+#  $PPISBAD(PARENT,[i])   -> !isnan(PARENT_physdatap[i]) == 0
+#  $PPISGOOD(PARENT,[i])  -> !isnan(PARENT_physdatap[i]) != 0
 #  $PPSETBAD(PARENT,[i])  -> PARENT_physdatap[i]          = PDL->bvals.Float (or .Double)
 #
 
@@ -870,7 +852,7 @@ sub get_str {
 
 ###########################
 #
-# Encapsulate a check on whether the state flag of a piddle
+# Encapsulate a check on whether the state flag of an ndarray
 # is set/change this state
 #
 # $PDLSTATEISBAD(a)    ->  ($PDL(a)->state & PDL_BADVAL) > 0
@@ -893,7 +875,7 @@ sub new {
     # trying to avoid auto creation of hash elements
     my $check = $parent->{ParObjs};
     die "\nIt looks like you have tried a \$PDLSTATE${op}${val}() macro on an\n" .
-	"  unknown piddle <$name>\n"
+	"  unknown ndarray <$name>\n"
 	unless exists($check->{$name}) and defined($check->{$name});
 
     bless [$op, $val, $name], $type;
@@ -1055,7 +1037,7 @@ sub get_str {my($this,$parent,$context) = @_;
 
 	my $s = $parent->{IndObjs}{$1}->get_size();
 
-# XXX NOTE: All piddles must be output piddles, there must not be
+# XXX NOTE: All ndarrays must be output ndarrays, there must not be
 # a loop over this var (at all!) etc. Should check for these,
 # this is why not yet documented.
 # FURTHER NOTE: RESIZE DOESN'T COPY DATA PROPERLY!

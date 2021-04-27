@@ -27,5 +27,9 @@ requires:
   PDL: '0'
   PDL::VectorValued: v1.0.4
   Test::More: '0'
-version: v1.23.14
+version: v1.23.15
+x_repository:
+  type: git
+  url: git://github.com/moocow-the-bovine/PDL-CCS.git
+  web: https://github.com/moocow-the-bovine/PDL-CCS
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

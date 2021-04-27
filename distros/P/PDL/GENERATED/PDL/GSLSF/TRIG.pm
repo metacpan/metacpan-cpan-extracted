@@ -64,7 +64,7 @@ Sin(x) with GSL semantics.
 =for bad
 
 gsl_sf_sin does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -93,7 +93,7 @@ Cos(x) with GSL semantics.
 =for bad
 
 gsl_sf_cos does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -122,7 +122,7 @@ Hypot(x,xx) with GSL semantics.
 =for bad
 
 gsl_sf_hypot does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -151,7 +151,7 @@ Sin(z) for complex z
 =for bad
 
 gsl_sf_complex_sin does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -180,7 +180,7 @@ Cos(z) for complex z
 =for bad
 
 gsl_sf_complex_cos does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -209,7 +209,7 @@ Log(Sin(z)) for complex z
 =for bad
 
 gsl_sf_complex_logsin does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -238,7 +238,7 @@ Log(Sinh(x)) with GSL semantics.
 =for bad
 
 gsl_sf_lnsinh does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -267,7 +267,7 @@ Log(Cos(x)) with GSL semantics.
 =for bad
 
 gsl_sf_lncosh does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -296,7 +296,7 @@ Convert polar to rectlinear coordinates.
 =for bad
 
 gsl_sf_polar_to_rect does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -325,7 +325,7 @@ Convert rectlinear to polar coordinates. return argument in range [-pi, pi].
 =for bad
 
 gsl_sf_rect_to_polar does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -354,7 +354,7 @@ Force an angle to lie in the range (-pi,pi].
 =for bad
 
 gsl_sf_angle_restrict_symm does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -383,7 +383,7 @@ Force an angle to lie in the range [0,2 pi).
 =for bad
 
 gsl_sf_angle_restrict_pos does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -412,7 +412,7 @@ Sin(x) for quantity with an associated error.
 =for bad
 
 gsl_sf_sin_err does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -441,7 +441,7 @@ Cos(x) for quantity with an associated error.
 =for bad
 
 gsl_sf_cos_err does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut

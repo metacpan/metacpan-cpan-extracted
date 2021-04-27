@@ -64,7 +64,7 @@ Log[Gamma(x)], x not a negative integer Uses real Lanczos method. Determines the
 =for bad
 
 gsl_sf_lngamma does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -93,7 +93,7 @@ Gamma(x), x not a negative integer
 =for bad
 
 gsl_sf_gamma does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -122,7 +122,7 @@ Regulated Gamma Function, x > 0 Gamma^*(x) = Gamma(x)/(Sqrt[2Pi] x^(x-1/2) exp(-
 =for bad
 
 gsl_sf_gammastar does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -151,7 +151,7 @@ It will set the bad-value flag of all output piddles if the flag is set for any 
 =for bad
 
 gsl_sf_gammainv does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -180,7 +180,7 @@ Log[Gamma(z)] for z complex, z not a negative integer. Calculates: lnr = log|Gam
 =for bad
 
 gsl_sf_lngamma_complex does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -209,7 +209,7 @@ x^n / n!
 =for bad
 
 gsl_sf_taylorcoeff does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -238,7 +238,7 @@ n!
 =for bad
 
 gsl_sf_fact does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -267,7 +267,7 @@ n!! = n(n-2)(n-4)
 =for bad
 
 gsl_sf_doublefact does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -296,7 +296,7 @@ ln n!
 =for bad
 
 gsl_sf_lnfact does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -325,7 +325,7 @@ ln n!!
 =for bad
 
 gsl_sf_lndoublefact does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -354,7 +354,7 @@ log(n choose m)
 =for bad
 
 gsl_sf_lnchoose does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -383,7 +383,7 @@ n choose m
 =for bad
 
 gsl_sf_choose does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -412,7 +412,7 @@ Logarithm of Pochammer (Apell) symbol, with sign information. result = log( |(a)
 =for bad
 
 gsl_sf_lnpoch does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -441,7 +441,7 @@ Pochammer (Apell) symbol (a)_x := Gamma[a + x]/Gamma[x]
 =for bad
 
 gsl_sf_poch does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -470,7 +470,7 @@ Relative Pochammer (Apell) symbol ((a,x) - 1)/x where (a,x) = (a)_x := Gamma[a +
 =for bad
 
 gsl_sf_pochrel does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -499,7 +499,7 @@ Normalized Incomplete Gamma Function Q(a,x) = 1/Gamma(a) Integral[ t^(a-1) e^(-t
 =for bad
 
 gsl_sf_gamma_inc_Q does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -528,7 +528,7 @@ Complementary Normalized Incomplete Gamma Function P(a,x) = 1/Gamma(a) Integral[
 =for bad
 
 gsl_sf_gamma_inc_P does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -557,7 +557,7 @@ Logarithm of Beta Function Log[B(a,b)]
 =for bad
 
 gsl_sf_lnbeta does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -586,7 +586,7 @@ Beta Function B(a,b)
 =for bad
 
 gsl_sf_beta does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut

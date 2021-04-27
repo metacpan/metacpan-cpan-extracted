@@ -1,0 +1,141 @@
+
+
+
+=encoding UTF-8
+
+=head1 NAME
+
+Image::PNG::Data - manipulate the image data part of PNGs
+
+=head1 SYNOPSIS
+
+    use Image::PNG::Data;
+
+=head1 VERSION
+
+This documents version 0.01 of Image-PNG-Data
+corresponding to L<git commit 64ed7dcffc6a69ab13a59d60c01a8c10fae08e53|https://github.com/benkasminbullock/image-png-data/commit/64ed7dcffc6a69ab13a59d60c01a8c10fae08e53> released on Thu Apr 8 17:01:29 2021 +0900.
+
+=head1 DESCRIPTION
+
+This module provides various utilities for manipulating and testing
+the image data part of a PNG image. This is a companion module to
+L<Image::PNG::Libpng> by the same authors.
+
+B<The documentation below refers to functions which are not yet
+implemented.>
+
+=head1 FUNCTIONS
+
+=head2 alpha_unused
+
+    if (alpha_unused (read_png_file ('some.png')) {
+
+Is the alpha channel in the image unused? This function returns a true
+value if the PNG has an alpha channel and it is not being used. If the
+image doesn't have an alpha channel it returns the undefined value. If
+it has an alpha channel and it is being used it returns 0.
+
+=head2 any2gray8
+
+    my $wpng = any2gray8 ("any.png");
+
+Convert any type of PNG file whatsoever into a bit-depth 8 grayscale
+image without an alpha channel (C<PNG_COLOR_TYPE_GRAY>). The return
+value is a write structure as made by
+L<Image::PNG::Libpng/create_write_struct>.
+
+Currently the C<tRNS> chunk (see L<Image::PNG::Libpng/tRNS>) is
+ignored by this.
+
+By default the alpha channel is set to either the value of the C<bKGD>
+chunk (see L<Image::PNG::Libpng/bKGD>) if there is one, or white if
+not. You can set another background using the option C<bkgd>:
+
+    my $wpng = any2gray8 ('any.png', bkgd => {red => 255, green => 0, blue => 99});
+
+This will of course be ignored if F<any.png> does not contain an alpha
+channel. RGB to gray conversion is done using
+L<Image::PNG::Libpng/set_rgb_to_gray> with the default values.
+
+This function is not supported for versions of libpng earlier than
+1.6.14.
+
+=head2 bwpng
+
+    my $png = bwpng (\@rows, sq => 20);
+
+Convert boolean-style data into a black and white PNG. A two-color PNG
+is also possible:
+
+    bwpng (\@rows, black => '#CFF', white => '#C00');
+
+
+
+=head2 rgb2gray
+
+    my $gray_png = rgb2gray ('colorful.png');
+
+Convert an RGB PNG image to a grayscale one.
+
+Options:
+
+
+grayonly
+
+
+=head2 rmalpha
+
+    my $png = rmalpha ('file.png');
+
+Remove the alpha channel of the PNG. If the input PNG has a color type
+other than C<GRAY_ALPHA> or C<RGB_ALPHA>, a warning is printed and the
+return value is undefined. The return value is an Image::PNG::Libpng
+structure for writing with the alpha channel data removed.
+
+=head2 split_alpha
+
+Unimplemented, due to be copied from L<Image::PNG::Libpng>.
+
+=head1 DEPENDENCIES
+
+=over
+
+=item L<Image::PNG::Libpng>
+
+=back
+
+=head1 SEE ALSO
+
+=head2 Online PNG tools
+
+=over
+
+=item L<https://onlinepngtools.com/convert-png-to-grayscale>
+
+Converts your PNG to grayscale via JavaScript. This actually resizes
+the image to the size of its box, but you can save the image with the
+Save as... link and you get the original size back.
+
+=item L<https://pinetools.com/grayscale-image>
+
+=back
+
+
+
+=head1 AUTHOR
+
+Ben Bullock, <bkb@cpan.org>
+
+=head1 COPYRIGHT & LICENCE
+
+This package and associated files are copyright (C) 
+2021
+Ben Bullock.
+
+You can use, copy, modify and redistribute this package and associated
+files under the Perl Artistic Licence or the GNU General Public
+Licence.
+
+
+

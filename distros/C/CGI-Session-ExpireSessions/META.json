@@ -1,27 +1,33 @@
 {
    "abstract" : "Expires CGI::Session db-based and file-based sessions",
    "author" : [
-      "Ron Savage <ron@savage.net.au>"
+      "Ron Savage (ron@savage.net.au)"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4003, CPAN::Meta::Converter version 2.120921",
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
    "license" : [
-      "artistic_2"
+      "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "CGI-Session-ExpireSessions",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
    "prereqs" : {
       "build" : {
          "requires" : {
-            "Test::More" : "0"
+            "ExtUtils::MakeMaker" : "0"
          }
       },
       "configure" : {
          "requires" : {
-            "Module::Build" : "0.38"
+            "ExtUtils::MakeMaker" : "0"
          }
       },
       "runtime" : {
@@ -30,19 +36,24 @@
             "Carp" : "0",
             "File::Spec" : "0"
          }
-      }
-   },
-   "provides" : {
-      "CGI::Session::ExpireSessions" : {
-         "file" : "lib/CGI/Session/ExpireSessions.pm",
-         "version" : "1.13"
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "1.001002"
+         }
       }
    },
    "release_status" : "stable",
    "resources" : {
       "license" : [
-         "http://www.perlfoundation.org/artistic_license_2_0"
-      ]
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/ronsavage/CGI-Session-ExpireSessions.git",
+         "web" : "https://github.com/ronsavage/CGI-Session-ExpireSessions"
+      }
    },
-   "version" : "1.13"
+   "version" : "1.14",
+   "x_serialization_backend" : "JSON::PP version 4.02"
 }

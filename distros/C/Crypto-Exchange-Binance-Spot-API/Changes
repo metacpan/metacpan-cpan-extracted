@@ -3,3 +3,31 @@
 
 2021-04-19 - v0.02
     + Update the tests backward compatible
+
+
+2021-04-27 - v0.03
+    + Fix cpan test from the test report
+
+    + Adding timezone for localizing your result
+
+    + DateTime auto formating will tranformed when required.
+
+    +   + Return a DateTime object if requesting as list context
+
+    +   + Return a DateTime string if requesting as a scalar context
+
+    + Added required flags to required fileds
+
+    + Adding new function $binance->list_filled_orders() for fillted orders
+
+    + Adding buy function
+
+    + Using Binance trading pair feed to determin which are the support pairs
+
+    + -----
+
+    + Todo: Add sell or cancel function
+
+
+2021-04-27 - v0.04
+    + Correct the previous version number format

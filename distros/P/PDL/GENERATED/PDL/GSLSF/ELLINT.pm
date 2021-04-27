@@ -64,7 +64,7 @@ Legendre form of complete elliptic integrals K(k) = Integral[1/Sqrt[1 - k^2 Sin[
 =for bad
 
 gsl_sf_ellint_Kcomp does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -93,7 +93,7 @@ Legendre form of complete elliptic integrals E(k) = Integral[  Sqrt[1 - k^2 Sin[
 =for bad
 
 gsl_sf_ellint_Ecomp does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -122,7 +122,7 @@ Legendre form of incomplete elliptic integrals F(phi,k)   = Integral[1/Sqrt[1 - 
 =for bad
 
 gsl_sf_ellint_F does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -151,7 +151,7 @@ Legendre form of incomplete elliptic integrals E(phi,k)   = Integral[  Sqrt[1 - 
 =for bad
 
 gsl_sf_ellint_E does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -181,7 +181,7 @@ Legendre form of incomplete elliptic integrals P(phi,k,n) = Integral[(1 + n Sin[
 =for bad
 
 gsl_sf_ellint_P does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -211,7 +211,7 @@ Legendre form of incomplete elliptic integrals D(phi,k)
 =for bad
 
 gsl_sf_ellint_D does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -240,7 +240,7 @@ Carlsons symmetric basis of functions RC(x,y)   = 1/2 Integral[(t+x)^(-1/2) (t+y
 =for bad
 
 gsl_sf_ellint_RC does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -269,7 +269,7 @@ Carlsons symmetric basis of functions RD(x,y,z) = 3/2 Integral[(t+x)^(-1/2) (t+y
 =for bad
 
 gsl_sf_ellint_RD does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -298,7 +298,7 @@ Carlsons symmetric basis of functions RF(x,y,z) = 1/2 Integral[(t+x)^(-1/2) (t+y
 =for bad
 
 gsl_sf_ellint_RF does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -327,7 +327,7 @@ Carlsons symmetric basis of functions RJ(x,y,z,p) = 3/2 Integral[(t+x)^(-1/2) (t
 =for bad
 
 gsl_sf_ellint_RJ does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut

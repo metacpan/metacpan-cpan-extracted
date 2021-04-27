@@ -96,7 +96,7 @@ it runs faster and handles a variety of boundary conditions.
 =for bad
 
 convolve does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -213,7 +213,7 @@ instead.  PDL::Transform::map runs slower but is more flexible.
 =for bad
 
 rebin does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -505,7 +505,7 @@ its own threadloops.
 =for bad
 
 convolveND does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut

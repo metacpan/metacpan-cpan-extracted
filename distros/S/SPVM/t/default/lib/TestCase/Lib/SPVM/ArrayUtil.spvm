@@ -1,5 +1,5 @@
 package TestCase::Lib::SPVM::ArrayUtil {
-  use SPVM::ArrayUtil(join_object, split, copy_array_object, equals_array_object, sprintf);
+  use SPVM::ArrayUtil(copy_array_object, equals_array_object);
   
   use SPVM::NumberUtil;
   use SPVM::Unicode (uchar);
@@ -24,20 +24,19 @@ package TestCase::Lib::SPVM::ArrayUtil {
     equals_array_long,
     equals_array_float,
     equals_array_double,
-    get_type_name,
     dump_array_byte,
     dump_array_short,
     dump_array_int,
     dump_array_long,
     dump_array_float,
     dump_array_double,
-    slice_byte,
-    slice_short,
-    slice_int,
-    slice_long,
-    slice_float,
-    slice_double,
-    slice_object,
+    copy_array_range_byte,
+    copy_array_range_short,
+    copy_array_range_int,
+    copy_array_range_long,
+    copy_array_range_float,
+    copy_array_range_double,
+    copy_array_range_object,
     memcpy_byte,
     memcpy_short,
     memcpy_int,
@@ -347,6 +346,349 @@ package TestCase::Lib::SPVM::ArrayUtil {
     return 1;
   }
 
+  sub test_equals_array_byte : int () {
+    my $nums1 = [(byte)0, 1, SPVM::NumberUtil->INT8_MIN()];
+    my $nums2 = [(byte)0, 1, SPVM::NumberUtil->INT8_MIN()];
+    my $nums3 = [(byte)0, 1];
+    my $nums4 = [(byte)0, 1, 2];
+    {
+      my $is_equals = equals_array_byte($nums1, $nums2);
+      unless ($is_equals) {
+        return 0;
+      }
+    }
+    {
+      my $is_equals = equals_array_byte($nums1, $nums3);
+      if ($is_equals) {
+        return 0;
+      }
+    }
+    {
+      my $is_equals = equals_array_byte($nums1, $nums4);
+      if ($is_equals) {
+        return 0;
+      }
+    }
+    
+    {
+      my $is_equals = equals_array_byte(undef, undef);
+      if ($is_equals) {
+        return 1;
+      }
+    }
+    
+    {
+      my $is_equals = equals_array_byte($nums1, undef);
+      if ($is_equals) {
+        return 0;
+      }
+    }
+    
+    {
+      my $is_equals = equals_array_byte(undef, $nums1);
+      if ($is_equals) {
+        return 0;
+      }
+    }
+
+    return 1;
+  }
+
+  sub test_equals_array_short : int () {
+    my $nums1 = [(short)0, 1, SPVM::NumberUtil->INT16_MIN()];
+    my $nums2 = [(short)0, 1, SPVM::NumberUtil->INT16_MIN()];
+    my $nums3 = [(short)0, 1];
+    my $nums4 = [(short)0, 1, 2];
+
+    {
+      my $is_equals = equals_array_short($nums1, $nums2);
+
+      unless ($is_equals) {
+        return 0;
+      }
+    }
+    {
+      my $is_equals = equals_array_short($nums1, $nums3);
+
+      if ($is_equals) {
+        return 0;
+      }
+    }
+    {
+      my $is_equals = equals_array_short($nums1, $nums4);
+      if ($is_equals) {
+        return 0;
+      }
+    }
+
+    {
+      my $is_equals = equals_array_short(undef, undef);
+      if ($is_equals) {
+        return 1;
+      }
+    }
+    
+    {
+      my $is_equals = equals_array_short($nums1, undef);
+      if ($is_equals) {
+        return 0;
+      }
+    }
+    
+    {
+      my $is_equals = equals_array_short(undef, $nums1);
+      if ($is_equals) {
+        return 0;
+      }
+    }
+
+    return 1;
+  }
+
+  sub test_equals_array_int : int () {
+    my $nums1 = [(int)0, 1, SPVM::NumberUtil->INT32_MIN()];
+    my $nums2 = [(int)0, 1, SPVM::NumberUtil->INT32_MIN()];
+    my $nums3 = [(int)0, 1];
+    my $nums4 = [(int)0, 1, 2];
+
+    {
+      my $is_equals = equals_array_int($nums1, $nums2);
+      unless ($is_equals) {
+        return 0;
+      }
+    }
+    {
+      my $is_equals = equals_array_int($nums1, $nums3);
+      if ($is_equals) {
+        return 0;
+      }
+    }
+    {
+      my $is_equals = equals_array_int($nums1, $nums4);
+      if ($is_equals) {
+        return 0;
+      }
+    }
+
+    {
+      my $is_equals = equals_array_int(undef, undef);
+      if ($is_equals) {
+        return 1;
+      }
+    }
+    
+    {
+      my $is_equals = equals_array_int($nums1, undef);
+      if ($is_equals) {
+        return 0;
+      }
+    }
+    
+    {
+      my $is_equals = equals_array_int(undef, $nums1);
+      if ($is_equals) {
+        return 0;
+      }
+    }
+
+    return 1;
+  }
+
+  sub test_equals_array_long : int () {
+    my $nums1 = [(long)0, 1, SPVM::NumberUtil->INT64_MIN()];
+    my $nums2 = [(long)0, 1, SPVM::NumberUtil->INT64_MIN()];
+    my $nums3 = [(long)0, 1];
+    my $nums4 = [(long)0, 1, 2];
+
+    {
+      my $is_equals = equals_array_long($nums1, $nums2);
+      unless ($is_equals) {
+        return 0;
+      }
+    }
+    {
+      my $is_equals = equals_array_long($nums1, $nums3);
+      if ($is_equals) {
+        return 0;
+      }
+    }
+    {
+      my $is_equals = equals_array_long($nums1, $nums4);
+      if ($is_equals) {
+        return 0;
+      }
+    }
+
+    {
+      my $is_equals = equals_array_long(undef, undef);
+      if ($is_equals) {
+        return 1;
+      }
+    }
+    
+    {
+      my $is_equals = equals_array_long($nums1, undef);
+      if ($is_equals) {
+        return 0;
+      }
+    }
+    
+    {
+      my $is_equals = equals_array_long(undef, $nums1);
+      if ($is_equals) {
+        return 0;
+      }
+    }
+
+    return 1;
+  }
+
+  sub test_equals_array_float : int () {
+    my $nums1 = [0.0f, 1.5f, SPVM::NumberUtil->FLT_MIN()];
+    my $nums2 = [0.0f, 1.5f, SPVM::NumberUtil->FLT_MIN()];
+    my $nums3 = [0.0f, 1.5f];
+    my $nums4 = [(float)0.0f, 1.5f, 0.5f];
+
+    {
+      my $is_equals = equals_array_float($nums1, $nums2);
+      unless ($is_equals) {
+        return 0;
+      }
+    }
+    {
+      my $is_equals = equals_array_float($nums1, $nums3);
+      if ($is_equals) {
+        return 0;
+      }
+    }
+    {
+      my $is_equals = equals_array_float($nums1, $nums4);
+      if ($is_equals) {
+        return 0;
+      }
+    }
+
+    {
+      my $is_equals = equals_array_float(undef, undef);
+      if ($is_equals) {
+        return 1;
+      }
+    }
+    
+    {
+      my $is_equals = equals_array_float($nums1, undef);
+      if ($is_equals) {
+        return 0;
+      }
+    }
+    
+    {
+      my $is_equals = equals_array_float(undef, $nums1);
+      if ($is_equals) {
+        return 0;
+      }
+    }
+
+    return 1;
+  }
+
+  sub test_equals_array_double : int () {
+    my $nums1 = [0.0, 1.5, SPVM::NumberUtil->DBL_MIN()];
+    my $nums2 = [0.0, 1.5, SPVM::NumberUtil->DBL_MIN()];
+    my $nums3 = [0.0, 1.5];
+    my $nums4 = [(double)0.0, 1.5, 0.5];
+
+    {
+      my $is_equals = equals_array_double($nums1, $nums2);
+      unless ($is_equals) {
+        return 0;
+      }
+    }
+    {
+      my $is_equals = equals_array_double($nums1, $nums3);
+      if ($is_equals) {
+        return 0;
+      }
+    }
+    {
+      my $is_equals = equals_array_double($nums1, $nums4);
+      if ($is_equals) {
+        return 0;
+      }
+    }
+
+    {
+      my $is_equals = equals_array_double(undef, undef);
+      if ($is_equals) {
+        return 1;
+      }
+    }
+    
+    {
+      my $is_equals = equals_array_double($nums1, undef);
+      if ($is_equals) {
+        return 0;
+      }
+    }
+    
+    {
+      my $is_equals = equals_array_double(undef, $nums1);
+      if ($is_equals) {
+        return 0;
+      }
+    }
+
+    return 1;
+  }
+
+  sub test_equals_array_string : int () {
+    my $strings1 = ["abc", "def", "ghi"];
+    my $strings2 = ["abc", "def", "ghi"];
+    my $strings3 = ["abc", "def"];
+    my $strings4 = ["abc", "def", "xxx"];
+
+    {
+      my $is_equals = equals_array_string($strings1, $strings2);
+      unless ($is_equals) {
+        return 0;
+      }
+    }
+    {
+      my $is_equals = equals_array_string($strings1, $strings3);
+      if ($is_equals) {
+        return 0;
+      }
+    }
+    {
+      my $is_equals = equals_array_string($strings1, $strings4);
+      if ($is_equals) {
+        return 0;
+      }
+    }
+
+    {
+      my $is_equals = equals_array_string(undef, undef);
+      if ($is_equals) {
+        return 1;
+      }
+    }
+    
+    {
+      my $is_equals = equals_array_string($strings1, undef);
+      if ($is_equals) {
+        return 0;
+      }
+    }
+    
+    {
+      my $is_equals = equals_array_string(undef, $strings1);
+      if ($is_equals) {
+        return 0;
+      }
+    }
+
+    return 1;
+  }
   sub test_equals_array_object : int () {
     my $minimal1 = TestCase::Minimal->new;
     my $minimal2 = TestCase::Minimal->new;
@@ -399,73 +741,1196 @@ package TestCase::Lib::SPVM::ArrayUtil {
   }
 
   sub test_memcpy_byte : int () {
-
+    
+    # Copy
     {
-      my $target = (byte[])"abcde";
-      my $search = (byte[])"ABC";
-      memcpy_byte($target, 0, $search, 0, 3);
-      unless ((string)$target eq (string)"ABCde") {
+      my $dest = new byte[4];
+      my $source = [(byte)1, 3, 5];
+      memcpy_byte($dest, 0, $source, 0, 3);
+      unless (SPVM::ArrayUtil->equals_array_byte($dest, [(byte)1, 3, 5, 0])) {
         return 0;
       }
     }
 
+    # Copy with offset
     {
-      my $target = (byte[])"abcde";
-      my $search = (byte[])"ABC";
-      memcpy_byte($target, 2, $search, 0, 3);
-      unless ((string)$target eq (string)"abABC") {
+      my $dest = new byte[4];
+      my $source = [(byte)1, 3, 5];
+      memcpy_byte($dest, 1, $source, 0, 3);
+      unless (SPVM::ArrayUtil->equals_array_byte($dest, [(byte)0, 1, 3, 5])) {
         return 0;
       }
     }
 
+    # Copy with offset and length
     {
-      my $target = (byte[])"abcde";
-      my $search = (byte[])"ABC";
-      memcpy_byte($target, 2, $search, 0, 3);
-      unless ((string)$target eq (string)"abABC") {
+      my $dest = new byte[4];
+      my $source = [(byte)1, 3, 5, 9];
+      memcpy_byte($dest, 1, $source, 1, 2);
+      unless (SPVM::ArrayUtil->equals_array_byte($dest, [(byte)0, 3, 5, 0])) {
         return 0;
       }
     }
+
+    # Copy with 0 length
+    {
+      my $dest = new byte[4];
+      my $source = [(byte)1, 3, 5];
+      memcpy_byte($dest, 0, $source, 0, 0);
+      unless (SPVM::ArrayUtil->equals_array_byte($dest, [(byte)0, 0, 0, 0])) {
+        return 0;
+      }
+    }
+
+    # Exception - Destnation must be defined
+    {
+      my $source = [(byte)1, 3, 5];
+      eval { memcpy_byte(undef, 0, $source, 0, 3); };
+      unless ($@) {
+        return 0;
+      }
+    }
+
+    # Exception - Source must be defined
+    {
+      my $dest = new byte[4];
+      eval { memcpy_byte($dest, 0, undef, 0, 3); };
+      unless ($@) {
+        return 0;
+      }
+    }
+    
+    # Exception - Length must be more than or equals to 0
+    {
+      my $dest = new byte[4];
+      my $source = [(byte)1, 3, 5];
+      eval { memcpy_byte($dest, 0, $source, 0, -1); };
+      unless ($@) {
+        return 0;
+      }
+    }
+    
+    # Exception - Destnation offset + length must be within the range of the destnation array
+    {
+      my $dest = new byte[4];
+      my $source = [(byte)1, 3, 5];
+      eval { memcpy_byte($dest, 2, $source, 0, 3); };
+      unless ($@) {
+        return 0;
+      }
+    }
+
+    # Exception - Source offset + length must be within the range of the source array
+    {
+      my $dest = new byte[4];
+      my $source = [(byte)1, 3, 5];
+      eval { memcpy_byte($dest, 0, $source, 1, 3); };
+      unless ($@) {
+        return 0;
+      }
+    }
+    
+    $@ = undef;
+
+    return 1;
+  }
+
+
+  sub test_memcpy_short : int () {
+    
+    # Copy
+    {
+      my $dest = new short[4];
+      my $source = [(short)1, 3, 5];
+      memcpy_short($dest, 0, $source, 0, 3);
+      unless (SPVM::ArrayUtil->equals_array_short($dest, [(short)1, 3, 5, 0])) {
+        return 0;
+      }
+    }
+
+    # Copy with offset
+    {
+      my $dest = new short[4];
+      my $source = [(short)1, 3, 5];
+      memcpy_short($dest, 1, $source, 0, 3);
+      unless (SPVM::ArrayUtil->equals_array_short($dest, [(short)0, 1, 3, 5])) {
+        return 0;
+      }
+    }
+
+    # Copy with offset and length
+    {
+      my $dest = new short[4];
+      my $source = [(short)1, 3, 5, 9];
+      memcpy_short($dest, 1, $source, 1, 2);
+      unless (SPVM::ArrayUtil->equals_array_short($dest, [(short)0, 3, 5, 0])) {
+        return 0;
+      }
+    }
+
+    # Copy with 0 length
+    {
+      my $dest = new short[4];
+      my $source = [(short)1, 3, 5];
+      memcpy_short($dest, 0, $source, 0, 0);
+      unless (SPVM::ArrayUtil->equals_array_short($dest, [(short)0, 0, 0, 0])) {
+        return 0;
+      }
+    }
+
+    # Exception - Destnation must be defined
+    {
+      my $source = [(short)1, 3, 5];
+      eval { memcpy_short(undef, 0, $source, 0, 3); };
+      unless ($@) {
+        return 0;
+      }
+    }
+
+    # Exception - Source must be defined
+    {
+      my $dest = new short[4];
+      eval { memcpy_short($dest, 0, undef, 0, 3); };
+      unless ($@) {
+        return 0;
+      }
+    }
+    
+    # Exception - Length must be more than or equals to 0
+    {
+      my $dest = new short[4];
+      my $source = [(short)1, 3, 5];
+      eval { memcpy_short($dest, 0, $source, 0, -1); };
+      unless ($@) {
+        return 0;
+      }
+    }
+    
+    # Exception - Destnation offset + length must be within the range of the destnation array
+    {
+      my $dest = new short[4];
+      my $source = [(short)1, 3, 5];
+      eval { memcpy_short($dest, 2, $source, 0, 3); };
+      unless ($@) {
+        return 0;
+      }
+    }
+
+    # Exception - Source offset + length must be within the range of the source array
+    {
+      my $dest = new short[4];
+      my $source = [(short)1, 3, 5];
+      eval { memcpy_short($dest, 0, $source, 1, 3); };
+      unless ($@) {
+        return 0;
+      }
+    }
+    
+    $@ = undef;
+
+    return 1;
+  }
+
+  sub test_memcpy_int : int () {
+    
+    # Copy
+    {
+      my $dest = new int[4];
+      my $source = [(int)1, 3, 5];
+      memcpy_int($dest, 0, $source, 0, 3);
+      unless (SPVM::ArrayUtil->equals_array_int($dest, [(int)1, 3, 5, 0])) {
+        return 0;
+      }
+    }
+
+    # Copy with offset
+    {
+      my $dest = new int[4];
+      my $source = [(int)1, 3, 5];
+      memcpy_int($dest, 1, $source, 0, 3);
+      unless (SPVM::ArrayUtil->equals_array_int($dest, [(int)0, 1, 3, 5])) {
+        return 0;
+      }
+    }
+
+    # Copy with offset and length
+    {
+      my $dest = new int[4];
+      my $source = [(int)1, 3, 5, 9];
+      memcpy_int($dest, 1, $source, 1, 2);
+      unless (SPVM::ArrayUtil->equals_array_int($dest, [(int)0, 3, 5, 0])) {
+        return 0;
+      }
+    }
+
+    # Copy with 0 length
+    {
+      my $dest = new int[4];
+      my $source = [(int)1, 3, 5];
+      memcpy_int($dest, 0, $source, 0, 0);
+      unless (SPVM::ArrayUtil->equals_array_int($dest, [(int)0, 0, 0, 0])) {
+        return 0;
+      }
+    }
+
+    # Exception - Destnation must be defined
+    {
+      my $source = [(int)1, 3, 5];
+      eval { memcpy_int(undef, 0, $source, 0, 3); };
+      unless ($@) {
+        return 0;
+      }
+    }
+
+    # Exception - Source must be defined
+    {
+      my $dest = new int[4];
+      eval { memcpy_int($dest, 0, undef, 0, 3); };
+      unless ($@) {
+        return 0;
+      }
+    }
+    
+    # Exception - Length must be more than or equals to 0
+    {
+      my $dest = new int[4];
+      my $source = [(int)1, 3, 5];
+      eval { memcpy_int($dest, 0, $source, 0, -1); };
+      unless ($@) {
+        return 0;
+      }
+    }
+    
+    # Exception - Destnation offset + length must be within the range of the destnation array
+    {
+      my $dest = new int[4];
+      my $source = [(int)1, 3, 5];
+      eval { memcpy_int($dest, 2, $source, 0, 3); };
+      unless ($@) {
+        return 0;
+      }
+    }
+
+    # Exception - Source offset + length must be within the range of the source array
+    {
+      my $dest = new int[4];
+      my $source = [(int)1, 3, 5];
+      eval { memcpy_int($dest, 0, $source, 1, 3); };
+      unless ($@) {
+        return 0;
+      }
+    }
+    
+    $@ = undef;
+
+    return 1;
+  }
+
+  sub test_memcpy_long : int () {
+    
+    # Copy
+    {
+      my $dest = new long[4];
+      my $source = [(long)1, 3, 5];
+      memcpy_long($dest, 0, $source, 0, 3);
+      unless (SPVM::ArrayUtil->equals_array_long($dest, [(long)1, 3, 5, 0])) {
+        return 0;
+      }
+    }
+
+    # Copy with offset
+    {
+      my $dest = new long[4];
+      my $source = [(long)1, 3, 5];
+      memcpy_long($dest, 1, $source, 0, 3);
+      unless (SPVM::ArrayUtil->equals_array_long($dest, [(long)0, 1, 3, 5])) {
+        return 0;
+      }
+    }
+
+    # Copy with offset and length
+    {
+      my $dest = new long[4];
+      my $source = [(long)1, 3, 5, 9];
+      memcpy_long($dest, 1, $source, 1, 2);
+      unless (SPVM::ArrayUtil->equals_array_long($dest, [(long)0, 3, 5, 0])) {
+        return 0;
+      }
+    }
+
+    # Copy with 0 length
+    {
+      my $dest = new long[4];
+      my $source = [(long)1, 3, 5];
+      memcpy_long($dest, 0, $source, 0, 0);
+      unless (SPVM::ArrayUtil->equals_array_long($dest, [(long)0, 0, 0, 0])) {
+        return 0;
+      }
+    }
+
+    # Exception - Destnation must be defined
+    {
+      my $source = [(long)1, 3, 5];
+      eval { memcpy_long(undef, 0, $source, 0, 3); };
+      unless ($@) {
+        return 0;
+      }
+    }
+
+    # Exception - Source must be defined
+    {
+      my $dest = new long[4];
+      eval { memcpy_long($dest, 0, undef, 0, 3); };
+      unless ($@) {
+        return 0;
+      }
+    }
+    
+    # Exception - Length must be more than or equals to 0
+    {
+      my $dest = new long[4];
+      my $source = [(long)1, 3, 5];
+      eval { memcpy_long($dest, 0, $source, 0, -1); };
+      unless ($@) {
+        return 0;
+      }
+    }
+    
+    # Exception - Destnation offset + length must be within the range of the destnation array
+    {
+      my $dest = new long[4];
+      my $source = [(long)1, 3, 5];
+      eval { memcpy_long($dest, 2, $source, 0, 3); };
+      unless ($@) {
+        return 0;
+      }
+    }
+
+    # Exception - Source offset + length must be within the range of the source array
+    {
+      my $dest = new long[4];
+      my $source = [(long)1, 3, 5];
+      eval { memcpy_long($dest, 0, $source, 1, 3); };
+      unless ($@) {
+        return 0;
+      }
+    }
+    
+    $@ = undef;
+
+    return 1;
+  }
+
+  sub test_memcpy_float : int () {
+    
+    # Copy
+    {
+      my $dest = new float[4];
+      my $source = [(float)1, 3, 5];
+      memcpy_float($dest, 0, $source, 0, 3);
+      unless (SPVM::ArrayUtil->equals_array_float($dest, [(float)1, 3, 5, 0])) {
+        return 0;
+      }
+    }
+
+    # Copy with offset
+    {
+      my $dest = new float[4];
+      my $source = [(float)1, 3, 5];
+      memcpy_float($dest, 1, $source, 0, 3);
+      unless (SPVM::ArrayUtil->equals_array_float($dest, [(float)0, 1, 3, 5])) {
+        return 0;
+      }
+    }
+
+    # Copy with offset and length
+    {
+      my $dest = new float[4];
+      my $source = [(float)1, 3, 5, 9];
+      memcpy_float($dest, 1, $source, 1, 2);
+      unless (SPVM::ArrayUtil->equals_array_float($dest, [(float)0, 3, 5, 0])) {
+        return 0;
+      }
+    }
+
+    # Copy with 0 length
+    {
+      my $dest = new float[4];
+      my $source = [(float)1, 3, 5];
+      memcpy_float($dest, 0, $source, 0, 0);
+      unless (SPVM::ArrayUtil->equals_array_float($dest, [(float)0, 0, 0, 0])) {
+        return 0;
+      }
+    }
+
+    # Exception - Destnation must be defined
+    {
+      my $source = [(float)1, 3, 5];
+      eval { memcpy_float(undef, 0, $source, 0, 3); };
+      unless ($@) {
+        return 0;
+      }
+    }
+
+    # Exception - Source must be defined
+    {
+      my $dest = new float[4];
+      eval { memcpy_float($dest, 0, undef, 0, 3); };
+      unless ($@) {
+        return 0;
+      }
+    }
+    
+    # Exception - Length must be more than or equals to 0
+    {
+      my $dest = new float[4];
+      my $source = [(float)1, 3, 5];
+      eval { memcpy_float($dest, 0, $source, 0, -1); };
+      unless ($@) {
+        return 0;
+      }
+    }
+    
+    # Exception - Destnation offset + length must be within the range of the destnation array
+    {
+      my $dest = new float[4];
+      my $source = [(float)1, 3, 5];
+      eval { memcpy_float($dest, 2, $source, 0, 3); };
+      unless ($@) {
+        return 0;
+      }
+    }
+
+    # Exception - Source offset + length must be within the range of the source array
+    {
+      my $dest = new float[4];
+      my $source = [(float)1, 3, 5];
+      eval { memcpy_float($dest, 0, $source, 1, 3); };
+      unless ($@) {
+        return 0;
+      }
+    }
+    
+    $@ = undef;
+
+    return 1;
+  }
+
+  sub test_memcpy_double : int () {
+    
+    # Copy
+    {
+      my $dest = new double[4];
+      my $source = [(double)1, 3, 5];
+      memcpy_double($dest, 0, $source, 0, 3);
+      unless (SPVM::ArrayUtil->equals_array_double($dest, [(double)1, 3, 5, 0])) {
+        return 0;
+      }
+    }
+
+    # Copy with offset
+    {
+      my $dest = new double[4];
+      my $source = [(double)1, 3, 5];
+      memcpy_double($dest, 1, $source, 0, 3);
+      unless (SPVM::ArrayUtil->equals_array_double($dest, [(double)0, 1, 3, 5])) {
+        return 0;
+      }
+    }
+
+    # Copy with offset and length
+    {
+      my $dest = new double[4];
+      my $source = [(double)1, 3, 5, 9];
+      memcpy_double($dest, 1, $source, 1, 2);
+      unless (SPVM::ArrayUtil->equals_array_double($dest, [(double)0, 3, 5, 0])) {
+        return 0;
+      }
+    }
+
+    # Copy with 0 length
+    {
+      my $dest = new double[4];
+      my $source = [(double)1, 3, 5];
+      memcpy_double($dest, 0, $source, 0, 0);
+      unless (SPVM::ArrayUtil->equals_array_double($dest, [(double)0, 0, 0, 0])) {
+        return 0;
+      }
+    }
+
+    # Exception - Destnation must be defined
+    {
+      my $source = [(double)1, 3, 5];
+      eval { memcpy_double(undef, 0, $source, 0, 3); };
+      unless ($@) {
+        return 0;
+      }
+    }
+
+    # Exception - Source must be defined
+    {
+      my $dest = new double[4];
+      eval { memcpy_double($dest, 0, undef, 0, 3); };
+      unless ($@) {
+        return 0;
+      }
+    }
+    
+    # Exception - Length must be more than or equals to 0
+    {
+      my $dest = new double[4];
+      my $source = [(double)1, 3, 5];
+      eval { memcpy_double($dest, 0, $source, 0, -1); };
+      unless ($@) {
+        return 0;
+      }
+    }
+    
+    # Exception - Destnation offset + length must be within the range of the destnation array
+    {
+      my $dest = new double[4];
+      my $source = [(double)1, 3, 5];
+      eval { memcpy_double($dest, 2, $source, 0, 3); };
+      unless ($@) {
+        return 0;
+      }
+    }
+
+    # Exception - Source offset + length must be within the range of the source array
+    {
+      my $dest = new double[4];
+      my $source = [(double)1, 3, 5];
+      eval { memcpy_double($dest, 0, $source, 1, 3); };
+      unless ($@) {
+        return 0;
+      }
+    }
+    
+    $@ = undef;
 
     return 1;
   }
 
   sub test_memmove_byte : int () {
-
+    
+    # Copy
     {
-      my $target = (byte[])"abcde";
-      my $search = (byte[])"ABC";
-      memmove_byte($target, 0, $search, 0, 3);
-      unless ((string)$target eq (string)"ABCde") {
+      my $dest = new byte[4];
+      my $source = [(byte)1, 3, 5];
+      memmove_byte($dest, 0, $source, 0, 3);
+      unless (SPVM::ArrayUtil->equals_array_byte($dest, [(byte)1, 3, 5, 0])) {
         return 0;
       }
     }
 
+    # Copy with offset
     {
-      my $target = (byte[])"abcde";
-      my $search = (byte[])"ABC";
-      memmove_byte($target, 2, $search, 0, 3);
-      unless ((string)$target eq (string)"abABC") {
+      my $dest = new byte[4];
+      my $source = [(byte)1, 3, 5];
+      memmove_byte($dest, 1, $source, 0, 3);
+      unless (SPVM::ArrayUtil->equals_array_byte($dest, [(byte)0, 1, 3, 5])) {
         return 0;
       }
     }
 
+    # Copy with offset and length
     {
-      my $target = (byte[])"abcde";
-      my $search = (byte[])"ABC";
-      memmove_byte($target, 2, $search, 0, 3);
-      unless ((string)$target eq (string)"abABC") {
+      my $dest = new byte[4];
+      my $source = [(byte)1, 3, 5, 9];
+      memmove_byte($dest, 1, $source, 1, 2);
+      unless (SPVM::ArrayUtil->equals_array_byte($dest, [(byte)0, 3, 5, 0])) {
         return 0;
       }
     }
 
+    # Copy with 0 length
     {
-      my $target = (byte[])"abcde";
-      memmove_byte($target, 0, $target, 2, 2);
-      unless ((string)$target eq (string)"cdcde") {
+      my $dest = new byte[4];
+      my $source = [(byte)1, 3, 5];
+      memmove_byte($dest, 0, $source, 0, 0);
+      unless (SPVM::ArrayUtil->equals_array_byte($dest, [(byte)0, 0, 0, 0])) {
         return 0;
       }
     }
+    
+    # Copy overwrap
+    {
+      my $dest = [(byte)1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+      memmove_byte($dest, 0, $dest, 1, 9);
+      unless (SPVM::ArrayUtil->equals_array_byte($dest, [(byte)2, 3, 4, 5, 6, 7, 8, 9, 10, 10])) {
+        return 0;
+      }
+    }
+
+    # Exception - Destnation must be defined
+    {
+      my $source = [(byte)1, 3, 5];
+      eval { memmove_byte(undef, 0, $source, 0, 3); };
+      unless ($@) {
+        return 0;
+      }
+    }
+
+    # Exception - Source must be defined
+    {
+      my $dest = new byte[4];
+      eval { memmove_byte($dest, 0, undef, 0, 3); };
+      unless ($@) {
+        return 0;
+      }
+    }
+    
+    # Exception - Length must be more than or equals to 0
+    {
+      my $dest = new byte[4];
+      my $source = [(byte)1, 3, 5];
+      eval { memmove_byte($dest, 0, $source, 0, -1); };
+      unless ($@) {
+        return 0;
+      }
+    }
+    
+    # Exception - Destnation offset + length must be within the range of the destnation array
+    {
+      my $dest = new byte[4];
+      my $source = [(byte)1, 3, 5];
+      eval { memmove_byte($dest, 2, $source, 0, 3); };
+      unless ($@) {
+        return 0;
+      }
+    }
+
+    # Exception - Source offset + length must be within the range of the source array
+    {
+      my $dest = new byte[4];
+      my $source = [(byte)1, 3, 5];
+      eval { memmove_byte($dest, 0, $source, 1, 3); };
+      unless ($@) {
+        return 0;
+      }
+    }
+    
+    $@ = undef;
+
+    return 1;
+  }
+
+  sub test_memmove_short : int () {
+    
+    # Copy
+    {
+      my $dest = new short[4];
+      my $source = [(short)1, 3, 5];
+      memmove_short($dest, 0, $source, 0, 3);
+      unless (SPVM::ArrayUtil->equals_array_short($dest, [(short)1, 3, 5, 0])) {
+        return 0;
+      }
+    }
+
+    # Copy with offset
+    {
+      my $dest = new short[4];
+      my $source = [(short)1, 3, 5];
+      memmove_short($dest, 1, $source, 0, 3);
+      unless (SPVM::ArrayUtil->equals_array_short($dest, [(short)0, 1, 3, 5])) {
+        return 0;
+      }
+    }
+
+    # Copy with offset and length
+    {
+      my $dest = new short[4];
+      my $source = [(short)1, 3, 5, 9];
+      memmove_short($dest, 1, $source, 1, 2);
+      unless (SPVM::ArrayUtil->equals_array_short($dest, [(short)0, 3, 5, 0])) {
+        return 0;
+      }
+    }
+
+    # Copy with 0 length
+    {
+      my $dest = new short[4];
+      my $source = [(short)1, 3, 5];
+      memmove_short($dest, 0, $source, 0, 0);
+      unless (SPVM::ArrayUtil->equals_array_short($dest, [(short)0, 0, 0, 0])) {
+        return 0;
+      }
+    }
+    
+    # Copy overwrap
+    {
+      my $dest = [(short)1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+      memmove_short($dest, 0, $dest, 1, 9);
+      unless (SPVM::ArrayUtil->equals_array_short($dest, [(short)2, 3, 4, 5, 6, 7, 8, 9, 10, 10])) {
+        return 0;
+      }
+    }
+
+    # Exception - Destnation must be defined
+    {
+      my $source = [(short)1, 3, 5];
+      eval { memmove_short(undef, 0, $source, 0, 3); };
+      unless ($@) {
+        return 0;
+      }
+    }
+
+    # Exception - Source must be defined
+    {
+      my $dest = new short[4];
+      eval { memmove_short($dest, 0, undef, 0, 3); };
+      unless ($@) {
+        return 0;
+      }
+    }
+    
+    # Exception - Length must be more than or equals to 0
+    {
+      my $dest = new short[4];
+      my $source = [(short)1, 3, 5];
+      eval { memmove_short($dest, 0, $source, 0, -1); };
+      unless ($@) {
+        return 0;
+      }
+    }
+    
+    # Exception - Destnation offset + length must be within the range of the destnation array
+    {
+      my $dest = new short[4];
+      my $source = [(short)1, 3, 5];
+      eval { memmove_short($dest, 2, $source, 0, 3); };
+      unless ($@) {
+        return 0;
+      }
+    }
+
+    # Exception - Source offset + length must be within the range of the source array
+    {
+      my $dest = new short[4];
+      my $source = [(short)1, 3, 5];
+      eval { memmove_short($dest, 0, $source, 1, 3); };
+      unless ($@) {
+        return 0;
+      }
+    }
+    
+    $@ = undef;
+
+    return 1;
+  }
+
+  sub test_memmove_int : int () {
+    
+    # Copy
+    {
+      my $dest = new int[4];
+      my $source = [(int)1, 3, 5];
+      memmove_int($dest, 0, $source, 0, 3);
+      unless (SPVM::ArrayUtil->equals_array_int($dest, [(int)1, 3, 5, 0])) {
+        return 0;
+      }
+    }
+
+    # Copy with offset
+    {
+      my $dest = new int[4];
+      my $source = [(int)1, 3, 5];
+      memmove_int($dest, 1, $source, 0, 3);
+      unless (SPVM::ArrayUtil->equals_array_int($dest, [(int)0, 1, 3, 5])) {
+        return 0;
+      }
+    }
+
+    # Copy with offset and length
+    {
+      my $dest = new int[4];
+      my $source = [(int)1, 3, 5, 9];
+      memmove_int($dest, 1, $source, 1, 2);
+      unless (SPVM::ArrayUtil->equals_array_int($dest, [(int)0, 3, 5, 0])) {
+        return 0;
+      }
+    }
+
+    # Copy with 0 length
+    {
+      my $dest = new int[4];
+      my $source = [(int)1, 3, 5];
+      memmove_int($dest, 0, $source, 0, 0);
+      unless (SPVM::ArrayUtil->equals_array_int($dest, [(int)0, 0, 0, 0])) {
+        return 0;
+      }
+    }
+    
+    # Copy overwrap
+    {
+      my $dest = [(int)1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+      memmove_int($dest, 0, $dest, 1, 9);
+      unless (SPVM::ArrayUtil->equals_array_int($dest, [(int)2, 3, 4, 5, 6, 7, 8, 9, 10, 10])) {
+        return 0;
+      }
+    }
+
+    # Exception - Destnation must be defined
+    {
+      my $source = [(int)1, 3, 5];
+      eval { memmove_int(undef, 0, $source, 0, 3); };
+      unless ($@) {
+        return 0;
+      }
+    }
+
+    # Exception - Source must be defined
+    {
+      my $dest = new int[4];
+      eval { memmove_int($dest, 0, undef, 0, 3); };
+      unless ($@) {
+        return 0;
+      }
+    }
+    
+    # Exception - Length must be more than or equals to 0
+    {
+      my $dest = new int[4];
+      my $source = [(int)1, 3, 5];
+      eval { memmove_int($dest, 0, $source, 0, -1); };
+      unless ($@) {
+        return 0;
+      }
+    }
+    
+    # Exception - Destnation offset + length must be within the range of the destnation array
+    {
+      my $dest = new int[4];
+      my $source = [(int)1, 3, 5];
+      eval { memmove_int($dest, 2, $source, 0, 3); };
+      unless ($@) {
+        return 0;
+      }
+    }
+
+    # Exception - Source offset + length must be within the range of the source array
+    {
+      my $dest = new int[4];
+      my $source = [(int)1, 3, 5];
+      eval { memmove_int($dest, 0, $source, 1, 3); };
+      unless ($@) {
+        return 0;
+      }
+    }
+    
+    $@ = undef;
+
+    return 1;
+  }
+
+  sub test_memmove_long : int () {
+    
+    # Copy
+    {
+      my $dest = new long[4];
+      my $source = [(long)1, 3, 5];
+      memmove_long($dest, 0, $source, 0, 3);
+      unless (SPVM::ArrayUtil->equals_array_long($dest, [(long)1, 3, 5, 0])) {
+        return 0;
+      }
+    }
+
+    # Copy with offset
+    {
+      my $dest = new long[4];
+      my $source = [(long)1, 3, 5];
+      memmove_long($dest, 1, $source, 0, 3);
+      unless (SPVM::ArrayUtil->equals_array_long($dest, [(long)0, 1, 3, 5])) {
+        return 0;
+      }
+    }
+
+    # Copy with offset and length
+    {
+      my $dest = new long[4];
+      my $source = [(long)1, 3, 5, 9];
+      memmove_long($dest, 1, $source, 1, 2);
+      unless (SPVM::ArrayUtil->equals_array_long($dest, [(long)0, 3, 5, 0])) {
+        return 0;
+      }
+    }
+
+    # Copy with 0 length
+    {
+      my $dest = new long[4];
+      my $source = [(long)1, 3, 5];
+      memmove_long($dest, 0, $source, 0, 0);
+      unless (SPVM::ArrayUtil->equals_array_long($dest, [(long)0, 0, 0, 0])) {
+        return 0;
+      }
+    }
+    
+    # Copy overwrap
+    {
+      my $dest = [(long)1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+      memmove_long($dest, 0, $dest, 1, 9);
+      unless (SPVM::ArrayUtil->equals_array_long($dest, [(long)2, 3, 4, 5, 6, 7, 8, 9, 10, 10])) {
+        return 0;
+      }
+    }
+
+    # Exception - Destnation must be defined
+    {
+      my $source = [(long)1, 3, 5];
+      eval { memmove_long(undef, 0, $source, 0, 3); };
+      unless ($@) {
+        return 0;
+      }
+    }
+
+    # Exception - Source must be defined
+    {
+      my $dest = new long[4];
+      eval { memmove_long($dest, 0, undef, 0, 3); };
+      unless ($@) {
+        return 0;
+      }
+    }
+    
+    # Exception - Length must be more than or equals to 0
+    {
+      my $dest = new long[4];
+      my $source = [(long)1, 3, 5];
+      eval { memmove_long($dest, 0, $source, 0, -1); };
+      unless ($@) {
+        return 0;
+      }
+    }
+    
+    # Exception - Destnation offset + length must be within the range of the destnation array
+    {
+      my $dest = new long[4];
+      my $source = [(long)1, 3, 5];
+      eval { memmove_long($dest, 2, $source, 0, 3); };
+      unless ($@) {
+        return 0;
+      }
+    }
+
+    # Exception - Source offset + length must be within the range of the source array
+    {
+      my $dest = new long[4];
+      my $source = [(long)1, 3, 5];
+      eval { memmove_long($dest, 0, $source, 1, 3); };
+      unless ($@) {
+        return 0;
+      }
+    }
+    
+    $@ = undef;
+
+    return 1;
+  }
+
+  sub test_memmove_float : int () {
+    
+    # Copy
+    {
+      my $dest = new float[4];
+      my $source = [(float)1, 3, 5];
+      memmove_float($dest, 0, $source, 0, 3);
+      unless (SPVM::ArrayUtil->equals_array_float($dest, [(float)1, 3, 5, 0])) {
+        return 0;
+      }
+    }
+
+    # Copy with offset
+    {
+      my $dest = new float[4];
+      my $source = [(float)1, 3, 5];
+      memmove_float($dest, 1, $source, 0, 3);
+      unless (SPVM::ArrayUtil->equals_array_float($dest, [(float)0, 1, 3, 5])) {
+        return 0;
+      }
+    }
+
+    # Copy with offset and length
+    {
+      my $dest = new float[4];
+      my $source = [(float)1, 3, 5, 9];
+      memmove_float($dest, 1, $source, 1, 2);
+      unless (SPVM::ArrayUtil->equals_array_float($dest, [(float)0, 3, 5, 0])) {
+        return 0;
+      }
+    }
+
+    # Copy with 0 length
+    {
+      my $dest = new float[4];
+      my $source = [(float)1, 3, 5];
+      memmove_float($dest, 0, $source, 0, 0);
+      unless (SPVM::ArrayUtil->equals_array_float($dest, [(float)0, 0, 0, 0])) {
+        return 0;
+      }
+    }
+    
+    # Copy overwrap
+    {
+      my $dest = [(float)1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+      memmove_float($dest, 0, $dest, 1, 9);
+      unless (SPVM::ArrayUtil->equals_array_float($dest, [(float)2, 3, 4, 5, 6, 7, 8, 9, 10, 10])) {
+        return 0;
+      }
+    }
+
+    # Exception - Destnation must be defined
+    {
+      my $source = [(float)1, 3, 5];
+      eval { memmove_float(undef, 0, $source, 0, 3); };
+      unless ($@) {
+        return 0;
+      }
+    }
+
+    # Exception - Source must be defined
+    {
+      my $dest = new float[4];
+      eval { memmove_float($dest, 0, undef, 0, 3); };
+      unless ($@) {
+        return 0;
+      }
+    }
+    
+    # Exception - Length must be more than or equals to 0
+    {
+      my $dest = new float[4];
+      my $source = [(float)1, 3, 5];
+      eval { memmove_float($dest, 0, $source, 0, -1); };
+      unless ($@) {
+        return 0;
+      }
+    }
+    
+    # Exception - Destnation offset + length must be within the range of the destnation array
+    {
+      my $dest = new float[4];
+      my $source = [(float)1, 3, 5];
+      eval { memmove_float($dest, 2, $source, 0, 3); };
+      unless ($@) {
+        return 0;
+      }
+    }
+
+    # Exception - Source offset + length must be within the range of the source array
+    {
+      my $dest = new float[4];
+      my $source = [(float)1, 3, 5];
+      eval { memmove_float($dest, 0, $source, 1, 3); };
+      unless ($@) {
+        return 0;
+      }
+    }
+    
+    $@ = undef;
+
+    return 1;
+  }
+
+  sub test_memmove_double : int () {
+    
+    # Copy
+    {
+      my $dest = new double[4];
+      my $source = [(double)1, 3, 5];
+      memmove_double($dest, 0, $source, 0, 3);
+      unless (SPVM::ArrayUtil->equals_array_double($dest, [(double)1, 3, 5, 0])) {
+        return 0;
+      }
+    }
+
+    # Copy with offset
+    {
+      my $dest = new double[4];
+      my $source = [(double)1, 3, 5];
+      memmove_double($dest, 1, $source, 0, 3);
+      unless (SPVM::ArrayUtil->equals_array_double($dest, [(double)0, 1, 3, 5])) {
+        return 0;
+      }
+    }
+
+    # Copy with offset and length
+    {
+      my $dest = new double[4];
+      my $source = [(double)1, 3, 5, 9];
+      memmove_double($dest, 1, $source, 1, 2);
+      unless (SPVM::ArrayUtil->equals_array_double($dest, [(double)0, 3, 5, 0])) {
+        return 0;
+      }
+    }
+
+    # Copy with 0 length
+    {
+      my $dest = new double[4];
+      my $source = [(double)1, 3, 5];
+      memmove_double($dest, 0, $source, 0, 0);
+      unless (SPVM::ArrayUtil->equals_array_double($dest, [(double)0, 0, 0, 0])) {
+        return 0;
+      }
+    }
+    
+    # Copy overwrap
+    {
+      my $dest = [(double)1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+      memmove_double($dest, 0, $dest, 1, 9);
+      unless (SPVM::ArrayUtil->equals_array_double($dest, [(double)2, 3, 4, 5, 6, 7, 8, 9, 10, 10])) {
+        return 0;
+      }
+    }
+
+    # Exception - Destnation must be defined
+    {
+      my $source = [(double)1, 3, 5];
+      eval { memmove_double(undef, 0, $source, 0, 3); };
+      unless ($@) {
+        return 0;
+      }
+    }
+
+    # Exception - Source must be defined
+    {
+      my $dest = new double[4];
+      eval { memmove_double($dest, 0, undef, 0, 3); };
+      unless ($@) {
+        return 0;
+      }
+    }
+    
+    # Exception - Length must be more than or equals to 0
+    {
+      my $dest = new double[4];
+      my $source = [(double)1, 3, 5];
+      eval { memmove_double($dest, 0, $source, 0, -1); };
+      unless ($@) {
+        return 0;
+      }
+    }
+    
+    # Exception - Destnation offset + length must be within the range of the destnation array
+    {
+      my $dest = new double[4];
+      my $source = [(double)1, 3, 5];
+      eval { memmove_double($dest, 2, $source, 0, 3); };
+      unless ($@) {
+        return 0;
+      }
+    }
+
+    # Exception - Source offset + length must be within the range of the source array
+    {
+      my $dest = new double[4];
+      my $source = [(double)1, 3, 5];
+      eval { memmove_double($dest, 0, $source, 1, 3); };
+      unless ($@) {
+        return 0;
+      }
+    }
+    
+    $@ = undef;
 
     return 1;
   }
@@ -785,10 +2250,10 @@ package TestCase::Lib::SPVM::ArrayUtil {
 
     return 1;
   }
-  sub test_slice_byte : int () {
+  sub test_copy_array_range_byte : int () {
     {
       my $nums = [(byte)5, -7, 9, SPVM::NumberUtil->INT8_MIN(), 127, 15, 19];
-      my $slice = slice_byte($nums, 0, 7);
+      my $slice = copy_array_range_byte($nums, 0, 7);
       unless (equals_array_byte($slice, [(byte)5, -7, 9, SPVM::NumberUtil->INT8_MIN(), 127, 15, 19])) {
         return 0;
       }
@@ -796,7 +2261,7 @@ package TestCase::Lib::SPVM::ArrayUtil {
 
     {
       my $nums = [(byte)5, -7, 9, SPVM::NumberUtil->INT8_MIN(), 127, 15, 19];
-      my $slice = slice_byte($nums, 1, 3);
+      my $slice = copy_array_range_byte($nums, 1, 3);
       unless (equals_array_byte($slice, [(byte)-7, 9, SPVM::NumberUtil->INT8_MIN()])) {
         return 0;
       }
@@ -804,17 +2269,17 @@ package TestCase::Lib::SPVM::ArrayUtil {
 
     return 1;
   }
-  sub test_slice_short : int () {
+  sub test_copy_array_range_short : int () {
     {
       my $nums = [(short)5, -7, 9, SPVM::NumberUtil->INT16_MIN(), 127, 15, 19];
-      my $slice = slice_short($nums, 0, 7);
+      my $slice = copy_array_range_short($nums, 0, 7);
       unless (equals_array_short($slice, [(short)5, -7, 9, SPVM::NumberUtil->INT16_MIN(), 127, 15, 19])) {
         return 0;
       }
     }
     {
       my $nums = [(short)5, -7, 9, SPVM::NumberUtil->INT16_MIN(), 127, 15, 19];
-      my $slice = slice_short($nums, 1, 3);
+      my $slice = copy_array_range_short($nums, 1, 3);
       unless (equals_array_short($slice, [(short)-7, 9, SPVM::NumberUtil->INT16_MIN()])) {
         return 0;
       }
@@ -822,34 +2287,34 @@ package TestCase::Lib::SPVM::ArrayUtil {
 
     return 1;
   }
-  sub test_slice_int : int () {
+  sub test_copy_array_range_int : int () {
     {
       my $nums = [(int)5, -7, 9, SPVM::NumberUtil->INT32_MIN(), 127, 15, 19];
-      my $slice = slice_int($nums, 0, 7);
+      my $slice = copy_array_range_int($nums, 0, 7);
       unless (equals_array_int($slice, [(int)5, -7, 9, SPVM::NumberUtil->INT32_MIN(), 127, 15, 19])) {
         return 0;
       }
     }
     {
       my $nums = [(int)5, -7, 9, SPVM::NumberUtil->INT32_MIN(), 127, 15, 19];
-      my $slice = slice_int($nums, 1, 3);
+      my $slice = copy_array_range_int($nums, 1, 3);
       unless (equals_array_int($slice, [(int)-7, 9, SPVM::NumberUtil->INT32_MIN()])) {
         return 0;
       }
     }
     return 1;
   }
-  sub test_slice_long : int () {
+  sub test_copy_array_range_long : int () {
     {
       my $nums = [(long)5, -7, 9, SPVM::NumberUtil->INT64_MIN(), 127, 15, 19];
-      my $slice = slice_long($nums, 0, 7);
+      my $slice = copy_array_range_long($nums, 0, 7);
       unless (equals_array_long($slice, [(long)5, -7, 9, SPVM::NumberUtil->INT64_MIN(), 127, 15, 19])) {
         return 0;
       }
     }
     {
       my $nums = [(long)5, -7, 9, SPVM::NumberUtil->INT64_MIN(), 127, 15, 19];
-      my $slice = slice_long($nums, 1, 3);
+      my $slice = copy_array_range_long($nums, 1, 3);
       unless (equals_array_long($slice, [(long)-7, 9, SPVM::NumberUtil->INT64_MIN()])) {
         return 0;
       }
@@ -857,17 +2322,17 @@ package TestCase::Lib::SPVM::ArrayUtil {
 
     return 1;
   }
-  sub test_slice_float : int () {
+  sub test_copy_array_range_float : int () {
     {
       my $nums = [(float)5, -7, 9, SPVM::NumberUtil->FLT_MIN(), 127, 15, 19];
-      my $slice = slice_float($nums, 0, 7);
+      my $slice = copy_array_range_float($nums, 0, 7);
       unless (equals_array_float($slice, [(float)5, -7, 9, SPVM::NumberUtil->FLT_MIN(), 127, 15, 19])) {
         return 0;
       }
     }
     {
       my $nums = [(float)5, -7, 9, SPVM::NumberUtil->FLT_MIN(), 127, 15, 19];
-      my $slice = slice_float($nums, 1, 3);
+      my $slice = copy_array_range_float($nums, 1, 3);
       unless (equals_array_float($slice, [(float)-7, 9, SPVM::NumberUtil->FLT_MIN()])) {
         return 0;
       }
@@ -877,17 +2342,17 @@ package TestCase::Lib::SPVM::ArrayUtil {
     return 1;
   }
   
-  sub test_slice_double : int () {
+  sub test_copy_array_range_double : int () {
     {
       my $nums = [(double)5, -7, 9, SPVM::NumberUtil->DBL_MIN(), 127, 15, 19];
-      my $slice = slice_double($nums, 0, 7);
+      my $slice = copy_array_range_double($nums, 0, 7);
       unless (equals_array_double($slice, [(double)5, -7, 9, SPVM::NumberUtil->DBL_MIN(), 127, 15, 19])) {
         return 0;
       }
     }
     {
       my $nums = [(double)5, -7, 9, SPVM::NumberUtil->DBL_MIN(), 127, 15, 19];
-      my $slice = slice_double($nums, 1, 3);
+      my $slice = copy_array_range_double($nums, 1, 3);
       unless (equals_array_double($slice, [(double)-7, 9, SPVM::NumberUtil->DBL_MIN()])) {
         return 0;
       }
@@ -895,17 +2360,17 @@ package TestCase::Lib::SPVM::ArrayUtil {
     return 1;
   }
 
-  sub test_slice_string : int () {
+  sub test_copy_array_range_string : int () {
     {
       my $strings = ["a", "b", "c", "d", "e", "f", "g"];
-      my $slice = SPVM::ArrayUtil->slice_string($strings, 0, 7);
+      my $slice = SPVM::ArrayUtil->copy_array_range_string($strings, 0, 7);
       unless (equals_array_string($slice, ["a", "b", "c", "d", "e", "f", "g"])) {
         return 0;
       }
     }
     {
       my $strings = ["a", "b", "c", "d", "e", "f", "g"];
-      my $slice = SPVM::ArrayUtil->slice_string($strings, 1, 3);
+      my $slice = SPVM::ArrayUtil->copy_array_range_string($strings, 1, 3);
       unless (equals_array_string($slice, ["b", "c", "d"])) {
         return 0;
       }
@@ -913,7 +2378,7 @@ package TestCase::Lib::SPVM::ArrayUtil {
     return 1;
   }
 
-  sub test_slice_object : int () {
+  sub test_copy_array_range_object : int () {
 
     {
       my $minimal1 = TestCase::Minimal->new;
@@ -922,7 +2387,7 @@ package TestCase::Lib::SPVM::ArrayUtil {
       my $minimal4 = TestCase::Minimal->new;
 
       my $elems = [$minimal1, $minimal2, $minimal3, $minimal4];
-      my $slice = (TestCase::Minimal[])slice_object($elems, 0, 4);
+      my $slice = (TestCase::Minimal[])copy_array_range_object($elems, 0, 4);
       unless (SPVM::ArrayUtil->equals_array_object($slice, [$minimal1, $minimal2, $minimal3, $minimal4], SPVM::EqualityChecker::SameObject->new)) {
         return 0;
       }
@@ -934,7 +2399,7 @@ package TestCase::Lib::SPVM::ArrayUtil {
       my $minimal4 = TestCase::Minimal->new;
 
       my $elems = [$minimal1, $minimal2, $minimal3, $minimal4];
-      my $slice = (TestCase::Minimal[])slice_object($elems, 1, 2);
+      my $slice = (TestCase::Minimal[])copy_array_range_object($elems, 1, 2);
       unless (SPVM::ArrayUtil->equals_array_object($slice, [$minimal2, $minimal3], SPVM::EqualityChecker::SameObject->new)) {
         return 0;
       }
@@ -942,199 +2407,1171 @@ package TestCase::Lib::SPVM::ArrayUtil {
     return 1;
   }
 
-  sub test_equals_array_byte : int () {
-    my $nums1 = [(byte)0, 1, SPVM::NumberUtil->INT8_MIN()];
-    my $nums2 = [(byte)0, 1, SPVM::NumberUtil->INT8_MIN()];
-    my $nums3 = [(byte)0, 1];
-    my $nums4 = [(byte)0, 1, 2];
+  sub sort_byte : int () {
+    # Sort array by asc order
     {
-      my $is_equals = equals_array_byte($nums1, $nums2);
-      unless ($is_equals) {
-        return 0;
-      }
-    }
-    {
-      my $is_equals = equals_array_byte($nums1, $nums3);
-      if ($is_equals) {
-        return 0;
-      }
-    }
-    {
-      my $is_equals = equals_array_byte($nums1, $nums4);
-      if ($is_equals) {
+      my $nums = [(byte)2, 3, 1];
+      
+      SPVM::ArrayUtil->sort_byte($nums, 0, scalar @$nums, sub : int ($self : self, $a : byte, $b : byte) {
+        return $a <=> $b;
+      });
+      
+      unless (SPVM::ArrayUtil->equals_array_byte($nums, [(byte)1, 2, 3])) {
         return 0;
       }
     }
 
+    # Sort array by asc order more long
+    {
+      my $nums = [(byte)5, 7, 9, 2, 4, 8, 1, 3, 6, 0];
+      
+      SPVM::ArrayUtil->sort_byte($nums, 0, scalar @$nums, sub : int ($self : self, $a : byte, $b : byte) {
+        return $a <=> $b;
+      });
+      
+      unless (SPVM::ArrayUtil->equals_array_byte($nums, [(byte)0, 1, 2, 3, 4, 5, 6, 7, 8, 9])) {
+        return 0;
+      }
+    }
+
+    # Sort array by asc order more long with same values
+    {
+      my $nums = [(byte)5, 7, 9, 2, 5, 4, 8, 1, 3, 6, 3, 0];
+      
+      SPVM::ArrayUtil->sort_byte($nums, 0, scalar @$nums, sub : int ($self : self, $a : byte, $b : byte) {
+        return $a <=> $b;
+      });
+      
+      unless (SPVM::ArrayUtil->equals_array_byte($nums, [(byte)0, 1, 2, 3, 3, 4, 5, 5, 6, 7, 8, 9])) {
+        return 0;
+      }
+    }
+
+    # Sort byte array by desc order
+    {
+      my $nums = [(byte)2, 3, 1];
+      
+      SPVM::ArrayUtil->sort_byte($nums, 0, scalar @$nums, sub : int ($self : self, $a : byte, $b : byte) {
+        return $b <=> $a;
+      });
+      
+      unless (SPVM::ArrayUtil->equals_array_byte($nums, [(byte)3, 2, 1])) {
+        return 0;
+      }
+    }
+
+    # If length is 0, There is nothing to do
+    {
+      my $nums = [(byte)2, 3, 1];
+      
+      SPVM::ArrayUtil->sort_byte($nums, 0, 0, sub : int ($self : self, $a : byte, $b : byte) {
+        return $a <=> $b;
+      });
+      
+      unless (SPVM::ArrayUtil->equals_array_byte($nums, [(byte)2, 3, 1])) {
+        return 0;
+      }
+    }
+    
+    # Sort partially
+    {
+      my $nums = [(byte)5, 2, 3, 1, -10];
+      
+      SPVM::ArrayUtil->sort_byte($nums, 1, 3, sub : int ($self : self, $a : byte, $b : byte) {
+        return $a <=> $b;
+      });
+      
+      unless (SPVM::ArrayUtil->equals_array_byte($nums, [(byte)5, 1, 2, 3, -10])) {
+        return 0;
+      }
+    }
+
+    # Exception - Array must be not undef
+    {
+      my $nums = [(byte)2, 3, 1];
+      
+      eval {
+        SPVM::ArrayUtil->sort_byte(undef, 0, scalar @$nums, sub : int ($self : self, $a : byte, $b : byte) {
+          return $a <=> $b;
+        });
+      };
+      unless ($@) {
+        return 0;
+      }
+    }
+    
+    # Exception - Offset must be more than or equals to 0
+    {
+      my $nums = [(byte)5, 2, 3, 1, -10];
+      
+      eval {
+        SPVM::ArrayUtil->sort_byte($nums, -1, 3, sub : int ($self : self, $a : byte, $b : byte) {
+          return $a <=> $b;
+        });
+      };
+      unless ($@) {
+        return 0;
+      }
+    }
+
+    # Exception - Length must be more than or equals to 0
+    {
+      my $nums = [(byte)5, 2, 3, 1, -10];
+      
+      eval {
+        SPVM::ArrayUtil->sort_byte($nums, 1, -1, sub : int ($self : self, $a : byte, $b : byte) {
+          return $a <=> $b;
+        });
+      };
+      unless ($@) {
+        return 0;
+      }
+    }
+
+    # Exception - Offset + Length must be in the array range
+    {
+      my $nums = [(byte)5, 2, 3, 1, -10];
+      
+      eval {
+        SPVM::ArrayUtil->sort_byte($nums, 3, 3, sub : int ($self : self, $a : byte, $b : byte) {
+          return $a <=> $b;
+        });
+      };
+      unless ($@) {
+        return 0;
+      }
+    }
+    
+    $@ = undef;
+    
     return 1;
   }
 
-  sub test_equals_array_short : int () {
-    my $nums1 = [(short)0, 1, SPVM::NumberUtil->INT16_MIN()];
-    my $nums2 = [(short)0, 1, SPVM::NumberUtil->INT16_MIN()];
-    my $nums3 = [(short)0, 1];
-    my $nums4 = [(short)0, 1, 2];
-
+  sub sort_short : int () {
+    # Sort array by asc order
     {
-      my $is_equals = equals_array_short($nums1, $nums2);
-
-      unless ($is_equals) {
-        return 0;
-      }
-    }
-    {
-      my $is_equals = equals_array_short($nums1, $nums3);
-
-      if ($is_equals) {
-        return 0;
-      }
-    }
-    {
-      my $is_equals = equals_array_short($nums1, $nums4);
-      if ($is_equals) {
+      my $nums = [(short)2, 3, 1];
+      
+      SPVM::ArrayUtil->sort_short($nums, 0, scalar @$nums, sub : int ($self : self, $a : short, $b : short) {
+        return $a <=> $b;
+      });
+      
+      unless (SPVM::ArrayUtil->equals_array_short($nums, [(short)1, 2, 3])) {
         return 0;
       }
     }
 
+    # Sort array by asc order more long
+    {
+      my $nums = [(short)5, 7, 9, 2, 4, 8, 1, 3, 6, 0];
+      
+      SPVM::ArrayUtil->sort_short($nums, 0, scalar @$nums, sub : int ($self : self, $a : short, $b : short) {
+        return $a <=> $b;
+      });
+      
+      unless (SPVM::ArrayUtil->equals_array_short($nums, [(short)0, 1, 2, 3, 4, 5, 6, 7, 8, 9])) {
+        return 0;
+      }
+    }
+
+    # Sort array by asc order more long with same values
+    {
+      my $nums = [(short)5, 7, 9, 2, 5, 4, 8, 1, 3, 6, 3, 0];
+      
+      SPVM::ArrayUtil->sort_short($nums, 0, scalar @$nums, sub : int ($self : self, $a : short, $b : short) {
+        return $a <=> $b;
+      });
+      
+      unless (SPVM::ArrayUtil->equals_array_short($nums, [(short)0, 1, 2, 3, 3, 4, 5, 5, 6, 7, 8, 9])) {
+        return 0;
+      }
+    }
+
+    # Sort short array by desc order
+    {
+      my $nums = [(short)2, 3, 1];
+      
+      SPVM::ArrayUtil->sort_short($nums, 0, scalar @$nums, sub : int ($self : self, $a : short, $b : short) {
+        return $b <=> $a;
+      });
+      
+      unless (SPVM::ArrayUtil->equals_array_short($nums, [(short)3, 2, 1])) {
+        return 0;
+      }
+    }
+
+    # If length is 0, There is nothing to do
+    {
+      my $nums = [(short)2, 3, 1];
+      
+      SPVM::ArrayUtil->sort_short($nums, 0, 0, sub : int ($self : self, $a : short, $b : short) {
+        return $a <=> $b;
+      });
+      
+      unless (SPVM::ArrayUtil->equals_array_short($nums, [(short)2, 3, 1])) {
+        return 0;
+      }
+    }
+    
+    # Sort partially
+    {
+      my $nums = [(short)5, 2, 3, 1, -10];
+      
+      SPVM::ArrayUtil->sort_short($nums, 1, 3, sub : int ($self : self, $a : short, $b : short) {
+        return $a <=> $b;
+      });
+      
+      unless (SPVM::ArrayUtil->equals_array_short($nums, [(short)5, 1, 2, 3, -10])) {
+        return 0;
+      }
+    }
+
+    # Exception - Array must be not undef
+    {
+      my $nums = [(short)2, 3, 1];
+      
+      eval {
+        SPVM::ArrayUtil->sort_short(undef, 0, scalar @$nums, sub : int ($self : self, $a : short, $b : short) {
+          return $a <=> $b;
+        });
+      };
+      unless ($@) {
+        return 0;
+      }
+    }
+    
+    # Exception - Offset must be more than or equals to 0
+    {
+      my $nums = [(short)5, 2, 3, 1, -10];
+      
+      eval {
+        SPVM::ArrayUtil->sort_short($nums, -1, 3, sub : int ($self : self, $a : short, $b : short) {
+          return $a <=> $b;
+        });
+      };
+      unless ($@) {
+        return 0;
+      }
+    }
+
+    # Exception - Length must be more than or equals to 0
+    {
+      my $nums = [(short)5, 2, 3, 1, -10];
+      
+      eval {
+        SPVM::ArrayUtil->sort_short($nums, 1, -1, sub : int ($self : self, $a : short, $b : short) {
+          return $a <=> $b;
+        });
+      };
+      unless ($@) {
+        return 0;
+      }
+    }
+
+    # Exception - Offset + Length must be in the array range
+    {
+      my $nums = [(short)5, 2, 3, 1, -10];
+      
+      eval {
+        SPVM::ArrayUtil->sort_short($nums, 3, 3, sub : int ($self : self, $a : short, $b : short) {
+          return $a <=> $b;
+        });
+      };
+      unless ($@) {
+        return 0;
+      }
+    }
+    
+    $@ = undef;
+    
     return 1;
   }
 
-  sub test_equals_array_int : int () {
-    my $nums1 = [(int)0, 1, SPVM::NumberUtil->INT32_MIN()];
-    my $nums2 = [(int)0, 1, SPVM::NumberUtil->INT32_MIN()];
-    my $nums3 = [(int)0, 1];
-    my $nums4 = [(int)0, 1, 2];
-
+  sub sort_int : int () {
+    # Sort array by asc order
     {
-      my $is_equals = equals_array_int($nums1, $nums2);
-      unless ($is_equals) {
-        return 0;
-      }
-    }
-    {
-      my $is_equals = equals_array_int($nums1, $nums3);
-      if ($is_equals) {
-        return 0;
-      }
-    }
-    {
-      my $is_equals = equals_array_int($nums1, $nums4);
-      if ($is_equals) {
+      my $nums = [(int)2, 3, 1];
+      
+      SPVM::ArrayUtil->sort_int($nums, 0, scalar @$nums, sub : int ($self : self, $a : int, $b : int) {
+        return $a <=> $b;
+      });
+      
+      unless (SPVM::ArrayUtil->equals_array_int($nums, [(int)1, 2, 3])) {
         return 0;
       }
     }
 
+    # Sort array by asc order more long
+    {
+      my $nums = [(int)5, 7, 9, 2, 4, 8, 1, 3, 6, 0];
+      
+      SPVM::ArrayUtil->sort_int($nums, 0, scalar @$nums, sub : int ($self : self, $a : int, $b : int) {
+        return $a <=> $b;
+      });
+      
+      unless (SPVM::ArrayUtil->equals_array_int($nums, [(int)0, 1, 2, 3, 4, 5, 6, 7, 8, 9])) {
+        return 0;
+      }
+    }
+
+    # Sort array by asc order more long with same values
+    {
+      my $nums = [(int)5, 7, 9, 2, 5, 4, 8, 1, 3, 6, 3, 0];
+      
+      SPVM::ArrayUtil->sort_int($nums, 0, scalar @$nums, sub : int ($self : self, $a : int, $b : int) {
+        return $a <=> $b;
+      });
+      
+      unless (SPVM::ArrayUtil->equals_array_int($nums, [(int)0, 1, 2, 3, 3, 4, 5, 5, 6, 7, 8, 9])) {
+        return 0;
+      }
+    }
+
+    # Sort int array by desc order
+    {
+      my $nums = [(int)2, 3, 1];
+      
+      SPVM::ArrayUtil->sort_int($nums, 0, scalar @$nums, sub : int ($self : self, $a : int, $b : int) {
+        return $b <=> $a;
+      });
+      
+      unless (SPVM::ArrayUtil->equals_array_int($nums, [(int)3, 2, 1])) {
+        return 0;
+      }
+    }
+
+    # If length is 0, There is nothing to do
+    {
+      my $nums = [(int)2, 3, 1];
+      
+      SPVM::ArrayUtil->sort_int($nums, 0, 0, sub : int ($self : self, $a : int, $b : int) {
+        return $a <=> $b;
+      });
+      
+      unless (SPVM::ArrayUtil->equals_array_int($nums, [(int)2, 3, 1])) {
+        return 0;
+      }
+    }
+    
+    # Sort partially
+    {
+      my $nums = [(int)5, 2, 3, 1, -10];
+      
+      SPVM::ArrayUtil->sort_int($nums, 1, 3, sub : int ($self : self, $a : int, $b : int) {
+        return $a <=> $b;
+      });
+      
+      unless (SPVM::ArrayUtil->equals_array_int($nums, [(int)5, 1, 2, 3, -10])) {
+        return 0;
+      }
+    }
+
+    # Exception - Array must be not undef
+    {
+      my $nums = [(int)2, 3, 1];
+      
+      eval {
+        SPVM::ArrayUtil->sort_int(undef, 0, scalar @$nums, sub : int ($self : self, $a : int, $b : int) {
+          return $a <=> $b;
+        });
+      };
+      unless ($@) {
+        return 0;
+      }
+    }
+    
+    # Exception - Offset must be more than or equals to 0
+    {
+      my $nums = [(int)5, 2, 3, 1, -10];
+      
+      eval {
+        SPVM::ArrayUtil->sort_int($nums, -1, 3, sub : int ($self : self, $a : int, $b : int) {
+          return $a <=> $b;
+        });
+      };
+      unless ($@) {
+        return 0;
+      }
+    }
+
+    # Exception - Length must be more than or equals to 0
+    {
+      my $nums = [(int)5, 2, 3, 1, -10];
+      
+      eval {
+        SPVM::ArrayUtil->sort_int($nums, 1, -1, sub : int ($self : self, $a : int, $b : int) {
+          return $a <=> $b;
+        });
+      };
+      unless ($@) {
+        return 0;
+      }
+    }
+
+    # Exception - Offset + Length must be in the array range
+    {
+      my $nums = [(int)5, 2, 3, 1, -10];
+      
+      eval {
+        SPVM::ArrayUtil->sort_int($nums, 3, 3, sub : int ($self : self, $a : int, $b : int) {
+          return $a <=> $b;
+        });
+      };
+      unless ($@) {
+        return 0;
+      }
+    }
+    
+    $@ = undef;
+    
     return 1;
   }
 
-  sub test_equals_array_long : int () {
-    my $nums1 = [(long)0, 1, SPVM::NumberUtil->INT64_MIN()];
-    my $nums2 = [(long)0, 1, SPVM::NumberUtil->INT64_MIN()];
-    my $nums3 = [(long)0, 1];
-    my $nums4 = [(long)0, 1, 2];
-
+  sub sort_long : int () {
+    # Sort array by asc order
     {
-      my $is_equals = equals_array_long($nums1, $nums2);
-      unless ($is_equals) {
-        return 0;
-      }
-    }
-    {
-      my $is_equals = equals_array_long($nums1, $nums3);
-      if ($is_equals) {
-        return 0;
-      }
-    }
-    {
-      my $is_equals = equals_array_long($nums1, $nums4);
-      if ($is_equals) {
+      my $nums = [(long)2, 3, 1];
+      
+      SPVM::ArrayUtil->sort_long($nums, 0, scalar @$nums, sub : int ($self : self, $a : long, $b : long) {
+        return $a <=> $b;
+      });
+      
+      unless (SPVM::ArrayUtil->equals_array_long($nums, [(long)1, 2, 3])) {
         return 0;
       }
     }
 
+    # Sort array by asc order more long
+    {
+      my $nums = [(long)5, 7, 9, 2, 4, 8, 1, 3, 6, 0];
+      
+      SPVM::ArrayUtil->sort_long($nums, 0, scalar @$nums, sub : int ($self : self, $a : long, $b : long) {
+        return $a <=> $b;
+      });
+      
+      unless (SPVM::ArrayUtil->equals_array_long($nums, [(long)0, 1, 2, 3, 4, 5, 6, 7, 8, 9])) {
+        return 0;
+      }
+    }
+
+    # Sort array by asc order more long with same values
+    {
+      my $nums = [(long)5, 7, 9, 2, 5, 4, 8, 1, 3, 6, 3, 0];
+      
+      SPVM::ArrayUtil->sort_long($nums, 0, scalar @$nums, sub : int ($self : self, $a : long, $b : long) {
+        return $a <=> $b;
+      });
+      
+      unless (SPVM::ArrayUtil->equals_array_long($nums, [(long)0, 1, 2, 3, 3, 4, 5, 5, 6, 7, 8, 9])) {
+        return 0;
+      }
+    }
+
+    # Sort long array by desc order
+    {
+      my $nums = [(long)2, 3, 1];
+      
+      SPVM::ArrayUtil->sort_long($nums, 0, scalar @$nums, sub : int ($self : self, $a : long, $b : long) {
+        return $b <=> $a;
+      });
+      
+      unless (SPVM::ArrayUtil->equals_array_long($nums, [(long)3, 2, 1])) {
+        return 0;
+      }
+    }
+
+    # If length is 0, There is nothing to do
+    {
+      my $nums = [(long)2, 3, 1];
+      
+      SPVM::ArrayUtil->sort_long($nums, 0, 0, sub : int ($self : self, $a : long, $b : long) {
+        return $a <=> $b;
+      });
+      
+      unless (SPVM::ArrayUtil->equals_array_long($nums, [(long)2, 3, 1])) {
+        return 0;
+      }
+    }
+    
+    # Sort partially
+    {
+      my $nums = [(long)5, 2, 3, 1, -10];
+      
+      SPVM::ArrayUtil->sort_long($nums, 1, 3, sub : int ($self : self, $a : long, $b : long) {
+        return $a <=> $b;
+      });
+      
+      unless (SPVM::ArrayUtil->equals_array_long($nums, [(long)5, 1, 2, 3, -10])) {
+        return 0;
+      }
+    }
+
+    # Exception - Array must be not undef
+    {
+      my $nums = [(long)2, 3, 1];
+      
+      eval {
+        SPVM::ArrayUtil->sort_long(undef, 0, scalar @$nums, sub : int ($self : self, $a : long, $b : long) {
+          return $a <=> $b;
+        });
+      };
+      unless ($@) {
+        return 0;
+      }
+    }
+    
+    # Exception - Offset must be more than or equals to 0
+    {
+      my $nums = [(long)5, 2, 3, 1, -10];
+      
+      eval {
+        SPVM::ArrayUtil->sort_long($nums, -1, 3, sub : int ($self : self, $a : long, $b : long) {
+          return $a <=> $b;
+        });
+      };
+      unless ($@) {
+        return 0;
+      }
+    }
+
+    # Exception - Length must be more than or equals to 0
+    {
+      my $nums = [(long)5, 2, 3, 1, -10];
+      
+      eval {
+        SPVM::ArrayUtil->sort_long($nums, 1, -1, sub : int ($self : self, $a : long, $b : long) {
+          return $a <=> $b;
+        });
+      };
+      unless ($@) {
+        return 0;
+      }
+    }
+
+    # Exception - Offset + Length must be in the array range
+    {
+      my $nums = [(long)5, 2, 3, 1, -10];
+      
+      eval {
+        SPVM::ArrayUtil->sort_long($nums, 3, 3, sub : int ($self : self, $a : long, $b : long) {
+          return $a <=> $b;
+        });
+      };
+      unless ($@) {
+        return 0;
+      }
+    }
+    
+    $@ = undef;
+    
     return 1;
   }
 
-  sub test_equals_array_float : int () {
-    my $nums1 = [0.0f, 1.5f, SPVM::NumberUtil->FLT_MIN()];
-    my $nums2 = [0.0f, 1.5f, SPVM::NumberUtil->FLT_MIN()];
-    my $nums3 = [0.0f, 1.5f];
-    my $nums4 = [(float)0.0f, 1.5f, 0.5f];
-
+  sub sort_float : int () {
+    # Sort array by asc order
     {
-      my $is_equals = equals_array_float($nums1, $nums2);
-      unless ($is_equals) {
-        return 0;
-      }
-    }
-    {
-      my $is_equals = equals_array_float($nums1, $nums3);
-      if ($is_equals) {
-        return 0;
-      }
-    }
-    {
-      my $is_equals = equals_array_float($nums1, $nums4);
-      if ($is_equals) {
+      my $nums = [(float)2, 3, 1];
+      
+      SPVM::ArrayUtil->sort_float($nums, 0, scalar @$nums, sub : int ($self : self, $a : float, $b : float) {
+        return $a <=> $b;
+      });
+      
+      unless (SPVM::ArrayUtil->equals_array_float($nums, [(float)1, 2, 3])) {
         return 0;
       }
     }
 
+    # Sort array by asc order more long
+    {
+      my $nums = [(float)5, 7, 9, 2, 4, 8, 1, 3, 6, 0];
+      
+      SPVM::ArrayUtil->sort_float($nums, 0, scalar @$nums, sub : int ($self : self, $a : float, $b : float) {
+        return $a <=> $b;
+      });
+      
+      unless (SPVM::ArrayUtil->equals_array_float($nums, [(float)0, 1, 2, 3, 4, 5, 6, 7, 8, 9])) {
+        return 0;
+      }
+    }
+
+    # Sort array by asc order more long with same values
+    {
+      my $nums = [(float)5, 7, 9, 2, 5, 4, 8, 1, 3, 6, 3, 0];
+      
+      SPVM::ArrayUtil->sort_float($nums, 0, scalar @$nums, sub : int ($self : self, $a : float, $b : float) {
+        return $a <=> $b;
+      });
+      
+      unless (SPVM::ArrayUtil->equals_array_float($nums, [(float)0, 1, 2, 3, 3, 4, 5, 5, 6, 7, 8, 9])) {
+        return 0;
+      }
+    }
+
+    # Sort float array by desc order
+    {
+      my $nums = [(float)2, 3, 1];
+      
+      SPVM::ArrayUtil->sort_float($nums, 0, scalar @$nums, sub : int ($self : self, $a : float, $b : float) {
+        return $b <=> $a;
+      });
+      
+      unless (SPVM::ArrayUtil->equals_array_float($nums, [(float)3, 2, 1])) {
+        return 0;
+      }
+    }
+
+    # If length is 0, There is nothing to do
+    {
+      my $nums = [(float)2, 3, 1];
+      
+      SPVM::ArrayUtil->sort_float($nums, 0, 0, sub : int ($self : self, $a : float, $b : float) {
+        return $a <=> $b;
+      });
+      
+      unless (SPVM::ArrayUtil->equals_array_float($nums, [(float)2, 3, 1])) {
+        return 0;
+      }
+    }
+    
+    # Sort partially
+    {
+      my $nums = [(float)5, 2, 3, 1, -10];
+      
+      SPVM::ArrayUtil->sort_float($nums, 1, 3, sub : int ($self : self, $a : float, $b : float) {
+        return $a <=> $b;
+      });
+      
+      unless (SPVM::ArrayUtil->equals_array_float($nums, [(float)5, 1, 2, 3, -10])) {
+        return 0;
+      }
+    }
+
+    # Exception - Array must be not undef
+    {
+      my $nums = [(float)2, 3, 1];
+      
+      eval {
+        SPVM::ArrayUtil->sort_float(undef, 0, scalar @$nums, sub : int ($self : self, $a : float, $b : float) {
+          return $a <=> $b;
+        });
+      };
+      unless ($@) {
+        return 0;
+      }
+    }
+    
+    # Exception - Offset must be more than or equals to 0
+    {
+      my $nums = [(float)5, 2, 3, 1, -10];
+      
+      eval {
+        SPVM::ArrayUtil->sort_float($nums, -1, 3, sub : int ($self : self, $a : float, $b : float) {
+          return $a <=> $b;
+        });
+      };
+      unless ($@) {
+        return 0;
+      }
+    }
+
+    # Exception - Length must be more than or equals to 0
+    {
+      my $nums = [(float)5, 2, 3, 1, -10];
+      
+      eval {
+        SPVM::ArrayUtil->sort_float($nums, 1, -1, sub : int ($self : self, $a : float, $b : float) {
+          return $a <=> $b;
+        });
+      };
+      unless ($@) {
+        return 0;
+      }
+    }
+
+    # Exception - Offset + Length must be in the array range
+    {
+      my $nums = [(float)5, 2, 3, 1, -10];
+      
+      eval {
+        SPVM::ArrayUtil->sort_float($nums, 3, 3, sub : int ($self : self, $a : float, $b : float) {
+          return $a <=> $b;
+        });
+      };
+      unless ($@) {
+        return 0;
+      }
+    }
+    
+    $@ = undef;
+    
     return 1;
   }
 
-  sub test_equals_array_double : int () {
-    my $nums1 = [0.0, 1.5, SPVM::NumberUtil->DBL_MIN()];
-    my $nums2 = [0.0, 1.5, SPVM::NumberUtil->DBL_MIN()];
-    my $nums3 = [0.0, 1.5];
-    my $nums4 = [(double)0.0, 1.5, 0.5];
-
+  sub sort_double : int () {
+    # Sort array by asc order
     {
-      my $is_equals = equals_array_double($nums1, $nums2);
-      unless ($is_equals) {
-        return 0;
-      }
-    }
-    {
-      my $is_equals = equals_array_double($nums1, $nums3);
-      if ($is_equals) {
-        return 0;
-      }
-    }
-    {
-      my $is_equals = equals_array_double($nums1, $nums4);
-      if ($is_equals) {
+      my $nums = [(double)2, 3, 1];
+      
+      SPVM::ArrayUtil->sort_double($nums, 0, scalar @$nums, sub : int ($self : self, $a : double, $b : double) {
+        return $a <=> $b;
+      });
+      
+      unless (SPVM::ArrayUtil->equals_array_double($nums, [(double)1, 2, 3])) {
         return 0;
       }
     }
 
+    # Sort array by asc order more long
+    {
+      my $nums = [(double)5, 7, 9, 2, 4, 8, 1, 3, 6, 0];
+      
+      SPVM::ArrayUtil->sort_double($nums, 0, scalar @$nums, sub : int ($self : self, $a : double, $b : double) {
+        return $a <=> $b;
+      });
+      
+      unless (SPVM::ArrayUtil->equals_array_double($nums, [(double)0, 1, 2, 3, 4, 5, 6, 7, 8, 9])) {
+        return 0;
+      }
+    }
+
+    # Sort array by asc order more long with same values
+    {
+      my $nums = [(double)5, 7, 9, 2, 5, 4, 8, 1, 3, 6, 3, 0];
+      
+      SPVM::ArrayUtil->sort_double($nums, 0, scalar @$nums, sub : int ($self : self, $a : double, $b : double) {
+        return $a <=> $b;
+      });
+      
+      unless (SPVM::ArrayUtil->equals_array_double($nums, [(double)0, 1, 2, 3, 3, 4, 5, 5, 6, 7, 8, 9])) {
+        return 0;
+      }
+    }
+
+    # Sort double array by desc order
+    {
+      my $nums = [(double)2, 3, 1];
+      
+      SPVM::ArrayUtil->sort_double($nums, 0, scalar @$nums, sub : int ($self : self, $a : double, $b : double) {
+        return $b <=> $a;
+      });
+      
+      unless (SPVM::ArrayUtil->equals_array_double($nums, [(double)3, 2, 1])) {
+        return 0;
+      }
+    }
+
+    # If length is 0, There is nothing to do
+    {
+      my $nums = [(double)2, 3, 1];
+      
+      SPVM::ArrayUtil->sort_double($nums, 0, 0, sub : int ($self : self, $a : double, $b : double) {
+        return $a <=> $b;
+      });
+      
+      unless (SPVM::ArrayUtil->equals_array_double($nums, [(double)2, 3, 1])) {
+        return 0;
+      }
+    }
+    
+    # Sort partially
+    {
+      my $nums = [(double)5, 2, 3, 1, -10];
+      
+      SPVM::ArrayUtil->sort_double($nums, 1, 3, sub : int ($self : self, $a : double, $b : double) {
+        return $a <=> $b;
+      });
+      
+      unless (SPVM::ArrayUtil->equals_array_double($nums, [(double)5, 1, 2, 3, -10])) {
+        return 0;
+      }
+    }
+
+    # Exception - Array must be not undef
+    {
+      my $nums = [(double)2, 3, 1];
+      
+      eval {
+        SPVM::ArrayUtil->sort_double(undef, 0, scalar @$nums, sub : int ($self : self, $a : double, $b : double) {
+          return $a <=> $b;
+        });
+      };
+      unless ($@) {
+        return 0;
+      }
+    }
+    
+    # Exception - Offset must be more than or equals to 0
+    {
+      my $nums = [(double)5, 2, 3, 1, -10];
+      
+      eval {
+        SPVM::ArrayUtil->sort_double($nums, -1, 3, sub : int ($self : self, $a : double, $b : double) {
+          return $a <=> $b;
+        });
+      };
+      unless ($@) {
+        return 0;
+      }
+    }
+
+    # Exception - Length must be more than or equals to 0
+    {
+      my $nums = [(double)5, 2, 3, 1, -10];
+      
+      eval {
+        SPVM::ArrayUtil->sort_double($nums, 1, -1, sub : int ($self : self, $a : double, $b : double) {
+          return $a <=> $b;
+        });
+      };
+      unless ($@) {
+        return 0;
+      }
+    }
+
+    # Exception - Offset + Length must be in the array range
+    {
+      my $nums = [(double)5, 2, 3, 1, -10];
+      
+      eval {
+        SPVM::ArrayUtil->sort_double($nums, 3, 3, sub : int ($self : self, $a : double, $b : double) {
+          return $a <=> $b;
+        });
+      };
+      unless ($@) {
+        return 0;
+      }
+    }
+    
+    $@ = undef;
+    
     return 1;
   }
 
-  sub test_equals_array_string : int () {
-    my $strings1 = ["abc", "def", "ghi"];
-    my $strings2 = ["abc", "def", "ghi"];
-    my $strings3 = ["abc", "def"];
-    my $strings4 = ["abc", "def", "xxx"];
-
+  sub sort_string : int () {
+    # Sort array by asc order
     {
-      my $is_equals = equals_array_string($strings1, $strings2);
+      my $strings = [(string)2, 3, 1];
+      
+      SPVM::ArrayUtil->sort_string($strings, 0, scalar @$strings, sub : int ($self : self, $a : string, $b : string) {
+        return $a cmp $b;
+      });
+      
+      unless (SPVM::ArrayUtil->equals_array_string($strings, [(string)1, 2, 3])) {
+        return 0;
+      }
+    }
+
+    # Sort array by asc order more long
+    {
+      my $strings = [(string)5, 7, 9, 2, 4, 8, 1, 3, 6, 0];
+      
+      SPVM::ArrayUtil->sort_string($strings, 0, scalar @$strings, sub : int ($self : self, $a : string, $b : string) {
+        return $a cmp $b;
+      });
+      
+      unless (SPVM::ArrayUtil->equals_array_string($strings, [(string)0, 1, 2, 3, 4, 5, 6, 7, 8, 9])) {
+        return 0;
+      }
+    }
+
+    # Sort array by asc order more long with same values
+    {
+      my $strings = [(string)5, 7, 9, 2, 5, 4, 8, 1, 3, 6, 3, 0];
+      
+      SPVM::ArrayUtil->sort_string($strings, 0, scalar @$strings, sub : int ($self : self, $a : string, $b : string) {
+        return $a cmp $b;
+      });
+      
+      unless (SPVM::ArrayUtil->equals_array_string($strings, [(string)0, 1, 2, 3, 3, 4, 5, 5, 6, 7, 8, 9])) {
+        return 0;
+      }
+    }
+
+    # Sort string array by desc order
+    {
+      my $strings = [(string)2, 3, 1];
+      
+      SPVM::ArrayUtil->sort_string($strings, 0, scalar @$strings, sub : int ($self : self, $a : string, $b : string) {
+        return $b cmp $a;
+      });
+      
+      unless (SPVM::ArrayUtil->equals_array_string($strings, [(string)3, 2, 1])) {
+        return 0;
+      }
+    }
+
+    # If length is 0, There is nothing to do
+    {
+      my $strings = [(string)2, 3, 1];
+      
+      SPVM::ArrayUtil->sort_string($strings, 0, 0, sub : int ($self : self, $a : string, $b : string) {
+        return $a cmp $b;
+      });
+      
+      unless (SPVM::ArrayUtil->equals_array_string($strings, [(string)2, 3, 1])) {
+        return 0;
+      }
+    }
+    
+    # Sort partially
+    {
+      my $strings = [(string)5, 2, 3, 1, -10];
+      
+      SPVM::ArrayUtil->sort_string($strings, 1, 3, sub : int ($self : self, $a : string, $b : string) {
+        return $a cmp $b;
+      });
+      
+      unless (SPVM::ArrayUtil->equals_array_string($strings, [(string)5, 1, 2, 3, -10])) {
+        return 0;
+      }
+    }
+
+    # Sort length is differnt and contain empty string and undef
+    {
+      my $strings = ["11", "1", "2", undef, ""];
+      
+      SPVM::ArrayUtil->sort_string($strings, 0, scalar @$strings, sub : int ($self : self, $a : string, $b : string) {
+        return $a cmp $b;
+      });
+      
+      unless (SPVM::ArrayUtil->equals_array_string($strings, [(string)undef, "", "1", "11", "2"])) {
+        return 0;
+      }
+    }
+
+    # Exception - Array must be not undef
+    {
+      my $strings = [(string)2, 3, 1];
+      
+      eval {
+        SPVM::ArrayUtil->sort_string(undef, 0, scalar @$strings, sub : int ($self : self, $a : string, $b : string) {
+          return $a cmp $b;
+        });
+      };
+      unless ($@) {
+        return 0;
+      }
+    }
+    
+    # Exception - Offset must be more than or equals to 0
+    {
+      my $strings = [(string)5, 2, 3, 1, -10];
+      
+      eval {
+        SPVM::ArrayUtil->sort_string($strings, -1, 3, sub : int ($self : self, $a : string, $b : string) {
+          return $a cmp $b;
+        });
+      };
+      unless ($@) {
+        return 0;
+      }
+    }
+
+    # Exception - Length must be more than or equals to 0
+    {
+      my $strings = [(string)5, 2, 3, 1, -10];
+      
+      eval {
+        SPVM::ArrayUtil->sort_string($strings, 1, -1, sub : int ($self : self, $a : string, $b : string) {
+          return $a cmp $b;
+        });
+      };
+      unless ($@) {
+        return 0;
+      }
+    }
+
+    # Exception - Offset + Length must be in the array range
+    {
+      my $strings = [(string)5, 2, 3, 1, -10];
+      
+      eval {
+        SPVM::ArrayUtil->sort_string($strings, 3, 3, sub : int ($self : self, $a : string, $b : string) {
+          return $a cmp $b;
+        });
+      };
+      unless ($@) {
+        return 0;
+      }
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+
+  sub new_minimal : TestCase::Minimal ($x : int, $y : int) {
+    my $minimal = TestCase::Minimal->new;
+    $minimal->set_x($x);
+    $minimal->set_y($y);
+    
+    return $minimal;
+  }
+  
+  sub sort_object : int () {
+    
+    # Sort array by asc order
+    {
+      my $objs = [new_minimal(2, 0), new_minimal(3, 0), new_minimal(1, 0)];
+      
+      SPVM::ArrayUtil->sort_object($objs, 0, scalar @$objs, sub : int ($self : self, $a : object, $b : object) {
+        return ((TestCase::Minimal)$a)->x <=> ((TestCase::Minimal)$b)->x;
+      });
+      
+      my $is_equals = SPVM::ArrayUtil->equals_array_object($objs, [new_minimal(1, 0), new_minimal(2, 0), new_minimal(3, 0)], sub : int ($self : self, $a : object, $b : object) {
+        return ((TestCase::Minimal)$a)->x == ((TestCase::Minimal)$b)->x;
+      });
+      
       unless ($is_equals) {
         return 0;
       }
     }
+
+    # Sort array by multiple conditions
     {
-      my $is_equals = equals_array_string($strings1, $strings3);
-      if ($is_equals) {
+      my $objs = [new_minimal(2, 1), new_minimal(2, 2), new_minimal(1, 3)];
+
+      SPVM::ArrayUtil->sort_object($objs, 0, scalar @$objs, sub : int ($self : self, $a : object, $b : object) {
+        my $a_x = ((TestCase::Minimal)$a)->x;
+        my $a_y = ((TestCase::Minimal)$a)->y;
+        my $b_x = ((TestCase::Minimal)$b)->x;
+        my $b_y = ((TestCase::Minimal)$b)->y;
+        
+        my $cmp = ((TestCase::Minimal)$a)->x <=> ((TestCase::Minimal)$b)->x;
+        if ($cmp != 0) {
+          return $cmp;
+        }
+        else {
+          $cmp = ((TestCase::Minimal)$a)->y <=> ((TestCase::Minimal)$b)->y;
+        }
+        
+        return $cmp;
+      });
+
+      my $is_equals = SPVM::ArrayUtil->equals_array_object($objs, [new_minimal(1, 3), new_minimal(2, 1), new_minimal(2, 2)], sub : int ($self : self, $a : object, $b : object) {
+        if (((TestCase::Minimal)$a)->x == ((TestCase::Minimal)$b)->x && ((TestCase::Minimal)$a)->y == ((TestCase::Minimal)$b)->y) {
+          return 1;
+        }
+        else {
+          return 0;
+        }
+      });
+      
+      unless ($is_equals) {
         return 0;
       }
     }
+
+    # Sort array by desc order
     {
-      my $is_equals = equals_array_string($strings1, $strings4);
-      if ($is_equals) {
+      my $objs = [new_minimal(2, 0), new_minimal(3, 0), new_minimal(1, 0)];
+      
+      SPVM::ArrayUtil->sort_object($objs, 0, scalar @$objs, sub : int ($self : self, $a : object, $b : object) {
+        return ((TestCase::Minimal)$b)->x <=> ((TestCase::Minimal)$a)->x;
+      });
+      
+      my $is_equals = SPVM::ArrayUtil->equals_array_object($objs, [new_minimal(3, 0), new_minimal(2, 0), new_minimal(1, 0)], sub : int ($self : self, $a : object, $b : object) {
+        return ((TestCase::Minimal)$a)->x == ((TestCase::Minimal)$b)->x;
+      });
+      
+      unless ($is_equals) {
         return 0;
       }
     }
+
+    # If length is 0, There is nothing to do
+    {
+      my $objs = [new_minimal(2, 0), new_minimal(3, 0), new_minimal(1, 0)];
+      
+      SPVM::ArrayUtil->sort_object($objs, 0, 0, sub : int ($self : self, $a : object, $b : object) {
+        return ((TestCase::Minimal)$a)->x <=> ((TestCase::Minimal)$b)->x;
+      });
+      
+      my $is_equals = SPVM::ArrayUtil->equals_array_object($objs, [new_minimal(2, 0), new_minimal(3, 0), new_minimal(1, 0)], sub : int ($self : self, $a : object, $b : object) {
+        return ((TestCase::Minimal)$a)->x == ((TestCase::Minimal)$b)->x;
+      });
+      unless ($is_equals) {
+        return 0;
+      }
+    }
+    
+    # Sort partially
+    {
+      my $objs = [new_minimal(5, 0), new_minimal(2, 0), new_minimal(3, 0), new_minimal(1, 0), new_minimal(-10, 0)];
+      
+      SPVM::ArrayUtil->sort_object($objs, 1, 3, sub : int ($self : self, $a : object, $b : object) {
+        return ((TestCase::Minimal)$a)->x <=> ((TestCase::Minimal)$b)->x;
+      });
+      
+      my $is_equals = SPVM::ArrayUtil->equals_array_object(
+        $objs,
+        [new_minimal(5, 0), new_minimal(1, 0), new_minimal(2, 0), new_minimal(3, 0), new_minimal(-10, 0)],
+        sub : int ($self : self, $a : object, $b : object) {
+          return ((TestCase::Minimal)$a)->x == ((TestCase::Minimal)$b)->x;
+        }
+      );
+      unless ($is_equals) {
+        return 0;
+      }
+    }
+
+    # Exception - Array must be not undef
+    {
+      my $objs = [new_minimal(2, 0), new_minimal(3, 0), new_minimal(1, 0)];
+      
+      eval {
+        SPVM::ArrayUtil->sort_object(undef, 0, scalar @$objs, sub : int ($self : self, $a : object, $b : object) {
+          return ((TestCase::Minimal)$a)->x <=> ((TestCase::Minimal)$b)->x;
+        });
+      };
+      unless ($@) {
+        return 0;
+      }
+    }
+    
+    # Exception - Offset must be more than or equals to 0
+    {
+      my $objs = [new_minimal(2, 0), new_minimal(3, 0), new_minimal(1, 0)];
+      
+      eval {
+        SPVM::ArrayUtil->sort_object($objs, -1, 3, sub : int ($self : self, $a : object, $b : object) {
+          return ((TestCase::Minimal)$a)->x <=> ((TestCase::Minimal)$b)->x;
+        });
+      };
+      unless ($@) {
+        return 0;
+      }
+    }
+
+    # Exception - Length must be more than or equals to 0
+    {
+      my $objs = [new_minimal(5, 0), new_minimal(2, 0), new_minimal(3, 0), new_minimal(1, 0), new_minimal(-10, 0)];
+      
+      eval {
+        SPVM::ArrayUtil->sort_object($objs, 1, -1, sub : int ($self : self, $a : object, $b : object) {
+          return ((TestCase::Minimal)$a)->x <=> ((TestCase::Minimal)$b)->x;
+        });
+      };
+      unless ($@) {
+        return 0;
+      }
+    }
+
+    # Exception - Offset + Length must be in the array range
+    {
+      my $objs = [new_minimal(5, 0), new_minimal(2, 0), new_minimal(3, 0), new_minimal(1, 0), new_minimal(-10, 0)];
+      
+      eval {
+        SPVM::ArrayUtil->sort_object($objs, 3, 3, sub : int ($self : self, $a : object, $b : object) {
+          return ((TestCase::Minimal)$a)->x <=> ((TestCase::Minimal)$b)->x;
+        });
+      };
+      unless ($@) {
+        return 0;
+      }
+    }
+    
+    $@ = undef;
 
     return 1;
   }

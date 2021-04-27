@@ -3,7 +3,7 @@ package Myriad::Service;
 use strict;
 use warnings;
 
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.003'; # VERSION
 our $AUTHORITY = 'cpan:DERIV'; # AUTHORITY
 
 use utf8;
@@ -95,6 +95,12 @@ use Myriad::Config;
 use Log::Any qw($log);
 use OpenTracing::Any qw($tracer);
 
+use Myriad::Exception::Builder category => 'service';
+
+declare_exception SecureDefaultValue => (
+    message => 'Secure configuration parameter may not have a default value'
+);
+
 our %SLOT;
 
 sub import ($called_on, @args) {
@@ -136,9 +142,8 @@ sub import ($called_on, @args) {
             my ($varname, %args) = @_;
             die 'config name is required' unless $varname;
 
-            if ($args{default} && $args{secure}) {
-                die "Are you serious $varname should be secure but it has a default value -_-";
-            }
+            Myriad::Exception::Service::SecureDefaultValue->throw
+                if defined($args{default}) and $args{secure};
 
             $Myriad::Config::SERVICES_CONFIG{$pkg}->{$varname} = \%args;
 

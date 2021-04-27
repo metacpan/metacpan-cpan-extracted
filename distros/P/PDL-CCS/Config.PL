@@ -45,13 +45,27 @@ if ($cconfig{USE_PDL_INDX}) {
 $cconfig{INDX_TYPEDEF} = "typedef $cconfig{INDX_CTYPE} CCS_Indx;  /**< typedef for CCS indices */\n";
 $cconfig{INDX_FUNCDEF} = "*ccs_indx = \\&PDL::$cconfig{INDX_FUNC}; ##-- typecasting for CCS indices\n";
 
+##-- figure out what integer types we have available
 require PDL::Types;
-$cconfig{INT_TYPE_KEYS} = [map {$_->{sym}}
-			   sort {$a->{numval} <=> $b->{numval}}
-			   grep {$_->{ppsym} =~ /^(?:[BSULQN]|LL|US)$/}
-			   values %PDL::Types::typehash
-			  ];
-$cconfig{INT_TYPE_CHRS} = [map {$_->{ppsym}} @PDL::Types::typehash{ @{$cconfig{INT_TYPE_KEYS}} }];
+if (version->parse($PDL::VERSION) >= version->parse("2.039")) {
+  ##-- integer types for b*over &c, PDL >= v2.039: elegant (and more correct)
+  local $, = ' ';
+  $cconfig{INT_TYPE_KEYS} = [map {$_->sym} grep {$_->integer} PDL::Types::types()];
+  $cconfig{INT_TYPE_CHRS} = [map {$_->ppsym} grep {$_->integer} PDL::Types::types()];
+  $cconfig{INT_TYPE_MAX_IONAME} = (grep {$_->integer} PDL::Types::types())[-1]->ioname;
+} else {
+  ##-- integer types for b*over &c, PDL < v2.039: functional (and mostly equivalent)
+  $cconfig{INT_TYPE_KEYS} = [map {$_->{sym}}
+			     sort {$a->{numval} <=> $b->{numval}}
+			     grep {$_->{ppsym} =~ /^(?:[BSULQN]|LL|US)$/}
+			     values %PDL::Types::typehash
+			    ];
+  $cconfig{INT_TYPE_CHRS} = [map {$_->{ppsym}} @PDL::Types::typehash{ @{$cconfig{INT_TYPE_KEYS}} }];
+
+  ##-- PDL < v2.039 downcasts to 'indx' if available (but probably should use 'longlong' if it could)
+  #$cconfig{INT_TYPE_MAX_IONAME} = $PDL::Types::typehash{$cconfig{INT_TYPE_KEYS}[-1]}{ioname}; ##-- -> longlong
+  $cconfig{INT_TYPE_MAX_IONAME} = 'ccs_indx';
+}
 
 ##-- save cache file
 open(CONFIGPM,">./CCS/Config.pm")

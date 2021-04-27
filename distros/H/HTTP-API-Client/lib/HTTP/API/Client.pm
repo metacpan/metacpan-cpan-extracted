@@ -1,5 +1,5 @@
 package HTTP::API::Client;
-$HTTP::API::Client::VERSION = '1.03';
+$HTTP::API::Client::VERSION = '1.04';
 use Moo;
 
 =head1 NAME
@@ -72,7 +72,6 @@ use HTTP::Headers;
 use HTTP::Request;
 use JSON::XS;
 use LWP::UserAgent;
-use Net::Curl::Simple;
 use Try::Tiny;
 use URI;
 use URI::Escape qw( uri_escape uri_unescape );
@@ -199,9 +198,8 @@ sub _build_ua {
         $ua->agent( $self->browser_id );
         $ua->timeout( $self->timeout );
     }
-    elsif ( $engine eq "CURL" ) {
-        $ua = Net::Curl::Simple->new( timeout => $self->timeout );
-        $ua->ua->setopt( useragent => $self->browser_id );
+    else {
+        $ua = $self->$engine($ssl_verify);
     }
 
     return $ua;
@@ -554,6 +552,8 @@ sub new_request {
             $headers->{$key} = $self->$do(%o);
         }
 
+        next if $o{skip_headers}{$key} || !exists $headers->{$key} || !defined $headers->{$key};
+
         $request->header( $key => $headers->{$key} );
 
         if (my $do = $events->{after_header}{$key}) {
@@ -644,7 +644,10 @@ sub kvp2json {
     my %data = ();
 
     foreach my $key(@keys) {
-        next if $o{skip_key}{$key};
+        if ($events->{not_include}{$key}) {
+            next
+        }
+        next if $o{skip_key}{$key} || !exists $data->{$key} || !defined $data->{$key};
         $data{$key} = $self->kvp2json_each(%o, value => $data->{$key});
     }
 
@@ -713,7 +716,7 @@ sub kvp2str {
     my @parts;
 
     foreach my $key(@keys) {
-        next if $o{skip_key}{$key};
+        next if $o{skip_key}{$key} || !exists $data->{$key} || !defined $data->{$key};
         push @parts, $self->kvp2str_each(%o, key => $key, value => $data->{$key});
     }
 

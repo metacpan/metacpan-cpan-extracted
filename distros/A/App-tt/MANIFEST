@@ -9,6 +9,8 @@ MANIFEST			This list of files
 README.md
 script/tt
 t/00-basic.t
+t/bin/editor.pl
+t/edit.t
 t/methods.t
 t/tt.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)

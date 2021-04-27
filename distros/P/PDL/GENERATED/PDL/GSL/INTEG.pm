@@ -174,7 +174,7 @@ info not available
 =for bad
 
 qng_meat does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -221,7 +221,7 @@ info not available
 =for bad
 
 qag_meat does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -268,7 +268,7 @@ info not available
 =for bad
 
 qags_meat does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -315,7 +315,7 @@ info not available
 =for bad
 
 qagp_meat does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -362,7 +362,7 @@ info not available
 =for bad
 
 qagi_meat does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -409,7 +409,7 @@ info not available
 =for bad
 
 qagiu_meat does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -456,7 +456,7 @@ info not available
 =for bad
 
 qagil_meat does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -503,7 +503,7 @@ info not available
 =for bad
 
 qawc_meat does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -551,7 +551,7 @@ info not available
 =for bad
 
 qaws_meat does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -606,7 +606,7 @@ info not available
 =for bad
 
 qawo_meat does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -659,7 +659,7 @@ info not available
 =for bad
 
 qawf_meat does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -792,7 +792,7 @@ gslinteg_qags taking into account the location of singular points
 until an estimate of
 the integral of f over ($la,$lb) is achieved within the desired absolute and
 relative error limits, $epsabs and $epsrel.
-Singular points are supplied in the piddle $points, whose endpoints
+Singular points are supplied in the ndarray $points, whose endpoints
 determine the integration range.
 So, for example, if the function has singular points at x_1 and x_2 and the
 integral is desired from a to b (a < x_1 < x_2 < b), $points = pdl(a,x_1,x_2,b).

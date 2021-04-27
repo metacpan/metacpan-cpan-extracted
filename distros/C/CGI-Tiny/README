@@ -290,18 +290,40 @@ METHODS
     rendered after the error handler completes or dies, the default 500
     Internal Server Error response will be rendered.
 
+  set_request_body_buffer
+
+      $cgi = $cgi->set_request_body_buffer(128*1024);
+
+    Sets the buffer size for reading the request body (number of bytes to
+    read at once). Defaults to the value of the
+    CGI_TINY_REQUEST_BODY_BUFFER environment variable or 131072 (128 KiB).
+    A value of 0 will use the default value.
+
   set_request_body_limit
 
       $cgi = $cgi->set_request_body_limit(16*1024*1024);
 
-    Sets the limit in bytes for parsing a request body into memory. If not
-    set, defaults to the value of the CGI_TINY_REQUEST_BODY_LIMIT
-    environment variable or 16777216 (16 MiB). Since the request body is
-    not parsed until needed, methods that parse the whole request body into
-    memory like "body" will set the response status to 413 Payload Too
-    Large and throw an exception if the content length is over the limit. A
-    value of 0 will remove the limit (not recommended unless you have other
-    safeguards on memory usage).
+    Sets the limit in bytes for the request body. Defaults to the value of
+    the CGI_TINY_REQUEST_BODY_LIMIT environment variable or 16777216 (16
+    MiB). A value of 0 will remove the limit (not recommended unless you
+    have other safeguards on memory usage).
+
+    Since the request body is not parsed until needed, methods that parse
+    the request body like "body" or "upload" will set the response status
+    to 413 Payload Too Large and throw an exception if the content length
+    is over the limit. Files uploaded through a multipart/form-data request
+    body also count toward this limit, though they are streamed to
+    temporary files when parsed.
+
+  set_multipart_form_charset
+
+      $cgi = $cgi->set_multipart_form_charset('UTF-8');
+
+    Sets the default charset for decoding multipart/form-data forms,
+    defaults to UTF-8. Parameter and upload field names, upload filenames,
+    and text parameter values that don't specify a charset will be decoded
+    from this charset. Set to an empty string to disable this decoding,
+    effectively interpreting such values in ISO-8859-1.
 
   set_input_handle
 
@@ -395,29 +417,31 @@ METHODS
       my $pairs = $cgi->query_params;
 
     Retrieve URL query string parameters as an ordered array reference of
-    name/value pairs, represented as two-element array references.
+    name/value pairs, represented as two-element array references. Names
+    and values are decoded to Unicode characters.
 
   query_param_names
 
       my $arrayref = $cgi->query_param_names;
 
-    Retrieve URL query string parameter names as an unsorted array
-    reference.
+    Retrieve URL query string parameter names, decoded to Unicode
+    characters, as an unsorted array reference.
 
   query_param
 
       my $value = $cgi->query_param('foo');
 
-    Retrieve value of a named URL query string parameter. If the parameter
-    name was passed multiple times, returns the last value. Use
-    "query_param_array" to get multiple values of a parameter.
+    Retrieve value of a named URL query string parameter, decoded to
+    Unicode characters. If the parameter name was passed multiple times,
+    returns the last value. Use "query_param_array" to get multiple values
+    of a parameter.
 
   query_param_array
 
       my $arrayref = $cgi->query_param_array('foo');
 
-    Retrieve values of a named URL query string parameter as an ordered
-    array reference.
+    Retrieve values of a named URL query string parameter, decoded to
+    Unicode characters, as an ordered array reference.
 
   headers
 
@@ -471,51 +495,55 @@ METHODS
     sure the "set_request_body_limit" can fit well within the available
     memory.
 
+    Not available after calling "body_parts", "body_params", or "uploads"
+    (or related accessors) on a multipart/form-data request, since this
+    type of request body is not retained in memory after parsing.
+
   body_params
 
       my $pairs = $cgi->body_params;
 
-    Retrieve x-www-form-urlencoded body parameters as an ordered array
-    reference of name/value pairs, represented as two-element array
-    references.
+    Retrieve application/x-www-form-urlencoded or multipart/form-data body
+    parameters as an ordered array reference of name/value pairs,
+    represented as two-element array references. Names and values are
+    decoded to Unicode characters.
 
-    Note that this will read the whole request body into memory, so make
-    sure the "set_request_body_limit" can fit well within the available
-    memory.
+    Note that this will read the text form fields into memory, so make sure
+    the "set_request_body_limit" can fit well within the available memory.
 
   body_param_names
 
       my $arrayref = $cgi->body_param_names;
 
-    Retrieve x-www-form-urlencoded body parameter names as an unsorted
-    array reference.
+    Retrieve application/x-www-form-urlencoded or multipart/form-data body
+    parameter names, decoded to Unicode characters, as an unsorted array
+    reference.
 
-    Note that this will read the whole request body into memory, so make
-    sure the "set_request_body_limit" can fit well within the available
-    memory.
+    Note that this will read the text form fields into memory, so make sure
+    the "set_request_body_limit" can fit well within the available memory.
 
   body_param
 
       my $value = $cgi->body_param('foo');
 
-    Retrieve value of a named x-www-form-urlencoded body parameter. If the
-    parameter name was passed multiple times, returns the last value. Use
-    "body_param_array" to get multiple values of a parameter.
+    Retrieve value of a named application/x-www-form-urlencoded or
+    multipart/form-data body parameter, decoded to Unicode characters. If
+    the parameter name was passed multiple times, returns the last value.
+    Use "body_param_array" to get multiple values of a parameter.
 
-    Note that this will read the whole request body into memory, so make
-    sure the "set_request_body_limit" can fit well within the available
-    memory.
+    Note that this will read the text form fields into memory, so make sure
+    the "set_request_body_limit" can fit well within the available memory.
 
   body_param_array
 
       my $arrayref = $cgi->body_param_array('foo');
 
-    Retrieve values of a named x-www-form-urlencoded body parameter as an
-    ordered array reference.
+    Retrieve values of a named application/x-www-form-urlencoded or
+    multipart/form-data body parameter, decoded to Unicode characters, as
+    an ordered array reference.
 
-    Note that this will read the whole request body into memory, so make
-    sure the "set_request_body_limit" can fit well within the available
-    memory.
+    Note that this will read the text form fields into memory, so make sure
+    the "set_request_body_limit" can fit well within the available memory.
 
   body_json
 
@@ -526,6 +554,112 @@ METHODS
     Note that this will read the whole request body into memory, so make
     sure the "set_request_body_limit" can fit well within the available
     memory.
+
+  body_parts
+
+      my $parts = $cgi->body_parts;
+
+    Retrieve multipart/form-data request body parts as an ordered array
+    reference. Most applications should retrieve multipart form data
+    through "body_params" and "uploads" (or related accessors) instead.
+
+    Body parts are represented as hash references containing:
+
+    headers
+
+      Hash reference of part headers. Header names are represented in
+      lowercase.
+
+    name
+
+      Form field name from Content-Disposition header, undecoded.
+
+    filename
+
+      Filename from Content-Disposition header if present, undecoded.
+
+    size
+
+      Size of part contents in bytes.
+
+    content
+
+      Part contents as undecoded bytes, for parts without a defined
+      filename. File uploads are stored in a temporary file instead.
+
+    file
+
+      File::Temp object referencing temporary file containing the part
+      contents, for parts with a defined filename.
+
+  uploads
+
+      my $pairs = $cgi->uploads;
+
+    Retrieve multipart/form-data file uploads as an ordered array reference
+    of name/upload pairs, represented as two-element array references.
+    Names are decoded to Unicode characters.
+
+    Note that this will read the text form fields into memory, so make sure
+    the "set_request_body_limit" can fit well within the available memory.
+
+    File uploads are represented as a hash reference containing the
+    following keys:
+
+    filename
+
+      Original filename supplied to file input. An empty filename may
+      indicate that no file was submitted.
+
+    content_type
+
+      Content-Type of uploaded file, undef if unspecified.
+
+    size
+
+      File size in bytes.
+
+    file
+
+      File::Temp object storing the file contents in a temporary file,
+      which will be cleaned up when the CGI script ends by default. The
+      filehandle will be open with the seek pointer at the start of the
+      file for reading.
+
+  upload_names
+
+      my $arrayref = $cgi->upload_names;
+
+    Retrieve multipart/form-data file upload names, decoded to Unicode
+    characters, as an unsorted array reference.
+
+    Note that this will read the text form fields into memory, so make sure
+    the "set_request_body_limit" can fit well within the available memory.
+
+  upload
+
+      my $upload = $cgi->upload('foo');
+
+    Retrieve a named multipart/form-data file upload. If the upload name
+    was passed multiple times, returns the last value. Use "upload_array"
+    to get multiple uploads with the same name.
+
+    See "uploads" for details on the representation of the upload.
+
+    Note that this will read the text form fields into memory, so make sure
+    the "set_request_body_limit" can fit well within the available memory.
+
+  upload_array
+
+      my $arrayref = $cgi->upload_array('foo');
+
+    Retrieve all multipart/form-data file uploads of the specified name as
+    an ordered array reference.
+
+    See "uploads" for details on the representation of the uploads.
+
+    Note that this will read the text form fields into memory, so make sure
+    the "set_request_body_limit" can fit well within the available memory.
 
  Response
 
@@ -689,9 +823,10 @@ METHODS
     passed in the first call to render, or to application/octet-stream if
     there is no more appropriate value.
 
-    html, xml, or text data is expected to be decoded characters, and will
-    be encoded according to "set_response_charset" (UTF-8 by default).
-    Unicode::UTF8 will be used for efficient UTF-8 encoding if available.
+    html, xml, or text data is expected to be decoded Unicode characters,
+    and will be encoded according to "set_response_charset" (UTF-8 by
+    default). Unicode::UTF8 will be used for efficient UTF-8 encoding if
+    available.
 
     json data structures will be encoded to JSON and UTF-8.
 
@@ -740,6 +875,10 @@ ENVIRONMENT
     CGI::Tiny recognizes the following environment variables, in addition
     to the standard CGI environment variables.
 
+ CGI_TINY_REQUEST_BODY_BUFFER
+
+    Default value for "set_request_body_buffer".
+
  CGI_TINY_REQUEST_BODY_LIMIT
 
     Default value for "set_request_body_limit".
@@ -768,15 +907,19 @@ COMPARISON TO CGI.PM
       context sensitive, as context sensitivity can lead to surprising
       behavior and vulnerabilities
       <https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2014-1572>.
-      "query_param" and "body_param" always return a single value, and
-      "query_param_array" and "body_param_array" must be used to retrieve
-      multi-value parameters. CGI::Tiny also does not have a
-      method-sensitive param accessor; query or body parameters must be
-      accessed specifically.
+      "query_param", "body_param", and "upload" always return a single
+      value; "query_param_array", "body_param_array", and "upload_array"
+      must be used to retrieve multi-value parameters.
 
-      * CGI::Tiny decodes request query and body parameters from UTF-8 to
-      Unicode characters automatically, and "render" provides methods to
-      encode response data from Unicode characters to UTF-8 by default.
+      * CGI::Tiny does not have a method-sensitive param accessor; query
+      and body request parameters are accessed with "query_param" and
+      "body_param" respectively. Uploaded files and their metadata are
+      accessed with "upload" and do not affect the text parameter
+      accessors.
+
+      * CGI::Tiny decodes request query and body parameters to Unicode
+      characters automatically, and "render" provides methods to encode
+      response data from Unicode characters to UTF-8 by default.
 
       * In CGI.pm, response headers must be printed manually before any
       response data is printed to avoid malformed responses. In CGI::Tiny,
@@ -838,9 +981,13 @@ CAVEATS
     CGI::Tiny does not verify this (though it does verify they do not
     contain newline characters to protect against HTTP response splitting).
 
-TODO
+    Field names and filenames in multipart/form-data requests do not have a
+    well-defined escape mechanism for special characters, so CGI::Tiny will
+    not attempt to decode these names from however the client passes them
+    aside from "set_multipart_form_charset". For best compatibility, form
+    field names should be ASCII without double quotes or semicolons.
 
-      * Uploads/multipart request
+TODO
 
       * Debugging tools
 

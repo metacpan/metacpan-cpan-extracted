@@ -4,7 +4,7 @@ package JSON::MaybeUTF8;
 use strict;
 use warnings;
 
-our $VERSION = '1.002';
+our $VERSION = '2.000';
 
 =head1 NAME
 
@@ -58,9 +58,16 @@ our @EXPORT_OK = qw(
     encode_json_utf8
     decode_json_text
     encode_json_text
+    format_json_text
 );
 our %EXPORT_TAGS = (
-    v1 => [ @EXPORT_OK ],
+    v1 => [ qw(
+        decode_json_utf8
+        encode_json_utf8
+        decode_json_text
+        encode_json_text
+    ) ],
+    v2 => [ @EXPORT_OK ],
 );
 
 =head2 decode_json_utf8
@@ -120,6 +127,26 @@ sub encode_json_text {
     $json->encode(shift)
 }
 
+=head2 encode_json_text
+
+Given a Perl data structure, returns a formatted JSON string composed
+of Unicode characters (in Perl's internal encoding).
+
+This is functionally identical to L</encode_json_text>, but with
+indentation to make it readable, and with defined key ordering which
+should make it easier to C<diff> two different data structures.
+
+=cut
+
+sub format_json_text {
+    state $json = JSON::MaybeXS->new(
+        pretty    => 1,
+        canonical => 1,
+    );
+    die 'bad json state' if $json->get_utf8;
+    $json->encode(shift)
+}
+
 1;
 
 =head1 AUTHOR
@@ -128,5 +155,5 @@ Tom Molesworth <TEAM@cpan.org>
 
 =head1 LICENSE
 
-Copyright Tom Molesworth 2017. Licensed under the same terms as Perl itself.
+Copyright Tom Molesworth 2017-2021. Licensed under the same terms as Perl itself.
 

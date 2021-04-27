@@ -1,5 +1,5 @@
 package Crypto::API;
-$Crypto::API::VERSION = '0.03';
+$Crypto::API::VERSION = '0.04';
 =head1 NAME
 
 Crypto::API - Universal Plug & Play API
@@ -125,17 +125,21 @@ sub _call_function {
 
     $data ||= {};
 
+    $events->{not_include} = {};
+
     while (my ($my_alias, $setting) = each %$data) {
-        my ($to_exchange, $required, $default);
+        my ($to_exchange, $required, $default, $include);
 
         if (ref $setting eq 'HASH') {
             $to_exchange = $setting->{field_name}
                 or die "Missing setting: field_name";
-            ($required, $default) = @$setting{qw(required default)};
+            ($required, $default, $include) = @$setting{qw(required default include)};
         }
         else {
             $to_exchange = $setting;
         }
+
+        $include ||= '';
 
         my $value = $o{$my_alias};
 
@@ -159,7 +163,12 @@ sub _call_function {
             $value = $self->$format($value);
         }
 
-        $mapped_data{$to_exchange} = $value;
+        if (defined($value) || $include eq 'always') {
+            $mapped_data{$to_exchange} = $value;
+        }
+        else {
+            $events->{not_include}{$to_exchange} = 1;
+        }
     }
 
     if (my $code = $events->{keys}) {
@@ -235,6 +244,9 @@ sub _call_function {
             my %mapped_row = $response_attr->($row);
             if (my $filter = $resp_spec->{row_filter}) {
                 my $action = $self->$filter(\%mapped_row) || '';
+                if ($action && $action !~ m/^(next|last)$/) {
+                    die "Row Filter returns expected either 'next' or 'last' or '' or undef";
+                }
                 if ($action eq 'next') {
                     next;
                 }

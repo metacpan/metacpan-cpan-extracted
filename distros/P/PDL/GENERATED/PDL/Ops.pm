@@ -72,7 +72,7 @@ none
 
 =for ref
 
-add two piddles
+add two ndarrays
 
 =for example
 
@@ -91,7 +91,7 @@ This restriction is expected to go away in future releases.
 =for bad
 
 plus processes bad values.
-The state of the bad-value flag of the output piddles is unknown.
+The state of the bad-value flag of the output ndarrays is unknown.
 
 
 =cut
@@ -115,7 +115,7 @@ The state of the bad-value flag of the output piddles is unknown.
 
 =for ref
 
-multiply two piddles
+multiply two ndarrays
 
 =for example
 
@@ -134,7 +134,7 @@ This restriction is expected to go away in future releases.
 =for bad
 
 mult processes bad values.
-The state of the bad-value flag of the output piddles is unknown.
+The state of the bad-value flag of the output ndarrays is unknown.
 
 
 =cut
@@ -158,7 +158,7 @@ The state of the bad-value flag of the output piddles is unknown.
 
 =for ref
 
-subtract two piddles
+subtract two ndarrays
 
 =for example
 
@@ -177,7 +177,7 @@ This restriction is expected to go away in future releases.
 =for bad
 
 minus processes bad values.
-The state of the bad-value flag of the output piddles is unknown.
+The state of the bad-value flag of the output ndarrays is unknown.
 
 
 =cut
@@ -201,7 +201,7 @@ The state of the bad-value flag of the output piddles is unknown.
 
 =for ref
 
-divide two piddles
+divide two ndarrays
 
 =for example
 
@@ -220,7 +220,7 @@ This restriction is expected to go away in future releases.
 =for bad
 
 divide processes bad values.
-The state of the bad-value flag of the output piddles is unknown.
+The state of the bad-value flag of the output ndarrays is unknown.
 
 
 =cut
@@ -263,7 +263,7 @@ This restriction is expected to go away in future releases.
 =for bad
 
 gt processes bad values.
-The state of the bad-value flag of the output piddles is unknown.
+The state of the bad-value flag of the output ndarrays is unknown.
 
 
 =cut
@@ -306,7 +306,7 @@ This restriction is expected to go away in future releases.
 =for bad
 
 lt processes bad values.
-The state of the bad-value flag of the output piddles is unknown.
+The state of the bad-value flag of the output ndarrays is unknown.
 
 
 =cut
@@ -349,7 +349,7 @@ This restriction is expected to go away in future releases.
 =for bad
 
 le processes bad values.
-The state of the bad-value flag of the output piddles is unknown.
+The state of the bad-value flag of the output ndarrays is unknown.
 
 
 =cut
@@ -392,7 +392,7 @@ This restriction is expected to go away in future releases.
 =for bad
 
 ge processes bad values.
-The state of the bad-value flag of the output piddles is unknown.
+The state of the bad-value flag of the output ndarrays is unknown.
 
 
 =cut
@@ -435,7 +435,7 @@ This restriction is expected to go away in future releases.
 =for bad
 
 eq processes bad values.
-The state of the bad-value flag of the output piddles is unknown.
+The state of the bad-value flag of the output ndarrays is unknown.
 
 
 =cut
@@ -478,7 +478,7 @@ This restriction is expected to go away in future releases.
 =for bad
 
 ne processes bad values.
-The state of the bad-value flag of the output piddles is unknown.
+The state of the bad-value flag of the output ndarrays is unknown.
 
 
 =cut
@@ -521,7 +521,7 @@ This restriction is expected to go away in future releases.
 =for bad
 
 shiftleft processes bad values.
-The state of the bad-value flag of the output piddles is unknown.
+The state of the bad-value flag of the output ndarrays is unknown.
 
 
 =cut
@@ -564,7 +564,7 @@ This restriction is expected to go away in future releases.
 =for bad
 
 shiftright processes bad values.
-The state of the bad-value flag of the output piddles is unknown.
+The state of the bad-value flag of the output ndarrays is unknown.
 
 
 =cut
@@ -588,7 +588,7 @@ The state of the bad-value flag of the output piddles is unknown.
 
 =for ref
 
-binary I<or> of two piddles
+binary I<or> of two ndarrays
 
 =for example
 
@@ -607,7 +607,7 @@ This restriction is expected to go away in future releases.
 =for bad
 
 or2 processes bad values.
-The state of the bad-value flag of the output piddles is unknown.
+The state of the bad-value flag of the output ndarrays is unknown.
 
 
 =cut
@@ -631,7 +631,7 @@ The state of the bad-value flag of the output piddles is unknown.
 
 =for ref
 
-binary I<and> of two piddles
+binary I<and> of two ndarrays
 
 =for example
 
@@ -650,7 +650,7 @@ This restriction is expected to go away in future releases.
 =for bad
 
 and2 processes bad values.
-The state of the bad-value flag of the output piddles is unknown.
+The state of the bad-value flag of the output ndarrays is unknown.
 
 
 =cut
@@ -674,7 +674,7 @@ The state of the bad-value flag of the output piddles is unknown.
 
 =for ref
 
-binary I<exclusive or> of two piddles
+binary I<exclusive or> of two ndarrays
 
 =for example
 
@@ -693,7 +693,7 @@ This restriction is expected to go away in future releases.
 =for bad
 
 xor processes bad values.
-The state of the bad-value flag of the output piddles is unknown.
+The state of the bad-value flag of the output ndarrays is unknown.
 
 
 =cut
@@ -732,7 +732,7 @@ This function is used to overload the unary C<~> operator/function.
 =for bad
 
 bitnot processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -756,7 +756,7 @@ It will set the bad-value flag of all output piddles if the flag is set for any 
 
 =for ref
 
-raise piddle C<$a> to the power C<$b>
+raise ndarray C<$a> to the power C<$b>
 
 =for example
 
@@ -775,7 +775,7 @@ This restriction is expected to go away in future releases.
 =for bad
 
 power processes bad values.
-The state of the bad-value flag of the output piddles is unknown.
+The state of the bad-value flag of the output ndarrays is unknown.
 
 
 =cut
@@ -799,7 +799,7 @@ The state of the bad-value flag of the output piddles is unknown.
 
 =for ref
 
-elementwise C<atan2> of two piddles
+elementwise C<atan2> of two ndarrays
 
 =for example
 
@@ -818,7 +818,7 @@ This restriction is expected to go away in future releases.
 =for bad
 
 atan2 processes bad values.
-The state of the bad-value flag of the output piddles is unknown.
+The state of the bad-value flag of the output ndarrays is unknown.
 
 
 =cut
@@ -861,7 +861,7 @@ This restriction is expected to go away in future releases.
 =for bad
 
 modulo processes bad values.
-The state of the bad-value flag of the output piddles is unknown.
+The state of the bad-value flag of the output ndarrays is unknown.
 
 
 =cut
@@ -904,7 +904,7 @@ This restriction is expected to go away in future releases.
 =for bad
 
 spaceship processes bad values.
-The state of the bad-value flag of the output piddles is unknown.
+The state of the bad-value flag of the output ndarrays is unknown.
 
 
 =cut
@@ -943,7 +943,7 @@ This function is used to overload the unary C<sqrt> operator/function.
 =for bad
 
 sqrt processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -982,7 +982,7 @@ This function is used to overload the unary C<sin> operator/function.
 =for bad
 
 sin processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -1021,7 +1021,7 @@ This function is used to overload the unary C<cos> operator/function.
 =for bad
 
 cos processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -1060,7 +1060,7 @@ This function is used to overload the unary C<!> operator/function.
 =for bad
 
 not processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -1099,7 +1099,7 @@ This function is used to overload the unary C<exp> operator/function.
 =for bad
 
 exp processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -1138,7 +1138,7 @@ This function is used to overload the unary C<log> operator/function.
 =for bad
 
 log processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -1177,7 +1177,7 @@ This function is used to overload the unary C<log10> operator/function.
 =for bad
 
 log10 processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -1222,7 +1222,7 @@ Plain numerical assignment. This is used to implement the ".=" operator
 
 =for bad
 
-If C<a> is a child piddle (e.g., the result of a slice) and bad values are generated in C<b>,
+If C<a> is a child ndarray (e.g., the result of a slice) and bad values are generated in C<b>,
 the bad value flag is set in C<b>, but it is B<NOT> automatically propagated back to the parent of C<a>.
 The following idiom ensures that the badflag is propagated back to the parent of C<a>:
 
@@ -1260,7 +1260,7 @@ Returns the polar angle of a complex number.
 =for bad
 
 carg processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -1289,7 +1289,7 @@ complex conjugate.
 =for bad
 
 conj processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -1318,7 +1318,7 @@ Returns the real part of a complex number.
 =for bad
 
 creal processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -1347,7 +1347,7 @@ Returns the imaginary part of a complex number.
 =for bad
 
 cimag processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -1376,7 +1376,7 @@ Returns the absolute (length) of a complex number.
 =for bad
 
 _cabs processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -1408,7 +1408,7 @@ that to C<ci>, which will not do what you want.
 =for bad
 
 ci processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -1433,7 +1433,7 @@ It will set the bad-value flag of all output piddles if the flag is set for any 
 
 =for ref
 
-raise piddle C<$a> to integer power C<$b>
+raise ndarray C<$a> to integer power C<$b>
 
 =for example
 
@@ -1453,7 +1453,7 @@ Algorithm from L<Wikipedia|http://en.wikipedia.org/wiki/Exponentiation_by_squari
 =for bad
 
 ipow does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -1482,7 +1482,7 @@ Returns the absolute value of a number.
 =for bad
 
 _rabs processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -1516,7 +1516,7 @@ convert real to native complex, with an imaginary part of zero
 =for bad
 
 r2C does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut

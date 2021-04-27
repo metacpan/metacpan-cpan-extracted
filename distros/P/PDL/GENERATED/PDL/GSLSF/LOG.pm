@@ -64,7 +64,7 @@ Provide a logarithm function with GSL semantics.
 =for bad
 
 gsl_sf_log does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -93,7 +93,7 @@ Complex Logarithm exp(lnr + I theta) = zr + I zi Returns argument in [-pi,pi].
 =for bad
 
 gsl_sf_complex_log does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut

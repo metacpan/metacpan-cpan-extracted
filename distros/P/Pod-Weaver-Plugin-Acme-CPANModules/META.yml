@@ -18,7 +18,7 @@ meta-spec:
 name: Pod-Weaver-Plugin-Acme-CPANModules
 requires:
   Moose: '0'
-  Pod::From::Acme::CPANModules: '0.005'
+  Pod::From::Acme::CPANModules: '0.007'
   Pod::Weaver::Role::AddTextToSection: '0.06'
   Pod::Weaver::Role::Section: '0'
   perl: '5.010001'
@@ -27,7 +27,7 @@ resources:
   bugtracker: https://github.com/perlancar/perl-Pod-Weaver-Plugin-Acme-CPANModules/issues
   homepage: https://metacpan.org/release/Pod-Weaver-Plugin-Acme-CPANModules
   repository: git://github.com/perlancar/perl-Pod-Weaver-Plugin-Acme-CPANModules.git
-version: '0.007'
+version: '0.008'
 x_Dist_Zilla:
   perl:
     version: '5.030000'

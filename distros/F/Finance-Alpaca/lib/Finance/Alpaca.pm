@@ -1,4 +1,4 @@
-package Finance::Alpaca 0.9900 {
+package Finance::Alpaca 0.9901 {
     use strictures 2;
     use Moo;
     use feature 'signatures';
@@ -8,7 +8,6 @@ package Finance::Alpaca 0.9900 {
     use Types::UUID;
     #
     use lib '../../lib/';
-
     use Finance::Alpaca::DataStream;
     use Finance::Alpaca::Struct::Account qw[to_Account];
     use Finance::Alpaca::Struct::Activity qw[to_Activity Activity];
@@ -79,8 +78,12 @@ package Finance::Alpaca 0.9900 {
             $_ . '='
                 . ( ref $params{$_} eq 'Time::Moment' ? $params{$_}->to_string() : $params{$_} )
         } keys %params if keys %params;
-        return ( ArrayRef [Asset] )
-            ->assert_coerce( $s->ua->get( $s->endpoint . '/v2/assets' . $params )->result->json );
+        return @{
+            ( ArrayRef [Asset] )->assert_coerce(
+                $s->ua->get( $s->endpoint . '/v2/assets' . $params )->result->json
+            )
+        };
+
     }
 
     sub asset ( $s, $symbol_or_asset_id ) {
@@ -103,10 +106,12 @@ package Finance::Alpaca 0.9900 {
             sprintf 'https://data.alpaca.markets/v%d/stocks/%s/bars%s',
             $s->api_version, $symbol, $params
         )->result;
-        return $res->is_error
-            ? $res->json
-            : ( Dict [ bars => ArrayRef [Bar], symbol => Str, next_page_token => Maybe [Str] ] )
-            ->assert_coerce( $res->json );
+        return $res->is_error ? $res->json : (
+            ( next_page_token => $res->json->{next_page_token} ),
+            map { delete $_->{symbol} => delete $_->{bars} }
+                ( Dict [ bars => ArrayRef [Bar], symbol => Str, next_page_token => Maybe [Str] ] )
+                ->assert_coerce( $res->json )
+        );
     }
 
     sub quotes ( $s, %params ) {
@@ -219,8 +224,9 @@ package Finance::Alpaca 0.9900 {
     }
 
     sub positions ($s) {
-        return ( ArrayRef [Position] )
-            ->assert_coerce( $s->ua->get( $s->endpoint . '/v2/positions' )->result->json );
+        return
+            @{ ( ArrayRef [Position] )
+                ->assert_coerce( $s->ua->get( $s->endpoint . '/v2/positions' )->result->json ) };
     }
 
     sub position ( $s, $symbol_or_asset_id ) {
@@ -487,13 +493,13 @@ found, an empty list is retured.
 
 =head2 C<bars( ... )>
 
-  my $bars = $camelid->bars(
+  my %bars = $camelid->bars(
         symbol    => 'MSFT',
         timeframe => '1Min',
         start     => Time::Moment->now->with_hour(10),
         end       => Time::Moment->now->minus_minutes(20)
     );
-
+ 
 Returns a list of Finance::Alpaca::Struct::Bar objects along with other data.
 
 The bar endpoint serves aggregate historical data for the requested securities.
@@ -516,17 +522,8 @@ The following parameters are accepted:
 
 =back
 
-The data returned includes the following data:
-
-=over
-
-=item C<bars> - List of Finance::Alpaca::Struct::Bar objects
-
-=item C<next_page_token> - Token that can be used to query the next page
-
-=item C<symbol> - Symbol that was queried
-
-=back
+The method returns a hash reference with bar data included as a list under the
+symbol as well as a C<next_page_token> for pagination if applicable.
 
 =head2 C<quotes( ... )>
 

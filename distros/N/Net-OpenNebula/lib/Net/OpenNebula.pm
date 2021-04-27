@@ -29,7 +29,7 @@ With this module you can access the OpenNebula XML-RPC service.
 =cut
 
 package Net::OpenNebula;
-$Net::OpenNebula::VERSION = '0.313.0';
+$Net::OpenNebula::VERSION = '0.316.0';
 use Net::OpenNebula::RPCClient;
 push our @ISA , qw(Net::OpenNebula::RPCClient);
 
@@ -43,6 +43,7 @@ use Net::OpenNebula::Image;
 use Net::OpenNebula::Template;
 use Net::OpenNebula::User;
 use Net::OpenNebula::VM;
+use Net::OpenNebula::VMGroup;
 use Net::OpenNebula::VNet;
 
 sub get_clusters {
@@ -136,6 +137,16 @@ sub get_vm {
 
 }
 
+sub get_vmgroups {
+   my ($self, $nameregex) = @_;
+
+   my $new = Net::OpenNebula::VMGroup->new(rpc => $self);
+   return $new->_get_instances($nameregex,
+                               [ int => -2 ], # all VM groups
+                               [ int => -1 ], # range start
+                               [ int => -1 ], # range end
+                               );
+}
 
 sub get_templates {
    my ($self, $nameregex) = @_;
@@ -268,6 +279,14 @@ sub create_template {
    return $new;
 }
 
+sub create_vmgroup {
+   my ($self, $txt) = @_;
+
+   my $new = Net::OpenNebula::VMGroup->new(rpc => $self, data => undef);
+   $new->create($txt);
+
+   return $new;
+}
 
 sub create_vnet {
    my ($self, $txt) = @_;

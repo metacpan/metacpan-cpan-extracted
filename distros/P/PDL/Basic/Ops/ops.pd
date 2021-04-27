@@ -7,6 +7,9 @@ my $C = [ppdefs_complex];
 my $F = [map $_->ppsym, grep $_->real && !$_->integer, types];
 my $T = [map $_->ppsym, grep $_->integer, types];
 my %is_real; @is_real{ppdefs()} = ();
+my @Rtypes = grep $_->real, types();
+my @Ctypes = grep !$_->real, types();
+my @Ftypes = grep !$_->integer, types();
 
 pp_addpm({At=>'Top'},<<'EOD');
 
@@ -65,17 +68,10 @@ pp_addhdr('
 /* Also changed the typecast in MOD to (long), and added a N==0 conditional to BU_MOD. -DAL 06-Mar-2015 */
 
 #define MOD(X,N) (  ((N) == 0)   ?    0   :   (   (X) - (ABS(N))  *  ((long     )((X)/(ABS(N))) + (   ( ((N) * ((long     )((X)/(N)))) != (X) )   ?   ( ( ((N)<0) ? 1 : 0 )  +  ( (((X)<0) ? -1 : 0)))  :  0 ))))
-
-/* We assume that "long long" is ok for all Microsoft Compiler versions >= 1400. */
-#if defined(_MSC_VER) && _MSC_VER < 1400
-#define Q_MOD(X,N) (((N) == 0)   ?    0   :   (   (X) - (ABS(N))  *  ((__int64  )((X)/(ABS(N))) + (   ( ((N) * ((__int64  )((X)/(N)))) != (X) )   ?   ( ( ((N)<0) ? 1 : 0 )  +  ( (((X)<0) ? -1 : 0)))  :  0 ))))
-#else
 #define Q_MOD(X,N) (((N) == 0)   ?    0   :   (   (X) - (ABS(N))  *  ((long long)((X)/(ABS(N))) + (   ( ((N) * ((long long)((X)/(N)))) != (X) )   ?   ( ( ((N)<0) ? 1 : 0 )  +  ( (((X)<0) ? -1 : 0)))  :  0 ))))
-#endif
 #define BU_MOD(X,N)(((N) == 0)   ?    0   :   ( (X)-(N)*((int)((X)/(N))) ))
 #define SPACE(A,B)   ( ((A)<(B)) ? -1 : ((A)!=(B)) )
 #define ABS(A)       ( (A)>=0 ? (A) : -(A) )
-#define NOTHING
 ');
 
 sub protect_chars {
@@ -197,30 +193,30 @@ EOH
     if ($isop) { $ovcall = "\$c = \$a $funcov \$b;    # overloaded use"; }
     else       { $ovcall = "\$c = $funcov \$a, \$b;    # overloaded use"; }
 
-
-#a little dance to avoid the MOD macro warnings for byte & ushort datatypes
+    my $complex_bit = join "\n",
+      map 'types('.$_->ppsym.') %{$c() = c'.$func.$_->floatsuffix.'($a(),$b());%}',
+      @Ctypes;
     my $codestr;
-    my $badcodestr;
-    my $complex_bit = << "ENDCODE";
-  types(C) %{ \$c() = c${func}(\$a(),\$b()); %}
-  types(G) %{ \$c() = c${func}f(\$a(),\$b()); %}
-ENDCODE
     if ($extra{unsigned}){
-    $codestr = << "ENDCODE";
+#a little dance to avoid the MOD macro warnings for byte & ushort datatypes
+      $codestr = << "ENDCODE";
   types(BU) %{ \$c() = BU_$func(\$a(),\$b()); %}
   types(SLNFD) %{ \$c() = $func(\$a(),\$b()); %}
   types(Q) %{ \$c() = Q_$func(\$a(),\$b()); %}
 ENDCODE
-} else {
-   $codestr = "types(BUSLNQFD) %{ \$c() = $func(\$a(),\$b()); %}";
-   }
- delete $extra{unsigned}; #remove the key so it doesn't get added in pp_def.
+#end dance
+    } else {
+      $codestr = join "\n",
+        map 'types('.$_->ppsym.') %{$c() = '.$func.'($a(),$b());%}',
+        @Rtypes;
+    }
+    delete $extra{unsigned}; #remove the key so it doesn't get added in pp_def.
     $codestr .= $complex_bit if $got_complex;
 
- $badcodestr = 'if ( $ISBAD(a()) || $ISBAD(b()) )
+    my $badcodestr;
+    $badcodestr = 'if ( $ISBAD(a()) || $ISBAD(b()) )
 	       $SETBAD(c());
 	       else {' . $codestr . " } \n";
-#end dance
 
     pp_def($name,
 	   HandleBad => 1,
@@ -279,17 +275,16 @@ sub ufunc {
 	#      See also `biop()`.
 	delete $extra{Exception};
     }
-    my $complex_bit = <<EOF;
-	types(G) %{ \$b() = c${func}f(\$a()); %}
-	types(C) %{ \$b() = c$func(\$a()); %}
-EOF
-    my $codestr = <<EOF;
-	types(BUSLNQFD) %{ \$b() = $func(\$a()); %}
-EOF
+    my $complex_bit = join "\n",
+      map 'types('.$_->ppsym.') %{$b() = c'.$func.$_->floatsuffix.'($a());%}',
+      @Ctypes;
+    my $codestr = join "\n",
+        map 'types('.$_->ppsym.') %{$b() = '.$func.'($a());%}',
+        @Rtypes;
     $codestr .= $complex_bit if $got_complex;
 
     # do not have to worry about propagation of the badflag when
-    # inplace since only input piddle is a, hence its badflag
+    # inplace since only input ndarray is a, hence its badflag
     # won't change
     # UNLESS an exception occurs...
     pp_def($name,
@@ -346,12 +341,12 @@ EOD
 
 ## arithmetic ops
 # no swap needed but set anyway fixing sf bug #391
-biop('plus','+',1,'add two piddles',GenericTypes => $A);
-biop('mult','*',1,'multiply two piddles',GenericTypes => $A);
+biop('plus','+',1,'add two ndarrays',GenericTypes => $A);
+biop('mult','*',1,'multiply two ndarrays',GenericTypes => $A);
 
 # all those need swapping
-biop('minus','-',1,'subtract two piddles',GenericTypes => $A);
-biop('divide','/',1,'divide two piddles', Exception => '$b() == 0', GenericTypes => $A);
+biop('minus','-',1,'subtract two ndarrays',GenericTypes => $A);
+biop('divide','/',1,'divide two ndarrays', Exception => '$b() == 0', GenericTypes => $A);
 
 ## note: divide should perhaps trap division by zero as well
 
@@ -370,19 +365,19 @@ biop('ne','!=',1,'binary I<not equal to> operation (C<!=>)', Comparison => 1, Ge
 # those need to be limited to the right types
 biop('shiftleft','<<',1,'leftshift C<$a> by C<$b>',GenericTypes => $T);
 biop('shiftright','>>',1,'rightshift C<$a> by C<$b>',GenericTypes => $T);
-biop('or2','|',1,'binary I<or> of two piddles',GenericTypes => $T,
+biop('or2','|',1,'binary I<or> of two ndarrays',GenericTypes => $T,
       Bitwise => 1);
-biop('and2','&',1,'binary I<and> of two piddles',GenericTypes => $T,
+biop('and2','&',1,'binary I<and> of two ndarrays',GenericTypes => $T,
       Bitwise => 1);
-biop('xor','^',1,'binary I<exclusive or> of two piddles',GenericTypes => $T,
+biop('xor','^',1,'binary I<exclusive or> of two ndarrays',GenericTypes => $T,
       Bitwise => 1);
 
 # really an ufunc
 ufunc('bitnot','~','unary bit negation',GenericTypes => $T);
 
 # some standard binary functions
-bifunc('power',['pow','op**'],1,'raise piddle C<$a> to the power C<$b>',GenericTypes => [@$C, @$F]);
-bifunc('atan2','atan2',1,'elementwise C<atan2> of two piddles',GenericTypes => $F);
+bifunc('power',['pow','op**'],1,'raise ndarray C<$a> to the power C<$b>',GenericTypes => [@$C, @$F]);
+bifunc('atan2','atan2',1,'elementwise C<atan2> of two ndarrays',GenericTypes => $F);
 bifunc('modulo',['MOD','op%'],1,'elementwise C<modulo> operation',unsigned=>1);
 bifunc('spaceship',['SPACE','op<=>'],1,'elementwise "<=>" operation');
 
@@ -397,7 +392,7 @@ ufunc('log','log','the natural logarithm',GenericTypes => [@$C, @$F], Exception 
 pp_export_nothing();
 
 # make log10() work on scalars (returning scalars)
-# as well as piddles
+# as well as ndarrays
 ufunc('log10','log10','the base 10 logarithm', GenericTypes => $A,
       Exception => '$a() <= 0',
       PMCode =>
@@ -444,7 +439,7 @@ pp_def(
        Doc =>
 'Plain numerical assignment. This is used to implement the ".=" operator',
 		BadDoc =>
-'If C<a> is a child piddle (e.g., the result of a slice) and bad values are generated in C<b>,
+'If C<a> is a child ndarray (e.g., the result of a slice) and bad values are generated in C<b>,
 the bad value flag is set in C<b>, but it is B<NOT> automatically propagated back to the parent of C<a>.
 The following idiom ensures that the badflag is propagated back to the parent of C<a>:
 
@@ -462,7 +457,10 @@ See http://pdl.perl.org/PDLdocs/BadValues.html#dataflow_of_the_badflag for detai
 sub cfunc {
     my ($name, $func, $make_real, $doc, %extra) = @_;
     my $badcode = '$ISBAD(complexv())';
-    my $codestr = "\$b() = $func\$TGC(f,)(\$complexv());";
+    my $codestr = "\$b() = $func\$T" .
+      join('', map $_->ppsym, @Ctypes) .
+      "(". join(',', map $_->floatsuffix, @Ctypes) .
+      ")(\$complexv());";
     pp_def($name,
 	   GenericTypes=>$C,
 	   Pars => 'complexv(); '.($make_real ? 'real' : '').' [o]b()',
@@ -510,7 +508,7 @@ pp_def('ipow',
    Doc => qq{
 =for ref
 
-raise piddle C<\$a> to integer power C<\$b>
+raise ndarray C<\$a> to integer power C<\$b>
 
 =for example
 

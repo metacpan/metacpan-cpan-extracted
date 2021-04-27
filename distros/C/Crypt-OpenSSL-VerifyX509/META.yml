@@ -23,7 +23,7 @@ no_index:
 provides:
   Crypt::OpenSSL::VerifyX509:
     file: VerifyX509.pm
-    version: '0.14'
+    version: '0.15'
 requires:
   Crypt::OpenSSL::X509: '1.807'
   perl: '5.008001'
@@ -31,7 +31,7 @@ resources:
   bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=Crypt-OpenSSL-VerifyX509
   license: http://dev.perl.org/licenses
   repository: http://github.com/timlegge/perl-Crypt-OpenSSL-VerifyX509
-version: '0.14'
+version: '0.15'
 x_maintainers:
   - 'Timothy Legge <timlegge@gmail.com>'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

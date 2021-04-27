@@ -48,6 +48,7 @@
             "IO::Handle" : "0",
             "JSON::PP" : "0",
             "Time::Local" : "0",
+            "constant" : "0",
             "perl" : "5.008001"
          }
       },
@@ -67,7 +68,7 @@
    "provides" : {
       "CGI::Tiny" : {
          "file" : "lib/CGI/Tiny.pm",
-         "version" : "0.006"
+         "version" : "0.007"
       }
    },
    "release_status" : "stable",
@@ -82,7 +83,7 @@
          "web" : "https://github.com/Grinnz/CGI-Tiny"
       }
    },
-   "version" : "0.006",
+   "version" : "0.007",
    "x_contributors" : [
       "Dan Book <grinnz@grinnz.com>"
    ],

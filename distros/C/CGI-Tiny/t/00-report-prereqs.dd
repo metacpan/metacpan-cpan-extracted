@@ -23,6 +23,7 @@ do { my $x = {
                                       'IO::Handle' => '0',
                                       'JSON::PP' => '0',
                                       'Time::Local' => '0',
+                                      'constant' => '0',
                                       'perl' => '5.008001'
                                     }
                     },

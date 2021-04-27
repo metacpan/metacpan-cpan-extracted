@@ -59,7 +59,7 @@
    "provides" : {
       "Finance::Alpaca" : {
          "file" : "lib/Finance/Alpaca.pm",
-         "version" : "0.9900"
+         "version" : "0.9901"
       },
       "Finance::Alpaca::DataStream" : {
          "file" : "lib/Finance/Alpaca/DataStream.pm",
@@ -141,7 +141,7 @@
          "web" : "https://github.com/sanko/Finance-Alpaca"
       }
    },
-   "version" : "0.9900",
+   "version" : "0.9901",
    "x_authority" : "cpan:SANKO",
    "x_serialization_backend" : "JSON::PP version 4.05",
    "x_static_install" : 1

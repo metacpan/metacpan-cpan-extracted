@@ -1,42 +1,25 @@
 use strict;
 use warnings;
-
-use Test::More import => ["!pass"], tests => 1;
+use Test::More;
 use HTTP::API::Client;
+use HTTP::Response;
 
-if ( !$ENV{RUN_TCP_TEST} ) {
-    ok 1;
-    done_testing;
-    exit;
+{
+
+    package Foo;
+    use Moo;
+    extends 'HTTP::API::Client';
+
+    sub send {
+        my $r = HTTP::Response->new;
+        $r->content('OK');
+        return $r;
+    }
 }
 
-use Dancer;
-use Test::TCP;
+my $api = Foo->new;
+my $res = $api->get("http://127.0.0.1/OK");
 
-Test::TCP::test_tcp(
-    client => sub {
-        my $port = shift;
-        my $api  = HTTP::API::Client->new;
-        my $res  = $api->send( GET => "http://127.0.0.1:$port/OK" );
-        is $res->content, "OK";
-    },
-    server => sub {
-        my $port = shift;
-        Dancer::set(
-            charset      => "utf8",
-            port         => $port,
-            show_errors  => 1,
-            startup_info => 0,
-            log          => "debug",
-            logger       => "console"
-        );
-        Dancer::get(
-            "/:status" => sub {
-                my $status = param("status");
-                content_type("text/plain");
-                return $status;
-            }
-        );
-        Dancer::dance();
-    }
-);
+is $res->content, "OK";
+
+done_testing;

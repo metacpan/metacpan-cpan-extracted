@@ -2,7 +2,7 @@ package Myriad::Plugin;
 
 use Myriad::Class;
 
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.003'; # VERSION
 our $AUTHORITY = 'cpan:DERIV'; # AUTHORITY
 
 =head1 NAME

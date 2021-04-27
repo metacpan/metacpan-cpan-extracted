@@ -10,6 +10,5 @@ my $png = read_from_scalar ($image_data);
 # Now $png contains the PNG information from the image.
 # Get the header.
 my $header = $png->get_IHDR ();
-my $jc = JSON::Create->new ();
-$jc->indent (1);
+my $jc = JSON::Create->new (indent => 1, sort => 1);
 print $jc->run ($header);

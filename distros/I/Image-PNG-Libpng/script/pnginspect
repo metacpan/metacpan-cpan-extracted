@@ -4,21 +4,44 @@ use warnings;
 use strict;
 use Image::PNG::Libpng ':all';
 use Data::Dumper;
+use Getopt::Long;
+
+my $ok = GetOptions (
+    json => \my $json,
+    verbose => \my $verbose,
+);
+
+if (! $ok) {
+    print <<EOF;
+
+pnginspect: valid options are
+
+--json         Output JSON
+--verbose      Print messages
+
+EOF
+    exit;
+}
+
 
 # Ok to connect to web?
 
-my $web_ok;
-
-eval {
+my $web_ok = eval {
     require Data::Validate::URI;
     Data::Validate::URI->import (qw/is_web_uri/);
     require LWP::Simple;
     LWP::Simple->import ();
-    $web_ok = 1;
+    1;
 };
 
-if ($@) {
-    $web_ok = 0;
+my $json_ok = eval {
+    require JSON::Create;
+    JSON::Create->import ();
+    1;
+};
+
+if ($json && ! $json_ok) {
+    die "Install JSON::Create to use the --json option";
 }
 
 binmode STDOUT, ":encoding(utf8)";
@@ -37,16 +60,25 @@ for my $file (@ARGV) {
 	$size = -s $file;
     }
     else {
+	if ($verbose) {
+	    print "Cannot find $file on this filesystem, web link?\n";
+	}
 	if ($web_ok) {
+	    if ($verbose) {
+		print "Checking if $file looks like a URI.\n";
+	    }
 	    if (is_web_uri ($file)) {
-		print "Getting '$file' from web.\n";
+		if ($verbose) {
+		    print "Getting '$file' from web.\n";
+		}
 		my $png_data = get ($file);
 		if ($png_data) {
 		    $png = read_from_scalar ($png_data);
-		    $size = length ($png);
+		    $size = length ($png_data);
 		}
 		else {
 		    warn "Could not download '$file', skipping.\n";
+		    next;
 		}
 	    }
 	    else {
@@ -56,12 +88,135 @@ for my $file (@ARGV) {
 	}
 	else {
 	    warn "Modules needed to read from web not installed";
+	    next;
+	}
+    }
+    my $contents = get_contents ($png, $file, $size);
+    if ($json) {
+	die "JSON output is not implemented";
+    }
+    else {
+	print_text ($contents);
+    }
+}
+
+sub print_text
+{
+    my ($contents) = @_;
+
+    print "Contents of '$contents->{name}':\n\n";
+    print "File size: $contents->{size} bytes\n\n";
+    # Print the header first
+    print_header ($contents->{ihdr});
+    for my $key (sort keys %$contents) {
+	if ($key =~ /^(name|size|ihdr|text)$/) {
+	    # Already printed above, or below in the case of 'text'.
+	    next;
+	}
+	my $chunk = $contents->{$key};
+	if (! $chunk) {
+	    next;
+	}
+	print "* Valid $key chunk";
+	if ($key eq 'IDAT') {
+	    print " (image data - omitted).\n";
+	    next;
+	}
+	if ($key eq 'tIME') {
+	    my $time = $chunk;
+	    print " - image modification time is:\n";
+	    for my $k (qw/year month day hour minute second/) {
+		print "$k: $time->{$k}\n";
+	    }
+	    next;
+	}
+	if ($key eq 'PLTE') {
+	    printf " containing %d colours as follows (RGB in hexadecimal):\n",
+	        scalar (@$chunk);
+	    print_PLTE ($chunk);
+	    print "\n";
+	    next;
+	}
+	if ($key eq 'tRNS') {
+	    my $trns = $chunk;
+	    printf " containing %d values as follows:\n",
+	    scalar (@$trns);
+	    my $dtrns = join ", ", @$trns;
+	    print "$dtrns\n";
+	    next;
+	}
+	if ($key eq 'iCCP') {
+	    my $iccp = $chunk;
+	    print "\n";
+	    print "name: $iccp->{name}\n";
+	    print "profile (binary data in hex) :\n";
+	    print_binary_data ($iccp->{profile});
+	    next;
+	}
+	# Default
+	print " as follows:\n";
+	print Dumper ($chunk);
+    }
+    my $text = $contents->{text};
+    if ($text) {
+	my $i = 0;
+        for my $t (@$text) {
+	    $i++;
+            print "Text chunk $i:\n";
+            for my $k (sort keys %$t) {
+                my $v = $t->{$k};
+                if (! defined $v) {
+                    $v = 'undefined';
+                }
+		if ($k eq 'compression') {
+		    $v = text_compression_name ($v);
+		}
+                print "$k: $v\n";
+            }
+            print "\n";
+        }
+    }
+    print "\n";
+}
+
+sub print_PLTE
+{
+    my ($plte) = @_;
+    my $col = 10;
+    my $i = 0;
+    for my $rgb (@$plte) {
+	printf "#%02X%02X%02X ", $rgb->{red}, $rgb->{green}, $rgb->{blue};
+	$i++;
+	if (($i % $col) == 0) {
+	    print "\n";
 	}
     }
 
-    print "Contents of '$file':\n\n";
-    print "File size: $size\n";
-    my $ihdr = $png->get_IHDR ();
+}
+
+sub print_binary_data
+{
+    my ($data) = @_;
+    my $cols = 10;
+    my $l = length ($data);
+    my $column = 0;
+    for my $i (0..$l-1) {
+	my $byte = substr ($data, $i, 1);
+	printf "%02X ", ord ($byte);
+	$column++;
+	if ($column > $cols) {
+	    print "\n";
+	    $column = 0;
+	}
+    }
+    if ($column != 0) {
+	print "\n";
+    }
+}
+
+sub print_header
+{
+    my ($ihdr) = @_;
     for my $k (sort keys %$ihdr) {
 	# Display key
 	my $dk = $k;
@@ -89,76 +244,6 @@ for my $file (@ARGV) {
 	}
 	print "\n";
     }
-    my $valid = $png->get_valid ();
-    for my $key (sort keys %$valid) {
-	if ($valid->{$key}) {
-	    print "Valid $key chunk";
-	    if ($key eq 'IDAT' || $key eq 'tIME') {
-		print ".\n";
-	    }
-	    elsif ($key eq 'PLTE') {
-		my $plte = $png->get_chunk ($key);
-		printf " containing %d colours as follows (CSS format):\n",
-		       scalar (@$plte);
-		print_PLTE ($plte);
-		print "\n";
-	    }
-	    elsif ($key eq 'tRNS') {
-		my $trns = $png->get_chunk ($key);
-		printf " containing %d values as follows:\n",
-		       scalar (@$trns);
-		my $dtrns = join ", ", @$trns;
-		print "$dtrns\n";
-	    }
-	    else {
-		my $value = $png->get_chunk ($key);
-		print " as follows:\n";
-		print Dumper ($value);
-	    }
-	}
-    }
-    my $text = $png->get_text ();
-    if ($text) {
-	my $i = 0;
-        for my $t (@$text) {
-	    $i++;
-            print "Text chunk $i:\n";
-            for my $k (sort keys %$t) {
-                my $v = $t->{$k};
-                if (! defined $v) {
-                    $v = 'undefined';
-                }
-		if ($k eq 'compression') {
-		    $v = text_compression_name ($v);
-		}
-                print "$k: $v\n";
-            }
-            print "\n";
-        }
-    }
-    my $time = $png->get_tIME ();
-    if ($time) {
-	print "Modification time:\n";
-	for my $k (qw/year month day hour minute second/) {
-	    print "$k: $time->{$k}\n";
-	}
-    }
-    print "\n";
-}
-
-sub print_PLTE
-{
-    my ($plte) = @_;
-    my $col = 10;
-    my $i = 0;
-    for my $rgb (@$plte) {
-	printf "#%02X%02X%02X ", $rgb->{red}, $rgb->{green}, $rgb->{blue};
-	$i++;
-	if (($i % $col) == 0) {
-	    print "\n";
-	}
-    }
-
 }
 
 __END__
@@ -189,7 +274,19 @@ can also use it to examine PNG files on the web, like this:
 
     pnginspect http://libpng.org/pub/png/img_png/libpng-88x31.png
 
-These modules are not installed by default.
+These modules are not installed automatically by Image::PNG::Libpng,
+so please install them yourself if you would like to use this
+facility.
+
+=head1 OPTIONS
+
+=over
+
+=item --verbose
+
+Print verbose information for debugging.
+
+=back
 
 =head1 SEE ALSO
 

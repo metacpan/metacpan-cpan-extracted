@@ -1,26 +1,29 @@
 ---
 abstract: 'Expires CGI::Session db-based and file-based sessions'
 author:
-  - 'Ron Savage <ron@savage.net.au>'
+  - 'Ron Savage (ron@savage.net.au)'
 build_requires:
-  Test::More: 0
+  ExtUtils::MakeMaker: '0'
+  Test::More: '1.001002'
 configure_requires:
-  Module::Build: 0.38
+  ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.4003, CPAN::Meta::Converter version 2.120921'
-license: artistic_2
+generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
+license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: CGI-Session-ExpireSessions
-provides:
-  CGI::Session::ExpireSessions:
-    file: lib/CGI/Session/ExpireSessions.pm
-    version: 1.13
+no_index:
+  directory:
+    - t
+    - inc
 requires:
-  CGI::Session: 4.14
-  Carp: 0
-  File::Spec: 0
+  CGI::Session: '4.14'
+  Carp: '0'
+  File::Spec: '0'
 resources:
-  license: http://www.perlfoundation.org/artistic_license_2_0
-version: 1.13
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/ronsavage/CGI-Session-ExpireSessions.git
+version: '1.14'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

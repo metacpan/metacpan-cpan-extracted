@@ -59,9 +59,9 @@ the in-place flag.  That should be fixed.
 =head1 DATA TYPES
 
 The underlying C library upon which this module is based performs FFTs
-on both single precision and double precision floating point piddles.
+on both single precision and double precision floating point ndarrays.
 Performing FFTs on integer data types is not reliable.  Consider the
-following FFT on piddles of type 'double':
+following FFT on ndarrays of type 'double':
 
 	$r = pdl(0,1,0,1);
 	$i = zeroes($r);
@@ -78,13 +78,13 @@ But if $r and $i are unsigned short integers (ushorts):
 	[2 0 65534 0] [0 0 0 0]
 
 This used to occur because L<PDL::PP> converts the ushort
-piddles to floats or doubles, performs the FFT on them, and then
+ndarrays to floats or doubles, performs the FFT on them, and then
 converts them back to ushort, causing the overflow where the amplitude
 of the frequency should be -2.
 
-Therefore, if you pass in a piddle of integer datatype (byte, short,
+Therefore, if you pass in an ndarray of integer datatype (byte, short,
 ushort, long) to any of the routines in PDL::FFT, your data will be
-promoted to a double-precision piddle.  If you pass in a float, the
+promoted to a double-precision ndarray.  If you pass in a float, the
 single-precision FFT will be performed.
 
 =head1 FREQUENCIES
@@ -173,7 +173,7 @@ sub todecimal {
 =for ref
 
 Complex 1-D FFT of the "real" and "imag" arrays [inplace]. A single
-cfloat/cdouble input piddle can also be used.
+cfloat/cdouble input ndarray can also be used.
 
 =for sig
 
@@ -205,7 +205,7 @@ sub PDL::fft {
 	if ($@) {
 		$@ =~ s/ at .*//s;
 		my $message = "Error in FFT with second argument: $@";
-		$message .= '. Did you forget to supply the second (imaginary) piddle?'
+		$message .= '. Did you forget to supply the second (imaginary) ndarray?'
 			if ($message =~ /undefined value/);
 		barf($message);
 	}
@@ -223,7 +223,7 @@ sub PDL::fft {
 =for ref
 
 Complex inverse 1-D FFT of the "real" and "imag" arrays [inplace]. A single
-cfloat/cdouble input piddle can also be used.
+cfloat/cdouble input ndarray can also be used.
 
 =for sig
 
@@ -255,7 +255,7 @@ sub PDL::ifft {
 	if ($@) {
 		$@ =~ s/ at .*//s;
 		my $message = "Error in FFT with second argument: $@";
-		$message .= '. Did you forget to supply the second (imaginary) piddle?'
+		$message .= '. Did you forget to supply the second (imaginary) ndarray?'
 			if ($message =~ /undefined value/);
 		barf($message);
 	}
@@ -528,7 +528,7 @@ Internal routine doing maths for convolution
 =for bad
 
 convmath does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -557,7 +557,7 @@ Complex multiplication
 =for bad
 
 cmul does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -586,7 +586,7 @@ Complex division
 =for bad
 
 cdiv does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut

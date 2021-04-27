@@ -7,7 +7,8 @@ ABSTRACT
 REQUIREMENTS
     *   PDL >= v2.4.2
 
-        Tested version(s) 2.4.2, 2.4.3, 2.4.7_001, 2.4.9_015.
+        Tested version(s) 2.4.2, 2.4.3, 2.4.7_001, 2.4.9_015, 2.4.10, 2.019,
+        2.039
 
     *   PDL::VectorValued >= v0.07001
 
@@ -23,8 +24,8 @@ BUILDING
     Build this module as you would any perl module, by doing something akin
     to the following:
 
-     gzip -dc distname-XX.YY.tar.gz | tar -xof -
-     cd distname-XX.YY/
+     gzip -dc PDL-CCS-XYZ.tar.gz | tar -xof -
+     cd PDL-CCS-XYZ/
      perl Makefile.PL
      make
      make test                                     # optional
@@ -36,7 +37,7 @@ AUTHOR
     Bryan Jurish <moocow@cpan.org>
 
 COPYRIGHT
-    Copyright (c) 2005-2018 by Bryan Jurish. All rights reserved.
+    Copyright (c) 2005-2021 by Bryan Jurish. All rights reserved.
 
     This package is free software, and entirely without warranty. You may
     redistribute it and/or modify it under the same terms as Perl itself.

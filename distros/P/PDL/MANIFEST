@@ -458,6 +458,9 @@ Libtmp/GSL/INTERP/gslerr.h
 Libtmp/GSL/INTERP/Makefile.PL
 Libtmp/GSL/INTERP/t/gsl_interp.t
 Libtmp/GSL/INTERP/typemap
+Libtmp/GSL/LINALG/gsl_linalg.pd
+Libtmp/GSL/LINALG/Makefile.PL
+Libtmp/GSL/LINALG/t/gsl_linalg.t
 Libtmp/GSL/Makefile.PL
 Libtmp/GSL/MROOT/FUNC.c
 Libtmp/GSL/MROOT/gsl_mroot.pd
@@ -776,6 +779,7 @@ GENERATED/PDL/GSL/CDF.pm                 mod=PDL::GSL::CDF pd=Libtmp/GSL/CDF/gsl
 GENERATED/PDL/GSL/DIFF.pm                mod=PDL::GSL::DIFF pd=Libtmp/GSL/DIFF/gsl_diff.pd (added by pdlpp_mkgen)
 GENERATED/PDL/GSL/INTEG.pm               mod=PDL::GSL::INTEG pd=Libtmp/GSL/INTEG/gsl_integ.pd (added by pdlpp_mkgen)
 GENERATED/PDL/GSL/INTERP.pm              mod=PDL::GSL::INTERP pd=Libtmp/GSL/INTERP/gsl_interp.pd (added by pdlpp_mkgen)
+GENERATED/PDL/GSL/LINALG.pm              mod=PDL::GSL::LINALG pd=Libtmp/GSL/LINALG/gsl_linalg.pd (added by pdlpp_mkgen)
 GENERATED/PDL/GSL/MROOT.pm               mod=PDL::GSL::MROOT pd=Libtmp/GSL/MROOT/gsl_mroot.pd (added by pdlpp_mkgen)
 GENERATED/PDL/GSL/RNG.pm                 mod=PDL::GSL::RNG pd=Libtmp/GSL/RNG/gsl_random.pd (added by pdlpp_mkgen)
 GENERATED/PDL/GSLSF/AIRY.pm              mod=PDL::GSLSF::AIRY pd=Libtmp/GSL/SF/airy/gsl_sf_airy.pd (added by pdlpp_mkgen)
