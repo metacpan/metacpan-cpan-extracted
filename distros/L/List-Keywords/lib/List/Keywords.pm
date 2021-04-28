@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2021 -- leonerd@leonerd.org.uk
 
-package List::Keywords 0.02;
+package List::Keywords 0.03;
 
 use v5.14;
 use warnings;
@@ -81,7 +81,7 @@ The C<List::Keyword> version here ran 26% faster.
 =cut
 
 my %KEYWORD_OK = map { $_ => 1 } qw(
-   any all
+   first any all none notall
 );
 
 sub import
@@ -100,6 +100,14 @@ sub import
 
 =cut
 
+=head2 first
+
+   $val = first { CODE } LIST
+
+Repeatedly calls the block of code, with C<$_> locally set to successive
+values from the given list. Returns the value and stops at the first item to
+make the block yield a true value. If no such item exists, returns C<undef>.
+
 =head2 any
 
    $bool = any { CODE } LIST
@@ -116,6 +124,14 @@ Repeatedly calls the block of code, with C<$_> locally set to successive
 values from the given list. Returns false and stops at the first item to make
 the block yield a false value. If no such item exists, returns true.
 
+=head2 none
+=head2 notall
+
+   $bool = none { CODE } LIST
+   $bool = notall { CODE } LISt
+
+Same as L</any> and L</all> but with the return value inverted.
+
 =cut
 
 =head1 TODO
@@ -124,8 +140,6 @@ More functions from C<List::Util>:
 
    reduce
    reductions
-   none notall
-   first
    pairfirst pairgrep pairmap
 
 Maybe also consider some from L<List::UtilsBy>.

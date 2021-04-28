@@ -62,32 +62,8 @@ my %pair = ( coin => 'XRP', base => 'GBP' );
 
 my $data = $binance->list_open_orders( pair => \%pair );
 
-is_deeply [map { delete @$_{qw(timestamp filled_time)}; $_ } @$data],
+is_deeply [map { delete @$_{qw(timestamp last_updated)}; $_ } @$data],
   [
-    {
-        'order_id'    => 35192621,
-        'external_id' => 'x-NS8RHAMK_gl_22505590_29',
-        'order_type'  => 'LIMIT',
-        'buy_or_sell' => 'SELL',
-        'status'      => 'NEW',
-        'pair'        => {
-            'base' => 'GBP',
-            'coin' => 'XRP'
-        },
-        'order_qty'  => '13.8',
-        'filled_qty' => '0',
-        'price'      => '1.28371',
-        _others      => {
-            'orderListId'         => '-1',
-            'cummulativeQuoteQty' => '0',
-            'timeInForce'         => 'GTC',
-            'stopPrice'           => '0',
-            'icebergQty'          => '0',
-            'origQuoteOrderQty'   => '0',
-            'isWorking'           => 1,
-            'updateTime'          => '1618539295363',
-        },
-    },
     {
         'order_type'  => 'LIMIT',
         'external_id' => 'x-NS8RHAMK_gl_22505588_32',
@@ -109,7 +85,29 @@ is_deeply [map { delete @$_{qw(timestamp filled_time)}; $_ } @$data],
             'icebergQty'          => '0',
             'origQuoteOrderQty'   => '0',
             'isWorking'           => 1,
-            'updateTime'          => '1618538883755',
+        },
+    },
+    {
+        'order_id'    => 35192621,
+        'external_id' => 'x-NS8RHAMK_gl_22505590_29',
+        'order_type'  => 'LIMIT',
+        'buy_or_sell' => 'SELL',
+        'status'      => 'NEW',
+        'pair'        => {
+            'base' => 'GBP',
+            'coin' => 'XRP'
+        },
+        'order_qty'  => '13.8',
+        'filled_qty' => '0',
+        'price'      => '1.28371',
+        _others      => {
+            'orderListId'         => '-1',
+            'cummulativeQuoteQty' => '0',
+            'timeInForce'         => 'GTC',
+            'stopPrice'           => '0',
+            'icebergQty'          => '0',
+            'origQuoteOrderQty'   => '0',
+            'isWorking'           => 1,
         },
     },
   ];

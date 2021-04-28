@@ -29,6 +29,18 @@ subtest 'basic' => sub {
   );
 };
 
+subtest base_url => sub {
+  is $schema->base_url, 'http://petstore.swagger.io/v1', 'get';
+  is $schema->base_url('https://api.example.com:8080/api'), $schema, 'set url';
+  is $schema->get('/servers/0/url'), 'https://api.example.com:8080/api', 'servers changed';
+
+  is $schema->base_url(Mojo::URL->new('//api2.example.com')), $schema, 'set without scheme';
+  is $schema->get('/servers/0/url'), 'https://api2.example.com', 'servers changed';
+
+  is $schema->base_url(Mojo::URL->new('/v1')), $schema, 'set path';
+  is $schema->base_url->to_string, 'https://api2.example.com/v1', 'get';
+};
+
 subtest 'parameters_for_request' => sub {
   is $schema->parameters_for_request([GET => '/pets/nope']), undef, 'no such path';
   cmp_deeply $schema->parameters_for_request([GET => '/pets']), [superhashof({in => 'query', name => 'limit'})],
@@ -113,6 +125,21 @@ subtest 'validate_response - accept' => sub {
   is_deeply $body,
     {accept => 'application/*', content_type => 'application/json', in => 'body', name => 'body', valid => 1},
     'negotiated content type';
+};
+
+subtest add_default_response => sub {
+  $schema = JSON::Validator->new->schema($cwd->child(qw(spec v3-petstore.json)))->schema->resolve;
+  ok !$schema->get('/components/schemas/DefaultResponse'), 'default response missing';
+  ok !$schema->get([paths => '/petss', 'get', 'responses', '400']), 'default response missing for 400';
+  $schema->add_default_response;
+  ok $schema->get('/components/schemas/DefaultResponse'), 'default response added';
+
+  for my $status (400, 401, 404, 500, 501) {
+    ok $schema->get([paths => '/pets', 'get', 'responses', $status]), "default response for $status";
+  }
+
+  delete $schema->{errors};
+  is_deeply $schema->errors, [], 'errors';
 };
 
 done_testing;

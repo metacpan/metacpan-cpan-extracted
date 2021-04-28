@@ -9,7 +9,10 @@ META.json
 META.yml
 README
 t/00use.t
-t/01any.t
-t/02all.t
+t/01first.t
+t/02any.t
+t/03all.t
+t/04none.t
+t/05notall.t
 t/95benchmark.t
 t/99pod.t

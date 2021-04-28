@@ -1,7 +1,7 @@
 package Perinci::Examples::CmdLineSrc;
 
-our $DATE = '2020-04-29'; # DATE
-our $VERSION = '0.820'; # VERSION
+our $DATE = '2021-01-30'; # DATE
+our $VERSION = '0.821'; # VERSION
 
 use 5.010;
 use strict;
@@ -183,7 +183,7 @@ sub cmdline_src_multi_stdin_line {
      {'func.args'=>\%args}];
 }
 
-$SPEC{test_binary} = {
+$SPEC{binary} = {
     v => 1.1,
     summary => "Accept binary in stdin/file",
     description => <<'_',
@@ -204,7 +204,7 @@ _
         schema => "buf*",
     },
 };
-sub test_binary {
+sub binary {
     my %args = @_; # NO_VALIDATE_ARGS
     my $data = $args{data} // "\0\0\0";
     return [200, "OK", $data, {'func.args'=>\%args}];
@@ -225,9 +225,44 @@ Perinci::Examples::CmdLineSrc - Examples for using cmdline_src function property
 
 =head1 VERSION
 
-This document describes version 0.820 of Perinci::Examples::CmdLineSrc (from Perl distribution Perinci-Examples), released on 2020-04-29.
+This document describes version 0.821 of Perinci::Examples::CmdLineSrc (from Perl distribution Perinci-Examples), released on 2021-01-30.
 
 =head1 FUNCTIONS
+
+
+=head2 binary
+
+Usage:
+
+ binary(%args) -> [status, msg, payload, meta]
+
+Accept binary in stdinE<sol>file.
+
+This function is like the one in L<Perinci::Examples> but argument is accepted
+via C<stdin_or_files>.
+
+This function is not exported.
+
+Arguments ('*' denotes required arguments):
+
+=over 4
+
+=item * B<data> => I<buf> (default: "\0\0\0")
+
+
+=back
+
+Returns an enveloped result (an array).
+
+First element (status) is an integer containing HTTP status code
+(200 means OK, 4xx caller error, 5xx function error). Second element
+(msg) is a string containing error message, or 'OK' if status is
+200. Third element (payload) is optional, the actual result. Fourth
+element (meta) is called result metadata and is optional, a hash
+that contains extra information.
+
+Return value:  (buf)
+
 
 
 =head2 cmdline_src_file
@@ -656,41 +691,6 @@ that contains extra information.
 
 Return value:  (any)
 
-
-
-=head2 test_binary
-
-Usage:
-
- test_binary(%args) -> [status, msg, payload, meta]
-
-Accept binary in stdinE<sol>file.
-
-This function is like the one in L<Perinci::Examples> but argument is accepted
-via C<stdin_or_files>.
-
-This function is not exported.
-
-Arguments ('*' denotes required arguments):
-
-=over 4
-
-=item * B<data> => I<buf> (default: "\0\0\0")
-
-
-=back
-
-Returns an enveloped result (an array).
-
-First element (status) is an integer containing HTTP status code
-(200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
-
-Return value:  (buf)
-
 =head1 HOMEPAGE
 
 Please visit the project's homepage at L<https://metacpan.org/release/Perinci-Examples>.
@@ -713,7 +713,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020, 2019, 2018, 2017, 2016, 2015, 2014, 2013, 2012, 2011 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2020, 2019, 2018, 2017, 2016, 2015, 2014, 2013, 2012, 2011 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

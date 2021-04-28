@@ -19,8 +19,17 @@ CGI::Tiny - Common Gateway Interface, with no frills
     $cgi->set_error_handler(sub {
       my ($cgi, $error) = @_;
       warn $error;
-      $cgi->render(json => {error => 'Internal Error'}) unless $cgi->headers_rendered;
+      unless ($cgi->headers_rendered) {
+        if ($cgi->response_status_code == 413) {
+          $cgi->render(json => {error => 'Request body limit exceeded'});
+        } elsif ($cgi->response_status_code == 400) {
+          $cgi->render(json => {error => 'Bad request'});
+        } else {
+          $cgi->render(json => {error => 'Internal server error'});
+        }
+      }
     });
+
     my $method = $cgi->method;
     my $fribble;
     if ($method eq 'GET') {
@@ -32,6 +41,10 @@ CGI::Tiny - Common Gateway Interface, with no frills
       exit;
     }
     die "Invalid fribble parameter" unless length $fribble;
+
+    if ($cgi->query_param('download')) {
+      $cgi->set_response_download('fribble.json');
+    }
     $cgi->render(json => {fribble => $fribble});
   };
 
@@ -151,6 +164,50 @@ CGI::Tiny has built in support for parsing and rendering JSON content with
 L<JSON::PP>. CGI scripts that deal with JSON content will greatly benefit from
 installing L<Cpanel::JSON::XS> version C<4.09> or newer for efficient encoding
 and decoding, which will be used automatically if available.
+
+=head2 Files
+
+Modules like L<Path::Tiny> and L<MIME::Types> can help with file responses. Be
+aware that Perl and some operating systems work with filenames in encoded
+bytes, so non-ASCII filenames make things trickier.
+
+  #!/usr/bin/perl
+  use strict;
+  use warnings;
+  use utf8;
+  use CGI::Tiny;
+  use Path::Tiny;
+  use MIME::Types;
+
+  cgi {
+    my $cgi = $_;
+
+    my $filename = $cgi->query_param('filename');
+    unless (length $filename) {
+      $cgi->set_response_status(404)->render(text => 'Not Found');
+      exit;
+    }
+
+    # get files from public/ next to cgi-bin/
+    my $public_dir = path(__FILE__)->realpath->parent->sibling('public');
+    my $filepath = $public_dir->child($filename);
+
+    # ensure file exists, is readable, and is not a directory
+    unless (-r $filepath and !-d _) {
+      $cgi->set_response_status(404)->render(text => 'Not Found');
+      exit;
+    }
+
+    # ensure file path doesn't escape the public/ directory
+    unless ($public_dir->subsumes($filepath->realpath)) {
+      $cgi->set_response_status(404)->render(text => 'Not Found');
+      exit;
+    }
+
+    my $mime = MIME::Types->new->mimeTypeOf($filepath->basename);
+    $cgi->set_response_content_type($mime->type) if defined $mime;
+    $cgi->set_response_download($filepath->basename)->render(file => $filepath);
+  };
 
 =head2 Templating
 
@@ -287,20 +344,20 @@ warned or logged.
 
 Exceptions may occur before or after response headers have been rendered, so
 error handlers should render some response if L</"headers_rendered"> is
-false.
+false. L</"response_status_code"> may be set by some errors and can be
+inspected if headers have not been rendered yet.
 
 If the error handler itself throws an exception, that error and the original
 error will be emitted as a warning. If no response has been rendered after the
-error handler completes or dies, the default 500 Internal Server Error response
-will be rendered.
+error handler completes or dies, a default error response will be rendered.
 
 =head3 set_request_body_buffer
 
-  $cgi = $cgi->set_request_body_buffer(128*1024);
+  $cgi = $cgi->set_request_body_buffer(256*1024);
 
-Sets the buffer size for reading the request body (number of bytes to read at
-once). Defaults to the value of the C<CGI_TINY_REQUEST_BODY_BUFFER> environment
-variable or 131072 (128 KiB). A value of 0 will use the default value.
+Sets the buffer size (number of bytes to read at once) for reading the request
+body. Defaults to the value of the C<CGI_TINY_REQUEST_BODY_BUFFER> environment
+variable or 262144 (256 KiB). A value of 0 will use the default value.
 
 =head3 set_request_body_limit
 
@@ -427,7 +484,7 @@ are decoded to Unicode characters.
   my $arrayref = $cgi->query_param_names;
 
 Retrieve URL query string parameter names, decoded to Unicode characters, as an
-unsorted array reference.
+ordered array reference.
 
 =head3 query_param
 
@@ -470,7 +527,7 @@ represented as two-element array references.
 
   my $arrayref = $cgi->cookie_names;
 
-Retrieve request cookie names as an unsorted array reference.
+Retrieve request cookie names as an ordered array reference.
 
 =head3 cookie
 
@@ -517,7 +574,7 @@ L</"set_request_body_limit"> can fit well within the available memory.
 
 Retrieve C<applicationE<sol>x-www-form-urlencoded> or
 C<multipartE<sol>form-data> body parameter names, decoded to Unicode
-characters, as an unsorted array reference.
+characters, as an ordered array reference.
 
 Note that this will read the text form fields into memory, so make sure the
 L</"set_request_body_limit"> can fit well within the available memory.
@@ -635,7 +692,7 @@ with the C<seek> pointer at the start of the file for reading.
   my $arrayref = $cgi->upload_names;
 
 Retrieve C<multipartE<sol>form-data> file upload names, decoded to Unicode
-characters, as an unsorted array reference.
+characters, as an ordered array reference.
 
 Note that this will read the text form fields into memory, so make sure the
 L</"set_request_body_limit"> can fit well within the available memory.
@@ -679,6 +736,15 @@ CGI server.
 
 No effect after response headers have been rendered.
 
+=head3 set_response_body_buffer
+
+  $cgi = $cgi->set_response_body_buffer(128*1024);
+
+Sets the buffer size (number of bytes to read at once) for streaming a C<file>
+or C<handle> response body with L</"render">. Defaults to the value of the
+C<CGI_TINY_RESPONSE_BODY_BUFFER> environment variable or 131072 (128 KiB). A
+value of 0 will use the default value.
+
 =head3 set_response_status
 
   $cgi = $cgi->set_response_status(404);
@@ -706,6 +772,15 @@ L</"render">. No effect after response headers have been rendered.
 
 Set charset to use when rendering C<text>, C<html>, or C<xml> response data,
 defaults to C<UTF-8>.
+
+=head3 set_response_download
+
+  $cgi = $cgi->set_response_download;
+  $cgi = $cgi->set_response_download($filename);
+
+Sets the response C<Content-Disposition> header to indicate to the client that
+the response is a file download, with an optional filename specified in Unicode
+characters. No effect after response headers have been rendered.
 
 =head3 add_response_header
 
@@ -798,6 +873,14 @@ If set to a true value, the cookie will be restricted to HTTPS requests.
 
 =back
 
+=head3 response_status_code
+
+  my $code = $cgi->response_status_code;
+
+Numerical response HTTP status code that will be sent when headers are
+rendered, as set by L</"set_response_status"> or an error occurring. Defaults
+to C<200>.
+
 =head3 headers_rendered
 
   my $bool = $cgi->headers_rendered;
@@ -808,11 +891,13 @@ to L</"render">.
 =head3 render
 
   $cgi->render;
-  $cgi->render(html => $html);
-  $cgi->render(xml  => $xml);
-  $cgi->render(text => $text);
-  $cgi->render(data => $bytes);
-  $cgi->render(json => $ref);
+  $cgi->render(html     => $html);
+  $cgi->render(xml      => $xml);
+  $cgi->render(text     => $text);
+  $cgi->render(data     => $bytes);
+  $cgi->render(file     => $filepath);
+  $cgi->render(handle   => $filehandle);
+  $cgi->render(json     => $ref);
   $cgi->render(redirect => $url);
 
 Renders response data of a type indicated by the first parameter, if any. The
@@ -828,6 +913,10 @@ there is no more appropriate value.
 C<html>, C<xml>, or C<text> data is expected to be decoded Unicode characters,
 and will be encoded according to L</"set_response_charset"> (UTF-8 by default).
 L<Unicode::UTF8> will be used for efficient UTF-8 encoding if available.
+
+C<data>, C<file>, or C<handle> will render bytes from a string, local file
+path, or open filehandle respectively. A C<handle> will have C<binmode> applied
+to remove any translation layers, and its contents will be streamed until EOF.
 
 C<json> data structures will be encoded to JSON and UTF-8.
 
@@ -880,6 +969,10 @@ Default value for L</"set_request_body_buffer">.
 =head2 CGI_TINY_REQUEST_BODY_LIMIT
 
 Default value for L</"set_request_body_limit">.
+
+=head2 CGI_TINY_RESPONSE_BODY_BUFFER
+
+Default value for L</"set_response_body_buffer">.
 
 =head1 COMPARISON TO CGI.PM
 
@@ -981,19 +1074,19 @@ does not reimplement the HTML generation helpers.
 =item *
 
 L<CGI::Thin> is ancient and only implements parsing of request query or body
-parameters, without decoding them from UTF-8 bytes.
+parameters, without decoding them to Unicode characters.
 
 =item *
 
 L<CGI::Minimal> has context-sensitive parameter accessors, and only implements
-parsing of request query/body parameters (without decoding them from UTF-8
-bytes) and uploads.
+parsing of request query/body parameters (without decoding them to Unicode
+characters) and uploads.
 
 =item *
 
 L<CGI::Lite> has context-sensitive parameter accessors, and only implements
-parsing of request query/body parameters (without decoding them from UTF-8
-bytes), uploads, and cookies.
+parsing of request query/body parameters (without decoding them to Unicode
+characters), uploads, and cookies.
 
 =item *
 

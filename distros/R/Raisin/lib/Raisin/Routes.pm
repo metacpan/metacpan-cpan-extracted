@@ -6,7 +6,7 @@ use strict;
 use warnings;
 
 package Raisin::Routes;
-$Raisin::Routes::VERSION = '0.90';
+$Raisin::Routes::VERSION = '0.91';
 use Carp;
 use Plack::Util::Accessor qw(
     cache
@@ -123,7 +123,7 @@ Raisin::Routes - A routing class for Raisin.
 
 =head1 VERSION
 
-version 0.90
+version 0.91
 
 =head1 SYNOPSIS
 
@@ -188,7 +188,7 @@ This module was inspired by L<Kelp::Routes>.
 
 =head1 AUTHOR
 
-Artur Khabibullin <rtkh@cpan.org>
+Artur Khabibullin
 
 =head1 COPYRIGHT AND LICENSE
 

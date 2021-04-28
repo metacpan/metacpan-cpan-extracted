@@ -3,7 +3,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = "0.11";
+our $VERSION = "0.12";
 
 use Scalar::Util ();
 
@@ -31,7 +31,7 @@ sub new {
 }
 
 sub name()       { my $self = shift; return $self->{name} // '' }
-sub type()       { my $self = shift; return $self->{type} // '' }
+sub type()       { my $self = shift; return $self->{type} }
 sub default()    { my $self = shift; return $self->{default} } ## no critic (ProhibitBuiltinHomonyms)
 sub coerce()     { my $self = shift; return $self->{coerce} }
 sub optional()   { my $self = shift; return !!$self->{optional} }
@@ -75,10 +75,30 @@ sub is_same_interface {
     }
 
     if ($self->has_type) {
-        return unless $self->type eq $other->type
+        return unless $self->type eq ($other->type // '');
     }
     else {
         return if $other->has_type
+    }
+
+    return unless $self->optional eq $other->optional;
+
+    return unless $self->named eq $other->named;
+
+    return !!1;
+}
+
+sub is_relaxed_same_interface {
+    my ($self, $other) = @_;
+
+    return unless Scalar::Util::blessed($other) && $other->isa('Sub::Meta::Param');
+
+    if ($self->has_name) {
+        return unless $self->name eq $other->name
+    }
+
+    if ($self->has_type) {
+        return unless $self->type eq ($other->type // '');
     }
 
     return unless $self->optional eq $other->optional;
@@ -97,8 +117,25 @@ sub is_same_interface_inlined {
     push @src => $self->has_name ? sprintf("'%s' eq %s->name", $self->name, $v)
                                  : sprintf('!%s->has_name', $v);
 
-    push @src => $self->has_type ? sprintf("'%s' eq %s->type", "@{[$self->type]}", $v)
+    push @src => $self->has_type ? sprintf("'%s' eq (%s->type // '')", "@{[$self->type]}", $v)
                                  : sprintf('!%s->has_type', $v);
+
+    push @src => sprintf("'%s' eq %s->optional", $self->optional, $v);
+
+    push @src => sprintf("'%s' eq %s->named", $self->named, $v);
+
+    return join "\n && ", @src;
+}
+
+sub is_relaxed_same_interface_inlined {
+    my ($self, $v) = @_;
+
+    my @src;
+    push @src => sprintf("Scalar::Util::blessed(%s) && %s->isa('Sub::Meta::Param')", $v, $v);
+
+    push @src => sprintf("'%s' eq %s->name", $self->name, $v) if $self->has_name;
+
+    push @src => sprintf("'%s' eq (%s->type // '')", "@{[$self->type]}", $v) if $self->has_type;
 
     push @src => sprintf("'%s' eq %s->optional", $self->optional, $v);
 
@@ -319,11 +356,30 @@ Setter for C<invocant>.
 A boolean value indicating whether C<Sub::Meta::Param> object is same or not.
 Specifically, check whether C<name>, C<type>, C<optional> and C<named> are equal.
 
+=head3 is_relaxed_same_interface($other_meta)
+
+  method is_relaxed_same_interface(InstanceOf[Sub::Meta::Param] $other_meta) => Bool
+
+A boolean value indicating whether C<Sub::Meta::Param> object is same or not.
+Specifically, check whether C<name>, C<type>, C<optional> and C<named> are satisfy
+the condition of C<$self> side:
+
+    my $meta = Sub::Meta::Param->new;
+    my $other = Sub::Meta::Param->new(name => '$a');
+    $meta->is_same_interface($other); # NG
+    $meta->is_relaxed_same_interface($other); # OK. The reason is that $meta does not specify the name.
+
 =head3 is_same_interface_inlined($other_meta_inlined)
 
   method is_same_interface_inlined(InstanceOf[Sub::Meta::Param] $other_meta) => Str
 
 Returns inlined C<is_same_interface> string.
+
+=head3 is_relaxed_same_interface_inlined($other_meta_inlined)
+
+    method is_relaxed_same_interface_inlined(InstanceOf[Sub::Meta::Param] $other_meta) => Str
+
+Returns inlined C<is_relaxed_same_interface> string.
 
 =head3 display
 

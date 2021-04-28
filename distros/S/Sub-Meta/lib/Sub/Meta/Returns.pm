@@ -3,7 +3,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = "0.11";
+our $VERSION = "0.12";
 
 use Scalar::Util ();
 
@@ -66,6 +66,26 @@ sub is_same_interface {
     return !!1;
 }
 
+sub is_relaxed_same_interface {
+    my ($self, $other) = @_;
+
+    return unless Scalar::Util::blessed($other) && $other->isa('Sub::Meta::Returns');
+
+    if ($self->has_scalar) {
+        return unless _eq($self->scalar, $other->scalar)
+    }
+
+    if ($self->has_list) {
+        return unless _eq($self->list, $other->list)
+    }
+
+    if ($self->has_void) {
+        return unless _eq($self->void, $other->void)
+    }
+
+    return !!1;
+}
+
 sub is_same_interface_inlined {
     my ($self, $v) = @_;
 
@@ -81,6 +101,22 @@ sub is_same_interface_inlined {
 
     push @src => $self->has_void ? _eq_inlined($self->void, sprintf('%s->void', $v))
                                    : sprintf('!%s->has_void', $v);
+
+    return join "\n && ", @src;
+}
+
+sub is_relaxed_same_interface_inlined {
+    my ($self, $v) = @_;
+
+    my @src;
+
+    push @src => sprintf("Scalar::Util::blessed(%s) && %s->isa('Sub::Meta::Returns')", $v, $v);
+
+    push @src => _eq_inlined($self->scalar, sprintf('%s->scalar', $v)) if $self->has_scalar;
+
+    push @src => _eq_inlined($self->list, sprintf('%s->list', $v)) if $self->has_list;
+
+    push @src => _eq_inlined($self->void, sprintf('%s->void', $v)) if $self->has_void;
 
     return join "\n && ", @src;
 }
@@ -101,7 +137,7 @@ sub _eq {
     return 1;
 }
 
-sub interface_error_message {
+sub error_message {
     my ($self, $other) = @_;
 
     return sprintf('must be Sub::Meta::Returns. got: %s', $other // '')
@@ -130,6 +166,30 @@ sub interface_error_message {
     else {
         return 'should not have void return' if $other->has_void;
     }
+    return '';
+}
+
+sub relaxed_error_message {
+    my ($self, $other) = @_;
+
+    return sprintf('must be Sub::Meta::Returns. got: %s', $other // '')
+        unless Scalar::Util::blessed($other) && $other->isa('Sub::Meta::Returns');
+
+    if ($self->has_scalar) {
+        return sprintf('invalid scalar return. got: %s, expected: %s', $other->scalar, $self->scalar)
+            unless _eq($self->scalar, $other->scalar);
+    }
+
+    if ($self->has_list) {
+        return sprintf('invalid list return. got: %s, expected: %s', $other->list, $self->list)
+            unless _eq($self->list, $other->list);
+    }
+
+    if ($self->has_void) {
+        return sprintf('invalid void return. got: %s, expected: %s', $other->void, $self->void)
+            unless _eq($self->void, $other->void);
+    }
+
     return '';
 }
 
@@ -299,17 +359,42 @@ Setter for C<coerce>.
 A boolean value indicating whether C<Sub::Meta::Returns> object is same or not.
 Specifically, check whether C<scalar>, C<list> and C<void> are equal.
 
+=head3 is_relaxed_same_interface($other_meta)
+
+    method is_relaxed_same_interface(InstanceOf[Sub::Meta::Returns] $other_meta) => Bool
+
+A boolean value indicating whether C<Sub::Meta::Returns> object is same or not.
+Specifically, check whether C<scalar>, C<list> and C<void> are satisfy
+the condition of C<$self> side:
+
+    my $meta = Sub::Meta::Returns->new(scalar => 'Str')
+    my $other = Sub::Meta::Returns->new(scalar => 'Str', list => 'Int');
+    $meta->is_same_interface($other); # NG
+    $meta->is_relaxed_same_interface($other); # OK. The reason is that $meta does not specify the list type.
+
 =head3 is_same_interface_inlined($other_meta_inlined)
 
     method is_same_interface_inlined(InstanceOf[Sub::Meta::Returns] $other_meta) => Str
 
 Returns inlined C<is_same_interface> string.
 
-=head3 interface_error_message($other_meta)
+=head3 is_relaxed_same_interface_inlined($other_meta_inlined)
 
-    method interface_error_message(InstanceOf[Sub::Meta::Returns] $other_meta) => Str
+    method is_relaxed_same_interface_inlined(InstanceOf[Sub::Meta::Returns] $other_meta) => Str
 
-Return the error message when the interface does not match. If match, then return empty string.
+Returns inlined C<is_relaxed_same_interface> string.
+
+=head3 error_message($other_meta)
+
+    method error_message(InstanceOf[Sub::Meta::Returns] $other_meta) => Str
+
+Return the error message when the interface is not same. If same, then return empty string.
+
+=head3 relaxed_error_message($other_meta)
+
+    method relaxed_error_message(InstanceOf[Sub::Meta::Returns] $other_meta) => Str
+
+Return the error message when the interface does not satisfy the C<$self> meta. If match, then return empty string.
 
 =head3 display
 

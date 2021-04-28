@@ -11,11 +11,21 @@ use List::Keywords 'all';
 ok( !(all { $_ < 10 } 1 .. 20), 'not all list values below ten' );
 ok(  (all { $_ < 10 } 1 .. 9), 'all list values below ten' );
 
-# any empty list is true
+# all empty list is true
 {
    my $invoked;
    ok( (all { $invoked } ()), 'all on empty list is true' );
    ok( !$invoked, 'all on empty list did not invoke block' );
+}
+
+# all failure yields false in list context
+{
+   my @ret;
+   @ret = all { $_ > 10 } 1 .. 9;
+   ok( !!@ret, 'all nothing yielded false in list context' );
+
+   @ret = all { $_ > 10 } ();
+   ok( !!@ret, 'all nothing yielded false in list context on empty input' );
 }
 
 # short-circuiting

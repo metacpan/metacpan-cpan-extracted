@@ -5,6 +5,7 @@ runtime:
     Carp: 0
     Encode: 0
     Exporter: '5.57'
+    File::Temp: 0
     IO::Handle: 0
     JSON::PP: 0
     Time::Local: 0
@@ -13,6 +14,5 @@ runtime:
     Unicode::UTF8: 0
 test:
   requires:
-    File::Temp: 0
     MIME::Base64: 0
     Test::More: '0.96'

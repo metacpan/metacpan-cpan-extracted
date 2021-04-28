@@ -6,7 +6,7 @@ use strict;
 use warnings;
 
 package Raisin::Encoder::Text;
-$Raisin::Encoder::Text::VERSION = '0.90';
+$Raisin::Encoder::Text::VERSION = '0.91';
 use Data::Dumper;
 use Encode 'encode';
 
@@ -45,7 +45,7 @@ Raisin::Encoder::Text - Data::Dumper serialization plugin for Raisin.
 
 =head1 VERSION
 
-version 0.90
+version 0.91
 
 =head1 DESCRIPTION
 
@@ -53,7 +53,7 @@ Provides C<content_type>, C<serialize> methods.
 
 =head1 AUTHOR
 
-Artur Khabibullin <rtkh@cpan.org>
+Artur Khabibullin
 
 =head1 COPYRIGHT AND LICENSE
 

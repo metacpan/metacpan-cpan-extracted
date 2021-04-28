@@ -31,3 +31,13 @@
 
 2021-04-27 - v0.04
     + Correct the previous version number format
+
+
+2021-04-28 - v0.05
+    + Re-use list_all_orders spec for list_open_orders
+
+    + list_open_orders sorted by price
+
+    + list_filled_orders sorted by filled_time
+
+    + list_all_orders sorted by last_updated

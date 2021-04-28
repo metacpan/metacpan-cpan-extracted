@@ -14,8 +14,20 @@ ok( !(any { $_ > 10 } 1 .. 9), 'list does not contain a value above ten' );
 # any empty list is false
 {
    my $invoked;
-   ok( !(any { $invoked++ } ()), 'any on empty list is false' );
+   my $ret = any { $invoked++ } ();
+   ok( defined $ret, 'any on empty list is defined' );
+   ok( !$ret, 'any on empty list is false' );
    ok( !$invoked, 'any on empty list did not invoke block' );
+}
+
+# any failure yields false in list context
+{
+   my @ret;
+   @ret = any { $_ > 10 } 1 .. 9;
+   ok( !!@ret, 'any nothing yielded false in list context' );
+
+   @ret = any { $_ > 10 } ();
+   ok( !!@ret, 'any nothing yielded false in list context on empty input' );
 }
 
 # short-circuiting

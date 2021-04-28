@@ -1,7 +1,7 @@
 package Perinci::Examples::CLI;
 
-our $DATE = '2020-04-29'; # DATE
-our $VERSION = '0.820'; # VERSION
+our $DATE = '2021-01-30'; # DATE
+our $VERSION = '0.821'; # VERSION
 
 use 5.010001;
 use strict;
@@ -322,7 +322,7 @@ Perinci::Examples::CLI - Example for CLI help/usage generation
 
 =head1 VERSION
 
-This document describes version 0.820 of Perinci::Examples::CLI (from Perl distribution Perinci-Examples), released on 2020-04-29.
+This document describes version 0.821 of Perinci::Examples::CLI (from Perl distribution Perinci-Examples), released on 2021-01-30.
 
 =head1 DESCRIPTION
 
@@ -353,19 +353,45 @@ Examples:
 
 Result:
 
- {
-   array1 => ["elem1", "elem2"],
-   full   => 1,
-   full2  => 1,
-   hash1  => { default => 1 },
-   int1   => 10,
-   int2   => 10,
-   str1   => "a value",
- }
+ [
+   200,
+   "OK",
+   {
+     array1 => ["elem1", "elem2"],
+     full   => 1,
+     full2  => 1,
+     hash1  => { default => 1 },
+     int1   => 10,
+     int2   => 10,
+     str1   => "a value",
+   },
+   {},
+ ]
 
 =item * A second example:
 
- demo_cli_opts( str1 => "x", array1 => [1, 2], int1 => 20); # -> undef
+ demo_cli_opts( str1 => "x", array1 => [1, 2], int1 => 20);
+
+Result:
+
+ [
+   400,
+   "Can't parse argv",
+   undef,
+   {
+     logs => [
+               {
+                 file    => "/home/s1/perl5/perlbrew/perls/perl-5.30.2/lib/site_perl/5.30.2/Perinci/Access/Schemeless.pm",
+                 func    => "Perinci::Access::Schemeless::action_call",
+                 line    => 501,
+                 package => "Perinci::Access::Schemeless",
+                 time    => 1611968767,
+                 type    => "create",
+               },
+             ],
+     prev => [500, "GetOptions failed"],
+   },
+ ]
 
 =back
 
@@ -523,7 +549,11 @@ Examples:
 
 =item * Summary for an example:
 
- demo_cli_opts_shorter( str1 => "a value", bool1 => 1); # -> { bool1 => 1, str1 => "a value" }
+ demo_cli_opts_shorter( str1 => "a value", bool1 => 1);
+
+Result:
+
+ [200, "OK", { bool1 => 1, str1 => "a value" }, {}]
 
 =back
 
@@ -585,7 +615,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020, 2019, 2018, 2017, 2016, 2015, 2014, 2013, 2012, 2011 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2020, 2019, 2018, 2017, 2016, 2015, 2014, 2013, 2012, 2011 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

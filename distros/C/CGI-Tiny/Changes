@@ -1,3 +1,12 @@
+0.009     2021-04-28 03:03:52 EDT
+  - query_param_names, body_param_names, cookie_names, and upload_names now return names in the original request order
+  - Add set_response_download and set_response_body_buffer methods
+  - Add file and handle render options
+
+0.008     2021-04-27 21:11:22 EDT
+  - Fix parsing of empty multipart/form-data forms and some other edge cases
+  - Add response_status_code method
+
 0.007     2021-04-27 02:00:33 EDT
   - Support reading request body parameters from multipart/form-data requests
   - Add uploads, upload_names, upload, and upload_array methods to support multipart/form-data file uploads

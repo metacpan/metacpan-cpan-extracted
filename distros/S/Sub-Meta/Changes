@@ -1,5 +1,13 @@
 Revision history for Perl extension Sub-Meta
 
+0.12 2021-04-28T14:39:12Z
+    [IMPROVEMENTS]
+    - feat: add is_relaxed_same_interface and relaxed_error_message #40 #41
+    - improve many tests #34 #35 #36 #37 #38 #39
+    
+    [INCOMPATIBLE CHANGES]
+    - rename interface_error_message to error_message #40
+
 0.11 2021-04-07T15:17:42Z
     [IMPROVEMENTS]
     - feat: add interface_error_message method #32

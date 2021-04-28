@@ -4,36 +4,31 @@ package SPVM::StringUtil;
 
 =head1 NAME
 
-SPVM::StringUtil - Variouse utilities
+SPVM::StringUtil - String Utilities
 
 =head1 SYNOPSYS
   
-  use SPVM::StringUtil (chomp_lf, chomp_crlf);
+  use SPVM::StringUtil;
 
   # Cut a newline LF
   {
-    my $ret = chomp_lf("abc\n");
-  }
-  
-  # Cut a newline CR LF
-  {
-    my $ret = chomp_crlf("abc\r\n");
+    my $ret = SPVM::StringUtil->chompr("abc\n");
   }
   
   # Copy a string
   {
-    my $str = "abc";
-    my $str_copy = copy_string($str);
+    my $string = "abc";
+    my $string_copy = SPVM::StringUtil->copy_string ($string);
   }
 
   # Search substr
   {
-    my $found_offset = index("pppabcde", "bcd", 2);
+    my $found_offset = SPVM::StringUtil->index("pppabcde", "bcd", 2);
   }
 
   # split a string by the specific separator
-  my $str = "foo,bar,baz";
-  my $splited_strs = split(",", $str);
+  my $string = "foo,bar,baz";
+  my $splited_strs = SPVM::StringUtil->split(",", $string);
 
 =head1 DESCRIPTION
 
@@ -41,23 +36,11 @@ String Utilities
 
 =head1 STATIC METHODS
 
-=head2 split
+=head2 chompr
 
-  sub split : string[] ($sep : string, $string : string)
+  sub chompr : string ($string : string)
 
-Split a string by the specific separator.
-
-=head2 chomp_lf
-
-  sub chomp_lf : string ($string : string)
-
-Copy the string and remove the newline "\n" from the end of string and return it.
-
-=head2 chomp_crlf
-
-  sub chomp_crlf : string ($string : string)
-
-Copy the string and remove the newline "\r\n" from the end of string and return it.
+Copy the string and remove "\n" of the end of line and return it.
 
 =head2 copy_string
 
@@ -69,109 +52,97 @@ If the array is undefined, a exception occurs.
 
 =head2 index
 
-  sub index : int ($str : string, $substr : string, $posision : int)
+  sub index : int ($string : string, $sub_string : string, $position : int)
 
 index function searches for one string within another.
-It returns the position of the first occurrence of $substr in $str at or after $position. If $position is omitted, starts
+It returns the position of the first occurrence of $sub_string in $string at or after $position. If $position is omitted, starts
 searching from the beginning of the string. $position before the
 beginning of the string or after its end is treated as if it were
 the beginning or the end, respectively. $position and the return
 value are based at zero. If the substring is not found, "index"
 returns -1.
             
-=head2 isalnum
+=head2 is_alnum
 
-  sub isalnum : int ($char : int)
+  sub is_alnum : int ($code_point : int)
 
 If character is alphanumeric('A'-'Z', 'a'-'z', '0'-'9'), return 1. If not, return 0.
 
-=head2 isalpha
+=head2 is_alpha
 
-  sub isalpha : int ($char : int)
+  sub is_alpha : int ($code_point : int)
 
 If character is alphabetic('A'-'Z', 'a'-'z'), return 1. If not, return 0.
 
-=head2 isblank
+=head2 is_blank
 
-  sub isblank : int ($char : int)
+  sub is_blank : int ($code_point : int)
 
 If character is blank(' ', '\t'), return 1. If not, return 0.
 
-=head2 iscntrl
+=head2 is_cntrl
 
-  sub iscntrl : int ($char : int)
+  sub is_cntrl : int ($code_point : int)
 
 If character is a control character(0x00-0x1F, 0x7F), return 1. If not, return 0.
 
-=head2 isdigit
+=head2 is_digit
 
-  sub isdigit : int ($char : int)
+  sub is_digit : int ($code_point : int)
 
 If character is decimal digit ('0'～'9'), return 1. If not, return 0.
 
-=head2 isgraph
+=head2 is_graph
 
-  sub isgraph : int ($char : int)
+  sub is_graph : int ($code_point : int)
 
 If character has graphical representation(0x21-0x7E), return 1. If not, return 0.
 
-=head2 islower
+=head2 is_lower
 
-  sub islower : int ($char : int)
+  sub is_lower : int ($code_point : int)
 
 If character is lowercase letter('a'-'z'), return 1. If not, return 0.
 
-=head2 isprint
+=head2 is_print
 
-  sub isprint : int ($char : int)
+  sub is_print : int ($code_point : int)
 
 If character is printable(0x20-0x7E), return 1. If not, return 0.
 
-=head2 ispunct
+=head2 is_punct
 
-  sub ispunct : int ($char : int)
+  sub is_punct : int ($code_point : int)
 
 If character is a punctuation character(0x21-0x2f, 0x3a-0x40, 0x5b-0x60, 0x7b-0x7e), return 1. If not, return 0.
 
-=head2 isspace
+=head2 is_space
 
-  sub isspace : int ($char : int)
+  sub is_space : int ($code_point : int)
 
 If character is a white-space(' ',  '\t', '\n', '\v', '\f', '\r'), return 1. If not, return 0.
 
-=head2 isupper
+=head2 is_upper
 
-  sub isupper : int ($char : int)
+  sub is_upper : int ($code_point : int)
 
 If character is uppercase letter('A'-'Z'), return 1. If not, return 0.
 
-=head2 isxdigit
+=head2 is_xdigit
 
-  sub isxdigit : int ($char : int)
+  sub is_xdigit : int ($code_point : int)
 
 If character is hexadecimal digit('0'-'9', 'A'-'F', 'a'-'f'), return 1. If not, return 0.
 
-=head2 tolower
-
-  sub tolower : int ($char : int)
-
-Convert uppercase letter('A'-'Z') to lowercase. If the character is not uppercase letter, return the character.
-
-=head2 toupper
-
-  sub toupper : int ($char : int)
-
-Convert lowercase letter('a'-'z') to lowercase. If the character is not uppercase letter, return the character.
-
 =head2 is_perl_space
 
-  sub is_perl_space : int ($char : int)
+  sub is_perl_space : int ($code_point : int)
 
 If character is Perl space character(' ', '\r', '\n', '\t', '\f'), return 1. If not, return 0.
 
 =head2 is_perl_word
 
-  sub is_perl_word : int ($char : int)
+  sub is_perl_word : int ($code_point : int)
 
 If character is Perl word character('a'-'z', 'A'-'Z', '_', '0'-'9'), return 1. If not, return 0.
 
@@ -187,46 +158,68 @@ If string array is undef, a exception occurs.
 
 =head2 lc
 
-  sub lc : string($str : string)
+  sub lc : string ($string : string)
 
 Convert uppercase string to lowercase string.
 
 =head2 lcfirst
 
-  sub lcfirst : string($str : string)
+  sub lcfirst : string ($string : string)
 
 Convert first chracter of string from uppercase to lowercase.
 
-=head2 replace
+=head2 rindex
 
-  sub replace : string ($str : string, $substr : string, $replace : string, $start_offset : int, $found_offset_ref : int&)
+  sub rindex : int ($string : string, $sub_string : string, $offset : int)
 
-Replace the sub string in the string with a replace string and return the result string.
+Same as "index" function except that the search is the last of the string.
 
-You can specify a byte offset of the string.
+=head2 split
 
-You can get the found byte offset by int reference.
+  sub split : string[] ($sep : string, $string : string)
 
-  my $str = "abcde";
-  my $substr = "bcd";
-  my $replace = "AB";
-  my $found_offset = 0;
-  my $result_str = replace($str, $substr, $replace, 0, \$found_offset);
+Split a string by the specific separator.
 
-=head2 replace_all
+=head2 uc
 
-  sub replace_all : string ($str : string, $substr : string, $replace : string)
+  sub uc : string ($string : string)
 
-Replace all the sub string in the string with a replace string and return the result string.
+Convert a lowercase string to a uppercase string.
 
-  my $str = "foo bar foo bar foo";
-  my $substr = "bar";
-  my $replace = "AB";
-  my $result_str = replace_all($str, $substr, $replace);
+If the string is undef, a exception occur.
 
-=head2 strtoi
+=head2 ucfirst
 
-  sub strtoi : int ($string : string, $digit : int);
+  sub ucfirst : string ($string : string)
+
+Convert the first character of a string to a uppercase character.
+
+If the string is undef, a exception occur.
+
+=head2 to_lower
+
+  sub to_lower : int ($code_point : int)
+
+Convert uppercase letter('A'-'Z') to lowercase. If the character is not uppercase letter, return the character.
+
+=head2 to_upper
+
+  sub to_upper : int ($code_point : int)
+
+Convert lowercase letter('a'-'z') to lowercase. If the character is not uppercase letter, return the character.
+
+=head2 to_int
+
+  sub to_int : int ($string : string, $digit : int);
+
+Convert the string to a int value. This method is same as to_int_with_base($string, 10).
+
+  my $string = "-2147483648";
+  my $num = to_int($string);
+
+=head2 to_int_with_base
+
+  sub to_int_with_base : int ($string : string, $digit : int);
 
 Convert the string to a int value with a digit(2, 8, 10, 16).
 
@@ -235,11 +228,20 @@ Format is [' ' or '\t' or '\n' or '\v' or '\f' or '\r'][+ or -][0][x][one more t
 If convertion fails, a exception occuer.
 
   my $string = "-2147483648";
-  my $num = strtoi($string, 10);
+  my $num = to_int_with_base($string, 10);
 
-=head2 strtol
+=head2 to_long
 
-  sub strtol : long ($string : string, $digit : int);
+  sub to_long : long ($string : string);
+
+Convert the string to long value. This method is same as to_long($string, 10).
+
+  my $string = "-9223372036854775808";
+  my $num = to_long($string);
+
+=head2 to_long_with_base
+
+  sub to_long_with_base : long ($string : string, $digit : int);
 
 Convert the string to long value with digit(2, 8, 10, 16).
 
@@ -248,24 +250,11 @@ Format is [' ' or '\t' or '\n' or '\v' or '\f' or '\r'][+ or -][0][x][zero more 
 If the convertion fails, a exception occuer.
 
   my $string = "-9223372036854775808";
-  my $num = strtol($string, 10);
+  my $num = to_long_with_base($string, 10);
 
-=head2 strtof
+=head2 to_float
 
-  sub strtof : float ($string : string);
-
-Convert the string to float value.
-
-Format is [' ' or '\t' or '\n' or '\v' or '\f' or '\r'][+ or -][zero more than 0-9][.][zero more than 0-9][e or E[+ or -]zero more than 0-9]. Internal of [] is optional.
-
-If the convertion fails, a exception occuer.
-
-  my $string = "1.25";
-  my $num = strtof($string);
-
-=head2 strtod
-
-  sub strtod : double ($string : string);
+  sub to_float : float ($string : string);
 
 Convert the string to float value.
 
@@ -274,32 +263,18 @@ Format is [' ' or '\t' or '\n' or '\v' or '\f' or '\r'][+ or -][zero more than 0
 If the convertion fails, a exception occuer.
 
   my $string = "1.25";
-  my $num = strtod($string);
+  my $num = to_float($string);
 
-=head2 uc
+=head2 to_double
 
-  sub uc : string($str : string)
+  sub to_double : double ($string : string);
 
-Convert a lowercase string to a uppercase string.
+Convert the string to float value.
 
-If the string is undef, a exception occur.
+Format is [' ' or '\t' or '\n' or '\v' or '\f' or '\r'][+ or -][zero more than 0-9][.][zero more than 0-9][e or E[+ or -]zero more than 0-9]. Internal of [] is optional.
 
-=head2 ucfirst
+If the convertion fails, a exception occuer.
 
-  sub ucfirst : string($str : string)
+  my $string = "1.25";
+  my $num = to_double($string);
 
-Convert the first character of a string to a uppercase character.
-
-If the string is undef, a exception occur.
-
-=head2 rindex
-
-  sub rindex : int ($str : string, $substr : string, $offset : int)
-
-Same as "index" function except that the search is the last of the string.
-
-=head2 contains
-
-  sub contains : int ($str : string, $substr : string)
-
-If the string contains the sub string, return 1. If not, return 0.

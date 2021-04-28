@@ -3,7 +3,7 @@ package Myriad::RPC;
 use strict;
 use warnings;
 
-our $VERSION = '0.003'; # VERSION
+our $VERSION = '0.004'; # VERSION
 our $AUTHORITY = 'cpan:DERIV'; # AUTHORITY
 
 no indirect qw(fatal);

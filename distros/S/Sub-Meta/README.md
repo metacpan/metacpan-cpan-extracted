@@ -161,7 +161,7 @@ Accessor for subroutine.
 - `sub`
 
     ```perl
-    method sub() Maybe[CodeRef]
+    method sub() => Maybe[CodeRef]
     ```
 
     Return a subroutine.
@@ -308,11 +308,10 @@ Accessor for subroutine information
 
     A subroutine information, e.g. `['main', 'hello']`
 
-- `set_subinfo($stashname, $subname)`
+- `set_subinfo([$stashname, $subname])`
 
     ```perl
-    method set_stashname(Str $stashname, Str $subname) => $self
-    method set_stashname(Tuple[Str, Str]) => $self
+    method set_stashname(Tuple[Str $stashname, Str $subname]) => $self
     ```
 
     Setter for subroutine information.
@@ -324,10 +323,18 @@ Accessor for filename and line where subroutine is defined
 - `file`
 
     ```perl
-    method file() => Str
+    method file() => Maybe[Str]
     ```
 
     A filename where subroutine is defined, e.g. `path/to/main.pl`.
+
+- `has_file`
+
+    ```perl
+    method has_file() => Bool
+    ```
+
+    Whether Sub::Meta has a filename where subroutine is defined.
 
 - `set_file($filepath)`
 
@@ -340,10 +347,18 @@ Accessor for filename and line where subroutine is defined
 - `line`
 
     ```perl
-    method line() => Int
+    method line() => Maybe[Int]
     ```
 
     A line where the definition of subroutine started, e.g. `5`
+
+- `has_line`
+
+    ```perl
+    method has_line() => Bool
+    ```
+
+    Whether Sub::Meta has a line where the definition of subroutine started.
 
 - `set_line($line)`
 
@@ -604,6 +619,23 @@ method is_same_interface(InstanceOf[Sub::Meta] $other_meta) => Bool
 A boolean value indicating whether the subroutine's interface is same or not.
 Specifically, check whether `subname`, `is_method`, `parameters` and `returns` are equal.
 
+### is\_relaxed\_same\_interface($other\_meta)
+
+```perl
+method is_relaxed_same_interface(InstanceOf[Sub::Meta] $other_meta) => Bool
+```
+
+A boolean value indicating whether the subroutine's interface is relaxed same or not.
+Specifically, check whether `subname`, `is_method`, `parameters` and `returns` satisfy
+the condition of `$self` side:
+
+```perl
+my $meta = Sub::Meta->new;
+my $other = Sub::Meta->new(subname => 'foo');
+$meta->is_same_interface($other); # NG
+$meta->is_relaxed_same_interface($other); # OK. The reason is that $meta does not specify the subname.
+```
+
 ### is\_same\_interface\_inlined($other\_meta\_inlined)
 
 ```perl
@@ -627,13 +659,29 @@ $check->(Sub::Meta->new(subname => 'hello')); # => OK
 $check->(Sub::Meta->new(subname => 'world')); # => NG
 ```
 
-### interface\_error\_message($other\_meta)
+### is\_relaxed\_same\_interface\_inlined($other\_meta\_inlined)
 
 ```perl
-method interface_error_message(InstanceOf[Sub::Meta] $other_meta) => Str
+method is_relaxed_same_interface_inlined(InstanceOf[Sub::Meta] $other_meta) => Str
 ```
 
-Return the error message when the interface does not match. If match, then return empty string.
+Returns inlined `is_relaxed_same_interface` string.
+
+### error\_message($other\_meta)
+
+```perl
+method error_message(InstanceOf[Sub::Meta] $other_meta) => Str
+```
+
+Return the error message when the interface is not same. If same, then return empty string
+
+### relaxed\_error\_message($other\_meta)
+
+```perl
+method relaxed_error_message(InstanceOf[Sub::Meta] $other_meta) => Str
+```
+
+Return the error message when the interface does not satisfy the `$self` meta. If match, then return empty string.
 
 ### display
 

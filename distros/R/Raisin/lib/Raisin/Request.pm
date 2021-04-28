@@ -6,7 +6,7 @@ use strict;
 use warnings;
 
 package Raisin::Request;
-$Raisin::Request::VERSION = '0.90';
+$Raisin::Request::VERSION = '0.91';
 use parent 'Plack::Request';
 
 sub prepare_params {
@@ -63,7 +63,7 @@ Raisin::Request - Request class for Raisin.
 
 =head1 VERSION
 
-version 0.90
+version 0.91
 
 =head1 SYNOPSIS
 
@@ -83,7 +83,7 @@ Extends L<Plack::Request>.
 
 =head1 AUTHOR
 
-Artur Khabibullin <rtkh@cpan.org>
+Artur Khabibullin
 
 =head1 COPYRIGHT AND LICENSE
 

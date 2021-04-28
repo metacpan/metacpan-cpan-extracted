@@ -6,7 +6,7 @@ use strict;
 use warnings;
 
 package Raisin::Plugin;
-$Raisin::Plugin::VERSION = '0.90';
+$Raisin::Plugin::VERSION = '0.91';
 use Carp;
 
 sub new {
@@ -64,7 +64,7 @@ Raisin::Plugin - Base class for Raisin plugins
 
 =head1 VERSION
 
-version 0.90
+version 0.91
 
 =head1 SYNOPSIS
 
@@ -94,7 +94,7 @@ Registers one or many methods into the application.
 
 =head1 AUTHOR
 
-Artur Khabibullin <rtkh@cpan.org>
+Artur Khabibullin
 
 =head1 COPYRIGHT AND LICENSE
 

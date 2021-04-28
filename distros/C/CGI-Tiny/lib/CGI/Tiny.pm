@@ -7,10 +7,11 @@ use Carp ();
 use IO::Handle ();
 use Exporter 'import';
 
-our $VERSION = '0.007';
+our $VERSION = '0.009';
 
 use constant DEFAULT_REQUEST_BODY_LIMIT => 16777216;
-use constant DEFAULT_REQUEST_BODY_BUFFER => 131072;
+use constant DEFAULT_REQUEST_BODY_BUFFER => 262144;
+use constant DEFAULT_RESPONSE_BODY_BUFFER => 131072;
 
 our @EXPORT = 'cgi';
 
@@ -82,71 +83,75 @@ my %HTTP_STATUS = (
     511 => 'Network Authentication Required', # RFC 6585: Additional Codes
 );
 
-my @DAYS_OF_WEEK = qw(Sun Mon Tue Wed Thu Fri Sat);
-my @MONTH_NAMES = qw(Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec);
-my %MONTH_NUMS;
-@MONTH_NUMS{@MONTH_NAMES} = 0..11;
+{
+  my @DAYS_OF_WEEK = qw(Sun Mon Tue Wed Thu Fri Sat);
+  my @MONTH_NAMES = qw(Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec);
+  my %MONTH_NUMS;
+  @MONTH_NUMS{@MONTH_NAMES} = 0..11;
 
-sub epoch_to_date {
-  my ($sec,$min,$hour,$mday,$mon,$year,$wday) = gmtime $_[0];
-  return sprintf '%s, %02d %s %04d %02d:%02d:%02d GMT',
-    $DAYS_OF_WEEK[$wday], $mday, $MONTH_NAMES[$mon], $year + 1900, $hour, $min, $sec;
-}
-
-sub date_to_epoch {
-  # RFC 1123 (Sun, 06 Nov 1994 08:49:37 GMT)
-  my ($mday,$mon,$year,$hour,$min,$sec) = $_[0] =~ m/^ (?:Sun|Mon|Tue|Wed|Thu|Fri|Sat),
-    [ ] ([0-9]{2}) [ ] (Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec) [ ] ([0-9]{4})
-    [ ] ([0-9]{2}) : ([0-9]{2}) : ([0-9]{2}) [ ] GMT $/x;
-
-  # RFC 850 (Sunday, 06-Nov-94 08:49:37 GMT)
-  ($mday,$mon,$year,$hour,$min,$sec) = $_[0] =~ m/^ (?:Sun|Mon|Tues|Wednes|Thurs|Fri|Satur)day,
-    [ ] ([0-9]{2}) - (Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec) - ([0-9]{2})
-    [ ] ([0-9]{2}) : ([0-9]{2}) : ([0-9]{2}) [ ] GMT $/x unless defined $mday;
-
-  # asctime (Sun Nov  6 08:49:37 1994)
-  ($mon,$mday,$hour,$min,$sec,$year) = $_[0] =~ m/^ (?:Sun|Mon|Tue|Wed|Thu|Fri|Sat)
-    [ ] (Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec) [ ]{1,2} ([0-9]{1,2})
-    [ ] ([0-9]{2}) : ([0-9]{2}) : ([0-9]{2}) [ ] ([0-9]{4}) $/x unless defined $mday;
-
-  return undef unless defined $mday;
-
-  require Time::Local;
-  # 4 digit years interpreted literally, but may have leading zeroes
-  # 2 digit years interpreted with best effort heuristic
-  return scalar Time::Local::timegm($sec, $min, $hour, $mday, $MONTH_NUMS{$mon},
-    (length($year) == 4 && $year < 1900) ? $year - 1900 : $year);
-}
-
-# for cleanup in END in case of premature exit
-my %PENDING_CGI;
-
-sub cgi (&) {
-  my ($handler) = @_;
-  my $cgi = bless {pid => $$}, __PACKAGE__;
-  my $cgi_key = 0+$cgi;
-  $PENDING_CGI{$cgi_key} = $cgi; # don't localize, so premature exit can clean up in END
-  my ($error, $errored);
-  {
-    local $@;
-    eval { local $_ = $cgi; $handler->(); 1 } or do { $error = $@; $errored = 1 };
+  sub epoch_to_date {
+    my ($sec,$min,$hour,$mday,$mon,$year,$wday) = gmtime $_[0];
+    return sprintf '%s, %02d %s %04d %02d:%02d:%02d GMT',
+      $DAYS_OF_WEEK[$wday], $mday, $MONTH_NAMES[$mon], $year + 1900, $hour, $min, $sec;
   }
-  if ($errored) {
-    _handle_error($cgi, $error);
-  } elsif (!$cgi->{headers_rendered}) {
-    _handle_error($cgi, "cgi completed without rendering a response\n");
+
+  sub date_to_epoch {
+    # RFC 1123 (Sun, 06 Nov 1994 08:49:37 GMT)
+    my ($mday,$mon,$year,$hour,$min,$sec) = $_[0] =~ m/^ (?:Sun|Mon|Tue|Wed|Thu|Fri|Sat),
+      [ ] ([0-9]{2}) [ ] (Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec) [ ] ([0-9]{4})
+      [ ] ([0-9]{2}) : ([0-9]{2}) : ([0-9]{2}) [ ] GMT $/x;
+
+    # RFC 850 (Sunday, 06-Nov-94 08:49:37 GMT)
+    ($mday,$mon,$year,$hour,$min,$sec) = $_[0] =~ m/^ (?:Sun|Mon|Tues|Wednes|Thurs|Fri|Satur)day,
+      [ ] ([0-9]{2}) - (Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec) - ([0-9]{2})
+      [ ] ([0-9]{2}) : ([0-9]{2}) : ([0-9]{2}) [ ] GMT $/x unless defined $mday;
+
+    # asctime (Sun Nov  6 08:49:37 1994)
+    ($mon,$mday,$hour,$min,$sec,$year) = $_[0] =~ m/^ (?:Sun|Mon|Tue|Wed|Thu|Fri|Sat)
+      [ ] (Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec) [ ]{1,2} ([0-9]{1,2})
+      [ ] ([0-9]{2}) : ([0-9]{2}) : ([0-9]{2}) [ ] ([0-9]{4}) $/x unless defined $mday;
+
+    return undef unless defined $mday;
+
+    require Time::Local;
+    # 4 digit years interpreted literally, but may have leading zeroes
+    # 2 digit years interpreted with best effort heuristic
+    return scalar Time::Local::timegm($sec, $min, $hour, $mday, $MONTH_NUMS{$mon},
+      (length($year) == 4 && $year < 1900) ? $year - 1900 : $year);
   }
-  delete $PENDING_CGI{$cgi_key};
-  1;
 }
 
-# cleanup of premature exit, more reliable than potentially doing this in global destruction
-# ModPerl::Registry or CGI::Compile won't run END after each request,
-# but they override exit to throw an exception which we handle already
-END {
-  foreach my $key (keys %PENDING_CGI) {
-    my $cgi = delete $PENDING_CGI{$key};
-    _handle_error($cgi, "cgi exited without rendering a response\n") unless $cgi->{headers_rendered};
+{
+  # for cleanup in END in case of premature exit
+  my %PENDING_CGI;
+
+  sub cgi (&) {
+    my ($handler) = @_;
+    my $cgi = bless {pid => $$}, __PACKAGE__;
+    my $cgi_key = 0+$cgi;
+    $PENDING_CGI{$cgi_key} = $cgi; # don't localize, so premature exit can clean up in END
+    my ($error, $errored);
+    {
+      local $@;
+      eval { local $_ = $cgi; $handler->(); 1 } or do { $error = $@; $errored = 1 };
+    }
+    if ($errored) {
+      _handle_error($cgi, $error);
+    } elsif (!$cgi->{headers_rendered}) {
+      _handle_error($cgi, "cgi completed without rendering a response\n");
+    }
+    delete $PENDING_CGI{$cgi_key};
+    1;
+  }
+
+  # cleanup of premature exit, more reliable than potentially doing this in global destruction
+  # ModPerl::Registry or CGI::Compile won't run END after each request,
+  # but they override exit to throw an exception which we handle already
+  END {
+    foreach my $key (keys %PENDING_CGI) {
+      my $cgi = delete $PENDING_CGI{$key};
+      _handle_error($cgi, "cgi exited without rendering a response\n") unless $cgi->{headers_rendered};
+    }
   }
 }
 
@@ -200,18 +205,19 @@ sub server_software   { defined $ENV{SERVER_SOFTWARE} ? $ENV{SERVER_SOFTWARE} : 
 *query = \&query_string;
 
 sub query_params      { [map { [@$_] } @{$_[0]->_query_params->{ordered}}] }
-sub query_param_names { [keys %{$_[0]->_query_params->{keyed}}] }
+sub query_param_names { [@{$_[0]->_query_params->{names}}] }
 sub query_param       { my $p = $_[0]->_query_params->{keyed}; exists $p->{$_[1]} ? $p->{$_[1]}[-1] : undef }
 sub query_param_array { my $p = $_[0]->_query_params->{keyed}; exists $p->{$_[1]} ? [@{$p->{$_[1]}}] : [] }
 
 sub _query_params {
   my ($self) = @_;
   unless (exists $self->{query_params}) {
-    $self->{query_params} = {ordered => \my @ordered, keyed => \my %keyed};
+    $self->{query_params} = {names => \my @names, ordered => \my @ordered, keyed => \my %keyed};
     foreach my $pair (split /[&;]/, $self->query) {
       my ($name, $value) = split /=/, $pair, 2;
       $value = '' unless defined $value;
       do { tr/+/ /; s/%([0-9a-fA-F]{2})/chr hex $1/ge; utf8::decode $_ } for $name, $value;
+      push @names, $name unless exists $keyed{$name};
       push @ordered, [$name, $value];
       push @{$keyed{$name}}, $value;
     }
@@ -237,24 +243,24 @@ sub headers {
 sub header { (my $name = $_[1]) =~ tr/-/_/; $ENV{"HTTP_\U$name"} }
 
 sub cookies      { [map { [@$_] } @{$_[0]->_cookies->{ordered}}] }
-sub cookie_names { [keys %{$_[0]->_cookies->{keyed}}] }
+sub cookie_names { [@{$_[0]->_cookies->{names}}] }
 sub cookie       { my $c = $_[0]->_cookies->{keyed}; exists $c->{$_[1]} ? $c->{$_[1]}[-1] : undef }
 sub cookie_array { my $c = $_[0]->_cookies->{keyed}; exists $c->{$_[1]} ? [@{$c->{$_[1]}}] : [] }
 
 sub _cookies {
   my ($self) = @_;
   unless (exists $self->{request_cookies}) {
-    my (@ordered, %keyed);
+    $self->{request_cookies} = {names => \my @names, ordered => \my @ordered, keyed => \my %keyed};
     if (defined $ENV{HTTP_COOKIE}) {
       foreach my $pair (split /\s*;\s*/, $ENV{HTTP_COOKIE}) {
         next unless length $pair;
         my ($name, $value) = split /=/, $pair, 2;
         next unless defined $value;
+        push @names, $name unless exists $keyed{$name};
         push @ordered, [$name, $value];
         push @{$keyed{$name}}, $value;
       }
     }
-    $self->{request_cookies} = {ordered => \@ordered, keyed => \%keyed};
   }
   return $self->{request_cookies};
 }
@@ -277,19 +283,20 @@ sub body {
 }
 
 sub body_params      { [map { [@$_] } @{$_[0]->_body_params->{ordered}}] }
-sub body_param_names { [keys %{$_[0]->_body_params->{keyed}}] }
+sub body_param_names { [@{$_[0]->_body_params->{names}}] }
 sub body_param       { my $p = $_[0]->_body_params->{keyed}; exists $p->{$_[1]} ? $p->{$_[1]}[-1] : undef }
 sub body_param_array { my $p = $_[0]->_body_params->{keyed}; exists $p->{$_[1]} ? [@{$p->{$_[1]}}] : [] }
 
 sub _body_params {
   my ($self) = @_;
   unless (exists $self->{body_params}) {
-    $self->{body_params} = {ordered => \my @ordered, keyed => \my %keyed};
+    $self->{body_params} = {names => \my @names, ordered => \my @ordered, keyed => \my %keyed};
     if ($ENV{CONTENT_TYPE} and $ENV{CONTENT_TYPE} =~ m/^application\/x-www-form-urlencoded\b/i) {
       foreach my $pair (split /&/, $self->body) {
         my ($name, $value) = split /=/, $pair, 2;
         $value = '' unless defined $value;
         do { tr/+/ /; s/%([0-9a-fA-F]{2})/chr hex $1/ge; utf8::decode $_ } for $name, $value;
+        push @names, $name unless exists $keyed{$name};
         push @ordered, [$name, $value];
         push @{$keyed{$name}}, $value;
       }
@@ -308,7 +315,8 @@ sub _body_params {
         if (!defined $headers->{'content-type'} or $headers->{'content-type'} =~ m/^text\/plain\b/i) {
           my $value_charset = $default_charset;
           if (defined $headers->{'content-type'}) {
-            if (my ($charset_quoted, $charset_unquoted) = $headers->{'content-type'} =~ m/;\s*charset=(?:"([^"]+)"|([^";]+))/i) {
+            if (my ($charset_quoted, $charset_unquoted) = $headers->{'content-type'} =~ m/;\s*charset=(?:"((?:\\[\\"]|[^"])+)"|([^";]+))/i) {
+              $charset_quoted =~ s/\\([\\"])/$1/g if defined $charset_quoted;
               $value_charset = defined $charset_quoted ? $charset_quoted : $charset_unquoted;
             }
           }
@@ -319,6 +327,7 @@ sub _body_params {
             $value = Encode::decode($value_charset, "$value");
           }
         }
+        push @names, $name unless exists $keyed{$name};
         push @ordered, [$name, $value];
         push @{$keyed{$name}}, $value;
       }
@@ -345,14 +354,14 @@ sub body_parts {
 }
 
 sub uploads      { [map { [@$_] } @{$_[0]->_body_uploads->{ordered}}] }
-sub upload_names { [keys %{$_[0]->_body_uploads->{keyed}}] }
+sub upload_names { [@{$_[0]->_body_uploads->{names}}] }
 sub upload       { my $u = $_[0]->_body_uploads->{keyed}; exists $u->{$_[1]} ? $u->{$_[1]}[-1] : undef }
 sub upload_array { my $u = $_[0]->_body_uploads->{keyed}; exists $u->{$_[1]} ? [@{$u->{$_[1]}}] : [] }
 
 sub _body_uploads {
   my ($self) = @_;
   unless (exists $self->{body_uploads}) {
-    $self->{body_uploads} = {ordered => \my @ordered, keyed => \my %keyed};
+    $self->{body_uploads} = {names => \my @names, ordered => \my @ordered, keyed => \my %keyed};
     if ($ENV{CONTENT_TYPE} and $ENV{CONTENT_TYPE} =~ m/^multipart\/form-data\b/i) {
       my $default_charset = $self->{multipart_form_charset};
       $default_charset = 'UTF-8' unless defined $default_charset;
@@ -373,6 +382,7 @@ sub _body_uploads {
           size         => $size,
           content_type => $headers->{'content-type'},
         };
+        push @names, $name unless exists $keyed{$name};
         push @ordered, [$name, $upload];
         push @{$keyed{$name}}, $upload;
       }
@@ -398,7 +408,8 @@ sub _body_multipart {
   my ($self) = @_;
   unless (exists $self->{body_parts}) {
     $self->{body_parts} = [];
-    my ($boundary_quoted, $boundary_unquoted) = $ENV{CONTENT_TYPE} =~ m/;\s*boundary\s*=\s*(?:"([^"]+)"|([^";]+))/i;
+    my ($boundary_quoted, $boundary_unquoted) = $ENV{CONTENT_TYPE} =~ m/;\s*boundary\s*=\s*(?:"((?:\\[\\"]|[^"])+)"|([^";]+))/i;
+    $boundary_quoted =~ s/\\([\\"])/$1/g if defined $boundary_quoted;
     my $boundary = defined $boundary_quoted ? $boundary_quoted : $boundary_unquoted;
     unless (defined $boundary) {
       $self->{response_status} = "400 $HTTP_STATUS{400}" unless $self->{headers_rendered};
@@ -424,9 +435,230 @@ sub _body_multipart {
   return $self->{body_parts};
 }
 
+sub set_nph {
+  my ($self, $value) = @_;
+  if ($self->{headers_rendered}) {
+    Carp::carp "Attempted to set NPH response mode but headers have already been rendered";
+  } else {
+    $self->{nph} = $value;
+  }
+  return $self;
+}
+
+sub set_response_body_buffer { $_[0]{response_body_buffer} = $_[1]; $_[0] }
+
+sub set_response_status {
+  my ($self, $status) = @_;
+  if ($self->{headers_rendered}) {
+    Carp::carp "Attempted to set HTTP response status but headers have already been rendered";
+  } else {
+    if ($status =~ m/\A[0-9]+ [^\r\n]*\z/) {
+      $self->{response_status} = $status;
+    } else {
+      Carp::croak "Attempted to set unknown HTTP response status $status" unless exists $HTTP_STATUS{$status};
+      $self->{response_status} = "$status $HTTP_STATUS{$status}";
+    }
+  }
+  return $self;
+}
+
+sub set_response_content_type {
+  my ($self, $content_type) = @_;
+  if ($self->{headers_rendered}) {
+    Carp::carp "Attempted to set HTTP response content type but headers have already been rendered";
+  } else {
+    Carp::croak "Newline characters not allowed in HTTP response content type" if $content_type =~ tr/\r\n//;
+    $self->{response_content_type} = $content_type;
+  }
+  return $self;
+}
+
+sub set_response_charset {
+  my ($self, $charset) = @_;
+  Carp::croak "Invalid characters in HTTP response charset" if $charset =~ m/[^a-zA-Z0-9!#\$%&'*+\-.^_`|~]/;
+  $self->{response_charset} = $charset;
+  return $self;
+}
+
+sub set_response_download {
+  my ($self, $filename) = @_;
+  if ($self->{headers_rendered}) {
+    Carp::carp "Attempted to set HTTP response content disposition but headers have already been rendered";
+  } else {
+    $self->{response_attachment} = 1;
+    $self->{response_filename} = $filename;
+  }
+  return $self;
+}
+
+sub add_response_header {
+  my ($self, $name, $value) = @_;
+  if ($self->{headers_rendered}) {
+    Carp::carp "Attempted to add HTTP response header '$name' but headers have already been rendered";
+  } else {
+    Carp::croak "Newline characters not allowed in HTTP response header '$name'" if $value =~ tr/\r\n//;
+    push @{$self->{response_headers}}, [$name, $value];
+  }
+  return $self;
+}
+
+{
+  my %COOKIE_ATTR_VALUE = (expires => 1, domain => 1, path => 1, secure => 0, httponly => 0, samesite => 1, 'max-age' => 1);
+  sub add_response_cookie {
+    my ($self, $name, $value, @attrs) = @_;
+    if ($self->{headers_rendered}) {
+      Carp::carp "Attempted to add HTTP response cookie '$name' but headers have already been rendered";
+    } else {
+      my $cookie_str = "$name=$value";
+      my $i = 0;
+      while ($i <= $#attrs) {
+        my ($key, $val) = @attrs[$i, $i+1];
+        my $has_value = $COOKIE_ATTR_VALUE{lc $key};
+        if (!defined $has_value) {
+          Carp::carp "Attempted to set unknown cookie attribute '$key' for HTTP response cookie '$name'";
+        } elsif ($has_value) {
+          $cookie_str .= "; $key=$val" if defined $val;
+        } else {
+          $cookie_str .= "; $key" if $val;
+        }
+      } continue {
+        $i += 2;
+      }
+      Carp::croak "Newline characters not allowed in HTTP response cookie '$name'" if $cookie_str =~ tr/\r\n//;
+      push @{$self->{response_headers}}, ['Set-Cookie', $cookie_str];
+    }
+    return $self;
+  }
+}
+
+sub response_status_code {
+  my ($self) = @_;
+  if (defined $self->{response_status} and $self->{response_status} =~ m/\A([0-9]+)/) {
+    return 0+$1;
+  }
+  return 200;
+}
+
+sub headers_rendered { $_[0]{headers_rendered} }
+
+{
+  my %RENDER_TYPES = (json => 1, html => 1, xml => 1, text => 1, data => 1, file => 1, handle => 1, redirect => 1);
+  sub render {
+    my ($self, $type, $data) = @_;
+    $type = '' unless defined $type;
+    Carp::croak "Don't know how to render '$type'" if length $type and !exists $RENDER_TYPES{$type};
+    my $charset = $self->{response_charset};
+    $charset = 'UTF-8' unless defined $charset;
+    my $out_fh = defined $self->{output_handle} ? $self->{output_handle} : *STDOUT;
+    if (!$self->{headers_rendered}) {
+      my @headers = @{$self->{response_headers} || []};
+      my $headers_str = '';
+      my %headers_set;
+      foreach my $header (@headers) {
+        my ($name, $value) = @$header;
+        $headers_str .= "$name: $value\r\n";
+        $headers_set{lc $name} = 1;
+      }
+      if (!$headers_set{location} and $type eq 'redirect') {
+        Carp::croak "Newline characters not allowed in HTTP redirect" if $data =~ tr/\r\n//;
+        $headers_str = "Location: $data\r\n$headers_str";
+      }
+      if (!$headers_set{'content-type'} and $type ne 'redirect') {
+        my $content_type = $self->{response_content_type};
+        $content_type =
+            $type eq 'json' ? 'application/json;charset=UTF-8'
+          : $type eq 'html' ? "text/html;charset=$charset"
+          : $type eq 'xml'  ? "application/xml;charset=$charset"
+          : $type eq 'text' ? "text/plain;charset=$charset"
+          : 'application/octet-stream'
+          unless defined $content_type;
+        $headers_str = "Content-Type: $content_type\r\n$headers_str";
+      }
+      if (!$headers_set{'content-disposition'} and $self->{response_attachment}) {
+        my $filename = $self->{response_filename};
+        my $value = 'attachment';
+        if (defined $filename and length $filename) {
+          require Encode;
+          my $quoted_filename = Encode::encode('ISO-8859-1', $filename);
+          $quoted_filename =~ tr/\r\n/  /;
+          $quoted_filename =~ s/([\\"])/\\$1/g;
+          $value .= "; filename=\"$quoted_filename\"";
+          my $ext_filename = $filename;
+          utf8::encode $ext_filename;
+          $ext_filename =~ s/([^a-zA-Z0-9!#\$&+\-.^_`|~])/sprintf '%%%02X', ord $1/ge;
+          $value .= "; filename*=UTF-8''$ext_filename";
+        }
+        $headers_str .= "Content-Disposition: $value\r\n";
+      }
+      if (!$headers_set{date}) {
+        my $date_str = epoch_to_date(time);
+        $headers_str = "Date: $date_str\r\n$headers_str";
+      }
+      my $status = $self->{response_status};
+      $status = $self->{response_status} = "302 $HTTP_STATUS{302}" if !defined $status and $type eq 'redirect';
+      if ($self->{nph}) {
+        $status = "200 $HTTP_STATUS{200}" unless defined $status;
+        my $protocol = $ENV{SERVER_PROTOCOL};
+        $protocol = 'HTTP/1.0' unless defined $protocol and length $protocol;
+        $headers_str = "$protocol $status\r\n$headers_str";
+        my $server = $ENV{SERVER_SOFTWARE};
+        $headers_str .= "Server: $server\r\n" if defined $server and length $server;
+      } elsif (!$headers_set{status} and defined $status) {
+        $headers_str = "Status: $status\r\n$headers_str";
+      }
+      binmode $out_fh;
+      $out_fh->printflush("$headers_str\r\n");
+      $self->{headers_rendered} = 1;
+    } elsif ($type eq 'redirect') {
+      Carp::carp "Attempted to render a redirect but headers have already been rendered";
+    }
+    if ($type eq 'json') {
+      $out_fh->printflush($self->_json->encode($data));
+    } elsif ($type eq 'html' or $type eq 'xml' or $type eq 'text') {
+      if (uc $charset eq 'UTF-8' and do { local $@; eval { require Unicode::UTF8; 1 } }) {
+        $out_fh->printflush(Unicode::UTF8::encode_utf8($data));
+      } else {
+        require Encode;
+        $out_fh->printflush(Encode::encode($charset, "$data"));
+      }
+    } elsif ($type eq 'data') {
+      $out_fh->printflush($data);
+    } elsif ($type eq 'file' or $type eq 'handle') {
+      my $in_fh;
+      if ($type eq 'file') {
+        open $in_fh, '<', $data or Carp::croak "Failed to open file '$data' for rendering: $!";
+      } else {
+        $in_fh = $data;
+      }
+      binmode $in_fh;
+      my $chunk = $self->{response_body_buffer} || $ENV{CGI_TINY_RESPONSE_BODY_BUFFER} || DEFAULT_RESPONSE_BODY_BUFFER;
+      while (read $in_fh, my $buffer, $chunk) {
+        $out_fh->print($buffer);
+      }
+      $out_fh->flush;
+    }
+  }
+}
+
+sub _json {
+  my ($self) = @_;
+  unless (exists $self->{json}) {
+    if (do { local $@; eval { require Cpanel::JSON::XS; Cpanel::JSON::XS->VERSION('4.09'); 1 } }) {
+      $self->{json} = Cpanel::JSON::XS->new->allow_dupkeys->stringify_infnan;
+    } else {
+      require JSON::PP;
+      $self->{json} = JSON::PP->new;
+    }
+    $self->{json}->utf8->canonical->allow_nonref->allow_unknown->allow_blessed->convert_blessed->escape_slash;
+  }
+  return $self->{json};
+}
+
 sub _parse_multipart {
   my ($input, $length, $boundary, $buffer_size) = @_;
   my $buffer = "\r\n";
+  my $next_boundary = "\r\n--$boundary\r\n";
+  my $end_boundary = "\r\n--$boundary--";
   my (%state, @parts);
   READER: while ($length > 0) {
     if (ref $input eq 'SCALAR') {
@@ -439,27 +671,78 @@ sub _parse_multipart {
       $length -= $read;
     }
 
-    if (!$state{started} and (my $pos = index $buffer, "\r\n--$boundary\r\n") >= 0) {
-      substr $buffer, 0, $pos + length($boundary) + 6, '';
-      $state{started} = 1;
-      push @parts, $state{part} = {headers => {}, name => undef, filename => undef, size => 0};
+    unless ($state{parsing_headers} or $state{parsing_body}) {
+      my $next_pos = index $buffer, $next_boundary;
+      my $end_pos = index $buffer, $end_boundary;
+      if ($next_pos >= 0 and ($end_pos < 0 or $end_pos > $next_pos)) {
+        substr $buffer, 0, $next_pos + length($next_boundary), '';
+        $state{parsing_headers} = 1;
+        push @parts, $state{part} = {headers => {}, name => undef, filename => undef, size => 0};
+      } elsif ($end_pos >= 0) {
+        $state{done} = 1;
+        last; # end of multipart data
+      } else {
+        next; # read more to find start of multipart data
+      }
     }
-    next unless $state{started}; # read more to find start of multipart data
 
     while (length $buffer) {
-      if ($state{parsing_body}) {
+      if ($state{parsing_headers}) {
+        while ((my $pos = index $buffer, "\r\n") >= 0) {
+          if ($pos == 0) { # end of headers
+            $state{parsing_headers} = 0;
+            $state{parsing_body} = 1;
+            $state{parsed_optional_crlf} = 0;
+            last;
+          }
+
+          my $header = substr $buffer, 0, $pos + 2, '';
+          my ($name, $value) = split /\s*:\s*/, $header, 2;
+          return undef unless defined $value;
+          $value =~ s/\s*\z//;
+
+          $state{part}{headers}{lc $name} = $value;
+          if (lc $name eq 'content-disposition') {
+            if (my ($name_quoted, $name_unquoted) = $value =~ m/;\s*name\s*=\s*(?:"((?:\\[\\"]|[^"])*)"|([^";]*))/i) {
+              $name_quoted =~ s/\\([\\"])/$1/g if defined $name_quoted;
+              $state{part}{name} = defined $name_quoted ? $name_quoted : $name_unquoted;
+            }
+            if (my ($filename_quoted, $filename_unquoted) = $value =~ m/;\s*filename\s*=\s*(?:"((?:\\[\\"]|[^"])*)"|([^";]*))/i) {
+              $filename_quoted =~ s/\\([\\"])/$1/g if defined $filename_quoted;
+              $state{part}{filename} = defined $filename_quoted ? $filename_quoted : $filename_unquoted;
+            }
+          }
+        }
+        next READER if $state{parsing_headers}; # read more to find end of headers
+      } else {
         my $append = '';
-        my $pos;
-        if (($pos = index $buffer, "\r\n--$boundary\r\n") >= 0) {
-          $append = substr $buffer, 0, $pos, '';
-          substr $buffer, 0, length($boundary) + 6, '';
+        my $next_pos = index $buffer, $next_boundary;
+        my $end_pos = index $buffer, $end_boundary;
+        if ($next_pos >= 0 and ($end_pos < 0 or $end_pos > $next_pos)) {
+          if (!$state{parsed_optional_crlf} and $next_pos >= 2) {
+            substr $buffer, 0, 2, '';
+            $next_pos -= 2;
+            $state{parsed_optional_crlf} = 1;
+          }
+          $append = substr $buffer, 0, $next_pos, '';
+          substr $buffer, 0, length($next_boundary), '';
           $state{parsing_body} = 0;
-        } elsif (($pos = index $buffer, "\r\n--$boundary--") >= 0) {
-          $append = substr $buffer, 0, $pos; # no replacement, we're done here
+          $state{parsing_headers} = 1;
+        } elsif ($end_pos >= 0) {
+          if (!$state{parsed_optional_crlf} and $end_pos >= 2) {
+            substr $buffer, 0, 2, '';
+            $end_pos -= 2;
+            $state{parsed_optional_crlf} = 1;
+          }
+          $append = substr $buffer, 0, $end_pos; # no replacement, we're done here
           $state{parsing_body} = 0;
           $state{done} = 1;
-        } elsif (length($buffer) > length($boundary) + 6) {
-          $append = substr $buffer, 0, length($buffer) - length($boundary) - 6, '';
+        } elsif (length($buffer) > length($next_boundary) + 2) {
+          if (!$state{parsed_optional_crlf}) {
+            substr $buffer, 0, 2, '';
+            $state{parsed_optional_crlf} = 1;
+          }
+          $append = substr $buffer, 0, length($buffer) - length($next_boundary), '';
         }
 
         if (defined $state{part}{filename}) {
@@ -490,202 +773,12 @@ sub _parse_multipart {
 
         # new part started
         push @parts, $state{part} = {headers => {}, name => undef, filename => undef, size => 0};
-      } else { # part headers
-        while ((my $pos = index $buffer, "\r\n") >= 0) {
-          if ($pos == 0) { # end of headers
-            substr $buffer, 0, 2, '';
-            $state{parsing_body} = 1;
-            last;
-          }
-
-          my $header = substr $buffer, 0, $pos + 2, '';
-          my ($name, $value) = split /\s*:\s*/, $header, 2;
-          return undef unless defined $value;
-          $value =~ s/\s*\z//;
-
-          $state{part}{headers}{lc $name} = $value;
-          if (lc $name eq 'content-disposition') {
-            if (my ($name_quoted, $name_unquoted) = $value =~ m/;\s*name\s*=\s*(?:"((?:\\"|[^";])*)"|([^";]*))/i) {
-              $state{part}{name} = defined $name_quoted ? $name_quoted : $name_unquoted;
-            }
-            if (my ($filename_quoted, $filename_unquoted) = $value =~ m/;\s*filename\s*=\s*(?:"((?:\\"|[^"])*)"|([^";]*))/i) {
-              $state{part}{filename} = defined $filename_quoted ? $filename_quoted : $filename_unquoted;
-            }
-          }
-        }
-        next READER unless $state{parsing_body}; # read more to find end of headers
       }
     }
   }
   return undef unless $state{done};
 
   return \@parts;
-}
-
-sub set_nph {
-  my ($self, $value) = @_;
-  if ($self->{headers_rendered}) {
-    Carp::carp "Attempted to set NPH response mode but headers have already been rendered";
-  } else {
-    $self->{nph} = $value;
-  }
-  return $self;
-}
-
-sub set_response_status {
-  my ($self, $status) = @_;
-  if ($self->{headers_rendered}) {
-    Carp::carp "Attempted to set HTTP response status but headers have already been rendered";
-  } else {
-    if ($status =~ m/\A[0-9]+ [^\r\n]*\z/) {
-      $self->{response_status} = $status;
-    } else {
-      Carp::croak "Attempted to set unknown HTTP response status $status" unless exists $HTTP_STATUS{$status};
-      $self->{response_status} = "$status $HTTP_STATUS{$status}";
-    }
-  }
-  return $self;
-}
-
-sub set_response_content_type {
-  my ($self, $content_type) = @_;
-  if ($self->{headers_rendered}) {
-    Carp::carp "Attempted to set HTTP response content type but headers have already been rendered";
-  } else {
-    Carp::croak "Newline characters not allowed in HTTP response content type" if $content_type =~ tr/\r\n//;
-    $self->{response_content_type} = $content_type;
-  }
-  return $self;
-}
-
-sub set_response_charset {
-  my ($self, $charset) = @_;
-  Carp::croak "Space characters not allowed in HTTP response charset" if $charset =~ m/\s/;
-  $self->{response_charset} = $charset;
-  return $self;
-}
-
-sub add_response_header {
-  my ($self, $name, $value) = @_;
-  if ($self->{headers_rendered}) {
-    Carp::carp "Attempted to add HTTP response header '$name' but headers have already been rendered";
-  } else {
-    Carp::croak "Newline characters not allowed in HTTP response header '$name'" if $value =~ tr/\r\n//;
-    push @{$self->{response_headers}}, [$name, $value];
-  }
-  return $self;
-}
-
-my %COOKIE_ATTR_VALUE = (expires => 1, domain => 1, path => 1, secure => 0, httponly => 0, samesite => 1, 'max-age' => 1);
-sub add_response_cookie {
-  my ($self, $name, $value, @attrs) = @_;
-  if ($self->{headers_rendered}) {
-    Carp::carp "Attempted to add HTTP response cookie '$name' but headers have already been rendered";
-  } else {
-    my $cookie_str = "$name=$value";
-    my $i = 0;
-    while ($i <= $#attrs) {
-      my ($key, $val) = @attrs[$i, $i+1];
-      my $has_value = $COOKIE_ATTR_VALUE{lc $key};
-      if (!defined $has_value) {
-        Carp::carp "Attempted to set unknown cookie attribute '$key' for HTTP response cookie '$name'";
-      } elsif ($has_value) {
-        $cookie_str .= "; $key=$val" if defined $val;
-      } else {
-        $cookie_str .= "; $key" if $val;
-      }
-    } continue {
-      $i += 2;
-    }
-    Carp::croak "Newline characters not allowed in HTTP response cookie '$name'" if $cookie_str =~ tr/\r\n//;
-    push @{$self->{response_headers}}, ['Set-Cookie', $cookie_str];
-  }
-  return $self;
-}
-
-sub headers_rendered { $_[0]{headers_rendered} }
-
-my %known_types = (json => 1, html => 1, xml => 1, text => 1, data => 1, redirect => 1);
-
-sub render {
-  my ($self, $type, $data) = @_;
-  $type = '' unless defined $type;
-  Carp::croak "Don't know how to render '$type'" if length $type and !exists $known_types{$type};
-  my $charset = $self->{response_charset};
-  $charset = 'UTF-8' unless defined $charset;
-  my $out_fh = defined $self->{output_handle} ? $self->{output_handle} : *STDOUT;
-  if (!$self->{headers_rendered}) {
-    my @headers = @{$self->{response_headers} || []};
-    my $headers_str = '';
-    my %headers_set;
-    foreach my $header (@headers) {
-      my ($name, $value) = @$header;
-      $headers_str .= "$name: $value\r\n";
-      $headers_set{lc $name} = 1;
-    }
-    if (!$headers_set{location} and $type eq 'redirect') {
-      Carp::croak "Newline characters not allowed in HTTP redirect" if $data =~ tr/\r\n//;
-      $headers_str = "Location: $data\r\n$headers_str";
-    }
-    if (!$headers_set{'content-type'} and $type ne 'redirect') {
-      my $content_type = $self->{response_content_type};
-      $content_type =
-          $type eq 'json' ? 'application/json;charset=UTF-8'
-        : $type eq 'html' ? "text/html;charset=$charset"
-        : $type eq 'xml'  ? "application/xml;charset=$charset"
-        : $type eq 'text' ? "text/plain;charset=$charset"
-        : 'application/octet-stream'
-        unless defined $content_type;
-      $headers_str = "Content-Type: $content_type\r\n$headers_str";
-    }
-    if (!$headers_set{date}) {
-      my $date_str = epoch_to_date(time);
-      $headers_str = "Date: $date_str\r\n$headers_str";
-    }
-    my $status = $self->{response_status};
-    $status = "302 $HTTP_STATUS{302}" if !defined $status and $type eq 'redirect';
-    if ($self->{nph}) {
-      $status = "200 $HTTP_STATUS{200}" unless defined $status;
-      my $protocol = $ENV{SERVER_PROTOCOL};
-      $protocol = 'HTTP/1.0' unless defined $protocol and length $protocol;
-      $headers_str = "$protocol $status\r\n$headers_str";
-      my $server = $ENV{SERVER_SOFTWARE};
-      $headers_str .= "Server: $server\r\n" if defined $server and length $server;
-    } elsif (!$headers_set{status} and defined $status) {
-      $headers_str = "Status: $status\r\n$headers_str";
-    }
-    binmode $out_fh;
-    $out_fh->printflush("$headers_str\r\n");
-    $self->{headers_rendered} = 1;
-  } elsif ($type eq 'redirect') {
-    Carp::carp "Attempted to render a redirect but headers have already been rendered";
-  }
-  if ($type eq 'json') {
-    $out_fh->printflush($self->_json->encode($data));
-  } elsif ($type eq 'html' or $type eq 'xml' or $type eq 'text') {
-    if (uc $charset eq 'UTF-8' and do { local $@; eval { require Unicode::UTF8; 1 } }) {
-      $out_fh->printflush(Unicode::UTF8::encode_utf8($data));
-    } else {
-      require Encode;
-      $out_fh->printflush(Encode::encode($charset, "$data"));
-    }
-  } elsif ($type eq 'data') {
-    $out_fh->printflush($data);
-  }
-}
-
-sub _json {
-  my ($self) = @_;
-  unless (exists $self->{json}) {
-    if (do { local $@; eval { require Cpanel::JSON::XS; Cpanel::JSON::XS->VERSION('4.09'); 1 } }) {
-      $self->{json} = Cpanel::JSON::XS->new->allow_dupkeys->stringify_infnan;
-    } else {
-      require JSON::PP;
-      $self->{json} = JSON::PP->new;
-    }
-    $self->{json}->utf8->canonical->allow_nonref->allow_unknown->allow_blessed->convert_blessed->escape_slash;
-  }
-  return $self->{json};
 }
 
 1;

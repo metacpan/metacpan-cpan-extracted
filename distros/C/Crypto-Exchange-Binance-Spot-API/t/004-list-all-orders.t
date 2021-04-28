@@ -63,7 +63,7 @@ my %pair = ( coin => 'XRP', base => 'GBP' );
 
 my $data = $binance->list_all_orders( pair => \%pair );
 
-is_deeply [map { delete @$_{qw(timestamp filled_time)}; $_ } @$data],
+is_deeply [map { delete @$_{qw(timestamp last_updated)}; $_ } @$data],
   [
     {
         'status'            => 'FILLED',

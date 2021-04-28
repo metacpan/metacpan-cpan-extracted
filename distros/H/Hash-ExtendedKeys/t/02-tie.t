@@ -27,5 +27,10 @@ for ( keys %ha ) {
 	is_deeply($_, { a => 1});
 }
 
+%ha = ();
+
+$ha{[qw/one/]} = 1;
+$ha{[qw/one/]}++;
+
 ok(1);
 done_testing;

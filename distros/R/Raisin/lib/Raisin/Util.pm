@@ -6,7 +6,7 @@ use strict;
 use warnings;
 
 package Raisin::Util;
-$Raisin::Util::VERSION = '0.90';
+$Raisin::Util::VERSION = '0.91';
 use Plack::Util;
 
 sub make_tag_from_path {
@@ -40,7 +40,7 @@ Raisin::Util - Utility subroutine for Raisin.
 
 =head1 VERSION
 
-version 0.90
+version 0.91
 
 =head1 FUNCTIONS
 
@@ -54,7 +54,7 @@ Iterates over route parameters.
 
 =head1 AUTHOR
 
-Artur Khabibullin <rtkh@cpan.org>
+Artur Khabibullin
 
 =head1 COPYRIGHT AND LICENSE
 

@@ -210,15 +210,14 @@ subtest 'negotiate_format' => sub {
 
 subtest 'format_from_extension' => sub {
     my @CASES = (
-        { ext => '/some/pa.th.yaml', expected => 'yaml' },
-        { ext => '/swagger.json',    expected => 'json' },
-        { ext => '/swagger.txt',     expected => 'text' },
+        { ext => '.yaml', expected => 'yaml' },
+        { ext => '.json', expected => 'json' },
+        { ext => '.txt',  expected => 'text' },
 
-        { ext => '/swagger.text', expected => undef },
-        { ext => '/swagger.xml',  expected => undef },
+        { ext => '.text', expected => undef },
+        { ext => '.xml',  expected => undef },
 
-        { ext => '/endpoint', expected => undef },
-        { ext => '/',         expected => undef },
+        { ext => '', expected => undef },
     );
 
     for my $c (@CASES) {
@@ -288,6 +287,35 @@ subtest 'format_from_header' => sub {
 
         my @h = $fmt->format_from_header($c->{header}, $DEFAULT_FORMAT);
         is_deeply \@h, $c->{expected}, join('>', @{ $c->{expected} }) || 'NONE';
+    }
+};
+
+subtest '_path_has_extension' => sub {
+    my @CASES = (
+        {
+            path => '/a/b/c.exe',
+            expected => '.exe',
+            message => 'extension',
+        },
+        {
+            path => '/a/b.at/c',
+            expected => '',
+            message => 'no extension',
+        },
+        {
+            path => '/',
+            expected => '',
+            message => 'slash',
+        },
+        {
+            path => '',
+            expected => '',
+            message => 'empty',
+        },
+    );
+
+    for my $c (@CASES) {
+        is Raisin::Middleware::Formatter::_path_has_extension($c->{path}), $c->{expected}, $c->{message};
     }
 };
 

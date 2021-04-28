@@ -2,8 +2,8 @@ NAME
     Perinci::Examples - Various examples of Rinci metadata
 
 VERSION
-    This document describes version 0.820 of Perinci::Examples (from Perl
-    distribution Perinci-Examples), released on 2020-04-29.
+    This document describes version 0.821 of Perinci::Examples (from Perl
+    distribution Perinci-Examples), released on 2021-01-30.
 
 DESCRIPTION
     This distribution contains an odd mix of various functions, variables,
@@ -78,6 +78,148 @@ FUNCTIONS
     information.
 
     Return value: (any)
+
+  args_as_array
+    Usage:
+
+     args_as_array($a0, $a1, $a2) -> [status, msg, payload, meta]
+
+    This function's metadata sets "args_as" property to "array". This means
+    it wants to accept argument as an array, like a regular Perl subroutine
+    accepting positional arguments in @_.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   $a0 => *str*
+
+    *   $a1 => *str*
+
+    *   $a2 => *str*
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (payload) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  args_as_arrayref
+    Usage:
+
+     args_as_arrayref([$a0, $a1, $a2]) -> [status, msg, payload, meta]
+
+    This function's metadata sets "args_as" property to "arrayref". This is
+    just like "array", except the whole argument list is passed in $_[0].
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   $a0 => *str*
+
+    *   $a1 => *str*
+
+    *   $a2 => *str*
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (payload) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  args_as_hashref
+    Usage:
+
+     args_as_hashref(\%args) -> [status, msg, payload, meta]
+
+    This function's metadata sets "args_as" property to "hashref". This is
+    just like "hash", except the whole argument hash is passed in $_[0].
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   a0 => *str*
+
+    *   a1 => *str*
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (payload) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  binary
+    Usage:
+
+     binary(%args) -> [status, msg, payload, meta]
+
+    Accept and send binary data.
+
+    This function sets its argument's schema type as "buf" which indicates
+    the argument accepts binary data. Likewise it also sets its result's
+    schema type as "buf" which says that function will return binary data.
+
+    The function just returns its argument.
+
+    Note that since the metadata also contains null ("\0") in the "default"
+    property of the argument specification, the metadata is also not
+    JSON-safe.
+
+    To pass binary data over JSON/Riap, you can use Riap version 1.2 and
+    encode the argument with ":base64" suffix, e.g.:
+
+     $res = Perinci::Access->new->request(
+         call => "http://example.com/api/Perinci/Examples/binary",
+         {v=>1.2, args=>{"data:base64"=>"/wA="}}); # send "\xff\0"
+
+    Without "v=>1.2", encoded argument won't be decoded by the server.
+
+    To pass binary data on the command-line, you can use "--ARG-base64" if
+    the command-line library provides it.
+
+    To receive binary result over JSON/Riap, you can use Riap version 1.2
+    which will automatically encode binary data with base64 so it is safe
+    when transformed as JSON. The client library will also decode the
+    encoded result back to the original, so the whole process is transparent
+    to you:
+
+     $res = Perinci::Access->new->request(
+         call => "http://example.com/api/Perinci/Examples/binary",
+         {v=>1.2}); # => [200,"OK","\0\0\0",{}]
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   data => *buf* (default: "\0\0\0")
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (payload) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (buf)
 
   call_gen_array
     Usage:
@@ -171,6 +313,189 @@ FUNCTIONS
 
     Return value: (any)
 
+  common_opts
+    Usage:
+
+     common_opts(%args) -> [status, msg, payload, meta]
+
+    This function has arguments with the same name as Perinci::CmdLine
+    common options.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   action => *str*
+
+    *   cmd => *str*
+
+    *   debug => *bool*
+
+    *   format => *str*
+
+    *   format_options => *str*
+
+    *   help => *bool*
+
+    *   json => *bool*
+
+    *   log_level => *str*
+
+    *   perl => *bool*
+
+    *   quiet => *bool*
+
+    *   subcommands => *str*
+
+    *   trace => *bool*
+
+    *   verbose => *bool*
+
+    *   version => *str*
+
+    *   yaml => *bool*
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (payload) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  completion
+    Usage:
+
+     completion(%args) -> [status, msg, payload, meta]
+
+    Do nothing, return args.
+
+    This function is used to test argument completion.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   a1 => *array[str]*
+
+        Array of strings, where the string has "in" schema clause.
+
+        Completion library can perhaps complete from the "in" value and
+        remember completed items when command-line option is repeated, e.g.
+        in:
+
+         --a1 <tab>
+
+        it will complete from any "in" value, but in:
+
+         --a1 apple --a1 <tab>
+
+        it can exclude "apple" from the completion candidate.
+
+        Currently the completion library Perinci::Sub::Complete does not do
+        this though. Perhaps there can be an option to toggle this behavior.
+
+    *   a2 => *array[str]*
+
+        Array with element_completion routine that generate random letter.
+
+    *   a3 => *array[str]*
+
+        Array with element_completion routine that dies.
+
+        See also "s3".
+
+    *   arg0 => *any*
+
+        Argument without any schema.
+
+    *   f0 => *float*
+
+        Float with just "float" schema defined.
+
+    *   f1 => *float*
+
+        Float with xmin/xmax on the schema.
+
+        A completion library can attempt to provide some possible and
+        incremental completion (e.g. if word is currently at one decimal
+        digit like 1.2, it can provide completion of 1.20 .. 1.29).
+
+    *   h1 => *hash*
+
+        Hash with "keys" and "allowed_keys" schema clauses and
+        "element_completion" property.
+
+    *   h2 => *hash*
+
+        Hash with "element_completion" as well as "index_completion"
+        properties.
+
+    *   i0 => *int*
+
+        Integer with just "int" schema defined.
+
+    *   i1 => *int*
+
+        Integer with min/xmax on the schema.
+
+        A completion library (like Perinci::Sub::Complete) can generate a
+        list of completion from the low end to the high end of the range, as
+        long as it is not too long.
+
+    *   i2 => *int*
+
+        Integer with large range min/max on the schema.
+
+        Unlike in "i1", a completion library probably won't generate a
+        number sequence for this argument because they are considered too
+        long (1000+ items).
+
+    *   s1 => *str*
+
+        String with possible values in "in" schema clause.
+
+    *   s1b => *str*
+
+        String with possible values in "in" schema clause, contains special
+        characters.
+
+        This argument is intended to test how special characters are
+        escaped.
+
+    *   s1c => *str*
+
+        String with examples in schema.
+
+    *   s1d => *str*
+
+        String with examples in argument spec.
+
+    *   s2 => *str*
+
+        String with completion routine that generate random letter.
+
+    *   s3 => *str*
+
+        String with completion routine that dies.
+
+        Completion should not display error (except perhaps under
+        debugging). It should just provide no completion.
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (payload) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
   delay
     Usage:
 
@@ -215,6 +540,74 @@ FUNCTIONS
     This function is not exported by default, but exportable.
 
     No arguments.
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (payload) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  dry_run
+    Usage:
+
+     dry_run() -> [status, msg, payload, meta]
+
+    Will return 'wet' if not run under dry run mode, or 'dry' if dry run.
+
+    The way you detect whether we are running under dry-run mode is to check
+    the special argument $args{-dry_run}.
+
+    This function is not exported.
+
+    This function supports dry-run operation.
+
+    No arguments.
+
+    Special arguments:
+
+    *   -dry_run => *bool*
+
+        Pass -dry_run=>1 to enable simulation mode.
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (payload) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  dry_run_default
+    Usage:
+
+     dry_run_default() -> [status, msg, payload, meta]
+
+    Will return 'wet' if not run under dry run mode, or 'dry' if dry run.
+
+    This function is like "dry_run", except the default mode is dry-run.
+
+    The way you detect whether we are running under dry-run mode is to check
+    the special argument $args{-dry_run}.
+
+    This function is not exported.
+
+    This function supports dry-run operation.
+
+    No arguments.
+
+    Special arguments:
+
+    *   -dry_run => *bool*
+
+        Pass -dry_run=>1 to enable simulation mode.
 
     Returns an enveloped result (an array).
 
@@ -564,6 +957,27 @@ FUNCTIONS
 
     Return value: (any)
 
+  result_naked
+    Usage:
+
+     result_naked(%args) -> any
+
+    This function's metadata sets "result_naked" to true. This means
+    function returns just the value (e.g. 42) and not with envelope (e.g.
+    "[200,"OK",42]"). However, when served over network Riap protocol, the
+    function wrapper Perinci::Sub::Wrapper can generate an envelope for the
+    result, so the wrapped function wil still return "[200,"OK",42]".
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   a0 => *str*
+
+    *   a1 => *str*
+
+    Return value: (any)
+
   return_args
     Usage:
 
@@ -605,15 +1019,24 @@ FUNCTIONS
 
     *   First example:
 
-         sum(array => [1, 2, 3]); # -> 6
+         sum(array => [1, 2, 3]); # -> [200, "OK", 6, {}]
 
     *   Second example, using argv:
 
-         sum( array => [1.1, 2.1, 3.1], round => 1); # -> 6
+         sum( array => [1.1, 2.1, 3.1], round => 1); # -> [200, "OK", 6, {}]
 
     *   Third example, invalid arguments:
 
-         sum(array => ["a"]); # ERROR 400
+         sum(array => ["a"]);
+
+        Result:
+
+         [
+           400,
+           "Argument 'array' fails validation: \@[0]: Not of type decimal number",
+           undef,
+           {},
+         ]
 
     This function can be used to test passing nonscalar (array) arguments.
 
@@ -639,413 +1062,6 @@ FUNCTIONS
     information.
 
     Return value: (any)
-
-  test_args_as_array
-    Usage:
-
-     test_args_as_array($a0, $a1, $a2) -> [status, msg, payload, meta]
-
-    This function's metadata sets "args_as" property to "array". This means
-    it wants to accept argument as an array, like a regular Perl subroutine
-    accepting positional arguments in @_.
-
-    This function is not exported.
-
-    Arguments ('*' denotes required arguments):
-
-    *   $a0 => *str*
-
-    *   $a1 => *str*
-
-    *   $a2 => *str*
-
-    Returns an enveloped result (an array).
-
-    First element (status) is an integer containing HTTP status code (200
-    means OK, 4xx caller error, 5xx function error). Second element (msg) is
-    a string containing error message, or 'OK' if status is 200. Third
-    element (payload) is optional, the actual result. Fourth element (meta)
-    is called result metadata and is optional, a hash that contains extra
-    information.
-
-    Return value: (any)
-
-  test_args_as_arrayref
-    Usage:
-
-     test_args_as_arrayref([$a0, $a1, $a2]) -> [status, msg, payload, meta]
-
-    This function's metadata sets "args_as" property to "arrayref". This is
-    just like "array", except the whole argument list is passed in $_[0].
-
-    This function is not exported.
-
-    Arguments ('*' denotes required arguments):
-
-    *   $a0 => *str*
-
-    *   $a1 => *str*
-
-    *   $a2 => *str*
-
-    Returns an enveloped result (an array).
-
-    First element (status) is an integer containing HTTP status code (200
-    means OK, 4xx caller error, 5xx function error). Second element (msg) is
-    a string containing error message, or 'OK' if status is 200. Third
-    element (payload) is optional, the actual result. Fourth element (meta)
-    is called result metadata and is optional, a hash that contains extra
-    information.
-
-    Return value: (any)
-
-  test_args_as_hashref
-    Usage:
-
-     test_args_as_hashref(\%args) -> [status, msg, payload, meta]
-
-    This function's metadata sets "args_as" property to "hashref". This is
-    just like "hash", except the whole argument hash is passed in $_[0].
-
-    This function is not exported.
-
-    Arguments ('*' denotes required arguments):
-
-    *   a0 => *str*
-
-    *   a1 => *str*
-
-    Returns an enveloped result (an array).
-
-    First element (status) is an integer containing HTTP status code (200
-    means OK, 4xx caller error, 5xx function error). Second element (msg) is
-    a string containing error message, or 'OK' if status is 200. Third
-    element (payload) is optional, the actual result. Fourth element (meta)
-    is called result metadata and is optional, a hash that contains extra
-    information.
-
-    Return value: (any)
-
-  test_binary
-    Usage:
-
-     test_binary(%args) -> [status, msg, payload, meta]
-
-    Accept and send binary data.
-
-    This function sets its argument's schema type as "buf" which indicates
-    the argument accepts binary data. Likewise it also sets its result's
-    schema type as "buf" which says that function will return binary data.
-
-    The function just returns its argument.
-
-    Note that since the metadata also contains null ("\0") in the "default"
-    property of the argument specification, the metadata is also not
-    JSON-safe.
-
-    To pass binary data over JSON/Riap, you can use Riap version 1.2 and
-    encode the argument with ":base64" suffix, e.g.:
-
-     $res = Perinci::Access->new->request(
-         call => "http://example.com/api/Perinci/Examples/test_binary",
-         {v=>1.2, args=>{"data:base64"=>"/wA="}}); # send "\xff\0"
-
-    Without "v=>1.2", encoded argument won't be decoded by the server.
-
-    To pass binary data on the command-line, you can use "--ARG-base64" if
-    the command-line library provides it.
-
-    To receive binary result over JSON/Riap, you can use Riap version 1.2
-    which will automatically encode binary data with base64 so it is safe
-    when transformed as JSON. The client library will also decode the
-    encoded result back to the original, so the whole process is transparent
-    to you:
-
-     $res = Perinci::Access->new->request(
-         call => "http://example.com/api/Perinci/Examples/test_binary",
-         {v=>1.2}); # => [200,"OK","\0\0\0",{}]
-
-    This function is not exported.
-
-    Arguments ('*' denotes required arguments):
-
-    *   data => *buf* (default: "\0\0\0")
-
-    Returns an enveloped result (an array).
-
-    First element (status) is an integer containing HTTP status code (200
-    means OK, 4xx caller error, 5xx function error). Second element (msg) is
-    a string containing error message, or 'OK' if status is 200. Third
-    element (payload) is optional, the actual result. Fourth element (meta)
-    is called result metadata and is optional, a hash that contains extra
-    information.
-
-    Return value: (buf)
-
-  test_common_opts
-    Usage:
-
-     test_common_opts(%args) -> [status, msg, payload, meta]
-
-    This function has arguments with the same name as Perinci::CmdLine
-    common options.
-
-    This function is not exported.
-
-    Arguments ('*' denotes required arguments):
-
-    *   action => *str*
-
-    *   cmd => *str*
-
-    *   debug => *bool*
-
-    *   format => *str*
-
-    *   format_options => *str*
-
-    *   help => *bool*
-
-    *   json => *bool*
-
-    *   log_level => *str*
-
-    *   perl => *bool*
-
-    *   quiet => *bool*
-
-    *   subcommands => *str*
-
-    *   trace => *bool*
-
-    *   verbose => *bool*
-
-    *   version => *str*
-
-    *   yaml => *bool*
-
-    Returns an enveloped result (an array).
-
-    First element (status) is an integer containing HTTP status code (200
-    means OK, 4xx caller error, 5xx function error). Second element (msg) is
-    a string containing error message, or 'OK' if status is 200. Third
-    element (payload) is optional, the actual result. Fourth element (meta)
-    is called result metadata and is optional, a hash that contains extra
-    information.
-
-    Return value: (any)
-
-  test_completion
-    Usage:
-
-     test_completion(%args) -> [status, msg, payload, meta]
-
-    Do nothing, return args.
-
-    This function is used to test argument completion.
-
-    This function is not exported.
-
-    Arguments ('*' denotes required arguments):
-
-    *   a1 => *array[str]*
-
-        Array of strings, where the string has "in" schema clause.
-
-        Completion library can perhaps complete from the "in" value and
-        remember completed items when command-line option is repeated, e.g.
-        in:
-
-         --a1 <tab>
-
-        it will complete from any "in" value, but in:
-
-         --a1 apple --a1 <tab>
-
-        it can exclude "apple" from the completion candidate.
-
-        Currently the completion library Perinci::Sub::Complete does not do
-        this though. Perhaps there can be an option to toggle this behavior.
-
-    *   a2 => *array[str]*
-
-        Array with element_completion routine that generate random letter.
-
-    *   a3 => *array[str]*
-
-        Array with element_completion routine that dies.
-
-        See also "s3".
-
-    *   arg0 => *any*
-
-        Argument without any schema.
-
-    *   f0 => *float*
-
-        Float with just "float" schema defined.
-
-    *   f1 => *float*
-
-        Float with xmin/xmax on the schema.
-
-        A completion library can attempt to provide some possible and
-        incremental completion (e.g. if word is currently at one decimal
-        digit like 1.2, it can provide completion of 1.20 .. 1.29).
-
-    *   h1 => *hash*
-
-        Hash with "keys" and "allowed_keys" schema clauses and
-        "element_completion" property.
-
-    *   h2 => *hash*
-
-        Hash with "element_completion" as well as "index_completion"
-        properties.
-
-    *   i0 => *int*
-
-        Integer with just "int" schema defined.
-
-    *   i1 => *int*
-
-        Integer with min/xmax on the schema.
-
-        A completion library (like Perinci::Sub::Complete) can generate a
-        list of completion from the low end to the high end of the range, as
-        long as it is not too long.
-
-    *   i2 => *int*
-
-        Integer with large range min/max on the schema.
-
-        Unlike in "i1", a completion library probably won't generate a
-        number sequence for this argument because they are considered too
-        long (1000+ items).
-
-    *   s1 => *str*
-
-        String with possible values in "in" schema clause.
-
-    *   s1b => *str*
-
-        String with possible values in "in" schema clause, contains special
-        characters.
-
-        This argument is intended to test how special characters are
-        escaped.
-
-    *   s1c => *str*
-
-        String with examples in schema.
-
-    *   s1d => *str*
-
-        String with examples in argument spec.
-
-    *   s2 => *str*
-
-        String with completion routine that generate random letter.
-
-    *   s3 => *str*
-
-        String with completion routine that dies.
-
-        Completion should not display error (except perhaps under
-        debugging). It should just provide no completion.
-
-    Returns an enveloped result (an array).
-
-    First element (status) is an integer containing HTTP status code (200
-    means OK, 4xx caller error, 5xx function error). Second element (msg) is
-    a string containing error message, or 'OK' if status is 200. Third
-    element (payload) is optional, the actual result. Fourth element (meta)
-    is called result metadata and is optional, a hash that contains extra
-    information.
-
-    Return value: (any)
-
-  test_dry_run
-    Usage:
-
-     test_dry_run() -> [status, msg, payload, meta]
-
-    Will return 'wet' if not run under dry run mode, or 'dry' if dry run.
-
-    The way you detect whether we are running under dry-run mode is to check
-    the special argument $args{-dry_run}.
-
-    This function is not exported.
-
-    This function supports dry-run operation.
-
-    No arguments.
-
-    Special arguments:
-
-    *   -dry_run => *bool*
-
-        Pass -dry_run=>1 to enable simulation mode.
-
-    Returns an enveloped result (an array).
-
-    First element (status) is an integer containing HTTP status code (200
-    means OK, 4xx caller error, 5xx function error). Second element (msg) is
-    a string containing error message, or 'OK' if status is 200. Third
-    element (payload) is optional, the actual result. Fourth element (meta)
-    is called result metadata and is optional, a hash that contains extra
-    information.
-
-    Return value: (any)
-
-  test_result_naked
-    Usage:
-
-     test_result_naked(%args) -> any
-
-    This function's metadata sets "result_naked" to true. This means
-    function returns just the value (e.g. 42) and not with envelope (e.g.
-    "[200,"OK",42]"). However, when served over network Riap protocol, the
-    function wrapper Perinci::Sub::Wrapper can generate an envelope for the
-    result, so the wrapped function wil still return "[200,"OK",42]".
-
-    This function is not exported.
-
-    Arguments ('*' denotes required arguments):
-
-    *   a0 => *str*
-
-    *   a1 => *str*
-
-    Return value: (any)
-
-  test_validate_args
-    Usage:
-
-     test_validate_args(%args) -> [status, msg, payload, meta]
-
-    Does nothing, only here to test # VALIDATE_ARGS.
-
-    This function is not exported.
-
-    Arguments ('*' denotes required arguments):
-
-    *   a => *int*
-
-    *   b => *str*
-
-    *   h1 => *hash*
-
-    Returns an enveloped result (an array).
-
-    First element (status) is an integer containing HTTP status code (200
-    means OK, 4xx caller error, 5xx function error). Second element (msg) is
-    a string containing error message, or 'OK' if status is 200. Third
-    element (payload) is optional, the actual result. Fourth element (meta)
-    is called result metadata and is optional, a hash that contains extra
-    information.
-
-    Return value: (str)
 
   undescribed_args
     Usage:
@@ -1080,6 +1096,34 @@ FUNCTIONS
 
     Return value: (any)
 
+  validate_args
+    Usage:
+
+     validate_args(%args) -> [status, msg, payload, meta]
+
+    Does nothing, only here to test # VALIDATE_ARGS.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   a => *int*
+
+    *   b => *str*
+
+    *   h1 => *hash*
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (payload) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (str)
+
 HOMEPAGE
     Please visit the project's homepage at
     <https://metacpan.org/release/Perinci-Examples>.
@@ -1104,8 +1148,8 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2020, 2019, 2018, 2017, 2016, 2015, 2014,
-    2013, 2012, 2011 by perlancar@cpan.org.
+    This software is copyright (c) 2021, 2020, 2019, 2018, 2017, 2016, 2015,
+    2014, 2013, 2012, 2011 by perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

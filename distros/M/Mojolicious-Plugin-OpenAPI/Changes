@@ -1,5 +1,12 @@
 Revision history for perl distribution Mojolicious-Plugin-OpenAPI
 
+4.03 2021-04-28T11:32:17+0900
+ - Depending on JSON::Validator 4.17
+ - Add support for "skip_validating_specification"
+ - Reverted back to supporting "default_response"
+ - Moved "DefaultResponse" for v2 from "definitions" to "responses"
+ - Improved documentation: "schema" is no longer needed
+
 4.02 2021-03-24T11:37:27+0900
  - Add support for passing in constraints (such as format) using x-mojo-to
 

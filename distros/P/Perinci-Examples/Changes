@@ -1,3 +1,10 @@
+0.821   2021-01-30  Released-By: PERLANCAR; Urgency: medium; Backward-Compatible: no
+
+	- [incompatible change] Rename functions (remove 'test_' prefix).
+
+        - Add function 'dry_run_default'.
+
+
 0.820   2020-04-29  Released-By: PERLANCAR; Urgency: medium
 
 	- Replace the usage of deprecated x.schema.entity with more

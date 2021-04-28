@@ -6,7 +6,7 @@ use strict;
 use warnings;
 
 package Raisin::Encoder;
-$Raisin::Encoder::VERSION = '0.90';
+$Raisin::Encoder::VERSION = '0.91';
 use Plack::Util;
 use Plack::Util::Accessor qw(registered);
 
@@ -69,7 +69,7 @@ Raisin::Encoder - A helper for L<Raisin::Middleware::Formatter> over encoder mod
 
 =head1 VERSION
 
-version 0.90
+version 0.91
 
 =head1 SYNOPSIS
 
@@ -118,7 +118,7 @@ Returns a hash of media types and associated formats.
 
 =head1 AUTHOR
 
-Artur Khabibullin <rtkh@cpan.org>
+Artur Khabibullin
 
 =head1 COPYRIGHT AND LICENSE
 

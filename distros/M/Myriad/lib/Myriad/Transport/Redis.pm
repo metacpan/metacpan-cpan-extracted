@@ -1,27 +1,37 @@
 package Myriad::Transport::Redis;
 
-use Class::Method::Modifiers qw(:all);
-use Sub::Util qw(subname);
 use Myriad::Class extends => qw(IO::Async::Notifier);
 
-our $VERSION = '0.003'; # VERSION
+our $VERSION = '0.004'; # VERSION
 our $AUTHORITY = 'cpan:DERIV'; # AUTHORITY
 
 =pod
 
 We expect to expose:
 
-- stream handling functionality, including claiming/pending
-- get/set and observables
-- sorted sets
-- hyperloglog existence
-- simple queues via lists
-- pub/sub
+=over 4
+
+=item * stream handling functionality, including claiming/pending
+
+=item * get/set and observables
+
+=item * sorted sets
+
+=item * hyperloglog existence
+
+=item * simple queues via lists
+
+=item * pub/sub
+
+=back
 
 This module is responsible for namespacing, connection handling and clustering.
 It should also cover retry for stateless calls.
 
 =cut
+
+use Class::Method::Modifiers qw(:all);
+use Sub::Util qw(subname);
 
 use Myriad::Redis::Pending;
 
@@ -101,7 +111,7 @@ method apply_prefix($key) {
 =cut
 
 method remove_prefix($key) {
-    $key =~ s/^$prefix\.//;
+    $key =~ s/^\Q$prefix\E\.//;
     return $key;
 }
 
@@ -219,7 +229,11 @@ async method read_from_stream (%args) {
         return map {
             my ($id, $args) = $_->@*;
             $log->tracef('Item from stream %s is ID %s and args %s', $stream, $id, $args);
-            return {stream => $self->remove_prefix($stream), id => $id, data => $args}
+            return {
+                stream => $self->remove_prefix($stream),
+                id     => $id,
+                data   => $args,
+            }
         } $data->@*;
     }
 
@@ -227,9 +241,8 @@ async method read_from_stream (%args) {
 }
 
 async method stream_info ($stream) {
-    $self->apply_prefix($stream);
     my $v = await $redis->xinfo(
-        STREAM => $stream
+        STREAM => $self->apply_prefix($stream)
     );
 
     my %info = pairmap {
@@ -328,11 +341,16 @@ method pending (%args) {
     my $stream = $self->apply_prefix($args{stream});
     my $group = $args{group};
     my $client = $args{client};
-    my $instance;
     Future->wait_any(
         $src->completed->without_cancel,
-        (async sub {
-            $instance = await $self->borrow_instance_from_pool;
+        (async method {
+            my $instance = await $self->borrow_instance_from_pool;
+            defer {
+                $self->return_instance_to_pool($instance) if $instance;
+                undef $instance;
+            }
+
+            my $src = $self->source;
             my $start = '-';
             while (1) {
                 await $src->unblocked;
@@ -356,11 +374,9 @@ method pending (%args) {
                 }
                 last unless @$pending >= $self->batch_count;
             }
-        })->(),
-    )->on_ready(sub {
-        $self->return_instance_to_pool($instance) if $instance;
-    })->on_fail(sub  {
-        $src->fail(shift);
+        })->($self),
+    )->on_fail(sub  {
+        $src->fail(@_);
     })->retain;
     $src;
 }
@@ -378,7 +394,7 @@ It'll also send the MKSTREAM option to create the stream if it doesn't exist.
 =item * C<group> - The group name.
 
 =item * C<start_from> - The id of the message that is going to be considered the start of the stream for this group's point of view
-by default it's `$` which means the last message.
+by default it's C<$> which means the last message.
 
 =back
 

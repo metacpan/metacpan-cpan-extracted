@@ -1,5 +1,9 @@
 Revision history for List-Keywords
 
+0.03    2021-04-28
+        [CHANGES]
+         * Added 'first', 'none', 'notall'
+
 0.02    2021-04-27
         [CHANGES]
          * Added a benchmarking test to print comparisons with List::Util

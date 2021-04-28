@@ -14,7 +14,37 @@ has specification => 'https://spec.openapis.org/oas/3.0/schema/2019-04-02';
 monkey_patch __PACKAGE__,
   $_ => JSON::Validator::Schema::OpenAPIv2->can($_)
   for qw(coerce routes validate_request validate_response),
-  qw(_coerce_arrays _coerce_default_value _find_all_nodes _prefix_error_path _validate_request_or_response);
+  qw(_coerce_arrays _coerce_default_value _find_all_nodes _params_for_add_default_response _prefix_error_path _validate_request_or_response);
+
+sub add_default_response {
+  my ($self, $params) = ($_[0], shift->_params_for_add_default_response(@_));
+
+  my $responses = $self->data->{components}{schemas} ||= {};
+  my $ref       = $responses->{$params->{name}}      ||= $params->{schema};
+  my %schema    = ('$ref' => "#/components/schemas/$params->{name}");
+  tie %schema, 'JSON::Validator::Ref', $ref, $schema{'$ref'}, $schema{'$ref'};
+
+  for my $route ($self->routes->each) {
+    my $op = $self->get([paths => @$route{qw(path method)}]);
+    $op->{responses}{$_}
+      ||= {description => $params->{description}, content => {'application/json' => {schema => \%schema}}}
+      for @{$params->{status}};
+  }
+
+  return $self;
+}
+
+sub base_url {
+  my ($self, $url) = @_;
+
+  # Get
+  return Mojo::URL->new($self->get('/servers/0/url') || '') unless $url;
+
+  # Set
+  $url = Mojo::URL->new($url)->to_abs($self->base_url);
+  $self->data->{servers}[0]{url} = $url->to_string;
+  return $self;
+}
 
 sub new {
   my $self = shift->SUPER::new(@_);
@@ -256,6 +286,11 @@ sub _validate_body {
   return;
 }
 
+sub _validate_type_array {
+  my $self = shift;
+  return $_[2]->{nullable} && !defined $_[0] ? () : $self->SUPER::_validate_type_array(@_);
+}
+
 sub _validate_type_boolean {
   my $self = shift;
   return $_[2]->{nullable} && !defined $_[0] ? () : $self->SUPER::_validate_type_boolean(@_);
@@ -273,6 +308,7 @@ sub _validate_type_number {
 
 sub _validate_type_object {
   my ($self, $data, $path, $schema) = @_;
+  return if $schema->{nullable} && !defined $data;
   return E $path, [object => type => data_type $data] if ref $data ne 'HASH';
   return shift->SUPER::_validate_type_object(@_) unless $self->{validate_request} or $self->{validate_response};
 
@@ -370,6 +406,22 @@ Used to get/set the moniker for the given schema. Default value is "openapiv3".
 Defaults to "L<https://spec.openapis.org/oas/3.0/schema/2019-04-02>".
 
 =head1 METHODS
+
+=head2 add_default_response
+
+  $schema = $schema->add_default_response(\%params);
+
+See L<JSON::Validator::Schema::OpenAPIv2/add_default_response> for details.
+
+=head2 base_url
+
+  $url = $schema->base_url;
+  $schema = $schema->base_url($url);
+
+Can get or set the default URL for this schema. C<$url> can be either a
+L<Mojo::URL> object or a plain string.
+
+This method will read or write "/servers/0/url" in L</data>.
 
 =head2 coerce
 

@@ -6,7 +6,7 @@ use Myriad::Config;
 use Myriad::Service::Remote;
 use Myriad::Service::Storage;
 
-our $VERSION = '0.003'; # VERSION
+our $VERSION = '0.004'; # VERSION
 our $AUTHORITY = 'cpan:DERIV'; # AUTHORITY
 
 =encoding utf8

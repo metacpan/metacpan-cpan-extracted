@@ -1,5 +1,5 @@
 package Crypto::Exchange::Binance::Spot::API;
-$Crypto::Exchange::Binance::Spot::API::VERSION = '0.04';
+$Crypto::Exchange::Binance::Spot::API::VERSION = '0.05';
 =head1 NAME
 
 Crypto::Exchange::Binance::Spot::API - Binance Spot API
@@ -138,12 +138,11 @@ sub response_attr_timestamp {
 }
 
 sub response_attr_filled_time {
-    my ($self, $epoch) = @_;
-    my $t = DateTime->from_epoch(epoch => $epoch / 1000);
-    if (my $tz = $t->time_zone) {
-        $t->set_time_zone($tz);
-    }
-    return sub {wantarray ? $t : "$t"};
+    return response_attr_timestamp(@_);
+}
+
+sub response_attr_last_updated {
+    return response_attr_timestamp(@_);
 }
 
 sub set_prices {{
@@ -200,52 +199,7 @@ sub set_balances {{
     },
 }}
 
-sub set_list_open_orders {{
-    request => {
-        method => 'get',
-        path   => '/api/v3/openOrders',
-        events => {
-            keys => [ qw( pair timestamp signature ) ],
-        },
-        data => {
-            pair => {
-                field_name => 'symbol',
-                required   => 1,
-            },
-        },
-    },
-    response => {
-        row => {
-            pair        => 'symbol',
-            order_id    => 'orderId',
-            external_id => 'clientOrderId',
-            buy_or_sell => 'side',
-            order_qty   => 'origQty',
-            filled_qty  => 'executedQty',
-            timestamp   => 'time',
-            filled_time => 'updateTime',
-            status      => 'status',
-            order_type  => 'type',
-            price       => 'price',
-            _others     => [qw(
-                orderListId
-                cummulativeQuoteQty
-                timeInForce
-                stopPrice
-                icebergQty
-                updateTime
-                isWorking
-                origQuoteOrderQty
-            )],
-        },
-        sort => sub {
-            my ($self, $a, $b) = @_;
-            return $b->{price} <=> $a->{price};
-        },
-    },
-}}
-
-sub set_list_filled_orders {
+sub set_list_open_orders {
     my ($self) = @_;
 
     my $spec = $self->set_list_all_orders;
@@ -255,7 +209,35 @@ sub set_list_filled_orders {
     $spec->{response}{row_filter} = sub {
         my ($self, $row) = @_;
         return $self->$old_filter($row)
-            || $row->{_others}{status} ne 'FILLED' ? 'next' : '';
+            || $row->{status} eq 'FILLED' ? 'next' : '';
+    };
+
+    $spec->{response}{sort} = sub {
+        my ($self, $a, $b) = @_;
+        return ($a->{price} || 0) <=> ($b->{price} || 0);
+    };
+
+    return $spec;
+}
+
+sub set_list_filled_orders {
+    my ($self) = @_;
+
+    my $spec = $self->set_list_all_orders;
+
+    my $old_filter = $spec->{response}{row_filter} || sub {};
+
+    $spec->{response}{row}{filled_time} = delete $spec->{response}{row}{last_updated};
+
+    $spec->{response}{row_filter} = sub {
+        my ($self, $row) = @_;
+        return $self->$old_filter($row)
+            || $row->{status} ne 'FILLED' ? 'next' : '';
+    };
+
+    $spec->{response}{sort} = sub {
+        my ($self, $a, $b) = @_;
+        return $a->{filled_time}->().'' cmp $b->{filled_time}->().'';
     };
 
     return $spec;
@@ -281,18 +263,18 @@ sub set_list_all_orders {{
     },
     response => {
         row => {
-            pair        => 'symbol',
-            order_id    => 'orderId',
-            external_id => 'clientOrderId',
-            buy_or_sell => 'side',
-            order_qty   => 'origQty',
-            filled_qty  => 'executedQty',
-            timestamp   => 'time',
-            filled_time => 'updateTime',
-            price       => 'price',
-            status      => 'status',
-            order_type  => 'type',
-            _others     => [qw(
+            pair         => 'symbol',
+            order_id     => 'orderId',
+            external_id  => 'clientOrderId',
+            buy_or_sell  => 'side',
+            order_qty    => 'origQty',
+            filled_qty   => 'executedQty',
+            timestamp    => 'time',
+            last_updated => 'updateTime',
+            price        => 'price',
+            status       => 'status',
+            order_type   => 'type',
+            _others      => [qw(
                 orderListId
                 cummulativeQuoteQty
                 timeInForce
@@ -304,7 +286,7 @@ sub set_list_all_orders {{
         },
         sort => sub {
             my ($self, $a, $b) = @_;
-            return ($a->{filled_time}->().'' || 0) cmp ($b->{filled_time}->().'');
+            return $a->{timestamp}->().'' cmp $b->{timestamp}->().'';
         },
     },
 }}

@@ -1,26 +1,20 @@
 
 Revision history for Myriad
+
+0.004     2021-04-28 13:27:36+08:00 Asia/Kuala_Lumpur
+    [API Changes]
+    - Helper methods from List::Util - `min`, `max` and `sum0` - plus JSON functions
+    from JSON::MaybeUTF8 now injected into classes by default
+    - `defer` keyword from Syntax::Keyword::Defer is also injected into classes by default
+
+    [Bugs fixed]
+    - `memory` transport was not delivering messages correctly due to a double-counting bug
+    - Redis stream cleanup fixed
+
+0.003     2021-04-27 14:57:49+08:00 Asia/Kuala_Lumpur
     [Bugs fixed]
     - updates to latest Net::Async::Redis to resolve remaining memory leaks
     - numeric configuration values were treated as booleans if the default was set to zero
-
-0.003     2021-04-27 14:57:49+08:00 Asia/Kuala_Lumpur
-    [API Changes]
-    - The "perl" transport has been renamed to "memory", for consistency
-      with implementations in other languages
-    - Startup and shutdown calls now receive the `$myriad` instance as the
-      first parameter for convenience, and can be method calls (e.g. Myriad.pm
-      method name) instead of plain coderefs
-
-    [New features]
-    - Subscription to configuration changes via the Redis transport - configuration
-      objects still use Ryu::Observable so this behaviour should be a seamless upgrade
-      for existing code
-
-    [Bugs fixed]
-    - Batch handling had a memory leak, this version should be improved
-      although `await` calls inside a batch method may still exhibit
-      increased memory usage (we expect to address this in the next version)
 
 0.002     2021-04-24 16:36:44+08:00 Asia/Kuala_Lumpur
     [API Changes]

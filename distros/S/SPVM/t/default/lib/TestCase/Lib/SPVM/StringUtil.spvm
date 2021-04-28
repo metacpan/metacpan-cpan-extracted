@@ -7,114 +7,113 @@ package TestCase::Lib::SPVM::StringUtil {
   use SPVM::ArrayUtil(equals_array_byte, equals_array_short, equals_array_int, equals_array_long, equals_array_float, equals_array_double, equals_array_string);
 
   use SPVM::StringUtil (
-    chomp_lf,
-    chomp_crlf,
+    chompr,
+    copy_string,
     is_perl_space,
     is_perl_word,
-    isalnum,
-    isalpha,
-    isblank,
-    iscntrl,
-    isdigit,
-    isgraph,
-    islower,
-    isprint,
-    ispunct,
-    isspace,
-    isupper,
-    isxdigit,
-    tolower,
-    toupper,
+    is_alnum,
+    is_alpha,
+    is_blank,
+    is_cntrl,
+    is_digit,
+    is_graph,
+    is_lower,
+    is_print,
+    is_punct,
+    is_space,
+    is_upper,
+    is_xdigit,
     join,
     lc,
     lcfirst,
     uc,
     ucfirst,
-    replace,
-    replace_all,
     rindex,
-    strtod,
-    strtof,
-    strtoi,
-    strtol,
-    copy_string,
+    to_double,
+    to_float,
+    to_int,
+    to_int_with_base,
+    to_long,
+    to_long_with_base,
     index,
     split,
     sprintf,
+    to_lower,
+    to_upper,
   );
 
   sub test_split : int () {
     {
-      my $str = "foo,bar,baz";
-      my $split_strs = split(",", $str);
+      my $string = "foo,bar,baz";
+      my $split_strs = split(",", $string);
       unless (equals_array_string($split_strs, ["foo", "bar", "baz"])) {
         return 0;
       }
     }
 
     {
-      my $str = "foo,bar,";
-      my $split_strs = split(",", $str);
+      my $string = "foo,bar,";
+      my $split_strs = split(",", $string);
       unless (equals_array_string($split_strs, ["foo", "bar", ""])) {
         return 0;
       }
     }
 
     {
-      my $str = ",foo,,bar,,";
-      my $split_strs = split(",", $str);
+      my $string = ",foo,,bar,,";
+      my $split_strs = split(",", $string);
       unless (equals_array_string($split_strs, ["", "foo", "", "bar", "", ""])) {
         return 0;
       }
     }
 
     {
-      my $str = "foo : bar : baz";
-      my $split_strs = split(" : ", $str);
+      my $string = "foo : bar : baz";
+      my $split_strs = split(" : ", $string);
       unless (equals_array_string($split_strs, ["foo", "bar", "baz"])) {
         return 0;
       }
     }
     {
-      my $str = "foo : bar : ";
-      my $split_strs = split(" : ", $str);
+      my $string = "foo : bar : ";
+      my $split_strs = split(" : ", $string);
       unless (equals_array_string($split_strs, ["foo", "bar", ""])) {
         return 0;
       }
     }
     {
-      my $str = " : foo :  : bar :  : ";
-      my $split_strs = split(" : ", $str);
+      my $string = " : foo :  : bar :  : ";
+      my $split_strs = split(" : ", $string);
       unless (equals_array_string($split_strs, ["", "foo", "", "bar", "", ""])) {
         return 0;
       }
     }
 
     {
-      my $str = "foo---bar---baz";
-      my $split_strs = split("---", $str);
+      my $string = "foo---bar---baz";
+      my $split_strs = split("---", $string);
       unless (equals_array_string($split_strs, ["foo", "bar", "baz"])) {
         return 0;
       }
     }
     {
-      my $str = "foo---bar---";
-      my $split_strs = split("---", $str);
+      my $string = "foo---bar---";
+      my $split_strs = split("---", $string);
       unless (equals_array_string($split_strs, ["foo", "bar", ""])) {
         return 0;
       }
     }
     {
-      my $str = "---foo------bar------";
-      my $split_strs = split("---", $str);
+      my $string = "---foo------bar------";
+      my $split_strs = split("---", $string);
       unless (equals_array_string($split_strs, ["", "foo", "", "bar", "", ""])) {
         return 0;
       }
     }
 
     {
-      my $str = "foo--!bar---baz";
-      my $split_strs = split("---", $str);
+      my $string = "foo--!bar---baz";
+      my $split_strs = split("---", $string);
       unless (equals_array_string($split_strs, ["foo--!bar", "baz"])) {
         return 0;
       }
@@ -350,9 +349,9 @@ package TestCase::Lib::SPVM::StringUtil {
     return 1;
   }
 
-  private sub _first_uchar : int ($str : string) {
+  private sub _first_uchar : int ($string : string) {
     my $uchar_pos = 0;
-    return uchar($str, \$uchar_pos);
+    return uchar($string, \$uchar_pos);
   }
 
   sub test_sprintf_U : int () {
@@ -442,22 +441,22 @@ package TestCase::Lib::SPVM::StringUtil {
       $@ = undef;
     }
     {
-      my $str = "abc\n";
-      my $ret = chomp_lf($str);
+      my $string = "abc\n";
+      my $ret = chompr($string);
       unless ($ret eq "abc") {
         return 0;
       }
     }
     {
-      my $str = "abc";
-      my $ret = chomp_lf($str);
+      my $string = "abc";
+      my $ret = chompr($string);
       unless ($ret eq "abc") {
         return 0;
       }
     }
     {
-      my $str = "";
-      my $ret = chomp_lf($str);
+      my $string = "";
+      my $ret = chompr($string);
       unless ($ret eq "") {
         return 0;
       }
@@ -466,24 +465,24 @@ package TestCase::Lib::SPVM::StringUtil {
     return 1;
   }
 
-  sub test_chomp_lf : int () {
+  sub test_chompr : int () {
     {
-      my $str = "abc\n";
-      my $ret = chomp_lf($str);
+      my $string = "abc\n";
+      my $ret = chompr($string);
       unless ($ret eq "abc") {
         return 0;
       }
     }
     {
-      my $str = "abc";
-      my $ret = chomp_lf($str);
+      my $string = "abc";
+      my $ret = chompr($string);
       unless ($ret eq "abc") {
         return 0;
       }
     }
     {
-      my $str = "";
-      my $ret = chomp_lf($str);
+      my $string = "";
+      my $ret = chompr($string);
       unless ($ret eq "") {
         return 0;
       }
@@ -491,53 +490,21 @@ package TestCase::Lib::SPVM::StringUtil {
 
     return 1;
   }
-  sub test_chomp_crlf : int () {
-    {
-      my $str = "abc\r\n";
-      my $ret = chomp_crlf($str);
-      unless ($ret eq "abc") {
-        return 0;
-      }
-    }
-    {
-      my $str = "abc";
-      my $ret = chomp_crlf($str);
-      unless ($ret eq "abc") {
-        return 0;
-      }
-    }
-    {
-      my $str = "";
-      my $ret = chomp_crlf($str);
-      unless ($ret eq "") {
-        return 0;
-      }
-    }
-    {
-      my $str = "a";
-      my $ret = chomp_crlf($str);
-      unless ($ret eq "a") {
-        return 0;
-      }
-    }
-
-    return 1;
-  }
-
-  sub test_isalnum : int () {
+  
+  sub test_is_alnum : int () {
 
     my $ok = 1;
     for (my $i = 0; $i < 128; $i++) {
       my $char = $i;
 
       if (($char >= 'A' && $char <= 'Z') || ($char >= 'a' && $char <= 'z') || ($char >= '0' && $char <= '9')) {
-        my $ret = isalnum($char);
+        my $ret = is_alnum($char);
         unless ($ret == 1) {
           $ok = 0;
         }
       }
       else {
-        my $ret = isalnum($char);
+        my $ret = is_alnum($char);
         unless ($ret == 0) {
           $ok = 0;
         }
@@ -551,20 +518,20 @@ package TestCase::Lib::SPVM::StringUtil {
     return 1;
   }
 
-  sub test_isalpha : int () {
+  sub test_is_alpha : int () {
 
     my $ok = 1;
     for (my $i = 0; $i < 128; $i++) {
       my $char = $i;
 
       if (($char >= 'A' && $char <= 'Z') || ($char >= 'a' && $char <= 'z')) {
-        my $ret = isalpha($char);
+        my $ret = is_alpha($char);
         unless ($ret == 1) {
           $ok = 0;
         }
       }
       else {
-        my $ret = isalpha($char);
+        my $ret = is_alpha($char);
         unless ($ret == 0) {
           $ok = 0;
         }
@@ -578,20 +545,20 @@ package TestCase::Lib::SPVM::StringUtil {
     return 1;
   }
 
-  sub test_isblank : int () {
+  sub test_is_blank : int () {
 
     my $ok = 1;
     for (my $i = 0; $i < 128; $i++) {
       my $char = $i;
 
       if ($char >= ' ' ||  $char <= '\t') {
-        my $ret = isblank($char);
+        my $ret = is_blank($char);
         unless ($ret == 1) {
           $ok = 0;
         }
       }
       else {
-        my $ret = isblank($char);
+        my $ret = is_blank($char);
         unless ($ret == 0) {
           $ok = 0;
         }
@@ -605,20 +572,20 @@ package TestCase::Lib::SPVM::StringUtil {
     return 1;
   }
 
-  sub test_iscntrl : int () {
+  sub test_is_cntrl : int () {
 
     my $ok = 1;
     for (my $i = 0; $i < 128; $i++) {
       my $char = $i;
 
       if (($char >= 0x00 && $char <= 0x1f) || $char == 0x7f) {
-        my $ret = iscntrl($char);
+        my $ret = is_cntrl($char);
         unless ($ret == 1) {
           $ok = 0;
         }
       }
       else {
-        my $ret = iscntrl($char);
+        my $ret = is_cntrl($char);
         unless ($ret == 0) {
           $ok = 0;
         }
@@ -632,20 +599,20 @@ package TestCase::Lib::SPVM::StringUtil {
     return 1;
   }
 
-  sub test_isdigit : int () {
+  sub test_is_digit : int () {
 
     my $ok = 1;
     for (my $i = 0; $i < 128; $i++) {
       my $char = $i;
 
       if ($char >= '0' && $char <= '9') {
-        my $ret = isdigit($char);
+        my $ret = is_digit($char);
         unless ($ret == 1) {
           $ok = 0;
         }
       }
       else {
-        my $ret = isdigit($char);
+        my $ret = is_digit($char);
         unless ($ret == 0) {
           $ok = 0;
         }
@@ -659,20 +626,20 @@ package TestCase::Lib::SPVM::StringUtil {
     return 1;
   }
 
-  sub test_isgraph : int () {
+  sub test_is_graph : int () {
 
     my $ok = 1;
     for (my $i = 0; $i < 128; $i++) {
       my $char = $i;
 
       if ($char >= 0x21 && $char <= 0x7e) {
-        my $ret = isgraph($char);
+        my $ret = is_graph($char);
         unless ($ret == 1) {
           $ok = 0;
         }
       }
       else {
-        my $ret = isgraph($char);
+        my $ret = is_graph($char);
         unless ($ret == 0) {
           $ok = 0;
         }
@@ -686,20 +653,20 @@ package TestCase::Lib::SPVM::StringUtil {
     return 1;
   }
 
-  sub test_islower : int () {
+  sub test_is_lower : int () {
 
     my $ok = 1;
     for (my $i = 0; $i < 128; $i++) {
       my $char = $i;
 
     if ($char >= 'a' && $char <= 'z') {
-        my $ret = islower($char);
+        my $ret = is_lower($char);
         unless ($ret == 1) {
           $ok = 0;
         }
       }
       else {
-        my $ret = islower($char);
+        my $ret = is_lower($char);
         unless ($ret == 0) {
           $ok = 0;
         }
@@ -713,20 +680,20 @@ package TestCase::Lib::SPVM::StringUtil {
     return 1;
   }
 
-  sub test_isprint : int () {
+  sub test_is_print : int () {
 
     my $ok = 1;
     for (my $i = 0; $i < 128; $i++) {
       my $char = $i;
 
       if ($char >= 0x20 && $char <= 0x7e) {
-        my $ret = isprint($char);
+        my $ret = is_print($char);
         unless ($ret == 1) {
           $ok = 0;
         }
       }
       else {
-        my $ret = isprint($char);
+        my $ret = is_print($char);
         unless ($ret == 0) {
           $ok = 0;
         }
@@ -740,20 +707,20 @@ package TestCase::Lib::SPVM::StringUtil {
     return 1;
   }
 
-  sub test_ispunct : int () {
+  sub test_is_punct : int () {
 
     my $ok = 1;
     for (my $i = 0; $i < 128; $i++) {
       my $char = $i;
 
       if (($char >= 0x21 && $char <= 0x2f) || ($char >= 0x3a && $char <= 0x40) || ($char >= 0x5b && $char <= 0x60) || ($char >= 0x7b && $char <= 0x7e)) {
-        my $ret = ispunct($char);
+        my $ret = is_punct($char);
         unless ($ret == 1) {
           $ok = 0;
         }
       }
       else {
-        my $ret = ispunct($char);
+        my $ret = is_punct($char);
         unless ($ret == 0) {
           $ok = 0;
         }
@@ -767,20 +734,20 @@ package TestCase::Lib::SPVM::StringUtil {
     return 1;
   }
 
-  sub test_isspace : int () {
+  sub test_is_space : int () {
 
     my $ok = 1;
     for (my $i = 0; $i < 128; $i++) {
       my $char = $i;
 
       if (($char >= 0x09 && $char <= 0x0d) || $char == 0x20) {
-        my $ret = isspace($char);
+        my $ret = is_space($char);
         unless ($ret == 1) {
           $ok = 0;
         }
       }
       else {
-        my $ret = isspace($char);
+        my $ret = is_space($char);
         unless ($ret == 0) {
           $ok = 0;
         }
@@ -794,20 +761,20 @@ package TestCase::Lib::SPVM::StringUtil {
     return 1;
   }
 
-  sub test_isupper : int () {
+  sub test_is_upper : int () {
 
     my $ok = 1;
     for (my $i = 0; $i < 128; $i++) {
       my $char = $i;
 
       if ($char >= 'A' && $char <= 'Z') {
-        my $ret = isupper($char);
+        my $ret = is_upper($char);
         unless ($ret == 1) {
           $ok = 0;
         }
       }
       else {
-        my $ret = isupper($char);
+        my $ret = is_upper($char);
         unless ($ret == 0) {
           $ok = 0;
         }
@@ -821,20 +788,20 @@ package TestCase::Lib::SPVM::StringUtil {
     return 1;
   }
 
-  sub test_isxdigit : int () {
+  sub test_is_xdigit : int () {
 
     my $ok = 1;
     for (my $i = 0; $i < 128; $i++) {
       my $char = $i;
 
       if (($char >= 'A' && $char <= 'F') || ($char >= 'a' && $char <= 'f') || ($char >= '0' && $char <= '9')) {
-        my $ret = isxdigit($char);
+        my $ret = is_xdigit($char);
         unless ($ret == 1) {
           $ok = 0;
         }
       }
       else {
-        my $ret = isxdigit($char);
+        my $ret = is_xdigit($char);
         unless ($ret == 0) {
           $ok = 0;
         }
@@ -848,20 +815,20 @@ package TestCase::Lib::SPVM::StringUtil {
     return 1;
   }
 
-  sub test_tolower : int () {
+  sub test_to_lower : int () {
 
     my $ok = 1;
     for (my $i = 0; $i < 128; $i++) {
       my $char = $i;
 
       if ($char >= 'A' && $char <= 'Z') {
-        my $ret = tolower($char);
+        my $ret = to_lower($char);
         unless ($ret == $char + 0x20) {
           $ok = 0;
         }
       }
       else {
-        my $ret = tolower($char);
+        my $ret = to_lower($char);
         unless ($ret == $char) {
           $ok = 0;
         }
@@ -875,20 +842,20 @@ package TestCase::Lib::SPVM::StringUtil {
     return 1;
   }
 
-  sub test_toupper : int () {
+  sub test_to_upper : int () {
 
     my $ok = 1;
     for (my $i = 0; $i < 128; $i++) {
       my $char = $i;
 
     if ($char >= 'a' && $char <= 'z') {
-        my $ret = toupper($char);
+        my $ret = to_upper($char);
         unless ($ret == $char - 0x20) {
           $ok = 0;
         }
       }
       else {
-        my $ret = toupper($char);
+        my $ret = to_upper($char);
         unless ($ret == $char) {
           $ok = 0;
         }
@@ -956,11 +923,28 @@ package TestCase::Lib::SPVM::StringUtil {
     return 1;
   }
 
-  sub test_strtoi : int () {
+  sub test_to_int : int () {
     # 10 digit minimal and return type is int
     {
       my $string = "-2147483648";
-      my $num = strtoi($string, 10);
+      my $num = to_int($string);
+      unless ($num isa int) {
+        return 0;
+      }
+
+      unless ($num == -2147483648) {
+        return 0;
+      }
+    }
+    
+    return 1;
+  }
+
+  sub test_to_int_with_base : int () {
+    # 10 digit minimal and return type is int
+    {
+      my $string = "-2147483648";
+      my $num = to_int_with_base($string, 10);
       unless ($num isa int) {
         return 0;
       }
@@ -973,7 +957,7 @@ package TestCase::Lib::SPVM::StringUtil {
     # 10 digit max
     {
       my $string = "2147483647";
-      my $num = strtoi($string, 10);
+      my $num = to_int_with_base($string, 10);
       unless ($num isa int) {
         return 0;
       }
@@ -986,7 +970,7 @@ package TestCase::Lib::SPVM::StringUtil {
     # 2 digit
     {
       my $string = "11";
-      my $num = strtoi($string, 2);
+      my $num = to_int_with_base($string, 2);
 
       unless ($num == 3) {
         return 0;
@@ -996,7 +980,7 @@ package TestCase::Lib::SPVM::StringUtil {
     # 8 digit
     {
       my $string = "11";
-      my $num = strtoi($string, 8);
+      my $num = to_int_with_base($string, 8);
 
       unless ($num == 9) {
         return 0;
@@ -1006,7 +990,7 @@ package TestCase::Lib::SPVM::StringUtil {
     # 16 digit
     {
       my $string = "FF";
-      my $num = strtoi($string, 16);
+      my $num = to_int_with_base($string, 16);
 
       unless ($num == 255) {
         return 0;
@@ -1017,7 +1001,7 @@ package TestCase::Lib::SPVM::StringUtil {
     {
       my $string = "10oppp";
       eval {
-        strtoi($string, 10);
+        to_int_with_base($string, 10);
       };
       unless ($@) {
         return 0;
@@ -1029,7 +1013,7 @@ package TestCase::Lib::SPVM::StringUtil {
     {
       my $string = "10";
       eval {
-        strtoi($string, 100);
+        to_int_with_base($string, 100);
       };
       unless ($@) {
         return 0;
@@ -1041,7 +1025,7 @@ package TestCase::Lib::SPVM::StringUtil {
     {
       my $string = "2147483648";
       eval {
-        strtoi($string, 10);
+        to_int_with_base($string, 10);
       };
       unless ($@) {
         return 0;
@@ -1053,7 +1037,7 @@ package TestCase::Lib::SPVM::StringUtil {
     {
       my $string = "-2147483649";
       eval {
-        strtoi($string, 10);
+        to_int_with_base($string, 10);
       };
       unless ($@) {
         return 0;
@@ -1064,11 +1048,28 @@ package TestCase::Lib::SPVM::StringUtil {
     return 1;
   }
 
-  sub test_strtol : int () {
+  sub test_to_long : int () {
     # 10 digit minimal and return type is int
     {
       my $string = "-9223372036854775808";
-      my $num = strtol($string, 10);
+      my $num = to_long($string);
+      unless ($num isa long) {
+        return 0;
+      }
+
+      unless ($num == -9223372036854775808L) {
+        return 0;
+      }
+    }
+    
+    return 1;
+  }
+  
+  sub test_to_long_with_base : int () {
+    # 10 digit minimal and return type is int
+    {
+      my $string = "-9223372036854775808";
+      my $num = to_long_with_base($string, 10);
       unless ($num isa long) {
         return 0;
       }
@@ -1081,7 +1082,7 @@ package TestCase::Lib::SPVM::StringUtil {
     # 10 digit max
     {
       my $string = "9223372036854775807";
-      my $num = strtol($string, 10);
+      my $num = to_long_with_base($string, 10);
 
       unless ($num == 9223372036854775807L) {
         return 0;
@@ -1091,7 +1092,7 @@ package TestCase::Lib::SPVM::StringUtil {
     # 2 digit
     {
       my $string = "11";
-      my $num = strtol($string, 2);
+      my $num = to_long_with_base($string, 2);
 
       unless ($num == 3) {
         return 0;
@@ -1101,7 +1102,7 @@ package TestCase::Lib::SPVM::StringUtil {
     # 8 digit
     {
       my $string = "11";
-      my $num = strtol($string, 8);
+      my $num = to_long_with_base($string, 8);
 
       unless ($num == 9) {
         return 0;
@@ -1111,7 +1112,7 @@ package TestCase::Lib::SPVM::StringUtil {
     # 16 digit
     {
       my $string = "FF";
-      my $num = strtol($string, 16);
+      my $num = to_long_with_base($string, 16);
 
       unless ($num == 255) {
         return 0;
@@ -1122,7 +1123,7 @@ package TestCase::Lib::SPVM::StringUtil {
     {
       my $string = "10oppp";
       eval {
-        strtol($string, 10);
+        to_long_with_base($string, 10);
       };
       unless ($@) {
         return 0;
@@ -1134,7 +1135,7 @@ package TestCase::Lib::SPVM::StringUtil {
     {
       my $string = "10";
       eval {
-        strtol($string, 100);
+        to_long_with_base($string, 100);
       };
       unless ($@) {
         return 0;
@@ -1146,7 +1147,7 @@ package TestCase::Lib::SPVM::StringUtil {
     {
       my $string = "9223372036854775808";
       eval {
-        strtol($string, 10);
+        to_long_with_base($string, 10);
       };
       unless ($@) {
         return 0;
@@ -1158,7 +1159,7 @@ package TestCase::Lib::SPVM::StringUtil {
     {
       my $string = "-9223372036854775809";
       eval {
-        strtol($string, 10);
+        to_long_with_base($string, 10);
       };
       unless ($@) {
         return 0;
@@ -1169,11 +1170,11 @@ package TestCase::Lib::SPVM::StringUtil {
     return 1;
   }
 
-  sub test_strtof : int () {
+  sub test_to_float : int () {
     # 10 digit minimal and return type is int
     {
       my $string = "1.25";
-      my $num = strtof($string);
+      my $num = to_float($string);
       unless ($num isa float) {
         return 0;
       }
@@ -1187,7 +1188,7 @@ package TestCase::Lib::SPVM::StringUtil {
     {
       my $string = "10.5oppp";
       eval {
-        strtof($string);
+        to_float($string);
       };
       unless ($@) {
         return 0;
@@ -1198,11 +1199,11 @@ package TestCase::Lib::SPVM::StringUtil {
     return 1;
   }
 
-  sub test_strtod : int () {
+  sub test_to_double : int () {
     # 10 digit minimal and return type is int
     {
       my $string = "1.25";
-      my $num = strtod($string);
+      my $num = to_double($string);
       unless ($num isa double) {
         return 0;
       }
@@ -1216,7 +1217,7 @@ package TestCase::Lib::SPVM::StringUtil {
     {
       my $string = "10.5oppp";
       eval {
-        strtod($string);
+        to_double($string);
       };
       unless ($@) {
         return 0;
@@ -1229,39 +1230,39 @@ package TestCase::Lib::SPVM::StringUtil {
 
   sub test_ucfirst : int () {
     {
-      my $str = "@abc";
-      my $result_str = ucfirst($str);
+      my $string = "@abc";
+      my $result_str = ucfirst($string);
       unless ($result_str eq "@abc") {
         return 0;
       }
     }
     {
-      my $str = "[abc";
-      my $result_str = ucfirst($str);
+      my $string = "[abc";
+      my $result_str = ucfirst($string);
       unless ($result_str eq "[abc") {
         return 0;
       }
     }
 
     {
-      my $str = "aabc";
-      my $result_str = ucfirst($str);
+      my $string = "aabc";
+      my $result_str = ucfirst($string);
       unless ($result_str eq "Aabc") {
         return 0;
       }
     }
 
     {
-      my $str = "pabc";
-      my $result_str = ucfirst($str);
+      my $string = "pabc";
+      my $result_str = ucfirst($string);
       unless ($result_str eq "Pabc") {
         return 0;
       }
     }
 
     {
-      my $str = "zabc";
-      my $result_str = ucfirst($str);
+      my $string = "zabc";
+      my $result_str = ucfirst($string);
       unless ($result_str eq "Zabc") {
         return 0;
       }
@@ -1271,8 +1272,8 @@ package TestCase::Lib::SPVM::StringUtil {
 
   sub test_uc : int () {
     {
-      my $str = "@[apz[";
-      my $result_str = uc($str);
+      my $string = "@[apz[";
+      my $result_str = uc($string);
       unless ($result_str eq "@[APZ[") {
         return 0;
       }
@@ -1282,8 +1283,8 @@ package TestCase::Lib::SPVM::StringUtil {
 
   sub test_lc : int () {
     {
-      my $str = "@[APZ[";
-      my $result_str = lc($str);
+      my $string = "@[APZ[";
+      my $result_str = lc($string);
       unless ($result_str eq "@[apz[") {
         return 0;
       }
@@ -1293,157 +1294,43 @@ package TestCase::Lib::SPVM::StringUtil {
 
   sub test_lcfirst : int () {
     {
-      my $str = "@ABC";
-      my $result_str = lcfirst($str);
+      my $string = "@ABC";
+      my $result_str = lcfirst($string);
       unless ($result_str eq "@ABC") {
         return 0;
       }
     }
     {
-      my $str = "[ABC";
-      my $result_str = lcfirst($str);
+      my $string = "[ABC";
+      my $result_str = lcfirst($string);
       unless ($result_str eq "[ABC") {
         return 0;
       }
     }
 
     {
-      my $str = "AABC";
-      my $result_str = lcfirst($str);
+      my $string = "AABC";
+      my $result_str = lcfirst($string);
       unless ($result_str eq "aABC") {
         return 0;
       }
     }
 
     {
-      my $str = "PABC";
-      my $result_str = lcfirst($str);
+      my $string = "PABC";
+      my $result_str = lcfirst($string);
       unless ($result_str eq "pABC") {
         return 0;
       }
     }
 
     {
-      my $str = "ZABC";
-      my $result_str = lcfirst($str);
+      my $string = "ZABC";
+      my $result_str = lcfirst($string);
       unless ($result_str eq "zABC") {
         return 0;
       }
     }
-    return 1;
-  }
-  sub test_replace_all : int () {
-
-    {
-      my $str = "foo bar foo bar foo";
-      my $substr = "bar";
-      my $replace = "AB";
-      my $result_str = replace_all($str, $substr, $replace);
-      unless ($result_str eq "foo AB foo AB foo") {
-        return 0;
-      }
-    }
-
-    {
-      my $str = "foobarfoobarfoo";
-      my $substr = "bar";
-      my $replace = "";
-      my $result_str = replace_all($str, $substr, $replace);
-      unless ($result_str eq "foofoofoo") {
-        return 0;
-      }
-    }
-
-    return 1;
-  }
-
-  sub test_replace : int () {
-
-    {
-      my $str = "abcde";
-      my $substr = "bcd";
-      my $replace = "AB";
-      my $found_offset = 0;
-      my $result_str = replace($str, $substr, $replace, 0, \$found_offset);
-      unless ($found_offset == 1) {
-        return 0;
-      }
-      unless ($result_str eq "aABe") {
-        return 0;
-      }
-    }
-
-    {
-      my $str = "abcde";
-      my $substr = "bcd";
-      my $replace = "AB";
-      my $found_offset = 0;
-      my $result_str = replace($str, $substr, $replace, 2, \$found_offset);
-      unless ($found_offset == -1) {
-        return 0;
-      }
-      unless ($result_str eq $str) {
-        return 0;
-      }
-    }
-
-    {
-      my $str = "abcde";
-      my $substr = "abc";
-      my $replace = "ABCD";
-      my $found_offset = 0;
-      my $result_str = replace($str, $substr, $replace, 0, \$found_offset);
-      unless ($found_offset == 0) {
-        return 0;
-      }
-      unless ($result_str eq "ABCDde") {
-        return 0;
-      }
-    }
-
-    {
-      my $str = "abcde";
-      my $substr = "cde";
-      my $replace = "ABCD";
-      my $found_offset = 0;
-      my $result_str = replace($str, $substr, $replace, 0, \$found_offset);
-      unless ($found_offset == 2) {
-        return 0;
-      }
-      unless ($result_str eq "abABCD") {
-        return 0;
-      }
-    }
-
-    {
-      my $str = "abcdcd";
-      my $substr = "cd";
-      my $replace = "A";
-      my $found_offset = 0;
-      my $result_str = replace($str, $substr, $replace, 4, \$found_offset);
-      unless ($found_offset == 4) {
-        return 0;
-      }
-      unless ($result_str eq "abcdA") {
-        return 0;
-      }
-    }
-
-    {
-      my $str = "abcd";
-      my $substr = "bc";
-      my $replace = "";
-      my $found_offset = 0;
-      my $result_str = replace($str, $substr, $replace, 0, \$found_offset);
-
-      unless ($found_offset == 1) {
-        return 0;
-      }
-      unless ($result_str eq "ad") {
-        return 0;
-      }
-    }
-
     return 1;
   }
 
@@ -1550,7 +1437,7 @@ package TestCase::Lib::SPVM::StringUtil {
     return 0;
   }
 
-  sub test_copy_str : int () {
+  sub test_copy_string : int () {
     my $string = "abc";
     my $string_out = copy_string($string);
 

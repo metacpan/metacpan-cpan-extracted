@@ -72255,3 +72255,15 @@ F/FR/FREDERICD/marc-moose-1.0.44.tar.gz
 R/RR/RRWO/Net-Statsd-Lite-v0.6.1.tar.gz
 R/RR/RRWO/Plack-Middleware-Statsd-v0.4.7.tar.gz
 S/SH/SHLOMIF/pyperl-1.0.2.tar.gz
+D/DB/DBOOK/CGI-Tiny-0.009.tar.gz
+M/MI/MICVU/Crypto-Exchange-Binance-Spot-API-0.05.tar.gz
+L/LN/LNATION/Hash-ExtendedKeys-0.02.tar.gz
+J/JH/JHTHORSEN/JSON-Validator-4.17.tar.gz
+P/PE/PEVANS/List-Keywords-0.03.tar.gz
+J/JH/JHTHORSEN/Mojo-mysql-1.21.tar.gz
+J/JH/JHTHORSEN/Mojolicious-Plugin-OpenAPI-4.03.tar.gz
+D/DE/DERIV/Myriad-0.004.tar.gz
+P/PE/PERLANCAR/Perinci-Examples-0.821.tar.gz
+R/RT/RTKH/Raisin-0.91.tar.gz
+K/KI/KIMOTO/SPVM-0.0948.tar.gz
+K/KF/KFLY/Sub-Meta-0.12.tar.gz

@@ -4,7 +4,7 @@ package SPVM::ShortList;
 
 =head1 NAME
 
-SPVM::ShortList - Continuous dynamic short array
+SPVM::ShortList - Dynamic short array
 
 =head1 SYNOPSYS
   
@@ -48,7 +48,7 @@ SPVM::ShortList - Continuous dynamic short array
 
 =head1 DESCRIPTION
 
-L<SPVM::ShortList> is continuous dynamic short array.
+L<SPVM::ShortList> is dynamic  short array.
 
 =head1 STATIC METHODS
 
@@ -66,45 +66,6 @@ Create a new L<SPVM::ShortList> object with array length.
 
 =head1 INSTANCE METHODS
 
-=head2 length
-  
-  sub length : int ()
-
-Get list length.
-
-=head2 push
-  
-  sub push : void ($self : self, $value : short)
-
-Appending the value to the end of list.
-
-=head2 pop
-
-  sub pop : short ($self : self)
-
-Pops and returns the last value of the list, shortening the array by one element
-If there are no elements in the list, exception occur.
-
-=head2 unshift
-
-  sub unshift : void ($self : self, $value : short)
-
-Appending the value to the top of list.
-
-=head2 shift
-
-  sub shift : short ($self : self)
-
-Shifts the first value of the list off and returns it, shortening
-the array by 1 and moving everything down.
-If there are no elements in the list, exception occur.
-
-=head2 set
-
-  sub set : void ($self : self, $index : int, $value : short)
-
-Set the value with index.
-
 =head2 get
 
   sub get : short ($self : self, $index : int)
@@ -117,17 +78,30 @@ Get the value with index.
 
 Insert a element to the specific index.
 
+=head2 length
+  
+  sub length : int ()
+
+Get list length.
+
+=head2 pop
+
+  sub pop : short ($self : self)
+
+Pops and returns the last value of the list, shortening the array by one element
+If there are no elements in the list, exception occur.
+
+=head2 push
+  
+  sub push : void ($self : self, $value : short)
+
+Appending the value to the end of list.
+
 =head2 remove
 
   sub remove : short ($self : self, $index : int)
 
 Remove and return the element which is specified by the index.
-
-=head2 to_array
-
-  sub to_array : short[] ($self : self)
-
-Convert L<SPVM::ShortList> to short array.
 
 =head2 resize
 
@@ -136,3 +110,40 @@ Convert L<SPVM::ShortList> to short array.
 Resize list.
 
 New length must be more than or equals to 0, otherwise a exception occur.
+
+=head2 set
+
+  sub set : void ($self : self, $index : int, $value : short)
+
+Set the value with index.
+
+=head2 set_array
+
+  sub set_array : void ($self : self, $array : short[])
+
+Set a array. Each elements of the array is copied to the correspoinding index of the array this list has.
+
+Array must be defined, otherwise a exception occurs.
+
+The length of argument array must be same as the length of current list array, otherwise a exception occures.
+
+=head2 shift
+
+  sub shift : short ($self : self)
+
+Shifts the first value of the list off and returns it, shortening
+the array by 1 and moving everything down.
+If there are no elements in the list, exception occur.
+
+=head2 to_array
+
+  sub to_array : short[] ($self : self)
+
+Convert L<SPVM::ShortList> to short array.
+
+=head2 unshift
+
+  sub unshift : void ($self : self, $value : short)
+
+Appending the value to the top of list.
+

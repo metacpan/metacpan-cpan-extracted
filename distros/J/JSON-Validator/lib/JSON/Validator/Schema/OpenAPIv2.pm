@@ -1,6 +1,7 @@
 package JSON::Validator::Schema::OpenAPIv2;
 use Mojo::Base 'JSON::Validator::Schema::Draft4';
 
+use JSON::Validator::Ref;
 use JSON::Validator::Util qw(E data_type negotiate_content_type schema_type);
 use Mojo::Collection;
 
@@ -15,6 +16,22 @@ has errors => sub {
 has moniker       => 'openapiv2';
 has specification => 'http://swagger.io/v2/schema.json';
 
+sub add_default_response {
+  my ($self, $params) = ($_[0], shift->_params_for_add_default_response(@_));
+
+  my $definitions = $self->data->{definitions}      ||= {};
+  my $ref         = $definitions->{$params->{name}} ||= $params->{schema};
+  my %schema      = ('$ref' => "#/definitions/$params->{name}");
+  tie %schema, 'JSON::Validator::Ref', $ref, $schema{'$ref'}, $schema{'$ref'};
+
+  for my $route ($self->routes->each) {
+    my $op = $self->get([paths => @$route{qw(path method)}]);
+    $op->{responses}{$_} ||= {description => $params->{description}, schema => \%schema} for @{$params->{status}};
+  }
+
+  return $self;
+}
+
 sub allow_invalid_ref {
   my $self = shift;
   return $self->{allow_invalid_ref} || 0 unless @_;
@@ -23,6 +40,28 @@ sub allow_invalid_ref {
   $self->{allow_invalid_ref} = shift;
   $self->data($self->{data}) if $self->{data};
 
+  return $self;
+}
+
+sub base_url {
+  my ($self, $url) = @_;
+  my $spec = $self->data;
+
+  # Get
+  unless ($url) {
+    $url = Mojo::URL->new;
+    $url->host($spec->{host}) if $spec->{host};
+    $url->path($spec->{basePath} || '/');
+    $url->scheme($spec->{schemes} && $spec->{schemes}[0] || undef);
+    $url->host('localhost') if $url->scheme and !$url->host;
+    return $url;
+  }
+
+  # Set
+  $url                = Mojo::URL->new($url)->to_abs($self->base_url);
+  $spec->{host}       = $url->host_port if $url->host_port;
+  $spec->{schemes}[0] = $url->scheme    if $url->scheme;
+  $spec->{basePath}   = $url->path->to_string || '/';
   return $self;
 }
 
@@ -202,6 +241,23 @@ sub _coerce_parameter_format {
   return $val->{value} = [split /,/,   $val->{value}];
 }
 
+sub _default_response_schema {
+  return {
+    type       => 'object',
+    required   => ['errors'],
+    properties => {
+      errors => {
+        type  => 'array',
+        items => {
+          type       => 'object',
+          required   => ['message'],
+          properties => {message => {type => 'string'}, path => {type => 'string'}},
+        },
+      },
+    },
+  };
+}
+
 sub _definitions_path_for_ref {
   my ($self, $ref) = @_;
   my $path = Mojo::Path->new($ref->fqn =~ m!^.*#/(definitions|parameters|responses/.+)$!)->to_dir->parts;
@@ -228,6 +284,18 @@ sub _get_parameter_value {
   my $val = $get->{$param->{in}}->($param->{name}, $param);
   @$val{qw(in name)} = (@$param{qw(in name)});
   return $val;
+}
+
+sub _params_for_add_default_response {
+  my $self   = shift;
+  my $params = shift || {};
+
+  return {
+    description => $params->{description} || 'Default response.',
+    name        => $params->{name}        || 'DefaultResponse',
+    schema      => $params->{schema}      || _default_response_schema(),
+    status      => $params->{status}      || [400, 401, 404, 500, 501],
+  };
 }
 
 sub _prefix_error_path {
@@ -386,6 +454,58 @@ Defaults to "L<http://swagger.io/v2/schema.json>".
 
 =head1 METHODS
 
+=head2 add_default_response
+
+  $schema = $schema->add_default_response(\%params);
+
+Used to add a default response schema for operations that does not already have
+one. C<%params> can be:
+
+=over 2
+
+=item * description
+
+The human readable description added to the operation.
+
+Defaults: "Default response."
+
+=item * name
+
+The name used in the specification under "/components/schemas/".
+
+Defaults: "DefaultResponse"
+
+=item * schema
+
+The schema to add. The default schema below might change, but the basics will
+stay the same:
+
+  {
+    type: "object",
+    required: ["errors"],
+    properties: {
+      errors: {
+        type: "array",
+        items: {
+          type: "object",
+          required: ["message"],
+          properties: {
+            message: {type: "string"},
+            path: {type: "string"}
+          }
+        }
+      }
+    }
+  }
+
+=item * status
+
+A list of status codes to apply the default schema to.
+
+Default: C<[400, 401, 404, 500, 501]>.
+
+=back
+
 =head2 allow_invalid_ref
 
   $bool   = $schema->allow_invalid_ref;
@@ -398,6 +518,16 @@ different files where OpenAPIv2 normally does not allow you to.
 Setting this attribute will not work if the schema has recursive C<$ref>s.
 
 This method is highly EXPERIMENTAL, and it is not advices to use this method.
+
+=head2 base_url
+
+  $url = $schema->base_url;
+  $schema = $schema->base_url($url);
+
+Can get or set the default URL for this schema. C<$url> can be either a
+L<Mojo::URL> object or a plain string.
+
+This method will read or write "basePath", "host" and/or "schemas" in L</data>.
 
 =head2 coerce
 

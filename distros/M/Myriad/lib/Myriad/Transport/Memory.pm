@@ -1,6 +1,6 @@
 package Myriad::Transport::Memory;
 
-our $VERSION = '0.003'; # VERSION
+our $VERSION = '0.004'; # VERSION
 # AUTHORTIY
 
 use strict;
@@ -202,7 +202,7 @@ async method read_from_stream_by_consumer ($stream_name, $group_name, $consumer_
         }
     }
 
-    $group->{cursor} += $group_offset + $read_count;
+    $group->{cursor} += $offset + $read_count;
 
     return %messages;
 }

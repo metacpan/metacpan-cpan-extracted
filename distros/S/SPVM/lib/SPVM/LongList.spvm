@@ -2,20 +2,11 @@ package SPVM::LongList : precompile {
   use SPVM::ArrayUtil (memcpy_long, memmove_long);
   
   has values   : long[];
-  has capacity : ro int;
+  has capacity : int;
   has length   : ro int;
   
   private enum {
     DEFAULT_CAPACITY = 16,
-  }
-  sub new_capacity : SPVM::LongList ($capacity : int) {
-    my $self = new SPVM::LongList;
-    unless ($capacity > 0) {
-      die "capacity must be positive";
-    }
-    $self->{capacity} = $capacity;
-    $self->{values} = new long[$capacity];
-    return $self;
   }
 
   sub new : SPVM::LongList ($array : long[]) {
@@ -205,6 +196,22 @@ package SPVM::LongList : precompile {
     $self->{values}[$index] = $value;
   }
   
+  sub set_array : void ($self : self, $array : long[]) {
+    unless ($array) {
+      die "Array must be defined";
+    }
+    
+    my $cur_length = $self->length;
+    
+    my $set_length = @$array;
+    
+    unless ($set_length == $cur_length) {
+      die "The length of argument array must be same as the length of current list array";
+    }
+    
+    SPVM::ArrayUtil->memcpy_long($self->{values}, 0, $array, 0, $cur_length);
+  }
+
   sub get : long ($self : self, $index : int) {
     my $length = $self->length;
     

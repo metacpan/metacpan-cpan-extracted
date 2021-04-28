@@ -1,7 +1,7 @@
 package Perinci::Examples::SubMeta;
 
-our $DATE = '2020-04-29'; # DATE
-our $VERSION = '0.820'; # VERSION
+our $DATE = '2021-01-30'; # DATE
+our $VERSION = '0.821'; # VERSION
 
 use 5.010;
 use strict;
@@ -167,7 +167,7 @@ Perinci::Examples::SubMeta - Test argument submetadata
 
 =head1 VERSION
 
-This document describes version 0.820 of Perinci::Examples::SubMeta (from Perl distribution Perinci-Examples), released on 2020-04-29.
+This document describes version 0.821 of Perinci::Examples::SubMeta (from Perl distribution Perinci-Examples), released on 2021-01-30.
 
 =head1 DESCRIPTION
 
@@ -298,7 +298,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020, 2019, 2018, 2017, 2016, 2015, 2014, 2013, 2012, 2011 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2020, 2019, 2018, 2017, 2016, 2015, 2014, 2013, 2012, 2011 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

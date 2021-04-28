@@ -6,7 +6,7 @@ use Unicode::UTF8 qw(decode_utf8);
 
 use Myriad::Util::UUID;
 
-our $VERSION = '0.003'; # VERSION
+our $VERSION = '0.004'; # VERSION
 our $AUTHORITY = 'cpan:DERIV'; # AUTHORITY
 
 =head1 NAME

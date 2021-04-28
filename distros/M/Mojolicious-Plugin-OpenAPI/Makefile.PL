@@ -16,7 +16,7 @@ my %WriteMakefileArgs = (
 }
 ,
   PREREQ_PM      => {
-  'JSON::Validator' => '4.16',
+  'JSON::Validator' => '4.17',
   'Mojolicious' => '9.00'
 }
 ,

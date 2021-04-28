@@ -6,7 +6,7 @@ use strict;
 use warnings;
 
 package Raisin::Routes::Endpoint;
-$Raisin::Routes::Endpoint::VERSION = '0.90';
+$Raisin::Routes::Endpoint::VERSION = '0.91';
 use Plack::Util::Accessor qw(
     check
     code
@@ -125,7 +125,7 @@ Raisin::Routes::Endpoint - Endpoint class for Raisin::Routes.
 
 =head1 VERSION
 
-version 0.90
+version 0.91
 
 =head1 ACKNOWLEDGEMENTS
 
@@ -133,7 +133,7 @@ This module was inspired by L<Kelp::Routes::Pattern>.
 
 =head1 AUTHOR
 
-Artur Khabibullin <rtkh@cpan.org>
+Artur Khabibullin
 
 =head1 COPYRIGHT AND LICENSE
 

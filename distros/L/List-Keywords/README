@@ -65,6 +65,15 @@ DESCRIPTION
 
 KEYWORDS
 
+ first
+
+       $val = first { CODE } LIST
+
+    Repeatedly calls the block of code, with $_ locally set to successive
+    values from the given list. Returns the value and stops at the first
+    item to make the block yield a true value. If no such item exists,
+    returns undef.
+
  any
 
        $bool = any { CODE } LIST
@@ -83,14 +92,19 @@ KEYWORDS
     to make the block yield a false value. If no such item exists, returns
     true.
 
+ none =head2 notall
+
+       $bool = none { CODE } LIST
+       $bool = notall { CODE } LISt
+
+    Same as "any" and "all" but with the return value inverted.
+
 TODO
 
     More functions from List::Util:
 
        reduce
        reductions
-       none notall
-       first
        pairfirst pairgrep pairmap
 
     Maybe also consider some from List::UtilsBy.

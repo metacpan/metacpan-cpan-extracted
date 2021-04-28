@@ -69,18 +69,44 @@ subtest 'No render' => sub {
   open my $in_fh, '<', \(my $in_data = '') or die "failed to open handle for input: $!";
   open my $out_fh, '>', \my $out_data or die "failed to open handle for output: $!";
 
-  my $error;
+  my ($error, $code);
   cgi {
-    $_->set_error_handler(sub { $error = $_[1] });
+    $_->set_error_handler(sub { $error = $_[1]; $code = $_[0]->response_status_code });
     $_->set_input_handle($in_fh);
     $_->set_output_handle($out_fh);
   };
 
   ok defined($error), 'error logged';
+  is $code, 500, '500 response status code';
   ok length($out_data), 'response rendered';
   my $response = _parse_response($out_data);
   ok defined($response->{headers}{'content-type'}), 'Content-Type set';
   like $response->{status}, qr/^5[0-9]{2}\b/, '500 response status';
+};
+
+subtest 'No render (custom response status)' => sub {
+  local @ENV{@env_keys} = ('')x@env_keys;
+  local $ENV{PATH_INFO} = '/';
+  local $ENV{REQUEST_METHOD} = 'GET';
+  local $ENV{SCRIPT_NAME} = '/';
+  local $ENV{SERVER_PROTOCOL} = 'HTTP/1.0';
+  open my $in_fh, '<', \(my $in_data = '') or die "failed to open handle for input: $!";
+  open my $out_fh, '>', \my $out_data or die "failed to open handle for output: $!";
+
+  my ($error, $code);
+  cgi {
+    $_->set_error_handler(sub { $error = $_[1]; $code = $_[0]->response_status_code });
+    $_->set_input_handle($in_fh);
+    $_->set_output_handle($out_fh);
+    $_->set_response_status(403);
+  };
+
+  ok defined($error), 'error logged';
+  is $code, 403, '403 response status code';
+  ok length($out_data), 'response rendered';
+  my $response = _parse_response($out_data);
+  ok defined($response->{headers}{'content-type'}), 'Content-Type set';
+  like $response->{status}, qr/^403\b/, '403 response status';
 };
 
 subtest 'No render (object lost)' => sub {
@@ -211,9 +237,9 @@ subtest 'Exception before render' => sub {
   open my $in_fh, '<', \(my $in_data = '') or die "failed to open handle for input: $!";
   open my $out_fh, '>', \my $out_data or die "failed to open handle for output: $!";
 
-  my ($error, $headers_rendered);
+  my ($error, $headers_rendered, $code);
   cgi {
-    $_->set_error_handler(sub { $error = $_[1]; $headers_rendered = $_[0]->headers_rendered; });
+    $_->set_error_handler(sub { $error = $_[1]; $headers_rendered = $_[0]->headers_rendered; $code = $_[0]->response_status_code });
     $_->set_input_handle($in_fh);
     $_->set_output_handle($out_fh);
     die 'Error 42';
@@ -222,6 +248,7 @@ subtest 'Exception before render' => sub {
   ok defined($error), 'error logged';
   like $error, qr/Error 42/, 'right error';
   ok !$headers_rendered, 'headers were not rendered';
+  is $code, 500, '500 response status code';
   ok length($out_data), 'response rendered';
   my $response = _parse_response($out_data);
   ok defined($response->{headers}{'content-type'}), 'Content-Type set';
@@ -266,9 +293,9 @@ subtest 'Excessive request body' => sub {
   open my $in_fh, '<', \$in_data or die "failed to open handle for input: $!";
   open my $out_fh, '>', \my $out_data or die "failed to open handle for output: $!";
 
-  my $error;
+  my ($error, $code);
   cgi {
-    $_->set_error_handler(sub { $error = $_[1] });
+    $_->set_error_handler(sub { $error = $_[1]; $code = $_[0]->response_status_code });
     $_->set_request_body_limit(100);
     $_->set_input_handle($in_fh);
     $_->set_output_handle($out_fh);
@@ -277,6 +304,7 @@ subtest 'Excessive request body' => sub {
   };
 
   ok defined($error), 'error logged';
+  is $code, 413, '413 response status code';
   ok length($out_data), 'response rendered';
   my $response = _parse_response($out_data);
   ok defined($response->{headers}{'content-type'}), 'Content-Type set';
@@ -321,6 +349,97 @@ subtest 'Data response' => sub {
     $_->set_input_handle($in_fh);
     $_->set_output_handle($out_fh);
     $_->render(data => $data);
+  };
+
+  ok length($out_data), 'response rendered';
+  my $response = _parse_response($out_data);
+  ok defined($response->{headers}{'content-type'}), 'Content-Type set';
+  is $response->{headers}{'content-type'}, 'application/octet-stream', 'right content type';
+  like $response->{status}, qr/^200\b/, '200 response status';
+  is $response->{body}, $data, 'right response body';
+};
+
+subtest 'File response' => sub {
+  local @ENV{@env_keys} = ('')x@env_keys;
+  local $ENV{PATH_INFO} = '/';
+  local $ENV{REQUEST_METHOD} = 'GET';
+  local $ENV{SCRIPT_NAME} = '/';
+  local $ENV{SERVER_PROTOCOL} = 'HTTP/1.0';
+  open my $in_fh, '<', \(my $in_data = '') or die "failed to open handle for input: $!";
+  open my $out_fh, '>', \my $out_data or die "failed to open handle for output: $!";
+
+  my $data = "\x01\x02\x03\x04\r\n\xFF";
+  my $tempdir = File::Temp->newdir;
+  my $filepath = "$tempdir/test.dat";
+  open my $fh, '>', $filepath or die "Failed to open $filepath for writing: $!";
+  binmode $fh;
+  print $fh $data;
+  close $fh;
+
+  cgi {
+    $_->set_input_handle($in_fh);
+    $_->set_output_handle($out_fh);
+    $_->render(file => $filepath);
+  };
+
+  ok length($out_data), 'response rendered';
+  my $response = _parse_response($out_data);
+  ok defined($response->{headers}{'content-type'}), 'Content-Type set';
+  is $response->{headers}{'content-type'}, 'application/octet-stream', 'right content type';
+  like $response->{status}, qr/^200\b/, '200 response status';
+  is $response->{body}, $data, 'right response body';
+};
+
+subtest 'File response (download)' => sub {
+  local @ENV{@env_keys} = ('')x@env_keys;
+  local $ENV{PATH_INFO} = '/';
+  local $ENV{REQUEST_METHOD} = 'GET';
+  local $ENV{SCRIPT_NAME} = '/';
+  local $ENV{SERVER_PROTOCOL} = 'HTTP/1.0';
+  open my $in_fh, '<', \(my $in_data = '') or die "failed to open handle for input: $!";
+  open my $out_fh, '>', \my $out_data or die "failed to open handle for output: $!";
+
+  my $data = "\x01\x02\x03\x04\r\n\xFF";
+  my $tempdir = File::Temp->newdir;
+  my $filepath = "$tempdir/test.dat";
+  open my $fh, '>', $filepath or die "Failed to open $filepath for writing: $!";
+  binmode $fh;
+  print $fh $data;
+  close $fh;
+
+  my $filename = '"test☃".dat';
+  cgi {
+    $_->set_input_handle($in_fh);
+    $_->set_output_handle($out_fh);
+    $_->set_response_download($filename);
+    $_->render(file => $filepath);
+  };
+
+  ok length($out_data), 'response rendered';
+  my $response = _parse_response($out_data);
+  ok defined($response->{headers}{'content-type'}), 'Content-Type set';
+  is $response->{headers}{'content-type'}, 'application/octet-stream', 'right content type';
+  is $response->{headers}{'content-disposition'},
+    'attachment; filename="\"test?\".dat"; filename*=UTF-8\'\'%22test%E2%98%83%22.dat', 'right content disposition';
+  like $response->{status}, qr/^200\b/, '200 response status';
+  is $response->{body}, $data, 'right response body';
+};
+
+subtest 'Filehandle response' => sub {
+  local @ENV{@env_keys} = ('')x@env_keys;
+  local $ENV{PATH_INFO} = '/';
+  local $ENV{REQUEST_METHOD} = 'GET';
+  local $ENV{SCRIPT_NAME} = '/';
+  local $ENV{SERVER_PROTOCOL} = 'HTTP/1.0';
+  open my $in_fh, '<', \(my $in_data = '') or die "failed to open handle for input: $!";
+  open my $out_fh, '>', \my $out_data or die "failed to open handle for output: $!";
+
+  my $data = "\x01\x02\x03\x04\r\n\xFF";
+  cgi {
+    $_->set_input_handle($in_fh);
+    $_->set_output_handle($out_fh);
+    open my $fh, '<', \$data or die "Failed to open scalar data handle: $!";
+    $_->render(handle => $fh);
   };
 
   ok length($out_data), 'response rendered';
@@ -544,7 +663,7 @@ subtest 'Query parameters' => sub {
   ok defined($response->{headers}{'content-type'}), 'Content-Type set';
   like $response->{status}, qr/^200\b/, '200 response status';
   is_deeply $params, \@query_pairs, 'right query pairs';
-  is_deeply [sort @$param_names], [sort 'c', 'b', '☃'], 'right query param names';
+  is_deeply $param_names, ['c', 'b', '☃'], 'right query param names';
   is $param_snowman, '%', 'right query param value';
   is_deeply $param_c_array, [42, 'foo'], 'right query param values array';
 };
@@ -578,7 +697,7 @@ subtest 'Body parameters' => sub {
   ok defined($response->{headers}{'content-type'}), 'Content-Type set';
   like $response->{status}, qr/^200\b/, '200 response status';
   is_deeply $params, \@body_pairs, 'right body pairs';
-  is_deeply [sort @$param_names], [sort 'c', 'b', '☃'], 'right body param names';
+  is_deeply $param_names, ['c', 'b', '☃'], 'right body param names';
   is $param_snowman, '%', 'right body param value';
   is_deeply $param_c_array, [42, 'foo'], 'right body param values array';
 };
@@ -603,9 +722,12 @@ Content-Type: text/plain;charset=UTF-16LE\r
 \r
 $utf16le_snowman\r
 --delimiter\r
-Content-Disposition: form-data; name="newline"\r
+Content-Disposition: form-data; name="newline\\\\\\""\r
 \r
 
+\r
+--delimiter\r
+Content-Disposition: form-data; name="empty"\r
 \r
 --delimiter\r
 Content-Disposition: form-data; name="empty"\r
@@ -623,7 +745,7 @@ Content-Type: application/json\r
 \r
 {"test":42}\r
 --delimiter\r
-Content-Disposition: form-data; name="snowman"; filename="snowman.txt"\r
+Content-Disposition: form-data; name="snowman"; filename="snowman\\\\\\".txt"\r
 Content-Type: text/plain;charset=UTF-16LE\r
 \r
 $utf16le_snowman\r
@@ -671,30 +793,32 @@ EOB
       name => 'snowman', filename => undef, size => length($utf8_snowman) + 1, content => "$utf8_snowman!"},
     {headers => {'content-disposition' => 'form-data; name=snowman', 'content-type' => 'text/plain;charset=UTF-16LE'},
       name => 'snowman', filename => undef, size => length($utf16le_snowman), content => $utf16le_snowman},
-    {headers => {'content-disposition' => 'form-data; name="newline"'},
-      name => 'newline', filename => undef, size => 1, content => "\n"},
+    {headers => {'content-disposition' => 'form-data; name="newline\\\\\\""'},
+      name => 'newline\"', filename => undef, size => 1, content => "\n"},
+    {headers => {'content-disposition' => 'form-data; name="empty"'},
+      name => 'empty', filename => undef, size => 0, content => ''},
     {headers => {'content-disposition' => 'form-data; name="empty"'},
       name => 'empty', filename => undef, size => 0, content => ''},
     {headers => {'content-disposition' => 'form-data; name="file"; filename="test.dat"', 'content-type' => 'application/octet-stream'},
       name => 'file', filename => 'test.dat', size => 18, file_contents => "00000000\n11111111\0"},
     {headers => {'content-disposition' => 'form-data; name="file"; filename="test2.dat"', 'content-type' => 'application/json'},
       name => 'file', filename => 'test2.dat', size => 11, file_contents => '{"test":42}'},
-    {headers => {'content-disposition' => 'form-data; name="snowman"; filename="snowman.txt"', 'content-type' => 'text/plain;charset=UTF-16LE'},
-      name => 'snowman', filename => 'snowman.txt', size => length($utf16le_snowman), file_contents => $utf16le_snowman},
+    {headers => {'content-disposition' => 'form-data; name="snowman"; filename="snowman\\\\\\".txt"', 'content-type' => 'text/plain;charset=UTF-16LE'},
+      name => 'snowman', filename => 'snowman\".txt', size => length($utf16le_snowman), file_contents => $utf16le_snowman},
   ], 'right multipart body parts';
 
-  is_deeply $params, [['snowman', '☃!'], ['snowman', "☃...\n"], ['newline', "\n"], ['empty', '']], 'right multipart body params';
-  is_deeply [sort @$param_names], [sort 'snowman', 'newline', 'empty'], 'right multipart body param names';
+  is_deeply $params, [['snowman', '☃!'], ['snowman', "☃...\n"], ['newline\"', "\n"], ['empty', ''], ['empty', '']], 'right multipart body params';
+  is_deeply $param_names, ['snowman', 'newline\"', 'empty'], 'right multipart body param names';
   is $param_snowman, "☃...\n", 'right multipart body param value';
   is_deeply $param_snowman_array, ['☃!', "☃...\n"], 'right multipart body param values';
   is $uploads->[-1][0], 'snowman', 'right upload name';
   my $upload_snowman = $uploads->[-1][1];
   ok defined $upload_snowman, 'last upload';
-  is $upload_snowman->{filename}, 'snowman.txt', 'right upload filename';
+  is $upload_snowman->{filename}, 'snowman\".txt', 'right upload filename';
   is $upload_snowman->{size}, length $utf16le_snowman, 'right upload size';
   is $upload_snowman->{content_type}, 'text/plain;charset=UTF-16LE', 'right upload Content-Type';
   is do { local $/; seek $upload_snowman->{file}, 0, 0; scalar readline $upload_snowman->{file} }, $utf16le_snowman, 'right upload contents';
-  is_deeply [sort @$upload_names], [sort 'file', 'snowman'], 'right upload names';
+  is_deeply $upload_names, ['file', 'snowman'], 'right upload names';
   is $upload_file->{filename}, 'test2.dat', 'right upload filename';
   is $upload_file->{content_type}, 'application/json', 'right upload Content-Type';
   is $upload_file_array->[0]{filename}, 'test.dat', 'right upload filename';
@@ -710,11 +834,11 @@ subtest 'Multipart body read into memory' => sub {
   my $utf8_snowman = encode 'UTF-8', '☃!';
   my $body_string = <<"EOB";
 --fffff\r
-Content-Disposition: form-data; name="snowman"\r
+Content-Disposition: form-data; name="snowman\\\\"\r
 \r
 $utf8_snowman\r
 --fffff\r
-Content-Disposition: form-data; name="file"; filename="test.txt"\r
+Content-Disposition: form-data; name="file"; filename="test.txt\\\\"\r
 Content-Type: text/plain;charset=UTF-8\r
 \r
 $utf8_snowman
@@ -734,7 +858,7 @@ EOB
     $parts = $_->body_parts;
     $params = $_->body_params;
     $param_names = $_->body_param_names;
-    $param_snowman = $_->body_param('snowman');
+    $param_snowman = $_->body_param('snowman\\');
     $uploads = $_->uploads;
     $upload_names = $_->upload_names;
     $upload_snowman = $_->upload('file');
@@ -755,19 +879,131 @@ EOB
     }
   }
   is_deeply $parts, [
-    {headers => {'content-disposition' => 'form-data; name="snowman"'},
-      name => 'snowman', filename => undef, size => length($utf8_snowman), content => $utf8_snowman},
-    {headers => {'content-disposition' => 'form-data; name="file"; filename="test.txt"', 'content-type' => 'text/plain;charset=UTF-8'},
-      name => 'file', filename => 'test.txt', size => length($utf8_snowman) + 1, file_contents => "$utf8_snowman\n"},
+    {headers => {'content-disposition' => 'form-data; name="snowman\\\\"'},
+      name => 'snowman\\', filename => undef, size => length($utf8_snowman), content => $utf8_snowman},
+    {headers => {'content-disposition' => 'form-data; name="file"; filename="test.txt\\\\"', 'content-type' => 'text/plain;charset=UTF-8'},
+      name => 'file', filename => 'test.txt\\', size => length($utf8_snowman) + 1, file_contents => "$utf8_snowman\n"},
   ], 'right multipart body parts';
 
-  is_deeply $params, [['snowman', '☃!']], 'right multipart body params';
-  is_deeply $param_names, ['snowman'], 'right multipart body param names';
+  is_deeply $params, [['snowman\\', '☃!']], 'right multipart body params';
+  is_deeply $param_names, ['snowman\\'], 'right multipart body param names';
   is $param_snowman, '☃!', 'right multipart body param value';
   is $uploads->[0][0], 'file', 'right upload name';
   is_deeply $upload_names, ['file'], 'right upload names';
-  is $upload_snowman->{filename}, 'test.txt', 'right upload filename';
+  is $upload_snowman->{filename}, 'test.txt\\', 'right upload filename';
   is $upload_snowman->{content_type}, 'text/plain;charset=UTF-8', 'right upload Content-Type';
+};
+
+subtest 'Empty multipart body' => sub {
+  local @ENV{@env_keys} = ('')x@env_keys;
+  local $ENV{PATH_INFO} = '/';
+  local $ENV{REQUEST_METHOD} = 'GET';
+  local $ENV{SCRIPT_NAME} = '/';
+  local $ENV{SERVER_PROTOCOL} = 'HTTP/1.0';
+  my $body_string = <<"EOB";
+preamble\r
+\r
+-------\r
+\r
+postamble\r
+-----\r
+Content-Disposition: should-be-ignored\r
+\r
+\r
+-------\r
+EOB
+  local $ENV{CONTENT_TYPE} = 'multipart/form-data; boundary="---"';
+  local $ENV{CONTENT_LENGTH} = length $body_string;
+  open my $in_fh, '<', \$body_string or die "failed to open handle for input: $!";
+  open my $out_fh, '>', \my $out_data or die "failed to open handle for output: $!";
+
+  my ($parts, $params, $param_names, $uploads, $upload_names);
+  cgi {
+    $_->set_input_handle($in_fh);
+    $_->set_output_handle($out_fh);
+    $parts = $_->body_parts;
+    $params = $_->body_params;
+    $param_names = $_->body_param_names;
+    $uploads = $_->uploads;
+    $upload_names = $_->upload_names;
+    $_->render;
+  };
+
+  ok length($out_data), 'response rendered';
+  my $response = _parse_response($out_data);
+  ok defined($response->{headers}{'content-type'}), 'Content-Type set';
+  like $response->{status}, qr/^200\b/, '200 response status';
+  is_deeply $parts, [], 'no multipart body parts';
+  is_deeply $params, [], 'no multipart body params';
+  is_deeply $param_names, [], 'no multipart body param names';
+  is_deeply $uploads, [], 'no uploads';
+  is_deeply $upload_names, [], 'no upload names';
+};
+
+subtest 'Malformed multipart body' => sub {
+  local @ENV{@env_keys} = ('')x@env_keys;
+  local $ENV{PATH_INFO} = '/';
+  local $ENV{REQUEST_METHOD} = 'GET';
+  local $ENV{SCRIPT_NAME} = '/';
+  local $ENV{SERVER_PROTOCOL} = 'HTTP/1.0';
+  my $body_string = <<"EOB";
+--fribble\r
+not a header\r
+\r
+--fribble--\r
+EOB
+  local $ENV{CONTENT_TYPE} = 'multipart/form-data; boundary="fribble"';
+  local $ENV{CONTENT_LENGTH} = length $body_string;
+  open my $in_fh, '<', \$body_string or die "failed to open handle for input: $!";
+  open my $out_fh, '>', \my $out_data or die "failed to open handle for output: $!";
+
+  my $error;
+  cgi {
+    $_->set_error_handler(sub { $error = $_[1] });
+    $_->set_input_handle($in_fh);
+    $_->set_output_handle($out_fh);
+    $_->body_parts;
+    $_->render;
+  };
+
+  ok defined($error), 'error logged';
+  ok length($out_data), 'response rendered';
+  my $response = _parse_response($out_data);
+  ok defined($response->{headers}{'content-type'}), 'Content-Type set';
+  like $response->{status}, qr/^400\b/, '400 response status';
+};
+
+subtest 'Unterminated multipart body' => sub {
+  local @ENV{@env_keys} = ('')x@env_keys;
+  local $ENV{PATH_INFO} = '/';
+  local $ENV{REQUEST_METHOD} = 'GET';
+  local $ENV{SCRIPT_NAME} = '/';
+  local $ENV{SERVER_PROTOCOL} = 'HTTP/1.0';
+  my $body_string = <<"EOB";
+--fribble\r
+\r
+\r
+--fribble\r
+EOB
+  local $ENV{CONTENT_TYPE} = 'multipart/form-data; boundary="fribble"';
+  local $ENV{CONTENT_LENGTH} = length $body_string;
+  open my $in_fh, '<', \$body_string or die "failed to open handle for input: $!";
+  open my $out_fh, '>', \my $out_data or die "failed to open handle for output: $!";
+
+  my $error;
+  cgi {
+    $_->set_error_handler(sub { $error = $_[1] });
+    $_->set_input_handle($in_fh);
+    $_->set_output_handle($out_fh);
+    $_->body_parts;
+    $_->render;
+  };
+
+  ok defined($error), 'error logged';
+  ok length($out_data), 'response rendered';
+  my $response = _parse_response($out_data);
+  ok defined($response->{headers}{'content-type'}), 'Content-Type set';
+  like $response->{status}, qr/^400\b/, '400 response status';
 };
 
 subtest 'Body JSON' => sub {
@@ -894,7 +1130,7 @@ subtest 'Cookies' => sub {
   ok defined($response->{headers}{'content-type'}), 'Content-Type set';
   like $response->{status}, qr/^200\b/, '200 response status';
   is_deeply $cookies, [['a', 'b'], ['c', 42], ['x', ''], ['a', 'c']], 'right cookies';
-  is_deeply [sort @$cookie_names], [sort 'a', 'c', 'x'], 'right cookie names';
+  is_deeply $cookie_names, ['a', 'c', 'x'], 'right cookie names';
   is $a_cookie, 'c', 'right cookie value';
   is_deeply $a_cookies, ['b', 'c'], 'right cookie values';
   ok !defined $b_cookie, 'no cookie value';

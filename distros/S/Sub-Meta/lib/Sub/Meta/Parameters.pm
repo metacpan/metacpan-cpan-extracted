@@ -3,7 +3,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = "0.11";
+our $VERSION = "0.12";
 
 use Carp ();
 use Scalar::Util ();
@@ -101,7 +101,7 @@ sub set_invocant {
 sub _normalize_args {
     my ($self, @args) = @_;
     my $args = $args[0];
-    _croak 'args must be a reference' unless @args == 1 && ref $args;
+    _croak 'args must be a single reference' unless @args == 1 && ref $args;
 
     my @normalized_args;
     if (ref $args eq 'ARRAY') {
@@ -185,6 +185,26 @@ sub is_same_interface {
     return !!1;
 }
 
+sub is_relaxed_same_interface {
+    my ($self, $other) = @_;
+
+    return unless Scalar::Util::blessed($other) && $other->isa('Sub::Meta::Parameters');
+
+    if ($self->has_slurpy) {
+        return unless $self->slurpy->is_same_interface($other->slurpy)
+    }
+
+    return unless $self->nshift == $other->nshift;
+
+    return unless @{$self->all_args} <= @{$other->all_args};
+
+    for (my $i = 0; $i < @{$self->all_args}; $i++) {
+        return unless $self->all_args->[$i]->is_relaxed_same_interface($other->all_args->[$i]);
+    }
+
+    return !!1;
+}
+
 sub is_same_interface_inlined {
     my ($self, $v) = @_;
 
@@ -206,7 +226,28 @@ sub is_same_interface_inlined {
     return join "\n && ", @src;
 }
 
-sub interface_error_message {
+sub is_relaxed_same_interface_inlined {
+    my ($self, $v) = @_;
+
+    my @src;
+
+    push @src => sprintf("Scalar::Util::blessed(%s) && %s->isa('Sub::Meta::Parameters')", $v, $v);
+
+    push @src => $self->slurpy->is_relaxed_same_interface_inlined(sprintf('%s->slurpy', $v)) if $self->has_slurpy; 
+
+    push @src => sprintf('%d == %s->nshift', $self->nshift, $v);
+
+    push @src => sprintf('%d <= @{%s->all_args}', scalar @{$self->all_args}, $v);
+
+    for (my $i = 0; $i < @{$self->all_args}; $i++) {
+        push @src => $self->all_args->[$i]->is_relaxed_same_interface_inlined(sprintf('%s->all_args->[%d]', $v, $i))
+    }
+
+    return join "\n && ", @src;
+}
+
+
+sub error_message {
     my ($self, $other) = @_;
 
     return sprintf('must be Sub::Meta::Parameters. got: %s', $other // '')
@@ -223,7 +264,7 @@ sub interface_error_message {
     return sprintf('nshift is not equal. got: %d, expected: %d', $other->nshift, $self->nshift)
         unless $self->nshift == $other->nshift;
 
-    return sprintf('args length is not equal. got: %d, expected: %d', scalar @{$other->all_args}, scalar @{$self->all_args})
+    return sprintf('invalid args length. got: %d, expected: %d', scalar @{$other->all_args}, scalar @{$self->all_args})
         unless @{$self->all_args} == @{$other->all_args};
 
     for (my $i = 0; $i < @{$self->all_args}; $i++) {
@@ -236,6 +277,32 @@ sub interface_error_message {
     return '';
 }
 
+sub relaxed_error_message {
+    my ($self, $other) = @_;
+
+    return sprintf('must be Sub::Meta::Parameters. got: %s', $other // '')
+        unless Scalar::Util::blessed($other) && $other->isa('Sub::Meta::Parameters');
+
+    if ($self->has_slurpy) {
+        return sprintf('invalid slurpy. got: %s, expected: %s', $other->has_slurpy ? $other->slurpy->display : '', $self->slurpy->display)
+            unless $self->slurpy->is_same_interface($other->slurpy)
+    }
+
+    return sprintf('nshift is not equal. got: %d, expected: %d', $other->nshift, $self->nshift)
+        unless $self->nshift == $other->nshift;
+
+    return sprintf('invalid args length. got: %d, expected: %d', scalar @{$other->all_args}, scalar @{$self->all_args})
+        unless @{$self->all_args} <= @{$other->all_args};
+
+    for (my $i = 0; $i < @{$self->all_args}; $i++) {
+        my $s = $self->all_args->[$i];
+        my $o = $other->all_args->[$i];
+        return sprintf('args[%d] is invalid. got: %s, expected: %s', $i, $o->display, $s->display)
+            unless $s->is_relaxed_same_interface($o);
+    }
+
+    return '';
+}
 sub display {
     my $self = shift;
 
@@ -488,17 +555,42 @@ This is computed as follows:
 A boolean value indicating whether C<Sub::Meta::Parameters> object is same or not.
 Specifically, check whether C<args>, C<nshift> and C<slurpy> are equal.
 
+=head3 is_relaxed_same_interface($other_meta)
+
+    method is_relaxed_same_interface(InstanceOf[Sub::Meta::Parameters] $other_meta) => Bool
+
+A boolean value indicating whether C<Sub::Meta::Parameters> object is same or not.
+Specifically, check whether C<args>, C<nshift> and C<slurpy> are satisfy
+the condition of C<$self> side:
+
+    my $meta = Sub::Meta::Parameters->new(args => []);
+    my $other = Sub::Meta::Parameters->new(args => ["Str"]);
+    $meta->is_same_interface($other); # NG
+    $meta->is_relaxed_same_interface($other); # OK. The reason is that $meta does not specify the elements of args.
+
 =head3 is_same_interface_inlined($other_meta_inlined)
 
     method is_same_interface_inlined(InstanceOf[Sub::Meta::Parameters] $other_meta) => Str
 
 Returns inlined C<is_same_interface> string.
 
-=head3 interface_error_message($other_meta)
+=head3 is_relaxed_same_interface_inlined($other_meta_inlined)
 
-    method interface_error_message(InstanceOf[Sub::Meta::Parameters] $other_meta) => Str
+    method is_relaxed_same_interface_inlined(InstanceOf[Sub::Meta::Parameters] $other_meta) => Str
 
-Return the error message when the interface does not match.
+Returns inlined C<is_relaxed_same_interface> string.
+
+=head3 error_message($other_meta)
+
+    method error_message(InstanceOf[Sub::Meta::Parameters] $other_meta) => Str
+
+Return the error message when the interface is not same. If same, then return empty string.
+
+=head3 relaxed_error_message($other_meta)
+
+    method relaxed_error_message(InstanceOf[Sub::Meta::Parameters] $other_meta) => Str
+
+Return the error message when the interface does not satisfy the C<$self> meta. If match, then return empty string.
 
 =head3 display
 

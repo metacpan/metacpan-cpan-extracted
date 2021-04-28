@@ -29,14 +29,14 @@ my $LU_elapsed = 0;
 
 foreach ( 1 .. 20 ) {
    $LK_elapsed += measure {
-      use List::Keywords 'any';
+      use List::Keywords 'first';
       my $ret;
-      ( $ret = any { $_ > 50 } @nums ) for 1 .. $COUNT;
+      ( $ret = first { $_ > 50 } @nums ) for 1 .. $COUNT;
    };
    $LU_elapsed += measure {
-      use List::Util 'any';
+      use List::Util 'first';
       my $ret;
-      ( $ret = any { $_ > 50 } @nums ) for 1 .. $COUNT;
+      ( $ret = first { $_ > 50 } @nums ) for 1 .. $COUNT;
    };
 }
 

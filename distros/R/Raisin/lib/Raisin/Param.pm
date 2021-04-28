@@ -6,7 +6,7 @@ use strict;
 use warnings;
 
 package Raisin::Param;
-$Raisin::Param::VERSION = '0.90';
+$Raisin::Param::VERSION = '0.91';
 use Carp;
 use Plack::Util::Accessor qw(
     named
@@ -175,7 +175,7 @@ Raisin::Param - Parameter class for Raisin
 
 =head1 VERSION
 
-version 0.90
+version 0.91
 
 =head1 DESCRIPTION
 
@@ -231,7 +231,7 @@ Process and validate parameter. Takes B<reference> as the input paramter.
 
 =head1 AUTHOR
 
-Artur Khabibullin <rtkh@cpan.org>
+Artur Khabibullin
 
 =head1 COPYRIGHT AND LICENSE
 

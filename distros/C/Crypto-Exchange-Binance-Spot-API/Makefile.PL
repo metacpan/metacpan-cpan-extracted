@@ -19,7 +19,7 @@ my %WriteMakefileArgs = (
     "Crypto::Exchange::API" => 0,
     "DateTime" => 0
   },
-  "VERSION" => "0.04",
+  "VERSION" => "0.05",
   "test" => {
     "TESTS" => "t/*.t"
   }

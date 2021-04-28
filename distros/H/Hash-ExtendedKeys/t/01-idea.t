@@ -1,6 +1,5 @@
 use Test::More;
 use Hash::ExtendedKeys;
-use feature 'declared_refs';
 
 my $ha = Hash::ExtendedKeys->new;
 
