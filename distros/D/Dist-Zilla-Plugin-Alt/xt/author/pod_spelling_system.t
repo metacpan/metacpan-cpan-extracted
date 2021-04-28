@@ -1,8 +1,8 @@
 use strict;
 use warnings;
 use Test::More;
-BEGIN { 
-  plan skip_all => 'test requires Test::Spelling' 
+BEGIN {
+  plan skip_all => 'test requires Test::Spelling'
     unless eval q{ use Test::Spelling; 1 };
   plan skip_all => 'test requires YAML'
     unless eval q{ use YAML; 1; };

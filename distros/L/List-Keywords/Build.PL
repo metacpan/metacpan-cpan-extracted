@@ -15,7 +15,7 @@ my $build = Module::Build->new(
       'XS::Parse::Keyword::Builder' => 0,
    },
    requires => {
-      'perl' => '5.022', # op_sibling_splice, etc...
+      'perl' => '5.016',
       'XS::Parse::Keyword' => 0,
    },
    license => 'perl',
@@ -26,6 +26,8 @@ my $build = Module::Build->new(
          x_IRC => "irc://irc.perl.org/#io-async",
       },
    },
+
+   extra_compiler_flags => [qw( -Ihax )],
 );
 
 XS::Parse::Keyword::Builder->extend_module_build( $build );

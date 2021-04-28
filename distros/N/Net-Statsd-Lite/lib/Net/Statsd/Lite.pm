@@ -22,7 +22,7 @@ use namespace::autoclean;
 # RECOMMEND PREREQ: Ref::Util::XS
 # RECOMMEND PREREQ: Type::Tiny::XS
 
-our $VERSION = 'v0.6.0';
+our $VERSION = 'v0.6.1';
 
 
 has host => (
@@ -91,7 +91,7 @@ BEGIN {
         set_add   => [ '|s',  SimpleStr, ],
         counter   => [ '|c',  Int, 1 ],
         gauge     => [ '|g',  StrMatch[ qr{\A[\-\+]?[0-9]+\z} ] ],
-        histogram => [ '|h',  PositiveOrZeroNum ],
+        histogram => [ '|h',  PositiveOrZeroNum, 1 ],
         meter     => [ '|m',  PositiveOrZeroNum ],
         timing    => [ '|ms', PositiveOrZeroNum, 1 ],
     );
@@ -104,8 +104,8 @@ BEGIN {
         my $code = q{ my ($self, $metric, $value, $opts) = @_; };
 
         if (defined $rate) {
-            $code .= q[ $opts = { rate => $opts // 1 } unless is_plain_hashref($opts); ] .
-                     q[ my $rate = $opts->{rate}; ]
+            $code .= q[ $opts = { rate => $opts } unless is_plain_hashref($opts); ] .
+                     q[ my $rate = $opts->{rate} // 1; ]
         }
         else {
             $code .= q[ $opts //= {}; ];
@@ -125,7 +125,7 @@ BEGIN {
 
         if ( defined $rate ) {
 
-            $code .= q/ if ((defined $rate) && ($rate<1)) {
+            $code .= q/ if ($rate<1) {
                      $self->record_metric( $tmpl . '|@' . $rate, $metric, $value, $opts )
                         if rand() <= $rate;
                    } else {
@@ -227,7 +227,7 @@ Net::Statsd::Lite - A lightweight StatsD client that supports multimetric packet
 
 =head1 VERSION
 
-version v0.6.0
+version v0.6.1
 
 =head1 SYNOPSIS
 
@@ -433,8 +433,9 @@ See L<Devel::StrictMode> for more information.
 =head1 TAGGING EXTENSIONS
 
 This class does not support tagging out-of-the box. But tagging can be
-added easily to a subclass, for example, L<DogStatsd|https://www.datadoghq.com/> tagging can be added
-using something like
+added easily to a subclass, for example, L<DogStatsd|https://www.datadoghq.com/> or
+L<CloudWatch|https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/CloudWatch-Agent-custom-metrics-statsd.html>
+tagging can be added using something like
 
   use Moo 1.000000;
   extends 'Net::Statsd::Lite';
@@ -452,6 +453,8 @@ using something like
 =head1 SEE ALSO
 
 This module was forked from L<Net::Statsd::Tiny>.
+
+L<https://github.com/statsd/statsd/blob/master/docs/metric_types.md>
 
 L<https://github.com/b/statsd_spec>
 

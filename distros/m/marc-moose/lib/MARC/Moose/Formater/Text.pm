@@ -1,6 +1,6 @@
 package MARC::Moose::Formater::Text;
 # ABSTRACT: Record formater into a text representation
-$MARC::Moose::Formater::Text::VERSION = '1.0.43';
+$MARC::Moose::Formater::Text::VERSION = '1.0.44';
 use Moose;
 
 extends 'MARC::Moose::Formater';
@@ -41,7 +41,7 @@ MARC::Moose::Formater::Text - Record formater into a text representation
 
 =head1 VERSION
 
-version 1.0.43
+version 1.0.44
 
 =head1 AUTHOR
 

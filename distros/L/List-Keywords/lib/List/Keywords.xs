@@ -11,6 +11,24 @@
 
 #include "XSParseKeyword.h"
 
+#include "perl-backcompat.c.inc"
+
+/* We can't newLOGOP because that will force scalar context */
+#define allocLOGOP_CUSTOM(func, flags, first, other)  MY_allocLOGOP_CUSTOM(aTHX_ func, flags, first, other)
+static LOGOP *MY_allocLOGOP_CUSTOM(pTHX_ OP *(*func)(pTHX), U32 flags, OP *first, OP *other)
+{
+  LOGOP *logop;
+  NewOp(1101, logop, 1, LOGOP);
+
+  logop->op_type = OP_CUSTOM;
+  logop->op_ppaddr = func;
+  logop->op_flags = OPf_KIDS | (U8)(flags);
+  logop->op_first = first;
+  logop->op_other = other;
+
+  return logop;
+}
+
 static XOP xop_anystart;
 static XOP xop_anywhile;
 
@@ -18,6 +36,13 @@ static OP *pp_anystart(pTHX)
 {
   /* Insired by perl core's pp_grepstart() */
   dSP;
+
+  if(PL_stack_base + TOPMARK == SP) {
+    U8 mode = PL_op->op_private;
+    (void)POPMARK;
+    XPUSHs(boolSV(mode));
+    RETURNOP(PL_op->op_next->op_next);
+  }
 
   PL_stack_sp = PL_stack_base + TOPMARK + 1;
   PUSHMARK(PL_stack_sp); /* current src item */
@@ -115,22 +140,14 @@ static int build_any(pTHX_ OP **out, XSParseKeywordPiece *args, size_t npieces, 
   anystart->op_type = OP_CUSTOM;
   anystart->op_ppaddr = &pp_anystart;
 
-  /* We can't newLOGOP because that will force anystart into scalar context */
-  LOGOP *anywhile;
-  NewOp(1101, anywhile, 1, LOGOP);
-  anywhile->op_type = OP_CUSTOM;
-  anywhile->op_ppaddr = &pp_anywhile;
-  anywhile->op_first = anystart;
-  anywhile->op_flags = OPf_KIDS;
-  anywhile->op_other = blockstart;
+  LOGOP *anywhile = allocLOGOP_CUSTOM(&pp_anywhile, 0, anystart, blockstart);
+  anywhile->op_private = anystart->op_private = SvIV((SV *)hookdata);
 
   OpLASTSIB_set(anystart, (OP *)anywhile);
 
   anywhile->op_next = LINKLIST(anystart);
   anystart->op_next = (OP *)anywhile;
   cUNOPx(block)->op_first->op_next = (OP *)anywhile;
-
-  anywhile->op_private = SvIV((SV *)hookdata);
 
   /* Since the body of the block is now hidden from the peephole optimizer
    * we'll have to run that manually now */

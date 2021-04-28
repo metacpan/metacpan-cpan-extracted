@@ -36,13 +36,13 @@ try_perlapi.pl
 ./perlsh.py
 ./pyperl.pm
 ./setup.py
-./Python-Object/Object.pm
 ./Python-Object/pyinc.py
 ./Python-Object/blib/lib/Python.pm
 ./Python-Object/blib/lib/Python/Err.pm
 ./Python-Object/blib/lib/Python/Object.pm
 ./Python-Object/lib/Python.pm
 ./Python-Object/lib/Python/Err.pm
+./Python-Object/lib/Python/Object.pm
 ./build/lib.linux-x86_64-3.9/dbi.py
 ./build/lib.linux-x86_64-3.9/dbi2.py
 ./build/lib.linux-x86_64-3.9/perlmod.py
@@ -80,13 +80,10 @@ Python-Object/Makefile.PL
 Python-Object/Object.bs
 Python-Object/Object.c
 Python-Object/Object.o
-Python-Object/Object.pm
 Python-Object/Object.xs
 Python-Object/PerlPyErr.h
-Python-Object/lang_map.o
 Python-Object/pm_to_blib
 Python-Object/pyinc.py
-Python-Object/pyo.o
 Python-Object/typemap
 Python-Object/blib/arch/.exists
 Python-Object/blib/arch/auto/Python/Object/.exists
@@ -105,6 +102,7 @@ Python-Object/blib/man3/Python::Object.3pm
 Python-Object/blib/script/.exists
 Python-Object/lib/Python.pm
 Python-Object/lib/Python/Err.pm
+Python-Object/lib/Python/Object.pm
 pyperl.egg-info/PKG-INFO
 pyperl.egg-info/SOURCES.txt
 pyperl.egg-info/dependency_links.txt

@@ -1,6 +1,6 @@
 package MARC::Moose::Reader::File::Marcxml;
 # ABSTRACT: File reader for MARCXML file
-$MARC::Moose::Reader::File::Marcxml::VERSION = '1.0.43';
+$MARC::Moose::Reader::File::Marcxml::VERSION = '1.0.44';
 use Moose;
 
 use Carp;
@@ -51,7 +51,7 @@ MARC::Moose::Reader::File::Marcxml - File reader for MARCXML file
 
 =head1 VERSION
 
-version 1.0.43
+version 1.0.44
 
 =head1 DESCRIPTION
 

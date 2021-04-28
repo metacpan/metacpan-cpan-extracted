@@ -27,4 +27,18 @@ use warnings;
         input       => [ [qw/ histogram size 12000 /, { tags => [qw/ env:test bo:baz /] } ] ],
         output      => "bar.size:12000|h|#env:test,bo:baz\n",
     },
+    {
+        description => "histogram with rate",
+        autoflush   => 1,
+        prefix      => 'foo.',
+        input       => [ [qw/ histogram load 123 0.5 /], ],
+        output      => "foo.load:123|h|\@0.5\n",
+    },
+    {
+        description => "histogram with rate",
+        autoflush   => 1,
+        prefix      => 'foo.',
+        input       => [ [qw/ histogram load 123 /, { rate => 0.7 } ], ],
+        output      => "foo.load:123|h|\@0.7\n",
+    },
 ];

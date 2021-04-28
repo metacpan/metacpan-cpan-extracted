@@ -1,5 +1,9 @@
 Revision history for Perl module MARC::Moose
 
+1.0.44
+
+  - Fix Unimarc to MARC21 601 conversion
+
 1.0.43
 
   - Fix unimarc to MARC21 conversion of 461 field

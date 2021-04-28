@@ -2,7 +2,7 @@ package App::Yath::Options::Finder;
 use strict;
 use warnings;
 
-our $VERSION = '1.000049';
+our $VERSION = '1.000050';
 
 use Test2::Harness::Util qw/mod2file/;
 
@@ -64,6 +64,13 @@ option_group {prefix => 'finder', category => "Finder Options", builds => 'Test2
         type => 's',
         description => "What plugin should be used to detect changed files.",
         long_examples => [' Git', ' +App::Yath::Plugin::Git'],
+        applicable => \&changes_applicable,
+    );
+
+    option coverage_manager => (
+        type => 's',
+        description => "Coverage 'from' manager to use when coverage data does not provide one",
+        long_examples => [ ' My::Coverage::Manager'],
         applicable => \&changes_applicable,
     );
 
@@ -289,6 +296,13 @@ What plugin should be used to detect changed files.
 =item --no-coverage-from
 
 Where to fetch coverage data. Can be a path to a .jsonl(.bz|.gz)? log file. Can be a path or url to a json file containing a hash where source files are key, and value is a list of tests to run.
+
+
+=item --coverage-manager My::Coverage::Manager
+
+=item --no-coverage-manager
+
+Coverage 'from' manager to use when coverage data does not provide one
 
 
 =item --default-at-search ARG

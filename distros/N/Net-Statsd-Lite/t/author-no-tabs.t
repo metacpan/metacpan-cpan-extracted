@@ -16,7 +16,6 @@ use Test::NoTabs;
 
 my @files = (
     'lib/Net/Statsd/Lite.pm',
-    'lib/Net/Statsd/Lite/Types.pm',
     't/00-report-prereqs.dd',
     't/00-report-prereqs.t',
     't/01-basic.t',

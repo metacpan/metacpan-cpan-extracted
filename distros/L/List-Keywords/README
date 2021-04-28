@@ -83,6 +83,18 @@ KEYWORDS
     to make the block yield a false value. If no such item exists, returns
     true.
 
+TODO
+
+    More functions from List::Util:
+
+       reduce
+       reductions
+       none notall
+       first
+       pairfirst pairgrep pairmap
+
+    Maybe also consider some from List::UtilsBy.
+
 ACKNOWLEDGEMENTS
 
     With thanks to Matthew Horsfall (alh) for much assistance with

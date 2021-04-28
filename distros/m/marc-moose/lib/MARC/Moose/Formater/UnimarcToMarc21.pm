@@ -1,5 +1,5 @@
 package MARC::Moose::Formater::UnimarcToMarc21;
-$MARC::Moose::Formater::UnimarcToMarc21::VERSION = '1.0.43';
+$MARC::Moose::Formater::UnimarcToMarc21::VERSION = '1.0.44';
 # ABSTRACT: Convert biblio record from UNIMARC to MARC21
 use Moose;
 
@@ -1045,7 +1045,7 @@ override 'format' => sub {
     # On conserve à leur place les lettres a x j (subdivision de forme)
     # On inverse y et z. et déplacée en v.
     # On suppr les $3
-    for my $fromto ( ( [604, 600], [605, 630], [606, 650], [607, 651], [608, 650] ) ) {
+    for my $fromto ( ( [601, 650], [604, 600], [605, 630], [606, 650], [607, 651], [608, 650] ) ) {
         my ($from, $to) = @$fromto;
         for my $field ( $unimarc->field($from) ) {
             my @sf;
@@ -1272,7 +1272,7 @@ MARC::Moose::Formater::UnimarcToMarc21 - Convert biblio record from UNIMARC to M
 
 =head1 VERSION
 
-version 1.0.43
+version 1.0.44
 
 =head1 SYNOPSYS
 

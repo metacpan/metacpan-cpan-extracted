@@ -5,12 +5,12 @@ author:
 build_requires:
   Test2::V0: '0.000060'
   Test::DZil: '0'
-  perl: '5.014'
+  perl: '5.020'
 configure_requires:
   ExtUtils::MakeMaker: '0'
-  perl: '5.014'
+  perl: '5.020'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.017, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -23,12 +23,14 @@ requires:
   Dist::Zilla: '6.00'
   File::chdir: '0'
   Moose: '0'
-  perl: '5.014'
+  experimental: '0'
+  perl: '5.020'
 resources:
-  bugtracker: https://github.com/plicease/Dist-Zilla-Plugin-Alt/issues
+  bugtracker: https://github.com/uperl/Dist-Zilla-Plugin-Alt/issues
   homepage: https://metacpan.org/pod/Dist::Zilla::Plugin::Alt
-  repository: git://github.com/plicease/Dist-Zilla-Plugin-Alt.git
-version: '0.07'
-x_generated_by_perl: v5.26.2
+  repository: git://github.com/uperl/Dist-Zilla-Plugin-Alt.git
+version: '0.08'
+x_generated_by_perl: v5.33.8
 x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'
 x_use_unsafe_inc: 0

@@ -53,12 +53,9 @@ use Scalar::Util qw(blessed);
 use Devel::NYTProf::Core;
 use Devel::NYTProf::FileInfo;
 use Devel::NYTProf::SubInfo;
-use Devel::NYTProf::Util qw(
-    make_path_strip_editor strip_prefix_from_paths get_abs_paths_alternation_regex
-    trace_level
-);
+use Devel::NYTProf::Util qw( trace_level _dumper );
 
-our $VERSION = '6.07';
+our $VERSION = '6.08';
 
 
 =head2 new
@@ -81,6 +78,8 @@ sub new {
     my $args = shift || { };
 
     my $file = $args->{filename} ||= 'nytprof.out';
+    croak "Devel::NYTProf::new() could not locate file for processing"
+        unless -f $file;
 
     print "Reading $file\n" unless $args->{quiet};
 
@@ -100,7 +99,7 @@ sub new {
 
     # add profile ref so fidinfo & subinfo objects
     # XXX circular ref, add weaken
-    $_ and $_->[7] = $profile for @$fid_fileinfo;
+    for (@$fid_fileinfo) { $_ and $_->[7] = $profile; }
     $_->[7] = $profile for values %$sub_subinfo;
 
     # bless sub_subinfo data
@@ -134,6 +133,10 @@ sub new {
     $profile->_clear_caches;
 
     # a hack for testing/debugging
+    # $ENV{NYTPROF_ONLOAD} must be a colon-delimited string of
+    # equal-sign-delimited substrings, e.g.,
+    # 'alpha=beta:gamma=delta:dump=1:exit=1';
+
     if (my $env = $ENV{NYTPROF_ONLOAD}) {
         my %onload = map { split /=/, $_, 2 } split /:/, $env, -1;
         warn _dumper($profile) if $onload{dump};
@@ -173,20 +176,20 @@ sub collapse_evals_in {
             my @subs  = map { $_->subs_defined } @$siblings;
             my @evals = map { $_->has_evals(0) } @$siblings;
             warn sprintf "%d:%d: has %d sibling evals (subs %d, evals %d, keys %d) in %s; fids: %s\n",
-                    $parent_fid, $line, scalar @$siblings, scalar @subs, scalar @evals,
-                    scalar keys %src_keyed,
-                    $parent_fi->filename,
-                    join(" ", map { $_->fid } @$siblings);
-            if (trace_level() >= 2) {
-                for my $si (@subs) {
-                    warn sprintf "%d:%d evals: define sub %s in fid %s\n",
-                            $parent_fid, $line, $si->subname, $si->fid;
-                }
-                for my $fi (@evals) {
-                    warn sprintf "%d:%d evals: execute eval %s\n",
-                            $parent_fid, $line, $fi->filename;
-                }
+                $parent_fid, $line, scalar @$siblings, scalar @subs, scalar @evals,
+                scalar keys %src_keyed,
+                $parent_fi->filename,
+                join(" ", map { $_->fid } @$siblings);
+
+            for my $si (@subs) {
+                warn sprintf "%d:%d evals: define sub %s in fid %s\n",
+                        $parent_fid, $line, $si->subname, $si->fid;
             }
+            for my $fi (@evals) {
+                warn sprintf "%d:%d evals: execute eval %s\n",
+                        $parent_fid, $line, $fi->filename;
+            }
+
         }
 
         # if 'too many' distinct eval source keys then simply collapse all
@@ -212,6 +215,7 @@ sub collapse_evals_in {
             }
         }
     }
+    return 1;
 }
 
 sub _caches       { return shift->{caches} ||= {} }
@@ -261,6 +265,9 @@ sub package_subinfo_map {
         if ($nested_pkgs) {
             my @parts = split /::/, $name;
             my $node = $pkg{ shift @parts } ||= {};
+            # TODO: Need to figure out how to provide a multi-part name, e.g., 'alpha::beta'
+            # Otherwise @parts is now empty and so next line is not exercised
+            # during testing.
             $node = $node->{ shift @parts } ||= {} while @parts;
             $subinfos = $node->{''} ||= [];
         }
@@ -280,54 +287,6 @@ sub package_subinfo_map {
     }
 
     return \%pkg;
-}
-
-# [
-#   undef,  # depth 0
-#   {       # depth 1
-#       "main::" => [ [ subinfo1, subinfo2 ] ],    # 2 subs in 1 pkg
-#       "Foo::"  => [ [ subinfo3 ], [ subinfo4 ] ] # 2 subs in 2 pkg
-#   }
-#   {       # depth 2
-#       "Foo::Bar::" => [ [ subinfo3 ] ]           # 1 sub in 1 pkg
-#       "Foo::Baz::" => [ [ subinfo4 ] ]           # 1 sub in 1 pkg
-#   }
-# ]
-sub packages_at_depth_subinfo {
-    my $self = shift;
-    my ($opts) = @_;
-
-    my $merged = $opts->{merge_subinfos};
-    my $all_pkgs = $self->package_subinfo_map($merged) || {};
-
-    my @packages_at_depth = ({});
-    while ( my ($fullpkgname, $subinfos) = each %$all_pkgs ) {
-
-        $subinfos = [ grep { $_->calls } @$subinfos ]
-            if not $opts->{include_unused_subs};
-
-        next unless @$subinfos;
-
-        my @parts = split /::/, $fullpkgname; # drops empty trailing part
-
-        # accumulate @$subinfos for the full package name
-        # and also for each successive truncation of the package name
-        for (my $depth; $depth = @parts; pop @parts) {
-            my $pkgname = join('::', @parts, '');
-
-            my $store = ($merged) ? $subinfos->[0] : $subinfos;
-
-            # { "Foo::" => [ [sub1,sub2], [sub3,sub4] ] } # subs from 2 packages
-            my $pkgdepthinfo = $packages_at_depth[$depth] ||= {};
-            push @{ $pkgdepthinfo->{$pkgname} }, $store;
-
-            last if not $opts->{rollup_packages};
-        }
-    }
-    # fill in any undef holes at depths with no subs
-    $_ ||= {} for @packages_at_depth;
-
-    return \@packages_at_depth;
 }
 
 sub all_fileinfos {
@@ -418,7 +377,7 @@ This format is especially useful for grep'ing and diff'ing.
 
 sub dump_profile_data {
     my $self       = shift;
-    my $args       = shift;
+    my $args       = shift || {};
     my $separator  = $args->{separator} || '';
     my $filehandle = $args->{filehandle} || \*STDOUT;
 
@@ -535,7 +494,9 @@ sub _dump_elements {
             }
         }
     }
+    no warnings 'numeric'; # @$path can be non-positive
     printf $fh "%s$end\n", ($pad x (@$path - 1)) if $end;
+    return 1;
 }
 
 
@@ -635,7 +596,7 @@ sub normalize_variables {
 
     $_->normalize_for_test for $self->all_fileinfos;
 
-    return;
+    return 1;
 }
 
 
@@ -652,7 +613,6 @@ sub _zero_array_elem {
         }
     }
 }
-
 
 sub _filename_to_fid {
     my $self = shift;
@@ -743,7 +703,7 @@ sub file_line_range_of_sub {
     my ($self, $sub) = @_;
 
     my $sub_subinfo = $self->subinfo_of($sub)
-        or return;    # no such sub
+        or return;    # no such sub; warning supplied by subinfo_of()
     my ($fid, $first, $last) = @$sub_subinfo;
 
     return if not $fid; # sub has no known file
@@ -795,31 +755,13 @@ sub resolve_fid {
     # prepend '/' and grep for trailing matches - if just one then use that
     my $match = qr{/\Q$file\E$};
     my @matches = grep {m/$match/} keys %$resolve_fid_cache;
+    # XXX: Not clear how to exercise either of the following conditions
     return $self->resolve_fid($matches[0])
         if @matches == 1;
     carp "Can't resolve '$file' to a unique file id (matches @matches)"
         if @matches >= 2;
 
     return undef;
-}
-
-
-sub package_fids {
-    my ($self, $package) = @_;
-    my @fids;
-    #warn "package_fids '$package'";
-    return @fids if wantarray;
-    warn "Package 'package' has items defined in multiple fids: @fids\n"
-        if @fids > 1;
-    return $fids[0];
-}
-
-
-sub _dumper {
-    require Data::Dumper;
-    local $Data::Dumper::Sortkeys = 1;
-    local $Data::Dumper::Indent = 1;
-    return Data::Dumper::Dumper(@_);
 }
 
 1;

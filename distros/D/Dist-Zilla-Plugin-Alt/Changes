@@ -1,5 +1,10 @@
 Revision history for Dist-Zilla-Plugin-Alt
 
+0.08      2021-04-27 09:36:53 -0600
+  - moved to New GitHub org
+  - Require Perl 5.20 (gh#4)
+  - Add diagnostic to help avoid confusion (gh#3, gh#5)
+
 0.07      2019-02-03 20:29:57 -0500
   - Additional workaround for MSWin32
 

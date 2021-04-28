@@ -62,8 +62,7 @@
             "Types::Standard" : "0",
             "namespace::autoclean" : "0",
             "perl" : "v5.10.0",
-            "strict" : "0",
-            "warnings" : "0"
+            "strict" : "0"
          }
       },
       "test" : {
@@ -78,6 +77,7 @@
             "Module::Metadata" : "0",
             "Net::EmptyPort" : "0",
             "Socket" : "0",
+            "Test::Deep" : "0",
             "Test::More" : "0",
             "Test::Roo" : "0",
             "Test::Roo::DataDriven" : "0",
@@ -86,18 +86,15 @@
             "curry" : "0",
             "if" : "0",
             "lib" : "0",
-            "utf8" : "0"
+            "utf8" : "0",
+            "warnings" : "0"
          }
       }
    },
    "provides" : {
       "Net::Statsd::Lite" : {
          "file" : "lib/Net/Statsd/Lite.pm",
-         "version" : "v0.6.0"
-      },
-      "Net::Statsd::Lite::Types" : {
-         "file" : "lib/Net/Statsd/Lite/Types.pm",
-         "version" : "v0.6.0"
+         "version" : "v0.6.1"
       }
    },
    "release_status" : "stable",
@@ -112,7 +109,7 @@
          "web" : "https://github.com/robrwo/Net-Statsd-Lite"
       }
    },
-   "version" : "v0.6.0",
+   "version" : "v0.6.1",
    "x_authority" : "cpan:RRWO",
    "x_contributors" : [
       "Michael R. Davis <mrdvt@cpan.org>",

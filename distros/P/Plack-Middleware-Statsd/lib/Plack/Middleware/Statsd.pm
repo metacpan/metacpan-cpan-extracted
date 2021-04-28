@@ -22,7 +22,7 @@ use Ref::Util qw/ is_coderef /;
 use Time::HiRes;
 use Try::Tiny;
 
-our $VERSION = 'v0.4.6';
+our $VERSION = 'v0.4.7';
 
 # Note: You may be able to omit the client if there is a client
 # defined in the environment hash at C<psgix.monitor.statsd>, and the
@@ -134,7 +134,7 @@ sub call {
 
             if ( $h->exists('Content-Length') ) {
                 my $length = $h->get('Content-Length') || 0;
-                $histogram->( $env, 'psgi.response.content-length', $length );
+                $histogram->( $env, 'psgi.response.content-length', $length, $rate );
             }
 
             if ( my $type = $h->get('Content-Type') ) {
@@ -178,7 +178,7 @@ Plack::Middleware::Statsd - send statistics to statsd
 
 =head1 VERSION
 
-version v0.4.6
+version v0.4.7
 
 =head1 SYNOPSIS
 

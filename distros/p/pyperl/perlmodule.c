@@ -561,6 +561,15 @@ defined(self, args)
     return Py_BuildValue("i", (sv != 0));
 }
 
+#define out_fh stdout
+#ifdef MYDEBUG
+#define TRACE(my_format, ...)                                                  \
+    fprintf(out_fh, my_format, __VA_ARGS__);                                   \
+    fflush(out_fh)
+#else
+#define TRACE(my_format, ...) {}
+#endif
+
 
 static PyObject *
 get_ref(self, args, keywds)
@@ -568,6 +577,7 @@ get_ref(self, args, keywds)
      PyObject *args;
      PyObject *keywds;
 {
+                  TRACE("sv[zooooooooopre]=%p\n", NULL);
     char *name;
     int create = 0;
     char type;
@@ -583,12 +593,14 @@ get_ref(self, args, keywds)
                      &name, &create))
     return NULL;
 
+                  TRACE("sv[after PyArg_ParseTupleAndKeywords]=%p\n", NULL);
     PERL_LOCK;
     SET_CUR_PERL;
 
     ENTER;
     RESTORE_UNSAFE_ENV;
 
+                  TRACE("sv[after RESTORE_UNSAFE_ENV]=%p\n", NULL);
     /* We assume that none of the stuff below can trigger perl code to
      * start running, so it is safe to hold both locks while doing this work.
      */
@@ -601,11 +613,17 @@ get_ref(self, args, keywds)
     name++;
     }
 
+                  TRACE("sv[after isIDFIRST]= name=%s type=%c\n", name, type);
     if (*name) {
     switch (type) {
     case '$': sv =      get_sv(name, create); break;
     case '@': sv = (SV*)get_av(name, create); break;
-    case '%': sv = (SV*)get_hv(name, create); break;
+    case '%': {
+                  TRACE("sv[pre]=%p\n", sv);
+                  sv = (SV*)get_hv(name, create);
+                  TRACE("sv=%p\n", sv);
+              }
+                  break;
     case '&': sv = (SV*)get_cv(name, create); break;
     default:
         LEAVE;
@@ -625,7 +643,12 @@ get_ref(self, args, keywds)
     switch (type) {
     case '$': sv =      newSV(0); break;
     case '@': sv = (SV*)newAV();  break;
-    case '%': sv = (SV*)newHV();  break;
+    case '%':{
+                  TRACE("sv[pre newHV]=%p\n", sv);
+                 sv = (SV*)newHV();
+                  TRACE("sv newHV=%p\n", sv);
+             }
+    break;
     default:
         LEAVE;
         PERL_UNLOCK;
@@ -635,13 +658,18 @@ get_ref(self, args, keywds)
     }
 
     sv = newRV_noinc(sv);
+                  TRACE("sv aftre newRV_noinc=%p\n", sv);
     pyo = PySVRV_New(sv);
+                  TRACE("sv aftre PySVRV_New=%p\n", sv);
     SvREFCNT_dec(sv);  /* since PySVRV_New incremented it */
+                  TRACE("sv aftre SvREFCNT_dec=%p\n", sv);
     LEAVE;
 
     PERL_UNLOCK;
     ASSERT_LOCK_PYTHON;
 
+                  TRACE("sv aftre ASSERT_LOCK_PYTHON=%p ; pyo=%p\n", sv, pyo);
+    TRACE("get_ref[%s] self=%p\n", "TRACE end", self);
     return pyo;
 }
 
@@ -652,12 +680,15 @@ array(self, args, keywds)
      PyObject *args;
      PyObject *keywds;
 {
+    TRACE("array[%s] self=%p\n", "rightstart", self);
     PyObject *o;
     int n, i;
     AV* av;
     SV* sv;
     PyObject *pyo;  /* return value */
     dCTXP;
+
+    TRACE("array[%s] self=%p\n", "start", self);
 
     ASSERT_LOCK_PYTHON;
 
@@ -736,7 +767,12 @@ static PyMethodDef PerlMethods[] = {
     { "require",     require,     METH_VARARGS},
     { "defined",     defined,     METH_VARARGS},
     { "get_ref",     get_ref,     METH_VARARGS|METH_KEYWORDS},
+#if PY_MAJOR_VERSION >= 3
+    { "__getitem__",       array,       METH_VARARGS},
+#else
     { "array",       array,       METH_VARARGS},
+#endif
+
     { NULL, NULL } /* Sentinel */
 };
 

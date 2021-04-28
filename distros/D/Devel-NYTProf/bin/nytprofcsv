@@ -16,7 +16,7 @@ use Getopt::Long;
 
 use Devel::NYTProf::Reader;
 
-our $VERSION = '6.07';
+our $VERSION = '6.08';
 
 use constant NUMERIC_PRECISION => 5;
 
@@ -145,7 +145,7 @@ B<nytprofcsv is deprecated and will be removed in a future release.>
 =head1 DESCRIPTION
 
 C<nytprofcsv> is a script that implements L<Devel::NYTProf::Reader> to
-create comma-seperated value formatted reports from L<Devel::NYTProf>
+create comma-separated value formatted reports from L<Devel::NYTProf>
 databases.
 
 See the L<Devel::NYTProf> Perl code profiler for more information.

@@ -44,6 +44,7 @@
       },
       "test" : {
          "requires" : {
+            "Capture::Tiny" : "0",
             "Test::Differences" : "0.60",
             "Test::More" : "0.84"
          }
@@ -52,7 +53,6 @@
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "mailto" : "bug-devel-nytprof@rt.cpan.org",
          "web" : "https://github.com/timbunce/devel-nytprof/issues"
       },
       "homepage" : "https://code.google.com/p/perl-devel-nytprof/",
@@ -66,6 +66,6 @@
       },
       "x_MailingList" : "http://groups.google.com/group/develnytprof-dev"
    },
-   "version" : "6.07",
+   "version" : "6.08",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

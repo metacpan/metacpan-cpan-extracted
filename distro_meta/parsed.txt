@@ -72244,3 +72244,14 @@ P/PE/PERLANCAR/Pod-Weaver-Plugin-Acme-CPANModules-0.008.tar.gz
 K/KI/KIMOTO/SPVM-0.0947.tar.gz
 S/SD/SDT/Template-Plugin-DataPrinter-0.014.tar.gz
 P/PE/PEVANS/XS-Parse-Keyword-0.03.tar.gz
+E/EX/EXODIST/Test2-Harness-1.000050.tar.gz
+R/RE/REEDFISH/Net-FullAuto-1.0000579.tar.gz
+R/RR/RRWO/Catalyst-Plugin-DetachIfNotModified-v0.2.1.tar.gz
+D/DC/DCANTRELL/Devel-Hide-0.0014.tar.gz
+J/JK/JKEENAN/Devel-NYTProf-6.08.tar.gz
+P/PL/PLICEASE/Dist-Zilla-Plugin-Alt-0.08.tar.gz
+P/PE/PEVANS/List-Keywords-0.02.tar.gz
+F/FR/FREDERICD/marc-moose-1.0.44.tar.gz
+R/RR/RRWO/Net-Statsd-Lite-v0.6.1.tar.gz
+R/RR/RRWO/Plack-Middleware-Statsd-v0.4.7.tar.gz
+S/SH/SHLOMIF/pyperl-1.0.2.tar.gz

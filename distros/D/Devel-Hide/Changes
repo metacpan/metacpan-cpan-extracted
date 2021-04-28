@@ -1,10 +1,14 @@
 Revision history for Perl extension Devel::Hide.
 
-0.0013      2020-01-16
+0.0014      2021-04-27
+
+   - Bump version requirement of Test::More to one that supports note()
+
+0.0013      2020-02-16
 
    - Cope with changes to how the hints hash works in perl 5.31.7
 
-0.0012      2020-01-15
+0.0012      2020-02-15
 
    - Add -lexically argument to import() to support hiding modules
      just during the current scope

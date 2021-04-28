@@ -2,7 +2,7 @@ package App::Yath::Command::run;
 use strict;
 use warnings;
 
-our $VERSION = '1.000049';
+our $VERSION = '1.000050';
 
 use App::Yath::Options;
 
@@ -369,6 +369,13 @@ What plugin should be used to detect changed files.
 =item --no-coverage-from
 
 Where to fetch coverage data. Can be a path to a .jsonl(.bz|.gz)? log file. Can be a path or url to a json file containing a hash where source files are key, and value is a list of tests to run.
+
+
+=item --coverage-manager My::Coverage::Manager
+
+=item --no-coverage-manager
+
+Coverage 'from' manager to use when coverage data does not provide one
 
 
 =item --default-at-search ARG

@@ -1,3 +1,11 @@
+2021-04-27   Shlomi Fish <shlomif@cpan.org>
+
+   Release 1.0.2
+
+   Apply patches from GitHub forks and the Mageia Linux package.
+
+   Fixes for newer perls.
+
 2001-03-06   Gisle Aas <gisle@ActiveState.com>
 
    Release 1.0.1

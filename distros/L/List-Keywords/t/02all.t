@@ -11,6 +11,13 @@ use List::Keywords 'all';
 ok( !(all { $_ < 10 } 1 .. 20), 'not all list values below ten' );
 ok(  (all { $_ < 10 } 1 .. 9), 'all list values below ten' );
 
+# any empty list is true
+{
+   my $invoked;
+   ok( (all { $invoked } ()), 'all on empty list is true' );
+   ok( !$invoked, 'all on empty list did not invoke block' );
+}
+
 # short-circuiting
 {
    my @seen;

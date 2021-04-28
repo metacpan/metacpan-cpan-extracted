@@ -10,6 +10,7 @@ build_requires:
   Module::Metadata: '0'
   Net::EmptyPort: '0'
   Socket: '0'
+  Test::Deep: '0'
   Test::More: '0'
   Test::Roo: '0'
   Test::Roo::DataDriven: '0'
@@ -19,6 +20,7 @@ build_requires:
   if: '0'
   lib: '0'
   utf8: '0'
+  warnings: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
@@ -36,10 +38,7 @@ name: Net-Statsd-Lite
 provides:
   Net::Statsd::Lite:
     file: lib/Net/Statsd/Lite.pm
-    version: v0.6.0
-  Net::Statsd::Lite::Types:
-    file: lib/Net/Statsd/Lite/Types.pm
-    version: v0.6.0
+    version: v0.6.1
 recommends:
   Ref::Util::XS: '0'
   Type::Tiny::XS: '0'
@@ -58,12 +57,11 @@ requires:
   namespace::autoclean: '0'
   perl: v5.10.0
   strict: '0'
-  warnings: '0'
 resources:
   bugtracker: https://github.com/robrwo/Net-Statsd-Lite/issues
   homepage: https://metacpan.org/release/Net-Statsd-Lite
   repository: git://github.com/robrwo/Net-Statsd-Lite.git
-version: v0.6.0
+version: v0.6.1
 x_authority: cpan:RRWO
 x_contributors:
   - 'Michael R. Davis <mrdvt@cpan.org>'

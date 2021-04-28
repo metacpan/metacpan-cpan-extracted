@@ -9,7 +9,7 @@
 ###########################################################
 package Devel::NYTProf::Reader;
 
-our $VERSION = '6.07';
+our $VERSION = '6.08';
 
 use warnings;
 use strict;
@@ -21,8 +21,6 @@ use Data::Dumper;
 
 use Devel::NYTProf::Data;
 use Devel::NYTProf::Util qw(
-    fmt_float
-    fmt_time
     html_safe_filename
     calculate_median_absolute_deviation
     trace_level
@@ -75,6 +73,7 @@ sub new {
             . "# This file uses special regexp match variables that impact the performance\n"
             . "# of all regular expression in the program!\n"
             . "# See WARNING in http://perldoc.perl.org/perlre.html#Capture-buffers\n",
+        current_level => '',
     };
 
     bless($self, $class);
@@ -201,8 +200,6 @@ sub _generate_report {
 
     my @all_fileinfos = $profile->all_fileinfos
         or carp "Profile report data contains no files";
-
-    #$profile->dump_profile_data({ filehandle => \*STDERR, separator=>"\t", });
 
     my @fis = @all_fileinfos;
     if ($LEVEL ne 'line') {

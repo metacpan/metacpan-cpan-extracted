@@ -1,5 +1,7 @@
 package Catalyst::Plugin::DetachIfNotModified;
 
+use v5.8;
+
 # ABSTRACT: Short-circuit requests with If-Modified-Since headers
 
 use Moose::Role;
@@ -14,7 +16,7 @@ use Ref::Util qw/ is_blessed_ref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v0.2.0';
+our $VERSION = 'v0.2.1';
 
 
 sub detach_if_not_modified_since {
@@ -49,7 +51,7 @@ Catalyst::Plugin::DetachIfNotModified - Short-circuit requests with If-Modified-
 
 =head1 VERSION
 
-version v0.2.0
+version v0.2.1
 
 =head1 SYNOPSIS
 

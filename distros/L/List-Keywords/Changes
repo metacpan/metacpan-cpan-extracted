@@ -1,4 +1,12 @@
 Revision history for List-Keywords
 
+0.02    2021-04-27
+        [CHANGES]
+         * Added a benchmarking test to print comparisons with List::Util
+
+        [BUGFIXES]
+         * Back-compat to perl 5.16
+         * Yield correct result when any/all are given an empty list of items
+
 0.01    2021-04-27
         First version, released on an unsuspecting world.

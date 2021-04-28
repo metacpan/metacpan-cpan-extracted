@@ -21,6 +21,7 @@
       },
       "develop" : {
          "requires" : {
+            "Test2::Require::Module" : "0.000127",
             "Test::Pod" : "1.41",
             "Test::Spelling" : "0.12"
          }
@@ -64,7 +65,6 @@
             "Test2::Plugin::Cover" : "0.000022",
             "Test2::Plugin::MemUsage" : "0.002003",
             "Test2::Plugin::UUID" : "0.002001",
-            "Test2::Require::Module" : "0.000127",
             "Test2::Tools::AsyncSubtest" : "0.000127",
             "Test2::Tools::Subtest" : "0.000127",
             "Test2::Util" : "1.302170",
@@ -108,7 +108,7 @@
          "url" : "https://github.com/Test-More/Test2-Harness/"
       }
    },
-   "version" : "1.000049",
+   "version" : "1.000050",
    "x_generated_by_perl" : "v5.32.0",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.25",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"

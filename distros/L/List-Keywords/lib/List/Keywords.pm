@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2021 -- leonerd@leonerd.org.uk
 
-package List::Keywords 0.01;
+package List::Keywords 0.02;
 
 use v5.14;
 use warnings;
@@ -117,6 +117,18 @@ values from the given list. Returns false and stops at the first item to make
 the block yield a false value. If no such item exists, returns true.
 
 =cut
+
+=head1 TODO
+
+More functions from C<List::Util>:
+
+   reduce
+   reductions
+   none notall
+   first
+   pairfirst pairgrep pairmap
+
+Maybe also consider some from L<List::UtilsBy>.
 
 =head1 ACKNOWLEDGEMENTS
 

@@ -1,6 +1,6 @@
 package MARC::Moose::Lint::Checker;
 # ABSTRACT: A Moose::Role to 'lint' biblio record
-$MARC::Moose::Lint::Checker::VERSION = '1.0.43';
+$MARC::Moose::Lint::Checker::VERSION = '1.0.44';
 use Moose::Role;
 
 
@@ -24,7 +24,7 @@ MARC::Moose::Lint::Checker - A Moose::Role to 'lint' biblio record
 
 =head1 VERSION
 
-version 1.0.43
+version 1.0.44
 
 =head1 DESCRIPTION
 

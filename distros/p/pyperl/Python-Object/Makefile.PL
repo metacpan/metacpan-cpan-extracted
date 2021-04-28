@@ -40,7 +40,7 @@ if (@libs) {
 
 WriteMakefile(
     NAME	 => 'Python::Object',
-    VERSION_FROM => 'Object.pm',
+    VERSION_FROM => 'lib/Python/Object.pm',
     INC          => $pyinc,
     @extra,
     dist         => { COMPRESS => 'xz -9f', SUFFIX => 'xz', },

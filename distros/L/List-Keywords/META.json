@@ -28,7 +28,7 @@
       "runtime" : {
          "requires" : {
             "XS::Parse::Keyword" : "0",
-            "perl" : "5.022"
+            "perl" : "5.016"
          }
       },
       "test" : {
@@ -40,7 +40,7 @@
    "provides" : {
       "List::Keywords" : {
          "file" : "lib/List/Keywords.pm",
-         "version" : "0.01"
+         "version" : "0.02"
       }
    },
    "release_status" : "stable",
@@ -50,6 +50,6 @@
       ],
       "x_IRC" : "irc://irc.perl.org/#io-async"
    },
-   "version" : "0.01",
+   "version" : "0.02",
    "x_serialization_backend" : "JSON::PP version 4.05"
 }

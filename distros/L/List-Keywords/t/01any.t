@@ -11,6 +11,13 @@ use List::Keywords 'any';
 ok(  (any { $_ > 10 } 1 .. 20), 'list contains a value above ten' );
 ok( !(any { $_ > 10 } 1 .. 9), 'list does not contain a value above ten' );
 
+# any empty list is false
+{
+   my $invoked;
+   ok( !(any { $invoked++ } ()), 'any on empty list is false' );
+   ok( !$invoked, 'any on empty list did not invoke block' );
+}
+
 # short-circuiting
 {
    my @seen;

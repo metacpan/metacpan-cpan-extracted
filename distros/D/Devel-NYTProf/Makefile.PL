@@ -15,6 +15,7 @@ use strict;
 use ExtUtils::MakeMaker;
 use Getopt::Long;
 use Config;
+use File::Spec;
 
 my $is_developer = (-d '.git');
 
@@ -59,7 +60,7 @@ utime time(), time(), "t/test40pmc.pmc"
 
 # --- Discover how much of stdio is implemented
 
-my $cpp = $Config{cpp} || do {
+my $cpp = $Config{cpprun} || do {
     warn "Warning: cpp not found in your perl config.  Falling back to 'cat'\n";
     'cat';
 };
@@ -122,8 +123,6 @@ if( $ExtUtils::MakeMaker::VERSION >= 6.46 ) {
             homepage    => 'https://code.google.com/p/perl-devel-nytprof/',
             bugtracker  => {
                 web    => 'https://github.com/timbunce/devel-nytprof/issues',
-                # old => 'http://rt.cpan.org/Public/Dist/Display.html?Name=Devel-NYTProf',
-                mailto => 'bug-devel-nytprof@rt.cpan.org',
             },
             repository  => {
                 url  => 'https://github.com/timbunce/devel-nytprof.git',
@@ -146,6 +145,7 @@ $mm_opts{PREREQ_PM} = {
 $mm_opts{TEST_REQUIRES} = {
     'Test::More'   => '0.84',
     'Test::Differences' => '0.60',
+    'Capture::Tiny' => 0,
 };
 
 $mm_opts{BUILD_REQUIRES} = {
@@ -189,7 +189,7 @@ WriteMakefile(
         FILES => join(" ",
             "nytprof demo-out",
             map { ("t/$_", "xt/$_") } qw(
-                nytprof nytprof*.out nytprof*.out.* *_outdir test*.*_new auto *.rdt_newp
+                nytprof nytprof*.out *_outdir test*.*_new auto *.rdt_newp
             ))
     },
     dist  => {
@@ -283,14 +283,18 @@ perltidy:
 ctidy_bcpp:
 	bcpp -f 2 -i 4 -bcl -qb 10 -ylcnc -yb NYTProf.xs
 
+NYTPROF_TEST_SHORT=""
+test_short:
+	NYTPROF_TEST_SHORT=1 make test
+
 }
 }
 
 sub dynamic {
     my $make = shift->SUPER::dynamic(@_);
 
-    my $xsl_dest_dir = '$(INST_LIB)/$(PARENT_NAME)/auto/$(FULLEXT)';
-    my $xsl_dest     = '$(XSL_DEST_DIR)/$(DLBASE).$(DLEXT)';
+    my $xsl_dest_dir = File::Spec->catdir('$(INST_LIB)', '$(PARENT_NAME)', 'auto', '$(FULLEXT)');
+    my $xsl_dest     = File::Spec->catdir('$(XSL_DEST_DIR)', '$(DLBASE).$(DLEXT)');
 
     if($^O eq 'VMS'){
         $xsl_dest_dir = File::Spec->catdir('blib','lib','Devel','auto','Devel','NYTProf');

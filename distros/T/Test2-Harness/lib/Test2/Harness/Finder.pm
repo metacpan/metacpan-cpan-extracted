@@ -2,7 +2,7 @@ package Test2::Harness::Finder;
 use strict;
 use warnings;
 
-our $VERSION = '1.000049';
+our $VERSION = '1.000050';
 
 use Test2::Harness::Util qw/clean_path mod2file/;
 use Test2::Harness::Util::JSON qw/decode_json encode_json/;
@@ -28,6 +28,7 @@ use Test2::Harness::Util::HashBase qw{
 
     <changed <changed_only <changes_plugin <show_changed_files
     +coverage_data <coverage_from <maybe_coverage_from
+    <coverage_manager
 };
 
 sub munge_settings {}
@@ -336,7 +337,7 @@ sub add_changed_to_search {
     for my $test (sort keys %tests) {
         my $meta = $testmeta->{$test} // {type => 'flat'};
         my $type = $meta->{type};
-        my $manager = $meta->{manager};
+        my $manager = $meta->{manager} // $self->coverage_manager;
 
         # In these cases we have no choice but to run the entire file
         if ($type eq 'flat' || !$manager) {

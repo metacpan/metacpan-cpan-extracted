@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-
+use 5.008000;
 
 use ExtUtils::MakeMaker;
 
@@ -14,6 +14,7 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "Catalyst-Plugin-DetachIfNotModified",
   "LICENSE" => "artistic_2",
+  "MIN_PERL_VERSION" => "5.008000",
   "NAME" => "Catalyst::Plugin::DetachIfNotModified",
   "PREREQ_PM" => {
     "Catalyst" => "5.90018",
@@ -33,7 +34,6 @@ my %WriteMakefileArgs = (
     "HTTP::Request::Common" => 0,
     "Module::Metadata" => 0,
     "Moose" => 0,
-    "Net::Statsd::Tiny" => "0.3.0",
     "Term::Size::Any" => 0,
     "Test::Log::Dispatch" => 0,
     "Test::More" => 0,
@@ -43,7 +43,7 @@ my %WriteMakefileArgs = (
     "strict" => 0,
     "warnings" => 0
   },
-  "VERSION" => "v0.2.0",
+  "VERSION" => "v0.2.1",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -63,7 +63,6 @@ my %FallbackPrereqs = (
   "Module::Metadata" => 0,
   "Moose" => 0,
   "Moose::Role" => 0,
-  "Net::Statsd::Tiny" => "0.3.0",
   "Ref::Util" => 0,
   "Term::Size::Any" => 0,
   "Test::Log::Dispatch" => 0,

@@ -1,14 +1,35 @@
 Revision history for Net-Statsd-Lite
 
+v0.6.1    2021-04-27 16:53:51+01:00 Europe/London
+  [Enhancements]
+  - Removed unused stub types library.
+
+  - Removed checks for undefined rates.
+
+  - Allow sampling rates for histogram metrics.
+
+  [Bug Fixes]
+  - Fix default sample rate.
+
+  [Documentation]
+  - Fixed typos in Changes.
+
+  - Added additional link to statsd spec in SEE ALSO.
+
+  - Add link to CloudWatch page on StatsD.
+
+  [Tests]
+  - Improved tests for sample rate cases.
+
 v0.6.0    2021-04-25 23:07:35+01:00 Europe/London
   [Enhancements]
   - All measurement methods take an optional `$opts` hashref that can
-    be used to pass additiona information, such as tags.
+    be used to pass additional information, such as tags.
 
   - Removed the use of custom type library.
 
   [Bug Fixes]
-  - Updated DEMOLISH method to delete buffer afterflush.
+  - Updated DEMOLISH method to delete buffer after flush.
 
   [Incompatabilities]
   - Renamed internal `_record` method to `record_metric`.
@@ -43,7 +64,7 @@ v0.5.1    2021-04-22 16:33:03+01:00 Europe/London (TRIAL RELEASE)
 v0.5.0    2021-04-22 00:30:57+01:00 Europe/London (TRIAL RELEASE)
   [Enhancements]
   - All measurement methods take an optional `$opts` hashref that can
-    be used to pass additiona information, such as tags.
+    be used to pass additional information, such as tags.
 
   - Renamed internal `_record` method to `record_metric`.
 

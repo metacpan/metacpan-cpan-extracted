@@ -73,7 +73,6 @@ my %WriteMakefileArgs = (
     "Test2::Plugin::Cover" => "0.000022",
     "Test2::Plugin::MemUsage" => "0.002003",
     "Test2::Plugin::UUID" => "0.002001",
-    "Test2::Require::Module" => "0.000127",
     "Test2::Tools::AsyncSubtest" => "0.000127",
     "Test2::Tools::Subtest" => "0.000127",
     "Test2::Util" => "1.302170",
@@ -91,7 +90,7 @@ my %WriteMakefileArgs = (
   "TEST_REQUIRES" => {
     "File::Copy" => 0
   },
-  "VERSION" => "1.000049",
+  "VERSION" => "1.000050",
   "test" => {
     "TESTS" => "t/*.t t/integration/*.t t/integration/signals/*.t t/unit/App/*.t t/unit/App/Yath/*.t t/unit/App/Yath/Command/*.t t/unit/App/Yath/Plugin/*.t t/unit/Test2/Harness/*.t t/unit/Test2/Harness/Runner/*.t t/unit/Test2/Harness/Settings/*.t t/unit/Test2/Harness/Util/*.t t/unit/Test2/Harness/Util/File/*.t t/unit/Test2/Tools/*.t"
   }
@@ -136,7 +135,6 @@ my %FallbackPrereqs = (
   "Test2::Plugin::Cover" => "0.000022",
   "Test2::Plugin::MemUsage" => "0.002003",
   "Test2::Plugin::UUID" => "0.002001",
-  "Test2::Require::Module" => "0.000127",
   "Test2::Tools::AsyncSubtest" => "0.000127",
   "Test2::Tools::Subtest" => "0.000127",
   "Test2::Util" => "1.302170",

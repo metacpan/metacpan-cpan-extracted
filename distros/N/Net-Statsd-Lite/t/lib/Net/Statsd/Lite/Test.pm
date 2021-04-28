@@ -2,6 +2,8 @@ package Net::Statsd::Lite::Test;
 
 use Test::Roo::Role;
 
+use Test::Deep;
+
 use Carp;
 use curry;
 use IO::Select;
@@ -60,12 +62,12 @@ test "test client" => sub {
 
     my $result = $self->test_udp( $self->curry::send_tests );
 
-  TODO: {
-
-        local $TODO = "random sample" if $self->output =~ /\|\@\d/;
-
-        is $result, $self->output, 'expected result';
-
+    my $expected = $self->output;
+    if ($expected =~ /\|\@(\d*\.)?\d/) {
+        cmp_deeply $result, any( undef, $expected ), 'possibly expected result';
+    }
+    else {
+        is $result, $expected, 'expected result';
     }
 };
 

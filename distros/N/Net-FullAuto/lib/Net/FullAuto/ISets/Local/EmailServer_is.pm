@@ -886,7 +886,6 @@ if ($do==1) { # INSTALL LATEST VERSION OF NGINX
    #          "  -   \\x22     \  -  \\x5C
    #          $  -   \\x24     %  -  \\x25
    #
-   # https://www.lisenet.com/2014/ - bash approach to conversion
    my $inet_d_script=<<'END';
 #\\x21/bin/sh
 #
@@ -1105,7 +1104,6 @@ END
    #          "  -   \\x22     \  -  \\x5C
    #          $  -   \\x24     %  -  \\x25
    #
-   # https://www.lisenet.com/2014/ - bash approach to conversion
    my $script=<<END;
 use Net::FullAuto;
 \\x24Net::FullAuto::FA_Core::debug=1;
@@ -1334,7 +1332,6 @@ if ($do==1) {
    #          "  -   \\x22     \  -  \\x5C
    #          $  -   \\x24     %  -  \\x25
    #
-   # https://www.lisenet.com/2014/ - bash approach to conversion
 
 
 
@@ -1410,7 +1407,6 @@ END
          #          "  -   \\x22     \  -  \\x5C
          #          $  -   \\x24     %  -  \\x25
          #
-         # https://www.lisenet.com/2014/ - bash approach to conversion
          my $thp=<<END;
 #\\x21/bin/bash
 ### BEGIN INIT INFO
@@ -2056,7 +2052,6 @@ END
       #          "  -   \\x22     \  -  \\x5C
       #          $  -   \\x24     %  -  \\x25
       #
-      # https://www.lisenet.com/2014/ - bash approach to conversion
       my $fpmsrv=<<"END";
 [Unit]
 Description=The PHP FastCGI Process Manager
@@ -2376,6 +2371,8 @@ END
    ($stdout,$stderr)=$handle->cmd($sudo.
       "postfix start",'__display__');
    ($stdout,$stderr)=$handle->cmd($sudo.
+      "postfix reload",'__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo.
       "postfix status",'__display__');
    ($stdout,$stderr)=$handle->cmd($sudo.
       "postconf -e \"inet_interfaces = all\"",'__display__');
@@ -2469,6 +2466,174 @@ END
       '$relocated_maps $transport_maps $mynetworks '.
       '$virtual_mailbox_limit_maps\'',
       '__display__');
+   if ($main::amazon) {
+      ($stdout,$stderr)=$handle->cmd($sudo.
+          'postconf -e '.
+          '\'relayhost = [email-smtp.us-west-2.amazonaws.com]:587\' ',
+          '\'smtp_sasl_auth_enable = yes\' '.
+          '\'smtp_sasl_security_options = noanonymous\' '.
+          '\'smtp_sasl_password_maps = hash:/etc/postfix/sasl_passwd\' '.
+          '\'smtp_use_tls = yes\' '.
+          '\'smtp_tls_security_level = encrypt\' '.
+          '\'smtp_tls_note_starttls_offer = yes\'',
+          '__display__');
+      #
+      # echo-ing/streaming files over ssh can be tricky. Use echo -e
+      #          and replace these characters with thier HEX
+      #          equivalents (use an external editor for quick
+      #          search and replace - and paste back results.
+      #          use copy/paste or cat file and copy/paste results.):
+      #
+      #          !  -   \\x21     `  -  \\x60   * - \\x2A
+      #          "  -   \\x22     \  -  \\x5C
+      #          $  -   \\x24     %  -  \\x25
+      #
+      my ($hash,$output,$error)=('','','');
+      my $c="aws iam list-access-keys --user-name ses_postfix_email";
+      ($hash,$output,$error)=run_aws_cmd($c);
+      $hash||={};
+      foreach my $hash (@{$hash->{AccessKeyMetadata}}) {
+         my $c="aws iam delete-access-key ".
+               "--access-key-id $hash->{AccessKeyId} ".
+               "--user-name ses_postfix_email";
+         ($hash,$output,$error)=run_aws_cmd($c);
+      }
+      sleep 1;
+      $c="aws iam delete-user --user-name ses_postfix_email";
+      ($hash,$output,$error)=run_aws_cmd($c);
+      $c="aws iam create-user --user-name gnusocial_email";
+      ($hash,$output,$error)=run_aws_cmd($c);
+      $c="aws iam create-access-key --user-name gnusocial_email";
+      ($hash,$output,$error)=run_aws_cmd($c);
+      $hash||={};
+      my $access_id=$hash->{AccessKey}->{AccessKeyId};
+      my $secret_access_key=$hash->{AccessKey}->{SecretAccessKey};
+      my $python_smtp_generator<<END;
+#\\x21/usr/bin/env python3
+
+import hmac
+import hashlib
+import base64
+import argparse
+
+SMTP_REGIONS = [
+    'us-east-2',       # US East (Ohio)
+    'us-east-1',       # US East (N. Virginia)
+    'us-west-2',       # US West (Oregon)
+    'ap-south-1',      # Asia Pacific (Mumbai)
+    'ap-northeast-2',  # Asia Pacific (Seoul)
+    'ap-southeast-1',  # Asia Pacific (Singapore)
+    'ap-southeast-2',  # Asia Pacific (Sydney)
+    'ap-northeast-1',  # Asia Pacific (Tokyo)
+    'ca-central-1',    # Canada (Central)
+    'eu-central-1',    # Europe (Frankfurt)
+    'eu-west-1',       # Europe (Ireland)
+    'eu-west-2',       # Europe (London)
+    'sa-east-1',       # South America (Sao Paulo)
+    'us-gov-west-1',   # AWS GovCloud (US)
+]
+
+# These values are required to calculate the signature. Do not change them.
+DATE = \\x2211111111\\x22
+SERVICE = \\x22ses\\x22
+MESSAGE = \\x22SendRawEmail\\x22
+TERMINAL = \\x22aws4_request\\x22
+VERSION = 0x04
+
+
+def sign(key, msg):
+    return hmac.new(key, msg.encode('utf-8'), hashlib.sha256).digest()
+
+
+def calculate_key(secret_access_key, region):
+    if region not in SMTP_REGIONS:
+        raise ValueError(f\\x22The {region} Region doesn't have an SMTP endpoint.\\x22)
+
+    signature = sign((\\x22AWS4\\x22 + secret_access_key).encode('utf-8'), DATE)
+    signature = sign(signature, region)
+    signature = sign(signature, SERVICE)
+    signature = sign(signature, TERMINAL)
+    signature = sign(signature, MESSAGE)
+    signature_and_version = bytes([VERSION]) + signature
+    smtp_password = base64.b64encode(signature_and_version)
+    return smtp_password.decode('utf-8')
+
+
+def main():
+    parser = argparse.ArgumentParser(
+        description='Convert a Secret Access Key for an IAM user to an SMTP password.')
+    parser.add_argument(
+        'secret', help='The Secret Access Key to convert.')
+    parser.add_argument(
+        'region',
+        help='The AWS Region where the SMTP password will be used.',
+        choices=SMTP_REGIONS)
+    args = parser.parse_args()
+    print(calculate_key(args.secret, args.region))
+
+
+if __name__ == '__main__':
+    main()
+END
+      ($stdout,$stderr)=$handle->cmd(
+         "echo -e \"$python_smtp_generator\" > smtp_credentials_generate.py");
+      my $smtppass='';
+      ($smtppass,$stderr)=$handle->cmd(
+         "python smtp_credentials_generate.py $secret_access_key us-west-2");
+      my $sasl_password=<<"END";
+[email-smtp.us-west-2.amazonaws.com]:587 ses_postfix_email:$smtppass
+END
+      ($stdout,$stderr)=$handle->cmd("echo -e \"$sasl_password\" > ".
+         "sasl_passwd");
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         'mv -v sasl_passwd /etc/postfix','__display__');
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         'chown -v root:root /etc/postfix/sasl_passwd','__display__');
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         'postmap hash:/etc/postfix/sasl_passwd');
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         'chown -v root:root /etc/postfix/sasl_passwd.db','__display__');
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         'chmod -v 0600 /etc/postfix/sasl_passwd '.
+         '/etc/postfix/sasl_passwd.db','__display__');
+      my $sespolicy=<<END;
+{
+   \\x22Version\\x22:\\x222012-10-17\\x22,
+   \\x22Statement\\x22: [{
+        \\x22Effect\\x22:\\x22Allow\\x22,
+        \\x22Action\\x22:\\x22ses:SendRawEmail\\x22,
+        \\x22Resource\\x22:\\x22*\\x22
+}]}
+END
+      chop $sespolicy;
+      ($stdout,$stderr)=$handle->cmd(
+         "echo -e \"$sespolicy\" > ./sespolicy");
+      $c="aws iam list-policies";
+      ($hash,$output,$error)=run_aws_cmd($c);
+      $hash||={};
+      foreach my $policy (@{$hash->{Policies}}) {
+         if ($policy->{PolicyName} eq 'sespolicy') {
+            $c="aws iam detach-user-policy --user-name ses_postfix_email ".
+               "--policy-arn $policy->{Arn}";
+            ($hash,$output,$error)=run_aws_cmd($c);
+            $c="aws iam delete-policy --policy-arn $policy->{Arn}";
+            ($hash,$output,$error)=run_aws_cmd($c);
+            last;
+         }
+      }
+      $c="aws iam create-policy --policy-name sespolicy --policy-document ".
+         "file://sespolicy";
+      ($hash,$output,$error)=run_aws_cmd($c);
+      my $policy_arn=$hash->{Policy}->{Arn};
+      $c="aws iam attach-user-policy --user-name ses_postfix_email ".
+         "--policy-arn $policy_arn";
+      ($hash,$output,$error)=run_aws_cmd($c);
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         'rm -rfv ./sespolicy','__display__');
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         'postconf -e \'smtp_tls_CAfile = /etc/ssl/certs/ca-bundle.crt\'',
+         '__display__');
+   }
    $ad='submission inet n       -       -       -       -       smtpd%NL%'.
           '  -o syslog_name=postfix/submission%NL%'.
           '  -o smtpd_tls_security_level=encrypt%NL%'.
@@ -2503,7 +2668,6 @@ END
    #          "  -   \\x22     \  -  \\x5C
    #          $  -   \\x24     %  -  \\x25
    #
-   # https://www.lisenet.com/2014/ - bash approach to conversion
    $ad=<<'END';
 [Unit]
 Description=Postfix Mail Transport Agent
@@ -2931,7 +3095,6 @@ END
    #          "  -   \\x22     \  -  \\x5C
    #          $  -   \\x24     %  -  \\x25
    #
-   # https://www.lisenet.com/2014/ - bash approach to conversion
 
    my $redis_service=<<'END';
 # example systemd service unit file for redis-server
@@ -3083,7 +3246,7 @@ END
       'useradd -u 5002 -r -g unbound -s /usr/bin/nologin '.
       'unbound');
    ($stdout,$stderr)=$handle->cmd($sudo.
-      'sed -i \'s/^nameserver/#nameserver/\' '.
+      'sed -i \'s/nameserver/#nameserver/\' '.
       '/etc/resolv.conf');
    ($stdout,$stderr)=$handle->cmd($sudo.
       'sed -i \'/nameserver/anameserver 127.0.0.1\' '.

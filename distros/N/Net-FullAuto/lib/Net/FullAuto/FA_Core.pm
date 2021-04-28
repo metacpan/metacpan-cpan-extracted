@@ -8471,18 +8471,21 @@ sub getpasswd
    my $host='';my $stdout='';my $stderr='';
    if (exists $Hosts{$hostlabel}{'cyberark'}) {
       my $capath=$Net::FullAuto::FA_Core::gbp->('clipasswordsdk');
+      $capath||='/opt/CARKaim/sdk/';
       my $app_id=$Hosts{$hostlabel}{'ca_appid'}||'';
       my $ca_das=$Hosts{$hostlabel}{'ca_das'}||'';
+      my $ca_safe=$Hosts{$hostlabel}{'ca_safe'}||'';
       $ca_das=";DualAccountStatus=$ca_das" if $ca_das;
+      $ca_safe="Safe=$ca_safe;" if $ca_safe;
       my $ca_host=$Hosts{$hostlabel}{'ca_host'}||'localhost';
       my $ca_user=$Hosts{$hostlabel}{'loginid'}||$username;
       my $cmd="${capath}clipasswordsdk GetPassword -p "
-             ."AppDescs.AppID=$app_id -p Query=\"Address="
+             ."AppDescs.AppID=$app_id -p Query=\"${ca_safe}Address="
              ."$hostname;Username=$ca_user"
              ."$ca_das\" -p RequiredProps=* -o Password";
       unless ($ca_das) {
          $cmd="${capath}clipasswordsdk GetPassword -p "
-             ."AppDescs.AppID=$app_id -p Query=\"Address="
+             ."AppDescs.AppID=$app_id -p Query=\"${ca_safe}Address="
              ."$hostname;Username=$ca_user\" "
              ."-p RequiredProps=* -o Password";
       }

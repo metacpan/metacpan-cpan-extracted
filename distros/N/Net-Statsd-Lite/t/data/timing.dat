@@ -23,7 +23,7 @@ use warnings;
         autoflush   => 1,
         prefix      => 'foo.',
         input       => [ [qw/ timing load 123 0.5 /], ],
-        output      => "foo.load:123|ms|\@0.500000\n",
+        output      => "foo.load:123|ms|\@0.5\n",
     },
     {
         description => "timing_ms (alias for timing)",

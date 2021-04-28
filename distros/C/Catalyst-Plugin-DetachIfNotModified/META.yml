@@ -11,7 +11,6 @@ build_requires:
   HTTP::Request::Common: '0'
   Module::Metadata: '0'
   Moose: '0'
-  Net::Statsd::Tiny: v0.3.0
   Term::Size::Any: '0'
   Test::Log::Dispatch: '0'
   Test::More: '0'
@@ -38,7 +37,7 @@ name: Catalyst-Plugin-DetachIfNotModified
 provides:
   Catalyst::Plugin::DetachIfNotModified:
     file: lib/Catalyst/Plugin/DetachIfNotModified.pm
-    version: v0.2.0
+    version: v0.2.1
 recommends:
   Plack::Middleware::ConditionalGET: '0'
   Ref::Util::XS: '0'
@@ -50,10 +49,11 @@ requires:
   Moose::Role: '0'
   Ref::Util: '0'
   namespace::autoclean: '0'
+  perl: v5.8.0
 resources:
   bugtracker: https://github.com/robrwo/Catalyst-Plugin-DetachIfNotModified/issues
   repository: git://github.com/robrwo/Catalyst-Plugin-DetachIfNotModified.git
-version: v0.2.0
+version: v0.2.1
 x_authority: cpan:RRWO
 x_generated_by_perl: v5.28.1
 x_serialization_backend: 'YAML::Tiny version 1.73'

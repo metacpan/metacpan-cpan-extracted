@@ -1,5 +1,9 @@
 Revision history for Plack-Middleware-Statsd
 
+v0.4.7    2021-04-27 16:47:35+01:00 Europe/London
+  [Bug Fixes]
+  - Use sample_rate for content length metrics.
+
 v0.4.6    2021-04-21 16:51:41+01:00 Europe/London
   [Enhancements]
   - Check if internal methods are unused before fetching arguments.

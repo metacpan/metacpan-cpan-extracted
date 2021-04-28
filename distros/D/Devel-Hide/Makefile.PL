@@ -21,7 +21,7 @@ my %write_makefile_args = (
         'prereqs'        => {
             test => {
                 requires => {
-                    'Test::More' => 0,
+                    'Test::More' => 0.82,
                 },
             },
             develop => {

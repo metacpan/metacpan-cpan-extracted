@@ -1,7 +1,7 @@
 # This Makefile is for the Python::Object extension to perl.
 #
 # It was generated automatically by MakeMaker version
-# 7.46 (Revision: 74600) from the contents of
+# 7.60 (Revision: 76000) from the contents of
 # Makefile.PL. Don't edit this file, edit Makefile.PL instead.
 #
 #       ANY CHANGES MADE HERE WILL BE LOST!
@@ -18,7 +18,7 @@
 #     NAME => q[Python::Object]
 #     PREREQ_PM => {  }
 #     TEST_REQUIRES => {  }
-#     VERSION_FROM => q[Object.pm]
+#     VERSION_FROM => q[lib/Python/Object.pm]
 #     dist => { COMPRESS=>q[xz -9f], SUFFIX=>q[xz] }
 
 # --- MakeMaker post_initialize section:
@@ -139,9 +139,9 @@ PERM_DIR = 755
 PERM_RW = 644
 PERM_RWX = 755
 
-MAKEMAKER   = /usr/share/perl5/vendor_perl/ExtUtils/MakeMaker.pm
-MM_VERSION  = 7.46
-MM_REVISION = 74600
+MAKEMAKER   = /home/shlomif/perl5/lib/perl5/ExtUtils/MakeMaker.pm
+MM_VERSION  = 7.60
+MM_REVISION = 76000
 
 # FULLEXT = Pathname for extension directory (eg Foo/Bar/Oracle).
 # BASEEXT = Basename part of FULLEXT. May be just equal FULLEXT. (eg Oracle)
@@ -152,7 +152,7 @@ FULLEXT = Python/Object
 BASEEXT = Object
 PARENT_NAME = Python
 DLBASE = $(BASEEXT)
-VERSION_FROM = Object.pm
+VERSION_FROM = lib/Python/Object.pm
 INC = -I/usr/include/python3.9
 OBJECT = $(BASEEXT)$(OBJ_EXT)
 LDFROM = $(OBJECT)
@@ -165,9 +165,9 @@ C_FILES  = Object.c
 O_FILES  = Object.o
 H_FILES  = PerlPyErr.h
 MAN1PODS = 
-MAN3PODS = Object.pm \
-	lib/Python.pm \
-	lib/Python/Err.pm
+MAN3PODS = lib/Python.pm \
+	lib/Python/Err.pm \
+	lib/Python/Object.pm
 
 # Where is the Config information that we are using/depend on
 CONFIGDEP = $(PERL_ARCHLIBDEP)$(DFSEP)Config.pm $(PERL_INCDEP)$(DFSEP)config.h
@@ -190,13 +190,13 @@ PERL_ARCHIVEDEP    =
 PERL_ARCHIVE_AFTER = 
 
 
-TO_INST_PM = Object.pm \
-	lib/Python.pm \
-	lib/Python/Err.pm
+TO_INST_PM = lib/Python.pm \
+	lib/Python/Err.pm \
+	lib/Python/Object.pm
 
 
 # --- MakeMaker platform_constants section:
-MM_Unix_VERSION = 7.46
+MM_Unix_VERSION = 7.60
 PERL_MALLOC_DEF = -DPERL_EXTMALLOC_DEF -Dmalloc=Perl_malloc -Dfree=Perl_mfree -Drealloc=Perl_realloc -Dcalloc=Perl_calloc
 
 
@@ -213,7 +213,7 @@ XSUBPP = "$(XSUBPPDIR)$(DFSEP)xsubpp"
 XSUBPPRUN = $(PERLRUN) $(XSUBPP)
 XSPROTOARG = 
 XSUBPPDEPS = /usr/share/perl5/ExtUtils/typemap typemap /usr/share/perl5/vendor_perl/ExtUtils$(DFSEP)xsubpp
-XSUBPPARGS = -typemap '/usr/share/perl5/ExtUtils/typemap' -typemap '/home/shlomif/progs/perl/cpan/pyperl/Python-Object/typemap'
+XSUBPPARGS = -typemap '/usr/share/perl5/ExtUtils/typemap' -typemap '/home/shlomif/Download/unpack/perl/p5/pyperl/Python-Object/typemap'
 XSUBPP_EXTRA_ARGS =
 
 
@@ -292,8 +292,8 @@ MPOLLUTE =
 # Python::Object might depend on some other libraries:
 # See ExtUtils::Liblist for details
 #
-EXTRALIBS = -L/home/shlomif/progs/perl/cpan/pyperl/Python-Object -lpython3.9
-LDLOADLIBS = -L/home/shlomif/progs/perl/cpan/pyperl/Python-Object -lpython3.9
+EXTRALIBS = -L/home/shlomif/Download/unpack/perl/p5/pyperl/Python-Object -lpython3.9
+LDLOADLIBS = -L/home/shlomif/Download/unpack/perl/p5/pyperl/Python-Object -lpython3.9
 BSLOADLIBS = 
 LD_RUN_PATH = /lib64
 
@@ -371,8 +371,6 @@ all :: pure_all manifypods
 	$(NOECHO) $(NOOP)
 
 pure_all :: config pm_to_blib subdirs linkext
-	$(NOECHO) $(NOOP)
-
 	$(NOECHO) $(NOOP)
 
 subdirs :: $(MYEXTLIB)
@@ -481,8 +479,8 @@ INST_DYNAMIC_FIX =
 
 $(INST_DYNAMIC) : $(OBJECT) $(MYEXTLIB) $(INST_ARCHAUTODIR)$(DFSEP).exists $(EXPORT_LIST) $(PERL_ARCHIVEDEP) $(PERL_ARCHIVE_AFTER) $(INST_DYNAMIC_DEP) 
 	$(RM_F) $@
-	$(LD)  $(LDDLFLAGS)  $(LDFROM) $(OTHERLDFLAGS) -o $@ $(MYEXTLIB) \
-	  $(PERL_ARCHIVE) $(LDLOADLIBS) -lperl $(PERL_ARCHIVE_AFTER) $(EXPORT_LIST) \
+	LD_RUN_PATH="$(LD_RUN_PATH)" $(LD)  $(LDDLFLAGS)  $(LDFROM) $(OTHERLDFLAGS) -o $@ $(MYEXTLIB) \
+	  $(PERL_ARCHIVE) $(LDLOADLIBS) $(PERL_ARCHIVE_AFTER) $(EXPORT_LIST) \
 	  $(INST_DYNAMIC_FIX)
 	$(CHMOD) $(PERM_RWX) $@
 
@@ -511,13 +509,13 @@ POD2MAN = $(POD2MAN_EXE)
 
 
 manifypods : pure_all config  \
-	Object.pm \
 	lib/Python.pm \
-	lib/Python/Err.pm
+	lib/Python/Err.pm \
+	lib/Python/Object.pm
 	$(NOECHO) $(POD2MAN) --section=$(MAN3SECTION) --perm_rw=$(PERM_RW) -u \
-	  Object.pm $(INST_MAN3DIR)/Python::Object.$(MAN3EXT) \
 	  lib/Python.pm $(INST_MAN3DIR)/Python.$(MAN3EXT) \
-	  lib/Python/Err.pm $(INST_MAN3DIR)/Python::Err.$(MAN3EXT) 
+	  lib/Python/Err.pm $(INST_MAN3DIR)/Python::Err.$(MAN3EXT) \
+	  lib/Python/Object.pm $(INST_MAN3DIR)/Python::Object.$(MAN3EXT) 
 
 
 
@@ -598,7 +596,7 @@ metafile : create_distdir
 	$(NOECHO) $(ECHO) 'configure_requires:' >> META_new.yml
 	$(NOECHO) $(ECHO) '  ExtUtils::MakeMaker: '\''0'\''' >> META_new.yml
 	$(NOECHO) $(ECHO) 'dynamic_config: 1' >> META_new.yml
-	$(NOECHO) $(ECHO) 'generated_by: '\''ExtUtils::MakeMaker version 7.46, CPAN::Meta::Converter version 2.150010'\''' >> META_new.yml
+	$(NOECHO) $(ECHO) 'generated_by: '\''ExtUtils::MakeMaker version 7.60, CPAN::Meta::Converter version 2.150010'\''' >> META_new.yml
 	$(NOECHO) $(ECHO) 'license: unknown' >> META_new.yml
 	$(NOECHO) $(ECHO) 'meta-spec:' >> META_new.yml
 	$(NOECHO) $(ECHO) '  url: http://module-build.sourceforge.net/META-spec-v1.4.html' >> META_new.yml
@@ -618,7 +616,7 @@ metafile : create_distdir
 	$(NOECHO) $(ECHO) '      "unknown"' >> META_new.json
 	$(NOECHO) $(ECHO) '   ],' >> META_new.json
 	$(NOECHO) $(ECHO) '   "dynamic_config" : 1,' >> META_new.json
-	$(NOECHO) $(ECHO) '   "generated_by" : "ExtUtils::MakeMaker version 7.46, CPAN::Meta::Converter version 2.150010",' >> META_new.json
+	$(NOECHO) $(ECHO) '   "generated_by" : "ExtUtils::MakeMaker version 7.60, CPAN::Meta::Converter version 2.150010",' >> META_new.json
 	$(NOECHO) $(ECHO) '   "license" : [' >> META_new.json
 	$(NOECHO) $(ECHO) '      "unknown"' >> META_new.json
 	$(NOECHO) $(ECHO) '   ],' >> META_new.json
@@ -647,7 +645,7 @@ metafile : create_distdir
 	$(NOECHO) $(ECHO) '   },' >> META_new.json
 	$(NOECHO) $(ECHO) '   "release_status" : "stable",' >> META_new.json
 	$(NOECHO) $(ECHO) '   "version" : "1.00",' >> META_new.json
-	$(NOECHO) $(ECHO) '   "x_serialization_backend" : "JSON::PP version 4.05"' >> META_new.json
+	$(NOECHO) $(ECHO) '   "x_serialization_backend" : "JSON::PP version 4.06"' >> META_new.json
 	$(NOECHO) $(ECHO) '}' >> META_new.json
 	-$(NOECHO) $(MV) META_new.json $(DISTVNAME)/META.json
 
@@ -1053,9 +1051,9 @@ ppd :
 
 pm_to_blib : $(FIRST_MAKEFILE) $(TO_INST_PM)
 	$(NOECHO) $(ABSPERLRUN) -MExtUtils::Install -e 'pm_to_blib({@ARGV}, '\''$(INST_LIB)/auto'\'', q[$(PM_FILTER)], '\''$(PERM_DIR)'\'')' -- \
-	  'Object.pm' '$(INST_LIB)/Python/Object.pm' \
 	  'lib/Python.pm' 'blib/lib/Python.pm' \
-	  'lib/Python/Err.pm' 'blib/lib/Python/Err.pm' 
+	  'lib/Python/Err.pm' 'blib/lib/Python/Err.pm' \
+	  'lib/Python/Object.pm' 'blib/lib/Python/Object.pm' 
 	$(NOECHO) $(TOUCH) pm_to_blib
 
 

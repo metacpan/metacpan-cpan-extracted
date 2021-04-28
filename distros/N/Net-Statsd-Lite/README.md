@@ -4,7 +4,7 @@ Net::Statsd::Lite - A lightweight StatsD client that supports multimetric packet
 
 # VERSION
 
-version v0.6.0
+version v0.6.1
 
 # SYNOPSIS
 
@@ -229,8 +229,9 @@ See [Devel::StrictMode](https://metacpan.org/pod/Devel::StrictMode) for more inf
 # TAGGING EXTENSIONS
 
 This class does not support tagging out-of-the box. But tagging can be
-added easily to a subclass, for example, [DogStatsd](https://www.datadoghq.com/) tagging can be added
-using something like
+added easily to a subclass, for example, [DogStatsd](https://www.datadoghq.com/) or
+[CloudWatch](https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/CloudWatch-Agent-custom-metrics-statsd.html)
+tagging can be added using something like
 
 ```perl
 use Moo 1.000000;
@@ -250,6 +251,8 @@ around record_metric => sub {
 # SEE ALSO
 
 This module was forked from [Net::Statsd::Tiny](https://metacpan.org/pod/Net::Statsd::Tiny).
+
+[https://github.com/statsd/statsd/blob/master/docs/metric\_types.md](https://github.com/statsd/statsd/blob/master/docs/metric_types.md)
 
 [https://github.com/b/statsd\_spec](https://github.com/b/statsd_spec)
 

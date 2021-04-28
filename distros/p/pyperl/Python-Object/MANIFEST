@@ -1,8 +1,8 @@
 MANIFEST
 Makefile.PL
-Object.pm
 Object.xs
 lib/Python.pm
 lib/Python/Err.pm
+lib/Python/Object.pm
 typemap
 pyinc.py

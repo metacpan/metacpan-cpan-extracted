@@ -117,8 +117,8 @@ if sys.argv[1] == "test" or sys.argv[1] == "build" or sys.argv[1] == "install":
     ldpath = '%s/Python-Object/blib/arch/auto/Python/Object' % cwd
     perllib = '%s/Python-Object/blib/lib' % cwd
     perlarchlib = '%s/Python-Object/blib/arch' % cwd
-    os.environ["PERL5LIB"] = "%s:%s" % (perllib,perlarchlib)
-    os.environ["LD_LIBRARY_PATH"] = ldpath
+    os.environ["PERL5LIB"] = "%s:%s%s" % (perllib, perlarchlib, (":"+os.environ["PERL5LIB"] if "PERL5LIB" in os.environ else ''))
+    os.environ["LD_LIBRARY_PATH"] = "%s%s" % (ldpath, (":"+os.environ["LD_LIBRARY_PATH"] if "LD_LIBRARY_PATH" in os.environ else ''))
     os.environ["PYTHON"] = sys.executable
 
 
@@ -178,7 +178,7 @@ class my_install(install):
             self.root = ''
 
         os.chdir('Python-Object')
-        install.spawn(self, ["make", "DESTDIR=%s" % self.root, "install"])
+        install.spawn(self, ["make",] + (["DESTDIR=%s" % self.root] if len(self.root) else []) + ["install",])
         os.chdir('..')
         if "-DMULTI_PERL" in cc_extra:
             cc_extra.pop(cc_extra.index("-DMULTI_PERL"))
@@ -187,7 +187,7 @@ class my_install(install):
         install.run(self)
 
 setup (name        = "pyperl",
-        version     = "1.0.1",
+        version     = "1.0.2",
         description = "Embed a Perl interpreter",
         url         = "http://www.ActiveState.com",
         author      = "ActiveState",

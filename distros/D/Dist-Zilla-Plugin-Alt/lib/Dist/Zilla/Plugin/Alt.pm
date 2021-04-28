@@ -1,7 +1,8 @@
-package Dist::Zilla::Plugin::Alt 0.07 {
+package Dist::Zilla::Plugin::Alt 0.08 {
 
-  use 5.014;
+  use 5.020;
   use Moose;
+  use experimental qw( postderef signatures );
   use List::Util qw( first );
   use File::Find ();
   use File::chdir;
@@ -13,14 +14,16 @@ package Dist::Zilla::Plugin::Alt 0.07 {
   with 'Dist::Zilla::Role::MetaProvider';
   with 'Dist::Zilla::Role::NameProvider';
 
-  sub munge_files
+  my @diagnostic = (q{print "!!! This is an Alt:: distribution that will not actually install unless you !!!\\n";},
+                    q{print "!!! set PERL_ALT_INSTALL=OVERWRITE.  See https://metacpan.org/pod/Alt       !!!\\n";});
+
+  sub munge_files ($self)
   {
-    my($self) = @_;
-  
     if(my $file = first { $_->name eq 'Makefile.PL' } @{ $self->zilla->files })
     {
       my $content = $file->content;
       my $extra = join "\n", qq{# begin inserted by @{[blessed $self ]} @{[ $self->VERSION || 'dev' ]}},
+                          @diagnostic,
                           q{my $alt = $ENV{PERL_ALT_INSTALL} || '';},
                           q{$WriteMakefileArgs{DESTDIR} =},
                           q{  $alt ? $alt eq 'OVERWRITE' ? '' : $alt : 'no-install-alt';},
@@ -35,7 +38,8 @@ package Dist::Zilla::Plugin::Alt 0.07 {
                           q{    # DO NOT DO THIS SORT OF THING},
                           q{    # THIS IS PRETTY UGLY AND PROBABLY BAD},
                           q{    # DO AS I SAY AND NOT AS I DO},
-                          q<    package ExtUtils::MM_Any;>,
+                          q<    package>,
+                          q<      ExtUtils::MM_Any;>,
                           q<    my $orig = \&init_INSTALL;>,
                           q<    *init_INSTALL = sub {>,
                           q<      my($self, @args) = @_;>,
@@ -54,10 +58,11 @@ package Dist::Zilla::Plugin::Alt 0.07 {
         $self->log_fatal('unable to find WriteMakefile in Makefile.PL');
       }
     }
-    elsif($file = first { $_->name eq 'Build.PL' } @{ $self->zilla->files })
+    elsif($file = first { $_->name eq 'Build.PL' } $self->zilla->files->@*)
     {
       my $content = $file->content;
       my $extra = join "\n", qq{# begin inserted by @{[blessed $self ]} @{[ $self->VERSION || 'dev' ]}},
+                             @diagnostic,
                              q{my $alt = $ENV{PERL_ALT_INSTALL} || '';},
                              q{$module_build_args{destdir} =},
                              q{  $alt ? $alt eq 'OVERWRITE' ? '' : $alt : 'no-install-alt';},
@@ -87,9 +92,8 @@ package Dist::Zilla::Plugin::Alt 0.07 {
     }
   }
 
-  sub metadata
+  sub metadata ($self)
   {
-    my($self) = @_;
     return {
       no_index => {
         file => [ grep !/^lib\/Alt\//, grep /^lib.*\.pm$/, map { $_->name } @{ $self->zilla->files } ],
@@ -97,13 +101,12 @@ package Dist::Zilla::Plugin::Alt 0.07 {
     };
   }
 
-  sub provide_name
+  sub provide_name ($self)
   {
-    my($self) = @_;
     local $CWD = $self->zilla->root;
     return unless -d 'lib/Alt';
     my @files;
-    File::Find::find(sub { return unless -f; push @files, $File::Find::name }, "lib/Alt");  
+    File::Find::find(sub { return unless -f; push @files, $File::Find::name }, "lib/Alt");
     return unless @files;
     $self->log_fatal("found too many Alt modules!") if @files > 1;
     my $name = $files[0];
@@ -129,7 +132,7 @@ Dist::Zilla::Plugin::Alt - Create Alt distributions with Dist::Zilla
 
 =head1 VERSION
 
-version 0.07
+version 0.08
 
 =head1 SYNOPSIS
 
@@ -152,6 +155,12 @@ What it does is:
 Adds code to change the install location so that your dist won't
 be installed unless the environment variable C<PERL_ALT_INSTALL>
 is set to C<OVERWRITE>.
+
+[version 0.08]
+
+Will also add a diagnostic warning that will display when
+C<Makefile.PL> or C<Build.PL> is run, with a link to L<Alt> to help
+de-confuse those unfamiliar with the L<Alt> namespace.
 
 =item Updates the no_index meta
 
