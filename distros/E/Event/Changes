@@ -1,3 +1,6 @@
+1.28 2021-04-29
+- remove C-only restriction on ->Inline method - thanks @oodler577
+
 1.27 2018-11-17
   - only Zero(Polld) if not NULL (reported by @andk, thanks!)
 

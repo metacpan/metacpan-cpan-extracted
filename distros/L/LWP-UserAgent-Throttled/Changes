@@ -1,5 +1,21 @@
 Revision history for LWP-UserAgent-Throttled
 
+0.08	Thu Apr 29 14:16:30 EDT 2021
+	Somehow the last release didn't go out
+
+0.07.1	Wed Apr 21 10:28:14 EDT 2021
+	Fix mymeta
+
+0.07	Wed Apr 21 08:20:00 EDT 2021
+	Use TEST_REQUIRES
+	Added ua() method
+
+0.06.2
+	Try a fix for http://www.cpantesters.org/cpan/report/f632cf00-555f-11e7-a074-e1beba07c9dd
+
+0.06.1	Thu Jun 15 09:07:07 EDT 2017
+	Fixed some tests that were failing
+
 0.06	Tue Jun 13 12:58:19 EDT 2017
 	Fixed testing on machines that are slow so throttling doesn't occur
 
@@ -10,7 +26,7 @@ Revision history for LWP-UserAgent-Throttled
 	Important code tidy - forgot some hashrefs now hash
 
 0.03	Sat 27 May 14:04:14 EDT 2017
-	Throttle each site independantly
+	Throttle each site independently
 	Changed 'load' method to 'throttle'
 
 0.02	Fri May 26 14:18:13 EDT 2017

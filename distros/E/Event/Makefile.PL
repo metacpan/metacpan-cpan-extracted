@@ -8,6 +8,7 @@ WriteMakefile(
   },
   MIN_PERL_VERSION  => 'v5.8.0',
   VERSION_FROM	=> "./lib/Event.pm",
+  LICENSE	=> "perl_5",
   NAME      	=> "Event",
   TYPEMAPS       => ['./lib/Event/typemap'],
   INC		=> '-Ic -Ilib/Event',
@@ -25,11 +26,13 @@ WriteMakefile(
         url => 'https://github.com/mohawk2/cpan-Event.git',
         web => 'https://github.com/mohawk2/cpan-Event',
       },
+      bugtracker  => {
+        web => 'https://github.com/mohawk2/cpan-Event/issues',
+      },
     },
     prereqs => {
       develop => {
         requires => {
-          'Test::CheckManifest' => '0.9',
           'Test::Pod' => '1.22',
           'Pod::Markdown' => 0,
         },

@@ -7,6 +7,7 @@ use IPC::Cmd qw(can_run);
 use Test::Requires qw( Image::Magick );
 use File::Temp;
 use File::Spec;
+use English;
 BEGIN { use_ok('Graphics::TIFF') }
 
 #########################
@@ -34,11 +35,15 @@ $image->Write($file);
 my $tif = Graphics::TIFF->Open( $file, 'r' );
 is( $tif->FileName, $file, 'FileName' );
 isa_ok $tif, 'Graphics::TIFF';
-can_ok $tif, qw(Close ReadDirectory GetField);
+can_ok $tif, qw(Close ReadDirectory ReadEXIFDirectory GetField);
 
 is( $tif->ReadDirectory, 0, 'ReadDirectory' );
 
-is( $tif->ReadEXIFDirectory(0), 0, 'ReadEXIFDirectory' );
+TODO: {
+    local $TODO = "Don't know how to create TIFF with EXIF on the fly, "
+      . 'and reading an empty one crashes some implementations';
+    is( $tif->ReadEXIFDirectory(0), 0, 'ReadEXIFDirectory' );
+}
 
 is( $tif->NumberOfDirectories, 1, 'NumberOfDirectories' );
 
@@ -107,8 +112,6 @@ is( length( $tif->ReadEncodedStrip( 1, 8190 ) ),
     1470, 'ReadEncodedStrip part strip' );
 
 is( length( $tif->ReadRawStrip( 1, 20 ) ), 20, 'ReadRawStrip' );
-
-is( $tif->ReadTile( 0, 0, 0, 0 ), undef, 'ReadTile' );
 
 my $filename = File::Spec->catfile( $directory, 'out.txt' );
 open my $fh, '>', $filename;
@@ -193,10 +196,25 @@ $tif->Close;
 
 #########################
 
-system "convert rose: -define tiff:predictor=2 -compress lzw $file";
-$tif = Graphics::TIFF->Open( $file, 'r' );
-is $tif->GetField(TIFFTAG_PREDICTOR), PREDICTOR_HORIZONTAL, 'GetField TIFFTAG_PREDICTOR';
-$tif->Close;
+my $convert;
+if ( can_run('magick') ) {
+    $convert = 'magick convert';
+}
+elsif ( $OSNAME ne 'MSWin32' and can_run('convert') ) {
+    $convert = 'convert';
+}
+SKIP: {
+    skip 'convert not installed', 2 if ( not $convert );
+    system "$convert rose: -define tiff:predictor=2 -compress lzw $file";
+    $tif = Graphics::TIFF->Open( $file, 'r' );
+    is $tif->GetField(TIFFTAG_PREDICTOR), PREDICTOR_HORIZONTAL,
+      'GetField TIFFTAG_PREDICTOR';
+    $tif->Close;
 
 #########################
 
+    system "$convert rose: -define tiff:tile-geometry=256x256 $file";
+    $tif = Graphics::TIFF->Open( $file, 'r' );
+    is( length( $tif->ReadTile( 0, 0, 0, 0 ) ), 196608, 'ReadTile' );
+    $tif->Close;
+}

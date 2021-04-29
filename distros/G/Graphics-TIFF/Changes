@@ -1,5 +1,9 @@
 Revision history for Perl extension Graphics::TIFF.
 
+12  Thu, 29 Apr 2021 22:30 +0200
+        - Changes to tests to fix RT 122933
+          (t/1.t test crashes with ImageMagick 7.0.6.9)
+
 11  Tue, 27 Apr 2021 22:30 +0200
         - Adapt tests to tiff-4.3.0.
           Closes RT 135330 (Tests fail with libtiff 4.3.0)

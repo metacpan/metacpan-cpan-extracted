@@ -4,9 +4,9 @@
       "unknown"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010",
    "license" : [
-      "unknown"
+      "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
@@ -33,7 +33,6 @@
       "develop" : {
          "requires" : {
             "Pod::Markdown" : "0",
-            "Test::CheckManifest" : "0.9",
             "Test::Pod" : "1.22"
          }
       },
@@ -50,12 +49,15 @@
    },
    "release_status" : "stable",
    "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/mohawk2/cpan-Event/issues"
+      },
       "repository" : {
          "type" : "git",
          "url" : "https://github.com/mohawk2/cpan-Event.git",
          "web" : "https://github.com/mohawk2/cpan-Event"
       }
    },
-   "version" : "1.27",
-   "x_serialization_backend" : "JSON::PP version 2.97001"
+   "version" : "1.28",
+   "x_serialization_backend" : "JSON::PP version 4.04"
 }

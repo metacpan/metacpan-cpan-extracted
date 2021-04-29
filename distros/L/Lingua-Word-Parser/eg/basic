@@ -5,11 +5,11 @@ use warnings;
 use Data::Dumper;
 use Lingua::Word::Parser;
 
-my $p = Lingua::Word::Parser->new(
-  word => shift || 'abioticaly',
-  file => 'eg/lexicon.dat',
-);
-#warn Dumper $p->{lex};
+my $word = shift || 'abioticaly';
+my $lex  = shift || 'eg/lexicon.dat';
+
+my $p = Lingua::Word::Parser->new(word => $word, file => $lex);
+#warn Dumper $p->{lex};exit;
 
 # Find the known word-part positions.
 my ($known, $masks) = $p->knowns;

@@ -1,5 +1,5 @@
 package String::TtyLength;
-$String::TtyLength::VERSION = '0.02';
+$String::TtyLength::VERSION = '0.03';
 use 5.006;
 use strict;
 use warnings;
@@ -66,7 +66,7 @@ String::TtyLength - length or width of string excluding ANSI tty codes
 
 =head1 SYNOPSIS
 
- use Text::Table::Tiny 0.02 qw/ tty_length tty_width /;
+ use String::TtyLength 0.02 qw/ tty_length tty_width /;
  $length = tty_length("\e[1mbold text\e[0m");
  print "length = $length\n";
  # 9

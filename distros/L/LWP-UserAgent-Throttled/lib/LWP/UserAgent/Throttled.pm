@@ -1,5 +1,7 @@
 package LWP::UserAgent::Throttled;
 
+use warnings;
+use strict;
 use LWP;
 use Time::HiRes;
 use LWP::UserAgent;
@@ -12,11 +14,11 @@ LWP::UserAgent::Throttled - Throttle requests to a site
 
 =head1 VERSION
 
-Version 0.06
+Version 0.08
 
 =cut
 
-our $VERSION = '0.06';
+our $VERSION = '0.08';
 
 =head1 SYNOPSIS
 
@@ -26,9 +28,9 @@ LWP::UserAgent::Throttled is a sub-class of LWP::UserAgent.
     use LWP::UserAgent::Throttled;
     my $ua = LWP::UserAgent::Throttled->new();
     $ua->throttle({ 'www.example.com' => 5 });
-    print $ua->get('http://www.example.com');
+    print $ua->get('http://www.example.com/page1.html');
     sleep (2);
-    print $ua->get('http://www.example.com');	# Will wait at least 3 seconds before the GET is sent
+    print $ua->get('http://www.example.com/page2.html');	# Will wait at least 3 seconds before the GET is sent
 
 =cut
 
@@ -55,7 +57,12 @@ sub send_request {
 			}
 		}
 	}
-	my $rc = $self->SUPER::send_request(@_);
+	my $rc;
+	if(defined($self->{'_ua'})) {
+		$rc = $self->{'_ua'}->send_request(@_);
+	} else {
+		$rc = $self->SUPER::send_request(@_);
+	}
 	$self->{'lastcallended'}{$host} = Time::HiRes::time();
 	return $rc;
 }
@@ -68,6 +75,9 @@ Get/set the number of seconds between each request for sites.
     $ua->throttle({ 'search.cpan.org' => 0.1, 'www.example.com' => 1 });
     print $ua->throttle('search.cpan.org'), "\n";    # prints 0.1
     print $ua->throttle('perl.org'), "\n";    # prints 0
+
+When setting a throttle it returns itself,
+so you can daisy chain messages.
 
 =cut
 
@@ -82,11 +92,32 @@ sub throttle {
 		foreach my $host(keys %throttles) {
 			$self->{'throttle'}{$host} = $throttles{$host};
 		}
-		return;
+		return $self;
 	}
 
 	my $host = shift;
 	return $self->{'throttle'}{$host} ? $self->{'throttle'}{$host} : 0;
+}
+
+=head2 ua
+
+Get/set the user agent if you wish to use that rather than itself
+
+    use LWP::UserAgent::Cached;
+
+    $ua->ua(LWP::UserAgent::Cached->new(cache_dir => '/home/home/.cache/lwp-cache'));
+    my $resp = $ua->get('https://www.nigelhorne.com');	# Throttles, then checks cache, then gets
+
+=cut
+
+sub ua {
+	my($self, $ua) = @_;
+
+	if($ua) {
+		$self->{_ua} = $ua;
+	}
+
+	return $self->{_ua};
 }
 
 =head1 AUTHOR
@@ -95,7 +126,11 @@ Nigel Horne, C<< <njh at bandsman.co.uk> >>
 
 =head1 BUGS
 
-There is one global throttle level, so you can't have different levels for different sites.
+Please report any bugs or feature requests to C<bug-lwp-useragent-throttled at rt.cpan.org>,
+or through the web interface at
+L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=LWP-UserAgent-Throttled>.
+I will be notified, and then you'll
+automatically be notified of progress on your bug as I make changes.
 
 =head1 SEE ALSO
 
@@ -111,27 +146,35 @@ You can also look for information at:
 
 =over 4
 
+=item * MetaCPAN
+
+L<https://metacpan.org/release/LWP-UserAgent-Throttled>
+
 =item * RT: CPAN's request tracker
 
-L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=LWP-UserAgent-Throttled>
+L<https://rt.cpan.org/NoAuth/Bugs.html?Dist=LWP-UserAgent-Throttled>
 
-=item * AnnoCPAN: Annotated CPAN documentation
+=item * CPANTS
 
-L<http://annocpan.org/dist/LWP-UserAgent-Throttled>
+L<http://cpants.cpanauthors.org/dist/LWP-UserAgent-Throttled>
+
+=item * CPAN Testers' Matrix
+
+L<http://matrix.cpantesters.org/?dist=LWP-UserAgent-Throttled>
 
 =item * CPAN Ratings
 
 L<http://cpanratings.perl.org/d/LWP-UserAgent-Throttled>
 
-=item * Search CPAN
+=item * CPAN Testers Dependencies
 
-L<http://search.cpan.org/dist/LWP-UserAgent-Throttled/>
+L<http://deps.cpantesters.org/?module=LWP::UserAgent::Throttled>
 
 =back
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2017 Nigel Horne.
+Copyright 2017-2021 Nigel Horne.
 
 This program is released under the following licence: GPL2
 

@@ -6,7 +6,7 @@ our $AUTHORITY = 'cpan:GENE';
 use strict;
 use warnings;
 
-our $VERSION = '0.0805';
+our $VERSION = '0.0806';
 
 use Bit::Vector;
 use DBI;
@@ -65,15 +65,18 @@ sub _init {
 sub _fetch_lex {
     my $self = shift;
 
+    my $i = 0;
+
     # Open the given file for reading...
-    my $fh = IO::File->new();
+    my $fh = IO::File->new;
     $fh->open( "< $self->{file}" ) or die "Can't read file: '$self->{file}'";
     for ( <$fh> ) {
+        $i++;
         # Split space-separated entries.
         chomp;
         my ($re, $defn) = split /\s+/, $_, 2;
         # Add the entry to the lexicon.
-        $self->{lex}{$re} = { defn => $defn, re => qr/$re/ };
+        $self->{lex}{$i} = { defn => $defn, re => qr/$re/ };
     }
     $fh->close;
 
@@ -88,14 +91,14 @@ sub _db_fetch {
     my $dbh = DBI->connect( $dsn, $self->{dbuser}, $self->{dbpass}, { RaiseError => 1, AutoCommit => 1 } )
       or die "Unable to connect to $self->{dbname}: $DBI::errstr\n";
 
-    my $sql = 'SELECT affix, definition FROM fragment';
+    my $sql = 'SELECT id, affix, definition FROM fragment';
 
     my $sth = $dbh->prepare($sql);
     $sth->execute or die "Unable to execute '$sql': $DBI::errstr\n";
 
     while( my @row = $sth->fetchrow_array ) {
-        my $part = $row[0];
-        $self->{lex}{$part} = { re => qr/$part/, defn => $row[1] };
+        my ($id, $part, $defn) = @row;
+        $self->{lex}{$id} = { re => qr/$part/, defn => $defn };
     }
     die "Fetch terminated early: $DBI::errstr\n" if $DBI::errstr;
 
@@ -417,7 +420,7 @@ Lingua::Word::Parser - Parse a word into scored known and unknown parts
 
 =head1 VERSION
 
-version 0.0805
+version 0.0806
 
 =head1 SYNOPSIS
 
@@ -460,12 +463,12 @@ lines of the form:
 Please see the included F<eg/lexicon.dat> example file.
 
 A database lexicon must have records as above, but with the column
-names, B<affix> and B<definition>.  Please see the included
+names, B<id>, B<affix> and B<definition>.  Please see the included
 F<eg/word_part.sql> example file.
 
 =head1 METHODS
 
-=head2 new()
+=head2 new
 
   $p = Lingua::Word::Parser->new(%arguments);
 
@@ -480,22 +483,22 @@ Arguments and defaults:
   dbtype: mysql
   dbhost: localhost
 
-=head2 knowns()
+=head2 knowns
 
   $known = $p->knowns;
 
 Find the known word parts and their bitstring masks.
 
-=head2 power()
+=head2 power
 
-  $combos = $p->power();
+  $combos = $p->power;
 
 Find the set of non-overlapping known word parts by considering the power set of
 all masks.
 
-=head2 score()
+=head2 score
 
-  $score = $p->score();
+  $score = $p->score;
   $score = $p->score( $open_separator, $close_separator);
 
 Score the known vs unknown word part combinations into ratios of characters and
@@ -511,9 +514,9 @@ This method sets the B<score> member to a list of hashrefs with keys:
 If not given, the B<$open_separator> and B<$close_separator> are '<' and '>' by
 default.
 
-=head2 score_parts()
+=head2 score_parts
 
-  $score_parts = $p->score_parts();
+  $score_parts = $p->score_parts;
   $score_parts = $p->score_parts( $open_separator, $close_separator );
   $score_parts = $p->score_parts( $open_separator, $close_separator, $line_terminator );
 
@@ -542,7 +545,7 @@ Gene Boggs <gene@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019 by Gene Boggs.
+This software is copyright (c) 2021 by Gene Boggs.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

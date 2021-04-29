@@ -25,6 +25,7 @@ Parser
 Word
 bitmasks
 gene
+knowns
 lib
 powerset
 un-digitized

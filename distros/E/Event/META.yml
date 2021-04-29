@@ -8,8 +8,8 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
-license: unknown
+generated_by: 'ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010'
+license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
@@ -21,6 +21,7 @@ no_index:
 requires:
   perl: '5.008000'
 resources:
+  bugtracker: https://github.com/mohawk2/cpan-Event/issues
   repository: https://github.com/mohawk2/cpan-Event.git
-version: '1.27'
+version: '1.28'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

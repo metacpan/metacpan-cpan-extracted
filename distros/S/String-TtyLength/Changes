@@ -1,5 +1,9 @@
 Revision history for Perl module String::TtyLength
 
+0.03 2021-04-29 NEILB
+    - SYNOPSIS was referring to Text::Table::Tiny (cut & paste error).
+      Thanks to Jonas Smedegaard for reporting this (GH#1).
+
 0.02 2020-09-12 NEILB
     - First non-developer release that includes tty_width() function.
 

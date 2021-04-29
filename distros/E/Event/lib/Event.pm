@@ -13,7 +13,7 @@ use base 'Exporter';
 use Carp;
 eval { require Carp::Heavy; };  # work around perl_call_pv bug XXX
 our $API;
-our $VERSION = '1.27';
+our $VERSION = '1.28';
 
 # If we inherit DynaLoader then we inherit AutoLoader; Bletch!
 require DynaLoader;
@@ -206,7 +206,6 @@ _load_watcher($_) for qw(idle io signal timer var);
 # use Inline with => 'Event';
 sub Inline {
     my ($class, $language) = @_;
-    return if $language ne 'C'; # Inline gives good error message
     require Event::MakeMaker;
     my $path = $Event::MakeMaker::installsitearch;
     require Config;

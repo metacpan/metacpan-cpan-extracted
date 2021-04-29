@@ -4,7 +4,7 @@
       "Nigel Horne <njh@bandsman.co.uk>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "open_source"
    ],
@@ -22,9 +22,7 @@
    "prereqs" : {
       "build" : {
          "requires" : {
-            "LWP::Protocol::https" : "0",
-            "Test::Most" : "0",
-            "Test::Timer" : "2.01"
+            "IO::Socket::INET" : "0"
          }
       },
       "configure" : {
@@ -39,13 +37,23 @@
             "Time::HiRes" : "0",
             "perl" : "5.006002"
          }
+      },
+      "test" : {
+         "requires" : {
+            "LWP::Protocol::https" : "0",
+            "Test::Most" : "0",
+            "Test::NoWarnings" : "0",
+            "Test::Timer" : "2.01",
+            "Test::URI" : "0"
+         }
       }
    },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
          "mailto" : "bug-LWP-UserAgent::Throttled@rt.cpan.org",
-         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=LWP-UserAgent::Throttled"
+         "web" : "https://github.com/nigelhorne/LWP-UserAgent-Throttled/issues",
+         "x_url" : "https://github.com/nigelhorne/LWP-UserAgent-Throttled/issues"
       },
       "repository" : {
          "type" : "git",
@@ -53,6 +61,6 @@
          "web" : "https://github.com/nigelhorne/LWP-UserAgent::Throttled"
       }
    },
-   "version" : "0.06",
-   "x_serialization_backend" : "JSON::PP version 2.94"
+   "version" : "0.08",
+   "x_serialization_backend" : "JSON::PP version 4.06"
 }

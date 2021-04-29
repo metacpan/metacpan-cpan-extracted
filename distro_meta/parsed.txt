@@ -72294,3 +72294,9 @@ P/PR/PRBRENAN/Tree-Trek-20210425.tar.gz
 B/BK/BKB/Unicode-Confuse-0.05.tar.gz
 P/PL/PLICEASE/UUID-FFI-0.08.tar.gz
 C/CH/CHOROBA/XML-XSH2-2.2.9.tar.gz
+E/EX/EXODIST/Test2-Harness-1.000051.tar.gz
+E/ET/ETJ/Event-1.28.tar.gz
+R/RA/RATCLIFFE/Graphics-TIFF-12.tar.gz
+G/GE/GENE/Lingua-Word-Parser-0.0806.tar.gz
+N/NH/NHORNE/LWP-UserAgent-Throttled-0.08.tar.gz
+N/NE/NEILB/String-TtyLength-0.03.tar.gz
