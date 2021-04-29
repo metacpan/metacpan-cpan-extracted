@@ -44,11 +44,13 @@ WriteMakefile(
 	      ##
 	      META_MERGE => {
 			     "meta-spec" => { version => 2 },
-			     repository => {
-					    url => 'git://github.com/moocow-the-bovine/PDL-CCS.git',
-					    type => 'git',
-					    web => 'https://github.com/moocow-the-bovine/PDL-CCS',
-					   },
+			     resources => {
+					   repository => {
+							  url => 'git://github.com/moocow-the-bovine/PDL-CCS.git',
+							  type => 'git',
+							  web => 'https://github.com/moocow-the-bovine/PDL-CCS',
+							 },
+					  },
 			    },
 	     );
 

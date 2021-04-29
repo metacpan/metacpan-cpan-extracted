@@ -1,7 +1,7 @@
 package Perinci::Examples::Bin::Any::Multi;
 
-our $DATE = '2020-04-29'; # DATE
-our $VERSION = '0.070'; # VERSION
+our $DATE = '2021-01-30'; # DATE
+our $VERSION = '0.071'; # VERSION
 
 use 5.010;
 use strict;
@@ -106,7 +106,7 @@ Perinci::Examples::Bin::Any::Multi - Functions to be used by peri-eg-multi-any
 
 =head1 VERSION
 
-This document describes version 0.070 of Perinci::Examples::Bin::Any::Multi (from Perl distribution Perinci-Examples-Bin-Any), released on 2020-04-29.
+This document describes version 0.071 of Perinci::Examples::Bin::Any::Multi (from Perl distribution Perinci-Examples-Bin-Any), released on 2021-01-30.
 
 =head1 FUNCTIONS
 
@@ -196,7 +196,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020, 2015, 2014 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2020, 2015, 2014 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -1,6 +1,6 @@
 use utf8;
 
-use Test::More;
+use Test::More 1.302183;
 use Test::Warnings qw/ warning /;
 
 use Encode qw/ encode_utf8 /;

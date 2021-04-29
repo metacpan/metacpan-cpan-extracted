@@ -5,7 +5,7 @@
 ##======================================================================
 
 use PDL::VectorValued::Dev;
-my $VERSION = '1.23.15'; ##-- update with perl-reversion from Perl::Version module
+my $VERSION = '1.23.16'; ##-- update with perl-reversion from Perl::Version module
 pp_setversion($VERSION);
 
 ##-- for integer-type keys

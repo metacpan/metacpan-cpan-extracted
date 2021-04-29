@@ -2,6 +2,7 @@ Changes
 etc/initialdata
 html/Callbacks/RT-Extension-ResetPassword/Admin/Users/index.html/Initial
 html/Callbacks/RT-Extension-ResetPassword/Admin/Users/index.html/InUsersAdminForm
+html/Callbacks/RT-Extension-ResetPassword/Admin/Users/index.html/ModifyCollectionListArgs
 html/Callbacks/RT-Extension-ResetPassword/Admin/Users/Modify.html/BeforeCreate
 html/Callbacks/RT-Extension-ResetPassword/Admin/Users/Modify.html/BeforeUpdate
 html/Callbacks/RT-Extension-ResetPassword/Elements/Login/Default
@@ -25,6 +26,8 @@ lib/RT/Extension/ResetPassword.pm
 Makefile.PL
 MANIFEST			This list of files
 META.yml
+patches/4-user-admin-callbacks.patch
+patches/4.4.4-user-admin-callbacks.patch
 patches/user-admin-callbacks.patch
 README
 static/css/resetpassword.css

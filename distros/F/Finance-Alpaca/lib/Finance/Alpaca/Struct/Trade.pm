@@ -1,4 +1,4 @@
-package Finance::Alpaca::Struct::Trade 0.9900 {
+package Finance::Alpaca::Struct::Trade 0.9902 {
     use strictures 2;
     use feature 'signatures';
     no warnings 'experimental::signatures';
@@ -43,7 +43,7 @@ Finance::Alpaca::Struct::Trade - A Single Trade Object
 
 =head1 DESCRIPTION
 
-The quote API provides historcial trade data for a given ticker symbol on a
+The quote API provides historical trade data for a given ticker symbol on a
 specified date.
 
 =head1 Properties

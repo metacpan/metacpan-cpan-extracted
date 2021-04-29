@@ -23,7 +23,7 @@
          "requires" : {
             "Carp" : "0",
             "Data::Dump" : "0",
-            "Data::Table::Text" : "0",
+            "Data::Table::Text" : "20210328",
             "Test2::API" : "0",
             "Test::More" : "0",
             "feature" : "0"
@@ -33,7 +33,7 @@
    "provides" : {
       "Tree::Trek" : {
          "file" : "lib/Tree/Trek.pm",
-         "version" : "20210424"
+         "version" : "20210425"
       }
    },
    "release_status" : "stable",
@@ -48,6 +48,6 @@
          "url" : "https://github.com/philiprbrenan/TreeTrek"
       }
    },
-   "version" : "20210424",
+   "version" : "20210425",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

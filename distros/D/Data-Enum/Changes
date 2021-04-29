@@ -1,0 +1,27 @@
+Revision history for Data-Enum:
+
+v0.2.0    2021-04-29 11:20:06+01:00 Europe/London
+ [Enhancements]
+ - Add `values` method.
+
+ - Moved overloaded methods to parent classes (removes slight
+   performance improvement from v0.1.1, but should reduce memory
+   footprint).
+
+ [Bug Fixes]
+ - The values are genuinely read only.
+
+ - "0" is accepted as a value.
+
+ [Documentation]
+ - Add more Enum-style modules to the SEE ALSO section.
+
+v0.1.1    2021-04-29 09:21:48+01:00 Europe/London
+ [Bug Fixes]
+ - Remove unnecessary call to SvREADONLY.
+
+ [Enhancements]
+ - Improve performance of eq/ne checks.
+
+v0.1.0    2021-04-28 23:04:24+01:00 Europe/London
+ - Initial version released.

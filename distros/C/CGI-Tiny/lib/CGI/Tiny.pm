@@ -7,7 +7,7 @@ use Carp ();
 use IO::Handle ();
 use Exporter 'import';
 
-our $VERSION = '0.009';
+our $VERSION = '0.011';
 
 use constant DEFAULT_REQUEST_BODY_LIMIT => 16777216;
 use constant DEFAULT_REQUEST_BODY_BUFFER => 262144;
@@ -306,25 +306,23 @@ sub _body_params {
       foreach my $part (@{$self->_body_multipart}) {
         next if defined $part->{filename};
         my ($name, $value, $headers) = @$part{'name','content','headers'};
-        if (uc $default_charset eq 'UTF-8' and do { local $@; eval { require Unicode::UTF8; 1 } }) {
-          $name = Unicode::UTF8::decode_utf8($name);
-        } elsif (length $default_charset) {
+        if (length $default_charset) {
           require Encode;
           $name = Encode::decode($default_charset, "$name");
         }
-        if (!defined $headers->{'content-type'} or $headers->{'content-type'} =~ m/^text\/plain\b/i) {
-          my $value_charset = $default_charset;
-          if (defined $headers->{'content-type'}) {
-            if (my ($charset_quoted, $charset_unquoted) = $headers->{'content-type'} =~ m/;\s*charset=(?:"((?:\\[\\"]|[^"])+)"|([^";]+))/i) {
-              $charset_quoted =~ s/\\([\\"])/$1/g if defined $charset_quoted;
-              $value_charset = defined $charset_quoted ? $charset_quoted : $charset_unquoted;
-            }
+        my $value_charset;
+        if (defined $headers->{'content-type'}) {
+          if (my ($charset_quoted, $charset_unquoted) = $headers->{'content-type'} =~ m/;\s*charset=(?:"((?:\\[\\"]|[^"])+)"|([^";]+))/i) {
+            $charset_quoted =~ s/\\([\\"])/$1/g if defined $charset_quoted;
+            $value_charset = defined $charset_quoted ? $charset_quoted : $charset_unquoted;
           }
-          if (uc $value_charset eq 'UTF-8' and do { local $@; eval { require Unicode::UTF8; 1 } }) {
-            $value = Unicode::UTF8::decode_utf8($value);
-          } elsif (length $value_charset) {
-            require Encode;
+        }
+        if (defined $value_charset or !defined $headers->{'content-type'} or $headers->{'content-type'} =~ m/^text\/plain\b/i) {
+          require Encode;
+          if (defined $value_charset) {
             $value = Encode::decode($value_charset, "$value");
+          } elsif (length $default_charset) {
+            $value = Encode::decode($default_charset, "$value");
           }
         }
         push @names, $name unless exists $keyed{$name};
@@ -368,10 +366,7 @@ sub _body_uploads {
       foreach my $part (@{$self->_body_multipart}) {
         next unless defined $part->{filename};
         my ($name, $filename, $file, $size, $headers) = @$part{'name','filename','file','size','headers'};
-        if (uc $default_charset eq 'UTF-8' and do { local $@; eval { require Unicode::UTF8; 1 } }) {
-          $name = Unicode::UTF8::decode_utf8($name);
-          $filename = Unicode::UTF8::decode_utf8($filename);
-        } elsif (length $default_charset) {
+        if (length $default_charset) {
           require Encode;
           $name = Encode::decode($default_charset, "$name");
           $filename = Encode::decode($default_charset, "$filename");
@@ -425,11 +420,13 @@ sub _body_multipart {
       $input = defined $self->{input_handle} ? $self->{input_handle} : *STDIN;
       binmode $input;
     }
-    my $parts = _parse_multipart($input, $length, $boundary, $self->{request_body_buffer});
+
+    my $parts = _parse_multipart($input, $length, $boundary, $self->{request_body_buffer} || $ENV{CGI_TINY_REQUEST_BODY_BUFFER});
     unless (defined $parts) {
       $self->{response_status} = "400 $HTTP_STATUS{400}" unless $self->{headers_rendered};
       die "Malformed multipart/form-data request\n";
     }
+
     $self->{body_parts} = $parts;
   }
   return $self->{body_parts};
@@ -445,6 +442,8 @@ sub set_nph {
   return $self;
 }
 
+sub set_response_fixed_length { $_[0]{response_fixed_length} = $_[1]; $_[0] }
+
 sub set_response_body_buffer { $_[0]{response_body_buffer} = $_[1]; $_[0] }
 
 sub set_response_status {
@@ -452,42 +451,49 @@ sub set_response_status {
   if ($self->{headers_rendered}) {
     Carp::carp "Attempted to set HTTP response status but headers have already been rendered";
   } else {
-    if ($status =~ m/\A[0-9]+ [^\r\n]*\z/) {
+    if (defined $status and $status =~ m/\A[0-9]+ [^\r\n]*\z/) {
       $self->{response_status} = $status;
-    } else {
+    } elsif (defined $status) {
       Carp::croak "Attempted to set unknown HTTP response status $status" unless exists $HTTP_STATUS{$status};
       $self->{response_status} = "$status $HTTP_STATUS{$status}";
+    } else {
+      delete $self->{response_status};
     }
   }
   return $self;
 }
 
-sub set_response_content_type {
+{
+  my %DISPOSITIONS = (attachment => 1, inline => 1);
+  sub set_response_disposition {
+    my ($self, $disposition, $filename) = @_;
+    if ($self->{headers_rendered}) {
+      Carp::carp "Attempted to set HTTP response content disposition but headers have already been rendered";
+    } else {
+      Carp::croak "Attempted to set unknown Content-Disposition value '$disposition'" unless exists $DISPOSITIONS{lc $disposition};
+      $self->{response_disposition} = $disposition;
+      # filename will be quoted/escaped later
+      $self->{response_filename} = $filename;
+    }
+    return $self;
+  }
+}
+
+sub set_response_type {
   my ($self, $content_type) = @_;
   if ($self->{headers_rendered}) {
     Carp::carp "Attempted to set HTTP response content type but headers have already been rendered";
   } else {
-    Carp::croak "Newline characters not allowed in HTTP response content type" if $content_type =~ tr/\r\n//;
-    $self->{response_content_type} = $content_type;
+    Carp::croak "Newline characters not allowed in HTTP response content type" if defined $content_type and $content_type =~ tr/\r\n//;
+    $self->{response_type} = $content_type;
   }
   return $self;
 }
 
 sub set_response_charset {
   my ($self, $charset) = @_;
-  Carp::croak "Invalid characters in HTTP response charset" if $charset =~ m/[^a-zA-Z0-9!#\$%&'*+\-.^_`|~]/;
+  Carp::croak "Invalid characters in HTTP response charset" if defined $charset and $charset =~ m/[^a-zA-Z0-9!#\$%&'*+\-.^_`|~]/;
   $self->{response_charset} = $charset;
-  return $self;
-}
-
-sub set_response_download {
-  my ($self, $filename) = @_;
-  if ($self->{headers_rendered}) {
-    Carp::carp "Attempted to set HTTP response content disposition but headers have already been rendered";
-  } else {
-    $self->{response_attachment} = 1;
-    $self->{response_filename} = $filename;
-  }
   return $self;
 }
 
@@ -531,6 +537,8 @@ sub add_response_header {
   }
 }
 
+sub reset_response_headers { delete $_[0]{response_headers}; $_[0] }
+
 sub response_status_code {
   my ($self) = @_;
   if (defined $self->{response_status} and $self->{response_status} =~ m/\A([0-9]+)/) {
@@ -549,22 +557,63 @@ sub headers_rendered { $_[0]{headers_rendered} }
     Carp::croak "Don't know how to render '$type'" if length $type and !exists $RENDER_TYPES{$type};
     my $charset = $self->{response_charset};
     $charset = 'UTF-8' unless defined $charset;
+
+    my $fixed_length = $self->{response_fixed_length} && !$self->{headers_rendered};
+    my ($response_body, $response_length);
+    if ($type eq 'json') {
+      $response_body = $self->_json->encode($data);
+      $response_length = length $response_body if $fixed_length;
+    } elsif ($type eq 'html' or $type eq 'xml' or $type eq 'text') {
+      if (uc $charset eq 'UTF-8' and do { local $@; eval { require Unicode::UTF8; 1 } }) {
+        $response_body = Unicode::UTF8::encode_utf8($data);
+      } else {
+        require Encode;
+        $response_body = Encode::encode($charset, "$data");
+      }
+      $response_length = length $response_body if $fixed_length;
+    } elsif ($type eq 'data') {
+      $response_body = $data;
+      $response_length = length $response_body if $fixed_length;
+    } elsif ($type eq 'file' and $fixed_length) {
+      $response_length = -s $data;
+      Carp::croak "Failed to retrieve size of file '$data': $!" unless defined $response_length;
+    } elsif ($type eq 'redirect' or ($fixed_length and !length $type)) {
+      $response_length = 0;
+    }
+
     my $out_fh = defined $self->{output_handle} ? $self->{output_handle} : *STDOUT;
     if (!$self->{headers_rendered}) {
-      my @headers = @{$self->{response_headers} || []};
       my $headers_str = '';
       my %headers_set;
-      foreach my $header (@headers) {
+      foreach my $header (@{$self->{response_headers} || []}) {
         my ($name, $value) = @$header;
         $headers_str .= "$name: $value\r\n";
         $headers_set{lc $name} = 1;
+      }
+      if (!$headers_set{'content-length'} and defined $response_length) {
+        $headers_str = "Content-Length: $response_length\r\n$headers_str";
+        $self->{response_fixed_length_set} = 1;
+      }
+      if (!$headers_set{'content-disposition'} and (defined $self->{response_disposition} or defined $self->{response_filename})) {
+        my $value = defined $self->{response_disposition} ? $self->{response_disposition} : 'inline';
+        if (defined(my $filename = $self->{response_filename})) {
+          require Encode;
+          my $quoted_filename = Encode::encode('ISO-8859-1', "$filename");
+          $quoted_filename =~ tr/\r\n/  /;
+          $quoted_filename =~ s/([\\"])/\\$1/g;
+          $value .= "; filename=\"$quoted_filename\"";
+          my $ext_filename = Encode::encode('UTF-8', "$filename");
+          $ext_filename =~ s/([^a-zA-Z0-9!#\$&+\-.^_`|~])/sprintf '%%%02X', ord $1/ge;
+          $value .= "; filename*=UTF-8''$ext_filename";
+        }
+        $headers_str = "Content-Disposition: $value\r\n$headers_str" unless lc $value eq 'inline';
       }
       if (!$headers_set{location} and $type eq 'redirect') {
         Carp::croak "Newline characters not allowed in HTTP redirect" if $data =~ tr/\r\n//;
         $headers_str = "Location: $data\r\n$headers_str";
       }
       if (!$headers_set{'content-type'} and $type ne 'redirect') {
-        my $content_type = $self->{response_content_type};
+        my $content_type = $self->{response_type};
         $content_type =
             $type eq 'json' ? 'application/json;charset=UTF-8'
           : $type eq 'html' ? "text/html;charset=$charset"
@@ -573,22 +622,6 @@ sub headers_rendered { $_[0]{headers_rendered} }
           : 'application/octet-stream'
           unless defined $content_type;
         $headers_str = "Content-Type: $content_type\r\n$headers_str";
-      }
-      if (!$headers_set{'content-disposition'} and $self->{response_attachment}) {
-        my $filename = $self->{response_filename};
-        my $value = 'attachment';
-        if (defined $filename and length $filename) {
-          require Encode;
-          my $quoted_filename = Encode::encode('ISO-8859-1', $filename);
-          $quoted_filename =~ tr/\r\n/  /;
-          $quoted_filename =~ s/([\\"])/\\$1/g;
-          $value .= "; filename=\"$quoted_filename\"";
-          my $ext_filename = $filename;
-          utf8::encode $ext_filename;
-          $ext_filename =~ s/([^a-zA-Z0-9!#\$&+\-.^_`|~])/sprintf '%%%02X', ord $1/ge;
-          $value .= "; filename*=UTF-8''$ext_filename";
-        }
-        $headers_str .= "Content-Disposition: $value\r\n";
       }
       if (!$headers_set{date}) {
         my $date_str = epoch_to_date(time);
@@ -611,18 +644,13 @@ sub headers_rendered { $_[0]{headers_rendered} }
       $self->{headers_rendered} = 1;
     } elsif ($type eq 'redirect') {
       Carp::carp "Attempted to render a redirect but headers have already been rendered";
+    } elsif ($self->{response_fixed_length_set}) {
+      Carp::carp "Attempted to render additional response data but a fixed length response has already been rendered";
+      return $self;
     }
-    if ($type eq 'json') {
-      $out_fh->printflush($self->_json->encode($data));
-    } elsif ($type eq 'html' or $type eq 'xml' or $type eq 'text') {
-      if (uc $charset eq 'UTF-8' and do { local $@; eval { require Unicode::UTF8; 1 } }) {
-        $out_fh->printflush(Unicode::UTF8::encode_utf8($data));
-      } else {
-        require Encode;
-        $out_fh->printflush(Encode::encode($charset, "$data"));
-      }
-    } elsif ($type eq 'data') {
-      $out_fh->printflush($data);
+
+    if ($type eq 'json' or $type eq 'html' or $type eq 'xml' or $type eq 'text' or $type eq 'data') {
+      $out_fh->printflush($response_body);
     } elsif ($type eq 'file' or $type eq 'handle') {
       my $in_fh;
       if ($type eq 'file') {
@@ -637,6 +665,7 @@ sub headers_rendered { $_[0]{headers_rendered} }
       }
       $out_fh->flush;
     }
+    return $self;
   }
 }
 
@@ -665,7 +694,7 @@ sub _parse_multipart {
       $buffer .= $$input;
       $length = 0;
     } else {
-      my $chunk = $buffer_size || $ENV{CGI_TINY_REQUEST_BODY_BUFFER} || DEFAULT_REQUEST_BODY_BUFFER;
+      my $chunk = $buffer_size || DEFAULT_REQUEST_BODY_BUFFER;
       $chunk = $length if $length < $chunk;
       last unless my $read = read $input, $buffer, $chunk, length $buffer;
       $length -= $read;
@@ -703,13 +732,11 @@ sub _parse_multipart {
 
           $state{part}{headers}{lc $name} = $value;
           if (lc $name eq 'content-disposition') {
-            if (my ($name_quoted, $name_unquoted) = $value =~ m/;\s*name\s*=\s*(?:"((?:\\[\\"]|[^"])*)"|([^";]*))/i) {
-              $name_quoted =~ s/\\([\\"])/$1/g if defined $name_quoted;
-              $state{part}{name} = defined $name_quoted ? $name_quoted : $name_unquoted;
-            }
-            if (my ($filename_quoted, $filename_unquoted) = $value =~ m/;\s*filename\s*=\s*(?:"((?:\\[\\"]|[^"])*)"|([^";]*))/i) {
-              $filename_quoted =~ s/\\([\\"])/$1/g if defined $filename_quoted;
-              $state{part}{filename} = defined $filename_quoted ? $filename_quoted : $filename_unquoted;
+            while ($value =~ m/;\s*([^=\s]+)\s*=\s*(?:"((?:\\[\\"]|[^"])*)"|([^";]*))/ig) {
+              my ($field_name, $field_quoted, $field_unquoted) = ($1, $2, $3);
+              next unless lc $field_name eq 'name' or lc $field_name eq 'filename';
+              $field_quoted =~ s/\\([\\"])/$1/g if defined $field_quoted;
+              $state{part}{lc $field_name} = defined $field_quoted ? $field_quoted : $field_unquoted;
             }
           }
         }

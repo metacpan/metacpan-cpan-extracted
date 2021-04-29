@@ -3,6 +3,8 @@ use strict;
 use warnings;
 use Moo;
 extends "Archive::BagIt";
+our $VERSION = '0.074'; # VERSION
+# ABSTRACT: deprecated, used for backwards compatibility
 
 
 __PACKAGE__->meta->make_immutable;
@@ -17,11 +19,11 @@ __END__
 
 =head1 NAME
 
-Archive::BagIt::Base
+Archive::BagIt::Base - deprecated, used for backwards compatibility
 
 =head1 VERSION
 
-version 0.073
+version 0.074
 
 =head1 NAME
 

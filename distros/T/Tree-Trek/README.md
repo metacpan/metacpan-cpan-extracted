@@ -3,6 +3,8 @@
 
 ![Test](https://github.com/philiprbrenan/TreeTrek/workflows/Test/badge.svg)
 
+Also available on [CPAN](https://metacpan.org/pod/Tree::Trek)
+
 Test cases can be seen at the end of [file](https://en.wikipedia.org/wiki/Computer_file) **lib/Tree/Trek.pm**.  The [test](https://en.wikipedia.org/wiki/Software_testing) cases
 are run by the [GitHub Action](https://docs.github.com/en/free-pro-team@latest/actions/quickstart). 
 

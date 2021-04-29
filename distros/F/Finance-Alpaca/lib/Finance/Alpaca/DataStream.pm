@@ -1,4 +1,4 @@
-package Finance::Alpaca::DataStream 0.9900 {
+package Finance::Alpaca::DataStream 0.9902 {
     use strictures 2;
     use Moo;
     use feature 'signatures';
@@ -292,6 +292,8 @@ conditions may apply to data transmitted through this module.
 =head1 AUTHOR
 
 Sanko Robinson E<lt>sanko@cpan.orgE<gt>
+
+=for stopwords unsubscribe unsubscribing unsubscribed websocket
 
 =cut
 # https://alpaca.markets/docs/api-documentation/api-v2/market-data/alpaca-data-api-v2/real-time/

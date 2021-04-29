@@ -27,7 +27,7 @@ no_index:
 provides:
   CGI::Tiny:
     file: lib/CGI/Tiny.pm
-    version: '0.009'
+    version: '0.011'
 recommends:
   Cpanel::JSON::XS: '4.09'
   Unicode::UTF8: '0'
@@ -45,7 +45,7 @@ resources:
   bugtracker: https://github.com/Grinnz/CGI-Tiny/issues
   homepage: https://github.com/Grinnz/CGI-Tiny
   repository: https://github.com/Grinnz/CGI-Tiny.git
-version: '0.009'
+version: '0.011'
 x_contributors:
   - 'Dan Book <grinnz@grinnz.com>'
 x_generated_by_perl: v5.32.1

@@ -6,9 +6,9 @@ use AnyEvent::Finger::Server;
 
 my $bind;
 
-my $server = eval { 
-  AnyEvent::Finger::Server->new( 
-    port     => 0, 
+my $server = eval {
+  AnyEvent::Finger::Server->new(
+    port     => 0,
     hostname => '127.0.0.1',
     on_bind  => sub { $bind->send },
   );
@@ -16,7 +16,7 @@ my $server = eval {
 diag $@ if $@;
 isa_ok $server, 'AnyEvent::Finger::Server';
 
-eval { 
+eval {
   $bind = AnyEvent->condvar;
   $server->start(
     sub {
@@ -49,9 +49,9 @@ subtest t1 => sub {
     ($lines) = shift;
     $done->send;
   });
-  
+
   $done->recv;
-  
+
   is $lines->[0], "request = ''", 'response is correct';
   like $lines->[1], qr/^[1-9]\d*$/, "remote_port = " . $lines->[1];
   is $lines->[2], $port, "local_port = " . $port;
@@ -66,9 +66,9 @@ subtest t2 => sub {
     $lines = shift;
     $done->send;
   });
-  
+
   $done->recv;
-  
+
   is $lines->[0], "request = 'grimlock'", 'response is correct';
 };
 
@@ -95,15 +95,15 @@ $client = AnyEvent::Finger::Client->new( port => $port, on_error => sub { say ST
 
 subtest t3 => sub {
   my $done = AnyEvent->condvar;
-  
+
   my $lines;
   $client->finger('/W grimlock@localhost@foo@bar@baz', sub {
     $lines = shift;
     $done->send;
   });
-  
+
   $done->recv;
-  
+
   # request_isa: AnyEvent::Finger::Request
   # verbose:     1
   # username:    grimlock

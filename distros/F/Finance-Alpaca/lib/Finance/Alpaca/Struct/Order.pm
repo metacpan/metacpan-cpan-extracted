@@ -1,4 +1,4 @@
-package Finance::Alpaca::Struct::Order 0.9900 {
+package Finance::Alpaca::Struct::Order 0.9902 {
     use strictures 2;
     use feature 'signatures';
     no warnings 'experimental::signatures';
@@ -104,7 +104,7 @@ The following properties are contained in the object.
 
 =item C<asset_class> - Asset class
 
-=item C<notional> - Ordered notional amount. If entered, C<qty( )> will be undefined. Can take u pto C<9> decimal places.
+=item C<notional> - Ordered notional amount. If entered, C<qty( )> will be undefined. Can take up to C<9> decimal places.
 
 =item C<qty> - Ordered quantity. If entered, C<notional( )> will be undefined. Can take up to C<9> decimal places.
 
@@ -128,7 +128,7 @@ The following properties are contained in the object.
 
 =item C<extended_hours> - Boolean value indicating whether the order is eligible for execution outside regular trading hours
 
-=item C<legs> - List of Orders; When querying non-simple C<order_class> order in a nested style, an arry of Order objects associated with this order. Otherwise, undefined.
+=item C<legs> - List of Orders; When querying non-simple C<order_class> order in a nested style, an array of Order objects associated with this order. Otherwise, undefined.
 
 =item C<trail_percent> - The percent value away from the high water mark for trailing stop orders, if applicable.
 

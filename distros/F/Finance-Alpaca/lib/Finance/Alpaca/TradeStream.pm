@@ -1,4 +1,4 @@
-package Finance::Alpaca::TradeStream 0.9900 {
+package Finance::Alpaca::TradeStream 0.9902 {
     use strictures 2;
     use Moo;
     use feature 'signatures';

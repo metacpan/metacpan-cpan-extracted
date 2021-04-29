@@ -29,3 +29,41 @@ index 4bcfc2e95..e819b3393 100644
  $caption = loc("Users matching search criteria");
  my @users_queries = ();
  push @users_queries, { field => $UserField, op => $UserOp, string => $UserString } if length $UserString;
+
+commit 73d82646143a5b72ac09902c93a0cbb330fd0e8b
+Author: sunnavy <sunnavy@bestpractical.com>
+Date:   Sat Apr 24 02:53:52 2021 +0800
+
+    Add ModifyCollectionListArgs callback to user admin index page
+    
+    The initial reason is: customization code that adds extra search
+    parameters can use this callback to pass them to paging URLs
+    accordingly.
+
+diff --git a/share/html/Admin/Users/index.html b/share/html/Admin/Users/index.html
+index a686e34422..c919f31b22 100644
+--- a/share/html/Admin/Users/index.html
++++ b/share/html/Admin/Users/index.html
+@@ -160,7 +160,8 @@ jQuery(function(){
+ % } else {
+ <p><&|/l&>Select a user</&>:</p>
+ 
+-<& /Elements/CollectionList,
++<%perl>
++my %collection_list_args = (
+     OrderBy => 'Name',
+     Order => 'ASC',
+     Rows  => $Rows,
+@@ -169,7 +170,11 @@ jQuery(function(){
+     Collection => $users,
+     AllowSorting => 1,
+     PassArguments => [qw(Format Rows Page Order OrderBy UserString UserOp UserField UserString2 UserOp2 UserField2 UserString3 UserOp3 UserField3 IdLike EmailLike FindDisabledUsers)],
+-&>
++);
++</%perl>
++
++% $m->callback( %ARGS, UsersObj => $users, CallbackName => 'ModifyCollectionListArgs', CollectionListArgs => \%collection_list_args );
++<& /Elements/CollectionList, %collection_list_args &>
+ 
+ % }
+ 

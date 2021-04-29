@@ -1,5 +1,5 @@
 # Exclude the author-only build scripts
-(build|make-pod|clean|make-confusables)\.pl
+(build|make-pod|clean|make-confusables|versionup)\.pl
 # Exclude the built module
 blib/.*
 # Exclude all git files
@@ -23,3 +23,5 @@ MYMETA..*
 ^examples/.*-out\.txt$
 # Author tests
 ^xt/.*.t$
+# Metadata file extracted from confusables.txt
+^confusables-metadata\.json$

@@ -2,13 +2,12 @@ package AnyEvent::Finger;
 
 use strict;
 use warnings;
-use Exporter ();
+use base qw( Exporter );
 
-our @ISA = qw( Exporter );
 our @EXPORT_OK = qw( finger_client finger_server );
 
 # ABSTRACT: Simple asynchronous finger client and server
-our $VERSION = '0.11'; # VERSION
+our $VERSION = '0.12'; # VERSION
 
 
 sub finger_client ($$$;$)
@@ -23,7 +22,7 @@ sub finger_client ($$$;$)
 
 
 # keep the server object in scope so that
-# we don't unbind from the port.  If you 
+# we don't unbind from the port.  If you
 # don't want this, then use the OO interface
 # for ::Server instead.
 my $keep = [];
@@ -52,7 +51,7 @@ AnyEvent::Finger - Simple asynchronous finger client and server
 
 =head1 VERSION
 
-version 0.11
+version 0.12
 
 =head1 SYNOPSIS
 
@@ -102,8 +101,8 @@ server:
 
 =head1 DESCRIPTION
 
-This distribution provides an asynchronous finger server and 
-client which can be used by any event loop supported by 
+This distribution provides an asynchronous finger server and
+client which can be used by any event loop supported by
 L<AnyEvent>.  This specific module provides a simple procedural
 interface to client and server classes also in this distribution.
 
@@ -130,8 +129,8 @@ on the options and the callback.
 
 Finger is an oldish protocol and almost nobody uses it anymore.
 
-Most finger clients do not have a way to configure an alternate port.  
-Binding to the default port 79 on Unix usually requires root.  Running 
+Most finger clients do not have a way to configure an alternate port.
+Binding to the default port 79 on Unix usually requires root.  Running
 L<AnyEvent::Finger::Server> as root is not recommended.
 
 Under Linux you can use C<iptables> to forward requests to port 79 to
@@ -194,7 +193,7 @@ Graham Ollis <plicease@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2012 by Graham Ollis.
+This software is copyright (c) 2012-2021 by Graham Ollis.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

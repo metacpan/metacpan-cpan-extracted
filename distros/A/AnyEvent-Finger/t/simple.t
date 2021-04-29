@@ -4,12 +4,12 @@ use Test::More tests => 3;
 use AnyEvent;
 use AnyEvent::Finger qw( finger_server finger_client );
 
-our $timeout = AnyEvent->timer( 
-  after => 15, 
+our $timeout = AnyEvent->timer(
+  after => 15,
   cb    => sub { diag "TIMEOUT"; exit },
 );
 
-my $port = eval { 
+my $port = eval {
   my $bind = AnyEvent->condvar;
   my $server = finger_server sub {
     my $tx = shift;
@@ -36,9 +36,9 @@ subtest t1 => sub {
     ($lines) = shift;
     $done->send;
   }, { port => $port, on_error => $error};
-  
+
   $done->recv;
-  
+
   is $lines->[0], "request = ''", 'response is correct';
 };
 
@@ -50,8 +50,8 @@ subtest t2 => sub {
     ($lines) = shift;
     $done->send;
   }, { port => $port, on_error => $error };
-  
+
   $done->recv;
-  
+
   is $lines->[0], "request = 'grimlock'", 'response is correct';
 };

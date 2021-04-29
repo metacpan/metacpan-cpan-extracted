@@ -469,8 +469,13 @@ has template => sub {
     # don't use L, use dbLookup instead
     monkey_patch $mt->namespace,
         L => $dbLookup;
+
     monkey_patch $mt->namespace,
         dbLookup => $dbLookup;
+
+    monkey_patch $mt->namespace,
+        app => sub { $self->app };
+
     monkey_patch $mt->namespace,
         slurp => sub {
             my $filename = shift;

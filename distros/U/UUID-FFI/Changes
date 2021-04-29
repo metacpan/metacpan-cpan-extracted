@@ -1,5 +1,8 @@
 Revision history for UUID-FFI
 
+0.08      2021-04-28 11:27:35 -0600
+  - Fixed bug in use of overload (gh#3)
+
 0.07      2018-09-03 09:38:14 -0400
   - Fallback on Alien::libuuid, if there is not libuuid already installed
 

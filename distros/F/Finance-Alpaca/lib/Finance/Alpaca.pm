@@ -1,4 +1,4 @@
-package Finance::Alpaca 0.9901 {
+package Finance::Alpaca 0.9902 {
     use strictures 2;
     use Moo;
     use feature 'signatures';
@@ -414,7 +414,7 @@ B<Note>: This is a false value by default.
     my $acct = $camelid->account( );
     CORE::say sprintf 'I can%s short!', $acct->shorting_enabled ? '' : 'not';
 
-Returns a Finance::Alpaca::Struct::Account object.
+Returns a L<Finance::Alpaca::Struct::Account> object.
 
 The account endpoint serves important information related to an account,
 including account status, funds available for trade, funds available for
@@ -427,7 +427,7 @@ withdrawal, and various flags relevant to an account’s ability to trade.
         $clock->timestamp->strftime('It is %l:%M:%S %p on a %A and the market is %%sopen!'),
         $clock->is_open ? '' : 'not ';
 
-Returns a Finance::Alpaca::Struct::Clock object.
+Returns a L<Finance::Alpaca::Struct::Clock> object.
 
 The clock endpoint serves the current market timestamp, whether or not the
 market is currently open, as well as the times of the next market open and
@@ -444,7 +444,7 @@ close.
                 $day->date, $day->open;
         }
 
-Returns a list of Finance::Alpaca::Struct::Calendar objects.
+Returns a list of L<Finance::Alpaca::Struct::Calendar> objects.
 
 The calendar endpoint serves the full list of market days from 1970 to 2029.
 
@@ -466,7 +466,7 @@ begin on January 1st, 1970.
     say $_->symbol
         for sort { $a->symbol cmp $b->symbol } @{ $camelid->assets( status => 'active' ) };
 
-Returns a list of Finance::Alpaca::Struct::Asset objects.
+Returns a list of L<Finance::Alpaca::Struct::Asset> objects.
 
 The assets endpoint serves as the master list of assets available for trade and
 data consumption from Alpaca.
@@ -486,10 +486,10 @@ The following parameters are accepted:
     my $msft = $camelid->asset('MSFT');
     my $spy  = $camelid->asset('b28f4066-5c6d-479b-a2af-85dc1a8f16fb');
 
-Returns a Finance::Alpaca::Struct::Asset object.
+Returns a L<Finance::Alpaca::Struct::Asset> object.
 
 You may use either the asset's C<id> (UUID) or C<symbol>. If the asset is not
-found, an empty list is retured.
+found, an empty list is returned.
 
 =head2 C<bars( ... )>
 
@@ -500,7 +500,8 @@ found, an empty list is retured.
         end       => Time::Moment->now->minus_minutes(20)
     );
  
-Returns a list of Finance::Alpaca::Struct::Bar objects along with other data.
+Returns a list of L<Finance::Alpaca::Struct::Bar> objects along with other
+data.
 
 The bar endpoint serves aggregate historical data for the requested securities.
 
@@ -516,7 +517,7 @@ The following parameters are accepted:
 
 =item C<limit> - Number of data points to return. Must be in range C<1-10000>, defaults to C<1000>
 
-=item C<page_token> - Pagination token to contine from
+=item C<page_token> - Pagination token to continue from
 
 =item C<timeframe> - Timeframe for the aggregation. Available values are: C<1Min>, C<1Hour>, and C<1Day>; this is required
 
@@ -533,7 +534,8 @@ symbol as well as a C<next_page_token> for pagination if applicable.
         end    => Time::Moment->now->minus_minutes(20)
     );
 
-Returns a list of Finance::Alpaca::Struct::Quote objects along with other data.
+Returns a list of L<Finance::Alpaca::Struct::Quote> objects along with other
+data.
 
 The bar endpoint serves quote (NBBO) historical data for the requested
 security.
@@ -550,7 +552,7 @@ The following parameters are accepted:
 
 =item C<limit> - Number of data points to return. Must be in range C<1-10000>, defaults to C<1000>
 
-=item C<page_token> - Pagination token to contine from
+=item C<page_token> - Pagination token to continue from
 
 =back
 
@@ -558,7 +560,7 @@ The data returned includes the following data:
 
 =over
 
-=item C<quotes> - List of Finance::Alpaca::Struct::Quote objects
+=item C<quotes> - List of L<Finance::Alpaca::Struct::Quote> objects
 
 =item C<next_page_token> - Token that can be used to query the next page
 
@@ -574,9 +576,10 @@ The data returned includes the following data:
         end    => Time::Moment->now->minus_minutes(20)
     );
 
-Returns a list of Finance::Alpaca::Struct::Trade objects along with other data.
+Returns a list of L<Finance::Alpaca::Struct::Trade> objects along with other
+data.
 
-The bar endpoint serves  historcial trade data for a given ticker symbol on a
+The bar endpoint serves historical trade data for a given ticker symbol on a
 specified date.
 
 The following parameters are accepted:
@@ -591,7 +594,7 @@ The following parameters are accepted:
 
 =item C<limit> - Number of data points to return. Must be in range C<1-10000>, defaults to C<1000>
 
-=item C<page_token> - Pagination token to contine from
+=item C<page_token> - Pagination token to continue from
 
 =back
 
@@ -599,7 +602,7 @@ The data returned includes the following data:
 
 =over
 
-=item C<trades> - List of Finance::Alpaca::Struct::Quote objects
+=item C<trades> - List of L<Finance::Alpaca::Struct::Quote> objects
 
 =item C<next_page_token> - Token that can be used to query the next page
 
@@ -611,11 +614,11 @@ The data returned includes the following data:
 
     my $stream = $camelid->trade_stream( sub ($packet) {  ... } );
 
-Returns a new Finance::Alpaca::TradeStream object.
+Returns a new L<Finance::Alpaca::TradeStream> object.
 
 You are ready to receive real-time account and order data!
 
-This method expects a code reference. This callback will recieve all incoming
+This method expects a code reference. This callback will receive all incoming
 data.
 
 =head2 C<data_stream( ... )>
@@ -625,22 +628,22 @@ data.
         trades => ['MSFT']
     );
 
-Returns a new Finance::Alpaca::DataStream object.
+Returns a new L<Finance::Alpaca::DataStream> object.
 
 You are ready to receive real-time market data!
 
 You can send one or more subscription messages (described in
-Finance::Alpaca::DataStream) and after confirmation you will receive the
+L<Finance::Alpaca::DataStream>) and after confirmation you will receive the
 corresponding market data.
 
-This method expects a code reference. This callback will recieve all incoming
+This method expects a code reference. This callback will receive all incoming
 data.
 
 =head2 C<orders( [...] )>
 
     my $orders = $camelid->orders( status => 'open' );
 
-Returns a list of Finance::Alpaca::Struct::Order objects.
+Returns a list of L<Finance::Alpaca::Struct::Order> objects.
 
 The orders endpoint returns a list of orders for the account, filtered by the
 supplied parameters.
@@ -669,13 +672,13 @@ The following parameters are accepted:
 
     my $order = $camelid->order_by_id('0f43d12c-8f13-4bff-8597-c665b66bace4');
 
-Returns a Finance::Alpaca::Struct::Order object.
+Returns a L<Finance::Alpaca::Struct::Order> object.
 
 You must provide the order's C<id> (UUID). If the order is not found, an empty
-list is retured.
+list is returned.
 
 You may also provide a boolean value; if true, the result will roll up
-multi-leg orders unter the C<legs( )> field in primary order.
+multi-leg orders under the C<legs( )> field in primary order.
 
     my $order = $camelid->order_by_id('0f43d12c-8f13-4bff-8597-c665b66bace4', 1);
 
@@ -683,10 +686,10 @@ multi-leg orders unter the C<legs( )> field in primary order.
 
     my $order = $camelid->order_by_client_id('17ff6b86-d330-4ac1-808b-846555b75b6e');
 
-Returns a Finance::Alpaca::Struct::Order object.
+Returns a L<Finance::Alpaca::Struct::Order> object.
 
 You must provide the order's C<client_order_id> (UUID). If the order is not
-found, an empty list is retured.
+found, an empty list is returned.
 
 =head2 C<create_order( ... )>
 
@@ -699,8 +702,8 @@ found, an empty list is retured.
     );
 
 If the order is placed successfully, this method returns a
-Finance::Alpaca::Struct::Order object. Failures result in hash references with
-data from the API.
+L<Finance::Alpaca::Struct::Order> object. Failures result in hash references
+with data from the API.
 
 An order request may be rejected if the account is not authorized for trading,
 or if the tradable balance is insufficient to fill the order.
@@ -747,7 +750,7 @@ The following parameters are accepted:
 
 =over
 
-=item C<stop_price> - Required for braket orders
+=item C<stop_price> - Required for bracket orders
 
 =item C<limit_price> - The stop-loss order becomes a stop-limit order if specified
 
@@ -836,7 +839,7 @@ cancel request, it returns status 204 and a true value.
     $camelid->positions( );
 
 Retrieves a list of the account’s open positions and returns a list of
-Finance::Alpaca::Struct::Positon objects.
+L<Finance::Alpaca::Struct::Position> objects.
 
 =head2 C<position( ... )>
 
@@ -844,7 +847,7 @@ Finance::Alpaca::Struct::Positon objects.
     my $msft = $camelid->position( 'b6d1aa75-5c9c-4353-a305-9e2caa1925ab' );
 
 Retreves the account's open position for the given symbol or asset ID and
-returns a Finance::Alpaca::Struct::Positoin object if found.
+returns a L<Finance::Alpaca::Struct::Position> object if found.
 
 If not found, and empty list is returned.
 
@@ -864,7 +867,7 @@ elements:
 
 =over
 
-=item C<body> - Finance::Alpaca::Struct::Order object
+=item C<body> - L<Finance::Alpaca::Struct::Order> object
 
 =item C<id> - the order ID (UUID)
 
@@ -880,8 +883,8 @@ A response will be provided for each position that is attempted to be closed.
     $order    = $camelid->close_position( 'b6d1aa75-5c9c-4353-a305-9e2caa1925ab' );
 
 Closes (liquidates) the account’s open position for the given symbol or asset
-ID and returns a Finance::Alpaca::Struct::Order object. Works for both long and
-short positions.
+ID and returns a L<Finance::Alpaca::Struct::Order> object. Works for both long
+and short positions.
 
     my $order = $camelid->close_position('MSFT', 0.5);
 
@@ -934,7 +937,7 @@ The returned data is in a hash ref with the following keys:
     my @watchlists = $camelid->watchlists;
 
 Returns the list of watchlists registered under the account as
-Finance::Alpaca::Struct::Watchlist objects.
+L<Finance::Alpaca::Struct::Watchlist> objects.
 
 =head2 C<create_watchlist( ..., [...] )>
 
@@ -946,7 +949,8 @@ first parameter is required and is the name of the user-defined new watchlist.
 This name must be a maximum of C<64> characters. To add assets to the watchlist
 on create, include a list of ticker symbols.
 
-On success, the related Finance::Alpaca::Struct::Watchlist object is returned.
+On success, the related L<Finance::Alpaca::Struct::Watchlist> object is
+returned.
 
 =head2 C<delete_watchlist( ... )>
 
@@ -966,21 +970,21 @@ Returns a watchlist identified by the ID.
     $camelid->update_watchlist( '29d85812-b4a2-45da-ac6c-dcc0ad9c1cd3', symbols => [qw[MA V]] );
 
 Update the name and/or content of watchlist. On success, a
-Finance::Alpaca::Struct::Watchlist object is returned.
+L<Finance::Alpaca::Struct::Watchlist> object is returned.
 
 =head2 C<add_to_watchlist( ... )>
 
     $camelid->add_to_watchlist( '88f0c1e1-58d4-42c5-b85b-864839045678', 'TSLA');
 
 Append an asset for the symbol to the end of watchlist asset list. On success,
-a Finance::Alpaca::Struct::Watchlist object is returned.
+a L<Finance::Alpaca::Struct::Watchlist> object is returned.
 
 =head2 C<remove_from_watchlist( ... )>
 
     $camelid->remove_from_watchlist( '88f0c1e1-58d4-42c5-b85b-864839045678', 'F');
 
 Delete one entry for an asset by symbol name. On success, a
-Finance::Alpaca::Struct::Watchlist object is returned.
+L<Finance::Alpaca::Struct::Watchlist> object is returned.
 
 =head2 C<configuration( )>
 
@@ -1028,21 +1032,21 @@ This method expects a combination of the following optional parameters:
 
 =back
 
-=head3 Paging of Results
+=head1 Paging of Results
 
-Pagination is handled using the C<page_token> and C<page_size> parameters.
-C<page_token> represents the ID of the end of your current page of results. If
-specified with a direction of C<desc>, for example, the results will end before
-the activity with the specified ID. If specified with a direction of C<asc>,
-results will begin with the activity immediately after the one specified.
-C<page_size> is the maximum number of entries to return in the response. If
-C<date> is not specified, the default and maximum value is C<100>. If C<date>
-is specified, the default behavior is to return all results, and there is no
-maximum page size.
+When required, pagination is handled using the C<page_token> and C<page_size>
+parameters. C<page_token> represents the ID of the end of your current page of
+results. If specified with a direction of C<desc>, for example, the results
+will end before the activity with the specified ID. If specified with a
+direction of C<asc>, results will begin with the activity immediately after the
+one specified. C<page_size> is the maximum number of entries to return in the
+response. If C<date> is not specified, the default and maximum value is C<100>.
+If C<date> is specified, the default behavior is to return all results, and
+there is no maximum page size.
 
 =head1 See Also
 
-https://alpaca.markets/docs/api-documentation/api-v2/
+L<https://alpaca.markets/docs/api-documentation/api-v2/>
 
 =head1 Note
 
@@ -1070,5 +1074,7 @@ conditions may apply to data transmitted through this module.
 =head1 AUTHOR
 
 Sanko Robinson E<lt>sanko@cpan.orgE<gt>
+
+=for stopwords algo-friendly fractionable watchlist watchlists timeframe timeseries qty website
 
 =cut

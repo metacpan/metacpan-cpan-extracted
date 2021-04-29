@@ -5,11 +5,15 @@ use Carp;
 use utf8;
 require Exporter;
 our @ISA = qw(Exporter);
-our @EXPORT_OK = qw/confusable canonical/;
+our @EXPORT_OK = qw/
+    canonical
+    confusable
+    similar
+/;
 our %EXPORT_TAGS = (
     all => \@EXPORT_OK,
 );
-our $VERSION = '0.03';
+our $VERSION = '0.05';
 use Unicode::Confuse::Regex;
 
 my $re = $Unicode::Confuse::Regex::re;
@@ -29,9 +33,31 @@ sub confusable
 sub canonical
 {
     my ($c) = @_;
+    my $r;
     if ($c =~ $re) {
-	return $data->{confusables}{$c};
+	$r = $data->{confusables}{$c};
+	if (! defined $r) {
+	    # $r is already the canonical form
+	    $r = $c;
+	}
     }
+    return $r;
+}
+
+sub similar
+{
+    my ($c) = @_;
+    my $d = canonical ($c);
+    if (! $d) {
+	return ();
+    }
+    my @similar;
+    # The reverse data does not include the canonical form in its
+    # list.
+    push @similar, $d;
+    my $r = $data->{reverse}{$d};
+    push @similar, @$r;
+    return @similar;
 }
 
 1;

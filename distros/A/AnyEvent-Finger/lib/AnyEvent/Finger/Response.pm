@@ -4,7 +4,7 @@ use strict;
 use warnings;
 
 # ABSTRACT: Simple asynchronous finger response
-our $VERSION = '0.11'; # VERSION
+our $VERSION = '0.12'; # VERSION
 
 
 sub say
@@ -32,7 +32,7 @@ AnyEvent::Finger::Response - Simple asynchronous finger response
 
 =head1 VERSION
 
-version 0.11
+version 0.12
 
 =head1 DESCRIPTION
 
@@ -46,7 +46,7 @@ the documentation on that class for more details.
 
  $response->say( @lines )
 
-Send the lines to the client.  Do not include new line characters (\r, 
+Send the lines to the client.  Do not include new line characters (\r,
 \n or \r\n), these will be added by L<AnyEvent::Finger::Server>.
 
 =head2 done
@@ -80,7 +80,7 @@ Graham Ollis <plicease@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2012 by Graham Ollis.
+This software is copyright (c) 2012-2021 by Graham Ollis.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

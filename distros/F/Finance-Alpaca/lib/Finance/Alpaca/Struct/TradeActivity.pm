@@ -1,4 +1,4 @@
-package Finance::Alpaca::Struct::TradeActivity 0.9900 {
+package Finance::Alpaca::Struct::TradeActivity 0.9902 {
     use strictures 2;
     use feature 'signatures';
     no warnings 'experimental::signatures';

@@ -7,7 +7,7 @@ use 5.006;
 use ExtUtils::MakeMaker;
 
 my %WriteMakefileArgs = (
-  "ABSTRACT" => "Test Perl Data Language arrays (a.k.a. piddles) for equality",
+  "ABSTRACT" => "Test Perl Data Language arrays (a.k.a. ndarrays) for equality",
   "AUTHOR" => "Edward Baudrez <ebaudrez\@cpan.org>",
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0
@@ -18,7 +18,7 @@ my %WriteMakefileArgs = (
   "NAME" => "Test::PDL",
   "PREREQ_PM" => {
     "Exporter" => 0,
-    "PDL" => "2.037",
+    "PDL" => "2.039",
     "PDL::Lite" => 0,
     "PDL::Types" => 0,
     "Test::Builder" => 0,
@@ -34,7 +34,7 @@ my %WriteMakefileArgs = (
     "IO::Handle" => 0,
     "IPC::Open3" => 0,
     "List::MoreUtils" => 0,
-    "PDL" => "2.037",
+    "PDL" => "2.039",
     "PDL::Core" => 0,
     "Test::Builder::Tester" => 0,
     "Test::Deep" => 0,
@@ -42,7 +42,7 @@ my %WriteMakefileArgs = (
     "Test::More" => 0,
     "Test::NoWarnings" => 0
   },
-  "VERSION" => "0.15",
+  "VERSION" => "0.16",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -57,7 +57,7 @@ my %FallbackPrereqs = (
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
   "List::MoreUtils" => 0,
-  "PDL" => "2.037",
+  "PDL" => "2.039",
   "PDL::Core" => 0,
   "PDL::Lite" => 0,
   "PDL::Types" => 0,

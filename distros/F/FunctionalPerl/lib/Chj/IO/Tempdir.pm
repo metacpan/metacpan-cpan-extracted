@@ -1,9 +1,11 @@
-# Mon Jul 14 07:58:53 2003  Christian Jaeger, christian.jaeger@ethlife.ethz.ch
 #
-# Copyright 2003-2020 by Christian Jaeger
-# Published under the same terms as perl itself.
+# Copyright (c) 2003-2021 Christian Jaeger, copying@christianjaeger.ch
 #
-# $Id$
+# This is free software, offered under either the same terms as perl 5
+# or the terms of the Artistic License version 2 or the terms of the
+# MIT License (Expat version). See the file COPYING.md that came
+# bundled with this file.
+#
 
 =head1 NAME
 
@@ -69,9 +71,14 @@ sub xtmpdir {
     my $class = shift;
     @_ <= 2 or fp_croak_arity "<= 2";
     my ($opt_basepath, $opt_mask) = @_;
-    my $basepath
-        = (defined($opt_basepath) ? $opt_basepath : $ENV{CHJ_TEMPDIR_BASEPATH}
-            || $ENV{CHJ_TEMPDIR} ? _Addslash($ENV{CHJ_TEMPDIR}) : "/tmp/");
+    my $basepath = (
+        $opt_basepath // do {
+            $ENV{CHJ_TEMPDIR_BASEPATH}
+                or $ENV{CHJ_TEMPDIR}
+                ? _Addslash($ENV{CHJ_TEMPDIR})
+                : "/tmp/"
+        }
+    );
     my $mask
         = defined($opt_mask)
         ? $opt_mask

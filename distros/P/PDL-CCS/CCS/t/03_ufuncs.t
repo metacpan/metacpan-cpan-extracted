@@ -18,7 +18,6 @@ use PDL::CCS::Nd;
 
 use version;
 my $HAVE_PDL_2_014 = version->parse($PDL::VERSION) >= version->parse("2.014");
-my $HAVE_PDL_2_039 = version->parse($PDL::VERSION) >= version->parse("2.039");
 
 ##--------------------------------------------------------------
 ## ufunc test

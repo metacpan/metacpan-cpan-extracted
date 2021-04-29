@@ -1,4 +1,4 @@
-package Finance::Alpaca::Struct::Account 0.9900 {
+package Finance::Alpaca::Struct::Account 0.9902 {
     use strictures 2;
     use feature 'signatures';
     no warnings 'experimental::signatures';
@@ -111,7 +111,7 @@ The following properties are contained in the object.
 
 =item C<daytrade_count> - The current number of daytrades that have been made in the last five trading days (inclusive of today)
 
-=item C<last_maintenance_margin> - Your maintenance marign requirement on the previous trading day
+=item C<last_maintenance_margin> - Your maintenance margin requirement on the previous trading day
 
 =item C<daytrading_buying_power> - Your buying power for day trades (continuously updated value)
 
@@ -156,6 +156,8 @@ conditions may apply to data transmitted through this module.
 =head1 AUTHOR
 
 Sanko Robinson E<lt>sanko@cpan.orgE<gt>
+
+=for stopwords daytrade daytrades onboarding MtM
 
 =cut
 

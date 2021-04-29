@@ -11,7 +11,7 @@ use warnings;
 
 use Config::Tiny;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 my $RESET = "\e[m";
 my $BOLD  = "\e[1m";
@@ -53,7 +53,9 @@ sub new
    my %args = @_;
 
    my $self = bless {
-      map { $_ => $args{$_} } qw( no_system_perl no_test since_version until_version ),
+      map { $_ => $args{$_} } qw(
+         no_system_perl no_test since_version until_version reverse stop_on_fail
+      ),
    }, $class;
 
    $self->maybe_apply_config( "./.eachperlrc" );
@@ -115,6 +117,9 @@ sub perls
 {
    my $self = shift;
 
+   my @perls = @{ $self->{perls} };
+   @perls = reverse @perls if $self->{reverse};
+
    return map {
       my $perl = $_;
       my $ver = $perl->version;
@@ -127,7 +132,7 @@ sub perls
       $perl->selected = $selected;
 
       $perl;
-   } @{ $self->{perls} };
+   } @perls;
 }
 
 sub run
@@ -187,6 +192,7 @@ sub run_exec
       }
       else {
          push @results, [ $perl => $? >> 8 ];
+         last if $? and $self->{stop_on_fail};
       }
    }
 
@@ -219,7 +225,7 @@ sub _invoke_local
       $perl .= <<'EOPERL';
          system( $^X, "Build.PL" ) == 0 and
          system( $^X, "Build", "clean" ) == 0 and
-         system ($^X, "Build" ) == 0
+         system( $^X, "Build" ) == 0
 EOPERL
       $perl .= ' and system( $^X, "Build", "test" ) == 0'    if $opts{test};
       $perl .= ' and system( $^X, "Build", "install" ) == 0' if $opts{install};
@@ -227,7 +233,7 @@ EOPERL
    elsif( -r "Makefile.PL" ) {
       $perl .= <<'EOPERL';
          system( $^X, "Makefile.PL" ) == 0 and
-         system( $^X, "make" ) == 0
+         system( "make" ) == 0
 EOPERL
       $perl .= ' and system( "make", "test" ) == 0'    if $opts{test};
       $perl .= ' and system( "make", "install" ) == 0' if $opts{install};

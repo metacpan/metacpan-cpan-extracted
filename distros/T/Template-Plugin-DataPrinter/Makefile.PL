@@ -23,6 +23,7 @@ my %WriteMakefileArgs = (
     "Template::Plugin" => 0,
     "base" => 0,
     "strict" => 0,
+    "version" => "0.77",
     "warnings" => 0
   },
   "TEST_REQUIRES" => {
@@ -33,13 +34,13 @@ my %WriteMakefileArgs = (
     "IO::Handle" => 0,
     "IPC::Open3" => 0,
     "Template" => 0,
-    "Term::ANSIColor" => 0,
+    "Term::ANSIColor" => "2.01",
     "Test::Builder" => 0,
     "Test::More" => 0,
     "Test::NoWarnings" => 0,
     "lib" => 0
   },
-  "VERSION" => "0.014",
+  "VERSION" => "0.015",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -58,13 +59,14 @@ my %FallbackPrereqs = (
   "IPC::Open3" => 0,
   "Template" => 0,
   "Template::Plugin" => 0,
-  "Term::ANSIColor" => 0,
+  "Term::ANSIColor" => "2.01",
   "Test::Builder" => 0,
   "Test::More" => 0,
   "Test::NoWarnings" => 0,
   "base" => 0,
   "lib" => 0,
   "strict" => 0,
+  "version" => "0.77",
   "warnings" => 0
 );
 

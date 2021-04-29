@@ -1,15 +1,8 @@
+package Comment::Spell;
+
 use 5.006;
 use strict;
 use warnings;
-
-package Comment::Spell;
-
-our $VERSION = '0.001002';
-
-# ABSTRACT: Spell Checking for your comments
-
-our $AUTHORITY = 'cpan:KENTNL'; # AUTHORITY
-
 use Carp qw( croak );
 use Moo qw( has );
 use Pod::Wordlist 1.07;
@@ -18,6 +11,98 @@ use Path::Tiny qw( path );
 use IO::Handle;
 use IO::Scalar;
 use Text::Wrap qw( wrap );
+
+=head1 NAME
+
+Comment::Spell  - Spell Checking for your comments
+
+=head1 VERSION
+
+0.001003
+
+=cut
+
+our $VERSION = '0.001003';
+
+=head1 SYNOPSIS
+
+C<Comment::Spell> is a work-a-like for Perl Comments similar to C<Pod::Spell>.
+
+It offers no I<in-built> spell checking services, merely streamlines extracting tokens
+to pass to a spell checker of your choice, while removing some basic useful items (stop-words).
+
+It also, by default, ignores comments with two or more leading hashes so to avoid directive comments
+like those found in C<Perl::Critic>
+
+  # Shorthand for CLI
+  perl -MComment::Spell -e 'Comment::Spell->new->parse_from_file(q[Foo.pm])' | spell -a
+
+  # Advanced Usage:
+
+  my $speller = Comment::Spell->new();
+
+  $speller->parse_from_file(q[Foo.pm]); # streams words to spell to STDOUT by default
+
+  $speller->parse_from_filehandle( $myfh ); # again to STDOUT
+
+  $speller->set_output_file('out.txt');
+
+  $speller->parse_from_file(q[Foo.pm]); # Now writes to out.txt
+
+  my $str;
+
+  $speller->set_output_string($str);
+
+  $speller->parse_from_file(q[Foo.pm]); # Now writes to $str
+
+=head2 C<new>
+
+  ->new(
+    stopwords         => A Pod::Wordlist instance
+    output_filehandle => A IO Handle ( default is STDOUT )
+  )
+
+=head2 C<output_filehandle>
+
+The file handle to write to.
+
+See L</set_output_filehandle>, L</set_output_string> and L</set_output_file>
+
+=head2 C<set_output_filehandle>
+
+  ->set_output_filehandle( $fh );
+  ->set_output_filehandle( \*STDOUT );
+
+=head2 C<set_output_string>
+
+  my $str;
+  ->set_output_string( $str ); # will write to $str
+
+=head2 C<set_output_file>
+
+  ->set_output_file('./out.txt');
+
+=head2 C<parse_from_file>
+
+  ->parse_from_file('./in.pm'); # Read in.pm and stream tokens to current FH
+
+=head2 C<parse_from_filehandle>
+
+  ->parse_from_filehandle( $fh ); # Slurps FH and streams its tokens to current FH
+
+=head2 C<parse_from_string>
+
+  ->parse_from_string( $string ); # decode $string as a PPI document and stream its comments tokens to FH
+
+=head2 C<parse_from_document>
+
+Lower level interface if you want to make C<PPI> Objects yourself.
+
+  ->parse_from_document( $ppi_document );
+
+=head1 SUBROUTINES/METHODS
+
+=cut
 
 # this comment is for self testing
 ## this comment is hidden for self testing
@@ -159,7 +244,12 @@ sub parse_from_filehandle {
   return $self->parse_from_document( $self->_ppi_fh($infh) );
 }
 
-# Load a PPI::Document from a file and process it for comments
+=head2 parse_from_file
+
+Load a PPI::Document from a file and process it for comments
+
+=cut
+
 # ->parse_from_file( $filename )
 sub parse_from_file {
   my ( $self, $infile ) = @_;
@@ -172,109 +262,55 @@ sub parse_from_string {    ## no critic (Subroutines::RequireArgUnpacking)
   return $_[0]->parse_from_document( $_[0]->_ppi_string( $_[1] ) );
 }
 
-1;
+=head1 SUPPORT
 
-__END__
+You can find documentation for this module with the perldoc command.
 
-=pod
+    perldoc Comment::Spell
 
-=encoding UTF-8
+You can also look for information at:
 
-=head1 NAME
+=over 4
 
-Comment::Spell - Spell Checking for your comments
+=item * MetaCPAN
 
-=head1 VERSION
+L<https://metacpan.org/release/Comment-Spell>
 
-version 0.001002
+=item * RT: CPAN's request tracker
 
-=head1 SYNOPSIS
+L<https://rt.cpan.org/NoAuth/Bugs.html?Dist=Comment-Spell>
 
-C<Comment::Spell> is a work-a-like for Perl Comments similar to C<Pod::Spell>.
+=item * CPANTS
 
-It offers no I<in-built> spell checking services, merely streamlines extracting tokens
-to pass to a spell checker of your choice, while removing some basic useful items (stop-words).
+L<http://cpants.cpanauthors.org/dist/Comment-Spell>
 
-It also, by default, ignores comments with two or more leading hashes so to avoid directive comments
-like those found in C<Perl::Critic>
+=item * CPAN Testers' Matrix
 
-  # Shorthand for CLI
-  perl -MComment::Spell -e 'Comment::Spell->new->parse_from_file(q[Foo.pm])' | spell -a
+L<http://matrix.cpantesters.org/?dist=Comment-Spell>
 
-  # Advanced Usage:
+=item * CPAN Ratings
 
-  my $speller = Comment::Spell->new();
+L<http://cpanratings.perl.org/d/Comment-Spell>
 
-  $speller->parse_from_file(q[Foo.pm]); # streams words to spell to STDOUT by default
+=item * CPAN Testers Dependencies
 
-  $speller->parse_from_filehandle( $myfh ); # again to STDOUT
+L<http://deps.cpantesters.org/?module=Comment::Spell>
 
-  $speller->set_output_file('out.txt');
-
-  $speller->parse_from_file(q[Foo.pm]); # Now writes to out.txt
-
-  my $str;
-
-  $speller->set_output_string($str);
-
-  $speller->parse_from_file(q[Foo.pm]); # Now writes to $str
-
-=head1 METHODS
-
-=head2 C<new>
-
-  ->new(
-    stopwords         => A Pod::Wordlist instance
-    output_filehandle => A IO Handle ( default is STDOUT )
-  )
-
-=head2 C<output_filehandle>
-
-The file handle to write to.
-
-See L</set_output_filehandle>, L</set_output_string> and L</set_output_file>
-
-=head2 C<set_output_filehandle>
-
-  ->set_output_filehandle( $fh );
-  ->set_output_filehandle( \*STDOUT );
-
-=head2 C<set_output_string>
-
-  my $str;
-  ->set_output_string( $str ); # will write to $str
-
-=head2 C<set_output_file>
-
-  ->set_output_file('./out.txt');
-
-=head2 C<parse_from_file>
-
-  ->parse_from_file('./in.pm'); # Read in.pm and stream tokens to current FH
-
-=head2 C<parse_from_filehandle>
-
-  ->parse_from_filehandle( $fh ); # Slurps FH and streams its tokens to current FH
-
-=head2 C<parse_from_string>
-
-  ->parse_from_string( $string ); # decode $string as a PPI document and stream its comments tokens to FH
-
-=head2 C<parse_from_document>
-
-Lower level interface if you want to make C<PPI> Objects yourself.
-
-  ->parse_from_document( $ppi_document );
+=back
 
 =head1 AUTHOR
 
-Kent Fredric <kentnl@cpan.org>
+Kent Fredric C<< <kentnl@cpan.org> >>
 
-=head1 COPYRIGHT AND LICENSE
+Maintained by Nigel Horne, C<< <njh at bandsman.co.uk> >>
 
-This software is copyright (c) 2017 by Kent Fredric <kentfredric@gmail.com>.
+=head1 LICENSE AND COPYRIGHT
+
+This software is copyright (c) 2017-2021 by Kent Fredric <kentfredric@gmail.com>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
 
 =cut
+
+1;

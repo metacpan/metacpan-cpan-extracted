@@ -1,5 +1,11 @@
 Release history for Comment-Spell
 
+0.001003	Thu Apr 29 09:20:35 EDT 2021
+	New maintainer
+	Added more CI testing
+
+{{$NEXT}}
+
 0.001002 2017-03-08T16:08:55Z e672660
  - Attempt to support 5.6 ( untested, dependenices may require newer )
  - Bugfix: Avoid test failures with -Ddefault_inc_excludes_dot

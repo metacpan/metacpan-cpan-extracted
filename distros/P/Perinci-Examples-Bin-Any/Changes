@@ -1,3 +1,9 @@
+0.071   2021-01-30  Released-By: PERLANCAR; Urgency: medium
+
+	- Update to Perinci::Examples 0.821; rename some CLIs (remove
+	  /-test-/); add CLI peri-eg-dry-run-default-any.
+
+
 0.070   2020-04-29  Released-By: PERLANCAR; Urgency: medium
 
         - [build] Rebuild with update Perinci::Examples::CLI to remove

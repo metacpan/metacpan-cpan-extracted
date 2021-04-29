@@ -15,7 +15,7 @@ use warnings;
 
 use Test::Perl::Critic (-profile => "") x!! -e "";
 
-my $filenames = ['lib/Perinci/Examples/Bin/Any.pm','lib/Perinci/Examples/Bin/Any/Multi.pm','script/peri-eg-cmdline-src-file-any','script/peri-eg-cmdline-src-stdin-or-args-any','script/peri-eg-cmdline-src-stdin-or-file-any','script/peri-eg-cmdline-src-stdin-or-files-any','script/peri-eg-complete-fruits-any','script/peri-eg-demo-cli-opts-any','script/peri-eg-gen-random-bytes-any','script/peri-eg-multi-any','script/peri-eg-multi-embedded-any','script/peri-eg-single-embedded-any','script/peri-eg-test-completion-any','script/peri-eg-test-dry-run-any'];
+my $filenames = ['lib/Perinci/Examples/Bin/Any.pm','lib/Perinci/Examples/Bin/Any/Multi.pm','script/peri-eg-cmdline-src-file-any','script/peri-eg-cmdline-src-stdin-or-args-any','script/peri-eg-cmdline-src-stdin-or-file-any','script/peri-eg-cmdline-src-stdin-or-files-any','script/peri-eg-complete-fruits-any','script/peri-eg-completion-any','script/peri-eg-demo-cli-opts-any','script/peri-eg-dry-run-any','script/peri-eg-dry-run-default-any','script/peri-eg-gen-random-bytes-any','script/peri-eg-multi-any','script/peri-eg-multi-embedded-any','script/peri-eg-single-embedded-any'];
 unless ($filenames && @$filenames) {
     $filenames = -d "blib" ? ["blib"] : ["lib"];
 }

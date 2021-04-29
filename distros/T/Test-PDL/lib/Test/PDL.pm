@@ -1,6 +1,6 @@
 package Test::PDL;
-$Test::PDL::VERSION = '0.15';
-# ABSTRACT: Test Perl Data Language arrays (a.k.a. piddles) for equality
+$Test::PDL::VERSION = '0.16';
+# ABSTRACT: Test Perl Data Language arrays (a.k.a. ndarrays) for equality
 
 
 use strict;
@@ -46,10 +46,10 @@ sub _comparison_fails
 {
 	my ( $got, $expected ) = @_;
 	if( not eval { $got->isa('PDL') } ) {
-		return 'received value is not a piddle';
+		return 'received value is not a ndarray';
 	}
 	if( not eval { $expected->isa('PDL') } ) {
-		return 'expected value is not a piddle';
+		return 'expected value is not a ndarray';
 	}
 	if( $OPTIONS{ EQUAL_TYPES } && $got->type != $expected->type ) {
 		return 'types do not match (EQUAL_TYPES is true)';
@@ -60,7 +60,7 @@ sub _comparison_fails
 	if( not _dimensions_match( [$got->dims], [$expected->dims] ) ) {
 		return 'dimensions do not match in extent';
 	}
-	# evaluating these only makes sense for piddles that conform in shape
+	# evaluating these only makes sense for ndarrays that conform in shape
 	if( ( $got->badflag == 1 || $expected->badflag == 1 ) &&
 		not eval { PDL::all( PDL::isbad($got) == PDL::isbad($expected) ) } ) {
 		return 'bad value patterns do not match';
@@ -99,9 +99,9 @@ sub is_pdl
 	my ( $got, $expected, $name ) = @_;
 	my $tb = Test::Builder->new;
 	if( eval { $name->isa('PDL') } ) {
-		$tb->croak( 'error in arguments: test name is a piddle' );
+		$tb->croak( 'error in arguments: test name is a ndarray' );
 	}
-	$name ||= "piddles are equal";
+	$name ||= "ndarrays are equal";
 	if( my $reason = _comparison_fails $got, $expected ) {
 		my $rc = $tb->ok( 0, $name );
 		my $fmt = '%-8T %-12D (%-5S) ';
@@ -179,11 +179,11 @@ __END__
 
 =head1 NAME
 
-Test::PDL - Test Perl Data Language arrays (a.k.a. piddles) for equality
+Test::PDL - Test Perl Data Language arrays (a.k.a. ndarrays) for equality
 
 =head1 VERSION
 
-version 0.15
+version 0.16
 
 =head1 SYNOPSIS
 
@@ -212,7 +212,7 @@ version 0.15
 	#          got: Double   D [5]        (P    ) [0 -1 -2 3 4]
 	#     expected: Double   D [5]        (P    ) [0 1 2 3 4]
 
-	# piddles within other data structures can be tested with Test::Deep
+	# ndarrays within other data structures can be tested with Test::Deep
 	use Test::Deep qw( cmp_deeply );
 	$got      = { name => 'Histogram', data => long( 17,0,1 ) };
 	$expected = { name => 'Histogram', data => test_long( 17,0,0,1 ) };
@@ -222,14 +222,14 @@ version 0.15
 	#
 	#   Failed test 'demonstrate the output of a failing deep comparison'
 	#   at aux/pod.t line 30.
-	# Comparing $data->{"data"} as a piddle:
+	# Comparing $data->{"data"} as a ndarray:
 	# dimensions do not match in extent
 	#    got : Long     D [3]        (P    ) [17 0 1]
 	# expect : Long     D [4]        (P    ) [17 0 0 1]
 
 =head1 DESCRIPTION
 
-With Test::PDL, you can compare two piddles for equality. The comparison is
+With Test::PDL, you can compare two ndarrays for equality. The comparison is
 performed as thoroughly as possible, comparing types, dimensions, bad value
 patterns, and finally the values themselves. The exact behaviour can be
 configured by setting certain options (see set_options() and %OPTIONS below).
@@ -261,14 +261,14 @@ if the absolute value of their difference is below the tolerance.
 
 =item EQUAL_TYPES
 
-If true, only piddles with equal type can be considered equal. If false, the
-types of the piddles being compared is not taken into consideration. Defaults
+If true, only ndarrays with equal type can be considered equal. If false, the
+types of the ndarrays being compared is not taken into consideration. Defaults
 to true: types must match for the comparison to succeed. If you want to
 write tests like
 
 	is_pdl( $got, pdl([ 1, 3, 5, 6 ]) );
 
-without having to worry about the type of the piddle being exactly I<double>
+without having to worry about the type of the ndarray being exactly I<double>
 (which is the default type of the pdl() constructor), set EQUAL_TYPES equal to
 0.
 
@@ -299,7 +299,7 @@ be set by the user (see set_options() and $OPTIONS{TOLERANCE}), and defaults to
 
 =head2 _comparison_fails
 
-Internal function which does the real work of comparing two piddles. If the
+Internal function which does the real work of comparing two ndarrays. If the
 comparison fails, _comparison_fails() returns a string containing the reason for
 failure. If the comparison succeeds, _comparison_fails() returns zero.
 
@@ -309,31 +309,31 @@ The criteria for equality are the following:
 
 =item *
 
-Both arguments must be piddles for the comparison to succeed. Currently, there
-is no implicit conversion from scalar to piddle.
+Both arguments must be ndarrays for the comparison to succeed. Currently, there
+is no implicit conversion from scalar to ndarray.
 
 =item *
 
-The type of both piddles must be equal if (and only if) EQUAL_TYPES is true.
+The type of both ndarrays must be equal if (and only if) EQUAL_TYPES is true.
 
 =item *
 
-The number of dimensions must be equal. That is, a two-dimensional piddle only
-compares equal with another two-dimensional piddle.
+The number of dimensions must be equal. That is, a two-dimensional ndarray only
+compares equal with another two-dimensional ndarray.
 
 =item *
 
 The extent of the dimensions are compared one by one and must match. That is, a
-piddle with dimensions (5,4) cannot compare equal with a piddle of dimensions
+ndarray with dimensions (5,4) cannot compare equal with a ndarray of dimensions
 (5,3). Note that degenerate dimensions are not treated specially, and thus a
-piddle with dimensions (5,4,1) is considered different from a piddle with
+ndarray with dimensions (5,4,1) is considered different from a ndarray with
 dimensions (5,4).
 
 =item *
 
-For piddles that conform in type and shape, the bad value pattern is examined.
-If the two piddles have bad values in different positions, the piddles are
-considered different. Note that two piddles may compare equal even though their
+For ndarrays that conform in type and shape, the bad value pattern is examined.
+If the two ndarrays have bad values in different positions, the ndarrays are
+considered different. Note that two ndarrays may compare equal even though their
 bad flag is different, if there are no bad values.
 
 =item *
@@ -349,26 +349,26 @@ for more information.
 =head2 _dimensions_match
 
 Internal function which compares the extent of each of the dimensions of two
-piddles, one by one. The dimensions must be passed in as two array references.
+ndarrays, one by one. The dimensions must be passed in as two array references.
 Returns 1 if all dimensions match pairwise. Returns 0 otherwise.
 
 This function will not operate correctly if the number of dimensions does not
-match between the piddles, so be sure to check that before calling this
+match between the ndarrays, so be sure to check that before calling this
 function.
 
 =head2 is_pdl
 
 =for ref # PDL
 
-Run a test comparing a piddle to an expected piddle, and fail with detailed
+Run a test comparing a ndarray to an expected ndarray, and fail with detailed
 diagnostics if they don't compare equal.
 
 =for usage # PDL
 
 	is_pdl( $got, $expected, $test_name );
 
-Yields ok if the first two arguments are piddles that compare equal, not ok if
-the piddles are different, or if at least one is not a piddle. Prints a
+Yields ok if the first two arguments are ndarrays that compare equal, not ok if
+the ndarrays are different, or if at least one is not a ndarray. Prints a
 diagnostic when the comparison fails, with the reason and a brief printout of
 both arguments. See the documentation of _comparison_fails() for the comparison
 criteria. $test_name is optional.
@@ -379,7 +379,7 @@ Named after is() from L<Test::More>.
 
 =for ref # PDL
 
-Return true if two piddles compare equal, false otherwise.
+Return true if two ndarrays compare equal, false otherwise.
 
 =for usage # PDL
 
@@ -387,7 +387,7 @@ Return true if two piddles compare equal, false otherwise.
 
 eq_pdl() contains just the comparison part of is_pdl(), without the
 infrastructure required to write tests with Test::More. It could be used as
-part of a larger test in which the equality of two piddles must be verified. By
+part of a larger test in which the equality of two ndarrays must be verified. By
 itself, eq_pdl() does not generate any output, so it should be safe to use
 outside test suites.
 
@@ -395,7 +395,7 @@ outside test suites.
 
 =for ref # PDL
 
-Return true if two piddles compare equal, false otherwise, and the reason why
+Return true if two ndarrays compare equal, false otherwise, and the reason why
 the comparison failed (if it did).
 
 =for usage # PDL
@@ -413,20 +413,15 @@ to support deep comparisons with L<Test::Deep>.
 
 =for ref # PDL
 
-Special comparison to be used in conjunction with L<Test::Deep> to test piddles
+Special comparison to be used in conjunction with L<Test::Deep> to test ndarrays
 inside data structures.
-
-B<NB> Due to probably the (as of PDL 2.037, and 0.15 of this module)
-not-yet-complete implementation of native complex numbers, these
-comparisons so far only work reliably on real data types, not
-native-complex ones.
 
 =for usage # PDL
 
 	my $expected = { ..., some_field => test_pdl( 1,2,-7 ), ... };
 	my $expected = [ ..., test_short( 1,2,-7 ), ... ];
 
-Suppose you want to compare data structures that happen to contain piddles. You
+Suppose you want to compare data structures that happen to contain ndarrays. You
 use is_deeply() (from L<Test::More>) or cmp_deeply() (from L<Test::Deep>) to
 compare the structures element by element. Unfortunately, you cannot just write
 
@@ -439,9 +434,9 @@ compare the structures element by element. Unfortunately, you cannot just write
 	is_deeply $got, $expected;
 
 Neither does cmp_deeply() work in the same situation. is_deeply() tries to
-compare the piddles using the (overloaded) C<==> comparison operator, which
+compare the ndarrays using the (overloaded) C<==> comparison operator, which
 doesn't work. It simply dies with an error message saying that multidimensional
-piddles cannot be compared, whereas cmp_deeply() performs only a shallow
+ndarrays cannot be compared, whereas cmp_deeply() performs only a shallow
 comparison of the references.
 
 What you need is a special comparison, which is provided by this function, to
@@ -465,13 +460,13 @@ same thing with
 
 but the diagnostics provided by test_pdl() are better, and it's easier to use.
 test_pdl() accepts the same arguments as the PDL constructor pdl() does. If you
-need to compare a piddle with a type different from the default type, use one
+need to compare a ndarray with a type different from the default type, use one
 of the provided test_byte(), test_short(), test_long(), etc.:
 
 	my $expected = { data => test_short( -4,-9,13 ) };
 
 If you need to manipulate the expected value, you should keep in mind that the
-return value of test_pdl() and the like are not piddles. Therefore, in-place
+return value of test_pdl() and the like are not ndarrays. Therefore, in-place
 modification of the expected value won't work:
 
 	my $expected = { data => test_short( -99,-9,13 )->inplace->setvaltobad( -99 ) }; # won't work!

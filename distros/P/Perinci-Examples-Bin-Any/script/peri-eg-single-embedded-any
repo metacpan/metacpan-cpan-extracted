@@ -2,8 +2,8 @@
 
 # NO_PWP_RINCI
 
-our $DATE = '2020-04-29'; # DATE
-our $VERSION = '0.070'; # VERSION
+our $DATE = '2021-01-30'; # DATE
+our $VERSION = '0.071'; # VERSION
 
 use 5.010;
 use strict;
@@ -91,7 +91,7 @@ peri-eg-single-embedded-any - Test a single function (no subcommands) (function 
 
 =head1 VERSION
 
-This document describes version 0.070 of peri-eg-single-embedded-any (from Perl distribution Perinci-Examples-Bin-Any), released on 2020-04-29.
+This document describes version 0.071 of peri-eg-single-embedded-any (from Perl distribution Perinci-Examples-Bin-Any), released on 2021-01-30.
 
 =head1 SYNOPSIS
 
@@ -197,6 +197,10 @@ you want to pipe the result for more post-processing. In this case you can use
 =item B<--page-result>
 
 Filter output through a pager.
+
+=item B<--view-result>
+
+View output using a viewer.
 
 =back
 
@@ -308,7 +312,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020, 2015, 2014 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2020, 2015, 2014 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

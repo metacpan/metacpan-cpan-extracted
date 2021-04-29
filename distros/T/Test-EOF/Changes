@@ -1,16 +1,86 @@
 Revision history for Test-EOF
 
+0.0804 2021-04-28 18:35:07 UTC
+ [Other Changes]
+ - Remove .travis.yml
+ - Add github actions
+ - Rebuilt with current tooling
+ - No functional changes
+
+ [Stats & Dependency Changes]
+ - 4 files changed, 65 insertions(+), 4 deletions(-)
+ - (test req) + IO::Handle (any)
+ - (test req) + IPC::Open3 (any)
+ - (dev req) + Badge::Depot 0.0103
+ - (dev req) + Badge::Depot::Plugin::Coverage (any)
+ - (dev req) + Badge::Depot::Plugin::Githubactions (any)
+ - (dev req) + Badge::Depot::Plugin::Perl (any)
+ - (dev req) + Dist::Zilla 6.015
+ - (dev req) +
+   Dist::Zilla::Plugin::Author::CSSON::GithubActions::Workflow::TestWithMakefile
+   0.0106
+ - (dev req) + Dist::Zilla::Plugin::Authority 1.009
+ - (dev req) + Dist::Zilla::Plugin::BumpVersionAfterRelease::Transitional
+   0.009
+ - (dev req) + Dist::Zilla::Plugin::ChangeStats::Dependencies::Git 0.0200
+ - (dev req) + Dist::Zilla::Plugin::Clean 0.07
+ - (dev req) + Dist::Zilla::Plugin::Git 2.046
+ - (dev req) + Dist::Zilla::Plugin::Git::CheckFor::CorrectBranch 0.014
+ - (dev req) + Dist::Zilla::Plugin::Git::Commit (any)
+ - (dev req) + Dist::Zilla::Plugin::InstallRelease 0.008
+ - (dev req) + Dist::Zilla::Plugin::MetaConfig (any)
+ - (dev req) + Dist::Zilla::Plugin::NextRelease::Grouped 0.0200
+ - (dev req) + Dist::Zilla::Plugin::PromptIfStale 0.057
+ - (dev req) + Dist::Zilla::Plugin::RewriteVersion::Transitional 0.007
+ - (dev req) + Dist::Zilla::Plugin::Test::Compile 2.058
+ - (dev req) + Dist::Zilla::Plugin::Test::EOF 0.0501
+ - (dev req) + Dist::Zilla::Plugin::Test::EOL 0.18
+ - (dev req) + Dist::Zilla::Plugin::Test::NoTabs 0.15
+ - (dev req) + Dist::Zilla::Plugin::Test::Version 1.09
+ - (dev req) + Pod::Weaver::Section::GenerateSection 1.01
+ - (dev req) + Test::EOF (any)
+ - (dev req) + Test::EOL (any)
+ - (dev req) + Test::More 0.88
+ - (dev req) + Test::NoTabs 1.4
+ - (dev req) + Test::Version 1
+ - (dev req) ~ Dist::Zilla::Plugin::CheckChangesHasContent (any) --> 0.011
+ - (dev req) ~ Dist::Zilla::Plugin::CopyFilesFromBuild (any) --> 0.170880
+ - (dev req) ~ Dist::Zilla::Plugin::Git::Contributors (any) --> 0.035
+ - (dev req) ~ Dist::Zilla::Plugin::GithubMeta (any) --> 0.54
+ - (dev req) ~ Dist::Zilla::Plugin::MetaProvides::Package (any) -->
+   2.004003
+ - (dev req) ~ Dist::Zilla::Plugin::PodWeaver (any) --> 4.006
+ - (dev req) ~ Dist::Zilla::Plugin::ReadmeAnyFromPod (any) --> 0.163250
+ - (dev req) ~ Dist::Zilla::Plugin::RunExtraTests (any) --> 0.029
+ - (dev req) ~ Dist::Zilla::Plugin::Test::ReportPrereqs (any) --> 0.027
+ - (dev req) ~ Pod::Weaver::Section::Badges (any) --> 0.0401
+ - (dev req) ~ Test::Warnings (any) --> 0.026
+ - (dev req) - Dist::Zilla::Plugin::CheckExtraTests
+ - (dev req) - Dist::Zilla::Plugin::MetaProvides::Class
+ - (dev req) - Dist::Zilla::Plugin::NextRelease
+ - (dev req) - Dist::Zilla::Plugin::NextVersion::Semantic
+ - (dev req) - Dist::Zilla::Plugin::OurPkgVersion
+ - (dev req) - Dist::Zilla::Plugin::PodnameFromClassname
+ - (dev req) - Dist::Zilla::Plugin::Prereqs::Plugins
+ - (dev req) - Dist::Zilla::Plugin::PreviousVersion::Changelog
+ - (dev req) - Dist::Zilla::Plugin::ReversionOnRelease
+ - (dev req) - Dist::Zilla::Plugin::TravisYML
+ - (dev req) - Pod::Weaver::Section::Homepage::DefaultCPAN
+ - (dev req) - Pod::Weaver::Section::Source::DefaultGitHub
+ - (dev sug) + Dist::Iller 0.1411
+ - (dev sug) + Dist::Iller::Config::Author::CSSON 0.0328
+
 0.0803 2015-11-25T21:52:37Z UTC
- [Documentation]
- - Removed duplicated POD sections.
+ [Requirements]
+ - Test::POD is now a develop requirement, rather than a (missing) build
+   requirement (MANWAR++).
 
  [Other Changes]
  - Can't test on Travis with less than Perl 5.14.
  - Regenerated dist.ini, weaver.ini from iller.yaml/Dist::Iller.
 
- [Requirements]
- - Test::POD is now a develop requirement, rather than a (missing) build
-   requirement (MANWAR++).
+ [Documentation]
+ - Removed duplicated POD sections.
 
 0.0802 2015-02-11T12:42:46Z CET
  [Enhancements]
@@ -26,14 +96,14 @@ Revision history for Test-EOF
  - Use \v instead of \n.
 
 0.0700 2015-01-15T19:32:20Z CET
- [Documentation]
- - Minor improvements.
+ [Meta]
+ - Converted to new dzil settings.
 
  [Enhancements]
  - Removed unused prereq.
 
- [Meta]
- - Converted to new dzil settings.
+ [Documentation]
+ - Minor improvements.
 
 0.0610 2014-09-18T21:26:55Z CEST
  [Meta]
@@ -58,4 +128,3 @@ Revision history for Test-EOF
 
 0.01 2014-09-05T15:02:32Z CEST
  - Initial release
-

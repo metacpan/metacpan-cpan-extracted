@@ -1,10 +1,10 @@
-#ABSTRACT: A role that defines the interface to a hashing algorithm
-#
 package Archive::BagIt::Role::Algorithm;
 use strict;
 use warnings;
 use Moo::Role;
 with 'Archive::BagIt::Role::Plugin';
+# ABSTRACT: A role that defines the interface to a hashing algorithm
+our $VERSION = '0.074'; # VERSION
 
 has 'name' => (
     is => 'ro',
@@ -55,7 +55,7 @@ Archive::BagIt::Role::Algorithm - A role that defines the interface to a hashing
 
 =head1 VERSION
 
-version 0.073
+version 0.074
 
 =head1 AVAILABILITY
 

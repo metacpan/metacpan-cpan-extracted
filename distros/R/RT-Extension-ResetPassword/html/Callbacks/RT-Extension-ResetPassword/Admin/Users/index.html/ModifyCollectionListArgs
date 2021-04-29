@@ -1,0 +1,6 @@
+<%INIT>
+push @{$CollectionListArgs->{PassArguments}}, 'FindUsersWithPassword';
+</%INIT>
+<%ARGS>
+$CollectionListArgs
+</%ARGS>

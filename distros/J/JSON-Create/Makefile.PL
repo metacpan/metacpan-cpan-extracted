@@ -23,6 +23,10 @@ my %WriteMakefileArgs = (
 	'Scalar::Util' => 0,
 	'Unicode::UTF8' => '0.62',
     },
+    TEST_REQUIRES => {
+	'File::Spec' => '0',
+	'File::Temp' => '0',
+    },
     META_MERGE => {
 	'meta-spec' => {
 	    version => 2,

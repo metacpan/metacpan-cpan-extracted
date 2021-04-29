@@ -2,6 +2,7 @@ package mymm;
 
 use strict;
 use warnings;
+use 5.008001;
 use ExtUtils::MakeMaker;
 use FFI::CheckLib;
 
@@ -18,7 +19,7 @@ sub myWriteMakefile
   {
     $args{PREREQ_PM}->{'Alien::libuuid'} = 0;
   }
-  
+
   WriteMakefile(%args);
 }
 

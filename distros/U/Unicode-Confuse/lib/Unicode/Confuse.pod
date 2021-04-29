@@ -1,6 +1,3 @@
-
-
-
 =encoding UTF-8
 
 =head1 NAME
@@ -9,16 +6,36 @@ Unicode::Confuse - Identify and replace Unicode confusables
 
 =head1 SYNOPSIS
 
-    use Unicode::Confuse;
+    
+    use utf8;
+    use Unicode::Confuse ':all';
+    if (confusable ('ρ')) {
+        my $canonical = canonical ('ρ');
+        print "'ρ' is confusable with $canonical.\n";
+        my @similar = similar ($canonical);
+        print "$canonical is also confusable with @similar.\n";
+    }
+    
+
+produces output
+
+    'ρ' is confusable with p.
+    p is also confusable with p ρ ϱ р ⍴ ⲣ ｐ 𝐩 𝑝 𝒑 𝓅 𝓹 𝔭 𝕡 𝖕 𝗉 𝗽 𝘱 𝙥 𝚙 𝛒 𝛠 𝜌 𝜚 𝝆 𝝔 𝞀 𝞎 𝞺 𝟈.
+
+(This example is included as L<F<synopsis.pl>|https://fastapi.metacpan.org/source/BKB/Unicode-Confusables-0.05/examples/synopsis.pl> in the distribution.)
 
 =head1 VERSION
 
-This documents version 0.03 of Unicode-Confuse
-corresponding to L<git commit a5b1eee3cc6e892e7e08bb2d0530b6bfd87017eb|https://github.com/benkasminbullock/unicode-confuse/commit/a5b1eee3cc6e892e7e08bb2d0530b6bfd87017eb> released on Thu Apr 15 09:11:48 2021 +0900.
+This documents version 0.05 of Unicode-Confuse
+corresponding to L<git commit 4a97ea6b65f148a559b21ebde80b189257d16b1c|https://github.com/benkasminbullock/unicode-confuse/commit/4a97ea6b65f148a559b21ebde80b189257d16b1c> released on Thu Apr 29 11:49:01 2021 +0900.
+
+This Perl module incorporates Unicode Security Mechanisms for UTS #39 version 13.0.0 dated 2020-02-13, 01:38:49 GMT, copyright © 2020 Unicode®, Inc.. For terms of use, see L<http://www.unicode.org/terms_of_use.html>.
 
 =head1 DESCRIPTION
 
-Unicode confusables Perl module.
+This module offers functions for dealing with Unicode "confusables",
+characters which look similar to one another but are represented by
+different Unicode code points.
 
 =head1 FUNCTIONS
 
@@ -26,8 +43,11 @@ Unicode confusables Perl module.
 
    my $canonical = canonical ($c);
 
-If C<$c> is a confusable, give the canonical form of C<$c>. If not,
-returns the undefined value.
+If C<$c> is a confusable, give the canonical form of C<$c>. If $c is
+already the canonical form of itself, return $c. If C<$c> is not a
+confusable, this returns the undefined value. "Canonical" here just
+means the character which is used as a representative of the group of
+confusables in the L</Unicode data files>.
 
 =head2 confusable
 
@@ -35,8 +55,67 @@ returns the undefined value.
         # do something.
     }
 
-Is C<$c> confusable, yes or no? This matches C<$c> against the large
-regex in L<Unicode::Confuse::Regex>.
+This returns a true or false value depending on whether C<$c> is a
+confusable. This matches C<$c> against a large regex in
+L<Unicode::Confuse::Regex>.
+
+=head2 similar
+
+    my @similar = similar ('p');
+
+Return a list of confusables which are similar to the given input. If
+the input is not a confusable, an empty list is returned.
+
+The first character in C<@similar> is the canonical form, and the
+remaining characters are the other confusables associated with that
+canonical form. These remaining characters, if more than one, are
+sorted by code point.
+
+=head3 Example: obfuscate text
+
+This example obfuscates strings by substituting confusable letters
+with substitutes picked at random from the confusable data for the
+letters.
+
+    
+    use utf8;
+    use Unicode::Confuse ':all';
+    
+    sub obfuscate
+    {
+        for (@_) {
+            my @letters = split '', $_;
+            my $out = '';
+            my $ok;
+            for my $letter (@letters) {
+                my @similar = similar ($letter);
+                if (@similar) {
+                    $ok = 1;
+                    my $n = scalar (@similar);
+                    my $r = int (rand ($n));
+                    $out .= $similar[$r];
+                }
+                else {
+                    $out .= $letter;
+                }
+            }
+            if (! $ok) {
+                print "No confusables in '$_'.\n";
+            }
+            else {
+                print "$_ -> $out\n";
+            }
+        }
+    }
+    
+    obfuscate ('paypal', '月火水木金土日');
+
+produces output
+
+    paypal -> 𝘱𝒂𝐲𝓅𝖺𝜤
+    月火水木金土日 -> 月火水木金⼠⽇
+
+(This example is included as L<F<obfuscate.pl>|https://fastapi.metacpan.org/source/BKB/Unicode-Confusables-0.05/examples/obfuscate.pl> in the distribution.)
 
 =head1 DEPENDENCIES
 
@@ -44,9 +123,7 @@ regex in L<Unicode::Confuse::Regex>.
 
 =item L<File::Slurper>
 
-This is used by the parsing module L<Unicode::Confuse::Parse>. You
-don't actually need to use the parsing module to use this module with
-the built-in version of the data.
+This is used by the parsing module L<Unicode::Confuse::Parse>.
 
 =item L<JSON::Parse>
 
@@ -115,9 +192,19 @@ The following links point to the latest data files:
 
 =back
 
+=item L<Unicode Utilities: Confusables|https://util.unicode.org/UnicodeJsps/confusables.jsp>
+
+The utility says
+
+=over
+
+With this demo, you can supply an Input string and see the
+combinations that are confusable with it, using data collected by the
+Unicode consortium.
+
 =back
 
-
+=back
 
 =head1 AUTHOR
 
@@ -132,6 +219,3 @@ Ben Bullock.
 You can use, copy, modify and redistribute this package and associated
 files under the Perl Artistic Licence or the GNU General Public
 Licence.
-
-
-

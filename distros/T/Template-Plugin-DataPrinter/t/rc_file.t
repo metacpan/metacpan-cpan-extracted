@@ -7,7 +7,7 @@ use Test::More;
 require Test::NoWarnings;
 
 use File::Temp      ();
-use Term::ANSIColor qw< colorstrip >;
+use Term::ANSIColor 2.01 qw< colorstrip >;
 
 delete $ENV{DATAPRINTERRC}; # make sure user rc doesn't interfere
 

@@ -60,6 +60,33 @@ subtest 'Empty response' => sub {
   ok !length($response->{body}), 'empty response body';
 };
 
+subtest 'Empty response (fixed length)' => sub {
+  local @ENV{@env_keys} = ('')x@env_keys;
+  local $ENV{PATH_INFO} = '/';
+  local $ENV{REQUEST_METHOD} = 'GET';
+  local $ENV{SCRIPT_NAME} = '/';
+  local $ENV{SERVER_PROTOCOL} = 'HTTP/1.0';
+  open my $in_fh, '<', \(my $in_data = '') or die "failed to open handle for input: $!";
+  open my $out_fh, '>', \my $out_data or die "failed to open handle for output: $!";
+
+  cgi {
+    $_->set_input_handle($in_fh);
+    $_->set_output_handle($out_fh);
+    $_->set_response_fixed_length(1);
+    $_->render;
+  };
+
+  ok length($out_data), 'response rendered';
+  my $response = _parse_response($out_data);
+  ok defined($response->{headers}{'content-type'}), 'Content-Type set';
+  is $response->{headers}{'content-type'}, 'application/octet-stream', 'right content type';
+  is $response->{headers}{'content-length'}, 0, 'right content length';
+  like $response->{status}, qr/^200\b/, '200 response status';
+  ok defined($response->{headers}{date}), 'Date set';
+  ok defined(CGI::Tiny::date_to_epoch $response->{headers}{date}), 'valid HTTP date';
+  ok !length($response->{body}), 'empty response body';
+};
+
 subtest 'No render' => sub {
   local @ENV{@env_keys} = ('')x@env_keys;
   local $ENV{PATH_INFO} = '/';
@@ -335,7 +362,33 @@ subtest 'Not found' => sub {
   ok !length($response->{body}), 'empty response body';
 };
 
-subtest 'Data response' => sub {
+subtest 'Data response (fixed length)' => sub {
+  local @ENV{@env_keys} = ('')x@env_keys;
+  local $ENV{PATH_INFO} = '/';
+  local $ENV{REQUEST_METHOD} = 'GET';
+  local $ENV{SCRIPT_NAME} = '/';
+  local $ENV{SERVER_PROTOCOL} = 'HTTP/1.0';
+  open my $in_fh, '<', \(my $in_data = '') or die "failed to open handle for input: $!";
+  open my $out_fh, '>', \my $out_data or die "failed to open handle for output: $!";
+
+  my $data = "\x01\x02\x03\x04\r\n\xFF";
+  cgi {
+    $_->set_input_handle($in_fh);
+    $_->set_output_handle($out_fh);
+    $_->set_response_fixed_length(1);
+    $_->render(data => $data);
+  };
+
+  ok length($out_data), 'response rendered';
+  my $response = _parse_response($out_data);
+  ok defined($response->{headers}{'content-type'}), 'Content-Type set';
+  is $response->{headers}{'content-length'}, length($data), 'right content length';
+  is $response->{headers}{'content-type'}, 'application/octet-stream', 'right content type';
+  like $response->{status}, qr/^200\b/, '200 response status';
+  is $response->{body}, $data, 'right response body';
+};
+
+subtest 'Data response (multiple renders)' => sub {
   local @ENV{@env_keys} = ('')x@env_keys;
   local $ENV{PATH_INFO} = '/';
   local $ENV{REQUEST_METHOD} = 'GET';
@@ -349,6 +402,7 @@ subtest 'Data response' => sub {
     $_->set_input_handle($in_fh);
     $_->set_output_handle($out_fh);
     $_->render(data => $data);
+    $_->render(data => $data);
   };
 
   ok length($out_data), 'response rendered';
@@ -356,7 +410,7 @@ subtest 'Data response' => sub {
   ok defined($response->{headers}{'content-type'}), 'Content-Type set';
   is $response->{headers}{'content-type'}, 'application/octet-stream', 'right content type';
   like $response->{status}, qr/^200\b/, '200 response status';
-  is $response->{body}, $data, 'right response body';
+  is $response->{body}, $data . $data, 'right response body';
 };
 
 subtest 'File response' => sub {
@@ -379,6 +433,7 @@ subtest 'File response' => sub {
   cgi {
     $_->set_input_handle($in_fh);
     $_->set_output_handle($out_fh);
+    $_->set_response_fixed_length(1);
     $_->render(file => $filepath);
   };
 
@@ -386,6 +441,7 @@ subtest 'File response' => sub {
   my $response = _parse_response($out_data);
   ok defined($response->{headers}{'content-type'}), 'Content-Type set';
   is $response->{headers}{'content-type'}, 'application/octet-stream', 'right content type';
+  is $response->{headers}{'content-length'}, length $data, 'right content length';
   like $response->{status}, qr/^200\b/, '200 response status';
   is $response->{body}, $data, 'right response body';
 };
@@ -411,7 +467,7 @@ subtest 'File response (download)' => sub {
   cgi {
     $_->set_input_handle($in_fh);
     $_->set_output_handle($out_fh);
-    $_->set_response_download($filename);
+    $_->set_response_disposition(attachment => $filename);
     $_->render(file => $filepath);
   };
 
@@ -463,6 +519,7 @@ subtest 'Text response' => sub {
   cgi {
     $_->set_input_handle($in_fh);
     $_->set_output_handle($out_fh);
+    $_->set_response_fixed_length(1);
     $_->render(text => $text);
   };
 
@@ -470,6 +527,7 @@ subtest 'Text response' => sub {
   my $response = _parse_response($out_data);
   ok defined($response->{headers}{'content-type'}), 'Content-Type set';
   like $response->{headers}{'content-type'}, qr/^text\/plain.*UTF-8/i, 'right content type';
+  is $response->{headers}{'content-length'}, length(encode 'UTF-8', $text), 'right content length';
   like $response->{status}, qr/^200\b/, '200 response status';
   is decode('UTF-8', $response->{body}), $text, 'right response body';
 };
@@ -512,6 +570,7 @@ subtest 'HTML response' => sub {
   cgi {
     $_->set_input_handle($in_fh);
     $_->set_output_handle($out_fh);
+    $_->set_response_fixed_length(1);
     $_->render(html => $html);
   };
 
@@ -519,8 +578,35 @@ subtest 'HTML response' => sub {
   my $response = _parse_response($out_data);
   ok defined($response->{headers}{'content-type'}), 'Content-Type set';
   like $response->{headers}{'content-type'}, qr/^text\/html.*UTF-8/i, 'right content type';
+  is $response->{headers}{'content-length'}, length(encode 'UTF-8', $html), 'right content length';
   like $response->{status}, qr/^200\b/, '200 response status';
   is decode('UTF-8', $response->{body}), $html, 'right response body';
+};
+
+subtest 'HTML response (multiple renders)' => sub {
+  local @ENV{@env_keys} = ('')x@env_keys;
+  local $ENV{PATH_INFO} = '/';
+  local $ENV{REQUEST_METHOD} = 'GET';
+  local $ENV{SCRIPT_NAME} = '/';
+  local $ENV{SERVER_PROTOCOL} = 'HTTP/1.0';
+  open my $in_fh, '<', \(my $in_data = '') or die "failed to open handle for input: $!";
+  open my $out_fh, '>', \my $out_data or die "failed to open handle for output: $!";
+
+  my $html1 = "<html><head><title>♥</title></head>";
+  my $html2 = "<body><p>☃&nbsp;&amp;</p></body></html>";
+  cgi {
+    $_->set_input_handle($in_fh);
+    $_->set_output_handle($out_fh);
+    $_->render(html => $html1);
+    $_->render(html => $html2);
+  };
+
+  ok length($out_data), 'response rendered';
+  my $response = _parse_response($out_data);
+  ok defined($response->{headers}{'content-type'}), 'Content-Type set';
+  like $response->{headers}{'content-type'}, qr/^text\/html.*UTF-8/i, 'right content type';
+  like $response->{status}, qr/^200\b/, '200 response status';
+  is decode('UTF-8', $response->{body}), $html1 . $html2, 'right response body';
 };
 
 subtest 'XML response' => sub {
@@ -619,7 +705,8 @@ subtest 'Response headers' => sub {
     $_->set_output_handle($out_fh);
     foreach my $header (@headers) { $_->add_response_header(@$header) }
     foreach my $cookie (@cookies) { $_->add_response_cookie(@$cookie) }
-    $_->set_response_content_type('image/gif');
+    $_->set_response_type('image/gif');
+    $_->set_response_disposition(attachment => 'foo.gif');
     $_->set_response_status(202);
     $_->render;
   };
@@ -628,11 +715,53 @@ subtest 'Response headers' => sub {
   my $response = _parse_response($out_data);
   ok defined($response->{headers}{'content-type'}), 'Content-Type set';
   is $response->{headers}{'content-type'}, 'image/gif', 'right content type';
+  is $response->{headers}{'content-disposition'}, 'attachment; filename="foo.gif"; filename*=UTF-8\'\'foo.gif', 'right Content-Disposition';
   like $response->{status}, qr/^202\b/, '202 response status';
   is_deeply $response->{headers}{'x-test'}, ['some value', 'another value'], 'right custom headers';
   is_deeply $response->{headers}{'set-cookie'},
     ['foo=bar; Domain=example.com; HttpOnly; Max-Age=3600; Path=/test; SameSite=Strict; Secure',
      'x=; Expires=Sun, 06 Nov 1994 08:49:37 GMT; SameSite=Lax'], 'right Set-Cookie headers';
+};
+
+subtest 'Reset response headers' => sub {
+  local @ENV{@env_keys} = ('')x@env_keys;
+  local $ENV{PATH_INFO} = '/';
+  local $ENV{REQUEST_METHOD} = 'GET';
+  local $ENV{SCRIPT_NAME} = '/';
+  local $ENV{SERVER_PROTOCOL} = 'HTTP/1.0';
+  open my $in_fh, '<', \(my $in_data = '') or die "failed to open handle for input: $!";
+  open my $out_fh, '>', \my $out_data or die "failed to open handle for output: $!";
+
+  my @headers = (
+    ['X-Test', 'some value'],
+    ['X-test', 'another value'],
+  );
+  my @cookies = (
+    ['foo', 'bar'],
+  );
+  cgi {
+    $_->set_input_handle($in_fh);
+    $_->set_output_handle($out_fh);
+    foreach my $header (@headers) { $_->add_response_header(@$header) }
+    foreach my $cookie (@cookies) { $_->add_response_cookie(@$cookie) }
+    $_->set_response_type('image/gif');
+    $_->set_response_status(400);
+    $_->set_response_disposition(attachment => 'foo.gif');
+    $_->reset_response_headers;
+    $_->set_response_type(undef);
+    $_->set_response_status(200);
+    $_->set_response_disposition('inline');
+    $_->render;
+  };
+
+  ok length($out_data), 'response rendered';
+  my $response = _parse_response($out_data);
+  ok defined($response->{headers}{'content-type'}), 'Content-Type set';
+  is $response->{headers}{'content-type'}, 'application/octet-stream', 'default content type';
+  ok !defined $response->{headers}{'content-disposition'}, 'Content-Disposition not set';
+  like $response->{status}, qr/^200\b/, '200 response status';
+  ok !defined $response->{headers}{'x-test'}, 'custom headers reset';
+  ok !defined $response->{headers}{'set-cookie'}, 'Set-Cookie headers reset';
 };
 
 subtest 'Query parameters' => sub {
@@ -834,7 +963,7 @@ subtest 'Multipart body read into memory' => sub {
   my $utf8_snowman = encode 'UTF-8', '☃!';
   my $body_string = <<"EOB";
 --fffff\r
-Content-Disposition: form-data; name="snowman\\\\"\r
+Content-Disposition: form-data; name="; filename=snowman\\\\"\r
 \r
 $utf8_snowman\r
 --fffff\r
@@ -858,7 +987,7 @@ EOB
     $parts = $_->body_parts;
     $params = $_->body_params;
     $param_names = $_->body_param_names;
-    $param_snowman = $_->body_param('snowman\\');
+    $param_snowman = $_->body_param('; filename=snowman\\');
     $uploads = $_->uploads;
     $upload_names = $_->upload_names;
     $upload_snowman = $_->upload('file');
@@ -879,14 +1008,14 @@ EOB
     }
   }
   is_deeply $parts, [
-    {headers => {'content-disposition' => 'form-data; name="snowman\\\\"'},
-      name => 'snowman\\', filename => undef, size => length($utf8_snowman), content => $utf8_snowman},
+    {headers => {'content-disposition' => 'form-data; name="; filename=snowman\\\\"'},
+      name => '; filename=snowman\\', filename => undef, size => length($utf8_snowman), content => $utf8_snowman},
     {headers => {'content-disposition' => 'form-data; name="file"; filename="test.txt\\\\"', 'content-type' => 'text/plain;charset=UTF-8'},
       name => 'file', filename => 'test.txt\\', size => length($utf8_snowman) + 1, file_contents => "$utf8_snowman\n"},
   ], 'right multipart body parts';
 
-  is_deeply $params, [['snowman\\', '☃!']], 'right multipart body params';
-  is_deeply $param_names, ['snowman\\'], 'right multipart body param names';
+  is_deeply $params, [['; filename=snowman\\', '☃!']], 'right multipart body params';
+  is_deeply $param_names, ['; filename=snowman\\'], 'right multipart body param names';
   is $param_snowman, '☃!', 'right multipart body param value';
   is $uploads->[0][0], 'file', 'right upload name';
   is_deeply $upload_names, ['file'], 'right upload names';
@@ -1179,7 +1308,7 @@ subtest 'NPH error response' => sub {
     $_->set_output_handle($out_fh);
     $_->set_nph(1);
     $_->set_response_status(404);
-    $_->set_response_content_type('text/plain');
+    $_->set_response_type('text/plain');
     $_->render;
   };
 

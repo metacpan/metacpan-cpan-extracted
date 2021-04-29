@@ -2,10 +2,12 @@ package AnyEvent::Finger::Request;
 
 use strict;
 use warnings;
-use overload '""' => sub { shift->as_string };
+use overload
+  '""' => sub { shift->as_string },
+  bool => sub { 1 }, fallback => 1;
 
 # ABSTRACT: Simple asynchronous finger request
-our $VERSION = '0.11'; # VERSION
+our $VERSION = '0.12'; # VERSION
 
 
 sub new
@@ -24,13 +26,13 @@ sub verbose
 sub username
 {
   my($self) = @_;
-  
+
   unless(defined $self->{username})
   {
     if($self->{raw} =~ /^(?:\/W\s*)?([^@]*)/)
     { $self->{username} = $1 }
   }
-  
+
   $self->{username};
 }
 
@@ -39,7 +41,7 @@ sub hostnames
 {
   my($self) = @_;
   return $self->{hostnames} if defined $self->{hostnames};
-  $self->{hostnames} = ($self->{raw} =~ /\@(.*)$/ ? [split '@', $1] : []);
+  $self->{hostnames} = ($self->{raw} =~ /\@(.*)$/ ? [split /\@/, $1] : []);
 }
 
 
@@ -70,7 +72,7 @@ AnyEvent::Finger::Request - Simple asynchronous finger request
 
 =head1 VERSION
 
-version 0.11
+version 0.12
 
 =head1 SYNOPSIS
 
@@ -155,7 +157,7 @@ Graham Ollis <plicease@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2012 by Graham Ollis.
+This software is copyright (c) 2012-2021 by Graham Ollis.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

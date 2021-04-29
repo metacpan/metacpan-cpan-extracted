@@ -1,5 +1,9 @@
 Revision history for Perl module RT::Extension::ResetPassword
 
+1.12 2021-04-28
+ - Pass FindUsersWithPassword argument to paging URL
+ - Support password set search for RT 4
+
 1.11 2021-04-22
  - Add an option to show all users with a password set
 

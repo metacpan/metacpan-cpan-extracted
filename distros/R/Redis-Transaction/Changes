@@ -1,5 +1,8 @@
 Revision history for Perl extension Redis-Transaction
 
+0.02 2021-04-28T16:02:20Z
+    - fix #2. ignore SIGPIPE in tests
+
 0.01 2016-03-11T11:01:23Z
 
     - original version

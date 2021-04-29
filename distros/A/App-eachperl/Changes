@@ -1,0 +1,19 @@
+Revision history for App-eachperl
+
+0.03    2021-04-28
+        [CHANGES]
+         * Added `--reverse/-r` and `--stop-on-fail/-s` options
+
+        [BUGFIXES]
+         * Don't run `make` via $^X
+
+0.02    2020-04-24
+        [CHANGES]
+         * Added `test-local`, `install-local` and `build-then-perl` commands
+         * Added `--no-test` option
+         * Make sure `--until` runs until the end of the series
+         * More concise output from `modpath` and `modversion` commands
+
+0.01    2020-04-09
+        First version, released on an unsuspecting world.
+

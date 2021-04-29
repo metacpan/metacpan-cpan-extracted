@@ -4,8 +4,8 @@
 #
 package PDL::CCS::Utils;
 
-@EXPORT_OK  = qw( PDL::PP nnz PDL::PP nnza PDL::PP ccs_encode_pointers PDL::PP ccs_decode_pointer PDL::PP ccs_pointerlen PDL::PP ccs_xindex1d PDL::PP ccs_xindex2d PDL::PP ccs_dump_which );
-%EXPORT_TAGS = (Func=>[@EXPORT_OK]);
+our @EXPORT_OK = qw(PDL::PP nnz PDL::PP nnza PDL::PP ccs_encode_pointers PDL::PP ccs_decode_pointer PDL::PP ccs_pointerlen PDL::PP ccs_xindex1d PDL::PP ccs_xindex2d PDL::PP ccs_dump_which );
+our %EXPORT_TAGS = (Func=>[@EXPORT_OK]);
 
 use PDL::Core;
 use PDL::Exporter;
@@ -13,8 +13,8 @@ use DynaLoader;
 
 
 
-   $PDL::CCS::Utils::VERSION = 1.23.15;
-   @ISA    = ( 'PDL::Exporter','DynaLoader' );
+   our $VERSION = '1.23.16';
+   our @ISA = ( 'PDL::Exporter','DynaLoader' );
    push @PDL::Core::PP, __PACKAGE__;
    bootstrap PDL::CCS::Utils $VERSION;
 

@@ -33,5 +33,5 @@ requires:
   XML::XUpdate::LibXML: v0.6.0
 resources:
   repository: https://github.com/choroba/xsh
-version: v2.2.8
+version: v2.2.9
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -53,7 +53,7 @@ This constructor accepts the following parameters:
     my $acct = $camelid->account( );
     CORE::say sprintf 'I can%s short!', $acct->shorting_enabled ? '' : 'not';
 
-Returns a Finance::Alpaca::Struct::Account object.
+Returns a [Finance::Alpaca::Struct::Account](https://metacpan.org/pod/Finance%3A%3AAlpaca%3A%3AStruct%3A%3AAccount) object.
 
 The account endpoint serves important information related to an account,
 including account status, funds available for trade, funds available for
@@ -66,7 +66,7 @@ withdrawal, and various flags relevant to an account’s ability to trade.
         $clock->timestamp->strftime('It is %l:%M:%S %p on a %A and the market is %%sopen!'),
         $clock->is_open ? '' : 'not ';
 
-Returns a Finance::Alpaca::Struct::Clock object.
+Returns a [Finance::Alpaca::Struct::Clock](https://metacpan.org/pod/Finance%3A%3AAlpaca%3A%3AStruct%3A%3AClock) object.
 
 The clock endpoint serves the current market timestamp, whether or not the
 market is currently open, as well as the times of the next market open and
@@ -83,7 +83,7 @@ close.
                 $day->date, $day->open;
         }
 
-Returns a list of Finance::Alpaca::Struct::Calendar objects.
+Returns a list of [Finance::Alpaca::Struct::Calendar](https://metacpan.org/pod/Finance%3A%3AAlpaca%3A%3AStruct%3A%3ACalendar) objects.
 
 The calendar endpoint serves the full list of market days from 1970 to 2029.
 
@@ -100,7 +100,7 @@ begin on January 1st, 1970.
     say $_->symbol
         for sort { $a->symbol cmp $b->symbol } @{ $camelid->assets( status => 'active' ) };
 
-Returns a list of Finance::Alpaca::Struct::Asset objects.
+Returns a list of [Finance::Alpaca::Struct::Asset](https://metacpan.org/pod/Finance%3A%3AAlpaca%3A%3AStruct%3A%3AAsset) objects.
 
 The assets endpoint serves as the master list of assets available for trade and
 data consumption from Alpaca.
@@ -115,10 +115,10 @@ The following parameters are accepted:
     my $msft = $camelid->asset('MSFT');
     my $spy  = $camelid->asset('b28f4066-5c6d-479b-a2af-85dc1a8f16fb');
 
-Returns a Finance::Alpaca::Struct::Asset object.
+Returns a [Finance::Alpaca::Struct::Asset](https://metacpan.org/pod/Finance%3A%3AAlpaca%3A%3AStruct%3A%3AAsset) object.
 
 You may use either the asset's `id` (UUID) or `symbol`. If the asset is not
-found, an empty list is retured.
+found, an empty list is returned.
 
 ## `bars( ... )`
 
@@ -130,7 +130,8 @@ found, an empty list is retured.
        );
     
 
-Returns a list of Finance::Alpaca::Struct::Bar objects along with other data.
+Returns a list of [Finance::Alpaca::Struct::Bar](https://metacpan.org/pod/Finance%3A%3AAlpaca%3A%3AStruct%3A%3ABar) objects along with other
+data.
 
 The bar endpoint serves aggregate historical data for the requested securities.
 
@@ -140,7 +141,7 @@ The following parameters are accepted:
 - `start` - Filter data equal to or before this time in RFC-3339 format or a Time::Moment object. Fractions of a second are not accepted; this is required
 - `end` - Filter data equal to or before this time in RFC-3339 format or a Time::Moment object. Fractions of a second are not accepted; this is required
 - `limit` - Number of data points to return. Must be in range `1-10000`, defaults to `1000`
-- `page_token` - Pagination token to contine from
+- `page_token` - Pagination token to continue from
 - `timeframe` - Timeframe for the aggregation. Available values are: `1Min`, `1Hour`, and `1Day`; this is required
 
 The method returns a hash reference with bar data included as a list under the
@@ -154,7 +155,8 @@ symbol as well as a `next_page_token` for pagination if applicable.
         end    => Time::Moment->now->minus_minutes(20)
     );
 
-Returns a list of Finance::Alpaca::Struct::Quote objects along with other data.
+Returns a list of [Finance::Alpaca::Struct::Quote](https://metacpan.org/pod/Finance%3A%3AAlpaca%3A%3AStruct%3A%3AQuote) objects along with other
+data.
 
 The bar endpoint serves quote (NBBO) historical data for the requested
 security.
@@ -165,11 +167,11 @@ The following parameters are accepted:
 - `start` - Filter data equal to or before this time in RFC-3339 format or a Time::Moment object. Fractions of a second are not accepted; this is required
 - `end` - Filter data equal to or before this time in RFC-3339 format or a Time::Moment object. Fractions of a second are not accepted; this is required
 - `limit` - Number of data points to return. Must be in range `1-10000`, defaults to `1000`
-- `page_token` - Pagination token to contine from
+- `page_token` - Pagination token to continue from
 
 The data returned includes the following data:
 
-- `quotes` - List of Finance::Alpaca::Struct::Quote objects
+- `quotes` - List of [Finance::Alpaca::Struct::Quote](https://metacpan.org/pod/Finance%3A%3AAlpaca%3A%3AStruct%3A%3AQuote) objects
 - `next_page_token` - Token that can be used to query the next page
 - `symbol` - Symbol that was queried
 
@@ -181,9 +183,10 @@ The data returned includes the following data:
         end    => Time::Moment->now->minus_minutes(20)
     );
 
-Returns a list of Finance::Alpaca::Struct::Trade objects along with other data.
+Returns a list of [Finance::Alpaca::Struct::Trade](https://metacpan.org/pod/Finance%3A%3AAlpaca%3A%3AStruct%3A%3ATrade) objects along with other
+data.
 
-The bar endpoint serves  historcial trade data for a given ticker symbol on a
+The bar endpoint serves historical trade data for a given ticker symbol on a
 specified date.
 
 The following parameters are accepted:
@@ -192,11 +195,11 @@ The following parameters are accepted:
 - `start` - Filter data equal to or before this time in RFC-3339 format or a Time::Moment object. Fractions of a second are not accepted; this is required
 - `end` - Filter data equal to or before this time in RFC-3339 format or a Time::Moment object. Fractions of a second are not accepted; this is required
 - `limit` - Number of data points to return. Must be in range `1-10000`, defaults to `1000`
-- `page_token` - Pagination token to contine from
+- `page_token` - Pagination token to continue from
 
 The data returned includes the following data:
 
-- `trades` - List of Finance::Alpaca::Struct::Quote objects
+- `trades` - List of [Finance::Alpaca::Struct::Quote](https://metacpan.org/pod/Finance%3A%3AAlpaca%3A%3AStruct%3A%3AQuote) objects
 - `next_page_token` - Token that can be used to query the next page
 - `symbol` - Symbol that was queried
 
@@ -204,11 +207,11 @@ The data returned includes the following data:
 
     my $stream = $camelid->trade_stream( sub ($packet) {  ... } );
 
-Returns a new Finance::Alpaca::TradeStream object.
+Returns a new [Finance::Alpaca::TradeStream](https://metacpan.org/pod/Finance%3A%3AAlpaca%3A%3ATradeStream) object.
 
 You are ready to receive real-time account and order data!
 
-This method expects a code reference. This callback will recieve all incoming
+This method expects a code reference. This callback will receive all incoming
 data.
 
 ## `data_stream( ... )`
@@ -218,22 +221,22 @@ data.
         trades => ['MSFT']
     );
 
-Returns a new Finance::Alpaca::DataStream object.
+Returns a new [Finance::Alpaca::DataStream](https://metacpan.org/pod/Finance%3A%3AAlpaca%3A%3ADataStream) object.
 
 You are ready to receive real-time market data!
 
 You can send one or more subscription messages (described in
-Finance::Alpaca::DataStream) and after confirmation you will receive the
+[Finance::Alpaca::DataStream](https://metacpan.org/pod/Finance%3A%3AAlpaca%3A%3ADataStream)) and after confirmation you will receive the
 corresponding market data.
 
-This method expects a code reference. This callback will recieve all incoming
+This method expects a code reference. This callback will receive all incoming
 data.
 
 ## `orders( [...] )`
 
     my $orders = $camelid->orders( status => 'open' );
 
-Returns a list of Finance::Alpaca::Struct::Order objects.
+Returns a list of [Finance::Alpaca::Struct::Order](https://metacpan.org/pod/Finance%3A%3AAlpaca%3A%3AStruct%3A%3AOrder) objects.
 
 The orders endpoint returns a list of orders for the account, filtered by the
 supplied parameters.
@@ -252,13 +255,13 @@ The following parameters are accepted:
 
     my $order = $camelid->order_by_id('0f43d12c-8f13-4bff-8597-c665b66bace4');
 
-Returns a Finance::Alpaca::Struct::Order object.
+Returns a [Finance::Alpaca::Struct::Order](https://metacpan.org/pod/Finance%3A%3AAlpaca%3A%3AStruct%3A%3AOrder) object.
 
 You must provide the order's `id` (UUID). If the order is not found, an empty
-list is retured.
+list is returned.
 
 You may also provide a boolean value; if true, the result will roll up
-multi-leg orders unter the `legs( )` field in primary order.
+multi-leg orders under the `legs( )` field in primary order.
 
     my $order = $camelid->order_by_id('0f43d12c-8f13-4bff-8597-c665b66bace4', 1);
 
@@ -266,10 +269,10 @@ multi-leg orders unter the `legs( )` field in primary order.
 
     my $order = $camelid->order_by_client_id('17ff6b86-d330-4ac1-808b-846555b75b6e');
 
-Returns a Finance::Alpaca::Struct::Order object.
+Returns a [Finance::Alpaca::Struct::Order](https://metacpan.org/pod/Finance%3A%3AAlpaca%3A%3AStruct%3A%3AOrder) object.
 
 You must provide the order's `client_order_id` (UUID). If the order is not
-found, an empty list is retured.
+found, an empty list is returned.
 
 ## `create_order( ... )`
 
@@ -282,8 +285,8 @@ found, an empty list is retured.
     );
 
 If the order is placed successfully, this method returns a
-Finance::Alpaca::Struct::Order object. Failures result in hash references with
-data from the API.
+[Finance::Alpaca::Struct::Order](https://metacpan.org/pod/Finance%3A%3AAlpaca%3A%3AStruct%3A%3AOrder) object. Failures result in hash references
+with data from the API.
 
 An order request may be rejected if the account is not authorized for trading,
 or if the tradable balance is insufficient to fill the order.
@@ -306,7 +309,7 @@ The following parameters are accepted:
 - `take_profit` - Additional parameters for `take_profit` leg of advanced orders
     - `limit_price` - Required for bracket orders
 - `stop_loss` - Additional parameters for stop-loss leg of advanced orders
-    - `stop_price` - Required for braket orders
+    - `stop_price` - Required for bracket orders
     - `limit_price` - The stop-loss order becomes a stop-limit order if specified
 
 ## `replace_order( ..., ... )`
@@ -375,7 +378,7 @@ cancel request, it returns status 204 and a true value.
     $camelid->positions( );
 
 Retrieves a list of the account’s open positions and returns a list of
-Finance::Alpaca::Struct::Positon objects.
+[Finance::Alpaca::Struct::Position](https://metacpan.org/pod/Finance%3A%3AAlpaca%3A%3AStruct%3A%3APosition) objects.
 
 ## `position( ... )`
 
@@ -383,7 +386,7 @@ Finance::Alpaca::Struct::Positon objects.
     my $msft = $camelid->position( 'b6d1aa75-5c9c-4353-a305-9e2caa1925ab' );
 
 Retreves the account's open position for the given symbol or asset ID and
-returns a Finance::Alpaca::Struct::Positoin object if found.
+returns a [Finance::Alpaca::Struct::Position](https://metacpan.org/pod/Finance%3A%3AAlpaca%3A%3AStruct%3A%3APosition) object if found.
 
 If not found, and empty list is returned.
 
@@ -401,7 +404,7 @@ orders before liquidating all positions.
 On success, an array of hashes will be returned each with the following
 elements:
 
-- `body` - Finance::Alpaca::Struct::Order object
+- `body` - [Finance::Alpaca::Struct::Order](https://metacpan.org/pod/Finance%3A%3AAlpaca%3A%3AStruct%3A%3AOrder) object
 - `id` - the order ID (UUID)
 - `status` - HTTP status code for the request
 
@@ -413,8 +416,8 @@ A response will be provided for each position that is attempted to be closed.
     $order    = $camelid->close_position( 'b6d1aa75-5c9c-4353-a305-9e2caa1925ab' );
 
 Closes (liquidates) the account’s open position for the given symbol or asset
-ID and returns a Finance::Alpaca::Struct::Order object. Works for both long and
-short positions.
+ID and returns a [Finance::Alpaca::Struct::Order](https://metacpan.org/pod/Finance%3A%3AAlpaca%3A%3AStruct%3A%3AOrder) object. Works for both long
+and short positions.
 
     my $order = $camelid->close_position('MSFT', 0.5);
 
@@ -451,7 +454,7 @@ The returned data is in a hash ref with the following keys:
     my @watchlists = $camelid->watchlists;
 
 Returns the list of watchlists registered under the account as
-Finance::Alpaca::Struct::Watchlist objects.
+[Finance::Alpaca::Struct::Watchlist](https://metacpan.org/pod/Finance%3A%3AAlpaca%3A%3AStruct%3A%3AWatchlist) objects.
 
 ## `create_watchlist( ..., [...] )`
 
@@ -463,7 +466,8 @@ first parameter is required and is the name of the user-defined new watchlist.
 This name must be a maximum of `64` characters. To add assets to the watchlist
 on create, include a list of ticker symbols.
 
-On success, the related Finance::Alpaca::Struct::Watchlist object is returned.
+On success, the related [Finance::Alpaca::Struct::Watchlist](https://metacpan.org/pod/Finance%3A%3AAlpaca%3A%3AStruct%3A%3AWatchlist) object is
+returned.
 
 ## `delete_watchlist( ... )`
 
@@ -483,21 +487,21 @@ Returns a watchlist identified by the ID.
     $camelid->update_watchlist( '29d85812-b4a2-45da-ac6c-dcc0ad9c1cd3', symbols => [qw[MA V]] );
 
 Update the name and/or content of watchlist. On success, a
-Finance::Alpaca::Struct::Watchlist object is returned.
+[Finance::Alpaca::Struct::Watchlist](https://metacpan.org/pod/Finance%3A%3AAlpaca%3A%3AStruct%3A%3AWatchlist) object is returned.
 
 ## `add_to_watchlist( ... )`
 
     $camelid->add_to_watchlist( '88f0c1e1-58d4-42c5-b85b-864839045678', 'TSLA');
 
 Append an asset for the symbol to the end of watchlist asset list. On success,
-a Finance::Alpaca::Struct::Watchlist object is returned.
+a [Finance::Alpaca::Struct::Watchlist](https://metacpan.org/pod/Finance%3A%3AAlpaca%3A%3AStruct%3A%3AWatchlist) object is returned.
 
 ## `remove_from_watchlist( ... )`
 
     $camelid->remove_from_watchlist( '88f0c1e1-58d4-42c5-b85b-864839045678', 'F');
 
 Delete one entry for an asset by symbol name. On success, a
-Finance::Alpaca::Struct::Watchlist object is returned.
+[Finance::Alpaca::Struct::Watchlist](https://metacpan.org/pod/Finance%3A%3AAlpaca%3A%3AStruct%3A%3AWatchlist) object is returned.
 
 ## `configuration( )`
 
@@ -535,21 +539,21 @@ This method expects a combination of the following optional parameters:
 - `page_size` - The maximum number of entries to return in the response
 - `page_token` - The ID of the end of your current page of results
 
-### Paging of Results
+# Paging of Results
 
-Pagination is handled using the `page_token` and `page_size` parameters.
-`page_token` represents the ID of the end of your current page of results. If
-specified with a direction of `desc`, for example, the results will end before
-the activity with the specified ID. If specified with a direction of `asc`,
-results will begin with the activity immediately after the one specified.
-`page_size` is the maximum number of entries to return in the response. If
-`date` is not specified, the default and maximum value is `100`. If `date`
-is specified, the default behavior is to return all results, and there is no
-maximum page size.
+When required, pagination is handled using the `page_token` and `page_size`
+parameters. `page_token` represents the ID of the end of your current page of
+results. If specified with a direction of `desc`, for example, the results
+will end before the activity with the specified ID. If specified with a
+direction of `asc`, results will begin with the activity immediately after the
+one specified. `page_size` is the maximum number of entries to return in the
+response. If `date` is not specified, the default and maximum value is `100`.
+If `date` is specified, the default behavior is to return all results, and
+there is no maximum page size.
 
 # See Also
 
-https://alpaca.markets/docs/api-documentation/api-v2/
+[https://alpaca.markets/docs/api-documentation/api-v2/](https://alpaca.markets/docs/api-documentation/api-v2/)
 
 # Note
 

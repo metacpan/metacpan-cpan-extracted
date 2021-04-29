@@ -7,7 +7,7 @@ use AnyEvent::Handle;
 use Carp qw( carp );
 
 # ABSTRACT: Simple asynchronous finger client
-our $VERSION = '0.11'; # VERSION
+our $VERSION = '0.12'; # VERSION
 
 
 sub new
@@ -16,8 +16,8 @@ sub new
   my $args  = ref $_[0] eq 'HASH' ? (\%{$_[0]}) : ({@_});
   my $port  = $args->{port};
   $port = 79 unless defined $port;
-  bless { 
-    hostname => $args->{hostname} || '127.0.0.1',  
+  bless {
+    hostname => $args->{hostname} || '127.0.0.1',
     port     => $port,
     timeout  => $args->{timeout}  || 60,
     on_error => $args->{on_error} || sub { carp $_[0] },
@@ -32,20 +32,20 @@ sub finger
   $request = '' unless defined $request;
   my $callback = shift || sub {};
   my $args     = ref $_[0] eq 'HASH' ? (\%{$_[0]}) : ({@_});
-  
+
   for(qw( hostname port timeout on_error ))
   {
     next if defined $args->{$_};
     $args->{$_} = $self->{$_};
   }
-  
+
   tcp_connect $args->{hostname}, $args->{port}, sub {
-  
+
     my($fh) = @_;
     return $args->{on_error}->("unable to connect: $!") unless $fh;
-    
+
     my @lines;
-    
+
     my $handle;
     $handle = AnyEvent::Handle->new(
       fh       => $fh,
@@ -59,11 +59,11 @@ sub finger
         $callback->(\@lines);
       },
     );
-    
+
     if(ref $request && $request->isa('AnyEvent::Finger::Request'))
     { $request = $request->{raw} }
     $handle->push_write("$request\015\012");
-    
+
     $handle->on_read(sub {
       $handle->push_read( line => sub {
         my($handle, $line) = @_;
@@ -71,9 +71,9 @@ sub finger
         push @lines, $line;
       });
     });
-  
+
   }, sub { $args->{timeout} };
-  
+
   $self;
 }
 
@@ -91,7 +91,7 @@ AnyEvent::Finger::Client - Simple asynchronous finger client
 
 =head1 VERSION
 
-version 0.11
+version 0.12
 
 =head1 SYNOPSIS
 
@@ -100,7 +100,7 @@ version 0.11
  
  my $done = AnyEvent->condvar;
  
- my $client = AnyEvent::Finger::Client->new( 
+ my $client = AnyEvent::Finger::Client->new(
    hostname => 'localhost',
  );
  
@@ -179,7 +179,7 @@ Graham Ollis <plicease@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2012 by Graham Ollis.
+This software is copyright (c) 2012-2021 by Graham Ollis.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

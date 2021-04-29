@@ -4,10 +4,11 @@ use warnings;
 use base 'Template::Plugin';
 
 # ABSTRACT: Template Toolkit dumper plugin using Data::Printer
-our $VERSION = '0.014'; # VERSION
+our $VERSION = '0.015'; # VERSION
 
 use HTML::FromANSI::Tiny ();
 use Hash::Merge::Simple qw< merge >;
+use version 0.77;
 
 sub new {
     my ($class, $context, $params) = @_;
@@ -75,7 +76,7 @@ Template::Plugin::DataPrinter - Template Toolkit dumper plugin using Data::Print
 
 =head1 VERSION
 
-version 0.014
+version 0.015
 
 =head1 SYNOPSIS
 

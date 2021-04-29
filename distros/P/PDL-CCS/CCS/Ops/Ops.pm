@@ -4,8 +4,8 @@
 #
 package PDL::CCS::Ops;
 
-@EXPORT_OK  = qw( PDL::PP ccs_binop_align_block_mia );
-%EXPORT_TAGS = (Func=>[@EXPORT_OK]);
+our @EXPORT_OK = qw(PDL::PP ccs_binop_align_block_mia );
+our %EXPORT_TAGS = (Func=>[@EXPORT_OK]);
 
 use PDL::Core;
 use PDL::Exporter;
@@ -13,8 +13,8 @@ use DynaLoader;
 
 
 
-   $PDL::CCS::Ops::VERSION = 1.23.15;
-   @ISA    = ( 'PDL::Exporter','DynaLoader' );
+   our $VERSION = '1.23.16';
+   our @ISA = ( 'PDL::Exporter','DynaLoader' );
    push @PDL::Core::PP, __PACKAGE__;
    bootstrap PDL::CCS::Ops $VERSION;
 

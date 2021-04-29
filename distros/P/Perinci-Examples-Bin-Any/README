@@ -3,9 +3,9 @@ NAME
     Perinci::CmdLine::Any)
 
 VERSION
-    This document describes version 0.070 of Perinci::Examples::Bin::Any
+    This document describes version 0.071 of Perinci::Examples::Bin::Any
     (from Perl distribution Perinci-Examples-Bin-Any), released on
-    2020-04-29.
+    2021-01-30.
 
 DESCRIPTION
     This distribution contains example scripts in "bin/" which use
@@ -36,7 +36,8 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2020, 2015, 2014 by perlancar@cpan.org.
+    This software is copyright (c) 2021, 2020, 2015, 2014 by
+    perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

@@ -1528,18 +1528,35 @@ json_create_not_ref (json_create_t * jc, SV * r)
 	break;
 
     case SVt_PVNV:
-	if (SvNOK (r)) {
-	    MSG ("SVt_PVNV %s/%g", SvPV_nolen (r), SvNV (r));
+	if (SvNIOK (r)) {
+	    if (SvNOK (r)) {
+		MSG ("SVt_PVNV with double %s/%g", SvPV_nolen (r), SvNV (r));
 
-	    /* We need to handle non-finite numbers without using
-	       Perl's stringified forms, because we need to put quotes
-	       around them, whereas Perl will just print 'nan' the
-	       same way it will print '0.01'. 'nan' is not valid JSON,
-	       so we have to convert to '"nan"'. */
-	    CALL (json_create_add_float (jc, r));
+		/* We need to handle non-finite numbers without using
+		   Perl's stringified forms, because we need to put quotes
+		   around them, whereas Perl will just print 'nan' the
+		   same way it will print '0.01'. 'nan' is not valid JSON,
+		   so we have to convert to '"nan"'. */
+		CALL (json_create_add_float (jc, r));
+	    }
+	    else if (SvIOK (r)) {
+		MSG ("SVt_PVNV with integer %s/%g", SvPV_nolen (r), SvNV (r));
+
+		/* We need to handle non-finite numbers without using
+		   Perl's stringified forms, because we need to put quotes
+		   around them, whereas Perl will just print 'nan' the
+		   same way it will print '0.01'. 'nan' is not valid JSON,
+		   so we have to convert to '"nan"'. */
+		CALL (json_create_add_integer (jc, r));
+	    }
+	    else {
+		/* I'm not sure if this will be reached. */
+		MSG ("SVt_PVNV without valid NV/IV %s", SvPV_nolen (r));
+		CALL (json_create_add_string (jc, r));
+	    }
 	}
 	else {
-	    MSG ("SVt_PVNV without valid NV %s", SvPV_nolen (r));
+	    MSG ("SVt_PVNV without valid NV/IV %s", SvPV_nolen (r));
 	    CALL (json_create_add_string (jc, r));
 	}
 	break;

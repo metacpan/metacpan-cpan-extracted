@@ -1,5 +1,6 @@
 bin/eachperl
 Build.PL
+Changes
 lib/App/eachperl.pm
 LICENSE
 MANIFEST			This list of files

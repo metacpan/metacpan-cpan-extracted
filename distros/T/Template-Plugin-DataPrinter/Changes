@@ -1,5 +1,8 @@
 Revision history for Template-Plugin-DataPrinter
 
+0.015     2021-04-29T10:56:52AEST+1000
+ - Fixes for Perl v5.8
+
 0.014     2021-04-27T16:33:13AEST+1000
  - Updates for DataPrinter 1.0.0
 

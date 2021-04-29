@@ -5,6 +5,8 @@ use namespace::autoclean;
 use Carp;
 use File::Spec;
 use Moo::Role;
+# ABSTRACT: A role that handles filepaths for improved portability
+our $VERSION = '0.074'; # VERSION
 
 
 sub chomp_portable {
@@ -52,11 +54,11 @@ __END__
 
 =head1 NAME
 
-Archive::BagIt::Role::Portability
+Archive::BagIt::Role::Portability - A role that handles filepaths for improved portability
 
 =head1 VERSION
 
-version 0.073
+version 0.074
 
 =head1 AVAILABILITY
 

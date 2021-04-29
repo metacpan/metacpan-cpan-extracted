@@ -54,6 +54,7 @@ t/dualvar.t
 t/escape-slash.t
 t/fformat.t
 t/float.t
+t/funky-numbers.t
 t/indent.t
 t/jcbool.t
 t/JCT.pm

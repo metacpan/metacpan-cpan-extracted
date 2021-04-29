@@ -43,7 +43,7 @@ CGI::Tiny - Common Gateway Interface, with no frills
     die "Invalid fribble parameter" unless length $fribble;
 
     if ($cgi->query_param('download')) {
-      $cgi->set_response_download('fribble.json');
+      $cgi->set_response_disposition(attachment => 'fribble.json');
     }
     $cgi->render(json => {fribble => $fribble});
   };
@@ -165,50 +165,6 @@ L<JSON::PP>. CGI scripts that deal with JSON content will greatly benefit from
 installing L<Cpanel::JSON::XS> version C<4.09> or newer for efficient encoding
 and decoding, which will be used automatically if available.
 
-=head2 Files
-
-Modules like L<Path::Tiny> and L<MIME::Types> can help with file responses. Be
-aware that Perl and some operating systems work with filenames in encoded
-bytes, so non-ASCII filenames make things trickier.
-
-  #!/usr/bin/perl
-  use strict;
-  use warnings;
-  use utf8;
-  use CGI::Tiny;
-  use Path::Tiny;
-  use MIME::Types;
-
-  cgi {
-    my $cgi = $_;
-
-    my $filename = $cgi->query_param('filename');
-    unless (length $filename) {
-      $cgi->set_response_status(404)->render(text => 'Not Found');
-      exit;
-    }
-
-    # get files from public/ next to cgi-bin/
-    my $public_dir = path(__FILE__)->realpath->parent->sibling('public');
-    my $filepath = $public_dir->child($filename);
-
-    # ensure file exists, is readable, and is not a directory
-    unless (-r $filepath and !-d _) {
-      $cgi->set_response_status(404)->render(text => 'Not Found');
-      exit;
-    }
-
-    # ensure file path doesn't escape the public/ directory
-    unless ($public_dir->subsumes($filepath->realpath)) {
-      $cgi->set_response_status(404)->render(text => 'Not Found');
-      exit;
-    }
-
-    my $mime = MIME::Types->new->mimeTypeOf($filepath->basename);
-    $cgi->set_response_content_type($mime->type) if defined $mime;
-    $cgi->set_response_download($filepath->basename)->render(file => $filepath);
-  };
-
 =head2 Templating
 
 HTML and XML responses are most easily managed with templating. A number of
@@ -270,6 +226,54 @@ toolkit.
   __DATA__
   @@ index.html.ep
   <html><body><h1><%= $foo %></h1></body></html>
+
+=head2 Files
+
+Modules like L<Path::Tiny> and L<MIME::Types> can help with file responses. Be
+aware that Perl and some operating systems work with filenames in encoded
+bytes (usually UTF-8), but this module works with parameters in Unicode
+characters, so non-ASCII filenames make things trickier.
+
+  #!/usr/bin/perl
+  use strict;
+  use warnings;
+  use utf8;
+  use CGI::Tiny;
+  use Path::Tiny;
+  use MIME::Types;
+  use Unicode::UTF8 qw(encode_utf8 decode_utf8);
+
+  cgi {
+    my $cgi = $_;
+
+    my $filename = $cgi->query_param('filename');
+    unless (length $filename) {
+      $cgi->set_response_status(404)->render(text => 'Not Found');
+      exit;
+    }
+
+    # get files from public/ next to cgi-bin/
+    my $public_dir = path(__FILE__)->realpath->parent->sibling('public');
+    my $encoded_filename = encode_utf8 $filename;
+    my $filepath = $public_dir->child($encoded_filename);
+
+    # ensure file exists, is readable, and is not a directory
+    unless (-r $filepath and !-d _) {
+      $cgi->set_response_status(404)->render(text => 'Not Found');
+      exit;
+    }
+
+    # ensure file path doesn't escape the public/ directory
+    unless ($public_dir->subsumes($filepath->realpath)) {
+      $cgi->set_response_status(404)->render(text => 'Not Found');
+      exit;
+    }
+
+    my $basename = decode_utf8 $filepath->basename;
+    my $mime = MIME::Types->new->mimeTypeOf($basename);
+    $cgi->set_response_type($mime->type) if defined $mime;
+    $cgi->set_response_disposition(attachment => $basename)->render(file => $filepath);
+  };
 
 =head2 Routing
 
@@ -736,6 +740,18 @@ CGI server.
 
 No effect after response headers have been rendered.
 
+=head3 set_response_fixed_length
+
+  $cgi = $cgi->set_response_fixed_length(1);
+
+If set to a true value before rendering response headers, a C<Content-Length>
+header will be set to the size of the encoded content on the first call to
+L</"render">, unless it streams the response data from a C<handle> and thus
+can't predetermine the content size. L</"render"> cannot be used to provide
+additional response data if a C<Content-Length> header was rendered.
+
+No effect after response headers have been rendered.
+
 =head3 set_response_body_buffer
 
   $cgi = $cgi->set_response_body_buffer(128*1024);
@@ -759,12 +775,26 @@ No effect after response headers have been rendered.
 
 The CGI protocol assumes a status of C<200 OK> if no response status is set.
 
-=head3 set_response_content_type
+=head3 set_response_disposition
 
-  $cgi = $cgi->set_response_content_type('application/xml');
+  $cgi = $cgi->set_response_disposition('attachment');
+  $cgi = $cgi->set_response_disposition(attachment => $filename);
+  $cgi = $cgi->set_response_disposition('inline'); # default behavior
+  $cgi = $cgi->set_response_disposition(inline => $filename);
+
+Sets the response C<Content-Disposition> header to indicate how the client
+should present the response, with an optional filename specified in Unicode
+characters. C<attachment> suggests to download the content as a file, and
+C<inline> suggests to display the content inline (the default behavior). No
+effect after response headers have been rendered.
+
+=head3 set_response_type
+
+  $cgi = $cgi->set_response_type('application/xml');
 
 Sets the response C<Content-Type> header, to override autodetection in
-L</"render">. No effect after response headers have been rendered.
+L</"render">. C<undef> will remove the override. No effect after response
+headers have been rendered.
 
 =head3 set_response_charset
 
@@ -773,18 +803,9 @@ L</"render">. No effect after response headers have been rendered.
 Set charset to use when rendering C<text>, C<html>, or C<xml> response data,
 defaults to C<UTF-8>.
 
-=head3 set_response_download
-
-  $cgi = $cgi->set_response_download;
-  $cgi = $cgi->set_response_download($filename);
-
-Sets the response C<Content-Disposition> header to indicate to the client that
-the response is a file download, with an optional filename specified in Unicode
-characters. No effect after response headers have been rendered.
-
 =head3 add_response_header
 
-  $cgi = $cgi->add_response_header('Content-Disposition' => 'attachment');
+  $cgi = $cgi->add_response_header('Content-Language' => 'en');
 
 Adds a custom response header. No effect after response headers have been
 rendered.
@@ -873,6 +894,13 @@ If set to a true value, the cookie will be restricted to HTTPS requests.
 
 =back
 
+=head3 reset_response_headers
+
+  $cgi = $cgi->reset_response_headers;
+
+Remove any pending response headers set by L</"add_response_header"> or
+L</"add_response_cookie">. No effect after response headers have been rendered.
+
 =head3 response_status_code
 
   my $code = $cgi->response_status_code;
@@ -890,25 +918,26 @@ to L</"render">.
 
 =head3 render
 
-  $cgi->render;
-  $cgi->render(html     => $html);
-  $cgi->render(xml      => $xml);
-  $cgi->render(text     => $text);
-  $cgi->render(data     => $bytes);
-  $cgi->render(file     => $filepath);
-  $cgi->render(handle   => $filehandle);
-  $cgi->render(json     => $ref);
-  $cgi->render(redirect => $url);
+  $cgi = $cgi->render;
+  $cgi = $cgi->render(html     => $html);
+  $cgi = $cgi->render(xml      => $xml);
+  $cgi = $cgi->render(text     => $text);
+  $cgi = $cgi->render(data     => $bytes);
+  $cgi = $cgi->render(file     => $filepath);
+  $cgi = $cgi->render(handle   => $filehandle);
+  $cgi = $cgi->render(json     => $ref);
+  $cgi = $cgi->render(redirect => $url);
 
 Renders response data of a type indicated by the first parameter, if any. The
 first time it is called will render response headers and set
-L</"headers_rendered">, and it may be called additional times with more
-response data.
+L</"headers_rendered">. It may be called additional times with more response
+data, unless a C<Content-Length> header was generated due to
+L</"set_response_fixed_length">.
 
 The C<Content-Type> response header will be set according to
-L</"set_response_content_type">, or autodetected depending on the data type
-passed in the first call to C<render>, or to C<application/octet-stream> if
-there is no more appropriate value.
+L</"set_response_type">, or autodetected depending on the data type passed in
+the first call to C<render>, or to C<application/octet-stream> if there is no
+more appropriate value.
 
 C<html>, C<xml>, or C<text> data is expected to be decoded Unicode characters,
 and will be encoded according to L</"set_response_charset"> (UTF-8 by default).
@@ -922,8 +951,9 @@ C<json> data structures will be encoded to JSON and UTF-8.
 
 C<redirect> will set a C<Location> header if response headers have not yet been
 rendered, and will set a response status of 302 if none has been set by
-L</"set_response_status">. It will not set a C<Content-Type> response header.
-If response headers have already been rendered a warning will be emitted.
+L</"set_response_status">. It will set a C<Content-Length> of 0, and it will
+not set a C<Content-Type> response header. If response headers have already
+been rendered a warning will be emitted.
 
 The C<Date> response header will be set to the current time as an HTTP date
 string if not set manually.
@@ -1041,7 +1071,7 @@ itself.
 
 Response setters are distinct methods from request accessors in CGI::Tiny.
 L</"content_type">, L</"header">, and L</"cookie"> are used to access request
-data, and L</"set_response_content_type">, L</"add_response_header">, and
+data, and L</"set_response_type">, L</"add_response_header">, and
 L</"add_response_cookie"> are used to set response headers for the pending
 response before the first call to L</"render">.
 

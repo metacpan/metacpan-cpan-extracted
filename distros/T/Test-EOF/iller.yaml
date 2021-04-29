@@ -1,8 +1,14 @@
 ---
+doctype: global
+
+distribution_name: Test-EOF
+
+---
 doctype: dist
 
 header:
   name: Test-EOF
+  copyright_year: 2021
 
 prereqs:
   runtime:
@@ -23,3 +29,11 @@ plugins:
   - +config: Author::CSSON
 
   - +remove_plugin: Splint
+
+---
+doctype: cpanfile
+
+---
+doctype: gitignore
+
+config: Author::CSSON

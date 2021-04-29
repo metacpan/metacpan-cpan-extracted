@@ -1,7 +1,7 @@
 #!perl
 
-our $DATE = '2020-04-29'; # DATE
-our $VERSION = '0.070'; # VERSION
+our $DATE = '2021-01-30'; # DATE
+our $VERSION = '0.071'; # VERSION
 
 use 5.010;
 use strict;
@@ -32,7 +32,7 @@ peri-eg-multi-any - Test command with multiple subcommands
 
 =head1 VERSION
 
-This document describes version 0.070 of peri-eg-multi-any (from Perl distribution Perinci-Examples-Bin-Any), released on 2020-04-29.
+This document describes version 0.071 of peri-eg-multi-any (from Perl distribution Perinci-Examples-Bin-Any), released on 2021-01-30.
 
 =head1 SYNOPSIS
 
@@ -41,11 +41,11 @@ Usage:
  % peri-eg-multi-any add [--config-path=path | -c]
      [--config-profile=profile | -P] [--format=name] [--json]
      [--(no)naked-res] [--no-config | -C] [--no-env]
-     [--page-result[=program]] <arg1> <arg2>
+     [--page-result[=program]] [--view-result[=program]] <arg1> <arg2>
  % peri-eg-multi-any subtract [--config-path=path | -c]
      [--config-profile=profile | -P] [--format=name] [--json]
      [--(no)naked-res] [--no-config | -C] [--no-env]
-     [--page-result[=program]] <arg1> <arg2>
+     [--page-result[=program]] [--view-result[=program]] <arg1> <arg2>
 
 =head1 SUBCOMMANDS
 
@@ -136,6 +136,10 @@ List available subcommands.
 =item B<--version>, B<-v>
 
 Display program's version and exit.
+
+=item B<--view-result>
+
+View output using a viewer.
 
 =back
 
@@ -264,7 +268,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020, 2015, 2014 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2020, 2015, 2014 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

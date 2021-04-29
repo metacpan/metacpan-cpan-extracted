@@ -7,7 +7,7 @@ build_requires:
 configure_requires:
   Module::Build::Tiny: '0.034'
 dynamic_config: 0
-generated_by: 'Dist::Milla version v1.0.17, Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Milla version v1.0.20, Dist::Zilla version 6.017, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -25,18 +25,18 @@ requires:
   Class::Data::Inheritable: '0'
   DateTime: '0'
   DateTime::TimeZone: '0'
-  Digest::SHA1: '0'
+  Digest::SHA: '0'
   LWP::UserAgent: '0'
   MIME::Base64: '0'
   URI: '0'
-  XML::LibXML: '1.69'
-  XML::XPath: '0'
+  XML::LibXML: '2.0202'
+  XML::XPath: '1.20'
   perl: '5.008001'
 resources:
   bugtracker: https://github.com/miyagawa/xml-atom/issues
   homepage: https://github.com/miyagawa/xml-atom
   repository: https://github.com/miyagawa/xml-atom.git
-version: '0.42'
+version: '0.43'
 x_contributors:
   - 'Andreas Marienborg <andreas.marienborg@gmail.com>'
   - 'Benjamin Trott <ben@stupidfool.org>'
@@ -44,6 +44,7 @@ x_contributors:
   - 'Dave Cross <dave@dave.org.uk>'
   - 'David Steinbrunner <dsteinbrunner@pobox.com>'
   - 'emasaka <emasaka@gmail.com>'
+  - 'Florian Schlichting <fsfs@debian.org>'
   - 'Jonathan "Duke" Leto <jonathan@leto.net>'
   - 'Martin Atkins <mart@degeneration.co.uk>'
   - 'root <root@localhost.localdomain>'
@@ -52,6 +53,10 @@ x_contributors:
   - 'Tatsuhiko Miyagawa <miyagawa@gmail.com>'
   - 'tokuhirom <tokuhirom@gmail.com>'
   - 'Tomas Doran <bobtfish@bobtfish.net>'
+  - 'tzccinct <tzccinct@gmail.com>'
   - 'Vince Veselosky <vince@control-escape.com>'
   - 'Yann Kerherve <yann@cyberion.net>'
-x_serialization_backend: 'YAML::Tiny version 1.70'
+x_generated_by_perl: v5.32.1
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'
+x_static_install: 0

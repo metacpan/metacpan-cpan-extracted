@@ -124,7 +124,7 @@ Submit a limit order to attempt to sell 1 share of AMD at a particular price
 Short orders can also be placed for securities which you do not hold an open
 long position in.
 
-Submit a market order to open a short position of one share
+Submit a market order to open a short position of one share.
 
     $alpaca->create_order(
         symbol => 'TSLA',
@@ -330,7 +330,7 @@ You can view the positions in your portfolio with the following example.
 =head2 View Open Positions in Your Portfolio
 
 You can view the positions in your portfolio with the following code. If you
-specify a symbol, you’ll see only your position for the associated stock.
+specify a symbol, you'll see only your position for the associated stock.
 
     for my $position ( $camelid->positions ) {
         say sprintf '%f shares of %s', $position->qty, $position->symbol;

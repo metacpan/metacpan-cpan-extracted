@@ -16,12 +16,12 @@ name: App-eachperl
 provides:
   App::eachperl:
     file: lib/App/eachperl.pm
-    version: '0.02'
+    version: '0.03'
 requires:
   Config::Tiny: '0'
   Struct::Dumb: '0'
   perl: '5.01'
 resources:
   license: http://dev.perl.org/licenses/
-version: '0.02'
+version: '0.03'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

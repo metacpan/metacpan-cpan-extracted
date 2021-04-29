@@ -1,0 +1,69 @@
+commit 6eef10d5861d11543ec2af521328217dea8b628d
+Author: Jim Brandt <jbrandt@bestpractical.com>
+Date:   Mon Apr 12 17:16:10 2021 -0400
+
+    Add callbacks to user admin index page
+    
+    These allow a developer to add a custom component to the
+    form and then act on it in the init section.
+
+diff --git a/share/html/Admin/Users/index.html b/share/html/Admin/Users/index.html
+index c254df74df..d73105c961 100644
+--- a/share/html/Admin/Users/index.html
++++ b/share/html/Admin/Users/index.html
+@@ -77,6 +77,8 @@ jQuery(function(){
+ <&|/l&>Find all users whose</&> <& /Elements/SelectUsers, %ARGS, Fields => \@fields &><br />
+ <input type="checkbox" class="checkbox" id="FindDisabledUsers" name="FindDisabledUsers" value="1" <% $FindDisabledUsers? 'checked="checked"': '' %> />
+ <label for="FindDisabledUsers"><&|/l&>Include disabled users in search.</&></label>
++% $m->callback( %ARGS, UsersObj => $users, CallbackName => 'InUsersAdminForm' );
++
+ <br />
+ <div align="right"><input type="submit" class="button" value="<&|/l&>Go!</&>" /></div> 
+ </form>
+@@ -104,6 +106,8 @@ my $caption;
+ my $users = RT::Users->new( $session{'CurrentUser'} );
+ $users->FindAllRows if $FindDisabledUsers;
+ 
++$m->callback( UsersObj => $users, ARGSRef => \%ARGS, CallbackName => 'Initial' );
++
+ if ( defined($UserString) && length $UserString ) {
+     $caption = loc("Users matching search criteria");
+     if ( $UserField =~ /^CustomField-(\d+)/ ) {
+
+commit fda000abd117d24aecca112e9b550bedafb38eba
+Author: sunnavy <sunnavy@bestpractical.com>
+Date:   Sat Apr 24 02:53:52 2021 +0800
+
+    Add ModifyCollectionListArgs callback to user admin index page
+    
+    The initial reason is: customization code that adds extra search
+    parameters can use this callback to pass them to paging URLs
+    accordingly.
+
+diff --git a/share/html/Admin/Users/index.html b/share/html/Admin/Users/index.html
+index c254df74df..b45b384dfe 100644
+--- a/share/html/Admin/Users/index.html
++++ b/share/html/Admin/Users/index.html
+@@ -86,7 +86,8 @@ jQuery(function(){
+ % } else {
+ <p><&|/l&>Select a user</&>:</p>
+ 
+-<& /Elements/CollectionList,
++<%perl>
++my %collection_list_args = (
+     OrderBy => 'Name',
+     Order => 'ASC',
+     Rows  => $Rows,
+@@ -95,7 +96,11 @@ jQuery(function(){
+     Collection => $users,
+     AllowSorting => 1,
+     PassArguments => [qw(Format Rows Page Order OrderBy UserString UserOp UserField IdLike EmailLike FindDisabledUsers)],
+-&>
++);
++</%perl>
++
++% $m->callback( %ARGS, UsersObj => $users, CallbackName => 'ModifyCollectionListArgs', CollectionListArgs => \%collection_list_args );
++<& /Elements/CollectionList, %collection_list_args &>
+ 
+ % }
+ 

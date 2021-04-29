@@ -7,7 +7,9 @@ use Time::HiRes qw(time);
 use Moo;
 extends "Archive::BagIt";
 
-our $VERSION = '0.073'; # VERSION
+our $VERSION = '0.074'; # VERSION
+
+# ABSTRACT: A module to use IO::AIO to het better performance
 
 
 has 'digest_callback' => (
@@ -66,11 +68,11 @@ __END__
 
 =head1 NAME
 
-Archive::BagIt::Fast
+Archive::BagIt::Fast - A module to use IO::AIO to het better performance
 
 =head1 VERSION
 
-version 0.073
+version 0.074
 
 =head1 NAME
 

@@ -4,8 +4,9 @@ use warnings;
 
 package Test::EOF;
 
-our $VERSION = '0.0803'; # VERSION
+our $VERSION = '0.0804';
 # ABSTRACT: Check correct end of files in a project.
+our $AUTHORITY = 'cpan:CSSON'; # AUTHORITY
 
 use Cwd qw/cwd/;
 use File::Find;
@@ -168,22 +169,19 @@ Test::EOF - Check correct end of files in a project.
 
 
 
-=begin HTML
+=begin html
 
-<p><img src="https://img.shields.io/badge/perl-5.10.1+-brightgreen.svg" alt="Requires Perl 5.10.1+" /> <a href="https://travis-ci.org/Csson/p5-test-eof"><img src="https://api.travis-ci.org/Csson/p5-test-eof.svg?branch=master" alt="Travis status" /></a></p>
+<p>
+<img src="https://img.shields.io/badge/perl-5.10.1+-blue.svg" alt="Requires Perl 5.10.1+" />
+<img src="https://img.shields.io/badge/coverage-65.4%25-red.svg" alt="coverage 65.4%" />
+<a href="https://github.com/Csson/p5-test-eof/actions?query=workflow%3Amakefile-test"><img src="https://img.shields.io/github/workflow/status/Csson/p5-test-eof/makefile-test" alt="Build status at Github" /></a>
+</p>
 
-=end HTML
-
-
-=begin markdown
-
-![Requires Perl 5.10.1+](https://img.shields.io/badge/perl-5.10.1+-brightgreen.svg) [![Travis status](https://api.travis-ci.org/Csson/p5-test-eof.svg?branch=master)](https://travis-ci.org/Csson/p5-test-eof)
-
-=end markdown
+=end html
 
 =head1 VERSION
 
-Version 0.0803, released 2015-11-25.
+Version 0.0804, released 2021-04-28.
 
 =head1 SYNOPSIS
 
@@ -267,7 +265,7 @@ Erik Carlsson <info@code301.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by Erik Carlsson.
+This software is copyright (c) 2021 by Erik Carlsson.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

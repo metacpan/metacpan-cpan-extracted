@@ -32,7 +32,7 @@ our %EXPORT_TAGS = (config=>['%ccsConfig'], Func=>\@Export, default=>\@EXPORT, a
                                     'PDL_IND',
                                     'PDL_LL'
                                   ],
-               'INT_TYPE_MAX_IONAME' => 'ccs_indx',
+               'INT_TYPE_MAX_IONAME' => 'longlong',
                'USE_PDL_INDX' => 1
              );
 

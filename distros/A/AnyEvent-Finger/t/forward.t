@@ -57,9 +57,9 @@ subtest 'finger', sub {
     ($lines) = shift;
     $done->send;
   });
-  
+
   $done->recv;
-  
+
   is $lines->[0], 'server2', 'lines[0] == server2';
 };
 
@@ -71,9 +71,9 @@ subtest 'finger @localhost', sub {
     ($lines) = shift;
     $done->send;
   });
-  
+
   $done->recv;
-  
+
   is $lines->[0], 'server1', 'lines[0] == server2';
   is $lines->[1], 'username = ', 'username = ';
 };
@@ -86,9 +86,9 @@ subtest 'finger @localhost@localhost', sub {
     ($lines) = shift;
     $done->send;
   });
-  
+
   $done->recv;
-  
+
   is $lines->[0], 'finger forwarding service denied', 'lines[0] == finger forwarding service denied';
 };
 
@@ -100,9 +100,9 @@ subtest 'finger foo@localhost', sub {
     ($lines) = shift;
     $done->send;
   });
-  
+
   $done->recv;
-  
+
   is $lines->[0], 'server1', 'lines[0] == server2';
   is $lines->[1], 'username = foo', 'username = foo';
   is $lines->[2], 'verbose  = 0', 'verbose = 0';
@@ -116,9 +116,9 @@ subtest 'finger /W foo@localhost', sub {
     ($lines) = shift;
     $done->send;
   });
-  
+
   $done->recv;
-  
+
   is $lines->[0], 'server1', 'lines[0] == server2';
   is $lines->[1], 'username = foo', 'username = foo';
   is $lines->[2], 'verbose  = 1', 'verbose = 1';
@@ -132,9 +132,9 @@ subtest 'finger /W @localhost', sub {
     ($lines) = shift;
     $done->send;
   });
-  
+
   $done->recv;
-  
+
   is $lines->[0], 'server1', 'lines[0] == server2';
   is $lines->[1], 'username = ', 'username = ';
   is $lines->[2], 'verbose  = 1', 'verbose = 1';

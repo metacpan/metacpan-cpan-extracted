@@ -1,6 +1,11 @@
 Revision history for Perl extension Finance-Alpaca
 
-0.9901 2021-04-26T20:59:38Z
+0.9902 2021-04-28T17:16:19Z
+
+    - Minor documentation updates
+    - Update dependencies in cpanfile
+
+0.9902 2021-04-26T20:59:38Z
 
     - Adding basic examples in Finance::Alpaca::Cookbook
 

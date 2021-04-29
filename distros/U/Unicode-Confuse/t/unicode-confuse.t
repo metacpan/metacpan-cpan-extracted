@@ -20,6 +20,10 @@ is (canonical ('Æ'), 'AE', "Got canonical form for Æ");
 ok (confusable ('㈝'), "㈝ is confusable");
 is (canonical ('㈝'), '(오전)', "Got canonical form for ㈝");
 
+ok (confusable ('−'), "Minus sign is confusable");
+is (canonical ('–'), '-', "Got canonical form for −");
+ok (confusable ('~'), "Tildes");
+is (canonical ('∼'), '~', "Tildes");
 done_testing ();
 
 # Local variables:

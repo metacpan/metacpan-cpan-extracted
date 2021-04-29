@@ -26,62 +26,64 @@ no_index:
 provides:
   Finance::Alpaca:
     file: lib/Finance/Alpaca.pm
-    version: '0.9901'
+    version: '0.9902'
   Finance::Alpaca::DataStream:
     file: lib/Finance/Alpaca/DataStream.pm
-    version: '0.9900'
+    version: '0.9902'
   Finance::Alpaca::Struct::Account:
     file: lib/Finance/Alpaca/Struct/Account.pm
-    version: '0.9900'
+    version: '0.9902'
   Finance::Alpaca::Struct::Activity:
     file: lib/Finance/Alpaca/Struct/Activity.pm
-    version: '0.9900'
+    version: '0.9902'
   Finance::Alpaca::Struct::Asset:
     file: lib/Finance/Alpaca/Struct/Asset.pm
-    version: '0.9900'
+    version: '0.9902'
   Finance::Alpaca::Struct::Bar:
     file: lib/Finance/Alpaca/Struct/Bar.pm
-    version: '0.9900'
+    version: '0.9902'
   Finance::Alpaca::Struct::Calendar:
     file: lib/Finance/Alpaca/Struct/Calendar.pm
-    version: '0.9900'
+    version: '0.9902'
   Finance::Alpaca::Struct::Clock:
     file: lib/Finance/Alpaca/Struct/Clock.pm
-    version: '0.9900'
+    version: '0.9902'
   Finance::Alpaca::Struct::Configuration:
     file: lib/Finance/Alpaca/Struct/Configuration.pm
-    version: '0.9900'
+    version: '0.9902'
   Finance::Alpaca::Struct::Order:
     file: lib/Finance/Alpaca/Struct/Order.pm
-    version: '0.9900'
+    version: '0.9902'
   Finance::Alpaca::Struct::Position:
     file: lib/Finance/Alpaca/Struct/Position.pm
-    version: '0.9900'
+    version: '0.9902'
   Finance::Alpaca::Struct::Quote:
     file: lib/Finance/Alpaca/Struct/Quote.pm
-    version: '0.9900'
+    version: '0.9902'
   Finance::Alpaca::Struct::Trade:
     file: lib/Finance/Alpaca/Struct/Trade.pm
-    version: '0.9900'
+    version: '0.9902'
   Finance::Alpaca::Struct::TradeActivity:
     file: lib/Finance/Alpaca/Struct/TradeActivity.pm
-    version: '0.9900'
+    version: '0.9902'
   Finance::Alpaca::Struct::TradeUpdate:
     file: lib/Finance/Alpaca/Struct/TradeUpdate.pm
-    version: '0.9900'
+    version: '0.9902'
   Finance::Alpaca::Struct::Watchlist:
     file: lib/Finance/Alpaca/Struct/Watchlist.pm
-    version: '0.9900'
+    version: '0.9902'
   Finance::Alpaca::TradeStream:
     file: lib/Finance/Alpaca/TradeStream.pm
-    version: '0.9900'
+    version: '0.9902'
   Finance::Alpaca::Types:
     file: lib/Finance/Alpaca/Types.pm
-    version: '0.9900'
+    version: '0.9902'
 requires:
+  Mojo::Promise: '0'
   Mojo::UserAgent: '0'
+  Moo: '0'
   Time::Moment: '0'
-  Types::Standard: '0'
+  Types::Standard: '1.006'
   Types::UUID: '0'
   perl: '5.022'
   strictures: '2'
@@ -89,7 +91,7 @@ resources:
   bugtracker: https://github.com/sanko/Finance-Alpaca/issues
   homepage: https://github.com/sanko/Finance-Alpaca
   repository: git://github.com/sanko/Finance-Alpaca.git
-version: '0.9901'
+version: '0.9902'
 x_authority: cpan:SANKO
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_static_install: 1

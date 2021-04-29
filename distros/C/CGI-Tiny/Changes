@@ -1,3 +1,11 @@
+0.011     2021-04-29 02:12:59 EDT
+  - Rename set_response_content_type and set_response_content_disposition to set_response_type and set_response_disposition
+  - Add set_response_fixed_length method
+
+0.010     2021-04-28 23:14:59 EDT
+  - Replace set_response_download method with set_response_content_disposition
+  - Add reset_response_headers method
+
 0.009     2021-04-28 03:03:52 EDT
   - query_param_names, body_param_names, cookie_names, and upload_names now return names in the original request order
   - Add set_response_download and set_response_body_buffer methods

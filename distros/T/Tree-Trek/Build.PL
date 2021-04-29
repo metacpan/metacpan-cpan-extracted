@@ -11,7 +11,7 @@ my $b = Module::Build->new
    {'Carp'                =>0,
     'Data::Dump'          =>0,
     'feature'             =>0,
-    'Data::Table::Text'   =>0,
+    'Data::Table::Text'   =>20210328,
     'Test2::API'          =>0,
     'Test::More'          =>0,
    },

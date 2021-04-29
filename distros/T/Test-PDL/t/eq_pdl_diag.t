@@ -12,30 +12,30 @@ my ( $got, $expected, $ok, $diag );
 
 ( $ok, $diag ) = eq_pdl_diag();
 ok !$ok;
-is $diag, 'received value is not a piddle';
+is $diag, 'received value is not a ndarray';
 
 $got = pdl( 9,-10 );
 ( $ok, $diag ) = eq_pdl_diag( $got );
 ok !$ok;
-is $diag, 'expected value is not a piddle';
+is $diag, 'expected value is not a ndarray';
 
 $expected = 3;
 $got = 4;
 ( $ok, $diag ) = eq_pdl_diag( $got, $expected );
 ok !$ok;
-is $diag, 'received value is not a piddle';
+is $diag, 'received value is not a ndarray';
 
 $expected = 3;
 $got = long( 3,4 );
 ( $ok, $diag ) = eq_pdl_diag( $got, $expected );
 ok !$ok;
-is $diag, 'expected value is not a piddle';
+is $diag, 'expected value is not a ndarray';
 
 $expected = short( 1,2 );
 $got = -2;
 ( $ok, $diag ) = eq_pdl_diag( $got, $expected );
 ok !$ok;
-is $diag, 'received value is not a piddle';
+is $diag, 'received value is not a ndarray';
 
 Test::PDL::set_options( EQUAL_TYPES => 0 );
 $expected = long( 3,4 );

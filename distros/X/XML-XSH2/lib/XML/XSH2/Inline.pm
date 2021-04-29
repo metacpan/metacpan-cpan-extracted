@@ -6,7 +6,7 @@ use vars qw($VERSION $terminator);
 
 use strict;
 use XML::XSH2 qw(xsh_init);
-  $VERSION='2.2.8'; # VERSION TEMPLATE
+  $VERSION='2.2.9'; # VERSION TEMPLATE
 $terminator = undef;
 
 use Filter::Simple;

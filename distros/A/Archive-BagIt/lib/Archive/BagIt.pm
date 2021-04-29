@@ -12,7 +12,7 @@ use POSIX qw(strftime);
 use Moo;
 with "Archive::BagIt::Role::Portability";
 
-our $VERSION = '0.073'; # VERSION
+our $VERSION = '0.074'; # VERSION
 
 # ABSTRACT: The main module to handle bags.
 
@@ -955,7 +955,7 @@ Archive::BagIt - The main module to handle bags.
 
 =head1 VERSION
 
-version 0.073
+version 0.074
 
 =head1 NAME
 

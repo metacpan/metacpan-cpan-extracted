@@ -15,80 +15,58 @@ use PDL::Types 'types';
 had_no_warnings;
 require List::MoreUtils;
 require PDL::Core;
+require Test::PDL;
 clear_warnings;
-
-my @test_types = map "test_$_", types();
-
-# force reloading Test::PDL on next 'require' + wipe functions living in the
-# Test::PDL namespace to avoid redefinition warnings
-sub wipe
-{
-	delete $INC{ 'Test/PDL.pm' };
-	delete $Test::PDL::{ $_ } for qw( _approx _comparison_fails
-		_dimensions_match eq_pdl eq_pdl_diag import is_pdl set_options
-		test_pdl test_anyval), @test_types;
-}
 
 # we should start out without an 'is_pdl' function
 ok ! __PACKAGE__->can( 'is_pdl' );
 
 # use Test::PDL '';
 package t1;
-require Test::PDL;
 ::cmp_deeply \%Test::PDL::OPTIONS, {
 	TOLERANCE   => ::code( sub { abs( $_[0]/1e-6 - 1 ) < 1e-6 ? 1 : ( 0, 'tolerance beyond specified value' ) } ),
 	EQUAL_TYPES => 1,
 };
 ::ok ! __PACKAGE__->can( 'is_pdl' );
-::wipe;
 
 # use Test::PDL;
 package t2;
-require Test::PDL;
 Test::PDL->import();
 ::cmp_deeply \%Test::PDL::OPTIONS, {
 	TOLERANCE   => ::code( sub { abs( $_[0]/1e-6 - 1 ) < 1e-6 ? 1 : ( 0, 'tolerance beyond specified value' ) } ),
 	EQUAL_TYPES => 1,
 };
 ::ok __PACKAGE__->can( 'is_pdl' );
-::wipe;
 
 # use Test::PDL -equal_types => 0;
 package t3;
-require Test::PDL;
 Test::PDL->import( -equal_types => 0 );
 ::cmp_deeply \%Test::PDL::OPTIONS, {
 	TOLERANCE   => ::code( sub { abs( $_[0]/1e-6 - 1 ) < 1e-6 ? 1 : ( 0, 'tolerance beyond specified value' ) } ),
 	EQUAL_TYPES => 0,
 };
+$Test::PDL::OPTIONS{EQUAL_TYPES} = 1; # explicitly reset so no need reload
 ::ok __PACKAGE__->can( 'is_pdl' );
-::wipe;
 
 # use Test::PDL -tolerance => 1e-8;
 package t4;
-require Test::PDL;
 Test::PDL->import( -tolerance => 1e-8 );
 ::cmp_deeply \%Test::PDL::OPTIONS, {
 	TOLERANCE   => ::code( sub { abs( $_[0]/1e-8 - 1 ) < 1e-6 ? 1 : ( 0, 'tolerance beyond specified value' ) } ),
 	EQUAL_TYPES => 1,
 };
 ::ok __PACKAGE__->can( 'is_pdl' );
-::wipe;
 
 # use Test::PDL -tolerance => 1e-8, -equal_types => 0, 'is_pdl';
 package t5;
-require Test::PDL;
 Test::PDL->import( -tolerance => 1e-8, -equal_types => 0, 'is_pdl' );
 ::cmp_deeply \%Test::PDL::OPTIONS, {
 	TOLERANCE   => ::code( sub { abs( $_[0]/1e-8 - 1 ) < 1e-6 ? 1 : ( 0, 'tolerance beyond specified value' ) } ),
 	EQUAL_TYPES => 0,
 };
 ::ok __PACKAGE__->can( 'is_pdl' );
-::wipe;
 
 # use Test::PDL -whatever => 42;
 package t6;
-require Test::PDL;
 ::throws_ok { Test::PDL->import( -whatever => 42 ) } qr/\binvalid option WHATEVER\b/;
 ::ok ! __PACKAGE__->can( 'is_pdl' );
-::wipe;

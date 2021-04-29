@@ -23,6 +23,10 @@ my $redis_server = retry 3, 1, sub {
     return $redis_server;
 };
 
+# ignore SIGPIPE
+# fixing https://github.com/shogo82148/p5-Redis-Transaction/issues/2
+$SIG{PIPE} = 'IGNORE';
+
 my $redis = $redis_backend->new( $redis_server->connect_info );
 
 $redis->flushall;

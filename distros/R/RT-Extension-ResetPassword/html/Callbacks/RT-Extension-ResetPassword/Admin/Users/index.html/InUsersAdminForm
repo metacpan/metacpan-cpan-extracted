@@ -1,3 +1,4 @@
+% if ( RT::Handle::cmp_version($RT::VERSION, '5.0.0') >= 0 ) {
   <div class="form-row">
     <div class="col-12">
       <div class="custom-control custom-checkbox">
@@ -6,3 +7,8 @@
       </div>
     </div>
   </div>
+% } else {
+  <br>
+  <input type="checkbox" class="checkbox" id="FindUsersWithPassword" name="FindUsersWithPassword" value="1" <% $ARGS{FindUsersWithPassword} ? 'checked="checked"': '' %> />
+  <label for="FindUsersWithPassword"><&|/l&>List users with a password set.</&></label>
+% }

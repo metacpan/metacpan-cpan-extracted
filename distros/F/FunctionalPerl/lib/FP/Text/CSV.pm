@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2015-2020 Christian Jaeger, copying@christianjaeger.ch
+# Copyright (c) 2015-2021 Christian Jaeger, copying@christianjaeger.ch
 #
 # This is free software, offered under either the same terms as perl 5
 # or the terms of the Artistic License version 2 or the terms of the
@@ -21,7 +21,7 @@ FP::Text::CSV - functional interface to Text::CSV
 
     my $csvparams = +{sep_char => ";", eol => "\n"};
     # $csvparams and any of its entries are optional,
-    #  defaults are taken from $FP::Text::CSV::defaults
+    #  for the defaults see the Text::CSV docs.
 
     use Chj::xopen qw(xopen_read xopen_write);
     use FP::List; use FP::Stream; use FP::Equal 'is_equal';
@@ -63,6 +63,10 @@ computed linked lists).
 
 =head1 NOTE
 
+L<Text::CSV> added a 'csv' export somewhat recently. Together with
+L<FP::autobox> that can make for a nice solution (although not lazy),
+too.
+
 This is alpha software! Read the status section in the package README
 or on the L<website|http://functional-perl.org/>.
 
@@ -94,22 +98,14 @@ use FP::HashSet 'hashset_union';
 use Chj::xopen 'xopen_read';
 use FP::Carp;
 
-our $defaults = +{ binary => 1, sep_char => "\t", eol => "\r\n", };
-
-sub params {
-    @_ == 1 or fp_croak_arity 1;
-    my ($maybe_params) = @_;
-    defined $maybe_params ? hashset_union($maybe_params, $defaults) : $defaults
-}
-
 sub new_csv_instance {
-    @_ >= 0 and @_ <= 1 or fp_croak_arity "0-1";
+    @_ == 1 or fp_croak_arity "1";
     my ($maybe_params) = @_;
-    Text::CSV->new(params $maybe_params)
+    Text::CSV->new($maybe_params)
 }
 
 sub csv_line_xparser {
-    @_ >= 0 and @_ <= 1 or fp_croak_arity "0-1";
+    @_ == 1 or fp_croak_arity "1";
     my ($maybe_params) = @_;
     my $csv = new_csv_instance $maybe_params;
 
@@ -124,7 +120,7 @@ sub csv_line_xparser {
 }
 
 sub csv_fh_to_rows {
-    @_ >= 1 and @_ <= 2 or fp_croak_arity "1-2";
+    @_ == 2 or fp_croak_arity "2";
     my ($in, $maybe_params) = @_;
     my $csv = new_csv_instance($maybe_params);
     my $next;
@@ -145,7 +141,7 @@ sub csv_fh_to_rows {
 }
 
 sub csv_file_to_rows {
-    @_ >= 1 and @_ <= 2 or fp_croak_arity "1-2";
+    @_ == 2 or fp_croak_arity "2";
     my ($path, $maybe_params) = @_;
     my $in = xopen_read $path;
     binmode($in, ":encoding(utf-8)") or die "binmode";
@@ -155,7 +151,7 @@ sub csv_file_to_rows {
 # -- Output: ---
 
 sub csv_printer {
-    @_ >= 1 and @_ <= 2 or fp_croak_arity "1-2";
+    @_ == 2 or fp_croak_arity "2";
     my ($fh, $maybe_params) = @_;
     my $csv = new_csv_instance($maybe_params);
     sub {
@@ -170,7 +166,7 @@ sub csv_printer {
 use FP::Stream "stream_for_each";
 
 sub rows_to_csv_fh {
-    @_ >= 2 and @_ <= 3 or fp_croak_arity "2-3";
+    @_ == 3 or fp_croak_arity "3";
     my ($s, $fh, $maybe_params) = @_;
     weaken $_[0];
     stream_for_each csv_printer($fh, $maybe_params), $s
@@ -179,7 +175,7 @@ sub rows_to_csv_fh {
 use Chj::xtmpfile;
 
 sub rows_to_csv_file {
-    @_ >= 2 and @_ <= 3 or fp_croak_arity "2-3";
+    @_ == 3 or fp_croak_arity "3";
     my ($s, $path, $maybe_params) = @_;
     weaken $_[0];
     my $out = xtmpfile $path;

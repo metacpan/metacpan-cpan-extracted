@@ -1,9 +1,10 @@
-#ABSTRACT: The role to load md5 plugin (default for v0.97)
 package Archive::BagIt::Plugin::Manifest::MD5;
 use strict;
 use warnings;
 use Moo;
 with 'Archive::BagIt::Role::Manifest';
+# ABSTRACT: The role to load md5 plugin (default for v0.97)
+our $VERSION = '0.074'; # VERSION
 
 has '+plugin_name' => (
     is => 'ro',
@@ -53,7 +54,7 @@ Archive::BagIt::Plugin::Manifest::MD5 - The role to load md5 plugin (default for
 
 =head1 VERSION
 
-version 0.073
+version 0.074
 
 =head1 AVAILABILITY
 

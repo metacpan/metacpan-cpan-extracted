@@ -5,9 +5,9 @@ use AnyEvent::Finger::Client;
 use AnyEvent::Finger::Server;
 
 my $bind = AnyEvent->condvar;
-my $server = eval { 
-  AnyEvent::Finger::Server->new( 
-    port         => 0, 
+my $server = eval {
+  AnyEvent::Finger::Server->new(
+    port         => 0,
     hostname     => '127.0.0.1',
     forward_deny => 1,
     on_bind      => sub { $bind->send },
@@ -39,9 +39,9 @@ subtest "finger" => sub {
     ($lines) = shift;
     $done->send;
   });
-  
+
   $done->recv;
-  
+
   is $lines->[0], 'okay', 'lines[0] == okay';
 };
 
@@ -54,9 +54,9 @@ subtest "finger \@localhost" => sub {
     ($lines) = shift;
     $done->send;
   });
-  
+
   $done->recv;
-  
+
   is $lines->[0], 'finger forwarding service denied', 'lines[0] == finger forwarding service denied';
 };
 
@@ -68,9 +68,9 @@ subtest "finger foo\@localhost" => sub {
     ($lines) = shift;
     $done->send;
   });
-  
+
   $done->recv;
-  
+
   is $lines->[0], 'finger forwarding service denied', 'lines[0] == finger forwarding service denied';
 };
 
@@ -82,8 +82,8 @@ subtest "finger foo\@bar\@baz\@whatever\@loalhost" => sub {
     ($lines) = shift;
     $done->send;
   });
-  
+
   $done->recv;
-  
+
   is $lines->[0], 'finger forwarding service denied', 'lines[0] == finger forwarding service denied';
 };

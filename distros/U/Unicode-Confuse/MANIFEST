@@ -1,4 +1,6 @@
 Changes
+examples/obfuscate.pl
+examples/synopsis.pl
 lib/Unicode/Confuse.pm
 lib/Unicode/Confuse.pod
 lib/Unicode/Confuse/confusables.json

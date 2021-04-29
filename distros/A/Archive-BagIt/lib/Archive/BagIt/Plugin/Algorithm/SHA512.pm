@@ -1,4 +1,3 @@
-#ABSTRACT: The default SHA algorithms plugin (default for v1.0)
 package Archive::BagIt::Plugin::Algorithm::SHA512;
 use strict;
 use warnings;
@@ -7,6 +6,8 @@ use Moo;
 use Net::SSLeay;
 use namespace::autoclean;
 with 'Archive::BagIt::Role::Algorithm';
+# ABSTRACT: The default SHA algorithms plugin (default for v1.0)
+our $VERSION = '0.074'; # VERSION
 
 sub BEGIN {
     Net::SSLeay::OpenSSL_add_all_digests();
@@ -74,7 +75,7 @@ Archive::BagIt::Plugin::Algorithm::SHA512 - The default SHA algorithms plugin (d
 
 =head1 VERSION
 
-version 0.073
+version 0.074
 
 =head1 AVAILABILITY
 

@@ -45,11 +45,13 @@
       }
    },
    "release_status" : "stable",
-   "version" : "v1.23.15",
-   "x_repository" : {
-      "type" : "git",
-      "url" : "git://github.com/moocow-the-bovine/PDL-CCS.git",
-      "web" : "https://github.com/moocow-the-bovine/PDL-CCS"
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/moocow-the-bovine/PDL-CCS.git",
+         "web" : "https://github.com/moocow-the-bovine/PDL-CCS"
+      }
    },
+   "version" : "v1.23.16",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

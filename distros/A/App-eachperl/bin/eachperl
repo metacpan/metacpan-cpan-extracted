@@ -13,6 +13,8 @@ GetOptions(
    'no-test'        => \( my $NO_TEST ),
    'since=s'        => \( my $SINCE_VERSION ),
    'until=s'        => \( my $UNTIL_VERSION ),
+   'reverse|r'      => \( my $REVERSE ),
+   'stop-on-fail|s' => \( my $STOP_ON_FAIL ),
 ) or exit 1;
 
 exit App::eachperl->new(
@@ -20,6 +22,8 @@ exit App::eachperl->new(
    no_test        => $NO_TEST,
    since_version  => $SINCE_VERSION,
    until_version  => $UNTIL_VERSION,
+   reverse        => $REVERSE,
+   stop_on_fail   => $STOP_ON_FAIL,
 )->run( @ARGV );
 
 __END__
@@ -156,6 +160,18 @@ Any perl binaries older than this will be skipped.
 
 Selects only perl versions that are at least as old as the requested version.
 Any perl binaries newer than this will be skipped.
+
+=head2 --reverse, -r
+
+Reverses the order in which perl versions are invoked.
+
+=head2 --stop-on-fail, -s
+
+Stops running after the first failure. Without this option, every version is
+attempted even if some fail.
+
+Useful when combined with C<--reverse> to test a module to see how far back in
+earlier perl versions it will support.
 
 =head2 --no-system-perl
 
