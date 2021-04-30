@@ -1,6 +1,13 @@
 
 Revision history for Myriad
 
+0.005     2021-04-30 12:44:44+00:00 UTC
+    [Bugs fixed]
+    - small memory leak due to defer blocks not being cleared up, now uses try/finally
+    to avoid this
+    - minor issues in command line parser for services' config
+    - bootstrap test to be skipped if Linux::Inotify2 is not available
+
 0.004     2021-04-28 13:27:36+08:00 Asia/Kuala_Lumpur
     [API Changes]
     - Helper methods from List::Util - `min`, `max` and `sum0` - plus JSON functions

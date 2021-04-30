@@ -28,14 +28,14 @@ is $#{ $r->children }, 2, "Router children count";
 my $bridge = $r->children->[0];
 ok $bridge->inline, "First child inline";
 is $#{ $bridge->children }, 2, "First child children count";
-is $bridge->via, undef, "First child via";
+is $bridge->methods, undef, "First child methods";
 is $bridge->pattern->unparsed, '/game/:id', "First child pattern";
 is $bridge->pattern->defaults->{action}, 'fetch', "First child action";
 is $bridge->pattern->defaults->{controller}, 'game', "First child controller";
 
 my $route = $r->children->[1];
 ok !$route->inline, "Second child inline";
-is $route->via->[0], "GET", "Second child via";
+is $route->methods->[0], "GET", "Second child methods";
 is $route->pattern->unparsed, '/game/create', "Second child pattern";
 is $route->pattern->defaults->{action}, 'create', "Second child action";
 is $route->pattern->defaults->{controller}, 'game', "Second child controller";

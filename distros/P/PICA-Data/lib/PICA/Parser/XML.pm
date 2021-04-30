@@ -1,7 +1,7 @@
 package PICA::Parser::XML;
 use v5.14.1;
 
-our $VERSION = '1.17';
+our $VERSION = '1.18';
 
 use Carp qw(croak);
 use Scalar::Util qw(reftype);

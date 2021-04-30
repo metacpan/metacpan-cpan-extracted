@@ -1,6 +1,6 @@
 package Myriad::Util::UUID;
 
-our $VERSION = '0.004'; # VERSION
+our $VERSION = '0.005'; # VERSION
 our $AUTHORITY = 'cpan:DERIV'; # AUTHORITY
 
 use strict;

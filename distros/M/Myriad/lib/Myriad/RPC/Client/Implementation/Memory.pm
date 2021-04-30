@@ -1,14 +1,24 @@
 package Myriad::RPC::Client::Implementation::Memory;
 
-our $VERSION = '0.004'; # VERSION
+use Myriad::Class extends => qw(IO::Async::Notifier);
+
+our $VERSION = '0.005'; # VERSION
 our $AUTHORITY = 'cpan:DERIV'; # AUTHORITY
 
-use strict;
-use warnings;
+=encoding utf8
+
+=head1 NAME
+
+Myriad::RPC::Client::Implementation::Memory
+
+=head1 SYNOPSIS
+
+=head1 DESCRIPTION
+
+=cut
 
 use Myriad::Util::UUID;
 use Myriad::RPC::Message;
-use Myriad::Class extends => qw(IO::Async::Notifier);
 
 has $transport;
 has $whoami;
@@ -97,4 +107,14 @@ method _add_to_loop ($loop) {
 }
 
 1;
+
+=head1 AUTHOR
+
+Deriv Group Services Ltd. C<< DERIV@cpan.org >>.
+
+See L<Myriad/CONTRIBUTORS> for full details.
+
+=head1 LICENSE
+
+Copyright Deriv Group Services Ltd 2020-2021. Licensed under the same terms as Perl itself.
 

@@ -3,10 +3,8 @@ package Myriad::Exception::General;
 use strict;
 use warnings;
 
-our $VERSION = '0.004'; # VERSION
+our $VERSION = '0.005'; # VERSION
 our $AUTHORITY = 'cpan:DERIV'; # AUTHORITY
-
-no indirect qw(fatal);
 
 use utf8;
 
@@ -22,9 +20,12 @@ See L<Myriad::Exception> for the rôle that defines the exception API.
 
 =cut
 
+no indirect qw(fatal);
+
 use Myriad::Exception::Builder;
 
 sub category { 'myriad' }
+
 sub message { shift->{message} //= 'unknown exception' }
 
 1;

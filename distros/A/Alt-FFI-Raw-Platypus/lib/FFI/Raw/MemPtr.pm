@@ -21,7 +21,7 @@ FFI::Raw::MemPtr - FFI::Platypus::Legacy::Raw memory pointer type
 
 =head1 VERSION
 
-version 0.03
+version 0.04
 
 =head1 DESCRIPTION
 

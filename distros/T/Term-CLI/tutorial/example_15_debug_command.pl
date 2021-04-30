@@ -75,7 +75,7 @@ push @commands, Term::CLI::Command->new(
                 .  "C<now>, C<never>, C<later>, or C<forever>.",
     arguments => [
         Term::CLI::Argument::Enum->new( name => 'target',
-            value_list => [qw( love money)],
+            value_list => [qw( love money )],
         ),
         Term::CLI::Argument::Enum->new( name => 'when',
             value_list => [qw( now later never forever )],

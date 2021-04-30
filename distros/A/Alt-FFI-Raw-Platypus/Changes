@@ -1,5 +1,9 @@
 Revision history for Alt-FFI-Raw-Platypus
 
+0.04      2021-04-29 21:00:36 -0600
+  - Moved to new GitHub org PerlFFI.  Additionally the repository link used to
+    be wrong and would 404 in older versions.
+
 0.03      2019-02-16 18:21:10 -0500
   - Fix configure prereqs
 

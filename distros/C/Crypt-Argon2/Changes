@@ -1,5 +1,8 @@
 Revision history for Crypt-Argon2
 
+0.011     2021-04-30 19:32:11+02:00 Europe/Amsterdam
+          - Added argon2-calibrate script
+
 0.010     2021-03-11 19:42:29+01:00 Europe/Amsterdam
           - Correctly handle raw numbers as memory cost in argon2_needs_rehash
 

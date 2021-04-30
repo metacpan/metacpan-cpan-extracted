@@ -2,7 +2,7 @@ package PICA::Parser::Plain;
 use v5.14.1;
 use utf8;
 
-our $VERSION = '1.17';
+our $VERSION = '1.18';
 
 use charnames ':full';
 use Carp qw(carp croak);
@@ -27,8 +27,17 @@ sub _next_record {
     my @record;
 
     for my $field (@fields) {
+        my ($annotation, $tag, $occurence, $data);
 
-        my ($tag, $occurence, $data);
+        unless (defined $self->{annotated} && !$self->{annotated}) {
+            if ($field =~ s/^([^a-z0-9]) (.+)/\2/) {
+                $annotation = $1;
+            }
+            elsif ($self->{annotated}) {
+                croak "ERROR: expected field annotation at field \"$field\"";
+            }
+        }
+
         if ($field =~ m/^(\d{3}[A-Z@])(\/(\d{2,3}))?\s(.+)/) {
             $tag       = $1;
             $occurence = $3 // '';
@@ -36,12 +45,12 @@ sub _next_record {
         }
         else {
             if ($self->{strict}) {
-                croak "ERROR: no valid PICA field structure \"$field\"";
+                croak " ERROR : no valid PICA field structure \"$field\"";
             }
             else {
                 carp
                     "WARNING: no valid PICA field structure \"$field\". Skipped field";
-                next;
+                next
             }
         }
 
@@ -77,6 +86,8 @@ sub _next_record {
             @subfields = @tokens;
         }
 
+        push @subfields, $annotation if defined $annotation;
+
         push @record, [$tag, $occurence, @subfields];
     }
     return \@record;
@@ -92,6 +103,9 @@ __END__
 PICA::Parser::Plain - Plain PICA format parser
 
 =head1 DESCRIPTION
+
+This parser can parse both PICA Plain and annotated PICA. Option C<annotation>
+can be used to enforce or forbid annotations.
 
 See L<PICA::Parser::Base> for synopsis and configuration.
 

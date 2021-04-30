@@ -1,5 +1,5 @@
 package Box::Calc::Layer;
-$Box::Calc::Layer::VERSION = '1.0201';
+$Box::Calc::Layer::VERSION = '1.0205';
 use strict;
 use Moose;
 use Box::Calc::Row;
@@ -13,7 +13,7 @@ Box::Calc::Layer - A box is packed with multiple layers.
 
 =head1 VERSION
 
-version 1.0201
+version 1.0205
 
 =head1 SYNOPSIS
 
@@ -178,7 +178,7 @@ The L<Box::Calc::Item> instance you want to add to this layer.
 sub pack_item {
     my ($self, $item, $count) = @_;
     $count ||= 1;
-    if ($count > 99) {
+    if ($count > 5) {
         $log->warn($item->{name}.' is causing infinite recursion in Box::Calc::Layer');
         $log->debug(Dumper($item));
         return 0;

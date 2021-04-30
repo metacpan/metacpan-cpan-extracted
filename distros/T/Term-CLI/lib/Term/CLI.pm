@@ -20,7 +20,7 @@
 
 use 5.014_001;
 
-package Term::CLI  0.051007 {
+package Term::CLI  0.052001 {
 
 use Modern::Perl 1.20140107;
 use Text::ParseWords 3.29 qw( parse_line );
@@ -469,7 +469,7 @@ Term::CLI - CLI interpreter based on Term::ReadLine
 
 =head1 VERSION
 
-version 0.051007
+version 0.052001
 
 =head1 SYNOPSIS
 

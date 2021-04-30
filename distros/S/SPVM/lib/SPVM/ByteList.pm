@@ -56,7 +56,11 @@ L<SPVM::ByteList> is Dynamic Byte Array.
 
     sub new : SPVM::ByteList ($array : byte[])
 
-Create a new L<SPVM::ByteList> object with specific C<byte> array.
+Create a new L<SPVM::ByteList> object with byte array.
+
+Internally, new array is created, and each element of argument array is copied to internal array.
+
+If array is undef, 0-length internal array is created.
 
 =head2 new_len
 
@@ -123,7 +127,7 @@ Appending the value to the end of list.
 
   sub resize : void ($self : self, $new_length : int)
 
-Resize list.
+Resize this list. If the new length is shorter than the current length, the list is truncated to the new length. If the new length is shorter than the current length, the list is truncated to the new length. If the new length is same as the current length, there is nothing to do. If the new length is longer than the current length, the list grows to the new length, and the values of the added elements are set to 0.
 
 New length must be more than or equals to 0, otherwise a exception occur.
 

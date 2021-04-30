@@ -1,3 +1,14 @@
+1.0205 2020-04-29
+ * Version bump for permissions
+
+1.0204 2020-04-29
+ * Fail faster if you're caught in an infinite loop.
+ * Setup an example of logging in tests
+ * Change several Moose methods to regular subroutines so they update along with x,y,z for Dimensionals
+
+1.0202 2020-07-13
+ * Allow void weight to be set per box type.
+
 1.0201 2019-01-21
  * Changed changelog format.
  * Fixed use of uninitialized value (Alberto Simões)

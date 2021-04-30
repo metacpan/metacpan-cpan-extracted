@@ -2,7 +2,7 @@ package Myriad::Transport::Redis;
 
 use Myriad::Class extends => qw(IO::Async::Notifier);
 
-our $VERSION = '0.004'; # VERSION
+our $VERSION = '0.005'; # VERSION
 our $AUTHORITY = 'cpan:DERIV'; # AUTHORITY
 
 =pod
@@ -345,34 +345,34 @@ method pending (%args) {
         $src->completed->without_cancel,
         (async method {
             my $instance = await $self->borrow_instance_from_pool;
-            defer {
+            try {
+                my $src = $self->source;
+                my $start = '-';
+                while (1) {
+                    await $src->unblocked;
+                    my ($pending) = await $instance->xpending(
+                        $stream,
+                        $group,
+                        $start, '+',
+                        $self->batch_count,
+                        $client,
+                    );
+                    for my $item ($pending->@*) {
+                        my ($id, $consumer, $age, $delivery_count) = $item->@*;
+                        $log->tracef('Claiming pending message %s from %s, age %s, %d prior deliveries', $id, $consumer, $age, $delivery_count);
+                        my $claim = await $redis->xclaim($stream, $group, $client, 10, $id);
+                        $log->tracef('Claim is %s', $claim);
+                        my $args = $claim->[0]->[1];
+                        if($args) {
+                            push @$args, ("message_id", $id);
+                            $src->emit($args);
+                        }
+                    }
+                    last unless @$pending >= $self->batch_count;
+                }
+            } finally {
                 $self->return_instance_to_pool($instance) if $instance;
                 undef $instance;
-            }
-
-            my $src = $self->source;
-            my $start = '-';
-            while (1) {
-                await $src->unblocked;
-                my ($pending) = await $instance->xpending(
-                    $stream,
-                    $group,
-                    $start, '+',
-                    $self->batch_count,
-                    $client,
-                );
-                for my $item ($pending->@*) {
-                    my ($id, $consumer, $age, $delivery_count) = $item->@*;
-                    $log->tracef('Claiming pending message %s from %s, age %s, %d prior deliveries', $id, $consumer, $age, $delivery_count);
-                    my $claim = await $redis->xclaim($stream, $group, $client, 10, $id);
-                    $log->tracef('Claim is %s', $claim);
-                    my $args = $claim->[0]->[1];
-                    if($args) {
-                        push @$args, ("message_id", $id);
-                        $src->emit($args);
-                    }
-                }
-                last unless @$pending >= $self->batch_count;
             }
         })->($self),
     )->on_fail(sub  {
@@ -452,14 +452,14 @@ With the possibility of waiting to get one, if all connection were busy and we m
 async method borrow_instance_from_pool {
     $log->tracef('Available Redis pool count: %d', 0 + $redis_pool->@*);
     if (my $available_redis = shift $redis_pool->@*) {
-        $pending_redis_count++;
-        return await $self->loop->new_future->done($available_redis);
+        ++$pending_redis_count;
+        return $available_redis;
     } elsif ($pending_redis_count < $max_pool_count) {
         ++$pending_redis_count;
         return await $self->redis;
     }
     push @$waiting_redis_pool, my $f = $self->loop->new_future;
-    $log->warnf('All Redis instances are pending, added to waiting list. Current Redis count: %d/%d | Waiting count: %d', $pending_redis_count, $max_pool_count, 0 + $waiting_redis_pool->@*);
+    $log->debugf('All Redis instances are pending, added to waiting list. Current Redis count: %d/%d | Waiting count: %d', $pending_redis_count, $max_pool_count, 0 + $waiting_redis_pool->@*);
     return await $f;
 }
 
@@ -471,9 +471,11 @@ It should be called at the end of every usage, as on_ready.
 It should also be possible with a try/finally combination..
 but that's currently failing with the $redis_pool slot not being defined.
 
+Takes the following parameters:
+
 =over 4
 
-=item * C<$instance> - Redis connection, to be returned.
+=item * C<$instance> - Redis connection to be returned.
 
 =back
 
@@ -487,6 +489,7 @@ method return_instance_to_pool ($instance) {
         $log->tracef('Returning instance to pool, Redis used/available now %d/%d', $pending_redis_count, 0 + $redis_pool->@*);
         $pending_redis_count--;
     }
+    return;
 }
 
 =head2 redis
@@ -496,7 +499,7 @@ instance, depending on the setting of C<$use_cluster>.
 
 =cut
 
-async method redis {
+async method redis () {
     my $instance;
     if($use_cluster) {
         $instance = Net::Async::Redis::Cluster->new(

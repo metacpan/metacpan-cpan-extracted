@@ -1,4 +1,4 @@
-package Finance::Alpaca::Struct::Trade 0.9902 {
+package Finance::Alpaca::Struct::Trade 0.9904 {
     use strictures 2;
     use feature 'signatures';
     no warnings 'experimental::signatures';
@@ -13,13 +13,14 @@ package Finance::Alpaca::Struct::Trade 0.9902 {
     use Moo;
     use lib './lib';
     use Finance::Alpaca::Types;
-    has t         => ( is => 'ro', isa => Timestamp, required => 1, coerce => 1 );
-    has [qw[x z]] => ( is => 'ro', isa => Str,       required => 1 );
-    has p         => ( is => 'ro', isa => Num,       required => 1 );
-    has [qw[s i]] => ( is => 'ro', isa => Int,       required => 1 );
-    has c         => ( is => 'ro', isa => ArrayRef [Str], required => 1 );
-    has S         => ( is => 'ro', isa => Str, predicate => 1 );    # If from stream
-
+    has timestamp  => ( is => 'ro', isa => Timestamp, required => 1, coerce => 1, init_arg => 't' );
+    has exchange   => ( is => 'ro', isa => Str,       required => 1, coerce => 1, init_arg => 'x' );
+    has tape       => ( is => 'ro', isa => Str,       required => 1, init_arg => 'z' );
+    has price      => ( is => 'ro', isa => Num,       required => 1, init_arg => 'p' );
+    has id         => ( is => 'ro', isa => Int,       required => 1, init_arg => 'i' );
+    has size       => ( is => 'ro', isa => Int,       required => 1, init_arg => 's' );
+    has conditions => ( is => 'ro', isa => ArrayRef [Str], required => 1, init_arg => 'c' );
+    has symbol     => ( is => 'ro', isa => Str, predicate => 1, init_arg => 'S' );  # If from stream
 }
 1;
 __END__
@@ -33,7 +34,7 @@ Finance::Alpaca::Struct::Trade - A Single Trade Object
 =head1 SYNOPSIS
 
     use Finance::Alpaca;
-    my @trades = Finance::Alpaca->new( ... )->trades(
+    my %trades = Finance::Alpaca->new( ... )->trades(
         symbol    => 'MSFT',
         start     => Time::Moment->now->with_day_of_week(2),
         end       => Time::Moment->now->with_hour(12)->with_day_of_week(3)
@@ -50,25 +51,25 @@ specified date.
 
 The following properties are contained in the object.
 
-    $trade->p;
+    $trade-timestamp;
 
 =over
 
-=item C<t> - Timestamp with nanosecond precision as a Time::Moment object
+=item C<timestamp> - Timestamp with nanosecond precision as a Time::Moment object
 
-=item C<x> - Exchange where the trade happened
+=item C<exchange> - Exchange where the trade happened
 
-=item C<p> - Trade price
+=item C<price> - Trade price
 
-=item C<s> - Trade size
+=item C<size> - Trade size
 
-=item C<c> - Trade conditions
+=item C<conditions> - Trade conditions
 
-=item C<i> - Trade ID
+=item C<id> - Trade ID
 
-=item C<z> - Tape
+=item C<tape> - Tape
 
-=item C<S> - Symbol; only provided if data is from a Finance::Alpaca::Stream session
+=item C<symbol> - Symbol; only provided if data is from a Finance::Alpaca::Stream session
 
 =back
 

@@ -3,11 +3,8 @@ package Myriad::RPC;
 use strict;
 use warnings;
 
-our $VERSION = '0.004'; # VERSION
+our $VERSION = '0.005'; # VERSION
 our $AUTHORITY = 'cpan:DERIV'; # AUTHORITY
-
-no indirect qw(fatal);
-use Scalar::Util qw(weaken);
 
 use utf8;
 
@@ -24,6 +21,9 @@ Myriad::RPC - microservice RPC abstraction
 =head1 DESCRIPTION
 
 =cut
+
+no indirect qw(fatal);
+use Scalar::Util qw(weaken);
 
 use Myriad::Exception::Builder category => 'rpc';
 

@@ -3,13 +3,10 @@ package Myriad::Role::Storage;
 use strict;
 use warnings;
 
-our $VERSION = '0.004'; # VERSION
+our $VERSION = '0.005'; # VERSION
 our $AUTHORITY = 'cpan:DERIV'; # AUTHORITY
 
-no indirect qw(fatal);
-use Future::AsyncAwait;
-
-use experimental qw(signatures);
+use utf8;
 
 =encoding utf8
 
@@ -46,6 +43,11 @@ a concrete implementation - instead, see classes such as:
 =back
 
 =cut
+
+no indirect qw(fatal);
+use Future::AsyncAwait;
+
+use experimental qw(signatures);
 
 use Role::Tiny;
 

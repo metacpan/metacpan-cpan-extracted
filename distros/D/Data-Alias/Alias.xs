@@ -1931,6 +1931,8 @@ STATIC void da_peep(pTHX_ OP *o) {
 	da_old_peepp(aTHX_ o);
 	ENTER;
 	SAVEVPTR(PL_curcop);
+	if (da_inside < 0)
+		Perl_croak(aTHX_ "Data::Alias confused in da_peep (da_inside < 0)");
 	if (da_inside && da_iscope == &cxstack[cxstack_ix]) {
 		OP *tmp;
 		while ((tmp = o->op_next))
@@ -1955,6 +1957,7 @@ STATIC OP *da_ck_rv2cv(pTHX_ OP *o) {
 	OP *kid;
 	char *s, *start_s;
 	CV *cv;
+	I32 inside;
 	o = da_old_ck_rv2cv(aTHX_ o);
 #if (PERL_COMBI_VERSION >= 5009005)
 	if (!PL_parser)
@@ -1963,26 +1966,36 @@ STATIC OP *da_ck_rv2cv(pTHX_ OP *o) {
 	if (PL_lex_state != LEX_NORMAL && PL_lex_state != LEX_INTERPNORMAL)
 		return o; /* not lexing? */
 	kid = cUNOPo->op_first;
-	if (kid->op_type != OP_GV || !DA_ACTIVE || (
-			(gvsv = (SV*)kGVOP_gv,
-				cv =
+	if (kid->op_type != OP_GV || !DA_ACTIVE)
+		return o;
+	gvsv = (SV*)kGVOP_gv;
 #if (PERL_COMBI_VERSION >= 5021004)
-					SvROK(gvsv) ? (CV*)SvRV(gvsv) :
+	cv = SvROK(gvsv) ? (CV*)SvRV(gvsv) : GvCV((GV*)gvsv);
+#else
+	cv = GvCV((GV*)gvsv);
 #endif
-					GvCV((GV*)gvsv),
-				1) &&
-			cv != da_cv && cv != da_cvc ))
+	if (cv == da_cv)  // Data::Alias::alias
+		inside = 1;
+	else if (cv == da_cvc)  // Data::Alias::copy
+		inside = 0;
+	else
 		return o;
 	if (o->op_private & OPpENTERSUB_AMPER)
 		return o;
+
+	// make sure the temporary ($) prototype for the parser hack is removed
 	SvPOK_off(cv);
+
+	// tag the op for later recognition
 	o->op_ppaddr = da_tag_rv2cv;
-	if (cv == da_cv)
+	if (inside)
 		o->op_flags &= ~OPf_SPECIAL;
 	else
 		o->op_flags |= OPf_SPECIAL;
+
 	start_s = s = PL_oldbufptr;
 	while (s < PL_bufend && isSPACE(*s)) s++;
+
 	if (memEQ(s, PL_tokenbuf, strlen(PL_tokenbuf))) {
 		s += strlen(PL_tokenbuf);
 		if (PL_bufptr > s) s = PL_bufptr;
@@ -2004,7 +2017,38 @@ STATIC OP *da_ck_rv2cv(pTHX_ OP *o) {
 	} else {
 		s = "";
 	}
-	if (*s == '{') { /* here comes deep magic */
+
+	// if not already done, localize da_inside to this compilation scope.
+	// this ensures it will get restored if we bail out with a compile error.
+	if (da_iscope != &cxstack[cxstack_ix]) {
+		SAVEVPTR(da_iscope);
+		SAVEI32(da_inside);
+		da_iscope = &cxstack[cxstack_ix];
+	}
+
+#if (PERL_COMBI_VERSION >= 5011002)
+	// since perl 5.11.2, when a sub is called with parenthesized argument the
+	// initial rv2cv op gets destroyed and a new one is created.  deal with that.
+	if (da_inside < 0) {
+		if (*s != '(' || da_inside != ~inside)
+			Perl_croak(aTHX_ "Data::Alias confused in da_ck_rv2cv");
+	} else
+#endif
+	{
+		// save da_inside on stack, restored in da_ck_entersub
+		SPAGAIN;
+		XPUSHs(da_inside ? &PL_sv_yes : &PL_sv_no);
+		PUTBACK;
+	}
+#if (PERL_COMBI_VERSION >= 5011002)
+	if (*s == '(' && da_inside >= 0) {
+		da_inside = ~inside;  // first rv2cv op (will be discarded)
+		return o;
+	}
+#endif
+	da_inside = inside;
+
+	if (*s == '{') {  // disgusting parser hack for alias BLOCK (and copy BLOCK)
 		I32 shift;
 		int tok;
 		YYSTYPE yylval = PL_yylval;
@@ -2083,22 +2127,13 @@ STATIC OP *da_ck_rv2cv(pTHX_ OP *o) {
 				memset(start_s, ' ', PL_bufptr-start_s);
 		}
 	}
-	if (da_iscope != &cxstack[cxstack_ix]) {
-		SAVEVPTR(da_iscope);
-		SAVEI32(da_inside);
-		da_iscope = &cxstack[cxstack_ix];
-	}
-	SPAGAIN;
-	XPUSHs(da_inside ? &PL_sv_yes : &PL_sv_no);
-	da_inside = (cv == da_cv);
-	PUTBACK;
 	return o;
 }
 
 STATIC OP *da_ck_entersub(pTHX_ OP *esop) {
 	dDA;
 	OP *lsop, *cvop, *pmop, *argop;
-	int inside;
+	I32 inside;
 	if (!(esop->op_flags & OPf_KIDS))
 		return da_old_ck_entersub(aTHX_ esop);
 	lsop = cUNOPx(esop)->op_first;
@@ -2110,6 +2145,8 @@ STATIC OP *da_ck_entersub(pTHX_ OP *esop) {
 	if (!DA_ACTIVE || cvop->op_ppaddr != da_tag_rv2cv)
 		return da_old_ck_entersub(aTHX_ esop);
 	inside = da_inside;
+	if (inside < 0)
+		Perl_croak(aTHX_ "Data::Alias confused in da_ck_entersub (da_inside < 0)");
 	da_inside = SvIVX(*PL_stack_sp--);
 	SvPOK_off(inside ? da_cv : da_cvc);
 	op_clear(esop);

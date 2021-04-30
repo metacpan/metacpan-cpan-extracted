@@ -17,7 +17,9 @@ is_deeply [ $red->values ], [qw/ blue green red /], 'values';
 
 isa_ok $red, $colors;
 
-can_ok( $red, qw/ values is_red is_green is_blue / );
+can_ok( $red, qw/ values predicates is_red is_green is_blue / );
+
+is_deeply [ $red->predicates ], [sort qw/ is_red is_green is_blue / ], 'predicates';
 
 ok $red->is_red, 'is_red';
 ok !$red->is_blue, '!is_blue';

@@ -1474,7 +1474,6 @@ sub typemap {
   my $type   = shift;
   my $arg    = shift;
 
-  #
   # Modification to parse Perl's typemap here.
   #
   # The default search path for the typemap taken from xsubpp. It seems it is
@@ -1499,13 +1498,9 @@ sub typemap {
 	    $_rootdir.'../../../typemap',
 	    $_rootdir.'../../typemap', $_rootdir.'../typemap',
 	    $_rootdir.'typemap');
-  # Finally tag onto the end, the current directory typemap. Ideally we should here pick
-  # up the TYPEMAPS flag from ExtUtils::MakeMaker, but a) I don't know how and b)
-  # it is only a slight inconvenience hopefully!
-  #
   # Note that the OUTPUT typemap is unlikely to be of use here, but I have kept
   # the source code from xsubpp for tidiness.
-  push @tm, 'typemap';
+  push @tm, &PDL::Core::Dev::PDL_TYPEMAP, 'typemap';
   my $foundtm = 0;
   foreach $typemap (@tm) {
     next unless -f $typemap ;
@@ -1672,6 +1667,9 @@ sub OtherPars_nft {
 	} elsif(/^\s*pdl\s+\*\s*(\w+)$/) {
 	    # It is an ndarray -> make it a controlling one.
 	    die("Not supported yet");
+	} elsif(/^\s*\(\s*void\s*\)/) {
+	    # suppressing unused param warning - skip
+	    next;
 	} else {
 	    $type = PDL::PP::CType->new(undef,$_);
 	}
@@ -1775,7 +1773,6 @@ sub wrap_vfn {
     my $sname = $hdrinfo->{StructName};
     my $oargs = ($name eq "foo" ? ",int i1,int i2,int i3" : "");
     my $str = PDL::PP::pp_line_numbers(__LINE__, qq|$type $rout(pdl_trans *__tr $oargs) {
-	int __dim;
 	$sname *__privtrans = ($sname *) __tr;\n|);
     if ( $p2child ) {
 	$str .= "\tpdl *__it = ((pdl_trans_affine *)(__tr))->pdls[1];\n\tpdl *__parent = __tr->pdls[0];\n";
@@ -1937,7 +1934,7 @@ sub VarArgsXSHdr {
   # Generate declarations for SV * variables corresponding to pdl * output variables.
   # These are used in creating output and temp variables.  One variable (ex: SV * outvar1_SV;)
   # is needed for each output and output create always argument
-  my $svdecls = join ("\n", map { "${ci}SV *${_}_SV;" } grep { $out{$_} || $outca{$_} || $tmp{$_} } @args);
+  my $svdecls = join ("\n", map { "${ci}SV *${_}_SV = NULL;" } grep { $out{$_} || $outca{$_} || $tmp{$_} } @args);
 
   my @create = ();  # The names of variables which need to be created by calling
                     # the 'initialize' perl routine from the correct package.

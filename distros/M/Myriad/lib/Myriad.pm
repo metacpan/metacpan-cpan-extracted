@@ -3,7 +3,7 @@ package Myriad;
 
 use Myriad::Class;
 
-our $VERSION = '0.004';
+our $VERSION = '0.005';
 our $AUTHORITY = 'cpan:DERIV'; # AUTHORITY
 
 =encoding utf8
@@ -11,6 +11,14 @@ our $AUTHORITY = 'cpan:DERIV'; # AUTHORITY
 =head1 NAME
 
 Myriad - microservice coördination
+
+=begin markdown
+
+[![Coverage status](https://coveralls.io/repos/github/binary-com/perl-Myriad/badge.svg?branch=master)](https://coveralls.io/github/binary-com/perl-Myriad?branch=master)
+[![Test status](https://circleci.com/gh/binary-com/perl-Myriad.svg?style=shield&circle-token=55b191c6582ef5932e57b142fb29d8e13ae19598)](https://app.circleci.com/pipelines/github/binary-com/perl-Myriad)
+[![Docker](https://img.shields.io/docker/pulls/deriv/myriad.svg)](https://hub.docker.com/r/deriv/myriad)
+
+=end markdown
 
 =head1 SYNOPSIS
 

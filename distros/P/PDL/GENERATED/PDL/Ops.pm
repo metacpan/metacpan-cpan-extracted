@@ -1428,7 +1428,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (a(); b(); [o] ans())
+  Signature: (a(); indx b(); [o] ans())
 
 
 =for ref
@@ -1469,36 +1469,19 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-=head2 _rabs
 
-=for sig
 
-  Signature: (a(); [o]b())
+
+
+=head2 abs
 
 =for ref
 
-Returns the absolute value of a number. 
-
-=for bad
-
-_rabs processes bad values.
-It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
-
+Returns the absolute value of a number.
 
 =cut
 
-
-
-
-
-
-
-
-
-sub PDL::abs {
-	my $x=shift;
-	$x->type->real ? PDL::_rabs($x) : PDL::_cabs($x);
-}
+sub PDL::abs { $_[0]->type->real ? goto &PDL::_rabs : goto &PDL::_cabs }
 
 
 

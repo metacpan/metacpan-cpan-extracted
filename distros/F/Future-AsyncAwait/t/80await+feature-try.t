@@ -81,6 +81,23 @@ BEGIN {
    ok( !$fellthrough, 'fallthrough after try{return} did not happen' );
 }
 
+# await in try/catch list context (RT134790)
+{
+   async sub return_list { return ( "first", "second" ); }
+
+   async sub await_return_list
+   {
+      try {
+         return await return_list();
+      }
+      catch ($e) { die $e; }
+   }
+
+   my ( $r1, $r2 ) = await await_return_list();
+   is( $r1, "first",  'first result from try/return list' );
+   is( $r2, "second", 'second result from try/return list' );
+}
+
 # await in toplevel try
 {
    try {

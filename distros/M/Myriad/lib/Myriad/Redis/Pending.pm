@@ -1,16 +1,21 @@
 package Myriad::Redis::Pending;
 
-use strict;
-use warnings;
+use Myriad::Class;
 
-our $VERSION = '0.004'; # VERSION
+our $VERSION = '0.005'; # VERSION
 our $AUTHORITY = 'cpan:DERIV'; # AUTHORITY
 
-use curry;
-use Object::Pad;
-use Future::AsyncAwait;
+=encoding utf8
 
-class Myriad::Redis::Pending;
+=head1 NAME
+
+Myriad::Redis::Pending
+
+=head1 SYNOPSIS
+
+=head1 DESCRIPTION
+
+=cut
 
 has $redis;
 has $stream;
@@ -48,3 +53,14 @@ async method finish () {
 }
 
 1;
+
+=head1 AUTHOR
+
+Deriv Group Services Ltd. C<< DERIV@cpan.org >>.
+
+See L<Myriad/CONTRIBUTORS> for full details.
+
+=head1 LICENSE
+
+Copyright Deriv Group Services Ltd 2020-2021. Licensed under the same terms as Perl itself.
+

@@ -42,6 +42,7 @@ t/40-holdings.t
 t/50-schema.t
 t/60-schema-builder.t
 t/70-guess.t
+t/files/annotated.pica
 t/files/bgb.example
 t/files/dump.dat
 t/files/pica.binary

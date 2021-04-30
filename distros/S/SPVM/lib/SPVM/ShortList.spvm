@@ -11,7 +11,13 @@ package SPVM::ShortList : precompile {
 
   sub new : SPVM::ShortList ($array : short[]) {
     my $self = new SPVM::ShortList;
-    my $length = @$array;
+    my $length : int;
+    if ($array) {
+      $length = @$array;
+    }
+    else {
+      $length = 0;
+    }
     
     my $capacity = 0;
     if ($length < DEFAULT_CAPACITY()) {
@@ -25,7 +31,9 @@ package SPVM::ShortList : precompile {
     
     $self->{length} = $length;
     
-    memcpy_short($values, 0, $array, 0, $length);
+    if ($array) {
+      memcpy_short($values, 0, $array, 0, $length);
+    }
     
     $self->{values} = $values;
     
@@ -172,6 +180,9 @@ package SPVM::ShortList : precompile {
     if ($new_length > $length) {
       if ($new_length > $capacity) {
         $self->_extend_with_capacity($new_length);
+      }
+      for (my $i = $length; $i < $new_length; $i++) {
+        $self->{values}[$i] = 0;
       }
     }
     elsif ($new_length < $length) {

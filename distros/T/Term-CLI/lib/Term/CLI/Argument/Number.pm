@@ -20,7 +20,7 @@
 
 use 5.014_001;
 
-package Term::CLI::Argument::Number  0.051007 {
+package Term::CLI::Argument::Number  0.052001 {
 
 use Modern::Perl 1.20140107;
 use Term::CLI::L10N;
@@ -84,7 +84,7 @@ Term::CLI::Argument::Number - base class for numerical arguments in Term::CLI
 
 =head1 VERSION
 
-version 0.051007
+version 0.052001
 
 =head1 SYNOPSIS
 

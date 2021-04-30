@@ -5,7 +5,7 @@ use warnings;
 use 5.008001;
 
 # ABSTRACT: Alternate FFI::Raw implementation powered by FFI::Platypus
-our $VERSION = '0.03'; # VERSION
+our $VERSION = '0.04'; # VERSION
 
 
 
@@ -23,7 +23,7 @@ Alt::FFI::Raw::Platypus - Alternate FFI::Raw implementation powered by FFI::Plat
 
 =head1 VERSION
 
-version 0.03
+version 0.04
 
 =head1 SYNOPSIS
 

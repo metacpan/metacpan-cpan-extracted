@@ -20,7 +20,7 @@
 
 use 5.014_001;
 
-package Term::CLI::Argument::Number::Float  0.051007 {
+package Term::CLI::Argument::Number::Float  0.052001 {
 
 use Modern::Perl 1.20140107;
 use Scalar::Util 1.38 qw( looks_like_number );
@@ -51,7 +51,7 @@ Term::CLI::Argument::Number::Float - class for floating point arguments in Term:
 
 =head1 VERSION
 
-version 0.051007
+version 0.052001
 
 =head1 SYNOPSIS
 

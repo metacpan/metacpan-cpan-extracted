@@ -22,6 +22,8 @@ Myriad::API - provides an API for Myriad services
 Used internally within L<Myriad> services for providing access to
 storage, subscription and RPC behaviour.
 
+=head1 METHODS
+
 =head2 storage
 
 Returns a L<Myriad::Role::Storage>-compatible instance for interacting with storage.

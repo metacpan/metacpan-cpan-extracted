@@ -1,5 +1,8 @@
 Release history for Comment-Spell
 
+0.001004	April 30, 2021 at 06:49:45 AM EDT
+	Fix http://www.cpantesters.org/cpan/report/df98ae17-811c-1014-abee-cf123d004874
+
 0.001003	Thu Apr 29 09:20:35 EDT 2021
 	New maintainer
 	Added more CI testing

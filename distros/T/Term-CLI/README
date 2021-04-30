@@ -1,4 +1,4 @@
-Term::CLI is Copyright (C) 2018, Steven Bakker (SBAKKER).
+Term::CLI is Copyright (C) 2018-2021, Steven Bakker (SBAKKER).
 
 The Term::CLI collection of modules implement a convenient interactive
 CLI parser based on Term::ReadLine(::Gnu), providing completion and

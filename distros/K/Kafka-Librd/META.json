@@ -4,7 +4,7 @@
       "Graham Ollis <plicease@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.48, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.60, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -46,21 +46,19 @@
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://github.com/plicease/Kafka-Librd/issues"
+         "web" : "https://github.com/uperl/Kafka-Librd/issues"
       },
-      "homepage" : "https://github.com/plicease/Kafka-Librd",
-      "license" : [
-         "http://dev.perl.org/licenses/"
-      ],
+      "homepage" : "https://metacpan.org/pod/Kafka::Librd",
       "repository" : {
          "type" : "git",
-         "url" : "git://github.com/plicease/Kafka-Librd"
+         "url" : "https://github.com/uperl/Kafka-Librd.git",
+         "web" : "https://github.com/uperl/Kafka-Librd"
       }
    },
-   "version" : "0.19",
+   "version" : "0.20",
    "x_contributors" : [
       "Pavel Shaydo <zwon@cpan.org>",
       "Graham Ollis <plicease@cpan.org>"
    ],
-   "x_serialization_backend" : "JSON::PP version 4.05"
+   "x_serialization_backend" : "JSON::PP version 4.06"
 }

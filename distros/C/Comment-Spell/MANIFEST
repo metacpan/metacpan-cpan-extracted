@@ -15,8 +15,10 @@ misc/Changes.deps.dev
 misc/Changes.deps.opt
 misc/perlcritic.deps
 perlcritic.rc
-README.mkdn
+README.md
+README.mkdn.keep
 t/basic.t
+t/eof.t
 t/links.t
 t/no404s.t
 t/noopentickets.t

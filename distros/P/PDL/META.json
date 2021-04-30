@@ -52,7 +52,7 @@
             "Filter::Util::Call" : "0",
             "Inline" : "0.83",
             "Inline::C" : "0.62",
-            "List::Util" : "0.33",
+            "List::Util" : "1.33",
             "Math::Complex" : "0",
             "OpenGL" : "0.70",
             "Pod::Parser" : "0",
@@ -91,6 +91,6 @@
       },
       "x_IRC" : "irc://irc.perl.org/#pdl"
    },
-   "version" : "2.040",
+   "version" : "2.043",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

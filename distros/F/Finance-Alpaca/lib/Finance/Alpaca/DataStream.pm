@@ -1,4 +1,4 @@
-package Finance::Alpaca::DataStream 0.9902 {
+package Finance::Alpaca::DataStream 0.9904 {
     use strictures 2;
     use Moo;
     use feature 'signatures';
@@ -16,7 +16,10 @@ package Finance::Alpaca::DataStream 0.9902 {
     has cb => ( is => 'ro',  isa => CodeRef, required => 1 );
     has subscriptions => (
         is  => 'rwp',
-        isa => Dict [ bars => ArrayRef [Str], quotes => ArrayRef [Str], trades => ArrayRef [Str] ],
+        isa => Dict [
+            bars   => ArrayRef [Str], dailyBars => ArrayRef [Str], quotes => ArrayRef [Str],
+            trades => ArrayRef [Str]
+        ],
         default => sub { { bars => [], quotes => [], trades => [] } },
         lazy    => 1
     );
@@ -156,6 +159,8 @@ This method accepts the following parameters:
 =over
 
 =item C<bars> - List of ticker symbols
+
+=item C<dailyBars> - List of ticker symbols
 
 =item C<quotes> - List of ticker symbols
 

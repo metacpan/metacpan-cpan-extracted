@@ -2,7 +2,7 @@ package Myriad::Registry;
 
 use Myriad::Class extends => 'IO::Async::Notifier';
 
-our $VERSION = '0.004'; # VERSION
+our $VERSION = '0.005'; # VERSION
 our $AUTHORITY = 'cpan:DERIV'; # AUTHORITY
 
 =encoding utf8
@@ -20,6 +20,8 @@ are available, and what they can do.
 
 =cut
 
+use Myriad::API;
+
 use Myriad::Exception::Builder category => 'registry';
 
 declare_exception ServiceNotFound => (
@@ -28,8 +30,6 @@ declare_exception ServiceNotFound => (
 declare_exception UnknownClass => (
     message => 'Unable to locate the given class for component lookup',
 );
-
-use Myriad::API;
 
 has %rpc;
 has %service_by_name;

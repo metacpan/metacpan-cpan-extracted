@@ -16,6 +16,7 @@ my $builder = Module::Build->new(
   'requires' => {
     'Exporter' => '5.57',
     'MIME::Base64' => '0',
+    'Time::HiRes' => '0',
     'XSLoader' => '0',
     'strict' => '0',
     'warnings' => '0'

@@ -11,6 +11,14 @@ sure you change the first line.
 
 =cut
 
+=head1 NAME
+
+Myriad::RPC::Client::Implementation::Memory
+
+=head1 SYNOPSIS
+
+=head1 DESCRIPTION
+
 =head1 INHERITED METHODS
 
 =over 4
@@ -24,4 +32,14 @@ L<add_child|IO::Async::Notifier/add_child>, L<adopt_future|IO::Async::Notifier/a
 L<BUILDARGS|Object::Pad::UNIVERSAL/BUILDARGS>
 
 =back
+
+=head1 AUTHOR
+
+Deriv Group Services Ltd. C<DERIV@cpan.org>.
+
+See L<Myriad/CONTRIBUTORS> for full details.
+
+=head1 LICENSE
+
+Copyright Deriv Group Services Ltd 2020-2021. Licensed under the same terms as Perl itself.
 

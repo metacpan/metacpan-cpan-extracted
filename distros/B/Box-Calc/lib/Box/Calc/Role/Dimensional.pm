@@ -1,5 +1,5 @@
 package Box::Calc::Role::Dimensional;
-$Box::Calc::Role::Dimensional::VERSION = '1.0201';
+$Box::Calc::Role::Dimensional::VERSION = '1.0205';
 use strict;
 use warnings;
 use Moose::Role;
@@ -11,7 +11,7 @@ Box::Calc::Role::Dimensional - Role to add standard dimensions to objects.
 
 =head1 VERSION
 
-version 1.0201
+version 1.0205
 
 =head2 SYNOPSIS
 
@@ -87,11 +87,10 @@ Returns the result of multiplying x, y, and z.
 
 =cut
 
-has volume => (
-    is          => 'ro',
-    isa         => 'Num',
-    required    => 1,
-);
+sub volume {
+    my ($self) = @_;
+    return $self->x * $self->y * $self->z;
+}
 
 =head2 dimensions
 
@@ -99,11 +98,10 @@ Returns an array reference containing x, y, and z.
 
 =cut
 
-has dimensions => (
-    is          => 'ro',
-    isa         => 'ArrayRef',
-    required    => 1,
-);
+sub dimensions {
+    my ($self) = @_;
+    return [ $self->x, $self->y, $self->z, ];
+}
 
 =head2 extent
 
@@ -111,11 +109,10 @@ Returns a string of C<x,y,z>. Good for comparing whether two items are dimension
 
 =cut
 
-has extent => (
-    is          => 'ro',
-    isa         => 'Str',
-    required    => 1,
-);
+sub extent {
+    my ($self) = @_;
+    return join ',', $self->x, $self->y, $self->z; 
+}
 
 around BUILDARGS => sub {
     my $orig      = shift;
@@ -141,13 +138,10 @@ around BUILDARGS => sub {
     else {
         ( $x, $y, $z ) = sort { $b <=> $a } ( $args->{x}, $args->{y}, $args->{z} );
     }
-    
+
     $args->{x} = $x;
     $args->{y} = $y;
     $args->{z} = $z;
-    $args->{volume} = $x * $y * $z;
-    $args->{dimensions} = [$x, $y, $z];
-    $args->{extent} = join(',', $x, $y, $z);
     return $className->$orig($args);
 };
 

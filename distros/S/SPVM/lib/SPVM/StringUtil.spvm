@@ -30,6 +30,12 @@ package SPVM::StringUtil : precompile {
   }
 
   sub copy_string : string ($string : string) {
+    unless ($string) {
+      return undef;
+    }
+    
+    my $string_length = length $string;
+    
     my $bytes = (byte[])$string;
 
     return (string)$bytes;
@@ -399,7 +405,9 @@ package SPVM::StringUtil : precompile {
 
         # Add constant string
         if ($constant_string_length > 0) {
-          $buffer->push_range($format, $index, $constant_string_length);
+          my $format_part = SPVM::StringUtil->substr($format, $index, $constant_string_length);
+          
+          $buffer->push($format_part);
           $index += $constant_string_length;
           $constant_string_length = 0;
         }
@@ -413,7 +421,8 @@ package SPVM::StringUtil : precompile {
       else {
         # Add constant string
         if ($constant_string_length > 0) {
-          $buffer->push_range($format, $index, $constant_string_length);
+          my $format_part = SPVM::StringUtil->substr($format, $index, $constant_string_length);
+          $buffer->push($format_part);
           $index += $constant_string_length;
           $constant_string_length = 0;
         }
@@ -747,7 +756,8 @@ package SPVM::StringUtil : precompile {
 
     # Add constant string
     if ($constant_string_length > 0) {
-      $buffer->push_range($format, $index, $constant_string_length);
+      my $format_part = SPVM::StringUtil->substr($format, $index, $constant_string_length);
+      $buffer->push($format_part);
       $index += $constant_string_length;
       $constant_string_length = 0;
     }

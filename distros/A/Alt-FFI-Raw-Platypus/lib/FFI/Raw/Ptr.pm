@@ -20,7 +20,7 @@ FFI::Raw::Ptr
 
 =head1 VERSION
 
-version 0.03
+version 0.04
 
 =head1 AUTHOR
 

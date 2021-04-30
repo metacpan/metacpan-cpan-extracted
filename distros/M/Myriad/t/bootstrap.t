@@ -24,7 +24,10 @@ eval {
     });
     1;
 } or do {
-    print "not ok - exception on ->boot, $@\n";
-    print "1..1\n";
+    if ($@ =~ q{Can't locate Linux/Inotify2.pm}) {
+        print "1..1 # SKIP Linux::Inotify2 not installed\n";
+    } else {
+        print "not ok - exception on ->boot, $@\n";
+        print "1..1\n";
+    }
 };
-

@@ -42,7 +42,7 @@ FFI::Raw - Perl bindings to the portable FFI library (libffi)
 
 =head1 VERSION
 
-version 0.03
+version 0.04
 
 =head1 SYNOPSIS
 

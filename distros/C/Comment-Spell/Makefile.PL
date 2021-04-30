@@ -17,6 +17,7 @@ WriteMakefile(
 	PL_FILES	=> {},
 	TEST_REQUIRES => {
 		'Test::More' => 0,
+		'Test::Most' => 0,
 	}, PREREQ_PM => {
 		'Carp' => 0,
 		'Moo' => 0,

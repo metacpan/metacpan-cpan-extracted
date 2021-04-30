@@ -1,5 +1,5 @@
 package Box::Calc::Role::Mailable;
-$Box::Calc::Role::Mailable::VERSION = '1.0201';
+$Box::Calc::Role::Mailable::VERSION = '1.0205';
 use strict;
 use warnings;
 use Moose::Role;
@@ -10,7 +10,7 @@ Box::Calc::Role::Mailable - Role to make an object mailable.
 
 =head1 VERSION
 
-version 1.0201
+version 1.0205
 
 =head1 METHODS
 

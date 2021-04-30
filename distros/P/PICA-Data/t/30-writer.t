@@ -288,7 +288,9 @@ FIELDS
 
     while (my ($plain, $record) = each %tests) {
         is pica_string($record), $plain, 'write annotated PICA';
-        # TODO: test round-trip parsing
+        my $pp = pica_string($record, 'plain', annotated => 1);
+        my $parsed = pica_parser(plain => \$plain, annotated => 1, bless => 1)->next;
+        is $plain, $parsed->string, 'round-tripping annotated PICA';
     }
 
     is pica_string([["123A",undef,"x","y"]], "plain", annotated => 1),

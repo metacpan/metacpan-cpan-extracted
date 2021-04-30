@@ -3,9 +3,9 @@ NAME
     Perinci::CmdLine::Classic)
 
 VERSION
-    This document describes version 0.080 of Perinci::Examples::Bin::Classic
+    This document describes version 0.081 of Perinci::Examples::Bin::Classic
     (from Perl distribution Perinci-Examples-Bin-Classic), released on
-    2020-04-29.
+    2021-01-30.
 
 DESCRIPTION
     This distribution contains example scripts in "bin/" which use
@@ -18,7 +18,7 @@ HOMEPAGE
 
 SOURCE
     Source repository is at
-    <https://github.com/perlancar/perl-Perinci-Examples-Bin-Classic>.
+    <https://github.com/perlancar/perl-Perinci-Examples-Bin>.
 
 BUGS
     Please report any bugs or feature requests on the bugtracker website
@@ -37,7 +37,7 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2020, 2015, 2014, 2013, 2012 by
+    This software is copyright (c) 2021, 2020, 2015, 2014, 2013, 2012 by
     perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under

@@ -25,8 +25,8 @@ DESCRIPTION
     that performs asynchronous operations using futures look neater and
     more expressive than simply using then chaining and other techniques on
     the futures themselves. It is also a similar syntax used by a number of
-    other languages; notably C# 5, EcmaScript 6, Python 3, Dart. Rust is
-    considering adding it.
+    other languages; notably C# 5, EcmaScript 6, Python 3, Dart, Rust,
+    C++20.
 
     This module is still under active development. While it now seems
     relatively stable enough for most use-cases and has received a lot of
@@ -325,9 +325,6 @@ SUPPORTED USES
     This behaviour is still more experimental than the rest of the logic.
     The following should be noted:
 
-      * There is currently no way to perform the equivalent of "on_cancel"
-      in Future to add a cancellation callback to a future chain.
-
       * Cancellation propagation is only implemented on Perl version 5.24
       and above. An async sub in an earlier perl version will still stop
       executing if cancelled, but will not propagate the request backwards
@@ -392,6 +389,9 @@ WITH OTHER MODULES
           }
        }
 
+    As of Future::AsyncAwait version 0.50, finally blocks are invoked even
+    during cancellation.
+
  Syntax::Keyword::Dynamically
 
     As of Future::AsyncAwait version 0.32, cross-module integration tests
@@ -410,6 +410,23 @@ WITH OTHER MODULES
     
           say "Var is still $var";
        }
+
+ Syntax::Keyword::Defer
+
+    As of Future::AsyncAwait version 0.50, defer blocks are invoked even
+    during cancellation.
+
+       use Future::AsyncAwait;
+       use Syntax::Keyword::Defer;
+    
+       async sub perhaps
+       {
+          defer { say "Cleaning up now" }
+          await $f1;
+       }
+    
+       my $fouter = perhaps();
+       $fouter->cancel;
 
  Object::Pad
 

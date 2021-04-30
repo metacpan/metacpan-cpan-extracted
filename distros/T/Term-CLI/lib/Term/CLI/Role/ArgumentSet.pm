@@ -20,7 +20,7 @@
 
 use 5.014_001;
 
-package Term::CLI::Role::ArgumentSet  0.051007 {
+package Term::CLI::Role::ArgumentSet  0.052001 {
 
 use Modern::Perl 1.20140107;
 
@@ -98,7 +98,7 @@ Term::CLI::Role::ArgumentSet - Role for (sub-)commands in Term::CLI
 
 =head1 VERSION
 
-version 0.051007
+version 0.052001
 
 =head1 SYNOPSIS
 

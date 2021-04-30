@@ -1,5 +1,21 @@
 Revision history for Future-AsyncAwait
 
+0.50    2021-04-30
+        [CHANGES]
+         * Rewrite of parser logic to use XS::Parse::Keyword instead of
+           lowlevel code on PL_keyword_parser directly
+         * Attempt to provide a name for the local'ized GV that cannot be
+           handled (thanks fgasper)
+         * Attempt to provide a name for SAVEt_* constants that cannot be
+           handled
+         * Added a shouty AWAIT_WAIT method to implement toplevel `await`
+           (RT134671)
+         * Docs update - remark that Rust and C++20 have async/await too
+           (RT135356)
+
+        [BUGFIXES]
+         * Invoke defer {} and finally {} blocks on cancellation (RT135351)
+
 0.49    2021-02-24
         [BUGFIXES]
          * Handle the CXp_TRY and real try/catch syntax added in perl 5.33.7

@@ -11,13 +11,19 @@ use Future::AsyncAwait;
 
 # immediate done ANON scalar
 {
+   my $want;
+
    my $func = async sub {
+      $want = wantarray         ? "list" :
+              defined wantarray ? "scalar" : "void";
       return 5;
    };
 
    my $f = $func->();
 
    isa_ok( $f, "Future", '$f' );
+
+   is( $want, "list", 'func saw list context' );
 
    ok( $f->is_ready, '$f is immediate' );
    is( scalar $f->get, 5, '$f->get' );

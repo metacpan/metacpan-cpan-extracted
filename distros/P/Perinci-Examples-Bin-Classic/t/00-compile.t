@@ -14,13 +14,13 @@ my @module_files = (
 
 my @scripts = (
     'script/peri-eg-append-file',
+    'script/peri-eg-binary-files',
+    'script/peri-eg-common-opts',
     'script/peri-eg-complete-fruits',
+    'script/peri-eg-completion',
     'script/peri-eg-demo-cli-opts',
     'script/peri-eg-gen-random-bytes',
     'script/peri-eg-read-file',
-    'script/peri-eg-test-binary-files',
-    'script/peri-eg-test-common-opts',
-    'script/peri-eg-test-completion',
     'script/peri-eg-write-file'
 );
 

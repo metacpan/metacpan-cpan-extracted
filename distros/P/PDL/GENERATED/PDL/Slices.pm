@@ -916,7 +916,7 @@ sub PDL::rle {
 
 =for sig
 
-  Signature: (P(); C(); int n1; int n2)
+  Signature: (P(); C(); PDL_Indx n1; PDL_Indx n2)
 
 =for ref
 
@@ -1082,7 +1082,7 @@ sub PDL::reorder {
 
 =for sig
 
-  Signature: (P(); C(); int n1; int n2)
+  Signature: (P(); C(); PDL_Indx n1; PDL_Indx n2)
 
 =for ref
 
@@ -1327,7 +1327,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (P(); C(); int nthdim; int step; int n)
+  Signature: (P(); C(); PDL_Indx nthdim;PDL_Indx step;PDL_Indx n)
 
 =for ref
 
@@ -1385,7 +1385,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (P(); C(); int nthdim; int nsp)
+  Signature: (P(); C(); PDL_Indx nthdim;PDL_Indx nsp)
 
 =for ref
 
@@ -1457,7 +1457,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (P(); C(); int id; SV *list)
+  Signature: (P(); C(); PDL_Indx id; SV *list)
 
 =for ref
 

@@ -4,6 +4,7 @@ use warnings;
 
 use Config;
 use Module::Build;
+use XS::Parse::Keyword::Builder;
 use XS::Parse::Sublike::Builder;
 
 my @extra_compiler_flags = qw( -std=c89 -Ihax );
@@ -26,6 +27,7 @@ my $build = Module::Build->new(
    requires => {
       'Future' => '0.43',
       'perl' => '5.016', # PL_keyword_plugin, pad_new(), CvDYNFILE, many tests fail on 5.14
+      'XS::Parse::Keyword' => 0,
       'XS::Parse::Sublike' => '0.10',
    },
    test_requires => {
@@ -35,6 +37,7 @@ my $build = Module::Build->new(
    },
    configure_requires => {
       'Module::Build' => '0.4004', # test_requires
+      'XS::Parse::Keyword::Builder' => 0,
       'XS::Parse::Sublike::Builder' => '0.10',
    },
    license => 'perl',
@@ -49,6 +52,7 @@ my $build = Module::Build->new(
    extra_compiler_flags => \@extra_compiler_flags,
 );
 
+XS::Parse::Keyword::Builder->extend_module_build( $build );
 XS::Parse::Sublike::Builder->extend_module_build( $build );
 
 if( eval { require Devel::MAT::Dumper::Helper } ) {

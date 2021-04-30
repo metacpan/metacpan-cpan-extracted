@@ -1,9 +1,9 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2016-2020 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2016-2021 -- leonerd@leonerd.org.uk
 
-package Future::AsyncAwait 0.49;
+package Future::AsyncAwait 0.50;
 
 use v5.14;
 use warnings;
@@ -14,6 +14,11 @@ require XSLoader;
 XSLoader::load( __PACKAGE__, our $VERSION );
 
 require Future; Future->VERSION( '0.43' );
+
+if( !Future->can( "AWAIT_WAIT" ) ) {
+   no strict 'refs';
+   *{"Future::AWAIT_WAIT"} = \&Future::get;
+}
 
 =head1 NAME
 
@@ -42,7 +47,7 @@ waiting for L<Future>s to complete. This syntax aims to make code that
 performs asynchronous operations using futures look neater and more expressive
 than simply using C<then> chaining and other techniques on the futures
 themselves. It is also a similar syntax used by a number of other languages;
-notably C# 5, EcmaScript 6, Python 3, Dart. Rust is considering adding it.
+notably C# 5, EcmaScript 6, Python 3, Dart, Rust, C++20.
 
 This module is still under active development. While it now seems relatively
 stable enough for most use-cases and has received a lot of "battle-testing" in
@@ -339,11 +344,6 @@ following should be noted:
 
 =item *
 
-There is currently no way to perform the equivalent of L<Future/on_cancel>
-to add a cancellation callback to a future chain.
-
-=item *
-
 Cancellation propagation is only implemented on Perl version 5.24 and above.
 An C<async sub> in an earlier perl version will still stop executing if
 cancelled, but will not propagate the request backwards into the future that
@@ -407,6 +407,9 @@ C<return> from inside C<try>.
       }
    }
 
+As of L<Future::AsyncAwait> version 0.50, C<finally> blocks are invoked even
+during cancellation.
+
 =head2 Syntax::Keyword::Dynamically
 
 As of L<Future::AsyncAwait> version 0.32, cross-module integration tests
@@ -425,6 +428,23 @@ assert that the C<dynamically> correctly works across an C<await> boundary.
 
       say "Var is still $var";
    }
+
+=head2 Syntax::Keyword::Defer
+
+As of L<Future::AsyncAwait> version 0.50, C<defer> blocks are invoked even
+during cancellation.
+
+   use Future::AsyncAwait;
+   use Syntax::Keyword::Defer;
+
+   async sub perhaps
+   {
+      defer { say "Cleaning up now" }
+      await $f1;
+   }
+
+   my $fouter = perhaps();
+   $fouter->cancel;
 
 =head2 Object::Pad
 

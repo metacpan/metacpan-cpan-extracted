@@ -3,11 +3,9 @@ package Myriad::Storage;
 use strict;
 use warnings;
 
-our $VERSION = '0.004'; # VERSION
+our $VERSION = '0.005'; # VERSION
 our $AUTHORITY = 'cpan:DERIV'; # AUTHORITY
 
-no indirect qw(fatal);
-use Scalar::Util qw(weaken);
 use utf8;
 
 =encoding utf8
@@ -24,8 +22,10 @@ Myriad::Storage - microservice Storage abstraction
 
 =cut
 
-use Myriad::Exception::Builder category => 'storage';
+no indirect qw(fatal);
+use Scalar::Util qw(weaken);
 
+use Myriad::Exception::Builder category => 'storage';
 use Myriad::Role::Storage;
 
 =head1 Exceptions

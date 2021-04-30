@@ -18,11 +18,11 @@ Comment::Spell  - Spell Checking for your comments
 
 =head1 VERSION
 
-0.001003
+0.001004
 
 =cut
 
-our $VERSION = '0.001003';
+our $VERSION = '0.001004';
 
 =head1 SYNOPSIS
 

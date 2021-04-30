@@ -1,7 +1,7 @@
 package PICA::Parser::Binary;
 use v5.14.1;
 
-our $VERSION = '1.17';
+our $VERSION = '1.18';
 
 use charnames qw(:full);
 

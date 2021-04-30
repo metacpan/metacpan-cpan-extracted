@@ -3,7 +3,7 @@ package Myriad::Class;
 use strict;
 use warnings;
 
-our $VERSION = '0.004'; # VERSION
+our $VERSION = '0.005'; # VERSION
 our $AUTHORITY = 'cpan:DERIV'; # AUTHORITY
 
 use utf8;
@@ -110,6 +110,7 @@ no multidimensional;
 no bareword::filehandles;
 use mro;
 use experimental qw(signatures);
+use curry;
 use Future::AsyncAwait;
 use Syntax::Keyword::Try;
 use Syntax::Keyword::Dynamically;
@@ -210,7 +211,7 @@ sub import {
     Syntax::Keyword::Try->import_into($pkg);
     Syntax::Keyword::Dynamically->import_into($pkg);
     Syntax::Keyword::Defer->import_into($pkg);
-    Future::AsyncAwait->import_into($pkg);
+    Future::AsyncAwait->import_into($pkg, ':experimental(cancel)');
     Metrics::Any->import_into($pkg, '$metrics');
 
     # For history here, see this:

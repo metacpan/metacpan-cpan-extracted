@@ -1,5 +1,5 @@
 package Box::Calc::Box;
-$Box::Calc::Box::VERSION = '1.0201';
+$Box::Calc::Box::VERSION = '1.0205';
 use strict;
 use warnings;
 use Moose;
@@ -18,7 +18,7 @@ Box::Calc::Box - The container in which we pack items.
 
 =head1 VERSION
 
-version 1.0201
+version 1.0205
 
 =head1 SYNOPSIS
 
@@ -219,7 +219,7 @@ The L<Box::Calc::Item> instance you want to add to this box.
 sub pack_item {
     my ($self, $item, $count) = @_;
     $count ||= 1;
-    if ($count > 99) {
+    if ($count > 5) {
         $log->warn($item->{name}.' is causing infinite recursion in Box::Calc');
         $log->debug(Dumper($item));
         return 0;
@@ -299,6 +299,7 @@ sub packing_instructions {
         weight              => $self->weight,
         calculated_weight   => $self->calculate_weight,
         used_volume         => $self->used_volume,
+        fill_volume         => $self->fill_volume,
         volume              => $self->volume,
         layers              => [map { $_->packing_instructions } @{ $self->layers }],
   };
@@ -315,13 +316,13 @@ sub used_volume {
     return sum map { $_->used_volume } @{ $self->layers };
 }
 
-=head2 volume 
+=head2 fill_volume 
 
 Returns the exact volume needed for this box.    
 
 =cut
 
-sub volume {
+sub fill_volume {
     return $_[0]->fill_x * $_[0]->fill_y * $_[0]->fill_z;
 }
 

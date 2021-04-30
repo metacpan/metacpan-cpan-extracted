@@ -1,10 +1,10 @@
 use strict;
-use Test::More 0.98;
+use Test2::V0;
+use Test2::Tools::Class;
 use lib '../lib', './lib';
 #
-use_ok $_ for qw(
-    Finance::Alpaca
-);
-
+use Finance::Alpaca;
+my $alpaca = Finance::Alpaca->new( keys => [ 'does not', 'really matter' ] );
+isa_ok $alpaca, 'Finance::Alpaca';
 done_testing;
 1;

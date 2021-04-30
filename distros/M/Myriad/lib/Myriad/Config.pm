@@ -2,7 +2,7 @@ package Myriad::Config;
 
 use Myriad::Class;
 
-our $VERSION = '0.004'; # VERSION
+our $VERSION = '0.005'; # VERSION
 our $AUTHORITY = 'cpan:DERIV'; # AUTHORITY
 
 =encoding utf8
@@ -16,8 +16,6 @@ Myriad::Config
 Configuration support.
 
 =cut
-
-use feature qw(current_sub);
 
 use Getopt::Long qw(GetOptionsFromArray);
 use Pod::Usage;
@@ -119,7 +117,7 @@ BUILD (%args) {
     $self->lookup_from_env();
 
     $config->{config_path} //= $DEFAULTS{config_path};
-    $self->lookup_from_file();
+    $self->lookup_from_file($config->{config_path});
 
     $config->{$_} //= $DEFAULTS{$_} for keys %DEFAULTS;
 
@@ -146,6 +144,28 @@ method key ($key) { return $config->{$key} // die 'unknown config key ' . $key }
 method define ($key, $v) {
     die 'already exists - ' . $key if exists $config->{$key} or exists $DEFAULTS{$key};
     $config->{$key} = $DEFAULTS{$key} = Ryu::Observable->new($v);
+}
+
+=head2 clear_key
+
+Delete a single config
+the best use case for this sub is during tests.
+
+=cut
+
+method clear_key($key) {
+    $config->{$key} = undef;
+}
+
+=head2 clear_all
+
+Delete all the config that has been parsed by this module,
+the best use case for this sub is during tests.
+
+=cut
+
+method clear_all {
+    $config = {};
 }
 
 =head2 parse_subargs
@@ -179,21 +199,27 @@ it takes:
 =cut
 
 method parse_subargs ($subarg, $root, $value) {
-    $subarg =~ s/(.*)[_|\.](configs?|instances?)(.*)/$2$3/;
+    my $service_name = $subarg =~ s/(.*?)[_|\.](configs?|instances?)(.*)/$2$3/ && $1;
     die 'invalid service name' unless $2;
 
-    my $service_name = $1;
     $service_name =~ s/_/\./g;
     $root = $root->{$service_name} //= {};
 
     my @sublist = split /_|\./, $subarg;
     die 'config key is not formated correctly' unless @sublist;
-    while (@sublist > 1) {
+
+    # configs is the latest level before starting a keyname
+    # Also users might pass config instead of configs
+    while ($sublist[0] !~ s/(config)s?/$1s/) {
         my $level = shift @sublist;
+        $level .= 's' if $level eq 'instance';
+
         $root->{$level} //= {};
         $root= $root->{$level};
     }
-    $root->{$sublist[0]} = $value;
+    shift @sublist;
+    my $key_name = join '_', @sublist;
+    $root->{configs}->{$key_name} = $value;
 }
 
 =head2 lookup_from_args
@@ -260,7 +286,7 @@ method lookup_from_env () {
     $config->{$_} //= delete $ENV{'MYRIAD_' . uc($_)} for grep { exists $ENV{'MYRIAD_' . uc($_)} } keys %DEFAULTS;
     map {
         s/(MYRIAD_SERVICES?_)//;
-        $self->parse_subargs(lc($_), $config->{services}, $ENV{$1 . $_});
+        $self->parse_subargs(lc($_), $config->{services} //= {}, $ENV{$1 . $_});
     } (grep {$_ =~ /MYRIAD_SERVICES?_/} keys %ENV);
 }
 
@@ -274,10 +300,10 @@ so it just read the file.
 
 =cut
 
-method lookup_from_file () {
-    if(-r $config->{config_path}) {
+method lookup_from_file ($file_path) {
+    if(-r $file_path) {
         my ($override) = Config::Any->load_files({
-            files   => [ $config->{config_path} ],
+            files   => [ $file_path ],
             use_ext => 1
         })->@*;
 

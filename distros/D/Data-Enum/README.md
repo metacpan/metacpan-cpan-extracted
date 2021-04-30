@@ -4,7 +4,7 @@ Data::Enum - fast, immutable enumeration classes
 
 # VERSION
 
-version v0.2.0
+version v0.2.1
 
 # SYNOPSIS
 
@@ -49,7 +49,7 @@ properties:
     my $a = $one->new("foo")
     my $b = $one->new("foo");
 
-    refaddr($a) == $refaddr($b); # they are the same thing
+    refaddr($a) == refaddr($b); # they are the same thing
     ```
 
 - Methods for checking values are fast.
@@ -97,6 +97,24 @@ Returns a list of valid values, stringified and sorted with duplicates
 removed.
 
 This was added in v0.2.0.
+
+## predicates
+
+```perl
+my @predicates = $class->predicates;
+```
+
+Returns a list of predicate methods for each value.
+
+A hash of predicates to values is roughly
+
+```perl
+use List::Util 1.56 'mesh';
+
+my %handlers = mesh [ $class->values ], [ $class->predicates ];
+```
+
+This was added in v0.2.1.
 
 # SEE ALSO
 

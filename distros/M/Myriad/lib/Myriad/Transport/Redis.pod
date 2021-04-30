@@ -136,9 +136,11 @@ It should be called at the end of every usage, as on_ready.
 It should also be possible with a try/finally combination..
 but that's currently failing with the $redis_pool slot not being defined.
 
+Takes the following parameters:
+
 =over 4
 
-=item * C<$instance> - Redis connection, to be returned.
+=item * C<$instance> - Redis connection to be returned.
 
 =back
 

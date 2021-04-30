@@ -3,11 +3,9 @@ package Myriad::RPC::Client;
 use strict;
 use warnings;
 
-our $VERSION = '0.004'; # VERSION
+our $VERSION = '0.005'; # VERSION
 our $AUTHORITY = 'cpan:DERIV'; # AUTHORITY
 
-no indirect qw(fatal);
-use Scalar::Util qw(weaken);
 use utf8;
 
 =encoding utf8
@@ -23,6 +21,9 @@ Myriad::RPC::Client - microservice RPC client abstraction
 =head1 DESCRIPTION
 
 =cut
+
+no indirect qw(fatal);
+use Scalar::Util qw(weaken);
 
 use Myriad::Exception::Builder category => 'rpc_client';
 
@@ -71,4 +72,14 @@ sub new {
 }
 
 1;
+
+=head1 AUTHOR
+
+Deriv Group Services Ltd. C<< DERIV@cpan.org >>.
+
+See L<Myriad/CONTRIBUTORS> for full details.
+
+=head1 LICENSE
+
+Copyright Deriv Group Services Ltd 2020-2021. Licensed under the same terms as Perl itself.
 

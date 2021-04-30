@@ -230,7 +230,7 @@ SEE ALSO
 
 BUGS
     Please report any bugs or feature requests via GitHub bug tracker at
-    <http://github.com/plicease/Kafka-Librd/issues>.
+    <http://github.com/uperl/Kafka-Librd/issues>.
 
 AUTHOR
     Original author Pavel Shaydo "<zwon at cpan.org>"

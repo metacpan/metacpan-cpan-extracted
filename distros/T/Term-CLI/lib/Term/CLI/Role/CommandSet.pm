@@ -20,7 +20,7 @@
 
 use 5.014_001;
 
-package Term::CLI::Role::CommandSet  0.051007 {
+package Term::CLI::Role::CommandSet  0.052001 {
 
 use Modern::Perl 1.20140107;
 use Term::CLI::L10N;
@@ -91,7 +91,7 @@ sub has_commands {
 
 sub add_command {
     my ($self, @commands) = @_;
-    
+
     if (!$self->_commands) {
         $self->_set_commands([]);
     }
@@ -174,7 +174,7 @@ Term::CLI::Role::CommandSet - Role for (sub-)commands in Term::CLI
 
 =head1 VERSION
 
-version 0.051007
+version 0.052001
 
 =head1 SYNOPSIS
 
@@ -280,7 +280,7 @@ Negative status values indicate a parse error. This is a sign that no
 action should be taken, but some error handling should be performed.
 The actual parse error can be found under the C<error> key. A typical
 thing to do in this case is for one of the callbacks in the chain (e.g.
-the one on the C<Term::CLI> object to print the error to F<STDERR>).
+the one on the C<Term::CLI> object) to print the error to F<STDERR>.
 
 =item I<0>
 
@@ -320,7 +320,7 @@ errors, this often contains elements, and otherwise should be empty.
 =item C<command_line>
 
 The complete command line as given to the
-L<Term::CLI::execute|Term::CLI/execute> method.  
+L<Term::CLI::execute|Term::CLI/execute> method.
 
 =item C<command_path>
 
@@ -388,7 +388,7 @@ X<find_command>
 
 Check whether I<Str> uniquely matches a command in this C<Term::CLI>
 object. Returns a reference to the appropriate
-L<Term::CLI::Command> object if successful; otherwise, it 
+L<Term::CLI::Command> object if successful; otherwise, it
 sets the objects C<error> field and returns C<undef>.
 
 Example:
@@ -396,7 +396,7 @@ Example:
     my $sub_cmd = $cmd->find_command($prefix);
     die $cmd->error unless $sub_cmd;
 
-=item B<root_node> 
+=item B<root_node>
 X<root_node>
 
 Walks L<parent|/parent> chain until it can go no further. Returns a

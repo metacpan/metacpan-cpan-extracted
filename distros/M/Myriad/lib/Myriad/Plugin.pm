@@ -2,8 +2,10 @@ package Myriad::Plugin;
 
 use Myriad::Class;
 
-our $VERSION = '0.004'; # VERSION
+our $VERSION = '0.005'; # VERSION
 our $AUTHORITY = 'cpan:DERIV'; # AUTHORITY
+
+=encoding utf8
 
 =head1 NAME
 

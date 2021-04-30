@@ -1,5 +1,12 @@
 Revision history for Data-Enum:
 
+v0.2.1    2021-04-30 11:26:32+01:00 Europe/London
+ [Enhancements]
+ - Add `predicates` method.
+
+ [Documentation]
+ - Fixed typo.
+
 v0.2.0    2021-04-29 11:20:06+01:00 Europe/London
  [Enhancements]
  - Add `values` method.

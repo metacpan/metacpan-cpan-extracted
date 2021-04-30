@@ -24,6 +24,16 @@ package TestCase::Lib::SPVM::ShortList {
         return 0;
       }
     }
+
+    # new with undef
+    {
+      my $list = SPVM::ShortList->new(undef);
+      
+      unless ($list->length == 0) {
+        return 0;
+      }
+    }
+    
     
     return 1;
   }
@@ -547,6 +557,23 @@ package TestCase::Lib::SPVM::ShortList {
         return 0;
       }
       unless ($list->get(3) == 0 && $list->get(31) == 0) {
+        return 0;
+      }
+    }
+
+    # 3 to 2 and 2 to 3 again
+    {
+      my $list = SPVM::ShortList->new([(short)1, 2, 3]);
+      $list->resize(2);
+      unless ($list->length == 2) {
+        return 0;
+      }
+      
+      $list->resize(3);
+      unless ($list->length == 3) {
+        return 0;
+      }
+      unless ($list->get(2) == 0) {
         return 0;
       }
     }

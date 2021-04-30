@@ -119,4 +119,23 @@ note '3-digit occurrence';
     is $record->{record}->[1]->[1], '102', '3-digit occurrence';
 }
 
+my $annotated = "";
+{
+    for my $annotated ("? 123A \$xy\n\n", "  123A \$xy\n\n") {
+        my $plain = substr $annotated, 2;
+
+        my $parser = pica_parser(plain => \"$annotated$plain", bless => 1);
+        is $annotated, $parser->next->string, 'support annotation by default';
+        is $plain, $parser->next->string, 'mixed with plain';
+        
+        $parser = pica_parser(plain => \"$annotated$plain", bless => 1, annotated => 1);
+        is $annotated, $parser->next->string, 'annotation = 1';
+        dies_ok{ $parser->next } 'require annotation';
+
+        $parser = pica_parser(plain => \"$plain$annotated", bless => 1, annotated => 0, strict => 1);         
+        ok $parser->next;
+        dies_ok { $parser->next } 'forbid annotation';
+    }
+}
+
 done_testing;

@@ -1,5 +1,5 @@
 package Box::Calc::BoxType;
-$Box::Calc::BoxType::VERSION = '1.0201';
+$Box::Calc::BoxType::VERSION = '1.0205';
 use strict;
 use warnings;
 use Moose;
@@ -13,7 +13,7 @@ Box::Calc::BoxType - The container class for the types (sizes) of boxes that can
 
 =head1 VERSION
 
-version 1.0201
+version 1.0205
 
 =head1 SYNOPSIS
 
@@ -77,6 +77,21 @@ has category => (
     is          => 'ro',
     isa         => 'Str',
     default     => '',
+);
+
+=head2 void_weight()
+
+Returns the weight assigned to the void space left in the box due to void space filler such as packing peanuts. Defaults to 70% of the box weight.
+
+=cut
+
+has void_weight => (
+    is      => 'rw',
+    lazy    => 1,
+    default => sub {
+        my $self = shift;
+        return $self->weight * 0.7;
+    }
 );
 
 =head2 describe

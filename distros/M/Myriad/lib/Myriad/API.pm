@@ -2,11 +2,7 @@ package Myriad::API;
 
 use Myriad::Class;
 
-use Myriad::Config;
-use Myriad::Service::Remote;
-use Myriad::Service::Storage;
-
-our $VERSION = '0.004'; # VERSION
+our $VERSION = '0.005'; # VERSION
 our $AUTHORITY = 'cpan:DERIV'; # AUTHORITY
 
 =encoding utf8
@@ -24,10 +20,18 @@ storage, subscription and RPC behaviour.
 
 =cut
 
+use Myriad::Config;
+use Myriad::Service::Remote;
+use Myriad::Service::Storage;
+
 has $myriad;
 has $service_name;
 has $storage;
 has $config;
+
+=head1 METHODS
+
+=cut
 
 BUILD (%args) {
     weaken($myriad = delete $args{myriad});

@@ -3,10 +3,9 @@ package Myriad::Role::RPC;
 use strict;
 use warnings;
 
-our $VERSION = '0.004'; # VERSION
+our $VERSION = '0.005'; # VERSION
 our $AUTHORITY = 'cpan:DERIV'; # AUTHORITY
 
-no indirect qw(fatal);
 use utf8;
 
 =encoding utf8
@@ -36,6 +35,7 @@ a concrete implementation - instead, see classes such as:
 
 =cut
 
+no indirect qw(fatal);
 use Role::Tiny;
 
 use Future::AsyncAwait;

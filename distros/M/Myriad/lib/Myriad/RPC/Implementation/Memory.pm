@@ -1,21 +1,11 @@
 package Myriad::RPC::Implementation::Memory;
 
-use strict;
-use warnings;
+use Myriad::Class extends => qw(IO::Async::Notifier);
 
-our $VERSION = '0.004'; # VERSION
+our $VERSION = '0.005'; # VERSION
 our $AUTHORITY = 'cpan:DERIV'; # AUTHORITY
 
-use Sys::Hostname qw(hostname);
-use Syntax::Keyword::Try qw( try :experimental(typed) );
-
-use Role::Tiny::With;
-with 'Myriad::Role::RPC';
-
-use Myriad::Exception::General;
-use Myriad::RPC::Message;
-
-use Myriad::Class extends => qw(IO::Async::Notifier);
+=encoding utf8
 
 =head1 NAME
 
@@ -24,6 +14,16 @@ Myriad::RPC::Implementation::Memory - microservice RPC in-memory implementation.
 =head1 DESCRIPTION
 
 =cut
+
+use Sys::Hostname qw(hostname);
+use Syntax::Keyword::Try qw( try :experimental(typed) );
+
+use Role::Tiny::With;
+
+use Myriad::Exception::General;
+use Myriad::RPC::Message;
+
+with 'Myriad::Role::RPC';
 
 has $transport;
 

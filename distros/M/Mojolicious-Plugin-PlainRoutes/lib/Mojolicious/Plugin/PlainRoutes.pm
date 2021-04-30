@@ -1,7 +1,7 @@
 use 5.014;
 package Mojolicious::Plugin::PlainRoutes;
 # ABSTRACT: Plaintext route definitions for Mojolicious
-$Mojolicious::Plugin::PlainRoutes::VERSION = '0.06';
+$Mojolicious::Plugin::PlainRoutes::VERSION = '0.07';
 use Mojo::Base 'Mojolicious::Plugin';
 use Mojo::Util qw/decamelize/;
 
@@ -248,10 +248,10 @@ sub process {
 	for my $node (@$tree) {
 		my $token = ref $node eq 'ARRAY' ? shift @$node : $node;
 
-		my $route = $bridge->route($token->{path})
+		my $route = $bridge->any($token->{path})
 		                   ->to($token->{action});
 		if ($token->{verb} ne 'ANY') {
-			$route->via($token->{verb});
+			$route->methods($token->{verb});
 		}
 
 		my $p = $route->pattern;
@@ -259,7 +259,7 @@ sub process {
 			$route->name($token->{name});
 		}
 		elsif (ref $self->autoname eq 'CODE') {
-			my $name = $self->autoname->($route->via->[0], $p->unparsed,
+			my $name = $self->autoname->($route->methods->[0], $p->unparsed,
 				@{$p->defaults}{qw/controller action/});
 
 			if (ref $name) {
@@ -293,7 +293,7 @@ Mojolicious::Plugin::PlainRoutes - Plaintext route definitions for Mojolicious
 
 =head1 VERSION
 
-version 0.06
+version 0.07
 
 =head1 SYNOPSIS
 
@@ -356,7 +356,7 @@ Cameron Thornton <cthor@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by Cameron Thornton.
+This software is copyright (c) 2021 by Cameron Thornton.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

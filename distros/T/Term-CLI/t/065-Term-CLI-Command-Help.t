@@ -124,7 +124,7 @@ sub check_help : Test(13) {
 
     stdout_like(
         sub { $cli->execute('help --pod') },
-        qr/=head2 Commands:.*B<cp>.*B<help>.*B<mv>/sm,
+        qr/=head\d Commands:.*B<cp>.*B<help>.*B<mv>/sm,
         'help --pod returns POD command summary'
     );
 
@@ -135,25 +135,30 @@ sub check_help : Test(13) {
     );
     stdout_like(
         sub { $cli->execute('help --pod cp') },
-        qr/=head2 Usage:.*B<cp>.*B<--force>.*I<src>.*I<dst>/sm,
+        qr/=head\d Usage:.*B<cp>.*B<--force>.*I<src>.*I<dst>/sm,
         '"help --pod cp" returns POD command help'
     );
 
     stdout_like(
         sub { $cli->execute('help --pod show') },
-        qr/=head2 Usage:.*B<show>.*=head2 Sub-Commands:.*B<clock>.*B<load>/sm,
+        qr{
+           =head\d \s+ Usage: \s*\n
+           B<show> .* \n
+           =head\d \s+ Sub-Commands: \s*\n
+           .* B<clock> .* B<load>
+        }smx,
         "'help --pod show' returns POD command summary with sub-commands'",
     );
 
     stdout_like(
         sub { $cli->execute('help --pod show load') },
-        qr/=head2 Usage:.*B<show> B<load>/sm,
+        qr/=head\d Usage:.*B<show> B<load>/sm,
         "'help --pod show load' returns POD command summary with sub-commands'",
     );
 
     stdout_like(
         sub { $cli->execute('help --pod mv') },
-        qr/=head2 Usage:.*B<mv> I<path1> I<path2>/sm,
+        qr/=head\d Usage:.*B<mv> I<path1> I<path2>/sm,
         "'help --pod mv' returns POD command summary'",
     );
 

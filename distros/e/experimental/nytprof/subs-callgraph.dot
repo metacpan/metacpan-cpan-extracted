@@ -1,0 +1,418 @@
+digraph {
+graph [overlap=false]
+subgraph cluster_Parse_CPAN_Meta {
+	label="Parse::CPAN::Meta";
+	"Parse::CPAN::Meta::BEGIN@47";
+	"Parse::CPAN::Meta::BEGIN@9";
+	"Parse::CPAN::Meta::BEGIN@10";
+}
+subgraph cluster_warnings {
+	label="warnings";
+	"warnings::_mkMask";
+	"warnings::register_categories";
+	"warnings::_expand_bits";
+	"warnings::import";
+	"warnings::unimport";
+	"warnings::CORE:match";
+	"warnings::_bits";
+}
+subgraph cluster_Exporter {
+	label="Exporter";
+	"Exporter::import";
+	"Exporter::CORE:subst";
+	"Exporter::CORE:match";
+}
+subgraph cluster_warnings_register {
+	label="warnings::register";
+	"warnings::register::import";
+}
+subgraph cluster_CPAN_Meta_Requirements {
+	label="CPAN::Meta::Requirements";
+	"CPAN::Meta::Requirements::BEGIN@229";
+	"CPAN::Meta::Requirements::BEGIN@44";
+	"CPAN::Meta::Requirements::BEGIN@214";
+	"CPAN::Meta::Requirements::BEGIN@1";
+	"CPAN::Meta::Requirements::BEGIN@36";
+}
+subgraph cluster_strict {
+	label="strict";
+	"strict::BEGIN@7";
+	"strict::unimport";
+	"strict::import";
+	"strict::bits";
+	"strict::CORE:match";
+}
+subgraph cluster_CPAN_Meta_Prereqs {
+	label="CPAN::Meta::Prereqs";
+	"CPAN::Meta::Prereqs::BEGIN@18";
+	"CPAN::Meta::Prereqs::__ANON__";
+	"CPAN::Meta::Prereqs::BEGIN@16";
+	"CPAN::Meta::Prereqs::BEGIN@2";
+	"CPAN::Meta::Prereqs::BEGIN@1";
+	"CPAN::Meta::Prereqs::BEGIN@3";
+	"CPAN::Meta::Prereqs::BEGIN@17";
+}
+subgraph cluster_Scalar_Util {
+	label="Scalar::Util";
+	"Scalar::Util::BEGIN@10";
+	"Scalar::Util::BEGIN@9";
+}
+subgraph cluster_overloading {
+	label="overloading";
+	"overloading::BEGIN@2";
+	"overloading::unimport";
+}
+subgraph cluster_main {
+	label="main";
+	"main::CORE:say";
+	"main::BEGIN@2";
+	"main::BEGIN@3";
+	"main::BEGIN@3.2";
+	"main::BEGIN@2.1";
+	"main::NULL";
+	"main::BEGIN@4";
+	"main::BEGIN@1";
+	"main::__ANON__";
+	"main::RUNTIME";
+}
+subgraph cluster_CPAN_Meta_Validator {
+	label="CPAN::Meta::Validator";
+	"CPAN::Meta::Validator::CORE:match";
+	"CPAN::Meta::Validator::new";
+	"CPAN::Meta::Validator::is_valid";
+	"CPAN::Meta::Validator::check_list";
+	"CPAN::Meta::Validator::license";
+	"CPAN::Meta::Validator::check_map";
+	"CPAN::Meta::Validator::boolean";
+	"CPAN::Meta::Validator::release_status";
+	"CPAN::Meta::Validator::version";
+	"CPAN::Meta::Validator::string";
+	"CPAN::Meta::Validator::errors";
+}
+subgraph cluster_experimental {
+	label="experimental";
+	"experimental::CORE:match";
+	"experimental::BEGIN@8";
+	"experimental::BEGIN@3";
+	"experimental::import";
+	"experimental::BEGIN@7";
+	"experimental::_enable";
+	"experimental::BEGIN@4";
+	"experimental::BEGIN@5";
+}
+subgraph cluster_Carp {
+	label="Carp";
+	"Carp::BEGIN@730";
+	"Carp::BEGIN@49";
+	"Carp::BEGIN@95";
+	"Carp::BEGIN@1";
+	"Carp::BEGIN@137";
+	"Carp::BEGIN@169";
+	"Carp::BEGIN@6";
+	"Carp::_fetch_sub";
+	"Carp::BEGIN@296";
+	"Carp::BEGIN@256";
+	"Carp::BEGIN@188";
+	"Carp::BEGIN@73";
+	"Carp::BEGIN@4";
+	"Carp::BEGIN@5";
+	"Carp::BEGIN@751";
+	"Carp::BEGIN@574";
+	"Carp::BEGIN@744";
+	"Carp::BEGIN@3";
+	"Carp::_univ_mod_loaded";
+	"Carp::BEGIN@61";
+}
+subgraph cluster_version {
+	label="version";
+	"version::BEGIN@4";
+	"version::BEGIN@27";
+	"version::new";
+	"version::BEGIN@5";
+	"version::BEGIN@6";
+}
+subgraph cluster_CPAN_Meta_Feature {
+	label="CPAN::Meta::Feature";
+	"CPAN::Meta::Feature::BEGIN@8";
+	"CPAN::Meta::Feature::BEGIN@3";
+	"CPAN::Meta::Feature::BEGIN@2";
+	"CPAN::Meta::Feature::__ANON__";
+	"CPAN::Meta::Feature::BEGIN@1";
+}
+subgraph cluster_CPAN_Meta {
+	label="CPAN::Meta";
+	"CPAN::Meta::_new";
+	"CPAN::Meta::BEGIN@56";
+	"CPAN::Meta::BEGIN@151";
+	"CPAN::Meta::CORE:subst";
+	"CPAN::Meta::BEGIN@114";
+	"CPAN::Meta::BEGIN@61";
+	"CPAN::Meta::BEGIN@1";
+	"CPAN::Meta::BEGIN@60";
+	"CPAN::Meta::BEGIN@82";
+	"CPAN::Meta::BEGIN@3.5";
+	"CPAN::Meta::__ANON__";
+	"CPAN::Meta::BEGIN@162";
+	"CPAN::Meta::BEGIN@57";
+	"CPAN::Meta::BEGIN@93";
+	"CPAN::Meta::BEGIN@3";
+	"CPAN::Meta::BEGIN@59";
+	"CPAN::Meta::BEGIN@2.4";
+	"CPAN::Meta::BEGIN@121";
+	"CPAN::Meta::BEGIN@63";
+	"CPAN::Meta::BEGIN@58";
+	"CPAN::Meta::BEGIN@2";
+	"CPAN::Meta::create";
+	"CPAN::Meta::BEGIN@1.3";
+	"CPAN::Meta::BEGIN@625";
+}
+subgraph cluster_XSLoader {
+	label="XSLoader";
+	"XSLoader::load";
+}
+subgraph cluster_CPAN_Meta_Converter {
+	label="CPAN::Meta::Converter";
+	"CPAN::Meta::Converter::BEGIN@27";
+	"CPAN::Meta::Converter::CORE:sort";
+	"CPAN::Meta::Converter::BEGIN@491";
+	"CPAN::Meta::Converter::CORE:qr";
+	"CPAN::Meta::Converter::BEGIN@28";
+	"CPAN::Meta::Converter::BEGIN@36";
+	"CPAN::Meta::Converter::BEGIN@3.8";
+	"CPAN::Meta::Converter::BEGIN@2";
+	"CPAN::Meta::Converter::BEGIN@2.7";
+	"CPAN::Meta::Converter::BEGIN@3";
+	"CPAN::Meta::Converter::BEGIN@506";
+	"CPAN::Meta::Converter::BEGIN@1.6";
+	"CPAN::Meta::Converter::BEGIN@1";
+	"CPAN::Meta::Converter::BEGIN@1.9";
+	"CPAN::Meta::Converter::CORE:regcomp";
+	"CPAN::Meta::Converter::BEGIN@26";
+	"CPAN::Meta::Converter::__ANON__";
+}
+subgraph cluster_UNIVERSAL {
+	label="UNIVERSAL";
+	"UNIVERSAL::VERSION";
+	"UNIVERSAL::can";
+}
+subgraph cluster_version_regex {
+	label="version::regex";
+	"version::regex::CORE:regcomp";
+	"version::regex::BEGIN@3";
+	"version::regex::CORE:qr";
+}
+subgraph cluster_feature {
+	label="feature";
+	"feature::__common";
+	"feature::import";
+}
+subgraph cluster_List_Util {
+	label="List::Util";
+	"List::Util::BEGIN@9";
+	"List::Util::BEGIN@10";
+	"List::Util::BEGIN@35";
+}
+"CPAN::Meta::Converter::BEGIN@491" -> "CPAN::Meta::Converter::CORE:qr";
+"experimental::import" -> "experimental::_enable";
+"main::BEGIN@3" -> "experimental::BEGIN@5";
+"strict::BEGIN@7" -> "strict::CORE:match";
+"main::NULL" -> "main::BEGIN@3";
+"experimental::BEGIN@5" -> "version::regex::BEGIN@3";
+"CPAN::Meta::Converter::BEGIN@28" -> "Parse::CPAN::Meta::BEGIN@47";
+"CPAN::Meta::Converter::BEGIN@28" -> "CPAN::Meta::Converter::BEGIN@2.7";
+"main::BEGIN@4" -> "CPAN::Meta::BEGIN@59";
+"main::BEGIN@3" -> "experimental::BEGIN@3";
+"CPAN::Meta::BEGIN@59" -> "CPAN::Meta::Converter::BEGIN@36";
+"main::BEGIN@4" -> "main::BEGIN@1";
+"CPAN::Meta::BEGIN@59" -> "CPAN::Meta::Converter::BEGIN@506";
+"experimental::BEGIN@8" -> "Carp::BEGIN@730";
+"CPAN::Meta::BEGIN@57" -> "CPAN::Meta::BEGIN@3";
+"Carp::BEGIN@256" -> "strict::unimport";
+"Carp::BEGIN@188" -> "strict::unimport";
+"CPAN::Meta::BEGIN@625" -> "strict::unimport";
+"CPAN::Meta::BEGIN@162" -> "strict::unimport";
+"Carp::BEGIN@751" -> "strict::unimport";
+"Parse::CPAN::Meta::BEGIN@47" -> "strict::unimport";
+"CPAN::Meta::BEGIN@121" -> "strict::unimport";
+"CPAN::Meta::Requirements::BEGIN@229" -> "strict::unimport";
+"Carp::BEGIN@730" -> "strict::unimport";
+"CPAN::Meta::Converter::BEGIN@506" -> "strict::unimport";
+"List::Util::BEGIN@35" -> "strict::unimport";
+"CPAN::Meta::BEGIN@93" -> "strict::unimport";
+"version::BEGIN@27" -> "strict::unimport";
+"CPAN::Meta::Prereqs::BEGIN@17" -> "Exporter::import";
+"Parse::CPAN::Meta::BEGIN@10" -> "Exporter::import";
+"CPAN::Meta::BEGIN@56" -> "Exporter::import";
+"experimental::BEGIN@8" -> "Exporter::import";
+"CPAN::Meta::Prereqs::BEGIN@16" -> "Exporter::import";
+"Parse::CPAN::Meta::BEGIN@9" -> "Exporter::import";
+"CPAN::Meta::Feature::BEGIN@8" -> "CPAN::Meta::Feature::BEGIN@1";
+"CPAN::Meta::Prereqs::BEGIN@17" -> "Scalar::Util::BEGIN@10";
+"CPAN::Meta::BEGIN@59" -> "CPAN::Meta::Converter::BEGIN@26";
+"CPAN::Meta::BEGIN@57" -> "CPAN::Meta::Feature::BEGIN@8";
+"CPAN::Meta::Validator::check_map" -> "CPAN::Meta::Validator::version";
+"main::BEGIN@3" -> "experimental::BEGIN@7";
+"main::BEGIN@4" -> "CPAN::Meta::BEGIN@57";
+"experimental::BEGIN@8" -> "Carp::BEGIN@5";
+"CPAN::Meta::Validator::is_valid" -> "CPAN::Meta::Validator::errors";
+"CPAN::Meta::BEGIN@59" -> "CPAN::Meta::Converter::BEGIN@491";
+"experimental::BEGIN@8" -> "Carp::BEGIN@188";
+"warnings::_bits" -> "warnings::_expand_bits";
+"warnings::unimport" -> "warnings::_expand_bits";
+"experimental::BEGIN@8" -> "Carp::BEGIN@574";
+"CPAN::Meta::Converter::BEGIN@26" -> "CPAN::Meta::Converter::BEGIN@2";
+"Carp::BEGIN@137" -> "Carp::_univ_mod_loaded";
+"warnings::register_categories" -> "warnings::_mkMask";
+"CPAN::Meta::Prereqs::BEGIN@17" -> "List::Util::BEGIN@10";
+"CPAN::Meta::BEGIN@59" -> "CPAN::Meta::BEGIN@3.5";
+"CPAN::Meta::Validator::check_map" -> "CPAN::Meta::Validator::check_map";
+"CPAN::Meta::Validator::is_valid" -> "CPAN::Meta::Validator::check_map";
+"main::BEGIN@4" -> "CPAN::Meta::BEGIN@82";
+"main::BEGIN@4" -> "CPAN::Meta::BEGIN@114";
+"CPAN::Meta::Prereqs::BEGIN@18" -> "CPAN::Meta::Requirements::BEGIN@36";
+"CPAN::Meta::Prereqs::BEGIN@18" -> "UNIVERSAL::can";
+"CPAN::Meta::BEGIN@59" -> "UNIVERSAL::can";
+"CPAN::Meta::create" -> "CPAN::Meta::_new";
+"experimental::BEGIN@8" -> "Carp::BEGIN@137";
+"experimental::BEGIN@3" -> "strict::BEGIN@7";
+"main::BEGIN@4" -> "main::BEGIN@3.2";
+"experimental::BEGIN@5" -> "version::BEGIN@27";
+"CPAN::Meta::Validator::boolean" -> "CPAN::Meta::Validator::CORE:match";
+"CPAN::Meta::Validator::version" -> "CPAN::Meta::Validator::CORE:match";
+"CPAN::Meta::Validator::release_status" -> "CPAN::Meta::Validator::CORE:match";
+"CPAN::Meta::_new" -> "CPAN::Meta::Validator::new";
+"CPAN::Meta::_new" -> "CPAN::Meta::Validator::is_valid";
+"Carp::BEGIN@61" -> "Carp::_fetch_sub";
+"Carp::BEGIN@73" -> "Carp::_fetch_sub";
+"Carp::BEGIN@137" -> "Carp::_fetch_sub";
+"experimental::BEGIN@5" -> "version::BEGIN@5";
+"experimental::BEGIN@5" -> "version::regex::CORE:qr";
+"main::RUNTIME" -> "CPAN::Meta::create";
+"experimental::BEGIN@8" -> "Carp::BEGIN@73";
+"Carp::BEGIN@169" -> "overloading::BEGIN@2";
+"CPAN::Meta::Converter::BEGIN@28" -> "Parse::CPAN::Meta::BEGIN@9";
+"CPAN::Meta::Feature::BEGIN@8" -> "CPAN::Meta::Prereqs::BEGIN@18";
+"CPAN::Meta::Feature::BEGIN@8" -> "CPAN::Meta::Prereqs::BEGIN@16";
+"CPAN::Meta::BEGIN@59" -> "CPAN::Meta::BEGIN@2.4";
+"CPAN::Meta::Feature::BEGIN@8" -> "CPAN::Meta::Feature::BEGIN@3";
+"CPAN::Meta::Converter::BEGIN@28" -> "CPAN::Meta::Converter::BEGIN@3.8";
+"CPAN::Meta::Converter::BEGIN@28" -> "CPAN::Meta::Converter::BEGIN@1.6";
+"main::BEGIN@3" -> "experimental::import";
+"Carp::BEGIN@744" -> "warnings::unimport";
+"Carp::BEGIN@6" -> "warnings::unimport";
+"experimental::_enable" -> "warnings::unimport";
+"Scalar::Util::BEGIN@10" -> "warnings::import";
+"main::BEGIN@3.2" -> "warnings::import";
+"CPAN::Meta::Prereqs::BEGIN@3" -> "warnings::import";
+"experimental::BEGIN@4" -> "warnings::import";
+"CPAN::Meta::Converter::BEGIN@3" -> "warnings::import";
+"CPAN::Meta::BEGIN@3" -> "warnings::import";
+"CPAN::Meta::Converter::BEGIN@3.8" -> "warnings::import";
+"CPAN::Meta::Feature::BEGIN@3" -> "warnings::import";
+"List::Util::BEGIN@10" -> "warnings::import";
+"CPAN::Meta::BEGIN@3.5" -> "warnings::import";
+"Carp::BEGIN@5" -> "warnings::import";
+"overloading::BEGIN@2" -> "warnings::import";
+"CPAN::Meta::Prereqs::BEGIN@18" -> "CPAN::Meta::Prereqs::BEGIN@3";
+"experimental::BEGIN@5" -> "version::BEGIN@4";
+"CPAN::Meta::Converter::BEGIN@26" -> "CPAN::Meta::Converter::__ANON__";
+"CPAN::Meta::Converter::BEGIN@27" -> "CPAN::Meta::Converter::__ANON__";
+"CPAN::Meta::Prereqs::BEGIN@18" -> "CPAN::Meta::Prereqs::BEGIN@1";
+"main::NULL" -> "main::BEGIN@4";
+"CPAN::Meta::Validator::check_map" -> "CPAN::Meta::Validator::release_status";
+"CPAN::Meta::Prereqs::BEGIN@17" -> "Scalar::Util::BEGIN@9";
+"CPAN::Meta::Prereqs::BEGIN@17" -> "List::Util::BEGIN@35";
+"Carp::BEGIN@1" -> "overloading::unimport";
+"Exporter::import" -> "Exporter::CORE:subst";
+"CPAN::Meta::Prereqs::BEGIN@17" -> "List::Util::BEGIN@9";
+"main::NULL" -> "main::BEGIN@2";
+"CPAN::Meta::Prereqs::BEGIN@18" -> "CPAN::Meta::Prereqs::__ANON__";
+"experimental::BEGIN@8" -> "Carp::BEGIN@296";
+"CPAN::Meta::Converter::BEGIN@491" -> "CPAN::Meta::Converter::CORE:regcomp";
+"CPAN::Meta::BEGIN@59" -> "CPAN::Meta::BEGIN@1.3";
+"CPAN::Meta::BEGIN@59" -> "CPAN::Meta::Converter::BEGIN@27";
+"Carp::BEGIN@4" -> "strict::import";
+"CPAN::Meta::BEGIN@2" -> "strict::import";
+"experimental::BEGIN@3" -> "strict::import";
+"main::BEGIN@2.1" -> "strict::import";
+"CPAN::Meta::Converter::BEGIN@2.7" -> "strict::import";
+"CPAN::Meta::BEGIN@2.4" -> "strict::import";
+"version::regex::BEGIN@3" -> "strict::import";
+"CPAN::Meta::Converter::BEGIN@2" -> "strict::import";
+"Scalar::Util::BEGIN@9" -> "strict::import";
+"CPAN::Meta::Feature::BEGIN@2" -> "strict::import";
+"CPAN::Meta::Prereqs::BEGIN@2" -> "strict::import";
+"version::BEGIN@5" -> "strict::import";
+"List::Util::BEGIN@9" -> "strict::import";
+"experimental::BEGIN@5" -> "version::regex::CORE:regcomp";
+"CPAN::Meta::Feature::BEGIN@8" -> "CPAN::Meta::Feature::__ANON__";
+"experimental::BEGIN@8" -> "Carp::BEGIN@751";
+"main::RUNTIME" -> "main::CORE:say";
+"main::BEGIN@4" -> "CPAN::Meta::BEGIN@121";
+"strict::unimport" -> "strict::bits";
+"Exporter::import" -> "Exporter::CORE:match";
+"CPAN::Meta::Converter::BEGIN@26" -> "CPAN::Meta::Converter::BEGIN@3";
+"main::BEGIN@4" -> "CPAN::Meta::BEGIN@93";
+"experimental::BEGIN@5" -> "version::BEGIN@6";
+"experimental::BEGIN@8" -> "Carp::BEGIN@4";
+"CPAN::Meta::BEGIN@59" -> "CPAN::Meta::Converter::CORE:sort";
+"CPAN::Meta::Validator::check_list" -> "CPAN::Meta::Validator::license";
+"CPAN::Meta::Prereqs::BEGIN@18" -> "CPAN::Meta::Requirements::BEGIN@229";
+"experimental::BEGIN@8" -> "Carp::BEGIN@61";
+"CPAN::Meta::BEGIN@57" -> "CPAN::Meta::BEGIN@1";
+"main::BEGIN@4" -> "CPAN::Meta::BEGIN@60";
+"main::BEGIN@3" -> "experimental::BEGIN@4";
+"CPAN::Meta::Prereqs::BEGIN@18" -> "CPAN::Meta::Requirements::BEGIN@44";
+"CPAN::Meta::Validator::check_map" -> "CPAN::Meta::Validator::check_list";
+"main::BEGIN@4" -> "CPAN::Meta::BEGIN@56";
+"main::BEGIN@3" -> "experimental::CORE:match";
+"CPAN::Meta::BEGIN@151" -> "CPAN::Meta::CORE:subst";
+"CPAN::Meta::Feature::BEGIN@8" -> "CPAN::Meta::Prereqs::BEGIN@17";
+"experimental::BEGIN@8" -> "Carp::BEGIN@6";
+"experimental::_enable" -> "feature::import";
+"main::BEGIN@4" -> "CPAN::Meta::BEGIN@151";
+"feature::import" -> "feature::__common";
+"CPAN::Meta::BEGIN@57" -> "CPAN::Meta::BEGIN@2";
+"experimental::BEGIN@4" -> "warnings::CORE:match";
+"CPAN::Meta::Validator::check_map" -> "CPAN::Meta::Validator::boolean";
+"main::BEGIN@4" -> "CPAN::Meta::BEGIN@58";
+"main::BEGIN@4" -> "CPAN::Meta::BEGIN@625";
+"main::BEGIN@3" -> "experimental::BEGIN@8";
+"CPAN::Meta::Prereqs::BEGIN@17" -> "XSLoader::load";
+"experimental::BEGIN@8" -> "Carp::BEGIN@3";
+"main::BEGIN@4" -> "main::BEGIN@2.1";
+"main::BEGIN@4" -> "CPAN::Meta::BEGIN@63";
+"experimental::BEGIN@8" -> "Carp::BEGIN@49";
+"CPAN::Meta::Converter::BEGIN@26" -> "CPAN::Meta::Converter::BEGIN@1";
+"CPAN::Meta::Feature::BEGIN@8" -> "CPAN::Meta::Feature::BEGIN@2";
+"Carp::BEGIN@169" -> "Carp::BEGIN@1";
+"experimental::BEGIN@8" -> "Carp::BEGIN@169";
+"CPAN::Meta::Converter::BEGIN@36" -> "CPAN::Meta::Converter::BEGIN@1.9";
+"CPAN::Meta::Converter::BEGIN@28" -> "Parse::CPAN::Meta::BEGIN@10";
+"CPAN::Meta::Prereqs::BEGIN@18" -> "version::new";
+"main::BEGIN@3" -> "version::new";
+"CPAN::Meta::BEGIN@59" -> "CPAN::Meta::Converter::BEGIN@28";
+"main::BEGIN@4" -> "CPAN::Meta::BEGIN@162";
+"CPAN::Meta::Validator::check_map" -> "CPAN::Meta::Validator::string";
+"experimental::BEGIN@8" -> "Carp::BEGIN@256";
+"CPAN::Meta::BEGIN@57" -> "CPAN::Meta::__ANON__";
+"CPAN::Meta::BEGIN@58" -> "CPAN::Meta::__ANON__";
+"CPAN::Meta::BEGIN@59" -> "CPAN::Meta::__ANON__";
+"CPAN::Meta::BEGIN@60" -> "CPAN::Meta::__ANON__";
+"CPAN::Meta::Requirements::BEGIN@44" -> "CPAN::Meta::Requirements::BEGIN@1";
+"CPAN::Meta::Prereqs::BEGIN@18" -> "CPAN::Meta::Requirements::BEGIN@214";
+"version::BEGIN@6" -> "warnings::register::import";
+"experimental::BEGIN@8" -> "Carp::BEGIN@744";
+"CPAN::Meta::Prereqs::BEGIN@17" -> "UNIVERSAL::VERSION";
+"CPAN::Meta::create" -> "UNIVERSAL::VERSION";
+"CPAN::Meta::Converter::BEGIN@28" -> "UNIVERSAL::VERSION";
+"CPAN::Meta::Prereqs::BEGIN@18" -> "UNIVERSAL::VERSION";
+"CPAN::Meta::BEGIN@61" -> "UNIVERSAL::VERSION";
+"warnings::import" -> "warnings::_bits";
+"main::BEGIN@4" -> "main::__ANON__";
+"main::BEGIN@4" -> "CPAN::Meta::BEGIN@61";
+"experimental::BEGIN@8" -> "Carp::BEGIN@95";
+"experimental::BEGIN@5" -> "warnings::register_categories";
+"warnings::register::import" -> "warnings::register_categories";
+"CPAN::Meta::Prereqs::BEGIN@18" -> "CPAN::Meta::Prereqs::BEGIN@2";
+}

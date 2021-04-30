@@ -8,6 +8,6 @@ requires 'Time::Moment';
 requires 'Moo';
 
 on 'test' => sub {
-    requires 'Test::More', '0.98';
+    requires 'Test2::Suite', 0.000139;
 };
 

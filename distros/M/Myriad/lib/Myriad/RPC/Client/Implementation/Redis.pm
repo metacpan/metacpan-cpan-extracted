@@ -1,12 +1,21 @@
 package Myriad::RPC::Client::Implementation::Redis;
 
-use strict;
-use warnings;
+use Myriad::Class extends => qw(IO::Async::Notifier);
 
-our $VERSION = '0.004'; # VERSION
+our $VERSION = '0.005'; # VERSION
 our $AUTHORITY = 'cpan:DERIV'; # AUTHORITY
 
-use Myriad::Class extends => qw(IO::Async::Notifier);
+=encoding utf8
+
+=head1 NAME
+
+Myriad::RPC::Client::Implementation::Redis - microservice RPC client abstraction
+
+=head1 SYNOPSIS
+
+=head1 DESCRIPTION
+
+=cut
 
 use Myriad::Util::UUID;
 use Myriad::RPC::Implementation::Redis qw(stream_name_from_service);
@@ -107,4 +116,14 @@ method next_id {
 }
 
 1;
+
+=head1 AUTHOR
+
+Deriv Group Services Ltd. C<< DERIV@cpan.org >>.
+
+See L<Myriad/CONTRIBUTORS> for full details.
+
+=head1 LICENSE
+
+Copyright Deriv Group Services Ltd 2020-2021. Licensed under the same terms as Perl itself.
 

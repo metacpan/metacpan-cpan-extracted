@@ -7,7 +7,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.017, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -16,7 +16,7 @@ name: experimental
 provides:
   experimental:
     file: lib/experimental.pm
-    version: '0.022'
+    version: '0.023'
 requires:
   Carp: '0'
   strict: '0'
@@ -25,7 +25,7 @@ requires:
 resources:
   bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=experimental
   repository: git://github.com/Dual-Life/experimental.git
-version: '0.022'
+version: '0.023'
 x_contributors:
   - 'brian greenfield <0briang0@gmail.com>'
   - 'Dagfinn Ilmari Mannsåker <ilmari@ilmari.org>'
@@ -36,5 +36,6 @@ x_contributors:
   - 'Leon Timmermans <fawaka@gmail.com>'
   - 'Ricardo Signes <rjbs@cpan.org>'
   - 'Sawyer X <xsawyerx@cpan.org>'
-x_generated_by_perl: v5.24.0
-x_serialization_backend: 'YAML::Tiny version 1.69'
+x_generated_by_perl: v5.32.0
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

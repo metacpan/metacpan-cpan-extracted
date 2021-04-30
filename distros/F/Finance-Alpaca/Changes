@@ -1,11 +1,20 @@
 Revision history for Perl extension Finance-Alpaca
 
+0.9904 2021-04-30T17:32:17Z
+
+    - Fixed race conditions in 09_orders.t
+    - Test websockets (only when the market is open)
+
+0.9903 2021-04-30T15:31:22Z
+
+    - Test suite! Might fail due to race cond between API limits and multiple smokers
+
 0.9902 2021-04-28T17:16:19Z
 
     - Minor documentation updates
     - Update dependencies in cpanfile
 
-0.9902 2021-04-26T20:59:38Z
+0.9901 2021-04-26T20:59:38Z
 
     - Adding basic examples in Finance::Alpaca::Cookbook
 

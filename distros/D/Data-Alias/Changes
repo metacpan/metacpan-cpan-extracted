@@ -1,3 +1,8 @@
+version 1.23; 2021-04-30
+
+  * bugfix: fix aliasing semantic unintentionally being applied to subs
+    defined after a parenthesized alias()-expression since perl 5.11.2.
+
 version 1.22; 2021-04-22
 
   * bugfix: use SvCUR_set instead of direct SvCUR assignment to fix

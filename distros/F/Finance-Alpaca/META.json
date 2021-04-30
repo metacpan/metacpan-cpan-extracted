@@ -54,18 +54,18 @@
       },
       "test" : {
          "requires" : {
-            "Test::More" : "0.98"
+            "Test2::Suite" : "0.000139"
          }
       }
    },
    "provides" : {
       "Finance::Alpaca" : {
          "file" : "lib/Finance/Alpaca.pm",
-         "version" : "0.9902"
+         "version" : "0.9904"
       },
       "Finance::Alpaca::DataStream" : {
          "file" : "lib/Finance/Alpaca/DataStream.pm",
-         "version" : "0.9902"
+         "version" : "0.9904"
       },
       "Finance::Alpaca::Struct::Account" : {
          "file" : "lib/Finance/Alpaca/Struct/Account.pm",
@@ -105,19 +105,19 @@
       },
       "Finance::Alpaca::Struct::Quote" : {
          "file" : "lib/Finance/Alpaca/Struct/Quote.pm",
-         "version" : "0.9902"
+         "version" : "0.9904"
       },
       "Finance::Alpaca::Struct::Trade" : {
          "file" : "lib/Finance/Alpaca/Struct/Trade.pm",
-         "version" : "0.9902"
+         "version" : "0.9904"
       },
       "Finance::Alpaca::Struct::TradeActivity" : {
          "file" : "lib/Finance/Alpaca/Struct/TradeActivity.pm",
-         "version" : "0.9902"
+         "version" : "0.9904"
       },
       "Finance::Alpaca::Struct::TradeUpdate" : {
          "file" : "lib/Finance/Alpaca/Struct/TradeUpdate.pm",
-         "version" : "0.9902"
+         "version" : "0.9904"
       },
       "Finance::Alpaca::Struct::Watchlist" : {
          "file" : "lib/Finance/Alpaca/Struct/Watchlist.pm",
@@ -125,7 +125,7 @@
       },
       "Finance::Alpaca::TradeStream" : {
          "file" : "lib/Finance/Alpaca/TradeStream.pm",
-         "version" : "0.9902"
+         "version" : "0.9904"
       },
       "Finance::Alpaca::Types" : {
          "file" : "lib/Finance/Alpaca/Types.pm",
@@ -143,7 +143,7 @@
          "web" : "https://github.com/sanko/Finance-Alpaca"
       }
    },
-   "version" : "0.9902",
+   "version" : "0.9904",
    "x_authority" : "cpan:SANKO",
    "x_serialization_backend" : "JSON::PP version 4.05",
    "x_static_install" : 1

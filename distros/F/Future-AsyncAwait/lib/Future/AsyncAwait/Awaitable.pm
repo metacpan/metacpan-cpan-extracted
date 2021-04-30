@@ -1,9 +1,9 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2019-2020 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2019-2021 -- leonerd@leonerd.org.uk
 
-package Future::AsyncAwait::Awaitable 0.49;
+package Future::AsyncAwait::Awaitable 0.50;
 
 use v5.14;
 use warnings;
@@ -49,6 +49,8 @@ if( defined eval { require Role::Tiny } ) {
       AWAIT_DONE AWAIT_FAIL AWAIT_GET
       AWAIT_IS_READY AWAIT_ON_READY
       AWAIT_IS_CANCELLED AWAIT_ON_CANCEL
+
+      AWAIT_WAIT
    ) );
 }
 
@@ -177,6 +179,16 @@ An implementation that does not support cancellation can simply ignore this
 method.
 
    sub AWAIT_ON_CANCEL { }
+
+=head2 AWAIT_WAIT
+
+Called by the toplevel C<await> expression in order to run the event system
+and wait for the instance to be ready. It should return results or throw an
+exception in the same manner as L</AWAIT_GET>.
+
+   @result = $f->AWAIT_WAIT
+   $result = $f->AWAIT_WAIT
+   $f->AWAIT_WAIT
 
 =cut
 

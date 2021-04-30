@@ -3,6 +3,7 @@
  *
  *  (C) Paul Evans, 2016-2021 -- leonerd@leonerd.org.uk
  */
+#define PERL_NO_GET_CONTEXT
 
 #include "EXTERN.h"
 #include "perl.h"
@@ -14,15 +15,23 @@
 #  include "DMD_helper.h"
 #endif
 
+#include "XSParseKeyword.h"
 #include "XSParseSublike.h"
 
-#define HAVE_PERL_VERSION(R, V, S) \
-    (PERL_REVISION > (R) || (PERL_REVISION == (R) && (PERL_VERSION > (V) || (PERL_VERSION == (V) && (PERL_SUBVERSION >= (S))))))
+#include "perl-backcompat.c.inc"
 
 #if !HAVE_PERL_VERSION(5, 24, 0)
   /* On perls before 5.24 we have to do some extra work to save the itervar
    * from being thrown away */
 #  define HAVE_ITERVAR
+#endif
+
+#if HAVE_PERL_VERSION(5, 24, 0)
+  /* For unknown reasons, doing this on perls 5.20 or 5.22 massively breaks
+   * everything.
+   *   https://rt.cpan.org/Ticket/Display.html?id=129202#txn-1843918
+   */
+#  define HAVE_FUTURE_CHAIN_CANCEL
 #endif
 
 #if HAVE_PERL_VERSION(5, 33, 7)
@@ -43,11 +52,8 @@
 #  define CvPADLIST_set(cv, padlist)  (CvPADLIST(cv) = padlist)
 #endif
 
-#ifndef wrap_keyword_plugin
-#  include "wrap_keyword_plugin.c.inc"
-#endif
-
 #include "perl-backcompat.c.inc"
+
 #include "perl-additions.c.inc"
 
 #include "lexer-additions.c.inc"
@@ -201,7 +207,8 @@ static void debug_sv_summary(const SV *sv)
   fprintf(stderr, "}");
 }
 
-static void debug_showstack(const char *name)
+#define debug_showstack(name)  S_debug_showstack(aTHX_ name)
+static void S_debug_showstack(pTHX_ const char *name)
 {
   SV **sp;
 
@@ -443,6 +450,7 @@ static int suspendedstate_free(pTHX_ SV *sv, MAGIC *mg)
             case SAVEt_CLEARSV:
             case SAVEt_COMPPAD:
             case SAVEt_INT_SMALL:
+            case SAVEt_DESTRUCTOR_X:
 #ifdef SAVEt_STRLEN
             case SAVEt_STRLEN:
 #endif
@@ -474,8 +482,14 @@ static int suspendedstate_free(pTHX_ SV *sv, MAGIC *mg)
               break;
 
             default:
-              fprintf(stderr, "TODO: free saved slot type %d\n", saved->type);
+            {
+              char *name = PL_savetype_name[saved->type];
+              if(name)
+                fprintf(stderr, "TODO: free saved slot type SAVEt_%s=%d\n", name, saved->type);
+              else
+                fprintf(stderr, "TODO: free saved slot type UNKNOWN=%d\n", saved->type);
               break;
+            }
           }
         }
 
@@ -791,8 +805,16 @@ static void MY_suspend_frame(pTHX_ SuspendedFrame *frame, PERL_CONTEXT *cx)
          * case of  local $@  is allowable
          * See also  https://rt.cpan.org/Ticket/Display.html?id=122793
          */
-        if(gv != PL_errgv)
-          panic("TODO: Unsure how to handle a savestack entry of SAVEt_SV with gv != PL_errgv\n");
+        if(gv != PL_errgv) {
+          const char *name = GvNAME(gv);
+          const char *stashname = HvNAME(GvSTASH(gv));
+
+          if(name && stashname)
+            panic("TODO: Unsure how to handle a savestack entry of SAVEt_SV with gv != PL_errgv ($%s::%s)\n",
+              stashname, name);
+          else
+            panic("TODO: Unsure how to handle a savestack entry of SAVEt_SV with gv != PL_errgv\n");
+        }
 
         saved->type     = SAVEt_SV;
         saved->u.gv     = gv;
@@ -841,7 +863,13 @@ static void MY_suspend_frame(pTHX_ SuspendedFrame *frame, PERL_CONTEXT *cx)
       }
 
       default:
-        panic("TODO: Unsure how to handle savestack entry of %d\n", type);
+      {
+        char *name = PL_savetype_name[type];
+        if(name)
+          panic("TODO: Unsure how to handle savestack entry of SAVEt_%s=%d\n", name, type);
+        else
+          panic("TODO: Unsure how to handle savestack entry of UNKNOWN=%d\n", type);
+      }
     }
 
     frame->savedlen++;
@@ -1555,6 +1583,29 @@ static void MY_suspendedstate_resume(pTHX_ SuspendedState *state, CV *cv)
     PL_curpm = state->curpm;
 }
 
+#define suspendedstate_cancel(state)  MY_suspendedstate_cancel(aTHX_ state)
+static void MY_suspendedstate_cancel(pTHX_ SuspendedState *state)
+{
+  SuspendedFrame *frame;
+  for(frame = state->frames; frame; frame = frame->next) {
+    I32 i;
+
+    for(i = frame->savedlen - 1; i >= 0; i--) {
+      struct Saved *saved = &frame->saved[i];
+
+      switch(saved->type) {
+        case SAVEt_DESTRUCTOR_X:
+          /* We have to run destructors to ensure that defer {} and try/finally
+           * work correctly
+           *   https://rt.cpan.org/Ticket/Display.html?id=135351
+           */
+          (*saved->u.dx.func)(aTHX_ saved->u.dx.data);
+          break;
+      }
+    }
+  }
+}
+
 /*
  * Some Future class helper functions
  */
@@ -1786,6 +1837,23 @@ static void MY_future_chain_on_cancel(pTHX_ SV *f1, SV *f2)
   LEAVE_with_name("future_chain_on_cancel");
 }
 
+#define future_await_toplevel(f)  MY_future_await_toplevel(aTHX_ f)
+static void MY_future_await_toplevel(pTHX_ SV *f)
+{
+  dSP;
+
+  ENTER_with_name("future_await_toplevel");
+
+  PUSHMARK(SP);
+  EXTEND(SP, 1);
+  PUSHs(f);
+  PUTBACK;
+
+  call_method("AWAIT_WAIT", GIMME);
+
+  LEAVE_with_name("future_await_toplevel");
+}
+
 /*
  * Custom ops
  */
@@ -1889,6 +1957,8 @@ static OP *pp_await(pTHX)
 
       TRACEPRINT("  CANCELLED\n");
 
+      suspendedstate_cancel(state);
+
       PUSHMARK(SP);
       PUTBACK;
       return PL_ppaddr[OP_RETURN](aTHX);
@@ -1941,6 +2011,11 @@ static OP *pp_await(pTHX)
 
   if(!sv_isobject(f))
     croak("Expected a blessed object reference to await");
+
+  if(PL_op->op_flags & OPf_SPECIAL) {
+    future_await_toplevel(f);
+    return PL_op->op_next;
+  }
 
   if(future_is_ready(f)) {
     assert(CvDEPTH(curcv) > 0);
@@ -1999,12 +2074,18 @@ static OP *pp_await(pTHX)
 
   if(!state->returning_future) {
     state->returning_future = future_new_from_proto(f);
-    if(PL_op->op_targ) {
+    if(precancel) {
       I32 i;
       for(i = 0; i < av_count(precancel); i++)
         future_on_cancel(state->returning_future, AvARRAY(precancel)[i]);
       AvFILLp(precancel) = -1;
     }
+#ifndef HAVE_FUTURE_CHAIN_CANCEL
+    /* We can't chain the cancellation but we do need a different way to
+     * invoke the defer and finally blocks
+     */
+    future_on_cancel(state->returning_future, newRV_inc((SV *)curcv));
+#endif
   }
 
   if(defer_mortal_curcv)
@@ -2019,11 +2100,7 @@ static OP *pp_await(pTHX)
   if(!SvROK(state->returning_future))
     panic("ARGH we lost state->returning_future for curcv=%p\n", curcv);
 
-/* For unknown reasons, doing this on perls 5.20 or 5.22 massively breaks
- * everything.
- *   https://rt.cpan.org/Ticket/Display.html?id=129202#txn-1843918
- */
-#if HAVE_PERL_VERSION(5, 24, 0)
+#ifdef HAVE_FUTURE_CHAIN_CANCEL
   future_chain_on_cancel(state->returning_future, state->awaiting_future);
 #endif
 
@@ -2035,23 +2112,6 @@ static OP *pp_await(pTHX)
   TRACEPRINT("LEAVE await curcv=%p [%s:%d]\n", curcv, CopFILE(PL_curcop), CopLINE(PL_curcop));
 
   return PL_ppaddr[OP_RETURN](aTHX);
-}
-
-static OP *newAWAITOP_toplevel(I32 flags, OP *expr)
-{
-  /* A toplevel await should just look like a ->get method call */
-  OP *op = op_append_elem(OP_LIST,
-    expr,
-#if HAVE_PERL_VERSION(5, 22, 0)
-    newMETHOP_named(OP_METHOD_NAMED, 0, newSVpvs_share("get"))
-#else
-    /* Before perl 5.22 this was just a plain SVOP */
-    newSVOP(OP_METHOD_NAMED, 0, newSVpvs_share("get"))
-#endif
-    );
-  op = op_convert_list(OP_ENTERSUB, OPf_STACKED, op);
-
-  return op;
 }
 
 static XOP xop_pushcancel;
@@ -2211,14 +2271,17 @@ static struct XSParseSublikeHooks parse_asyncsub_hooks = {
   .post_newcv      = parse_post_newcv,
 };
 
-static int async_keyword_plugin(pTHX_ OP **op_ptr)
+static int parse_async(pTHX_ OP **op_ptr, void *hookdata)
 {
-  lex_read_space(0);
-
   return xs_parse_sublike_any(&parse_asyncsub_hooks, NULL, op_ptr);
 }
 
-static int await_keyword_plugin(pTHX_ OP **op_ptr)
+static struct XSParseKeywordHooks hooks_async = {
+  .permit_hintkey = "Future::AsyncAwait/async",
+  .parse = &parse_async,
+};
+
+static void check_await(pTHX_ void *hookdata)
 {
   SV **asynccvp = hv_fetchs(GvHV(PL_hintgv), "Future::AsyncAwait/PL_compcv", 0);
   if(asynccvp && SvUV(*asynccvp) == PTR2UV(PL_compcv))
@@ -2229,42 +2292,34 @@ static int await_keyword_plugin(pTHX_ OP **op_ptr)
     croak(CvEVAL(PL_compcv) ?
       "await is not allowed inside string eval" :
       "Cannot 'await' outside of an 'async sub'");
+}
 
-  lex_read_space(0);
-
-  OP *expr;
-  /* await TERMEXPR wants a single term expression
-   * await( FULLEXPR ) will be a full expression */
-  if(lex_peek_unichar(0) == '(') {
-    lex_read_unichar(0);
-
-    expr = parse_fullexpr(0);
-
-    lex_read_space(0);
-
-    if(lex_peek_unichar(0) != ')')
-      croak("Expected ')'");
-    lex_read_unichar(0);
-  }
-  else
-    expr = parse_termexpr(0);
-
+static int build_await(pTHX_ OP **out, XSParseKeywordPiece arg0, void *hookdata)
+{
+  OP *expr = arg0.op;
   op_contextualize(expr, OP_SCALAR);
 
   if(PL_compcv == PL_main_cv)
-    *op_ptr = newAWAITOP_toplevel(0, expr);
+    *out = newUNOP_CUSTOM(&pp_await, OPf_SPECIAL, expr);
   else {
-    *op_ptr = newUNOP_CUSTOM(&pp_await, 0, expr);
+    *out = newUNOP_CUSTOM(&pp_await, 0, expr);
 
     PADOFFSET precancel_padix = SvUV(SvRV(*hv_fetchs(GvHV(PL_hintgv), "Future::AsyncAwait/*precancel_padix", 0)));
     if(precancel_padix)
-      (*op_ptr)->op_targ = precancel_padix;
+      (*out)->op_targ = precancel_padix;
   }
 
   return KEYWORD_PLUGIN_EXPR;
 }
 
-static int cancel_phaser_keyword_plugin(pTHX_ OP **op_ptr)
+static struct XSParseKeywordHooks hooks_await = {
+  .permit_hintkey = "Future::AsyncAwait/async",
+  .check = &check_await,
+  .piece1 = XS_PARSE_KEYWORD_TERMEXPR,
+  .build1 = &build_await,
+};
+
+static void check_cancel(pTHX_ void *hookdata)
 {
   SV **asynccvp = hv_fetchs(GvHV(PL_hintgv), "Future::AsyncAwait/PL_compcv", 0);
   if(!asynccvp || SvUV(*asynccvp) != PTR2UV(PL_compcv))
@@ -2273,29 +2328,19 @@ static int cancel_phaser_keyword_plugin(pTHX_ OP **op_ptr)
       "Cannot 'CANCEL' outside of an 'async sub'");
 
 #ifdef WARN_EXPERIMENTAL
-      if(!hv_fetchs(GvHV(PL_hintgv), "Future::AsyncAwait/experimental(cancel)", 0)) {
-        Perl_ck_warner(aTHX_ packWARN(WARN_EXPERIMENTAL),
-          "CANCEL block syntax is experimental and may be changed or removed without notice");
-      }
+  if(!hv_fetchs(GvHV(PL_hintgv), "Future::AsyncAwait/experimental(cancel)", 0)) {
+    Perl_ck_warner(aTHX_ packWARN(WARN_EXPERIMENTAL),
+      "CANCEL block syntax is experimental and may be changed or removed without notice");
+  }
 #endif
+}
 
-  lex_read_space(0);
-
-  I32 floor_ix = start_subparse(FALSE, CVf_ANON);
-  SAVEFREESV(PL_compcv);
-
-  I32 save_ix = block_start(0);
-  OP *body = parse_block(0);
-  SvREFCNT_inc(PL_compcv);
-  body = block_end(save_ix, body);
-
-  CV *on_cancel = newATTRSUB(floor_ix, NULL, NULL, NULL, body);
-
-  lex_read_space(0);
-
+static int build_cancel(pTHX_ OP **out, XSParseKeywordPiece arg0, void *hookdata)
+{
+  CV *on_cancel = arg0.cv;
   OP *pushcancel;
 
-  *op_ptr = op_prepend_elem(OP_LINESEQ,
+  *out = op_prepend_elem(OP_LINESEQ,
     (pushcancel = newSVOP_CUSTOM(&pp_pushcancel, 0, (SV *)on_cancel)), NULL);
 
   SV *sv;
@@ -2310,30 +2355,12 @@ static int cancel_phaser_keyword_plugin(pTHX_ OP **op_ptr)
   return KEYWORD_PLUGIN_STMT;
 }
 
-static int (*next_keyword_plugin)(pTHX_ char *, STRLEN, OP **);
-
-static int my_keyword_plugin(pTHX_ char *kw, STRLEN kwlen, OP **op_ptr)
-{
-  HV *hints = GvHV(PL_hintgv);
-
-  if((PL_parser && PL_parser->error_count) ||
-     !hints)
-    return (*next_keyword_plugin)(aTHX_ kw, kwlen, op_ptr);
-
-  if(kwlen == 5 && strEQ(kw, "async") &&
-      hv_fetchs(hints, "Future::AsyncAwait/async", 0))
-    return async_keyword_plugin(aTHX_ op_ptr);
-
-  if(kwlen == 5 && strEQ(kw, "await") &&
-      hv_fetchs(hints, "Future::AsyncAwait/async", 0))
-    return await_keyword_plugin(aTHX_ op_ptr);
-
-  if(kwlen == 6 && strEQ(kw, "CANCEL") &&
-      hv_fetchs(hints, "Future::AsyncAwait/async", 0))
-    return cancel_phaser_keyword_plugin(aTHX_ op_ptr);
-
-  return (*next_keyword_plugin)(aTHX_ kw, kwlen, op_ptr);
-}
+static struct XSParseKeywordHooks hooks_cancel = {
+  .permit_hintkey = "Future::AsyncAwait/async",
+  .check = &check_cancel,
+  .piece1 = XS_PARSE_KEYWORD_ANONSUB,
+  .build1 = &build_cancel,
+};
 
 MODULE = Future::AsyncAwait    PACKAGE = Future::AsyncAwait
 
@@ -2365,7 +2392,11 @@ BOOT:
   XopENTRY_set(&xop_pushcancel, xop_class, OA_SVOP);
   Perl_custom_op_register(aTHX_ &pp_pushcancel, &xop_pushcancel);
 
-  wrap_keyword_plugin(&my_keyword_plugin, &next_keyword_plugin);
+  boot_xs_parse_keyword(0);
+
+  register_xs_parse_keyword("async", &hooks_async, NULL);
+  register_xs_parse_keyword("await", &hooks_await, NULL);
+  register_xs_parse_keyword("CANCEL", &hooks_cancel, NULL);
 #ifdef HAVE_DMD_HELPER
   DMD_SET_MAGIC_HELPER(&vtbl_suspendedstate, dumpmagic_suspendedstate);
 #endif

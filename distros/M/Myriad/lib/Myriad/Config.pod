@@ -39,6 +39,16 @@ A registry of configs defined by the services using the C<config > helper.
 
 A collection of L<Ryu::Observable> to notify services about updates on the configs values
 
+=head2 clear_key
+
+Delete a single config
+the best use case for this sub is during tests.
+
+=head2 clear_all
+
+Delete all the config that has been parsed by this module,
+the best use case for this sub is during tests.
+
 =head2 parse_subargs
 
 A helper to resolve the correct service config

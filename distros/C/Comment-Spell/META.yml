@@ -5,6 +5,7 @@ author:
 build_requires:
   ExtUtils::MakeMaker: '0'
   Test::More: '0'
+  Test::Most: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
@@ -31,5 +32,5 @@ requires:
 resources:
   bugtracker: https://github.com/nigelhorne/Comment-Spell/issues
   repository: git://github.com/nigelhorne/Comment-Spell.git
-version: '0.001003'
+version: '0.001004'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

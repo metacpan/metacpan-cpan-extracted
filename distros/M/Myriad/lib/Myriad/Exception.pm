@@ -3,10 +3,8 @@ package Myriad::Exception;
 use strict;
 use warnings;
 
-our $VERSION = '0.004'; # VERSION
+our $VERSION = '0.005'; # VERSION
 our $AUTHORITY = 'cpan:DERIV'; # AUTHORITY
-
-no indirect qw(fatal);
 
 use utf8;
 
@@ -21,6 +19,8 @@ Myriad::Exception
 This is a rôle used for all exceptions throughout the framework.
 
 =cut
+
+no indirect qw(fatal);
 
 use Scalar::Util;
 use Role::Tiny;

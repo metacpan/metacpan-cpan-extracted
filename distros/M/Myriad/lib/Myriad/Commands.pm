@@ -2,12 +2,10 @@ package Myriad::Commands;
 
 use Myriad::Class;
 
-use Unicode::UTF8 qw(decode_utf8);
-
-use Myriad::Util::UUID;
-
-our $VERSION = '0.004'; # VERSION
+our $VERSION = '0.005'; # VERSION
 our $AUTHORITY = 'cpan:DERIV'; # AUTHORITY
+
+=encoding utf8
 
 =head1 NAME
 
@@ -19,10 +17,13 @@ Provides top-level commands, such as loading a service or making an RPC call.
 
 =cut
 
+use Unicode::UTF8 qw(decode_utf8);
+
 use Future::Utils qw(fmap0);
 
 use Module::Runtime qw(require_module);
 
+use Myriad::Util::UUID;
 use Myriad::Service::Remote;
 
 has $myriad;

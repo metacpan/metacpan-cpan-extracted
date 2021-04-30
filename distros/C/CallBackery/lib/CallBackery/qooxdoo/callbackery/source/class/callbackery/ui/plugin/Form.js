@@ -280,7 +280,7 @@ qx.Class.define("callbackery.ui.plugin.Form", {
                     if (that._form) {
                         var statusData = {};
                         that._cfg.form.forEach(function(item){
-                            if (data[item.key]) {
+                            if (data[item.key] !== null) {
                                 if (item.reloadOnFormReset === true) {
                                     statusData[item.key] = data[item.key];
                                 }

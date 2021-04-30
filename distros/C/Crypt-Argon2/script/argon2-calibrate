@@ -1,0 +1,119 @@
+#!perl
+
+use strict;
+use warnings;
+
+use Time::HiRes 'time';
+use Crypt::Argon2;
+
+sub prompt {
+	my ($mess, $def) = @_;
+
+	my $dispdef = defined $def ? ("[$def] " ) : '';
+
+	local $| = 1;
+	print "$mess ", $dispdef;
+
+	my $ans = <STDIN>;
+	chomp $ans;
+
+	if (not defined $ans or not length $ans) {
+		$ans = defined $def ? $def : '';
+	}
+
+	return $ans;
+}
+
+my %encoder = (
+	argon2id => \&Crypt::Argon2::argon2id_raw,
+	argon2i  => \&Crypt::Argon2::argon2i_raw,
+	argon2d  => \&Crypt::Argon2::argon2d_raw,
+);
+
+my $type = prompt('What type of hash?', 'argon2id');
+my $encoder = $encoder{$type} or die "Invalid type $type";
+
+my $threads = prompt('How many threads may it use', 1);
+die 'Invalid number' unless $threads > 0;
+
+my $mem_cost = prompt('How much memory may it use (e.g. 32M)');
+die 'Invalid memory usage' unless $mem_cost =~ / ^ \d+ [hMG] $ /x;
+
+my $max_time = prompt('How much time may argon2 take? (in milliseconds)');
+die 'No time given' unless $max_time > 0;
+
+my $begin = time;
+$encoder->("correct horse battery staple", scalar("\x00" x 16), 100, $mem_cost, $threads, 16);
+my $end = time;
+
+my $time_per_round = ($end - $begin) * 10;
+my $time_cost = int($max_time / $time_per_round);
+
+die "Can't compute a hash in the given time (took $time_per_round milliseconds)" if $time_cost == 0;
+
+die "Unsafe parameters were computed" if $type eq 'argon2i' && $time_cost < 3;
+
+print <<"END";
+
+type = $type
+threads = $threads
+mem_cost = $mem_cost
+time_cost = $time_cost
+END
+
+# PODNAME: argon2-calibrate
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+argon2-calibrate
+
+=head1 VERSION
+
+version 0.011
+
+=head1 DESCRIPTION
+
+This program implements the following procedure, as recommended by the argon2 authors:
+
+=over 4
+
+=item 1. Select the type C<y>. If you do not know the difference between them, choose Argon2id.
+
+=item 2. Figure out the maximum number of threads C<h> that can be initiated by each call to Argon2. This is the C<parallelism> argument.
+
+=item 3. Figure out the maximum amount of memory  C<m> that each call can a afford.
+
+=item 4. Figure out the maximum amount C<x> of time (in seconds) that each call can a afford.
+
+=item 5. Select the salt length. 16 bytes is suffient for all applications, but can be reduced to 8 bytes in the case of space constraints.
+
+=item 6. Select the tag (output) size. 16 bytes is suffient for most applications, including key derivation.
+
+=item 7. Run the scheme of type C<y>, memory C<m> and C<h> lanes and threads, using different number of passes C<t>. Figure out the maximum C<t> such that the running time does not exceed C<x>. If it exceeds C<x> even for C<t = 1>, reduce C<m> accordingly. If using Argon2i, t must be at least 3.
+
+=item 8. Hash all the passwords with the just determined values C<m>, C<h>, and C<t>.
+
+=back
+
+=head1 AUTHOR
+
+Leon Timmermans <leont@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+
+Daniel Dinu, Dmitry Khovratovich, Jean-Philippe Aumasson, Samuel Neves, Thomas Pornin and Leon Timmermans has dedicated the work to the Commons by waiving all of his
+or her rights to the work worldwide under copyright law and all related or
+neighboring legal rights he or she had in the work, to the extent allowable by
+law.
+
+Works under CC0 do not require attribution. When citing the work, you should
+not imply endorsement by the author.
+
+=cut

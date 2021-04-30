@@ -122,13 +122,12 @@ found, an empty list is returned.
 
 ## `bars( ... )`
 
-     my %bars = $camelid->bars(
-           symbol    => 'MSFT',
-           timeframe => '1Min',
-           start     => Time::Moment->now->with_hour(10),
-           end       => Time::Moment->now->minus_minutes(20)
-       );
-    
+    my %bars = $camelid->bars(
+          symbol    => 'MSFT',
+          timeframe => '1Min',
+          start     => Time::Moment->now->with_hour(10),
+          end       => Time::Moment->now->minus_minutes(20)
+      );
 
 Returns a list of [Finance::Alpaca::Struct::Bar](https://metacpan.org/pod/Finance%3A%3AAlpaca%3A%3AStruct%3A%3ABar) objects along with other
 data.
@@ -149,7 +148,7 @@ symbol as well as a `next_page_token` for pagination if applicable.
 
 ## `quotes( ... )`
 
-    my $quotes = $camelid->quotes(
+    my %quotes = $camelid->quotes(
         symbol => 'MSFT',
         start  => Time::Moment->now->with_hour(10),
         end    => Time::Moment->now->minus_minutes(20)
@@ -169,15 +168,12 @@ The following parameters are accepted:
 - `limit` - Number of data points to return. Must be in range `1-10000`, defaults to `1000`
 - `page_token` - Pagination token to continue from
 
-The data returned includes the following data:
-
-- `quotes` - List of [Finance::Alpaca::Struct::Quote](https://metacpan.org/pod/Finance%3A%3AAlpaca%3A%3AStruct%3A%3AQuote) objects
-- `next_page_token` - Token that can be used to query the next page
-- `symbol` - Symbol that was queried
+The method returns a hash reference with quote data included as a list under
+the symbol as well as a `next_page_token` for pagination if applicable.
 
 ## `trades( ... )`
 
-    my $trades = $camelid->trades(
+    my %trades = $camelid->trades(
         symbol => 'MSFT',
         start  => Time::Moment->now->with_hour(10),
         end    => Time::Moment->now->minus_minutes(20)
@@ -197,11 +193,8 @@ The following parameters are accepted:
 - `limit` - Number of data points to return. Must be in range `1-10000`, defaults to `1000`
 - `page_token` - Pagination token to continue from
 
-The data returned includes the following data:
-
-- `trades` - List of [Finance::Alpaca::Struct::Quote](https://metacpan.org/pod/Finance%3A%3AAlpaca%3A%3AStruct%3A%3AQuote) objects
-- `next_page_token` - Token that can be used to query the next page
-- `symbol` - Symbol that was queried
+The method returns a hash reference with trade data included as a list under
+the symbol as well as a `next_page_token` for pagination if applicable.
 
 ## `trade_stream( ... )`
 
@@ -234,7 +227,7 @@ data.
 
 ## `orders( [...] )`
 
-    my $orders = $camelid->orders( status => 'open' );
+    my @orders = $camelid->orders( status => 'open' );
 
 Returns a list of [Finance::Alpaca::Struct::Order](https://metacpan.org/pod/Finance%3A%3AAlpaca%3A%3AStruct%3A%3AOrder) objects.
 

@@ -2,6 +2,21 @@ use Test::More;
 use Test::Deep;
 use Ouch;
 
+if ($ENV{TEST_LOGGING}) {
+    my $logging_conf = q(
+        log4perl.logger = DEBUG, mainlog
+        log4perl.appender.mainlog          = Log::Log4perl::Appender::File
+        log4perl.appender.mainlog.filename = test.log
+        log4perl.appender.mainlog.layout   = PatternLayout
+        log4perl.appender.mainlog.layout.ConversionPattern = %d %p %m %n
+    );
+
+    use Log::Log4perl;
+    Log::Log4perl::init(\$logging_conf);
+    use Log::Any::Adapter;
+    Log::Any::Adapter->set('Log4perl');
+}
+
 use lib '../lib';
 use 5.010;
 use Box::Calc::Box;

@@ -29,18 +29,26 @@ WriteMakefile(
     dist                => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean               => { FILES => 'Kafka-Librd-* const_xs.inc' },
     depend              => { 'Rdkafka.c' => 'const_xs.inc' },
+
     META_MERGE => {
+        'meta-spec' => { version => 2 },
         resources => {
-            homepage   => 'https://github.com/plicease/Kafka-Librd',
-            bugtracker => 'https://github.com/plicease/Kafka-Librd/issues',
-            repository => 'git://github.com/plicease/Kafka-Librd',
-            license    => 'http://dev.perl.org/licenses/',
+            bugtracker => {
+                web  => 'https://github.com/uperl/Kafka-Librd/issues',
+            },
+            homepage => 'https://metacpan.org/pod/Kafka::Librd',
+            repository => {
+                type => 'git',
+                url  => 'https://github.com/uperl/Kafka-Librd.git',
+                web  => 'https://github.com/uperl/Kafka-Librd',
+            },
         },
         x_contributors => [
             'Pavel Shaydo <zwon@cpan.org>',
             'Graham Ollis <plicease@cpan.org>',
         ],
     },
+
     Alien::Base::Wrapper->mm_args,
 );
 

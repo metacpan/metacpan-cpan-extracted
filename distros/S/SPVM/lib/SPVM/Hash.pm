@@ -4,55 +4,43 @@ package SPVM::Hash;
 
 =head1 NAME
 
-SPVM::Hash - Key-Values Stored Data Structrue
+SPVM::Hash - Hash Data Structure
 
 =head1 SYNOPSYS
   
   use SPVM::Hash;
   
-  # Book Data
-  my $book = SPVM::Hash->new;
+  # Create hash
+  my $book = SPVM::Hash->new({});
   
   $book->set_int(id => 4);
-  $book->set(name => "Perl");
-  $book->set_int(price => 300);
+  $book->set_string(name => "Perl");
+  $book->set_double(price => 3000.0);
   
   my $id = (int)$book->get_int("id");
-  my $name = (string)$book->get("name");
-  my $price = (int)$book->get_int("price");
+  my $name = (string)$book->get_string("name");
+  my $price = (double)$book->get_double("price");
   
-  # Create Book data with array
-  my $book = SPVM::Hash->newa([(object)id => 4, name => "Perl"]);
-  
-  # Option Data
-  my $opt = SPVM::Hash->new;
-  $opt->set_int(limit => 10);
-  $opt->set(caption => "Perl is Good Plain Old Language");
-  $opt->set_double(rate => 0.95);
-  
+  # Create hash with key value pairs
+  my $book = SPVM::Hash->new({id => 4, name => "Perl", price => 3000.0});
+
 =head1 DESCRIPTION
 
-L<SPVM::Hash> is Key-Values Stored Data Structrue.
+L<SPVM::Hash> is Hash Data Structure. This is generally called associative array.
 
 =head1 STATIC METHODS
 
 =head2 new
 
-    sub new : SPVM::Hash ()
+    sub new : SPVM::Hash ($key_values : oarray)
 
-Create a new L<SPVM::Hash> object.
+Create a new L<SPVM::Hash> object with key value pairs.
 
-=head2 newa
+  # Create hash
+  my $book = SPVM::Hash->new({});
 
-    sub newa : SPVM::Hash ($key_values : oarray)
-
-Create a new L<SPVM::Hash> object with array.
-
-  # Create Book data with object array
-  my $book = SPVM::Hash->newa([(object)id => 4, name => "Perl"]);
-
-  # Create Book data with string array
-  my $book = SPVM::Hash->newa([foo => "4px", bar => "5px"]);
+  # Create hash with key value pairs
+  my $book = SPVM::Hash->new({id => 4, name => "Perl"});
 
 =head1 INSTANCE METHODS
 
@@ -104,37 +92,37 @@ Get a value.
 
   get_byte : byte ($self : self, $name : string)
 
-Set value with a key. the value is converted to byte type.
+Get value with a key. the value is converted to byte type.
 
 =head2 get_short
 
   get_short : short ($self : self, $name : string)
 
-Set value with a key. the value is converted to short type.
+Get value with a key. the value is converted to short type.
   
 =head2 get_int
 
   get_int : int ($self : self, $name : string)
 
-Set value with a key. the value is converted to int type.
+Get value with a key. the value is converted to int type.
   
 =head2 get_long
 
   get_long : long ($self : self, $name : string)
 
-Set value with a key. the value is converted to long type.
+Get value with a key. the value is converted to long type.
 
 =head2 get_float
 
   get_float : float ($self : self, $name : string)
 
-Set value with a key. the value is converted to float type.
+Get value with a key. the value is converted to float type.
   
 =head2 get_double
 
   get_double : double ($self : self, $name : string)
 
-Set value with a key. the value is converted to double type.
+Get value with a key. the value is converted to double type.
 
 =head2 set
   
@@ -182,5 +170,5 @@ Set key and value pair. double value is converted to L<SPVM::Double> object.
 
   set_string : void ($self : self, $name : string, $value : string)
 
-Set key and value pair with string value..
+Set key and value pair with string value.
 

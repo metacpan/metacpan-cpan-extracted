@@ -1,5 +1,8 @@
 Revision history for Kafka-Librd
 
+0.20 2021-04-30 09:27:54 -0600
+  - Moved to new GtiHub org: uperl
+
 0.19 2020-12-02 05:46:51 -0700
   - Production release identical to 0.18_01.
 

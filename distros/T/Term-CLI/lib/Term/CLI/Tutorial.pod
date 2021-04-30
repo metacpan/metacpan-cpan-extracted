@@ -22,7 +22,7 @@ Term::CLI::Tutorial - tips, tricks, and examples for Term::CLI
 
 =head1 VERSION
 
-version 0.051007
+version 0.052001
 
 =head1 SYNOPSIS
 
@@ -158,7 +158,7 @@ L<Term::CLI> provides a framework to make this happen:
     while (defined (my $line = $term->readline)) {
         $term->execute($line);
     }
-    say "\nexit";
+    say "\n-- exit";
     exit 0;
 
 This example is pretty much non-functional, since the L<Term::CLI> object is
@@ -232,7 +232,7 @@ This gives us:
     bssh> # This is a comment!
     bssh> exit
     ERROR: unknown command 'exit'
-    bssh>
+    bssh> ^D
     -- exit
 
 =head1 ADDING COMMANDS
@@ -442,12 +442,16 @@ If you add this to the application, you'll get:
     Usage:
         exit [excode]
     bssh> help h
-    Usage:
-        help [--pod] [-p] [cmd ...]
+      Usage:
+        help [--pod] [--all] [-pa] [cmd ...]
 
-    Description:
-        Show help for any given command sequence. The "--pod"
-        option (or "-p") will cause raw POD to be shown.
+      Description:
+        Show help for any given command sequence (or a command overview
+        if no argument is given.
+
+        The "--pod" ("-p") option will cause raw POD to be shown.
+
+        The "--all" ("-a") option will list help text for all commands.
 
 Note that we don't have to specify the full command to get help on:
 command abbreviation works here as well (C<help h>). Also, if you'd type
@@ -460,13 +464,18 @@ manual page:
 
     =head2 Usage:
 
-    B<help> [B<--pod>] [B<-p>] [I<cmd> ...]
+    B<help> [B<--pod>] [B<--all>] [B<-pa>] [I<cmd> ...]
 
     =head2 Description:
 
-    Show help for any given command sequence.
-    The C<--pod> option (or C<-p>) will cause raw POD
+    Show help for any given command sequence (or a command
+    overview if no argument is given.
+
+    The C<--pod> (C<-p>) option will cause raw POD
     to be shown.
+
+    The C<--all> (C<-a>) option will list help text for all
+    commands.
 
 =head2 Fleshing out help text
 
@@ -619,7 +628,7 @@ L<Term::CLI::Argument::Enum> objects:
                     .  "C<now>, C<never>, C<later>, or C<forever>.",
         arguments => [
             Term::CLI::Argument::Enum->new( name => 'target',
-                value_list => [qw( love money)],
+                value_list => [qw( love money )],
             ),
             Term::CLI::Argument::Enum->new( name => 'when',
                 value_list => [qw( now later never forever )],
@@ -752,7 +761,7 @@ topic.
 
 For now, there's no other way than to specify a single
 L<Term::CLI::Argument::Filename>, with a minimum occurrence of 2, and no
-maximum. De distinction between I<src-path> and I<dst-path> needs to be
+maximum. The distinction between I<src-path> and I<dst-path> needs to be
 made in the callback code.
 
     push @commands, Term::CLI::Command->new(
@@ -1334,7 +1343,7 @@ the L<Term::CLI::Command> constructor call:
 The value should be an ArrayRef with the allowed options in
 L<Getopt::Long>(3p) format. The L<Term::CLI> code will turn
 on C<bundling> (allow grouping of single letter options, i.e. C<-a>
-nd C<-b> can be written as C<-ab>) and C<require_order> (no mixing of
+and C<-b> can be written as C<-ab>) and C<require_order> (no mixing of
 options and arguments).
 
 Above, we've added a C<--verbose> option to the C<show> command, and a

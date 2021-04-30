@@ -5,7 +5,7 @@
 #  Description:  Class for Term::CLI 'help' command.
 #
 #       Author:  Steven Bakker (SBAKKER), <sbakker@cpan.org>
-#      Created:  18/02/18
+#      Created:  18/Feb/2018
 #
 #   Copyright (c) 2018 Steven Bakker
 #
@@ -20,7 +20,7 @@
 
 use 5.014_001;
 
-package Term::CLI::Command::Help  0.051007 {
+package Term::CLI::Command::Help  0.052001 {
 
 use Modern::Perl 1.20140107;
 use Pod::Text::Termcap 2.08;
@@ -70,14 +70,17 @@ has '+callback' => (
 );
 
 has '+options' => (
-    default => sub { [ 'pod|p' ] },
+    default => sub { [ 'pod|p', 'all|a' ] },
 );
 
 has '+description' => (
     default => sub {
-        loc(qq{Show help for any given command sequence.\n}
-           .qq{The C<--pod> option (or C<-p>) will cause raw POD\n}
-           .qq{to be shown.});
+        loc(qq{Show help for any given command sequence (or a command\n}
+           .qq{overview if no argument is given.\n\n}
+           .qq{The C<--pod> (C<-p>) option will cause raw POD\n}
+           .qq{to be shown.\n\n}
+           .qq{The C<--all> (C<-a>) option will list help text for all commands.}
+       );
     }
 );
 
@@ -111,8 +114,8 @@ sub _format_pod {
 # ($pod, $text) = $self->_make_command_summary( %args );
 sub _make_command_summary {
     my ($self, %args) = @_;
-    
-    my $cmd_path   = $args{cmd_path};
+
+    my @cmd_path   = map { $_->name } @{ $args{cmd_path} };
     my $commands   = $args{commands};
     my $pod_prefix = $args{pod_prefix};
 
@@ -123,7 +126,7 @@ sub _make_command_summary {
     for my $cmd_ref (@$commands) {
         for my $usage ($cmd_ref->usage_text(with_options => 'none')) {
             my $item_text = join(' ',
-                (map { "B<$_>" } @$cmd_path),
+                (map { "B<$_>" } @cmd_path),
                 $usage
             );
             $full_pod .= "=item $item_text\n\n";
@@ -139,6 +142,8 @@ sub _make_command_summary {
 
     $full_pod = $pod_prefix."=over $over_width\n\n$full_pod";
     $full_pod .= "=back\n\n";
+
+    # Format POD to text, remove extraneous empty lines.
     $text = $self->_format_pod($full_pod);
     $text =~ s/\n\n+/\n/gs;
     $text =~ s/^\n+//;
@@ -146,10 +151,16 @@ sub _make_command_summary {
     return ($full_pod, $text);
 }
 
+
 sub _get_help {
     my ($self, %args) = @_;
 
     my $text = '';
+
+    # Handle "--all" in a separate routine.
+    if ($args{options}->{all}) {
+        return $self->_get_all_help(%args);
+    }
 
     # Top-level help, i.e. "help" without arguments.
     # Produce a simple command summary.
@@ -163,47 +174,30 @@ sub _get_help {
         return (%args, pod => $pod, text => $text);
     }
 
-    my @cmd_path;
+    # We've been given arguments to "help". Find the
+    # appropriate command object, and work from there.
 
     my $cur_cmd_ref = $self->root_node;
-    my $cmd_list = $args{arguments};
     my @cmd_ref_path;
 
-    while (@$cmd_list) {
-        my $new_cmd_ref = $cur_cmd_ref->find_command($cmd_list->[0]);
+    for my $cmd_name (@{ $args{arguments} }) {
+        my $new_cmd_ref = $cur_cmd_ref->find_command($cmd_name);
         if (!$new_cmd_ref) {
+            my @cmd_path = map { $_->name } @cmd_ref_path;
             return (%args, status => -1,
                 error => @cmd_path > 0
                             ? "@cmd_path: ".$cur_cmd_ref->error
                             : $cur_cmd_ref->error
             );
         }
-        push @cmd_path, shift @{$cmd_list};
         push @cmd_ref_path, $new_cmd_ref;
         $cur_cmd_ref = $new_cmd_ref;
     }
 
-    my $last_cmd = pop @cmd_ref_path;
-    my $usage_prefix = join(' ',
-        map { $_->usage_text(with_options => 'none', with_subcommands => 0) }
-        @cmd_ref_path
+    my $pod = $self->_get_help_cmd(
+        cmd_path => \@cmd_ref_path,
+        style => 'head1',
     );
-    $usage_prefix .= ' ' if length $usage_prefix;
-    my $pod .= "=head2 ".loc("Usage").":\n\n";
-    for my $usage ($last_cmd->usage_text(with_options => 'both')) {
-        $pod .= "$usage_prefix$usage\n\n";
-    }
-    $pod =~ s/\n*$//s;
-    $pod .= "\n\n";
-
-    if (my $description = $cur_cmd_ref->description) {
-        $pod .= "=head2 ".loc("Description").":\n\n";
-        $pod .= $cur_cmd_ref->description;
-    }
-    elsif (my $summary = $cur_cmd_ref->summary) {
-        $pod .= "=head2 Description:\n\n";
-        $pod .= $cur_cmd_ref->summary;
-    }
 
     $pod =~ s/\n*$/\n\n/s;
 
@@ -213,7 +207,7 @@ sub _get_help {
     if (scalar($cur_cmd_ref->commands) > 1) {
         my ($cmd_pod, $cmd_text) =
             $self->_make_command_summary(
-                cmd_path => \@cmd_path,
+                cmd_path => \@cmd_ref_path,
                 pod_prefix => "=head2 ".loc("Sub-Commands").":\n\n",
                 commands => [$cur_cmd_ref->commands],
             );
@@ -222,13 +216,102 @@ sub _get_help {
     }
 
     # Play fast and loose with the POD formatter output.
-    # Remove leading and trailing newlines, reduce line indent.
+    # Remove leading and trailing newlines.
     $pod2txt =~ s/^\n+//s;
     $pod2txt =~ s/\n+$//s;
-    #$pod2txt =~ s/^  //gm;
     $text .= "$pod2txt\n";
-    
+
     return (%args, pod => $pod, text => $text);
+}
+
+
+sub _get_help_cmd {
+    my ($self, %args) = @_;
+
+    my $style = $args{style} // 'item';
+    my @cmd_path = @{$args{cmd_path}};
+
+    my $cmd = $cmd_path[$#cmd_path];
+
+    my $usage_prefix = join(' ',
+        map { $_->usage_text(with_options => 'none', with_subcommands => 0) }
+        @cmd_path[0..$#cmd_path-1]
+    );
+
+    $usage_prefix .= ' ' if length $usage_prefix;
+
+    my $pod;
+
+    if ($style =~ /head/) {
+        $pod .= "=$style ".loc("Usage").":\n\n";
+    }
+
+    for my $usage ($cmd->usage_text(with_options => 'both')) {
+        $pod .= "=item " if $style eq 'item';
+        $pod .= "$usage_prefix$usage\n\n";
+    }
+
+    $pod =~ s/\n*$//s;
+    $pod .= "\n\n";
+
+    my $description = ($cmd->description || $cmd->summary);
+    if ($description) {
+        $pod .= "=$style ".loc("Description").":\n\n" if $style =~ /head/;
+        $pod .= $description;
+    }
+
+    $pod =~ s/\n*$/\n\n/s;
+
+    return $pod;
+}
+
+
+sub _get_help_all_commands {
+    my ($self, %args) = @_;
+
+    my @cmd_path = @{ $args{cmd_path} // [] };
+    my $cmd = $cmd_path[$#cmd_path] // $self->root_node;
+
+    my $pod = '';
+
+    if ($cmd->has_commands) {
+        for my $command ($cmd->commands) {
+            $pod .= $self->_get_help_all_commands(
+                cmd_path => [@cmd_path, $command]
+            );
+        }
+        return $pod;
+    }
+
+    return $self->_get_help_cmd(cmd_path => \@cmd_path);
+}
+
+
+sub _get_all_help {
+    my ($self, %args) = @_;
+
+    my ($pod1, $txt1)
+        = $self->_make_command_summary(
+            cmd_path   => [],
+            pod_prefix => "=head1 ".loc("COMMAND SUMMARY")."\n\n",
+            commands   => [$self->root_node->commands]
+        );
+
+    my $pod2 .= "\n=head1 ".loc("COMMANDS")."\n\n"
+         . "=over\n\n"
+         . $self->_get_help_all_commands()
+         . "=back\n"
+         ;
+
+    my $txt2 = $self->_format_pod($pod2);
+
+    # Play fast and loose with the POD formatter output.
+    # Remove leading and trailing newlines.
+    $txt2 =~ s/^\n+//s;
+    $txt2 =~ s/\n+$//s;
+    $txt2 .= "\n";
+
+    return (%args, pod => $pod1.$pod2, text => "$txt1\n$txt2");
 }
 
 
@@ -311,7 +394,7 @@ sub _execute_help {
         $args{status} = $?;
         $args{error} = $! if $args{status} != 0;
     }
-    else { 
+    else {
         if (!open $pager_fh, '>&', \*STDOUT) {
             $args{status} = -1;
             $args{error} = "dup(STDOUT): $!";
@@ -340,7 +423,7 @@ Term::CLI::Command::Help - A generic 'help' command for Term::CLI
 
 =head1 VERSION
 
-version 0.051007
+version 0.052001
 
 =head1 SYNOPSIS
 
@@ -368,13 +451,16 @@ version 0.051007
 
 =head1 DESCRIPTION
 
-The C<Term::CLI::Command::Help> class is derived from L<Term::CLI::Command>(3p) and implements
+The C<Term::CLI::Command::Help> class is derived from
+L<Term::CLI::Command>(3p) and implements
 a generic "help" command for L<Term::CLI>(3p) applications.
 
-The C<help> command accepts arguments that it will try to match against the commands of its 
-L<Term::CLI>(3p) parent.
+The C<help> command accepts arguments that it will try to match against
+the commands of its L<Term::CLI>(3p) parent.
 
-It supports completion, as well as a C<--pod> parameter to dump raw POD text.
+It supports completion, as well as a C<--pod> option to dump raw POD text,
+and a C<--all> option to show a command summary followed by extended
+help on each commands.
 
 =head1 CONSTRUCTORS
 
@@ -383,14 +469,15 @@ It supports completion, as well as a C<--pod> parameter to dump raw POD text.
 =item B<new>
 X<new>
 
-Create a new C<Term::CLI::Command::Help> object and return a reference to it.
+Create a new C<Term::CLI::Command::Help> object and return a reference
+to it.
 
-The object provides appropriate default values for all attributes, so there is
-no need to provide any.
+The object provides appropriate default values for all attributes,
+so there is no need to provide any.
 
-If you want, you can override the default attributes; in that case, see the
-L<Term::CLI::Command>(3p) documentation. Attributes that are "safe" to override
-are:
+If you want, you can override the default attributes; in that case,
+see the L<Term::CLI::Command>(3p) documentation. Attributes that are
+"safe" to override are:
 
 =over
 

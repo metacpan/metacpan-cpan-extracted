@@ -1,3 +1,18 @@
+0.052001 -- 2021-04-30
+
+    - Update copyright.
+    
+    - Packaging fixes.
+    
+    - Improve "help":
+        - Fix "help" test suite to fit new POD format.
+        - Add "--all" flag to "help" command.
+        - Refactor help text generation.
+        - POD fixes.
+        - Update tutorial.
+
+    - POD and whitespace fixes.
+
 0.051007 -- 2019-11-18
 
     - Get rid of bogus file "xx".

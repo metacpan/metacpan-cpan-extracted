@@ -1,22 +1,11 @@
 package Myriad::RPC::Implementation::Redis;
 
-use strict;
-use warnings;
-
-our $VERSION = '0.004'; # VERSION
-our $AUTHORITY = 'cpan:DERIV'; # AUTHORITY
-
-use Role::Tiny::With;
-with 'Myriad::Role::RPC';
-
 use Myriad::Class extends => qw(IO::Async::Notifier);
 
-use Future::Utils qw(fmap0);
+our $VERSION = '0.005'; # VERSION
+our $AUTHORITY = 'cpan:DERIV'; # AUTHORITY
 
-use constant RPC_SUFFIX => '/rpc';
-use constant RPC_PREFIX => 'service';
-use Exporter qw(import);
-our @EXPORT_OK = qw(stream_name_from_service);
+=encoding utf8
 
 =head1 NAME
 
@@ -26,11 +15,23 @@ Myriad::RPC::Implementation::Redis - microservice RPC Redis implementation.
 
 =cut
 
+use Role::Tiny::With;
+
+use Future::Utils qw(fmap0);
 use Sys::Hostname qw(hostname);
 use Scalar::Util qw(blessed);
 
 use Myriad::Exception::InternalError;
 use Myriad::RPC::Message;
+
+use constant RPC_SUFFIX => '/rpc';
+use constant RPC_PREFIX => 'service';
+
+use Exporter qw(import export_to_level);
+
+with 'Myriad::Role::RPC';
+
+our @EXPORT_OK = qw(stream_name_from_service);
 
 has $redis;
 method redis { $redis }

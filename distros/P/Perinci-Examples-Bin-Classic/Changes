@@ -1,3 +1,9 @@
+0.081   2021-01-30  Released-By: PERLANCAR; Urgency: medium
+
+	- Update to Perinci::Examples 0.821; rename some CLIs (remove
+	  /-test-/).
+
+
 0.080   2020-04-29  Released-By: PERLANCAR; Urgency: medium
 
         - [build] Rebuild with update Perinci::Examples::CLI to remove

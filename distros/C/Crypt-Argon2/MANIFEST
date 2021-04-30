@@ -11,6 +11,7 @@ dist.ini
 include/argon2.h
 lib/Crypt/Argon2.pm
 lib/Crypt/Argon2.xs
+script/argon2-calibrate
 src/argon2.c
 src/blake2/blake2-impl.h
 src/blake2/blake2.h

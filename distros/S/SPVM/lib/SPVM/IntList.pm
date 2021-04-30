@@ -58,6 +58,10 @@ L<SPVM::IntList> is dynamic int array.
 
 Create a new L<SPVM::IntList> object with specific C<int> array.
 
+Internally, new array is created, and each element of argument array is copied to internal array.
+
+If array is undef, 0-length internal array is created.
+
 =head2 new_len
 
     sub new_len : SPVM::IntList ($length : int)
@@ -107,7 +111,7 @@ Remove and return the element which is specified by the index.
 
   sub resize : void ($self : self, $new_length : int)
 
-Resize list.
+Resize this list. If the new length is shorter than the current length, the list is truncated to the new length. If the new length is shorter than the current length, the list is truncated to the new length. If the new length is same as the current length, there is nothing to do. If the new length is longer than the current length, the list grows to the new length, and the values of the added elements are set to 0.
 
 New length must be more than or equals to 0, otherwise a exception occur.
 

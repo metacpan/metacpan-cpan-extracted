@@ -45,7 +45,8 @@
       },
       "test" : {
          "requires" : {
-            "Test::More" : "0"
+            "Test::More" : "0",
+            "Test::Most" : "0"
          }
       }
    },
@@ -63,6 +64,6 @@
          "x_repository" : "https://github.com/nigelhorne/Comment-Spell"
       }
    },
-   "version" : "0.001003",
+   "version" : "0.001004",
    "x_serialization_backend" : "JSON::PP version 4.06"
 }

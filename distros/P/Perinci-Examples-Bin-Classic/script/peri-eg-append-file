@@ -1,12 +1,12 @@
 #!perl
 
 # Note: This script is a CLI for Riap function /Perinci/Examples/FileStream/append_file
-# and generated automatically using Perinci::CmdLine::Gen version 0.496
+# and generated automatically using Perinci::CmdLine::Gen version 0.497
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-04-29'; # DATE
+our $DATE = '2021-01-30'; # DATE
 our $DIST = 'Perinci-Examples-Bin-Classic'; # DIST
-our $VERSION = '0.080'; # VERSION
+our $VERSION = '0.081'; # VERSION
 
 use 5.010001;
 use strict;
@@ -36,7 +36,7 @@ peri-eg-append-file - peri-eg-append-file
 
 =head1 VERSION
 
-This document describes version 0.080 of peri-eg-append-file (from Perl distribution Perinci-Examples-Bin-Classic), released on 2020-04-29.
+This document describes version 0.081 of peri-eg-append-file (from Perl distribution Perinci-Examples-Bin-Classic), released on 2021-01-30.
 
 =head1 SYNOPSIS
 
@@ -194,7 +194,7 @@ For fish and zsh, install L<shcompgen> as described above.
 
 This script can read configuration files. Configuration files are in the format of L<IOD>, which is basically INI with some extra features.
 
-By default, these names are searched for configuration filenames (can be changed using C<--config-path>): F</home/u1/.config/peri-eg-append-file.conf>, F</home/u1/peri-eg-append-file.conf>, or F</etc/peri-eg-append-file.conf>.
+By default, these names are searched for configuration filenames (can be changed using C<--config-path>): F</home/s1/.config/peri-eg-append-file.conf>, F</home/s1/peri-eg-append-file.conf>, or F</etc/peri-eg-append-file.conf>.
 
 All found files will be read and merged.
 
@@ -222,9 +222,9 @@ Specify additional command-line options.
 
 =head1 FILES
 
-F</home/u1/.config/peri-eg-append-file.conf>
+F</home/s1/.config/peri-eg-append-file.conf>
 
-F</home/u1/peri-eg-append-file.conf>
+F</home/s1/peri-eg-append-file.conf>
 
 F</etc/peri-eg-append-file.conf>
 
@@ -234,7 +234,7 @@ Please visit the project's homepage at L<https://metacpan.org/release/Perinci-Ex
 
 =head1 SOURCE
 
-Source repository is at L<https://github.com/perlancar/perl-Perinci-Examples-Bin-Classic>.
+Source repository is at L<https://github.com/perlancar/perl-Perinci-Examples-Bin>.
 
 =head1 BUGS
 
@@ -250,7 +250,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020, 2015, 2014, 2013, 2012 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2020, 2015, 2014, 2013, 2012 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

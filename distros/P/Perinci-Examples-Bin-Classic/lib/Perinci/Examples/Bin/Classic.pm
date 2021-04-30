@@ -1,7 +1,7 @@
 package Perinci::Examples::Bin::Classic;
 
-our $DATE = '2020-04-29'; # DATE
-our $VERSION = '0.080'; # VERSION
+our $DATE = '2021-01-30'; # DATE
+our $VERSION = '0.081'; # VERSION
 
 use 5.010001;
 
@@ -20,7 +20,7 @@ Perinci::Examples::Bin::Classic - Perinci example CLI scripts (using Perinci::Cm
 
 =head1 VERSION
 
-This document describes version 0.080 of Perinci::Examples::Bin::Classic (from Perl distribution Perinci-Examples-Bin-Classic), released on 2020-04-29.
+This document describes version 0.081 of Perinci::Examples::Bin::Classic (from Perl distribution Perinci-Examples-Bin-Classic), released on 2021-01-30.
 
 =head1 DESCRIPTION
 
@@ -34,7 +34,7 @@ Please visit the project's homepage at L<https://metacpan.org/release/Perinci-Ex
 
 =head1 SOURCE
 
-Source repository is at L<https://github.com/perlancar/perl-Perinci-Examples-Bin-Classic>.
+Source repository is at L<https://github.com/perlancar/perl-Perinci-Examples-Bin>.
 
 =head1 BUGS
 
@@ -56,7 +56,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020, 2015, 2014, 2013, 2012 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2020, 2015, 2014, 2013, 2012 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

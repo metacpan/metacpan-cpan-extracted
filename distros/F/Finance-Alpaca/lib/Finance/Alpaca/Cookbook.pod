@@ -1,3 +1,4 @@
+
 =encoding utf-8
 
 =head1 NAME
@@ -83,8 +84,8 @@ time.
     );
 
     # See how much AAPL moved in that timeframe
-    my $start_price    = $bars{AAPL}->[0]->open;
-    my $end_price      = $bars{AAPL}->[-1]->close;
+    my $start_price    = $bars{AAPL}[0]->open;
+    my $end_price      = $bars{AAPL}[-1]->close;
     my $percent_change = ( $end_price - $start_price ) / $start_price * 100;
     CORE::say sprintf 'AAPL moved %f%% over the last 5 days.', $percent_change;
 
@@ -139,7 +140,7 @@ Submit a limit order to attempt to grow our short position.
     # First, get an up-to-date price for our symbol...
     my $symbol = 'TSLA';
     my $time   = Time::Moment->now;
-    my $symbol_bars = $alpaca->bars(
+    my %symbol_bars = $alpaca->bars(
         symbol    => $symbol,
         timeframe => '1Min',
         limit     => 1,
@@ -154,7 +155,7 @@ Submit a limit order to attempt to grow our short position.
         side          => 'sell',
         type          => 'limit',
         time_in_force => 'day',
-        limit_price   => $symbol_bars->{bars}[0]->close
+        limit_price   => $symbol_bars{$symbol}[0]->close
     );
 
     # Wait a second for our orders to fill...
@@ -192,14 +193,14 @@ Overview|https://alpaca.markets/docs/trading-on-alpaca/orders/#bracket-orders>
     my $symbol = 'AAPL';
     my $time   = Time::Moment->now;
     $time = Time::Moment->now->minus_days(1);
-    my $symbol_bars = $alpaca->bars(
+    my %symbol_bars = $alpaca->bars(
         symbol    => $symbol,
         timeframe => '1Min',
         limit     => 1,
         end       => $time,
         start     => $time->minus_minutes(5)
     );
-    my $symbol_price = $symbol_bars->{bars}[0]->close;
+    my $symbol_price = $symbol_bars{$symbol}[0]->close;
 
     # We could buy a position and add a stop-loss and a take-profit of 5 %
     $alpaca->create_order(
@@ -290,12 +291,12 @@ Overview|https://alpaca.markets/docs/trading-on-alpaca/orders/#trailing-stop-ord
 If you’d like to see a list of your existing orders, you can send a get
 request for that!
 
-    my $closed_orders = $alpaca->orders(
+    my @closed_orders = $alpaca->orders(
         status => 'closed',
         limit  => 100,
         nested => 1
     );
-    my @closed_aapl_orders = grep { $_->symbol eq 'AAPL' } @$closed_orders;
+    my @closed_aapl_orders = grep { $_->symbol eq 'AAPL' } @closed_orders;
 
 =head2 Listen for Updates to Orders
 
@@ -349,5 +350,4 @@ conditions may apply to data transmitted through this module.
 Sanko Robinson E<lt>sanko@cpan.orgE<gt>
 
 =cut
-
 # https://alpaca.markets/docs/api-documentation/how-to/

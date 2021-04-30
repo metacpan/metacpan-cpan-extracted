@@ -19,7 +19,7 @@ use 5.014_001;
 
 package Term::CLI::L10N::nl;
 
-our $VERSION = 0.051007;
+our $VERSION = 0.052001;
 
 use Modern::Perl 1.20140107;
 
@@ -170,13 +170,17 @@ msgstr "te lang (max. lengte %1)"
 
 #: lib/Term/CLI/Command/Help.pm
 msgid ""
-"Show help for any given command sequence.\n"
-"The C<--pod> option (or C<-p>) will cause raw POD\n"
-"to be shown."
+"Show help for any given command sequence (or a command\n"
+"overview if no argument is given.\n\n"
+"The C<--pod> (C<-p>) option will cause raw POD\n"
+"to be shown.\n\n"
+"The C<--all> (C<-a>) option will list help text for all commands."
 msgstr ""
-"Toon hulp voor willekeurige commando's.\n"
-"De C<--pod> optie (of C<-p>) geeft POD broncode\n"
-"als uitvoer."
+"Toon hulp voor willekeurige commando's (of een overzicht\n"
+"van commando's als er geen argumenten worden aangeleverd).\n\n"
+"De C<--pod> (C<-p>) optie geeft POD broncode als uitvoer.\n\n"
+"De C<--all> (C<-a>) optie geeft uitgebreide hulp voor alle\n"
+"commando's."
 
 #: lib/Term/CLI/Command/Help.pm
 msgid "show help"
@@ -185,6 +189,14 @@ msgstr "toon hulp"
 #: lib/Term/CLI/Command/Help.pm
 msgid "Commands"
 msgstr "Commando's"
+
+#: lib/Term/CLI/Command/Help.pm
+msgid "COMMANDS"
+msgstr "COMMANDO'S"
+
+#: lib/Term/CLI/Command/Help.pm
+msgid "COMMAND SUMMARY"
+msgstr "COMMANDO OVERZICHT"
 
 #: lib/Term/CLI/Command/Help.pm
 msgid "Usage"
@@ -289,7 +301,7 @@ Term::CLI::L10N::nl - Dutch localizations for Term::CLI
 
 =head1 VERSION
 
-version 0.051007
+version 0.052001
 
 =head1 SYNOPSIS
 

@@ -4,6 +4,7 @@ package TestCase::Lib::SPVM::FloatList {
   use SPVM::NumberUtil (INT8_MIN, INT8_MAX, INT16_MIN, INT16_MAX, INT32_MIN, INT32_MAX, INT64_MIN, INT64_MAX, FLT_MIN, FLT_MAX, DBL_MIN, DBL_MAX);
 
   sub new : int () {
+    # new with array
     {
       my $list = SPVM::FloatList->new([(float)3, 5, FLT_MIN()]);
       
@@ -21,6 +22,15 @@ package TestCase::Lib::SPVM::FloatList {
       
       my $length = $list->length;
       unless ($length == 3) {
+        return 0;
+      }
+    }
+
+    # new with undef
+    {
+      my $list = SPVM::FloatList->new(undef);
+      
+      unless ($list->length == 0) {
         return 0;
       }
     }
@@ -548,6 +558,23 @@ package TestCase::Lib::SPVM::FloatList {
         return 0;
       }
       unless ($list->get(3) == 0 && $list->get(31) == 0) {
+        return 0;
+      }
+    }
+
+    # 3 to 2 and 2 to 3 again
+    {
+      my $list = SPVM::FloatList->new([(float)1, 2, 3]);
+      $list->resize(2);
+      unless ($list->length == 2) {
+        return 0;
+      }
+      
+      $list->resize(3);
+      unless ($list->length == 3) {
+        return 0;
+      }
+      unless ($list->get(2) == 0) {
         return 0;
       }
     }

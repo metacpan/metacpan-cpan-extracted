@@ -1,4 +1,4 @@
-package Finance::Alpaca::Struct::Quote 0.9902 {
+package Finance::Alpaca::Struct::Quote 0.9904 {
     use strictures 2;
     use feature 'signatures';
     no warnings 'experimental::signatures';
@@ -13,13 +13,15 @@ package Finance::Alpaca::Struct::Quote 0.9902 {
     use Moo;
     use lib './lib';
     use Finance::Alpaca::Types;
-    has t => ( is => 'ro', isa => Timestamp, required => 1, coerce => 1 );
-    has ax => ( is => 'ro', isa => Str, required => 1 );
-
-    has [qw[ap bp]] => ( is => 'ro', isa => Num, required => 1 );
-    has [qw[as bs]] => ( is => 'ro', isa => Int, required => 1 );
-    has c           => ( is => 'ro', isa => ArrayRef [Str], required => 1 );
-    has S           => ( is => 'ro', isa => Str, predicate => 1 );    # If from stream
+    has timestamp => ( is => 'ro', isa => Timestamp, required => 1, coerce => 1, init_arg => 't' );
+    has ask_exchange => ( is => 'ro', isa => Str, required => 1, init_arg => 'ax' );
+    has ask_price    => ( is => 'ro', isa => Str, required => 1, init_arg => 'ap' );
+    has ask_size     => ( is => 'ro', isa => Str, required => 1, init_arg => 'as' );
+    has bid_exchange => ( is => 'ro', isa => Str, required => 1, init_arg => 'bx' );
+    has bid_price    => ( is => 'ro', isa => Str, required => 1, init_arg => 'bp' );
+    has bid_size     => ( is => 'ro', isa => Str, required => 1, init_arg => 'bs' );
+    has conditions   => ( is => 'ro', isa => ArrayRef [Str], required => 1, init_arg => 'c' );
+    has symbol       => ( is => 'ro', isa => Str, predicate => 1, init_arg => 'S' );
 }
 1;
 __END__
@@ -50,27 +52,27 @@ date.
 
 The following properties are contained in the object.
 
-    $quote->ap;
+    $quote->ask_price;
 
 =over
 
-=item C<t> - Timestamp with nanosecond precision as a Time::Moment object
+=item C<timestamp> - Timestamp with nanosecond precision as a Time::Moment object
 
-=item C<ax> - Ask exchange
+=item C<ask_exchaneg> - Ask exchange
 
-=item C<ap> - Ask price
+=item C<ask_price> - Ask price
 
-=item C<as> - Ask size
+=item C<ask_size> - Ask size
 
-=item C<bx> - Bid exchange
+=item C<bid_exchange> - Bid exchange
 
-=item C<bp> - Bid price
+=item C<bid_price> - Bid price
 
-=item C<bs> - Bid size
+=item C<bid_size> - Bid size
 
-=item C<c> - Quote conditions
+=item C<conditions> - Quote conditions
 
-=item C<S> - Symbol; only provided if data is from a Finance::Alpaca::Stream session
+=item C<symbol> - Symbol; only provided if data is from a Finance::Alpaca::Stream session
 
 =back
 

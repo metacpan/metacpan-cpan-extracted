@@ -3,7 +3,7 @@ abstract: "Perl Wrapper for Alpaca's Commission-free Stock Trading API"
 author:
   - 'Sanko Robinson <sanko@cpan.org>'
 build_requires:
-  Test::More: '0.98'
+  Test2::Suite: '0.000139'
 configure_requires:
   Module::Build::Tiny: '0.035'
 dynamic_config: 0
@@ -26,10 +26,10 @@ no_index:
 provides:
   Finance::Alpaca:
     file: lib/Finance/Alpaca.pm
-    version: '0.9902'
+    version: '0.9904'
   Finance::Alpaca::DataStream:
     file: lib/Finance/Alpaca/DataStream.pm
-    version: '0.9902'
+    version: '0.9904'
   Finance::Alpaca::Struct::Account:
     file: lib/Finance/Alpaca/Struct/Account.pm
     version: '0.9902'
@@ -59,22 +59,22 @@ provides:
     version: '0.9902'
   Finance::Alpaca::Struct::Quote:
     file: lib/Finance/Alpaca/Struct/Quote.pm
-    version: '0.9902'
+    version: '0.9904'
   Finance::Alpaca::Struct::Trade:
     file: lib/Finance/Alpaca/Struct/Trade.pm
-    version: '0.9902'
+    version: '0.9904'
   Finance::Alpaca::Struct::TradeActivity:
     file: lib/Finance/Alpaca/Struct/TradeActivity.pm
-    version: '0.9902'
+    version: '0.9904'
   Finance::Alpaca::Struct::TradeUpdate:
     file: lib/Finance/Alpaca/Struct/TradeUpdate.pm
-    version: '0.9902'
+    version: '0.9904'
   Finance::Alpaca::Struct::Watchlist:
     file: lib/Finance/Alpaca/Struct/Watchlist.pm
     version: '0.9902'
   Finance::Alpaca::TradeStream:
     file: lib/Finance/Alpaca/TradeStream.pm
-    version: '0.9902'
+    version: '0.9904'
   Finance::Alpaca::Types:
     file: lib/Finance/Alpaca/Types.pm
     version: '0.9902'
@@ -91,7 +91,7 @@ resources:
   bugtracker: https://github.com/sanko/Finance-Alpaca/issues
   homepage: https://github.com/sanko/Finance-Alpaca
   repository: git://github.com/sanko/Finance-Alpaca.git
-version: '0.9902'
+version: '0.9904'
 x_authority: cpan:SANKO
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_static_install: 1

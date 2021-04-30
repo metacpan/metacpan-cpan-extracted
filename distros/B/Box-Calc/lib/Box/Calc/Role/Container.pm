@@ -1,5 +1,5 @@
 package Box::Calc::Role::Container;
-$Box::Calc::Role::Container::VERSION = '1.0201';
+$Box::Calc::Role::Container::VERSION = '1.0205';
 use strict;
 use warnings;
 use Moose::Role;
@@ -12,7 +12,7 @@ Box::Calc::Role::Container - Extends the L<Box::Calc::Role::Dimensional> role to
 
 =head1 VERSION
 
-version 1.0201
+version 1.0205
 
 =head1 METHODS
 
@@ -60,11 +60,11 @@ Returns the result of multiplying outer_x, outer_y, and outer_z.
 
 =cut
 
-has outer_volume => (
-    is          => 'ro',
-    isa         => 'Num',
-    required    => 1,
-);
+
+sub outer_volume {
+    my ($self) = @_;
+    return $self->outer_x * $self->outer_y * $self->outer_z;
+}
 
 =head2 outer_dimensions
 
@@ -72,11 +72,10 @@ Returns an array reference containing outer_x, outer_y, and outer_z.
 
 =cut
 
-has outer_dimensions => (
-    is          => 'ro',
-    isa         => 'ArrayRef',
-    required    => 1,
-);
+sub outer_dimensions {
+    my ($self) = @_;
+    return [ $self->outer_x, $self->outer_y, $self->outer_z, ];
+}
 
 =head2 outer_extent
 
@@ -84,11 +83,11 @@ Returns a string of C<outer_x,outer_y,outer_z>. Good for comparing whether two i
 
 =cut
 
-has outer_extent => (
-    is          => 'ro',
-    isa         => 'Str',
-    required    => 1,
-);
+
+sub outer_extent {
+    my ($self) = @_;
+    return join ',', $self->outer_x, $self->outer_y, $self->outer_z; 
+}
 
 =head2 max_weight
 
@@ -123,9 +122,6 @@ around BUILDARGS => sub {
     $args->{outer_x} = $x;
     $args->{outer_y} = $y;
     $args->{outer_z} = $z;
-    $args->{outer_volume} = $x * $y * $z;
-    $args->{outer_dimensions} = [$x, $y, $z];
-    $args->{outer_extent} = join(',', $x, $y, $z);
     return $className->$orig($args);
 };
 

@@ -15,7 +15,7 @@ use Scalar::Util qw/ blessed refaddr /;
 
 use overload ();
 
-our $VERSION = 'v0.2.0';
+our $VERSION = 'v0.2.1';
 
 
 my %Cache;
@@ -45,6 +45,11 @@ sub new {
         return $self;
     };
 
+    my $_make_predicate = sub {
+        my ($value) = @_;
+        return "is_" . $value;
+    };
+
     $base->add_symbol(
         '&new',
         sub {
@@ -60,6 +65,8 @@ sub new {
     );
 
     $base->add_symbol( '&values', sub { return @values });
+
+    $base->add_symbol( '&predicates', sub { return map { $_make_predicate->($_) } @values } );
 
     $name->overload::OVERLOAD(
         q{""} => sub { my ($self) = @_; return $$self; },
@@ -78,12 +85,12 @@ sub new {
     );
 
     for my $value (@values) {
-        my $method = '&is_' . $value;
-        $base->add_symbol( $method, sub { '' } );
+        my $predicate = $_make_predicate->($value);
+        $base->add_symbol( '&' . $predicate, sub { '' } );
         my $elem    = "${name}::${value}";
         my $subtype = Package::Stash->new($elem);
         $subtype->add_symbol( '@ISA',  [$name] );
-        $subtype->add_symbol( $method, sub { 1 } );
+        $subtype->add_symbol( '&' . $predicate, sub { 1 } );
     }
 
     return $Cache{$key} = $name;
@@ -104,7 +111,7 @@ Data::Enum - fast, immutable enumeration classes
 
 =head1 VERSION
 
-version v0.2.0
+version v0.2.1
 
 =head1 SYNOPSIS
 
@@ -150,7 +157,7 @@ All class instances are singletons.
   my $a = $one->new("foo")
   my $b = $one->new("foo");
 
-  refaddr($a) == $refaddr($b); # they are the same thing
+  refaddr($a) == refaddr($b); # they are the same thing
 
 =item *
 
@@ -195,6 +202,20 @@ Returns a list of valid values, stringified and sorted with duplicates
 removed.
 
 This was added in v0.2.0.
+
+=head2 predicates
+
+  my @predicates = $class->predicates;
+
+Returns a list of predicate methods for each value.
+
+A hash of predicates to values is roughly
+
+  use List::Util 1.56 'mesh';
+
+  my %handlers = mesh [ $class->values ], [ $class->predicates ];
+
+This was added in v0.2.1.
 
 =head1 SEE ALSO
 

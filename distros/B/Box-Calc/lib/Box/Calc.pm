@@ -1,5 +1,5 @@
 package Box::Calc;
-$Box::Calc::VERSION = '1.0201';
+$Box::Calc::VERSION = '1.0205';
 use strict;
 use Moose;
 use Box::Calc::BoxType;
@@ -16,7 +16,7 @@ Box::Calc - Packing Algorithm
 
 =head1 VERSION
 
-version 1.0201
+version 1.0205
 
 =head1 SYNOPSIS
 
@@ -611,6 +611,7 @@ sub make_box {
         z                   => $box_type->z,
         weight              => $box_type->weight,
         max_weight          => $box_type->max_weight,
+        void_weight         => $box_type->void_weight,
         name                => $box_type->name,
         outer_x             => $box_type->outer_x,
         outer_y             => $box_type->outer_y,
