@@ -1,5 +1,10 @@
 Revision history for perl module Image::SVG::Path
 
+0.36 2021-05-01
+
+* Tests for arc flag parsing
+* Account for "useless" M commands (ZMZ)
+
 0.35 2021-04-26
 
 * Improved parsing of flags in arc elements

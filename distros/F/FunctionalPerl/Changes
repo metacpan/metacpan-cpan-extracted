@@ -1,5 +1,30 @@
 Revision history for FunctionalPerl
 
+0.72.59 2021-5-2
+    - Repl: avoid taint check failures (if easily possible)
+    - Documentation
+
+0.72.58 2021-5-1
+    - try to fix Windows test failure
+    - add CPAN signature
+
+0.72.57 2021-5-1
+    - more test failure fixing?
+    - rename `number_cmp` to `real_cmp`
+    - create examples/youtube-extract
+
+0.72.56 2021-4-29
+    - more test failure fixing?
+    - some todo list entries
+    - meta/release: remove wrong `dev` mode again (leave other new
+      features in)
+
+0.72.55 2021-4-29
+    - Equal: add `boolean_equal`
+    - some more test failure fixes?
+    - meta/release: add flexible versioning, incl. wrongly(?)
+      understood underscore based ones
+
 0.72.54 2021-4-28
     - various small fixes
     - FP::Text::CSV: require params argument even if undef, to remind

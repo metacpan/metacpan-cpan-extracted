@@ -215,6 +215,8 @@ scripts/test.1.sh
 scripts/test.html.pl
 scripts/test.n.sh
 scripts/test.utf8.sh
+t/00.versions.t
+t/00.versions.tx
 t/decode.port.compass.t
 t/test.t
 xt/author/data/a.gv

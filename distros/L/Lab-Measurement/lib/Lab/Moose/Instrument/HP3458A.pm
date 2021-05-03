@@ -1,5 +1,5 @@
 package Lab::Moose::Instrument::HP3458A;
-$Lab::Moose::Instrument::HP3458A::VERSION = '3.741';
+$Lab::Moose::Instrument::HP3458A::VERSION = '3.750';
 #ABSTRACT: HP 3458A digital multimeter
 
 use v5.20;
@@ -148,6 +148,40 @@ sub set_end {
 }
 
 
+cache range => ( getter => 'get_range' );
+
+sub get_range {
+    my ( $self, %args ) = validated_getter( \@_ );
+    return $self->cached_end( $self->query( command => "RANGE?", %args ) );
+}
+
+sub set_range {
+    my ( $self, $value, %args ) = validated_setter(
+        \@_,
+        value => { isa => 'Lab::Moose::PosNum' }
+    );
+    $self->write( command => "RANGE $value" );
+    $self->cached_range($value);
+}
+
+
+cache auto_range => ( getter => 'get_auto_range' );
+
+sub get_auto_range {
+    my ( $self, %args ) = validated_getter( \@_ );
+    return $self->cached_end( $self->query( command => "ARANGE?", %args ) );
+}
+
+sub set_auto_range {
+    my ( $self, $value, %args ) = validated_setter(
+        \@_,
+        value => { isa => enum( [qw/ON OFF ONCE/] ) }
+    );
+    $self->write( command => "ARANGE $value" );
+    $self->cached_auto_range($value);
+}
+
+
 __PACKAGE__->meta()->make_immutable();
 
 1;
@@ -164,7 +198,7 @@ Lab::Moose::Instrument::HP3458A - HP 3458A digital multimeter
 
 =head1 VERSION
 
-version 3.741
+version 3.750
 
 =head1 SYNOPSIS
 
@@ -235,6 +269,21 @@ Get/Set trigger event.
 Get/Set control of GPIB End Or Identify (EOI) function.
 This driver sets this to 'ALWAYS' on startup.
 
+=head2 get_range/set_range
+
+ $dmm->set_range(value => 100e-3); # select 100mV range (if in DCV mode)
+ $range = $dmm->get_range();
+
+Get/Set measurement range.
+
+=head2 get_auto_range/set_auto_range
+
+ $dmm->set_auto_range(value => 'OFF');
+ $auto_range = $dmm->get_auto_range();
+
+Get/Set the status of the autorange function.
+Possible values: C<OFF, ON, ONCE>.
+
 =head2 Consumed Roles
 
 This driver consumes the following roles:
@@ -251,6 +300,7 @@ This software is copyright (c) 2021 by the Lab::Measurement team; in detail:
 
   Copyright 2017       Simon Reinhardt
             2020       Andreas K. Huettel
+            2021       Simon Reinhardt
 
 
 This is free software; you can redistribute it and/or modify it under

@@ -1497,6 +1497,16 @@ json_create_refobj (json_create_t * jc, SV * input)
     return json_create_ok;
 }
 
+#ifdef INDENT
+#define TOP_NEWLINE \
+    if (jc->indent && jc->depth == 0) {\
+	MSG ("Top-level non-object non-array with indent, adding newline");\
+	CALL (add_char (jc, '\n'));\
+    }
+#else
+#define TOP_NEWLINE
+#endif /* INDENT */
+
 static json_create_status_t
 json_create_not_ref (json_create_t * jc, SV * r)
 {
@@ -1586,6 +1596,7 @@ json_create_not_ref (json_create_t * jc, SV * r)
     default:
 	CALL (json_create_handle_unknown_type (jc, r));
     }
+    TOP_NEWLINE;
     return json_create_ok;
 }
 
@@ -1604,6 +1615,7 @@ json_create_recursively (json_create_t * jc, SV * input)
 	   'null' (without quotes) at the end of "jc" then return. */
 	MSG("Adding 'null'");
 	ADD ("null");
+	TOP_NEWLINE;
 	return json_create_ok;
     }
     /* JSON::Parse inserts pointers to &PL_sv_yes and no as literal

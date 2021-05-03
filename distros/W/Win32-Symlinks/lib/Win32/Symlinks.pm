@@ -12,30 +12,51 @@ Win32::Symlinks - A maintained, working implementation of Perl symlink built in 
 
 =head1 VERSION
 
-Version 0.08
+Version 0.10
 
 =cut
 
+sub _mklink_works {
+	my $cmd = ($ENV{COMSPEC} =~ /^(.*?)$/) ? $1 : 'cmd.exe'; # Untaint
+	my $r = `"$cmd" /c mklink /? 2>&1`;
+    if ($r =~ m[/D]i and $r =~ m[/H]i and $r =~ m[/J]i) {
+		return 1;
+	}
+	return 0;
+}
+
 BEGIN {
-	our $VERSION = '0.08';
+	our $VERSION = '0.10';
 	if ($^O eq 'MSWin32') {
-		require XSLoader;
-		require Win32::Shortcut;
+		require Parse::Lnk;
 		require File::Spec;
 		require File::Basename;
+        my $mklink_works = _mklink_works();
 		
-		XSLoader::load();
-		_override_link_test();
+        if ($] >= 5.016) {
+            require XSLoader;
+            XSLoader::load();
+            _override_link_test();
+        } else {
+            unless ($ENV{WIN32_SYMLINKS_SUPRESS_VERSION_WARNING}) {
+                print STDERR "Warning: ".__PACKAGE__." can't override the -l operator on Perl versions older than 5.016. You are running $].\n";
+                print STDERR "You can supress this warning by setting the environment variable WIN32_SYMLINKS_SUPRESS_VERSION_WARNING to a true value.\n";
+            }
+        }
+        
+        unless ($mklink_works) {
+            unless ($ENV{WIN32_SYMLINKS_SUPRESS_VERSION_WARNING}) {
+                print STDERR "Warning: ".__PACKAGE__." cannot override the function 'symlink' because mklink doesn't seem to be available in this system.\n";
+                print STDERR "You can supress this warning by setting the environment variable WIN32_SYMLINKS_SUPRESS_VERSION_WARNING to a true value.\n";
+            }
+        }
 		
 		*CORE::GLOBAL::readlink = sub ($) {
 			my $path = shift;
 			undef $Win32::Symlinks::Type;
 			$path = File::Spec->catdir(File::Spec->splitdir($path));
 			if ($path =~ /\.lnk$/i) {
-				my $sc = Win32::Shortcut->new;
-				$sc->Load($path);
-				my $target = $sc->{Path};
-				$sc->Close;
+				my $target = Parse::Lnk->from($path);
 				if ($target) {
 					$Win32::Symlinks::Type = 'SHORTCUT';
 					return $target;
@@ -60,21 +81,23 @@ BEGIN {
 			return;
 		};
 		
-		*CORE::GLOBAL::symlink = sub ($$) {
-			my ($old, $new) = (shift, shift);
-			return unless defined $old;
-			return unless defined $new;
-			$old = File::Spec->catdir(File::Spec->splitdir($old));
-			$new = File::Spec->catdir(File::Spec->splitdir($new));
-			my $r;
-			if (-d $old) {
-				$r = `mklink /d "$new" "$old" 2>&1`;
-			} else {
-				$r = `mklink "$new" "$old" 2>&1`;
-			}
-			return 1 if $r =~ /\Q<<===>>\E/;
-			return 0;
-		};
+		if ($mklink_works) {
+            *CORE::GLOBAL::symlink = sub ($$) {
+                my ($old, $new) = (shift, shift);
+                return unless defined $old;
+                return unless defined $new;
+                $old = File::Spec->catdir(File::Spec->splitdir($old));
+                $new = File::Spec->catdir(File::Spec->splitdir($new));
+                my $r;
+                if (-d $old) {
+                    $r = `mklink /d "$new" "$old" 2>&1`;
+                } else {
+                    $r = `mklink "$new" "$old" 2>&1`;
+                }
+                return 1 if $r =~ /\Q<<===>>\E/;
+                return 0;
+            };
+        }
 		
 		*CORE::GLOBAL::unlink = sub ($) {
 			my $path = shift;

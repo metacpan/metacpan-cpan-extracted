@@ -48,7 +48,7 @@ use Scalar::Util qw/looks_like_number blessed reftype/;
 use Unicode::UTF8 qw/decode_utf8 valid_utf8 encode_utf8/;
 use B;
 
-our $VERSION = '0.33';
+our $VERSION = '0.34';
 
 sub create_json
 {
@@ -57,6 +57,11 @@ sub create_json
 	output => '',
     };
     $jc->{_strict} = !! $options{strict};
+    $jc->{_indent} = !! $options{indent};
+    $jc->{_sort} = !! $options{sort};
+    if ($jc->{_indent}) {
+	$jc->{depth} = 0;
+    }
     my $error = create_json_recursively ($jc, $input);
     if ($error) {
 	$jc->user_error ($error);
@@ -372,6 +377,13 @@ sub object
     $jc->closeB ('}');
     return undef;
 }
+sub newline_for_top
+{
+    my ($jc) = @_;
+    if ($jc->{_indent} && $jc->{depth} == 0) {
+	$jc->{output} .= "\n";
+    }
+}
 
 sub create_json_recursively
 {
@@ -380,11 +392,13 @@ sub create_json_recursively
 	my $bool = isbool ($input, $input_ref);
 	if ($bool) {
 	    $jc->{output} .= $bool;
+	    $jc->newline_for_top ();
 	    return undef;
 	}
     }
     if (! defined $input) {
 	$jc->{output} .= 'null';
+	$jc->newline_for_top ();
 	return undef;
     }
     my $ref = ref ($input);
@@ -395,6 +409,7 @@ sub create_json_recursively
 	else {
 	     $jc->{output} .= 'false';
 	}
+	$jc->newline_for_top ();
 	return undef;
     }
     if (! keys %{$jc->{_handlers}} && ! $jc->{_obj_handler}) {
@@ -487,6 +502,7 @@ sub create_json_recursively
 	if ($error) {
 	    return $error;
 	}
+	$jc->newline_for_top ();
     }
     return undef;
 }

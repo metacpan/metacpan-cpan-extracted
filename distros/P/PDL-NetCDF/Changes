@@ -1,4 +1,5 @@
-Revision history for Perl extension PDL::NetCDFobj
+4.21 2021-05-01
+- build and metadata updates
 
 0.01  12/31/97
 	- original version
@@ -137,7 +138,3 @@ Revision history for Perl extension PDL::NetCDFobj
          Fixed errors in version number to help PAUSE indexer.
 4.20  11/18/2013
          Added PREREQ_PM as PDL version 0 to Makefile.PL.
-         
-
-         
-

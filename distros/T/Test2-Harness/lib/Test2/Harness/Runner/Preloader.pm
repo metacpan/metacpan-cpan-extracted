@@ -2,7 +2,7 @@ package Test2::Harness::Runner::Preloader;
 use strict;
 use warnings;
 
-our $VERSION = '1.000051';
+our $VERSION = '1.000053';
 
 use Carp qw/confess croak/;
 use Fcntl qw/LOCK_EX LOCK_UN/;
@@ -47,6 +47,7 @@ use Test2::Harness::Util::HashBase(
         <monitor
         <monitored
         <changed
+        <reload
 
         <blacklist_file
         <blacklist_lock
@@ -212,6 +213,25 @@ sub start_stage {
     $self->_monitor() if $self->{+MONITOR};
 }
 
+sub can_reload {
+    my $self = shift;
+    my ($mod) = @_;
+
+    return 0 if $mod->can('TEST2_HARNESS_PRELOAD');
+
+    return 1 unless $mod->can('import');
+
+    return 0 if $mod->can('IMPORTER_MENU');
+
+    {
+        no strict 'refs';
+        return 0 if @{"$mod\::EXPORT"};
+        return 0 if @{"$mod\::EXPORT_OK"};
+    }
+
+    return 1;
+}
+
 sub check {
     my $self = shift;
 
@@ -222,11 +242,53 @@ sub check {
     my $changed = USE_INOTIFY ? $self->_check_monitored_inotify : $self->_check_monitored_hardway;
     return 0 unless $changed;
 
-    $self->{+CHANGED} = 1;
-    print "$$ $0 - Runner detected a change in one or more preloaded modules, blacklisting changed files and reloading...\n";
+    print "$$ $0 - Runner detected a change in one or more preloaded modules...\n";
 
     my %CNI = reverse %INC;
-    my @todo = map {[file2mod($CNI{$_}), $_]} keys %$changed;
+    my @todo;
+    for my $file (keys %$changed) {
+        my $rel = $CNI{$file};
+        my $mod = file2mod($rel);
+
+        unless ($self->{+RELOAD}) {
+            push @todo => [$mod, $file];
+            next;
+        }
+
+        unless ($self->can_reload($mod)) {
+            print "$$ $0 - Changed file '$file' cannot be reloaded in place...\n";
+            push @todo => [$mod, $file];
+            next;
+        }
+
+        print "$$ $0 - Attempting to reload '$file' in place...\n";
+
+        my @warnings;
+        my $ok = eval {
+            local $SIG{__WARN__} = sub { push @warnings => @_ };
+
+            my $stash = do { no strict 'refs'; \%{"${mod}\::"} };
+            for my $sym (keys %$stash) {
+                next if $sym =~ m/::$/;
+                delete $stash->{$sym};
+            }
+
+            delete $INC{$rel};
+            local $.;
+            require $rel;
+            die "Reloading '$rel' loaded $INC{$rel} instead, \@INC must have been altered" if $INC{$rel} ne $file;
+
+            1;
+        };
+        my $err = $@;
+        next if $ok && !@warnings;
+        print "$$ $0 - Failed to reload '$file' in place...\n", map { "  $$ $0 - $_\n"  } map { split /\n/, $_ } grep { $_ } @warnings, $ok ? () : ($err);
+        push @todo => [$mod, $file];
+    }
+
+    return 0 unless @todo;
+    $self->{+CHANGED} = 1;
+    print "$$ $0 - blacklisting changed files and reloading stage...\n";
 
     my $bl = $self->_lock_blacklist();
 
@@ -409,6 +471,7 @@ sub _check_monitored_hardway {
         my (undef, undef, undef, undef, undef, undef, undef, undef, undef, $mtime, $ctime) = stat($file);
         my $times = $self->{+STATS}->{$file};
         next if $mtime == $times->[0] && $ctime == $times->[1];
+        $self->{+STATS}->{$file} = [$mtime, $ctime];
         $found++;
         $changed{$file}++;
     }

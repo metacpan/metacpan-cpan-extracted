@@ -6,10 +6,10 @@ Dancer::Plugin::Catmandu::OAI - OAI-PMH provider backed by a searchable Catmandu
 
 =cut
 
-our $VERSION = '0.0507';
+our $VERSION = '0.0508';
 
 use Catmandu::Sane;
-use Catmandu::Util qw(is_string is_array_ref);
+use Catmandu::Util qw(is_string is_array_ref hash_merge);
 use Catmandu;
 use Catmandu::Fix;
 use Catmandu::Exporter::Template;
@@ -20,7 +20,6 @@ use Dancer qw(:syntax);
 use DateTime;
 use DateTime::Format::ISO8601;
 use DateTime::Format::Strptime;
-use Clone qw(clone);
 
 my $DEFAULT_LIMIT = 100;
 
@@ -94,7 +93,7 @@ sub _new_token {
     $token->{_s} = $params->{set} if defined $params->{set};
     $token->{_m} = $params->{metadataPrefix}
         if defined $params->{metadataPrefix};
-    $token->{_f} = $from if defined $from;
+    $token->{_f} = $from  if defined $from;
     $token->{_u} = $until if defined $until;
     $token;
 }
@@ -124,10 +123,9 @@ sub _search {
 sub oai_provider {
     my ($path, %opts) = @_;
 
-    my $setting = clone(plugin_setting);
+    my $setting = hash_merge(plugin_setting, \%opts);
 
-    my $bag = Catmandu->store($opts{store} || $setting->{store})
-        ->bag($opts{bag} || $setting->{bag});
+    my $bag = Catmandu->store($setting->{store})->bag($setting->{bag});
 
     $setting->{granularity} //= "YYYY-MM-DDThh:mm:ssZ";
 
@@ -161,6 +159,8 @@ sub oai_provider {
         : sub {
         $_[0];
         };
+
+    $setting->{datestamp_index} //= $setting->{datestamp_field};
 
     $setting->{get_record_cql_pattern} ||= $bag->id_key . ' exact "%s"';
 
@@ -394,7 +394,7 @@ TT
 $template_footer
 TT
 
-    my $fix = $opts{fix} || $setting->{fix};
+    my $fix = $setting->{fix};
     if ($fix) {
         $fix = Catmandu::Fix->new(fixes => $fix);
     }
@@ -487,11 +487,12 @@ TT
             else {
                 try {
                     my $token = _deserialize($params->{resumptionToken});
-                    $params->{set}            = $token->{_s} if defined $token->{_s};
-                    $params->{metadataPrefix} = $token->{_m} if defined $token->{_m};
-                    $params->{from}           = $token->{_f} if defined $token->{_f};
-                    $params->{until}          = $token->{_u} if defined $token->{_u};
-                    $vars->{token}            = $token;
+                    $params->{set} = $token->{_s} if defined $token->{_s};
+                    $params->{metadataPrefix} = $token->{_m}
+                        if defined $token->{_m};
+                    $params->{from}  = $token->{_f} if defined $token->{_f};
+                    $params->{until} = $token->{_u} if defined $token->{_u};
+                    $vars->{token}   = $token;
                 }
                 catch {
                     push @$errors,
@@ -513,7 +514,8 @@ TT
         }
 
         if (exists $params->{metadataPrefix}) {
-            unless ($format = $metadata_formats->{$params->{metadataPrefix}}) {
+            unless ($format = $metadata_formats->{$params->{metadataPrefix}})
+            {
                 push @$errors,
                     [cannotDisseminateFormat =>
                         "metadataPrefix $params->{metadataPrefix} is not supported"
@@ -578,7 +580,7 @@ TT
                     %{$setting->{default_search_params}},
                     cql_query => $setting->{cql_filter} || 'cql.allRecords',
                     limit     => 1,
-                    sru_sortkeys => $setting->{datestamp_field},
+                    sru_sortkeys => "$setting->{datestamp_index},,1",
                 );
                 if (my $rec = $hits->first) {
                     $format_datestamp->($rec->{$setting->{datestamp_field}});
@@ -645,9 +647,9 @@ TT
             push @cql, qq|($setting->{cql_filter})| if $setting->{cql_filter};
             push @cql, qq|($format->{cql})|         if $format->{cql};
             push @cql, qq|($set->{cql})|            if $set && $set->{cql};
-            push @cql, qq|($setting->{datestamp_field} >= "$cql_from")|
+            push @cql, qq|($setting->{datestamp_index} >= "$cql_from")|
                 if $cql_from;
-            push @cql, qq|($setting->{datestamp_field} <= "$cql_until")|
+            push @cql, qq|($setting->{datestamp_index} <= "$cql_until")|
                 if $cql_until;
             unless (@cql) {
                 push @cql, "(cql.allRecords)";
@@ -875,6 +877,7 @@ The Dancer configuration file 'config.yml' contains basic information for the OA
     * store - In which Catmandu::Store are the metadata records stored
     * bag - In which Catmandu::Bag are the records of this 'store' (use: 'data' as default)
     * datestamp_field - Which field in the record contains a datestamp ('datestamp' in our example above)
+    * datestamp_index - Which CQL index should be used to find records within a specified date range (if not specified, the value from the 'datestamp_field' setting is used)
     * repositoryName - The name of the repository
     * uri_base - The full base url of the OAI controller. To be used when behind a proxy server. When not set, this module relies on the Dancer request to provide its full url. Use middleware like 'ReverseProxy' or 'Dancer::Middleware::Rebase' in that case.
     * adminEmail - An administrative email. Can be string or array of strings. This will be included in the Identify response.

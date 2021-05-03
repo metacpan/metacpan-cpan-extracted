@@ -6,7 +6,9 @@ use DBIx::RunSQL;
 use Data::Dumper;
 
 # Test against a "real" database if we have one:
-if( ! eval { require DBD::SQLite; 1 }) {
+if( ! eval { require DBD::SQLite;
+             require 5.008; # for scalar open
+             1;  }) {
     plan skip_all => $@;
     exit;
 };
@@ -14,7 +16,7 @@ if( ! eval { require DBD::SQLite; 1 }) {
 plan tests => 1;
 
 # Redirect STDOUT to a variable
-close STDOUT; # sssh
+close STDOUT; # shhh
 open STDOUT, '>', \my $output;
 
 my $exitcode = DBIx::RunSQL->handle_command_line(

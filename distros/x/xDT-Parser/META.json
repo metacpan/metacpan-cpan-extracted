@@ -55,6 +55,6 @@
          "web" : "https://github.com/ChristophB/perl-xdt-parser"
       }
    },
-   "version" : "1.04",
+   "version" : "1.05",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

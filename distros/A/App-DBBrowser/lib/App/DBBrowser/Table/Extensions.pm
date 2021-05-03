@@ -74,7 +74,8 @@ sub complex_unit {
     elsif ( $type eq $set_to_null ) {
         return "NULL";
     }
-    if ( $clause !~ /^(?:set|where|having|group_by|order_by)\z/i ) {
+    #if ( $clause !~ /^(?:set|where|having|group_by|order_by)\z/i ) {
+    if ( $clause eq 'select' ) {
         my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
         my $alias = $ax->alias( $alias_type, $complex_unit );
         if ( defined $alias && length $alias ) {

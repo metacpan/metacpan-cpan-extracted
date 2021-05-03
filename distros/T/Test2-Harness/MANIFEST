@@ -205,6 +205,17 @@ t/integration/projects/foo/lib/Bar.pm
 t/integration/projects/foo/lib/Baz.pm
 t/integration/projects/foo/lib/Foo.pm
 t/integration/projects/foo/t/pass.tx
+t/integration/reload.t
+t/integration/reload/lib/Preload.pm
+t/integration/reload/lib/Preload/A.pm
+t/integration/reload/lib/Preload/B.pm
+t/integration/reload/lib/Preload/ExceptionA.pm
+t/integration/reload/lib/Preload/ExceptionB.pm
+t/integration/reload/lib/Preload/ExporterA.pm
+t/integration/reload/lib/Preload/ExporterB.pm
+t/integration/reload/lib/Preload/IncChange.pm
+t/integration/reload/lib/Preload/WarningA.pm
+t/integration/reload/lib/Preload/WarningB.pm
 t/integration/replay.t
 t/integration/replay/fail.tx
 t/integration/replay/pass.tx

@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package Test::Deep::JType;
 # ABSTRACT: Test::Deep helpers for JSON::Typist data
-$Test::Deep::JType::VERSION = '0.006';
+$Test::Deep::JType::VERSION = '0.007';
 use JSON::PP ();
 use JSON::Typist ();
 use Test::Deep 1.126 (); # LeafWrapper, as_test_deep_cmp
@@ -129,7 +129,12 @@ sub jfalse { $FALSE }
   sub descend
   {
     my $self = shift;
-    my $got = shift();
+    my $got = shift;
+
+    # Stringify what we got for test output purposes. Otherwise,
+    # string overloading won't be called on $got, and we'll end up
+    # with 'JSON::Typist::String=SCALAR(0x...) in our test output
+    $self->data->{got} = $got . "" if defined $got;
 
     # If either is undef but not both this is a failure where
     # as Test::Deep::String would just stringify the undef,
@@ -153,7 +158,7 @@ sub jfalse { $FALSE }
 
 {
   package Test::Deep::JType::jstr;
-$Test::Deep::JType::jstr::VERSION = '0.006';
+$Test::Deep::JType::jstr::VERSION = '0.007';
 use overload
     '""'    => sub {
       Carp::confess("can't use valueless jstr() as a string")
@@ -179,7 +184,7 @@ use overload
 
 {
   package Test::Deep::JType::jnum;
-$Test::Deep::JType::jnum::VERSION = '0.006';
+$Test::Deep::JType::jnum::VERSION = '0.007';
 use overload
     '0+'    => sub {
       Carp::confess("can't use valueless jnum() as a number")
@@ -205,7 +210,7 @@ use overload
 
 {
   package Test::Deep::JType::jbool;
-$Test::Deep::JType::jbool::VERSION = '0.006';
+$Test::Deep::JType::jbool::VERSION = '0.007';
 use overload
     'bool'    => sub {
       Carp::confess("can't use valueless jbool() as a bool")
@@ -247,7 +252,7 @@ Test::Deep::JType - Test::Deep helpers for JSON::Typist data
 
 =head1 VERSION
 
-version 0.006
+version 0.007
 
 =head1 OVERVIEW
 

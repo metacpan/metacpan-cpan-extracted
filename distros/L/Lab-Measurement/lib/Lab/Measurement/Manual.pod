@@ -14,7 +14,7 @@ Lab::Measurement::Manual - API documentation manual for Lab::Measurement
 
 =head1 VERSION
 
-version 3.741
+version 3.750
 
 =head1 OVERVIEW
 
@@ -160,6 +160,8 @@ alias: L<Lab::Moose::Instrument::Agilent34410A>
 
 =item * L<Lab::Moose::Instrument::Keithley2400>
 
+=item * L<Lab::Moose::Instrument::Keithley2450>
+
 =item * L<Lab::Moose::Instrument::KeysightB2901A>
 
 =back
@@ -173,6 +175,8 @@ alias: L<Lab::Moose::Instrument::Agilent34410A>
 =item * L<Lab::Moose::Instrument::ZI_MFLI>
 
 =item * L<Lab::Moose::Instrument::ZI_HF2LI>
+
+=item * work in progress: L<Lab::Moose::Instrument::SignalRecovery7265>
 
 =back
 
@@ -700,6 +704,7 @@ This software is copyright (c) 2021 by the Lab::Measurement team; in detail:
             2018       Andreas K. Huettel, Simon Reinhardt
             2019       Simon Reinhardt
             2020       Andreas K. Huettel, Sam Bingner, Simon Reinhardt
+            2021       Simon Reinhardt
 
 
 This is free software; you can redistribute it and/or modify it under

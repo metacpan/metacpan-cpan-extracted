@@ -57,7 +57,7 @@ sub test_01_load_balancing_async : Test(6) {
 
         # diag "$pid: $got  $offs  $dev %";
 
-        cmp_ok($dev,'<', 60, "expected $expected async runs, got $got");
+        cmp_ok($dev,'<', 60, "expected average $expected async runs, got $got");
     }
 
     is($total, $tasks, "expected total $tasks async runs, got $total");
@@ -103,7 +103,7 @@ sub test_02_load_balancing_background : Test(6) {
 
         # diag "$pid: $got  $offs  $dev %";
 
-        cmp_ok($dev,'<', 60, "expected $expected background runs, got $got");
+        cmp_ok($dev,'<', 60, "expected average $expected background runs, got $got");
     }
 
     is( $total, $tasks, "expected total $tasks background runs, got $total");
@@ -160,7 +160,7 @@ sub test_03_slow_consumer_async : Test(6) {
         delete $runs->{$pid};
         $total += $got;
 
-        is($got, $expected_slow, "expected $expected_slow slow runs, got $got");
+        is($got, $expected_slow, "expected average $expected_slow slow runs, got $got");
     }
 
     foreach my $pid (sort keys %$runs) {
@@ -171,7 +171,7 @@ sub test_03_slow_consumer_async : Test(6) {
 
         # diag "$pid: $got  $offs  $dev %";
 
-        cmp_ok($dev,'<', 60, "expected $expected_fast runs, got $got");
+        cmp_ok($dev,'<', 60, "expected average $expected_fast runs, got $got");
     }
 
     is($total, $tasks, "expected total $tasks async runs, got $total");

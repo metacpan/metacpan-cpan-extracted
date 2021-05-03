@@ -122,6 +122,7 @@ DANCER CONFIGURATION
         * store - In which Catmandu::Store are the metadata records stored
         * bag - In which Catmandu::Bag are the records of this 'store' (use: 'data' as default)
         * datestamp_field - Which field in the record contains a datestamp ('datestamp' in our example above)
+        * datestamp_index - Which CQL index should be used to find records within a specified date range (if not specified, the value from the 'datestamp_field' setting is used)
         * repositoryName - The name of the repository
         * uri_base - The full base url of the OAI controller. To be used when behind a proxy server. When not set, this module relies on the Dancer request to provide its full url. Use middleware like 'ReverseProxy' or 'Dancer::Middleware::Rebase' in that case.
         * adminEmail - An administrative email. Can be string or array of strings. This will be included in the Identify response.

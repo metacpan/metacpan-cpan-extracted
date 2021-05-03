@@ -34,9 +34,7 @@
          "requires" : {
             "Cairo" : "0",
             "Carp" : "0",
-            "ExtUtils::ParseXS::Utilities" : "0",
-            "Graphics::ColorNames::WWW" : "1.14",
-            "Image::SVG::Path" : "0.24",
+            "Image::SVG::Path" : "0.36",
             "Math::Trig" : "0",
             "XML::Parser" : "0",
             "perl" : "5.006001"
@@ -62,6 +60,6 @@
          "web" : "https://github.com/benkasminbullock/image-cairosvg"
       }
    },
-   "version" : "0.13",
+   "version" : "0.16",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

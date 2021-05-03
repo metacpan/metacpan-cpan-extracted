@@ -1,0 +1,16 @@
+Changes
+ignore.txt
+lib/Array/Objectify.pm
+lib/Array/Objectify/Tie.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/00-load.t
+t/01-idea.t
+t/02-array.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+xt/boilerplate.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

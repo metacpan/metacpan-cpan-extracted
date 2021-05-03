@@ -1,5 +1,10 @@
 	-*- Indented-text -*-
 
+1.41  2021-05-01
+        - Makefile.PL
+			- Search a terminal library only when it necessary. [#6]
+			- whole refactoring
+
 1.40  2021-02-23
         - Migrate the repository and the bug tracker to GitHub
 

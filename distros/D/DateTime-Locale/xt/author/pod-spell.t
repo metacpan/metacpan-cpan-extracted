@@ -1175,6 +1175,7 @@ nn
 nn_NO
 nnh
 nnh_CM
+no
 nt
 nus
 nus_SS

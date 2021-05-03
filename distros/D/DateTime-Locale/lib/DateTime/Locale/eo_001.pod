@@ -19,12 +19,12 @@
 
 =head1 NAME
 
-DateTime::Locale::eo_001 - Locale data examples for the Esperanto World (eo-001) locale
+DateTime::Locale::eo_001 - Locale data examples for the Esperanto world (eo-001) locale
 
 =head1 DESCRIPTION
 
 This pod file contains examples of the locale data available for the
-Esperanto World locale.
+Esperanto world locale.
 
 =head2 Days
 

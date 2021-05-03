@@ -19,12 +19,12 @@
 
 =head1 NAME
 
-DateTime::Locale::ia_001 - Locale data examples for the Interlingua World (ia-001) locale
+DateTime::Locale::ia_001 - Locale data examples for the Interlingua world (ia-001) locale
 
 =head1 DESCRIPTION
 
 This pod file contains examples of the locale data available for the
-Interlingua World locale.
+Interlingua world locale.
 
 =head2 Days
 

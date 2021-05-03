@@ -1,5 +1,11 @@
 Revision history for xDT-Parser
 
+1.05 2021-05-03
+  - Fix a bug where object end records are not added to objects, when read from file
+
+1.04  2021-03-01
+  - Relaxe Moose dependency to version 2
+
 1.03  2021-02-15
   - Update to BDT/GDT 3.1
 

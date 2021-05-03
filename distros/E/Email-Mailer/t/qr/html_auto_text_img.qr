@@ -10,7 +10,8 @@
 --\S+
 (?:[\w\-]+:[ ]*[^\n]+\n)+
 
-This is a generic message for testing purposes only with regard to some stuff and things:
+This is a generic message for testing purposes only with regard to some stu=
+ff and things:
 
 \[IMAGE\]
 

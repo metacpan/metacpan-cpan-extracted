@@ -34,6 +34,46 @@ handle to which the entries will be printed.
 Optionally you may pass an `encoding` argument which will be used to apply
 a `binmode` layer to the output handle. The default encoding is `UTF-8`.
 
+Optionally you may turn off string formatting, see below.
+
+# PARAMETERS
+
+## log\_level
+
+Set the minimum logging level to output. Any messages lower than this level
+will be discarded. Default is trace.
+
+    use Log::Any::Adapter ('JSON', \*STDERR, log_level => 'info');
+
+## encoding
+
+Defaults to `UTF-8`. Pass a different encoding to change the binmode applied
+to the log output.
+
+## localtime
+
+By default the message `time` will be in UTC. If you wish to log using your
+system's localtime instead, set this parameter to a true value. Output will
+look something like:
+
+    2021-05-01T10:01:37.482042-04:00
+
+versus, by default, always something like:
+
+    2021-05-01T10:01:37.482042Z
+
+## without\_formatting
+
+By default the message will be formatted using sprintf if it contains
+formatting codes such as '%s'. This will cause the program to die if a
+message does not contain enough arguments to process all the formatting
+codes in a message. If your logs will contain the format codes and should
+not be formatted, or to prevent log messages from dependencies or untrusted
+sources from accidentally crashing the program, you can disable
+message formatting by setting this parameter to a true value:
+
+    use Log::Any::Adapter ('JSON', \*STDERR, without_formatting => 1);
+
 # OUTPUT
 
 ## Logged data fields
@@ -78,7 +118,7 @@ Output is a **single line** with JSON like:
       "category":"main",
       "level":"debug",
       "message":"hello, world",
-      "time":"2021-03-03T17:23:25.73124"
+      "time":"2021-03-03T17:23:25.731243Z"
     }
 
 ## Formatted message
@@ -94,7 +134,7 @@ Output is a **single line** with JSON like:
       "category":"main",
       "level":"debug",
       "message":"a formatted string with 2 tokens",
-      "time":"2021-03-03T17:23:25.73124"
+      "time":"2021-03-03T17:23:25.731243Z"
     }
 
 ## Single hashref
@@ -109,7 +149,7 @@ Output is a **single line** with JSON like:
       "category":"main",
       "level":"debug",
       "message":"the message",
-      "time":"2021-03-03T17:23:25.73124",
+      "time":"2021-03-03T17:23:25.731243Z",
       "tracker":42
     }
 
@@ -129,12 +169,12 @@ Output is a **single line** with JSON like:
 
     {
       "category":"main",
-      "hash_data":{
-        "foo":"bar"
-      },
+      "hash_data":[
+        {"foo":"bar"}
+      ],
       "level":"debug",
       "message":"the message",
-      "time":"2021-03-03T17:23:25.73124",
+      "time":"2021-03-03T17:23:25.731243Z",
       "tracker":42
     }
 
@@ -154,7 +194,7 @@ Output is a **single line** with JSON like:
         [1,2,3]
       ],
       "message":"the message",
-      "time":"2021-03-03T17:23:25.73124",
+      "time":"2021-03-03T17:23:25.731243Z",
       "tracker":42
   }
 
@@ -175,7 +215,7 @@ Output is a **single line** with JSON like:
       "category":"main",
       "level":"debug",
       "message":"hello, world",
-      "time":"2021-03-03T17:23:25.73124"
+      "time":"2021-03-03T17:23:25.731243Z"
     }
 
 # SEE ALSO

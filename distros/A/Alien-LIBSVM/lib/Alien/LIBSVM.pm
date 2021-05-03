@@ -1,41 +1,57 @@
 package Alien::LIBSVM;
-$Alien::LIBSVM::VERSION = '0.003';
+# ABSTRACT: Alien package for the LIBSVM library
+$Alien::LIBSVM::VERSION = '0.004';
 use strict;
 use warnings;
 
 use parent 'Alien::Base';
 
+sub version {
+	my ($class) = @_;
+
+	( "" . $class->SUPER::version) =~ s/^\d/$&./gr;
+}
+
+sub inline_auto_include {
+	return  [ "svm.h" ];
+}
+sub libs {
+	my ($class) = @_;
+
+	join ' ', (
+		$class->install_type eq 'share' ? ('-L' . File::Spec->catfile($class->dist_dir, qw(lib)) ) : (),
+		'-lsvm',
+	);
+}
+
+sub cflags {
+	my ($class) = @_;
+	join ' ', (
+		$class->install_type eq 'share' ? ('-I' . File::Spec->catfile($class->dist_dir, qw(include)) ) : (),
+	);
+}
+
 sub Inline {
 	return unless $_[-1] eq 'C'; # Inline's error message is good
-	my $self = __PACKAGE__->new;
-	+{
-		LIBS => $self->libs,
-		INC => $self->cflags,
-		AUTO_INCLUDE => q|
-
-#include "svm.h"
-
-|
-	};
+	my $params = Alien::Base::Inline(@_);
 }
 
 sub svm_train_path {
-  my ($self) = @_;
-  File::Spec->catfile( $self->dist_dir , 'bin', 'svm-train' );
+	my ($self) = @_;
+	File::Spec->catfile( $self->dist_dir , 'bin', 'svm-train' );
 }
 
 sub svm_predict_path {
-  my ($self) = @_;
-  File::Spec->catfile( $self->dist_dir , 'bin', 'svm-predict' );
+	my ($self) = @_;
+	File::Spec->catfile( $self->dist_dir , 'bin', 'svm-predict' );
 }
 
 sub svm_scale_path {
-  my ($self) = @_;
-  File::Spec->catfile( $self->dist_dir , 'bin', 'svm-scale' );
+	my ($self) = @_;
+	File::Spec->catfile( $self->dist_dir , 'bin', 'svm-scale' );
 }
 
 1;
-# ABSTRACT: Alien package for the LIBSVM library
 
 __END__
 
@@ -49,7 +65,21 @@ Alien::LIBSVM - Alien package for the LIBSVM library
 
 =head1 VERSION
 
-version 0.003
+version 0.004
+
+=head1 METHODS
+
+=head2 svm_train_path
+
+Path to the C<svm-train> executable.
+
+=head2 svm_predict_path
+
+Path to the C<svm-predict> executable.
+
+=head2 svm_scale_path
+
+Path to the C<svm-scale> executable.
 
 =head1 Inline support
 

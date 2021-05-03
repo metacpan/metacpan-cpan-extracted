@@ -1,7 +1,6 @@
 <script type="text/javascript">
     jQuery(function() {
-        jQuery("td.boxcontainer > div.ticket-info-basics"   ).unwrap();
-        jQuery("td.boxcontainer > div.ticket-info-reminders").unwrap();
+        jQuery("table.ticket-summary td.boxcontainer > div:first-child").unwrap();
 
         jQuery("#body > div.summary, #body > div.summary ~ div")
             .wrapAll("<table width='100%'><tr></tr></table>");

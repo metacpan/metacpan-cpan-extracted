@@ -1,3 +1,12 @@
+1.19     2021-05-02
+
+- When the precious lint test fails, it now prints out the output from
+  precious (though with garbled UTF-8 for reasons I haven't figured out yet).
+
+- Remove my RunExtraTests plugin. This is no longer needed now that dzil
+  supports passing the --jobs flags to `dzil test` and `dzil release`.
+
+
 1.18     2021-01-24
 
 - Fix development prereqs for projects that use precious. This was still using

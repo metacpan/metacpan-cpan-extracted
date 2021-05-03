@@ -1,5 +1,5 @@
 package Box::Calc::Layer;
-$Box::Calc::Layer::VERSION = '1.0205';
+$Box::Calc::Layer::VERSION = '1.0206';
 use strict;
 use Moose;
 use Box::Calc::Row;
@@ -13,7 +13,7 @@ Box::Calc::Layer - A box is packed with multiple layers.
 
 =head1 VERSION
 
-version 1.0205
+version 1.0206
 
 =head1 SYNOPSIS
 

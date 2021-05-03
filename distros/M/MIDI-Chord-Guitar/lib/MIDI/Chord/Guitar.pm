@@ -3,7 +3,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: MIDI pitches for guitar chord voicings
 
-our $VERSION = '0.0603';
+our $VERSION = '0.0604';
 
 use strict;
 use warnings;
@@ -211,7 +211,7 @@ MIDI::Chord::Guitar - MIDI pitches for guitar chord voicings
 
 =head1 VERSION
 
-version 0.0603
+version 0.0604
 
 =head1 SYNOPSIS
 

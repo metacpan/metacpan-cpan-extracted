@@ -30,7 +30,7 @@ sub test_01_client : Test(11) {
     # Cause a warning
     Tests::Service::Client->notify( 'test.fail' => { 'warn' => 'Foo' });
 
-    sleep 0.01;
+    sleep 0.1;
 
     my $svc = 'Beekeeper::Service::LogTail';
 
@@ -46,7 +46,7 @@ sub test_01_client : Test(11) {
     # Cause an error
     Tests::Service::Client->notify( 'test.fail' => { 'die'  => 'Bar' });
 
-    sleep 0.01;
+    sleep 0.1;
 
     $logged = $svc->tail;
     $last = $logged->[-1];

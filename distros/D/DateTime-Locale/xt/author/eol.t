@@ -580,6 +580,7 @@ my @files = (
     'lib/DateTime/Locale/nn_NO.pod',
     'lib/DateTime/Locale/nnh.pod',
     'lib/DateTime/Locale/nnh_CM.pod',
+    'lib/DateTime/Locale/no.pod',
     'lib/DateTime/Locale/nus.pod',
     'lib/DateTime/Locale/nus_SS.pod',
     'lib/DateTime/Locale/nyn.pod',

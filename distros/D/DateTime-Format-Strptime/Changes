@@ -1,3 +1,11 @@
+1.79     2021-05-02
+
+* Fix too-strict type checking for time zones. This module now uses the same
+  check as DateTime itself, which allows for things that don't subclass
+  DateTime::TimeZone as long as they provide the same API. Reported by
+  E. Choroba. GH #30.
+
+
 1.78     2020-12-15
 
 * Fix tests for new failure caused by locale data changes in DateTime::Locale

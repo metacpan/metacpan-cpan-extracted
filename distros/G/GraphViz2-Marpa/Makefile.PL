@@ -16,8 +16,8 @@ my(%params) =
 (
 	($] ge '5.005') ?
 	(
-		AUTHOR   => 'Ron Savage (ron@savage.net.au)',
-		ABSTRACT => 'A Marpa-based parser for Graphviz dot files',
+		AUTHOR		=> 'Ron Savage (ron@savage.net.au)',
+		ABSTRACT	=> 'A Marpa-based parser for Graphviz dot files',
 	) : (),
 	clean =>
 	{
@@ -25,13 +25,14 @@ my(%params) =
 	},
 	dist =>
 	{
-		COMPRESS => 'gzip',
-		SUFFIX   => 'gz'
+		COMPRESS	=> 'gzip',
+		SUFFIX		=> 'gz'
 	},
-	DISTNAME  => 'GraphViz2-Marpa',
-	NAME      => 'GraphViz2::Marpa',
-	PL_FILES  => {},
-	PREREQ_PM =>
+	DISTNAME	=> 'GraphViz2-Marpa',
+	LICENSE		=> 'perl',
+	NAME		=> 'GraphViz2::Marpa',
+	PL_FILES	=> {},
+	PREREQ_PM	=>
 	{
 		'Algorithm::Diff'				=> 1.1903,
 		'Capture::Tiny'					=> 0.44,
@@ -52,7 +53,6 @@ my(%params) =
 		'Moo'							=> 2.002004,
 		'Path::Iterator::Rule'			=> 1.012,
 		'Path::Tiny'					=> 0.096,
-		'perl'							=> 5.010001,
 		'Pod::Usage'					=> 1.36,
 		'strict'						=> 0,
 		'Text::Xslate'					=> 3.3.9,

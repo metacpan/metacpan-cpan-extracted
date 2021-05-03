@@ -1,8 +1,13 @@
 t Revision history for Perl extension Attribute-Handlers-Clean
 
-1.00  Mon Aug 24 23:10:07 2020
-	- first public version; adapted from Attribute::Handlers v0.99
-1.02  Mon Aug 25 03:02:11 2020
-	- minor fixes in POD
-1.04  Mon Aug 25 03:02:11 2020
-	- fixed dependencies and unregistered namespaces in Makefile.PL
+1.00    2020-08-24
+        First public version; adapted from Attribute::Handlers v0.99.
+1.02    2020-08-25
+        Minor fixes in POD.
+1.04    2020-08-27
+        Fixed dependencies and unregistered namespaces in Makefile.PL.
+1.06    2021-05-02
+        Updated minimum Perl required version to 5.010, as testers are
+            showing failures on some 5.008 setups. Not planning on a fix
+            for 5.008 at the moment. If it is truly important for you, let
+            me know.

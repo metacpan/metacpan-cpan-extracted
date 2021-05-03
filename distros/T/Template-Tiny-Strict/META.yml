@@ -1,0 +1,36 @@
+---
+abstract: 'Template Toolkit reimplemented in as little code as possible'
+author:
+  - 'Adam Kennedy <adamk@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Template-Tiny-Strict
+no_index:
+  directory:
+    - eg
+    - examples
+    - inc
+    - share
+    - t
+    - xt
+provides:
+  Template::Tiny::Strict:
+    file: lib/Template/Tiny/Strict.pm
+    version: '1.17'
+resources:
+  bugtracker: https://github.com/Ovid/template-tiny-strict/issues
+  homepage: https://metacpan.org/pod/Template::Tiny::Strict
+  repository: https://github.com/Ovid/template-tiny-strict.git
+version: '1.17'
+x_generated_by_perl: v5.26.2
+x_serialization_backend: 'YAML::Tiny version 1.73'

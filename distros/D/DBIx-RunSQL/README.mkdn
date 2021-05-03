@@ -1,5 +1,6 @@
 
-[![Build Status](https://travis-ci.org/Corion/App-scrape.svg?branch=master)](https://github.com/Corion/App-scrape)
+[![Travis Build Status](https://travis-ci.org/Corion/DBIx-RunSQL.svg?branch=master)](https://travis-ci.org/Corion/DBIx-RunSQL)
+[![AppVeyor Build Status](https://ci.appveyor.com/api/projects/status/github/Corion/DBIx-RunSQL?branch=master&svg=true)](https://ci.appveyor.com/project/Corion/DBIx-RunSQL)
 
 # NAME
 
@@ -16,6 +17,7 @@ DBIx::RunSQL - run SQL from a file
         sql     => 'sql/create.sql',
         force   => 1,
         verbose => 1,
+        formatter => 'Text::Table',
     );
 
     # now run your tests with a DB setup fresh from setup.sql
@@ -50,7 +52,7 @@ suggested exit code.
 
         sql => \"update mytable set foo='bar';",
 
-- `dsn`, `user`, `password` - DBI parameters for connecting to the DB
+- `dsn`, `user`, `password`, `options` - DBI parameters for connecting to the DB
 - `dbh` - a premade database handle to be used instead of `dsn`
 - `force` - continue even if errors are encountered
 - `verbose` - print each SQL statement as it is run
@@ -90,6 +92,7 @@ separated with tabs.
 
 - `output_string` - whether to output the (one) row and column, without any
 headers
+- `formatter` - see the `<formatter`> option of `->format_results`
 
 ## `DBIx::RunSQL->run_sql ARGS`
 
@@ -119,6 +122,7 @@ separated with tabs, but see the `output_bool` and `output_string` options.
     but a row was found.
 
 - `output_string` - whether to output the (one) row and column, without any headers
+- `formatter` - see the `<formatter`> option of `->format_results`
 
 ## `DBIx::RunSQL->format_results %options`
 
@@ -327,15 +331,18 @@ or potentially [DBIx::SQLHandler](https://metacpan.org/pod/DBIx::SQLHandler).
 
 [ORLite::Migrate](https://metacpan.org/pod/ORLite::Migrate)
 
+[Test::SQLite](https://metacpan.org/pod/Test::SQLite) - SQLite setup/teardown for tests, mostly geared towards
+testing, not general database setup
+
 # REPOSITORY
 
 The public repository of this module is
-[http://github.com/Corion/DBIx--RunSQL](http://github.com/Corion/DBIx--RunSQL).
+[https://github.com/Corion/DBIx--RunSQL](https://github.com/Corion/DBIx--RunSQL).
 
 # SUPPORT
 
 The public support forum of this module is
-[http://perlmonks.org/](http://perlmonks.org/).
+[https://perlmonks.org/](https://perlmonks.org/).
 
 # BUG TRACKER
 
@@ -349,7 +356,7 @@ Max Maischein `corion@cpan.org`
 
 # COPYRIGHT (c)
 
-Copyright 2009-2018 by Max Maischein `corion@cpan.org`.
+Copyright 2009-2021 by Max Maischein `corion@cpan.org`.
 
 # LICENSE
 

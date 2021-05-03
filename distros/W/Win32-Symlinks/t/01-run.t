@@ -21,7 +21,19 @@ if ($^O eq 'MSWin32') {
 	}
 }
 
-plan tests => 25;
+my $l_operator_works = 1;
+my $mklink_works = 1;
+if ($^O eq 'MSWin32') {
+    $l_operator_works = $] >= 5.016;
+    $mklink_works = Win32::Symlinks::_mklink_works();
+}
+unless ($mklink_works) {
+    plan skip_all => "mklink is not available on this system, cannot test symlink";
+}
+
+plan tests => $l_operator_works ? 25 : 20;
+
+
 
 my $folder1 = 'testfolder_'.int time;
 my $folder2 = 'testfolder_link_'.int time;
@@ -50,13 +62,17 @@ symlink $folder1, $folder2;
 # In Perl 5.18, a folder symlink is true for -f and false for -d. So, let's try both.
 # The important thing is that it's found by one of them and that -l actually works fine.
 is -d $folder2 || -f $folder2, 1, "Folder $folder2 exists";
-is -l $folder2, 1, "Folder $folder2 is a symlink";
+if ($l_operator_works) {
+    is -l $folder2, 1, "Folder $folder2 is a symlink";
+}
 is readlink($folder2), $folder1, 'Symlink points correctly';
 
 # 6, 7, 8
 symlink File::Spec->catfile('..', $file1), File::Spec->catfile($folder2, $file2);
 is -f File::Spec->catfile($folder2, $file2), 1, "File $folder2/$file2 exists";
-is -l File::Spec->catfile($folder2, $file2), 1, "File $folder2/$file2 is a symlink";
+if ($l_operator_works) {
+    is -l File::Spec->catfile($folder2, $file2), 1, "File $folder2/$file2 is a symlink";
+}
 is readlink(File::Spec->catfile($folder2, $file2)), File::Spec->catfile('..', $file1), 'Symlink points correctly';
 
 # 9
@@ -77,13 +93,17 @@ is $file1_data, $content2, "File $file1 new data is correct";
 
 # 12, 13, 14, 15, 16, 17
 symlink $invalid_path, 'invalid_symlink';
-is -l 'invalid_symlink', 1, 'Invalid symlink was created and is symlink';
+if ($l_operator_works) {
+    is -l 'invalid_symlink', 1, 'Invalid symlink was created and is symlink';
+}
 isnt -f 'invalid_symlink', 1, 'Invalid symlink returns false with -f';
 isnt -d 'invalid_symlink', 1, 'Invalid symlink returns false with -d';
 isnt -e 'invalid_symlink', 1, 'Invalid symlink returns false with -e';
 is readlink('invalid_symlink'), $invalid_path, 'Readlink works with invalid symlink';
 unlink 'invalid_symlink';
-isnt -l 'invalid_symlink', 1, 'Invalid symlink is gone';
+if ($l_operator_works) {
+    isnt -l 'invalid_symlink', 1, 'Invalid symlink is gone';
+}
 
 # 18
 unlink $folder2;
@@ -91,7 +111,9 @@ isnt -d $folder2, 1, "Folder $folder2 is gone with unlink";
 
 # 19, 20, 21
 is -f File::Spec->catfile($folder1, $file2), 1, "File $folder1/$file2 still exists in Folder $folder1";
-is -l File::Spec->catfile($folder1, $file2), 1, "File $folder1/$file2 is a symlink as expected";
+if ($l_operator_works) {
+    is -l File::Spec->catfile($folder1, $file2), 1, "File $folder1/$file2 is a symlink as expected";
+}
 $file1_data = slurp (File::Spec->catfile($folder1, $file2));
 is $file1_data, $content2, 'The content of the symlinked file is correct';
 

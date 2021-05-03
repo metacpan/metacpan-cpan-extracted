@@ -2,7 +2,7 @@ package Sub::Meta::Creator;
 use strict;
 use warnings;
 
-our $VERSION = "0.12";
+our $VERSION = "0.13";
 
 use List::Util ();
 use Sub::Meta;

@@ -1,6 +1,6 @@
 package Lab::Connection::LinuxGPIB::Trace;
 #ABSTRACT: ???
-$Lab::Connection::LinuxGPIB::Trace::VERSION = '3.741';
+$Lab::Connection::LinuxGPIB::Trace::VERSION = '3.750';
 use v5.20;
 
 use warnings;
@@ -33,7 +33,7 @@ Lab::Connection::LinuxGPIB::Trace - ???
 
 =head1 VERSION
 
-version 3.741
+version 3.750
 
 =head1 COPYRIGHT AND LICENSE
 

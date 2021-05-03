@@ -4,7 +4,7 @@ DateTime::Locale - Localization support for DateTime.pm
 
 # VERSION
 
-version 1.31
+version 1.32
 
 # SYNOPSIS
 
@@ -26,7 +26,7 @@ also provides some functions for getting information on all the available
 locales.
 
 If you want to know what methods are available for locale objects, then please
-read the `DateTime::Locale::FromData` documentation.
+read the [DateTime::Locale::FromData](https://metacpan.org/pod/DateTime%3A%3ALocale%3A%3AFromData) documentation.
 
 # USAGE
 
@@ -35,11 +35,11 @@ This module provides the following class methods:
 ## DateTime::Locale->load( $locale\_code | $locale\_name )
 
 Returns the locale object for the specified locale code or name - see the
-`DateTime::Locale::Catalog` documentation for the list of available codes and
+[DateTime::Locale::Catalog](https://metacpan.org/pod/DateTime%3A%3ALocale%3A%3ACatalog) documentation for the list of available codes and
 names. The name provided may be either the English or native name.
 
-If the requested locale is not found, a fallback search takes place to
-find a suitable replacement.
+If the requested locale is not found, a fallback search takes place to find a
+suitable replacement.
 
 The fallback search order is:
 
@@ -66,8 +66,8 @@ Eg. For the locale code `es-Latn-XX` the fallback search would be:
 
 If no suitable replacement is found, then an exception is thrown.
 
-The loaded locale is cached, so that **locale objects may be
-singletons**. Calling `DateTime::Locale->register_from_data`, `DateTime::Locale->add_aliases`, or `DateTime::Locale->remove_alias`
+The loaded locale is cached, so that **locale objects may be singletons**.
+Calling `DateTime::Locale->register_from_data`, `DateTime::Locale->add_aliases`, or `DateTime::Locale->remove_alias`
 clears the cache.
 
 ## DateTime::Locale->codes
@@ -75,8 +75,8 @@ clears the cache.
     my @codes = DateTime::Locale->codes;
     my $codes = DateTime::Locale->codes;
 
-Returns an unsorted list of the available locale codes, or an array reference if
-called in a scalar context. This list does not include aliases.
+Returns an unsorted list of the available locale codes, or an array reference
+if called in a scalar context. This list does not include aliases.
 
 ## DateTime::Locale->names
 
@@ -92,14 +92,14 @@ reference if called in a scalar context.
     my $names = DateTime::Locale->native_names;
 
 Returns an unsorted list of the available locale names in their native
-language, or an array reference if called in a scalar context. All native
-names use UTF-8 as appropriate.
+language, or an array reference if called in a scalar context. All native names
+use UTF-8 as appropriate.
 
 ## DateTime::Locale->register\_from\_data( $locale\_data )
 
 This method allows you to register a custom locale. The data for the locale is
-specified as a hash (or hashref) where the keys match the method names given
-in `DateTime::Locale::FromData`.
+specified as a hash (or hashref) where the keys match the method names given in
+[DateTime::Locale::FromData](https://metacpan.org/pod/DateTime%3A%3ALocale%3A%3AFromData).
 
 If you just want to make some small changes on top of an existing locale you
 can get that locale's data by calling `$locale->locale_data`.
@@ -124,8 +124,8 @@ methods provided by [DateTime::Locale::FromData](https://metacpan.org/pod/DateTi
 
 - The `*_code` methods
 
-    While you should provide a `code` key, the other methods like
-    `language_code` and `script_code` are determined by parsing the code.
+    While you should provide a `code` key, the other methods like `language_code`
+    and `script_code` are determined by parsing the code.
 
 - All `id` returning methods
 
@@ -172,7 +172,7 @@ contain errors in some locales.
 
 When reporting errors in data, please check the primary data sources first,
 then where necessary report errors directly to the primary source via the CLDR
-bug report system. See http://unicode.org/cldr/filing\_bug\_reports.html for
+bug report system. See [http://unicode.org/cldr/filing\_bug\_reports.html](http://unicode.org/cldr/filing_bug_reports.html) for
 details.
 
 Once these errors have been confirmed, please forward the error report and
@@ -236,7 +236,7 @@ Dave Rolsky <autarch@urth.org>
 
 # COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2003 - 2020 by Dave Rolsky.
+This software is copyright (c) 2003 - 2021 by Dave Rolsky.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

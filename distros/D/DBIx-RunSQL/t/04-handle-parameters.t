@@ -5,6 +5,12 @@ use Test::More tests => 7;
 use DBIx::RunSQL;
 use Data::Dumper;
 
+my $have_scalar_open = eval {
+    require 5.008; # for scalar open
+    require DBD::SQLite;
+    1;  
+};
+
 my @received;
 {
     no warnings 'redefine';
@@ -45,21 +51,26 @@ DBIx::RunSQL->handle_command_line(
 is ${$options{ sql }}, "sql 2 on command line", "SQL on the command line gets returned";
 
 
-{ open *STDIN, '<', \'sql from STDIN';
-DBIx::RunSQL->handle_command_line(
-    "my-test-app",
-    ['--'],
-);
-($package,%options)= @received;
+SKIP: {
+    if( ! $have_scalar_open ) {
+        skip "No scalar open on this version of Perl", 3;
+    };
+    { open *STDIN, '<', \'sql from STDIN';
+    DBIx::RunSQL->handle_command_line(
+        "my-test-app",
+        ['--'],
+    );
+    ($package,%options)= @received;
+    };
+    ok !$options{ sql }, "We got no SQL string";
+    ok $options{ fh }, "We'll read sql from STDIN";
+    
+    { open *STDIN, '<', \'sql from STDIN 2';
+    DBIx::RunSQL->handle_command_line(
+        "my-test-app",
+        ['--', "some SQL"],
+    );
+    ($package,%options)= @received;
+    };
+    is ${$options{ sql }}, "some SQL", "We don't read from STDIN if we get other stuff";
 };
-ok !$options{ sql }, "We got no SQL string";
-ok $options{ fh }, "We'll read sql from STDIN";
-
-{ open *STDIN, '<', \'sql from STDIN 2';
-DBIx::RunSQL->handle_command_line(
-    "my-test-app",
-    ['--', "some SQL"],
-);
-($package,%options)= @received;
-};
-is ${$options{ sql }}, "some SQL", "We don't read from STDIN if we get other stuff";

@@ -1,3 +1,7 @@
+0.36.8 2021-05-02 13:47:46 +0200 Tobias Oetiker <tobi@oetiker.ch>
+
+ - add missing context to make form reload actually work
+
 0.36.7 2021-04-30 09:00:12 +0200 Tobias Oetiker <tobi@oetiker.ch>
 
  - reload the readOnly fields of a form associacted with a table

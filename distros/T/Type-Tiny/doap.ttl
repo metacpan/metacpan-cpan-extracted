@@ -113,7 +113,7 @@
 	doap:maintainer      <http://purl.org/NET/cpan-uri/person/tobyink>;
 	doap:name            "Type-Tiny";
 	doap:programming-language "Perl";
-	doap:release         <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-000_01>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-000_02>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-000_03>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-000_04>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-000_05>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-000_06>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-000_07>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-000_08>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-000_09>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-000_10>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-000_11>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-000_12>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-001>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-002>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-003_01>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-003_02>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-003_03>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-003_04>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-003_05>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-003_06>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-003_07>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-003_08>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-003_09>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-003_10>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-003_11>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-003_12>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-003_13>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-003_14>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-003_15>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-003_16>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-004>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-005_01>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-005_02>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-005_03>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-005_04>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-005_05>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-005_06>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-005_07>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-005_08>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-006>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-007_01>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-007_02>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-007_03>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-007_04>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-007_05>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-007_06>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-007_07>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-007_08>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-007_09>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-007_10>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-008>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-009_01>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-009_02>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-009_03>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-009_04>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-009_05>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-009_06>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-009_07>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-010>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-011_01>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-011_02>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-011_03>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-012>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-013_01>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-014>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-015_01>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-015_02>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-015_03>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-015_04>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-015_05>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-016>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-017_01>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-017_02>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-018>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-019_01>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-020>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-021_01>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-021_02>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-021_03>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-021_04>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-022>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-023_01>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-023_02>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-023_03>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-024>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-025_01>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-025_02>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-025_03>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-026>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-027_01>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-027_02>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-027_03>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-027_04>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-027_05>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-027_06>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-027_07>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-027_08>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-027_09>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-028>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-029_01>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-029_02>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-029_03>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-029_04>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-030>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-031_01>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-031_02>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-031_03>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-031_04>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-031_05>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-032>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-033_01>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-033_02>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-033_03>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-033_04>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-034>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-035_01>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-036>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-037_01>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-037_02>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-037_03>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-038>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-039_01>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-039_02>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-039_03>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-039_04>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-039_05>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-039_06>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-039_07>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-039_08>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-039_09>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-039_10>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-039_11>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-039_12>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-039_13>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-040>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-041_01>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-041_02>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-041_03>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-041_04>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-042>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-043_01>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-043_02>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-043_03>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-043_04>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-043_05>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-044>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-045_01>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-045_02>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-045_03>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-045_04>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-045_05>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-046>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-047_01>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-047_02>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-047_03>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-047_04>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-047_05>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-047_06>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-047_07>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-047_08>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-047_09>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-000000>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-000001>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-000002>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-000003>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-000004>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-000005>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-000006>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-001_000>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-001_001>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-001_002>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-001_003>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-001_004>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-001_005>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-001_006>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-001_007>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-001_008>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-001_009>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-001_010>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-001_011>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-001_012>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-001_013>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-001_014>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-001_015>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-001_016>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-002000>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-002001>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-003_000>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-003_001>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-003_002>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-003_003>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-003_004>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-003_005>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-003_006>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-003_007>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-003_008>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-003_009>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-003_010>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-004000>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-004001>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-004002>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-004003>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-004004>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-005_000>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-005_001>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-005_002>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-005_003>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-005_004>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-006000>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-007_000>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-007_001>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-007_002>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-007_003>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-007_004>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-007_005>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-007_006>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-007_007>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-007_008>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-007_009>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-007_010>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-007_011>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-007_012>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-007_013>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-007_014>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-007_015>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-008000>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-008001>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-008002>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-008003>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-008004>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-008005>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-009_000>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-009_001>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-009_002>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-009_003>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-010000>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-010001>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-010002>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-010003>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-010004>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-010005>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-010006>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-011_000>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-011_001>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-011_002>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-011_003>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-011_004>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-011_005>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-011_006>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-011_007>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-011_008>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-011_009>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-011_010>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-011_011>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-012000>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-012001>;
+	doap:release         <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-000_01>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-000_02>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-000_03>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-000_04>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-000_05>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-000_06>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-000_07>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-000_08>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-000_09>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-000_10>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-000_11>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-000_12>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-001>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-002>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-003_01>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-003_02>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-003_03>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-003_04>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-003_05>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-003_06>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-003_07>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-003_08>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-003_09>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-003_10>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-003_11>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-003_12>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-003_13>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-003_14>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-003_15>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-003_16>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-004>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-005_01>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-005_02>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-005_03>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-005_04>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-005_05>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-005_06>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-005_07>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-005_08>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-006>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-007_01>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-007_02>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-007_03>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-007_04>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-007_05>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-007_06>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-007_07>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-007_08>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-007_09>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-007_10>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-008>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-009_01>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-009_02>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-009_03>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-009_04>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-009_05>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-009_06>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-009_07>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-010>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-011_01>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-011_02>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-011_03>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-012>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-013_01>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-014>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-015_01>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-015_02>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-015_03>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-015_04>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-015_05>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-016>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-017_01>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-017_02>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-018>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-019_01>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-020>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-021_01>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-021_02>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-021_03>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-021_04>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-022>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-023_01>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-023_02>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-023_03>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-024>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-025_01>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-025_02>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-025_03>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-026>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-027_01>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-027_02>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-027_03>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-027_04>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-027_05>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-027_06>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-027_07>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-027_08>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-027_09>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-028>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-029_01>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-029_02>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-029_03>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-029_04>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-030>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-031_01>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-031_02>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-031_03>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-031_04>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-031_05>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-032>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-033_01>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-033_02>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-033_03>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-033_04>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-034>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-035_01>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-036>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-037_01>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-037_02>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-037_03>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-038>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-039_01>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-039_02>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-039_03>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-039_04>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-039_05>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-039_06>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-039_07>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-039_08>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-039_09>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-039_10>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-039_11>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-039_12>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-039_13>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-040>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-041_01>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-041_02>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-041_03>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-041_04>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-042>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-043_01>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-043_02>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-043_03>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-043_04>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-043_05>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-044>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-045_01>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-045_02>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-045_03>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-045_04>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-045_05>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-046>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-047_01>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-047_02>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-047_03>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-047_04>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-047_05>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-047_06>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-047_07>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-047_08>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-047_09>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-000000>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-000001>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-000002>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-000003>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-000004>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-000005>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-000006>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-001_000>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-001_001>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-001_002>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-001_003>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-001_004>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-001_005>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-001_006>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-001_007>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-001_008>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-001_009>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-001_010>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-001_011>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-001_012>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-001_013>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-001_014>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-001_015>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-001_016>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-002000>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-002001>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-003_000>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-003_001>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-003_002>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-003_003>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-003_004>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-003_005>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-003_006>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-003_007>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-003_008>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-003_009>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-003_010>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-004000>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-004001>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-004002>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-004003>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-004004>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-005_000>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-005_001>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-005_002>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-005_003>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-005_004>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-006000>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-007_000>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-007_001>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-007_002>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-007_003>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-007_004>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-007_005>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-007_006>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-007_007>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-007_008>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-007_009>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-007_010>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-007_011>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-007_012>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-007_013>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-007_014>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-007_015>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-008000>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-008001>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-008002>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-008003>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-008004>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-008005>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-009_000>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-009_001>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-009_002>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-009_003>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-010000>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-010001>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-010002>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-010003>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-010004>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-010005>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-010006>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-011_000>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-011_001>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-011_002>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-011_003>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-011_004>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-011_005>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-011_006>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-011_007>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-011_008>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-011_009>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-011_010>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-011_011>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-012000>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-012001>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-012002>;
 	doap:repository      [
 		a doap:GitRepository;
 		doap:browse <https://github.com/tobyink/p5-type-tiny>;
@@ -6073,6 +6073,44 @@
 	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Type-Tiny-1.012001.tar.gz>;
 	doap:revision        "1.012001"^^xsd:string.
 
+<http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-012002>
+	a                    doap:Version;
+	dc:identifier        "Type-Tiny-1.012002"^^xsd:string;
+	dc:issued            "2021-05-02"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Tests;
+			rdfs:label "Type::Tiny is no longer routinely tested on Perl versions older than 5.8.1.";
+			rdfs:seeAlso <https://github.com/tobyink/p5-type-tiny/actions>;
+		], [
+			a doap-changeset:Change;
+			rdfs:label "Type::Parser now supports hexadecimal integers.";
+			doap-changeset:fixes <tdb:2013:https://github.com/tobyink/p5-type-tiny/issues/71>;
+			rdfs:seeAlso <https://github.com/tobyink/p5-type-tiny/issues/71>;
+		], [
+			a doap-changeset:Tests;
+			rdfs:label "Fix testcase for Tuples with slurpy HashRef to pass a literal hashref (which should fail) instead of an arrayref (which should also fail, but less subtly).";
+			doap-changeset:blame <http://purl.org/NET/cpan-uri/person/book>;
+			rdfs:seeAlso <https://github.com/tobyink/p5-type-tiny/pull/64>;
+		], [
+			a doap-changeset:Bugfix;
+			rdfs:label "Fix precendence error in generated code for Tuples.";
+			doap-changeset:blame <http://purl.org/NET/cpan-uri/person/book>;
+			doap-changeset:fixes <tdb:2013:https://github.com/tobyink/p5-type-tiny/pull/64>;
+			rdfs:seeAlso <https://github.com/tobyink/p5-type-tiny/pull/64>;
+		], [
+			a doap-changeset:Documentation;
+			rdfs:label "Fixed typo in pod for Type::Tiny::Enum";
+			doap-changeset:blame <urn:uuid:43559705-9a3a-45fe-b29c-c4aaed234e37>;
+			doap-changeset:fixes <tdb:2013:https://github.com/tobyink/p5-type-tiny/pull/70>;
+			rdfs:seeAlso <https://github.com/tobyink/p5-type-tiny/pull/70>;
+		];
+		doap-changeset:versus <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-012001>;
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Type-Tiny-1.012002.tar.gz>;
+	doap:revision        "1.012002"^^xsd:string.
+
 <http://purl.org/NET/cpan-uri/person/ANDK>
 	a                    foaf:Agent;
 	foaf:mbox_sha1sum    "cbd91ef3fd54c52cae34a5aaaed67dbf2da2b222".
@@ -8048,6 +8086,10 @@
 	foaf:name            "Pierre Masci";
 	foaf:page            <http://www.perlmonks.org/?node_id=946673>.
 
+<urn:uuid:43559705-9a3a-45fe-b29c-c4aaed234e37>
+	foaf:name            "Windymelt";
+	foaf:page            <https://github.com/windymelt>, <https://www.3qe.us/>.
+
 <urn:uuid:580d3dfe-fe45-42ef-9f58-1310ffee7004>
 	foaf:mbox            <mailto:bpj@melroch.se>;
 	foaf:name            "Benct Philip Jonsson".
@@ -8144,6 +8186,63 @@ _:B9
 	dc:rightsHolder      <http://purl.org/NET/cpan-uri/person/tobyink>;
 	nfo:fileName         "TODO.mm".
 
+_:B11
+	a                    nfo:FileDataObject, nfo:SourceCode;
+	nfo:fileName         "t/20-unit/Type-Params/multisig-custom-message.t".
+
+_:B12
+	a                    nfo:FileDataObject, nfo:SourceCode;
+	nfo:fileName         "t/20-unit/Type-Params/multisig.t".
+
+_:B13
+	a                    nfo:FileDataObject, nfo:SourceCode;
+	nfo:fileName         "t/20-unit/Type-Params/named-to-list.t".
+
+_:B14
+	a                    nfo:FileDataObject, nfo:SourceCode;
+	nfo:fileName         "t/20-unit/Type-Params/named.t".
+
+_:B15
+	a                    nfo:FileDataObject, nfo:SourceCode;
+	nfo:fileName         "t/20-unit/Type-Params/noninline.t".
+
+_:B16
+	a                    nfo:FileDataObject, nfo:SourceCode;
+	nfo:fileName         "t/20-unit/Type-Params/optional.t".
+
+_:B17
+	a                    nfo:FileDataObject, nfo:SourceCode;
+	nfo:fileName         "t/20-unit/Type-Params/positional.t".
+
+_:B18
+	a                    nfo:FileDataObject, nfo:SourceCode;
+	nfo:fileName         "t/20-unit/Type-Params/slurpy.t".
+
+_:B19
+	a                    nfo:FileDataObject, nfo:SourceCode;
+	nfo:fileName         "t/20-unit/Type-Params/wrap.t".
+
+[]
+	a                    nfo:FileDataObject, nfo:SourceCode;
+	rdfs:label           "Type::Parser";
+	doap-tests:unit_test [
+		a doap-tests:UnitTest;
+		doap-tests:purpose "Checks Type::Parser works.";
+		doap-tests:test_script [
+			a nfo:FileDataObject, nfo:SourceCode;
+			nfo:fileName "t/20-unit/Type-Parser/basic.t";
+		];
+	], [
+		a doap-tests:UnitTest;
+		doap-tests:purpose "Checks Type::Parser can pick up MooseX::Types type constraints.";
+		doap-tests:test_script [
+			a nfo:FileDataObject, nfo:SourceCode;
+			nfo:fileName "t/20-unit/Type-Parser/moosextypes.t";
+		];
+	];
+	nfo:fileName         "lib/Type/Parser.pm";
+	nfo:programmingLanguage "Perl".
+
 []
 	a                    nfo:FileDataObject, nfo:SourceCode;
 	dc:license           <http://dev.perl.org/licenses/>;
@@ -8153,9 +8252,191 @@ _:B9
 
 []
 	a                    nfo:FileDataObject, nfo:SourceCode;
+	rdfs:label           "Type::Registry";
+	doap-tests:unit_test [
+		a doap-tests:UnitTest;
+		doap-tests:purpose "Checks Type::Registry->for_class is automagically populated.";
+		doap-tests:test_script [
+			a nfo:FileDataObject, nfo:SourceCode;
+			nfo:fileName "t/20-unit/Type-Registry/automagic.t";
+		];
+	], [
+		a doap-tests:UnitTest;
+		doap-tests:purpose "Checks Type::Registry works.";
+		doap-tests:test_script [
+			a nfo:FileDataObject, nfo:SourceCode;
+			nfo:fileName "t/20-unit/Type-Registry/basic.t";
+		];
+	], [
+		a doap-tests:UnitTest;
+		doap-tests:purpose "Checks various newish Type::Registry method calls.";
+		doap-tests:test_script [
+			a nfo:FileDataObject, nfo:SourceCode;
+			nfo:fileName "t/20-unit/Type-Registry/methods.t";
+		];
+	], [
+		a doap-tests:UnitTest;
+		doap-tests:purpose "Checks Type::Registry works with MooseX::Types.";
+		doap-tests:test_script [
+			a nfo:FileDataObject, nfo:SourceCode;
+			nfo:fileName "t/20-unit/Type-Registry/moosextypes.t";
+		];
+	], [
+		a doap-tests:UnitTest;
+		doap-tests:purpose "Checks Type::Registry works with MouseX::Types.";
+		doap-tests:test_script [
+			a nfo:FileDataObject, nfo:SourceCode;
+			nfo:fileName "t/20-unit/Type-Registry/mousextypes.t";
+		];
+	], [
+		a doap-tests:UnitTest;
+		doap-tests:purpose "Check the Type::Registrys can have parents.";
+		doap-tests:test_script [
+			a nfo:FileDataObject, nfo:SourceCode;
+			nfo:fileName "t/20-unit/Type-Registry/parent.t";
+		];
+	], [
+		a doap-tests:UnitTest;
+		doap-tests:purpose "Checks Type::Registry refcount stuff.";
+		doap-tests:test_script [
+			a nfo:FileDataObject, nfo:SourceCode;
+			nfo:fileName "t/20-unit/Type-Registry/refcount.t";
+		];
+	];
+	nfo:fileName         "lib/Type/Registry.pm";
+	nfo:programmingLanguage "Perl".
+
+[]
+	a                    nfo:FileDataObject, nfo:SourceCode;
 	dc:license           <http://dev.perl.org/licenses/>;
 	dc:rightsHolder      <http://purl.org/NET/cpan-uri/person/tobyink>;
 	nfo:fileName         "examples/benchmarking/benchmark-constraints.pl";
+	nfo:programmingLanguage "Perl".
+
+[]
+	a                    nfo:FileDataObject, nfo:SourceCode;
+	rdfs:label           "Type::Tiny";
+	doap-tests:unit_test [
+		a doap-tests:UnitTest;
+		doap-tests:purpose "Tests overloading of bitwise operators and numeric comparison operators for Type::Tiny.";
+		doap-tests:test_script [
+			a nfo:FileDataObject, nfo:SourceCode;
+			nfo:fileName "t/20-unit/Type-Tiny/arithmetic.t";
+		];
+	], [
+		a doap-tests:UnitTest;
+		doap-tests:purpose "Checks Type::Tiny works.";
+		doap-tests:test_script [
+			a nfo:FileDataObject, nfo:SourceCode;
+			nfo:fileName "t/20-unit/Type-Tiny/basic.t";
+		];
+	], [
+		a doap-tests:UnitTest;
+		doap-tests:purpose "Test new type comparison stuff with Type::Tiny objects.";
+		doap-tests:test_script [
+			a nfo:FileDataObject, nfo:SourceCode;
+			nfo:fileName "t/20-unit/Type-Tiny/cmp.t";
+		];
+	], [
+		a doap-tests:UnitTest;
+		doap-tests:purpose "Checks 'plus_coercions', 'minus_coercions' and 'no_coercions' methods work.";
+		doap-tests:test_script [
+			a nfo:FileDataObject, nfo:SourceCode;
+			nfo:fileName "t/20-unit/Type-Tiny/coercion-modifiers.t";
+		];
+	], [
+		a doap-tests:UnitTest;
+		doap-tests:purpose "Checks Type::Tiny works accepts strings of Perl code as constraints.";
+		doap-tests:test_script [
+			a nfo:FileDataObject, nfo:SourceCode;
+			nfo:fileName "t/20-unit/Type-Tiny/constraint-strings.t";
+		];
+	], [
+		a doap-tests:UnitTest;
+		doap-tests:purpose "Checks Type::Tiny's 'deprecated' attribute works.";
+		doap-tests:test_script [
+			a nfo:FileDataObject, nfo:SourceCode;
+			nfo:fileName "t/20-unit/Type-Tiny/deprecation.t";
+		];
+	], [
+		a doap-tests:UnitTest;
+		doap-tests:purpose "Checks various undocumented Type::Tiny methods. The fact that these are tested here should not be construed to mean tht they are any any way a stable, supported part of the Type::Tiny API.";
+		doap-tests:test_script [
+			a nfo:FileDataObject, nfo:SourceCode;
+			nfo:fileName "t/20-unit/Type-Tiny/esoteric.t";
+		];
+	], [
+		a doap-tests:UnitTest;
+		doap-tests:purpose "Tests for Type::Tiny's 'inline_assert' method.";
+		doap-tests:test_script [
+			a nfo:FileDataObject, nfo:SourceCode;
+			nfo:fileName "t/20-unit/Type-Tiny/inline-assert.t";
+		];
+	], [
+		a doap-tests:UnitTest;
+		doap-tests:purpose "Checks Type::Tiny's list processing methods.";
+		doap-tests:test_script [
+			a nfo:FileDataObject, nfo:SourceCode;
+			nfo:fileName "t/20-unit/Type-Tiny/list-methods.t";
+		];
+	], [
+		a doap-tests:UnitTest;
+		doap-tests:purpose "Checks Type::Tiny's 'my_methods' attribute.";
+		doap-tests:test_script [
+			a nfo:FileDataObject, nfo:SourceCode;
+			nfo:fileName "t/20-unit/Type-Tiny/my-methods.t";
+		];
+	], [
+		a doap-tests:UnitTest;
+		doap-tests:purpose "There are loads of tests for parameterization in 'stdlib.t', 'stdlib-overload.t', 'stdlib-strmatch.t', 'stdlib-structures.t', 'syntax.t', 'stdlib-automatic.t', etc. This file includes a handful of other parameterization-related tests that didn't fit anywhere else.";
+		doap-tests:test_script [
+			a nfo:FileDataObject, nfo:SourceCode;
+			nfo:fileName "t/20-unit/Type-Tiny/parameterization.t";
+		];
+	], [
+		a doap-tests:UnitTest;
+		doap-tests:purpose "Checks Type::Tiny refcount stuff.";
+		doap-tests:test_script [
+			a nfo:FileDataObject, nfo:SourceCode;
+			nfo:fileName "t/20-unit/Type-Tiny/refcount.t";
+		];
+	], [
+		a doap-tests:UnitTest;
+		doap-tests:purpose "Test the '->of' and '->where' shortcut methods.";
+		doap-tests:test_script [
+			a nfo:FileDataObject, nfo:SourceCode;
+			nfo:fileName "t/20-unit/Type-Tiny/shortcuts.t";
+		];
+	], [
+		a doap-tests:UnitTest;
+		doap-tests:purpose "Checks Type::Tiny works with the smartmatch operator.";
+		doap-tests:test_script [
+			a nfo:FileDataObject, nfo:SourceCode;
+			nfo:fileName "t/20-unit/Type-Tiny/smartmatch.t";
+		];
+	], [
+		a doap-tests:UnitTest;
+		doap-tests:purpose "Checks that all this Type[Param] syntactic sugar works. In particular, the following three type constraints are expected to be equivalent to each other: use Types::Standard qw( ArrayRef Int Num Str ); use Type::Utils qw( union intersection ); my $type1 = ArrayRef[Int] | ArrayRef[Num & ~Int] | ArrayRef[Str & ~Num]; my $type2 = union [ ArrayRef[Int], ArrayRef[Num & ~Int], ArrayRef[Str & ~Num], ]; my $type3 = union([ ArrayRef->parameterize(Int), ArrayRef->parameterize( intersection([ Num, Int->complementary_type, ]), ), ArrayRef->parameterize( intersection([ Str, Num->complementary_type, ]), ), ]);";
+		doap-tests:test_script [
+			a nfo:FileDataObject, nfo:SourceCode;
+			nfo:fileName "t/20-unit/Type-Tiny/syntax.t";
+		];
+	], [
+		a doap-tests:UnitTest;
+		doap-tests:purpose "Checks Type::Tiny objects can be converted to Moose type constraint objects.";
+		doap-tests:test_script [
+			a nfo:FileDataObject, nfo:SourceCode;
+			nfo:fileName "t/20-unit/Type-Tiny/to-moose.t";
+		];
+	], [
+		a doap-tests:UnitTest;
+		doap-tests:purpose "Checks Type::Tiny objects can be converted to Mouse type constraint objects.";
+		doap-tests:test_script [
+			a nfo:FileDataObject, nfo:SourceCode;
+			nfo:fileName "t/20-unit/Type-Tiny/to-mouse.t";
+		];
+	];
+	nfo:fileName         "lib/Type/Tiny.pm";
 	nfo:programmingLanguage "Perl".
 
 []
@@ -8317,23 +8598,23 @@ _:B9
 	dc:rightsHolder      <http://purl.org/NET/cpan-uri/person/ingy>;
 	nfo:fileName         "MANIFEST.SKIP".
 
-_:B11
+_:B20
 	a                    nfo:FileDataObject, nfo:SourceCode;
 	nfo:fileName         "t/00-begin.t".
 
-_:B12
+_:B21
 	a                    nfo:FileDataObject, nfo:SourceCode;
 	nfo:fileName         "t/01-compile.t".
 
-_:B13
+_:B22
 	a                    nfo:FileDataObject, nfo:SourceCode;
 	nfo:fileName         "t/02-api.t".
 
-_:B14
+_:B23
 	a                    nfo:FileDataObject, nfo:SourceCode;
 	nfo:fileName         "t/03-leak.t".
 
-_:B15
+_:B24
 	a                    nfo:FileDataObject, nfo:SourceCode;
 	nfo:fileName         "t/98-param-eg-from-docs.t".
 
@@ -8343,7 +8624,7 @@ _:B15
 	dc:rightsHolder      <http://purl.org/NET/cpan-uri/person/tobyink>;
 	nfo:fileName         "LICENSE".
 
-_:B16
+_:B25
 	a                    nfo:FileDataObject, nfo:SourceCode;
 	nfo:fileName         "t/99-moose-std-types-test.t".
 
@@ -8362,10 +8643,136 @@ _:B16
 	nfo:programmingLanguage "Perl".
 
 []
+	a                    nfo:FileDataObject, nfo:SourceCode;
+	rdfs:label           "Devel::TypeTiny::Perl58Compat";
+	doap-tests:unit_test [
+		a doap-tests:UnitTest;
+		doap-tests:purpose "Checks 're::is_regexp()' works.";
+		doap-tests:test_script [
+			a nfo:FileDataObject, nfo:SourceCode;
+			nfo:fileName "t/20-unit/Devel-TypeTiny-Perl58Compat/basic.t";
+		];
+	];
+	nfo:fileName         "lib/Devel/TypeTiny/Perl58Compat.pm";
+	nfo:programmingLanguage "Perl".
+
+[]
+	a                    nfo:FileDataObject, nfo:SourceCode;
+	rdfs:label           "Error::TypeTiny";
+	doap-tests:unit_test [
+		a doap-tests:UnitTest;
+		doap-tests:purpose "Tests for basic Error::TypeTiny functionality.";
+		doap-tests:test_script [
+			a nfo:FileDataObject, nfo:SourceCode;
+			nfo:fileName "t/20-unit/Error-TypeTiny/basic.t";
+		];
+	], [
+		a doap-tests:UnitTest;
+		doap-tests:purpose "Tests that Error::TypeTiny is capable of providing stack traces.";
+		doap-tests:test_script [
+			a nfo:FileDataObject, nfo:SourceCode;
+			nfo:fileName "t/20-unit/Error-TypeTiny/stacktrace.t";
+		];
+	];
+	nfo:fileName         "lib/Error/TypeTiny.pm";
+	nfo:programmingLanguage "Perl".
+
+[]
+	a                    nfo:FileDataObject, nfo:SourceCode;
+	rdfs:label           "Error::TypeTiny::Assertion";
+	doap-tests:unit_test [
+		a doap-tests:UnitTest;
+		doap-tests:purpose "Tests Error::TypeTiny::Assertion.";
+		doap-tests:test_script [
+			a nfo:FileDataObject, nfo:SourceCode;
+			nfo:fileName "t/20-unit/Error-TypeTiny-Assertion/basic.t";
+		];
+	];
+	nfo:fileName         "lib/Error/TypeTiny/Assertion.pm";
+	nfo:programmingLanguage "Perl".
+
+[]
 	a                    nfo:FileDataObject;
 	dc:license           <http://dev.perl.org/licenses/>;
 	dc:rightsHolder      <http://purl.org/NET/cpan-uri/person/tobyink>;
 	nfo:fileName         "META.ttl".
+
+[]
+	a                    nfo:FileDataObject, nfo:SourceCode;
+	rdfs:label           "Error::TypeTiny::Compilation";
+	doap-tests:unit_test [
+		a doap-tests:UnitTest;
+		doap-tests:purpose "Tests for Error::TypeTiny::Compilation, mostly by triggering compilation errors using Eval::TypeTiny.";
+		doap-tests:test_script [
+			a nfo:FileDataObject, nfo:SourceCode;
+			nfo:fileName "t/20-unit/Error-TypeTiny-Compilation/basic.t";
+		];
+	];
+	nfo:fileName         "lib/Error/TypeTiny/Compilation.pm";
+	nfo:programmingLanguage "Perl".
+
+[]
+	a                    nfo:FileDataObject, nfo:SourceCode;
+	rdfs:label           "Error::TypeTiny::WrongNumberOfParameters";
+	doap-tests:unit_test [
+		a doap-tests:UnitTest;
+		doap-tests:purpose "Test Error::TypeTiny::WrongNumberOfParameters.";
+		doap-tests:test_script [
+			a nfo:FileDataObject, nfo:SourceCode;
+			nfo:fileName "t/20-unit/Error-TypeTiny-WrongNumberOfParameters/basic.t";
+		];
+	];
+	nfo:fileName         "lib/Error/TypeTiny/WrongNumberOfParameters.pm";
+	nfo:programmingLanguage "Perl".
+
+[]
+	a                    nfo:FileDataObject, nfo:SourceCode;
+	rdfs:label           "Eval::TypeTiny";
+	doap-tests:unit_test [
+		a doap-tests:UnitTest;
+		doap-tests:purpose "Tests Eval::TypeTiny supports alias=>1 using Devel::LexAlias implementation.";
+		doap-tests:test_script [
+			a nfo:FileDataObject, nfo:SourceCode;
+			nfo:fileName "t/20-unit/Eval-TypeTiny/aliases-devel-lexalias.t";
+		];
+	], [
+		a doap-tests:UnitTest;
+		doap-tests:purpose "Tests Eval::TypeTiny supports alias=>1 using Perl refaliasing.";
+		doap-tests:test_script [
+			a nfo:FileDataObject, nfo:SourceCode;
+			nfo:fileName "t/20-unit/Eval-TypeTiny/aliases-native.t";
+		];
+	], [
+		a doap-tests:UnitTest;
+		doap-tests:purpose "Tests Eval::TypeTiny supports alias=>1 using PadWalker implementation.";
+		doap-tests:test_script [
+			a nfo:FileDataObject, nfo:SourceCode;
+			nfo:fileName "t/20-unit/Eval-TypeTiny/aliases-padwalker.t";
+		];
+	], [
+		a doap-tests:UnitTest;
+		doap-tests:purpose "Tests Eval::TypeTiny supports alias=>1 using 'tie()' implementation.";
+		doap-tests:test_script [
+			a nfo:FileDataObject, nfo:SourceCode;
+			nfo:fileName "t/20-unit/Eval-TypeTiny/aliases-tie.t";
+		];
+	], [
+		a doap-tests:UnitTest;
+		doap-tests:purpose "Tests Eval::TypeTiny.";
+		doap-tests:test_script [
+			a nfo:FileDataObject, nfo:SourceCode;
+			nfo:fileName "t/20-unit/Eval-TypeTiny/basic.t";
+		];
+	], [
+		a doap-tests:UnitTest;
+		doap-tests:purpose "Tests Eval::TypeTiny with experimental lexical subs.";
+		doap-tests:test_script [
+			a nfo:FileDataObject, nfo:SourceCode;
+			nfo:fileName "t/20-unit/Eval-TypeTiny/lexical-subs.t";
+		];
+	];
+	nfo:fileName         "lib/Eval/TypeTiny.pm";
+	nfo:programmingLanguage "Perl".
 
 []
 	a                    nfo:FileDataObject, nfo:SourceCode;
@@ -8375,10 +8782,206 @@ _:B16
 	nfo:programmingLanguage "Perl".
 
 []
+	a                    nfo:FileDataObject, nfo:SourceCode;
+	rdfs:label           "Test::TypeTiny";
+	doap-tests:unit_test [
+		a doap-tests:UnitTest;
+		doap-tests:purpose "Tests Test::TypeTiny (which is somewhat important because Test::TypeTiny is itself used for the majority of the type constraint tests). In particular, this tests that everything works when the '$EXTENDED_TESTING' environment variable is false.";
+		doap-tests:test_script [
+			a nfo:FileDataObject, nfo:SourceCode;
+			nfo:fileName "t/20-unit/Test-TypeTiny/basic.t";
+		];
+	], [
+		a doap-tests:UnitTest;
+		doap-tests:purpose "Tests Test::TypeTiny works when the '$EXTENDED_TESTING' environment variable is true. Note that Test::Tester appears to have issues with subtests, so currently 'should_pass' and 'should_fail' are not tested.";
+		doap-tests:test_script [
+			a nfo:FileDataObject, nfo:SourceCode;
+			nfo:fileName "t/20-unit/Test-TypeTiny/extended.t";
+		];
+	], [
+		a doap-tests:UnitTest;
+		doap-tests:purpose "Tests Test::TypeTiny (which is somewhat important because Test::TypeTiny is itself used for the majority of the type constraint tests). In particular, this tests that everything works when the '$EXTENDED_TESTING' environment variable is false.";
+		doap-tests:test_script [
+			a nfo:FileDataObject, nfo:SourceCode;
+			nfo:fileName "t/20-unit/Test-TypeTiny/matchfor.t";
+		];
+	];
+	nfo:fileName         "lib/Test/TypeTiny.pm";
+	nfo:programmingLanguage "Perl".
+
+[]
+	a                    nfo:FileDataObject, nfo:SourceCode;
+	rdfs:label           "Type::Coercion";
+	doap-tests:unit_test [
+		a doap-tests:UnitTest;
+		doap-tests:purpose "Checks Type::Coercion works.";
+		doap-tests:test_script [
+			a nfo:FileDataObject, nfo:SourceCode;
+			nfo:fileName "t/20-unit/Type-Coercion/basic.t";
+		];
+	], [
+		a doap-tests:UnitTest;
+		doap-tests:purpose "Checks various undocumented Type::Coercion methods. The fact that these are tested here should not be construed to mean tht they are any any way a stable, supported part of the Type::Coercion API.";
+		doap-tests:test_script [
+			a nfo:FileDataObject, nfo:SourceCode;
+			nfo:fileName "t/20-unit/Type-Coercion/esoteric.t";
+		];
+	], [
+		a doap-tests:UnitTest;
+		doap-tests:purpose "Type::Coercion objects are mutable, unlike Type::Tiny objects. However, they can be frozen, making them immutable. (And Type::Tiny will freeze them occasionally, if it feels it has to.)";
+		doap-tests:test_script [
+			a nfo:FileDataObject, nfo:SourceCode;
+			nfo:fileName "t/20-unit/Type-Coercion/frozen.t";
+		];
+	], [
+		a doap-tests:UnitTest;
+		doap-tests:purpose "Checks Type::Coercion can be inlined.";
+		doap-tests:test_script [
+			a nfo:FileDataObject, nfo:SourceCode;
+			nfo:fileName "t/20-unit/Type-Coercion/inlining.t";
+		];
+	], [
+		a doap-tests:UnitTest;
+		doap-tests:purpose "Checks the 'Split' and 'Join' parameterized coercions from Types::Standard.";
+		doap-tests:test_script [
+			a nfo:FileDataObject, nfo:SourceCode;
+			nfo:fileName "t/20-unit/Type-Coercion/parameterized.t";
+		];
+	], [
+		a doap-tests:UnitTest;
+		doap-tests:purpose "Checks Type::Coercion overload of '~~'.";
+		doap-tests:test_script [
+			a nfo:FileDataObject, nfo:SourceCode;
+			nfo:fileName "t/20-unit/Type-Coercion/smartmatch.t";
+		];
+	], [
+		a doap-tests:UnitTest;
+		doap-tests:purpose "Checks proper Type::Coercion objects are automatically created by the Type::Tiny constructor.";
+		doap-tests:test_script [
+			a nfo:FileDataObject, nfo:SourceCode;
+			nfo:fileName "t/20-unit/Type-Coercion/typetiny-constructor.t";
+		];
+	];
+	nfo:fileName         "lib/Type/Coercion.pm";
+	nfo:programmingLanguage "Perl".
+
+[]
 	a                    nfo:FileDataObject, nfo:TextDocument;
 	dc:license           <http://dev.perl.org/licenses/>;
 	dc:rightsHolder      <http://purl.org/NET/cpan-uri/person/tobyink>;
 	nfo:fileName         "NEWS".
+
+[]
+	a                    nfo:FileDataObject, nfo:SourceCode;
+	rdfs:label           "Type::Coercion::FromMoose";
+	doap-tests:unit_test [
+		a doap-tests:UnitTest;
+		doap-tests:purpose "Checks the types adopted from Moose still have a coercion which works.";
+		doap-tests:test_script [
+			a nfo:FileDataObject, nfo:SourceCode;
+			nfo:fileName "t/20-unit/Type-Coercion-FromMoose/basic.t";
+		];
+	], [
+		a doap-tests:UnitTest;
+		doap-tests:purpose "Checks crazy Type::Coercion::FromMoose errors.";
+		doap-tests:test_script [
+			a nfo:FileDataObject, nfo:SourceCode;
+			nfo:fileName "t/20-unit/Type-Coercion-FromMoose/errors.t";
+		];
+	];
+	nfo:fileName         "lib/Type/Coercion/FromMoose.pm";
+	nfo:programmingLanguage "Perl".
+
+[]
+	a                    nfo:FileDataObject, nfo:SourceCode;
+	rdfs:label           "Type::Coercion::Union";
+	doap-tests:unit_test [
+		a doap-tests:UnitTest;
+		doap-tests:purpose "Checks Type::Coercion::Union works.";
+		doap-tests:test_script [
+			a nfo:FileDataObject, nfo:SourceCode;
+			nfo:fileName "t/20-unit/Type-Coercion-Union/basic.t";
+		];
+	];
+	nfo:fileName         "lib/Type/Coercion/Union.pm";
+	nfo:programmingLanguage "Perl".
+
+[]
+	a                    nfo:FileDataObject, nfo:SourceCode;
+	rdfs:label           "Type::Library";
+	doap-tests:unit_test [
+		a doap-tests:UnitTest;
+		doap-tests:purpose "Checks that the assertion functions exported by a type library work as expected.";
+		doap-tests:test_script [
+			a nfo:FileDataObject, nfo:SourceCode;
+			nfo:fileName "t/20-unit/Type-Library/assert.t";
+		];
+	], [
+		a doap-tests:UnitTest;
+		doap-tests:purpose "Tests that placeholder objects generated by '-declare' work.";
+		doap-tests:test_script [
+			a nfo:FileDataObject, nfo:SourceCode;
+			nfo:fileName "t/20-unit/Type-Library/declared-types.t";
+		];
+	], [
+		a doap-tests:UnitTest;
+		doap-tests:purpose "Checks Type::Library warns about deprecated types.";
+		doap-tests:test_script [
+			a nfo:FileDataObject, nfo:SourceCode;
+			nfo:fileName "t/20-unit/Type-Library/deprecation.t";
+		];
+	], [
+		a doap-tests:UnitTest;
+		doap-tests:purpose "Tests errors thrown by Type::Library.";
+		doap-tests:test_script [
+			a nfo:FileDataObject, nfo:SourceCode;
+			nfo:fileName "t/20-unit/Type-Library/errors.t";
+		];
+	], [
+		a doap-tests:UnitTest;
+		doap-tests:purpose "Checks 'of' and 'where' import options works.";
+		doap-tests:test_script [
+			a nfo:FileDataObject, nfo:SourceCode;
+			nfo:fileName "t/20-unit/Type-Library/import-params.t";
+		];
+	], [
+		a doap-tests:UnitTest;
+		doap-tests:purpose "Checks that it's possible to extend existing type libraries.";
+		doap-tests:test_script [
+			a nfo:FileDataObject, nfo:SourceCode;
+			nfo:fileName "t/20-unit/Type-Library/inheritance.t";
+		];
+	], [
+		a doap-tests:UnitTest;
+		doap-tests:purpose "Checks that the check functions exported by a type library work as expected.";
+		doap-tests:test_script [
+			a nfo:FileDataObject, nfo:SourceCode;
+			nfo:fileName "t/20-unit/Type-Library/is.t";
+		];
+	], [
+		a doap-tests:UnitTest;
+		doap-tests:purpose "Tests that types may be defined recursively.";
+		doap-tests:test_script [
+			a nfo:FileDataObject, nfo:SourceCode;
+			nfo:fileName "t/20-unit/Type-Library/recursive-type-definitions.t";
+		];
+	], [
+		a doap-tests:UnitTest;
+		doap-tests:purpose "Checks that the coercion functions exported by a type library work as expected.";
+		doap-tests:test_script [
+			a nfo:FileDataObject, nfo:SourceCode;
+			nfo:fileName "t/20-unit/Type-Library/to.t";
+		];
+	], [
+		a doap-tests:UnitTest;
+		doap-tests:purpose "Checks that the type functions exported by a type library work as expected.";
+		doap-tests:test_script [
+			a nfo:FileDataObject, nfo:SourceCode;
+			nfo:fileName "t/20-unit/Type-Library/types.t";
+		];
+	];
+	nfo:fileName         "lib/Type/Library.pm";
+	nfo:programmingLanguage "Perl".
 
 []
 	a                    nfo:FileDataObject, nfo:TextDocument;
@@ -8387,249 +8990,123 @@ _:B16
 	nfo:fileName         "README".
 
 []
+	a                    nfo:FileDataObject, nfo:SourceCode;
+	rdfs:label           "Type::Params";
+	doap-tests:unit_test [
+		a doap-tests:UnitTest;
+		doap-tests:purpose "Check that people doing silly things with Test::Params get";
+		doap-tests:test_script [
+			a nfo:FileDataObject, nfo:SourceCode;
+			nfo:fileName "t/20-unit/Type-Params/badsigs.t";
+		];
+	], [
+		a doap-tests:UnitTest;
+		doap-tests:purpose "Test Type::Params' interaction with Carp: use Type::Params compile => { confess => 1 };";
+		doap-tests:test_script [
+			a nfo:FileDataObject, nfo:SourceCode;
+			nfo:fileName "t/20-unit/Type-Params/carping.t";
+		];
+	], [
+		a doap-tests:UnitTest;
+		doap-tests:purpose "Test Type::Params usage of types with coercions.";
+		doap-tests:test_script [
+			a nfo:FileDataObject, nfo:SourceCode;
+			nfo:fileName "t/20-unit/Type-Params/coerce.t";
+		];
+	], [
+		a doap-tests:UnitTest;
+		doap-tests:purpose "Test Type::Params' brand spanking new 'compile_named' function.";
+		doap-tests:test_script [
+			a nfo:FileDataObject, nfo:SourceCode;
+			nfo:fileName "t/20-unit/Type-Params/compile-named-bless.t";
+		];
+	], [
+		a doap-tests:UnitTest;
+		doap-tests:purpose "Test Type::Params 'compile_named_oo' function.";
+		doap-tests:test_script [
+			a nfo:FileDataObject, nfo:SourceCode;
+			nfo:fileName "t/20-unit/Type-Params/compile-named-oo.t";
+		];
+	], [
+		a doap-tests:UnitTest;
+		doap-tests:purpose "Test Type::Params' brand spanking new 'compile_named' function.";
+		doap-tests:test_script [
+			a nfo:FileDataObject, nfo:SourceCode;
+			nfo:fileName "t/20-unit/Type-Params/compile-named.t";
+		];
+	], [
+		a doap-tests:UnitTest;
+		doap-tests:purpose "Test 'compile' and 'compile_named' support defaults for parameters.";
+		doap-tests:test_script [
+			a nfo:FileDataObject, nfo:SourceCode;
+			nfo:fileName "t/20-unit/Type-Params/defaults.t";
+		];
+	], [
+		a doap-tests:UnitTest;
+		doap-tests:purpose "Test Type::Params' brand spanking new 'compile_named' function.";
+		doap-tests:test_script [
+			a nfo:FileDataObject, nfo:SourceCode;
+			nfo:fileName "t/20-unit/Type-Params/hashorder.t";
+		];
+	], [
+		a doap-tests:UnitTest;
+		doap-tests:purpose "Test Type::Params usage for method calls.";
+		doap-tests:test_script [
+			a nfo:FileDataObject, nfo:SourceCode;
+			nfo:fileName "t/20-unit/Type-Params/methods.t";
+		];
+	], [
+		a doap-tests:UnitTest;
+		doap-tests:purpose "Test Type::Params usage with mix of positional and named parameters.";
+		doap-tests:test_script [
+			a nfo:FileDataObject, nfo:SourceCode;
+			nfo:fileName "t/20-unit/Type-Params/mixednamed.t";
+		];
+	], [
+		a doap-tests:UnitTest;
+		doap-tests:purpose "Make sure that custom 'multisig()' messages work.";
+		doap-tests:test_script _:B11;
+	], [
+		a doap-tests:UnitTest;
+		doap-tests:purpose "Test Type::Params 'multisig' function.";
+		doap-tests:test_script _:B12;
+	], [
+		a doap-tests:UnitTest;
+		doap-tests:purpose "Test Type::Params usage with named parameters and 'named_to_list'.";
+		doap-tests:test_script _:B13;
+	], [
+		a doap-tests:UnitTest;
+		doap-tests:purpose "Test Type::Params usage with named parameters.";
+		doap-tests:test_script _:B14;
+	], [
+		a doap-tests:UnitTest;
+		doap-tests:purpose "Test Type::Params with type constraints that cannot be inlined.";
+		doap-tests:test_script _:B15;
+	], [
+		a doap-tests:UnitTest;
+		doap-tests:purpose "Test Type::Params usage with optional parameters.";
+		doap-tests:test_script _:B16;
+	], [
+		a doap-tests:UnitTest;
+		doap-tests:purpose "Test Type::Params positional parameters, a la the example in the documentation: sub nth_root { state $check = compile( Num, Num ); my ($x, $n) = $check->(@_); return $x ** (1 / $n); }";
+		doap-tests:test_script _:B17;
+	], [
+		a doap-tests:UnitTest;
+		doap-tests:purpose "Test Type::Params usage with slurpy parameters.";
+		doap-tests:test_script _:B18;
+	], [
+		a doap-tests:UnitTest;
+		doap-tests:purpose "Test 'wrap_subs' and 'wrap_methods' from Type::Params.";
+		doap-tests:test_script _:B19;
+	];
+	nfo:fileName         "lib/Type/Params.pm";
+	nfo:programmingLanguage "Perl".
+
+[]
 	a                    nfo:FileDataObject, nfo:TextDocument;
 	dc:license           <http://dev.perl.org/licenses/>;
 	dc:rightsHolder      <http://purl.org/NET/cpan-uri/person/tobyink>;
 	nfo:fileName         "TODO".
-
-_:B17
-	a                    nfo:FileDataObject, nfo:SourceCode;
-	nfo:fileName         "t/20-unit/Type-Params/multisig-custom-message.t".
-
-_:B18
-	a                    nfo:FileDataObject, nfo:SourceCode;
-	nfo:fileName         "t/20-unit/Type-Params/multisig.t".
-
-_:B19
-	a                    nfo:FileDataObject, nfo:SourceCode;
-	nfo:fileName         "t/20-unit/Type-Params/named-to-list.t".
-
-_:B20
-	a                    nfo:FileDataObject, nfo:SourceCode;
-	nfo:fileName         "t/20-unit/Type-Params/named.t".
-
-_:B21
-	a                    nfo:FileDataObject, nfo:SourceCode;
-	nfo:fileName         "t/20-unit/Type-Params/noninline.t".
-
-_:B22
-	a                    nfo:FileDataObject, nfo:SourceCode;
-	nfo:fileName         "t/20-unit/Type-Params/optional.t".
-
-_:B23
-	a                    nfo:FileDataObject, nfo:SourceCode;
-	nfo:fileName         "t/20-unit/Type-Params/positional.t".
-
-_:B24
-	a                    nfo:FileDataObject, nfo:SourceCode;
-	nfo:fileName         "t/20-unit/Type-Params/slurpy.t".
-
-_:B25
-	a                    nfo:FileDataObject, nfo:SourceCode;
-	nfo:fileName         "t/20-unit/Type-Params/wrap.t".
-
-[]
-	a                    nfo:FileDataObject, nfo:SourceCode;
-	rdfs:label           "Type::Parser";
-	doap-tests:unit_test [
-		a doap-tests:UnitTest;
-		doap-tests:purpose "Checks Type::Parser works.";
-		doap-tests:test_script [
-			a nfo:FileDataObject, nfo:SourceCode;
-			nfo:fileName "t/20-unit/Type-Parser/basic.t";
-		];
-	], [
-		a doap-tests:UnitTest;
-		doap-tests:purpose "Checks Type::Parser can pick up MooseX::Types type constraints.";
-		doap-tests:test_script [
-			a nfo:FileDataObject, nfo:SourceCode;
-			nfo:fileName "t/20-unit/Type-Parser/moosextypes.t";
-		];
-	];
-	nfo:fileName         "lib/Type/Parser.pm";
-	nfo:programmingLanguage "Perl".
-
-[]
-	a                    nfo:FileDataObject, nfo:SourceCode;
-	rdfs:label           "Type::Registry";
-	doap-tests:unit_test [
-		a doap-tests:UnitTest;
-		doap-tests:purpose "Checks Type::Registry->for_class is automagically populated.";
-		doap-tests:test_script [
-			a nfo:FileDataObject, nfo:SourceCode;
-			nfo:fileName "t/20-unit/Type-Registry/automagic.t";
-		];
-	], [
-		a doap-tests:UnitTest;
-		doap-tests:purpose "Checks Type::Registry works.";
-		doap-tests:test_script [
-			a nfo:FileDataObject, nfo:SourceCode;
-			nfo:fileName "t/20-unit/Type-Registry/basic.t";
-		];
-	], [
-		a doap-tests:UnitTest;
-		doap-tests:purpose "Checks various newish Type::Registry method calls.";
-		doap-tests:test_script [
-			a nfo:FileDataObject, nfo:SourceCode;
-			nfo:fileName "t/20-unit/Type-Registry/methods.t";
-		];
-	], [
-		a doap-tests:UnitTest;
-		doap-tests:purpose "Checks Type::Registry works with MooseX::Types.";
-		doap-tests:test_script [
-			a nfo:FileDataObject, nfo:SourceCode;
-			nfo:fileName "t/20-unit/Type-Registry/moosextypes.t";
-		];
-	], [
-		a doap-tests:UnitTest;
-		doap-tests:purpose "Checks Type::Registry works with MouseX::Types.";
-		doap-tests:test_script [
-			a nfo:FileDataObject, nfo:SourceCode;
-			nfo:fileName "t/20-unit/Type-Registry/mousextypes.t";
-		];
-	], [
-		a doap-tests:UnitTest;
-		doap-tests:purpose "Check the Type::Registrys can have parents.";
-		doap-tests:test_script [
-			a nfo:FileDataObject, nfo:SourceCode;
-			nfo:fileName "t/20-unit/Type-Registry/parent.t";
-		];
-	], [
-		a doap-tests:UnitTest;
-		doap-tests:purpose "Checks Type::Registry refcount stuff.";
-		doap-tests:test_script [
-			a nfo:FileDataObject, nfo:SourceCode;
-			nfo:fileName "t/20-unit/Type-Registry/refcount.t";
-		];
-	];
-	nfo:fileName         "lib/Type/Registry.pm";
-	nfo:programmingLanguage "Perl".
-
-[]
-	a                    nfo:FileDataObject, nfo:SourceCode;
-	rdfs:label           "Type::Tiny";
-	doap-tests:unit_test [
-		a doap-tests:UnitTest;
-		doap-tests:purpose "Tests overloading of bitwise operators and numeric comparison operators for Type::Tiny.";
-		doap-tests:test_script [
-			a nfo:FileDataObject, nfo:SourceCode;
-			nfo:fileName "t/20-unit/Type-Tiny/arithmetic.t";
-		];
-	], [
-		a doap-tests:UnitTest;
-		doap-tests:purpose "Checks Type::Tiny works.";
-		doap-tests:test_script [
-			a nfo:FileDataObject, nfo:SourceCode;
-			nfo:fileName "t/20-unit/Type-Tiny/basic.t";
-		];
-	], [
-		a doap-tests:UnitTest;
-		doap-tests:purpose "Test new type comparison stuff with Type::Tiny objects.";
-		doap-tests:test_script [
-			a nfo:FileDataObject, nfo:SourceCode;
-			nfo:fileName "t/20-unit/Type-Tiny/cmp.t";
-		];
-	], [
-		a doap-tests:UnitTest;
-		doap-tests:purpose "Checks 'plus_coercions', 'minus_coercions' and 'no_coercions' methods work.";
-		doap-tests:test_script [
-			a nfo:FileDataObject, nfo:SourceCode;
-			nfo:fileName "t/20-unit/Type-Tiny/coercion-modifiers.t";
-		];
-	], [
-		a doap-tests:UnitTest;
-		doap-tests:purpose "Checks Type::Tiny works accepts strings of Perl code as constraints.";
-		doap-tests:test_script [
-			a nfo:FileDataObject, nfo:SourceCode;
-			nfo:fileName "t/20-unit/Type-Tiny/constraint-strings.t";
-		];
-	], [
-		a doap-tests:UnitTest;
-		doap-tests:purpose "Checks Type::Tiny's 'deprecated' attribute works.";
-		doap-tests:test_script [
-			a nfo:FileDataObject, nfo:SourceCode;
-			nfo:fileName "t/20-unit/Type-Tiny/deprecation.t";
-		];
-	], [
-		a doap-tests:UnitTest;
-		doap-tests:purpose "Checks various undocumented Type::Tiny methods. The fact that these are tested here should not be construed to mean tht they are any any way a stable, supported part of the Type::Tiny API.";
-		doap-tests:test_script [
-			a nfo:FileDataObject, nfo:SourceCode;
-			nfo:fileName "t/20-unit/Type-Tiny/esoteric.t";
-		];
-	], [
-		a doap-tests:UnitTest;
-		doap-tests:purpose "Tests for Type::Tiny's 'inline_assert' method.";
-		doap-tests:test_script [
-			a nfo:FileDataObject, nfo:SourceCode;
-			nfo:fileName "t/20-unit/Type-Tiny/inline-assert.t";
-		];
-	], [
-		a doap-tests:UnitTest;
-		doap-tests:purpose "Checks Type::Tiny's list processing methods.";
-		doap-tests:test_script [
-			a nfo:FileDataObject, nfo:SourceCode;
-			nfo:fileName "t/20-unit/Type-Tiny/list-methods.t";
-		];
-	], [
-		a doap-tests:UnitTest;
-		doap-tests:purpose "Checks Type::Tiny's 'my_methods' attribute.";
-		doap-tests:test_script [
-			a nfo:FileDataObject, nfo:SourceCode;
-			nfo:fileName "t/20-unit/Type-Tiny/my-methods.t";
-		];
-	], [
-		a doap-tests:UnitTest;
-		doap-tests:purpose "There are loads of tests for parameterization in 'stdlib.t', 'stdlib-overload.t', 'stdlib-strmatch.t', 'stdlib-structures.t', 'syntax.t', 'stdlib-automatic.t', etc. This file includes a handful of other parameterization-related tests that didn't fit anywhere else.";
-		doap-tests:test_script [
-			a nfo:FileDataObject, nfo:SourceCode;
-			nfo:fileName "t/20-unit/Type-Tiny/parameterization.t";
-		];
-	], [
-		a doap-tests:UnitTest;
-		doap-tests:purpose "Checks Type::Tiny refcount stuff.";
-		doap-tests:test_script [
-			a nfo:FileDataObject, nfo:SourceCode;
-			nfo:fileName "t/20-unit/Type-Tiny/refcount.t";
-		];
-	], [
-		a doap-tests:UnitTest;
-		doap-tests:purpose "Test the '->of' and '->where' shortcut methods.";
-		doap-tests:test_script [
-			a nfo:FileDataObject, nfo:SourceCode;
-			nfo:fileName "t/20-unit/Type-Tiny/shortcuts.t";
-		];
-	], [
-		a doap-tests:UnitTest;
-		doap-tests:purpose "Checks Type::Tiny works with the smartmatch operator.";
-		doap-tests:test_script [
-			a nfo:FileDataObject, nfo:SourceCode;
-			nfo:fileName "t/20-unit/Type-Tiny/smartmatch.t";
-		];
-	], [
-		a doap-tests:UnitTest;
-		doap-tests:purpose "Checks that all this Type[Param] syntactic sugar works. In particular, the following three type constraints are expected to be equivalent to each other: use Types::Standard qw( ArrayRef Int Num Str ); use Type::Utils qw( union intersection ); my $type1 = ArrayRef[Int] | ArrayRef[Num & ~Int] | ArrayRef[Str & ~Num]; my $type2 = union [ ArrayRef[Int], ArrayRef[Num & ~Int], ArrayRef[Str & ~Num], ]; my $type3 = union([ ArrayRef->parameterize(Int), ArrayRef->parameterize( intersection([ Num, Int->complementary_type, ]), ), ArrayRef->parameterize( intersection([ Str, Num->complementary_type, ]), ), ]);";
-		doap-tests:test_script [
-			a nfo:FileDataObject, nfo:SourceCode;
-			nfo:fileName "t/20-unit/Type-Tiny/syntax.t";
-		];
-	], [
-		a doap-tests:UnitTest;
-		doap-tests:purpose "Checks Type::Tiny objects can be converted to Moose type constraint objects.";
-		doap-tests:test_script [
-			a nfo:FileDataObject, nfo:SourceCode;
-			nfo:fileName "t/20-unit/Type-Tiny/to-moose.t";
-		];
-	], [
-		a doap-tests:UnitTest;
-		doap-tests:purpose "Checks Type::Tiny objects can be converted to Mouse type constraint objects.";
-		doap-tests:test_script [
-			a nfo:FileDataObject, nfo:SourceCode;
-			nfo:fileName "t/20-unit/Type-Tiny/to-mouse.t";
-		];
-	];
-	nfo:fileName         "lib/Type/Tiny.pm";
-	nfo:programmingLanguage "Perl".
 
 []
 	a                    nfo:FileDataObject, nfo:SourceCode;
@@ -9294,441 +9771,6 @@ _:B70
 	a                    nfo:FileDataObject, nfo:SourceCode;
 	nfo:fileName         "t/30-integration/Validation-Class-Simple/basic.t".
 
-[]
-	a                    nfo:FileDataObject, nfo:SourceCode;
-	rdfs:label           "Devel::TypeTiny::Perl58Compat";
-	doap-tests:unit_test [
-		a doap-tests:UnitTest;
-		doap-tests:purpose "Checks 're::is_regexp()' works.";
-		doap-tests:test_script [
-			a nfo:FileDataObject, nfo:SourceCode;
-			nfo:fileName "t/20-unit/Devel-TypeTiny-Perl58Compat/basic.t";
-		];
-	];
-	nfo:fileName         "lib/Devel/TypeTiny/Perl58Compat.pm";
-	nfo:programmingLanguage "Perl".
-
-[]
-	a                    nfo:FileDataObject, nfo:SourceCode;
-	rdfs:label           "Error::TypeTiny";
-	doap-tests:unit_test [
-		a doap-tests:UnitTest;
-		doap-tests:purpose "Tests for basic Error::TypeTiny functionality.";
-		doap-tests:test_script [
-			a nfo:FileDataObject, nfo:SourceCode;
-			nfo:fileName "t/20-unit/Error-TypeTiny/basic.t";
-		];
-	], [
-		a doap-tests:UnitTest;
-		doap-tests:purpose "Tests that Error::TypeTiny is capable of providing stack traces.";
-		doap-tests:test_script [
-			a nfo:FileDataObject, nfo:SourceCode;
-			nfo:fileName "t/20-unit/Error-TypeTiny/stacktrace.t";
-		];
-	];
-	nfo:fileName         "lib/Error/TypeTiny.pm";
-	nfo:programmingLanguage "Perl".
-
-[]
-	a                    nfo:FileDataObject, nfo:SourceCode;
-	rdfs:label           "Error::TypeTiny::Assertion";
-	doap-tests:unit_test [
-		a doap-tests:UnitTest;
-		doap-tests:purpose "Tests Error::TypeTiny::Assertion.";
-		doap-tests:test_script [
-			a nfo:FileDataObject, nfo:SourceCode;
-			nfo:fileName "t/20-unit/Error-TypeTiny-Assertion/basic.t";
-		];
-	];
-	nfo:fileName         "lib/Error/TypeTiny/Assertion.pm";
-	nfo:programmingLanguage "Perl".
-
-[]
-	a                    nfo:FileDataObject, nfo:SourceCode;
-	rdfs:label           "Error::TypeTiny::Compilation";
-	doap-tests:unit_test [
-		a doap-tests:UnitTest;
-		doap-tests:purpose "Tests for Error::TypeTiny::Compilation, mostly by triggering compilation errors using Eval::TypeTiny.";
-		doap-tests:test_script [
-			a nfo:FileDataObject, nfo:SourceCode;
-			nfo:fileName "t/20-unit/Error-TypeTiny-Compilation/basic.t";
-		];
-	];
-	nfo:fileName         "lib/Error/TypeTiny/Compilation.pm";
-	nfo:programmingLanguage "Perl".
-
-[]
-	a                    nfo:FileDataObject, nfo:SourceCode;
-	rdfs:label           "Error::TypeTiny::WrongNumberOfParameters";
-	doap-tests:unit_test [
-		a doap-tests:UnitTest;
-		doap-tests:purpose "Test Error::TypeTiny::WrongNumberOfParameters.";
-		doap-tests:test_script [
-			a nfo:FileDataObject, nfo:SourceCode;
-			nfo:fileName "t/20-unit/Error-TypeTiny-WrongNumberOfParameters/basic.t";
-		];
-	];
-	nfo:fileName         "lib/Error/TypeTiny/WrongNumberOfParameters.pm";
-	nfo:programmingLanguage "Perl".
-
-[]
-	a                    nfo:FileDataObject, nfo:SourceCode;
-	rdfs:label           "Eval::TypeTiny";
-	doap-tests:unit_test [
-		a doap-tests:UnitTest;
-		doap-tests:purpose "Tests Eval::TypeTiny supports alias=>1 using Devel::LexAlias implementation.";
-		doap-tests:test_script [
-			a nfo:FileDataObject, nfo:SourceCode;
-			nfo:fileName "t/20-unit/Eval-TypeTiny/aliases-devel-lexalias.t";
-		];
-	], [
-		a doap-tests:UnitTest;
-		doap-tests:purpose "Tests Eval::TypeTiny supports alias=>1 using Perl refaliasing.";
-		doap-tests:test_script [
-			a nfo:FileDataObject, nfo:SourceCode;
-			nfo:fileName "t/20-unit/Eval-TypeTiny/aliases-native.t";
-		];
-	], [
-		a doap-tests:UnitTest;
-		doap-tests:purpose "Tests Eval::TypeTiny supports alias=>1 using PadWalker implementation.";
-		doap-tests:test_script [
-			a nfo:FileDataObject, nfo:SourceCode;
-			nfo:fileName "t/20-unit/Eval-TypeTiny/aliases-padwalker.t";
-		];
-	], [
-		a doap-tests:UnitTest;
-		doap-tests:purpose "Tests Eval::TypeTiny supports alias=>1 using 'tie()' implementation.";
-		doap-tests:test_script [
-			a nfo:FileDataObject, nfo:SourceCode;
-			nfo:fileName "t/20-unit/Eval-TypeTiny/aliases-tie.t";
-		];
-	], [
-		a doap-tests:UnitTest;
-		doap-tests:purpose "Tests Eval::TypeTiny.";
-		doap-tests:test_script [
-			a nfo:FileDataObject, nfo:SourceCode;
-			nfo:fileName "t/20-unit/Eval-TypeTiny/basic.t";
-		];
-	], [
-		a doap-tests:UnitTest;
-		doap-tests:purpose "Tests Eval::TypeTiny with experimental lexical subs.";
-		doap-tests:test_script [
-			a nfo:FileDataObject, nfo:SourceCode;
-			nfo:fileName "t/20-unit/Eval-TypeTiny/lexical-subs.t";
-		];
-	];
-	nfo:fileName         "lib/Eval/TypeTiny.pm";
-	nfo:programmingLanguage "Perl".
-
-[]
-	a                    nfo:FileDataObject, nfo:SourceCode;
-	rdfs:label           "Test::TypeTiny";
-	doap-tests:unit_test [
-		a doap-tests:UnitTest;
-		doap-tests:purpose "Tests Test::TypeTiny (which is somewhat important because Test::TypeTiny is itself used for the majority of the type constraint tests). In particular, this tests that everything works when the '$EXTENDED_TESTING' environment variable is false.";
-		doap-tests:test_script [
-			a nfo:FileDataObject, nfo:SourceCode;
-			nfo:fileName "t/20-unit/Test-TypeTiny/basic.t";
-		];
-	], [
-		a doap-tests:UnitTest;
-		doap-tests:purpose "Tests Test::TypeTiny works when the '$EXTENDED_TESTING' environment variable is true. Note that Test::Tester appears to have issues with subtests, so currently 'should_pass' and 'should_fail' are not tested.";
-		doap-tests:test_script [
-			a nfo:FileDataObject, nfo:SourceCode;
-			nfo:fileName "t/20-unit/Test-TypeTiny/extended.t";
-		];
-	], [
-		a doap-tests:UnitTest;
-		doap-tests:purpose "Tests Test::TypeTiny (which is somewhat important because Test::TypeTiny is itself used for the majority of the type constraint tests). In particular, this tests that everything works when the '$EXTENDED_TESTING' environment variable is false.";
-		doap-tests:test_script [
-			a nfo:FileDataObject, nfo:SourceCode;
-			nfo:fileName "t/20-unit/Test-TypeTiny/matchfor.t";
-		];
-	];
-	nfo:fileName         "lib/Test/TypeTiny.pm";
-	nfo:programmingLanguage "Perl".
-
-[]
-	a                    nfo:FileDataObject, nfo:SourceCode;
-	rdfs:label           "Type::Coercion";
-	doap-tests:unit_test [
-		a doap-tests:UnitTest;
-		doap-tests:purpose "Checks Type::Coercion works.";
-		doap-tests:test_script [
-			a nfo:FileDataObject, nfo:SourceCode;
-			nfo:fileName "t/20-unit/Type-Coercion/basic.t";
-		];
-	], [
-		a doap-tests:UnitTest;
-		doap-tests:purpose "Checks various undocumented Type::Coercion methods. The fact that these are tested here should not be construed to mean tht they are any any way a stable, supported part of the Type::Coercion API.";
-		doap-tests:test_script [
-			a nfo:FileDataObject, nfo:SourceCode;
-			nfo:fileName "t/20-unit/Type-Coercion/esoteric.t";
-		];
-	], [
-		a doap-tests:UnitTest;
-		doap-tests:purpose "Type::Coercion objects are mutable, unlike Type::Tiny objects. However, they can be frozen, making them immutable. (And Type::Tiny will freeze them occasionally, if it feels it has to.)";
-		doap-tests:test_script [
-			a nfo:FileDataObject, nfo:SourceCode;
-			nfo:fileName "t/20-unit/Type-Coercion/frozen.t";
-		];
-	], [
-		a doap-tests:UnitTest;
-		doap-tests:purpose "Checks Type::Coercion can be inlined.";
-		doap-tests:test_script [
-			a nfo:FileDataObject, nfo:SourceCode;
-			nfo:fileName "t/20-unit/Type-Coercion/inlining.t";
-		];
-	], [
-		a doap-tests:UnitTest;
-		doap-tests:purpose "Checks the 'Split' and 'Join' parameterized coercions from Types::Standard.";
-		doap-tests:test_script [
-			a nfo:FileDataObject, nfo:SourceCode;
-			nfo:fileName "t/20-unit/Type-Coercion/parameterized.t";
-		];
-	], [
-		a doap-tests:UnitTest;
-		doap-tests:purpose "Checks Type::Coercion overload of '~~'.";
-		doap-tests:test_script [
-			a nfo:FileDataObject, nfo:SourceCode;
-			nfo:fileName "t/20-unit/Type-Coercion/smartmatch.t";
-		];
-	], [
-		a doap-tests:UnitTest;
-		doap-tests:purpose "Checks proper Type::Coercion objects are automatically created by the Type::Tiny constructor.";
-		doap-tests:test_script [
-			a nfo:FileDataObject, nfo:SourceCode;
-			nfo:fileName "t/20-unit/Type-Coercion/typetiny-constructor.t";
-		];
-	];
-	nfo:fileName         "lib/Type/Coercion.pm";
-	nfo:programmingLanguage "Perl".
-
-[]
-	a                    nfo:FileDataObject, nfo:SourceCode;
-	rdfs:label           "Type::Coercion::FromMoose";
-	doap-tests:unit_test [
-		a doap-tests:UnitTest;
-		doap-tests:purpose "Checks the types adopted from Moose still have a coercion which works.";
-		doap-tests:test_script [
-			a nfo:FileDataObject, nfo:SourceCode;
-			nfo:fileName "t/20-unit/Type-Coercion-FromMoose/basic.t";
-		];
-	], [
-		a doap-tests:UnitTest;
-		doap-tests:purpose "Checks crazy Type::Coercion::FromMoose errors.";
-		doap-tests:test_script [
-			a nfo:FileDataObject, nfo:SourceCode;
-			nfo:fileName "t/20-unit/Type-Coercion-FromMoose/errors.t";
-		];
-	];
-	nfo:fileName         "lib/Type/Coercion/FromMoose.pm";
-	nfo:programmingLanguage "Perl".
-
-[]
-	a                    nfo:FileDataObject, nfo:SourceCode;
-	rdfs:label           "Type::Coercion::Union";
-	doap-tests:unit_test [
-		a doap-tests:UnitTest;
-		doap-tests:purpose "Checks Type::Coercion::Union works.";
-		doap-tests:test_script [
-			a nfo:FileDataObject, nfo:SourceCode;
-			nfo:fileName "t/20-unit/Type-Coercion-Union/basic.t";
-		];
-	];
-	nfo:fileName         "lib/Type/Coercion/Union.pm";
-	nfo:programmingLanguage "Perl".
-
-[]
-	a                    nfo:FileDataObject, nfo:SourceCode;
-	rdfs:label           "Type::Library";
-	doap-tests:unit_test [
-		a doap-tests:UnitTest;
-		doap-tests:purpose "Checks that the assertion functions exported by a type library work as expected.";
-		doap-tests:test_script [
-			a nfo:FileDataObject, nfo:SourceCode;
-			nfo:fileName "t/20-unit/Type-Library/assert.t";
-		];
-	], [
-		a doap-tests:UnitTest;
-		doap-tests:purpose "Tests that placeholder objects generated by '-declare' work.";
-		doap-tests:test_script [
-			a nfo:FileDataObject, nfo:SourceCode;
-			nfo:fileName "t/20-unit/Type-Library/declared-types.t";
-		];
-	], [
-		a doap-tests:UnitTest;
-		doap-tests:purpose "Checks Type::Library warns about deprecated types.";
-		doap-tests:test_script [
-			a nfo:FileDataObject, nfo:SourceCode;
-			nfo:fileName "t/20-unit/Type-Library/deprecation.t";
-		];
-	], [
-		a doap-tests:UnitTest;
-		doap-tests:purpose "Tests errors thrown by Type::Library.";
-		doap-tests:test_script [
-			a nfo:FileDataObject, nfo:SourceCode;
-			nfo:fileName "t/20-unit/Type-Library/errors.t";
-		];
-	], [
-		a doap-tests:UnitTest;
-		doap-tests:purpose "Checks 'of' and 'where' import options works.";
-		doap-tests:test_script [
-			a nfo:FileDataObject, nfo:SourceCode;
-			nfo:fileName "t/20-unit/Type-Library/import-params.t";
-		];
-	], [
-		a doap-tests:UnitTest;
-		doap-tests:purpose "Checks that it's possible to extend existing type libraries.";
-		doap-tests:test_script [
-			a nfo:FileDataObject, nfo:SourceCode;
-			nfo:fileName "t/20-unit/Type-Library/inheritance.t";
-		];
-	], [
-		a doap-tests:UnitTest;
-		doap-tests:purpose "Checks that the check functions exported by a type library work as expected.";
-		doap-tests:test_script [
-			a nfo:FileDataObject, nfo:SourceCode;
-			nfo:fileName "t/20-unit/Type-Library/is.t";
-		];
-	], [
-		a doap-tests:UnitTest;
-		doap-tests:purpose "Tests that types may be defined recursively.";
-		doap-tests:test_script [
-			a nfo:FileDataObject, nfo:SourceCode;
-			nfo:fileName "t/20-unit/Type-Library/recursive-type-definitions.t";
-		];
-	], [
-		a doap-tests:UnitTest;
-		doap-tests:purpose "Checks that the coercion functions exported by a type library work as expected.";
-		doap-tests:test_script [
-			a nfo:FileDataObject, nfo:SourceCode;
-			nfo:fileName "t/20-unit/Type-Library/to.t";
-		];
-	], [
-		a doap-tests:UnitTest;
-		doap-tests:purpose "Checks that the type functions exported by a type library work as expected.";
-		doap-tests:test_script [
-			a nfo:FileDataObject, nfo:SourceCode;
-			nfo:fileName "t/20-unit/Type-Library/types.t";
-		];
-	];
-	nfo:fileName         "lib/Type/Library.pm";
-	nfo:programmingLanguage "Perl".
-
-[]
-	a                    nfo:FileDataObject, nfo:SourceCode;
-	rdfs:label           "Type::Params";
-	doap-tests:unit_test [
-		a doap-tests:UnitTest;
-		doap-tests:purpose "Check that people doing silly things with Test::Params get";
-		doap-tests:test_script [
-			a nfo:FileDataObject, nfo:SourceCode;
-			nfo:fileName "t/20-unit/Type-Params/badsigs.t";
-		];
-	], [
-		a doap-tests:UnitTest;
-		doap-tests:purpose "Test Type::Params' interaction with Carp: use Type::Params compile => { confess => 1 };";
-		doap-tests:test_script [
-			a nfo:FileDataObject, nfo:SourceCode;
-			nfo:fileName "t/20-unit/Type-Params/carping.t";
-		];
-	], [
-		a doap-tests:UnitTest;
-		doap-tests:purpose "Test Type::Params usage of types with coercions.";
-		doap-tests:test_script [
-			a nfo:FileDataObject, nfo:SourceCode;
-			nfo:fileName "t/20-unit/Type-Params/coerce.t";
-		];
-	], [
-		a doap-tests:UnitTest;
-		doap-tests:purpose "Test Type::Params' brand spanking new 'compile_named' function.";
-		doap-tests:test_script [
-			a nfo:FileDataObject, nfo:SourceCode;
-			nfo:fileName "t/20-unit/Type-Params/compile-named-bless.t";
-		];
-	], [
-		a doap-tests:UnitTest;
-		doap-tests:purpose "Test Type::Params 'compile_named_oo' function.";
-		doap-tests:test_script [
-			a nfo:FileDataObject, nfo:SourceCode;
-			nfo:fileName "t/20-unit/Type-Params/compile-named-oo.t";
-		];
-	], [
-		a doap-tests:UnitTest;
-		doap-tests:purpose "Test Type::Params' brand spanking new 'compile_named' function.";
-		doap-tests:test_script [
-			a nfo:FileDataObject, nfo:SourceCode;
-			nfo:fileName "t/20-unit/Type-Params/compile-named.t";
-		];
-	], [
-		a doap-tests:UnitTest;
-		doap-tests:purpose "Test 'compile' and 'compile_named' support defaults for parameters.";
-		doap-tests:test_script [
-			a nfo:FileDataObject, nfo:SourceCode;
-			nfo:fileName "t/20-unit/Type-Params/defaults.t";
-		];
-	], [
-		a doap-tests:UnitTest;
-		doap-tests:purpose "Test Type::Params' brand spanking new 'compile_named' function.";
-		doap-tests:test_script [
-			a nfo:FileDataObject, nfo:SourceCode;
-			nfo:fileName "t/20-unit/Type-Params/hashorder.t";
-		];
-	], [
-		a doap-tests:UnitTest;
-		doap-tests:purpose "Test Type::Params usage for method calls.";
-		doap-tests:test_script [
-			a nfo:FileDataObject, nfo:SourceCode;
-			nfo:fileName "t/20-unit/Type-Params/methods.t";
-		];
-	], [
-		a doap-tests:UnitTest;
-		doap-tests:purpose "Test Type::Params usage with mix of positional and named parameters.";
-		doap-tests:test_script [
-			a nfo:FileDataObject, nfo:SourceCode;
-			nfo:fileName "t/20-unit/Type-Params/mixednamed.t";
-		];
-	], [
-		a doap-tests:UnitTest;
-		doap-tests:purpose "Make sure that custom 'multisig()' messages work.";
-		doap-tests:test_script _:B17;
-	], [
-		a doap-tests:UnitTest;
-		doap-tests:purpose "Test Type::Params 'multisig' function.";
-		doap-tests:test_script _:B18;
-	], [
-		a doap-tests:UnitTest;
-		doap-tests:purpose "Test Type::Params usage with named parameters and 'named_to_list'.";
-		doap-tests:test_script _:B19;
-	], [
-		a doap-tests:UnitTest;
-		doap-tests:purpose "Test Type::Params usage with named parameters.";
-		doap-tests:test_script _:B20;
-	], [
-		a doap-tests:UnitTest;
-		doap-tests:purpose "Test Type::Params with type constraints that cannot be inlined.";
-		doap-tests:test_script _:B21;
-	], [
-		a doap-tests:UnitTest;
-		doap-tests:purpose "Test Type::Params usage with optional parameters.";
-		doap-tests:test_script _:B22;
-	], [
-		a doap-tests:UnitTest;
-		doap-tests:purpose "Test Type::Params positional parameters, a la the example in the documentation: sub nth_root { state $check = compile( Num, Num ); my ($x, $n) = $check->(@_); return $x ** (1 / $n); }";
-		doap-tests:test_script _:B23;
-	], [
-		a doap-tests:UnitTest;
-		doap-tests:purpose "Test Type::Params usage with slurpy parameters.";
-		doap-tests:test_script _:B24;
-	], [
-		a doap-tests:UnitTest;
-		doap-tests:purpose "Test 'wrap_subs' and 'wrap_methods' from Type::Params.";
-		doap-tests:test_script _:B25;
-	];
-	nfo:fileName         "lib/Type/Params.pm";
-	nfo:programmingLanguage "Perl".
-
 _:B71
 	a                    nfo:FileDataObject, nfo:SourceCode;
 	nfo:fileName         "t/30-integration/match-simple/basic.t".
@@ -9752,12 +9794,12 @@ _:B75
 []
 	a                    doap-tests:Test;
 	doap-tests:purpose   "Print some standard diagnostics before beginning testing.";
-	doap-tests:test_script _:B11.
+	doap-tests:test_script _:B20.
 
 []
 	a                    doap-tests:Test;
 	doap-tests:purpose   "Test that Type::Tiny, Type::Library, etc compile.";
-	doap-tests:test_script _:B12.
+	doap-tests:test_script _:B21.
 
 []
 	a                    doap-tests:IntegrationTest;
@@ -10012,20 +10054,20 @@ _:B75
 []
 	a                    doap-tests:Test;
 	doap-tests:purpose   "Test that Type::Tiny and Type::Coercion provide a Moose/Mouse-compatible API.";
-	doap-tests:test_script _:B13.
+	doap-tests:test_script _:B22.
 
 []
 	a                    doap-tests:Test;
 	doap-tests:purpose   "Check for memory leaks. These tests are not comprehensive; chances are that there are still memory leaks lurking somewhere in Type::Tiny. If you have any concrete suggestions for things to test, or fixes for identified memory leaks, please file a bug report. https://rt.cpan.org/Ticket/Create.html?Queue=Type-Tiny.";
-	doap-tests:test_script _:B14.
+	doap-tests:test_script _:B23.
 
 []
 	a                    doap-tests:Test;
 	doap-tests:purpose   "An example of parameterized types from Type::Tiny::Manual::Libraries. The example uses Type::Tiny, Type::Library, and Type::Coercion, and makes use of inlining and parameterization, so is a good canary to check everything is working.";
-	doap-tests:test_script _:B15.
+	doap-tests:test_script _:B24.
 
 []
 	a                    doap-tests:Test;
 	doap-tests:purpose   "Type constraint tests pilfered from the Moose test suite.";
-	doap-tests:test_script _:B16.
+	doap-tests:test_script _:B25.
 

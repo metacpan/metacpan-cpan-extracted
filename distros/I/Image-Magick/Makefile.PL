@@ -70,7 +70,7 @@ sub AutodetectWin32gcc {
       push @i, catfile($dirpath,'..','..','include','ImageMagick');
       push @i, catfile($dirpath,'..','..','..','include');
       push @i, catfile($dirpath,'..','..','..','include','ImageMagick');
-      foreach (@i) { push @incdir, $_ if (-e "$_/magick/MagickCore.h") };
+      foreach (@i) { push @incdir, $_ if (-e "$_/MagickCore/MagickCore.h") };
     }
   };
 
@@ -162,7 +162,7 @@ foreach my $delegate (@tested_delegates) {
 
 # defaults for LIBS & INC & CCFLAGS params that we later pass to Writemakefile
 my $INC_magick = '-I/usr/local/include/ImageMagick-7 -DMAGICKCORE_HDRI_ENABLE=1 -DMAGICKCORE_QUANTUM_DEPTH=16 -I/usr/include/libxml2 -I"' . $Config{'usrinc'} . '/ImageMagick-7"';
-my $LIBS_magick = '-L/usr/local/lib -lMagickCore-7.Q16HDRI -lperl -lm';
+my $LIBS_magick = '-L/usr/local/lib -lMagickCore-7.Q16HDRI -lm -L' . $Config{'archlib'} . '/CORE';
 my $CCFLAGS_magick = "$Config{'ccflags'} -I/usr/include/freetype2 -g -O2 -Wall -pthread -DMAGICKCORE_HDRI_ENABLE=1 -DMAGICKCORE_QUANTUM_DEPTH=16";
 my $LDFLAGS_magick   = "-L/usr/local/lib -lMagickCore-7.Q16HDRI $Config{'ldflags'} ";
 my $LDDLFLAGS_magick = "-L/usr/local/lib -lMagickCore-7.Q16HDRI $Config{'lddlflags'} ";

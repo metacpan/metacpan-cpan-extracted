@@ -99,26 +99,10 @@ sub PDL::c$function {
 EOF
 }
 
-#pp_bless('PDL::Complex');
 pp_addpm({At=>'Top'},<<'EOD');
 use strict;
-use PDL::Complex;
 use PDL::LinearAlgebra::Real;
 
-{ 
-  package # hide from CPAN
-    PDL;
-	my $warningFlag;
-  	BEGIN{
-  		$warningFlag = $^W;
-		$^W = 0;
-	}
-	use overload (
-		'x'     =>  sub {UNIVERSAL::isa($_[1],'PDL::Complex') ? PDL::cmmult(PDL::Complex::r2C($_[0]), $_[1]):
-								PDL::mmult($_[0], $_[1]);
-				});
-	BEGIN{ $^W = $warningFlag ; }	
-}
 { 
   package # hide from CPAN
     PDL::Complex;

@@ -4,17 +4,17 @@ use warnings;
 use ExtUtils::MakeMaker;
 
 my %dependencies = (
-	'Perlmazing' => 1,
+    'Perlmazing' => 1,
 );
 
 my %params = (
-	NAME             => 'Attribute::Handlers::Clean',
+    NAME             => 'Attribute::Handlers::Clean',
     AUTHOR           => q{Francisco Zarabozo <zarabozo@cpan.org>},
     VERSION_FROM     => 'lib/Attribute/Handlers/Clean.pm',
     ABSTRACT_FROM    => 'lib/Attribute/Handlers/Clean.pm',
     LICENSE          => 'perl_5',
     PL_FILES         => {},
-    MIN_PERL_VERSION => 5.006,
+    MIN_PERL_VERSION => 5.010,
     CONFIGURE_REQUIRES => {
         %dependencies,
     },
@@ -28,19 +28,19 @@ my %params = (
         %dependencies,
     },
     dist			=> {
-		COMPRESS	=> 'gzip -9f',
-		SUFFIX		=> 'gz',
-	},
+        COMPRESS	=> 'gzip -9f',
+        SUFFIX		=> 'gz',
+    },
     clean			=> {
-		FILES => 'Attribute-Handlers-Clean-*',
-	},
-	META_MERGE		=> {
-		no_index	=> {
-			directory => [
-				"demo",
-			],
-		},
-	},
+        FILES => 'Attribute-Handlers-Clean-*',
+    },
+    META_MERGE		=> {
+        no_index	=> {
+            directory => [
+                "demo",
+            ],
+        },
+    },
 );
 
 delete $params{TEST_REQUIRES} unless ExtUtils::MakeMaker->VERSION >= 6.64;

@@ -21,7 +21,7 @@ SYNOPSIS
             } elsif ($cgi->response_status_code == 400) {
               $cgi->render(json => {error => 'Bad request'});
             } else {
-              $cgi->render(json => {error => 'Internal server error'});
+              $cgi->set_response_status(500)->render(json => {error => 'Internal server error'});
             }
           }
         });
@@ -101,12 +101,13 @@ USAGE
     CGI::Tiny's interface is a regular function called cgi exported by
     default.
 
+      use CGI::Tiny;
       cgi {
         my $cgi = $_;
         # set up error handling on $cgi
         # inspect request data via $cgi
         # set response headers if needed via $cgi
-        # render response data with $cgi->render
+        # render response data with $cgi->render or $cgi->render_chunk
       };
 
     The code block is immediately run with $_ set to a CGI::Tiny object,
@@ -117,7 +118,9 @@ USAGE
     not render a response, it will run the handler set by
     "set_error_handler" if any, or by default emit the error as a warning
     and (if nothing has been rendered yet) render a 500 Internal Server
-    Error.
+    Error. The default server error will also be rendered if the process
+    ends abnormally between importing from CGI::Tiny and the start of the
+    cgi block.
 
     Note that the cgi block's current implementation as a regular exported
     subroutine is an implementation detail, and future implementations
@@ -184,7 +187,7 @@ EXTENDING
         # from templates/
         $cgi->render(html => $tx->render('index.tx', {foo => $foo}));
     
-        # from __DATA__
+        # or from __DATA__
         my $template = get_data_section 'index.tx';
         $cgi->render(html => $tx->render_string($template, {foo => $foo}));
       };
@@ -214,7 +217,7 @@ EXTENDING
         my $template_path = curfile->sibling('templates', 'index.html.ep');
         $cgi->render(html => $mt->render_file($template_path, {foo => $foo}));
     
-        # from __DATA__
+        # or from __DATA__
         my $template = data_section __PACKAGE__, 'index.html.ep';
         $cgi->render(html => $mt->render($template, {foo => $foo}));
       };
@@ -269,6 +272,54 @@ EXTENDING
         my $mime = MIME::Types->new->mimeTypeOf($basename);
         $cgi->set_response_type($mime->type) if defined $mime;
         $cgi->set_response_disposition(attachment => $basename)->render(file => $filepath);
+      };
+
+ Logging
+
+    CGI scripts can usually log errors directly to STDERR with the warn
+    function, and rely on the CGI server to log them to a file, but you
+    will likely need to encode errors to UTF-8 if you expect them to
+    contain non-ASCII text.
+
+    Minimal loggers like Log::Any can also be used to redirect errors and
+    warnings to a file or other logging mechanism specific to the CGI
+    script, encode them to bytes automatically, and also log debugging
+    information when the log level is set to debug. Just make sure the CGI
+    server has permission to create and write to the logging target.
+
+      #!/usr/bin/perl
+      use strict;
+      use warnings;
+      use utf8;
+      use CGI::Tiny;
+      use Log::Any;
+      use Log::Any::Adapter
+        {category => 'cgi-script'}, # only log our category here
+        File => '/path/to/log/file.log',
+        binmode => ':encoding(UTF-8)',
+        log_level => $ENV{MY_CGI_LOG_LEVEL} || 'info';
+    
+      my $log = Log::Any->get_logger(category => 'cgi-script');
+    
+      local $SIG{__WARN__} = sub {
+        my ($warning) = @_;
+        chomp $warning;
+        $log->warn($warning);
+      };
+    
+      cgi {
+        my $cgi = $_;
+    
+        $cgi->set_error_handler(sub {
+          my ($cgi, $error) = @_;
+          chomp $error;
+          $log->error($error);
+        });
+    
+        # only logged if MY_CGI_LOG_LEVEL=debug set in CGI server environment
+        $log->debugf('Method: %s, Path: %s, Query: %s', $cgi->method, $cgi->path, $cgi->query);
+    
+        # handle the actual request
       };
 
  Routing
@@ -334,16 +385,15 @@ METHODS
         ...
       });
 
-    Sets an error handler to run in the event of an exception. If the
-    response status has not been set by "set_response_status" or rendering
-    headers, it will default to 500 when this handler is called.
+    Sets an error handler to run in the event of an exception or if the
+    script ends without rendering a response.
 
     The error value can be any exception thrown by Perl or user code. It
     should generally not be included in any response rendered to the
     client, but instead warned or logged.
 
     Exceptions may occur before or after response headers have been
-    rendered, so error handlers should render some response if
+    rendered, so error handlers may choose to render some response if
     "headers_rendered" is false. "response_status_code" may be set by some
     errors and can be inspected if headers have not been rendered yet.
 
@@ -403,7 +453,7 @@ METHODS
     STDOUT. The handle will have binmode applied before printing to remove
     any translation layers.
 
- Request
+ Request Environment
 
   auth_type
 
@@ -473,6 +523,8 @@ METHODS
       my $query  = $cgi->query;  # QUERY_STRING
 
     Short aliases for a few request meta-variables.
+
+ Request Parsing
 
   query_params
 
@@ -625,6 +677,9 @@ METHODS
     reference. Most applications should retrieve multipart form data
     through "body_params" and "uploads" (or related accessors) instead.
 
+    Note that this will read the text form fields into memory, so make sure
+    the "set_request_body_limit" can fit well within the available memory.
+
     Body parts are represented as hash references containing:
 
     headers
@@ -727,27 +782,15 @@ METHODS
 
   set_nph
 
+      $cgi = $cgi->set_nph;
       $cgi = $cgi->set_nph(1);
 
-    If set to a true value before rendering response headers, CGI::Tiny
-    will act as a NPH (Non-Parsed Header)
+    If set to a true value or called without a value before rendering
+    response headers, CGI::Tiny will act as a NPH (Non-Parsed Header)
     <https://tools.ietf.org/html/rfc3875#section-5> script and render full
     HTTP response headers. This may be required for some CGI servers, or
     enable unbuffered responses or HTTP extensions not supported by the CGI
     server.
-
-    No effect after response headers have been rendered.
-
-  set_response_fixed_length
-
-      $cgi = $cgi->set_response_fixed_length(1);
-
-    If set to a true value before rendering response headers, a
-    Content-Length header will be set to the size of the encoded content on
-    the first call to "render", unless it streams the response data from a
-    handle and thus can't predetermine the content size. "render" cannot be
-    used to provide additional response data if a Content-Length header was
-    rendered.
 
     No effect after response headers have been rendered.
 
@@ -756,9 +799,9 @@ METHODS
       $cgi = $cgi->set_response_body_buffer(128*1024);
 
     Sets the buffer size (number of bytes to read at once) for streaming a
-    file or handle response body with "render". Defaults to the value of
-    the CGI_TINY_RESPONSE_BODY_BUFFER environment variable or 131072 (128
-    KiB). A value of 0 will use the default value.
+    file or handle response body with "render" or "render_chunk". Defaults
+    to the value of the CGI_TINY_RESPONSE_BODY_BUFFER environment variable
+    or 131072 (128 KiB). A value of 0 will use the default value.
 
   set_response_status
 
@@ -794,8 +837,8 @@ METHODS
       $cgi = $cgi->set_response_type('application/xml');
 
     Sets the response Content-Type header, to override autodetection in
-    "render". undef will remove the override. No effect after response
-    headers have been rendered.
+    "render" or "render_chunk". undef will remove the override. No effect
+    after response headers have been rendered.
 
   set_response_charset
 
@@ -914,8 +957,8 @@ METHODS
 
       my $bool = $cgi->headers_rendered;
 
-    Returns true if response headers have been rendered, such as by the
-    first call to "render".
+    Returns true if response headers have been rendered, such as by
+    "render" or the first call to "render_chunk".
 
   render
 
@@ -925,20 +968,70 @@ METHODS
       $cgi = $cgi->render(text     => $text);
       $cgi = $cgi->render(data     => $bytes);
       $cgi = $cgi->render(file     => $filepath);
-      $cgi = $cgi->render(handle   => $filehandle);
       $cgi = $cgi->render(json     => $ref);
       $cgi = $cgi->render(redirect => $url);
 
-    Renders response data of a type indicated by the first parameter, if
-    any. The first time it is called will render response headers and set
-    "headers_rendered". It may be called additional times with more
-    response data, unless a Content-Length header was generated due to
-    "set_response_fixed_length".
+    Renders response headers (setting "headers_rendered") and then
+    fixed-length response data of a type indicated by the first parameter,
+    if any. A Content-Length header will be set to the length of the
+    encoded response content, and further calls to render or "render_chunk"
+    will throw an exception.
+
+    The Content-Type response header will be set according to
+    "set_response_type", or autodetected depending on the data type passed,
+    or to application/octet-stream if there is no more appropriate value.
+
+    The Date response header will be set to the current time as an HTTP
+    date string if not set manually.
+
+    html, xml, or text data is expected to be decoded Unicode characters,
+    and will be encoded according to "set_response_charset" (UTF-8 by
+    default). Unicode::UTF8 will be used for efficient UTF-8 encoding if
+    available.
+
+    data or file will render bytes from a string or local file path
+    respectively. A handle, or a file whose size cannot be determined
+    accurately from the filesystem, must be rendered using "render_chunk"
+    since its Content-Length cannot be determined beforehand.
+
+    json data structures will be encoded to JSON and UTF-8.
+
+    redirect will set a Location header if response headers have not yet
+    been rendered, and will set a response status of 302 unless a different
+    status has been set with "set_response_status". It will set a
+    Content-Length of 0, and it will not set a Content-Type response
+    header.
+
+  render_chunk
+
+      $cgi = $cgi->render_chunk;
+      $cgi = $cgi->render_chunk(html   => $html);
+      $cgi = $cgi->render_chunk(xml    => $xml);
+      $cgi = $cgi->render_chunk(text   => $text);
+      $cgi = $cgi->render_chunk(data   => $bytes);
+      $cgi = $cgi->render_chunk(file   => $filepath);
+      $cgi = $cgi->render_chunk(handle => $filehandle);
+      $cgi = $cgi->render_chunk(json   => $ref);
+
+    Renders response headers (setting "headers_rendered") the first time it
+    is called, and then chunked response data of a type indicated by the
+    first parameter, if any. No Content-Length header will be set, and
+    render_chunk may be called additional times with more response data.
+
+    render_chunk does not impose a chunked response, it simply does not
+    generate a Content-Length header. For content where the total encoded
+    content length is known in advance but the content can't be passed to a
+    single "render" call, a Content-Length header can be set manually with
+    "add_response_header", and then render_chunk may be used to render each
+    part.
 
     The Content-Type response header will be set according to
     "set_response_type", or autodetected depending on the data type passed
-    in the first call to render, or to application/octet-stream if there is
-    no more appropriate value.
+    in the first call to render_chunk, or to application/octet-stream if
+    there is no more appropriate value.
+
+    The Date response header will be set to the current time as an HTTP
+    date string if not set manually.
 
     html, xml, or text data is expected to be decoded Unicode characters,
     and will be encoded according to "set_response_charset" (UTF-8 by
@@ -952,14 +1045,7 @@ METHODS
 
     json data structures will be encoded to JSON and UTF-8.
 
-    redirect will set a Location header if response headers have not yet
-    been rendered, and will set a response status of 302 if none has been
-    set by "set_response_status". It will set a Content-Length of 0, and it
-    will not set a Content-Type response header. If response headers have
-    already been rendered a warning will be emitted.
-
-    The Date response header will be set to the current time as an HTTP
-    date string if not set manually.
+    redirect responses must be rendered with "render".
 
 FUNCTIONS
 
@@ -1016,11 +1102,11 @@ COMPARISON TO CGI.PM
     module fills a similar need but has a number of interface differences
     to be aware of.
 
-      * There is no global CGI::Tiny object; the object is constructed for
-      the scope of the cgi block, only reads request data from the
-      environment once it is accessed, and once the block completes
-      (normally or abnormally), it ensures that a valid response is
-      rendered to avoid gateway errors.
+      * There is no CGI::Tiny object constructor; the object is accessible
+      within the cgi block, only reads request data from the environment
+      once it is accessed, and ensures that a valid response is rendered to
+      avoid gateway errors even in the event of an exception or premature
+      exit.
 
       * Instead of global variables like $CGI::POST_MAX, global behavior
       settings are applied to the CGI::Tiny object inside the cgi block.
@@ -1044,25 +1130,25 @@ COMPARISON TO CGI.PM
       accessors.
 
       * CGI::Tiny decodes request query and body parameters to Unicode
-      characters automatically, and "render" provides methods to encode
-      response data from Unicode characters to UTF-8 by default.
+      characters automatically, and "render"/"render_chunk" provide methods
+      to encode response data from Unicode characters to UTF-8 by default.
 
       * In CGI.pm, response headers must be printed manually before any
       response data is printed to avoid malformed responses. In CGI::Tiny,
-      the "render" method is used to print response data, and automatically
-      prints response headers the first time it is called. redirect
-      responses are also handled by "render".
+      the "render" or "render_chunk" methods are used to print response
+      data, and automatically print response headers when first called.
+      redirect responses are also handled by "render".
 
       * In CGI::Tiny, a custom response status is set by calling
-      "set_response_status" before the first "render", which only requires
-      the status code and will add the appropriate human-readable status
-      message itself.
+      "set_response_status" before the first "render" or "render_chunk",
+      which only requires the status code and will add the appropriate
+      human-readable status message itself.
 
       * Response setters are distinct methods from request accessors in
       CGI::Tiny. "content_type", "header", and "cookie" are used to access
       request data, and "set_response_type", "add_response_header", and
       "add_response_cookie" are used to set response headers for the
-      pending response before the first call to "render".
+      pending response before the first call to "render" or "render_chunk".
 
       * CGI::Tiny does not provide any HTML generation helpers, as this
       functionality is much better implemented by other robust

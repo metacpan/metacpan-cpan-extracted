@@ -92,7 +92,9 @@ KEYWORDS
     to make the block yield a false value. If no such item exists, returns
     true.
 
- none =head2 notall
+ none
+
+ notall
 
        $bool = none { CODE } LIST
        $bool = notall { CODE } LISt

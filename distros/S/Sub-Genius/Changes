@@ -1,0 +1,35 @@
+Changes for Sub::Genius
+
+0.01         2021-04-22 14:30:51-04:00 America/New_York
+             - initial TRIAL release
+
+0.02         2021-04-22 14:30:51-04:01 America/New_York
+             - updated old POD with intended POD
+
+0.03         2021-04-22 14:30:51-04:04 America/New_York
+             - fixed minor attribution error in POD
+
+0.04         2021-04-22 14:30:51-04:04 America/New_York
+             - added install of stubby using dzil's [ExecDir]
+             - fixed minor attribution error in POD
+
+0.05         2021-04-22 14:30:51-04:05 America/New_York
+             - cleaning up POD
+             - fixed -TRIAL marker
+             - distributing PRE debug too, "fash" from FLAT
+             - added ./examples directory, 2 "japh" examples
+
+0.06         2021-04-22 14:30:51-04:06 America/New_York
+             - fixed fash POD
+             - tweaked distro tarball
+
+0.07         2021-04-25 14:30:51-04:07 America/New_York
+             - 'pre' (FLAT term) is now called 'preplan', this makes it
+                less implementation dependent
+             - added PRE clensing:
+             -   auto-bracketizes all 'words', makes it unnecessary to
+                 to put space delimited symbols of any length in brackets
+             -   accepts and strips comments and empty line
+
+0.08         2021-04-25 14:30:51-05:08 America/New_York
+             - cleaned up and reorganized documentation

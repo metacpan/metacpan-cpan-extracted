@@ -14,13 +14,12 @@ WriteMakefile (
     AUTHOR => 'Ben Bullock <bkb@cpan.org>',
     LICENSE => 'perl',
     PREREQ_PM => {
-	'Cairo' => '0',
+	# These are in Perl already.
 	'Carp' => '0',
-	'ExtUtils::ParseXS::Utilities' => '0',
-	'Graphics::ColorNames::WWW' => '1.14',
-	# Found lots of bugs in this so version needs to be this high.
-	'Image::SVG::Path' => '0.24',
 	'Math::Trig' => '0',
+	# These may need to be installed by the user.
+	'Cairo' => '0',
+	'Image::SVG::Path' => '0.36',
 	'XML::Parser' => '0',
     },
     EXE_FILES => [

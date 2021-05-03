@@ -6,6 +6,7 @@ requires "JSON::MaybeXS" => "0";
 requires "Log::Any::Adapter" => "1.050";
 requires "Path::Tiny" => "0";
 requires "Time::Moment" => "0";
+requires "parent" => "0";
 requires "perl" => "5.010";
 requires "strictures" => "2.000006";
 

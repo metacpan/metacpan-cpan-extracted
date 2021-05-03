@@ -3,26 +3,55 @@ abstract: 'Alien package for the LIBSVM library'
 author:
   - 'Zakariyya Mughal <zmughal@cpan.org>'
 build_requires:
+  Alien::Build: '0.32'
+  Alien::Build::MM: '0.32'
+  Capture::Tiny: '0'
+  ExtUtils::MakeMaker: '6.52'
+  Path::Tiny: '0'
   Test::More: '0'
+  Test::Most: '0'
+  perl: '5.013002'
 configure_requires:
-  Alien::Base::ModuleBuild: '0.002'
-  File::ShareDir: '1.03'
-  File::chmod: '0'
-dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150005'
+  Alien::Build: '0.32'
+  Alien::Build::MM: '0.32'
+  ExtUtils::MakeMaker: '6.52'
+  perl: '5.013002'
+dynamic_config: 1
+generated_by: 'Dist::Zilla version 6.017, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: Alien-LIBSVM
 requires:
-  Alien::Base: '0.002'
-  File::ShareDir: '1.03'
+  Alien::Base: '0.038'
   parent: '0'
+  perl: '5.013002'
   strict: '0'
   warnings: '0'
 resources:
   homepage: https://github.com/EntropyOrg/p5-Alien-LIBSVM
   repository: https://github.com/EntropyOrg/p5-Alien-LIBSVM.git
-version: '0.003'
-x_serialization_backend: 'YAML::Tiny version 1.69'
+version: '0.004'
+x_alienfile:
+  generated_by: 'Dist::Zilla::Plugin::AlienBuild version 0.31'
+  requires:
+    share:
+      Alien::gmake: '0.14'
+      Archive::Tar: '0'
+      Config: '0'
+      File::chmod: '0'
+      HTTP::Tiny: '0.044'
+      IO::Socket::SSL: '1.56'
+      IO::Zlib: '0'
+      Mojo::DOM: '0'
+      Mojolicious: '7.00'
+      Net::SSLeay: '1.49'
+      Path::Tiny: '0'
+      Sort::Versions: '0'
+      URI: '0'
+      URI::Escape: '0'
+    system: {}
+x_generated_by_perl: v5.26.1
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

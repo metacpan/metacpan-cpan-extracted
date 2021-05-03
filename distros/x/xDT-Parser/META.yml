@@ -28,5 +28,5 @@ resources:
   bugtracker: https://github.com/ChristophB/perl-xdt-parser/issues
   license: https://opensource.org/licenses/MIT
   repository: https://github.com/ChristophB/perl-xdt-parser.git
-version: '1.04'
+version: '1.05'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

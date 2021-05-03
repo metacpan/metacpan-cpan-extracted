@@ -14,7 +14,7 @@ The distribution is managed with
 [Dist::Zilla](https://metacpan.org/release/Dist-Zilla).
 
 However, you can still compile and test the code with the
-{{ -e 'Makefile.PL' ? q{`MakeFile.PL`} : -e 'Build.PL' ? q{`Build.PL`} : 'ERROR: no Makefile.PL or Build.PL!!!' }}
+{{ -e 'Makefile.PL' ? q{`Makefile.PL`} : -e 'Build.PL' ? q{`Build.PL`} : 'ERROR: no Makefile.PL or Build.PL!!!' }}
 in the repository:
 {{ if ( -e 'Makefile.PL' ) {
 '

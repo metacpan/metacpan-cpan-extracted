@@ -1,5 +1,9 @@
 Revision history for Dancer-Plugin-Catmandu-OAI
 
+0.0508  2021-05-03 14:27:13 CEST
+  - allow for override at initialization (thanks @danmichaelo)
+  - make datestamp search field configurable (thanks again @danmichaelo)
+
 0.0507  2021-03-23 15:11:37 CET
   - fix until bug
 

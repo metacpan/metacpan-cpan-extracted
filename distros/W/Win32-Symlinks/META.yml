@@ -8,11 +8,10 @@ build_requires:
   ExtUtils::MakeMaker: '0'
   File::Basename: '0'
   File::Spec: '0'
+  Parse::Lnk: '0.06'
   Test::More: '0'
-  Win32::Shortcut: '0'
 configure_requires:
   ExtUtils::MakeMaker: '7.12'
-  Win32::Shortcut: '0'
   XSLoader: '0'
 dynamic_config: 1
 generated_by: ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010
@@ -29,7 +28,7 @@ requires:
   Cwd: '0'
   File::Basename: '0'
   File::Spec: '0'
-  Win32::Shortcut: '0'
-  perl: '5.006'
-version: '0.08'
+  Parse::Lnk: '0.04'
+  perl: '5.016'
+version: '0.10'
 x_serialization_backend: YAML::XS version 0.82

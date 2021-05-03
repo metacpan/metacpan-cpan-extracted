@@ -43,7 +43,7 @@ sub test_01_term : Test(21) {
             push @req, $cli->do_async_job(
                 method  => 'test.sleep',
                 params  => .5,
-                timeout => 20,
+                timeout => 30,
             );
         }
 
@@ -55,7 +55,7 @@ sub test_01_term : Test(21) {
         my ($new) = $self->start_workers('Tests::Service::Resend', workers_count => 1, no_wait => 1);
         push @worker_pids, $new;
 
-        sleep .5;
+        sleep 1;
         ok(1);
     }
 
@@ -85,7 +85,7 @@ sub test_02_int : Test(21) {
             push @req, $cli->do_async_job(
                 method  => 'test.sleep',
                 params  => .5,
-                timeout => 20,
+                timeout => 30,
             );
         }
 
@@ -97,7 +97,7 @@ sub test_02_int : Test(21) {
         my ($new) = $self->start_workers('Tests::Service::Resend', workers_count => 1, no_wait => 1);
         push @worker_pids, $new;
 
-        sleep .5;
+        sleep 1;
         ok(1);
     }
 
@@ -125,7 +125,7 @@ sub test_03_nack : Test(21) {
             push @req, $cli->do_async_job(
                 method  => 'test.sleep',
                 params  => 0.2,
-                timeout => 20,
+                timeout => 30,
             );
         }
 

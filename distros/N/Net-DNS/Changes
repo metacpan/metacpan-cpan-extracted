@@ -1,4 +1,9 @@
-$Id: Changes 1836 2021-03-30 07:55:46Z willem $                       -*-text-*-
+$Id: Changes 1839 2021-05-02 12:40:09Z willem $                       -*-text-*-
+
+
+**** 1.31 May 2, 2021
+
+	Improve implementation of SVCB record.
 
 
 **** 1.30 Mar 30, 2021

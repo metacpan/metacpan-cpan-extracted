@@ -87,7 +87,7 @@ sub log_handler {
     $self->SUPER::log_handler( foreground => 1 );
 }
 
-=item worker_status
+=head3 worker_status
 
 Handler for 'supervisor.worker_status' job.
 
@@ -105,7 +105,7 @@ sub worker_status {
     $self->set_worker_status( %$params );
 }
 
-=item on_worker_exit
+=head3 on_worker_exit
 
 Handler for 'supervisor.worker_exit' job.
 
@@ -185,7 +185,7 @@ sub _get_workers {
 }
 
 
-=item check_workers
+=head3 check_workers
 
 Check every worker process in this host (even workers in other pools) to
 ensure that they are running, and measure their memory usage.
@@ -267,7 +267,7 @@ sub check_workers {
     }
 }
 
-=item check_queues
+=head3 check_queues
 
 In the case of all workers of a given service being down, all requests sent to
 the service will timeout as no one is serving them. This may cause a serious
@@ -314,7 +314,7 @@ sub check_queues {
     );
 }
 
-=item get_workers_status
+=head3 get_workers_status
 
 Handler for 'supervisor.get_workers_status' job.
 
@@ -334,7 +334,7 @@ sub get_workers_status {
     return $workers;
 }
 
-=item get_services_status
+=head3 get_services_status
 
 Handler for 'supervisor.get_services_status' job.
 
@@ -377,7 +377,7 @@ sub get_services_status {
     return \%services;
 }
 
-=item restart_workers
+=head3 restart_workers
 
 Handler for 'supervisor.restart_workers' notification.
 
@@ -432,7 +432,7 @@ sub restart_workers {
     }
 }
 
-=item restart_pool
+=head3 restart_pool
 
 Handler for 'supervisor.restart_pool' notification.
 

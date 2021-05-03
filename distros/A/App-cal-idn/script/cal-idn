@@ -1,0 +1,158 @@
+#!perl
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2021-01-23'; # DATE
+our $DIST = 'App-cal-idn'; # DIST
+our $VERSION = '0.134'; # VERSION
+
+use 5.010001;
+use strict;
+use warnings;
+#use Log::Any '$log';
+
+use App::cal::idn;
+use DateTime;
+use Getopt::Long qw(:config auto_help auto_version);
+
+my %args = (months => 1);
+
+GetOptions(
+    'h' => sub { $args{highlight_today} = 0 },
+    'noshow-holiday-list|L' => sub { $args{show_holiday_list} = 0 },
+    '1' => sub { $args{months} = 1  },
+    '3' => sub { $args{months} = 3  },
+    'y' => sub { $args{months} = 12 },
+    'show-joint-leave' => sub { $args{show_joint_leave} = 1 },
+) or die "cal-idn: Error in option parsing, bailing out\n";
+
+my $dt = DateTime->now;
+
+if (@ARGV == 1) {
+    $args{year}   = $ARGV[0];
+    $args{months} = 12;
+} elsif (@ARGV == 2) {
+    $args{month} = $ARGV[0];
+    $args{year}  = $ARGV[1];
+} else {
+    $args{month} = $dt->month;
+    $args{year}  = $dt->year;
+}
+
+if ($args{months} == 3) {
+    $dt = DateTime->new(year=>$args{year}, month=>$args{month}//1, day=>1);
+    $dt->subtract(months=>1);
+    $args{month} = $dt->month;
+    $args{year}  = $dt->year;
+}
+
+my $res = App::cal::idn::gen_calendar(%args);
+die $res->[1] unless $res->[0] == 200;
+say $res->[2];
+
+1;
+# ABSTRACT: Display Indonesian calendar on the command-line
+# PODNAME: cal-idn
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+cal-idn - Display Indonesian calendar on the command-line
+
+=head1 VERSION
+
+This document describes version 0.134 of cal-idn (from Perl distribution App-cal-idn), released on 2021-01-23.
+
+=head1 SYNOPSIS
+
+ # show calendar for the current month
+ % cal-idn
+
+ # show calendar for the whole year
+ % cal-idn 2013
+
+ # show calendar for a certain month and year
+ % cal-idn 12 2013
+
+=head1 DESCRIPTION
+
+This command provides a subset of the Unix command B<cal> functionality for
+displaying Indonesian calendar. It starts the week at Monday and highlights (and
+lists) Indonesian holidays.
+
+Background: I needed a quick and easy way to see monthly (and sometimes yearly)
+calendar, since I haven't got a desk calendar on my desk for years (decades,
+even).
+
+=head1 OPTIONS
+
+ % cal-idn [opts] [[month] year]
+
+Most options follow corresponding options of B<cal>. Not all options from B<cal>
+are supported/recognized. Some options (long ones) are specific to B<cal-idn>.
+
+=head2 -1
+
+Show a single month of calendar (the default).
+
+=head2 -3
+
+Show three months of calendar (previous, current, next).
+
+=head2 -h
+
+Turn off highlighting of today.
+
+=head2 -y
+
+Show one year (12 months) of calendar (the default if only year is specified).
+
+=head2 --noshow-holiday-list (-L)
+
+Turn off showing list of holidays.
+
+=head2 --show-joint-leave
+
+Turn on showing list of joint leaves (cuti bersama). By default it is turned
+off.
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/App-cal-idn>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-App-cal-idn>.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-App-cal-idn/issues>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 SEE ALSO
+
+Unix command B<cal>
+
+L<Calendar::Indonesia::Holiday>
+
+L<dateseq-id> from L<App::dateseq::id>
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2021, 2019, 2017, 2015, 2014, 2013 by perlancar@cpan.org.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

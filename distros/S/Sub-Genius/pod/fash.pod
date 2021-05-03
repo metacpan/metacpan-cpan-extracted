@@ -1,0 +1,150 @@
+=head1 NAME
+
+fash - interactive shell for debugging L<FLAT> based PREs and underlying structures
+
+=head1 C<fash> OPTIONS
+
+fash provides an easier commandline interface to one liners available via FLAT::CMD
+
+=head2 Usage:
+
+Sending input interactively: 
+
+    % fash <action> [parameter1 parameter2 ... parameterN]
+
+Sending input via C<< <STDIN> >>:
+
+    % cat file.dat | fash -b test
+
+=head2 Actions:
+
+=over 4
+
+=item somestrings "regular_expression"
+
+Outputs strings based on all acyclic paths from start to all final states found in the minimal DFA
+
+=item morestrings "regular_expression"
+
+Outputs strings associated with all acyclic paths and backedges detected on an accepting state from
+
+start to all final states found in the minimal DFA
+
+=item dump "regular_expression"
+
+Perl dump parse tree of given regex.
+
+=item dfa2jflap "regular_expression"
+
+Dumps out FA in FLAT input format; useful for visualizing and manipulating FA
+
+=item nfa2jflap "regular_expression"
+
+Dumps out FA in FLAT input format; useful for visualizing and manipulating FA
+
+=item dfa2gv "regular_expression"
+
+Dumps out FA in graphviz input format; useful for visualizing FA
+
+=item nfa2gv "regular_expression"
+
+Dumps out FA in graphviz input format; useful for visualizing FA
+
+=item pfa2gv "regular_expression"
+
+Dumps out FA in graphviz input format; useful for visualizing FA
+
+=item dfa2undgv "regular_expression"
+
+Dumps out undirected graph underlying the FA in graphviz input format; useful for visualizing FA
+
+=item nfa2undgv "regular_expression"
+
+Dumps out undirected graph underlying the FA in graphviz input format; useful for visualizing FA
+
+=item pfa2undgv "regular_expression"
+
+Dumps out undirected graph underlying the FA in graphviz input format; useful for visualizing FA
+
+=item dfa2digraph "regular_expression"
+
+Outputs digraph of FA for input into a program that might operate over the underlying graph.
+
+=item nfa2digraph "regular_expression"
+
+Outputs digraph of FA for input into a program that might operate over the underlying graph.
+
+=item pfa2digraph "regular_expression"
+
+Outputs digraph of FA for input into a program that might operate over the underlying graph.
+
+=item dfa2undirectedgraph "regular_expression"
+
+Outputs undirected graph of FA for input into a program that might operate over the underlying graph.
+
+=item nfa2undirectedgraph "regular_expression"
+
+Outputs undirected graph of FA for input into a program that might operate over the underlying graph.
+
+=item pfa2undirectedgraph "regular_expression"
+
+Outputs undirected graph of FA for input into a program that might operate over the underlying graph.
+
+=item test "regular_expression" "test_string"
+
+Given a regular expression, tests the given string(s) for acceptance.
+
+=item compare "regular_expression1" "regular_expression2"
+
+Compares 2 regularexpressions.
+
+=back
+
+Notes on 'test' action:
+
+this action may accept STDIN when using the -b flag; the 
+format of the file should be a regular expression in the 
+top line, followed by strings to test for acceptance.
+
+=head1 EXTERNAL PROGRAM SUPPORT
+
+This shell interface to L<FLAT> provides support for two external programs, which opens
+the door widely for true introspection into the underlying data structures affecting the
+program's execution.
+
+=over 4
+
+=item C<JFLAP> L<http://www.jflap.org/tutorial/>
+
+    JFLAP is a package of graphical tools which can be used as an aid in learning
+    the basic concepts of Formal Languages and Automata Theory. 
+
+Another useful direct link to JFLAP, is L<http://www.jflap.org/whatis.html>
+
+=item  C<GraphViz>
+
+GraphViz is a very well known package, originally created at AT&T, L<https://graphviz.org/>:
+
+    Graphviz is open source graph visualization software. Graph visualization is
+    a way of representing structural information as diagrams of abstract graphs
+    and networks. It has important applications in networking, bioinformatics,
+    software engineering, database and web design, machine learning, and in
+    visual interfaces for other technical domains.
+
+For Perl interfaces to C<GraphViz>, look no further than L<GraphViz> and L<Tk::GraphViz>.
+
+More are listed at L<https://metacpan.org/search?q=graphviz>.
+
+=back
+
+=head1 COPYRIGHT AND LICENSE
+
+Same terms as perl itself.
+
+=head1 AUTHOR
+
+OODLER 577 <oodler@cpan.org>
+
+=head1 ACKNOWLEDGEMENTS
+
+Same as those of L<FLAT>.

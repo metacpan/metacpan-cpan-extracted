@@ -57,7 +57,7 @@
          "web" : "https://github.com/perlancar/perl-Sort-SubBundle-PERLANCAR"
       }
    },
-   "version" : "0.082",
+   "version" : "0.087",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.030002"

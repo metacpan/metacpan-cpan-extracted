@@ -1,0 +1,37 @@
+CXC::Number
+
+The following are known:
+
+CXC::Number::Grid
+    A representation of a grid of numbers, with the ability to join and
+    overlay grids. Useful for binning data.
+
+CXC::Number::Sequence
+    A namespace and module for dealing with sequences of numbers, often
+    constructed so that they are useful for binning data.
+
+INSTALLATION
+
+This is a Perl module distribution. It should be installed with whichever
+tool you use to manage your installation of Perl, e.g. any of
+
+  cpanm .
+  cpan  .
+  cpanp -i .
+
+Consult http://www.cpan.org/modules/INSTALL.html for further instruction.
+Should you wish to install this module manually, the procedure is
+
+  perl Build.PL
+  ./Build
+  ./Build test
+  ./Build install
+
+COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2019 by Smithsonian Astrophysical
+Observatory.
+
+This is free software, licensed under:
+
+  The GNU General Public License, Version 3, June 2007

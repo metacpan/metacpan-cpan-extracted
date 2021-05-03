@@ -3,7 +3,7 @@ use warnings;
 
 package JSON::Typist;
 # ABSTRACT: replace mushy strings and numbers with rigidly typed replacements
-$JSON::Typist::VERSION = '0.006';
+$JSON::Typist::VERSION = '0.007';
 #pod =head1 OVERVIEW
 #pod
 #pod JSON is super useful and everybody loves it.  Woo!  Go JSON!  Good job!
@@ -56,7 +56,7 @@ use Scalar::Util qw(blessed);
 
 {
   package JSON::Typist::Number;
-$JSON::Typist::Number::VERSION = '0.006';
+$JSON::Typist::Number::VERSION = '0.007';
 use overload '0+' => sub { ${ $_[0] } }, fallback => 1;
   sub new { my $x = $_[1]; bless \$x, $_[0] }
   sub TO_JSON { 0 + ${$_[0]} }
@@ -64,7 +64,7 @@ use overload '0+' => sub { ${ $_[0] } }, fallback => 1;
 
 {
   package JSON::Typist::String;
-$JSON::Typist::String::VERSION = '0.006';
+$JSON::Typist::String::VERSION = '0.007';
 use overload '""' => sub { ${ $_[0] } }, fallback => 1;
   sub new { my $x = $_[1]; bless \$x, $_[0] }
   sub TO_JSON { "${$_[0]}" }
@@ -190,7 +190,7 @@ JSON::Typist - replace mushy strings and numbers with rigidly typed replacements
 
 =head1 VERSION
 
-version 0.006
+version 0.007
 
 =head1 SYNOPSIS
 
@@ -285,11 +285,21 @@ typed JSON structure from C<apply_types>.
 
 Ricardo Signes <rjbs@cpan.org>
 
-=head1 CONTRIBUTOR
+=head1 CONTRIBUTORS
 
-=for stopwords Matthew Horsfall
+=for stopwords Matthew Horsfall Ricardo Signes
+
+=over 4
+
+=item *
 
 Matthew Horsfall <wolfsage@gmail.com>
+
+=item *
+
+Ricardo Signes <rjbs@semiotic.systems>
+
+=back
 
 =head1 COPYRIGHT AND LICENSE
 

@@ -88,7 +88,7 @@ subtest 'create' => sub {
 
     subtest 'case_method_named' => sub {
         my $sub = wrap_method { a => Str } => Str, sub {};
-    
+
         my $meta = $creator->create($sub);
         is $meta->sub, $sub, 'sub';
         is $meta->is_method, !!1, 'is_method';

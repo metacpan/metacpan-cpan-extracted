@@ -1,7 +1,7 @@
 do { my $x = {
        'configure' => {
                         'requires' => {
-                                        'ExtUtils::MakeMaker' => '0'
+                                        'ExtUtils::MakeMaker' => '6.78'
                                       }
                       },
        'develop' => {
@@ -14,10 +14,13 @@ do { my $x = {
        'runtime' => {
                       'requires' => {
                                       'B' => '0',
+                                      'Data::Printer' => '0',
                                       'Exporter' => '0',
                                       'JSON::PP' => '0',
                                       'Params::Util' => '0',
                                       'Scalar::Util' => '0',
+                                      'Sub::Exporter' => '0',
+                                      'Term::ANSIColor' => '0',
                                       'Test::Deep' => '1.126',
                                       'Test::Deep::Cmp' => '0',
                                       'overload' => '0',

@@ -1,0 +1,6 @@
+^.hg
+^cover_db/
+^blib
+Build$
+_build_params
+MYMETA.*

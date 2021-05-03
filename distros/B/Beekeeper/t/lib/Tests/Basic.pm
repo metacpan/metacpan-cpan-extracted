@@ -22,7 +22,7 @@ sub test_01_notifications : Test(2) {
     my $cli = Beekeeper::Client->instance;
     my $var = 74;
 
-    $SIG{'USR1'} = sub { $var = $var + 1 };
+    $SIG{'USR1'} = sub { $var++ };
 
     $cli->send_notification(
         method => "test.signal",
@@ -30,16 +30,18 @@ sub test_01_notifications : Test(2) {
     );
 
     my $expected = 76;
-    my $max_wait = 200; while ($max_wait--) { last if $var == $expected; sleep 0.01; }
+    my $max_wait = 10; while ($max_wait--) { sleep 0.5; last if $var == $expected }
     is( $var, $expected, "Notifications received by 2 workers");
+
+    $var = 58;
 
     $cli->send_notification(
         method => "test.try_catchall",
         params => { signal => 'USR1', pid => $$ },
     );
 
-    $expected = 78;
-    $max_wait = 200; while ($max_wait--) { last if $var == $expected; sleep 0.01; }
+    $expected = 60;
+    $max_wait = 10; while ($max_wait--) { sleep 0.5; last if $var == $expected }
     is( $var, $expected, "Catchall notifications received by 2 workers");
 }
 
@@ -139,7 +141,7 @@ sub test_03_background_jobs : Test(1) {
     my $cli = Beekeeper::Client->instance;
     my $var = 594;
 
-    $SIG{'USR1'} = sub { $var = $var + 1 };
+    $SIG{'USR1'} = sub { $var++ };
 
     for (1..3) {
         $cli->do_background_job(
@@ -149,7 +151,7 @@ sub test_03_background_jobs : Test(1) {
     }
 
     my $expected = 597;
-    my $max_wait = 100; while ($max_wait--) { last if $var == $expected; sleep 0.01; }
+    my $max_wait = 10; while ($max_wait--) { sleep 0.5; last if $var == $expected }
     is( $var, $expected, "Background job executed 3 times");
 }
 

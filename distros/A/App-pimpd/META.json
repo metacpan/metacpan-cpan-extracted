@@ -52,6 +52,6 @@
          "x_bugtracker" : "https://github.com/trapd00r/pimpd2/issues"
       }
    },
-   "version" : "0.348",
+   "version" : "0.350",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

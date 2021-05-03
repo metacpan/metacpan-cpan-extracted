@@ -1,5 +1,14 @@
 Revision history for List-Keywords
 
+0.04    2021-04-30
+        [CHANGES]
+         * Implement B::Deparse hackery so code deparses properly
+         * Now works back to perl 5.14 so declare that as such
+
+        [BUGFIXES]
+         * Fix POD error in docs
+         * Fix maths error in t/95benchmark.t
+
 0.03    2021-04-28
         [CHANGES]
          * Added 'first', 'none', 'notall'

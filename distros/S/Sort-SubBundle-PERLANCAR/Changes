@@ -1,6 +1,41 @@
+0.087   2021-05-01  Released-By: PERLANCAR; Urgency: medium
+
+	- Tweak POD sections: recognize ORIGINAL LICENSE, remove FOO'S
+	  (BUGS|AUTHORS|etc) because I am using ORIGINAL (BUGS|AUTHORS|etc)
+	  nowadays.
+
+
+0.086   2021-04-23  Released-By: PERLANCAR; Urgency: medium
+
+	- [sub pod_section_ala_perlancar] Add CREDITS/THANKS sections.
+
+
+0.085   2021-04-23  Released-By: PERLANCAR; Urgency: medium
+
+	[sub pod_section_ala_perlancar]
+
+        - Add 'ORIGINAL XXX' sections for forked module original sections.
+
+
+0.084   2021-04-11  Released-By: PERLANCAR; Urgency: low
+
+	- No functional changes.
+
+	- Edit Changes again, derp.
+
+
+0.083   2021-04-11  Released-By: PERLANCAR; Urgency: low
+
+	- No functional changes.
+
+	- Edit Changes.
+
+
 0.082   2021-04-11  Released-By: PERLANCAR; Urgency: medium
 
-	- Add a couple Acme::CPANModules headers (so it's ahead of Bencher
+	[sub pod_section_ala_perlancar]
+
+        - Add a couple Acme::CPANModules headers (so it's ahead of Bencher
 	  headers).
 
 
@@ -10,13 +45,16 @@
 
         - Rename module Sort::Sub::pod_section{s,}_ala_perlancar.
 
-	- [pod_section_ala_perlancar] Sort CAVEATS like GOTCHAS.
+	[sub pod_section_ala_perlancar]
+
+        - Sort CAVEATS like GOTCHAS.
 
 
 0.080   2020-02-13  Released-By: PERLANCAR; Urgency: medium
 
 	- Add sort sub: pod_sections_ala_perlancar (sort spec moved from
-	  Pod::Weaver::Plugin::PERLANCAR::SortSections).
+	  Pod::Weaver::Plugin::PERLANCAR::SortSections). UPDATE: renamed to
+	  pod_section_ala_perlancar.
 
 
 0.07    2019-12-15  Released-By: PERLANCAR; Urgency: medium

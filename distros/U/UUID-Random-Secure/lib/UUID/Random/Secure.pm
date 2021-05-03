@@ -1,9 +1,9 @@
 package UUID::Random::Secure;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-01-20'; # DATE
+our $DATE = '2021-01-24'; # DATE
 our $DIST = 'UUID-Random-Secure'; # DIST
-our $VERSION = '0.003'; # VERSION
+our $VERSION = '0.004'; # VERSION
 
 use strict;
 use warnings;
@@ -46,7 +46,7 @@ UUID::Random::Secure - Like UUID::Random, but uses Math::Random::Secure for rand
 
 =head1 VERSION
 
-This document describes version 0.003 of UUID::Random::Secure (from Perl distribution UUID-Random-Secure), released on 2021-01-20.
+This document describes version 0.004 of UUID::Random::Secure (from Perl distribution UUID-Random-Secure), released on 2021-01-24.
 
 =head1 SYNOPSIS
 
@@ -96,11 +96,9 @@ feature.
 
 =head1 SEE ALSO
 
-L<UUID::Random>
-
-L<Math::Random::Secure>
-
-L<Crypt::Misc>
+Other ways to generate cryptographically secure random (v4) UUIDs:
+L<Crypt::Misc>, L<UUID::Tiny::Patch::UseMRS>. L<Acme::CPANModules::UUID> reviews
+and benchmarks these modules.
 
 =head1 AUTHOR
 

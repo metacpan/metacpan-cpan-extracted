@@ -4,7 +4,7 @@ author:
   - 'Olaf Alders <olaf@wundercounter.com>'
 build_requires:
   Cpanel::JSON::XS: '0'
-  Data::Printer: '0'
+  Data::Printer: '0.36'
   ExtUtils::MakeMaker: '0'
   File::Spec: '0'
   Geo::IP: '0'
@@ -15,7 +15,7 @@ build_requires:
   Test::Most: '0'
   Test::Needs: '0'
   Test::RequiresInternet: '0'
-  Test::Script: '0'
+  Test::Script: '1.27'
   Test::Warnings: '0'
   perl: '5.008'
 configure_requires:
@@ -39,7 +39,7 @@ requires:
   Class::Inspector: '1.36'
   Class::Unload: '0'
   Data::Dumper: '0'
-  Data::Printer: '0'
+  Data::Printer: '0.36'
   File::Basename: '0'
   FindBin: '0'
   Getopt::Long::Descriptive: '0'
@@ -72,7 +72,7 @@ resources:
   bugtracker: https://github.com/oalders/App-perlimports/issues
   homepage: https://github.com/oalders/App-perlimports
   repository: https://github.com/oalders/App-perlimports.git
-version: '0.000003'
+version: '0.000005'
 x_Dist_Zilla:
   perl:
     version: '5.030002'
@@ -505,7 +505,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v0.000003
+          tag: v0.000005
           tag_format: v%V
           tag_message: v%V
         Dist::Zilla::Role::Git::Repo:

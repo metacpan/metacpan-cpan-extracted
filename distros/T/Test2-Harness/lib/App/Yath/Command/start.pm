@@ -2,7 +2,7 @@ package App::Yath::Command::start;
 use strict;
 use warnings;
 
-our $VERSION = '1.000051';
+our $VERSION = '1.000053';
 
 use App::Yath::Util qw/find_pfile/;
 use App::Yath::Options;
@@ -38,6 +38,13 @@ include_options(
 );
 
 option_group {prefix => 'runner', category => "Persistent Runner Options"} => sub {
+    option reload => (
+        short => 'r',
+        type  => 'b',
+        description => "Attempt to reload modified modules in-place, restarting entire stages only when necessary.",
+        default => 0,
+    );
+
     option quiet => (
         short       => 'q',
         type        => 'c',
@@ -374,6 +381,15 @@ Do not delete directories when done. This is useful if you want to inspect the d
 Be very quiet.
 
 Can be specified multiple times
+
+
+=item --reload
+
+=item -r
+
+=item --no-reload
+
+Attempt to reload modified modules in-place, restarting entire stages only when necessary.
 
 
 =back

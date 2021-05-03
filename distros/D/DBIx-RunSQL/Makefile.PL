@@ -1,7 +1,7 @@
 # -*- mode: perl; c-basic-offset: 4; indent-tabs-mode: nil; -*-
 
-#use 5.006; #weaken
-use ExtUtils::MakeMaker;
+use strict;
+use ExtUtils::MakeMaker qw(WriteMakefile);
 # See lib/ExtUtils/MakeMaker.pm for details of how to influence
 # the contents of the Makefile that is written.
 
@@ -12,32 +12,46 @@ $eumm_version =~ s/_//;
 
 my $module = 'DBIx::RunSQL';
 (my $main_file = "lib/$module.pm" ) =~ s!::!/!g;
-(my $distname = $module) =~ s!::!-!g;
+(my $distbase = $module) =~ s!::!-!g;
+my $distlink = $distbase;
 
 my @tests = map { glob $_ } 't/*.t', 't/*/*.t';
 
 my %module = (
-    MIN_PERL_VERSION => '5.006',
+    NAME                => $module,
+    AUTHOR              => q{Max Maischein <corion@cpan.org>},
+    VERSION_FROM        => $main_file,
+    ABSTRACT_FROM       => $main_file,
     META_MERGE => {
         "meta-spec" => { version => 2 },
         resources => {
             repository => {
-                web => 'https://github.com/Corion/dbix--runsql',
-                url => 'git://github.com/Corion/dbix--runsql.git',
+                web => "https://github.com/Corion/$distlink",
+                url => "git://github.com/Corion/$distlink.git",
                 type => 'git',
             },
             bugtracker  => {
-              web    => 'http://rt.cpan.org/Public/Dist/Display.html?Name='.$distname,
-              mailto => $distname.'-bugs@rt.cpan.org',
+              web    => 'https://rt.cpan.org/Public/Dist/Display.html?Name='.$distbase,
+              mailto => $distbase.'-bugs@rt.cpan.org',
             },
-            license    => ['http://dev.perl.org/licenses/'],
+            license    => ['https://dev.perl.org/licenses/'],
         },
         dynamic_config   => 0, # we promise to keep META.* up-to-date
         x_static_install => 1, # we are pure Perl and don't do anything fancy
     },
-    'NAME'          => $module,
-    'LICENSE'       => 'perl',
-    'VERSION_FROM'  => $main_file, # finds $VERSION
+
+    MIN_PERL_VERSION => '5.006',
+
+    'EXE_FILES' => [
+        'bin/run-sql.pl',
+    ],
+    'LICENSE'=> 'perl',
+
+    PL_FILES            => {},
+    BUILD_REQUIRES => {
+        'ExtUtils::MakeMaker' => 0,
+    },
+
     'PREREQ_PM'     => {
                         'strict'       => 0,
                         'warnings'     => 0,
@@ -45,31 +59,34 @@ my %module = (
                         'DBI'          => 0,
                         'Module::Load' => 0,
                       }, # e.g., Module::Name => 1.1
-    'EXE_FILES' => [
-        'bin/run-sql.pl',
-    ],
-    'TEST_REQUIRES' => {
+    TEST_REQUIRES => {
         'Test::More'   => 0,
         'Data::Dumper' => 0,
     },
-    ABSTRACT_FROM   => $main_file, # retrieve abstract from module
-    AUTHOR          => 'Max Maischein <corion@cpan.org>',
+
+    dist                => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
+    clean               => { FILES => "$distbase-*" },
+
+    test            => { TESTS => join( ' ', @tests ) },
 );
+
+# This is so that we can do
+#     require 'Makefile.PL'
+# and then call get_module_info
 
 sub get_module_info { %module }
 
 if( ! caller ) {
     # I should maybe use something like Shipwright...
     regen_README($main_file);
-    #regen_EXAMPLES();
+    regen_EXAMPLES() if -d 'examples';
     WriteMakefile1(get_module_info);
 };
 
+1;
+
 sub WriteMakefile1 {  #Written by Alexandr Ciornii, version 0.21. Added by eumm-upgrade.
     my %params=@_;
-    
-    regen_README( $params{VERSION_FROM} );
-    
     my $eumm_version=$ExtUtils::MakeMaker::VERSION;
     $eumm_version=eval $eumm_version;
     die "EXTRA_META is deprecated" if exists $params{EXTRA_META};
@@ -78,6 +95,10 @@ sub WriteMakefile1 {  #Written by Alexandr Ciornii, version 0.21. Added by eumm-
         #EUMM 6.5502 has problems with BUILD_REQUIRES
         $params{PREREQ_PM}={ %{$params{PREREQ_PM} || {}} , %{$params{BUILD_REQUIRES}} };
         delete $params{BUILD_REQUIRES};
+    }
+    if ($params{TEST_REQUIRES} and $eumm_version < 6.64) {
+        $params{PREREQ_PM}={ %{$params{PREREQ_PM} || {}} , %{$params{TEST_REQUIRES}} };
+        delete $params{TEST_REQUIRES};
     }
     delete $params{CONFIGURE_REQUIRES} if $eumm_version < 6.52;
     delete $params{MIN_PERL_VERSION} if $eumm_version < 6.48;
@@ -99,7 +120,7 @@ sub regen_README {
         my $readme = join "\n",
             pod_section($_[0], 'NAME', 'no heading' ),
             pod_section($_[0], 'DESCRIPTION' ),
-            <<EOD,
+            <<INSTALL,
 
 INSTALLATION
 
@@ -110,7 +131,7 @@ tool you use to manage your installation of Perl, e.g. any of
   cpan  .
   cpanp -i .
 
-Consult http://www.cpan.org/modules/INSTALL.html for further instruction.
+Consult https://www.cpan.org/modules/INSTALL.html for further instruction.
 Should you wish to install this module manually, the procedure is
 
   perl Makefile.PL
@@ -118,10 +139,14 @@ Should you wish to install this module manually, the procedure is
   make test
   make install
 
-EOD
+INSTALL
             pod_section($_[0], 'REPOSITORY'),
             pod_section($_[0], 'SUPPORT'),
+            pod_section($_[0], 'TALKS'),
+            pod_section($_[0], 'KNOWN ISSUES'),
             pod_section($_[0], 'BUG TRACKER'),
+            pod_section($_[0], 'CONTRIBUTING'),
+            pod_section($_[0], 'SEE ALSO'),
             pod_section($_[0], 'AUTHOR'),
             pod_section($_[0], 'LICENSE' ),
             pod_section($_[0], 'COPYRIGHT' ),
@@ -140,7 +165,8 @@ EOD
         $parser->parse_from_file($_[0]);
         my $readme_mkdn = <<STATUS . $parser->as_markdown;
 
-[![Build Status](https://travis-ci.org/Corion/App-scrape.svg?branch=master)](https://github.com/Corion/App-scrape)
+[![Travis Build Status](https://travis-ci.org/Corion/$distlink.svg?branch=master)](https://travis-ci.org/Corion/$distlink)
+[![AppVeyor Build Status](https://ci.appveyor.com/api/projects/status/github/Corion/$distlink?branch=master&svg=true)](https://ci.appveyor.com/project/Corion/$distlink)
 
 STATUS
         update_file( 'README.mkdn', $readme_mkdn );
@@ -154,11 +180,12 @@ sub pod_section {
 
     my @section =
         grep { /^=head1\s+$section/.../^=/ } <$fh>;
-    pop @section if $section[-1] =~ /^=/;
-    shift @section if $remove_heading;
 
     # Trim the section
     if( @section ) {
+        pop @section if $section[-1] =~ /^=/;
+        shift @section if $remove_heading;
+
         pop @section
             while $section[-1] =~ /^\s*$/;
         shift @section
@@ -168,6 +195,20 @@ sub pod_section {
     @section = map { $_ =~ s!^=\w+\s+!!; $_ } @section;
     return join "", @section;
 }
+
+sub regen_EXAMPLES {
+    my $perl = $^X;
+    if ($perl =~/\s/) {
+        $perl = qq{"$perl"};
+    };
+    (my $example_file = $main_file) =~ s!\.pm$!/Examples.pm!;
+    my $examples = `$perl -w examples/gen_examples_pod.pl`;
+    if ($examples) {
+        warn "(Re)Creating $example_file\n";
+        $examples =~ s/\r\n/\n/g;
+        update_file( $example_file, $examples );
+    };
+};
 
 sub update_file {
     my( $filename, $new_content ) = @_;

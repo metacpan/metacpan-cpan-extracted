@@ -36,9 +36,17 @@ $mmv >= 6.4501 and $args{META_ADD} = {
 };
 
 $mmv >= 6.4501 and $args{META_MERGE} = {
+    'meta-spec' => { version => 2 },
     resources => {
-	bugtracker => 'https://rt.cpan.org/Public/Dist/Display.html?Name=Win32-Process-Info',
-	license => 'http://dev.perl.org/licenses/',
+        bugtracker => {
+            web  => 'https://github.com/uperl/Win32-Process-Info/issues',
+        },
+        homepage => 'https://metacpan.org/pod/Win32::Process::Info',
+        repository => {
+            type => 'git',
+            url  => 'https://github.com/uperl/Win32-Process-Info.git',
+            web  => 'https://github.com/uperl/Win32-Process-Info',
+        },
     },
 };
 

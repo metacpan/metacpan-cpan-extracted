@@ -1,12 +1,12 @@
 package Attribute::Handlers::Clean;
-use 5.006;
+use 5.010;
 use Carp;
 use warnings;
 use strict;
 use attributes ();
 use Perlmazing ();
 
-our $VERSION = '1.04'; # remember to update version in POD!
+our $VERSION = '1.06'; # remember to update version in POD!
 our $AUTOLOAD;
 
 my %symcache;
@@ -274,12 +274,11 @@ Attribute::Handlers::Clean - Simpler definition of attribute handlers, without m
 
 =head1 VERSION
 
-This document describes version 1.04 of Attribute::Handlers::Clean.
+This document describes version 1.06 of Attribute::Handlers::Clean.
 
 =head1 SYNOPSIS
 
     package MyClass;
-    require 5.006;
     use Attribute::Handlers::Clean;
     
     sub Good : ATTR(SCALAR) {

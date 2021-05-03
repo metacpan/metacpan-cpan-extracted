@@ -2,7 +2,7 @@ package Acme::MetaSyntactic::wales_towns;
 use strict;
 use Acme::MetaSyntactic::List;
 our @ISA = qw( Acme::MetaSyntactic::List );
-our $VERSION = '1.013';
+our $VERSION = '1.014';
 __PACKAGE__->init();
 
 our %Remote = (
@@ -41,6 +41,12 @@ Abigail, Philippe Bruhat (BooK).
 =head1 CHANGES
 
 =over 4
+
+=item *
+
+2021-04-30 - v1.014
+
+Updated from the source web site in Acme-MetaSyntactic-Themes version 1.055.
 
 =item *
 
@@ -161,6 +167,7 @@ Bargoed
 Barmouth
 Barry
 Beaumaris
+Bedwas
 Bethesda
 Blackwood
 Blaenau_Ffestiniog
@@ -183,7 +190,6 @@ Cardigan
 Carmarthen
 Chepstow
 Chirk
-Cilgerran
 Colwyn_Bay
 Connah_s_Quay
 Conwy
@@ -192,21 +198,16 @@ Cowbridge
 Criccieth
 Crickhowell
 Crumlin
-Crymych
-Cwmamman
 Cwmbran
 Denbigh
 Dolgellau
 Ebbw_Vale
-Ewloe
 Fishguard
 Flint
 Gelligaer
 Glynneath
 Goodwick
 Gorseinon
-Gowerton
-Gresford
 Harlech
 Haverfordwest
 Hay_on_Wye
@@ -216,7 +217,6 @@ Kidwelly
 Knighton
 Lampeter
 Laugharne
-Llanberis
 Llandeilo
 Llandovery
 Llandrindod_Wells
@@ -254,7 +254,6 @@ Newport_Pembrokeshire
 New_Quay
 Newtown
 Neyland
-Old_Colwyn
 Overton_on_Dee
 Pembroke
 Pembroke_Dock
@@ -264,7 +263,6 @@ Penmaenmawr
 Penrhyn_Bay
 Pontardawe
 Pontarddulais
-Pontyclun
 Pontypool
 Pontypridd
 Porth
@@ -287,6 +285,7 @@ Shotton
 St_Asaph
 St_Clears
 Swansea
+Talbot_Green
 Talgarth
 Tenby
 Tonypandy

@@ -12,9 +12,12 @@ Makefile.PL
 README.md
 azure-pipelines.yml
 cpanfile
+dev-bin/install-xt-tools.sh
 dist.ini
 eg/new-stats
 eg/old-stats
+git/hooks/pre-commit.sh
+git/setup.pl
 lib/DateTime/Locale.pm
 lib/DateTime/Locale/Base.pm
 lib/DateTime/Locale/Catalog.pm
@@ -588,6 +591,7 @@ lib/DateTime/Locale/nn.pod
 lib/DateTime/Locale/nn_NO.pod
 lib/DateTime/Locale/nnh.pod
 lib/DateTime/Locale/nnh_CM.pod
+lib/DateTime/Locale/no.pod
 lib/DateTime/Locale/nus.pod
 lib/DateTime/Locale/nus_SS.pod
 lib/DateTime/Locale/nyn.pod
@@ -812,6 +816,7 @@ lib/DateTime/Locale/zu.pod
 lib/DateTime/Locale/zu_ZA.pod
 perlcriticrc
 perltidyrc
+precious.toml
 share/af-NA.pl
 share/af-ZA.pl
 share/af.pl
@@ -1370,6 +1375,7 @@ share/nn-NO.pl
 share/nn.pl
 share/nnh-CM.pl
 share/nnh.pl
+share/no.pl
 share/nus-SS.pl
 share/nus.pl
 share/nyn-UG.pl
@@ -1605,7 +1611,6 @@ t/script.t
 t/storable.t
 t/version-check.t
 t/zzz-check-breaks.t
-tidyall.ini
 tools/generate-modules
 tools/lib/ModuleGenerator.pm
 tools/lib/ModuleGenerator/Locale.pm
@@ -1618,8 +1623,8 @@ xt/author/nonexistent-locale.t
 xt/author/pod-spell.t
 xt/author/pod-syntax.t
 xt/author/portability.t
+xt/author/precious.t
 xt/author/test-all-my-deps.t
 xt/author/test-version.t
-xt/author/tidyall.t
 xt/release/cpan-changes.t
 xt/release/meta-json.t

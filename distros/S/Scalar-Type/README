@@ -1,0 +1,19 @@
+This module grovels in perl's guts to see if a variable really is a number,
+as opposed to a string that just looks like a number, and whether it is an
+integer or not. ie, it can tell the difference between "100", 100, and 100.0.
+
+100 is an integer.
+
+"100" is a string that looks like an integer.
+
+100.0 is numerically equivalent to 100, but it is only accurate to 4
+significant figures.
+
+To install, do the usual:
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+You may use, modify and distribute this code under the same terms as you
+may use, modify and distribute perl itself.

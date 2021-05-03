@@ -19,12 +19,12 @@
 
 =head1 NAME
 
-DateTime::Locale::en_001 - Locale data examples for the English World (en-001) locale
+DateTime::Locale::en_001 - Locale data examples for the English world (en-001) locale
 
 =head1 DESCRIPTION
 
 This pod file contains examples of the locale data available for the
-English World locale.
+English world locale.
 
 =head2 Days
 

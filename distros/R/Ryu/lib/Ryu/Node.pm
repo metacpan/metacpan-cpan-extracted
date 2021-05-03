@@ -3,7 +3,7 @@ package Ryu::Node;
 use strict;
 use warnings;
 
-our $VERSION = '2.009'; # VERSION
+our $VERSION = '3.000'; # VERSION
 our $AUTHORITY = 'cpan:TEAM'; # AUTHORITY
 
 =head1 NAME
@@ -46,6 +46,32 @@ sub describe {
     ($self->parent ? $self->parent->describe . '=>' : '') . $self->label . '(' . $self->completed->state . ')';
 }
 
+=head2 completed
+
+Returns a L<Future> indicating completion (or failure) of this stream.
+
+=cut
+
+sub completed {
+    my ($self) = @_;
+    return $self->_completed->without_cancel;
+}
+
+# Internal use only, since it's cancellable
+sub _completed {
+    my ($self) = @_;
+    $self->{completed} //= do {
+        my $f = $self->new_future(
+            'completion'
+        );
+        $f->on_ready(
+            $self->curry::weak::cleanup
+        ) if $self->can('cleanup');
+        $self->prepare_await if $self->can('prepare_await');
+        $f
+    }
+}
+
 =head2 pause
 
 Does nothing useful.
@@ -81,7 +107,7 @@ sub resume {
     my $k = refaddr($src) // 0;
     delete $self->{is_paused}{$k} unless --$self->{is_paused}{$k} > 0;
     unless($self->{is_paused} and keys %{$self->{is_paused}}) {
-        my $f = $self->unblocked;
+        my $f = $self->_unblocked;
         $f->done unless $f->is_ready;
         if(my $parent = $self->parent) {
             $parent->resume($self) if $self->{pause_propagation};
@@ -103,7 +129,15 @@ otherwise L<ready|Future/is_ready>.
 =cut
 
 sub unblocked {
+    # Since we don't want stray callers to affect our internal state, we always return
+    # a non-cancellable version of our internal Future.
+    shift->_unblocked->without_cancel
+}
+
+sub _unblocked {
     my ($self) = @_;
+    # Since we don't want stray callers to affect our internal state, we always return
+    # a non-cancellable version of our internal Future.
     $self->{unblocked} //= do {
         $self->is_paused
         ? $self->new_future

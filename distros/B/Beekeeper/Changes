@@ -1,2 +1,6 @@
+0.02    2021-04-30
+  - Fix tests failing on smoke testers
+  - Fix POD errors
+
 0.01	2020-05-14
   - Initial release

@@ -6,7 +6,6 @@ use PDL::Primitive qw/which which_both/;
 use PDL::Ufunc qw/sumover/;
 use PDL::NiceSlice;
 use PDL::Slices;
-use PDL::Complex;
 use PDL::LinearAlgebra::Real;
 use PDL::LinearAlgebra::Complex;
 use PDL::LinearAlgebra::Special qw//;
@@ -20,7 +19,7 @@ use constant{
 
 use strict;
 
-our $VERSION = '0.17';
+our $VERSION = '0.18';
 $VERSION = eval $VERSION;
 
 @PDL::LinearAlgebra::ISA = qw/PDL::Exporter/;
@@ -29,15 +28,12 @@ $VERSION = eval $VERSION;
 				mgeigen  mgeigenx msymeigen msymeigenx msymgeigen msymgeigenx
 				msolve mtrisolve msymsolve mpossolve msolvex msymsolvex mpossolvex
 				mrank mlls mllsy mllss mglm mlse tritosym mnorm mgschur mgschurx
-				mcrossprod mcond morth mschur mschurx posinf neginf nan
+				mcrossprod mcond morth mschur mschurx posinf neginf
 				NO WARN BARF setlaerror getlaerorr laerror/;
 %PDL::LinearAlgebra::EXPORT_TAGS = (Func=>[@PDL::LinearAlgebra::EXPORT_OK]);
 
 my $_laerror = BARF;
 
-my $nan;
-BEGIN { $nan = 0/pdl(0) }
-sub nan() { $nan->copy };
 my $posinf;
 BEGIN { $posinf = 1/pdl(0) }
 sub posinf() { $posinf->copy };
@@ -87,7 +83,7 @@ sub ecplx {
 	  $ret->slice('(1),') .= $im;
 	  return $ret;  
   }
-  croak "first dimsize must be 2" unless $re->dims > 0 && $re->dim(0) == 2;
+  Carp::croak("first dimsize must be 2") unless $re->dims > 0 && $re->dim(0) == 2;
   bless $_[0]->slice('');
 }
 
@@ -107,7 +103,7 @@ sub norm {
 	# 		     such that max abs will be real
 	
 	#require PDL::LinearAlgebra::Complex;
-	PDL::LinearAlgebra::Complex::cnrm2($m,1, my $ret = null);
+	PDL::LinearAlgebra::Complex::cnrm2($m,1, my $ret = PDL::null());
 	if ($real){
 		my ($index, $scale);
 		$m = PDL::Complex::Cscale($m,1/$ret->dummy(0))->reshape(-1);
@@ -5472,7 +5468,7 @@ sub PDL::meigenx {
 		if ($jobvr){
 			($w, $vr) = cplx_eigen((bless $wr, 'PDL::Complex'), $wi, $vr, 1);
 		}
-		$w = PDL::Complex::complex t(cat $wr, $wi) unless $jobvr || $jobvl;
+		$w = PDL::Complex::complex(t(cat $wr, $wi)) unless $jobvr || $jobvl;
 	}
 
 	if ($info){
@@ -5801,7 +5797,7 @@ sub PDL::mgeigenx {
 	if (@adims == 2){
 		$a->xchg(0,1)->ggevx($balanc, $jobvl, $jobvr, $sense, $b, $wr, $wi, $beta, $vl, $vr, $ilo, $ihi, $lscale, $rscale,
 					$abnrm, $bbnrm, $rconde, $rcondv, $info);
-		$eigens = PDL::Complex::complex t(cat $wr, $wi);
+		$eigens = PDL::Complex::complex(t(cat $wr, $wi));
 	}
 	else{
 		$a->xchg(1,2)->cggevx($balanc, $jobvl, $jobvr, $sense, $b, $eigens, $beta, $vl, $vr, $ilo, $ihi, $lscale, $rscale,

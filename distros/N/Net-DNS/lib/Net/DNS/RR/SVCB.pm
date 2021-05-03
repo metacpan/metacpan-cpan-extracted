@@ -2,7 +2,7 @@ package Net::DNS::RR::SVCB;
 
 use strict;
 use warnings;
-our $VERSION = (qw$Id: SVCB.pm 1834 2021-03-28 09:34:49Z willem $)[2];
+our $VERSION = (qw$Id: SVCB.pm 1838 2021-05-02 12:35:14Z willem $)[2];
 
 use base qw(Net::DNS::RR);
 
@@ -48,9 +48,9 @@ sub _decode_rdata {			## decode rdata from wire-format octet string
 sub _encode_rdata {			## encode rdata as wire-format octet string
 	my $self = shift;
 
-	my @packed   = pack 'n a*', $self->{SvcPriority}, $self->{TargetName}->encode;
-	my ($params) = grep {defined} $self->{SvcParams}, [];
-	my @params   = @$params;
+	my @packed = pack 'n a*', $self->{SvcPriority}, $self->{TargetName}->encode;
+	my $params = $self->{SvcParams} || [];
+	my @params = @$params;
 	while (@params) {
 		my $key = shift @params;
 		my $val = shift @params;
@@ -64,7 +64,7 @@ sub _format_rdata {			## format rdata portion of RR string.
 	my $self = shift;
 
 	my $priority = $self->{SvcPriority};
-	my ($params) = grep {defined} $self->{SvcParams}, [];
+	my $params   = $self->{SvcParams} || [];
 	return ( $priority, $self->{TargetName}->string ) unless scalar @$params;
 
 	my @rdata  = unpack 'H4', pack 'n', $priority;
@@ -94,20 +94,19 @@ sub _parse_rdata {			## populate RR from rdata in argument list
 	$self->svcpriority(shift);
 	$self->targetname(shift);
 
-	while ( my $attribute = shift ) {
-		for ($attribute) {
-			my @argument = '';
+	while ( my $svcparam = shift ) {
+		for ($svcparam) {
+			my @value = '';
 			if (/=(.*)$/) {
-				for ( my $rhs = length($1) ? $1 : shift ) {
-					s/^(["'])(.*)\1$/$2/;	# strip paired quotes
-					s/\\,/\\044/g;		# disguise escaped comma
-					@argument = split /,/;	# potentially multi-valued
-				}
+				local $_ = length($1) ? $1 : shift;
+				s/^(["'])(.*)\1$/$2/;		# strip paired quotes
+				s/\\,/\\044/g;			# disguise escaped comma
+				@value = ( $svcparam =~ /^key/i ) ? $_ : split /,/;
 			}
 
-			s/[-]/_/g;				# extract attribute identifier
+			s/[-]/_/g;				# extract identifier
 			m/^([^=]+)/;
-			$self->$1(@argument);
+			$self->$1(@value);
 		}
 	}
 	return;
@@ -117,17 +116,17 @@ sub _parse_rdata {			## populate RR from rdata in argument list
 sub _post_parse {			## parser post processing
 	my $self = shift;
 
-	if ( defined $self->key0() ) {
-		my %params = @{$self->{SvcParams}};
+	my $params = $self->{SvcParams} || return;
+	my %params = @$params;
+	$self->key0(undef);					# ruse to force sorting of SvcParams
+	if ( defined $params{0} ) {
 		my %unique;
 		foreach ( grep { !$unique{$_}++ } unpack 'n*', $params{0} ) {
 			croak( $self->type . qq[: unexpected "key0" in mandatory list] ) if $unique{0};
 			croak( $self->type . qq[: duplicate "key$_" in mandatory list] ) if --$unique{$_};
 			croak( $self->type . qq[: mandatory "key$_" not defined] ) unless defined $params{$_};
 		}
-		$self->mandatory( keys %unique );		# sort both $self->key0 and SvcParams
-	} else {
-		$self->key0(undef)				# force sorting of SvcParams
+		$self->mandatory( keys %unique );		# sort mandatory key list
 	}
 	return;
 }
@@ -165,20 +164,22 @@ sub targetname {
 use constant ASCII => chr(65) eq 'A';
 
 my %escape = do {			## precalculated ASCII escape table
-	my @escape = ( 0 .. 32, 34, 92, 127 .. 255 );		# numerical escape
-
 	my %table = map { ( chr($_) => chr($_) ) } ( 0 .. 255 );
 
-	foreach my $codepoint (@escape) {
+	foreach my $codepoint ( 0 .. 32, 92, 127 .. 255 ) {	# numerical escape
 		my $ddd = sprintf( '%03u', $codepoint );
 		$ddd =~ tr [0-9] [\060-\071];			# transliterate non-ASCII
 		$table{pack( 'C', $codepoint )} = pack 'C a3', 92, $ddd;
 	}
 
+	foreach my $codepoint ( 34, 44 ) {			# character escape
+		$table{pack( 'C', $codepoint )} = pack 'C2', 92, $codepoint;
+	}
+
 	%table;
 };
 
-sub _raw {				## concatenate @_ and escape non-printable
+sub _presentation {			## render octet string(s) in presentation format
 	return () unless scalar @_;
 	local $_ = join '', map { $escape{$_} } split( //, join '', @_ );
 
@@ -191,23 +192,23 @@ sub _raw {				## concatenate @_ and escape non-printable
 }
 
 sub _base64 {
-	return _raw( map { MIME::Base64::decode($_) } @_ );
+	return map { _presentation( MIME::Base64::decode($_) ) } @_;
 }
 
 sub _integer16 {
-	return _raw( map { pack( 'n', $_ ) } @_ );
+	return _presentation( map { pack( 'n', $_ ) } @_ );
 }
 
 sub _ipv4 {
-	return _raw( map { bless( {}, 'Net::DNS::RR::A' )->address($_) } @_ );
+	return _presentation( map { bless( {}, 'Net::DNS::RR::A' )->address($_) } @_ );
 }
 
 sub _ipv6 {
-	return _raw( map { bless( {}, 'Net::DNS::RR::AAAA' )->address($_) } @_ );
+	return _presentation( map { bless( {}, 'Net::DNS::RR::AAAA' )->address($_) } @_ );
 }
 
 sub _string {
-	return _raw( map { Net::DNS::Text->new($_)->encode() } @_ );
+	return _presentation( map { Net::DNS::Text->new($_)->encode() } @_ );
 }
 
 
@@ -240,7 +241,7 @@ sub no_default_alpn {			## no-default-alpn
 
 sub port {				## port=1234
 	my $self = shift;
-	return $self->key3( map { _integer16($_) } @_ );
+	return $self->key3( _integer16(@_) );
 }
 
 sub ipv4hint {				## ipv4hint=192.0.2.1,...
@@ -250,9 +251,13 @@ sub ipv4hint {				## ipv4hint=192.0.2.1,...
 
 sub ech {				## ech=base64string
 	my $self = shift;
-	return $self->key5( map { _base64($_) } @_ );
+	return $self->key5( _base64(@_) );
 }
-sub echconfig { return &ech; }					# uncoverable pod
+
+sub echconfig {				## echconfig=base64string
+	$_[0]->_deprecate(qq[please use "ech"]);		# uncoverable pod
+	return &ech;
+}
 
 sub ipv6hint {				## ipv6hint=2001:DB8::1,...
 	my $self = shift;
@@ -268,7 +273,7 @@ sub AUTOLOAD {				## Dynamic constructor/accessor methods
 	my ($method) = reverse split /::/, $AUTOLOAD;
 
 	my $default = join '::', 'SUPER', $method;
-	return $self->$default(@_) unless $method =~ /^key(\d+)$/i;
+	return $self->$default(@_) unless $method =~ /^key[0]*(\d+)$/i;
 	my $key = $1;
 
 	my $params = $self->{SvcParams} || [];
@@ -279,12 +284,11 @@ sub AUTOLOAD {				## Dynamic constructor/accessor methods
 		croak 'unexpected number of arguments' if scalar @_;
 		delete $params{$key};
 		$params{$key} = Net::DNS::Text->new("$arg")->raw if defined $arg;
-		$self->{SvcParams} = $params;			# maintain list in ascending order
-		@$params = map { ( $_, $params{$_} ) } sort { $a <=> $b } keys %params;
+		$self->{SvcParams} = [map { ( $_, $params{$_} ) } sort { $a <=> $b } keys %params];
 	}
 
 	my $value = $params{$key};
-	return defined($value) ? _raw($value) : $value;
+	return defined($value) ? _presentation($value) : $value;
 }
 
 
@@ -354,12 +358,13 @@ The behaviour with undefined arguments is not specified.
 
     $keynn = $rr->keyNN;
     $rr->keyNN( $keynn );
+    $rr->keyNN( undef );
 
 Generic constructor and accessor methods for SvcParams.
 The key index NN is a decimal integer in the range 0 .. 65534.
 The method argument and returned value are both presentation format strings.
 The method returns the undefined value if the key is not present.
-A (key,value) pair will be ignored if the value is undefined.
+The specified key will be deleted if the value is undefined.
 
 
 =head1 COPYRIGHT

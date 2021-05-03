@@ -2,10 +2,10 @@ use 5.008;
 use strict;
 use warnings;
 
-package Dist::Zilla::Plugin::InstallGuide; # git description: v1.200012-7-g19b74b1
+package Dist::Zilla::Plugin::InstallGuide; # git description: v1.200013-7-g803cf68
 # ABSTRACT: Build an INSTALL file
 
-our $VERSION = '1.200013';
+our $VERSION = '1.200014';
 
 use Moose;
 with 'Dist::Zilla::Role::FileGatherer';
@@ -65,6 +65,12 @@ Alternatively, if your CPAN shell is set up, you should just be able to do:
 
 ## Manual installation
 
+As a last resort, you can manually install it. If you have not already
+downloaded the release tarball, you can find the download link on the module's
+MetaCPAN page: https://metacpan.org/pod/{{ $package }}
+
+Untar the tarball, install configure prerequisites (see below), then build it:
+
 {{ $manual_installation }}
 The prerequisites of this distribution will also have to be installed manually. The
 prerequisites are listed in one of the files: `MYMETA.yml` or `MYMETA.json` generated
@@ -82,7 +88,7 @@ distribution's installer can be run.  They can be found under the
 ## Other Prerequisites
 
 This distribution may require additional modules to be installed after running
-{{ join(' or ', grep { $installer{$_} } qw(Build.PL Makefile.PL)) }}.
+{{ join(' or ', grep $installer{$_}, qw(Build.PL Makefile.PL)) }}.
 Look for prerequisites in the following phases:
 
 * to run {{ join(' or ',
@@ -107,15 +113,9 @@ For more information on installing Perl modules via CPAN, please see:
 https://www.cpan.org/modules/INSTALL.html
 END_TEXT
 
-our $common_instructions = <<'END_TEXT';
-As a last resort, you can manually install it. Download the tarball, untar it,
-install configure prerequisites (see below), then build it:
-
-END_TEXT
-
 has makemaker_manual_installation => (
     is => 'ro', isa => 'Str',
-    default => $common_instructions . <<'END_TEXT',
+    default => <<'END_TEXT',
     % perl Makefile.PL
     % make && make test
 
@@ -133,7 +133,7 @@ END_TEXT
 
 has module_build_manual_installation => (
     is => 'ro', isa => 'Str',
-    default => $common_instructions . <<'END_TEXT',
+    default => <<'END_TEXT',
     % perl Build.PL
     % ./Build && ./Build test
 
@@ -186,10 +186,10 @@ sub munge_files {
     my $manual_installation = '';
 
     my %installer = (
-        map {
+        map +(
             $_->isa('Dist::Zilla::Plugin::MakeMaker') ? ( 'Makefile.PL' => 1 ) : (),
             $_->does('Dist::Zilla::Role::BuildPL') ? ( 'Build.PL' => 1 ) : (),
-        } @{ $zilla->plugins }
+        ), @{ $zilla->plugins }
     );
 
     if ($installer{'Build.PL'}) {
@@ -237,7 +237,7 @@ Dist::Zilla::Plugin::InstallGuide - Build an INSTALL file
 
 =head1 VERSION
 
-version 1.200013
+version 1.200014
 
 =for test_synopsis BEGIN { die "SKIP: synopsis isn't perl code" }
 
@@ -294,7 +294,7 @@ Mike Doherty <doherty@cpan.org>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Karen Etheridge Mike Doherty Marcel Gruenauer jonasbn Dan Book Dave Rolsky Apocalypse
+=for stopwords Karen Etheridge Mike Doherty Marcel Gruenauer jonasbn Dan Book Apocalypse Dave Rolsky
 
 =over 4
 
@@ -324,11 +324,15 @@ Dan Book <grinnz@gmail.com>
 
 =item *
 
-Dave Rolsky <autarch@urth.org>
+Apocalypse <APOCAL@cpan.org>
 
 =item *
 
-Apocalypse <APOCAL@cpan.org>
+Dan Book <grinnz@grinnz.com>
+
+=item *
+
+Dave Rolsky <autarch@urth.org>
 
 =back
 

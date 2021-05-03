@@ -1,5 +1,8 @@
 Revision history for RT::Extension::SideBySideView
 
+2.00 2021-05-01
+ - update Module::Install and rt_too_new for RT 5.0 compatibility
+
 1.01 2016-08-15
  - update Module::Install and friends
  - update for RT 4.4 compatibility

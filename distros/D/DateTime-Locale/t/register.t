@@ -127,7 +127,7 @@ DateTime::Locale->register(
     my $l = DateTime::Locale->load('fr_FR_BZH2');
     isa_ok( $l, 'DateTime::Locale::fr_FR_BZH2' );
     ok( $l, 'was able to load fr_FR_BZH2' );
-    is( $l->short_date_format, 'test test2', 'short date' );
+    is( $l->short_date_format, 'test test2',   'short date' );
     is( $l->name, 'French2 French2 Britanny2', 'name is also set' );
 }
 

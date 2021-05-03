@@ -19,12 +19,12 @@
 
 =head1 NAME
 
-DateTime::Locale::root - Locale data examples for the Root (root) locale
+DateTime::Locale::root - Locale data examples for the  (root) locale
 
 =head1 DESCRIPTION
 
 This pod file contains examples of the locale data available for the
-Root locale.
+ locale.
 
 =head2 Days
 

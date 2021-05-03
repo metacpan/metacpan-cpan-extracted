@@ -1,0 +1,140 @@
+#!/bin/sh
+
+# NOTE: at some point, this may be rewritten in Perl, but it was eay and quick enough
+#       to do it this way so that is why.
+
+_echo_help()
+{ echo "" 
+  echo "fash provides an easier commandline interface to one liners available via FLAT::CMD" 
+  echo "  Usage:"
+  echo "   1.   % flat <action> [parameter1 parameter2 ... parameterN]"
+  echo "   2.   % cat file.dat | fash -b test"
+  echo ""
+  echo "  Actions:"
+  echo "    somestrings \"regular_expression\""
+  echo "        Outputs strings based on all acyclic paths from start to all final states found in the minimal DFA"
+  echo ""
+  echo "    morestrings \"regular_expression\""
+  echo "        Outputs strings associated with all acyclic paths and backedges detected on an accepting state from"
+  echo "         start to all final states found in the minimal DFA"
+  echo ""
+  echo "    dump \"regular_expression\""
+  echo "        Perl dump parse tree of given regex."
+  echo ""
+  echo "    dfa2jflap \"regular_expression\""
+  echo "        Dumps out FA in FLAT input format; useful for visualizing and manipulating FA"
+  echo ""
+  echo "    nfa2jflap \"regular_expression\""
+  echo "        Dumps out FA in FLAT input format; useful for visualizing and manipulating FA"
+  echo ""
+  echo "    dfa2gv \"regular_expression\""
+  echo "        Dumps out FA in graphviz input format; useful for visualizing FA"
+  echo ""
+  echo "    nfa2gv \"regular_expression\""
+  echo "        Dumps out FA in graphviz input format; useful for visualizing FA"
+  echo ""
+  echo "    pfa2gv \"regular_expression\""
+  echo "        Dumps out FA in graphviz input format; useful for visualizing FA"
+  echo ""
+  echo "    dfa2undgv \"regular_expression\""
+  echo "        Dumps out undirected graph underlying the FA in graphviz input format; useful for visualizing FA"
+  echo ""
+  echo "    nfa2undgv \"regular_expression\""
+  echo "        Dumps out undirected graph underlying the FA in graphviz input format; useful for visualizing FA"
+  echo ""
+  echo "    pfa2undgv \"regular_expression\""
+  echo "        Dumps out undirected graph underlying the FA in graphviz input format; useful for visualizing FA"
+  echo ""
+  echo "    dfa2digraph \"regular_expression\""
+  echo "        Outputs digraph of FA for input into a program that might operate over the underlying graph."
+  echo ""
+  echo "    nfa2digraph \"regular_expression\""
+  echo "        Outputs digraph of FA for input into a program that might operate over the underlying graph."
+  echo ""
+  echo "    pfa2digraph \"regular_expression\""
+  echo "        Outputs digraph of FA for input into a program that might operate over the underlying graph."
+  echo ""
+  echo "    dfa2undirectedgraph \"regular_expression\""
+  echo "        Outputs undirected graph of FA for input into a program that might operate over the underlying graph."
+  echo ""
+  echo "    nfa2undirectedgraph \"regular_expression\""
+  echo "        Outputs undirected graph of FA for input into a program that might operate over the underlying graph."
+  echo ""
+  echo "    pfa2undirectedgraph \"regular_expression\""
+  echo "        Outputs undirected graph of FA for input into a program that might operate over the underlying graph."
+  echo ""
+  echo "    test \"regular_expression\" \"test_string\"" 
+  echo "        Given a regular expression, tests the given string(s) for acceptance."
+  echo ""
+  echo "    compare \"regular_expression1\" \"regular_expression2\""
+  echo "        Compares 2 regularexpressions."
+  echo ""
+  echo "  Notes on 'test' action:"
+  echo "    this action may accept STDIN when using the -b flag; the "
+  echo "    format of the file should be a regular expression in the "
+  echo "    top line, followed by strings to test for acceptance."
+  echo ""
+}
+
+
+showhelp() {
+  _echo_help
+}
+
+LISTENSTDIN=0
+while getopts 'b' option; do
+    case "$option" in
+      b) LISTENSTDIN=1  # specify INDEX to $OPTARG
+         shift # get reid of -b so the default vars below work
+         ;;
+    esac
+done
+
+if [ ${LISTENSTDIN} -eq 1 ]; then
+  IFS="" # ensures that leading spaces are retained
+  while read -r IN <&0 ; do # break after 1 sec of no stdin
+  if [ -z "${ALL}" ]; then
+    ALL="${IN}";
+  else
+    ALL="${ALL}\n${IN}";
+  fi
+  done
+fi
+
+case "${1}" in
+  dump)           perl -MFLAT::CMD -e "dump(\"${2}\")" ;;
+  dfa2jflap)      perl -MFLAT::CMD -e "dfa2jflap(\"${2}\")" ;;
+  nfa2jflap)      perl -MFLAT::CMD -e "nfa2jflap(\"${2}\")" ;;
+  dfa2gv)         perl -MFLAT::CMD -e "dfa2gv(\"${2}\")" ;;
+  nfa2gv)         perl -MFLAT::CMD -e "nfa2gv(\"${2}\")" ;;
+  pfa2gv)         perl -MFLAT::CMD -e "pfa2gv(\"${2}\")" ;;
+  dfa2undgv)      perl -MFLAT::CMD -e "dfa2undgv(\"${2}\")" ;;
+  nfa2undgv)      perl -MFLAT::CMD -e "nfa2undgv(\"${2}\")" ;;
+  pfa2undgv)      perl -MFLAT::CMD -e "pfa2undgv(\"${2}\")" ;;
+  somestrings)    perl -MFLAT::CMD::AcyclicStrings -e "as_strings(\"${2}\")" ;;
+  morestrings)        
+    if [ -n "${3}" ]; then
+      perl -MFLAT::CMD::DFTStrings     -e "as_strings(\"${2}\",\"${3}\")"
+    else 
+      perl -MFLAT::CMD::DFTStrings     -e "as_strings(\"${2}\")"
+    fi ;;
+  dfa2digraph)    perl -MFLAT::CMD -e "dfa2digraph(\"${2}\")" ;;         
+  nfa2digraph)    perl -MFLAT::CMD -e "nfa2digraph(\"${2}\")" ;;           
+  pfa2digraph)    perl -MFLAT::CMD -e "pfa2digraph(\"${2}\")" ;;            
+  dfa2undirected) perl -MFLAT::CMD -e "dfa2undirected(\"${2}\")" ;;         
+  nfa2undirected) perl -MFLAT::CMD -e "nfa2undirected(\"${2}\")" ;;          
+  pfa2undirected) perl -MFLAT::CMD -e "pfa2undirected(\"${2}\")" ;;           
+  random_re)      perl -MFLAT::CMD -e random_re ;;
+  random_pre)     perl -MFLAT::CMD -e random_pre ;;
+  compare)        perl -MFLAT::CMD -e "compare(\"${2}\",\"${3}\")" ;;
+  test) # how we'll handle STDIN           
+    if [ ${LISTENSTDIN} -eq 1 ]; then
+      echo "$ALL" |  perl -MFLAT::CMD -e "test"
+    else
+      perl -MFLAT::CMD -e "test(\"${2}\",\"${3}\")"
+    fi
+    ;; 
+  savedfa)        perl -MFLAT::CMD -e "savedfa(\"${2}\")" ;;
+  help)           showhelp ;;
+  *) echo function \""${1}"\" not available ;;
+esac

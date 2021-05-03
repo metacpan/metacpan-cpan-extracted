@@ -1,3 +1,14 @@
+0.004   2021-05-01  Released-By: PERLANCAR; Urgency: medium
+
+	- Fix module name, derp.
+
+
+0.003   2021-05-01  Released-By: PERLANCAR; Urgency: medium
+
+	- Mention Text::Table::More & Text::ANSITable, but avoid making
+	  these modules as regular entries.
+
+
 0.002   2021-04-25  Released-By: PERLANCAR; Urgency: medium
 
 	- [bugfix] Forgot to set Abstract.

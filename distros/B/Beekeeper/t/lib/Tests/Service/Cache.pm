@@ -20,7 +20,7 @@ Simple worker used to test shared cache.
 sub on_startup {
     my $self = shift;
 
-    $self->{Cache} = $self->shared_cache( id => "test", max_age => 10 );
+    $self->{Cache} = $self->shared_cache( id => "test", max_age => 20 );
 
     $self->accept_jobs(
         'cache.set'  => 'set',

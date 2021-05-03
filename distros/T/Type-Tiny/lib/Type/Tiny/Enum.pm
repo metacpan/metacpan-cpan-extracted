@@ -6,7 +6,7 @@ use warnings;
 
 BEGIN {
 	$Type::Tiny::Enum::AUTHORITY = 'cpan:TOBYINK';
-	$Type::Tiny::Enum::VERSION   = '1.012001';
+	$Type::Tiny::Enum::VERSION   = '1.012002';
 }
 
 $Type::Tiny::Enum::VERSION =~ tr/_//d;
@@ -472,7 +472,7 @@ You can get a case-insensitive regexp using C<< $enum->as_regexp('i') >>.
 Returns the closest match in the enum for a string.
 
   my $enum = Type::Tiny::Enum->new(
-    value => [ qw( foo bar baz quux ) ],
+    values => [ qw( foo bar baz quux ) ],
   );
   
   say $enum->closest_match("FO");   # ==> foo
@@ -482,7 +482,7 @@ match, if it still can't find one, will try to find a head substring match,
 and finally, if given an integer, will use that as an index.
 
   my $enum = Type::Tiny::Enum->new(
-    value => [ qw( foo bar baz quux ) ],
+    values => [ qw( foo bar baz quux ) ],
   );
   
   say $enum->closest_match(  0 );  # ==> foo

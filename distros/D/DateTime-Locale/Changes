@@ -1,3 +1,8 @@
+1.32     2021-04-30
+
+- Rebuilt all locale data with the data from CLDR 39.0.0.
+
+
 1.31     2020-12-22
 
 - The docs for each locale now show examples of its strftime patterns as well.

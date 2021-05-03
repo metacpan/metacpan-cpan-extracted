@@ -4,7 +4,7 @@ use warnings;
 use DBI;
 use Module::Load 'load';
 
-our $VERSION = '0.21';
+our $VERSION = '0.22';
 
 =head1 NAME
 
@@ -23,6 +23,7 @@ DBIx::RunSQL - run SQL from a file
         sql     => 'sql/create.sql',
         force   => 1,
         verbose => 1,
+        formatter => 'Text::Table',
     );
 
     # now run your tests with a DB setup fresh from setup.sql
@@ -63,7 +64,7 @@ you can simply pass in a reference to a scalar containing the SQL:
 
 =item *
 
-C<dsn>, C<user>, C<password> - DBI parameters for connecting to the DB
+C<dsn>, C<user>, C<password>, C<options> - DBI parameters for connecting to the DB
 
 =item *
 
@@ -93,9 +94,11 @@ sub create {
     my ($self,%args) = @_;
     $args{sql} ||= 'sql/create.sql';
 
+    $args{options} ||= {};
+
     my $dbh = delete $args{ dbh };
     if (! $dbh) {
-        $dbh = DBI->connect($args{dsn}, $args{user}, $args{password}, {})
+        $dbh = DBI->connect($args{dsn}, $args{user}, $args{password}, $args{options})
             or die "Couldn't connect to DSN '$args{dsn}' : " . DBI->errstr;
     };
 
@@ -167,6 +170,10 @@ but a row was found.
 
 C<output_string> - whether to output the (one) row and column, without any
 headers
+
+=item *
+
+C<formatter> - see the C<<formatter>> option of C<< ->format_results >>
 
 =back
 
@@ -243,6 +250,10 @@ but a row was found.
 
 C<output_string> - whether to output the (one) row and column, without any headers
 
+=item *
+
+C<formatter> - see the C<<formatter>> option of C<< ->format_results >>
+
 =back
 
 =cut
@@ -292,6 +303,9 @@ sub run_sql {
                         %args
                     );
                     print $res;
+                    # Set the exit code depending on the length of $res because
+                    # we lost the information on how many rows the result
+                    # set had ...
                     $errors = length $res > 0;
 
                 } elsif( $args{ output_string }) {
@@ -383,7 +397,7 @@ sub format_results {
 
                 eval { load $class; };
             };
-            
+
             # Now dispatch according to the apparent type
             if( !$class->isa('Text::Table') and my $table = $class->can('table') ) {
                 # Text::Table::Any interface
@@ -685,15 +699,18 @@ or potentially L<DBIx::SQLHandler>.
 
 L<ORLite::Migrate>
 
+L<Test::SQLite> - SQLite setup/teardown for tests, mostly geared towards
+testing, not general database setup
+
 =head1 REPOSITORY
 
 The public repository of this module is
-L<http://github.com/Corion/DBIx--RunSQL>.
+L<https://github.com/Corion/DBIx--RunSQL>.
 
 =head1 SUPPORT
 
 The public support forum of this module is
-L<http://perlmonks.org/>.
+L<https://perlmonks.org/>.
 
 =head1 BUG TRACKER
 
@@ -707,7 +724,7 @@ Max Maischein C<corion@cpan.org>
 
 =head1 COPYRIGHT (c)
 
-Copyright 2009-2018 by Max Maischein C<corion@cpan.org>.
+Copyright 2009-2021 by Max Maischein C<corion@cpan.org>.
 
 =head1 LICENSE
 

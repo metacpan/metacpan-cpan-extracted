@@ -4,7 +4,7 @@
 #
 package PDL::Complex;
 
-our @EXPORT_OK = qw( Ctan  Catan  re  im  i  cplx  real PDL::PP r2C PDL::PP i2C PDL::PP Cr2p PDL::PP Cp2r PDL::PP Cadd PDL::PP Csub PDL::PP Cmul PDL::PP Cprodover PDL::PP Cscale PDL::PP Cdiv PDL::PP Ccmp PDL::PP Cconj PDL::PP Cabs PDL::PP Cabs2 PDL::PP Carg PDL::PP Csin PDL::PP Ccos PDL::PP Cexp PDL::PP Clog PDL::PP Cpow PDL::PP Csqrt PDL::PP Casin PDL::PP Cacos PDL::PP Csinh PDL::PP Ccosh PDL::PP Ctanh PDL::PP Casinh PDL::PP Cacosh PDL::PP Catanh PDL::PP Cproj PDL::PP Croots PDL::PP rCpolynomial );
+our @EXPORT_OK = qw( Ctan  Catan  re  im  i  cplx  real PDL::PP r2C PDL::PP i2C PDL::PP Cr2p PDL::PP Cp2r PDL::PP Cadd PDL::PP Csub PDL::PP Cmul PDL::PP Cprodover PDL::PP Cscale PDL::PP Cdiv PDL::PP Ceq PDL::PP Cconj PDL::PP Cabs PDL::PP Cabs2 PDL::PP Carg PDL::PP Csin PDL::PP Ccos PDL::PP Cexp PDL::PP Clog PDL::PP Cpow PDL::PP Csqrt PDL::PP Casin PDL::PP Cacos PDL::PP Csinh PDL::PP Ccosh PDL::PP Ctanh PDL::PP Casinh PDL::PP Cacosh PDL::PP Catanh PDL::PP Cproj PDL::PP Croots PDL::PP rCpolynomial );
 our %EXPORT_TAGS = (Func=>[@EXPORT_OK]);
 
 use PDL::Core;
@@ -206,8 +206,6 @@ The following operators are overloaded:
 
 =item atan2 (4-quadrant arc tangent)
 
-=item <=> (nonsensical comparison operator; L</Ccmp>)
-
 =item sin (L</Csin>)
 
 =item cos (L</Ccos>)
@@ -220,13 +218,13 @@ The following operators are overloaded:
 
 =item sqrt (L</Csqrt>)
 
-=item <, <=, ==, !=, >=, > (just as nonsensical as L</Ccmp>)
-
 =item ++, -- (increment, decrement; they affect the real part of the complex number only)
 
 =item "" (stringification)
 
 =back
+
+Comparing complex numbers other than for equality is a fatal error.
 
 =cut
 
@@ -571,7 +569,7 @@ BEGIN {*Cdiv = \&PDL::Complex::Cdiv;
 
 
 
-=head2 Ccmp
+=head2 Ceq
 
 =for sig
 
@@ -579,13 +577,11 @@ BEGIN {*Cdiv = \&PDL::Complex::Cdiv;
 
 =for ref
 
-Complex comparison operator (spaceship).
-
-Ccmp orders by real first, then by imaginary. Hm, but it is mathematical nonsense! Complex numbers cannot be ordered.
+Complex equality operator.
 
 =for bad
 
-Ccmp does not process bad values.
+Ceq does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
@@ -594,9 +590,15 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
+sub PDL::Complex::Ceq {
+    my @args = reverse &PDL::Core::rswap;
+    $args[1] = r2C($args[1]) if ref $args[1] ne __PACKAGE__;
+    PDL::Complex::_Ceq_int($args[0], $args[1], my $r = PDL->null);
+    $r;
+}
 
 
-BEGIN {*Ccmp = \&PDL::Complex::Ccmp;
+BEGIN {*Ceq = \&PDL::Complex::Ceq;
 }
 
 
@@ -1246,11 +1248,16 @@ imaginary parts are returned as ndarrays (ref eq PDL).
 
 =cut
 
-sub re($) { bless $_[0]->slice("(0)"), 'PDL'; }
-sub im($) { bless $_[0]->slice("(1)"), 'PDL'; }
+sub re($) { $_[0]->slice("(0)") }
+sub im($) { $_[0]->slice("(1)") }
 
-*PDL::Complex::re = \&re;
-*PDL::Complex::im = \&im;
+# if the argument does anything other than pass through 0-th dim, re-bless
+sub slice (;@) :lvalue {
+  my $first = ref $_[1] ? $_[1][0] : (split ',', $_[1])[0];
+  my $class = $first =~ /^[:x]?$/i ? ref($_[0]) : 'PDL';
+  my $ret = bless $_[0]->SUPER::slice(@_[1..$#_]), $class;
+  $ret;
+}
 
 
 
@@ -1328,7 +1335,7 @@ sub _gen_biop {
    } else {
       die;
    }
-   if($1 eq "atan2" || $1 eq "<=>") { return ($1, $sub) }
+   if($1 eq "atan2") { return ($1, $sub) }
    ($1, $sub, "$1=", $sub);
 }
 
@@ -1338,34 +1345,29 @@ sub _gen_unop {
    ($op, eval 'sub { '.$func.' $_[0] }');
 }
 
-#sub _gen_cpop {
-#   ($_[0], eval 'sub { my $y = ref $_[1] eq __PACKAGE__ ? $_[1] : r2C $_[1];
-#                 ($_[2] ? $y <=> $_[0] : $_[0] <=> $y) '.$_[0].' 0 }');
-#}
-
 sub initialize {
    # Bless a null PDL into the supplied 1st arg package
    #   If 1st arg is a ref, get the package from it
-   bless PDL->null, ref($_[0]) ? ref($_[0]) : $_[0];
+   bless PDL->null, ref($_[0]) || $_[0];
+}
+
+# so threading doesn't also assign the real value into the imaginary
+sub Cassgn {
+    my @args = reverse &PDL::Core::rswap;
+    $args[1] = r2C($args[1]) if ref $args[1] ne __PACKAGE__;
+    PDL::Ops::assgn(@args);
+    $args[1];
 }
 
 use overload
-   (map _gen_biop($_), qw(++Cadd --Csub *+Cmul /-Cdiv **-Cpow atan2-Catan2 <=>-Ccmp)),
+   (map _gen_biop($_), qw(++Cadd --Csub *+Cmul /-Cdiv **-Cpow atan2-Catan2 ==+Ceq .=-Cassgn)),
    (map _gen_unop($_), qw(sin@Csin cos@Ccos exp@Cexp abs@Cabs log@Clog sqrt@Csqrt)),
-#   (map _gen_cpop($_), qw(< <= == != >= >)), #segfaults with infinite recursion of the operator.
 #final ternary used to make result a scalar, not a PDL:::Complex (thx CED!)
-    "<" => sub { my $y = ref $_[1] eq __PACKAGE__ ? $_[1] : r2C $_[1];
-		 PDL::lt( ($_[2] ? $y <=> $_[0] : $_[0] <=> $y), 0, 0) ? 1 : 0;},
-    "<=" => sub { my $y = ref $_[1] eq __PACKAGE__ ? $_[1] : r2C $_[1];
-                 PDL::le( ($_[2] ? $y <=> $_[0] : $_[0] <=> $y), 0, 0) ? 1 : 0;},
-    "==" => sub { my $y = ref $_[1] eq __PACKAGE__ ? $_[1] : r2C $_[1];
-                 PDL::eq( ($_[2] ? $y <=> $_[0] : $_[0] <=> $y), 0, 0) ? 1 : 0;},
-    "!=" => sub { my $y = ref $_[1] eq __PACKAGE__ ? $_[1] : r2C $_[1];
-                 PDL::ne( ($_[2] ? $y <=> $_[0] : $_[0] <=> $y), 0, 0) ? 1 : 0;},
-    ">=" => sub { my $y = ref $_[1] eq __PACKAGE__ ? $_[1] : r2C $_[1];
-                 PDL::ge( ($_[2] ? $y <=> $_[0] : $_[0] <=> $y), 0, 0) ? 1 : 0;},
-    ">" => sub { my $y = ref $_[1] eq __PACKAGE__ ? $_[1] : r2C $_[1];
-                 PDL::gt( ($_[2] ? $y <=> $_[0] : $_[0] <=> $y), 0, 0) ? 1 : 0;},
+    "<" => sub { confess "Can't compare complex numbers" },
+    "<=" => sub { confess "Can't compare complex numbers" },
+    ">=" => sub { confess "Can't compare complex numbers" },
+    ">" => sub { confess "Can't compare complex numbers" },
+    "!=" => sub { !($_[0] == $_[1]) },
    '++' => sub { $_[0] += 1 },
    '--' => sub { $_[0] -= 1 },
    '""' => \&PDL::Complex::string

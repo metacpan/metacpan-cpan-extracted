@@ -6,7 +6,7 @@ use warnings;
 
 use Test::More;
 
-plan tests => 16;
+plan tests => 14;
 
 my @module_files = (
     'Dist/Zilla/Plugin/DROLSKY/BundleAuthordep.pm',
@@ -17,9 +17,7 @@ my @module_files = (
     'Dist/Zilla/Plugin/DROLSKY/MakeMaker.pm',
     'Dist/Zilla/Plugin/DROLSKY/PerlLinterConfigFiles.pm',
     'Dist/Zilla/Plugin/DROLSKY/Precious.pm',
-    'Dist/Zilla/Plugin/DROLSKY/Role/CoreCounter.pm',
     'Dist/Zilla/Plugin/DROLSKY/Role/MaybeFileWriter.pm',
-    'Dist/Zilla/Plugin/DROLSKY/RunExtraTests.pm',
     'Dist/Zilla/Plugin/DROLSKY/Test/Precious.pm',
     'Dist/Zilla/Plugin/DROLSKY/WeaverConfig.pm',
     'Dist/Zilla/PluginBundle/DROLSKY.pm',

@@ -229,7 +229,9 @@ sub read_and_add_value {
             return;
         }
         if ( $op =~ /^(?:NOT\s)?IN\z/ ) {
-            $complex_value =~ s/^\s*\(|\)\s*\z//g;
+            while ( $complex_value =~ /^\s*\((.+)\)\s*\z/ ) {
+                $complex_value = $1;
+            }
             $sql->{$stmt} .= '(' . $complex_value . ')';
         }
         #elsif ( $op =~ /REGEXP(_i)?\z/ ) {

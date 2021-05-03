@@ -9,9 +9,10 @@ our %Remote = (
     source  => 'https://www.whitehouse.gov/1600/Presidents',
     extract => sub {
         return
-            map { y'- .'_'; s/_+/_/g; s/\b(.)/uc $1/eg; $_ }
-            grep { !/^(?:BEGIN|END)$/ }
-            $_[0] =~ /"Portrait of ([^"]+)"/g;
+            map { s/(?:,| the [1-9]).*//; y'- .'_'; s/_+/_/g; s/_+\z//; s/\b(.)/uc $1/eg; $_ }
+	    #grep { !/^(?:BEGIN|END)$/ }
+	    #$_[0] =~ /"Portrait of ([^"]+)"/g;
+	    $_[0] =~ m{<h3 class="acctext--con grid-item__title h4alt">\s*([^<]+?)\s*</h3>}g;
     }
 );
 
@@ -35,6 +36,13 @@ Abigail
 =head1 CHANGES
 
 =over 4
+
+=item *
+
+2021-04-30 - v1.002
+
+Updated with the new US president since 2017
+in Acme-MetaSyntactic-Themes version 1.055.
 
 =item *
 
@@ -83,41 +91,42 @@ Andrew_Johnson
 Barack_Obama
 Benjamin_Harrison
 Calvin_Coolidge
-Chester_Arthur
-Donald_J_Trump
-Dwight_Eisenhower
+Chester_A_Arthur
+Donald_Trump
+Dwight_D_Eisenhower
 Franklin_D_Roosevelt
 Franklin_Pierce
 George_H_W_Bush
-George_W_Bush
 George_Washington
-Gerald_Ford
+George_W_Bush
+Gerald_R_Ford
 Grover_Cleveland
 Harry_S_Truman
 Herbert_Hoover
 James_Buchanan
+James_Carter
 James_Garfield
+James_K_Polk
 James_Madison
 James_Monroe
-James_Polk
-Jimmy_Carter
 John_Adams
-John_Kennedy
+John_F_Kennedy
 John_Quincy_Adams
 John_Tyler
-Lyndon_Johnson
+Joseph_R_Biden_Jr
+Lyndon_B_Johnson
 Martin_Van_Buren
 Millard_Fillmore
-Richard_Nixon
+Richard_M_Nixon
 Ronald_Reagan
-Rutherford_Hayes
+Rutherford_B_Hayes
 Theodore_Roosevelt
 Thomas_Jefferson
-Ulysses_Grant
-Warren_Harding
-William_Clinton
+Ulysses_S_Grant
+Warren_G_Harding
 William_Henry_Harrison
 William_Howard_Taft
+William_J_Clinton
 William_McKinley
 Woodrow_Wilson
 Zachary_Taylor

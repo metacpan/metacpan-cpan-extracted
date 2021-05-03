@@ -4,4 +4,3 @@ MANIFEST.SKIP
 NZ.pm
 test.pl
 META.yml                                 Module meta-data (added by MakeMaker)
-META.json                                Module JSON meta-data (added by MakeMaker)

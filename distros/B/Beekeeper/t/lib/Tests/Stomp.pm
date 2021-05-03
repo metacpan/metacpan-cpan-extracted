@@ -60,7 +60,7 @@ sub test_01_topic : Test(3) {
         },
     );
 
-    $cv = AnyEvent->condvar; $tmr = AnyEvent->timer( after => 0.1, cb => $cv); $cv->recv;
+    $cv = AnyEvent->condvar; $tmr = AnyEvent->timer( after => 1, cb => $cv); $cv->recv;
 
 
     $bus1->send(
@@ -68,7 +68,7 @@ sub test_01_topic : Test(3) {
         body        => 'Hello',
     );
 
-    $cv = AnyEvent->condvar; $tmr = AnyEvent->timer( after => 0.1, cb => $cv); $cv->recv;
+    $cv = AnyEvent->condvar; $tmr = AnyEvent->timer( after => 1, cb => $cv); $cv->recv;
 
     is( scalar(@received), 2, "received 2 messages from topic");
     is( $received[0]->{body}, 'Hello', "got message");
@@ -116,7 +116,7 @@ sub test_02_topic_wildcard : Test(7) {
         },
     );
 
-    $cv = AnyEvent->condvar; $tmr = AnyEvent->timer( after => 0.1, cb => $cv); $cv->recv;
+    $cv = AnyEvent->condvar; $tmr = AnyEvent->timer( after => 1, cb => $cv); $cv->recv;
 
 
     $bus1->send(
@@ -124,7 +124,7 @@ sub test_02_topic_wildcard : Test(7) {
         body        => 'Hello',
     );
 
-    $cv = AnyEvent->condvar; $tmr = AnyEvent->timer( after => 0.1, cb => $cv); $cv->recv;
+    $cv = AnyEvent->condvar; $tmr = AnyEvent->timer( after => 1, cb => $cv); $cv->recv;
 
     is( scalar(@received), 2, "received 2 messages from topic");
     is( $received[0]->{body}, 'Hello', "got message");
@@ -140,7 +140,7 @@ sub test_02_topic_wildcard : Test(7) {
         body        => 'Hello',
     );
 
-    $cv = AnyEvent->condvar; $tmr = AnyEvent->timer( after => 0.1, cb => $cv); $cv->recv;
+    $cv = AnyEvent->condvar; $tmr = AnyEvent->timer( after => 1, cb => $cv); $cv->recv;
 
     is( scalar(@received), 0, "received no messages from topic");
 
@@ -154,7 +154,7 @@ sub test_02_topic_wildcard : Test(7) {
         body        => 'Hello',
     );
 
-    $cv = AnyEvent->condvar; $tmr = AnyEvent->timer( after => 0.1, cb => $cv); $cv->recv;
+    $cv = AnyEvent->condvar; $tmr = AnyEvent->timer( after => 1, cb => $cv); $cv->recv;
 
     is( scalar(@received), 1, "received 1 message from topic");
     is( $received[0]->{body}, 'Hello', "got message");
@@ -202,7 +202,7 @@ sub test_03_queue : Test(4) {
         },
     );
 
-    $cv = AnyEvent->condvar; $tmr = AnyEvent->timer( after => 0.1, cb => $cv); $cv->recv;
+    $cv = AnyEvent->condvar; $tmr = AnyEvent->timer( after => 1, cb => $cv); $cv->recv;
 
 
     $bus1->send(
@@ -210,7 +210,7 @@ sub test_03_queue : Test(4) {
         body        => 'Hello',
     );
 
-    $cv = AnyEvent->condvar; $tmr = AnyEvent->timer( after => 0.1, cb => $cv); $cv->recv;
+    $cv = AnyEvent->condvar; $tmr = AnyEvent->timer( after => 1, cb => $cv); $cv->recv;
 
     is( scalar(@received), 1, "received 1 message from queue");
     is( $received[0]->{body}, 'Hello', "got message");
@@ -225,7 +225,7 @@ sub test_03_queue : Test(4) {
         body        => 'Hello',
     );
 
-    $cv = AnyEvent->condvar; $tmr = AnyEvent->timer( after => 0.1, cb => $cv); $cv->recv;
+    $cv = AnyEvent->condvar; $tmr = AnyEvent->timer( after => 1, cb => $cv); $cv->recv;
 
     is( scalar(@received), 1, "received 1 message from queue");
     is( $received[0]->{body}, 'Hello', "got message");
@@ -274,7 +274,7 @@ sub test_04_temp_queue : Test(11) {
         },
     );
 
-    $cv = AnyEvent->condvar; $tmr = AnyEvent->timer( after => 0.1, cb => $cv); $cv->recv;
+    $cv = AnyEvent->condvar; $tmr = AnyEvent->timer( after => 1, cb => $cv); $cv->recv;
 
 
     $bus1->send(
@@ -283,7 +283,7 @@ sub test_04_temp_queue : Test(11) {
         body        => 'Hello',
     );
 
-    $cv = AnyEvent->condvar; $tmr = AnyEvent->timer( after => 0.1, cb => $cv); $cv->recv;
+    $cv = AnyEvent->condvar; $tmr = AnyEvent->timer( after => 1, cb => $cv); $cv->recv;
 
     is( scalar(@received_2), 1, "received 1 message from queue");
     is( $received_2[0]->{body}, 'Hello', "got message");
@@ -299,7 +299,7 @@ sub test_04_temp_queue : Test(11) {
         body        => 'Hello!',
     );
 
-    $cv = AnyEvent->condvar; $tmr = AnyEvent->timer( after => 0.1, cb => $cv); $cv->recv;
+    $cv = AnyEvent->condvar; $tmr = AnyEvent->timer( after => 1, cb => $cv); $cv->recv;
 
     is( scalar(@received_1), 1, "received 1 message from temp-queue");
     is( $received_1[0]->{body}, 'Hello!', "got message");
@@ -321,7 +321,7 @@ sub test_04_temp_queue : Test(11) {
             },
         );
 
-        $cv = AnyEvent->condvar; $tmr = AnyEvent->timer( after => 0.1, cb => $cv); $cv->recv;
+        $cv = AnyEvent->condvar; $tmr = AnyEvent->timer( after => 1, cb => $cv); $cv->recv;
     };
 
     if ($@) {
@@ -337,7 +337,7 @@ sub test_04_temp_queue : Test(11) {
             body        => 'Hello again',
         );
 
-        $cv = AnyEvent->condvar; $tmr = AnyEvent->timer( after => 0.1, cb => $cv); $cv->recv;
+        $cv = AnyEvent->condvar; $tmr = AnyEvent->timer( after => 1, cb => $cv); $cv->recv;
 
         is( scalar(@received_1), 1, "did not received message from another temp-queue with same destination");
         is( $received_1[-1]->{body}, 'Hello!', "did not received another message");
@@ -361,7 +361,7 @@ sub test_04_temp_queue : Test(11) {
             },
         );
 
-        $cv = AnyEvent->condvar; $tmr = AnyEvent->timer( after => 0.1, cb => $cv); $cv->recv;
+        $cv = AnyEvent->condvar; $tmr = AnyEvent->timer( after => 1, cb => $cv); $cv->recv;
     };
 
     if ($@) {
@@ -377,7 +377,7 @@ sub test_04_temp_queue : Test(11) {
             body        => 'Pff',
         );
 
-        $cv = AnyEvent->condvar; $tmr = AnyEvent->timer( after => 0.1, cb => $cv); $cv->recv;
+        $cv = AnyEvent->condvar; $tmr = AnyEvent->timer( after => 1, cb => $cv); $cv->recv;
 
         is( scalar(@received_1), 2, "sent another message to temp-queue");
         is( $received_1[1]->{body}, 'Pff', "sent message");
@@ -431,7 +431,7 @@ sub test_05_queue_prefetch : Test(6) {
         },
     );
 
-    $cv = AnyEvent->condvar; $tmr = AnyEvent->timer( after => 0.1, cb => $cv); $cv->recv;
+    $cv = AnyEvent->condvar; $tmr = AnyEvent->timer( after => 1, cb => $cv); $cv->recv;
 
 
     $bus1->send(
@@ -439,7 +439,7 @@ sub test_05_queue_prefetch : Test(6) {
         body        => 'Hello',
     );
 
-    $cv = AnyEvent->condvar; $tmr = AnyEvent->timer( after => 0.1, cb => $cv); $cv->recv;
+    $cv = AnyEvent->condvar; $tmr = AnyEvent->timer( after => 1, cb => $cv); $cv->recv;
 
     is( scalar(@received), 1, "received 1 message from queue");
     is( $received[0]->{body}, 'Hello', "got message");
@@ -452,7 +452,7 @@ sub test_05_queue_prefetch : Test(6) {
         body        => 'Hello',
     );
 
-    $cv = AnyEvent->condvar; $tmr = AnyEvent->timer( after => 0.1, cb => $cv); $cv->recv;
+    $cv = AnyEvent->condvar; $tmr = AnyEvent->timer( after => 1, cb => $cv); $cv->recv;
 
     is( scalar(@received), 2, "received 1 more message from queue");
     is( $received[1]->{body}, 'Hello', "got message");
@@ -466,7 +466,7 @@ sub test_05_queue_prefetch : Test(6) {
         body        => 'Hello',
     );
 
-    $cv = AnyEvent->condvar; $tmr = AnyEvent->timer( after => 0.1, cb => $cv); $cv->recv;
+    $cv = AnyEvent->condvar; $tmr = AnyEvent->timer( after => 1, cb => $cv); $cv->recv;
 
     is( scalar(@received), 2, "received no more messages until ACK");
  
@@ -487,7 +487,7 @@ sub test_05_queue_prefetch : Test(6) {
         }
     }
 
-    $cv = AnyEvent->condvar; $tmr = AnyEvent->timer( after => 0.1, cb => $cv); $cv->recv;
+    $cv = AnyEvent->condvar; $tmr = AnyEvent->timer( after => 1, cb => $cv); $cv->recv;
 
     is( scalar(@received), 3, "received another message");
 
@@ -534,10 +534,10 @@ sub test_06_queue_timeout : Test(2) {
     $bus1->send(
         destination => '/queue/req.foo.bar',
         body        => 'Message B',
-        expiration  => 500,
+        expiration  => 1000,
     );
 
-    $cv = AnyEvent->condvar; $tmr = AnyEvent->timer( after => 0.2, cb => $cv); $cv->recv;
+    $cv = AnyEvent->condvar; $tmr = AnyEvent->timer( after => 0.5, cb => $cv); $cv->recv;
 
     $bus1->subscribe(
         destination     => '/queue/req.foo.bar',
@@ -552,7 +552,7 @@ sub test_06_queue_timeout : Test(2) {
         },
     );
 
-    $cv = AnyEvent->condvar; $tmr = AnyEvent->timer( after => 0.1, cb => $cv); $cv->recv;
+    $cv = AnyEvent->condvar; $tmr = AnyEvent->timer( after => 1, cb => $cv); $cv->recv;
 
     # Message A should have expired
     is( scalar(@received), 1, "received only 1 message from queue");

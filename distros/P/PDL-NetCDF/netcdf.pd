@@ -1,11 +1,15 @@
 # -*- Perl -*-
 use Config;
+use Devel::CheckLib qw(check_lib);
+our $VERSION = '4.21';
+pp_setversion($VERSION);
 
-# Read in options determined by Makefile.PL and written to the OPTIONS! file
-my $ncversion = do 'OPTIONS!';
+my $ncversion = {nc_inq_var_deflate => check_lib(
+  header => 'netcdf.h', lib => 'netcdf',
+  function => 'nc_inq_var_deflate(0, 0, NULL, NULL, NULL);',
+)};
 
 pp_addpm({At => Top}, <<'EOD');
-package PDL::NetCDF; # to fool CPAN indexer
 =head1 NAME
 
 PDL::NetCDF - Object-oriented interface between NetCDF files and PDL objects.
@@ -1002,11 +1006,6 @@ EOXS
 #-------------------------------------------------------------------------
 
 pp_addpm (<<'EOPM');
-
-our $VERSION;
-BEGIN { 
-    $VERSION = '4.20';
-};
 
 use Carp;
 use Fcntl; # importing constants O_CREAT,O_RDONLY,O_RDWR

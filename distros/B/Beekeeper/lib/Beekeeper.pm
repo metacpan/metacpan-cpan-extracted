@@ -1,6 +1,9 @@
 package Beekeeper;
 
-our $VERSION = '0.01';
+use strict;
+use warnings;
+
+our $VERSION = '0.02';
 
 1;
 
@@ -12,7 +15,7 @@ Beekeeper - Framework for building applications with a microservices architectur
  
 =head1 VERSION
  
-Version 0.01
+Version 0.02
 
 =head1 SYNOPSIS
 
@@ -152,9 +155,9 @@ another workers.
 
 A worker class just declares on startup which methods it will accept, then implements them:
 
-package MyApp::Worker;
+  package MyApp::Worker;
   
-use base 'Beekeeper::Worker';
+  use base 'Beekeeper::Worker';
   
   sub on_startup {
       my $self = shift;
@@ -273,7 +276,7 @@ C<examples/chat> implements a real world setup with isolated buses and redundanc
 =head3 TODO
 
 Since this project was started (and even then) STOMP has been completely surpassed 
-as a fast and simple messaging protocol by superior MQTT. And since 2019, when MQTT
+as a fast and simple messaging protocol by MQTT. And since 2019, when MQTT
 version 5.0 was released, many brokers started to implement the routing features
 needed by Beekeeper to run.
 

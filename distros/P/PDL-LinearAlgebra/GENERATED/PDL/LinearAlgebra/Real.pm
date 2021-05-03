@@ -148,8 +148,8 @@ its second element.
 
 =for bad
 
-gtsv ignores the bad-value flag of the input piddles.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+gtsv ignores the bad-value flag of the input ndarrays.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -258,8 +258,8 @@ Note that the routine returns VT = V', not V.
 
 =for bad
 
-gesvd ignores the bad-value flag of the input piddles.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+gesvd ignores the bad-value flag of the input ndarrays.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -352,8 +352,8 @@ It is much faster than the simple driver for large matrices, but uses more works
 
 =for bad
 
-gesdd ignores the bad-value flag of the input piddles.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+gesdd ignores the bad-value flag of the input ndarrays.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -547,8 +547,8 @@ form by taking the nonsingular matrix X as
 
 =for bad
 
-ggsvd ignores the bad-value flag of the input piddles.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+ggsvd ignores the bad-value flag of the input ndarrays.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -648,8 +648,8 @@ equal to 1 and largest component real.
 
 =for bad
 
-geev ignores the bad-value flag of the input piddles.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+geev ignores the bad-value flag of the input ndarrays.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -827,8 +827,8 @@ Users' Guide.
 
 =for bad
 
-geevx ignores the bad-value flag of the input piddles.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+geevx ignores the bad-value flag of the input ndarrays.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -952,8 +952,8 @@ of (A,B) satisfies
 
 =for bad
 
-ggev ignores the bad-value flag of the input piddles.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+ggev ignores the bad-value flag of the input ndarrays.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -1185,8 +1185,8 @@ and rcondv, see section 4.11 of LAPACK User's Guide.
 
 =for bad
 
-ggevx ignores the bad-value flag of the input piddles.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+ggevx ignores the bad-value flag of the input ndarrays.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -1311,8 +1311,8 @@ The eigenvalues of such a block are a +- sqrt(bc).
 
 =for bad
 
-gees ignores the bad-value flag of the input piddles.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+gees ignores the bad-value flag of the input ndarrays.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -1456,8 +1456,8 @@ the form
 
 =for bad
 
-geesx ignores the bad-value flag of the input piddles.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+geesx ignores the bad-value flag of the input ndarrays.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -1621,8 +1621,8 @@ complex conjugate pair of generalized eigenvalues.
 
 =for bad
 
-gges ignores the bad-value flag of the input piddles.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+gges ignores the bad-value flag of the input ndarrays.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -1823,8 +1823,8 @@ See LAPACK User's Guide, section 4.11 for more information.
 
 =for bad
 
-ggesx ignores the bad-value flag of the input piddles.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+ggesx ignores the bad-value flag of the input ndarrays.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -1891,8 +1891,8 @@ real symmetric matrix A.
 
 =for bad
 
-syev ignores the bad-value flag of the input piddles.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+syev ignores the bad-value flag of the input ndarrays.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -1970,8 +1970,8 @@ workspace than syevx.
 
 =for bad
 
-syevd ignores the bad-value flag of the input piddles.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+syevd ignores the bad-value flag of the input ndarrays.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -2106,8 +2106,8 @@ for the desired eigenvalues.
 
 =for bad
 
-syevx ignores the bad-value flag of the input piddles.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+syevx ignores the bad-value flag of the input ndarrays.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -2284,8 +2284,8 @@ manner.
 
 =for bad
 
-syevr ignores the bad-value flag of the input piddles.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+syevr ignores the bad-value flag of the input ndarrays.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -2381,8 +2381,8 @@ positive definite.
 
 =for bad
 
-sygv ignores the bad-value flag of the input piddles.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+sygv ignores the bad-value flag of the input ndarrays.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -2485,8 +2485,8 @@ without guard digits, but we know of none.
 
 =for bad
 
-sygvd ignores the bad-value flag of the input piddles.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+sygvd ignores the bad-value flag of the input ndarrays.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -2645,8 +2645,8 @@ range of values or a range of indices for the desired eigenvalues.
 
 =for bad
 
-sygvx ignores the bad-value flag of the input piddles.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+sygvx ignores the bad-value flag of the input ndarrays.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -2719,8 +2719,8 @@ system of equations A * X = B.
 
 =for bad
 
-gesv ignores the bad-value flag of the input piddles.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+gesv ignores the bad-value flag of the input ndarrays.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -2975,8 +2975,8 @@ that it solves the original system before equilibration.
 
 =for bad
 
-gesvx ignores the bad-value flag of the input piddles.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+gesvx ignores the bad-value flag of the input ndarrays.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -3072,8 +3072,8 @@ used to solve the system of equations A * X = B.
 
 =for bad
 
-sysv ignores the bad-value flag of the input piddles.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+sysv ignores the bad-value flag of the input ndarrays.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -3251,8 +3251,8 @@ for it.
 
 =for bad
 
-sysvx ignores the bad-value flag of the input piddles.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+sysvx ignores the bad-value flag of the input ndarrays.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -3334,8 +3334,8 @@ equations A * X = B.
 
 =for bad
 
-posv ignores the bad-value flag of the input piddles.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+posv ignores the bad-value flag of the input ndarrays.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -3552,8 +3552,8 @@ equilibration.
 
 =for bad
 
-posvx ignores the bad-value flag of the input piddles.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+posvx ignores the bad-value flag of the input ndarrays.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -3664,8 +3664,8 @@ matrix X.
 
 =for bad
 
-gels ignores the bad-value flag of the input piddles.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+gels ignores the bad-value flag of the input ndarrays.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -3774,8 +3774,8 @@ The minimum-norm solution is then
 
 =for bad
 
-gelsy ignores the bad-value flag of the input piddles.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+gelsy ignores the bad-value flag of the input ndarrays.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -3865,8 +3865,8 @@ value.
 
 =for bad
 
-gelss ignores the bad-value flag of the input piddles.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+gelss ignores the bad-value flag of the input ndarrays.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -3983,8 +3983,8 @@ without guard digits, but we know of none.
 
 =for bad
 
-gelsd ignores the bad-value flag of the input piddles.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+gelsd ignores the bad-value flag of the input ndarrays.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -4065,8 +4065,8 @@ which is obtained using a GRQ factorization of the matrices B and A.
 
 =for bad
 
-gglse ignores the bad-value flag of the input piddles.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+gglse ignores the bad-value flag of the input ndarrays.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -4148,8 +4148,8 @@ problem
 
 =for bad
 
-ggglm ignores the bad-value flag of the input piddles.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+ggglm ignores the bad-value flag of the input ndarrays.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -4216,8 +4216,8 @@ This is the right-looking Level 3 BLAS version of the algorithm.
 
 =for bad
 
-getrf ignores the bad-value flag of the input piddles.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+getrf ignores the bad-value flag of the input ndarrays.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -4284,8 +4284,8 @@ This is the right-looking Level 2 BLAS version of the algorithm.
 
 =for bad
 
-getf2 ignores the bad-value flag of the input piddles.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+getf2 ignores the bad-value flag of the input ndarrays.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -4404,8 +4404,8 @@ This is the blocked version of the algorithm, calling Level 3 BLAS.
 
 =for bad
 
-sytrf ignores the bad-value flag of the input piddles.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+sytrf ignores the bad-value flag of the input ndarrays.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -4489,8 +4489,8 @@ This is the unblocked version of the algorithm, calling Level 2 BLAS.
 
 =for bad
 
-sytf2 ignores the bad-value flag of the input piddles.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+sytf2 ignores the bad-value flag of the input ndarrays.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -4560,8 +4560,8 @@ This is the block version of the algorithm, calling Level 3 BLAS.
 
 =for bad
 
-potrf ignores the bad-value flag of the input piddles.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+potrf ignores the bad-value flag of the input ndarrays.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -4631,8 +4631,8 @@ This is the unblocked version of the algorithm, calling Level 2 BLAS.
 
 =for bad
 
-potf2 ignores the bad-value flag of the input piddles.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+potf2 ignores the bad-value flag of the input ndarrays.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -4697,8 +4697,8 @@ This method inverts U and then computes inv(A) by solving the system
 
 =for bad
 
-getri ignores the bad-value flag of the input piddles.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+getri ignores the bad-value flag of the input ndarrays.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -4771,8 +4771,8 @@ C<sytrf>.
 
 =for bad
 
-sytri ignores the bad-value flag of the input piddles.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+sytri ignores the bad-value flag of the input ndarrays.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -4835,8 +4835,8 @@ computed by C<potrf>.
 
 =for bad
 
-potri ignores the bad-value flag of the input piddles.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+potri ignores the bad-value flag of the input ndarrays.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -4906,8 +4906,8 @@ This is the Level 3 BLAS version of the algorithm.
 
 =for bad
 
-trtri ignores the bad-value flag of the input piddles.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+trtri ignores the bad-value flag of the input ndarrays.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -4973,8 +4973,8 @@ This is the Level 2 BLAS version of the algorithm.
 
 =for bad
 
-trti2 ignores the bad-value flag of the input piddles.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+trti2 ignores the bad-value flag of the input ndarrays.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -5041,8 +5041,8 @@ by getrf.
 
 =for bad
 
-getrs ignores the bad-value flag of the input piddles.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+getrs ignores the bad-value flag of the input ndarrays.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -5109,8 +5109,8 @@ A = L*D*L' computed by C<sytrf>.
 
 =for bad
 
-sytrs ignores the bad-value flag of the input piddles.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+sytrs ignores the bad-value flag of the input ndarrays.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -5172,8 +5172,8 @@ A = U'*U or A = L*L' computed by C<potrf>.
 
 =for bad
 
-potrs ignores the bad-value flag of the input piddles.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+potrs ignores the bad-value flag of the input ndarrays.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -5254,8 +5254,8 @@ A check is made to verify that A is nonsingular.
 
 =for bad
 
-trtrs ignores the bad-value flag of the input piddles.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+trtrs ignores the bad-value flag of the input ndarrays.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -5435,8 +5435,8 @@ than max(underflow, 1/overflow).
 
 =for bad
 
-latrs ignores the bad-value flag of the input piddles.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+latrs ignores the bad-value flag of the input ndarrays.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -5505,8 +5505,8 @@ condition number is computed as
 
 =for bad
 
-gecon ignores the bad-value flag of the input piddles.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+gecon ignores the bad-value flag of the input ndarrays.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -5576,8 +5576,8 @@ condition number is computed as rcond = 1 / (anorm * norm(inv(A))).
 
 =for bad
 
-sycon ignores the bad-value flag of the input piddles.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+sycon ignores the bad-value flag of the input ndarrays.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -5641,8 +5641,8 @@ condition number is computed as rcond = 1 / (anorm * norm(inv(A))).
 
 =for bad
 
-pocon ignores the bad-value flag of the input piddles.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+pocon ignores the bad-value flag of the input ndarrays.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -5718,8 +5718,8 @@ computed as
 
 =for bad
 
-trcon ignores the bad-value flag of the input piddles.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+trcon ignores the bad-value flag of the input ndarrays.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -5794,8 +5794,8 @@ Each H(i) has the form
 
 =for bad
 
-geqp3 ignores the bad-value flag of the input piddles.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+geqp3 ignores the bad-value flag of the input ndarrays.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -5863,8 +5863,8 @@ Each H(i) has the form
 
 =for bad
 
-geqrf ignores the bad-value flag of the input piddles.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+geqrf ignores the bad-value flag of the input ndarrays.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -5925,8 +5925,8 @@ reflectors of order M
 
 =for bad
 
-orgqr ignores the bad-value flag of the input piddles.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+orgqr ignores the bad-value flag of the input ndarrays.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -6008,8 +6008,8 @@ if C<side> = 1.
 
 =for bad
 
-ormqr ignores the bad-value flag of the input piddles.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+ormqr ignores the bad-value flag of the input ndarrays.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -6076,8 +6076,8 @@ Each H(i) has the form
 
 =for bad
 
-gelqf ignores the bad-value flag of the input piddles.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+gelqf ignores the bad-value flag of the input ndarrays.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -6137,8 +6137,8 @@ reflectors of order N
 
 =for bad
 
-orglq ignores the bad-value flag of the input piddles.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+orglq ignores the bad-value flag of the input ndarrays.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -6220,8 +6220,8 @@ if C<side> = 1.
 
 =for bad
 
-ormlq ignores the bad-value flag of the input piddles.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+ormlq ignores the bad-value flag of the input ndarrays.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -6290,8 +6290,8 @@ Each H(i) has the form
 
 =for bad
 
-geqlf ignores the bad-value flag of the input piddles.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+geqlf ignores the bad-value flag of the input ndarrays.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -6352,8 +6352,8 @@ reflectors of order M
 
 =for bad
 
-orgql ignores the bad-value flag of the input piddles.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+orgql ignores the bad-value flag of the input ndarrays.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -6435,8 +6435,8 @@ if C<side> = 1.
 
 =for bad
 
-ormql ignores the bad-value flag of the input piddles.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+ormql ignores the bad-value flag of the input ndarrays.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -6506,8 +6506,8 @@ Each H(i) has the form
 
 =for bad
 
-gerqf ignores the bad-value flag of the input piddles.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+gerqf ignores the bad-value flag of the input ndarrays.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -6568,8 +6568,8 @@ reflectors of order N
 
 =for bad
 
-orgrq ignores the bad-value flag of the input piddles.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+orgrq ignores the bad-value flag of the input ndarrays.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -6651,8 +6651,8 @@ if C<side> = 1.
 
 =for bad
 
-ormrq ignores the bad-value flag of the input piddles.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+ormrq ignores the bad-value flag of the input ndarrays.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -6740,8 +6740,8 @@ Z is given by
 
 =for bad
 
-tzrzf ignores the bad-value flag of the input piddles.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+tzrzf ignores the bad-value flag of the input ndarrays.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -6823,8 +6823,8 @@ if C<side> = 1.
 
 =for bad
 
-ormrz ignores the bad-value flag of the input piddles.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+ormrz ignores the bad-value flag of the input ndarrays.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -6921,8 +6921,8 @@ n = 7, ilo = 2 and ihi = 6:
 
 =for bad
 
-gehrd ignores the bad-value flag of the input piddles.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+gehrd ignores the bad-value flag of the input ndarrays.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -6987,8 +6987,8 @@ C<gehrd>:
 
 =for bad
 
-orghr ignores the bad-value flag of the input piddles.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+orghr ignores the bad-value flag of the input ndarrays.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -7094,8 +7094,8 @@ matrix Q:  A = Q*H*Q**T = (QZ)*T*(QZ)**T.
 
 =for bad
 
-hseqr ignores the bad-value flag of the input piddles.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+hseqr ignores the bad-value flag of the input ndarrays.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -7255,8 +7255,8 @@ magnitude has magnitude 1; here the magnitude of a complex number
 
 =for bad
 
-trevc ignores the bad-value flag of the input piddles.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+trevc ignores the bad-value flag of the input ndarrays.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -7395,8 +7395,8 @@ to the eigenvalue with positive imaginary part.
 
 =for bad
 
-tgevc ignores the bad-value flag of the input piddles.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+tgevc ignores the bad-value flag of the input ndarrays.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -7508,8 +7508,8 @@ returned in the vector C<scale>.
 
 =for bad
 
-gebal ignores the bad-value flag of the input piddles.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+gebal ignores the bad-value flag of the input ndarrays.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -7586,8 +7586,8 @@ balanced matrix output by gebal.
 
 =for bad
 
-gebak ignores the bad-value flag of the input piddles.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+gebak ignores the bad-value flag of the input ndarrays.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -7653,8 +7653,8 @@ real matrix A.
 
 =for bad
 
-lange ignores the bad-value flag of the input piddles.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+lange ignores the bad-value flag of the input ndarrays.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -7729,8 +7729,8 @@ real symmetric matrix A.
 
 =for bad
 
-lansy ignores the bad-value flag of the input piddles.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+lansy ignores the bad-value flag of the input ndarrays.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -7811,8 +7811,8 @@ trapezoidal or triangular matrix A.
 
 =for bad
 
-lantr ignores the bad-value flag of the input piddles.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+lantr ignores the bad-value flag of the input ndarrays.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -7890,8 +7890,8 @@ Performs one of the matrix-matrix operations
 
 =for bad
 
-gemm ignores the bad-value flag of the input piddles.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+gemm ignores the bad-value flag of the input ndarrays.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -7923,8 +7923,8 @@ Blas matrix multiplication based on gemm
 
 =for bad
 
-mmult ignores the bad-value flag of the input piddles.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+mmult ignores the bad-value flag of the input ndarrays.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -7956,8 +7956,8 @@ Blas matrix cross product based on gemm
 
 =for bad
 
-crossprod ignores the bad-value flag of the input piddles.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+crossprod ignores the bad-value flag of the input ndarrays.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -8046,8 +8046,8 @@ or
 
 =for bad
 
-syrk ignores the bad-value flag of the input piddles.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+syrk ignores the bad-value flag of the input ndarrays.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -8085,8 +8085,8 @@ Dot product of two vectors using Blas.
 
 =for bad
 
-dot ignores the bad-value flag of the input piddles.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+dot ignores the bad-value flag of the input ndarrays.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -8126,8 +8126,8 @@ Returns result in b.
 
 =for bad
 
-axpy ignores the bad-value flag of the input piddles.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+axpy ignores the bad-value flag of the input ndarrays.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -8164,8 +8164,8 @@ Euclidean norm of a vector using Blas.
 
 =for bad
 
-nrm2 ignores the bad-value flag of the input piddles.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+nrm2 ignores the bad-value flag of the input ndarrays.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -8202,8 +8202,8 @@ Sum of absolute values of a vector using Blas.
 
 =for bad
 
-asum ignores the bad-value flag of the input piddles.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+asum ignores the bad-value flag of the input ndarrays.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -8240,8 +8240,8 @@ Scale a vector by a constant using Blas.
 
 =for bad
 
-scal ignores the bad-value flag of the input piddles.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+scal ignores the bad-value flag of the input ndarrays.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -8279,8 +8279,8 @@ Applies plane rotation using Blas.
 
 =for bad
 
-rot ignores the bad-value flag of the input piddles.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+rot ignores the bad-value flag of the input ndarrays.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -8317,8 +8317,8 @@ Generates plane rotation using Blas.
 
 =for bad
 
-rotg ignores the bad-value flag of the input piddles.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+rotg ignores the bad-value flag of the input ndarrays.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -8372,8 +8372,8 @@ size <= 20. Dimension of stack limits N to about 2**32.
 
 =for bad
 
-lasrt ignores the bad-value flag of the input piddles.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+lasrt ignores the bad-value flag of the input ndarrays.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -8425,8 +8425,8 @@ matrix B.
 
 =for bad
 
-lacpy ignores the bad-value flag of the input piddles.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+lacpy ignores the bad-value flag of the input ndarrays.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -8486,8 +8486,8 @@ Dosen't use PDL indice (start = 1).
 
 =for bad
 
-laswp ignores the bad-value flag of the input piddles.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+laswp ignores the bad-value flag of the input ndarrays.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -8552,8 +8552,8 @@ Works inplace.
 
 =for bad
 
-lamch ignores the bad-value flag of the input piddles.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+lamch ignores the bad-value flag of the input ndarrays.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -8609,8 +8609,8 @@ the exponent range, as is found on a Cray.
 
 =for bad
 
-labad ignores the bad-value flag of the input piddles.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+labad ignores the bad-value flag of the input ndarrays.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -8641,7 +8641,7 @@ Copy triangular part to another matrix. If uplo == 0 copy upper triangular part.
 =for bad
 
 tricpy does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -8674,7 +8674,7 @@ as computed by geev or geevx.
 =for bad
 
 cplx_eigen does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -8706,7 +8706,7 @@ This routine does backward and forward dataflow automatically.
 =for bad
 
 augment does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -8738,7 +8738,7 @@ This routine does backward and forward dataflow automatically.
 =for bad
 
 mstack does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -8769,7 +8769,7 @@ Compute adjoint matrix and characteristic polynomial.
 =for bad
 
 charpol does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut

@@ -1,5 +1,8 @@
 Revision history for MIDI-Chord-Guitar
 
+0.0604 2021-05-02 19:13:52
+    - Fix the dim7 chords which seemed to be duplicates of m!
+
 0.0603 2021-04-16 01:00:41
     - Add and test for missing else-if clause!
 

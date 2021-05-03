@@ -1,0 +1,18 @@
+Revision history for CXC-Number
+
+0.05      2021-05-03 10:13:09-04:00 America/New_York
+
+  [BUILD FIXES]
+    * Requires at least Hash::Wrap 0.11 (RT#136409 ++srezic)
+
+0.04      2021-04-26 17:42:41-04:00 America/New_York
+
+  [DISTRIBUTION FIXES]
+    * Incorrect distribution name in meta resources (RT#136396 ++srezic)
+
+  [BUILD FIXES]
+    * Requires at least Type::Tiny 1.006 (RT#136397 ++srezic)
+
+0.03      2021-04-26 17:42:41-04:00 America/New_York
+
+   * initial release to CPAN

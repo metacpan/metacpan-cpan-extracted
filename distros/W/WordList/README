@@ -3,8 +3,8 @@ NAME
     contain word list
 
 VERSION
-    This document describes version 0.7.6 of WordList (from Perl
-    distribution WordList), released on 2020-08-23.
+    This document describes version 0.7.7 of WordList (from Perl
+    distribution WordList), released on 2021-01-28.
 
 SYNOPSIS
     Use one of the "WordList::*" modules.
@@ -215,23 +215,26 @@ SOURCE
 
 BUGS
     Please report any bugs or feature requests on the bugtracker website
-    <https://rt.cpan.org/Public/Dist/Display.html?Name=WordList>
+    <https://github.com/perlancar/perl-WordList/issues>
 
     When submitting a bug or request, please include a test-file or a patch
     to an existing test-file that illustrates the bug or desired feature.
 
 SEE ALSO
+    Related specifications: Rinci, DefHash.
+
     "WordListRole::*" modules.
 
     "WordList::*" modules.
 
-    Rinci.
+    CLI's are provided in App::wordlist (wordlist), App::WordListUtils (e.g.
+    list-wordlist-modules, etc).
 
 AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2020, 2018, 2017, 2016 by
+    This software is copyright (c) 2021, 2020, 2018, 2017, 2016 by
     perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under

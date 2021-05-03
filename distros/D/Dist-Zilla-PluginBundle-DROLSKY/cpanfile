@@ -13,6 +13,7 @@ requires "Dist::Zilla::Plugin::CheckSelfDependency" => "0";
 requires "Dist::Zilla::Plugin::CheckStrictVersion" => "0";
 requires "Dist::Zilla::Plugin::CheckVersionIncrement" => "0";
 requires "Dist::Zilla::Plugin::CopyFilesFromBuild" => "0";
+requires "Dist::Zilla::Plugin::DROLSKY::Role::CoreCounter" => "0";
 requires "Dist::Zilla::Plugin::EnsureChangesHasContent" => "0.02";
 requires "Dist::Zilla::Plugin::GenerateFile::FromShareDir" => "0.013";
 requires "Dist::Zilla::Plugin::Git::Check" => "0";
@@ -111,6 +112,7 @@ on 'configure' => sub {
 
 on 'develop' => sub {
   requires "Capture::Tiny" => "0";
+  requires "Encode" => "0";
   requires "File::Spec" => "0";
   requires "FindBin" => "0";
   requires "IO::Handle" => "0";

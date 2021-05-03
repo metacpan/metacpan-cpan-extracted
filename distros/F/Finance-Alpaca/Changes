@@ -1,5 +1,10 @@
 Revision history for Perl extension Finance-Alpaca
 
+0.9906 2021-04-30T22:54:04Z
+
+    - Fix for smoker without a modern version of IO::Socket::SSL
+    - Fix testing unsent orders when the exchanges are closed
+
 0.9904 2021-04-30T17:32:17Z
 
     - Fixed race conditions in 09_orders.t

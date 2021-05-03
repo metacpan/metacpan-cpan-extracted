@@ -1,4 +1,4 @@
-use Test::More tests => 52;
+use Test::More;
 use warnings;
 use strict;
 use Fcntl;
@@ -243,3 +243,5 @@ my $strX = $obj->get($varname);
 my $nsize = 1;
 map {$nsize *= $_ } $strX->dims;
 ok($nsize == 200*5*4, "reading 3dim strings complete");
+
+done_testing;

@@ -1,0 +1,9 @@
+# -*- mode: perl -*-
+
+requires 'Net::DBus';
+requires 'experimental';
+requires 'Moo';
+requires 'Log::Any';
+requires 'curry';
+requires 'parent';
+requires 'perl','>= 5.32.0';

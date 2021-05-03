@@ -1,5 +1,9 @@
 Revision history for Syntax-Keyword-Dynamically
 
+0.08    2021-05-01
+        [CHANGES]
+         * Rewrite parsing logic to use XS::Parse::Keyword
+
 0.07    2021-02-02
         [CHANGES]
          * Use the proper future_asyncawait_on_loaded() mechanism to enable

@@ -1,3 +1,5 @@
+use strict;
+use warnings;
 use PDL::LiteF;
 #use PDL::Complex;
 use PDL::Config;
@@ -17,9 +19,9 @@ is_deeply [ ppdefs() ], [qw(B S U L N Q F D)];
 is_deeply [ ppdefs_complex() ], [qw(G C)];
 is_deeply [ ppdefs_all() ], [qw(B S U L N Q F D G C)];
 
-$ref = pdl([[-2,1],[-3,1]]);
-$ref2 = squeeze($ref->slice("0,")+ci()*$ref->slice("1,"));
-$x = ci() -pdl (-2, -3);
+my $ref = pdl([[-2,1],[-3,1]]);
+my $ref2 = squeeze($ref->slice("0,")+ci()*$ref->slice("1,"));
+my $x = ci() -pdl (-2, -3);
 
 is($x->type, 'cdouble', 'type promotion i - ndarray');
 ok(tapprox($x->cimag,$ref->slice("1,:")), 'value from i - ndarray');
@@ -30,7 +32,7 @@ $x = cdouble(2,3);
 $x-=3*ci();
 is type($x), 'cdouble', 'type promotion ndarray - i';
 is $x->creal->type, 'double', 'real real part';
-$y=cfloat($x);
+my $y=cfloat($x);
 is type($y), 'cfloat', 'type conversion to cfloat';
 is $y->creal->type, 'float', 'real real part';
 ok(tapprox($x->cimag,$ref->slice("0,1")), 'value from ndarray - i') or diag 'got: ', $x->cimag;
@@ -41,6 +43,10 @@ is zeroes($_->[0], 2)->r2C->type, $_->[1], "r2C $_->[0] -> $_->[1]"
 my $got_double = double(-1, 2);
 my $got_r2C = $got_double->r2C;
 is ''.$got_r2C->creal, ''.$got_double, 'creal(r2C) identical to orig';
+
+my $got = r2C(1);
+is $got, 1, 'can give Perl numbers to r2C';
+ok !$got->type->real, 'complex type';
 
 for (float, double, cfloat, cdouble) {
   my $got = pdl $_, '[0 BAD]';
@@ -55,7 +61,7 @@ for (float, double, cfloat, cdouble) {
 }
 
 # dataflow from complex to real
-$ar = $x->creal;
+my $ar = $x->creal;
 $ar++;
 ok(tapprox($x->creal, -$ref->slice("0,")->squeeze), 'no complex to real dataflow');
 $x+=ci;
@@ -67,14 +73,14 @@ $x = $ref2->copy;
 my $a=abs($x);
 my $p=carg($x)->double; # force to double to avoid glibc bug 18594
 
-my $y = $a*cos($p)+ci()*$a*sin($p);
+$y = $a*cos($p)+ci()*$a*sin($p);
 ok(tapprox($x-$y, 0.), 'check re/im and mag/ang equivalence')
   or diag "For ($x), got: ($y) from a=($a) p=($p) cos(p)=(", cos($p), ") sin(p)=(", sin($p), ")";
 
 # to test Cabs, Cabs2, Carg (ref PDL)
 # Catan, Csinh, Ccosh, Catanh, Croots
 
-$cabs = sqrt($x->creal->double**2+$x->cimag->double**2);
+my $cabs = sqrt($x->creal->double**2+$x->cimag->double**2);
 
 ok(ref abs $x eq 'PDL', 'Cabs type');
 ok(ref carg ($x) eq 'PDL', 'Carg type');
@@ -119,14 +125,28 @@ if (PDL::Core::Dev::got_complex_version('asin', 1)) {
 
 TODO: {
    local $TODO = "Known_problems sf.net bug #1176614" if ($PDL::Config{SKIP_KNOWN_PROBLEMS} or exists $ENV{SKIP_KNOWN_PROBLEMS} );
-
-
    # Check stringification of complex ndarray
    # This is sf.net bug #1176614
    my $c =  9.1234 + 4.1234*ci;
    my $c211 = $c->dummy(2,1);
    my $c211str = "$c211";
    ok($c211str=~/(9.123|4.123)/, 'sf.net bug #1176614');
+}
+
+#test overloaded operators
+{
+    my $less = 3-4*ci;
+    my $equal = -1*(-3+4*ci);
+    my $more = 3+2*ci;
+    my $zero_imag = r2C(4);
+    eval { my $bool = $less<$more }; ok $@, 'exception on invalid operator';
+    eval { my $bool = $less<=$equal }; ok $@, 'exception on invalid operator';
+    ok($less==$equal,'equal to');
+    ok(!($less!=$equal),'not equal to');
+    eval { my $bool = $more>$equal }; ok $@, 'exception on invalid operator';
+    eval { my $bool = $more>=$equal }; ok $@, 'exception on invalid operator';
+    ok($zero_imag==4,'equal to real');
+    ok($zero_imag!=5,'neq real');
 }
 
 done_testing;

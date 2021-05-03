@@ -21,11 +21,11 @@ use namespace::autoclean;
 use File::ShareDir qw( dist_file );
 use File::Spec;
 
-our $VERSION = '1.31';
+our $VERSION = '1.32';
 
 #<<<
 ### :start CLDRVersion:
-our $CLDRVersion = 38;
+our $CLDRVersion = 39;
 ### :end CLDRVersion:
 #>>>
 
@@ -598,6 +598,7 @@ our %Codes = (
   "nn-NO" => 1,
   nnh => 1,
   "nnh-CM" => 1,
+  no => 1,
   nus => 1,
   "nus-SS" => 1,
   nyn => 1,
@@ -827,6 +828,7 @@ our %Codes = (
 #<<<
 ### :start Names:
 our %Names = (
+  "" => "root",
   Afrikaans => "af",
   "Afrikaans Namibia" => "af-NA",
   "Afrikaans South Africa" => "af-ZA",
@@ -867,8 +869,8 @@ our %Names = (
   "Arabic Tunisia" => "ar-TN",
   "Arabic United Arab Emirates" => "ar-AE",
   "Arabic Western Sahara" => "ar-EH",
-  "Arabic World" => "ar-001",
   "Arabic Yemen" => "ar-YE",
+  "Arabic world" => "ar-001",
   Armenian => "hy",
   "Armenian Armenia" => "hy-AM",
   Assamese => "as",
@@ -1081,11 +1083,11 @@ our %Names = (
   "English United States" => "en-US",
   "English United States Computer" => "en-US-POSIX",
   "English Vanuatu" => "en-VU",
-  "English World" => "en-001",
   "English Zambia" => "en-ZM",
   "English Zimbabwe" => "en-ZW",
+  "English world" => "en-001",
   Esperanto => "eo",
-  "Esperanto World" => "eo-001",
+  "Esperanto world" => "eo-001",
   Estonian => "et",
   "Estonian Estonia" => "et-EE",
   Ewe => "ee",
@@ -1218,7 +1220,7 @@ our %Names = (
   Indonesian => "id",
   "Indonesian Indonesia" => "id-ID",
   Interlingua => "ia",
-  "Interlingua World" => "ia-001",
+  "Interlingua world" => "ia-001",
   Irish => "ga",
   "Irish Ireland" => "ga-IE",
   "Irish United Kingdom" => "ga-GB",
@@ -1366,6 +1368,7 @@ our %Names = (
   "Northern Sami Finland" => "se-FI",
   "Northern Sami Norway" => "se-NO",
   "Northern Sami Sweden" => "se-SE",
+  Norwegian => "no",
   "Norwegian Bokm\N{U+00e5}l" => "nb",
   "Norwegian Bokm\N{U+00e5}l Norway" => "nb-NO",
   "Norwegian Bokm\N{U+00e5}l Svalbard & Jan Mayen" => "nb-SJ",
@@ -1420,7 +1423,6 @@ our %Names = (
   "Romansh Switzerland" => "rm-CH",
   Rombo => "rof",
   "Rombo Tanzania" => "rof-TZ",
-  Root => "root",
   Rundi => "rn",
   "Rundi Burundi" => "rn-BI",
   Russian => "ru",
@@ -1607,7 +1609,7 @@ our %Names = (
   Yangben => "yav",
   "Yangben Cameroon" => "yav-CM",
   Yiddish => "yi",
-  "Yiddish World" => "yi-001",
+  "Yiddish world" => "yi-001",
   Yoruba => "yo",
   "Yoruba Benin" => "yo-BJ",
   "Yoruba Nigeria" => "yo-NG",
@@ -1754,9 +1756,9 @@ our %NativeNames = (
   "English United States" => "en-US",
   "English United States Computer" => "en-US-POSIX",
   "English Vanuatu" => "en-VU",
-  "English World" => "en-001",
   "English Zambia" => "en-ZM",
   "English Zimbabwe" => "en-ZW",
+  "English world" => "en-001",
   "E\N{U+028b}egbe" => "ee",
   "E\N{U+028b}egbe Ghana nutome" => "ee-GH",
   "E\N{U+028b}egbe Togo nutome" => "ee-TG",
@@ -2112,6 +2114,7 @@ our %NativeNames = (
   "nds NL" => "nds-NL",
   nmg => "nmg",
   "nmg Kamerun" => "nmg-CM",
+  norsk => "no",
   "norsk bokm\N{U+00e5}l" => "nb",
   "norsk bokm\N{U+00e5}l Norge" => "nb-NO",
   "norsk bokm\N{U+00e5}l Svalbard og Jan Mayen" => "nb-SJ",
@@ -2142,7 +2145,6 @@ our %NativeNames = (
   "rom\N{U+00e2}n\N{U+0103}" => "ro",
   "rom\N{U+00e2}n\N{U+0103} Republica Moldova" => "ro-MD",
   "rom\N{U+00e2}n\N{U+0103} Rom\N{U+00e2}nia" => "ro-RO",
-  root => "root",
   rumantsch => "rm",
   "rumantsch Svizra" => "rm-CH",
   sena => "seh",
@@ -2840,6 +2842,7 @@ our %ISO639Aliases = (
   nob => "nb",
   "nob-NO" => "nb-NO",
   "nob-SJ" => "nb-SJ",
+  nor => "no",
   ori => "or",
   "ori-IN" => "or-IN",
   orm => "om",
@@ -3313,7 +3316,7 @@ my %LocaleData = (
     time_format_medium => "h:mm:ss a",
     time_format_short => "h:mm a",
     variant => undef,
-    version => 38,
+    version => 39,
   },
   en => {
     am_pm_abbreviated => [
@@ -3585,7 +3588,7 @@ my %LocaleData = (
     time_format_medium => "h:mm:ss a",
     time_format_short => "h:mm a",
     variant => undef,
-    version => 38,
+    version => 39,
   },
   "en-CA" => {
     am_pm_abbreviated => [
@@ -3864,7 +3867,7 @@ my %LocaleData = (
     time_format_medium => "h:mm:ss a",
     time_format_short => "h:mm a",
     variant => undef,
-    version => 38,
+    version => 39,
   },
   "en-US" => {
     am_pm_abbreviated => [
@@ -4136,7 +4139,7 @@ my %LocaleData = (
     time_format_medium => "h:mm:ss a",
     time_format_short => "h:mm a",
     variant => undef,
-    version => 38,
+    version => 39,
   },
   es => {
     am_pm_abbreviated => [
@@ -4419,7 +4422,7 @@ my %LocaleData = (
     time_format_medium => "H:mm:ss",
     time_format_short => "H:mm",
     variant => undef,
-    version => 38,
+    version => 39,
   },
   "fr-FR" => {
     am_pm_abbreviated => [
@@ -4691,7 +4694,7 @@ my %LocaleData = (
     time_format_medium => "HH:mm:ss",
     time_format_short => "HH:mm",
     variant => undef,
-    version => 38,
+    version => 39,
   },
   hi => {
     am_pm_abbreviated => [
@@ -4967,7 +4970,7 @@ my %LocaleData = (
     time_format_medium => "h:mm:ss a",
     time_format_short => "h:mm a",
     variant => undef,
-    version => 38,
+    version => 39,
   },
   "ja-JP" => {
     am_pm_abbreviated => [
@@ -5244,7 +5247,7 @@ my %LocaleData = (
     time_format_medium => "H:mm:ss",
     time_format_short => "H:mm",
     variant => undef,
-    version => 38,
+    version => 39,
   },
   "pt-BR" => {
     am_pm_abbreviated => [
@@ -5521,7 +5524,7 @@ my %LocaleData = (
     time_format_medium => "HH:mm:ss",
     time_format_short => "HH:mm",
     variant => undef,
-    version => 38,
+    version => 39,
   },
   "zh-Hans-CN" => {
     am_pm_abbreviated => [
@@ -5583,9 +5586,9 @@ my %LocaleData = (
     date_format_long => "y\N{U+5e74}M\N{U+6708}d\N{U+65e5}",
     date_format_medium => "y\N{U+5e74}M\N{U+6708}d\N{U+65e5}",
     date_format_short => "y/M/d",
-    datetime_format_full => "{1}{0}",
+    datetime_format_full => "{1} {0}",
     datetime_format_long => "{1} {0}",
-    datetime_format_medium => "{1}{0}",
+    datetime_format_medium => "{1} {0}",
     datetime_format_short => "{1} {0}",
     day_format_abbreviated => [
       "\N{U+5468}\N{U+4e00}",
@@ -5793,7 +5796,7 @@ my %LocaleData = (
     time_format_medium => "ah:mm:ss",
     time_format_short => "ah:mm",
     variant => undef,
-    version => 38,
+    version => 39,
   },
   "zh-Hant-TW" => {
     am_pm_abbreviated => [
@@ -6065,7 +6068,7 @@ my %LocaleData = (
     time_format_medium => "ah:mm:ss",
     time_format_short => "ah:mm",
     variant => undef,
-    version => 38,
+    version => 39,
   },
 );
 ### :end LocaleData:
@@ -6128,7 +6131,7 @@ DateTime::Locale::Data - Locale data generated from CLDR
 
 =head1 VERSION
 
-version 1.31
+version 1.32
 
 =head1 DESCRIPTION
 
@@ -6153,7 +6156,7 @@ Dave Rolsky <autarch@urth.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2003 - 2020 by Dave Rolsky.
+This software is copyright (c) 2003 - 2021 by Dave Rolsky.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

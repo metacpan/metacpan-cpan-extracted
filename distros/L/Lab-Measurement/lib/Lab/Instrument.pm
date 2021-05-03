@@ -1,5 +1,5 @@
 package Lab::Instrument;
-$Lab::Instrument::VERSION = '3.741';
+$Lab::Instrument::VERSION = '3.750';
 #ABSTRACT: Instrument base class
 
 use v5.20;
@@ -1321,7 +1321,7 @@ Lab::Instrument - Instrument base class
 
 =head1 VERSION
 
-version 3.741
+version 3.750
 
 =head1 SYNOPSIS
 

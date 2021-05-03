@@ -1,22 +1,27 @@
 use strict;
 use warnings;
 use Carp;
+use Config qw(%Config);
 use Devel::NYTProf::Reader;
 use Devel::NYTProf::Util qw( trace_level );
 use Test::More;
 use File::Spec;
 use File::Temp qw( tempdir tempfile );
-use Data::Dumper;$Data::Dumper::Indent=1;
 use Capture::Tiny qw(capture_stdout capture_stderr );
+use Devel::NYTProf::Constants qw(
+    NYTP_DEFAULT_COMPRESSION
+    NYTP_ZLIB_VERSION
+);
 
-# Relax this restriction once we figure out how to make test $file work for
-# Appveyor.
-plan skip_all => "doesn't work without HAS_ZLIB" if (($^O eq "MSWin32") || ($^O eq 'VMS'));
-
-# General setup
+plan skip_all => "needs different profile data for testing on longdouble builds"
+    if (defined $Config{uselongdouble} and $Config{uselongdouble} eq 'define');
 
 my $file = "./t/nytprof_12-data.out.txt";
 croak "No $file" unless -f $file;
+
+plan skip_all => "$file doesn't work unless NYTP_ZLIB_VERSION is set" unless NYTP_ZLIB_VERSION();
+
+# General setup
 
 my $reporter = Devel::NYTProf::Reader->new($file, { quiet => 1 });
 ok(defined $reporter, "Devel::NYTProf::Reader->new returned defined entity");
@@ -261,6 +266,7 @@ is(scalar(@noneval_fileinfos), 1, "got 1 noneval_fileinfo");
 
 {
     SKIP: {
+        skip "NYTPROF_AUTHOR_TESTING only", 3 unless $ENV{NYTPROF_AUTHOR_TESTING};
         skip "Bad interaction when trace_level is set", 3
             if trace_level();
         my $profile;

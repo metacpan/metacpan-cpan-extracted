@@ -5,9 +5,9 @@ use strict;
 use warnings;
 use Carp ();
 use IO::Handle ();
-use Exporter 'import';
+use Exporter ();
 
-our $VERSION = '0.011';
+our $VERSION = '0.012';
 
 use constant DEFAULT_REQUEST_BODY_LIMIT => 16777216;
 use constant DEFAULT_REQUEST_BODY_BUFFER => 262144;
@@ -122,14 +122,17 @@ my %HTTP_STATUS = (
 }
 
 {
-  # for cleanup in END in case of premature exit
-  my %PENDING_CGI;
+  my $cgi;
+
+  sub import {
+    # for cleanup in END in case of premature exit
+    $cgi ||= bless {pid => $$}, $_[0];
+    goto &Exporter::import;
+  }
 
   sub cgi (&) {
     my ($handler) = @_;
-    my $cgi = bless {pid => $$}, __PACKAGE__;
-    my $cgi_key = 0+$cgi;
-    $PENDING_CGI{$cgi_key} = $cgi; # don't localize, so premature exit can clean up in END
+    $cgi ||= bless {pid => $$}, __PACKAGE__;
     my ($error, $errored);
     {
       local $@;
@@ -140,7 +143,7 @@ my %HTTP_STATUS = (
     } elsif (!$cgi->{headers_rendered}) {
       _handle_error($cgi, "cgi completed without rendering a response\n");
     }
-    delete $PENDING_CGI{$cgi_key};
+    undef $cgi;
     1;
   }
 
@@ -148,9 +151,9 @@ my %HTTP_STATUS = (
   # ModPerl::Registry or CGI::Compile won't run END after each request,
   # but they override exit to throw an exception which we handle already
   END {
-    foreach my $key (keys %PENDING_CGI) {
-      my $cgi = delete $PENDING_CGI{$key};
+    if (defined $cgi) {
       _handle_error($cgi, "cgi exited without rendering a response\n") unless $cgi->{headers_rendered};
+      undef $cgi;
     }
   }
 }
@@ -158,7 +161,6 @@ my %HTTP_STATUS = (
 sub _handle_error {
   my ($cgi, $error) = @_;
   return unless $cgi->{pid} == $$; # in case of fork
-  $cgi->{response_status} = "500 $HTTP_STATUS{500}" unless $cgi->{headers_rendered} or defined $cgi->{response_status};
   if (defined(my $handler = $cgi->{on_error})) {
     my ($error_error, $error_errored);
     {
@@ -173,7 +175,10 @@ sub _handle_error {
   } else {
     warn $error;
   }
-  $cgi->render(text => $cgi->{response_status}) unless $cgi->{headers_rendered};
+  unless ($cgi->{headers_rendered}) {
+    $cgi->{response_status} = "500 $HTTP_STATUS{500}" unless defined $cgi->{response_status};
+    $cgi->set_response_type('text/plain')->render(data => $cgi->{response_status});
+  }
 }
 
 sub set_error_handler          { $_[0]{on_error} = $_[1]; $_[0] }
@@ -272,9 +277,9 @@ sub body {
     my $length = $self->_body_length;
     my $in_fh = defined $self->{input_handle} ? $self->{input_handle} : *STDIN;
     binmode $in_fh;
+    my $buffer_size = 0 + ($self->{request_body_buffer} || $ENV{CGI_TINY_REQUEST_BODY_BUFFER} || DEFAULT_REQUEST_BODY_BUFFER);
     while ($length > 0) {
-      my $chunk = $self->{request_body_buffer} || $ENV{CGI_TINY_REQUEST_BODY_BUFFER} || DEFAULT_REQUEST_BODY_BUFFER;
-      $chunk = $length if $length < $chunk;
+      my $chunk = $length < $buffer_size ? $length : $buffer_size;
       last unless my $read = read $in_fh, $self->{body_content}, $chunk, length $self->{body_content};
       $length -= $read;
     }
@@ -396,7 +401,7 @@ sub _body_length {
     $self->{response_status} = "413 $HTTP_STATUS{413}" unless $self->{headers_rendered};
     die "Request body limit exceeded\n";
   }
-  return $length;
+  return 0 + $length;
 }
 
 sub _body_multipart {
@@ -437,12 +442,10 @@ sub set_nph {
   if ($self->{headers_rendered}) {
     Carp::carp "Attempted to set NPH response mode but headers have already been rendered";
   } else {
-    $self->{nph} = $value;
+    $self->{nph} = @_ < 2 ? 1 : $value;
   }
   return $self;
 }
-
-sub set_response_fixed_length { $_[0]{response_fixed_length} = $_[1]; $_[0] }
 
 sub set_response_body_buffer { $_[0]{response_body_buffer} = $_[1]; $_[0] }
 
@@ -551,106 +554,93 @@ sub headers_rendered { $_[0]{headers_rendered} }
 
 {
   my %RENDER_TYPES = (json => 1, html => 1, xml => 1, text => 1, data => 1, file => 1, handle => 1, redirect => 1);
+
   sub render {
     my ($self, $type, $data) = @_;
+    Carp::croak "Cannot render additional data with ->render; use ->render_chunk" if $self->{headers_rendered};
     $type = '' unless defined $type;
     Carp::croak "Don't know how to render '$type'" if length $type and !exists $RENDER_TYPES{$type};
-    my $charset = $self->{response_charset};
-    $charset = 'UTF-8' unless defined $charset;
+    Carp::croak "Cannot render from an open filehandle with ->render; use ->render_chunk" if $type eq 'handle';
 
-    my $fixed_length = $self->{response_fixed_length} && !$self->{headers_rendered};
-    my ($response_body, $response_length);
+    my ($response_body, $response_length, $redirect_url);
     if ($type eq 'json') {
       $response_body = $self->_json->encode($data);
-      $response_length = length $response_body if $fixed_length;
+      $response_length = length $response_body;
     } elsif ($type eq 'html' or $type eq 'xml' or $type eq 'text') {
+      my $charset = $self->{response_charset};
+      $charset = 'UTF-8' unless defined $charset;
       if (uc $charset eq 'UTF-8' and do { local $@; eval { require Unicode::UTF8; 1 } }) {
         $response_body = Unicode::UTF8::encode_utf8($data);
       } else {
         require Encode;
         $response_body = Encode::encode($charset, "$data");
       }
-      $response_length = length $response_body if $fixed_length;
+      $response_length = length $response_body;
     } elsif ($type eq 'data') {
       $response_body = $data;
-      $response_length = length $response_body if $fixed_length;
-    } elsif ($type eq 'file' and $fixed_length) {
+      $response_length = length $response_body;
+    } elsif ($type eq 'file') {
       $response_length = -s $data;
       Carp::croak "Failed to retrieve size of file '$data': $!" unless defined $response_length;
-    } elsif ($type eq 'redirect' or ($fixed_length and !length $type)) {
-      $response_length = 0;
+    } elsif ($type eq 'redirect') {
+      Carp::croak "Newline characters not allowed in HTTP redirect" if $data =~ tr/\r\n//;
+      $redirect_url = $data;
     }
+    $response_length = 0 unless defined $response_length;
+
+    my $headers_str = $self->_response_headers($type, $response_length, $redirect_url);
+    my $out_fh = defined $self->{output_handle} ? $self->{output_handle} : *STDOUT;
+    binmode $out_fh;
+    $out_fh->printflush($headers_str);
+    $self->{headers_rendered} = 1;
+    $self->{response_fixed_length} = 1;
+    return $self unless $response_length;
+
+    if ($type eq 'file') {
+      open my $in_fh, '<', $data or Carp::croak "Failed to open file '$data' for rendering: $!";
+      binmode $in_fh;
+      my $buffer_size = 0 + ($self->{response_body_buffer} || $ENV{CGI_TINY_RESPONSE_BODY_BUFFER} || DEFAULT_RESPONSE_BODY_BUFFER);
+      while (read $in_fh, my $buffer, $buffer_size) {
+        $out_fh->print($buffer);
+      }
+      $out_fh->flush;
+    } else {
+      $out_fh->printflush($response_body);
+    }
+    return $self;
+  }
+
+  sub render_chunk {
+    my ($self, $type, $data) = @_;
+    Carp::croak "Cannot render additional data after ->render" if $self->{response_fixed_length};
+    $type = '' unless defined $type;
+    Carp::croak "Don't know how to render '$type'" if length $type and !exists $RENDER_TYPES{$type};
+    Carp::croak "Cannot render a chunked redirect" if $type eq 'redirect';
 
     my $out_fh = defined $self->{output_handle} ? $self->{output_handle} : *STDOUT;
-    if (!$self->{headers_rendered}) {
-      my $headers_str = '';
-      my %headers_set;
-      foreach my $header (@{$self->{response_headers} || []}) {
-        my ($name, $value) = @$header;
-        $headers_str .= "$name: $value\r\n";
-        $headers_set{lc $name} = 1;
-      }
-      if (!$headers_set{'content-length'} and defined $response_length) {
-        $headers_str = "Content-Length: $response_length\r\n$headers_str";
-        $self->{response_fixed_length_set} = 1;
-      }
-      if (!$headers_set{'content-disposition'} and (defined $self->{response_disposition} or defined $self->{response_filename})) {
-        my $value = defined $self->{response_disposition} ? $self->{response_disposition} : 'inline';
-        if (defined(my $filename = $self->{response_filename})) {
-          require Encode;
-          my $quoted_filename = Encode::encode('ISO-8859-1', "$filename");
-          $quoted_filename =~ tr/\r\n/  /;
-          $quoted_filename =~ s/([\\"])/\\$1/g;
-          $value .= "; filename=\"$quoted_filename\"";
-          my $ext_filename = Encode::encode('UTF-8', "$filename");
-          $ext_filename =~ s/([^a-zA-Z0-9!#\$&+\-.^_`|~])/sprintf '%%%02X', ord $1/ge;
-          $value .= "; filename*=UTF-8''$ext_filename";
-        }
-        $headers_str = "Content-Disposition: $value\r\n$headers_str" unless lc $value eq 'inline';
-      }
-      if (!$headers_set{location} and $type eq 'redirect') {
-        Carp::croak "Newline characters not allowed in HTTP redirect" if $data =~ tr/\r\n//;
-        $headers_str = "Location: $data\r\n$headers_str";
-      }
-      if (!$headers_set{'content-type'} and $type ne 'redirect') {
-        my $content_type = $self->{response_type};
-        $content_type =
-            $type eq 'json' ? 'application/json;charset=UTF-8'
-          : $type eq 'html' ? "text/html;charset=$charset"
-          : $type eq 'xml'  ? "application/xml;charset=$charset"
-          : $type eq 'text' ? "text/plain;charset=$charset"
-          : 'application/octet-stream'
-          unless defined $content_type;
-        $headers_str = "Content-Type: $content_type\r\n$headers_str";
-      }
-      if (!$headers_set{date}) {
-        my $date_str = epoch_to_date(time);
-        $headers_str = "Date: $date_str\r\n$headers_str";
-      }
-      my $status = $self->{response_status};
-      $status = $self->{response_status} = "302 $HTTP_STATUS{302}" if !defined $status and $type eq 'redirect';
-      if ($self->{nph}) {
-        $status = "200 $HTTP_STATUS{200}" unless defined $status;
-        my $protocol = $ENV{SERVER_PROTOCOL};
-        $protocol = 'HTTP/1.0' unless defined $protocol and length $protocol;
-        $headers_str = "$protocol $status\r\n$headers_str";
-        my $server = $ENV{SERVER_SOFTWARE};
-        $headers_str .= "Server: $server\r\n" if defined $server and length $server;
-      } elsif (!$headers_set{status} and defined $status) {
-        $headers_str = "Status: $status\r\n$headers_str";
-      }
+    unless ($self->{headers_rendered}) {
+      my $headers_str = $self->_response_headers($type);
       binmode $out_fh;
-      $out_fh->printflush("$headers_str\r\n");
+      $out_fh->printflush($headers_str);
       $self->{headers_rendered} = 1;
-    } elsif ($type eq 'redirect') {
-      Carp::carp "Attempted to render a redirect but headers have already been rendered";
-    } elsif ($self->{response_fixed_length_set}) {
-      Carp::carp "Attempted to render additional response data but a fixed length response has already been rendered";
-      return $self;
     }
 
-    if ($type eq 'json' or $type eq 'html' or $type eq 'xml' or $type eq 'text' or $type eq 'data') {
+    if ($type eq 'json') {
+      my $response_body = $self->_json->encode($data);
       $out_fh->printflush($response_body);
+    } elsif ($type eq 'html' or $type eq 'xml' or $type eq 'text') {
+      my $charset = $self->{response_charset};
+      $charset = 'UTF-8' unless defined $charset;
+      my $response_body;
+      if (uc $charset eq 'UTF-8' and do { local $@; eval { require Unicode::UTF8; 1 } }) {
+        $response_body = Unicode::UTF8::encode_utf8($data);
+      } else {
+        require Encode;
+        $response_body = Encode::encode($charset, "$data");
+      }
+      $out_fh->printflush($response_body);
+    } elsif ($type eq 'data') {
+      $out_fh->printflush($data);
     } elsif ($type eq 'file' or $type eq 'handle') {
       my $in_fh;
       if ($type eq 'file') {
@@ -659,14 +649,75 @@ sub headers_rendered { $_[0]{headers_rendered} }
         $in_fh = $data;
       }
       binmode $in_fh;
-      my $chunk = $self->{response_body_buffer} || $ENV{CGI_TINY_RESPONSE_BODY_BUFFER} || DEFAULT_RESPONSE_BODY_BUFFER;
-      while (read $in_fh, my $buffer, $chunk) {
+      my $buffer_size = 0 + ($self->{response_body_buffer} || $ENV{CGI_TINY_RESPONSE_BODY_BUFFER} || DEFAULT_RESPONSE_BODY_BUFFER);
+      while (read $in_fh, my $buffer, $buffer_size) {
         $out_fh->print($buffer);
       }
       $out_fh->flush;
     }
     return $self;
   }
+}
+
+sub _response_headers {
+  my ($self, $type, $content_length, $location) = @_;
+  my $headers_str = '';
+  my %headers_set;
+  foreach my $header (@{$self->{response_headers} || []}) {
+    my ($name, $value) = @$header;
+    $headers_str .= "$name: $value\r\n";
+    $headers_set{lc $name} = 1;
+  }
+  if (!$headers_set{'content-length'} and defined $content_length) {
+    $headers_str = "Content-Length: $content_length\r\n$headers_str";
+  }
+  if (!$headers_set{'content-disposition'} and (defined $self->{response_disposition} or defined $self->{response_filename})) {
+    my $value = defined $self->{response_disposition} ? $self->{response_disposition} : 'inline';
+    if (defined(my $filename = $self->{response_filename})) {
+      require Encode;
+      my $quoted_filename = Encode::encode('ISO-8859-1', "$filename");
+      $quoted_filename =~ tr/\r\n/  /;
+      $quoted_filename =~ s/([\\"])/\\$1/g;
+      $value .= "; filename=\"$quoted_filename\"";
+      my $ext_filename = Encode::encode('UTF-8', "$filename");
+      $ext_filename =~ s/([^a-zA-Z0-9!#\$&+\-.^_`|~])/sprintf '%%%02X', ord $1/ge;
+      $value .= "; filename*=UTF-8''$ext_filename";
+    }
+    $headers_str = "Content-Disposition: $value\r\n$headers_str" unless lc $value eq 'inline';
+  }
+  if (!$headers_set{location} and $type eq 'redirect') {
+    $headers_str = "Location: $location\r\n$headers_str";
+  }
+  if (!$headers_set{'content-type'} and $type ne 'redirect') {
+    my $content_type = $self->{response_type};
+    my $charset = $self->{response_charset};
+    $charset = 'UTF-8' unless defined $charset;
+    $content_type =
+        $type eq 'json' ? 'application/json;charset=UTF-8'
+      : $type eq 'html' ? "text/html;charset=$charset"
+      : $type eq 'xml'  ? "application/xml;charset=$charset"
+      : $type eq 'text' ? "text/plain;charset=$charset"
+      : 'application/octet-stream'
+      unless defined $content_type;
+    $headers_str = "Content-Type: $content_type\r\n$headers_str";
+  }
+  if (!$headers_set{date}) {
+    my $date_str = epoch_to_date(time);
+    $headers_str = "Date: $date_str\r\n$headers_str";
+  }
+  my $status = $self->{response_status};
+  $status = $self->{response_status} = "302 $HTTP_STATUS{302}" if !defined $status and $type eq 'redirect';
+  if ($self->{nph}) {
+    $status = "200 $HTTP_STATUS{200}" unless defined $status;
+    my $protocol = $ENV{SERVER_PROTOCOL};
+    $protocol = 'HTTP/1.0' unless defined $protocol and length $protocol;
+    $headers_str = "$protocol $status\r\n$headers_str";
+    my $server = $ENV{SERVER_SOFTWARE};
+    $headers_str .= "Server: $server\r\n" if defined $server and length $server;
+  } elsif (!$headers_set{status} and defined $status) {
+    $headers_str = "Status: $status\r\n$headers_str";
+  }
+  return "$headers_str\r\n";
 }
 
 sub _json {
@@ -685,6 +736,7 @@ sub _json {
 
 sub _parse_multipart {
   my ($input, $length, $boundary, $buffer_size) = @_;
+  $buffer_size = 0 + ($buffer_size || DEFAULT_REQUEST_BODY_BUFFER);
   my $buffer = "\r\n";
   my $next_boundary = "\r\n--$boundary\r\n";
   my $end_boundary = "\r\n--$boundary--";
@@ -694,8 +746,7 @@ sub _parse_multipart {
       $buffer .= $$input;
       $length = 0;
     } else {
-      my $chunk = $buffer_size || DEFAULT_REQUEST_BODY_BUFFER;
-      $chunk = $length if $length < $chunk;
+      my $chunk = $length < $buffer_size ? $length : $buffer_size;
       last unless my $read = read $input, $buffer, $chunk, length $buffer;
       $length -= $read;
     }

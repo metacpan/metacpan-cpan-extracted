@@ -4,7 +4,7 @@ Dist::Zilla::PluginBundle::DROLSKY - DROLSKY's plugin bundle
 
 # VERSION
 
-version 1.18
+version 1.19
 
 # SYNOPSIS
 
@@ -160,8 +160,6 @@ This is more or less equivalent to the following `dist.ini`:
     skip = Dist::Zilla::Plugin::DROLSKY::MakeMaker
     skip = Dist::Zilla::Plugin::DROLSKY::PerlLinterConfigFiles
     skip = Dist::Zilla::Plugin::DROLSKY::Precious
-    skip = Dist::Zilla::Plugin::DROLSKY::Role::CoreCounter
-    skip = Dist::Zilla::Plugin::DROLSKY::RunExtraTests
     skip = Dist::Zilla::Plugin::DROLSKY::Test::Precious
     skip = Dist::Zilla::Plugin::DROLSKY::WeaverConfig
     skip = Pod::Weaver::PluginBundle::DROLSKY
@@ -180,7 +178,6 @@ This is more or less equivalent to the following `dist.ini`:
 
     [PodSyntaxTests]
 
-    [DROLSKY::RunExtraTests]
     [DROLSKY::Test::Precious]
     [MojibakeTests]
     [Test::CleanNamespaces]
@@ -317,9 +314,10 @@ button at [https://www.urth.org/fs-donation.html](https://www.urth.org/fs-donati
 
 Dave Rolsky <autarch@urth.org>
 
-# CONTRIBUTOR
+# CONTRIBUTORS
 
-Mark Fowler <mark@twoshortplanks.com>
+- Karen Etheridge <ether@cpan.org>
+- Mark Fowler <mark@twoshortplanks.com>
 
 # COPYRIGHT AND LICENSE
 

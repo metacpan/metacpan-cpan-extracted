@@ -4,6 +4,11 @@ History for the Lab-Measurement Perl distribution
 This document is work in progress (in the sense of adding
 historical information).
 
+3.750 2021-05-01
+  * Start driver for SignalRecovery 7265 lock-in
+  * Start driver for Keithley 2450 sourcemeter
+  * HP3458A: add RANGE and ARANGE commands
+
 3.741 2021-02-09
   * SR830: Fix and document the set_auto_sens function
 

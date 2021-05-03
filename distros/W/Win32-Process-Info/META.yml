@@ -5,9 +5,9 @@ author:
 build_requires:
   Test::More: '0.88'
 configure_requires:
-  Module::Build: '0.42'
+  ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.4204, CPAN::Meta::Converter version 2.143240'
+generated_by: 'ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -18,19 +18,6 @@ no_index:
     - inc
     - t
     - xt
-provides:
-  Win32::Process::Info:
-    file: lib/Win32/Process/Info.pm
-    version: '1.022'
-  Win32::Process::Info::NT:
-    file: lib/Win32/Process/Info/NT.pm
-    version: '1.022'
-  Win32::Process::Info::PT:
-    file: lib/Win32/Process/Info/PT.pm
-    version: '1.022'
-  Win32::Process::Info::WMI:
-    file: lib/Win32/Process/Info/WMI.pm
-    version: '1.022'
 requires:
   Carp: '0'
   File::Spec: '0'
@@ -39,6 +26,8 @@ requires:
   strict: '0'
   warnings: '0'
 resources:
-  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Win32-Process-Info
-  license: http://dev.perl.org/licenses/
-version: '1.022'
+  bugtracker: https://github.com/uperl/Win32-Process-Info/issues
+  homepage: https://metacpan.org/pod/Win32::Process::Info
+  repository: https://github.com/uperl/Win32-Process-Info.git
+version: '1.023'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,3 +1,9 @@
+0.22 2021-05-03
+    * Allow pass-through of DBI database options for ->create()
+    * Move URLs to https://
+    * Documentation updates
+
+
 0.21 2019-03-09
     * Use Module::Load to load renderers
     * Check if a class isa Text::Table, otherwise dispatch to Text::Table::Any

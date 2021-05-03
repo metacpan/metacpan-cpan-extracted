@@ -1,0 +1,81 @@
+use alienfile;
+
+use File::Copy "cp";
+use File::Path qw(make_path);
+
+share {
+	requires 'Alien::gmake' => 0.14;
+	requires 'Path::Tiny' => 0;
+	requires 'File::chmod';
+
+	# http://www.csie.ntu.edu.tw/~cjlin/libsvm/
+	plugin Download => (
+		url => 'https://github.com/cjlin1/libsvm/releases',
+		version => qr/v([\d\.]+)\.tar\.gz/,
+	);
+
+	plugin Extract => 'tar.gz';
+
+	my $sh_version = "3";
+	patch sub {
+		my $makefile = Path::Tiny::path('Makefile');
+		# real version is 3.x
+		$makefile->edit_lines_utf8(sub {
+			s/^SHVER = 2/SHVER = $sh_version/;
+		});
+	};
+
+	build [
+		$^O ne 'MSWin32' ? ( '%{make} all lib' ) : () ,
+		sub {
+			my ($build) = @_;
+
+			my $dir = $build->install_prop->{prefix};
+
+			my (@libs, @headers, @bins, $symlink);
+			my @bin_names = qw(svm-predict svm-scale svm-train);
+			if( $^O eq 'MSWin32' ) {
+				@libs = ( File::Spec->catfile( qw(windows libsvm.dll) ) );
+				@headers = ( 'svm.h' );
+				@bins = map { File::Spec->catfile( 'windows', "$_.exe" ) } @bin_names;
+			} elsif( $^O eq 'darwin' ) {
+				rename "libsvm.so.$sh_version", "libsvm.$sh_version.dylib";
+				@libs = ( "libsvm.$sh_version.dylib", 'libsvm.a' );
+				@headers = ( 'svm.h' );
+				@bins = @bin_names;
+				$symlink = { 'libsvm.dylib' => "libsvm.$sh_version.dylib" };
+			} else {
+				@libs = ( "libsvm.so.$sh_version", 'libsvm.a' );
+				@headers = ( 'svm.h' );
+				@bins = @bin_names;
+				$symlink = { 'libsvm.so' => "libsvm.so.$sh_version" };
+			}
+
+			my ($lib_dir, $header_dir, $bin_dir) =
+				map { File::Spec->catfile( $dir, $_ ) }
+				qw(lib include bin);
+
+			my @filesys = (
+				{ to => $lib_dir, files => \@libs, symlink => $symlink },
+				{ to => $header_dir, files => \@headers },
+				{ to => $bin_dir, files => \@bins, exec => 1 },
+			);
+
+			local $File::chmod::UMASK = 0;
+			for my $type (@filesys) {
+				make_path $type->{to};
+				for my $file (@{ $type->{files} }) {
+					cp( $file, $type->{to} ); # cp keeps permissions
+					File::chmod::chmod('a+x', File::Spec->catfile( $type->{to}, $file )) if exists $type->{exec};
+				}
+				if( $^O ne 'MSWin32' && exists $type->{symlink} ) {
+					# NOTE we assume symlink exists on non-MSWin32 systems
+					while( my ($k, $v) = each %{  $type->{symlink} } ) {
+						symlink( $v, File::Spec->catfile( $type->{to}, $k ) );
+					}
+				}
+			}
+		}
+	];
+};
+

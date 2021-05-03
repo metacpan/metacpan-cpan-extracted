@@ -1,0 +1,365 @@
+=head1 NAME
+
+PDL::IO::Matlab -- Read and write Matlab format data files.
+
+=head1 DESCRIPTION
+
+This module provides routines to read and write pdls to and from
+data files in Matlab formats. The module uses the matio C library.
+Both functional and OO interface are provided.
+
+Only real, multi-dimensional arrays corresponding to PDL data types are supported.
+Compression for both reading and writing is supported.
+
+See the section L</CAVEATS> for important information on potential problems when using
+this module.
+
+=head1 SYNOPSIS
+
+ use PDL;
+ use PDL::IO::Matlab qw( matlab_read matlab_write matlab_print_info);
+
+ # write two pdls in matlab 5 format
+ matlab_write('file.dat', $x, $y);
+
+ # read an array of piddles 
+ # from file in matlab 4, 5, or 7.3 format.
+ my @pdls =  matlab_read('file.dat');
+ 
+ # write pdl in matlab 7.3 format.
+ matlab_write('file.dat', 'MAT73', $x);
+
+ matlab_print_info('file.dat');
+
+=cut
+=head1 FUNCTIONS
+
+The functional interface.
+
+=head2 B<matlab_read>
+
+=head3 Usage
+
+Return all arrays in C<$filename>
+
+ @pdls = matlab_read($filename);
+ @pdls = matlab_read($filename, {OPTIONS});
+
+Return first array in C<$filename>
+
+ $x = matlab_read($filename);
+
+Do not automatically convert C<1xn> and C<nx1> arrays
+to 1-d arrays.
+
+ @pdls = matlab_read($filename, { onedr => 0 } );
+
+Reads all data in the file C<$filename>.
+Formats 4, 5, and 7.3 are supported. Options
+are passed to L</B<new>>.
+
+=cut
+=head2 B<matlab_write>
+
+=head3 Usage
+
+ matlab_write($filename,$x1,$x2,...);
+ matlab_write($filename,$format,$x1,$x2,...);
+
+Automatically convert C<n> element, 1-d piddles to C<1xn> matlab
+variables.
+
+ matlab_write($filename,$x1,$x2,..., {onedw => 1} );
+
+Automatically convert to C<nx1> matlab
+variables.
+
+ matlab_write($filename,$x1,$x2,..., {onedw => 2} );
+
+Use zlib compression
+
+ matlab_write($filename,$x1,$x2,..., {compress => 1} );
+
+This method writes pdls C<$x1>, C<$x2>,.... If present, C<$format>
+must be either C<'MAT5'> or C<'MAT73'>.
+
+=cut
+=head2 B<matlab_print_info>
+
+=head3 Usage
+
+ # print names and dimensions of variables.
+ matlab_print_info($filename);
+ # also print a small amount of the data.
+ matlab_print_info($filename, { data => 1 });
+ # This does the same thing.
+ matlab_print_info($filename,  data => 1 );
+
+Print information about the contents of the matlab file C<$filename>,
+including the name, dimension and class type of the variables.
+
+=cut
+=head1 METHODS
+
+=head2 B<new>
+
+=head3 Usage
+
+ # open for writing
+ $mat = PDL::IO::Matlab->new('file.dat', '>', {format => 'MAT5'});
+
+ # default format is MAT5
+ $mat = PDL::IO::Matlab->new('file.dat', '>');
+
+ # may use 'w' or '>'
+ $mat = PDL::IO::Matlab->new('file.dat', 'w');
+
+ # supply header
+ $mat = PDL::IO::Matlab->new('file.dat', '>', { header => 'some text'} );
+
+ # read-write  with rw or <>
+ $mat = PDL::IO::Matlab->new('file.dat', 'rw');  
+
+ # open for reading
+ $mat = PDL::IO::Matlab->new('file.dat', '<');
+
+=head3 Options
+
+=over
+
+=item format
+
+Either C<'MAT5'> or C<'MAT73'>.
+
+=item compress
+
+Either C<1> for yes, or C<0> for no.
+
+=item header
+
+A header (a string) to write into the file.
+
+=item namekey
+
+A hash key that will be used to store the matlab name
+for a variable read from a file in the header of a piddle.
+The default value is 'NAME'. Thus, the name can be accessed
+via C<< $pdl->hdr->{NAME} >>.
+
+=item varbasew
+
+The base of the default matlab variable name that will be
+written in the matlab file along with each piddle. An
+integer will be appended to the base name. This integer is
+initialized to zero and is incremented after writing each
+variable.
+
+=back
+
+The option C<compress> enables zlib compression if the zlib library
+is available and if the data file format is C<'MAT5'>.
+
+=cut
+=head2 B<close>
+
+=head3 Usage
+
+$mat->close;
+
+Close matlab file and free memory associated with C<$mat>.
+
+=cut
+=head2 B<read_next>
+
+=head3 Usage
+
+ my $x = $mat->read_next;
+ print "End of file\n" unless ref($x);
+
+ my ($err,$x) = $mat->read_next;
+ print "End of file\n" if $err;
+
+Read one pdl from file associated with object C<$mat>.
+
+=cut
+=head2 B<read_all>
+
+=head3 Usage
+
+ my @pdls = $mat->read_all;
+
+Read all remaining pdls from file associated with object C<$mat>.
+
+=cut
+=head2 B<write>
+
+=head3 Usage
+
+ $x2->hdr->{NAME} = 'variablename';
+
+ $mat->write($x1,$x2,...);
+
+ $mat->write($x1,$x2,...,{OPTIONS});
+
+Append pdls to open file associated with C<$mat>.
+
+If a piddle has a matlab name stored in the header
+it will be used as the matlab name written to the file
+with this piddle. The key is in C<< $pdl->{namekey} >>,
+with default value C<'NAME'>. If the name is not in
+the piddle's header, then a default value will be used.
+
+=head3 Options
+
+=over
+
+=item onedw
+
+In order to write a file that is compatible with Matlab and Octave,
+C<onedw> must be either C<1> or C<2>.  If C<onedw> is C<1> then a 1-d
+pdl of length n is written as a as an C<nx1> pdl (a C<1xn> matlab
+variable). If C<onedw> is C<2> then the output piddle is C<1xn> and
+the matlab variable C<nx1>.  If C<onedw> is zero (the default), then
+the 1-d pdl is written as a 1-d piddle. In the last case, Octave will
+print an error and fail to read the variable.
+
+=item compress
+
+If C<compress> is C<1> then zlib compression is used, if the library
+is available and if the format is C<'MAT5'>.
+
+=back
+
+=cut
+=head2 B<rewind>
+
+=head3 Usage
+
+ $mat->rewind
+
+Reset pointer to the head of the file.
+
+=cut
+=head2 B<get_filename>
+
+=head3 Usage
+
+ $mat->get_filename
+
+Return name of file associated with C<$mat>.
+
+=cut
+=head2 B<get_header>
+
+=head3 Usage
+
+ $mat->get_header
+
+Return the header string from the matlab data file associated with
+C<$mat>.
+
+=cut
+=head2 B<get_format>
+
+=head3 Usage
+
+ $mat->get_format
+
+Return matlab data file format for file associated with
+C<$mat>. One of C<'MAT4'>, C<'MAT5'>, or C<'MAT73'>.
+
+=cut
+=head2 B<print_all_var_info>
+
+=head3 Usage
+
+ $mat->print_all_var_info;
+
+ # also print a small amount of data from each variable.
+ $mat->print_all_var_info( data => 1 );
+
+Print a summary of all data in the file associated
+with C<$mat> (starting from the next unread variable.)
+
+=cut
+=head1 ACCESSOR METHODS
+
+The following are additional accessor methods for the matlab file objects
+PDL::IO::Matlab.
+
+get_handle set_handle get_mode set_mode get_filename set_filename get_format set_format get_varbasew set_varbasew get_onedw set_onedw get_onedr set_onedr get_namekey set_namekey get_wvarnum set_wvarnum get_compress set_compress
+=cut
+=head1 CAVEATS
+
+=head2 complicating factors
+
+There are two complicating factors when using matlab files with PDL.
+First, matlab does not support one-dimensional vectors. Thus, a 1-d pdl
+must be represented as either a C<1 x n> of a C<n x 1> matlab variable. Second,
+matlab stores matrices in column-major order, while pdl stores them
+in row-major order.
+
+=over
+
+=item B<one-dimensional pdls>
+
+You can write 1-d pdls to a file with this module. This module can then read the
+file. But, Octave will fail to read the file and print an error message.
+See L</B<write>> for how this is handled.
+
+=item B<column- vs. row major>
+
+Data written by Octave (PDL) will be read by PDL (Octave) with indices transposed.
+On the todo list is an option to physically or logically transpose the data on
+reading and writing.
+
+=item B<Octave requires distinct matlab variable names>
+
+With this module, you may write more than one
+variable, each with the same name, (the matlab name; not the
+pdl identifier, or variable, name), to a file in MAT5
+format. This module is then able to read all pdls from this file.
+But, Octave, when reading this file, will overwrite all but
+the last occurrence of the variable with the last
+occurrence. See the method L</B<write>>.
+
+Trying to write two pdls with the same matlab variable name in MAT73 format will cause
+an error.
+
+=back
+
+=head2 other missing features, bugs
+
+When trying to read an unsupported matlab data type from a file, this module will
+throw an error. Supporting other data types or optionally skipping them is on
+the todo list.
+
+Random access of variables in a file is on the todo list. The underlying B<matio>
+library supports this.
+
+This module is currently built with some hardcoded data from a PDL installation, that
+may contain platform-specific (linux) features. It may fail to
+build or function correctly when used on other platforms.
+
+=head1 AUTHOR
+
+John Lapeyre, C<< <jlapeyre at cpan.org> >>
+
+The matio library was written by Christopher C. Hulbert.
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright 2012 John Lapeyre.
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.
+
+The matio library included here is 
+Copyright 2011 Christopher C. Hulbert. All rights reserved.
+See the file matio-1.5/COPYING in the source distribution
+of this module.
+
+=cut

@@ -1,0 +1,23 @@
+---
+abstract: 'Manage concurrent C<Perl> semantics in the uniprocess execution model of C<perl>.'
+author:
+  - 'oodler <oodler@cpan.org>'
+build_requires:
+  Test::Exception: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.048, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Sub-Genius
+requires:
+  FLAT: v1.0.3
+  Parse::RecDescent: '0'
+resources:
+  homepage: https://github.com/oodler577/p5-Sub-Genius
+  repository: https://github.com/oodler577/p5-Sub-Genius.git
+version: '0.08'

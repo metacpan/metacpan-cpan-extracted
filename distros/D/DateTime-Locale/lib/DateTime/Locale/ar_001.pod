@@ -19,12 +19,12 @@
 
 =head1 NAME
 
-DateTime::Locale::ar_001 - Locale data examples for the Arabic World (ar-001) locale
+DateTime::Locale::ar_001 - Locale data examples for the Arabic world (ar-001) locale
 
 =head1 DESCRIPTION
 
 This pod file contains examples of the locale data available for the
-Arabic World locale.
+Arabic world locale.
 
 =head2 Days
 

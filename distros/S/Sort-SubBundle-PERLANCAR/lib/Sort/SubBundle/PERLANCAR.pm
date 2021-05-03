@@ -1,9 +1,9 @@
 package Sort::SubBundle::PERLANCAR;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-04-11'; # DATE
+our $DATE = '2021-05-01'; # DATE
 our $DIST = 'Sort-SubBundle-PERLANCAR'; # DIST
-our $VERSION = '0.082'; # VERSION
+our $VERSION = '0.087'; # VERSION
 
 1;
 # ABSTRACT: PERLANCAR's Sort::Sub subroutines
@@ -20,7 +20,7 @@ Sort::SubBundle::PERLANCAR - PERLANCAR's Sort::Sub subroutines
 
 =head1 VERSION
 
-This document describes version 0.082 of Sort::SubBundle::PERLANCAR (from Perl distribution Sort-SubBundle-PERLANCAR), released on 2021-04-11.
+This document describes version 0.087 of Sort::SubBundle::PERLANCAR (from Perl distribution Sort-SubBundle-PERLANCAR), released on 2021-05-01.
 
 =head1 HOMEPAGE
 

@@ -1,5 +1,5 @@
 # -*- Perl -*-
-use Test::More tests => 21;
+use Test::More;
 use Data::Dumper;
 use strict;
 use warnings;
@@ -50,3 +50,5 @@ SKIP: {
     ok(eq_array([$outPdl->list], [$pdl->list]), "write/read equal");
     unlink $bar if -f $bar;
 }
+
+done_testing;

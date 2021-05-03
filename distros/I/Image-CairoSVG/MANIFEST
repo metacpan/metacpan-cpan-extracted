@@ -1,7 +1,11 @@
 Changes
+examples/durn.png
 examples/locust.png
 examples/locust.svg
+examples/scale.pl
 examples/synopsis.pl
+examples/urn.png
+examples/urn.svg
 lib/Image/CairoSVG.pm
 lib/Image/CairoSVG.pod
 Makefile.PL

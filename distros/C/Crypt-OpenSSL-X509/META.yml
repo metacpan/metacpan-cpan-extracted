@@ -3,9 +3,9 @@ abstract: "Perl extension to OpenSSL's X509 API."
 author:
   - 'Dan Sully'
 build_requires:
-  ExtUtils::MakeMaker: 6.36
+  ExtUtils::MakeMaker: 6.59
 configure_requires:
-  ExtUtils::MakeMaker: 6.36
+  ExtUtils::MakeMaker: 6.59
 distribution_type: module
 dynamic_config: 1
 generated_by: 'Module::Install version 1.19'
@@ -19,10 +19,10 @@ no_index:
     - inc
     - t
 requires:
-  perl: '5.005'
+  perl: 5.8.0
 resources:
   bugtracker: https://github.com/dsully/perl-crypt-openssl-x509/issues
   homepage: https://github.com/dsully/perl-crypt-openssl-x509
   license: http://dev.perl.org/licenses/
   repository: https://github.com/dsully/perl-crypt-openssl-x509
-version: '1.813'
+version: '1.907'

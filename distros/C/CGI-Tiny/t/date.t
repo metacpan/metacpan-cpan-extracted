@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use CGI::Tiny;
+use CGI::Tiny ();
 use Test::More;
 use Time::Local 'timegm';
 

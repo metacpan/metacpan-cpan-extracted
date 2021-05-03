@@ -1,6 +1,6 @@
 package Lab::Instrument::Keithley2400;
 #ABSTRACT: Keithley 2400 SourceMeter
-$Lab::Instrument::Keithley2400::VERSION = '3.741';
+$Lab::Instrument::Keithley2400::VERSION = '3.750';
 use v5.20;
 
 use strict;
@@ -1764,7 +1764,7 @@ Lab::Instrument::Keithley2400 - Keithley 2400 SourceMeter
 
 =head1 VERSION
 
-version 3.741
+version 3.750
 
 =head1 SYNOPSIS
 

@@ -1,5 +1,5 @@
 package Data::Printer::Filter::PDL;
-$Data::Printer::Filter::PDL::VERSION = '1.000';
+$Data::Printer::Filter::PDL::VERSION = '1.001';
 use strict;
 use warnings;
 
@@ -34,7 +34,7 @@ use constant COLORS => {
 # _get_color_pair
 sub _gcp {
   my ($ddp, $name) = @_;
-  my $color_spec = %{ COLORS() }{$name};
+  my $color_spec = COLORS()->{$name};
   my $default_color = $color_spec->{color};
   if( exists $color_spec->{fallback} && ( my $fallback_color = $ddp->theme->color_for($color_spec->{fallback}) ) ) {
     $default_color = $fallback_color;
@@ -138,7 +138,7 @@ Data::Printer::Filter::PDL
 
 =head1 VERSION
 
-version 1.000
+version 1.001
 
 =head1 SYNOPSIS
 
@@ -204,7 +204,7 @@ Report bugs and submit patches to the repository on L<GitHub|https://github.com/
 
 =head1 SEE ALSO
 
-L<Data::Printer>, L<PDL>, L<Devel::REPL::Plugin::DataPrinter>
+L<Data::Printer>, L<PDL>, L<Reply::Plugin::DataPrinter>, L<Devel::REPL::Plugin::DataPrinter>
 
 =head1 COPYRIGHT
 

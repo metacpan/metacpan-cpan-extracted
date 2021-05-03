@@ -1,0 +1,72 @@
+Changes for Perl extension Template-Tiny-Strict
+
+1.17      2021-05-02 15:23:14 CEST
+          - Merged typo fix in Changes. Thanks to Karen Etheridge for the PR.
+            https://github.com/Ovid/template-tiny-strict/pull/1
+          - You can optionally "name" a template. The name will be reported
+            in errors.
+
+1.16      2021-05-01 09:14:21 CEST
+          - Fix minor POD error.
+          - Interim release to handle missing Changes in last release
+
+1.15      2021-05-01 09:02:02 CEST
+          - Forked from Template::Tiny to Template::Tiny::Strict
+          - Added forbid_undef and forbid_unused arguments
+          - Retroactively update these Changes
+
+1.13      2021-01-30 17:28:27Z
+          - distribution tooling updates
+
+1.12      2011-06-17
+          - Template::Tiny is unchanged for a year, moving to stable release
+          - Cleaning up POD grammar a bit (ADAMK)
+          - Removing test dependency on Capture::Tiny for tiny purity (ADAMK)
+
+0.11      2010-02-22
+          - Adding preparse-specific test script (ADAMK)
+          - Add compatibility with the horrible TT process() signature (MSTROUT)
+
+0.10      2010-01-24
+          - The use of the constructor is now compulsory, as per Template.pm
+          - Adding support for constructor params
+          - Adding support for constructor TRIM param
+          - The process method now works in both static and instance modes
+
+0.09      2009-12-16
+          - Adding support for "private" _foo keys
+
+0.08      2009-12-13
+          - Removing some minor code no longer needed.
+          - Updating the POD documentation
+
+0.07      2009-12-13
+          - Recursion is now processed top to bottom
+          - Added support for FOREACH
+
+0.06      2009-12-13
+          - Added support for nested [% IF %] and [% UNLESS %] conditions
+
+0.05      2009-12-10
+          - Expression chains in a condition that terminate in an object
+            will boolify the object instead of stringifying it + tests for it
+
+0.04      2009-12-10
+          - Reduced implementation by 8kb
+          - As a side effect of this, added support for UNLESS/ELSE
+          - Matching behaviour of TT to NOT chomp on -%](space)(EOF)
+          - Switch to Tiny-style Makefile.PL
+
+0.03      2009-12-10
+          - Bug fix for methods in expressions
+          - Added test case for method calls
+
+0.02      2009-12-08
+          - Added support for [%- -%]
+          - Added support for recursive simple expressions
+          - Added support for [% IF expr %]
+          - Added support for [% UNLESS expr %]
+          - Added support for [% ELSE %]
+
+0.01      2009-12-06
+          - Created initial release

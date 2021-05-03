@@ -1,10 +1,13 @@
 Revision history for Perl extension Sub-Meta
 
+0.13 2021-05-01T04:28:01Z
+    - update cpanfile and github action #43
+
 0.12 2021-04-28T14:39:12Z
     [IMPROVEMENTS]
     - feat: add is_relaxed_same_interface and relaxed_error_message #40 #41
     - improve many tests #34 #35 #36 #37 #38 #39
-    
+
     [INCOMPATIBLE CHANGES]
     - rename interface_error_message to error_message #40
 

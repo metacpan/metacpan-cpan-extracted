@@ -15,7 +15,7 @@ my $build = Module::Build->new(
       'XS::Parse::Keyword::Builder' => 0,
    },
    requires => {
-      'perl' => '5.016',
+      'perl' => '5.014',
       'XS::Parse::Keyword' => 0,
    },
    license => 'perl',

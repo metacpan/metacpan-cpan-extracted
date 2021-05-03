@@ -1,5 +1,11 @@
 Revision history for Group-Git
 
+0.7.5   2021-05-03
+        Updating for release of version 0.7.5
+        Updated date (Ivan Wills)
+        Cleaned up a warning (Ivan Wills)
+        Adding post help message listing all the commands (Ivan Wills)
+
 0.7.4   2020-03-06
         Updating for release of version 0.7.4
         Fixing issue when tag_group doesn't exist (Ivan Wills)

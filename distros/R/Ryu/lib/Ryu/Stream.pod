@@ -32,7 +32,7 @@ A L<Ryu::Sink>.
 
 =item L<Ryu::Node>
 
-L<describe|Ryu::Node/describe>, L<flow_control|Ryu::Node/flow_control>, L<is_paused|Ryu::Node/is_paused>, L<label|Ryu::Node/label>, L<new|Ryu::Node/new>, L<new_future|Ryu::Node/new_future>, L<parent|Ryu::Node/parent>, L<pause|Ryu::Node/pause>, L<resume|Ryu::Node/resume>, L<unblocked|Ryu::Node/unblocked>
+L<completed|Ryu::Node/completed>, L<describe|Ryu::Node/describe>, L<flow_control|Ryu::Node/flow_control>, L<is_paused|Ryu::Node/is_paused>, L<label|Ryu::Node/label>, L<new|Ryu::Node/new>, L<new_future|Ryu::Node/new_future>, L<parent|Ryu::Node/parent>, L<pause|Ryu::Node/pause>, L<resume|Ryu::Node/resume>, L<unblocked|Ryu::Node/unblocked>
 
 =back
 

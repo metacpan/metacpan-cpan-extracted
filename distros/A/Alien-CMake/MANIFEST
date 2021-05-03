@@ -1,4 +1,3 @@
-.travis.yml
 Build.PL
 Changes
 inc/My/Builder.pm
@@ -7,6 +6,8 @@ inc/My/Builder/Windows.pm
 inc/My/Utility.pm
 lib/Alien/CMake.pm
 LICENSE
+maint/cip-before-install
+maint/releaseprep
 MANIFEST			This list of files
 META.json
 META.yml

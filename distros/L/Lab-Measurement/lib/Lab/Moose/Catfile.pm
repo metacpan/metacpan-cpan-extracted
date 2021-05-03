@@ -1,5 +1,5 @@
 package Lab::Moose::Catfile;
-$Lab::Moose::Catfile::VERSION = '3.741';
+$Lab::Moose::Catfile::VERSION = '3.750';
 use warnings;
 use strict;
 
@@ -32,7 +32,7 @@ Lab::Moose::Catfile - Export custom catfile which avoids backslashes
 
 =head1 VERSION
 
-version 3.741
+version 3.750
 
 =head1 SYNOPSIS
 

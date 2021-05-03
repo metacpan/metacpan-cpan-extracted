@@ -1,3 +1,6 @@
+0.18 2021-05-03
+- stop loading PDL::Complex and overriding PDL:: functions
+
 0.17 2021-04-01
 - handle native complex data
 

@@ -2,7 +2,7 @@ package Acme::MetaSyntactic::debian;
 use strict;
 use Acme::MetaSyntactic::List;
 our @ISA = qw( Acme::MetaSyntactic::List );
-our $VERSION = '1.004';
+our $VERSION = '1.005';
 __PACKAGE__->init();
 1;
 
@@ -15,7 +15,7 @@ Acme::MetaSyntactic::debian - The debian theme
 This theme lists all the Debian codenames. So far they have been
 characters taken from the movie I<Toy Story> by Pixar.
 
-Source: L<http://www.debian.org/doc/manuals/debian-faq/ch-ftparchives.en.html#s-sourceforcodenames>.
+Source: L<https://www.debian.org/doc/manuals/debian-faq/ftparchives.en.html#codenames>.
 
 =head1 CONTRIBUTOR
 
@@ -24,6 +24,13 @@ Philippe Bruhat (Book).
 =head1 CHANGES
 
 =over 4
+
+=item *
+
+2021-04-30 - v1.005
+
+Updated the link to the Debian documentation about codenames.
+Published in Acme-MetaSyntactic-Themes version 1.055.
 
 =item *
 

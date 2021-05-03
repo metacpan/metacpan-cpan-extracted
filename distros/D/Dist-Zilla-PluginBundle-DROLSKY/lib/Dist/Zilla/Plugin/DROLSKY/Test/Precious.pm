@@ -7,7 +7,7 @@ use warnings;
 use autodie;
 use namespace::autoclean;
 
-our $VERSION = '1.18';
+our $VERSION = '1.19';
 
 use Dist::Zilla::File::InMemory;
 
@@ -22,14 +22,22 @@ use warnings;
 use Test::More;
 
 use Capture::Tiny qw( capture );
+use Encode qw( decode );
 use FindBin qw( $Bin );
+
+binmode $_, ':encoding(utf-8)'
+    for map { Test::More->builder->$_ }
+    qw( output failure_output todo_output );
 
 chdir "$Bin/../.."
     or die "Cannot chdir to $Bin/../..: $!";
 
 my ( $out, $err ) = capture { system(qw( precious lint -a )) };
-is( $? >> 8, 0,   'precious lint -a exited with 0' );
-is( $err,    q{}, 'no output to stderr' );
+$_ = decode( 'UTF-8', $_ ) for grep {defined} $out, $err;
+
+is( $? >> 8, 0, 'precious lint -a exited with 0' )
+    or diag($out);
+is( $err, q{}, 'no output to stderr' );
 
 done_testing();
 EOF
@@ -65,7 +73,7 @@ Dist::Zilla::Plugin::DROLSKY::Test::Precious - Creates a test that runs precious
 
 =head1 VERSION
 
-version 1.18
+version 1.19
 
 =for Pod::Coverage .*
 

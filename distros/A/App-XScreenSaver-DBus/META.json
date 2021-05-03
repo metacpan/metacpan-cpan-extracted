@@ -1,0 +1,74 @@
+{
+   "abstract" : "tie xscreensaver into dbus",
+   "author" : [
+      "Gianni Ceccarelli <dakkar@thenautilus.net>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.017, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "agpl_3"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "App-XScreenSaver-DBus",
+   "no_index" : {
+      "directory" : [
+         "t/lib"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::Pod" : "1.41",
+            "Test::Spelling" : "0.12"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "IPC::Run" : "0",
+            "Log::Any" : "0",
+            "Log::Any::Adapter" : "0",
+            "Moo" : "0",
+            "Net::DBus" : "0",
+            "Net::DBus::Exporter" : "0",
+            "Net::DBus::Object" : "0",
+            "Net::DBus::Reactor" : "0",
+            "Try::Tiny" : "0",
+            "curry" : "0",
+            "experimental" : "0",
+            "parent" : "0",
+            "perl" : "v5.20.0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Spec" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "https://www.thenautilus.net/cgit/xscreensaver-dbus/",
+         "web" : "https://www.thenautilus.net/cgit/xscreensaver-dbus/"
+      }
+   },
+   "version" : "1.0.2",
+   "x_generated_by_perl" : "v5.24.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.26",
+   "x_spdx_expression" : "AGPL-3.0"
+}
+

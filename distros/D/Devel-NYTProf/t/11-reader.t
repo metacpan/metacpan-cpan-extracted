@@ -1,17 +1,23 @@
 use strict;
 use warnings;
 use Carp;
+use Config qw(%Config);
 use Devel::NYTProf::Reader;
 use Test::More;
 use File::Spec;
 use File::Temp qw( tempdir );
+use Devel::NYTProf::Constants qw(
+    NYTP_DEFAULT_COMPRESSION
+    NYTP_ZLIB_VERSION
+);
 
-# Relax this restriction once we figure out how to make test $file work for
-# Appveyor.
-plan skip_all => "doesn't work without HAS_ZLIB" if (($^O eq "MSWin32") || ($^O eq 'VMS'));
+plan skip_all => "needs different profile data for testing on longdouble builds"
+    if (defined $Config{uselongdouble} and $Config{uselongdouble} eq 'define');
 
 my $file = "./t/nytprof_11-reader.out.txt";
 croak "No $file" unless -f $file;
+
+plan skip_all => "$file doesn't work unless NYTP_ZLIB_VERSION is set" unless NYTP_ZLIB_VERSION();
 
 # new()
 

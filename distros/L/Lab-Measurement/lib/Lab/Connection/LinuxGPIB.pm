@@ -1,6 +1,6 @@
 package Lab::Connection::LinuxGPIB;
 #ABSTRACT: LinuxGPIB connection
-$Lab::Connection::LinuxGPIB::VERSION = '3.741';
+$Lab::Connection::LinuxGPIB::VERSION = '3.750';
 use v5.20;
 
 #
@@ -101,7 +101,7 @@ Lab::Connection::LinuxGPIB - LinuxGPIB connection
 
 =head1 VERSION
 
-version 3.741
+version 3.750
 
 =head1 SYNOPSIS
 

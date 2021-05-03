@@ -1,0 +1,1148 @@
+#LyX 2.3 created this file. For more info see http://www.lyx.org/
+\lyxformat 544
+\begin_document
+\begin_header
+\save_transient_properties true
+\origin unavailable
+\textclass scrartcl
+\use_default_options true
+\begin_modules
+logicalmkup
+theorems-ams
+theorems-ams-extended
+enumitem
+\end_modules
+\maintain_unincluded_children false
+\begin_local_layout
+Format 7
+InsetLayout CharStyle:MenuItem
+LyxType               charstyle
+LabelString           menu
+LatexType             command
+LatexName             menuitem
+Font
+Family              Sans
+EndFont
+Preamble
+\newcommand*{\menuitem}[1]{{\sffamily #1}}
+EndPreamble
+End
+\end_local_layout
+\language english
+\language_package default
+\inputencoding auto
+\fontencoding global
+\font_roman "default" "default"
+\font_sans "default" "default"
+\font_typewriter "default" "default"
+\font_math "auto" "auto"
+\font_default_family default
+\use_non_tex_fonts false
+\font_sc false
+\font_osf false
+\font_sf_scale 100 100
+\font_tt_scale 100 100
+\use_microtype false
+\use_dash_ligatures true
+\graphics default
+\default_output_format default
+\output_sync 0
+\bibtex_command default
+\index_command default
+\paperfontsize 12
+\spacing single
+\use_hyperref true
+\pdf_title "LyX's Additional Features manual"
+\pdf_author "LyX Team"
+\pdf_subject "LyX's additional features documentation"
+\pdf_keywords "LyX, Documentation, Additional"
+\pdf_bookmarks true
+\pdf_bookmarksnumbered true
+\pdf_bookmarksopen false
+\pdf_bookmarksopenlevel 1
+\pdf_breaklinks false
+\pdf_pdfborder false
+\pdf_colorlinks true
+\pdf_backref false
+\pdf_pdfusetitle false
+\pdf_quoted_options "linkcolor=black, citecolor=black, urlcolor=blue, filecolor=blue, pdfpagelayout=OneColumn, pdfnewwindow=true, pdfstartview=XYZ, plainpages=false"
+\papersize letterpaper
+\use_geometry false
+\use_package amsmath 1
+\use_package amssymb 1
+\use_package cancel 1
+\use_package esint 0
+\use_package mathdots 1
+\use_package mathtools 1
+\use_package mhchem 1
+\use_package stackrel 1
+\use_package stmaryrd 1
+\use_package undertilde 1
+\cite_engine basic
+\cite_engine_type default
+\biblio_style plain
+\use_bibtopic true
+\use_indices false
+\paperorientation portrait
+\suppress_date false
+\justification true
+\use_refstyle 0
+\use_minted 0
+\index Index
+\shortcut idx
+\color #008000
+\end_index
+\secnumdepth 3
+\tocdepth 3
+\paragraph_separation skip
+\defskip smallskip
+\is_math_indent 1
+\math_indentation default
+\math_numbering_side default
+\quotes_style english
+\dynamic_quotes 0
+\papercolumns 1
+\papersides 1
+\paperpagestyle default
+\tracking_changes false
+\output_changes false
+\html_math_output 0
+\html_css_as_file 0
+\html_be_strict true
+\end_header
+
+\begin_body
+
+\begin_layout Title
+Creating Histogram Grids
+\end_layout
+
+\begin_layout Section
+Linear Grids
+\end_layout
+
+\begin_layout Subsection
+General Statements
+\end_layout
+
+\begin_layout Standard
+Given
+\end_layout
+
+\begin_layout Description
+\begin_inset Argument 1
+status collapsed
+
+\begin_layout Plain Layout
+style=nextline,left=1cm..2cm
+\end_layout
+
+\end_inset
+
+
+\begin_inset Formula $R_{min}$
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+&
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset Formula $R_{max}$
+\end_inset
+
+ are the soft bounds of the range to be covered.
+ The actual range must include them, but may be larger.
+\end_layout
+
+\begin_layout Description
+\begin_inset Formula $E_{i}$
+\end_inset
+
+ are the bin edges, with edges 
+\begin_inset Formula $\left[E_{min},E_{max}\right]$
+\end_inset
+
+ covering the range 
+\begin_inset Formula $\left[R_{min},R_{max}\right]$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Description
+\begin_inset Formula $P$
+\end_inset
+
+ is the fiducial alignment position 
+\end_layout
+
+\begin_layout Description
+\begin_inset Formula $i$
+\end_inset
+
+ is the bin index, whose origin is defined such that 
+\family roman
+\series medium
+\shape up
+\size normal
+\emph off
+\bar no
+\strikeout off
+\xout off
+\uuline off
+\uwave off
+\noun off
+\color none
+
+\begin_inset Formula $E_{0}\le P\le E_{1}$
+\end_inset
+
+, with 
+\begin_inset Formula 
+\begin{eqnarray*}
+i & = & \begin{cases}
+i_{min}, & E_{i}=E_{min}\\
+i_{max}, & E_{i}=E_{max}
+\end{cases}
+\end{eqnarray*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Description
+\begin_inset Formula $w$
+\end_inset
+
+ is the bin width;
+\end_layout
+
+\begin_layout Description
+\begin_inset Formula $f$
+\end_inset
+
+ is the fractional offset from the alignment position to the left edge of
+ the bin containing it, i.e., 
+\begin_inset Formula $E_{0}=P-fw$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Description
+\begin_inset Formula $n$
+\end_inset
+
+ is the number of bins
+\end_layout
+
+\begin_layout Standard
+Here's what passes for general expressions for the minimum and maximum bin
+ values required to cover the range.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{eqnarray}
+E_{min} & < & R_{min}\nonumber \\
+E_{0}+i_{min}w & < & R_{min}\nonumber \\
+E_{0}+\left\lfloor \frac{R_{min}-E_{0}}{w}\right\rfloor w & < & R_{min}\nonumber \\
+P-fw+\left\lfloor \frac{R_{min}-(P-fw)}{w}\right\rfloor w & < & R_{min}\nonumber \\
+P+\left(\left\lfloor \frac{R_{min}-P}{w}+f\right\rfloor -f\right)w & < & R_{min}\label{eq:Emin-General}
+\end{eqnarray}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Similarly,
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{eqnarray}
+E_{max} & > & R_{max}\nonumber \\
+E_{0}+i_{max}w & > & R_{max}\nonumber \\
+E_{0}+\left\lceil \frac{R_{max}-E_{0}}{w}\right\rceil w & > & R_{max}\nonumber \\
+P+\left(\left\lceil \frac{R_{max}-P}{w}+f\right\rceil -f\right)w & > & R_{max}\label{eq:Emax-General}
+\end{eqnarray}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Note that these use
+\begin_inset Formula 
+\begin{eqnarray}
+i_{min} & = & \left\lfloor \frac{R_{min}-P}{w}+f\right\rfloor \label{eq:imin-max}\\
+i_{max} & = & \left\lceil \frac{R_{max}-P}{w}+f\right\rceil \nonumber 
+\end{eqnarray}
+
+\end_inset
+
+so 
+\begin_inset Formula $i_{max}-i_{min}$
+\end_inset
+
+ is 
+\emph on
+not necessarily
+\emph default
+ 
+\begin_inset Formula $n$
+\end_inset
+
+.
+ One must choose either 
+\begin_inset Formula $i_{max}$
+\end_inset
+
+ or 
+\begin_inset Formula $i_{min}$
+\end_inset
+
+ as the fiducial index and calculate the other using 
+\begin_inset Formula $n$
+\end_inset
+
+.
+ The tricky part is that the the expressions for 
+\begin_inset Formula $i_{min}$
+\end_inset
+
+ and 
+\begin_inset Formula $i_{max}$
+\end_inset
+
+ are integral, which makes solving this a bit difficult.
+\end_layout
+
+\begin_layout Subsection
+Aligned bins, Fixed 
+\begin_inset Formula $w$
+\end_inset
+
+, variable 
+\begin_inset Formula $n$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Given: 
+\begin_inset Formula $\Delta$
+\end_inset
+
+, 
+\begin_inset Formula $P$
+\end_inset
+
+, 
+\begin_inset Formula $R_{max}$
+\end_inset
+
+, 
+\begin_inset Formula $R_{min}$
+\end_inset
+
+, 
+\begin_inset Formula $w$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{eqnarray*}
+E_{0} & = & P-fw\\
+i_{min} & = & \left\lfloor \frac{R_{min}-E_{0}}{w}\right\rfloor \\
+i_{max} & = & \left\lceil \frac{R_{max}-E_{0}}{w}\right\rceil \\
+n & = & i_{max}-i_{min}+1
+\end{eqnarray*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+Aligned bins, Fixed 
+\begin_inset Formula $n$
+\end_inset
+
+, variable 
+\begin_inset Formula $w$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Given: 
+\begin_inset Formula $\Delta$
+\end_inset
+
+, 
+\begin_inset Formula $P$
+\end_inset
+
+, 
+\begin_inset Formula $R_{max}$
+\end_inset
+
+, 
+\begin_inset Formula $R_{min}$
+\end_inset
+
+, 
+\begin_inset Formula $n$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+Wanted: minimum 
+\begin_inset Formula $w\ni w\geq\frac{R_{min}-R_{max}}{n}$
+\end_inset
+
+ 
+\end_layout
+
+\begin_layout Standard
+Because Eqs.
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:Emin-General"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ and 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:Emax-General"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ are painful to solve, let's see if we can figure things out another way.
+\end_layout
+
+\begin_layout Standard
+Once we have a bin width such that bin edges 
+\begin_inset Formula $\left[E_{min},E_{max}\right]$
+\end_inset
+
+ cover our data range, 
+\begin_inset Formula $\left[R_{min},R_{max}\right]$
+\end_inset
+
+, attending to alignment with the fiducial point 
+\begin_inset Formula $P$
+\end_inset
+
+ is a simple translation of the bins.
+ 
+\begin_inset Formula $P$
+\end_inset
+
+'s position relative to its containing bin is given by 
+\begin_inset Formula $fw$
+\end_inset
+
+, so it's a periodic condition (it doesn't matter 
+\emph on
+which
+\emph default
+ bin it's in) and the maximum we need to translate is exactly one bin.
+ Given 
+\begin_inset Formula $n$
+\end_inset
+
+ bins, 
+\begin_inset Formula $n-1$
+\end_inset
+
+ bins will cover the data range, with the extra bin used to accommodate
+ the alignment shift, or 
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+w=\begin{cases}
+\frac{R_{max}-R_{min}}{n} & \textrm{no\,alignment}\\
+\frac{R_{max}-R_{min}}{n-1} & \mathrm{with\,alignment}
+\end{cases}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Is it optimal? Is there a smaller 
+\begin_inset Formula $w$
+\end_inset
+
+ which allows for proper alignment? Why bother?
+\end_layout
+
+\begin_layout Standard
+Well, it'd be nice to have a 
+\begin_inset Quotes eld
+\end_inset
+
+nice
+\begin_inset Quotes erd
+\end_inset
+
+ value for 
+\begin_inset Formula $w$
+\end_inset
+
+ (say some exponent of 10, or a rational number), rather than a random sequence
+ of digits, so if we can find a viable range for 
+\begin_inset Formula $w$
+\end_inset
+
+ there might be a 
+\begin_inset Quotes eld
+\end_inset
+
+nice
+\begin_inset Quotes erd
+\end_inset
+
+ value in that range.
+\end_layout
+
+\begin_layout Standard
+Eqs.
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:imin-max"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ present a problem, but we can simplify things if we restrict 
+\begin_inset Formula $w$
+\end_inset
+
+ so that they remain a constant.
+ 
+\end_layout
+
+\begin_layout Section
+Ratio (geometric series) binning
+\end_layout
+
+\begin_layout Description
+\begin_inset Argument 1
+status collapsed
+
+\begin_layout Plain Layout
+style=nextline,left=1cm..2cm
+\end_layout
+
+\end_inset
+
+
+\begin_inset Formula $R$
+\end_inset
+
+ A soft bound of the range to be covered.
+ The actual range must include it, but may be larger.
+ Only one soft bound is allowed.
+\end_layout
+
+\begin_layout Description
+\begin_inset Formula $E_{0}$
+\end_inset
+
+ is the fiducial bin edge, with 
+\family roman
+\series medium
+\shape up
+\size normal
+\emph off
+\bar no
+\strikeout off
+\xout off
+\uuline off
+\uwave off
+\noun off
+\color none
+
+\begin_inset Formula 
+\begin{eqnarray*}
+E_{0} & = & \begin{cases}
+E_{min}, & w>0\\
+E_{max}, & w<0
+\end{cases}
+\end{eqnarray*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Description
+\begin_inset Formula $E_{n}$
+\end_inset
+
+ is at the opposite extremum from the fiducial bin edge, with 
+\family roman
+\series medium
+\shape up
+\size normal
+\emph off
+\bar no
+\strikeout off
+\xout off
+\uuline off
+\uwave off
+\noun off
+\color none
+
+\begin_inset Formula 
+\begin{eqnarray*}
+E_{n} & = & \begin{cases}
+E_{max}, & w>0\\
+E_{min}, & w<0
+\end{cases}
+\end{eqnarray*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Description
+\begin_inset Formula $\Delta R$
+\end_inset
+
+ is the actual range covered, 
+\begin_inset Formula $E_{n}-E_{0}$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Description
+\begin_inset Formula $i$
+\end_inset
+
+ is the bin index, with
+\family roman
+\series medium
+\shape up
+\size normal
+\emph off
+\bar no
+\strikeout off
+\xout off
+\uuline off
+\uwave off
+\noun off
+\color none
+
+\begin_inset Formula 
+\begin{eqnarray*}
+i & = & \begin{cases}
+i_{min}, & E_{i}=E_{min}\\
+i_{max}, & E_{i}=E_{max}
+\end{cases}
+\end{eqnarray*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Description
+\begin_inset Formula $E_{i}$
+\end_inset
+
+ are the bin edges, such that 
+\begin_inset Formula $\left[E_{min},E_{max}\right]$
+\end_inset
+
+ covers the range, which may be either 
+\begin_inset Formula $\left[E_{min},R\right]$
+\end_inset
+
+ or 
+\begin_inset Formula $\left[R,E_{max}\right]$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Description
+\begin_inset Formula $w$
+\end_inset
+
+ is the width of the fiducial bin, e.g.
+ 
+\begin_inset Formula $w=E_{1}-E_{0}$
+\end_inset
+
+; 
+\begin_inset Formula $w$
+\end_inset
+
+ may be negative, indicating that bin widths increase towards 
+\begin_inset Formula $-\infty$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Description
+\begin_inset Formula $r$
+\end_inset
+
+ is the ratio of each bin relative to its neighbor.
+ 
+\begin_inset Formula $r>0,r\neq1$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Description
+\begin_inset Formula $n$
+\end_inset
+
+ is the number of bins
+\end_layout
+
+\begin_layout Standard
+Geometrically binned grids follow the scheme:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{eqnarray*}
+E_{1} & = & E_{0}+w\\
+E_{2} & = & E_{1}+wr\\
+E_{3} & = & E_{2}+wr^{2}\\
+ & \cdots\\
+E_{n} & = & E_{n-1}+wr^{n-1}\\
+ & = & E_{0}+\sum_{i=0}^{n-1}wr^{i}
+\end{eqnarray*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+For 
+\begin_inset Formula $r\neq1$
+\end_inset
+
+, 
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{eqnarray}
+(E_{k}-E_{0}) & = & \sum_{i=0}^{k-1}wr^{i}\nonumber \\
+r(E_{k}-E_{0}) & = & \sum_{i=0}^{k-1}wr^{i+1}\nonumber \\
+(E_{k}-E_{0})-r(E_{k}-E_{0}) & = & \sum_{i=0}^{k-1}wr^{i}-\sum_{i=0}^{k-1}wr^{i+1}\nonumber \\
+(E_{k}-E_{0})(1-r) & = & w+\left(\sum_{i=1}^{k-1}wr^{i}-\sum_{i=0}^{k-2}wr^{i+1}\right)-wr^{k}\nonumber \\
+ & = & w-wr^{k}+\left(\sum_{i=1}^{k-1}wr^{i}-\sum_{i=1}^{k-1}wr^{i}\right)\nonumber \\
+ & = & w(1-r^{k})\nonumber \\
+E_{k} & = & E_{0}+w\frac{(1-r^{k})}{(11-r)}\label{eq:Ratio-En}
+\end{eqnarray}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula $r=1$
+\end_inset
+
+ implies a linear grid, so we'll ignore it.
+\end_layout
+
+\begin_layout Standard
+For 
+\begin_inset Formula $\left|r\right|<1$
+\end_inset
+
+,
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{eqnarray}
+E_{\infty} & = & E_{0}+\frac{w}{1-r}\label{eq:Ratio-maxE}\\
+\left|\Delta R_{max}\right| & = & \left|\frac{w}{1-r}\right|
+\end{eqnarray}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Given a range, 
+\begin_inset Formula $\left[E_{0},E_{n}\right]$
+\end_inset
+
+, what is 
+\begin_inset Formula $n$
+\end_inset
+
+? From Eq.
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:Ratio-En"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+,
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{eqnarray}
+(E_{n}-E_{0}) & = & w\frac{1-r^{n}}{1-r}\nonumber \\
+\Delta R & = & w\frac{1-r^{n}}{1-r}\nonumber \\
+\frac{(1-r)\Delta R}{w} & = & 1-r^{n}\nonumber \\
+r^{n} & = & \frac{w-(1-r)\Delta R}{w}\label{eq:Ratio-minimum-n}\\
+n & = & \ln\left(\frac{w-(1-r)\Delta R}{w}\right)/\ln(r)\nonumber 
+\end{eqnarray}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+If one of the extrema is soft, e.g.
+\begin_inset Formula 
+\begin{eqnarray*}
+\Delta R & = & \begin{cases}
+R-E_{0}\\
+E_{n}-R
+\end{cases}
+\end{eqnarray*}
+
+\end_inset
+
+ Then
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{eqnarray}
+n(\Delta R) & = & \left\lceil \ln\left(\frac{w-(1-r)\Delta R}{w}\right)/\ln(r)\right\rceil \label{eq:Ratio-n-from-range}
+\end{eqnarray}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+\begin_inset Formula $E_{0}$
+\end_inset
+
+, 
+\begin_inset Formula $w$
+\end_inset
+
+, 
+\begin_inset Formula $r$
+\end_inset
+
+, 
+\begin_inset Formula $n$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+This one is easy, generate the bin edges with Eq.
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:Ratio-En"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+.
+ Just note that if 
+\begin_inset Formula $w<0$
+\end_inset
+
+ then the edges will be generated in decreasing order, 
+\emph on
+i.e.
+\emph default
+, 
+\begin_inset Formula $E_{i+1}<E_{i}$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Subsection
+\begin_inset Formula $\left[E_{min},R\right]$
+\end_inset
+
+, 
+\begin_inset Formula $w$
+\end_inset
+
+, 
+\begin_inset Formula $r$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The grid must cover 
+\begin_inset Formula $\left[E_{min},R\right]$
+\end_inset
+
+.
+ The sign of 
+\begin_inset Formula $w$
+\end_inset
+
+ indicates whether 
+\begin_inset Formula $E_{min}$
+\end_inset
+
+ is the fiducial bin edge:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{eqnarray*}
+E_{min} & \equiv & \begin{cases}
+E_{n} & w<0\\
+E_{0} & w>0
+\end{cases}
+\end{eqnarray*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+If 
+\begin_inset Formula $\left|r\right|<1$
+\end_inset
+
+, it is possible that the prescribed grid cannot cover the range ( Eq.
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:Ratio-maxE"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+).
+\end_layout
+
+\begin_layout Standard
+The number of bins, 
+\begin_inset Formula $n$
+\end_inset
+
+, can be determined from Eq.
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:Ratio-n-from-range"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+.
+ If 
+\begin_inset Formula $E_{min}\equiv E_{n},$
+\end_inset
+
+then 
+\begin_inset Formula $E_{0}$
+\end_inset
+
+ may be determined from Eq.
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:Ratio-En"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+, which in any case provides the remaining bin edges.
+\end_layout
+
+\begin_layout Subsection
+\begin_inset Formula $\left[R,E_{max}\right]$
+\end_inset
+
+, 
+\begin_inset Formula $w$
+\end_inset
+
+, 
+\begin_inset Formula $r$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Similar to the last section, just note that 
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{eqnarray*}
+E_{max} & \equiv & \begin{cases}
+E_{0} & w<0\\
+E_{n} & w>0
+\end{cases}
+\end{eqnarray*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+\begin_inset Formula $E_{0}$
+\end_inset
+
+, 
+\begin_inset Formula $[R_{min},R_{max}],$
+\end_inset
+
+
+\begin_inset Formula $w$
+\end_inset
+
+, 
+\begin_inset Formula $r$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+If 
+\begin_inset Formula $E_{0}$
+\end_inset
+
+is not at one of the grid extrema, 
+\begin_inset Formula $i_{min}$
+\end_inset
+
+ and 
+\begin_inset Formula $i_{max}$
+\end_inset
+
+ can be determined from Eq.
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:Ratio-n-from-range"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+, with 
+\begin_inset Formula 
+\begin{eqnarray*}
+i_{min} & = & n(R_{min}-E_{0})-1\\
+i_{max} & = & n(R_{max}-E_{0})
+\end{eqnarray*}
+
+\end_inset
+
+
+\end_layout
+
+\end_body
+\end_document

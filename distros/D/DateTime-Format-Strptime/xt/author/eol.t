@@ -16,13 +16,13 @@ my @files = (
     't/errors.t',
     't/format-datetime.t',
     't/format-with-locale.t',
+    't/generated-locale-de.t',
+    't/generated-locale-en.t',
+    't/generated-locale-ga.t',
+    't/generated-locale-pt.t',
+    't/generated-locale-zh.t',
     't/import.t',
     't/lib/T.pm',
-    't/locale-de.t',
-    't/locale-en.t',
-    't/locale-ga.t',
-    't/locale-pt.t',
-    't/locale-zh.t',
     't/zones.t'
 );
 

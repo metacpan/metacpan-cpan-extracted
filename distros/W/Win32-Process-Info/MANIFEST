@@ -1,4 +1,3 @@
-Build.PL
 Changes
 eg/ProcessInfo.pl
 eg/README
@@ -10,6 +9,7 @@ lib/Win32/Process/Info/PT.pm
 lib/Win32/Process/Info/WMI.pm
 LICENSES/Artistic
 LICENSES/Copying
+maint/releaseprep
 Makefile.PL
 MANIFEST			This list of files
 META.json

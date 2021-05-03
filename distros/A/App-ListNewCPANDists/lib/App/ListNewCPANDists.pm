@@ -1,9 +1,9 @@
 package App::ListNewCPANDists;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-06-13'; # DATE
+our $DATE = '2021-05-02'; # DATE
 our $DIST = 'App-ListNewCPANDists'; # DIST
-our $VERSION = '0.013'; # VERSION
+our $VERSION = '0.014'; # VERSION
 
 use 5.010001;
 use strict;
@@ -17,14 +17,35 @@ my $URL_PREFIX = 'https://fastapi.metacpan.org/v1';
 
 our $db_schema_spec = {
     summary => __PACKAGE__,
-    latest_v => 1,
+    latest_v => 2,
     install => [
+        'CREATE TABLE dist (
+            name TEXT NOT NULL PRIMARY KEY,
+            first_version TEXT NOT NULL,
+            first_time INTEGER NOT NULL,
+            latest_version TEXT NOT NULL,
+            latest_time INTEGER NOT NULL,
+            mtime INTEGER NOT NULL
+        )',
+    ],
+    install_v1 => [
         'CREATE TABLE release (
             name TEXT NOT NULL PRIMARY KEY,
             dist TEXT NOT NULL,
             time INTEGER NOT NULL
         )',
         'CREATE UNIQUE INDEX ix_release__dist ON release(name,dist)',
+    ],
+    upgrade_to_v2 => [
+        'DROP TABLE release',
+        'CREATE TABLE dist (
+            name TEXT NOT NULL PRIMARY KEY,
+            first_version TEXT NOT NULL,
+            first_time INTEGER NOT NULL,
+            latest_version TEXT NOT NULL,
+            latest_time INTEGER NOT NULL,
+            mtime INTEGER NOT NULL
+        )',
     ],
 };
 
@@ -149,49 +170,88 @@ sub _http_tiny {
     $obj;
 }
 
-sub _get_dist_first_release {
+sub _get_dist_release_times {
     require Time::Local;
 
     my ($state, $dist) = @_;
 
     # save an API call if we can find a cache in database
     my $dbh = $state->{dbh};
-    my ($relinfo) = $dbh->selectrow_hashref(
-        "SELECT * FROM release WHERE dist=? ORDER BY time LIMIT 1",
+    my ($distinfo) = $dbh->selectrow_hashref(
+        "SELECT * FROM dist WHERE name=?",
         {},
         $dist,
     );
-    return $relinfo if $relinfo;
+    return $distinfo if $distinfo && $distinfo->{mtime} >= time() - 8*3600; # cache for 8 hours
+    my $row_exists = $distinfo ? 1:0;
 
-    my $res = _http_tiny->post("$URL_PREFIX/release/_search?size=1&sort=date", {
-        content => _json_encode({
-            query => {
-                terms => {
-                    distribution => [$dist],
+    # find first release time & version
+    unless ($distinfo) {
+        my $res = _http_tiny->post("$URL_PREFIX/release/_search?size=1&sort=date", {
+            content => _json_encode({
+                query => {
+                    terms => {
+                        distribution => [$dist],
+                    },
                 },
-            },
-            fields => [qw/name date version version_numified/],
-        }),
-    });
+                fields => [qw/name date version version_numified/],
+            }),
+        });
 
-    die "Can't retrieve first release information of distribution '$dist': ".
-        "$res->{status} - $res->{reason}\n" unless $res->{success};
-    my $api_res = _json_decode($res->{content});
-    my $hit = $api_res->{hits}{hits}[0];
-    die "No release information for distribution '$dist'" unless $hit;
-    $hit->{fields}{date} =~ /^(\d\d\d\d)-(\d\d)-(\d\d)T(\d\d):(\d\d):(\d\d)/
-        or die "Can't parse date '$hit->{fields}{date}'";
-    my $time = Time::Local::timegm($6, $5, $4, $3, $2-1, $1);
-    $relinfo = {
-        name => $hit->{fields}{name},
-        time => $time,
-        dist => $dist,
-    };
+        die "Can't retrieve first release information of distribution '$dist': ".
+            "$res->{status} - $res->{reason}\n" unless $res->{success};
+        my $api_res = _json_decode($res->{content});
+        my $hit = $api_res->{hits}{hits}[0];
+        die "No release information for distribution '$dist'" unless $hit;
+        $hit->{fields}{date} =~ /^(\d\d\d\d)-(\d\d)-(\d\d)T(\d\d):(\d\d):(\d\d)/
+            or die "Can't parse date '$hit->{fields}{date}'";
+        my $time = Time::Local::timegm($6, $5, $4, $3, $2-1, $1);
+        $distinfo = {
+            name => $dist,
+            first_time => $time,
+            first_version => $hit->{fields}{version},
+        };
+    }
+
+    # find latest release time & version
+    {
+        my $res = _http_tiny->post("$URL_PREFIX/release/_search?size=1&sort=date:desc", {
+            content => _json_encode({
+                query => {
+                    terms => {
+                        distribution => [$dist],
+                    },
+                },
+                fields => [qw/name date version version_numified/],
+            }),
+        });
+
+        die "Can't retrieve latest release information of distribution '$dist': ".
+            "$res->{status} - $res->{reason}\n" unless $res->{success};
+        my $api_res = _json_decode($res->{content});
+        my $hit = $api_res->{hits}{hits}[0];
+        die "No release information for distribution '$dist'" unless $hit;
+        $hit->{fields}{date} =~ /^(\d\d\d\d)-(\d\d)-(\d\d)T(\d\d):(\d\d):(\d\d)/
+            or die "Can't parse date '$hit->{fields}{date}'";
+        my $time = Time::Local::timegm($6, $5, $4, $3, $2-1, $1);
+        $distinfo->{latest_time} = $time;
+        $distinfo->{latest_version} = $hit->{fields}{version};
+    }
+
     # cache to database
-    $dbh->do("INSERT INTO release (name,time,dist) VALUES (?,?,?)", {},
-             $relinfo->{name}, $relinfo->{time}, $relinfo->{dist},
-         );
-    $relinfo;
+    if ($row_exists) {
+        $dbh->do("UPDATE dist SET first_version=?,first_time=?,latest_version=?,latest_time=?, mtime=? WHERE name=?", {},
+                 $distinfo->{first_version}, $distinfo->{first_time}, $distinfo->{latest_version}, $distinfo->{latest_time},
+                 time(),
+                 $distinfo->{name},
+             );
+    } else {
+        $dbh->do("INSERT INTO dist (name,first_version,first_time,latest_version,latest_time, mtime) VALUES (?,?,?,?,?, ?)", {},
+                 $distinfo->{name}, $distinfo->{first_version}, $distinfo->{first_time}, $distinfo->{latest_version}, $distinfo->{latest_time},
+                 time(),
+             );
+    }
+    $distinfo;
 }
 
 $SPEC{list_new_cpan_dists} = {
@@ -286,17 +346,20 @@ sub list_new_cpan_dists {
         next if $dists{ $dist }++;
         log_trace("[#%d/%d] Got distribution %s", $i, $num_hits, $dist);
         # find the first release of this distribution
-        my $relinfo = _get_dist_first_release($state, $dist);
-        unless ($relinfo->{time} >= $from_time->epoch &&
-                    $relinfo->{time} <= $to_time->epoch) {
+        my $distinfo = _get_dist_release_times($state, $dist);
+        unless ($distinfo->{first_time} >= $from_time->epoch &&
+                    $distinfo->{first_time} <= $to_time->epoch) {
             log_trace("First release of distribution %s is not in this time period, skipped", $dist);
             next;
         }
         my $row = {
             dist => $dist,
-            release => $hit->{fields}{name},
+            #release => $hit->{fields}{name},
             author => $hit->{fields}{author},
-            version => $hit->{fields}{version},
+            first_version => $distinfo->{first_version},
+            first_time => $distinfo->{first_time},
+            latest_version => $distinfo->{latest_version},
+            latest_time => $distinfo->{latest_time},
             abstract => $hit->{fields}{abstract},
             date => $hit->{fields}{date},
         };
@@ -327,7 +390,7 @@ sub list_new_cpan_dists {
     }
 
     my %resmeta = (
-        'table.fields' => [qw/dist release author version date abstract/],
+        'table.fields' => [qw/dist author first_version first_time latest_version latest_time abstract/],
         'func.stats' => create_new_cpan_dists_stats(dists => \@res)->[2],
     );
 
@@ -448,7 +511,7 @@ sub list_monthly_new_cpan_dists_html {
     my $cols = $res->[3]{'table.fields'};
     push @html, "<tr>\n";
     for my $col (@$cols) {
-        next if $col eq 'release' || $col eq 'date';
+        next if $col =~ /\A(first|latest)_(time)\z/;
         push @html, "<th>$col</th>\n";
     }
     push @html, "</tr>\n\n";
@@ -458,12 +521,12 @@ sub list_monthly_new_cpan_dists_html {
         for my $row (@{ $res->[2] }) {
             push @html, "<tr>\n";
             for my $col (@$cols) {
-                next if $col eq 'release' || $col eq 'date';
+                next if $col =~ /\A(first|latest)_(time)\z/;
                 my $cell = HTML::Entities::encode_entities($row->{$col});
                 if ($col eq 'author') {
                     $cell = qq(<a href="https://metacpan.org/author/$cell">$cell</a>);
                 } elsif ($col eq 'dist') {
-                    $cell = qq(<a href="https://metacpan.org/release/$row->{author}/$row->{release}">$cell</a>);
+                    $cell = qq(<a href="https://metacpan.org/release/$row->{dist}">$cell</a>);
                 }
                 push @html, "<td>$cell</td>\n";
             }
@@ -506,7 +569,7 @@ App::ListNewCPANDists - List new CPAN distributions in a given time period
 
 =head1 VERSION
 
-This document describes version 0.013 of App::ListNewCPANDists (from Perl distribution App-ListNewCPANDists), released on 2020-06-13.
+This document describes version 0.014 of App::ListNewCPANDists (from Perl distribution App-ListNewCPANDists), released on 2021-05-02.
 
 =head1 FUNCTIONS
 
@@ -711,7 +774,7 @@ Source repository is at L<https://github.com/perlancar/perl-App-ListNewCPANDists
 
 =head1 BUGS
 
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-ListNewCPANDists>
+Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-App-ListNewCPANDists/issues>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
@@ -723,7 +786,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020, 2019, 2018, 2017 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2020, 2019, 2018, 2017 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

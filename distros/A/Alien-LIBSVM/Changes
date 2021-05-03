@@ -1,3 +1,24 @@
+0.004 2021-05-01 12:34:45-0400
+
+  Features
+
+   - Switch to using alienfile.
+
+     See <https://github.com/EntropyOrg/p5-Alien-LIBSVM/issues/12>,
+     <https://github.com/EntropyOrg/p5-Alien-LIBSVM/pull/14>.
+
+     This switches to using libsvm releases from GitHub tags
+     <https://github.com/EntropyOrg/p5-Alien-LIBSVM/issues/11>.
+
+   - macOS: Rename the .so file to .dylib.
+
+     Fixes <https://github.com/EntropyOrg/p5-Alien-LIBSVM/issues/13>.
+
+   - Add documentation and tests for SVM tools.
+
+     See <https://github.com/EntropyOrg/p5-Alien-LIBSVM/pull/18>.
+     Fixes <https://github.com/EntropyOrg/p5-Alien-LIBSVM/issues/8>.
+
 0.003 2016-11-21 20:01:09-0600
   - Add a configure time dependency on File::chmod. Thanks to @pablrod for the patch!
     <https://github.com/EntropyOrg/p5-Alien-LIBSVM/pull/3>.

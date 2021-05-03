@@ -1,9 +1,9 @@
 package Sort::Sub::changes_group_ala_perlancar;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-04-11'; # DATE
+our $DATE = '2021-05-01'; # DATE
 our $DIST = 'Sort-SubBundle-PERLANCAR'; # DIST
-our $VERSION = '0.082'; # VERSION
+our $VERSION = '0.087'; # VERSION
 
 use 5.010001;
 use strict;
@@ -49,7 +49,7 @@ Sort::Sub::changes_group_ala_perlancar - Sort changes group heading PERLANCAR-st
 
 =head1 VERSION
 
-This document describes version 0.082 of Sort::Sub::changes_group_ala_perlancar (from Perl distribution Sort-SubBundle-PERLANCAR), released on 2021-04-11.
+This document describes version 0.087 of Sort::Sub::changes_group_ala_perlancar (from Perl distribution Sort-SubBundle-PERLANCAR), released on 2021-05-01.
 
 =head1 SYNOPSIS
 

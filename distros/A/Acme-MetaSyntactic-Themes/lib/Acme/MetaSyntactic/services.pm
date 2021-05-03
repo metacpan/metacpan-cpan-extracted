@@ -2,7 +2,7 @@ package Acme::MetaSyntactic::services;
 use strict;
 use Acme::MetaSyntactic::List;
 our @ISA = qw( Acme::MetaSyntactic::List );
-our $VERSION = '1.007';
+our $VERSION = '1.008';
 __PACKAGE__->init();
 
 our %Remote = (
@@ -55,6 +55,12 @@ Philippe "BooK" Bruhat.
 =head1 CHANGES
 
 =over 4
+
+=item *
+
+2021-04-30 - v1.008
+
+Updated from the source web site in Acme-MetaSyntactic-Themes version 1.055.
 
 =item *
 
@@ -211,6 +217,7 @@ acp_port
 acp_proto
 acptsys
 acr_nema
+acronis_backup
 ac_tech
 acter
 actifio_c2c
@@ -513,6 +520,7 @@ artifact_msg
 aruba_papi
 aruba_server
 asa
+asa_gateways
 asam
 asap_sctp
 asap_sctp_tls
@@ -624,6 +632,7 @@ avt_profile_2
 awacs_ice
 awg_proxy
 aws_brf
+aws_wsp
 axio_disc
 axis_wimp_port
 axon_lm
@@ -1021,6 +1030,7 @@ cgn_config
 cgn_stat
 chargen
 charsetmgr
+checkmk_agent
 checkoutdb
 checkpoint_rtm
 checksum
@@ -1051,6 +1061,7 @@ cinegrfx_lm
 ciphire_data
 ciphire_serv
 circle_x
+cirrossp
 cis
 cisco_aqos
 cisco_avp
@@ -1133,6 +1144,7 @@ cognex_insight
 cognima
 cogsys_lm
 coherence
+cohesity_agent
 coldfusion_auth
 collaber
 collaborator
@@ -1200,6 +1212,7 @@ corbaloc
 corelccam
 corelvideo
 corel_vncadmin
+core_of_source
 corerjd
 cosir
 cosmocall
@@ -1502,6 +1515,7 @@ dict
 dict_lookup
 di_drm
 dif_port
+digilent_adept
 digiman
 digital_notary
 digital_vrc
@@ -1590,6 +1604,7 @@ domiq
 donnyworld
 doom
 dossier
+dots_signal
 down
 downtools
 downtools_disc
@@ -2250,6 +2265,7 @@ groove
 groove_dpp
 groupwise
 grubd
+gruber_cashreg
 gsakmp
 gsi
 gsidcap
@@ -2330,6 +2346,7 @@ health_trap
 heartbeat
 heathview
 hecmtl_db
+heliosd
 helix
 hello
 hello_port
@@ -2341,6 +2358,7 @@ herodotus_net
 hes_clip
 hexarc
 hexen2
+heythings
 hfcs
 hfcs_manager
 hhb_gateway
@@ -3963,6 +3981,7 @@ nta_ds
 ntalk
 nta_us
 ntp
+ntske
 ntz_p2p_storage
 ntz_tracker
 nuauth
@@ -4029,6 +4048,7 @@ oi_2000
 oidocsvc
 oidsr
 oirtgsvc
+oktaauthenticat
 olhost
 olsr
 olsv
@@ -4932,12 +4952,14 @@ sai_sentlm
 salient_dtasrv
 salient_mux
 salient_usrmgr
+saltd_licensing
 samba_swat
 samd
 sa_msg_port
 samsung_disc
 samsung_unidex
 sanavigator
+sandpolis
 sane_port
 sanity
 santak_ups
@@ -4946,6 +4968,7 @@ sapcomm
 sapeps
 saphostctrl
 saphostctrls
+sapms
 saposs
 saprouter
 sapv1
@@ -5065,6 +5088,7 @@ securitychase
 seispoc
 semantix
 semaphore
+semi_grpc
 send
 senip
 senomix01
@@ -5199,6 +5223,7 @@ sitewatch
 sitewatch_s
 sixchat
 six_degrees
+sixid
 sixnetudr
 sixtrak
 sixxsconfig
@@ -5208,6 +5233,7 @@ skip_cert_send
 skip_mc_gikreq
 skkserv
 skronk
+skynetflow
 skytelnet
 sky_transport
 slc_ctrlrloops
@@ -5393,6 +5419,7 @@ spike
 spiral_admin
 splitlock
 splitlock_gw
+split_ping
 spmp
 spock
 spocp
@@ -5698,6 +5725,7 @@ taskmaster2000
 tasp_net
 taurus_wh
 tbrpf
+tc_ads_discovery
 tcc_http
 tcim_control
 tclprodebugger
@@ -6252,6 +6280,7 @@ webobjects
 webphone
 webpush
 websm
+websnp
 websphere_snmp
 webster
 webtie
@@ -6262,6 +6291,7 @@ westell_stats
 wfc
 wfm
 wfremotertm
+wg_endpt_comms
 wg_netforce
 wherehoo
 whisker
@@ -6376,6 +6406,7 @@ x25_svc_port
 x2_control
 x2e_disc
 x500ms
+x510
 x9_icue
 xaapi
 xact_backup

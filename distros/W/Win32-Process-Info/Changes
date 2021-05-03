@@ -1,7 +1,11 @@
 Revision history for Win32-Process-Info
 
+1.023 2021-05-02 08:28:25 -0600
+  - Update meta
+  - Remove Build.PL to make way for Makefile.PL
 
-  - Fix for 64 bit Perls on Windows (rt101658)
+1.022  2015-03-26
+  - Fix for 64 bit Perls on Windows (plicease rt101658)
 
 1.021		2014-12-02	T. R. Wyant
   No changes since 1.020_01

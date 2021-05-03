@@ -1,5 +1,8 @@
 Version history for Perl module Alien::CMake
 
+0.12 2021-05-03 08:39:29 -0600
+  - Migrate to using GitHub issues instead of RT
+
 0.11    09/13/2017
         - File::Fetch 0.50 is a configure require.
           Fixes prereq bug introduced in 0.10

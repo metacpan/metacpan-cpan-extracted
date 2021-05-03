@@ -2,7 +2,6 @@ AsyncAwait.h
 Build.PL
 Changes
 hax/perl-additions.c.inc
-hax/wrap_keyword_plugin.c.inc
 lib/Syntax/Keyword/Dynamically.pm
 lib/Syntax/Keyword/Dynamically.xs
 LICENSE

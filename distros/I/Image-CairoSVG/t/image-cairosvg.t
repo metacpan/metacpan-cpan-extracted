@@ -76,7 +76,11 @@ for my $f (qw/Technical_college Church/) {
     ok (-f $nosurf, "Got file from no surface specified case");
 };
 
-ok (compare ($fs, "$Bin/church-out.png"), "Church renderings equal");
+# This is not a good test since it relies on Cairo always creating an
+# identical file. The Cairo file is broken anyway since it adds a
+# background unnecessarily.
+
+# ok (compare ($fs, "$Bin/Church-out.png") == 0, "Church renderings equal");
 
 done_testing ();
 

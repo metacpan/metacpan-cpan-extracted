@@ -3,8 +3,8 @@ NAME
     period
 
 VERSION
-    This document describes version 0.013 of App::ListNewCPANDists (from
-    Perl distribution App-ListNewCPANDists), released on 2020-06-13.
+    This document describes version 0.014 of App::ListNewCPANDists (from
+    Perl distribution App-ListNewCPANDists), released on 2021-05-02.
 
 FUNCTIONS
   create_new_cpan_dists_stats
@@ -174,7 +174,7 @@ SOURCE
 
 BUGS
     Please report any bugs or feature requests on the bugtracker website
-    <https://rt.cpan.org/Public/Dist/Display.html?Name=App-ListNewCPANDists>
+    <https://github.com/perlancar/perl-App-ListNewCPANDists/issues>
 
     When submitting a bug or request, please include a test-file or a patch
     to an existing test-file that illustrates the bug or desired feature.
@@ -183,7 +183,7 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2020, 2019, 2018, 2017 by
+    This software is copyright (c) 2021, 2020, 2019, 2018, 2017 by
     perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under

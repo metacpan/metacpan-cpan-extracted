@@ -22,23 +22,8 @@ use DynaLoader;
 
 
 use strict;
-use PDL::Complex;
 use PDL::LinearAlgebra::Real;
 
-{ 
-  package # hide from CPAN
-    PDL;
-	my $warningFlag;
-  	BEGIN{
-  		$warningFlag = $^W;
-		$^W = 0;
-	}
-	use overload (
-		'x'     =>  sub {UNIVERSAL::isa($_[1],'PDL::Complex') ? PDL::cmmult(PDL::Complex::r2C($_[0]), $_[1]):
-								PDL::mmult($_[0], $_[1]);
-				});
-	BEGIN{ $^W = $warningFlag ; }	
-}
 { 
   package # hide from CPAN
     PDL::Complex;
@@ -3443,8 +3428,8 @@ Scales a complex vector by a real constant.
 
 =for bad
 
-sscal ignores the bad-value flag of the input piddles.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+sscal ignores the bad-value flag of the input ndarrays.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -3578,7 +3563,7 @@ Copy triangular part to another matrix. If uplo == 0 copy upper triangular part.
 =for bad
 
 ctricpy does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -3611,7 +3596,7 @@ This routine does backward and forward dataflow automatically.
 =for bad
 
 cmstack does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut

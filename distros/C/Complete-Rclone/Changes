@@ -1,0 +1,9 @@
+0.002   2021-05-01  Released-By: PERLANCAR; Urgency: medium
+
+	- Rename function to be more consistent:
+	  complete_rclone_remote{s,}.
+
+
+0.001   2021-05-01  Released-By: PERLANCAR
+
+        - First release.

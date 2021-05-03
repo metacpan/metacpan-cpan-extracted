@@ -5,6 +5,7 @@ use Test::Tester;
 use Test::More;
 use Test::Deep;
 use Test::Deep::JType;
+use JSON::Typist;
 
 {
   note("got undef, expect empty str");
@@ -66,6 +67,29 @@ use Test::Deep::JType;
   like(
     $results[0]->{diag},
     qr/got \s* : \s* '' \s* expect \s* : \s* undef/x,
+    'diag is right'
+  );
+}
+
+
+{
+  note("ensure JSON::Typist values stringify right on failure");
+  my ($premature, @results) = run_tests(
+    sub {
+      jcmp_deeply(
+        JSON::Typist->apply_types({ u => "cat" }),
+        { u => "dog" },
+        "cat vs dog"
+      );
+    },
+  );
+
+  is($premature, '', 'no early diag');
+  is($results[0]->{ok}, 0, 'test failed');
+
+  like(
+    $results[0]->{diag},
+    qr/got \s* : \s* 'cat' \s* expect \s* : \s* 'dog'/x,
     'diag is right'
   );
 }

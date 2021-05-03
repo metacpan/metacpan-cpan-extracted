@@ -1508,7 +1508,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 sub PDL::r2C ($) {
-  return $_[0] if !$_[0]->type->real;
+  return $_[0] if UNIVERSAL::isa($_[0], 'PDL') and !$_[0]->type->real;
   my $r = $_[1] // PDL->nullcreate($_[0]);
   PDL::_r2C_int($_[0], $r);
   $r;

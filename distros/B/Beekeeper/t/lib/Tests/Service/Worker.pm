@@ -53,7 +53,7 @@ sub signal {
     my ($signal) = $params->{signal} =~ m/(\w+)/;  # untaint
     my ($pid)    = $params->{pid}    =~ m/(\d+)/;
 
-    sleep(rand() / 100); # helps to avoid signal races
+    sleep(rand() / 10); # helps to avoid signal races
 
     kill( $signal, $pid );
 }

@@ -33,7 +33,7 @@ requires:
 resources:
   bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=Acme-MetaSyntactic-Themes
   repository: http://github.com/book/Acme-MetaSyntactic-Themes.git
-version: '1.054'
+version: '1.055'
 x_contributors:
   - 'Éric Guirbal <eguirbal@cpan.org>'
   - 'Brian Gottreu <gottreu@cpan.org>'

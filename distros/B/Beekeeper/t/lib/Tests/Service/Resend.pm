@@ -26,7 +26,7 @@ sub on_startup {
     );
 
     $self->accept_jobs(
-        'test.sleep'  => 'sleeep',
+        'test.sleep'  => 'sleep_job',
     );
 }
 
@@ -36,7 +36,7 @@ sub authorize_request {
     return REQUEST_AUTHORIZED;
 }
 
-sub sleeep {
+sub sleep_job {
     my ($self, $params) = @_;
 
     sleep $params;
@@ -68,7 +68,7 @@ sub resume {
     );
 
     $self->accept_jobs(
-        'test.sleep'  => 'sleeep',
+        'test.sleep'  => 'sleep_job',
     );
 }
 

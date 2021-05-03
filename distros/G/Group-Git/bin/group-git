@@ -20,7 +20,7 @@ use Term::ANSIColor qw/colored/;
 use File::chdir;
 use Time::HiRes qw/sleep/;
 
-our $VERSION = version->new('0.7.4');
+our $VERSION = version->new('0.7.5');
 my ($name)   = $PROGRAM_NAME =~ m{^.*/(.*?)$}mxs;
 
 main();
@@ -52,6 +52,26 @@ sub main {
             conf_prefix   => '',
             conf_section  => 'defaults',
             aliases       => $aliases,
+            help_post     => sub {
+                $ENV{TMP} ||= $ENV{HOME};
+                my $cache = path("$ENV{TMP}/.group-git-commands");
+                if ( ! -f $cache ) {
+                    return '';
+                }
+                my $out = "All commands:\n";
+                my $line = '';
+                for my $cmd ( sort split /\n/, $cache->slurp ) {
+                    if ( length "$line $cmd" > 80 ) {
+                        $out .= " $line\n";
+                        $line = '';
+                    }
+                    $line .= " $cmd,";
+                }
+                $out .= " $line";
+                chop $out;
+
+                return "$out\n";
+            },
             default       => {
                 max      => 10,
                 runtime  => 600,
@@ -359,7 +379,7 @@ group-git - Perform operations over many git repositories at once
 
 =head1 VERSION
 
-This documentation refers to group-git version 0.7.4.
+This documentation refers to group-git version 0.7.5.
 
 =head1 SYNOPSIS
 

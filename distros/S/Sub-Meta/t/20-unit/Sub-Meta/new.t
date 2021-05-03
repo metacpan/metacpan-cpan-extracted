@@ -3,9 +3,6 @@ use Test2::V0;
 use Sub::Meta;
 use Sub::Meta::Parameters;
 
-use JSON::PP;
-my $json = JSON::PP->new->allow_nonref->convert_blessed->canonical;
-
 subtest 'args: parameters' => sub {
     subtest "{ args => ['Str'] }" => sub {
         my $parameters = { args => ['Str'] };
@@ -34,7 +31,7 @@ subtest 'args: args' => sub {
         my ($a, $b) = @_;
         my $meta = Sub::Meta->new($a);
         my $parameters = Sub::Meta::Parameters->new($b);
-        is $meta->parameters, $parameters, $json->encode($a);
+        is $meta->parameters, $parameters;
     };
 
     $check->({args => ['Str']}, {args => ['Str']});

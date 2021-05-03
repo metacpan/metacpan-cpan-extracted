@@ -14,7 +14,7 @@ use Test::More;
 
 plan tests => 17;
 
-unless ($^O eq 'linux' || $^O eq 'freebsd' || $^O eq 'darwin') {
+unless ($^O eq 'linux' || $^O eq 'freebsd') {
     BAIL_OUT "OS unsupported";
 }
 

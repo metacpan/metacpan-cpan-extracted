@@ -4,7 +4,7 @@ use 5.10.1;
 use strict;
 use warnings;
 
-our $VERSION = '1.01';
+our $VERSION = '2.00';
 
 $RT::Config::META{'SideBySideView'} = {
     Section         => 'Ticket display',

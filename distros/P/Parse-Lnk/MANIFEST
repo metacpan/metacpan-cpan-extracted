@@ -1,0 +1,21 @@
+Changes
+lib/Parse/Lnk.pm
+Makefile.PL
+MANIFEST
+README
+t/00-load.t
+t/01-run.t
+t/lnk_samples/empty.lnk
+t/lnk_samples/invalid_1.lnk
+t/lnk_samples/invalid_2.lnk
+t/lnk_samples/invalid_3.lnk/empty.txt
+t/lnk_samples/shortcut_1.lnk
+t/lnk_samples/shortcut_2.lnk
+t/lnk_samples/shortcut_3.lnk
+t/lnk_samples/shortcut_4.lnk
+t/lnk_samples/shortcut_5.lnk
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

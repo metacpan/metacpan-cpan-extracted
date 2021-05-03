@@ -7,7 +7,7 @@ our @EXPORT_OK = qw/create_json create_json_strict write_json/;
 our %EXPORT_TAGS = (
     all => \@EXPORT_OK,
 );
-our $VERSION = '0.33';
+our $VERSION = '0.34';
 
 # Are we running as XS?
 

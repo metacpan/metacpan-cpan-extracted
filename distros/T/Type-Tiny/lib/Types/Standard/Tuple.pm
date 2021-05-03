@@ -6,7 +6,7 @@ use warnings;
 
 BEGIN {
 	$Types::Standard::Tuple::AUTHORITY = 'cpan:TOBYINK';
-	$Types::Standard::Tuple::VERSION   = '1.012001';
+	$Types::Standard::Tuple::VERSION   = '1.012002';
 }
 
 $Types::Standard::Tuple::VERSION =~ tr/_//d;
@@ -121,7 +121,7 @@ sub __inline_generator {
 	if ( defined $slurpy ) {
 		$tmpl =
 			'do { my ($orig, $from, $to) = (%s, %d, $#{%s});'
-			. '($to-$from %% 2) and do { my $tmp = +{@{$orig}[$from..$to]}; %s }'
+			. '(($to-$from) %% 2) and do { my $tmp = +{@{$orig}[$from..$to]}; %s }'
 			. '}'
 			if $slurpy->is_a_type_of( Types::Standard::HashRef );
 		$slurpy_any = 1

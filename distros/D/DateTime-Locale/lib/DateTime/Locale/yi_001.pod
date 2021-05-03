@@ -19,12 +19,12 @@
 
 =head1 NAME
 
-DateTime::Locale::yi_001 - Locale data examples for the Yiddish World (yi-001) locale
+DateTime::Locale::yi_001 - Locale data examples for the Yiddish world (yi-001) locale
 
 =head1 DESCRIPTION
 
 This pod file contains examples of the locale data available for the
-Yiddish World locale.
+Yiddish world locale.
 
 =head2 Days
 

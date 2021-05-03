@@ -16,7 +16,7 @@ subtest 'filter hash based on values for keys' => sub {
         { some_key => 'specific value' },
         { some_key => 'specific value with suffix' },
         ;
-    $src->completed->done;
+    $src->_completed->done;
     cmp_deeply([ $f->get ], [ { some_key => 'specific value' } ], 'filter operation was performed');
     done_testing;
 };
@@ -30,7 +30,7 @@ subtest 'filter hash based on regex for key' => sub {
         { some_key => 'specific value' },
         { some_key => 'specific value with suffix' },
         ;
-    $src->completed->done;
+    $src->_completed->done;
     cmp_deeply([ $f->get ], [
         { some_key => 'specific value' },
         { some_key => 'specific value with suffix' },
@@ -55,7 +55,7 @@ subtest 'filter hash based on array of values for key' => sub {
         { xy => 'y' },
         { xx => 'y' },
         ;
-    $src->completed->done;
+    $src->_completed->done;
     cmp_deeply([ $f->get ], [
         { xx => 'x' },
         { xx => 'y' },

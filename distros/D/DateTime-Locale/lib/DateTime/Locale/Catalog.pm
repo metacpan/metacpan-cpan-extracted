@@ -3,7 +3,7 @@ package DateTime::Locale::Catalog;
 use strict;
 use warnings;
 
-our $VERSION = '1.31';
+our $VERSION = '1.32';
 
 1;
 
@@ -21,7 +21,7 @@ DateTime::Locale::Catalog - Provides a catalog of all valid locale names
 
 =head1 VERSION
 
-version 1.31
+version 1.32
 
 =head1 DESCRIPTION
 
@@ -31,12 +31,12 @@ This module contains a list of all known locales.
 
 Any method taking locale code or name arguments should use one of the values
 listed below. Codes and names are case sensitive. The code starts with the
-ISO639-1 language code, and may also include information identifying any or
-all of territory, script, or variant.
+ISO639-1 language code, and may also include information identifying any or all
+of territory, script, or variant.
 
-Always select the closest matching locale - for example, French Canadians
-would choose C<fr-CA> over fr - and B<always> use locale codes in preference
-to names; locale codes offer greater compatibility when using localized third
+Always select the closest matching locale - for example, French Canadians would
+choose C<fr-CA> over fr - and B<always> use locale codes in preference to
+names; locale codes offer greater compatibility when using localized third
 party modules.
 
 The available locales are:
@@ -59,7 +59,7 @@ The available locales are:
  am               Amharic                                     አማርኛ
  am-ET            Amharic Ethiopia                            አማርኛ ኢትዮጵያ
  ar               Arabic                                      العربية
- ar-001           Arabic World                                العربية العالم
+ ar-001           Arabic world                                العربية العالم
  ar-AE            Arabic United Arab Emirates                 العربية الإمارات العربية المتحدة
  ar-BH            Arabic Bahrain                              العربية البحرين
  ar-DJ            Arabic Djibouti                             العربية جيبوتي
@@ -183,7 +183,7 @@ The available locales are:
  el-CY            Greek Cyprus                                Ελληνικά Κύπρος
  el-GR            Greek Greece                                Ελληνικά Ελλάδα
  en               English                                     English
- en-001           English World                               English World
+ en-001           English world                               English world
  en-150           English Europe                              English Europe
  en-AE            English United Arab Emirates                English United Arab Emirates
  en-AG            English Antigua & Barbuda                   English Antigua & Barbuda
@@ -290,7 +290,7 @@ The available locales are:
  en-ZM            English Zambia                              English Zambia
  en-ZW            English Zimbabwe                            English Zimbabwe
  eo               Esperanto                                   esperanto
- eo-001           Esperanto World                             esperanto Mondo
+ eo-001           Esperanto world                             esperanto Mondo
  es               Spanish                                     español
  es-419           Spanish Latin America                       español Latinoamérica
  es-AR            Spanish Argentina                           español Argentina
@@ -451,7 +451,7 @@ The available locales are:
  hy               Armenian                                    հայերեն
  hy-AM            Armenian Armenia                            հայերեն Հայաստան
  ia               Interlingua                                 interlingua
- ia-001           Interlingua World                           interlingua Mundo
+ ia-001           Interlingua world                           interlingua Mundo
  id               Indonesian                                  Indonesia
  id-ID            Indonesian Indonesia                        Indonesia Indonesia
  ig               Igbo                                        Igbo
@@ -615,6 +615,7 @@ The available locales are:
  nn-NO            Norwegian Nynorsk Norway                    norsk nynorsk Noreg
  nnh              Ngiemboon                                   Shwóŋò ngiembɔɔn
  nnh-CM           Ngiemboon Cameroon                          Shwóŋò ngiembɔɔn Kàmalûm
+ no               Norwegian                                   norsk
  nus              Nuer                                        Thok Nath
  nus-SS           Nuer South Sudan                            Thok Nath SS
  nyn              Nyankole                                    Runyankore
@@ -665,7 +666,7 @@ The available locales are:
  ro-RO            Romanian Romania                            română România
  rof              Rombo                                       Kihorombo
  rof-TZ           Rombo Tanzania                              Kihorombo Tanzania
- root             Root                                        root
+ root
  ru               Russian                                     русский
  ru-BY            Russian Belarus                             русский Беларусь
  ru-KG            Russian Kyrgyzstan                          русский Киргизия
@@ -814,7 +815,7 @@ The available locales are:
  yav              Yangben                                     nuasue
  yav-CM           Yangben Cameroon                            nuasue Kemelún
  yi               Yiddish                                     ייִדיש
- yi-001           Yiddish World                               ייִדיש וועלט
+ yi-001           Yiddish world                               ייִדיש וועלט
  yo               Yoruba                                      Èdè Yorùbá
  yo-BJ            Yoruba Benin                                Èdè Yorùbá Bɛ̀nɛ̀
  yo-NG            Yoruba Nigeria                              Èdè Yorùbá Nàìjíríà
@@ -857,7 +858,7 @@ Dave Rolsky <autarch@urth.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2003 - 2020 by Dave Rolsky.
+This software is copyright (c) 2003 - 2021 by Dave Rolsky.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

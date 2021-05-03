@@ -1,0 +1,15 @@
+# severity = brutal
+
+theme = (pbp + freenode)
+verbose = 9
+
+[-ValuesAndExpressions::ProhibitAccessOfPrivateData]
+
+[-Subroutines::ProhibitSubroutinePrototypes]
+
+[Variables::ProhibitUnusedVarsStricter]
+
+[TryTiny::RequireUse]
+
+[TestingAndDebugging::RequireUseStrict]
+equivalent_modules = Moo Moo::Role strictures

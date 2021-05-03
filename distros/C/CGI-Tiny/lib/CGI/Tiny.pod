@@ -25,7 +25,7 @@ CGI::Tiny - Common Gateway Interface, with no frills
         } elsif ($cgi->response_status_code == 400) {
           $cgi->render(json => {error => 'Bad request'});
         } else {
-          $cgi->render(json => {error => 'Internal server error'});
+          $cgi->set_response_status(500)->render(json => {error => 'Internal server error'});
         }
       }
     });
@@ -109,12 +109,13 @@ incompatibly if needed.
 
 CGI::Tiny's interface is a regular function called C<cgi> exported by default.
 
+  use CGI::Tiny;
   cgi {
     my $cgi = $_;
     # set up error handling on $cgi
     # inspect request data via $cgi
     # set response headers if needed via $cgi
-    # render response data with $cgi->render
+    # render response data with $cgi->render or $cgi->render_chunk
   };
 
 The code block is immediately run with C<$_> set to a CGI::Tiny object, which
@@ -124,7 +125,9 @@ response.
 If an exception is thrown within the code block, or the code block does not
 render a response, it will run the handler set by L</"set_error_handler"> if
 any, or by default emit the error as a warning and (if nothing has been
-rendered yet) render a 500 Internal Server Error.
+rendered yet) render a 500 Internal Server Error. The default server error
+will also be rendered if the process ends abnormally between importing from
+CGI::Tiny and the start of the C<cgi> block.
 
 Note that the C<cgi> block's current implementation as a regular exported
 subroutine is an implementation detail, and future implementations reserve the
@@ -188,7 +191,7 @@ L<Text::Xslate> is an efficient template engine designed for HTML/XML.
     # from templates/
     $cgi->render(html => $tx->render('index.tx', {foo => $foo}));
 
-    # from __DATA__
+    # or from __DATA__
     my $template = get_data_section 'index.tx';
     $cgi->render(html => $tx->render_string($template, {foo => $foo}));
   };
@@ -218,7 +221,7 @@ toolkit.
     my $template_path = curfile->sibling('templates', 'index.html.ep');
     $cgi->render(html => $mt->render_file($template_path, {foo => $foo}));
 
-    # from __DATA__
+    # or from __DATA__
     my $template = data_section __PACKAGE__, 'index.html.ep';
     $cgi->render(html => $mt->render($template, {foo => $foo}));
   };
@@ -273,6 +276,53 @@ characters, so non-ASCII filenames make things trickier.
     my $mime = MIME::Types->new->mimeTypeOf($basename);
     $cgi->set_response_type($mime->type) if defined $mime;
     $cgi->set_response_disposition(attachment => $basename)->render(file => $filepath);
+  };
+
+=head2 Logging
+
+CGI scripts can usually log errors directly to STDERR with the C<warn>
+function, and rely on the CGI server to log them to a file, but you will likely
+need to encode errors to UTF-8 if you expect them to contain non-ASCII text.
+
+Minimal loggers like L<Log::Any> can also be used to redirect errors and
+warnings to a file or other logging mechanism specific to the CGI script,
+encode them to bytes automatically, and also log debugging information when the
+log level is set to C<debug>. Just make sure the CGI server has permission to
+create and write to the logging target.
+
+  #!/usr/bin/perl
+  use strict;
+  use warnings;
+  use utf8;
+  use CGI::Tiny;
+  use Log::Any;
+  use Log::Any::Adapter
+    {category => 'cgi-script'}, # only log our category here
+    File => '/path/to/log/file.log',
+    binmode => ':encoding(UTF-8)',
+    log_level => $ENV{MY_CGI_LOG_LEVEL} || 'info';
+
+  my $log = Log::Any->get_logger(category => 'cgi-script');
+
+  local $SIG{__WARN__} = sub {
+    my ($warning) = @_;
+    chomp $warning;
+    $log->warn($warning);
+  };
+
+  cgi {
+    my $cgi = $_;
+
+    $cgi->set_error_handler(sub {
+      my ($cgi, $error) = @_;
+      chomp $error;
+      $log->error($error);
+    });
+
+    # only logged if MY_CGI_LOG_LEVEL=debug set in CGI server environment
+    $log->debugf('Method: %s, Path: %s, Query: %s', $cgi->method, $cgi->path, $cgi->query);
+
+    # handle the actual request
   };
 
 =head2 Routing
@@ -338,16 +388,15 @@ C<cgi> code block.
     ...
   });
 
-Sets an error handler to run in the event of an exception. If the response
-status has not been set by L</"set_response_status"> or rendering headers, it
-will default to 500 when this handler is called.
+Sets an error handler to run in the event of an exception or if the script ends
+without rendering a response.
 
 The error value can be any exception thrown by Perl or user code. It should
 generally not be included in any response rendered to the client, but instead
 warned or logged.
 
 Exceptions may occur before or after response headers have been rendered, so
-error handlers should render some response if L</"headers_rendered"> is
+error handlers may choose to render some response if L</"headers_rendered"> is
 false. L</"response_status_code"> may be set by some errors and can be
 inspected if headers have not been rendered yet.
 
@@ -405,7 +454,7 @@ Sets the output handle to print the response to. If not set, prints to
 C<STDOUT>. The handle will have C<binmode> applied before printing to remove
 any translation layers.
 
-=head2 Request
+=head2 Request Environment
 
 =head3 auth_type
 
@@ -474,6 +523,8 @@ missing and empty values, missing values will be normalized to an empty string.
   my $query  = $cgi->query;  # QUERY_STRING
 
 Short aliases for a few request meta-variables.
+
+=head2 Request Parsing
 
 =head3 query_params
 
@@ -623,6 +674,9 @@ Retrieve C<multipartE<sol>form-data> request body parts as an ordered array
 reference. Most applications should retrieve multipart form data through
 L</"body_params"> and L</"uploads"> (or related accessors) instead.
 
+Note that this will read the text form fields into memory, so make sure the
+L</"set_request_body_limit"> can fit well within the available memory.
+
 Body parts are represented as hash references containing:
 
 =over
@@ -730,25 +784,15 @@ L</"set_request_body_limit"> can fit well within the available memory.
 
 =head3 set_nph
 
+  $cgi = $cgi->set_nph;
   $cgi = $cgi->set_nph(1);
 
-If set to a true value before rendering response headers, CGI::Tiny will act as
-a L<NPH (Non-Parsed Header)|https://tools.ietf.org/html/rfc3875#section-5>
-script and render full HTTP response headers. This may be required for some CGI
+If set to a true value or called without a value before rendering response
+headers, CGI::Tiny will act as a
+L<NPH (Non-Parsed Header)|https://tools.ietf.org/html/rfc3875#section-5> script
+and render full HTTP response headers. This may be required for some CGI
 servers, or enable unbuffered responses or HTTP extensions not supported by the
 CGI server.
-
-No effect after response headers have been rendered.
-
-=head3 set_response_fixed_length
-
-  $cgi = $cgi->set_response_fixed_length(1);
-
-If set to a true value before rendering response headers, a C<Content-Length>
-header will be set to the size of the encoded content on the first call to
-L</"render">, unless it streams the response data from a C<handle> and thus
-can't predetermine the content size. L</"render"> cannot be used to provide
-additional response data if a C<Content-Length> header was rendered.
 
 No effect after response headers have been rendered.
 
@@ -757,9 +801,9 @@ No effect after response headers have been rendered.
   $cgi = $cgi->set_response_body_buffer(128*1024);
 
 Sets the buffer size (number of bytes to read at once) for streaming a C<file>
-or C<handle> response body with L</"render">. Defaults to the value of the
-C<CGI_TINY_RESPONSE_BODY_BUFFER> environment variable or 131072 (128 KiB). A
-value of 0 will use the default value.
+or C<handle> response body with L</"render"> or L</"render_chunk">. Defaults to
+the value of the C<CGI_TINY_RESPONSE_BODY_BUFFER> environment variable or
+131072 (128 KiB). A value of 0 will use the default value.
 
 =head3 set_response_status
 
@@ -793,8 +837,8 @@ effect after response headers have been rendered.
   $cgi = $cgi->set_response_type('application/xml');
 
 Sets the response C<Content-Type> header, to override autodetection in
-L</"render">. C<undef> will remove the override. No effect after response
-headers have been rendered.
+L</"render"> or L</"render_chunk">. C<undef> will remove the override. No
+effect after response headers have been rendered.
 
 =head3 set_response_charset
 
@@ -913,8 +957,8 @@ to C<200>.
 
   my $bool = $cgi->headers_rendered;
 
-Returns true if response headers have been rendered, such as by the first call
-to L</"render">.
+Returns true if response headers have been rendered, such as by L</"render"> or
+the first call to L</"render_chunk">.
 
 =head3 render
 
@@ -924,20 +968,68 @@ to L</"render">.
   $cgi = $cgi->render(text     => $text);
   $cgi = $cgi->render(data     => $bytes);
   $cgi = $cgi->render(file     => $filepath);
-  $cgi = $cgi->render(handle   => $filehandle);
   $cgi = $cgi->render(json     => $ref);
   $cgi = $cgi->render(redirect => $url);
 
-Renders response data of a type indicated by the first parameter, if any. The
-first time it is called will render response headers and set
-L</"headers_rendered">. It may be called additional times with more response
-data, unless a C<Content-Length> header was generated due to
-L</"set_response_fixed_length">.
+Renders response headers (setting L</"headers_rendered">) and then fixed-length
+response data of a type indicated by the first parameter, if any. A
+C<Content-Length> header will be set to the length of the encoded response
+content, and further calls to C<render> or L</"render_chunk"> will throw an
+exception.
+
+The C<Content-Type> response header will be set according to
+L</"set_response_type">, or autodetected depending on the data type passed, or
+to C<application/octet-stream> if there is no more appropriate value.
+
+The C<Date> response header will be set to the current time as an HTTP date
+string if not set manually.
+
+C<html>, C<xml>, or C<text> data is expected to be decoded Unicode characters,
+and will be encoded according to L</"set_response_charset"> (UTF-8 by default).
+L<Unicode::UTF8> will be used for efficient UTF-8 encoding if available.
+
+C<data> or C<file> will render bytes from a string or local file path
+respectively. A C<handle>, or a C<file> whose size cannot be determined
+accurately from the filesystem, must be rendered using L</"render_chunk"> since
+its C<Content-Length> cannot be determined beforehand.
+
+C<json> data structures will be encoded to JSON and UTF-8.
+
+C<redirect> will set a C<Location> header if response headers have not yet been
+rendered, and will set a response status of 302 unless a different status has
+been set with L</"set_response_status">. It will set a C<Content-Length> of 0,
+and it will not set a C<Content-Type> response header.
+
+=head3 render_chunk
+
+  $cgi = $cgi->render_chunk;
+  $cgi = $cgi->render_chunk(html   => $html);
+  $cgi = $cgi->render_chunk(xml    => $xml);
+  $cgi = $cgi->render_chunk(text   => $text);
+  $cgi = $cgi->render_chunk(data   => $bytes);
+  $cgi = $cgi->render_chunk(file   => $filepath);
+  $cgi = $cgi->render_chunk(handle => $filehandle);
+  $cgi = $cgi->render_chunk(json   => $ref);
+
+Renders response headers (setting L</"headers_rendered">) the first time it is
+called, and then chunked response data of a type indicated by the first
+parameter, if any. No C<Content-Length> header will be set, and C<render_chunk>
+may be called additional times with more response data.
+
+C<render_chunk> does not impose a chunked response, it simply does not generate
+a C<Content-Length> header. For content where the total encoded content length
+is known in advance but the content can't be passed to a single L</"render">
+call, a C<Content-Length> header can be set manually with
+L</"add_response_header">, and then C<render_chunk> may be used to render each
+part.
 
 The C<Content-Type> response header will be set according to
 L</"set_response_type">, or autodetected depending on the data type passed in
-the first call to C<render>, or to C<application/octet-stream> if there is no
-more appropriate value.
+the first call to C<render_chunk>, or to C<application/octet-stream> if there
+is no more appropriate value.
+
+The C<Date> response header will be set to the current time as an HTTP date
+string if not set manually.
 
 C<html>, C<xml>, or C<text> data is expected to be decoded Unicode characters,
 and will be encoded according to L</"set_response_charset"> (UTF-8 by default).
@@ -949,14 +1041,7 @@ to remove any translation layers, and its contents will be streamed until EOF.
 
 C<json> data structures will be encoded to JSON and UTF-8.
 
-C<redirect> will set a C<Location> header if response headers have not yet been
-rendered, and will set a response status of 302 if none has been set by
-L</"set_response_status">. It will set a C<Content-Length> of 0, and it will
-not set a C<Content-Type> response header. If response headers have already
-been rendered a warning will be emitted.
-
-The C<Date> response header will be set to the current time as an HTTP date
-string if not set manually.
+C<redirect> responses must be rendered with L</"render">.
 
 =head1 FUNCTIONS
 
@@ -1014,10 +1099,10 @@ fills a similar need but has a number of interface differences to be aware of.
 
 =item *
 
-There is no global CGI::Tiny object; the object is constructed for the scope of
-the C<cgi> block, only reads request data from the environment once it is
-accessed, and once the block completes (normally or abnormally), it ensures
-that a valid response is rendered to avoid gateway errors.
+There is no CGI::Tiny object constructor; the object is accessible within the
+C<cgi> block, only reads request data from the environment once it is accessed,
+and ensures that a valid response is rendered to avoid gateway errors even in
+the event of an exception or premature exit.
 
 =item *
 
@@ -1049,23 +1134,23 @@ and do not affect the text parameter accessors.
 =item *
 
 CGI::Tiny decodes request query and body parameters to Unicode characters
-automatically, and L</"render"> provides methods to encode response data from
-Unicode characters to UTF-8 by default.
+automatically, and L</"render">/L</"render_chunk"> provide methods to encode
+response data from Unicode characters to UTF-8 by default.
 
 =item *
 
 In CGI.pm, response headers must be printed manually before any response data
-is printed to avoid malformed responses. In CGI::Tiny, the L</"render"> method
-is used to print response data, and automatically prints response headers the
-first time it is called. C<redirect> responses are also handled by
-L</"render">.
+is printed to avoid malformed responses. In CGI::Tiny, the L</"render"> or
+L</"render_chunk"> methods are used to print response data, and automatically
+print response headers when first called. C<redirect> responses are also
+handled by L</"render">.
 
 =item *
 
 In CGI::Tiny, a custom response status is set by calling
-L</"set_response_status"> before the first L</"render">, which only requires
-the status code and will add the appropriate human-readable status message
-itself.
+L</"set_response_status"> before the first L</"render"> or L</"render_chunk">,
+which only requires the status code and will add the appropriate human-readable
+status message itself.
 
 =item *
 
@@ -1073,7 +1158,7 @@ Response setters are distinct methods from request accessors in CGI::Tiny.
 L</"content_type">, L</"header">, and L</"cookie"> are used to access request
 data, and L</"set_response_type">, L</"add_response_header">, and
 L</"add_response_cookie"> are used to set response headers for the pending
-response before the first call to L</"render">.
+response before the first call to L</"render"> or L</"render_chunk">.
 
 =item *
 

@@ -22,6 +22,7 @@ my %WriteMakefileArgs = (
     "Log::Any::Adapter" => "1.050",
     "Path::Tiny" => 0,
     "Time::Moment" => 0,
+    "parent" => 0,
     "strictures" => "2.000006"
   },
   "TEST_REQUIRES" => {
@@ -31,7 +32,7 @@ my %WriteMakefileArgs = (
     "Test::Most" => 0,
     "Test::Pod::Coverage" => 0
   },
-  "VERSION" => "1.08",
+  "VERSION" => "1.12",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -48,6 +49,7 @@ my %FallbackPrereqs = (
   "Test::Most" => 0,
   "Test::Pod::Coverage" => 0,
   "Time::Moment" => 0,
+  "parent" => 0,
   "strictures" => "2.000006"
 );
 

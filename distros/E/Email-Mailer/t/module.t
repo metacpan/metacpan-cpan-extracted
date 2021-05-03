@@ -81,7 +81,7 @@ like( $headers->[0]{'Content-Type'}, qr|^multipart/mixed\b|, 'Content-Type is mu
 is( $headers->[0]{'Subject'}, 'Test Email', 'Subject is correct' );
 is( $headers->[0]{'To'}, 'to@example.com', 'To is correct' );
 is( $headers->[0]{'From'}, 'from@example.com', 'From is correct' );
-is( $headers->[2]{'Content-Type'}, 'text/plain', 'Email contains text-only portion' );
+is( $headers->[2]{'Content-Type'}, 'text/plain; charset=us-ascii', 'Email contains text-only portion' );
 like( $headers->[3]{'Content-Type'}, qr|^text/html\b|, 'Email contains HTML portion' );
 
 #-------------------------------------------------------------------------------
@@ -121,7 +121,7 @@ like( $headers->[0]{'Content-Type'}, qr|^multipart/mixed\b|, 'Content-Type is mu
 is( $headers->[0]{'Subject'}, 'Test Email', 'Subject is correct' );
 is( $headers->[0]{'To'}, 'to@example.com', 'To is correct' );
 is( $headers->[0]{'From'}, 'from@example.com', 'From is correct' );
-is( $headers->[2]{'Content-Type'}, 'text/plain', 'Email contains text-only portion' );
+is( $headers->[2]{'Content-Type'}, 'text/plain; charset=us-ascii', 'Email contains text-only portion' );
 like( $headers->[4]{'Content-Type'}, qr|^text/html\b|, 'Email contains HTML portion' );
 like( $headers->[5]{'Content-Type'}, qr|^image/gif\b|, 'Email contains image portion' );
 
@@ -163,7 +163,7 @@ like( $headers->[0]{'Content-Type'}, qr|^multipart/mixed\b|, 'Content-Type is mu
 is( $headers->[0]{'Subject'}, 'Test Email', 'Subject is correct' );
 is( $headers->[0]{'To'}, 'to@example.com', 'To is correct' );
 is( $headers->[0]{'From'}, 'from@example.com', 'From is correct' );
-is( $headers->[2]{'Content-Type'}, 'text/plain', 'Email contains text-only portion' );
+is( $headers->[2]{'Content-Type'}, 'text/plain; charset=us-ascii', 'Email contains text-only portion' );
 like( $headers->[3]{'Content-Type'}, qr|^text/html\b|, 'Email contains HTML portion' );
 
 #-------------------------------------------------------------------------------
@@ -199,7 +199,7 @@ like( $headers->[0]{'Content-Type'}, qr|^multipart/mixed\b|, 'Content-Type is mu
 is( $headers->[0]{'Subject'}, 'Test Email', 'Subject is correct' );
 is( $headers->[0]{'To'}, 'to@example.com', 'To is correct' );
 is( $headers->[0]{'From'}, 'from@example.com', 'From is correct' );
-is( $headers->[2]{'Content-Type'}, 'text/plain', 'Email contains text-only portion' );
+is( $headers->[2]{'Content-Type'}, 'text/plain; charset=us-ascii', 'Email contains text-only portion' );
 like( $headers->[3]{'Content-Type'}, qr|^text/html\b|, 'Email contains HTML portion' );
 
 #-------------------------------------------------------------------------------
@@ -242,7 +242,7 @@ like( $headers->[0]{'Content-Type'}, qr|^multipart/mixed\b|, 'Content-Type is mu
 is( $headers->[0]{'Subject'}, 'Test Email', 'Subject is correct' );
 is( $headers->[0]{'To'}, 'to@example.com', 'To is correct' );
 is( $headers->[0]{'From'}, 'from@example.com', 'From is correct' );
-is( $headers->[2]{'Content-Type'}, 'text/plain', 'Email contains text-only portion' );
+is( $headers->[2]{'Content-Type'}, 'text/plain; charset=us-ascii', 'Email contains text-only portion' );
 like( $headers->[3]{'Content-Type'}, qr|^text/html\b|, 'Email contains HTML portion' );
 like( $headers->[4]{'Content-Type'}, qr|^image/gif\b|, 'Email contains image portion 1' );
 like( $headers->[5]{'Content-Type'}, qr|^image/gif\b|, 'Email contains image portion 2' );
@@ -292,5 +292,7 @@ ok(
 ) or note $@;
 is( @mail, 1, '1 mail generated' );
 like( $mail[0]->as_string, file_qr('templating.qr'), 'templating.qr' );
+
+#-------------------------------------------------------------------------------
 
 done_testing;

@@ -28,20 +28,21 @@
       },
       "develop" : {
          "requires" : {
-            "Code::TidyAll" : "0.56",
-            "Code::TidyAll::Plugin::SortLines::Naturally" : "0.000003",
-            "Code::TidyAll::Plugin::Test::Vars" : "0.02",
+            "Capture::Tiny" : "0",
             "Cwd" : "0",
             "Data::Dumper::Concise" : "0",
             "File::Spec" : "0",
+            "FindBin" : "0",
             "IO::Handle" : "0",
             "IPC::Open3" : "0",
-            "Parallel::ForkManager" : "1.19",
             "Parse::PMFile" : "0",
             "Path::Tiny" : "0",
             "Path::Tiny::Rule" : "0",
-            "Perl::Critic" : "1.126",
-            "Perl::Tidy" : "20160302",
+            "Perl::Critic" : "1.138",
+            "Perl::Critic::Moose" : "1.05",
+            "Perl::Tidy" : "20210111",
+            "Pod::Checker" : "1.74",
+            "Pod::Tidy" : "0.10",
             "Pod::Wordlist" : "0",
             "Specio" : "0.42",
             "Specio::Library::Path::Tiny" : "0",
@@ -49,7 +50,6 @@
             "Test::CPAN::Changes" : "0.19",
             "Test::CPAN::Meta::JSON" : "0.16",
             "Test::CleanNamespaces" : "0.15",
-            "Test::Code::TidyAll" : "0.50",
             "Test::DependentModules" : "0",
             "Test::EOL" : "0",
             "Test::File::ShareDir::Dist" : "0",
@@ -58,7 +58,6 @@
             "Test::Pod" : "1.41",
             "Test::Portability::Files" : "0",
             "Test::Spelling" : "0.12",
-            "Test::Vars" : "0.009",
             "Test::Version" : "2.05",
             "utf8" : "0"
          }
@@ -107,27 +106,27 @@
    "provides" : {
       "DateTime::Locale" : {
          "file" : "lib/DateTime/Locale.pm",
-         "version" : "1.31"
+         "version" : "1.32"
       },
       "DateTime::Locale::Base" : {
          "file" : "lib/DateTime/Locale/Base.pm",
-         "version" : "1.31"
+         "version" : "1.32"
       },
       "DateTime::Locale::Catalog" : {
          "file" : "lib/DateTime/Locale/Catalog.pm",
-         "version" : "1.31"
+         "version" : "1.32"
       },
       "DateTime::Locale::Data" : {
          "file" : "lib/DateTime/Locale/Data.pm",
-         "version" : "1.31"
+         "version" : "1.32"
       },
       "DateTime::Locale::FromData" : {
          "file" : "lib/DateTime/Locale/FromData.pm",
-         "version" : "1.31"
+         "version" : "1.32"
       },
       "DateTime::Locale::Util" : {
          "file" : "lib/DateTime/Locale/Util.pm",
-         "version" : "1.31"
+         "version" : "1.32"
       }
    },
    "release_status" : "stable",
@@ -143,12 +142,17 @@
       },
       "x_MailingList" : "datetime@perl.org"
    },
-   "version" : "1.31",
+   "version" : "1.32",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.030001"
       },
       "plugins" : [
+         {
+            "class" : "Dist::Zilla::Plugin::DROLSKY::BundleAuthordep",
+            "name" : "@DROLSKY/DROLSKY::BundleAuthordep",
+            "version" : "1.18"
+         },
          {
             "class" : "Dist::Zilla::Plugin::Git::GatherDir",
             "config" : {
@@ -251,7 +255,7 @@
          {
             "class" : "Dist::Zilla::Plugin::GitHub::Meta",
             "name" : "@DROLSKY/GitHub::Meta",
-            "version" : "0.47"
+            "version" : "0.48"
          },
          {
             "class" : "Dist::Zilla::Plugin::GitHub::Update",
@@ -261,7 +265,7 @@
                }
             },
             "name" : "@DROLSKY/GitHub::Update",
-            "version" : "0.47"
+            "version" : "0.48"
          },
          {
             "class" : "Dist::Zilla::Plugin::MetaResources",
@@ -339,7 +343,7 @@
                   "type" : "requires"
                }
             },
-            "name" : "@DROLSKY/Modules for use with tidyall",
+            "name" : "@DROLSKY/Tools for use with precious",
             "version" : "6.017"
          },
          {
@@ -380,10 +384,16 @@
                   "phase" : "release",
                   "run_under_travis" : 0,
                   "skip" : [
+                     "Dist::Zilla::Plugin::DROLSKY::BundleAuthordep",
                      "Dist::Zilla::Plugin::DROLSKY::Contributors",
                      "Dist::Zilla::Plugin::DROLSKY::Git::CheckFor::CorrectBranch",
                      "Dist::Zilla::Plugin::DROLSKY::License",
-                     "Dist::Zilla::Plugin::DROLSKY::TidyAll",
+                     "Dist::Zilla::Plugin::DROLSKY::MakeMaker",
+                     "Dist::Zilla::Plugin::DROLSKY::PerlLinterConfigFiles",
+                     "Dist::Zilla::Plugin::DROLSKY::Precious",
+                     "Dist::Zilla::Plugin::DROLSKY::Role::CoreCounter",
+                     "Dist::Zilla::Plugin::DROLSKY::RunExtraTests",
+                     "Dist::Zilla::Plugin::DROLSKY::Test::Precious",
                      "Dist::Zilla::Plugin::DROLSKY::WeaverConfig",
                      "Pod::Weaver::PluginBundle::DROLSKY"
                   ]
@@ -555,7 +565,6 @@
                      "Hms",
                      "Hmsv",
                      "Hmsvvvv",
-                     "Hmv",
                      "Hmv",
                      "Hong",
                      "IC",
@@ -832,7 +841,6 @@
                      "UMsombuluko",
                      "UY",
                      "Uhr",
-                     "Usbuuca",
                      "Usbuuca",
                      "Uyghur",
                      "VC",
@@ -1126,7 +1134,7 @@
                }
             },
             "name" : "@DROLSKY/DROLSKY::RunExtraTests",
-            "version" : "1.09"
+            "version" : "1.18"
          },
          {
             "class" : "Dist::Zilla::Plugin::Test::CleanNamespaces",
@@ -1198,11 +1206,6 @@
             "version" : "2.001000"
          },
          {
-            "class" : "Dist::Zilla::Plugin::Test::TidyAll",
-            "name" : "@DROLSKY/Test::TidyAll",
-            "version" : "0.04"
-         },
-         {
             "class" : "Dist::Zilla::Plugin::Test::Compile",
             "config" : {
                "Dist::Zilla::Plugin::Test::Compile" : {
@@ -1236,15 +1239,20 @@
             "version" : "1.09"
          },
          {
+            "class" : "Dist::Zilla::Plugin::DROLSKY::Test::Precious",
+            "name" : "@DROLSKY/DROLSKY::Test::Precious",
+            "version" : "1.18"
+         },
+         {
             "class" : "Dist::Zilla::Plugin::DROLSKY::Contributors",
             "name" : "@DROLSKY/DROLSKY::Contributors",
-            "version" : "1.09"
+            "version" : "1.18"
          },
          {
             "class" : "Dist::Zilla::Plugin::Git::Contributors",
             "config" : {
                "Dist::Zilla::Plugin::Git::Contributors" : {
-                  "git_version" : "2.20.1",
+                  "git_version" : "2.31.1",
                   "include_authors" : 0,
                   "include_releaser" : 1,
                   "order_by" : "name",
@@ -1252,7 +1260,7 @@
                }
             },
             "name" : "@DROLSKY/Git::Contributors",
-            "version" : "0.035"
+            "version" : "0.036"
          },
          {
             "class" : "Dist::Zilla::Plugin::SurgicalPodWeaver",
@@ -1410,7 +1418,7 @@
          {
             "class" : "Dist::Zilla::Plugin::DROLSKY::WeaverConfig",
             "name" : "@DROLSKY/DROLSKY::WeaverConfig",
-            "version" : "1.09"
+            "version" : "1.18"
          },
          {
             "class" : "Dist::Zilla::Plugin::ReadmeAnyFromPod",
@@ -1440,7 +1448,7 @@
                }
             },
             "name" : "@DROLSKY/Generate CONTRIBUTING.md",
-            "version" : "0.014"
+            "version" : "0.015"
          },
          {
             "class" : "Dist::Zilla::Plugin::GenerateFile::FromShareDir",
@@ -1460,7 +1468,7 @@
                }
             },
             "name" : "@DROLSKY/Generate CODE_OF_CONDUCT.md",
-            "version" : "0.014"
+            "version" : "0.015"
          },
          {
             "class" : "Dist::Zilla::Plugin::InstallGuide",
@@ -1481,7 +1489,7 @@
          {
             "class" : "Dist::Zilla::Plugin::DROLSKY::License",
             "name" : "@DROLSKY/DROLSKY::License",
-            "version" : "1.09"
+            "version" : "1.18"
          },
          {
             "class" : "Dist::Zilla::Plugin::CheckStrictVersion",
@@ -1513,12 +1521,12 @@
             "class" : "Dist::Zilla::Plugin::DROLSKY::Git::CheckFor::CorrectBranch",
             "config" : {
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.20.1",
+                  "git_version" : "2.31.1",
                   "repo_root" : "."
                }
             },
             "name" : "@DROLSKY/DROLSKY::Git::CheckFor::CorrectBranch",
-            "version" : "1.09"
+            "version" : "1.18"
          },
          {
             "class" : "Dist::Zilla::Plugin::EnsureChangesHasContent",
@@ -1529,7 +1537,7 @@
             "class" : "Dist::Zilla::Plugin::Git::CheckFor::MergeConflicts",
             "config" : {
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.20.1",
+                  "git_version" : "2.31.1",
                   "repo_root" : "."
                }
             },
@@ -1537,9 +1545,19 @@
             "version" : "0.014"
          },
          {
-            "class" : "Dist::Zilla::Plugin::DROLSKY::TidyAll",
-            "name" : "@DROLSKY/DROLSKY::TidyAll",
-            "version" : "1.09"
+            "class" : "Dist::Zilla::Plugin::DROLSKY::PerlLinterConfigFiles",
+            "name" : "@DROLSKY/DROLSKY::PerlLinterConfigFiles",
+            "version" : "1.18"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::DROLSKY::DevTools",
+            "name" : "@DROLSKY/DROLSKY::DevTools",
+            "version" : "1.18"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::DROLSKY::Precious",
+            "name" : "@DROLSKY/DROLSKY::Precious",
+            "version" : "1.18"
          },
          {
             "class" : "Dist::Zilla::Plugin::Git::Check",
@@ -1556,13 +1574,13 @@
                      "Makefile.PL",
                      "README.md",
                      "cpanfile",
-                     "tidyall.ini"
+                     "precious.toml"
                   ],
                   "allow_dirty_match" : [],
                   "changelog" : "Changes"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.20.1",
+                  "git_version" : "2.31.1",
                   "repo_root" : "."
                }
             },
@@ -1586,13 +1604,13 @@
                      "Makefile.PL",
                      "README.md",
                      "cpanfile",
-                     "tidyall.ini"
+                     "precious.toml"
                   ],
                   "allow_dirty_match" : [],
                   "changelog" : "Changes"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.20.1",
+                  "git_version" : "2.31.1",
                   "repo_root" : "."
                },
                "Dist::Zilla::Role::Git::StringFormatter" : {
@@ -1609,12 +1627,12 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "v1.31",
+                  "tag" : "v1.32",
                   "tag_format" : "v%V",
                   "tag_message" : "v%V"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.20.1",
+                  "git_version" : "2.31.1",
                   "repo_root" : "."
                },
                "Dist::Zilla::Role::Git::StringFormatter" : {
@@ -1634,7 +1652,7 @@
                   "remotes_must_exist" : 1
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.20.1",
+                  "git_version" : "2.31.1",
                   "repo_root" : "."
                }
             },
@@ -1675,7 +1693,7 @@
                   "changelog" : "Changes"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.20.1",
+                  "git_version" : "2.31.1",
                   "repo_root" : "."
                },
                "Dist::Zilla::Role::Git::StringFormatter" : {
@@ -1695,7 +1713,7 @@
                   "remotes_must_exist" : 1
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.20.1",
+                  "git_version" : "2.31.1",
                   "repo_root" : "."
                }
             },
@@ -1718,7 +1736,7 @@
                }
             },
             "name" : "@DROLSKY/DROLSKY::MakeMaker",
-            "version" : "1.09"
+            "version" : "1.18"
          },
          {
             "class" : "Dist::Zilla::Plugin::MetaResources",

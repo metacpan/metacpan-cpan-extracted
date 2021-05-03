@@ -24,13 +24,15 @@ my %WriteMakefileArgs = (
     "Ouch" => "0.0400"
   },
   "TEST_REQUIRES" => {
+    "Log::Any::Adapter::Log4perl" => 0,
+    "Log::Log4perl" => 0,
     "Pod::Coverage::TrustPod" => 0,
     "Test::Deep" => 0,
     "Test::More" => 0,
     "Test::Pod" => 0,
     "Test::Pod::Coverage" => 0
   },
-  "VERSION" => "1.0205",
+  "VERSION" => "1.0206",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -41,6 +43,8 @@ my %FallbackPrereqs = (
   "Data::GUID" => 0,
   "List::MoreUtils" => 0,
   "Log::Any" => 0,
+  "Log::Any::Adapter::Log4perl" => 0,
+  "Log::Log4perl" => 0,
   "Moose" => 0,
   "Ouch" => "0.0400",
   "Pod::Coverage::TrustPod" => 0,

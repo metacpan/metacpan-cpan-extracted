@@ -10,7 +10,7 @@
 --\S+
 (?:[\w\-]+:[ ]*[^\n]+\n)+
 
-This is a simple text-only email\.
+This is a simple text-only email\.=
 --\S+
 (?:[\w\-]+:[ ]*[^\n]+\n)+
 

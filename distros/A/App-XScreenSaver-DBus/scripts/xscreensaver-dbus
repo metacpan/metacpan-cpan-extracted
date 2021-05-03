@@ -1,0 +1,99 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+use v5.20;
+use Log::Any::Adapter Stdout => ( log_level => 'debug' );
+use App::XScreenSaver::DBus;
+our $VERSION = '1.0.2'; # VERSION
+# PODNAME: xscreensaver-dbus
+# ABSTRACT: tie xscreensaver into dbus
+
+$|++;
+App::XScreenSaver::DBus->new->run;
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+xscreensaver-dbus - tie xscreensaver into dbus
+
+=head1 VERSION
+
+version 1.0.2
+
+=head1 SYNOPSIS
+
+    xscreensaver &
+    xscreensaver-dbus > ~/xscreensaver-dbus.log &
+
+=head1 DESCRIPTION
+
+This program will ensure that xscreensaver locks the screen before
+your laptop goes to sleep, and will prevent the screen saver from
+running while video is playing.
+
+It does so by implementing L<the "idle inhibition" DBus
+service|https://people.freedesktop.org/~hadess/idle-inhibition-spec/index.html>
+and using L<the "inhibitor locks" feature of
+logind|https://www.freedesktop.org/wiki/Software/systemd/inhibit/>.
+
+=head1 WHY?
+
+If you use xscreensaver, you may have noticed that it doesn't
+integrate very well with all the new & fancy desktop features.
+
+jwz has resisted adding this kind of integration to the base program,
+saying (sensibly) that they would bloat the code and introduce
+potential security holes.
+
+From version 5.43, xscreensaver includes F<xscreensaver-systemd>, a
+stripped-down version of L<a program initially developed by Martin
+Lucina|https://github.com/mato/xscreensaver-systemd>, which handles
+the logind interaction. Both of those versions link to F<libsystemd>,
+which you may not have if you use elogind instead of the full systemd.
+
+So I wrote this.
+
+=head1 REFERENCES
+
+=over 4
+
+=item *
+
+L<< Martin Lucina F<xscreensaver-systemd>|https://github.com/mato/xscreensaver-systemd >>
+
+=item *
+
+L<the Debian bug where the above program is first mentioned|https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=781961>
+
+=item *
+
+L<"Is there a decent way to inhibit screensavers in linux?" on StackOverflow|https://stackoverflow.com/questions/460140/is-there-a-decent-way-to-inhibit-screensavers-in-linux>
+
+=item *
+
+L<the systemd "Inhibitor Locks" documentation|https://www.freedesktop.org/wiki/Software/systemd/inhibit/>
+
+=item *
+
+L<the "idle inhibition" spec|https://people.freedesktop.org/~hadess/idle-inhibition-spec/index.html>
+
+=back
+
+=head1 AUTHOR
+
+Gianni Ceccarelli <dakkar@thenautilus.net>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2021 by Gianni Ceccarelli <dakkar@thenautilus.net>.
+
+This is free software, licensed under:
+
+  The GNU Affero General Public License, Version 3, November 2007
+
+=cut

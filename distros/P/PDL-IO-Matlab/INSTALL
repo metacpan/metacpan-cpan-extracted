@@ -1,0 +1,11 @@
+perl Makefile.PL
+make
+make test
+make install
+
+This will build the matio source as well as the pdl interface.
+
+The makefile written by Makefile.PL has targets 'cleanall'
+and 'distcleanall'.  These perform make clean and make
+distclean in both module distribution toplevel and in
+$matio_top_level.

@@ -20,6 +20,6 @@ no_index:
   - demo
 requires:
   Perlmazing: '1'
-  perl: '5.006'
-version: '1.04'
+  perl: '5.01'
+version: '1.06'
 x_serialization_backend: YAML::XS version 0.82

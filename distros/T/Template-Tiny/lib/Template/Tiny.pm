@@ -1,4 +1,4 @@
-package Template::Tiny; # git description: v1.12-5-ge3206c1
+package Template::Tiny; # git description: v1.13-3-g7fb3b0a
 # ABSTRACT: Template Toolkit reimplemented in as little code as possible
 
 
@@ -6,7 +6,7 @@ package Template::Tiny; # git description: v1.12-5-ge3206c1
 
 use strict;
 
-our $VERSION = '1.13';
+our $VERSION = '1.14';
 
 # Evaluatable expression
 my $EXPR = qr/ [a-z_][\w.]* /xs;
@@ -217,7 +217,7 @@ Template::Tiny - Template Toolkit reimplemented in as little code as possible
 
 =head1 VERSION
 
-version 1.13
+version 1.14
 
 =head1 SYNOPSIS
 
@@ -326,7 +326,7 @@ template results will be C<print()>ed to the currently selected file handle
 
 =head1 SEE ALSO
 
-L<Config::Tiny>, L<CSS::Tiny>, L<YAML::Tiny>
+L<Template::Tiny::Strict>, L<Config::Tiny>, L<CSS::Tiny>, L<YAML::Tiny>
 
 =head1 SUPPORT
 

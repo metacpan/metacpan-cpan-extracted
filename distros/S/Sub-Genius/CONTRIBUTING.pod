@@ -1,0 +1,19 @@
+=head1 CONTRIBUTING TO C<Sub::Genius>
+
+Please read the L<README> for latest information, goals, etc..
+
+Feel free to submit issues via GitHub. If there is a feature you think
+is missing or something that should covered, contact us before starting
+down a rabbit hole.
+
+Otherwise, feedback on this module and approach is most appreciated!
+
+One restriction, I'd like to set in stone in the event this approach
+becomes interesting to others is this. The I<power> of restricting the
+"serialization" of PREs to the realm of Regular Languages (in the formal
+Computer Science sense) is sufficient to do what the module purports.
+
+If any contributor wishes to extend into other types of Languages,
+please consider forking this module or creating one's own. Simplicity
+in this approach is key to understanding it, and that's not even close
+to accomplished.

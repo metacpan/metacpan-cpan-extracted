@@ -665,13 +665,24 @@ Emits the given item.
 
 =head2 each_as_source
 
-=head2 completed
-
-Returns a L<Future> indicating completion (or failure) of this stream.
-
 =head2 await
 
 Block until this source finishes.
+
+=head2 next
+
+Returns a L<Future> which will resolve to the next item emitted by this source.
+
+If the source completes before an item is emitted, the L<Future> will be cancelled.
+
+Note that these are independent - they don't stack, so if you call C<< ->next >>
+multiple times before an item is emitted, each of those would return the same value.
+
+See L<Ryu::Buffer> if you're dealing with protocols and want to extract sequences of
+bytes or characters.
+
+To access the sequence as a discrete stream of L<Future> instances, try L</as_queue>
+which will provide a L<Future::Queue>.
 
 =head2 finish
 
@@ -732,7 +743,7 @@ emits than a standard L</map> or L</filter> implementation.
 
 =item L<Ryu::Node>
 
-L<describe|Ryu::Node/describe>, L<flow_control|Ryu::Node/flow_control>, L<is_paused|Ryu::Node/is_paused>, L<label|Ryu::Node/label>, L<new_future|Ryu::Node/new_future>, L<parent|Ryu::Node/parent>, L<pause|Ryu::Node/pause>, L<resume|Ryu::Node/resume>, L<unblocked|Ryu::Node/unblocked>
+L<completed|Ryu::Node/completed>, L<describe|Ryu::Node/describe>, L<flow_control|Ryu::Node/flow_control>, L<is_paused|Ryu::Node/is_paused>, L<label|Ryu::Node/label>, L<new_future|Ryu::Node/new_future>, L<parent|Ryu::Node/parent>, L<pause|Ryu::Node/pause>, L<resume|Ryu::Node/resume>, L<unblocked|Ryu::Node/unblocked>
 
 =back
 

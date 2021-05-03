@@ -2,7 +2,7 @@ package Acme::MetaSyntactic::tld;
 use strict;
 use Acme::MetaSyntactic::MultiList;
 our @ISA = qw( Acme::MetaSyntactic::MultiList );
-our $VERSION = '1.011';
+our $VERSION = '1.012';
 __PACKAGE__->init();
 
 our %Remote = (
@@ -38,6 +38,12 @@ Scott Lanning, Philippe Bruhat (BooK).
 =head1 CHANGES
 
 =over 4
+
+=item *
+
+2021-04-30 - v1.012
+
+Updated from the source web site in Acme-MetaSyntactic-Themes version 1.055.
 
 =item *
 
@@ -152,7 +158,7 @@ aaa aarp abarth abb abbott abbvie abc able abogado abudhabi academy
 accenture accountant accountants aco active actor adac ads adult aeg aetna
 afamilycompany afl africa agakhan agency aig aigo airbus airforce airtel
 akdn alfaromeo alibaba alipay allfinanz allstate ally alsace alstom
-americanexpress americanfamily amex amfam amica amsterdam analytics
+amazon americanexpress americanfamily amex amfam amica amsterdam analytics
 android anquan anz aol apartments app apple aquarelle arab aramco archi
 army art arte asda associates athleta attorney auction audi audible
 audio auspost author auto autos avianca aws axa azure
@@ -212,7 +218,7 @@ lacaixa ladbrokes lamborghini lamer lancaster lancia lancome land
 landrover lanxess lasalle lat latino latrobe law lawyer lds lease leclerc
 lefrak legal lego lexus lgbt liaison lidl life lifeinsurance lifestyle
 lighting like lilly limited limo lincoln linde link lipsy live living
-lixil llc loan loans locker locus loft lol london lotte lotto love lpl
+lixil llc llp loan loans locker locus loft lol london lotte lotto love lpl
 lplfinancial ltd ltda lundbeck lupin luxe luxury
 macys madrid maif maison makeup man management mango map market marketing
 markets marriott marshalls maserati mattel mba mcd mcdonalds mckinsey med
@@ -246,7 +252,7 @@ scor scot search seat secure security seek select sener services ses
 seven sew sex sexy sfr shangrila sharp shaw shell shia shiksha shoes shop
 shopping shouji show showtime shriram silk sina singles site ski skin
 sky skype sling smart smile sncf soccer social softbank software sohu
-solar solutions song sony soy space spiegel sport spot spreadbetting srl
+solar solutions song sony soy spa space spiegel sport spot spreadbetting srl
 srt stada staples star starhub statebank statefarm statoil stc stcgroup
 stockholm storage store stream studio study style sucks supplies supply
 support surf surgery suzuki swatch swiftcover swiss sydney symantec

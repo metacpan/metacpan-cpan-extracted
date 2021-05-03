@@ -1,5 +1,9 @@
 Revision history for Perl extension Crypt-OpenSSL-Guess
 
+0.13 2021-05-03T15:37:39Z
+
+    - use --installed option while executing brew --prefix (PR#9 @skaji++)
+
 0.12 2021-03-05T08:54:55Z
 
     - backport from Net::SSLeay 1.90 (PR#7)

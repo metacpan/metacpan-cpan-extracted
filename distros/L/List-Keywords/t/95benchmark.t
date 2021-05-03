@@ -47,7 +47,7 @@ if( $LK_elapsed > $LU_elapsed ) {
       $LU_elapsed, $LK_elapsed );
 }
 else {
-   my $speedup = ( $LU_elapsed - $LK_elapsed ) / $LK_elapsed;
+   my $speedup = ( $LU_elapsed - $LK_elapsed ) / $LU_elapsed;
    diag( sprintf "List::Util took %.3fsec, this was %d%% faster at %.3fsec",
       $LU_elapsed, $speedup * 100, $LK_elapsed );
 }

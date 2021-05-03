@@ -15,6 +15,7 @@ my @files = (
     't/caught.t',
     't/context.t',
     't/ecb-standalone.t',
+    't/field-names.t',
     't/ignore.t'
 );
 

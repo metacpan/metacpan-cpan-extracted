@@ -4,7 +4,7 @@ DateTime::Format::Strptime - Parse and format strp and strf time patterns
 
 # VERSION
 
-version 1.78
+version 1.79
 
 # SYNOPSIS
 
@@ -64,17 +64,17 @@ This methods creates a new object. It accepts the following arguments:
     By default, this module turns your pattern into a regex that will match
     anywhere in a string. So given the pattern `%Y%m%d%H%M%S` it will match a
     string like `20161214233712`. However, this also means that a this pattern
-    will match **any** string that contains 14 or more numbers! This behavior can
-    be very surprising.
+    will match **any** string that contains 14 or more numbers! This behavior can be
+    very surprising.
 
     If you enable strict mode, then the generated regex is wrapped in boundary
     checks of the form `/(?:\A|\b)...(?:\b|\z_/)`. These checks ensure that the
-    pattern will only match when at the beginning or end of a string, or when it
-    is separated by other text with a word boundary (`\w` versus `\W`).
+    pattern will only match when at the beginning or end of a string, or when it is
+    separated by other text with a word boundary (`\w` versus `\W`).
 
-    By default, strict mode is off. This is done for backwards
-    compatibility. Future releases may turn it on by default, as it produces less
-    surprising behavior in many cases.
+    By default, strict mode is off. This is done for backwards compatibility.
+    Future releases may turn it on by default, as it produces less surprising
+    behavior in many cases.
 
     Because the default may change in the future, **you are strongly encouraged
     to explicitly set this when constructing all `DateTime::Format::Strptime`
@@ -87,8 +87,8 @@ This methods creates a new object. It accepts the following arguments:
 - zone\_map
 
     Some time zone abbreviations are ambiguous (e.g. PST, EST, EDT). By default,
-    the parser will die when it parses an ambiguous abbreviation. You may specify
-    a `zone_map` parameter as a hashref to map zone abbreviations however you like:
+    the parser will die when it parses an ambiguous abbreviation. You may specify a
+    `zone_map` parameter as a hashref to map zone abbreviations however you like:
 
         zone_map => { PST => '-0800', EST => '-0600' }
 
@@ -119,13 +119,13 @@ This methods creates a new object. It accepts the following arguments:
         When given a code ref, the module will call that sub on errors. The sub
         receives two parameters: the object and the error message.
 
-        If your sub does not die, then the formatter will continue on as if
-        `on_error` was `'undef'`.
+        If your sub does not die, then the formatter will continue on as if `on_error`
+        was `'undef'`.
 
 ## $strptime->parse\_datetime($string)
 
-Given a string in the pattern specified in the constructor, this method
-will return a new `DateTime` object.
+Given a string in the pattern specified in the constructor, this method will
+return a new `DateTime` object.
 
 If given a string that doesn't match the pattern, the formatter will croak or
 return undef, depending on the setting of `on_error` in the constructor.
@@ -163,8 +163,8 @@ object.
 
 ## strftime( $strftime\_pattern, $datetime )
 
-Given a pattern and a `DateTime` object this function will return a
-formatted string.
+Given a pattern and a `DateTime` object this function will return a formatted
+string.
 
 # STRPTIME PATTERN TOKENS
 
@@ -177,13 +177,13 @@ The following tokens are allowed in the pattern string for strptime
 
 - %a or %A
 
-    The weekday name according to the given locale, in abbreviated form or
-    the full name.
+    The weekday name according to the given locale, in abbreviated form or the full
+    name.
 
 - %b or %B or %h
 
-    The month name according to the given locale, in abbreviated form or
-    the full name.
+    The month name according to the given locale, in abbreviated form or the full
+    name.
 
 - %c
 
@@ -205,9 +205,9 @@ The following tokens are allowed in the pattern string for strptime
 
 - %D
 
-    Equivalent to %m/%d/%y. (This is the American style date, very confusing
-    to non-Americans, especially since %d/%m/%y is widely used in Europe.
-    The ISO 8601 standard pattern is %F.)
+    Equivalent to %m/%d/%y. (This is the American style date, very confusing to
+    non-Americans, especially since %d/%m/%y is widely used in Europe. The ISO 8601
+    standard pattern is %F.)
 
 - %F
 
@@ -215,8 +215,7 @@ The following tokens are allowed in the pattern string for strptime
 
 - %g
 
-    The year corresponding to the ISO week number, but without the century
-    (0-99).
+    The year corresponding to the ISO week number, but without the century (0-99).
 
 - %G
 
@@ -269,8 +268,7 @@ The following tokens are allowed in the pattern string for strptime
 
 - %S
 
-    The second (0-60; 60 may occur for leap seconds. See
-    [DateTime::LeapSecond](https://metacpan.org/pod/DateTime%3A%3ALeapSecond)).
+    The second (0-60; 60 may occur for leap seconds. See [DateTime::LeapSecond](https://metacpan.org/pod/DateTime%3A%3ALeapSecond)).
 
 - %t
 
@@ -282,8 +280,8 @@ The following tokens are allowed in the pattern string for strptime
 
 - %U
 
-    The week number with Sunday the first day of the week (0-53). The first
-    Sunday of January is the first day of week 1.
+    The week number with Sunday the first day of the week (0-53). The first Sunday
+    of January is the first day of week 1.
 
 - %u
 
@@ -295,8 +293,8 @@ The following tokens are allowed in the pattern string for strptime
 
 - %W
 
-    The week number with Monday the first day of the week (0-53). The first
-    Monday of January is the first day of week 1.
+    The week number with Monday the first day of the week (0-53). The first Monday
+    of January is the first day of week 1.
 
 - %x
 
@@ -320,9 +318,9 @@ The following tokens are allowed in the pattern string for strptime
 
 - %y
 
-    The year within century (0-99). When a century is not otherwise specified
-    (with a value for %C), values in the range 69-99 refer to years in the
-    twentieth century (1969-1999); values in the range 00-68 refer to years in the
+    The year within century (0-99). When a century is not otherwise specified (with
+    a value for %C), values in the range 69-99 refer to years in the twentieth
+    century (1969-1999); values in the range 00-68 refer to years in the
     twenty-first century (2000-2068).
 
 - %Y
@@ -331,19 +329,18 @@ The following tokens are allowed in the pattern string for strptime
 
 - %z
 
-    An RFC-822/ISO 8601 standard time zone specification. (For example
-    \+1100) \[See note below\]
+    An RFC-822/ISO 8601 standard time zone specification. (For example +1100) \[See
+    note below\]
 
 - %Z
 
-    The timezone name. (For example EST -- which is ambiguous) \[See note
-    below\]
+    The timezone name. (For example EST -- which is ambiguous) \[See note below\]
 
 - %O
 
-    This extended token allows the use of Olson Time Zone names to appear
-    in parsed strings. **NOTE**: This pattern cannot be passed to `DateTime`'s
-    `strftime()` method, but can be passed to `format_datetime()`.
+    This extended token allows the use of Olson Time Zone names to appear in parsed
+    strings. **NOTE**: This pattern cannot be passed to `DateTime`'s `strftime()`
+    method, but can be passed to `format_datetime()`.
 
 # AUTHOR EMERITUS
 
@@ -407,7 +404,7 @@ button at [https://www.urth.org/fs-donation.html](https://www.urth.org/fs-donati
 
 # COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2015 - 2020 by Dave Rolsky.
+This software is Copyright (c) 2015 - 2021 by Dave Rolsky.
 
 This is free software, licensed under:
 

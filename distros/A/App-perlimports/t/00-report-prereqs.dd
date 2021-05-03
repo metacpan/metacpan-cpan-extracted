@@ -38,7 +38,7 @@ do { my $x = {
                                       'Class::Inspector' => '1.36',
                                       'Class::Unload' => '0',
                                       'Data::Dumper' => '0',
-                                      'Data::Printer' => '0',
+                                      'Data::Printer' => '0.36',
                                       'File::Basename' => '0',
                                       'FindBin' => '0',
                                       'Getopt::Long::Descriptive' => '0',
@@ -75,7 +75,7 @@ do { my $x = {
                                    },
                    'requires' => {
                                    'Cpanel::JSON::XS' => '0',
-                                   'Data::Printer' => '0',
+                                   'Data::Printer' => '0.36',
                                    'ExtUtils::MakeMaker' => '0',
                                    'File::Spec' => '0',
                                    'Geo::IP' => '0',
@@ -86,7 +86,7 @@ do { my $x = {
                                    'Test::Most' => '0',
                                    'Test::Needs' => '0',
                                    'Test::RequiresInternet' => '0',
-                                   'Test::Script' => '0',
+                                   'Test::Script' => '1.27',
                                    'Test::Warnings' => '0',
                                    'perl' => '5.008'
                                  }

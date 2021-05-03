@@ -46,6 +46,104 @@
          }
       }
    },
+   "provides" : {
+      "Beekeeper" : {
+         "file" : "lib/Beekeeper.pm",
+         "version" : "0.02"
+      },
+      "Beekeeper::Bus::STOMP" : {
+         "file" : "lib/Beekeeper/Bus/STOMP.pm",
+         "version" : "0.02"
+      },
+      "Beekeeper::Client" : {
+         "file" : "lib/Beekeeper/Client.pm",
+         "version" : "0.02"
+      },
+      "Beekeeper::Config" : {
+         "file" : "lib/Beekeeper/Config.pm",
+         "version" : "0.02"
+      },
+      "Beekeeper::JSONRPC" : {
+         "file" : "lib/Beekeeper/JSONRPC.pm",
+         "version" : "0.02"
+      },
+      "Beekeeper::JSONRPC::AuthHeaders" : {
+         "file" : "lib/Beekeeper/JSONRPC/AuthHeaders.pm",
+         "version" : "0.02"
+      },
+      "Beekeeper::JSONRPC::Error" : {
+         "file" : "lib/Beekeeper/JSONRPC/Error.pm",
+         "version" : "0.02"
+      },
+      "Beekeeper::JSONRPC::Notification" : {
+         "file" : "lib/Beekeeper/JSONRPC/Notification.pm",
+         "version" : "0.02"
+      },
+      "Beekeeper::JSONRPC::Request" : {
+         "file" : "lib/Beekeeper/JSONRPC/Request.pm",
+         "version" : "0.02"
+      },
+      "Beekeeper::JSONRPC::Response" : {
+         "file" : "lib/Beekeeper/JSONRPC/Response.pm",
+         "version" : "0.02"
+      },
+      "Beekeeper::Logger" : {
+         "file" : "lib/Beekeeper/Logger.pm",
+         "version" : "0.02"
+      },
+      "Beekeeper::Service::LogTail" : {
+         "file" : "lib/Beekeeper/Service/LogTail.pm",
+         "version" : "0.02"
+      },
+      "Beekeeper::Service::LogTail::Worker" : {
+         "file" : "lib/Beekeeper/Service/LogTail/Worker.pm",
+         "version" : "0.02"
+      },
+      "Beekeeper::Service::Router" : {
+         "file" : "lib/Beekeeper/Service/Router.pm",
+         "version" : "0.02"
+      },
+      "Beekeeper::Service::Router::Worker" : {
+         "file" : "lib/Beekeeper/Service/Router/Worker.pm",
+         "version" : "0.02"
+      },
+      "Beekeeper::Service::Sinkhole::Worker" : {
+         "file" : "lib/Beekeeper/Service/Sinkhole/Worker.pm",
+         "version" : "0.02"
+      },
+      "Beekeeper::Service::Supervisor" : {
+         "file" : "lib/Beekeeper/Service/Supervisor.pm",
+         "version" : "0.02"
+      },
+      "Beekeeper::Service::Supervisor::Worker" : {
+         "file" : "lib/Beekeeper/Service/Supervisor/Worker.pm",
+         "version" : "0.02"
+      },
+      "Beekeeper::Service::ToyBroker::Worker" : {
+         "file" : "lib/Beekeeper/Service/ToyBroker/Worker.pm",
+         "version" : "0.02"
+      },
+      "Beekeeper::Worker" : {
+         "file" : "lib/Beekeeper/Worker.pm",
+         "version" : "0.02"
+      },
+      "Beekeeper::Worker::Util" : {
+         "file" : "lib/Beekeeper/Worker/Util.pm",
+         "version" : "0.02"
+      },
+      "Beekeeper::Worker::Util::SharedCache" : {
+         "file" : "lib/Beekeeper/Worker/Util/SharedCache.pm",
+         "version" : "0.02"
+      },
+      "Beekeeper::WorkerPool" : {
+         "file" : "lib/Beekeeper/WorkerPool.pm",
+         "version" : "0.02"
+      },
+      "Beekeeper::WorkerPool::Daemon" : {
+         "file" : "lib/Beekeeper/WorkerPool/Daemon.pm",
+         "version" : "0.02"
+      }
+   },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
@@ -58,7 +156,7 @@
          "web" : "https://github.com/jmico/beekeeper"
       }
    },
-   "version" : "0.01",
+   "version" : "0.02",
    "x_generated_by_perl" : "v5.28.1",
    "x_serialization_backend" : "JSON::XS version 3.04"
 }

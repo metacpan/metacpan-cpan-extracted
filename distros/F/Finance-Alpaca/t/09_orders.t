@@ -36,16 +36,22 @@ SKIP: {
 
     # Make original order larger
     my $replacement = $alpaca->replace_order( $order->id, qty => 50 );
+SKIP: {
+        if ( ref $replacement eq 'HASH' && defined $replacement->{code} ) {
+            skip ucfirst $replacement->{message};
+            $order->cancel;    # Just cancel it and move on
+        }
 
-    # Gather original with updated stats
-    $order = $alpaca->order_by_id( $order->id );
-    is( $order->replaced_by,    $replacement->id, 'Order replaced' );
-    is( $replacement->replaces, $order->id,       'Both sides have references' );
-    ok( $alpaca->cancel_order( $replacement->id ), 'Cancel replacement' );
-    like(
-        $alpaca->order_by_id( $replacement->id )->status,
-        qr[^canceled|pending_cancel$], 'Canceled order status is correct'
-    );
+        # Gather original with updated stats
+        $order = $alpaca->order_by_id( $order->id );
+        is( $order->replaced_by,    $replacement->id, 'Order replaced' );
+        is( $replacement->replaces, $order->id,       'Both sides have references' );
+        ok( $alpaca->cancel_order( $replacement->id ), 'Cancel replacement' );
+        like(
+            $alpaca->order_by_id( $replacement->id )->status,
+            qr[^canceled|pending_cancel$], 'Canceled order status is correct'
+        );
+    }
 }
 #
 done_testing;

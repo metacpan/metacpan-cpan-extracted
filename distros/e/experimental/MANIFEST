@@ -9,57 +9,5 @@ Makefile.PL
 README
 dist.ini
 lib/experimental.pm
-nytprof.out
-'nytprof/(eval 1)[Carp-pm-21]-10-line.html'
-'nytprof/(eval 2)[Carp-pm-116]-11-line.html'
-'nytprof/(eval 3)[Carp-pm-171]-13-line.html'
-'nytprof/(eval 4)[Carp-pm-577]-14-line.html'
-'nytprof/(eval 5)[CPAN-Meta-Requirements-pm-45]-22-line.html'
-'nytprof/(eval 6)[CPAN-Meta-Converter-pm-37]-26-line.html'
-nytprof/CPAN-Meta-Converter-pm-23-line.html
-nytprof/CPAN-Meta-Feature-pm-17-line.html
-nytprof/CPAN-Meta-Prereqs-pm-18-line.html
-nytprof/CPAN-Meta-Requirements-pm-21-line.html
-nytprof/CPAN-Meta-Validator-pm-24-line.html
-nytprof/CPAN-Meta-pm-16-line.html
-nytprof/Carp-pm-9-line.html
-nytprof/Exporter-pm-15-line.html
-nytprof/List-Util-pm-20-line.html
-nytprof/Parse-CPAN-Meta-pm-25-line.html
-nytprof/Scalar-Util-pm-19-line.html
-nytprof/XSLoader-pm-27-line.html
-nytprof/all_stacks_by_time.calls
-nytprof/all_stacks_by_time.svg
-nytprof/experimental-pm-2-line.html
-nytprof/feature-pm-8-line.html
-nytprof/flamegraph_subattr.txt
-nytprof/home-leont-Code-cpan-experimental-test-pl-1-line.html
-nytprof/index-subs-excl.html
-nytprof/index.html
-nytprof/js/asc.png
-nytprof/js/bg.png
-nytprof/js/desc.png
-nytprof/js/jit/Treemap.css
-nytprof/js/jit/gradient-cushion1.png
-nytprof/js/jit/gradient.png
-nytprof/js/jit/gradient20.png
-nytprof/js/jit/gradient30.png
-nytprof/js/jit/gradient40.png
-nytprof/js/jit/gradient50.png
-nytprof/js/jit/jit-yc.js
-nytprof/js/jit/jit.js
-nytprof/js/jquery-min.js
-nytprof/js/jquery-tablesorter-min.js
-nytprof/js/style-tablesorter.css
-nytprof/overloading-pm-12-line.html
-nytprof/packages-callgraph.dot
-nytprof/strict-pm-3-line.html
-nytprof/style.css
-nytprof/subs-callgraph.dot
-nytprof/subs-treemap-excl.html
-nytprof/version-pm-5-line.html
-nytprof/version-regex-pm-7-line.html
-nytprof/warnings-pm-4-line.html
-nytprof/warnings-register-pm-6-line.html
 t/basic.t
 xt/author/pod-syntax.t

@@ -1,9 +1,30 @@
 Changes file for Log::Any::Adapter::JSON
 
+1.12      2021-05-02 08:04:20-04:00 America/New_York
+
+  - Minor doc fixes
+
+1.11      2021-05-01 18:50:11-04:00 America/New_York
+
+  - Update prereqs for Kwalitee
+
+1.10      2021-05-01 17:34:22-04:00 America/New_York
+
+  - Pad timestamp with 0s on RHS so it's always of same length
+
+1.09      2021-05-01 10:19:44-04:00 America/New_York
+
+  - Allow disabling message string formatting
+    Thanks Dan Michael O. Heggø!
+
+  - Allow choosing to timestamp the log message in localtime
+
+  - Extend timestamp to microseconds and include TZ
+
 1.08      2021-03-04 18:21:40-05:00 America/New_York
 
   - Update prereqs (strictures is v 2)
-  
+
 1.07      2021-03-04 06:31:39-05:00 America/New_York
 
   - Skip pipe test on MSWin32

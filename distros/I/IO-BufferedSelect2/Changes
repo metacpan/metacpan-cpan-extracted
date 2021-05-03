@@ -1,0 +1,11 @@
+Revision history for Perl extension IO::BufferedSelect2.
+
+1.0  Tue Mar 13 00:37:49 2007
+	- original version; created by h2xs 1.23 with options
+		-v 1.0 -X -n IO::BufferedSelect
+
+1.1  Mon May 3 22:48:49 2021
+	- forked IO::BufferedSelect to IO::BufferedSelect2
+	- refactored to support "tail -f" like facilities
+	- incorporated Linux::Inotify2 syscalls
+

@@ -9,6 +9,7 @@ README
 cpanfile
 dist.ini
 lib/Email/Mailer.pm
+spike.pl
 t/00-compile.t
 t/author-eol.t
 t/author-no-tabs.t

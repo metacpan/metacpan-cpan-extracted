@@ -3,7 +3,7 @@ package DateTime::Format::Strptime;
 use strict;
 use warnings;
 
-our $VERSION = '1.78';
+our $VERSION = '1.79';
 
 use Carp qw( carp croak );
 use DateTime 1.00;
@@ -978,7 +978,7 @@ DateTime::Format::Strptime - Parse and format strp and strf time patterns
 
 =head1 VERSION
 
-version 1.78
+version 1.79
 
 =head1 SYNOPSIS
 
@@ -1042,17 +1042,17 @@ This is a boolean which disables or enables strict matching mode.
 By default, this module turns your pattern into a regex that will match
 anywhere in a string. So given the pattern C<%Y%m%d%H%M%S> it will match a
 string like C<20161214233712>. However, this also means that a this pattern
-will match B<any> string that contains 14 or more numbers! This behavior can
-be very surprising.
+will match B<any> string that contains 14 or more numbers! This behavior can be
+very surprising.
 
 If you enable strict mode, then the generated regex is wrapped in boundary
 checks of the form C</(?:\A|\b)...(?:\b|\z_/)>. These checks ensure that the
-pattern will only match when at the beginning or end of a string, or when it
-is separated by other text with a word boundary (C<\w> versus C<\W>).
+pattern will only match when at the beginning or end of a string, or when it is
+separated by other text with a word boundary (C<\w> versus C<\W>).
 
-By default, strict mode is off. This is done for backwards
-compatibility. Future releases may turn it on by default, as it produces less
-surprising behavior in many cases.
+By default, strict mode is off. This is done for backwards compatibility.
+Future releases may turn it on by default, as it produces less surprising
+behavior in many cases.
 
 Because the default may change in the future, B<< you are strongly encouraged
 to explicitly set this when constructing all C<DateTime::Format::Strptime>
@@ -1065,8 +1065,8 @@ The default time zone to use for objects returned from parsing.
 =item * zone_map
 
 Some time zone abbreviations are ambiguous (e.g. PST, EST, EDT). By default,
-the parser will die when it parses an ambiguous abbreviation. You may specify
-a C<zone_map> parameter as a hashref to map zone abbreviations however you like:
+the parser will die when it parses an ambiguous abbreviation. You may specify a
+C<zone_map> parameter as a hashref to map zone abbreviations however you like:
 
     zone_map => { PST => '-0800', EST => '-0600' }
 
@@ -1099,8 +1099,8 @@ The module will croak with an error message on errors.
 When given a code ref, the module will call that sub on errors. The sub
 receives two parameters: the object and the error message.
 
-If your sub does not die, then the formatter will continue on as if
-C<on_error> was C<'undef'>.
+If your sub does not die, then the formatter will continue on as if C<on_error>
+was C<'undef'>.
 
 =back
 
@@ -1108,8 +1108,8 @@ C<on_error> was C<'undef'>.
 
 =head2 $strptime->parse_datetime($string)
 
-Given a string in the pattern specified in the constructor, this method
-will return a new C<DateTime> object.
+Given a string in the pattern specified in the constructor, this method will
+return a new C<DateTime> object.
 
 If given a string that doesn't match the pattern, the formatter will croak or
 return undef, depending on the setting of C<on_error> in the constructor.
@@ -1147,8 +1147,8 @@ object.
 
 =head2 strftime( $strftime_pattern, $datetime )
 
-Given a pattern and a C<DateTime> object this function will return a
-formatted string.
+Given a pattern and a C<DateTime> object this function will return a formatted
+string.
 
 =head1 STRPTIME PATTERN TOKENS
 
@@ -1163,13 +1163,13 @@ The % character.
 
 =item * %a or %A
 
-The weekday name according to the given locale, in abbreviated form or
-the full name.
+The weekday name according to the given locale, in abbreviated form or the full
+name.
 
 =item * %b or %B or %h
 
-The month name according to the given locale, in abbreviated form or
-the full name.
+The month name according to the given locale, in abbreviated form or the full
+name.
 
 =item * %c
 
@@ -1191,9 +1191,9 @@ The day of month (01-31). This will parse single digit numbers as well.
 
 =item * %D
 
-Equivalent to %m/%d/%y. (This is the American style date, very confusing
-to non-Americans, especially since %d/%m/%y is widely used in Europe.
-The ISO 8601 standard pattern is %F.)
+Equivalent to %m/%d/%y. (This is the American style date, very confusing to
+non-Americans, especially since %d/%m/%y is widely used in Europe. The ISO 8601
+standard pattern is %F.)
 
 =item * %F
 
@@ -1201,8 +1201,7 @@ Equivalent to %Y-%m-%d. (This is the ISO style date)
 
 =item * %g
 
-The year corresponding to the ISO week number, but without the century
-(0-99).
+The year corresponding to the ISO week number, but without the century (0-99).
 
 =item * %G
 
@@ -1255,8 +1254,7 @@ Number of seconds since the Epoch.
 
 =item * %S
 
-The second (0-60; 60 may occur for leap seconds. See
-L<DateTime::LeapSecond>).
+The second (0-60; 60 may occur for leap seconds. See L<DateTime::LeapSecond>).
 
 =item * %t
 
@@ -1268,8 +1266,8 @@ Equivalent to %H:%M:%S.
 
 =item * %U
 
-The week number with Sunday the first day of the week (0-53). The first
-Sunday of January is the first day of week 1.
+The week number with Sunday the first day of the week (0-53). The first Sunday
+of January is the first day of week 1.
 
 =item * %u
 
@@ -1281,8 +1279,8 @@ The weekday number (0-6) with Sunday = 0.
 
 =item * %W
 
-The week number with Monday the first day of the week (0-53). The first
-Monday of January is the first day of week 1.
+The week number with Monday the first day of the week (0-53). The first Monday
+of January is the first day of week 1.
 
 =item * %x
 
@@ -1306,9 +1304,9 @@ L<DateTime::Locale> that the parser is using.
 
 =item * %y
 
-The year within century (0-99). When a century is not otherwise specified
-(with a value for %C), values in the range 69-99 refer to years in the
-twentieth century (1969-1999); values in the range 00-68 refer to years in the
+The year within century (0-99). When a century is not otherwise specified (with
+a value for %C), values in the range 69-99 refer to years in the twentieth
+century (1969-1999); values in the range 00-68 refer to years in the
 twenty-first century (2000-2068).
 
 =item * %Y
@@ -1317,19 +1315,18 @@ A 4-digit year, including century (for example, 1991).
 
 =item * %z
 
-An RFC-822/ISO 8601 standard time zone specification. (For example
-+1100) [See note below]
+An RFC-822/ISO 8601 standard time zone specification. (For example +1100) [See
+note below]
 
 =item * %Z
 
-The timezone name. (For example EST -- which is ambiguous) [See note
-below]
+The timezone name. (For example EST -- which is ambiguous) [See note below]
 
 =item * %O
 
-This extended token allows the use of Olson Time Zone names to appear
-in parsed strings. B<NOTE>: This pattern cannot be passed to C<DateTime>'s
-C<strftime()> method, but can be passed to C<format_datetime()>.
+This extended token allows the use of Olson Time Zone names to appear in parsed
+strings. B<NOTE>: This pattern cannot be passed to C<DateTime>'s C<strftime()>
+method, but can be passed to C<format_datetime()>.
 
 =back
 
@@ -1424,7 +1421,7 @@ Mohammad S Anwar <mohammad.anwar@yahoo.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2015 - 2020 by Dave Rolsky.
+This software is Copyright (c) 2015 - 2021 by Dave Rolsky.
 
 This is free software, licensed under:
 

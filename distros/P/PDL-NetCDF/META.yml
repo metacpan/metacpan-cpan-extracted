@@ -3,24 +3,28 @@ abstract: unknown
 author:
   - 'Douglas Hunt (dhunt@ucar.edu)'
 build_requires:
-  ExtUtils::MakeMaker: 0
+  Devel::CheckLib: '1.14'
+  Test::More: '0.88'
 configure_requires:
-  ExtUtils::MakeMaker: 0
+  Devel::CheckLib: '1.14'
+  ExtUtils::MakeMaker: '6.64'
+  PDL: '2.043'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 6.6302, CPAN::Meta::Converter version 2.120630'
+generated_by: 'ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010'
 license: unknown
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: PDL-NetCDF
 no_index:
   directory:
     - t
     - inc
-provides:
-  PDL::NetCDF:
-    file: netcdf.pd
-    version: 4.19
 requires:
-  PDL: 0
-version: 4.20
+  PDL: '2.043'
+resources:
+  IRC: irc://irc.perl.org/#pdl
+  bugtracker: https://github.com/PDLPorters/PDL-NetCDF/issues
+  repository: git://github.com/PDLPorters/PDL-NetCDF.git
+version: '4.21'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -4,7 +4,7 @@
       "Nicolas Steenlant, C<< <nicolas.steenlant at ugent.be> >>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Milla version v1.0.20, Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Milla version v1.0.20, Dist::Zilla version 6.015, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -57,7 +57,8 @@
       "test" : {
          "requires" : {
             "Dancer::Test" : "1.3123",
-            "Test::More" : "0.88"
+            "Test::More" : "0.88",
+            "YAML" : "0"
          }
       }
    },
@@ -73,7 +74,7 @@
          "web" : "https://github.com/LibreCat/Dancer-Plugin-Catmandu-OAI"
       }
    },
-   "version" : "0.0507",
+   "version" : "0.0508",
    "x_contributors" : [
       "Dan Michael O. Hegg\u00f8 <danmichaelo@gmail.com>",
       "Nicolas Franck <Nicolas.Franck@ugent.be>",
@@ -84,8 +85,9 @@
       "Patrick Hochstenbach <patrick.hochstenbach@ugent.be>",
       "Vitali Peil <vitali.peil@uni-bielefeld.de>"
    ],
-   "x_generated_by_perl" : "v5.30.0",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.25",
+   "x_generated_by_perl" : "v5.32.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.26",
+   "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later",
    "x_static_install" : 0
 }
 

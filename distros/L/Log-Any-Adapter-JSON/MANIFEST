@@ -15,3 +15,5 @@ t/010-output.t
 t/011-package.t
 t/012-pipe.t
 t/013-context.t
+t/014-output-unformatted.t
+t/015-localtime.t

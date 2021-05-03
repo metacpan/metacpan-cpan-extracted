@@ -16,7 +16,7 @@ BEGIN {
 }
 
 use vars qw($VERSION @EXPORT @EXPORT_OK);
-$VERSION = '1.04';
+$VERSION = '1.05';
 @EXPORT = qw(is_nz_holiday nz_holidays nz_regional_day nz_holiday_date);
 @EXPORT_OK = qw(%HOLIDAYS $NATIONAL_HOLIDAYS %regions
 		nz_region_code nz_region_name %holiday_cache);
@@ -202,7 +202,7 @@ sub check_falling_on {
 	if ( $falls_on >= 6 ) {
 	    my $name = delete $h->{$date};
 	    #print STDERR "Blast, $name falls on a ".UnixDate($year.$date, "%A"). " ($falls_on)\n";
-	    my $add = ($falls_on + 2) % 7;
+	    my $add = ($falls_on == 6) ? 2 : 1;
 	    #print STDERR "Adding $add days to it.\n";
 	    my $to_fall_on = UnixDate(DateCalc($year.$date, "+${add}d"), "%m%d");
 	    #print STDERR "Trying $to_fall_on instead.\n";

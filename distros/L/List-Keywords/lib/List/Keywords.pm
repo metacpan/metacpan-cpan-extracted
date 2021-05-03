@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2021 -- leonerd@leonerd.org.uk
 
-package List::Keywords 0.03;
+package List::Keywords 0.04;
 
 use v5.14;
 use warnings;
@@ -90,10 +90,31 @@ sub import
    my @syms = @_;
 
    foreach ( @syms ) {
+      if( $_ eq ":all" ) {
+         push @syms, keys %KEYWORD_OK;
+         next;
+      }
+
       $KEYWORD_OK{$_} or croak "Unrecognised import symbol '$_'";
 
       $^H{"List::Keywords/$_"}++;
    }
+}
+
+sub B::Deparse::pp_firstwhile
+{
+   my ($self, $op) = @_;
+   # first, any, all, none, notall
+   my $private = $op->private;
+   my $name =
+      ( $private ==  0 ) ? "first" :
+      ( $private ==  6 ) ? "none" :
+      ( $private ==  9 ) ? "any" :
+      ( $private == 22 ) ? "all" :
+      ( $private == 25 ) ? "notall" :
+                           "firstwhile[op_private=$private]";
+
+   return B::Deparse::mapop(@_, $name);
 }
 
 =head1 KEYWORDS
@@ -125,6 +146,7 @@ values from the given list. Returns false and stops at the first item to make
 the block yield a false value. If no such item exists, returns true.
 
 =head2 none
+
 =head2 notall
 
    $bool = none { CODE } LIST

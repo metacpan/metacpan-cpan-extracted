@@ -219,7 +219,7 @@ qx.Class.define('callbackery.ui.plugin.Table', {
                         model.reloadData();
                         break;
                 }
-            });
+            }, this);
             return table;
         }
     }

@@ -51,6 +51,7 @@ my @files = (
     't/source/mean.t',
     't/source/merge.t',
     't/source/min.t',
+    't/source/next.t',
     't/source/ordered_futures.t',
     't/source/prefix.t',
     't/source/skip.t',

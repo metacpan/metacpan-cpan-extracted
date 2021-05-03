@@ -42,6 +42,7 @@
       },
       "runtime" : {
          "requires" : {
+            "IO::Socket::SSL" : "2.009",
             "Mojo::Promise" : "0",
             "Mojo::UserAgent" : "0",
             "Moo" : "0",
@@ -61,7 +62,7 @@
    "provides" : {
       "Finance::Alpaca" : {
          "file" : "lib/Finance/Alpaca.pm",
-         "version" : "0.9904"
+         "version" : "0.9906"
       },
       "Finance::Alpaca::DataStream" : {
          "file" : "lib/Finance/Alpaca/DataStream.pm",
@@ -143,7 +144,7 @@
          "web" : "https://github.com/sanko/Finance-Alpaca"
       }
    },
-   "version" : "0.9904",
+   "version" : "0.9906",
    "x_authority" : "cpan:SANKO",
    "x_serialization_backend" : "JSON::PP version 4.05",
    "x_static_install" : 1

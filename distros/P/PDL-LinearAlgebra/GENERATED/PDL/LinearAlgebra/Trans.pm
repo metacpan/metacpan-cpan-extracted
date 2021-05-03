@@ -33,7 +33,6 @@ use PDL::Core;
 use PDL::Slices;
 use PDL::Ops qw//;
 use PDL::Math qw/floor/;
-use PDL::Complex;
 use PDL::NiceSlice;
 use PDL::LinearAlgebra;
 use PDL::LinearAlgebra::Real qw //;
@@ -122,7 +121,7 @@ ACM - Transactions On Mathematical Software, 24(1):130-156, 1998
 =for bad
 
 geexp does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -158,7 +157,7 @@ ACM - Transactions On Mathematical Software, 24(1):130-156, 1998
 =for bad
 
 cgeexp does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -195,7 +194,7 @@ If uplo is true, A is lower triangular.
 =for bad
 
 ctrsqrt does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -229,7 +228,7 @@ If uplo is true, A is lower triangular.
 =for bad
 
 ctrfun does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -290,7 +289,7 @@ sub toreal{
 	$_tol = $_[1] if defined $_[1];
 	my ($min, $max, $tmp);
 	($min, $max) = $_[0]->slice('(1)')->minmax;
-	return re($_[0])->sever unless (abs($min) > $_tol || abs($max) > $_tol);
+	return $_[0]->re->sever unless (abs($min) > $_tol || abs($max) > $_tol);
 	$_[0];
 }
 
@@ -485,7 +484,7 @@ sub PDL::mexpts {
 		unless( ((@dims == 2) || (@dims == 3)) && $dims[-1] == $dims[-2] );
 	my ($em, $trm);
 	$order = 20 unless defined $order;
-	$em = (@dims == 3 ) ? diag(r2C ones($dims[1])) : diag(ones($dims[1]));
+	$em = (@dims == 3 ) ? diag(r2C(ones($dims[1]))) : diag(ones($dims[1]));
 	$trm = $em->copy;
 	for (1..($order - 1)){
 		$trm =  $trm x ($m / $_);
@@ -572,7 +571,7 @@ sub PDL::mcos {
 	my @dims = $m->dims;
 	barf("mcos requires a 2-D square matrix")
 		unless( ((@dims == 2) || (@dims == 3)) && $dims[-1] == $dims[-2] );
-	return (@dims == 3) ? (mexp(i*$m) + mexp(- i*$m)) / 2 : re(mexp(i*$m))->sever;
+	return (@dims == 3) ? (mexp(PDL::Complex::i()*$m) + mexp(- PDL::Complex::i()*$m)) / 2 : mexp(PDL::Complex::i()*$m)->re->sever;
 }
 
 =head2 macos
@@ -601,7 +600,7 @@ sub PDL::macos {
 	my ($id, $ret);
 	$id = PDL::zeroes $m;
 	(@dims == 3) ? $id->slice('(0),:,:')->diagonal(0,1) .= 1 : $id->diagonal(0,1) .= 1;
-	$ret = i * mlog( ($m->r2C - i * msqrt( ($id - $m x $m), $tol)));
+	$ret = PDL::Complex::i() * mlog( ($m->r2C - PDL::Complex::i() * msqrt( ($id - $m x $m), $tol)));
 	return (@dims ==3) ? $ret : toreal($ret, $tol);
 }
 
@@ -628,7 +627,7 @@ sub PDL::msin {
 	my @dims = $m->dims;
 	barf("msin requires a 2-D square matrix")
 		unless( ((@dims == 2) || (@dims == 3)) && $dims[-1] == $dims[-2] );
-	return (@dims == 3) ? (mexp(i*$m) - mexp(- i*$m))/(2*i) : im(mexp(i*$m))->sever;
+	return (@dims == 3) ? (mexp(PDL::Complex::i()*$m) - mexp(- PDL::Complex::i()*$m))/(2*PDL::Complex::i()) : mexp(PDL::Complex::i()*$m)->im->sever;
 }
 
 =head2 masin
@@ -657,7 +656,7 @@ sub PDL::masin {
 	my ($ret, $id);
 	$id = PDL::zeroes $m;
 	(@dims == 3) ? $id->slice('(0),:,:')->diagonal(0,1) .= 1 : $id->diagonal(0,1) .= 1;
-	$ret = (- i) * mlog(((i*$m) + msqrt($id - $m x $m, $tol)));
+	$ret = (- PDL::Complex::i()) * mlog(((PDL::Complex::i()*$m) + msqrt($id - $m x $m, $tol)));
 	return (@dims ==3) ? $ret : toreal($ret, $tol);
 }
 
@@ -688,11 +687,11 @@ sub PDL::mtan {
 	if (@dims == 3){
 		$id = PDL::zeroes $m;
 		$id->slice('(0),:,:')->diagonal(0,1) .= 1;
-		$m = mexp(-2*i*$m);
-		return scalar msolvex( ($id + $m ),( (- i) * ($id - $m)),equilibrate=>1);
+		$m = mexp(-2*PDL::Complex::i()*$m);
+		return scalar msolvex( ($id + $m ),( (- PDL::Complex::i()) * ($id - $m)),equilibrate=>1);
 	}
 	else{
-		$m = mexp(i * $m);
+		$m = mexp(PDL::Complex::i() * $m);
 		return scalar $m->re->msolvex($m->im,equilibrate=>1);
 	}
 }
@@ -723,7 +722,7 @@ sub PDL::matan {
 	my ($id, $ret);
 	$id = PDL::zeroes($m)->r2C;
 	$id->re->diagonal(0,1) .= 1;
-	$ret = - i/2 * mlog( scalar PDL::msolvex( ($id - i*$m) ,($id + i*$m),equilibrate=>1 ));
+	$ret = - PDL::Complex::i()/2 * mlog( scalar PDL::msolvex( ($id - PDL::Complex::i()*$m) ,($id + PDL::Complex::i()*$m),equilibrate=>1 ));
 	return (@dims ==3) ? $ret : toreal($ret, $tol);
 }
 
@@ -754,11 +753,11 @@ sub PDL::mcot {
 	if (@dims == 3){
 		$id = PDL::zeroes $m;
 		$id->slice('(0),:,:')->diagonal(0,1) .= 1;
-		$m = mexp(-2*i*$m);
-		return  scalar msolvex( ($id - $m ),(  i * ($id + $m)),equilibrate=>1);
+		$m = mexp(-2*PDL::Complex::i()*$m);
+		return  scalar msolvex( ($id - $m ),(  PDL::Complex::i() * ($id + $m)),equilibrate=>1);
 	}
 	else{
-		$m = mexp(i * $m);
+		$m = mexp(PDL::Complex::i() * $m);
 		return scalar $m->im->msolvex($m->re,equilibrate=>1);
 	}
 }
@@ -817,7 +816,7 @@ sub PDL::msec {
 	my @dims = $m->dims;
 	barf("msec requires a 2-D square matrix")
 		unless( ((@dims == 2) || (@dims == 3)) && $dims[-1] == $dims[-2] );
-	return (@dims == 3) ? PDL::minv(mexp(i+$m) + mexp(- i*$m)) * 2 : scalar PDL::minv(re(mexp(i*$m)));
+	return (@dims == 3) ? PDL::minv(mexp(PDL::Complex::i()+$m) + mexp(- PDL::Complex::i()*$m)) * 2 : scalar PDL::minv(re(mexp(PDL::Complex::i()*$m)));
 }
 
 =head2 masec
@@ -874,7 +873,7 @@ sub PDL::mcsc {
 	my @dims = $m->dims;
 	barf("mcsc requires a 2-D square matrix")
 		unless( ((@dims == 2) || (@dims == 3)) && $dims[-1] == $dims[-2] );
-	return (@dims == 3) ? PDL::minv(mexp(i*$m) - mexp(- i*$m)) * 2*i : scalar PDL::minv(im(mexp(i*$m)));
+	return (@dims == 3) ? PDL::minv(mexp(PDL::Complex::i()*$m) - mexp(- PDL::Complex::i()*$m)) * 2*PDL::Complex::i() : scalar PDL::minv(im(mexp(PDL::Complex::i()*$m)));
 }
 
 =head2 macsc

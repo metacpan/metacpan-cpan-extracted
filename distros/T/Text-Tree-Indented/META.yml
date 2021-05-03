@@ -1,0 +1,33 @@
+---
+abstract: 'render a tree data structure in the classic indented view'
+author:
+  - 'Neil Bowers <neilb@cpan.org>'
+build_requires:
+  Test::Fatal: '0'
+  Test::More: '0.88'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.017, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Text-Tree-Indented
+requires:
+  Carp: '0'
+  Exporter: '0'
+  Ref::Util: '0.202'
+  parent: '0'
+  perl: '5.010'
+  strict: '0'
+  utf8: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/neilb/Text-Tree-Indented/issues
+  homepage: https://github.com/neilb/Text-Tree-Indented
+  repository: https://github.com/neilb/Text-Tree-Indented.git
+version: '0.01'
+x_generated_by_perl: v5.28.2
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

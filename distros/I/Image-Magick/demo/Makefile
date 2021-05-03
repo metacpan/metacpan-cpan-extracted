@@ -13,5 +13,6 @@ all:
 	perl composite.pl
 
 clean:
-	/bin/rm -f demo.jpg button.gif model.png shadow.gif tree.gif \
-	    compose-specials.jpg  single-pixels.gif  pixel-fx.gif
+	/bin/rm -f demo.jpg annotate.miff button.gif model.png shadow.gif tree.gif \
+	  compose_specials.jpg coposite.miff single-pixels.gif pixel-fx.gif \
+	  piddle.gif

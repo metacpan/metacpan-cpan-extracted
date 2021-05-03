@@ -4,13 +4,13 @@
       "Tom Wyant (wyant at cpan dot org)"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4204",
+   "generated_by" : "ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Win32-Process-Info",
    "no_index" : {
@@ -28,7 +28,7 @@
       },
       "configure" : {
          "requires" : {
-            "Module::Build" : "0.42"
+            "ExtUtils::MakeMaker" : "0"
          }
       },
       "runtime" : {
@@ -42,32 +42,18 @@
          }
       }
    },
-   "provides" : {
-      "Win32::Process::Info" : {
-         "file" : "lib/Win32/Process/Info.pm",
-         "version" : "1.022"
-      },
-      "Win32::Process::Info::NT" : {
-         "file" : "lib/Win32/Process/Info/NT.pm",
-         "version" : "1.022"
-      },
-      "Win32::Process::Info::PT" : {
-         "file" : "lib/Win32/Process/Info/PT.pm",
-         "version" : "1.022"
-      },
-      "Win32::Process::Info::WMI" : {
-         "file" : "lib/Win32/Process/Info/WMI.pm",
-         "version" : "1.022"
-      }
-   },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Win32-Process-Info"
+         "web" : "https://github.com/uperl/Win32-Process-Info/issues"
       },
-      "license" : [
-         "http://dev.perl.org/licenses/"
-      ]
+      "homepage" : "https://metacpan.org/pod/Win32::Process::Info",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/uperl/Win32-Process-Info.git",
+         "web" : "https://github.com/uperl/Win32-Process-Info"
+      }
    },
-   "version" : "1.022"
+   "version" : "1.023",
+   "x_serialization_backend" : "JSON::PP version 4.06"
 }

@@ -30,6 +30,17 @@ like to scan through all possible work (or like to lose yourself), see
 * Videos (screen recordings), articles, talks.
 
 
+## Consistency
+
+* `pointer_eq` vs. `boolean_equal` is probably inconsistent ("equal is
+  always about the content, eq is about pointer identity", fine, but,
+  `eq` is taken, and if you make it long, just use the same naming
+  approach?)
+  
+* `boolean_equal` should be in a `FP::Boolean` library. Speaking of
+  which: what about a real boolean type, so that `equal` will know how
+  to work with them? That would probably go there.
+
 ## Items
 
 This is an unsorted collection of items to work on.
@@ -298,6 +309,14 @@ usefully listed first).
 
 
 ### Other people's code
+
+- change dependency on `Math::BigInt` into a recommendation?
+
+- remove recommendation of `Method::Signatures`, experimental
+  signatures are enough?
+
+- should FunctionalPerl feature tags only import those whose
+  dependencies are satisfied? Probably, to make `fperl` work.
 
 - replace `FP::Lazy` with `Data::Thunk`? This would be cool from a
   transparency stand point, except that separate code by way of

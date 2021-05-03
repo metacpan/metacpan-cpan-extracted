@@ -3,7 +3,7 @@ use 5.008001;
 use strict;
 use warnings;
 
-our $VERSION = "0.12";
+our $VERSION = "0.13";
 
 use Config;
 use English qw( $OSNAME -no_match_vars );
@@ -111,7 +111,7 @@ sub find_openssl_prefix {
     }
 
     # Homebrew (macOS) or LinuxBrew
-    if ($^O ne 'MSWin32' and my $prefix = `brew --prefix openssl 2>@{[File::Spec->devnull]}`) {
+    if ($^O ne 'MSWin32' and my $prefix = `brew --prefix --installed openssl 2>@{[File::Spec->devnull]}`) {
         chomp $prefix;
         return $prefix;
     }

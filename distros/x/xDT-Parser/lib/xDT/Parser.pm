@@ -14,11 +14,11 @@ xDT::Parser - A Parser for xDT files.
 
 =head1 VERSION
 
-Version 1.04
+Version 1.05
 
 =cut
 
-our $VERSION = '1.04';
+our $VERSION = '1.05';
 
 
 =head1 SYNOPSIS
@@ -164,8 +164,8 @@ sub next_object {
     my @records;
 
     while (my $record = $self->_next()) {
-        last if ($record->is_object_end);
         push @records, $record;
+        last if ($record->is_object_end);
     }
 
     return undef unless (scalar @records);

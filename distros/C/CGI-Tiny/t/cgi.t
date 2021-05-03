@@ -18,6 +18,7 @@ my @env_keys = qw(
 
 sub _parse_response {
   my ($response, $nph) = @_;
+  return {} unless length $response;
   my ($headers_str, $body) = split /\r\n\r\n/, $response, 2;
   my (%headers, $start_line, $response_status);
   foreach my $header (split /\r\n/, $headers_str) {
@@ -47,13 +48,14 @@ subtest 'Empty response' => sub {
   cgi {
     $_->set_input_handle($in_fh);
     $_->set_output_handle($out_fh);
-    $_->render;
+    $_->render_chunk;
   };
 
   ok length($out_data), 'response rendered';
   my $response = _parse_response($out_data);
   ok defined($response->{headers}{'content-type'}), 'Content-Type set';
   is $response->{headers}{'content-type'}, 'application/octet-stream', 'right content type';
+  ok !defined($response->{headers}{'content-length'}), 'no Content-Length set';
   like $response->{status}, qr/^200\b/, '200 response status';
   ok defined($response->{headers}{date}), 'Date set';
   ok defined(CGI::Tiny::date_to_epoch $response->{headers}{date}), 'valid HTTP date';
@@ -72,7 +74,6 @@ subtest 'Empty response (fixed length)' => sub {
   cgi {
     $_->set_input_handle($in_fh);
     $_->set_output_handle($out_fh);
-    $_->set_response_fixed_length(1);
     $_->render;
   };
 
@@ -104,10 +105,11 @@ subtest 'No render' => sub {
   };
 
   ok defined($error), 'error logged';
-  is $code, 500, '500 response status code';
+  is $code, 200, 'response status code not set';
   ok length($out_data), 'response rendered';
   my $response = _parse_response($out_data);
   ok defined($response->{headers}{'content-type'}), 'Content-Type set';
+  ok defined($response->{headers}{'content-length'}), 'Content-Length set';
   like $response->{status}, qr/^5[0-9]{2}\b/, '500 response status';
 };
 
@@ -133,6 +135,7 @@ subtest 'No render (custom response status)' => sub {
   ok length($out_data), 'response rendered';
   my $response = _parse_response($out_data);
   ok defined($response->{headers}{'content-type'}), 'Content-Type set';
+  ok defined($response->{headers}{'content-length'}), 'Content-Length set';
   like $response->{status}, qr/^403\b/, '403 response status';
 };
 
@@ -157,6 +160,7 @@ subtest 'No render (object lost)' => sub {
   ok length($out_data), 'response rendered';
   my $response = _parse_response($out_data);
   ok defined($response->{headers}{'content-type'}), 'Content-Type set';
+  ok defined($response->{headers}{'content-length'}), 'Content-Length set';
   like $response->{status}, qr/^5[0-9]{2}\b/, '500 response status';
 };
 
@@ -182,6 +186,7 @@ subtest 'No render (object not destroyed)' => sub {
   ok length($out_data), 'response rendered';
   my $response = _parse_response($out_data);
   ok defined($response->{headers}{'content-type'}), 'Content-Type set';
+  ok defined($response->{headers}{'content-length'}), 'Content-Length set';
   like $response->{status}, qr/^5[0-9]{2}\b/, '500 response status';
 };
 
@@ -216,6 +221,7 @@ subtest 'No render (premature exit)' => sub {
   ok length($out_data), 'response rendered';
   my $response = _parse_response($out_data);
   ok defined($response->{headers}{'content-type'}), 'Content-Type set';
+  ok defined($response->{headers}{'content-length'}), 'Content-Length set';
   like $response->{status}, qr/^5[0-9]{2}\b/, '500 response status';
 };
 
@@ -252,6 +258,53 @@ subtest 'No render (premature exit with persistent object)' => sub {
   ok length($out_data), 'response rendered';
   my $response = _parse_response($out_data);
   ok defined($response->{headers}{'content-type'}), 'Content-Type set';
+  ok defined($response->{headers}{'content-length'}), 'Content-Length set';
+  like $response->{status}, qr/^5[0-9]{2}\b/, '500 response status';
+};
+
+subtest 'No render (premature exit before cgi block)' => sub {
+  my $pid = open my $out_fh, '-|';
+  plan skip_all => "fork failed: $!" unless defined $pid;
+  unless ($pid) {
+    local @ENV{@env_keys} = ('')x@env_keys;
+    local $ENV{PATH_INFO} = '/';
+    local $ENV{REQUEST_METHOD} = 'GET';
+    local $ENV{SCRIPT_NAME} = '/';
+    local $ENV{SERVER_PROTOCOL} = 'HTTP/1.0';
+    CGI::Tiny->import; # init handler
+    $SIG{__WARN__} = sub {}; # suppress stderr in child
+    exit;
+  }
+  my $out_data = do { local $/; readline $out_fh };
+  close $out_fh;
+
+  ok length($out_data), 'response rendered';
+  my $response = _parse_response($out_data);
+  ok defined($response->{headers}{'content-type'}), 'Content-Type set';
+  ok defined($response->{headers}{'content-length'}), 'Content-Length set';
+  like $response->{status}, qr/^5[0-9]{2}\b/, '500 response status';
+};
+
+subtest 'Exception before cgi block' => sub {
+  my $pid = open my $out_fh, '-|';
+  plan skip_all => "fork failed: $!" unless defined $pid;
+  unless ($pid) {
+    local @ENV{@env_keys} = ('')x@env_keys;
+    local $ENV{PATH_INFO} = '/';
+    local $ENV{REQUEST_METHOD} = 'GET';
+    local $ENV{SCRIPT_NAME} = '/';
+    local $ENV{SERVER_PROTOCOL} = 'HTTP/1.0';
+    CGI::Tiny->import; # init handler
+    $SIG{__WARN__} = sub {}; # suppress stderr in child
+    die;
+  }
+  my $out_data = do { local $/; readline $out_fh };
+  close $out_fh;
+
+  ok length($out_data), 'response rendered';
+  my $response = _parse_response($out_data);
+  ok defined($response->{headers}{'content-type'}), 'Content-Type set';
+  ok defined($response->{headers}{'content-length'}), 'Content-Length set';
   like $response->{status}, qr/^5[0-9]{2}\b/, '500 response status';
 };
 
@@ -275,10 +328,11 @@ subtest 'Exception before render' => sub {
   ok defined($error), 'error logged';
   like $error, qr/Error 42/, 'right error';
   ok !$headers_rendered, 'headers were not rendered';
-  is $code, 500, '500 response status code';
+  is $code, 200, 'response status code not set';
   ok length($out_data), 'response rendered';
   my $response = _parse_response($out_data);
   ok defined($response->{headers}{'content-type'}), 'Content-Type set';
+  ok defined($response->{headers}{'content-length'}), 'Content-Length set';
   like $response->{status}, qr/^5[0-9]{2}\b/, '500 response status';
 };
 
@@ -306,6 +360,7 @@ subtest 'Exception after render' => sub {
   ok length($out_data), 'response rendered';
   my $response = _parse_response($out_data);
   ok defined($response->{headers}{'content-type'}), 'Content-Type set';
+  is $response->{headers}{'content-length'}, 0, 'right Content-Length';
   like $response->{status}, qr/^200\b/, '200 response status';
 };
 
@@ -335,6 +390,7 @@ subtest 'Excessive request body' => sub {
   ok length($out_data), 'response rendered';
   my $response = _parse_response($out_data);
   ok defined($response->{headers}{'content-type'}), 'Content-Type set';
+  ok defined($response->{headers}{'content-length'}), 'Content-Length set';
   like $response->{status}, qr/^413\b/, '413 response status';
 };
 
@@ -358,6 +414,7 @@ subtest 'Not found' => sub {
   my $response = _parse_response($out_data);
   ok defined($response->{headers}{'content-type'}), 'Content-Type set';
   like $response->{headers}{'content-type'}, qr/^text\/plain/i, 'right content type';
+  is $response->{headers}{'content-length'}, 0, 'right Content-Length';
   like $response->{status}, qr/^404\b/, '404 response status';
   ok !length($response->{body}), 'empty response body';
 };
@@ -375,7 +432,6 @@ subtest 'Data response (fixed length)' => sub {
   cgi {
     $_->set_input_handle($in_fh);
     $_->set_output_handle($out_fh);
-    $_->set_response_fixed_length(1);
     $_->render(data => $data);
   };
 
@@ -401,14 +457,15 @@ subtest 'Data response (multiple renders)' => sub {
   cgi {
     $_->set_input_handle($in_fh);
     $_->set_output_handle($out_fh);
-    $_->render(data => $data);
-    $_->render(data => $data);
+    $_->render_chunk(data => $data);
+    $_->render_chunk(data => $data);
   };
 
   ok length($out_data), 'response rendered';
   my $response = _parse_response($out_data);
   ok defined($response->{headers}{'content-type'}), 'Content-Type set';
   is $response->{headers}{'content-type'}, 'application/octet-stream', 'right content type';
+  ok !defined($response->{headers}{'content-length'}), 'no Content-Length set';
   like $response->{status}, qr/^200\b/, '200 response status';
   is $response->{body}, $data . $data, 'right response body';
 };
@@ -433,7 +490,6 @@ subtest 'File response' => sub {
   cgi {
     $_->set_input_handle($in_fh);
     $_->set_output_handle($out_fh);
-    $_->set_response_fixed_length(1);
     $_->render(file => $filepath);
   };
 
@@ -475,6 +531,7 @@ subtest 'File response (download)' => sub {
   my $response = _parse_response($out_data);
   ok defined($response->{headers}{'content-type'}), 'Content-Type set';
   is $response->{headers}{'content-type'}, 'application/octet-stream', 'right content type';
+  is $response->{headers}{'content-length'}, length($data), 'right Content-Length';
   is $response->{headers}{'content-disposition'},
     'attachment; filename="\"test?\".dat"; filename*=UTF-8\'\'%22test%E2%98%83%22.dat', 'right content disposition';
   like $response->{status}, qr/^200\b/, '200 response status';
@@ -495,12 +552,13 @@ subtest 'Filehandle response' => sub {
     $_->set_input_handle($in_fh);
     $_->set_output_handle($out_fh);
     open my $fh, '<', \$data or die "Failed to open scalar data handle: $!";
-    $_->render(handle => $fh);
+    $_->render_chunk(handle => $fh);
   };
 
   ok length($out_data), 'response rendered';
   my $response = _parse_response($out_data);
   ok defined($response->{headers}{'content-type'}), 'Content-Type set';
+  ok !defined($response->{headers}{'content-length'}), 'no Content-Length set';
   is $response->{headers}{'content-type'}, 'application/octet-stream', 'right content type';
   like $response->{status}, qr/^200\b/, '200 response status';
   is $response->{body}, $data, 'right response body';
@@ -519,7 +577,6 @@ subtest 'Text response' => sub {
   cgi {
     $_->set_input_handle($in_fh);
     $_->set_output_handle($out_fh);
-    $_->set_response_fixed_length(1);
     $_->render(text => $text);
   };
 
@@ -546,13 +603,14 @@ subtest 'Text response (UTF-16LE)' => sub {
     $_->set_input_handle($in_fh);
     $_->set_output_handle($out_fh);
     $_->set_response_charset('UTF-16LE');
-    $_->render(text => $text);
+    $_->render_chunk(text => $text);
   };
 
   ok length($out_data), 'response rendered';
   my $response = _parse_response($out_data);
   ok defined($response->{headers}{'content-type'}), 'Content-Type set';
   like $response->{headers}{'content-type'}, qr/^text\/plain.*UTF-16LE/i, 'right content type';
+  ok !defined($response->{headers}{'content-length'}), 'no Content-Length set';
   like $response->{status}, qr/^200\b/, '200 response status';
   is decode('UTF-16LE', $response->{body}), $text, 'right response body';
 };
@@ -570,7 +628,6 @@ subtest 'HTML response' => sub {
   cgi {
     $_->set_input_handle($in_fh);
     $_->set_output_handle($out_fh);
-    $_->set_response_fixed_length(1);
     $_->render(html => $html);
   };
 
@@ -597,14 +654,15 @@ subtest 'HTML response (multiple renders)' => sub {
   cgi {
     $_->set_input_handle($in_fh);
     $_->set_output_handle($out_fh);
-    $_->render(html => $html1);
-    $_->render(html => $html2);
+    $_->render_chunk(html => $html1);
+    $_->render_chunk(html => $html2);
   };
 
   ok length($out_data), 'response rendered';
   my $response = _parse_response($out_data);
   ok defined($response->{headers}{'content-type'}), 'Content-Type set';
   like $response->{headers}{'content-type'}, qr/^text\/html.*UTF-8/i, 'right content type';
+  ok !defined($response->{headers}{'content-length'}), 'no Content-Length set';
   like $response->{status}, qr/^200\b/, '200 response status';
   is decode('UTF-8', $response->{body}), $html1 . $html2, 'right response body';
 };
@@ -676,6 +734,7 @@ subtest 'Redirect response' => sub {
   ok length($out_data), 'response rendered';
   my $response = _parse_response($out_data);
   ok !defined($response->{headers}{'content-type'}), 'Content-Type not set';
+  is $response->{headers}{'content-length'}, 0, 'right Content-Length';
   is $response->{headers}{location}, $url, 'Location set';
   like $response->{status}, qr/^302\b/, '302 response status';
   ok defined($response->{headers}{date}), 'Date set';
@@ -1278,7 +1337,7 @@ subtest 'NPH response' => sub {
   cgi {
     $_->set_input_handle($in_fh);
     $_->set_output_handle($out_fh);
-    $_->set_nph(1);
+    $_->set_nph;
     $_->render;
   };
 

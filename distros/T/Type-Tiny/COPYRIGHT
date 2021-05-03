@@ -351,14 +351,6 @@ Files: examples/benchmarking/benchmark-constraints.pl
 Copyright: Copyright 2017 Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
-Files: lib/Types/Standard/CycleTuple.pm
- t/20-unit/Type-Tiny-_HalfOp/double-union.t
- t/20-unit/Type-Tiny/constraint-strings.t
- t/20-unit/Types-Standard/cycletuple.t
- t/40-regression/gh14.t
-Copyright: This software is copyright (c) 2017-2021 by Toby Inkster.
-License: GPL-1.0+ or Artistic-1.0
-
 Files: t/40-regression/rt92571-2.t
  t/40-regression/rt92571.t
  t/40-regression/rt92591.t
@@ -367,11 +359,12 @@ Files: t/40-regression/rt92571-2.t
 Copyright: This software is copyright (c) 2014, 2017-2021 by Diab Jerius.
 License: GPL-1.0+ or Artistic-1.0
 
-Files: t/20-unit/Types-Common-Numeric/basic.t
- t/20-unit/Types-Common-String/basic.t
- t/20-unit/Types-Common-String/coerce.t
- t/20-unit/Types-Common-String/unicode.t
-Copyright: This software is copyright (c) 2013-2014, 2017-2021 by Matt S Trout - mst (at) shadowcatsystems.co.uk (L<http://www.shadowcatsystems.co.uk/>).
+Files: lib/Types/Standard/CycleTuple.pm
+ t/20-unit/Type-Tiny-_HalfOp/double-union.t
+ t/20-unit/Type-Tiny/constraint-strings.t
+ t/20-unit/Types-Standard/cycletuple.t
+ t/40-regression/gh14.t
+Copyright: This software is copyright (c) 2017-2021 by Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
 Files: lib/Type/Tiny/_HalfOp.pm
@@ -381,20 +374,17 @@ Files: lib/Type/Tiny/_HalfOp.pm
 Copyright: This software is copyright (c) 2014, 2017-2021 by Graham Knop.
 License: GPL-1.0+ or Artistic-1.0
 
+Files: t/20-unit/Types-Common-Numeric/basic.t
+ t/20-unit/Types-Common-String/basic.t
+ t/20-unit/Types-Common-String/coerce.t
+ t/20-unit/Types-Common-String/unicode.t
+Copyright: This software is copyright (c) 2013-2014, 2017-2021 by Matt S Trout - mst (at) shadowcatsystems.co.uk (L<http://www.shadowcatsystems.co.uk/>).
+License: GPL-1.0+ or Artistic-1.0
+
 Files: t/40-regression/rt85911.t
  t/40-regression/rt86004.t
  t/40-regression/rt90096-2.t
 Copyright: This software is copyright (c) 2013-2014, 2017-2021 by Diab Jerius.
-License: GPL-1.0+ or Artistic-1.0
-
-Files: COPYRIGHT
- SIGNATURE
-Copyright: None
-License: public-domain
-
-Files: t/40-regression/rt86233.t
- t/40-regression/rt86239.t
-Copyright: This software is copyright (c) 2013-2014, 2017-2021 by Vyacheslav Matyukhin.
 License: GPL-1.0+ or Artistic-1.0
 
 Files: NEWS
@@ -407,61 +397,46 @@ Files: inc/archaic/Test/More.pm
 Copyright: Copyright 2001-2008 by Michael G Schwern <schwern@pobox.com>.
 License: GPL-1.0+ or Artistic-1.0
 
-Files: CONTRIBUTING
-Copyright: Copyright 2019 Toby Inkster.
-License: GPL-1.0+ or Artistic-1.0
+Files: COPYRIGHT
+ SIGNATURE
+Copyright: None
+License: public-domain
 
-Files: t/40-regression/ttxs-gh1.t
-Copyright: This software is copyright (c) 2014, 2017-2021 by Jed Lund.
-License: GPL-1.0+ or Artistic-1.0
-
-Files: t/40-regression/rt133141.t
-Copyright: This software is copyright (c) 2020-2021 by Andrew Ruder.
-License: GPL-1.0+ or Artistic-1.0
-
-Files: inc/archaic/Test/Builder/Module.pm
-Copyright: Copyright 2011 Chromatic.
-License: GPL-1.0+ or Artistic-1.0
-
-Files: t/20-unit/Type-Params/multisig-custom-message.t
-Copyright: This software is copyright (c) 2018-2021 by Benct Philip Jonsson.
-License: GPL-1.0+ or Artistic-1.0
-
-Files: inc/archaic/Test/Builder/IO/Scalar.pm
-Copyright: Copyright (c) 1996 by Eryq.  All rights reserved.
- Copyright (c) 1999,2001 by ZeeGee Software Inc.  All rights reserved.
-License: GPL-1.0+ or Artistic-1.0
-
-Files: examples/benchmarking/benchmark-coercions.pl
-Copyright: This software is copyright (c) 2013-2014, 2017 by Toby Inkster.
-License: GPL-1.0+ or Artistic-1.0
-
-Files: examples/benchmarking/benchmark-param-validation.pl
-Copyright: Copyright 2018 Toby Inkster.
-License: GPL-1.0+ or Artistic-1.0
-
-Files: t/40-regression/gh1.t
-Copyright: This software is copyright (c) 2013-2014, 2017-2021 by Richard SimÃµes.
-License: GPL-1.0+ or Artistic-1.0
-
-Files: dist.ini
-Copyright: Copyright 2014 Toby Inkster.
+Files: t/40-regression/rt86233.t
+ t/40-regression/rt86239.t
+Copyright: This software is copyright (c) 2013-2014, 2017-2021 by Vyacheslav Matyukhin.
 License: GPL-1.0+ or Artistic-1.0
 
 Files: t/40-regression/rt90096.t
 Copyright: This software is copyright (c) 2013-2014, 2017-2021 by Samuel Kaufman.
 License: GPL-1.0+ or Artistic-1.0
 
-Files: inc/archaic/Test/Builder/Tester.pm
-Copyright: Copyright 2011 Richard Clamp.
+Files: t/30-integration/Class-InsideOut/basic.t
+Copyright: This software is copyright (c) 2013-2014, 2017-2021 by David Golden, Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: t/20-unit/Type-Tiny-_HalfOp/extra-params.t
+Copyright: This software is copyright (c) 2020-2021 by Graham Knop.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: CONTRIBUTING
+Copyright: Copyright 2019 Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: inc/archaic/Test/Builder/Module.pm
+Copyright: Copyright 2011 Chromatic.
 License: GPL-1.0+ or Artistic-1.0
 
 Files: inc/archaic/Test/Builder/Tester/Color.pm
 Copyright: Copyright 2011 Mark Fowler.
 License: GPL-1.0+ or Artistic-1.0
 
-Files: t/30-integration/MooseX-Getopt/coercion.t
-Copyright: This software is copyright (c) 2014, 2017-2021 by Alexander Hartmaier.
+Files: t/99-moose-std-types-test.t
+Copyright: This software is copyright (c) 2013-2014, 2017-2021 by Infinity Interactive, Inc..
+License: GPL-1.0+ or Artistic-1.0
+
+Files: inc/Try/Tiny.pm
+Copyright: Copyright 2014 Yuval Kogman.
 License: GPL-1.0+ or Artistic-1.0
 
 Files: inc/Test/Fatal.pm
@@ -472,6 +447,43 @@ Files: inc/archaic/Test/Builder.pm
 Copyright: Copyright 2002-2008 by chromatic <chromatic@wgz.org> and.
 License: GPL-1.0+ or Artistic-1.0
 
+Files: t/40-regression/rt133141.t
+Copyright: This software is copyright (c) 2020-2021 by Andrew Ruder.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: inc/Test/Requires.pm
+Copyright: Copyright 2019 MATSUNO Tokuhiro.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: examples/benchmarking/benchmark-param-validation.pl
+Copyright: Copyright 2018 Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: dist.ini
+Copyright: Copyright 2014 Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: t/40-regression/gh1.t
+Copyright: This software is copyright (c) 2013-2014, 2017-2021 by Richard SimÃµes.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: t/30-integration/MooseX-Getopt/coercion.t
+Copyright: This software is copyright (c) 2014, 2017-2021 by Alexander Hartmaier.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: inc/archaic/Test/Builder/Tester.pm
+Copyright: Copyright 2011 Richard Clamp.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: examples/benchmarking/benchmark-coercions.pl
+Copyright: This software is copyright (c) 2013-2014, 2017 by Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: inc/archaic/Test/Builder/IO/Scalar.pm
+Copyright: Copyright (c) 1996 by Eryq.  All rights reserved.
+ Copyright (c) 1999,2001 by ZeeGee Software Inc.  All rights reserved.
+License: GPL-1.0+ or Artistic-1.0
+
 Files: t/40-regression/rt98113.t
 Copyright: This software is copyright (c) 2014, 2017-2021 by Dagfinn Ilmari MannsÃ¥ker.
 License: GPL-1.0+ or Artistic-1.0
@@ -480,28 +492,16 @@ Files: t/40-regression/rt125765.t
 Copyright: This software is copyright (c) 2018-2021 by KB JÃ¸rgensen.
 License: GPL-1.0+ or Artistic-1.0
 
-Files: t/30-integration/Class-InsideOut/basic.t
-Copyright: This software is copyright (c) 2013-2014, 2017-2021 by David Golden, Toby Inkster.
-License: GPL-1.0+ or Artistic-1.0
-
-Files: inc/Test/Requires.pm
-Copyright: Copyright 2019 MATSUNO Tokuhiro.
-License: GPL-1.0+ or Artistic-1.0
-
-Files: inc/Try/Tiny.pm
-Copyright: Copyright 2014 Yuval Kogman.
-License: GPL-1.0+ or Artistic-1.0
-
-Files: t/20-unit/Type-Tiny-_HalfOp/extra-params.t
-Copyright: This software is copyright (c) 2020-2021 by Graham Knop.
-License: GPL-1.0+ or Artistic-1.0
-
-Files: t/99-moose-std-types-test.t
-Copyright: This software is copyright (c) 2013-2014, 2017-2021 by Infinity Interactive, Inc..
+Files: t/40-regression/ttxs-gh1.t
+Copyright: This software is copyright (c) 2014, 2017-2021 by Jed Lund.
 License: GPL-1.0+ or Artistic-1.0
 
 Files: t/40-regression/rt125132.t
 Copyright: This software is copyright (c) 2018-2021 by Marc Ballarin.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: t/20-unit/Type-Params/multisig-custom-message.t
+Copyright: This software is copyright (c) 2018-2021 by Benct Philip Jonsson.
 License: GPL-1.0+ or Artistic-1.0
 
 License: Artistic-1.0

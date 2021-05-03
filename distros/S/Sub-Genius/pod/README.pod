@@ -1,0 +1,126 @@
+=head1 THIS IS A TEAM SPORT
+
+See L<https://github.com/oodler577/p5-Sub-Genius/milestone/1> for a
+specific list of documentation and example needs if you wish to contribute
+immediately (and I<we> hope you do). Please visit L<CONTRIBUTING> if
+
+All may contribute to this effort. I will help I<save> C<perl>, even if
+this approach is deemed sub-optimal (hmm, might be a good name for a new
+model :-)). In any case, the most important step towards making C<perl>
+perceived as being more relevant is to see how creative we can be with
+it as it stands I<now>. And the more hands on deck, the better.
+
+L<FLAT> was created in 2006 as a homework assignment. It wasn't until
+recently that any practical use for it emerged. Why? People started
+asking hard questions about the nature of Perl (the language) and perl
+(the runtime).
+
+Sub::Genius came about by the following line of questioning:
+
+1. can we make perl I<truly> C<[qw/threaded asynchronouse parallel
+... etc/]>?
+
+A: No, nope, nada, nein! x C<$MANY_YEARS>
+
+...  years of repeated questions, drama, and soul searching
+
+2. (recently) if perl can't be made threaded, what can be done to make
+it easier to expose concurrent semantics to perl programs? What does
+embracing the indisputible serial nature of C<perl> give us?
+
+A: It let us look away from C<perl> and more to C<Perl>; the idea of
+planning the executions in a I<sequentially consistent> way emerged. And
+this is how we are here now.
+
+Eventually, we realized that I<Parallel Regular Expressions> (also,
+directly convertible to PetriNets) could provide some step towards improved,
+albeit I<low level> semantics.
+
+L<Sub::Genius> is not the only approach, but hopefull it'll get the
+cognative I<cogs> turning.
+
+=head1 SUMMARY
+
+L<Sub::Genius> is not itself to be ambitious. It is meant to present a
+light Perl interface that allows for parallel thinking for the sequential
+execution environment that C<perl> presents. There is little interest in
+expanding the expressiveness of parallel semantics that it presents. E.g.,
+there are no plans (nor the need) to look beyond the power of reasoning
+affored by the application Regular Languages.
+
+The following areas are the main targets for future development.
+
+=head1 DOCUMENTATION AND EXAMPLE NEEDS
+
+This is the current focus area. Exploring application areas and open
+questions will naturally genertate code examples and documentation
+artifacts.
+
+See L<https://github.com/oodler577/p5-Sub-Genius/milestone/1> for a
+specific list of documentation and example needs.
+
+=head1 APPLICATION AREAS
+
+This certainly includes using L<Sub::Genius> for cool things, but this
+focus is meant to make this model facilitate a new wave in creative uses
+and approaches for Perl programs.
+
+Applying L<Sub::Genius> to as many uses as possible will expose obvious
+or non-obvious needs, not only in terms of supporting runtime semantics;
+but also in terms of tooling, e.g., L<stubby> and L<fash>.
+
+=head1 ELEPHANT IN THE ROOM - PERFORMANCE
+
+There is one major issue that needs to be addressed for this approach to be
+fully accepted is that the algorithm used to convert the *parallel* regular
+expression into a DFA suitable for generating I<valid> sequential strings
+(e.g., sequentially consistent execution plans) is not efficient. It's
+from 2006 and was done for correctness rather than for performance.
+
+Since then, a number of researchers have published more efficient
+algorithms for directly converting PREs (REs with the I<shuffle> operator)
+into DFAs. It is not even necessary for the DFA to be I<minimal> as the
+documentation in L<FLAT> implies.
+
+This work belongs to L<FLAT>, so the author(s) of that old module will be
+involved in such improvements. If not, then the module can be replaced
+entirely, since the only thing needed from it (really) is the ability to
+parse a PRE, then from the abstract syntax tree (AST) of the PRE, execute
+the algorithm that most efficiently produces a DFA. The DFA is I<simply>
+a graph structure, so with that almost any approach to creating an iterator
+that enumerates paths between the initial state and an acceptance state
+would suffice.
+
+=head1 I<Some> OPEN QUESTIONS
+
+=over 4
+
+=item * Is there a better way to express a I<current> plan for C<perl>
+programs in a more I<perlish> or more natural way? Can a C<plan> be
+generated I<at> run time, rather than being done so up front?
+
+=item * Creating examples and documentation applying Sub::Genius to
+implement different memory models, which is now a little more easily
+possible. (e.g., SMP, futures, etc).
+
+=item * How can Perl libraries (modules) be composed to provide even
+more unobtrusive access to these memory models and concurrent programming
+paradigms?
+
+=item * How can the uniprocess C<perl> runtime be used even more effectively
+and creatively?  E.g., subroutines can be given persistent state that
+remains between calls using the C<state> variable. This presents a
+programming model that naturally admits the use of co-routines.
+
+=item * What does it look like when one introduces actual C<perl> C<fork>ing
+to a program that is expressed in using L<Sub::Genius> facilities?
+
+=item * Are there fundamental capabilities the C<perl> runtime can provide
+to make the model presented by L<Sub::Genius>? For example, TEODESIAN
+@cpan has suggested a very interesting idea that C<perl> should support a
+I<finite automata> engine, which would serve exactly the purpose L<FLAT>
+provides for Sub::Genius.
+
+=item * What other questions are there?
+
+=back

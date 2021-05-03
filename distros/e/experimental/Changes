@@ -1,5 +1,8 @@
 Revision history for experimental
 
+0.024     2021-05-01 19:44:14+02:00 Europe/Amsterdam
+          - Rereleased without NYTProf files
+
 0.023     2021-04-30 19:35:09+02:00 Europe/Amsterdam
           - Added try feature
 

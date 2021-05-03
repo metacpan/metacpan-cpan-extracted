@@ -202,4 +202,25 @@ for my $enc (@enclist) {
   is($decoded, "Hello!");
 }
 
+{ # https://github.com/DCIT/perl-Crypt-JWT/issues/31
+  # verify_xxx options do not work with decode_payload=0
+  my $h = { hello => 'world' };
+  my $token = encode_jwt(key=>\$rsaPriv, payload=>$h, alg=>'RS256', relative_exp => 1000);
+  ok($token);
+  ok( decode_jwt(key=>\$rsaPub, token=>$token) );
+  ok( decode_jwt(key=>\$rsaPub, token=>$token, verify_exp=>1, decode_payload=>undef) );
+  ok( decode_jwt(key=>\$rsaPub, token=>$token, verify_exp=>1, decode_payload=>1) );
+  ok( decode_jwt(key=>\$rsaPub, token=>$token, verify_exp=>0, decode_payload=>1) );
+  ok( decode_jwt(key=>\$rsaPub, token=>$token, verify_exp=>0, decode_payload=>0) );
+  ok( !eval { decode_jwt(key=>\$rsaPub, token=>$token, verify_exp=>1, decode_payload=>0) } );
+  my $tokenex = encode_jwt(key=>\$rsaPriv, payload=>$h, alg=>'RS256', relative_exp => -1000);
+  ok($tokenex);
+  ok( !eval { decode_jwt(key=>\$rsaPub, token=>$tokenex) } );
+  ok( !eval { decode_jwt(key=>\$rsaPub, token=>$tokenex, verify_exp=>1, decode_payload=>undef) } );
+  ok( !eval { decode_jwt(key=>\$rsaPub, token=>$tokenex, verify_exp=>1, decode_payload=>1) } );
+  ok( decode_jwt(key=>\$rsaPub, token=>$tokenex, verify_exp=>0, decode_payload=>1) );
+  ok( decode_jwt(key=>\$rsaPub, token=>$tokenex, verify_exp=>0, decode_payload=>0) );
+  ok( !eval { decode_jwt(key=>\$rsaPub, token=>$tokenex, verify_exp=>1, decode_payload=>0) } );
+}
+
 done_testing;

@@ -7,7 +7,7 @@ use warnings;
 use autodie;
 use namespace::autoclean;
 
-our $VERSION = '1.18';
+our $VERSION = '1.19';
 
 use Path::Tiny qw( path );
 use Path::Tiny::Rule;
@@ -242,7 +242,7 @@ Dist::Zilla::Plugin::DROLSKY::Precious - Creates a default precious.toml file if
 
 =head1 VERSION
 
-version 1.18
+version 1.19
 
 =for Pod::Coverage .*
 

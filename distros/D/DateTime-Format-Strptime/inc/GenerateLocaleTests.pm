@@ -251,8 +251,8 @@ sub gather_files {
     for my $code ( DateTime::Locale->codes ) {
         my $filename
             = $non_author{$code}
-            ? "t/locale-$code.t"
-            : "xt/author/locale-$code.t";
+            ? "t/generated-locale-$code.t"
+            : "xt/author/generated-locale-$code.t";
 
         $self->add_file(
             Dist::Zilla::File::InMemory->new(

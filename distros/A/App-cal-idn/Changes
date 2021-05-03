@@ -1,0 +1,114 @@
+0.134   2021-01-23  Released-By: PERLANCAR; Urgency: medium
+
+	- Rename module/dist from App::CalId to App::cal::idn (I know I renamed
+	  this from App::cal::id to App::CalId in , but the lowercase version is
+	  prettier anyway).
+
+        - Rename script cal-id -> cal-idn to avoid ambiguity of 'id'.
+
+
+0.133   2021-01-13  Released-By: PERLANCAR; Urgency: low
+
+	- No functional changes.
+
+	- [doc] Mention dateseq-id.
+
+
+0.132   2021-01-13  Released-By: PERLANCAR; Urgency: low
+
+	- No functional changes.
+
+	- [doc] Mention cal in See Also.
+
+
+0.131   2021-01-13  Released-By: PERLANCAR; Urgency: medium
+
+	- [ux] Bail out if CLI option parsing fails.
+
+
+0.130   2019-03-26  Released-By: PERLANCAR
+
+	- [build] Remove use of DZP:Rinci::Validate [ref: RT#128914].
+
+
+0.12    2017-03-21  Released-By: PERLANCAR
+
+        - No functional changes.
+
+        - [build] Rebuild to remove unneeded dependency on Perl::osnames.
+
+
+0.11    2015-12-17  Released-By: PERLANCAR
+
+	- No functional changes.
+
+	- [build] Re-build with updated Perinci::To::POD (0.70) which fixes
+          rendering of modules' POD with regard to result_naked=1/args_as !=
+          'hash'.
+
+
+0.10    2015-08-18  Released-By: PERLANCAR
+
+	- No functional changes.
+
+	- [dist] Move spec prereqs from RuntimeRequires to
+	  DevelopRecommends to reduce deps but still allow indicating spec
+	  requirement.
+
+
+0.09    2014-09-06  Released-By: PERLANCAR
+
+	- No functional changes.
+
+	- D'oh, previous change not yet done.
+
+
+0.08    2014-09-06  Released-By: PERLANCAR
+
+	- Adjust to Perinci::Sub::Wrapper 0.62
+	  (_perinci.sub.wrapper.validate_args is now renamed).
+
+
+0.07    2014-06-19  Released-By: SHARYANTO
+
+        - No functional changes.
+
+        - Rename dist from App-cal-id to App-CalId to follow my convention as
+          follow: "For app dist, if binary name is a single word (e.g. foo) then
+          module name is App::foo and dist name App-foo. If binary is a multiple
+          word (e.g. foo-bar-baz) or there are multiple binaries, then module
+          name becomes camel case App::FooBarBaz and dist App-FooBarBaz."
+
+
+0.06    2014-05-26  Released-By: SHARYANTO
+
+        - No functional changes.
+
+        - App 'use experimental smartmatch' for perl 5.18+.
+
+
+0.05    2013-10-31  Released-By: SHARYANTO
+
+        - Add option 'time_zone' and defaults to $ENV{TZ}.
+
+
+0.04    2013-10-05  Released-By: SHARYANTO
+
+        - Add option --show-joint-leave.
+
+
+0.03    2013-04-03  Released-By: SHARYANTO
+
+        - No functional changes. Some display tweaks (short day of week names,
+          not showing prev/next month's days if we are showing more than one
+          month of calendar).
+
+
+0.02    2013-04-03  Released-By: SHARYANTO
+
+        - Add options: -1, -3, -y, -h, -L.
+
+
+0.01    2013-04-03  Released-By: SHARYANTO
+
+        - First release.

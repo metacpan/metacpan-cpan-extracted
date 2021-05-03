@@ -1,5 +1,5 @@
 package Box::Calc::Role::Dimensional;
-$Box::Calc::Role::Dimensional::VERSION = '1.0205';
+$Box::Calc::Role::Dimensional::VERSION = '1.0206';
 use strict;
 use warnings;
 use Moose::Role;
@@ -11,7 +11,7 @@ Box::Calc::Role::Dimensional - Role to add standard dimensions to objects.
 
 =head1 VERSION
 
-version 1.0205
+version 1.0206
 
 =head2 SYNOPSIS
 

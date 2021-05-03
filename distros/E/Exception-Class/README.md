@@ -4,7 +4,7 @@ Exception::Class - A module that allows you to declare real exception classes in
 
 # VERSION
 
-version 1.44
+version 1.45
 
 # SYNOPSIS
 
@@ -66,14 +66,14 @@ version 1.44
 [Moo](https://metacpan.org/pod/Moo) I highly recommend using [Throwable](https://metacpan.org/pod/Throwable) instead of this module.
 
 **RECOMMENDATION 2**: Whether or not you use [Throwable](https://metacpan.org/pod/Throwable), you should use
-[Try::Tiny](https://metacpan.org/pod/Try::Tiny).
+[Try::Tiny](https://metacpan.org/pod/Try%3A%3ATiny).
 
-Exception::Class allows you to declare exception hierarchies in your modules
-in a "Java-esque" manner.
+Exception::Class allows you to declare exception hierarchies in your modules in
+a "Java-esque" manner.
 
 It features a simple interface allowing programmers to 'declare' exception
 classes at compile time. It also has a base exception class,
-[Exception::Class::Base](https://metacpan.org/pod/Exception::Class::Base), that can be easily extended.
+[Exception::Class::Base](https://metacpan.org/pod/Exception%3A%3AClass%3A%3ABase), that can be easily extended.
 
 It is designed to make structured exception handling simpler and better by
 encouraging people to use hierarchies of exceptions in their applications, as
@@ -83,14 +83,14 @@ This module does not implement any try/catch syntax. Please see the "OTHER
 EXCEPTION MODULES (try/catch syntax)" section for more information on how to
 get this syntax.
 
-You will also want to look at the documentation for [Exception::Class::Base](https://metacpan.org/pod/Exception::Class::Base),
+You will also want to look at the documentation for [Exception::Class::Base](https://metacpan.org/pod/Exception%3A%3AClass%3A%3ABase),
 which is the default base class for all exception objects created by this
 module.
 
 # DECLARING EXCEPTION CLASSES
 
 Importing `Exception::Class` allows you to automagically create
-[Exception::Class::Base](https://metacpan.org/pod/Exception::Class::Base) subclasses. You can also create subclasses via the
+[Exception::Class::Base](https://metacpan.org/pod/Exception%3A%3AClass%3A%3ABase) subclasses. You can also create subclasses via the
 traditional means of defining your own subclass with `@ISA`.  These two
 methods may be easily combined, so that you could subclass an exception class
 defined via the automagic import, if you desired this.
@@ -103,12 +103,11 @@ The hashref may contain the following options:
 
 - isa
 
-    This is the class's parent class. If this isn't provided then the class name
-    in `$Exception::Class::BASE_EXC_CLASS` is assumed to be the parent (see
-    below).
+    This is the class's parent class. If this isn't provided then the class name in
+    `$Exception::Class::BASE_EXC_CLASS` is assumed to be the parent (see below).
 
-    This parameter lets you create arbitrarily deep class hierarchies.  This can
-    be any other [Exception::Class::Base](https://metacpan.org/pod/Exception::Class::Base) subclass in your declaration _or_ a
+    This parameter lets you create arbitrarily deep class hierarchies.  This can be
+    any other [Exception::Class::Base](https://metacpan.org/pod/Exception%3A%3AClass%3A%3ABase) subclass in your declaration _or_ a
     subclass loaded from a module.
 
     To change the default exception class you will need to change the value of
@@ -119,20 +118,25 @@ The hashref may contain the following options:
 
     If anyone can come up with a more elegant way to do this please let me know.
 
-    CAVEAT: If you want to automagically subclass an [Exception::Class::Base](https://metacpan.org/pod/Exception::Class::Base)
+    CAVEAT: If you want to automagically subclass an [Exception::Class::Base](https://metacpan.org/pod/Exception%3A%3AClass%3A%3ABase)
     subclass loaded from a file, then you _must_ compile the class (via use or
-    require or some other magic) _before_ you import `Exception::Class` or
-    you'll get a compile time error.
+    require or some other magic) _before_ you import `Exception::Class` or you'll
+    get a compile time error.
 
 - fields
 
     This allows you to define additional attributes for your exception class. Any
     field you define can be passed to the `throw` or `new` methods as additional
-    parameters for the constructor. In addition, your exception object will have
-    an accessor method for the fields you define.
+    parameters for the constructor. In addition, your exception object will have an
+    accessor method for the fields you define.
 
     This parameter can be either a scalar (for a single field) or an array
     reference if you need to define multiple fields.
+
+    Each field name must be a legal Perl identifier: it starts with a ASCII letter
+    or underscore, and is followed by zero or more ASCII letters, ASCII digits, or
+    underscores. If a field name does not match this, the creation of that
+    exception class croaks.
 
     Fields will be inherited by subclasses.
 
@@ -144,26 +148,26 @@ The hashref may contain the following options:
 
     Besides convenience, using aliases also allows for additional compile time
     checking. If the alias is called _without parentheses_, as in `throw_fields
-    "an error occurred"`, then Perl checks for the existence of the
-    `throw_fields` subroutine at compile time. If instead you do `ExceptionWithFields->throw(...)`, then Perl checks the class name at
-    runtime, meaning that typos may sneak through.
+    "an error occurred"`, then Perl checks for the existence of the `throw_fields`
+    subroutine at compile time. If instead you do `ExceptionWithFields->throw(...)`, then Perl checks the class name at runtime,
+    meaning that typos may sneak through.
 
 - description
 
-    Each exception class has a description method that returns a fixed
-    string. This should describe the exception _class_ (as opposed to any
-    particular exception object). This may be useful for debugging if you start
-    catching exceptions you weren't expecting (particularly if someone forgot to
-    document them) and you don't understand the error messages.
+    Each exception class has a description method that returns a fixed string. This
+    should describe the exception _class_ (as opposed to any particular exception
+    object). This may be useful for debugging if you start catching exceptions you
+    weren't expecting (particularly if someone forgot to document them) and you
+    don't understand the error messages.
 
-The `Exception::Class` magic attempts to detect circular class hierarchies
-and will die if it finds one. It also detects missing links in a chain, for
-example if you declare Bar to be a subclass of Foo and never declare Foo.
+The `Exception::Class` magic attempts to detect circular class hierarchies and
+will die if it finds one. It also detects missing links in a chain, for example
+if you declare Bar to be a subclass of Foo and never declare Foo.
 
-# [Try::Tiny](https://metacpan.org/pod/Try::Tiny)
+# [Try::Tiny](https://metacpan.org/pod/Try%3A%3ATiny)
 
 If you are interested in adding try/catch/finally syntactic sugar to your code
-then I recommend you check out [Try::Tiny](https://metacpan.org/pod/Try::Tiny). This is a great module that helps
+then I recommend you check out [Try::Tiny](https://metacpan.org/pod/Try%3A%3ATiny). This is a great module that helps
 you ignore some of the weirdness with `eval` and `$@`. Here's an example of
 how the two modules work together:
 
@@ -183,9 +187,9 @@ how the two modules work together:
         }
     };
 
-Note that you **cannot** use `Exception::Class->caught` with [Try::Tiny](https://metacpan.org/pod/Try::Tiny).
+Note that you **cannot** use `Exception::Class->caught` with [Try::Tiny](https://metacpan.org/pod/Try%3A%3ATiny).
 
-# Catching Exceptions Without [Try::Tiny](https://metacpan.org/pod/Try::Tiny)
+# Catching Exceptions Without [Try::Tiny](https://metacpan.org/pod/Try%3A%3ATiny)
 
 `Exception::Class` provides some syntactic sugar for catching exceptions in a
 safe manner:
@@ -198,8 +202,8 @@ safe manner:
     }
 
 The `caught` method takes a class name and returns an exception object if the
-last thrown exception is of the given class, or a subclass of that class. If
-it is not given any arguments, it simply returns `$@`.
+last thrown exception is of the given class, or a subclass of that class. If it
+is not given any arguments, it simply returns `$@`.
 
 You should **always** make a copy of the exception object, rather than using
 `$@` directly. This is necessary because if your `cleanup` function uses
@@ -259,23 +263,23 @@ This might look something like this:
         ...
     );
 
-You may want to create a real module to subclass [Exception::Class::Base](https://metacpan.org/pod/Exception::Class::Base) as
+You may want to create a real module to subclass [Exception::Class::Base](https://metacpan.org/pod/Exception%3A%3AClass%3A%3ABase) as
 well, particularly if you want your exceptions to have more methods.
 
 ## Subclassing Exception::Class::Base
 
 As part of your usage of `Exception::Class`, you may want to create your own
-base exception class which subclasses [Exception::Class::Base](https://metacpan.org/pod/Exception::Class::Base). You should
-feel free to subclass any of the methods documented above. For example, you
-may want to subclass `new` to add additional information to your exception
+base exception class which subclasses [Exception::Class::Base](https://metacpan.org/pod/Exception%3A%3AClass%3A%3ABase). You should
+feel free to subclass any of the methods documented above. For example, you may
+want to subclass `new` to add additional information to your exception
 objects.
 
 # Exception::Class FUNCTIONS
 
 The `Exception::Class` method offers one function, `Classes`, which is not
 exported. This method returns a list of the classes that have been created by
-calling the `Exception::Class` `import` method.  Note that this is _all_
-the subclasses that have been created, so it may include subclasses created by
+calling the `Exception::Class` `import` method.  Note that this is _all_ the
+subclasses that have been created, so it may include subclasses created by
 things like CPAN modules, etc. Also note that if you simply define a subclass
 via the normal Perl method of setting `@ISA` or `use base`, then your
 subclass will not be included.
@@ -305,7 +309,7 @@ software much more, unless I get so many donations that I can consider working
 on free software full time (let's all have a chuckle at that together).
 
 To donate, log into PayPal and send money to autarch@urth.org, or use the
-button at [http://www.urth.org/~autarch/fs-donation.html](http://www.urth.org/~autarch/fs-donation.html).
+button at [https://www.urth.org/fs-donation.html](https://www.urth.org/fs-donation.html).
 
 # AUTHOR
 
@@ -314,12 +318,13 @@ Dave Rolsky <autarch@urth.org>
 # CONTRIBUTORS
 
 - Alexander Batyrshin <0x62ash@gmail.com>
+- brian d foy <brian.d.foy@gmail.com>
 - Leon Timmermans <fawaka@gmail.com>
 - Ricardo Signes <rjbs@cpan.org>
 
 # COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Dave Rolsky.
+This software is copyright (c) 2021 by Dave Rolsky.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

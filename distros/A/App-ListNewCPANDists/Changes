@@ -1,3 +1,9 @@
+0.014   2021-05-02  Released-By: PERLANCAR; Urgency: medium
+
+	- Link to latest version instead of first version (suggested by
+	  BKB).
+
+
 0.013   2020-06-13  Released-By: PERLANCAR; Urgency: medium
 
 	- [ux] Some convenience added: --from as alias for --from-time,

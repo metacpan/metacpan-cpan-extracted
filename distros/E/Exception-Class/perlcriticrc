@@ -66,5 +66,8 @@ add_packages = Carp Test::Builder
 # hash and ending up with a missing value or key.
 [-Subroutines::ProhibitExplicitReturnUndef]
 
+# Sometimes I want to write "return unless $x > 4"
+[-ControlStructures::ProhibitNegativeExpressionsInUnlessAndUntilConditions]
+
 [Variables::RequireLocalizedPunctuationVars]
 allow = %INC

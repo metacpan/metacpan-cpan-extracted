@@ -1,5 +1,8 @@
 package Beekeeper::JSONRPC;
 
+use strict;
+use warnings;
+
 our $VERSION = '0.01';
 
 =head1 NAME

@@ -8,7 +8,7 @@ use base 'Tests::Service::Base';
 use Test::More;
 use Time::HiRes 'sleep';
 
-use constant TOUT => 2;
+use constant TOUT => 10;
 
 
 sub start_test_workers : Test(startup => 1) {

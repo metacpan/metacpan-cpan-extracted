@@ -180,7 +180,7 @@ has uid =>
 	required => 0,
 );
 
-our $VERSION = '2.11';
+our $VERSION = '2.12';
 
 # ------------------------------------------------
 
@@ -531,7 +531,7 @@ sub _check4embedded_separator
 
 	my($numeric) = ($lexeme =~ /^(\d+|\d+\.\d*|\.\d+)[;,]/) ? $1 : undef;
 
-	if ($numeric || ($lexeme =~ /^(".*"|[A-Za-z]+)[;,]/s) )
+	if (defined($numeric) || ($lexeme =~ /^(".*"|[A-Za-z]+)[;,]/s) )
 	{
 		my($s)  = $lexeme;
 		$lexeme = $numeric || $1;

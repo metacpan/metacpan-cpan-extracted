@@ -1,3 +1,11 @@
+0.012     2021-05-02 23:28:28 EDT
+  - Remove set_response_fixed_length
+  - render now always sets a Content-Length and can only be called once
+  - Add render_chunk method which can be used instead of render for chunked content
+  - set_nph now sets a true value if called without a value
+  - Gracefully handle premature exit before the cgi block
+  - Exceptions no longer cause the response status to default to 500 unless the error handler doesn't render anything
+
 0.011     2021-04-29 02:12:59 EDT
   - Rename set_response_content_type and set_response_content_disposition to set_response_type and set_response_disposition
   - Add set_response_fixed_length method

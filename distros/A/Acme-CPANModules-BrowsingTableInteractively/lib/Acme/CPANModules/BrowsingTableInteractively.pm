@@ -1,59 +1,75 @@
 package Acme::CPANModules::BrowsingTableInteractively;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-04-25'; # DATE
+our $DATE = '2021-05-01'; # DATE
 our $DIST = 'Acme-CPANModules-BrowsingTableInteractively'; # DIST
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.004'; # VERSION
 
 use strict;
-use Acme::CPANModulesUtil::Misc;
 
-my $text = <<'_';
+our $LIST = {
+    summary => 'Browsing table data interactively',
+    description => <<'_',
 
-The following are some options on CPAN if you have a table data (typically as an
+This list catalogs are some options on CPAN if you have a table data (typically as an
 array of arrayrefs) and want to browse it interactively.
 
-<pm:Tickit::Table::Widget> - this module lets you browse the table in a
-terminal. Using the <pm:Tickit> library, the advantages it's supposed to have is
-mouse support. It's still very basic: you either have to specify each column
-width manually or the width of all columns will be the same. There's no
-horizontal scrolling support or a way to see long text in a column. Not updated
-since 2016.
+_
+    entries => [
+        {
+            module => 'Tickit::Widget::Table',
+            description => <<'_',
 
-<pm:Term::TablePrint> - this module lets you browse the table in a terminal.
-Provides roughly the same features like Tickit::Table::Widget with an extra one:
-you can press Enter on a row to view it as a "card" where each column will be
-displayed vertically, so you can better see a row that has many columns or
-columns with long text.
+This module lets you browse the table in a terminal. Using the <pm:Tickit>
+library, the advantages it's supposed to have is mouse support. It's still very
+basic: you either have to specify each column width manually or the width of all
+columns will be the same. There's no horizontal scrolling support or a way to
+see long text in a column. Not updated since 2016.
 
-Personally, both the above modules are not satisfactory for me. They are not
-that much better than drawing the text table and then filtering the output
+_
+        },
+
+        {
+            module => 'Term::TablePrint',
+            description => <<'_',
+
+This module lets you browse the table in a terminal. Provides roughly the same
+features like Tickit::Widget::Table with an extra one: you can press Enter on a
+row to view it as a "card" where each column will be displayed vertically, so
+you can better see a row that has many columns or columns with long text.
+
+_
+        },
+
+        {
+            module => 'Text::Table::HTML::DataTables',
+            description => <<'_',
+
+Personally, all the terminal modules listed here (<pm:Term::TablePrint> and
+<pm:Tickit::Widget::Table>) are currently not satisfactory for me. They are not
+that much better than drawing the text table (using something like
+<pm:Text::Table::More> or <pm:Text::ANSITable>) and then piping the output
 through a pager like *less*. At least with *less* you can scroll horizontally or
 perform incremental searching (though not interactive filtering of rows).
 
-<pm:Text::Table::HTML::DataTables> - this module bundles the wonderful
-DataTables [1] JavaScript library and lets you see your table in a web browser
-to interact with. I use this method the most often (usually through my CLI
-framework and the option `--format=html+datatables` specified through my CLIs).
-The main advantage is incremental searching/filtering. DataTables also lets you
-hide/show/reorder columns, change the page size, and so on. This is leaps and
-bounds more useful than simply scrolling pages of text provided by
-Tickit::Table::Widget or Term::TablePrint.
+Text::Table::HTML::DataTables bundles the wonderful DataTables [1] JavaScript
+library and lets you see your table in a web browser to interact with. I use
+this method the most often (usually through my CLI framework and the option
+`--format=html+datatables` specified through my CLIs). The main advantage is
+incremental searching/filtering. DataTables also lets you hide/show/reorder
+columns, change the page size, and so on. This is leaps and bounds more useful
+than simply scrolling pages of text provided by Tickit::Widget::Table or
+Term::TablePrint.
 
 [1] <https://datatables.net/>
 
 _
-
-our $LIST = {
-    summary => 'Browsing table interactively',
-    description => $text,
-    tags => ['task'],
+        },
+    ],
 };
 
-Acme::CPANModulesUtil::Misc::populate_entries_from_module_links_in_description;
-
 1;
-# ABSTRACT: Browsing table interactively
+# ABSTRACT: Browsing table data interactively
 
 __END__
 
@@ -63,61 +79,68 @@ __END__
 
 =head1 NAME
 
-Acme::CPANModules::BrowsingTableInteractively - Browsing table interactively
+Acme::CPANModules::BrowsingTableInteractively - Browsing table data interactively
 
 =head1 VERSION
 
-This document describes version 0.002 of Acme::CPANModules::BrowsingTableInteractively (from Perl distribution Acme-CPANModules-BrowsingTableInteractively), released on 2021-04-25.
+This document describes version 0.004 of Acme::CPANModules::BrowsingTableInteractively (from Perl distribution Acme-CPANModules-BrowsingTableInteractively), released on 2021-05-01.
 
 =head1 DESCRIPTION
 
-The following are some options on CPAN if you have a table data (typically as an
+This list catalogs are some options on CPAN if you have a table data (typically as an
 array of arrayrefs) and want to browse it interactively.
 
-L<Tickit::Table::Widget> - this module lets you browse the table in a
-terminal. Using the L<Tickit> library, the advantages it's supposed to have is
-mouse support. It's still very basic: you either have to specify each column
-width manually or the width of all columns will be the same. There's no
-horizontal scrolling support or a way to see long text in a column. Not updated
-since 2016.
-
-L<Term::TablePrint> - this module lets you browse the table in a terminal.
-Provides roughly the same features like Tickit::Table::Widget with an extra one:
-you can press Enter on a row to view it as a "card" where each column will be
-displayed vertically, so you can better see a row that has many columns or
-columns with long text.
-
-Personally, both the above modules are not satisfactory for me. They are not
-that much better than drawing the text table and then filtering the output
-through a pager like I<less>. At least with I<less> you can scroll horizontally or
-perform incremental searching (though not interactive filtering of rows).
-
-L<Text::Table::HTML::DataTables> - this module bundles the wonderful
-DataTables [1] JavaScript library and lets you see your table in a web browser
-to interact with. I use this method the most often (usually through my CLI
-framework and the option C<--format=html+datatables> specified through my CLIs).
-The main advantage is incremental searching/filtering. DataTables also lets you
-hide/show/reorder columns, change the page size, and so on. This is leaps and
-bounds more useful than simply scrolling pages of text provided by
-Tickit::Table::Widget or Term::TablePrint.
-
-[1] L<https://datatables.net/>
-
-=head1 MODULES INCLUDED IN THIS ACME::CPANMODULES MODULE
+=head1 ACME::CPANMODULES ENTRIES
 
 =over
 
-=item * L<Tickit::Table::Widget>
+=item * L<Tickit::Widget::Table>
 
-=item * L<Tickit>
+This module lets you browse the table in a terminal. Using the L<Tickit>
+library, the advantages it's supposed to have is mouse support. It's still very
+basic: you either have to specify each column width manually or the width of all
+columns will be the same. There's no horizontal scrolling support or a way to
+see long text in a column. Not updated since 2016.
+
 
 =item * L<Term::TablePrint>
 
+This module lets you browse the table in a terminal. Provides roughly the same
+features like Tickit::Widget::Table with an extra one: you can press Enter on a
+row to view it as a "card" where each column will be displayed vertically, so
+you can better see a row that has many columns or columns with long text.
+
+
 =item * L<Text::Table::HTML::DataTables>
+
+Personally, all the terminal modules listed here (L<Term::TablePrint> and
+L<Tickit::Widget::Table>) are currently not satisfactory for me. They are not
+that much better than drawing the text table (using something like
+L<Text::Table::More> or L<Text::ANSITable>) and then piping the output
+through a pager like I<less>. At least with I<less> you can scroll horizontally or
+perform incremental searching (though not interactive filtering of rows).
+
+Text::Table::HTML::DataTables bundles the wonderful DataTables [1] JavaScript
+library and lets you see your table in a web browser to interact with. I use
+this method the most often (usually through my CLI framework and the option
+C<--format=html+datatables> specified through my CLIs). The main advantage is
+incremental searching/filtering. DataTables also lets you hide/show/reorder
+columns, change the page size, and so on. This is leaps and bounds more useful
+than simply scrolling pages of text provided by Tickit::Widget::Table or
+Term::TablePrint.
+
+[1] L<https://datatables.net/>
+
 
 =back
 
 =head1 FAQ
+
+=head2 What is an Acme::CPANModules::* module?
+
+An Acme::CPANModules::* module, like this module, contains just a list of module
+names that share a common characteristics. It is a way to categorize modules and
+document CPAN. See L<Acme::CPANModules> for more details.
 
 =head2 What are ways to use this Acme::CPANModules module?
 
@@ -149,7 +172,7 @@ Source repository is at L<https://github.com/perlancar/perl-Acme-CPANModules-Bro
 
 =head1 BUGS
 
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Acme-CPANModules-BrowsingTableInteractively>
+Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-Acme-CPANModules-BrowsingTableInteractively/issues>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired

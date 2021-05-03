@@ -1,0 +1,127 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+use Sub::Genius::Util ();
+use Getopt::Long      ();
+
+my $VERSION = 1.0;
+
+require Data::Dumper;
+
+# maybe switch to App::Cmd later for sub commands,
+# but it's options processing is super tard
+my $subcommand = shift @ARGV;
+
+sub usage {
+    die qq{USAGE:\n   stubby init [-r|--run [once|any|all] -s|--subroutines "sub1 sub2 sub3 ..." > my-script.pl.\n};
+}
+
+# enforce subcommand
+if ( not $subcommand or $subcommand ne q{init} ) {
+    warn qq{'init' subcommand required\n};
+    usage;
+}
+
+my %opts = ( R => q{once} );    # default is 'once', as in C<Sub::Genius::run_once>
+Getopt::Long::GetOptions(
+    \%opts,                     # container for all processed options
+    q/s|subroutines=s/,         # specify name of subroutines; NOT a PRE!
+    q/R|run=s/,                 # specify invocation method: once, any, all, none
+);
+
+# option validation
+if ( not defined $opts{s} ) {
+    warn qq{'--subroutines' is required, two or more subroutine names is recommended\n};
+    usage;
+}
+if ( not grep { /$opts{R}/ } (qw/once any all none/) ) {
+    warn qq{'--run' is required and must be one of 4 values: 'once', 'any', or 'all'\n};
+    usage;
+}
+
+# Code generation support is limited at this time
+print Sub::Genius::Util->subs2perl( q{subs} => [ split( /[\s&|,]/, $opts{s} ) ], q{with-run} => $opts{R} );
+
+exit;
+__END__
+
+=head1 NAME
+
+stubby - commandline tool for dumping stub Perl programs sequentialized using L<Sub::Genius>.
+
+=head1 SYNOPSIS
+
+    $ stubby init [--run [once|any|all]] -s|--subroutines = "sub1 sub2 sub3 ..."
+
+Example,
+
+    $ stubby init --run once --subroutines "init spawn threadsA criticalsectA threadsB criticalsectB combine" > ./spawn-combine.pl
+
+=head1 DESCRIPTION
+
+Commandline tool for generating boilerplate for use with L<Sub::Genius>.
+
+=head2 General Development Workflow
+
+Most will want to use this to start their Perl script or module, the workflow over
+the lifetime of the program might look like this:
+
+=over 4
+
+=item * Dump program using C<stubby>.
+
+=item * Annotate PRE (C<$pre> in generated code) to achieve concurrent semantics (see L<Sub::Genius> for more info).
+
+=item * Implement subroutine bodies that exist, albeit empty of anything meaningful.
+
+=item * C<...>
+
+=item * Profit!
+
+=item * Maintain as any other code in your arsenal.
+
+=back
+
+=head1 OPTIONS
+
+=over 4
+
+=item C<init>
+
+Subcommand, currently only one supported.
+
+=item C<-s|--subroutines>
+
+Specify a space delimited list of subroutine names to generate stubs and a unannotated PRE.
+
+=item C<-R|--run>
+
+Choose invocation method to use in the code. The default is C<once>.
+
+Options include:
+
+C<once> - generates code that invokes C<Sub::Genius::run_once>
+
+C<any>  - generates code that invokes C<Sub::Genius::run_any>
+
+C<all>  - generates code that invokes C<Sub::Genius::run_once>, in a C<do { ... } while ()> loop
+
+=back
+
+=head1 SEE ALSO
+
+L<Sub::Genius>
+
+=head1 BUGS
+
+I<Probably>
+
+=head1 COPYRIGHT AND LICENSE
+
+perl5
+
+=head1 AUTHOR
+
+OODLER 577 E<lt>oodler@cpan.org</gt>
+

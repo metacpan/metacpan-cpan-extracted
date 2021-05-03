@@ -8,6 +8,10 @@ set plugins => from_yaml("@settings");
 
 oai_provider '/oai';
 
+oai_provider '/oai_override',
+    adminEmail    => 'override_my_mail@example.com',
+    deletedRecord => "transient";
+
 1;
 
 __DATA__

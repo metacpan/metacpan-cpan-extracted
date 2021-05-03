@@ -1,0 +1,10 @@
+Revision history for Parse-Lnk
+
+0.02    2021-05-01
+        First version, released on an unsuspecting world.
+0.04    2021-05-01
+        Now rounding time values to exatly 3 decimal points, after noticing
+            failures/differences in some systems while running tests.
+        Improved documentation.
+0.06    2021-05-02
+        Added missing information in the ACKNOWLEDGEMENTS section of POD.

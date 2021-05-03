@@ -11,11 +11,13 @@ MANIFEST			This list of files
 MANIFEST.SKIP
 README
 t/doubled-path-commands.t
+t/eaa.t
 t/gorlov-checks.t
 t/Image-SVG-Path.t
 t/multiple-subpaths-absolute.t
 t/number-paths.t
 t/regex-export.t
 t/svg-signs.t
+t/zmz.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)
