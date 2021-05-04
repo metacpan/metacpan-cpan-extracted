@@ -10,18 +10,24 @@ use Dancer::Test;
 use lib 't/lib';
 use TestApp;
 
-response_status_is [ GET => '/sru' ], 200, "response for GET /sru is 200";
-
-response_status_isnt [ GET => '/sru' ], 404,
-    "response for GET /sru is not a 404";
-
 my $res;
-$res = dancer_response( "GET", '/sru',
-    { params => { operation => "searchRetrieve"} } );
-like $res->{content}, qr/searchRetrieveResponse/, "Response ok";
+foreach my $sru_route (qw(/sru /sru_override)) {
+    response_status_is [ GET => $sru_route ], 200, "response for GET $sru_route is 200";
 
-$res = dancer_response( "GET", '/sru',
+    response_status_isnt [ GET => $sru_route ], 404,
+        "response for GET $sru_route is not a 404";
+
+    $res = dancer_response( "GET", $sru_route,
+        { params => { operation => "searchRetrieve"} } );
+    like $res->{content}, qr/searchRetrieveResponse/, "Response ok for $sru_route";
+
+    $res = dancer_response( "GET", $sru_route,
+        { params => { operation => "explain" } } );
+    like $res->{content}, qr/configInfo/, "Explain ok for $sru_route";
+}
+
+$res = dancer_response( "GET", "/sru_override",
     { params => { operation => "explain" } } );
-like $res->{content}, qr/configInfo/, "Explain ok";
+like $res->{content}, qr/<default type=\"numberOfRecords\">50<\/default>/, "Overriden value ok";
 
-done_testing 4;
+done_testing;

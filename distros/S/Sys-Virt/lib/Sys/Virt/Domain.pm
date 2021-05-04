@@ -3097,7 +3097,12 @@ Allocation is preferred from the masked nodes
 
 =item Sys::Virt::Domain::NUMATUNE_MEM_INTERLEAVE
 
-Allocation is interleaved across all masked nods
+Allocation is interleaved across all masked nodes
+
+=item Sys::Virt::Domain::NUMATUNE_MEM_RESTRICTIVE
+
+Allocation is determined by the host using the masked
+nodes.
 
 =back
 

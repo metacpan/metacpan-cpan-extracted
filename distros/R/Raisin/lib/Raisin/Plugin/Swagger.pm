@@ -7,7 +7,7 @@ use strict;
 use warnings;
 
 package Raisin::Plugin::Swagger;
-$Raisin::Plugin::Swagger::VERSION = '0.91';
+$Raisin::Plugin::Swagger::VERSION = '0.92';
 use parent 'Raisin::Plugin';
 
 use Carp 'croak';
@@ -528,7 +528,7 @@ Raisin::Plugin::Swagger - Generates API description in Swagger 2/OpenAPI compati
 
 =head1 VERSION
 
-version 0.91
+version 0.92
 
 =head1 SYNOPSIS
 

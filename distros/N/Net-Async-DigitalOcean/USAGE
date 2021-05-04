@@ -1,0 +1,32 @@
+Usage Scenarios
+===============
+
+Working against the DigitalOcean APIv2 service
+----------------------------------------------
+
+To do "real work" - in contrast to testing - you would initialize the DigitalOcean
+handle $do as such
+
+    use IO::Async::Loop;
+    my $loop = IO::Async::Loop->new;
+       
+    use Net::Async::DigitalOcean;
+    my $do = Net::Async::DigitalOcean->new( loop => $loop );
+
+This will automatically choose the API v2 server https://api.digitalocean.com/v2/
+
+
+Testing against a local mock server
+-----------------------------------
+
+to be announced
+
+Testing against a remote mock server
+------------------------------------
+
+to be announced
+
+Building distribution
+---------------------
+
+In this case you may not want to run any tests.

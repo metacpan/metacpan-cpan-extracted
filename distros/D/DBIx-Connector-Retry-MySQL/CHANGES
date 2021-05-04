@@ -1,0 +1,27 @@
+Changelog for DBIx-Connector-Retry-MySQL
+
+v1.0.0 2021-05-04T15:10:03
+ - Update README (Brendan Byrd)
+ - Turn off retry_debug in unit tests (Brendan Byrd)
+ - Switch to an in-memory SQLite DB for base unit tests (Brendan Byrd)
+ - Fix another "local $@" case within the SET SESSION eval (Brendan Byrd)
+ - Reverse logic of disable_retry_handler to enable_retry_handler (Brendan
+   Byrd)
+ - Add t/test.db to .gitignore (Brendan Byrd)
+ - Skip aggressive_timeouts tests on ancient versions of DBD::mysql
+   (Brendan Byrd)
+ - Add more detailed comment about DBITEST_* variables (Brendan Byrd)
+ - Drop redefine warnings in t/syntax.t (Brendan Byrd)
+ - Remove non-existent t/lib use (Brendan Byrd)
+ - Update DBIx::Connector::Retry to now-released version (Brendan Byrd)
+ - Add unit tests (Brendan Byrd)
+ - Enhance retry_debug and exception messages (Brendan Byrd)
+ - Remove default unit test (Brendan Byrd)
+ - Only force disconnects if the connection seems to be in a broken state
+   (Brendan Byrd)
+ - Don't retry connection errors if they aren't considered transient
+   (Brendan Byrd)
+ - Override fixup mode to work better with retry model (Brendan Byrd)
+ - Create initial module (Brendan Byrd)
+ - Create distribution files (Brendan Byrd)
+ - Initial Commit (Brendan Byrd)

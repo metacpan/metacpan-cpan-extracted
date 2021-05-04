@@ -3,7 +3,6 @@ Changes
 LICENSE
 META.json
 README.md
-author/check_release_branch.sh
 cpanfile
 lib/Sub/WrapInType/Attribute.pm
 minil.toml

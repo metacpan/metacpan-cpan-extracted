@@ -2,6 +2,7 @@ use Test2::V0 -no_srand => 1;
 use Clang::CastXML;
 use Path::Tiny qw( path );
 use Test::XML;
+use 5.022;
 
 subtest basic => sub {
 

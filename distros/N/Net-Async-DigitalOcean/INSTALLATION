@@ -1,0 +1,25 @@
+=head1 INSTALLATION OPTIONS
+
+=over
+
+=item * installation via cpanm (or similar)
+
+    sudo cpanm Net::Async::DigitalOcean
+
+=item * installation via downloaded .tgz file
+
+    ls -al Net-Async-DigitalOcean-*.tar.gz
+    tar zxvf Net*
+    pushd Net-Async-DigitalOcean-*
+    perl Build.PL
+    sudo ./Build installdeps
+    sudo ./Build install
+
+=item * access to proprietary Debian repository http://packages.devc.at/
+
+   sudo wget -O - http://packages.devc.at/stretch/templescript.list > /etc/apt/sources.list.d/templescript.list
+   sudo wget -O - http://packages.devc.at/jessie/archive.key|apt-key add -
+   sudo apt update
+   sudo apt install libnet-async-digitalocean-perl
+
+=back

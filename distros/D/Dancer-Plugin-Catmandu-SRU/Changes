@@ -1,5 +1,8 @@
 Revision history for Dancer-Plugin-Catmandu-SRU
 
+0.0504  2021-05-03 22:19:48 CEST
+  - make configuration overridable during initialization
+
 0.0503  2018-11-27 12:06:54 CET
   - fix setting content type
   - new content_type setting

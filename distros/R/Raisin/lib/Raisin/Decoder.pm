@@ -6,7 +6,7 @@ use strict;
 use warnings;
 
 package Raisin::Decoder;
-$Raisin::Decoder::VERSION = '0.91';
+$Raisin::Decoder::VERSION = '0.92';
 use parent 'Raisin::Encoder';
 
 sub builtin {
@@ -30,7 +30,7 @@ Raisin::Decoder - A helper for L<Raisin::Middleware::Formatter> over decoder mod
 
 =head1 VERSION
 
-version 0.91
+version 0.92
 
 =head1 SYNOPSIS
 

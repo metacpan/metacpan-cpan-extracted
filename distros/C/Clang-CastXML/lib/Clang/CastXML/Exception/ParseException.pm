@@ -1,11 +1,11 @@
 package Clang::CastXML::Exception::ParseException;
 
 use Moo;
-use 5.020;
+use 5.022;
 use experimental qw( signatures );
 
 # ABSTRACT: Exception for when XML parsing fails
-our $VERSION = '0.01'; # VERSION
+our $VERSION = '0.02'; # VERSION
 
 
 extends 'Clang::CastXML::Exception';
@@ -32,7 +32,7 @@ Clang::CastXML::Exception::ParseException - Exception for when XML parsing fails
 
 =head1 VERSION
 
-version 0.01
+version 0.02
 
 =head1 DESCRIPTION
 

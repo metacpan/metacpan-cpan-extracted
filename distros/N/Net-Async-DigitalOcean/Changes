@@ -1,0 +1,5 @@
+Revision history for IO-Async-DigitalOcean
+
+0.01    Tue Apr 27 15:03:18 CEST 2021
+	- supporting most on droplets, domains, keys, volumes
+

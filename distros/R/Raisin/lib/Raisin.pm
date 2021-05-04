@@ -6,7 +6,7 @@ use strict;
 use warnings;
 
 package Raisin;
-$Raisin::VERSION = '0.91';
+$Raisin::VERSION = '0.92';
 use Carp qw(croak carp longmess);
 use HTTP::Status qw(:constants);
 use Plack::Response;
@@ -315,7 +315,7 @@ Raisin - A REST API microframework for Perl.
 
 =head1 VERSION
 
-version 0.91
+version 0.92
 
 =head1 SYNOPSIS
 

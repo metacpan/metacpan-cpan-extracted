@@ -1,5 +1,13 @@
 Revision history for perl module Sys::Virt
 
+7.3.0 2021-04-04
+
+ - Add virNodeDeviceCreate, virNodeDeviceDefineXML and
+   virNodeDeviceUndefine
+ - Add new constants for filtering node devices
+ - Add new constants for node device events
+ - Add VIR_DOMAIN_NUMATUNE_MEM_RESTRICTIVE constant
+
 7.2.0 2021-04-01
 
  - Add virDomainStartDirtyRateCalc API

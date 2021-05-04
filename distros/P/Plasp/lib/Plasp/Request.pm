@@ -425,25 +425,11 @@ this method:
 =cut
 
 has 'ServerVariables' => (
-    is      => 'ro',
-    isa     => HashRef,
-    reader  => '_get_ServerVariables',
-    lazy    => 1,
-    default => sub {
-        my ( $self ) = @_;
-
-        # Populate %ENV freely because we assume some process upstream will
-        # localize ENV for the request.
-        my $env = $self->asp->req->env;
-        for ( keys %$env ) {
-            $ENV{$_} = $env->{$_} unless ref $env->{$_};
-        }
-
-        # For backwards compatibility with Apache::ASP
-        $ENV{SCRIPT_NAME} = $ENV{PATH_INFO};
-
-        return \%ENV;
-    },
+    is          => 'ro',
+    isa         => HashRef,
+    reader      => '_get_ServerVariables',
+    lazy        => 1,
+    default     => sub { \%ENV },
     handles_via => 'Hash',
     handles     => {
         _get_ServerVariable => 'get',

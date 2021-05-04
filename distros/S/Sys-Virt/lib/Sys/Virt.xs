@@ -7929,6 +7929,18 @@ _create_xml(con, xml, flags=0)
 
 
 virNodeDevicePtr
+_define_xml(con, xml, flags=0)
+      virConnectPtr con;
+      const char *xml;
+      unsigned int flags;
+    CODE:
+      if (!(RETVAL = virNodeDeviceDefineXML(con, xml, flags)))
+          _croak_error();
+  OUTPUT:
+      RETVAL
+
+
+virNodeDevicePtr
 _lookup_by_name(con, name)
       virConnectPtr con;
       const char *name;
@@ -8025,6 +8037,24 @@ reset(dev)
       virNodeDevicePtr dev;
     PPCODE:
       if (virNodeDeviceReset(dev) < 0)
+          _croak_error();
+
+
+void
+create(dev, flags=0)
+      virNodeDevicePtr dev;
+      unsigned int flags;
+    PPCODE:
+      if (virNodeDeviceCreate(dev, flags) < 0)
+          _croak_error();
+
+
+void
+undefine(dev, flags=0)
+      virNodeDevicePtr dev;
+      unsigned int flags;
+    PPCODE:
+      if (virNodeDeviceUndefine(dev, flags) < 0)
           _croak_error();
 
 
@@ -9842,6 +9872,7 @@ BOOT:
       REGISTER_CONSTANT(VIR_DOMAIN_NUMATUNE_MEM_STRICT, NUMATUNE_MEM_STRICT);
       REGISTER_CONSTANT(VIR_DOMAIN_NUMATUNE_MEM_PREFERRED, NUMATUNE_MEM_PREFERRED);
       REGISTER_CONSTANT(VIR_DOMAIN_NUMATUNE_MEM_INTERLEAVE, NUMATUNE_MEM_INTERLEAVE);
+      REGISTER_CONSTANT(VIR_DOMAIN_NUMATUNE_MEM_RESTRICTIVE, NUMATUNE_MEM_RESTRICTIVE);
 
       REGISTER_CONSTANT_STR(VIR_PERF_PARAM_CMT, PERF_PARAM_CMT);
       REGISTER_CONSTANT_STR(VIR_PERF_PARAM_MBML, PERF_PARAM_MBML);
@@ -10341,12 +10372,16 @@ BOOT:
       REGISTER_CONSTANT(VIR_CONNECT_LIST_NODE_DEVICES_CAP_AP_CARD, LIST_CAP_AP_CARD);
       REGISTER_CONSTANT(VIR_CONNECT_LIST_NODE_DEVICES_CAP_AP_MATRIX, LIST_CAP_AP_MATRIX);
       REGISTER_CONSTANT(VIR_CONNECT_LIST_NODE_DEVICES_CAP_AP_QUEUE, LIST_CAP_AP_QUEUE);
+      REGISTER_CONSTANT(VIR_CONNECT_LIST_NODE_DEVICES_ACTIVE, LIST_ACTIVE);
+      REGISTER_CONSTANT(VIR_CONNECT_LIST_NODE_DEVICES_INACTIVE, LIST_INACTIVE);
 
       REGISTER_CONSTANT(VIR_NODE_DEVICE_EVENT_ID_LIFECYCLE, EVENT_ID_LIFECYCLE);
       REGISTER_CONSTANT(VIR_NODE_DEVICE_EVENT_ID_UPDATE, EVENT_ID_UPDATE);
 
       REGISTER_CONSTANT(VIR_NODE_DEVICE_EVENT_CREATED, EVENT_CREATED);
       REGISTER_CONSTANT(VIR_NODE_DEVICE_EVENT_DELETED, EVENT_DELETED);
+      REGISTER_CONSTANT(VIR_NODE_DEVICE_EVENT_DEFINED, EVENT_DEFINED);
+      REGISTER_CONSTANT(VIR_NODE_DEVICE_EVENT_UNDEFINED, EVENT_UNDEFINED);
 
 
       stash = gv_stashpv( "Sys::Virt::StorageVol", TRUE );

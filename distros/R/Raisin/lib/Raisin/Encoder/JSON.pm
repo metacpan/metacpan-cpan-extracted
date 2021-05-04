@@ -6,7 +6,7 @@ use strict;
 use warnings;
 
 package Raisin::Encoder::JSON;
-$Raisin::Encoder::JSON::VERSION = '0.91';
+$Raisin::Encoder::JSON::VERSION = '0.92';
 use JSON::MaybeXS qw();
 
 my $json = JSON::MaybeXS->new(utf8 => 1);
@@ -33,7 +33,7 @@ Raisin::Encoder::JSON - JSON serialization plugin for Raisin.
 
 =head1 VERSION
 
-version 0.91
+version 0.92
 
 =head1 DESCRIPTION
 

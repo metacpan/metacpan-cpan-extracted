@@ -2,6 +2,7 @@ use Test2::V0 -no_srand => 1;
 use Clang::CastXML;
 use Path::Tiny qw( path );
 use Test::XML;
+use 5.022;
 use experimental qw( postderef );
 
 subtest 'basic' => sub {
@@ -47,8 +48,40 @@ subtest 'basic' => sub {
     },
     'work around name mangle bug',
   );
-  use YAML ();
-  note YAML::Dump(\%func);
+
+};
+
+subtest 'top-level variables' => sub {
+
+  is(
+    { map { $_->{name} => $_ } grep { $_->{_class} eq 'Variable' } Clang::CastXML->new->introspect(q{
+      int foo;
+      extern "C" int bar;
+      namespace ns {
+        int baz;
+        extern "C" int frooble;
+      }
+    })->to_href->{inner}->@*},
+    hash {
+      field foo => hash {
+        field mangled => DNE();
+        etc;
+      };
+      field bar => hash {
+        field mangled => DNE();
+        etc;
+      };
+      field baz => hash {
+        field mangled => T();
+        etc;
+      };
+      field frooble => hash {
+        field mangled => DNE();
+        etc;
+      };
+      etc;
+    }
+  );
 
 };
 

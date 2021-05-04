@@ -1,14 +1,14 @@
 package Clang::CastXML::Wrapper;
 
 use Moo;
-use 5.020;
+use 5.022;
 use experimental qw( signatures );
 use Capture::Tiny ();
 use Clang::CastXML::Wrapper::Result;
 use Clang::CastXML::Exception::ProcessException::BadCastXMLVersionException;
 
 # ABSTRACT: Lowish level wrapper around the CastXML binary
-our $VERSION = '0.01'; # VERSION
+our $VERSION = '0.02'; # VERSION
 
 
 has exe => (
@@ -62,7 +62,7 @@ Clang::CastXML::Wrapper - Lowish level wrapper around the CastXML binary
 
 =head1 VERSION
 
-version 0.01
+version 0.02
 
 =head1 SYNOPSIS
 

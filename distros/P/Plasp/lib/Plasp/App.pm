@@ -177,6 +177,10 @@ my %_error_docs = (
 # Create a global variable to cache ASP object
 my $_asp;
 
+# Create a copy of initial environment variables
+my %startup_env;
+$startup_env{$_} = $ENV{$_} for ( keys %ENV );
+
 sub psgi_app {
     my $class = shift;
 
@@ -184,9 +188,18 @@ sub psgi_app {
     return sub {
         my $env = shift;
 
-        # Create localized ENV because ASP modifies and assumes ENV being
+        # Rebuild ENV from startup because ASP modifies and assumes ENV being
         # populated with Request headers as in CGI
-        local %ENV = %ENV;
+        %ENV = ();
+        $ENV{$_} = $startup_env{$_} for ( keys %startup_env );
+
+        # Add in values from Plack env
+        for ( keys %$env ) {
+            $ENV{$_} = $env->{$_} unless ref $env->{$_};
+        }
+
+        # For backwards compatibility with Apache::ASP
+        $ENV{SCRIPT_NAME} = $ENV{PATH_INFO};
 
         # Initialize and keep compiled code in this scope;
         my ( $compiled, $error_response );

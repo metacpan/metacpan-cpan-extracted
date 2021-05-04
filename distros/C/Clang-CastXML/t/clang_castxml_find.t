@@ -2,6 +2,7 @@ use Test2::V0 -no_srand => 1;
 use Clang::CastXML::Find;
 use Path::Tiny qw( path );
 use Env qw( @PATH );
+use 5.022;
 
 BEGIN { $ENV{DEVEL_HIDE_VERBOSE} = 0 }
 

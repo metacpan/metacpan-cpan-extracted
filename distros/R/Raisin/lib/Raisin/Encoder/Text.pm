@@ -6,7 +6,7 @@ use strict;
 use warnings;
 
 package Raisin::Encoder::Text;
-$Raisin::Encoder::Text::VERSION = '0.91';
+$Raisin::Encoder::Text::VERSION = '0.92';
 use Data::Dumper;
 use Encode 'encode';
 
@@ -45,7 +45,7 @@ Raisin::Encoder::Text - Data::Dumper serialization plugin for Raisin.
 
 =head1 VERSION
 
-version 0.91
+version 0.92
 
 =head1 DESCRIPTION
 

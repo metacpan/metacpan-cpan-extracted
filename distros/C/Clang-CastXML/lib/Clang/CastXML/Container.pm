@@ -1,13 +1,13 @@
 package Clang::CastXML::Container;
 
 use Moo;
-use 5.020;
+use 5.022;
 use experimental qw( signatures );
 use XML::Parser;
 use Clang::CastXML::Exception::ParseException;
 
 # ABSTRACT: Container class for XML output from CastXML
-our $VERSION = '0.01'; # VERSION
+our $VERSION = '0.02'; # VERSION
 
 
 has $_ => (
@@ -33,7 +33,7 @@ sub to_href ($self)
 
         # Fixups
         delete $attrs{location}; # redundant
-        if($element eq 'Function')
+        if($element =~ /^(Function|Variable)$/n)
         {
           # TODO: This works for current Clang (probably).  If we need to
           # support other compiles, like Visual C++ this computed
@@ -83,7 +83,7 @@ Clang::CastXML::Container - Container class for XML output from CastXML
 
 =head1 VERSION
 
-version 0.01
+version 0.02
 
 =head1 SYNOPSIS
 

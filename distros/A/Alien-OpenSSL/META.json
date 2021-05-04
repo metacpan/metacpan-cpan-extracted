@@ -1,10 +1,11 @@
 {
    "abstract" : "Alien wrapper for OpenSSL",
    "author" : [
-      "Johanna Amann <johanna@icir.org>"
+      "Johanna Amann <johanna@icir.org>",
+      "Graham Ollis <plicease@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.017, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -13,51 +14,73 @@
       "version" : 2
    },
    "name" : "Alien-OpenSSL",
-   "no_index" : {
-      "directory" : [
-         "t",
-         "inc"
-      ]
-   },
    "prereqs" : {
       "build" : {
          "requires" : {
-            "Alien::Build::MM" : "1.30"
+            "Alien::Build" : "0.32",
+            "Alien::Build::MM" : "0.32",
+            "ExtUtils::MakeMaker" : "6.52"
          }
       },
       "configure" : {
          "requires" : {
-            "Alien::Build" : "1.30",
-            "Alien::Build::MM" : "1.30"
+            "Alien::Build" : "1.19",
+            "Alien::Build::MM" : "0.32",
+            "ExtUtils::MakeMaker" : "6.52",
+            "perl" : "5.006"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "File::Spec" : "0",
+            "FindBin" : "0",
+            "Test::CPAN::Changes" : "0",
+            "Test::EOL" : "0",
+            "Test::Fixme" : "0.07",
+            "Test::More" : "0.98",
+            "Test::NoTabs" : "0",
+            "Test::Pod" : "0",
+            "Test::Pod::Coverage" : "0",
+            "Test::Pod::Spelling::CommonMistakes" : "0",
+            "Test::Spelling" : "0",
+            "Test::Strict" : "0",
+            "YAML" : "0"
          }
       },
       "runtime" : {
          "requires" : {
-            "Alien::Build" : "1.30",
-            "parent" : "0"
+            "Alien::Base" : "0.038",
+            "base" : "0",
+            "perl" : "5.006",
+            "strict" : "0",
+            "warnings" : "0"
          }
       },
       "test" : {
          "requires" : {
-            "Test2::V0" : "0",
-            "Test::Alien::Diag" : "0"
+            "Test2::V0" : "0.000060",
+            "Test::Alien" : "0",
+            "Test::Alien::Diag" : "0",
+            "perl" : "5.006"
          }
       }
    },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://github.com/0xxon/alien-openssl/issues"
+         "web" : "https://github.com/PerlAlien/Alien-OpenSSL/issues"
       },
-      "homepage" : "https://github.com/0xxon/alien-openssl",
+      "homepage" : "https://metacpan.org/pod/Alien::OpenSSL",
       "repository" : {
          "type" : "git",
-         "url" : "git://github.com/0xxon/alien-openssl.git"
-      }
+         "url" : "git://github.com/PerlAlien/Alien-OpenSSL.git",
+         "web" : "https://github.com/PerlAlien/Alien-OpenSSL"
+      },
+      "x_IRC" : "irc://irc.perl.org/#native"
    },
-   "version" : "0.11",
+   "version" : "0.12",
    "x_alienfile" : {
-      "generated_by" : "Alien::Build::MM version 2.28",
+      "generated_by" : "Dist::Zilla::Plugin::AlienBuild version 0.31",
       "requires" : {
          "share" : {
             "Alien::Build::Plugin::Gather::IsolateDynamic" : "0.48",
@@ -77,5 +100,14 @@
          "system" : {}
       }
    },
-   "x_serialization_backend" : "JSON::PP version 4.04"
+   "x_contributors" : [
+      "Johanna Amann <johanna@icir.org>",
+      "Graham Ollis <plicease@cpan.org>",
+      "Salvador Fandi\u00f1o"
+   ],
+   "x_generated_by_perl" : "v5.33.8",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.25",
+   "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later",
+   "x_use_unsafe_inc" : 0
 }
+

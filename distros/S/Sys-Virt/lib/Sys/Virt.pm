@@ -81,7 +81,7 @@ use Sys::Virt::DomainSnapshot;
 use Sys::Virt::DomainCheckpoint;
 use Sys::Virt::Stream;
 
-our $VERSION = '7.2.0';
+our $VERSION = '7.3.0';
 require XSLoader;
 XSLoader::load('Sys::Virt', $VERSION);
 
@@ -445,10 +445,11 @@ sub define_interface {
     return Sys::Virt::Interface->_new(connection => $self, xml => $xml, nocreate => 1);
 }
 
-=item my $dev = $conn->create_node_device($xml);
+=item my $dev = $conn->create_node_device($xml, $flags=0);
 
 Create a new virtual node device based on the XML description passed into the
-C<$xml> parameter. The returned object is an instance of the L<Sys::Virt::NodeDevice>
+C<$xml> parameter. The C<$flags> parameter is currently unused and defaults to
+zero. The returned object is an instance of the L<Sys::Virt::NodeDevice>
 class. This method is not available with unprivileged connections to
 the hypervisor.
 
@@ -457,8 +458,29 @@ the hypervisor.
 sub create_node_device {
     my $self = shift;
     my $xml = shift;
+    my $flags = shift || 0;
 
-    return Sys::Virt::NodeDevice->_new(connection => $self, xml => $xml);
+    return Sys::Virt::NodeDevice->_new(connection => $self, xml => $xml, flags => $flags);
+}
+
+=item my $dev = $conn->define_node_device($xml, $flags=0);
+
+Defines, but does not start, a new node dev based on the XML description
+passed into the C<$xml> parameter. The C<$flags> parameter is
+currently unused and defaults to zero. The returned object is an instance
+of the L<Sys::Virt::NodeDevice> class. This method is not available with
+unprivileged connections to the hypervisor. The defined node device can
+be later started by calling the C<create> method on the returned
+C<Sys::Virt::NodeDevice> object.
+
+=cut
+
+sub define_node_device {
+    my $self = shift;
+    my $xml = shift;
+    my $flags = shift || 0;
+
+    return Sys::Virt::NodeDevice->_new(connection => $self, xml => $xml, flags => $flags, nocreate => 1);
 }
 
 

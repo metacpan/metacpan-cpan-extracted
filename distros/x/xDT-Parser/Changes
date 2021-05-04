@@ -1,5 +1,8 @@
 Revision history for xDT-Parser
 
+1.06 2021-05-03
+  - Add missing test dependency and clean up manifest
+
 1.05 2021-05-03
   - Fix a bug where object end records are not added to objects, when read from file
 

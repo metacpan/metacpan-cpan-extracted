@@ -3,12 +3,11 @@ abstract: 'attribute for Sub::WrapInType'
 author:
   - 'kfly8 <kfly@cpan.org>'
 build_requires:
-  Module::Build::Tiny: '0.035'
   Test2::V0: '0.000111'
 configure_requires:
   Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v3.1.11, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Minilla/v3.1.12, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -27,7 +26,7 @@ no_index:
 provides:
   Sub::WrapInType::Attribute:
     file: lib/Sub/WrapInType/Attribute.pm
-    version: '0.01'
+    version: '0.02'
 requires:
   Attribute::Handlers: '0'
   B::Hooks::EndOfScope: '0.23'
@@ -39,7 +38,7 @@ resources:
   bugtracker: https://github.com/kfly8/p5-Sub-WrapInType-Attribute/issues
   homepage: https://github.com/kfly8/p5-Sub-WrapInType-Attribute
   repository: git://github.com/kfly8/p5-Sub-WrapInType-Attribute.git
-version: '0.01'
+version: '0.02'
 x_authority: cpan:KFLY
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_static_install: 1

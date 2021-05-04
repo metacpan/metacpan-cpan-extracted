@@ -30,7 +30,7 @@ sub apply {
         $plan_stmt->add_element(PPI::Token::Whitespace->new(' '));
         $plan_stmt->add_element(PPI::Token::Operator->new('=>'));
         $plan_stmt->add_element(PPI::Token::Whitespace->new(' '));
-        $plan_stmt->add_element(PPI::Token::Number->new($test_num));
+        $plan_stmt->add_element($test_num->clone);
         $plan_stmt->add_element(PPI::Token::Structure->new(';'));
         $use->insert_after($plan_stmt);
     } elsif ($arg_kind eq 'skip_all') {
@@ -40,7 +40,7 @@ sub apply {
         $skip_all_stmt->add_element(PPI::Token::Whitespace->new("\n"));
         $skip_all_stmt->add_element(PPI::Token::Word->new('skip_all'));
         $skip_all_stmt->add_element(PPI::Token::Whitespace->new(' '));
-        $skip_all_stmt->add_element($skip_reason);
+        $skip_all_stmt->add_element($skip_reason->clone);
         $skip_all_stmt->add_element(PPI::Token::Structure->new(';'));
         $use->insert_after($skip_all_stmt);
     }

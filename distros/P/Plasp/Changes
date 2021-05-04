@@ -1,5 +1,8 @@
 Revision history for Plasp
 
+1.05 2021-05-04T15:44:24Z
+1.05    Tue May 4 11:18:10 2021 -0400
+        - Fix %ENV values leakage!
 1.04    Mon Apr 12 12:33:13 2021 -0400
         - Fix error condition when code compilation fails
         - Throw exception on code compilation error

@@ -2,7 +2,7 @@ package App::Yath::Command::projects;
 use strict;
 use warnings;
 
-our $VERSION = '1.000053';
+our $VERSION = '1.000054';
 
 use parent 'App::Yath::Command::test';
 use Test2::Harness::Util::HashBase;
@@ -935,6 +935,13 @@ The TAP format is lossy and clunky. Test2::Harness normally uses a newer streami
 =item --no-cover
 
 Use Devel::Cover to calculate test coverage. This disables forking. If no args are specified the following are used: -silent,1,+ignore,^t/,+ignore,^t2/,+ignore,^xt,+ignore,^test.pl
+
+
+=item --dump-depmap
+
+=item --no-dump-depmap
+
+When using staged preload, dump the depmap for each stage as json files
 
 
 =item --event-timeout SECONDS

@@ -6,7 +6,7 @@ use strict;
 use warnings;
 
 package Raisin::Param;
-$Raisin::Param::VERSION = '0.91';
+$Raisin::Param::VERSION = '0.92';
 use Carp;
 use Plack::Util::Accessor qw(
     named
@@ -175,7 +175,7 @@ Raisin::Param - Parameter class for Raisin
 
 =head1 VERSION
 
-version 0.91
+version 0.92
 
 =head1 DESCRIPTION
 

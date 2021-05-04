@@ -1,5 +1,8 @@
 Revision history for Perl extension Sub-WrapInType-Attribute
 
+0.02 2021-05-04T12:30:46Z
+    - chore: update cpanfile, github action and minil.toml
+
 0.01 2021-03-23T04:19:39Z
 
     - original version

@@ -6,7 +6,7 @@ use strict;
 use warnings;
 
 package Raisin::Plugin;
-$Raisin::Plugin::VERSION = '0.91';
+$Raisin::Plugin::VERSION = '0.92';
 use Carp;
 
 sub new {
@@ -64,7 +64,7 @@ Raisin::Plugin - Base class for Raisin plugins
 
 =head1 VERSION
 
-version 0.91
+version 0.92
 
 =head1 SYNOPSIS
 

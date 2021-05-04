@@ -7,7 +7,7 @@ use Carp ();
 use IO::Handle ();
 use Exporter ();
 
-our $VERSION = '0.012';
+our $VERSION = '0.014';
 
 use constant DEFAULT_REQUEST_BODY_LIMIT => 16777216;
 use constant DEFAULT_REQUEST_BODY_BUFFER => 262144;
@@ -161,11 +161,13 @@ my %HTTP_STATUS = (
 sub _handle_error {
   my ($cgi, $error) = @_;
   return unless $cgi->{pid} == $$; # in case of fork
+  $cgi->{response_status} = "500 $HTTP_STATUS{500}" unless $cgi->{headers_rendered}
+    or (defined $cgi->{response_status} and $cgi->{response_status} =~ m/^[45][0-9]{2} /);
   if (defined(my $handler = $cgi->{on_error})) {
     my ($error_error, $error_errored);
     {
       local $@;
-      eval { $handler->($cgi, $error); 1 } or do { $error_error = $@; $error_errored = 1 };
+      eval { $handler->($cgi, $error, !!$cgi->{headers_rendered}); 1 } or do { $error_error = $@; $error_errored = 1 };
     }
     return unless $cgi->{pid} == $$; # in case of fork in error handler
     if ($error_errored) {
@@ -175,10 +177,7 @@ sub _handle_error {
   } else {
     warn $error;
   }
-  unless ($cgi->{headers_rendered}) {
-    $cgi->{response_status} = "500 $HTTP_STATUS{500}" unless defined $cgi->{response_status};
-    $cgi->set_response_type('text/plain')->render(data => $cgi->{response_status});
-  }
+  $cgi->set_response_type('text/plain')->render(data => $cgi->{response_status}) unless $cgi->{headers_rendered};
 }
 
 sub set_error_handler          { $_[0]{on_error} = $_[1]; $_[0] }
@@ -524,7 +523,7 @@ sub add_response_header {
         my ($key, $val) = @attrs[$i, $i+1];
         my $has_value = $COOKIE_ATTR_VALUE{lc $key};
         if (!defined $has_value) {
-          Carp::carp "Attempted to set unknown cookie attribute '$key' for HTTP response cookie '$name'";
+          Carp::croak "Attempted to set unknown cookie attribute '$key' for HTTP response cookie '$name'";
         } elsif ($has_value) {
           $cookie_str .= "; $key=$val" if defined $val;
         } else {
@@ -550,10 +549,8 @@ sub response_status_code {
   return 200;
 }
 
-sub headers_rendered { $_[0]{headers_rendered} }
-
 {
-  my %RENDER_TYPES = (json => 1, html => 1, xml => 1, text => 1, data => 1, file => 1, handle => 1, redirect => 1);
+  my %RENDER_TYPES = (text => 1, html => 1, xml => 1, json => 1, data => 1, file => 1, handle => 1, redirect => 1);
 
   sub render {
     my ($self, $type, $data) = @_;
@@ -563,10 +560,7 @@ sub headers_rendered { $_[0]{headers_rendered} }
     Carp::croak "Cannot render from an open filehandle with ->render; use ->render_chunk" if $type eq 'handle';
 
     my ($response_body, $response_length, $redirect_url);
-    if ($type eq 'json') {
-      $response_body = $self->_json->encode($data);
-      $response_length = length $response_body;
-    } elsif ($type eq 'html' or $type eq 'xml' or $type eq 'text') {
+    if ($type eq 'text' or $type eq 'html' or $type eq 'xml') {
       my $charset = $self->{response_charset};
       $charset = 'UTF-8' unless defined $charset;
       if (uc $charset eq 'UTF-8' and do { local $@; eval { require Unicode::UTF8; 1 } }) {
@@ -575,6 +569,9 @@ sub headers_rendered { $_[0]{headers_rendered} }
         require Encode;
         $response_body = Encode::encode($charset, "$data");
       }
+      $response_length = length $response_body;
+    } elsif ($type eq 'json') {
+      $response_body = $self->_json->encode($data);
       $response_length = length $response_body;
     } elsif ($type eq 'data') {
       $response_body = $data;
@@ -625,10 +622,7 @@ sub headers_rendered { $_[0]{headers_rendered} }
       $self->{headers_rendered} = 1;
     }
 
-    if ($type eq 'json') {
-      my $response_body = $self->_json->encode($data);
-      $out_fh->printflush($response_body);
-    } elsif ($type eq 'html' or $type eq 'xml' or $type eq 'text') {
+    if ($type eq 'text' or $type eq 'html' or $type eq 'xml') {
       my $charset = $self->{response_charset};
       $charset = 'UTF-8' unless defined $charset;
       my $response_body;
@@ -638,6 +632,9 @@ sub headers_rendered { $_[0]{headers_rendered} }
         require Encode;
         $response_body = Encode::encode($charset, "$data");
       }
+      $out_fh->printflush($response_body);
+    } elsif ($type eq 'json') {
+      my $response_body = $self->_json->encode($data);
       $out_fh->printflush($response_body);
     } elsif ($type eq 'data') {
       $out_fh->printflush($data);
@@ -693,10 +690,10 @@ sub _response_headers {
     my $charset = $self->{response_charset};
     $charset = 'UTF-8' unless defined $charset;
     $content_type =
-        $type eq 'json' ? 'application/json;charset=UTF-8'
+        $type eq 'text' ? "text/plain;charset=$charset"
       : $type eq 'html' ? "text/html;charset=$charset"
       : $type eq 'xml'  ? "application/xml;charset=$charset"
-      : $type eq 'text' ? "text/plain;charset=$charset"
+      : $type eq 'json' ? 'application/json;charset=UTF-8'
       : 'application/octet-stream'
       unless defined $content_type;
     $headers_str = "Content-Type: $content_type\r\n$headers_str";
@@ -706,7 +703,8 @@ sub _response_headers {
     $headers_str = "Date: $date_str\r\n$headers_str";
   }
   my $status = $self->{response_status};
-  $status = $self->{response_status} = "302 $HTTP_STATUS{302}" if !defined $status and $type eq 'redirect';
+  $status = $self->{response_status} = "302 $HTTP_STATUS{302}" if $type eq 'redirect'
+    and !(defined $status and $status =~ m/^3[0-9]{2} /);
   if ($self->{nph}) {
     $status = "200 $HTTP_STATUS{200}" unless defined $status;
     my $protocol = $ENV{SERVER_PROTOCOL};

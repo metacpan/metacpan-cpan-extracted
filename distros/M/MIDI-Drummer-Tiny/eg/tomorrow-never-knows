@@ -12,7 +12,7 @@ my $d = MIDI::Drummer::Tiny->new(
     bars      => 16, # Actually it's like 87
 );
 
-$d->score->synch(
+$d->sync(
     \&cymbals,
     \&drums,
 );
@@ -21,23 +21,17 @@ $d->write;
 
 sub cymbals {
     for my $n (1 .. $d->bars) {
-        $d->note($d->eighth, $d->ride1);
-        $d->note($d->eighth, $d->ride1);
-        $d->note($d->eighth, $d->ride1);
-        $d->note($d->eighth, $d->ride1);
-        $d->note($d->eighth, $d->ride1);
-        $d->note($d->eighth, $d->ride1);
-        $d->note($d->eighth, $d->ride1);
-        $d->note($d->eighth, $d->ride1);
+        $d->note($d->eighth, $d->ride1)
+            for 1 .. 8;
     }
 }
 
 sub drums {
     for my $n (1 .. $d->bars) {
-        $d->note($d->quarter, $d->kick);
-        $d->note($d->eighth, $d->snare);
-        $d->note($d->eighth, $d->kick);
-        $d->note($d->eighth, $d->kick);
+        $d->note($d->quarter,   $d->kick);
+        $d->note($d->eighth,    $d->snare);
+        $d->note($d->eighth,    $d->kick);
+        $d->note($d->eighth,    $d->kick);
         $d->note($d->sixteenth, $d->hi_tom);
         $d->note($d->sixteenth, $d->hi_tom);
         $d->rest($d->quarter);

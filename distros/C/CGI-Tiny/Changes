@@ -1,3 +1,11 @@
+0.014     2021-05-04 03:26:46 EDT
+  - Remove headers_rendered method, instead pass rendered status to error handlers
+
+0.013     2021-05-03 23:32:56 EDT
+  - Skip tests that don't work on Windows
+  - Rendering a redirect will now set the response status to 302 if any non-300 status was set
+  - Exceptions and failure to render now set a 500 response status unless any error status was set
+
 0.012     2021-05-02 23:28:28 EDT
   - Remove set_response_fixed_length
   - render now always sets a Content-Length and can only be called once

@@ -6,7 +6,7 @@ use strict;
 use warnings;
 
 package Raisin::Routes::Endpoint;
-$Raisin::Routes::Endpoint::VERSION = '0.91';
+$Raisin::Routes::Endpoint::VERSION = '0.92';
 use Plack::Util::Accessor qw(
     check
     code
@@ -125,7 +125,7 @@ Raisin::Routes::Endpoint - Endpoint class for Raisin::Routes.
 
 =head1 VERSION
 
-version 0.91
+version 0.92
 
 =head1 ACKNOWLEDGEMENTS
 

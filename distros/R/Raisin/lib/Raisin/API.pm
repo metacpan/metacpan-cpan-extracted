@@ -6,7 +6,7 @@ use strict;
 use warnings;
 
 package Raisin::API;
-$Raisin::API::VERSION = '0.91';
+$Raisin::API::VERSION = '0.92';
 use parent 'Exporter';
 
 use Carp;
@@ -257,7 +257,7 @@ Raisin::API
 
 =head1 VERSION
 
-version 0.91
+version 0.92
 
 =head1 DESCRIPTION
 

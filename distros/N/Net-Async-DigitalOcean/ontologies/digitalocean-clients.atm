@@ -1,0 +1,91 @@
+# this topic map cover collected information about various
+# client library for the DigitalOcean RESTy API v2.0
+
+%include file:rest.atm
+
+#--
+
+digitalocean-api-v2 isa rest:api
+= https://developers.digitalocean.com/documentation/v2/
+library-listing: https://docs.digitalocean.com/reference/libraries/
+tutorial:        https://www.digitalocean.com/community/tutorials/how-to-use-and-understand-action-objects-and-the-digitalocean-api
+tutorial:        https://www.digitalocean.com/community/tutorials/how-to-automate-the-scaling-of-your-web-application-on-digitalocean-1404
+library-listing: https://www.programmableweb.com/api/digitalocean/sdks
+
+#--
+
+client-software < software           # a client software is a special kind of software
+
+sync-library < software              # conventional synchronous library
+
+async-library < software             # library, supporting asynchronous access
+
+#--
+
+droplet-kit-ruby isa client-software
+                 isa sync-library
+! Droplet Kit
+comment: official Ruby library for DigitalOcean's API
+oc: https://rubygems.org/gems/droplet_kit
+
+#--
+
+net-async-digitalocean-perl isa client-software
+                            isa async-library
+! Net::Async::DigitalOcean
+git:hub : https://github.com/drrrho/net-async-digitalocean-perl
+
+isa written-in:
+   language: lang:perl
+   software: net-async-digitalocean-perl
+
+#--
+
+digitalocean-perl isa client-software
+                  isa sync-library
+! DigitalOcean
+cpan:distribution : https://metacpan.org/pod/DigitalOcean
+features: <<<
+- droplets
+- ssh keys
+- domains and records
+<<<
+tutorial: https://perlmaven.com/cloud-automation-at-digital-ocean
+tutorial: https://perlmaven.com/digital-ocean-api
+
+isa written-in:
+   language: lang:perl
+   software: digitalocean-perl
+
+#--
+
+webservice-digitalocean-perl isa client-software
+                             isa sync-library
+! WebService::DigitalOcean
+cpan:distribution : https://metacpan.org/release/WebService-DigitalOcean
+oc: https://www.digitalocean.com/community/tools/webservice-digitalocean
+git:hub : https://github.com/andrewalker/p5-webservice-digitalocean
+features: <<<
+- droplets and actions (reboot, ...)
+- ssh keys
+- domains and records
+<<<
+
+isa written-in:
+   language: lang:perl
+   software: webservice-digitalocean-perl
+
+%cancel
+
+https://docs.digitalocean.com/products/droplets/
+
+https://docs.digitalocean.com/products/volumes/
+
+https://docs.digitalocean.com/products/networking/dns/
+
+
+https://www.programmableweb.com/sdk/digitalocean-python-sdk-wiredcraft
+
+https://www.programmableweb.com/sdk/digitalocean-.net-sdk-thomas-niven
+
+https://www.programmableweb.com/sdk/digitalocean-go-sdk-digitalocean

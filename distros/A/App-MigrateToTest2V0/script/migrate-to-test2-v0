@@ -1,18 +1,9 @@
 #!/usr/bin/env perl
 use strict;
 use warnings;
-use App::MigrateToTest2V0;
-use PPI;
+use App::MigrateToTest2V0::CLI;
 
-process($_) for @ARGV;
-
-sub process {
-    my $filename = shift;
-    die "$filename not found" unless -e $filename;
-
-    my $doc = PPI::Document->new($filename);
-    App::MigrateToTest2V0->apply($doc);
-}
+App::MigrateToTest2V0::CLI->process(@ARGV);
 
 1;
 __END__

@@ -6,21 +6,22 @@ Dancer::Plugin::Catmandu::SRU - SRU server backed by a searchable Catmandu::Stor
 
 =cut
 
-our $VERSION = '0.0503';
+our $VERSION = '0.0504';
 
 use Catmandu::Sane;
 use Catmandu;
 use Catmandu::Fix;
 use Catmandu::Exporter::Template;
+use Catmandu::Util qw(hash_merge);
 use SRU::Request;
 use SRU::Response;
 use Dancer qw(:syntax);
 use Dancer::Plugin;
 
 sub sru_provider {
-    my ($path) = @_;
+    my ($path, %opts) = @_;
 
-    my $setting = plugin_setting;
+    my $setting = hash_merge(plugin_setting, \%opts);
 
     my $content_type = $setting->{content_type} // 'text/xml';
 
@@ -94,10 +95,10 @@ sub sru_provider {
             my $host        = $uri->host;
             my $port        = $uri->port;
             $response->record(SRU::Response::Record->new(
-                recordSchema => 'http://explain.z3950.org/dtd/2.1/',
+                recordSchema => 'http://explain.z3950.org/dtd/2.0/',
                 recordData   => <<XML,
-<explain xmlns="http://explain.z3950.org/dtd/2.1/">
-<serverInfo protocol="SRU" method="GET" transport="$transport">
+<explain xmlns="http://explain.z3950.org/dtd/2.0/">
+<serverInfo protocol="SRU" transport="$transport">
 <host>$host</host>
 <port>$port</port>
 <database>$database</database>

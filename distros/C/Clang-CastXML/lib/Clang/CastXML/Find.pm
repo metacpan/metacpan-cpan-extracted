@@ -2,14 +2,14 @@ package Clang::CastXML::Find;
 
 use strict;
 use warnings;
-use 5.020;
+use 5.022;
 use experimental qw( signatures );
 use File::Which ();
 use Carp ();
 use Env qw( @PATH );
 
 # ABSTRACT: Find the CastXML executable, if available.
-our $VERSION = '0.01'; # VERSION
+our $VERSION = '0.02'; # VERSION
 
 
 sub where ($)
@@ -43,7 +43,7 @@ Clang::CastXML::Find - Find the CastXML executable, if available.
 
 =head1 VERSION
 
-version 0.01
+version 0.02
 
 =head1 SYNOPSIS
 

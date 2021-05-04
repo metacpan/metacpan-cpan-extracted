@@ -1,14 +1,14 @@
 package Clang::CastXML::Exception;
 
 use Moo;
-use 5.020;
+use 5.022;
 use experimental qw( signatures );
 use overload
   '""' => sub { shift->to_string . "\n" },
   bool => sub { 1 }, fallback => 1;
 
 # ABSTRACT: Base exception class for Clang::CastXML
-our $VERSION = '0.01'; # VERSION
+our $VERSION = '0.02'; # VERSION
 
 
 with 'Throwable', 'StackTrace::Auto';
@@ -37,7 +37,7 @@ Clang::CastXML::Exception - Base exception class for Clang::CastXML
 
 =head1 VERSION
 
-version 0.01
+version 0.02
 
 =head1 SYNOPSIS
 

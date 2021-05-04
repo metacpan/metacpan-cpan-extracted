@@ -3,7 +3,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Glorified metronome
 
-our $VERSION = '0.1803';
+our $VERSION = '0.1805';
 
 use Math::Bezier;
 use MIDI::Simple ();
@@ -362,6 +362,12 @@ sub set_time_sig {
 }
 
 
+sub sync {
+    my $self = shift;
+    $self->score->synch(@_);
+}
+
+
 sub write {
     my $self = shift;
     $self->score->write_score( $self->file );
@@ -381,7 +387,7 @@ MIDI::Drummer::Tiny - Glorified metronome
 
 =head1 VERSION
 
-version 0.1803
+version 0.1805
 
 =head1 SYNOPSIS
 
@@ -690,9 +696,18 @@ rather than as a straight line.
 Set the B<signature>, B<beats>, B<divisions>, and the B<score>
 C<time_signature> values based on the given string.
 
+=head2 sync
+
+  $d->sync(@code_refs);
+
+This is a simple pass-through to the B<score> C<synch> method.
+
+This allows simultaneous playing of multiple "tracks" defined by code
+references.
+
 =head2 write
 
-Output the score as a MIDI file with the module L</file> setting as
+Output the score as a MIDI file with the module L</file> attribute as
 the file name.
 
 =head1 SEE ALSO

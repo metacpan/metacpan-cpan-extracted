@@ -2,7 +2,7 @@ package Test2::Harness::UI::Sweeper;
 use strict;
 use warnings;
 
-our $VERSION = '0.000060';
+our $VERSION = '0.000063';
 
 use Test2::Harness::UI::Util::HashBase qw{
     <config
@@ -39,7 +39,6 @@ sub sweep {
 
         while (my $job = $jobs->next()) {
             $counts{jobs}++;
-            $job->coverages->delete;
             $job->events->delete;
             $job->delete;
         }

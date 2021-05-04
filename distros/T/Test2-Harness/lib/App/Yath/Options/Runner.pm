@@ -2,7 +2,7 @@ package App::Yath::Options::Runner;
 use strict;
 use warnings;
 
-our $VERSION = '1.000053';
+our $VERSION = '1.000054';
 
 use Test2::Util qw/IS_WIN32/;
 use Test2::Harness::Util qw/clean_path/;
@@ -37,6 +37,12 @@ option_group {prefix => 'runner', category => "Runner Options"} => sub {
         env_vars       => [qw/YATH_JOB_COUNT T2_HARNESS_JOB_COUNT HARNESS_JOB_COUNT/],
         clear_env_vars => 1,
         default        => 1,
+    );
+
+    option dump_depmap => (
+        type => 'b',
+        description => "When using staged preload, dump the depmap for each stage as json files",
+        default => 0,
     );
 
     option includes => (
@@ -233,6 +239,13 @@ This is where command line options for the runner are defined.
 =item --no-cover
 
 Use Devel::Cover to calculate test coverage. This disables forking. If no args are specified the following are used: -silent,1,+ignore,^t/,+ignore,^t2/,+ignore,^xt,+ignore,^test.pl
+
+
+=item --dump-depmap
+
+=item --no-dump-depmap
+
+When using staged preload, dump the depmap for each stage as json files
 
 
 =item --event-timeout SECONDS

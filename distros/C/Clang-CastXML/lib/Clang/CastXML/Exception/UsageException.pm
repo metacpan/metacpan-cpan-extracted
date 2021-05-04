@@ -1,11 +1,11 @@
 package Clang::CastXML::Exception::UsageException;
 
 use Moo;
-use 5.020;
+use 5.022;
 use experimental qw( signatures );
 
 # ABSTRACT: Exception for when the Clang::CastXML is fed rubbish
-our $VERSION = '0.01'; # VERSION
+our $VERSION = '0.02'; # VERSION
 
 
 extends 'Clang::CastXML::Exception';
@@ -33,7 +33,7 @@ Clang::CastXML::Exception::UsageException - Exception for when the Clang::CastXM
 
 =head1 VERSION
 
-version 0.01
+version 0.02
 
 =head1 DESCRIPTION
 

@@ -8,6 +8,17 @@ use File::Temp;
 use JSON::PP 'decode_json', 'encode_json';
 use MIME::Base64 'encode_base64';
 
+my $skip_pipe_open;
+BEGIN {
+  if (defined(my $pid = open my $out, '-|')) {
+    exit unless $pid;
+    close $out;
+    $skip_pipe_open = 1 if $?;
+  } else {
+    $skip_pipe_open = 1;
+  }
+}
+
 my @env_keys = qw(
   AUTH_TYPE CONTENT_LENGTH CONTENT_TYPE GATEWAY_INTERFACE
   PATH_INFO PATH_TRANSLATED QUERY_STRING
@@ -105,7 +116,7 @@ subtest 'No render' => sub {
   };
 
   ok defined($error), 'error logged';
-  is $code, 200, 'response status code not set';
+  is $code, 500, '500 response status code';
   ok length($out_data), 'response rendered';
   my $response = _parse_response($out_data);
   ok defined($response->{headers}{'content-type'}), 'Content-Type set';
@@ -263,6 +274,7 @@ subtest 'No render (premature exit with persistent object)' => sub {
 };
 
 subtest 'No render (premature exit before cgi block)' => sub {
+  plan skip_all => 'fork pipe open not supported' if $skip_pipe_open;
   my $pid = open my $out_fh, '-|';
   plan skip_all => "fork failed: $!" unless defined $pid;
   unless ($pid) {
@@ -286,6 +298,7 @@ subtest 'No render (premature exit before cgi block)' => sub {
 };
 
 subtest 'Exception before cgi block' => sub {
+  plan skip_all => 'fork pipe open not supported' if $skip_pipe_open;
   my $pid = open my $out_fh, '-|';
   plan skip_all => "fork failed: $!" unless defined $pid;
   unless ($pid) {
@@ -319,7 +332,7 @@ subtest 'Exception before render' => sub {
 
   my ($error, $headers_rendered, $code);
   cgi {
-    $_->set_error_handler(sub { $error = $_[1]; $headers_rendered = $_[0]->headers_rendered; $code = $_[0]->response_status_code });
+    $_->set_error_handler(sub { $error = $_[1]; $headers_rendered = $_[2]; $code = $_[0]->response_status_code });
     $_->set_input_handle($in_fh);
     $_->set_output_handle($out_fh);
     die 'Error 42';
@@ -328,7 +341,65 @@ subtest 'Exception before render' => sub {
   ok defined($error), 'error logged';
   like $error, qr/Error 42/, 'right error';
   ok !$headers_rendered, 'headers were not rendered';
-  is $code, 200, 'response status code not set';
+  is $code, 500, '500 response status code';
+  ok length($out_data), 'response rendered';
+  my $response = _parse_response($out_data);
+  ok defined($response->{headers}{'content-type'}), 'Content-Type set';
+  ok defined($response->{headers}{'content-length'}), 'Content-Length set';
+  like $response->{status}, qr/^5[0-9]{2}\b/, '500 response status';
+};
+
+subtest 'Exception before render (set error code)' => sub {
+  local @ENV{@env_keys} = ('')x@env_keys;
+  local $ENV{PATH_INFO} = '/';
+  local $ENV{REQUEST_METHOD} = 'GET';
+  local $ENV{SCRIPT_NAME} = '/';
+  local $ENV{SERVER_PROTOCOL} = 'HTTP/1.0';
+  open my $in_fh, '<', \(my $in_data = '') or die "failed to open handle for input: $!";
+  open my $out_fh, '>', \my $out_data or die "failed to open handle for output: $!";
+
+  my ($error, $headers_rendered, $code);
+  cgi {
+    $_->set_error_handler(sub { $error = $_[1]; $headers_rendered = $_[2]; $code = $_[0]->response_status_code });
+    $_->set_input_handle($in_fh);
+    $_->set_output_handle($out_fh);
+    $_->set_response_status(501);
+    die 'Error 42';
+  };
+
+  ok defined($error), 'error logged';
+  like $error, qr/Error 42/, 'right error';
+  ok !$headers_rendered, 'headers were not rendered';
+  is $code, 501, '501 response status code';
+  ok length($out_data), 'response rendered';
+  my $response = _parse_response($out_data);
+  ok defined($response->{headers}{'content-type'}), 'Content-Type set';
+  ok defined($response->{headers}{'content-length'}), 'Content-Length set';
+  like $response->{status}, qr/^5[0-9]{2}\b/, '500 response status';
+};
+
+subtest 'Exception before render (set non-error code)' => sub {
+  local @ENV{@env_keys} = ('')x@env_keys;
+  local $ENV{PATH_INFO} = '/';
+  local $ENV{REQUEST_METHOD} = 'GET';
+  local $ENV{SCRIPT_NAME} = '/';
+  local $ENV{SERVER_PROTOCOL} = 'HTTP/1.0';
+  open my $in_fh, '<', \(my $in_data = '') or die "failed to open handle for input: $!";
+  open my $out_fh, '>', \my $out_data or die "failed to open handle for output: $!";
+
+  my ($error, $headers_rendered, $code);
+  cgi {
+    $_->set_error_handler(sub { $error = $_[1]; $headers_rendered = $_[2]; $code = $_[0]->response_status_code });
+    $_->set_input_handle($in_fh);
+    $_->set_output_handle($out_fh);
+    $_->set_response_status(301);
+    die 'Error 42';
+  };
+
+  ok defined($error), 'error logged';
+  like $error, qr/Error 42/, 'right error';
+  ok !$headers_rendered, 'headers were not rendered';
+  is $code, 500, '500 response status code';
   ok length($out_data), 'response rendered';
   my $response = _parse_response($out_data);
   ok defined($response->{headers}{'content-type'}), 'Content-Type set';
@@ -347,7 +418,7 @@ subtest 'Exception after render' => sub {
 
   my ($error, $headers_rendered);
   cgi {
-    $_->set_error_handler(sub { $error = $_[1]; $headers_rendered = $_[0]->headers_rendered; });
+    $_->set_error_handler(sub { $error = $_[1]; $headers_rendered = $_[2]; });
     $_->set_input_handle($in_fh);
     $_->set_output_handle($out_fh);
     $_->render;
@@ -729,6 +800,60 @@ subtest 'Redirect response' => sub {
     $_->set_input_handle($in_fh);
     $_->set_output_handle($out_fh);
     $_->render(redirect => $url);
+  };
+
+  ok length($out_data), 'response rendered';
+  my $response = _parse_response($out_data);
+  ok !defined($response->{headers}{'content-type'}), 'Content-Type not set';
+  is $response->{headers}{'content-length'}, 0, 'right Content-Length';
+  is $response->{headers}{location}, $url, 'Location set';
+  like $response->{status}, qr/^302\b/, '302 response status';
+  ok defined($response->{headers}{date}), 'Date set';
+  ok defined(CGI::Tiny::date_to_epoch $response->{headers}{date}), 'valid HTTP date';
+  ok !length($response->{body}), 'empty response body';
+};
+
+subtest 'Redirect response (301)' => sub {
+  local @ENV{@env_keys} = ('')x@env_keys;
+  local $ENV{PATH_INFO} = '/';
+  local $ENV{REQUEST_METHOD} = 'GET';
+  local $ENV{SCRIPT_NAME} = '/';
+  local $ENV{SERVER_PROTOCOL} = 'HTTP/1.0';
+  open my $in_fh, '<', \(my $in_data = '') or die "failed to open handle for input: $!";
+  open my $out_fh, '>', \my $out_data or die "failed to open handle for output: $!";
+
+  my $url = '/foo';
+  cgi {
+    $_->set_input_handle($in_fh);
+    $_->set_output_handle($out_fh);
+    $_->set_response_status(301)->render(redirect => $url);
+  };
+
+  ok length($out_data), 'response rendered';
+  my $response = _parse_response($out_data);
+  ok !defined($response->{headers}{'content-type'}), 'Content-Type not set';
+  is $response->{headers}{'content-length'}, 0, 'right Content-Length';
+  is $response->{headers}{location}, $url, 'Location set';
+  like $response->{status}, qr/^301\b/, '301 response status';
+  ok defined($response->{headers}{date}), 'Date set';
+  ok defined(CGI::Tiny::date_to_epoch $response->{headers}{date}), 'valid HTTP date';
+  ok !length($response->{body}), 'empty response body';
+};
+
+subtest 'Redirect response (non-300)' => sub {
+  local @ENV{@env_keys} = ('')x@env_keys;
+  local $ENV{PATH_INFO} = '/';
+  local $ENV{REQUEST_METHOD} = 'GET';
+  local $ENV{SCRIPT_NAME} = '/';
+  local $ENV{SERVER_PROTOCOL} = 'HTTP/1.0';
+  open my $in_fh, '<', \(my $in_data = '') or die "failed to open handle for input: $!";
+  open my $out_fh, '>', \my $out_data or die "failed to open handle for output: $!";
+
+  my $url = '/foo';
+  cgi {
+    $_->set_input_handle($in_fh);
+    $_->set_output_handle($out_fh);
+    $_->set_response_status(100)->render(redirect => $url);
   };
 
   ok length($out_data), 'response rendered';

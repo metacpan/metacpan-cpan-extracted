@@ -1,11 +1,11 @@
 package Clang::CastXML::Wrapper::Result;
 
 use Moo;
-use 5.020;
+use 5.022;
 use experimental qw( signatures );
 
 # ABSTRACT: The result of a Clang::CastXML::Wrapper run
-our $VERSION = '0.01'; # VERSION
+our $VERSION = '0.02'; # VERSION
 
 
 has $_ => (
@@ -33,7 +33,7 @@ Clang::CastXML::Wrapper::Result - The result of a Clang::CastXML::Wrapper run
 
 =head1 VERSION
 
-version 0.01
+version 0.02
 
 =head1 SYNOPSIS
 

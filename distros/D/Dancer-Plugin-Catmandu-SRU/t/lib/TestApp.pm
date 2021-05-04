@@ -8,6 +8,10 @@ set plugins => from_yaml("@settings");
 
 sru_provider '/sru';
 
+my $options = {limit => 50, default_record_schema => "dc"};
+
+sru_provider '/sru_override', %$options; 
+
 1;
 
 __DATA__

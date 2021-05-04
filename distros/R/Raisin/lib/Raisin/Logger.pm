@@ -6,7 +6,7 @@ use strict;
 use warnings;
 
 package Raisin::Logger;
-$Raisin::Logger::VERSION = '0.91';
+$Raisin::Logger::VERSION = '0.92';
 my $FH = *STDERR;
 
 sub new { bless {}, shift }
@@ -30,7 +30,7 @@ Raisin::Logger - Default logger for Raisin.
 
 =head1 VERSION
 
-version 0.91
+version 0.92
 
 =head1 SYNOPSIS
 

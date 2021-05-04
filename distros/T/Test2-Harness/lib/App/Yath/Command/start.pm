@@ -2,7 +2,7 @@ package App::Yath::Command::start;
 use strict;
 use warnings;
 
-our $VERSION = '1.000053';
+our $VERSION = '1.000054';
 
 use App::Yath::Util qw/find_pfile/;
 use App::Yath::Options;
@@ -421,6 +421,13 @@ Use Devel::Cover to calculate test coverage. This disables forking. If no args a
 =item --no-daemon
 
 Start the runner as a daemon (Default: True)
+
+
+=item --dump-depmap
+
+=item --no-dump-depmap
+
+When using staged preload, dump the depmap for each stage as json files
 
 
 =item --event-timeout SECONDS

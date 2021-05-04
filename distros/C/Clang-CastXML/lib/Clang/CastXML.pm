@@ -1,7 +1,7 @@
 package Clang::CastXML;
 
 use Moo;
-use 5.020;
+use 5.022;
 use experimental qw( signatures );
 use Ref::Util qw( is_blessed_ref is_ref );
 use Clang::CastXML::Container;
@@ -10,7 +10,7 @@ use Clang::CastXML::Exception::UsageException;
 use Clang::CastXML::Exception::ProcessException::IntrospectException;
 
 # ABSTRACT: C-family abstract syntax tree output tool
-our $VERSION = '0.01'; # VERSION
+our $VERSION = '0.02'; # VERSION
 
 
 has wrapper => (
@@ -89,7 +89,7 @@ Clang::CastXML - C-family abstract syntax tree output tool
 
 =head1 VERSION
 
-version 0.01
+version 0.02
 
 =head1 SYNOPSIS
 

@@ -22,7 +22,6 @@ $modules{$_} = $_ for qw(
   Test::XML
   Throwable
   XML::Parser
-  YAML
 );
 
 
@@ -67,7 +66,7 @@ if(@keys > 0)
   spacer;
 }
 
-diag sprintf $format, 'perl ', $];
+diag sprintf $format, 'perl', "$] $^O $Config{archname}";
 
 foreach my $module (sort @modules)
 {

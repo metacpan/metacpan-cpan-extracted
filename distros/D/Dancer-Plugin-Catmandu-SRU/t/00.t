@@ -8,4 +8,4 @@ my $pkg = 'Dancer::Plugin::Catmandu::SRU';
 
 require_ok $pkg;
 
-done_testing 1;
+done_testing;

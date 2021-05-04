@@ -1,5 +1,23 @@
 Revision history for Perl extension App-MigrateToTest2V0
 
+0.02 2021-05-04T08:16:35Z
+
+    - No changes since 0.01_02
+
+0.01_02 2021-05-04T05:50:28Z
+
+    - Don't use `system()` on test
+    - Fix insufficient dependency (Test2::V0)
+
+0.01_01 2021-05-04T03:25:19Z
+
+    - Add tests for:
+        - Migration rules
+        - CLI
+        - Test2 plugin
+    - Move example test file to `share` (since it's not an example for usage of this tool)
+    - Fix migration of `use Test::More skip_all => ...` (the reason of skip was not migrated correctly)
+
 0.01 2021-04-18T13:16:51Z
 
     - original version

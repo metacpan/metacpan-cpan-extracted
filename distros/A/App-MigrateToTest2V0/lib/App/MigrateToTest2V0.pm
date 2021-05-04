@@ -3,7 +3,7 @@ use 5.008001;
 use strict;
 use warnings;
 
-our $VERSION = "0.01";
+our $VERSION = "0.02";
 
 our @rules = qw(
     App::MigrateToTest2V0::Rule::ReplaceUseTestMoreToUseTest2V0
@@ -21,7 +21,7 @@ sub apply {
         $rule_class->apply($doc);
     }
 
-    $doc->save($doc->filename);
+    return $doc;
 }
 
 1;

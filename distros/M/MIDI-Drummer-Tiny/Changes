@@ -1,5 +1,12 @@
 Revision history for MIDI-Drummer
 
+0.1805 2021-05-03 22:04:18
+    - Fix-up the eg/tomorrow-never-knows program.
+
+0.1804 2021-05-03 21:42:38
+    - Add the ->sync passthrough method.
+    - Improve documentation.
+
 0.1803 2021-04-09 23:00:00
     - Add the eg/tomorrow-never-knows program.
     - Use new Music::Duration values.

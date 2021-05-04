@@ -7,4 +7,4 @@ static_install = "auto"
 markdown_maker = "Pod::Markdown::Github"
 
 [release]
-hooks = ['author/check_release_branch.sh main']
+branch = "main"

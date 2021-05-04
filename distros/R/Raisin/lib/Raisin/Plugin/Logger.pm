@@ -6,7 +6,7 @@ use strict;
 use warnings;
 
 package Raisin::Plugin::Logger;
-$Raisin::Plugin::Logger::VERSION = '0.91';
+$Raisin::Plugin::Logger::VERSION = '0.92';
 use parent 'Raisin::Plugin';
 
 use Carp qw(carp);
@@ -63,7 +63,7 @@ Raisin::Plugin::Logger - Logger plugin for Raisin.
 
 =head1 VERSION
 
-version 0.91
+version 0.92
 
 =head1 SYNOPSIS
 

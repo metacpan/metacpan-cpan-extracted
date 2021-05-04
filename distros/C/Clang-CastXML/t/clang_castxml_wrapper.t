@@ -1,5 +1,6 @@
 use Test2::V0 -no_srand => 1;
 use Clang::CastXML::Wrapper;
+use 5.022;
 
 subtest basic => sub {
 

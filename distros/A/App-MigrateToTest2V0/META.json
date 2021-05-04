@@ -43,6 +43,7 @@
       "runtime" : {
          "requires" : {
             "Carp" : "0",
+            "File::Temp" : "0",
             "List::Util" : "0",
             "PPI" : "0",
             "PPIx::Utils" : "0",
@@ -53,6 +54,10 @@
       },
       "test" : {
          "requires" : {
+            "App::Prove" : "0",
+            "FindBin" : "0",
+            "Test2::V0" : "0",
+            "Test::Base::Less" : "0",
             "Test::More" : "0.98"
          }
       }
@@ -60,7 +65,10 @@
    "provides" : {
       "App::MigrateToTest2V0" : {
          "file" : "lib/App/MigrateToTest2V0.pm",
-         "version" : "0.01"
+         "version" : "0.02"
+      },
+      "App::MigrateToTest2V0::CLI" : {
+         "file" : "lib/App/MigrateToTest2V0/CLI.pm"
       },
       "App::MigrateToTest2V0::Rule" : {
          "file" : "lib/App/MigrateToTest2V0/Rule.pm"
@@ -95,7 +103,7 @@
          "web" : "https://github.com/utgwkk/App-MigrateToTest2V0"
       }
    },
-   "version" : "0.01",
+   "version" : "0.02",
    "x_serialization_backend" : "JSON::PP version 4.02",
    "x_static_install" : 1
 }
