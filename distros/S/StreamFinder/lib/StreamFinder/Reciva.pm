@@ -1,6 +1,6 @@
 =head1 NAME
 
-StreamFinder::Reciva - Fetch actual raw streamable URLs from radio-station websites on Reciva.com
+StreamFinder::Reciva - DEPRECIATED - Fetch actual raw streamable URLs from radio-station websites on Reciva.com
 
 =head1 AUTHOR
 
@@ -113,7 +113,7 @@ StreamFinder::Reciva, use 'ssl_opts' instead of 'reciva_ssl_opts'.
 
 =over 4
 
-=item B<new>(I<ID>|I<url> [, "debug" [ => 0|1|2 ]])
+=item B<new>(I<ID>|I<url> [, I<-debug> [ => 0|1|2 ]])
 
 Accepts a reciva.com station ID or URL and creates and returns a new station 
 object, or I<undef> if the URL is not a valid Reciva station or no streams 

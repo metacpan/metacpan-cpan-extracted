@@ -1,12 +1,12 @@
 #!perl
 
 # Note: This script is a CLI for Riap function /App/UuidUtils/gen_uuid
-# and generated automatically using Perinci::CmdLine::Gen version 0.497
+# and generated automatically using Perinci::CmdLine::Gen version 0.498
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-01-20'; # DATE
+our $DATE = '2021-05-06'; # DATE
 our $DIST = 'App-UuidUtils'; # DIST
-our $VERSION = '0.030'; # VERSION
+our $VERSION = '0.031'; # VERSION
 
 use 5.010001;
 use strict;
@@ -42,16 +42,16 @@ gen-uuid - Generate UUID, with several options
 
 =head1 VERSION
 
-This document describes version 0.030 of gen-uuid (from Perl distribution App-UuidUtils), released on 2021-01-20.
+This document describes version 0.031 of gen-uuid (from Perl distribution App-UuidUtils), released on 2021-05-06.
 
 =head1 SYNOPSIS
 
 Usage:
 
- % gen-uuid [--backend=s] [--debug] [--format=name] [--json]
+ % gen-uuid [-R] [--backend=s] [--debug] [--format=name] [--json]
      [--log-level=level] [--(no)naked-res] [--page-result[=program]]
-     [--quiet] [--trace] [--uuid-version=s] [--verbose]
-     [--view-result[=program]] [num]
+     [--quiet] [--random] [--trace] [--uuid-version=s] [--v1] [--v4]
+     [--verbose] [--view-result[=program]] [num]
 
 =head1 DESCRIPTION
 
@@ -72,7 +72,7 @@ Choose a specific backend, if unspecified one will be chosen.
 
 Valid values:
 
- ["Data::UUID","UUID::Tiny","Crypt::Misc","UUID::Random::Secure"]
+ ["Data::UUID","UUID::Tiny","Crypt::Misc","UUID::Random::Secure","UUID::FFI"]
 
 Note that not all backends support every version of UUID.
 
@@ -83,6 +83,12 @@ Default value:
 
  1
 
+=item B<--random>
+
+Shortcut for --uuid-version=random.
+
+See C<--uuid-version>.
+
 =item B<--uuid-version>=I<s>
 
 Default value:
@@ -92,6 +98,24 @@ Default value:
 Valid values:
 
  [1,"v1",4,"v4","random"]
+
+=item B<--v1>
+
+Shortcut for --uuid-version=v1.
+
+See C<--uuid-version>.
+
+=item B<--v4>
+
+Shortcut for --uuid-version=v4 (random).
+
+See C<--uuid-version>.
+
+=item B<-R>
+
+Shortcut for --uuid-version=random.
+
+See C<--uuid-version>.
 
 =back
 

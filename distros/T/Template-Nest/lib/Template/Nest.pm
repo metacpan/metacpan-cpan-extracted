@@ -6,7 +6,7 @@ use File::Spec;
 use Carp;
 use Data::Dumper;
 
-our $VERSION = '0.10';
+our $VERSION = '0.11';
 
 sub new{
 	my ($class,%opts) = @_;
@@ -84,7 +84,7 @@ sub defaults_namespace_char{
 
     return $self->{defaults_namespace_char};
 }
-	
+
 
 sub comment_delims{
     my ($self,$delim1,$delim2) = @_;
@@ -98,7 +98,7 @@ sub comment_delims{
 
 sub token_delims{
     my ($self,$delim1,$delim2) = @_;
-    
+
     if (defined $delim1 ){
 
         if ( ref $delim1 eq ref [] ){
@@ -127,7 +127,7 @@ sub template_ext{
 	$self->{template_ext} = $ext if defined $ext;
 	return $self->{template_ext};
 }
-	
+
 
 sub name_label{
 	my ($self,$label) = @_;
@@ -289,19 +289,32 @@ sub params{
             $rem{$f} = 1;
         }
     }
-    
+
     my @params = sort(keys %rem);
     return \@params;
 }
 
 
 
+sub _token_regex{
+    my ($self,$param_name) = @_;
+
+    my $esc = $self->{escape_char};
+    my $tda = $self->{token_delims}[0];
+    my $tdb = $self->{token_delims}[1];
+
+    $param_name = '.*?' unless defined $param_name;
+
+    my $token_regex = qr/\Q$tda\E\s+$param_name\s+\Q$tdb\E/;
+    if ( $esc ){
+        $token_regex = qr/(?<!\Q$esc\E)($token_regex)/;
+    }
+    return $token_regex;
+}
+
 
 sub _fill_in{
-    my ($self,$template_name,$template,$param) = @_;
-    # this sub has grown a little unwieldy
-    # but doesn't break naturally
-    # TODO re-param and break up (if it gets any bigger?)
+    my ($self,$template_name,$template,$params) = @_;
 
     my $esc = $self->{escape_char};
     my @frags;
@@ -312,25 +325,17 @@ sub _fill_in{
         @frags = ( $template );
     }
 
-    my $tda = $self->{token_delims}[0];
-    my $tdb = $self->{token_delims}[1];
+    foreach my $param_name (keys %$params){
 
-    # first, attempt to replace the parameters we were provided
-    foreach my $param_name (keys %$param){ 
+        my $param_val = $params->{$param_name};
 
-        my $param_val = $param->{$param_name};
-        
         my $replaced = 0;
 
         if ( $self->{fixed_indent} ){ #if fixed_indent we need to add spaces during the replacement
             for my $i (0..$#frags){
-                my @spaces_repl;
-                if ( $esc ){
-                    @spaces_repl = $frags[$i] =~ m/([^\S\r\n]*)(?<!\Q$esc\E)(\Q$tda\E\s+$param_name\s+\Q$tdb\E)/g;
-                } else {
-                    @spaces_repl = $frags[$i] =~ m/([^\S\r\n]*)(\Q$tda\E\s+$param_name\s+\Q$tdb\E)/g;
-                }
-				
+                my $rx = $self->_token_regex( $param_name );
+                my @spaces_repl = $frags[$i] =~ m/([^\S\r\n]*)$rx/g;
+
                 while(@spaces_repl){
                     my $sp = shift @spaces_repl;
                     my $repl = shift @spaces_repl;
@@ -344,61 +349,36 @@ sub _fill_in{
                     }
                 }
             }
-        } else { #if no fixed_indent global search/replace is probably quicker
+        } else {
             for my $i (0..$#frags){
-                if ( $esc ){
-                    $replaced = 1 if $frags[$i] =~ s/(?<!\Q$esc\E)\Q$tda\E\s+$param_name\s+\Q$tdb\E/$param_val/g;
-                } else {
-                    $replaced = 1 if $frags[$i] =~ s/\Q$tda\E\s+$param_name\s+\Q$tdb\E/$param_val/g;
-                }
+                my $rx = $self->_token_regex( $param_name );
+                $replaced = 1 if $frags[$i] =~ s/$rx/$param_val/g;
             }
         }
 
-        if ( $self->{die_on_bad_params} ){
-            confess "Could not replace template param '$param_name': token does not exist in template '$template_name'" unless $replaced;
+        if ( $self->{die_on_bad_params} && $replaced == 0 ){
+            confess "Could not replace template param '$param_name': token does not exist in template '$template_name'";
         }
     }
 
-    # now handle remaining, unreplaced tokens
-    if ( %{$self->{defaults}} ){
-        # defaults were provided, so we need to find out if any tokens match defaults
-        my $char = $self->{defaults_namespace_char};
-        for my $i (0..$#frags){
+    for my $i (0..$#frags){
 
-            my @rem = $frags[$i] =~ m/(?<!\Q$esc\E)\Q$tda\E\s+(.*?)\s+\Q$tdb\E/g;
-            my %rem;
-            for my $name ( @rem ){;
-#                $name =~ s/^\s*//;
-#                $name =~ s/\s*$//;
-                $rem{$name} = 1
-            }
-
-            for my $name (keys %rem){
+        if ( %{$self->{defaults}} ){
+            my @rem = $self->_params_in( $frags[$i] );
+            my $char = $self->defaults_namespace_char;
+            for my $name ( @rem ){
                 my @parts = ( $name );
                 @parts = split( /\Q$char\E/, $name ) if $char;
-                my $val = $self->_get_default_val($self->{defaults},@parts);
-                $frags[$i] =~ s/(?<!\Q$esc\E)\Q$tda\E\s+$name\s+\Q$tdb\E/$val/g;
-            }
-            
-            if ( $esc ){
-                $frags[$i] =~ s/(?<!\Q$esc\E)\Q$tda\E\s.*?\s\Q$tdb\E//g;
-            } else {
-                $frags[$i] =~ s/\Q$tda\E\s.*?\s\Q$tdb\E//g;
+
+                my $val = $self->_get_default_val( $self->{defaults}, @parts );
+                my $rx = $self->_token_regex( $name );
+                $frags[$i] =~ s/$rx/$val/g;
             }
         }
 
-    } else {
-
-        # we don't have any defaults, so quicker to directly remove any params that weren't specified
-        for my $i (0..$#frags){
-            if ( $esc ){
-                $frags[$i] =~ s/(?<!\Q$esc\E)\Q$tda\E\s.*?\s\Q$tdb\E//g;
-            } else {
-                $frags[$i] =~ s/\Q$tda\E\s.*?\s\Q$tdb\E//g;
-            }
-        }
+        my $rx = $self->_token_regex;
+        $frags[$i] =~ s/$rx//g;
     }
-
 
     if ( $esc ){
         for my $i (0..$#frags){
@@ -406,12 +386,34 @@ sub _fill_in{
         }
     }
 
-
     my $text = $esc? join($esc,@frags): $frags[0];
     return $text;
 }
 
-    
+
+sub _params_in{
+    my ( $self, $text ) = @_;
+
+    my $esc = $self->{escape_char};
+    my $tda = $self->token_delims->[0];
+    my $tdb = $self->token_delims->[1];
+
+    my @rem;
+    if ( $esc ){
+        @rem = $text =~ m/(?<!\Q$esc\E)\Q$tda\E\s+(.*?)\s+\Q$tdb\E/g;
+    } else {
+        @rem = $text =~ m/\Q$tda\E\s+(.*?)\s+\Q$tdb\E/g;
+    }
+
+    my %rem;
+    for my $name (@rem){
+        $rem{$name} = 1
+    }
+
+    return keys %rem;
+}
+
+
 
 sub _get_default_val{
     my ($self,$ref,@parts) = @_;
@@ -442,7 +444,7 @@ Template::Nest - manipulate a generic template structure via a perl hash
 	<html>
 		<head>
 			<style>
-				div { 
+				div {
 					padding: 20px;
 					margin: 20px;
 					background-color: yellow;
@@ -454,7 +456,7 @@ Template::Nest - manipulate a generic template structure via a perl hash
 			<% contents %>
 		</body>
 	</html>
-	 
+
 
 
 	box.html:
@@ -484,14 +486,14 @@ Template::Nest - manipulate a generic template structure via a perl hash
 	);
 
 	print $nest->render( $page );
-  
-	
+
+
 	# output:
 
     <html>
 	    <head>
 		    <style>
-			    div { 
+			    div {
 				    padding: 20px;
 				    margin: 20px;
 				    background-color: yellow;
@@ -499,7 +501,7 @@ Template::Nest - manipulate a generic template structure via a perl hash
 		    </style>
 	    </head>
 
-	    <body>	    
+	    <body>
             <div>
 	            First nested box
             </div>
@@ -523,7 +525,7 @@ Lets go one step further to hammer home the point. Say you use Template Toolkit 
 
 Indeed if templates have any kind of processing at all on board, I put it to you that they B<aren't templates> at all. (You wouldn't call a PHP script a template, would you?)
 
-The L<Template::Nest> philosophy is that if you are templating something, your templates should be little chunks of that something, and nothing more. So when templating html, each template should be a standalone chunk of html, you can save it with file extension .html, and you can go ahead and display it standalone in a browser. 
+The L<Template::Nest> philosophy is that if you are templating something, your templates should be little chunks of that something, and nothing more. So when templating html, each template should be a standalone chunk of html, you can save it with file extension .html, and you can go ahead and display it standalone in a browser.
 
 Personally I have never liked complex templating systems like Mason, Template Toolkit etc. - I am forced to put up with them because of their near-ubiquity, but in my experience their usage often leads to some truly outrageous messes. I don't think this is surprising, because with processing in your template, how can you really have MVC? "Control" and "View" are not separate.
 
@@ -551,12 +553,12 @@ I want to keep this module lightweight and simple, but one minor irritation with
         'config.variable2' => $config->{variable2}
     });
 
-    my $output2 = $nest->render({                   
+    my $output2 = $nest->render({
         'NAME' => 'some_template',
         'config.variable1' => $config->{variable1},  # same crap all over again
         'config.variable2' => $config->{variable2}   # and it was annoying enough
     });                                              # the first time
-        
+
 Obviously this is tedious and a deal-breaker for a larger project. So C<v0.05> allows you to preload config variables thus:
 
     my $config = get_config_from_somewhere();
@@ -565,7 +567,7 @@ Obviously this is tedious and a deal-breaker for a larger project. So C<v0.05> a
 
     my $output1 = $nest->render({
         NAME => 'some_template'
-        
+
         # no need for anything here
 
     });
@@ -589,7 +591,7 @@ In C<v0.04> if you had:
  <strong>
       TO INFINITY AND BEYOND!
  </strong>
- 
+
 and then you did
 
  $nest->render({
@@ -609,7 +611,7 @@ You would get:
 
 Note the indenting. Not pretty! (However this is completely accurate in terms of replacing the C<contents> token; no extra characters are added or removed during the replacement)
 
-So now you can 
+So now you can
 
  $nest->fixed_indent(1);
 
@@ -670,9 +672,9 @@ I specify that I want to use C<address.html> when I fill out the template, thus:
         NAME => 'letter',
         username => 'billy',
         address => {
-            NAME => 'address', # this specifies "address.html" 
+            NAME => 'address', # this specifies "address.html"
                                # provided template_ext=".html"
-            
+
             # variables in 'address.html'
         }
     };
@@ -685,7 +687,7 @@ Commonly used template structures can be labelled (C<main_page> etc.) stored in 
 
 =head2 Another example
 
-The idea of a "template loop" comes from the need to e.g. fill in a table with an arbitrary number of rows. So using L<HTML::Template> you might do something like: 
+The idea of a "template loop" comes from the need to e.g. fill in a table with an arbitrary number of rows. So using L<HTML::Template> you might do something like:
 
     # in the template
 
@@ -702,17 +704,17 @@ The idea of a "template loop" comes from the need to e.g. fill in a table with a
        </TMPL_LOOP>
     </table>
 
-    # in the perl 
+    # in the perl
 
     $template->param(
         EMPLOYEE_INFO => [
-            {name => 'Sam', job => 'programmer'}, 
+            {name => 'Sam', job => 'programmer'},
             {name => 'Steve', job => 'soda jerk'}
         ]
     );
     print $template->output();
 
-    # output 
+    # output
 
     <table>
 
@@ -812,7 +814,7 @@ C<Template::Nest> is far simpler, and makes far more sense!
 Use this in conjunction with show_labels. Get/set the delimiters used to define comment labels. Expects a 2 element arrayref. E.g. if you were templating javascript you could do:
 
     $nest->comment_delims( '/*', '*/' );
-    
+
 Now your output will have labels like
 
     /* BEGIN my_js_file */
@@ -854,7 +856,7 @@ Provide a hashref of default values to have L<Template::Nest> auto-fill matching
     print "$html\n";
 
     # prints:
-    
+
     <div class='box'>
         <a href="">Soup of the day is French Onion Soup !</a>
     </div>
@@ -908,7 +910,7 @@ ie you are reserving the C<config.> prefix for parameters you are expecting to c
     my $defaults = {
         'config.soup_website_url' => 'http://www.example.com/soup-addicts',
         'config.some_other_url' => 'http://www.example.com/some-other-url'
-    
+
         #...
     };
 
@@ -922,7 +924,7 @@ but writing 'config.' repeatedly is a bit effortful, so L<Template::Nest> allows
 
             soup_website_url => 'http://www.example.com/soup-addicts',
             some_other_url => 'http://www.example.com/some-other-url'
-    
+
             #...
         },
 
@@ -962,7 +964,7 @@ Allows you to provide a "namespaced" defaults hash rather than just a flat one. 
 
 You can do this:
 
-    $nest->defaults({        
+    $nest->defaults({
         namespace1 => {
             variable1 => 'value1',
             variable2 => 'value2'
@@ -1012,7 +1014,7 @@ Clearly in this case we are a bit stuck because L<Template::Nest> is going to th
     lots of love
     Roger
 
-In the output the backslash will be removed, and the C<[% and %]> will get printed verbatim. 
+In the output the backslash will be removed, and the C<[% and %]> will get printed verbatim.
 
 C<escape_char> is set to be a backslash by default. This means if you want an actual backslash to be printed, you would need a double backslash in your template.
 
@@ -1042,7 +1044,7 @@ Intended to improve readability when inspecting nested templates. Consider the f
     <div>
         <img src='/some_image.jpg'>
     </div>
-    
+
     $nest->render({
         NAME => 'box',
         contents => 'image'
@@ -1056,7 +1058,7 @@ Intended to improve readability when inspecting nested templates. Consider the f
     </div>
     </div>
 
-Note the ugly indenting. In fact this is completely correct behaviour in terms of faithfully replacing the token 
+Note the ugly indenting. In fact this is completely correct behaviour in terms of faithfully replacing the token
 
     <!--% contents %-->
 
@@ -1099,7 +1101,7 @@ will never get populated. If you really are adamant about needing to have a temp
 
 =head2 new
 
-constructor for a Template::Nest object. 
+constructor for a Template::Nest object.
 
     my $nest = Template::Nest->new( %opts );
 
@@ -1131,7 +1133,7 @@ e.g.
 
     widget_body.html:
     <div>
-        <div>I am the widget body!</div>    
+        <div>I am the widget body!</div>
         <div><!-- TMPL_VAR NAME=some_widget_property --></div>
     </div>
 
@@ -1153,7 +1155,7 @@ e.g.
         <h4>I am a widget</h4>
         <div>
             <div>
-                <div>I am the widget body!</div>    
+                <div>I am the widget body!</div>
                 <div>Totally useless widget</div>
             </div>
         </div>
@@ -1163,7 +1165,7 @@ e.g.
 
 =head2 show_labels
 
-Get/set the show_labels property. This is a boolean with default 0. Setting this to 1 results in adding comments to the output so you can identify which template output text came from. This is useful in development when you have many templates. E.g. adding 
+Get/set the show_labels property. This is a boolean with default 0. Setting this to 1 results in adding comments to the output so you can identify which template output text came from. This is useful in development when you have many templates. E.g. adding
 
     $nest->show_labels(1);
 
@@ -1173,7 +1175,7 @@ to the example in the synopsis results in the following:
     <html>
         <head>
             <style>
-                div { 
+                div {
                     padding: 20px;
                     margin: 20px;
                     background-color: yellow;
@@ -1182,7 +1184,7 @@ to the example in the synopsis results in the following:
         </head>
 
         <body>
-            
+
     <!-- BEGIN box -->
     <div>
         First nested box
@@ -1233,7 +1235,7 @@ Template::Nest will then prepend NAME with template_dir, append template_ext and
  /my/template/dir/my/component/location.html
 
 
-Of course if you want components to be nested arbitrarily, it might not make sense to contain them in a prescriptive directory structure. 
+Of course if you want components to be nested arbitrarily, it might not make sense to contain them in a prescriptive directory structure.
 
 
 =head2 template_ext
@@ -1249,7 +1251,7 @@ then
         ...
     }
 
-So here HTML::Template::Nest will look in template_dir for 
+So here HTML::Template::Nest will look in template_dir for
 
 some_js_file.js
 
@@ -1284,7 +1286,7 @@ The default token_delims are the mason style delimiters C<<%> and C<%>>. Note th
 
 =head1 SEE ALSO
 
-L<HTML::Template::Nest> L<HTML::Template> L<Text::Template> L<Mason> L<Template::Toolkit> 
+L<HTML::Template::Nest> L<HTML::Template> L<Text::Template> L<Mason> L<Template::Toolkit>
 
 =head1 AUTHOR
 
@@ -1299,22 +1301,3 @@ it under the same terms as Perl itself, either Perl version 5.20.1 or,
 at your option, any later version of Perl 5 you may have available.
 
 =cut
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

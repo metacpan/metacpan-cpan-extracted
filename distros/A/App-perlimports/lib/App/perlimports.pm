@@ -3,7 +3,7 @@ package App::perlimports;
 use strict;
 use warnings;
 
-our $VERSION = '0.000005';
+our $VERSION = '0.000006';
 
 1;
 
@@ -21,7 +21,7 @@ App::perlimports - Make implicit imports explicit
 
 =head1 VERSION
 
-version 0.000005
+version 0.000006
 
 =head1 SYNOPSIS
 
@@ -37,6 +37,35 @@ hints as to where to find them:
 Redirect output to a new file:
 
     perlimports --filename test-data/foo.pl > foo.new.pl
+
+=head2 COMMAND LINE INTERFACE
+
+See L<perlimports> for more complete documentation of the command line
+interface.
+
+=head2 ANNOTATIONS/IGNORING MODULES
+
+Aside from the documented command line switches for ignoring modules, you can
+add annotations in your code.
+
+    use Encode; ## no perlimports
+
+The above will tell L<perlimports> not to attempt a tidy of this line.
+
+    ## no perlimports
+    use Encode;
+    use Cpanel::JSON::XS;
+    ## use perlimports
+
+    use POSIX ();
+
+The above will tell L<perlimports> not to tidy the two modules contained inside
+of the annotations.
+
+Please note that since L<perlimports> needs to know as much as possible about
+what's going on in a file, the annotations don't prevent modules from being
+loaded. It's only a directive to leave the lines in the file unchanged after
+processing.
 
 =head2 VIM
 

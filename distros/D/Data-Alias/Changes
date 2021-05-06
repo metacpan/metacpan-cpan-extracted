@@ -1,3 +1,10 @@
+version 1.24; 2021-05-05
+
+  * bugfix: copy() no longer produces malformed optrees which under certain
+    circumstances crashed perl 5.31.2 and later.  (contributed by TonyC)
+
+  * update for removal of '.' from @INC in perl 5.26.
+
 version 1.23; 2021-04-30
 
   * bugfix: fix aliasing semantic unintentionally being applied to subs
@@ -6,9 +13,9 @@ version 1.23; 2021-04-30
 version 1.22; 2021-04-22
 
   * bugfix: use SvCUR_set instead of direct SvCUR assignment to fix
-    compilation problems with -DDEBUGGING builds
+    compilation problems with -DDEBUGGING builds.  (contributed by TonyC)
 
-  * update for parser changes in v5.33.5-62-gc588171e62
+  * update for parser changes in v5.33.6.  (contributed by TonyC)
 
 version 1.21; 2017-12-08
 

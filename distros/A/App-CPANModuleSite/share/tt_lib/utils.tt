@@ -1,0 +1,22 @@
+[% MACRO doc_links BLOCK -%]
+<ul>
+[% FOR m IN modules -%]
+<li><a href="/lib/[% m.module.0.name.replace('::', '/') %].html">[% m.module.0.name %]</a></li>
+[% END -%]
+</ul>
+[% END -%]
+
+[% MACRO other_links BLOCK -%]
+<ul>
+<li><a href="https://metacpan.org/release/[% release.distribution %]">MetaCPAN</a></li>
+<li><a href="http://matrix.cpantesters.org/?dist=[% release.distribution %]">CPAN testers</a></li>
+<li><a href="https://cpants.cpanauthors.org/release/[% release.author %]/[% release.name %]">CPANTS</a></li>
+<li><a href="[% release.download_url %]">Download</a></li>
+[% IF release.resources.bugtracker.web -%]
+<li><a href="[% release.resources.bugtracker.web %]">Bug tracker</a></li>
+[% END -%]
+[% IF release.resources.repository.web -%]
+<li><a href="[% release.resources.repository.web %]">Code repository</a></li>
+[% END -%]
+</ul>
+[% END -%]

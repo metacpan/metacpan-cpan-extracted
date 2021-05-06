@@ -1,5 +1,8 @@
 Revision history for Perl extension namespace-allclean
 
+0.02 2021-05-05T13:34:38Z
+    - update github action, cpanfile and minil.toml
+
 0.01 2021-02-27T03:10:31Z
 
     - original version

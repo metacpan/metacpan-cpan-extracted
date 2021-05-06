@@ -1,9 +1,9 @@
 package Acme::CPANModules::UUID;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-01-20'; # DATE
+our $DATE = '2021-05-06'; # DATE
 our $DIST = 'Acme-CPANModules-UUID'; # DIST
-our $VERSION = '0.007'; # VERSION
+our $VERSION = '0.010'; # VERSION
 
 use strict;
 use warnings;
@@ -30,7 +30,7 @@ There are 5 "versions" of UUID for both variants 1 & 2, each might be more
 suitable than others in specific cases. The version information is encoded in
 the M position. Version 1 (v1) UUIDs are generated from a time and a node ID
 (usually the MAC address); version 2 (v2) UUIDs from an identifier (group/user
-ID), a time, and a node ID; version 4 (v4) UUIDs from a random/pseudo-random
+ID), a time, and a node ID; version 4 (v4) UUIDs from a rando/mpseudo-random
 number; version 3 (v3) UUIDs from hashing a namespace using MD5; version 5 (v5)
 from hashing a namespace using SHA-1.
 
@@ -38,7 +38,8 @@ from hashing a namespace using SHA-1.
 modules you can use <pm:UUID::Tiny> instead.
 
 Aside from the modules listed as entries below, there are also:
-<pm:App::UUIDUtils> (containing CLIs to create/check UUID).
+<pm:App::UUIDUtils> (containing CLIs to create/check UUID), <pm:Data::GUID>
+(currently just a wrapper for Data::UUID).
 
 _
     entry_features => {
@@ -70,12 +71,37 @@ _
         },
 
         {
+            module => 'UUID::FFI',
+            description => <<'_',
+
+This module provides access to libuuid via the FFI interface. It can create v1
+as well as v4 (random) UUIDs. Note that Data::UUID (XS-based) is faster this
+module (FFI-based).
+
+The benchmark code creates 1000+1 v1 string UUIDs.
+
+_
+            bench_code_template => 'UUID::FFI->new_time for 1..1000; UUID::FFI->new_time->as_hex',
+            features => {
+                is_xs => 1,
+                is_pp => 0,
+                create_v1 => 1,
+                create_v2 => 0,
+                create_v3 => 0,
+                create_v4 => 1,
+                v4_secure_random => 0,
+                v4_rfc4122 => 1,
+                create_v5 => 0,
+            },
+        },
+
+        {
             module => 'UUID::Tiny',
             description => <<'_',
 
 This module should be your go-to choice if you cannot use an XS module. It can
 create v1, v3, v4 UUIDs. However, the random v4 UUIDs are not cryptographically
-secure, if you need that use <pm:Crypt::Misc>.
+secure; if you need cryptographically secure random UUIDs, use <pm:Crypt::Misc>.
 
 The benchmark code creates 1000+1 v1 string UUIDs.
 
@@ -229,7 +255,7 @@ Acme::CPANModules::UUID - Modules that can generate immutable universally unique
 
 =head1 VERSION
 
-This document describes version 0.007 of Acme::CPANModules::UUID (from Perl distribution Acme-CPANModules-UUID), released on 2021-01-20.
+This document describes version 0.010 of Acme::CPANModules::UUID (from Perl distribution Acme-CPANModules-UUID), released on 2021-05-06.
 
 =head1 SYNOPSIS
 
@@ -263,7 +289,7 @@ There are 5 "versions" of UUID for both variants 1 & 2, each might be more
 suitable than others in specific cases. The version information is encoded in
 the M position. Version 1 (v1) UUIDs are generated from a time and a node ID
 (usually the MAC address); version 2 (v2) UUIDs from an identifier (group/user
-ID), a time, and a node ID; version 4 (v4) UUIDs from a random/pseudo-random
+ID), a time, and a node ID; version 4 (v4) UUIDs from a rando/mpseudo-random
 number; version 3 (v3) UUIDs from hashing a namespace using MD5; version 5 (v5)
 from hashing a namespace using SHA-1.
 
@@ -271,7 +297,106 @@ L<Data::UUID> should be your first choice, and when you cannot install XS
 modules you can use L<UUID::Tiny> instead.
 
 Aside from the modules listed as entries below, there are also:
-L<App::UUIDUtils> (containing CLIs to create/check UUID).
+L<App::UUIDUtils> (containing CLIs to create/check UUID), L<Data::GUID>
+(currently just a wrapper for Data::UUID).
+
+=head1 ACME::CPANMODULES ENTRIES
+
+=over
+
+=item * L<Data::UUID>
+
+This module creates v1 and v2 UUIDs. Depending on the OS, for MAC address, it
+usually uses a hash of hostname instead. This module is XS, so performance is
+good. If you cannot use an XS module, try L<UUID::Tiny> instead.
+
+The benchmark code creates 1000+1 v1 string UUIDs.
+
+
+=item * L<UUID::FFI>
+
+This module provides access to libuuid via the FFI interface. It can create v1
+as well as v4 (random) UUIDs. Note that Data::UUID (XS-based) is faster this
+module (FFI-based).
+
+The benchmark code creates 1000+1 v1 string UUIDs.
+
+
+=item * L<UUID::Tiny>
+
+This module should be your go-to choice if you cannot use an XS module. It can
+create v1, v3, v4 UUIDs. However, the random v4 UUIDs are not cryptographically
+secure; if you need cryptographically secure random UUIDs, use L<Crypt::Misc>.
+
+The benchmark code creates 1000+1 v1 string UUIDs.
+
+See also: L<Types::UUID> which is a type library that uses Data::UUID as the
+backend.
+
+
+=item * L<UUID::Random>
+
+This module simply uses 32 calls to Perl's C<rand()> to construct each random
+hexadecimal digits of the UUID (v4). Not really recommended, since perl's
+default pseudo-random generator is neither cryptographically secure nor has 128
+bit of entropy. It also does not produce v4 UUIDs that conform to RFC 4122 (no
+encoding of variant & version information).
+
+To create a cryptographically secure random UUIDs, use L<Crypt::Misc>.
+
+The benchmark code creates 1000+1 v4 string UUIDs.
+
+
+=item * L<UUID::Random::PERLANCAR>
+
+Just another implementation of L<UUID::Random>.
+
+The benchmark code creates 1000+1 v4 string UUIDs.
+
+
+=item * L<UUID::Random::Secure>
+
+Just like L<UUID::Random>, except it uses L<Math::Random::Secure>'s
+C<irand()> to produce random numbers.
+
+The benchmark code creates 1000+1 v4 string UUIDs.
+
+
+=item * L<Crypt::Misc>
+
+This module from the L<CryptX> distribution has a function to create and check
+v4 UUIDs.
+
+The benchmark code creates 1000+1 v4 string UUIDs.
+
+
+=back
+
+=head1 ACME::CPANMODULES FEATURE COMPARISON MATRIX
+
+ +-------------------------+-----------+-----------+-----------+-----------+-----------+-------+-------+----------------+----------------------+
+ | module                  | create_v1 | create_v2 | create_v3 | create_v4 | create_v5 | is_pp | is_xs | v4_rfc4122 *1) | v4_secure_random *2) |
+ +-------------------------+-----------+-----------+-----------+-----------+-----------+-------+-------+----------------+----------------------+
+ | Data::UUID              | yes       | yes       | no        | no        | no        | no    | yes   | N/A            | N/A                  |
+ | UUID::FFI               | yes       | no        | no        | yes       | no        | no    | yes   | yes            | no                   |
+ | UUID::Tiny              | yes       | no        | yes       | yes       | yes       | yes   | no    | yes            | no                   |
+ | UUID::Random            | no        | no        | no        | yes       | no        | yes   | no    | no             | no                   |
+ | UUID::Random::PERLANCAR | no        | no        | no        | yes       | no        | yes   | no    | yes            | no                   |
+ | UUID::Random::Secure    | no        | no        | no        | yes       | no        | yes   | no    | yes            | yes                  |
+ | Crypt::Misc             | no        | no        | no        | yes       | no        | yes   | no    | yes            | yes                  |
+ +-------------------------+-----------+-----------+-----------+-----------+-----------+-------+-------+----------------+----------------------+
+ 
+
+
+Notes:
+
+=over
+
+=item 1. v4_rfc4122: Whether the generated v4 UUID follows RFC 4122 specification (i.e. encodes variant and version information in M & N positions)
+
+=item 2. v4_secure_random: Whether the module uses cryptographically secure pseudo-random number generator for v4 UUIDs
+
+=back
 
 =head1 BENCHMARKED MODULES
 
@@ -279,13 +404,15 @@ Version numbers shown below are the versions used when running the sample benchm
 
 L<Data::UUID> 1.224
 
+L<UUID::FFI> 0.09
+
 L<UUID::Tiny> 1.04
 
 L<UUID::Random> 0.04
 
 L<UUID::Random::PERLANCAR> 0.005
 
-L<UUID::Random::Secure> 0.003
+L<UUID::Random::Secure> 0.004
 
 L<Crypt::Misc> 0.069
 
@@ -298,6 +425,14 @@ L<Crypt::Misc> 0.069
 Code template:
 
  my $u = Data::UUID->new; $u->create for 1..1000; $u->to_string($u->create)
+
+
+
+=item * UUID::FFI (perl_code)
+
+Code template:
+
+ UUID::FFI->new_time for 1..1000; UUID::FFI->new_time->as_hex
 
 
 
@@ -361,23 +496,24 @@ Code template:
 
 =head1 SAMPLE BENCHMARK RESULTS
 
-Run on: perl: I<< v5.30.0 >>, CPU: I<< Intel(R) Core(TM) i5-7200U CPU @ 2.50GHz (2 cores) >>, OS: I<< GNU/Linux Ubuntu version 19.10 >>, OS kernel: I<< Linux version 5.3.0-64-generic >>.
+Run on: perl: I<< v5.30.0 >>, CPU: I<< Intel(R) Core(TM) i5-7200U CPU @ 2.50GHz (2 cores) >>, OS: I<< GNU/Linux Ubuntu version 20.04 >>, OS kernel: I<< Linux version 5.3.0-64-generic >>.
 
 Benchmark with default options (C<< bencher --cpanmodules-module UUID >>):
 
  #table1#
- +---------------------------------------+-----------+-----------+-----------------------+-----------------------+---------+---------+
- | participant                           | rate (/s) | time (ms) | pct_faster_vs_slowest | pct_slower_vs_fastest |  errors | samples |
- +---------------------------------------+-----------+-----------+-----------------------+-----------------------+---------+---------+
- | UUID::Random::Secure::generate_rfc    |        47 |    21     |                 0.00% |              5170.91% | 4.4e-05 |      20 |
- | UUID::Random::Secure::generate        |        48 |    21     |                 1.57% |              5089.54% | 5.8e-05 |      20 |
- | UUID::Random                          |       110 |     8.7   |               144.09% |              2059.42% | 3.3e-05 |      20 |
- | UUID::Tiny                            |       150 |     6.9   |               209.41% |              1603.51% |   4e-05 |      20 |
- | Crypt::Misc                           |       280 |     3.5   |               502.44% |               774.93% | 2.1e-05 |      21 |
- | UUID::Random::PERLANCAR::generate_rfc |      1530 |     0.652 |              3171.61% |                61.11% | 1.6e-07 |      20 |
- | UUID::Random::PERLANCAR::generate     |      1860 |     0.538 |              3866.37% |                32.89% | 3.6e-07 |      21 |
- | Data::UUID                            |      2500 |     0.4   |              5170.91% |                 0.00% | 1.5e-06 |      20 |
- +---------------------------------------+-----------+-----------+-----------------------+-----------------------+---------+---------+
+ +---------------------------------------+-----------+-----------+-----------------------+-----------------------+-----------+---------+
+ | participant                           | rate (/s) | time (ms) | pct_faster_vs_slowest | pct_slower_vs_fastest |  errors   | samples |
+ +---------------------------------------+-----------+-----------+-----------------------+-----------------------+-----------+---------+
+ | UUID::Random::Secure::generate_rfc    |        46 |     22    |                 0.00% |              4868.44% | 7.5e-05   |      28 |
+ | UUID::Random::Secure::generate        |        47 |     21    |                 2.74% |              4735.97% |   6e-05   |      23 |
+ | UUID::Random                          |        90 |     10    |                95.80% |              2437.45% |   0.00034 |      22 |
+ | UUID::Tiny                            |       140 |      7.2  |               201.89% |              1545.81% | 1.8e-05   |      20 |
+ | Crypt::Misc                           |       290 |      3.5  |               525.12% |               694.80% | 1.4e-05   |      20 |
+ | UUID::FFI                             |       930 |      1.1  |              1911.64% |               146.98% | 3.4e-06   |      20 |
+ | UUID::Random::PERLANCAR::generate_rfc |      1000 |      1    |              2098.91% |               125.95% | 2.9e-05   |      34 |
+ | UUID::Random::PERLANCAR::generate     |      1700 |      0.59 |              3596.91% |                34.39% | 1.1e-06   |      20 |
+ | Data::UUID                            |      2300 |      0.44 |              4868.44% |                 0.00% | 1.8e-06   |      20 |
+ +---------------------------------------+-----------+-----------+-----------------------+-----------------------+-----------+---------+
 
 
 Benchmark module startup overhead (C<< bencher --cpanmodules-module UUID --module-startup >>):
@@ -386,104 +522,18 @@ Benchmark module startup overhead (C<< bencher --cpanmodules-module UUID --modul
  +-------------------------+-----------+-------------------+-----------------------+-----------------------+-----------+---------+
  | participant             | time (ms) | mod_overhead_time | pct_faster_vs_slowest | pct_slower_vs_fastest |  errors   | samples |
  +-------------------------+-----------+-------------------+-----------------------+-----------------------+-----------+---------+
- | UUID::Random::Secure    |      90   |              83.3 |                 0.00% |              1241.53% |   0.00036 |      20 |
- | UUID::Tiny              |      24   |              17.3 |               275.89% |               256.89% | 8.1e-05   |      20 |
- | Crypt::Misc             |      18   |              11.3 |               393.94% |               171.60% | 8.1e-05   |      20 |
- | Data::UUID              |      15   |               8.3 |               506.49% |               121.19% | 6.8e-05   |      20 |
- | UUID::Random            |       8.9 |               2.2 |               917.54% |                31.84% | 5.4e-05   |      22 |
- | UUID::Random::PERLANCAR |       8.8 |               2.1 |               925.85% |                30.77% |   6e-05   |      20 |
- | perl -e1 (baseline)     |       6.7 |               0   |              1241.53% |                 0.00% | 3.8e-05   |      22 |
+ | UUID::Random::Secure    |      86   |              78   |                 0.00% |               976.54% |   0.00038 |      20 |
+ | UUID::FFI               |      60   |              52   |                44.16% |               646.77% | 8.1e-05   |      20 |
+ | UUID::Tiny              |      24   |              16   |               259.84% |               199.17% | 3.8e-05   |      22 |
+ | Crypt::Misc             |      18.3 |              10.3 |               371.86% |               128.15% | 1.6e-05   |      20 |
+ | Data::UUID              |      16   |               8   |               429.19% |               103.43% |   0.00012 |      20 |
+ | UUID::Random            |       9.2 |               1.2 |               840.25% |                14.50% | 2.7e-05   |      20 |
+ | UUID::Random::PERLANCAR |       9.1 |               1.1 |               850.03% |                13.32% | 2.3e-05   |      20 |
+ | perl -e1 (baseline)     |       8   |               0   |               976.54% |                 0.00% |   0.00018 |      20 |
  +-------------------------+-----------+-------------------+-----------------------+-----------------------+-----------+---------+
 
 
 To display as an interactive HTML table on a browser, you can add option C<--format html+datatables>.
-
-=head1 ACME::CPANMODULES FEATURE COMPARISON MATRIX
-
- +-------------------------+-----------+-----------+-----------+-----------+-----------+-------+-------+----------------+----------------------+
- | module                  | create_v1 | create_v2 | create_v3 | create_v4 | create_v5 | is_pp | is_xs | v4_rfc4122 *1) | v4_secure_random *2) |
- +-------------------------+-----------+-----------+-----------+-----------+-----------+-------+-------+----------------+----------------------+
- | Data::UUID              | yes       | yes       | no        | no        | no        | no    | yes   | N/A            | N/A                  |
- | UUID::Tiny              | yes       | no        | yes       | yes       | yes       | yes   | no    | yes            | no                   |
- | UUID::Random            | no        | no        | no        | yes       | no        | yes   | no    | no             | no                   |
- | UUID::Random::PERLANCAR | no        | no        | no        | yes       | no        | yes   | no    | yes            | no                   |
- | UUID::Random::Secure    | no        | no        | no        | yes       | no        | yes   | no    | yes            | yes                  |
- | Crypt::Misc             | no        | no        | no        | yes       | no        | yes   | no    | yes            | yes                  |
- +-------------------------+-----------+-----------+-----------+-----------+-----------+-------+-------+----------------+----------------------+
-
-
-Notes:
-
-=over
-
-=item 1. v4_rfc4122: Whether the generated v4 UUID follows RFC 4122 specification (i.e. encodes variant and version information in M & N positions)
-
-=item 2. v4_secure_random: Whether the module uses cryptographically secure pseudo-random number generator for v4 UUIDs
-
-=back
-
-=head1 ACME::MODULES ENTRIES
-
-=over
-
-=item * L<Data::UUID>
-
-This module creates v1 and v2 UUIDs. Depending on the OS, for MAC address, it
-usually uses a hash of hostname instead. This module is XS, so performance is
-good. If you cannot use an XS module, try L<UUID::Tiny> instead.
-
-The benchmark code creates 1000+1 v1 string UUIDs.
-
-
-=item * L<UUID::Tiny>
-
-This module should be your go-to choice if you cannot use an XS module. It can
-create v1, v3, v4 UUIDs. However, the random v4 UUIDs are not cryptographically
-secure, if you need that use L<Crypt::Misc>.
-
-The benchmark code creates 1000+1 v1 string UUIDs.
-
-See also: L<Types::UUID> which is a type library that uses Data::UUID as the
-backend.
-
-
-=item * L<UUID::Random>
-
-This module simply uses 32 calls to Perl's C<rand()> to construct each random
-hexadecimal digits of the UUID (v4). Not really recommended, since perl's
-default pseudo-random generator is neither cryptographically secure nor has 128
-bit of entropy. It also does not produce v4 UUIDs that conform to RFC 4122 (no
-encoding of variant & version information).
-
-To create a cryptographically secure random UUIDs, use L<Crypt::Misc>.
-
-The benchmark code creates 1000+1 v4 string UUIDs.
-
-
-=item * L<UUID::Random::PERLANCAR>
-
-Just another implementation of L<UUID::Random>.
-
-The benchmark code creates 1000+1 v4 string UUIDs.
-
-
-=item * L<UUID::Random::Secure>
-
-Just like L<UUID::Random>, except it uses L<Math::Random::Secure>'s
-C<irand()> to produce random numbers.
-
-The benchmark code creates 1000+1 v4 string UUIDs.
-
-
-=item * L<Crypt::Misc>
-
-This module from the L<CryptX> distribution has a function to create and check
-v4 UUIDs.
-
-The benchmark code creates 1000+1 v4 string UUIDs.
-
-
-=back
 
 =head1 FAQ
 

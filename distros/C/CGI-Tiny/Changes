@@ -1,3 +1,11 @@
+0.016     2021-05-05 21:31:12 EDT
+  - Add CGI::Tiny::escape_html convenience function
+
+0.015     2021-05-05 01:57:53 EDT
+  - Add debugging commands for commandline convenience
+  - Ignore response content passed to render and render_chunk in HEAD requests
+  - Omit autodetected Content-Type header when rendering empty fixed-length responses
+
 0.014     2021-05-04 03:26:46 EDT
   - Remove headers_rendered method, instead pass rendered status to error handlers
 

@@ -6,7 +6,7 @@ use strict;
 use warnings;
 
 package Raisin::Encoder::YAML;
-$Raisin::Encoder::YAML::VERSION = '0.92';
+$Raisin::Encoder::YAML::VERSION = '0.93';
 use Encode qw(encode_utf8 decode_utf8);
 use YAML qw(Dump Load);
 
@@ -29,7 +29,7 @@ Raisin::Encoder::YAML - YAML serialization plugin for Raisin.
 
 =head1 VERSION
 
-version 0.92
+version 0.93
 
 =head1 DESCRIPTION
 

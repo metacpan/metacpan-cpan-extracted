@@ -1,5 +1,9 @@
 Revision history for Perl extension Catalyst::Plugin::Static::Simple
 
+0.37 - 2021-05-05
+       - Port Makefile.PL from Module::Install to Distar
+       - Remove MooseX::Types dependency
+
 0.36   2018-03-15 11:37 GMT
        - Relax PNG content type check in t/05dirs.t
 

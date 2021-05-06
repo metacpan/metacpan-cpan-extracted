@@ -112,25 +112,25 @@ sub new {
     return $self;
 }
 
+# regularly prune queue
+sub __disp_expire_timer {
+    my $self = shift || return; # dispatcher already deleted (weak reference)
+    my $min_expire = $self->queue_expire($self->{eventloop}->looptime);
+    if (!$min_expire) {
+	# nothing in queue to expire
+	delete $self->{disp_expire};
+	return;
+    }
+    # add timer again
+    $self->{disp_expire} = $self->add_timer(
+	1, [\&__disp_expire_timer, $self], undef, 'disp_expire');
+}
 sub __set_disp_expire_timer {
     my Net::SIP::Dispatcher $self = shift;
-    return if exists $self->{disp_expire};
-    # regularly prune queue
-    my $sub = sub {
-	my ($self,$timer) = @_;
-	if ( $self ) {
-	    my $min_expire = $self->queue_expire( $self->{eventloop}->looptime );
-	    if ( not defined $min_expire ) {
-		delete $self->{disp_expire};
-		$timer->cancel;
-	    }
-	} else {
-	    $timer->cancel;
-	}
-    };
-    my $cb = [ $sub,$self ];
-    weaken( $cb->[1] );
-    $self->{disp_expire} = $self->add_timer( 1,$cb,1,'disp_expire' );
+    $self->{disp_expire} and return;
+    my $cb = [\&__disp_expire_timer, $self];
+    weaken($cb->[1]);
+    $self->{disp_expire} = $self->add_timer(1, $cb, undef, 'disp_expire');
 }
 
 ###########################################################################
@@ -693,6 +693,7 @@ sub resolve_uri {
     };
 
     my @proto;
+    my $force_port;
     my $default_port = 5060;
     if ( $sip_proto eq 'sips' ) {
 	$default_port = 5061;
@@ -740,7 +741,7 @@ sub resolve_uri {
 	    DEBUG( 50,"bad URI '$uri'" );
 	    return invoke_callback($callback, EHOSTUNREACH );
 	};
-	$default_port = $port if defined $port;
+	$force_port = $port if defined $port;
 	if ($family) {
 	    $ip_addr ||= $host;
 	    $domain = ip_ptr($host,$family);
@@ -764,6 +765,7 @@ sub resolve_uri {
 	    if ( $addr ) {
 		DEBUG( 50,"setting dst_addr from domain specific proxy for domain $dom" );
 		@$dst_addr = @$addr;
+		undef $force_port;
 	    }
 	}
     }
@@ -774,6 +776,7 @@ sub resolve_uri {
 	# if we have a fixed outgoing proxy use it
 	DEBUG( 50,"setting dst_addr+leg to $addr from outgoing_proxy" );
 	@$dst_addr = ( $addr );
+	undef $force_port;
     }
 
     # is it an IP address?
@@ -800,7 +803,7 @@ sub resolve_uri {
 		proto  => $proto,
 		host   => $host,
 		addr   => $family ? $host : undef,
-		port   => $port || $default_port,
+		port   => $port || $force_port || $default_port,
 		family => $family
 	    });
 	    push @resp, map { lock_ref_keys({
@@ -828,7 +831,7 @@ sub resolve_uri {
 	return invoke_callback($callback, ENOPROTOOPT) if ! @resp;
     }
 
-    my @param = ( $dst_addr,$legs,$allowed_legs,$default_port,$callback );
+    my @param = ( $dst_addr,$legs,$allowed_legs,$force_port,$default_port,$callback );
     if (@resp) {
 	# directly call __resolve_uri_final if all names are resolved
 	return __resolve_uri_final( @param,\@resp )
@@ -843,16 +846,32 @@ sub resolve_uri {
     # but query instead directly for _sip._udp.domain.. like in
     # RFC2543 specified
 
+    # filter protocols not supported by any leg
+    my @proto_new;
+    foreach my $p ( @proto ) {
+	my $l = first { $_->match({ proto => $p }) } @$allowed_legs;
+	push @proto_new,$p if $l;
+    }
+    @proto = @proto_new;
+    @proto or do {
+	DEBUG( 50,"no legs allowed for $uri" );
+	@$dst_addr = ();
+	return invoke_callback( $callback, ENOPROTOOPT ); # no proto available
+    };
+
     return $self->dns_domain2srv($domain, \@proto,
 	[ \&__resolve_uri_final, @param ]);
 }
 
 sub __resolve_uri_final {
-    my ($dst_addr,$legs,$allowed_legs,$default_port,$callback,$resp) = @_;
+    my ($dst_addr,$legs,$allowed_legs,$force_port,$default_port,$callback,$resp) = @_;
     $DEBUG && DEBUG_DUMP( 100,$resp );
 
     return invoke_callback( $callback,EHOSTUNREACH )
 	unless $resp && @$resp;
+
+    # overwrite port if it was forced by user
+    do { $_->{port} = $force_port for(@$resp) } if $force_port;
 
     # for A|AAAA records we got no port, use default_port
     $_->{port} ||= $default_port for(@$resp);
@@ -1063,7 +1082,7 @@ sub __generic_resolver {
     for(my $i=0; $i<@$queries; $i++) {
 	my $q = $queries->[$i];
 	if ($q->{type} eq 'BREAK-IF-RESULTS') {
-	    if (@$results) {
+	    if (@$results and $i==0) {
 		# skip remaining queries
 		@$queries = ();
 		last;

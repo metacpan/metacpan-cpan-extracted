@@ -9,7 +9,7 @@ use PGPLOT;
 use Starlink::AST;
 use Carp;
 
-$VERSION = '3.00';
+$VERSION = '3.01';
 
 =head1 NAME
 

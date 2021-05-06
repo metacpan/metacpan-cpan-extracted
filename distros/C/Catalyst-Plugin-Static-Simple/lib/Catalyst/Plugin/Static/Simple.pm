@@ -5,14 +5,13 @@ use File::stat;
 use File::Spec ();
 use IO::File ();
 use MIME::Types ();
-use MooseX::Types::Moose qw/ArrayRef Str/;
 use Catalyst::Utils;
 use namespace::autoclean;
 
-our $VERSION = '0.36';
+our $VERSION = '0.37';
 
 has _static_file => ( is => 'rw' );
-has _static_debug_message => ( is => 'rw', isa => ArrayRef[Str] );
+has _static_debug_message => ( is => 'rw', isa => 'ArrayRef[Str]' );
 
 after setup_finalize => sub {
   my $c = shift;

@@ -1,0 +1,10 @@
+BEGIN { -e 'Distar' or system qw(git clone https://github.com/p5sagit/Distar.git) }
+use lib 'Distar/lib';
+use Distar 0.001;
+
+author 'Andy Grundman <andy@hybridized.org>';
+
+manifest_include 't/lib/TestApp/root' => qr/.*/;
+manifest_include 't/lib/IncTestApp/root' => qr/.*/;
+
+1;

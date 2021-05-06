@@ -37,7 +37,7 @@ qx.Class.define('callbackery.data.Config', {
             if (base){
                 base[1].split(/;/).forEach(function(kv){
                     var list = kv.split('=');
-                    ha[list[0]] = list[1];
+                    ha[list[0]] = decodeURIComponent(list[1]);
                 });
             }
             return ha;

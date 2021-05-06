@@ -103,7 +103,7 @@ One or more stream URLs can be returned for each podcast.
 
 =over 4
 
-=item B<new>(I<ID>|I<url> [, I<-debug> [ => 0|1|2 ] ... ])
+=item B<new>(I<ID>|I<url> [, I<-secure> [ => 0|1 ]] [, I<-debug> [ => 0|1|2 ]])
 
 Accepts a spreaker.com podcast ID or URL and creates and returns a 
 a new podcast object, or I<undef> if the URL is not a valid podcast, or no streams 
@@ -111,6 +111,11 @@ are found.  The URL can be the full URL, ie.
 https://widget.spreaker.com/player?episode_id=B<podcast-id>, 
 https://www.spreaker.com/user/B<user-id>/B<podcast-id-string>, or just 
 I<podcast-id>.
+
+The optional I<-secure> argument can be either 0 or 1 (I<false> or I<true>).  If 1 
+then only secure ("https://") streams will be returned.
+
+DEFAULT I<-secure> is 0 (false) - return all streams (http and https).
 
 =item $podcast->B<get>()
 
@@ -336,12 +341,16 @@ sub new
 	push (@userAgentOps, 'agent', 'Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101 Firefox/68.0')
 			unless (defined $uops{'agent'});
 	$uops{'timeout'} = 10  unless (defined $uops{'timeout'});
+	$uops{'secure'} = 0    unless (defined $uops{'secure'});
 	$DEBUG = $uops{'debug'}  if (defined $uops{'debug'});
 
 	while (@_) {
 		if ($_[0] =~ /^\-?debug$/o) {
 			shift;
 			$DEBUG = (defined($_[0]) && $_[0] =~/^[0-9]$/) ? shift : 1;
+		} elsif ($_[0] =~ /^\-?secure$/o) {
+			shift;
+			$uops{'secure'} = (defined $_[0]) ? shift : 1;
 		}
 	}
 
@@ -398,18 +407,24 @@ print STDERR "---failed to fetch!\n";
 
 	while ($html =~ s#\"(?:playback|download)\_url\"\:\"([^\"]+)\"##gso) {
 		(my $s = $1) =~ s#\\##g;;
-		push @{$self->{'streams'}}, $s;
-		$self->{'cnt'}++;
+		unless ($uops{'secure'} && $s !~ /^https/o) {
+			push @{$self->{'streams'}}, $s;
+			$self->{'cnt'}++;
+		}
 	}
 	while ($html =~ s#href\=\"([^\"]+)\"\s+id\=\"track[\_\-]download\"##gso) {
 		(my $s = $1) =~ s#\\##g;;
-		push @{$self->{'streams'}}, $s;
-		$self->{'cnt'}++;
+		unless ($uops{'secure'} && $s !~ /^https/o) {
+			push @{$self->{'streams'}}, $s;
+			$self->{'cnt'}++;
+		}
 	}
 	while ($html =~ s#\s+id\=\"track[\_\-]download\"\s+href\=\"([^\"]+)\"##gso) {
 		(my $s = $1) =~ s#\\##g;;
-		push @{$self->{'streams'}}, $s;
-		$self->{'cnt'}++;
+		unless ($uops{'secure'} && $s !~ /^https/o) {
+			push @{$self->{'streams'}}, $s;
+			$self->{'cnt'}++;
+		}
 	}
 	unless ($tried || $self->{'cnt'} > 0) {   #NO STREAMS, PERHAPS WE HAVE A PODCAST PAGE INSTEAD OF AN EPISODE PAGE?:
 		if ($html =~ s#^.+?\<div\s+class\=\"epl\_ep\_title\"\>##s) {

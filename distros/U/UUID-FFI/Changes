@@ -1,5 +1,8 @@
 Revision history for UUID-FFI
 
+0.09      2021-05-05 13:56:33 -0600
+  - Fixed runtime detection order (gh#4)
+
 0.08      2021-04-28 11:27:35 -0600
   - Fixed bug in use of overload (gh#3)
 

@@ -1,6 +1,10 @@
+v0.530
+    - Fix handling of newlines in responses.
+    - Update certificates for TLS tests.
+
 v0.520
     - Add support for PKI certificates.
-    - Fix failing remaining requests on errors.
+    - Fail remaining requests on errors.
 
 v0.501
     - Fix connection tests.

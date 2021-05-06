@@ -3,7 +3,7 @@ NAME
     Math::Random::Secure's rand()
 
 VERSION
-    This document describes version 0.02 of UUID::Random::Patch::UseMRS
+    This document describes version 0.030 of UUID::Random::Patch::UseMRS
     (from Perl distribution UUID-Random-Patch-UseMRS), released on
     2021-01-24.
 

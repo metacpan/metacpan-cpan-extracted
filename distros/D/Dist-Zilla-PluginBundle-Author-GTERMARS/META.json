@@ -105,8 +105,8 @@
          "web" : "https://github.com/bleargh45/Dist-Zilla-PluginBundle-Author-GTERMARS"
       }
    },
-   "version" : "0.03",
-   "x_generated_by_perl" : "v5.32.0",
+   "version" : "0.04",
+   "x_generated_by_perl" : "v5.32.1",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.24",
    "x_spdx_expression" : "Artistic-2.0",
    "x_static_install" : 1

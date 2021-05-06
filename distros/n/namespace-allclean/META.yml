@@ -3,12 +3,11 @@ abstract: 'Avoid imports all subroutines into your namespace'
 author:
   - 'kfly8 <kfly8@cpan.org>'
 build_requires:
-  Module::Build::Tiny: '0.035'
   Test::More: '0.98'
 configure_requires:
   Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v3.1.11, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Minilla/v3.1.12, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -27,7 +26,7 @@ no_index:
 provides:
   namespace::allclean:
     file: lib/namespace/allclean.pm
-    version: '0.01'
+    version: '0.02'
 requires:
   B::Hooks::EndOfScope: '0.12'
   namespace::clean: '0.20'
@@ -36,9 +35,9 @@ resources:
   bugtracker: https://github.com/kfly8/p5-namespace-allclean/issues
   homepage: https://github.com/kfly8/p5-namespace-allclean
   repository: git://github.com/kfly8/p5-namespace-allclean.git
-version: '0.01'
+version: '0.02'
 x_authority: cpan:KFLY
 x_contributors:
-  - 'kfly8 <kfly@cpan.org>'
+  - 'kobaken <kfly@cpan.org>'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_static_install: 1

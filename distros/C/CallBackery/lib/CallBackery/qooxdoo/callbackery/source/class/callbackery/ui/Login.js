@@ -156,16 +156,18 @@ qx.Class.define("callbackery.ui.Login", {
             colSpan: 3
         });
         if (cfg.passwordreset_popup) {
-            extraActions.add(
-                this.__makeExtraButton(
-                    cfg.passwordreset_popup,this.tr("Reset Password"))
+            let btn = this.__passwordresetBtn = this.__makeExtraButton(
+                cfg.passwordreset_popup,this.tr("Reset Password")
             );
+            extraActions.add(btn);
+            
+
         }
         if (cfg.registration_popup) {
-            extraActions.add(
-                this.__makeExtraButton(
-                    cfg.registration_popup,this.tr("Register New Account"))
+            let btn = this.__registrationBtn = this.__makeExtraButton(
+                cfg.registration_popup,this.tr("Register New Account")
             );
+            extraActions.add(btn);
         }
         
         if ( cfg.company_name && !cfg.hide_company){
@@ -214,6 +216,7 @@ qx.Class.define("callbackery.ui.Login", {
         },
         this);
 
+        let urlCfg = callbackery.data.Config.getInstance().getUrlConfig();
         this.addListener('appear', function() {
             if (! cfg.hide_password) {
                 password.setValue('');
@@ -235,6 +238,12 @@ qx.Class.define("callbackery.ui.Login", {
                 username.activate();
             }
             this.__ensureIframe();
+            if (urlCfg.app === 'registration' && this.__registrationBtn){
+                this.__registrationBtn.fireEvent('tap');
+            }
+            else if (urlCfg.app === 'passwordreset' && this.__passwordresetBtn){
+                this.__passwordresetBtn.fireEvent('tap');
+            }
         },this);
     },
 
@@ -249,6 +258,8 @@ qx.Class.define("callbackery.ui.Login", {
          * @return {void}
          */
         __iframe: null,
+        __passwdBtn: null,
+        __registrationBtn: null,
         __ensureIframe: function(){
             var iframe = document.getElementById("cbLoginIframe");
             if (!iframe) {

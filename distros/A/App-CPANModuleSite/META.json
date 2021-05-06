@@ -1,0 +1,58 @@
+{
+   "abstract" : "Automatically create a web site for a CPAN module.",
+   "author" : [
+      "Dave Cross <dave@perlhacks.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "App-CPANModuleSite",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "File::ShareDir::Install" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "File::ShareDir" : "0",
+            "MetaCPAN::Client" : "2",
+            "Moose" : "0",
+            "Moose::Util::TypeConstraints" : "0",
+            "Path::Iterator::Rule" : "0",
+            "Template" : "0",
+            "perl" : "5.014000"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/davorg/app-cpanmodulesite/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/davorg/app-cpanmodulesite.git",
+         "web" : "https://github.com/davorg/app-cpanmodulesite"
+      }
+   },
+   "version" : "v0.0.6",
+   "x_serialization_backend" : "JSON::PP version 4.06"
+}

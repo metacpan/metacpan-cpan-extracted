@@ -1,9 +1,9 @@
 package UUID::Tiny::Patch::UseMRS;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-12-22'; # DATE
+our $DATE = '2021-01-24'; # DATE
 our $DIST = 'UUID-Tiny-Patch-UseMRS'; # DIST
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 
 require Math::Random::Secure;
 
@@ -29,7 +29,7 @@ UUID::Tiny::Patch::UseMRS - Make UUID::Tiny use Math::Random::Secure's rand()
 
 =head1 VERSION
 
-This document describes version 0.001 of UUID::Tiny::Patch::UseMRS (from Perl distribution UUID-Tiny-Patch-UseMRS), released on 2020-12-22.
+This document describes version 0.002 of UUID::Tiny::Patch::UseMRS (from Perl distribution UUID-Tiny-Patch-UseMRS), released on 2021-01-24.
 
 =head1 SYNOPSIS
 
@@ -63,11 +63,11 @@ feature.
 
 =head1 SEE ALSO
 
-L<Math::Random::Secure>
+L<Math::Random::Secure>, L<UUID::Tiny>
 
-L<UUID::Tiny>
-
-L<UUID::Random> and L<UUID::Random::Patch::UseMRS>
+Other ways to generate random (v4) UUIDs: L<Crypt::Misc>,
+L<UUID::Random::Secure>, L<UUID::Random::Patch::UseMRS> and L<UUID::Random>.
+L<Acme::CPANModules::UUID> contains reviews and benchmarks of these.
 
 =head1 AUTHOR
 
@@ -75,7 +75,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2020 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

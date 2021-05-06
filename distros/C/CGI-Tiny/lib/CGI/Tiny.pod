@@ -32,7 +32,7 @@ CGI::Tiny - Common Gateway Interface, with no frills
 
     my $method = $cgi->method;
     my $fribble;
-    if ($method eq 'GET') {
+    if ($method eq 'GET' or $method eq 'HEAD') {
       $fribble = $cgi->query_param('fribble');
     } elsif ($method eq 'POST') {
       $fribble = $cgi->body_param('fribble');
@@ -115,7 +115,7 @@ CGI::Tiny's interface is a regular function called C<cgi> exported by default.
     # set up error handling on $cgi
     # inspect request data via $cgi
     # set response headers if needed via $cgi
-    # render response data with $cgi->render or $cgi->render_chunk
+    # render response with $cgi->render or $cgi->render_chunk
   };
 
 The code block is immediately run with C<$_> set to a CGI::Tiny object, which
@@ -465,73 +465,142 @@ any translation layers.
 
 =head2 Request Environment
 
+CGI::Tiny provides direct access to CGI
+L<request meta-variables|https://tools.ietf.org/html/rfc3875#section-4.1> via
+methods that map to the equivalent uppercase names (and a few short aliases).
+Since CGI does not distinguish between missing and empty values, missing values
+will be normalized to an empty string.
+
 =head3 auth_type
+
+  # AUTH_TYPE="Basic"
+  my $auth_type = $cgi->auth_type;
+
+The authentication scheme used in the C<Authorization> HTTP request header if
+any.
 
 =head3 content_length
 
+  # CONTENT_LENGTH="42"
+  my $content_length = $cgi->content_length;
+
+The size in bytes of the request body content if any.
+
 =head3 content_type
+
+  # CONTENT_TYPE="text/plain;charset=UTF-8"
+  my $content_type = $cgi->content_type;
+
+The MIME type of the request body content if any.
 
 =head3 gateway_interface
 
+  # GATEWAY_INTERFACE="CGI/1.1"
+  my $gateway_inteface = $cgi->gateway_interface;
+
+The CGI version used for communication with the CGI server.
+
 =head3 path_info
-
-=head3 path_translated
-
-=head3 query_string
-
-=head3 remote_addr
-
-=head3 remote_host
-
-=head3 remote_ident
-
-=head3 remote_user
-
-=head3 request_method
-
-=head3 script_name
-
-=head3 server_name
-
-=head3 server_port
-
-=head3 server_protocol
-
-=head3 server_software
-
-  my $auth_type      = $cgi->auth_type;         # AUTH_TYPE
-  my $content_length = $cgi->content_length;    # CONTENT_LENGTH
-  my $content_type   = $cgi->content_type;      # CONTENT_TYPE
-  my $gateway        = $cgi->gateway_interface; # GATEWAY_INTERFACE
-  my $path           = $cgi->path_info;         # PATH_INFO
-  my $file_path      = $cgi->path_translated;   # PATH_TRANSLATED
-  my $query          = $cgi->query_string;      # QUERY_STRING
-  my $remote_addr    = $cgi->remote_addr;       # REMOTE_ADDR
-  my $remote_host    = $cgi->remote_host;       # REMOTE_HOST
-  my $remote_ident   = $cgi->remote_ident;      # REMOTE_IDENT
-  my $remote_user    = $cgi->remote_user;       # REMOTE_USER
-  my $method         = $cgi->request_method;    # REQUEST_METHOD
-  my $script_name    = $cgi->script_name;       # SCRIPT_NAME
-  my $hostname       = $cgi->server_name;       # SERVER_NAME
-  my $port           = $cgi->server_port;       # SERVER_PORT
-  my $protocol       = $cgi->server_protocol;   # SERVER_PROTOCOL
-  my $server         = $cgi->server_software;   # SERVER_SOFTWARE
-
-Access to L<request meta-variables|https://tools.ietf.org/html/rfc3875#section-4.1>
-of the equivalent uppercase names. Since CGI does not distinguish between
-missing and empty values, missing values will be normalized to an empty string.
-
-=head3 method
 
 =head3 path
 
+  # PATH_INFO="/foo/42"
+  my $path = $cgi->path_info;
+  my $path = $cgi->path;
+
+The URL path following the C<SCRIPT_NAME> in the request URL if any.
+
+=head3 path_translated
+
+  # PATH_TRANSLATED="/var/www/html/foo/42"
+  my $path_translated = $cgi->path_translated;
+
+A local file path derived from C<PATH_INFO> by the CGI server, as if it were
+a request to the document root, if it chooses to provide it.
+
+=head3 query_string
+
 =head3 query
 
-  my $method = $cgi->method; # REQUEST_METHOD
-  my $path   = $cgi->path;   # PATH_INFO
-  my $query  = $cgi->query;  # QUERY_STRING
+  # QUERY_STRING="foo=bar"
+  my $query = $cgi->query_string;
+  my $query = $cgi->query;
 
-Short aliases for a few request meta-variables.
+The query string component of the request URL.
+
+=head3 remote_addr
+
+  # REMOTE_ADDR="8.8.8.8"
+  my $remote_addr = $cgi->remote_addr;
+
+The IPv4 or IPv6 address of the requesting client.
+
+=head3 remote_host
+
+  # REMOTE_HOST="example.com"
+  my $remote_host = $cgi->remote_host;
+
+The domain name of the requesting client if available, or C<REMOTE_ADDR>.
+
+=head3 remote_ident
+
+  # REMOTE_IDENT="someuser"
+  my $remote_ident = $cgi->remote_ident;
+
+The identity of the client reported by an RFC 1413 ident request if available.
+
+=head3 remote_user
+
+  # REMOTE_USER="someuser"
+  my $remote_user = $cgi->remote_user;
+
+The user identity provided as part of an C<AUTH_TYPE> authenticated request.
+
+=head3 request_method
+
+=head3 method
+
+  # REQUEST_METHOD="GET"
+  my $method = $cgi->request_method;
+  my $method = $cgi->method;
+
+The HTTP request method verb.
+
+=head3 script_name
+
+  # SCRIPT_NAME="/cgi-bin/script.cgi"
+  my $script_name = $cgi->script_name;
+
+The host-relative URL path to the CGI script.
+
+=head3 server_name
+
+  # SERVER_NAME="example.com"
+  my $server_name = $cgi->server_name;
+
+The hostname of the server as the target of the request, such as from the
+C<Host> HTTP request header.
+
+=head3 server_port
+
+  # SERVER_PORT="443"
+  my $server_port = $cgi->server_port;
+
+The TCP port on which the server received the request.
+
+=head3 server_protocol
+
+  # SERVER_PROTOCOL="HTTP/1.1"
+  my $server_protocol = $cgi->server_protocol;
+
+The HTTP protocol version of the request.
+
+=head3 server_software
+
+  # SERVER_SOFTWARE="Apache\/2.4.37 (centos)"
+  my $server_software = $cgi->server_software;
+
+The name and version of the CGI server.
 
 =head2 Request Parsing
 
@@ -620,6 +689,15 @@ Not available after calling L</"body_parts">, L</"body_params">, or
 L</"uploads"> (or related accessors) on a C<multipartE<sol>form-data> request,
 since this type of request body is not retained in memory after parsing.
 
+=head3 body_json
+
+  my $data = $cgi->body_json;
+
+Decode an C<application/json> request body from UTF-8-encoded JSON.
+
+Note that this will read the whole request body into memory, so make sure the
+L</"set_request_body_limit"> can fit well within the available memory.
+
 =head3 body_params
 
   my $pairs = $cgi->body_params;
@@ -631,6 +709,8 @@ are decoded to Unicode characters.
 
 Note that this will read the text form fields into memory, so make sure the
 L</"set_request_body_limit"> can fit well within the available memory.
+C<multipartE<sol>form-data> file uploads will be streamed to temporary files
+accessible via L</"uploads"> and related methods.
 
 =head3 body_param_names
 
@@ -642,6 +722,8 @@ characters, as an ordered array reference.
 
 Note that this will read the text form fields into memory, so make sure the
 L</"set_request_body_limit"> can fit well within the available memory.
+C<multipartE<sol>form-data> file uploads will be streamed to temporary files
+accessible via L</"uploads"> and related methods.
 
 =head3 body_param
 
@@ -654,6 +736,8 @@ L</"body_param_array"> to get multiple values of a parameter.
 
 Note that this will read the text form fields into memory, so make sure the
 L</"set_request_body_limit"> can fit well within the available memory.
+C<multipartE<sol>form-data> file uploads will be streamed to temporary files
+accessible via L</"uploads"> and related methods.
 
 =head3 body_param_array
 
@@ -665,15 +749,8 @@ an ordered array reference.
 
 Note that this will read the text form fields into memory, so make sure the
 L</"set_request_body_limit"> can fit well within the available memory.
-
-=head3 body_json
-
-  my $data = $cgi->body_json;
-
-Decode an C<application/json> request body from UTF-8-encoded JSON.
-
-Note that this will read the whole request body into memory, so make sure the
-L</"set_request_body_limit"> can fit well within the available memory.
+C<multipartE<sol>form-data> file uploads will be streamed to temporary files
+accessible via L</"uploads"> and related methods.
 
 =head3 body_parts
 
@@ -684,7 +761,8 @@ reference. Most applications should retrieve multipart form data through
 L</"body_params"> and L</"uploads"> (or related accessors) instead.
 
 Note that this will read the text form fields into memory, so make sure the
-L</"set_request_body_limit"> can fit well within the available memory.
+L</"set_request_body_limit"> can fit well within the available memory. File
+uploads will be streamed to temporary files.
 
 Body parts are represented as hash references containing:
 
@@ -853,7 +931,7 @@ effect after response headers have been rendered.
 
   $cgi = $cgi->set_response_charset('UTF-8');
 
-Set charset to use when rendering C<text>, C<html>, or C<xml> response data,
+Set charset to use when rendering C<text>, C<html>, or C<xml> response content,
 defaults to C<UTF-8>.
 
 =head3 add_response_header
@@ -973,18 +1051,21 @@ to C<200>.
   $cgi = $cgi->render(file     => $filepath); # application/octet-stream
   $cgi = $cgi->render(redirect => $url);
 
-Renders response headers and then fixed-length response data of a type
+Renders response headers and then fixed-length response content of a type
 indicated by the first parameter, if any. A C<Content-Length> header will be
 set to the length of the encoded response content, and further calls to
 C<render> or L</"render_chunk"> will throw an exception. Use L</"render_chunk">
 instead to render without a C<Content-Length> header.
 
 The C<Content-Type> response header will be set according to
-L</"set_response_type">, or autodetected depending on the data type passed, or
-to C<application/octet-stream> if there is no more appropriate value.
+L</"set_response_type">, or autodetected depending on the data type of any
+non-empty response content passed.
 
 The C<Date> response header will be set to the current time as an HTTP date
 string if not set manually.
+
+If the L</"request_method"> is C<HEAD>, any provided response content will be
+ignored (other than redirect URLs) and C<Content-Length> will be set to 0.
 
 C<text>, C<html>, or C<xml> data is expected to be decoded Unicode characters,
 and will be encoded according to L</"set_response_charset"> (UTF-8 by default).
@@ -1014,9 +1095,9 @@ C<Content-Length> of 0, and it will not set a C<Content-Type> response header.
   $cgi = $cgi->render_chunk(handle => $filehandle); # application/octet-stream
 
 Renders response headers the first time it is called, and then chunked response
-data of a type indicated by the first parameter, if any. No C<Content-Length>
-header will be set, and C<render_chunk> may be called additional times with
-more response data.
+content of a type indicated by the first parameter, if any. No
+C<Content-Length> header will be set, and C<render_chunk> may be called
+additional times with more response content.
 
 C<render_chunk> does not impose a chunked response, it simply does not generate
 a C<Content-Length> header. For content where the total encoded content length
@@ -1028,10 +1109,15 @@ part.
 The C<Content-Type> response header will be set according to
 L</"set_response_type">, or autodetected depending on the data type passed in
 the first call to C<render_chunk>, or to C<application/octet-stream> if there
-is no more appropriate value.
+is no more appropriate value. It will be set even if no content is passed to
+the first C<render_chunk> call, in case content is rendered in subsequent
+calls.
 
 The C<Date> response header will be set to the current time as an HTTP date
 string if not set manually.
+
+If the L</"request_method"> is C<HEAD>, any provided response content will be
+ignored.
 
 C<text>, C<html>, or C<xml> data is expected to be decoded Unicode characters,
 and will be encoded according to L</"set_response_charset"> (UTF-8 by default).
@@ -1074,22 +1160,93 @@ C<undef> if the string does not parse as any of these formats.
   # asctime
   my $epoch = CGI::Tiny::date_to_epoch 'Sun Nov  6 08:49:37 1994';
 
+=head2 escape_html
+
+  my $escaped = CGI::Tiny::escape_html $text;
+
+Escapes characters that are unsafe for embedding in HTML text. The characters
+C<&E<lt>E<gt>"'> will each be replaced with the corresponding HTML character
+reference (HTML entity).
+
+This functionality is built into most HTML template engines; see
+L</"Templating">. For more general HTML entity escaping and unescaping use
+L<HTML::Entities>.
+
 =head1 ENVIRONMENT
 
 CGI::Tiny recognizes the following environment variables, in addition to the
 standard CGI environment variables.
 
-=head2 CGI_TINY_REQUEST_BODY_BUFFER
+=over
+
+=item CGI_TINY_REQUEST_BODY_BUFFER
 
 Default value for L</"set_request_body_buffer">.
 
-=head2 CGI_TINY_REQUEST_BODY_LIMIT
+=item CGI_TINY_REQUEST_BODY_LIMIT
 
 Default value for L</"set_request_body_limit">.
 
-=head2 CGI_TINY_RESPONSE_BODY_BUFFER
+=item CGI_TINY_RESPONSE_BODY_BUFFER
 
 Default value for L</"set_response_body_buffer">.
+
+=back
+
+=head1 DEBUGGING COMMANDS
+
+CGI::Tiny scripts can be executed from the commandline for debugging purposes.
+A command can be passed as the first argument to help set up the CGI
+environment.
+
+These commands are considered a development interface and come with no
+stability guarantee.
+
+  $ ./script.cgi get '/?foo=bar'
+  $ ./script.cgi head
+  $ ./script.cgi post '/form' -C 'one=value' -C 'two=value' --content='foo=bar+baz'
+      -H 'Content-Type: application/x-www-form-urlencoded'
+  $ ./script.cgi put -H "Content-Length: $(stat --printf='%s' foo.dat)"
+      -H "Content-Type: $(file -bi foo.dat)" <foo.dat
+  $ ./script.cgi delete -v '/item/42'
+
+The C<get>, C<head>, C<post>, C<put>, and C<delete> commands will emulate a
+request of the specified L</"request_method">. A following URL parameter will
+be passed as the L</"path_info"> and L</"query_string"> if present.
+
+Request content may be provided through STDIN but the C<Content-Length> request
+header must be set to the size of the input as required by the CGI spec.
+
+The response will be printed to STDOUT as normal. You may wish to redirect the
+output of the command to a file or hexdump program if the response is expected
+not to be printable text in the character encoding of your terminal.
+
+Options may follow the command:
+
+=over
+
+=item --content=<string>, -c <string>
+
+Passes the string value as request body content and sets the C<Content-Length>
+request header to its size.
+
+=item --cookie=<string>, -C <string>
+
+String values of the form C<name=value> will be passed as request cookies. Can
+appear multiple times.
+
+=item --header=<string>, -H <string>
+
+String values of the form C<Name: value> will be passed as request headers. Can
+appear multiple times. If the same header name is provided multiple times, the
+values will be joined with commas, which is only valid for certain headers.
+
+=item --verbose, -v
+
+Includes response CGI headers (or HTTP headers in L<NPH mode|/"set_nph">) in
+the output before response content. Enabled automatically for C<head>.
+
+=back
 
 =head1 COMPARISON TO CGI.PM
 
@@ -1137,15 +1294,15 @@ and do not affect the text parameter accessors.
 
 CGI::Tiny decodes request query and body parameters to Unicode characters
 automatically, and L</"render">/L</"render_chunk"> provide methods to encode
-response data from Unicode characters to UTF-8 by default.
+response content from Unicode characters to UTF-8 by default.
 
 =item *
 
-In CGI.pm, response headers must be printed manually before any response data
-is printed to avoid malformed responses. In CGI::Tiny, the L</"render"> or
-L</"render_chunk"> methods are used to print response data, and automatically
-print response headers when first called. C<redirect> responses are also
-handled by L</"render">.
+In CGI.pm, response headers must be printed manually before any response
+content is printed to avoid malformed responses. In CGI::Tiny, the L</"render">
+or L</"render_chunk"> methods are used to print response content, and
+automatically print response headers when first called. C<redirect> responses
+are also handled by L</"render">.
 
 =item *
 
@@ -1229,14 +1386,6 @@ a well-defined escape mechanism for special characters, so CGI::Tiny will not
 attempt to decode these names from however the client passes them aside from
 L</"set_multipart_form_charset">. For best compatibility, form field names
 should be ASCII without double quotes or semicolons.
-
-=head1 TODO
-
-=over
-
-=item * Debugging tools
-
-=back
 
 =head1 BUGS
 

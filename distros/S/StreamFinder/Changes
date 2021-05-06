@@ -251,3 +251,15 @@ Revision history for StreamFinder
         - Initialize some variables that should be.
         - StreamFinder::Apple:  Better checks for album, genre and year.
         - Misc. doc-fixes all over.
+1.45    2021/05/04
+        - Add StreamFinder::Anystream - as a "fall-back" module to search any 
+        specified webpage URL for streams (streams are matched by searching 
+        for URLs matching specific known stream types, ie. ".mp3", ".ogg", etc. 
+        (The default "-keep" list is: "mp3,ogg,flac,mp4,m4a,mpd,m3u8,m3u,pls").
+        - Added StreamFinder option "-omit" to specify submodules that you 
+        have installed to NOT be used, ie. -omit => "Anystream,Youtube".
+1.46    2021/05/05
+        - Oops - add StreamFinder::Anystream to MANIFEST.
+        - Add & document new -secure option (all) to allow user to limit 
+        streams returned to (secure) https streems.
+        - Minor doc. cleanups.

@@ -1,5 +1,13 @@
 Revision history for Sentry-SDK
 
+v1.0.4  2021-05-06 16:53:01 CEST
+
+  - fix(CGI::Application::Plugin::Sentry): provide `runmode` and `server_name` tags
+
+v1.0.3  2021-05-06 16:20:47 CEST
+  
+  - fix "Too few arguments for subroutine" warning
+
 v1.0.2  2021-02-11 15:38:56 CET
 
   - fix(CGI::Application::Plugin::Sentry): handle scope end in prerun stage

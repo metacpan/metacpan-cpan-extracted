@@ -168,13 +168,13 @@ qx.Class.define("callbackery.ui.form.Auto", {
                     }, this);
                     this._selectBoxKeyToItem[s.key] = lookup;
                     control.setModel(sbModel);
+                    // to be removed as soon as fritz.zaucker@oetiker.ch
+                    // has cleaned up the Camas application (fz, 2021-05-05)
                     // set initial selection
-                    let sel = s.set.modelSelection;
-                    delete s.set.modelSelection;
-                    if (sel !== null && sel !== undefined) {
-                        // next two lines are equivalent
+                    if (s.set && s.set.modelSelection) {
+                        let sel = s.set.modelSelection;
+                        delete s.set.modelSelection;
                         control.setValue(lookup[sel]);
-                        // control.getSelection().setItem(0, lookup[sel]);
                     }
                     break;
 

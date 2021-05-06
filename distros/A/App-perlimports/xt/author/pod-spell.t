@@ -12,6 +12,7 @@ all_pod_files_spelling_ok( qw( bin lib ) );
 __DATA__
 Alders
 Alders'
+Annotations
 App
 CLI
 Document

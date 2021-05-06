@@ -2,7 +2,7 @@
 
 use strict;
 use warnings;
-use constant NTESTS => 86;
+use constant NTESTS => 87;
 use Test::More tests => NTESTS;
 use Test::Number::Delta;
 
@@ -125,3 +125,7 @@ ok($map2->MapHasKey('SHRT'), 'SHRT as renamed in copied map');
 # Test MapGetC and MapLenC.
 is($map2->MapGetC('STRARR'), '(hello,goodbye,yo)');
 is($map2->MapLenC('STRARR'), 7);
+
+# Test MapCopyEntry.
+$map2->MapCopyEntry('SHORT', $map, 0);
+ok($map2->MapHasKey('SHORT'), 'SHORT copied again from copied map');

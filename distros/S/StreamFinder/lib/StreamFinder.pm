@@ -109,10 +109,10 @@ file.
 StreamFinder accepts a webpage URL for a valid radio station, video, or podcast 
 URL on supported websites and returns the actual stream URL(s), title, and cover 
 art icon for that station / podcast / video.  The purpose is that one needs one 
-of these URLs in order to have the option to stream the station / video in one's 
-own choice of media player software rather than using their web browser and 
-accepting flash, ads, javascript, cookies, trackers, web-bugs, and other 
-crapware associated with that method of play.  The author uses his own 
+of these URLs in order to have the option to stream the station / podcast / 
+video in one's own choice of media player software rather than using their web 
+browser and accepting flash, ads, javascript, cookies, trackers, web-bugs, and 
+other crapware associated with that method of play.  The author uses his own 
 custom all-purpose media player called "Fauxdacious" (his custom forked 
 version of the open-source "Audacious" audio player).  "Fauxdacious" 
 (L<https://wildstar84.wordpress.com/fauxdacious/>) incorporates this module to 
@@ -135,12 +135,13 @@ reciva.com (L<StreamFinder::Reciva>), rumble.com (L<StreamFinder::Rumble>),
 sermonaudio.com (L<StreamFinder::SermonAudio>), 
 spreaker.com podcasts (L<StreamFinder::Spreaker>), 
 tunein.com (L<StreamFinder::Tunein>), vimeo.com (L<StreamFinder::Vimeo>), 
-and (youtube.com, et. al and other sites that youtube-dl supports) 
-(L<StreamFinder::Youtube>).  
+(youtube.com, et. al and other sites that youtube-dl supports) 
+(L<StreamFinder::Youtube>), and L<StreamFinder::Anystream> - search any (other) 
+webpage URL (not supported by any of the other submodules) for streams.  
 
-NOTE:  StreamFinder::Reciva will likely be removed next release after 
-April 30, 2021 due to that site's announcement that they're going 
-offline after that date!
+NOTE:  StreamFinder::Reciva will likely be removed next release sometime 
+after April 30, 2021 due to that site's announcement that they're going 
+offline after that date, though as of this release, Reciva.com is still active!
 
 NOTE:  Facebook (Streamfinder::Facebook) has been removed because 
 logging into Facebook via the call to youtube-dl is now interpreted by 
@@ -153,9 +154,9 @@ etc. the "station" object actually refers to a specific video or podcast, but
 functions the same way.
 
 Each site is supported by a separate subpackage (StreamFinder::I<Package>), 
-which is determined and selected based on the URL when the StreamFinder object 
-is created.  The methods are overloaded by the selected subpackage's methods.  
-An example would be B<StreamFinder::Youtube>.  
+which is determined and selected based on the URL argument passed to it when the 
+StreamFinder object is created.  The methods are overloaded by the selected 
+subpackage's methods.  An example would be B<StreamFinder::Youtube>.  
 
 Please see the POD. documentation for each subpackage for important additional 
 information on options and features specific to each site / subpackage!
@@ -169,7 +170,9 @@ videos, etc.).  Some sites also provide station's FCC call letters
 ("fccid").  For icon and image URLs, functions exist (getIconData() 
 and getImageData() to fetch the actual binary data and mime type for 
 downloading to local storage for use by your application or preferred media 
-player.  
+player.  NOTE:  StreamFinder::Anystream is not able to return much beyond 
+the stream URLs it finds, please see it's POD documentation for details on 
+what it is able to return.
 
 If you have another streaming site that is not supported, first, make sure 
 you have B<youtube-dl> installed and see if B<StreamFinder::Youtube> can 
@@ -208,6 +211,32 @@ being queried.  One option common to all sites is I<-debug>, which
 turns on debugging output.  A numeric option can follow specifying 
 the level (0, 1, or 2).  0 is none, 1 is basic, 2 is detailed.  
 Default:  B<1> (if I<-debug> is specified).
+
+One specific option (I<-omit>, added as of v1.45) permits omitting 
+specific submodules which are currently installed.  For example, to 
+NOT handle Youtube videos nor use the fallback "Anystream" module, 
+specify:  I<-omit> => I<"Youtube,Anystream">, which will cause 
+StreamFinder::Anystream and StreamFinder::Youtube to not be used 
+for the stream search.  Default is to all installed modules will be 
+considered.
+
+Another global option (applicable to all submodules) is the I<-secure> 
+option who's argument can be either 0 or 1 (I<false> or I<true>).  If 1,  
+then only secure ("https://") streams will be returned.  NOTE, it's 
+possible that some sites may only contain insecure ("http://") streams, 
+which won't return any streams if this option is specified.  Therefore, 
+it may be necessary, if setting this option globally, to set it to 
+zero in the config. files for those specific modules, if you determine 
+that to be the case (I have not tested all sites for that).
+
+DEFAULT I<-secure> is 0 (false) - return all streams (http and https).
+
+Any other options (including I<-debug> will be passed to the submodule 
+(if any) that handles the URL you pass in, but note, submodules accept 
+different options and ignore ones they do not recognize.  Valid values 
+for some options can also vary across different submodules.  A better 
+way to change default options for one or more submodules is to set up 
+submodule configuration files for the ones you wish to change.
 
 =item $station->B<get>(['playlist'])
 
@@ -283,10 +312,10 @@ the "icon image" data, if any, will be returned.
 =item $station->B<getType>()
 
 Returns the station / podcast / video's type (I<submodule-name>).  
-(one of:  "Apple", "BitChute", "Blogger", "Brighteon", "Castbox", 
-"Google", "IHeartRadio", "RadioNet", "Reciva", "Rumble", "SermonAudio", 
-"Spreaker", "Tunein", "Youtube" or "Vimeo" - 
-depending on the sight that matched the URL.
+(one of:  "Anystream", "Apple", "BitChute", "Blogger", "Brighteon", 
+"Castbox", "Google", "IHeartRadio", "RadioNet", "Reciva", "Rumble", 
+"SermonAudio", "Spreaker", "Tunein", "Youtube" or "Vimeo" - 
+depending on the sight that matched the URL).
 
 =back
 
@@ -297,9 +326,11 @@ depending on the sight that matched the URL.
 =item ~/.config/StreamFinder/config
 
 Optional text file for specifying various configuration options.  
-Each option is specified on a separate line in the format below:
+Each option is specified on a separate line in the formats below:
 
 'option' => 'value' [,]
+'option' => ['value1', 'value2', ...]
+'option' => {'key1' => 'value1', 'key2' => 'value2', ...}
 
 and the options are loaded into a hash used by all sites 
 (submodules) that support them.  Valid options include 
@@ -311,20 +342,23 @@ Blank lines and lines starting with a "#" sign are ignored.
 Optional text file for specifying various configuration options 
 for a specific site (submodule, ie. "Youtube" for 
 StreamFinder::Youtube).  Each option is specified on a separate 
-line in the format below:
+line in the formats below:
 
 'option' => 'value' [,]
+'option' => ['value1', 'value2', ...]
+'option' => {'key1' => 'value1', 'key2' => 'value2', ...}
 
 and the options are loaded into a hash used only by the specific 
 (submodule) specified.  Valid options include 
 I<-debug> => [0|1|2], and most of the L<LWP::UserAgent> options.
+Blank lines and lines starting with a "#" sign are ignored.
 
-Options specified here override any specified in I<~/.config/StreamFinder/config>.
+NOTE:  Options specified here override any specified in I<~/.config/StreamFinder/config>.
 
 =back
 
 NOTE:  Options specified in the options parameter list will override 
-those corresponding options specified in these files.
+any corresponding options specified in either of these files.
 
 =head1 DEPENDENCIES
 
@@ -420,14 +454,14 @@ use strict;
 use warnings;
 use vars qw(@ISA @EXPORT $VERSION);
 
-our $VERSION = '1.44';
+our $VERSION = '1.46';
 our $DEBUG = 0;
 
 require Exporter;
 
 @ISA = qw(Exporter);
 @EXPORT = qw();
-my @supported_mods = (qw(Apple Bitchute Blogger Brighteon Castbox Google IHeartRadio
+my @supported_mods = (qw(Anystream Apple Bitchute Blogger Brighteon Castbox Google IHeartRadio
 		RadioNet Reciva Rumble SermonAudio Spreaker Tunein Vimeo Youtube));
 
 my %haveit;
@@ -446,7 +480,21 @@ sub new
 	my $self = {};
 	return undef  unless ($url);
 
-	my @args = @_;
+	my $arg;
+	my @args = ();
+	while (@_) {
+		$arg = shift(@_);
+		if ($arg =~ /^\-?omit$/o) {   #ALLOW USER TO OMIT SPECIFIC INSTALLED SUBMODULE(S):
+			my @omitModules = split(/\,/, shift(@_));
+			foreach my $omit (@omitModules)
+			{
+				$haveit{$omit} = 0  if (defined($haveit{$omit}) && $haveit{$omit});
+			}
+		} else {
+			push @args, $arg;
+		}
+	}
+		
 	push @args, ('-debug', $DEBUG)  if ($DEBUG);
 	if ($haveit{'IHeartRadio'} && $url =~ m#\biheart(?:radio)?\.#i) {
 		return new StreamFinder::IHeartRadio($url, @args);
@@ -477,10 +525,13 @@ sub new
 	} elsif ($haveit{'SermonAudio'} && $url =~ m#\bsermonaudio\.com\/#) {
 		return new StreamFinder::SermonAudio($url, @args);
 	} elsif ($haveit{'Youtube'}) {  #DEFAULT TO youtube-dl SINCE SO MANY URLS ARE HANDLED THERE NOW.
-		return new StreamFinder::Youtube($url, @args);
-	} else {
-		return undef;
+		my $yt = new StreamFinder::Youtube($url, @args);
+		return $yt  if (defined($yt) && $yt && $yt->count() > 0);
 	}
+	if ($haveit{'Anystream'}) {  #SITE NOT SUPPORTED, TRY TO FIND ANY STREAM URLS WE CAN:
+		return new StreamFinder::Anystream($url, @args);
+	}
+	return undef;
 }
 
 1

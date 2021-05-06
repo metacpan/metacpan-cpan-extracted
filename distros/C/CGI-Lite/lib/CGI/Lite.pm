@@ -1,9 +1,10 @@
 ##++
-##     CGI Lite v3.02
+##     CGI Lite v3.03
 ##
 ##     see separate CHANGES file for detailed history
 ##
-##     Changes in versions 2.03 and newer copyright (c) 2014-2015 Pete Houston
+##     Changes in versions 2.03 and newer copyright
+##     (c) 2014-2015, 2017-2018, 2021 Pete Houston
 ##
 ##     Copyright (c) 1995, 1996, 1997 by Shishir Gundavaram
 ##     All Rights Reserved
@@ -515,7 +516,7 @@ lightweight CGI implementations.
 
 =head1 REPOSITORY
 
-L<https://github.com/openstrike/perl-CGI-Lite>
+L<https://gitlab.com/openstrike/cgi-lite/>
 
 =head1 MAINTAINER
 
@@ -529,23 +530,23 @@ and offering suggestions:
 
 =over 4
 
-=item Eric D. Friedman (friedman@uci.edu)   
+=item Eric D. Friedman
 
-=item Thomas Winzig (tsw@pvo.com)
+=item Thomas Winzig
 
-=item Len Charest (len@cogent.net)
+=item Len Charest
 
-=item Achim Bohnet (ach@rosat.mpe-garching.mpg.de)
+=item Achim Bohnet
 
-=item John E. Townsend (John.E.Townsend@BST.BLS.com)
+=item John E. Townsend
 
-=item Andrew McRae (mcrae@internet.com)
+=item Andrew McRae
 
-=item Dennis Grant (dg50@chrysler.com)
+=item Dennis Grant
 
-=item Scott Neufeld (scott.neufeld@mis.ussurg.com)
+=item Scott Neufeld
 
-=item Raul Almquist (imrs@ShadowMAC.org)
+=item Raul Almquist
 
 =item and many others!
 
@@ -559,7 +560,8 @@ Smylers, Andreas, Ben and Shishir.
 Copyright (c) 1995, 1996, 1997 by Shishir Gundavaram.
 All Rights Reserved.
 
-Changes in versions 2.03 onwards are copyright 2014, 2015 by Pete Houston.
+Changes in versions 2.03 onwards are copyright 2014, 2015, 2017, 2018, 2021
+by Pete Houston.
 
 Permission to use, copy, and  distribute  is  hereby granted,
 providing that the above copyright notice and this permission
@@ -592,7 +594,7 @@ BEGIN {
 	our @EXPORT = qw/browser_escape url_encode url_decode is_dangerous/;
 }
 
-our $VERSION = '3.02';
+our $VERSION = '3.03';
 
 ##++
 ##  Start

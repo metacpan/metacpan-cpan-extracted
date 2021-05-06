@@ -7,7 +7,7 @@ use Carp ();
 use IO::Handle ();
 use Exporter ();
 
-our $VERSION = '0.014';
+our $VERSION = '0.016';
 
 use constant DEFAULT_REQUEST_BODY_LIMIT => 16777216;
 use constant DEFAULT_REQUEST_BODY_BUFFER => 262144;
@@ -84,44 +84,6 @@ my %HTTP_STATUS = (
 );
 
 {
-  my @DAYS_OF_WEEK = qw(Sun Mon Tue Wed Thu Fri Sat);
-  my @MONTH_NAMES = qw(Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec);
-  my %MONTH_NUMS;
-  @MONTH_NUMS{@MONTH_NAMES} = 0..11;
-
-  sub epoch_to_date {
-    my ($sec,$min,$hour,$mday,$mon,$year,$wday) = gmtime $_[0];
-    return sprintf '%s, %02d %s %04d %02d:%02d:%02d GMT',
-      $DAYS_OF_WEEK[$wday], $mday, $MONTH_NAMES[$mon], $year + 1900, $hour, $min, $sec;
-  }
-
-  sub date_to_epoch {
-    # RFC 1123 (Sun, 06 Nov 1994 08:49:37 GMT)
-    my ($mday,$mon,$year,$hour,$min,$sec) = $_[0] =~ m/^ (?:Sun|Mon|Tue|Wed|Thu|Fri|Sat),
-      [ ] ([0-9]{2}) [ ] (Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec) [ ] ([0-9]{4})
-      [ ] ([0-9]{2}) : ([0-9]{2}) : ([0-9]{2}) [ ] GMT $/x;
-
-    # RFC 850 (Sunday, 06-Nov-94 08:49:37 GMT)
-    ($mday,$mon,$year,$hour,$min,$sec) = $_[0] =~ m/^ (?:Sun|Mon|Tues|Wednes|Thurs|Fri|Satur)day,
-      [ ] ([0-9]{2}) - (Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec) - ([0-9]{2})
-      [ ] ([0-9]{2}) : ([0-9]{2}) : ([0-9]{2}) [ ] GMT $/x unless defined $mday;
-
-    # asctime (Sun Nov  6 08:49:37 1994)
-    ($mon,$mday,$hour,$min,$sec,$year) = $_[0] =~ m/^ (?:Sun|Mon|Tue|Wed|Thu|Fri|Sat)
-      [ ] (Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec) [ ]{1,2} ([0-9]{1,2})
-      [ ] ([0-9]{2}) : ([0-9]{2}) : ([0-9]{2}) [ ] ([0-9]{4}) $/x unless defined $mday;
-
-    return undef unless defined $mday;
-
-    require Time::Local;
-    # 4 digit years interpreted literally, but may have leading zeroes
-    # 2 digit years interpreted with best effort heuristic
-    return scalar Time::Local::timegm($sec, $min, $hour, $mday, $MONTH_NUMS{$mon},
-      (length($year) == 4 && $year < 1900) ? $year - 1900 : $year);
-  }
-}
-
-{
   my $cgi;
 
   sub import {
@@ -133,6 +95,7 @@ my %HTTP_STATUS = (
   sub cgi (&) {
     my ($handler) = @_;
     $cgi ||= bless {pid => $$}, __PACKAGE__;
+    _debug_command($cgi, [@ARGV]) if @ARGV and !defined $ENV{REQUEST_METHOD};
     my ($error, $errored);
     {
       local $@;
@@ -192,21 +155,21 @@ sub content_length    { defined $ENV{CONTENT_LENGTH} ? $ENV{CONTENT_LENGTH} : ''
 sub content_type      { defined $ENV{CONTENT_TYPE} ? $ENV{CONTENT_TYPE} : '' }
 sub gateway_interface { defined $ENV{GATEWAY_INTERFACE} ? $ENV{GATEWAY_INTERFACE} : '' }
 sub path_info         { defined $ENV{PATH_INFO} ? $ENV{PATH_INFO} : '' }
+*path = \&path_info;
 sub path_translated   { defined $ENV{PATH_TRANSLATED} ? $ENV{PATH_TRANSLATED} : '' }
 sub query_string      { defined $ENV{QUERY_STRING} ? $ENV{QUERY_STRING} : '' }
+*query = \&query_string;
 sub remote_addr       { defined $ENV{REMOTE_ADDR} ? $ENV{REMOTE_ADDR} : '' }
 sub remote_host       { defined $ENV{REMOTE_HOST} ? $ENV{REMOTE_HOST} : '' }
 sub remote_ident      { defined $ENV{REMOTE_IDENT} ? $ENV{REMOTE_IDENT} : '' }
 sub remote_user       { defined $ENV{REMOTE_USER} ? $ENV{REMOTE_USER} : '' }
 sub request_method    { defined $ENV{REQUEST_METHOD} ? $ENV{REQUEST_METHOD} : '' }
+*method = \&request_method;
 sub script_name       { defined $ENV{SCRIPT_NAME} ? $ENV{SCRIPT_NAME} : '' }
 sub server_name       { defined $ENV{SERVER_NAME} ? $ENV{SERVER_NAME} : '' }
 sub server_port       { defined $ENV{SERVER_PORT} ? $ENV{SERVER_PORT} : '' }
 sub server_protocol   { defined $ENV{SERVER_PROTOCOL} ? $ENV{SERVER_PROTOCOL} : '' }
 sub server_software   { defined $ENV{SERVER_SOFTWARE} ? $ENV{SERVER_SOFTWARE} : '' }
-*method = \&request_method;
-*path = \&path_info;
-*query = \&query_string;
 
 sub query_params      { [map { [@$_] } @{$_[0]->_query_params->{ordered}}] }
 sub query_param_names { [@{$_[0]->_query_params->{names}}] }
@@ -286,6 +249,17 @@ sub body {
   return $self->{body_content};
 }
 
+sub body_json {
+  my ($self) = @_;
+  unless (exists $self->{body_json}) {
+    $self->{body_json} = undef;
+    if ($ENV{CONTENT_TYPE} and $ENV{CONTENT_TYPE} =~ m/^application\/json\b/i) {
+      $self->{body_json} = $self->_json->decode($self->body);
+    }
+  }
+  return $self->{body_json};
+}
+
 sub body_params      { [map { [@$_] } @{$_[0]->_body_params->{ordered}}] }
 sub body_param_names { [@{$_[0]->_body_params->{names}}] }
 sub body_param       { my $p = $_[0]->_body_params->{keyed}; exists $p->{$_[1]} ? $p->{$_[1]}[-1] : undef }
@@ -336,17 +310,6 @@ sub _body_params {
     }
   }
   return $self->{body_params};
-}
-
-sub body_json {
-  my ($self) = @_;
-  unless (exists $self->{body_json}) {
-    $self->{body_json} = undef;
-    if ($ENV{CONTENT_TYPE} and $ENV{CONTENT_TYPE} =~ m/^application\/json\b/i) {
-      $self->{body_json} = $self->_json->decode($self->body);
-    }
-  }
-  return $self->{body_json};
 }
 
 sub body_parts {
@@ -560,7 +523,12 @@ sub response_status_code {
     Carp::croak "Cannot render from an open filehandle with ->render; use ->render_chunk" if $type eq 'handle';
 
     my ($response_body, $response_length, $redirect_url);
-    if ($type eq 'text' or $type eq 'html' or $type eq 'xml') {
+    if ($type eq 'redirect') {
+      Carp::croak "Newline characters not allowed in HTTP redirect" if $data =~ tr/\r\n//;
+      $redirect_url = $data;
+    } elsif (uc($ENV{REQUEST_METHOD} || '') eq 'HEAD') {
+      # no response content
+    } elsif ($type eq 'text' or $type eq 'html' or $type eq 'xml') {
       my $charset = $self->{response_charset};
       $charset = 'UTF-8' unless defined $charset;
       if (uc $charset eq 'UTF-8' and do { local $@; eval { require Unicode::UTF8; 1 } }) {
@@ -579,9 +547,6 @@ sub response_status_code {
     } elsif ($type eq 'file') {
       $response_length = -s $data;
       Carp::croak "Failed to retrieve size of file '$data': $!" unless defined $response_length;
-    } elsif ($type eq 'redirect') {
-      Carp::croak "Newline characters not allowed in HTTP redirect" if $data =~ tr/\r\n//;
-      $redirect_url = $data;
     }
     $response_length = 0 unless defined $response_length;
 
@@ -622,7 +587,9 @@ sub response_status_code {
       $self->{headers_rendered} = 1;
     }
 
-    if ($type eq 'text' or $type eq 'html' or $type eq 'xml') {
+    if (uc($ENV{REQUEST_METHOD} || '') eq 'HEAD') {
+      # no response content
+    } elsif ($type eq 'text' or $type eq 'html' or $type eq 'xml') {
       my $charset = $self->{response_charset};
       $charset = 'UTF-8' unless defined $charset;
       my $response_body;
@@ -659,6 +626,7 @@ sub response_status_code {
 sub _response_headers {
   my ($self, $type, $content_length, $location) = @_;
   my $headers_str = '';
+  return $headers_str if defined $ENV{CGI_TINY_DEBUG_METHOD} and !$ENV{CGI_TINY_DEBUG_VERBOSE};
   my %headers_set;
   foreach my $header (@{$self->{response_headers} || []}) {
     my ($name, $value) = @$header;
@@ -695,8 +663,8 @@ sub _response_headers {
       : $type eq 'xml'  ? "application/xml;charset=$charset"
       : $type eq 'json' ? 'application/json;charset=UTF-8'
       : 'application/octet-stream'
-      unless defined $content_type;
-    $headers_str = "Content-Type: $content_type\r\n$headers_str";
+      unless defined $content_type or (defined $content_length and $content_length == 0);
+    $headers_str = "Content-Type: $content_type\r\n$headers_str" if defined $content_type;
   }
   if (!$headers_set{date}) {
     my $date_str = epoch_to_date(time);
@@ -855,6 +823,117 @@ sub _parse_multipart {
   return undef unless $state{done};
 
   return \@parts;
+}
+
+{
+  my @DAYS_OF_WEEK = qw(Sun Mon Tue Wed Thu Fri Sat);
+  my @MONTH_NAMES = qw(Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec);
+  my %MONTH_NUMS;
+  @MONTH_NUMS{@MONTH_NAMES} = 0..11;
+
+  sub epoch_to_date {
+    my ($sec,$min,$hour,$mday,$mon,$year,$wday) = gmtime $_[0];
+    return sprintf '%s, %02d %s %04d %02d:%02d:%02d GMT',
+      $DAYS_OF_WEEK[$wday], $mday, $MONTH_NAMES[$mon], $year + 1900, $hour, $min, $sec;
+  }
+
+  sub date_to_epoch {
+    # RFC 1123 (Sun, 06 Nov 1994 08:49:37 GMT)
+    my ($mday,$mon,$year,$hour,$min,$sec) = $_[0] =~ m/^ (?:Sun|Mon|Tue|Wed|Thu|Fri|Sat),
+      [ ] ([0-9]{2}) [ ] (Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec) [ ] ([0-9]{4})
+      [ ] ([0-9]{2}) : ([0-9]{2}) : ([0-9]{2}) [ ] GMT $/x;
+
+    # RFC 850 (Sunday, 06-Nov-94 08:49:37 GMT)
+    ($mday,$mon,$year,$hour,$min,$sec) = $_[0] =~ m/^ (?:Sun|Mon|Tues|Wednes|Thurs|Fri|Satur)day,
+      [ ] ([0-9]{2}) - (Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec) - ([0-9]{2})
+      [ ] ([0-9]{2}) : ([0-9]{2}) : ([0-9]{2}) [ ] GMT $/x unless defined $mday;
+
+    # asctime (Sun Nov  6 08:49:37 1994)
+    ($mon,$mday,$hour,$min,$sec,$year) = $_[0] =~ m/^ (?:Sun|Mon|Tue|Wed|Thu|Fri|Sat)
+      [ ] (Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec) [ ]{1,2} ([0-9]{1,2})
+      [ ] ([0-9]{2}) : ([0-9]{2}) : ([0-9]{2}) [ ] ([0-9]{4}) $/x unless defined $mday;
+
+    return undef unless defined $mday;
+
+    require Time::Local;
+    # 4 digit years interpreted literally, but may have leading zeroes
+    # 2 digit years interpreted with best effort heuristic
+    return scalar Time::Local::timegm($sec, $min, $hour, $mday, $MONTH_NUMS{$mon},
+      (length($year) == 4 && $year < 1900) ? $year - 1900 : $year);
+  }
+}
+
+{
+  my %ESCAPES = ('&' => '&amp;', '<' => '&lt;', '>' => '&gt;', '"' => '&quot;', '\'' => '&#39;');
+  sub escape_html { (my $escaped = $_[0]) =~ s/([&<>"'])/$ESCAPES{$1}/ge; $escaped }
+}
+
+{
+  my %methods = (get => 1, head => 1, post => 1, put => 1, delete => 1);
+  sub _debug_command {
+    my ($cgi, $argv) = @_;
+    return 1 unless @$argv;
+    my $command = shift @$argv;
+    if (exists $methods{$command}) {
+      $ENV{CGI_TINY_DEBUG_METHOD} = uc $command;
+      $ENV{CGI_TINY_DEBUG_VERBOSE} = 1 if uc($command) eq 'HEAD';
+
+      require Getopt::Long;
+      Getopt::Long::Configure('default', 'gnu_getopt', 'no_ignore_case');
+      Getopt::Long::GetOptionsFromArray($argv,
+        'content|c=s' => \my $content,
+        'cookie|C=s' => \my @cookies,
+        'header|H=s' => \my @headers,
+        'verbose|v' => \$ENV{CGI_TINY_DEBUG_VERBOSE},
+      ) or die "Failed to parse debug command options\n";
+
+      my ($path) = @$argv;
+
+      if (defined $content) {
+        open my $in_fh, '<', \$content or die "Failed to open in-memory handle to request content: $!\n";
+        $cgi->set_input_handle($in_fh);
+      }
+
+      foreach my $header (@headers) {
+        my ($name, $value) = split /\s*:\s*/, $header, 2;
+        next unless defined $value;
+        $name =~ tr/-/_/;
+        if (defined $ENV{"HTTP_\U$name"}) {
+          $ENV{"HTTP_\U$name"} .= ", $value";
+        } else {
+          $ENV{"HTTP_\U$name"} = $value;
+        }
+      }
+
+      $ENV{HTTP_CONTENT_LENGTH} = length $content if defined $content;
+      $ENV{HTTP_CONTENT_LENGTH} = '' unless defined $ENV{HTTP_CONTENT_LENGTH};
+      $ENV{HTTP_CONTENT_TYPE} = 'application/octet-stream' if $ENV{HTTP_CONTENT_LENGTH} and !defined $ENV{HTTP_CONTENT_TYPE};
+      $ENV{HTTP_COOKIE} = join '; ', @cookies if @cookies;
+
+      my $query;
+      ($path, $query) = split /\?/, $path, 2 if defined $path;
+      $ENV{AUTH_TYPE} = '' unless defined $ENV{AUTH_TYPE};
+      $ENV{CONTENT_LENGTH} = $ENV{HTTP_CONTENT_LENGTH};
+      $ENV{CONTENT_TYPE} = $ENV{HTTP_CONTENT_TYPE};
+      $ENV{GATEWAY_INTERFACE} = 'CGI/1.1' unless defined $ENV{GATEWAY_INTERFACE};
+      $ENV{PATH_INFO} = defined $path ? $path : '';
+      $ENV{PATH_TRANSLATED} = '' unless defined $ENV{PATH_TRANSLATED};
+      $ENV{QUERY_STRING} = defined $query ? $query : '';
+      $ENV{REMOTE_ADDR} = '127.0.0.1' unless defined $ENV{REMOTE_ADDR};
+      $ENV{REMOTE_HOST} = do { require Sys::Hostname; Sys::Hostname::hostname() } unless defined $ENV{REMOTE_HOST};
+      $ENV{REMOTE_IDENT} = '' unless defined $ENV{REMOTE_IDENT};
+      $ENV{REMOTE_USER} = '' unless defined $ENV{REMOTE_USER};
+      $ENV{REQUEST_METHOD} = uc $command;
+      $ENV{SCRIPT_NAME} = do { require File::Basename; '/' . File::Basename::basename($0) } unless defined $ENV{SCRIPT_NAME};
+      $ENV{SERVER_NAME} = do { require Sys::Hostname; Sys::Hostname::hostname() } unless defined $ENV{SERVER_NAME};
+      $ENV{SERVER_PORT} = 80 unless defined $ENV{SERVER_PORT};
+      $ENV{SERVER_PROTOCOL} = 'HTTP/1.0' unless defined $ENV{SERVER_PROTOCOL};
+      $ENV{SERVER_SOFTWARE} = "CGI::Tiny/$VERSION" unless defined $ENV{SERVER_SOFTWARE};
+    } else {
+      die "Unknown debug command $command\n";
+    }
+    return 1;
+  }
 }
 
 1;

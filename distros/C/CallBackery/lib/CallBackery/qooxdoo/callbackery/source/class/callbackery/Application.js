@@ -86,19 +86,9 @@ qx.Class.define("callbackery.Application", {
         },
 
         __changeLanguage: function() {
-            var h = qx.bom.History.getInstance();
-            var state = h.getState();
-            var items = state.split(';');
-            var lang;
-            for (var i=0; i<items.length; i++) {
-                var item = items[i].split('=');
-                if (item[0] == 'lang') {
-                    lang = decodeURIComponent(item[1]);
-                    break;
-                }
-            }
-            if (lang) {
-                qx.locale.Manager.getInstance().setLocale(lang);
+            var urlCfg = callbackery.data.Config.getInstance().getUrlConfig();
+            if (urlCfg.lang) {
+                qx.locale.Manager.getInstance().setLocale(urlCfg.lang);
             }
         },
 

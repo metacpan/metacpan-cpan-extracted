@@ -1,9 +1,9 @@
 package Acme::CPANModules::HaveWebsite;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-02-18'; # DATE
+our $DATE = '2021-05-06'; # DATE
 our $DIST = 'Acme-CPANModules-HaveWebsite'; # DIST
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.003'; # VERSION
 
 use strict;
 
@@ -11,7 +11,7 @@ our $LIST = {
     summary => 'Modules that have their own website',
     description => <<'_',
 
-This list is first constructed based on Gabor Szabo's post:
+This list was first constructed based on Gabor Szabo's post:
 <https://dev.to/szabgab/perl-modules-with-their-own-web-site-2gmo> on
 2021-02-16. It has then been updated with more entries.
 
@@ -23,6 +23,7 @@ _
         {module=>'App::TimeTracker', website_url=>'http://timetracker.plix.at/'},
         {module=>'Catalyst', website_url=>'http://www.catalystframework.org/'},
         {module=>'Dancer', website_url=>'https://perldancer.org/'},
+        {module=>'Giblog', website_url=>'https://www.giblog.net/', description=>'Currently in Japanese only'},
         {module=>'Mojolicious', website_url=>'https://mojolicious.org/'},
         {module=>'MooX::Role::JSON_LD', website_url=>'https://davorg.dev/moox-role-json_ld/'},
         {module=>'Padre', website_url=>'http://padre.perlide.org/'},
@@ -30,6 +31,7 @@ _
         {module=>'Perl::Critic', website_url=>'http://perlcritic.com/'},
         {module=>'Plack', website_url=>'https://plackperl.org/'},
         {module=>'Rex', website_url=>'https://www.rexify.org/'},
+        {module=>'SPVM', website_url=>'https://yuki-kimoto.github.io/spvmdoc-public/', description=>'Currently machine-translated from Japanese'},
         {module=>'Template', website_url=>'http://www.template-toolkit.org/'},
         {module=>'Test::BDD::Cucumber', website_url=>'https://pherkin.pm/'},
         {module=>'Type::Tiny', website_url=>'https://typetiny.toby.ink/'},
@@ -53,15 +55,15 @@ Acme::CPANModules::HaveWebsite - Modules that have their own website
 
 =head1 VERSION
 
-This document describes version 0.002 of Acme::CPANModules::HaveWebsite (from Perl distribution Acme-CPANModules-HaveWebsite), released on 2021-02-18.
+This document describes version 0.003 of Acme::CPANModules::HaveWebsite (from Perl distribution Acme-CPANModules-HaveWebsite), released on 2021-05-06.
 
 =head1 DESCRIPTION
 
-This list is first constructed based on Gabor Szabo's post:
+This list was first constructed based on Gabor Szabo's post:
 L<https://dev.to/szabgab/perl-modules-with-their-own-web-site-2gmo> on
 2021-02-16. It has then been updated with more entries.
 
-=head1 ACME::MODULES ENTRIES
+=head1 ACME::CPANMODULES ENTRIES
 
 =over
 
@@ -88,6 +90,10 @@ Website URL: L<http://www.catalystframework.org/>
 =item * L<Dancer>
 
 Website URL: L<https://perldancer.org/>
+
+=item * L<Giblog>
+
+Website URL: L<https://www.giblog.net/>
 
 =item * L<Mojolicious>
 
@@ -116,6 +122,10 @@ Website URL: L<https://plackperl.org/>
 =item * L<Rex>
 
 Website URL: L<https://www.rexify.org/>
+
+=item * L<SPVM>
+
+Website URL: L<https://yuki-kimoto.github.io/spvmdoc-public/>
 
 =item * L<Template>
 

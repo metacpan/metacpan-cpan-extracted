@@ -19,7 +19,7 @@ STATIC U8* TextMinify(pTHX_ U8* src, STRLEN len, STRLEN* packed) {
     return dest;
 
   /* initialize to end-of-string in case string contains only spaces */
-  *dest = NULL;
+  *dest = 0;
 
   U8* end = src + len;
   U8* ptr = dest;

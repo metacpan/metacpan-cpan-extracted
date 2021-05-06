@@ -1,5 +1,16 @@
 Revision history for Fork-Event-Interval
 
+1.03    2021-05-05
+    - Added events() class function, returns hash reference details of each
+      event that's been created
+    - Added id() object method; returns the ID of the event
+    - Added info() object method; returns an href of details about the event
+    - Added shared_scalar() object method; Returns a reference to a scalar
+      that resides in shared memory. We use IPC::Shareable for the backend
+    - Fixed issue where fractional seconds weren't being honoured
+    - POD updates, including a new SYNOPSIS
+    - Added accessor methods for most object attributes
+
 1.02    2021-04-15
     - Updated shared data example to be a scalar
     - Update t/10-shared.t as it was failing under MacOS/FreeBSD

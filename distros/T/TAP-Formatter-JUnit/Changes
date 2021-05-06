@@ -1,5 +1,8 @@
 Revision history for Perl extension TAP::Formatter::JUnit.
 
+0.13      2021-05-04 10:04:17-07:00 America/Vancouver
+    - Fix install of "script/tap2junit"
+
 0.12      2021-01-05 21:23:07-08:00 America/Vancouver
     - Switch to Dist::Zilla for release management.
     - Various POD fixups; syntax, spelling, SYNOPSIS fixes

@@ -17,7 +17,7 @@ use Net::Z3950::FOLIO::OPACXMLRecord qw(makeOPACXMLRecord);
 use Net::Z3950::FOLIO::RPN;;
 
 
-our $VERSION = 'v2.0.0';
+our $VERSION = 'v2.1.0';
 
 
 sub FORMAT_USMARC { '1.2.840.10003.5.10' }

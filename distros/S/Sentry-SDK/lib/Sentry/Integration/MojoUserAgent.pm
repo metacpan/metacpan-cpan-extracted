@@ -12,7 +12,7 @@ sub setup_once ($self, $add_global_event_processor, $get_current_hub) {
 
   around(
     'Mojo::UserAgent',
-    start => sub ($orig, $ua, $tx, $cb) {
+    start => sub ($orig, $ua, $tx, $cb = undef) {
       my $url = $tx->req->url;
 
       # Exclude Requests to the Sentry server

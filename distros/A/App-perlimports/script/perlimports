@@ -283,7 +283,7 @@ $fatpacked{"PPI/Token/Pod.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<<'P
 PPI_TOKEN_POD
 
 $fatpacked{"PPI/Token/Prototype.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<<'PPI_TOKEN_PROTOTYPE';
-  package PPI::Token::Prototype;use strict;use PPI::Token ();our$VERSION='1.271';our@ISA="PPI::Token";sub __TOKENIZER__on_char {my$class=shift;my$t=shift;pos$t->{line}=$t->{line_cursor};die "regex should always match" if$t->{line}!~ m/\G(.*?(?:\)|$))/gc;$t->{token}->{content}.= $1;$t->{line_cursor}+= length $1;return 0 unless $1 =~ /\)$/;$t->_finalize_token->__TOKENIZER__on_char($t)}sub prototype {my$self=shift;my$proto=$self->content;$proto =~ s/(^\(|\)$|\s+)//g;$proto}1;
+  package PPI::Token::Prototype;use strict;use PPI::Token ();our$VERSION='1.271';our@ISA="PPI::Token";sub __TOKENIZER__on_char {my$class=shift;my$t=shift;pos$t->{line}=$t->{line_cursor};die "regex should always match" if$t->{line}!~ m/\G(.*?\n?(?:\)|$))/gc;$t->{token}->{content}.= $1;$t->{line_cursor}+= length $1;return 0 unless $1 =~ /\)$/;$t->_finalize_token->__TOKENIZER__on_char($t)}sub prototype {my$self=shift;my$proto=$self->content;$proto =~ s/(^\(|\)$|\s+)//g;$proto}1;
 PPI_TOKEN_PROTOTYPE
 
 $fatpacked{"PPI/Token/Quote.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<<'PPI_TOKEN_QUOTE';
@@ -462,9 +462,6 @@ unshift @INC, bless \%fatpacked, $class;
 use strict;
 use warnings;
 
-use FindBin qw( $Bin );
-use lib "$Bin/../lib";
-
 use App::perlimports::CLI ();
 
 App::perlimports::CLI->new->run;
@@ -485,7 +482,7 @@ perlimports - A command line utility for cleaning up imports in your Perl code
 
 =head1 VERSION
 
-version 0.000005
+version 0.000006
 
 =head1 SYNOPSIS
 
@@ -592,6 +589,37 @@ A comma separated list of module directories which are not in your C<@INC>
 
     --libs lib,t/lib
 
+=head2 --[no-]preserve-duplicates
+
+When enabled, only one use statement per module will be preserved. Defaults to
+preserving duplicate statements.
+
+For example, when enabled the following text
+
+    use Foo qw( bar );
+    use Foo qw (baz );
+
+will be converted to:
+
+    use Foo qw( bar baz );
+
+If left disabled, the above will probably be converted to:
+
+    use Foo qw( bar baz );
+    use Foo qw( bar baz );
+
+This allows you to determine manually how you'd like to handle the imports in
+question. Use this setting with care.
+
+=head2 --[no-]preserve-unused
+
+When enabled, unused modules will be removed. Defaults to preserving unused
+modules.
+
+Enabling this may remove modules which are only present for the purposes of
+preloading or which aren't being detected for other reasons, so use this
+setting with care.
+
 =head2 --read-stdin
 
 Read statements to process from STDIN rather than processing the entire file.
@@ -604,15 +632,18 @@ If this option is enabled, then C<--inplace-edit|-i> is not available.
 
 =head2 --log-level|-l
 
-Generally only useful for debugging. So far two log levels have been
-implemented. C<notice> notifies about progress, like which file or snippet is
-currently being processed. C<info> will generally log the errors which were
-swallowed as text was being processed. All levels are subject to change.
+Generally only useful for debugging. C<notice> notifies about progress, like
+which file or snippet is currently being processed. C<info> will generally log
+the errors which were swallowed as text was being processed. All levels are
+subject to change.
 
     --log-level notice
     --log-level info
     -l notice
     -l info
+
+See L<https://metacpan.org/pod/Log::Dispatch#LOG-LEVELS> for a list of
+available log levels.
 
 =head2 --help
 

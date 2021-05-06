@@ -1,5 +1,8 @@
 Revision history for Perl extension Dist::Zilla::PluginBundle::Author::GTERMARS
 
+0.04      2021-05-04 09:29:38-07:00 America/Vancouver
+    - Fix handling of "script/" dirs for StaticInstall
+
 0.03      2021-01-10 15:29:03-08:00 America/Vancouver
     - Post-release, push branches+tags upstream to Git
     - Pre-release, check for outstanding issues.

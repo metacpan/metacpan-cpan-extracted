@@ -4,7 +4,7 @@ StreamFinder::Tunein - Fetch actual raw streamable URLs from radio-station websi
 
 =head1 AUTHOR
 
-This module is Copyright (C) 2020 by
+This module is Copyright (C) 2021 by
 
 Jim Turner, C<< <turnerjw784 at yahoo.com> >>
 		
@@ -119,7 +119,7 @@ calling youtube-dl.
 
 =over 4
 
-=item B<new>(I<ID>|I<ID/ID>|I<url> [, "debug" [ => 0|1|2 ]])
+=item B<new>(I<ID>|I<ID/ID>|I<url> [, I<-secure> [ => 0|1 ]] [, I<-debug> [ => 0|1|2 ]])
 
 Accepts a tunein.com station / podcast ID or URL and creates and returns a new 
 station object, or I<undef> if the URL is not a valid Tunein station or podcast, 
@@ -129,6 +129,11 @@ https://tunein.com/podcasts/B<podcast-id>/?topicId=B<episode-id>,
 or just I<station-id> or I<podcast-id>/I<episode-id>.  NOTE:  For podcasts, 
 you must also include the I<episode-id>, otherwise, the I<podcast-id> will be 
 interpreted as a I<station-id> and you'll likely get no streams!
+
+The optional I<-secure> argument can be either 0 or 1 (I<false> or I<true>).  If 1 
+then only secure ("https://") streams will be returned.
+
+DEFAULT I<-secure> is 0 (false) - return all streams (http and https).
 
 =item $station->B<get>()
 
@@ -272,7 +277,7 @@ L<http://search.cpan.org/dist/StreamFinder-Tunein/>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2020 Jim Turner.
+Copyright 2021 Jim Turner.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of the the Artistic License (2.0). You may obtain a
@@ -366,12 +371,16 @@ sub new
 	push (@userAgentOps, 'agent', 'Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101 Firefox/68.0')
 			unless (defined $uops{'agent'});
 	$uops{'timeout'} = 10  unless (defined $uops{'timeout'});
+	$uops{'secure'} = 0    unless (defined $uops{'secure'});
 	$DEBUG = $uops{'debug'}  if (defined $uops{'debug'});
 
 	while (@_) {
 		if ($_[0] =~ /^\-?debug$/o) {
 			shift;
 			$DEBUG = (defined($_[0]) && $_[0] =~/^[0-9]$/) ? shift : 1;
+		} elsif ($_[0] =~ /^\-?secure$/o) {
+			shift;
+			$uops{'secure'} = (defined $_[0]) ? shift : 1;
 		}
 	}	
 
@@ -388,7 +397,6 @@ sub new
 	$self->{'year'} = '';
 	$self->{'streams'} = [];
 	$self->{'cnt'} = 0;
-	
 
 	(my $url2fetch = $url);
 	#DEPRECIATED (STATION-IDS NOW INCLUDE STUFF BEFORE THE DASH: ($self->{'id'} = $url) =~ s#^.*\-([a-z]\d+)\/?$#$1#;
@@ -460,13 +468,13 @@ sub new
 	return undef  unless ($self->{'id'});
 
 	my $stationID = $self->{'id'};
-	$self->{'streams'} = [];
-	$self->{'cnt'} = 0;
 	while ($html =~ s#\"playUrl\"\:\"([^\"]+)\"#STREAMFINDER_MARK#i) {  #PROBABLY A PODCAST?:
 		(my $one = $1) =~ s#\\u002F#\/#g;
 		$one =~ s#\.mp3\?.*$#\.mp3#;   #STRIP OFF EXTRA GARBAGE PARMS, COMMENT OUT IF STARTS FAILING!
-		push @{$self->{'streams'}}, $one;
-		$self->{'cnt'}++;
+		unless ($uops{'secure'} && $one !~ /^https/o) {
+			push @{$self->{'streams'}}, $one;
+			$self->{'cnt'}++;
+		}
 		print STDERR "i:Found stream ($one) in page.\n"  if ($DEBUG);
 	}
 	if ($self->{'cnt'}) {   #STREAM(S) FOUND, PBLY A PODCAST:
@@ -480,8 +488,14 @@ sub new
 			$_ = `youtube-dl --get-url  "$tryStream"`;
 			print STDERR "-2 TRYING($tryStream): YT returned ($_)!\n"  if ($DEBUG);
 			my @urls = split(/\r?\n/);
-			while (@urls && $urls[0] !~ m#^https?\:\/\/#o) {
-				shift @urls;
+			if ($uops{'secure'}) {
+				while (@urls && $urls[0] !~ m#^https\:\/\/#o) {
+					shift @urls;
+				}
+			} else {
+				while (@urls && $urls[0] !~ m#^https?\:\/\/#o) {
+					shift @urls;
+				}
 			}
 			if (scalar(@urls) > 0) {
 				for (my $i=0;$i<=$#urls;$i++) {

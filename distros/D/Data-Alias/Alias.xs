@@ -321,6 +321,9 @@ STATIC void (*da_old_peepp)(pTHX_ OP *);
 STATIC OP *da_tag_rv2cv(pTHX) { return NORMAL; }
 STATIC OP *da_tag_list(pTHX) { return NORMAL; }
 STATIC OP *da_tag_entersub(pTHX) { return NORMAL; }
+#if (PERL_COMBI_VERSION >= 5031002)
+STATIC OP *da_tag_enter(pTHX) { return NORMAL; }
+#endif
 
 STATIC void da_peep(pTHX_ OP *o);
 STATIC void da_peep2(pTHX_ OP *o);
@@ -1882,7 +1885,11 @@ STATIC int da_transform(pTHX_ OP *op, int sib) {
 STATIC void da_peep2(pTHX_ OP *o) {
 	OP *k, *lsop, *pmop, *argop, *cvop, *esop;
 	int useful;
-	while (o->op_ppaddr != da_tag_list) {
+	while (o->op_ppaddr != da_tag_list
+#if (PERL_COMBI_VERSION >= 5031002)
+			&& o->op_ppaddr != da_tag_enter
+#endif
+	) {
 		while (OpHAS_SIBLING(o)) {
 			if ((o->op_flags & OPf_KIDS) && (k = cUNOPo->op_first)){
 				da_peep2(aTHX_ k);
@@ -1897,6 +1904,12 @@ STATIC void da_peep2(pTHX_ OP *o) {
 		if (!(o->op_flags & OPf_KIDS) || !(o = cUNOPo->op_first))
 			return;
 	}
+#if (PERL_COMBI_VERSION >= 5031002)
+	if (o->op_ppaddr == da_tag_enter) {
+	        o = OpSIBLING(o);
+		assert(o);
+	}
+#endif
 	lsop = o;
 	useful = lsop->op_private & OPpUSEFUL;
 	op_null(lsop);
@@ -1916,6 +1929,18 @@ STATIC void da_peep2(pTHX_ OP *o) {
 		return;
 	}
 	esop->op_type = OP_ENTERSUB;
+#if (PERL_COMBI_VERSION >= 5031002)
+	if (cLISTOPx(esop)->op_first->op_ppaddr == da_tag_enter) {
+	        /* the first is a dummy op we inserted to satisfy Perl_scalar/list.
+		   we can't remove it since an op_next points at it, so null it out.
+		*/
+	        OP *nullop = cLISTOPx(esop)->op_first;
+	        assert(nullop->op_type == OP_ENTER);
+		assert(OpSIBLING(nullop));
+		nullop->op_type = OP_NULL;
+		nullop->op_ppaddr = PL_ppaddr[OP_NULL];
+	}
+#endif
 	if (cvop->op_flags & OPf_SPECIAL) {
 		esop->op_ppaddr = DataAlias_pp_copy;
 		da_peep2(aTHX_ pmop);
@@ -2154,6 +2179,21 @@ STATIC OP *da_ck_entersub(pTHX_ OP *esop) {
 	OpLASTSIB_set(lsop, esop);
 	esop->op_type = inside ? OP_SCOPE : OP_LEAVE;
 	esop->op_ppaddr = da_tag_entersub;
+#if (PERL_COMBI_VERSION >= 5031002)
+	if (!inside && !OpHAS_SIBLING(lsop)) {
+	          /* esop is now a leave, and Perl_scalar/Perl_list expects at least two children.
+		     we insert it in the middle (and null it later) since Perl_scalar()
+		     tries to find the last non-(null/state) op *after* the expected enter.
+		   */
+	          OP *enterop;
+	          NewOp(0, enterop, 1, OP);
+		  enterop->op_type = OP_ENTER;
+		  enterop->op_ppaddr = da_tag_enter;
+		  cLISTOPx(esop)->op_first = enterop;
+		  OpMORESIB_set(enterop, lsop);
+		  OpLASTSIB_set(lsop, esop);
+	}
+#endif
 	cLISTOPx(esop)->op_last = lsop;
 	lsop->op_type = OP_LIST;
 	lsop->op_targ = 0;

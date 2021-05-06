@@ -1,3 +1,19 @@
+* v3.03 - 6th May 2021
+
+No changes from v3.02_02
+
+* v3.02_02 - 31st March 2021
+
+Makefile.PL improved to CPAN Meta Spec 2 where available
+
+Test suite enhanced: full coverage of add_timestamp()
+
+* v3.02_01 - 16th March 2021
+
+DOC: Remove obsolete email addresses of contributors
+
+META: Public repo is now at GitLab
+
 * v3.02 - 19th May 2018
 
 No changes from v3.01_02

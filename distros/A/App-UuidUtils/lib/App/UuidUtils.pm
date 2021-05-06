@@ -1,9 +1,9 @@
 package App::UuidUtils;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-01-20'; # DATE
+our $DATE = '2021-05-06'; # DATE
 our $DIST = 'App-UuidUtils'; # DIST
-our $VERSION = '0.030'; # VERSION
+our $VERSION = '0.031'; # VERSION
 
 use 5.010001;
 use strict;
@@ -25,10 +25,16 @@ _
         uuid_version => {
             schema => ['str*', in=>[qw/1 v1 4 v4 random/]],
             default => 'random',
+            cmdline_aliases => {
+                random => {is_flag=>1, summary=>'Shortcut for --uuid-version=random'     , code=>sub{ $_[0]{uuid_version} = 'random'}},
+                R      => {is_flag=>1, summary=>'Shortcut for --uuid-version=random'     , code=>sub{ $_[0]{uuid_version} = 'random'}},
+                v1     => {is_flag=>1, summary=>'Shortcut for --uuid-version=v1'         , code=>sub{ $_[0]{uuid_version} = 'v1'}},
+                v4     => {is_flag=>1, summary=>'Shortcut for --uuid-version=v4 (random)', code=>sub{ $_[0]{uuid_version} = 'v4'}},
+            },
         },
         backend => {
             summary => 'Choose a specific backend, if unspecified one will be chosen',
-            schema => ['str*', in=>[qw/Data::UUID UUID::Tiny Crypt::Misc UUID::Random::Secure/]],
+            schema => ['str*', in=>[qw/Data::UUID UUID::Tiny Crypt::Misc UUID::Random::Secure UUID::FFI/]],
             description => <<'_',
 
 Note that not all backends support every version of UUID.
@@ -79,6 +85,17 @@ sub gen_uuid {
                 log_trace "Can't load UUID::Tiny: $@" if $@;
                 last if $code_gen;
             }
+            if (!$backend || $backend eq 'UUID::FFI') {
+                eval {
+                    require UUID::FFI;
+                    log_trace "Picking UUID::FFI as backend";
+                    $code_gen = sub {
+                        UUID::FFI->new_time->as_hex;
+                    };
+                };
+                log_trace "Can't load UUID::FFI: $@" if $@;
+                last if $code_gen;
+            }
         }
         die [412, "Can't use any suitable backend to generate v1 UUID"]
             unless $code_gen;
@@ -96,7 +113,7 @@ sub gen_uuid {
                 last if $code_gen;
             }
         }
-        die [412, "Can't use any suitable backend to generate v1 UUID"]
+        die [412, "Can't use any suitable backend to generate v3 UUID"]
             unless $code_gen;
     } elsif ($version =~ /\A(v?5)\z/) {
       CHOOSE_BACKEND: {
@@ -139,8 +156,19 @@ sub gen_uuid {
                 log_trace "Can't load UUID::Random::Secure: $@" if $@;
                 last if $code_gen;
             }
+            if (!$backend || $backend eq 'UUID::FFI') {
+                eval {
+                    require UUID::FFI;
+                    log_trace "Picking UUID::FFI as backend";
+                    $code_gen = sub {
+                        UUID::FFI->new_random->as_hex;
+                    };
+                };
+                log_trace "Can't load UUID::FFI: $@" if $@;
+                last if $code_gen;
+            }
         }
-        die [412, "Can't use any suitable backend to generate v1 UUID"]
+        die [412, "Can't use any suitable backend to generate v4 UUID"]
             unless $code_gen;
     }
 
@@ -171,7 +199,7 @@ App::UuidUtils - Command-line utilities related to UUIDs
 
 =head1 VERSION
 
-This document describes version 0.030 of App::UuidUtils (from Perl distribution App-UuidUtils), released on 2021-01-20.
+This document describes version 0.031 of App::UuidUtils (from Perl distribution App-UuidUtils), released on 2021-05-06.
 
 =head1 DESCRIPTION
 

@@ -23,15 +23,11 @@ resources:
   bugtracker: https://github.com/perlancar/perl-UUID-Random-Patch-UseMRS/issues
   homepage: https://metacpan.org/release/UUID-Random-Patch-UseMRS
   repository: git://github.com/perlancar/perl-UUID-Random-Patch-UseMRS.git
-version: '0.02'
+version: '0.030'
 x_Dist_Zilla:
   perl:
     version: '5.030000'
   plugins:
-    -
-      class: Dist::Zilla::Plugin::MetaResources
-      name: MetaResources
-      version: '6.012'
     -
       class: Dist::Zilla::Plugin::PERLANCAR::CheckPendingRelease
       name: '@Author::PERLANCAR/PERLANCAR::CheckPendingRelease'

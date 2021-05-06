@@ -1,5 +1,15 @@
 Revision history for Plack-Middleware-Text-Minify:
 
+v0.1.5    2021-05-06 12:57:13+01:00 Europe/London
+  [Bug Fixes]
+  - Bump minimum version of Text::Minify::XS to v0.4.0.
+
+  [Documentation]
+  - Added note about whitespace cleanup in templating systems.
+
+  [Tests]
+  - Add more author tests.
+
 v0.1.4    2021-01-05 14:29:37+00:00 Europe/London
   [Bug Fixes]
   - Upgrade minimum version of Text::Minify::XS to v0.3.6, GH#2.

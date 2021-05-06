@@ -1,0 +1,44 @@
+NAME
+
+    Faster::Maths - make mathematically-intense programs faster
+
+SYNOPSIS
+
+       use Faster::Maths;
+    
+       # and that's it :)
+
+DESCRIPTION
+
+    This module installs an optimizer into the perl compiler that looks for
+    sequences of maths operations that it can make faster.
+
+    When this module is lexically in scope, mathematical expressions
+    composed of the four basic operators (+, -, *, /) operating on lexical
+    variables and constants will be compiled into a form that is more
+    efficient at runtime.
+
+TODO
+
+      * Recognise more potential arguments - padrange and package variables
+      at least.
+
+      * Recognise more operators - %, unary - and sqrt, possibly other
+      unary operators like sin.
+
+      * Recognise the presence of overloading magic on variables and fall
+      back to slower-but-correct operation in that case.
+
+      * Split the runtime loop into IV/UV/NV cases, further optimise the
+      accumulator value in each case.
+
+      * Store IV/UV constants as values directly in the UNOP_AUX structure
+      avoiding the need for SV lookup on them.
+
+      * Back-compatibility to perls older than 5.22.0 by providing an
+      UNOP_AUX implementation.
+
+AUTHOR
+
+    Paul Evans <leonerd@leonerd.org.uk>
+

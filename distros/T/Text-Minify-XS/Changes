@@ -1,5 +1,13 @@
 Revision history for Text-Minify-XS:
 
+v0.4.1    2021-05-06 12:58:09+01:00 Europe/London
+  [Documentation]
+  - Improved formatting.
+
+v0.4.0    2021-05-05 11:47:08+01:00 Europe/London
+  [Bug Fixes]
+  - Fixed warning about casting pointer to integer.
+
 v0.3.9    2021-04-29 08:47:02+01:00 Europe/London
   [Tests]
   - Specify a minimum version of Test::More.

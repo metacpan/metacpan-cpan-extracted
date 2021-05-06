@@ -6,7 +6,7 @@ use strict;
 use warnings;
 
 package Raisin::Encoder;
-$Raisin::Encoder::VERSION = '0.92';
+$Raisin::Encoder::VERSION = '0.93';
 use Plack::Util;
 use Plack::Util::Accessor qw(registered);
 
@@ -69,7 +69,7 @@ Raisin::Encoder - A helper for L<Raisin::Middleware::Formatter> over encoder mod
 
 =head1 VERSION
 
-version 0.92
+version 0.93
 
 =head1 SYNOPSIS
 

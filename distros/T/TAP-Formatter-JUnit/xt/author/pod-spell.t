@@ -19,3 +19,5 @@ TAP
 TerMarsch
 cpan
 lib
+script
+tap2junit

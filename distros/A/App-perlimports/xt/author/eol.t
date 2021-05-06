@@ -8,6 +8,7 @@ use Test::EOL;
 
 my @files = (
     'lib/App/perlimports.pm',
+    'lib/App/perlimports/Annotations.pm',
     'lib/App/perlimports/CLI.pm',
     'lib/App/perlimports/Document.pm',
     'lib/App/perlimports/ExportInspector.pm',
@@ -22,6 +23,7 @@ my @files = (
     't/ExportInspector/SubExporter.t',
     't/ExportInspector/load.t',
     't/after.t',
+    't/annotations.t',
     't/args-in-import.t',
     't/builtin.pl',
     't/carp.t',

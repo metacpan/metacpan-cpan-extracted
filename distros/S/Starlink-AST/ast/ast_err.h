@@ -516,5 +516,32 @@ enum { AST__BGWRD           	= 233934498 };	/* messid=468 */
 /* Array is too big */
 enum { AST__TOOBG           	= 233934506 };	/* messid=469 */
 
+/* Requested feature is not supported */
+enum { AST__NOTSP           	= 233934514 };	/* messid=470 */
+
+/* Text truncated */
+enum { AST__TRUNC           	= 233934522 };	/* messid=471 */
+
+/* Error in libyaml function */
+enum { AST__LYAML           	= 233934530 };	/* messid=472 */
+
+/* Error reading YAML text */
+enum { AST__YAML            	= 233934538 };	/* messid=473 */
+
+/* AST was configured without YAML support */
+enum { AST__NOYAML          	= 233934546 };	/* messid=474 */
+
+/* No TMapping found */
+enum { AST__NOTMP           	= 233934554 };	/* messid=475 */
+
+/* Invalid YAML object supplied */
+enum { AST__BYAML           	= 233934562 };	/* messid=476 */
+
+/* Invalid ASDF object supplied */
+enum { AST__BASDF           	= 233934570 };	/* messid=477 */
+
+/* Unsupported ASDF object supplied */
+enum { AST__UASDF           	= 233934578 };	/* messid=478 */
+
 
 #endif	/* AST_ERROR_DEFINED */

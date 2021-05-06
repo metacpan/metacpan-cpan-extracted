@@ -55,7 +55,7 @@ sub _makeSingleHoldingsRecord {
 	$shelvingLocation = $location->{name};
     }
 
-    my $itemObjects = _makeItemRecords($holding->{bareHoldingsItems}, $holding->{permanentLocation});
+    my $itemObjects = _makeItemRecords($holding->{bareHoldingsItems}, $location, $holding->{permanentLocation});
 
     return bless [
         [ 'typeOfRecord', substr($marc->leader(), 5, 1) ], # LDR 06
@@ -153,13 +153,13 @@ sub _makeTermsUseRepro {
 
 
 sub _makeItemRecords {
-    my($items, $defaultLocation) = @_;
-    return [ map { _makeSingleItemRecord($_, $defaultLocation) } @$items ];
+    my($items, $defaultLocation, $defaultPermamentLocation) = @_;
+    return [ map { _makeSingleItemRecord($_, $defaultLocation, $defaultPermamentLocation) } @$items ];
 }
 
 
 sub _makeSingleItemRecord {
-    my($item, $defaultLocation) = @_;
+    my($item, $defaultLocation, $defaultPermamentLocation) = @_;
 
     my @tmp;
     push @tmp, $item->{enumeration} if $item->{enumeration};
@@ -184,6 +184,7 @@ sub _makeSingleItemRecord {
         [ 'enumAndChron', $enumAndChronForItem ],
         [ 'midspine', undef ], # XXX Will be added in UIIN-220 but doesn't exist yet
         [ 'temporaryLocation', _makeLocation($item->{temporaryLocation} || $defaultLocation) ],
+	[ '_permanentLocation', _makeLocation($item->{permanentLocation} || $defaultPermamentLocation) ],
         [ '_holdingsLocation', _makeLocation($defaultLocation) ],
         [ '_callNumber', $ecnc->{callNumber} ],
         [ '_callNumberPrefix', $ecnc->{prefix} ],

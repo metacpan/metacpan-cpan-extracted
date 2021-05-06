@@ -4,13 +4,13 @@
       "Andre Parker <andreparker@gmail.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "ExtUtils::MakeMaker version 6.68, CPAN::Meta::Converter version 2.120921",
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "artistic_2"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "MikroTik-Client",
    "no_index" : {
@@ -22,6 +22,11 @@
    },
    "prereqs" : {
       "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
          "requires" : {
             "ExtUtils::MakeMaker" : "0"
          }
@@ -47,5 +52,6 @@
          "web" : "https://github.com/anparker/mikrotik-client"
       }
    },
-   "version" : "v0.520"
+   "version" : "v0.530",
+   "x_serialization_backend" : "JSON::PP version 4.02"
 }

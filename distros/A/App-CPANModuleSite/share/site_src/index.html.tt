@@ -1,0 +1,5 @@
+<h1>[% distribution.name %]</h1>
+<p>[% release.abstract %]</p>
+<p>Current version: [% release.version %]</p>
+
+[% INCLUDE intro.tt %]

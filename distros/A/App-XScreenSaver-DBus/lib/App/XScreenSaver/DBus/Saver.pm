@@ -7,7 +7,7 @@ use Log::Any;
 use Try::Tiny;
 use IPC::Run;
 use App::XScreenSaver::DBus::SaverProxy;
-our $VERSION = '1.0.2'; # VERSION
+our $VERSION = '1.0.3'; # VERSION
 # ABSTRACT: implements the "idle inhibition" protocol
 
 
@@ -67,7 +67,7 @@ sub start($self) {
 
     $self->_prod_id(
         $self->reactor->add_timeout(
-            5_000,
+            60_000,
             Net::DBus::Callback->new(
                 method => $self->curry::weak::_prod_screensaver
             ),
@@ -172,7 +172,7 @@ App::XScreenSaver::DBus::Saver - implements the "idle inhibition" protocol
 
 =head1 VERSION
 
-version 1.0.2
+version 1.0.3
 
 =head1 SYNOPSIS
 

@@ -1,0 +1,269 @@
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="Mark Otto, Jacob Thornton, and Bootstrap contributors">
+    <meta name="generator" content="Hugo 0.80.0">
+    <meta name="theme-color" content="#7952b3">
+    <title>MooX-Role-JSON_LD</title>
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-BmbxuPwQa2lc/FVzBcNJ7UAyJxM6wuqIj61tLrc4wSX0szH/Ev+nYRRuWlolflfl" crossorigin="anonymous">
+
+    <style>
+      .bd-placeholder-img {
+        font-size: 1.125rem;
+        text-anchor: middle;
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        user-select: none;
+      }
+
+      @media (min-width: 768px) {
+        .bd-placeholder-img-lg {
+          font-size: 3.5rem;
+        }
+      }
+    </style>
+
+  </head>
+  <body>
+
+<header>
+  <div class="collapse bg-dark" id="navbarHeader">
+    <div class="container">
+      <div class="row">
+        <div class="col-sm-8 col-md-7 py-4">
+          <h4 class="text-white">About</h4>
+          <p class="text-muted">Add some information about the album below, the author, or any other background context. Make it a few sentences long so folks can pick up some informative tidbits. Then, link them off to some social networking sites or contact information.</p>
+        </div>
+        <div class="col-sm-4 offset-md-1 py-4">
+          <h4 class="text-white">Contact</h4>
+          <ul class="list-unstyled">
+            <li><a href="#" class="text-white">Follow on Twitter</a></li>
+            <li><a href="#" class="text-white">Like on Facebook</a></li>
+            <li><a href="#" class="text-white">Email me</a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="navbar navbar-dark bg-dark shadow-sm">
+    <div class="container">
+      <a href="#" class="navbar-brand d-flex align-items-center">
+        <strong>MooX-Role-JSON_LD</strong>
+      </a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarHeader" aria-controls="navbarHeader" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+    </div>
+  </div>
+</header>
+
+<main>
+  <div class="container">
+    <div class="row">
+      <div class="col-3">
+        <h2>Documentation</h2>
+<ul>
+<li><a href="/lib/MooX/JSON_LD.html">MooX::JSON_LD</a></li>
+<li><a href="/lib/MooX/Role/JSON_LD.html">MooX::Role::JSON_LD</a></li>
+</ul>
+
+        <h2>Other links</h2>
+<ul>
+<li><a href="https://metacpan.org/release/MooX-Role-JSON_LD">MetaCPAN</a></li>
+<li><a href="http://matrix.cpantesters.org/?dist=MooX-Role-JSON_LD">CPAN testers</a></li>
+<li><a href="https://cpants.cpanauthors.org/release/DAVECROSS/MooX-Role-JSON_LD-1.0.0">CPANTS</a></li>
+<li><a href="https://cpan.metacpan.org/authors/id/D/DA/DAVECROSS/MooX-Role-JSON_LD-1.0.0.tar.gz">Download</a></li>
+<li><a href="https://github.com/davorg/moox-role-json_ld/issues">Bug tracker</a></li>
+<li><a href="https://github.com/davorg/moox-role-json_ld">Code repository</a></li>
+</ul>
+
+      </div>
+      <div class="col-9">
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a>
+    <ul>
+      <li><a href="#Using-the-role">Using the role</a></li>
+      <li><a href="#Defining-your-type">Defining your type</a></li>
+      <li><a href="#Defining-your-fields">Defining your fields</a></li>
+      <li><a href="#Other-contexts">Other contexts</a></li>
+    </ul>
+  </li>
+  <li><a href="#AUTHOR">AUTHOR</a></li>
+  <li><a href="#SEE-ALSO">SEE ALSO</a></li>
+  <li><a href="#COPYRIGHT-AND-LICENSE">COPYRIGHT AND LICENSE</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>MooX::Role::JSON_LD - Easily provide JSON-LD mark-up for your objects.</p>
+
+<h1 id="SYNOPSIS">SYNOPSIS</h1>
+
+<pre><code>    # Your Moo (or Moose) Class
+    package::My::Moo::Class
+
+    use Moo;
+    with &#39;MooX::Role::JSON_LD&#39;;
+
+    # define your attributes
+    has first_name =&gt; (
+      is =&gt; &#39;ro&#39;,
+      # Various other properties
+    );
+    has last_name  =&gt; (
+      is =&gt; &#39;ro&#39;,
+      # Various other properties
+    );
+    has birth_date =&gt; (
+      is =&gt; &#39;ro&#39;,
+      # Various other properties
+    );
+
+    # Add two required methods
+    sub json_ld_type { &#39;Person&#39; };
+
+    sub json_ld_fields { [ qw[ first_name last_name birth_date ] ] };
+
+    # Then, in a program somewhere...
+    use My::Moo::Class;
+
+    my $obj = My::Moo::Class-&gt;new({
+      first_name =&gt; &#39;David&#39;,
+      last_name  =&gt; &#39;Bowie&#39;,
+      birth_date =&gt; &#39;1947-01-08&#39;,
+    });
+
+    # print a text representation of the JSON-LD
+    print $obj-&gt;json_ld;
+
+    # print the raw data structure for the JSON-LD
+    use Data::Dumper;
+    print Dumper $obj-&gt;json_ld_data;</code></pre>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>This role allows you to easily add a method to your class that produces JSON-LD representing an instance of your class.</p>
+
+<p>To do this, you need to do three things:</p>
+
+<dl>
+
+<dt id="1.-Add-the-role-to-your-class"><a id="1"></a><a id="Add-the-role-to-your-class"></a>1. Add the role to your class</dt>
+<dd>
+
+<pre><code>    with &#39;MooX::Role::JSON_LD&#39;;</code></pre>
+
+</dd>
+<dt id="2.-Add-a-method-telling-the-role-which-JSON-LD-type-to-use-in-the-output"><a id="2"></a><a id="Add-a-method-telling-the-role-which-JSON-LD-type-to-use-in-the-output"></a>2. Add a method telling the role which JSON-LD type to use in the output</dt>
+<dd>
+
+<pre><code>    sub json_ld_type { &#39;Person&#39; }</code></pre>
+
+</dd>
+<dt id="3.-Add-a-method-defining-the-fields-you-want-to-appear-in-the-JSON-LD"><a id="3"></a><a id="Add-a-method-defining-the-fields-you-want-to-appear-in-the-JSON-LD"></a>3. Add a method defining the fields you want to appear in the JSON-LD</dt>
+<dd>
+
+<pre><code>    sub json_ld_fields { [ qw[ first_name last_name birth_date ] ] };</code></pre>
+
+</dd>
+</dl>
+
+<h2 id="Using-the-role"><a id="Using"></a>Using the role</h2>
+
+<p><code>MooX::Role::JSON_LD</code> can be loaded into your class using the <code>with</code> keyword, just like any other role. The role has been written so that it works in both <a href="https://metacpan.org/pod/Moo">Moo</a> and <a href="https://metacpan.org/pod/Moose">Moose</a> classes.</p>
+
+<h2 id="Defining-your-type"><a id="Defining"></a>Defining your type</h2>
+
+<p>JSON-LD can be used to model many different types of object. The current list can be found at <a href="https://schema.org/">https://schema.org/</a>. Once you have chosen one of the types you want to use in your JSON-LD, simply add a method called <code>json_ld_type</code> which returns the name of your type as a string. This string will be used in the <code>@type</code> field of the JSON-LD.</p>
+
+<h2 id="Defining-your-fields"><a id="Defining1"></a>Defining your fields</h2>
+
+<p>You also need to define the fields that are to be included in your JSON-LD. To do this, you need to add a method called <code>json_ld_fields</code> which returns an array reference containing details of the fields you want.</p>
+
+<p>The simplest approach is for each element of the array to be the name of a method on your object. In our example above, we call the three methods, <code>first_name</code>, <code>last_name</code> and <code>birth_date</code>. The names of the methods are used as keys in the JSON-LD and the values returned will be the matching values. So in our example, we would get the following as part of our output:</p>
+
+<pre><code>    &quot;birth_date&quot; : &quot;1947-01-08&quot;,
+    &quot;first_name&quot; : &quot;David&quot;,
+    &quot;last_name&quot; : &quot;Bowie&quot;,</code></pre>
+
+<p>Unfortunately, these aren&#39;t valid keys in the &quot;Person&quot; type, so we need to use a slightly more complicated version of the <code>json_ld_fields</code> method, one that enables us to rename fields.</p>
+
+<pre><code>    sub json_ld_fields {
+        [
+          qw[ first_name last_name],
+          { birthDate =&gt; &#39;birth_date&#39; },
+        ]
+    }</code></pre>
+
+<p>In this version, the last element of the array is a hash reference. The key in the hash will be used as the key in the JSON-LD and the value is the name of a method to call. If we make this change, our JSON will look like this:</p>
+
+<pre><code>    &quot;birthDate&quot; : &quot;1947-01-08&quot;,
+    &quot;first_name&quot; : &quot;David&quot;,
+    &quot;last_name&quot; : &quot;Bowie&quot;,</code></pre>
+
+<p>The <code>birthDate</code> key is now a valid key in the JSON-LD representation of a person.</p>
+
+<p>But our <code>first_name</code> and <code>last_name</code> keys are still wrong. We could take the same approach as we did with <code>birthDate</code> and translate them to <code>givenName</code> and <code>familyName</code>, but what if we want to combine them into the single <code>name</code> key. We can do that by using another version of <code>json_ld_fields</code> where the value of the definition hash is a subroutine reference. That subroutine is called, passing it the object, so it can build anything you want. We can use that to get the full name of our person.</p>
+
+<pre><code>    sub json_ld_fields {
+        [
+          { birthDate =&gt; &#39;birthDate&#39;},
+          { name =&gt; sub{ $_[0]-&gt; first_name . &#39; &#39; . $_[0]-&gt;last_name} },
+        ]
+      }</code></pre>
+
+<p>That configuration will give us the following output:</p>
+
+<pre><code>    &quot;birthDate&quot; : &quot;1974-01-08&quot;,
+    &quot;name&quot; : &quot;David Bowie&quot;,</code></pre>
+
+<h2 id="Other-contexts"><a id="Other"></a>Other contexts</h2>
+
+<p>By default, this role uses the URL <a href="http://schema.org">http://schema.org</a>, but you can change this. This role adds an attribute (called <code>context</code>) which can be used to change the context.</p>
+
+<h1 id="AUTHOR">AUTHOR</h1>
+
+<p>Dave Cross &lt;dave@perlhacks.com&gt;</p>
+
+<h1 id="SEE-ALSO"><a id="SEE"></a>SEE ALSO</h1>
+
+<p>perl(1), Moo, Moose, <a href="https://json-ld.org/">https://json-ld.org/</a>, <a href="https://schema.org/">https://schema.org/</a></p>
+
+<p><a href="https://metacpan.org/pod/MooX::JSON_LD">MooX::JSON_LD</a> is included in this distribution and provides an alternative interface to the same functionality.</p>
+
+<h1 id="COPYRIGHT-AND-LICENSE"><a id="COPYRIGHT"></a>COPYRIGHT AND LICENSE</h1>
+
+<p>Copyright (C) 2018, Magnum Solutions Ltd. All Rights Reserved.</p>
+
+<p>This script is free software; you can redistribute it and/or modify it under the same terms as Perl itself.</p>
+
+
+      </div>
+    </div>
+  </div>
+</main>
+
+<footer class="text-muted py-5">
+  <div class="container">
+    <p class="float-end mb-1">
+      <a href="#">Back to top</a>
+    </p>
+    <p class="mb-1">Album example is &copy; Bootstrap, but please download and customize it for yourself!</p>
+    <p class="mb-0">New to Bootstrap? <a href="/">Visit the homepage</a> or read our <a href="/docs/5.0/getting-started/introduction/">getting started guide</a>.</p>
+  </div>
+</footer>
+
+    <!-- Option 1: Bootstrap Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/js/bootstrap.bundle.min.js" integrity="sha384-b5kHyXgcpbZJO/tY9Ul7kGkf1S0CWuKcCD38l8YkeH8z8QjE0GmW1gYU5S9FOnJ0" crossorigin="anonymous"></script>
+
+  </body>
+</html>

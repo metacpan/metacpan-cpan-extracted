@@ -106,12 +106,12 @@ DESCRIPTION
     podcast URL on supported websites and returns the actual stream URL(s),
     title, and cover art icon for that station / podcast / video. The
     purpose is that one needs one of these URLs in order to have the option
-    to stream the station / video in one's own choice of media player
-    software rather than using their web browser and accepting flash, ads,
-    javascript, cookies, trackers, web-bugs, and other crapware associated
-    with that method of play. The author uses his own custom all-purpose
-    media player called "Fauxdacious" (his custom forked version of the
-    open-source "Audacious" audio player). "Fauxdacious"
+    to stream the station / podcast / video in one's own choice of media
+    player software rather than using their web browser and accepting flash,
+    ads, javascript, cookies, trackers, web-bugs, and other crapware
+    associated with that method of play. The author uses his own custom
+    all-purpose media player called "Fauxdacious" (his custom forked version
+    of the open-source "Audacious" audio player). "Fauxdacious"
     (<https://wildstar84.wordpress.com/fauxdacious/>) incorporates this
     module to decode and play streams, along with their titles / station
     names, and station / podcast / video icons!
@@ -133,12 +133,15 @@ DESCRIPTION
     rumble.com (StreamFinder::Rumble), sermonaudio.com
     (StreamFinder::SermonAudio), spreaker.com podcasts
     (StreamFinder::Spreaker), tunein.com (StreamFinder::Tunein), vimeo.com
-    (StreamFinder::Vimeo), and (youtube.com, et. al and other sites that
-    youtube-dl supports) (StreamFinder::Youtube).
+    (StreamFinder::Vimeo), (youtube.com, et. al and other sites that
+    youtube-dl supports) (StreamFinder::Youtube), and
+    StreamFinder::Anystream - search any (other) webpage URL (not supported
+    by any of the other submodules) for streams.
 
-    NOTE: StreamFinder::Reciva will likely be removed next release after
-    April 30, 2021 due to that site's announcement that they're going
-    offline after that date!
+    NOTE: StreamFinder::Reciva will likely be removed next release sometime
+    after April 30, 2021 due to that site's announcement that they're going
+    offline after that date, though as of this release, Reciva.com is still
+    active!
 
     NOTE: Facebook (Streamfinder::Facebook) has been removed because logging
     into Facebook via the call to youtube-dl is now interpreted by Facebook
@@ -151,9 +154,9 @@ DESCRIPTION
 
     Each site is supported by a separate subpackage
     (StreamFinder::*Package*), which is determined and selected based on the
-    URL when the StreamFinder object is created. The methods are overloaded
-    by the selected subpackage's methods. An example would be
-    StreamFinder::Youtube.
+    URL argument passed to it when the StreamFinder object is created. The
+    methods are overloaded by the selected subpackage's methods. An example
+    would be StreamFinder::Youtube.
 
     Please see the POD. documentation for each subpackage for important
     additional information on options and features specific to each site /
@@ -168,7 +171,10 @@ DESCRIPTION
     provide station's FCC call letters ("fccid"). For icon and image URLs,
     functions exist (getIconData() and getImageData() to fetch the actual
     binary data and mime type for downloading to local storage for use by
-    your application or preferred media player.
+    your application or preferred media player. NOTE:
+    StreamFinder::Anystream is not able to return much beyond the stream
+    URLs it finds, please see it's POD documentation for details on what it
+    is able to return.
 
     If you have another streaming site that is not supported, first, make
     sure you have youtube-dl installed and see if StreamFinder::Youtube can
@@ -203,6 +209,35 @@ SUBROUTINES/METHODS
         debugging output. A numeric option can follow specifying the level
         (0, 1, or 2). 0 is none, 1 is basic, 2 is detailed. Default: 1 (if
         *-debug* is specified).
+
+        One specific option (*-omit*, added as of v1.45) permits omitting
+        specific submodules which are currently installed. For example, to
+        NOT handle Youtube videos nor use the fallback "Anystream" module,
+        specify: *-omit* => *"Youtube,Anystream"*, which will cause
+        StreamFinder::Anystream and StreamFinder::Youtube to not be used for
+        the stream search. Default is to all installed modules will be
+        considered.
+
+        Another global option (applicable to all submodules) is the
+        *-secure* option who's argument can be either 0 or 1 (*false* or
+        *true*). If 1, then only secure ("https://") streams will be
+        returned. NOTE, it's possible that some sites may only contain
+        insecure ("http://") streams, which won't return any streams if this
+        option is specified. Therefore, it may be necessary, if setting this
+        option globally, to set it to zero in the config. files for those
+        specific modules, if you determine that to be the case (I have not
+        tested all sites for that).
+
+        DEFAULT *-secure* is 0 (false) - return all streams (http and
+        https).
+
+        Any other options (including *-debug* will be passed to the
+        submodule (if any) that handles the URL you pass in, but note,
+        submodules accept different options and ignore ones they do not
+        recognize. Valid values for some options can also vary across
+        different submodules. A better way to change default options for one
+        or more submodules is to set up submodule configuration files for
+        the ones you wish to change.
 
     $station->get(['playlist'])
         Returns an array of strings representing all stream URLs found. If
@@ -268,17 +303,18 @@ SUBROUTINES/METHODS
 
     $station->getType()
         Returns the station / podcast / video's type (*submodule-name*).
-        (one of: "Apple", "BitChute", "Blogger", "Brighteon", "Castbox",
-        "Google", "IHeartRadio", "RadioNet", "Reciva", "Rumble",
+        (one of: "Anystream", "Apple", "BitChute", "Blogger", "Brighteon",
+        "Castbox", "Google", "IHeartRadio", "RadioNet", "Reciva", "Rumble",
         "SermonAudio", "Spreaker", "Tunein", "Youtube" or "Vimeo" -
-        depending on the sight that matched the URL.
+        depending on the sight that matched the URL).
 
 CONFIGURATION FILES
     ~/.config/StreamFinder/config
         Optional text file for specifying various configuration options.
-        Each option is specified on a separate line in the format below:
+        Each option is specified on a separate line in the formats below:
 
-        'option' => 'value' [,]
+        'option' => 'value' [,] 'option' => ['value1', 'value2', ...]
+        'option' => {'key1' => 'value1', 'key2' => 'value2', ...}
 
         and the options are loaded into a hash used by all sites
         (submodules) that support them. Valid options include *-debug* =>
@@ -289,19 +325,21 @@ CONFIGURATION FILES
         Optional text file for specifying various configuration options for
         a specific site (submodule, ie. "Youtube" for
         StreamFinder::Youtube). Each option is specified on a separate line
-        in the format below:
+        in the formats below:
 
-        'option' => 'value' [,]
+        'option' => 'value' [,] 'option' => ['value1', 'value2', ...]
+        'option' => {'key1' => 'value1', 'key2' => 'value2', ...}
 
         and the options are loaded into a hash used only by the specific
         (submodule) specified. Valid options include *-debug* => [0|1|2],
-        and most of the LWP::UserAgent options.
+        and most of the LWP::UserAgent options. Blank lines and lines
+        starting with a "#" sign are ignored.
 
-        Options specified here override any specified in
+        NOTE: Options specified here override any specified in
         *~/.config/StreamFinder/config*.
 
-    NOTE: Options specified in the options parameter list will override
-    those corresponding options specified in these files.
+    NOTE: Options specified in the options parameter list will override any
+    corresponding options specified in either of these files.
 
 DEPENDENCIES
     URI::Escape, HTML::Entities, LWP::UserAgent

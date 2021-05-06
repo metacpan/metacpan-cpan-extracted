@@ -107,7 +107,7 @@ returned for the first (latest) episode on the podcast page.
 
 =over 4
 
-=item B<new>(I<url> [, I<-debug> [ => 0|1|2 ] ... ])
+=item B<new>(I<url> [, I<-secure> [ => 0|1 ]] [, I<-debug> [ => 0|1|2 ] ... ])
 
 Accepts a podcasts.google.com podcast URL and creates and returns a 
 a new podcast object, or I<undef> if the URL is not a valid podcast, or no 
@@ -116,6 +116,11 @@ ie. https://podcasts.google.com/feed/B<podcast-id>/episode/B<episode-id>,
 https://podcasts.google.com/feed/B<podcast-id>, B<podcast-id>/B<episode-id>, 
 or just B<podcast-id>.  (If no I<episode-id> is specified, the first (latest) 
 episode on the podcaster's page will be fetched).
+
+The optional I<-secure> argument can be either 0 or 1 (I<false> or I<true>).  If 1 
+then only secure ("https://") streams will be returned.
+
+DEFAULT I<-secure> is 0 (false) - return all streams (http and https).
 
 =item $podcast->B<get>(['playlist'])
 
@@ -351,12 +356,16 @@ sub new
 	push (@userAgentOps, 'agent', 'Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101 Firefox/68.0')
 			unless (defined $uops{'agent'});
 	$uops{'timeout'} = 10  unless (defined $uops{'timeout'});
+	$uops{'secure'} = 0    unless (defined $uops{'secure'});
 	$DEBUG = $uops{'debug'}  if (defined $uops{'debug'});
 
 	while (@_) {
 		if ($_[0] =~ /^\-?debug$/o) {
 			shift;
 			$DEBUG = (defined($_[0]) && $_[0] =~/^[0-9]$/) ? shift : 1;
+		} elsif ($_[0] =~ /^\-?secure$/o) {
+			shift;
+			$uops{'secure'} = (defined $_[0]) ? shift : 1;
 		}
 	}
 	$self->{'id'} = '';
@@ -421,8 +430,11 @@ sub new
 
 		#TITLE, DESCRIPTION:
 		if ($html =~ m#\bjsdata\=\"(?:[a-zA-Z0-9]*\;)?(https?\:\/\/[^\"\?\;]+)#s) {
-			push @{$self->{'streams'}}, $1;  #CAPTURE "1ST STREAM":
-			$self->{'cnt'}++;
+			my $one = $1;
+			unless ($uops{'secure'} && $one !~ /^https/o) {  #CAPTURE "1ST STREAM":
+				push @{$self->{'streams'}}, $one;
+				$self->{'cnt'}++;
+			}
 			if ($html =~ m#\<meta\s+name\=\"title\"\s+content\=\"([^\"]+)\"\>\<meta\s+name\=\"description\"\s+content\=\"([^\"]*)#) {
 				$self->{'title'} = $1;
 				$self->{'artist'} ||= $$self->{'title'};
@@ -442,7 +454,7 @@ sub new
 					my $streamURL = $1;
 					$streamURL =~ s/(?:\%|\\?u?00)([0-9A-Fa-f]{2})/chr(hex($1))/eg;
 					$streamURL =~ s/\?.*$//;
-					if ($streamURL) {
+					if ($streamURL && (!$uops{'secure'} || $streamURL =~ /^https/o)) {
 						push @epiStreams, $streamURL;
 						push @epiTitles, $title;
 					}
@@ -510,8 +522,11 @@ sub new
 
 	#STREAM:
 	if ($html =~ s#\bjsdata\=\"(?:[a-zA-Z0-9]*\;)?(https?\:\/\/[^\"\?\;]+)##s) {
-		push @{$self->{'streams'}}, $1;
-		$self->{'cnt'}++;
+		my $one = $1;
+		unless ($uops{'secure'} && $one !~ /^https/o) {
+			push @{$self->{'streams'}}, $one;
+			$self->{'cnt'}++;
+		}
 	}
 	$self->{'total'} = $self->{'cnt'};
 	return undef  unless ($self->{'cnt'} > 0);

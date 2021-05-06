@@ -11,6 +11,7 @@
       "k": "_callNumberPrefix",
       "h": "_callNumber",
       "l": "temporaryLocation",
+      "L": "_permanentLocation",
       "m": "_callNumberSuffix",
       "v": "_volume",
       "e": "_enumeration",

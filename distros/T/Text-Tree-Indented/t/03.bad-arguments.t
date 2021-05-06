@@ -1,7 +1,7 @@
 #!perl
 use strict;
 use warnings;
-use Test::More tests => 1;
+use Test::More 0.88;
 use Text::Tree::Indented qw/ generate_tree /;
 use Test::Fatal;
 use utf8;
@@ -14,3 +14,10 @@ like(
     "unknown style should cause generate_tree() to croak"
 );
 
+like(
+    exception { generate_tree($data, { size => 'huge' }) },
+    qr/unknown argument/,
+    "unknown argument should cause generate_tree() to croak"
+);
+
+done_testing;

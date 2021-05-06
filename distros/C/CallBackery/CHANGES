@@ -1,3 +1,24 @@
+0.37.0 2021-05-06 16:31:40 +0200 Tobias Oetiker <tobi@oetiker.ch>
+ New Features
+
+ - access registration app as app=registration
+ - access passwordreset app as app=passwordreset
+ - prefill form fields with set_{$key}=value
+ - cleanup hash url with cleanup=1
+
+ Bugfix
+
+ - do not close popup on showMessage 
+ - emit selection event on change selection in popup
+
+ Example:
+
+  http://127.0.0.1:3626/#app=registration;set_email=dummy@address;set_token=ebc4g90d2;cleanup=1
+
+0.36.9 2021-05-05 18:06:10 +0200 Tobias Oetiker <tobi@oetiker.ch>
+
+ - fix eventhandling in frontend code
+
 0.36.8 2021-05-02 13:47:46 +0200 Tobias Oetiker <tobi@oetiker.ch>
 
  - add missing context to make form reload actually work

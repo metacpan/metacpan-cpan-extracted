@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use base qw(Firefox::Marionette::Exception);
 
-our $VERSION = '1.03';
+our $VERSION = '1.05';
 
 sub throw {
     my ( $class, $response ) = @_;
@@ -14,6 +14,16 @@ sub throw {
         response => $response
     }, $class;
     return $self->SUPER::_throw();
+}
+
+sub status {
+    my ($self) = @_;
+    return $self->{response}->error()->{status};
+}
+
+sub message {
+    my ($self) = @_;
+    return $self->{response}->error()->{message};
 }
 
 sub error {
@@ -35,7 +45,7 @@ Firefox::Marionette::Exception::Response - Represents an exception thrown by Fir
 
 =head1 VERSION
 
-Version 1.03
+Version 1.05
 
 =head1 SYNOPSIS
 
@@ -48,17 +58,25 @@ This module handles the implementation of an error in a Marionette protocol resp
 
 =head1 SUBROUTINES/METHODS
 
+=head2 error
+
+returns the firefox error message.  Only available in recent firefox versions
+
+=head2 message
+
+returns a text description of the error.  This is the most reliable method to give the user some indication of what is happening across all firefox versions.
+
+=head2 status
+
+returns the firefox status, a numeric identifier in older versions of firefox (such as 38.8)
+
 =head2 throw
  
 accepts a Marionette L<response|Firefox::Marionette::Response> as it's only parameter and calls Carp::croak.
 
-=head2 error
-
-returns the firefox error message
-
 =head2 trace
 
-returns the firefox trace.
+returns the firefox trace.  Only available in recent firefox versions.
 
 =head1 DIAGNOSTICS
 

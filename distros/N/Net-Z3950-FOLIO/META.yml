@@ -31,4 +31,4 @@ requires:
 resources:
   bugtracker: https://issues.folio.org/projects/ZF/issues
   repository: https://github.com/folio-org/Net-Z3950-FOLIO.git
-version: v2.0.0
+version: v2.1.0

@@ -10,7 +10,7 @@ plan tests => 5 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'App/XScreenSaver/DBus.pm',
-    'App/XScreenSaver/DBus/InhibitSleep.pm',
+    'App/XScreenSaver/DBus/Logind.pm',
     'App/XScreenSaver/DBus/Saver.pm',
     'App/XScreenSaver/DBus/SaverProxy.pm'
 );

@@ -1,5 +1,5 @@
 package Text::Tree::Indented;
-$Text::Tree::Indented::VERSION = '0.01';
+$Text::Tree::Indented::VERSION = '0.02';
 use 5.010;
 use strict;
 use warnings;
@@ -9,6 +9,10 @@ use parent          qw/ Exporter    /;
 use utf8;
 
 our @EXPORT_OK = qw/ generate_tree /;
+
+my %arguments = (
+    style => "styling of tree, one of: classic, boxrule, norule",
+);
 
 my %styles = (
     boxrule => { vert => '│', horiz => '─', tee => '├', corner => '└' },
@@ -22,6 +26,10 @@ sub generate_tree
 
     $opt          //= {};
     $opt->{style} //= 'boxrule';
+
+    foreach my $arg (keys %$opt) {
+        croak "unknown argument '$arg'" if not exists $arguments{$arg};
+    }
 
     croak "unknown style '$opt->{style}'" if not exists($styles{ $opt->{style} });
 
@@ -69,7 +77,13 @@ Text::Tree::Indented - render a tree data structure in the classic indented view
 =head1 SYNOPSIS
 
     use Text::Tree::Indented qw/ generate_tree /;
-    my $data = ['ABC', ['DEF', ... ];
+
+    my $data = [ 'ABC', [
+                   'DEF', [ 'GHI', 'JKL' ],
+                   'MNO', [ 'PQR', ['STU' ]],
+                   'VWX'
+               ] ];
+
     binmode(STDOUT, "utf8");
     print generate_tree($data);
 
@@ -91,7 +105,7 @@ which takes a perl data structure and renders it into
 an indented tree view.
 
 B<Note>: the design of this module is still very much in flux,
-so the data structure and other aspects made change from release
+so the data structure and other aspects may change from release
 to release.
 
 The tree data is passed as an arrayref.
@@ -131,12 +145,46 @@ this function takes an optional second argument,
 which should be a hashref.
 
 At the moment there is just one option, B<style>,
-which can be one of B<'boxrule'>, B<'classic'>, or B<'norule'>.
+which can be one of B<'boxrule'>, B<'classic'>, or B<'norule'>:
+
+ print generate_tree($data, { style => 'classic' });
+
+For the example shown in the SYNOPSIS, the resulting tree is:
+
+ ABC
+   +-DEF
+   |   +-GHI
+   |   +-JKL
+   +-MNO
+   |   +-PQR
+   |       +-STU
+   +-VWX
+
 The default is 'boxrule'.
 
 If you are using the boxrule style,
 then you should make sure your output can handle wide characters,
 as in the SYNOPSIS.
+
+
+=head1 SEE ALSO
+
+There are many modules on CPAN for building tree data structures,
+such as L<Tree>, L<Tree::AVL>, L<Tree::Binary>, etc.
+
+L<Data::RenderAsTree>, L<Data::TreeDumper>, and L<Data::TreeDraw>
+will render a Perl data structure as an ASCII tree.
+
+L<Text::Tree> takes a representation of a tree and draws
+a top-down tree with ASCII boxes around the labels.
+
+L<Tree::To::TextLines> draws an indented tree,
+but requires the tree to be in a more complex,
+but richer, data structure.
+
+L<Tree::Visualize> can render trees in a number of ways,
+aimed at situations where you're already using something
+like L<Tree::Binary> to hold your tree data.
 
 =head1 REPOSITORY
 

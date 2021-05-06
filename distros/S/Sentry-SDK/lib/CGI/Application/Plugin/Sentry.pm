@@ -5,18 +5,24 @@ use CGI::Application;
 use HTTP::Status ':constants';
 use Mojo::Util 'dumper';
 use Sentry::SDK;
+use Sys::Hostname 'hostname';
+
+my $_initialized;
 
 CGI::Application->add_callback(
   init => sub ($c, @args) {
+    if ($_initialized) {
+      return;
+    }
+
     my $options = $c->param('sentry_options');
     Sentry::SDK->init($options);
 
     Sentry::SDK->configure_scope(sub ($scope) {
-      $scope->set_tags({
-        runtime => "Perl $]",
-        url     => $c->query->url(-full => 1, -path => 1, -query => 1),
-      });
+      $scope->set_tags({ runtime => "Perl $]", server_name => hostname });
     });
+
+    $_initialized = 1;
   }
 );
 
@@ -28,6 +34,14 @@ CGI::Application->add_callback(
 
 CGI::Application->add_callback(
   prerun => sub ($c, $rm) {
+    Sentry::SDK->configure_scope(sub ($scope) {
+      $scope->set_tags({
+        runtime => "Perl $]",
+        url     => $c->query->url(-full => 1, -path => 1, -query => 1),
+        runmode => $rm,
+      });
+    });
+
     Sentry::Hub->get_current_hub()->push_scope();
 
     Sentry::SDK->configure_scope(sub ($scope) {

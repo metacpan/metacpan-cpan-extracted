@@ -14,16 +14,18 @@ use overload '<=>' => sub { $_[0]->compare($_[1]) },
 # TODO: as_bin or similar
 
 # ABSTRACT: Universally Unique Identifiers FFI style
-our $VERSION = '0.08'; # VERSION
+our $VERSION = '0.09'; # VERSION
 
 
 my $ffi = FFI::Platypus->new( api => 1 );
 
 $ffi->lib(sub {
-  my $lib = FFI::CheckLib::find_lib(lib => 'uuid');
-  return $lib if $lib;
-  require Alien::libuuid;
-  Alien::libuuid->dynamic_libs;
+  my @lib = eval {
+    require Alien::libuuid;
+    Alien::libuuid->dynamic_libs;
+  };
+  return @lib if @lib;
+  return FFI::CheckLib::find_lib(lib => 'uuid');
 });
 
 $ffi->attach( [uuid_generate_random => '_generate_random'] => ['opaque']           => 'void'   => '$'  );
@@ -151,7 +153,7 @@ UUID::FFI - Universally Unique Identifiers FFI style
 
 =head1 VERSION
 
-version 0.08
+version 0.09
 
 =head1 SYNOPSIS
 

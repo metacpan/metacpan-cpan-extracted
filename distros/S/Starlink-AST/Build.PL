@@ -48,10 +48,11 @@ my $class = Module::Build->subclass(code => <<'EOF');
             my (undef, $dir, $file) = File::Spec->splitpath($path);
             my (undef, @dir) = File::Spec->splitdir($dir);
             my $dirname = join('/', grep {$_ ne ''} @dir);
-            if (($dirname eq 'cminpack') or (($dirname eq '') and (not $exclude{$file}) and (
-                $include{$file}
-                or $file =~ '^[^f].*\.c$'
-                or $file =~ '^.*\.h$'
+            if (($dirname eq 'cminpack')
+                or ((grep {$_ eq $dirname} ('', qw/src wcslib/)) and (not $exclude{$file}) and (
+                    $include{$file}
+                    or $file =~ '^[^f].*\.c$'
+                    or $file =~ '^.*\.h$'
             ))) {
                 $self->copy_if_modified(from => $path, to => File::Spec->catfile('ast', @dir, $file));
             }
@@ -111,6 +112,8 @@ my $build = $class->new
                              "-DHAVE_DECL_ISNAN=1", # Assume we have NaN
                              "-DSIZEOF_LONG=". $Config{longsize},
                              "-DSIZEOF_LONG_LONG=". $Config{longlongsize},
+                             '-DHAVE_INT64_T=1',
+                             '-DHAVE_UINT64_T=1',
                              @defines,
                            ],
    extra_linker_flags => $linkflags,

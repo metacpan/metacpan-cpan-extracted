@@ -30,8 +30,27 @@ qx.Class.define("callbackery.ui.plugin.Form", {
         this._getParentFormData = getParentFormData;
         this._populate();
         this._addValidation();
+
+        let urlCfg = callbackery.data.Config.getInstance().getUrlConfig();
+
         this.addListener('appear',function () {
             this._loadData();
+            let data = {};
+            let gotData = false;
+            for (let key in urlCfg){
+                let match = key.match(/^set_(.+)/);
+                if (match !== null){
+                    data[match[1]] = urlCfg[key];
+                    gotData = true;
+                }
+            }
+            if (gotData) {
+                this._form.setData(data,true);
+                //this._reconfForm();
+                if (urlCfg.cleanup) {
+                    window.location.hash = '';
+                }
+            }
         }, this);
         // a map of pending reconfigure requests. The keys are the
         // names of the fields for which we postponed reconfiguration.
@@ -180,8 +199,7 @@ qx.Class.define("callbackery.ui.plugin.Form", {
                     }
                 };
                 if (control.getSelection){
-                    control.addListener('changeSelection',callback,this);
-                }
+                    control.getSelection().addListener("change", callback, this);                }
                 else {
                     control.addListener('changeValue',callback,this);
                 }
@@ -249,6 +267,9 @@ qx.Class.define("callbackery.ui.plugin.Form", {
                 if (s.set) {
                     if ('value' in s.set){
                         delete s.set.value; // do NOT change the value of anything.
+                    }
+                    if ('modelSelection' in s.set){
+                        delete s.set.modelSelection; // do NOT change the modelSelection of anything.
                     }
                     ['placeholder','tooltip','label'].forEach(function(key){
                          if (key in s.set){

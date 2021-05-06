@@ -4,14 +4,22 @@ use strict;
 use warnings;
 use base qw(Firefox::Marionette::Exception::Response);
 
-our $VERSION = '1.03';
+our $VERSION = '1.05';
 
 sub throw {
     my ( $class, $response, $parameters ) = @_;
-    my $self = bless {
-        string => 'Failed to find '
+    my $string;
+    if ( defined $parameters ) {
+        $string =
+            'Failed to find '
           . $parameters->{using} . ' of "'
-          . $parameters->{value},
+          . $parameters->{value};
+    }
+    else {
+        $string = $response->{error}->{message};
+    }
+    my $self = bless {
+        string     => $string,
         response   => $response,
         parameters => $parameters,
     }, $class;
@@ -27,7 +35,7 @@ Firefox::Marionette::Exception::StaleElement - Represents a 'stale element refer
 
 =head1 VERSION
 
-Version 1.03
+Version 1.05
 
 =head1 SYNOPSIS
 

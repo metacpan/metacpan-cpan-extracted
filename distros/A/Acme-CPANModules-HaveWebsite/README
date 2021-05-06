@@ -2,16 +2,16 @@ NAME
     Acme::CPANModules::HaveWebsite - Modules that have their own website
 
 VERSION
-    This document describes version 0.002 of Acme::CPANModules::HaveWebsite
+    This document describes version 0.003 of Acme::CPANModules::HaveWebsite
     (from Perl distribution Acme-CPANModules-HaveWebsite), released on
-    2021-02-18.
+    2021-05-06.
 
 DESCRIPTION
-    This list is first constructed based on Gabor Szabo's post:
+    This list was first constructed based on Gabor Szabo's post:
     <https://dev.to/szabgab/perl-modules-with-their-own-web-site-2gmo> on
     2021-02-16. It has then been updated with more entries.
 
-ACME::MODULES ENTRIES
+ACME::CPANMODULES ENTRIES
     *   App::Ack
 
         Website URL: <https://beyondgrep.com/>
@@ -35,6 +35,10 @@ ACME::MODULES ENTRIES
     *   Dancer
 
         Website URL: <https://perldancer.org/>
+
+    *   Giblog
+
+        Website URL: <https://www.giblog.net/>
 
     *   Mojolicious
 
@@ -63,6 +67,10 @@ ACME::MODULES ENTRIES
     *   Rex
 
         Website URL: <https://www.rexify.org/>
+
+    *   SPVM
+
+        Website URL: <https://yuki-kimoto.github.io/spvmdoc-public/>
 
     *   Template
 

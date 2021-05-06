@@ -17,6 +17,7 @@ build_requires:
   Test::RequiresInternet: '0'
   Test::Script: '1.27'
   Test::Warnings: '0'
+  lib: '0'
   perl: '5.008'
 configure_requires:
   ExtUtils::MakeMaker: '0'
@@ -41,7 +42,6 @@ requires:
   Data::Dumper: '0'
   Data::Printer: '0.36'
   File::Basename: '0'
-  FindBin: '0'
   Getopt::Long::Descriptive: '0'
   List::Util: '0'
   Log::Dispatch: '0'
@@ -63,7 +63,6 @@ requires:
   Text::SimpleTable::AutoWidth: '0'
   Try::Tiny: '0'
   Types::Standard: '0'
-  lib: '0'
   perl: '5.008'
   strict: '0'
   utf8: '0'
@@ -72,7 +71,7 @@ resources:
   bugtracker: https://github.com/oalders/App-perlimports/issues
   homepage: https://github.com/oalders/App-perlimports
   repository: https://github.com/oalders/App-perlimports.git
-version: '0.000005'
+version: '0.000006'
 x_Dist_Zilla:
   perl:
     version: '5.030002'
@@ -505,7 +504,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v0.000005
+          tag: v0.000006
           tag_format: v%V
           tag_message: v%V
         Dist::Zilla::Role::Git::Repo:
@@ -635,6 +634,7 @@ x_Dist_Zilla:
       is_trial: '0'
     version: '6.017'
 x_contributors:
+  - 'Olaf Alders <olaf.alders@gmail.com>'
   - 'Olaf Alders <olaf@wundersolutions.com>'
 x_generated_by_perl: v5.30.2
 x_serialization_backend: 'YAML::Tiny version 1.73'

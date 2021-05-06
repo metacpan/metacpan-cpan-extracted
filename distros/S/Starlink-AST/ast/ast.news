@@ -1,6 +1,6 @@
 AST Library
 -----------
-   A new release (V9.0.0) of the Starlink AST (astrometry) library is
+   A new release (V9.2.4) of the Starlink AST (astrometry) library is
 now available.
 
    AST provides a comprehensive range of facilities for attaching
@@ -14,9 +14,79 @@ celestial coordinate systems. AST is portable and
 environment-independent.
 
 
-
 Main Changes in this Version
 ----------------------------
+
+- A bug has been fixed that could prevent the astWrite method of the
+FitsChan class producing FITS-WCS headers describing alternate axes for
+some of the Frames in the supplied FrameSet.  Consequently, the headers
+produced by astWrite may now include alternate axis descriptions that
+were not present previously. These can be supressed using the new AltAxes
+attribute.
+- The FitsChan class has a new attribute, AltAxes, which controls the
+creation of FITS-WCS alternate axis descriptions by the astWrite method.
+- The KeyMap class now supports 64 bit signed integer entries.
+- Two simplification bugs introduced at V9.2.0 have been fixed.
+- The YamlChan class now supports AST "native" encoding.
+
+
+Main Changes in V9.2.0
+----------------------
+
+- A new subclass of Channel called YamlChan has been added. It allows AST
+objects to be read and written using YAML. Currently, the ASDF format
+developed by STSci (https://asdf-standard.readthedocs.io) is the only
+supported encoding.
+
+
+Main Changes in V9.1.3
+----------------------
+
+- The KeyMap class has a new method called astMapCopyEntry that can be used
+to copy a single entry from one KeyMap to another.
+
+- The astSimplify method now prefers ShiftMaps over equivalent WinMaps.
+
+- The astSimplify method will now merge WinMaps with neighbouring
+diagonal MatrixMaps.
+
+
+Main Changes in V9.1.2
+----------------------
+
+- A bug in the way in which the FitsChan class reads FITS-WCS headers
+that have more WCS axes than pixel axes has been fixed (i.e. axes for
+which there is no CRPIX value). Previously, the missing pixel axes were
+assigned a constant value 1.0. However, the default value for CRPIX
+specified by FITS-WCS Paper I is 0.0, not 1.0. So now the missing pixel
+axes are assigned the value 0.0.
+
+
+Main Changes in V9.1.0
+----------------------
+
+- The AST source directory has been reorganised to put most of the AST
+source files into a subdirectory named "src".
+
+- A bug has been fixed in the TimeFrame class that caused the time
+returned by astCurrentTime to be wrong by 37 seconds.
+
+- The Region class has a new convenience method (astPointInRegion) to
+test a if a single point is inside a Region.
+
+
+Main Changes in V9.0.2
+----------------------
+
+- The AST sharable libraries now use a non-zero version number.
+
+- The FitsChan class has a new attribute called ForceTab, which is used
+in conjunction with the TabOK attribute to force the use of the
+"-TAB" algorithm when writing a FrameSet out using the FITS-WCS encoding.
+
+
+Main Changes in V9.0.0
+----------------------
 
 - Functions such as astResample and astMask that handle grids of data
 values now have alternative interfaces that can handle grids that contain

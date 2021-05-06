@@ -1,5 +1,5 @@
 ---
-abstract: 'Extremely simple timed asynchronous events'
+abstract: 'Timed and one-off asynchronous events'
 author:
   - 'Steve Bertrand <steveb@cpan.org>'
 build_requires:
@@ -24,5 +24,5 @@ requires:
 resources:
   bugtracker: https://github.com/stevieb9/async-event-interval/issues
   repository: https://github.com/stevieb9/async-event-interval.git
-version: '1.02'
+version: '1.03'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

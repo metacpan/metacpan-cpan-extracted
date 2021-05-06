@@ -1,3 +1,9 @@
+0.125   2021-05-06  Released-By: PERLANCAR; Urgency: medium
+
+	- Add modules:
+	  {Code::Includable,Role::TinyCommons}::Tree::FromObjArray.
+
+
 0.124   2020-04-14  Released-By: PERLANCAR; Urgency: medium
 
 	- NodeMethods: add descendants_depth_first().

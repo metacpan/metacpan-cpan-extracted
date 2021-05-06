@@ -1,7 +1,7 @@
-CGI::Lite v3.02
+CGI::Lite v3.03
 ---------------
 
-Released: 19th May 2018
+Released: 6th May 2021
 
 This is a new release of the 3.x branch. Please be aware of the API
 changes from 2.x with particular reference to the deprecated and obsolete
@@ -21,18 +21,14 @@ This makes it well suited to a non-persistent CGI scenario.
 NEW IN THIS VERSION
 -------------------
 
-These are the changes since the last general release (3.01).
+These are the changes since the last general release (3.02).
 
-BUG FIX: Uploads on MSWin32 were not correctly converted if the first
-    character of a buffer was LF. Changed regex to negative lookarounds.
+Makefile.PL improved to CPAN Meta Spec 2 where available
 
-BUG FIX: Uploads could fail if n * buffer_size fell inside the boundary
-    marker. Thanks pru-mike (PR 1). (possibly fixes issue 116670)
+Test suite enhanced: full coverage of add_timestamp()
 
-BUG FIX: Changing the boundary marker for second and subsequent uploads
-    causes errors. Thanks pru-mike (PR 1). (issue 125130)
+DOC: Remove obsolete email addresses of contributors
 
-Test suite enhanced: now with Test::Vars (0.12) and fix of tmp filename
-    race condition.
+META: Public repo is now at GitLab
 
 See the CHANGES file for full history.

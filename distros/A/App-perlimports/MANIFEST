@@ -14,6 +14,7 @@ dist.ini
 git/hooks/pre-commit
 git/setup.sh
 lib/App/perlimports.pm
+lib/App/perlimports/Annotations.pm
 lib/App/perlimports/CLI.pm
 lib/App/perlimports/Document.pm
 lib/App/perlimports/ExportInspector.pm
@@ -30,6 +31,7 @@ t/ExportInspector/DDP.t
 t/ExportInspector/SubExporter.t
 t/ExportInspector/load.t
 t/after.t
+t/annotations.t
 t/args-in-import.t
 t/builtin.pl
 t/carp.t
@@ -85,6 +87,8 @@ t/var-in-hash-key.pl
 t/var-in-regex.t
 t/variable.t
 t/with-version.t
+test-data/annotate-everything.pl
+test-data/annotation.pl
 test-data/args-in-import.t
 test-data/builtin.pl
 test-data/carp-with-no-imports.pl

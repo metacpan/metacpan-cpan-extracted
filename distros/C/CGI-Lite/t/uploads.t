@@ -16,7 +16,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 14268;
+use Test::More tests => 14269;
 
 use lib './lib';
 
@@ -160,6 +160,8 @@ like ($form->{'300x300_gif'}, qr/^300x300\.gif/, 'Fourth file');
 
 unlink ("$uploaddir/300x300.gif");
 
+$cgi->add_timestamp (1);
+is ($cgi->{timestamp}, 1, 'timestamp is 1');
 $cgi->add_timestamp (2);
 is ($cgi->{timestamp}, 2, 'timestamp is 2');
 ($cgi, $form) = post_data ($datafile, $uploaddir, $cgi);

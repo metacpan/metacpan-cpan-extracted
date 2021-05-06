@@ -681,3 +681,39 @@
       INTEGER AST__TOOBG
       PARAMETER ( AST__TOOBG = 233934506 )
 
+*     Requested feature is not supported
+      INTEGER AST__NOTSP
+      PARAMETER ( AST__NOTSP = 233934514 )
+
+*     Text truncated
+      INTEGER AST__TRUNC
+      PARAMETER ( AST__TRUNC = 233934522 )
+
+*     Error in libyaml function
+      INTEGER AST__LYAML
+      PARAMETER ( AST__LYAML = 233934530 )
+
+*     Error reading YAML text
+      INTEGER AST__YAML
+      PARAMETER ( AST__YAML = 233934538 )
+
+*     AST was configured without YAML support
+      INTEGER AST__NOYAML
+      PARAMETER ( AST__NOYAML = 233934546 )
+
+*     No TMapping found
+      INTEGER AST__NOTMP
+      PARAMETER ( AST__NOTMP = 233934554 )
+
+*     Invalid YAML object supplied
+      INTEGER AST__BYAML
+      PARAMETER ( AST__BYAML = 233934562 )
+
+*     Invalid ASDF object supplied
+      INTEGER AST__BASDF
+      PARAMETER ( AST__BASDF = 233934570 )
+
+*     Unsupported ASDF object supplied
+      INTEGER AST__UASDF
+      PARAMETER ( AST__UASDF = 233934578 )
+

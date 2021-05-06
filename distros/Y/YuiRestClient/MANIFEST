@@ -1,0 +1,23 @@
+lib/YuiRestClient.pm
+lib/YuiRestClient/Action.pm
+lib/YuiRestClient/App.pm
+lib/YuiRestClient/Http/HttpClient.pm
+lib/YuiRestClient/Http/WidgetController.pm
+lib/YuiRestClient/Wait.pm
+lib/YuiRestClient/Widget/Base.pm
+lib/YuiRestClient/Widget/Button.pm
+lib/YuiRestClient/Widget/CheckBox.pm
+lib/YuiRestClient/Widget/ComboBox.pm
+lib/YuiRestClient/Widget/ItemSelector.pm
+lib/YuiRestClient/Widget/Label.pm
+lib/YuiRestClient/Widget/MenuCollection.pm
+lib/YuiRestClient/Widget/RadioButton.pm
+lib/YuiRestClient/Widget/RichText.pm
+lib/YuiRestClient/Widget/SelectionBox.pm
+lib/YuiRestClient/Widget/Tab.pm
+lib/YuiRestClient/Widget/Table.pm
+lib/YuiRestClient/Widget/Textbox.pm
+lib/YuiRestClient/Widget/Tree.pm
+MANIFEST			This list of files
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

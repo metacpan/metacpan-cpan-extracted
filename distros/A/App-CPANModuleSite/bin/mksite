@@ -1,0 +1,69 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+use v5.14;
+
+use App::CPANModuleSite;
+
+@ARGV or die "Usage: $0 <distribution_name>\n";
+
+my $app = App::CPANModuleSite->new($ARGV[0]);
+
+$app->run;
+
+=head1 NAME
+
+mksite - Generate a web site for a CPAN module
+
+=head1 SYNOPSIS
+
+    $ mksite My::Lovely::Module
+
+=head1 DESCRIPTION
+
+This program will automatically generate a web site for a CPAN module
+(actually, it's more accurate to say a CPAN distribution). It gets the
+information used to create the site from two sources:
+
+=over 4
+
+=item * It uses the MetaCPAN API to get data about the distribution.
+
+=item * It uses templates and other files that can be stored in the code
+repository for the distribution.
+
+=back
+
+Note that the first of these items creates a tiny caveat as you can only use
+this module to create sites for distributions that the MetaCPAN API knows about
+- i.e. distributions that have been released to CPAN.
+
+=head1 TODO
+
+This documentation needs a lot of expansion. I'll be doing that over the
+next few weeks.
+
+=head1 AUTHOR
+
+Dave Cross <dave@perlhacks.com>
+
+=head1 SEE ALSO
+
+=over 4
+
+=item * L<Perl Modules with their own web sites|https://dev.to/szabgab/perl-modules-with-their-own-web-site-2gmo>
+
+=item * L<Simple CPAN module web sites with GitHub Pages|https://dev.to/davorg/simple-cpan-module-web-sites-with-github-pages-29ka>
+
+=back
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2021, Magnum Solutions Ltd.  All Rights Reserved.
+
+This script is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+=cut

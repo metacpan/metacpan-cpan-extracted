@@ -1,3 +1,18 @@
+0.010   2021-05-06  Released-By: PERLANCAR; Urgency: medium
+
+	- Add entry: UUID::FFI.
+
+
+0.009   2021-03-09  Released-By: PERLANCAR; Urgency: low
+
+	- Wording.
+
+
+0.008   2021-01-20  Released-By: PERLANCAR; Urgency: high
+
+        - Merge 0.005 and 0.005.2.
+
+
 0.007   2021-01-20  Released-By: PERLANCAR; Urgency: low
 
 	- No functional changes.
@@ -11,12 +26,21 @@
 	  UUID::Random::Secure.
 
 
-0.005   2021-01-18  Released-By: PERLANCAR; Urgency: low
+0.005.2  2021-01-18  Released-By: PERLANCAR; Urgency: low
 
 	- No functional changes.
 
 	- Forgot to recommend Crypt::Misc (instead of UUID::Random family)
 	  in one instance.
+
+        - UPDATE 2021-02-08: Rename release to 0.005.2 due to conflict.
+
+
+0.005   2021-01-31  Released-By: PERLANCAR; Urgency: low
+
+	- No functional changes.
+
+	- Mention Data::GUID.
 
 
 0.004   2021-01-18  Released-By: PERLANCAR; Urgency: medium

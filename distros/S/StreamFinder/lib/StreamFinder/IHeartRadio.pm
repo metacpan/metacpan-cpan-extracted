@@ -108,7 +108,8 @@ One or more stream URLs can be returned for each station or podcast.
 
 =over 4
 
-=item B<new>(I<ID>|I<url> [, I<-keep|-skip> => I<streamtypes> | I<-debug> [ => 0|1|2 ] ... ])
+=item B<new>(I<ID>|I<url> [, I<-keep|-skip> => I<streamtypes>] 
+[, I<-secure> [ => 0|1 ]] [, I<-debug> [ => 0|1|2 ] ... ])
 
 Accepts an iheartradio.com station / podcast ID or URL and creates and returns a 
 new station (or podcast) object, or I<undef> if the URL is not a valid IHeart 
@@ -126,29 +127,18 @@ include or skip respectively.  The list for each can be either a comma-separated
 string or an array reference ([...]) of stream types, in the order they should be 
 returned.  Each stream type in the list can be one of:  any, secure, secure_pls, 
 pls, secure_hls, hls, secure_shortcast, shortcast, secure_rtmp, rtmp, (I<ext>, 
-ie. mp4) etc.
+ie. mp4) etc.  NOTE:  If you specify the I<-secure> option, described below, as 1 
+(true), and only non-secure* options above for I<-keep>, you won't get any streams!
 
-DEFAULT keep list is 'secure_shoutcast, shoutcast, secure, any', meaning that all 
+DEFAULT I<-keep> list is 'secure_shoutcast, shoutcast, secure, any', meaning that all 
 secure_shoutcast (https:) streams followed by any other shoutcast streams, then all 
 other secure (https:) streams, followed by any remaining (http:) streams (.m3u8, etc.).  
 More than one value can be specified to control order of search.
 
-NOTE:  This is now the preferred method over the DEPRECIATED one below.  If using 
-this method, do NOT include the inverter ("!") in front of the stream types, as 
-this is not used - these should be put in the I<-skip> list now.  The method 
-below will be REMOVED in a later version soon!
+The optional I<-secure> argument can be either 0 or 1 (I<false> or I<true>).  If 1 
+then only secure ("https://") streams will be returned.
 
-DEPRECIATED:  use The optional I<streamtype> can be one of:  any, secure, 
-secure_pls, pls, secure_hls, hls, secure_shortcast, shortcast, secure_rtmp, 
-rtmp etc.  More than one value can be specified to control 
-order of search.  A I<streamtype> can be preceeded by an exclamantion point 
-("!") to reject that type of stream.  If "any" appears in the list, it should 
-be the last specifier without a "!" preceeding it, and itself should not be 
-preceeded with a "!" (inverter)!  For example, the list:  'secure_shoutcast', 
-'secure', 'any', '!rtmp' would try to find a "secure_shoutcast" (https) 
-shortcast stream, if none found, would then look for any secure (https) 
-stream, failing that, would look for any valid stream.  All the while 
-skipping any that are "rtmp" streams.
+DEFAULT I<-secure> is 0 (false) - return all streams (http and https).
 
 =item $station->B<get>()
 
@@ -369,7 +359,7 @@ sub new
 	my $homedir = $bummer ? $ENV{'HOMEDRIVE'} . $ENV{'HOMEPATH'} : $ENV{'HOME'};
 	$homedir ||= $ENV{'LOGDIR'}  if ($ENV{'LOGDIR'});
 	$homedir =~ s#[\/\\]$##;
-	my (@okStreams, @skipStreams, @okStreamsClassic, @skipStreamsClassic);
+	my (@okStreams, @skipStreams);
 	foreach my $p ("${homedir}/.config/StreamFinder/config", "${homedir}/.config/StreamFinder/IHeartRadio/config") {
 		if (open IN, $p) {
 			my ($atr, $val);
@@ -390,13 +380,11 @@ sub new
 	push (@userAgentOps, 'agent', 'Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101 Firefox/68.0')
 			unless (defined $uops{'agent'});
 	$uops{'timeout'} = 10  unless (defined $uops{'timeout'});
+	$uops{'secure'} = 0    unless (defined $uops{'secure'});
 	$DEBUG = $uops{'debug'}  if (defined $uops{'debug'});
 
 	while (@_) {
-		if ($_[0] =~ /^\!/o) {  #DEPRECIATED, USE -keep AND/OR -skip!
-			(my $i = shift) =~ s/\!//o;
-			push @skipStreamsClassic, $i;
-		} elsif ($_[0] =~ /^\-?debug$/o) {
+		if ($_[0] =~ /^\-?debug$/o) {
 			shift;
 			$DEBUG = (defined($_[0]) && $_[0] =~/^[0-9]$/) ? shift : 1;
 		} elsif ($_[0] =~ /^\-?keep$/o) {
@@ -411,12 +399,11 @@ sub new
 				my $skiporder = shift;
 				@skipStreams = (ref($skiporder) =~ /ARRAY/) ? @{$skiporder} : split(/\,\s*/, $skiporder);
 			}
-		} else {  #DEPRECIATED, USE -keep AND/OR -skip!
-			push @okStreamsClassic, shift;
+		} elsif ($_[0] =~ /^\-?secure$/o) {
+			shift;
+			$uops{'secure'} = (defined $_[0]) ? shift : 1;
 		}
 	}
-	@okStreams = @okStreamsClassic  unless (defined $okStreams[0]);
-	@skipStreams = @skipStreamsClassic  unless (defined $skipStreams[0]);
 	if (!defined($okStreams[0]) && defined($uops{'keep'})) {
 		@okStreams = (ref($uops{'keep'}) =~ /ARRAY/) ? @{$uops{'keep'}} : split(/\,\s*/, $uops{'keep'});
 	}
@@ -504,8 +491,11 @@ TRYIT:
 	$self->{'albumartist'} = '';
 	unless ($streamhtml0) {  #NO STREAMS (PODCAST?) - LOOK FOR MEDIAURL:
 		while ($html =~ s#\"mediaUrl\"\:\"([^\"]+)\"##gso) {
-			push @{$self->{'streams'}}, $1;
-			$self->{'cnt'}++;
+			my $one = $1;
+			unless ($uops{'secure'} && $one !~ /^https/o) {
+				push @{$self->{'streams'}}, $one;
+				$self->{'cnt'}++;
+			}
 		}
 		unless ($tryit || $self->{'cnt'} > 0) {
 			print "--no streams found, ID=".$self->{'id'}."= url=$url2fetch= PODCAST PG, MAYBE?\n"  if ($DEBUG);
@@ -651,9 +641,11 @@ INNER:  while ($streamhtml =~ s#(${streampattern}_stream)\"\s*\:\s*\"([^\"]+)\"#
 	#$self->{'total'} = $self->{'cnt'};
 	$self->{'total'} = 0;
 	foreach my $s (sort {$streams{$b} <=> $streams{$a}} keys %streams) {
-		push @{$self->{'streams'}}, $s;
-		print STDERR "++++ ADDING STREAM(".$streams{$s}."): $s\n"  if ($DEBUG);
-		++$self->{'total'};
+		unless ($uops{'secure'} && $s !~ /^https/o) {
+			push @{$self->{'streams'}}, $s;
+			print STDERR "++++ ADDING STREAM(".$streams{$s}."): $s\n"  if ($DEBUG);
+			++$self->{'total'};
+		}
 	}
 	print STDERR "-(all)count=".$self->{'cnt'}."= iconurl=".$self->{'iconurl'}."= TITLE=".$self->{'title'}."= DESC=".$self->{'description'}."= GENRE=".$self->{'genre'}."=\n"  if ($DEBUG);
 	print STDERR "-SUCCESS: 1st stream=".${$self->{'streams'}}[0]."=\n"  if ($DEBUG);

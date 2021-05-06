@@ -1,5 +1,12 @@
 # Revision history for Perl extension Net::Z3950::FOLIO.
 
+## [2.1.0](https://github.com/folio-org/Net-Z3950-FOLIO/tree/v2.1.0) (Thu May  6 16:17:03 BST 2021)
+
+* Add missing virtual fields to the GraphQL query used to fetch instances with their holdings and items: holdings temporary location, and item permanent and temporary locations. When used with a suffiently recent mod-graphql, fixes ZF-43.
+* The GraphQL query now specifies to fetch up to 100 holdings records, and up to 100 items per holdings record. Fixes ZF-42.
+* The virtual item records in holdings, from which OPAC records and holdings-related MARC fields are generated, now contains not only `temporaryLocation` but also the private field `_permanentLocation`. MARC holdings mappings can refer to this field, and the examples now map it to subfield `L` of the 952 field. An attempt to be all things to all people in ZF-43.
+* Updates to release-procedure documentation.
+
 ## [2.0.0](https://github.com/folio-org/Net-Z3950-FOLIO/tree/v2.0.0) (Mon Apr 26 12:19:40 BST 2021)
 
 * Change to three-facet version numbers, which it turns out Perl has supported for a long time. This is necessary (as well as desirable) because CPAN thinks version 1.10 is older than 1.9, which is why there is no version 1.10 there. Fixes ZF-46.

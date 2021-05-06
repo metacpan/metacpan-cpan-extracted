@@ -6,12 +6,14 @@ use warnings;
 
 use Test::More;
 
-plan tests => 7 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 9 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
+    'Code/Includable/Tree/FromObjArray.pm',
     'Code/Includable/Tree/FromStruct.pm',
     'Code/Includable/Tree/NodeMethods.pm',
     'Role/TinyCommons/Tree.pm',
+    'Role/TinyCommons/Tree/FromObjArray.pm',
     'Role/TinyCommons/Tree/FromStruct.pm',
     'Role/TinyCommons/Tree/Node.pm',
     'Role/TinyCommons/Tree/NodeMethods.pm',

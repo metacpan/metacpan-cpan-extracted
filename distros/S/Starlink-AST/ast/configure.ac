@@ -7,8 +7,19 @@ dnl   1.5.  It should work with autoconf versions 2.50 or better, and
 dnl   automake 1.6 or better.
 
 dnl   Initialisation: package name and version number
-AC_INIT([ast],[9.0.0],[starlink@jiscmail.ac.uk])
+m4_define([v_maj], [9])
+m4_define([v_min], [2])
+m4_define([v_mic], [4])
+m4_define([project_version], [v_maj.v_min.v_mic])
+AC_INIT([ast],[project_version],[starlink@jiscmail.ac.uk])
 AC_CONFIG_AUX_DIR([build-aux])
+
+dnl   Shared library versioning
+m4_define([lt_cur], [m4_eval(v_maj + v_min)])
+m4_define([lt_rev], [v_mic])
+m4_define([lt_age], [v_min])
+version_info="lt_cur:lt_rev:lt_age"
+AC_SUBST([version_info])
 
 dnl   Require autoconf-2.50 at least
 AC_PREREQ([2.69])
@@ -17,6 +28,12 @@ AM_INIT_AUTOMAKE([1.8.2-starlink subdir-objects])
 
 dnl   Sanity-check: name a file in the source directory
 AC_CONFIG_SRCDIR([ast_link.in])
+
+#   Checks for programs
+AC_PROG_CC
+AC_PROG_CPP
+LT_INIT
+AC_PROG_LN_S
 
 #   Include defaults for Starlink configurations
 STAR_DEFAULTS
@@ -75,12 +92,28 @@ else
 fi
 AM_CONDITIONAL(EXTERNAL_PAL, test x$external_pal = x1)
 
+#  Conditional defining whether we want to support Fortran libraries
+#  (e.g. pgplot) and applications. It seems that this must come before
+#  any uses of AC_CHECK_LIB as otherwise the library checked using
+#  AC_CHECK_LIB is automatically added to the list of linker options
+#  created by AC_FC_LIBRARY_LDFLAGS
+AC_ARG_WITH([fortran],
+            [ --without-fortran   Build package without Fortran support],
+        if test "$withval" = "yes"; then
+           use_fortran="1"
+        else
+           use_fortran="0"
+        fi,
+        use_fortran="1")
+AM_CONDITIONAL(NOFORTRAN, test x$use_fortran = x0)
+AC_SUBST(FORTRAN, $use_fortran)
 
-#   Checks for programs
-AC_PROG_CC
-AC_PROG_CPP
-LT_INIT
-AC_PROG_LN_S
+#   ast_link needs to be able to link against the Fortran runtime if
+#   necessary
+if test "$use_fortran" = "1"; then
+AC_PROG_FC
+AC_FC_LIBRARY_LDFLAGS
+fi
 
 #   If --with-pic=no is set we should honour that.
 AM_CONDITIONAL(NOPIC, test x$pic_mode = xno)
@@ -99,6 +132,21 @@ AC_CHECK_LIB([pthread], [pthread_create], ,[use_pthreads="0"])
 fi
 AM_CONDITIONAL(NOTHREADS, test x$use_pthreads = x0)
 AC_SUBST(THREADS, $use_pthreads)
+
+#  Conditional defining whether we build with YAML support.
+AC_ARG_WITH([yaml],
+            [ --without-yaml   Build package without YAML support],
+        if test "$withval" = "yes"; then
+           use_yaml="1"
+        else
+           use_yaml="0"
+        fi,
+        use_yaml="1")
+if test "$use_yaml" = "1"; then
+AC_CHECK_LIB([yaml], [yaml_parser_initialize], ,[use_yaml="0"])
+fi
+AM_CONDITIONAL(NOYAML, test x$use_yaml = x0)
+AC_SUBST(YAML, $use_yaml)
 
 # See which variadic function API to use
 AC_CHECK_HEADERS(stdarg.h varargs.h, break)
@@ -150,26 +198,6 @@ AC_DEFUN([CIT_FUNCTIONSTRING], [
 ])
 
 CIT_FUNCTIONSTRING
-
-#  Conditional defining whether we want to support Fortran libraries
-#  (e.g. pgplot) and applications.
-AC_ARG_WITH([fortran],
-            [ --without-fortran   Build package without Fortran support],
-        if test "$withval" = "yes"; then
-           use_fortran="1"
-        else
-           use_fortran="0"
-        fi,
-        use_fortran="1")
-AM_CONDITIONAL(NOFORTRAN, test x$use_fortran = x0)
-AC_SUBST(FORTRAN, $use_fortran)
-
-#   ast_link needs to be able to link against the Fortran runtime if
-#   necessary
-if test "$use_fortran" = "1"; then
-AC_PROG_FC
-AC_FC_LIBRARY_LDFLAGS
-fi
 
 #   Find an absolute path to the Perl binary, augmenting the path with the
 #   location of the Starlink Perl build.  If this fails, then set @PERL@
@@ -246,14 +274,14 @@ STAR_CHECK_PROGS(prolat, sst)   # prolat is part of SST
 
 AC_CONFIG_HEADERS(config.h)
 
-AC_CONFIG_FILES(Makefile component.xml ast_link ast_link_adam object.h)
+AC_CONFIG_FILES(Makefile component.xml ast_link ast_link_adam src/object.h)
 if test "$use_fortran" = "1"; then
-AC_CONFIG_FILES(f77.h)
+AC_CONFIG_FILES(src/f77.h)
 fi
 
 AC_CONFIG_FILES([ast_cpp], [chmod +x ast_cpp])
 #   Following are files which are substituted by the Makefile at
 #   distribution time, rather than by configure.  They are not distributed.
-STAR_PREDIST_SOURCES(version.h.in builddocs.in addversion.in)
+STAR_PREDIST_SOURCES(src/version.h.in builddocs.in addversion.in)
 
 AC_OUTPUT

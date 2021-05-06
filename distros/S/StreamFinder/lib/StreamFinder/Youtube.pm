@@ -112,7 +112,8 @@ and the separate application program:  youtube-dl.
 
 =over 4
 
-=item B<new>(I<ID>|I<url> [, "debug" [ => 0|(1)|2 ]] [, "fast" [ => 0|(1) ]])
+=item B<new>(I<ID>|I<url> [, I<-debug> [ => 0|1|2 ]] 
+[, <-fast> [ => 0|1 ]] [, I<-secure> [ => 0|1 ]])
 
 Accepts a youtube.com video ID, or any full URL that youtube-dl supports 
 and creates and returns a new video object, or I<undef> if the URL is 
@@ -121,10 +122,15 @@ be the full URL,
 ie. https://www.youtube.com/watch?v=B<video-id>, or just I<video-id> 
 (if the site is www.youtube.com, since YouTube has multiple sites).
 
-If "fast" or "-fast" is specified (or set to 1), a separate probe of the 
+If I<-fast> is specified (set to 1 (true)), a separate probe of the 
 page to fetch the video's title and artist is skipped.  This is useful 
 if you know the video is NOT a YouTube video or you don't care about 
 the artist (youtube channel's owner) field.
+
+The optional I<-secure> argument can be either 0 or 1 (I<false> or I<true>).  If 1 
+then only secure ("https://") streams will be returned.
+
+DEFAULT I<-secure> is 0 (false) - return all streams (http and https).
 
 =item $video->B<get>()
 
@@ -360,6 +366,7 @@ sub new
 	push (@userAgentOps, 'agent', 'Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101 Firefox/68.0')
 			unless (defined $uops{'agent'});
 	$uops{'timeout'} = 10  unless (defined $uops{'timeout'});
+	$uops{'secure'} = 0    unless (defined $uops{'secure'});
 	$DEBUG = $uops{'debug'}  if (defined $uops{'debug'});
 	$FAST = $uops{'fast'}  if (defined $uops{'fast'});
 
@@ -370,6 +377,9 @@ sub new
 		} elsif ($_[0] =~ /^\-?fast$/o) {
 			shift;
 			$FAST = (defined($_[0]) && $_[0] =~/^[0-9]$/) ? shift : 1;
+		} elsif ($_[0] =~ /^\-?secure$/o) {
+			shift;
+			$uops{'secure'} = (defined $_[0]) ? shift : 1;
 		}
 	}
 
@@ -407,7 +417,7 @@ $url2fetch =~ s/www\.youtube\.com/youtube\.be/;  #WWW.YOUTUBE.COM SEEMS TO NOW B
 			. ((defined $uops{'format'}) ? $uops{'format'} : 'mp4')
 			. '" ' . ((defined $uops{'youtube-dl-args'}) ? $uops{'youtube-dl-args'} : '');
 	my $try = 0;
-	my ($more, @ytdldata);
+	my ($more, @ytdldata, @ytStreams);
 RETRYIT:
 	$_ = '';
 	if (defined($uops{'userid'}) && defined($uops{'userpw'})) {  #USER HAS A LOGIN CONFIGURED:
@@ -426,23 +436,25 @@ RETRYIT:
 	}
 	return undef unless (scalar(@ytdldata) > 0);
 
+	#NOTE:  ytdldata is ORDERED:  TITLE?, STREAM-URLS, THEN THE ICON URL, THEN DESCRIPTION!:
 	unless ($ytdldata[0] =~ m#^https?\:\/\/#) {
 		$_ = shift(@ytdldata);
 		$self->{'title'} ||= $_;
 	}
 	$self->{'description'} = '';
 	$more = 1;
+	@ytStreams = ();
 	while (@ytdldata) {
 		$_ = shift @ytdldata;
 		$more = 0  unless (m#^https?\:\/\/#o);
 		if ($more) {
-			push @{$self->{'streams'}}, $_;
+			push @ytStreams, $_  unless ($uops{'secure'} && $_ !~ /^https/o);
 		} else {
 			$self->{'description'} .= $_ . ' ';
 		}
 	}
-	$self->{'cnt'} = scalar @{$self->{'streams'}};
-	$self->{'iconurl'} = pop(@{$self->{'streams'}})  if ($self->{'cnt'} > 1);
+	$self->{'iconurl'} = pop(@ytStreams)  if ($#ytStreams > 0);
+	push @{$self->{'streams'}}, @ytStreams;
 	$self->{'cnt'} = scalar @{$self->{'streams'}};
 	unless ($try || $self->{'cnt'} > 0) {  #IF NO STREAMS FOUND, RETRY WITHOUT THE SPECIFIC FILE-FORMAT:
 		print STDERR "..2:No MP4 streams found, try again for any (audio, etc.)...\n";

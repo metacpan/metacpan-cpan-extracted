@@ -28,9 +28,9 @@ use lib "$Bin/../../lib";
 use Google::Ads::GoogleAds::Client;
 use Google::Ads::GoogleAds::Utils::GoogleAdsHelper;
 use Google::Ads::GoogleAds::Utils::FieldMasks;
-use Google::Ads::GoogleAds::V6::Resources::FeedItemAttributeValue;
-use Google::Ads::GoogleAds::V6::Services::FeedItemService::FeedItemOperation;
-use Google::Ads::GoogleAds::V6::Utils::ResourceNames;
+use Google::Ads::GoogleAds::V7::Resources::FeedItemAttributeValue;
+use Google::Ads::GoogleAds::V7::Services::FeedItemService::FeedItemOperation;
+use Google::Ads::GoogleAds::V7::Utils::ResourceNames;
 
 use Getopt::Long qw(:config auto_help);
 use Pod::Usage;
@@ -52,6 +52,7 @@ my $feed_item_id                  = "INSERT_FEED_ITEM_ID_HERE";
 my $flight_placeholder_field_name = "INSERT_FLIGHT_PLACEHOLDER_FIELD_NAME_HERE";
 my $attribute_value               = "INSERT_ATTRIBUTE_VALUE_HERE";
 
+# [START update_flights_feed_item_string_attribute_value]
 sub update_flights_feed_item_string_attribute_value {
   my ($api_client, $customer_id, $feed_id, $feed_item_id,
     $flight_placeholder_field_name,
@@ -60,7 +61,7 @@ sub update_flights_feed_item_string_attribute_value {
 
   # Get the feed resource name.
   my $feed_resource_name =
-    Google::Ads::GoogleAds::V6::Utils::ResourceNames::feed($customer_id,
+    Google::Ads::GoogleAds::V7::Utils::ResourceNames::feed($customer_id,
     $feed_id);
 
   # Get a hash of the placeholder values and feed attributes.
@@ -73,7 +74,7 @@ sub update_flights_feed_item_string_attribute_value {
 
   # Get the feed item resource name.
   my $feed_item_resource_name =
-    Google::Ads::GoogleAds::V6::Utils::ResourceNames::feed_item($customer_id,
+    Google::Ads::GoogleAds::V7::Utils::ResourceNames::feed_item($customer_id,
     $feed_id, $feed_item_id);
 
   # Retrieve the feed item and its associated attributes based on its resource name.
@@ -82,7 +83,7 @@ sub update_flights_feed_item_string_attribute_value {
 
   # Create the updated FeedItemAttributeValue.
   my $feed_item_attribute_value =
-    Google::Ads::GoogleAds::V6::Resources::FeedItemAttributeValue->new({
+    Google::Ads::GoogleAds::V7::Resources::FeedItemAttributeValue->new({
       feedAttributeId => $attribute_id,
       stringValue     => $attribute_value
     });
@@ -96,7 +97,7 @@ sub update_flights_feed_item_string_attribute_value {
 
   # Create a feed item operation.
   my $feed_item_operation =
-    Google::Ads::GoogleAds::V6::Services::FeedItemService::FeedItemOperation->
+    Google::Ads::GoogleAds::V7::Services::FeedItemService::FeedItemOperation->
     new({
       update     => $feed_item,
       updateMask => all_set_fields_of($feed_item)});
@@ -111,6 +112,7 @@ sub update_flights_feed_item_string_attribute_value {
 
   return 1;
 }
+# [END update_flights_feed_item_string_attribute_value]
 
 # Retrieves a feed item and its attribute values given a resource name.
 sub get_feed_item {

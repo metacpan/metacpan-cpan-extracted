@@ -1,5 +1,8 @@
 Revision history for RT::Extension::SideBySideView
 
+2.01 2021-05-06
+ - update javascript for RT5 page layout
+
 2.00 2021-05-01
  - update Module::Install and rt_too_new for RT 5.0 compatibility
 

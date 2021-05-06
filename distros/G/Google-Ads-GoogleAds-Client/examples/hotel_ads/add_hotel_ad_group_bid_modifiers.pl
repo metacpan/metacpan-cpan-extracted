@@ -25,13 +25,13 @@ use FindBin qw($Bin);
 use lib "$Bin/../../lib";
 use Google::Ads::GoogleAds::Client;
 use Google::Ads::GoogleAds::Utils::GoogleAdsHelper;
-use Google::Ads::GoogleAds::V6::Resources::AdGroupBidModifier;
-use Google::Ads::GoogleAds::V6::Common::HotelCheckInDayInfo;
-use Google::Ads::GoogleAds::V6::Common::HotelLengthOfStayInfo;
-use Google::Ads::GoogleAds::V6::Enums::DayOfWeekEnum qw(MONDAY);
+use Google::Ads::GoogleAds::V7::Resources::AdGroupBidModifier;
+use Google::Ads::GoogleAds::V7::Common::HotelCheckInDayInfo;
+use Google::Ads::GoogleAds::V7::Common::HotelLengthOfStayInfo;
+use Google::Ads::GoogleAds::V7::Enums::DayOfWeekEnum qw(MONDAY);
 use
-  Google::Ads::GoogleAds::V6::Services::AdGroupBidModifierService::AdGroupBidModifierOperation;
-use Google::Ads::GoogleAds::V6::Utils::ResourceNames;
+  Google::Ads::GoogleAds::V7::Services::AdGroupBidModifierService::AdGroupBidModifierOperation;
+use Google::Ads::GoogleAds::V7::Utils::ResourceNames;
 
 use Getopt::Long qw(:config auto_help);
 use Pod::Usage;
@@ -48,18 +48,19 @@ use Cwd qw(abs_path);
 my $customer_id = "INSERT_CUSTOMER_ID_HERE";
 my $ad_group_id = "INSERT_AD_GROUP_ID_HERE";
 
+# [START add_hotel_ad_group_bid_modifiers]
 sub add_hotel_ad_group_bid_modifiers {
   my ($api_client, $customer_id, $ad_group_id) = @_;
 
   # 1) Create an ad group bid modifier based on the hotel check-in day.
   my $check_in_day_ad_group_bid_modifier =
-    Google::Ads::GoogleAds::V6::Resources::AdGroupBidModifier->new({
+    Google::Ads::GoogleAds::V7::Resources::AdGroupBidModifier->new({
       # Set the ad group.
-      adGroup => Google::Ads::GoogleAds::V6::Utils::ResourceNames::ad_group(
+      adGroup => Google::Ads::GoogleAds::V7::Utils::ResourceNames::ad_group(
         $customer_id, $ad_group_id
       ),
       hotelCheckInDay =>
-        Google::Ads::GoogleAds::V6::Common::HotelCheckInDayInfo->new({
+        Google::Ads::GoogleAds::V7::Common::HotelCheckInDayInfo->new({
           dayOfWeek => MONDAY
         }
         ),
@@ -69,21 +70,21 @@ sub add_hotel_ad_group_bid_modifiers {
 
   # Create an ad group bid modifier operation.
   my $check_in_day_ad_group_bid_modifier_operation =
-    Google::Ads::GoogleAds::V6::Services::AdGroupBidModifierService::AdGroupBidModifierOperation
+    Google::Ads::GoogleAds::V7::Services::AdGroupBidModifierService::AdGroupBidModifierOperation
     ->new({
       create => $check_in_day_ad_group_bid_modifier
     });
 
   # 2) Create an ad group bid modifier based on the hotel length of stay.
   my $length_of_stay_ad_group_bid_modifier =
-    Google::Ads::GoogleAds::V6::Resources::AdGroupBidModifier->new({
+    Google::Ads::GoogleAds::V7::Resources::AdGroupBidModifier->new({
       # Set the ad group.
-      adGroup => Google::Ads::GoogleAds::V6::Utils::ResourceNames::ad_group(
+      adGroup => Google::Ads::GoogleAds::V7::Utils::ResourceNames::ad_group(
         $customer_id, $ad_group_id
       ),
       # Create the hotel length of stay info.
       hotelLengthOfStay =>
-        Google::Ads::GoogleAds::V6::Common::HotelLengthOfStayInfo->new({
+        Google::Ads::GoogleAds::V7::Common::HotelLengthOfStayInfo->new({
           minNights => 3,
           maxNights => 7
         }
@@ -94,7 +95,7 @@ sub add_hotel_ad_group_bid_modifiers {
 
   # Create an ad group bid modifier operation.
   my $length_of_stay_ad_group_bid_modifier_operation =
-    Google::Ads::GoogleAds::V6::Services::AdGroupBidModifierService::AdGroupBidModifierOperation
+    Google::Ads::GoogleAds::V7::Services::AdGroupBidModifierService::AdGroupBidModifierOperation
     ->new({
       create => $length_of_stay_ad_group_bid_modifier
     });
@@ -120,6 +121,7 @@ sub add_hotel_ad_group_bid_modifiers {
 
   return 1;
 }
+# [END add_hotel_ad_group_bid_modifiers]
 
 # Don't run the example if the file is being included.
 if (abs_path($0) ne abs_path(__FILE__)) {

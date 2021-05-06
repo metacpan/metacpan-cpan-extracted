@@ -12,7 +12,7 @@ require XSLoader;
 our @ISA = qw(Exporter);
 our @EXPORT_OK = qw(minify);
 
-our $VERSION = 'v0.3.9';
+our $VERSION = 'v0.4.1';
 
 XSLoader::load( "Text::Minify::XS", $VERSION );
 
@@ -30,7 +30,7 @@ Text::Minify::XS - Simple text minification
 
 =head1 VERSION
 
-version v0.3.9
+version v0.4.1
 
 =head1 SYNOPSIS
 
@@ -51,13 +51,21 @@ It does the following:
 
 =over
 
-=item removes leading whitespace (indentation),
+=item *
 
-=item removes trailing whitespace,
+removes leading whitespace (indentation),
 
-=item removes multiple newlines,
+=item *
 
-=item and changes carriage returns to newlines.
+removes trailing whitespace,
+
+=item *
+
+removes multiple newlines,
+
+=item *
+
+and changes carriage returns to newlines.
 
 =back
 

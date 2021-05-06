@@ -13,7 +13,7 @@ use constant CONN_TIMEOUT => $ENV{MIKROTIK_CLIENT_CONNTIMEOUT};
 use constant DEBUG        => $ENV{MIKROTIK_CLIENT_DEBUG} || 0;
 use constant PROMISES     => !!(eval { require Promises; 1 });
 
-our $VERSION = "v0.520";
+our $VERSION = "v0.530";
 
 has ca   => sub { $ENV{MIKROTIK_CLIENT_CA} };
 has cert => sub { $ENV{MIKROTIK_CLIENT_CERT} };

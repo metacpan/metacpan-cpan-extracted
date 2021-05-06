@@ -1,0 +1,119 @@
+NAME
+    Tree::From::ObjArray - Build a tree of objects from a nested array of
+    objects
+
+VERSION
+    This document describes version 0.001 of Tree::From::ObjArray (from Perl
+    distribution Tree-From-ObjArray), released on 2021-05-06.
+
+SYNOPSIS
+    In your tree node class My/Person.pm:
+
+     package My::Person;
+
+     sub new {
+         my $class = shift;
+         my %args = @_;
+         bless \%args, $class;
+     }
+
+     sub parent {
+         my $self = shift;
+         $self->{_parent} = $_[0] if $@;
+         $self->{_parent};
+     }
+
+     sub children {
+         my $self = shift;
+         $self->{_children} = $_[0] if $@;
+         $self->{_children};
+     }
+
+    In your code to build a tree:
+
+     use Tree::From::ObjArray qw(build_tree_from_obj_array);
+
+     # require all the used classes
+     use My::Person;
+     use My::MarriedPerson;
+     use My::KidPerson;
+
+     my $family_tree = build_tree_from_obj_array([
+         My::Person->new(name => 'Andi', age => 60), [
+           My::Person->new(name => 'Budi', age => 30),
+           My::MarriedPerson->new(name => 'Cinta'), [
+             My::KidPerson->new(name => 'Deni'),
+             My::KidPerson->new(name => 'Eno'),
+           ],
+        ]
+     ]);
+
+    This tree is visualized as follows:
+
+     Andi
+       ├─Budi
+       └─Cinta
+           ├─Deni
+           └─Eno
+
+DESCRIPTION
+    Building a tree manually can be tedious: you have to connect the parent
+    and the children nodes together:
+
+     my $root = My::TreeNode->new(...);
+     my $child1 = My::TreeNode->new(...);
+     my $child2 = My::TreeNode->new(...);
+
+     $root->children([$child1, $child2]);
+     $child1->parent($root);
+     $child2->parent($root);
+
+     my $grandchild1 = My::TreeNode->new(...);
+     ...
+
+    This module provides a convenience function to build a tree of objects
+    in a single command. It connects the parent and children nodes for you.
+
+    The class can be any class that provides "parent" and "children"
+    methods. See Role::TinyCommons::Tree::Node for more details.
+
+FUNCTIONS
+  build_tree_from_obj_array($obj_array) => obj
+    This is basically Role::TinyCommons::Tree::FromObjArray's
+    "new_from_obj_array" presented as a function. See the role's
+    documentation for more details on what you can put in $obj_array.
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Tree-From-ObjArray>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Tree-From-ObjArray>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://github.com/perlancar/perl-Tree-From-ObjArray/issues>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    Role::TinyCommons::Tree::FromObjArray if you want to use this
+    functionality via consuming a role.
+
+    Another way to create tree from a nested hash data structure:
+    Tree::From::Struct.
+
+    Other ways to create tree: Tree::From::Text, Tree::From::TextLines,
+    Tree::Create::Callback, Tree::Create::Size.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2021 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

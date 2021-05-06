@@ -10,6 +10,7 @@ my @files = (
     'lib/TAP/Formatter/JUnit.pm',
     'lib/TAP/Formatter/JUnit/Result.pm',
     'lib/TAP/Formatter/JUnit/Session.pm',
+    'script/tap2junit',
     't/00-report-prereqs.dd',
     't/00-report-prereqs.t',
     't/01-compile.t',

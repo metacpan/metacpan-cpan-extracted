@@ -12,11 +12,11 @@ use parent qw/ Plack::Middleware /;
 use Plack::Util;
 use Plack::Util::Accessor qw/ path type /;
 use Ref::Util qw/ is_arrayref is_coderef /;
-use Text::Minify::XS v0.3.6 ();
+use Text::Minify::XS v0.4.0 ();
 
 # RECOMMEND PREREQ:  Ref::Util::XS
 
-our $VERSION = 'v0.1.4';
+our $VERSION = 'v0.1.5';
 
 sub call {
     my ($self, $env) = @_;
@@ -91,7 +91,7 @@ Plack::Middleware::Text::Minify - minify text responses on the fly
 
 =head1 VERSION
 
-version v0.1.4
+version v0.1.5
 
 =head1 SYNOPSIS
 
@@ -140,6 +140,20 @@ By default, it will match against any "text/" MIME type.
 
 This module requires Perl v5.9.3 or newer, which is the minimum
 version supported by L<Text::Minify::XS>.
+
+=head2 Use with templating directive that collapse whitespace
+
+If you are using a templating system with directives that collapse
+whitespace in HTML documents, e.g. in L<Template-Toolkit|Template>
+
+    [%- IF something -%]
+      <div class="foo">
+        ...
+      </div>
+    [%- END -%]
+
+then you may find it worth removing these and letting the middleware
+clean up extra whitespace.
 
 =head1 SEE ALSO
 

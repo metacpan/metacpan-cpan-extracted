@@ -52,7 +52,7 @@ query($cql: String, $offset: Int, $limit: Int) {
         relationshipId
         uri
       }
-      holdingsRecords2 {
+      holdingsRecords2(limit: 100) {
         acquisitionFormat
         acquisitionMethod
         callNumber
@@ -71,7 +71,7 @@ query($cql: String, $offset: Int, $limit: Int) {
         }
         formerIds
         # No need to loop back to holdingsInstance
-        bareHoldingsItems {
+        bareHoldingsItems(limit: 100) {
           accessionNumber
           barcode
           chronology
@@ -133,12 +133,124 @@ query($cql: String, $offset: Int, $limit: Int) {
           numberOfMissingPieces
           numberOfPieces
           permanentLocationId
+          permanentLocation {
+            campusId
+            campus {
+              code
+              id
+              institutionId # no need to resolve, it's redundant
+              name
+            }
+            code
+            description
+            # Nothing known about the details subrecord
+            discoveryDisplayName
+            id
+            institutionId
+            institution {
+              code
+              id
+              name
+            }
+            isActive
+            libraryId
+            library {
+              code
+              id
+              name
+            }
+            metadata {
+              createdByUserId
+              createdByUsername
+              createdDate
+              updatedByUserId
+              updatedByUsername
+              updatedDate
+            }
+            name
+            primaryServicePoint
+            primaryServicePointObject {
+              code
+              description
+              discoveryDisplayName
+              id
+              name
+              pickupLocation
+              shelvingLagTime
+            }
+            servicePointIds
+            servicePoints {
+              code
+              description
+              discoveryDisplayName
+              id
+              name
+              pickupLocation
+              shelvingLagTime
+            }
+          }
           statisticalCodeIds
           status {
             name
           }
           temporaryLoanTypeId
           temporaryLocationId
+          temporaryLocation {
+            campusId
+            campus {
+              code
+              id
+              institutionId # no need to resolve, it's redundant
+              name
+            }
+            code
+            description
+            # Nothing known about the details subrecord
+            discoveryDisplayName
+            id
+            institutionId
+            institution {
+              code
+              id
+              name
+            }
+            isActive
+            libraryId
+            library {
+              code
+              id
+              name
+            }
+            metadata {
+              createdByUserId
+              createdByUsername
+              createdDate
+              updatedByUserId
+              updatedByUsername
+              updatedDate
+            }
+            name
+            primaryServicePoint
+            primaryServicePointObject {
+              code
+              description
+              discoveryDisplayName
+              id
+              name
+              pickupLocation
+              shelvingLagTime
+            }
+            servicePointIds
+            servicePoints {
+              code
+              description
+              discoveryDisplayName
+              id
+              name
+              pickupLocation
+              shelvingLagTime
+            }
+          }
           volume
           yearCaption
         }
@@ -248,6 +360,62 @@ query($cql: String, $offset: Int, $limit: Int) {
         shelvingTitle
         statisticalCodeIds
         temporaryLocationId
+        temporaryLocation {
+          campusId
+          campus {
+            code
+            id
+            institutionId # no need to resolve, it's redundant
+            name
+          }
+          code
+          description
+          # Nothing known about the details subrecord
+          discoveryDisplayName
+          id
+          institutionId
+          institution {
+            code
+            id
+            name
+          }
+          isActive
+          libraryId
+          library {
+            code
+            id
+            name
+          }
+          metadata {
+            createdByUserId
+            createdByUsername
+            createdDate
+            updatedByUserId
+            updatedByUsername
+            updatedDate
+          }
+          name
+          primaryServicePoint
+          primaryServicePointObject {
+            code
+            description
+            discoveryDisplayName
+            id
+            name
+            pickupLocation
+            shelvingLagTime
+          }
+          servicePointIds
+          servicePoints {
+            code
+            description
+            discoveryDisplayName
+            id
+            name
+            pickupLocation
+            shelvingLagTime
+          }
+        }
       }
       hrid
       id

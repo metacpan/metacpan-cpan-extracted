@@ -1,7 +1,7 @@
 #!perl
 
 use strict;
-use Test::More tests => 37;
+use Test::More tests => 39;
 use Test::Number::Delta;
 
 require_ok( "Starlink::AST" );
@@ -87,6 +87,10 @@ is( $circle->Overlap( $obsArea2 ), 1,"Outside Circular area");
 is( $box->Overlap( $obsArea2 ), 1,"Outside Box area");
 is( $int->Overlap( $obsArea2 ), 1,"Outside Interval");
 is( $ellipse->Overlap( $obsArea2 ), 1,"Outside Ellipse");
+
+# Test PointInRegion
+ok( $int->PointInRegion( [-0.2, 0.4] ), 'Point in region' );
+ok( ! $int->PointInRegion( [0.2, -0.4] ), 'Point not in region' );
 
 # Create a compound region
 

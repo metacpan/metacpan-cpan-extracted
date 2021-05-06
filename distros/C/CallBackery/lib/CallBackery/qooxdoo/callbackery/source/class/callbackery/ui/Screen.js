@@ -51,6 +51,10 @@ qx.Class.define("callbackery.ui.Screen", {
             var cfg = this.__cfg;
             var getParentFormDataCallBack = this.__getParentFormDataCallBack;
             var extraAction = this.__extraAction;
+
+            var formData =  this.__getParentFormDataCallBack ? this.__getParentFormDataCallBack() : {};
+            formData.userData = cfg.userData;
+
             rpc.callAsyncSmart(function(pluginConfig){
                 if (extraAction && pluginConfig.action){
                     pluginConfig.action.push(extraAction);
@@ -139,8 +143,7 @@ qx.Class.define("callbackery.ui.Screen", {
                 else {
                     that.debug('Invalid plugin type:"' + type + '"');
                 }
-            },'getPluginConfig',cfg.name,
-                getParentFormDataCallBack ? getParentFormDataCallBack() : null
+            },'getPluginConfig', cfg.name, formData
             );
         }
     }

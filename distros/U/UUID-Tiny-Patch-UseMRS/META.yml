@@ -23,7 +23,7 @@ resources:
   bugtracker: https://github.com/perlancar/perl-UUID-Tiny-Patch-UseMRS/issues
   homepage: https://metacpan.org/release/UUID-Tiny-Patch-UseMRS
   repository: git://github.com/perlancar/perl-UUID-Tiny-Patch-UseMRS.git
-version: '0.001'
+version: '0.002'
 x_Dist_Zilla:
   perl:
     version: '5.030000'

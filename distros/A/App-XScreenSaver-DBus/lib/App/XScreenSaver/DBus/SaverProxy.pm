@@ -6,7 +6,7 @@ use experimental qw(signatures postderef);
 # this is the interface name
 use Net::DBus::Exporter qw(org.freedesktop.ScreenSaver);
 use parent 'Net::DBus::Object';
-our $VERSION = '1.0.2'; # VERSION
+our $VERSION = '1.0.3'; # VERSION
 # ABSTRACT: proxy dbus object
 
 
@@ -49,7 +49,7 @@ App::XScreenSaver::DBus::SaverProxy - proxy dbus object
 
 =head1 VERSION
 
-version 1.0.2
+version 1.0.3
 
 =head1 DESCRIPTION
 

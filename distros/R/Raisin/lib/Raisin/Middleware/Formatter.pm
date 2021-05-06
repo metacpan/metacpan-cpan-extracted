@@ -6,7 +6,7 @@ use strict;
 use warnings;
 
 package Raisin::Middleware::Formatter;
-$Raisin::Middleware::Formatter::VERSION = '0.92';
+$Raisin::Middleware::Formatter::VERSION = '0.93';
 use parent 'Plack::Middleware';
 
 use File::Basename qw(fileparse);
@@ -177,7 +177,7 @@ Raisin::Middleware::Formatter - A parser/formatter middleware for L<Raisin>.
 
 =head1 VERSION
 
-version 0.92
+version 0.93
 
 =head1 DESCRIPTION
 

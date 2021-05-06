@@ -113,7 +113,7 @@ https://podcasts.apple.com/I<country>/podcast/idB<podcast#>?i=B<episode#>
 
 =over 4
 
-=item B<new>(I<ID>|I<url> [, "debug" [ => 0|1|2 ]])
+=item B<new>(I<ID>|I<url> [I<-secure> [ => 0|1 ]] [, I<-debug> [ => 0|1|2 ]])
 
 Accepts a podcasts.apple.com ID or URL and creates and 
 returns a new podcast object, or I<undef> if the URL is not a valid podcast, 
@@ -121,6 +121,11 @@ album, etc. or no streams are found.  The URL can be the full URL,
 ie. https://podcasts.apple.com/podcast/idI<podcast-id>, 
 https://podcasts.apple.com/podcast/idB<podcast-id>?i=B<episode-id>, or just 
 I<podcast-id>, or I<podcast-id>/I<episode-id>.  
+
+The optional I<-secure> argument can be either 0 or 1 (I<false> or I<true>).  If 1 
+then only secure ("https://") streams will be returned.
+
+DEFAULT I<-secure> is 0 (false) - return all streams (http and https).
 
 =item $podcast->B<get>(['playlist'])
 
@@ -365,12 +370,16 @@ sub new
 	push (@userAgentOps, 'agent', 'Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101 Firefox/68.0')
 			unless (defined $uops{'agent'});
 	$uops{'timeout'} = 10  unless (defined $uops{'timeout'});
+	$uops{'secure'} = 0    unless (defined $uops{'secure'});
 	$DEBUG = $uops{'debug'}  if (defined $uops{'debug'});
 
 	while (@_) {
 		if ($_[0] =~ /^\-?debug$/o) {
 			shift;
 			$DEBUG = (defined($_[0]) && $_[0] =~/^[0-9]$/) ? shift : 1;
+		} elsif ($_[0] =~ /^\-?secure$/o) {
+			shift;
+			$uops{'secure'} = (defined $_[0]) ? shift : 1;
 		}
 	}	
 
@@ -454,14 +463,15 @@ sub new
 	}
 	if ($pre =~ m#\"assetUrl\"\:\"([^\"]+)\"#s) {   #INVIDUAL EPISODE:
 		print STDERR "---EPISODE---\n"  if ($DEBUG);
-		$self->{'streams'}->[0] = $1;
+		my $stream = $1;
+		$self->{'streams'}->[0] = $stream  unless ($uops{'secure'} && $stream !~ /^https/o);
 		my $rest = $2;
 		$self->{'title'} = $1  if ($pre =~ m#\"mediaKind\"\:\"[^\"]*\"\,\"name\"\:\"([^\"]+)\"#s);
 		if ($self->{'title'}) {
 			my $title = HTML::Entities::decode_entities($self->{'title'});
 			$title = uri_unescape($title);
 			$title =~ s/(?:\%|\\?u?00)([0-9A-Fa-f]{2})/chr(hex($1))/egs;
-			@epiTitles = ($title);
+			@epiTitles = ($title)  if ($self->{'streams'}->[0]);
 		}
 		if ($pre =~ m#episode-description\>(.+?)\<\/section\>#s) {
 			$self->{'description'} = $1;
@@ -483,8 +493,10 @@ sub new
 			my $title = HTML::Entities::decode_entities($2);
 			$title = uri_unescape($title);
 			$title =~ s/(?:\%|\\?u?00)([0-9A-Fa-f]{2})/chr(hex($1))/egs;
-			push @{$self->{'streams'}}, $stream;
-			push @epiTitles, $title;
+			unless ($uops{'secure'} && $stream !~ /^https/o) {
+				push @{$self->{'streams'}}, $stream;
+				push @epiTitles, $title;
+			}
 		}
 	}
 	$self->{'year'} = $1  if ($self->{'created'} =~ /(\d\d\d\d)/);

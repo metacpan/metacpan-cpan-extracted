@@ -111,29 +111,36 @@ and the separate application program:  youtube-dl.
 
 =over 4
 
-=item B<new>(I<ID>|I<url> [, I<-youtube> => yes|(no)|only ] [, I<-keep> => "type1,type2?..." | [type1,type2?...] ] | [, "debug" [ => 0|(1)|2 ]])
+=item B<new>(I<ID>|I<url> [, I<-youtube> => yes|no|only ] 
+[, I<-keep> => "type1,type2?..." | [type1,type2?...] ] 
+[, I<-secure> [ => 0|1 ]] [, I<-debug> [ => 0|1|2 ]])
 
 Accepts a bitchute.com video ID or URL and creates and returns a new video object, 
 or I<undef> if the URL is not a valid Bitchute video or no streams are found.  
 The URL can be the full URL, ie. https://www.bitchute.com/video/B<video-id>, 
 or just I<video-id>.
 
-The optional I<keep> argument can be either a comma-separated string or an array 
+The optional I<-keep> argument can be either a comma-separated string or an array 
 reference ([...]) of stream types to keep (include) and returned in order specified 
 (type1, type2...).  Each "type" can be one of:  extension (ie. m4a, mp4, etc.), 
 "playlist", "stream", or ("any" or "all").
 
-DEFAULT keep list is:  'm4a,mpd,stream,all', meaning that all m4a streams 
+DEFAULT I<-keep> list is:  'm4a,mpd,stream,all', meaning that all m4a streams 
 followed by all "mpd" streams, followed by non-playlists, followed by all 
-remaining (playlists: m3u8,pls) streams.  More than one value can be specified to 
+remaining (playlists (pls)) streams.  More than one value can be specified to 
 control order of search.
 
-NOTE:  I<keep> is ignored if I<youtube> is set to "only".
+NOTE:  I<-keep> is ignored if I<-youtube> is set to "only".
 
-The optional I<youtube> argument can be set to "yes" - also include streams 
+The optional I<-youtube> argument can be set to "yes" - also include streams 
 youtube-dl finds, "no" - only include streams embedded in the video's 
 bitchute.com page, or "only" - only include streams youtube-dl finds.  Default 
 is B<"no">.
+
+The optional I<-secure> argument can be either 0 or 1 (I<false> or I<true>).  If 1 
+then only secure ("https://") streams will be returned.
+
+DEFAULT I<-secure> is 0 (false) - return all streams (http and https).
 
 =item $video->B<get>()
 
@@ -374,6 +381,7 @@ sub new
 	push (@userAgentOps, 'agent', 'Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101 Firefox/68.0')
 			unless (defined $uops{'agent'});
 	$uops{'timeout'} = 10  unless (defined $uops{'timeout'});
+	$uops{'secure'} = 0    unless (defined $uops{'secure'});
 	$DEBUG = $uops{'debug'}  if (defined $uops{'debug'});
 	$YOUTUBE = $uops{'youtube'}  if (defined $uops{'youtube'});
 
@@ -390,6 +398,9 @@ sub new
 				my $keeporder = shift;
 				@okStreams = (ref($keeporder) =~ /ARRAY/) ? @{$keeporder} : split(/\,\s*/, $keeporder);
 			}
+		} elsif ($_[0] =~ /^\-?secure$/o) {
+			shift;
+			$uops{'secure'} = (defined $_[0]) ? shift : 1;
 		}
 	}
 	if (!defined($okStreams[0]) && defined($uops{'keep'})) {
@@ -461,18 +472,22 @@ sub new
 				if ($streamtype =~ /^stream$/i) {
 					while ($streams =~ /^([^\=]*)\=([^\|]+)/o) {
 						$ext = $1; $one = $2;
-						if ($ext !~ /^(?:m3u8?|pls)$/i && !defined($havestreams{"$ext|$one"})) {
-							$self->{'streams'}->[$stindex++] = $one;
-							$havestreams{"$ext|$one"}++;
+						if ($ext !~ /^pls$/i && !defined($havestreams{"$ext|$one"})) {
+							unless ($uops{'secure'} && $one !~ /^https/o) {
+								$self->{'streams'}->[$stindex++] = $one;
+								$havestreams{"$ext|$one"}++;
+							}
 						}
 						$streams =~ s/^[^\|]*\|//o;
 					}
 				} elsif ($streamtype =~ /^playlist$/i) {
 					while ($streams =~ /^([^\=]*)\=([^\|]+)/o) {
 						$ext = $1; $one = $2;
-						if ($ext =~ /^(?:m3u8?|pls)$/i && !defined($havestreams{"$ext|$one"})) {
-							$self->{'streams'}->[$stindex++] = $one;
-							$havestreams{"$ext|$one"}++;
+						if ($ext =~ /^pls$/i && !defined($havestreams{"$ext|$one"})) {
+							unless ($uops{'secure'} && $one !~ /^https/o) {
+								$self->{'streams'}->[$stindex++] = $one;
+								$havestreams{"$ext|$one"}++;
+							}
 						}
 						$streams =~ s/^[^\|]*\|//o;
 					}
@@ -480,8 +495,10 @@ sub new
 					while ($streams =~ /^([^\=]*)\=([^\|]+)/o) {
 						$ext = $1; $one = $2;
 						unless (defined($havestreams{"$ext|$one"})) {
-							$self->{'streams'}->[$stindex++] = $one;
-							$havestreams{"$ext|$one"}++;
+							unless ($uops{'secure'} && $one !~ /^https/o) {
+								$self->{'streams'}->[$stindex++] = $one;
+								$havestreams{"$ext|$one"}++;
+							}
 						}
 						$streams =~ s/^[^\|]*\|//o;
 					}
@@ -537,7 +554,7 @@ RETRYIT:
 			my $upw = $uops{'userpw'};
 			$_ = `youtube-dl --username "$uid" --password "$upw" $ytdlArgs "$url2fetch"`;
 		} else {
-			$_ = `youtube-dl --get-url $ytdlArgs "$url2fetch"`;
+			$_ = `youtube-dl $ytdlArgs "$url2fetch"`;
 		}
 		print STDERR "--TRY($try of 1): youtube-dl returned=$_= ARGS=$ytdlArgs=\n"  if ($DEBUG);
 		@ytdldata = split /\r?\n/s;
@@ -554,7 +571,7 @@ RETRYIT:
 			$_ = shift @ytdldata;
 			$more = 0  unless (m#^https?\:\/\/#o);
 			if ($more) {
-				push @ytStreams, $_;
+				push @ytStreams, $_  unless ($uops{'secure'} && $_ !~ /^https/o);
 			} else {
 				$self->{'description'} .= $_ . ' ';
 			}

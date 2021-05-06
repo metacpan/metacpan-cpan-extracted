@@ -1,0 +1,31 @@
+---
+abstract: 'Perl module to interact with YaST applications via libyui-rest-api.'
+author:
+  - 'QE YaST'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '6.58'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: YuiRestClient
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  List::MoreUtils: '0'
+  Mojo::UserAgent: '0'
+  constant: '0'
+  parent: '0'
+  perl: '5.008004'
+  strict: '0'
+  warnings: '0'
+resources:
+  repository: https://github.com/qe-yast/perl-yui-rest-client.git
+version: '0.1'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

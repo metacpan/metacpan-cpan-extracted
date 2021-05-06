@@ -1,0 +1,13 @@
+Build.PL
+Changes
+lib/Faster/Maths.pm
+lib/Faster/Maths.xs
+MANIFEST			This list of files
+t/00use.t
+t/01maths.t
+t/95benchmark.t
+t/99pod.t
+README
+LICENSE
+META.yml
+META.json

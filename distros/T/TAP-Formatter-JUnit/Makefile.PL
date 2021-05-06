@@ -13,6 +13,9 @@ my %WriteMakefileArgs = (
     "ExtUtils::MakeMaker" => 0
   },
   "DISTNAME" => "TAP-Formatter-JUnit",
+  "EXE_FILES" => [
+    "script/tap2junit"
+  ],
   "LICENSE" => "perl",
   "MIN_PERL_VERSION" => "5.008",
   "NAME" => "TAP::Formatter::JUnit",
@@ -36,7 +39,7 @@ my %WriteMakefileArgs = (
     "Test::More" => "0.96",
     "Test::XML" => 0
   },
-  "VERSION" => "0.12",
+  "VERSION" => "0.13",
   "test" => {
     "TESTS" => "t/*.t"
   }

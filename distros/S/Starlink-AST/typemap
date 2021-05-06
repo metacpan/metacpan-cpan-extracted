@@ -64,6 +64,7 @@ AstWcsMap *	T_ASTOBJ
 AstWinMap *	T_ASTOBJ
 AstXmlChan *	T_ASTOBJ
 AstXphMap *	T_ASTOBJ
+AstYamlChan *	T_ASTOBJ
 AstZoomMap *	T_ASTOBJ
 StatusType	T_STATUSINT
 WcsMapType	T_WCSMAPINT

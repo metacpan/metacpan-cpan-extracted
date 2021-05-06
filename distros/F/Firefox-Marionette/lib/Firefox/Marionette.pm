@@ -49,7 +49,7 @@ our @EXPORT_OK =
   qw(BY_XPATH BY_ID BY_NAME BY_TAG BY_CLASS BY_SELECTOR BY_LINK BY_PARTIAL);
 our %EXPORT_TAGS = ( all => \@EXPORT_OK );
 
-our $VERSION = '1.03';
+our $VERSION = '1.05';
 
 sub _ANYPROCESS                     { return -1 }
 sub _COMMAND                        { return 0 }
@@ -96,6 +96,8 @@ sub _WATERFOX_CLASSIC_VERSION_EQUIV {
 my $proxy_name_regex = qr/perl_ff_m_\w+/smx;
 my $local_name_regex = qr/firefox_marionette_local_\w+/smx;
 my $tmp_name_regex   = qr/firefox_marionette_(?:remote|local)_\w+/smx;
+my @sig_nums         = split q[ ], $Config{sig_num};
+my @sig_names        = split q[ ], $Config{sig_name};
 
 sub BY_XPATH {
     Carp::carp(
@@ -1770,14 +1772,14 @@ sub _launch {
         && ( $self->_xvfb_exists() )
         && ( $self->_launch_xvfb_if_not_present() ) )
     { # if not MacOS or Win32 and no DISPLAY variable, launch Xvfb if at all possible
-        local $ENV{DISPLAY}    = $self->_xvfb_display();
-        local $ENV{XAUTHORITY} = $self->_xvfb_xauthority();
+        local $ENV{DISPLAY}    = $self->xvfb_display();
+        local $ENV{XAUTHORITY} = $self->xvfb_xauthority();
         local $ENV{TMPDIR}     = $self->_local_firefox_tmp_directory();
         $self->{_firefox_pid} = $self->_launch_unix(@arguments);
     }
     elsif ( $self->{_launched_xvfb_anyway} ) {
-        local $ENV{DISPLAY}    = $self->_xvfb_display();
-        local $ENV{XAUTHORITY} = $self->_xvfb_xauthority();
+        local $ENV{DISPLAY}    = $self->xvfb_display();
+        local $ENV{XAUTHORITY} = $self->xvfb_xauthority();
         local $ENV{TMPDIR}     = $self->_local_firefox_tmp_directory();
         $self->{_firefox_pid} = $self->_launch_unix(@arguments);
     }
@@ -1867,7 +1869,10 @@ sub _xvfb_exists {
 
 sub xvfb {
     my ($self) = @_;
-    return $self->{_xvfb_pid};
+    Carp::carp(
+'**** DEPRECATED METHOD - using xvfb() HAS BEEN REPLACED BY xvfb_pid ****'
+    );
+    return $self->xvfb_pid();
 }
 
 sub _launch_xauth {
@@ -1941,12 +1946,17 @@ sub _launch_xauth {
     return;
 }
 
-sub _xvfb_display {
+sub xvfb_pid {
+    my ($self) = @_;
+    return $self->{_xvfb_pid};
+}
+
+sub xvfb_display {
     my ($self) = @_;
     return ":$self->{_xvfb_display_number}";
 }
 
-sub _xvfb_xauthority {
+sub xvfb_xauthority {
     my ($self) = @_;
     return File::Spec->catfile( $self->{_xvfb_authority_directory},
         'Xauthority' );
@@ -2021,8 +2031,8 @@ sub _launch_xvfb {
           or Firefox::Marionette::Exception->throw(
 "Failed to create directory $self->{_xvfb_authority_directory}:$EXTENDED_OS_ERROR"
           );
-        local $ENV{DISPLAY}    = $self->_xvfb_display();
-        local $ENV{XAUTHORITY} = $self->_xvfb_xauthority();
+        local $ENV{DISPLAY}    = $self->xvfb_display();
+        local $ENV{XAUTHORITY} = $self->xvfb_xauthority();
         if ( $self->_launch_xauth($display_number) ) {
             return 1;
         }
@@ -2642,7 +2652,6 @@ sub child_error {
 
 sub _signal_name {
     my ( $proto, $number ) = @_;
-    my @sig_names = split q[ ], $Config{sig_name};
     return $sig_names[$number];
 }
 
@@ -2712,7 +2721,7 @@ sub _reap {
             if ( ( $ssh->{pid} ) && ( $pid == $ssh->{pid} ) ) {
                 $self->{_child_error} = $CHILD_ERROR;
             }
-            elsif ( ( $self->xvfb() ) && ( $pid == $self->xvfb() ) ) {
+            elsif ( ( $self->xvfb_pid() ) && ( $pid == $self->xvfb_pid() ) ) {
                 $self->{_xvfb_child_error} = $CHILD_ERROR;
                 delete $self->{xvfb_pid};
                 delete $self->{_xvfb_display_number};
@@ -2731,7 +2740,7 @@ sub _reap {
             {
                 $self->{_child_error} = $CHILD_ERROR;
             }
-            elsif ( ( $self->xvfb() ) && ( $pid == $self->xvfb() ) ) {
+            elsif ( ( $self->xvfb_pid() ) && ( $pid == $self->xvfb_pid() ) ) {
                 $self->{_xvfb_child_error} = $CHILD_ERROR;
                 delete $self->{xvfb_pid};
                 delete $self->{_xvfb_display_number};
@@ -5433,8 +5442,8 @@ sub pdf {
         return MIME::Base64::decode_base64($content);
     }
     else {
-        my $handle = File::Temp::tempfile(
-            File::Spec->catfile(
+        my $handle = File::Temp->new(
+            TEMPLATE => File::Spec->catfile(
                 File::Spec->tmpdir(), 'firefox_marionette_print_XXXXXXXXXXX'
             )
           )
@@ -5496,8 +5505,8 @@ sub selfie {
         return MIME::Base64::decode_base64($content);
     }
     else {
-        my $handle = File::Temp::tempfile(
-            File::Spec->catfile(
+        my $handle = File::Temp->new(
+            TEMPLATE => File::Spec->catfile(
                 File::Spec->tmpdir(), 'firefox_marionette_selfie_XXXXXXXXXXX'
             )
           )
@@ -5691,6 +5700,54 @@ sub attribute {
     return $self->_response_result_value($response);
 }
 
+sub has {
+    my ( $self, $value, $using, $from ) = @_;
+    return $self->_find( $value, $using, $from,
+        { return_undef_if_no_such_element => 1 } );
+}
+
+sub has_id {
+    my ( $self, $value, $from ) = @_;
+    return $self->_find( $value, 'id', $from,
+        { return_undef_if_no_such_element => 1 } );
+}
+
+sub has_name {
+    my ( $self, $value, $from ) = @_;
+    return $self->_find( $value, 'name', $from,
+        { return_undef_if_no_such_element => 1 } );
+}
+
+sub has_tag {
+    my ( $self, $value, $from ) = @_;
+    return $self->_find( $value, 'tag name', $from,
+        { return_undef_if_no_such_element => 1 } );
+}
+
+sub has_class {
+    my ( $self, $value, $from ) = @_;
+    return $self->_find( $value, 'class name', $from,
+        { return_undef_if_no_such_element => 1 } );
+}
+
+sub has_selector {
+    my ( $self, $value, $from ) = @_;
+    return $self->_find( $value, 'css selector', $from,
+        { return_undef_if_no_such_element => 1 } );
+}
+
+sub has_link {
+    my ( $self, $value, $from ) = @_;
+    return $self->_find( $value, 'link text', $from,
+        { return_undef_if_no_such_element => 1 } );
+}
+
+sub has_partial {
+    my ( $self, $value, $from ) = @_;
+    return $self->_find( $value, 'partial link text',
+        $from, { return_undef_if_no_such_element => 1 } );
+}
+
 sub find_element {
     my ( $self, $value, $using ) = @_;
     Carp::carp(
@@ -5795,7 +5852,7 @@ sub find_by_partial {
 }
 
 sub _find {
-    my ( $self, $value, $using, $from ) = @_;
+    my ( $self, $value, $using, $from, $options ) = @_;
     $using ||= 'xpath';
     my $message_id = $self->_new_message_id();
     my $parameters = { using => $using, value => $value };
@@ -5813,8 +5870,12 @@ sub _find {
     $self->_send_request(
         [ _COMMAND(), $message_id, $self->_command($command), $parameters, ] );
     my $response =
-      $self->_get_response( $message_id, { using => $using, value => $value } );
+      $self->_get_response( $message_id, { using => $using, value => $value },
+        $options );
     if (wantarray) {
+        if ( $response->ignored_exception() ) {
+            return ();
+        }
         if ( $self->marionette_protocol() == _MARIONETTE_PROTOCOL_VERSION_3() )
         {
             return
@@ -5838,6 +5899,9 @@ sub _find {
         }
     }
     else {
+        if ( $response->ignored_exception() ) {
+            return;
+        }
         if (
             (
                 $self->marionette_protocol() == _MARIONETTE_PROTOCOL_VERSION_3()
@@ -6249,7 +6313,7 @@ sub _terminate_process {
 
 sub _terminate_xvfb {
     my ($self) = @_;
-    if ( my $pid = $self->xvfb() ) {
+    if ( my $pid = $self->xvfb_pid() ) {
         my $int_signal = $self->_signal_number('INT');
         while ( kill 0, $pid ) {
             kill $int_signal, $pid;
@@ -6346,6 +6410,9 @@ sub _script_parameters {
     my ( $self, %parameters ) = @_;
     delete $parameters{script};
     $parameters{args} ||= [];
+    if ( ( !ref $parameters{args} ) or ( ref $parameters{args} ne 'ARRAY' ) ) {
+        $parameters{args} = [ $parameters{args} ];
+    }
     my %mapping = (
         timeout => 'scriptTimeout',
         new     => 'newSandbox',
@@ -6386,9 +6453,10 @@ sub script {
 }
 
 sub json {
-    my ($self) = @_;
+    my ($self)  = @_;
     my $content = $self->strip();
-    return JSON::decode_json($content);
+    my $json    = JSON->new()->decode($content);
+    return $json;
 }
 
 sub strip {
@@ -6564,7 +6632,7 @@ sub sleep_time_in_ms {
 sub bye {
     my ( $self, $code ) = @_;
     my $found = 1;
-    while ( !$found ) {
+    while ($found) {
         eval { &{$code} } and do {
             Time::HiRes::sleep(
                 $self->sleep_time_in_ms() / _MILLISECONDS_IN_ONE_SECOND() );
@@ -6839,7 +6907,7 @@ sub _convert_request_to_old_protocols {
 sub _send_request {
     my ( $self, $object ) = @_;
     $object = $self->_convert_request_to_old_protocols($object);
-    my $json   = JSON::encode_json($object);
+    my $json   = JSON->new()->convert_blessed()->encode($object);
     my $length = length $json;
     if ( $self->_debug() ) {
         warn ">> $length:$json\n";
@@ -6949,10 +7017,11 @@ sub _socket {
 }
 
 sub _get_response {
-    my ( $self, $message_id, $parameters ) = @_;
+    my ( $self, $message_id, $parameters, $options ) = @_;
     my $next_message = $self->_read_from_socket();
     my $response =
-      Firefox::Marionette::Response->new( $next_message, $parameters );
+      Firefox::Marionette::Response->new( $next_message, $parameters,
+        $options );
     if ( $self->marionette_protocol() == _MARIONETTE_PROTOCOL_VERSION_3() ) {
         while ( $response->message_id() < $message_id ) {
             $next_message = $self->_read_from_socket();
@@ -6965,8 +7034,6 @@ sub _get_response {
 
 sub _signal_number {
     my ( $proto, $name ) = @_;
-    my @sig_nums  = split q[ ], $Config{sig_num};
-    my @sig_names = split q[ ], $Config{sig_name};
     my %signals_by_name;
     my $idx = 0;
     foreach my $sig_name (@sig_names) {
@@ -7027,7 +7094,7 @@ Firefox::Marionette - Automate the Firefox browser with the Marionette protocol
 
 =head1 VERSION
 
-Version 1.03
+Version 1.05
 
 =head1 SYNOPSIS
 
@@ -7073,6 +7140,8 @@ returns the active element of the current browsing context's document element, i
 =head2 add_cookie
 
 accepts a single L<cookie|Firefox::Marionette::Cookie> object as the first parameter and adds it to the current cookie jar.  This method returns L<itself|Firefox::Marionette> to aid in chaining methods.
+
+This method throws an exception if you try to L<add a cookie for a different domain than the current document|https://developer.mozilla.org/en-US/docs/Web/WebDriver/Errors/InvalidCookieDomain>.
 
 =head2 add_header
 
@@ -7168,7 +7237,7 @@ causes the browser to traverse one step backward in the joint history of the cur
 
 =head2 browser_version
 
-This method returns version of firefox.
+This method returns the current version of firefox.
 
 =head2 bye
 
@@ -7319,7 +7388,7 @@ This method returns L<itself|Firefox::Marionette> to aid in chaining methods.
 
 =head2 developer
 
-returns true if the current version of firefox is a L<developer edition|https://www.mozilla.org/en-US/firefox/developer/> (does the minor version number end with an 'b\d+'?) version.
+returns true if the L<current version|Firefox::Marionette#browser_version> of firefox is a L<developer edition|https://www.mozilla.org/en-US/firefox/developer/> (does the minor version number end with an 'b\d+'?) version.
 
 =head2 dismiss_alert
 
@@ -7420,7 +7489,7 @@ This method is subject to the L<implicit|Firefox::Marionette::Timeouts#implicit>
         $element->type('Test::More');
     }
 
-If no elements are found, a L<not found|Firefox::Marionette::Exception::NotFound> exception will be thrown. 
+If no elements are found, a L<not found|Firefox::Marionette::Exception::NotFound> exception will be thrown.  For the same functionality that returns undef if no elements are found, see the L<has|Firefox::Marionette#has> method.
 
 =head2 find_id
 
@@ -7440,7 +7509,7 @@ This method is subject to the L<implicit|Firefox::Marionette::Timeouts#implicit>
         $element->type('Test::More');
     }
 
-If no elements are found, a L<not found|Firefox::Marionette::Exception::NotFound> exception will be thrown. 
+If no elements are found, a L<not found|Firefox::Marionette::Exception::NotFound> exception will be thrown.  For the same functionality that returns undef if no elements are found, see the L<has_id|Firefox::Marionette#has_id> method.
 
 =head2 find_name
 
@@ -7459,7 +7528,7 @@ This method is subject to the L<implicit|Firefox::Marionette::Timeouts#implicit>
         $element->type('Test::More');
     }
 
-If no elements are found, a L<not found|Firefox::Marionette::Exception::NotFound> exception will be thrown. 
+If no elements are found, a L<not found|Firefox::Marionette::Exception::NotFound> exception will be thrown.  For the same functionality that returns undef if no elements are found, see the L<has_name|Firefox::Marionette#has_name> method.
 
 =head2 find_class
 
@@ -7478,7 +7547,7 @@ This method is subject to the L<implicit|Firefox::Marionette::Timeouts#implicit>
         $element->type('Test::More');
     }
 
-If no elements are found, a L<not found|Firefox::Marionette::Exception::NotFound> exception will be thrown. 
+If no elements are found, a L<not found|Firefox::Marionette::Exception::NotFound> exception will be thrown.  For the same functionality that returns undef if no elements are found, see the L<has_class|Firefox::Marionette#has_class> method.
 
 =head2 find_selector
 
@@ -7497,7 +7566,7 @@ This method is subject to the L<implicit|Firefox::Marionette::Timeouts#implicit>
         $element->type('Test::More');
     }
 
-If no elements are found, a L<not found|Firefox::Marionette::Exception::NotFound> exception will be thrown. 
+If no elements are found, a L<not found|Firefox::Marionette::Exception::NotFound> exception will be thrown.  For the same functionality that returns undef if no elements are found, see the L<has_selector|Firefox::Marionette#has_selector> method.
 
 =head2 find_tag
 
@@ -7516,7 +7585,7 @@ This method is subject to the L<implicit|Firefox::Marionette::Timeouts#implicit>
         # do something
     }
 
-If no elements are found, a L<not found|Firefox::Marionette::Exception::NotFound> exception will be thrown. 
+If no elements are found, a L<not found|Firefox::Marionette::Exception::NotFound> exception will be thrown. For the same functionality that returns undef if no elements are found, see the L<has_tag|Firefox::Marionette#has_tag> method.
 
 =head2 find_link
 
@@ -7535,7 +7604,7 @@ This method is subject to the L<implicit|Firefox::Marionette::Timeouts#implicit>
         $element->click();
     }
 
-If no elements are found, a L<not found|Firefox::Marionette::Exception::NotFound> exception will be thrown. 
+If no elements are found, a L<not found|Firefox::Marionette::Exception::NotFound> exception will be thrown.  For the same functionality that returns undef if no elements are found, see the L<has_link|Firefox::Marionette#has_link> method.
 
 =head2 find_partial
 
@@ -7554,7 +7623,7 @@ This method is subject to the L<implicit|Firefox::Marionette::Timeouts#implicit>
         $element->click();
     }
 
-If no elements are found, a L<not found|Firefox::Marionette::Exception::NotFound> exception will be thrown. 
+If no elements are found, a L<not found|Firefox::Marionette::Exception::NotFound> exception will be thrown.  For the same functionality that returns undef if no elements are found, see the L<has_partial|Firefox::Marionette#has_partial> method.
 
 =head2 forward
 
@@ -7603,6 +7672,128 @@ returns a hashref representing the L<http archive|https://en.wikipedia.org/wiki/
     foreach my $entry ($har->entries()) {
         say $entry->request()->url() . " spent " . $entry->timings()->connect() . " ms establishing a TCP connection";
     }
+
+=head2 has
+
+accepts an L<xpath expression|https://en.wikipedia.org/wiki/XPath> as the first parameter and returns the first L<element|Firefox::Marionette::Element> that matches this expression.
+
+This method is subject to the L<implicit|Firefox::Marionette::Timeouts#implicit> timeout, which, by default is 0 seconds.
+
+    use Firefox::Marionette();
+
+    my $firefox = Firefox::Marionette->new()->go('https://metacpan.org/');
+
+    if (my $element = $firefox->has('//input[@id="search-input"]')) {
+        $element->type('Test::More');
+    }
+
+If no elements are found, this method will return undef.  For the same functionality that throws a L<not found|Firefox::Marionette::Exception::NotFound> exception, see the L<find|Firefox::Marionette#find> method.
+
+=head2 has_id
+
+accepts an L<id|https://developer.mozilla.org/en-US/docs/Web/HTML/Global_attributes/id> as the first parameter and returns the first L<element|Firefox::Marionette::Element> with a matching 'id' property.
+
+This method is subject to the L<implicit|Firefox::Marionette::Timeouts#implicit> timeout, which, by default is 0 seconds.
+
+    use Firefox::Marionette();
+
+    my $firefox = Firefox::Marionette->new()->go('https://metacpan.org/');
+
+    if (my $element = $firefox->has_id('search-input')) {
+        $element->type('Test::More');
+    }
+
+If no elements are found, this method will return undef.  For the same functionality that throws a L<not found|Firefox::Marionette::Exception::NotFound> exception, see the L<find_id|Firefox::Marionette#find_id> method.
+
+=head2 has_name
+
+This method returns the first L<element|Firefox::Marionette::Element> with a matching 'name' property.
+
+This method is subject to the L<implicit|Firefox::Marionette::Timeouts#implicit> timeout, which, by default is 0 seconds.
+
+    use Firefox::Marionette();
+
+    my $firefox = Firefox::Marionette->new()->go('https://metacpan.org/');
+    if (my $element = $firefox->has_name('q')) {
+        $element->type('Test::More');
+    }
+
+If no elements are found, this method will return undef.  For the same functionality that throws a L<not found|Firefox::Marionette::Exception::NotFound> exception, see the L<find_name|Firefox::Marionette#find_name> method.
+
+=head2 has_class
+
+accepts a L<class name|https://developer.mozilla.org/en-US/docs/Web/HTML/Global_attributes/class> as the first parameter and returns the first L<element|Firefox::Marionette::Element> with a matching 'class' property.
+
+This method is subject to the L<implicit|Firefox::Marionette::Timeouts#implicit> timeout, which, by default is 0 seconds.
+
+    use Firefox::Marionette();
+
+    my $firefox = Firefox::Marionette->new()->go('https://metacpan.org/');
+    if (my $element = $firefox->has_class('form-control home-search-input')) {
+        $element->type('Test::More');
+    }
+
+If no elements are found, this method will return undef.  For the same functionality that throws a L<not found|Firefox::Marionette::Exception::NotFound> exception, see the L<find_class|Firefox::Marionette#find_class> method.
+
+=head2 has_selector
+
+accepts a L<CSS Selector|https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Selectors> as the first parameter and returns the first L<element|Firefox::Marionette::Element> that matches that selector.
+
+This method is subject to the L<implicit|Firefox::Marionette::Timeouts#implicit> timeout, which, by default is 0 seconds.
+
+    use Firefox::Marionette();
+
+    my $firefox = Firefox::Marionette->new()->go('https://metacpan.org/');
+    if (my $element = $firefox->has_selector('input.home-search-input')) {
+        $element->type('Test::More');
+    }
+
+If no elements are found, this method will return undef.  For the same functionality that throws a L<not found|Firefox::Marionette::Exception::NotFound> exception, see the L<find_selector|Firefox::Marionette#find_selector> method.
+
+=head2 has_tag
+
+accepts a L<tag name|https://developer.mozilla.org/en-US/docs/Web/API/Element/tagName> as the first parameter and returns the first L<element|Firefox::Marionette::Element> with this tag name.
+
+This method is subject to the L<implicit|Firefox::Marionette::Timeouts#implicit> timeout, which, by default is 0 seconds.
+
+    use Firefox::Marionette();
+
+    my $firefox = Firefox::Marionette->new()->go('https://metacpan.org/');
+    if (my $element = $firefox->has_tag('input')) {
+        # do something
+    }
+
+If no elements are found, this method will return undef.  For the same functionality that throws a L<not found|Firefox::Marionette::Exception::NotFound> exception, see the L<find_tag|Firefox::Marionette#find_tag> method.
+
+=head2 has_link
+
+accepts a text string as the first parameter and returns the first link L<element|Firefox::Marionette::Element> that has a matching link text.
+
+This method is subject to the L<implicit|Firefox::Marionette::Timeouts#implicit> timeout, which, by default is 0 seconds.
+
+    use Firefox::Marionette();
+
+    my $firefox = Firefox::Marionette->new()->go('https://metacpan.org/');
+    if (my $element = $firefox->has_link('API')) {
+        $element->click();
+    }
+
+If no elements are found, this method will return undef.  For the same functionality that throws a L<not found|Firefox::Marionette::Exception::NotFound> exception, see the L<find_link|Firefox::Marionette#find_link> method.
+
+=head2 has_partial
+
+accepts a text string as the first parameter and returns the first link L<element|Firefox::Marionette::Element> that has a partially matching link text.
+
+This method is subject to the L<implicit|Firefox::Marionette::Timeouts#implicit> timeout, which, by default is 0 seconds.
+
+    use Firefox::Marionette();
+
+    my $firefox = Firefox::Marionette->new()->go('https://metacpan.org/');
+    if (my $element = $firefox->find_partial('AP')) {
+        $element->click();
+    }
+
+If no elements are found, this method will return undef.  For the same functionality that throws a L<not found|Firefox::Marionette::Exception::NotFound> exception, see the L<find_partial|Firefox::Marionette#find_partial> method.
 
 =head2 html
 
@@ -7664,15 +7855,15 @@ returns true if C<document.readyState === "interactive"> or if L<loaded|Firefox:
 
 =head2 is_displayed
 
-accepts an L<element|Firefox::Marionette::Element> as the first parameter.  This method returns true or false depending on if the element is displayed.
+accepts an L<element|Firefox::Marionette::Element> as the first parameter.  This method returns true or false depending on if the element L<is displayed|https://firefox-source-docs.mozilla.org/testing/marionette/internals/interaction.html#interaction.isElementDisplayed>.
 
 =head2 is_enabled
 
-accepts an L<element|Firefox::Marionette::Element> as the first parameter.  This method returns true or false depending on if the element is enabled.
+accepts an L<element|Firefox::Marionette::Element> as the first parameter.  This method returns true or false depending on if the element L<is enabled|https://w3c.github.io/webdriver/#is-element-enabled>.
 
 =head2 is_selected
 
-accepts an L<element|Firefox::Marionette::Element> as the first parameter.  This method returns true or false depending on if the element is selected.
+accepts an L<element|Firefox::Marionette::Element> as the first parameter.  This method returns true or false depending on if the element L<is selected|https://w3c.github.io/webdriver/#dfn-is-element-selected>.  Note that this method only makes sense for L<checkbox|https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input/checkbox> or L<radio|https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input/radio> inputs or L<option|https://developer.mozilla.org/en-US/docs/Web/HTML/Element/option> elements in a L<select|https://developer.mozilla.org/en-US/docs/Web/HTML/Element/select> dropdown.
 
 =head2 json
 
@@ -7832,7 +8023,7 @@ creates a new WebDriver session.  It is expected that the caller performs the ne
 
 =head2 nightly
 
-returns true if the current version of firefox is a L<nightly release|https://www.mozilla.org/en-US/firefox/channel/desktop/#nightly> (does the minor version number end with an 'a1'?)
+returns true if the L<current version|Firefox::Marionette#browser_version> of firefox is a L<nightly release|https://www.mozilla.org/en-US/firefox/channel/desktop/#nightly> (does the minor version number end with an 'a1'?)
 
 =head2 paper_sizes 
 
@@ -7937,6 +8128,10 @@ Returns the result of the javascript function.
         # luckily!
     }
 
+    my $search_input = $firefox->find_by_id('search-input');
+
+    $firefox->script('arguments[0].style.backgroundColor = "red"', args => [ $search_input ]); # turn the search input box red
+
 The executing javascript is subject to the L<script|Firefox::Marionette::Timeouts#script> timeout, which, by default is 30 seconds.
 
 =head2 selfie
@@ -7985,7 +8180,9 @@ returns the page source of the content document after an attempt has been made t
     use JSON();
     use v5.10;
 
-    say JSON::decode_json(Firefox::Marionette->new()->go('https://fastapi.metacpan.org/v1/download_url/Firefox::Marionette")->strip())->{version};
+    say JSON::decode_json(Firefox::Marionette->new()->go("https://fastapi.metacpan.org/v1/download_url/Firefox::Marionette")->strip())->{version};
+
+Note that this method will assume the bytes it receives from the L<html|Firefox::Marionette#html> method are UTF-8 encoded and will translate accordingly, throwing an exception in the process if the bytes are not UTF-8 encoded.
 
 =head2 switch_to_frame
 
@@ -8001,7 +8198,7 @@ accepts a window handle (either the result of L<window_handles|Firefox::Marionet
 
 =head2 tag_name
 
-accepts a L<Firefox::Marionette::Element|Firefox::Marionette::Element> object as the first parameter and returns the relevant tag name.  For example 'a' or 'input'.
+accepts a L<Firefox::Marionette::Element|Firefox::Marionette::Element> object as the first parameter and returns the relevant tag name.  For example 'L<a|https://developer.mozilla.org/en-US/docs/Web/HTML/Element/a>' or 'L<input|https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input>'.
 
 =head2 text
 
@@ -8013,7 +8210,7 @@ returns the current L<timeouts|Firefox::Marionette::Timeouts> for page loading, 
 
 =head2 title
 
-returns the current title of the window.
+returns the current L<title|https://developer.mozilla.org/en-US/docs/Web/HTML/Element/title> of the window.
 
 =head2 type
 
@@ -8053,9 +8250,17 @@ accepts an optional L<position and size|Firefox::Marionette::Window::Rect> as a 
 
 returns the current window's type.  This should be 'navigator:browser'.
 
-=head2 xvfb
+=head2 xvfb_pid
 
 returns the pid of the xvfb process if it exists.
+
+=head2 xvfb_display
+
+returns the value for the DISPLAY environment variable if one has been generated for the xvfb environment.
+
+=head2 xvfb_xauthority
+
+returns the value for the XAUTHORITY environment variable if one has been generated for the xvfb environment
 
 =head1 REMOTE AUTOMATION OF FIREFOX VIA SSH
 

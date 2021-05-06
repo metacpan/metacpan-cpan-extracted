@@ -1,13 +1,16 @@
 <script type="text/javascript">
     jQuery(function() {
+% if ($RT::MAJOR_VERSION >= 5) {
+        jQuery("div.card-body > div.ticket-summary > div.boxcontainer > div:first-child").unwrap();
+        jQuery("div.card-body > div.ticket-summary > div").wrapAll("<div class='boxcontainer col'></div>");
+        jQuery("div#body > div.summary").css({float: "left", width: "30%"});
+        jQuery("div#body > div.summary > div.fullwidth > div.titlebox").css({"margin-top": "0", "margin-right": "20px"});
+% } else {
         jQuery("table.ticket-summary td.boxcontainer > div:first-child").unwrap();
-
-        jQuery("#body > div.summary, #body > div.summary ~ div")
-            .wrapAll("<table width='100%'><tr></tr></table>");
-        jQuery("#body > div.summary ~ div")
-            .wrapAll("<td valign='top' class='boxcontainer'></td>");
-        jQuery("div.summary")
-            .wrap("<td valign='top' class='boxcontainer' style='width: 30%;'></td>");
+        jQuery("#body > div.summary, #body > div.summary ~ div").wrapAll("<table width='100%'><tr></tr></table>");
+        jQuery("#body > div.summary ~ div").wrapAll("<td valign='top' class='boxcontainer'></td>");
+        jQuery("div.summary").wrap("<td valign='top' class='boxcontainer' style='width: 30%;'></td>");
+% }
     });
 </script>
 <%init>

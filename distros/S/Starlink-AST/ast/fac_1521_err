@@ -169,3 +169,12 @@ FACILITY AST
 467,SMBUF,Supplied buffer too small
 468,BGWRD,Word is too long
 469,TOOBG,Array is too big
+470,NOTSP,Requested feature is not supported
+471,TRUNC,Text truncated
+472,LYAML,Error in libyaml function
+473,YAML,Error reading YAML text
+474,NOYAML,AST was configured without YAML support
+475,NOTMP,No TMapping found
+476,BYAML,Invalid YAML object supplied
+477,BASDF,Invalid ASDF object supplied
+478,UASDF,Unsupported ASDF object supplied

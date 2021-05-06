@@ -41,11 +41,11 @@
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "http://rt.cpan.org/Public/Dist/Display.html?Name=CGI-Lite"
+         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=CGI-Lite"
       },
       "repository" : {
-         "url" : "https://github.com/openstrike/perl-CGI-Lite"
+         "url" : "https://gitlab.com/openstrike/cgi-lite/"
       }
    },
-   "version" : "3.02"
+   "version" : "3.03"
 }

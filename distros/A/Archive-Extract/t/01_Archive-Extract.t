@@ -279,6 +279,21 @@ if( $Debug ) {
         like( $warnings, qr/Cannot determine file type for/,
                                 "           Error is: unknown file type" );
     }
+
+    ### test reading the type
+    my %type_exts = map { $_ => [$_] } @types;
+    push @{ $type_exts{tgz} } => qw(tar.gz);
+    push @{ $type_exts{zip} } => qw(jar ear war par);
+    push @{ $type_exts{tbz} } => qw(tbz2 tar.bz tar.bz2);
+    push @{ $type_exts{txz} } => qw(tar.xz);
+    while (my ($type, $exts) = each %type_exts) {
+        for my $ext (@{ $exts }) {
+            is(
+                Archive::Extract::type_for("foo.$ext"), $type,
+                "Should detect type '$type' for 'foo.$ext",
+            );
+        }
+    }
 }
 
 ### test multiple errors

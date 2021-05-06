@@ -8675,7 +8675,7 @@ test -n "$_star_docs_only"        || _star_docs_only=false
 # /export/data/gbell/star.  Note that this directory may be
 # different from /star, and reflects the value of
 # STARCONF_DEFAULT_STARLINK that the `starconf' package was configured
-# with before its installation. 
+# with before its installation.
 #
 # We use $STARLINK as the location of any other Starlink tools we need
 # to use during the building of our packages, and for the location of
@@ -8690,7 +8690,7 @@ test -n "$_star_docs_only"        || _star_docs_only=false
 # default.  This is so even if $STARLINK and STARCONF_DEFAULT_STARLINK
 # are different, because in this case we are planning to use a
 # previous installation in $STARLINK or $STARCONF_DEFAULT_STARLINK,
-# but install the newly built tool elsewhere. 
+# but install the newly built tool elsewhere.
 #
 # In most cases, including the most important case where we are
 # building the tree from scratch, in a checked out directory,
@@ -8699,7 +8699,7 @@ test -n "$_star_docs_only"        || _star_docs_only=false
 # process, respecting the various dependencies expresses in source
 # directories, ensures that we don't use (and install) any Starlink
 # tools in one component before that component has been build and
-# installed. 
+# installed.
 
 AC_PREFIX_DEFAULT(per_dir_PREFIX)dnl
 
@@ -8823,7 +8823,7 @@ fi
 
 
 # Dependency declarations and checks.
-# Everything is dependent on starconf, so we don't have to declare that 
+# Everything is dependent on starconf, so we don't have to declare that
 # for each package separately.
 # STAR_DEPENDENCIES_ATTRIBUTES is currently not used.
 STAR_DEPENDENCIES_ATTRIBUTES=''
@@ -8870,7 +8870,7 @@ AC_SUBST(STAR_MANIFEST_DIR)
 # Each package updates the "starlink.version" file installed into the
 # manifests directory. This tracks the last git sha1 checkin for
 # the current code state by running the git show on the HEAD.
-# Define GIT as the program to run, but allow it to be overridden 
+# Define GIT as the program to run, but allow it to be overridden
 # (most likely by ":" to avoid the overhead).
 # Also requires that STAR_SOURCE_ROOT_DIR is defined to locate the
 # head of the source tree.
@@ -8912,6 +8912,41 @@ ALL_TARGET=all-am-normal
 test "x$prefix" = xNONE && prefix=$ac_default_prefix
 # Let make expand exec_prefix.
 test "x$exec_prefix" = xNONE && exec_prefix='${prefix}'
+
+#  As of gcc 10, gfortran reports an error rather than a warning if
+#  multiple calls to the same subroutine have different argument types.
+#  This break most uses of %VAL in starlink code, which is always assumed
+#  by the coimpiler to have a type of INTEGER*8. So test  if
+#  "-fallow-argument-mismatch" works (skip this test if we are configuring
+#  without fortran).
+AC_ARG_WITH([fortran],
+            [ --without-fortran   Build package without Fortran support],
+        if test "$withval" = "yes"; then
+           use_fortran="1"
+        else
+           use_fortran="0"
+        fi,
+        use_fortran="1")
+if test "$use_fortran" = "1"; then
+   AC_LANG_PUSH([Fortran])
+   AC_LANG_CONFTEST([AC_LANG_SOURCE([
+      PROGRAM conftest
+      CALL BB( 1.0 )
+      END
+
+      SUBROUTINE BB( DIN )
+      DOUBLE PRECISION DIN
+      END
+   ])])
+   if $FC -c $FCFLAGS -fallow-argument-mismatch -o conftest conftest.f 2>&5
+   then
+      STAR_FCFLAGS="$STAR_FCFLAGS -fallow-argument-mismatch"
+      STAR_FFLAGS="$STAR_FFLAGS -fallow-argument-mismatch"
+   fi
+   AC_LANG_POP([Fortran])
+   rm -f conftest.f
+fi
+
 ])# STAR_DEFAULTS
 
 
@@ -8939,8 +8974,8 @@ test "x$exec_prefix" = xNONE && exec_prefix='${prefix}'
 # The macro may be called more than once if you have more than one
 # .msg file in the directory.
 #
-# The files listed in the '_MESSAGES' variable will often have to be 
-# declared as `BUILT_SOURCES'.  
+# The files listed in the '_MESSAGES' variable will often have to be
+# declared as `BUILT_SOURCES'.
 #
 # The macro also implicitly declares a `sourceset' dependency on the
 # messgen package.
@@ -9169,7 +9204,7 @@ float fred_() {
            then
               star_cv_cnf_f2c_compatible=`eval ./conftest | sed 's/\ //g'` > /dev/null
            else
-              AC_MSG_ERROR([failed to link program]) 
+              AC_MSG_ERROR([failed to link program])
            fi
            AC_LANG_POP([Fortran])
            rm -f conftest* c-conftest*
@@ -9191,7 +9226,8 @@ float fred_() {
 # Define the global symbol used to access the Fortran blank common block.
 # Usually under UNIX this is _BLNK__, but gfortran uses __BLNK__, so we
 # need to check for that. Gfortran is just detected by being a GNU compiler
-# and having "Fortran (GCC) 4.x[x].x[x]" as part of its --version output.
+# and having "Fortran (GCC) 4.x[x].x[x]" (or 1x.x[x].x[x]) as part of
+# its --version output.
 #
 # The effect of this macro is to substitute BLANK_COMMON_SYMBOL with
 # the expected value.
@@ -9203,6 +9239,8 @@ AC_DEFUN([STAR_CNF_BLANK_COMMON],
        star_cv_blank_common_symbol=_BLNK__
        if test "$ac_cv_fc_compiler_gnu" = yes; then
             if "$FC" --version 2>&1 < /dev/null | grep 'GNU Fortran.*[[4-9]]\.[[0-9]][[0-9]]*\.[[0-9]][[0-9]]*' > /dev/null; then
+                star_cv_blank_common_symbol=__BLNK__
+            elif "$FC" --version 2>&1 < /dev/null | grep 'GNU Fortran.*1[[0-9]]\.[[0-9]][[0-9]]*\.[[0-9]][[0-9]]*' > /dev/null; then
                 star_cv_blank_common_symbol=__BLNK__
             fi
        fi])
@@ -9227,7 +9265,7 @@ AC_DEFUN([STAR_CNF_BLANK_COMMON],
 #  LOGICAL parameters, so we need to use the -f77 flag.
 #
 #  In general this macro should be used by all packages that include PRM_PAR,
-#  all monoliths are assumed to use this by default. 
+#  all monoliths are assumed to use this by default.
 #
 AC_DEFUN([STAR_PRM_COMPATIBLE_SYMBOLS],
    [$_star_docs_only &&
@@ -9273,7 +9311,7 @@ AC_DEFUN([STAR_PRM_COMPATIBLE_SYMBOLS],
                  if $FC -c $FCFLAGS -fno-range-check -o conftest conftest.f 2>&5
                  then
                     star_cv_prm_compatible_symbols="-fno-range-check"
-                 fi              
+                 fi
                  AC_LANG_POP([Fortran])
                  rm -f conftest.f
               fi
@@ -9303,7 +9341,7 @@ AC_DEFUN([STAR_PRM_COMPATIBLE_SYMBOLS],
 # Solaris studio12 with -m64.
 #
 # The test is only performed for 64bit compilers, all others are assumed
-# to use 32bit lengths. Various attempts to trap this issue permanently 
+# to use 32bit lengths. Various attempts to trap this issue permanently
 # using a test program have failed (especially for the Intel compiler), so the
 # actual test is to check for a known 64 bit compiler first and then try a
 # program that has had some success. Note no GNU compilers seem to have this
@@ -9327,7 +9365,7 @@ AC_DEFUN([STAR_CNF_TRAIL_TYPE],
               AC_LANG_PUSH([Fortran])
               if test "$ac_cv_fc_have_percentloc" = yes; then
                  FORTRAN_GETLOC='%loc'
-              else 
+              else
                  FORTRAN_GETLOC='loc'
               fi
               AC_LANG_CONFTEST([AC_LANG_SOURCE([
@@ -9351,7 +9389,7 @@ C  checks passing 4 byte character string lengths on 64bit compiler.
       l2 = 2048
 
       call report( dummy1, dummy2, %val(ip1), dummy3, dummy4,
-     :             %val(ip2), dummy5, dummy6, 
+     :             %val(ip2), dummy5, dummy6,
      :             %val(l1), %val(l2) )
 
       end
@@ -9378,7 +9416,7 @@ C  checks passing 4 byte character string lengths on 64bit compiler.
               then
                  star_cv_cnf_trail_type=`eval ./conftest | sed 's/\ //g'` > /dev/null
               else
-                 AC_MSG_ERROR([failed to link program]) 
+                 AC_MSG_ERROR([failed to link program])
               fi
               rm -f conftest*
               AC_LANG_POP([Fortran])
@@ -9389,7 +9427,7 @@ dnl  sizeof(void *) != 8 or GNU so no problems.
         fi
 ])
     AC_SUBST([TRAIL_TYPE], $star_cv_cnf_trail_type )
-    AC_DEFINE_UNQUOTED([TRAIL_TYPE], $star_cv_cnf_trail_type, 
+    AC_DEFINE_UNQUOTED([TRAIL_TYPE], $star_cv_cnf_trail_type,
                        [Type of Fortran CNF TRAIL argument] )
 ])# STAR_CNF_TRAIL_TYPE
 
@@ -9400,9 +9438,9 @@ dnl  sizeof(void *) != 8 or GNU so no problems.
 # TCL_CFLAGS to the C compiler flags necessary to compile with Tcl, TCL_LIBS
 # to the required library flags, and TCLSH to the full path of the tclsh
 # executable, TCL_PREFIX to the installation root and TCL_LD_SEARCH_FLAGS
-# to the default search path for loading the shareable library; if Tk is  
-# requested, it similarly sets TK_CFLAGS, TK_LIBS and WISH.  Define the 
-# cpp variable TCL_MISSING to 1 if Tcl is not available.  Similar to 
+# to the default search path for loading the shareable library; if Tk is
+# requested, it similarly sets TK_CFLAGS, TK_LIBS and WISH.  Define the
+# cpp variable TCL_MISSING to 1 if Tcl is not available.  Similar to
 # macro AC_PATH_XTRA.
 #
 # If argument MINVERSION is present, it specifies the minimum Tcl/Tk
@@ -9716,10 +9754,10 @@ AC_DEFUN([STAR_XML_DOCUMENTATION],
                     # Building documentation is all we're supposed to do,
                     # and we can't, so suppress further building.
                     do_the_build=\
-"This docs-only component requires Jade, sgmlnorm and sgml2docs.  
+"This docs-only component requires Jade, sgmlnorm and sgml2docs.
         All I could find were:
-        $JADE for Jade, 
-        $SGMLNORM for sgmlnorm and 
+        $JADE for Jade,
+        $SGMLNORM for sgmlnorm and
         $SGML2DOCS for sgml2docs (requires full path).
         Your system may have a way to install Jade and sgmlnorm as a package,
         sgml2docs is part of the SGMLKIT package."
@@ -9765,7 +9803,7 @@ AC_DEFUN([STAR_XML_DOCUMENTATION],
     fi
     AC_SUBST([STAR@&t@_XML_DOCUMENTATION])dnl
 ])# STAR_XML_DOCUMENTATION
-            
+
 
 
 # STAR_CHECK_PROGS(progs-to-check-for, [component=''])
@@ -9789,7 +9827,7 @@ AC_DEFUN([STAR_XML_DOCUMENTATION],
 # For example:
 #     STAR_CHECK_PROGS(messgen)
 # would define the variable MESSGEN to have the full path to the
-# messgen application, and 
+# messgen application, and
 #     STAR_CHECK_PROGS(prolat, sst)
 # would define the variable PROLAT to have the path to the prolat
 # application within the sst component.
@@ -9826,7 +9864,7 @@ AC_DEFUN([STAR_XML_DOCUMENTATION],
 #
 # The default, if the program isn't in the augmented path, is the path
 # to the starconf-finder program if that's available, and the bare
-# program-name otherwise.  Is this the best default?  Would just 
+# program-name otherwise.  Is this the best default?  Would just
 # program-name be better?  The program may not be in the augmented
 # path for two reasons: (1) we are doing the global configuration done
 # during bootstrapping, and noting has been installed yet; or (2) the
@@ -9846,7 +9884,7 @@ AC_DEFUN([STAR_CHECK_PROGS],
           AC_FOREACH([ProgramName], [$1],
                      [m4_define([star_prog],
                                 _STAR_UPCASE(m4_bpatsubst(ProgramName,
-                                                          [[^0-9a-zA-Z_]], 
+                                                          [[^0-9a-zA-Z_]],
                                                           [_])))
                       AC_PATH_PROG(star_prog,
                                    ProgramName,
@@ -9906,7 +9944,7 @@ AC_DEFUN([STAR_SPECIAL_INSTALL_COMMAND],
     fi
     AC_SUBST(CP_RECURSIVE, $star_cv_cp_r)dnl
 ])# STAR_SPECIAL_INSTALL_COMMAND
-    
+
 
 # STAR_MONOLITHS
 # --------------
@@ -10062,7 +10100,7 @@ AC_DEFUN([STAR_EXAMPLES_FILES],
 # are expressed in the file component.xml in the component directory.
 AC_DEFUN([STAR_DECLARE_DEPENDENCIES],
  [m4_ifval([$1], [], [AC_FATAL([$0: no type given])])dnl
-  m4_if(m4_bregexp([$1], 
+  m4_if(m4_bregexp([$1],
                    [^\(sourceset\|build\|link\|use\|test\|configure\)$]),
         [0],
         [],
@@ -10138,7 +10176,7 @@ AC_REQUIRE([AC_CANONICAL_BUILD])dnl
 m4_ifval([$1], [], [AC_FATAL([$0: no target-file-list given])])dnl
 m4_ifval([$2], [], [AC_FATAL([$0: no platform-list given])])dnl
 AC_FOREACH([TargetFile], [$1],
-  [AC_FOREACH([Ext], [$2], 
+  [AC_FOREACH([Ext], [$2],
     [m4_if(Ext, [NONE], , [AC_LIBSOURCE(TargetFile[]Ext)])])])dnl
 AC_MSG_CHECKING([platform-specific source for file(s) $1])
 _star_tmp=
@@ -10163,7 +10201,7 @@ if test -z "$_star_tmp"; then
     # (though it should have been)
     AC_MSG_WARN([build platform $build does not match any of ($2): using `default'])
     _star_tmp=default
-fi    
+fi
 if test $_star_tmp = NONE; then
     AC_MSG_RESULT([none required])
 else
@@ -10225,7 +10263,7 @@ fi
 # is to have "IFORT" in the --version string.
 #
 # Under Solaris and the studio compilers the argc and argv values are no
-# longer automatically shared, so we test for "Sun Fortran" and have a 
+# longer automatically shared, so we test for "Sun Fortran" and have a
 # code section that copies the given argc and argv directly to the global
 # variable __xargc and __xargv, this may need fixing from time to time.
 # Doesn't seem to be a function for doing this job.
@@ -10238,6 +10276,8 @@ AC_DEFUN([STAR_INITIALISE_FORTRAN_RTL],
             if "$FC" --version 2>&1 < /dev/null | grep 'G95' > /dev/null; then
                 star_cv_initialise_fortran=g95-start
             elif "$FC" --version 2>&1 < /dev/null | grep 'GNU Fortran.*[[4-9]]\.[[0-9]][[0-9]]*\.[[0-9]][[0-9]]*' > /dev/null; then
+                star_cv_initialise_fortran=gfortran-setarg
+            elif "$FC" --version 2>&1 < /dev/null | grep 'GNU Fortran.*1[[0-9]]\.[[0-9]][[0-9]]*\.[[0-9]][[0-9]]*' > /dev/null; then
                 star_cv_initialise_fortran=gfortran-setarg
             else
                 star_cv_initialise_fortran=g77-setarg
@@ -10274,7 +10314,7 @@ AC_DEFUN([STAR_INITIALISE_FORTRAN_RTL],
         AC_DEFINE([STAR_INITIALISE_FORTRAN(argc,argv)],
                   [{extern int __xargc; extern char **__xargv;__xargc = argc;__xargv = argv;}])
         ;;
-      *) 
+      *)
         AC_DEFINE([STAR_INITIALISE_FORTRAN(argc,argv)],[])
         ;;
     esac
@@ -10345,12 +10385,12 @@ AC_DEFUN([_STAR_EXTRADIR_COMMON],
 # STAR_LARGEFILE_SUPPORT
 # ----------------------
 #
-# Set C macros for compiling C routines that want to make use of large file 
+# Set C macros for compiling C routines that want to make use of large file
 # support. This is a joining of AC_SYS_LARGEFILE and AC_FUNC_FSEEKO
 # so defines the macros _FILE_OFFSET_BITS, _LARGEFILE_SOURCE and _LARGE_FILES,
 # along with HAVE_FSEEKO. To use large file support you need to use fseeko and
 # ftello when HAVE_FSEEKO is defined (and use off_t for offsets) and compile
-# all C code with the other defines. 
+# all C code with the other defines.
 #
 # This function also gathers the values of _FILE_OFFSET_BITS, _LARGEFILE_SOURCE
 # and _LARGE_FILES and sets the STAR_LARGEFILE_CFLAGS variable (this in useful

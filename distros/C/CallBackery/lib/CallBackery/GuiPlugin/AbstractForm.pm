@@ -131,7 +131,7 @@ an error message.
 sub validateData {
     my $self = shift;
     my $fieldName = shift;
-    my $formData = shift;
+    my $formData = shift || {};
     my $entry = $self->formCfgMap->{$fieldName};
     if (not ref $entry){
         die mkerror(4095,trm("sorry, don't know the field you are talking about"));

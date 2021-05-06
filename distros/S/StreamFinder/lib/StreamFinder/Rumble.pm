@@ -112,7 +112,8 @@ L<URI::Escape>, L<HTML::Entities>, and L<LWP::UserAgent>.
 
 =over 4
 
-=item B<new>(I<ID>|I<url> [, I<-keep> => I<streamtypes> | [, "debug" [ => 0|(1)|2 ]])
+=item B<new>(I<ID>|I<url> [, I<-keep> => I<streamtypes>] [, I<-secure> [ => 0|1 ]] 
+[, I<-debug> [ => 0|1|2 ]])
 
 Accepts a rumble.com video ID or URL and creates and returns a new video object, 
 or I<undef> if the URL is not a valid Rumble video or no streams are found.  
@@ -125,8 +126,13 @@ either a comma-separated string or an array reference ([...]) of stream types, i
 the order they should be returned.  Each stream type in the list can be one of:  
 I<any>, I<mp4>, or I<webm>.
 
-DEFAULT keep list is 'mp4, webm, any', meaning that all mp4 streams followed by all 
+DEFAULT I<-keep> list is 'mp4, webm, any', meaning that all mp4 streams followed by all 
 webm streams, then all of any others found.
+
+The optional I<-secure> argument can be either 0 or 1 (I<false> or I<true>).  If 1 
+then only secure ("https://") streams will be returned.
+
+DEFAULT I<-secure> is 0 (false) - return all streams (http and https).
 
 =item $video->B<get>()
 
@@ -364,6 +370,7 @@ sub new
 	push (@userAgentOps, 'agent', 'Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101 Firefox/68.0')
 			unless (defined $uops{'agent'});
 	$uops{'timeout'} = 10  unless (defined $uops{'timeout'});
+	$uops{'secure'} = 0    unless (defined $uops{'secure'});
 	$DEBUG = $uops{'debug'}  if (defined $uops{'debug'});
 	$YOUTUBE = $uops{'youtube'}  if (defined $uops{'youtube'});
 
@@ -377,6 +384,9 @@ sub new
 				my $keeporder = shift;
 				@okStreams = (ref($keeporder) =~ /ARRAY/) ? @{$keeporder} : split(/\,\s*/, $keeporder);
 			}
+		} elsif ($_[0] =~ /^\-?secure$/o) {
+			shift;
+			$uops{'secure'} = (defined $_[0]) ? shift : 1;
 		}
 	}
 	if (!defined($okStreams[0]) && defined($uops{'keep'})) {
@@ -395,7 +405,7 @@ sub new
 	$self->{'description'} = '';
 	$self->{'created'} = '';
 	$self->{'year'} = '';
-	$self->{'genre'} = '';
+	$self->{'genre'} = 'Video';
 	$self->{'iconurl'} = '';
 	$self->{'imageurl'} = '';
 	$self->{'streams'} = [];
@@ -509,7 +519,8 @@ sub new
 					foreach my $stream (@{$streamsets{$class}}) {  #THEN BY RESOLUTION:
 						if ($streamtype =~ /^any/io || $stream =~ /${streamtype}$/i) {
 							print STDERR "------found stream=$stream=\n"  if ($DEBUG);
-							unless (defined $streamHash{$stream}) {
+							unless (defined $streamHash{$stream}
+									|| ($uops{'secure'} && $stream !~ /^https/o)) {
 								push @{$self->{'streams'}}, $stream;
 								$streamHash{$stream} = $stream;
 							}

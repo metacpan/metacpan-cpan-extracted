@@ -4,7 +4,7 @@ StreamFinder::Vimeo - Fetch actual raw streamable URLs from Vimeo.com.
 
 =head1 AUTHOR
 
-This module is Copyright (C) 2017-2020 by
+This module is Copyright (C) 2017-2021 by
 
 Jim Turner, C<< <turnerjw784 at yahoo.com> >>
 		
@@ -111,19 +111,25 @@ and the separate application program:  youtube-dl.
 
 =over 4
 
-=item B<new>(I<ID>|I<url> [, "debug" [ => 0|(1)|2 ]] [, "quality" => I<quality>)
+=item B<new>(I<ID>|I<url> [, I<-debug> [ => 0|1|2 ]] 
+[, "-quality" => I<quality>] [, I<-secure> [ => 0|1 ]])
 
 Accepts a vimeo.com ID or URL and creates and returns a new video object, 
 or I<undef> if the URL is not a valid Vimeo video or no streams are 
 found.  The URL can be the full URL, 
 ie. https://player.vimeo.com/video/B<video-id>, or just I<video-id>.
 
-The I<"quality"> option, which can be set to a "p number" optionally 
+The optional I<-quality> argument, which can be set to a "p number" optionally 
 preceeded by a relational operator ("<", ">", "=") - default: "<".  
 This limits the video quality.. For example:  "720" would mean select 
 a stream "<= 720p", ">720" would mean ">= 720p", and "=1080" would 
 mean "only "1080p".  See also the "vimeo_quality" config. file option 
-that does the same thing.
+that does the same thing.  Default is just use the best quality found.
+
+The optional I<-secure> argument can be either 0 or 1 (I<false> or I<true>).  If 1 
+then only secure ("https://") streams will be returned.
+
+DEFAULT I<-secure> is 0 (false) - return all streams (http and https).
 
 =item $video->B<get>()
 
@@ -275,7 +281,7 @@ L<http://search.cpan.org/dist/StreamFinder-Vimeo/>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2017-2020 Jim Turner.
+Copyright 2017-2021 Jim Turner.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of the the Artistic License (2.0). You may obtain a
@@ -366,6 +372,7 @@ sub new
 	push (@userAgentOps, 'agent', 'Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101 Firefox/68.0')
 			unless (defined $uops{'agent'});
 	$uops{'timeout'} = 10  unless (defined $uops{'timeout'});
+	$uops{'secure'} = 0    unless (defined $uops{'secure'});
 	$DEBUG = $uops{'debug'}  if (defined $uops{'debug'});
 
 	while (@_) {
@@ -375,6 +382,9 @@ sub new
 		} elsif ($_[0] =~ /^\-?quality$/o) {
 			shift;
 			$uops{'vimeo_quality'} = (defined $_[0]) ? shift : 0;
+		} elsif ($_[0] =~ /^\-?secure$/o) {
+			shift;
+			$uops{'secure'} = (defined $_[0]) ? shift : 1;
 		}
 	}
 
@@ -440,9 +450,11 @@ sub new
 		}
 		if ($cnt) {
 			foreach my $i (sort { $a <=> $b } keys %streams) {
-				print STDERR "**** VIMEO STREAM FOUND: QUALITY($i)=$streams{$i}=\n"  if ($DEBUG);
-				unshift @{$self->{'streams'}}, $streams{$i};
-				$self->{'cnt'}++;
+				unless ($uops{'secure'} && $streams{$i} !~ /^https/o) {
+					print STDERR "**** VIMEO STREAM FOUND: QUALITY($i)=$streams{$i}=\n"  if ($DEBUG);
+					unshift @{$self->{'streams'}}, $streams{$i};
+					$self->{'cnt'}++;
+				}
 			}
 			if ($cnt) {
 				$self->{'artist'} = $1  if ($html =~ s#\"owner\"\:\{.*?\"name\"\:\"([^\"]+)\"#STREAMFINDERMARK#s);
@@ -462,7 +474,7 @@ sub new
 				. ((defined $uops{'format'}) ? $uops{'format'} : 'mp4')
 				. '" ' . ((defined $uops{'youtube-dl-args'}) ? $uops{'youtube-dl-args'} : '');
 		my $try = 0;
-		my ($more, @ytdldata);
+		my ($more, @ytdldata, @ytStreams);
 
 RETRYIT:
 		if (defined($uops{'userid'}) && defined($uops{'userpw'})) {  #USER HAS A LOGIN CONFIGURED:
@@ -470,28 +482,30 @@ RETRYIT:
 			my $upw = $uops{'userpw'};
 			$_ = `youtube-dl --username "$uid" --password "$upw" $ytdlArgs "$url2fetch"`;
 		} else {
-			$_ = `youtube-dl --get-url $ytdlArgs "$url2fetch"`;
+			$_ = `youtube-dl $ytdlArgs "$url2fetch"`;
 		}
 		print STDERR "--TRY($try of 1): youtube-dl returned=$_= ARGS=$ytdlArgs=\n"  if ($DEBUG);
 		@ytdldata = split /\r?\n/s;
 		return undef unless (scalar(@ytdldata) > 0);
 
+		#NOTE:  ytdldata is ORDERED:  TITLE?, STREAM-URLS, THEN THE ICON URL, THEN DESCRIPTION!:
 		unless ($ytdldata[0] =~ m#^https?\:\/\/#) {
 			$_ = shift(@ytdldata);
 			$self->{'title'} ||= $_;
 		}
 		$more = 1;
+		@ytStreams = ();
 		while (@ytdldata) {
 			$_ = shift @ytdldata;
 			$more = 0  unless (m#^https?\:\/\/#o);
 			if ($more) {
-				push @{$self->{'streams'}}, $_;
+				push @ytStreams, $_  unless ($uops{'secure'} && $_ !~ /^https/o);
 			} else {
 				$self->{'description'} .= $_ . ' ';
 			}
 		}
-		$self->{'cnt'} = scalar @{$self->{'streams'}};
-		$self->{'iconurl'} = pop(@{$self->{'streams'}})  if ($self->{'cnt'} > 1);
+		$self->{'iconurl'} = pop(@ytStreams)  if ($#ytStreams > 0);
+		push @{$self->{'streams'}}, @ytStreams;
 		$self->{'cnt'} = scalar @{$self->{'streams'}};
 		unless ($try || $self->{'cnt'} > 0) {  #IF NOTHING FOUND, RETRY WITHOUT THE SPECIFIC FILE-FORMAT:
 			$try++;

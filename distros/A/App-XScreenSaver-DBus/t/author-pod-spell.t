@@ -22,7 +22,7 @@ App
 Ceccarelli
 DBus
 Gianni
-InhibitSleep
+Logind
 Saver
 SaverProxy
 XScreenSaver

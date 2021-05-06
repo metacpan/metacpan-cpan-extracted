@@ -730,6 +730,7 @@ _new( class, sourcefunc, sinkfunc, options )
   AstChannel * channel;
   AstFitsChan * fitschan;
   AstXmlChan * xmlchan;
+  AstYamlChan * yamlchan;
   AstStcsChan * stcschan;
   AstMocChan * mocchan;
   bool has_source = 0;
@@ -796,6 +797,12 @@ _new( class, sourcefunc, sinkfunc, options )
                              (void (*)( const char * )) sink, sinkWrap, options );
    )
    if (astOK) setPerlAstObject( RETVAL, (AstObject*)xmlchan );
+  } else if (strstr( class, "YamlChan") != NULL ) {
+   ASTCALL(
+    yamlchan = astYamlChanFor( (const char *(*)()) source, sourceWrap,
+                               (void (*)( const char * )) sink, sinkWrap, options );
+   )
+   if (astOK) setPerlAstObject( RETVAL, (AstObject*)yamlchan );
   } else if (strstr( class, "StcsChan") != NULL ) {
    ASTCALL(
     stcschan = astStcsChanFor( (const char *(*)()) source, sourceWrap,
@@ -2086,6 +2093,17 @@ astMapCopy( this, that )
   ASTCALL(
     astMapCopy( this, that );
   )
+
+void
+astMapCopyEntry( this, key, that, merge )
+  AstKeyMap * this
+  char * key
+  AstKeyMap * that
+  int merge
+ CODE:
+  ASTCALL(
+   astMapCopyEntry( this, key, that, merge );
+ )
 
 void
 astMapPutU( this, key, comment )
@@ -4070,6 +4088,25 @@ astShowMesh( this, format, ttl )
     astShowMesh( this, format, ttl);
   )
 
+int
+astPointInRegion( this, point )
+  AstRegion * this
+  AV * point
+ PREINIT:
+  double * cpoint;
+  int len;
+  int naxes;
+ CODE:
+  naxes = astGetI( this, "Naxes" );
+  len = av_len( point ) + 1;
+  if ( len != naxes ) Perl_croak( aTHX_ "point must contain %d elements", naxes );
+  cpoint = pack1D(newRV_noinc((SV*)point), 'd');
+
+  ASTCALL(
+     RETVAL = astPointInRegion( this, cpoint );
+  )
+ OUTPUT:
+  RETVAL
 
 MODULE = Starlink::AST   PACKAGE = Starlink::AST::Ellipse
 

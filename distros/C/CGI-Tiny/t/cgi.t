@@ -90,8 +90,7 @@ subtest 'Empty response (fixed length)' => sub {
 
   ok length($out_data), 'response rendered';
   my $response = _parse_response($out_data);
-  ok defined($response->{headers}{'content-type'}), 'Content-Type set';
-  is $response->{headers}{'content-type'}, 'application/octet-stream', 'right content type';
+  ok !defined($response->{headers}{'content-type'}), 'Content-Type not set';
   is $response->{headers}{'content-length'}, 0, 'right content length';
   like $response->{status}, qr/^200\b/, '200 response status';
   ok defined($response->{headers}{date}), 'Date set';
@@ -430,7 +429,7 @@ subtest 'Exception after render' => sub {
   ok $headers_rendered, 'headers were rendered';
   ok length($out_data), 'response rendered';
   my $response = _parse_response($out_data);
-  ok defined($response->{headers}{'content-type'}), 'Content-Type set';
+  ok !defined($response->{headers}{'content-type'}), 'Content-Type not set';
   is $response->{headers}{'content-length'}, 0, 'right Content-Length';
   like $response->{status}, qr/^200\b/, '200 response status';
 };
@@ -483,8 +482,7 @@ subtest 'Not found' => sub {
 
   ok length($out_data), 'response rendered';
   my $response = _parse_response($out_data);
-  ok defined($response->{headers}{'content-type'}), 'Content-Type set';
-  like $response->{headers}{'content-type'}, qr/^text\/plain/i, 'right content type';
+  ok !defined($response->{headers}{'content-type'}), 'Content-Type not set';
   is $response->{headers}{'content-length'}, 0, 'right Content-Length';
   like $response->{status}, qr/^404\b/, '404 response status';
   ok !length($response->{body}), 'empty response body';
@@ -539,6 +537,56 @@ subtest 'Data response (multiple renders)' => sub {
   ok !defined($response->{headers}{'content-length'}), 'no Content-Length set';
   like $response->{status}, qr/^200\b/, '200 response status';
   is $response->{body}, $data . $data, 'right response body';
+};
+
+subtest 'Data response (fixed length HEAD)' => sub {
+  local @ENV{@env_keys} = ('')x@env_keys;
+  local $ENV{PATH_INFO} = '/';
+  local $ENV{REQUEST_METHOD} = 'HEAD';
+  local $ENV{SCRIPT_NAME} = '/';
+  local $ENV{SERVER_PROTOCOL} = 'HTTP/1.0';
+  open my $in_fh, '<', \(my $in_data = '') or die "failed to open handle for input: $!";
+  open my $out_fh, '>', \my $out_data or die "failed to open handle for output: $!";
+
+  my $data = "\x01\x02\x03\x04\r\n\xFF";
+  cgi {
+    $_->set_input_handle($in_fh);
+    $_->set_output_handle($out_fh);
+    $_->render(data => $data);
+  };
+
+  ok length($out_data), 'response rendered';
+  my $response = _parse_response($out_data);
+  ok !defined($response->{headers}{'content-type'}), 'Content-Type not set';
+  is $response->{headers}{'content-length'}, 0, 'right content length';
+  like $response->{status}, qr/^200\b/, '200 response status';
+  is $response->{body}, '', 'empty response body';
+};
+
+subtest 'Data response (multiple renders HEAD)' => sub {
+  local @ENV{@env_keys} = ('')x@env_keys;
+  local $ENV{PATH_INFO} = '/';
+  local $ENV{REQUEST_METHOD} = 'HEAD';
+  local $ENV{SCRIPT_NAME} = '/';
+  local $ENV{SERVER_PROTOCOL} = 'HTTP/1.0';
+  open my $in_fh, '<', \(my $in_data = '') or die "failed to open handle for input: $!";
+  open my $out_fh, '>', \my $out_data or die "failed to open handle for output: $!";
+
+  my $data = "\x01\x02\x03\x04\r\n\xFF";
+  cgi {
+    $_->set_input_handle($in_fh);
+    $_->set_output_handle($out_fh);
+    $_->render_chunk(data => $data);
+    $_->render_chunk(data => $data);
+  };
+
+  ok length($out_data), 'response rendered';
+  my $response = _parse_response($out_data);
+  ok defined($response->{headers}{'content-type'}), 'Content-Type set';
+  is $response->{headers}{'content-type'}, 'application/octet-stream', 'right content type';
+  ok !defined($response->{headers}{'content-length'}), 'no Content-Length set';
+  like $response->{status}, qr/^200\b/, '200 response status';
+  is $response->{body}, '', 'empty response body';
 };
 
 subtest 'File response' => sub {
@@ -940,8 +988,7 @@ subtest 'Reset response headers' => sub {
 
   ok length($out_data), 'response rendered';
   my $response = _parse_response($out_data);
-  ok defined($response->{headers}{'content-type'}), 'Content-Type set';
-  is $response->{headers}{'content-type'}, 'application/octet-stream', 'default content type';
+  ok !defined($response->{headers}{'content-type'}), 'Content-Type not set';
   ok !defined $response->{headers}{'content-disposition'}, 'Content-Disposition not set';
   like $response->{status}, qr/^200\b/, '200 response status';
   ok !defined $response->{headers}{'x-test'}, 'custom headers reset';
@@ -973,7 +1020,7 @@ subtest 'Query parameters' => sub {
 
   ok length($out_data), 'response rendered';
   my $response = _parse_response($out_data);
-  ok defined($response->{headers}{'content-type'}), 'Content-Type set';
+  ok defined($response->{headers}{date}), 'Date set';
   like $response->{status}, qr/^200\b/, '200 response status';
   is_deeply $params, \@query_pairs, 'right query pairs';
   is_deeply $param_names, ['c', 'b', '☃'], 'right query param names';
@@ -984,7 +1031,7 @@ subtest 'Query parameters' => sub {
 subtest 'Body parameters' => sub {
   local @ENV{@env_keys} = ('')x@env_keys;
   local $ENV{PATH_INFO} = '/';
-  local $ENV{REQUEST_METHOD} = 'GET';
+  local $ENV{REQUEST_METHOD} = 'POST';
   local $ENV{SCRIPT_NAME} = '/';
   local $ENV{SERVER_PROTOCOL} = 'HTTP/1.0';
   my $body_string = 'c=42&b=1+2%26&%E2%98%83=%25&c=foo';
@@ -1007,7 +1054,7 @@ subtest 'Body parameters' => sub {
 
   ok length($out_data), 'response rendered';
   my $response = _parse_response($out_data);
-  ok defined($response->{headers}{'content-type'}), 'Content-Type set';
+  ok defined($response->{headers}{date}), 'Date set';
   like $response->{status}, qr/^200\b/, '200 response status';
   is_deeply $params, \@body_pairs, 'right body pairs';
   is_deeply $param_names, ['c', 'b', '☃'], 'right body param names';
@@ -1018,7 +1065,7 @@ subtest 'Body parameters' => sub {
 subtest 'Multipart body' => sub {
   local @ENV{@env_keys} = ('')x@env_keys;
   local $ENV{PATH_INFO} = '/';
-  local $ENV{REQUEST_METHOD} = 'GET';
+  local $ENV{REQUEST_METHOD} = 'POST';
   local $ENV{SCRIPT_NAME} = '/';
   local $ENV{SERVER_PROTOCOL} = 'HTTP/1.0';
   my $utf8_snowman = encode 'UTF-8', '☃';
@@ -1091,7 +1138,7 @@ EOB
 
   ok length($out_data), 'response rendered';
   my $response = _parse_response($out_data);
-  ok defined($response->{headers}{'content-type'}), 'Content-Type set';
+  ok defined($response->{headers}{date}), 'Date set';
   like $response->{status}, qr/^200\b/, '200 response status';
 
   my @files;
@@ -1141,7 +1188,7 @@ EOB
 subtest 'Multipart body read into memory' => sub {
   local @ENV{@env_keys} = ('')x@env_keys;
   local $ENV{PATH_INFO} = '/';
-  local $ENV{REQUEST_METHOD} = 'GET';
+  local $ENV{REQUEST_METHOD} = 'POST';
   local $ENV{SCRIPT_NAME} = '/';
   local $ENV{SERVER_PROTOCOL} = 'HTTP/1.0';
   my $utf8_snowman = encode 'UTF-8', '☃!';
@@ -1180,7 +1227,7 @@ EOB
 
   ok length($out_data), 'response rendered';
   my $response = _parse_response($out_data);
-  ok defined($response->{headers}{'content-type'}), 'Content-Type set';
+  ok defined($response->{headers}{date}), 'Date set';
   like $response->{status}, qr/^200\b/, '200 response status';
   is $body, $body_string, 'right body content bytes';
 
@@ -1210,7 +1257,7 @@ EOB
 subtest 'Empty multipart body' => sub {
   local @ENV{@env_keys} = ('')x@env_keys;
   local $ENV{PATH_INFO} = '/';
-  local $ENV{REQUEST_METHOD} = 'GET';
+  local $ENV{REQUEST_METHOD} = 'POST';
   local $ENV{SCRIPT_NAME} = '/';
   local $ENV{SERVER_PROTOCOL} = 'HTTP/1.0';
   my $body_string = <<"EOB";
@@ -1244,7 +1291,7 @@ EOB
 
   ok length($out_data), 'response rendered';
   my $response = _parse_response($out_data);
-  ok defined($response->{headers}{'content-type'}), 'Content-Type set';
+  ok defined($response->{headers}{date}), 'Date set';
   like $response->{status}, qr/^200\b/, '200 response status';
   is_deeply $parts, [], 'no multipart body parts';
   is_deeply $params, [], 'no multipart body params';
@@ -1256,7 +1303,7 @@ EOB
 subtest 'Malformed multipart body' => sub {
   local @ENV{@env_keys} = ('')x@env_keys;
   local $ENV{PATH_INFO} = '/';
-  local $ENV{REQUEST_METHOD} = 'GET';
+  local $ENV{REQUEST_METHOD} = 'POST';
   local $ENV{SCRIPT_NAME} = '/';
   local $ENV{SERVER_PROTOCOL} = 'HTTP/1.0';
   my $body_string = <<"EOB";
@@ -1282,14 +1329,14 @@ EOB
   ok defined($error), 'error logged';
   ok length($out_data), 'response rendered';
   my $response = _parse_response($out_data);
-  ok defined($response->{headers}{'content-type'}), 'Content-Type set';
+  ok defined($response->{headers}{date}), 'Date set';
   like $response->{status}, qr/^400\b/, '400 response status';
 };
 
 subtest 'Unterminated multipart body' => sub {
   local @ENV{@env_keys} = ('')x@env_keys;
   local $ENV{PATH_INFO} = '/';
-  local $ENV{REQUEST_METHOD} = 'GET';
+  local $ENV{REQUEST_METHOD} = 'POST';
   local $ENV{SCRIPT_NAME} = '/';
   local $ENV{SERVER_PROTOCOL} = 'HTTP/1.0';
   my $body_string = <<"EOB";
@@ -1315,14 +1362,14 @@ EOB
   ok defined($error), 'error logged';
   ok length($out_data), 'response rendered';
   my $response = _parse_response($out_data);
-  ok defined($response->{headers}{'content-type'}), 'Content-Type set';
+  ok defined($response->{headers}{date}), 'Date set';
   like $response->{status}, qr/^400\b/, '400 response status';
 };
 
 subtest 'Body JSON' => sub {
   local @ENV{@env_keys} = ('')x@env_keys;
   local $ENV{PATH_INFO} = '/';
-  local $ENV{REQUEST_METHOD} = 'GET';
+  local $ENV{REQUEST_METHOD} = 'POST';
   local $ENV{SCRIPT_NAME} = '/';
   local $ENV{SERVER_PROTOCOL} = 'HTTP/1.0';
   my $body_hash = {c => [42, 'foo'], b => '1 2&', '☃' => '%'};
@@ -1342,7 +1389,7 @@ subtest 'Body JSON' => sub {
 
   ok length($out_data), 'response rendered';
   my $response = _parse_response($out_data);
-  ok defined($response->{headers}{'content-type'}), 'Content-Type set';
+  ok defined($response->{headers}{date}), 'Date set';
   like $response->{status}, qr/^200\b/, '200 response status';
   is_deeply $json_data, $body_hash, 'right body JSON';
 };
@@ -1361,7 +1408,7 @@ subtest 'Request meta-variables and headers' => sub {
   local $ENV{REMOTE_HOST} = 'localhost';
   local $ENV{REMOTE_IDENT} = 'somebody';
   local $ENV{REMOTE_USER} = 'user';
-  local $ENV{REQUEST_METHOD} = 'GET';
+  local $ENV{REQUEST_METHOD} = 'POST';
   local $ENV{SCRIPT_NAME} = '/test.cgi';
   local $ENV{SERVER_NAME} = 'localhost';
   local $ENV{SERVER_PORT} = '80';
@@ -1387,7 +1434,7 @@ subtest 'Request meta-variables and headers' => sub {
 
   ok length($out_data), 'response rendered';
   my $response = _parse_response($out_data);
-  ok defined($response->{headers}{'content-type'}), 'Content-Type set';
+  ok defined($response->{headers}{date}), 'Date set';
   like $response->{status}, qr/^200\b/, '200 response status';
   is $vars{auth_type}, 'Basic', 'right AUTH_TYPE';
   is $vars{content_length}, length($text), 'right CONTENT_LENGTH';
@@ -1400,13 +1447,13 @@ subtest 'Request meta-variables and headers' => sub {
   is $vars{remote_host}, 'localhost', 'right REMOTE_HOST';
   is $vars{remote_ident}, 'somebody', 'right REMOTE_IDENT';
   is $vars{remote_user}, 'user', 'right REMOTE_USER';
-  is $vars{request_method}, 'GET', 'right REQUEST_METHOD';
+  is $vars{request_method}, 'POST', 'right REQUEST_METHOD';
   is $vars{script_name}, '/test.cgi', 'right SCRIPT_NAME';
   is $vars{server_name}, 'localhost', 'right SERVER_NAME';
   is $vars{server_port}, '80', 'right SERVER_PORT';
   is $vars{server_protocol}, 'HTTP/1.0', 'right SERVER_PROTOCOL';
   is $vars{server_software}, "CGI::Tiny/$CGI::Tiny::VERSION", 'right SERVER_SOFTWARE';
-  is $vars{method}, 'GET', 'right method';
+  is $vars{method}, 'POST', 'right method';
   is $vars{path}, '/foo', 'right path';
   is $vars{query}, 'foo=bar', 'right query';
   is $headers->{authorization}, "Basic $auth_str", 'right Authorization header';
@@ -1440,7 +1487,7 @@ subtest 'Cookies' => sub {
 
   ok length($out_data), 'response rendered';
   my $response = _parse_response($out_data);
-  ok defined($response->{headers}{'content-type'}), 'Content-Type set';
+  ok defined($response->{headers}{date}), 'Date set';
   like $response->{status}, qr/^200\b/, '200 response status';
   is_deeply $cookies, [['a', 'b'], ['c', 42], ['x', ''], ['a', 'c']], 'right cookies';
   is_deeply $cookie_names, ['a', 'c', 'x'], 'right cookie names';
@@ -1469,8 +1516,7 @@ subtest 'NPH response' => sub {
   ok length($out_data), 'response rendered';
   my $response = _parse_response($out_data, 1);
   like $response->{start_line}, qr/^HTTP\/1.0\b/, 'right start line';
-  ok defined($response->{headers}{'content-type'}), 'Content-Type set';
-  is $response->{headers}{'content-type'}, 'application/octet-stream', 'right content type';
+  ok !defined($response->{headers}{'content-type'}), 'Content-Type not set';
   is $response->{headers}{server}, "CGI::Tiny/$CGI::Tiny::VERSION", 'right Server header';
   like $response->{status}, qr/^200\b/, '200 response status';
   ok defined($response->{headers}{date}), 'Date set';

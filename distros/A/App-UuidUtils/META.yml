@@ -16,15 +16,17 @@ meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: App-UuidUtils
+recommends:
+  Data::UUID: '0'
+  UUID::FFI: '0'
+  UUID::Random::Secure: '0.003'
 requires:
   Crypt::Misc: '0'
   Data::Sah::Compiler::perl::TH::int: '0'
   Data::Sah::Compiler::perl::TH::str: '0'
-  Data::UUID: '0'
-  Log::ger: '0.037'
+  Log::ger: '0.038'
   Perinci::CmdLine::Any: '0'
   Perinci::CmdLine::Lite: '1.827'
-  UUID::Random::Secure: '0.003'
   UUID::Tiny: '0'
   perl: '5.010001'
   strict: '0'
@@ -33,7 +35,7 @@ resources:
   bugtracker: https://github.com/perlancar/perl-App-UuidUtils/issues
   homepage: https://metacpan.org/release/App-UuidUtils
   repository: git://github.com/perlancar/perl-App-UuidUtils.git
-version: '0.030'
+version: '0.031'
 x_Dist_Zilla:
   perl:
     version: '5.030000'
@@ -402,6 +404,14 @@ x_Dist_Zilla:
           phase: runtime
           type: requires
       name: Prereqs
+      version: '6.012'
+    -
+      class: Dist::Zilla::Plugin::Prereqs
+      config:
+        Dist::Zilla::Plugin::Prereqs:
+          phase: runtime
+          type: recommends
+      name: RuntimeRecommends
       version: '6.012'
     -
       class: Dist::Zilla::Plugin::Prereqs

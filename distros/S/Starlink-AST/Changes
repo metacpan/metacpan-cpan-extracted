@@ -1,5 +1,9 @@
 Revision history for Starlink::AST
 
+3.01 2021-05-05
+    - Update to AST version 9.2.4
+    - Add support for YamlChan, astMapCopyEntry and astPointInRegion
+
 3.00 2019-10-03
     - Update to AST version 9.0.0 (with ERFA 1.3.0 and PAL 0.9.7)
     - Add support for several new features such as ChebyMap, FitsTable,

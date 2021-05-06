@@ -7,7 +7,7 @@ META.yml
 Makefile.PL
 cpanfile
 lib/App/XScreenSaver/DBus.pm
-lib/App/XScreenSaver/DBus/InhibitSleep.pm
+lib/App/XScreenSaver/DBus/Logind.pm
 lib/App/XScreenSaver/DBus/Saver.pm
 lib/App/XScreenSaver/DBus/SaverProxy.pm
 perlcritic.rc

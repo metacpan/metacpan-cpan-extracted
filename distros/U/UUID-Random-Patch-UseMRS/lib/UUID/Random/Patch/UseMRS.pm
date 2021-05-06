@@ -1,6 +1,6 @@
 package UUID::Random::Patch::UseMRS;
 
-our $VERSION = '0.02'; # VERSION
+our $VERSION = '0.030'; # VERSION
 
 require Math::Random::Secure;
 
@@ -26,7 +26,7 @@ UUID::Random::Patch::UseMRS - Make UUID::Random use Math::Random::Secure's rand(
 
 =head1 VERSION
 
-This document describes version 0.02 of UUID::Random::Patch::UseMRS (from Perl distribution UUID-Random-Patch-UseMRS), released on 2021-01-24.
+This document describes version 0.030 of UUID::Random::Patch::UseMRS (from Perl distribution UUID-Random-Patch-UseMRS), released on 2021-01-24.
 
 =head1 SYNOPSIS
 

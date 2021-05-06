@@ -7,9 +7,11 @@ META.yml
 Makefile.PL
 README
 dist.ini
+lib/Code/Includable/Tree/FromObjArray.pm
 lib/Code/Includable/Tree/FromStruct.pm
 lib/Code/Includable/Tree/NodeMethods.pm
 lib/Role/TinyCommons/Tree.pm
+lib/Role/TinyCommons/Tree/FromObjArray.pm
 lib/Role/TinyCommons/Tree/FromStruct.pm
 lib/Role/TinyCommons/Tree/Node.pm
 lib/Role/TinyCommons/Tree/NodeMethods.pm

@@ -5,7 +5,7 @@ NAME
 
 VERSION
 
-    Version 1.03
+    Version 1.05
 
 SYNOPSIS
 
@@ -60,6 +60,10 @@ SUBROUTINES/METHODS
     accepts a single cookie object as the first parameter and adds it to
     the current cookie jar. This method returns itself to aid in chaining
     methods.
+
+    This method throws an exception if you try to add a cookie for a
+    different domain than the current document
+    <https://developer.mozilla.org/en-US/docs/Web/WebDriver/Errors/InvalidCookieDomain>.
 
  add_header
 
@@ -182,7 +186,7 @@ SUBROUTINES/METHODS
 
  browser_version
 
-    This method returns version of firefox.
+    This method returns the current version of firefox.
 
  bye
 
@@ -485,7 +489,9 @@ SUBROUTINES/METHODS
             $element->type('Test::More');
         }
 
-    If no elements are found, a not found exception will be thrown.
+    If no elements are found, a not found exception will be thrown. For the
+    same functionality that returns undef if no elements are found, see the
+    has method.
 
  find_id
 
@@ -509,7 +515,9 @@ SUBROUTINES/METHODS
             $element->type('Test::More');
         }
 
-    If no elements are found, a not found exception will be thrown.
+    If no elements are found, a not found exception will be thrown. For the
+    same functionality that returns undef if no elements are found, see the
+    has_id method.
 
  find_name
 
@@ -529,7 +537,9 @@ SUBROUTINES/METHODS
             $element->type('Test::More');
         }
 
-    If no elements are found, a not found exception will be thrown.
+    If no elements are found, a not found exception will be thrown. For the
+    same functionality that returns undef if no elements are found, see the
+    has_name method.
 
  find_class
 
@@ -552,7 +562,9 @@ SUBROUTINES/METHODS
             $element->type('Test::More');
         }
 
-    If no elements are found, a not found exception will be thrown.
+    If no elements are found, a not found exception will be thrown. For the
+    same functionality that returns undef if no elements are found, see the
+    has_class method.
 
  find_selector
 
@@ -575,7 +587,9 @@ SUBROUTINES/METHODS
             $element->type('Test::More');
         }
 
-    If no elements are found, a not found exception will be thrown.
+    If no elements are found, a not found exception will be thrown. For the
+    same functionality that returns undef if no elements are found, see the
+    has_selector method.
 
  find_tag
 
@@ -597,7 +611,9 @@ SUBROUTINES/METHODS
             # do something
         }
 
-    If no elements are found, a not found exception will be thrown.
+    If no elements are found, a not found exception will be thrown. For the
+    same functionality that returns undef if no elements are found, see the
+    has_tag method.
 
  find_link
 
@@ -618,7 +634,9 @@ SUBROUTINES/METHODS
             $element->click();
         }
 
-    If no elements are found, a not found exception will be thrown.
+    If no elements are found, a not found exception will be thrown. For the
+    same functionality that returns undef if no elements are found, see the
+    has_link method.
 
  find_partial
 
@@ -639,7 +657,9 @@ SUBROUTINES/METHODS
             $element->click();
         }
 
-    If no elements are found, a not found exception will be thrown.
+    If no elements are found, a not found exception will be thrown. For the
+    same functionality that returns undef if no elements are found, see the
+    has_partial method.
 
  forward
 
@@ -703,6 +723,166 @@ SUBROUTINES/METHODS
         foreach my $entry ($har->entries()) {
             say $entry->request()->url() . " spent " . $entry->timings()->connect() . " ms establishing a TCP connection";
         }
+
+ has
+
+    accepts an xpath expression <https://en.wikipedia.org/wiki/XPath> as
+    the first parameter and returns the first element that matches this
+    expression.
+
+    This method is subject to the implicit timeout, which, by default is 0
+    seconds.
+
+        use Firefox::Marionette();
+    
+        my $firefox = Firefox::Marionette->new()->go('https://metacpan.org/');
+    
+        if (my $element = $firefox->has('//input[@id="search-input"]')) {
+            $element->type('Test::More');
+        }
+
+    If no elements are found, this method will return undef. For the same
+    functionality that throws a not found exception, see the find method.
+
+ has_id
+
+    accepts an id
+    <https://developer.mozilla.org/en-US/docs/Web/HTML/Global_attributes/id>
+    as the first parameter and returns the first element with a matching
+    'id' property.
+
+    This method is subject to the implicit timeout, which, by default is 0
+    seconds.
+
+        use Firefox::Marionette();
+    
+        my $firefox = Firefox::Marionette->new()->go('https://metacpan.org/');
+    
+        if (my $element = $firefox->has_id('search-input')) {
+            $element->type('Test::More');
+        }
+
+    If no elements are found, this method will return undef. For the same
+    functionality that throws a not found exception, see the find_id
+    method.
+
+ has_name
+
+    This method returns the first element with a matching 'name' property.
+
+    This method is subject to the implicit timeout, which, by default is 0
+    seconds.
+
+        use Firefox::Marionette();
+    
+        my $firefox = Firefox::Marionette->new()->go('https://metacpan.org/');
+        if (my $element = $firefox->has_name('q')) {
+            $element->type('Test::More');
+        }
+
+    If no elements are found, this method will return undef. For the same
+    functionality that throws a not found exception, see the find_name
+    method.
+
+ has_class
+
+    accepts a class name
+    <https://developer.mozilla.org/en-US/docs/Web/HTML/Global_attributes/class>
+    as the first parameter and returns the first element with a matching
+    'class' property.
+
+    This method is subject to the implicit timeout, which, by default is 0
+    seconds.
+
+        use Firefox::Marionette();
+    
+        my $firefox = Firefox::Marionette->new()->go('https://metacpan.org/');
+        if (my $element = $firefox->has_class('form-control home-search-input')) {
+            $element->type('Test::More');
+        }
+
+    If no elements are found, this method will return undef. For the same
+    functionality that throws a not found exception, see the find_class
+    method.
+
+ has_selector
+
+    accepts a CSS Selector
+    <https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Selectors> as the
+    first parameter and returns the first element that matches that
+    selector.
+
+    This method is subject to the implicit timeout, which, by default is 0
+    seconds.
+
+        use Firefox::Marionette();
+    
+        my $firefox = Firefox::Marionette->new()->go('https://metacpan.org/');
+        if (my $element = $firefox->has_selector('input.home-search-input')) {
+            $element->type('Test::More');
+        }
+
+    If no elements are found, this method will return undef. For the same
+    functionality that throws a not found exception, see the find_selector
+    method.
+
+ has_tag
+
+    accepts a tag name
+    <https://developer.mozilla.org/en-US/docs/Web/API/Element/tagName> as
+    the first parameter and returns the first element with this tag name.
+
+    This method is subject to the implicit timeout, which, by default is 0
+    seconds.
+
+        use Firefox::Marionette();
+    
+        my $firefox = Firefox::Marionette->new()->go('https://metacpan.org/');
+        if (my $element = $firefox->has_tag('input')) {
+            # do something
+        }
+
+    If no elements are found, this method will return undef. For the same
+    functionality that throws a not found exception, see the find_tag
+    method.
+
+ has_link
+
+    accepts a text string as the first parameter and returns the first link
+    element that has a matching link text.
+
+    This method is subject to the implicit timeout, which, by default is 0
+    seconds.
+
+        use Firefox::Marionette();
+    
+        my $firefox = Firefox::Marionette->new()->go('https://metacpan.org/');
+        if (my $element = $firefox->has_link('API')) {
+            $element->click();
+        }
+
+    If no elements are found, this method will return undef. For the same
+    functionality that throws a not found exception, see the find_link
+    method.
+
+ has_partial
+
+    accepts a text string as the first parameter and returns the first link
+    element that has a partially matching link text.
+
+    This method is subject to the implicit timeout, which, by default is 0
+    seconds.
+
+        use Firefox::Marionette();
+    
+        my $firefox = Firefox::Marionette->new()->go('https://metacpan.org/');
+        if (my $element = $firefox->find_partial('AP')) {
+            $element->click();
+        }
+
+    If no elements are found, this method will return undef. For the same
+    functionality that throws a not found exception, see the find_partial
+    method.
 
  html
 
@@ -782,17 +962,29 @@ SUBROUTINES/METHODS
  is_displayed
 
     accepts an element as the first parameter. This method returns true or
-    false depending on if the element is displayed.
+    false depending on if the element is displayed
+    <https://firefox-source-docs.mozilla.org/testing/marionette/internals/interaction.html#interaction.isElementDisplayed>.
 
  is_enabled
 
     accepts an element as the first parameter. This method returns true or
-    false depending on if the element is enabled.
+    false depending on if the element is enabled
+    <https://w3c.github.io/webdriver/#is-element-enabled>.
 
  is_selected
 
     accepts an element as the first parameter. This method returns true or
-    false depending on if the element is selected.
+    false depending on if the element is selected
+    <https://w3c.github.io/webdriver/#dfn-is-element-selected>. Note that
+    this method only makes sense for checkbox
+    <https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input/checkbox>
+    or radio
+    <https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input/radio>
+    inputs or option
+    <https://developer.mozilla.org/en-US/docs/Web/HTML/Element/option>
+    elements in a select
+    <https://developer.mozilla.org/en-US/docs/Web/HTML/Element/select>
+    dropdown.
 
  json
 
@@ -1172,6 +1364,10 @@ SUBROUTINES/METHODS
         if ($firefox->script('return window.find("lucky");')) {
             # luckily!
         }
+    
+        my $search_input = $firefox->find_by_id('search-input');
+    
+        $firefox->script('arguments[0].style.backgroundColor = "red"', args => [ $search_input ]); # turn the search input box red
 
     The executing javascript is subject to the script timeout, which, by
     default is 30 seconds.
@@ -1236,7 +1432,11 @@ SUBROUTINES/METHODS
         use JSON();
         use v5.10;
     
-        say JSON::decode_json(Firefox::Marionette->new()->go('https://fastapi.metacpan.org/v1/download_url/Firefox::Marionette")->strip())->{version};
+        say JSON::decode_json(Firefox::Marionette->new()->go("https://fastapi.metacpan.org/v1/download_url/Firefox::Marionette")->strip())->{version};
+
+    Note that this method will assume the bytes it receives from the html
+    method are UTF-8 encoded and will translate accordingly, throwing an
+    exception in the process if the bytes are not UTF-8 encoded.
 
  switch_to_frame
 
@@ -1256,7 +1456,10 @@ SUBROUTINES/METHODS
  tag_name
 
     accepts a Firefox::Marionette::Element object as the first parameter
-    and returns the relevant tag name. For example 'a' or 'input'.
+    and returns the relevant tag name. For example 'a
+    <https://developer.mozilla.org/en-US/docs/Web/HTML/Element/a>' or
+    'input
+    <https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input>'.
 
  text
 
@@ -1269,7 +1472,9 @@ SUBROUTINES/METHODS
 
  title
 
-    returns the current title of the window.
+    returns the current title
+    <https://developer.mozilla.org/en-US/docs/Web/HTML/Element/title> of
+    the window.
 
  type
 
@@ -1327,9 +1532,19 @@ SUBROUTINES/METHODS
 
     returns the current window's type. This should be 'navigator:browser'.
 
- xvfb
+ xvfb_pid
 
     returns the pid of the xvfb process if it exists.
+
+ xvfb_display
+
+    returns the value for the DISPLAY environment variable if one has been
+    generated for the xvfb environment.
+
+ xvfb_xauthority
+
+    returns the value for the XAUTHORITY environment variable if one has
+    been generated for the xvfb environment
 
 REMOTE AUTOMATION OF FIREFOX VIA SSH
 

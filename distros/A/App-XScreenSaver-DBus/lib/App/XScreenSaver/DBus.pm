@@ -4,10 +4,10 @@ use Moo;
 use experimental qw(signatures postderef);
 use Net::DBus::Reactor;
 use Log::Any;
-use App::XScreenSaver::DBus::InhibitSleep;
+use App::XScreenSaver::DBus::Logind;
 use App::XScreenSaver::DBus::Saver;
-our $VERSION = '1.0.2'; # VERSION
-# ABSTRACT: main application class
+our $VERSION = '1.0.3'; # VERSION
+# ABSTRACT: tie xscreensaver into dbus
 
 
 has reactor => (
@@ -16,9 +16,9 @@ has reactor => (
 );
 
 
-has inhibit_sleep => (
+has logind => (
     is => 'lazy',
-    builder => sub { App::XScreenSaver::DBus::InhibitSleep->new() },
+    builder => sub { App::XScreenSaver::DBus::Logind->new() },
 );
 
 
@@ -34,7 +34,7 @@ has log => ( is => 'lazy', builder => sub { Log::Any->get_logger } );
 
 
 sub run($self) {
-    $self->inhibit_sleep->start();
+    $self->logind->start();
     $self->saver->start();
     $self->reactor->run;
 }
@@ -49,11 +49,11 @@ __END__
 
 =head1 NAME
 
-App::XScreenSaver::DBus - main application class
+App::XScreenSaver::DBus - tie xscreensaver into dbus
 
 =head1 VERSION
 
-version 1.0.2
+version 1.0.3
 
 =head1 SYNOPSIS
 
@@ -66,9 +66,9 @@ version 1.0.2
 
 the event loop
 
-=head2 C<inhibit_sleep>
+=head2 C<logind>
 
-instance of L<< C<App::XScreenSaver::DBus::InhibitSleep> >>.
+instance of L<< C<App::XScreenSaver::DBus::Logind> >>.
 
 =head2 C<saver>
 

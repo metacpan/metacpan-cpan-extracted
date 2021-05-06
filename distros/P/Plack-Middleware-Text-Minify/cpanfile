@@ -3,7 +3,7 @@
 
 requires "Plack::Middleware" => "0";
 requires "Ref::Util" => "0";
-requires "Text::Minify::XS" => "v0.3.6";
+requires "Text::Minify::XS" => "v0.4.0";
 requires "parent" => "0";
 requires "perl" => "v5.9.3";
 requires "strict" => "0";
@@ -46,4 +46,5 @@ on 'develop' => sub {
   requires "Test::Pod::LinkCheck" => "0";
   requires "Test::Portability::Files" => "0";
   requires "Test::TrailingSpace" => "0.0203";
+  requires "Test::Vars" => "0.015";
 };

@@ -31,9 +31,19 @@ sub get_children {
     }
 }
 
-sub set_children {
+sub get_children_arrayref {
     my $self = shift;
     $self->{children};
+}
+
+sub get_children_list {
+    my $self = shift;
+    @{ $self->{children} };
+}
+
+sub set_children {
+    my $self = shift;
+    $self->{children} = $_[0];
 }
 
 sub get_id {

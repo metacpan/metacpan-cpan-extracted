@@ -2,8 +2,8 @@ NAME
     App::UuidUtils - Command-line utilities related to UUIDs
 
 VERSION
-    This document describes version 0.030 of App::UuidUtils (from Perl
-    distribution App-UuidUtils), released on 2021-01-20.
+    This document describes version 0.031 of App::UuidUtils (from Perl
+    distribution App-UuidUtils), released on 2021-05-06.
 
 DESCRIPTION
     This distribution contains command-line utilities related to UUIDs:

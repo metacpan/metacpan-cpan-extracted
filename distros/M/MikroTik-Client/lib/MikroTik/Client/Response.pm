@@ -22,7 +22,7 @@ sub parse {
         next unless @$words;
 
         while (my $w = shift @$words) {
-            $item->{$1 || $2} = $3 if ($w =~ /^(?:=([^=]+)|(\.tag))=(.*)/);
+            $item->{$1 || $2} = $3 if ($w =~ /^(?:=([^=]+)|(\.tag))=(.*)/s);
         }
     }
 

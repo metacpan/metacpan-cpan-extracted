@@ -429,6 +429,8 @@ Z39.50 record, assigned names that begin with underscores:
 
 =item C<_callNumberSuffix>
 
+-item C<_permanentLocation>
+
 =item C<_holdingsLocation>
 
 =item C<_volume>

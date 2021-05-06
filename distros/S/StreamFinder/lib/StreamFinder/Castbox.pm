@@ -103,7 +103,7 @@ One or more stream URLs can be returned for each podcast.
 
 =over 4
 
-=item B<new>(I<url> [, I<-debug> [ => 0|1|2 ] ... ])
+=item B<new>(I<url> [, I<-secure> [ => 0|1 ]] [, I<-debug> [ => 0|1|2 ] ... ])
 
 Accepts a www.castbox.com podcast URL and creates and returns a 
 a new podcast object, or I<undef> if the URL is not a valid podcast, or no 
@@ -113,6 +113,11 @@ https://castbox.fm/channel/idB<channel-id>
 as I know of no way to look up a podcast on Castbox with just an episode ID.
 If no I<episode-id> is specified, the first (latest) episode for the channel 
 is returned.
+
+The optional I<-secure> argument can be either 0 or 1 (I<false> or I<true>).  If 1 
+then only secure ("https://") streams will be returned.
+
+DEFAULT I<-secure> is 0 (false) - return all streams (http and https).
 
 =item $podcast->B<get>(['playlist'])
 
@@ -344,12 +349,16 @@ sub new
 	push (@userAgentOps, 'agent', 'Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101 Firefox/68.0')
 			unless (defined $uops{'agent'});
 	$uops{'timeout'} = 10  unless (defined $uops{'timeout'});
+	$uops{'secure'} = 0    unless (defined $uops{'secure'});
 	$DEBUG = $uops{'debug'}  if (defined $uops{'debug'});
 
 	while (@_) {
 		if ($_[0] =~ /^\-?debug$/o) {
 			shift;
 			$DEBUG = (defined($_[0]) && $_[0] =~/^[0-9]$/) ? shift : 1;
+		} elsif ($_[0] =~ /^\-?secure$/o) {
+			shift;
+			$uops{'secure'} = (defined $_[0]) ? shift : 1;
 		}
 	}
 	$self->{'id'} = '';
@@ -419,8 +428,11 @@ sub new
 					$stream = $1;
 				}
 				if ($stream && $goodstuff =~ s#\"title\"\:\"([^\"]+)\"##s) {
-					push @epiTitles, $1;
-					push @epiStreams, $stream;
+					my $one = $1;
+					unless ($uops{'secure'} && $stream !~ /^https/o) {
+						push @epiTitles, $one;
+						push @epiStreams, $stream;
+					}
 				}
 			}
 			$html = '';
@@ -445,7 +457,7 @@ sub new
 		my $audiostuff = $1;
 		while ($audiostuff =~ s#\s+src\=\"([^\"]+)\"##s) {
 			my $audiourl = $1;
-			unless ($dups{$audiourl}) {
+			unless ($dups{$audiourl} || ($uops{'secure'} && $audiourl !~ /^https/o)) {
 				push @{$self->{'streams'}}, $audiourl;
 				$self->{'cnt'}++;
 				$dups{$audiourl} = 1;

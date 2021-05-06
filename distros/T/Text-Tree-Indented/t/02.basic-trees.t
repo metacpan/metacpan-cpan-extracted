@@ -21,6 +21,7 @@ binmode(\*STDOUT,'utf8');
 binmode(\*STDERR,'utf8');
 parse_expected_results();
 run_tests();
+run_misc_additional_tests();
 done_testing();
 
 sub run_tests
@@ -33,6 +34,19 @@ sub run_tests
                "check tree '$testname' with style '$style'");
         }
     }
+}
+
+sub run_misc_additional_tests
+{
+
+    my $tree = generate_tree($tests{onelevel});
+    is($tree, $expected{"onelevel/style=boxrule"},
+       "check tree 'onelevel' with no options ref");
+
+    $tree = generate_tree($tests{onelevel}, {});
+    is($tree, $expected{"onelevel/style=boxrule"},
+       "check tree 'onelevel' with style in options ref");
+
 }
 
 sub parse_expected_results

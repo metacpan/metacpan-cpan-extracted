@@ -3,8 +3,8 @@ NAME
     rand()
 
 VERSION
-    This document describes version 0.001 of UUID::Tiny::Patch::UseMRS (from
-    Perl distribution UUID-Tiny-Patch-UseMRS), released on 2020-12-22.
+    This document describes version 0.002 of UUID::Tiny::Patch::UseMRS (from
+    Perl distribution UUID-Tiny-Patch-UseMRS), released on 2021-01-24.
 
 SYNOPSIS
      use UUID::Tiny::Patch::UseMRS;
@@ -34,17 +34,17 @@ BUGS
     to an existing test-file that illustrates the bug or desired feature.
 
 SEE ALSO
-    Math::Random::Secure
+    Math::Random::Secure, UUID::Tiny
 
-    UUID::Tiny
-
-    UUID::Random and UUID::Random::Patch::UseMRS
+    Other ways to generate random (v4) UUIDs: Crypt::Misc,
+    UUID::Random::Secure, UUID::Random::Patch::UseMRS and UUID::Random.
+    Acme::CPANModules::UUID contains reviews and benchmarks of these.
 
 AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2020 by perlancar@cpan.org.
+    This software is copyright (c) 2021, 2020 by perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.
