@@ -20,14 +20,18 @@ my %WriteMakefileArgs = (
   "LICENSE" => "perl",
   "NAME" => "Sub::Genius",
   "PREREQ_PM" => {
-    "FLAT" => "1.0.3",
-    "Parse::RecDescent" => 0
+    "Digest::MD5" => 0,
+    "FLAT" => "1.0.4",
+    "Parse::RecDescent" => 0,
+    "Storable" => 0
   },
   "TEST_REQUIRES" => {
+    "Digest::MD5" => 0,
+    "File::Temp" => 0,
     "Test::Exception" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.08",
+  "VERSION" => "0.11",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -35,8 +39,11 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
-  "FLAT" => "1.0.3",
+  "Digest::MD5" => 0,
+  "FLAT" => "1.0.4",
+  "File::Temp" => 0,
   "Parse::RecDescent" => 0,
+  "Storable" => 0,
   "Test::Exception" => 0,
   "Test::More" => 0
 );

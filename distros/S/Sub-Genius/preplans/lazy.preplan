@@ -1,0 +1,12 @@
+init
+( subA
+    &
+    (
+      subB
+      _DO_LAZY_SEQ_   #<~ this subroutine encapsulates another PRE
+      subC
+    )
+    &
+  subD
+)
+fin

@@ -21,12 +21,16 @@
       },
       "runtime" : {
          "requires" : {
-            "FLAT" : "v1.0.3",
-            "Parse::RecDescent" : "0"
+            "Digest::MD5" : "0",
+            "FLAT" : "v1.0.4",
+            "Parse::RecDescent" : "0",
+            "Storable" : "0"
          }
       },
       "test" : {
          "requires" : {
+            "Digest::MD5" : "0",
+            "File::Temp" : "0",
             "Test::Exception" : "0",
             "Test::More" : "0"
          }
@@ -41,6 +45,6 @@
          "web" : "https://github.com/oodler577/p5-Sub-Genius"
       }
    },
-   "version" : "0.08"
+   "version" : "0.11"
 }
 

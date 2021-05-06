@@ -72454,3 +72454,9 @@ P/PL/PLICEASE/UUID-FFI-0.09.tar.gz
 P/PE/PERLANCAR/UUID-Random-Patch-UseMRS-0.030.tar.gz
 P/PE/PERLANCAR/UUID-Tiny-Patch-UseMRS-0.002.tar.gz
 Q/QE/QEYAST/YuiRestClient-0.1.tar.gz
+E/EX/EXODIST/Test2-Harness-UI-0.000064.tar.gz
+E/ES/ESTRABD/FLAT-1.0.4.tar.gz
+O/OA/OALDERS/libwww-perl-6.54.tar.gz
+P/PL/PLICEASE/NewFangle-0.06.tar.gz
+O/OO/OODLER/Sub-Genius-0.11.tar.gz
+Z/ZO/ZOFFIX/Test-Mojo-Role-SubmitForm-1.004004.tar.gz

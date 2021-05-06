@@ -1,5 +1,8 @@
 Revision history for NewFangle},
 
+0.06      2021-05-06 10:25:40 -0600
+  - Fixed some frankly embarrassing documentation errors (arc++, gh#20)
+
 0.05      2021-04-24 13:08:35 -0600
   - Moved to new GitHub org
   - Add support for Perl 5.14 (gh#19)

@@ -1,5 +1,8 @@
 Revision history for Test-Mojo-Role-SubmitForm
 
+1.004004  2021-05-08
+    - Ignore controls from templates (guillomovitch, #12)
+
 1.004003  2021-03-14
     - Fix incorrect handling of disabled controls (guillomovitch, #11)
 

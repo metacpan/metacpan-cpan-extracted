@@ -27,7 +27,7 @@ name: Test-Mojo-Role-SubmitForm
 provides:
   Test::Mojo::Role::SubmitForm:
     file: lib/Test/Mojo/Role/SubmitForm.pm
-    version: '1.004003'
+    version: '1.004004'
 requires:
   Carp: '0'
   Mojo::Base: '0'
@@ -40,7 +40,7 @@ resources:
   bugtracker: https://github.com/zoffixznet/test-mojo-role-submitform/issues
   homepage: http://metacpan.org/release/Test-Mojo-Role-SubmitForm
   repository: git://github.com/zoffixznet/test-mojo-role-submitform.git
-version: '1.004003'
+version: '1.004004'
 x_Dist_Zilla:
   perl:
     version: '5.032000'
@@ -166,7 +166,7 @@ x_Dist_Zilla:
           Module::Metadata: '1.000037'
           version: '0.006'
       name: '@Author::ZOFFIX/InstallGuide'
-      version: '1.200013'
+      version: '1.200014'
     -
       class: Dist::Zilla::Plugin::ReadmeAnyFromPod
       config:
@@ -308,7 +308,7 @@ x_Dist_Zilla:
           version_by_branch: 0
           version_regexp: (?^:^v(.+)$)
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.29.2
+          git_version: 1.7.10.4
           repo_root: .
       name: '@Author::ZOFFIX/Git::NextVersion'
       version: '2.047'
@@ -349,7 +349,7 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.29.2
+          git_version: 1.7.10.4
           repo_root: .
       name: '@Author::ZOFFIX/Git::Check'
       version: '2.047'
@@ -367,7 +367,7 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.29.2
+          git_version: 1.7.10.4
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -380,11 +380,11 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v1.004003
+          tag: v1.004004
           tag_format: v%V
           tag_message: v%V
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.29.2
+          git_version: 1.7.10.4
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -398,7 +398,7 @@ x_Dist_Zilla:
             - origin
           remotes_must_exist: 1
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.29.2
+          git_version: 1.7.10.4
           repo_root: .
       name: '@Author::ZOFFIX/Git::Push'
       version: '2.047'
@@ -418,7 +418,7 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::Git::Contributors
       config:
         Dist::Zilla::Plugin::Git::Contributors:
-          git_version: 2.29.2
+          git_version: 1.7.10.4
           include_authors: 0
           include_releaser: 1
           order_by: name

@@ -362,14 +362,14 @@ sub new_acyclic_string_generator {
 
 sub get_deepdft_sub {
     my $self = shift;
-    my ( $start, $nodelist_ref, $dflabel_ref, $string_ref, $accepting_ref, $lastDFLabel, $max ) = @_;
+    my ( $start, $nodelist_ref, $dflabel_ref, $string_ref, $accepting_ref, $lastDFLabel, $MAXLEVEL, $delimiter ) = @_;
     my @ret = ();
     my $c1  = ( ref $dflabel_ref eq 'HASH' ) ? @{ $dflabel_ref->{$start} } : 0;
-    if ( $max and $c1 < $max ) {
+    if ( $MAXLEVEL and $c1 < $MAXLEVEL ) {
         push( @{ $dflabel_ref->{$start} }, ++$lastDFLabel );
         foreach my $adjacent ( keys( %{ $nodelist_ref->{$start} } ) ) {
             my $c2 = @{ $dflabel_ref->{$adjacent} };
-            if ( $c2 < $max ) {
+            if ( $c2 < $MAXLEVEL ) {
                 foreach my $symbol ( @{ $nodelist_ref->{$start}{$adjacent} } ) {
                     push( @{$string_ref}, $symbol );
                     my $string_clone  = dclone($string_ref);
@@ -377,7 +377,7 @@ sub get_deepdft_sub {
                     push(
                         @ret,
                         sub {
-                            return $self->get_deepdft_sub( $adjacent, $nodelist_ref, $dflabel_clone, $string_clone, $accepting_ref, $lastDFLabel, $max );
+                            return $self->get_deepdft_sub( $adjacent, $nodelist_ref, $dflabel_clone, $string_clone, $accepting_ref, $lastDFLabel, $MAXLEVEL, $delimiter );
                         }
                     );
                     pop @{$string_ref};
@@ -388,13 +388,14 @@ sub get_deepdft_sub {
     return {
         substack    => [@ret],
         lastDFLabel => $lastDFLabel,
-        string      => ( $self->array_is_subset( [$start], $accepting_ref ) ? join( '', @{$string_ref} ) : undef )
+        string      => ( $self->array_is_subset( [$start], $accepting_ref ) ? join( $delimiter, @{$string_ref} ) : undef )
     };
 }
 
 sub init_deepdft_iterator {
-    my $self        = shift;
-    my $MAXLEVEL    = shift;
+    my ($self, $MAXLEVEL, $delimiter) = @_;
+    $MAXLEVEL       //= 1;
+    $delimiter      //= q{};
     my %dflabel     = ();
     my @string      = ();
     my $lastDFLabel = 0;
@@ -406,7 +407,7 @@ sub init_deepdft_iterator {
 
     # initialize
     my @substack = ();
-    my $r        = $self->get_deepdft_sub( $self->get_starting(), \%nodelist, \%dflabel, \@string, \@accepting, $lastDFLabel, $MAXLEVEL );
+    my $r        = $self->get_deepdft_sub( $self->get_starting(), \%nodelist, \%dflabel, \@string, \@accepting, $lastDFLabel, $MAXLEVEL, $delimiter );
     push( @substack, @{ $r->{substack} } );
     return sub {
         while (1) {
@@ -424,9 +425,8 @@ sub init_deepdft_iterator {
 }
 
 sub new_deepdft_string_generator {
-    my $self     = shift;
-    my $MAXLEVEL = ( @_ ? shift : 1 );
-    return $self->init_deepdft_iterator($MAXLEVEL);
+    my ($self, $MAXLEVEL, $delimiter)  = @_;
+    return $self->init_deepdft_iterator($MAXLEVEL, $delimiter);
 }
 
 1;

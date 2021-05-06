@@ -6,7 +6,7 @@ use FLAT::Regex;
 use FLAT::DFA;
 use Carp;
 
-our $VERSION = q{1.0.3};
+our $VERSION = q{1.0.4};
 
 =head1 NAME
 
@@ -14,15 +14,20 @@ FLAT - Formal Language & Automata Toolkit
 
 =head2 Name Change Possibility
 
-Future releases of this module may very well reflect a name change
-that is considered to me more I<normal> for Perl modules. When this was
-originally written (2006), the original author was not very well versed
-in the idiomatic aspects of C<PERL>.
+Future releases of this module may very well reflect a name change that is
+considered to me more I<normal> for Perl modules. When this was originally
+written (2006) as a homework assignment, the original author was not very
+well versed in the idiomatic aspects of C<PERL>. Shortly after, a friendly
+fellow traveller rewrote it. Since then, this module has patiently sat on
+CPAN waiting for a use. Recently, this use has come in the form of a module
+for managing sequential consistency in Perl C<&> perl - L<Sub::Genius>.
 
 =head1 SYNOPSIS
 
 FLAT.pm is the base class of all regular language objects. For more
-information, see other POD pages.
+information, see other POD pages. It provides full support for the
+I<shuffle> operator, which is useful for expressing the regular interleaving
+of regular languages.
 
 =head1 DESCRIPTION
 

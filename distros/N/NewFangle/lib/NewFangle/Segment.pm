@@ -1,4 +1,4 @@
-package NewFangle::Segment 0.05 {
+package NewFangle::Segment 0.06 {
 
   use strict;
   use warnings;
@@ -6,7 +6,7 @@ package NewFangle::Segment 0.05 {
   use NewFangle::FFI;
   use Carp ();
 
-# ABSTRACT: NewRelic application class
+# ABSTRACT: NewRelic segment class
 
 
   sub transaction { shift->{txn} }
@@ -42,11 +42,11 @@ __END__
 
 =head1 NAME
 
-NewFangle::Segment - NewRelic application class
+NewFangle::Segment - NewRelic segment class
 
 =head1 VERSION
 
-version 0.05
+version 0.06
 
 =head1 SYNOPSIS
 
@@ -57,7 +57,7 @@ version 0.05
 
 =head1 DESCRIPTION
 
-NewRelic transaction class
+NewRelic segment class
 
 =head1 METHODS
 

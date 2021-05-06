@@ -1,0 +1,14 @@
+init
+(
+  ( subA & subB )
+  ( subA & subB )
+  ( subA & subB )
+  ( subA & subB )
+    AU::Nugget    # name space, :: is capture in preprocessing
+  ( subA & subB )
+  ( subA & subB )
+  ( subA & subB )
+  ( subA & subB )
+   A & B & C & D
+)
+fin

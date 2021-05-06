@@ -1,4 +1,4 @@
-package NewFangle::App 0.05 {
+package NewFangle::App 0.06 {
 
   use strict;
   use warnings;
@@ -74,7 +74,7 @@ NewFangle::App - NewRelic application class
 
 =head1 VERSION
 
-version 0.05
+version 0.06
 
 =head1 SYNOPSIS
 

@@ -33,6 +33,7 @@ __DATA__
   <!-- The usual stuff -->
   <input type="text" name="a" value="A">
   <input type="text" name="a_disabled" value="A" disabled>
+  <template><input type="text" name="a_templatized" value="A"></template>
   <input type="checkbox" checked name="b" value="B">
   <input type="checkbox" name="c" value="C">
   <input type="checkbox" checked name="meows" value="42">
@@ -53,8 +54,10 @@ __DATA__
   <select name="n"><option>N</option></select>
   <select name="l"><option selected>L</option></select>
   <select name="l_disabled" disabled><option selected>L</option></select>
+  <template><select name="l_templatized"><option selected>L</option></select></template>
   <textarea name="m">M</textarea>
   <textarea name="m_disabled" disabled>M</textarea>
+  <template><textarea name="m_templatized">M</textarea></template>
   <button name="o" value="O">No!</button>
   <input type="button" name="s" value="S">
   <input type="submit" name="p" value="P">

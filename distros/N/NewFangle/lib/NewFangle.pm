@@ -1,4 +1,4 @@
-package NewFangle 0.05 {
+package NewFangle 0.06 {
 
   use strict;
   use warnings;
@@ -46,12 +46,12 @@ NewFangle - Unofficial Perl NewRelic SDK
 
 =head1 VERSION
 
-version 0.05
+version 0.06
 
 =head1 SYNOPSIS
 
- use NewRelic;
- my $app = NewRelic::App->new('MyApp', $license_key);
+ use NewFangle;
+ my $app = NewFangle::App->new('MyApp', $license_key);
  my $txn = $app->start_transaction('my transaction');
  $txn->end;
 

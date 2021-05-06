@@ -13,3 +13,9 @@ Changes for FLAT
 
 1.0.3         2021-04-24 14:30:52-04:00 America/New_York 
               - added extra characters to cast
+
+1.0.4         2021-04-24 14:30:52-04:00 America/New_York 
+              - string emumeration for acyclical graphs now
+                support the specification of delimiters, which
+                was needed to support L<Sub::Genius>'s "next"
+                method

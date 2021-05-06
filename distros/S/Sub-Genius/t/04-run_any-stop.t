@@ -23,7 +23,7 @@ my $pre = q{
 my $GLOBAL = {};
 
 # Load PRE describing concurrent semantics
-my $final_scope = Sub::Genius->new(preplan => $pre, preprocess => 0 )->run_any(
+my $final_scope = Sub::Genius->new( preplan => $pre, preprocess => 0 )->run_any(
     scope => {
         japh    => [ qw/just Another perl/, q{Hacker,} ],
         curr    => 0,

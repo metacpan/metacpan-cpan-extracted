@@ -21,7 +21,7 @@ end
 };
 
 # Load PRE describing concurrent semantics
-my $sq = Sub::Genius->new(preplan => $pre );
+my $sq = Sub::Genius->new( preplan => $pre );
 
 # 'compile' PRE
 $sq->init_plan;

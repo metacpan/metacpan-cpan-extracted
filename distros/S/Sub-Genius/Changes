@@ -33,3 +33,29 @@ Changes for Sub::Genius
 
 0.08         2021-04-25 14:30:51-05:08 America/New_York
              - cleaned up and reorganized documentation
+             - Note: should have been released as a TRIAL
+
+0.09         2021-04-25 14:30:51-05:09 America/New_York
+             - added caching (on by default)
+             - fixed bug in run_once that unnecessarily
+             called ->next; now next() is only called if
+             ->plan() is not defined
+             - removed mindfa option; if this is desired
+               ->dfa can be manipulated directly,
+               $sq->dfa($sq->dfa->min_dfa->trim_sinks)
+             - added static code gen to stubby
+             - cleaned up stubby POD
+
+0.10         2021-04-25 14:30:51-05:10 America/New_York
+             - refactored stubby to be more easily extended
+               with subcommands; added 'precache' for basically
+               compiling PREs into DFAs ahead of their use; caching
+               documentation was improved
+             - continued refining POD, provided a POC for "lazy linearization",
+               which is another potential approach to solving the fast
+               growing complexity of converting PREs to DFAs
+             - added some more tests 
+
+0.11         2021-04-25 14:30:51-05:11 America/New_York
+             - pinned to FLAT 1.0.4
+             - mark end of "TRIAL" releases

@@ -9,7 +9,7 @@ use_ok q{Sub::Genius};
 # NOTE: subs are implemented such that the end result is
 # the same for any ordering of execution
 
-my $pre = q{
+my $preplan = q{
 begin           # this is a comment
 (               # another comment
 
@@ -23,13 +23,13 @@ end             # this is the end
 };
 
 # Load PRE describing concurrent semantics
-my $sq = Sub::Genius->new(preplan => $pre );
+my $sq = Sub::Genius->new( preplan => $preplan );
 
 # 'compile' PRE
 $sq->init_plan;
 
 my $GLOBAL = {};
-while ( $sq->next ) {
+do {
 
     # run loop-ish
     my $final_scope = $sq->run_once(
@@ -49,7 +49,7 @@ while ( $sq->next ) {
     is_deeply $final_scope->{japh}, $expected_final_scope->{japh}, q{final scope returned after execution properly};
     is_deeply $final_scope->{curr}, $expected_final_scope->{curr}, q{final scope returned after execution properly};
     $GLOBAL = {};
-}
+} while ( $sq->next );
 
 sub begin {
     my $scope = shift;

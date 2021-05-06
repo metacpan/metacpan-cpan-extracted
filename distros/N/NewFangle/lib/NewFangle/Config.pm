@@ -1,4 +1,4 @@
-package NewFangle::Config 0.05 {
+package NewFangle::Config 0.06 {
 
   use strict;
   use warnings;
@@ -48,7 +48,7 @@ NewFangle::Config - NewRelic Configuration class.
 
 =head1 VERSION
 
-version 0.05
+version 0.06
 
 =head1 SYNOPSIS
 

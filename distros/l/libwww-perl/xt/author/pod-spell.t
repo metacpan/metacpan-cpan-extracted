@@ -162,6 +162,7 @@ MacEachern
 Macdonald
 Madsen
 Mailto
+Maischein
 Mann
 Mark
 Marko
@@ -172,6 +173,7 @@ Massjouni
 Mates
 Matthew
 Matyukhin
+Max
 McCauley
 Melchner
 MemberMixin
@@ -312,6 +314,7 @@ bryan
 capoeirab
 cjm
 colin
+corion
 cpan
 data
 david

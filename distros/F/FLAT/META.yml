@@ -15,4 +15,4 @@ meta-spec:
 name: FLAT
 requires:
   Parse::RecDescent: '0'
-version: 1.0.3
+version: 1.0.4

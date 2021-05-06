@@ -1,7 +1,7 @@
 
 
 This archive contains the distribution Sub-Genius,
-version 0.08:
+version 0.11:
 
   Manage concurrent C<Perl> semantics in the uniprocess execution model of C<perl>.
 
