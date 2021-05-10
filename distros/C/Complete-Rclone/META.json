@@ -35,8 +35,9 @@
       "runtime" : {
          "requires" : {
             "Complete::Util" : "0.608",
-            "Config::IOD::Reader" : "0.341",
             "Exporter" : "5.57",
+            "Hash::Subset" : "0.006",
+            "Rclone::Util" : "0",
             "perl" : "5.010001",
             "strict" : "0",
             "warnings" : "0"
@@ -63,7 +64,7 @@
          "web" : "https://github.com/perlancar/perl-Complete-Rclone"
       }
    },
-   "version" : "0.002",
+   "version" : "0.003",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.030002"
@@ -183,7 +184,7 @@
          {
             "class" : "Dist::Zilla::Plugin::PERLANCAR::MetaResources",
             "name" : "@Author::PERLANCAR/PERLANCAR::MetaResources",
-            "version" : "0.040"
+            "version" : "0.043"
          },
          {
             "class" : "Dist::Zilla::Plugin::CheckChangeLog",

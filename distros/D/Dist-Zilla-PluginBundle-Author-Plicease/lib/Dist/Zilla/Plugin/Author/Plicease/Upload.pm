@@ -1,6 +1,6 @@
-package Dist::Zilla::Plugin::Author::Plicease::Upload 2.62 {
+package Dist::Zilla::Plugin::Author::Plicease::Upload 2.63 {
 
-  use 5.014;
+  use 5.020;
   use Moose;
   use Path::Tiny ();
 
@@ -101,7 +101,7 @@ Dist::Zilla::Plugin::Author::Plicease::Upload - Upload a dist to CPAN
 
 =head1 VERSION
 
-version 2.62
+version 2.63
 
 =head1 SYNOPSIS
 

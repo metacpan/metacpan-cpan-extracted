@@ -5,9 +5,10 @@
 use strict;
 use Resque;
 use Getopt::Long::Descriptive;
+use Class::Load;
 
 my $opt = getopt();
-$_->require for @{$opt->module||[]};
+load_class($_) for @{$opt->module||[]};
 
 my $w = Resque->new( redis => $opt->redis )->worker;
 $w->$_($opt->$_) for qw/ interval verbose cant_fork/;
@@ -45,7 +46,7 @@ resque-worker - Executable to run your resque workers
 
 =head1 VERSION
 
-version 0.37
+version 0.38
 
 =head1 SYNOPSIS
 
@@ -63,7 +64,7 @@ Diego Kuperman <diego@freekeylabs.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by Diego Kuperman.
+This software is copyright (c) 2021 by Diego Kuperman.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

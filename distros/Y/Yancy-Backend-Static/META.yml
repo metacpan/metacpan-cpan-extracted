@@ -29,7 +29,7 @@ no_index:
 provides:
   Yancy::Backend::Static:
     file: lib/Yancy/Backend/Static.pm
-    version: '0.014'
+    version: '0.015'
 requires:
   I18N::Langinfo: '0'
   JSON::PP: '0'
@@ -42,7 +42,7 @@ resources:
   bugtracker: https://github.com/preaction/Yancy-Backend-Static/issues
   homepage: http://preaction.me/yancy/
   repository: https://github.com/preaction/Yancy-Backend-Static.git
-version: '0.014'
+version: '0.015'
 x_authority: cpan:PREACTION
 x_contributors:
   - 'Mohammad S Anwar <mohammad.anwar@yahoo.com>'

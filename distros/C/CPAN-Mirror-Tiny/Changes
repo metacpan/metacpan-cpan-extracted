@@ -1,5 +1,9 @@
 Revision history for CPAN-Mirror-Tiny
 
+0.30  2021-05-10 01:28:13 JST
+  - Fix "upload" in CPAN::Mirror::Tiny::Server (tehmoth #8, #10)
+  - Use IPC::Run3 (#11)
+
 0.20  2017-07-15 22:30:29 JST
   - Improve Windows support (#6)
   - Make `cpan-mirror-tiny gen-index` verbose

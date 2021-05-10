@@ -6,7 +6,7 @@ use base qw( Exporter );
 use File::Spec ();
 
 # ABSTRACT: Perl implementation of the which utility as an API
-our $VERSION = '1.24'; # VERSION
+our $VERSION = '1.27'; # VERSION
 
 
 our @EXPORT    = 'which';
@@ -159,7 +159,7 @@ File::Which - Perl implementation of the which utility as an API
 
 =head1 VERSION
 
-version 1.24
+version 1.27
 
 =head1 SYNOPSIS
 
@@ -323,7 +323,7 @@ report of how it went.
 
 Bugs should be reported via the GitHub issue tracker
 
-L<https://github.com/plicease/File-Which/issues>
+L<https://github.com/uperl/File-Which/issues>
 
 For other issues, contact the maintainer.
 

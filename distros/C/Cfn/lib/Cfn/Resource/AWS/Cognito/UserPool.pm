@@ -1,4 +1,4 @@
-# AWS::Cognito::UserPool generated from spec 18.4.0
+# AWS::Cognito::UserPool generated from spec 22.0.0
 use Moose::Util::TypeConstraints;
 
 coerce 'Cfn::Resource::Properties::AWS::Cognito::UserPool',
@@ -155,6 +155,50 @@ package Cfn::Resource::Properties::Object::AWS::Cognito::UserPool::InviteMessage
   has EmailMessage => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has EmailSubject => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has SMSMessage => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+}
+
+subtype 'Cfn::Resource::Properties::AWS::Cognito::UserPool::CustomSMSSender',
+     as 'Cfn::Value';
+
+coerce 'Cfn::Resource::Properties::AWS::Cognito::UserPool::CustomSMSSender',
+  from 'HashRef',
+   via {
+     if (my $f = Cfn::TypeLibrary::try_function($_)) {
+       return $f
+     } else {
+       return Cfn::Resource::Properties::Object::AWS::Cognito::UserPool::CustomSMSSender->new( %$_ );
+     }
+   };
+
+package Cfn::Resource::Properties::Object::AWS::Cognito::UserPool::CustomSMSSender {
+  use Moose;
+  use MooseX::StrictConstructor;
+  extends 'Cfn::Value::TypedValue';
+  
+  has LambdaArn => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has LambdaVersion => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+}
+
+subtype 'Cfn::Resource::Properties::AWS::Cognito::UserPool::CustomEmailSender',
+     as 'Cfn::Value';
+
+coerce 'Cfn::Resource::Properties::AWS::Cognito::UserPool::CustomEmailSender',
+  from 'HashRef',
+   via {
+     if (my $f = Cfn::TypeLibrary::try_function($_)) {
+       return $f
+     } else {
+       return Cfn::Resource::Properties::Object::AWS::Cognito::UserPool::CustomEmailSender->new( %$_ );
+     }
+   };
+
+package Cfn::Resource::Properties::Object::AWS::Cognito::UserPool::CustomEmailSender {
+  use Moose;
+  use MooseX::StrictConstructor;
+  extends 'Cfn::Value::TypedValue';
+  
+  has LambdaArn => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has LambdaVersion => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
 }
 
 subtype 'Cfn::Resource::Properties::AWS::Cognito::UserPool::VerificationMessageTemplate',
@@ -336,8 +380,11 @@ package Cfn::Resource::Properties::Object::AWS::Cognito::UserPool::LambdaConfig 
   extends 'Cfn::Value::TypedValue';
   
   has CreateAuthChallenge => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has CustomEmailSender => (isa => 'Cfn::Resource::Properties::AWS::Cognito::UserPool::CustomEmailSender', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has CustomMessage => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has CustomSMSSender => (isa => 'Cfn::Resource::Properties::AWS::Cognito::UserPool::CustomSMSSender', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has DefineAuthChallenge => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has KMSKeyID => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has PostAuthentication => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has PostConfirmation => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has PreAuthentication => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');

@@ -1,4 +1,4 @@
-# AWS::ECS::Service generated from spec 20.1.0
+# AWS::ECS::Service generated from spec 34.0.0
 use Moose::Util::TypeConstraints;
 
 coerce 'Cfn::Resource::Properties::AWS::ECS::Service',
@@ -19,6 +19,28 @@ package Cfn::Resource::AWS::ECS::Service {
 }
 
 
+
+subtype 'Cfn::Resource::Properties::AWS::ECS::Service::DeploymentCircuitBreaker',
+     as 'Cfn::Value';
+
+coerce 'Cfn::Resource::Properties::AWS::ECS::Service::DeploymentCircuitBreaker',
+  from 'HashRef',
+   via {
+     if (my $f = Cfn::TypeLibrary::try_function($_)) {
+       return $f
+     } else {
+       return Cfn::Resource::Properties::Object::AWS::ECS::Service::DeploymentCircuitBreaker->new( %$_ );
+     }
+   };
+
+package Cfn::Resource::Properties::Object::AWS::ECS::Service::DeploymentCircuitBreaker {
+  use Moose;
+  use MooseX::StrictConstructor;
+  extends 'Cfn::Value::TypedValue';
+  
+  has Enable => (isa => 'Cfn::Value::Boolean', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has Rollback => (isa => 'Cfn::Value::Boolean', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+}
 
 subtype 'Cfn::Resource::Properties::AWS::ECS::Service::AwsVpcConfiguration',
      as 'Cfn::Value';
@@ -283,6 +305,7 @@ package Cfn::Resource::Properties::Object::AWS::ECS::Service::DeploymentConfigur
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
   
+  has DeploymentCircuitBreaker => (isa => 'Cfn::Resource::Properties::AWS::ECS::Service::DeploymentCircuitBreaker', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has MaximumPercent => (isa => 'Cfn::Value::Integer', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has MinimumHealthyPercent => (isa => 'Cfn::Value::Integer', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
 }
@@ -343,13 +366,14 @@ package Cfn::Resource::Properties::AWS::ECS::Service {
   has DeploymentController => (isa => 'Cfn::Resource::Properties::AWS::ECS::Service::DeploymentController', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
   has DesiredCount => (isa => 'Cfn::Value::Integer', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has EnableECSManagedTags => (isa => 'Cfn::Value::Boolean', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
+  has EnableExecuteCommand => (isa => 'Cfn::Value::Boolean', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has HealthCheckGracePeriodSeconds => (isa => 'Cfn::Value::Integer', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has LaunchType => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
   has LoadBalancers => (isa => 'ArrayOfCfn::Resource::Properties::AWS::ECS::Service::LoadBalancer', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
   has NetworkConfiguration => (isa => 'Cfn::Resource::Properties::AWS::ECS::Service::NetworkConfiguration', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has PlacementConstraints => (isa => 'ArrayOfCfn::Resource::Properties::AWS::ECS::Service::PlacementConstraint', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
   has PlacementStrategies => (isa => 'ArrayOfCfn::Resource::Properties::AWS::ECS::Service::PlacementStrategy', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
-  has PlatformVersion => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
+  has PlatformVersion => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has PropagateTags => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
   has Role => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
   has SchedulingStrategy => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');

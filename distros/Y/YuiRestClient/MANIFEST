@@ -19,5 +19,6 @@ lib/YuiRestClient/Widget/Table.pm
 lib/YuiRestClient/Widget/Textbox.pm
 lib/YuiRestClient/Widget/Tree.pm
 MANIFEST			This list of files
+MANIFEST.SKIP
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

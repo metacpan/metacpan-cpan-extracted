@@ -1,9 +1,9 @@
 package App::dateseq;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-01-04'; # DATE
+our $DATE = '2021-01-13'; # DATE
 our $DIST = 'App-dateseq'; # DIST
-our $VERSION = '0.101'; # VERSION
+our $VERSION = '0.102'; # VERSION
 
 use 5.010001;
 use strict;
@@ -95,9 +95,18 @@ _
         },
         limit => {
             summary => 'Only generate a certain amount of numbers',
-            schema => ['int*', min=>1],
+            schema => ['posint*'],
             cmdline_aliases => {n=>{}},
         },
+        limit_yearly => {
+            summary => 'Only output at most this number of dates for each year',
+            schema => ['posint*'],
+        },
+        limit_monthly => {
+            summary => 'Only output at most this number of dates for each month',
+            schema => ['posint*'],
+        },
+        # XXX limit_weekly, limit_daily, limit_hourly, limit_minutely, limit_secondly
         strftime => {
             summary => 'strftime() format for each date',
             description => <<'_',
@@ -206,6 +215,18 @@ _
             'x.doc.max_result_lines' => 5,
         },
         {
+            summary => 'Show the first business day (Mon-Fri) of each month in 2021',
+            src => '[[prog]] 2021-01-01 2021-12-13 --business --limit-monthly 1 -f "%Y-%m-%d(%a)"',
+            src_plang => 'bash',
+            'x.doc.max_result_lines' => 10,
+        },
+        {
+            summary => 'Show the last business day (Mon-Fri) of each month in 2021',
+            src => '[[prog]] 2021-12-31 2021-01-01 -r --business --limit-monthly 1 -f "%Y-%m-%d(%a)"',
+            src_plang => 'bash',
+            'x.doc.max_result_lines' => 10,
+        },
+        {
             summary => 'Show Mondays, Wednesdays, and Fridays between 2015-01-01 and 2015-02-28',
             src => '[[prog]] 2015-01-01 2015-02-28 --include-dow Mo,We,Fr -f "%Y-%m-%d(%a)"',
             src_plang => 'bash',
@@ -233,12 +254,22 @@ _
         },
         {
             summary => 'List non-holidays in 2015 (using Indonesian holidays)',
+            description => <<'_',
+
+See also <prog:dateseq-id> as alternative.
+
+_
             src => 'setop --diff <([[prog]] 2015-01-01 2015-12-31) <(list-id-holidays --year 2015)',
             src_plang => 'bash',
             'x.doc.max_result_lines' => 10,
         },
         {
             summary => 'List non-holidays business days in 2015 (using Indonesian holidays)',
+            description => <<'_',
+
+See also <prog:dateseq-id> as alternative.
+
+_
             src => 'setop --diff <([[prog]] 2015-01-01 2015-12-31 --business) <(list-id-holidays --year 2015)',
             src_plang => 'bash',
             'x.doc.max_result_lines' => 10,
@@ -258,6 +289,7 @@ _
     ],
     links => [
         {url=>'prog:durseq', summary=>'Produce sequence of date durations'},
+        {url=>'prog:dateseq-id', summary=>'A wrapper for dateseq, with built-in support for Indonesian holidays'},
         {url=>'prog:seq'},
         {url=>'prog:seq-pl', summary=>'Perl variant of seq'},
     ],
@@ -301,6 +333,8 @@ sub dateseq {
         );
     }
 
+    my %seen_years;  # key=year (e.g. 2021), val=int
+    my %seen_months; # key=year-mon (e.g. 2021-01), val=int
     my $code_filter = sub {
         my $dt = shift;
         if (defined $args{business}) {
@@ -335,6 +369,20 @@ sub dateseq {
             my $dt_mon = $dt->month;
             return 0 if     grep { $dt_mon == $_ } @{ $args{exclude_month} };
         }
+
+        if ($args{_filter}) {
+            return 0 unless $args{_filter}->($dt, \%args);
+        }
+
+        if ($args{limit_yearly}) {
+            my $key = $dt->year;
+            return 0 if ++$seen_years{$key} > $args{limit_yearly};
+        }
+        if ($args{limit_monthly}) {
+            my $key = $dt->strftime("%Y-%m");
+            return 0 if ++$seen_months{$key} > $args{limit_monthly};
+        }
+
         1;
     };
 
@@ -395,7 +443,7 @@ App::dateseq - Generate a sequence of dates
 
 =head1 VERSION
 
-This document describes version 0.101 of App::dateseq (from Perl distribution App-dateseq), released on 2021-01-04.
+This document describes version 0.102 of App::dateseq (from Perl distribution App-dateseq), released on 2021-01-13.
 
 =head1 FUNCTIONS
 
@@ -462,9 +510,17 @@ Only show dates with these month numbers.
 
 =item * B<increment> => I<duration>
 
-=item * B<limit> => I<int>
+=item * B<limit> => I<posint>
 
 Only generate a certain amount of numbers.
+
+=item * B<limit_monthly> => I<posint>
+
+Only output at most this number of dates for each month.
+
+=item * B<limit_yearly> => I<posint>
+
+Only output at most this number of dates for each year.
 
 =item * B<reverse> => I<true>
 

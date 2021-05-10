@@ -37,9 +37,10 @@
          "requires" : {
             "Color::ANSI::Util" : "0.164",
             "ColorThemeBase::Static::FromStructColors" : "0.006",
+            "ColorThemeRole::ANSI" : "0",
             "Exporter" : "5.57",
             "Graphics::ColorNamesLite::WWW" : "0",
-            "Module::Load::Util" : "0",
+            "Module::Load::Util" : "0.004",
             "Role::Tiny" : "0",
             "Term::ANSIColor" : "3.00",
             "parent" : "0",
@@ -69,7 +70,7 @@
          "web" : "https://github.com/perlancar/perl-JSON-Color"
       }
    },
-   "version" : "0.130",
+   "version" : "0.131",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.030002"
@@ -84,6 +85,11 @@
                }
             },
             "name" : "ColorTheme",
+            "version" : "0.002"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::PERLANCAR::CheckPendingRelease",
+            "name" : "@Author::PERLANCAR/PERLANCAR::CheckPendingRelease",
             "version" : "0.001"
          },
          {
@@ -175,7 +181,7 @@
          {
             "class" : "Dist::Zilla::Plugin::PERLANCAR::BeforeBuild",
             "name" : "@Author::PERLANCAR/PERLANCAR::BeforeBuild",
-            "version" : "0.600"
+            "version" : "0.603"
          },
          {
             "class" : "Dist::Zilla::Plugin::Rinci::AbstractFromMeta",
@@ -190,12 +196,12 @@
          {
             "class" : "Dist::Zilla::Plugin::PERLANCAR::EnsurePrereqToSpec",
             "name" : "@Author::PERLANCAR/PERLANCAR::EnsurePrereqToSpec",
-            "version" : "0.061"
+            "version" : "0.062"
          },
          {
             "class" : "Dist::Zilla::Plugin::PERLANCAR::MetaResources",
             "name" : "@Author::PERLANCAR/PERLANCAR::MetaResources",
-            "version" : "0.040"
+            "version" : "0.043"
          },
          {
             "class" : "Dist::Zilla::Plugin::CheckChangeLog",
@@ -244,9 +250,9 @@
             "version" : "6.014"
          },
          {
-            "class" : "Dist::Zilla::Plugin::Authority",
-            "name" : "@Author::PERLANCAR/Authority",
-            "version" : "1.009"
+            "class" : "Dist::Zilla::Plugin::PERLANCAR::Authority",
+            "name" : "@Author::PERLANCAR/PERLANCAR::Authority",
+            "version" : "0.001"
          },
          {
             "class" : "Dist::Zilla::Plugin::OurDate",
@@ -426,7 +432,7 @@
          {
             "class" : "Dist::Zilla::Plugin::Rinci::AddPrereqs",
             "name" : "@Author::PERLANCAR/Rinci::AddPrereqs",
-            "version" : "0.144"
+            "version" : "0.145"
          },
          {
             "class" : "Dist::Zilla::Plugin::Rinci::AddToDb",
@@ -436,7 +442,7 @@
          {
             "class" : "Dist::Zilla::Plugin::Rinci::EmbedValidator",
             "name" : "@Author::PERLANCAR/Rinci::EmbedValidator",
-            "version" : "0.250"
+            "version" : "0.251"
          },
          {
             "class" : "Dist::Zilla::Plugin::SetScriptShebang",

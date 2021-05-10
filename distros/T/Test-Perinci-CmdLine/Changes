@@ -1,15 +1,29 @@
-1.47    2017-01-12 (PERLANCAR)
+1.481   2021-05-07  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+        - Switch to x.yyy versioning scheme more properly.
+
+
+1.480   2021-05-07  Released-By: PERLANCAR; Urgency: medium
+
+	- Adjust to Perinci::Examples 0.821 (renamed test_dry_run() to
+	  dry_run()); Adjust to BorderStyle::ASCII::SingleLineInnerOnly
+	  (extra space in border).
+
+
+1.47    2017-01-12  Released-By: PERLANCAR
 
 	- Adjust to Perinci::CmdLine::Inline 0.45.
 
 
-1.46    2017-01-04 (PERLANCAR)
+1.46    2017-01-04  Released-By: PERLANCAR
 
 	- Adjust to Perinci::CmdLine::Gen 1.40 (subcommands now a hash, not
 	  array).
 
 
-1.45    2017-01-04 (PERLANCAR)
+1.45    2017-01-04  Released-By: PERLANCAR
 
 	- pericmd_run_ok(): Add argument 'inline_run_filter' to allow not
 	  using -Mfilter when running generated Perinci::CmdLine::Inline
@@ -22,17 +36,17 @@
 	- [Bugfix] Fix inline_allow.
 
 
-1.44    2016-10-29 (PERLANCAR)
+1.44    2016-10-29  Released-By: PERLANCAR
 
 	- Add pericmd_run_tests_ok() to run a single group of tests.
 
 
-1.43    2016-10-29 (PERLANCAR)
+1.43    2016-10-29  Released-By: PERLANCAR
 
 	- Add pericmd_run_test_groups_ok().
 
 
-1.42    2016-10-29 (PERLANCAR)
+1.42    2016-10-29  Released-By: PERLANCAR
 
 	- Add pericmd_run_ok() to run a single test.
 
@@ -40,98 +54,98 @@
           the old name is now undocumented but will be kept around for a while.
 
 
-1.41    2016-08-30 (PERLANCAR)
+1.41    2016-08-30  Released-By: PERLANCAR
 
 	- Add tests: + cannot be used as option starter.
 
 
-1.40    2016-08-03 (PERLANCAR)
+1.40    2016-08-03  Released-By: PERLANCAR
 
 	- Test config_filenames attribute which contains array of hashes to set
           different section for different config filename.
 
 
-1.39    2016-02-26 (PERLANCAR)
+1.39    2016-02-26  Released-By: PERLANCAR
 
 	- Add test for cmdline_src=stdin_or_args (Rinci 1.1.79).
 
 
-1.38    2016-02-04 (PERLANCAR)
+1.38    2016-02-04  Released-By: PERLANCAR
 
 	- Adjust to Perinci::Examples 0.69.
 
 
-1.37    2016-01-22 (PERLANCAR)
+1.37    2016-01-22  Released-By: PERLANCAR
 
 	- Reorganize streaming tests and update to
 	  Perinci::Examples::Stream 0.68 (renamed functions).
 
 
-1.36    2016-01-22 (PERLANCAR)
+1.36    2016-01-22  Released-By: PERLANCAR
 
 	- [Bugfix] Adjust expected test result because of chomping of
 	  streaming input records.
 
 
-1.35    2016-01-22 (PERLANCAR)
+1.35    2016-01-22  Released-By: PERLANCAR
 
 	- [Bugfix] Add test to really check that stream input record
 	  chomping is done.
 
 
-1.34    2016-01-22 (PERLANCAR)
+1.34    2016-01-22  Released-By: PERLANCAR
 
         - Add more tests for validation of streaming output and input.
 
 
-1.33    2016-01-21 (PERLANCAR)
+1.33    2016-01-21  Released-By: PERLANCAR
 
 	- Add clause exit_code_like.
 
 	- [Incompatible change] Add/rename some tags.
 
 
-1.32    2016-01-20 (PERLANCAR)
+1.32    2016-01-20  Released-By: PERLANCAR
 
 	- Fix/tweak streaming tests.
 
 
-1.31    2015-12-02 (PERLANCAR)
+1.31    2015-12-02  Released-By: PERLANCAR
 
 	- Add new syntax of specifying configuration for subcommand
 	  ([SUBCMDNAME] -> [subcommand=SUBCMDNAME]).
 
 
-1.30    2015-11-28 (PERLANCAR)
+1.30    2015-11-28  Released-By: PERLANCAR
 
 	- Add test: function that returns naked result.
 
 
-1.29    2015-11-27 (PERLANCAR)
+1.29    2015-11-27  Released-By: PERLANCAR
 
 	- Adjustments for upcoming Perinci::CmdLine::Inline 0.30.
 
 
-1.28    2015-11-27 (PERLANCAR)
+1.28    2015-11-27  Released-By: PERLANCAR
 
         - Some adjustments for newer Perinci::CmdLine::{Lite,Inline}.
 
 
-1.27    2015-10-12 (PERLANCAR)
+1.27    2015-10-12  Released-By: PERLANCAR
 
 	- Avoid circular dependency by splitting App::GenPericmdScript
 	  (CLI, which requires Perinci::CmdLine::Lite) into
 	  Perinci::CmdLine::Gen.
 
 
-1.26    2015-09-29 (PERLANCAR)
+1.26    2015-09-29  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- Tag dry-run tests.
 
 
-1.25    2015-09-29 (PERLANCAR)
+1.25    2015-09-29  Released-By: PERLANCAR
 
 	- Add tests: some other common options, cmdline_src, streaming, tx,
 	  result metadata, JSON-encoded argument.
@@ -141,7 +155,7 @@
         - Export pericmd_ok() by default.
 
 
-1.24    2015-09-28 (PERLANCAR)
+1.24    2015-09-28  Released-By: PERLANCAR
 
         - Use App::GenPericmdScript to reduce code duplication.
 
@@ -151,12 +165,12 @@
           subcommands action.
 
 
-1.23    2015-09-23 (PERLANCAR)
+1.23    2015-09-23  Released-By: PERLANCAR
 
 	- Add test for handling arguments that contain dot, e.g. 'foo.bar'.
 
 
-1.22    2015-09-13 (PERLANCAR)
+1.22    2015-09-13  Released-By: PERLANCAR
 
 	- Add options: include_tags, exclude_tags.
 
@@ -169,17 +183,17 @@
           exclude unsupported tests by itself.
 
 
-1.21    2015-08-01 (PERLANCAR)
+1.21    2015-08-01  Released-By: PERLANCAR
 
 	- Add more tests.
 
 
-1.20    2015-07-10 (PERLANCAR)
+1.20    2015-07-10  Released-By: PERLANCAR
 
 	- Print out scripts's stdout/stderr on exit_code failed test [CT].
 
 
-1.19    2015-07-03 (PERLANCAR)
+1.19    2015-07-03  Released-By: PERLANCAR
 
 	- No functional changes.
 
@@ -187,7 +201,7 @@
 	  into 'capture_stdout' & 'capture_stderr').
 
 
-1.18    2015-06-18 (PERLANCAR)
+1.18    2015-06-18  Released-By: PERLANCAR
 
 	- Use IPC::System::Options 0.13 to capture system()'s output without
           interfering with Log::Any.
@@ -196,26 +210,26 @@
           modules.
 
 
-1.17    2015-06-18 (PERLANCAR)
+1.17    2015-06-18  Released-By: PERLANCAR
 
 	- No functional changes.
 
         - [dist] Add missing dep to Perinci-Examples.
 
 
-1.16    2015-06-18 (PERLANCAR)
+1.16    2015-06-18  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- Don't remove tempdir when DEBUG=1.
 
 
-1.15    2015-06-17 (PERLANCAR)
+1.15    2015-06-17  Released-By: PERLANCAR
 
 	- Use Devel::Confess.
 
 
-1.14     2015-06-11 (PERLANCAR)
+1.14     2015-06-11  Released-By: PERLANCAR
 
          - First release, split from Perinci-CmdLine-Lite dist to be more
            independent. Become a test suite for all Perinci::CmdLine backends

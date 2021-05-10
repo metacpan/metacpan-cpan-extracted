@@ -1,4 +1,4 @@
-# AWS::Glue::Database generated from spec 21.0.0
+# AWS::Glue::Database generated from spec 22.0.0
 use Moose::Util::TypeConstraints;
 
 coerce 'Cfn::Resource::Properties::AWS::Glue::Database',
@@ -19,71 +19,6 @@ package Cfn::Resource::AWS::Glue::Database {
 }
 
 
-
-subtype 'Cfn::Resource::Properties::AWS::Glue::Database::DataLakePrincipal',
-     as 'Cfn::Value';
-
-coerce 'Cfn::Resource::Properties::AWS::Glue::Database::DataLakePrincipal',
-  from 'HashRef',
-   via {
-     if (my $f = Cfn::TypeLibrary::try_function($_)) {
-       return $f
-     } else {
-       return Cfn::Resource::Properties::Object::AWS::Glue::Database::DataLakePrincipal->new( %$_ );
-     }
-   };
-
-package Cfn::Resource::Properties::Object::AWS::Glue::Database::DataLakePrincipal {
-  use Moose;
-  use MooseX::StrictConstructor;
-  extends 'Cfn::Value::TypedValue';
-  
-  has DataLakePrincipalIdentifier => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
-}
-subtype 'ArrayOfCfn::Resource::Properties::AWS::Glue::Database::PrincipalPrivileges',
-     as 'Cfn::Value',
-  where { $_->isa('Cfn::Value::Array') or $_->isa('Cfn::Value::Function') },
-message { "$_ is not a Cfn::Value or a Cfn::Value::Function" };
-
-coerce 'ArrayOfCfn::Resource::Properties::AWS::Glue::Database::PrincipalPrivileges',
-  from 'HashRef',
-   via {
-     if (my $f = Cfn::TypeLibrary::try_function($_)) {
-       return $f
-     } else {
-       die 'Only accepts functions'; 
-     }
-   },
-  from 'ArrayRef',
-   via {
-     Cfn::Value::Array->new(Value => [
-       map { 
-         Moose::Util::TypeConstraints::find_type_constraint('Cfn::Resource::Properties::AWS::Glue::Database::PrincipalPrivileges')->coerce($_)
-       } @$_
-     ]);
-   };
-
-subtype 'Cfn::Resource::Properties::AWS::Glue::Database::PrincipalPrivileges',
-     as 'Cfn::Value';
-
-coerce 'Cfn::Resource::Properties::AWS::Glue::Database::PrincipalPrivileges',
-  from 'HashRef',
-   via {
-     if (my $f = Cfn::TypeLibrary::try_function($_)) {
-       return $f
-     } else {
-       return Cfn::Resource::Properties::Object::AWS::Glue::Database::PrincipalPrivileges->new( %$_ );
-     }
-   };
-
-package Cfn::Resource::Properties::Object::AWS::Glue::Database::PrincipalPrivileges {
-  use Moose;
-  use MooseX::StrictConstructor;
-  extends 'Cfn::Value::TypedValue';
-  
-  has Permissions => (isa => 'Cfn::Value::Array|Cfn::Value::Function|Cfn::DynamicValue', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
-  has Principal => (isa => 'Cfn::Resource::Properties::AWS::Glue::Database::DataLakePrincipal', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
-}
 
 subtype 'Cfn::Resource::Properties::AWS::Glue::Database::DatabaseIdentifier',
      as 'Cfn::Value';
@@ -125,7 +60,6 @@ package Cfn::Resource::Properties::Object::AWS::Glue::Database::DatabaseInput {
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
   
-  has CreateTableDefaultPermissions => (isa => 'ArrayOfCfn::Resource::Properties::AWS::Glue::Database::PrincipalPrivileges', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has Description => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has LocationUri => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has Name => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');

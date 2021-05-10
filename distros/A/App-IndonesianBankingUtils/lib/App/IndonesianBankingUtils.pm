@@ -2,8 +2,8 @@ package App::IndonesianBankingUtils;
 
 use 5.010001;
 
-our $DATE = '2020-03-18'; # DATE
-our $VERSION = '0.144'; # VERSION
+our $DATE = '2021-05-07'; # DATE
+our $VERSION = '0.145'; # VERSION
 
 1;
 # ABSTRACT: CLIs related to Indonesian banking
@@ -20,7 +20,7 @@ App::IndonesianBankingUtils - CLIs related to Indonesian banking
 
 =head1 VERSION
 
-This document describes version 0.144 of App::IndonesianBankingUtils (from Perl distribution App-IndonesianBankingUtils), released on 2020-03-18.
+This document describes version 0.145 of App::IndonesianBankingUtils (from Perl distribution App-IndonesianBankingUtils), released on 2021-05-07.
 
 =head1
 
@@ -34,9 +34,9 @@ This distribution contains several CLI's related to Indonesian banking:
 
 =item * L<list-bca-branches>
 
-=item * L<list-id-bank-cards>
+=item * L<list-idn-bank-cards>
 
-=item * L<list-id-banks>
+=item * L<list-idn-banks>
 
 =item * L<list-mandiri-branches>
 
@@ -84,7 +84,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020, 2019, 2018, 2017, 2016, 2015 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2020, 2019, 2018, 2017, 2016, 2015 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -1,4 +1,4 @@
-# AWS::IoT::ProvisioningTemplate generated from spec 20.1.0
+# AWS::IoT::ProvisioningTemplate generated from spec 34.0.0
 use Moose::Util::TypeConstraints;
 
 coerce 'Cfn::Resource::Properties::AWS::IoT::ProvisioningTemplate',
@@ -19,27 +19,6 @@ package Cfn::Resource::AWS::IoT::ProvisioningTemplate {
 }
 
 
-
-subtype 'Cfn::Resource::Properties::AWS::IoT::ProvisioningTemplate::Tags',
-     as 'Cfn::Value';
-
-coerce 'Cfn::Resource::Properties::AWS::IoT::ProvisioningTemplate::Tags',
-  from 'HashRef',
-   via {
-     if (my $f = Cfn::TypeLibrary::try_function($_)) {
-       return $f
-     } else {
-       return Cfn::Resource::Properties::Object::AWS::IoT::ProvisioningTemplate::Tags->new( %$_ );
-     }
-   };
-
-package Cfn::Resource::Properties::Object::AWS::IoT::ProvisioningTemplate::Tags {
-  use Moose;
-  use MooseX::StrictConstructor;
-  extends 'Cfn::Value::TypedValue';
-  
-  has Tags => (isa => 'ArrayOfCfn::Resource::Properties::TagType', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
-}
 
 subtype 'Cfn::Resource::Properties::AWS::IoT::ProvisioningTemplate::ProvisioningHook',
      as 'Cfn::Value';
@@ -72,7 +51,7 @@ package Cfn::Resource::Properties::AWS::IoT::ProvisioningTemplate {
   has Enabled => (isa => 'Cfn::Value::Boolean', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has PreProvisioningHook => (isa => 'Cfn::Resource::Properties::AWS::IoT::ProvisioningTemplate::ProvisioningHook', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has ProvisioningRoleArn => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
-  has Tags => (isa => 'Cfn::Resource::Properties::AWS::IoT::ProvisioningTemplate::Tags', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has Tags => (isa => 'ArrayOfCfn::Resource::Properties::TagType', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has TemplateBody => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has TemplateName => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
 }

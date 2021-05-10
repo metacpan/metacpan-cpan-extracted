@@ -3,7 +3,7 @@ package Health::BladderDiary::GenTable;
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2020-12-10'; # DATE
 our $DIST = 'Health-BladderDiary-GenTable'; # DIST
-our $VERSION = '0.006'; # VERSION
+our $VERSION = '0.007'; # VERSION
 
 use 5.010001;
 use strict;
@@ -30,6 +30,7 @@ $SPEC{gen_bladder_diary_table_from_entries} = {
         },
         date => {
             schema => ['date*', 'x.perl.coerce_to' => 'DateTime'],
+            cmdline_aliases => {d=>{}},
         },
     },
 };
@@ -307,7 +308,7 @@ Health::BladderDiary::GenTable - Create bladder diary table from entries
 
 =head1 VERSION
 
-This document describes version 0.006 of Health::BladderDiary::GenTable (from Perl distribution Health-BladderDiary-GenTable), released on 2020-12-10.
+This document describes version 0.007 of Health::BladderDiary::GenTable (from Perl distribution Health-BladderDiary-GenTable), released on 2020-12-10.
 
 =head1 SYNOPSIS
 

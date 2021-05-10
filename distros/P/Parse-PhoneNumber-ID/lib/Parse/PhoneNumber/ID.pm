@@ -1,7 +1,9 @@
 package Parse::PhoneNumber::ID;
 
-our $DATE = '2017-07-10'; # DATE
-our $VERSION = '0.16'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2021-05-07'; # DATE
+our $DIST = 'Parse-PhoneNumber-ID'; # DIST
+our $VERSION = '0.170'; # VERSION
 
 use 5.010001;
 use strict;
@@ -13,8 +15,8 @@ use Perinci::Sub::Util qw(gen_modified_sub);
 
 require Exporter;
 our @ISA       = qw(Exporter);
-our @EXPORT_OK = qw(extract_id_phones parse_id_phone
-                    list_id_operators list_id_area_codes);
+our @EXPORT_OK = qw(extract_idn_phones parse_idn_phone
+                    list_idn_operators list_idn_area_codes);
 
 # from: http://id.wikipedia.org/wiki/Daftar_kode_telepon_di_Indonesia
 # last updated: 2011-03-08
@@ -506,7 +508,7 @@ _
     },
 };
 
-$SPEC{extract_id_phones} = {
+$SPEC{extract_idn_phones} = {
     v            => 1.1,
     summary      => 'Extract phone number(s) from text',
     description  => <<'_',
@@ -527,7 +529,7 @@ _
     args         => $extract_args,
     result_naked => 1,
 };
-sub extract_id_phones {
+sub extract_idn_phones {
     my %args  = @_;
     my $text  = $args{text};
     my $level = $args{level} // 5;
@@ -857,13 +859,13 @@ sub extract_id_phones {
 }
 
 gen_modified_sub(
-    output_name => 'parse_id_phone',
-    base_name   => 'extract_id_phones',
-    summary     => 'Alias for extract_id_phones(..., max_numbers=>1)->[0]',
+    output_name => 'parse_idn_phone',
+    base_name   => 'extract_idn_phones',
+    summary     => 'Alias for extract_idn_phones(..., max_numbers=>1)->[0]',
     remove_args => [qw/max_numbers/],
     output_code => sub {
         my %args = @_;
-        my $res = extract_id_phones(%args, max_numbers=>1);
+        my $res = extract_idn_phones(%args, max_numbers=>1);
         $res->[0];
     },
 );
@@ -950,22 +952,22 @@ sub _add_info {
     }
 }
 
-#$SPEC{list_id_operators} = {
+#$SPEC{list_idn_operators} = {
 #    v            => 1.1,
 #    summary      => 'Return list of known phone operators',
 #    result_naked => 1,
 #};
-#sub list_id_operators {
+#sub list_idn_operators {
 #
 #}
 
-#$SPEC{list_id_area_codes} = {
+#$SPEC{list_idn_area_codes} = {
 #    v            => 1.1,
 #    summary      => 'Return list of known area codes in Indonesia, '.
 #        'along with area names',
 #    result_naked => 1,
 #};
-#sub list_id_area_codes {
+#sub list_idn_area_codes {
 #}
 
 1;
@@ -983,15 +985,15 @@ Parse::PhoneNumber::ID - Parse Indonesian phone numbers
 
 =head1 VERSION
 
-This document describes version 0.16 of Parse::PhoneNumber::ID (from Perl distribution Parse-PhoneNumber-ID), released on 2017-07-10.
+This document describes version 0.170 of Parse::PhoneNumber::ID (from Perl distribution Parse-PhoneNumber-ID), released on 2021-05-07.
 
 =head1 SYNOPSIS
 
- use Parse::PhoneNumber::ID qw(parse_id_phone extract_id_phones);
+ use Parse::PhoneNumber::ID qw(parse_idn_phone extract_idn_phones);
  use Data::Dump;
 
- dd parse_id_phone(text => 'Jual dalmatian 2bl lucu2x. Hub: 7123 4567',
-                   default_area_code=>'022');
+ dd parse_idn_phone(text => 'Jual dalmatian 2bl lucu2x. Hub: 7123 4567',
+                    default_area_code=>'022');
 
 Will print something like:
 
@@ -1013,19 +1015,19 @@ Will print something like:
 
 To extract more than one numbers in a text:
 
- my $phones = extract_id_phones(text => 'some text containing phone number(s):'.
-                                        '0812 2345 6789, +62-22-91234567');
+ my $phones = extract_idn_phones(text => 'some text containing phone number(s):'.
+                                         '0812 2345 6789, +62-22-91234567');
  say "There are ", scalar(@$phones), "phone number(s) found in text";
  for (@$phones) { say $_->{pretty} }
 
 =head1 FUNCTIONS
 
 
-=head2 extract_id_phones
+=head2 extract_idn_phones
 
 Usage:
 
- extract_id_phones(%args) -> any
+ extract_idn_phones(%args) -> any
 
 Extract phone number(s) from text.
 
@@ -1070,18 +1072,20 @@ default level is fine.
 
 Text containing phone numbers to extract from.
 
+
 =back
 
 Return value:  (any)
 
 
-=head2 parse_id_phone
+
+=head2 parse_idn_phone
 
 Usage:
 
- parse_id_phone(%args) -> any
+ parse_idn_phone(%args) -> any
 
-Alias for extract_id_phones(..., max_numbers=>1)->[0].
+Alias for extract_idn_phones(..., max_numbers=E<gt>1)-E<gt>[0].
 
 Extracts phone number(s) from text. Return an array of one or more parsed phone
 number structure (a hash). Understands the list of known area codes and cellular
@@ -1122,6 +1126,7 @@ default level is fine.
 
 Text containing phone numbers to extract from.
 
+
 =back
 
 Return value:  (any)
@@ -1152,7 +1157,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017, 2015, 2014, 2013, 2012, 2011 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2017, 2015, 2014, 2013, 2012, 2011 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

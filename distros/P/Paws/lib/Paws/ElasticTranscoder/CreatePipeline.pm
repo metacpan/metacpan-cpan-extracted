@@ -49,8 +49,8 @@ You shouldn't make instances of this class. Each attribute should be used as a n
             GranteeType => 'MyGranteeType',         # OPTIONAL
           },
           ...
-        ],                                          # max: 30; OPTIONAL
-        StorageClass => 'MyStorageClass',           # OPTIONAL
+        ],    # max: 30; OPTIONAL
+        StorageClass => 'MyStorageClass',    # OPTIONAL
       },    # OPTIONAL
       Notifications => {
         Completed   => 'MySnsTopic',    # OPTIONAL
@@ -68,8 +68,8 @@ You shouldn't make instances of this class. Each attribute should be used as a n
             GranteeType => 'MyGranteeType',         # OPTIONAL
           },
           ...
-        ],                                          # max: 30; OPTIONAL
-        StorageClass => 'MyStorageClass',           # OPTIONAL
+        ],    # max: 30; OPTIONAL
+        StorageClass => 'MyStorageClass',    # OPTIONAL
       },    # OPTIONAL
     );
 

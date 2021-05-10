@@ -24,6 +24,7 @@ pod_spelling_system:
     - bakeini
     - EUMM
     - ci
+    - Unixy
 
 pod_coverage:
   private:

@@ -1,9 +1,9 @@
 package Perinci::CmdLine::POD;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-10-21'; # DATE
+our $DATE = '2021-05-07'; # DATE
 our $DIST = 'Perinci-CmdLine-POD'; # DIST
-our $VERSION = '0.021'; # VERSION
+our $VERSION = '0.022'; # VERSION
 
 use 5.010001;
 use strict;
@@ -67,6 +67,18 @@ sub _fmt_opt {
         push @res, "See C<$main_opt>.\n\n";
     } else {
         push @res, "$ospec->{description}\n\n" if $ospec->{description};
+    }
+
+    if (defined $arg_spec->{pos}) {
+        require Lingua::EN::Numbers::Ordinate;
+        my $ord = Lingua::EN::Numbers::Ordinate::ordinate($arg_spec->{pos} + 1);
+        if ($arg_spec->{slurpy} ||
+                $arg_spec->{greedy} # old name
+            ) {
+            push @res, "Can also be specified as the $ord command-line argument and onwards.\n\n";
+        } else {
+            push @res, "Can also be specified as the $ord command-line argument.\n\n";
+        }
     }
 
     if (($ospec->{orig_opt} // '') =~ /\@/) {
@@ -853,9 +865,10 @@ _
 
                 "You can also filter a section by environment variable using the filter C<env=CONDITION> in section names. ",
                 "For example if you only want a section to be read if a certain environment variable is true: C<[env=SOMEVAR ...]> or C<[SOMESECTION env=SOMEVAR ...]>. ",
-                "If you only want a section to be read when the value of an environment variable has value equals something: C<[env=HOSTNAME=blink ...]> or C<[SOMESECTION env=HOSTNAME=blink ...]>. ",
-                "If you only want a section to be read when the value of an environment variable does not equal something: C<[env=HOSTNAME!=blink ...]> or C<[SOMESECTION env=HOSTNAME!=blink ...]>. ",
-                "If you only want a section to be read when an environment variable contains something: C<[env=HOSTNAME*=server ...]> or C<[SOMESECTION env=HOSTNAME*=server ...]>. ",
+                "If you only want a section to be read when the value of an environment variable equals some string: C<[env=HOSTNAME=blink ...]> or C<[SOMESECTION env=HOSTNAME=blink ...]>. ",
+                "If you only want a section to be read when the value of an environment variable does not equal some string: C<[env=HOSTNAME!=blink ...]> or C<[SOMESECTION env=HOSTNAME!=blink ...]>. ",
+                "If you only want a section to be read when the value of an environment variable includes some string: C<[env=HOSTNAME*=server ...]> or C<[SOMESECTION env=HOSTNAME*=server ...]>. ",
+                "If you only want a section to be read when the value of an environment variable does not include some string: C<[env=HOSTNAME!*=server ...]> or C<[SOMESECTION env=HOSTNAME!*=server ...]>. ",
                 "Note that currently due to simplistic parsing, there must not be any whitespace in the value being compared because it marks the beginning of a new section filter or section name.\n\n",
 
                 "To load and configure plugins, you can use either the C<-plugins> parameter (e.g. C<< -plugins=DumpArgs >> or C<< -plugins=DumpArgs\@before_validate_args >>), ",
@@ -1002,7 +1015,7 @@ Perinci::CmdLine::POD - Generate POD for Perinci::CmdLine-based CLI script
 
 =head1 VERSION
 
-This document describes version 0.021 of Perinci::CmdLine::POD (from Perl distribution Perinci-CmdLine-POD), released on 2020-10-21.
+This document describes version 0.022 of Perinci::CmdLine::POD (from Perl distribution Perinci-CmdLine-POD), released on 2021-05-07.
 
 =head1 SYNOPSIS
 
@@ -1156,7 +1169,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020, 2019, 2017 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2020, 2019, 2017 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

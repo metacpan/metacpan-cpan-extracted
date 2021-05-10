@@ -8,6 +8,7 @@ use Test::EOL;
 
 my @files = (
     'bin/myriad-dev.pl',
+    'bin/myriad-migrate-rpc-streams.pl',
     'bin/myriad-start.sh',
     'bin/myriad.pl',
     'lib/Myriad.pm',
@@ -104,8 +105,9 @@ my @files = (
     't/storage.t',
     't/subscription.t',
     't/syntax.t',
-    't/transport/perl.t',
+    't/transport/memory.t',
     't/transport/redis.t',
+    't/util/secret.t',
     'xt/author/distmeta.t',
     'xt/author/eol.t',
     'xt/author/minimum-version.t',

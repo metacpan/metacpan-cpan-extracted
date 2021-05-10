@@ -1,4 +1,4 @@
-# AWS::Transfer::User generated from spec 20.1.0
+# AWS::Transfer::User generated from spec 34.0.0
 use Moose::Util::TypeConstraints;
 
 coerce 'Cfn::Resource::Properties::AWS::Transfer::User',
@@ -14,7 +14,7 @@ package Cfn::Resource::AWS::Transfer::User {
     [ 'Arn','ServerId','UserName' ]
   }
   sub supported_regions {
-    [ 'ap-northeast-1','ap-northeast-2','ap-south-1','ap-southeast-1','ap-southeast-2','ca-central-1','eu-central-1','eu-north-1','eu-west-1','eu-west-2','eu-west-3','sa-east-1','us-east-1','us-east-2','us-gov-east-1','us-gov-west-1','us-west-1','us-west-2' ]
+    [ 'af-south-1','ap-east-1','ap-northeast-1','ap-northeast-2','ap-south-1','ap-southeast-1','ap-southeast-2','ca-central-1','eu-central-1','eu-north-1','eu-west-1','eu-west-2','eu-west-3','me-south-1','sa-east-1','us-east-1','us-east-2','us-gov-east-1','us-gov-west-1','us-west-1','us-west-2' ]
   }
 }
 
@@ -60,6 +60,29 @@ package Cfn::Resource::Properties::Object::AWS::Transfer::User::SshPublicKey {
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
   
+}
+
+subtype 'Cfn::Resource::Properties::AWS::Transfer::User::PosixProfile',
+     as 'Cfn::Value';
+
+coerce 'Cfn::Resource::Properties::AWS::Transfer::User::PosixProfile',
+  from 'HashRef',
+   via {
+     if (my $f = Cfn::TypeLibrary::try_function($_)) {
+       return $f
+     } else {
+       return Cfn::Resource::Properties::Object::AWS::Transfer::User::PosixProfile->new( %$_ );
+     }
+   };
+
+package Cfn::Resource::Properties::Object::AWS::Transfer::User::PosixProfile {
+  use Moose;
+  use MooseX::StrictConstructor;
+  extends 'Cfn::Value::TypedValue';
+  
+  has Gid => (isa => 'Cfn::Value::Double', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has SecondaryGids => (isa => 'Cfn::Value::Array|Cfn::Value::Function|Cfn::DynamicValue', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has Uid => (isa => 'Cfn::Value::Double', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
 }
 subtype 'ArrayOfCfn::Resource::Properties::AWS::Transfer::User::HomeDirectoryMapEntry',
      as 'Cfn::Value',
@@ -115,6 +138,7 @@ package Cfn::Resource::Properties::AWS::Transfer::User {
   has HomeDirectoryMappings => (isa => 'ArrayOfCfn::Resource::Properties::AWS::Transfer::User::HomeDirectoryMapEntry', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has HomeDirectoryType => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has Policy => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has PosixProfile => (isa => 'Cfn::Resource::Properties::AWS::Transfer::User::PosixProfile', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has Role => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has ServerId => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
   has SshPublicKeys => (isa => 'ArrayOfCfn::Resource::Properties::AWS::Transfer::User::SshPublicKey', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');

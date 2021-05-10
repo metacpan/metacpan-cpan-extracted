@@ -3,30 +3,44 @@ NAME
     company names
 
 VERSION
-    This document describes version 0.004 of Acme::ID::CompanyName (from
-    Perl distribution Acme-ID-CompanyName), released on 2017-12-19.
+    This document describes version 0.006 of Acme::ID::CompanyName (from
+    Perl distribution Acme-ID-CompanyName), released on 2021-05-07.
 
 DESCRIPTION
 FUNCTIONS
-  gen_generic_id_company_names
+  gen_generic_ind_company_names
     Usage:
 
-     gen_generic_id_company_names(%args) -> any
+     gen_generic_ind_company_names(%args) -> any
 
     Generate nice-sounding, generic Indonesian company names.
 
     Examples:
 
-    *   Example #1:
+    *   Generate five random PT names:
 
-         gen_generic_id_company_names( num_names => 2);
+         gen_generic_ind_company_names( num_names => 5);
 
         Result:
 
          [
-           200,
-           "OK",
-           ["PT Sentosa Jaya Abadi", "PT Putra Utama Globalindo"],
+           "PT Krida Akur Tren",
+           "PT Industri Sentral Baru",
+           "PT Vita Humania Cipta",
+           "PT Cakrawalatama Central Hasil",
+           "PT Utara Ekasentralindo Cakra",
+         ]
+
+    *   Generate three PT names with desired initials "ACME":
+
+         gen_generic_ind_company_names( num_names => 3, desired_initials => "ACME");
+
+        Result:
+
+         [
+           "PT Angkasatama Cipta Milenial Eka",
+           "PT Agung Chandra Milenia Eka",
+           "PT Amantama Cipta Milenial Elektronik",
          ]
 
     This function is not exported by default, but exportable.
@@ -68,7 +82,7 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2017 by perlancar@cpan.org.
+    This software is copyright (c) 2021, 2017 by perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

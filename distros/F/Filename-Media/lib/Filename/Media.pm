@@ -1,9 +1,9 @@
 package Filename::Media;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-05-30'; # DATE
+our $DATE = '2020-10-20'; # DATE
 our $DIST = 'Filename-Media'; # DIST
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.003'; # VERSION
 
 use 5.010001;
 use strict;
@@ -15,6 +15,61 @@ our @EXPORT_OK = qw(check_media_filename);
 our $STR_RE = "movie|mpega|aifc|aiff|djvu|flac|jpeg|jpg2|midi|mpeg|mpga|opus|svgz|tiff|wbmp|webm|3gp|aif|amr|art|asf|asx|avi|awb|axa|axv|bmp|cdr|cdt|cpt|cr2|crw|csd|dif|djv|erf|fli|flv|gif|gsm|ico|ief|jng|jp2|jpe|jpf|jpg|jpm|jpx|kar|lsf|lsx|m3u|m4a|mid|mkv|mng|mov|mp2|mp3|mp4|mpe|mpg|mpv|mxu|nef|oga|ogg|ogv|orc|orf|pat|pbm|pcx|pgm|pls|png|pnm|ppm|psd|ram|ras|rgb|sco|sd2|sid|snd|spx|svg|tif|wav|wax|wma|wmv|wmx|wvx|xbm|xpm|xwd|au|dl|dv|gl|qt|ra|rm|ts|wm"; # STR_RE
 our $RE = qr(\.(?:$STR_RE)\z)i;
 
+our %SPEC;
+
+$SPEC{check_media_filename} = {
+    v => 1.1,
+    summary => 'Check whether filename indicates being a media (audio/video/image) file',
+    description => <<'_',
+
+
+_
+    args => {
+        filename => {
+            schema => 'filename*',
+            req => 1,
+            pos => 0,
+        },
+        # XXX recurse?
+        #ci => {
+        #    summary => 'Whether to match case-insensitively',
+        #    schema  => 'bool',
+        #    default => 1,
+        #},
+    },
+    result_naked => 1,
+    result => {
+        schema => ['any*', of=>['bool*', 'hash*']],
+        description => <<'_',
+
+Return false if no archive suffixes detected. Otherwise return a hash of
+information.
+
+_
+    },
+    examples => [
+        {
+            args => {filename => 'foo.txt'},
+            naked_result => 0,
+        },
+        {
+            args => {filename => 'foo.DOC'},
+            naked_result => 0,
+        },
+        {
+            args => {filename => 'foo.webm'},
+            naked_result => {},
+        },
+        {
+            args => {filename => 'foo.MP3'},
+            naked_result => {},
+        },
+        {
+            args => {filename => 'foo.Jpeg'},
+            naked_result => {},
+        },
+    ],
+};
 sub check_media_filename {
     my %args = @_;
 
@@ -36,7 +91,7 @@ Filename::Media - Check whether filename indicates being a media (audio/video/im
 
 =head1 VERSION
 
-This document describes version 0.002 of Filename::Media (from Perl distribution Filename-Media), released on 2020-05-30.
+This document describes version 0.003 of Filename::Media (from Perl distribution Filename-Media), released on 2020-10-20.
 
 =head1 SYNOPSIS
 
@@ -52,7 +107,57 @@ This document describes version 0.002 of Filename::Media (from Perl distribution
 
 =head1 FUNCTIONS
 
+
 =head2 check_media_filename
+
+Usage:
+
+ check_media_filename(%args) -> bool|hash
+
+Check whether filename indicates being a media (audioE<sol>videoE<sol>image) file.
+
+Examples:
+
+=over
+
+=item * Example #1:
+
+ check_media_filename(filename => "foo.txt"); # -> 0
+
+=item * Example #2:
+
+ check_media_filename(filename => "foo.DOC"); # -> 0
+
+=item * Example #3:
+
+ check_media_filename(filename => "foo.webm"); # -> {}
+
+=item * Example #4:
+
+ check_media_filename(filename => "foo.MP3"); # -> {}
+
+=item * Example #5:
+
+ check_media_filename(filename => "foo.Jpeg"); # -> {}
+
+=back
+
+This function is not exported by default, but exportable.
+
+Arguments ('*' denotes required arguments):
+
+=over 4
+
+=item * B<filename>* => I<filename>
+
+
+=back
+
+Return value:  (bool|hash)
+
+
+Return false if no archive suffixes detected. Otherwise return a hash of
+information.
 
 =head1 HOMEPAGE
 

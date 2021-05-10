@@ -2,6 +2,9 @@
 <!doctype html>
 <html lang="en">
   <head>
+[% IF base -%]
+    <base href="[% base %]">
+[% END -%]
     <!-- Required meta tags -->
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -36,7 +39,7 @@
 <header>
   <div class="navbar navbar-dark bg-dark shadow-sm">
     <div class="container">
-      <a href="/" class="navbar-brand d-flex align-items-center">
+      <a href="[% IF base; base; ELSE %]/[% END %]" class="navbar-brand d-flex align-items-center">
         <strong>[% distribution.name %]</strong>
       </a>
     </div>

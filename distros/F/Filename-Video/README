@@ -2,8 +2,8 @@ NAME
     Filename::Video - Check whether filename indicates being a video file
 
 VERSION
-    This document describes version 0.003 of Filename::Video (from Perl
-    distribution Filename-Video), released on 2020-05-30.
+    This document describes version 0.004 of Filename::Video (from Perl
+    distribution Filename-Video), released on 2020-10-20.
 
 SYNOPSIS
      use Filename::Video qw(check_video_filename);
@@ -17,6 +17,41 @@ SYNOPSIS
 DESCRIPTION
 FUNCTIONS
   check_video_filename
+    Usage:
+
+     check_video_filename(%args) -> bool|hash
+
+    Check whether filename indicates being a video file.
+
+    Examples:
+
+    *   Example #1:
+
+         check_video_filename(filename => "foo.txt"); # -> 0
+
+    *   Example #2:
+
+         check_video_filename(filename => "foo.DOC"); # -> 0
+
+    *   Example #3:
+
+         check_video_filename(filename => "foo.webm"); # -> {}
+
+    *   Example #4:
+
+         check_video_filename(filename => "foo.MP4"); # -> {}
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   filename* => *filename*
+
+    Return value: (bool|hash)
+
+    Return false if no archive suffixes detected. Otherwise return a hash of
+    information.
+
 HOMEPAGE
     Please visit the project's homepage at
     <https://metacpan.org/release/Filename-Video>.

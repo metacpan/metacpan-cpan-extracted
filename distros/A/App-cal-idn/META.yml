@@ -17,7 +17,7 @@ meta-spec:
   version: '1.4'
 name: App-cal-idn
 requires:
-  Calendar::Indonesia::Holiday: '0.335'
+  Calendar::Indonesia::Holiday: '0.338'
   DateTime: '0'
   Getopt::Long: '2.50'
   List::Util: '1.45'
@@ -31,7 +31,7 @@ resources:
   bugtracker: https://github.com/perlancar/perl-App-cal-idn/issues
   homepage: https://metacpan.org/release/App-cal-idn
   repository: git://github.com/perlancar/perl-App-cal-idn.git
-version: '0.134'
+version: '0.136'
 x_Dist_Zilla:
   perl:
     version: '5.030000'

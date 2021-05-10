@@ -3,13 +3,14 @@ package PDL::Stats;
 use strict;
 use warnings;
 
-our $VERSION = '0.77';
+our $VERSION = '0.78';
 
 $PDL::onlinedoc->scan(__FILE__) if $PDL::onlinedoc;
 
 sub import {
   my $pkg = (caller())[0];
-  my $cdf = grep -e "$_/PDL/GSL/CDF.pm", @INC;
+  eval { require PDL::Core; require PDL::GSL::CDF; };
+  my $cdf = !$@;
   my $use = <<"EOD";
 package $pkg;
 use PDL::Stats::Basic;

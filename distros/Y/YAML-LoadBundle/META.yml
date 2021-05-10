@@ -12,7 +12,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '7.1101'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Dist::Zilla version 6.015, CPAN::Meta::Converter version 2.150010'
 license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -21,7 +21,7 @@ name: YAML-LoadBundle
 provides:
   YAML::LoadBundle:
     file: lib/YAML/LoadBundle.pm
-    version: v0.4.2
+    version: v0.4.3
 requires:
   Digest::SHA1: '0'
   Hash::Merge::Simple: '0'
@@ -29,6 +29,8 @@ requires:
 resources:
   bugtracker: https://github.com/GrantStreetGroup/p5-YAML-LoadBundle/issues
   repository: git://github.com/GrantStreetGroup/p5-YAML-LoadBundle.git
-version: v0.4.2
-x_serialization_backend: 'YAML::Tiny version 1.69'
+version: v0.4.3
+x_generated_by_perl: v5.18.2
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: Artistic-2.0
 x_static_install: 1

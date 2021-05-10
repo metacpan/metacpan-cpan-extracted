@@ -3,11 +3,14 @@ package Scalar::Type;
 use strict;
 use warnings;
 
+our $VERSION = '0.0.4';
+
+require XSLoader;
+XSLoader::load(__PACKAGE__, $VERSION);
+
 use Scalar::Util qw(blessed);
 
 use base qw(Exporter);
-
-our $VERSION = '0.0.2';
 
 =head1 NAME
 
@@ -86,45 +89,6 @@ sub type {
            ref($arg)     ? 'REF_TO_'.ref($arg) :
                            _scalar_type($arg);
 }
-
-use Inline C => <<'END_OF_C';
-
-// Unfortunately this would also promote 1.0 to an int, which we don't want.
-// We want to only do that for 1e2 and friends, and that means we have to get
-// our oar in rather earlier, in toke.c
-// 
-// void _attempt_int_promote(SV* argument) {
-//     if(SvNOK(argument) && !SvIOK(argument)) {
-//         /* retrieve the 'double' value from the NV slot and get an
-//            equivalent int, losing anything after the decimal point
-//         */
-//         NV nv = SvNVX(argument);
-//         IV potential_iv = (IV)nv;
-//         
-//         int SV_is_readonly = SvREADONLY(argument);
-// 
-//         /* now turn the int back into a double and if it's the same
-//            as what we started with, fill in the IV slot
-//         */
-//         if((NV)potential_iv == nv) {
-//             if(SV_is_readonly) { SvREADONLY_off(argument); }
-//             SvIV_set(argument, potential_iv);
-//             SvIOK_on(argument);
-//             if(SV_is_readonly) { SvREADONLY_on(argument); }
-//         }
-//     }
-// }
-
-SV* _scalar_type(SV* argument) {
-    // /* handle nonsense like 1e2 being recognised by perl as a number but not an int */
-    // _attempt_int_promote(argument);
-
-    return SvIOK(argument) ? newSVpv("INTEGER", 7) :
-           SvNOK(argument) ? newSVpv("NUMBER",  6) : 
-                             newSVpv("SCALAR",  6);
-}
-
-END_OF_C
 
 =head2 is_integer
 

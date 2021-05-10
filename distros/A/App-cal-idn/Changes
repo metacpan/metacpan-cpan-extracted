@@ -1,8 +1,23 @@
+0.136   2021-05-03  Released-By: PERLANCAR; Urgency: low
+
+	- No functional changes.
+
+	- [doc] Update mentioned script dateseq-id -> dateseq-idn.
+
+	- [dist] Fix wording in Changes.
+
+
+0.135   2021-03-09  Released-By: PERLANCAR; Urgency: medium
+
+	- Adjust to Calendar::Indonesia::Holiday 0.338+ (list_id_holidays
+	  -> list_idn_holidays).
+
+
 0.134   2021-01-23  Released-By: PERLANCAR; Urgency: medium
 
 	- Rename module/dist from App::CalId to App::cal::idn (I know I renamed
-	  this from App::cal::id to App::CalId in , but the lowercase version is
-	  prettier anyway).
+	  this module from App::cal::id to App::CalId in the past, but the
+	  lowercase version is prettier anyway).
 
         - Rename script cal-id -> cal-idn to avoid ambiguity of 'id'.
 

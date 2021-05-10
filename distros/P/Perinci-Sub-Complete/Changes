@@ -1,3 +1,8 @@
+0.944   2021-05-07  Released-By: PERLANCAR; Urgency: medium
+
+	- Adjust to Perinci::Examples 0.821 (RT#135349).
+
+
 0.943   2020-06-04  Released-By: PERLANCAR; Urgency: low
 
         - No functional changes.

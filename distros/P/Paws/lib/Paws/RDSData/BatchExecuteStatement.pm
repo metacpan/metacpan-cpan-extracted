@@ -42,29 +42,33 @@ You shouldn't make instances of this class. Each attribute should be used as a n
       ParameterSets => [
         [
           {
-            Name => 'MyParameterName',     # OPTIONAL
+            Name     => 'MyParameterName',    # OPTIONAL
             TypeHint =>
               'DATE',    # values: DATE, DECIMAL, TIME, TIMESTAMP; OPTIONAL
             Value => {
               ArrayValue => {
                 ArrayValues   => [ <ArrayValue>, ... ],    # OPTIONAL
-                BooleanValues => [ 1,            ... ],    # OPTIONAL
-                DoubleValues  => [ 1,            ... ],    # OPTIONAL
-                LongValues    => [ 1,            ... ],    # OPTIONAL
-                StringValues  => [ 'MyString',   ... ],    # OPTIONAL
+                BooleanValues => [
+                  1, ...                                   # OPTIONAL
+                ],    # OPTIONAL
+                DoubleValues => [ 1, ... ],    # OPTIONAL
+                LongValues   => [ 1, ... ],    # OPTIONAL
+                StringValues => [
+                  'MyString', ...              # OPTIONAL
+                ],    # OPTIONAL
               },    # OPTIONAL
               BlobValue    => 'BlobBlob',    # OPTIONAL
-              BooleanValue => 1,
+              BooleanValue => 1,             # OPTIONAL
               DoubleValue  => 1,
-              IsNull       => 1,
+              IsNull       => 1,             # OPTIONAL
               LongValue    => 1,
-              StringValue  => 'MyString',
+              StringValue  => 'MyString',    # OPTIONAL
             },    # OPTIONAL
           },
           ...
         ],
         ...
-      ],          # OPTIONAL
+      ],    # OPTIONAL
       Schema        => 'MyDbName',    # OPTIONAL
       TransactionId => 'MyId',        # OPTIONAL
     );

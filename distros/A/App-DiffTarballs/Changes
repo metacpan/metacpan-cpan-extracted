@@ -1,13 +1,22 @@
-0.003   2017-08-07 (PERLANCAR)
+0.004   2021-05-09  Released-By: PERLANCAR; Urgency: medium
 
-	- Grok DIFF environment.
+        - [bugfix] Remove an extraneous diff command.
+
+        - [ux] Observe COLOR & NO_COLOR environment variables.
+
+	- [doc] Add description.
 
 
-0.002   2017-08-06 (PERLANCAR)
+0.003   2017-08-07  Released-By: PERLANCAR
 
-	- Check existence of tarballs first.
+        - Grok DIFF environment.
 
 
-0.001   2017-08-06 (PERLANCAR)
+0.002   2017-08-06  Released-By: PERLANCAR
+
+        - Check existence of tarballs first.
+
+
+0.001   2017-08-06  Released-By: PERLANCAR
 
         - First release.

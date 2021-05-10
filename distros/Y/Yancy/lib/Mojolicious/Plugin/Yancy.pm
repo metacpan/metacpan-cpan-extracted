@@ -1,30 +1,12 @@
 package Mojolicious::Plugin::Yancy;
-our $VERSION = '1.069';
+our $VERSION = '1.070';
 # ABSTRACT: Embed a simple admin CMS into your Mojolicious application
 
 #pod =head1 SYNOPSIS
 #pod
 #pod     use Mojolicious::Lite;
-#pod     plugin Yancy => {
-#pod         backend => 'pg://postgres@/mydb',
-#pod         schema => { ... },
-#pod     };
-#pod
-#pod     ## With custom auth routine
-#pod     use Mojo::Base 'Mojolicious';
-#pod     sub startup {
-#pod         my ( $app ) = @_;
-#pod         my $auth_route = $app->routes->under( '/yancy', sub {
-#pod             my ( $c ) = @_;
-#pod             # ... Validate user
-#pod             return 1;
-#pod         } );
-#pod         $app->plugin( 'Yancy', {
-#pod             backend => 'pg://postgres@/mydb',
-#pod             schema => { ... },
-#pod             route => $auth_route,
-#pod         });
-#pod     }
+#pod     plugin Yancy => backend => 'sqlite:myapp.db'; # mysql, pg, dbic...
+#pod     app->start;
 #pod
 #pod =head1 DESCRIPTION
 #pod
@@ -612,6 +594,11 @@ has _filters => sub { {} };
 sub register {
     my ( $self, $app, $config ) = @_;
 
+    # XXX: Move editor, auth, schema to attributes of this object.
+    # That allows for easier extending/replacing of them.
+    # XXX: Deprecate direct access to the backend. Backend should be
+    # accessed through the schema, if needed.
+
     # New default for read_schema is on, since it mostly should be
     # on. Any real-world database is going to be painstakingly tedious
     # to type out in JSON schema...
@@ -636,6 +623,7 @@ sub register {
         }
         return $default_backend;
     } );
+    # XXX: Move this to Yancy::Schema
     if ( $config->{schema} || $config->{read_schema} ) {
         $config->{schema} = $config->{schema} ? dclone( $config->{schema} ) : {};
 
@@ -1066,31 +1054,13 @@ Mojolicious::Plugin::Yancy - Embed a simple admin CMS into your Mojolicious appl
 
 =head1 VERSION
 
-version 1.069
+version 1.070
 
 =head1 SYNOPSIS
 
     use Mojolicious::Lite;
-    plugin Yancy => {
-        backend => 'pg://postgres@/mydb',
-        schema => { ... },
-    };
-
-    ## With custom auth routine
-    use Mojo::Base 'Mojolicious';
-    sub startup {
-        my ( $app ) = @_;
-        my $auth_route = $app->routes->under( '/yancy', sub {
-            my ( $c ) = @_;
-            # ... Validate user
-            return 1;
-        } );
-        $app->plugin( 'Yancy', {
-            backend => 'pg://postgres@/mydb',
-            schema => { ... },
-            route => $auth_route,
-        });
-    }
+    plugin Yancy => backend => 'sqlite:myapp.db'; # mysql, pg, dbic...
+    app->start;
 
 =head1 DESCRIPTION
 

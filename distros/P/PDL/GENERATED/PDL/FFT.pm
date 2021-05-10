@@ -153,7 +153,7 @@ use PDL::Core qw/:Func/;
 use PDL::Basic qw/:Func/;
 use PDL::Types;
 use PDL::ImageND qw/kernctr/; # moved to ImageND since FFTW uses it too
-use PDL::Ops qw/ci cimag creal/;
+use PDL::Ops qw/czip/;
 
 END {
   # tidying up required after using fftn
@@ -192,8 +192,8 @@ sub PDL::fft {
 	my $re=$_[0];
 	my $im=$_[1];
 	if (!$re->type->real) {
-		$im=cimag($re);
-		$re=creal($re);
+		$im=$re->im;
+		$re=$re->re;
 	}
 	eval {	todecimal($re);	};
 	if ($@) {
@@ -211,7 +211,7 @@ sub PDL::fft {
 	}
 	_fft($re,$im);
 	if (!$_[0]->type->real) {
-		$_[0]= $re+ci()*$im;
+		$_[0]= czip($re, $im);
 	} else {
 		$_[0]=$re,$_[1]=$im;
 	}
@@ -242,8 +242,8 @@ sub PDL::ifft {
 	my $re=$_[0];
 	my $im=$_[1];
 	if (!$re->type->real) {
-		$im=cimag($re);
-		$re=creal($re);
+		$im=$re->im;
+		$re=$re->re;
 	}
 	eval {	todecimal($re);	};
 	if ($@) {
@@ -261,7 +261,7 @@ sub PDL::ifft {
 	}
 	_ifft($re,$im);
 	if (!$_[0]->type->real) {
-		$_[0]= $re+ci()*$im;
+		$_[0]= czip($re, $im);
 	} else {
 		$_[0]=$re,$_[1]=$im;
 	}
@@ -346,8 +346,8 @@ sub PDL::fftnd {
     barf "Must have real and imaginary parts for fftnd" if $#_ != 1;
     my ($r,$i) = @_;
     if (!$r->type->real) {
-	$i=cimag $r;
-	$r=creal $r;
+	$i=im $r;
+	$r=re $r;
     }
     my ($n) = $r->getndims;
     barf "Dimensions of real and imag must be the same for fft"
@@ -363,7 +363,7 @@ sub PDL::fftnd {
       $i = $i->mv(0,$n);
     }
     if (!$_[0]->type->real) {
-	$_[0]=$r+ci()*$i;
+	$_[0]= czip($r, $i);
     } else {
 	$_[0] = $r; $_[1] = $i;
     }
@@ -388,8 +388,8 @@ sub PDL::ifftnd {
     barf "Must have real and imaginary parts for ifftnd" if $#_ != 1;
     my ($r,$i) = @_;
     if (!$r->type->real) {
-	$r=creal $r;
-	$i=cimag $r;
+	$r=re $r;
+	$i=im $r;
     }
     my ($n) = $r->getndims;
     barf "Dimensions of real and imag must be the same for ifft"
@@ -405,7 +405,7 @@ sub PDL::ifftnd {
       $i = $i->mv(0,$n);
     }
     if (!$_[0]->type->real) {
-	$_[0]=$r+ci()*$i;
+	$_[0]= czip($r, $i);
     } else {
 	$_[0] = $r; $_[1] = $i;
     }
@@ -473,8 +473,8 @@ sub PDL::fftconvolve_inplace {
     barf "Must have image & kernel for fftconvolve" if $#_ != 1;
     my ($hr, $hi) = @_;
     if (!$hr->type->real) {
-	$hi=cimag($hr);
-	$hr=creal($hr);
+	$hi=$hr->im;
+	$hr=$hr->re;
     }
     my ($n) = $hr->getndims;
     todecimal($hr);   # Convert to double unless already float or double
@@ -503,7 +503,7 @@ sub PDL::fftconvolve_inplace {
     ifftnd($hr,$hi);
     # convert back to complex if input was complex
     if (!$_[0]->type->real) {
-	$_[0]=$hr+ci()*$hi;
+	$_[0]= czip($hr, $hi);
 	return $_[0];
     } else {
         $_[0] = $hr; $_[1] = $hi;

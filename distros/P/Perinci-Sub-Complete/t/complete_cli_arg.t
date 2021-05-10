@@ -21,7 +21,7 @@ my $meta0 = normalize_function_metadata({
 });
 
 my $meta = normalize_function_metadata(
-    $Perinci::Examples::SPEC{test_completion});
+    $Perinci::Examples::SPEC{completion});
 
 # note that the way arg name and aliases are translated to option name (e.g.
 # 'body_len.max' -> 'body-len-max', 'help' -> 'help-arg') should be tested in

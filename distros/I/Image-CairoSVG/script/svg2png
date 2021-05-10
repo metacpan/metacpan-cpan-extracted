@@ -1,6 +1,7 @@
 #!/home/ben/software/install/bin/perl
 use warnings;
 use strict;
+use lib '/home/ben/projects/image-cairosvg/lib';
 use Image::CairoSVG;
 use Getopt::Long;
 
@@ -28,6 +29,50 @@ for my $file (@ARGV) {
 	warn "$0 failed for $file: $@\n";
     }
 }
+
+=head1 NAME
+
+svg2png - Render SVG into PNG
+
+=head1 SYNOPSIS
+
+   svg2png file1.svg file2.svg file3.svg 
+
+=head1 DESCRIPTION
+
+This renders SVG (Scalable Vector Graphics) into PNG (Portable Network
+Graphics) using the Perl module L<Image::CairoSVG>. 
+
+=head2 Input and output
+
+The output file is named after the input file, with the suffix C<.svg>
+replaced with C<.png>, so F<example-file.svg> is rendered into
+F<example-file.png>. If the input file does not have the suffix
+C<.svg>, the suffix C<.png> is added, so the output of F<example-file>
+is named F<example-file.png>
+
+=head1 OPTIONS
+
+=over
+
+=item --verbose
+
+This switches on debugging messages.
+
+=back
+
+=head1 SEE ALSO
+
+=over
+
+=item Image::CairoSVG
+
+For author information, copyright, licence, and details of the
+rendering, please refer to the documentation for L<Image::CairoSVG>.
+
+=back
+
+=cut
 
 # Local variables:
 # mode: perl

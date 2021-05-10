@@ -1,4 +1,4 @@
-# AWS::Batch::JobQueue generated from spec 20.1.0
+# AWS::Batch::JobQueue generated from spec 34.0.0
 use Moose::Util::TypeConstraints;
 
 coerce 'Cfn::Resource::Properties::AWS::Batch::JobQueue',
@@ -14,7 +14,7 @@ package Cfn::Resource::AWS::Batch::JobQueue {
     [  ]
   }
   sub supported_regions {
-    [ 'ap-northeast-1','ap-southeast-2','eu-central-1','eu-west-1','eu-west-2','eu-west-3','us-east-1','us-east-2','us-west-2' ]
+    [ 'af-south-1','ap-northeast-1','ap-northeast-3','ap-southeast-2','eu-central-1','eu-west-1','eu-west-2','eu-west-3','us-east-1','us-east-2','us-west-2' ]
   }
 }
 

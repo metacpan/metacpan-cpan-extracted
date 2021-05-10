@@ -42,7 +42,7 @@ You shouldn't make instances of this class. Each attribute should be used as a n
       'MaxCapacity' => 10,
       'MinCapacity' => 1,
       'ResourceId'  => 'service/default/web-app',
-      'RoleARN' =>
+      'RoleARN'     =>
         'arn:aws:iam::012345678910:role/ApplicationAutoscalingECSRole',
       'ScalableDimension' => 'ecs:service:DesiredCount',
       'ServiceNamespace'  => 'ecs'
@@ -55,7 +55,7 @@ You shouldn't make instances of this class. Each attribute should be used as a n
       $application -autoscaling->RegisterScalableTarget(
       'MaxCapacity' => 10,
       'MinCapacity' => 1,
-      'ResourceId' =>
+      'ResourceId'  =>
         'spot-fleet-request/sfr-45e69d8a-be48-4539-bbf3-3464e99c50c3',
       'RoleARN' =>
         'arn:aws:iam::012345678910:role/ApplicationAutoscalingSpotRole',

@@ -3,7 +3,7 @@ NAME
     .xlsx) as two directories of CSV files
 
 VERSION
-    This document describes version 0.004 of App::DiffXlsText (from Perl
+    This document describes version 0.005 of App::DiffXlsText (from Perl
     distribution App-DiffXlsText), released on 2020-12-01.
 
 SYNOPSIS

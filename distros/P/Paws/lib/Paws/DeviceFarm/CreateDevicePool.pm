@@ -37,7 +37,7 @@ You shouldn't make instances of this class. Each attribute should be used as a n
     my $CreateDevicePoolResult = $devicefarm->CreateDevicePool(
       'Description' => 'My Android devices',
       'Name'        => 'MyDevicePool',
-      'ProjectArn' =>
+      'ProjectArn'  =>
 'arn:aws:devicefarm:us-west-2:123456789101:project:EXAMPLE-GUID-123-456',
       'Rules' => [
 

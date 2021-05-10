@@ -1,4 +1,4 @@
-# AWS::ECS::CapacityProvider generated from spec 18.4.0
+# AWS::ECS::CapacityProvider generated from spec 34.0.0
 use Moose::Util::TypeConstraints;
 
 coerce 'Cfn::Resource::Properties::AWS::ECS::CapacityProvider',
@@ -14,7 +14,7 @@ package Cfn::Resource::AWS::ECS::CapacityProvider {
     [  ]
   }
   sub supported_regions {
-    [ 'ap-east-1','ap-northeast-1','ap-northeast-2','ap-south-1','ap-southeast-1','ap-southeast-2','ca-central-1','cn-north-1','cn-northwest-1','eu-central-1','eu-north-1','eu-west-1','eu-west-2','eu-west-3','me-south-1','sa-east-1','us-east-1','us-east-2','us-gov-east-1','us-gov-west-1','us-west-1','us-west-2' ]
+    [ 'af-south-1','ap-east-1','ap-northeast-1','ap-northeast-2','ap-northeast-3','ap-south-1','ap-southeast-1','ap-southeast-2','ca-central-1','cn-north-1','cn-northwest-1','eu-central-1','eu-north-1','eu-south-1','eu-west-1','eu-west-2','eu-west-3','me-south-1','sa-east-1','us-east-1','us-east-2','us-gov-east-1','us-gov-west-1','us-west-1','us-west-2' ]
   }
 }
 
@@ -38,10 +38,10 @@ package Cfn::Resource::Properties::Object::AWS::ECS::CapacityProvider::ManagedSc
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
   
-  has MaximumScalingStepSize => (isa => 'Cfn::Value::Integer', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
-  has MinimumScalingStepSize => (isa => 'Cfn::Value::Integer', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
-  has Status => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
-  has TargetCapacity => (isa => 'Cfn::Value::Integer', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
+  has MaximumScalingStepSize => (isa => 'Cfn::Value::Integer', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has MinimumScalingStepSize => (isa => 'Cfn::Value::Integer', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has Status => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has TargetCapacity => (isa => 'Cfn::Value::Integer', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
 }
 
 subtype 'Cfn::Resource::Properties::AWS::ECS::CapacityProvider::AutoScalingGroupProvider',
@@ -63,8 +63,8 @@ package Cfn::Resource::Properties::Object::AWS::ECS::CapacityProvider::AutoScali
   extends 'Cfn::Value::TypedValue';
   
   has AutoScalingGroupArn => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
-  has ManagedScaling => (isa => 'Cfn::Resource::Properties::AWS::ECS::CapacityProvider::ManagedScaling', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
-  has ManagedTerminationProtection => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
+  has ManagedScaling => (isa => 'Cfn::Resource::Properties::AWS::ECS::CapacityProvider::ManagedScaling', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has ManagedTerminationProtection => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
 }
 
 package Cfn::Resource::Properties::AWS::ECS::CapacityProvider {
@@ -72,7 +72,7 @@ package Cfn::Resource::Properties::AWS::ECS::CapacityProvider {
   use MooseX::StrictConstructor;
   extends 'Cfn::Resource::Properties';
   
-  has AutoScalingGroupProvider => (isa => 'Cfn::Resource::Properties::AWS::ECS::CapacityProvider::AutoScalingGroupProvider', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
+  has AutoScalingGroupProvider => (isa => 'Cfn::Resource::Properties::AWS::ECS::CapacityProvider::AutoScalingGroupProvider', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has Name => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
   has Tags => (isa => 'ArrayOfCfn::Resource::Properties::TagType', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
 }

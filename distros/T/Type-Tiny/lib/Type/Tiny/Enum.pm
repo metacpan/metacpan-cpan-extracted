@@ -6,7 +6,7 @@ use warnings;
 
 BEGIN {
 	$Type::Tiny::Enum::AUTHORITY = 'cpan:TOBYINK';
-	$Type::Tiny::Enum::VERSION   = '1.012002';
+	$Type::Tiny::Enum::VERSION   = '1.012003';
 }
 
 $Type::Tiny::Enum::VERSION =~ tr/_//d;
@@ -467,7 +467,7 @@ checking each string against
 
 You can get a case-insensitive regexp using C<< $enum->as_regexp('i') >>.
 
-=item C<closet_match>
+=item C<closest_match>
 
 Returns the closest match in the enum for a string.
 

@@ -2,8 +2,8 @@ NAME
     Text::NonWideChar::Util - Utility routines for text
 
 VERSION
-    This document describes version 0.003 of Text::NonWideChar::Util (from
-    Perl distribution Text-NonWideChar-Util), released on 2021-04-14.
+    This document describes version 0.004 of Text::NonWideChar::Util (from
+    Perl distribution Text-NonWideChar-Util), released on 2021-04-16.
 
 SYNOPSIS
      use Text::NonWideChar::Util qw(
@@ -22,7 +22,10 @@ FUNCTIONS
     your text only contains printable ASCII characters and newlines.
 
 FAQ
-    # INSERT_BLOCK: Text::ANSI::Util why_split
+  Why split functionalities of wide character and color support into multiple modules/distributions?
+    Performance (see numbers in the function description), dependency
+    (Unicode::GCString is used for wide character support), and overhead
+    (loading Unicode::GCString).
 
 HOMEPAGE
     Please visit the project's homepage at

@@ -39,7 +39,7 @@ You shouldn't make instances of this class. Each attribute should be used as a n
         'arn:aws:inspector:us-west-2:123456789012:target/0-nvgVhaxX',
       'AssessmentTemplateName' => 'ExampleAssessmentTemplate',
       'DurationInSeconds'      => 180,
-      'RulesPackageArns' =>
+      'RulesPackageArns'       =>
         ['arn:aws:inspector:us-west-2:758058086616:rulespackage/0-11B9DBXp'],
       'UserAttributesForFindings' => [
 

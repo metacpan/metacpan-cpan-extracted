@@ -7,9 +7,15 @@ use v5.14;
 
 use App::CPANModuleSite;
 
-@ARGV or die "Usage: $0 <distribution_name>\n";
+@ARGV or die "Usage: $0 <distribution_name> [<base_url>]\n";
 
-my $app = App::CPANModuleSite->new($ARGV[0]);
+my $args = { distribution => $ARGV[0] };
+if (@ARGV > 1) {
+  $args->{base} = $ARGV[1];
+  $args->{base} .= '/' if $args->{base} !~ m|/$|;
+}
+
+my $app = App::CPANModuleSite->new($args);
 
 $app->run;
 

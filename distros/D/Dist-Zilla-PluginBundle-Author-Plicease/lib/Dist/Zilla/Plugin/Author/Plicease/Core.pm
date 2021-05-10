@@ -1,9 +1,10 @@
-package Dist::Zilla::Plugin::Author::Plicease::Core 2.62 {
+package Dist::Zilla::Plugin::Author::Plicease::Core 2.63 {
 
-  use 5.014;
+  use 5.020;
   use Moose;
   use Module::CoreList ();
   use version ();
+  use experimental qw( postderef );
 
   # ABSTRACT: Handle core prereqs
   # VERSION
@@ -35,7 +36,7 @@ package Dist::Zilla::Plugin::Author::Plicease::Core 2.62 {
     foreach my $phase (keys %$prereqs)
     {
       next if $phase eq 'develop';
-      foreach my $type (keys %{ $prereqs->{$phase} })
+      foreach my $type (keys $prereqs->{$phase}->%*)
       {
         foreach my $module (sort keys %{ $prereqs->{$phase}->{$type} })
         {
@@ -62,7 +63,7 @@ package Dist::Zilla::Plugin::Author::Plicease::Core 2.62 {
   sub setup_installer
   {
     my($self) = @_;
-    foreach my $file (grep { $_->name =~ /^(Makefile\.PL|Build\.PL)$/ } @{ $self->zilla->files })
+    foreach my $file (grep { $_->name =~ /^(Makefile\.PL|Build\.PL)$/ } $self->zilla->files->@*)
     {
       my $content = $file->content;
 
@@ -119,7 +120,7 @@ Dist::Zilla::Plugin::Author::Plicease::Core - Handle core prereqs
 
 =head1 VERSION
 
-version 2.62
+version 2.63
 
 =head1 AUTHOR
 

@@ -1,3 +1,8 @@
+0.013   2021-04-04  Released-By: PERLANCAR; Urgency: medium
+
+	- [bugfix] Test optional prereq conditionally (GH#2).
+
+
 0.012   2021-02-26  Released-By: PERLANCAR; Urgency: low
 
 	- No functional changes.

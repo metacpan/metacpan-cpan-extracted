@@ -29,7 +29,7 @@
          },
          "x_spec" : {
             "Perinci::Sub::ArgEntity" : "0.01",
-            "Rinci" : "v1.1.90",
+            "Rinci" : "v1.1.96",
             "Sah" : "v0.9.49"
          }
       },
@@ -37,14 +37,14 @@
          "requires" : {
             "Complete::Common" : "0.22",
             "Complete::Getopt::Long" : "0.479",
-            "Complete::Sah" : "0.005",
+            "Complete::Sah" : "0.007",
             "Complete::Util" : "0.608",
             "Data::Sah::Normalize" : "0",
             "Exporter" : "5.57",
-            "Log::ger" : "0.037",
+            "Log::ger" : "0.038",
             "Module::Installed::Tiny" : "0.004",
-            "Perinci::Sub::GetArgs::Argv" : "0.842",
-            "Perinci::Sub::Util" : "0.46",
+            "Perinci::Sub::GetArgs::Argv" : "0.845",
+            "Perinci::Sub::Util" : "0.470",
             "perl" : "5.010001",
             "strict" : "0",
             "warnings" : "0"
@@ -57,7 +57,7 @@
             "IO::Handle" : "0",
             "IPC::Open3" : "0",
             "Monkey::Patch::Action" : "0.060",
-            "Perinci::Examples" : "0.819",
+            "Perinci::Examples" : "0.821",
             "Perinci::Sub::Normalize" : "0.19",
             "Sah::SchemaR::negint" : "0",
             "Sah::SchemaR::posint" : "0",
@@ -77,12 +77,17 @@
          "web" : "https://github.com/perlancar/perl-Perinci-Sub-Complete"
       }
    },
-   "version" : "0.943",
+   "version" : "0.944",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.030002"
       },
       "plugins" : [
+         {
+            "class" : "Dist::Zilla::Plugin::PERLANCAR::CheckPendingRelease",
+            "name" : "@Author::PERLANCAR/PERLANCAR::CheckPendingRelease",
+            "version" : "0.001"
+         },
          {
             "class" : "Dist::Zilla::Plugin::GatherDir",
             "config" : {
@@ -172,7 +177,7 @@
          {
             "class" : "Dist::Zilla::Plugin::PERLANCAR::BeforeBuild",
             "name" : "@Author::PERLANCAR/PERLANCAR::BeforeBuild",
-            "version" : "0.600"
+            "version" : "0.603"
          },
          {
             "class" : "Dist::Zilla::Plugin::Rinci::AbstractFromMeta",
@@ -187,12 +192,12 @@
          {
             "class" : "Dist::Zilla::Plugin::PERLANCAR::EnsurePrereqToSpec",
             "name" : "@Author::PERLANCAR/PERLANCAR::EnsurePrereqToSpec",
-            "version" : "0.060"
+            "version" : "0.062"
          },
          {
             "class" : "Dist::Zilla::Plugin::PERLANCAR::MetaResources",
             "name" : "@Author::PERLANCAR/PERLANCAR::MetaResources",
-            "version" : "0.040"
+            "version" : "0.043"
          },
          {
             "class" : "Dist::Zilla::Plugin::CheckChangeLog",
@@ -241,9 +246,9 @@
             "version" : "6.014"
          },
          {
-            "class" : "Dist::Zilla::Plugin::Authority",
-            "name" : "@Author::PERLANCAR/Authority",
-            "version" : "1.009"
+            "class" : "Dist::Zilla::Plugin::PERLANCAR::Authority",
+            "name" : "@Author::PERLANCAR/PERLANCAR::Authority",
+            "version" : "0.001"
          },
          {
             "class" : "Dist::Zilla::Plugin::OurDate",
@@ -418,7 +423,7 @@
          {
             "class" : "Dist::Zilla::Plugin::Rinci::AddPrereqs",
             "name" : "@Author::PERLANCAR/Rinci::AddPrereqs",
-            "version" : "0.144"
+            "version" : "0.145"
          },
          {
             "class" : "Dist::Zilla::Plugin::Rinci::AddToDb",
@@ -428,7 +433,7 @@
          {
             "class" : "Dist::Zilla::Plugin::Rinci::EmbedValidator",
             "name" : "@Author::PERLANCAR/Rinci::EmbedValidator",
-            "version" : "0.250"
+            "version" : "0.251"
          },
          {
             "class" : "Dist::Zilla::Plugin::SetScriptShebang",

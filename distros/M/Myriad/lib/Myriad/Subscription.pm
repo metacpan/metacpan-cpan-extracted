@@ -3,7 +3,7 @@ package Myriad::Subscription;
 use strict;
 use warnings;
 
-our $VERSION = '0.005'; # VERSION
+our $VERSION = '0.006'; # VERSION
 our $AUTHORITY = 'cpan:DERIV'; # AUTHORITY
 
 use utf8;
@@ -12,7 +12,7 @@ use utf8;
 
 =head1 NAME
 
-Myriad::Subscription - microservice Subscription abstraction
+Myriad::Subscription - microservice subscription abstraction
 
 =head1 SYNOPSIS
 

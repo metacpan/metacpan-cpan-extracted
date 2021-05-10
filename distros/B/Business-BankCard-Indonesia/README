@@ -1,13 +1,270 @@
+NAME
+    Business::BankCard::Indonesia - Utilities for dealing with bank card
+    number issued in Indonesia
+
+VERSION
+    This document describes version 0.070 of Business::BankCard::Indonesia
+    (from Perl distribution Business-BankCard-Indonesia), released on
+    2021-05-07.
+
 SYNOPSIS
-
 DESCRIPTION
-
     NOTE: This module is still in early development and incomplete.
 
     This module provides routines to deal with bank card number issued in
     Indonesia.
 
-SEE ALSO
+FUNCTIONS
+  list_idn_bank_card_prefixes
+    Usage:
 
+     list_idn_bank_card_prefixes(%args) -> [status, msg, payload, meta]
+
+    Prefix of card numbers issued in Indonesia.
+
+    Data source is currently at https://github.com/sharyanto/gudangdata
+    (table/idn_bank_card_prefix).
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   detail => *bool* (default: 0)
+
+        Return array of full records instead of just ID fields.
+
+        By default, only the key (ID) field is returned per result entry.
+
+    *   exclude_fields => *array[str]*
+
+        Select fields to return.
+
+    *   fields => *array[str]* (default: ["prefix"])
+
+        Select fields to return.
+
+    *   ind_description => *str*
+
+        Only return records where the 'ind_description' field equals
+        specified value.
+
+    *   ind_description.contains => *str*
+
+        Only return records where the 'ind_description' field contains
+        specified text.
+
+    *   ind_description.in => *array[str]*
+
+        Only return records where the 'ind_description' field is in the
+        specified values.
+
+    *   ind_description.is => *str*
+
+        Only return records where the 'ind_description' field equals
+        specified value.
+
+    *   ind_description.isnt => *str*
+
+        Only return records where the 'ind_description' field does not equal
+        specified value.
+
+    *   ind_description.max => *str*
+
+        Only return records where the 'ind_description' field is less than
+        or equal to specified value.
+
+    *   ind_description.min => *str*
+
+        Only return records where the 'ind_description' field is greater
+        than or equal to specified value.
+
+    *   ind_description.not_contains => *str*
+
+        Only return records where the 'ind_description' field does not
+        contain specified text.
+
+    *   ind_description.not_in => *array[str]*
+
+        Only return records where the 'ind_description' field is not in the
+        specified values.
+
+    *   ind_description.xmax => *str*
+
+        Only return records where the 'ind_description' field is less than
+        specified value.
+
+    *   ind_description.xmin => *str*
+
+        Only return records where the 'ind_description' field is greater
+        than specified value.
+
+    *   issuer_id => *int*
+
+        Only return records where the 'issuer_id' field equals specified
+        value.
+
+    *   issuer_id.in => *array[int]*
+
+        Only return records where the 'issuer_id' field is in the specified
+        values.
+
+    *   issuer_id.is => *int*
+
+        Only return records where the 'issuer_id' field equals specified
+        value.
+
+    *   issuer_id.isnt => *int*
+
+        Only return records where the 'issuer_id' field does not equal
+        specified value.
+
+    *   issuer_id.max => *int*
+
+        Only return records where the 'issuer_id' field is less than or
+        equal to specified value.
+
+    *   issuer_id.min => *int*
+
+        Only return records where the 'issuer_id' field is greater than or
+        equal to specified value.
+
+    *   issuer_id.not_in => *array[int]*
+
+        Only return records where the 'issuer_id' field is not in the
+        specified values.
+
+    *   issuer_id.xmax => *int*
+
+        Only return records where the 'issuer_id' field is less than
+        specified value.
+
+    *   issuer_id.xmin => *int*
+
+        Only return records where the 'issuer_id' field is greater than
+        specified value.
+
+    *   prefix => *str*
+
+        Only return records where the 'prefix' field equals specified value.
+
+    *   prefix.contains => *str*
+
+        Only return records where the 'prefix' field contains specified
+        text.
+
+    *   prefix.in => *array[str]*
+
+        Only return records where the 'prefix' field is in the specified
+        values.
+
+    *   prefix.is => *str*
+
+        Only return records where the 'prefix' field equals specified value.
+
+    *   prefix.isnt => *str*
+
+        Only return records where the 'prefix' field does not equal
+        specified value.
+
+    *   prefix.max => *str*
+
+        Only return records where the 'prefix' field is less than or equal
+        to specified value.
+
+    *   prefix.min => *str*
+
+        Only return records where the 'prefix' field is greater than or
+        equal to specified value.
+
+    *   prefix.not_contains => *str*
+
+        Only return records where the 'prefix' field does not contain
+        specified text.
+
+    *   prefix.not_in => *array[str]*
+
+        Only return records where the 'prefix' field is not in the specified
+        values.
+
+    *   prefix.xmax => *str*
+
+        Only return records where the 'prefix' field is less than specified
+        value.
+
+    *   prefix.xmin => *str*
+
+        Only return records where the 'prefix' field is greater than
+        specified value.
+
+    *   query => *str*
+
+        Search.
+
+    *   random => *bool* (default: 0)
+
+        Return records in random order.
+
+    *   result_limit => *int*
+
+        Only return a certain number of records.
+
+    *   result_start => *int* (default: 1)
+
+        Only return starting from the n'th record.
+
+    *   sort => *array[str]*
+
+        Order records according to certain field(s).
+
+        A list of field names separated by comma. Each field can be prefixed
+        with '-' to specify descending order instead of the default
+        ascending.
+
+    *   with_field_names => *bool*
+
+        Return field names in each record (as hash/associative array).
+
+        When enabled, function will return each record as hash/associative
+        array (field name => value pairs). Otherwise, function will return
+        each record as list/array (field value, field value, ...).
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (payload) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Business-BankCard-Indonesia>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Business-BankCard-Indonesia>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Business-BankCard-Ind
+    onesia>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
     Business::BankCard
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2021, 2015, 2014, 2012 by
+    perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

@@ -1,7 +1,10 @@
 package Locale::ID::SubCountry;
 use Locale::ID::Province;
 
-our $VERSION = '0.10'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2021-05-07'; # DATE
+our $DIST = 'Locale-ID-Province'; # DIST
+our $VERSION = '0.110'; # VERSION
 
 our @ISA       = @Locale::ID::Province::ISA;
 our @EXPORT    = @Locale::ID::Province::EXPORT;
@@ -26,16 +29,16 @@ Locale::ID::SubCountry - Alias for Locale::ID::Province
 
 =head1 VERSION
 
-This document describes version 0.10 of Locale::ID::SubCountry (from Perl distribution Locale-ID-Province), released on 2017-07-10.
+This document describes version 0.110 of Locale::ID::SubCountry (from Perl distribution Locale-ID-Province), released on 2021-05-07.
 
 =head1 FUNCTIONS
 
 
-=head2 list_id_provinces
+=head2 list_idn_provinces
 
 Usage:
 
- list_id_provinces(%args) -> [status, msg, result, meta]
+ list_idn_provinces(%args) -> [status, msg, payload, meta]
 
 Provinces in Indonesia.
 
@@ -132,6 +135,10 @@ Only return records where the 'eng_name' field is less than specified value.
 =item * B<eng_name.xmin> => I<str>
 
 Only return records where the 'eng_name' field is greater than specified value.
+
+=item * B<exclude_fields> => I<array[str]>
+
+Select fields to return.
 
 =item * B<fields> => I<array[str]>
 
@@ -382,11 +389,12 @@ Only return records where the 'tags' field is greater than specified value.
 
 =item * B<with_field_names> => I<bool>
 
-Return field names in each record (as hash/associative array).
+Return field names in each record (as hashE<sol>associative array).
 
 When enabled, function will return each record as hash/associative array
 (field name => value pairs). Otherwise, function will return each record
 as list/array (field value, field value, ...).
+
 
 =back
 
@@ -395,7 +403,7 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
@@ -423,7 +431,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017, 2015, 2014, 2012 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2017, 2015, 2014, 2012 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

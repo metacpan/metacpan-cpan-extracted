@@ -1,4 +1,4 @@
-# AWS::IoT::Thing generated from spec 18.4.0
+# AWS::IoT::Thing generated from spec 34.0.0
 use Moose::Util::TypeConstraints;
 
 coerce 'Cfn::Resource::Properties::AWS::IoT::Thing',
@@ -20,12 +20,33 @@ package Cfn::Resource::AWS::IoT::Thing {
 
 
 
+subtype 'Cfn::Resource::Properties::AWS::IoT::Thing::AttributePayload',
+     as 'Cfn::Value';
+
+coerce 'Cfn::Resource::Properties::AWS::IoT::Thing::AttributePayload',
+  from 'HashRef',
+   via {
+     if (my $f = Cfn::TypeLibrary::try_function($_)) {
+       return $f
+     } else {
+       return Cfn::Resource::Properties::Object::AWS::IoT::Thing::AttributePayload->new( %$_ );
+     }
+   };
+
+package Cfn::Resource::Properties::Object::AWS::IoT::Thing::AttributePayload {
+  use Moose;
+  use MooseX::StrictConstructor;
+  extends 'Cfn::Value::TypedValue';
+  
+  has Attributes => (isa => 'Cfn::Value::Hash|Cfn::DynamicValue', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+}
+
 package Cfn::Resource::Properties::AWS::IoT::Thing {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Resource::Properties';
   
-  has AttributePayload => (isa => 'Cfn::Value::Json|Cfn::DynamicValue', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has AttributePayload => (isa => 'Cfn::Resource::Properties::AWS::IoT::Thing::AttributePayload', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has ThingName => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
 }
 

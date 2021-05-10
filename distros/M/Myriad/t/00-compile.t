@@ -6,7 +6,7 @@ use warnings;
 
 use Test::More;
 
-plan tests => 49 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 50 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'Myriad.pm',
@@ -60,6 +60,7 @@ my @module_files = (
 
 my @scripts = (
     'bin/myriad-dev.pl',
+    'bin/myriad-migrate-rpc-streams.pl',
     'bin/myriad.pl'
 );
 

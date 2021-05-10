@@ -1,9 +1,9 @@
 package Dist::Zilla::Plugin::PERLANCAR::MetaResources;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-12-09'; # DATE
+our $DATE = '2021-05-07'; # DATE
 our $DIST = 'Dist-Zilla-Plugin-PERLANCAR-MetaResources'; # DIST
-our $VERSION = '0.042'; # VERSION
+our $VERSION = '0.043'; # VERSION
 
 use 5.010001;
 use strict;
@@ -57,9 +57,8 @@ has homepage => (
 has bugtracker_web => (
     is      => 'ro',
     isa     => 'Str',
-    # old, will be dead in mar 2021
-    # default => 'https://rt.cpan.org/Public/Dist/Display.html?Name=%N',
-    default => 'https://github.com/%a/%r/issues',
+    default => 'https://rt.cpan.org/Public/Dist/Display.html?Name=%N',
+    #default => 'https://github.com/%a/%r/issues',
 );
 
 has repository_url => (
@@ -181,7 +180,7 @@ Dist::Zilla::Plugin::PERLANCAR::MetaResources - Set meta resources for dists
 
 =head1 VERSION
 
-This document describes version 0.042 of Dist::Zilla::Plugin::PERLANCAR::MetaResources (from Perl distribution Dist-Zilla-Plugin-PERLANCAR-MetaResources), released on 2020-12-09.
+This document describes version 0.043 of Dist::Zilla::Plugin::PERLANCAR::MetaResources (from Perl distribution Dist-Zilla-Plugin-PERLANCAR-MetaResources), released on 2021-05-07.
 
 =head1 SYNOPSIS
 
@@ -207,7 +206,7 @@ Source repository is at L<https://github.com/perlancar/perl-Dist-Zilla-Plugin-PE
 
 =head1 BUGS
 
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Dist-Zilla-Plugin-PERLANCAR-MetaResources>
+Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-Dist-Zilla-Plugin-PERLANCAR-MetaResources/issues>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
@@ -223,7 +222,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020, 2018, 2014, 2013 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2018, 2014, 2013 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

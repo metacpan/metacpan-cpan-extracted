@@ -1,7 +1,11 @@
+## no critic: Modules::ProhibitAutomaticExportation
+
 package Test::Perinci::CmdLine;
 
-our $DATE = '2017-01-12'; # DATE
-our $VERSION = '1.47'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2021-05-07'; # DATE
+our $DIST = 'Test-Perinci-CmdLine'; # DIST
+our $VERSION = '1.481'; # VERSION
 
 use 5.010001;
 use strict 'subs', 'vars';
@@ -625,7 +629,7 @@ sub square { my %args=@_; [200, "OK", $args{num}**2] }
                         inline_gen_args => {load_module=>['Perinci::Examples::Tiny']},
                         argv        => [qw/--help/],
                         exit_code   => 0,
-                        stdout_like => qr/^Usage.+^([^\n]*)Options/ims,
+                        stdout_like => qr/^\s*Usage.+^([^\n]*)Options/ims,
                     },
                     {
                         name        => '+ is not accepted as option starter',
@@ -647,7 +651,7 @@ sub square { my %args=@_; [200, "OK", $args{num}**2] }
                         inline_gen_args => {load_module=>['Perinci::Examples::Tiny']},
                         argv        => [qw/--help 1 2 3/],
                         exit_code   => 0,
-                        stdout_like => qr/^Usage.+^([^\n]*)Options/ims,
+                        stdout_like => qr/^\s*Usage.+^([^\n]*)Options/ims,
                     },
                     {
                         tags        => [qw/subcommand/],
@@ -661,7 +665,7 @@ sub square { my %args=@_; [200, "OK", $args{num}**2] }
                         inline_gen_args => {load_module=>['Perinci::Examples::Tiny']},
                         argv        => [qw/--help/],
                         exit_code   => 0,
-                        stdout_like => qr/^Subcommands.+\bsc1\b/ms,
+                        stdout_like => qr/^\s*Subcommands.+\bsc1\b/ms,
                     },
                     {
                         tags          => [qw/subcommand/],
@@ -675,8 +679,8 @@ sub square { my %args=@_; [200, "OK", $args{num}**2] }
                         inline_gen_args => {load_module=>['Perinci::Examples::Tiny']},
                         argv          => [qw/sc1 --help/],
                         exit_code     => 0,
-                        stdout_like   => qr/Do nothing.+^Usage/ms,
-                        stdout_unlike => qr/^Subcommands.+\bsc1\b/ms,
+                        stdout_like   => qr/Do nothing.+^\s*Usage/ms,
+                        stdout_unlike => qr/^\s*Subcommands.+\bsc1\b/ms,
                     },
                 ],
             }, # help action
@@ -1206,7 +1210,7 @@ sub square { my %args=@_; [200, "OK", $args{num}**2] }
                     {
                         tags        => ['dry-run'],
                         name        => 'dry-run (via env, 0)',
-                        gen_args    => {url=>'/Perinci/Examples/test_dry_run'},
+                        gen_args    => {url=>'/Perinci/Examples/dry_run'},
                         #inline_gen_args => {...},
                         env         => {DRY_RUN=>0},
                         argv        => [],
@@ -1215,7 +1219,7 @@ sub square { my %args=@_; [200, "OK", $args{num}**2] }
                     {
                         tags        => ['dry-run'],
                         name        => 'dry-run (via env, 1)',
-                        gen_args    => {url=>'/Perinci/Examples/test_dry_run'},
+                        gen_args    => {url=>'/Perinci/Examples/dry_run'},
                         #inline_gen_args => {...},
                         env         => {DRY_RUN=>1},
                         argv        => [qw//],
@@ -1224,7 +1228,7 @@ sub square { my %args=@_; [200, "OK", $args{num}**2] }
                     {
                         tags        => ['dry-run'],
                         name        => 'dry-run (via cmdline opt)',
-                        gen_args    => {url=>'/Perinci/Examples/test_dry_run'},
+                        gen_args    => {url=>'/Perinci/Examples/dry_run'},
                         #inline_gen_args => {...},
                         argv        => [qw/--dry-run/],
                         stdout_like => qr/dry/,
@@ -1808,14 +1812,18 @@ Test::Perinci::CmdLine - Common test suite for Perinci::CmdLine::{Lite,Classic,I
 
 =head1 VERSION
 
-This document describes version 1.47 of Test::Perinci::CmdLine (from Perl distribution Test-Perinci-CmdLine), released on 2017-01-12.
+This document describes version 1.481 of Test::Perinci::CmdLine (from Perl distribution Test-Perinci-CmdLine), released on 2021-05-07.
 
 =for Pod::Coverage ^(pericmd_ok)$
 
 =head1 FUNCTIONS
 
 
-=head2 pericmd_run_ok(%args) -> [status, msg, result, meta]
+=head2 pericmd_run_ok
+
+Usage:
+
+ pericmd_run_ok(%args) -> [status, msg, payload, meta]
 
 Run a single test of a Perinci::CmdLine script.
 
@@ -1948,6 +1956,7 @@ Test output of generated CLI script.
 
 Test output of generated CLI script.
 
+
 =back
 
 Returns an enveloped result (an array).
@@ -1955,14 +1964,19 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
 Return value:  (any)
 
 
-=head2 pericmd_run_suite_ok(%args) -> [status, msg, result, meta]
+
+=head2 pericmd_run_suite_ok
+
+Usage:
+
+ pericmd_run_suite_ok(%args) -> [status, msg, payload, meta]
 
 Common test suite for Perinci::CmdLine::{Lite,Classic,Inline}.
 
@@ -1976,6 +1990,7 @@ Arguments ('*' denotes required arguments):
 
 Which Perinci::CmdLine class are we testing.
 
+
 =back
 
 Returns an enveloped result (an array).
@@ -1983,14 +1998,19 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
 Return value:  (any)
 
 
-=head2 pericmd_run_test_groups_ok(%args) -> [status, msg, result, meta]
+
+=head2 pericmd_run_test_groups_ok
+
+Usage:
+
+ pericmd_run_test_groups_ok(%args) -> [status, msg, payload, meta]
 
 Run groups of Perinci::CmdLine tests.
 
@@ -2017,6 +2037,7 @@ Which Perinci::CmdLine class are we testing.
 If not specified, will create temporary directory with C<File::Temp>'s
 C<tempdir()>.
 
+
 =back
 
 Returns an enveloped result (an array).
@@ -2024,14 +2045,19 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
 Return value:  (any)
 
 
-=head2 pericmd_run_tests_ok(%args) -> [status, msg, result, meta]
+
+=head2 pericmd_run_tests_ok
+
+Usage:
+
+ pericmd_run_tests_ok(%args) -> [status, msg, payload, meta]
 
 Run a group of tests of a Perinci::CmdLine script.
 
@@ -2049,6 +2075,7 @@ Which Perinci::CmdLine class are we testing.
 
 =item * B<tests>* => I<array[hash]>
 
+
 =back
 
 Returns an enveloped result (an array).
@@ -2056,7 +2083,7 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
@@ -2087,7 +2114,7 @@ Source repository is at L<https://github.com/perlancar/perl-Test-Perinci-CmdLine
 
 =head1 BUGS
 
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Test-Perinci-CmdLine>
+Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-Test-Perinci-CmdLine/issues>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
@@ -2104,7 +2131,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2017, 2016, 2015 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

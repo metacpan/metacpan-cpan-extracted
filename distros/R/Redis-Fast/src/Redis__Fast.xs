@@ -249,6 +249,21 @@ static int wait_for_event(Redis__Fast self, double read_timeout, double write_ti
     return WAIT_FOR_EVENT_OK;
 }
 
+
+static int _wait_all_responses(Redis__Fast self) {
+    DEBUG_MSG("%s", "start");
+    while(self->ac && self->ac->replies.tail) {
+        int res = wait_for_event(self, self->read_timeout, self->write_timeout);
+        if (res != WAIT_FOR_EVENT_OK) {
+            DEBUG_MSG("error: %d", res);
+            return res;
+        }
+    }
+    DEBUG_MSG("%s", "finish");
+    return WAIT_FOR_EVENT_OK;
+}
+
+
 static void Redis__Fast_connect_cb(redisAsyncContext* c, int status) {
     Redis__Fast self = (Redis__Fast)c->data;
     DEBUG_MSG("connected status = %d", status);
@@ -329,12 +344,12 @@ static redisAsyncContext* __build_sock(Redis__Fast self)
         if(res != WAIT_FOR_EVENT_OK) {
             DEBUG_MSG("error: %d", res);
             redisAsyncFree(self->ac);
+            _wait_all_responses(self);
 
             // set is_connected flag to reconnect.
             // see https://github.com/shogo82148/Redis-Fast/issues/73
             self->is_connected = 1;
 
-            self->ac = NULL;
             return NULL;
         }
     }
@@ -349,20 +364,6 @@ static redisAsyncContext* __build_sock(Redis__Fast self)
 }
 
 
-static int _wait_all_responses(Redis__Fast self) {
-    DEBUG_MSG("%s", "start");
-    while(self->ac && self->ac->replies.tail) {
-        int res = wait_for_event(self, self->read_timeout, self->write_timeout);
-        if (res != WAIT_FOR_EVENT_OK) {
-            DEBUG_MSG("error: %d", res);
-            return res;
-        }
-    }
-    DEBUG_MSG("%s", "finish");
-    return WAIT_FOR_EVENT_OK;
-}
-
-
 static void Redis__Fast_connect(Redis__Fast self) {
     struct timeval start, end;
 
@@ -370,7 +371,7 @@ static void Redis__Fast_connect(Redis__Fast self) {
 
     if (self->ac) {
         redisAsyncFree(self->ac);
-        self->ac = NULL;
+        _wait_all_responses(self);
     }
     self->flags = 0;
 
@@ -716,7 +717,6 @@ static void Redis__Fast_quit(Redis__Fast self) {
         if(cbt->ret.result || cbt->ret.error) Safefree(cbt);
     }
     DEBUG_MSG("%s", "finish");
-    self->ac = NULL;
 }
 
 static redis_fast_reply_t  Redis__Fast_run_cmd(Redis__Fast self, int collect_errors, CUSTOM_DECODE custom_decode, SV* cb, int argc, const char** argv, size_t* argvlen) {
@@ -1128,7 +1128,7 @@ CODE:
     if (self->ac) {
         DEBUG_MSG("%s", "free ac");
         redisAsyncFree(self->ac);
-        self->ac = NULL;
+        _wait_all_responses(self);
     }
 
     if(self->hostname) {
@@ -1339,7 +1339,6 @@ CODE:
         redisAsyncDisconnect(self->ac);
         _wait_all_responses(self);
         self->is_connected = 0;
-        self->ac = NULL;
         ST(0) = sv_2mortal(newSViv(1));
         XSRETURN(1);
     } else {

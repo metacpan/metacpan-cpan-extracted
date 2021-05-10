@@ -41,7 +41,7 @@ $sink->source->map(async sub {
     await $rpc->reply_success('test::service', shift, {ok => 1});
 })->resolve()->completed->retain();
 
-$rpc->create_from_sink(method => 'test', sink => $sink, service => 'test::service');
+$rpc->create_from_sink(method => 'test', sink => $sink, service => 'test.service');
 $rpc->start->retain->on_fail(sub {
     die shift;
 });
@@ -51,7 +51,7 @@ subtest 'it should propagate the message correctly' => sub {
         $message_args->{rpc} = 'test';
 
         my $sub = await $transport->subscribe('client');
-        my $id =    await $transport->add_to_stream('test::service', $message_args->%*);
+        my $id =    await $transport->add_to_stream('service.test.service.rpc/test', $message_args->%*);
         await $sub->take(1)->each(sub {
             my $message = shift;
             like($message, qr{\\"ok\\":1}, 'message has been propagated correctly');

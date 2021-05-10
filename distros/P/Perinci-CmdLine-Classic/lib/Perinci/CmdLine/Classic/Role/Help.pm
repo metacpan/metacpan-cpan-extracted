@@ -2,8 +2,8 @@
 
 package Perinci::CmdLine::Classic::Role::Help;
 
-our $DATE = '2019-04-15'; # DATE
-our $VERSION = '1.813'; # VERSION
+our $DATE = '2021-05-07'; # DATE
+our $VERSION = '1.814'; # VERSION
 
 # split here just so it's more organized
 
@@ -33,7 +33,7 @@ sub _help_add_table {
 
     $self->_help_draw_curtbl($r);
     my $t = Text::ANSITable->new;
-    $t->border_style('Default::spacei_ascii');
+    $t->border_style('ASCII::SingleLineInnerOnly');
     $t->cell_pad(0);
     if ($args{column_widths}) {
         for (0..$columns-1) {
@@ -91,9 +91,9 @@ sub _help_add_heading {
 }
 
 sub _color {
-    my ($self, $color_name, $text) = @_;
-    my $color_code = $color_name ?
-        $self->get_theme_color_as_ansi($color_name) : "";
+    my ($self, $item_name, $text) = @_;
+    my $color_code = $item_name ?
+        $self->{color_theme_obj}->get_item_color_as_ansi($item_name) : "";
     my $reset_code = $color_code ? "\e[0m" : "";
     "$color_code$text$reset_code";
 }
@@ -517,7 +517,7 @@ Perinci::CmdLine::Classic::Role::Help - Help-related routines
 
 =head1 VERSION
 
-This document describes version 1.813 of Perinci::CmdLine::Classic::Role::Help (from Perl distribution Perinci-CmdLine-Classic), released on 2019-04-15.
+This document describes version 1.814 of Perinci::CmdLine::Classic::Role::Help (from Perl distribution Perinci-CmdLine-Classic), released on 2021-05-07.
 
 =for Pod::Coverage ^(.+)$
 
@@ -542,7 +542,7 @@ Source repository is at L<https://github.com/perlancar/perl-Perinci-CmdLine-Clas
 
 =head1 BUGS
 
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Perinci-CmdLine-Classic>
+Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-Perinci-CmdLine-Classic/issues>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
@@ -554,7 +554,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019, 2018, 2017, 2016, 2015, 2014, 2013, 2012, 2011 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2018, 2017, 2016, 2015, 2014, 2013, 2012, 2011 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -1,4 +1,4 @@
-# AWS::QLDB::Stream generated from spec 18.4.0
+# AWS::QLDB::Stream generated from spec 34.0.0
 use Moose::Util::TypeConstraints;
 
 coerce 'Cfn::Resource::Properties::AWS::QLDB::Stream',
@@ -14,7 +14,7 @@ package Cfn::Resource::AWS::QLDB::Stream {
     [ 'Arn','Id' ]
   }
   sub supported_regions {
-    [ 'ap-northeast-1','ap-northeast-2','ap-southeast-1','ap-southeast-2','eu-central-1','eu-west-1','us-east-1','us-east-2','us-west-2' ]
+    [ 'ap-northeast-1','ap-northeast-2','ap-southeast-1','ap-southeast-2','eu-central-1','eu-west-1','eu-west-2','us-east-1','us-east-2','us-west-2' ]
   }
 }
 

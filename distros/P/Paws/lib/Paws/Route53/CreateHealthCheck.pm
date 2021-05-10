@@ -4,6 +4,7 @@ package Paws::Route53::CreateHealthCheck;
   has CallerReference => (is => 'ro', isa => 'Str', required => 1);
   has HealthCheckConfig => (is => 'ro', isa => 'Paws::Route53::HealthCheckConfig', required => 1);
 
+
   use MooseX::ClassAttribute;
 
   class_has _api_call => (isa => 'Str', is => 'ro', default => 'CreateHealthCheck');
@@ -11,7 +12,8 @@ package Paws::Route53::CreateHealthCheck;
   class_has _api_method  => (isa => 'Str', is => 'ro', default => 'POST');
   class_has _returns => (isa => 'Str', is => 'ro', default => 'Paws::Route53::CreateHealthCheckResponse');
   class_has _result_key => (isa => 'Str', is => 'ro');
-  
+  class_has _top_level_element => (isa => 'Str', is => 'ro', default => 'CreateHealthCheckRequest');
+  class_has _top_level_namespace => (isa => 'Str', is => 'ro', default => 'https://route53.amazonaws.com/doc/2013-04-01/');  
 1;
 
 ### main pod documentation begin ###
@@ -44,14 +46,14 @@ You shouldn't make instances of this class. Each attribute should be used as a n
         },    # OPTIONAL
         ChildHealthChecks => [
           'MyHealthCheckId', ...    # max: 64
-        ],                          # max: 256; OPTIONAL
-        Disabled         => 1,      # OPTIONAL
-        EnableSNI        => 1,      # OPTIONAL
-        FailureThreshold => 1,      # min: 1, max: 10; OPTIONAL
+        ],    # max: 256; OPTIONAL
+        Disabled                 => 1,     # OPTIONAL
+        EnableSNI                => 1,     # OPTIONAL
+        FailureThreshold         => 1,     # min: 1, max: 10; OPTIONAL
         FullyQualifiedDomainName =>
           'MyFullyQualifiedDomainName',    # max: 255; OPTIONAL
-        HealthThreshold => 1,              # max: 256; OPTIONAL
-        IPAddress       => 'MyIPAddress',  # max: 45; OPTIONAL
+        HealthThreshold              => 1,                # max: 256; OPTIONAL
+        IPAddress                    => 'MyIPAddress',    # max: 45; OPTIONAL
         InsufficientDataHealthStatus =>
           'Healthy',    # values: Healthy, Unhealthy, LastKnownStatus; OPTIONAL
         Inverted       => 1,    # OPTIONAL

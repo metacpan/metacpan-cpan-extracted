@@ -2,7 +2,7 @@ package Myriad::Commands;
 
 use Myriad::Class;
 
-our $VERSION = '0.005'; # VERSION
+our $VERSION = '0.006'; # VERSION
 our $AUTHORITY = 'cpan:DERIV'; # AUTHORITY
 
 =encoding utf8
@@ -71,7 +71,7 @@ async method service (@args) {
             require_module($module);
             die 'loaded ' . $module . ' but it cannot ->new?' unless $module->can('new');
         } catch ($e) {
-            Future::Exception->throw(sprintf 'Service module %s not found', $module) if $e =~ /Can't locate/;
+            Future::Exception->throw(sprintf 'Service module %s not found', $module) if $e =~ /Can't locate.*(\Q$module\E)/;
             Future::Exception->throw(sprintf 'Failed to load module for service %s - %s', $module, $e);
         }
     }

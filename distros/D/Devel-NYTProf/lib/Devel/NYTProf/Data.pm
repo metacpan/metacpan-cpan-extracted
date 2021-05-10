@@ -55,7 +55,7 @@ use Devel::NYTProf::FileInfo;
 use Devel::NYTProf::SubInfo;
 use Devel::NYTProf::Util qw( trace_level _dumper );
 
-our $VERSION = '6.09';
+our $VERSION = '6.10';
 
 
 =head2 new
@@ -783,7 +783,7 @@ L<Devel::NYTProf>
 =head1 AUTHOR
 
 B<Adam Kaplan>, C<< <akaplan at nytimes.com> >>
-B<Tim Bunce>, L<http://www.tim.bunce.name> and L<http://blog.timbunce.org>
+B<Tim Bunce>, L<http://blog.timbunce.org>
 B<Steve Peters>, C<< <steve at fisharerojo.org> >>
 
 =head1 COPYRIGHT AND LICENSE

@@ -1,7 +1,7 @@
-use 5.024;
+use 5.020;
 use Test2::V0 -no_srand => 1;
-use lib '.';
 use Test::DZil;
+use experimental qw( postderef );
 
 subtest basics => sub {
 
@@ -20,7 +20,7 @@ subtest basics => sub {
 
   $tzil->build;
 
-  my($pm) = grep { $_->name eq 'lib/DZT.pm' } @{ $tzil->files };
+  my($pm) = grep { $_->name eq 'lib/DZT.pm' } $tzil->files->@*;
   ok $pm->content =~ m{^ say 'hello world';$}m, "module contains example file";
 };
 
@@ -41,7 +41,7 @@ subtest 'basics file not in gather but on disk' => sub {
 
   $tzil->build;
 
-  my($pm) = grep { $_->name eq 'lib/DZT.pm' } @{ $tzil->files };
+  my($pm) = grep { $_->name eq 'lib/DZT.pm' } $tzil->files->@*;
   ok $pm->content =~ m{^ say 'hello world';$}m, "module contains example file";
 };
 
@@ -62,7 +62,7 @@ subtest 'utf8 script' => sub {
 
   $tzil->build;
 
-  my($pm) = grep { $_->name eq 'lib/DZT.pm' } @{ $tzil->files };
+  my($pm) = grep { $_->name eq 'lib/DZT.pm' } $tzil->files->@*;
   ok $pm->content =~ m{^ say 'Привет, мир';$}m, "module contains example file"
     or diag $pm->content;
 };
@@ -84,7 +84,7 @@ subtest 'utf8 script not in gather but on disk' => sub {
 
   $tzil->build;
 
-  my($pm) = grep { $_->name eq 'lib/DZT.pm' } @{ $tzil->files };
+  my($pm) = grep { $_->name eq 'lib/DZT.pm' } $tzil->files->@*;
   ok $pm->content =~ m{^ say 'Привет, мир';$}m, "module contains example file"
     or diag $pm->content;
 };
@@ -107,7 +107,7 @@ subtest 'from generated' => sub {
 
   $tzil->build;
 
-  my($pm) = grep { $_->name eq 'lib/DZT.pm' } @{ $tzil->files };
+  my($pm) = grep { $_->name eq 'lib/DZT.pm' } $tzil->files->@*;
 
   ok $pm->content =~ m{^ here is a generated file$}m, "module contains example file";
 };
@@ -130,7 +130,7 @@ subtest 'from generated' => sub {
 
   $tzil->build;
 
-  my($pm) = grep { $_->name eq 'lib/DZT.pm' } @{ $tzil->files };
+  my($pm) = grep { $_->name eq 'lib/DZT.pm' } $tzil->files->@*;
 
   ok $pm->content =~ m{^    here is a generated file$}m, "module contains example file";
 };

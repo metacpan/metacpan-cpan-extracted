@@ -1,9 +1,9 @@
 package Filename::Video;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-05-30'; # DATE
+our $DATE = '2020-10-20'; # DATE
 our $DIST = 'Filename-Video'; # DIST
-our $VERSION = '0.003'; # VERSION
+our $VERSION = '0.004'; # VERSION
 
 use 5.010001;
 use strict;
@@ -16,6 +16,57 @@ our $STR_RE = "movie|mpeg|webm|3gp|asf|asx|avi|axv|dif|fli|flv|lsf|lsx|mkv|mng|m
 
 our $RE = qr(\.(?:$STR_RE)\z)i;
 
+our %SPEC;
+
+$SPEC{check_video_filename} = {
+    v => 1.1,
+    summary => 'Check whether filename indicates being a video file',
+    description => <<'_',
+
+
+_
+    args => {
+        filename => {
+            schema => 'filename*',
+            req => 1,
+            pos => 0,
+        },
+        # XXX recurse?
+        #ci => {
+        #    summary => 'Whether to match case-insensitively',
+        #    schema  => 'bool',
+        #    default => 1,
+        #},
+    },
+    result_naked => 1,
+    result => {
+        schema => ['any*', of=>['bool*', 'hash*']],
+        description => <<'_',
+
+Return false if no archive suffixes detected. Otherwise return a hash of
+information.
+
+_
+    },
+    examples => [
+        {
+            args => {filename => 'foo.txt'},
+            naked_result => 0,
+        },
+        {
+            args => {filename => 'foo.DOC'},
+            naked_result => 0,
+        },
+        {
+            args => {filename => 'foo.webm'},
+            naked_result => {},
+        },
+        {
+            args => {filename => 'foo.MP4'},
+            naked_result => {},
+        },
+    ],
+};
 sub check_video_filename {
     my %args = @_;
 
@@ -37,7 +88,7 @@ Filename::Video - Check whether filename indicates being a video file
 
 =head1 VERSION
 
-This document describes version 0.003 of Filename::Video (from Perl distribution Filename-Video), released on 2020-05-30.
+This document describes version 0.004 of Filename::Video (from Perl distribution Filename-Video), released on 2020-10-20.
 
 =head1 SYNOPSIS
 
@@ -53,7 +104,53 @@ This document describes version 0.003 of Filename::Video (from Perl distribution
 
 =head1 FUNCTIONS
 
+
 =head2 check_video_filename
+
+Usage:
+
+ check_video_filename(%args) -> bool|hash
+
+Check whether filename indicates being a video file.
+
+Examples:
+
+=over
+
+=item * Example #1:
+
+ check_video_filename(filename => "foo.txt"); # -> 0
+
+=item * Example #2:
+
+ check_video_filename(filename => "foo.DOC"); # -> 0
+
+=item * Example #3:
+
+ check_video_filename(filename => "foo.webm"); # -> {}
+
+=item * Example #4:
+
+ check_video_filename(filename => "foo.MP4"); # -> {}
+
+=back
+
+This function is not exported by default, but exportable.
+
+Arguments ('*' denotes required arguments):
+
+=over 4
+
+=item * B<filename>* => I<filename>
+
+
+=back
+
+Return value:  (bool|hash)
+
+
+Return false if no archive suffixes detected. Otherwise return a hash of
+information.
 
 =head1 HOMEPAGE
 

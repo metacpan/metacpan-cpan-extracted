@@ -1,3 +1,6 @@
+0.78 2021-04-24
+- update build to avoid false positives for working CDF library
+
 0.77 2021-04-20
 - moved the GSL CDF functions over to main PDL - thanks @maggiexyz!
 

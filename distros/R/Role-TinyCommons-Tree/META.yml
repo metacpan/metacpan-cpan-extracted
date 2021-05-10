@@ -34,7 +34,7 @@ resources:
   bugtracker: https://github.com/perlancar/perl-Role-TinyCommons-TreeNode/issues
   homepage: https://metacpan.org/release/Role-TinyCommons-Tree
   repository: git://github.com/perlancar/perl-Role-TinyCommons-TreeNode.git
-version: '0.125'
+version: '0.126'
 x_Dist_Zilla:
   perl:
     version: '5.030002'

@@ -1,4 +1,4 @@
-# AWS::IoT::Authorizer generated from spec 20.1.0
+# AWS::IoT::Authorizer generated from spec 34.0.0
 use Moose::Util::TypeConstraints;
 
 coerce 'Cfn::Resource::Properties::AWS::IoT::Authorizer',
@@ -20,47 +20,6 @@ package Cfn::Resource::AWS::IoT::Authorizer {
 
 
 
-subtype 'Cfn::Resource::Properties::AWS::IoT::Authorizer::TokenSigningPublicKeys',
-     as 'Cfn::Value';
-
-coerce 'Cfn::Resource::Properties::AWS::IoT::Authorizer::TokenSigningPublicKeys',
-  from 'HashRef',
-   via {
-     if (my $f = Cfn::TypeLibrary::try_function($_)) {
-       return $f
-     } else {
-       return Cfn::Resource::Properties::Object::AWS::IoT::Authorizer::TokenSigningPublicKeys->new( %$_ );
-     }
-   };
-
-package Cfn::Resource::Properties::Object::AWS::IoT::Authorizer::TokenSigningPublicKeys {
-  use Moose;
-  use MooseX::StrictConstructor;
-  extends 'Cfn::Value::TypedValue';
-  
-}
-
-subtype 'Cfn::Resource::Properties::AWS::IoT::Authorizer::Tags',
-     as 'Cfn::Value';
-
-coerce 'Cfn::Resource::Properties::AWS::IoT::Authorizer::Tags',
-  from 'HashRef',
-   via {
-     if (my $f = Cfn::TypeLibrary::try_function($_)) {
-       return $f
-     } else {
-       return Cfn::Resource::Properties::Object::AWS::IoT::Authorizer::Tags->new( %$_ );
-     }
-   };
-
-package Cfn::Resource::Properties::Object::AWS::IoT::Authorizer::Tags {
-  use Moose;
-  use MooseX::StrictConstructor;
-  extends 'Cfn::Value::TypedValue';
-  
-  has Tags => (isa => 'ArrayOfCfn::Resource::Properties::TagType', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
-}
-
 package Cfn::Resource::Properties::AWS::IoT::Authorizer {
   use Moose;
   use MooseX::StrictConstructor;
@@ -70,9 +29,9 @@ package Cfn::Resource::Properties::AWS::IoT::Authorizer {
   has AuthorizerName => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
   has SigningDisabled => (isa => 'Cfn::Value::Boolean', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
   has Status => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
-  has Tags => (isa => 'Cfn::Resource::Properties::AWS::IoT::Authorizer::Tags', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has Tags => (isa => 'ArrayOfCfn::Resource::Properties::TagType', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has TokenKeyName => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
-  has TokenSigningPublicKeys => (isa => 'Cfn::Resource::Properties::AWS::IoT::Authorizer::TokenSigningPublicKeys', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has TokenSigningPublicKeys => (isa => 'Cfn::Value::Hash|Cfn::DynamicValue', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
 }
 
 1;

@@ -15,6 +15,7 @@ my %WriteMakefileArgs = (
   "DISTNAME" => "Myriad",
   "EXE_FILES" => [
     "bin/myriad-dev.pl",
+    "bin/myriad-migrate-rpc-streams.pl",
     "bin/myriad-start.sh",
     "bin/myriad.pl"
   ],
@@ -28,7 +29,7 @@ my %WriteMakefileArgs = (
     "Database::Async::Engine::PostgreSQL" => "0.010",
     "Devel::MAT::Dumper" => 0,
     "Future" => "0.47",
-    "Future::AsyncAwait" => "0.49",
+    "Future::AsyncAwait" => "0.50",
     "Future::Queue" => 0,
     "Getopt::Long" => 0,
     "Heap" => "0.80",
@@ -36,6 +37,8 @@ my %WriteMakefileArgs = (
     "IO::Async::SSL" => "0.22",
     "IO::Async::Test" => "0.78",
     "JSON::MaybeUTF8" => "2.000",
+    "List::Keywords" => "0.04",
+    "List::Util" => "1.56",
     "Log::Any" => "1.709",
     "Log::Any::Adapter" => "1.709",
     "Log::Any::Adapter::OpenTracing" => "0.001",
@@ -55,7 +58,7 @@ my %WriteMakefileArgs = (
     "Pod::Simple::Text" => 0,
     "Pod::Usage" => 0,
     "Role::Tiny" => "2.002004",
-    "Ryu" => "2.009",
+    "Ryu" => "3.000",
     "Ryu::Async" => "0.019",
     "Scope::Guard" => 0,
     "Syntax::Keyword::Defer" => "0.05",
@@ -87,9 +90,9 @@ my %WriteMakefileArgs = (
     "Test::More" => "0.98",
     "Test::NoTabs" => 0
   },
-  "VERSION" => "0.005",
+  "VERSION" => "0.006",
   "test" => {
-    "TESTS" => "t/*.t t/RPC/*.t t/transport/*.t"
+    "TESTS" => "t/*.t t/RPC/*.t t/transport/*.t t/util/*.t"
   }
 );
 
@@ -104,7 +107,7 @@ my %FallbackPrereqs = (
   "ExtUtils::MakeMaker" => 0,
   "File::Spec" => 0,
   "Future" => "0.47",
-  "Future::AsyncAwait" => "0.49",
+  "Future::AsyncAwait" => "0.50",
   "Future::Queue" => 0,
   "Getopt::Long" => 0,
   "Heap" => "0.80",
@@ -114,6 +117,8 @@ my %FallbackPrereqs = (
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
   "JSON::MaybeUTF8" => "2.000",
+  "List::Keywords" => "0.04",
+  "List::Util" => "1.56",
   "Log::Any" => "1.709",
   "Log::Any::Adapter" => "1.709",
   "Log::Any::Adapter::OpenTracing" => "0.001",
@@ -135,7 +140,7 @@ my %FallbackPrereqs = (
   "Pod::Simple::Text" => 0,
   "Pod::Usage" => 0,
   "Role::Tiny" => "2.002004",
-  "Ryu" => "2.009",
+  "Ryu" => "3.000",
   "Ryu::Async" => "0.019",
   "Scope::Guard" => 0,
   "Syntax::Keyword::Defer" => "0.05",

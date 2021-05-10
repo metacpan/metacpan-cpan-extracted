@@ -55,8 +55,8 @@ EOF
   # type
   processTypes( $thisfunction, $is_native_output, \$in, \$out );
 
-  # I now create a piddle for the null output. Normally PP does this, but I need
-  # to have the piddle made to create plans. If I don't, the alignment may
+  # I now create an ndarray for the null output. Normally PP does this, but I need
+  # to have the ndarray made to create plans. If I don't, the alignment may
   # differ between plan-time and run-time
   if ( $out->isnull ) {
     my @args = getOutArgs($in, $is_real_fft, $do_inverse_fft, $is_native_output);
@@ -65,7 +65,7 @@ EOF
 
   validateArguments( $rank, $is_real_fft, $do_inverse_fft, $is_native_output, $thisfunction, $in, $out );
 
-  # I need to physical-ize the piddles before I make a plan. Again, normally PP
+  # I need to physical-ize the ndarrays before I make a plan. Again, normally PP
   # does this, but to make sure alignments match, I need to do this myself, now
   $in->make_physical;
   $out->make_physical;
@@ -137,7 +137,7 @@ sub validateArguments
   for my $arg ( $in, $out )
   {
     barf <<EOF unless defined $arg;
-$thisfunction arguments must all be defined. If you want an auto-growing piddle, use 'null' such as
+$thisfunction arguments must all be defined. If you want an auto-growing ndarray, use 'null' such as
 $thisfunction( \$in, \$out = null )
 Giving up.
 EOF
@@ -150,7 +150,7 @@ Instead I got an arg of type '$type'. Giving up.
 EOF
   }
 
-  # validate dimensionality of the piddles
+  # validate dimensionality of the ndarrays
   my @inout = ($in, $out);
 
   for my $iarg ( 0..1 )
@@ -168,7 +168,7 @@ EOF
     { validateArgumentDimensions_real( $rank, $do_inverse_fft, $is_native_output, $thisfunction, $iarg, $arg); }
   }
 
-  # we have an explicit output piddle we're filling in. Make sure the
+  # we have an explicit output ndarray we're filling in. Make sure the
   # input/output dimensions match up
   if ( !$is_real_fft )
   { matchDimensions_complex($thisfunction, $rank, $in, $out); }

@@ -1,20 +1,298 @@
-SEE ALSO
+NAME
+    Test::Perinci::CmdLine - Common test suite for
+    Perinci::CmdLine::{Lite,Classic,Inline}
 
-    Supported Perinci::CmdLine backends: Perinci::CmdLine::Inline,
-    Perinci::CmdLine::Lite, Perinci::CmdLine::Classic.
+VERSION
+    This document describes version 1.481 of Test::Perinci::CmdLine (from
+    Perl distribution Test-Perinci-CmdLine), released on 2021-05-07.
+
+FUNCTIONS
+  pericmd_run_ok
+    Usage:
+
+     pericmd_run_ok(%args) -> [status, msg, payload, meta]
+
+    Run a single test of a Perinci::CmdLine script.
+
+    This function is exported by default.
+
+    Arguments ('*' denotes required arguments):
+
+    *   argv => *array* (default: [])
+
+        Command-line arguments that will be passed to generated CLI script.
+
+    *   class* => *str*
+
+        Which Perinci::CmdLine class are we testing.
+
+    *   classic_gen_args => *hash*
+
+        Additional arguments to be passed to
+        `Perinci::CmdLine::Gen::gen_pericmd_script()`.
+
+        Keys from this argument will be added to "gen_args" and will only be
+        used when "class" is "Perinci::CmdLine::Classic".
+
+    *   comp_answer => *array[str]*
+
+        Test completion answer of generated CLI script.
+
+    *   comp_line0 => *str*
+
+        Set COMP_LINE environment for generated CLI script.
+
+        Can contain "^" (caret) character which will be stripped from the
+        final "COMP_LINE" and the position of the character will be used to
+        determine "COMP_POINT".
+
+    *   env => *hash*
+
+        Set environment variables for generated CLI script.
+
+    *   exit_code => *int* (default: 0)
+
+        Expected script's exit code.
+
+    *   exit_code_like => *re* (default: 0)
+
+        Expected script's exit code (as regex pattern).
+
+    *   gen_args* => *hash*
+
+        Arguments to be passed to
+        `Perinci::CmdLine::Gen::gen_pericmd_script()`.
+
+    *   gen_status => *int* (default: 200)
+
+        Expected generate result status.
+
+    *   inline_allow => *array[perl::modname]*
+
+        Modules to allow to be loaded when testing generated
+        Perinci::CmdLine::Inline script.
+
+        By default, when running the generated Perinci::CmdLine::Inline
+        script, this perl option will be used (see lib::filter for more
+        details):
+
+         -Mlib::filter=allow_noncore,0
+
+        This means the script will only be able to load core modules. But if
+        the script is allowed to load additional modules, you can set this
+        "inline_allow" parameter to, e.g. "["Foo::Bar","Baz"]" and the above
+        perl option will become:
+
+         -Mlib::filter=allow_noncore,0,allow,Foo::Bar;Baz
+
+        To skip using this option, set "inline_run_filter" to false.
+
+    *   inline_gen_args => *hash*
+
+        Additional arguments to be passed to
+        `Perinci::CmdLine::Gen::gen_pericmd_script()`.
+
+        Keys from this argument will be added to "gen_args" and will only be
+        used when "class" is "Perinci::CmdLine::Inline".
+
+    *   inline_run_filter => *bool* (default: 1)
+
+        Whether to use -Mfilter when running generated
+        Perinci::CmdLine::Inline script.
+
+        By default, when running the generated Perinci::CmdLine::Inline
+        script, this perl option will be used (see lib::filter for more
+        details):
+
+         -Mlib::filter=allow_noncore,0,...
+
+        This is to test that the script does not require non-core modules.
+        To skip using this option (e.g. when using "pack_deps" gen option
+        set to false), set this option to false.
+
+    *   lite_gen_args => *hash*
+
+        Additional arguments to be passed to
+        `Perinci::CmdLine::Gen::gen_pericmd_script()`.
+
+        Keys from this argument will be added to "gen_args" and will only be
+        used when "class" is "Perinci::CmdLine::Lite".
+
+    *   name => *str*
+
+        Test name.
+
+        If not specified, a nice default will be picked (e.g. from "argv").
+
+    *   posttest => *code*
+
+        Additional tests.
+
+        For example you can do "is()" or "ok()" or other Test::More tests.
+
+    *   stderr_like => *re*
+
+        Test error output of generated CLI script.
+
+    *   stderr_unlike => *re*
+
+        Test error output of generated CLI script.
+
+    *   stdin => *str*
+
+        Supply stdin content to generated CLI script.
+
+    *   stdout_like => *re*
+
+        Test output of generated CLI script.
+
+    *   stdout_unlike => *re*
+
+        Test output of generated CLI script.
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (payload) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  pericmd_run_suite_ok
+    Usage:
+
+     pericmd_run_suite_ok(%args) -> [status, msg, payload, meta]
+
+    Common test suite for Perinci::CmdLine::{Lite,Classic,Inline}.
+
+    This function is exported by default.
+
+    Arguments ('*' denotes required arguments):
+
+    *   class* => *str*
+
+        Which Perinci::CmdLine class are we testing.
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (payload) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  pericmd_run_test_groups_ok
+    Usage:
+
+     pericmd_run_test_groups_ok(%args) -> [status, msg, payload, meta]
+
+    Run groups of Perinci::CmdLine tests.
+
+    This function is exported by default.
+
+    Arguments ('*' denotes required arguments):
+
+    *   class* => *str*
+
+        Which Perinci::CmdLine class are we testing.
+
+    *   cleanup_tempdir => *bool*
+
+    *   exclude_tags => *array[str]*
+
+    *   groups* => *array*
+
+    *   include_tags => *array[str]*
+
+    *   tempdir => *str*
+
+        If not specified, will create temporary directory with
+        "File::Temp"'s "tempdir()".
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (payload) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  pericmd_run_tests_ok
+    Usage:
+
+     pericmd_run_tests_ok(%args) -> [status, msg, payload, meta]
+
+    Run a group of tests of a Perinci::CmdLine script.
+
+    This function is exported by default.
+
+    Arguments ('*' denotes required arguments):
+
+    *   class* => *str*
+
+        Which Perinci::CmdLine class are we testing.
+
+    *   name => *str*
+
+    *   tests* => *array[hash]*
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (payload) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
 
 ENVIRONMENT
-
- DEBUG => bool
-
+  DEBUG => bool
     If set to 1, then temporary files (e.g. generated scripts for testing)
     will not be cleaned up, so you can inspect them.
 
- TEST_PERICMD_EXCLUDE_TAGS => str
+  TEST_PERICMD_EXCLUDE_TAGS => str
+    To set default for "pericmd_ok()"'s "exclude_tags" argument.
 
-    To set default for pericmd_ok()'s exclude_tags argument.
+  TEST_PERICMD_INCLUDE_TAGS => str
+    To set default for "pericmd_ok()"'s "include_tags" argument.
 
- TEST_PERICMD_INCLUDE_TAGS => str
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Test-Perinci-CmdLine>.
 
-    To set default for pericmd_ok()'s include_tags argument.
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Test-Perinci-CmdLine>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://github.com/perlancar/perl-Test-Perinci-CmdLine/issues>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    Supported Perinci::CmdLine backends: Perinci::CmdLine::Inline,
+    Perinci::CmdLine::Lite, Perinci::CmdLine::Classic.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2021, 2017, 2016, 2015 by
+    perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

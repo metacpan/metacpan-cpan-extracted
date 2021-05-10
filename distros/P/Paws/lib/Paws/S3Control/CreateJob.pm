@@ -11,6 +11,7 @@ package Paws::S3Control::CreateJob;
   has Report => (is => 'ro', isa => 'Paws::S3Control::JobReport', required => 1);
   has RoleArn => (is => 'ro', isa => 'Str', required => 1);
 
+
   use MooseX::ClassAttribute;
 
   class_has _api_call => (isa => 'Str', is => 'ro', default => 'CreateJob');
@@ -18,7 +19,8 @@ package Paws::S3Control::CreateJob;
   class_has _api_method  => (isa => 'Str', is => 'ro', default => 'POST');
   class_has _returns => (isa => 'Str', is => 'ro', default => 'Paws::S3Control::CreateJobResult');
   class_has _result_key => (isa => 'Str', is => 'ro');
-  
+  class_has _top_level_element => (isa => 'Str', is => 'ro', default => 'CreateJobRequest');
+  class_has _top_level_namespace => (isa => 'Str', is => 'ro', default => 'http://awss3control.amazonaws.com/doc/2018-08-20/');  
 1;
 
 ### main pod documentation begin ###
@@ -53,7 +55,7 @@ You shouldn't make instances of this class. Each attribute should be used as a n
           , # values: S3BatchOperations_CSV_20180820, S3InventoryReport_CSV_20161130
           Fields => [
             'Ignore', ...    # values: Ignore, Bucket, Key, VersionId
-          ],                 # OPTIONAL
+          ],    # OPTIONAL
         },
 
       },
@@ -111,7 +113,7 @@ You shouldn't make instances of this class. Each attribute should be used as a n
           ],    # OPTIONAL
           CannedAccessControlList => 'private'
           , # values: private, public-read, public-read-write, aws-exec-read, authenticated-read, bucket-owner-read, bucket-owner-full-control; OPTIONAL
-          MetadataDirective => 'COPY',    # values: COPY, REPLACE; OPTIONAL
+          MetadataDirective       => 'COPY',   # values: COPY, REPLACE; OPTIONAL
           ModifiedSinceConstraint => '1970-01-01T01:00:00',    # OPTIONAL
           NewObjectMetadata       => {
             CacheControl => 'MyNonEmptyMaxLength1024String', # min: 1, max: 1024
@@ -126,8 +128,8 @@ You shouldn't make instances of this class. Each attribute should be used as a n
             ContentType => 'MyNonEmptyMaxLength1024String',  # min: 1, max: 1024
             HttpExpiresDate  => '1970-01-01T01:00:00',       # OPTIONAL
             RequesterCharged => 1,                           # OPTIONAL
-            SSEAlgorithm => 'AES256',    # values: AES256, KMS; OPTIONAL
-            UserMetadata => {
+            SSEAlgorithm     => 'AES256',    # values: AES256, KMS; OPTIONAL
+            UserMetadata     => {
               'MyNonEmptyMaxLength1024String' => 'MyMaxLength1024String'
               ,    # key: min: 1, max: 1024, value: max: 1024
             },    # max: 8192; OPTIONAL
@@ -139,12 +141,12 @@ You shouldn't make instances of this class. Each attribute should be used as a n
 
             },
             ...
-          ],                                               # OPTIONAL
+          ],    # OPTIONAL
           ObjectLockLegalHoldStatus => 'OFF',    # values: OFF, ON; OPTIONAL
-          ObjectLockMode =>
+          ObjectLockMode            =>
             'COMPLIANCE',    # values: COMPLIANCE, GOVERNANCE; OPTIONAL
           ObjectLockRetainUntilDate => '1970-01-01T01:00:00',    # OPTIONAL
-          RedirectLocation =>
+          RedirectLocation          =>
             'MyNonEmptyMaxLength2048String',    # min: 1, max: 2048; OPTIONAL
           RequesterPays  => 1,                     # OPTIONAL
           SSEAwsKmsKeyId => 'MyKmsKeyArnString',   # min: 1, max: 2000; OPTIONAL
@@ -163,7 +165,7 @@ You shouldn't make instances of this class. Each attribute should be used as a n
 
             },
             ...
-          ],                                               # OPTIONAL
+          ],    # OPTIONAL
         },    # OPTIONAL
       },
       Priority => 1,

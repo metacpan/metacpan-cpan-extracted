@@ -37,10 +37,10 @@ You shouldn't make instances of this class. Each attribute should be used as a n
               Values => [ 'MyString', ... ],    # OPTIONAL
             },
             ...
-          ],                                    # OPTIONAL
+          ],    # OPTIONAL
           ExcludeManagementEventSources => [ 'MyString', ... ],    # OPTIONAL
           IncludeManagementEvents       => 1,                      # OPTIONAL
-          ReadWriteType =>
+          ReadWriteType                 =>
             'ReadOnly',    # values: ReadOnly, WriteOnly, All; OPTIONAL
         },
         ...

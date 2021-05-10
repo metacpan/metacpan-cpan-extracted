@@ -1,61 +1,95 @@
 package Acme::ID::CompanyName;
 
-our $DATE = '2017-12-19'; # DATE
-our $VERSION = '0.004'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2021-05-07'; # DATE
+our $DIST = 'Acme-ID-CompanyName'; # DIST
+our $VERSION = '0.006'; # VERSION
 
 use 5.010001;
 use strict;
-use warnings;
+#use warnings; # XXX actually want to just disable 'Possible attempts to put comments in qw()'
 
 use Exporter 'import';
-our @EXPORT_OK = qw(gen_generic_id_company_names);
+our @EXPORT_OK = qw(gen_generic_ind_company_names);
 
 our %SPEC;
 
+# you can comment to disable a word
 our @Words = qw(
-alam
-alami
 abad
 abadi
 agung
+aksa
+aksara
+akur
+akurasi
+akurat
+alam
+alami
 aman
-ampuh
 amanah
 amanat
+amerta
+ampuh
+angkasa
+arunika
+asa
 
 bagus
 bangsa
-berjaya
+baru
+baskara
+baswara
+batara
+bentala
+bentang
 berdikari
 berdiri
+berjaya
 berlian
 bersama
 bersatu
 bersaudara
+beruntung
 besar
+bestari
+bijaksana
+binar
+buana
+bukit
+bulan
+bumi
 
 cahaya
 cahya
 cakra
+cakrawala
+candala
 catur
 cendrawasih
 central
 chandra
 cipta
 citra
-class
-control
-cosmos
-creative
 
-diamond
-dika
+dasa
+dasar
+data
 delta
+digital
+dika
+dirgantara
 dunia
 
 eka
 elegan
+elegi
+elektrik
+elektro
+elektronik
+energi
 era
+esa
 eterna
 etos
 
@@ -63,164 +97,199 @@ fajar
 forsa
 fortuna
 
+gelora
+gemerlap
+gemilang
+gemintang
+gempita
+gilang
 global
 graha
 guna
+gunung
 
-hutama
-hulu
+halal
+haluan
 harapan
 harmoni
 harta
 hasil
 hasrat
 hasta
-haluan
-halal
 hati
-hurip
-humana
+#hosana-christianish
+hulu
 human
+humana
 humania
+hurip
+hutama
 
 indah
-inti
-internasional
 indonesia
 indotama
+industri
+inspirasi
+internasional
+inti
 
 jasa
+jatmika
 jaya
+jenggala
+jingga
+jumantara
+juwita
 
+kala
+karsa
 karya
+kasih
+khatulistiwa
+kidung
+kirana
+kreasi
+kreatif
+krida
 kurnia
 
-lestari
-lumbung
 laksana
+langit
 lautan
+lembayung
+lestari
 lotus
-lucky
 luas
+lumbung
 
-mulia
-mandala
-makmur
 maju
+makmur
+mandala
+maritim
+media
 milenia
 milenial
-multi
 mitra
+multi
 
-nusantara
-normal
+nirmala
 nirwana
+normal
+nusa
+nusantara
 
 oasis
+obor
+online
 optima
+optimis
 optimum
 optimus
-obor
 orisinal
-optimis
-oscar
+otomatis
 
+paripurna
 pelangi
-perusahaan
+perkasa
 pertama
+perusahaan
+pijar
 pratama
 prima
-putra
 pusaka
 pusat
+putra
 
-quick
 quadra
-quadrant
-quality
-quantum
+quadran
 quanta
+quantum
 
-rekayasa
-rajawali
+radian
 raja
-radiant
+rajawali
+ratu
+raya
+rekayasa
+rembulan
 rintis
-royal
 roda
+royal
 ruang
 
+santosa
 sarana
+sehat
 sejahtera
 sejati
+sempurna
 sentosa
-santosa
+sentra
+sentral
+simfoni
 sintesa
 sintesis
 sumber
 
-tentram
+taktis
+teduh
+teknologi
 tenteram
-tunggal
+tentram
+terang
+terus
 tren
+tunggal
 
+ufuk
 umum
-utara
+untung
+usaha
 utama
+utara
 
-victory
-viktori
-victoria
 varia
 variasi
-versa
 vektor
-vista
-visi
-vision
 venus
-venture
-ventura
+versa
+vidia
+viktori
+viktoria
+visi
+vista
 vita
 vito
-vidia
 
-widya
-widia
-wira
-wiratama
-warna
-wahana
-wahyu
-waringin
 wacana
 wadah
 waguna
+wahana
+wahyu
+waringin
+warna
+widia
+widya
 wiguna
+wira
+wiratama
+wiyata
 
-xsis
 xcel
-xtra
-xtras
 xmas
-xpro
 xpres
-xpress
-xtreme
+xsis
+xtra
 
-yellow
+#yahya-christianish
 yasa
-yes
-young
+#yobel-christianish
 
-zeus
-zeta
-zoom
-zona
-zone
-zaman
 zaitun
-
+zaman
+zeta
+zeus
+zona
 );
 
 my %Per_Letter_Words;
@@ -232,60 +301,28 @@ for my $letter ("a".."z") {
 }
 
 our @Prefixes = qw(
-indo
-multi
-mitra
+adi
 dwi
 eka
-tri
-tetra
+indo
+media
+mega
+mitra
+multi
+oto
 panca
+swa
+tekno
+tetra
+tri
 );
-# ever
 
 our @Suffixes = qw(
 indo
 tama
 );
 
-## some more specific words
-# elektrik
-# industri
-# teknologi
-# otomatis
-# media
-
-## some more specific prefixes/suffixes
-# valas
-# herbal
-# higienis
-# home
-# cyber
-# net
-# organik
-# online
-# ritel
-# data
-# digital
-# energi
-# energy
-# equinox
-# exa
-# pustaka
-# huruf
-# equity
-# eco-
-# electronic
-# tekno-
-# oto-
-# media-
-
-# christianish
-# yobel
-# hosana
-# yahya
-
-$SPEC{gen_generic_id_company_names} = {
+$SPEC{gen_generic_ind_company_names} = {
     v => 1.1,
     summary => 'Generate nice-sounding, generic Indonesian company names',
     args => {
@@ -299,6 +336,7 @@ $SPEC{gen_generic_id_company_names} = {
             schema => ['int*', min=>0],
             default => 1,
             cmdline_aliases => {n=>{}},
+            pos => 0,
         },
         num_words => {
             schema => ['int*', min=>1],
@@ -321,13 +359,18 @@ $SPEC{gen_generic_id_company_names} = {
     result_naked => 1,
     examples => [
         {
-            argv => [qw/-n 2/],
-            result => [200, "OK", ["PT Sentosa Jaya Abadi", "PT Putra Utama Globalindo"]],
+            summary => 'Generate five random PT names',
+            argv => [qw/5/],
+            test => 0,
+        },
+        {
+            summary => 'Generate three PT names with desired initials "ACME"',
+            argv => [qw/-n3 --desired-initials ACME/],
             test => 0,
         },
     ],
 };
-sub gen_generic_id_company_names {
+sub gen_generic_ind_company_names {
     my %args = @_;
 
     my $type = $args{type} // 'PT';
@@ -365,6 +408,7 @@ sub gen_generic_id_company_names {
             } else {
                 $word = $Words[@Words * rand()];
             }
+            next if $word =~ /^#/;
 
           ADD_PREFIX:
             {
@@ -433,18 +477,18 @@ Acme::ID::CompanyName - Generate nice-sounding, generic Indonesian company names
 
 =head1 VERSION
 
-This document describes version 0.004 of Acme::ID::CompanyName (from Perl distribution Acme-ID-CompanyName), released on 2017-12-19.
+This document describes version 0.006 of Acme::ID::CompanyName (from Perl distribution Acme-ID-CompanyName), released on 2021-05-07.
 
 =head1 DESCRIPTION
 
 =head1 FUNCTIONS
 
 
-=head2 gen_generic_id_company_names
+=head2 gen_generic_ind_company_names
 
 Usage:
 
- gen_generic_id_company_names(%args) -> any
+ gen_generic_ind_company_names(%args) -> any
 
 Generate nice-sounding, generic Indonesian company names.
 
@@ -452,16 +496,30 @@ Examples:
 
 =over
 
-=item * Example #1:
+=item * Generate five random PT names:
 
- gen_generic_id_company_names( num_names => 2);
+ gen_generic_ind_company_names( num_names => 5);
 
 Result:
 
  [
-   200,
-   "OK",
-   ["PT Sentosa Jaya Abadi", "PT Putra Utama Globalindo"],
+   "PT Krida Akur Tren",
+   "PT Industri Sentral Baru",
+   "PT Vita Humania Cipta",
+   "PT Cakrawalatama Central Hasil",
+   "PT Utara Ekasentralindo Cakra",
+ ]
+
+=item * Generate three PT names with desired initials "ACME":
+
+ gen_generic_ind_company_names( num_names => 3, desired_initials => "ACME");
+
+Result:
+
+ [
+   "PT Angkasatama Cipta Milenial Eka",
+   "PT Agung Chandra Milenia Eka",
+   "PT Amantama Cipta Milenial Elektronik",
  ]
 
 =back
@@ -485,6 +543,7 @@ Arguments ('*' denotes required arguments):
 =item * B<type> => I<str> (default: "PT")
 
 Just a string to be prepended before the name.
+
 
 =back
 
@@ -512,7 +571,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2017 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

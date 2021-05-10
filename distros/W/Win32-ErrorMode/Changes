@@ -1,5 +1,9 @@
 Revision history for Win32-ErrorMode
 
+0.07      2021-05-07 04:31:01 -0600
+  - Streamlined implementation by removing support for
+    Windows prior to 8.1.
+
 0.06      2017-08-31 13:45:59 -0400
   - Migrate to EUMM
 

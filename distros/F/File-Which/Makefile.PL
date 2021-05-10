@@ -27,9 +27,10 @@ my %WriteMakefileArgs = (
     "base" => 0
   },
   "TEST_REQUIRES" => {
+    "Env" => 0,
     "Test::More" => "0.47"
   },
-  "VERSION" => "1.24",
+  "VERSION" => "1.27",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -37,6 +38,7 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
+  "Env" => 0,
   "Test::More" => "0.47",
   "base" => 0
 );

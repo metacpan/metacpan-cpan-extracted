@@ -1,4 +1,4 @@
-# AWS::IoT::TopicRuleDestination generated from spec 21.0.0
+# AWS::IoT::TopicRuleDestination generated from spec 22.0.0
 use Moose::Util::TypeConstraints;
 
 coerce 'Cfn::Resource::Properties::AWS::IoT::TopicRuleDestination',
@@ -19,6 +19,30 @@ package Cfn::Resource::AWS::IoT::TopicRuleDestination {
 }
 
 
+
+subtype 'Cfn::Resource::Properties::AWS::IoT::TopicRuleDestination::VpcDestinationProperties',
+     as 'Cfn::Value';
+
+coerce 'Cfn::Resource::Properties::AWS::IoT::TopicRuleDestination::VpcDestinationProperties',
+  from 'HashRef',
+   via {
+     if (my $f = Cfn::TypeLibrary::try_function($_)) {
+       return $f
+     } else {
+       return Cfn::Resource::Properties::Object::AWS::IoT::TopicRuleDestination::VpcDestinationProperties->new( %$_ );
+     }
+   };
+
+package Cfn::Resource::Properties::Object::AWS::IoT::TopicRuleDestination::VpcDestinationProperties {
+  use Moose;
+  use MooseX::StrictConstructor;
+  extends 'Cfn::Value::TypedValue';
+  
+  has RoleArn => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
+  has SecurityGroups => (isa => 'Cfn::Value::Array|Cfn::Value::Function|Cfn::DynamicValue', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
+  has SubnetIds => (isa => 'Cfn::Value::Array|Cfn::Value::Function|Cfn::DynamicValue', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
+  has VpcId => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
+}
 
 subtype 'Cfn::Resource::Properties::AWS::IoT::TopicRuleDestination::HttpUrlDestinationSummary',
      as 'Cfn::Value';
@@ -48,6 +72,7 @@ package Cfn::Resource::Properties::AWS::IoT::TopicRuleDestination {
   
   has HttpUrlProperties => (isa => 'Cfn::Resource::Properties::AWS::IoT::TopicRuleDestination::HttpUrlDestinationSummary', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
   has Status => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has VpcProperties => (isa => 'Cfn::Resource::Properties::AWS::IoT::TopicRuleDestination::VpcDestinationProperties', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
 }
 
 1;

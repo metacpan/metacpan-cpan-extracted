@@ -1,13 +1,15 @@
 package Complete::Rclone;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-05-01'; # DATE
+our $DATE = '2021-05-09'; # DATE
 our $DIST = 'Complete-Rclone'; # DIST
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.003'; # VERSION
 
 use 5.010001;
 use strict;
 use warnings;
+
+use Rclone::Util ();
 
 use Exporter 'import';
 our @EXPORT_OK = qw(
@@ -16,57 +18,10 @@ our @EXPORT_OK = qw(
 
 our %SPEC;
 
-our %argspecs_common = (
-    config_filenames => {
-        schema => ['array*', of=>'filename*'],
-        tags => ['category:configuration'],
-    },
-    config_dirs => {
-        schema => ['array*', of=>'filename*'],
-        tags => ['category:configuration'],
-    },
-);
-
 $SPEC{':package'} = {
     v => 1.1,
     summary => 'Completion routines related to rclone',
 };
-
-sub _parse_rclone_config {
-    my %args = @_;
-
-    my @dirs      = @{ $args{config_dirs} // ["$ENV{HOME}/.config/rclone", "/etc/rclone", "/etc"] };
-    my @filenames = @{ $args{config_filenames} // ["rclone.conf"] };
-
-    my @paths;
-    for my $dir (@dirs) {
-        for my $filename (@filenames) {
-            my $path = "$dir/$filename";
-            next unless -f $path;
-            push @paths, $path;
-        }
-    }
-    unless (@paths) {
-        return [412, "No config paths found/specified"];
-    }
-
-    require Config::IOD::Reader;
-    my $reader = Config::IOD::Reader->new;
-    my $merged_config_hash;
-    for my $path (@paths) {
-        my $config_hash;
-        eval { $config_hash = $reader->read_file($path) };
-        return [500, "Error in parsing config file $path: $@"] if $@;
-        for my $section (keys %$config_hash) {
-            my $hash = $config_hash->{$section};
-            for my $param (keys %$hash) {
-                $merged_config_hash->{$section}{$param} = $hash->{$param};
-            }
-        }
-    }
-    [200, "OK", $merged_config_hash];
-}
-
 
 $SPEC{complete_rclone_remote} = {
     v => 1.1,
@@ -77,8 +32,9 @@ $SPEC{complete_rclone_remote} = {
             req => 1,
             pos => 0,
         },
-        %argspecs_common,
+        %Rclone::Util::argspecs_common,
         type => {
+            summary => 'Only list remotes of a certain type (e.g. "drive" for Google Drive, "google photos" for Google Photos)',
             schema => 'str*',
             tags => ['category:filtering'],
         },
@@ -87,10 +43,11 @@ $SPEC{complete_rclone_remote} = {
 };
 sub complete_rclone_remote {
     require Complete::Util;
+    require Hash::Subset;
 
     my %args = @_;
 
-    my $res = _parse_rclone_config(%args);
+    my $res = Rclone::Util::parse_rclone_config(Hash::Subset::hash_subset(\%args, \%Rclone::Util::argspecs_common));
     return {message=>"Can't parse rclone config files: $res->[1]"} unless $res->[0] == 200;
     my $config = $res->[2];
 
@@ -115,7 +72,7 @@ Complete::Rclone - Completion routines related to rclone
 
 =head1 VERSION
 
-This document describes version 0.002 of Complete::Rclone (from Perl distribution Complete-Rclone), released on 2021-05-01.
+This document describes version 0.003 of Complete::Rclone (from Perl distribution Complete-Rclone), released on 2021-05-09.
 
 =for Pod::Coverage .+
 
@@ -136,11 +93,13 @@ Arguments ('*' denotes required arguments):
 
 =over 4
 
-=item * B<config_dirs> => I<array[filename]>
+=item * B<rclone_config_dirs> => I<array[dirname]>
 
-=item * B<config_filenames> => I<array[filename]>
+=item * B<rclone_config_filenames> => I<array[filename]>
 
 =item * B<type> => I<str>
+
+Only list remotes of a certain type (e.g. "drive" for Google Drive, "google photos" for Google Photos).
 
 =item * B<word>* => I<str>
 

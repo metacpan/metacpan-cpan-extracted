@@ -42,7 +42,7 @@ You shouldn't make instances of this class. Each attribute should be used as a n
     my $ModifyTargetGroupOutput = $elasticloadbalancing->ModifyTargetGroup(
       'HealthCheckPort'     => 443,
       'HealthCheckProtocol' => 'HTTPS',
-      'TargetGroupArn' =>
+      'TargetGroupArn'      =>
 'arn:aws:elasticloadbalancing:us-west-2:123456789012:targetgroup/my-https-targets/2453ed029918f21f'
     );
 

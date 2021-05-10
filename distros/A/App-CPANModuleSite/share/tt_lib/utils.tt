@@ -1,7 +1,7 @@
 [% MACRO doc_links BLOCK -%]
 <ul>
 [% FOR m IN modules -%]
-<li><a href="/lib/[% m.module.0.name.replace('::', '/') %].html">[% m.module.0.name %]</a></li>
+<li><a href="lib/[% m.module.0.name.replace('::', '/') %].html">[% m.module.0.name %]</a></li>
 [% END -%]
 </ul>
 [% END -%]

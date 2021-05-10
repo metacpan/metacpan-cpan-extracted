@@ -1,0 +1,78 @@
+NAME
+    Role::TinyCommons::BinarySearch::LinesInHandle - Provide has_item() that
+    uses binary search
+
+VERSION
+    This document describes version 0.001 of
+    Role::TinyCommons::BinarySearch::LinesInHandle (from Perl distribution
+    Role-TinyCommons-BinarySearch-LinesInHandle), released on 2021-05-07.
+
+SYNOPSIS
+DESCRIPTION
+REQUIRED METHODS
+  fh
+    Must return the filehandle.
+
+OPTIONALLY DEPENDED METHODS
+  fh_min_offset
+    Must return the minimum position (in bytes) to search the filehandle
+    from.
+
+    If this method is not supported by object, 0 will be assumed.
+
+  fh_max_offset
+    Must return the maximum position (in bytes) to search the filehandle to.
+    Can also return "undef", in which case the filehandle will be
+    "stat()"-ed to find out the size of the file.
+
+    If this method is not supported by object, the filehandle will also be
+    "stat()"-ed.
+
+  cmp_items
+    Usage:
+
+     my $res = $obj->cmp_items($item1, $item2); # 0|-1|1
+
+    Must return 0, -1, or 1 like Perl's "cmp" or "<=>" operator. Note that
+    Role::TinyCommons::Collection::CompareItems also uses this method.
+
+PROVIDED METHODS
+  has_item
+    Usage:
+
+     my $has_item = $obj->has_item($item); # bool
+
+    Return true if $item is found in the filehandle (searched using binary
+    search), false otherwise.
+
+    Note that the Role::TinyCommons::Collection::FindItem role also uses
+    this method.
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Role-TinyCommons-BinarySearch-LinesInHandl
+    e>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Role-TinyCommons-BinarySearch-LinesIn
+    Handle>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://github.com/perlancar/perl-Role-TinyCommons-BinarySearch-LinesIn
+    Handle/issues>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2021 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

@@ -41,7 +41,7 @@ You shouldn't make instances of this class. Each attribute should be used as a n
           Connections => [ 'MyGenericString', ... ],    # OPTIONAL
         },    # OPTIONAL
         DefaultArguments => { 'MyGenericString' => 'MyGenericString', }
-        ,     # OPTIONAL
+        ,                                              # OPTIONAL
         Description       => 'MyDescriptionString',    # max: 2048; OPTIONAL
         ExecutionProperty => {
           MaxConcurrentRuns => 1,                      # OPTIONAL

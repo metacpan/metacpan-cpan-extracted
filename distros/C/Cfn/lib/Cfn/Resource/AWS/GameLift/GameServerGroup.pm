@@ -1,4 +1,4 @@
-# AWS::GameLift::GameServerGroup generated from spec 20.1.0
+# AWS::GameLift::GameServerGroup generated from spec 34.0.0
 use Moose::Util::TypeConstraints;
 
 coerce 'Cfn::Resource::Properties::AWS::GameLift::GameServerGroup',
@@ -39,6 +39,29 @@ package Cfn::Resource::Properties::Object::AWS::GameLift::GameServerGroup::Targe
   extends 'Cfn::Value::TypedValue';
   
   has TargetValue => (isa => 'Cfn::Value::Double', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+}
+
+subtype 'Cfn::Resource::Properties::AWS::GameLift::GameServerGroup::LaunchTemplate',
+     as 'Cfn::Value';
+
+coerce 'Cfn::Resource::Properties::AWS::GameLift::GameServerGroup::LaunchTemplate',
+  from 'HashRef',
+   via {
+     if (my $f = Cfn::TypeLibrary::try_function($_)) {
+       return $f
+     } else {
+       return Cfn::Resource::Properties::Object::AWS::GameLift::GameServerGroup::LaunchTemplate->new( %$_ );
+     }
+   };
+
+package Cfn::Resource::Properties::Object::AWS::GameLift::GameServerGroup::LaunchTemplate {
+  use Moose;
+  use MooseX::StrictConstructor;
+  extends 'Cfn::Value::TypedValue';
+  
+  has LaunchTemplateId => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has LaunchTemplateName => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has Version => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
 }
 subtype 'ArrayOfCfn::Resource::Properties::AWS::GameLift::GameServerGroup::InstanceDefinition',
      as 'Cfn::Value',
@@ -85,92 +108,6 @@ package Cfn::Resource::Properties::Object::AWS::GameLift::GameServerGroup::Insta
   has WeightedCapacity => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
 }
 
-subtype 'Cfn::Resource::Properties::AWS::GameLift::GameServerGroup::VpcSubnets',
-     as 'Cfn::Value';
-
-coerce 'Cfn::Resource::Properties::AWS::GameLift::GameServerGroup::VpcSubnets',
-  from 'HashRef',
-   via {
-     if (my $f = Cfn::TypeLibrary::try_function($_)) {
-       return $f
-     } else {
-       return Cfn::Resource::Properties::Object::AWS::GameLift::GameServerGroup::VpcSubnets->new( %$_ );
-     }
-   };
-
-package Cfn::Resource::Properties::Object::AWS::GameLift::GameServerGroup::VpcSubnets {
-  use Moose;
-  use MooseX::StrictConstructor;
-  extends 'Cfn::Value::TypedValue';
-  
-  has VpcSubnets => (isa => 'Cfn::Value::Array|Cfn::Value::Function|Cfn::DynamicValue', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
-}
-
-subtype 'Cfn::Resource::Properties::AWS::GameLift::GameServerGroup::Tags',
-     as 'Cfn::Value';
-
-coerce 'Cfn::Resource::Properties::AWS::GameLift::GameServerGroup::Tags',
-  from 'HashRef',
-   via {
-     if (my $f = Cfn::TypeLibrary::try_function($_)) {
-       return $f
-     } else {
-       return Cfn::Resource::Properties::Object::AWS::GameLift::GameServerGroup::Tags->new( %$_ );
-     }
-   };
-
-package Cfn::Resource::Properties::Object::AWS::GameLift::GameServerGroup::Tags {
-  use Moose;
-  use MooseX::StrictConstructor;
-  extends 'Cfn::Value::TypedValue';
-  
-  has Tags => (isa => 'ArrayOfCfn::Resource::Properties::TagType', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
-}
-
-subtype 'Cfn::Resource::Properties::AWS::GameLift::GameServerGroup::LaunchTemplate',
-     as 'Cfn::Value';
-
-coerce 'Cfn::Resource::Properties::AWS::GameLift::GameServerGroup::LaunchTemplate',
-  from 'HashRef',
-   via {
-     if (my $f = Cfn::TypeLibrary::try_function($_)) {
-       return $f
-     } else {
-       return Cfn::Resource::Properties::Object::AWS::GameLift::GameServerGroup::LaunchTemplate->new( %$_ );
-     }
-   };
-
-package Cfn::Resource::Properties::Object::AWS::GameLift::GameServerGroup::LaunchTemplate {
-  use Moose;
-  use MooseX::StrictConstructor;
-  extends 'Cfn::Value::TypedValue';
-  
-  has LaunchTemplateId => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
-  has LaunchTemplateName => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
-  has Version => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
-}
-
-subtype 'Cfn::Resource::Properties::AWS::GameLift::GameServerGroup::InstanceDefinitions',
-     as 'Cfn::Value';
-
-coerce 'Cfn::Resource::Properties::AWS::GameLift::GameServerGroup::InstanceDefinitions',
-  from 'HashRef',
-   via {
-     if (my $f = Cfn::TypeLibrary::try_function($_)) {
-       return $f
-     } else {
-       return Cfn::Resource::Properties::Object::AWS::GameLift::GameServerGroup::InstanceDefinitions->new( %$_ );
-     }
-   };
-
-package Cfn::Resource::Properties::Object::AWS::GameLift::GameServerGroup::InstanceDefinitions {
-  use Moose;
-  use MooseX::StrictConstructor;
-  extends 'Cfn::Value::TypedValue';
-  
-  has InstanceDefinitions => (isa => 'ArrayOfCfn::Resource::Properties::AWS::GameLift::GameServerGroup::InstanceDefinition', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
-}
-
 subtype 'Cfn::Resource::Properties::AWS::GameLift::GameServerGroup::AutoScalingPolicy',
      as 'Cfn::Value';
 
@@ -203,13 +140,13 @@ package Cfn::Resource::Properties::AWS::GameLift::GameServerGroup {
   has DeleteOption => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has GameServerGroupName => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has GameServerProtectionPolicy => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
-  has InstanceDefinitions => (isa => 'Cfn::Resource::Properties::AWS::GameLift::GameServerGroup::InstanceDefinitions', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has InstanceDefinitions => (isa => 'ArrayOfCfn::Resource::Properties::AWS::GameLift::GameServerGroup::InstanceDefinition', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has LaunchTemplate => (isa => 'Cfn::Resource::Properties::AWS::GameLift::GameServerGroup::LaunchTemplate', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has MaxSize => (isa => 'Cfn::Value::Double', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has MinSize => (isa => 'Cfn::Value::Double', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has RoleArn => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
-  has Tags => (isa => 'Cfn::Resource::Properties::AWS::GameLift::GameServerGroup::Tags', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
-  has VpcSubnets => (isa => 'Cfn::Resource::Properties::AWS::GameLift::GameServerGroup::VpcSubnets', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has Tags => (isa => 'ArrayOfCfn::Resource::Properties::TagType', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has VpcSubnets => (isa => 'Cfn::Value::Array|Cfn::Value::Function|Cfn::DynamicValue', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
 }
 
 1;

@@ -63,6 +63,7 @@
             "Sah::Schema::date::month_num" : "0",
             "Sah::Schema::date::month_nums" : "0",
             "Sah::Schema::perl::modname" : "0",
+            "Sah::Schema::posint" : "0",
             "Sah::Schema::true" : "0",
             "perl" : "5.010001",
             "strict" : "0",
@@ -90,7 +91,7 @@
          "web" : "https://github.com/perlancar/perl-App-dateseq"
       }
    },
-   "version" : "0.101",
+   "version" : "0.102",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.030000"

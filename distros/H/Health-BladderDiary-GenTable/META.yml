@@ -35,7 +35,7 @@ resources:
   bugtracker: https://github.com/perlancar/perl-Health-BladderDiary-GenTable/issues
   homepage: https://metacpan.org/release/Health-BladderDiary-GenTable
   repository: git://github.com/perlancar/perl-Health-BladderDiary-GenTable.git
-version: '0.006'
+version: '0.007'
 x_Dist_Zilla:
   perl:
     version: '5.030000'

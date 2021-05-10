@@ -2,8 +2,8 @@ NAME
     App::cal::idn - Display Indonesian calendar on the command-line
 
 VERSION
-    This document describes version 0.134 of App::cal::idn (from Perl
-    distribution App-cal-idn), released on 2021-01-23.
+    This document describes version 0.136 of App::cal::idn (from Perl
+    distribution App-cal-idn), released on 2021-05-03.
 
 SYNOPSIS
      # See cal-idn script provided in this distribution

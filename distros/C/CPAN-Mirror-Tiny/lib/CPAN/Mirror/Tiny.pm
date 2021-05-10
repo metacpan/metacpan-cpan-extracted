@@ -3,13 +3,11 @@ use 5.008001;
 use strict;
 use warnings;
 
-our $VERSION = '0.20';
+our $VERSION = '0.30';
 
 use CPAN::Meta;
 use CPAN::Mirror::Tiny::Archive;
 use CPAN::Mirror::Tiny::Tempdir;
-use CPAN::Mirror::Tiny::Util 'safe_system';
-use Capture::Tiny ();
 use Cwd ();
 use Digest::MD5 ();
 use File::Basename ();
@@ -21,12 +19,20 @@ use File::Spec;
 use File::Temp ();
 use File::Which ();
 use HTTP::Tinyish;
+use IPC::Run3 ();
 use JSON ();
 use Parse::LocalDistribution;
 use Parse::PMFile;
 
 my $JSON = JSON->new->canonical(1)->utf8(1);
 my $CACHE_VERSION = 1;
+
+sub run3 {
+    my ($cmd, $outfile) = @_;
+    my $out;
+    IPC::Run3::run3 $cmd, \undef, ($outfile ? $outfile : \$out), \my $err;
+    return ($out, $err, $?);
+}
 
 sub new {
     my ($class, %option) = @_;
@@ -59,8 +65,7 @@ sub http { shift->{http} }
 
 sub extract {
     my ($self, $path) = @_;
-    my $method = $path =~ /\.zip$/ ? "unzip" : "untar";
-    $self->archive->$method($path);
+    $self->archive->unpack($path);
 }
 
 sub base {
@@ -160,7 +165,7 @@ sub inject_local_directory {
     my $guard = $self->pushd_tempdir;
     File::Path::rmtree($distvname) if -d $distvname;
     File::Copy::Recursive::dircopy($dir, $distvname) or die;
-    my ($out, $err, $exit) = safe_system [$self->{tar}, "czf", "$distvname.tar.gz", $distvname];
+    my ($out, $err, $exit) = run3 [$self->{tar}, "czf", "$distvname.tar.gz", $distvname];
     die "Failed to create tarball: $err" unless $exit == 0;
     my $author = ($option ||= {})->{author} || "VENDOR";
     return $self->_locate_tarball("$distvname.tar.gz", $author);
@@ -210,7 +215,7 @@ sub inject_git {
     if ($url =~ /(.*)\@(.*)$/) {
         # take care of git@github.com:skaji/repo@tag, http://user:pass@example.com/foo@tag
         my ($leading, $remove) = ($1, $2);
-        my ($out, $err, $exit) = safe_system [$self->{git}, "ls-remote", $leading];
+        my ($out, $err, $exit) = run3 [$self->{git}, "ls-remote", $leading];
         if ($exit == 0) {
             $ref = $remove;
             $url =~ s/\@$remove$//;
@@ -218,25 +223,25 @@ sub inject_git {
     }
 
     my $guard = $self->pushd_tempdir;
-    my (undef, $err, $exit) = safe_system [$self->{git}, "clone", $url, "."];
+    my (undef, $err, $exit) = run3 [$self->{git}, "clone", $url, "."];
     die "Couldn't git clone $url: $err" unless $exit == 0;
     if ($ref) {
-        my (undef, $err, $exit) = safe_system [$self->{git}, "checkout", $ref];
+        my (undef, $err, $exit) = run3 [$self->{git}, "checkout", $ref];
         die "Couldn't git checkout $ref: $err" unless $exit == 0;
     }
     my $metafile = "META.json";
     die "Couldn't find $metafile in $url" unless -f $metafile;
     my $meta = CPAN::Meta->load_file($metafile);
-    my ($rev) = safe_system [$self->{git}, "rev-parse", "--short", "HEAD"];
+    my ($rev) = run3 [$self->{git}, "rev-parse", "--short", "HEAD"];
     chomp $rev;
     my $distvname = sprintf "%s-%s-%s", $meta->name, $meta->version, $rev;
-    (undef, $err, $exit) = safe_system(
-        [$self->{git}, "archive", "--format=tar", "--prefix=$distvname/", "HEAD"],
-        "|",
-        [$self->{gzip}],
-        ">",
-        ["$distvname.tar.gz"],
-    );
+    {
+        my $temp = File::Temp->new(SUFFIX => '.tar', EXLOCK => 0);
+        (undef, $err, $exit)
+            = run3 [$self->{git}, "archive", "--format=tar", "--prefix=$distvname/", "HEAD"], $temp->filename;
+        last if $exit != 0;
+        (undef, $err, $exit) = run3 [$self->{gzip}, "--stdout", "--no-name", $temp->filename], "$distvname.tar.gz";
+    }
     if ($exit == 0 && -f "$distvname.tar.gz") {
         my $author = ($option || +{})->{author} || "VENDOR";
         return $self->_locate_tarball("$distvname.tar.gz", $author);
@@ -343,11 +348,8 @@ sub write_index {
     print {$fh} $self->index(%option);
     close $fh;
     if ($option{compress}) {
-        my (undef, $err, $exit) = safe_system(
-            [$self->{gzip}, "--stdout", "--no-name", "$file.tmp"],
-            ">",
-            ["$file.gz.tmp"],
-        );
+        my (undef, $err, $exit)
+            = run3 [$self->{gzip}, "--stdout", "--no-name", "$file.tmp"], "$file.gz.tmp";
         if ($exit == 0) {
             rename "$file.gz.tmp", "$file.gz"
                 or die "Couldn't rename $file.gz.tmp to $file.gz: $!";
@@ -533,7 +535,7 @@ or C< base/modules/02packages.details.txt.gz >.
 
 =head2 How can I install modules in my DarkPAN with cpanm / cpm?
 
-L<cpanm> is an awesome CPAN clients. If you want to install modules
+L<cpanm> is an awesome CPAN client. If you want to install modules
 in your DarkPAN with cpanm, there are 2 ways.
 
 First way:

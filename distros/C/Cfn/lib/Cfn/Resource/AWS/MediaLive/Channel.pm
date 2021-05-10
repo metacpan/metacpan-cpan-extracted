@@ -1,4 +1,4 @@
-# AWS::MediaLive::Channel generated from spec 18.4.0
+# AWS::MediaLive::Channel generated from spec 34.0.0
 use Moose::Util::TypeConstraints;
 
 coerce 'Cfn::Resource::Properties::AWS::MediaLive::Channel',
@@ -170,6 +170,26 @@ package Cfn::Resource::Properties::Object::AWS::MediaLive::Channel::StandardHlsS
   has M3u8Settings => (isa => 'Cfn::Resource::Properties::AWS::MediaLive::Channel::M3u8Settings', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
 }
 
+subtype 'Cfn::Resource::Properties::AWS::MediaLive::Channel::RawSettings',
+     as 'Cfn::Value';
+
+coerce 'Cfn::Resource::Properties::AWS::MediaLive::Channel::RawSettings',
+  from 'HashRef',
+   via {
+     if (my $f = Cfn::TypeLibrary::try_function($_)) {
+       return $f
+     } else {
+       return Cfn::Resource::Properties::Object::AWS::MediaLive::Channel::RawSettings->new( %$_ );
+     }
+   };
+
+package Cfn::Resource::Properties::Object::AWS::MediaLive::Channel::RawSettings {
+  use Moose;
+  use MooseX::StrictConstructor;
+  extends 'Cfn::Value::TypedValue';
+  
+}
+
 subtype 'Cfn::Resource::Properties::AWS::MediaLive::Channel::M2tsSettings',
      as 'Cfn::Value';
 
@@ -235,6 +255,26 @@ package Cfn::Resource::Properties::Object::AWS::MediaLive::Channel::M2tsSettings
   has TimedMetadataPid => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has TransportStreamId => (isa => 'Cfn::Value::Integer', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has VideoPid => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+}
+
+subtype 'Cfn::Resource::Properties::AWS::MediaLive::Channel::FrameCaptureHlsSettings',
+     as 'Cfn::Value';
+
+coerce 'Cfn::Resource::Properties::AWS::MediaLive::Channel::FrameCaptureHlsSettings',
+  from 'HashRef',
+   via {
+     if (my $f = Cfn::TypeLibrary::try_function($_)) {
+       return $f
+     } else {
+       return Cfn::Resource::Properties::Object::AWS::MediaLive::Channel::FrameCaptureHlsSettings->new( %$_ );
+     }
+   };
+
+package Cfn::Resource::Properties::Object::AWS::MediaLive::Channel::FrameCaptureHlsSettings {
+  use Moose;
+  use MooseX::StrictConstructor;
+  extends 'Cfn::Value::TypedValue';
+  
 }
 
 subtype 'Cfn::Resource::Properties::AWS::MediaLive::Channel::Fmp4HlsSettings',
@@ -455,7 +495,29 @@ package Cfn::Resource::Properties::Object::AWS::MediaLive::Channel::HlsSettings 
   
   has AudioOnlyHlsSettings => (isa => 'Cfn::Resource::Properties::AWS::MediaLive::Channel::AudioOnlyHlsSettings', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has Fmp4HlsSettings => (isa => 'Cfn::Resource::Properties::AWS::MediaLive::Channel::Fmp4HlsSettings', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has FrameCaptureHlsSettings => (isa => 'Cfn::Resource::Properties::AWS::MediaLive::Channel::FrameCaptureHlsSettings', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has StandardHlsSettings => (isa => 'Cfn::Resource::Properties::AWS::MediaLive::Channel::StandardHlsSettings', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+}
+
+subtype 'Cfn::Resource::Properties::AWS::MediaLive::Channel::HlsS3Settings',
+     as 'Cfn::Value';
+
+coerce 'Cfn::Resource::Properties::AWS::MediaLive::Channel::HlsS3Settings',
+  from 'HashRef',
+   via {
+     if (my $f = Cfn::TypeLibrary::try_function($_)) {
+       return $f
+     } else {
+       return Cfn::Resource::Properties::Object::AWS::MediaLive::Channel::HlsS3Settings->new( %$_ );
+     }
+   };
+
+package Cfn::Resource::Properties::Object::AWS::MediaLive::Channel::HlsS3Settings {
+  use Moose;
+  use MooseX::StrictConstructor;
+  extends 'Cfn::Value::TypedValue';
+  
+  has CannedAcl => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
 }
 
 subtype 'Cfn::Resource::Properties::AWS::MediaLive::Channel::HlsMediaStoreSettings',
@@ -556,6 +618,27 @@ package Cfn::Resource::Properties::Object::AWS::MediaLive::Channel::Hdr10Setting
   has MaxFall => (isa => 'Cfn::Value::Integer', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
 }
 
+subtype 'Cfn::Resource::Properties::AWS::MediaLive::Channel::FrameCaptureS3Settings',
+     as 'Cfn::Value';
+
+coerce 'Cfn::Resource::Properties::AWS::MediaLive::Channel::FrameCaptureS3Settings',
+  from 'HashRef',
+   via {
+     if (my $f = Cfn::TypeLibrary::try_function($_)) {
+       return $f
+     } else {
+       return Cfn::Resource::Properties::Object::AWS::MediaLive::Channel::FrameCaptureS3Settings->new( %$_ );
+     }
+   };
+
+package Cfn::Resource::Properties::Object::AWS::MediaLive::Channel::FrameCaptureS3Settings {
+  use Moose;
+  use MooseX::StrictConstructor;
+  extends 'Cfn::Value::TypedValue';
+  
+  has CannedAcl => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+}
+
 subtype 'Cfn::Resource::Properties::AWS::MediaLive::Channel::FecOutputSettings',
      as 'Cfn::Value';
 
@@ -597,6 +680,30 @@ package Cfn::Resource::Properties::Object::AWS::MediaLive::Channel::ColorSpacePa
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
   
+}
+
+subtype 'Cfn::Resource::Properties::AWS::MediaLive::Channel::CaptionRectangle',
+     as 'Cfn::Value';
+
+coerce 'Cfn::Resource::Properties::AWS::MediaLive::Channel::CaptionRectangle',
+  from 'HashRef',
+   via {
+     if (my $f = Cfn::TypeLibrary::try_function($_)) {
+       return $f
+     } else {
+       return Cfn::Resource::Properties::Object::AWS::MediaLive::Channel::CaptionRectangle->new( %$_ );
+     }
+   };
+
+package Cfn::Resource::Properties::Object::AWS::MediaLive::Channel::CaptionRectangle {
+  use Moose;
+  use MooseX::StrictConstructor;
+  extends 'Cfn::Value::TypedValue';
+  
+  has Height => (isa => 'Cfn::Value::Double', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has LeftOffset => (isa => 'Cfn::Value::Double', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has TopOffset => (isa => 'Cfn::Value::Double', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has Width => (isa => 'Cfn::Value::Double', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
 }
 subtype 'ArrayOfCfn::Resource::Properties::AWS::MediaLive::Channel::AudioTrack',
      as 'Cfn::Value',
@@ -642,6 +749,27 @@ package Cfn::Resource::Properties::Object::AWS::MediaLive::Channel::AudioTrack {
   has Track => (isa => 'Cfn::Value::Integer', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
 }
 
+subtype 'Cfn::Resource::Properties::AWS::MediaLive::Channel::ArchiveS3Settings',
+     as 'Cfn::Value';
+
+coerce 'Cfn::Resource::Properties::AWS::MediaLive::Channel::ArchiveS3Settings',
+  from 'HashRef',
+   via {
+     if (my $f = Cfn::TypeLibrary::try_function($_)) {
+       return $f
+     } else {
+       return Cfn::Resource::Properties::Object::AWS::MediaLive::Channel::ArchiveS3Settings->new( %$_ );
+     }
+   };
+
+package Cfn::Resource::Properties::Object::AWS::MediaLive::Channel::ArchiveS3Settings {
+  use Moose;
+  use MooseX::StrictConstructor;
+  extends 'Cfn::Value::TypedValue';
+  
+  has CannedAcl => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+}
+
 subtype 'Cfn::Resource::Properties::AWS::MediaLive::Channel::ArchiveContainerSettings',
      as 'Cfn::Value';
 
@@ -661,6 +789,7 @@ package Cfn::Resource::Properties::Object::AWS::MediaLive::Channel::ArchiveConta
   extends 'Cfn::Value::TypedValue';
   
   has M2tsSettings => (isa => 'Cfn::Resource::Properties::AWS::MediaLive::Channel::M2tsSettings', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has RawSettings => (isa => 'Cfn::Resource::Properties::AWS::MediaLive::Channel::RawSettings', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
 }
 
 subtype 'Cfn::Resource::Properties::AWS::MediaLive::Channel::VideoSelectorProgramId',
@@ -705,6 +834,28 @@ package Cfn::Resource::Properties::Object::AWS::MediaLive::Channel::VideoSelecto
   has Pid => (isa => 'Cfn::Value::Integer', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
 }
 
+subtype 'Cfn::Resource::Properties::AWS::MediaLive::Channel::VideoBlackFailoverSettings',
+     as 'Cfn::Value';
+
+coerce 'Cfn::Resource::Properties::AWS::MediaLive::Channel::VideoBlackFailoverSettings',
+  from 'HashRef',
+   via {
+     if (my $f = Cfn::TypeLibrary::try_function($_)) {
+       return $f
+     } else {
+       return Cfn::Resource::Properties::Object::AWS::MediaLive::Channel::VideoBlackFailoverSettings->new( %$_ );
+     }
+   };
+
+package Cfn::Resource::Properties::Object::AWS::MediaLive::Channel::VideoBlackFailoverSettings {
+  use Moose;
+  use MooseX::StrictConstructor;
+  extends 'Cfn::Value::TypedValue';
+  
+  has BlackDetectThreshold => (isa => 'Cfn::Value::Double', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has VideoBlackThresholdMsec => (isa => 'Cfn::Value::Integer', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+}
+
 subtype 'Cfn::Resource::Properties::AWS::MediaLive::Channel::UdpOutputSettings',
      as 'Cfn::Value';
 
@@ -747,6 +898,7 @@ package Cfn::Resource::Properties::Object::AWS::MediaLive::Channel::TeletextSour
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
   
+  has OutputRectangle => (isa => 'Cfn::Resource::Properties::AWS::MediaLive::Channel::CaptionRectangle', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has PageNumber => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
 }
 
@@ -860,6 +1012,27 @@ package Cfn::Resource::Properties::Object::AWS::MediaLive::Channel::MsSmoothOutp
   has NameModifier => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
 }
 
+subtype 'Cfn::Resource::Properties::AWS::MediaLive::Channel::Mpeg2FilterSettings',
+     as 'Cfn::Value';
+
+coerce 'Cfn::Resource::Properties::AWS::MediaLive::Channel::Mpeg2FilterSettings',
+  from 'HashRef',
+   via {
+     if (my $f = Cfn::TypeLibrary::try_function($_)) {
+       return $f
+     } else {
+       return Cfn::Resource::Properties::Object::AWS::MediaLive::Channel::Mpeg2FilterSettings->new( %$_ );
+     }
+   };
+
+package Cfn::Resource::Properties::Object::AWS::MediaLive::Channel::Mpeg2FilterSettings {
+  use Moose;
+  use MooseX::StrictConstructor;
+  extends 'Cfn::Value::TypedValue';
+  
+  has TemporalFilterSettings => (isa => 'Cfn::Resource::Properties::AWS::MediaLive::Channel::TemporalFilterSettings', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+}
+
 subtype 'Cfn::Resource::Properties::AWS::MediaLive::Channel::MediaPackageOutputSettings',
      as 'Cfn::Value';
 
@@ -899,6 +1072,27 @@ package Cfn::Resource::Properties::Object::AWS::MediaLive::Channel::KeyProviderS
   extends 'Cfn::Value::TypedValue';
   
   has StaticKeySettings => (isa => 'Cfn::Resource::Properties::AWS::MediaLive::Channel::StaticKeySettings', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+}
+
+subtype 'Cfn::Resource::Properties::AWS::MediaLive::Channel::InputLossFailoverSettings',
+     as 'Cfn::Value';
+
+coerce 'Cfn::Resource::Properties::AWS::MediaLive::Channel::InputLossFailoverSettings',
+  from 'HashRef',
+   via {
+     if (my $f = Cfn::TypeLibrary::try_function($_)) {
+       return $f
+     } else {
+       return Cfn::Resource::Properties::Object::AWS::MediaLive::Channel::InputLossFailoverSettings->new( %$_ );
+     }
+   };
+
+package Cfn::Resource::Properties::Object::AWS::MediaLive::Channel::InputLossFailoverSettings {
+  use Moose;
+  use MooseX::StrictConstructor;
+  extends 'Cfn::Value::TypedValue';
+  
+  has InputLossThresholdMsec => (isa => 'Cfn::Value::Integer', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
 }
 subtype 'ArrayOfCfn::Resource::Properties::AWS::MediaLive::Channel::InputChannelLevel',
      as 'Cfn::Value',
@@ -990,6 +1184,7 @@ package Cfn::Resource::Properties::Object::AWS::MediaLive::Channel::HlsCdnSettin
   has HlsAkamaiSettings => (isa => 'Cfn::Resource::Properties::AWS::MediaLive::Channel::HlsAkamaiSettings', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has HlsBasicPutSettings => (isa => 'Cfn::Resource::Properties::AWS::MediaLive::Channel::HlsBasicPutSettings', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has HlsMediaStoreSettings => (isa => 'Cfn::Resource::Properties::AWS::MediaLive::Channel::HlsMediaStoreSettings', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has HlsS3Settings => (isa => 'Cfn::Resource::Properties::AWS::MediaLive::Channel::HlsS3Settings', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has HlsWebdavSettings => (isa => 'Cfn::Resource::Properties::AWS::MediaLive::Channel::HlsWebdavSettings', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
 }
 
@@ -1103,6 +1298,27 @@ package Cfn::Resource::Properties::Object::AWS::MediaLive::Channel::FrameCapture
   has NameModifier => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
 }
 
+subtype 'Cfn::Resource::Properties::AWS::MediaLive::Channel::FrameCaptureCdnSettings',
+     as 'Cfn::Value';
+
+coerce 'Cfn::Resource::Properties::AWS::MediaLive::Channel::FrameCaptureCdnSettings',
+  from 'HashRef',
+   via {
+     if (my $f = Cfn::TypeLibrary::try_function($_)) {
+       return $f
+     } else {
+       return Cfn::Resource::Properties::Object::AWS::MediaLive::Channel::FrameCaptureCdnSettings->new( %$_ );
+     }
+   };
+
+package Cfn::Resource::Properties::Object::AWS::MediaLive::Channel::FrameCaptureCdnSettings {
+  use Moose;
+  use MooseX::StrictConstructor;
+  extends 'Cfn::Value::TypedValue';
+  
+  has FrameCaptureS3Settings => (isa => 'Cfn::Resource::Properties::AWS::MediaLive::Channel::FrameCaptureS3Settings', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+}
+
 subtype 'Cfn::Resource::Properties::AWS::MediaLive::Channel::EmbeddedSourceSettings',
      as 'Cfn::Value';
 
@@ -1214,6 +1430,28 @@ package Cfn::Resource::Properties::Object::AWS::MediaLive::Channel::AudioTrackSe
   has Tracks => (isa => 'ArrayOfCfn::Resource::Properties::AWS::MediaLive::Channel::AudioTrack', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
 }
 
+subtype 'Cfn::Resource::Properties::AWS::MediaLive::Channel::AudioSilenceFailoverSettings',
+     as 'Cfn::Value';
+
+coerce 'Cfn::Resource::Properties::AWS::MediaLive::Channel::AudioSilenceFailoverSettings',
+  from 'HashRef',
+   via {
+     if (my $f = Cfn::TypeLibrary::try_function($_)) {
+       return $f
+     } else {
+       return Cfn::Resource::Properties::Object::AWS::MediaLive::Channel::AudioSilenceFailoverSettings->new( %$_ );
+     }
+   };
+
+package Cfn::Resource::Properties::Object::AWS::MediaLive::Channel::AudioSilenceFailoverSettings {
+  use Moose;
+  use MooseX::StrictConstructor;
+  extends 'Cfn::Value::TypedValue';
+  
+  has AudioSelectorName => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has AudioSilenceThresholdMsec => (isa => 'Cfn::Value::Integer', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+}
+
 subtype 'Cfn::Resource::Properties::AWS::MediaLive::Channel::AudioPidSelection',
      as 'Cfn::Value';
 
@@ -1300,6 +1538,48 @@ package Cfn::Resource::Properties::Object::AWS::MediaLive::Channel::ArchiveOutpu
   has NameModifier => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
 }
 
+subtype 'Cfn::Resource::Properties::AWS::MediaLive::Channel::ArchiveCdnSettings',
+     as 'Cfn::Value';
+
+coerce 'Cfn::Resource::Properties::AWS::MediaLive::Channel::ArchiveCdnSettings',
+  from 'HashRef',
+   via {
+     if (my $f = Cfn::TypeLibrary::try_function($_)) {
+       return $f
+     } else {
+       return Cfn::Resource::Properties::Object::AWS::MediaLive::Channel::ArchiveCdnSettings->new( %$_ );
+     }
+   };
+
+package Cfn::Resource::Properties::Object::AWS::MediaLive::Channel::ArchiveCdnSettings {
+  use Moose;
+  use MooseX::StrictConstructor;
+  extends 'Cfn::Value::TypedValue';
+  
+  has ArchiveS3Settings => (isa => 'Cfn::Resource::Properties::AWS::MediaLive::Channel::ArchiveS3Settings', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+}
+
+subtype 'Cfn::Resource::Properties::AWS::MediaLive::Channel::AncillarySourceSettings',
+     as 'Cfn::Value';
+
+coerce 'Cfn::Resource::Properties::AWS::MediaLive::Channel::AncillarySourceSettings',
+  from 'HashRef',
+   via {
+     if (my $f = Cfn::TypeLibrary::try_function($_)) {
+       return $f
+     } else {
+       return Cfn::Resource::Properties::Object::AWS::MediaLive::Channel::AncillarySourceSettings->new( %$_ );
+     }
+   };
+
+package Cfn::Resource::Properties::Object::AWS::MediaLive::Channel::AncillarySourceSettings {
+  use Moose;
+  use MooseX::StrictConstructor;
+  extends 'Cfn::Value::TypedValue';
+  
+  has SourceAncillaryChannelNumber => (isa => 'Cfn::Value::Integer', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+}
+
 subtype 'Cfn::Resource::Properties::AWS::MediaLive::Channel::WebvttDestinationSettings',
      as 'Cfn::Value';
 
@@ -1318,6 +1598,29 @@ package Cfn::Resource::Properties::Object::AWS::MediaLive::Channel::WebvttDestin
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
   
+}
+
+subtype 'Cfn::Resource::Properties::AWS::MediaLive::Channel::WavSettings',
+     as 'Cfn::Value';
+
+coerce 'Cfn::Resource::Properties::AWS::MediaLive::Channel::WavSettings',
+  from 'HashRef',
+   via {
+     if (my $f = Cfn::TypeLibrary::try_function($_)) {
+       return $f
+     } else {
+       return Cfn::Resource::Properties::Object::AWS::MediaLive::Channel::WavSettings->new( %$_ );
+     }
+   };
+
+package Cfn::Resource::Properties::Object::AWS::MediaLive::Channel::WavSettings {
+  use Moose;
+  use MooseX::StrictConstructor;
+  extends 'Cfn::Value::TypedValue';
+  
+  has BitDepth => (isa => 'Cfn::Value::Double', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has CodingMode => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has SampleRate => (isa => 'Cfn::Value::Double', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
 }
 
 subtype 'Cfn::Resource::Properties::AWS::MediaLive::Channel::VideoSelectorSettings',
@@ -1340,6 +1643,27 @@ package Cfn::Resource::Properties::Object::AWS::MediaLive::Channel::VideoSelecto
   
   has VideoSelectorPid => (isa => 'Cfn::Resource::Properties::AWS::MediaLive::Channel::VideoSelectorPid', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has VideoSelectorProgramId => (isa => 'Cfn::Resource::Properties::AWS::MediaLive::Channel::VideoSelectorProgramId', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+}
+
+subtype 'Cfn::Resource::Properties::AWS::MediaLive::Channel::VideoSelectorColorSpaceSettings',
+     as 'Cfn::Value';
+
+coerce 'Cfn::Resource::Properties::AWS::MediaLive::Channel::VideoSelectorColorSpaceSettings',
+  from 'HashRef',
+   via {
+     if (my $f = Cfn::TypeLibrary::try_function($_)) {
+       return $f
+     } else {
+       return Cfn::Resource::Properties::Object::AWS::MediaLive::Channel::VideoSelectorColorSpaceSettings->new( %$_ );
+     }
+   };
+
+package Cfn::Resource::Properties::Object::AWS::MediaLive::Channel::VideoSelectorColorSpaceSettings {
+  use Moose;
+  use MooseX::StrictConstructor;
+  extends 'Cfn::Value::TypedValue';
+  
+  has Hdr10Settings => (isa => 'Cfn::Resource::Properties::AWS::MediaLive::Channel::Hdr10Settings', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
 }
 
 subtype 'Cfn::Resource::Properties::AWS::MediaLive::Channel::UdpGroupSettings',
@@ -1530,6 +1854,7 @@ package Cfn::Resource::Properties::Object::AWS::MediaLive::Channel::RtmpGroupSet
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
   
+  has AdMarkers => (isa => 'Cfn::Value::Array|Cfn::Value::Function|Cfn::DynamicValue', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has AuthenticationScheme => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has CacheFullBehavior => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has CacheLength => (isa => 'Cfn::Value::Integer', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
@@ -1665,6 +1990,42 @@ package Cfn::Resource::Properties::Object::AWS::MediaLive::Channel::MsSmoothGrou
   has TimestampOffsetMode => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
 }
 
+subtype 'Cfn::Resource::Properties::AWS::MediaLive::Channel::Mpeg2Settings',
+     as 'Cfn::Value';
+
+coerce 'Cfn::Resource::Properties::AWS::MediaLive::Channel::Mpeg2Settings',
+  from 'HashRef',
+   via {
+     if (my $f = Cfn::TypeLibrary::try_function($_)) {
+       return $f
+     } else {
+       return Cfn::Resource::Properties::Object::AWS::MediaLive::Channel::Mpeg2Settings->new( %$_ );
+     }
+   };
+
+package Cfn::Resource::Properties::Object::AWS::MediaLive::Channel::Mpeg2Settings {
+  use Moose;
+  use MooseX::StrictConstructor;
+  extends 'Cfn::Value::TypedValue';
+  
+  has AdaptiveQuantization => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has AfdSignaling => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has ColorMetadata => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has ColorSpace => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has DisplayAspectRatio => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has FilterSettings => (isa => 'Cfn::Resource::Properties::AWS::MediaLive::Channel::Mpeg2FilterSettings', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has FixedAfd => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has FramerateDenominator => (isa => 'Cfn::Value::Integer', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has FramerateNumerator => (isa => 'Cfn::Value::Integer', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has GopClosedCadence => (isa => 'Cfn::Value::Integer', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has GopNumBFrames => (isa => 'Cfn::Value::Integer', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has GopSize => (isa => 'Cfn::Value::Double', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has GopSizeUnits => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has ScanType => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has SubgopLength => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has TimecodeInsertion => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+}
+
 subtype 'Cfn::Resource::Properties::AWS::MediaLive::Channel::Mp2Settings',
      as 'Cfn::Value';
 
@@ -1707,6 +2068,26 @@ package Cfn::Resource::Properties::Object::AWS::MediaLive::Channel::MediaPackage
   extends 'Cfn::Value::TypedValue';
   
   has Destination => (isa => 'Cfn::Resource::Properties::AWS::MediaLive::Channel::OutputLocationRef', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+}
+
+subtype 'Cfn::Resource::Properties::AWS::MediaLive::Channel::HtmlMotionGraphicsSettings',
+     as 'Cfn::Value';
+
+coerce 'Cfn::Resource::Properties::AWS::MediaLive::Channel::HtmlMotionGraphicsSettings',
+  from 'HashRef',
+   via {
+     if (my $f = Cfn::TypeLibrary::try_function($_)) {
+       return $f
+     } else {
+       return Cfn::Resource::Properties::Object::AWS::MediaLive::Channel::HtmlMotionGraphicsSettings->new( %$_ );
+     }
+   };
+
+package Cfn::Resource::Properties::Object::AWS::MediaLive::Channel::HtmlMotionGraphicsSettings {
+  use Moose;
+  use MooseX::StrictConstructor;
+  extends 'Cfn::Value::TypedValue';
+  
 }
 
 subtype 'Cfn::Resource::Properties::AWS::MediaLive::Channel::HlsInputSettings',
@@ -1763,10 +2144,12 @@ package Cfn::Resource::Properties::Object::AWS::MediaLive::Channel::HlsGroupSett
   has ConstantIv => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has Destination => (isa => 'Cfn::Resource::Properties::AWS::MediaLive::Channel::OutputLocationRef', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has DirectoryStructure => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has DiscontinuityTags => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has EncryptionType => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has HlsCdnSettings => (isa => 'Cfn::Resource::Properties::AWS::MediaLive::Channel::HlsCdnSettings', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has HlsId3SegmentTagging => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has IFrameOnlyPlaylists => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has IncompleteSegmentBehavior => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has IndexNSegments => (isa => 'Cfn::Value::Integer', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has InputLossAction => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has IvInManifest => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
@@ -1944,6 +2327,30 @@ package Cfn::Resource::Properties::Object::AWS::MediaLive::Channel::FrameCapture
   extends 'Cfn::Value::TypedValue';
   
   has Destination => (isa => 'Cfn::Resource::Properties::AWS::MediaLive::Channel::OutputLocationRef', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has FrameCaptureCdnSettings => (isa => 'Cfn::Resource::Properties::AWS::MediaLive::Channel::FrameCaptureCdnSettings', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+}
+
+subtype 'Cfn::Resource::Properties::AWS::MediaLive::Channel::FailoverConditionSettings',
+     as 'Cfn::Value';
+
+coerce 'Cfn::Resource::Properties::AWS::MediaLive::Channel::FailoverConditionSettings',
+  from 'HashRef',
+   via {
+     if (my $f = Cfn::TypeLibrary::try_function($_)) {
+       return $f
+     } else {
+       return Cfn::Resource::Properties::Object::AWS::MediaLive::Channel::FailoverConditionSettings->new( %$_ );
+     }
+   };
+
+package Cfn::Resource::Properties::Object::AWS::MediaLive::Channel::FailoverConditionSettings {
+  use Moose;
+  use MooseX::StrictConstructor;
+  extends 'Cfn::Value::TypedValue';
+  
+  has AudioSilenceSettings => (isa => 'Cfn::Resource::Properties::AWS::MediaLive::Channel::AudioSilenceFailoverSettings', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has InputLossSettings => (isa => 'Cfn::Resource::Properties::AWS::MediaLive::Channel::InputLossFailoverSettings', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has VideoBlackSettings => (isa => 'Cfn::Resource::Properties::AWS::MediaLive::Channel::VideoBlackFailoverSettings', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
 }
 
 subtype 'Cfn::Resource::Properties::AWS::MediaLive::Channel::EmbeddedPlusScte20DestinationSettings',
@@ -2004,6 +2411,7 @@ package Cfn::Resource::Properties::Object::AWS::MediaLive::Channel::EbuTtDDestin
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
   
+  has CopyrightHolder => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has FillLineGap => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has FontFamily => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has StyleControl => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
@@ -2104,6 +2512,7 @@ package Cfn::Resource::Properties::Object::AWS::MediaLive::Channel::CaptionSelec
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
   
+  has AncillarySourceSettings => (isa => 'Cfn::Resource::Properties::AWS::MediaLive::Channel::AncillarySourceSettings', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has AribSourceSettings => (isa => 'Cfn::Resource::Properties::AWS::MediaLive::Channel::AribSourceSettings', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has DvbSubSourceSettings => (isa => 'Cfn::Resource::Properties::AWS::MediaLive::Channel::DvbSubSourceSettings', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has EmbeddedSourceSettings => (isa => 'Cfn::Resource::Properties::AWS::MediaLive::Channel::EmbeddedSourceSettings', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
@@ -2254,6 +2663,7 @@ package Cfn::Resource::Properties::Object::AWS::MediaLive::Channel::ArchiveGroup
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
   
+  has ArchiveCdnSettings => (isa => 'Cfn::Resource::Properties::AWS::MediaLive::Channel::ArchiveCdnSettings', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has Destination => (isa => 'Cfn::Resource::Properties::AWS::MediaLive::Channel::OutputLocationRef', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has RolloverInterval => (isa => 'Cfn::Value::Integer', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
 }
@@ -2333,6 +2743,7 @@ package Cfn::Resource::Properties::Object::AWS::MediaLive::Channel::VideoSelecto
   extends 'Cfn::Value::TypedValue';
   
   has ColorSpace => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has ColorSpaceSettings => (isa => 'Cfn::Resource::Properties::AWS::MediaLive::Channel::VideoSelectorColorSpaceSettings', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has ColorSpaceUsage => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has SelectorSettings => (isa => 'Cfn::Resource::Properties::AWS::MediaLive::Channel::VideoSelectorSettings', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
 }
@@ -2358,6 +2769,7 @@ package Cfn::Resource::Properties::Object::AWS::MediaLive::Channel::VideoCodecSe
   has FrameCaptureSettings => (isa => 'Cfn::Resource::Properties::AWS::MediaLive::Channel::FrameCaptureSettings', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has H264Settings => (isa => 'Cfn::Resource::Properties::AWS::MediaLive::Channel::H264Settings', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has H265Settings => (isa => 'Cfn::Resource::Properties::AWS::MediaLive::Channel::H265Settings', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has Mpeg2Settings => (isa => 'Cfn::Resource::Properties::AWS::MediaLive::Channel::Mpeg2Settings', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
 }
 
 subtype 'Cfn::Resource::Properties::AWS::MediaLive::Channel::RemixSettings',
@@ -2480,6 +2892,27 @@ package Cfn::Resource::Properties::Object::AWS::MediaLive::Channel::NetworkInput
   has ServerValidation => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
 }
 
+subtype 'Cfn::Resource::Properties::AWS::MediaLive::Channel::MotionGraphicsSettings',
+     as 'Cfn::Value';
+
+coerce 'Cfn::Resource::Properties::AWS::MediaLive::Channel::MotionGraphicsSettings',
+  from 'HashRef',
+   via {
+     if (my $f = Cfn::TypeLibrary::try_function($_)) {
+       return $f
+     } else {
+       return Cfn::Resource::Properties::Object::AWS::MediaLive::Channel::MotionGraphicsSettings->new( %$_ );
+     }
+   };
+
+package Cfn::Resource::Properties::Object::AWS::MediaLive::Channel::MotionGraphicsSettings {
+  use Moose;
+  use MooseX::StrictConstructor;
+  extends 'Cfn::Value::TypedValue';
+  
+  has HtmlMotionGraphicsSettings => (isa => 'Cfn::Resource::Properties::AWS::MediaLive::Channel::HtmlMotionGraphicsSettings', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+}
+
 subtype 'Cfn::Resource::Properties::AWS::MediaLive::Channel::InputLossBehavior',
      as 'Cfn::Value';
 
@@ -2503,6 +2936,49 @@ package Cfn::Resource::Properties::Object::AWS::MediaLive::Channel::InputLossBeh
   has InputLossImageSlate => (isa => 'Cfn::Resource::Properties::AWS::MediaLive::Channel::InputLocation', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has InputLossImageType => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has RepeatFrameMsec => (isa => 'Cfn::Value::Integer', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+}
+subtype 'ArrayOfCfn::Resource::Properties::AWS::MediaLive::Channel::FailoverCondition',
+     as 'Cfn::Value',
+  where { $_->isa('Cfn::Value::Array') or $_->isa('Cfn::Value::Function') },
+message { "$_ is not a Cfn::Value or a Cfn::Value::Function" };
+
+coerce 'ArrayOfCfn::Resource::Properties::AWS::MediaLive::Channel::FailoverCondition',
+  from 'HashRef',
+   via {
+     if (my $f = Cfn::TypeLibrary::try_function($_)) {
+       return $f
+     } else {
+       die 'Only accepts functions'; 
+     }
+   },
+  from 'ArrayRef',
+   via {
+     Cfn::Value::Array->new(Value => [
+       map { 
+         Moose::Util::TypeConstraints::find_type_constraint('Cfn::Resource::Properties::AWS::MediaLive::Channel::FailoverCondition')->coerce($_)
+       } @$_
+     ]);
+   };
+
+subtype 'Cfn::Resource::Properties::AWS::MediaLive::Channel::FailoverCondition',
+     as 'Cfn::Value';
+
+coerce 'Cfn::Resource::Properties::AWS::MediaLive::Channel::FailoverCondition',
+  from 'HashRef',
+   via {
+     if (my $f = Cfn::TypeLibrary::try_function($_)) {
+       return $f
+     } else {
+       return Cfn::Resource::Properties::Object::AWS::MediaLive::Channel::FailoverCondition->new( %$_ );
+     }
+   };
+
+package Cfn::Resource::Properties::Object::AWS::MediaLive::Channel::FailoverCondition {
+  use Moose;
+  use MooseX::StrictConstructor;
+  extends 'Cfn::Value::TypedValue';
+  
+  has FailoverConditionSettings => (isa => 'Cfn::Resource::Properties::AWS::MediaLive::Channel::FailoverConditionSettings', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
 }
 subtype 'ArrayOfCfn::Resource::Properties::AWS::MediaLive::Channel::CaptionSelector',
      as 'Cfn::Value',
@@ -2695,6 +3171,7 @@ package Cfn::Resource::Properties::Object::AWS::MediaLive::Channel::AudioCodecSe
   has Eac3Settings => (isa => 'Cfn::Resource::Properties::AWS::MediaLive::Channel::Eac3Settings', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has Mp2Settings => (isa => 'Cfn::Resource::Properties::AWS::MediaLive::Channel::Mp2Settings', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has PassThroughSettings => (isa => 'Cfn::Resource::Properties::AWS::MediaLive::Channel::PassThroughSettings', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has WavSettings => (isa => 'Cfn::Resource::Properties::AWS::MediaLive::Channel::WavSettings', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
 }
 subtype 'ArrayOfCfn::Resource::Properties::AWS::MediaLive::Channel::VideoDescription',
      as 'Cfn::Value',
@@ -2901,6 +3378,28 @@ package Cfn::Resource::Properties::Object::AWS::MediaLive::Channel::MultiplexPro
   
   has MultiplexId => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has ProgramName => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+}
+
+subtype 'Cfn::Resource::Properties::AWS::MediaLive::Channel::MotionGraphicsConfiguration',
+     as 'Cfn::Value';
+
+coerce 'Cfn::Resource::Properties::AWS::MediaLive::Channel::MotionGraphicsConfiguration',
+  from 'HashRef',
+   via {
+     if (my $f = Cfn::TypeLibrary::try_function($_)) {
+       return $f
+     } else {
+       return Cfn::Resource::Properties::Object::AWS::MediaLive::Channel::MotionGraphicsConfiguration->new( %$_ );
+     }
+   };
+
+package Cfn::Resource::Properties::Object::AWS::MediaLive::Channel::MotionGraphicsConfiguration {
+  use Moose;
+  use MooseX::StrictConstructor;
+  extends 'Cfn::Value::TypedValue';
+  
+  has MotionGraphicsInsertion => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has MotionGraphicsSettings => (isa => 'Cfn::Resource::Properties::AWS::MediaLive::Channel::MotionGraphicsSettings', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
 }
 subtype 'ArrayOfCfn::Resource::Properties::AWS::MediaLive::Channel::MediaPackageOutputDestinationSettings',
      as 'Cfn::Value',
@@ -3156,6 +3655,8 @@ package Cfn::Resource::Properties::Object::AWS::MediaLive::Channel::AutomaticInp
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
   
+  has ErrorClearTimeMsec => (isa => 'Cfn::Value::Integer', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has FailoverConditions => (isa => 'ArrayOfCfn::Resource::Properties::AWS::MediaLive::Channel::FailoverCondition', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has InputPreference => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has SecondaryInputId => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
 }
@@ -3210,6 +3711,29 @@ package Cfn::Resource::Properties::Object::AWS::MediaLive::Channel::AudioDescrip
   has Name => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has RemixSettings => (isa => 'Cfn::Resource::Properties::AWS::MediaLive::Channel::RemixSettings', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has StreamName => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+}
+
+subtype 'Cfn::Resource::Properties::AWS::MediaLive::Channel::VpcOutputSettings',
+     as 'Cfn::Value';
+
+coerce 'Cfn::Resource::Properties::AWS::MediaLive::Channel::VpcOutputSettings',
+  from 'HashRef',
+   via {
+     if (my $f = Cfn::TypeLibrary::try_function($_)) {
+       return $f
+     } else {
+       return Cfn::Resource::Properties::Object::AWS::MediaLive::Channel::VpcOutputSettings->new( %$_ );
+     }
+   };
+
+package Cfn::Resource::Properties::Object::AWS::MediaLive::Channel::VpcOutputSettings {
+  use Moose;
+  use MooseX::StrictConstructor;
+  extends 'Cfn::Value::TypedValue';
+  
+  has PublicAddressAllocationIds => (isa => 'Cfn::Value::Array|Cfn::Value::Function|Cfn::DynamicValue', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has SecurityGroupIds => (isa => 'Cfn::Value::Array|Cfn::Value::Function|Cfn::DynamicValue', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has SubnetIds => (isa => 'Cfn::Value::Array|Cfn::Value::Function|Cfn::DynamicValue', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
 }
 subtype 'ArrayOfCfn::Resource::Properties::AWS::MediaLive::Channel::OutputDestination',
      as 'Cfn::Value',
@@ -3352,10 +3876,32 @@ package Cfn::Resource::Properties::Object::AWS::MediaLive::Channel::EncoderSetti
   has CaptionDescriptions => (isa => 'ArrayOfCfn::Resource::Properties::AWS::MediaLive::Channel::CaptionDescription', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has FeatureActivations => (isa => 'Cfn::Resource::Properties::AWS::MediaLive::Channel::FeatureActivations', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has GlobalConfiguration => (isa => 'Cfn::Resource::Properties::AWS::MediaLive::Channel::GlobalConfiguration', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has MotionGraphicsConfiguration => (isa => 'Cfn::Resource::Properties::AWS::MediaLive::Channel::MotionGraphicsConfiguration', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has NielsenConfiguration => (isa => 'Cfn::Resource::Properties::AWS::MediaLive::Channel::NielsenConfiguration', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has OutputGroups => (isa => 'ArrayOfCfn::Resource::Properties::AWS::MediaLive::Channel::OutputGroup', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has TimecodeConfig => (isa => 'Cfn::Resource::Properties::AWS::MediaLive::Channel::TimecodeConfig', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has VideoDescriptions => (isa => 'ArrayOfCfn::Resource::Properties::AWS::MediaLive::Channel::VideoDescription', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+}
+
+subtype 'Cfn::Resource::Properties::AWS::MediaLive::Channel::CdiInputSpecification',
+     as 'Cfn::Value';
+
+coerce 'Cfn::Resource::Properties::AWS::MediaLive::Channel::CdiInputSpecification',
+  from 'HashRef',
+   via {
+     if (my $f = Cfn::TypeLibrary::try_function($_)) {
+       return $f
+     } else {
+       return Cfn::Resource::Properties::Object::AWS::MediaLive::Channel::CdiInputSpecification->new( %$_ );
+     }
+   };
+
+package Cfn::Resource::Properties::Object::AWS::MediaLive::Channel::CdiInputSpecification {
+  use Moose;
+  use MooseX::StrictConstructor;
+  extends 'Cfn::Value::TypedValue';
+  
+  has Resolution => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
 }
 
 package Cfn::Resource::Properties::AWS::MediaLive::Channel {
@@ -3363,6 +3909,7 @@ package Cfn::Resource::Properties::AWS::MediaLive::Channel {
   use MooseX::StrictConstructor;
   extends 'Cfn::Resource::Properties';
   
+  has CdiInputSpecification => (isa => 'Cfn::Resource::Properties::AWS::MediaLive::Channel::CdiInputSpecification', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has ChannelClass => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has Destinations => (isa => 'ArrayOfCfn::Resource::Properties::AWS::MediaLive::Channel::OutputDestination', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has EncoderSettings => (isa => 'Cfn::Resource::Properties::AWS::MediaLive::Channel::EncoderSettings', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
@@ -3372,6 +3919,7 @@ package Cfn::Resource::Properties::AWS::MediaLive::Channel {
   has Name => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has RoleArn => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has Tags => (isa => 'Cfn::Value::Json|Cfn::DynamicValue', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has Vpc => (isa => 'Cfn::Resource::Properties::AWS::MediaLive::Channel::VpcOutputSettings', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
 }
 
 1;

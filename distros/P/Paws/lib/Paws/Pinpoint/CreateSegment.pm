@@ -9,7 +9,7 @@ package Paws::Pinpoint::CreateSegment;
   class_has _api_call => (isa => 'Str', is => 'ro', default => 'CreateSegment');
   class_has _api_uri  => (isa => 'Str', is => 'ro', default => '/v1/apps/{application-id}/segments');
   class_has _api_method  => (isa => 'Str', is => 'ro', default => 'POST');
-  class_has _returns => (isa => 'Str', is => 'ro', default => 'Paws::Pinpoint::SegmentResponse');
+  class_has _returns => (isa => 'Str', is => 'ro', default => 'Paws::Pinpoint::CreateSegmentResponse');
 1;
 
 ### main pod documentation begin ###
@@ -29,13 +29,13 @@ You shouldn't make instances of this class. Each attribute should be used as a n
 =head1 SYNOPSIS
 
     my $pinpoint = Paws->service('Pinpoint');
-    my $SegmentResponse = $pinpoint->CreateSegment(
+    my $CreateSegmentResponse = $pinpoint->CreateSegment(
       ApplicationId       => 'My__string',
       WriteSegmentRequest => {
         Dimensions => {
           Attributes => {
             'My__string' => {
-              Values => [ 'My__string', ... ],
+              Values        => [ 'My__string', ... ],
               AttributeType =>
                 'INCLUSIVE',    # values: INCLUSIVE, EXCLUSIVE; OPTIONAL
             },
@@ -49,39 +49,39 @@ You shouldn't make instances of this class. Each attribute should be used as a n
           },    # OPTIONAL
           Demographic => {
             AppVersion => {
-              Values => [ 'My__string', ... ],
+              Values        => [ 'My__string', ... ],
               DimensionType =>
                 'INCLUSIVE',    # values: INCLUSIVE, EXCLUSIVE; OPTIONAL
             },    # OPTIONAL
             Channel => {
-              Values => [ 'My__string', ... ],
+              Values        => [ 'My__string', ... ],
               DimensionType =>
                 'INCLUSIVE',    # values: INCLUSIVE, EXCLUSIVE; OPTIONAL
             },    # OPTIONAL
             DeviceType => {
-              Values => [ 'My__string', ... ],
+              Values        => [ 'My__string', ... ],
               DimensionType =>
                 'INCLUSIVE',    # values: INCLUSIVE, EXCLUSIVE; OPTIONAL
             },    # OPTIONAL
             Make => {
-              Values => [ 'My__string', ... ],
+              Values        => [ 'My__string', ... ],
               DimensionType =>
                 'INCLUSIVE',    # values: INCLUSIVE, EXCLUSIVE; OPTIONAL
             },    # OPTIONAL
             Model => {
-              Values => [ 'My__string', ... ],
+              Values        => [ 'My__string', ... ],
               DimensionType =>
                 'INCLUSIVE',    # values: INCLUSIVE, EXCLUSIVE; OPTIONAL
             },    # OPTIONAL
             Platform => {
-              Values => [ 'My__string', ... ],
+              Values        => [ 'My__string', ... ],
               DimensionType =>
                 'INCLUSIVE',    # values: INCLUSIVE, EXCLUSIVE; OPTIONAL
             },    # OPTIONAL
           },    # OPTIONAL
           Location => {
             Country => {
-              Values => [ 'My__string', ... ],
+              Values        => [ 'My__string', ... ],
               DimensionType =>
                 'INCLUSIVE',    # values: INCLUSIVE, EXCLUSIVE; OPTIONAL
             },    # OPTIONAL
@@ -103,7 +103,7 @@ You shouldn't make instances of this class. Each attribute should be used as a n
           },    # OPTIONAL
           UserAttributes => {
             'My__string' => {
-              Values => [ 'My__string', ... ],
+              Values        => [ 'My__string', ... ],
               AttributeType =>
                 'INCLUSIVE',    # values: INCLUSIVE, EXCLUSIVE; OPTIONAL
             },
@@ -117,7 +117,7 @@ You shouldn't make instances of this class. Each attribute should be used as a n
                 {
                   Attributes => {
                     'My__string' => {
-                      Values => [ 'My__string', ... ],
+                      Values        => [ 'My__string', ... ],
                       AttributeType =>
                         'INCLUSIVE',    # values: INCLUSIVE, EXCLUSIVE; OPTIONAL
                     },
@@ -132,39 +132,39 @@ You shouldn't make instances of this class. Each attribute should be used as a n
                   },    # OPTIONAL
                   Demographic => {
                     AppVersion => {
-                      Values => [ 'My__string', ... ],
+                      Values        => [ 'My__string', ... ],
                       DimensionType =>
                         'INCLUSIVE',    # values: INCLUSIVE, EXCLUSIVE; OPTIONAL
                     },    # OPTIONAL
                     Channel => {
-                      Values => [ 'My__string', ... ],
+                      Values        => [ 'My__string', ... ],
                       DimensionType =>
                         'INCLUSIVE',    # values: INCLUSIVE, EXCLUSIVE; OPTIONAL
                     },    # OPTIONAL
                     DeviceType => {
-                      Values => [ 'My__string', ... ],
+                      Values        => [ 'My__string', ... ],
                       DimensionType =>
                         'INCLUSIVE',    # values: INCLUSIVE, EXCLUSIVE; OPTIONAL
                     },    # OPTIONAL
                     Make => {
-                      Values => [ 'My__string', ... ],
+                      Values        => [ 'My__string', ... ],
                       DimensionType =>
                         'INCLUSIVE',    # values: INCLUSIVE, EXCLUSIVE; OPTIONAL
                     },    # OPTIONAL
                     Model => {
-                      Values => [ 'My__string', ... ],
+                      Values        => [ 'My__string', ... ],
                       DimensionType =>
                         'INCLUSIVE',    # values: INCLUSIVE, EXCLUSIVE; OPTIONAL
                     },    # OPTIONAL
                     Platform => {
-                      Values => [ 'My__string', ... ],
+                      Values        => [ 'My__string', ... ],
                       DimensionType =>
                         'INCLUSIVE',    # values: INCLUSIVE, EXCLUSIVE; OPTIONAL
                     },    # OPTIONAL
                   },    # OPTIONAL
                   Location => {
                     Country => {
-                      Values => [ 'My__string', ... ],
+                      Values        => [ 'My__string', ... ],
                       DimensionType =>
                         'INCLUSIVE',    # values: INCLUSIVE, EXCLUSIVE; OPTIONAL
                     },    # OPTIONAL
@@ -186,27 +186,27 @@ You shouldn't make instances of this class. Each attribute should be used as a n
                   },    # OPTIONAL
                   UserAttributes => {
                     'My__string' => {
-                      Values => [ 'My__string', ... ],
+                      Values        => [ 'My__string', ... ],
                       AttributeType =>
                         'INCLUSIVE',    # values: INCLUSIVE, EXCLUSIVE; OPTIONAL
                     },
                   },    # OPTIONAL
                 },
                 ...
-              ],        # OPTIONAL
+              ],    # OPTIONAL
               SourceSegments => [
                 {
                   Id      => 'My__string',
                   Version => 1,              # OPTIONAL
                 },
                 ...
-              ],                             # OPTIONAL
-              SourceType => 'ALL',           # values: ALL, ANY, NONE; OPTIONAL
-              Type       => 'ALL',           # values: ALL, ANY, NONE; OPTIONAL
+              ],    # OPTIONAL
+              SourceType => 'ALL',    # values: ALL, ANY, NONE; OPTIONAL
+              Type       => 'ALL',    # values: ALL, ANY, NONE; OPTIONAL
             },
             ...
-          ],                                 # OPTIONAL
-          Include => 'ALL',                  # values: ALL, ANY, NONE; OPTIONAL
+          ],    # OPTIONAL
+          Include => 'ALL',    # values: ALL, ANY, NONE; OPTIONAL
         },    # OPTIONAL
         Tags => { 'My__string' => 'My__string', },    # OPTIONAL
       },
@@ -214,20 +214,9 @@ You shouldn't make instances of this class. Each attribute should be used as a n
     );
 
     # Results:
-    my $ApplicationId    = $SegmentResponse->ApplicationId;
-    my $Arn              = $SegmentResponse->Arn;
-    my $CreationDate     = $SegmentResponse->CreationDate;
-    my $Dimensions       = $SegmentResponse->Dimensions;
-    my $Id               = $SegmentResponse->Id;
-    my $ImportDefinition = $SegmentResponse->ImportDefinition;
-    my $LastModifiedDate = $SegmentResponse->LastModifiedDate;
-    my $Name             = $SegmentResponse->Name;
-    my $SegmentGroups    = $SegmentResponse->SegmentGroups;
-    my $SegmentType      = $SegmentResponse->SegmentType;
-    my $Tags             = $SegmentResponse->Tags;
-    my $Version          = $SegmentResponse->Version;
+    my $SegmentResponse = $CreateSegmentResponse->SegmentResponse;
 
-    # Returns a L<Paws::Pinpoint::SegmentResponse> object.
+    # Returns a L<Paws::Pinpoint::CreateSegmentResponse> object.
 
 Values for attributes that are native types (Int, String, Float, etc) can passed as-is (scalar values). Values for complex Types (objects) can be passed as a HashRef. The keys and values of the hashref will be used to instance the underlying object.
 For the AWS API documentation, see L<https://docs.aws.amazon.com/goto/WebAPI/pinpoint/CreateSegment>

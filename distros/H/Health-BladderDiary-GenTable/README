@@ -2,7 +2,7 @@ NAME
     Health::BladderDiary::GenTable - Create bladder diary table from entries
 
 VERSION
-    This document describes version 0.006 of Health::BladderDiary::GenTable
+    This document describes version 0.007 of Health::BladderDiary::GenTable
     (from Perl distribution Health-BladderDiary-GenTable), released on
     2020-12-10.
 

@@ -74,7 +74,7 @@
          "web" : "https://github.com/perlancar/perl-Role-TinyCommons-TreeNode"
       }
    },
-   "version" : "0.125",
+   "version" : "0.126",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.030002"

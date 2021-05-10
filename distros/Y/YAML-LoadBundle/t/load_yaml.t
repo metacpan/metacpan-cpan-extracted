@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 30;
+use Test::More tests => 31;
 use Test::Exception;
 use Fcntl qw(:seek);
 use File::Temp qw(:POSIX);
@@ -263,3 +263,110 @@ $yaml = <<'...';
         'not really a pseudo-hash'
     );
 }
+
+$yaml =
+    load_yaml(<<EOF
+node:
+    letters: &letters
+       - alpha
+       - bravo
+       - charlie
+       - delta
+    numbers: &numbers
+       - uno
+       - duo
+       - tres
+
+apple:
+    -clone:
+       letters:
+         letters: *letters
+         fuji: mcintosh
+         gala: golden
+
+banana:
+    -clone:
+       letters:
+         letters: *letters
+         echo: e
+         foxtrot: t
+       numbers:
+         numbers: *numbers
+         quattro: 4
+         cinco:   5
+    golf: g
+    hotel: h
+
+EOF
+          );
+
+is_deeply(
+    $yaml,
+    {
+        'node' => {
+            'letters' => [
+                'alpha',
+                'bravo',
+                'charlie',
+                'delta'
+            ],
+            'numbers' => [
+                'uno',
+                'duo',
+                'tres'
+            ],
+        },
+
+        'apple' => {
+            'alpha' => {
+                'fuji' => 'mcintosh',
+                'gala' => 'golden',
+            },
+            'bravo' => {
+                'fuji' => 'mcintosh',
+                'gala' => 'golden',
+            },
+            'charlie' => {
+                'fuji' => 'mcintosh',
+                'gala' => 'golden',
+            },
+            'delta' => {
+                'fuji' => 'mcintosh',
+                'gala' => 'golden',
+            },
+        },
+        'banana' => {
+            'alpha' => {
+                'echo' => 'e',
+                'foxtrot' => 't',
+            },
+            'bravo' => {
+                'echo' => 'e',
+                'foxtrot' => 't',
+            },
+            'charlie' => {
+                'echo' => 'e',
+                'foxtrot' => 't',
+            },
+            'delta' => {
+                'echo' => 'e',
+                'foxtrot' => 't',
+            },
+            'uno' => {
+                'cinco' => '5',
+                'quattro' => '4',
+            },
+            'duo' => {
+                'cinco' => '5',
+                'quattro' => '4',
+            },
+            'tres' => {
+                'cinco' => '5',
+                'quattro' => '4',
+            },
+            'golf' => 'g',
+            'hotel' => 'h',
+        },
+    },
+    'clones',
+);

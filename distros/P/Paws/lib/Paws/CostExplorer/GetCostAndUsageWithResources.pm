@@ -60,11 +60,11 @@ You shouldn't make instances of this class. Each attribute should be used as a n
       Granularity => 'DAILY',    # OPTIONAL
       GroupBy     => [
         {
-          Key => 'MyGroupDefinitionKey',    # OPTIONAL
+          Key  => 'MyGroupDefinitionKey',    # OPTIONAL
           Type => 'DIMENSION', # values: DIMENSION, TAG, COST_CATEGORY; OPTIONAL
         },
         ...
-      ],                       # OPTIONAL
+      ],    # OPTIONAL
       Metrics       => [ 'MyMetricName', ... ],    # OPTIONAL
       NextPageToken => 'MyNextPageToken',          # OPTIONAL
       );

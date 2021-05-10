@@ -1,6 +1,6 @@
 package Myriad::Transport::Memory;
 
-our $VERSION = '0.005'; # VERSION
+our $VERSION = '0.006'; # VERSION
 # AUTHORTIY
 
 use strict;
@@ -158,8 +158,9 @@ as long as it exists in the stream.
 
 async method read_from_stream ($stream_name, $offset = 0 , $count = 10) {
     my $stream = $streams->{$stream_name} // return ();
-    my %messages = map { $_ => $stream->{data}->{$_}->{data} } ($offset..$offset+$count - 1);
-    return %messages;
+    return {
+        map { $_ => $stream->{data}->{$_}->{data} } ($offset..$offset+$count - 1)
+    };
 }
 
 
@@ -204,7 +205,7 @@ async method read_from_stream_by_consumer ($stream_name, $group_name, $consumer_
 
     $group->{cursor} += $offset + $read_count;
 
-    return %messages;
+    return \%messages;
 }
 
 =head2 ack_message

@@ -13,7 +13,7 @@ It's probably not particularly useful to use the class directly.
 
 package App::CPANModuleSite;
 
-our $VERSION = '0.0.6';
+our $VERSION = '0.0.8';
 
 use v5.14;
 
@@ -105,6 +105,7 @@ sub _build_tt_config {
       distribution => $self->distribution,
       release => $self->release,
       modules => $self->modules,
+      base => $self->base,
     },
   }
 }
@@ -167,6 +168,12 @@ has wrapper => (
 sub _build_wrapper {
   return 'page.tt';
 }
+
+has base => (
+  is => 'ro',
+  isa => 'Str',
+  default => '',
+);
 
 around BUILDARGS => sub {
   my $orig = shift;

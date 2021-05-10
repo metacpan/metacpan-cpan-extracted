@@ -3,7 +3,7 @@ package Code::Includable::Tree::NodeMethods;
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2021-05-06'; # DATE
 our $DIST = 'Role-TinyCommons-Tree'; # DIST
-our $VERSION = '0.125'; # VERSION
+our $VERSION = '0.126'; # VERSION
 
 use strict;
 our $IGNORE_NO_CHILDREN_METHOD = 1;
@@ -289,7 +289,7 @@ Code::Includable::Tree::NodeMethods - Tree node routines
 
 =head1 VERSION
 
-This document describes version 0.125 of Code::Includable::Tree::NodeMethods (from Perl distribution Role-TinyCommons-Tree), released on 2021-05-06.
+This document describes version 0.126 of Code::Includable::Tree::NodeMethods (from Perl distribution Role-TinyCommons-Tree), released on 2021-05-06.
 
 =head1 DESCRIPTION
 

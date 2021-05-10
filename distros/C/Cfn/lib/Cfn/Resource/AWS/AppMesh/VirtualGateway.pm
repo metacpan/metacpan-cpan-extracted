@@ -1,4 +1,4 @@
-# AWS::AppMesh::VirtualGateway generated from spec 21.0.0
+# AWS::AppMesh::VirtualGateway generated from spec 34.0.0
 use Moose::Util::TypeConstraints;
 
 coerce 'Cfn::Resource::Properties::AWS::AppMesh::VirtualGateway',
@@ -19,6 +19,27 @@ package Cfn::Resource::AWS::AppMesh::VirtualGateway {
 }
 
 
+
+subtype 'Cfn::Resource::Properties::AWS::AppMesh::VirtualGateway::VirtualGatewayTlsValidationContextSdsTrust',
+     as 'Cfn::Value';
+
+coerce 'Cfn::Resource::Properties::AWS::AppMesh::VirtualGateway::VirtualGatewayTlsValidationContextSdsTrust',
+  from 'HashRef',
+   via {
+     if (my $f = Cfn::TypeLibrary::try_function($_)) {
+       return $f
+     } else {
+       return Cfn::Resource::Properties::Object::AWS::AppMesh::VirtualGateway::VirtualGatewayTlsValidationContextSdsTrust->new( %$_ );
+     }
+   };
+
+package Cfn::Resource::Properties::Object::AWS::AppMesh::VirtualGateway::VirtualGatewayTlsValidationContextSdsTrust {
+  use Moose;
+  use MooseX::StrictConstructor;
+  extends 'Cfn::Value::TypedValue';
+  
+  has SecretName => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+}
 
 subtype 'Cfn::Resource::Properties::AWS::AppMesh::VirtualGateway::VirtualGatewayTlsValidationContextFileTrust',
      as 'Cfn::Value';
@@ -62,6 +83,27 @@ package Cfn::Resource::Properties::Object::AWS::AppMesh::VirtualGateway::Virtual
   has CertificateAuthorityArns => (isa => 'Cfn::Value::Array|Cfn::Value::Function|Cfn::DynamicValue', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
 }
 
+subtype 'Cfn::Resource::Properties::AWS::AppMesh::VirtualGateway::SubjectAlternativeNameMatchers',
+     as 'Cfn::Value';
+
+coerce 'Cfn::Resource::Properties::AWS::AppMesh::VirtualGateway::SubjectAlternativeNameMatchers',
+  from 'HashRef',
+   via {
+     if (my $f = Cfn::TypeLibrary::try_function($_)) {
+       return $f
+     } else {
+       return Cfn::Resource::Properties::Object::AWS::AppMesh::VirtualGateway::SubjectAlternativeNameMatchers->new( %$_ );
+     }
+   };
+
+package Cfn::Resource::Properties::Object::AWS::AppMesh::VirtualGateway::SubjectAlternativeNameMatchers {
+  use Moose;
+  use MooseX::StrictConstructor;
+  extends 'Cfn::Value::TypedValue';
+  
+  has Exact => (isa => 'Cfn::Value::Array|Cfn::Value::Function|Cfn::DynamicValue', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+}
+
 subtype 'Cfn::Resource::Properties::AWS::AppMesh::VirtualGateway::VirtualGatewayTlsValidationContextTrust',
      as 'Cfn::Value';
 
@@ -82,27 +124,28 @@ package Cfn::Resource::Properties::Object::AWS::AppMesh::VirtualGateway::Virtual
   
   has ACM => (isa => 'Cfn::Resource::Properties::AWS::AppMesh::VirtualGateway::VirtualGatewayTlsValidationContextAcmTrust', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has File => (isa => 'Cfn::Resource::Properties::AWS::AppMesh::VirtualGateway::VirtualGatewayTlsValidationContextFileTrust', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has SDS => (isa => 'Cfn::Resource::Properties::AWS::AppMesh::VirtualGateway::VirtualGatewayTlsValidationContextSdsTrust', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
 }
 
-subtype 'Cfn::Resource::Properties::AWS::AppMesh::VirtualGateway::VirtualGatewayTlsValidationContext',
+subtype 'Cfn::Resource::Properties::AWS::AppMesh::VirtualGateway::VirtualGatewayListenerTlsSdsCertificate',
      as 'Cfn::Value';
 
-coerce 'Cfn::Resource::Properties::AWS::AppMesh::VirtualGateway::VirtualGatewayTlsValidationContext',
+coerce 'Cfn::Resource::Properties::AWS::AppMesh::VirtualGateway::VirtualGatewayListenerTlsSdsCertificate',
   from 'HashRef',
    via {
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::Object::AWS::AppMesh::VirtualGateway::VirtualGatewayTlsValidationContext->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::AppMesh::VirtualGateway::VirtualGatewayListenerTlsSdsCertificate->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::Object::AWS::AppMesh::VirtualGateway::VirtualGatewayTlsValidationContext {
+package Cfn::Resource::Properties::Object::AWS::AppMesh::VirtualGateway::VirtualGatewayListenerTlsSdsCertificate {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
   
-  has Trust => (isa => 'Cfn::Resource::Properties::AWS::AppMesh::VirtualGateway::VirtualGatewayTlsValidationContextTrust', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has SecretName => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
 }
 
 subtype 'Cfn::Resource::Properties::AWS::AppMesh::VirtualGateway::VirtualGatewayListenerTlsFileCertificate',
@@ -127,6 +170,71 @@ package Cfn::Resource::Properties::Object::AWS::AppMesh::VirtualGateway::Virtual
   has PrivateKey => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
 }
 
+subtype 'Cfn::Resource::Properties::AWS::AppMesh::VirtualGateway::SubjectAlternativeNames',
+     as 'Cfn::Value';
+
+coerce 'Cfn::Resource::Properties::AWS::AppMesh::VirtualGateway::SubjectAlternativeNames',
+  from 'HashRef',
+   via {
+     if (my $f = Cfn::TypeLibrary::try_function($_)) {
+       return $f
+     } else {
+       return Cfn::Resource::Properties::Object::AWS::AppMesh::VirtualGateway::SubjectAlternativeNames->new( %$_ );
+     }
+   };
+
+package Cfn::Resource::Properties::Object::AWS::AppMesh::VirtualGateway::SubjectAlternativeNames {
+  use Moose;
+  use MooseX::StrictConstructor;
+  extends 'Cfn::Value::TypedValue';
+  
+  has Match => (isa => 'Cfn::Resource::Properties::AWS::AppMesh::VirtualGateway::SubjectAlternativeNameMatchers', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+}
+
+subtype 'Cfn::Resource::Properties::AWS::AppMesh::VirtualGateway::VirtualGatewayTlsValidationContext',
+     as 'Cfn::Value';
+
+coerce 'Cfn::Resource::Properties::AWS::AppMesh::VirtualGateway::VirtualGatewayTlsValidationContext',
+  from 'HashRef',
+   via {
+     if (my $f = Cfn::TypeLibrary::try_function($_)) {
+       return $f
+     } else {
+       return Cfn::Resource::Properties::Object::AWS::AppMesh::VirtualGateway::VirtualGatewayTlsValidationContext->new( %$_ );
+     }
+   };
+
+package Cfn::Resource::Properties::Object::AWS::AppMesh::VirtualGateway::VirtualGatewayTlsValidationContext {
+  use Moose;
+  use MooseX::StrictConstructor;
+  extends 'Cfn::Value::TypedValue';
+  
+  has SubjectAlternativeNames => (isa => 'Cfn::Resource::Properties::AWS::AppMesh::VirtualGateway::SubjectAlternativeNames', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has Trust => (isa => 'Cfn::Resource::Properties::AWS::AppMesh::VirtualGateway::VirtualGatewayTlsValidationContextTrust', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+}
+
+subtype 'Cfn::Resource::Properties::AWS::AppMesh::VirtualGateway::VirtualGatewayListenerTlsValidationContextTrust',
+     as 'Cfn::Value';
+
+coerce 'Cfn::Resource::Properties::AWS::AppMesh::VirtualGateway::VirtualGatewayListenerTlsValidationContextTrust',
+  from 'HashRef',
+   via {
+     if (my $f = Cfn::TypeLibrary::try_function($_)) {
+       return $f
+     } else {
+       return Cfn::Resource::Properties::Object::AWS::AppMesh::VirtualGateway::VirtualGatewayListenerTlsValidationContextTrust->new( %$_ );
+     }
+   };
+
+package Cfn::Resource::Properties::Object::AWS::AppMesh::VirtualGateway::VirtualGatewayListenerTlsValidationContextTrust {
+  use Moose;
+  use MooseX::StrictConstructor;
+  extends 'Cfn::Value::TypedValue';
+  
+  has File => (isa => 'Cfn::Resource::Properties::AWS::AppMesh::VirtualGateway::VirtualGatewayTlsValidationContextFileTrust', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has SDS => (isa => 'Cfn::Resource::Properties::AWS::AppMesh::VirtualGateway::VirtualGatewayTlsValidationContextSdsTrust', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+}
+
 subtype 'Cfn::Resource::Properties::AWS::AppMesh::VirtualGateway::VirtualGatewayListenerTlsAcmCertificate',
      as 'Cfn::Value';
 
@@ -146,6 +254,50 @@ package Cfn::Resource::Properties::Object::AWS::AppMesh::VirtualGateway::Virtual
   extends 'Cfn::Value::TypedValue';
   
   has CertificateArn => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+}
+
+subtype 'Cfn::Resource::Properties::AWS::AppMesh::VirtualGateway::VirtualGatewayClientTlsCertificate',
+     as 'Cfn::Value';
+
+coerce 'Cfn::Resource::Properties::AWS::AppMesh::VirtualGateway::VirtualGatewayClientTlsCertificate',
+  from 'HashRef',
+   via {
+     if (my $f = Cfn::TypeLibrary::try_function($_)) {
+       return $f
+     } else {
+       return Cfn::Resource::Properties::Object::AWS::AppMesh::VirtualGateway::VirtualGatewayClientTlsCertificate->new( %$_ );
+     }
+   };
+
+package Cfn::Resource::Properties::Object::AWS::AppMesh::VirtualGateway::VirtualGatewayClientTlsCertificate {
+  use Moose;
+  use MooseX::StrictConstructor;
+  extends 'Cfn::Value::TypedValue';
+  
+  has File => (isa => 'Cfn::Resource::Properties::AWS::AppMesh::VirtualGateway::VirtualGatewayListenerTlsFileCertificate', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has SDS => (isa => 'Cfn::Resource::Properties::AWS::AppMesh::VirtualGateway::VirtualGatewayListenerTlsSdsCertificate', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+}
+
+subtype 'Cfn::Resource::Properties::AWS::AppMesh::VirtualGateway::VirtualGatewayListenerTlsValidationContext',
+     as 'Cfn::Value';
+
+coerce 'Cfn::Resource::Properties::AWS::AppMesh::VirtualGateway::VirtualGatewayListenerTlsValidationContext',
+  from 'HashRef',
+   via {
+     if (my $f = Cfn::TypeLibrary::try_function($_)) {
+       return $f
+     } else {
+       return Cfn::Resource::Properties::Object::AWS::AppMesh::VirtualGateway::VirtualGatewayListenerTlsValidationContext->new( %$_ );
+     }
+   };
+
+package Cfn::Resource::Properties::Object::AWS::AppMesh::VirtualGateway::VirtualGatewayListenerTlsValidationContext {
+  use Moose;
+  use MooseX::StrictConstructor;
+  extends 'Cfn::Value::TypedValue';
+  
+  has SubjectAlternativeNames => (isa => 'Cfn::Resource::Properties::AWS::AppMesh::VirtualGateway::SubjectAlternativeNames', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has Trust => (isa => 'Cfn::Resource::Properties::AWS::AppMesh::VirtualGateway::VirtualGatewayListenerTlsValidationContextTrust', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
 }
 
 subtype 'Cfn::Resource::Properties::AWS::AppMesh::VirtualGateway::VirtualGatewayListenerTlsCertificate',
@@ -168,6 +320,7 @@ package Cfn::Resource::Properties::Object::AWS::AppMesh::VirtualGateway::Virtual
   
   has ACM => (isa => 'Cfn::Resource::Properties::AWS::AppMesh::VirtualGateway::VirtualGatewayListenerTlsAcmCertificate', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has File => (isa => 'Cfn::Resource::Properties::AWS::AppMesh::VirtualGateway::VirtualGatewayListenerTlsFileCertificate', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has SDS => (isa => 'Cfn::Resource::Properties::AWS::AppMesh::VirtualGateway::VirtualGatewayListenerTlsSdsCertificate', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
 }
 
 subtype 'Cfn::Resource::Properties::AWS::AppMesh::VirtualGateway::VirtualGatewayHttpConnectionPool',
@@ -273,6 +426,7 @@ package Cfn::Resource::Properties::Object::AWS::AppMesh::VirtualGateway::Virtual
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
   
+  has Certificate => (isa => 'Cfn::Resource::Properties::AWS::AppMesh::VirtualGateway::VirtualGatewayClientTlsCertificate', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has Enforce => (isa => 'Cfn::Value::Boolean', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has Ports => (isa => 'Cfn::Value::Array|Cfn::Value::Function|Cfn::DynamicValue', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has Validation => (isa => 'Cfn::Resource::Properties::AWS::AppMesh::VirtualGateway::VirtualGatewayTlsValidationContext', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
@@ -320,6 +474,7 @@ package Cfn::Resource::Properties::Object::AWS::AppMesh::VirtualGateway::Virtual
   
   has Certificate => (isa => 'Cfn::Resource::Properties::AWS::AppMesh::VirtualGateway::VirtualGatewayListenerTlsCertificate', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has Mode => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has Validation => (isa => 'Cfn::Resource::Properties::AWS::AppMesh::VirtualGateway::VirtualGatewayListenerTlsValidationContext', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
 }
 
 subtype 'Cfn::Resource::Properties::AWS::AppMesh::VirtualGateway::VirtualGatewayHealthCheckPolicy',
@@ -534,7 +689,7 @@ package Cfn::Resource::Properties::AWS::AppMesh::VirtualGateway {
   has MeshOwner => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
   has Spec => (isa => 'Cfn::Resource::Properties::AWS::AppMesh::VirtualGateway::VirtualGatewaySpec', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has Tags => (isa => 'ArrayOfCfn::Resource::Properties::TagType', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
-  has VirtualGatewayName => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
+  has VirtualGatewayName => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
 }
 
 1;

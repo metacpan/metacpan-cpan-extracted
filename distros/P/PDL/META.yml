@@ -54,5 +54,5 @@ resources:
   bugtracker: https://github.com/PDLPorters/pdl/issues
   homepage: http://pdl.perl.org/
   repository: git://github.com/PDLPorters/pdl.git
-version: '2.046'
+version: '2.047'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

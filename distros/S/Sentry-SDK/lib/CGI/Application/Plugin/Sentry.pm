@@ -34,12 +34,12 @@ CGI::Application->add_callback(
 
 CGI::Application->add_callback(
   prerun => sub ($c, $rm) {
+    my $request_uri = $ENV{REQUEST_URI}
+      || $c->query->url(-full => 1, -path => 1, -query => 1);
+
     Sentry::SDK->configure_scope(sub ($scope) {
       $scope->set_tags({
-        runtime => "Perl $]",
-        url     => $c->query->url(-full => 1, -path => 1, -query => 1),
-        runmode => $rm,
-      });
+        runtime => "Perl $]", url => $request_uri, runmode => $rm, });
     });
 
     Sentry::Hub->get_current_hub()->push_scope();
@@ -53,7 +53,7 @@ CGI::Application->add_callback(
       { name => "$method $rm", op => 'http.server', },
       {
         request => {
-          url     => $c->query->url(-full => 1, -path => 1, -query => 1),
+          url     => $request_uri,
           method  => $method,
           query   => { $c->query->Vars },
           headers => { map { $_ => $c->query->http($_) } $c->query->http },

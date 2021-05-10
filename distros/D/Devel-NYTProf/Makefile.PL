@@ -162,7 +162,8 @@ $mm_opts{PREREQ_PM} = {
 if (my $gccversion = $Config{gccversion}) {    # ask gcc to be more pedantic
     print "Your perl was compiled with gcc (version $Config{gccversion}), okay.\n";
     $gccversion =~ s/[^\d\.]//g;               # just a number please
-    $mm_opts{DEFINE} .= ' -W -Wall -Wpointer-arith -Wbad-function-cast';
+    $mm_opts{DEFINE} .= ' -W -Wall -Wpointer-arith';
+    $mm_opts{DEFINE} .= ' -Wbad-function-cast' unless $Config{d_cplusplus};
     $mm_opts{DEFINE} .= ' -Wno-comment -Wno-sign-compare -Wno-cast-qual';
     $mm_opts{DEFINE} .= ' -Wmissing-noreturn -Wno-unused-parameter' if $gccversion ge "3.0";
     if ($is_developer && $opt_g) {
@@ -193,7 +194,7 @@ WriteMakefile(
             ))
     },
     dist  => {
-        DIST_DEFAULT => 'clean distcheck disttest tardist',
+        DIST_DEFAULT => 'clean distcheck disttest_author tardist',
         PREOP        => '$(MAKE) -f Makefile.old distdir',
         COMPRESS     => 'gzip -v9',
         SUFFIX       => 'gz',
@@ -290,6 +291,11 @@ test_author:
 	NYTPROF_AUTHOR_TESTING=1 make test
 
 atest: test_author
+
+disttest_author :: distdir
+	cd $(DISTVNAME) && $(ABSPERLRUN) Makefile.PL
+	cd $(DISTVNAME) && $(MAKE) $(PASTHRU)
+	cd $(DISTVNAME) && $(MAKE) test_author $(PASTHRU)
 
 }
 }

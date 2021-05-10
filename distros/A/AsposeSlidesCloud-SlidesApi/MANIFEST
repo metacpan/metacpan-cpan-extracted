@@ -115,7 +115,6 @@ lib/AsposeSlidesCloud/Object/ResponseOutputFile.pm
 lib/AsposeSlidesCloud/Object/Save.pm
 lib/AsposeSlidesCloud/Object/SaveShape.pm
 lib/AsposeSlidesCloud/Object/SaveSlide.pm
-lib/AsposeSlidesCloud/Object/ScaleType.pm
 lib/AsposeSlidesCloud/Object/ScatterChartDataPoint.pm
 lib/AsposeSlidesCloud/Object/ScatterSeries.pm
 lib/AsposeSlidesCloud/Object/Section.pm
@@ -129,7 +128,6 @@ lib/AsposeSlidesCloud/Object/ShapeImageExportOptions.pm
 lib/AsposeSlidesCloud/Object/Shapes.pm
 lib/AsposeSlidesCloud/Object/ShapesAlignmentType.pm
 lib/AsposeSlidesCloud/Object/ShapeThumbnailBounds.pm
-lib/AsposeSlidesCloud/Object/SizeType.pm
 lib/AsposeSlidesCloud/Object/Slide.pm
 lib/AsposeSlidesCloud/Object/SlideAnimation.pm
 lib/AsposeSlidesCloud/Object/SlideBackground.pm

@@ -1,8 +1,15 @@
+0.005   2020-12-01  Released-By: PERLANCAR; Urgency: medium
+
+        - No functional changes.
+
+        - Edit Changes.
+
+
 0.004   2020-12-01  Released-By: PERLANCAR; Urgency: medium
 
-	[cli diff-xls-text-between-conflicted-git-versions]
+        - Add script: diff-xls-text-between-conflicted-git-versions.
 
-        - [bugfix] Forgot to pass --transpose-csv option.
+        - Use CLI::MetaUtil::Getopt::Long & CLI::Meta::diff.
 
 
 0.003   2020-10-27  Released-By: PERLANCAR; Urgency: medium

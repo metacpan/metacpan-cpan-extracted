@@ -65,7 +65,7 @@ sub usage_precache {
 }
 
 sub run_helf {
-    my $has_perldoc = system(qw/which perdoc/);
+    my $has_perldoc = system(qw/which perldoc/);
     if ( $has_perldoc > EXIT_SUCCESS ) {
         print qq{(fatal) 'perldoc' utility required, please install & resubmit your request...\n};
         return $has_perldoc;
@@ -79,6 +79,7 @@ sub run_init {
     my $gol  = Getopt::Long::GetOptionsFromArray(
         $argv,
         \%opts,                # container for all processed options
+        q/f|prefile=s/,     # specify file containing PRE
         q/p|preplan=s/,        # define PRE (currently for -x nodeps, only)
         q/s|subroutines=s/,    # specify name of subroutines; NOT a PRE!
         q/x|run=s/,            # specify invocation method: once, any, all, once
@@ -106,7 +107,7 @@ sub run_precache {
         $argv,
         \%opts,             # container for all processed options
         q/d|cachedir=s/,    # specify cachedir, defaults to Sub:Genius' default
-        q/f|file=s/,        # specify file containing PRE
+        q/f|prefile=s/,     # specify file containing PRE
         q/force/,           # forces re-caching (sends 'reset=>1' to 'init_plan')
         q/o=s/,             # specify Storable file for DFA being cached
         q/p|preplan=s/,     # define PRE (required if -f is not specified
@@ -234,6 +235,10 @@ Invalid for use with C<-x|--run nodeps>.
 
 An actual PRE, used with C<-x|--run nodeps>, since this option necessarily
 generates subroutine calls that must necessarily be I<sequentially consistent>.
+
+=item C<-f|--prefile>
+
+Specify the PRE from a file. Mutually exclusive with C<-p|--preplan>.
 
 =back
 

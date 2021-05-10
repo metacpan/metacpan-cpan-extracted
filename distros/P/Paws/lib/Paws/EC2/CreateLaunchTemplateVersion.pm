@@ -45,17 +45,17 @@ You shouldn't make instances of this class. Each attribute should be used as a n
               KmsKeyId            => 'MyString',        # OPTIONAL
               SnapshotId          => 'MySnapshotId',    # OPTIONAL
               VolumeSize          => 1,                 # OPTIONAL
-              VolumeType =>
+              VolumeType          =>
                 'standard',    # values: standard, io1, gp2, sc1, st1; OPTIONAL
             },    # OPTIONAL
             NoDevice    => 'MyString',    # OPTIONAL
             VirtualName => 'MyString',    # OPTIONAL
           },
           ...
-        ],                                # OPTIONAL
+        ],    # OPTIONAL
         CapacityReservationSpecification => {
           CapacityReservationPreference =>
-            'open',                       # values: open, none; OPTIONAL
+            'open',    # values: open, none; OPTIONAL
           CapacityReservationTarget => {
             CapacityReservationId => 'MyCapacityReservationId',    # OPTIONAL
           },    # OPTIONAL
@@ -76,33 +76,33 @@ You shouldn't make instances of this class. Each attribute should be used as a n
 
           },
           ...
-        ],                                # OPTIONAL
+        ],    # OPTIONAL
         ElasticInferenceAccelerators => [
           {
-            Type  => 'MyString',          # OPTIONAL
-            Count => 1,                   # min: 1; OPTIONAL
+            Type  => 'MyString',    # OPTIONAL
+            Count => 1,             # min: 1; OPTIONAL
           },
           ...
-        ],                                # OPTIONAL
+        ],    # OPTIONAL
         HibernationOptions => {
-          Configured => 1,                # OPTIONAL
+          Configured => 1,    # OPTIONAL
         },    # OPTIONAL
         IamInstanceProfile => {
           Arn  => 'MyString',    # OPTIONAL
           Name => 'MyString',    # OPTIONAL
         },    # OPTIONAL
-        ImageId => 'MyImageId',    # OPTIONAL
+        ImageId                           => 'MyImageId',    # OPTIONAL
         InstanceInitiatedShutdownBehavior =>
-          'stop',                  # values: stop, terminate; OPTIONAL
+          'stop',    # values: stop, terminate; OPTIONAL
         InstanceMarketOptions => {
           MarketType  => 'spot',    # values: spot; OPTIONAL
           SpotOptions => {
-            BlockDurationMinutes => 1,    # OPTIONAL
+            BlockDurationMinutes         => 1,    # OPTIONAL
             InstanceInterruptionBehavior =>
               'hibernate',    # values: hibernate, stop, terminate; OPTIONAL
-            MaxPrice => 'MyString',    # OPTIONAL
+            MaxPrice         => 'MyString',    # OPTIONAL
             SpotInstanceType =>
-              'one-time',              # values: one-time, persistent; OPTIONAL
+              'one-time',    # values: one-time, persistent; OPTIONAL
             ValidUntil => '1970-01-01T01:00:00',    # OPTIONAL
           },    # OPTIONAL
         },    # OPTIONAL
@@ -115,11 +115,11 @@ You shouldn't make instances of this class. Each attribute should be used as a n
             LicenseConfigurationArn => 'MyString',    # OPTIONAL
           },
           ...
-        ],                                            # OPTIONAL
+        ],    # OPTIONAL
         MetadataOptions => {
           HttpEndpoint => 'disabled',    # values: disabled, enabled; OPTIONAL
-          HttpPutResponseHopLimit => 1,  # OPTIONAL
-          HttpTokens => 'optional',      # values: optional, required; OPTIONAL
+          HttpPutResponseHopLimit => 1,    # OPTIONAL
+          HttpTokens => 'optional',    # values: optional, required; OPTIONAL
         },    # OPTIONAL
         Monitoring => {
           Enabled => 1,    # OPTIONAL
@@ -138,33 +138,33 @@ You shouldn't make instances of this class. Each attribute should be used as a n
                 Ipv6Address => 'MyString',                            # OPTIONAL
               },
               ...
-            ],                                                        # OPTIONAL
-            NetworkInterfaceId => 'MyNetworkInterfaceId',             # OPTIONAL
-            PrivateIpAddress   => 'MyString',                         # OPTIONAL
+            ],    # OPTIONAL
+            NetworkInterfaceId => 'MyNetworkInterfaceId',    # OPTIONAL
+            PrivateIpAddress   => 'MyString',                # OPTIONAL
             PrivateIpAddresses => [
               {
-                Primary          => 1,                                # OPTIONAL
-                PrivateIpAddress => 'MyString',                       # OPTIONAL
+                Primary          => 1,             # OPTIONAL
+                PrivateIpAddress => 'MyString',    # OPTIONAL
               },
               ...
-            ],                                                        # OPTIONAL
-            SecondaryPrivateIpAddressCount => 1,                      # OPTIONAL
-            SubnetId                       => 'MySubnetId',           # OPTIONAL
+            ],    # OPTIONAL
+            SecondaryPrivateIpAddressCount => 1,               # OPTIONAL
+            SubnetId                       => 'MySubnetId',    # OPTIONAL
           },
           ...
-        ],                                                            # OPTIONAL
+        ],    # OPTIONAL
         Placement => {
-          Affinity             => 'MyString',                         # OPTIONAL
-          AvailabilityZone     => 'MyString',                         # OPTIONAL
-          GroupName            => 'MyPlacementGroupName',             # OPTIONAL
-          HostId               => 'MyDedicatedHostId',                # OPTIONAL
-          HostResourceGroupArn => 'MyString',                         # OPTIONAL
-          PartitionNumber      => 1,                                  # OPTIONAL
-          SpreadDomain         => 'MyString',                         # OPTIONAL
+          Affinity             => 'MyString',                # OPTIONAL
+          AvailabilityZone     => 'MyString',                # OPTIONAL
+          GroupName            => 'MyPlacementGroupName',    # OPTIONAL
+          HostId               => 'MyDedicatedHostId',       # OPTIONAL
+          HostResourceGroupArn => 'MyString',                # OPTIONAL
+          PartitionNumber      => 1,                         # OPTIONAL
+          SpreadDomain         => 'MyString',                # OPTIONAL
           Tenancy => 'default',    # values: default, dedicated, host; OPTIONAL
         },    # OPTIONAL
         RamDiskId         => 'MyRamdiskId',                     # OPTIONAL
-        SecurityGroupIds  => [ 'MySecurityGroupId', ... ],      # OPTIONAL
+        SecurityGroupIds  => [ 'MySecurityGroupId',   ... ],    # OPTIONAL
         SecurityGroups    => [ 'MySecurityGroupName', ... ],    # OPTIONAL
         TagSpecifications => [
           {
@@ -176,11 +176,11 @@ You shouldn't make instances of this class. Each attribute should be used as a n
                 Value => 'MyString',    # OPTIONAL
               },
               ...
-            ],                          # OPTIONAL
+            ],    # OPTIONAL
           },
           ...
-        ],                              # OPTIONAL
-        UserData => 'MyString',         # OPTIONAL
+        ],    # OPTIONAL
+        UserData => 'MyString',    # OPTIONAL
       },
       ClientToken        => 'MyString',                # OPTIONAL
       DryRun             => 1,                         # OPTIONAL

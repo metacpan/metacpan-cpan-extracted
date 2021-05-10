@@ -1,7 +1,40 @@
+NAME
+    App::IndonesianLocaleUtils - CLIs related to Indonesian locale
+
+VERSION
+    This document describes version 0.02 of App::IndonesianLocaleUtils (from
+    Perl distribution App-IndonesianLocaleUtils), released on 2021-05-07.
+
 
     This distribution contains several CLI's related to Indonesian locale:
 
-    # INSERT_EXECS_LIST
+    *   list-idn-localities
+
+    *   list-idn-provinces
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/App-IndonesianLocaleUtils>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-App-IndonesianLocaleUtils>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=App-IndonesianLocaleU
+    tils>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
 
 SEE ALSO
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2021, 2015 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

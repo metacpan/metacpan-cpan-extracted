@@ -29,6 +29,7 @@ package Paws::S3::CreateMultipartUpload;
   has Tagging => (is => 'ro', isa => 'Str', header_name => 'x-amz-tagging', traits => ['ParamInHeader']);
   has WebsiteRedirectLocation => (is => 'ro', isa => 'Str', header_name => 'x-amz-website-redirect-location', traits => ['ParamInHeader']);
 
+
   use MooseX::ClassAttribute;
 
   class_has _api_call => (isa => 'Str', is => 'ro', default => 'CreateMultipartUpload');
@@ -37,6 +38,7 @@ package Paws::S3::CreateMultipartUpload;
   class_has _returns => (isa => 'Str', is => 'ro', default => 'Paws::S3::CreateMultipartUploadOutput');
   class_has _result_key => (isa => 'Str', is => 'ro');
   
+    
 1;
 
 ### main pod documentation begin ###
@@ -59,31 +61,31 @@ You shouldn't make instances of this class. Each attribute should be used as a n
     my $CreateMultipartUploadOutput = $s3->CreateMultipartUpload(
       Bucket             => 'MyBucketName',
       Key                => 'MyObjectKey',
-      ACL                => 'private',                 # OPTIONAL
-      CacheControl       => 'MyCacheControl',          # OPTIONAL
-      ContentDisposition => 'MyContentDisposition',    # OPTIONAL
-      ContentEncoding    => 'MyContentEncoding',       # OPTIONAL
-      ContentLanguage    => 'MyContentLanguage',       # OPTIONAL
-      ContentType        => 'MyContentType',           # OPTIONAL
-      Expires            => '1970-01-01T01:00:00',     # OPTIONAL
-      GrantFullControl   => 'MyGrantFullControl',      # OPTIONAL
-      GrantRead          => 'MyGrantRead',             # OPTIONAL
-      GrantReadACP       => 'MyGrantReadACP',          # OPTIONAL
-      GrantWriteACP      => 'MyGrantWriteACP',         # OPTIONAL
-      Metadata => { 'MyMetadataKey' => 'MyMetadataValue', },    # OPTIONAL
-      ObjectLockLegalHoldStatus => 'ON',                        # OPTIONAL
-      ObjectLockMode            => 'GOVERNANCE',                # OPTIONAL
-      ObjectLockRetainUntilDate => '1970-01-01T01:00:00',       # OPTIONAL
-      RequestPayer              => 'requester',                 # OPTIONAL
-      SSECustomerAlgorithm      => 'MySSECustomerAlgorithm',    # OPTIONAL
-      SSECustomerKey            => 'MySSECustomerKey',          # OPTIONAL
-      SSECustomerKeyMD5         => 'MySSECustomerKeyMD5',       # OPTIONAL
-      SSEKMSEncryptionContext   => 'MySSEKMSEncryptionContext', # OPTIONAL
-      SSEKMSKeyId               => 'MySSEKMSKeyId',             # OPTIONAL
-      ServerSideEncryption      => 'AES256',                    # OPTIONAL
-      StorageClass              => 'STANDARD',                  # OPTIONAL
-      Tagging                   => 'MyTaggingHeader',           # OPTIONAL
-      WebsiteRedirectLocation   => 'MyWebsiteRedirectLocation', # OPTIONAL
+      ACL                => 'private',                             # OPTIONAL
+      CacheControl       => 'MyCacheControl',                      # OPTIONAL
+      ContentDisposition => 'MyContentDisposition',                # OPTIONAL
+      ContentEncoding    => 'MyContentEncoding',                   # OPTIONAL
+      ContentLanguage    => 'MyContentLanguage',                   # OPTIONAL
+      ContentType        => 'MyContentType',                       # OPTIONAL
+      Expires            => '1970-01-01T01:00:00',                 # OPTIONAL
+      GrantFullControl   => 'MyGrantFullControl',                  # OPTIONAL
+      GrantRead          => 'MyGrantRead',                         # OPTIONAL
+      GrantReadACP       => 'MyGrantReadACP',                      # OPTIONAL
+      GrantWriteACP      => 'MyGrantWriteACP',                     # OPTIONAL
+      Metadata => { 'MyMetadataKey' => 'MyMetadataValue', },       # OPTIONAL
+      ObjectLockLegalHoldStatus => 'ON',                           # OPTIONAL
+      ObjectLockMode            => 'GOVERNANCE',                   # OPTIONAL
+      ObjectLockRetainUntilDate => '1970-01-01T01:00:00',          # OPTIONAL
+      RequestPayer              => 'requester',                    # OPTIONAL
+      SSECustomerAlgorithm      => 'MySSECustomerAlgorithm',       # OPTIONAL
+      SSECustomerKey            => 'MySSECustomerKey',             # OPTIONAL
+      SSECustomerKeyMD5         => 'MySSECustomerKeyMD5',          # OPTIONAL
+      SSEKMSEncryptionContext   => 'MySSEKMSEncryptionContext',    # OPTIONAL
+      SSEKMSKeyId               => 'MySSEKMSKeyId',                # OPTIONAL
+      ServerSideEncryption      => 'AES256',                       # OPTIONAL
+      StorageClass              => 'STANDARD',                     # OPTIONAL
+      Tagging                   => 'MyTaggingHeader',              # OPTIONAL
+      WebsiteRedirectLocation   => 'MyWebsiteRedirectLocation',    # OPTIONAL
     );
 
     # Results:

@@ -30,6 +30,7 @@ t/04-failure.t
 t/05-plugin.t
 t/06-workerclass.t
 t/07-job.t
+t/08-connection_options.t
 t/author-pod-coverage.t
 t/author-pod-syntax.t
 t/lib/Resque/Plugin/Duck.pm

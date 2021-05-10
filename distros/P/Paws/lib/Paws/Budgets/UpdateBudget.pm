@@ -55,7 +55,7 @@ You shouldn't make instances of this class. Each attribute should be used as a n
         CostFilters => {
           'MyGenericString' => [
             'MyGenericString', ...    # max: 2147483647
-          ],                          # key: max: 2147483647
+          ],    # key: max: 2147483647
         },    # OPTIONAL
         CostTypes => {
           IncludeCredit            => 1,    # OPTIONAL

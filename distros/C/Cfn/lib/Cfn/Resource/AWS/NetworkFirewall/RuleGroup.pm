@@ -1,4 +1,4 @@
-# AWS::NetworkFirewall::RuleGroup generated from spec 21.0.0
+# AWS::NetworkFirewall::RuleGroup generated from spec 34.0.0
 use Moose::Util::TypeConstraints;
 
 coerce 'Cfn::Resource::Properties::AWS::NetworkFirewall::RuleGroup',
@@ -11,35 +11,14 @@ package Cfn::Resource::AWS::NetworkFirewall::RuleGroup {
   has Properties => (isa => 'Cfn::Resource::Properties::AWS::NetworkFirewall::RuleGroup', is => 'rw', coerce => 1);
   
   sub AttributeList {
-    [ 'RuleGroupArn' ]
+    [ 'RuleGroupArn','RuleGroupId' ]
   }
   sub supported_regions {
-    [ 'eu-west-1','us-east-1','us-west-2' ]
+    [ 'ap-northeast-1','ap-southeast-2','eu-central-1','eu-north-1','eu-west-1','us-east-1','us-east-2','us-west-2' ]
   }
 }
 
 
-
-subtype 'Cfn::Resource::Properties::AWS::NetworkFirewall::RuleGroup::Flags',
-     as 'Cfn::Value';
-
-coerce 'Cfn::Resource::Properties::AWS::NetworkFirewall::RuleGroup::Flags',
-  from 'HashRef',
-   via {
-     if (my $f = Cfn::TypeLibrary::try_function($_)) {
-       return $f
-     } else {
-       return Cfn::Resource::Properties::Object::AWS::NetworkFirewall::RuleGroup::Flags->new( %$_ );
-     }
-   };
-
-package Cfn::Resource::Properties::Object::AWS::NetworkFirewall::RuleGroup::Flags {
-  use Moose;
-  use MooseX::StrictConstructor;
-  extends 'Cfn::Value::TypedValue';
-  
-  has Flags => (isa => 'Cfn::Value::Array|Cfn::Value::Function|Cfn::DynamicValue', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
-}
 subtype 'ArrayOfCfn::Resource::Properties::AWS::NetworkFirewall::RuleGroup::TCPFlagField',
      as 'Cfn::Value',
   where { $_->isa('Cfn::Value::Array') or $_->isa('Cfn::Value::Function') },
@@ -81,8 +60,8 @@ package Cfn::Resource::Properties::Object::AWS::NetworkFirewall::RuleGroup::TCPF
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
   
-  has Flags => (isa => 'Cfn::Resource::Properties::AWS::NetworkFirewall::RuleGroup::Flags', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
-  has Masks => (isa => 'Cfn::Resource::Properties::AWS::NetworkFirewall::RuleGroup::Flags', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has Flags => (isa => 'Cfn::Value::Array|Cfn::Value::Function|Cfn::DynamicValue', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has Masks => (isa => 'Cfn::Value::Array|Cfn::Value::Function|Cfn::DynamicValue', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
 }
 subtype 'ArrayOfCfn::Resource::Properties::AWS::NetworkFirewall::RuleGroup::PortRange',
      as 'Cfn::Value',
@@ -215,111 +194,6 @@ package Cfn::Resource::Properties::Object::AWS::NetworkFirewall::RuleGroup::Addr
   has AddressDefinition => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
 }
 
-subtype 'Cfn::Resource::Properties::AWS::NetworkFirewall::RuleGroup::TCPFlags',
-     as 'Cfn::Value';
-
-coerce 'Cfn::Resource::Properties::AWS::NetworkFirewall::RuleGroup::TCPFlags',
-  from 'HashRef',
-   via {
-     if (my $f = Cfn::TypeLibrary::try_function($_)) {
-       return $f
-     } else {
-       return Cfn::Resource::Properties::Object::AWS::NetworkFirewall::RuleGroup::TCPFlags->new( %$_ );
-     }
-   };
-
-package Cfn::Resource::Properties::Object::AWS::NetworkFirewall::RuleGroup::TCPFlags {
-  use Moose;
-  use MooseX::StrictConstructor;
-  extends 'Cfn::Value::TypedValue';
-  
-  has TCPFlags => (isa => 'ArrayOfCfn::Resource::Properties::AWS::NetworkFirewall::RuleGroup::TCPFlagField', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
-}
-
-subtype 'Cfn::Resource::Properties::AWS::NetworkFirewall::RuleGroup::ProtocolNumbers',
-     as 'Cfn::Value';
-
-coerce 'Cfn::Resource::Properties::AWS::NetworkFirewall::RuleGroup::ProtocolNumbers',
-  from 'HashRef',
-   via {
-     if (my $f = Cfn::TypeLibrary::try_function($_)) {
-       return $f
-     } else {
-       return Cfn::Resource::Properties::Object::AWS::NetworkFirewall::RuleGroup::ProtocolNumbers->new( %$_ );
-     }
-   };
-
-package Cfn::Resource::Properties::Object::AWS::NetworkFirewall::RuleGroup::ProtocolNumbers {
-  use Moose;
-  use MooseX::StrictConstructor;
-  extends 'Cfn::Value::TypedValue';
-  
-  has ProtocolNumbers => (isa => 'Cfn::Value::Array|Cfn::Value::Function|Cfn::DynamicValue', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
-}
-
-subtype 'Cfn::Resource::Properties::AWS::NetworkFirewall::RuleGroup::PortRanges',
-     as 'Cfn::Value';
-
-coerce 'Cfn::Resource::Properties::AWS::NetworkFirewall::RuleGroup::PortRanges',
-  from 'HashRef',
-   via {
-     if (my $f = Cfn::TypeLibrary::try_function($_)) {
-       return $f
-     } else {
-       return Cfn::Resource::Properties::Object::AWS::NetworkFirewall::RuleGroup::PortRanges->new( %$_ );
-     }
-   };
-
-package Cfn::Resource::Properties::Object::AWS::NetworkFirewall::RuleGroup::PortRanges {
-  use Moose;
-  use MooseX::StrictConstructor;
-  extends 'Cfn::Value::TypedValue';
-  
-  has PortRanges => (isa => 'ArrayOfCfn::Resource::Properties::AWS::NetworkFirewall::RuleGroup::PortRange', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
-}
-
-subtype 'Cfn::Resource::Properties::AWS::NetworkFirewall::RuleGroup::Dimensions',
-     as 'Cfn::Value';
-
-coerce 'Cfn::Resource::Properties::AWS::NetworkFirewall::RuleGroup::Dimensions',
-  from 'HashRef',
-   via {
-     if (my $f = Cfn::TypeLibrary::try_function($_)) {
-       return $f
-     } else {
-       return Cfn::Resource::Properties::Object::AWS::NetworkFirewall::RuleGroup::Dimensions->new( %$_ );
-     }
-   };
-
-package Cfn::Resource::Properties::Object::AWS::NetworkFirewall::RuleGroup::Dimensions {
-  use Moose;
-  use MooseX::StrictConstructor;
-  extends 'Cfn::Value::TypedValue';
-  
-  has Dimensions => (isa => 'ArrayOfCfn::Resource::Properties::AWS::NetworkFirewall::RuleGroup::Dimension', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
-}
-
-subtype 'Cfn::Resource::Properties::AWS::NetworkFirewall::RuleGroup::Addresses',
-     as 'Cfn::Value';
-
-coerce 'Cfn::Resource::Properties::AWS::NetworkFirewall::RuleGroup::Addresses',
-  from 'HashRef',
-   via {
-     if (my $f = Cfn::TypeLibrary::try_function($_)) {
-       return $f
-     } else {
-       return Cfn::Resource::Properties::Object::AWS::NetworkFirewall::RuleGroup::Addresses->new( %$_ );
-     }
-   };
-
-package Cfn::Resource::Properties::Object::AWS::NetworkFirewall::RuleGroup::Addresses {
-  use Moose;
-  use MooseX::StrictConstructor;
-  extends 'Cfn::Value::TypedValue';
-  
-  has Addresses => (isa => 'ArrayOfCfn::Resource::Properties::AWS::NetworkFirewall::RuleGroup::Address', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
-}
-
 subtype 'Cfn::Resource::Properties::AWS::NetworkFirewall::RuleGroup::PublishMetricAction',
      as 'Cfn::Value';
 
@@ -338,7 +212,7 @@ package Cfn::Resource::Properties::Object::AWS::NetworkFirewall::RuleGroup::Publ
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
   
-  has Dimensions => (isa => 'Cfn::Resource::Properties::AWS::NetworkFirewall::RuleGroup::Dimensions', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has Dimensions => (isa => 'ArrayOfCfn::Resource::Properties::AWS::NetworkFirewall::RuleGroup::Dimension', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
 }
 
 subtype 'Cfn::Resource::Properties::AWS::NetworkFirewall::RuleGroup::MatchAttributes',
@@ -359,56 +233,12 @@ package Cfn::Resource::Properties::Object::AWS::NetworkFirewall::RuleGroup::Matc
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
   
-  has DestinationPorts => (isa => 'Cfn::Resource::Properties::AWS::NetworkFirewall::RuleGroup::PortRanges', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
-  has Destinations => (isa => 'Cfn::Resource::Properties::AWS::NetworkFirewall::RuleGroup::Addresses', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
-  has Protocols => (isa => 'Cfn::Resource::Properties::AWS::NetworkFirewall::RuleGroup::ProtocolNumbers', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
-  has SourcePorts => (isa => 'Cfn::Resource::Properties::AWS::NetworkFirewall::RuleGroup::PortRanges', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
-  has Sources => (isa => 'Cfn::Resource::Properties::AWS::NetworkFirewall::RuleGroup::Addresses', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
-  has TCPFlags => (isa => 'Cfn::Resource::Properties::AWS::NetworkFirewall::RuleGroup::TCPFlags', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
-}
-subtype 'ArrayOfCfn::Resource::Properties::AWS::NetworkFirewall::RuleGroup::RuleOption',
-     as 'Cfn::Value',
-  where { $_->isa('Cfn::Value::Array') or $_->isa('Cfn::Value::Function') },
-message { "$_ is not a Cfn::Value or a Cfn::Value::Function" };
-
-coerce 'ArrayOfCfn::Resource::Properties::AWS::NetworkFirewall::RuleGroup::RuleOption',
-  from 'HashRef',
-   via {
-     if (my $f = Cfn::TypeLibrary::try_function($_)) {
-       return $f
-     } else {
-       die 'Only accepts functions'; 
-     }
-   },
-  from 'ArrayRef',
-   via {
-     Cfn::Value::Array->new(Value => [
-       map { 
-         Moose::Util::TypeConstraints::find_type_constraint('Cfn::Resource::Properties::AWS::NetworkFirewall::RuleGroup::RuleOption')->coerce($_)
-       } @$_
-     ]);
-   };
-
-subtype 'Cfn::Resource::Properties::AWS::NetworkFirewall::RuleGroup::RuleOption',
-     as 'Cfn::Value';
-
-coerce 'Cfn::Resource::Properties::AWS::NetworkFirewall::RuleGroup::RuleOption',
-  from 'HashRef',
-   via {
-     if (my $f = Cfn::TypeLibrary::try_function($_)) {
-       return $f
-     } else {
-       return Cfn::Resource::Properties::Object::AWS::NetworkFirewall::RuleGroup::RuleOption->new( %$_ );
-     }
-   };
-
-package Cfn::Resource::Properties::Object::AWS::NetworkFirewall::RuleGroup::RuleOption {
-  use Moose;
-  use MooseX::StrictConstructor;
-  extends 'Cfn::Value::TypedValue';
-  
-  has Keyword => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
-  has Settings => (isa => 'Cfn::Value::Array|Cfn::Value::Function|Cfn::DynamicValue', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has DestinationPorts => (isa => 'ArrayOfCfn::Resource::Properties::AWS::NetworkFirewall::RuleGroup::PortRange', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has Destinations => (isa => 'ArrayOfCfn::Resource::Properties::AWS::NetworkFirewall::RuleGroup::Address', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has Protocols => (isa => 'Cfn::Value::Array|Cfn::Value::Function|Cfn::DynamicValue', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has SourcePorts => (isa => 'ArrayOfCfn::Resource::Properties::AWS::NetworkFirewall::RuleGroup::PortRange', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has Sources => (isa => 'ArrayOfCfn::Resource::Properties::AWS::NetworkFirewall::RuleGroup::Address', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has TCPFlags => (isa => 'ArrayOfCfn::Resource::Properties::AWS::NetworkFirewall::RuleGroup::TCPFlagField', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
 }
 
 subtype 'Cfn::Resource::Properties::AWS::NetworkFirewall::RuleGroup::RuleDefinition',
@@ -497,26 +327,49 @@ package Cfn::Resource::Properties::Object::AWS::NetworkFirewall::RuleGroup::Stat
   has Priority => (isa => 'Cfn::Value::Integer', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has RuleDefinition => (isa => 'Cfn::Resource::Properties::AWS::NetworkFirewall::RuleGroup::RuleDefinition', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
 }
+subtype 'ArrayOfCfn::Resource::Properties::AWS::NetworkFirewall::RuleGroup::RuleOption',
+     as 'Cfn::Value',
+  where { $_->isa('Cfn::Value::Array') or $_->isa('Cfn::Value::Function') },
+message { "$_ is not a Cfn::Value or a Cfn::Value::Function" };
 
-subtype 'Cfn::Resource::Properties::AWS::NetworkFirewall::RuleGroup::RuleOptions',
-     as 'Cfn::Value';
-
-coerce 'Cfn::Resource::Properties::AWS::NetworkFirewall::RuleGroup::RuleOptions',
+coerce 'ArrayOfCfn::Resource::Properties::AWS::NetworkFirewall::RuleGroup::RuleOption',
   from 'HashRef',
    via {
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::Object::AWS::NetworkFirewall::RuleGroup::RuleOptions->new( %$_ );
+       die 'Only accepts functions'; 
+     }
+   },
+  from 'ArrayRef',
+   via {
+     Cfn::Value::Array->new(Value => [
+       map { 
+         Moose::Util::TypeConstraints::find_type_constraint('Cfn::Resource::Properties::AWS::NetworkFirewall::RuleGroup::RuleOption')->coerce($_)
+       } @$_
+     ]);
+   };
+
+subtype 'Cfn::Resource::Properties::AWS::NetworkFirewall::RuleGroup::RuleOption',
+     as 'Cfn::Value';
+
+coerce 'Cfn::Resource::Properties::AWS::NetworkFirewall::RuleGroup::RuleOption',
+  from 'HashRef',
+   via {
+     if (my $f = Cfn::TypeLibrary::try_function($_)) {
+       return $f
+     } else {
+       return Cfn::Resource::Properties::Object::AWS::NetworkFirewall::RuleGroup::RuleOption->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::Object::AWS::NetworkFirewall::RuleGroup::RuleOptions {
+package Cfn::Resource::Properties::Object::AWS::NetworkFirewall::RuleGroup::RuleOption {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
   
-  has RuleOptions => (isa => 'ArrayOfCfn::Resource::Properties::AWS::NetworkFirewall::RuleGroup::RuleOption', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has Keyword => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has Settings => (isa => 'Cfn::Value::Array|Cfn::Value::Function|Cfn::DynamicValue', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
 }
 
 subtype 'Cfn::Resource::Properties::AWS::NetworkFirewall::RuleGroup::Header',
@@ -589,67 +442,26 @@ package Cfn::Resource::Properties::Object::AWS::NetworkFirewall::RuleGroup::Cust
   has ActionName => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
 }
 
-subtype 'Cfn::Resource::Properties::AWS::NetworkFirewall::RuleGroup::VariableDefinitionList',
+subtype 'Cfn::Resource::Properties::AWS::NetworkFirewall::RuleGroup::StatelessRulesAndCustomActions',
      as 'Cfn::Value';
 
-coerce 'Cfn::Resource::Properties::AWS::NetworkFirewall::RuleGroup::VariableDefinitionList',
+coerce 'Cfn::Resource::Properties::AWS::NetworkFirewall::RuleGroup::StatelessRulesAndCustomActions',
   from 'HashRef',
    via {
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::Object::AWS::NetworkFirewall::RuleGroup::VariableDefinitionList->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::NetworkFirewall::RuleGroup::StatelessRulesAndCustomActions->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::Object::AWS::NetworkFirewall::RuleGroup::VariableDefinitionList {
+package Cfn::Resource::Properties::Object::AWS::NetworkFirewall::RuleGroup::StatelessRulesAndCustomActions {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
   
-  has VariableDefinitionList => (isa => 'Cfn::Value::Array|Cfn::Value::Function|Cfn::DynamicValue', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
-}
-
-subtype 'Cfn::Resource::Properties::AWS::NetworkFirewall::RuleGroup::TargetTypes',
-     as 'Cfn::Value';
-
-coerce 'Cfn::Resource::Properties::AWS::NetworkFirewall::RuleGroup::TargetTypes',
-  from 'HashRef',
-   via {
-     if (my $f = Cfn::TypeLibrary::try_function($_)) {
-       return $f
-     } else {
-       return Cfn::Resource::Properties::Object::AWS::NetworkFirewall::RuleGroup::TargetTypes->new( %$_ );
-     }
-   };
-
-package Cfn::Resource::Properties::Object::AWS::NetworkFirewall::RuleGroup::TargetTypes {
-  use Moose;
-  use MooseX::StrictConstructor;
-  extends 'Cfn::Value::TypedValue';
-  
-  has TargetTypes => (isa => 'Cfn::Value::Array|Cfn::Value::Function|Cfn::DynamicValue', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
-}
-
-subtype 'Cfn::Resource::Properties::AWS::NetworkFirewall::RuleGroup::StatelessRules',
-     as 'Cfn::Value';
-
-coerce 'Cfn::Resource::Properties::AWS::NetworkFirewall::RuleGroup::StatelessRules',
-  from 'HashRef',
-   via {
-     if (my $f = Cfn::TypeLibrary::try_function($_)) {
-       return $f
-     } else {
-       return Cfn::Resource::Properties::Object::AWS::NetworkFirewall::RuleGroup::StatelessRules->new( %$_ );
-     }
-   };
-
-package Cfn::Resource::Properties::Object::AWS::NetworkFirewall::RuleGroup::StatelessRules {
-  use Moose;
-  use MooseX::StrictConstructor;
-  extends 'Cfn::Value::TypedValue';
-  
-  has StatelessRules => (isa => 'ArrayOfCfn::Resource::Properties::AWS::NetworkFirewall::RuleGroup::StatelessRule', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has CustomActions => (isa => 'ArrayOfCfn::Resource::Properties::AWS::NetworkFirewall::RuleGroup::CustomAction', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has StatelessRules => (isa => 'ArrayOfCfn::Resource::Properties::AWS::NetworkFirewall::RuleGroup::StatelessRule', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
 }
 subtype 'ArrayOfCfn::Resource::Properties::AWS::NetworkFirewall::RuleGroup::StatefulRule',
      as 'Cfn::Value',
@@ -694,71 +506,7 @@ package Cfn::Resource::Properties::Object::AWS::NetworkFirewall::RuleGroup::Stat
   
   has Action => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has Header => (isa => 'Cfn::Resource::Properties::AWS::NetworkFirewall::RuleGroup::Header', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
-  has RuleOptions => (isa => 'Cfn::Resource::Properties::AWS::NetworkFirewall::RuleGroup::RuleOptions', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
-}
-
-subtype 'Cfn::Resource::Properties::AWS::NetworkFirewall::RuleGroup::CustomActions',
-     as 'Cfn::Value';
-
-coerce 'Cfn::Resource::Properties::AWS::NetworkFirewall::RuleGroup::CustomActions',
-  from 'HashRef',
-   via {
-     if (my $f = Cfn::TypeLibrary::try_function($_)) {
-       return $f
-     } else {
-       return Cfn::Resource::Properties::Object::AWS::NetworkFirewall::RuleGroup::CustomActions->new( %$_ );
-     }
-   };
-
-package Cfn::Resource::Properties::Object::AWS::NetworkFirewall::RuleGroup::CustomActions {
-  use Moose;
-  use MooseX::StrictConstructor;
-  extends 'Cfn::Value::TypedValue';
-  
-  has CustomActions => (isa => 'ArrayOfCfn::Resource::Properties::AWS::NetworkFirewall::RuleGroup::CustomAction', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
-}
-
-subtype 'Cfn::Resource::Properties::AWS::NetworkFirewall::RuleGroup::StatelessRulesAndCustomActions',
-     as 'Cfn::Value';
-
-coerce 'Cfn::Resource::Properties::AWS::NetworkFirewall::RuleGroup::StatelessRulesAndCustomActions',
-  from 'HashRef',
-   via {
-     if (my $f = Cfn::TypeLibrary::try_function($_)) {
-       return $f
-     } else {
-       return Cfn::Resource::Properties::Object::AWS::NetworkFirewall::RuleGroup::StatelessRulesAndCustomActions->new( %$_ );
-     }
-   };
-
-package Cfn::Resource::Properties::Object::AWS::NetworkFirewall::RuleGroup::StatelessRulesAndCustomActions {
-  use Moose;
-  use MooseX::StrictConstructor;
-  extends 'Cfn::Value::TypedValue';
-  
-  has CustomActions => (isa => 'Cfn::Resource::Properties::AWS::NetworkFirewall::RuleGroup::CustomActions', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
-  has StatelessRules => (isa => 'Cfn::Resource::Properties::AWS::NetworkFirewall::RuleGroup::StatelessRules', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
-}
-
-subtype 'Cfn::Resource::Properties::AWS::NetworkFirewall::RuleGroup::StatefulRules',
-     as 'Cfn::Value';
-
-coerce 'Cfn::Resource::Properties::AWS::NetworkFirewall::RuleGroup::StatefulRules',
-  from 'HashRef',
-   via {
-     if (my $f = Cfn::TypeLibrary::try_function($_)) {
-       return $f
-     } else {
-       return Cfn::Resource::Properties::Object::AWS::NetworkFirewall::RuleGroup::StatefulRules->new( %$_ );
-     }
-   };
-
-package Cfn::Resource::Properties::Object::AWS::NetworkFirewall::RuleGroup::StatefulRules {
-  use Moose;
-  use MooseX::StrictConstructor;
-  extends 'Cfn::Value::TypedValue';
-  
-  has StatefulRules => (isa => 'ArrayOfCfn::Resource::Properties::AWS::NetworkFirewall::RuleGroup::StatefulRule', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has RuleOptions => (isa => 'ArrayOfCfn::Resource::Properties::AWS::NetworkFirewall::RuleGroup::RuleOption', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
 }
 
 subtype 'Cfn::Resource::Properties::AWS::NetworkFirewall::RuleGroup::RulesSourceList',
@@ -781,7 +529,7 @@ package Cfn::Resource::Properties::Object::AWS::NetworkFirewall::RuleGroup::Rule
   
   has GeneratedRulesType => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has Targets => (isa => 'Cfn::Value::Array|Cfn::Value::Function|Cfn::DynamicValue', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
-  has TargetTypes => (isa => 'Cfn::Resource::Properties::AWS::NetworkFirewall::RuleGroup::TargetTypes', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has TargetTypes => (isa => 'Cfn::Value::Array|Cfn::Value::Function|Cfn::DynamicValue', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
 }
 
 subtype 'MapOfCfn::Resource::Properties::AWS::NetworkFirewall::RuleGroup::PortSet',
@@ -820,7 +568,7 @@ package Cfn::Resource::Properties::Object::AWS::NetworkFirewall::RuleGroup::Port
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
   
-  has Definition => (isa => 'Cfn::Resource::Properties::AWS::NetworkFirewall::RuleGroup::VariableDefinitionList', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has Definition => (isa => 'Cfn::Value::Array|Cfn::Value::Function|Cfn::DynamicValue', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
 }
 
 subtype 'MapOfCfn::Resource::Properties::AWS::NetworkFirewall::RuleGroup::IPSet',
@@ -859,7 +607,7 @@ package Cfn::Resource::Properties::Object::AWS::NetworkFirewall::RuleGroup::IPSe
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
   
-  has Definition => (isa => 'Cfn::Resource::Properties::AWS::NetworkFirewall::RuleGroup::VariableDefinitionList', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has Definition => (isa => 'Cfn::Value::Array|Cfn::Value::Function|Cfn::DynamicValue', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
 }
 
 subtype 'Cfn::Resource::Properties::AWS::NetworkFirewall::RuleGroup::RulesSource',
@@ -882,7 +630,7 @@ package Cfn::Resource::Properties::Object::AWS::NetworkFirewall::RuleGroup::Rule
   
   has RulesSourceList => (isa => 'Cfn::Resource::Properties::AWS::NetworkFirewall::RuleGroup::RulesSourceList', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has RulesString => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
-  has StatefulRules => (isa => 'Cfn::Resource::Properties::AWS::NetworkFirewall::RuleGroup::StatefulRules', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has StatefulRules => (isa => 'ArrayOfCfn::Resource::Properties::AWS::NetworkFirewall::RuleGroup::StatefulRule', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has StatelessRulesAndCustomActions => (isa => 'Cfn::Resource::Properties::AWS::NetworkFirewall::RuleGroup::StatelessRulesAndCustomActions', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
 }
 
@@ -906,27 +654,6 @@ package Cfn::Resource::Properties::Object::AWS::NetworkFirewall::RuleGroup::Rule
   
   has IPSets => (isa => 'MapOfCfn::Resource::Properties::AWS::NetworkFirewall::RuleGroup::IPSet', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has PortSets => (isa => 'MapOfCfn::Resource::Properties::AWS::NetworkFirewall::RuleGroup::PortSet', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
-}
-
-subtype 'Cfn::Resource::Properties::AWS::NetworkFirewall::RuleGroup::Tags',
-     as 'Cfn::Value';
-
-coerce 'Cfn::Resource::Properties::AWS::NetworkFirewall::RuleGroup::Tags',
-  from 'HashRef',
-   via {
-     if (my $f = Cfn::TypeLibrary::try_function($_)) {
-       return $f
-     } else {
-       return Cfn::Resource::Properties::Object::AWS::NetworkFirewall::RuleGroup::Tags->new( %$_ );
-     }
-   };
-
-package Cfn::Resource::Properties::Object::AWS::NetworkFirewall::RuleGroup::Tags {
-  use Moose;
-  use MooseX::StrictConstructor;
-  extends 'Cfn::Value::TypedValue';
-  
-  has Tags => (isa => 'ArrayOfCfn::Resource::Properties::TagType', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
 }
 
 subtype 'Cfn::Resource::Properties::AWS::NetworkFirewall::RuleGroup::RuleGroup',
@@ -959,9 +686,8 @@ package Cfn::Resource::Properties::AWS::NetworkFirewall::RuleGroup {
   has Capacity => (isa => 'Cfn::Value::Integer', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
   has Description => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has RuleGroup => (isa => 'Cfn::Resource::Properties::AWS::NetworkFirewall::RuleGroup::RuleGroup', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
-  has RuleGroupId => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has RuleGroupName => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
-  has Tags => (isa => 'Cfn::Resource::Properties::AWS::NetworkFirewall::RuleGroup::Tags', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has Tags => (isa => 'ArrayOfCfn::Resource::Properties::TagType', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has Type => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
 }
 

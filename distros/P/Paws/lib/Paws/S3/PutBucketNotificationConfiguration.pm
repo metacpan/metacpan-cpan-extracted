@@ -2,7 +2,8 @@
 package Paws::S3::PutBucketNotificationConfiguration;
   use Moose;
   has Bucket => (is => 'ro', isa => 'Str', uri_name => 'Bucket', traits => ['ParamInURI'], required => 1);
-  has NotificationConfiguration => (is => 'ro', isa => 'Paws::S3::NotificationConfiguration', required => 1);
+  has NotificationConfiguration => (is => 'ro', isa => 'Paws::S3::NotificationConfiguration', traits => ['ParamInBody'], required => 1);
+
 
   use MooseX::ClassAttribute;
 
@@ -12,6 +13,7 @@ package Paws::S3::PutBucketNotificationConfiguration;
   class_has _returns => (isa => 'Str', is => 'ro', default => 'Paws::API::Response');
   class_has _result_key => (isa => 'Str', is => 'ro');
   
+    
 1;
 
 ### main pod documentation begin ###
@@ -45,17 +47,17 @@ You shouldn't make instances of this class. Each attribute should be used as a n
               Key => {
                 FilterRules => [
                   {
-                    Name => 'prefix',    # values: prefix, suffix; OPTIONAL
+                    Name  => 'prefix',    # values: prefix, suffix; OPTIONAL
                     Value => 'MyFilterRuleValue',    # OPTIONAL
                   },
                   ...
-                ],                                   # OPTIONAL
+                ],    # OPTIONAL
               },    # OPTIONAL
             },    # OPTIONAL
             Id => 'MyNotificationId',    # OPTIONAL
           },
           ...
-        ],                               # OPTIONAL
+        ],    # OPTIONAL
         QueueConfigurations => [
           {
             Events => [
@@ -67,17 +69,17 @@ You shouldn't make instances of this class. Each attribute should be used as a n
               Key => {
                 FilterRules => [
                   {
-                    Name => 'prefix',    # values: prefix, suffix; OPTIONAL
+                    Name  => 'prefix',    # values: prefix, suffix; OPTIONAL
                     Value => 'MyFilterRuleValue',    # OPTIONAL
                   },
                   ...
-                ],                                   # OPTIONAL
+                ],    # OPTIONAL
               },    # OPTIONAL
             },    # OPTIONAL
             Id => 'MyNotificationId',    # OPTIONAL
           },
           ...
-        ],                               # OPTIONAL
+        ],    # OPTIONAL
         TopicConfigurations => [
           {
             Events => [
@@ -89,17 +91,17 @@ You shouldn't make instances of this class. Each attribute should be used as a n
               Key => {
                 FilterRules => [
                   {
-                    Name => 'prefix',    # values: prefix, suffix; OPTIONAL
+                    Name  => 'prefix',    # values: prefix, suffix; OPTIONAL
                     Value => 'MyFilterRuleValue',    # OPTIONAL
                   },
                   ...
-                ],                                   # OPTIONAL
+                ],    # OPTIONAL
               },    # OPTIONAL
             },    # OPTIONAL
             Id => 'MyNotificationId',    # OPTIONAL
           },
           ...
-        ],                               # OPTIONAL
+        ],    # OPTIONAL
       },
 
     );

@@ -13,7 +13,7 @@ use DynaLoader;
 
 
 
-   our $VERSION = '0.14';
+   our $VERSION = '0.15';
    our @ISA = ( 'PDL::Exporter','DynaLoader' );
    push @PDL::Core::PP, __PACKAGE__;
    bootstrap PDL::FFTW3 $VERSION;
@@ -146,7 +146,7 @@ output). An in-place transform of C<$x> can be computed with
  fft1( $x->inplace );
 
 All the functions in this module support PDL threading. For instance, if we have
-4 different image piddles C<$a>, C<$b>, C<$c>, C<$d> and we want to compute
+4 different image ndarrays C<$a>, C<$b>, C<$c>, C<$d> and we want to compute
 their 2D FFTs at the same time, we can say
 
  my $ABCD_transformed = rfft2( PDL::cat( $a, $b, $c, $d) );
@@ -164,14 +164,14 @@ a single-precision floating point transform (and return data of that type).
  fft1( $x->byte )
 
 This module expects complex numbers to be stored as a (real,imag) pair in the
-first dimension of a piddle. Thus in a complex piddle C<$x>, it is expected that
+first dimension of an ndarray. Thus in a complex ndarray C<$x>, it is expected that
 C<$x-E<gt>dim(0) == 2> (this module verifies this before proceeding).
 As of 0.10, it works to pass in a L<PDL::Complex> object, though the
 output will still currently be a similarly-shaped "real" L<PDL>
 object with the initial dimension of 2. This is intended to be changed
 so the output type is the same as the input.
 
-As of version 0.11, you can also pass in piddles with the new "native
+As of version 0.11, you can also pass in ndarrays with the new "native
 complex" types (C<cfloat>, C<cdouble>), without the initial dimension of
 2. Outputs will also be native complex.
 
@@ -198,8 +198,8 @@ Thus C<irfft1( sequence(2,10) )-E<gt>dim(0) == 18> is true. If we want the odd-s
 
  irfft1( sequence(2,10), zeros(19) )
 
-Here I create a new output piddle with the C<zeros> function; C<irfft1> then
-fills in this piddle with the result of the computation. This module validates
+Here I create a new output ndarray with the C<zeros> function; C<irfft1> then
+fills in this ndarray with the result of the computation. This module validates
 all of its input, so only 18 and 19 are valid here. An error will be thrown if
 you try to pass in C<zeros(20)>.
 
@@ -230,10 +230,10 @@ including PDL.
 
 The basic complex <-> complex FFT. You can pass in the rank as a
 parameter with the C<fftn> form, or append the rank to the function
-name for ranks up to 9. These functions all take one input piddle and
-one output piddle.  The dimensions of the input and the output are
+name for ranks up to 9. These functions all take one input ndarray and
+one output ndarray.  The dimensions of the input and the output are
 identical. The output parameter is optional and, if present, must be
-the last argument. If the output piddle is passed in, the user I<must>
+the last argument. If the output ndarray is passed in, the user I<must>
 make sure the dimensions match.
 
 If PDL 2.027+ "native complex" data is the input, the dimensions are as
@@ -265,10 +265,10 @@ is a good approximation of C<$x> itself.
 
 The real -> complex FFT. You can pass in the rank with the C<rfftn>
 form, or append the rank to the function name for ranks up to 9.
-These functions all take one input piddle and one output piddle. The
+These functions all take one input ndarray and one output ndarray. The
 dimensions of the input and the output are not identical, but are
 related as described in L<Data formats>. The output can be passed in
-as the last argument, if desired. If the output piddle is passed in,
+as the last argument, if desired. If the output ndarray is passed in,
 the user I<must> make sure the dimensions match.
 
 In the C<rfftn> form, the rank is the second argument.
@@ -281,7 +281,7 @@ The following are equivalent:
 
 =head2 rNfftX (rNfft1, rNfft2, rNfft3, ..., rNfftn)
 
-Similar to the above, but returns native-complex piddles.
+Similar to the above, but returns native-complex ndarrays.
 
 =head2 irfftX (irfft1, irfft2, irfft3, ..., irfftn)
 
@@ -674,8 +674,8 @@ EOF
   # type
   processTypes( $thisfunction, $is_native_output, \$in, \$out );
 
-  # I now create a piddle for the null output. Normally PP does this, but I need
-  # to have the piddle made to create plans. If I don't, the alignment may
+  # I now create an ndarray for the null output. Normally PP does this, but I need
+  # to have the ndarray made to create plans. If I don't, the alignment may
   # differ between plan-time and run-time
   if ( $out->isnull ) {
     my @args = getOutArgs($in, $is_real_fft, $do_inverse_fft, $is_native_output);
@@ -684,7 +684,7 @@ EOF
 
   validateArguments( $rank, $is_real_fft, $do_inverse_fft, $is_native_output, $thisfunction, $in, $out );
 
-  # I need to physical-ize the piddles before I make a plan. Again, normally PP
+  # I need to physical-ize the ndarrays before I make a plan. Again, normally PP
   # does this, but to make sure alignments match, I need to do this myself, now
   $in->make_physical;
   $out->make_physical;
@@ -756,7 +756,7 @@ sub validateArguments
   for my $arg ( $in, $out )
   {
     barf <<EOF unless defined $arg;
-$thisfunction arguments must all be defined. If you want an auto-growing piddle, use 'null' such as
+$thisfunction arguments must all be defined. If you want an auto-growing ndarray, use 'null' such as
 $thisfunction( \$in, \$out = null )
 Giving up.
 EOF
@@ -769,7 +769,7 @@ Instead I got an arg of type '$type'. Giving up.
 EOF
   }
 
-  # validate dimensionality of the piddles
+  # validate dimensionality of the ndarrays
   my @inout = ($in, $out);
 
   for my $iarg ( 0..1 )
@@ -787,7 +787,7 @@ EOF
     { validateArgumentDimensions_real( $rank, $do_inverse_fft, $is_native_output, $thisfunction, $iarg, $arg); }
   }
 
-  # we have an explicit output piddle we're filling in. Make sure the
+  # we have an explicit output ndarray we're filling in. Make sure the
   # input/output dimensions match up
   if ( !$is_real_fft )
   { matchDimensions_complex($thisfunction, $rank, $in, $out); }
@@ -1239,7 +1239,7 @@ sub irfft10 { my $a = __fft_internal( "irfft10", @_ ); $a /= $a->shape->slice('0
 sub _rank_springboard {
   my ($name, $source, $rank, @rest) = @_;
   my $inverse = ($name =~ m/^i/);
-  my $real    = ($name =~ m/r/);
+  my $real    = ($name =~ m/r/) || !$source->type->real;
 
   unless(defined $rank) {
     die "${name}n: second argument must be the rank of the transform you want";

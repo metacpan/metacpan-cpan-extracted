@@ -1,9 +1,9 @@
 package ArrayDataRole::Spec::Basic;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-04-20'; # DATE
+our $DATE = '2021-05-07'; # DATE
 our $DIST = 'ArrayData'; # DIST
-our $VERSION = '0.2.0'; # VERSION
+our $VERSION = '0.2.2'; # VERSION
 
 use Role::Tiny;
 use Role::Tiny::With;
@@ -13,6 +13,16 @@ requires 'new';
 
 # mixin
 with 'Role::TinyCommons::Iterator::Resettable';
+with 'Role::TinyCommons::Collection::GetItemByPos';
+
+# provides
+
+sub apply_roles {
+    my ($obj, @ad_roles) = @_;
+    Role::Tiny->apply_roles_to_object(
+        $obj, map { "ArrayDataRole::$_" } @ad_roles);
+    $obj;
+}
 
 ###
 
@@ -31,19 +41,20 @@ ArrayDataRole::Spec::Basic - Required methods for all ArrayData::* modules
 
 =head1 VERSION
 
-This document describes version 0.2.0 of ArrayDataRole::Spec::Basic (from Perl distribution ArrayData), released on 2021-04-20.
+This document describes version 0.2.2 of ArrayDataRole::Spec::Basic (from Perl distribution ArrayData), released on 2021-05-07.
 
 =head1 DESCRIPTION
 
-The basic interface of an ArrayData module is a resettable iterator
-(L<Role::TinyCommons::Iterator::Resettable>). You can call L</reset_iterator> to
-jump to the first element, then call L</get_next_item> repeatedly
-to get elements one at a time until all the elements are retrieved. If you need
-to go back to the first element, you can call L</reset_iterator> again.
+L<ArrayData>::* modules let you iterate elements using a resettable iterator
+interface (L<Role::TinyCommons::Iterator::Resettable>) as well as get elements
+by position (L<Role::TinyCommons::Collection::GetItemByPos>), like what a
+regular Perl array lets you.
 
 =head1 ROLES MIXED IN
 
 L<Role::TinyCommons::Iterator::Resettable>
+
+L<Role::TinyCommons::Collection::GetItemByPos>
 
 =head1 REQUIRED METHODS
 
@@ -55,9 +66,38 @@ Usage:
 
 Constructor. Must accept a pair of argument names and values.
 
+=head2 get_next_item
+
+From L<Role::TinyCommons::Iterator::Resettable>.
+
+=head2 has_next_item
+
+From L<Role::TinyCommons::Iterator::Resettable>.
+
+=head2 reset_iterator
+
+From L<Role::TinyCommons::Iterator::Resettable>.
+
+=head2 get_item_at_pos
+
+From L<Role::TinyCommons::Iterator::GetItemByPos>.
+
+=head2 has_item_at_pos
+
+From L<Role::TinyCommons::Iterator::GetItemByPos>.
+
 =head1 PROVIDED METHODS
 
-No additional provided methods.
+=head2 apply_roles
+
+Usage:
+
+ $obj->apply_roles('R1', ...)
+
+Apply ArrayDataRole::* roles (ArrayDataRole::R1, ...) to object. It's basically
+a shortcut for:
+
+ Role::Tiny->apply_roles_to_object($obj, 'ArrayDataRole::R1', ...);
 
 =head1 HOMEPAGE
 
@@ -78,6 +118,8 @@ feature.
 =head1 SEE ALSO
 
 L<Role::TinyCommons::Iterator::Resettable>
+
+L<Role::TinyCommons::Collection::GetItemByPos>
 
 =head1 AUTHOR
 

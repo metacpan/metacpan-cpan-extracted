@@ -1,3 +1,11 @@
+0.087   2021-02-19  Released-By: PERLANCAR; Urgency: low
+
+	- No functional changes.
+
+	- [dist] Edit Changes: rename Backward-Compatible property in
+	  Release Note to Backward-Incompatible.
+
+
 0.086   2020-04-29  Released-By: PERLANCAR; Urgency: low
 
 	- Tweak Rinci metadata: replace deprecated
@@ -19,7 +27,7 @@
 	- [ux] Simplify CLI scripts by disabling read_config & read_env.
 
 
-0.082   2019-07-29  Released-By: PERLANCAR; Urgency: medium; Backward-Compatible: no
+0.082   2019-07-29  Released-By: PERLANCAR; Urgency: medium; Backward-Incompatible: yes
 
 	- [refactor][imcompatible change] Extract common subroutine: foosel(),
 	  add --select-action, rename --actions to --node-actions, tweak dump

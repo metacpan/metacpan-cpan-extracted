@@ -116,8 +116,8 @@ TIPS
 
  How can I install modules in my DarkPAN with cpanm / cpm?
 
-    cpanm is an awesome CPAN clients. If you want to install modules in
-    your DarkPAN with cpanm, there are 2 ways.
+    cpanm is an awesome CPAN client. If you want to install modules in your
+    DarkPAN with cpanm, there are 2 ways.
 
     First way:
 

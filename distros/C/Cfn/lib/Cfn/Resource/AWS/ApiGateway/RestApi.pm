@@ -1,4 +1,4 @@
-# AWS::ApiGateway::RestApi generated from spec 18.4.0
+# AWS::ApiGateway::RestApi generated from spec 34.0.0
 use Moose::Util::TypeConstraints;
 
 coerce 'Cfn::Resource::Properties::AWS::ApiGateway::RestApi',
@@ -77,6 +77,7 @@ package Cfn::Resource::Properties::AWS::ApiGateway::RestApi {
   has BodyS3Location => (isa => 'Cfn::Resource::Properties::AWS::ApiGateway::RestApi::S3Location', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has CloneFrom => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has Description => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has DisableExecuteApiEndpoint => (isa => 'Cfn::Value::Boolean', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has EndpointConfiguration => (isa => 'Cfn::Resource::Properties::AWS::ApiGateway::RestApi::EndpointConfiguration', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has FailOnWarnings => (isa => 'Cfn::Value::Boolean', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has MinimumCompressionSize => (isa => 'Cfn::Value::Integer', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');

@@ -1,0 +1,935 @@
+#!perl
+
+# Note: This script is a CLI for Riap function /Locale/ID/Province/list_idn_provinces
+# and generated automatically using Perinci::CmdLine::Gen version 0.498
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2021-05-07'; # DATE
+our $DIST = 'App-IndonesianLocaleUtils'; # DIST
+our $VERSION = '0.02'; # VERSION
+
+use 5.010001;
+use strict;
+use warnings;
+
+use Perinci::CmdLine::Any;
+
+my $cmdline = Perinci::CmdLine::Any->new(
+    url => "/Locale/ID/Province/list_idn_provinces",
+    program_name => "list-idn-provinces",
+);
+
+$cmdline->run;
+
+# ABSTRACT: Provinces in Indonesia
+# PODNAME: list-idn-provinces
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+list-idn-provinces - Provinces in Indonesia
+
+=head1 VERSION
+
+This document describes version 0.02 of list-idn-provinces (from Perl distribution App-IndonesianLocaleUtils), released on 2021-05-07.
+
+=head1 SYNOPSIS
+
+Usage:
+
+ % list-idn-provinces [--bps-code-in-json=s] [--bps-code-in=s+]
+     [--bps-code-is=s] [--bps-code-isnt=s] [--bps-code-max=s]
+     [--bps-code-min=s] [--bps-code-not-in-json=s] [--bps-code-not-in=s+]
+     [--bps-code-xmax=s] [--bps-code-xmin=s] [--bps-code=s]
+     [--config-path=path | -c] [--config-profile=profile | -P] [--detail]
+     [--eng-name-contains=s] [--eng-name-in-json=s] [--eng-name-in=s+]
+     [--eng-name-is=s] [--eng-name-isnt=s] [--eng-name-max=s]
+     [--eng-name-min=s] [--eng-name-not-contains=s]
+     [--eng-name-not-in-json=s] [--eng-name-not-in=s+] [--eng-name-xmax=s]
+     [--eng-name-xmin=s] [--eng-name=s] [--exclude-field=s+]
+     [--exclude-fields-json=s] [--field=s+] [--fields-json=s]
+     [--format=name] [--ind-capital-name-contains=s]
+     [--ind-capital-name-in-json=s] [--ind-capital-name-in=s+]
+     [--ind-capital-name-is=s] [--ind-capital-name-isnt=s]
+     [--ind-capital-name-max=s] [--ind-capital-name-min=s]
+     [--ind-capital-name-not-contains=s] [--ind-capital-name-not-in-json=s]
+     [--ind-capital-name-not-in=s+] [--ind-capital-name-xmax=s]
+     [--ind-capital-name-xmin=s] [--ind-capital-name=s]
+     [--ind-island-name-contains=s] [--ind-island-name-in-json=s]
+     [--ind-island-name-in=s+] [--ind-island-name-is=s]
+     [--ind-island-name-isnt=s] [--ind-island-name-max=s]
+     [--ind-island-name-min=s] [--ind-island-name-not-contains=s]
+     [--ind-island-name-not-in-json=s] [--ind-island-name-not-in=s+]
+     [--ind-island-name-xmax=s] [--ind-island-name-xmin=s]
+     [--ind-island-name=s] [--ind-name-contains=s] [--ind-name-in-json=s]
+     [--ind-name-in=s+] [--ind-name-is=s] [--ind-name-isnt=s]
+     [--ind-name-max=s] [--ind-name-min=s] [--ind-name-not-contains=s]
+     [--ind-name-not-in-json=s] [--ind-name-not-in=s+] [--ind-name-xmax=s]
+     [--ind-name-xmin=s] [--ind-name=s] [--iso3166-2-code-contains=s]
+     [--iso3166-2-code-in-json=s] [--iso3166-2-code-in=s+]
+     [--iso3166-2-code-is=s] [--iso3166-2-code-isnt=s]
+     [--iso3166-2-code-max=s] [--iso3166-2-code-min=s]
+     [--iso3166-2-code-not-contains=s] [--iso3166-2-code-not-in-json=s]
+     [--iso3166-2-code-not-in=s+] [--iso3166-2-code-xmax=s]
+     [--iso3166-2-code-xmin=s] [--iso3166-2-code=s] [--json] [-l]
+     [--(no)naked-res] [--no-config | -C] [--no-detail] [--no-env]
+     [--no-random] [--nodetail] [--norandom] [--page-result[=program]]
+     [--random] [--result-limit=s] [--result-start=s] [--sort-json=s]
+     [--sort=s+] [--tags-contains=s] [--tags-in-json=s] [--tags-in=s+]
+     [--tags-is=s] [--tags-isnt=s] [--tags-max=s] [--tags-min=s]
+     [--tags-not-contains=s] [--tags-not-in-json=s] [--tags-not-in=s+]
+     [--tags-xmax=s] [--tags-xmin=s] [--tags=s] [--view-result[=program]]
+     [--with-field-names] [--without-field-names] [query]
+
+=head1 DESCRIPTION
+
+REPLACE ME
+
+=head1 OPTIONS
+
+C<*> marks required options.
+
+=head2 Configuration options
+
+=over
+
+=item B<--config-path>=I<s>, B<-c>
+
+Set path to configuration file.
+
+=item B<--config-profile>=I<s>, B<-P>
+
+Set configuration profile to use.
+
+=item B<--no-config>, B<-C>
+
+Do not use any configuration file.
+
+=back
+
+=head2 Environment options
+
+=over
+
+=item B<--no-env>
+
+Do not read environment for default options.
+
+=back
+
+=head2 Field selection options
+
+=over
+
+=item B<--detail>, B<-l>
+
+Return array of full records instead of just ID fields.
+
+By default, only the key (ID) field is returned per result entry.
+
+
+=item B<--exclude-field>=I<s@>
+
+Select fields to return.
+
+Can be specified multiple times.
+
+=item B<--exclude-fields-json>=I<s>
+
+Select fields to return (JSON-encoded).
+
+See C<--exclude-field>.
+
+=item B<--field>=I<s@>
+
+Select fields to return.
+
+Can be specified multiple times.
+
+=item B<--fields-json>=I<s>
+
+Select fields to return (JSON-encoded).
+
+See C<--field>.
+
+=item B<--with-field-names>
+
+Return field names in each record (as hash/associative array).
+
+When enabled, function will return each record as hash/associative array
+(field name => value pairs). Otherwise, function will return each record
+as list/array (field value, field value, ...).
+
+
+=back
+
+=head2 Filtering for bps_code options
+
+=over
+
+=item B<--bps-code-in-json>=I<s>
+
+Only return records where the 'bps_code' field is in the specified values (JSON-encoded).
+
+See C<--bps-code-in>.
+
+=item B<--bps-code-in>=I<s@>
+
+Only return records where the 'bps_code' field is in the specified values.
+
+Can be specified multiple times.
+
+=item B<--bps-code-is>=I<s>
+
+Only return records where the 'bps_code' field equals specified value.
+
+=item B<--bps-code-isnt>=I<s>
+
+Only return records where the 'bps_code' field does not equal specified value.
+
+=item B<--bps-code-max>=I<s>
+
+Only return records where the 'bps_code' field is less than or equal to specified value.
+
+=item B<--bps-code-min>=I<s>
+
+Only return records where the 'bps_code' field is greater than or equal to specified value.
+
+=item B<--bps-code-not-in-json>=I<s>
+
+Only return records where the 'bps_code' field is not in the specified values (JSON-encoded).
+
+See C<--bps-code-not-in>.
+
+=item B<--bps-code-not-in>=I<s@>
+
+Only return records where the 'bps_code' field is not in the specified values.
+
+Can be specified multiple times.
+
+=item B<--bps-code-xmax>=I<s>
+
+Only return records where the 'bps_code' field is less than specified value.
+
+=item B<--bps-code-xmin>=I<s>
+
+Only return records where the 'bps_code' field is greater than specified value.
+
+=item B<--bps-code>=I<s>
+
+Only return records where the 'bps_code' field equals specified value.
+
+=back
+
+=head2 Filtering for eng_name options
+
+=over
+
+=item B<--eng-name-contains>=I<s>
+
+Only return records where the 'eng_name' field contains specified text.
+
+=item B<--eng-name-in-json>=I<s>
+
+Only return records where the 'eng_name' field is in the specified values (JSON-encoded).
+
+See C<--eng-name-in>.
+
+=item B<--eng-name-in>=I<s@>
+
+Only return records where the 'eng_name' field is in the specified values.
+
+Can be specified multiple times.
+
+=item B<--eng-name-is>=I<s>
+
+Only return records where the 'eng_name' field equals specified value.
+
+=item B<--eng-name-isnt>=I<s>
+
+Only return records where the 'eng_name' field does not equal specified value.
+
+=item B<--eng-name-max>=I<s>
+
+Only return records where the 'eng_name' field is less than or equal to specified value.
+
+=item B<--eng-name-min>=I<s>
+
+Only return records where the 'eng_name' field is greater than or equal to specified value.
+
+=item B<--eng-name-not-contains>=I<s>
+
+Only return records where the 'eng_name' field does not contain specified text.
+
+=item B<--eng-name-not-in-json>=I<s>
+
+Only return records where the 'eng_name' field is not in the specified values (JSON-encoded).
+
+See C<--eng-name-not-in>.
+
+=item B<--eng-name-not-in>=I<s@>
+
+Only return records where the 'eng_name' field is not in the specified values.
+
+Can be specified multiple times.
+
+=item B<--eng-name-xmax>=I<s>
+
+Only return records where the 'eng_name' field is less than specified value.
+
+=item B<--eng-name-xmin>=I<s>
+
+Only return records where the 'eng_name' field is greater than specified value.
+
+=item B<--eng-name>=I<s>
+
+Only return records where the 'eng_name' field equals specified value.
+
+=back
+
+=head2 Filtering for ind_capital_name options
+
+=over
+
+=item B<--ind-capital-name-contains>=I<s>
+
+Only return records where the 'ind_capital_name' field contains specified text.
+
+=item B<--ind-capital-name-in-json>=I<s>
+
+Only return records where the 'ind_capital_name' field is in the specified values (JSON-encoded).
+
+See C<--ind-capital-name-in>.
+
+=item B<--ind-capital-name-in>=I<s@>
+
+Only return records where the 'ind_capital_name' field is in the specified values.
+
+Can be specified multiple times.
+
+=item B<--ind-capital-name-is>=I<s>
+
+Only return records where the 'ind_capital_name' field equals specified value.
+
+=item B<--ind-capital-name-isnt>=I<s>
+
+Only return records where the 'ind_capital_name' field does not equal specified value.
+
+=item B<--ind-capital-name-max>=I<s>
+
+Only return records where the 'ind_capital_name' field is less than or equal to specified value.
+
+=item B<--ind-capital-name-min>=I<s>
+
+Only return records where the 'ind_capital_name' field is greater than or equal to specified value.
+
+=item B<--ind-capital-name-not-contains>=I<s>
+
+Only return records where the 'ind_capital_name' field does not contain specified text.
+
+=item B<--ind-capital-name-not-in-json>=I<s>
+
+Only return records where the 'ind_capital_name' field is not in the specified values (JSON-encoded).
+
+See C<--ind-capital-name-not-in>.
+
+=item B<--ind-capital-name-not-in>=I<s@>
+
+Only return records where the 'ind_capital_name' field is not in the specified values.
+
+Can be specified multiple times.
+
+=item B<--ind-capital-name-xmax>=I<s>
+
+Only return records where the 'ind_capital_name' field is less than specified value.
+
+=item B<--ind-capital-name-xmin>=I<s>
+
+Only return records where the 'ind_capital_name' field is greater than specified value.
+
+=item B<--ind-capital-name>=I<s>
+
+Only return records where the 'ind_capital_name' field equals specified value.
+
+=back
+
+=head2 Filtering for ind_island_name options
+
+=over
+
+=item B<--ind-island-name-contains>=I<s>
+
+Only return records where the 'ind_island_name' field contains specified text.
+
+=item B<--ind-island-name-in-json>=I<s>
+
+Only return records where the 'ind_island_name' field is in the specified values (JSON-encoded).
+
+See C<--ind-island-name-in>.
+
+=item B<--ind-island-name-in>=I<s@>
+
+Only return records where the 'ind_island_name' field is in the specified values.
+
+Can be specified multiple times.
+
+=item B<--ind-island-name-is>=I<s>
+
+Only return records where the 'ind_island_name' field equals specified value.
+
+=item B<--ind-island-name-isnt>=I<s>
+
+Only return records where the 'ind_island_name' field does not equal specified value.
+
+=item B<--ind-island-name-max>=I<s>
+
+Only return records where the 'ind_island_name' field is less than or equal to specified value.
+
+=item B<--ind-island-name-min>=I<s>
+
+Only return records where the 'ind_island_name' field is greater than or equal to specified value.
+
+=item B<--ind-island-name-not-contains>=I<s>
+
+Only return records where the 'ind_island_name' field does not contain specified text.
+
+=item B<--ind-island-name-not-in-json>=I<s>
+
+Only return records where the 'ind_island_name' field is not in the specified values (JSON-encoded).
+
+See C<--ind-island-name-not-in>.
+
+=item B<--ind-island-name-not-in>=I<s@>
+
+Only return records where the 'ind_island_name' field is not in the specified values.
+
+Can be specified multiple times.
+
+=item B<--ind-island-name-xmax>=I<s>
+
+Only return records where the 'ind_island_name' field is less than specified value.
+
+=item B<--ind-island-name-xmin>=I<s>
+
+Only return records where the 'ind_island_name' field is greater than specified value.
+
+=item B<--ind-island-name>=I<s>
+
+Only return records where the 'ind_island_name' field equals specified value.
+
+=back
+
+=head2 Filtering for ind_name options
+
+=over
+
+=item B<--ind-name-contains>=I<s>
+
+Only return records where the 'ind_name' field contains specified text.
+
+=item B<--ind-name-in-json>=I<s>
+
+Only return records where the 'ind_name' field is in the specified values (JSON-encoded).
+
+See C<--ind-name-in>.
+
+=item B<--ind-name-in>=I<s@>
+
+Only return records where the 'ind_name' field is in the specified values.
+
+Can be specified multiple times.
+
+=item B<--ind-name-is>=I<s>
+
+Only return records where the 'ind_name' field equals specified value.
+
+=item B<--ind-name-isnt>=I<s>
+
+Only return records where the 'ind_name' field does not equal specified value.
+
+=item B<--ind-name-max>=I<s>
+
+Only return records where the 'ind_name' field is less than or equal to specified value.
+
+=item B<--ind-name-min>=I<s>
+
+Only return records where the 'ind_name' field is greater than or equal to specified value.
+
+=item B<--ind-name-not-contains>=I<s>
+
+Only return records where the 'ind_name' field does not contain specified text.
+
+=item B<--ind-name-not-in-json>=I<s>
+
+Only return records where the 'ind_name' field is not in the specified values (JSON-encoded).
+
+See C<--ind-name-not-in>.
+
+=item B<--ind-name-not-in>=I<s@>
+
+Only return records where the 'ind_name' field is not in the specified values.
+
+Can be specified multiple times.
+
+=item B<--ind-name-xmax>=I<s>
+
+Only return records where the 'ind_name' field is less than specified value.
+
+=item B<--ind-name-xmin>=I<s>
+
+Only return records where the 'ind_name' field is greater than specified value.
+
+=item B<--ind-name>=I<s>
+
+Only return records where the 'ind_name' field equals specified value.
+
+=back
+
+=head2 Filtering for iso3166_2_code options
+
+=over
+
+=item B<--iso3166-2-code-contains>=I<s>
+
+Only return records where the 'iso3166_2_code' field contains specified text.
+
+=item B<--iso3166-2-code-in-json>=I<s>
+
+Only return records where the 'iso3166_2_code' field is in the specified values (JSON-encoded).
+
+See C<--iso3166-2-code-in>.
+
+=item B<--iso3166-2-code-in>=I<s@>
+
+Only return records where the 'iso3166_2_code' field is in the specified values.
+
+Can be specified multiple times.
+
+=item B<--iso3166-2-code-is>=I<s>
+
+Only return records where the 'iso3166_2_code' field equals specified value.
+
+=item B<--iso3166-2-code-isnt>=I<s>
+
+Only return records where the 'iso3166_2_code' field does not equal specified value.
+
+=item B<--iso3166-2-code-max>=I<s>
+
+Only return records where the 'iso3166_2_code' field is less than or equal to specified value.
+
+=item B<--iso3166-2-code-min>=I<s>
+
+Only return records where the 'iso3166_2_code' field is greater than or equal to specified value.
+
+=item B<--iso3166-2-code-not-contains>=I<s>
+
+Only return records where the 'iso3166_2_code' field does not contain specified text.
+
+=item B<--iso3166-2-code-not-in-json>=I<s>
+
+Only return records where the 'iso3166_2_code' field is not in the specified values (JSON-encoded).
+
+See C<--iso3166-2-code-not-in>.
+
+=item B<--iso3166-2-code-not-in>=I<s@>
+
+Only return records where the 'iso3166_2_code' field is not in the specified values.
+
+Can be specified multiple times.
+
+=item B<--iso3166-2-code-xmax>=I<s>
+
+Only return records where the 'iso3166_2_code' field is less than specified value.
+
+=item B<--iso3166-2-code-xmin>=I<s>
+
+Only return records where the 'iso3166_2_code' field is greater than specified value.
+
+=item B<--iso3166-2-code>=I<s>
+
+Only return records where the 'iso3166_2_code' field equals specified value.
+
+=back
+
+=head2 Filtering for tags options
+
+=over
+
+=item B<--tags-contains>=I<s>
+
+Only return records where the 'tags' field contains specified text.
+
+=item B<--tags-in-json>=I<s>
+
+Only return records where the 'tags' field is in the specified values (JSON-encoded).
+
+See C<--tags-in>.
+
+=item B<--tags-in>=I<s@>
+
+Only return records where the 'tags' field is in the specified values.
+
+Can be specified multiple times.
+
+=item B<--tags-is>=I<s>
+
+Only return records where the 'tags' field equals specified value.
+
+=item B<--tags-isnt>=I<s>
+
+Only return records where the 'tags' field does not equal specified value.
+
+=item B<--tags-max>=I<s>
+
+Only return records where the 'tags' field is less than or equal to specified value.
+
+=item B<--tags-min>=I<s>
+
+Only return records where the 'tags' field is greater than or equal to specified value.
+
+=item B<--tags-not-contains>=I<s>
+
+Only return records where the 'tags' field does not contain specified text.
+
+=item B<--tags-not-in-json>=I<s>
+
+Only return records where the 'tags' field is not in the specified values (JSON-encoded).
+
+See C<--tags-not-in>.
+
+=item B<--tags-not-in>=I<s@>
+
+Only return records where the 'tags' field is not in the specified values.
+
+Can be specified multiple times.
+
+=item B<--tags-xmax>=I<s>
+
+Only return records where the 'tags' field is less than specified value.
+
+=item B<--tags-xmin>=I<s>
+
+Only return records where the 'tags' field is greater than specified value.
+
+=item B<--tags>=I<s>
+
+Only return records where the 'tags' field equals specified value.
+
+=back
+
+=head2 Filtering options
+
+=over
+
+=item B<--query>=I<s>, B<-q>
+
+Search.
+
+=back
+
+=head2 Ordering options
+
+=over
+
+=item B<--random>
+
+Return records in random order.
+
+=item B<--sort-json>=I<s>
+
+Order records according to certain field(s) (JSON-encoded).
+
+See C<--sort>.
+
+=item B<--sort>=I<s@>
+
+Order records according to certain field(s).
+
+A list of field names separated by comma. Each field can be prefixed with '-' to
+specify descending order instead of the default ascending.
+
+
+Can be specified multiple times.
+
+=back
+
+=head2 Output options
+
+=over
+
+=item B<--format>=I<s>
+
+Choose output format, e.g. json, text.
+
+Default value:
+
+ undef
+
+=item B<--json>
+
+Set output format to json.
+
+=item B<--naked-res>
+
+When outputing as JSON, strip result envelope.
+
+Default value:
+
+ 0
+
+By default, when outputing as JSON, the full enveloped result is returned, e.g.:
+
+    [200,"OK",[1,2,3],{"func.extra"=>4}]
+
+The reason is so you can get the status (1st element), status message (2nd
+element) as well as result metadata/extra result (4th element) instead of just
+the result (3rd element). However, sometimes you want just the result, e.g. when
+you want to pipe the result for more post-processing. In this case you can use
+`--naked-res` so you just get:
+
+    [1,2,3]
+
+
+=item B<--page-result>
+
+Filter output through a pager.
+
+=item B<--view-result>
+
+View output using a viewer.
+
+=back
+
+=head2 Paging options
+
+=over
+
+=item B<--result-limit>=I<s>
+
+Only return a certain number of records.
+
+=item B<--result-start>=I<s>
+
+Only return starting from the n'th record.
+
+Default value:
+
+ 1
+
+=back
+
+=head2 Other options
+
+=over
+
+=item B<--help>, B<-h>, B<-?>
+
+Display help message and exit.
+
+=item B<--version>, B<-v>
+
+Display program's version and exit.
+
+=back
+
+=head1 COMPLETION
+
+This script has shell tab completion capability with support for several
+shells.
+
+=head2 bash
+
+To activate bash completion for this script, put:
+
+ complete -C list-idn-provinces list-idn-provinces
+
+in your bash startup (e.g. F<~/.bashrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is recommended, however, that you install modules using L<cpanm-shcompgen>
+which can activate shell completion for scripts immediately.
+
+=head2 tcsh
+
+To activate tcsh completion for this script, put:
+
+ complete list-idn-provinces 'p/*/`list-idn-provinces`/'
+
+in your tcsh startup (e.g. F<~/.tcshrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is also recommended to install L<shcompgen> (see above).
+
+=head2 other shells
+
+For fish and zsh, install L<shcompgen> as described above.
+
+=head1 CONFIGURATION FILE
+
+This script can read configuration files. Configuration files are in the format of L<IOD>, which is basically INI with some extra features.
+
+By default, these names are searched for configuration filenames (can be changed using C<--config-path>): F<~/.config/list-idn-provinces.conf>, F<~/list-idn-provinces.conf>, or F</etc/list-idn-provinces.conf>.
+
+All found files will be read and merged.
+
+To disable searching for configuration files, pass C<--no-config>.
+
+You can put multiple profiles in a single file by using section names like C<[profile=SOMENAME]> or C<[SOMESECTION profile=SOMENAME]>. Those sections will only be read if you specify the matching C<--config-profile SOMENAME>.
+
+You can also put configuration for multiple programs inside a single file, and use filter C<program=NAME> in section names, e.g. C<[program=NAME ...]> or C<[SOMESECTION program=NAME]>. The section will then only be used when the reading program matches.
+
+You can also filter a section by environment variable using the filter C<env=CONDITION> in section names. For example if you only want a section to be read if a certain environment variable is true: C<[env=SOMEVAR ...]> or C<[SOMESECTION env=SOMEVAR ...]>. If you only want a section to be read when the value of an environment variable has value equals something: C<[env=HOSTNAME=blink ...]> or C<[SOMESECTION env=HOSTNAME=blink ...]>. If you only want a section to be read when the value of an environment variable does not equal something: C<[env=HOSTNAME!=blink ...]> or C<[SOMESECTION env=HOSTNAME!=blink ...]>. If you only want a section to be read when an environment variable contains something: C<[env=HOSTNAME*=server ...]> or C<[SOMESECTION env=HOSTNAME*=server ...]>. Note that currently due to simplistic parsing, there must not be any whitespace in the value being compared because it marks the beginning of a new section filter or section name.
+
+To load and configure plugins, you can use either the C<-plugins> parameter (e.g. C<< -plugins=DumpArgs >> or C<< -plugins=DumpArgs@before_validate_args >>), or use the C<[plugin=NAME ...]> sections, for example:
+
+ [plugin=DumpArgs]
+ -event=before_validate_args
+ -prio=99
+ 
+ [plugin=Foo]
+ -event=after_validate_args
+ arg1=val1
+ arg2=val2
+
+ 
+
+which is equivalent to setting C<< -plugins=-DumpArgs@before_validate_args@99,-Foo@after_validate_args,arg1,val1,arg2,val2 >>.
+
+List of available configuration parameters:
+
+ bps_code (see --bps-code)
+ bps_code.in (see --bps-code-in)
+ bps_code.is (see --bps-code-is)
+ bps_code.isnt (see --bps-code-isnt)
+ bps_code.max (see --bps-code-max)
+ bps_code.min (see --bps-code-min)
+ bps_code.not_in (see --bps-code-not-in)
+ bps_code.xmax (see --bps-code-xmax)
+ bps_code.xmin (see --bps-code-xmin)
+ detail (see --detail)
+ eng_name (see --eng-name)
+ eng_name.contains (see --eng-name-contains)
+ eng_name.in (see --eng-name-in)
+ eng_name.is (see --eng-name-is)
+ eng_name.isnt (see --eng-name-isnt)
+ eng_name.max (see --eng-name-max)
+ eng_name.min (see --eng-name-min)
+ eng_name.not_contains (see --eng-name-not-contains)
+ eng_name.not_in (see --eng-name-not-in)
+ eng_name.xmax (see --eng-name-xmax)
+ eng_name.xmin (see --eng-name-xmin)
+ exclude_fields (see --exclude-field)
+ fields (see --field)
+ format (see --format)
+ ind_capital_name (see --ind-capital-name)
+ ind_capital_name.contains (see --ind-capital-name-contains)
+ ind_capital_name.in (see --ind-capital-name-in)
+ ind_capital_name.is (see --ind-capital-name-is)
+ ind_capital_name.isnt (see --ind-capital-name-isnt)
+ ind_capital_name.max (see --ind-capital-name-max)
+ ind_capital_name.min (see --ind-capital-name-min)
+ ind_capital_name.not_contains (see --ind-capital-name-not-contains)
+ ind_capital_name.not_in (see --ind-capital-name-not-in)
+ ind_capital_name.xmax (see --ind-capital-name-xmax)
+ ind_capital_name.xmin (see --ind-capital-name-xmin)
+ ind_island_name (see --ind-island-name)
+ ind_island_name.contains (see --ind-island-name-contains)
+ ind_island_name.in (see --ind-island-name-in)
+ ind_island_name.is (see --ind-island-name-is)
+ ind_island_name.isnt (see --ind-island-name-isnt)
+ ind_island_name.max (see --ind-island-name-max)
+ ind_island_name.min (see --ind-island-name-min)
+ ind_island_name.not_contains (see --ind-island-name-not-contains)
+ ind_island_name.not_in (see --ind-island-name-not-in)
+ ind_island_name.xmax (see --ind-island-name-xmax)
+ ind_island_name.xmin (see --ind-island-name-xmin)
+ ind_name (see --ind-name)
+ ind_name.contains (see --ind-name-contains)
+ ind_name.in (see --ind-name-in)
+ ind_name.is (see --ind-name-is)
+ ind_name.isnt (see --ind-name-isnt)
+ ind_name.max (see --ind-name-max)
+ ind_name.min (see --ind-name-min)
+ ind_name.not_contains (see --ind-name-not-contains)
+ ind_name.not_in (see --ind-name-not-in)
+ ind_name.xmax (see --ind-name-xmax)
+ ind_name.xmin (see --ind-name-xmin)
+ iso3166_2_code (see --iso3166-2-code)
+ iso3166_2_code.contains (see --iso3166-2-code-contains)
+ iso3166_2_code.in (see --iso3166-2-code-in)
+ iso3166_2_code.is (see --iso3166-2-code-is)
+ iso3166_2_code.isnt (see --iso3166-2-code-isnt)
+ iso3166_2_code.max (see --iso3166-2-code-max)
+ iso3166_2_code.min (see --iso3166-2-code-min)
+ iso3166_2_code.not_contains (see --iso3166-2-code-not-contains)
+ iso3166_2_code.not_in (see --iso3166-2-code-not-in)
+ iso3166_2_code.xmax (see --iso3166-2-code-xmax)
+ iso3166_2_code.xmin (see --iso3166-2-code-xmin)
+ naked_res (see --naked-res)
+ query (see --query)
+ random (see --random)
+ result_limit (see --result-limit)
+ result_start (see --result-start)
+ sort (see --sort)
+ tags (see --tags)
+ tags.contains (see --tags-contains)
+ tags.in (see --tags-in)
+ tags.is (see --tags-is)
+ tags.isnt (see --tags-isnt)
+ tags.max (see --tags-max)
+ tags.min (see --tags-min)
+ tags.not_contains (see --tags-not-contains)
+ tags.not_in (see --tags-not-in)
+ tags.xmax (see --tags-xmax)
+ tags.xmin (see --tags-xmin)
+ with_field_names (see --with-field-names)
+
+=head1 ENVIRONMENT
+
+=head2 LIST_IDN_PROVINCES_OPT => str
+
+Specify additional command-line options.
+
+=head1 FILES
+
+F<~/.config/list-idn-provinces.conf>
+
+F<~/list-idn-provinces.conf>
+
+F</etc/list-idn-provinces.conf>
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/App-IndonesianLocaleUtils>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-App-IndonesianLocaleUtils>.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-IndonesianLocaleUtils>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2021, 2015 by perlancar@cpan.org.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

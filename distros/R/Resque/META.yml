@@ -51,7 +51,7 @@ resources:
   bugtracker: https://github.com/diegok/resque-perl/issues
   homepage: https://github.com/diegok/resque-perl
   repository: https://github.com/diegok/resque-perl.git
-version: '0.37'
+version: '0.38'
 x_Dist_Zilla:
   perl:
     version: '5.026001'
@@ -136,7 +136,7 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.19.0
+          git_version: 2.31.1
           repo_root: .
       name: '@Git/Check'
       version: '2.045'
@@ -153,7 +153,7 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.19.0
+          git_version: 2.31.1
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -166,11 +166,11 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v0.37
+          tag: v0.38
           tag_format: v%v
           tag_message: v%v
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.19.0
+          git_version: 2.31.1
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -184,7 +184,7 @@ x_Dist_Zilla:
             - origin
           remotes_must_exist: 1
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.19.0
+          git_version: 2.31.1
           repo_root: .
       name: '@Git/Push'
       version: '2.045'
@@ -216,7 +216,7 @@ x_Dist_Zilla:
           version_by_branch: 0
           version_regexp: (?^:^v(.+)$)
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.19.0
+          git_version: 2.31.1
           repo_root: .
       name: Git::NextVersion
       version: '2.045'

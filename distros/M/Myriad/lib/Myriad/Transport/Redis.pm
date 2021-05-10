@@ -2,7 +2,7 @@ package Myriad::Transport::Redis;
 
 use Myriad::Class extends => qw(IO::Async::Notifier);
 
-our $VERSION = '0.005'; # VERSION
+our $VERSION = '0.006'; # VERSION
 our $AUTHORITY = 'cpan:DERIV'; # AUTHORITY
 
 =pod
@@ -342,7 +342,7 @@ method pending (%args) {
     my $group = $args{group};
     my $client = $args{client};
     Future->wait_any(
-        $src->completed->without_cancel,
+        $src->completed,
         (async method {
             my $instance = await $self->borrow_instance_from_pool;
             try {

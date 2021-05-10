@@ -7,6 +7,15 @@ Home page:    <https://metacpan.org/release/Type-Tiny>
 Bug tracker:  <https://github.com/tobyink/p5-type-tiny/issues>
 Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
 
+1.012003	2021-05-09
+
+ [ Documentation ]
+ - Fixed typo in Type::Tiny::Enum where the `closest_match` method was
+   documented as being called `closet_match`.
+
+ [ Other ]
+ - Type::Parser now supports negative hexadecimal integers.
+
 1.012002	2021-05-02
 
  [ Bug Fixes ]

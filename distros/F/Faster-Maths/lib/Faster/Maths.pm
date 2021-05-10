@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2021 -- leonerd@leonerd.org.uk
 
-package Faster::Maths 0.01;
+package Faster::Maths 0.02;
 
 use v5.14;
 use warnings;
@@ -43,6 +43,31 @@ sub unimport
    delete $^H{"Faster::Maths/faster"};
 }
 
+=head2 BUGS
+
+=over 2
+
+=item *
+
+Does not currently respect operator overloading. All values will get converted
+into NVs individually, and composed using regular NV maths.
+
+We should recognise the presence of overloading magic on variables and fall
+back to slower-but-correct operation in that case; also potentially ignore any
+OP_CONSTs with magical values.
+
+L<https://rt.cpan.org/Ticket/Display.html?id=136453>
+
+=item *
+
+Does not currently retain full integer precision on integer values larger than
+platform float (NV) size. All values will get converted to NVs immediately,
+thus losing the lower bits of precision if the value is too large.
+
+L<https://rt.cpan.org/Ticket/Display.html?id=136454>
+
+=back
+
 =head1 TODO
 
 =over 2
@@ -55,16 +80,6 @@ Recognise more potential arguments - padrange and package variables at least.
 
 Recognise more operators - C<%>, unary C<-> and C<sqrt>, possibly other unary
 operators like C<sin>.
-
-=item *
-
-Recognise the presence of overloading magic on variables and fall back to
-slower-but-correct operation in that case.
-
-=item *
-
-Split the runtime loop into IV/UV/NV cases, further optimise the accumulator
-value in each case.
 
 =item *
 

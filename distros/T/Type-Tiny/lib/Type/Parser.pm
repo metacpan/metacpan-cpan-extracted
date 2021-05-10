@@ -6,7 +6,7 @@ use warnings;
 sub _croak ($;@) { require Error::TypeTiny; goto \&Error::TypeTiny::croak }
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '1.012002';
+our $VERSION   = '1.012003';
 
 $VERSION =~ tr/_//d;
 
@@ -122,7 +122,15 @@ Evaluate: {
 		}
 		
 		if ( $node->{type} eq "primary" and $node->{token}->type eq HEXNUM ) {
-			return hex( $node->{token}->spelling );
+			my $sign = '+';
+			my $spelling = $node->{token}->spelling;
+			if ( $spelling =~ /^[+-]/ ) {
+				$sign = substr( $spelling, 0, 1);
+				$spelling = substr( $spelling, 1 );
+			}
+			return (
+				( $sign eq '-' ) ? ( 0 - hex($spelling) ) : hex($spelling)
+			);
 		}
 		
 		if ( $node->{type} eq "primary" and $node->{token}->type eq TYPE ) {

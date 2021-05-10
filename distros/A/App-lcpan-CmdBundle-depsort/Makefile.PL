@@ -20,6 +20,7 @@ my %WriteMakefileArgs = (
     "App::lcpan" => "1.058",
     "App::lcpan::Cmd::mod2dist" => 0,
     "Data::Graph::Util" => 0,
+    "List::Util" => "1.45",
     "Log::ger" => "0.038",
     "strict" => 0,
     "warnings" => 0
@@ -30,7 +31,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.002",
+  "VERSION" => "0.004",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -44,6 +45,7 @@ my %FallbackPrereqs = (
   "File::Spec" => 0,
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
+  "List::Util" => "1.45",
   "Log::ger" => "0.038",
   "Test::More" => 0,
   "strict" => 0,

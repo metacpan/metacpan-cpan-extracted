@@ -1,6 +1,6 @@
 package Myriad::Subscription::Implementation::Memory;
 
-our $VERSION = '0.005'; # VERSION
+our $VERSION = '0.006'; # VERSION
 our $AUTHORITY = 'cpan:DERIV'; # AUTHORITY
 
 use Myriad::Class extends => qw(IO::Async::Notifier);
@@ -20,7 +20,7 @@ BUILD {
     $receivers = [];
 }
 
-method receivers { $receivers }
+method receivers () { $receivers }
 
 method _add_to_loop ($loop) {
     $stopped = $loop->new_future(label => 'subscription::redis::stopped');
@@ -38,7 +38,10 @@ async method create_from_source (%args) {
 
     $src->map(async sub {
         my $message = shift;
-        await $transport->add_to_stream($channel_name, $message->%*);
+        await $transport->add_to_stream(
+            $channel_name,
+            $message->%*
+        );
     })->resolve->completed->retain;
     return;
 }
@@ -48,43 +51,53 @@ async method create_from_sink (%args) {
     my $remote_service = $args{from} || $args{service};
     my $channel_name = $remote_service . '.' . $args{channel};
 
-    push $receivers->@*, { channel => $channel_name, sink => $sink };
+    push $receivers->@*, {
+        channel => $channel_name,
+        sink    => $sink
+    };
     return;
 }
 
 
 async method start {
+    my %groups_for_channel;
     while (1) {
-        if ($receivers && $receivers->@*) {
-            my $subscription = shift $receivers->@*;
-            push  $receivers->@*, $subscription;
-
-            try {
-                await $transport->create_consumer_group($subscription->{channel}, 'subscriber', 0, 1);
-            } catch ($e) {
-                $log->tracef('Failed to create consumer group due: %s', $e);
+        await &fmap_void($self->$curry::curry(async method ($subscription) {
+            unless(exists $groups_for_channel{$subscription->{channel}}{subscriber}) {
+                try {
+                    await $transport->create_consumer_group($subscription->{channel}, 'subscriber', 0, 1);
+                    $groups_for_channel{$subscription->{channel}}{subscriber} = 1;
+                } catch ($e) {
+                    $log->tracef('Failed to create consumer group due: %s', $e);
+                }
             }
 
             try {
+                $log->tracef('Sink blocked state: %s', $subscription->{sink}->unblocked->state);
                 await Future->wait_any(
                     $self->loop->timeout_future(after => 0.5),
                     $subscription->{sink}->unblocked,
                 );
             } catch {
                 $log->tracef("skipped stream %s because sink is blocked", $subscription->{channel});
-                next
+                return;
             }
 
-            my %messages = await $transport->read_from_stream_by_consumer($subscription->{channel}, 'subscriber', 'consumer');
-            for my $event_id (keys %messages) {
-                $subscription->{sink}->emit($messages{$event_id});
+            my $messages = await $transport->read_from_stream_by_consumer(
+                $subscription->{channel},
+                'subscriber',
+                'consumer'
+            );
+            for my $event_id (sort keys $messages->%*) {
+                $subscription->{sink}->emit($messages->{$event_id});
                 await $transport->ack_message($subscription->{channel}, 'subscriber', $event_id);
             }
+
             if($should_shutdown) {
                 $stopped->done;
                 last;
             }
-        }
+        }), foreach => [ $receivers->@* ], concurrent => 8);
         await $self->loop->delay_future(after => 0.1);
     }
 }

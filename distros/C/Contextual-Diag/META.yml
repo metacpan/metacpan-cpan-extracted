@@ -1,0 +1,44 @@
+---
+abstract: 'diagnosing perl context'
+author:
+  - 'kfly8 <kfly@cpan.org>'
+build_requires:
+  Test2::V0: '0.000135'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.1.12, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Contextual-Diag
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Contextual::Diag:
+    file: lib/Contextual/Diag.pm
+    version: '0.03'
+  Contextual::Diag::Value:
+    file: lib/Contextual/Diag/Value.pm
+    version: '0.03'
+requires:
+  Carp: '0'
+  Exporter: '0'
+  perl: '5.010001'
+resources:
+  bugtracker: https://github.com/kfly8/p5-Contextual-Diag/issues
+  homepage: https://github.com/kfly8/p5-Contextual-Diag
+  repository: git://github.com/kfly8/p5-Contextual-Diag.git
+version: '0.03'
+x_authority: cpan:KFLY
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

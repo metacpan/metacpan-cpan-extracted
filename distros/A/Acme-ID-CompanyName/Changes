@@ -1,20 +1,37 @@
-0.004   2017-12-19 (PERLANCAR)
+0.006   2021-05-07  Released-By: PERLANCAR; Urgency: low
+
+	- No functional changes.
+
+	- [ux] [doc] Add more examples.
+
+	- [ux] [cli] Allow -n to be specified as argument.
+
+
+0.005   2021-05-07  Released-By: PERLANCAR; Urgency: medium; Backward-Incompatible: yes
+
+        - [incompatible change] Rename functions (*_id_* to *_idn_*) to avoid
+          ambiguity of 'id'.
+
+	- Add more words, remove English words.
+
+
+0.004   2017-12-19  Released-By: PERLANCAR
 
 	- Add some more words.
 
 	- Fix example.
 
 
-0.003   2017-10-26 (PERLANCAR)
+0.003   2017-10-26  Released-By: PERLANCAR
 
 	- [dist] Fix ordering in dist.ini to properly create POD for CLI.
 
 
-0.002   2017-10-26 (PERLANCAR)
+0.002   2017-10-26  Released-By: PERLANCAR
 
 	- Remove unwanted character in one of the words.
 
 
-0.001   2017-10-26 (PERLANCAR)
+0.001   2017-10-26  Released-By: PERLANCAR
 
         - First release.

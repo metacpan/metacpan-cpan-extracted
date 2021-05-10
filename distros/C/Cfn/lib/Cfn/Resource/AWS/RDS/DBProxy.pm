@@ -1,4 +1,4 @@
-# AWS::RDS::DBProxy generated from spec 18.4.0
+# AWS::RDS::DBProxy generated from spec 34.0.0
 use Moose::Util::TypeConstraints;
 
 coerce 'Cfn::Resource::Properties::AWS::RDS::DBProxy',
@@ -11,7 +11,7 @@ package Cfn::Resource::AWS::RDS::DBProxy {
   has Properties => (isa => 'Cfn::Resource::Properties::AWS::RDS::DBProxy', is => 'rw', coerce => 1);
   
   sub AttributeList {
-    [ 'DBProxyArn','Endpoint' ]
+    [ 'DBProxyArn','Endpoint','VpcId' ]
   }
   sub supported_regions {
     [ 'ap-northeast-1','ap-northeast-2','ap-south-1','ap-southeast-1','ap-southeast-2','ca-central-1','eu-central-1','eu-west-1','eu-west-2','us-east-1','us-east-2','us-west-1','us-west-2' ]

@@ -138,13 +138,13 @@ You shouldn't make instances of this class. Each attribute should be used as a n
           DocumentAttributeKey => 'MyDocumentAttributeKey',   # min: 1, max: 200
         },
         ...
-      ],                                                      # OPTIONAL
-      PageNumber                  => 1,                       # OPTIONAL
-      PageSize                    => 1,                       # OPTIONAL
-      QueryResultTypeFilter       => 'DOCUMENT',              # OPTIONAL
+      ],    # OPTIONAL
+      PageNumber                  => 1,             # OPTIONAL
+      PageSize                    => 1,             # OPTIONAL
+      QueryResultTypeFilter       => 'DOCUMENT',    # OPTIONAL
       RequestedDocumentAttributes => [
-        'MyDocumentAttributeKey', ...                         # min: 1, max: 200
-      ],                                                      # OPTIONAL
+        'MyDocumentAttributeKey', ...               # min: 1, max: 200
+      ],    # OPTIONAL
     );
 
     # Results:

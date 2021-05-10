@@ -4,7 +4,7 @@ my $path = 'lib/Gtk3/ImageView.pm';
 my $year = (localtime)[5] + 1900;
 
 # Slurp the program source and dig out the version number.
-my $text    = do { local ( @ARGV, $/ ) = $path; <> };
+my $text = do { local ( @ARGV, $/ ) = $path; <> };
 my $version = $2 if ( $text =~ /^(my|our) \$VERSION\s*=\s*'?([^;]*)'?/m );
 
 WriteMakefile(
@@ -17,6 +17,7 @@ WriteMakefile(
     },
     TEST_REQUIRES => {
         Test::More        => 0,
+        Test::Deep        => 0,
         Test::Differences => 0,
         Image::Magick     => 0,
         Try::Tiny         => 0,
@@ -30,6 +31,9 @@ WriteMakefile(
                 type => 'git',
                 url  => 'https://github.com/carygravel/gtk3-imageview.git',
                 web  => 'https://github.com/carygravel/gtk3-imageview',
+            },
+            bugtracker => {
+                web => 'https://github.com/carygravel/gtk3-imageview/issues',
             },
         },
     },

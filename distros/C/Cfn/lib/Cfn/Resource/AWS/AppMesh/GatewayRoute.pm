@@ -1,4 +1,4 @@
-# AWS::AppMesh::GatewayRoute generated from spec 18.4.0
+# AWS::AppMesh::GatewayRoute generated from spec 34.0.0
 use Moose::Util::TypeConstraints;
 
 coerce 'Cfn::Resource::Properties::AWS::AppMesh::GatewayRoute',
@@ -218,7 +218,7 @@ package Cfn::Resource::Properties::AWS::AppMesh::GatewayRoute {
   use MooseX::StrictConstructor;
   extends 'Cfn::Resource::Properties';
   
-  has GatewayRouteName => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
+  has GatewayRouteName => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
   has MeshName => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
   has MeshOwner => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
   has Spec => (isa => 'Cfn::Resource::Properties::AWS::AppMesh::GatewayRoute::GatewayRouteSpec', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');

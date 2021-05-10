@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    version 1.24
+    version 1.27
 
 SYNOPSIS
 
@@ -167,7 +167,7 @@ SUPPORT
 
     Bugs should be reported via the GitHub issue tracker
 
-    https://github.com/plicease/File-Which/issues
+    https://github.com/uperl/File-Which/issues
 
     For other issues, contact the maintainer.
 

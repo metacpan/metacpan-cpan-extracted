@@ -1,6 +1,6 @@
 package Resque::WorkerClass;
 # ABSTRACT: Resque adaptor to create moose based jobs
-$Resque::WorkerClass::VERSION = '0.37';
+$Resque::WorkerClass::VERSION = '0.38';
 use Moose ();
 use Moose::Exporter;
 
@@ -36,7 +36,7 @@ Resque::WorkerClass - Resque adaptor to create moose based jobs
 
 =head1 VERSION
 
-version 0.37
+version 0.38
 
 =head1 SYNOPSIS
 
@@ -98,7 +98,7 @@ Diego Kuperman <diego@freekeylabs.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by Diego Kuperman.
+This software is copyright (c) 2021 by Diego Kuperman.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

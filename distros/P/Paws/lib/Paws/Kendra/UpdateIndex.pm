@@ -42,11 +42,11 @@ You shouldn't make instances of this class. Each attribute should be used as a n
           Relevance => {
             Duration   => 'MyDuration',    # min: 1, max: 10; OPTIONAL
             Freshness  => 1,               # OPTIONAL
-            Importance => 1,               # min: 1, max: 10; OPTIONAL
-            RankOrder => 'ASCENDING',  # values: ASCENDING, DESCENDING; OPTIONAL
+            Importance => 1,               # min: 1, max: 10
+            RankOrder  => 'ASCENDING', # values: ASCENDING, DESCENDING; OPTIONAL
             ValueImportanceMap => {
               'MyValueImportanceMapKey' =>
-                1,    # key: min: 1, max: 50, value: min: 1, max: 10; OPTIONAL
+                1,    # key: min: 1, max: 50, value: min: 1, max: 10
             },    # OPTIONAL
           },    # OPTIONAL
           Search => {
@@ -56,7 +56,7 @@ You shouldn't make instances of this class. Each attribute should be used as a n
           },    # OPTIONAL
         },
         ...
-      ],        # OPTIONAL
+      ],    # OPTIONAL
       Name    => 'MyIndexName',    # OPTIONAL
       RoleArn => 'MyRoleArn',      # OPTIONAL
     );

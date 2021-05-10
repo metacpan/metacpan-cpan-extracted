@@ -19,6 +19,7 @@ my %WriteMakefileArgs = (
   "PREREQ_PM" => {
     "Role::Tiny" => 0,
     "Role::Tiny::With" => 0,
+    "Role::TinyCommons::Collection::GetItemByPos" => 0,
     "Role::TinyCommons::Iterator::Resettable" => 0,
     "strict" => 0,
     "warnings" => 0
@@ -30,7 +31,7 @@ my %WriteMakefileArgs = (
     "Test::Exception" => 0,
     "Test::More" => "0.98"
   },
-  "VERSION" => "0.2.0",
+  "VERSION" => "0.2.2",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -43,6 +44,7 @@ my %FallbackPrereqs = (
   "IPC::Open3" => 0,
   "Role::Tiny" => 0,
   "Role::Tiny::With" => 0,
+  "Role::TinyCommons::Collection::GetItemByPos" => 0,
   "Role::TinyCommons::Iterator::Resettable" => 0,
   "Test::Exception" => 0,
   "Test::More" => "0.98",

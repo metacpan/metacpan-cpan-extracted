@@ -1,4 +1,4 @@
-# AWS::SSM::Association generated from spec 18.4.0
+# AWS::SSM::Association generated from spec 34.0.0
 use Moose::Util::TypeConstraints;
 
 coerce 'Cfn::Resource::Properties::AWS::SSM::Association',

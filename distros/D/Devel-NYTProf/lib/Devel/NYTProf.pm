@@ -9,7 +9,7 @@
 ###########################################################
 package Devel::NYTProf;
 
-our $VERSION = '6.09'; # also change in Devel::NYTProf::Core
+our $VERSION = '6.10'; # also change in Devel::NYTProf::Core
 
 package    # hide the package from the PAUSE indexer
     DB;
@@ -1248,7 +1248,7 @@ value longer than the longest subroutine names in your code.
 
 =head1 AUTHORS AND CONTRIBUTORS
 
-B<Tim Bunce> (L<http://www.tim.bunce.name> and L<http://blog.timbunce.org>)
+B<Tim Bunce> (L<http://blog.timbunce.org>)
 leads the project and has done most of the development work thus far.
 
 B<Nicholas Clark> contributed zip compression and C<nytprofmerge>.

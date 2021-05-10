@@ -3,7 +3,7 @@ package Test::Role::TinyCommons::Tree;
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2021-05-06'; # DATE
 our $DIST = 'Role-TinyCommons-Tree'; # DIST
-our $VERSION = '0.125'; # VERSION
+our $VERSION = '0.126'; # VERSION
 
 use strict;
 use warnings;
@@ -337,7 +337,7 @@ Test::Role::TinyCommons::Tree - Test suite for Role::TinyCommons::Tree
 
 =head1 VERSION
 
-This document describes version 0.125 of Test::Role::TinyCommons::Tree (from Perl distribution Role-TinyCommons-Tree), released on 2021-05-06.
+This document describes version 0.126 of Test::Role::TinyCommons::Tree (from Perl distribution Role-TinyCommons-Tree), released on 2021-05-06.
 
 =head1 DESCRIPTION
 

@@ -1,4 +1,4 @@
-# AWS::Events::Archive generated from spec 20.1.0
+# AWS::Events::Archive generated from spec 22.0.0
 use Moose::Util::TypeConstraints;
 
 coerce 'Cfn::Resource::Properties::AWS::Events::Archive',
@@ -25,6 +25,7 @@ package Cfn::Resource::Properties::AWS::Events::Archive {
   use MooseX::StrictConstructor;
   extends 'Cfn::Resource::Properties';
   
+  has ArchiveName => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
   has Description => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has EventPattern => (isa => 'Cfn::Value::Json|Cfn::DynamicValue', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has RetentionDays => (isa => 'Cfn::Value::Integer', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');

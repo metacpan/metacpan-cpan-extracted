@@ -1,4 +1,4 @@
-# AWS::IoTSiteWise::AssetModel generated from spec 20.1.0
+# AWS::IoTSiteWise::AssetModel generated from spec 34.0.0
 use Moose::Util::TypeConstraints;
 
 coerce 'Cfn::Resource::Properties::AWS::IoTSiteWise::AssetModel',
@@ -14,7 +14,7 @@ package Cfn::Resource::AWS::IoTSiteWise::AssetModel {
     [ 'AssetModelArn','AssetModelId' ]
   }
   sub supported_regions {
-    [ 'ap-southeast-1','ap-southeast-2','eu-central-1','eu-west-1','us-east-1','us-west-2' ]
+    [ 'ap-southeast-1','ap-southeast-2','cn-north-1','eu-central-1','eu-west-1','us-east-1','us-west-2' ]
   }
 }
 
@@ -259,6 +259,7 @@ package Cfn::Resource::Properties::Object::AWS::IoTSiteWise::AssetModel::AssetMo
   extends 'Cfn::Value::TypedValue';
   
   has DataType => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has DataTypeSpec => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has LogicalId => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has Name => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has Type => (isa => 'Cfn::Resource::Properties::AWS::IoTSiteWise::AssetModel::PropertyType', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
@@ -309,12 +310,59 @@ package Cfn::Resource::Properties::Object::AWS::IoTSiteWise::AssetModel::AssetMo
   has LogicalId => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has Name => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
 }
+subtype 'ArrayOfCfn::Resource::Properties::AWS::IoTSiteWise::AssetModel::AssetModelCompositeModel',
+     as 'Cfn::Value',
+  where { $_->isa('Cfn::Value::Array') or $_->isa('Cfn::Value::Function') },
+message { "$_ is not a Cfn::Value or a Cfn::Value::Function" };
+
+coerce 'ArrayOfCfn::Resource::Properties::AWS::IoTSiteWise::AssetModel::AssetModelCompositeModel',
+  from 'HashRef',
+   via {
+     if (my $f = Cfn::TypeLibrary::try_function($_)) {
+       return $f
+     } else {
+       die 'Only accepts functions'; 
+     }
+   },
+  from 'ArrayRef',
+   via {
+     Cfn::Value::Array->new(Value => [
+       map { 
+         Moose::Util::TypeConstraints::find_type_constraint('Cfn::Resource::Properties::AWS::IoTSiteWise::AssetModel::AssetModelCompositeModel')->coerce($_)
+       } @$_
+     ]);
+   };
+
+subtype 'Cfn::Resource::Properties::AWS::IoTSiteWise::AssetModel::AssetModelCompositeModel',
+     as 'Cfn::Value';
+
+coerce 'Cfn::Resource::Properties::AWS::IoTSiteWise::AssetModel::AssetModelCompositeModel',
+  from 'HashRef',
+   via {
+     if (my $f = Cfn::TypeLibrary::try_function($_)) {
+       return $f
+     } else {
+       return Cfn::Resource::Properties::Object::AWS::IoTSiteWise::AssetModel::AssetModelCompositeModel->new( %$_ );
+     }
+   };
+
+package Cfn::Resource::Properties::Object::AWS::IoTSiteWise::AssetModel::AssetModelCompositeModel {
+  use Moose;
+  use MooseX::StrictConstructor;
+  extends 'Cfn::Value::TypedValue';
+  
+  has CompositeModelProperties => (isa => 'ArrayOfCfn::Resource::Properties::AWS::IoTSiteWise::AssetModel::AssetModelProperty', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has Description => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has Name => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has Type => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+}
 
 package Cfn::Resource::Properties::AWS::IoTSiteWise::AssetModel {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Resource::Properties';
   
+  has AssetModelCompositeModels => (isa => 'ArrayOfCfn::Resource::Properties::AWS::IoTSiteWise::AssetModel::AssetModelCompositeModel', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has AssetModelDescription => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has AssetModelHierarchies => (isa => 'ArrayOfCfn::Resource::Properties::AWS::IoTSiteWise::AssetModel::AssetModelHierarchy', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has AssetModelName => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');

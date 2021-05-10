@@ -1,3 +1,11 @@
+0.022   2021-05-07  Released-By: PERLANCAR; Urgency: medium
+
+	- Note command-line options that can be specified as command-line
+	  arguments ('pos' defined).
+
+	- Mention support for [env=VARNAME=value] section.
+
+
 0.021   2020-10-21  Released-By: PERLANCAR; Urgency: medium
 
 	- Fix generated examples.

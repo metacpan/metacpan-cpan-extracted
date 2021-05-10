@@ -1,4 +1,4 @@
-# AWS::Cassandra::Keyspace generated from spec 18.2.0
+# AWS::Cassandra::Keyspace generated from spec 34.0.0
 use Moose::Util::TypeConstraints;
 
 coerce 'Cfn::Resource::Properties::AWS::Cassandra::Keyspace',
@@ -26,6 +26,7 @@ package Cfn::Resource::Properties::AWS::Cassandra::Keyspace {
   extends 'Cfn::Resource::Properties';
   
   has KeyspaceName => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
+  has Tags => (isa => 'ArrayOfCfn::Resource::Properties::TagType', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
 }
 
 1;

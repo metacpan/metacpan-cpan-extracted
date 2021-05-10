@@ -1,7 +1,16 @@
 
 Revision history for Myriad
 
-0.005     2021-04-30 12:44:44+00:00 UTC
+0.006     2021-05-07 04:16:11+00:00 UTC
+    [API Changes]
+    - `fmap_void`, `fmap_concat` and `fmap_scalar` are imported from Future::Utils into classes by default
+    - RPC streams are now organized differently there will be a stream for each method 
+      instead of one stream per service to migrate use the script in bin/myriad-migrate-rpc-streams.pl
+    [Bugs fixed]
+    - The RPC reads will not block each other if multiple services have been loaded into one myriad
+      process
+
+0.005     2021-04-30 12:52:41+00:00 UTC
     [Bugs fixed]
     - small memory leak due to defer blocks not being cleared up, now uses try/finally
     to avoid this

@@ -2,8 +2,8 @@ package App::IndonesianLocaleUtils;
 
 use 5.010001;
 
-our $DATE = '2015-07-10'; # DATE
-our $VERSION = '0.01'; # VERSION
+our $DATE = '2021-05-07'; # DATE
+our $VERSION = '0.02'; # VERSION
 
 1;
 # ABSTRACT: CLIs related to Indonesian locale
@@ -20,7 +20,7 @@ App::IndonesianLocaleUtils - CLIs related to Indonesian locale
 
 =head1 VERSION
 
-This document describes version 0.01 of App::IndonesianLocaleUtils (from Perl distribution App-IndonesianLocaleUtils), released on 2015-07-10.
+This document describes version 0.02 of App::IndonesianLocaleUtils (from Perl distribution App-IndonesianLocaleUtils), released on 2021-05-07.
 
 =head1
 
@@ -28,15 +28,13 @@ This distribution contains several CLI's related to Indonesian locale:
 
 =over
 
-=item * L<list-id-localities>
+=item * L<list-idn-localities>
 
-=item * L<list-id-provinces>
+=item * L<list-idn-provinces>
 
 =back
 
 
-
-=head1 SEE ALSO
 
 =head1 HOMEPAGE
 
@@ -54,13 +52,15 @@ When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
 
+=head1 SEE ALSO
+
 =head1 AUTHOR
 
 perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2015 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

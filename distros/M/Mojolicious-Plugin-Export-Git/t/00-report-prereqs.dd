@@ -6,6 +6,7 @@ do { my $x = {
                       },
        'runtime' => {
                       'requires' => {
+                                      'Git::Repository' => '1.322',
                                       'Mojolicious' => '8',
                                       'Mojolicious::Plugin::Export' => '0.008',
                                       'perl' => '5.014'

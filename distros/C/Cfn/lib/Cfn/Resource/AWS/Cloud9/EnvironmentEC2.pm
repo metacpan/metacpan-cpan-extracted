@@ -1,4 +1,4 @@
-# AWS::Cloud9::EnvironmentEC2 generated from spec 18.4.0
+# AWS::Cloud9::EnvironmentEC2 generated from spec 34.0.0
 use Moose::Util::TypeConstraints;
 
 coerce 'Cfn::Resource::Properties::AWS::Cloud9::EnvironmentEC2',
@@ -14,7 +14,7 @@ package Cfn::Resource::AWS::Cloud9::EnvironmentEC2 {
     [ 'Arn','Name' ]
   }
   sub supported_regions {
-    [ 'ap-southeast-1','eu-south-1','eu-west-1','us-east-1','us-east-2','us-west-2' ]
+    [ 'ap-southeast-1','cn-north-1','cn-northwest-1','eu-south-1','eu-west-1','us-east-1','us-east-2','us-west-2' ]
   }
 }
 
@@ -72,6 +72,7 @@ package Cfn::Resource::Properties::AWS::Cloud9::EnvironmentEC2 {
   has AutomaticStopTimeMinutes => (isa => 'Cfn::Value::Integer', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
   has ConnectionType => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
   has Description => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has ImageId => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
   has InstanceType => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
   has Name => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has OwnerArn => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');

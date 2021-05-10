@@ -1,6 +1,6 @@
 package Resque;
 # ABSTRACT: Redis-backed library for creating background jobs, placing them on multiple queues, and processing them later.
-$Resque::VERSION = '0.37';
+$Resque::VERSION = '0.38';
 use Moose;
 use Scalar::Util 'blessed';
 use Moose::Util::TypeConstraints;
@@ -24,6 +24,15 @@ coerce 'Sugar::Redis' => from 'Str' => via {
         every     => 250,
         encoding  => undef
     )
+};
+
+coerce 'Sugar::Redis' => from 'HashRef' => via {
+    _redis_class->new((
+        reconnect => 60,
+        every     => 250,
+        encoding  => undef,
+        %$_,
+    ));
 };
 
 has redis => (
@@ -181,7 +190,7 @@ Resque - Redis-backed library for creating background jobs, placing them on mult
 
 =head1 VERSION
 
-version 0.37
+version 0.38
 
 =head1 SYNOPSIS
 
@@ -246,7 +255,7 @@ A lot more about Resque can be read on the original blog post: L<http://github.c
 
 =head2 redis
 
-Redis instance for this Resque instance. Accepts a string, L<Redis>, L<Redis::Fast> or any other object that behaves like those.
+Redis instance for this Resque instance. Accepts a string, hash reference, L<Redis>, L<Redis::Fast> or any other object that behaves like those.
 
 When a string is passed in, it will be used as the server argument of a new client object. When L<Redis::Fast> is available this
 will be used, when not the pure perl L<Redis> client will be used instead.
@@ -431,7 +440,7 @@ More tests on worker fork and signal handling.
 
 =item *
 
-L<Gearman>
+L<Gearman::Client>
 
 =item *
 
@@ -449,7 +458,7 @@ Diego Kuperman <diego@freekeylabs.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by Diego Kuperman.
+This software is copyright (c) 2021 by Diego Kuperman.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

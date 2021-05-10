@@ -18,6 +18,25 @@ DESCRIPTION
     variables and constants will be compiled into a form that is more
     efficient at runtime.
 
+ BUGS
+
+      * Does not currently respect operator overloading. All values will
+      get converted into NVs individually, and composed using regular NV
+      maths.
+
+      We should recognise the presence of overloading magic on variables
+      and fall back to slower-but-correct operation in that case; also
+      potentially ignore any OP_CONSTs with magical values.
+
+      https://rt.cpan.org/Ticket/Display.html?id=136453
+
+      * Does not currently retain full integer precision on integer values
+      larger than platform float (NV) size. All values will get converted
+      to NVs immediately, thus losing the lower bits of precision if the
+      value is too large.
+
+      https://rt.cpan.org/Ticket/Display.html?id=136454
+
 TODO
 
       * Recognise more potential arguments - padrange and package variables
@@ -25,12 +44,6 @@ TODO
 
       * Recognise more operators - %, unary - and sqrt, possibly other
       unary operators like sin.
-
-      * Recognise the presence of overloading magic on variables and fall
-      back to slower-but-correct operation in that case.
-
-      * Split the runtime loop into IV/UV/NV cases, further optimise the
-      accumulator value in each case.
 
       * Store IV/UV constants as values directly in the UNOP_AUX structure
       avoiding the need for SV lookup on them.

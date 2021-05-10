@@ -1,0 +1,12 @@
+Revision history for Perl extension Contextual-Diag
+
+0.03 2021-05-10T01:18:16Z
+    - eliminate dependence on Contextual::Return #1
+
+0.02 2021-05-08T05:26:04Z
+    - fixed typo
+
+0.01 2021-05-08T02:02:36Z
+
+    - original version
+

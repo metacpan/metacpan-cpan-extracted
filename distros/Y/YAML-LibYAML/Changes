@@ -1,3 +1,7 @@
+0.83 Sat 08 May 2021 11:51:32 PM CEST
+ - Recognize tied variables (PR#101 tinita)
+ - Add license file from included libyaml code (PR#102 tinita)
+
 0.82 Sat 02 May 2020 08:39:03 PM CEST
  - Updated libyaml sources to 0.2.4. Changes affecting YAML::XS are
  - Output '...' at the stream end after a block scalar with trailing empty

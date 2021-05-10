@@ -1,13 +1,13 @@
 use strict;
 use warnings;
-use 5.024;
+use 5.020;
 
-package Dist::Zilla::Plugin::InsertExample 0.11 {
+package Dist::Zilla::Plugin::InsertExample 0.12 {
 
   use Moose;
   use Encode qw( encode );
   use List::Util qw( first );
-  use experimental qw( signatures );
+  use experimental qw( signatures postderef );
 
   # ABSTRACT: Insert example into your POD from a file
 
@@ -87,7 +87,7 @@ Dist::Zilla::Plugin::InsertExample - Insert example into your POD from a file
 
 =head1 VERSION
 
-version 0.11
+version 0.12
 
 =head1 SYNOPSIS
 

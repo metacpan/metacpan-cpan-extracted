@@ -285,7 +285,13 @@ sub write_rlver {
 /* used by Makefile.pl to check the version of the GNU Readline Library */
 #include <stdio.h>
 #include <readline/readline.h>
-int main() { puts(rl_library_version); return 0; }
+extern char *tgetstr(const char *, char **);
+int main(int argc, char *argv[]) {
+    if (argc > 1)  // not to be optimized away
+        tgetstr("", NULL);  // force to link a terminal library
+    puts(rl_library_version);
+    return 0;
+}
 EOF
     close(F);
 }

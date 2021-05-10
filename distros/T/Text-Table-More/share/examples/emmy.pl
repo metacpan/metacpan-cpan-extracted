@@ -57,26 +57,23 @@ print generate_table(
     rows => $rows,      # required
     header_row => 1,    # optional, default 0
     separate_rows => 1, # optional, default 0
-    border_style => $ARGV[0] // 'ASCII::SingleLineDoubleAfterHeader',
-    # optional, this is module name in BorderStyle::* namespace, without the prefix
+    border_style => $ARGV[0] // 'ASCII::SingleLineDoubleAfterHeader', # optional, this is module name in BorderStyle::* namespace, without the prefix
     #align => 'left',   # optional, default 'left'. can be left/middle/right.
     #valign => 'top',   # optional, default 'top'. can be top/middle/bottom.
-
     #color => 1,        # optional, default 0. turn on support for cell content that contain ANSI color codes.
-
     #wide_char => 1,    # optional, default 0. turn on support for wide Unicode characters.
 
-    row_attrs => [
+    row_attrs => [      # optional, specify per-row attributes
         # rownum (0-based int), attributes (hashref)
         [0, {align=>'middle', bottom_border=>1}],
     ],
 
-    col_attrs => [
+    col_attrs => [      # optional, per-column attributes
         # colnum (0-based int), attributes (hashref)
         [2, {valign=>'middle'}],
     ],
 
-    #cell_attrs => [
+    #cell_attrs => [    # optional, per-cell attributes
     #    # rownum (0-based int), colnum (0-based int), attributes (hashref)
     #    [1, 2, {rowspan=>3}],
     #    [1, 4, {rowspan=>2, colspan=>2}],

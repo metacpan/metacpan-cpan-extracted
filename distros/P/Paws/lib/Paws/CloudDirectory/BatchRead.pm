@@ -77,9 +77,9 @@ You shouldn't make instances of this class. Each attribute should be used as a n
               Selector => 'MySelectorObjectReference',    # OPTIONAL
             },
             SchemaFacet => {
-              FacetName => 'MyFacetName',                 # min: 1, max: 64
+              FacetName => 'MyFacetName',    # min: 1, max: 64; OPTIONAL
               SchemaArn => 'MyArn',
-            },    # OPTIONAL
+            },
 
           },    # OPTIONAL
           GetObjectInformation => {
@@ -124,14 +124,14 @@ You shouldn't make instances of this class. Each attribute should be used as a n
                 AttributeName => 'MyAttributeName', # min: 1, max: 230; OPTIONAL
               },
               ...
-            ],                                      # OPTIONAL
+            ],    # OPTIONAL
             FilterTypedLink => {
               SchemaArn     => 'MyArn',
               TypedLinkName => 'MyTypedLinkName',
 
-            },                                      # OPTIONAL
-            MaxResults => 1,                        # min: 1; OPTIONAL
-            NextToken  => 'MyNextToken',            # OPTIONAL
+            },    # OPTIONAL
+            MaxResults => 1,                # min: 1; OPTIONAL
+            NextToken  => 'MyNextToken',    # OPTIONAL
           },    # OPTIONAL
           ListIndex => {
             IndexReference => {
@@ -142,7 +142,7 @@ You shouldn't make instances of this class. Each attribute should be used as a n
             RangesOnIndexedValues => [
               {
                 AttributeKey => {
-                  FacetName => 'MyFacetName',       # min: 1, max: 64
+                  FacetName => 'MyFacetName',       # min: 1, max: 64; OPTIONAL
                   Name      => 'MyAttributeName',   # min: 1, max: 230; OPTIONAL
                   SchemaArn => 'MyArn',
 
@@ -169,18 +169,18 @@ You shouldn't make instances of this class. Each attribute should be used as a n
                 },
               },
               ...
-            ],          # OPTIONAL
+            ],    # OPTIONAL
           },    # OPTIONAL
           ListObjectAttributes => {
             ObjectReference => {
               Selector => 'MySelectorObjectReference',    # OPTIONAL
             },
             FacetFilter => {
-              FacetName => 'MyFacetName',                 # min: 1, max: 64
+              FacetName => 'MyFacetName',    # min: 1, max: 64; OPTIONAL
               SchemaArn => 'MyArn',
-            },    # OPTIONAL
-            MaxResults => 1,                # min: 1; OPTIONAL
-            NextToken  => 'MyNextToken',    # OPTIONAL
+            },
+            MaxResults => 1,                 # min: 1; OPTIONAL
+            NextToken  => 'MyNextToken',     # OPTIONAL
           },    # OPTIONAL
           ListObjectChildren => {
             ObjectReference => {
@@ -239,14 +239,14 @@ You shouldn't make instances of this class. Each attribute should be used as a n
                 AttributeName => 'MyAttributeName', # min: 1, max: 230; OPTIONAL
               },
               ...
-            ],                                      # OPTIONAL
+            ],    # OPTIONAL
             FilterTypedLink => {
               SchemaArn     => 'MyArn',
               TypedLinkName => 'MyTypedLinkName',
 
-            },                                      # OPTIONAL
-            MaxResults => 1,                        # min: 1; OPTIONAL
-            NextToken  => 'MyNextToken',            # OPTIONAL
+            },    # OPTIONAL
+            MaxResults => 1,                # min: 1; OPTIONAL
+            NextToken  => 'MyNextToken',    # OPTIONAL
           },    # OPTIONAL
           ListPolicyAttachments => {
             PolicyReference => {

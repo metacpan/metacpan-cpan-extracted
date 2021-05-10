@@ -1,4 +1,4 @@
-# AWS::ApiGatewayV2::Integration generated from spec 18.4.0
+# AWS::ApiGatewayV2::Integration generated from spec 34.0.0
 use Moose::Util::TypeConstraints;
 
 coerce 'Cfn::Resource::Properties::AWS::ApiGatewayV2::Integration',
@@ -19,6 +19,50 @@ package Cfn::Resource::AWS::ApiGatewayV2::Integration {
 }
 
 
+subtype 'ArrayOfCfn::Resource::Properties::AWS::ApiGatewayV2::Integration::ResponseParameter',
+     as 'Cfn::Value',
+  where { $_->isa('Cfn::Value::Array') or $_->isa('Cfn::Value::Function') },
+message { "$_ is not a Cfn::Value or a Cfn::Value::Function" };
+
+coerce 'ArrayOfCfn::Resource::Properties::AWS::ApiGatewayV2::Integration::ResponseParameter',
+  from 'HashRef',
+   via {
+     if (my $f = Cfn::TypeLibrary::try_function($_)) {
+       return $f
+     } else {
+       die 'Only accepts functions'; 
+     }
+   },
+  from 'ArrayRef',
+   via {
+     Cfn::Value::Array->new(Value => [
+       map { 
+         Moose::Util::TypeConstraints::find_type_constraint('Cfn::Resource::Properties::AWS::ApiGatewayV2::Integration::ResponseParameter')->coerce($_)
+       } @$_
+     ]);
+   };
+
+subtype 'Cfn::Resource::Properties::AWS::ApiGatewayV2::Integration::ResponseParameter',
+     as 'Cfn::Value';
+
+coerce 'Cfn::Resource::Properties::AWS::ApiGatewayV2::Integration::ResponseParameter',
+  from 'HashRef',
+   via {
+     if (my $f = Cfn::TypeLibrary::try_function($_)) {
+       return $f
+     } else {
+       return Cfn::Resource::Properties::Object::AWS::ApiGatewayV2::Integration::ResponseParameter->new( %$_ );
+     }
+   };
+
+package Cfn::Resource::Properties::Object::AWS::ApiGatewayV2::Integration::ResponseParameter {
+  use Moose;
+  use MooseX::StrictConstructor;
+  extends 'Cfn::Value::TypedValue';
+  
+  has Destination => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has Source => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+}
 
 subtype 'Cfn::Resource::Properties::AWS::ApiGatewayV2::Integration::TlsConfig',
      as 'Cfn::Value';
@@ -41,6 +85,27 @@ package Cfn::Resource::Properties::Object::AWS::ApiGatewayV2::Integration::TlsCo
   has ServerNameToVerify => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
 }
 
+subtype 'Cfn::Resource::Properties::AWS::ApiGatewayV2::Integration::ResponseParameterList',
+     as 'Cfn::Value';
+
+coerce 'Cfn::Resource::Properties::AWS::ApiGatewayV2::Integration::ResponseParameterList',
+  from 'HashRef',
+   via {
+     if (my $f = Cfn::TypeLibrary::try_function($_)) {
+       return $f
+     } else {
+       return Cfn::Resource::Properties::Object::AWS::ApiGatewayV2::Integration::ResponseParameterList->new( %$_ );
+     }
+   };
+
+package Cfn::Resource::Properties::Object::AWS::ApiGatewayV2::Integration::ResponseParameterList {
+  use Moose;
+  use MooseX::StrictConstructor;
+  extends 'Cfn::Value::TypedValue';
+  
+  has ResponseParameters => (isa => 'ArrayOfCfn::Resource::Properties::AWS::ApiGatewayV2::Integration::ResponseParameter', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+}
+
 package Cfn::Resource::Properties::AWS::ApiGatewayV2::Integration {
   use Moose;
   use MooseX::StrictConstructor;
@@ -60,6 +125,7 @@ package Cfn::Resource::Properties::AWS::ApiGatewayV2::Integration {
   has PayloadFormatVersion => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has RequestParameters => (isa => 'Cfn::Value::Json|Cfn::DynamicValue', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has RequestTemplates => (isa => 'Cfn::Value::Json|Cfn::DynamicValue', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has ResponseParameters => (isa => 'Cfn::Value::Json|Cfn::DynamicValue', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has TemplateSelectionExpression => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has TimeoutInMillis => (isa => 'Cfn::Value::Integer', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has TlsConfig => (isa => 'Cfn::Resource::Properties::AWS::ApiGatewayV2::Integration::TlsConfig', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');

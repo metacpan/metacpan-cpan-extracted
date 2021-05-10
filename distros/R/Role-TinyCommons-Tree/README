@@ -2,7 +2,7 @@ NAME
     Role::TinyCommons::Tree - Roles related to object tree
 
 VERSION
-    This document describes version 0.125 of Role::TinyCommons::Tree (from
+    This document describes version 0.126 of Role::TinyCommons::Tree (from
     Perl distribution Role-TinyCommons-Tree), released on 2021-05-06.
 
 DESCRIPTION

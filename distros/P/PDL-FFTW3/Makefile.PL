@@ -60,7 +60,7 @@ $descriptor{depend} = { 'FFTW3.pm' => join(' ', qw(template_complex.c template_r
                                                    FFTW3_header_include.pm)) };
 
 $descriptor{PREREQ_PM} = {
-  'PDL' => '2.034', # "complex" type qualifier
+  'PDL' => '2.047', # ci gone, use _ci
 };
 $descriptor{CONFIGURE_REQUIRES} = {
   'PDL::Core::Dev' =>0,

@@ -1,7 +1,7 @@
 package Text::NonWideChar::Util;
 
-our $DATE = '2021-04-14'; # DATE
-our $VERSION = '0.003'; # VERSION
+our $DATE = '2021-04-16'; # DATE
+our $VERSION = '0.004'; # VERSION
 
 use strict;
 use warnings;
@@ -42,7 +42,7 @@ Text::NonWideChar::Util - Utility routines for text
 
 =head1 VERSION
 
-This document describes version 0.003 of Text::NonWideChar::Util (from Perl distribution Text-NonWideChar-Util), released on 2021-04-14.
+This document describes version 0.004 of Text::NonWideChar::Util (from Perl distribution Text-NonWideChar-Util), released on 2021-04-16.
 
 =head1 SYNOPSIS
 
@@ -66,7 +66,11 @@ text only contains printable ASCII characters and newlines.
 
 =head1 FAQ
 
-# INSERT_BLOCK: Text::ANSI::Util why_split
+=head2 Why split functionalities of wide character and color support into multiple modules/distributions?
+
+Performance (see numbers in the function description), dependency
+(L<Unicode::GCString> is used for wide character support), and overhead (loading
+Unicode::GCString).
 
 =head1 HOMEPAGE
 

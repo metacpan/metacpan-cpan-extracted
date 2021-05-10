@@ -2,7 +2,7 @@ package Myriad::Registry;
 
 use Myriad::Class extends => 'IO::Async::Notifier';
 
-our $VERSION = '0.005'; # VERSION
+our $VERSION = '0.006'; # VERSION
 our $AUTHORITY = 'cpan:DERIV'; # AUTHORITY
 
 =encoding utf8

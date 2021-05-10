@@ -1,4 +1,4 @@
-# AWS::ElastiCache::SecurityGroup generated from spec 14.3.0
+# AWS::ElastiCache::SecurityGroup generated from spec 34.0.0
 use Moose::Util::TypeConstraints;
 
 coerce 'Cfn::Resource::Properties::AWS::ElastiCache::SecurityGroup',
@@ -26,6 +26,7 @@ package Cfn::Resource::Properties::AWS::ElastiCache::SecurityGroup {
   extends 'Cfn::Resource::Properties';
   
   has Description => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has Tags => (isa => 'ArrayOfCfn::Resource::Properties::TagType', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
 }
 
 1;

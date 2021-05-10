@@ -1,4 +1,4 @@
-# AWS::ApiGatewayV2::Stage generated from spec 18.4.0
+# AWS::ApiGatewayV2::Stage generated from spec 34.0.0
 use Moose::Util::TypeConstraints;
 
 coerce 'Cfn::Resource::Properties::AWS::ApiGatewayV2::Stage',
@@ -73,6 +73,7 @@ package Cfn::Resource::Properties::AWS::ApiGatewayV2::Stage {
   extends 'Cfn::Resource::Properties';
   
   has AccessLogSettings => (isa => 'Cfn::Resource::Properties::AWS::ApiGatewayV2::Stage::AccessLogSettings', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has AccessPolicyId => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has ApiId => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
   has AutoDeploy => (isa => 'Cfn::Value::Boolean', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has ClientCertificateId => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');

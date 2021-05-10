@@ -12,5 +12,5 @@ RUN dzil install \
  && apt purge --autoremove -y \
  && rm -rf .git .circleci
 
-ENTRYPOINT [ "bin/start.sh" ]
+ENTRYPOINT [ "bin/myriad-start.sh" ]
 

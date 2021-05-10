@@ -9,7 +9,7 @@
 
 # Maintainer: QE YaST <qa-sle-yast@suse.de>
 
-package YuiRestClient 0.1;
+package YuiRestClient 0.4;
 use strict;
 use warnings;
 
@@ -27,11 +27,6 @@ YuiRestClient - Perl module to interact with YaST applications via libyui-rest-a
 
 See documentation of the L<libyui-rest-api project|https://github.com/libyui/libyui/tree/master/libyui-rest-api/doc>.
 for more details about server side implementation.
-
-
-=head1 VERSION
-
-This document describes L<YuiRestClient> version B<%VERSION%>.
 
 
 =head1 SYNOPSIS

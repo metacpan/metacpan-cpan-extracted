@@ -1,12 +1,13 @@
-package Dist::Zilla::Plugin::Author::Plicease::Tests 2.62 {
+package Dist::Zilla::Plugin::Author::Plicease::Tests 2.63 {
 
-  use 5.014;
+  use 5.020;
   use Moose;
   use File::chdir;
   use File::Path qw( make_path );
   use Path::Tiny qw( path );
   use Sub::Exporter::ForMethods qw( method_installer );
   use Data::Section { installer => method_installer }, -setup;
+  use experimental qw( postderef );
 
   # ABSTRACT: add author only release tests to xt/release
 
@@ -67,7 +68,7 @@ package Dist::Zilla::Plugin::Author::Plicease::Tests 2.62 {
   {
     my($self) = @_;
     my $content = ${ $self->section_data( $self->test2_v0 ? 't/00_xdiag.t' : 't/00_diag.t' ) };
-    $content =~ s{## PREAMBLE ##}{join "\n", map { s/^\| //; $_ } @{ $self->diag_preamble }}e;
+    $content =~ s{## PREAMBLE ##}{join "\n", map { s/^\| //; $_ } $self->diag_preamble->@*}e;
     $self->_diag_content($content);
   }
 
@@ -83,9 +84,9 @@ package Dist::Zilla::Plugin::Author::Plicease::Tests 2.62 {
     foreach my $phase (keys %$prereqs)
     {
       next if $phase eq 'develop';
-      foreach my $type (keys %{ $prereqs->{$phase} })
+      foreach my $type (keys $prereqs->{$phase}->%*)
       {
-        foreach my $module (keys %{ $prereqs->{$phase}->{$type} })
+        foreach my $module (keys $prereqs->{$phase}->{$type}->%*)
         {
           next if $module =~ /^(perl|strict|warnings|base)$/;
           $list{$module}++;
@@ -99,12 +100,12 @@ package Dist::Zilla::Plugin::Author::Plicease::Tests 2.62 {
       $list{'JSON::XS'}++;
     }
 
-    if(my($alien) = grep { $_->isa('Dist::Zilla::Plugin::Alien') } @{ $self->zilla->plugins })
+    if(my($alien) = grep { $_->isa('Dist::Zilla::Plugin::Alien') } $self->zilla->plugins->@*)
     {
-      $list{$_}++ foreach keys %{ $alien->module_build_args->{alien_bin_requires} };
+      $list{$_}++ foreach keys $alien->module_build_args->{alien_bin_requires}->%*;
     }
 
-    foreach my $lib (@{ $self->diag })
+    foreach my $lib ($self->diag->@*)
     {
       if($lib =~ /^-(.*)$/)
       {
@@ -128,7 +129,7 @@ package Dist::Zilla::Plugin::Author::Plicease::Tests 2.62 {
     $code .= "\n);\n";
     $code .= "eval q{ require Test::Tester; };" if $list{'Test::Builder'} && $list{'Test::Tester'};
 
-    my($file) = grep { $_->name eq 't/00_diag.t' } @{ $self->zilla->files };
+    my($file) = grep { $_->name eq 't/00_diag.t' } $self->zilla->files->@*;
 
     my $content = $self->_diag_content;
     $content =~ s{## GENERATE ##}{$code};
@@ -176,7 +177,7 @@ Dist::Zilla::Plugin::Author::Plicease::Tests - add author only release tests to 
 
 =head1 VERSION
 
-version 2.62
+version 2.63
 
 =head1 SYNOPSIS
 
@@ -535,10 +536,10 @@ chdir(File::Spec->catdir($FindBin::Bin, File::Spec->updir, File::Spec->updir));
 my @private_classes;
 my %private_methods;
 
-push @{ $config->{pod_coverage}->{private} },
+push $config->{pod_coverage}->{private}->@*,
   'Alien::.*::Install::Files#Inline';
 
-foreach my $private (@{ $config->{pod_coverage}->{private} })
+foreach my $private ($config->{pod_coverage}->{private}->@*)
 {
   my($class,$method) = split /#/, $private;
   if(defined $class && $class ne '')
@@ -636,7 +637,7 @@ plan skip_all => 'disabled' if $config->{pod_spelling_system}->{skip};
 
 chdir(File::Spec->catdir($FindBin::Bin, File::Spec->updir, File::Spec->updir));
 
-add_stopwords(@{ $config->{pod_spelling_system}->{stopwords} });
+add_stopwords($config->{pod_spelling_system}->{stopwords}->@*);
 add_stopwords(qw(
 Plicease
 stdout

@@ -73,7 +73,13 @@ is( $found, 1, 'there is red background' );
 $found = 0;
 while ( $x > 0 ) {
     my @pixel = $image->GetPixel( x => $x, y => $y );
-    if ( join( ',', @pixel ) eq '0,0,1' ) {
+
+    # the blue chessboard can become blurred with hidpi :(
+    my @pixel_below =
+      $image->GetPixel( x => $x, y => $y + $view->get('scale-factor') );
+    if (   join( ',', @pixel ) eq '0,0,1'
+        or join( ',', @pixel_below ) eq '0,0,1' )
+    {
         $found = 1;
         last;
     }

@@ -125,7 +125,7 @@ This will allow the following two commands to function.
 
 To generate the API for a given API call:
 ```
-./gen_classes.pl botocore/botocore/data/SERVICE/DATE/service-2.json
+./gen_classes.pl --classes botocore/botocore/data/SERVICE/DATE/service-2.json
 ```
 
 This will generate file(s) in auto-lib.
@@ -212,7 +212,9 @@ If everything is OK:
 git checkout master
 git pull origin master
 git merge release/X.XX
+git push origin master
 git tag release-X.XX
+git push origin release-X.XX
 make dist
 ```
 
@@ -230,7 +232,7 @@ we will find Paws version number. Replace X.XX for Y.YY
 
 ```
 
-We add Y.YY to the Changes file
+We add Y.YY to the Changes file. Commit the changes and push:
 
 ```
 git push origin release/Y.YY
@@ -456,3 +458,6 @@ campus-explorer for contributing to test suite
 byterock for testing and fixing PinPoint
 
 torrentale for fixing QueryCaller to correctly signal empty arrays
+
+Jess Robinson and shadowcat.co.uk  for setting up ver 0.43
+ 

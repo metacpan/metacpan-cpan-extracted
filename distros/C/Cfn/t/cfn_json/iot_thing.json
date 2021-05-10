@@ -8,7 +8,7 @@
                "Ref": "NameParameter"
             },
             "AttributePayload": {
-               "attributes": {
+               "Attributes": {
                   "myAttributeA": {
                      "Ref": "MyAttributeValueA"
                   },

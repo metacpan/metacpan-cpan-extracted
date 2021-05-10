@@ -35,13 +35,13 @@ You shouldn't make instances of this class. Each attribute should be used as a n
         ApplicationCodeUpdate => 'MyApplicationCode',    # max: 102400; OPTIONAL
         CloudWatchLoggingOptionUpdates => [
           {
-            CloudWatchLoggingOptionId => 'MyId',         # min: 1, max: 50
-            LogStreamARNUpdate =>
+            CloudWatchLoggingOptionId => 'MyId',    # min: 1, max: 50
+            LogStreamARNUpdate        =>
               'MyLogStreamARN',    # min: 1, max: 2048; OPTIONAL
             RoleARNUpdate => 'MyRoleARN',    # min: 1, max: 2048; OPTIONAL
           },
           ...
-        ],                                   # OPTIONAL
+        ],    # OPTIONAL
         InputUpdates => [
           {
             InputId                => 'MyId',    # min: 1, max: 50
@@ -94,12 +94,12 @@ You shouldn't make instances of this class. Each attribute should be used as a n
             NamePrefixUpdate => 'MyInAppStreamName', # min: 1, max: 32; OPTIONAL
           },
           ...
-        ],                                           # OPTIONAL
+        ],    # OPTIONAL
         OutputUpdates => [
           {
-            OutputId                => 'MyId',       # min: 1, max: 50
+            OutputId                => 'MyId',    # min: 1, max: 50
             DestinationSchemaUpdate => {
-              RecordFormatType => 'JSON',            # values: JSON, CSV
+              RecordFormatType => 'JSON',         # values: JSON, CSV
 
             },    # OPTIONAL
             KinesisFirehoseOutputUpdate => {
@@ -120,10 +120,10 @@ You shouldn't make instances of this class. Each attribute should be used as a n
             NameUpdate => 'MyInAppStreamName',    # min: 1, max: 32; OPTIONAL
           },
           ...
-        ],                                        # OPTIONAL
+        ],    # OPTIONAL
         ReferenceDataSourceUpdates => [
           {
-            ReferenceId           => 'MyId',      # min: 1, max: 50
+            ReferenceId           => 'MyId',    # min: 1, max: 50
             ReferenceSchemaUpdate => {
               RecordColumns => [
                 {
@@ -158,7 +158,7 @@ You shouldn't make instances of this class. Each attribute should be used as a n
             TableNameUpdate => 'MyInAppTableName',   # min: 1, max: 32; OPTIONAL
           },
           ...
-        ],                                           # OPTIONAL
+        ],    # OPTIONAL
       },
       CurrentApplicationVersionId => 1,
 

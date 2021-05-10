@@ -9,7 +9,7 @@ use warnings;
 
 use Array::RefElem ();
 
-our $VERSION = '0.94';
+our $VERSION = '0.95';
 
 
 # shared undef variable
@@ -104,7 +104,7 @@ Set::Light - (memory efficient) unordered set of strings
 
 =head1 VERSION
 
-version 0.94
+version 0.95
 
 =head1 SYNOPSIS
 
@@ -248,8 +248,7 @@ and may be cloned from L<git://github.com/robrwo/Set-Light.git>
 =head1 BUGS
 
 Please report any bugs or feature requests on the bugtracker website
-L<https://rt.cpan.org/Public/Dist/Display.html?Name=Set-Light> or by email
-to L<bug-Set-Light@rt.cpan.org|mailto:bug-Set-Light@rt.cpan.org>.
+L<https://github.com/robrwo/Set-Light/issues>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
@@ -267,7 +266,7 @@ Robert Rothenberg <rrwo@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2004-2008, 2019-2020 by Tels.
+This software is copyright (c) 2004-2008, 2019-2021 by Tels.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

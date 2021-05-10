@@ -6,7 +6,7 @@
                                                  
 
 
-This is the README for XS::Check version 0.11.
+This is the README for XS::Check version 0.12.
 
 XS::Check is a "module" for the Perl computer programming language, a
 library of computer code to install on a computer.  This document contains
@@ -59,11 +59,11 @@ If you have the App::cpanminus installer, you may prefer
 
     cpanm XS::Check
 
-To install the module from the source file, XS-Check-0.11.tar.gz, follow
+To install the module from the source file, XS-Check-0.12.tar.gz, follow
 this sequence of commands:
 
-    tar xfz XS-Check-0.11.tar.gz
-    cd XS-Check-0.11
+    tar xfz XS-Check-0.12.tar.gz
+    cd XS-Check-0.12
     perl Makefile.PL
     make
     make install
@@ -88,6 +88,6 @@ repository on github at
 
 -----------------------------------------------------------------------------
 
-This README was written on Sun Dec 27 12:59:59 2020.
+This README was written on Mon May 10 13:00:00 2021.
 
 -----------------------------------------------------------------------------

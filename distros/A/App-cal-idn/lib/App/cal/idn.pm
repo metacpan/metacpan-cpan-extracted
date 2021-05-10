@@ -1,16 +1,16 @@
 package App::cal::idn;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-01-23'; # DATE
+our $DATE = '2021-05-03'; # DATE
 our $DIST = 'App-cal-idn'; # DIST
-our $VERSION = '0.134'; # VERSION
+our $VERSION = '0.136'; # VERSION
 
 use 5.010001;
 use strict;
 use warnings;
 use experimental 'smartmatch';
 
-use Calendar::Indonesia::Holiday qw(list_id_holidays);
+use Calendar::Indonesia::Holiday qw(list_idn_holidays);
 use DateTime;
 use List::Util qw(max);
 use Term::ANSIColor;
@@ -93,7 +93,7 @@ sub gen_monthly_calendar {
     my $dt  = DateTime->new(year=>$y, month=>$m, day=>1, time_zone=>$tz);
     my $dtl = DateTime->last_day_of_month(year=>$y, month=>$m, time_zone=>$tz);
     my $dt_today = DateTime->today(time_zone=>$tz);
-    my $hol = list_id_holidays(
+    my $hol = list_idn_holidays(
         detail => 1, year => $y, month => $m,
         (is_joint_leave => 0) x !$args{show_joint_leave},
     )->[2];
@@ -255,7 +255,7 @@ App::cal::idn - Display Indonesian calendar on the command-line
 
 =head1 VERSION
 
-This document describes version 0.134 of App::cal::idn (from Perl distribution App-cal-idn), released on 2021-01-23.
+This document describes version 0.136 of App::cal::idn (from Perl distribution App-cal-idn), released on 2021-05-03.
 
 =head1 SYNOPSIS
 

@@ -149,13 +149,13 @@ You shouldn't make instances of this class. Each attribute should be used as a n
                       ],                                              # OPTIONAL
                     },
                     ...
-                  ],                                                  # OPTIONAL
+                  ],    # OPTIONAL
                   IpPermissionsEgress => [
                     {
                       FromPort   => 1,
                       IpProtocol => 'MyNonEmptyString',
                       IpRanges   => [ { CidrIp => 'MyNonEmptyString', }, ... ]
-                      ,                                               # OPTIONAL
+                      ,    # OPTIONAL
                       Ipv6Ranges =>
                         [ { CidrIpv6 => 'MyNonEmptyString', }, ... ], # OPTIONAL
                       PrefixListIds =>
@@ -175,7 +175,7 @@ You shouldn't make instances of this class. Each attribute should be used as a n
                       ],                                              # OPTIONAL
                     },
                     ...
-                  ],                                                  # OPTIONAL
+                  ],    # OPTIONAL
                   OwnerId => 'MyNonEmptyString',
                   VpcId   => 'MyNonEmptyString',
                 },    # OPTIONAL
@@ -231,7 +231,7 @@ You shouldn't make instances of this class. Each attribute should be used as a n
                   PrincipalId   => 'MyNonEmptyString',
                   PrincipalName => 'MyNonEmptyString',
                   PrincipalType => 'MyNonEmptyString',
-                  Status => 'Active',    # values: Active, Inactive; OPTIONAL
+                  Status   => 'Active',    # values: Active, Inactive; OPTIONAL
                   UserName => 'MyNonEmptyString',
                 },    # OPTIONAL
                 AwsIamRole => {
@@ -322,8 +322,8 @@ You shouldn't make instances of this class. Each attribute should be used as a n
                     HostedZoneId => 'MyNonEmptyString',
                     Port         => 1,
                   },                                               # OPTIONAL
-                  Engine        => 'MyNonEmptyString',
-                  EngineVersion => 'MyNonEmptyString',
+                  Engine                           => 'MyNonEmptyString',
+                  EngineVersion                    => 'MyNonEmptyString',
                   IAMDatabaseAuthenticationEnabled => 1,           # OPTIONAL
                   InstanceCreateTime => 'MyNonEmptyString',
                   KmsKeyId           => 'MyNonEmptyString',
@@ -375,7 +375,7 @@ You shouldn't make instances of this class. Each attribute should be used as a n
                       Type     => 'MyNonEmptyString',
                     },
                     ...
-                  ],                                                  # OPTIONAL
+                  ],    # OPTIONAL
                   WebAclId => 'MyNonEmptyString',
                 },    # OPTIONAL
                 Container => {
@@ -388,7 +388,7 @@ You shouldn't make instances of this class. Each attribute should be used as a n
                 ,     # OPTIONAL
               },    # OPTIONAL
               Partition => 'aws',    # values: aws, aws-cn, aws-us-gov; OPTIONAL
-              Region => 'MyNonEmptyString',
+              Region    => 'MyNonEmptyString',
               Tags => { 'MyNonEmptyString' => 'MyNonEmptyString', },  # OPTIONAL
             },
             ...
@@ -396,13 +396,13 @@ You shouldn't make instances of this class. Each attribute should be used as a n
           SchemaVersion => 'MyNonEmptyString',
           Severity      => {
             Normalized => 1,
-            Product    => 1,                                          # OPTIONAL
+            Product    => 1,    # OPTIONAL
           },
           Title      => 'MyNonEmptyString',
           Types      => [ 'MyNonEmptyString', ... ],
           UpdatedAt  => 'MyNonEmptyString',
           Compliance => {
-            RelatedRequirements => [ 'MyNonEmptyString', ... ],       # OPTIONAL
+            RelatedRequirements => [ 'MyNonEmptyString', ... ],    # OPTIONAL
             Status              => 'PASSED'
             ,    # values: PASSED, WARNING, FAILED, NOT_AVAILABLE; OPTIONAL
           },    # OPTIONAL
@@ -449,7 +449,7 @@ You shouldn't make instances of this class. Each attribute should be used as a n
             TerminatedAt => 'MyNonEmptyString',
           },    # OPTIONAL
           ProductFields => { 'MyNonEmptyString' => 'MyNonEmptyString', }
-          ,     # OPTIONAL
+          ,                               # OPTIONAL
           RecordState     => 'ACTIVE',    # values: ACTIVE, ARCHIVED; OPTIONAL
           RelatedFindings => [
             {

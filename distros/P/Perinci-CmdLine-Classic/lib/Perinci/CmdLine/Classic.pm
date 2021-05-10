@@ -1,7 +1,7 @@
 package Perinci::CmdLine::Classic;
 
-our $DATE = '2019-04-15'; # DATE
-our $VERSION = '1.813'; # VERSION
+our $DATE = '2021-05-07'; # DATE
+our $VERSION = '1.814'; # VERSION
 
 use 5.010001;
 #use strict; # enabled by Moo
@@ -18,9 +18,23 @@ our $REQ_VERSION = 0; # version requested by user
 
 extends 'Perinci::CmdLine::Base';
 
-with 'Color::Theme::Role::ANSI' unless $ENV{COMP_LINE};
 with 'Perinci::CmdLine::Classic::Role::Help' unless $ENV{COMP_LINE};
 with 'Term::App::Role::Attrs' unless $ENV{COMP_LINE};
+
+has color_theme => (
+    is => 'rw',
+    trigger => sub {
+        require Module::Load::Util;
+        require Role::Tiny;
+
+        my ($self, $val) = @_;
+        my $obj =
+            Module::Load::Util::instantiate_class_with_optional_args(
+                {ns_prefix=>'ColorTheme'}, $val);
+        Role::Tiny->apply_roles_to_object($obj, 'ColorThemeRole::ANSI');
+        $self->{color_theme_obj} = $obj;
+    },
+);
 
 has undo => (is=>'rw', default=>sub{0});
 has undo_dir => (
@@ -274,10 +288,10 @@ sub BUILD {
         if (!$ct) {
             if ($self->use_color) {
                 my $bg = $self->detect_terminal->{default_bgcolor} // '';
-                $ct = 'Default::default' .
-                    ($bg eq 'ffffff' ? '_whitebg' : '');
+                $ct = 'Perinci::CmdLine::Classic::Default' .
+                    ($bg eq 'ffffff' ? 'WhiteBG' : '');
             } else {
-                $ct = 'Default::no_color';
+                $ct = 'NoColor';
             }
         }
         $self->color_theme($ct);
@@ -297,9 +311,9 @@ sub __json_encode {
 }
 
 sub _color {
-    my ($self, $color_name, $text) = @_;
-    my $color_code = $color_name ?
-        $self->get_theme_color_as_ansi($color_name) : "";
+    my ($self, $item_name, $text) = @_;
+    my $color_code = $item_name ?
+        $self->{color_theme_obj}->get_item_color_as_ansi($item_name) : "";
     my $reset_code = $color_code ? "\e[0m" : "";
     "$color_code$text$reset_code";
 }
@@ -435,6 +449,7 @@ sub _unsetup_progress_output {
     my $self = shift;
 
     return unless $setup_progress;
+    no warnings 'once';
     my $out = $Progress::Any::outputs{''}[0];
     $out->cleanup if $out->can("cleanup");
     undef $ph1;
@@ -758,7 +773,7 @@ Perinci::CmdLine::Classic - Rinci/Riap-based command-line application framework
 
 =head1 VERSION
 
-This document describes version 1.813 of Perinci::CmdLine::Classic (from Perl distribution Perinci-CmdLine-Classic), released on 2019-04-15.
+This document describes version 1.814 of Perinci::CmdLine::Classic (from Perl distribution Perinci-CmdLine-Classic), released on 2021-05-07.
 
 =head1 SYNOPSIS
 
@@ -1003,7 +1018,7 @@ Source repository is at L<https://github.com/perlancar/perl-Perinci-CmdLine-Clas
 
 =head1 BUGS
 
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Perinci-CmdLine-Classic>
+Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-Perinci-CmdLine-Classic/issues>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
@@ -1019,7 +1034,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019, 2018, 2017, 2016, 2015, 2014, 2013, 2012, 2011 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2018, 2017, 2016, 2015, 2014, 2013, 2012, 2011 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

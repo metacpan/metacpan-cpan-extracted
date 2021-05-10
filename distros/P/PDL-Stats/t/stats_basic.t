@@ -117,7 +117,7 @@ is( tapprox( $df, 3 ), 1, "paired sample t-test with bad values between $a_bad a
 }
 
 SKIP: {
-  eval { require PDL::GSL::CDF; };
+  eval { require PDL::Core; require PDL::GSL::CDF; };
   skip 'no PDL::GSL::CDF', 1 if $@;
   my $x = pdl(1, 2);
   my $n = pdl(2, 10);

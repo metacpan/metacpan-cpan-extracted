@@ -1,5 +1,5 @@
 package Yancy::Plugin::Editor;
-our $VERSION = '1.069';
+our $VERSION = '1.070';
 # ABSTRACT: Yancy content editor, admin, and management application
 
 #pod =head1 SYNOPSIS
@@ -256,6 +256,7 @@ sub register {
         default_response_name => '_Error',
         validator => json_validator(),
     } );
+    $_->to(format => 'json') for (@{$openapi->route->children});
     $app->helper( 'yancy.openapi' => sub {
         derp 'yancy.openapi helper is deprecated. Use yancy.editor.openapi instead';
         return $openapi;
@@ -696,7 +697,7 @@ Yancy::Plugin::Editor - Yancy content editor, admin, and management application
 
 =head1 VERSION
 
-version 1.069
+version 1.070
 
 =head1 SYNOPSIS
 

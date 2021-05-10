@@ -31,6 +31,7 @@
          "requires" : {
             "Role::Tiny" : "0",
             "Role::Tiny::With" : "0",
+            "Role::TinyCommons::Collection::GetItemByPos" : "0",
             "Role::TinyCommons::Iterator::Resettable" : "0",
             "perl" : "5.010001",
             "strict" : "0",
@@ -59,7 +60,7 @@
          "web" : "https://github.com/perlancar/perl-ArrayData"
       }
    },
-   "version" : "0.2.0",
+   "version" : "0.2.2",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.030000"

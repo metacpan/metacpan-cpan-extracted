@@ -1,4 +1,4 @@
-# AWS::SSM::ResourceDataSync generated from spec 20.1.0
+# AWS::SSM::ResourceDataSync generated from spec 34.0.0
 use Moose::Util::TypeConstraints;
 
 coerce 'Cfn::Resource::Properties::AWS::SSM::ResourceDataSync',
@@ -11,10 +11,10 @@ package Cfn::Resource::AWS::SSM::ResourceDataSync {
   has Properties => (isa => 'Cfn::Resource::Properties::AWS::SSM::ResourceDataSync', is => 'rw', coerce => 1);
   
   sub AttributeList {
-    [  ]
+    [ 'SyncName' ]
   }
   sub supported_regions {
-    [ 'ap-northeast-1','ap-northeast-2','ap-northeast-3','ap-south-1','ap-southeast-1','ap-southeast-2','ca-central-1','cn-north-1','cn-northwest-1','eu-central-1','eu-west-1','eu-west-2','eu-west-3','sa-east-1','us-east-1','us-east-2','us-gov-west-1','us-west-1','us-west-2' ]
+    [ 'ap-northeast-1','ap-northeast-2','ap-northeast-3','ap-south-1','ap-southeast-1','ap-southeast-2','ca-central-1','cn-north-1','cn-northwest-1','eu-central-1','eu-north-1','eu-west-1','eu-west-2','eu-west-3','sa-east-1','us-east-1','us-east-2','us-gov-west-1','us-west-1','us-west-2' ]
   }
 }
 
@@ -39,7 +39,7 @@ package Cfn::Resource::Properties::Object::AWS::SSM::ResourceDataSync::AwsOrgani
   extends 'Cfn::Value::TypedValue';
   
   has OrganizationalUnits => (isa => 'Cfn::Value::Array|Cfn::Value::Function|Cfn::DynamicValue', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
-  has OrganizationSourceType => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
+  has OrganizationSourceType => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
 }
 
 subtype 'Cfn::Resource::Properties::AWS::SSM::ResourceDataSync::SyncSource',
@@ -63,7 +63,7 @@ package Cfn::Resource::Properties::Object::AWS::SSM::ResourceDataSync::SyncSourc
   has AwsOrganizationsSource => (isa => 'Cfn::Resource::Properties::AWS::SSM::ResourceDataSync::AwsOrganizationsSource', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has IncludeFutureRegions => (isa => 'Cfn::Value::Boolean', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has SourceRegions => (isa => 'Cfn::Value::Array|Cfn::Value::Function|Cfn::DynamicValue', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
-  has SourceType => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
+  has SourceType => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
 }
 
 subtype 'Cfn::Resource::Properties::AWS::SSM::ResourceDataSync::S3Destination',

@@ -1,6 +1,11 @@
-Revision history for Business-BankCard-Indonesia
+0.070   2021-05-07  Released-By: PERLANCAR; Urgency: medium; Backward-Incompatible: yes
 
-0.06    2015-09-03 (PERLANCAR)
+	- [incompatible change] Rename function
+	  list_id_bank_card_prefixes() -> list_idn_bank_card_prefixes() to
+	  avoid ambiguity of 'id'.
+
+
+0.06    2015-09-03  Released-By: PERLANCAR
 
 	- No functional changes.
 
@@ -9,7 +14,7 @@ Revision history for Business-BankCard-Indonesia
 	  requirement.
 
 
-0.05    2015-07-10 (PERLANCAR)
+0.05    2015-07-10  Released-By: PERLANCAR
 
 	- Move pericmd CLI script to App-IndonesianBankingUtils (to reduce
 	  dependencies of our dist).
@@ -17,21 +22,21 @@ Revision history for Business-BankCard-Indonesia
 	- Fix arguments (need to be array).
 
 
-0.04     2014-08-16 (SHARYANTO) - Happy 19th CPAN Day!
+0.04     2014-08-16  Released-By: SHARYANTO; Note: Happy 19th CPAN Day!
 
          - Add CLI script(s).
 
 
-0.03    2012-07-11 (SHARYANTO)
+0.03    2012-07-11  Released-By: SHARYANTO
 
         - No functional changes. Adjust to Perinci::Sub::Gen::AccessTable 0.14.
 
 
-0.02    2012-07-07 (SHARYANTO)
+0.02    2012-07-07  Released-By: SHARYANTO
 
         - No functional changes. No data update. Add missing dependency [CT].
 
 
-0.01    2012-07-06 (SHARYANTO)
+0.01    2012-07-06  Released-By: SHARYANTO
 
         - First version.

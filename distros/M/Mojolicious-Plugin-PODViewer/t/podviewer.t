@@ -106,7 +106,7 @@ $t->get_ok('/perldoc/MojoliciousTest/PODTest' => {Accept => 'text/plain'})
   ->content_like(qr/package MojoliciousTest::PODTest/);
 
 # Perldoc browser (unsupported format)
-$t->get_ok('/perldoc/MojoliciousTest/PODTest.json')->status_is(204);
+$t->get_ok('/perldoc/MojoliciousTest/PODTest.json')->status_is(404);
 
 # Restrict to only desired set of modules
 $t->get_ok('/perldoc/Mojolicious/Lite')->status_is(302)

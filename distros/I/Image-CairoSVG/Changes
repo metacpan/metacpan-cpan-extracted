@@ -1,5 +1,9 @@
 Revision log for Perl module "Image::CairoSVG"
 
+0.17 2021-05-09
+
+- Documentation changes only
+
 0.16 2021-05-03
 
 - Support opacity

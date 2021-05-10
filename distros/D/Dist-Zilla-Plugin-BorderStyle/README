@@ -1,0 +1,58 @@
+NAME
+    Dist::Zilla::Plugin::BorderStyle - Plugin to use when building
+    distribution that has BorderStyle modules
+
+VERSION
+    This document describes version 0.001 of
+    Dist::Zilla::Plugin::BorderStyle (from Perl distribution
+    Dist-Zilla-Plugin-BorderStyle), released on 2021-01-23.
+
+SYNOPSIS
+    In dist.ini:
+
+     [BorderStyle]
+
+DESCRIPTION
+    This plugin is to be used when building distribution that has
+    BorderStyle modules.
+
+    It does the following to every "BorderStyles/*" .pm file:
+
+    *
+
+    It does the following to every "BorderStyle/*" .pm file:
+
+    *   Set module abstract from the border style structure (%BORDER)'s
+        summary
+
+CONFIGURATION
+  exclude_module
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Dist-Zilla-Plugin-BorderStyle>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Dist-Zilla-Plugin-BorderStyle>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://github.com/perlancar/perl-Dist-Zilla-Plugin-BorderStyle/issues>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    Pod::Weaver::Plugin::BorderStyle
+
+    BorderStyle
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2021 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

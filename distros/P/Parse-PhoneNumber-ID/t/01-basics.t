@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use Test::More 0.98;
 
-use Parse::PhoneNumber::ID qw(extract_id_phones parse_id_phone);
+use Parse::PhoneNumber::ID qw(extract_idn_phones parse_idn_phone);
 
 test_extract(
     name => 'too short',
@@ -168,7 +168,7 @@ for my $t (sort keys %sample_data) {
     );
 }
 
-my $res = parse_id_phone(text=>'022-123-4567');
+my $res = parse_idn_phone(text=>'022-123-4567');
 is($res->{standard}, "+62.22.1234567", "parse");
 
 done_testing();
@@ -176,7 +176,7 @@ done_testing();
 sub test_extract {
     my %args = @_;
     my $extract_args = $args{args};
-    my $res = extract_id_phones(%$extract_args);
+    my $res = extract_idn_phones(%$extract_args);
 
     subtest "extract: $args{name}" => sub {
         if (defined $args{num}) {

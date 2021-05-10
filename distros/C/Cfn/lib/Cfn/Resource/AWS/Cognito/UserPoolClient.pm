@@ -1,4 +1,4 @@
-# AWS::Cognito::UserPoolClient generated from spec 18.4.0
+# AWS::Cognito::UserPoolClient generated from spec 34.0.0
 use Moose::Util::TypeConstraints;
 
 coerce 'Cfn::Resource::Properties::AWS::Cognito::UserPoolClient',
@@ -61,6 +61,7 @@ package Cfn::Resource::Properties::Object::AWS::Cognito::UserPoolClient::Analyti
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
   
+  has ApplicationArn => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has ApplicationId => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has ExternalId => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has RoleArn => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');

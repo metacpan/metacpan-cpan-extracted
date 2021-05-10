@@ -1,4 +1,4 @@
-# AWS::Cassandra::Table generated from spec 18.4.0
+# AWS::Cassandra::Table generated from spec 34.0.0
 use Moose::Util::TypeConstraints;
 
 coerce 'Cfn::Resource::Properties::AWS::Cassandra::Table',
@@ -161,8 +161,10 @@ package Cfn::Resource::Properties::AWS::Cassandra::Table {
   has ClusteringKeyColumns => (isa => 'ArrayOfCfn::Resource::Properties::AWS::Cassandra::Table::ClusteringKeyColumn', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
   has KeyspaceName => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
   has PartitionKeyColumns => (isa => 'ArrayOfCfn::Resource::Properties::AWS::Cassandra::Table::Column', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
+  has PointInTimeRecoveryEnabled => (isa => 'Cfn::Value::Boolean', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has RegularColumns => (isa => 'ArrayOfCfn::Resource::Properties::AWS::Cassandra::Table::Column', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has TableName => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
+  has Tags => (isa => 'ArrayOfCfn::Resource::Properties::TagType', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
 }
 
 1;

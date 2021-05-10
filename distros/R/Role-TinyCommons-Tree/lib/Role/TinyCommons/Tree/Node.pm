@@ -3,7 +3,7 @@ package Role::TinyCommons::Tree::Node;
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2021-05-06'; # DATE
 our $DIST = 'Role-TinyCommons-Tree'; # DIST
-our $VERSION = '0.125'; # VERSION
+our $VERSION = '0.126'; # VERSION
 
 use Role::Tiny;
 
@@ -25,7 +25,7 @@ Role::TinyCommons::Tree::Node - Role for a tree node object
 
 =head1 VERSION
 
-This document describes version 0.125 of Role::TinyCommons::Tree::Node (from Perl distribution Role-TinyCommons-Tree), released on 2021-05-06.
+This document describes version 0.126 of Role::TinyCommons::Tree::Node (from Perl distribution Role-TinyCommons-Tree), released on 2021-05-06.
 
 =head1 DESCRIPTION
 

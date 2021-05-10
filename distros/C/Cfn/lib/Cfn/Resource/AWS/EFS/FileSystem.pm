@@ -1,4 +1,4 @@
-# AWS::EFS::FileSystem generated from spec 18.4.0
+# AWS::EFS::FileSystem generated from spec 34.0.0
 use Moose::Util::TypeConstraints;
 
 coerce 'Cfn::Resource::Properties::AWS::EFS::FileSystem',
@@ -133,7 +133,9 @@ package Cfn::Resource::Properties::AWS::EFS::FileSystem {
   use MooseX::StrictConstructor;
   extends 'Cfn::Resource::Properties';
   
+  has AvailabilityZoneName => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
   has BackupPolicy => (isa => 'Cfn::Resource::Properties::AWS::EFS::FileSystem::BackupPolicy', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has BypassPolicyLockoutSafetyCheck => (isa => 'Cfn::Value::Boolean', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has Encrypted => (isa => 'Cfn::Value::Boolean', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
   has FileSystemPolicy => (isa => 'Cfn::Value::Json|Cfn::DynamicValue', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has FileSystemTags => (isa => 'ArrayOfCfn::Resource::Properties::AWS::EFS::FileSystem::ElasticFileSystemTag', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');

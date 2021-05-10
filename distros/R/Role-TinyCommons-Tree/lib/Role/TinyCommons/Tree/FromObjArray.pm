@@ -3,7 +3,7 @@ package Role::TinyCommons::Tree::FromObjArray;
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2021-05-06'; # DATE
 our $DIST = 'Role-TinyCommons-Tree'; # DIST
-our $VERSION = '0.125'; # VERSION
+our $VERSION = '0.126'; # VERSION
 
 use Role::Tiny;
 use Role::Tiny::With;
@@ -33,7 +33,7 @@ Role::TinyCommons::Tree::FromObjArray - Role that provides methods to build a tr
 
 =head1 VERSION
 
-This document describes version 0.125 of Role::TinyCommons::Tree::FromObjArray (from Perl distribution Role-TinyCommons-Tree), released on 2021-05-06.
+This document describes version 0.126 of Role::TinyCommons::Tree::FromObjArray (from Perl distribution Role-TinyCommons-Tree), released on 2021-05-06.
 
 =head1 MIXED IN ROLES
 
@@ -44,7 +44,9 @@ L<Role::TinyCommons::Tree::NodeMethods>
 =head2 new_from_obj_array($obj_array) => obj
 
 Construct a tree of objects from a nested array of objects C<$obj_array>. The
-array must be in format:
+array must contain the root node object followed by zero or more children node
+objects. Each child can be directly followed by an arrayref to specify I<its>
+children. Examples:
 
  [$root_node_obj]                                     # if there are no children nodes
 

@@ -1,9 +1,9 @@
 #!perl
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-01-23'; # DATE
+our $DATE = '2021-05-03'; # DATE
 our $DIST = 'App-cal-idn'; # DIST
-our $VERSION = '0.134'; # VERSION
+our $VERSION = '0.136'; # VERSION
 
 use 5.010001;
 use strict;
@@ -65,7 +65,7 @@ cal-idn - Display Indonesian calendar on the command-line
 
 =head1 VERSION
 
-This document describes version 0.134 of cal-idn (from Perl distribution App-cal-idn), released on 2021-01-23.
+This document describes version 0.136 of cal-idn (from Perl distribution App-cal-idn), released on 2021-05-03.
 
 =head1 SYNOPSIS
 
@@ -142,7 +142,7 @@ Unix command B<cal>
 
 L<Calendar::Indonesia::Holiday>
 
-L<dateseq-id> from L<App::dateseq::id>
+L<dateseq-idn> from L<App::dateseq::idn>
 
 =head1 AUTHOR
 

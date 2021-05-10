@@ -1,4 +1,4 @@
-# AWS::Glue::Partition generated from spec 18.4.0
+# AWS::Glue::Partition generated from spec 22.0.0
 use Moose::Util::TypeConstraints;
 
 coerce 'Cfn::Resource::Properties::AWS::Glue::Partition',
@@ -19,6 +19,29 @@ package Cfn::Resource::AWS::Glue::Partition {
 }
 
 
+
+subtype 'Cfn::Resource::Properties::AWS::Glue::Partition::SchemaId',
+     as 'Cfn::Value';
+
+coerce 'Cfn::Resource::Properties::AWS::Glue::Partition::SchemaId',
+  from 'HashRef',
+   via {
+     if (my $f = Cfn::TypeLibrary::try_function($_)) {
+       return $f
+     } else {
+       return Cfn::Resource::Properties::Object::AWS::Glue::Partition::SchemaId->new( %$_ );
+     }
+   };
+
+package Cfn::Resource::Properties::Object::AWS::Glue::Partition::SchemaId {
+  use Moose;
+  use MooseX::StrictConstructor;
+  extends 'Cfn::Value::TypedValue';
+  
+  has RegistryName => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has SchemaArn => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has SchemaName => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+}
 
 subtype 'Cfn::Resource::Properties::AWS::Glue::Partition::SkewedInfo',
      as 'Cfn::Value';
@@ -64,6 +87,29 @@ package Cfn::Resource::Properties::Object::AWS::Glue::Partition::SerdeInfo {
   has Name => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has Parameters => (isa => 'Cfn::Value::Json|Cfn::DynamicValue', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has SerializationLibrary => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+}
+
+subtype 'Cfn::Resource::Properties::AWS::Glue::Partition::SchemaReference',
+     as 'Cfn::Value';
+
+coerce 'Cfn::Resource::Properties::AWS::Glue::Partition::SchemaReference',
+  from 'HashRef',
+   via {
+     if (my $f = Cfn::TypeLibrary::try_function($_)) {
+       return $f
+     } else {
+       return Cfn::Resource::Properties::Object::AWS::Glue::Partition::SchemaReference->new( %$_ );
+     }
+   };
+
+package Cfn::Resource::Properties::Object::AWS::Glue::Partition::SchemaReference {
+  use Moose;
+  use MooseX::StrictConstructor;
+  extends 'Cfn::Value::TypedValue';
+  
+  has SchameVersionId => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has SchemaId => (isa => 'Cfn::Resource::Properties::AWS::Glue::Partition::SchemaId', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has SchemaVersionNumber => (isa => 'Cfn::Value::Integer', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
 }
 subtype 'ArrayOfCfn::Resource::Properties::AWS::Glue::Partition::Order',
      as 'Cfn::Value',
@@ -181,6 +227,7 @@ package Cfn::Resource::Properties::Object::AWS::Glue::Partition::StorageDescript
   has NumberOfBuckets => (isa => 'Cfn::Value::Integer', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has OutputFormat => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has Parameters => (isa => 'Cfn::Value::Json|Cfn::DynamicValue', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has SchemaReference => (isa => 'Cfn::Resource::Properties::AWS::Glue::Partition::SchemaReference', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has SerdeInfo => (isa => 'Cfn::Resource::Properties::AWS::Glue::Partition::SerdeInfo', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has SkewedInfo => (isa => 'Cfn::Resource::Properties::AWS::Glue::Partition::SkewedInfo', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has SortColumns => (isa => 'ArrayOfCfn::Resource::Properties::AWS::Glue::Partition::Order', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');

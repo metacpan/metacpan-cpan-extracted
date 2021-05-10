@@ -16,7 +16,7 @@ use PDL::Stats::Kmeans;
 
 $PDL::onlinedoc->scan(__FILE__) if $PDL::onlinedoc;
 
-eval { require PDL::GSL::CDF; };
+eval { require PDL::Core; require PDL::GSL::CDF; };
 my $CDF = 1 if !$@;
 
 eval { require PDL::Slatec; };

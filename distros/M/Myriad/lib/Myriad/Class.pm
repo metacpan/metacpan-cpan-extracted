@@ -3,7 +3,7 @@ package Myriad::Class;
 use strict;
 use warnings;
 
-our $VERSION = '0.005'; # VERSION
+our $VERSION = '0.006'; # VERSION
 our $AUTHORITY = 'cpan:DERIV'; # AUTHORITY
 
 use utf8;
@@ -61,6 +61,8 @@ The following Perl language features and modules are applied:
 
 =item * provides L<List::Util/min>, L<List::Util/max>, L<List::Util/sum0>
 
+=item * provides L<List::Keywords/any>, L<List::Keywords/all>
+
 =item * provides L<JSON::MaybeUTF8/encode_json_text>, L<JSON::MaybeUTF8/encode_json_utf8>,
 L<JSON::MaybeUTF8/decode_json_text>, L<JSON::MaybeUTF8/decode_json_utf8>, L<JSON::MaybeUTF8/format_json_text>
 
@@ -117,6 +119,8 @@ use Syntax::Keyword::Dynamically;
 use Syntax::Keyword::Defer;
 use Scalar::Util;
 use List::Util;
+use List::Keywords;
+use Future::Utils;
 
 use JSON::MaybeUTF8;
 
@@ -192,6 +196,16 @@ sub import {
             format_json_text
         );
     }
+    {
+        no strict 'refs';
+        *{$pkg . '::' . $_} = Future::Utils->can($_) for qw(
+            fmap_void
+            fmap_concat
+            fmap_scalar
+            fmap0
+            fmap1
+        );
+    }
 
     {
         no strict 'refs';
@@ -213,6 +227,9 @@ sub import {
     Syntax::Keyword::Defer->import_into($pkg);
     Future::AsyncAwait->import_into($pkg, ':experimental(cancel)');
     Metrics::Any->import_into($pkg, '$metrics');
+
+    # Others use lexical hints
+    List::Keywords->import(qw(any all));
 
     # For history here, see this:
     # https://rt.cpan.org/Ticket/Display.html?id=132337

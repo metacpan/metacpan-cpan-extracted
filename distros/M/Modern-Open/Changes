@@ -1,5 +1,9 @@
 Revision history for this software.
 
+0.13  2021-05-08 00:00:00
+  - fix confess() messages
+  - created by INABA Hitoshi
+
 0.12 2021-03-16 00:00:00
   - fix Modern::Open::confess() message
   - created by INABA Hitoshi

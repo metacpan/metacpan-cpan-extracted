@@ -45,4 +45,12 @@ subtest each_item => sub {
     is_deeply($row, 1);
 };
 
+subtest "get_item_at_pos, has_item_at_pos" => sub {
+    is_deeply($ary->get_item_at_pos(0), 1);
+    ok($ary->has_item_at_pos(0));
+
+    dies_ok { $ary->get_item_at_pos(4) };
+    ok(!$ary->has_item_at_pos(4));
+};
+
 done_testing;

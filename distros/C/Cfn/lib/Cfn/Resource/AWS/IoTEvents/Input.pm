@@ -1,4 +1,4 @@
-# AWS::IoTEvents::Input generated from spec 18.4.0
+# AWS::IoTEvents::Input generated from spec 34.0.0
 use Moose::Util::TypeConstraints;
 
 coerce 'Cfn::Resource::Properties::AWS::IoTEvents::Input',
@@ -14,7 +14,7 @@ package Cfn::Resource::AWS::IoTEvents::Input {
     [  ]
   }
   sub supported_regions {
-    [ 'ap-northeast-1','ap-northeast-2','ap-southeast-1','ap-southeast-2','eu-central-1','eu-west-1','eu-west-2','us-east-1','us-east-2','us-west-2' ]
+    [ 'ap-northeast-1','ap-northeast-2','ap-southeast-1','ap-southeast-2','cn-north-1','eu-central-1','eu-west-1','eu-west-2','us-east-1','us-east-2','us-west-2' ]
   }
 }
 
@@ -60,7 +60,7 @@ package Cfn::Resource::Properties::Object::AWS::IoTEvents::Input::Attribute {
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
   
-  has JsonPath => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has JsonPath => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
 }
 
 subtype 'Cfn::Resource::Properties::AWS::IoTEvents::Input::InputDefinition',
@@ -81,7 +81,7 @@ package Cfn::Resource::Properties::Object::AWS::IoTEvents::Input::InputDefinitio
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
   
-  has Attributes => (isa => 'ArrayOfCfn::Resource::Properties::AWS::IoTEvents::Input::Attribute', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has Attributes => (isa => 'ArrayOfCfn::Resource::Properties::AWS::IoTEvents::Input::Attribute', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
 }
 
 package Cfn::Resource::Properties::AWS::IoTEvents::Input {
@@ -89,7 +89,7 @@ package Cfn::Resource::Properties::AWS::IoTEvents::Input {
   use MooseX::StrictConstructor;
   extends 'Cfn::Resource::Properties';
   
-  has InputDefinition => (isa => 'Cfn::Resource::Properties::AWS::IoTEvents::Input::InputDefinition', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has InputDefinition => (isa => 'Cfn::Resource::Properties::AWS::IoTEvents::Input::InputDefinition', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has InputDescription => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has InputName => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
   has Tags => (isa => 'ArrayOfCfn::Resource::Properties::TagType', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');

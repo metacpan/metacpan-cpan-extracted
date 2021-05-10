@@ -4,8 +4,9 @@ use 5.010001;
 use strict;
 use utf8;
 use warnings;
-use Test::More 0.98;
 #use Test::Differences;
+use Test::More 0.98;
+#use Test::Needs;
 
 use Text::Table::More qw(generate_table);
 
@@ -270,6 +271,10 @@ _
     },
 
     {
+        test_if => sub {
+            return 0 unless eval { require "Text/ANSI/Util.pm"; 1 };
+            return 0 unless eval { require "Text/WideChar/Util.pm"; 1 };
+        },
         name => 'wide_char & color',
         rows => [
             [{text=>"⻅", align=>'middle'},"B0","C0"], # cell attrs (hash cell)
@@ -349,12 +354,18 @@ _
     },
 
 );
-my @include_tests = ("wide_char & color"); # e.g. ("1x1")
+my @include_tests = (); #("wide_char & color"); # e.g. ("1x1")
 my $border_style;# = "UTF8::SingleLineBoldHeader"; # force border style
 
 for my $test (@tests) {
     if (@include_tests) {
         next unless grep { $_ eq $test->{name} } @include_tests;
+    }
+    if ($test->{test_if}) {
+        unless ($test->{test_if}->()) {
+            diag "Test $test->{name} skipped (test_if returns false)";
+            next;
+        }
     }
     subtest $test->{name} => sub {
         my $res = generate_table(

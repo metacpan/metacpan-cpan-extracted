@@ -1,4 +1,4 @@
-# AWS::DataBrew::Job generated from spec 21.0.0
+# AWS::DataBrew::Job generated from spec 34.0.0
 use Moose::Util::TypeConstraints;
 
 coerce 'Cfn::Resource::Properties::AWS::DataBrew::Job',
@@ -14,11 +14,32 @@ package Cfn::Resource::AWS::DataBrew::Job {
     [  ]
   }
   sub supported_regions {
-    [ 'ap-northeast-1','ap-southeast-2','eu-central-1','eu-west-1','us-east-1','us-east-2','us-west-2' ]
+    [ 'ap-northeast-1','ap-northeast-2','ap-south-1','ap-southeast-1','ap-southeast-2','ca-central-1','eu-central-1','eu-north-1','eu-west-1','eu-west-2','eu-west-3','sa-east-1','us-east-1','us-east-2','us-west-1','us-west-2' ]
   }
 }
 
 
+
+subtype 'Cfn::Resource::Properties::AWS::DataBrew::Job::CsvOutputOptions',
+     as 'Cfn::Value';
+
+coerce 'Cfn::Resource::Properties::AWS::DataBrew::Job::CsvOutputOptions',
+  from 'HashRef',
+   via {
+     if (my $f = Cfn::TypeLibrary::try_function($_)) {
+       return $f
+     } else {
+       return Cfn::Resource::Properties::Object::AWS::DataBrew::Job::CsvOutputOptions->new( %$_ );
+     }
+   };
+
+package Cfn::Resource::Properties::Object::AWS::DataBrew::Job::CsvOutputOptions {
+  use Moose;
+  use MooseX::StrictConstructor;
+  extends 'Cfn::Value::TypedValue';
+  
+  has Delimiter => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+}
 
 subtype 'Cfn::Resource::Properties::AWS::DataBrew::Job::S3Location',
      as 'Cfn::Value';
@@ -40,6 +61,27 @@ package Cfn::Resource::Properties::Object::AWS::DataBrew::Job::S3Location {
   
   has Bucket => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has Key => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+}
+
+subtype 'Cfn::Resource::Properties::AWS::DataBrew::Job::OutputFormatOptions',
+     as 'Cfn::Value';
+
+coerce 'Cfn::Resource::Properties::AWS::DataBrew::Job::OutputFormatOptions',
+  from 'HashRef',
+   via {
+     if (my $f = Cfn::TypeLibrary::try_function($_)) {
+       return $f
+     } else {
+       return Cfn::Resource::Properties::Object::AWS::DataBrew::Job::OutputFormatOptions->new( %$_ );
+     }
+   };
+
+package Cfn::Resource::Properties::Object::AWS::DataBrew::Job::OutputFormatOptions {
+  use Moose;
+  use MooseX::StrictConstructor;
+  extends 'Cfn::Value::TypedValue';
+  
+  has Csv => (isa => 'Cfn::Resource::Properties::AWS::DataBrew::Job::CsvOutputOptions', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
 }
 subtype 'ArrayOfCfn::Resource::Properties::AWS::DataBrew::Job::Output',
      as 'Cfn::Value',
@@ -84,6 +126,7 @@ package Cfn::Resource::Properties::Object::AWS::DataBrew::Job::Output {
   
   has CompressionFormat => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has Format => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has FormatOptions => (isa => 'Cfn::Resource::Properties::AWS::DataBrew::Job::OutputFormatOptions', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has Location => (isa => 'Cfn::Resource::Properties::AWS::DataBrew::Job::S3Location', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has Overwrite => (isa => 'Cfn::Value::Boolean', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has PartitionColumns => (isa => 'Cfn::Value::Array|Cfn::Value::Function|Cfn::DynamicValue', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
@@ -97,6 +140,7 @@ package Cfn::Resource::Properties::AWS::DataBrew::Job {
   has DatasetName => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has EncryptionKeyArn => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has EncryptionMode => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has JobSample => (isa => 'Cfn::Value::Json|Cfn::DynamicValue', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has LogSubscription => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has MaxCapacity => (isa => 'Cfn::Value::Integer', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has MaxRetries => (isa => 'Cfn::Value::Integer', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');

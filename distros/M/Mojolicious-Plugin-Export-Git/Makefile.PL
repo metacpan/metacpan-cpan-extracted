@@ -17,6 +17,7 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.014",
   "NAME" => "Mojolicious::Plugin::Export::Git",
   "PREREQ_PM" => {
+    "Git::Repository" => "1.322",
     "Mojolicious" => 8,
     "Mojolicious::Plugin::Export" => "0.008"
   },
@@ -27,7 +28,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.002",
+  "VERSION" => "0.003",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -37,6 +38,7 @@ my %WriteMakefileArgs = (
 my %FallbackPrereqs = (
   "ExtUtils::MakeMaker" => 0,
   "File::Spec" => 0,
+  "Git::Repository" => "1.322",
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
   "Mojolicious" => 8,

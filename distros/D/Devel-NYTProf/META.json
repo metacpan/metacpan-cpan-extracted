@@ -66,6 +66,6 @@
       },
       "x_MailingList" : "http://groups.google.com/group/develnytprof-dev"
    },
-   "version" : "6.09",
+   "version" : "6.10",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

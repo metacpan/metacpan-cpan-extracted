@@ -1,4 +1,4 @@
-# AWS::StepFunctions::StateMachine generated from spec 20.1.0
+# AWS::StepFunctions::StateMachine generated from spec 34.0.0
 use Moose::Util::TypeConstraints;
 
 coerce 'Cfn::Resource::Properties::AWS::StepFunctions::StateMachine',
@@ -195,20 +195,20 @@ package Cfn::Resource::Properties::Object::AWS::StepFunctions::StateMachine::Log
   has Level => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
 }
 
-subtype 'Cfn::Resource::Properties::AWS::StepFunctions::StateMachine::DefinitionSubstitutions',
+subtype 'Cfn::Resource::Properties::AWS::StepFunctions::StateMachine::Definition',
      as 'Cfn::Value';
 
-coerce 'Cfn::Resource::Properties::AWS::StepFunctions::StateMachine::DefinitionSubstitutions',
+coerce 'Cfn::Resource::Properties::AWS::StepFunctions::StateMachine::Definition',
   from 'HashRef',
    via {
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::Object::AWS::StepFunctions::StateMachine::DefinitionSubstitutions->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::StepFunctions::StateMachine::Definition->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::Object::AWS::StepFunctions::StateMachine::DefinitionSubstitutions {
+package Cfn::Resource::Properties::Object::AWS::StepFunctions::StateMachine::Definition {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -220,9 +220,10 @@ package Cfn::Resource::Properties::AWS::StepFunctions::StateMachine {
   use MooseX::StrictConstructor;
   extends 'Cfn::Resource::Properties';
   
+  has Definition => (isa => 'Cfn::Resource::Properties::AWS::StepFunctions::StateMachine::Definition', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has DefinitionS3Location => (isa => 'Cfn::Resource::Properties::AWS::StepFunctions::StateMachine::S3Location', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has DefinitionString => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
-  has DefinitionSubstitutions => (isa => 'Cfn::Resource::Properties::AWS::StepFunctions::StateMachine::DefinitionSubstitutions', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has DefinitionSubstitutions => (isa => 'Cfn::Value::Hash|Cfn::DynamicValue', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has LoggingConfiguration => (isa => 'Cfn::Resource::Properties::AWS::StepFunctions::StateMachine::LoggingConfiguration', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has RoleArn => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has StateMachineName => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');

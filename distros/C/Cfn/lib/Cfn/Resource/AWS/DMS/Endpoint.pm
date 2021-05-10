@@ -1,4 +1,4 @@
-# AWS::DMS::Endpoint generated from spec 18.4.0
+# AWS::DMS::Endpoint generated from spec 34.0.0
 use Moose::Util::TypeConstraints;
 
 coerce 'Cfn::Resource::Properties::AWS::DMS::Endpoint',
@@ -19,6 +19,28 @@ package Cfn::Resource::AWS::DMS::Endpoint {
 }
 
 
+
+subtype 'Cfn::Resource::Properties::AWS::DMS::Endpoint::SybaseSettings',
+     as 'Cfn::Value';
+
+coerce 'Cfn::Resource::Properties::AWS::DMS::Endpoint::SybaseSettings',
+  from 'HashRef',
+   via {
+     if (my $f = Cfn::TypeLibrary::try_function($_)) {
+       return $f
+     } else {
+       return Cfn::Resource::Properties::Object::AWS::DMS::Endpoint::SybaseSettings->new( %$_ );
+     }
+   };
+
+package Cfn::Resource::Properties::Object::AWS::DMS::Endpoint::SybaseSettings {
+  use Moose;
+  use MooseX::StrictConstructor;
+  extends 'Cfn::Value::TypedValue';
+  
+  has SecretsManagerAccessRoleArn => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has SecretsManagerSecretId => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+}
 
 subtype 'Cfn::Resource::Properties::AWS::DMS::Endpoint::S3Settings',
      as 'Cfn::Value';
@@ -45,6 +67,74 @@ package Cfn::Resource::Properties::Object::AWS::DMS::Endpoint::S3Settings {
   has CsvRowDelimiter => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has ExternalTableDefinition => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has ServiceAccessRoleArn => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+}
+
+subtype 'Cfn::Resource::Properties::AWS::DMS::Endpoint::RedshiftSettings',
+     as 'Cfn::Value';
+
+coerce 'Cfn::Resource::Properties::AWS::DMS::Endpoint::RedshiftSettings',
+  from 'HashRef',
+   via {
+     if (my $f = Cfn::TypeLibrary::try_function($_)) {
+       return $f
+     } else {
+       return Cfn::Resource::Properties::Object::AWS::DMS::Endpoint::RedshiftSettings->new( %$_ );
+     }
+   };
+
+package Cfn::Resource::Properties::Object::AWS::DMS::Endpoint::RedshiftSettings {
+  use Moose;
+  use MooseX::StrictConstructor;
+  extends 'Cfn::Value::TypedValue';
+  
+  has SecretsManagerAccessRoleArn => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has SecretsManagerSecretId => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+}
+
+subtype 'Cfn::Resource::Properties::AWS::DMS::Endpoint::PostgreSqlSettings',
+     as 'Cfn::Value';
+
+coerce 'Cfn::Resource::Properties::AWS::DMS::Endpoint::PostgreSqlSettings',
+  from 'HashRef',
+   via {
+     if (my $f = Cfn::TypeLibrary::try_function($_)) {
+       return $f
+     } else {
+       return Cfn::Resource::Properties::Object::AWS::DMS::Endpoint::PostgreSqlSettings->new( %$_ );
+     }
+   };
+
+package Cfn::Resource::Properties::Object::AWS::DMS::Endpoint::PostgreSqlSettings {
+  use Moose;
+  use MooseX::StrictConstructor;
+  extends 'Cfn::Value::TypedValue';
+  
+  has SecretsManagerAccessRoleArn => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has SecretsManagerSecretId => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+}
+
+subtype 'Cfn::Resource::Properties::AWS::DMS::Endpoint::OracleSettings',
+     as 'Cfn::Value';
+
+coerce 'Cfn::Resource::Properties::AWS::DMS::Endpoint::OracleSettings',
+  from 'HashRef',
+   via {
+     if (my $f = Cfn::TypeLibrary::try_function($_)) {
+       return $f
+     } else {
+       return Cfn::Resource::Properties::Object::AWS::DMS::Endpoint::OracleSettings->new( %$_ );
+     }
+   };
+
+package Cfn::Resource::Properties::Object::AWS::DMS::Endpoint::OracleSettings {
+  use Moose;
+  use MooseX::StrictConstructor;
+  extends 'Cfn::Value::TypedValue';
+  
+  has SecretsManagerAccessRoleArn => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has SecretsManagerOracleAsmAccessRoleArn => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has SecretsManagerOracleAsmSecretId => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has SecretsManagerSecretId => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
 }
 
 subtype 'Cfn::Resource::Properties::AWS::DMS::Endpoint::NeptuneSettings',
@@ -74,6 +164,28 @@ package Cfn::Resource::Properties::Object::AWS::DMS::Endpoint::NeptuneSettings {
   has ServiceAccessRoleArn => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
 }
 
+subtype 'Cfn::Resource::Properties::AWS::DMS::Endpoint::MySqlSettings',
+     as 'Cfn::Value';
+
+coerce 'Cfn::Resource::Properties::AWS::DMS::Endpoint::MySqlSettings',
+  from 'HashRef',
+   via {
+     if (my $f = Cfn::TypeLibrary::try_function($_)) {
+       return $f
+     } else {
+       return Cfn::Resource::Properties::Object::AWS::DMS::Endpoint::MySqlSettings->new( %$_ );
+     }
+   };
+
+package Cfn::Resource::Properties::Object::AWS::DMS::Endpoint::MySqlSettings {
+  use Moose;
+  use MooseX::StrictConstructor;
+  extends 'Cfn::Value::TypedValue';
+  
+  has SecretsManagerAccessRoleArn => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has SecretsManagerSecretId => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+}
+
 subtype 'Cfn::Resource::Properties::AWS::DMS::Endpoint::MongoDbSettings',
      as 'Cfn::Value';
 
@@ -101,8 +213,32 @@ package Cfn::Resource::Properties::Object::AWS::DMS::Endpoint::MongoDbSettings {
   has NestingLevel => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has Password => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has Port => (isa => 'Cfn::Value::Integer', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has SecretsManagerAccessRoleArn => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has SecretsManagerSecretId => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has ServerName => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has Username => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+}
+
+subtype 'Cfn::Resource::Properties::AWS::DMS::Endpoint::MicrosoftSqlServerSettings',
+     as 'Cfn::Value';
+
+coerce 'Cfn::Resource::Properties::AWS::DMS::Endpoint::MicrosoftSqlServerSettings',
+  from 'HashRef',
+   via {
+     if (my $f = Cfn::TypeLibrary::try_function($_)) {
+       return $f
+     } else {
+       return Cfn::Resource::Properties::Object::AWS::DMS::Endpoint::MicrosoftSqlServerSettings->new( %$_ );
+     }
+   };
+
+package Cfn::Resource::Properties::Object::AWS::DMS::Endpoint::MicrosoftSqlServerSettings {
+  use Moose;
+  use MooseX::StrictConstructor;
+  extends 'Cfn::Value::TypedValue';
+  
+  has SecretsManagerAccessRoleArn => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has SecretsManagerSecretId => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
 }
 
 subtype 'Cfn::Resource::Properties::AWS::DMS::Endpoint::KinesisSettings',
@@ -150,6 +286,28 @@ package Cfn::Resource::Properties::Object::AWS::DMS::Endpoint::KafkaSettings {
   has Topic => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
 }
 
+subtype 'Cfn::Resource::Properties::AWS::DMS::Endpoint::IbmDb2Settings',
+     as 'Cfn::Value';
+
+coerce 'Cfn::Resource::Properties::AWS::DMS::Endpoint::IbmDb2Settings',
+  from 'HashRef',
+   via {
+     if (my $f = Cfn::TypeLibrary::try_function($_)) {
+       return $f
+     } else {
+       return Cfn::Resource::Properties::Object::AWS::DMS::Endpoint::IbmDb2Settings->new( %$_ );
+     }
+   };
+
+package Cfn::Resource::Properties::Object::AWS::DMS::Endpoint::IbmDb2Settings {
+  use Moose;
+  use MooseX::StrictConstructor;
+  extends 'Cfn::Value::TypedValue';
+  
+  has SecretsManagerAccessRoleArn => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has SecretsManagerSecretId => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+}
+
 subtype 'Cfn::Resource::Properties::AWS::DMS::Endpoint::ElasticsearchSettings',
      as 'Cfn::Value';
 
@@ -195,6 +353,28 @@ package Cfn::Resource::Properties::Object::AWS::DMS::Endpoint::DynamoDbSettings 
   has ServiceAccessRoleArn => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
 }
 
+subtype 'Cfn::Resource::Properties::AWS::DMS::Endpoint::DocDbSettings',
+     as 'Cfn::Value';
+
+coerce 'Cfn::Resource::Properties::AWS::DMS::Endpoint::DocDbSettings',
+  from 'HashRef',
+   via {
+     if (my $f = Cfn::TypeLibrary::try_function($_)) {
+       return $f
+     } else {
+       return Cfn::Resource::Properties::Object::AWS::DMS::Endpoint::DocDbSettings->new( %$_ );
+     }
+   };
+
+package Cfn::Resource::Properties::Object::AWS::DMS::Endpoint::DocDbSettings {
+  use Moose;
+  use MooseX::StrictConstructor;
+  extends 'Cfn::Value::TypedValue';
+  
+  has SecretsManagerAccessRoleArn => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has SecretsManagerSecretId => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+}
+
 package Cfn::Resource::Properties::AWS::DMS::Endpoint {
   use Moose;
   use MooseX::StrictConstructor;
@@ -202,22 +382,31 @@ package Cfn::Resource::Properties::AWS::DMS::Endpoint {
   
   has CertificateArn => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has DatabaseName => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has DocDbSettings => (isa => 'Cfn::Resource::Properties::AWS::DMS::Endpoint::DocDbSettings', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has DynamoDbSettings => (isa => 'Cfn::Resource::Properties::AWS::DMS::Endpoint::DynamoDbSettings', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has ElasticsearchSettings => (isa => 'Cfn::Resource::Properties::AWS::DMS::Endpoint::ElasticsearchSettings', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has EndpointIdentifier => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has EndpointType => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has EngineName => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has ExtraConnectionAttributes => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has IbmDb2Settings => (isa => 'Cfn::Resource::Properties::AWS::DMS::Endpoint::IbmDb2Settings', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has KafkaSettings => (isa => 'Cfn::Resource::Properties::AWS::DMS::Endpoint::KafkaSettings', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has KinesisSettings => (isa => 'Cfn::Resource::Properties::AWS::DMS::Endpoint::KinesisSettings', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has KmsKeyId => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
+  has MicrosoftSqlServerSettings => (isa => 'Cfn::Resource::Properties::AWS::DMS::Endpoint::MicrosoftSqlServerSettings', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has MongoDbSettings => (isa => 'Cfn::Resource::Properties::AWS::DMS::Endpoint::MongoDbSettings', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has MySqlSettings => (isa => 'Cfn::Resource::Properties::AWS::DMS::Endpoint::MySqlSettings', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has NeptuneSettings => (isa => 'Cfn::Resource::Properties::AWS::DMS::Endpoint::NeptuneSettings', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has OracleSettings => (isa => 'Cfn::Resource::Properties::AWS::DMS::Endpoint::OracleSettings', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has Password => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has Port => (isa => 'Cfn::Value::Integer', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has PostgreSqlSettings => (isa => 'Cfn::Resource::Properties::AWS::DMS::Endpoint::PostgreSqlSettings', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has RedshiftSettings => (isa => 'Cfn::Resource::Properties::AWS::DMS::Endpoint::RedshiftSettings', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has ResourceIdentifier => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
   has S3Settings => (isa => 'Cfn::Resource::Properties::AWS::DMS::Endpoint::S3Settings', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has ServerName => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has SslMode => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has SybaseSettings => (isa => 'Cfn::Resource::Properties::AWS::DMS::Endpoint::SybaseSettings', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has Tags => (isa => 'ArrayOfCfn::Resource::Properties::TagType', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
   has Username => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
 }

@@ -50,6 +50,7 @@ my %WriteMakefileArgs = (
     "Sah::Schema::date::month_num" => 0,
     "Sah::Schema::date::month_nums" => 0,
     "Sah::Schema::perl::modname" => 0,
+    "Sah::Schema::posint" => 0,
     "Sah::Schema::true" => 0,
     "strict" => 0,
     "warnings" => 0
@@ -60,7 +61,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.101",
+  "VERSION" => "0.102",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -101,6 +102,7 @@ my %FallbackPrereqs = (
   "Sah::Schema::date::month_num" => 0,
   "Sah::Schema::date::month_nums" => 0,
   "Sah::Schema::perl::modname" => 0,
+  "Sah::Schema::posint" => 0,
   "Sah::Schema::true" => 0,
   "Test::More" => 0,
   "strict" => 0,

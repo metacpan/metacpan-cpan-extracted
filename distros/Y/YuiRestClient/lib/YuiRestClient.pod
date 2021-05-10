@@ -9,11 +9,6 @@ See documentation of the L<libyui-rest-api project|https://github.com/libyui/lib
 for more details about server side implementation.
 
 
-=head1 VERSION
-
-This document describes L<YuiRestClient> version B<%VERSION%>.
-
-
 =head1 SYNOPSIS
 
   use YuiRestClient;

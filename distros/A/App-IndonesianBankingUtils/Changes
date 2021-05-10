@@ -1,3 +1,10 @@
+0.145   2021-05-07  Released-By: PERLANCAR; Urgency: medium; Backward-Incompatible: yes
+
+	- [incompatible change] Update to newer
+	  Business::BankCard::Indonesia & Business::BankList::Indonesia
+	  (renamed CLIs list-id{,n}-{bank-cards,banks}.
+
+
 0.144   2020-03-18  Released-By: PERLANCAR; Urgency: medium
 
         - [build] Rebuild with updated Log::ger* modules.

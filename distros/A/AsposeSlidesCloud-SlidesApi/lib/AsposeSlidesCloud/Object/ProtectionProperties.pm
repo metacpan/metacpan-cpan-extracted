@@ -193,20 +193,56 @@ __PACKAGE__->method_documentation({
     	format => '',
     	read_only => '',
     		},
+    'read_password' => {
+    	datatype => 'string',
+    	base_name => 'ReadPassword',
+    	description => 'Password for read protection.',
+    	format => '',
+    	read_only => '',
+    		},
+    'write_password' => {
+    	datatype => 'string',
+    	base_name => 'WritePassword',
+    	description => 'Password for write protection.',
+    	format => '',
+    	read_only => '',
+    		},
+    'is_write_protected' => {
+    	datatype => 'boolean',
+    	base_name => 'IsWriteProtected',
+    	description => 'Returns true if the presentation protected for editing. ',
+    	format => '',
+    	read_only => '',
+    		},
+    'is_encrypted' => {
+    	datatype => 'boolean',
+    	base_name => 'IsEncrypted',
+    	description => 'Returns true if the presentation protected for reading. ',
+    	format => '',
+    	read_only => '',
+    		},
 });
 
 __PACKAGE__->swagger_types( {
     'self_uri' => 'ResourceUri',
     'alternate_links' => 'ARRAY[ResourceUri]',
     'encrypt_document_properties' => 'boolean',
-    'read_only_recommended' => 'boolean'
+    'read_only_recommended' => 'boolean',
+    'read_password' => 'string',
+    'write_password' => 'string',
+    'is_write_protected' => 'boolean',
+    'is_encrypted' => 'boolean'
 } );
 
 __PACKAGE__->attribute_map( {
     'self_uri' => 'SelfUri',
     'alternate_links' => 'AlternateLinks',
     'encrypt_document_properties' => 'EncryptDocumentProperties',
-    'read_only_recommended' => 'ReadOnlyRecommended'
+    'read_only_recommended' => 'ReadOnlyRecommended',
+    'read_password' => 'ReadPassword',
+    'write_password' => 'WritePassword',
+    'is_write_protected' => 'IsWriteProtected',
+    'is_encrypted' => 'IsEncrypted'
 } );
 
 __PACKAGE__->mk_accessors(keys %{__PACKAGE__->attribute_map});

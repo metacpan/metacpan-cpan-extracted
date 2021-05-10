@@ -2,8 +2,8 @@ NAME
     Complete::Rclone - Completion routines related to rclone
 
 VERSION
-    This document describes version 0.002 of Complete::Rclone (from Perl
-    distribution Complete-Rclone), released on 2021-05-01.
+    This document describes version 0.003 of Complete::Rclone (from Perl
+    distribution Complete-Rclone), released on 2021-05-09.
 
 FUNCTIONS
   complete_rclone_remote
@@ -17,11 +17,14 @@ FUNCTIONS
 
     Arguments ('*' denotes required arguments):
 
-    *   config_dirs => *array[filename]*
+    *   rclone_config_dirs => *array[dirname]*
 
-    *   config_filenames => *array[filename]*
+    *   rclone_config_filenames => *array[filename]*
 
     *   type => *str*
+
+        Only list remotes of a certain type (e.g. "drive" for Google Drive,
+        "google photos" for Google Photos).
 
     *   word* => *str*
 

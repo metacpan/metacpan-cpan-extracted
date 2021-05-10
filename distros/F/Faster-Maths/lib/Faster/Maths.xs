@@ -24,24 +24,25 @@ static XOP xop_multimath;
 static OP *pp_multimath(pTHX)
 {
   dSP;
+  dTARGET;
   UNOP_AUX_item *aux = cUNOP_AUX->op_aux;
 
   char *prog = GET_UNOP_AUX_item_pv(aux[0]) + 1; /* skip leading '(' */
   U32 ntmps = PL_op->op_private;
 
   U32 tmpi = 1;
-  SV *accum = PAD_SV(aux[tmpi].pad_offset);
+  NV accum;
 
   U32 auxi = 1 + ntmps;
 
   switch(*(prog++)) {
     case 'p':
-      sv_setnv(accum, SvNV_nomg(PAD_SV(aux[auxi].pad_offset)));
+      accum = SvNV_nomg(PAD_SV(aux[auxi].pad_offset));
       auxi++;
       break;
 
     case 'c':
-      sv_setnv(accum, SvNV_nomg(aux[auxi].sv));
+      accum = SvNV_nomg(aux[auxi].sv);
       auxi++;
       break;
 
@@ -57,20 +58,20 @@ static OP *pp_multimath(pTHX)
       case '*':
       case '/':
       {
-        SV *rhs;
+        NV rhs;
         switch(*(prog++)) {
           case 'p':
-            rhs = PAD_SV(aux[auxi].pad_offset);
+            rhs = SvNV_nomg(PAD_SV(aux[auxi].pad_offset));
             auxi++;
             break;
           case 'c':
-            rhs = aux[auxi].sv;
+            rhs = SvNV_nomg(aux[auxi].sv);
             auxi++;
             break;
           case ')':
             rhs = accum;
             tmpi--;
-            accum = PAD_SV(aux[tmpi].pad_offset);
+            accum = SvNV_nomg(PAD_SV(aux[tmpi].pad_offset));
             break;
           default:
             croak("ARGH MULTIMATH arg %c\n", prog[-1]);
@@ -78,16 +79,16 @@ static OP *pp_multimath(pTHX)
 
         switch(op) {
           case '+':
-            sv_setnv(accum, SvNV_nomg(accum) + SvNV_nomg(rhs));
+            accum += rhs;
             break;
           case '-':
-            sv_setnv(accum, SvNV_nomg(accum) - SvNV_nomg(rhs));
+            accum -= rhs;
             break;
           case '*':
-            sv_setnv(accum, SvNV_nomg(accum) * SvNV_nomg(rhs));
+            accum *= rhs;
             break;
           case '/':
-            sv_setnv(accum, SvNV_nomg(accum) / SvNV_nomg(rhs));
+            accum /= rhs;
             break;
         }
         break;
@@ -95,20 +96,20 @@ static OP *pp_multimath(pTHX)
 
       case '(':
       {
-        SV *val;
+        NV val;
         switch(*(prog++)) {
           case 'p':
-            val = PAD_SV(aux[auxi].pad_offset);
+            val = SvNV_nomg(PAD_SV(aux[auxi].pad_offset));
             auxi++;
             break;
           case 'c':
-            val = aux[auxi].sv;
+            val = SvNV_nomg(aux[auxi].sv);
             auxi++;
             break;
         }
+        sv_setnv(PAD_SV(aux[tmpi].pad_offset), accum);
         tmpi++;
-        accum = PAD_SV(aux[tmpi].pad_offset);
-        sv_setnv(accum, SvNV_nomg(val));
+        accum = val;
         break;
       }
 
@@ -118,7 +119,7 @@ static OP *pp_multimath(pTHX)
   }
 
   EXTEND(SP, 1);
-  PUSHs(accum);
+  PUSHn(accum);
   RETURN;
 }
 
@@ -228,25 +229,27 @@ do_BINOP:
   OP *retop = newUNOP_AUX(OP_CUSTOM, 0, NULL, aux);
   retop->op_ppaddr = &pp_multimath;
   retop->op_private = ntmps;
+  retop->op_targ = final->op_targ;
 
   return retop;
 }
 
-static void (*next_rpeepp)(pTHX_ OP *o);
-
-static void
-my_rpeepp(pTHX_ OP *o)
+static void rpeep_for_fastermaths(pTHX_ OP *o, bool init_enabled);
+static void rpeep_for_fastermaths(pTHX_ OP *o, bool init_enabled)
 {
-  if(!o)
-    return;
-
-  (*next_rpeepp)(aTHX_ o);
-
-  bool enabled = FALSE;
+  bool enabled = init_enabled;
 
   OP *prevo = NULL;
 
-  while(o) {
+  /* In some cases (e.g.  while(1) { ... } ) the ->op_next chain actually
+   * forms a closed loop. In order to detect this loop and break out we'll
+   * advance the `slowo` pointer half as fast as o. If o is ever equal to
+   * slowo then we have reached a cycle and should stop
+   */
+  OP *slowo = NULL;
+  int slowotick = 0;
+
+  while(o && o != slowo) {
     if(o->op_type == OP_NEXTSTATE) {
       SV *sv = cop_hints_fetch_pvs(cCOPo, "Faster::Maths/faster", 0);
       enabled = sv && sv != &PL_sv_placeholder && SvTRUE(sv);
@@ -262,6 +265,31 @@ my_rpeepp(pTHX_ OP *o)
       case OP_CONST:
       case OP_PADSV:
         break;
+
+      case OP_OR:
+      case OP_AND:
+      case OP_DOR:
+#if HAVE_PERL_VERSION(5,32,0)
+      case OP_CMPCHAIN_AND:
+#endif
+      case OP_COND_EXPR:
+      case OP_MAPWHILE:
+      case OP_ANDASSIGN:
+      case OP_ORASSIGN:
+      case OP_DORASSIGN:
+      case OP_RANGE:
+      case OP_ONCE:
+#if HAVE_PERL_VERSION(5,26,0)
+      case OP_ARGDEFELEM:
+#endif
+        /* Optimize on the righthand side of `or` / `and` operators and other.
+         * similar cases. This might catch more things than perl's own
+         * recursion inside because simple expressions don't begin with an
+         * OP_NEXTSTATE
+         */
+        if(cLOGOPo->op_other && cLOGOPo->op_other->op_type != OP_NEXTSTATE)
+          rpeep_for_fastermaths(aTHX_ cLOGOPo->op_other, enabled);
+        goto next_o;
 
       default:
         goto next_o;
@@ -334,6 +362,7 @@ done_scout:
       prevo->op_next = o = newo;
     else {
       /* we optimized starting at the very first op in this chain */
+      o->op_targ = o->op_type;
       o->op_type = OP_NULL;
       o->op_next = newo;
 
@@ -341,9 +370,27 @@ done_scout:
     }
 
 next_o:
+    if(!slowo)
+      slowo = o;
+    else if((slowotick++) % 2)
+      slowo = slowo->op_next;
+
     prevo = o;
     o = o->op_next;
   }
+}
+
+static void (*next_rpeepp)(pTHX_ OP *o);
+
+static void
+my_rpeepp(pTHX_ OP *o)
+{
+  if(!o)
+    return;
+
+  (*next_rpeepp)(aTHX_ o);
+
+  rpeep_for_fastermaths(aTHX_ o, FALSE);
 }
 
 MODULE = Faster::Maths    PACKAGE = Faster::Maths

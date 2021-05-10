@@ -1,11 +1,12 @@
-package Dist::Zilla::Plugin::Author::Plicease::MakeMaker 2.62 {
+package Dist::Zilla::Plugin::Author::Plicease::MakeMaker 2.63 {
 
-  use 5.014;
+  use 5.020;
   use Moose;
   use namespace::autoclean;
   use Perl::Tidy ();
   use Dist::Zilla::Plugin::Author::Plicease ();
   use List::Util qw( first );
+  use experimental qw( postderef );
 
   # ABSTRACT: munge the AUTHOR section
 
@@ -24,7 +25,7 @@ package Dist::Zilla::Plugin::Author::Plicease::MakeMaker 2.62 {
              map { s/^lib\///r }
              grep /^lib\/.*\.p(od|m)$/,
              map { $_->name }
-             @{ $self->zilla->files };
+             $self->zilla->files->@*;
     $h->{PM} = \%PM;
 
     $h;
@@ -35,12 +36,12 @@ package Dist::Zilla::Plugin::Author::Plicease::MakeMaker 2.62 {
 
     $self->$orig(@args);
 
-    my $file   = first { $_->name eq 'Makefile.PL' }        @{ $self->zilla->files };
-    my $mod    = first { $_->name eq 'inc/mymm.pl' }        @{ $self->zilla->files };
-    my $config = first { $_->name eq 'inc/mymm-config.pl' } @{ $self->zilla->files };
-    my $build  = first { $_->name eq 'inc/mymm-build.pl' }  @{ $self->zilla->files };
-    my $test   = first { $_->name eq 'inc/mymm-test.pl' }   @{ $self->zilla->files };
-    my $clean  = first { $_->name eq 'inc/mymm-clean.pl' }  @{ $self->zilla->files };
+    my $file   = first { $_->name eq 'Makefile.PL' }        $self->zilla->files->@*;
+    my $mod    = first { $_->name eq 'inc/mymm.pl' }        $self->zilla->files->@*;
+    my $config = first { $_->name eq 'inc/mymm-config.pl' } $self->zilla->files->@*;
+    my $build  = first { $_->name eq 'inc/mymm-build.pl' }  $self->zilla->files->@*;
+    my $test   = first { $_->name eq 'inc/mymm-test.pl' }   $self->zilla->files->@*;
+    my $clean  = first { $_->name eq 'inc/mymm-clean.pl' }  $self->zilla->files->@*;
 
     my @content = do {
       my $in  = $file->content;
@@ -229,7 +230,7 @@ package Dist::Zilla::Plugin::Author::Plicease::MakeMaker 2.62 {
     my($orig, $self, @args) = @_;
     my $h = $self->$orig(@args);
 
-    my $mod  = first { $_->name eq 'inc/mymm.pl' } @{ $self->zilla->files };
+    my $mod  = first { $_->name eq 'inc/mymm.pl' } $self->zilla->files->@*;
     if($mod)
     {
       $self->zilla->register_prereqs(
@@ -238,7 +239,7 @@ package Dist::Zilla::Plugin::Author::Plicease::MakeMaker 2.62 {
       );
     }
 
-    my $test = first { $_->name eq 'inc/mymm-test.pl' } @{ $self->zilla->files };
+    my $test = first { $_->name eq 'inc/mymm-test.pl' } $self->zilla->files->@*;
     if($test)
     {
       $self->zilla->register_prereqs(
@@ -256,7 +257,7 @@ package Dist::Zilla::Plugin::Author::Plicease::MakeMaker 2.62 {
 
     my %meta;
 
-    my $mod  = first { $_->name eq 'inc/mymm.pl' } @{ $self->zilla->files };
+    my $mod  = first { $_->name eq 'inc/mymm.pl' } $self->zilla->files->@*;
 
     $meta{dynamic_config} = 1 if $mod;
 
@@ -280,7 +281,7 @@ Dist::Zilla::Plugin::Author::Plicease::MakeMaker - munge the AUTHOR section
 
 =head1 VERSION
 
-version 2.62
+version 2.63
 
 =head1 SYNOPSIS
 

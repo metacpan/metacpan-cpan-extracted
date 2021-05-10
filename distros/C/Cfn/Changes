@@ -1,3 +1,6 @@
+0.14
+  - 
+ 
 0.13 2020-12-04
   - Implements the resources in CloudFormation spec 21.0.0 (published as of 2020-12-04)
   - Added minimal documentation for resource classes

@@ -5,7 +5,7 @@ NAME
 
 VERSION
 
-    version 2.62
+    version 2.63
 
 SYNOPSIS
 
@@ -63,8 +63,6 @@ DESCRIPTION
      exclude_match = ^_build/
      
      [PruneCruft]
-     except = .travis.yml
-     
      [ManifestSkip]
      [MetaYAML]
      [License]
@@ -107,8 +105,9 @@ DESCRIPTION
      repository.web = https://github.com/plicease/My-Dist
      
      [InstallGuide]
-     [ConfirmRelease]
      [MinimumPerl]
+     [Author::Plicease::SpecialPrereqs]
+     [ConfirmRelease]
      
      [Author::Plicease::ReadmeAnyFromPod]
      filename = README
@@ -118,19 +117,9 @@ DESCRIPTION
      [Author::Plicease::ReadmeAnyFromPod / ReadMePodInRoot]
      filename = README.md
      location = root
-     travis_status = 0
      type = gfm
      
-     [Author::Plicease::SpecialPrereqs]
      [Author::Plicease::NoUnsafeInc]
-
-    Some exceptions:
-
-    MSWin32
-
-      Installing Dist::Zilla::Plugin::Git::* on MSWin32 is a pain so it is
-      also not a prereq on that platform, isn't used and as a result
-      releasing from MSWin32 is not allowed.
 
 OPTIONS
 
@@ -159,28 +148,6 @@ OPTIONS
 
     Passed into the Author::Plicease::Tests if release_tests is true.
 
- travis_status
-
-    if set to true, then include a link to the travis build page in the
-    readme.
-
- travis_com
-
-    If set to true use travis-ci.com instead of travis-ci.org.
-
- travis_base
-
-    Base URL for travis-ci.
-
- travis_image_base
-
-    Base URL for the travis-ci status button.
-
- appveyor
-
-    if set to a appveyor id, then include a link to the appveyor build page
-    in the readme.
-
  mb_class
 
     if builder = ModuleBuild, this is the mb_class passed into the
@@ -194,17 +161,9 @@ OPTIONS
 
     Set the GitHub user name.
 
- travis_user
-
-    Set the travis user name (defaults to github_user).
-
- appveyor_user
-
-    Set the appveyor username (defaults to plicease).
-
  cirrus_user
 
-    Set the cirrus-ci user (defaults to same as travis_user, which itself
+    Set the cirrus-ci user (defaults to same as github_user, which itself
     defaults to plicease).
 
  copy_mb
@@ -237,6 +196,14 @@ OPTIONS
  perl
 
     Specify a minimum Perl version. If not specified it will be detected.
+
+ win32
+
+    If set to true, then the dist MUST be released on MSWin32. This is
+    useful for Win32:: type dists that aren't testable on Unixy platforms.
+
+    If set to false, then the dist MUST NOT be released on MSWin32. This is
+    a personal preference; I prefer not to release on non-Unixy platforms.
 
 SEE ALSO
 

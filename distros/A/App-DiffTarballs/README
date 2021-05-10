@@ -2,8 +2,8 @@ NAME
     App::DiffTarballs - Diff contents of two tarballs
 
 VERSION
-    This document describes version 0.003 of App::DiffTarballs (from Perl
-    distribution App-DiffTarballs), released on 2017-08-07.
+    This document describes version 0.004 of App::DiffTarballs (from Perl
+    distribution App-DiffTarballs), released on 2021-05-09.
 
 SYNOPSIS
     See the included script diff-tarballs.
@@ -12,7 +12,7 @@ FUNCTIONS
   diff_tarballs
     Usage:
 
-     diff_tarballs(%args) -> [status, msg, result, meta]
+     diff_tarballs(%args) -> [status, msg, payload, meta]
 
     Diff contents of two tarballs.
 
@@ -21,9 +21,13 @@ FUNCTIONS
     *   Show diff between two Perl releases:
 
          diff_tarballs(
-           tarball1 => "My-Dist-1.001.tar.gz",
+             tarball1 => "My-Dist-1.001.tar.gz",
            tarball2 => "My-Dist-1.002.tar.bz2"
          );
+
+    This utility extracts the two tarballs to temporary directories and then
+    perform "diff -ruN" against the two. It deletes the temporary
+    directories afterwards.
 
     This function is not exported.
 
@@ -38,21 +42,34 @@ FUNCTIONS
     First element (status) is an integer containing HTTP status code (200
     means OK, 4xx caller error, 5xx function error). Second element (msg) is
     a string containing error message, or 'OK' if status is 200. Third
-    element (result) is optional, the actual result. Fourth element (meta)
+    element (payload) is optional, the actual result. Fourth element (meta)
     is called result metadata and is optional, a hash that contains extra
     information.
 
     Return value: (any)
 
 ENVIRONMENT
-  DEBUG => bool
-    If set to true, will cause temporary directories to not being cleaned up
-    after the program is done.
+  DEBUG
+    Bool. If set to true, will cause temporary directories to not being
+    cleaned up after the program is done.
 
-  DIFF => str
-    Set diff command to use. Defaults to "diff -ruN". For example, you can
-    set it to "diff --color -ruN" ("--color" requires GNU diff 3.4 or
-    later), or "colordiff -ruN".
+  DIFF
+    String. Set diff command to use. Defaults to "diff -ruN". For example,
+    you can set it to "diff --color -ruN" ("--color" requires GNU diff 3.4
+    or later), or "colordiff -ruN".
+
+  NO_COLOR
+    If set (and "DIFF" is not set), will add "--color=never" option to diff
+    command.
+
+  COLOR => bool
+    If set to true (and "DIFF" is not set), will add "--color=always" option
+    to diff command.
+
+    If set to false (and "DIFF" is not set), will add "--color=never" option
+    to diff command.
+
+    Note that "NO_COLOR" takes precedence.
 
 HOMEPAGE
     Please visit the project's homepage at
@@ -73,7 +90,7 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2017 by perlancar@cpan.org.
+    This software is copyright (c) 2021, 2017, 2016 by perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

@@ -23,13 +23,13 @@ produces output
     /usr/home/ben/projects/xs-check/examples/synopsis.xs:3: len is not a STRLEN variable (unsigned int ).
 
 
-(This example is included as L<F<synopsis.pl>|https://fastapi.metacpan.org/source/BKB/XS-Check-0.11/examples/synopsis.pl> in the distribution.)
+(This example is included as L<F<synopsis.pl>|https://fastapi.metacpan.org/source/BKB/XS-Check-0.12/examples/synopsis.pl> in the distribution.)
 
 
 =head1 VERSION
 
-This documents version 0.11 of XS-Check
-corresponding to L<git commit e0a989758dadf34879764978928ea2a98bf562f7|https://github.com/benkasminbullock/xs-check/commit/e0a989758dadf34879764978928ea2a98bf562f7> released on Sun Dec 27 12:55:27 2020 +0900.
+This documents version 0.12 of XS-Check
+corresponding to L<git commit 09c996b41cd1b91df7a1bb10a3b5624bb361939f|https://github.com/benkasminbullock/xs-check/commit/09c996b41cd1b91df7a1bb10a3b5624bb361939f> released on Sun May 9 10:44:08 2021 +0900.
 
 =head1 DESCRIPTION
 
@@ -96,7 +96,7 @@ produces output
     Remove the 'Perl_' prefix from Perl_croak at 1.
 
 
-(This example is included as L<F<reporter.pl>|https://fastapi.metacpan.org/source/BKB/XS-Check-0.11/examples/reporter.pl> in the distribution.)
+(This example is included as L<F<reporter.pl>|https://fastapi.metacpan.org/source/BKB/XS-Check-0.12/examples/reporter.pl> in the distribution.)
 
 
 This was added in version 0.07 of the module..
@@ -140,7 +140,7 @@ produces output
     1: Remove the 'Perl_' prefix from Perl_croak.
 
 
-(This example is included as L<F<set-file.pl>|https://fastapi.metacpan.org/source/BKB/XS-Check-0.11/examples/set-file.pl> in the distribution.)
+(This example is included as L<F<set-file.pl>|https://fastapi.metacpan.org/source/BKB/XS-Check-0.12/examples/set-file.pl> in the distribution.)
 
 
 This was added in version 0.08 of the module.
@@ -234,7 +234,7 @@ This was added in version 0.10 of the module.
 
 =head1 LIMITATIONS
 
-As of 0.11, the module has the following limitations.
+As of 0.12, the module has the following limitations.
 
 =over
 
@@ -312,6 +312,27 @@ Print the version of XS::Check in use.
 
 =head1 SEE ALSO
 
+=head2 Other CPAN modules
+
+=over
+
+=item ExtUtils::ParseXS
+
+L<ExtUtils::ParseXS> is Perl's parser for XS which converts XS code
+into C.
+
+=item Test::XS::Check
+
+L<Test::XS::Check> is a test module based on this one.
+
+=item XS::Tutorial
+
+L<XS::Tutorial> is a tutorial about programming in XS.
+
+=back
+
+=head2 More information
+
 =over
 
 =item L<Perl XS modules and CPAN testers|https://www.lemoda.net/perl/perl-xs-cpan-testers/index.html>
@@ -330,7 +351,7 @@ Ben Bullock, <bkb@cpan.org>
 =head1 COPYRIGHT & LICENCE
 
 This package and associated files are copyright (C) 
-2017-2020
+2017-2021
 Ben Bullock.
 
 You can use, copy, modify and redistribute this package and associated

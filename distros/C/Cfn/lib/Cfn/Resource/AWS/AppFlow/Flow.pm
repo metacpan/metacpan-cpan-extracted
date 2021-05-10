@@ -1,4 +1,4 @@
-# AWS::AppFlow::Flow generated from spec 18.4.0
+# AWS::AppFlow::Flow generated from spec 34.0.0
 use Moose::Util::TypeConstraints;
 
 coerce 'Cfn::Resource::Properties::AWS::AppFlow::Flow',
@@ -63,6 +63,29 @@ package Cfn::Resource::Properties::Object::AWS::AppFlow::Flow::AggregationConfig
   has AggregationType => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
 }
 
+subtype 'Cfn::Resource::Properties::AWS::AppFlow::Flow::UpsolverS3OutputFormatConfig',
+     as 'Cfn::Value';
+
+coerce 'Cfn::Resource::Properties::AWS::AppFlow::Flow::UpsolverS3OutputFormatConfig',
+  from 'HashRef',
+   via {
+     if (my $f = Cfn::TypeLibrary::try_function($_)) {
+       return $f
+     } else {
+       return Cfn::Resource::Properties::Object::AWS::AppFlow::Flow::UpsolverS3OutputFormatConfig->new( %$_ );
+     }
+   };
+
+package Cfn::Resource::Properties::Object::AWS::AppFlow::Flow::UpsolverS3OutputFormatConfig {
+  use Moose;
+  use MooseX::StrictConstructor;
+  extends 'Cfn::Value::TypedValue';
+  
+  has AggregationConfig => (isa => 'Cfn::Resource::Properties::AWS::AppFlow::Flow::AggregationConfig', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has FileType => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has PrefixConfig => (isa => 'Cfn::Resource::Properties::AWS::AppFlow::Flow::PrefixConfig', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+}
+
 subtype 'Cfn::Resource::Properties::AWS::AppFlow::Flow::S3OutputFormatConfig',
      as 'Cfn::Value';
 
@@ -84,6 +107,27 @@ package Cfn::Resource::Properties::Object::AWS::AppFlow::Flow::S3OutputFormatCon
   has AggregationConfig => (isa => 'Cfn::Resource::Properties::AWS::AppFlow::Flow::AggregationConfig', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has FileType => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has PrefixConfig => (isa => 'Cfn::Resource::Properties::AWS::AppFlow::Flow::PrefixConfig', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+}
+
+subtype 'Cfn::Resource::Properties::AWS::AppFlow::Flow::IdFieldNamesList',
+     as 'Cfn::Value';
+
+coerce 'Cfn::Resource::Properties::AWS::AppFlow::Flow::IdFieldNamesList',
+  from 'HashRef',
+   via {
+     if (my $f = Cfn::TypeLibrary::try_function($_)) {
+       return $f
+     } else {
+       return Cfn::Resource::Properties::Object::AWS::AppFlow::Flow::IdFieldNamesList->new( %$_ );
+     }
+   };
+
+package Cfn::Resource::Properties::Object::AWS::AppFlow::Flow::IdFieldNamesList {
+  use Moose;
+  use MooseX::StrictConstructor;
+  extends 'Cfn::Value::TypedValue';
+  
+  has IdFieldNamesList => (isa => 'Cfn::Value::Array|Cfn::Value::Function|Cfn::DynamicValue', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
 }
 
 subtype 'Cfn::Resource::Properties::AWS::AppFlow::Flow::ErrorHandlingConfig',
@@ -149,6 +193,29 @@ package Cfn::Resource::Properties::Object::AWS::AppFlow::Flow::VeevaSourceProper
   extends 'Cfn::Value::TypedValue';
   
   has Object => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+}
+
+subtype 'Cfn::Resource::Properties::AWS::AppFlow::Flow::UpsolverDestinationProperties',
+     as 'Cfn::Value';
+
+coerce 'Cfn::Resource::Properties::AWS::AppFlow::Flow::UpsolverDestinationProperties',
+  from 'HashRef',
+   via {
+     if (my $f = Cfn::TypeLibrary::try_function($_)) {
+       return $f
+     } else {
+       return Cfn::Resource::Properties::Object::AWS::AppFlow::Flow::UpsolverDestinationProperties->new( %$_ );
+     }
+   };
+
+package Cfn::Resource::Properties::Object::AWS::AppFlow::Flow::UpsolverDestinationProperties {
+  use Moose;
+  use MooseX::StrictConstructor;
+  extends 'Cfn::Value::TypedValue';
+  
+  has BucketName => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has BucketPrefix => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has S3OutputFormatConfig => (isa => 'Cfn::Resource::Properties::AWS::AppFlow::Flow::UpsolverS3OutputFormatConfig', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
 }
 
 subtype 'Cfn::Resource::Properties::AWS::AppFlow::Flow::TrendmicroSourceProperties',
@@ -301,7 +368,9 @@ package Cfn::Resource::Properties::Object::AWS::AppFlow::Flow::SalesforceDestina
   extends 'Cfn::Value::TypedValue';
   
   has ErrorHandlingConfig => (isa => 'Cfn::Resource::Properties::AWS::AppFlow::Flow::ErrorHandlingConfig', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has IdFieldNames => (isa => 'Cfn::Resource::Properties::AWS::AppFlow::Flow::IdFieldNamesList', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has Object => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has WriteOperationType => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
 }
 
 subtype 'Cfn::Resource::Properties::AWS::AppFlow::Flow::S3SourceProperties',
@@ -392,6 +461,27 @@ package Cfn::Resource::Properties::Object::AWS::AppFlow::Flow::MarketoSourceProp
   extends 'Cfn::Value::TypedValue';
   
   has Object => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+}
+
+subtype 'Cfn::Resource::Properties::AWS::AppFlow::Flow::LookoutMetricsDestinationProperties',
+     as 'Cfn::Value';
+
+coerce 'Cfn::Resource::Properties::AWS::AppFlow::Flow::LookoutMetricsDestinationProperties',
+  from 'HashRef',
+   via {
+     if (my $f = Cfn::TypeLibrary::try_function($_)) {
+       return $f
+     } else {
+       return Cfn::Resource::Properties::Object::AWS::AppFlow::Flow::LookoutMetricsDestinationProperties->new( %$_ );
+     }
+   };
+
+package Cfn::Resource::Properties::Object::AWS::AppFlow::Flow::LookoutMetricsDestinationProperties {
+  use Moose;
+  use MooseX::StrictConstructor;
+  extends 'Cfn::Value::TypedValue';
+  
+  has Object => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
 }
 
 subtype 'Cfn::Resource::Properties::AWS::AppFlow::Flow::InforNexusSourceProperties',
@@ -624,6 +714,27 @@ package Cfn::Resource::Properties::Object::AWS::AppFlow::Flow::ScheduledTriggerP
   has TimeZone => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
 }
 
+subtype 'Cfn::Resource::Properties::AWS::AppFlow::Flow::IncrementalPullConfig',
+     as 'Cfn::Value';
+
+coerce 'Cfn::Resource::Properties::AWS::AppFlow::Flow::IncrementalPullConfig',
+  from 'HashRef',
+   via {
+     if (my $f = Cfn::TypeLibrary::try_function($_)) {
+       return $f
+     } else {
+       return Cfn::Resource::Properties::Object::AWS::AppFlow::Flow::IncrementalPullConfig->new( %$_ );
+     }
+   };
+
+package Cfn::Resource::Properties::Object::AWS::AppFlow::Flow::IncrementalPullConfig {
+  use Moose;
+  use MooseX::StrictConstructor;
+  extends 'Cfn::Value::TypedValue';
+  
+  has DatetimeTypeFieldName => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+}
+
 subtype 'Cfn::Resource::Properties::AWS::AppFlow::Flow::DestinationConnectorProperties',
      as 'Cfn::Value';
 
@@ -643,10 +754,12 @@ package Cfn::Resource::Properties::Object::AWS::AppFlow::Flow::DestinationConnec
   extends 'Cfn::Value::TypedValue';
   
   has EventBridge => (isa => 'Cfn::Resource::Properties::AWS::AppFlow::Flow::EventBridgeDestinationProperties', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has LookoutMetrics => (isa => 'Cfn::Resource::Properties::AWS::AppFlow::Flow::LookoutMetricsDestinationProperties', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has Redshift => (isa => 'Cfn::Resource::Properties::AWS::AppFlow::Flow::RedshiftDestinationProperties', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has S3 => (isa => 'Cfn::Resource::Properties::AWS::AppFlow::Flow::S3DestinationProperties', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has Salesforce => (isa => 'Cfn::Resource::Properties::AWS::AppFlow::Flow::SalesforceDestinationProperties', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has Snowflake => (isa => 'Cfn::Resource::Properties::AWS::AppFlow::Flow::SnowflakeDestinationProperties', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has Upsolver => (isa => 'Cfn::Resource::Properties::AWS::AppFlow::Flow::UpsolverDestinationProperties', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
 }
 
 subtype 'Cfn::Resource::Properties::AWS::AppFlow::Flow::ConnectorOperator',
@@ -772,6 +885,7 @@ package Cfn::Resource::Properties::Object::AWS::AppFlow::Flow::SourceFlowConfig 
   
   has ConnectorProfileName => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has ConnectorType => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has IncrementalPullConfig => (isa => 'Cfn::Resource::Properties::AWS::AppFlow::Flow::IncrementalPullConfig', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has SourceConnectorProperties => (isa => 'Cfn::Resource::Properties::AWS::AppFlow::Flow::SourceConnectorProperties', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
 }
 subtype 'ArrayOfCfn::Resource::Properties::AWS::AppFlow::Flow::DestinationFlowConfig',

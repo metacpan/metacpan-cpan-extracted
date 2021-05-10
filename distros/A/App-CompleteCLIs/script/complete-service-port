@@ -1,22 +1,24 @@
 #!perl
 
 # Note: This script is a CLI for Riap function /Complete/Unix/complete_service_port
-# and generated automatically using Perinci::CmdLine::Gen version 0.497
+# and generated automatically using Perinci::CmdLine::Gen version 0.498
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-01-18'; # DATE
+our $DATE = '2021-05-09'; # DATE
 our $DIST = 'App-CompleteCLIs'; # DIST
-our $VERSION = '0.148'; # VERSION
+our $VERSION = '0.150'; # VERSION
 
 use 5.010001;
 use strict;
 use warnings;
+use Log::ger;
 
 use Perinci::CmdLine::Any;
 
 my $cmdline = Perinci::CmdLine::Any->new(
     url => "/Complete/Unix/complete_service_port",
     program_name => "complete-service-port",
+    log => 1,
     read_config => 0,
     read_env => 0,
 );
@@ -38,14 +40,15 @@ complete-service-port - Complete from list of service ports from /etc/services
 
 =head1 VERSION
 
-This document describes version 0.148 of complete-service-port (from Perl distribution App-CompleteCLIs), released on 2021-01-18.
+This document describes version 0.150 of complete-service-port (from Perl distribution App-CompleteCLIs), released on 2021-05-09.
 
 =head1 SYNOPSIS
 
 Usage:
 
- % complete-service-port [--format=name] [--json] [--(no)naked-res]
-     [--page-result[=program]] [--view-result[=program]] <word>
+ % complete-service-port [--debug] [--format=name] [--json]
+     [--log-level=level] [--(no)naked-res] [--page-result[=program]]
+     [--quiet] [--trace] [--verbose] [--view-result[=program]] <word>
 
 =head1 OPTIONS
 
@@ -62,6 +65,34 @@ Word to complete.
 Default value:
 
  ""
+
+Can also be specified as the 1st command-line argument.
+
+=back
+
+=head2 Logging options
+
+=over
+
+=item B<--debug>
+
+Shortcut for --log-level=debug.
+
+=item B<--log-level>=I<s>
+
+Set log level.
+
+=item B<--quiet>
+
+Shortcut for --log-level=error.
+
+=item B<--trace>
+
+Shortcut for --log-level=trace.
+
+=item B<--verbose>
+
+Shortcut for --log-level=info.
 
 =back
 
@@ -170,7 +201,7 @@ Source repository is at L<https://github.com/perlancar/perl-App-CompleteCLIs>.
 
 =head1 BUGS
 
-Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-App-CompleteCLIs/issues>
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-CompleteCLIs>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired

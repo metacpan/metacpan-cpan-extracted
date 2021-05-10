@@ -37,19 +37,17 @@ You shouldn't make instances of this class. Each attribute should be used as a n
             ConditionExpression => 'MyConditionExpression',    # OPTIONAL
             Key                 => {
               'MyAttributeName' => {
-                B    => 'BlobBinaryAttributeValue',            # OPTIONAL
-                BOOL => 1,                                     # OPTIONAL
+                B    => 'BlobBinaryAttributeValue',    # OPTIONAL
+                BOOL => 1,                             # OPTIONAL
                 BS   => [
-                  'BlobBinaryAttributeValue', ...              # OPTIONAL
-                ],                                             # OPTIONAL
-                L => [ <AttributeValue>, ... ],                # OPTIONAL
+                  'BlobBinaryAttributeValue', ...      # OPTIONAL
+                ],    # OPTIONAL
+                L => [ <AttributeValue>, ... ],    # OPTIONAL
                 M => {
-                  'MyAttributeName' => <AttributeValue>,       # key: max: 65535
+                  'MyAttributeName' => <AttributeValue>,    # key: max: 65535
                 },    # OPTIONAL
-                N  => 'MyNumberAttributeValue',    # OPTIONAL
-                NS => [
-                  'MyNumberAttributeValue', ...    # OPTIONAL
-                ],                                 # OPTIONAL
+                N    => 'MyNumberAttributeValue',
+                NS   => [ 'MyNumberAttributeValue', ... ],    # OPTIONAL
                 NULL => 1,                                    # OPTIONAL
                 S    => 'MyStringAttributeValue',
                 SS   => [ 'MyStringAttributeValue', ... ],    # OPTIONAL
@@ -66,15 +64,13 @@ You shouldn't make instances of this class. Each attribute should be used as a n
                 BOOL => 1,                             # OPTIONAL
                 BS   => [
                   'BlobBinaryAttributeValue', ...      # OPTIONAL
-                ],                                     # OPTIONAL
-                L => [ <AttributeValue>, ... ],        # OPTIONAL
+                ],    # OPTIONAL
+                L => [ <AttributeValue>, ... ],    # OPTIONAL
                 M => {
                   'MyAttributeName' => <AttributeValue>,    # key: max: 65535
                 },    # OPTIONAL
-                N  => 'MyNumberAttributeValue',    # OPTIONAL
-                NS => [
-                  'MyNumberAttributeValue', ...    # OPTIONAL
-                ],                                 # OPTIONAL
+                N    => 'MyNumberAttributeValue',
+                NS   => [ 'MyNumberAttributeValue', ... ],    # OPTIONAL
                 NULL => 1,                                    # OPTIONAL
                 S    => 'MyStringAttributeValue',
                 SS   => [ 'MyStringAttributeValue', ... ],    # OPTIONAL
@@ -90,15 +86,13 @@ You shouldn't make instances of this class. Each attribute should be used as a n
                 BOOL => 1,                             # OPTIONAL
                 BS   => [
                   'BlobBinaryAttributeValue', ...      # OPTIONAL
-                ],                                     # OPTIONAL
-                L => [ <AttributeValue>, ... ],        # OPTIONAL
+                ],    # OPTIONAL
+                L => [ <AttributeValue>, ... ],    # OPTIONAL
                 M => {
                   'MyAttributeName' => <AttributeValue>,    # key: max: 65535
                 },    # OPTIONAL
-                N  => 'MyNumberAttributeValue',    # OPTIONAL
-                NS => [
-                  'MyNumberAttributeValue', ...    # OPTIONAL
-                ],                                 # OPTIONAL
+                N    => 'MyNumberAttributeValue',
+                NS   => [ 'MyNumberAttributeValue', ... ],    # OPTIONAL
                 NULL => 1,                                    # OPTIONAL
                 S    => 'MyStringAttributeValue',
                 SS   => [ 'MyStringAttributeValue', ... ],    # OPTIONAL
@@ -116,15 +110,13 @@ You shouldn't make instances of this class. Each attribute should be used as a n
                 BOOL => 1,                             # OPTIONAL
                 BS   => [
                   'BlobBinaryAttributeValue', ...      # OPTIONAL
-                ],                                     # OPTIONAL
-                L => [ <AttributeValue>, ... ],        # OPTIONAL
+                ],    # OPTIONAL
+                L => [ <AttributeValue>, ... ],    # OPTIONAL
                 M => {
                   'MyAttributeName' => <AttributeValue>,    # key: max: 65535
                 },    # OPTIONAL
-                N  => 'MyNumberAttributeValue',    # OPTIONAL
-                NS => [
-                  'MyNumberAttributeValue', ...    # OPTIONAL
-                ],                                 # OPTIONAL
+                N    => 'MyNumberAttributeValue',
+                NS   => [ 'MyNumberAttributeValue', ... ],    # OPTIONAL
                 NULL => 1,                                    # OPTIONAL
                 S    => 'MyStringAttributeValue',
                 SS   => [ 'MyStringAttributeValue', ... ],    # OPTIONAL
@@ -140,15 +132,13 @@ You shouldn't make instances of this class. Each attribute should be used as a n
                 BOOL => 1,                             # OPTIONAL
                 BS   => [
                   'BlobBinaryAttributeValue', ...      # OPTIONAL
-                ],                                     # OPTIONAL
-                L => [ <AttributeValue>, ... ],        # OPTIONAL
+                ],    # OPTIONAL
+                L => [ <AttributeValue>, ... ],    # OPTIONAL
                 M => {
                   'MyAttributeName' => <AttributeValue>,    # key: max: 65535
                 },    # OPTIONAL
-                N  => 'MyNumberAttributeValue',    # OPTIONAL
-                NS => [
-                  'MyNumberAttributeValue', ...    # OPTIONAL
-                ],                                 # OPTIONAL
+                N    => 'MyNumberAttributeValue',
+                NS   => [ 'MyNumberAttributeValue', ... ],    # OPTIONAL
                 NULL => 1,                                    # OPTIONAL
                 S    => 'MyStringAttributeValue',
                 SS   => [ 'MyStringAttributeValue', ... ],    # OPTIONAL
@@ -166,15 +156,13 @@ You shouldn't make instances of this class. Each attribute should be used as a n
                 BOOL => 1,                             # OPTIONAL
                 BS   => [
                   'BlobBinaryAttributeValue', ...      # OPTIONAL
-                ],                                     # OPTIONAL
-                L => [ <AttributeValue>, ... ],        # OPTIONAL
+                ],    # OPTIONAL
+                L => [ <AttributeValue>, ... ],    # OPTIONAL
                 M => {
                   'MyAttributeName' => <AttributeValue>,    # key: max: 65535
                 },    # OPTIONAL
-                N  => 'MyNumberAttributeValue',    # OPTIONAL
-                NS => [
-                  'MyNumberAttributeValue', ...    # OPTIONAL
-                ],                                 # OPTIONAL
+                N    => 'MyNumberAttributeValue',
+                NS   => [ 'MyNumberAttributeValue', ... ],    # OPTIONAL
                 NULL => 1,                                    # OPTIONAL
                 S    => 'MyStringAttributeValue',
                 SS   => [ 'MyStringAttributeValue', ... ],    # OPTIONAL
@@ -190,15 +178,13 @@ You shouldn't make instances of this class. Each attribute should be used as a n
                 BOOL => 1,                             # OPTIONAL
                 BS   => [
                   'BlobBinaryAttributeValue', ...      # OPTIONAL
-                ],                                     # OPTIONAL
-                L => [ <AttributeValue>, ... ],        # OPTIONAL
+                ],    # OPTIONAL
+                L => [ <AttributeValue>, ... ],    # OPTIONAL
                 M => {
                   'MyAttributeName' => <AttributeValue>,    # key: max: 65535
                 },    # OPTIONAL
-                N  => 'MyNumberAttributeValue',    # OPTIONAL
-                NS => [
-                  'MyNumberAttributeValue', ...    # OPTIONAL
-                ],                                 # OPTIONAL
+                N    => 'MyNumberAttributeValue',
+                NS   => [ 'MyNumberAttributeValue', ... ],    # OPTIONAL
                 NULL => 1,                                    # OPTIONAL
                 S    => 'MyStringAttributeValue',
                 SS   => [ 'MyStringAttributeValue', ... ],    # OPTIONAL
@@ -217,15 +203,13 @@ You shouldn't make instances of this class. Each attribute should be used as a n
                 BOOL => 1,                             # OPTIONAL
                 BS   => [
                   'BlobBinaryAttributeValue', ...      # OPTIONAL
-                ],                                     # OPTIONAL
-                L => [ <AttributeValue>, ... ],        # OPTIONAL
+                ],    # OPTIONAL
+                L => [ <AttributeValue>, ... ],    # OPTIONAL
                 M => {
                   'MyAttributeName' => <AttributeValue>,    # key: max: 65535
                 },    # OPTIONAL
-                N  => 'MyNumberAttributeValue',    # OPTIONAL
-                NS => [
-                  'MyNumberAttributeValue', ...    # OPTIONAL
-                ],                                 # OPTIONAL
+                N    => 'MyNumberAttributeValue',
+                NS   => [ 'MyNumberAttributeValue', ... ],    # OPTIONAL
                 NULL => 1,                                    # OPTIONAL
                 S    => 'MyStringAttributeValue',
                 SS   => [ 'MyStringAttributeValue', ... ],    # OPTIONAL

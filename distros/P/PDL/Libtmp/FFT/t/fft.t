@@ -27,13 +27,13 @@ $pa = rfits("../../m51.fits");
 
 $pb = $pa->copy;
 $pc = $pb->zeroes;
-my $pd=$pb+ci()*$pc;
+my $pd=czip($pb, $pc);
 fft($pb,$pc);
 ifft($pb,$pc);
 fft($pd);
 ifft($pd);
 ok (tapprox($pc,0), "fft zeroes");
-ok (tapprox(cimag($pd),0), "fft zeroes using complex ndarrays");
+ok (tapprox($pd->im,0), "fft zeroes using complex ndarrays");
 
 #print "\n",$pc->info("Type: %T Dim: %-15D State: %S"),"\n";
 #print "Max: ",$pc->max,"\n";

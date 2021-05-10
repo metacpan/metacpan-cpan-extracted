@@ -36,6 +36,7 @@
             "App::lcpan" : "1.058",
             "App::lcpan::Cmd::mod2dist" : "0",
             "Data::Graph::Util" : "0",
+            "List::Util" : "1.45",
             "Log::ger" : "0.038",
             "perl" : "5.010001",
             "strict" : "0",
@@ -63,7 +64,7 @@
          "web" : "https://github.com/perlancar/perl-App-lcpan-CmdBundle-depsort"
       }
    },
-   "version" : "0.002",
+   "version" : "0.004",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.030002"

@@ -1,4 +1,4 @@
-# AWS::CE::CostCategory generated from spec 20.1.0
+# AWS::CE::CostCategory generated from spec 34.0.0
 use Moose::Util::TypeConstraints;
 
 coerce 'Cfn::Resource::Properties::AWS::CE::CostCategory',
@@ -25,6 +25,7 @@ package Cfn::Resource::Properties::AWS::CE::CostCategory {
   use MooseX::StrictConstructor;
   extends 'Cfn::Resource::Properties';
   
+  has DefaultValue => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has Name => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
   has RuleVersion => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has Rules => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');

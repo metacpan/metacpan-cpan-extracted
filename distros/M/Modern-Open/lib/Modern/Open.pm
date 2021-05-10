@@ -8,7 +8,7 @@ package Modern::Open;
 # Copyright (c) 2014, 2015, 2018, 2019, 2020, 2021 INABA Hitoshi <ina@cpan.org>
 ######################################################################
 
-$VERSION = '0.12';
+$VERSION = '0.13';
 $VERSION = $VERSION;
 
 use 5.00503;
@@ -17,19 +17,20 @@ BEGIN { $INC{'warnings.pm'} = '' if $] < 5.006 }; use warnings; local $^W=1;
 
 use Fcntl;
 
+#---------------------------------------------------------------------
 sub Modern::Open::confess (@) {
     my $i = 0;
     my @confess = ();
     while (my($package,$filename,$line,$subroutine) = caller($i)) {
-        push @confess, "[$i] $filename($line) $package"."::$subroutine\n";
+        push @confess, "[$i] $filename($line) $subroutine\n";
         $i++;
     }
+    print STDERR "\n", @_, "\n";
     print STDERR CORE::reverse @confess;
-    print STDERR "\n";
-    print STDERR @_;
-    die "\n";
+    die;
 }
 
+#---------------------------------------------------------------------
 sub Modern::Open::open (*$;$) {
     my $handle;
 
@@ -99,6 +100,7 @@ sub Modern::Open::open (*$;$) {
     }
 }
 
+#---------------------------------------------------------------------
 sub Modern::Open::opendir (*$) {
     my $handle;
 
@@ -124,6 +126,7 @@ sub Modern::Open::opendir (*$) {
     }
 }
 
+#---------------------------------------------------------------------
 sub Modern::Open::sysopen (*$$;$) {
     my $handle;
 
@@ -160,6 +163,7 @@ sub Modern::Open::sysopen (*$$;$) {
     }
 }
 
+#---------------------------------------------------------------------
 sub Modern::Open::pipe (**) {
     my($handle0,$handle1);
 
@@ -186,6 +190,7 @@ sub Modern::Open::pipe (**) {
     }
 }
 
+#---------------------------------------------------------------------
 sub Modern::Open::socket (*$$$) {
     my $handle;
 
@@ -200,6 +205,7 @@ sub Modern::Open::socket (*$$$) {
     return CORE::socket($handle,$_[1],$_[2],$_[3]);
 }
 
+#---------------------------------------------------------------------
 sub Modern::Open::accept (**) {
     my($handle0,$handle1);
 
@@ -223,6 +229,7 @@ sub Modern::Open::accept (**) {
     }
 }
 
+#---------------------------------------------------------------------
 sub import {
 
     # avoid: Can't use string ("main::open") as a symbol ref while "strict refs" in use

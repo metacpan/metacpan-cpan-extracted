@@ -1,7 +1,7 @@
 package App::lcpan::CmdBundle::depsort;
 
-our $DATE = '2021-03-07'; # DATE
-our $VERSION = '0.002'; # VERSION
+our $DATE = '2021-04-24'; # DATE
+our $VERSION = '0.004'; # VERSION
 
 1;
 # ABSTRACT: More lcpan subcommands related to sorting by dependencies
@@ -18,7 +18,7 @@ App::lcpan::CmdBundle::depsort - More lcpan subcommands related to sorting by de
 
 =head1 VERSION
 
-This document describes version 0.002 of App::lcpan::CmdBundle::depsort (from Perl distribution App-lcpan-CmdBundle-depsort), released on 2021-03-07.
+This document describes version 0.004 of App::lcpan::CmdBundle::depsort (from Perl distribution App-lcpan-CmdBundle-depsort), released on 2021-04-24.
 
 =head1 SYNOPSIS
 

@@ -1,5 +1,5 @@
 {
-   "abstract" : "render SVG into a Cairo surface",
+   "abstract" : "Render SVG into a Cairo surface",
    "author" : [
       "Ben Bullock <bkb@cpan.org>"
    ],
@@ -60,6 +60,6 @@
          "web" : "https://github.com/benkasminbullock/image-cairosvg"
       }
    },
-   "version" : "0.16",
+   "version" : "0.17",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

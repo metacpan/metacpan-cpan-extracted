@@ -5,7 +5,7 @@
       "Alexey Sokolov <sokolov@google.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "unknown"
    ],
@@ -42,6 +42,7 @@
          "requires" : {
             "Carp::Always" : "0",
             "Image::Magick" : "0",
+            "Test::Deep" : "0",
             "Test::Differences" : "0",
             "Test::MockObject" : "0",
             "Test::More" : "0",
@@ -51,12 +52,15 @@
    },
    "release_status" : "stable",
    "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/carygravel/gtk3-imageview/issues"
+      },
       "repository" : {
          "type" : "git",
          "url" : "https://github.com/carygravel/gtk3-imageview.git",
          "web" : "https://github.com/carygravel/gtk3-imageview"
       }
    },
-   "version" : "6",
-   "x_serialization_backend" : "JSON::PP version 4.02"
+   "version" : "8",
+   "x_serialization_backend" : "JSON::PP version 4.04"
 }

@@ -47,6 +47,22 @@ In this implementation it's done by resolving the L<Future> calling C<fail>.
 
 Drop the request because we can't reply to the requester.
 
+=head2 stream_name
+
+Get the stream name of the service the current template is
+
+service.$service_name.rpc/$method
+
+it takes:
+
+=over 4
+
+=item * L<service> - the name of service
+
+=item * L<method> - the name of the method
+
+=back
+
 =head1 INHERITED METHODS
 
 =over 4

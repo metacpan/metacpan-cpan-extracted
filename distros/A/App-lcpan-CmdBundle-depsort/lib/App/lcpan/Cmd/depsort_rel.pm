@@ -1,9 +1,9 @@
 package App::lcpan::Cmd::depsort_rel;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-03-07'; # DATE
+our $DATE = '2021-04-24'; # DATE
 our $DIST = 'App-lcpan-CmdBundle-depsort'; # DIST
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.004'; # VERSION
 
 use 5.010001;
 use strict;
@@ -55,11 +55,12 @@ sub handle_cmd {
     my @dists;
     my %reldists; # key = release name, val = dist name
     for my $rel (@$rels) {
-        $rel =~ /\A(\w+(?:-\w+)*)-(\d+(?:\.\d+)*)\.(tar\.gz|tar\.bz2|zip)\z/
+        $rel =~ m!\A(?:.+/)?(\w+(?:-\w+)*)-(\d+(?:\.\d+)*)\.(tar\.gz|tar\.bz2|zip)\z!
             or return [400, "Unrecognized release name $rel, please use DISTNAME-VERSION.tar.gz"];
         $reldists{$rel} = $1;
         push @dists, $1;
     }
+    log_trace "Depsorting dists: %s ...", \@dists;
     my $res = App::lcpan::Cmd::depsort_dist::handle_cmd(dists => \@dists);
     return $res unless $res->[0] == 200;
     my %distpos; # key = dist, val = index
@@ -68,7 +69,8 @@ sub handle_cmd {
     }
 
     my @sorted_rels = sort {
-        $distpos{ $reldists{$a} } <=> $distpos{ $reldists{$b} }
+        $distpos{ $reldists{$a} } <=> $distpos{ $reldists{$b} } ||
+            $a cmp $b
     } @$rels;
     [200, "OK", \@sorted_rels];
 }
@@ -88,7 +90,7 @@ App::lcpan::Cmd::depsort_rel - Given a list of release tarball names, sort using
 
 =head1 VERSION
 
-This document describes version 0.002 of App::lcpan::Cmd::depsort_rel (from Perl distribution App-lcpan-CmdBundle-depsort), released on 2021-03-07.
+This document describes version 0.004 of App::lcpan::Cmd::depsort_rel (from Perl distribution App-lcpan-CmdBundle-depsort), released on 2021-04-24.
 
 =head1 DESCRIPTION
 

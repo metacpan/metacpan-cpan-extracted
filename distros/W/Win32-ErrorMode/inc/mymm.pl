@@ -10,7 +10,7 @@ sub myWriteMakefile
   $args{INC} = '-Iinclude';
 
   if($^O !~ /^(cygwin|MSWin32|msys)$/)
-  {  
+  {
     print STDERR "platform not supported\n";
     exit;
   }

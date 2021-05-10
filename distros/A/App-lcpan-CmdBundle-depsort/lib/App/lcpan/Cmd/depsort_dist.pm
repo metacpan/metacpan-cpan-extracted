@@ -1,9 +1,9 @@
 package App::lcpan::Cmd::depsort_dist;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-03-07'; # DATE
+our $DATE = '2021-04-24'; # DATE
 our $DIST = 'App-lcpan-CmdBundle-depsort'; # DIST
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.004'; # VERSION
 
 use 5.010001;
 use strict;
@@ -25,6 +25,7 @@ $SPEC{handle_cmd} = {
 sub handle_cmd {
     require App::lcpan::Cmd::mod2dist;
     require Data::Graph::Util;
+    require List::Util;
 
     my %args = @_;
 
@@ -32,6 +33,8 @@ sub handle_cmd {
     my $dbh = $state->{dbh};
 
     my $dists = delete $args{dists};
+    $dists = [List::Util::uniq(@$dists)];
+    return [200, "OK (no sorting needed)", $dists] unless @$dists > 1;
 
     my %seen_dists;
     my %seen_mods;
@@ -63,6 +66,7 @@ sub handle_cmd {
     } # while @dists_to_check
     #return [200, "TMP", \%deps];
 
+    log_trace "Toposorting %s with dependency information %s ...", $dists, \%deps;
     my @sorted_dists;
     eval {
         @sorted_dists = Data::Graph::Util::toposort(
@@ -90,7 +94,7 @@ App::lcpan::Cmd::depsort_dist - Given a list of dist names, sort using dependenc
 
 =head1 VERSION
 
-This document describes version 0.002 of App::lcpan::Cmd::depsort_dist (from Perl distribution App-lcpan-CmdBundle-depsort), released on 2021-03-07.
+This document describes version 0.004 of App::lcpan::Cmd::depsort_dist (from Perl distribution App-lcpan-CmdBundle-depsort), released on 2021-04-24.
 
 =head1 DESCRIPTION
 

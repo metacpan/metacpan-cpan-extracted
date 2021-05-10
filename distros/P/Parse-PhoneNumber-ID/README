@@ -2,15 +2,15 @@ NAME
     Parse::PhoneNumber::ID - Parse Indonesian phone numbers
 
 VERSION
-    This document describes version 0.16 of Parse::PhoneNumber::ID (from
-    Perl distribution Parse-PhoneNumber-ID), released on 2017-07-10.
+    This document describes version 0.170 of Parse::PhoneNumber::ID (from
+    Perl distribution Parse-PhoneNumber-ID), released on 2021-05-07.
 
 SYNOPSIS
-     use Parse::PhoneNumber::ID qw(parse_id_phone extract_id_phones);
+     use Parse::PhoneNumber::ID qw(parse_idn_phone extract_idn_phones);
      use Data::Dump;
 
-     dd parse_id_phone(text => 'Jual dalmatian 2bl lucu2x. Hub: 7123 4567',
-                       default_area_code=>'022');
+     dd parse_idn_phone(text => 'Jual dalmatian 2bl lucu2x. Hub: 7123 4567',
+                        default_area_code=>'022');
 
     Will print something like:
 
@@ -32,16 +32,16 @@ SYNOPSIS
 
     To extract more than one numbers in a text:
 
-     my $phones = extract_id_phones(text => 'some text containing phone number(s):'.
-                                            '0812 2345 6789, +62-22-91234567');
+     my $phones = extract_idn_phones(text => 'some text containing phone number(s):'.
+                                             '0812 2345 6789, +62-22-91234567');
      say "There are ", scalar(@$phones), "phone number(s) found in text";
      for (@$phones) { say $_->{pretty} }
 
 FUNCTIONS
-  extract_id_phones
+  extract_idn_phones
     Usage:
 
-     extract_id_phones(%args) -> any
+     extract_idn_phones(%args) -> any
 
     Extract phone number(s) from text.
 
@@ -89,12 +89,12 @@ FUNCTIONS
 
     Return value: (any)
 
-  parse_id_phone
+  parse_idn_phone
     Usage:
 
-     parse_id_phone(%args) -> any
+     parse_idn_phone(%args) -> any
 
-    Alias for extract_id_phones(..., max_numbers=>1)->[0].
+    Alias for extract_idn_phones(..., max_numbers=>1)->[0].
 
     Extracts phone number(s) from text. Return an array of one or more
     parsed phone number structure (a hash). Understands the list of known
@@ -160,8 +160,8 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2017, 2015, 2014, 2013, 2012, 2011 by
-    perlancar@cpan.org.
+    This software is copyright (c) 2021, 2017, 2015, 2014, 2013, 2012, 2011
+    by perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

@@ -1,4 +1,4 @@
-# AWS::DynamoDB::Table generated from spec 18.4.0
+# AWS::DynamoDB::Table generated from spec 34.0.0
 use Moose::Util::TypeConstraints;
 
 coerce 'Cfn::Resource::Properties::AWS::DynamoDB::Table',
@@ -106,6 +106,27 @@ package Cfn::Resource::Properties::Object::AWS::DynamoDB::Table::KeySchema {
   
   has AttributeName => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has KeyType => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+}
+
+subtype 'Cfn::Resource::Properties::AWS::DynamoDB::Table::ContributorInsightsSpecification',
+     as 'Cfn::Value';
+
+coerce 'Cfn::Resource::Properties::AWS::DynamoDB::Table::ContributorInsightsSpecification',
+  from 'HashRef',
+   via {
+     if (my $f = Cfn::TypeLibrary::try_function($_)) {
+       return $f
+     } else {
+       return Cfn::Resource::Properties::Object::AWS::DynamoDB::Table::ContributorInsightsSpecification->new( %$_ );
+     }
+   };
+
+package Cfn::Resource::Properties::Object::AWS::DynamoDB::Table::ContributorInsightsSpecification {
+  use Moose;
+  use MooseX::StrictConstructor;
+  extends 'Cfn::Value::TypedValue';
+  
+  has Enabled => (isa => 'Cfn::Value::Boolean', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
 }
 
 subtype 'Cfn::Resource::Properties::AWS::DynamoDB::Table::TimeToLiveSpecification',
@@ -239,6 +260,27 @@ package Cfn::Resource::Properties::Object::AWS::DynamoDB::Table::LocalSecondaryI
   has KeySchema => (isa => 'ArrayOfCfn::Resource::Properties::AWS::DynamoDB::Table::KeySchema', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has Projection => (isa => 'Cfn::Resource::Properties::AWS::DynamoDB::Table::Projection', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
 }
+
+subtype 'Cfn::Resource::Properties::AWS::DynamoDB::Table::KinesisStreamSpecification',
+     as 'Cfn::Value';
+
+coerce 'Cfn::Resource::Properties::AWS::DynamoDB::Table::KinesisStreamSpecification',
+  from 'HashRef',
+   via {
+     if (my $f = Cfn::TypeLibrary::try_function($_)) {
+       return $f
+     } else {
+       return Cfn::Resource::Properties::Object::AWS::DynamoDB::Table::KinesisStreamSpecification->new( %$_ );
+     }
+   };
+
+package Cfn::Resource::Properties::Object::AWS::DynamoDB::Table::KinesisStreamSpecification {
+  use Moose;
+  use MooseX::StrictConstructor;
+  extends 'Cfn::Value::TypedValue';
+  
+  has StreamArn => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+}
 subtype 'ArrayOfCfn::Resource::Properties::AWS::DynamoDB::Table::GlobalSecondaryIndex',
      as 'Cfn::Value',
   where { $_->isa('Cfn::Value::Array') or $_->isa('Cfn::Value::Function') },
@@ -280,6 +322,7 @@ package Cfn::Resource::Properties::Object::AWS::DynamoDB::Table::GlobalSecondary
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
   
+  has ContributorInsightsSpecification => (isa => 'Cfn::Resource::Properties::AWS::DynamoDB::Table::ContributorInsightsSpecification', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has IndexName => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has KeySchema => (isa => 'ArrayOfCfn::Resource::Properties::AWS::DynamoDB::Table::KeySchema', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has Projection => (isa => 'Cfn::Resource::Properties::AWS::DynamoDB::Table::Projection', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
@@ -337,8 +380,10 @@ package Cfn::Resource::Properties::AWS::DynamoDB::Table {
   
   has AttributeDefinitions => (isa => 'ArrayOfCfn::Resource::Properties::AWS::DynamoDB::Table::AttributeDefinition', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Conditional');
   has BillingMode => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has ContributorInsightsSpecification => (isa => 'Cfn::Resource::Properties::AWS::DynamoDB::Table::ContributorInsightsSpecification', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has GlobalSecondaryIndexes => (isa => 'ArrayOfCfn::Resource::Properties::AWS::DynamoDB::Table::GlobalSecondaryIndex', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has KeySchema => (isa => 'ArrayOfCfn::Resource::Properties::AWS::DynamoDB::Table::KeySchema', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
+  has KinesisStreamSpecification => (isa => 'Cfn::Resource::Properties::AWS::DynamoDB::Table::KinesisStreamSpecification', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has LocalSecondaryIndexes => (isa => 'ArrayOfCfn::Resource::Properties::AWS::DynamoDB::Table::LocalSecondaryIndex', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
   has PointInTimeRecoverySpecification => (isa => 'Cfn::Resource::Properties::AWS::DynamoDB::Table::PointInTimeRecoverySpecification', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has ProvisionedThroughput => (isa => 'Cfn::Resource::Properties::AWS::DynamoDB::Table::ProvisionedThroughput', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');

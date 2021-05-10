@@ -1,4 +1,4 @@
-# AWS::S3::Bucket generated from spec 21.0.0
+# AWS::S3::Bucket generated from spec 22.0.0
 use Moose::Util::TypeConstraints;
 
 coerce 'Cfn::Resource::Properties::AWS::S3::Bucket',
@@ -215,6 +215,27 @@ package Cfn::Resource::Properties::Object::AWS::S3::Bucket::ReplicationRuleAndOp
   has TagFilters => (isa => 'ArrayOfCfn::Resource::Properties::AWS::S3::Bucket::TagFilter', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
 }
 
+subtype 'Cfn::Resource::Properties::AWS::S3::Bucket::ReplicaModifications',
+     as 'Cfn::Value';
+
+coerce 'Cfn::Resource::Properties::AWS::S3::Bucket::ReplicaModifications',
+  from 'HashRef',
+   via {
+     if (my $f = Cfn::TypeLibrary::try_function($_)) {
+       return $f
+     } else {
+       return Cfn::Resource::Properties::Object::AWS::S3::Bucket::ReplicaModifications->new( %$_ );
+     }
+   };
+
+package Cfn::Resource::Properties::Object::AWS::S3::Bucket::ReplicaModifications {
+  use Moose;
+  use MooseX::StrictConstructor;
+  extends 'Cfn::Value::TypedValue';
+  
+  has Status => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+}
+
 subtype 'Cfn::Resource::Properties::AWS::S3::Bucket::Metrics',
      as 'Cfn::Value';
 
@@ -366,6 +387,7 @@ package Cfn::Resource::Properties::Object::AWS::S3::Bucket::SourceSelectionCrite
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
   
+  has ReplicaModifications => (isa => 'Cfn::Resource::Properties::AWS::S3::Bucket::ReplicaModifications', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has SseKmsEncryptedObjects => (isa => 'Cfn::Resource::Properties::AWS::S3::Bucket::SseKmsEncryptedObjects', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
 }
 
@@ -790,6 +812,7 @@ package Cfn::Resource::Properties::Object::AWS::S3::Bucket::ServerSideEncryption
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
   
+  has BucketKeyEnabled => (isa => 'Cfn::Value::Boolean', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has ServerSideEncryptionByDefault => (isa => 'Cfn::Resource::Properties::AWS::S3::Bucket::ServerSideEncryptionByDefault', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
 }
 subtype 'ArrayOfCfn::Resource::Properties::AWS::S3::Bucket::Rule',

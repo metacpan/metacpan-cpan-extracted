@@ -1,3 +1,8 @@
+0.003   2021-05-09  Released-By: PERLANCAR; Urgency: medium
+
+	- [refactor] Extract parsing routine to its own dist Rclone-Util.
+
+
 0.002   2021-05-01  Released-By: PERLANCAR; Urgency: medium
 
 	- Rename function to be more consistent:

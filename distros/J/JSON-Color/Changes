@@ -1,3 +1,9 @@
+0.131   2021-05-07  Released-By: PERLANCAR; Urgency: medium
+
+	- [bugfix] Add missing prereq to ColorThemeRole::ANSI (resolves
+	  https://github.com/ingydotnet/xxx-pm/issues/13).
+
+
 0.130   2020-06-09  Released-By: PERLANCAR; Urgency: medium
 
 	- Add color theme support.

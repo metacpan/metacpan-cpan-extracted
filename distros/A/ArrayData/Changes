@@ -1,3 +1,19 @@
+0.2.2   2021-05-07  Released-By: PERLANCAR; Urgency: medium
+
+	- ArrayDataRole::Spec::Basic: provide method apply_roles().
+
+
+0.2.1   2021-05-03  Released-By: PERLANCAR; Urgency: medium
+
+	- Mix Role::TinyCommons::Collection::GetItemByPos into
+	  ArrayDataRole::Spec::Basic.
+
+	- [compliance] Use 'StopIteration' as the die string, as specified
+	  by Role::TinyCommons::Iterator::Basic.
+
+	- [doc] Add more namespace organization, add FAQ entries.
+
+
 0.2.0   2021-04-20  Released-By: PERLANCAR; Urgency: medium; Backward-Incompatible: yes
 
 	- [incompatible change] For better reusability and orthogonality,

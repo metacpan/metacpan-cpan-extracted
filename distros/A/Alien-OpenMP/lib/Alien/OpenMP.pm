@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use Config ();
 
-our $VERSION = '0.002';
+our $VERSION = '0.003';
 
 # set as package variable since %Config::Config is read only, (per docs and in practice)
 our $CCNAME = $Config::Config{ccname};
@@ -41,6 +41,16 @@ sub lddlflags {
     my $cn = $CCNAME;
     _assert_os($omp_flags, $cn);
     return $omp_flags->{$cn};
+}
+
+# Inline related methods
+
+sub Inline {
+  my ($self, $lang) = @_;
+  return {
+    CCFLAGS     => cflags(),
+    LDDLFLAGS   => join( q{ }, $Config::Config{lddlflags}, lddlflags() ),
+  };
 }
 
 # "private" internal helper subs
@@ -158,6 +168,27 @@ Returns the flag used by the linker to enable OpenMP. This is usually the same
 as what is returned by C<cflags>.
 
 Example, GCC uses, C<-fopenmp>, for this as well.
+
+=item C<Inline>
+
+Used in support of L<Inline::C>'s C<with> method (inherited from
+L<Inline>). This method is not called directly, but used when compiling
+OpenMP programs with C<Inline::C>:
+
+    use Alien::OpenMP;
+    use Inline (
+        C           => 'DATA',
+        with        => qw/Alien::OpenMP/,
+    );
+
+The nice, compact form above replaces this mess:
+
+    use Alien::OpenMP;
+    use Inline (
+        C           => 'DATA',
+        ccflagsex   => Alien::OpenMP::cflags(),
+        lddlflags   => join( q{ }, $Config::Config{lddlflags}, Alien::OpenMP::lddlflags() ),
+    );
 
 =item C<_check_libs>
 

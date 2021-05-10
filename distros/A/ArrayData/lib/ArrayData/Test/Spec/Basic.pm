@@ -1,9 +1,9 @@
 package ArrayData::Test::Spec::Basic;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-04-20'; # DATE
+our $DATE = '2021-05-07'; # DATE
 our $DIST = 'ArrayData'; # DIST
-our $VERSION = '0.2.0'; # VERSION
+our $VERSION = '0.2.2'; # VERSION
 
 use strict;
 use warnings;
@@ -31,7 +31,7 @@ sub _elems {
 
 sub get_next_item {
     my $self = shift;
-    die "Out of range" unless $self->{pos} < @$elems;
+    die "StopIteration" unless $self->{pos} < @$elems;
     $elems->[ $self->{pos}++ ];
 }
 
@@ -50,6 +50,25 @@ sub reset_iterator {
     $self->{pos} = 0;
 }
 
+sub get_item_at_pos {
+    my ($self, $pos) = @_;
+    if ($pos < 0) {
+        die "Out of range" unless -$pos <= @$elems;
+    } else {
+        die "Out of range" unless $pos < @$elems;
+    }
+    $elems->[ $pos ];
+}
+
+sub has_item_at_pos {
+    my ($self, $pos) = @_;
+    if ($pos < 0) {
+        return -$pos <= @$elems ? 1:0;
+    } else {
+        return $pos < @$elems ? 1:0;
+    }
+}
+
 1;
 
 # ABSTRACT: A test table data
@@ -66,7 +85,7 @@ ArrayData::Test::Spec::Basic - A test table data
 
 =head1 VERSION
 
-This document describes version 0.2.0 of ArrayData::Test::Spec::Basic (from Perl distribution ArrayData), released on 2021-04-20.
+This document describes version 0.2.2 of ArrayData::Test::Spec::Basic (from Perl distribution ArrayData), released on 2021-05-07.
 
 =for Pod::Coverage ^(.+)$
 

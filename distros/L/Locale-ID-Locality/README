@@ -3,12 +3,12 @@ NAME
     Indonesia
 
 VERSION
-    This document describes version 0.11 of Locale::ID::Locality (from Perl
-    distribution Locale-ID-Locality), released on 2017-07-10.
+    This document describes version 0.120 of Locale::ID::Locality (from Perl
+    distribution Locale-ID-Locality), released on 2021-05-07.
 
 SYNOPSIS
-     use Locale::ID::Locality qw(list_id_localities);
-     my $res = list_id_localities(detail=>1);
+     use Locale::ID::Locality qw(list_idn_localities);
+     my $res = list_idn_localities(detail=>1);
 
 DESCRIPTION
     This module provides API access for list of localities
@@ -20,10 +20,10 @@ DESCRIPTION
     This module's functions have Rinci specs.
 
 FUNCTIONS
-  list_id_localities
+  list_idn_localities
     Usage:
 
-     list_id_localities(%args) -> [status, msg, result, meta]
+     list_idn_localities(%args) -> [status, msg, payload, meta]
 
     Localities (cities & regencies) in Indonesia.
 
@@ -128,6 +128,10 @@ FUNCTIONS
         Return array of full records instead of just ID fields.
 
         By default, only the key (ID) field is returned per result entry.
+
+    *   exclude_fields => *array[str]*
+
+        Select fields to return.
 
     *   fields => *array[str]* (default: ["ind_name"])
 
@@ -268,7 +272,7 @@ FUNCTIONS
     First element (status) is an integer containing HTTP status code (200
     means OK, 4xx caller error, 5xx function error). Second element (msg) is
     a string containing error message, or 'OK' if status is 200. Third
-    element (result) is optional, the actual result. Fourth element (meta)
+    element (payload) is optional, the actual result. Fourth element (meta)
     is called result metadata and is optional, a hash that contains extra
     information.
 
@@ -290,7 +294,7 @@ BUGS
     to an existing test-file that illustrates the bug or desired feature.
 
 SEE ALSO
-    list-id-localities
+    list-idn-localities
 
     Gudang Data Interim project,
     https://github.com/sharyanto/gudang-data-interim/
@@ -301,7 +305,7 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2017, 2015, 2014, 2012 by
+    This software is copyright (c) 2021, 2017, 2015, 2014, 2012 by
     perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under

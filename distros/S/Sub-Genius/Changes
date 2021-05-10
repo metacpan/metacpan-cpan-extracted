@@ -59,3 +59,11 @@ Changes for Sub::Genius
 0.11         2021-04-25 14:30:51-05:11 America/New_York
              - pinned to FLAT 1.0.4
              - mark end of "TRIAL" releases
+
+0.12         2021-04-25 14:30:51-05:12 America/New_York
+             - removed unneeded "use feature 'state'" in Sub/Genius.pm
+             - fixed call to "perldoc" via `stubby help`
+             - `stubby -x nodeps` now accepts the -f|--prefile option
+             - `stubby -x nodeps` skips generating subs for words that look
+             like external package calls (looks for '::'); warns
+             - fixed `stubby precache` not accepting --prefile as expected

@@ -151,7 +151,7 @@ sub copy_file {
     }
 
     my $_body_data;
-    my $files;
+    my $files = [];
     # make the API Call
     $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
@@ -250,7 +250,7 @@ sub copy_folder {
     }
 
     my $_body_data;
-    my $files;
+    my $files = [];
     # make the API Call
     $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
@@ -322,7 +322,7 @@ sub create_folder {
     }
 
     my $_body_data;
-    my $files;
+    my $files = [];
     # make the API Call
     $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
@@ -470,7 +470,7 @@ sub delete_chart_category {
     }
 
     my $_body_data;
-    my $files;
+    my $files = [];
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
@@ -640,7 +640,7 @@ sub delete_chart_data_point {
     }
 
     my $_body_data;
-    my $files;
+    my $files = [];
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
@@ -792,7 +792,7 @@ sub delete_chart_series {
     }
 
     my $_body_data;
-    my $files;
+    my $files = [];
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
@@ -879,7 +879,7 @@ sub delete_file {
     }
 
     my $_body_data;
-    my $files;
+    my $files = [];
     # make the API Call
     $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
@@ -962,7 +962,7 @@ sub delete_folder {
     }
 
     my $_body_data;
-    my $files;
+    my $files = [];
     # make the API Call
     $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
@@ -1074,7 +1074,7 @@ sub delete_notes_slide {
     }
 
     my $_body_data;
-    my $files;
+    my $files = [];
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
@@ -1226,7 +1226,7 @@ sub delete_notes_slide_paragraph {
     }
 
     my $_body_data;
-    my $files;
+    my $files = [];
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
@@ -1371,7 +1371,7 @@ sub delete_notes_slide_paragraphs {
     }
 
     my $_body_data;
-    my $files;
+    my $files = [];
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
@@ -1541,7 +1541,7 @@ sub delete_notes_slide_portion {
     }
 
     my $_body_data;
-    my $files;
+    my $files = [];
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
@@ -1704,7 +1704,7 @@ sub delete_notes_slide_portions {
     }
 
     my $_body_data;
-    my $files;
+    my $files = [];
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
@@ -1838,7 +1838,7 @@ sub delete_notes_slide_shape {
     }
 
     my $_body_data;
-    my $files;
+    my $files = [];
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
@@ -1965,7 +1965,7 @@ sub delete_notes_slide_shapes {
     }
 
     my $_body_data;
-    my $files;
+    my $files = [];
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
@@ -2117,7 +2117,7 @@ sub delete_paragraph {
     }
 
     my $_body_data;
-    my $files;
+    my $files = [];
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
@@ -2262,7 +2262,7 @@ sub delete_paragraphs {
     }
 
     my $_body_data;
-    my $files;
+    my $files = [];
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
@@ -2432,7 +2432,7 @@ sub delete_portion {
     }
 
     my $_body_data;
-    my $files;
+    my $files = [];
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
@@ -2595,7 +2595,7 @@ sub delete_portions {
     }
 
     my $_body_data;
-    my $files;
+    my $files = [];
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
@@ -2722,7 +2722,7 @@ sub delete_section {
     }
 
     my $_body_data;
-    my $files;
+    my $files = [];
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
@@ -2842,7 +2842,7 @@ sub delete_sections {
     }
 
     my $_body_data;
-    my $files;
+    my $files = [];
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
@@ -2958,7 +2958,7 @@ sub delete_animation {
     }
 
     my $_body_data;
-    my $files;
+    my $files = [];
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
@@ -3144,7 +3144,7 @@ sub delete_animation_effect {
     }
 
     my $_body_data;
-    my $files;
+    my $files = [];
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
@@ -3336,7 +3336,7 @@ sub delete_animation_interactive_sequence {
     }
 
     my $_body_data;
-    my $files;
+    my $files = [];
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
@@ -3546,7 +3546,7 @@ sub delete_animation_interactive_sequence_effect {
     }
 
     my $_body_data;
-    my $files;
+    my $files = [];
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
@@ -3726,7 +3726,7 @@ sub delete_animation_interactive_sequences {
     }
 
     my $_body_data;
-    my $files;
+    my $files = [];
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
@@ -3894,7 +3894,7 @@ sub delete_animation_main_sequence {
     }
 
     my $_body_data;
-    my $files;
+    my $files = [];
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
@@ -4062,7 +4062,7 @@ sub delete_slide {
     }
 
     my $_body_data;
-    my $files;
+    my $files = [];
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
@@ -4248,7 +4248,7 @@ sub delete_shape {
     }
 
     my $_body_data;
-    my $files;
+    my $files = [];
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
@@ -4433,7 +4433,7 @@ sub delete_shapes {
     }
 
     my $_body_data;
-    my $files;
+    my $files = [];
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
@@ -4643,7 +4643,7 @@ sub delete_subshape {
     }
 
     my $_body_data;
-    my $files;
+    my $files = [];
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
@@ -4852,7 +4852,7 @@ sub delete_subshapes {
     }
 
     my $_body_data;
-    my $files;
+    my $files = [];
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
@@ -5025,7 +5025,7 @@ sub delete_slides {
     }
 
     my $_body_data;
-    my $files;
+    my $files = [];
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
@@ -5175,7 +5175,7 @@ sub delete_document_properties {
     }
 
     my $_body_data;
-    my $files;
+    my $files = [];
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
@@ -5337,7 +5337,7 @@ sub delete_document_property {
     }
 
     my $_body_data;
-    my $files;
+    my $files = [];
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
@@ -5399,6 +5399,261 @@ sub delete_slides_document_property {
     warnings::warnif("deprecated", "delete_slides_document_property is deprecated, use delete_document_property instead");
   
     return delete_document_property(@_);
+}
+
+#
+# delete_protection
+#
+# Resets all presentation protection settings. 
+# 
+# @param string $name Document name. (required)
+# @param string $password Presentation password. (optional)
+# @param string $folder Document folder. (optional)
+# @param string $storage Document storage. (optional)
+{
+    my $params = {
+    'name' => {
+        data_type => 'string',
+        description => 'Document name.',
+        required => '1',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Presentation password.',
+        required => '0',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => 'Document folder.',
+        required => '0',
+    },
+    'storage' => {
+        data_type => 'string',
+        description => 'Document storage.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'delete_protection' } = { 
+    	summary => 'Resets all presentation protection settings. ',
+        params => $params,
+        returns => 'ProtectionProperties',
+        };
+}
+# @return ProtectionProperties
+#
+sub delete_protection {
+    my ($self, %args) = @_;
+
+    # verify the required parameter 'name' is set
+    unless (exists $args{'name'} && $args{'name'}) {
+      croak("Missing the required parameter 'name' when calling delete_slides_protection_properties");
+    }
+
+    # parse inputs
+    my $_resource_path = '/slides/{name}/protection';
+
+    my $_method = 'DELETE';
+    my $query_params = {};
+    my $header_params = {};
+    my $form_params = {};
+
+    # 'Accept' and 'Content-Type' header
+    my $_header_accept = $self->{api_client}->select_header_accept('application/json');
+    if ($_header_accept) {
+        $header_params->{'Accept'} = $_header_accept;
+    }
+    $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
+
+    # query params
+    if (exists $args{'folder'} && defined $args{'folder'}) {
+        $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
+    }
+
+    # query params
+    if (exists $args{'storage'} && defined $args{'storage'}) {
+        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    }
+
+    # header params
+    if ( exists $args{'password'}) {
+        $header_params->{':password'} = $self->{api_client}->to_header_value($args{'password'});
+    }
+
+    # path params
+    if ( exists $args{'name'}) {
+        my $_base_variable = "{" . "name" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'name'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    my $_body_data;
+    my $files = [];
+    # make the API Call
+    my $response = $self->{api_client}->call_api($_resource_path, $_method,
+                                           $query_params, $form_params,
+                                           $header_params, $_body_data, $files);
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('ProtectionProperties', $response);
+    return $_response_object;
+}
+
+#
+# delete_slides_protection_properties
+#
+# Resets all presentation protection settings. 
+# 
+# @param string $name Document name. (required)
+# @param string $password Presentation password. (optional)
+# @param string $folder Document folder. (optional)
+# @param string $storage Document storage. (optional)
+{
+    my $params = {
+    'name' => {
+        data_type => 'string',
+        description => 'Document name.',
+        required => '1',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Presentation password.',
+        required => '0',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => 'Document folder.',
+        required => '0',
+    },
+    'storage' => {
+        data_type => 'string',
+        description => 'Document storage.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'delete_slides_protection_properties' } = { 
+    	summary => 'Resets all presentation protection settings. ',
+        params => $params,
+        returns => 'ProtectionProperties',
+        };
+}
+# @return ProtectionProperties
+#
+sub delete_slides_protection_properties {
+    warnings::warnif("deprecated", "delete_slides_protection_properties is deprecated, use delete_protection instead");
+  
+    return delete_protection(@_);
+}
+
+#
+# delete_protection_online
+#
+# Resets all presentation protection settings. 
+# 
+# @param File $document Document data. (required)
+# @param string $password Presentation password. (required)
+{
+    my $params = {
+    'document' => {
+        data_type => 'File',
+        description => 'Document data.',
+        required => '1',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Presentation password.',
+        required => '1',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'delete_protection_online' } = { 
+    	summary => 'Resets all presentation protection settings. ',
+        params => $params,
+        returns => 'File',
+        };
+}
+# @return File
+#
+sub delete_protection_online {
+    my ($self, %args) = @_;
+
+    # verify the required parameter 'document' is set
+    unless (exists $args{'document'} && $args{'document'}) {
+      croak("Missing the required parameter 'document' when calling delete_slides_protection_properties_online");
+    }
+
+    # verify the required parameter 'password' is set
+    unless (exists $args{'password'} && $args{'password'}) {
+      croak("Missing the required parameter 'password' when calling delete_slides_protection_properties_online");
+    }
+
+    # parse inputs
+    my $_resource_path = '/slides/protection/delete';
+
+    my $_method = 'POST';
+    my $query_params = {};
+    my $header_params = {};
+    my $form_params = {};
+
+    # 'Accept' and 'Content-Type' header
+    my $_header_accept = $self->{api_client}->select_header_accept('multipart/form-data');
+    if ($_header_accept) {
+        $header_params->{'Accept'} = $_header_accept;
+    }
+    $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('multipart/form-data');
+
+    # header params
+    if ( exists $args{'password'}) {
+        $header_params->{':password'} = $self->{api_client}->to_header_value($args{'password'});
+    }
+
+    my $_body_data;
+    my $files = [];
+    if ( exists $args{'document'} && $args{'document'}) {
+        push(@$files, $args{'document'});
+    }
+    # make the API Call
+    my $response = $self->{api_client}->call_api($_resource_path, $_method,
+                                           $query_params, $form_params,
+                                           $header_params, $_body_data, $files);
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('File', $response);
+    return $_response_object;
+}
+
+#
+# delete_slides_protection_properties_online
+#
+# Resets all presentation protection settings. 
+# 
+# @param File $document Document data. (required)
+# @param string $password Presentation password. (required)
+{
+    my $params = {
+    'document' => {
+        data_type => 'File',
+        description => 'Document data.',
+        required => '1',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Presentation password.',
+        required => '1',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'delete_slides_protection_properties_online' } = { 
+    	summary => 'Resets all presentation protection settings. ',
+        params => $params,
+        returns => 'File',
+        };
+}
+# @return File
+#
+sub delete_slides_protection_properties_online {
+    warnings::warnif("deprecated", "delete_slides_protection_properties_online is deprecated, use delete_protection_online instead");
+  
+    return delete_protection_online(@_);
 }
 
 #
@@ -5505,7 +5760,7 @@ sub delete_background {
     }
 
     my $_body_data;
-    my $files;
+    my $files = [];
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
@@ -5727,7 +5982,7 @@ sub delete_subshape_paragraph {
     }
 
     my $_body_data;
-    my $files;
+    my $files = [];
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
@@ -5890,7 +6145,7 @@ sub delete_subshape_paragraphs {
     }
 
     my $_body_data;
-    my $files;
+    my $files = [];
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
@@ -6078,7 +6333,7 @@ sub delete_subshape_portion {
     }
 
     my $_body_data;
-    my $files;
+    my $files = [];
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
@@ -6259,7 +6514,7 @@ sub delete_subshape_portions {
     }
 
     my $_body_data;
-    my $files;
+    my $files = [];
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
@@ -6269,6 +6524,111 @@ sub delete_subshape_portions {
     }
     my $_response_object = $self->{api_client}->deserialize('Portions', $response);
     return $_response_object;
+}
+
+#
+# delete_watermark
+#
+# Removes shapes with name \"watermark\" from the presentation.
+# 
+# @param string $name Document name. (required)
+# @param string $shape_name Name of the watermark shape. If null, default value \&quot;watermark\&quot;is used. (optional)
+# @param string $password Document password. (optional)
+# @param string $folder Document folder. (optional)
+# @param string $storage Document storage. (optional)
+{
+    my $params = {
+    'name' => {
+        data_type => 'string',
+        description => 'Document name.',
+        required => '1',
+    },
+    'shape_name' => {
+        data_type => 'string',
+        description => 'Name of the watermark shape. If null, default value \&quot;watermark\&quot;is used.',
+        required => '0',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => 'Document folder.',
+        required => '0',
+    },
+    'storage' => {
+        data_type => 'string',
+        description => 'Document storage.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'delete_watermark' } = { 
+    	summary => 'Removes shapes with name \&quot;watermark\&quot; from the presentation.',
+        params => $params,
+        returns => undef,
+        };
+}
+# @return void
+#
+sub delete_watermark {
+    my ($self, %args) = @_;
+
+    # verify the required parameter 'name' is set
+    unless (exists $args{'name'} && $args{'name'}) {
+      croak("Missing the required parameter 'name' when calling delete_watermark");
+    }
+
+    # parse inputs
+    my $_resource_path = '/slides/{name}/watermark/delete';
+
+    my $_method = 'DELETE';
+    my $query_params = {};
+    my $header_params = {};
+    my $form_params = {};
+
+    # 'Accept' and 'Content-Type' header
+    my $_header_accept = $self->{api_client}->select_header_accept('application/json');
+    if ($_header_accept) {
+        $header_params->{'Accept'} = $_header_accept;
+    }
+    $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('multipart/form-data');
+
+    # query params
+    if (exists $args{'shape_name'} && defined $args{'shape_name'}) {
+        $query_params->{'shapeName'} = $self->{api_client}->to_query_value($args{'shape_name'});
+    }
+
+    # query params
+    if (exists $args{'folder'} && defined $args{'folder'}) {
+        $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
+    }
+
+    # query params
+    if (exists $args{'storage'} && defined $args{'storage'}) {
+        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    }
+
+    # header params
+    if ( exists $args{'password'}) {
+        $header_params->{':password'} = $self->{api_client}->to_header_value($args{'password'});
+    }
+
+    # path params
+    if ( exists $args{'name'}) {
+        my $_base_variable = "{" . "name" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'name'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    my $_body_data;
+    my $files = [];
+    # make the API Call
+    $self->{api_client}->call_api($_resource_path, $_method,
+                                           $query_params, $form_params,
+                                           $header_params, $_body_data, $files);
+    return;
 }
 
 #
@@ -6346,7 +6706,7 @@ sub download_file {
     }
 
     my $_body_data;
-    my $files;
+    my $files = [];
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
@@ -6404,7 +6764,7 @@ sub get_disc_usage {
     }
 
     my $_body_data;
-    my $files;
+    my $files = [];
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
@@ -6480,7 +6840,7 @@ sub get_file_versions {
     }
 
     my $_body_data;
-    my $files;
+    my $files = [];
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
@@ -6556,7 +6916,7 @@ sub get_files_list {
     }
 
     my $_body_data;
-    my $files;
+    my $files = [];
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
@@ -6672,7 +7032,7 @@ sub get_layout_slide {
     }
 
     my $_body_data;
-    my $files;
+    my $files = [];
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
@@ -6770,7 +7130,7 @@ sub get_layout_slides {
     }
 
     my $_body_data;
-    my $files;
+    my $files = [];
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
@@ -6932,7 +7292,7 @@ sub get_master_slide {
     }
 
     my $_body_data;
-    my $files;
+    my $files = [];
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
@@ -7030,7 +7390,7 @@ sub get_master_slides {
     }
 
     my $_body_data;
-    my $files;
+    my $files = [];
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
@@ -7192,7 +7552,7 @@ sub get_notes_slide {
     }
 
     my $_body_data;
-    my $files;
+    my $files = [];
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
@@ -7308,7 +7668,7 @@ sub notes_slide_exists {
     }
 
     my $_body_data;
-    my $files;
+    my $files = [];
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
@@ -7476,7 +7836,7 @@ sub get_notes_slide_header_footer {
     }
 
     my $_body_data;
-    my $files;
+    my $files = [];
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
@@ -7610,7 +7970,7 @@ sub get_notes_slide_shape {
     }
 
     my $_body_data;
-    my $files;
+    my $files = [];
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
@@ -7762,7 +8122,7 @@ sub get_notes_slide_paragraph {
     }
 
     my $_body_data;
-    my $files;
+    my $files = [];
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
@@ -7960,7 +8320,7 @@ sub get_notes_slide_paragraphs {
     }
 
     my $_body_data;
-    my $files;
+    my $files = [];
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
@@ -8188,7 +8548,7 @@ sub get_notes_slide_portion {
     }
 
     my $_body_data;
-    my $files;
+    my $files = [];
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
@@ -8410,7 +8770,7 @@ sub get_notes_slide_portions {
     }
 
     my $_body_data;
-    my $files;
+    my $files = [];
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
@@ -8590,7 +8950,7 @@ sub get_notes_slide_shapes {
     }
 
     my $_body_data;
-    my $files;
+    my $files = [];
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
@@ -8757,7 +9117,7 @@ sub download_notes_slide {
     }
 
     my $_body_data;
-    my $files;
+    my $files = [];
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
@@ -9003,7 +9363,7 @@ sub get_portion {
     }
 
     my $_body_data;
-    my $files;
+    my $files = [];
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
@@ -9225,7 +9585,7 @@ sub get_portions {
     }
 
     my $_body_data;
-    my $files;
+    my $files = [];
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
@@ -9387,7 +9747,7 @@ sub get_sections {
     }
 
     my $_body_data;
-    my $files;
+    my $files = [];
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
@@ -9514,7 +9874,7 @@ sub get_animation {
     }
 
     my $_body_data;
-    my $files;
+    my $files = [];
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
@@ -9688,7 +10048,7 @@ sub get_slide_header_footer {
     }
 
     my $_body_data;
-    my $files;
+    my $files = [];
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
@@ -9822,7 +10182,7 @@ sub get_shape {
     }
 
     my $_body_data;
-    my $files;
+    my $files = [];
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
@@ -10032,7 +10392,7 @@ sub get_paragraph {
     }
 
     my $_body_data;
-    my $files;
+    my $files = [];
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
@@ -10230,7 +10590,7 @@ sub get_paragraphs {
     }
 
     my $_body_data;
-    my $files;
+    my $files = [];
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
@@ -10404,7 +10764,7 @@ sub get_shapes {
     }
 
     my $_body_data;
-    my $files;
+    my $files = [];
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
@@ -10608,7 +10968,7 @@ sub get_subshape {
     }
 
     my $_body_data;
-    my $files;
+    my $files = [];
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
@@ -10842,7 +11202,7 @@ sub get_subshape_paragraph {
     }
 
     my $_body_data;
-    my $files;
+    my $files = [];
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
@@ -11064,7 +11424,7 @@ sub get_subshape_paragraphs {
     }
 
     my $_body_data;
-    my $files;
+    my $files = [];
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
@@ -11262,7 +11622,7 @@ sub get_subshapes {
     }
 
     my $_body_data;
-    my $files;
+    my $files = [];
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
@@ -11367,7 +11727,7 @@ sub get_api_info {
     $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
 
     my $_body_data;
-    my $files;
+    my $files = [];
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
@@ -11409,7 +11769,7 @@ sub get_slides_api_info {
 # @param string $name Document name. (required)
 # @param string $password Document password. (optional)
 # @param string $folder Document folder. (optional)
-# @param string $storage Documentstorage. (optional)
+# @param string $storage Document storage. (optional)
 {
     my $params = {
     'name' => {
@@ -11429,7 +11789,7 @@ sub get_slides_api_info {
     },
     'storage' => {
         data_type => 'string',
-        description => 'Documentstorage.',
+        description => 'Document storage.',
         required => '0',
     },
     };
@@ -11487,7 +11847,7 @@ sub get_presentation {
     }
 
     my $_body_data;
-    my $files;
+    my $files = [];
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
@@ -11507,7 +11867,7 @@ sub get_presentation {
 # @param string $name Document name. (required)
 # @param string $password Document password. (optional)
 # @param string $folder Document folder. (optional)
-# @param string $storage Documentstorage. (optional)
+# @param string $storage Document storage. (optional)
 {
     my $params = {
     'name' => {
@@ -11527,7 +11887,7 @@ sub get_presentation {
     },
     'storage' => {
         data_type => 'string',
-        description => 'Documentstorage.',
+        description => 'Document storage.',
         required => '0',
     },
     };
@@ -11631,7 +11991,7 @@ sub get_document_properties {
     }
 
     my $_body_data;
-    my $files;
+    my $files = [];
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
@@ -11793,7 +12153,7 @@ sub get_document_property {
     }
 
     my $_body_data;
-    my $files;
+    my $files = [];
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
@@ -11961,7 +12321,7 @@ sub download_image_default_format {
     }
 
     my $_body_data;
-    my $files;
+    my $files = [];
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
@@ -12147,7 +12507,7 @@ sub download_image {
     }
 
     my $_body_data;
-    my $files;
+    my $files = [];
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
@@ -12303,7 +12663,7 @@ sub get_presentation_images {
     }
 
     my $_body_data;
-    my $files;
+    my $files = [];
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
@@ -12483,7 +12843,7 @@ sub get_placeholder {
     }
 
     my $_body_data;
-    my $files;
+    my $files = [];
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
@@ -12657,7 +13017,7 @@ sub get_placeholders {
     }
 
     my $_body_data;
-    my $files;
+    my $files = [];
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
@@ -12818,7 +13178,7 @@ sub get_presentation_text_items {
     }
 
     my $_body_data;
-    my $files;
+    my $files = [];
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
@@ -12931,7 +13291,7 @@ sub get_protection_properties {
     }
 
     # parse inputs
-    my $_resource_path = '/slides/{name}/protectionProperties';
+    my $_resource_path = '/slides/{name}/protection';
 
     my $_method = 'GET';
     my $query_params = {};
@@ -12968,7 +13328,7 @@ sub get_protection_properties {
     }
 
     my $_body_data;
-    my $files;
+    my $files = [];
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
@@ -13130,7 +13490,7 @@ sub get_slide {
     }
 
     my $_body_data;
-    my $files;
+    my $files = [];
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
@@ -13298,7 +13658,7 @@ sub get_background {
     }
 
     my $_body_data;
-    my $files;
+    my $files = [];
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
@@ -13466,7 +13826,7 @@ sub get_comments {
     }
 
     my $_body_data;
-    my $files;
+    my $files = [];
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
@@ -13634,7 +13994,7 @@ sub get_slide_images {
     }
 
     my $_body_data;
-    my $files;
+    my $files = [];
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
@@ -13784,7 +14144,7 @@ sub get_slide_properties {
     }
 
     my $_body_data;
-    my $files;
+    my $files = [];
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
@@ -13957,7 +14317,7 @@ sub get_slide_text_items {
     }
 
     my $_body_data;
-    my $files;
+    my $files = [];
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
@@ -14113,7 +14473,7 @@ sub get_slides {
     }
 
     my $_body_data;
-    my $files;
+    my $files = [];
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
@@ -14275,7 +14635,7 @@ sub get_theme {
     }
 
     my $_body_data;
-    my $files;
+    my $files = [];
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
@@ -14443,7 +14803,7 @@ sub get_color_scheme {
     }
 
     my $_body_data;
-    my $files;
+    my $files = [];
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
@@ -14611,7 +14971,7 @@ sub get_font_scheme {
     }
 
     my $_body_data;
-    my $files;
+    my $files = [];
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
@@ -14779,7 +15139,7 @@ sub get_format_scheme {
     }
 
     my $_body_data;
-    my $files;
+    my $files = [];
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
@@ -14929,7 +15289,7 @@ sub get_view_properties {
     }
 
     my $_body_data;
-    my $files;
+    my $files = [];
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
@@ -15163,7 +15523,7 @@ sub get_subshape_portion {
     }
 
     my $_body_data;
-    my $files;
+    my $files = [];
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
@@ -15409,7 +15769,7 @@ sub get_subshape_portions {
     }
 
     my $_body_data;
-    my $files;
+    my $files = [];
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
@@ -15593,7 +15953,7 @@ sub move_file {
     }
 
     my $_body_data;
-    my $files;
+    my $files = [];
     # make the API Call
     $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
@@ -15692,7 +16052,7 @@ sub move_folder {
     }
 
     my $_body_data;
-    my $files;
+    my $files = [];
     # make the API Call
     $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
@@ -15775,7 +16135,7 @@ sub object_exists {
     }
 
     my $_body_data;
-    my $files;
+    my $files = [];
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
@@ -15931,9 +16291,9 @@ sub create_paragraph {
     }
 
     my $_body_data;
-    my $files;
+    my $files = [];
     # body params
-    if ( exists $args{'dto'}) {
+    if ( exists $args{'dto'} && $args{'dto'}) {
         $_body_data = $args{'dto'};
     }
 
@@ -16180,9 +16540,9 @@ sub create_portion {
     }
 
     my $_body_data;
-    my $files;
+    my $files = [];
     # body params
-    if ( exists $args{'dto'}) {
+    if ( exists $args{'dto'} && $args{'dto'}) {
         $_body_data = $args{'dto'};
     }
 
@@ -16405,9 +16765,9 @@ sub create_shape {
     }
 
     my $_body_data;
-    my $files;
+    my $files = [];
     # body params
-    if ( exists $args{'dto'}) {
+    if ( exists $args{'dto'} && $args{'dto'}) {
         $_body_data = $args{'dto'};
     }
 
@@ -16642,9 +17002,9 @@ sub create_subshape {
     }
 
     my $_body_data;
-    my $files;
+    my $files = [];
     # body params
-    if ( exists $args{'dto'}) {
+    if ( exists $args{'dto'} && $args{'dto'}) {
         $_body_data = $args{'dto'};
     }
 
@@ -16897,9 +17257,9 @@ sub create_subshape_paragraph {
     }
 
     my $_body_data;
-    my $files;
+    my $files = [];
     # body params
-    if ( exists $args{'dto'}) {
+    if ( exists $args{'dto'} && $args{'dto'}) {
         $_body_data = $args{'dto'};
     }
 
@@ -17170,9 +17530,9 @@ sub create_subshape_portion {
     }
 
     my $_body_data;
-    my $files;
+    my $files = [];
     # body params
-    if ( exists $args{'dto'}) {
+    if ( exists $args{'dto'} && $args{'dto'}) {
         $_body_data = $args{'dto'};
     }
 
@@ -17384,9 +17744,9 @@ sub create_notes_slide {
     }
 
     my $_body_data;
-    my $files;
+    my $files = [];
     # body params
-    if ( exists $args{'dto'}) {
+    if ( exists $args{'dto'} && $args{'dto'}) {
         $_body_data = $args{'dto'};
     }
 
@@ -17603,7 +17963,7 @@ sub align_shapes {
     }
 
     my $_body_data;
-    my $files;
+    my $files = [];
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
@@ -17818,9 +18178,9 @@ sub create_chart_category {
     }
 
     my $_body_data;
-    my $files;
+    my $files = [];
     # body params
-    if ( exists $args{'category'}) {
+    if ( exists $args{'category'} && $args{'category'}) {
         $_body_data = $args{'category'};
     }
 
@@ -18050,9 +18410,9 @@ sub create_chart_data_point {
     }
 
     my $_body_data;
-    my $files;
+    my $files = [];
     # body params
-    if ( exists $args{'data_point'}) {
+    if ( exists $args{'data_point'} && $args{'data_point'}) {
         $_body_data = $args{'data_point'};
     }
 
@@ -18270,9 +18630,9 @@ sub create_chart_series {
     }
 
     my $_body_data;
-    my $files;
+    my $files = [];
     # body params
-    if ( exists $args{'series'}) {
+    if ( exists $args{'series'} && $args{'series'}) {
         $_body_data = $args{'series'};
     }
 
@@ -18491,7 +18851,7 @@ sub copy_layout_slide {
     }
 
     my $_body_data;
-    my $files;
+    my $files = [];
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
@@ -18724,7 +19084,7 @@ sub copy_master_slide {
     }
 
     my $_body_data;
-    my $files;
+    my $files = [];
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
@@ -18887,12 +19247,10 @@ sub download_image_default_format_online {
     }
 
     my $_body_data;
-    my $files;
-    # form params
-    if ( exists $args{'document'} ) {
-        $_body_data = $args{'document'};
+    my $files = [];
+    if ( exists $args{'document'} && $args{'document'}) {
+        push(@$files, $args{'document'});
     }
-
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
@@ -19037,12 +19395,10 @@ sub download_image_online {
     }
 
     my $_body_data;
-    my $files;
-    # form params
-    if ( exists $args{'document'} ) {
-        $_body_data = $args{'document'};
+    my $files = [];
+    if ( exists $args{'document'} && $args{'document'}) {
+        push(@$files, $args{'document'});
     }
-
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
@@ -19175,12 +19531,10 @@ sub download_images_online {
     }
 
     my $_body_data;
-    my $files;
-    # form params
-    if ( exists $args{'document'} ) {
-        $_body_data = $args{'document'};
+    my $files = [];
+    if ( exists $args{'document'} && $args{'document'}) {
+        push(@$files, $args{'document'});
     }
-
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
@@ -19318,7 +19672,7 @@ sub download_images_default_format {
     }
 
     my $_body_data;
-    my $files;
+    my $files = [];
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
@@ -19480,7 +19834,7 @@ sub download_images {
     }
 
     my $_body_data;
-    my $files;
+    my $files = [];
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
@@ -19553,11 +19907,11 @@ sub post_export_images_with_format {
 # @param int $slide_index Slide index. (required)
 # @param int $shape_index Index of shape starting from 1 (required)
 # @param string $format Export picture format. (required)
-# @param string $password Document password. (optional)
-# @param string $storage Document storage. (optional)
 # @param double $scale_x X scale ratio. (optional, default to 0.0)
 # @param double $scale_y Y scale ratio. (optional, default to 0.0)
 # @param string $bounds Shape thumbnail bounds type. (optional, default to 1)
+# @param string $password Document password. (optional)
+# @param string $storage Document storage. (optional)
 # @param string $fonts_folder Fonts folder. (optional)
 {
     my $params = {
@@ -19581,16 +19935,6 @@ sub post_export_images_with_format {
         description => 'Export picture format.',
         required => '1',
     },
-    'password' => {
-        data_type => 'string',
-        description => 'Document password.',
-        required => '0',
-    },
-    'storage' => {
-        data_type => 'string',
-        description => 'Document storage.',
-        required => '0',
-    },
     'scale_x' => {
         data_type => 'double',
         description => 'X scale ratio.',
@@ -19604,6 +19948,16 @@ sub post_export_images_with_format {
     'bounds' => {
         data_type => 'string',
         description => 'Shape thumbnail bounds type.',
+        required => '0',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    'storage' => {
+        data_type => 'string',
+        description => 'Document storage.',
         required => '0',
     },
     'fonts_folder' => {
@@ -19659,11 +20013,6 @@ sub download_shape_online {
     $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('multipart/form-data');
 
     # query params
-    if (exists $args{'storage'} && defined $args{'storage'}) {
-        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
-    }
-
-    # query params
     if (exists $args{'scale_x'} && defined $args{'scale_x'}) {
         $query_params->{'scaleX'} = $self->{api_client}->to_query_value($args{'scale_x'});
     }
@@ -19676,6 +20025,11 @@ sub download_shape_online {
     # query params
     if (exists $args{'bounds'} && defined $args{'bounds'}) {
         $query_params->{'bounds'} = $self->{api_client}->to_query_value($args{'bounds'});
+    }
+
+    # query params
+    if (exists $args{'storage'} && defined $args{'storage'}) {
+        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
     }
 
     # query params
@@ -19710,12 +20064,10 @@ sub download_shape_online {
     }
 
     my $_body_data;
-    my $files;
-    # form params
-    if ( exists $args{'document'} ) {
-        $_body_data = $args{'document'};
+    my $files = [];
+    if ( exists $args{'document'} && $args{'document'}) {
+        push(@$files, $args{'document'});
     }
-
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
@@ -19736,11 +20088,11 @@ sub download_shape_online {
 # @param int $slide_index Slide index. (required)
 # @param int $shape_index Index of shape starting from 1 (required)
 # @param string $format Export picture format. (required)
-# @param string $password Document password. (optional)
-# @param string $storage Document storage. (optional)
 # @param double $scale_x X scale ratio. (optional, default to 0.0)
 # @param double $scale_y Y scale ratio. (optional, default to 0.0)
 # @param string $bounds Shape thumbnail bounds type. (optional, default to 1)
+# @param string $password Document password. (optional)
+# @param string $storage Document storage. (optional)
 # @param string $fonts_folder Fonts folder. (optional)
 {
     my $params = {
@@ -19764,16 +20116,6 @@ sub download_shape_online {
         description => 'Export picture format.',
         required => '1',
     },
-    'password' => {
-        data_type => 'string',
-        description => 'Document password.',
-        required => '0',
-    },
-    'storage' => {
-        data_type => 'string',
-        description => 'Document storage.',
-        required => '0',
-    },
     'scale_x' => {
         data_type => 'double',
         description => 'X scale ratio.',
@@ -19787,6 +20129,16 @@ sub download_shape_online {
     'bounds' => {
         data_type => 'string',
         description => 'Shape thumbnail bounds type.',
+        required => '0',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    'storage' => {
+        data_type => 'string',
+        description => 'Document storage.',
         required => '0',
     },
     'fonts_folder' => {
@@ -19946,12 +20298,10 @@ sub download_slide_online {
     }
 
     my $_body_data;
-    my $files;
-    # form params
-    if ( exists $args{'document'} ) {
-        $_body_data = $args{'document'};
+    my $files = [];
+    if ( exists $args{'document'} && $args{'document'}) {
+        push(@$files, $args{'document'});
     }
-
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
@@ -20108,12 +20458,10 @@ sub get_notes_slide_online {
     }
 
     my $_body_data;
-    my $files;
-    # form params
-    if ( exists $args{'document'} ) {
-        $_body_data = $args{'document'};
+    my $files = [];
+    if ( exists $args{'document'} && $args{'document'}) {
+        push(@$files, $args{'document'});
     }
-
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
@@ -20240,12 +20588,10 @@ sub notes_slide_exists_online {
     }
 
     my $_body_data;
-    my $files;
-    # form params
-    if ( exists $args{'document'} ) {
-        $_body_data = $args{'document'};
+    my $files = [];
+    if ( exists $args{'document'} && $args{'document'}) {
+        push(@$files, $args{'document'});
     }
-
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
@@ -20423,12 +20769,10 @@ sub download_notes_slide_online {
     }
 
     my $_body_data;
-    my $files;
-    # form params
-    if ( exists $args{'document'} ) {
-        $_body_data = $args{'document'};
+    my $files = [];
+    if ( exists $args{'document'} && $args{'document'}) {
+        push(@$files, $args{'document'});
     }
-
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
@@ -20505,6 +20849,316 @@ sub post_get_notes_slide_with_format {
 }
 
 #
+# create_image_watermark
+#
+# Adds an image watermark to each slide of the presentation.  Image can be provided as a part of the form or withing PictureFrame DTO for detailed customization. Both options are applicable simultaneously. 
+# 
+# @param string $name Document name. (required)
+# @param File $image Image data. (optional)
+# @param PictureFrame $picture_frame PictureFrame DTO (optional)
+# @param string $password Document password. (optional)
+# @param string $folder Document folder. (optional)
+# @param string $storage Document storage. (optional)
+{
+    my $params = {
+    'name' => {
+        data_type => 'string',
+        description => 'Document name.',
+        required => '1',
+    },
+    'image' => {
+        data_type => 'File',
+        description => 'Image data.',
+        required => '0',
+    },
+    'picture_frame' => {
+        data_type => 'PictureFrame',
+        description => 'PictureFrame DTO',
+        required => '0',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => 'Document folder.',
+        required => '0',
+    },
+    'storage' => {
+        data_type => 'string',
+        description => 'Document storage.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'create_image_watermark' } = { 
+    	summary => 'Adds an image watermark to each slide of the presentation.  Image can be provided as a part of the form or withing PictureFrame DTO for detailed customization. Both options are applicable simultaneously. ',
+        params => $params,
+        returns => undef,
+        };
+}
+# @return void
+#
+sub create_image_watermark {
+    my ($self, %args) = @_;
+
+    # verify the required parameter 'name' is set
+    unless (exists $args{'name'} && $args{'name'}) {
+      croak("Missing the required parameter 'name' when calling post_image_watermark");
+    }
+
+    # parse inputs
+    my $_resource_path = '/slides/{name}/watermark/image';
+
+    my $_method = 'POST';
+    my $query_params = {};
+    my $header_params = {};
+    my $form_params = {};
+
+    # 'Accept' and 'Content-Type' header
+    my $_header_accept = $self->{api_client}->select_header_accept('application/json');
+    if ($_header_accept) {
+        $header_params->{'Accept'} = $_header_accept;
+    }
+    $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('multipart/form-data');
+
+    # query params
+    if (exists $args{'folder'} && defined $args{'folder'}) {
+        $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
+    }
+
+    # query params
+    if (exists $args{'storage'} && defined $args{'storage'}) {
+        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    }
+
+    # header params
+    if ( exists $args{'password'}) {
+        $header_params->{':password'} = $self->{api_client}->to_header_value($args{'password'});
+    }
+
+    # path params
+    if ( exists $args{'name'}) {
+        my $_base_variable = "{" . "name" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'name'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    my $_body_data;
+    my $files = [];
+    if ( exists $args{'image'} && $args{'image'}) {
+        push(@$files, $args{'image'});
+    }
+    # body params
+    if ( exists $args{'picture_frame'} && $args{'picture_frame'}) {
+        $_body_data = $args{'picture_frame'};
+    }
+
+    # make the API Call
+    $self->{api_client}->call_api($_resource_path, $_method,
+                                           $query_params, $form_params,
+                                           $header_params, $_body_data, $files);
+    return;
+}
+
+#
+# post_image_watermark
+#
+# Adds an image watermark to each slide of the presentation.  Image can be provided as a part of the form or withing PictureFrame DTO for detailed customization. Both options are applicable simultaneously. 
+# 
+# @param string $name Document name. (required)
+# @param File $image Image data. (optional)
+# @param PictureFrame $picture_frame PictureFrame DTO (optional)
+# @param string $password Document password. (optional)
+# @param string $folder Document folder. (optional)
+# @param string $storage Document storage. (optional)
+{
+    my $params = {
+    'name' => {
+        data_type => 'string',
+        description => 'Document name.',
+        required => '1',
+    },
+    'image' => {
+        data_type => 'File',
+        description => 'Image data.',
+        required => '0',
+    },
+    'picture_frame' => {
+        data_type => 'PictureFrame',
+        description => 'PictureFrame DTO',
+        required => '0',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => 'Document folder.',
+        required => '0',
+    },
+    'storage' => {
+        data_type => 'string',
+        description => 'Document storage.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'post_image_watermark' } = { 
+    	summary => 'Adds an image watermark to each slide of the presentation.  Image can be provided as a part of the form or withing PictureFrame DTO for detailed customization. Both options are applicable simultaneously. ',
+        params => $params,
+        returns => undef,
+        };
+}
+# @return void
+#
+sub post_image_watermark {
+    warnings::warnif("deprecated", "post_image_watermark is deprecated, use create_image_watermark instead");
+  
+    return create_image_watermark(@_);
+}
+
+#
+# create_image_watermark_online
+#
+# Adds an image watermark to each slide of the presentation.  Image can be provided as a part of the form or withing PictureFrame DTO for detailed customization. Both options are applicable simultaneously. 
+# 
+# @param File $document Document data. (required)
+# @param File $image Image data. (optional)
+# @param PictureFrame $picture_frame PictureFrame DTO. (optional)
+# @param string $password Document password. (optional)
+{
+    my $params = {
+    'document' => {
+        data_type => 'File',
+        description => 'Document data.',
+        required => '1',
+    },
+    'image' => {
+        data_type => 'File',
+        description => 'Image data.',
+        required => '0',
+    },
+    'picture_frame' => {
+        data_type => 'PictureFrame',
+        description => 'PictureFrame DTO.',
+        required => '0',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'create_image_watermark_online' } = { 
+    	summary => 'Adds an image watermark to each slide of the presentation.  Image can be provided as a part of the form or withing PictureFrame DTO for detailed customization. Both options are applicable simultaneously. ',
+        params => $params,
+        returns => 'File',
+        };
+}
+# @return File
+#
+sub create_image_watermark_online {
+    my ($self, %args) = @_;
+
+    # verify the required parameter 'document' is set
+    unless (exists $args{'document'} && $args{'document'}) {
+      croak("Missing the required parameter 'document' when calling post_image_watermark_online");
+    }
+
+    # parse inputs
+    my $_resource_path = '/slides/watermark/image';
+
+    my $_method = 'POST';
+    my $query_params = {};
+    my $header_params = {};
+    my $form_params = {};
+
+    # 'Accept' and 'Content-Type' header
+    my $_header_accept = $self->{api_client}->select_header_accept('multipart/form-data');
+    if ($_header_accept) {
+        $header_params->{'Accept'} = $_header_accept;
+    }
+    $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('multipart/form-data');
+
+    # header params
+    if ( exists $args{'password'}) {
+        $header_params->{':password'} = $self->{api_client}->to_header_value($args{'password'});
+    }
+
+    my $_body_data;
+    my $files = [];
+    if ( exists $args{'document'} && $args{'document'}) {
+        push(@$files, $args{'document'});
+    }
+    if ( exists $args{'image'} && $args{'image'}) {
+        push(@$files, $args{'image'});
+    }
+    # body params
+    if ( exists $args{'picture_frame'} && $args{'picture_frame'}) {
+        $_body_data = $args{'picture_frame'};
+    }
+
+    # make the API Call
+    my $response = $self->{api_client}->call_api($_resource_path, $_method,
+                                           $query_params, $form_params,
+                                           $header_params, $_body_data, $files);
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('File', $response);
+    return $_response_object;
+}
+
+#
+# post_image_watermark_online
+#
+# Adds an image watermark to each slide of the presentation.  Image can be provided as a part of the form or withing PictureFrame DTO for detailed customization. Both options are applicable simultaneously. 
+# 
+# @param File $document Document data. (required)
+# @param File $image Image data. (optional)
+# @param PictureFrame $picture_frame PictureFrame DTO. (optional)
+# @param string $password Document password. (optional)
+{
+    my $params = {
+    'document' => {
+        data_type => 'File',
+        description => 'Document data.',
+        required => '1',
+    },
+    'image' => {
+        data_type => 'File',
+        description => 'Image data.',
+        required => '0',
+    },
+    'picture_frame' => {
+        data_type => 'PictureFrame',
+        description => 'PictureFrame DTO.',
+        required => '0',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'post_image_watermark_online' } = { 
+    	summary => 'Adds an image watermark to each slide of the presentation.  Image can be provided as a part of the form or withing PictureFrame DTO for detailed customization. Both options are applicable simultaneously. ',
+        params => $params,
+        returns => 'File',
+        };
+}
+# @return File
+#
+sub post_image_watermark_online {
+    warnings::warnif("deprecated", "post_image_watermark_online is deprecated, use create_image_watermark_online instead");
+  
+    return create_image_watermark_online(@_);
+}
+
+#
 # download_images_default_format_online
 #
 # Get all presentation images.
@@ -20561,12 +21215,10 @@ sub download_images_default_format_online {
     }
 
     my $_body_data;
-    my $files;
-    # form params
-    if ( exists $args{'document'} ) {
-        $_body_data = $args{'document'};
+    my $files = [];
+    if ( exists $args{'document'} && $args{'document'}) {
+        push(@$files, $args{'document'});
     }
-
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
@@ -20756,9 +21408,9 @@ sub create_notes_slide_paragraph {
     }
 
     my $_body_data;
-    my $files;
+    my $files = [];
     # body params
-    if ( exists $args{'dto'}) {
+    if ( exists $args{'dto'} && $args{'dto'}) {
         $_body_data = $args{'dto'};
     }
 
@@ -21005,9 +21657,9 @@ sub create_notes_slide_portion {
     }
 
     my $_body_data;
-    my $files;
+    my $files = [];
     # body params
-    if ( exists $args{'dto'}) {
+    if ( exists $args{'dto'} && $args{'dto'}) {
         $_body_data = $args{'dto'};
     }
 
@@ -21235,9 +21887,9 @@ sub create_notes_slide_shape {
     }
 
     my $_body_data;
-    my $files;
+    my $files = [];
     # body params
-    if ( exists $args{'dto'}) {
+    if ( exists $args{'dto'} && $args{'dto'}) {
         $_body_data = $args{'dto'};
     }
 
@@ -21512,9 +22164,9 @@ sub download_notes_slide_shape {
     }
 
     my $_body_data;
-    my $files;
+    my $files = [];
     # body params
-    if ( exists $args{'options'}) {
+    if ( exists $args{'options'} && $args{'options'}) {
         $_body_data = $args{'options'};
     }
 
@@ -21720,9 +22372,9 @@ sub merge {
     }
 
     my $_body_data;
-    my $files;
+    my $files = [];
     # body params
-    if ( exists $args{'request'}) {
+    if ( exists $args{'request'} && $args{'request'}) {
         $_body_data = $args{'request'};
     }
 
@@ -21889,12 +22541,10 @@ sub replace_presentation_text_online {
     }
 
     my $_body_data;
-    my $files;
-    # form params
-    if ( exists $args{'document'} ) {
-        $_body_data = $args{'document'};
+    my $files = [];
+    if ( exists $args{'document'} && $args{'document'}) {
+        push(@$files, $args{'document'});
     }
-
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
@@ -22099,12 +22749,10 @@ sub split_online {
     }
 
     my $_body_data;
-    my $files;
-    # form params
-    if ( exists $args{'document'} ) {
-        $_body_data = $args{'document'};
+    my $files = [];
+    if ( exists $args{'document'} && $args{'document'}) {
+        push(@$files, $args{'document'});
     }
-
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
@@ -22310,7 +22958,7 @@ sub create_section {
     }
 
     my $_body_data;
-    my $files;
+    my $files = [];
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
@@ -22500,7 +23148,7 @@ sub move_section {
     }
 
     my $_body_data;
-    my $files;
+    my $files = [];
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
@@ -22760,9 +23408,9 @@ sub download_shape {
     }
 
     my $_body_data;
-    my $files;
+    my $files = [];
     # body params
-    if ( exists $args{'options'}) {
+    if ( exists $args{'options'} && $args{'options'}) {
         $_body_data = $args{'options'};
     }
 
@@ -22986,9 +23634,9 @@ sub create_animation_effect {
     }
 
     my $_body_data;
-    my $files;
+    my $files = [];
     # body params
-    if ( exists $args{'effect'}) {
+    if ( exists $args{'effect'} && $args{'effect'}) {
         $_body_data = $args{'effect'};
     }
 
@@ -23176,9 +23824,9 @@ sub create_animation_interactive_sequence {
     }
 
     my $_body_data;
-    my $files;
+    my $files = [];
     # body params
-    if ( exists $args{'sequence'}) {
+    if ( exists $args{'sequence'} && $args{'sequence'}) {
         $_body_data = $args{'sequence'};
     }
 
@@ -23384,9 +24032,9 @@ sub create_animation_interactive_sequence_effect {
     }
 
     my $_body_data;
-    my $files;
+    my $files = [];
     # body params
-    if ( exists $args{'effect'}) {
+    if ( exists $args{'effect'} && $args{'effect'}) {
         $_body_data = $args{'effect'};
     }
 
@@ -23583,12 +24231,10 @@ sub replace_slide_text_online {
     }
 
     my $_body_data;
-    my $files;
-    # form params
-    if ( exists $args{'document'} ) {
-        $_body_data = $args{'document'};
+    my $files = [];
+    if ( exists $args{'document'} && $args{'document'}) {
+        push(@$files, $args{'document'});
     }
-
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
@@ -23819,9 +24465,9 @@ sub download_slide {
     }
 
     my $_body_data;
-    my $files;
+    my $files = [];
     # body params
-    if ( exists $args{'options'}) {
+    if ( exists $args{'options'} && $args{'options'}) {
         $_body_data = $args{'options'};
     }
 
@@ -24026,7 +24672,7 @@ sub create_slide {
     }
 
     my $_body_data;
-    my $files;
+    my $files = [];
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
@@ -24193,12 +24839,10 @@ sub convert {
     }
 
     my $_body_data;
-    my $files;
-    # form params
-    if ( exists $args{'document'} ) {
-        $_body_data = $args{'document'};
+    my $files = [];
+    if ( exists $args{'document'} && $args{'document'}) {
+        push(@$files, $args{'document'});
     }
-
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
@@ -24408,7 +25052,7 @@ sub copy_slide {
     }
 
     my $_body_data;
-    my $files;
+    my $files = [];
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
@@ -24599,12 +25243,10 @@ sub create_presentation {
     }
 
     my $_body_data;
-    my $files;
-    # form params
-    if ( exists $args{'data'} ) {
-        $_body_data = $args{'data'};
+    my $files = [];
+    if ( exists $args{'data'} && $args{'data'}) {
+        push(@$files, $args{'data'});
     }
-
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
@@ -24766,9 +25408,9 @@ sub import_from_html {
     }
 
     my $_body_data;
-    my $files;
+    my $files = [];
     # body params
-    if ( exists $args{'html'}) {
+    if ( exists $args{'html'} && $args{'html'}) {
         $_body_data = $args{'html'};
     }
 
@@ -24927,12 +25569,10 @@ sub import_from_pdf {
     }
 
     my $_body_data;
-    my $files;
-    # form params
-    if ( exists $args{'pdf'} ) {
-        $_body_data = $args{'pdf'};
+    my $files = [];
+    if ( exists $args{'pdf'} && $args{'pdf'}) {
+        push(@$files, $args{'pdf'});
     }
-
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
@@ -25115,7 +25755,7 @@ sub create_presentation_from_source {
     }
 
     my $_body_data;
-    my $files;
+    my $files = [];
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
@@ -25332,9 +25972,9 @@ sub create_presentation_from_template {
     }
 
     my $_body_data;
-    my $files;
+    my $files = [];
     # body params
-    if ( exists $args{'data'}) {
+    if ( exists $args{'data'} && $args{'data'}) {
         $_body_data = $args{'data'};
     }
 
@@ -25483,13 +26123,13 @@ sub merge_online {
     }
 
     my $_body_data;
-    my $files;
-    if ( exists $args{'files'}) {
-        $files = $args{'files'};
+    my $files = [];
+    if ( exists $args{'files'} && $args{'files'}) {
+        my $arg_files = $args{'files'};
+        push(@$files, @$arg_files);
     }
-
     # body params
-    if ( exists $args{'request'}) {
+    if ( exists $args{'request'} && $args{'request'}) {
         $_body_data = $args{'request'};
     }
 
@@ -25596,13 +26236,13 @@ sub pipeline {
     $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('multipart/form-data');
 
     my $_body_data;
-    my $files;
-    if ( exists $args{'files'}) {
-        $files = $args{'files'};
+    my $files = [];
+    if ( exists $args{'files'} && $args{'files'}) {
+        my $arg_files = $args{'files'};
+        push(@$files, @$arg_files);
     }
-
     # body params
-    if ( exists $args{'pipeline'}) {
+    if ( exists $args{'pipeline'} && $args{'pipeline'}) {
         $_body_data = $args{'pipeline'};
     }
 
@@ -25780,7 +26420,7 @@ sub replace_presentation_text {
     }
 
     my $_body_data;
-    my $files;
+    my $files = [];
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
@@ -25976,7 +26616,7 @@ sub move_slide {
     }
 
     my $_body_data;
-    my $files;
+    my $files = [];
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
@@ -26154,7 +26794,7 @@ sub reorder_slides {
     }
 
     my $_body_data;
-    my $files;
+    my $files = [];
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
@@ -26345,9 +26985,9 @@ sub download_presentation {
     }
 
     my $_body_data;
-    my $files;
+    my $files = [];
     # body params
-    if ( exists $args{'options'}) {
+    if ( exists $args{'options'} && $args{'options'}) {
         $_body_data = $args{'options'};
     }
 
@@ -26523,9 +27163,9 @@ sub set_document_properties {
     }
 
     my $_body_data;
-    my $files;
+    my $files = [];
     # body params
-    if ( exists $args{'properties'}) {
+    if ( exists $args{'properties'} && $args{'properties'}) {
         $_body_data = $args{'properties'};
     }
 
@@ -26739,7 +27379,7 @@ sub replace_slide_text {
     }
 
     my $_body_data;
-    my $files;
+    my $files = [];
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
@@ -26990,9 +27630,9 @@ sub split {
     }
 
     my $_body_data;
-    my $files;
+    my $files = [];
     # body params
-    if ( exists $args{'options'}) {
+    if ( exists $args{'options'} && $args{'options'}) {
         $_body_data = $args{'options'};
     }
 
@@ -27309,9 +27949,9 @@ sub download_subshape {
     }
 
     my $_body_data;
-    my $files;
+    my $files = [];
     # body params
-    if ( exists $args{'options'}) {
+    if ( exists $args{'options'} && $args{'options'}) {
         $_body_data = $args{'options'};
     }
 
@@ -27424,6 +28064,545 @@ sub post_subshape_save_as {
     warnings::warnif("deprecated", "post_subshape_save_as is deprecated, use download_subshape instead");
   
     return download_subshape(@_);
+}
+
+#
+# create_watermark
+#
+# Adds a text watermark to each slide of the presentation. Text watermark can be setup via method arguments or withing Shape DTO for detailed customization. Both options are applicable simultaneously. 
+# 
+# @param string $name Document name. (required)
+# @param Shape $shape Shape DTO (optional)
+# @param double $font_height Watermark font height. (optional)
+# @param string $text Watermark text. (optional)
+# @param string $font_name Watermark font name. (optional)
+# @param string $font_color Watermark font color. (optional)
+# @param string $password Document password. (optional)
+# @param string $folder Document folder. (optional)
+# @param string $storage Document storage. (optional)
+{
+    my $params = {
+    'name' => {
+        data_type => 'string',
+        description => 'Document name.',
+        required => '1',
+    },
+    'shape' => {
+        data_type => 'Shape',
+        description => 'Shape DTO',
+        required => '0',
+    },
+    'font_height' => {
+        data_type => 'double',
+        description => 'Watermark font height.',
+        required => '0',
+    },
+    'text' => {
+        data_type => 'string',
+        description => 'Watermark text.',
+        required => '0',
+    },
+    'font_name' => {
+        data_type => 'string',
+        description => 'Watermark font name.',
+        required => '0',
+    },
+    'font_color' => {
+        data_type => 'string',
+        description => 'Watermark font color.',
+        required => '0',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => 'Document folder.',
+        required => '0',
+    },
+    'storage' => {
+        data_type => 'string',
+        description => 'Document storage.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'create_watermark' } = { 
+    	summary => 'Adds a text watermark to each slide of the presentation. Text watermark can be setup via method arguments or withing Shape DTO for detailed customization. Both options are applicable simultaneously. ',
+        params => $params,
+        returns => undef,
+        };
+}
+# @return void
+#
+sub create_watermark {
+    my ($self, %args) = @_;
+
+    # verify the required parameter 'name' is set
+    unless (exists $args{'name'} && $args{'name'}) {
+      croak("Missing the required parameter 'name' when calling post_watermark");
+    }
+
+    # parse inputs
+    my $_resource_path = '/slides/{name}/watermark';
+
+    my $_method = 'POST';
+    my $query_params = {};
+    my $header_params = {};
+    my $form_params = {};
+
+    # 'Accept' and 'Content-Type' header
+    my $_header_accept = $self->{api_client}->select_header_accept('application/json');
+    if ($_header_accept) {
+        $header_params->{'Accept'} = $_header_accept;
+    }
+    $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('multipart/form-data');
+
+    # query params
+    if (exists $args{'font_height'} && defined $args{'font_height'}) {
+        $query_params->{'fontHeight'} = $self->{api_client}->to_query_value($args{'font_height'});
+    }
+
+    # query params
+    if (exists $args{'text'} && defined $args{'text'}) {
+        $query_params->{'text'} = $self->{api_client}->to_query_value($args{'text'});
+    }
+
+    # query params
+    if (exists $args{'font_name'} && defined $args{'font_name'}) {
+        $query_params->{'fontName'} = $self->{api_client}->to_query_value($args{'font_name'});
+    }
+
+    # query params
+    if (exists $args{'font_color'} && defined $args{'font_color'}) {
+        $query_params->{'fontColor'} = $self->{api_client}->to_query_value($args{'font_color'});
+    }
+
+    # query params
+    if (exists $args{'folder'} && defined $args{'folder'}) {
+        $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
+    }
+
+    # query params
+    if (exists $args{'storage'} && defined $args{'storage'}) {
+        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    }
+
+    # header params
+    if ( exists $args{'password'}) {
+        $header_params->{':password'} = $self->{api_client}->to_header_value($args{'password'});
+    }
+
+    # path params
+    if ( exists $args{'name'}) {
+        my $_base_variable = "{" . "name" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'name'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    my $_body_data;
+    my $files = [];
+    # body params
+    if ( exists $args{'shape'} && $args{'shape'}) {
+        $_body_data = $args{'shape'};
+    }
+
+    # make the API Call
+    $self->{api_client}->call_api($_resource_path, $_method,
+                                           $query_params, $form_params,
+                                           $header_params, $_body_data, $files);
+    return;
+}
+
+#
+# post_watermark
+#
+# Adds a text watermark to each slide of the presentation. Text watermark can be setup via method arguments or withing Shape DTO for detailed customization. Both options are applicable simultaneously. 
+# 
+# @param string $name Document name. (required)
+# @param Shape $shape Shape DTO (optional)
+# @param double $font_height Watermark font height. (optional)
+# @param string $text Watermark text. (optional)
+# @param string $font_name Watermark font name. (optional)
+# @param string $font_color Watermark font color. (optional)
+# @param string $password Document password. (optional)
+# @param string $folder Document folder. (optional)
+# @param string $storage Document storage. (optional)
+{
+    my $params = {
+    'name' => {
+        data_type => 'string',
+        description => 'Document name.',
+        required => '1',
+    },
+    'shape' => {
+        data_type => 'Shape',
+        description => 'Shape DTO',
+        required => '0',
+    },
+    'font_height' => {
+        data_type => 'double',
+        description => 'Watermark font height.',
+        required => '0',
+    },
+    'text' => {
+        data_type => 'string',
+        description => 'Watermark text.',
+        required => '0',
+    },
+    'font_name' => {
+        data_type => 'string',
+        description => 'Watermark font name.',
+        required => '0',
+    },
+    'font_color' => {
+        data_type => 'string',
+        description => 'Watermark font color.',
+        required => '0',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => 'Document folder.',
+        required => '0',
+    },
+    'storage' => {
+        data_type => 'string',
+        description => 'Document storage.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'post_watermark' } = { 
+    	summary => 'Adds a text watermark to each slide of the presentation. Text watermark can be setup via method arguments or withing Shape DTO for detailed customization. Both options are applicable simultaneously. ',
+        params => $params,
+        returns => undef,
+        };
+}
+# @return void
+#
+sub post_watermark {
+    warnings::warnif("deprecated", "post_watermark is deprecated, use create_watermark instead");
+  
+    return create_watermark(@_);
+}
+
+#
+# delete_watermark_online
+#
+# Removes shapes with name \"watermark\" from the presentation.
+# 
+# @param File $document Document data. (required)
+# @param string $shape_name Name of the watermark shape. If null, default value \&quot;watermark\&quot;is used. (optional)
+# @param string $password Document password. (optional)
+{
+    my $params = {
+    'document' => {
+        data_type => 'File',
+        description => 'Document data.',
+        required => '1',
+    },
+    'shape_name' => {
+        data_type => 'string',
+        description => 'Name of the watermark shape. If null, default value \&quot;watermark\&quot;is used.',
+        required => '0',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'delete_watermark_online' } = { 
+    	summary => 'Removes shapes with name \&quot;watermark\&quot; from the presentation.',
+        params => $params,
+        returns => 'File',
+        };
+}
+# @return File
+#
+sub delete_watermark_online {
+    my ($self, %args) = @_;
+
+    # verify the required parameter 'document' is set
+    unless (exists $args{'document'} && $args{'document'}) {
+      croak("Missing the required parameter 'document' when calling post_watermark_delete_online");
+    }
+
+    # parse inputs
+    my $_resource_path = '/slides/watermark/delete';
+
+    my $_method = 'POST';
+    my $query_params = {};
+    my $header_params = {};
+    my $form_params = {};
+
+    # 'Accept' and 'Content-Type' header
+    my $_header_accept = $self->{api_client}->select_header_accept('multipart/form-data');
+    if ($_header_accept) {
+        $header_params->{'Accept'} = $_header_accept;
+    }
+    $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('multipart/form-data');
+
+    # query params
+    if (exists $args{'shape_name'} && defined $args{'shape_name'}) {
+        $query_params->{'shapeName'} = $self->{api_client}->to_query_value($args{'shape_name'});
+    }
+
+    # header params
+    if ( exists $args{'password'}) {
+        $header_params->{':password'} = $self->{api_client}->to_header_value($args{'password'});
+    }
+
+    my $_body_data;
+    my $files = [];
+    if ( exists $args{'document'} && $args{'document'}) {
+        push(@$files, $args{'document'});
+    }
+    # make the API Call
+    my $response = $self->{api_client}->call_api($_resource_path, $_method,
+                                           $query_params, $form_params,
+                                           $header_params, $_body_data, $files);
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('File', $response);
+    return $_response_object;
+}
+
+#
+# post_watermark_delete_online
+#
+# Removes shapes with name \"watermark\" from the presentation.
+# 
+# @param File $document Document data. (required)
+# @param string $shape_name Name of the watermark shape. If null, default value \&quot;watermark\&quot;is used. (optional)
+# @param string $password Document password. (optional)
+{
+    my $params = {
+    'document' => {
+        data_type => 'File',
+        description => 'Document data.',
+        required => '1',
+    },
+    'shape_name' => {
+        data_type => 'string',
+        description => 'Name of the watermark shape. If null, default value \&quot;watermark\&quot;is used.',
+        required => '0',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'post_watermark_delete_online' } = { 
+    	summary => 'Removes shapes with name \&quot;watermark\&quot; from the presentation.',
+        params => $params,
+        returns => 'File',
+        };
+}
+# @return File
+#
+sub post_watermark_delete_online {
+    warnings::warnif("deprecated", "post_watermark_delete_online is deprecated, use delete_watermark_online instead");
+  
+    return delete_watermark_online(@_);
+}
+
+#
+# create_watermark_online
+#
+# Adds a text watermark to each slide of the presentation. Text watermark can be setup via method arguments or withing Shape DTO for detailed customization. Both options are applicable simultaneously. 
+# 
+# @param File $document Document data. (required)
+# @param Shape $shape Shape DTO (optional)
+# @param double $font_height Watermark font height. (optional)
+# @param string $text Watermark text. (optional)
+# @param string $font_name Watermark font name. (optional)
+# @param string $font_color Watermark font color. (optional)
+# @param string $password Document password. (optional)
+{
+    my $params = {
+    'document' => {
+        data_type => 'File',
+        description => 'Document data.',
+        required => '1',
+    },
+    'shape' => {
+        data_type => 'Shape',
+        description => 'Shape DTO',
+        required => '0',
+    },
+    'font_height' => {
+        data_type => 'double',
+        description => 'Watermark font height.',
+        required => '0',
+    },
+    'text' => {
+        data_type => 'string',
+        description => 'Watermark text.',
+        required => '0',
+    },
+    'font_name' => {
+        data_type => 'string',
+        description => 'Watermark font name.',
+        required => '0',
+    },
+    'font_color' => {
+        data_type => 'string',
+        description => 'Watermark font color.',
+        required => '0',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'create_watermark_online' } = { 
+    	summary => 'Adds a text watermark to each slide of the presentation. Text watermark can be setup via method arguments or withing Shape DTO for detailed customization. Both options are applicable simultaneously. ',
+        params => $params,
+        returns => 'File',
+        };
+}
+# @return File
+#
+sub create_watermark_online {
+    my ($self, %args) = @_;
+
+    # verify the required parameter 'document' is set
+    unless (exists $args{'document'} && $args{'document'}) {
+      croak("Missing the required parameter 'document' when calling post_watermark_online");
+    }
+
+    # parse inputs
+    my $_resource_path = '/slides/watermark';
+
+    my $_method = 'POST';
+    my $query_params = {};
+    my $header_params = {};
+    my $form_params = {};
+
+    # 'Accept' and 'Content-Type' header
+    my $_header_accept = $self->{api_client}->select_header_accept('multipart/form-data');
+    if ($_header_accept) {
+        $header_params->{'Accept'} = $_header_accept;
+    }
+    $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('multipart/form-data');
+
+    # query params
+    if (exists $args{'font_height'} && defined $args{'font_height'}) {
+        $query_params->{'fontHeight'} = $self->{api_client}->to_query_value($args{'font_height'});
+    }
+
+    # query params
+    if (exists $args{'text'} && defined $args{'text'}) {
+        $query_params->{'text'} = $self->{api_client}->to_query_value($args{'text'});
+    }
+
+    # query params
+    if (exists $args{'font_name'} && defined $args{'font_name'}) {
+        $query_params->{'fontName'} = $self->{api_client}->to_query_value($args{'font_name'});
+    }
+
+    # query params
+    if (exists $args{'font_color'} && defined $args{'font_color'}) {
+        $query_params->{'fontColor'} = $self->{api_client}->to_query_value($args{'font_color'});
+    }
+
+    # header params
+    if ( exists $args{'password'}) {
+        $header_params->{':password'} = $self->{api_client}->to_header_value($args{'password'});
+    }
+
+    my $_body_data;
+    my $files = [];
+    if ( exists $args{'document'} && $args{'document'}) {
+        push(@$files, $args{'document'});
+    }
+    # body params
+    if ( exists $args{'shape'} && $args{'shape'}) {
+        $_body_data = $args{'shape'};
+    }
+
+    # make the API Call
+    my $response = $self->{api_client}->call_api($_resource_path, $_method,
+                                           $query_params, $form_params,
+                                           $header_params, $_body_data, $files);
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('File', $response);
+    return $_response_object;
+}
+
+#
+# post_watermark_online
+#
+# Adds a text watermark to each slide of the presentation. Text watermark can be setup via method arguments or withing Shape DTO for detailed customization. Both options are applicable simultaneously. 
+# 
+# @param File $document Document data. (required)
+# @param Shape $shape Shape DTO (optional)
+# @param double $font_height Watermark font height. (optional)
+# @param string $text Watermark text. (optional)
+# @param string $font_name Watermark font name. (optional)
+# @param string $font_color Watermark font color. (optional)
+# @param string $password Document password. (optional)
+{
+    my $params = {
+    'document' => {
+        data_type => 'File',
+        description => 'Document data.',
+        required => '1',
+    },
+    'shape' => {
+        data_type => 'Shape',
+        description => 'Shape DTO',
+        required => '0',
+    },
+    'font_height' => {
+        data_type => 'double',
+        description => 'Watermark font height.',
+        required => '0',
+    },
+    'text' => {
+        data_type => 'string',
+        description => 'Watermark text.',
+        required => '0',
+    },
+    'font_name' => {
+        data_type => 'string',
+        description => 'Watermark font name.',
+        required => '0',
+    },
+    'font_color' => {
+        data_type => 'string',
+        description => 'Watermark font color.',
+        required => '0',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'post_watermark_online' } = { 
+    	summary => 'Adds a text watermark to each slide of the presentation. Text watermark can be setup via method arguments or withing Shape DTO for detailed customization. Both options are applicable simultaneously. ',
+        params => $params,
+        returns => 'File',
+        };
+}
+# @return File
+#
+sub post_watermark_online {
+    warnings::warnif("deprecated", "post_watermark_online is deprecated, use create_watermark_online instead");
+  
+    return create_watermark_online(@_);
 }
 
 #
@@ -27577,9 +28756,9 @@ sub update_chart_category {
     }
 
     my $_body_data;
-    my $files;
+    my $files = [];
     # body params
-    if ( exists $args{'category'}) {
+    if ( exists $args{'category'} && $args{'category'}) {
         $_body_data = $args{'category'};
     }
 
@@ -27833,9 +29012,9 @@ sub update_chart_data_point {
     }
 
     my $_body_data;
-    my $files;
+    my $files = [];
     # body params
-    if ( exists $args{'data_point'}) {
+    if ( exists $args{'data_point'} && $args{'data_point'}) {
         $_body_data = $args{'data_point'};
     }
 
@@ -28077,9 +29256,9 @@ sub update_chart_series {
     }
 
     my $_body_data;
-    my $files;
+    my $files = [];
     # body params
-    if ( exists $args{'series'}) {
+    if ( exists $args{'series'} && $args{'series'}) {
         $_body_data = $args{'series'};
     }
 
@@ -28174,11 +29353,11 @@ sub put_chart_series {
 # @param int $shape_index Index of shape starting from 1 (required)
 # @param string $format Export picture format. (required)
 # @param string $out_path Path to save result. (required)
-# @param string $password Document password. (optional)
-# @param string $storage Document storage. (optional)
 # @param double $scale_x X scale ratio. (optional, default to 0.0)
 # @param double $scale_y Y scale ratio. (optional, default to 0.0)
 # @param string $bounds Shape thumbnail bounds type. (optional, default to 1)
+# @param string $password Document password. (optional)
+# @param string $storage Document storage. (optional)
 # @param string $fonts_folder Fonts folder. (optional)
 {
     my $params = {
@@ -28207,16 +29386,6 @@ sub put_chart_series {
         description => 'Path to save result.',
         required => '1',
     },
-    'password' => {
-        data_type => 'string',
-        description => 'Document password.',
-        required => '0',
-    },
-    'storage' => {
-        data_type => 'string',
-        description => 'Document storage.',
-        required => '0',
-    },
     'scale_x' => {
         data_type => 'double',
         description => 'X scale ratio.',
@@ -28230,6 +29399,16 @@ sub put_chart_series {
     'bounds' => {
         data_type => 'string',
         description => 'Shape thumbnail bounds type.',
+        required => '0',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    'storage' => {
+        data_type => 'string',
+        description => 'Document storage.',
         required => '0',
     },
     'fonts_folder' => {
@@ -28295,11 +29474,6 @@ sub save_shape_online {
     }
 
     # query params
-    if (exists $args{'storage'} && defined $args{'storage'}) {
-        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
-    }
-
-    # query params
     if (exists $args{'scale_x'} && defined $args{'scale_x'}) {
         $query_params->{'scaleX'} = $self->{api_client}->to_query_value($args{'scale_x'});
     }
@@ -28312,6 +29486,11 @@ sub save_shape_online {
     # query params
     if (exists $args{'bounds'} && defined $args{'bounds'}) {
         $query_params->{'bounds'} = $self->{api_client}->to_query_value($args{'bounds'});
+    }
+
+    # query params
+    if (exists $args{'storage'} && defined $args{'storage'}) {
+        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
     }
 
     # query params
@@ -28346,12 +29525,10 @@ sub save_shape_online {
     }
 
     my $_body_data;
-    my $files;
-    # form params
-    if ( exists $args{'document'} ) {
-        $_body_data = $args{'document'};
+    my $files = [];
+    if ( exists $args{'document'} && $args{'document'}) {
+        push(@$files, $args{'document'});
     }
-
     # make the API Call
     $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
@@ -28369,11 +29546,11 @@ sub save_shape_online {
 # @param int $shape_index Index of shape starting from 1 (required)
 # @param string $format Export picture format. (required)
 # @param string $out_path Path to save result. (required)
-# @param string $password Document password. (optional)
-# @param string $storage Document storage. (optional)
 # @param double $scale_x X scale ratio. (optional, default to 0.0)
 # @param double $scale_y Y scale ratio. (optional, default to 0.0)
 # @param string $bounds Shape thumbnail bounds type. (optional, default to 1)
+# @param string $password Document password. (optional)
+# @param string $storage Document storage. (optional)
 # @param string $fonts_folder Fonts folder. (optional)
 {
     my $params = {
@@ -28402,16 +29579,6 @@ sub save_shape_online {
         description => 'Path to save result.',
         required => '1',
     },
-    'password' => {
-        data_type => 'string',
-        description => 'Document password.',
-        required => '0',
-    },
-    'storage' => {
-        data_type => 'string',
-        description => 'Document storage.',
-        required => '0',
-    },
     'scale_x' => {
         data_type => 'double',
         description => 'X scale ratio.',
@@ -28425,6 +29592,16 @@ sub save_shape_online {
     'bounds' => {
         data_type => 'string',
         description => 'Shape thumbnail bounds type.',
+        required => '0',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    'storage' => {
+        data_type => 'string',
+        description => 'Document storage.',
         required => '0',
     },
     'fonts_folder' => {
@@ -28600,12 +29777,10 @@ sub save_slide_online {
     }
 
     my $_body_data;
-    my $files;
-    # form params
-    if ( exists $args{'document'} ) {
-        $_body_data = $args{'document'};
+    my $files = [];
+    if ( exists $args{'document'} && $args{'document'}) {
+        push(@$files, $args{'document'});
     }
-
     # make the API Call
     $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
@@ -28804,9 +29979,9 @@ sub update_layout_slide {
     }
 
     my $_body_data;
-    my $files;
+    my $files = [];
     # body params
-    if ( exists $args{'slide_dto'}) {
+    if ( exists $args{'slide_dto'} && $args{'slide_dto'}) {
         $_body_data = $args{'slide_dto'};
     }
 
@@ -28994,9 +30169,9 @@ sub set_notes_slide_header_footer {
     }
 
     my $_body_data;
-    my $files;
+    my $files = [];
     # body params
-    if ( exists $args{'dto'}) {
+    if ( exists $args{'dto'} && $args{'dto'}) {
         $_body_data = $args{'dto'};
     }
 
@@ -29275,9 +30450,9 @@ sub save_notes_slide_shape {
     }
 
     my $_body_data;
-    my $files;
+    my $files = [];
     # body params
-    if ( exists $args{'options'}) {
+    if ( exists $args{'options'} && $args{'options'}) {
         $_body_data = $args{'options'};
     }
 
@@ -29485,9 +30660,9 @@ sub ordered_merge {
     }
 
     my $_body_data;
-    my $files;
+    my $files = [];
     # body params
-    if ( exists $args{'request'}) {
+    if ( exists $args{'request'} && $args{'request'}) {
         $_body_data = $args{'request'};
     }
 
@@ -29706,12 +30881,10 @@ sub split_and_save_online {
     }
 
     my $_body_data;
-    my $files;
-    # form params
-    if ( exists $args{'document'} ) {
-        $_body_data = $args{'document'};
+    my $files = [];
+    if ( exists $args{'document'} && $args{'document'}) {
+        push(@$files, $args{'document'});
     }
-
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
@@ -29925,7 +31098,7 @@ sub update_section {
     }
 
     my $_body_data;
-    my $files;
+    my $files = [];
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
@@ -30092,9 +31265,9 @@ sub set_sections {
     }
 
     my $_body_data;
-    my $files;
+    my $files = [];
     # body params
-    if ( exists $args{'sections'}) {
+    if ( exists $args{'sections'} && $args{'sections'}) {
         $_body_data = $args{'sections'};
     }
 
@@ -30330,9 +31503,9 @@ sub update_portion {
     }
 
     my $_body_data;
-    my $files;
+    my $files = [];
     # body params
-    if ( exists $args{'dto'}) {
+    if ( exists $args{'dto'} && $args{'dto'}) {
         $_body_data = $args{'dto'};
     }
 
@@ -30574,9 +31747,9 @@ sub update_paragraph {
     }
 
     my $_body_data;
-    my $files;
+    my $files = [];
     # body params
-    if ( exists $args{'dto'}) {
+    if ( exists $args{'dto'} && $args{'dto'}) {
         $_body_data = $args{'dto'};
     }
 
@@ -30848,9 +32021,9 @@ sub update_subshape_portion {
     }
 
     my $_body_data;
-    my $files;
+    my $files = [];
     # body params
-    if ( exists $args{'dto'}) {
+    if ( exists $args{'dto'} && $args{'dto'}) {
         $_body_data = $args{'dto'};
     }
 
@@ -31116,9 +32289,9 @@ sub update_subshape_paragraph {
     }
 
     my $_body_data;
-    my $files;
+    my $files = [];
     # body params
-    if ( exists $args{'dto'}) {
+    if ( exists $args{'dto'} && $args{'dto'}) {
         $_body_data = $args{'dto'};
     }
 
@@ -31415,9 +32588,9 @@ sub save_shape {
     }
 
     my $_body_data;
-    my $files;
+    my $files = [];
     # body params
-    if ( exists $args{'options'}) {
+    if ( exists $args{'options'} && $args{'options'}) {
         $_body_data = $args{'options'};
     }
 
@@ -31643,9 +32816,9 @@ sub set_animation {
     }
 
     my $_body_data;
-    my $files;
+    my $files = [];
     # body params
-    if ( exists $args{'animation'}) {
+    if ( exists $args{'animation'} && $args{'animation'}) {
         $_body_data = $args{'animation'};
     }
 
@@ -31851,9 +33024,9 @@ sub update_animation_effect {
     }
 
     my $_body_data;
-    my $files;
+    my $files = [];
     # body params
-    if ( exists $args{'effect'}) {
+    if ( exists $args{'effect'} && $args{'effect'}) {
         $_body_data = $args{'effect'};
     }
 
@@ -32083,9 +33256,9 @@ sub update_animation_interactive_sequence_effect {
     }
 
     my $_body_data;
-    my $files;
+    my $files = [];
     # body params
-    if ( exists $args{'effect'}) {
+    if ( exists $args{'effect'} && $args{'effect'}) {
         $_body_data = $args{'effect'};
     }
 
@@ -32285,9 +33458,9 @@ sub set_slide_header_footer {
     }
 
     my $_body_data;
-    my $files;
+    my $files = [];
     # body params
-    if ( exists $args{'dto'}) {
+    if ( exists $args{'dto'} && $args{'dto'}) {
         $_body_data = $args{'dto'};
     }
 
@@ -32537,9 +33710,9 @@ sub save_slide {
     }
 
     my $_body_data;
-    my $files;
+    my $files = [];
     # body params
-    if ( exists $args{'options'}) {
+    if ( exists $args{'options'} && $args{'options'}) {
         $_body_data = $args{'options'};
     }
 
@@ -32771,9 +33944,9 @@ sub update_shape {
     }
 
     my $_body_data;
-    my $files;
+    my $files = [];
     # body params
-    if ( exists $args{'dto'}) {
+    if ( exists $args{'dto'} && $args{'dto'}) {
         $_body_data = $args{'dto'};
     }
 
@@ -33003,9 +34176,9 @@ sub update_subshape {
     }
 
     my $_body_data;
-    my $files;
+    my $files = [];
     # body params
-    if ( exists $args{'dto'}) {
+    if ( exists $args{'dto'} && $args{'dto'}) {
         $_body_data = $args{'dto'};
     }
 
@@ -33203,12 +34376,10 @@ sub convert_and_save {
     }
 
     my $_body_data;
-    my $files;
-    # form params
-    if ( exists $args{'document'} ) {
-        $_body_data = $args{'document'};
+    my $files = [];
+    if ( exists $args{'document'} && $args{'document'}) {
+        push(@$files, $args{'document'});
     }
-
     # make the API Call
     $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
@@ -33272,115 +34443,6 @@ sub put_slides_convert {
     warnings::warnif("deprecated", "put_slides_convert is deprecated, use convert_and_save instead");
   
     return convert_and_save(@_);
-}
-
-#
-# put_slides_document_from_html
-#
-# Update presentation document from html.
-# 
-# @param string $name Document name. (required)
-# @param string $html HTML data. (optional)
-# @param string $password Document password. (optional)
-# @param string $folder Document folder. (optional)
-# @param string $storage Document storage. (optional)
-{
-    my $params = {
-    'name' => {
-        data_type => 'string',
-        description => 'Document name.',
-        required => '1',
-    },
-    'html' => {
-        data_type => 'string',
-        description => 'HTML data.',
-        required => '0',
-    },
-    'password' => {
-        data_type => 'string',
-        description => 'Document password.',
-        required => '0',
-    },
-    'folder' => {
-        data_type => 'string',
-        description => 'Document folder.',
-        required => '0',
-    },
-    'storage' => {
-        data_type => 'string',
-        description => 'Document storage.',
-        required => '0',
-    },
-    };
-    __PACKAGE__->method_documentation->{ 'put_slides_document_from_html' } = { 
-    	summary => 'Update presentation document from html.',
-        params => $params,
-        returns => 'Document',
-        };
-}
-# @return Document
-#
-sub put_slides_document_from_html {
-    my ($self, %args) = @_;
-
-    # verify the required parameter 'name' is set
-    unless (exists $args{'name'} && $args{'name'}) {
-      croak("Missing the required parameter 'name' when calling put_slides_document_from_html");
-    }
-
-    # parse inputs
-    my $_resource_path = '/slides/{name}/fromHtml';
-
-    my $_method = 'PUT';
-    my $query_params = {};
-    my $header_params = {};
-    my $form_params = {};
-
-    # 'Accept' and 'Content-Type' header
-    my $_header_accept = $self->{api_client}->select_header_accept('application/json');
-    if ($_header_accept) {
-        $header_params->{'Accept'} = $_header_accept;
-    }
-    $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
-
-    # query params
-    if (exists $args{'folder'} && defined $args{'folder'}) {
-        $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
-    }
-
-    # query params
-    if (exists $args{'storage'} && defined $args{'storage'}) {
-        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
-    }
-
-    # header params
-    if ( exists $args{'password'}) {
-        $header_params->{':password'} = $self->{api_client}->to_header_value($args{'password'});
-    }
-
-    # path params
-    if ( exists $args{'name'}) {
-        my $_base_variable = "{" . "name" . "}";
-        my $_base_value = $self->{api_client}->to_path_value($args{'name'});
-        $_resource_path =~ s/$_base_variable/$_base_value/g;
-    }
-
-    my $_body_data;
-    my $files;
-    # body params
-    if ( exists $args{'html'}) {
-        $_body_data = $args{'html'};
-    }
-
-    # make the API Call
-    my $response = $self->{api_client}->call_api($_resource_path, $_method,
-                                           $query_params, $form_params,
-                                           $header_params, $_body_data, $files);
-    if (!$response) {
-        return;
-    }
-    my $_response_object = $self->{api_client}->deserialize('Document', $response);
-    return $_response_object;
 }
 
 #
@@ -33480,9 +34542,9 @@ sub set_presentation_header_footer {
     }
 
     my $_body_data;
-    my $files;
+    my $files = [];
     # body params
-    if ( exists $args{'dto'}) {
+    if ( exists $args{'dto'} && $args{'dto'}) {
         $_body_data = $args{'dto'};
     }
 
@@ -33634,13 +34696,13 @@ sub merge_and_save_online {
     }
 
     my $_body_data;
-    my $files;
-    if ( exists $args{'files'}) {
-        $files = $args{'files'};
+    my $files = [];
+    if ( exists $args{'files'} && $args{'files'}) {
+        my $arg_files = $args{'files'};
+        push(@$files, @$arg_files);
     }
-
     # body params
-    if ( exists $args{'request'}) {
+    if ( exists $args{'request'} && $args{'request'}) {
         $_body_data = $args{'request'};
     }
 
@@ -33704,12 +34766,12 @@ sub put_slides_merge {
 }
 
 #
-# set_protection_properties
+# set_protection
 #
-# Update presentation protection properties.
+# Updates presentation protection properties.
 # 
 # @param string $name Document name. (required)
-# @param ProtectionProperties $dto The view properties data. (required)
+# @param ProtectionProperties $dto Protection properties. (required)
 # @param string $password Document password. (optional)
 # @param string $folder Document folder. (optional)
 # @param string $storage Document storage. (optional)
@@ -33722,7 +34784,7 @@ sub put_slides_merge {
     },
     'dto' => {
         data_type => 'ProtectionProperties',
-        description => 'The view properties data.',
+        description => 'Protection properties.',
         required => '1',
     },
     'password' => {
@@ -33741,15 +34803,15 @@ sub put_slides_merge {
         required => '0',
     },
     };
-    __PACKAGE__->method_documentation->{ 'set_protection_properties' } = { 
-    	summary => 'Update presentation protection properties.',
+    __PACKAGE__->method_documentation->{ 'set_protection' } = { 
+    	summary => 'Updates presentation protection properties.',
         params => $params,
         returns => 'ProtectionProperties',
         };
 }
 # @return ProtectionProperties
 #
-sub set_protection_properties {
+sub set_protection {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
@@ -33763,7 +34825,7 @@ sub set_protection_properties {
     }
 
     # parse inputs
-    my $_resource_path = '/slides/{name}/protectionProperties';
+    my $_resource_path = '/slides/{name}/protection';
 
     my $_method = 'PUT';
     my $query_params = {};
@@ -33800,9 +34862,9 @@ sub set_protection_properties {
     }
 
     my $_body_data;
-    my $files;
+    my $files = [];
     # body params
-    if ( exists $args{'dto'}) {
+    if ( exists $args{'dto'} && $args{'dto'}) {
         $_body_data = $args{'dto'};
     }
 
@@ -33820,10 +34882,10 @@ sub set_protection_properties {
 #
 # put_slides_protection_properties
 #
-# Update presentation protection properties.
+# Updates presentation protection properties.
 # 
 # @param string $name Document name. (required)
-# @param ProtectionProperties $dto The view properties data. (required)
+# @param ProtectionProperties $dto Protection properties. (required)
 # @param string $password Document password. (optional)
 # @param string $folder Document folder. (optional)
 # @param string $storage Document storage. (optional)
@@ -33836,7 +34898,7 @@ sub set_protection_properties {
     },
     'dto' => {
         data_type => 'ProtectionProperties',
-        description => 'The view properties data.',
+        description => 'Protection properties.',
         required => '1',
     },
     'password' => {
@@ -33856,7 +34918,7 @@ sub set_protection_properties {
     },
     };
     __PACKAGE__->method_documentation->{ 'put_slides_protection_properties' } = { 
-    	summary => 'Update presentation protection properties.',
+    	summary => 'Updates presentation protection properties.',
         params => $params,
         returns => 'ProtectionProperties',
         };
@@ -33864,9 +34926,137 @@ sub set_protection_properties {
 # @return ProtectionProperties
 #
 sub put_slides_protection_properties {
-    warnings::warnif("deprecated", "put_slides_protection_properties is deprecated, use set_protection_properties instead");
+    warnings::warnif("deprecated", "put_slides_protection_properties is deprecated, use set_protection instead");
   
-    return set_protection_properties(@_);
+    return set_protection(@_);
+}
+
+#
+# set_protection_online
+#
+# Sets presentation protection options. 
+# 
+# @param File $document Document data. (required)
+# @param ProtectionProperties $dto Protection properties. (required)
+# @param string $password Document password. (optional)
+{
+    my $params = {
+    'document' => {
+        data_type => 'File',
+        description => 'Document data.',
+        required => '1',
+    },
+    'dto' => {
+        data_type => 'ProtectionProperties',
+        description => 'Protection properties.',
+        required => '1',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'set_protection_online' } = { 
+    	summary => 'Sets presentation protection options. ',
+        params => $params,
+        returns => 'File',
+        };
+}
+# @return File
+#
+sub set_protection_online {
+    my ($self, %args) = @_;
+
+    # verify the required parameter 'document' is set
+    unless (exists $args{'document'} && $args{'document'}) {
+      croak("Missing the required parameter 'document' when calling put_slides_protection_properties_online");
+    }
+
+    # verify the required parameter 'dto' is set
+    unless (exists $args{'dto'} && $args{'dto'}) {
+      croak("Missing the required parameter 'dto' when calling put_slides_protection_properties_online");
+    }
+
+    # parse inputs
+    my $_resource_path = '/slides/protection';
+
+    my $_method = 'PUT';
+    my $query_params = {};
+    my $header_params = {};
+    my $form_params = {};
+
+    # 'Accept' and 'Content-Type' header
+    my $_header_accept = $self->{api_client}->select_header_accept('multipart/form-data');
+    if ($_header_accept) {
+        $header_params->{'Accept'} = $_header_accept;
+    }
+    $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('multipart/form-data');
+
+    # header params
+    if ( exists $args{'password'}) {
+        $header_params->{':password'} = $self->{api_client}->to_header_value($args{'password'});
+    }
+
+    my $_body_data;
+    my $files = [];
+    if ( exists $args{'document'} && $args{'document'}) {
+        push(@$files, $args{'document'});
+    }
+    # body params
+    if ( exists $args{'dto'} && $args{'dto'}) {
+        $_body_data = $args{'dto'};
+    }
+
+    # make the API Call
+    my $response = $self->{api_client}->call_api($_resource_path, $_method,
+                                           $query_params, $form_params,
+                                           $header_params, $_body_data, $files);
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('File', $response);
+    return $_response_object;
+}
+
+#
+# put_slides_protection_properties_online
+#
+# Sets presentation protection options. 
+# 
+# @param File $document Document data. (required)
+# @param ProtectionProperties $dto Protection properties. (required)
+# @param string $password Document password. (optional)
+{
+    my $params = {
+    'document' => {
+        data_type => 'File',
+        description => 'Document data.',
+        required => '1',
+    },
+    'dto' => {
+        data_type => 'ProtectionProperties',
+        description => 'Protection properties.',
+        required => '1',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'put_slides_protection_properties_online' } = { 
+    	summary => 'Sets presentation protection options. ',
+        params => $params,
+        returns => 'File',
+        };
+}
+# @return File
+#
+sub put_slides_protection_properties_online {
+    warnings::warnif("deprecated", "put_slides_protection_properties_online is deprecated, use set_protection_online instead");
+  
+    return set_protection_online(@_);
 }
 
 #
@@ -34006,9 +35196,9 @@ sub save_presentation {
     }
 
     my $_body_data;
-    my $files;
+    my $files = [];
     # body params
-    if ( exists $args{'options'}) {
+    if ( exists $args{'options'} && $args{'options'}) {
         $_body_data = $args{'options'};
     }
 
@@ -34204,9 +35394,9 @@ sub set_document_property {
     }
 
     my $_body_data;
-    my $files;
+    my $files = [];
     # body params
-    if ( exists $args{'property'}) {
+    if ( exists $args{'property'} && $args{'property'}) {
         $_body_data = $args{'property'};
     }
 
@@ -34394,9 +35584,9 @@ sub update_slide {
     }
 
     my $_body_data;
-    my $files;
+    my $files = [];
     # body params
-    if ( exists $args{'slide_dto'}) {
+    if ( exists $args{'slide_dto'} && $args{'slide_dto'}) {
         $_body_data = $args{'slide_dto'};
     }
 
@@ -34584,9 +35774,9 @@ sub set_background {
     }
 
     my $_body_data;
-    my $files;
+    my $files = [];
     # body params
-    if ( exists $args{'background'}) {
+    if ( exists $args{'background'} && $args{'background'}) {
         $_body_data = $args{'background'};
     }
 
@@ -34779,7 +35969,7 @@ sub set_background_color {
     }
 
     my $_body_data;
-    my $files;
+    my $files = [];
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
@@ -34946,9 +36136,9 @@ sub set_slide_properties {
     }
 
     my $_body_data;
-    my $files;
+    my $files = [];
     # body params
-    if ( exists $args{'dto'}) {
+    if ( exists $args{'dto'} && $args{'dto'}) {
         $_body_data = $args{'dto'};
     }
 
@@ -35013,148 +36203,6 @@ sub put_slides_slide_properties {
     warnings::warnif("deprecated", "put_slides_slide_properties is deprecated, use set_slide_properties instead");
   
     return set_slide_properties(@_);
-}
-
-#
-# put_slides_slide_size
-#
-# Set slide size for a presentation.
-# 
-# @param string $name Document name. (required)
-# @param int $width Slide width. (optional, default to 0)
-# @param int $height Slide height. (optional, default to 0)
-# @param string $size_type Standard slide size type. (optional)
-# @param string $scale_type Standard slide scale type. (optional, default to 0)
-# @param string $password Document password. (optional)
-# @param string $folder Document folder. (optional)
-# @param string $storage Document storage. (optional)
-{
-    my $params = {
-    'name' => {
-        data_type => 'string',
-        description => 'Document name.',
-        required => '1',
-    },
-    'width' => {
-        data_type => 'int',
-        description => 'Slide width.',
-        required => '0',
-    },
-    'height' => {
-        data_type => 'int',
-        description => 'Slide height.',
-        required => '0',
-    },
-    'size_type' => {
-        data_type => 'string',
-        description => 'Standard slide size type.',
-        required => '0',
-    },
-    'scale_type' => {
-        data_type => 'string',
-        description => 'Standard slide scale type.',
-        required => '0',
-    },
-    'password' => {
-        data_type => 'string',
-        description => 'Document password.',
-        required => '0',
-    },
-    'folder' => {
-        data_type => 'string',
-        description => 'Document folder.',
-        required => '0',
-    },
-    'storage' => {
-        data_type => 'string',
-        description => 'Document storage.',
-        required => '0',
-    },
-    };
-    __PACKAGE__->method_documentation->{ 'put_slides_slide_size' } = { 
-    	summary => 'Set slide size for a presentation.',
-        params => $params,
-        returns => 'Document',
-        };
-}
-# @return Document
-#
-sub put_slides_slide_size {
-    my ($self, %args) = @_;
-
-    # verify the required parameter 'name' is set
-    unless (exists $args{'name'} && $args{'name'}) {
-      croak("Missing the required parameter 'name' when calling put_slides_slide_size");
-    }
-
-    # parse inputs
-    my $_resource_path = '/slides/{name}/slideSize';
-
-    my $_method = 'PUT';
-    my $query_params = {};
-    my $header_params = {};
-    my $form_params = {};
-
-    # 'Accept' and 'Content-Type' header
-    my $_header_accept = $self->{api_client}->select_header_accept('application/json');
-    if ($_header_accept) {
-        $header_params->{'Accept'} = $_header_accept;
-    }
-    $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
-
-    # query params
-    if (exists $args{'width'} && defined $args{'width'}) {
-        $query_params->{'width'} = $self->{api_client}->to_query_value($args{'width'});
-    }
-
-    # query params
-    if (exists $args{'height'} && defined $args{'height'}) {
-        $query_params->{'height'} = $self->{api_client}->to_query_value($args{'height'});
-    }
-
-    # query params
-    if (exists $args{'size_type'} && defined $args{'size_type'}) {
-        $query_params->{'sizeType'} = $self->{api_client}->to_query_value($args{'size_type'});
-    }
-
-    # query params
-    if (exists $args{'scale_type'} && defined $args{'scale_type'}) {
-        $query_params->{'scaleType'} = $self->{api_client}->to_query_value($args{'scale_type'});
-    }
-
-    # query params
-    if (exists $args{'folder'} && defined $args{'folder'}) {
-        $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
-    }
-
-    # query params
-    if (exists $args{'storage'} && defined $args{'storage'}) {
-        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
-    }
-
-    # header params
-    if ( exists $args{'password'}) {
-        $header_params->{':password'} = $self->{api_client}->to_header_value($args{'password'});
-    }
-
-    # path params
-    if ( exists $args{'name'}) {
-        my $_base_variable = "{" . "name" . "}";
-        my $_base_value = $self->{api_client}->to_path_value($args{'name'});
-        $_resource_path =~ s/$_base_variable/$_base_value/g;
-    }
-
-    my $_body_data;
-    my $files;
-    # make the API Call
-    my $response = $self->{api_client}->call_api($_resource_path, $_method,
-                                           $query_params, $form_params,
-                                           $header_params, $_body_data, $files);
-    if (!$response) {
-        return;
-    }
-    my $_response_object = $self->{api_client}->deserialize('Document', $response);
-    return $_response_object;
 }
 
 #
@@ -35254,9 +36302,9 @@ sub set_view_properties {
     }
 
     my $_body_data;
-    my $files;
+    my $files = [];
     # body params
-    if ( exists $args{'dto'}) {
+    if ( exists $args{'dto'} && $args{'dto'}) {
         $_body_data = $args{'dto'};
     }
 
@@ -35547,9 +36595,9 @@ sub save_subshape {
     }
 
     my $_body_data;
-    my $files;
+    my $files = [];
     # body params
-    if ( exists $args{'options'}) {
+    if ( exists $args{'options'} && $args{'options'}) {
         $_body_data = $args{'options'};
     }
 
@@ -35781,9 +36829,9 @@ sub update_notes_slide {
     }
 
     my $_body_data;
-    my $files;
+    my $files = [];
     # body params
-    if ( exists $args{'dto'}) {
+    if ( exists $args{'dto'} && $args{'dto'}) {
         $_body_data = $args{'dto'};
     }
 
@@ -35989,9 +37037,9 @@ sub update_notes_slide_shape {
     }
 
     my $_body_data;
-    my $files;
+    my $files = [];
     # body params
-    if ( exists $args{'dto'}) {
+    if ( exists $args{'dto'} && $args{'dto'}) {
         $_body_data = $args{'dto'};
     }
 
@@ -36221,9 +37269,9 @@ sub update_notes_slide_paragraph {
     }
 
     my $_body_data;
-    my $files;
+    my $files = [];
     # body params
-    if ( exists $args{'dto'}) {
+    if ( exists $args{'dto'} && $args{'dto'}) {
         $_body_data = $args{'dto'};
     }
 
@@ -36477,9 +37525,9 @@ sub update_notes_slide_portion {
     }
 
     my $_body_data;
-    my $files;
+    my $files = [];
     # body params
-    if ( exists $args{'dto'}) {
+    if ( exists $args{'dto'} && $args{'dto'}) {
         $_body_data = $args{'dto'};
     }
 
@@ -36623,7 +37671,7 @@ sub storage_exists {
     }
 
     my $_body_data;
-    my $files;
+    my $files = [];
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
@@ -36710,12 +37758,10 @@ sub upload_file {
     }
 
     my $_body_data;
-    my $files;
-    # form params
-    if ( exists $args{'file'} ) {
-        $_body_data = $args{'file'};
+    my $files = [];
+    if ( exists $args{'file'} && $args{'file'}) {
+        push(@$files, $args{'file'});
     }
-
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,

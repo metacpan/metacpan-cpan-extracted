@@ -4,7 +4,7 @@
 #
 package PDL::Ops;
 
-our @EXPORT_OK = qw( PDL::PP log10 PDL::PP assgn PDL::PP carg PDL::PP conj PDL::PP creal PDL::PP cimag PDL::PP _cabs PDL::PP ci PDL::PP ipow PDL::PP _rabs PDL::PP r2C );
+our @EXPORT_OK = qw( PDL::PP log10 PDL::PP assgn PDL::PP carg PDL::PP conj PDL::PP czip PDL::PP _ci PDL::PP ipow PDL::PP r2C PDL::PP i2C );
 our %EXPORT_TAGS = (Func=>[@EXPORT_OK]);
 
 use PDL::Core;
@@ -1154,6 +1154,97 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
+=head2 re
+
+=for sig
+
+  Signature: (complexv(); real [o]b())
+
+=for ref
+
+Returns the real part of a complex number.
+
+=for bad
+
+re processes bad values.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
+
+
+=cut
+
+
+
+
+
+
+*re = \&PDL::re;
+
+
+
+
+
+=head2 im
+
+=for sig
+
+  Signature: (complexv(); real [o]b())
+
+=for ref
+
+Returns the imaginary part of a complex number.
+
+=for bad
+
+im processes bad values.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
+
+
+=cut
+
+
+
+
+
+
+*im = \&PDL::im;
+
+
+
+
+
+=head2 _cabs
+
+=for sig
+
+  Signature: (complexv(); real [o]b())
+
+=for ref
+
+Returns the absolute (length) of a complex number.
+
+=for bad
+
+_cabs processes bad values.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
+
+
+=cut
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 =head2 log10
 
 =for sig
@@ -1305,19 +1396,20 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-=head2 creal
+=head2 czip
 
 =for sig
 
-  Signature: (complexv(); real [o]b())
+  Signature: (r(); i(); complex [o]c())
 
-=for ref
+convert real, imaginary to native complex, (sort of) like LISP zip
+function. Will add the C<r> ndarray to "i" times the C<i> ndarray. Only
+takes real ndarrays as input.
 
-Returns the real part of a complex number.
 
 =for bad
 
-creal processes bad values.
+czip does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
@@ -1328,97 +1420,13 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-*creal = \&PDL::creal;
+*czip = \&PDL::czip;
 
 
 
 
 
-=head2 cimag
-
-=for sig
-
-  Signature: (complexv(); real [o]b())
-
-=for ref
-
-Returns the imaginary part of a complex number.
-
-=for bad
-
-cimag processes bad values.
-It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
-
-
-=cut
-
-
-
-
-
-
-*cimag = \&PDL::cimag;
-
-
-
-
-
-=head2 _cabs
-
-=for sig
-
-  Signature: (complexv(); real [o]b())
-
-=for ref
-
-Returns the absolute (length) of a complex number.
-
-=for bad
-
-_cabs processes bad values.
-It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
-
-
-=cut
-
-
-
-
-
-
-
-
-
-
-
-=head2 ci
-
-=for sig
-
-  Signature: (cdouble [o]b())
-
-Returns the complex number 0 + 1i.
-
-B<WARNING> because this is not defined as a constant (with empty
-prototype), you must use it either as C<10*ci> or C<ci()*10>. If you
-use it as C<ci*10> this will actually try to use 10 as a glob and pass
-that to C<ci>, which will not do what you want.
-
-
-=for bad
-
-ci processes bad values.
-It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
-
-
-=cut
-
-
-
-
-
-
-*ci = \&PDL::ci;
+*_ci = \&PDL::_ci;
 
 
 
@@ -1468,11 +1476,6 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-
-
-
-
-
 =head2 abs
 
 =for ref
@@ -1482,6 +1485,18 @@ Returns the absolute value of a number.
 =cut
 
 sub PDL::abs { $_[0]->type->real ? goto &PDL::_rabs : goto &PDL::_cabs }
+
+
+
+=head2 abs2
+
+=for ref
+
+Returns the square of the absolute value of a number.
+
+=cut
+
+sub PDL::abs2 ($) { my $r = &PDL::abs; $r * $r }
 
 
 
@@ -1516,6 +1531,41 @@ sub PDL::r2C ($) {
 
 
 *r2C = \&PDL::r2C;
+
+
+
+
+
+=head2 i2C
+
+=for sig
+
+  Signature: (i(); complex [o]c())
+
+=for ref
+
+convert imaginary to native complex, with a real part of zero
+
+=for bad
+
+i2C does not process bad values.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
+
+
+=cut
+
+
+
+
+sub PDL::i2C ($) {
+  return $_[0] if UNIVERSAL::isa($_[0], 'PDL') and !$_[0]->type->real;
+  my $r = $_[1] // PDL->nullcreate($_[0]);
+  PDL::_i2C_int($_[0], $r);
+  $r;
+}
+
+
+*i2C = \&PDL::i2C;
 
 
 

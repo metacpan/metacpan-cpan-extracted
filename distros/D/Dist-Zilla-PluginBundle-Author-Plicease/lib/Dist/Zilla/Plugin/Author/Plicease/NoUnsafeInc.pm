@@ -1,6 +1,6 @@
-package Dist::Zilla::Plugin::Author::Plicease::NoUnsafeInc 2.62 {
+package Dist::Zilla::Plugin::Author::Plicease::NoUnsafeInc 2.63 {
 
-  use 5.014;
+  use 5.020;
   use Moose;
 
   # ABSTRACT: Set x_use_unsafe_inc = 0
@@ -46,7 +46,7 @@ Dist::Zilla::Plugin::Author::Plicease::NoUnsafeInc - Set x_use_unsafe_inc = 0
 
 =head1 VERSION
 
-version 2.62
+version 2.63
 
 =head1 SYNOPSIS
 

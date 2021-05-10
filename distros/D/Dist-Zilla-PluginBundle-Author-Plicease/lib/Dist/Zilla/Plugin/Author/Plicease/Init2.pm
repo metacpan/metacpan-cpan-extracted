@@ -1,6 +1,6 @@
-package Dist::Zilla::Plugin::Author::Plicease::Init2 2.62 {
+package Dist::Zilla::Plugin::Author::Plicease::Init2 2.63 {
 
-  use 5.014;
+  use 5.020;
   use Moose;
   use Dist::Zilla::File::InMemory;
   use Dist::Zilla::File::FromCode;
@@ -9,6 +9,7 @@ package Dist::Zilla::Plugin::Author::Plicease::Init2 2.62 {
   use Dist::Zilla::MintingProfile::Author::Plicease;
   use JSON::PP qw( encode_json );
   use Encode qw( encode_utf8 );
+  use experimental qw( postderef );
 
   # ABSTRACT: Dist::Zilla initialization tasks for Plicease
 
@@ -166,7 +167,7 @@ package Dist::Zilla::Plugin::Author::Plicease::Init2 2.62 {
     $self->gather_file_template('t/main_class.t' => 't/' . lc($self->zilla->name =~ s/-/_/gr) . ".t" );
     $self->gather_file_simple  ('xt/author/critic.t');
 
-    foreach my $workflow (@{ $self->workflow })
+    foreach my $workflow ($self->workflow->@*)
     {
       $self->gather_file_simple(".github/workflows/$workflow.yml");
     }
@@ -384,7 +385,7 @@ Dist::Zilla::Plugin::Author::Plicease::Init2 - Dist::Zilla initialization tasks 
 
 =head1 VERSION
 
-version 2.62
+version 2.63
 
 =head1 DESCRIPTION
 
@@ -539,7 +540,6 @@ version          = 0.01
 
 [@Author::Plicease]
 :version       = {{$version}}
-travis_status  = 1
 release_tests  = {{$release_tests}}
 installer      = Author::Plicease::MakeMaker
 github_user    = {{$github_user}}

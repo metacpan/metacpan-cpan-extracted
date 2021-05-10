@@ -34,9 +34,9 @@ You shouldn't make instances of this class. Each attribute should be used as a n
         InstanceFleetType   => 'MASTER',    # values: MASTER, CORE, TASK
         InstanceTypeConfigs => [
           {
-            InstanceType => 'MyInstanceType',          # min: 1, max: 256
-            BidPrice     => 'MyXmlStringMaxLen256',    # max: 256
-            BidPriceAsPercentageOfOnDemandPrice => 1,  # OPTIONAL
+            InstanceType => 'MyInstanceType',            # min: 1, max: 256
+            BidPrice     => 'MyXmlStringMaxLen256',      # max: 256
+            BidPriceAsPercentageOfOnDemandPrice => 1,    # OPTIONAL
             Configurations                      => [
               {
                 Classification => 'MyString',
@@ -44,7 +44,7 @@ You shouldn't make instances of this class. Each attribute should be used as a n
                 Properties     => { 'MyString' => 'MyString', },    # OPTIONAL
               },
               ...
-            ],                                                      # OPTIONAL
+            ],    # OPTIONAL
             EbsConfiguration => {
               EbsBlockDeviceConfigs => [
                 {
@@ -56,13 +56,13 @@ You shouldn't make instances of this class. Each attribute should be used as a n
                   VolumesPerInstance => 1,
                 },
                 ...
-              ],                                                    # OPTIONAL
-              EbsOptimized => 1,                                    # OPTIONAL
+              ],    # OPTIONAL
+              EbsOptimized => 1,    # OPTIONAL
             },    # OPTIONAL
             WeightedCapacity => 1,    # OPTIONAL
           },
           ...
-        ],                            # OPTIONAL
+        ],    # OPTIONAL
         LaunchSpecifications => {
           SpotSpecification => {
             TimeoutAction => 'SWITCH_TO_ON_DEMAND'

@@ -1,4 +1,4 @@
-# AWS::GameLift::GameSessionQueue generated from spec 18.4.0
+# AWS::GameLift::GameSessionQueue generated from spec 34.0.0
 use Moose::Util::TypeConstraints;
 
 coerce 'Cfn::Resource::Properties::AWS::GameLift::GameSessionQueue',
@@ -112,8 +112,10 @@ package Cfn::Resource::Properties::AWS::GameLift::GameSessionQueue {
   use MooseX::StrictConstructor;
   extends 'Cfn::Resource::Properties';
   
+  has CustomEventData => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has Destinations => (isa => 'ArrayOfCfn::Resource::Properties::AWS::GameLift::GameSessionQueue::Destination', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has Name => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
+  has NotificationTarget => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has PlayerLatencyPolicies => (isa => 'ArrayOfCfn::Resource::Properties::AWS::GameLift::GameSessionQueue::PlayerLatencyPolicy', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has TimeoutInSeconds => (isa => 'Cfn::Value::Integer', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
 }

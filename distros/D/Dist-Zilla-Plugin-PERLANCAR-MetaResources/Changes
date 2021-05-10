@@ -1,3 +1,9 @@
+0.043   2021-05-07  Released-By: PERLANCAR; Urgency: medium
+
+	- Revert back to RT for bugtracker default as RT is not going away
+	  for now.
+
+
 0.042   2020-12-09  Released-By: PERLANCAR; Urgency: medium
 
 	- Now defaults to github as bugtracker, as rt.cpan.org is going

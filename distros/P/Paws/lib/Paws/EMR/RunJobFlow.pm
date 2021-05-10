@@ -53,29 +53,27 @@ You shouldn't make instances of this class. Each attribute should be used as a n
     my $RunJobFlowOutput = $elasticmapreduce->RunJobFlow(
       Instances => {
         AdditionalMasterSecurityGroups => [
-          'MyXmlStringMaxLen256', ...    # max: 256; OPTIONAL
-        ],                               # OPTIONAL
+          'MyXmlStringMaxLen256', ...    # max: 256
+        ],    # OPTIONAL
         AdditionalSlaveSecurityGroups => [
-          'MyXmlStringMaxLen256', ...    # max: 256; OPTIONAL
-        ],                               # OPTIONAL
-        Ec2KeyName   => 'MyXmlStringMaxLen256',    # max: 256; OPTIONAL
-        Ec2SubnetId  => 'MyXmlStringMaxLen256',    # max: 256; OPTIONAL
+          'MyXmlStringMaxLen256', ...    # max: 256
+        ],    # OPTIONAL
+        Ec2KeyName   => 'MyXmlStringMaxLen256',    # max: 256
+        Ec2SubnetId  => 'MyXmlStringMaxLen256',    # max: 256
         Ec2SubnetIds => [
-          'MyXmlStringMaxLen256', ...              # max: 256; OPTIONAL
-        ],                                         # OPTIONAL
-        EmrManagedMasterSecurityGroup =>
-          'MyXmlStringMaxLen256',                  # max: 256; OPTIONAL
-        EmrManagedSlaveSecurityGroup =>
-          'MyXmlStringMaxLen256',                  # max: 256; OPTIONAL
-        HadoopVersion  => 'MyXmlStringMaxLen256',  # max: 256; OPTIONAL
-        InstanceCount  => 1,
-        InstanceFleets => [
+          'MyXmlStringMaxLen256', ...              # max: 256
+        ],    # OPTIONAL
+        EmrManagedMasterSecurityGroup => 'MyXmlStringMaxLen256',    # max: 256
+        EmrManagedSlaveSecurityGroup  => 'MyXmlStringMaxLen256',    # max: 256
+        HadoopVersion                 => 'MyXmlStringMaxLen256',    # max: 256
+        InstanceCount                 => 1,                         # OPTIONAL
+        InstanceFleets                => [
           {
-            InstanceFleetType   => 'MASTER',       # values: MASTER, CORE, TASK
+            InstanceFleetType   => 'MASTER',    # values: MASTER, CORE, TASK
             InstanceTypeConfigs => [
               {
                 InstanceType => 'MyInstanceType',   # min: 1, max: 256; OPTIONAL
-                BidPrice => 'MyXmlStringMaxLen256', # max: 256; OPTIONAL
+                BidPrice     => 'MyXmlStringMaxLen256',    # max: 256
                 BidPriceAsPercentageOfOnDemandPrice => 1,    # OPTIONAL
                 Configurations                      => [
                   {
@@ -84,25 +82,25 @@ You shouldn't make instances of this class. Each attribute should be used as a n
                     Properties     => { 'MyString' => 'MyString', },  # OPTIONAL
                   },
                   ...
-                ],                                                    # OPTIONAL
+                ],    # OPTIONAL
                 EbsConfiguration => {
                   EbsBlockDeviceConfigs => [
                     {
                       VolumeSpecification => {
-                        SizeInGB   => 1,
+                        SizeInGB   => 1,            # OPTIONAL
                         VolumeType => 'MyString',
-                        Iops       => 1,
+                        Iops       => 1,            # OPTIONAL
                       },
-                      VolumesPerInstance => 1,
+                      VolumesPerInstance => 1,      # OPTIONAL
                     },
                     ...
-                  ],                                                  # OPTIONAL
-                  EbsOptimized => 1,                                  # OPTIONAL
+                  ],    # OPTIONAL
+                  EbsOptimized => 1,    # OPTIONAL
                 },    # OPTIONAL
                 WeightedCapacity => 1,    # OPTIONAL
               },
               ...
-            ],                            # OPTIONAL
+            ],    # OPTIONAL
             LaunchSpecifications => {
               SpotSpecification => {
                 TimeoutAction => 'SWITCH_TO_ON_DEMAND'
@@ -112,31 +110,31 @@ You shouldn't make instances of this class. Each attribute should be used as a n
               },
 
             },    # OPTIONAL
-            Name => 'MyXmlStringMaxLen256',    # max: 256; OPTIONAL
-            TargetOnDemandCapacity => 1,       # OPTIONAL
-            TargetSpotCapacity     => 1,       # OPTIONAL
+            Name                   => 'MyXmlStringMaxLen256',    # max: 256
+            TargetOnDemandCapacity => 1,                         # OPTIONAL
+            TargetSpotCapacity     => 1,                         # OPTIONAL
           },
           ...
-        ],                                     # OPTIONAL
+        ],    # OPTIONAL
         InstanceGroups => [
           {
-            InstanceCount     => 1,
+            InstanceCount     => 1,                 # OPTIONAL
             InstanceRole      => 'MASTER',          # values: MASTER, CORE, TASK
             InstanceType      => 'MyInstanceType',  # min: 1, max: 256; OPTIONAL
             AutoScalingPolicy => {
               Constraints => {
-                MaxCapacity => 1,
-                MinCapacity => 1,
+                MaxCapacity => 1,    # OPTIONAL
+                MinCapacity => 1,    # OPTIONAL
 
               },
               Rules => [
                 {
                   Action => {
                     SimpleScalingPolicyConfiguration => {
-                      ScalingAdjustment => 1,
+                      ScalingAdjustment => 1,                     # OPTIONAL
                       AdjustmentType    => 'CHANGE_IN_CAPACITY'
                       , # values: CHANGE_IN_CAPACITY, PERCENT_CHANGE_IN_CAPACITY, EXACT_CAPACITY; OPTIONAL
-                      CoolDown => 1,
+                      CoolDown => 1,    # OPTIONAL
                     },
                     Market => 'ON_DEMAND',   # values: ON_DEMAND, SPOT; OPTIONAL
                   },
@@ -146,7 +144,7 @@ You shouldn't make instances of this class. Each attribute should be used as a n
                       ComparisonOperator => 'GREATER_THAN_OR_EQUAL'
                       , # values: GREATER_THAN_OR_EQUAL, GREATER_THAN, LESS_THAN, LESS_THAN_OR_EQUAL
                       MetricName => 'MyString',
-                      Period     => 1,
+                      Period     => 1,            # OPTIONAL
                       Threshold  => 1,            # OPTIONAL
                       Dimensions => [
                         {
@@ -155,7 +153,7 @@ You shouldn't make instances of this class. Each attribute should be used as a n
                         },
                         ...
                       ],                          # OPTIONAL
-                      EvaluationPeriods => 1,
+                      EvaluationPeriods => 1,               # OPTIONAL
                       Namespace         => 'MyString',
                       Statistic         => 'SAMPLE_COUNT'
                       , # values: SAMPLE_COUNT, AVERAGE, SUM, MINIMUM, MAXIMUM; OPTIONAL
@@ -170,7 +168,7 @@ You shouldn't make instances of this class. Each attribute should be used as a n
               ],
 
             },    # OPTIONAL
-            BidPrice       => 'MyXmlStringMaxLen256',    # max: 256; OPTIONAL
+            BidPrice       => 'MyXmlStringMaxLen256',    # max: 256
             Configurations => [
               {
                 Classification => 'MyString',
@@ -178,36 +176,35 @@ You shouldn't make instances of this class. Each attribute should be used as a n
                 Properties     => { 'MyString' => 'MyString', },    # OPTIONAL
               },
               ...
-            ],                                                      # OPTIONAL
+            ],    # OPTIONAL
             EbsConfiguration => {
               EbsBlockDeviceConfigs => [
                 {
                   VolumeSpecification => {
-                    SizeInGB   => 1,
+                    SizeInGB   => 1,            # OPTIONAL
                     VolumeType => 'MyString',
-                    Iops       => 1,
+                    Iops       => 1,            # OPTIONAL
                   },
-                  VolumesPerInstance => 1,
+                  VolumesPerInstance => 1,      # OPTIONAL
                 },
                 ...
-              ],                                                    # OPTIONAL
-              EbsOptimized => 1,                                    # OPTIONAL
+              ],    # OPTIONAL
+              EbsOptimized => 1,    # OPTIONAL
             },    # OPTIONAL
             Market => 'ON_DEMAND',    # values: ON_DEMAND, SPOT; OPTIONAL
-            Name => 'MyXmlStringMaxLen256',    # max: 256; OPTIONAL
+            Name   => 'MyXmlStringMaxLen256',    # max: 256
           },
           ...
-        ],                                     # OPTIONAL
-        KeepJobFlowAliveWhenNoSteps => 1,      # OPTIONAL
+        ],    # OPTIONAL
+        KeepJobFlowAliveWhenNoSteps => 1,          # OPTIONAL
         MasterInstanceType => 'MyInstanceType',    # min: 1, max: 256; OPTIONAL
         Placement          => {
           AvailabilityZone  => 'MyXmlString',      # max: 10280; OPTIONAL
           AvailabilityZones => [
-            'MyXmlStringMaxLen256', ...            # max: 256; OPTIONAL
-          ],                                       # OPTIONAL
+            'MyXmlStringMaxLen256', ...            # max: 256
+          ],    # OPTIONAL
         },    # OPTIONAL
-        ServiceAccessSecurityGroup =>
-          'MyXmlStringMaxLen256',    # max: 256; OPTIONAL
+        ServiceAccessSecurityGroup => 'MyXmlStringMaxLen256',    # max: 256
         SlaveInstanceType    => 'MyInstanceType',   # min: 1, max: 256; OPTIONAL
         TerminationProtected => 1,                  # OPTIONAL
       },
@@ -222,21 +219,21 @@ You shouldn't make instances of this class. Each attribute should be used as a n
           Version        => 'MyString',
         },
         ...
-      ],                                                      # OPTIONAL
-      AutoScalingRole  => 'MyXmlString',                      # OPTIONAL
+      ],    # OPTIONAL
+      AutoScalingRole  => 'MyXmlString',    # OPTIONAL
       BootstrapActions => [
         {
-          Name                  => 'MyXmlStringMaxLen256',  # max: 256; OPTIONAL
+          Name                  => 'MyXmlStringMaxLen256',    # max: 256
           ScriptBootstrapAction => {
             Path => 'MyXmlString',    # max: 10280; OPTIONAL
             Args => [
               'MyXmlString', ...      # max: 10280; OPTIONAL
-            ],                        # OPTIONAL
+            ],    # OPTIONAL
           },
 
         },
         ...
-      ],                              # OPTIONAL
+      ],    # OPTIONAL
       Configurations => [
         {
           Classification => 'MyString',
@@ -244,28 +241,27 @@ You shouldn't make instances of this class. Each attribute should be used as a n
           Properties     => { 'MyString' => 'MyString', },    # OPTIONAL
         },
         ...
-      ],                                                      # OPTIONAL
-      CustomAmiId        => 'MyXmlStringMaxLen256',           # OPTIONAL
-      EbsRootVolumeSize  => 1,                                # OPTIONAL
-      JobFlowRole        => 'MyXmlString',                    # OPTIONAL
+      ],    # OPTIONAL
+      CustomAmiId        => 'MyXmlStringMaxLen256',    # OPTIONAL
+      EbsRootVolumeSize  => 1,                         # OPTIONAL
+      JobFlowRole        => 'MyXmlString',             # OPTIONAL
       KerberosAttributes => {
-        KdcAdminPassword     => 'MyXmlStringMaxLen256',    # max: 256; OPTIONAL
-        Realm                => 'MyXmlStringMaxLen256',    # max: 256; OPTIONAL
-        ADDomainJoinPassword => 'MyXmlStringMaxLen256',    # max: 256; OPTIONAL
-        ADDomainJoinUser     => 'MyXmlStringMaxLen256',    # max: 256; OPTIONAL
-        CrossRealmTrustPrincipalPassword =>
-          'MyXmlStringMaxLen256',                          # max: 256; OPTIONAL
+        KdcAdminPassword                 => 'MyXmlStringMaxLen256',   # max: 256
+        Realm                            => 'MyXmlStringMaxLen256',   # max: 256
+        ADDomainJoinPassword             => 'MyXmlStringMaxLen256',   # max: 256
+        ADDomainJoinUser                 => 'MyXmlStringMaxLen256',   # max: 256
+        CrossRealmTrustPrincipalPassword => 'MyXmlStringMaxLen256',   # max: 256
       },    # OPTIONAL
       LogUri               => 'MyXmlString',    # OPTIONAL
       NewSupportedProducts => [
         {
           Args => [
-            'MyXmlString', ...                  # max: 10280; OPTIONAL
-          ],                                    # OPTIONAL
-          Name => 'MyXmlStringMaxLen256',       # max: 256; OPTIONAL
+            'MyXmlString', ...    # max: 10280; OPTIONAL
+          ],    # OPTIONAL
+          Name => 'MyXmlStringMaxLen256',    # max: 256
         },
         ...
-      ],                                        # OPTIONAL
+      ],    # OPTIONAL
       ReleaseLabel          => 'MyXmlStringMaxLen256',          # OPTIONAL
       RepoUpgradeOnBoot     => 'SECURITY',                      # OPTIONAL
       ScaleDownBehavior     => 'TERMINATE_AT_INSTANCE_HOUR',    # OPTIONAL
@@ -278,33 +274,33 @@ You shouldn't make instances of this class. Each attribute should be used as a n
             Jar  => 'MyXmlString',    # max: 10280; OPTIONAL
             Args => [
               'MyXmlString', ...      # max: 10280; OPTIONAL
-            ],                        # OPTIONAL
+            ],    # OPTIONAL
             MainClass  => 'MyXmlString',    # max: 10280; OPTIONAL
             Properties => [
               {
-                Key   => 'MyXmlString',     # max: 10280; OPTIONAL
-                Value => 'MyXmlString',     # max: 10280; OPTIONAL
+                Key   => 'MyXmlString',    # max: 10280; OPTIONAL
+                Value => 'MyXmlString',    # max: 10280; OPTIONAL
               },
               ...
-            ],                              # OPTIONAL
+            ],    # OPTIONAL
           },
-          Name            => 'MyXmlStringMaxLen256',    # max: 256; OPTIONAL
+          Name            => 'MyXmlStringMaxLen256',    # max: 256
           ActionOnFailure => 'TERMINATE_JOB_FLOW'
           , # values: TERMINATE_JOB_FLOW, TERMINATE_CLUSTER, CANCEL_AND_WAIT, CONTINUE; OPTIONAL
         },
         ...
       ],    # OPTIONAL
       SupportedProducts => [
-        'MyXmlStringMaxLen256', ...    # max: 256; OPTIONAL
-      ],                               # OPTIONAL
+        'MyXmlStringMaxLen256', ...    # max: 256
+      ],    # OPTIONAL
       Tags => [
         {
           Key   => 'MyString',
           Value => 'MyString',
         },
         ...
-      ],                               # OPTIONAL
-      VisibleToAllUsers => 1,          # OPTIONAL
+      ],    # OPTIONAL
+      VisibleToAllUsers => 1,    # OPTIONAL
     );
 
     # Results:

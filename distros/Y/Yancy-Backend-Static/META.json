@@ -59,7 +59,7 @@
    "provides" : {
       "Yancy::Backend::Static" : {
          "file" : "lib/Yancy/Backend/Static.pm",
-         "version" : "0.014"
+         "version" : "0.015"
       }
    },
    "release_status" : "stable",
@@ -75,7 +75,7 @@
       },
       "x_IRC" : "irc://irc.freenode.org/#mojo-yancy"
    },
-   "version" : "0.014",
+   "version" : "0.015",
    "x_authority" : "cpan:PREACTION",
    "x_contributors" : [
       "Mohammad S Anwar <mohammad.anwar@yahoo.com>",

@@ -1,4 +1,4 @@
-# AWS::Kendra::Faq generated from spec 21.0.0
+# AWS::Kendra::Faq generated from spec 34.0.0
 use Moose::Util::TypeConstraints;
 
 coerce 'Cfn::Resource::Properties::AWS::Kendra::Faq',
@@ -19,27 +19,6 @@ package Cfn::Resource::AWS::Kendra::Faq {
 }
 
 
-
-subtype 'Cfn::Resource::Properties::AWS::Kendra::Faq::TagList',
-     as 'Cfn::Value';
-
-coerce 'Cfn::Resource::Properties::AWS::Kendra::Faq::TagList',
-  from 'HashRef',
-   via {
-     if (my $f = Cfn::TypeLibrary::try_function($_)) {
-       return $f
-     } else {
-       return Cfn::Resource::Properties::Object::AWS::Kendra::Faq::TagList->new( %$_ );
-     }
-   };
-
-package Cfn::Resource::Properties::Object::AWS::Kendra::Faq::TagList {
-  use Moose;
-  use MooseX::StrictConstructor;
-  extends 'Cfn::Value::TypedValue';
-  
-  has TagList => (isa => 'ArrayOfCfn::Resource::Properties::TagType', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
-}
 
 subtype 'Cfn::Resource::Properties::AWS::Kendra::Faq::S3Path',
      as 'Cfn::Value';
@@ -74,7 +53,7 @@ package Cfn::Resource::Properties::AWS::Kendra::Faq {
   has Name => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
   has RoleArn => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
   has S3Path => (isa => 'Cfn::Resource::Properties::AWS::Kendra::Faq::S3Path', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
-  has Tags => (isa => 'Cfn::Resource::Properties::AWS::Kendra::Faq::TagList', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has Tags => (isa => 'ArrayOfCfn::Resource::Properties::TagType', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
 }
 
 1;

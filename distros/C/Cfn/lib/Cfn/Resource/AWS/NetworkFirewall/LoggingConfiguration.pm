@@ -1,4 +1,4 @@
-# AWS::NetworkFirewall::LoggingConfiguration generated from spec 21.0.0
+# AWS::NetworkFirewall::LoggingConfiguration generated from spec 34.0.0
 use Moose::Util::TypeConstraints;
 
 coerce 'Cfn::Resource::Properties::AWS::NetworkFirewall::LoggingConfiguration',
@@ -11,10 +11,10 @@ package Cfn::Resource::AWS::NetworkFirewall::LoggingConfiguration {
   has Properties => (isa => 'Cfn::Resource::Properties::AWS::NetworkFirewall::LoggingConfiguration', is => 'rw', coerce => 1);
   
   sub AttributeList {
-    [ 'FirewallArn','FirewallName' ]
+    [  ]
   }
   sub supported_regions {
-    [ 'eu-west-1','us-east-1','us-west-2' ]
+    [ 'ap-northeast-1','ap-southeast-2','eu-central-1','eu-north-1','eu-west-1','us-east-1','us-east-2','us-west-2' ]
   }
 }
 
@@ -65,27 +65,6 @@ package Cfn::Resource::Properties::Object::AWS::NetworkFirewall::LoggingConfigur
   has LogType => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
 }
 
-subtype 'Cfn::Resource::Properties::AWS::NetworkFirewall::LoggingConfiguration::LogDestinationConfigs',
-     as 'Cfn::Value';
-
-coerce 'Cfn::Resource::Properties::AWS::NetworkFirewall::LoggingConfiguration::LogDestinationConfigs',
-  from 'HashRef',
-   via {
-     if (my $f = Cfn::TypeLibrary::try_function($_)) {
-       return $f
-     } else {
-       return Cfn::Resource::Properties::Object::AWS::NetworkFirewall::LoggingConfiguration::LogDestinationConfigs->new( %$_ );
-     }
-   };
-
-package Cfn::Resource::Properties::Object::AWS::NetworkFirewall::LoggingConfiguration::LogDestinationConfigs {
-  use Moose;
-  use MooseX::StrictConstructor;
-  extends 'Cfn::Value::TypedValue';
-  
-  has LogDestinationConfigs => (isa => 'ArrayOfCfn::Resource::Properties::AWS::NetworkFirewall::LoggingConfiguration::LogDestinationConfig', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
-}
-
 subtype 'Cfn::Resource::Properties::AWS::NetworkFirewall::LoggingConfiguration::LoggingConfiguration',
      as 'Cfn::Value';
 
@@ -104,7 +83,7 @@ package Cfn::Resource::Properties::Object::AWS::NetworkFirewall::LoggingConfigur
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
   
-  has LogDestinationConfigs => (isa => 'Cfn::Resource::Properties::AWS::NetworkFirewall::LoggingConfiguration::LogDestinationConfigs', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has LogDestinationConfigs => (isa => 'ArrayOfCfn::Resource::Properties::AWS::NetworkFirewall::LoggingConfiguration::LogDestinationConfig', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
 }
 
 package Cfn::Resource::Properties::AWS::NetworkFirewall::LoggingConfiguration {
@@ -112,6 +91,8 @@ package Cfn::Resource::Properties::AWS::NetworkFirewall::LoggingConfiguration {
   use MooseX::StrictConstructor;
   extends 'Cfn::Resource::Properties';
   
+  has FirewallArn => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
+  has FirewallName => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
   has LoggingConfiguration => (isa => 'Cfn::Resource::Properties::AWS::NetworkFirewall::LoggingConfiguration::LoggingConfiguration', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
 }
 

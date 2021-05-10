@@ -1,6 +1,10 @@
-Revision history for Business-BankList-Indonesia
+0.080   2021-05-07  Released-By: PERLANCAR; Urgency: medium; Backward-Incompatible: yes
 
-0.07    2015-09-03 (PERLANCAR)
+	- [incompatible change] Rename function list_id_banks() ->
+	  list_idn_banks() to avoid ambiguity of 'id'.
+
+
+0.07    2015-09-03  Released-By: PERLANCAR
 
 	- [dist] Move spec prereqs from RuntimeRequires to
 	  DevelopRecommends to reduce deps but still allow indicating spec
@@ -15,14 +19,14 @@ Revision history for Business-BankList-Indonesia
 	- Fix arguments (need to be array).
 
 
-0.06     2014-08-16 (SHARYANTO) - Happy 19th CPAN Day!
+0.06     2014-08-16  Released-By: SHARYANTO; Note: Happy 19th CPAN Day!
 
          - [build] CLI scripts are now generated automatically using
            Dist::Zilla::Plugin::ScriptFromFunc. The plugin is still at 0.01 so the
            generated script is not as polished as it should be. Stay tuned.
 
 
-0.05     2014-07-22 (SHARYANTO)
+0.05     2014-07-22  Released-By: SHARYANTO
 
          - No functional changes.
 
@@ -30,21 +34,21 @@ Revision history for Business-BankList-Indonesia
            Perinci::CmdLine::Any to reduce size of dependencies.
 
 
-0.04    2012-07-11 (SHARYANTO)
+0.04    2012-07-11  Released-By: SHARYANTO
 
         - Data update (rev bc00a6a3, Wed Jul 11 12:22:39 2012 +0700).
 
 
-0.03    2012-07-06 (SHARYANTO)
+0.03    2012-07-06  Released-By: SHARYANTO
 
         - No functional changes. Fix POD.
 
 
-0.02    2012-07-06 (SHARYANTO)
+0.02    2012-07-06  Released-By: SHARYANTO
 
         - No functional changes. Fix POD.
 
 
-0.01    2012-07-06 (SHARYANTO)
+0.01    2012-07-06  Released-By: SHARYANTO
 
         - First version.

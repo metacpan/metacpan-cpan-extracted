@@ -22,12 +22,13 @@ $t->app->plugin( Yancy => {
     read_schema => 1,
 } );
 
-$t->app->routes->get( '/not-a-draft' )->to(
+$t->app->routes->get( '/not-a-draft', [ format => ['html']] )->to(
     'yancy#get',
     schema => 'pages',
     slug => 'not-a-draft',
     template => 'is-draft',
     layout => 'default',
+    format => undef,
 );
 
 $t->get_ok( '/not-a-draft.html' )

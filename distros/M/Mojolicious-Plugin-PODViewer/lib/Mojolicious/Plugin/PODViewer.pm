@@ -1,5 +1,5 @@
 package Mojolicious::Plugin::PODViewer;
-our $VERSION = '0.006';
+our $VERSION = '0.007';
 # ABSTRACT: POD renderer plugin
 
 #pod =encoding utf8
@@ -179,10 +179,13 @@ sub register {
       module => $default_module,
       ( $conf->{layout} ? ( layout => $conf->{layout} ) : () ),
       allow_modules => $conf->{allow_modules} // [ qr{} ],
+      format => undef,
   };
   my $route = $conf->{route} ||= $app->routes->any( '/perldoc' );
-  return $route->any( '/:module' =>
-      $defaults => [module => qr/[^.]+/] => \&_perldoc,
+  return $route->any( '/:module'
+    => $defaults
+    => [format => [qw( html txt )], module => qr/[^.]+/]
+    => \&_perldoc,
   )->name('plugin.podviewer');
 }
 
@@ -278,7 +281,7 @@ Mojolicious::Plugin::PODViewer - POD renderer plugin
 
 =head1 VERSION
 
-version 0.006
+version 0.007
 
 =head1 SYNOPSIS
 

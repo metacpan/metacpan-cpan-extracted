@@ -1,5 +1,14 @@
 History Revision for Set-Light:
 
+0.95      2021-05-07 13:02:47+01:00 Europe/London
+  [Documentation]
+  - Changed website of bug tracker to github.
+
+  - Bumped copyright year.
+
+  [Tests]
+  - Removed unnecessary prerequisite.
+
 0.94      2020-09-09 18:54:16+01:00 Europe/London
   [Documentation]
   - Cleaned up POD for the constructor.

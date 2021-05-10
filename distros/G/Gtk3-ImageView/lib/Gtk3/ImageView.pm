@@ -17,7 +17,7 @@ use Readonly;
 Readonly my $HALF     => 0.5;
 Readonly my $MAX_ZOOM => 100;
 
-our $VERSION = 6;
+our $VERSION = 8;
 
 use Glib::Object::Subclass Gtk3::DrawingArea::, signals => {
     'zoom-changed' => {
@@ -315,7 +315,7 @@ sub _draw {
             $style->restore;
         }
 
-        my $zoom = $self->get_zoom;
+        my $zoom = $self->get_zoom / $self->get('scale-factor');
         $context->scale( $zoom / $ratio, $zoom );
         my $offset = $self->get_offset;
         $context->translate( $offset->{x}, $offset->{y} );
@@ -380,8 +380,9 @@ sub to_widget_coords {
     my $zoom   = $self->get_zoom;
     my $ratio  = $self->get_resolution_ratio;
     my $offset = $self->get_offset;
-    return ( $x + $offset->{x} ) * $zoom / $ratio,
-      ( $y + $offset->{y} ) * $zoom;
+    my $factor = $self->get('scale-factor');
+    return ( $x + $offset->{x} ) * $zoom / $factor / $ratio,
+      ( $y + $offset->{y} ) * $zoom / $factor;
 }
 
 # convert x, y in widget coords to image coords
@@ -390,15 +391,18 @@ sub to_image_coords {
     my $zoom   = $self->get_zoom;
     my $ratio  = $self->get_resolution_ratio;
     my $offset = $self->get_offset;
-    return $x / $zoom * $ratio - $offset->{x}, $y / $zoom - $offset->{y};
+    my $factor = $self->get('scale-factor');
+    return $x * $factor / $zoom * $ratio - $offset->{x},
+      $y * $factor / $zoom - $offset->{y};
 }
 
 # convert x, y in widget distance to image distance
 sub to_image_distance {
     my ( $self, $x, $y ) = @_;
-    my $zoom  = $self->get_zoom;
-    my $ratio = $self->get_resolution_ratio;
-    return $x / $zoom * $ratio, $y / $zoom;
+    my $zoom   = $self->get_zoom;
+    my $ratio  = $self->get_resolution_ratio;
+    my $factor = $self->get('scale-factor');
+    return $x * $factor / $zoom * $ratio, $y * $factor / $zoom;
 }
 
 # set zoom with centre in image coordinates
@@ -406,8 +410,10 @@ sub _set_zoom_with_center {
     my ( $self, $zoom, $center_x, $center_y ) = @_;
     my $allocation = $self->get_allocation;
     my $ratio      = $self->get_resolution_ratio;
-    my $offset_x   = $allocation->{width} / 2 / $zoom * $ratio - $center_x;
-    my $offset_y   = $allocation->{height} / 2 / $zoom - $center_y;
+    my $factor     = $self->get('scale-factor');
+    my $offset_x =
+      $allocation->{width} * $factor / 2 / $zoom * $ratio - $center_x;
+    my $offset_y = $allocation->{height} * $factor / 2 / $zoom - $center_y;
     $self->_set_zoom($zoom);
     $self->set_offset( $offset_x, $offset_y );
     return;
@@ -449,7 +455,9 @@ sub zoom_to_box {
     my $sc_factor_h =
       min( $limit, $allocation->{height} / $box->{height} );
     $self->_set_zoom_with_center(
-        min( $sc_factor_w, $sc_factor_h ) * $additional_factor,
+        min( $sc_factor_w, $sc_factor_h ) *
+          $additional_factor *
+          $self->get('scale-factor'),
         ( $box->{x} + $box->{width} / 2 ) / $ratio,
         $box->{y} + $box->{height} / 2
     );
@@ -660,7 +668,7 @@ Gtk3::ImageView - Image viewer widget for Gtk3
 
 =head1 VERSION
 
-6
+8
 
 =head1 SYNOPSIS
 

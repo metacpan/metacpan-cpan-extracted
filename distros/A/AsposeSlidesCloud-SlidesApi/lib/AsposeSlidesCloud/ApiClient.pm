@@ -164,6 +164,7 @@ sub call_api_once {
 sub get_body_data {
     my $self = shift;
     my ($header_params, $body_data, $files) = @_;
+    my $part_count = 0;
     if (defined $body_data) {
         if (!(ref $body_data eq "HASH") && $body_data->can('to_hash')) {
             $body_data = $body_data->to_hash;
@@ -171,28 +172,37 @@ sub get_body_data {
         if (ref $body_data eq "HASH") {
             $body_data = to_json($body_data); # model to json string
         }
+        $part_count++;
     }
-    if (!defined $files) {
-        return $body_data;
+    if (defined $files) {
+        $part_count += scalar @$files;
     }
     my $_body_data = "";
-    my $boundary = "7d70fb31-0eb9-4846-9ea8-933dfb69d8f1";
-    $header_params->{'Content-Type'} = "multipart/form-data; boundary=${boundary}";
-    $_body_data = $_body_data . "\r\n--${boundary}\r\n";
-    $_body_data = $_body_data . "Content-Disposition: form-data; name=\"data\"\r\n";
-    $_body_data = $_body_data . "Content-Type: text/json\r\n";
-    $_body_data = $_body_data . "\r\n";
-    $_body_data = $_body_data . $body_data;
-    my $fileIndex = 1;
-    foreach (@$files) {
-        $_body_data = $_body_data . "\r\n--${boundary}\r\n";
-        $_body_data = $_body_data . "Content-Disposition: form-data; name=\"file${fileIndex}\";filename=\"file${fileIndex}\"\r\n";
-        $_body_data = $_body_data . "Content-Type: application/octet-stream\r\n";
-        $_body_data = $_body_data . "\r\n";
-        $_body_data = $_body_data . $_;
-        $fileIndex++;
+    if ($part_count > 1) {
+        my $boundary = "7d70fb31-0eb9-4846-9ea8-933dfb69d8f1";
+        $header_params->{'Content-Type'} = "multipart/form-data; boundary=${boundary}";
+        if (defined $body_data) {
+            $_body_data = $_body_data . "\r\n--${boundary}\r\n";
+            $_body_data = $_body_data . "Content-Disposition: form-data; name=\"data\"\r\n";
+            $_body_data = $_body_data . "Content-Type: text/json\r\n";
+            $_body_data = $_body_data . "\r\n";
+            $_body_data = $_body_data . $body_data;
+        }
+        my $fileIndex = 1;
+        foreach (@$files) {
+            $_body_data = $_body_data . "\r\n--${boundary}\r\n";
+            $_body_data = $_body_data . "Content-Disposition: form-data; name=\"file${fileIndex}\";filename=\"file${fileIndex}\"\r\n";
+            $_body_data = $_body_data . "Content-Type: application/octet-stream\r\n";
+            $_body_data = $_body_data . "\r\n";
+            $_body_data = $_body_data . $_;
+            $fileIndex++;
+        }
+        $_body_data = $_body_data . "\r\n--${boundary}--\r\n";
+    } elsif (defined $body_data) {
+        $_body_data = $body_data;
+    } elsif (defined $files) {
+        $_body_data = @$files[0];
     }
-    $_body_data = $_body_data . "\r\n--${boundary}--\r\n";
     return $_body_data;
 }
 

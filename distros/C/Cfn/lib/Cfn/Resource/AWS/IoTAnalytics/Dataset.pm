@@ -1,4 +1,4 @@
-# AWS::IoTAnalytics::Dataset generated from spec 20.1.0
+# AWS::IoTAnalytics::Dataset generated from spec 34.0.0
 use Moose::Util::TypeConstraints;
 
 coerce 'Cfn::Resource::Properties::AWS::IoTAnalytics::Dataset',
@@ -264,6 +264,27 @@ package Cfn::Resource::Properties::Object::AWS::IoTAnalytics::Dataset::Filter {
   has DeltaTime => (isa => 'Cfn::Resource::Properties::AWS::IoTAnalytics::Dataset::DeltaTime', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
 }
 
+subtype 'Cfn::Resource::Properties::AWS::IoTAnalytics::Dataset::DeltaTimeSessionWindowConfiguration',
+     as 'Cfn::Value';
+
+coerce 'Cfn::Resource::Properties::AWS::IoTAnalytics::Dataset::DeltaTimeSessionWindowConfiguration',
+  from 'HashRef',
+   via {
+     if (my $f = Cfn::TypeLibrary::try_function($_)) {
+       return $f
+     } else {
+       return Cfn::Resource::Properties::Object::AWS::IoTAnalytics::Dataset::DeltaTimeSessionWindowConfiguration->new( %$_ );
+     }
+   };
+
+package Cfn::Resource::Properties::Object::AWS::IoTAnalytics::Dataset::DeltaTimeSessionWindowConfiguration {
+  use Moose;
+  use MooseX::StrictConstructor;
+  extends 'Cfn::Value::TypedValue';
+  
+  has TimeoutInMinutes => (isa => 'Cfn::Value::Integer', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+}
+
 subtype 'Cfn::Resource::Properties::AWS::IoTAnalytics::Dataset::TriggeringDataset',
      as 'Cfn::Value';
 
@@ -326,6 +347,27 @@ package Cfn::Resource::Properties::Object::AWS::IoTAnalytics::Dataset::QueryActi
   
   has Filters => (isa => 'ArrayOfCfn::Resource::Properties::AWS::IoTAnalytics::Dataset::Filter', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has SqlQuery => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+}
+
+subtype 'Cfn::Resource::Properties::AWS::IoTAnalytics::Dataset::LateDataRuleConfiguration',
+     as 'Cfn::Value';
+
+coerce 'Cfn::Resource::Properties::AWS::IoTAnalytics::Dataset::LateDataRuleConfiguration',
+  from 'HashRef',
+   via {
+     if (my $f = Cfn::TypeLibrary::try_function($_)) {
+       return $f
+     } else {
+       return Cfn::Resource::Properties::Object::AWS::IoTAnalytics::Dataset::LateDataRuleConfiguration->new( %$_ );
+     }
+   };
+
+package Cfn::Resource::Properties::Object::AWS::IoTAnalytics::Dataset::LateDataRuleConfiguration {
+  use Moose;
+  use MooseX::StrictConstructor;
+  extends 'Cfn::Value::TypedValue';
+  
+  has DeltaTimeSessionWindowConfiguration => (isa => 'Cfn::Resource::Properties::AWS::IoTAnalytics::Dataset::DeltaTimeSessionWindowConfiguration', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
 }
 
 subtype 'Cfn::Resource::Properties::AWS::IoTAnalytics::Dataset::DatasetContentDeliveryRuleDestination',
@@ -461,6 +503,50 @@ package Cfn::Resource::Properties::Object::AWS::IoTAnalytics::Dataset::Retention
   has NumberOfDays => (isa => 'Cfn::Value::Integer', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has Unlimited => (isa => 'Cfn::Value::Boolean', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
 }
+subtype 'ArrayOfCfn::Resource::Properties::AWS::IoTAnalytics::Dataset::LateDataRule',
+     as 'Cfn::Value',
+  where { $_->isa('Cfn::Value::Array') or $_->isa('Cfn::Value::Function') },
+message { "$_ is not a Cfn::Value or a Cfn::Value::Function" };
+
+coerce 'ArrayOfCfn::Resource::Properties::AWS::IoTAnalytics::Dataset::LateDataRule',
+  from 'HashRef',
+   via {
+     if (my $f = Cfn::TypeLibrary::try_function($_)) {
+       return $f
+     } else {
+       die 'Only accepts functions'; 
+     }
+   },
+  from 'ArrayRef',
+   via {
+     Cfn::Value::Array->new(Value => [
+       map { 
+         Moose::Util::TypeConstraints::find_type_constraint('Cfn::Resource::Properties::AWS::IoTAnalytics::Dataset::LateDataRule')->coerce($_)
+       } @$_
+     ]);
+   };
+
+subtype 'Cfn::Resource::Properties::AWS::IoTAnalytics::Dataset::LateDataRule',
+     as 'Cfn::Value';
+
+coerce 'Cfn::Resource::Properties::AWS::IoTAnalytics::Dataset::LateDataRule',
+  from 'HashRef',
+   via {
+     if (my $f = Cfn::TypeLibrary::try_function($_)) {
+       return $f
+     } else {
+       return Cfn::Resource::Properties::Object::AWS::IoTAnalytics::Dataset::LateDataRule->new( %$_ );
+     }
+   };
+
+package Cfn::Resource::Properties::Object::AWS::IoTAnalytics::Dataset::LateDataRule {
+  use Moose;
+  use MooseX::StrictConstructor;
+  extends 'Cfn::Value::TypedValue';
+  
+  has RuleConfiguration => (isa => 'Cfn::Resource::Properties::AWS::IoTAnalytics::Dataset::LateDataRuleConfiguration', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has RuleName => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+}
 subtype 'ArrayOfCfn::Resource::Properties::AWS::IoTAnalytics::Dataset::DatasetContentDeliveryRule',
      as 'Cfn::Value',
   where { $_->isa('Cfn::Value::Array') or $_->isa('Cfn::Value::Function') },
@@ -559,6 +645,7 @@ package Cfn::Resource::Properties::AWS::IoTAnalytics::Dataset {
   has Actions => (isa => 'ArrayOfCfn::Resource::Properties::AWS::IoTAnalytics::Dataset::Action', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has ContentDeliveryRules => (isa => 'ArrayOfCfn::Resource::Properties::AWS::IoTAnalytics::Dataset::DatasetContentDeliveryRule', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has DatasetName => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
+  has LateDataRules => (isa => 'ArrayOfCfn::Resource::Properties::AWS::IoTAnalytics::Dataset::LateDataRule', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has RetentionPeriod => (isa => 'Cfn::Resource::Properties::AWS::IoTAnalytics::Dataset::RetentionPeriod', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has Tags => (isa => 'ArrayOfCfn::Resource::Properties::TagType', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has Triggers => (isa => 'ArrayOfCfn::Resource::Properties::AWS::IoTAnalytics::Dataset::Trigger', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');

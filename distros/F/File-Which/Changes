@@ -1,5 +1,16 @@
 Revision history for File-Which
 
+1.27      2021-05-07 04:54:31 -0600
+  - Production release identical to 1.26_01
+
+1.26_01   2021-04-27 05:15:20 -0600
+  - Fix bug in test where test files sometimes didn't have
+    execute permissions (gh#31)
+  - Add Env as an explicit test prereq (gh#13, gh#32)
+
+1.25_01   2021-04-25 07:35:41 -0600
+  - Tests should now work when Perl isn't in the PATH (gh#29, gh#30)
+
 1.24      2021-03-19 05:50:14 -0600
   - Documentation improvements
   - Moved repository to new github org

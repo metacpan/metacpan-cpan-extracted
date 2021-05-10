@@ -1,4 +1,4 @@
-# AWS::IoTAnalytics::Datastore generated from spec 20.1.0
+# AWS::IoTAnalytics::Datastore generated from spec 34.0.0
 use Moose::Util::TypeConstraints;
 
 coerce 'Cfn::Resource::Properties::AWS::IoTAnalytics::Datastore',
@@ -19,6 +19,71 @@ package Cfn::Resource::AWS::IoTAnalytics::Datastore {
 }
 
 
+subtype 'ArrayOfCfn::Resource::Properties::AWS::IoTAnalytics::Datastore::Column',
+     as 'Cfn::Value',
+  where { $_->isa('Cfn::Value::Array') or $_->isa('Cfn::Value::Function') },
+message { "$_ is not a Cfn::Value or a Cfn::Value::Function" };
+
+coerce 'ArrayOfCfn::Resource::Properties::AWS::IoTAnalytics::Datastore::Column',
+  from 'HashRef',
+   via {
+     if (my $f = Cfn::TypeLibrary::try_function($_)) {
+       return $f
+     } else {
+       die 'Only accepts functions'; 
+     }
+   },
+  from 'ArrayRef',
+   via {
+     Cfn::Value::Array->new(Value => [
+       map { 
+         Moose::Util::TypeConstraints::find_type_constraint('Cfn::Resource::Properties::AWS::IoTAnalytics::Datastore::Column')->coerce($_)
+       } @$_
+     ]);
+   };
+
+subtype 'Cfn::Resource::Properties::AWS::IoTAnalytics::Datastore::Column',
+     as 'Cfn::Value';
+
+coerce 'Cfn::Resource::Properties::AWS::IoTAnalytics::Datastore::Column',
+  from 'HashRef',
+   via {
+     if (my $f = Cfn::TypeLibrary::try_function($_)) {
+       return $f
+     } else {
+       return Cfn::Resource::Properties::Object::AWS::IoTAnalytics::Datastore::Column->new( %$_ );
+     }
+   };
+
+package Cfn::Resource::Properties::Object::AWS::IoTAnalytics::Datastore::Column {
+  use Moose;
+  use MooseX::StrictConstructor;
+  extends 'Cfn::Value::TypedValue';
+  
+  has Name => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has Type => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+}
+
+subtype 'Cfn::Resource::Properties::AWS::IoTAnalytics::Datastore::SchemaDefinition',
+     as 'Cfn::Value';
+
+coerce 'Cfn::Resource::Properties::AWS::IoTAnalytics::Datastore::SchemaDefinition',
+  from 'HashRef',
+   via {
+     if (my $f = Cfn::TypeLibrary::try_function($_)) {
+       return $f
+     } else {
+       return Cfn::Resource::Properties::Object::AWS::IoTAnalytics::Datastore::SchemaDefinition->new( %$_ );
+     }
+   };
+
+package Cfn::Resource::Properties::Object::AWS::IoTAnalytics::Datastore::SchemaDefinition {
+  use Moose;
+  use MooseX::StrictConstructor;
+  extends 'Cfn::Value::TypedValue';
+  
+  has Columns => (isa => 'ArrayOfCfn::Resource::Properties::AWS::IoTAnalytics::Datastore::Column', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+}
 
 subtype 'Cfn::Resource::Properties::AWS::IoTAnalytics::Datastore::ServiceManagedS3',
      as 'Cfn::Value';
@@ -34,6 +99,47 @@ coerce 'Cfn::Resource::Properties::AWS::IoTAnalytics::Datastore::ServiceManagedS
    };
 
 package Cfn::Resource::Properties::Object::AWS::IoTAnalytics::Datastore::ServiceManagedS3 {
+  use Moose;
+  use MooseX::StrictConstructor;
+  extends 'Cfn::Value::TypedValue';
+  
+}
+
+subtype 'Cfn::Resource::Properties::AWS::IoTAnalytics::Datastore::ParquetConfiguration',
+     as 'Cfn::Value';
+
+coerce 'Cfn::Resource::Properties::AWS::IoTAnalytics::Datastore::ParquetConfiguration',
+  from 'HashRef',
+   via {
+     if (my $f = Cfn::TypeLibrary::try_function($_)) {
+       return $f
+     } else {
+       return Cfn::Resource::Properties::Object::AWS::IoTAnalytics::Datastore::ParquetConfiguration->new( %$_ );
+     }
+   };
+
+package Cfn::Resource::Properties::Object::AWS::IoTAnalytics::Datastore::ParquetConfiguration {
+  use Moose;
+  use MooseX::StrictConstructor;
+  extends 'Cfn::Value::TypedValue';
+  
+  has SchemaDefinition => (isa => 'Cfn::Resource::Properties::AWS::IoTAnalytics::Datastore::SchemaDefinition', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+}
+
+subtype 'Cfn::Resource::Properties::AWS::IoTAnalytics::Datastore::JsonConfiguration',
+     as 'Cfn::Value';
+
+coerce 'Cfn::Resource::Properties::AWS::IoTAnalytics::Datastore::JsonConfiguration',
+  from 'HashRef',
+   via {
+     if (my $f = Cfn::TypeLibrary::try_function($_)) {
+       return $f
+     } else {
+       return Cfn::Resource::Properties::Object::AWS::IoTAnalytics::Datastore::JsonConfiguration->new( %$_ );
+     }
+   };
+
+package Cfn::Resource::Properties::Object::AWS::IoTAnalytics::Datastore::JsonConfiguration {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -85,6 +191,28 @@ package Cfn::Resource::Properties::Object::AWS::IoTAnalytics::Datastore::Retenti
   has Unlimited => (isa => 'Cfn::Value::Boolean', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
 }
 
+subtype 'Cfn::Resource::Properties::AWS::IoTAnalytics::Datastore::FileFormatConfiguration',
+     as 'Cfn::Value';
+
+coerce 'Cfn::Resource::Properties::AWS::IoTAnalytics::Datastore::FileFormatConfiguration',
+  from 'HashRef',
+   via {
+     if (my $f = Cfn::TypeLibrary::try_function($_)) {
+       return $f
+     } else {
+       return Cfn::Resource::Properties::Object::AWS::IoTAnalytics::Datastore::FileFormatConfiguration->new( %$_ );
+     }
+   };
+
+package Cfn::Resource::Properties::Object::AWS::IoTAnalytics::Datastore::FileFormatConfiguration {
+  use Moose;
+  use MooseX::StrictConstructor;
+  extends 'Cfn::Value::TypedValue';
+  
+  has JsonConfiguration => (isa => 'Cfn::Resource::Properties::AWS::IoTAnalytics::Datastore::JsonConfiguration', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has ParquetConfiguration => (isa => 'Cfn::Resource::Properties::AWS::IoTAnalytics::Datastore::ParquetConfiguration', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+}
+
 subtype 'Cfn::Resource::Properties::AWS::IoTAnalytics::Datastore::DatastoreStorage',
      as 'Cfn::Value';
 
@@ -114,6 +242,7 @@ package Cfn::Resource::Properties::AWS::IoTAnalytics::Datastore {
   
   has DatastoreName => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
   has DatastoreStorage => (isa => 'Cfn::Resource::Properties::AWS::IoTAnalytics::Datastore::DatastoreStorage', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has FileFormatConfiguration => (isa => 'Cfn::Resource::Properties::AWS::IoTAnalytics::Datastore::FileFormatConfiguration', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has RetentionPeriod => (isa => 'Cfn::Resource::Properties::AWS::IoTAnalytics::Datastore::RetentionPeriod', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has Tags => (isa => 'ArrayOfCfn::Resource::Properties::TagType', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
 }

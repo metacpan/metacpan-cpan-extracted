@@ -1,4 +1,4 @@
-# AWS::Kendra::DataSource generated from spec 21.0.0
+# AWS::Kendra::DataSource generated from spec 34.0.0
 use Moose::Util::TypeConstraints;
 
 coerce 'Cfn::Resource::Properties::AWS::Kendra::DataSource',
@@ -130,6 +130,186 @@ package Cfn::Resource::Properties::Object::AWS::Kendra::DataSource::SalesforceCu
   has DocumentTitleFieldName => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has FieldMappings => (isa => 'Cfn::Resource::Properties::AWS::Kendra::DataSource::DataSourceToIndexFieldMappingList', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has Name => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+}
+subtype 'ArrayOfCfn::Resource::Properties::AWS::Kendra::DataSource::ConfluenceSpaceToIndexFieldMapping',
+     as 'Cfn::Value',
+  where { $_->isa('Cfn::Value::Array') or $_->isa('Cfn::Value::Function') },
+message { "$_ is not a Cfn::Value or a Cfn::Value::Function" };
+
+coerce 'ArrayOfCfn::Resource::Properties::AWS::Kendra::DataSource::ConfluenceSpaceToIndexFieldMapping',
+  from 'HashRef',
+   via {
+     if (my $f = Cfn::TypeLibrary::try_function($_)) {
+       return $f
+     } else {
+       die 'Only accepts functions'; 
+     }
+   },
+  from 'ArrayRef',
+   via {
+     Cfn::Value::Array->new(Value => [
+       map { 
+         Moose::Util::TypeConstraints::find_type_constraint('Cfn::Resource::Properties::AWS::Kendra::DataSource::ConfluenceSpaceToIndexFieldMapping')->coerce($_)
+       } @$_
+     ]);
+   };
+
+subtype 'Cfn::Resource::Properties::AWS::Kendra::DataSource::ConfluenceSpaceToIndexFieldMapping',
+     as 'Cfn::Value';
+
+coerce 'Cfn::Resource::Properties::AWS::Kendra::DataSource::ConfluenceSpaceToIndexFieldMapping',
+  from 'HashRef',
+   via {
+     if (my $f = Cfn::TypeLibrary::try_function($_)) {
+       return $f
+     } else {
+       return Cfn::Resource::Properties::Object::AWS::Kendra::DataSource::ConfluenceSpaceToIndexFieldMapping->new( %$_ );
+     }
+   };
+
+package Cfn::Resource::Properties::Object::AWS::Kendra::DataSource::ConfluenceSpaceToIndexFieldMapping {
+  use Moose;
+  use MooseX::StrictConstructor;
+  extends 'Cfn::Value::TypedValue';
+  
+  has DataSourceFieldName => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has DateFieldFormat => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has IndexFieldName => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+}
+subtype 'ArrayOfCfn::Resource::Properties::AWS::Kendra::DataSource::ConfluencePageToIndexFieldMapping',
+     as 'Cfn::Value',
+  where { $_->isa('Cfn::Value::Array') or $_->isa('Cfn::Value::Function') },
+message { "$_ is not a Cfn::Value or a Cfn::Value::Function" };
+
+coerce 'ArrayOfCfn::Resource::Properties::AWS::Kendra::DataSource::ConfluencePageToIndexFieldMapping',
+  from 'HashRef',
+   via {
+     if (my $f = Cfn::TypeLibrary::try_function($_)) {
+       return $f
+     } else {
+       die 'Only accepts functions'; 
+     }
+   },
+  from 'ArrayRef',
+   via {
+     Cfn::Value::Array->new(Value => [
+       map { 
+         Moose::Util::TypeConstraints::find_type_constraint('Cfn::Resource::Properties::AWS::Kendra::DataSource::ConfluencePageToIndexFieldMapping')->coerce($_)
+       } @$_
+     ]);
+   };
+
+subtype 'Cfn::Resource::Properties::AWS::Kendra::DataSource::ConfluencePageToIndexFieldMapping',
+     as 'Cfn::Value';
+
+coerce 'Cfn::Resource::Properties::AWS::Kendra::DataSource::ConfluencePageToIndexFieldMapping',
+  from 'HashRef',
+   via {
+     if (my $f = Cfn::TypeLibrary::try_function($_)) {
+       return $f
+     } else {
+       return Cfn::Resource::Properties::Object::AWS::Kendra::DataSource::ConfluencePageToIndexFieldMapping->new( %$_ );
+     }
+   };
+
+package Cfn::Resource::Properties::Object::AWS::Kendra::DataSource::ConfluencePageToIndexFieldMapping {
+  use Moose;
+  use MooseX::StrictConstructor;
+  extends 'Cfn::Value::TypedValue';
+  
+  has DataSourceFieldName => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has DateFieldFormat => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has IndexFieldName => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+}
+subtype 'ArrayOfCfn::Resource::Properties::AWS::Kendra::DataSource::ConfluenceBlogToIndexFieldMapping',
+     as 'Cfn::Value',
+  where { $_->isa('Cfn::Value::Array') or $_->isa('Cfn::Value::Function') },
+message { "$_ is not a Cfn::Value or a Cfn::Value::Function" };
+
+coerce 'ArrayOfCfn::Resource::Properties::AWS::Kendra::DataSource::ConfluenceBlogToIndexFieldMapping',
+  from 'HashRef',
+   via {
+     if (my $f = Cfn::TypeLibrary::try_function($_)) {
+       return $f
+     } else {
+       die 'Only accepts functions'; 
+     }
+   },
+  from 'ArrayRef',
+   via {
+     Cfn::Value::Array->new(Value => [
+       map { 
+         Moose::Util::TypeConstraints::find_type_constraint('Cfn::Resource::Properties::AWS::Kendra::DataSource::ConfluenceBlogToIndexFieldMapping')->coerce($_)
+       } @$_
+     ]);
+   };
+
+subtype 'Cfn::Resource::Properties::AWS::Kendra::DataSource::ConfluenceBlogToIndexFieldMapping',
+     as 'Cfn::Value';
+
+coerce 'Cfn::Resource::Properties::AWS::Kendra::DataSource::ConfluenceBlogToIndexFieldMapping',
+  from 'HashRef',
+   via {
+     if (my $f = Cfn::TypeLibrary::try_function($_)) {
+       return $f
+     } else {
+       return Cfn::Resource::Properties::Object::AWS::Kendra::DataSource::ConfluenceBlogToIndexFieldMapping->new( %$_ );
+     }
+   };
+
+package Cfn::Resource::Properties::Object::AWS::Kendra::DataSource::ConfluenceBlogToIndexFieldMapping {
+  use Moose;
+  use MooseX::StrictConstructor;
+  extends 'Cfn::Value::TypedValue';
+  
+  has DataSourceFieldName => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has DateFieldFormat => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has IndexFieldName => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+}
+subtype 'ArrayOfCfn::Resource::Properties::AWS::Kendra::DataSource::ConfluenceAttachmentToIndexFieldMapping',
+     as 'Cfn::Value',
+  where { $_->isa('Cfn::Value::Array') or $_->isa('Cfn::Value::Function') },
+message { "$_ is not a Cfn::Value or a Cfn::Value::Function" };
+
+coerce 'ArrayOfCfn::Resource::Properties::AWS::Kendra::DataSource::ConfluenceAttachmentToIndexFieldMapping',
+  from 'HashRef',
+   via {
+     if (my $f = Cfn::TypeLibrary::try_function($_)) {
+       return $f
+     } else {
+       die 'Only accepts functions'; 
+     }
+   },
+  from 'ArrayRef',
+   via {
+     Cfn::Value::Array->new(Value => [
+       map { 
+         Moose::Util::TypeConstraints::find_type_constraint('Cfn::Resource::Properties::AWS::Kendra::DataSource::ConfluenceAttachmentToIndexFieldMapping')->coerce($_)
+       } @$_
+     ]);
+   };
+
+subtype 'Cfn::Resource::Properties::AWS::Kendra::DataSource::ConfluenceAttachmentToIndexFieldMapping',
+     as 'Cfn::Value';
+
+coerce 'Cfn::Resource::Properties::AWS::Kendra::DataSource::ConfluenceAttachmentToIndexFieldMapping',
+  from 'HashRef',
+   via {
+     if (my $f = Cfn::TypeLibrary::try_function($_)) {
+       return $f
+     } else {
+       return Cfn::Resource::Properties::Object::AWS::Kendra::DataSource::ConfluenceAttachmentToIndexFieldMapping->new( %$_ );
+     }
+   };
+
+package Cfn::Resource::Properties::Object::AWS::Kendra::DataSource::ConfluenceAttachmentToIndexFieldMapping {
+  use Moose;
+  use MooseX::StrictConstructor;
+  extends 'Cfn::Value::TypedValue';
+  
+  has DataSourceFieldName => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has DateFieldFormat => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has IndexFieldName => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
 }
 subtype 'ArrayOfCfn::Resource::Properties::AWS::Kendra::DataSource::SalesforceStandardObjectConfiguration',
      as 'Cfn::Value',
@@ -326,6 +506,111 @@ package Cfn::Resource::Properties::Object::AWS::Kendra::DataSource::DataSourceIn
   extends 'Cfn::Value::TypedValue';
   
   has DataSourceInclusionsExclusionsStrings => (isa => 'Cfn::Value::Array|Cfn::Value::Function|Cfn::DynamicValue', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+}
+
+subtype 'Cfn::Resource::Properties::AWS::Kendra::DataSource::ConfluenceSpaceList',
+     as 'Cfn::Value';
+
+coerce 'Cfn::Resource::Properties::AWS::Kendra::DataSource::ConfluenceSpaceList',
+  from 'HashRef',
+   via {
+     if (my $f = Cfn::TypeLibrary::try_function($_)) {
+       return $f
+     } else {
+       return Cfn::Resource::Properties::Object::AWS::Kendra::DataSource::ConfluenceSpaceList->new( %$_ );
+     }
+   };
+
+package Cfn::Resource::Properties::Object::AWS::Kendra::DataSource::ConfluenceSpaceList {
+  use Moose;
+  use MooseX::StrictConstructor;
+  extends 'Cfn::Value::TypedValue';
+  
+  has ConfluenceSpaceList => (isa => 'Cfn::Value::Array|Cfn::Value::Function|Cfn::DynamicValue', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+}
+
+subtype 'Cfn::Resource::Properties::AWS::Kendra::DataSource::ConfluenceSpaceFieldMappingsList',
+     as 'Cfn::Value';
+
+coerce 'Cfn::Resource::Properties::AWS::Kendra::DataSource::ConfluenceSpaceFieldMappingsList',
+  from 'HashRef',
+   via {
+     if (my $f = Cfn::TypeLibrary::try_function($_)) {
+       return $f
+     } else {
+       return Cfn::Resource::Properties::Object::AWS::Kendra::DataSource::ConfluenceSpaceFieldMappingsList->new( %$_ );
+     }
+   };
+
+package Cfn::Resource::Properties::Object::AWS::Kendra::DataSource::ConfluenceSpaceFieldMappingsList {
+  use Moose;
+  use MooseX::StrictConstructor;
+  extends 'Cfn::Value::TypedValue';
+  
+  has ConfluenceSpaceFieldMappingsList => (isa => 'ArrayOfCfn::Resource::Properties::AWS::Kendra::DataSource::ConfluenceSpaceToIndexFieldMapping', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+}
+
+subtype 'Cfn::Resource::Properties::AWS::Kendra::DataSource::ConfluencePageFieldMappingsList',
+     as 'Cfn::Value';
+
+coerce 'Cfn::Resource::Properties::AWS::Kendra::DataSource::ConfluencePageFieldMappingsList',
+  from 'HashRef',
+   via {
+     if (my $f = Cfn::TypeLibrary::try_function($_)) {
+       return $f
+     } else {
+       return Cfn::Resource::Properties::Object::AWS::Kendra::DataSource::ConfluencePageFieldMappingsList->new( %$_ );
+     }
+   };
+
+package Cfn::Resource::Properties::Object::AWS::Kendra::DataSource::ConfluencePageFieldMappingsList {
+  use Moose;
+  use MooseX::StrictConstructor;
+  extends 'Cfn::Value::TypedValue';
+  
+  has ConfluencePageFieldMappingsList => (isa => 'ArrayOfCfn::Resource::Properties::AWS::Kendra::DataSource::ConfluencePageToIndexFieldMapping', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+}
+
+subtype 'Cfn::Resource::Properties::AWS::Kendra::DataSource::ConfluenceBlogFieldMappingsList',
+     as 'Cfn::Value';
+
+coerce 'Cfn::Resource::Properties::AWS::Kendra::DataSource::ConfluenceBlogFieldMappingsList',
+  from 'HashRef',
+   via {
+     if (my $f = Cfn::TypeLibrary::try_function($_)) {
+       return $f
+     } else {
+       return Cfn::Resource::Properties::Object::AWS::Kendra::DataSource::ConfluenceBlogFieldMappingsList->new( %$_ );
+     }
+   };
+
+package Cfn::Resource::Properties::Object::AWS::Kendra::DataSource::ConfluenceBlogFieldMappingsList {
+  use Moose;
+  use MooseX::StrictConstructor;
+  extends 'Cfn::Value::TypedValue';
+  
+  has ConfluenceBlogFieldMappingsList => (isa => 'ArrayOfCfn::Resource::Properties::AWS::Kendra::DataSource::ConfluenceBlogToIndexFieldMapping', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+}
+
+subtype 'Cfn::Resource::Properties::AWS::Kendra::DataSource::ConfluenceAttachmentFieldMappingsList',
+     as 'Cfn::Value';
+
+coerce 'Cfn::Resource::Properties::AWS::Kendra::DataSource::ConfluenceAttachmentFieldMappingsList',
+  from 'HashRef',
+   via {
+     if (my $f = Cfn::TypeLibrary::try_function($_)) {
+       return $f
+     } else {
+       return Cfn::Resource::Properties::Object::AWS::Kendra::DataSource::ConfluenceAttachmentFieldMappingsList->new( %$_ );
+     }
+   };
+
+package Cfn::Resource::Properties::Object::AWS::Kendra::DataSource::ConfluenceAttachmentFieldMappingsList {
+  use Moose;
+  use MooseX::StrictConstructor;
+  extends 'Cfn::Value::TypedValue';
+  
+  has ConfluenceAttachmentFieldMappingsList => (isa => 'ArrayOfCfn::Resource::Properties::AWS::Kendra::DataSource::ConfluenceAttachmentToIndexFieldMapping', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
 }
 
 subtype 'Cfn::Resource::Properties::AWS::Kendra::DataSource::ChangeDetectingColumns',
@@ -534,6 +819,69 @@ package Cfn::Resource::Properties::Object::AWS::Kendra::DataSource::OneDriveUser
   has OneDriveUserS3Path => (isa => 'Cfn::Resource::Properties::AWS::Kendra::DataSource::S3Path', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
 }
 
+subtype 'Cfn::Resource::Properties::AWS::Kendra::DataSource::ExcludeUserAccountsList',
+     as 'Cfn::Value';
+
+coerce 'Cfn::Resource::Properties::AWS::Kendra::DataSource::ExcludeUserAccountsList',
+  from 'HashRef',
+   via {
+     if (my $f = Cfn::TypeLibrary::try_function($_)) {
+       return $f
+     } else {
+       return Cfn::Resource::Properties::Object::AWS::Kendra::DataSource::ExcludeUserAccountsList->new( %$_ );
+     }
+   };
+
+package Cfn::Resource::Properties::Object::AWS::Kendra::DataSource::ExcludeUserAccountsList {
+  use Moose;
+  use MooseX::StrictConstructor;
+  extends 'Cfn::Value::TypedValue';
+  
+  has ExcludeUserAccountsList => (isa => 'Cfn::Value::Array|Cfn::Value::Function|Cfn::DynamicValue', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+}
+
+subtype 'Cfn::Resource::Properties::AWS::Kendra::DataSource::ExcludeSharedDrivesList',
+     as 'Cfn::Value';
+
+coerce 'Cfn::Resource::Properties::AWS::Kendra::DataSource::ExcludeSharedDrivesList',
+  from 'HashRef',
+   via {
+     if (my $f = Cfn::TypeLibrary::try_function($_)) {
+       return $f
+     } else {
+       return Cfn::Resource::Properties::Object::AWS::Kendra::DataSource::ExcludeSharedDrivesList->new( %$_ );
+     }
+   };
+
+package Cfn::Resource::Properties::Object::AWS::Kendra::DataSource::ExcludeSharedDrivesList {
+  use Moose;
+  use MooseX::StrictConstructor;
+  extends 'Cfn::Value::TypedValue';
+  
+  has ExcludeSharedDrivesList => (isa => 'Cfn::Value::Array|Cfn::Value::Function|Cfn::DynamicValue', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+}
+
+subtype 'Cfn::Resource::Properties::AWS::Kendra::DataSource::ExcludeMimeTypesList',
+     as 'Cfn::Value';
+
+coerce 'Cfn::Resource::Properties::AWS::Kendra::DataSource::ExcludeMimeTypesList',
+  from 'HashRef',
+   via {
+     if (my $f = Cfn::TypeLibrary::try_function($_)) {
+       return $f
+     } else {
+       return Cfn::Resource::Properties::Object::AWS::Kendra::DataSource::ExcludeMimeTypesList->new( %$_ );
+     }
+   };
+
+package Cfn::Resource::Properties::Object::AWS::Kendra::DataSource::ExcludeMimeTypesList {
+  use Moose;
+  use MooseX::StrictConstructor;
+  extends 'Cfn::Value::TypedValue';
+  
+  has ExcludeMimeTypesList => (isa => 'Cfn::Value::Array|Cfn::Value::Function|Cfn::DynamicValue', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+}
+
 subtype 'Cfn::Resource::Properties::AWS::Kendra::DataSource::DocumentsMetadataConfiguration',
      as 'Cfn::Value';
 
@@ -600,6 +948,95 @@ package Cfn::Resource::Properties::Object::AWS::Kendra::DataSource::ConnectionCo
   has DatabasePort => (isa => 'Cfn::Value::Integer', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has SecretArn => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has TableName => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+}
+
+subtype 'Cfn::Resource::Properties::AWS::Kendra::DataSource::ConfluenceSpaceConfiguration',
+     as 'Cfn::Value';
+
+coerce 'Cfn::Resource::Properties::AWS::Kendra::DataSource::ConfluenceSpaceConfiguration',
+  from 'HashRef',
+   via {
+     if (my $f = Cfn::TypeLibrary::try_function($_)) {
+       return $f
+     } else {
+       return Cfn::Resource::Properties::Object::AWS::Kendra::DataSource::ConfluenceSpaceConfiguration->new( %$_ );
+     }
+   };
+
+package Cfn::Resource::Properties::Object::AWS::Kendra::DataSource::ConfluenceSpaceConfiguration {
+  use Moose;
+  use MooseX::StrictConstructor;
+  extends 'Cfn::Value::TypedValue';
+  
+  has CrawlArchivedSpaces => (isa => 'Cfn::Value::Boolean', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has CrawlPersonalSpaces => (isa => 'Cfn::Value::Boolean', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has ExcludeSpaces => (isa => 'Cfn::Resource::Properties::AWS::Kendra::DataSource::ConfluenceSpaceList', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has IncludeSpaces => (isa => 'Cfn::Resource::Properties::AWS::Kendra::DataSource::ConfluenceSpaceList', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has SpaceFieldMappings => (isa => 'Cfn::Resource::Properties::AWS::Kendra::DataSource::ConfluenceSpaceFieldMappingsList', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+}
+
+subtype 'Cfn::Resource::Properties::AWS::Kendra::DataSource::ConfluencePageConfiguration',
+     as 'Cfn::Value';
+
+coerce 'Cfn::Resource::Properties::AWS::Kendra::DataSource::ConfluencePageConfiguration',
+  from 'HashRef',
+   via {
+     if (my $f = Cfn::TypeLibrary::try_function($_)) {
+       return $f
+     } else {
+       return Cfn::Resource::Properties::Object::AWS::Kendra::DataSource::ConfluencePageConfiguration->new( %$_ );
+     }
+   };
+
+package Cfn::Resource::Properties::Object::AWS::Kendra::DataSource::ConfluencePageConfiguration {
+  use Moose;
+  use MooseX::StrictConstructor;
+  extends 'Cfn::Value::TypedValue';
+  
+  has PageFieldMappings => (isa => 'Cfn::Resource::Properties::AWS::Kendra::DataSource::ConfluencePageFieldMappingsList', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+}
+
+subtype 'Cfn::Resource::Properties::AWS::Kendra::DataSource::ConfluenceBlogConfiguration',
+     as 'Cfn::Value';
+
+coerce 'Cfn::Resource::Properties::AWS::Kendra::DataSource::ConfluenceBlogConfiguration',
+  from 'HashRef',
+   via {
+     if (my $f = Cfn::TypeLibrary::try_function($_)) {
+       return $f
+     } else {
+       return Cfn::Resource::Properties::Object::AWS::Kendra::DataSource::ConfluenceBlogConfiguration->new( %$_ );
+     }
+   };
+
+package Cfn::Resource::Properties::Object::AWS::Kendra::DataSource::ConfluenceBlogConfiguration {
+  use Moose;
+  use MooseX::StrictConstructor;
+  extends 'Cfn::Value::TypedValue';
+  
+  has BlogFieldMappings => (isa => 'Cfn::Resource::Properties::AWS::Kendra::DataSource::ConfluenceBlogFieldMappingsList', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+}
+
+subtype 'Cfn::Resource::Properties::AWS::Kendra::DataSource::ConfluenceAttachmentConfiguration',
+     as 'Cfn::Value';
+
+coerce 'Cfn::Resource::Properties::AWS::Kendra::DataSource::ConfluenceAttachmentConfiguration',
+  from 'HashRef',
+   via {
+     if (my $f = Cfn::TypeLibrary::try_function($_)) {
+       return $f
+     } else {
+       return Cfn::Resource::Properties::Object::AWS::Kendra::DataSource::ConfluenceAttachmentConfiguration->new( %$_ );
+     }
+   };
+
+package Cfn::Resource::Properties::Object::AWS::Kendra::DataSource::ConfluenceAttachmentConfiguration {
+  use Moose;
+  use MooseX::StrictConstructor;
+  extends 'Cfn::Value::TypedValue';
+  
+  has AttachmentFieldMappings => (isa => 'Cfn::Resource::Properties::AWS::Kendra::DataSource::ConfluenceAttachmentFieldMappingsList', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has CrawlAttachments => (isa => 'Cfn::Value::Boolean', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
 }
 
 subtype 'Cfn::Resource::Properties::AWS::Kendra::DataSource::ColumnConfiguration',
@@ -688,6 +1125,7 @@ package Cfn::Resource::Properties::Object::AWS::Kendra::DataSource::SharePointCo
   extends 'Cfn::Value::TypedValue';
   
   has CrawlAttachments => (isa => 'Cfn::Value::Boolean', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has DisableLocalGroups => (isa => 'Cfn::Value::Boolean', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has DocumentTitleFieldName => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has ExclusionPatterns => (isa => 'Cfn::Resource::Properties::AWS::Kendra::DataSource::DataSourceInclusionsExclusionsStrings', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has FieldMappings => (isa => 'Cfn::Resource::Properties::AWS::Kendra::DataSource::DataSourceToIndexFieldMappingList', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
@@ -797,12 +1235,40 @@ package Cfn::Resource::Properties::Object::AWS::Kendra::DataSource::OneDriveConf
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
   
+  has DisableLocalGroups => (isa => 'Cfn::Value::Boolean', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has ExclusionPatterns => (isa => 'Cfn::Resource::Properties::AWS::Kendra::DataSource::DataSourceInclusionsExclusionsStrings', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has FieldMappings => (isa => 'Cfn::Resource::Properties::AWS::Kendra::DataSource::DataSourceToIndexFieldMappingList', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has InclusionPatterns => (isa => 'Cfn::Resource::Properties::AWS::Kendra::DataSource::DataSourceInclusionsExclusionsStrings', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has OneDriveUsers => (isa => 'Cfn::Resource::Properties::AWS::Kendra::DataSource::OneDriveUsers', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has SecretArn => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has TenantDomain => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+}
+
+subtype 'Cfn::Resource::Properties::AWS::Kendra::DataSource::GoogleDriveConfiguration',
+     as 'Cfn::Value';
+
+coerce 'Cfn::Resource::Properties::AWS::Kendra::DataSource::GoogleDriveConfiguration',
+  from 'HashRef',
+   via {
+     if (my $f = Cfn::TypeLibrary::try_function($_)) {
+       return $f
+     } else {
+       return Cfn::Resource::Properties::Object::AWS::Kendra::DataSource::GoogleDriveConfiguration->new( %$_ );
+     }
+   };
+
+package Cfn::Resource::Properties::Object::AWS::Kendra::DataSource::GoogleDriveConfiguration {
+  use Moose;
+  use MooseX::StrictConstructor;
+  extends 'Cfn::Value::TypedValue';
+  
+  has ExcludeMimeTypes => (isa => 'Cfn::Resource::Properties::AWS::Kendra::DataSource::ExcludeMimeTypesList', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has ExcludeSharedDrives => (isa => 'Cfn::Resource::Properties::AWS::Kendra::DataSource::ExcludeSharedDrivesList', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has ExcludeUserAccounts => (isa => 'Cfn::Resource::Properties::AWS::Kendra::DataSource::ExcludeUserAccountsList', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has ExclusionPatterns => (isa => 'Cfn::Resource::Properties::AWS::Kendra::DataSource::DataSourceInclusionsExclusionsStrings', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has FieldMappings => (isa => 'Cfn::Resource::Properties::AWS::Kendra::DataSource::DataSourceToIndexFieldMappingList', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has InclusionPatterns => (isa => 'Cfn::Resource::Properties::AWS::Kendra::DataSource::DataSourceInclusionsExclusionsStrings', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has SecretArn => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
 }
 
 subtype 'Cfn::Resource::Properties::AWS::Kendra::DataSource::DatabaseConfiguration',
@@ -831,25 +1297,34 @@ package Cfn::Resource::Properties::Object::AWS::Kendra::DataSource::DatabaseConf
   has VpcConfiguration => (isa => 'Cfn::Resource::Properties::AWS::Kendra::DataSource::DataSourceVpcConfiguration', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
 }
 
-subtype 'Cfn::Resource::Properties::AWS::Kendra::DataSource::TagList',
+subtype 'Cfn::Resource::Properties::AWS::Kendra::DataSource::ConfluenceConfiguration',
      as 'Cfn::Value';
 
-coerce 'Cfn::Resource::Properties::AWS::Kendra::DataSource::TagList',
+coerce 'Cfn::Resource::Properties::AWS::Kendra::DataSource::ConfluenceConfiguration',
   from 'HashRef',
    via {
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::Object::AWS::Kendra::DataSource::TagList->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::Kendra::DataSource::ConfluenceConfiguration->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::Object::AWS::Kendra::DataSource::TagList {
+package Cfn::Resource::Properties::Object::AWS::Kendra::DataSource::ConfluenceConfiguration {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
   
-  has TagList => (isa => 'ArrayOfCfn::Resource::Properties::TagType', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has AttachmentConfiguration => (isa => 'Cfn::Resource::Properties::AWS::Kendra::DataSource::ConfluenceAttachmentConfiguration', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has BlogConfiguration => (isa => 'Cfn::Resource::Properties::AWS::Kendra::DataSource::ConfluenceBlogConfiguration', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has ExclusionPatterns => (isa => 'Cfn::Resource::Properties::AWS::Kendra::DataSource::DataSourceInclusionsExclusionsStrings', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has InclusionPatterns => (isa => 'Cfn::Resource::Properties::AWS::Kendra::DataSource::DataSourceInclusionsExclusionsStrings', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has PageConfiguration => (isa => 'Cfn::Resource::Properties::AWS::Kendra::DataSource::ConfluencePageConfiguration', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has SecretArn => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has ServerUrl => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has SpaceConfiguration => (isa => 'Cfn::Resource::Properties::AWS::Kendra::DataSource::ConfluenceSpaceConfiguration', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has Version => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has VpcConfiguration => (isa => 'Cfn::Resource::Properties::AWS::Kendra::DataSource::DataSourceVpcConfiguration', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
 }
 
 subtype 'Cfn::Resource::Properties::AWS::Kendra::DataSource::DataSourceConfiguration',
@@ -870,7 +1345,9 @@ package Cfn::Resource::Properties::Object::AWS::Kendra::DataSource::DataSourceCo
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
   
+  has ConfluenceConfiguration => (isa => 'Cfn::Resource::Properties::AWS::Kendra::DataSource::ConfluenceConfiguration', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has DatabaseConfiguration => (isa => 'Cfn::Resource::Properties::AWS::Kendra::DataSource::DatabaseConfiguration', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has GoogleDriveConfiguration => (isa => 'Cfn::Resource::Properties::AWS::Kendra::DataSource::GoogleDriveConfiguration', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has OneDriveConfiguration => (isa => 'Cfn::Resource::Properties::AWS::Kendra::DataSource::OneDriveConfiguration', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has S3Configuration => (isa => 'Cfn::Resource::Properties::AWS::Kendra::DataSource::S3DataSourceConfiguration', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has SalesforceConfiguration => (isa => 'Cfn::Resource::Properties::AWS::Kendra::DataSource::SalesforceConfiguration', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
@@ -889,7 +1366,7 @@ package Cfn::Resource::Properties::AWS::Kendra::DataSource {
   has Name => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has RoleArn => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has Schedule => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
-  has Tags => (isa => 'Cfn::Resource::Properties::AWS::Kendra::DataSource::TagList', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has Tags => (isa => 'ArrayOfCfn::Resource::Properties::TagType', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has Type => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
 }
 

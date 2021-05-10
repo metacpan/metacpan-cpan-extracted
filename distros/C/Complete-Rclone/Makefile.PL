@@ -18,8 +18,9 @@ my %WriteMakefileArgs = (
   "NAME" => "Complete::Rclone",
   "PREREQ_PM" => {
     "Complete::Util" => "0.608",
-    "Config::IOD::Reader" => "0.341",
     "Exporter" => "5.57",
+    "Hash::Subset" => "0.006",
+    "Rclone::Util" => 0,
     "strict" => 0,
     "warnings" => 0
   },
@@ -29,7 +30,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.002",
+  "VERSION" => "0.003",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -38,11 +39,12 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "Complete::Util" => "0.608",
-  "Config::IOD::Reader" => "0.341",
   "Exporter" => "5.57",
   "File::Spec" => 0,
+  "Hash::Subset" => "0.006",
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
+  "Rclone::Util" => 0,
   "Test::More" => 0,
   "strict" => 0,
   "warnings" => 0

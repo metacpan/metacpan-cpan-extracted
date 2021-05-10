@@ -1,4 +1,16 @@
 Revision history for Faster-Maths
 
+0.02    2021-05-08
+        [CHANGES]
+         * Further performance improvement by storing the accumulator directly
+           as a C-level NV rather than using the NV field of an SV
+
+        [BUGFIXES]
+         * Don't get stuck in optree cycles relating to  while(1) {} loops
+           (RT136443)
+         * Remember to recurse into ->op_other of certain LOGOPs ourselves in
+           case they contain optimizable expressions before the first
+           OP_NEXTSTATE
+
 0.01    2021-05-05
         First version, released on an unsuspecting world.

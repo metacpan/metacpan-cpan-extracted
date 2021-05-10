@@ -1,7 +1,5 @@
 .gitignore
-.travis.yml
 Changes
-copy.pl
 examples/reporter.pl
 examples/set-file.pl
 examples/synopsis.pl
@@ -16,6 +14,8 @@ script/checkxs
 t/av-len.t
 t/comment.t
 t/deref.t
+t/svpv.t
 t/xs-check.t
+t/XSCT.pm
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

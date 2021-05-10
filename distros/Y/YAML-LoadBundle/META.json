@@ -4,7 +4,7 @@
       "Grant Street Group <developers@grantstreet.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "Dist::Zilla version 6.015, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "artistic_2"
    ],
@@ -48,7 +48,7 @@
    "provides" : {
       "YAML::LoadBundle" : {
          "file" : "lib/YAML/LoadBundle.pm",
-         "version" : "v0.4.2"
+         "version" : "v0.4.3"
       }
    },
    "release_status" : "stable",
@@ -62,8 +62,10 @@
          "web" : "https://github.com/GrantStreetGroup/p5-YAML-LoadBundle"
       }
    },
-   "version" : "v0.4.2",
-   "x_serialization_backend" : "JSON::XS version 3.04",
+   "version" : "v0.4.3",
+   "x_generated_by_perl" : "v5.18.2",
+   "x_serialization_backend" : "JSON::XS version 4.02",
+   "x_spdx_expression" : "Artistic-2.0",
    "x_static_install" : 1
 }
 

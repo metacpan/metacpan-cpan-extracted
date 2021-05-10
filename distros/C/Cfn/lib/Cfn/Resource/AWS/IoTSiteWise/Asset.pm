@@ -1,4 +1,4 @@
-# AWS::IoTSiteWise::Asset generated from spec 20.1.0
+# AWS::IoTSiteWise::Asset generated from spec 34.0.0
 use Moose::Util::TypeConstraints;
 
 coerce 'Cfn::Resource::Properties::AWS::IoTSiteWise::Asset',
@@ -14,7 +14,7 @@ package Cfn::Resource::AWS::IoTSiteWise::Asset {
     [ 'AssetArn','AssetId' ]
   }
   sub supported_regions {
-    [ 'ap-southeast-1','ap-southeast-2','eu-central-1','eu-west-1','us-east-1','us-west-2' ]
+    [ 'ap-southeast-1','ap-southeast-2','cn-north-1','eu-central-1','eu-west-1','us-east-1','us-west-2' ]
   }
 }
 

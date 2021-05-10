@@ -3,8 +3,8 @@ NAME
     (audio/video/image) file
 
 VERSION
-    This document describes version 0.002 of Filename::Media (from Perl
-    distribution Filename-Media), released on 2020-05-30.
+    This document describes version 0.003 of Filename::Media (from Perl
+    distribution Filename-Media), released on 2020-10-20.
 
 SYNOPSIS
      use Filename::Media qw(check_media_filename);
@@ -18,6 +18,45 @@ SYNOPSIS
 DESCRIPTION
 FUNCTIONS
   check_media_filename
+    Usage:
+
+     check_media_filename(%args) -> bool|hash
+
+    Check whether filename indicates being a media (audio/video/image) file.
+
+    Examples:
+
+    *   Example #1:
+
+         check_media_filename(filename => "foo.txt"); # -> 0
+
+    *   Example #2:
+
+         check_media_filename(filename => "foo.DOC"); # -> 0
+
+    *   Example #3:
+
+         check_media_filename(filename => "foo.webm"); # -> {}
+
+    *   Example #4:
+
+         check_media_filename(filename => "foo.MP3"); # -> {}
+
+    *   Example #5:
+
+         check_media_filename(filename => "foo.Jpeg"); # -> {}
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   filename* => *filename*
+
+    Return value: (bool|hash)
+
+    Return false if no archive suffixes detected. Otherwise return a hash of
+    information.
+
 HOMEPAGE
     Please visit the project's homepage at
     <https://metacpan.org/release/Filename-Media>.

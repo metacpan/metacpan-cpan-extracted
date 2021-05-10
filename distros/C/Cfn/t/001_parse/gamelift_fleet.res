@@ -4,11 +4,14 @@
     "Name": "MyGameFleet",
     "Description": "A fleet for my game",
     "BuildId": { "Ref": "BuildResource" },
-    "ServerLaunchPath": "c:\\game\\TestApplicationServer.exe",
-    "LogPaths": [
-      "c:\\game\\testlog.log",
-      "c:\\game\\testlog2.log"
-    ],
+    "RuntimeConfiguration": {
+      "ServerProcesses": [
+        {
+          "ConcurrentExecutions": "1",
+          "LaunchPath": "c:\\game\\TestApplicationServer.exe"
+        }
+      ]
+    },
     "EC2InstanceType": "t2.small",
     "DesiredEC2Instances": "2",
     "EC2InboundPermissions": [
@@ -25,5 +28,5 @@
         "Protocol": "UDP"
       }
     ]
-  } 
+  }
 }

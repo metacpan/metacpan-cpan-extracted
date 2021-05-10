@@ -7,9 +7,6 @@ DESCRIPTION
     <https://github.com/libyui/libyui/tree/master/libyui-rest-api/doc>. for
     more details about server side implementation.
 
-VERSION
-    This document describes YuiRestClient version 0.1.
-
 SYNOPSIS
       use YuiRestClient;
       use constant API_VERSION => 'v1';

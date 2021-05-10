@@ -1,6 +1,6 @@
 package Resque::Failure::Redis;
 # ABSTRACT: Redis backend for worker failures
-$Resque::Failure::Redis::VERSION = '0.37';
+$Resque::Failure::Redis::VERSION = '0.38';
 use Moose;
 with 'Resque::Failure';
 with 'Resque::Encoder';
@@ -33,7 +33,7 @@ Resque::Failure::Redis - Redis backend for worker failures
 
 =head1 VERSION
 
-version 0.37
+version 0.38
 
 =head1 METHODS
 
@@ -47,7 +47,7 @@ Diego Kuperman <diego@freekeylabs.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by Diego Kuperman.
+This software is copyright (c) 2021 by Diego Kuperman.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

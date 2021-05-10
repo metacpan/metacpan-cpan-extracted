@@ -4,7 +4,7 @@
       "Ichinose Shogo"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.1.11",
+   "generated_by" : "Minilla/v3.1.12",
    "license" : [
       "mit"
    ],
@@ -68,7 +68,7 @@
    "provides" : {
       "AWS::Lambda" : {
          "file" : "lib/AWS/Lambda.pm",
-         "version" : "v0.0.25"
+         "version" : "v0.0.26"
       },
       "AWS::Lambda::Bootstrap" : {
          "file" : "lib/AWS/Lambda/Bootstrap.pm"
@@ -91,7 +91,7 @@
          "web" : "https://github.com/shogo82148/p5-aws-lambda"
       }
    },
-   "version" : "0.0.25",
+   "version" : "0.0.26",
    "x_contributors" : [
       "Ichinose Shogo <shogo82148@gmail.com>",
       "Jose Luis Martinez <jlmartinez@capside.com>",

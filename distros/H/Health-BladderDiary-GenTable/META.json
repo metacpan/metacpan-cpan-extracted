@@ -70,7 +70,7 @@
          "web" : "https://github.com/perlancar/perl-Health-BladderDiary-GenTable"
       }
    },
-   "version" : "0.006",
+   "version" : "0.007",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.030000"

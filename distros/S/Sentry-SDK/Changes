@@ -1,11 +1,19 @@
 Revision history for Sentry-SDK
 
+v1.0.6  2021-05-07 10:25:25 CEST
+
+  - fix(Sentry::Integration::DBI): do not try to finish non-existing spans.
+
+v1.0.5  2021-05-07 09:10:20 CEST
+
+  - fix(CGI::Application::Plugin::Sentry): prefer `REQUEST_URI` environment variable for building the current URL
+
 v1.0.4  2021-05-06 16:53:01 CEST
 
   - fix(CGI::Application::Plugin::Sentry): provide `runmode` and `server_name` tags
 
 v1.0.3  2021-05-06 16:20:47 CEST
-  
+
   - fix "Too few arguments for subroutine" warning
 
 v1.0.2  2021-02-11 15:38:56 CET

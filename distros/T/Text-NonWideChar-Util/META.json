@@ -55,12 +55,17 @@
          "web" : "https://github.com/perlancar/perl-Text-NonWideChar-Util"
       }
    },
-   "version" : "0.003",
+   "version" : "0.004",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.030000"
       },
       "plugins" : [
+         {
+            "class" : "Dist::Zilla::Plugin::InsertBlock::FromModule",
+            "name" : "InsertBlock::FromModule",
+            "version" : "0.102"
+         },
          {
             "class" : "Dist::Zilla::Plugin::PERLANCAR::CheckPendingRelease",
             "name" : "@Author::PERLANCAR/PERLANCAR::CheckPendingRelease",

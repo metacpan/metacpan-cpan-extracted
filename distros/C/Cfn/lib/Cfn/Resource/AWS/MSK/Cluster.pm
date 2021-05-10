@@ -1,4 +1,4 @@
-# AWS::MSK::Cluster generated from spec 18.4.0
+# AWS::MSK::Cluster generated from spec 34.0.0
 use Moose::Util::TypeConstraints;
 
 coerce 'Cfn::Resource::Properties::AWS::MSK::Cluster',
@@ -450,7 +450,7 @@ package Cfn::Resource::Properties::Object::AWS::MSK::Cluster::BrokerNodeGroupInf
   
   has BrokerAZDistribution => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
   has ClientSubnets => (isa => 'Cfn::Value::Array|Cfn::Value::Function|Cfn::DynamicValue', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
-  has InstanceType => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
+  has InstanceType => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has SecurityGroups => (isa => 'Cfn::Value::Array|Cfn::Value::Function|Cfn::DynamicValue', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
   has StorageInfo => (isa => 'Cfn::Resource::Properties::AWS::MSK::Cluster::StorageInfo', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
 }
@@ -460,7 +460,7 @@ package Cfn::Resource::Properties::AWS::MSK::Cluster {
   use MooseX::StrictConstructor;
   extends 'Cfn::Resource::Properties';
   
-  has BrokerNodeGroupInfo => (isa => 'Cfn::Resource::Properties::AWS::MSK::Cluster::BrokerNodeGroupInfo', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
+  has BrokerNodeGroupInfo => (isa => 'Cfn::Resource::Properties::AWS::MSK::Cluster::BrokerNodeGroupInfo', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has ClientAuthentication => (isa => 'Cfn::Resource::Properties::AWS::MSK::Cluster::ClientAuthentication', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
   has ClusterName => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
   has ConfigurationInfo => (isa => 'Cfn::Resource::Properties::AWS::MSK::Cluster::ConfigurationInfo', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');

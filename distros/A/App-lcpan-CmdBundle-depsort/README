@@ -3,9 +3,9 @@ NAME
     sorting by dependencies
 
 VERSION
-    This document describes version 0.002 of App::lcpan::CmdBundle::depsort
+    This document describes version 0.004 of App::lcpan::CmdBundle::depsort
     (from Perl distribution App-lcpan-CmdBundle-depsort), released on
-    2021-03-07.
+    2021-04-24.
 
 SYNOPSIS
 DESCRIPTION

@@ -2,8 +2,8 @@ NAME
     App::dateseq - Generate a sequence of dates
 
 VERSION
-    This document describes version 0.101 of App::dateseq (from Perl
-    distribution App-dateseq), released on 2021-01-04.
+    This document describes version 0.102 of App::dateseq (from Perl
+    distribution App-dateseq), released on 2021-01-13.
 
 FUNCTIONS
   dateseq
@@ -65,9 +65,17 @@ FUNCTIONS
 
     *   increment => *duration*
 
-    *   limit => *int*
+    *   limit => *posint*
 
         Only generate a certain amount of numbers.
+
+    *   limit_monthly => *posint*
+
+        Only output at most this number of dates for each month.
+
+    *   limit_yearly => *posint*
+
+        Only output at most this number of dates for each year.
 
     *   reverse => *true*
 

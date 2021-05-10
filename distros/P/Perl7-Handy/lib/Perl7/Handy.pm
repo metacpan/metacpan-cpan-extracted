@@ -5,13 +5,13 @@ package Perl7::Handy;
 #
 # https://metacpan.org/release/Perl7-Handy
 #
-# Copyright (c) 2020, 2001 INABA Hitoshi <ina@cpan.org>
+# Copyright (c) 2020, 2021 INABA Hitoshi <ina@cpan.org>
 ######################################################################
 
 use 5.00503;    # Universal Consensus 1998 for primetools
 # use 5.008001; # Lancaster Consensus 2013 for toolchains
 
-$VERSION = '0.04';
+$VERSION = '0.05';
 $VERSION = $VERSION;
 
 BEGIN { pop @INC if $INC[-1] eq '.' } # CVE-2016-1238: Important unsafe module load path flaw
@@ -26,14 +26,12 @@ sub Perl7::Handy::confess (@) {
     my $i = 0;
     my @confess = ();
     while (my($package,$filename,$line,$subroutine) = caller($i)) {
-        push @confess, "[$i] $filename($line) $package"."::$subroutine\n";
+        push @confess, "[$i] $filename($line) $subroutine\n";
         $i++;
     }
-    print STDERR __PACKAGE__, " says:\n";
+    print STDERR "\n", @_, "\n";
     print STDERR CORE::reverse @confess;
-    print STDERR "\n";
-    print STDERR @_, "\n";
-    die "\n";
+    die;
 }
 
 #---------------------------------------------------------------------

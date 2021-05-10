@@ -25,7 +25,6 @@ sub setup_once ($self, $add_global_event_processor, $get_current_hub) {
   around(
     'DBI::db',
     do => sub ($orig, $dbh, $statement, @args) {
-
       my $hub = $get_current_hub->();
 
       my $span;
@@ -41,7 +40,7 @@ sub setup_once ($self, $add_global_event_processor, $get_current_hub) {
         type => 'query', category => 'do', data => { sql => $statement }, })
         if $self->breadcrumbs;
 
-      if ($self->tracing) {
+      if (defined $span && $self->tracing) {
         $span->finish();
       }
 

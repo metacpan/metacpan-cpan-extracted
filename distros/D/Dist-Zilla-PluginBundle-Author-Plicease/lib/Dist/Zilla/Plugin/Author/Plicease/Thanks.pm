@@ -1,7 +1,8 @@
-package Dist::Zilla::Plugin::Author::Plicease::Thanks 2.62 {
+package Dist::Zilla::Plugin::Author::Plicease::Thanks 2.63 {
 
-  use 5.014;
+  use 5.020;
   use Moose;
+  use experimental qw( postderef );
 
   with 'Dist::Zilla::Role::MetaProvider';
   with 'Dist::Zilla::Role::FileMunger';
@@ -33,7 +34,7 @@ package Dist::Zilla::Plugin::Author::Plicease::Thanks 2.62 {
   sub munge_files
   {
     my($self) = @_;
-    $self->munge_file($_) for @{ $self->found_files };
+    $self->munge_file($_) for $self->found_files->@*;
   }
 
   sub _escape ($)
@@ -69,9 +70,9 @@ package Dist::Zilla::Plugin::Author::Plicease::Thanks 2.62 {
         push @list, 'Author: ' . _escape $self->current,
                     '';
       }
-      if(@{ $self->contributor } > 0)
+      if($self->contributor->@* > 0)
       {
-        push @list, 'Contributors:', '', map { (_escape $_, '') } @{ $self->contributor };
+        push @list, 'Contributors:', '', map { (_escape $_, '') } $self->contributor->@*;
       }
       return join "\n", @list, '';
     };
@@ -90,7 +91,7 @@ package Dist::Zilla::Plugin::Author::Plicease::Thanks 2.62 {
   {
     my ($self) = @_;
 
-    my @contributors = @{$self->contributor};
+    my @contributors = $self->contributor->@*;
     unshift @contributors, $self->current  if $self->current;
     unshift @contributors, $self->original if $self->original;
 
@@ -115,7 +116,7 @@ Dist::Zilla::Plugin::Author::Plicease::Thanks - munge the AUTHOR section
 
 =head1 VERSION
 
-version 2.62
+version 2.63
 
 =head1 SYNOPSIS
 

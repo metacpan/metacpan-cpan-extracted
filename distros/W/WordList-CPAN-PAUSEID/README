@@ -2,8 +2,8 @@ NAME
     WordList::CPAN::PAUSEID - CPAN PAUSE ID's
 
 VERSION
-    This document describes version 20200504.0.1 of WordList::CPAN::PAUSEID
-    (from Perl distribution WordList-CPAN-PAUSEID), released on 2020-05-04.
+    This document describes version 20200829.0.0 of WordList::CPAN::PAUSEID
+    (from Perl distribution WordList-CPAN-PAUSEID), released on 2020-09-14.
 
 SYNOPSIS
      use WordList::CPAN::PAUSEID;
@@ -20,10 +20,14 @@ SYNOPSIS
      # Call a callback for each word
      $wl->each_word(sub { my $word = shift; ... });
 
+     # Iterate
+     my $first_word = $wl->first_word;
+     while (defined(my $word = $wl->next_word)) { ... }
+
      # Get all the words
      my @all_words = $wl->all_words;
 
-STATISTICS
+WORDLIST STATISTICS
      +----------------------------------+------------------+
      | key                              | value            |
      +----------------------------------+------------------+
@@ -47,7 +51,7 @@ HOMEPAGE
 
 SOURCE
     Source repository is at
-    <https://github.com/perlancar/perl-WordList-CPAN-PAUSEIDs>.
+    <https://github.com/perlancar/perl-WordList-CPAN-PAUSEID>.
 
 BUGS
     Please report any bugs or feature requests on the bugtracker website
@@ -61,7 +65,7 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2020, 2017 by perlancar@cpan.org.
+    This software is copyright (c) 2020 by perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

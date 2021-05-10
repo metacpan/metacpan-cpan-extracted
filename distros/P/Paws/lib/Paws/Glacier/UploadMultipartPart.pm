@@ -2,7 +2,7 @@
 package Paws::Glacier::UploadMultipartPart;
   use Moose;
   has AccountId => (is => 'ro', isa => 'Str', traits => ['ParamInURI'], uri_name => 'accountId', required => 1);
-  has Body => (is => 'ro', isa => 'Str', traits => ['NameInRequest'], request_name => 'body');
+  has Body => (is => 'ro', isa => 'Str', traits => ['ParamInBody']);
   has Checksum => (is => 'ro', isa => 'Str', traits => ['ParamInHeader'], header_name => 'x-amz-sha256-tree-hash');
   has Range => (is => 'ro', isa => 'Str', traits => ['ParamInHeader'], header_name => 'Content-Range');
   has UploadId => (is => 'ro', isa => 'Str', traits => ['ParamInURI'], uri_name => 'uploadId', required => 1);
@@ -40,7 +40,7 @@ You shouldn't make instances of this class. Each attribute should be used as a n
       'Body'      => 'part1',
       'Checksum'  => 'c06f7cd4baacb087002a99a5f48bf953',
       'Range'     => 'bytes 0-1048575/*',
-      'UploadId' =>
+      'UploadId'  =>
 '19gaRezEXAMPLES6Ry5YYdqthHOC_kGRCT03L9yetr220UmPtBYKk-OssZtLqyFu7sY1_lR7vgFuJV6NtcV5zpsJ',
       'VaultName' => 'examplevault'
     );

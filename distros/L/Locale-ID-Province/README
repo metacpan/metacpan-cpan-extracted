@@ -2,12 +2,12 @@ NAME
     Locale::ID::Province - List of provinces in Indonesia
 
 VERSION
-    This document describes version 0.10 of Locale::ID::Province (from Perl
-    distribution Locale-ID-Province), released on 2017-07-10.
+    This document describes version 0.110 of Locale::ID::Province (from Perl
+    distribution Locale-ID-Province), released on 2021-05-07.
 
 SYNOPSIS
-     use Locale::ID::Province qw(list_id_provinces);
-     my $res = list_id_provinces();
+     use Locale::ID::Province qw(list_idn_provinces);
+     my $res = list_idn_provinces();
 
 DESCRIPTION
     This module provides API access for list of provinces in Indonesia. Data
@@ -18,10 +18,10 @@ DESCRIPTION
     This module's functions has Rinci specs.
 
 FUNCTIONS
-  list_id_provinces
+  list_idn_provinces
     Usage:
 
-     list_id_provinces(%args) -> [status, msg, result, meta]
+     list_idn_provinces(%args) -> [status, msg, payload, meta]
 
     Provinces in Indonesia.
 
@@ -136,6 +136,10 @@ FUNCTIONS
 
         Only return records where the 'eng_name' field is greater than
         specified value.
+
+    *   exclude_fields => *array[str]*
+
+        Select fields to return.
 
     *   fields => *array[str]*
 
@@ -450,7 +454,7 @@ FUNCTIONS
     First element (status) is an integer containing HTTP status code (200
     means OK, 4xx caller error, 5xx function error). Second element (msg) is
     a string containing error message, or 'OK' if status is 200. Third
-    element (result) is optional, the actual result. Fourth element (meta)
+    element (payload) is optional, the actual result. Fourth element (meta)
     is called result metadata and is optional, a hash that contains extra
     information.
 
@@ -472,7 +476,7 @@ BUGS
     to an existing test-file that illustrates the bug or desired feature.
 
 SEE ALSO
-    list-id-provinces
+    list-idn-provinces
 
     Gudang Data Interim project,
     https://github.com/sharyanto/gudang-data-interim/
@@ -483,7 +487,7 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2017, 2015, 2014, 2012 by
+    This software is copyright (c) 2021, 2017, 2015, 2014, 2012 by
     perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under

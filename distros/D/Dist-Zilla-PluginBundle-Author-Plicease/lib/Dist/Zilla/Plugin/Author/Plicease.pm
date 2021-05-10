@@ -1,9 +1,11 @@
-package Dist::Zilla::Plugin::Author::Plicease 2.62 {
+package Dist::Zilla::Plugin::Author::Plicease 2.63 {
 
   use strict;
   use warnings;
+  use 5.020;
   use Path::Tiny ();
   use File::ShareDir::Dist ();
+  use File::Which ();
 
   # ABSTRACT: Dist::Zilla plugins used by Plicease
 
@@ -32,6 +34,12 @@ package Dist::Zilla::Plugin::Author::Plicease 2.62 {
       return $share;
     }
   }
+
+
+  sub git
+  {
+    File::Which::which('git') && eval { require Dist::Zilla::Plugin::Git; 1 } ? 1 : 0
+  }
 }
 
 1;
@@ -48,7 +56,7 @@ Dist::Zilla::Plugin::Author::Plicease - Dist::Zilla plugins used by Plicease
 
 =head1 VERSION
 
-version 2.62
+version 2.63
 
 =head1 DESCRIPTION
 
@@ -67,6 +75,12 @@ L<Dist::Zilla::PluginBundle::Author::Plicease>
  my $dir = Dist::Zilla::Plugin::Author::Plicease->dist_dir;
 
 Returns this distributions share directory.
+
+=head2 git
+
+ my $bool = Dist::Zilla::Plugin::Author::Plicease->git;
+
+Returns true if C<git> and the Git plugins are installed.
 
 =head1 AUTHOR
 

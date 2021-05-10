@@ -1,4 +1,4 @@
-# AWS::EC2::LocalGatewayRouteTableVPCAssociation generated from spec 20.1.0
+# AWS::EC2::LocalGatewayRouteTableVPCAssociation generated from spec 34.0.0
 use Moose::Util::TypeConstraints;
 
 coerce 'Cfn::Resource::Properties::AWS::EC2::LocalGatewayRouteTableVPCAssociation',
@@ -20,34 +20,13 @@ package Cfn::Resource::AWS::EC2::LocalGatewayRouteTableVPCAssociation {
 
 
 
-subtype 'Cfn::Resource::Properties::AWS::EC2::LocalGatewayRouteTableVPCAssociation::Tags',
-     as 'Cfn::Value';
-
-coerce 'Cfn::Resource::Properties::AWS::EC2::LocalGatewayRouteTableVPCAssociation::Tags',
-  from 'HashRef',
-   via {
-     if (my $f = Cfn::TypeLibrary::try_function($_)) {
-       return $f
-     } else {
-       return Cfn::Resource::Properties::Object::AWS::EC2::LocalGatewayRouteTableVPCAssociation::Tags->new( %$_ );
-     }
-   };
-
-package Cfn::Resource::Properties::Object::AWS::EC2::LocalGatewayRouteTableVPCAssociation::Tags {
-  use Moose;
-  use MooseX::StrictConstructor;
-  extends 'Cfn::Value::TypedValue';
-  
-  has Tags => (isa => 'ArrayOfCfn::Resource::Properties::TagType', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
-}
-
 package Cfn::Resource::Properties::AWS::EC2::LocalGatewayRouteTableVPCAssociation {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Resource::Properties';
   
   has LocalGatewayRouteTableId => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
-  has Tags => (isa => 'Cfn::Resource::Properties::AWS::EC2::LocalGatewayRouteTableVPCAssociation::Tags', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has Tags => (isa => 'ArrayOfCfn::Resource::Properties::TagType', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has VpcId => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
 }
 

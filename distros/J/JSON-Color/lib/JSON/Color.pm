@@ -1,9 +1,9 @@
 package JSON::Color;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-06-09'; # DATE
+our $DATE = '2021-05-07'; # DATE
 our $DIST = 'JSON-Color'; # DIST
-our $VERSION = '0.130'; # VERSION
+our $VERSION = '0.131'; # VERSION
 
 use 5.010001;
 use strict;
@@ -16,6 +16,7 @@ our @ISA       = qw(Exporter);
 our @EXPORT_OK = qw(encode_json);
 
 use Color::ANSI::Util qw(ansi_reset);
+use ColorThemeRole::ANSI (); # for scan_prereqs
 
 my %esc = (
     "\n" => '\n',
@@ -219,7 +220,7 @@ JSON::Color - Encode to colored JSON
 
 =head1 VERSION
 
-This document describes version 0.130 of JSON::Color (from Perl distribution JSON-Color), released on 2020-06-09.
+This document describes version 0.131 of JSON::Color (from Perl distribution JSON-Color), released on 2021-05-07.
 
 =head1 SYNOPSIS
 
@@ -337,7 +338,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020, 2016, 2015, 2014, 2012 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2020, 2016, 2015, 2014, 2012 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -1,0 +1,11 @@
+Revision history for Function-Runner
+
+0.003
+        - Fixed bug where checking sub existence failed
+
+0.002
+        - Added detailed error logging for debugging
+
+0.001
+        - Initial release
+

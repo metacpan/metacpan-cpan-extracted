@@ -1,12 +1,319 @@
+NAME
+    Business::BankList::Indonesia - List banks/financial institutions in
+    Indonesia
+
+VERSION
+    This document describes version 0.080 of Business::BankList::Indonesia
+    (from Perl distribution Business-BankList-Indonesia), released on
+    2021-05-07.
+
 SYNOPSIS
-
 DESCRIPTION
-
     This module contains list of banks/financial institutions in Indonesia.
     Data source is currently at: https://github.com/sharyanto/gudangdata
     (table/idn_bank).
 
-SEE ALSO
+FUNCTIONS
+  list_idn_banks
+    Usage:
 
+     list_idn_banks(%args) -> [status, msg, payload, meta]
+
+    Indonesian banks/financial institutions.
+
+    REPLACE ME
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   atmb_code => *str*
+
+        Only return records where the 'atmb_code' field equals specified
+        value.
+
+    *   atmb_code.contains => *str*
+
+        Only return records where the 'atmb_code' field contains specified
+        text.
+
+    *   atmb_code.in => *array[str]*
+
+        Only return records where the 'atmb_code' field is in the specified
+        values.
+
+    *   atmb_code.is => *str*
+
+        Only return records where the 'atmb_code' field equals specified
+        value.
+
+    *   atmb_code.isnt => *str*
+
+        Only return records where the 'atmb_code' field does not equal
+        specified value.
+
+    *   atmb_code.max => *str*
+
+        Only return records where the 'atmb_code' field is less than or
+        equal to specified value.
+
+    *   atmb_code.min => *str*
+
+        Only return records where the 'atmb_code' field is greater than or
+        equal to specified value.
+
+    *   atmb_code.not_contains => *str*
+
+        Only return records where the 'atmb_code' field does not contain
+        specified text.
+
+    *   atmb_code.not_in => *array[str]*
+
+        Only return records where the 'atmb_code' field is not in the
+        specified values.
+
+    *   atmb_code.xmax => *str*
+
+        Only return records where the 'atmb_code' field is less than
+        specified value.
+
+    *   atmb_code.xmin => *str*
+
+        Only return records where the 'atmb_code' field is greater than
+        specified value.
+
+    *   detail => *bool* (default: 0)
+
+        Return array of full records instead of just ID fields.
+
+        By default, only the key (ID) field is returned per result entry.
+
+    *   exclude_fields => *array[str]*
+
+        Select fields to return.
+
+    *   fields => *array[str]* (default: ["name"])
+
+        Select fields to return.
+
+    *   id => *int*
+
+        Only return records where the 'id' field equals specified value.
+
+    *   id.in => *array[int]*
+
+        Only return records where the 'id' field is in the specified values.
+
+    *   id.is => *int*
+
+        Only return records where the 'id' field equals specified value.
+
+    *   id.isnt => *int*
+
+        Only return records where the 'id' field does not equal specified
+        value.
+
+    *   id.max => *int*
+
+        Only return records where the 'id' field is less than or equal to
+        specified value.
+
+    *   id.min => *int*
+
+        Only return records where the 'id' field is greater than or equal to
+        specified value.
+
+    *   id.not_in => *array[int]*
+
+        Only return records where the 'id' field is not in the specified
+        values.
+
+    *   id.xmax => *int*
+
+        Only return records where the 'id' field is less than specified
+        value.
+
+    *   id.xmin => *int*
+
+        Only return records where the 'id' field is greater than specified
+        value.
+
+    *   name => *str*
+
+        Only return records where the 'name' field equals specified value.
+
+    *   name.contains => *str*
+
+        Only return records where the 'name' field contains specified text.
+
+    *   name.in => *array[str]*
+
+        Only return records where the 'name' field is in the specified
+        values.
+
+    *   name.is => *str*
+
+        Only return records where the 'name' field equals specified value.
+
+    *   name.isnt => *str*
+
+        Only return records where the 'name' field does not equal specified
+        value.
+
+    *   name.max => *str*
+
+        Only return records where the 'name' field is less than or equal to
+        specified value.
+
+    *   name.min => *str*
+
+        Only return records where the 'name' field is greater than or equal
+        to specified value.
+
+    *   name.not_contains => *str*
+
+        Only return records where the 'name' field does not contain
+        specified text.
+
+    *   name.not_in => *array[str]*
+
+        Only return records where the 'name' field is not in the specified
+        values.
+
+    *   name.xmax => *str*
+
+        Only return records where the 'name' field is less than specified
+        value.
+
+    *   name.xmin => *str*
+
+        Only return records where the 'name' field is greater than specified
+        value.
+
+    *   nickname => *str*
+
+        Only return records where the 'nickname' field equals specified
+        value.
+
+    *   nickname.contains => *str*
+
+        Only return records where the 'nickname' field contains specified
+        text.
+
+    *   nickname.in => *array[str]*
+
+        Only return records where the 'nickname' field is in the specified
+        values.
+
+    *   nickname.is => *str*
+
+        Only return records where the 'nickname' field equals specified
+        value.
+
+    *   nickname.isnt => *str*
+
+        Only return records where the 'nickname' field does not equal
+        specified value.
+
+    *   nickname.max => *str*
+
+        Only return records where the 'nickname' field is less than or equal
+        to specified value.
+
+    *   nickname.min => *str*
+
+        Only return records where the 'nickname' field is greater than or
+        equal to specified value.
+
+    *   nickname.not_contains => *str*
+
+        Only return records where the 'nickname' field does not contain
+        specified text.
+
+    *   nickname.not_in => *array[str]*
+
+        Only return records where the 'nickname' field is not in the
+        specified values.
+
+    *   nickname.xmax => *str*
+
+        Only return records where the 'nickname' field is less than
+        specified value.
+
+    *   nickname.xmin => *str*
+
+        Only return records where the 'nickname' field is greater than
+        specified value.
+
+    *   query => *str*
+
+        Search.
+
+    *   random => *bool* (default: 0)
+
+        Return records in random order.
+
+    *   result_limit => *int*
+
+        Only return a certain number of records.
+
+    *   result_start => *int* (default: 1)
+
+        Only return starting from the n'th record.
+
+    *   sort => *array[str]*
+
+        Order records according to certain field(s).
+
+        A list of field names separated by comma. Each field can be prefixed
+        with '-' to specify descending order instead of the default
+        ascending.
+
+    *   with_field_names => *bool*
+
+        Return field names in each record (as hash/associative array).
+
+        When enabled, function will return each record as hash/associative
+        array (field name => value pairs). Otherwise, function will return
+        each record as list/array (field value, field value, ...).
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (payload) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Business-BankList-Indonesia>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Business-BankList-Indonesia>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Business-BankList-Ind
+    onesia>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
     Business::BankList
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2021, 2015, 2014, 2012 by
+    perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

@@ -1,4 +1,4 @@
-# AWS::AutoScaling::LaunchConfiguration generated from spec 20.1.0
+# AWS::AutoScaling::LaunchConfiguration generated from spec 22.0.0
 use Moose::Util::TypeConstraints;
 
 coerce 'Cfn::Resource::Properties::AWS::AutoScaling::LaunchConfiguration',
@@ -46,20 +46,20 @@ package Cfn::Resource::Properties::Object::AWS::AutoScaling::LaunchConfiguration
   has VolumeType => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
 }
 
-subtype 'Cfn::Resource::Properties::AWS::AutoScaling::LaunchConfiguration::MetadataOption',
+subtype 'Cfn::Resource::Properties::AWS::AutoScaling::LaunchConfiguration::MetadataOptions',
      as 'Cfn::Value';
 
-coerce 'Cfn::Resource::Properties::AWS::AutoScaling::LaunchConfiguration::MetadataOption',
+coerce 'Cfn::Resource::Properties::AWS::AutoScaling::LaunchConfiguration::MetadataOptions',
   from 'HashRef',
    via {
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::Object::AWS::AutoScaling::LaunchConfiguration::MetadataOption->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::AutoScaling::LaunchConfiguration::MetadataOptions->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::Object::AWS::AutoScaling::LaunchConfiguration::MetadataOption {
+package Cfn::Resource::Properties::Object::AWS::AutoScaling::LaunchConfiguration::MetadataOptions {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -133,7 +133,7 @@ package Cfn::Resource::Properties::AWS::AutoScaling::LaunchConfiguration {
   has KernelId => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
   has KeyName => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
   has LaunchConfigurationName => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
-  has MetadataOptions => (isa => 'Cfn::Resource::Properties::AWS::AutoScaling::LaunchConfiguration::MetadataOption', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
+  has MetadataOptions => (isa => 'Cfn::Resource::Properties::AWS::AutoScaling::LaunchConfiguration::MetadataOptions', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
   has PlacementTenancy => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
   has RamDiskId => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
   has SecurityGroups => (isa => 'Cfn::Value::Array|Cfn::Value::Function|Cfn::DynamicValue', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');

@@ -13,6 +13,7 @@ package Paws::S3::SelectObjectContent;
   has SSECustomerKey => (is => 'ro', isa => 'Str', header_name => 'x-amz-server-side-encryption-customer-key', traits => ['ParamInHeader']);
   has SSECustomerKeyMD5 => (is => 'ro', isa => 'Str', header_name => 'x-amz-server-side-encryption-customer-key-MD5', traits => ['ParamInHeader']);
 
+
   use MooseX::ClassAttribute;
 
   class_has _api_call => (isa => 'Str', is => 'ro', default => 'SelectObjectContent');
@@ -20,7 +21,8 @@ package Paws::S3::SelectObjectContent;
   class_has _api_method  => (isa => 'Str', is => 'ro', default => 'POST');
   class_has _returns => (isa => 'Str', is => 'ro', default => 'Paws::S3::SelectObjectContentOutput');
   class_has _result_key => (isa => 'Str', is => 'ro');
-  
+  class_has _top_level_element => (isa => 'Str', is => 'ro', default => 'SelectObjectContentRequest');
+  class_has _top_level_namespace => (isa => 'Str', is => 'ro', default => 'http://s3.amazonaws.com/doc/2006-03-01/');  
 1;
 
 ### main pod documentation begin ###
@@ -49,7 +51,7 @@ You shouldn't make instances of this class. Each attribute should be used as a n
           AllowQuotedRecordDelimiter => 1,                     # OPTIONAL
           Comments                   => 'MyComments',          # OPTIONAL
           FieldDelimiter             => 'MyFieldDelimiter',    # OPTIONAL
-          FileHeaderInfo => 'USE',    # values: USE, IGNORE, NONE; OPTIONAL
+          FileHeaderInfo       => 'USE',   # values: USE, IGNORE, NONE; OPTIONAL
           QuoteCharacter       => 'MyQuoteCharacter',          # OPTIONAL
           QuoteEscapeCharacter => 'MyQuoteEscapeCharacter',    # OPTIONAL
           RecordDelimiter      => 'MyRecordDelimiter',         # OPTIONAL
@@ -68,8 +70,8 @@ You shouldn't make instances of this class. Each attribute should be used as a n
           FieldDelimiter       => 'MyFieldDelimiter',          # OPTIONAL
           QuoteCharacter       => 'MyQuoteCharacter',          # OPTIONAL
           QuoteEscapeCharacter => 'MyQuoteEscapeCharacter',    # OPTIONAL
-          QuoteFields => 'ALWAYS',    # values: ALWAYS, ASNEEDED; OPTIONAL
-          RecordDelimiter => 'MyRecordDelimiter',    # OPTIONAL
+          QuoteFields          => 'ALWAYS', # values: ALWAYS, ASNEEDED; OPTIONAL
+          RecordDelimiter      => 'MyRecordDelimiter',    # OPTIONAL
         },    # OPTIONAL
         JSON => {
           RecordDelimiter => 'MyRecordDelimiter',    # OPTIONAL

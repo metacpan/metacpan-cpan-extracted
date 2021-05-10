@@ -39,15 +39,15 @@ You shouldn't make instances of this class. Each attribute should be used as a n
     my $CreateComputeEnvironmentResponse = $batch->CreateComputeEnvironment(
       'ComputeEnvironmentName' => 'C4OnDemand',
       'ComputeResources'       => {
-        'DesiredvCpus' => 48,
-        'Ec2KeyPair'   => 'id_rsa',
-        'InstanceRole' => 'ecsInstanceRole',
+        'DesiredvCpus'  => 48,
+        'Ec2KeyPair'    => 'id_rsa',
+        'InstanceRole'  => 'ecsInstanceRole',
         'InstanceTypes' =>
           [ 'c4.large', 'c4.xlarge', 'c4.2xlarge', 'c4.4xlarge', 'c4.8xlarge' ],
         'MaxvCpus'         => 128,
         'MinvCpus'         => 0,
         'SecurityGroupIds' => ['sg-cf5093b2'],
-        'Subnets' =>
+        'Subnets'          =>
           [ 'subnet-220c0e0a', 'subnet-1a95556d', 'subnet-978f6dce' ],
         'Tags' => {
           'Name' => 'Batch Instance - C4OnDemand'

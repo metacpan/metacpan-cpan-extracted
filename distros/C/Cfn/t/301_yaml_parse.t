@@ -50,4 +50,5 @@ sub test_ds_vs_parsed {
   cmp_ok($parsed->MappingCount,   '==', scalar(keys %{ $datastruct->{ Mappings   } }), "Got the same number of mappings for $test_name");
   cmp_ok($parsed->ConditionCount, '==', scalar(keys %{ $datastruct->{ Conditions } }), "Got the same number of conditions for $test_name");
   cmp_ok($parsed->MetadataCount,  '==', scalar(keys %{ $datastruct->{ Metadata   } }), "Got the same number of metadata entries for $test_name");
+  $parsed->as_yaml;
 }

@@ -1,15 +1,20 @@
 
 
 
+
+
+
+
+
 =encoding UTF-8
 
 =head1 NAME
 
-Image::CairoSVG - render SVG into a Cairo surface
+Image::CairoSVG - Render SVG into a Cairo surface
 
 =head1 SYNOPSIS
 
-This example converts an SVG into a PNG:
+This example converts an SVG file into PNG:
 
     
     use FindBin '$Bin';
@@ -25,21 +30,27 @@ This example converts an SVG into a PNG:
 <p>
 This renders the following image:
 </p>
-<img width="451.271" height="187.542" src='https://fastapi.metacpan.org/source/BKB/Image-CairoSVG-0.16/examples/locust.png'>
+
+<img width="451.271" height="187.542"
+ src='https://fastapi.metacpan.org/source/BKB/Image-CairoSVG-0.17/examples/locust.png'>
 
 =end html
 
-(This example is included as L<F<synopsis.pl>|https://fastapi.metacpan.org/source/BKB/Image-CairoSVG-0.16/examples/synopsis.pl> in the distribution. The L<input|https://fastapi.metacpan.org/source/BKB/Image-CairoSVG-0.16/examples/locust.svg> and L<output files|https://fastapi.metacpan.org/source/BKB/Image-CairoSVG-0.16/examples/locust.png> are also included.)
+(This example is included as
+L<F<synopsis.pl>|https://fastapi.metacpan.org/source/BKB/Image-CairoSVG-0.17/examples/synopsis.pl> in the distribution. The
+L<input|https://fastapi.metacpan.org/source/BKB/Image-CairoSVG-0.17/examples/locust.svg> and L<output
+files|https://fastapi.metacpan.org/source/BKB/Image-CairoSVG-0.17/examples/locust.png> are also included.)
 
 =head1 VERSION
 
-This documents Image::CairoSVG version 0.16
-corresponding to git commit L<6bab4288745016723b4513f54789fe5b1b454899|https://github.com/benkasminbullock/image-cairosvg/commit/6bab4288745016723b4513f54789fe5b1b454899> released on Mon May 3 13:29:36 2021 +0900. 
+This documents Image::CairoSVG version 0.17
+corresponding to git commit L<bcf7f3e01e92ea2f16c874e362c90ad677bcf34e|https://github.com/benkasminbullock/image-cairosvg/commit/bcf7f3e01e92ea2f16c874e362c90ad677bcf34e> released on Sun May 9 22:21:29 2021 +0900. 
 
 =head1 DESCRIPTION
 
-This module renders some kinds of SVG ("Scalable Vector Graphics")
-instructions into a Cairo surface.
+This module renders SVG ("Scalable Vector Graphics") instructions into
+a Cairo surface. The user can then choose what to do with the surface,
+for example write it out to a PNG file.
 
 =head1 METHODS
 
@@ -136,35 +147,45 @@ This example shows how to scale the output image using Cairo commands.
 <p>
 The default size looks like this:
 </p>
-<img width="36" height="36" src='https://fastapi.metacpan.org/source/BKB/Image-CairoSVG-0.16/examples/durn.png'>
+<img width="36" height="36" src='https://fastapi.metacpan.org/source/BKB/Image-CairoSVG-0.17/examples/durn.png'>
 <p>
 The scaled image looks like this:
 </p>
-<img width="200" height="200" src='https://fastapi.metacpan.org/source/BKB/Image-CairoSVG-0.16/examples/urn.png'>
+<img width="200" height="200" src='https://fastapi.metacpan.org/source/BKB/Image-CairoSVG-0.17/examples/urn.png'>
 
 =end html
 
-(This example is included as
-L<F<scale.pl>|https://fastapi.metacpan.org/source/BKB/Image-CairoSVG-0.16/examples/scale.pl> in the distribution. The original image
-is part of the L<Twitter Emoji
-collection|https://twemoji.twitter.com/>, 1f3fa.svg, representing
-U+1F3FA AMPHORA, used under L<CC-BY
-4.0|https://creativecommons.org/licenses/by/4.0/>)
+(This example is included as L<F<scale.pl>|https://fastapi.metacpan.org/source/BKB/Image-CairoSVG-0.17/examples/scale.pl> in the
+distribution. The original image is part of the L<Twitter Emoji
+collection|https://twemoji.twitter.com/>, F<1f3fa.svg>, representing
+C<U+1F3FA AMPHORA>. This illustration is used under the terms of
+L<CC-BY 4.0|https://creativecommons.org/licenses/by/4.0/>)
 
 =head1 DRAWING METHODS
 
-All of these methods take the attributes of the specific element after
-which they're named. So, for example, if you have an SVG C<line>
-element, you can parse its attributes with an XML parser, then send
-the hash of key/value pairs in the attributes to L</line>.
+The drawing methods of the module are as follows.
+
+=head2 circle
+
+    $cairosvg->circle (%attr);
+
+Draw the circle specified by the SVG attributes in C<%attr> into the
+surface of C<$cairosvg>.
+
+=head2 ellipse
+
+    $cairosvg->ellipse (%attr);
+
+Draw the ellipse specified by the SVG attributes in C<%attr> into the
+surface of C<$cairosvg>.
 
 =head2 line
 
     $cairosvg->line (%attr);
 
-Render an SVG line onto the surface specified by C<$cairosvg>.  Given
-SVG input of the form C<< <line > >>, this renders it onto the Cairo
-surface.
+Render the line specified by the SVG attributes in C<%attr> into the
+surface specified by C<$cairosvg>.  Given SVG input of the form C<<
+<line > >>, this renders it onto the Cairo surface.
 
 =head2 path
 
@@ -172,35 +193,45 @@ surface.
 
 Given an SVG path element, send its attribute key / value pairs as
 C<%attr> to render into the Cairo surface of C<$cairosvg>. This uses
-L<Image::SVG::Path> to render the "d" attibute of the path. It also
-converts quadratic bezier curves into cubic bezier curves, since Cairo
-does not support quadratic bezier curves.
+L<Image::SVG::Path> to parse the "d" attibute of the path. 
 
-=head2 rect
-
-    $cairosvg->rect (%attr);
-
-=head2 ellipse
-
-    $cairosvg->ellipse (%attr);
-
-=head2 circle
-
-    $cairosvg->circle (%attr);
+This converts any quadratic bezier curves found in the path into cubic
+bezier curves, since Cairo does not support quadratic bezier curves.
 
 =head2 polygon
 
     $cairosvg->polygon (%attr);
 
-Draws a polygon based on the C<points> attribute, closing the path.
+Draw the polygon specified by the C<points> attribute of C<%attr>,
+closing the path.
 
 =head2 polyline
 
     $cairosvg->polyline (%attr);
 
-The same as L</polygon> except that it doesn't close the path.
+Similar to L</polygon> except that it doesn't close the path.
+
+=head2 processUse
+
+    $cairosvg->processUse (%attr);
+
+Process a <use> SVG element. It relies on C<$cairosvg> already having
+processed the XML file in order to find the used element.
+
+=head2 rect
+
+    $cairosvg->rect (%attr);
+
+Draw the rectangle specified by C<%attr> into the surface contained in
+C<$cairosvg>.
+
+If the rectangle has rounded corners (a non-zero C<rx> attribute), a
+shim function is used to draw the rectangle, since Cairo has no native
+support for rectangles with rounded corners.
 
 =head1 DEPENDENCIES
+
+This module depends on the following other modules.
 
 =over
 
@@ -214,12 +245,14 @@ Carp is used for reporting errors.
 
 =item L<Image::SVG::Path>
 
-Image::SVG::Path is used for parsing the "path" information of the SVG.
+Image::SVG::Path is used for parsing the "path" information of the
+SVG, see L</path>.
 
 =item L<Math::Trig>
 
-Used for the value of C<pi> and various functions related to drawing
-arcs.
+This is used for the value of C<pi>, and for various functions related
+to drawing arcs, and for converting angles between radians (used by
+Cairo) and degrees (used by SVG).
 
 =item L<XML::Parser>
 
@@ -229,13 +262,33 @@ XML::Parser is used for parsing SVG files.
 
 =head1 SEE ALSO
 
-=head2 Demonstration website - Super Tiny Icons
+=head2 Demonstration website and blog articles
 
-The demonstration website
-L<https://benkasminbullock.github.io/supertinyiconscairosvg/> shows
-the output of Image::CairoSVG on the Super Tiny Icons collection and
-the L<Twitter Emoji
+L<This demonstration
+website|https://benkasminbullock.github.io/supertinyiconscairosvg/>
+shows the output of Image::CairoSVG on the Super Tiny Icons collection
+and the L<Twitter Emoji
 Collection|https://benkasminbullock.github.io/supertinyiconscairosvg/twemoji/>.
+
+Please see L</BUGS> below for notable errors in the rendering.
+
+=head3 Blog articles
+
+I've written some blog articles about extending the SVG support in
+this module.
+
+=over
+
+=item L<Trying to get SVG right|https://benbullock.substack.com/p/trying-to-get-svg-right>
+
+This was the first article, where I had discovered that the module's
+arc-drawing code and arc-parsing code was not working.
+
+=item L<Improvements to Image::CairoSVG|https://benbullock.substack.com/p/improvements-to-imagecairosvg>
+
+This illustrates some of the improvements made.
+
+=back
 
 =head2 Other software
 
@@ -300,11 +353,13 @@ L<https://rt.cpan.org/Ticket/Display.html?id=136405>.
 
 =item Perl Maven article
 
-L<SVG - Scalable Vector Graphics with Perl|http://perlmaven.com/scalable-vector-graphics-with-perl> - article at Perl Maven
+L<SVG - Scalable Vector Graphics with
+Perl|http://perlmaven.com/scalable-vector-graphics-with-perl> -
+article at Perl Maven
 
 =item Perl Cairo tutorial
 
-This L<Perl Cairo
+The Cairo module is mostly undocumented. This L<Perl Cairo
 tutorial|https://www.lemoda.net/cairo/cairo-tutorial/index.html> may
 be useful if you need to go beyond defaults.
 
@@ -312,56 +367,222 @@ be useful if you need to go beyond defaults.
 
 =head1 BUGS
 
+Various parts of the SVG standard are not implemented, as follows.
+
+If viewing the HTML version of this page, the illustrations below each
+bug description demonstrate instances from the Super Tiny Icons
+collection where the bug causes a rendering problem. See
+L</"Demonstration website and blog articles"> above.
+
 =over
 
 =item Clip paths
 
-Does not support clip paths (clipping the output image to a given
-path).
+Clip paths (clipping the output image to a given path) are not
+supported. These are supported in Cairo so it should be possible to
+add them.
 
-=item Copied paths
 
-Does not support xlink:href (copied paths).
+
+=begin html
+
+<table>
+<tr>
+<td>
+<img height="250"
+     src="https://benkasminbullock.github.io/supertinyiconscairosvg//svg/google_maps.svg"
+     width="250">
+</td>
+
+<td>
+<img height="250"
+     src="https://benkasminbullock.github.io/supertinyiconscairosvg//png/google_maps.png"
+     width="250">
+</td>
+</tr>
+
+<tr>
+<td>
+Input SVG
+<td>
+Output of Image::CairoSVG
+</tr>
+
+</table>
+
+=end html
+
+
 
 =item Elliptical arcs
 
-Elliptical arcs are not handled correctly. There are no primitives in
-Cairo for these shapes so they will need to be implemented via Cairo
+Circular arcs are produced correctly but elliptical arcs in paths are
+not handled correctly. This is because there are no primitives in
+Cairo for these shapes, so they need to be implemented via Cairo
 transforms.
 
-=item fill-rule
 
-The C<fill-rule> attribute is not supported.
+
+=begin html
+
+<table>
+<tr>
+<td>
+<img height="250"
+     src="https://benkasminbullock.github.io/supertinyiconscairosvg//svg/react.svg"
+     width="250">
+</td>
+
+<td>
+<img height="250"
+     src="https://benkasminbullock.github.io/supertinyiconscairosvg//png/react.png"
+     width="250">
+</td>
+</tr>
+
+<tr>
+<td>
+Input SVG
+<td>
+Output of Image::CairoSVG
+</tr>
+
+</table>
+
+=end html
+
+
 
 =item Gradients
 
 Gradients are not supported.
 
-=item Groups
+There is L<support in
+Cairo|https://www.cairographics.org/samples/gradient/> so it should be
+possible to add them.
 
-Groups are not supported, although inherited fill/stroke and other
-attributes are supported.
 
-=item Inherited fill / stroke values
 
-The handling of fill and stroke inherited from parent elements may be
-somewhat patchy.
+=begin html
+
+<table>
+<tr>
+<td>
+<img height="250"
+     src="https://benkasminbullock.github.io/supertinyiconscairosvg//svg/glitch.svg"
+     width="250">
+</td>
+
+<td>
+<img height="250"
+     src="https://benkasminbullock.github.io/supertinyiconscairosvg//png/glitch.png"
+     width="250">
+</td>
+</tr>
+
+<tr>
+<td>
+Input SVG
+<td>
+Output of Image::CairoSVG
+</tr>
+
+</table>
+
+=end html
+
+
+
+=item shadows
+
+Shadows are not supported.
 
 =item stroke-dasharray
 
 stroke-dasharray is not supported.
 
+
+
+=begin html
+
+<table>
+<tr>
+<td>
+<img height="250"
+     src="https://benkasminbullock.github.io/supertinyiconscairosvg//svg/signal.svg"
+     width="250">
+</td>
+
+<td>
+<img height="250"
+     src="https://benkasminbullock.github.io/supertinyiconscairosvg//png/signal.png"
+     width="250">
+</td>
+</tr>
+
+<tr>
+<td>
+Input SVG
+<td>
+Output of Image::CairoSVG
+</tr>
+
+</table>
+
+=end html
+
+
+
+=item Text
+
+Text rendering is not supported at all.
+
 =item Transforms
 
-Some transforms are not handled.
+Some transforms (matrix, skew) are not handled. There is some support
+for matrix transformations but the matrix transformations in L<Cairo>
+are completely undocumented so it's based on guesswork and reading the
+Cairo source code. See
+L<https://rt.cpan.org/Ticket/Display.html?id=136410>.
+
+
+
+=begin html
+
+<table>
+<tr>
+<td>
+<img height="250"
+     src="https://benkasminbullock.github.io/supertinyiconscairosvg//svg/raspberry_pi.svg"
+     width="250">
+</td>
+
+<td>
+<img height="250"
+     src="https://benkasminbullock.github.io/supertinyiconscairosvg//png/raspberry_pi.png"
+     width="250">
+</td>
+</tr>
+
+<tr>
+<td>
+Input SVG
+<td>
+Output of Image::CairoSVG
+</tr>
+
+</table>
+
+=end html
+
+
 
 =item Units
 
-Units have been added haphazardly as they have been found in actual
-SVG documents. Although pixel units seem easy enough to understand,
-we're not exactly sure what the correct treatment of units such as
-millimetres or percents should be, so there is some guesswork at the
-moment.
+Millimetre units are quite common in Inkscape output, so these are
+supported. Inches are also supported incidentally since in SVG
+millimetres are defined as 25.4 inches, and inches are defined by
+having 96 pixels per inch, but not all other possible units are.
 
 =back
 

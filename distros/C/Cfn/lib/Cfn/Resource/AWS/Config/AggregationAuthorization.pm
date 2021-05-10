@@ -1,4 +1,4 @@
-# AWS::Config::AggregationAuthorization generated from spec 17.0.0
+# AWS::Config::AggregationAuthorization generated from spec 34.0.0
 use Moose::Util::TypeConstraints;
 
 coerce 'Cfn::Resource::Properties::AWS::Config::AggregationAuthorization',
@@ -14,7 +14,7 @@ package Cfn::Resource::AWS::Config::AggregationAuthorization {
     [  ]
   }
   sub supported_regions {
-    [ 'ap-east-1','ap-northeast-1','ap-southeast-1','ap-southeast-2','eu-central-1','eu-north-1','eu-west-1','me-south-1','us-east-1','us-east-2','us-gov-east-1','us-gov-west-1','us-west-1','us-west-2' ]
+    [ 'af-south-1','ap-east-1','ap-northeast-1','ap-southeast-1','ap-southeast-2','eu-central-1','eu-north-1','eu-south-1','eu-west-1','me-south-1','us-east-1','us-east-2','us-gov-east-1','us-gov-west-1','us-west-1','us-west-2' ]
   }
 }
 

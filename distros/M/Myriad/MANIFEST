@@ -9,13 +9,14 @@ Makefile.PL
 README
 aptfile
 bin/myriad-dev.pl
+bin/myriad-migrate-rpc-streams.pl
 bin/myriad-start.sh
 bin/myriad.pl
 cpanfile
 dist.ini
-example/Service/Factor.pm
-example/Service/Secret.pm
 example/batch-demo.pl
+example/lib/Example/Service/Factor.pm
+example/lib/Example/Service/Secret.pm
 example/logic-demo.pl
 example/rpc-demo.pl
 example/use-config.pl
@@ -116,8 +117,9 @@ t/service-lifecycle.t
 t/storage.t
 t/subscription.t
 t/syntax.t
-t/transport/perl.t
+t/transport/memory.t
 t/transport/redis.t
+t/util/secret.t
 xt/author/distmeta.t
 xt/author/eol.t
 xt/author/minimum-version.t

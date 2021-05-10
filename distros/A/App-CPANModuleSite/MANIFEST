@@ -1,7 +1,4 @@
 bin/mksite
-docs/index.html
-docs/lib/MooX/JSON_LD.html
-docs/lib/MooX/Role/JSON_LD.html
 lib/App/CPANModuleSite.pm
 Makefile.PL
 MANIFEST			This list of files

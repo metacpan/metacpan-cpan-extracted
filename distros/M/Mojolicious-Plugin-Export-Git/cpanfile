@@ -1,3 +1,4 @@
+requires "Git::Repository" => "1.322";
 requires "Mojolicious" => "8";
 requires "Mojolicious::Plugin::Export" => "0.008";
 requires "perl" => "5.014";

@@ -3,49 +3,56 @@ use warnings;
 
 use Future::AsyncAwait;
 use Test::More;
+use Log::Any::Adapter qw(TAP);
 use Myriad;
-my @received_from_emitter;
-my @received_from_batch;
 
 package Example::Sender {
     use Myriad::Service;
-    my $sent = 0;
+    has $sent = 0;
 
     async method simple_emitter : Emitter() ($sink) {
-        $sink->emit({event => 1});
+        my $data = {event => 1};
+        $log->infof('emitter emits %s', $data);
+        $sink->emit($data);
     }
 
     async method simple_batch : Batch () {
         my $arr = [];
         $arr =  [{event => 1}, {event => 2}] unless $sent;
         $sent = 1;
+        $log->infof('batch emits %s', $arr);
         return $arr;
     }
 }
 
+my @received_from_emitter;
+my @received_from_batch;
+
 package Example::Receiver {
     use Myriad::Service;
-    async method receiver_from_emitter :
-        Receiver( service => 'Example::Sender',
-                  channel => 'simple_emitter') ($src) {
+    async method receiver_from_emitter : Receiver(
+        service => 'Example::Sender',
+        channel => 'simple_emitter'
+    ) ($src) {
         return $src->map(sub {
             push @received_from_emitter, shift
         });
     }
 
-    async method receiver_from_batch :
-        Receiver( service => 'Example::Sender',
-                  channel => 'simple_batch') ($src) {
+    async method receiver_from_batch : Receiver(
+        service => 'Example::Sender',
+        channel => 'simple_batch'
+    ) ($src) {
         return $src->map(sub {
+            $log->infof('batch receives %s', $_);
             push @received_from_batch, shift
         });
     }
-
 }
 
 my $myriad = new_ok('Myriad');
 await $myriad->configure_from_argv(
-    qw(--transport perl --log_level error service)
+    qw(--transport memory --log_level warn service)
 );
 
 await $myriad->add_service('Example::Receiver');

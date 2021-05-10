@@ -73,7 +73,7 @@ sub subs2perl {
 
  my \$preplan = q{
  # TODO - add concurrent semantics (e.g., '&', etc)
- # [note: this comment is ignored by S::G]
+ # [note: this comment is ignored by Sub::Genius]
 $perlpre
  };
 
@@ -130,7 +130,12 @@ sub _dump_subs {
  #
 };
 
+  DUMPSUBS:
     foreach my $sub (@$subs) {
+      if ($sub =~ m/::/g) { 
+        warn qq{'$sub' appears to be a call to a fully qualified method from an external package. Skipping subroutine stub...\n};
+        next DUMPSUBS;
+      }
         $perl .= qq/
  #TODO - implement the logic!
  sub $sub {
@@ -155,25 +160,35 @@ sub _dump_subs {
 
 sub plan2nodeps {
     my ( $self, %opts ) = @_;
+
+    die qq{'preplan' and 'prefile' are mutually exclusive\n} if ( $opts{preplan} and $opts{prefile} );
+
+    if ( defined $opts{prefile} ) {
+        local $/ = undef;
+        open my $ph, q{<}, $opts{prefile} || die $!;
+        $opts{preplan} = <$ph>;
+        close $ph;
+    }
+ 
     my $sq = $self->new(%opts);
 
-    my $preplan = $sq->preplan;
+    my $preplan = $sq->original_preplan;
+    $preplan =~ s/^/#   /gm;
+    $preplan =~ s/\n$//g;
 
     my $perl = qq{ #!/usr/bin/env perl
-
- # Sub::Genius is not used, but this call list has been generated
- # using Sub::Genius::Util::plan2nodeps,
- #
- #  perl -MSub::Genius::Util -e 'print Sub::Genius::Util->plan2nodeps(preplan => q{$preplan})'
  use strict;
  use warnings;
  use feature 'state';
 
+ # Sub::Genius is not used, but this call list has been generated
+ # using Sub::Genius::Util::plan2nodeps,
+ # 
  ## intialize hash ref as container for global memory
 # The following sequence of calls is consistent with the original preplan,
-#
-## ~> $preplan
-#
+# my \$preplan = q{
+$preplan
+# };
 
  my \$GLOBAL = {};
  my \$scope  = { thing => 0, };

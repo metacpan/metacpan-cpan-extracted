@@ -1,5 +1,4 @@
 .travis.yml
 ^\.git
-_Inline/
 .appveyor.yml
 .cirrus.yml

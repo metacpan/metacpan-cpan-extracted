@@ -2,14 +2,13 @@ package Sub::Genius;
 
 use strict;
 use warnings;
-use feature 'state';
 use FLAT::PFA;
 use FLAT::Regex::WithExtraOps;
 use Digest::MD5 ();
 use Storable    ();
 use Cwd         ();
 
-our $VERSION = q{0.11};
+our $VERSION = q{0.12};
 
 # constructor
 sub new {
@@ -28,6 +27,9 @@ sub new {
     if ( not exists $self->{cachedir} ) {
         $self->cachedir( sprintf( qq{%s/%s}, Cwd::cwd(), q{_Sub::Genius} ) );
     }
+
+    # keep a historical record
+    $self->original_preplan($self->preplan);
 
     # 'pre-process' plan - this step maximizes the chance of capturing
     # the same checksum for identical PREs that may just be formatted differently
@@ -116,7 +118,16 @@ sub _normalize {
     return $self->preplan;
 }
 
-# RO accessor for original plan
+# accessor for original plan
+sub original_preplan {
+    my ( $self, $pp ) = @_;
+    if ($pp) {
+        $self->{original_preplan} = $pp;
+    }
+    return $self->{original_preplan};
+}
+
+# accessor for original plan
 sub preplan {
     my ( $self, $pp ) = @_;
     if ($pp) {
@@ -125,7 +136,7 @@ sub preplan {
     return $self->{preplan};
 }
 
-# RO accessor for original
+# accessor for original
 sub pregex {
     my ( $self, $pregex ) = @_;
     if ($pregex) {

@@ -19,6 +19,7 @@ package Paws::S3::UploadPartCopy;
   has SSECustomerKeyMD5 => (is => 'ro', isa => 'Str', header_name => 'x-amz-server-side-encryption-customer-key-MD5', traits => ['ParamInHeader']);
   has UploadId => (is => 'ro', isa => 'Str', query_name => 'uploadId', traits => ['ParamInQuery'], required => 1);
 
+
   use MooseX::ClassAttribute;
 
   class_has _api_call => (isa => 'Str', is => 'ro', default => 'UploadPartCopy');
@@ -27,6 +28,7 @@ package Paws::S3::UploadPartCopy;
   class_has _returns => (isa => 'Str', is => 'ro', default => 'Paws::S3::UploadPartCopyOutput');
   class_has _result_key => (isa => 'Str', is => 'ro');
   
+    
 1;
 
 ### main pod documentation begin ###
@@ -47,18 +49,18 @@ You shouldn't make instances of this class. Each attribute should be used as a n
 
     my $s3 = Paws->service('S3');
     my $UploadPartCopyOutput = $s3->UploadPartCopy(
-      Bucket                      => 'MyBucketName',
-      CopySource                  => 'MyCopySource',
-      Key                         => 'MyObjectKey',
-      PartNumber                  => 1,
-      UploadId                    => 'MyMultipartUploadId',
-      CopySourceIfMatch           => 'MyCopySourceIfMatch',        # OPTIONAL
-      CopySourceIfModifiedSince   => '1970-01-01T01:00:00',        # OPTIONAL
-      CopySourceIfNoneMatch       => 'MyCopySourceIfNoneMatch',    # OPTIONAL
-      CopySourceIfUnmodifiedSince => '1970-01-01T01:00:00',        # OPTIONAL
-      CopySourceRange             => 'MyCopySourceRange',          # OPTIONAL
+      Bucket                         => 'MyBucketName',
+      CopySource                     => 'MyCopySource',
+      Key                            => 'MyObjectKey',
+      PartNumber                     => 1,
+      UploadId                       => 'MyMultipartUploadId',
+      CopySourceIfMatch              => 'MyCopySourceIfMatch',        # OPTIONAL
+      CopySourceIfModifiedSince      => '1970-01-01T01:00:00',        # OPTIONAL
+      CopySourceIfNoneMatch          => 'MyCopySourceIfNoneMatch',    # OPTIONAL
+      CopySourceIfUnmodifiedSince    => '1970-01-01T01:00:00',        # OPTIONAL
+      CopySourceRange                => 'MyCopySourceRange',          # OPTIONAL
       CopySourceSSECustomerAlgorithm =>
-        'MyCopySourceSSECustomerAlgorithm',                        # OPTIONAL
+        'MyCopySourceSSECustomerAlgorithm',                           # OPTIONAL
       CopySourceSSECustomerKey    => 'MyCopySourceSSECustomerKey',    # OPTIONAL
       CopySourceSSECustomerKeyMD5 => 'MyCopySourceSSECustomerKeyMD5', # OPTIONAL
       RequestPayer                => 'requester',                     # OPTIONAL

@@ -39,6 +39,7 @@ package Paws::S3::CopyObject;
   has TaggingDirective => (is => 'ro', isa => 'Str', header_name => 'x-amz-tagging-directive', traits => ['ParamInHeader']);
   has WebsiteRedirectLocation => (is => 'ro', isa => 'Str', header_name => 'x-amz-website-redirect-location', traits => ['ParamInHeader']);
 
+
   use MooseX::ClassAttribute;
 
   class_has _api_call => (isa => 'Str', is => 'ro', default => 'CopyObject');
@@ -47,6 +48,7 @@ package Paws::S3::CopyObject;
   class_has _returns => (isa => 'Str', is => 'ro', default => 'Paws::S3::CopyObjectOutput');
   class_has _result_key => (isa => 'Str', is => 'ro');
   
+    
 1;
 
 ### main pod documentation begin ###
@@ -67,21 +69,21 @@ You shouldn't make instances of this class. Each attribute should be used as a n
 
     my $s3 = Paws->service('S3');
     my $CopyObjectOutput = $s3->CopyObject(
-      Bucket                      => 'MyBucketName',
-      CopySource                  => 'MyCopySource',
-      Key                         => 'MyObjectKey',
-      ACL                         => 'private',                    # OPTIONAL
-      CacheControl                => 'MyCacheControl',             # OPTIONAL
-      ContentDisposition          => 'MyContentDisposition',       # OPTIONAL
-      ContentEncoding             => 'MyContentEncoding',          # OPTIONAL
-      ContentLanguage             => 'MyContentLanguage',          # OPTIONAL
-      ContentType                 => 'MyContentType',              # OPTIONAL
-      CopySourceIfMatch           => 'MyCopySourceIfMatch',        # OPTIONAL
-      CopySourceIfModifiedSince   => '1970-01-01T01:00:00',        # OPTIONAL
-      CopySourceIfNoneMatch       => 'MyCopySourceIfNoneMatch',    # OPTIONAL
-      CopySourceIfUnmodifiedSince => '1970-01-01T01:00:00',        # OPTIONAL
+      Bucket                         => 'MyBucketName',
+      CopySource                     => 'MyCopySource',
+      Key                            => 'MyObjectKey',
+      ACL                            => 'private',                    # OPTIONAL
+      CacheControl                   => 'MyCacheControl',             # OPTIONAL
+      ContentDisposition             => 'MyContentDisposition',       # OPTIONAL
+      ContentEncoding                => 'MyContentEncoding',          # OPTIONAL
+      ContentLanguage                => 'MyContentLanguage',          # OPTIONAL
+      ContentType                    => 'MyContentType',              # OPTIONAL
+      CopySourceIfMatch              => 'MyCopySourceIfMatch',        # OPTIONAL
+      CopySourceIfModifiedSince      => '1970-01-01T01:00:00',        # OPTIONAL
+      CopySourceIfNoneMatch          => 'MyCopySourceIfNoneMatch',    # OPTIONAL
+      CopySourceIfUnmodifiedSince    => '1970-01-01T01:00:00',        # OPTIONAL
       CopySourceSSECustomerAlgorithm =>
-        'MyCopySourceSSECustomerAlgorithm',                        # OPTIONAL
+        'MyCopySourceSSECustomerAlgorithm',                           # OPTIONAL
       CopySourceSSECustomerKey    => 'MyCopySourceSSECustomerKey',    # OPTIONAL
       CopySourceSSECustomerKeyMD5 => 'MyCopySourceSSECustomerKeyMD5', # OPTIONAL
       Expires                     => '1970-01-01T01:00:00',           # OPTIONAL

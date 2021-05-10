@@ -34,8 +34,6 @@ sub new {
     my ($class, $args) = @_;
 
     return bless {
-        port              => $args->{port},
-        host              => $args->{host},
         api_version       => $args->{api_version},
         timeout           => $args->{timeout},
         interval          => $args->{interval},
@@ -51,19 +49,29 @@ sub get_widget_controller {
 
 sub get_port {
     my ($self) = @_;
-    return $self->{port};
+    return $self->{widget_controller}->{port};
 }
 
 sub get_host {
     my ($self) = @_;
-    return $self->{host};
+    return $self->{widget_controller}->{host};
+}
+
+sub set_host {
+    my ($self, $host) = @_;
+    $self->{widget_controller}->{host} = $host;
+}
+
+sub set_port {
+    my ($self, $port) = @_;
+    $self->{widget_controller}->{port} = $port;
 }
 
 sub check_connection {
     my ($self, %args) = @_;
     my $uri = YuiRestClient::Http::HttpClient::compose_uri(
-        host => $self->{host},
-        port => $self->{port},
+        host => $self->get_host(),
+        port => $self->get_port(),
         path => $self->{api_version} . '/widgets');
     YuiRestClient::Wait::wait_until(object => sub {
             my $response = YuiRestClient::Http::HttpClient::http_get($uri);

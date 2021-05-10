@@ -1,9 +1,9 @@
 package Perinci::Sub::Complete;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-06-04'; # DATE
+our $DATE = '2021-05-07'; # DATE
 our $DIST = 'Perinci-Sub-Complete'; # DIST
-our $VERSION = '0.943'; # VERSION
+our $VERSION = '0.944'; # VERSION
 
 use 5.010001;
 use strict;
@@ -1086,7 +1086,7 @@ Perinci::Sub::Complete - Complete command-line argument using Rinci metadata
 
 =head1 VERSION
 
-This document describes version 0.943 of Perinci::Sub::Complete (from Perl distribution Perinci-Sub-Complete), released on 2020-06-04.
+This document describes version 0.944 of Perinci::Sub::Complete (from Perl distribution Perinci-Sub-Complete), released on 2021-05-07.
 
 =head1 SYNOPSIS
 
@@ -1597,7 +1597,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020, 2019, 2018, 2017, 2016, 2015, 2014, 2013, 2012, 2011 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2020, 2019, 2018, 2017, 2016, 2015, 2014, 2013, 2012, 2011 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

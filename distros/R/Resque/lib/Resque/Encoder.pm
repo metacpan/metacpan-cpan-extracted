@@ -1,6 +1,6 @@
 package Resque::Encoder;
 # ABSTRACT: Moose role for encoding Resque structures
-$Resque::Encoder::VERSION = '0.37';
+$Resque::Encoder::VERSION = '0.38';
 use Moose::Role;
 use JSON;
 
@@ -20,7 +20,7 @@ Resque::Encoder - Moose role for encoding Resque structures
 
 =head1 VERSION
 
-version 0.37
+version 0.38
 
 =head1 ATTRIBUTES
 
@@ -34,7 +34,7 @@ Diego Kuperman <diego@freekeylabs.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by Diego Kuperman.
+This software is copyright (c) 2021 by Diego Kuperman.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

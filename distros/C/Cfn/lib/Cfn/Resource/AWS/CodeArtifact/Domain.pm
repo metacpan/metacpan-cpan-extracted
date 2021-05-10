@@ -1,4 +1,4 @@
-# AWS::CodeArtifact::Domain generated from spec 20.1.0
+# AWS::CodeArtifact::Domain generated from spec 34.0.0
 use Moose::Util::TypeConstraints;
 
 coerce 'Cfn::Resource::Properties::AWS::CodeArtifact::Domain',
@@ -14,7 +14,7 @@ package Cfn::Resource::AWS::CodeArtifact::Domain {
     [ 'Arn','EncryptionKey','Name','Owner' ]
   }
   sub supported_regions {
-    [ 'ap-northeast-1','ap-south-1','ap-southeast-1','ap-southeast-2','eu-central-1','eu-north-1','eu-west-1','us-east-1','us-east-2','us-west-2' ]
+    [ 'ap-northeast-1','ap-south-1','ap-southeast-1','ap-southeast-2','eu-central-1','eu-north-1','eu-south-1','eu-west-1','eu-west-2','eu-west-3','us-east-1','us-east-2','us-west-2' ]
   }
 }
 
@@ -26,6 +26,7 @@ package Cfn::Resource::Properties::AWS::CodeArtifact::Domain {
   extends 'Cfn::Resource::Properties';
   
   has DomainName => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
+  has EncryptionKey => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
   has PermissionsPolicyDocument => (isa => 'Cfn::Value::Json|Cfn::DynamicValue', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has Tags => (isa => 'ArrayOfCfn::Resource::Properties::TagType', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
 }

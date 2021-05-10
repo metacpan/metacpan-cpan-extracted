@@ -52,6 +52,7 @@ WriteMakefile(
                     'Pod::Coverage'       => '0.18',
                     'Test::Pod'           => '1.00',
                     'Pod::Markdown'       => 0,
+                    'Inline::C'           => 0,
                 },
             },
             test => {

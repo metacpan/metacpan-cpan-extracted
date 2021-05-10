@@ -1,9 +1,9 @@
 package Text::Table::More;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-02-26'; # DATE
+our $DATE = '2021-04-04'; # DATE
 our $DIST = 'Text-Table-More'; # DIST
-our $VERSION = '0.012'; # VERSION
+our $VERSION = '0.013'; # VERSION
 
 use 5.010001;
 use strict;
@@ -11,6 +11,10 @@ use warnings;
 #use utf8;
 
 our %FEATURES = (
+    set_v => {
+        TextTable => 1,
+    },
+
     features => {
         TextTable => {
             can_align_cell_containing_wide_character => 1,
@@ -297,6 +301,7 @@ sub generate_table {
 
                 my @widths;
                 my @heights;
+              ROW:
                 for my $ir (1..$rowspan) {
                     for my $ic (1..$colspan) {
                         my $exptable_cell;
@@ -313,10 +318,16 @@ sub generate_table {
                         #use DDC; dd $exptable; say ''; # debug
                     }
 
-                    my $val;
-                    $val = _get_attr('bottom_border', $rownum+$ir-1, undef, undef, \%args); $exptable_bottom_borders->[$rownum+$ir-1] = $val if $val;
-                    $val = _get_attr('top_border'   , $rownum+$ir-1, undef, undef, \%args); $exptable_bottom_borders->[$rownum+$ir-2] = $val if $val;
-                    $exptable_bottom_borders->[0] = 1 if $rownum+$ir-1 == 0 && $args{header_row};
+                    # determine whether we should draw bottom border of each row
+                    if ($rownum+$ir-1 == 0 && $args{header_row}) {
+                        $exptable_bottom_borders->[0] = 1
+                    } else {
+                        my $val;
+                        $val = _get_attr('bottom_border', $rownum+$ir-1, 0, $cell, \%args);     $exptable_bottom_borders->[$rownum+$ir-1] = $val if $val;
+                        $val = _get_attr('top_border'   , $rownum+$ir-1, 0, $cell, \%args);     $exptable_bottom_borders->[$rownum+$ir-2] = $val if $val;
+                        $val = _get_attr('bottom_border', $rownum+$ir-1, undef, undef, \%args); $exptable_bottom_borders->[$rownum+$ir-1] = $val if $val;
+                        $val = _get_attr('top_border'   , $rownum+$ir-1, undef, undef, \%args); $exptable_bottom_borders->[$rownum+$ir-2] = $val if $val;
+                    }
 
                     $M = $rownum+$ir if $M < $rownum+$ir;
                 }
@@ -596,7 +607,7 @@ Text::Table::More - Generate text table with simple interface and many options
 
 =head1 VERSION
 
-This document describes version 0.012 of Text::Table::More (from Perl distribution Text-Table-More), released on 2021-02-26.
+This document describes version 0.013 of Text::Table::More (from Perl distribution Text-Table-More), released on 2021-04-04.
 
 =head1 SYNOPSIS
 
@@ -659,26 +670,23 @@ This document describes version 0.012 of Text::Table::More (from Perl distributi
      rows => $rows,      # required
      header_row => 1,    # optional, default 0
      separate_rows => 1, # optional, default 0
-     border_style => $ARGV[0] // 'ASCII::SingleLineDoubleAfterHeader',
-     # optional, this is module name in BorderStyle::* namespace, without the prefix
+     border_style => $ARGV[0] // 'ASCII::SingleLineDoubleAfterHeader', # optional, this is module name in BorderStyle::* namespace, without the prefix
      #align => 'left',   # optional, default 'left'. can be left/middle/right.
      #valign => 'top',   # optional, default 'top'. can be top/middle/bottom.
- 
      #color => 1,        # optional, default 0. turn on support for cell content that contain ANSI color codes.
- 
      #wide_char => 1,    # optional, default 0. turn on support for wide Unicode characters.
  
-     row_attrs => [
+     row_attrs => [      # optional, specify per-row attributes
          # rownum (0-based int), attributes (hashref)
          [0, {align=>'middle', bottom_border=>1}],
      ],
  
-     col_attrs => [
+     col_attrs => [      # optional, per-column attributes
          # colnum (0-based int), attributes (hashref)
          [2, {valign=>'middle'}],
      ],
  
-     #cell_attrs => [
+     #cell_attrs => [    # optional, per-cell attributes
      #    # rownum (0-based int), colnum (0-based int), attributes (hashref)
      #    [1, 2, {rowspan=>3}],
      #    [1, 4, {rowspan=>2, colspan=>2}],
@@ -932,6 +940,14 @@ Positive integer. Default 1.
 =head2 rowspan
 
 Positive integer. Default 1.
+
+=head2 bottom_border.
+
+Boolean. Currently the attribute of he leftmost cell is used.
+
+=head2 top_border.
+
+Boolean. Currently the attribute of he leftmost cell is used.
 
 =head1 FUNCTIONS
 

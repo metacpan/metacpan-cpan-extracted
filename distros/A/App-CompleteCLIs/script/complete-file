@@ -1,22 +1,24 @@
 #!perl
 
 # Note: This script is a CLI for Riap function /Complete/File/complete_file
-# and generated automatically using Perinci::CmdLine::Gen version 0.497
+# and generated automatically using Perinci::CmdLine::Gen version 0.498
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-01-18'; # DATE
+our $DATE = '2021-05-09'; # DATE
 our $DIST = 'App-CompleteCLIs'; # DIST
-our $VERSION = '0.148'; # VERSION
+our $VERSION = '0.150'; # VERSION
 
 use 5.010001;
 use strict;
 use warnings;
+use Log::ger;
 
 use Perinci::CmdLine::Any;
 
 my $cmdline = Perinci::CmdLine::Any->new(
     url => "/Complete/File/complete_file",
     program_name => "complete-file",
+    log => 1,
     read_config => 0,
     read_env => 0,
 );
@@ -38,18 +40,21 @@ complete-file - Complete file and directory from local filesystem
 
 =head1 VERSION
 
-This document describes version 0.148 of complete-file (from Perl distribution App-CompleteCLIs), released on 2021-01-18.
+This document describes version 0.150 of complete-file (from Perl distribution App-CompleteCLIs), released on 2021-05-09.
 
 =head1 SYNOPSIS
 
 Usage:
 
- % complete-file [--allow-dot] [--disallow-dot] [--exclude-dir]
-     [--file-ext-filter-json=s] [--file-ext-filter=s]
+ % complete-file [--allow-dot] [--debug] [--disallow-dot] [--exclude-dir]
+     [--exclude-leaf] [--file-ext-filter-json=s] [--file-ext-filter=s]
      [--file-regex-filter=s] [--filter-json=s] [--filter=s] [--format=name]
-     [--handle-tilde] [--include-dir] [--json] [--(no)naked-res]
-     [--no-handle-tilde] [--nohandle-tilde] [--page-result[=program]]
-     [--starting-path=s] [--view-result[=program]] <word>
+     [--handle-tilde] [--include-dir] [--include-leaf] [--json]
+     [--log-level=level] [--(no)naked-res] [--no-handle-tilde]
+     [--no-recurse] [--nohandle-tilde] [--norecurse]
+     [--page-result[=program]] [--quiet] [-r] [--recurse]
+     [--recurse-matching=s] [--starting-path=s] [--trace] [--verbose]
+     [--view-result[=program]] <word>
 
 =head1 OPTIONS
 
@@ -65,7 +70,23 @@ This is most useful when combined with `starting_path` option to prevent user
 going up/outside the starting path.
 
 
+=item B<--exclude-dir>
+
+=item B<--exclude-leaf>
+
 =item B<--no-handle-tilde>
+
+=item B<--recurse>, B<-r>
+
+=item B<--recurse-matching>=I<s>
+
+Default value:
+
+ "level-by-level"
+
+Valid values:
+
+ ["level-by-level","all-at-once"]
 
 =item B<--starting-path>=I<s>
 
@@ -81,19 +102,13 @@ Default value:
 
  ""
 
+Can also be specified as the 1st command-line argument.
+
 =back
 
 =head2 Filtering options
 
 =over
-
-=item B<--exclude-dir>
-
-This is also an alternative to specifying full `filter`. Set this to true if you
-do not want directories.
-
-If you only want directories, take a look at `complete_dir()`.
-
 
 =item B<--file-ext-filter-json>=I<s>
 
@@ -138,6 +153,32 @@ For code filter, you supply a coderef. The coderef will be called for each item
 with these arguments: `$name`. It should return true if it wants the item to be
 included.
 
+
+=back
+
+=head2 Logging options
+
+=over
+
+=item B<--debug>
+
+Shortcut for --log-level=debug.
+
+=item B<--log-level>=I<s>
+
+Set log level.
+
+=item B<--quiet>
+
+Shortcut for --log-level=error.
+
+=item B<--trace>
+
+Shortcut for --log-level=trace.
+
+=item B<--verbose>
+
+Shortcut for --log-level=info.
 
 =back
 
@@ -246,7 +287,7 @@ Source repository is at L<https://github.com/perlancar/perl-App-CompleteCLIs>.
 
 =head1 BUGS
 
-Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-App-CompleteCLIs/issues>
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-CompleteCLIs>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired

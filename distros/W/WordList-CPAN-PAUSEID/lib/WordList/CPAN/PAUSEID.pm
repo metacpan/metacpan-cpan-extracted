@@ -1,14 +1,14 @@
 package WordList::CPAN::PAUSEID;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-05-04'; # DATE
+our $DATE = '2020-09-14'; # DATE
 our $DIST = 'WordList-CPAN-PAUSEID'; # DIST
-our $VERSION = '20200504.0.1'; # VERSION
+our $VERSION = '20200829.0.0'; # VERSION
 
 use WordList;
 our @ISA = qw(WordList);
 
-our %STATS = ("num_words_contain_nonword_chars",2,"num_words_contain_whitespace",0,"longest_word_len",9,"shortest_word_len",2,"avg_word_len",6.36030150753769,"num_words_contain_unicode",0,"num_words",13930,"num_words_contains_nonword_chars",2,"num_words_contains_whitespace",0,"num_words_contains_unicode",0); # STATS
+our %STATS = ("num_words_contain_nonword_chars",2,"num_words_contains_whitespace",0,"shortest_word_len",2,"num_words_contains_nonword_chars",2,"longest_word_len",9,"num_words_contain_whitespace",0,"num_words",13930,"avg_word_len",6.36030150753769,"num_words_contain_unicode",0,"num_words_contains_unicode",0); # STATS
 
 1;
 # ABSTRACT: CPAN PAUSE ID's
@@ -23,7 +23,7 @@ WordList::CPAN::PAUSEID - CPAN PAUSE ID's
 
 =head1 VERSION
 
-This document describes version 20200504.0.1 of WordList::CPAN::PAUSEID (from Perl distribution WordList-CPAN-PAUSEID), released on 2020-05-04.
+This document describes version 20200829.0.0 of WordList::CPAN::PAUSEID (from Perl distribution WordList-CPAN-PAUSEID), released on 2020-09-14.
 
 =head1 SYNOPSIS
 
@@ -41,10 +41,14 @@ This document describes version 20200504.0.1 of WordList::CPAN::PAUSEID (from Pe
  # Call a callback for each word
  $wl->each_word(sub { my $word = shift; ... });
 
+ # Iterate
+ my $first_word = $wl->first_word;
+ while (defined(my $word = $wl->next_word)) { ... }
+
  # Get all the words
  my @all_words = $wl->all_words;
 
-=head1 STATISTICS
+=head1 WORDLIST STATISTICS
 
  +----------------------------------+------------------+
  | key                              | value            |
@@ -69,7 +73,7 @@ Please visit the project's homepage at L<https://metacpan.org/release/WordList-C
 
 =head1 SOURCE
 
-Source repository is at L<https://github.com/perlancar/perl-WordList-CPAN-PAUSEIDs>.
+Source repository is at L<https://github.com/perlancar/perl-WordList-CPAN-PAUSEID>.
 
 =head1 BUGS
 
@@ -85,7 +89,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020, 2017 by perlancar@cpan.org.
+This software is copyright (c) 2020 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

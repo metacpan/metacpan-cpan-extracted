@@ -1,3 +1,15 @@
+0.004   2021-04-24  Released-By: PERLANCAR; Urgency: medium
+
+	- [bugfix] Handle duplicates in argument, allow sorting only 0/1
+	  entry.
+
+
+0.003   2021-04-24  Released-By: PERLANCAR; Urgency: medium
+
+	- [bugfix] Handle duplicates in argument, allow sorting only 0/1
+	  entries.
+
+
 0.002   2021-03-07  Released-By: PERLANCAR; Urgency: medium
 
 	- [bugfix] Fix regex to recognize version number in tarball name.

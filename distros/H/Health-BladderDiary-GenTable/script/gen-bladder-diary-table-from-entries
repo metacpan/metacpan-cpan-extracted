@@ -6,7 +6,7 @@
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2020-12-10'; # DATE
 our $DIST = 'Health-BladderDiary-GenTable'; # DIST
-our $VERSION = '0.006'; # VERSION
+our $VERSION = '0.007'; # VERSION
 
 use 5.010001;
 use strict;
@@ -40,13 +40,13 @@ gen-bladder-diary-table-from-entries - Create bladder diary table from bladder d
 
 =head1 VERSION
 
-This document describes version 0.006 of gen-bladder-diary-table-from-entries (from Perl distribution Health-BladderDiary-GenTable), released on 2020-12-10.
+This document describes version 0.007 of gen-bladder-diary-table-from-entries (from Perl distribution Health-BladderDiary-GenTable), released on 2020-12-10.
 
 =head1 SYNOPSIS
 
 Usage:
 
- % gen-bladder-diary-table-from-entries [--date=s] [--debug]
+ % gen-bladder-diary-table-from-entries [-d=s] [--date=s] [--debug]
      [--format=name] [--json] [--log-level=level] [--(no)naked-res]
      [--page-result[=program]] [--quiet] [--trace] [--verbose]
      [--view-result[=program]] [-y=s] [--yesterday-last-urination-entry=s]
@@ -60,7 +60,7 @@ C<*> marks required options.
 
 =over
 
-=item B<--date>=I<s>
+=item B<--date>=I<s>, B<-d>
 
 =item B<--entries>=I<s>*
 

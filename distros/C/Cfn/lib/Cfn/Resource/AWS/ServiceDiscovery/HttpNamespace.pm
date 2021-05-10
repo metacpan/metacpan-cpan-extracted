@@ -1,4 +1,4 @@
-# AWS::ServiceDiscovery::HttpNamespace generated from spec 20.1.0
+# AWS::ServiceDiscovery::HttpNamespace generated from spec 34.0.0
 use Moose::Util::TypeConstraints;
 
 coerce 'Cfn::Resource::Properties::AWS::ServiceDiscovery::HttpNamespace',
@@ -14,7 +14,7 @@ package Cfn::Resource::AWS::ServiceDiscovery::HttpNamespace {
     [ 'Arn','Id' ]
   }
   sub supported_regions {
-    [ 'ap-east-1','ap-northeast-2','ap-south-1','ap-southeast-1','ap-southeast-2','ca-central-1','cn-north-1','cn-northwest-1','eu-central-1','eu-north-1','eu-west-1','eu-west-2','me-south-1','us-east-1','us-east-2','us-west-1','us-west-2' ]
+    [ 'af-south-1','ap-east-1','ap-northeast-2','ap-south-1','ap-southeast-1','ap-southeast-2','ca-central-1','cn-north-1','cn-northwest-1','eu-central-1','eu-north-1','eu-south-1','eu-west-1','eu-west-2','me-south-1','us-east-1','us-east-2','us-west-1','us-west-2' ]
   }
 }
 
@@ -27,7 +27,7 @@ package Cfn::Resource::Properties::AWS::ServiceDiscovery::HttpNamespace {
   
   has Description => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
   has Name => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
-  has Tags => (isa => 'ArrayOfCfn::Resource::Properties::TagType', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
+  has Tags => (isa => 'ArrayOfCfn::Resource::Properties::TagType', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
 }
 
 1;

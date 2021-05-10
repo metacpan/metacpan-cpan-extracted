@@ -63,14 +63,13 @@
    "provides" : {
       "Set::Light" : {
          "file" : "lib/Set/Light.pm",
-         "version" : "0.94"
+         "version" : "0.95"
       }
    },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "mailto" : "bug-Set-Light@rt.cpan.org",
-         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Set-Light"
+         "web" : "https://github.com/robrwo/Set-Light/issues"
       },
       "repository" : {
          "type" : "git",
@@ -78,7 +77,7 @@
          "web" : "https://github.com/robrwo/Set-Light"
       }
    },
-   "version" : "0.94",
+   "version" : "0.95",
    "x_authority" : "cpan:RRWO",
    "x_contributors" : [
       "Robert Rothenberg <rrwo@cpan.org>"

@@ -1,7 +1,7 @@
 package App::CompleteCLIs;
 
-our $DATE = '2021-01-18'; # DATE
-our $VERSION = '0.148'; # VERSION
+our $DATE = '2021-05-09'; # DATE
+our $VERSION = '0.150'; # VERSION
 
 use 5.010001;
 use strict;
@@ -22,7 +22,7 @@ App::CompleteCLIs - CLI wrappers for complete_*() functions
 
 =head1 VERSION
 
-This document describes version 0.148 of App::CompleteCLIs (from Perl distribution App-CompleteCLIs), released on 2021-01-18.
+This document describes version 0.150 of App::CompleteCLIs (from Perl distribution App-CompleteCLIs), released on 2021-05-09.
 
 =head1 SYNOPSIS
 
@@ -114,6 +114,8 @@ functions on the command-line.
 
 =item * L<complete-program>
 
+=item * L<complete-rclone-remote>
+
 =item * L<complete-regexp-pattern-module>
 
 =item * L<complete-regexp-pattern-pattern>
@@ -156,7 +158,7 @@ Source repository is at L<https://github.com/perlancar/perl-App-CompleteCLIs>.
 
 =head1 BUGS
 
-Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-App-CompleteCLIs/issues>
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-CompleteCLIs>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
