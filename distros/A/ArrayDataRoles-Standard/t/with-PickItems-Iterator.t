@@ -5,8 +5,9 @@ use warnings;
 use Test::Exception;
 use Test::More 0.98;
 
-use Role::Tiny;
 use ArrayData::Test::Source::LinesInDATA;
+use Role::Tiny;
+use Role::TinyCommons::Collection::PickItems::Iterator; # for scan_prereqs
 
 my $t = ArrayData::Test::Source::LinesInDATA->new;
 Role::Tiny->apply_roles_to_object($t, 'Role::TinyCommons::Collection::PickItems::Iterator');

@@ -4,7 +4,7 @@
       "Al Newkirk <anewkirk@ana.io>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 5.037, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "Dist::Zilla version 6.017, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -43,21 +43,25 @@
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://github.com/alnewkirk/Emailesque/issues"
+         "web" : "https://github.com/fany/Emailesque/issues"
       },
-      "homepage" : "http://metacpan.org/release/Emailesque/",
       "repository" : {
          "type" : "git",
-         "url" : "git://github.com/alnewkirk/Emailesque.git",
-         "web" : "https://github.com/alnewkirk/Emailesque"
+         "url" : "git://github.com/fany/Emailesque.git",
+         "web" : "https://github.com/fany/Emailesque"
       }
    },
-   "version" : "1.26",
-   "x_authority" : "cpan:AWNCORP",
+   "version" : "1.27",
+   "x_authority" : "cpan:FANY",
    "x_contributors" : [
       "Andrew Beverley <a.beverley@ctrlo.com>",
       "Eric Johnson <eric.git@iijo.org>",
-      "Stefan Hornburg <racke@linuxia.de>"
-   ]
+      "Stefan Hornburg <racke@linuxia.de>",
+      "Martin Sluka <perl@sluka.de>",
+      "Martin H. Sluka <martin@sluka.de>"
+   ],
+   "x_generated_by_perl" : "v5.32.1",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.26",
+   "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }
 

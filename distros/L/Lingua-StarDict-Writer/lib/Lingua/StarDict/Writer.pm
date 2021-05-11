@@ -24,7 +24,7 @@ Version 0.01
 
 =cut
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 
 =head1 SYNOPSIS
@@ -77,8 +77,8 @@ By default, current date will be used.
 
 =head2 entry($entry_title)
 
-Returns dictionary entry named C<$entry_title>, if entry C<$entry_title> does not exist, a new empty empty
-dictionary entry  will be created and returned. The only reason you may want to get dictionary entry is to
+Returns dictionary entry named C<$entry_title>. If entry C<$entry_title> does not exist, a new empty
+dictionary entry  will be created and returned. The only reason you may want to get a dictionary entry is to
 add a new part using C<add_part> method (See below)
 
 Entries can be added in arbitrary order, they will be sorted alphabetically using StarDict sorting algorithm, when
@@ -102,14 +102,14 @@ Parts will be saved in the entry in the order they were added.
 
 =head2 write
 
-This method will write all entries to the disk formatted as StarDict dictionary. C<.dict> C<.idx> and C<.ifo> files
-will be placed in a C<name> dir at the path you've specified in C<output_dir> option. You should put them to C</usr/share/stardict/dic> or
+This method will write all entries to the disk formatted as StarDict dictionary. C<.dict>, C<.idx> and C<.ifo> files
+will be placed in directory C<name> at the path specified in C<output_dir> option. You should put them to C</usr/share/stardict/dic> or
  C<~/.stardict/dic> path to make them visible to StarDict.
 
 =head1 ENCODING ISSUE
 
-All methods expect to recieve data encoded as perl character strings, not byte string (I.e. Cyrillic "я" should be encoded as C<\x{44f}>,
-and not as C<\x{d1}\x{8f}>. If you have read utf-8 source data from a file, database or from web, make sure that utf-8 bytes you've got
+All methods expect to recieve data encoded as perl character strings, not as byte string (i.e. Cyrillic "я" should be encoded as C<\x{44f}>,
+and not as C<\x{d1}\x{8f}>). If you have read utf-8 source data from a file, database or from web, make sure that utf-8 bytes you've got
 are converted to perl characters. See L<this article|https://dev.to/fgasper/perl-unicode-and-bytes-5cg7> for more info.
 
 
@@ -123,7 +123,7 @@ are converted to perl characters. See L<this article|https://dev.to/fgasper/perl
 
 =item * Dictionary compression is not implemented.
 
-=item * Synonyms is not implemented.
+=item * Synonyms are not implemented.
 
 =back
 
@@ -320,8 +320,10 @@ sub stardict_strcmp
     $s2_bytes = Unicode::UTF8::encode_utf8($s2);
   }
 
-  my $s1_lc_bytes = $s1_bytes =~ tr/A-Z/a-z/r; # do lower case
-  my $s2_lc_bytes = $s2_bytes =~ tr/A-Z/a-z/r;
+  my $s1_lc_bytes = $s1_bytes;
+  $s1_lc_bytes =~ tr/A-Z/a-z/; # do lower case
+  my $s2_lc_bytes = $s2_bytes;
+  $s2_lc_bytes =~ tr/A-Z/a-z/;
 
   my $res = $s1_lc_bytes cmp $s2_lc_bytes; # Compare lower case string represented as bytes
 
@@ -334,10 +336,6 @@ sub stardict_strcmp
 =head1 AUTHOR
 
 Nikolay Shaplov, C<< <dhyan at nataraj.su> >>
-
-=head1 CREDITS
-
-Special thanks to B<xq> from C<freenode> C<#perl> for deep code review.
 
 
 =head1 BUGS
@@ -377,6 +375,9 @@ L<https://metacpan.org/release/Lingua-StarDict-Writer>
 
 =head1 ACKNOWLEDGEMENTS
 
+Special thanks to B<xq> from C<freenode> C<#perl> for deep code review.
+
+Thanks to B<Rince> for proofreading.
 
 =head1 LICENSE AND COPYRIGHT
 

@@ -1,0 +1,76 @@
+NAME
+    ArrayData::Word::ID::KBBI - Indonesian words from Kamus Besar Bahasa
+    Indonesia
+
+VERSION
+    This document describes version 0.002 of ArrayData::Word::ID::KBBI (from
+    Perl distribution ArrayData-Word-ID-KBBI), released on 2021-05-11.
+
+SYNOPSIS
+     use ArrayData::Word::ID::KBBI;
+
+     my $wl = ArrayData::Word::ID::KBBI->new;
+
+     # Iterate the words
+     $wl->reset_iterator;
+     while ($wl->has_next_item) {
+         my $word = $wl->get_next_item;
+         ... # do something about the word
+     }
+
+     # Another way to iterate
+     $wl->each_item(sub { my ($item, $obj, $pos) = @_; ... }); # return false in anonsub to exit early
+
+     # Get words by position (array index)
+     my $word = $wl->get_item_at_pos(0);  # get the first word
+     my $word = $wl->get_item_at_pos(90); # get the 91th word, will die if there is no word at that position.
+
+     # Get number of words in the list
+     my $count = $wl->get_item_count;
+
+     # Get all words from the list
+     my @all_words = $wl->get_all_items;
+
+     # Find an item (by iterating). See Role::TinyCommons::Collection::FindItem for more details.
+     my @found = ${wl}->find_item(item => 'foo');
+     my $has_item = ${wl}->has_item('foo'); # bool
+
+     # Find an item by binary searching (only when data source is filehandle and the data is sorted)
+     Role::Tiny->apply_roles_to_object($wl, 'ArrayData::BinarySearch::LinesInHandle');
+     my @found = ${wl}->find_item(item => 'foo');
+     my $has_item = ${wl}->has_item('foo'); # bool
+
+     # Pick one or several random words (apply one of these roles first: Role::TinyCommons::Collection::PickItems::{Iterator,RandomSeek})
+     Role::Tiny->apply_roles_to_object($wl, 'Role::TinyCommons::Collection::PickItems::Iterator');
+     my $word = ${wl}->pick_item;
+     my @words = ${wl}->pick_items(n=>3);
+
+DESCRIPTION
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/ArrayData-Word-ID-KBBI>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-ArrayData-Word-ID-KBBI>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=ArrayData-Word-ID-KBB
+    I>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    WordList::ID::KBBI is the previous reincarnation.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2021 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

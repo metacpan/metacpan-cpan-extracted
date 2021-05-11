@@ -1,5 +1,10 @@
 Revision history for UUID-FFI
 
+0.10      2021-05-10 06:53:27 -0600
+  - Check for required symbols, and require
+    Alien::libuuid 0.05 if an appropriate system
+    lib is not found (gh#6)
+
 0.09      2021-05-05 13:56:33 -0600
   - Fixed runtime detection order (gh#4)
 

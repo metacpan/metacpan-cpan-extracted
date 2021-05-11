@@ -8,6 +8,8 @@ aliases:
     - building
     - public_building
     - isolated_dwelling
+    - farmland
+    - allotments
 ---
 name: road
 aliases:
@@ -40,22 +42,26 @@ aliases:
     - commercial
     - industrial
     - houses
+    - subdistrict    
     - subdivision
-    - allotments
+    - ward
 ---
 name: postal_city    
 ---
 name: city
 aliases:
     - town
+    - township
 ---
 name: municipality
 aliases:
     - local_administrative_area
+    - subcounty
 ---    
 name: county
 aliases:
     - county_code
+    - department
 ---
 name: state_district
 ---

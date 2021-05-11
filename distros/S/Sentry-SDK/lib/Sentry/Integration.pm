@@ -21,10 +21,12 @@ sub _add_global_event_processor ($cb) {
 
 sub setup ($package, $custom_integrations = []) {
   my @all_integrations = (@Global_integrations, $custom_integrations->@*);
-  foreach my $integration (@all_integrations) {
+  foreach my $integration (grep { !$_->initialized } @all_integrations) {
     $integration->setup_once(
       Sentry::Integration->can('_add_global_event_processor'),
       Sentry::Hub->can('get_current_hub'));
+
+    $integration->initialized(1);
   }
 }
 

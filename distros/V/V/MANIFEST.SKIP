@@ -1,0 +1,9 @@
+\..+\.swp$
+MYMETA\.
+\.git
+\.git(ignore|attributes)
+core-t/
+Makefile$
+Makefile.bak
+pm_to_blib
+blib/

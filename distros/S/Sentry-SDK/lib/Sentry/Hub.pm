@@ -18,10 +18,12 @@ has _stack         => sub { [{}] };
 has client         => undef;
 has scopes         => sub { [Sentry::Hub::Scope->new] };
 
-# has _root_scope =>
-
 sub init ($package, $options) {
   $Instance = Sentry::Hub->new($options);
+}
+
+sub reset ($self) {
+  $self->scopes([Sentry::Hub::Scope->new]);
 }
 
 sub bind_client ($self, $client) {

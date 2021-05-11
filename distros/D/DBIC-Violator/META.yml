@@ -1,0 +1,36 @@
+---
+abstract: "Violate DBIC's most private moments"
+author:
+  - 'Henry Van Styn <vanstyn@cpan.org>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.031, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: DBIC-Violator
+requires:
+  Class::MOP::Class: 0
+  DBI: 0
+  DBIx::Class::Storage::DBI: 0
+  Moo: 0
+  Path::Class: 0
+  Plack::Middleware: 0
+  Plack::Request: 0
+  Plack::Response: 0
+  Plack::Util: 0
+  RapidApp::Util: 0
+  SQL::Abstract::Tree: 0
+  Time::HiRes: 0
+  Try::Tiny: 0
+  Types::Standard: 0
+  parent: 0
+  strict: 0
+  warnings: 0
+resources:
+  bugtracker: https://github.com/vanstyn/DBIC-Violator/issues
+  repository: https://github.com/vanstyn/DBIC-Violator.git
+version: 0.900

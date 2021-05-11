@@ -2,3 +2,18 @@ default:
     address_template: |
         {{one}}, {{two}}
         {{three}}
+
+# Germany
+DE:
+    fallback_template: |
+        {{#first}} {{{suburb}}} || {{{city_district}}} || {{{neighbourhood}}} {{/first}}
+        {{#first}} {{{town}}} || {{{city}}} || {{{village}}} || {{{municipality}}} {{/first}}
+        {{{county}}}
+        {{#first}} {{{state}}} || {{{state_district}}} {{/first}}
+        {{{country}}}    
+    replace:
+        - ["^Landkreis ",""]
+        - ["^Kreis ",""]
+    postformat_replace:
+        - ["Berlin\nBerlin","Berlin"]
+

@@ -1,5 +1,9 @@
 Revision history for Alien::gdal
 
+1.24 2021-05011
+    - Trim dangling -L in LDFLAGS for source installs on Windows.
+      Possibly affect(s|ed) other OSes.
+
 1.23 2020-09-05
     - Add Alien::Build::Plugin::PkgConfig::PPWrapper
       to more places in Makefile.pl

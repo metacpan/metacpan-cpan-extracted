@@ -53,6 +53,6 @@
          "web" : "https://github.com/qe-yast/perl-yui-rest-client"
       }
    },
-   "version" : "0.4",
+   "version" : "0.5",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

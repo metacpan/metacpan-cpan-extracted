@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2016-2021 -- leonerd@leonerd.org.uk
 
-package Syntax::Keyword::Try 0.23;
+package Syntax::Keyword::Try 0.24;
 
 use v5.14;
 use warnings;
@@ -44,6 +44,13 @@ also serves to contain a number of code examples for how to implement parser
 plugins and manipulate optrees to provide new syntax and behaviours for perl
 code.
 
+Syntax similar to this module has now been added to core perl, starting at
+development version 5.33.7, and is expected to become generally available when
+perl 5.34 is released. If you are writing new code, it is suggested that you
+instead use the L<Feature::Compat::Try> module instead, as that will enable
+the core feature on those supported perl versions, falling back to
+C<Syntax::Keyword::Try> on older perls.
+
 =head1 Experimental Features
 
 Some of the features of this module are currently marked as experimental. They
@@ -56,7 +63,7 @@ module to only silence this module's warnings selectively:
 
    use Syntax::Keyword::Try qw( try :experimental(typed) );
 
-   use Syntax::Keyword::Try qw( try :experimental(try_value) );
+   use Syntax::Keyword::Try qw( try :experimental(try_value) ); # deprecated
 
    use Syntax::Keyword::Try qw( try :experimental );  # all of the above
 
@@ -219,16 +226,24 @@ from disturbing the value of C<$@>. If the C<finally {}> block code throws an
 exception, this will be printed as a warning and discarded, leaving C<$@>
 containing the original exception, if one existed.
 
+Note that the C<finally> syntax is not available when using this module via
+L<Feature::Compat::Try>, as it is not expected that syntax will be added to
+the core perl C<'try'> feature. This is because a more general-purpose ability
+may be added instead, under the name C<'defer'>. If you wish to write code
+that may more easily be forward-compatible with that feature instead, you
+should consider using L<Syntax::Keyword::Defer> rather than using C<finally>
+statements.
+
 =head1 VALUE SEMANTICS
 
 =over 4
 
-B<Warning:> the feature described in this section is experimental. This
-experiment has existed for a while, though given that since version 0.22
-the regular C<try> syntax already behaves fine inside a C<do> block, there is
-no longer any reason for this experimental feature to exist. It will start
-printing deprecation warnings in a later version, and eventually will be
-removed.
+B<Warning:> the feature described in this section was experimental and is now
+deprecated. This experiment has existed for a while, though given that since
+version 0.22 the regular C<try> syntax already behaves fine inside a C<do>
+block, there is no longer any reason for this experimental feature to exist.
+It will print a deprecation warning, and eventually will be removed in a later
+version. You should use C<do { try ... }> instead.
 
 Additionally, on I<perl> versions 5.18 and later, it will produce a warning
 in the C<experimental> category.

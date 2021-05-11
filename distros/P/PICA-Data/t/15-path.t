@@ -29,6 +29,7 @@ foreach my $path (keys %pathes) {
     }
 }
 
+is "" . PICA::Path->new('123A[00]'), '123A';
 is "" . PICA::Path->new('003.abc')->stringify(1), '003.abc', 'stringify(1)';
 
 my $field = ['123A', undef, _ => 'abcdefghijk'];

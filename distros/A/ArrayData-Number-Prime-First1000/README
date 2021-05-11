@@ -1,0 +1,75 @@
+NAME
+    ArrayData::Number::Prime::First1000 - List of first 1000 prime numbers
+
+VERSION
+    This document describes version 0.001 of
+    ArrayData::Number::Prime::First1000 (from Perl distribution
+    ArrayData-Number-Prime-First1000), released on 2021-05-11.
+
+SYNOPSIS
+     use ArrayData::Number::Prime::First1000;
+
+     my $ary = ArrayData::Number::Prime::First1000->new;
+
+     # Iterate the elements
+     $ary->reset_iterator;
+     while ($ary->has_next_item) {
+         my $element = $ary->get_next_item;
+         ... # do something about the element
+     }
+
+     # Another way to iterate
+     $ary->each_item(sub { my ($item, $obj, $pos) = @_; ... }); # return false in anonsub to exit early
+
+     # Get elements by position (array index)
+     my $element = $ary->get_item_at_pos(0);  # get the first element
+     my $element = $ary->get_item_at_pos(90); # get the 91th element, will die if there is no element at that position.
+
+     # Get number of elements in the list
+     my $count = $ary->get_item_count;
+
+     # Get all elements from the list
+     my @all_elements = $ary->get_all_items;
+
+     # Find an item (by iterating). See Role::TinyCommons::Collection::FindItem for more details.
+     my @found = ${ary}->find_item(item => 'foo');
+     my $has_item = ${ary}->has_item('foo'); # bool
+
+     # Find an item by binary searching (only when data source is filehandle and the data is sorted)
+     Role::Tiny->apply_roles_to_object($ary, 'ArrayData::BinarySearch::LinesInHandle');
+     my @found = ${ary}->find_item(item => 'foo');
+     my $has_item = ${ary}->has_item('foo'); # bool
+
+     # Pick one or several random elements (apply one of these roles first: Role::TinyCommons::Collection::PickItems::{Iterator,RandomSeek})
+     Role::Tiny->apply_roles_to_object($ary, 'Role::TinyCommons::Collection::PickItems::Iterator');
+     my $element = ${ary}->pick_item;
+     my @elements = ${ary}->pick_items(n=>3);
+
+DESCRIPTION
+    Mainly for testing ArrayData.
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/ArrayData-Number-Prime-First1000>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-ArrayData-Number-Prime-First1000>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=ArrayData-Number-Prim
+    e-First1000>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2021 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

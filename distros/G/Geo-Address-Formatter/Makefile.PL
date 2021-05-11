@@ -29,16 +29,14 @@ my %WriteMakefileArgs = (
     "YAML::LibYAML" => "0.82"
   },
   "TEST_REQUIRES" => {
-    "Code::TidyAll" => "0.78",
     "File::Slurper" => 0,
     "File::Spec" => 0,
-    "Perl::Tidy" => 20210111,
     "Test::Exception" => 0,
     "Test::More" => "0.88",
     "Test::Warn" => 0,
     "Text::Trim" => "1.02"
   },
-  "VERSION" => "1.87",
+  "VERSION" => "1.88",
   "test" => {
     "TESTS" => "t/blackbox/*.t t/unit/*.t"
   }
@@ -47,14 +45,12 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "Clone" => "0.45",
-  "Code::TidyAll" => "0.78",
   "Data::Dumper" => 0,
   "File::Basename" => 0,
   "File::Find::Rule" => 0,
   "File::Slurper" => 0,
   "File::Spec" => 0,
   "List::Util" => 0,
-  "Perl::Tidy" => 20210111,
   "Ref::Util" => "0.204",
   "Scalar::Util" => 0,
   "Test::Exception" => 0,

@@ -8,9 +8,9 @@ use Test::More;
 BEGIN {
    plan skip_all => "Future is not available"
       unless eval { require Future };
-   plan skip_all => "Future::AsyncAwait >= 0.10 is not available"
+   plan skip_all => "Future::AsyncAwait >= 0.50 is not available"
       unless eval { require Future::AsyncAwait;
-                    Future::AsyncAwait->VERSION( '0.10' ) };
+                    Future::AsyncAwait->VERSION( '0.50' ) };
    plan skip_all => "Syntax::Keyword::Try >= 0.22 is not available"
       unless eval { require Syntax::Keyword::Try;
                     Syntax::Keyword::Try->VERSION( '0.22' ) };
@@ -121,6 +121,26 @@ BEGIN {
    $f1->done;
 
    is( scalar $fret->get, "TF", '$fret for await in try/finally' );
+}
+
+# finally still runs for cancel (RT135351)
+{
+   my $ok;
+   my $f1 = Future->new;
+   my $fret = (async sub {
+      try {
+         await $f1;
+      }
+      finally {
+         $ok++;
+      }
+   })->();
+
+   ok( !$ok, 'defer {} not run before ->cancel' );
+
+   $fret->cancel;
+
+   ok( $ok, 'defer {} was run after ->cancel' );
 }
 
 # await in toplevel try

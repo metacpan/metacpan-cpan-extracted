@@ -1,5 +1,8 @@
 Revision history for Alien-libuuid
 
+0.05      2021-05-10 05:39:51 -0600
+  - Check for required symbols via FFI (gh#9, gh#11)
+
 0.04      2020-05-08 07:50:23 -0600
   - patch .pc file to include include/uuid for share install
     (gh#4, gh#6, tib++)

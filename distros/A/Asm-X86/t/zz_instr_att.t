@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 1 + 12 + 26;
+use Test::More tests => 1 + 12 + 26 + 10;
 use Asm::X86 qw(@instr_att is_instr_att);
 
 cmp_ok ( $#instr_att, '>', 0, "Non-empty instruction list" );
@@ -48,3 +48,14 @@ is ( is_instr_att ("fistps"), 1, "fistps is an instruction" );
 is ( is_instr_att ("fstp"), 0, "fstp is an instruction" );
 is ( is_instr_att ("fstpl"), 1, "fstpl is an instruction" );
 
+is ( is_instr_att ("movzbw"), 1, "movzbw is an instruction" );
+is ( is_instr_att ("movzbl"), 1, "movzbl is an instruction" );
+is ( is_instr_att ("movzwl"), 1, "movzwl is an instruction" );
+is ( is_instr_att ("movzbq"), 1, "movzbq is an instruction" );
+is ( is_instr_att ("movzwq"), 1, "movzwq is an instruction" );
+
+is ( is_instr_att ("movsbw"), 1, "movzbw is an instruction" );
+is ( is_instr_att ("movsbl"), 1, "movzbl is an instruction" );
+is ( is_instr_att ("movswl"), 1, "movzwl is an instruction" );
+is ( is_instr_att ("movsbq"), 1, "movzbq is an instruction" );
+is ( is_instr_att ("movswq"), 1, "movzwq is an instruction" );

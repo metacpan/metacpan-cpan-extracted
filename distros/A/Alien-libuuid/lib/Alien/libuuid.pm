@@ -2,11 +2,11 @@ package Alien::libuuid;
 
 use strict;
 use warnings;
-use 5.008001;
+use 5.008004;
 use base qw( Alien::Base );
 
 # ABSTRACT: Find or download and install libuuid
-our $VERSION = '0.04'; # VERSION
+our $VERSION = '0.05'; # VERSION
 
 
 
@@ -29,7 +29,7 @@ Alien::libuuid - Find or download and install libuuid
 
 =head1 VERSION
 
-version 0.04
+version 0.05
 
 =head1 SYNOPSIS
 
@@ -41,7 +41,7 @@ In your Makefile.PL:
  WriteMakefile(
    Alien::Base::Wrapper->new('Alien::libuuid')->mm_args2(
      # MakeMaker args
-     NAME => 'Kafka::Librd',
+     NAME => 'My::XS',
      ...
    ),
  );

@@ -7,8 +7,7 @@
 #include "perl.h"
 #include "XSUB.h"
 
-#define HAVE_PERL_VERSION(R, V, S) \
-    (PERL_REVISION > (R) || (PERL_REVISION == (R) && (PERL_VERSION > (V) || (PERL_VERSION == (V) && (PERL_SUBVERSION >= (S))))))
+#include "perl-backcompat.c.inc"
 
 #if HAVE_PERL_VERSION(5,32,0)
 #  define HAVE_OP_ISA
@@ -27,8 +26,6 @@ typedef I32 array_ix_t;
 #ifndef wrap_keyword_plugin
 #  include "wrap_keyword_plugin.c.inc"
 #endif
-
-#include "perl-backcompat.c.inc"
 
 #include "lexer-additions.c.inc"
 
@@ -440,6 +437,9 @@ static int try_keyword(pTHX_ OP **op)
         "'try do' syntax is experimental and may be changed or removed without notice");
     }
 #endif
+
+    Perl_ck_warner(aTHX_ packWARN(WARN_DEPRECATED),
+      "'try do' syntax is deprecated and will be removed. Use  do { try ... }  instead");
   }
 
   if(lex_peek_unichar(0) != '{')

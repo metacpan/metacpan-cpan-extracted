@@ -10,13 +10,14 @@ use Capture::Tiny qw /:all/;
 use Path::Tiny qw /path/;
 use Alien::proj;
 
-our $VERSION = '1.23';
+our $VERSION = '1.24';
 
-my ($have_geos, $have_proj);
+my ($have_geos, $have_proj, $have_spatialite);
 my @have_aliens;
 BEGIN {
     $have_geos = eval 'require Alien::geos::af';
-    foreach my $alien_lib (qw /Alien::geos::af Alien::sqlite Alien::proj Alien::spatialite Alien::freexl Alien::libtiff/) {
+    $have_spatialite = eval 'require Alien::spatialite';
+    foreach my $alien_lib (qw /Alien::geos::af Alien::sqlite Alien::proj Alien::freexl Alien::libtiff/) {
         my $have_lib = eval "require $alien_lib";
         my $pushed_to_env = 0;
         if ($have_lib && $alien_lib->install_type eq 'share') {
@@ -46,12 +47,40 @@ BEGIN {
     if (Alien::gdal->version ge '3') {
         push @PATH, 'Alien::proj'->bin_dirs
           if 'Alien::proj'->can('bin_dirs');
+        if ($have_spatialite && Alien::spatialite->version ge 5) {
+          push @PATH, 'Alien::spatialite'->bin_dirs
+            if 'Alien::spatialite'->can('bin_dirs');
+          push @have_aliens, 'Alien::spatialite';
+        }
     }
+    if ($have_geos
+        && $^O =~ /bsd/
+        && Alien::geos::af->install_type eq 'share'
+        ) {
+        #  underhanded, but we are getting failures if this is not set
+        #  maybe should be done in A::g::af
+        my $libdir = Alien::geos::af->dist_dir . q{/lib};
+        push @LD_LIBRARY_PATH, $libdir
+          if !grep {/^$libdir$/}
+              grep {defined}
+              @LD_LIBRARY_PATH;
+        push @DYLD_LIBRARY_PATH, $libdir
+          if !grep {/^$libdir$/}
+              grep {defined}
+              @DYLD_LIBRARY_PATH;
+        #warn "Adding $libdir to LD_LIBRARY_PATH and DYLD_LIBRARY_PATH";
+    }
+
 }
 
 sub dynamic_libs {
     my $self = shift;
     
+    #warn 'LD Path is: ' . join ' ', grep {defined} @LD_LIBRARY_PATH;
+    #warn 'Bare env var: ' . ($ENV{LD_LIBRARY_PATH} // '');
+    #warn 'DYLD Path is: ' . join ' ', grep {defined} @DYLD_LIBRARY_PATH;
+    #warn 'Bare env var: ' . ($ENV{DYLD_LIBRARY_PATH} // '');
+
     my (@libs) = $self->SUPER::dynamic_libs;
 
     foreach my $alien (@have_aliens) {

@@ -17,11 +17,14 @@ name: Syntax-Keyword-Try
 provides:
   Syntax::Keyword::Try:
     file: lib/Syntax/Keyword/Try.pm
-    version: '0.23'
+    version: '0.24'
+  Syntax::Keyword::Try::Deparse:
+    file: lib/Syntax/Keyword/Try/Deparse.pm
+    version: '0.24'
 requires:
   perl: '5.014'
 resources:
   IRC: irc://irc.perl.org/#io-async
   license: http://dev.perl.org/licenses/
-version: '0.23'
+version: '0.24'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,7 +1,7 @@
 package PICA::Writer::XML;
 use v5.14.1;
 
-our $VERSION = '1.18';
+our $VERSION = '1.19';
 
 use Scalar::Util qw(reftype);
 use XML::Writer;
@@ -35,7 +35,7 @@ sub write_record {
     foreach my $field (@$record) {
         my $id = $field->[0];
         my @attr = (tag => $field->[0]);
-        if (defined $field->[1] && $field->[1] ne '') {
+        if ($field->[1] > 0) {
             push @attr, occurrence => $field->[1];
             $id = "$id/" . $field->[1];
         }

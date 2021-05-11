@@ -111,6 +111,9 @@ note 'error handling';
     dies_ok {pica_parser(plain => bless({}, 'MyFooBar'))} 'invalid handle';
 }
 
+is pica_parser(plain => \'012A/00 $xy', bless => 1)->next->string, 
+  "012A \$xy\n\n", 'occurrence zero';
+
 note '3-digit occurrence';
 {
     my $data   = '00045     003@ 012345231@/102 d10j19660d11j1970';

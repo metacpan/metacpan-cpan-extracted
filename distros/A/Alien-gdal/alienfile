@@ -24,15 +24,19 @@ my @aliens_l_and_I = qw(
 foreach my $alien (@aliens_l_and_I) {
   eval "require $alien";
   if ($alien->install_type eq 'share') {
+    log "Prepending $alien bin dir to path";
     unshift @PATH, $alien->bin_dir;
   }
 }
 my $have_spatialite = eval 'require
   Alien::spatialite';
-if ($have_spatialite) {
-    $have_spatialite = 'Alien' . '::' . 'spatialite';  #  hide from scanners
-    unshift @PATH, $have_spatialite->bin_dir;
-    push @aliens_l_and_I, $have_spatialite;
+if ($have_spatialite && Alien::spatialite->version ge 5) {
+  log "Prepending Alien::spatialite bin dir to path";
+  unshift @PATH, $have_spatialite->bin_dir;
+  push @aliens_l_and_I, $have_spatialite;
+}
+else {
+  $have_spatialite = undef;
 }
 
 
@@ -212,6 +216,7 @@ share {
       #'--without-pg',
       '--without-ogdi',
       '--with-mongocxxv3=no',
+      $^O eq 'MSWin32' ? '--without-hdf5' : (),  #  issues with strawberry perl hdf5 dlls
     );
     my @ld_flags;
     #  system installs won't necessarily have dist dirs
@@ -232,6 +237,29 @@ share {
       push @ld_flags, 'LDFLAGS=' . Alien::sqlite->libs;
       #'-L/home/libraries/intel/sqlite/lib -lsqlite3'
     }
+    if (Alien::geos::af->install_type eq 'share') {
+      push @with_args,
+          '--with-geos='
+        . Alien::geos::af->bin_dir
+        . '/geos-config'; 
+    }
+    #  an attempt to get hdf5 support under strawberry,
+    #  but which did not work so now it is turned off
+    #if ($^O eq 'MSWin32' && !$ENV{HDF5_LIBS}) {
+    #  my $c_dir = path ($^X)->parent->parent->parent->child('c');
+    #  if ($c_dir->exists) {
+    #    #$ENV{HDF5_LIBS} = "-L$c_dir/lib -lhdf5";
+    #    #warn 'adding HDF5_LIBS var: ' . $ENV{HDF5_LIBS};
+    #    push @with_args, '--without-hdf5';
+    #    #push @ld_flags, "-L$c_dir/lib -lhdf5";
+    #  }
+    #}
+    if ($^O eq 'MSWin32') {
+      unshift @with_args, '--with-hide-internal-symbols=yes';
+      push @with_args, '--without-gnm';
+      #  should add an env flag for this
+      push @with_args, '--with-curl=no';
+    }    
     
     
     my $config_args = $ENV{ALIEN_GDAL_CONFIG_ARGS} // '';
@@ -245,23 +273,16 @@ share {
     meta->around_hook( build => \&remove_gitfw_from_path );
     plugin 'PkgConfig::PPWrapper';
 
-    #  debug
-    if ($ENV{CI} && Alien::proj->install_type eq 'share') {
-      my $dir = path(Alien::proj->dist_dir);
-      my @files = File::Find::Rule
-        ->file()
-        ->name( '*' )
-        #->recursive
-        ->in( "$dir" );;
-      say 'PROJ INCLUDE FILES: ' . join ' ', @files;
-      say 'PROJ CFLAGS: ' . Alien::proj->cflags;
-    }
+    #meta->before_hook( build => \&cleanup_ldflags );
     
+    my $drivers_to_disable = join ' ', get_drivers_to_disable();
+    ## --with-curl=no
     #  not sure this is needed, or if it is to deal with a cirrus quirk 
     #local $ENV{LDFLAGS} = join ' ', @ld_flags;
     build [
       #\&update_pkg_conf_path,
-      "%{configure} $config_args $build_static",
+      \&cleanup_ldflags,
+      "%{configure} $config_args $drivers_to_disable $build_static",
       \&pause,
       $make_cmd,
       \&patch_pkgconfig,
@@ -269,6 +290,21 @@ share {
     ];
   }
 };
+
+#  we can get dangling -L values
+#  bandaid until we find the source
+sub cleanup_ldflags {
+    my ($build, @args) = @_;
+
+    if ($ENV{LDFLAGS} =~ /\s*-L\s*$/) {
+        $build->log("Trimming trailing -L from $ENV{LDFLAGS}");
+        $ENV{LDFLAGS} =~ s/\s*-L\s*$//;
+    }
+
+    #$orig->($build, @args);
+    return;
+}
+
 
 sub update_makefile {
     return;  #  should not be needed now
@@ -451,4 +487,31 @@ sub get_alien_state_hash {
         $h = JSON::PP::decode_json($d);
     }
     return $h;
+}
+
+
+sub get_drivers_to_disable {
+  my @drivers = qw /
+    e00grid
+    jdem
+    xpm
+    grib
+    zmap
+    
+    aeronavfaa
+    arcgen
+    bna
+    couchdb
+    geomedia
+    gtm
+    htf
+    openair
+    cloudant
+    rec
+    sdts
+    sua
+    walk
+  /;
+  my @args = map {"--disable-driver-$_"} @drivers;
+  return wantarray ? @args : \@args;
 }

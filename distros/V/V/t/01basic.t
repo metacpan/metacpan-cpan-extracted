@@ -1,18 +1,15 @@
-#!/usr/bin/perl -w
-use strict;
-
-# $Id: 01basic.t 575 2004-01-16 13:09:03Z abeltje $
-
-use Test::More tests => 3;
+#! perl -I.
+use t::Test::abeltje;
 
 require_ok( 'V' );
 
 ok( $V::VERSION, '$V::VERSION is there' );
 
 SKIP: {
+    local $ENV{PERL5OPT} = -d 'blib' ? '-Mblib' : '-Mlib=lib';
     local *PIPE;
     my $out;
-    if ( open PIPE, qq!$^X -Mblib -MV |! ) {
+    if ( open PIPE, qq!$^X -MV |! ) {
         $out = do { local $/; <PIPE> };
         unless ( close PIPE ) {
             if ( open PIPE, qq!$^X -I. -e 'use V;' |! ) {
@@ -32,4 +29,4 @@ SKIP: {
     is( $version, $V::VERSION, "Version ok ($version)" );
 }
 
-__END__
+abeltje_done_testing();

@@ -25,7 +25,7 @@ INSTALLATION
 
       perl Makefile.pl
       make manifest
-      male install
+      make install
 
     To generate tarball, execute "make dist" command. This command will also
     generate README file and update README.pod file.

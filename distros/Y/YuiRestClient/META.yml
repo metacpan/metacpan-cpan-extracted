@@ -27,5 +27,5 @@ requires:
   warnings: '0'
 resources:
   repository: https://github.com/qe-yast/perl-yui-rest-client.git
-version: '0.4'
+version: '0.5'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -29,6 +29,13 @@ DESCRIPTION
     implement parser plugins and manipulate optrees to provide new syntax
     and behaviours for perl code.
 
+    Syntax similar to this module has now been added to core perl, starting
+    at development version 5.33.7, and is expected to become generally
+    available when perl 5.34 is released. If you are writing new code, it
+    is suggested that you instead use the Feature::Compat::Try module
+    instead, as that will enable the core feature on those supported perl
+    versions, falling back to Syntax::Keyword::Try on older perls.
+
 Experimental Features
 
     Some of the features of this module are currently marked as
@@ -43,7 +50,7 @@ Experimental Features
 
        use Syntax::Keyword::Try qw( try :experimental(typed) );
     
-       use Syntax::Keyword::Try qw( try :experimental(try_value) );
+       use Syntax::Keyword::Try qw( try :experimental(try_value) ); # deprecated
     
        use Syntax::Keyword::Try qw( try :experimental );  # all of the above
 
@@ -205,14 +212,23 @@ KEYWORDS
     warning and discarded, leaving $@ containing the original exception, if
     one existed.
 
+    Note that the finally syntax is not available when using this module
+    via Feature::Compat::Try, as it is not expected that syntax will be
+    added to the core perl 'try' feature. This is because a more
+    general-purpose ability may be added instead, under the name 'defer'.
+    If you wish to write code that may more easily be forward-compatible
+    with that feature instead, you should consider using
+    Syntax::Keyword::Defer rather than using finally statements.
+
 VALUE SEMANTICS
 
-      Warning: the feature described in this section is experimental. This
-      experiment has existed for a while, though given that since version
-      0.22 the regular try syntax already behaves fine inside a do block,
-      there is no longer any reason for this experimental feature to exist.
-      It will start printing deprecation warnings in a later version, and
-      eventually will be removed.
+      Warning: the feature described in this section was experimental and
+      is now deprecated. This experiment has existed for a while, though
+      given that since version 0.22 the regular try syntax already behaves
+      fine inside a do block, there is no longer any reason for this
+      experimental feature to exist. It will print a deprecation warning,
+      and eventually will be removed in a later version. You should use do
+      { try ... } instead.
 
       Additionally, on perl versions 5.18 and later, it will produce a
       warning in the experimental category.

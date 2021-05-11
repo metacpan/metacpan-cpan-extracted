@@ -3,12 +3,11 @@ use strict;
 use warnings;
 
 use Data::Dumper::Compact 'ddc';
-use lib map { "$ENV{HOME}/sandbox/$_/lib" } qw(MIDI-Util);
-use MIDI::Util;
+use MIDI::Util qw(setup_score midi_format);
 use Music::Chord::Progression;
 use Music::Scales qw(get_scale_notes);
 
-my $score = MIDI::Util::setup_score();
+my $score = setup_score();
 
 my @pitches = get_scale_notes('C', 'pentatonic');
 my @notes = map { $pitches[int rand @pitches] } 1 .. 4;
@@ -21,8 +20,8 @@ for my $note (@notes) {
     my $chords = $prog->generate;
 
     for my $chord (@$chords) {
-        $chord = [ MIDI::Util::midi_format(@$chord) ];
-        $score->n('wn', @$chord);
+        my @chord = midi_format(@$chord);
+        $score->n('wn', @chord);
     }
     print $note, ': ', ddc($chords);
 }

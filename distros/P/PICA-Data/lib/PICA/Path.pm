@@ -2,7 +2,7 @@ package PICA::Path;
 use v5.14.1;
 use utf8;
 
-our $VERSION = '1.18';
+our $VERSION = '1.19';
 
 use Carp qw(confess);
 use Scalar::Util qw(reftype);
@@ -14,13 +14,13 @@ sub new {
 
     confess "invalid pica path" if $path !~ /
         ([012.][0-9.][0-9.][A-Z@.]) # tag
-        (\[([0-9.]{2,3})\])?        # occurence
+        (\[([0-9.]{2,3})\])?        # occurrence
         (\$?([_A-Za-z0-9]+))?       # subfields
         (\/(\d+)?(-(\d+)?)?)?       # position
     /x;
 
     my $field      = $1;
-    my $occurrence = $3;
+    my $occurrence = $3 !~ /^0+$/ ? $3 : undef;
     my $subfield   = defined $5 ? "[$5]" : "[_A-Za-z0-9]";
 
     my @position;
@@ -132,8 +132,7 @@ sub match_field {
     my ($self, $field) = @_;
 
     if ($field->[0] =~ $self->[0]
-        && (!$self->[1] || (defined $field->[1] && $field->[1] =~ $self->[1]))
-        )
+        && (!$self->[1] || ($field->[1] > 0 && $field->[1] =~ $self->[1])))
     {
         return $field;
     }

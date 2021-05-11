@@ -3,7 +3,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Create network transition chord progressions
 
-our $VERSION = '0.0502';
+our $VERSION = '0.0503';
 
 use Carp qw(croak);
 use Data::Dumper::Compact qw(ddc);
@@ -17,14 +17,14 @@ use namespace::clean;
 
 has max => (
     is      => 'ro',
-    isa     => sub { die "$_[0] is not a valid integer" unless $_[0] =~ /^\d+$/ },
+    isa     => sub { croak "$_[0] is not a valid integer" unless $_[0] =~ /^\d+$/ },
     default => sub { 8 },
 );
 
 
 has net => (
     is      => 'ro',
-    isa     => sub { die "$_[0] is not a hashref" unless ref $_[0] eq 'HASH' },
+    isa     => sub { croak "$_[0] is not a hashref" unless ref $_[0] eq 'HASH' },
     default => sub {
       { 1 => [qw( 1 2 3 4 5 6 )],
         2 => [qw( 3 4 5 )],
@@ -39,21 +39,21 @@ has net => (
 
 has chord_map => (
     is      => 'ro',
-    isa     => sub { die "$_[0] is not a arrayref" unless ref $_[0] eq 'ARRAY' },
+    isa     => sub { croak "$_[0] is not a arrayref" unless ref $_[0] eq 'ARRAY' },
     default => sub { ['', 'm', 'm', '', '', 'm', 'dim'] },
 );
 
 
 has scale_name => (
     is      => 'ro',
-    isa     => sub { die "$_[0] is not a valid string" if ref $_[0] },
+    isa     => sub { croak "$_[0] is not a valid string" if ref $_[0] },
     default => sub { 'major' },
 );
 
 
 has scale_note => (
     is      => 'ro',
-    isa     => sub { die "$_[0] is not a valid note" unless $_[0] =~ /^[A-G][#b]?$/ },
+    isa     => sub { croak "$_[0] is not a valid note" unless $_[0] =~ /^[A-G][#b]?$/ },
     default => sub { 'C' },
 );
 
@@ -73,42 +73,42 @@ sub _build_scale {
 
 has octave => (
     is      => 'ro',
-    isa     => sub { die "$_[0] is not a valid octave" unless $_[0] =~ /^-?\d+$/ },
+    isa     => sub { croak "$_[0] is not a valid octave" unless $_[0] =~ /^-?\d+$/ },
     default => sub { 4 },
 );
 
 
 has tonic => (
     is      => 'ro',
-    isa     => sub { die "$_[0] is not a valid setting" unless $_[0] =~ /^-?[01]$/ },
+    isa     => sub { croak "$_[0] is not a valid setting" unless $_[0] =~ /^-?[01]$/ },
     default => sub { 1 },
 );
 
 
 has resolve => (
     is      => 'ro',
-    isa     => sub { die "$_[0] is not a valid setting" unless $_[0] =~ /^-?[01]$/ },
+    isa     => sub { croak "$_[0] is not a valid setting" unless $_[0] =~ /^-?[01]$/ },
     default => sub { 1 },
 );
 
 
 has substitute => (
     is      => 'ro',
-    isa     => sub { die "$_[0] is not a valid boolean" unless $_[0] =~ /^[01]$/ },
+    isa     => sub { croak "$_[0] is not a valid boolean" unless $_[0] =~ /^[01]$/ },
     default => sub { 0 },
 );
 
 
 has sub_cond => (
     is      => 'ro',
-    isa     => sub { die "$_[0] is not a valid coderef" unless ref($_[0]) eq 'CODE' },
+    isa     => sub { croak "$_[0] is not a valid coderef" unless ref($_[0]) eq 'CODE' },
     default => sub { return sub { int rand 4 == 0 } },
 );
 
 
 has flat => (
     is      => 'ro',
-    isa     => sub { die "$_[0] is not a valid boolean" unless $_[0] =~ /^[01]$/ },
+    isa     => sub { croak "$_[0] is not a valid boolean" unless $_[0] =~ /^[01]$/ },
     default => sub { 0 },
 );
 
@@ -132,7 +132,7 @@ sub _build_graph {
 
 has verbose => (
     is      => 'ro',
-    isa     => sub { die "$_[0] is not a valid boolean" unless $_[0] =~ /^[01]$/ },
+    isa     => sub { croak "$_[0] is not a valid boolean" unless $_[0] =~ /^[01]$/ },
     default => sub { 0 },
 );
 
@@ -318,7 +318,7 @@ Music::Chord::Progression - Create network transition chord progressions
 
 =head1 VERSION
 
-version 0.0502
+version 0.0503
 
 =head1 SYNOPSIS
 
@@ -328,7 +328,7 @@ version 0.0502
 
   my $chords = $prog->generate;
 
-  my $chord = $prog->substitution('m'); # m7 or mM7
+  my $chord = $prog->substitution('m'); # returns m7 or mM7
 
 =head1 DESCRIPTION
 
@@ -492,7 +492,7 @@ Default: C<Graph::Directed>
 
 =head2 verbose
 
-Show the B<generate> and B<substitute> progress.
+Show the B<generate> and B<substitution> progress.
 
 =head1 METHODS
 

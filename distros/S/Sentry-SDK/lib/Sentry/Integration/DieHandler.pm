@@ -1,5 +1,5 @@
 package Sentry::Integration::DieHandler;
-use Mojo::Base -base, -signatures;
+use Mojo::Base 'Sentry::Integration::Base', -signatures;
 
 use Mojo::Exception;
 

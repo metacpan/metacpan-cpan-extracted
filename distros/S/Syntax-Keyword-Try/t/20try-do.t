@@ -10,6 +10,8 @@ use constant HAVE_WARN_EXPERIMENTAL => $] >= 5.018;
 no if HAVE_WARN_EXPERIMENTAL, warnings => 'experimental';
 use Syntax::Keyword::Try qw( try try_value );
 
+no warnings 'deprecated';
+
 # try do { } yields result
 {
    is( try do { "result" } catch ($e) {},
@@ -56,10 +58,12 @@ SKIP: {
       'Plain do { ... } unaffected' );
 }
 
-# try do syntax produces experimental warnings
+# try do syntax produces experimental and deprecated warnings
 SKIP: {
    use if HAVE_WARN_EXPERIMENTAL, warnings => 'experimental';
    skip "No 'experimental' warnings category", 1 unless HAVE_WARN_EXPERIMENTAL;
+
+   use warnings 'deprecated';
 
    my $warnings = "";
    local $SIG{__WARN__} = sub { $warnings .= join "", @_ };
@@ -68,9 +72,13 @@ SKIP: {
 
    like( $warnings, qr/^'try do' syntax is experimental/,
       'try do syntax produces experimental warnings' );
+   like( $warnings, qr/^'try do' syntax is deprecated /m,
+      'try do syntax produces deprecated warnings' );
 
    # warning can be disabled
    use Syntax::Keyword::Try qw( :experimental(try_value) );
+   no warnings 'deprecated';
+
    $warnings = "";
 
    eval "try do { 3 } catch (\$e) { 4 }" or die $@;

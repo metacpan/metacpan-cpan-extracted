@@ -1,7 +1,7 @@
 package PICA::Parser::XML;
 use v5.14.1;
 
-our $VERSION = '1.18';
+our $VERSION = '1.19';
 
 use Carp qw(croak);
 use Scalar::Util qw(reftype);
@@ -67,8 +67,8 @@ sub _next_record {
         my $tag = $field_node->getAttribute('tag')
             // $field_node->getAttributeNS($namespaceURI, 'tag');
         my $occurrence = $field_node->getAttribute('occurrence')
-            // $field_node->getAttributeNS($namespaceURI, 'occurrence') // '';
-        push(@fields, ($tag, $occurrence));
+            // $field_node->getAttributeNS($namespaceURI, 'occurrence');
+        push(@fields, ($tag, $occurrence > 0 ? $occurrence : ''));
 
         # get all subfield nodes
         foreach my $subfield_node (

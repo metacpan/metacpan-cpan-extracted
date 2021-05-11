@@ -2,7 +2,7 @@ use strict;
 use warnings;
 use 5.020;
 
-package Dist::Zilla::Plugin::InsertExample 0.12 {
+package Dist::Zilla::Plugin::InsertExample 0.14 {
 
   use Moose;
   use Encode qw( encode );
@@ -87,7 +87,7 @@ Dist::Zilla::Plugin::InsertExample - Insert example into your POD from a file
 
 =head1 VERSION
 
-version 0.12
+version 0.14
 
 =head1 SYNOPSIS
 

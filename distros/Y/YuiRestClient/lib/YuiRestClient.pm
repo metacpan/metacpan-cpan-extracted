@@ -9,7 +9,7 @@
 
 # Maintainer: QE YaST <qa-sle-yast@suse.de>
 
-package YuiRestClient 0.4;
+package YuiRestClient 0.5;
 use strict;
 use warnings;
 
@@ -50,7 +50,7 @@ To manually install the package run following commands:
 
   perl Makefile.pl
   make manifest
-  male install
+  make install
 
 To generate tarball, execute C<make dist> command. This command will also
 generate README file and update README.pod file.

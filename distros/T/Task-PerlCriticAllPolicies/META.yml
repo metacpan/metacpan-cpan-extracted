@@ -6,7 +6,7 @@ build_requires: {}
 configure_requires:
   Module::Build::Tiny: '0.034'
 dynamic_config: 0
-generated_by: 'App::ModuleBuildTiny version 0.028, CPAN::Meta::Converter version 2.150010'
+generated_by: 'App::ModuleBuildTiny version 0.029, CPAN::Meta::Converter version 2.150010'
 license: mit
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -15,7 +15,7 @@ name: Task-PerlCriticAllPolicies
 provides:
   Task::PerlCriticAllPolicies:
     file: lib/Task/PerlCriticAllPolicies.pm
-    version: '0.01'
+    version: '0.02'
 requires:
   Perl::Critic: '0'
   Perl::Critic::Bangs: '0'
@@ -32,7 +32,6 @@ requires:
   Perl::Critic::Moose: '0'
   Perl::Critic::More: '0'
   Perl::Critic::Nits: '0'
-  Perl::Critic::OTRS: '0'
   Perl::Critic::PetPeeves::JTRAMMELL: '0'
   Perl::Critic::Plicease: '0'
   Perl::Critic::Policy::BadStrings: '0'
@@ -50,6 +49,7 @@ requires:
   Perl::Critic::Policy::Modules::ProhibitUseLib: '0'
   Perl::Critic::Policy::Moo::ProhibitMakeImmutable: '0'
   Perl::Critic::Policy::Perlsecret: '0'
+  Perl::Critic::Policy::ProhibitImplicitImport: '0'
   Perl::Critic::Policy::ProhibitOrReturn: '0'
   Perl::Critic::Policy::ProhibitSmartmatch: '0'
   Perl::Critic::Policy::References::ProhibitComplexDoubleSigils: '0'
@@ -84,7 +84,7 @@ requires:
 resources:
   bugtracker: https://github.com/gugod/Task-PerlCriticAllPolicies/issues
   repository: https://github.com/gugod/Task-PerlCriticAllPolicies.git
-version: '0.01'
+version: '0.02'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_spdx_expression: MIT
 x_static_install: '1'

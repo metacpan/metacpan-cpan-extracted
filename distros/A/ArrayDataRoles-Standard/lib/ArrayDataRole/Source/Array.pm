@@ -1,9 +1,9 @@
 package ArrayDataRole::Source::Array;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-04-25'; # DATE
+our $DATE = '2021-05-03'; # DATE
 our $DIST = 'ArrayDataRoles-Standard'; # DIST
-our $VERSION = '0.004'; # VERSION
+our $VERSION = '0.005'; # VERSION
 
 use 5.010001;
 use Role::Tiny;
@@ -45,6 +45,30 @@ sub get_iterator_pos {
     $self->{pos};
 }
 
+sub get_item_count {
+    my $self = shift;
+    scalar @{ $self->{array} };
+}
+
+sub get_item_at_pos {
+    my ($self, $pos) = @_;
+    if ($pos < 0) {
+        die "Out of range" unless -$pos <= @{ $self->{array} };
+    } else {
+        die "Out of range" unless $pos < @{ $self->{array} };
+    }
+    $self->{array}->[ $pos ];
+}
+
+sub has_item_at_pos {
+    my ($self, $pos) = @_;
+    if ($pos < 0) {
+        return -$pos <= @{ $self->{array} } ? 1:0;
+    } else {
+        return $pos < @{ $self->{array} } ? 1:0;
+    }
+}
+
 1;
 # ABSTRACT: Get array data from a Perl array
 
@@ -60,7 +84,7 @@ ArrayDataRole::Source::Array - Get array data from a Perl array
 
 =head1 VERSION
 
-This document describes version 0.004 of ArrayDataRole::Source::Array (from Perl distribution ArrayDataRoles-Standard), released on 2021-04-25.
+This document describes version 0.005 of ArrayDataRole::Source::Array (from Perl distribution ArrayDataRoles-Standard), released on 2021-05-03.
 
 =head1 SYNOPSIS
 
@@ -86,7 +110,7 @@ Source repository is at L<https://github.com/perlancar/perl-ArrayDataRoles-Stand
 
 =head1 BUGS
 
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=ArrayDataRoles-Standard>
+Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-ArrayDataRoles-Standard/issues>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired

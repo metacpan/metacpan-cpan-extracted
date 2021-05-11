@@ -14,6 +14,8 @@ use constant HAVE_WARN_EXPERIMENTAL => $] >= 5.018;
 no if HAVE_WARN_EXPERIMENTAL, warnings => 'experimental';
 use Syntax::Keyword::Try qw( try try_value );
 
+no warnings 'deprecated';
+
 # try do { } finally { }
 {
    my $x;

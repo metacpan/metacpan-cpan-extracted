@@ -1,0 +1,52 @@
+{
+   "abstract" : "Print version of the specified module(s).",
+   "author" : [
+      "Abe Timmerman <abeltje@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.143240",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "V",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::Fatal" : "0",
+            "Test::More" : "0",
+            "Test::Warnings" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "perl" : "5.010001",
+            "version" : "0.77"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "https://github.com/abeltje/V",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/abeltje/V.git"
+      }
+   },
+   "version" : "0.14",
+   "x_IRC" : "irc://irc.perl.org/#amsterdam.pm"
+}

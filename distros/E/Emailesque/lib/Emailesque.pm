@@ -14,7 +14,7 @@ our @EXPORT_OK = qw(email);
 
 use Moo;
 
-our $VERSION = '1.26'; # VERSION
+our $VERSION = '1.27'; # VERSION
 
 my %headers = map {
     my $name = lc $_;
@@ -942,7 +942,6 @@ $DB::single=1;
         Disposition-Notification-To
         Errors-To
         Followup-To
-        In-Reply-To
         Mail-Copies-To
         Posted-To
         Read-Receipt-To
@@ -1089,7 +1088,7 @@ Emailesque - Lightweight To-The-Point Email
 
 =head1 VERSION
 
-version 1.26
+version 1.27
 
 =head1 SYNOPSIS
 
@@ -2484,7 +2483,7 @@ Al Newkirk <anewkirk@ana.io>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Andrew Beverley Eric Johnson Stefan Hornburg
+=for stopwords Andrew Beverley Eric Johnson Martin H. Sluka Stefan Hornburg
 
 =over 4
 
@@ -2498,7 +2497,15 @@ Eric Johnson <eric.git@iijo.org>
 
 =item *
 
+Martin H. Sluka <martin@sluka.de>
+
+=item *
+
 Stefan Hornburg <racke@linuxia.de>
+
+=item *
+
+Martin Sluka <perl@sluka.de>
 
 =back
 

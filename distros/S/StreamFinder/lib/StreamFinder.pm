@@ -130,7 +130,8 @@ The currently-supported websites are:  podcasts.apple.com (L<StreamFinder::Apple
 bitchute.com (L<StreamFinder::Bitchute>, blogger.com (L<StreamFinder::Blogger>), 
 brighteon.com (L<StreamFinder::Brighteon>), castbox.fm (L<StreamFinder::Castbox>), 
 podcasts.google.com (L<StreamFinder::Google>), 
-iheartradio.com (L<StreamFinder::IHeartRadio>), radio.net (L<StreamFinder::RadioNet>), 
+iheartradio.com (L<StreamFinder::IHeartRadio>), 
+radio.net (L<StreamFinder::RadioNet>), 
 reciva.com (L<StreamFinder::Reciva>), rumble.com (L<StreamFinder::Rumble>),
 sermonaudio.com (L<StreamFinder::SermonAudio>), 
 spreaker.com podcasts (L<StreamFinder::Spreaker>), 
@@ -217,7 +218,7 @@ specific submodules which are currently installed.  For example, to
 NOT handle Youtube videos nor use the fallback "Anystream" module, 
 specify:  I<-omit> => I<"Youtube,Anystream">, which will cause 
 StreamFinder::Anystream and StreamFinder::Youtube to not be used 
-for the stream search.  Default is to all installed modules will be 
+for the stream search.  Default is for all installed summodules to be 
 considered.
 
 Another global option (applicable to all submodules) is the I<-secure> 
@@ -227,11 +228,10 @@ possible that some sites may only contain insecure ("http://") streams,
 which won't return any streams if this option is specified.  Therefore, 
 it may be necessary, if setting this option globally, to set it to 
 zero in the config. files for those specific modules, if you determine 
-that to be the case (I have not tested all sites for that).
+that to be the case (I have not tested all sites for that).  Default: 
+I<-secure> is 0 (false) - return all streams (http and https).
 
-DEFAULT I<-secure> is 0 (false) - return all streams (http and https).
-
-Any other options (including I<-debug> will be passed to the submodule 
+Any other options (including I<-debug>) will be passed to the submodule 
 (if any) that handles the URL you pass in, but note, submodules accept 
 different options and ignore ones they do not recognize.  Valid values 
 for some options can also vary across different submodules.  A better 
@@ -328,9 +328,11 @@ depending on the sight that matched the URL).
 Optional text file for specifying various configuration options.  
 Each option is specified on a separate line in the formats below:
 
-'option' => 'value' [,]
-'option' => ['value1', 'value2', ...]
-'option' => {'key1' => 'value1', 'key2' => 'value2', ...}
+'option' => 'value' [, ...]
+
+'option' => ['value1', 'value2', ...] [, ...]
+
+'option' => {'key1' => 'value1', 'key2' => 'value2', ...} [, ...]
 
 and the options are loaded into a hash used by all sites 
 (submodules) that support them.  Valid options include 
@@ -344,9 +346,11 @@ for a specific site (submodule, ie. "Youtube" for
 StreamFinder::Youtube).  Each option is specified on a separate 
 line in the formats below:
 
-'option' => 'value' [,]
-'option' => ['value1', 'value2', ...]
-'option' => {'key1' => 'value1', 'key2' => 'value2', ...}
+'option' => 'value' [, ...]
+
+'option' => ['value1', 'value2', ...] [, ...]
+
+'option' => {'key1' => 'value1', 'key2' => 'value2', ...} [, ...]
 
 and the options are loaded into a hash used only by the specific 
 (submodule) specified.  Valid options include 
@@ -454,7 +458,7 @@ use strict;
 use warnings;
 use vars qw(@ISA @EXPORT $VERSION);
 
-our $VERSION = '1.46';
+our $VERSION = '1.47';
 our $DEBUG = 0;
 
 require Exporter;

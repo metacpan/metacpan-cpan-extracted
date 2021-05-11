@@ -1,7 +1,7 @@
 package Task::PerlCriticAllPolicies;
 use strict;
 use warnings;
-our $VERSION = "0.01";
+our $VERSION = "0.02";
 1;
 __END__
 
@@ -31,7 +31,7 @@ Kang-min Liu <gugod@gugod.org>
 
 =head1 COPYRIGHT
 
-Copyright (c) 2021- Kang-min Liu C<< <gugod@gugod.org> >>.
+Copyright (c) 2021 Kang-min Liu C<< <gugod@gugod.org> >>.
 
 =head1 LICENCE
 

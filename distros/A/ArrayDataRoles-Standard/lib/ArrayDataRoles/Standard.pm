@@ -1,9 +1,9 @@
 package ArrayDataRoles::Standard;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-04-25'; # DATE
+our $DATE = '2021-05-03'; # DATE
 our $DIST = 'ArrayDataRoles-Standard'; # DIST
-our $VERSION = '0.004'; # VERSION
+our $VERSION = '0.005'; # VERSION
 
 1;
 # ABSTRACT: Standard set of roles for ArrayData
@@ -20,7 +20,7 @@ ArrayDataRoles::Standard - Standard set of roles for ArrayData
 
 =head1 VERSION
 
-This document describes version 0.004 of ArrayDataRoles::Standard (from Perl distribution ArrayDataRoles-Standard), released on 2021-04-25.
+This document describes version 0.005 of ArrayDataRoles::Standard (from Perl distribution ArrayDataRoles-Standard), released on 2021-05-03.
 
 =head1 HOMEPAGE
 
@@ -32,7 +32,7 @@ Source repository is at L<https://github.com/perlancar/perl-ArrayDataRoles-Stand
 
 =head1 BUGS
 
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=ArrayDataRoles-Standard>
+Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-ArrayDataRoles-Standard/issues>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired

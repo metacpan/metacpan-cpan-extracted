@@ -2,7 +2,7 @@ package PICA::Parser::Plain;
 use v5.14.1;
 use utf8;
 
-our $VERSION = '1.18';
+our $VERSION = '1.19';
 
 use charnames ':full';
 use Carp qw(carp croak);
@@ -27,7 +27,7 @@ sub _next_record {
     my @record;
 
     for my $field (@fields) {
-        my ($annotation, $tag, $occurence, $data);
+        my ($annotation, $tag, $occ, $data);
 
         unless (defined $self->{annotated} && !$self->{annotated}) {
             if ($field =~ s/^([^a-z0-9]) (.+)/\2/) {
@@ -39,9 +39,9 @@ sub _next_record {
         }
 
         if ($field =~ m/^(\d{3}[A-Z@])(\/(\d{2,3}))?\s(.+)/) {
-            $tag       = $1;
-            $occurence = $3 // '';
-            $data      = $4;
+            $tag  = $1;
+            $occ  = $3;
+            $data = $4;
         }
         else {
             if ($self->{strict}) {
@@ -88,7 +88,7 @@ sub _next_record {
 
         push @subfields, $annotation if defined $annotation;
 
-        push @record, [$tag, $occurence, @subfields];
+        push @record, [$tag, $occ > 0 ? $occ : '', @subfields];
     }
     return \@record;
 }

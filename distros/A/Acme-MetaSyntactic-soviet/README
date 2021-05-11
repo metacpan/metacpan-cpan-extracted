@@ -1,16 +1,18 @@
 Acme-MetaSyntactic-soviet
 
-This module is a theme for Acme::MetaSyntactic, giving the NATO 
+This module is a theme for Acme::MetaSyntactic, giving the NATO
 codenames for various Soviet equipments.
 
 INSTALLATION
 
-To install this module, run the following commands:
+To install this module, use the CPAN shell or cpanminus.
 
-	perl Makefile.PL
-	make
-	make test
-	make install
+Or you can use the manual way by running the following commands:
+
+        perl Makefile.PL
+        make
+        make test
+        make install
 
 There is also a Build.PL file, but since Module::Build is no longer recommended,
 this installation procedure has not been tested for this version.
@@ -24,25 +26,39 @@ perldoc command.
 
 You can also look for information at:
 
-    Search CPAN
-        http://search.cpan.org/dist/Acme-MetaSyntactic-soviet
-
     meta::CPAN
         https://metacpan.org/pod/Acme::MetaSyntactic::soviet
 
-    RT, CPAN's request tracker
-        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Acme-MetaSyntactic-soviet
+Please report problems with Github's issues tracker:
+        https://github.com/jforget/Acme-MetaSyntactic-soviet/issues
 
-    AnnoCPAN, Annotated CPAN documentation
-        http://annocpan.org/dist/Acme-MetaSyntactic-soviet
+WHY THIS THEME ABOUT SOVIET STUFF?
 
-    CPAN Ratings
-        http://cpanratings.perl.org/d/Acme-MetaSyntactic-soviet
+First, because Acme::MetaSyntactic is fun.
 
+Second: As a wargamer interested (among  other eras) in the air combat
+and the  naval combat in  the second half of  the XXth century,  be it
+hypothetical wars or historical wars, I have no problems to find lists
+of Soviet  aircraft with their  NATO designations and  Soviet missiles
+with  their   NATO  designations.  On   the  other  hand,   finding  a
+comprehensive list of radars or sonars is difficult. When I discovered
+Internet and the web, I had hope  finding a website that would give me
+the list I did not find in printed books. No luck.
+
+So, I  would have to  build myself a webpage  with the list  of soviet
+radars.  When I  saw how  search.cpan.org  would render  POD files,  I
+decided to format the  list as a POD file and to  have it displayed by
+search.cpan.org. How would I do that? By writing a Perl module.
+
+Since  then,  search.cpan.org  has   disappeared  from  the  web,  but
+metacpan.org does a  POD rendering as good  as search.cpan.org. That's
+OK for me. So I know there is a webpage listing all soviet radars with
+their  NATO designation,  this webpage  is the  POD documentation  for
+Acme::MetaSyntactic::soviet.
 
 COPYRIGHT AND LICENCE
 
-Copyright (C) 2008, 2012, 2016 Jean Forget
+Copyright (C) 2008, 2012, 2016, 2021 Jean Forget
 
 This program is free software; you can redistribute it and you can modify it
 under the same terms as Perl itself.

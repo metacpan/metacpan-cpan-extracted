@@ -7,22 +7,16 @@ use Mojo::Util 'dumper';
 use Sentry::SDK;
 use Sys::Hostname 'hostname';
 
-my $_initialized;
-
 CGI::Application->add_callback(
   init => sub ($c, @args) {
-    if ($_initialized) {
-      return;
-    }
-
     my $options = $c->param('sentry_options');
     Sentry::SDK->init($options);
+
+    Sentry::Hub->get_current_hub()->reset();
 
     Sentry::SDK->configure_scope(sub ($scope) {
       $scope->set_tags({ runtime => "Perl $]", server_name => hostname });
     });
-
-    $_initialized = 1;
   }
 );
 

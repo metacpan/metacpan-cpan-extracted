@@ -29,4 +29,11 @@ $t->reset_iterator;
 is_deeply($t->get_next_item, 'one');
 is($t->get_item_count, 3);
 
+ok($t->has_item_at_pos(0));
+is_deeply($t->get_item_at_pos(0), 'one');
+ok($t->has_item_at_pos(2));
+is_deeply($t->get_item_at_pos(2), 'three');
+ok(!$t->has_item_at_pos(3));
+dies_ok { $t->get_item_at_pos(3) };
+
 done_testing;

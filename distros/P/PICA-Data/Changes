@@ -1,5 +1,9 @@
 Revision history for PICA::Data
 
+1.19 2021-05-10T13:22:39Z
+    - picadata: get schema via URL (#77)
+    - Treat occurrence zero equal to none (#88)
+
 1.18 2021-04-30T10:54:49Z
     - Support parsing field annotations (#86)
 

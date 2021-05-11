@@ -2,6 +2,14 @@
 
 Revision history for Acme-MetaSyntactic-soviet
 
+0.06    2021-05-10, the Fresco version
+        Sixth version, released on the 49th anniversary of the dogfight between a Fresco piloted by
+        ace Colonel Tomb and a F-4 Phantom piloted by soon-to-be-aces Cunningham and Driscoll
+        - new bugtracker: Github instead of rt.cpan.org
+        - add data from magazine "Science & Vie" (special issue Aviation 1977), from the novel
+        "Helicopter Aces", from the books "Bullseye one Reactor", "Air Warfare in the Missile Age",
+        "Aircraft Armament"
+
 0.05    2016-10-21, the Styx version
         Fifth version, released  on the 49th anniversary of the sinking of the Israeli destroyer Eilat by Styx missiles fired from Egyptian patrol boats.
         - playing the CPANTS game: adding "strict" and "warnings" as prerequisite.

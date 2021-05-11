@@ -94,12 +94,12 @@ sub has_progress {
     $args{-progress} ? [200, "OK"] : [500, "No -progress passed"];
 }
 
-$SPEC{test_uws} = {v=>1.1, args=>{a=>{}}};
-sub test_uws { [200] }
+$SPEC{uws} = {v=>1.1, args=>{a=>{}}};
+sub uws { [200] }
 
 # this metadata marks that argument has been validated and that periap shouldn't wrap again
-$SPEC{test_double_wrap1} = {v=>1.1, args=>{a=>{}}, 'x.perinci.sub.wrapper.logs'=>[{validate_args=>1}]};
-sub test_double_wrap1 { [200] }
+$SPEC{double_wrap1} = {v=>1.1, args=>{a=>{}}, 'x.perinci.sub.wrapper.logs'=>[{validate_args=>1}]};
+sub double_wrap1 { [200] }
 
 package main;
 
@@ -463,7 +463,7 @@ subtest 'schema in metadata is normalized' => sub {
 subtest "avoid double wrapping" => sub {
     my $h = patch_package("Perinci::Sub::Wrapper", "wrap_sub", "replace", sub { say "WRAPPING AGAIN!"; die });
     test_request(
-        req => [call => "/Perinci/Access/Schemeless/Test3/test_double_wrap1"],
+        req => [call => "/Perinci/Access/Schemeless/Test3/double_wrap1"],
         #req => [call => "/App/GenPericmdScript/gen_perinci_cmdline_script"],
         status => 200,
     );
@@ -686,33 +686,33 @@ subtest "action: call" => sub {
 subtest "action: complete_arg_val" => sub {
     test_request(
         name => 'complete_arg_val: missing arg',
-        req => [complete_arg_val => "/Perinci/Examples/test_completion", {}],
+        req => [complete_arg_val => "/Perinci/Examples/completion", {}],
         status => 400,
     );
     test_request(
         name => 'complete: str\'s in',
-        req => [complete_arg_val => "/Perinci/Examples/test_completion",
+        req => [complete_arg_val => "/Perinci/Examples/completion",
                 {arg=>"s1", word=>"r"}],
         status => 200,
         result => {static=>0, words=>[{word=>"red date",summary=>undef}, {word=>"red grape",summary=>undef}]},
     );
     test_request(
         name => 'complete: int\'s min+max',
-        req => [complete_arg_val => "/Perinci/Examples/test_completion",
+        req => [complete_arg_val => "/Perinci/Examples/completion",
                 {arg=>"i1", word=>"1"}],
         status => 200,
         result => {static=>0, words=>[map {+{word=>$_, summary=>undef}} 1, 10..19]},
     );
     test_request(
         name => 'complete: sub',
-        req => [complete_arg_val => "/Perinci/Examples/test_completion",
+        req => [complete_arg_val => "/Perinci/Examples/completion",
                 {arg=>"s2", word=>"z"}],
         status => 200,
         result => {static=>0, words=>["za".."zz"]},
     );
     test_request(
         name => 'complete: sub die trapped',
-        req => [complete_arg_val => "/Perinci/Examples/test_completion",
+        req => [complete_arg_val => "/Perinci/Examples/completion",
                 {arg=>"s3"}],
         status => 200,
     );
@@ -805,13 +805,13 @@ test_request(
 test_request(
     name => 'opt: wrap=0',
     object_opts=>{wrap=>0},
-    req => [call => '/Perinci/Access/Schemeless/Test3/test_uws', {args=>{x=>1}}],
+    req => [call => '/Perinci/Access/Schemeless/Test3/uws', {args=>{x=>1}}],
     status => 200,
 );
 test_request(
     name => 'opt: wrap=1 (the default)',
     object_opts=>{},
-    req => [call => '/Perinci/Access/Schemeless/Test3/test_uws', {args=>{x=>1}}],
+    req => [call => '/Perinci/Access/Schemeless/Test3/uws', {args=>{x=>1}}],
     status => 400,
 );
 

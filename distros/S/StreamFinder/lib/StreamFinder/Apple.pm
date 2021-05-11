@@ -380,6 +380,8 @@ sub new
 		} elsif ($_[0] =~ /^\-?secure$/o) {
 			shift;
 			$uops{'secure'} = (defined $_[0]) ? shift : 1;
+		} else {
+			shift;
 		}
 	}	
 

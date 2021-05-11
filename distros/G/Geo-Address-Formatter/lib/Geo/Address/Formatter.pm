@@ -1,7 +1,7 @@
 # ABSTRACT: take structured address data and format it according to the various global/country rules
 
 package Geo::Address::Formatter;
-$Geo::Address::Formatter::VERSION = '1.87';
+$Geo::Address::Formatter::VERSION = '1.88';
 use strict;
 use warnings;
 use feature qw(say);
@@ -20,6 +20,8 @@ use utf8;
 
 my $THC = Text::Hogan::Compiler->new;
 my %THT_CACHE; # a place to store Text::Hogan::Template objects
+
+my $debug = 0;
 
 
 sub new {
@@ -159,13 +161,19 @@ sub format_address {
     $self->_sanity_cleaning($rh_components);
 
     # determine the template
-    my $rh_config     = $self->{templates}{uc($cc)} || $self->{templates}{default};
-    my $template_text = $rh_config->{address_template};
-
+    my $rh_config = $self->{templates}{uc($cc)} || $self->{templates}{default};
+    
+    my $template_text;
+    if (defined($rh_config->{address_template})) {
+        $template_text = $rh_config->{address_template};
+    } elsif (defined($self->{templates}{default}{address_template})) {
+        $template_text = $self->{templates}{default}{address_template};
+    }
+    
     # do we have the minimal components for an address?
     # or should we instead use the fallback template?
     if (!$self->_minimal_components($rh_components)) {
-        #say STDERR "using fallback";
+        say STDERR "using fallback" if ($debug);
         if (defined($rh_config->{fallback_template})) {
             $template_text = $rh_config->{fallback_template};
         } elsif (defined($self->{templates}{default}{fallback_template})) {
@@ -173,6 +181,7 @@ sub format_address {
         }
         # no fallback
     }
+    say STDERR 'template text: ' . $template_text if ($debug);
 
     # clean up the components
     $self->_fix_country($rh_components);
@@ -180,8 +189,10 @@ sub format_address {
     $self->_add_state_code($rh_components);
     $self->_add_county_code($rh_components);
 
-    #say STDERR "after adding codes";
-    #say STDERR Dumper $rh_components;
+    if ($debug){
+        say STDERR "after replacements and adding codes";
+        say STDERR Dumper $rh_components;
+    }
 
     # add the attention, but only if needed
     my $ra_unknown = $self->_find_unknown_components($rh_components);
@@ -199,16 +210,18 @@ sub format_address {
     }
     my $compiled_template = $THT_CACHE{$template_text};
 
-    #say STDERR "before _render_template";
-    #say STDERR Dumper $rh_components;
-    #say STDERR "template: ";
-    #say STDERR Dumper $compiled_template;
+    if ($debug){
+        say STDERR "before _render_template";
+        say STDERR Dumper $rh_components;
+        say STDERR "template: ";
+        say STDERR Dumper $compiled_template;
+    }
 
     # render it
     my $text;
     $text = $self->_render_template($compiled_template, $rh_components);
 
-    #say STDERR "text after _render_template $text";
+    say STDERR "text after _render_template $text" if ($debug);
 
     $text = $self->_postformat($text, $rh_config->{postformat_replace});
     $text = $self->_clean($text);
@@ -224,7 +237,8 @@ sub format_address {
 sub _postformat {
     my $self = shift;
     my $text = shift;
-    #say STDERR "_postformat $text";
+
+    say STDERR "entering _postformat: $text" if ($debug);
     my $raa_rules = shift;
     my $text_orig = $text; # keep a copy
 
@@ -246,8 +260,10 @@ sub _postformat {
     foreach my $ra_fromto (@$raa_rules) {
         try {
             my $regexp = qr/$ra_fromto->[0]/;
-            #say STDERR 'text: ' . $text;
-            #say STDERR 're: ' . $regexp;
+            if ($debug){
+                say STDERR 'text: ' . $text;
+                say STDERR 're: ' . $regexp;
+            }
             my $replacement = $ra_fromto->[1];
 
             # ultra hack to do substitution
@@ -657,7 +673,7 @@ sub _render_template {
     };
 
     my $output = $thtemplate->render($context);
-    # say STDERR "in _render pre _clean $output";
+    say STDERR "in _render pre _clean: $output" if ($debug);
     $output = $self->_clean($output);
 
     # is it empty?
@@ -699,7 +715,7 @@ Geo::Address::Formatter - take structured address data and format it according t
 
 =head1 VERSION
 
-version 1.87
+version 1.88
 
 =head1 SYNOPSIS
 

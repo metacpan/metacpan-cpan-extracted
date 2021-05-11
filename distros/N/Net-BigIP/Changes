@@ -1,0 +1,7 @@
+Revision history for BigIP::REST
+
+0.2 Sun, 10 May 2021
+* rename to Net::BigIP, as requested per RT#136411
+
+0.1 Sun, 11 Apr 2021
+* initial release

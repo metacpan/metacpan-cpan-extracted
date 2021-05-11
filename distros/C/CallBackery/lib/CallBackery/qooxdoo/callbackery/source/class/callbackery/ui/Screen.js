@@ -44,6 +44,7 @@ qx.Class.define("callbackery.ui.Screen", {
         __extraAction: null,
         __getParentFormDataCallBack: null,
         __cfg: null,
+        __reconfiguring: null,
         instantiatePlugin: function(){
             var rpc = callbackery.data.Server.getInstance();
             var pluginMap = callbackery.ui.Plugins.getInstance().getPlugins();
@@ -52,7 +53,7 @@ qx.Class.define("callbackery.ui.Screen", {
             var getParentFormDataCallBack = this.__getParentFormDataCallBack;
             var extraAction = this.__extraAction;
 
-            var formData =  this.__getParentFormDataCallBack ? this.__getParentFormDataCallBack() : {};
+            var formData = this.__getParentFormDataCallBack ? this.__getParentFormDataCallBack() : {};
             formData.userData = cfg.userData;
 
             rpc.callAsyncSmart(function(pluginConfig){
@@ -107,7 +108,7 @@ qx.Class.define("callbackery.ui.Screen", {
                     if (options) {
                         disclaimerCfg = options.disclaimer;
                     }
-                    if (disclaimerCfg) {
+                    if (disclaimerCfg && !that.__reconfiguring) {
                         content.hide();
                         // force widget visibility because it is tied to
                         // content visibility above
@@ -138,6 +139,14 @@ qx.Class.define("callbackery.ui.Screen", {
                         disclaimerContainer.add(check);
                         disclaimerContainer.add(btnRow);
                         that.add(disclaimerContainer);
+                    }
+                    // install re-configure handler
+                    if (pluginConfig.reconfigurePluginOnAppear && !that.__reconfiguring) {
+                        that.addListener('appear', function() {
+                            this.__reconfiguring = true;
+                            this.removeAll();
+                            this.instantiatePlugin();
+                        }, that);
                     }
                 }
                 else {

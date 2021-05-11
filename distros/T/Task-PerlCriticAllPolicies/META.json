@@ -4,7 +4,7 @@
       "Kang-min Liu <gugod@gugod.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "App::ModuleBuildTiny version 0.028",
+   "generated_by" : "App::ModuleBuildTiny version 0.029",
    "license" : [
       "mit"
    ],
@@ -21,7 +21,7 @@
       },
       "develop" : {
          "requires" : {
-            "App::ModuleBuildTiny" : "0.028"
+            "App::ModuleBuildTiny" : "0.029"
          }
       },
       "runtime" : {
@@ -41,7 +41,6 @@
             "Perl::Critic::Moose" : "0",
             "Perl::Critic::More" : "0",
             "Perl::Critic::Nits" : "0",
-            "Perl::Critic::OTRS" : "0",
             "Perl::Critic::PetPeeves::JTRAMMELL" : "0",
             "Perl::Critic::Plicease" : "0",
             "Perl::Critic::Policy::BadStrings" : "0",
@@ -59,6 +58,7 @@
             "Perl::Critic::Policy::Modules::ProhibitUseLib" : "0",
             "Perl::Critic::Policy::Moo::ProhibitMakeImmutable" : "0",
             "Perl::Critic::Policy::Perlsecret" : "0",
+            "Perl::Critic::Policy::ProhibitImplicitImport" : "0",
             "Perl::Critic::Policy::ProhibitOrReturn" : "0",
             "Perl::Critic::Policy::ProhibitSmartmatch" : "0",
             "Perl::Critic::Policy::References::ProhibitComplexDoubleSigils" : "0",
@@ -96,7 +96,7 @@
    "provides" : {
       "Task::PerlCriticAllPolicies" : {
          "file" : "lib/Task/PerlCriticAllPolicies.pm",
-         "version" : "0.01"
+         "version" : "0.02"
       }
    },
    "release_status" : "stable",
@@ -110,7 +110,7 @@
          "web" : "https://github.com/gugod/Task-PerlCriticAllPolicies"
       }
    },
-   "version" : "0.01",
+   "version" : "0.02",
    "x_serialization_backend" : "JSON::PP version 4.04",
    "x_spdx_expression" : "MIT",
    "x_static_install" : "1"

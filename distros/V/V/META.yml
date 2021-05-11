@@ -1,14 +1,29 @@
---- #YAML:1.0
-name:                V
-version:             0.13
-abstract:            Print version of the specified module(s).
-license:             ~
-generated_by:        ExtUtils::MakeMaker version 6.36
-distribution_type:   module
-requires:     
-    Test::More:                    0
-meta-spec:
-    url:     http://module-build.sourceforge.net/META-spec-v1.2.html
-    version: 1.2
+---
+abstract: 'Print version of the specified module(s).'
 author:
-    - Abe Timmerman <abeltje@cpan.org>
+  - 'Abe Timmerman <abeltje@cpan.org>'
+build_requires:
+  Test::Fatal: '0'
+  Test::More: '0'
+  Test::Warnings: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: V
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  perl: '5.010001'
+  version: '0.77'
+resources:
+  homepage: https://github.com/abeltje/V
+  repository: https://github.com/abeltje/V.git
+version: '0.14'
+x_IRC: irc://irc.perl.org/#amsterdam.pm

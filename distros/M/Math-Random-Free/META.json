@@ -1,0 +1,49 @@
+{
+   "abstract" : "Free drop-in replacement for Math::Random",
+   "author" : [
+      "Andrius Merkys <merkys@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "bsd"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Math-Random-Free",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Digest::SHA" : "0",
+            "List::Util" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/merkys/math-random-free/issues"
+      },
+      "homepage" : "https://search.cpan.org/dist/Math-Random-Free",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/merkys/math-random-free.git",
+         "web" : "https://github.com/merkys/math-random-free"
+      }
+   },
+   "version" : "0.1.0",
+   "x_serialization_backend" : "JSON::XS version 3.04"
+}
+

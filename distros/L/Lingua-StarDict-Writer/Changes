@@ -1,5 +1,9 @@
 Revision history for Lingua-StarDict-Writer
 
+0.02    04 May 2021
+        - Fix tr///r problem that failed tests on perl 5.8+
+        - Documentation improvement
+
 0.01    16 Apr 2021
         - First CPAN version.
 

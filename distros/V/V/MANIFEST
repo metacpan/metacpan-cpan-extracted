@@ -1,9 +1,18 @@
-MANIFEST	# $Id: MANIFEST 1126 2007-11-07 00:10:02Z abeltje $
 Changes
+lib/V.pm
 Makefile.PL
-README
-V.pm
+MANIFEST			This list of files
+MANIFEST.SKIP
+README.md
 t/01basic.t
 t/02useit.t
 t/03bug.t
-META.yml                                 Module meta-data (added by MakeMaker)
+t/04v_version.t
+t/lib/V_Version.pm
+t/Test/abeltje.pm
+xt/00-manifest.t
+xt/01-compile.t
+xt/02-pod_syntax.t
+xt/03-pod-coverage.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

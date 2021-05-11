@@ -1,9 +1,9 @@
 package Perinci::Access::Schemeless;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-05-18'; # DATE
+our $DATE = '2021-05-11'; # DATE
 our $DIST = 'Perinci-Access-Perl'; # DIST
-our $VERSION = '0.893'; # VERSION
+our $VERSION = '0.894'; # VERSION
 
 use 5.010001;
 use strict;
@@ -1050,7 +1050,7 @@ Perinci::Access::Schemeless - Base class for Perinci::Access::Perl
 
 =head1 VERSION
 
-This document describes version 0.893 of Perinci::Access::Schemeless (from Perl distribution Perinci-Access-Perl), released on 2020-05-18.
+This document describes version 0.894 of Perinci::Access::Schemeless (from Perl distribution Perinci-Access-Perl), released on 2021-05-11.
 
 =head1 DESCRIPTION
 
@@ -1298,7 +1298,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020, 2019, 2017, 2016, 2015, 2014, 2013, 2012 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2020, 2019, 2017, 2016, 2015, 2014, 2013, 2012 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

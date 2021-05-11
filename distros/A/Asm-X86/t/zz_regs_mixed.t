@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 2*9 + (14*9 + 6 + 22) * 4;
+use Test::More tests => 9 + 9 + 684; # 2*9 + (14*9 + 6 + 22) * 4;
 use Asm::X86 qw(
 	@regs8_intel @regs16_intel @segregs_intel @regs32_intel
 		@regs64_intel @regs_mm_intel @regs_intel @regs_fpu_intel
@@ -20,6 +20,7 @@ use Asm::X86 qw(
 	is_reg
 	is_reg8 is_reg16 is_reg32 is_reg64
 	is_reg_mm is_segreg is_reg_fpu is_reg_opmask
+	is_addressable32 is_r32_in64
 	);
 
 cmp_ok ( $#regs8_intel,   '>', 0, "Non-empty 8-bit register list" );
@@ -728,3 +729,78 @@ is ( is_reg   ("ast0"), 0, "ast0 is a register" );
 is ( is_reg   ("st5b"), 0, "st5b is a register" );
 is ( is_reg   ("k02"), 0, "k02 is a register" );
 
+is ( is_addressable32 ("\%al"), 0, "AL can be used for addressing" );
+is ( is_addressable32 ("\%ax"), 0, "AX can be used for addressing" );
+is ( is_addressable32 ("\%eax"), 1, "EAX can be used for addressing" );
+is ( is_addressable32 ("\%mm0"), 0, "MM0 can be used for addressing" );
+is ( is_addressable32 ("\%xmm0"), 0, "XMM0 can be used for addressing" );
+is ( is_addressable32 ("\%ymm0"), 0, "YMM0 can be used for addressing" );
+is ( is_addressable32 ("\%zmm0"), 0, "ZMM0 can be used for addressing" );
+is ( is_addressable32 ("\%k2"), 0, "K2 can be used for addressing" );
+
+is ( is_addressable32 ("al"), 0, "AL can be used for addressing" );
+is ( is_addressable32 ("ax"), 0, "AX can be used for addressing" );
+is ( is_addressable32 ("eax"), 1, "EAX can be used for addressing" );
+is ( is_addressable32 ("mm0"), 0, "MM0 can be used for addressing" );
+is ( is_addressable32 ("xmm0"), 0, "XMM0 can be used for addressing" );
+is ( is_addressable32 ("ymm0"), 0, "YMM0 can be used for addressing" );
+is ( is_addressable32 ("zmm0"), 0, "ZMM0 can be used for addressing" );
+is ( is_addressable32 ("k2"), 0, "K2 can be used for addressing" );
+
+is ( is_addressable32 ("\%cal"), 0, "CAL can be used for addressing" );
+is ( is_addressable32 ("\%dax"), 0, "DAX can be used for addressing" );
+is ( is_addressable32 ("\%reax"), 0, "REAX can be used for addressing" );
+is ( is_addressable32 ("\%amm0"), 0, "AMM0 can be used for addressing" );
+is ( is_addressable32 ("\%xmm"), 0, "XMM can be used for addressing" );
+is ( is_addressable32 ("\%ymm"), 0, "YMM can be used for addressing" );
+is ( is_addressable32 ("\%zmm"), 0, "ZMM can be used for addressing" );
+is ( is_addressable32 ("\%k12"), 0, "K2 can be used for addressing" );
+
+is ( is_addressable32 ("cal"), 0, "CAL can be used for addressing" );
+is ( is_addressable32 ("dax"), 0, "DAX can be used for addressing" );
+is ( is_addressable32 ("reax"), 0, "REAX can be used for addressing" );
+is ( is_addressable32 ("amm0"), 0, "AMM0 can be used for addressing" );
+is ( is_addressable32 ("xmm"), 0, "XMM can be used for addressing" );
+is ( is_addressable32 ("ymm"), 0, "YMM can be used for addressing" );
+is ( is_addressable32 ("zmm"), 0, "ZMM can be used for addressing" );
+is ( is_addressable32 ("k12"), 0, "K2 can be used for addressing" );
+
+is ( is_r32_in64 ("\%al"), 0, "AL can be used for 32-in-64 addressing" );
+is ( is_r32_in64 ("\%ax"), 0, "AX can be used for 32-in-64 addressing" );
+is ( is_r32_in64 ("\%eax"), 0, "EAX can be used for 32-in-64 addressing" );
+is ( is_r32_in64 ("\%r10d"), 1, "R10D can be used for 32-in-64 addressing" );
+is ( is_r32_in64 ("\%mm0"), 0, "MM0 can be used for 32-in-64 addressing" );
+is ( is_r32_in64 ("\%xmm0"), 0, "XMM0 can be used for 32-in-64 addressing" );
+is ( is_r32_in64 ("\%ymm0"), 0, "YMM0 can be used for 32-in-64 addressing" );
+is ( is_r32_in64 ("\%zmm0"), 0, "ZMM0 can be used for 32-in-64 addressing" );
+is ( is_r32_in64 ("\%k2"), 0, "K2 can be used for 32-in-64 addressing" );
+
+is ( is_r32_in64 ("\%ald"), 0, "ALD can be used for 32-in-64 addressing" );
+is ( is_r32_in64 ("\%axh"), 0, "AXH can be used for 32-in-64 addressing" );
+is ( is_r32_in64 ("\%eaxl"), 0, "EAXL can be used for 32-in-64 addressing" );
+is ( is_r32_in64 ("\%r10ld"), 0, "R10LD can be used for 32-in-64 addressing" );
+is ( is_r32_in64 ("\%mm0l"), 0, "MM0L can be used for 32-in-64 addressing" );
+is ( is_r32_in64 ("\%xmm0d"), 0, "XMM0D can be used for 32-in-64 addressing" );
+is ( is_r32_in64 ("\%ymm0l"), 0, "YMM0L can be used for 32-in-64 addressing" );
+is ( is_r32_in64 ("\%zmm0d"), 0, "ZMM0D can be used for 32-in-64 addressing" );
+is ( is_r32_in64 ("\%k3l"), 0, "K3L can be used for 32-in-64 addressing" );
+
+is ( is_r32_in64 ("al"), 0, "AL can be used for 32-in-64 addressing" );
+is ( is_r32_in64 ("ax"), 0, "AX can be used for 32-in-64 addressing" );
+is ( is_r32_in64 ("eax"), 0, "EAX can be used for 32-in-64 addressing" );
+is ( is_r32_in64 ("r10d"), 1, "R10D can be used for 32-in-64 addressing" );
+is ( is_r32_in64 ("mm0"), 0, "MM0 can be used for 32-in-64 addressing" );
+is ( is_r32_in64 ("xmm0"), 0, "XMM0 can be used for 32-in-64 addressing" );
+is ( is_r32_in64 ("ymm0"), 0, "YMM0 can be used for 32-in-64 addressing" );
+is ( is_r32_in64 ("zmm0"), 0, "ZMM0 can be used for 32-in-64 addressing" );
+is ( is_r32_in64 ("k2"), 0, "K2 can be used for 32-in-64 addressing" );
+
+is ( is_r32_in64 ("ald"), 0, "ALD can be used for 32-in-64 addressing" );
+is ( is_r32_in64 ("axh"), 0, "AXH can be used for 32-in-64 addressing" );
+is ( is_r32_in64 ("eaxl"), 0, "EAXL can be used for 32-in-64 addressing" );
+is ( is_r32_in64 ("r10ld"), 0, "R10LD can be used for 32-in-64 addressing" );
+is ( is_r32_in64 ("mm0l"), 0, "MM0L can be used for 32-in-64 addressing" );
+is ( is_r32_in64 ("xmm0d"), 0, "XMM0D can be used for 32-in-64 addressing" );
+is ( is_r32_in64 ("ymm0l"), 0, "YMM0L can be used for 32-in-64 addressing" );
+is ( is_r32_in64 ("zmm0d"), 0, "ZMM0D can be used for 32-in-64 addressing" );
+is ( is_r32_in64 ("k3l"), 0, "K3L can be used for 32-in-64 addressing" );

@@ -1,5 +1,8 @@
 Revision history for Dist-Zilla-Plugin-InsertExample
 
+0.14      2021-05-10 10:28:53 -0600
+  - Re-index
+
 0.12      2021-05-07 03:02:14 -0600
   - Back off on Perl prereq: Require only 5.20+ (gh#7)
 

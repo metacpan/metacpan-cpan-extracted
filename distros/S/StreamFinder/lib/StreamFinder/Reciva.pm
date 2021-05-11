@@ -365,6 +365,8 @@ sub new
 		if ($_[0] =~ /^\-?debug$/o) {
 			shift;
 			$DEBUG = (defined($_[0]) && $_[0] =~/^[0-9]$/) ? shift : 1;
+		} else {
+			shift;
 		}
 	}	
 

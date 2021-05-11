@@ -2,6 +2,8 @@ use strict;
 use warnings;
 use ExtUtils::MakeMaker;
 
+my $mod_file = 'lib/Asm/X86.pm';
+
 # Dynamic configuration is a workaround for some Linux systems where BSD tar
 # is installed instead of GNU tar
 sub conf
@@ -25,10 +27,9 @@ sub conf
 
 WriteMakefile(
 	NAME			=> 'Asm::X86',
-	AUTHOR			=> 'Bogdan Drozdowski <bogdandr@op.pl>',
-	VERSION_FROM		=> 'lib/Asm/X86.pm',
-	ABSTRACT_FROM		=> 'lib/Asm/X86.pm',
-	PL_FILES		=> {},
+	AUTHOR			=> 'Bogdan Drozdowski <bogdro@cpan.org>',
+	VERSION_FROM		=> $mod_file,
+	ABSTRACT_FROM		=> $mod_file,
 	PREREQ_PM => {
 		'Test::More'	=> 0,
 	},
@@ -40,6 +41,7 @@ WriteMakefile(
 	LICENSE			=> 'perl_5',
 	SIGN			=> '1',
 	MIN_PERL_VERSION	=> '5.006',	# just because of 'Exporter'
+	META_ADD		=> { provides => { 'Asm::X86' => { file => $mod_file, version => '0.40' } } },
 
 	# When setting 'vendor', the module cannot be installed in local Perl
 	#  installations.

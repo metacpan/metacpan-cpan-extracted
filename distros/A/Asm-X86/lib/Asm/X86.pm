@@ -44,11 +44,11 @@ Asm::X86 - List of instructions and registers of x86-compatible processors, vali
 
 =head1 VERSION
 
-Version 0.33
+Version 0.40
 
 =cut
 
-our $VERSION = '0.33';
+our $VERSION = '0.40';
 
 =head1 DESCRIPTION
 
@@ -1315,7 +1315,7 @@ sub is_valid_16bit_addr_intel ( $ ) {
 					# must be one of predefined registers
 					if ( ($r4 =~ /^bx$/io || $r4 =~ /^bp$/io
 						|| $r4 =~ /^si$/io  || $r4 =~ /^di$/io)
-						&& $r4 !~ /\b$r2\b/i
+						#&& $r4 !~ /\b$r2\b/i	# already checked
 						&& $r3 !~ /-/o
 						)
 					{
@@ -1375,7 +1375,7 @@ sub is_valid_16bit_addr_intel ( $ ) {
 					# must be one of predefined registers
 					if ( ($r4 =~ /^bx$/io || $r4 =~ /^bp$/io
 						|| $r4 =~ /^si$/io  || $r4 =~ /^di$/io)
-						&& $r4 !~ /\b$r2\b/i
+						#&& $r4 !~ /\b$r2\b/i	# already checked
 						&& $r3 !~ /-/o
 						&& ! is_reg_intel($r6)
 						)
@@ -1392,9 +1392,9 @@ sub is_valid_16bit_addr_intel ( $ ) {
 					# must be one of predefined registers
 					if ( ($r6 =~ /^bx$/io || $r6 =~ /^bp$/io
 						|| $r6 =~ /^si$/io  || $r6 =~ /^di$/io)
-						&& $r6 !~ /\b$r2\b/i
+						#&& $r6 !~ /\b$r2\b/i	# already checked
 						&& $r5 !~ /-/o
-						&& ! is_reg_intel($r4)
+						#&& ! is_reg_intel($r4)	# already checked
 						)
 					{
 						return 1;
@@ -1422,7 +1422,7 @@ sub is_valid_16bit_addr_intel ( $ ) {
 						# must be one of predefined registers
 						if ( ($r6 =~ /^bx$/io || $r6 =~ /^bp$/io
 							|| $r6 =~ /^si$/io  || $r6 =~ /^di$/io)
-							&& $r6 !~ /\b$r4\b/i
+							#&& $r6 !~ /\b$r4\b/i	# already checked
 							&& $r5 !~ /-/o
 							)
 						{
@@ -1489,7 +1489,7 @@ sub is_valid_16bit_addr_intel ( $ ) {
 					# must be one of predefined registers
 					if ( ($r4 =~ /^bx$/io || $r4 =~ /^bp$/io
 						|| $r4 =~ /^si$/io  || $r4 =~ /^di$/io)
-						&& $r4 !~ /\b$r2\b/i
+						#&& $r4 !~ /\b$r2\b/i	# already checked
 						&& $r3 !~ /-/o
 						)
 					{
@@ -1548,7 +1548,7 @@ sub is_valid_16bit_addr_intel ( $ ) {
 					# must be one of predefined registers
 					if ( ($r4 =~ /^bx$/io || $r4 =~ /^bp$/io
 						|| $r4 =~ /^si$/io  || $r4 =~ /^di$/io)
-						&& $r4 !~ /\b$r2\b/i
+						#&& $r4 !~ /\b$r2\b/i	# already checked
 						&& $r3 !~ /-/o
 						&& ! is_reg_intel($r6)
 						)
@@ -1565,9 +1565,9 @@ sub is_valid_16bit_addr_intel ( $ ) {
 					# must be one of predefined registers
 					if ( ($r6 =~ /^bx$/io || $r6 =~ /^bp$/io
 						|| $r6 =~ /^si$/io  || $r6 =~ /^di$/io)
-						&& $r6 !~ /\b$r2\b/i
+						#&& $r6 !~ /\b$r2\b/i	# already checked
 						&& $r5 !~ /-/o
-						&& ! is_reg_intel($r4)
+						#&& ! is_reg_intel($r4)	# already checked
 						)
 					{
 						return 1;
@@ -1580,6 +1580,7 @@ sub is_valid_16bit_addr_intel ( $ ) {
 			}
 			return 0;
 		} else {
+			return 0 if $r3 =~ /-/o;
 			# variable/number/constant is OK
 			if ( is_reg16_intel($r4) ) {
 
@@ -1595,7 +1596,7 @@ sub is_valid_16bit_addr_intel ( $ ) {
 						# must be one of predefined registers
 						if ( ($r6 =~ /^bx$/io || $r6 =~ /^bp$/io
 							|| $r6 =~ /^si$/io  || $r6 =~ /^di$/io)
-							&& $r6 !~ /\b$r4\b/i
+							#&& $r6 !~ /\b$r4\b/i	# already checked
 							&& $r5 !~ /-/o
 							)
 						{
@@ -1642,9 +1643,9 @@ sub is_valid_16bit_addr_att ( $ ) {
 		my ($r1, $r2, $r3) = ($1, $2, $3);
 		return 0 if (! is_segreg_att ($r1)) || is_segreg_att ($r2) || is_segreg_att ($r3);
 		return 0 if (! is_reg16_att($r2)) || (! is_reg16_att($r3));
-		return 0 if is_reg16_att($r2) && $r2 !~ /^%b.$/io && $r2 !~ /^%.i$/io;
-		return 0 if is_reg16_att($r3) && $r3 !~ /^%b.$/io && $r3 !~ /^%.i$/io;
-		return 0 if is_reg16_att($r2) && is_reg16_att($r3) && (
+		return 0 if $r2 !~ /^%b.$/io && $r2 !~ /^%.i$/io;
+		return 0 if $r3 !~ /^%b.$/io && $r3 !~ /^%.i$/io;
+		return 0 if (
 			   $r2 !~ /^%b.$/io && $r3 !~ /^%b.$/io
 			|| $r2 !~ /^%.i$/io && $r3 !~ /^%.i$/io
 			);
@@ -1675,9 +1676,9 @@ sub is_valid_16bit_addr_att ( $ ) {
 		my ($r1, $r2, $r3, $var) = ($1, $3, $4, $2);
 		return 0 if (! is_segreg_att ($r1)) || is_segreg_att ($r2) || is_segreg_att ($r3);
 		return 0 if (! is_reg16_att($r2)) || (! is_reg16_att($r3));
-		return 0 if is_reg16_att($r2) && $r2 !~ /^%b.$/io && $r2 !~ /^%.i$/io;
-		return 0 if is_reg16_att($r3) && $r3 !~ /^%b.$/io && $r3 !~ /^%.i$/io;
-		return 0 if is_reg16_att($r2) && is_reg16_att($r3) && (
+		return 0 if $r2 !~ /^%b.$/io && $r2 !~ /^%.i$/io;
+		return 0 if $r3 !~ /^%b.$/io && $r3 !~ /^%.i$/io;
+		return 0 if (
 			   $r2 !~ /^%b.$/io && $r3 !~ /^%b.$/io
 			|| $r2 !~ /^%.i$/io && $r3 !~ /^%.i$/io
 			);
@@ -1715,9 +1716,9 @@ sub is_valid_16bit_addr_att ( $ ) {
 		my ($r2, $r3) = ($1, $2);
 		return 0 if is_segreg_att ($r2) || is_segreg_att ($r3);
 		return 0 if (! is_reg16_att($r2)) || (! is_reg16_att($r3));
-		return 0 if is_reg16_att($r2) && $r2 !~ /^%b.$/io && $r2 !~ /^%.i$/io;
-		return 0 if is_reg16_att($r3) && $r3 !~ /^%b.$/io && $r3 !~ /^%.i$/io;
-		return 0 if is_reg16_att($r2) && is_reg16_att($r3) && (
+		return 0 if $r2 !~ /^%b.$/io && $r2 !~ /^%.i$/io;
+		return 0 if $r3 !~ /^%b.$/io && $r3 !~ /^%.i$/io;
+		return 0 if (
 			   $r2 !~ /^%b.$/io && $r3 !~ /^%b.$/io
 			|| $r2 !~ /^%.i$/io && $r3 !~ /^%.i$/io
 			);
@@ -1737,9 +1738,9 @@ sub is_valid_16bit_addr_att ( $ ) {
 
 		my ($r2, $var, $sign) = ($3, $1, $2);
 		return 0 if is_segreg_att ($r2);
-		return 0 if is_reg16_att($r2) && $r2 !~ /^%b.$/io && $r2 !~ /^%.i$/io;
-		return 0 if is_reg_att($r2) && ! is_reg16_att($r2);
-		return 0 if is_reg16_att($r2) && $sign =~ /-/o;
+		return 0 if ! is_reg16_att($r2);
+		return 0 if $r2 !~ /^%b.$/io && $r2 !~ /^%.i$/io;
+		return 0 if $sign =~ /-/o;
 		return 0 if is_reg_att($var);
 		return 1;
 	}
@@ -1748,9 +1749,9 @@ sub is_valid_16bit_addr_att ( $ ) {
 		my ($r2, $r3, $var) = ($2, $3, $1);
 		return 0 if is_segreg_att ($r2) || is_segreg_att ($r3);
 		return 0 if (! is_reg16_att($r2)) || (! is_reg16_att($r3));
-		return 0 if is_reg16_att($r2) && $r2 !~ /^%b.$/io && $r2 !~ /^%.i$/io;
-		return 0 if is_reg16_att($r3) && $r3 !~ /^%b.$/io && $r3 !~ /^%.i$/io;
-		return 0 if is_reg16_att($r2) && is_reg16_att($r3) && (
+		return 0 if $r2 !~ /^%b.$/io && $r2 !~ /^%.i$/io;
+		return 0 if $r3 !~ /^%b.$/io && $r3 !~ /^%.i$/io;
+		return 0 if (
 			   $r2 !~ /^%b.$/io && $r3 !~ /^%b.$/io
 			|| $r2 !~ /^%.i$/io && $r3 !~ /^%.i$/io
 			);
@@ -2209,7 +2210,7 @@ sub is_valid_32bit_addr_intel ( $ ) {
 
 		my ($r2, $r3) = ($1, $2);
 
-		return 0 if ( is_segreg_intel($r3) );
+		#return 0 if ( is_segreg_intel($r3) ); # checked below
 		return 0 if ( (! is_addressable32_intel($r3)) && (is_reg8_intel($r3) || is_segreg_intel($r3)
 			|| is_reg16_intel($r3) || is_reg64_intel($r3) || is_reg32_intel($r3)
 			|| is_reg_mm_intel($r3) || is_reg_fpu_intel($r3)) );
@@ -2283,8 +2284,8 @@ sub is_valid_32bit_addr_att ( $ ) {
 		my ($r1, $r2, $r3) = ($1, $2, $3);
 		return 0 if (! is_segreg_att ($r1)) || is_segreg_att ($r2) || is_segreg_att ($r3);
 		return 0 if (! is_reg_att($r2)) || (! is_reg_att($r3));
-		return 0 if is_reg_att($r2) && ! is_addressable32_att ($r2);
-		return 0 if is_reg_att($r3) && ! is_addressable32_att ($r3);
+		return 0 if ! is_addressable32_att ($r2);
+		return 0 if ! is_addressable32_att ($r3);
 		return 1;
 	}
 	elsif ( $elem =~ /^([%\w]+):\s*\(\s*([%\w]+)\s*,\s*([%\w]+)\s*,\s*(\d+)\s*\)$/o ) {
@@ -2292,8 +2293,8 @@ sub is_valid_32bit_addr_att ( $ ) {
 		my ($r1, $r2, $r3, $scale) = ($1, $2, $3, $4);
 		return 0 if (! is_segreg_att ($r1)) || is_segreg_att ($r2) || is_segreg_att ($r3);
 		return 0 if (! is_reg_att($r2)) || (! is_reg_att($r3));
-		return 0 if is_reg_att($r2) && ! is_addressable32_att ($r2);
-		return 0 if is_reg_att($r3) && ! is_addressable32_att ($r3);
+		return 0 if ! is_addressable32_att ($r2);
+		return 0 if ! is_addressable32_att ($r3);
 		return 0 if $r3 =~ /^%esp$/io;
 		return 0 if $scale != 1 && $scale != 2 && $scale != 4 && $scale != 8;
 		return 1;
@@ -2303,7 +2304,7 @@ sub is_valid_32bit_addr_att ( $ ) {
 		my ($r1, $r3, $scale) = ($1, $2, $3);
 		return 0 if (! is_segreg_att ($r1)) || is_segreg_att ($r3);
 		return 0 if ! is_reg_att($r3);
-		return 0 if is_reg_att($r3) && ! is_addressable32_att ($r3);
+		return 0 if ! is_addressable32_att ($r3);
 		return 0 if $r3 =~ /^%esp$/io;
 		return 0 if $scale != 1 && $scale != 2 && $scale != 4 && $scale != 8;
 		return 1;
@@ -2312,8 +2313,9 @@ sub is_valid_32bit_addr_att ( $ ) {
 
 		my ($r1, $r2, $var, $sign) = ($1, $4, $2, $3);
 		return 0 if (! is_segreg_att ($r1)) || is_segreg_att ($r2);
-		return 0 if is_reg_att($r2) && ! is_addressable32_att ($r2);
-		return 0 if is_reg32_att($r2) && $sign =~ /-/o;
+		return 0 if ! is_reg32_att($r2);
+		return 0 if ! is_addressable32_att ($r2);
+		return 0 if $sign =~ /-/o;
 		return 0 if is_reg_att($var);
 		return 1;
 	}
@@ -2322,8 +2324,8 @@ sub is_valid_32bit_addr_att ( $ ) {
 		my ($r1, $r2, $r3, $var) = ($1, $3, $4, $2);
 		return 0 if (! is_segreg_att ($r1)) || is_segreg_att ($r2) || is_segreg_att ($r3);
 		return 0 if (! is_reg32_att($r2)) || (! is_reg32_att($r3));
-		return 0 if is_reg_att($r2) && ! is_addressable32_att ($r2);
-		return 0 if is_reg_att($r3) && ! is_addressable32_att ($r3);
+		return 0 if ! is_addressable32_att ($r2);
+		return 0 if ! is_addressable32_att ($r3);
 		return 0 if is_reg_att($var);
 		return 1;
 	}
@@ -2332,8 +2334,8 @@ sub is_valid_32bit_addr_att ( $ ) {
 		my ($r1, $r2, $r3, $var, $scale) = ($1, $3, $4, $2, $5);
 		return 0 if (! is_segreg_att ($r1)) || is_segreg_att ($r2) || is_segreg_att ($r3);
 		return 0 if (! is_reg32_att($r2)) || (! is_reg32_att($r3));
-		return 0 if is_reg_att($r2) && ! is_addressable32_att ($r2);
-		return 0 if is_reg_att($r3) && ! is_addressable32_att ($r3);
+		return 0 if ! is_addressable32_att ($r2);
+		return 0 if ! is_addressable32_att ($r3);
 		return 0 if is_reg_att($var);
 		return 0 if $r3 =~ /^%esp$/io;
 		return 0 if $scale != 1 && $scale != 2 && $scale != 4 && $scale != 8;
@@ -2344,7 +2346,7 @@ sub is_valid_32bit_addr_att ( $ ) {
 		my ($r1, $r3, $var, $scale) = ($1, $3, $2, $4);
 		return 0 if (! is_segreg_att ($r1)) || is_segreg_att ($r3);
 		return 0 if ! is_reg32_att($r3);
-		return 0 if is_reg_att($r3) && ! is_addressable32_att ($r3);
+		return 0 if ! is_addressable32_att ($r3);
 		return 0 if is_reg_att($var);
 		return 0 if $r3 =~ /^%esp$/io;
 		return 0 if $scale != 1 && $scale != 2 && $scale != 4 && $scale != 8;
@@ -2379,8 +2381,8 @@ sub is_valid_32bit_addr_att ( $ ) {
 		my ($r2, $r3, $scale) = ($1, $2, $3);
 		return 0 if is_segreg_att ($r2) || is_segreg_att ($r3);
 		return 0 if (! is_reg32_att($r2)) || (! is_reg32_att($r3));
-		return 0 if is_reg_att($r2) && ! is_addressable32_att ($r2);
-		return 0 if is_reg_att($r3) && ! is_addressable32_att ($r3);
+		return 0 if ! is_addressable32_att ($r2);
+		return 0 if ! is_addressable32_att ($r3);
 		return 0 if $r3 =~ /^%esp$/io;
 		return 0 if $scale != 1 && $scale != 2 && $scale != 4 && $scale != 8;
 		return 1;
@@ -2390,7 +2392,7 @@ sub is_valid_32bit_addr_att ( $ ) {
 		my ($r3, $scale) = ($1, $2);
 		return 0 if is_segreg_att ($r3);
 		return 0 if ! is_reg32_att($r3);
-		return 0 if is_reg_att($r3) && ! is_addressable32_att ($r3);
+		return 0 if ! is_addressable32_att ($r3);
 		return 0 if $r3 =~ /^%esp$/io;
 		return 0 if $scale != 1 && $scale != 2 && $scale != 4 && $scale != 8;
 		return 1;
@@ -2399,8 +2401,9 @@ sub is_valid_32bit_addr_att ( $ ) {
 
 		my ($r2, $var, $sign) = ($3, $1, $2);
 		return 0 if is_segreg_att ($r2);
-		return 0 if is_reg_att($r2) && ! is_addressable32_att ($r2);
-		return 0 if is_reg32_att($r2) && $sign =~ /-/o;
+		return 0 if ! is_reg_att($r2);
+		return 0 if ! is_addressable32_att ($r2);
+		return 0 if $sign =~ /-/o;
 		return 0 if is_reg_att($var);
 		return 1;
 	}
@@ -2409,8 +2412,8 @@ sub is_valid_32bit_addr_att ( $ ) {
 		my ($r2, $r3, $var) = ($2, $3, $1);
 		return 0 if is_segreg_att ($r2) || is_segreg_att ($r3);
 		return 0 if (! is_reg_att($r2)) || (! is_reg32_att($r3));
-		return 0 if is_reg_att($r2) && ! is_addressable32_att ($r2);
-		return 0 if is_reg_att($r3) && ! is_addressable32_att ($r3);
+		return 0 if ! is_addressable32_att ($r2);
+		return 0 if ! is_addressable32_att ($r3);
 		return 0 if is_reg_att($var);
 		return 1;
 	}
@@ -2419,8 +2422,8 @@ sub is_valid_32bit_addr_att ( $ ) {
 		my ($r2, $r3, $scale, $var) = ($2, $3, $4, $1);
 		return 0 if is_segreg_att ($r2) || is_segreg_att ($r3);
 		return 0 if (! is_reg32_att($r2)) || (! is_reg32_att($r3));
-		return 0 if is_reg_att($r2) && ! is_addressable32_att ($r2);
-		return 0 if is_reg_att($r3) && ! is_addressable32_att ($r3);
+		return 0 if ! is_addressable32_att ($r2);
+		return 0 if ! is_addressable32_att ($r3);
 		return 0 if $r3 =~ /^%esp$/io;
 		return 0 if $scale != 1 && $scale != 2 && $scale != 4 && $scale != 8;
 		return 0 if is_reg_att($var);
@@ -2431,7 +2434,7 @@ sub is_valid_32bit_addr_att ( $ ) {
 		my ($r3, $scale, $var) = ($2, $3, $1);
 		return 0 if is_segreg_att ($r3);
 		return 0 if ! is_reg32_att($r3);
-		return 0 if is_reg_att($r3) && ! is_addressable32_att ($r3);
+		return 0 if ! is_addressable32_att ($r3);
 		return 0 if $r3 =~ /^%esp$/io;
 		return 0 if $scale != 1 && $scale != 2 && $scale != 4 && $scale != 8;
 		return 0 if is_reg_att($var);
@@ -2699,7 +2702,7 @@ sub is_valid_64bit_addr_intel ( $ ) {
 		return 0 if ( is_segreg_intel($r3) || ! is_segreg_intel($r1) );
 		return 0 if ( (! is_reg64_intel($r3) && ! is_r32_in64_intel($r3))
 			&& (is_reg8_intel($r3) || is_segreg_intel($r3)
-			|| is_reg16_intel($r3) || is_reg32_intel($r3)
+			|| is_reg16_intel($r3) || (is_reg32_intel($r3) && ! is_addressable32_intel($r3))
 			|| is_reg_mm_intel($r3) || is_reg_fpu_intel($r3)) );
 		return 0 if ( is_reg_intel($r3) && $r2 =~ /-/o );
 
@@ -2971,7 +2974,7 @@ sub is_valid_64bit_addr_intel ( $ ) {
 		return 0 if ( is_segreg_intel($r3) );
 		return 0 if ( (! is_reg64_intel($r3) && ! is_r32_in64_intel($r3))
 			&& (is_reg8_intel($r3) || is_segreg_intel($r3)
-			|| is_reg16_intel($r3) || is_reg32_intel($r3)
+			|| is_reg16_intel($r3) || (is_reg32_intel($r3) && ! is_addressable32_intel($r3))
 			|| is_reg_mm_intel($r3) || is_reg_fpu_intel($r3)) );
 		return 0 if ( is_reg_intel($r3) && $r2 =~ /-/o );
 
@@ -3054,9 +3057,9 @@ sub is_valid_64bit_addr_att ( $ ) {
 		my ($r1, $r2, $r3) = ($1, $2, $3);
 		return 0 if (! is_segreg_att ($r1)) || is_segreg_att ($r2) || is_segreg_att ($r3);
 		return 0 if (! is_reg_att($r2)) || (! is_reg_att($r3));
-		return 0 if is_reg_att($r2) && (! is_r32_in64_att($r2))
+		return 0 if (! is_r32_in64_att($r2))
 			&& (!is_addressable32_att($r2)) && (! is_reg64_att($r2));
-		return 0 if is_reg_att($r3) && (! is_r32_in64_att($r3))
+		return 0 if (! is_r32_in64_att($r3))
 			&& (!is_addressable32_att($r3)) && (! is_reg64_att($r3));
 		my $was64 = is_reg64_att($r2) + is_reg64_att($r3);
 		my $nregs = is_reg_att($r2) + is_reg_att($r3);
@@ -3068,11 +3071,12 @@ sub is_valid_64bit_addr_att ( $ ) {
 		my ($r1, $r2, $r3, $scale) = ($1, $2, $3, $4);
 		return 0 if (! is_segreg_att ($r1)) || is_segreg_att ($r2) || is_segreg_att ($r3);
 		return 0 if (! is_reg_att($r2)) || (! is_reg_att($r3));
-		return 0 if is_reg_att($r2) && (! is_r32_in64_att($r2))
+		return 0 if (! is_r32_in64_att($r2))
 			&& (!is_addressable32_att($r2)) && (! is_reg64_att($r2));
-		return 0 if is_reg_att($r3) && (! is_r32_in64_att($r3))
+		return 0 if (! is_r32_in64_att($r3))
 			&& (!is_addressable32_att($r3)) && (! is_reg64_att($r3));
 		return 0 if $r3 =~ /^%rsp$/io || $r3 =~ /^%rip$/io;
+		return 0 if $r2 =~ /^%rip$/io;
 		return 0 if $scale != 1 && $scale != 2 && $scale != 4 && $scale != 8;
 		my $was64 = is_reg64_att($r2) + is_reg64_att($r3);
 		my $nregs = is_reg_att($r2) + is_reg_att($r3);
@@ -3084,7 +3088,7 @@ sub is_valid_64bit_addr_att ( $ ) {
 		my ($r1, $r3, $scale) = ($1, $2, $3);
 		return 0 if (! is_segreg_att ($r1)) || is_segreg_att ($r3);
 		return 0 if ! is_reg_att($r3);
-		return 0 if is_reg_att($r3) && (! is_r32_in64_att($r3))
+		return 0 if (! is_r32_in64_att($r3))
 			&& (!is_addressable32_att($r3)) && (! is_reg64_att($r3));
 		return 0 if $r3 =~ /^%rsp$/io || $r3 =~ /^%rip$/io;
 		return 0 if $scale != 1 && $scale != 2 && $scale != 4 && $scale != 8;
@@ -3094,7 +3098,8 @@ sub is_valid_64bit_addr_att ( $ ) {
 
 		my ($r1, $r2, $var, $sign) = ($1, $4, $2, $3);
 		return 0 if (! is_segreg_att ($r1)) || is_segreg_att ($r2);
-		return 0 if is_reg_att($r2) && (! is_r32_in64_att($r2))
+		return 0 if ! is_reg_att($r2);
+		return 0 if (! is_r32_in64_att($r2))
 			&& (!is_addressable32_att($r2)) && (! is_reg64_att($r2));
 		return 0 if is_reg64_att($r2) && $sign =~ /-/o;
 		return 0 if is_reg_att($var);
@@ -3104,10 +3109,11 @@ sub is_valid_64bit_addr_att ( $ ) {
 
 		my ($r1, $r2, $r3, $var) = ($1, $3, $4, $2);
 		return 0 if (! is_segreg_att ($r1)) || is_segreg_att ($r2) || is_segreg_att ($r3);
-		return 0 if (! is_reg64_att($r2)) || (! is_reg64_att($r3));
-		return 0 if is_reg_att($r2) && (! is_r32_in64_att($r2))
+		#return 0 if (! is_reg64_att($r2)) || (! is_reg64_att($r3));
+		return 0 if (! is_reg_att($r2)) || (! is_reg_att($r3));
+		return 0 if (! is_r32_in64_att($r2))
 			&& (!is_addressable32_att($r2)) && (! is_reg64_att($r2));
-		return 0 if is_reg_att($r3) && (! is_r32_in64_att($r3))
+		return 0 if (! is_r32_in64_att($r3))
 			&& (!is_addressable32_att($r3)) && (! is_reg64_att($r3));
 		return 0 if is_reg_att($var);
 		my $was64 = is_reg64_att($r2) + is_reg64_att($r3);
@@ -3119,13 +3125,15 @@ sub is_valid_64bit_addr_att ( $ ) {
 
 		my ($r1, $r2, $r3, $var, $scale) = ($1, $3, $4, $2, $5);
 		return 0 if (! is_segreg_att ($r1)) || is_segreg_att ($r2) || is_segreg_att ($r3);
-		return 0 if (! is_reg64_att($r2)) || (! is_reg64_att($r3));
-		return 0 if is_reg_att($r2) && (! is_r32_in64_att($r2))
+		#return 0 if (! is_reg64_att($r2)) || (! is_reg64_att($r3));
+		return 0 if (! is_reg_att($r2)) || (! is_reg_att($r3));
+		return 0 if (! is_r32_in64_att($r2))
 			&& (!is_addressable32_att($r2)) && (! is_reg64_att($r2));
-		return 0 if is_reg_att($r3) && (! is_r32_in64_att($r3))
+		return 0 if (! is_r32_in64_att($r3))
 			&& (!is_addressable32_att($r3)) && (! is_reg64_att($r3));
 		return 0 if is_reg_att($var);
 		return 0 if $r3 =~ /^%rsp$/io || $r3 =~ /^%rip$/io;
+		return 0 if $r2 =~ /^%rip$/io;
 		return 0 if $scale != 1 && $scale != 2 && $scale != 4 && $scale != 8;
 		my $was64 = is_reg64_att($r2) + is_reg64_att($r3);
 		my $nregs = is_reg_att($r2) + is_reg_att($r3);
@@ -3136,8 +3144,9 @@ sub is_valid_64bit_addr_att ( $ ) {
 
 		my ($r1, $r3, $var, $scale) = ($1, $3, $2, $4);
 		return 0 if (! is_segreg_att ($r1)) || is_segreg_att ($r3);
-		return 0 if ! is_reg64_att($r3);
-		return 0 if is_reg_att($r3) && (! is_r32_in64_att($r3))
+		#return 0 if ! is_reg64_att($r3);
+		return 0 if ! is_reg_att($r3);
+		return 0 if (! is_r32_in64_att($r3))
 			&& (!is_addressable32_att($r3)) && (! is_reg64_att($r3));
 		return 0 if is_reg_att($var);
 		return 0 if $r3 =~ /^%rsp$/io || $r3 =~ /^%rip$/io;
@@ -3164,11 +3173,13 @@ sub is_valid_64bit_addr_att ( $ ) {
 
 		my ($r2, $r3) = ($1, $2);
 		return 0 if is_segreg_att ($r2) || is_segreg_att ($r3);
-		return 0 if is_reg_att($r2) && (! is_r32_in64_att($r2))
+		#return 0 if (! is_reg64_att($r2)) || (! is_reg64_att($r3));
+		return 0 if (! is_reg_att($r2)) || (! is_reg_att($r3));
+		return 0 if (! is_r32_in64_att($r2))
 			&& (!is_addressable32_att($r2)) && (! is_reg64_att($r2));
-		return 0 if is_reg_att($r3) && (! is_r32_in64_att($r3))
+		return 0 if (! is_r32_in64_att($r3))
 			&& (!is_addressable32_att($r3)) && (! is_reg64_att($r3));
-		return 0 if (! is_reg_att($r2)) || (! is_reg64_att($r3));
+		#return 0 if (! is_reg_att($r2)) || (! is_reg64_att($r3));
 		my $was64 = is_reg64_att($r2) + is_reg64_att($r3);
 		my $nregs = is_reg_att($r2) + is_reg_att($r3);
 		return 0 if ( $was64 != 0 && $was64 != $nregs );
@@ -3178,12 +3189,14 @@ sub is_valid_64bit_addr_att ( $ ) {
 
 		my ($r2, $r3, $scale) = ($1, $2, $3);
 		return 0 if is_segreg_att ($r2) || is_segreg_att ($r3);
-		return 0 if (! is_reg64_att($r2)) || (! is_reg64_att($r3));
-		return 0 if is_reg_att($r2) && (! is_r32_in64_att($r2))
+		#return 0 if (! is_reg64_att($r2)) || (! is_reg64_att($r3));
+		return 0 if (! is_reg_att($r2)) || (! is_reg_att($r3));
+		return 0 if (! is_r32_in64_att($r2))
 			&& (!is_addressable32_att($r2)) && (! is_reg64_att($r2));
-		return 0 if is_reg_att($r3) && (! is_r32_in64_att($r3))
+		return 0 if (! is_r32_in64_att($r3))
 			&& (!is_addressable32_att($r3)) && (! is_reg64_att($r3));
 		return 0 if $r3 =~ /^%rsp$/io || $r3 =~ /^%rip$/io;
+		return 0 if $r2 =~ /^%rip$/io;
 		return 0 if $scale != 1 && $scale != 2 && $scale != 4 && $scale != 8;
 		my $was64 = is_reg64_att($r2) + is_reg64_att($r3);
 		my $nregs = is_reg_att($r2) + is_reg_att($r3);
@@ -3194,8 +3207,9 @@ sub is_valid_64bit_addr_att ( $ ) {
 
 		my ($r3, $scale) = ($1, $2);
 		return 0 if is_segreg_att ($r3);
-		return 0 if ! is_reg64_att($r3);
-		return 0 if is_reg_att($r3) && (! is_r32_in64_att($r3))
+		#return 0 if ! is_reg64_att($r3);
+		return 0 if ! is_reg_att($r3);
+		return 0 if (! is_r32_in64_att($r3))
 			&& (!is_addressable32_att($r3)) && (! is_reg64_att($r3));
 		return 0 if $r3 =~ /^%rsp$/io || $r3 =~ /^%rip$/io;
 		return 0 if $scale != 1 && $scale != 2 && $scale != 4 && $scale != 8;
@@ -3205,7 +3219,8 @@ sub is_valid_64bit_addr_att ( $ ) {
 
 		my ($r2, $var, $sign) = ($3, $1, $2);
 		return 0 if is_segreg_att ($r2);
-		return 0 if is_reg_att($r2) && (! is_r32_in64_att($r2))
+		return 0 if ! is_reg_att($r2);
+		return 0 if (! is_r32_in64_att($r2))
 			&& (!is_addressable32_att($r2)) && (! is_reg64_att($r2));
 		return 0 if is_reg64_att($r2) && $sign =~ /-/o;
 		return 0 if is_reg_att($var);
@@ -3215,10 +3230,11 @@ sub is_valid_64bit_addr_att ( $ ) {
 
 		my ($r2, $r3, $var) = ($2, $3, $1);
 		return 0 if is_segreg_att ($r2) || is_segreg_att ($r3);
-		return 0 if (! is_reg_att($r2)) || (! is_reg64_att($r3));
-		return 0 if is_reg_att($r2) && (! is_r32_in64_att($r2))
+		#return 0 if (! is_reg_att($r2)) || (! is_reg64_att($r3));
+		return 0 if (! is_reg_att($r2)) || (! is_reg_att($r3));
+		return 0 if (! is_r32_in64_att($r2))
 			&& (!is_addressable32_att($r2)) && (! is_reg64_att($r2));
-		return 0 if is_reg_att($r3) && (! is_r32_in64_att($r3))
+		return 0 if (! is_r32_in64_att($r3))
 			&& (!is_addressable32_att($r3)) && (! is_reg64_att($r3));
 		return 0 if is_reg_att($var);
 		my $was64 = is_reg64_att($r2) + is_reg64_att($r3);
@@ -3230,12 +3246,14 @@ sub is_valid_64bit_addr_att ( $ ) {
 
 		my ($r2, $r3, $scale, $var) = ($2, $3, $4, $1);
 		return 0 if is_segreg_att ($r2) || is_segreg_att ($r3);
-		return 0 if (! is_reg64_att($r2)) || (! is_reg64_att($r3));
-		return 0 if is_reg_att($r2) && (! is_r32_in64_att($r2))
+		#return 0 if (! is_reg64_att($r2)) || (! is_reg64_att($r3));
+		return 0 if (! is_reg_att($r2)) || (! is_reg_att($r3));
+		return 0 if (! is_r32_in64_att($r2))
 			&& (!is_addressable32_att($r2)) && (! is_reg64_att($r2));
-		return 0 if is_reg_att($r3) && (! is_r32_in64_att($r3))
+		return 0 if (! is_r32_in64_att($r3))
 			&& (!is_addressable32_att($r3)) && (! is_reg64_att($r3));
 		return 0 if $r3 =~ /^%rsp$/io || $r3 =~ /^%rip$/io;
+		return 0 if $r2 =~ /^%rip$/io;
 		return 0 if $scale != 1 && $scale != 2 && $scale != 4 && $scale != 8;
 		return 0 if is_reg_att($var);
 		my $was64 = is_reg64_att($r2) + is_reg64_att($r3);
@@ -3247,8 +3265,9 @@ sub is_valid_64bit_addr_att ( $ ) {
 
 		my ($r3, $scale, $var) = ($2, $3, $1);
 		return 0 if is_segreg_att ($r3);
-		return 0 if ! is_reg64_att($r3);
-		return 0 if is_reg_att($r3) && (! is_r32_in64_att($r3))
+		#return 0 if ! is_reg64_att($r3);
+		return 0 if ! is_reg_att($r3);
+		return 0 if (! is_r32_in64_att($r3))
 			&& (!is_addressable32_att($r3)) && (! is_reg64_att($r3));
 		return 0 if $r3 =~ /^%rsp$/io || $r3 =~ /^%rip$/io;
 		return 0 if $scale != 1 && $scale != 2 && $scale != 4 && $scale != 8;
@@ -3392,6 +3411,7 @@ sub add_att_suffix_instr ( @ ) {
 			push @result, $_.'b';
 			push @result, $_.'w';
 			push @result, $_.'l';
+			push @result, $_.'q';
 		}
 		else
 		{
@@ -3422,9 +3442,23 @@ sub add_att_suffix_instr ( @ ) {
 					push @result, "${inst}bl";
 				} elsif ( is_reg8($arg2) && is_reg16($arg1) ) {
 					push @result, "${inst}bw";
-				} elsif ( is_reg16($arg2) || is_reg32($arg1)  ) {
+				} elsif ( is_reg8($arg2) && is_reg64($arg1) ) {
+					push @result, "${inst}bq";
+				} elsif ( is_reg16($arg2) && is_reg32($arg1)  ) {
 					push @result, "${inst}wl";
+				} elsif ( is_reg16($arg2) && is_reg64($arg1)  ) {
+					push @result, "${inst}wq";
 				}
+				push @result, "$_";
+			}
+			elsif ( /^\s*(mov[sz])x/io )
+			{
+				# add suffixes to MOVSX/MOVZX instructions
+				push @result, "$1bl";
+				push @result, "$1bw";
+				push @result, "$1bq";
+				push @result, "$1wl";
+				push @result, "$1wq";
 				push @result, "$_";
 			}
 			elsif ( /^\s*cbw\b/io )
@@ -3529,7 +3563,7 @@ sub conv_att_addr_to_intel ( $ ) {
 
 	# disp(base)
 	$par =~ s/([\w\-\+\(\)]+)\(\s*(\w+)\s*\)/[$2+$1]/o unless $par =~ /st\(\d\)/io;
-	$par =~ s/\(\s*(\w+)\s*\)/[$1]/o;
+	$par =~ s/\(\s*(\w+)\s*\)/[$1]/o unless $par =~ /st\(\d\)/io;
 
 	return $par;
 }
@@ -3548,6 +3582,7 @@ sub conv_intel_addr_to_att ( $ ) {
 	# seg: disp(base, index, scale)
 	# [seg:base+index*scale+disp]
 	if ( $par =~ 	 /\[\s*(\w+)\s*:\s*([\+\-\(\)]*)\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*\*\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*(\)*)\s*\]/o ) {
+
 		$a1 = $2;
 		$a2 = $4;
 		$a3 = $7;
@@ -3577,6 +3612,7 @@ sub conv_intel_addr_to_att ( $ ) {
 		}
 	}
 	elsif ( $par =~  /\[\s*(\w+)\s*:\s*([\+\-\(\)]*)\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*\*\s*(\w+)\s*(\)*)\s*\]/o ) {
+
 		$a1 = $2;
 		$a2 = $4;
 		$a3 = $6;
@@ -3605,7 +3641,8 @@ sub conv_intel_addr_to_att ( $ ) {
 			$par =~ s/\[\s*(\w+)\s*:\s*([\+\-\(\)]*)\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*\*\s*(\w+)\s*(\)*)\s*\]/$1:($z1$3$z2$5$z3$7*$8)$9(,1)/o;
 		}
 	}
-	elsif ( $par =~  /\[\s*(\w+)\s*:\s*([\+\-\(\)]*)\s*(\w+)\s*\*\s*(\w+)\s*([\+\-\(\)]*)\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*(\)*)\s*\]/o ) {
+	elsif ( $par =~  /\[\s*(\w+)\s*:\s*([\+\-\(\)]*)\s*(\w+)\s*\*\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*(\)*)\s*\]/o ) {
+
 		$a1 = $2;
 		$a2 = $5;
 		$a3 = $7;
@@ -3613,28 +3650,29 @@ sub conv_intel_addr_to_att ( $ ) {
 		$z2 = nopluses($a2);
 		$z3 = nopluses($a3);
 		if ( is_reg($3) && is_reg($6) ) {
-			$par =~ s/\[\s*(\w+)\s*:\s*([\+\-\(\)]*)\s*(\w+)\s*\*\s*(\w+)\s*([\+\-\(\)]*)\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*(\)*)\s*\]/$1:($z3$8)$9($6,$3,$4)/o;
+			$par =~ s/\[\s*(\w+)\s*:\s*([\+\-\(\)]*)\s*(\w+)\s*\*\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*(\)*)\s*\]/$1:($z3$8)$9($6,$3,$4)/o;
 		} elsif ( is_reg($4) && is_reg($6) ) {
-			$par =~ s/\[\s*(\w+)\s*:\s*([\+\-\(\)]*)\s*(\w+)\s*\*\s*(\w+)\s*([\+\-\(\)]*)\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*(\)*)\s*\]/$1:($z3$8)$9($6,$4,$3)/o;
+			$par =~ s/\[\s*(\w+)\s*:\s*([\+\-\(\)]*)\s*(\w+)\s*\*\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*(\)*)\s*\]/$1:($z3$8)$9($6,$4,$3)/o;
 		} elsif ( is_reg($6) && is_reg($8) ) {
-			$par =~ s/\[\s*(\w+)\s*:\s*([\+\-\(\)]*)\s*(\w+)\s*\*\s*(\w+)\s*([\+\-\(\)]*)\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*(\)*)\s*\]/$1:($z1$3*$4)$9($6,$8)/o;
+			$par =~ s/\[\s*(\w+)\s*:\s*([\+\-\(\)]*)\s*(\w+)\s*\*\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*(\)*)\s*\]/$1:($z1$3*$4)$9($6,$8)/o;
 		} elsif ( is_reg($3) && is_reg($8) ) {
-			$par =~ s/\[\s*(\w+)\s*:\s*([\+\-\(\)]*)\s*(\w+)\s*\*\s*(\w+)\s*([\+\-\(\)]*)\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*(\)*)\s*\]/$1:($z2$6)$9($8,$3,$4)/o;
+			$par =~ s/\[\s*(\w+)\s*:\s*([\+\-\(\)]*)\s*(\w+)\s*\*\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*(\)*)\s*\]/$1:($z2$6)$9($8,$3,$4)/o;
 		} elsif ( is_reg($4) && is_reg($8) ) {
-			$par =~ s/\[\s*(\w+)\s*:\s*([\+\-\(\)]*)\s*(\w+)\s*\*\s*(\w+)\s*([\+\-\(\)]*)\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*(\)*)\s*\]/$1:($z2$6)$9($8,$4,$3)/o;
+			$par =~ s/\[\s*(\w+)\s*:\s*([\+\-\(\)]*)\s*(\w+)\s*\*\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*(\)*)\s*\]/$1:($z2$6)$9($8,$4,$3)/o;
 		} elsif ( is_reg($3) ) {
-			$par =~ s/\[\s*(\w+)\s*:\s*([\+\-\(\)]*)\s*(\w+)\s*\*\s*(\w+)\s*([\+\-\(\)]*)\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*(\)*)\s*\]/$1:($z2$6$z3$8)$9(,$3,$4)/o;
+			$par =~ s/\[\s*(\w+)\s*:\s*([\+\-\(\)]*)\s*(\w+)\s*\*\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*(\)*)\s*\]/$1:($z2$6$z3$8)$9(,$3,$4)/o;
 		} elsif ( is_reg($4) ) {
-			$par =~ s/\[\s*(\w+)\s*:\s*([\+\-\(\)]*)\s*(\w+)\s*\*\s*(\w+)\s*([\+\-\(\)]*)\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*(\)*)\s*\]/$1:($z2$6$z3$8)$9(,$4,$3)/o;
+			$par =~ s/\[\s*(\w+)\s*:\s*([\+\-\(\)]*)\s*(\w+)\s*\*\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*(\)*)\s*\]/$1:($z2$6$z3$8)$9(,$4,$3)/o;
 		} elsif ( is_reg($6) ) {
-			$par =~ s/\[\s*(\w+)\s*:\s*([\+\-\(\)]*)\s*(\w+)\s*\*\s*(\w+)\s*([\+\-\(\)]*)\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*(\)*)\s*\]/$1:($z1$3*$4$z3$8)$9($6)/o;
+			$par =~ s/\[\s*(\w+)\s*:\s*([\+\-\(\)]*)\s*(\w+)\s*\*\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*(\)*)\s*\]/$1:($z1$3*$4$z3$8)$9($6)/o;
 		} elsif ( is_reg($8) ) {
-			$par =~ s/\[\s*(\w+)\s*:\s*([\+\-\(\)]*)\s*(\w+)\s*\*\s*(\w+)\s*([\+\-\(\)]*)\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*(\)*)\s*\]/$1:($z1$3*$4$z2$6)$9($8)/o;
+			$par =~ s/\[\s*(\w+)\s*:\s*([\+\-\(\)]*)\s*(\w+)\s*\*\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*(\)*)\s*\]/$1:($z1$3*$4$z2$6)$9($8)/o;
 		} else {
-			$par =~ s/\[\s*(\w+)\s*:\s*([\+\-\(\)]*)\s*(\w+)\s*\*\s*(\w+)\s*([\+\-\(\)]*)\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*(\)*)\s*\]/$1:($z1$3*$4$z2$6$z3$8)$9(,1)/o;
+			$par =~ s/\[\s*(\w+)\s*:\s*([\+\-\(\)]*)\s*(\w+)\s*\*\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*(\)*)\s*\]/$1:($z1$3*$4$z2$6$z3$8)$9(,1)/o;
 		}
 	}
 	elsif ( $par =~  /\[\s*(\w+)\s*:\s*([\+\-\(\)]*)\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*(\)*)\s*\]/o ) {
+
 		$a1 = $2;
 		$a2 = $4;
 		$a3 = $6;
@@ -3658,6 +3696,7 @@ sub conv_intel_addr_to_att ( $ ) {
 		}
 	}
 	elsif ( $par =~  /\[\s*(\w+)\s*:\s*([\+\-\(\)]*)\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*\*\s*(\w+)\s*(\)*)\s*\]/o ) {
+
 		$a1 = $2;
 		$a2 = $4;
 		$z1 = nopluses($a1);
@@ -3677,6 +3716,7 @@ sub conv_intel_addr_to_att ( $ ) {
 		}
 	}
 	elsif ( $par =~  /\[\s*(\w+)\s*:\s*([\+\-\(\)]*)\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*(\)*)\s*\]/o ) {
+
 		$a1 = $2;
 		$a2 = $4;
 		$z1 = nopluses($a1);
@@ -3692,6 +3732,7 @@ sub conv_intel_addr_to_att ( $ ) {
 		}
 	}
 	elsif ( $par =~  /\[\s*(\w+)\s*:\s*(\w+)\s*\]/o ) {
+
 		if ( is_reg($2) ) {
 			$par =~ s/\[\s*(\w+)\s*:\s*(\w+)\s*\]/$1:($2)/o;
 		} else {
@@ -3699,6 +3740,7 @@ sub conv_intel_addr_to_att ( $ ) {
 		}
 	}
 	elsif ( $par =~  /\[\s*(\w+)\s*:\s*([\+\-\(\)]*)\s*(\w+)\s*\*\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*(\)*)\s*\]/o ) {
+
 		$a1 = $2;
 		$a2 = $5;
 		$z1 = nopluses($a1);
@@ -3766,9 +3808,9 @@ sub conv_intel_addr_to_att ( $ ) {
 		} elsif ( is_reg($5) && is_reg($7) ) {
 			$par =~ s/\[\s*([\+\-\(\)]*)\s*(\w+)\s*\*\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*(\)*)\s*\]/($z1$2*$3)$8($5,$7)/o;
 		} elsif ( is_reg($2) ) {
-			$par =~ s/\[\s*([\+\-\(\)]*)\s*(\w+)\s*\*\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*(\)*)\s*\]/($z2$5z3$7)$8(,$2,$3)/o;
+			$par =~ s/\[\s*([\+\-\(\)]*)\s*(\w+)\s*\*\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*(\)*)\s*\]/($z2$5$z3$7)$8(,$2,$3)/o;
 		} elsif ( is_reg($3) ) {
-			$par =~ s/\[\s*([\+\-\(\)]*)\s*(\w+)\s*\*\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*(\)*)\s*\]/($z2$5z3$7)$8(,$3,$2)/o;
+			$par =~ s/\[\s*([\+\-\(\)]*)\s*(\w+)\s*\*\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*(\)*)\s*\]/($z2$5$z3$7)$8(,$3,$2)/o;
 		} elsif ( is_reg($5) ) {
 			$par =~ s/\[\s*([\+\-\(\)]*)\s*(\w+)\s*\*\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*(\)*)\s*\]/($z1$2*$3$z3$7)$8($5)/o;
 		} elsif ( is_reg($7) ) {
@@ -3924,7 +3966,7 @@ sub conv_att_instr_to_intel ( $ ) {
 		$a4 = $4;
 
 		# (don't touch "call/jmp xxx")
-		if ( $a1 !~ /call/io && $a1 !~ /^\s*j[a-z]{1,3}/io ) {
+		#if ( $a1 !~ /call/io && $a1 !~ /^\s*j[a-z]{1,3}/io ) {
 
 			# (we mustn't change digits and %st(n))
 			if ( $a2 !~ /\$/o && $a2 !~ /\%/o && $a2 !~ /_L\d+/o && $a2 =~ /[a-zA-Z_\.]/o ) {
@@ -3942,7 +3984,7 @@ sub conv_att_instr_to_intel ( $ ) {
 
 			# (ATTENTION: operand order will be changed later)
 			$par = "\t$a1\t$a2, $a3, $a4\n";
-		}
+		#}
 	}
 
 	if ( $par =~ /^\s*(\w+)\s+([\$\%\w\+\-]+)\s*,\s*([\$\%\w\+\-]+)\s*$/o ) {
@@ -3954,7 +3996,7 @@ sub conv_att_instr_to_intel ( $ ) {
 		$a3 = $3;
 
 		# (don't touch "call/jmp xxx")
-		if ( $a1 !~ /call/io && $a1 !~ /^\s*j[a-z]{1,3}/io ) {
+		#if ( $a1 !~ /call/io && $a1 !~ /^\s*j[a-z]{1,3}/io ) {
 
 			# (we mustn't change digits and %st(n))
 			if ( $a2 !~ /\$/o && $a2 !~ /\%/o && $a2 !~ /_L\d+/o && $a2 =~ /[a-zA-Z_\.]/o ) {
@@ -3968,7 +4010,7 @@ sub conv_att_instr_to_intel ( $ ) {
 
 			# (ATTENTION: operand order will be changed later)
 			$par = "\t$a1\t$a2, $a3\n";
-		}
+		#}
 	}
 
 	if ( $par =~ /^\s*(\w+)\s+([\$\%\w\+\-]+)\s*\s*$/o ) {
@@ -4079,10 +4121,120 @@ sub conv_intel_instr_to_att ( $ ) {
 		if ( $par =~ /^\s*$i\s+([^,]+)/i ) {
 
 			($a1 = $1) =~ s/\s+$//o;
-			if ( $par =~ /[^;]+\bbyte\b/io )     { $par =~ s/^\s*$i\s+byte\b/\t${i}b/i; }
-			elsif ( $par =~ /[^;]+\bword\b/io )  { $par =~ s/^\s*$i\s+word\b/\t${i}w/i; }
-			elsif ( $par =~ /[^;]+\bdword\b/io ) { $par =~ s/^\s*$i\s+dword\b/\t${i}l/i; }
-			elsif ( $par =~ /^\s*$i\s+([^,]+)\s*,\s*([^,]+)/i ) {
+			if ( $par =~ /[^;]+\bbyte\b/io )     {
+
+				$par =~ s/^\s*$i\b/\t${i}b/i;
+				$par =~ s/\b(t?byte|[dqpft]?word)\b//io;
+
+			} elsif ( $par =~ /[^;]+\bword\b/io )  {
+
+				$par =~ s/^\s*$i\b/\t${i}w/i;
+				$par =~ s/\b(t?byte|[dqpft]?word)\b//io;
+
+			} elsif ( $par =~ /[^;]+\bdword\b/io ) {
+
+				$par =~ s/^\s*$i\b/\t${i}l/i;
+				$par =~ s/\b(t?byte|[dqpft]?word)\b//io;
+
+			} elsif ( $par =~ /[^;]+\bqword\b/io ) {
+
+				$par =~ s/^\s*$i\b/\t${i}q/i;
+				$par =~ s/\b(t?byte|[dqpft]?word)\b//io;
+
+			} elsif ( $par =~ /^\s*$i\s+([^,]+)\s*,\s*([^,]+)\s*,\s*([^,]+)/i ) {
+
+				($a2 = $2) =~ s/\s+$//o;
+				($a3 = $3) =~ s/\s+$//o;
+				if ( $a3 !~ /\[.*\]/o ) {
+
+					if ( is_reg8 ($a3) )    { $par =~ s/^\s*$i\b/\t${i}b/i; }
+					elsif ( is_reg16($a3) ) { $par =~ s/^\s*$i\b/\t${i}w/i; }
+					elsif ( is_reg32($a3) ) { $par =~ s/^\s*$i\b/\t${i}l/i; }
+					elsif ( is_reg64($a3) ) { $par =~ s/^\s*$i\b/\t${i}q/i; }
+					elsif ( $par =~ /^\s*$i\s+([^\[\],]+)\s*,\s*([^,]+)\s*,\s*([^,]+)/i ) {
+						$a1 = $1;
+						$a1 =~ s/\s+$//o;
+						if ( is_reg8 ($a1) )    { $par =~ s/^\s*$i\b/\t${i}b/i; }
+						elsif ( is_reg16($a1) ) { $par =~ s/^\s*$i\b/\t${i}w/i; }
+						elsif ( is_reg32($a1) ) { $par =~ s/^\s*$i\b/\t${i}l/i; }
+						elsif ( is_reg64($a1) ) { $par =~ s/^\s*$i\b/\t${i}q/i; }
+						# (default: let the programmer decide)
+						#else { $par =~ s/^\s*$i\b/\t${i}l/i; }
+					}
+					elsif ( $par =~ /^\s*$i\s+([^,]+)\s*,\s*([^\[\],]+)\s*,\s*([^,]+)/i ) {
+						$a2 = $2;
+						$a2 =~ s/\s+$//o;
+						if ( is_reg8 ($a2) )    { $par =~ s/^\s*$i\b/\t${i}b/i; }
+						elsif ( is_reg16($a2) ) { $par =~ s/^\s*$i\b/\t${i}w/i; }
+						elsif ( is_reg32($a2) ) { $par =~ s/^\s*$i\b/\t${i}l/i; }
+						elsif ( is_reg64($a2) ) { $par =~ s/^\s*$i\b/\t${i}q/i; }
+						# (default: let the programmer decide)
+						#else { $par =~ s/^\s*$i\b/\t${i}l/i; }
+					}
+					# taken care of by the first conditions
+					#else {#if ( $par =~ /^\s*$i\s+([^,]+)\s*,\s*([^,]+),\s*([^\[\],]+)\s*/i ) {
+						#$par =~ /^\s*$i\s+([^,]+)\s*,\s*([^,]+),\s*([^\[\],]+)\s*/i;
+						#$a3 = $3;
+						#$a3 =~ s/\s+$//o;
+						#if ( is_reg8 ($a3) )    { $par =~ s/^\s*$i\b/\t${i}b/i; }
+						#elsif ( is_reg16($a3) ) { $par =~ s/^\s*$i\b/\t${i}w/i; }
+						#elsif ( is_reg32($a3) ) { $par =~ s/^\s*$i\b/\t${i}l/i; }
+						#elsif ( is_reg64($a3) ) { $par =~ s/^\s*$i\b/\t${i}q/i; }
+						# (default: let the programmer decide)
+						#else { $par =~ s/^\s*$i\b/\t${i}l/i; }
+					#} else {
+						# (default: let the programmer decide)
+						#$par =~ s/^\s*$i\b/\t${i}l/i;
+					#}
+
+				} elsif ( $a2 !~ /\[.*\]/o ) {
+
+					if ( is_reg8 ($a2) )    { $par =~ s/^\s*$i\b/\t${i}b/i; }
+					elsif ( is_reg16($a2) ) { $par =~ s/^\s*$i\b/\t${i}w/i; }
+					elsif ( is_reg32($a2) ) { $par =~ s/^\s*$i\b/\t${i}l/i; }
+					elsif ( is_reg64($a2) ) { $par =~ s/^\s*$i\b/\t${i}q/i; }
+					elsif ( $par =~ /^\s*$i\s+([^\[\],]+)\s*,\s*([^,]+)\s*,\s*([^,]+)/i ) {
+						$a1 = $1;
+						$a1 =~ s/\s+$//o;
+						if ( is_reg8 ($a1) )    { $par =~ s/^\s*$i\b/\t${i}b/i; }
+						elsif ( is_reg16($a1) ) { $par =~ s/^\s*$i\b/\t${i}w/i; }
+						elsif ( is_reg32($a1) ) { $par =~ s/^\s*$i\b/\t${i}l/i; }
+						elsif ( is_reg64($a1) ) { $par =~ s/^\s*$i\b/\t${i}q/i; }
+						# (default: let the programmer decide)
+						#else { $par =~ s/^\s*$i\b/\t${i}l/i; }
+					}
+					# taken care of by the first conditions
+					#else {#if ( $par =~ /^\s*$i\s+([^,]+)\s*,\s*([^\[\],]+)\s*,\s*([^,]+)/i ) {
+						#$par =~ /^\s*$i\s+([^,]+)\s*,\s*([^\[\],]+)\s*,\s*([^,]+)/i;
+						#$a1 = $2;
+						#$a1 =~ s/\s+$//o;
+						#if ( is_reg8 ($a1) )    { $par =~ s/^\s*$i\b/\t${i}b/i; }
+						#elsif ( is_reg16($a1) ) { $par =~ s/^\s*$i\b/\t${i}w/i; }
+						#elsif ( is_reg32($a1) ) { $par =~ s/^\s*$i\b/\t${i}l/i; }
+						#elsif ( is_reg64($a1) ) { $par =~ s/^\s*$i\b/\t${i}q/i; }
+						# (default: let the programmer decide)
+						#else { $par =~ s/^\s*$i\b/\t${i}l/i; }
+					#} else {
+						# (default: let the programmer decide)
+						#$par =~ s/^\s*$i\b/\t${i}l/i;
+					#}
+
+				} elsif ( $par =~ /^\s*$i\s+([^\[\],]+)\s*,\s*([^,]+)\s*,\s*([^,]+)/i ) {
+
+					$a1 = $1;
+					$a1 =~ s/\s+$//o;
+					if ( is_reg8 ($a1) )    { $par =~ s/^\s*$i\b/\t${i}b/i; }
+					elsif ( is_reg16($a1) ) { $par =~ s/^\s*$i\b/\t${i}w/i; }
+					elsif ( is_reg32($a1) ) { $par =~ s/^\s*$i\b/\t${i}l/i; }
+					elsif ( is_reg64($a1) ) { $par =~ s/^\s*$i\b/\t${i}q/i; }
+					# (default: let the programmer decide)
+					#else { $par =~ s/^\s*$i\b/\t${i}l/i; }
+
+				#} else {
+					# (default: let the programmer decide)
+					#$par =~ s/^\s*$i\b/\t${i}l/i;
+				}
+			} elsif ( $par =~ /^\s*$i\s+([^,]+)\s*,\s*([^,]+)/i ) {
 
 				($a2 = $2) =~ s/\s+$//o;
 				if ( $a2 !~ /\[.*\]/o ) {
@@ -4090,68 +4242,108 @@ sub conv_intel_instr_to_att ( $ ) {
 					if ( is_reg8 ($a2) )    { $par =~ s/^\s*$i\b/\t${i}b/i; }
 					elsif ( is_reg16($a2) ) { $par =~ s/^\s*$i\b/\t${i}w/i; }
 					elsif ( is_reg32($a2) ) { $par =~ s/^\s*$i\b/\t${i}l/i; }
+					elsif ( is_reg64($a2) ) { $par =~ s/^\s*$i\b/\t${i}q/i; }
 					elsif ( $par =~ /^\s*$i\s+([^\[\],]+)\s*,\s*([^,]+)/i ) {
 						$a1 = $1;
-						$a2 = $2;
 						$a1 =~ s/\s+$//o;
-						$a2 =~ s/\s+$//o;
 						if ( is_reg8 ($a1) )    { $par =~ s/^\s*$i\b/\t${i}b/i; }
 						elsif ( is_reg16($a1) ) { $par =~ s/^\s*$i\b/\t${i}w/i; }
 						elsif ( is_reg32($a1) ) { $par =~ s/^\s*$i\b/\t${i}l/i; }
-						else { $par =~ s/^\s*$i\b/\t${i}l/i; }
+						elsif ( is_reg64($a1) ) { $par =~ s/^\s*$i\b/\t${i}q/i; }
+						# (default: let the programmer decide)
+						#else { $par =~ s/^\s*$i\b/\t${i}l/i; }
 					}
+					# taken care of by the first conditions
+					#else {#if ( $par =~ /^\s*$i\s+([^,]+)\s*,\s*([^\[\],]+)/i ) {
+						#$a1 = $2;
+						#$a1 =~ s/\s+$//o;
+						#if ( is_reg8 ($a1) )    { $par =~ s/^\s*$i\b/\t${i}b/i; }
+						#elsif ( is_reg16($a1) ) { $par =~ s/^\s*$i\b/\t${i}w/i; }
+						#elsif ( is_reg32($a1) ) { $par =~ s/^\s*$i\b/\t${i}l/i; }
+						#elsif ( is_reg64($a1) ) { $par =~ s/^\s*$i\b/\t${i}q/i; }
+						# (default: let the programmer decide)
+						#else { $par =~ s/^\s*$i\b/\t${i}l/i; }
+					#} else {
+						# (default: let the programmer decide)
+						#$par =~ s/^\s*$i\b/\t${i}l/i;
+					#}
+
 				} elsif ( $par =~ /^\s*$i\s+([^\[\],]+)\s*,\s*([^,]+)/i ) {
 
 					$a1 = $1;
-					$a2 = $2;
 					$a1 =~ s/\s+$//o;
-					$a2 =~ s/\s+$//o;
 					if ( is_reg8 ($a1) )    { $par =~ s/^\s*$i\b/\t${i}b/i; }
 					elsif ( is_reg16($a1) ) { $par =~ s/^\s*$i\b/\t${i}w/i; }
 					elsif ( is_reg32($a1) ) { $par =~ s/^\s*$i\b/\t${i}l/i; }
-					else { $par =~ s/^\s*$i\b/\t${i}l/i; }
-				} else {
-					# (default: long)
-					$par =~ s/^\s*$i\b/\t${i}l/i;
+					elsif ( is_reg64($a1) ) { $par =~ s/^\s*$i\b/\t${i}q/i; }
+					# (default: let the programmer decide)
+					#else { $par =~ s/^\s*$i\b/\t${i}l/i; }
+
+				#} else {
+					# (default: let the programmer decide)
+					#$par =~ s/^\s*$i\b/\t${i}l/i;
 				}
-			} else {
+			} else { #if ( $par =~ /^\s*$i\s+([^,]+)\s*/i ) {
+
+				$par =~ /^\s*$i\s+([^,]+)\s*/i;
+				($a1 = $1) =~ s/\s+$//o;
+				if ( is_reg8 ($a1) )    { $par =~ s/^\s*$i\b/\t${i}b/i; }
+				elsif ( is_reg16($a1) ) { $par =~ s/^\s*$i\b/\t${i}w/i; }
+				elsif ( is_reg32($a1) ) { $par =~ s/^\s*$i\b/\t${i}l/i; }
+				elsif ( is_reg64($a1) ) { $par =~ s/^\s*$i\b/\t${i}q/i; }
+				#else {
+					# (default: let the programmer decide)
+					#$par =~ s/^\s*$i\b/\t${i}l/i;
+				#}
+
+			#} else {
 				# (default: long)
-				$par =~ s/^\s*$i\b/\t${i}l/i;
+				# unreachable code
+				#$par =~ s/^\s*$i\b/\t${i}l/i;
 			}
 			last;
 		}
 	}
 
-	# (changing operands' order):
-	if ( $par =~ 	 /^\s*(\w+)\s+(\[?[:\.\w\*\+\-\s\(\)]+\]?)\s*,\s*(\[?[:\.\w\*\+\-\s\(\)]+\]?)\s*,\s*(\[?[:\.\w\*\+\-\s\(\)]+\]?)/o ) {
-		if ( is_instr($1) ) {
-			$par =~ s/^\s*(\w+)\s+(\[?[:\.\w\*\+\-\s\(\)]+\]?)\s*,\s*(\[?[:\.\w\*\+\-\s\(\)]+\]?)\s*,\s*(\[?[:\.\w\*\+\-\s\(\)]+\]?)/\t$1\t$4, $3, $2/o;
+	# (add suffixes to MOVSX/MOVZX instructions)
+	if ( $par =~ /^\s*(mov[sz])x\s+([^,]+)\s*,\s*([^,]+)(.*)/io ) {
+
+		my ($inst, $arg1, $arg2, $rest, $z1, $z2);
+		$inst = $1;
+		$z1 = $2;
+		$z2 = $3;
+		$rest = $4;
+		($arg1 = $z1) =~ s/\s*$//o;
+		($arg2 = $z2) =~ s/\s*$//o;
+		# operand order is changed later
+		if ( ($par =~ /\bbyte\b/io || is_reg8($arg2) ) && is_reg32($arg1) ) {
+			$par = "\t${inst}bl\t$arg1, $arg2 $rest\n";
+		} elsif ( ($par =~ /\bbyte\b/io || is_reg8($arg2) ) && is_reg16($arg1) ) {
+			$par = "\t${inst}bw\t$arg1, $arg2 $rest\n";
+		} elsif ( ($par =~ /\bword\b/io || is_reg16($arg2)) && is_reg32($arg1)  ) {
+			$par = "\t${inst}wl\t$arg1, $arg2 $rest\n";
+		} elsif ( ($par =~ /\bbyte\b/io || is_reg8($arg2)) && is_reg64($arg1)  ) {
+			$par = "\t${inst}bq\t$arg1, $arg2 $rest\n";
+		} elsif ( ($par =~ /\bword\b/io || is_reg16($arg2)) && is_reg64($arg1)  ) {
+			$par = "\t${inst}wq\t$arg1, $arg2 $rest\n";
 		}
-	}
-	if ( $par =~ 	 /^\s*(\w+)\s+(\[?[:\.\w\*\+\-\s\(\)]+\]?)\s*,\s*(\[?[:\.\w\*\+\-\s\(\)]+\]?)([^,]*(;.*)?)$/o ) {
-		if ( is_instr($1) ) {
-			$par =~ s/^\s*(\w+)\s+(\[?[:\.\w\*\+\-\s\(\)]+\]?)\s*,\s*(\[?[:\.\w\*\+\-\s\(\)]+\]?)([^,]*(;.*)?)$/\t$1\t$3, $2$4\n/o;
-		}
-	}
-	if ( $par =~ 	 /^\s*(\w+)\s+(\[?[:\.\w\*\+\-\s\(\)]+\]?)([^,]*(;.*)?)$/o ) {
-		if ( is_instr($1) ) {
-			$par =~ s/^\s*(\w+)\s+(\[?[:\.\w\*\+\-\s\(\)]+\]?)([^,]*(;.*)?)$/\t$1\t$2$3\n/o;
-		}
+		# if we can't decide on register sizes, leave it for the programmer to fix
 	}
 
-	if ( $par =~ 	 /^\s*(\w+)\s+((t?byte|[dqpft]?word)\s*\[?[\.\w\*\+\-\s\(\)]+\]?)\s*,\s*(\[?[\.\w\*\+\-\s\(\)]+\]?)\s*,\s*(\[?[\.\w\*\+\-\s\(\)]+\]?)/o ) {
+	# (changing operands' order):
+	if ( $par =~ 	 /^\s*(\w+)\s+((t?byte|[dqpft]?word)?\s*\[?[\.\w\*\+\-\s\(\)\[\]]+\]?)\s*,\s*((t?byte|[dqpft]?word)?\s*\[?[\.\w\*\+\-\s\(\)\[\]]+\]?)\s*,\s*((t?byte|[dqpft]?word)?\s*\[?[\.\w\*\+\-\s\(\)\[\]]+\]?)/o ) {
 		if ( is_instr($1) ) {
-			$par =~ s/^\s*(\w+)\s+((t?byte|[dqpft]?word)\s*\[?[\.\w\*\+\-\s\(\)]+\]?)\s*,\s*(\[?[\.\w\*\+\-\s\(\)]+\]?)\s*,\s*(\[?[\.\w\*\+\-\s\(\)]+\]?)/\t$1\t$5, $4, $2/o;
+			$par =~ s/^\s*(\w+)\s+((t?byte|[dqpft]?word)?\s*\[?[\.\w\*\+\-\s\(\)\[\]]+\]?)\s*,\s*((t?byte|[dqpft]?word)?\s*\[?[\.\w\*\+\-\s\(\)\[\]]+\]?)\s*,\s*((t?byte|[dqpft]?word)?\s*\[?[\.\w\*\+\-\s\(\)\[\]]+\]?)/\t$1\t$6, $4, $2/o;
 		}
 	}
-	if ( $par =~ 	 /^\s*(\w+)\s+((t?byte|[dqpft]?word)\s*\[?[\.\w\*\+\-\s\(\)]+\]?)\s*,\s*(\[?[\.\w\*\+\-\s\(\)]+\]?)([^,]*(;.*)?)$/o ) {
+	if ( $par =~ 	 /^\s*(\w+)\s+((t?byte|[dqpft]?word)?\s*\[?[\.\w\*\+\-\s\(\)\[\]]+\]?)\s*,\s*((t?byte|[dqpft]?word)?\s*\[?[\.\w\*\+\-\s\(\)\[\]]+\]?)([^,]*(;.*)?)$/o ) {
 		if ( is_instr($1) ) {
-			$par =~ s/^\s*(\w+)\s+((t?byte|[dqpft]?word)\s*\[?[\.\w\*\+\-\s\(\)]+\]?)\s*,\s*(\[?[\.\w\*\+\-\s\(\)]+\]?)([^,]*(;.*)?)$/\t$1\t$4, $2$5\n/o;
+			$par =~ s/^\s*(\w+)\s+((t?byte|[dqpft]?word)?\s*\[?[\.\w\*\+\-\s\(\)\[\]]+\]?)\s*,\s*((t?byte|[dqpft]?word)?\s*\[?[\.\w\*\+\-\s\(\)\[\]]+\]?)([^,]*(;.*)?)$/\t$1\t$4, $2$6\n/o;
 		}
 	}
-	if ( $par =~ 	 /^\s*(\w+)\s+((t?byte|[dqpft]?word)\s*\[?[\.\w\*\+\-\s\(\)]+\]?)([^,]*(;.*)?)$/o ) {
+	if ( $par =~ 	 /^\s*(\w+)\s+((t?byte|[dqpft]?word)?\s*\[?[\.\w\*\+\-\s\(\)\[\]]+\]?)([^,]*(;.*)?)$/o ) {
 		if ( is_instr($1) ) {
-			$par =~ s/^\s*(\w+)\s+((t?byte|[dqpft]?word)\s*\[?[\.\w\*\+\-\s\(\)]+\]?)([^,]*(;.*)?)$/\t$1\t$2$4\n/o;
+			$par =~ s/^\s*(\w+)\s+((t?byte|[dqpft]?word)?\s*\[?[\.\w\*\+\-\s\(\)\[\]]+\]?)([^,]*(;.*)?)$/\t$1\t$2$4\n/o;
 		}
 	}
 
@@ -4179,9 +4371,9 @@ sub conv_intel_instr_to_att ( $ ) {
 			$a2 =~ s/\s+$//o;
 			$a3 =~ s/\s+$//o;
 			$a4 =~ s/\s+$//o;
-			$a2 =~ s/(t?byte|[dqpft]?word)//o;
-			$a3 =~ s/(t?byte|[dqpft]?word)//o;
-			$a4 =~ s/(t?byte|[dqpft]?word)//o;
+			$a2 =~ s/(t?byte|[dqpft]?word)//io;
+			$a3 =~ s/(t?byte|[dqpft]?word)//io;
+			$a4 =~ s/(t?byte|[dqpft]?word)//io;
 			$a2 =~ s/^\s+//o;
 			$a3 =~ s/^\s+//o;
 			$a4 =~ s/^\s+//o;
@@ -4200,8 +4392,8 @@ sub conv_intel_instr_to_att ( $ ) {
 			$a1 =~ s/\s+$//o;
 			$a2 =~ s/\s+$//o;
 			$a3 =~ s/\s+$//o;
-			$a2 =~ s/(t?byte|[dqpft]?word)//o;
-			$a3 =~ s/(t?byte|[dqpft]?word)//o;
+			$a2 =~ s/(t?byte|[dqpft]?word)//io;
+			$a3 =~ s/(t?byte|[dqpft]?word)//io;
 			$a2 =~ s/^\s+//o;
 			$a3 =~ s/^\s+//o;
 
@@ -4216,33 +4408,13 @@ sub conv_intel_instr_to_att ( $ ) {
 			$a2 = $2;
 			$a1 =~ s/\s+$//o;
 			$a2 =~ s/\s+$//o;
-			$a2 =~ s/(t?byte|[dqpft]?word)//o;
+			$a2 =~ s/(t?byte|[dqpft]?word)//io;
 			$a2 =~ s/^\s+//o;
 
 			if ( $a2 !~ /\[/o && !is_reg($a2) ) { $a2 = "\$$a2"; }
 
 			$par = "\t$a1\t$a2\n";
 
-		}
-	}
-
-	my ($z1, $z2, $z3);
-	# (add suffixes to MOVSX/MOVZX instructions)
-	if ( $par =~ /^\s*(mov[sz])x\s+([^,]+)\s*,\s*([^,]+)(.*)/io ) {
-
-		my ($inst, $arg1, $arg2, $reszta);
-		$inst = $1;
-		$z1 = $2;
-		$z2 = $3;
-		$reszta = $4;
-		($arg1 = $z1) =~ s/\s*$//o;
-		($arg2 = $z2) =~ s/\s*$//o;
-		if ( ($par =~ /\bbyte\b/io || is_reg8($arg2) ) && is_reg32($arg1) ) {
-			$par = "\t${inst}bl\t$arg1, $arg2 $reszta\n";
-		} elsif ( ($par =~ /\bbyte\b/io || is_reg8($arg2) ) && is_reg16($arg1) ) {
-			$par = "\t${inst}bw\t$arg1, $arg2 $reszta\n";
-		} elsif ( $par =~ /\bword\b/io || is_reg16($arg2) || is_reg32($arg1)  ) {
-			$par = "\t${inst}wl\t$arg1, $arg2 $reszta\n";
 		}
 	}
 
@@ -4290,24 +4462,24 @@ After installing, you can find documentation for this module with the perldoc co
 You can also look for information at:
 
     Search CPAN
+        https://metacpan.org/release/Asm-X86
         http://search.cpan.org/dist/Asm-X86
 
     CPAN Request Tracker:
+        https://rt.cpan.org/Public/Dist/Display.html?Name=Asm-X86
         http://rt.cpan.org/NoAuth/Bugs.html?Dist=Asm-X86
 
-    AnnoCPAN, annotated CPAN documentation:
-        http://annocpan.org/dist/Asm-X86
-
     CPAN Ratings:
+        https://cpanratings.perl.org/dist/Asm-X86
         http://cpanratings.perl.org/d/Asm-X86
 
 =head1 AUTHOR
 
-Bogdan Drozdowski, C<< <bogdandr at op.pl> >>
+Bogdan Drozdowski, C<< <bogdro at cpan.org> >>
 
 =head1 COPYRIGHT
 
-Copyright 2008-2020 Bogdan Drozdowski, all rights reserved.
+Copyright 2008-2021 Bogdan Drozdowski, all rights reserved.
 
 =head1 LICENSE
 

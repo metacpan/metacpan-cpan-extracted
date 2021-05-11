@@ -1,9 +1,9 @@
 package ArrayDataRole::Source::DBI;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-04-25'; # DATE
+our $DATE = '2021-05-03'; # DATE
 our $DIST = 'ArrayDataRoles-Standard'; # DIST
-our $VERSION = '0.004'; # VERSION
+our $VERSION = '0.005'; # VERSION
 
 use 5.010001;
 use Role::Tiny;
@@ -118,6 +118,26 @@ sub get_iterator_pos {
     $self->{pos};
 }
 
+sub get_item_at_pos {
+    my ($self, $pos) = @_;
+    $self->reset_iterator if $self->{pos} > $pos;
+    while (1) {
+        die "Out of range" unless $self->has_next_item;
+        my $item = $self->get_next_item;
+        return $item if $self->{pos} > $pos;
+    }
+}
+
+sub has_item_at_pos {
+    my ($self, $pos) = @_;
+    return 1 if $self->{pos} > $pos;
+    while (1) {
+        return 0 unless $self->has_next_item;
+        $self->get_next_item;
+        return 1 if $self->{pos} > $pos;
+    }
+}
+
 1;
 # ABSTRACT: Role to access elements from DBI
 
@@ -133,11 +153,15 @@ ArrayDataRole::Source::DBI - Role to access elements from DBI
 
 =head1 VERSION
 
-This document describes version 0.004 of ArrayDataRole::Source::DBI (from Perl distribution ArrayDataRoles-Standard), released on 2021-04-25.
+This document describes version 0.005 of ArrayDataRole::Source::DBI (from Perl distribution ArrayDataRoles-Standard), released on 2021-05-03.
 
 =head1 DESCRIPTION
 
 This role expects array data in L<DBI> database table or query.
+
+Note: C<get_item_at_pos()> and C<has_item_at_pos()> are slow (O(n) in worst
+case) because they iterate. Caching might be added in the future to speed this
+up.
 
 =for Pod::Coverage ^(.+)$
 
@@ -188,7 +212,7 @@ Source repository is at L<https://github.com/perlancar/perl-ArrayDataRoles-Stand
 
 =head1 BUGS
 
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=ArrayDataRoles-Standard>
+Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-ArrayDataRoles-Standard/issues>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired

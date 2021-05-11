@@ -6,6 +6,7 @@ use PICA::Schema;
 use PICA::Schema::Builder;
 use Getopt::Long qw(:config bundling);
 use Pod::Usage;
+use HTTP::Tiny;
 use JSON::PP;
 use List::Util 'sum';
 
@@ -87,8 +88,16 @@ $from = 'plain' unless $from;
 pod2usage("unknown serialization type: $from") unless $types{lc $from};
 
 if ($schema) {
-    my $fh = IO::File->new($schema);
-    $schema = PICA::Schema->new(decode_json(join "\n", <$fh>));
+    my $json;
+    if ($schema =~ qr{^https?://}) {
+        my $res = HTTP::Tiny->new->get($schema);
+        die "HTTP request failed: $schema\n" unless $res->{success};
+        $json = $res->{content};
+    } else {
+        my $fh = IO::File->new($schema);
+        $json = join "\n", <$fh>;
+    }
+    $schema = PICA::Schema->new(decode_json($json));
 }
 
 $to = $from unless ($to or $count or $schema or $build or $sfpath);
@@ -179,7 +188,7 @@ Parse, validate and/or serialize PICA+ data from the command line, e.g.:
   picadata pica.xml -s schema.json   # validate against Avram schema
 
   # document fields used in a record
-  picadata -t fields pica.xml -s <(curl -s https://format.k10plus.de/avram.pl?profile=k10plus)
+  picadata -t fields pica.xml -s https://format.k10plus.de/avram.pl?profile=k10plus
 
 =head1 OPTIONS
 
@@ -210,7 +219,7 @@ expressions can be separated by C<|> or by repeating the option.
 =head2 --schema, -s
 
 L<Avram Schema|http://format.gbv.de/schema/avram/specification> to validate
-against.
+against. Can be a file or an URL.
 
 =head2 --unknown, -u
 

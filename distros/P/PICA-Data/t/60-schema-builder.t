@@ -42,7 +42,7 @@ is_deeply $builder->schema->{fields}, $fields;
 $builder->add(
     [
         # omit 003@
-        ['028B', '00', 'x', 1],              # new field with occurrence
+        ['028B', '01', 'x', 1],              # new field with occurrence
         ['144Z', '',   'y', 0],              # omit 114Z$x
     ]
 );
@@ -50,9 +50,9 @@ $builder->add(
 delete $fields->{'003@'}{required};
 delete $fields->{'144Z'}{subfields}{x}{required};
 $fields->{'144Z'}{subfields}{y} = {code => 'y'};
-$fields->{'028B/00'} = {
+$fields->{'028B/01'} = {
     tag        => '028B',
-    occurrence => '00',
+    occurrence => '01',
     subfields  => {x => {code => 'x', required => \1}}
 };
 

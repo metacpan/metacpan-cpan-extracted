@@ -3,11 +3,10 @@ use strict;
 use warnings;
 
 use Data::Dumper::Compact 'ddc';
-use lib map { "$ENV{HOME}/sandbox/$_/lib" } qw(MIDI-Util);
-use MIDI::Util;
+use MIDI::Util qw(setup_score midi_format);
 use Music::Chord::Progression;
 
-my $score = MIDI::Util::setup_score();
+my $score = setup_score();
 
 my $prog = Music::Chord::Progression->new(
     chord_map => [qw(M7 m7 m7 M7 7 m7 dim7)],
@@ -18,7 +17,7 @@ my $prog = Music::Chord::Progression->new(
 my $chords = $prog->generate;
 
 for my $chord (@$chords) {
-    my @chord = MIDI::Util::midi_format(@$chord);
+    my @chord = midi_format(@$chord);
     $score->n('wn', @chord);
 }
 

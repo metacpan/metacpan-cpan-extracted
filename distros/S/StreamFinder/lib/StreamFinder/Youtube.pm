@@ -113,7 +113,8 @@ and the separate application program:  youtube-dl.
 =over 4
 
 =item B<new>(I<ID>|I<url> [, I<-debug> [ => 0|1|2 ]] 
-[, <-fast> [ => 0|1 ]] [, I<-secure> [ => 0|1 ]])
+[, <-fast> [ => 0|1 ]] [, I<-secure> [ => 0|1 ]] 
+[, I<-noiframes> [ => 0|1 ]])
 
 Accepts a youtube.com video ID, or any full URL that youtube-dl supports 
 and creates and returns a new video object, or I<undef> if the URL is 
@@ -125,12 +126,21 @@ ie. https://www.youtube.com/watch?v=B<video-id>, or just I<video-id>
 If I<-fast> is specified (set to 1 (true)), a separate probe of the 
 page to fetch the video's title and artist is skipped.  This is useful 
 if you know the video is NOT a YouTube video or you don't care about 
-the artist (youtube channel's owner) field.
+the title, or artist (youtube channel's owner) fields.
 
-The optional I<-secure> argument can be either 0 or 1 (I<false> or I<true>).  If 1 
-then only secure ("https://") streams will be returned.
+The optional I<-secure> argument can be either 0 or 1 (I<false> or I<true>).  
+If 1 then only secure ("https://") streams will be returned.  Default for 
+I<-secure> is 0 (false) - return all streams (http and https).
 
-DEFAULT I<-secure> is 0 (false) - return all streams (http and https).
+The optional argument I<-noiframes>, if set to 1 (I<true>) means only 
+process actual video URLs, not search the page for an iframe containing 
+a video URL (a new feature with v0.47).  This is used primarily internally 
+to prevent possible recursion when StreamFinder::YouTube finds an iframe 
+containing a potential video stream URL and creates a new StreamFinder object 
+to find any streams in that URL (which can then call StreamFinder::Youtube 
+again on that URL to find the stream).  Default is 0 (false) - search for 
+StreamFinder-searchable URLs in an iframe, if the page is HTML and not an 
+actual video URL.
 
 =item $video->B<get>()
 
@@ -367,6 +377,7 @@ sub new
 			unless (defined $uops{'agent'});
 	$uops{'timeout'} = 10  unless (defined $uops{'timeout'});
 	$uops{'secure'} = 0    unless (defined $uops{'secure'});
+	$uops{'noiframes'} = 0    unless (defined $uops{'noiframes'});
 	$DEBUG = $uops{'debug'}  if (defined $uops{'debug'});
 	$FAST = $uops{'fast'}  if (defined $uops{'fast'});
 
@@ -377,9 +388,14 @@ sub new
 		} elsif ($_[0] =~ /^\-?fast$/o) {
 			shift;
 			$FAST = (defined($_[0]) && $_[0] =~/^[0-9]$/) ? shift : 1;
+		} elsif ($_[0] =~ /^\-?noiframes$/o) {
+			shift;
+			$uops{'noiframes'} = (defined $_[0]) ? shift : 1;
 		} elsif ($_[0] =~ /^\-?secure$/o) {
 			shift;
 			$uops{'secure'} = (defined $_[0]) ? shift : 1;
+		} else {
+			shift;
 		}
 	}
 
@@ -430,7 +446,41 @@ RETRYIT:
 	print STDERR "--TRY($try of 1): youtube-dl returned=$_= ARGS=$ytdlArgs=\n"  if ($DEBUG);
 	@ytdldata = split /\r?\n/s;
 	unless ($try || scalar(@ytdldata) > 0) {  #IF NOTHING FOUND, RETRY WITHOUT THE SPECIFIC FILE-FORMAT:
-		print STDERR "..1:No MP4 streams found, try again for any (audio, etc.)...\n";
+		unless ($uops{'-noiframes'}) {
+			print STDERR "..1a:See if we have a StreamFinder-supported URL in 1st iframe?...\n"  if ($DEBUG);
+			my $embedded_video;
+			my $html = '';
+			my $ua = LWP::UserAgent->new(@userAgentOps);		
+			$ua->timeout($uops{'timeout'});
+			$ua->cookie_jar({});
+			$ua->env_proxy;
+		 	my $response = $ua->get($url);
+		 	if ($response->is_success) {
+		 		$html = $response->decoded_content;
+		 	} else {
+		 		print STDERR $response->status_line  if ($DEBUG);
+		 		my $no_wget = system('wget','-V');
+		 		unless ($no_wget) {
+		 			print STDERR "\n..trying wget...\n"  if ($DEBUG);
+		 			$html = `wget -t 2 -T 20 -O- -o /dev/null \"$url\" 2>/dev/null `;
+		 		}
+		 	}
+
+			while ($html && $html =~ m#\<iframe([^\>]+)#s) {
+				my $one = $1;
+				my $embeddedURL = ($one =~ m#\"(https?\:\/\/[^\"]+)#s) ? $1 : '';
+				print STDERR "--embedded IFRAME url=$embeddedURL=\n"  if ($DEBUG);
+				if ($embeddedURL) {
+					my $haveStreamFinder = 0;
+					eval { require 'StreamFinder.pm'; $haveStreamFinder = 1; };
+					$embedded_video = new StreamFinder($embeddedURL, -noiframes => 1, -debug => 1)
+							if ($haveStreamFinder);
+					last;
+				}
+			}
+			return $embedded_video  if (defined($embedded_video) && $embedded_video->count() > 0);
+		}
+		print STDERR "..1:No MP4 streams found, try again for any (audio, etc.)...\n"  if ($DEBUG);
 		$try++;
 		goto RETRYIT  if ($ytdlArgs =~ s/\-f\s+\"([^\"]+)\"//);
 	}

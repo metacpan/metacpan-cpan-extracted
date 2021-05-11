@@ -26,6 +26,12 @@ schemas:
         required: 1
       222X:
         required: 0
+  occurrence-range:
+    fields:
+      028C/00-11:
+        required: 1
+      222X:
+        required: 0
   pattern:
     fields:
       021A:
@@ -186,6 +192,14 @@ tests:
 - check: occurrence not missing
   schema: occurrences
   record: occurrences
+
+- check: occurrence in range
+  schema: occurrence-range
+  record: occurrences
+
+- check: occurrence zero=none in range
+  schema: occurrence-range
+  record: occurrences-missing
 
 - check: subfield does not match pattern
   schema: pattern

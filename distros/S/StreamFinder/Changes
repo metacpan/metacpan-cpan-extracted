@@ -263,3 +263,8 @@ Revision history for StreamFinder
         - Add & document new -secure option (all) to allow user to limit 
         streams returned to (secure) https streems.
         - Minor doc. cleanups.
+1.47    2021/05/10
+        - Fix potential infinite loop if unrecognized option arg. passed in.
+        - StreamFinder::Youtube - Add fallback ability to check html page for 
+        embedded iframe containing a valid StreamFinder page, and new option: 
+        "-noiframes" to not do this (if set to 1/true).

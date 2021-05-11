@@ -305,12 +305,12 @@ note('Repeated field with occurrence');
 
 {
     my $match = pica_match($record, '045F[01]');
-    is($match, '001', 'match field occurence');
+    is($match, '001', 'match field occurrence');
 }
 
 {
     my $match = pica_match($record, '045F[0.]', split => 1);
-    is_deeply($match, ['001', '002'], 'match field occurence split');
+    is_deeply($match, ['001', '002'], 'match field occurrence split');
 }
 
 note('Referencing the whole record');

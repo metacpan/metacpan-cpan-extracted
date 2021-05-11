@@ -7,7 +7,7 @@ use Sentry::Client;
 use Sentry::Hub;
 use Sentry::Logger 'logger';
 
-our $VERSION = version->declare('v1.0.6');
+our $VERSION = version->declare('v1.0.8');
 
 sub _call_on_hub ($method, @args) {
   my $hub = Sentry::Hub->get_current_hub();
@@ -91,7 +91,7 @@ Sentry::SDK - sentry.io integration
   Sentry::SDK->init({
     dsn => "https://examplePublicKey@o0.ingest.sentry.io/0",
 
-    # Adjusting this value in production
+    # Adjust this value in production
     traces_sample_rate => 1.0,
   });
 
@@ -176,7 +176,7 @@ Captures a manually created event and sends it to Sentry.
 
   Sentry::SDK->configure_scope(sub ($scope) {
     $scope->set_tag(foo => "bar");
-    $scope->set-user({id => 1, email => "john.doe@example.com"});
+    $scope->set_user({id => 1, email => "john.doe@example.com"});
   });
 
 When an event is captured and sent to Sentry, event data with extra information will be merged from the current scope. The C<configure_scope> function can be used to reconfigure the current scope. This for instance can be used to add custom tags or to inform sentry about the currently authenticated user. See L<Sentry::Hub::Scope> for further information.

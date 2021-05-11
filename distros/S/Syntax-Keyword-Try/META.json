@@ -38,7 +38,11 @@
    "provides" : {
       "Syntax::Keyword::Try" : {
          "file" : "lib/Syntax/Keyword/Try.pm",
-         "version" : "0.23"
+         "version" : "0.24"
+      },
+      "Syntax::Keyword::Try::Deparse" : {
+         "file" : "lib/Syntax/Keyword/Try/Deparse.pm",
+         "version" : "0.24"
       }
    },
    "release_status" : "stable",
@@ -48,6 +52,6 @@
       ],
       "x_IRC" : "irc://irc.perl.org/#io-async"
    },
-   "version" : "0.23",
+   "version" : "0.24",
    "x_serialization_backend" : "JSON::PP version 4.05"
 }

@@ -6,6 +6,7 @@ hax/perl-backcompat.c.inc
 hax/wrap_keyword_plugin.c.inc
 lib/Syntax/Keyword/Try.pm
 lib/Syntax/Keyword/Try.xs
+lib/Syntax/Keyword/Try/Deparse.pm
 LICENSE
 MANIFEST			This list of files
 META.json
@@ -26,6 +27,7 @@ t/16final-expr.t
 t/20try-do.t
 t/21try-do-finally.t
 t/30compat.t
+t/70deparse.t
 t/80await+SKT.t
 t/80defer+SKT.t
 t/90rt123547.t

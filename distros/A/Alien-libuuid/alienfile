@@ -1,5 +1,29 @@
 use alienfile;
+
+use FFI::CheckLib qw( find_lib_or_die );
 plugin 'PkgConfig' => 'uuid';
+
+meta->around_hook('probe' => sub {
+  my $orig = shift;
+  my $build = shift;
+  my $type = $orig->($build, @_);
+  return $type if $type eq 'share';
+  find_lib_or_die lib => 'uuid', symbol => [
+    'uuid_generate_random',
+    'uuid_generate_time',
+    'uuid_unparse',
+    'uuid_parse',
+    'uuid_copy',
+    'uuid_clear',
+    'uuid_type',
+    'uuid_variant',
+    'uuid_time',
+    'uuid_is_null',
+    'uuid_compare',
+  ];
+  return $type;
+});
+
 share {
   plugin Download => (
     url => 'https://sourceforge.net/projects/libuuid/files/libuuid-1.0.3.tar.gz',

@@ -1,3 +1,7 @@
+0.37.1 2021-05-10 09:54:11 +0200 Tobias Oetiker <tobi@oetiker.ch>
+
+ - support for reconfigurePluginOnAppear to have tabs rebuilt on open
+
 0.37.0 2021-05-06 16:31:40 +0200 Tobias Oetiker <tobi@oetiker.ch>
  New Features
 

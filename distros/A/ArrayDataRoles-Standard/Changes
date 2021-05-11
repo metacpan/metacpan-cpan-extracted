@@ -1,3 +1,8 @@
+0.005   2021-05-03  Released-By: PERLANCAR; Urgency: medium
+
+	- Update to ArrayData 0.2.1.
+
+
 0.004   2021-04-25  Released-By: PERLANCAR; Urgency: medium
 
 	- Bump prereqs (GH#2).

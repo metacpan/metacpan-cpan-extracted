@@ -6,6 +6,7 @@ use Test::Warn;
 use Clone qw(clone);
 use File::Basename qw(dirname);
 use Data::Dumper;
+$Data::Dumper::Sortkeys = 1;
 use Text::Hogan::Compiler;
 use utf8;
 
@@ -20,7 +21,6 @@ my $GAF  = $CLASS->new(conf_path => $path);
     is($GAF->_determine_country_code({country_code => 'de'}), 'DE', 'determine_country 2');
 }
 
-
 {
     is($GAF->_clean(undef), undef, 'clean - undef');
     is($GAF->_clean(0),     "0\n", 'clean - zero');
@@ -29,9 +29,7 @@ my $GAF  = $CLASS->new(conf_path => $path);
     while (my ($source, $expected) = each(%$rh_tests)) {
         is($GAF->_clean($source), $expected, 'clean - ' . $source);
     }
-
 }
-
 
 {
     # keep in mind this is using the test conf, not the real address-formatting conf
@@ -83,7 +81,6 @@ my $GAF  = $CLASS->new(conf_path => $path);
     my $components = {street => 'Hello World',};
 
     is_deeply($GAF->_apply_replacements(clone($components), []), $components);
-
     is_deeply($GAF->_apply_replacements(clone($components), [['^Hello', 'Bye'], ['d', 't']]), {street => 'Bye Worlt'});
 
     warning_like {
@@ -91,7 +88,6 @@ my $GAF  = $CLASS->new(conf_path => $path);
     }
     qr/invalid replacement/, 'got warning';
 }
-
 
 {
     my $components = {
@@ -111,6 +107,47 @@ my $GAF  = $CLASS->new(conf_path => $path);
     is($GAF->_render_template($THT, {two => 2}), "abc 2 def\n", '_render_template - first');
 }
 
+
+{
+    # uses test conf
+    my $GAF  = $CLASS->new(conf_path => $path);
+    my $rh_components = {
+        'country_code'  => 'DE',
+        'city'          => 'Heilbad Heiligenstadt',
+        'county'        => 'Landkreis Eichsfeld',
+        'state'         => 'Thüringen',
+        'country'       => 'Deutschland',
+    };
+    my $formatted = $GAF->format_address($rh_components);
+    $formatted =~ s/\n$//g;  # remove from end
+    $formatted =~ s/\n/, /g; # turn into commas
+
+    is( $formatted,
+        'Heilbad Heiligenstadt, Eichsfeld, Thüringen, Deutschland',
+        'correctly formatted DE with fallback and replace'
+    );
+}
+
+{
+    # uses test conf
+    my $GAF  = $CLASS->new(conf_path => $path);
+    my $rh_components = {
+        'country_code' => 'DE',
+        'one'          => 'Heilbad Heiligenstadt',        
+        'two'          => 'Landkreis Eichsfeld',
+        'three'        => 'Deutschland',
+        'road'         => 'Rosenstraße',  # needed to avoid fallback
+        'postcode'     => '37308',        # needed to avoid fallback        
+    };
+    my $formatted = $GAF->format_address($rh_components);
+    $formatted =~ s/\n$//g;  # remove from end
+    $formatted =~ s/\n/, /g; # turn into commas
+
+    is( $formatted,
+        'Heilbad Heiligenstadt, Eichsfeld, Deutschland',
+        'correctly formatted DE with default and replace'
+    );
+}
 
 # actually do some formatting
 {

@@ -293,12 +293,11 @@ address-formatting/testcases/countries/za.yaml
 address-formatting/testcases/countries/zm.yaml
 address-formatting/testcases/countries/zw.yaml
 address-formatting/testcases/other/null.yaml
+address-formatting/testcases/other/xx.yaml
 dist.ini
-git/hooks/pre-commit
 git/setup.sh
 lib/Geo/Address/Formatter.pm
 opencage_logo_300_150.png
-perltidy.ini
 t/blackbox/check_yaml.t
 t/blackbox/countries.t
 t/blackbox/state_code.t
@@ -319,5 +318,3 @@ t/unit/test_conf-general/countries/worldwide.yaml
 t/unit/test_conf-general/county_codes.yaml
 t/unit/test_conf-general/state_codes.yaml
 t/unit/testcases1/aa.yaml
-t/unit/tidyall.t
-tidyall.ini

@@ -1,5 +1,12 @@
 Revision history for Perl module Geo::Address::Formatter.
 
+1.88   2021-05-10
+       - remove the tidyall stuff, made life too complicated
+       - more tests
+       - use generic address_template even if a country specific fallback
+         template or formatting rules are specified
+       - newest address-formatting templates       
+
 1.87   2021-03-14
        rename perltidy conf files so Dist::Zilla adds them to distribution
 

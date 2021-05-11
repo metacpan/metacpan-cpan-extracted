@@ -1,0 +1,15 @@
+Revision history for Data-Dataset-ChordProgressions
+
+0.0103 2021-05-11 06:05:39
+    - Replace "Aug" with "aug" (augmented) in the shared CSV.
+    - Improve the eg/jazz program.
+
+0.0102 2021-05-11 04:37:51
+    - Improve documentation.
+    - Add the WIP eg/jazz program.
+
+0.0101 2021-05-11 03:34:10
+    - Replace "Dom7" with "7" in the shared CSV.
+
+0.0100 2021-05-11 03:19:22
+    - Copy from the Data-Dataset-Classic-Titanic distribution.

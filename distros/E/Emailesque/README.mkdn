@@ -4,7 +4,7 @@ Emailesque - Lightweight To-The-Point Email
 
 # VERSION
 
-version 1.26
+version 1.27
 
 # SYNOPSIS
 
@@ -1245,7 +1245,7 @@ RFC7444 [http://www.iana.org/go/rfc7444](http://www.iana.org/go/rfc7444).
 
     my $result = $email->send($attributes, @transport_args);
 
-The send method generates a [Email::Stuffer](https://metacpan.org/pod/Email::Stuffer) object based on the stashed and
+The send method generates a [Email::Stuffer](https://metacpan.org/pod/Email%3A%3AStuffer) object based on the stashed and
 passed in attributes, and attempts delivery using the configured transport.
 
 ## sender
@@ -1401,7 +1401,9 @@ Al Newkirk <anewkirk@ana.io>
 
 - Andrew Beverley <a.beverley@ctrlo.com>
 - Eric Johnson <eric.git@iijo.org>
+- Martin H. Sluka <martin@sluka.de>
 - Stefan Hornburg <racke@linuxia.de>
+- Martin Sluka <perl@sluka.de>
 
 # COPYRIGHT AND LICENSE
 

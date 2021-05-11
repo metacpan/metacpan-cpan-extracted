@@ -215,7 +215,7 @@ SUBROUTINES/METHODS
         NOT handle Youtube videos nor use the fallback "Anystream" module,
         specify: *-omit* => *"Youtube,Anystream"*, which will cause
         StreamFinder::Anystream and StreamFinder::Youtube to not be used for
-        the stream search. Default is to all installed modules will be
+        the stream search. Default is for all installed summodules to be
         considered.
 
         Another global option (applicable to all submodules) is the
@@ -226,12 +226,10 @@ SUBROUTINES/METHODS
         option is specified. Therefore, it may be necessary, if setting this
         option globally, to set it to zero in the config. files for those
         specific modules, if you determine that to be the case (I have not
-        tested all sites for that).
+        tested all sites for that). Default: *-secure* is 0 (false) - return
+        all streams (http and https).
 
-        DEFAULT *-secure* is 0 (false) - return all streams (http and
-        https).
-
-        Any other options (including *-debug* will be passed to the
+        Any other options (including *-debug*) will be passed to the
         submodule (if any) that handles the URL you pass in, but note,
         submodules accept different options and ignore ones they do not
         recognize. Valid values for some options can also vary across
@@ -313,8 +311,11 @@ CONFIGURATION FILES
         Optional text file for specifying various configuration options.
         Each option is specified on a separate line in the formats below:
 
-        'option' => 'value' [,] 'option' => ['value1', 'value2', ...]
-        'option' => {'key1' => 'value1', 'key2' => 'value2', ...}
+        'option' => 'value' [, ...]
+
+        'option' => ['value1', 'value2', ...] [, ...]
+
+        'option' => {'key1' => 'value1', 'key2' => 'value2', ...} [, ...]
 
         and the options are loaded into a hash used by all sites
         (submodules) that support them. Valid options include *-debug* =>
@@ -327,8 +328,11 @@ CONFIGURATION FILES
         StreamFinder::Youtube). Each option is specified on a separate line
         in the formats below:
 
-        'option' => 'value' [,] 'option' => ['value1', 'value2', ...]
-        'option' => {'key1' => 'value1', 'key2' => 'value2', ...}
+        'option' => 'value' [, ...]
+
+        'option' => ['value1', 'value2', ...] [, ...]
+
+        'option' => {'key1' => 'value1', 'key2' => 'value2', ...} [, ...]
 
         and the options are loaded into a hash used only by the specific
         (submodule) specified. Valid options include *-debug* => [0|1|2],
