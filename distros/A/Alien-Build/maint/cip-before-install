@@ -9,13 +9,14 @@ if echo $CIP_TAG | grep -q -- -alpine ; then
   cip sudo apk add libffi-dev
 elif  echo $CIP_TAG | grep -q -- -centos ; then
   echo CentOS
-  cip sudo yum install libffi-devel -y
+  cip sudo yum install libffi-devel wget -y
 elif echo $CIP_TAG | grep -q -- -fedora ; then
   echo Fedora
-  cip sudo yum install cmake libffi-devel -y
+  cip sudo yum install cmake libffi-devel wget -y
 else
+  echo Debian or Ubuntu
   cip sudo apt-get update
-  cip sudo apt-get -y install pkg-config cmake libffi-dev
+  cip sudo apt-get -y install pkg-config cmake libffi-dev wget
 fi
 
 if [ "x$ALIEN_BUILD_INSTALL_EXTRA" == "x1" ]; then
@@ -49,7 +50,10 @@ if [ "x$ALIEN_BUILD_INSTALL_EXTRA" == "x1" ]; then
     FFI::Platypus \
     Mojo::DOM58 \
     Mojolicious \
-    Win32::Vcpkg
+    Win32::Vcpkg \
+    Plack \
+    Proc::Daemon \
+    AnyEvent::FTP
 
 fi
 

@@ -26,6 +26,6 @@ WriteMakefile(
       },
     },
   },
-  PREREQ_PM    => {'Mojolicious' => '7.43'},
+  PREREQ_PM    => {'Mojolicious' => '9.17'},
   test         => {TESTS => 't/*.pl'}
 );

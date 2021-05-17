@@ -75,8 +75,8 @@ subtest "void(string) dispatcher" => sub {
     
     subtest "ext callback" => sub {
         subtest "add/remove" => sub {
-            my $sub1 = sub { ok 1 };
-            my $sub2 = sub { ok 1; my $n = shift; $n->(@_) };
+            my $sub1 = sub { ok 1; my $n = shift; $n->(@_) };
+            my $sub2 = sub { ok 1 };
             $obj->vs->add_event_listener($sub1);
             $obj->vs->add_event_listener($sub2);
             $obj->vs->call("");
@@ -89,27 +89,27 @@ subtest "void(string) dispatcher" => sub {
             done_testing(5);
         };
         subtest "not forwarding" => sub {
-            $obj->vs->add_event_listener(sub { ok 1; ok 1; });
             $obj->vs->add_event_listener(sub {
                 my ($e, $val) = @_;
                 is($val, "value", "val ok");
             });
+            $obj->vs->add_event_listener(sub { ok 1; ok 1; });
             $obj->vs->call("value");
             $obj->vs->remove_all;
             done_testing(1);
         };
         subtest "forwarding" => sub {
             $obj->vs->add_event_listener(sub {
-                is($_[1], "value23", "val3 ok");
-                $_[0]->($_[1]);
+                is($_[1], "value", "val1 ok");
+                $_[0]->($_[1].2);
             });
             $obj->vs->add_event_listener(sub {
                 is($_[1], "value2", "val2 ok");
                 $_[0]->($_[1].3);
             });
             $obj->vs->add_event_listener(sub {
-                is($_[1], "value", "val1 ok");
-                $_[0]->($_[1].2);
+                is($_[1], "value23", "val3 ok");
+                $_[0]->($_[1]);
             });
             $obj->vs->call("value");
             $obj->vs->remove_all;
@@ -155,8 +155,8 @@ subtest "int(void) dispatcher" => sub {
         done_testing(2);
     };
     subtest "multi cb" => sub {
-        $obj->iv->add_event_listener(sub { ok 1; return 11 });
         $obj->iv->add_event_listener(sub { ok 1; return $_[0]->() + 100 });
+        $obj->iv->add_event_listener(sub { ok 1; return 11 });
         is $obj->iv->call, 111;
         $obj->iv->remove_all;
         done_testing(3);
@@ -234,28 +234,28 @@ subtest "front/back" => sub {
     $obj->vv->add_event_listener($sub1);
     $obj->vv->add_event_listener($sub2);
     $obj->vv->call;
-    cmp_deeply(\@check, [2,1]);
+    cmp_deeply(\@check, [1,2]);
     $obj->vv->remove_all;
     @check = ();
     
-    $obj->vv->add_event_listener($sub1, 1);
-    $obj->vv->add_event_listener($sub2, 1);
+    $obj->vv->add_event_listener($sub1);
+    $obj->vv->prepend_event_listener($sub2);
     $obj->vv->call;
-    cmp_deeply(\@check, [1,2]);
+    cmp_deeply(\@check, [2,1]);
     $obj->vv->remove_all;
 };
 
 subtest "no typemap" => sub {
     $obj->notm->add_event_listener(sub {
         my ($e, $val) = @_;
-        is $val, "Xioio";
+        is $val, "Xio";
+        $val = $e->($val);
+        is $val, "Xioioio";
         return $val;
     });
     $obj->notm->add_event_listener(sub {
         my ($e, $val) = @_;
-        is $val, "Xio";
-        $val = $e->($val);
-        is $val, "Xioioio";
+        is $val, "Xioio";
         return $val;
     });
     is $obj->notm->call("X"), "Xioioioio";
@@ -270,6 +270,139 @@ subtest "const ref argument" => sub {
     });
     $obj->viref->call(42);
     done_testing(1);
+};
+
+subtest "add_weak" => sub {
+    subtest "basic" => sub {
+        {
+            package MyCDWeakTest;
+            our $dcnt = 0;
+            
+            sub DESTROY { $dcnt++ }
+        }
+        
+        my $obj = MyTest::DispatchingObject->new;
+        my $test = bless {obj => $obj, val => 111}, 'MyCDWeakTest';
+        my $d = $obj->vv;
+        my ($var, $ccnt);
+        $d->add_weak($test, sub {
+            $var = $test->{val};
+            $ccnt++;
+        });
+        is $MyCDWeakTest::dcnt, 0;
+        
+        $d->call;
+        
+        is $MyCDWeakTest::dcnt, 0;
+        is $ccnt, 1;
+        is $var, 111, "captured value is correct";
+        ok $test;
+        
+        $test = undef; # $obj and dispatcher still alive
+        $var = undef;
+        $ccnt = 0;
+        
+        is $MyCDWeakTest::dcnt, 1, "callback does not hold the object";
+        $d->call;
+        is $ccnt, 0, "callback wasn't invoked";
+    };
+    
+    subtest "remove callback" => sub {
+        my $obj = MyTest::DispatchingObject->new;
+        my $cb = sub {$obj};
+        $obj->vv->add_weak($obj, $cb);
+        ok $obj->vv->has_listeners;
+        $obj->vv->remove($cb);
+        ok !$obj->vv->has_listeners;
+    };
+    
+    subtest "bad" => sub {
+        my $obj = MyTest::DispatchingObject->new;
+        my $d = $obj->vv;
+        dies_ok { $d->add_weak(undef, sub {}) } "undef payload is not accepted";
+        dies_ok { $d->add_weak($obj, undef) } "undef callback is not accepted";
+        dies_ok { my $a = 132; $d->add_weak($a, sub {$a}) } "non-refs are not allowed";
+        dies_ok { $d->add_weak($obj, sub {}) } "callback must capture the object";
+        dies_ok { $d->add_weak($obj, sub {$d}) } "callback must capture the object";
+    };
+    
+    subtest "op_free check" => sub {
+        my $obj = MyTest::DispatchingObject->new;
+        my $d = $obj->vv;
+        my $sub = eval "sub { \$obj }";
+        $d->add_weak($obj, $sub);
+        $d->remove_all;
+        $sub = undef; # all opcodes should be freed now
+        pass();
+    };
+    
+    subtest "adding different CV with the same CvSTART" => sub {
+        my $obj = MyTest::DispatchingObject->new;
+        my $d = $obj->vv;
+        my $cnt = 0;
+        my $ref = {};
+        $d->add_weak($ref, sub {$cnt++; $ref}) for 1..3;
+        $d->call;
+        $ref = undef;
+        $d->call;
+        is $cnt, 3;
+    };
+    
+    subtest "remove" => sub {
+        my $obj = MyTest::DispatchingObject->new;
+        my $d = $obj->vv;
+        my $cnt = 0;
+        my $sub = sub {$cnt++; $obj};
+        $d->add_weak($obj, $sub);
+        $d->call;
+        $d->remove($sub);
+        $d->call;
+        is $cnt, 1;
+    };
+    
+    if (0) {
+        say "leak check for op_free";
+        my $obj = MyTest::DispatchingObject->new;
+        my $d = $obj->vv;
+        while (1) {
+            my $sub = eval "sub { \$obj }";
+            $d->add_weak($obj, $sub);
+            $d->remove_all;
+        }
+    }
+    
+    if (0) {
+        say "leak check with different CV and same start";
+        my $obj = MyTest::DispatchingObject->new;
+        my $d = $obj->vv;
+        while (1) {
+            $d->add_weak($obj, sub {$obj});
+            $d->remove_all;
+        }
+    }
+    
+    if (0) {
+        require Benchmark;
+        my $obj = MyTest::DispatchingObject->new;
+        my $test = bless {obj => $obj}, 'MyCDWeakTest';
+        my $d = $obj->vv;
+        $d->add_weak($test, sub {$test});
+        Benchmark::timethis(-1, sub { $obj->call_vv(1000) });
+        
+        $d->remove_all;
+        Benchmark::timethese(-1, {
+            orig_add_remove => sub { $d->add(sub {$test}); $d->remove_all },
+            weak_add_remove => sub { $d->add_weak($test, sub {$test}); $d->remove_all },
+        });
+    }
+    
+    while (0) {
+        my $aaa = {obj => MyTest::DispatchingObject->new};
+        $aaa->{obj}->vv->add_weak($aaa, sub {
+            $aaa;
+        });
+        $aaa->{obj}->vv->call();
+    }
 };
 
 done_testing();

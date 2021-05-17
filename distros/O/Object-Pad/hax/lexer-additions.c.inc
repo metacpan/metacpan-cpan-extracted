@@ -1,4 +1,4 @@
-/* vi: set ft=c inde=: */
+/* vi: set ft=c */
 
 /* Perls before 5.18 lack isIDCONT_uni, but baring minor differences of weird
  * Unicode characters, isALNUM_uni is close enough
@@ -77,7 +77,7 @@ static bool MY_lex_scan_attrval_into(pTHX_ SV *name, SV *val)
   /* TODO: really want  lex_scan_ident_into() */
   SV *n = lex_scan_ident();
   if(!n)
-    return false;
+    return FALSE;
 
   sv_setsv(name, n);
   SvREFCNT_dec(n);
@@ -88,7 +88,7 @@ static bool MY_lex_scan_attrval_into(pTHX_ SV *name, SV *val)
   /* Do not read space here as space is not allowed between NAME(ARGS) */
 
   if(lex_peek_unichar(0) != '(')
-    return true;
+    return TRUE;
 
   lex_read_unichar(0);
   if(name == val)
@@ -122,9 +122,9 @@ static bool MY_lex_scan_attrval_into(pTHX_ SV *name, SV *val)
   }
 
   if(c == -1)
-    return false;
+    return FALSE;
 
-  return true;
+  return TRUE;
 
 unterminated:
   croak("Unterminated attribute parameter in attribute list");

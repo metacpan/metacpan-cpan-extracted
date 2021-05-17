@@ -11,6 +11,7 @@ lib/Form/Tiny/Filtered.pm
 lib/Form/Tiny/Form.pm
 lib/Form/Tiny/Inline.pm
 lib/Form/Tiny/Manual.pod
+lib/Form/Tiny/Manual/Internals.pod
 lib/Form/Tiny/PathValue.pm
 lib/Form/Tiny/Strict.pm
 lib/Form/Tiny/Utils.pm

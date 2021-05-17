@@ -8,6 +8,6 @@ on 'test', sub {
 
 requires 'perl', '5.12.0';
 requires 'Catmandu', '1.20';
-requires 'PICA::Data', '1.12';
+requires 'PICA::Data', '1.20';
 requires 'Moo', '1.0';
 requires 'Catmandu::SRU', '0.427';

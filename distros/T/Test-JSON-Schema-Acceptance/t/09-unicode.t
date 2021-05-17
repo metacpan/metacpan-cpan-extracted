@@ -96,4 +96,3 @@ $accepter->acceptance(
 );
 
 done_testing;
-

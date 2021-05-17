@@ -12,7 +12,7 @@ use AutoLoader;
 
 our @ISA = qw(Exporter);
 
-our $VERSION = '0.08';
+our $VERSION = '0.09';
 
 # Preloaded methods go here.
 
@@ -122,7 +122,7 @@ sub read_handle_perl {
     }
     my $count = 0;
     #
-    for (my $pos = 0; $pos <= $len; $pos += $CHUNK_SIZE) {
+    for (my $pos = $off; $pos <= $len+$off; $pos += $CHUNK_SIZE) {
         my $chunk;
         if ($pos + $CHUNK_SIZE > $len) {
             $chunk = $len % $CHUNK_SIZE;

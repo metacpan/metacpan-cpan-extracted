@@ -4,13 +4,13 @@
       "David E. Wheeler <david.wheeler@pgexperts.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4007, CPAN::Meta::Converter version 2.132830",
+   "generated_by" : "Module::Build version 0.4231",
    "license" : [
-      "open_source"
+      "unknown"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "PGXN-Site",
    "prereqs" : {
@@ -52,7 +52,7 @@
             "Plack::Request" : "0.9956",
             "Plack::Response" : "0.9956",
             "Router::Resource" : "0.11",
-            "SemVer" : "v0.2.0",
+            "SemVer" : "v0.10.0",
             "Software::License" : "0.102340",
             "Template::Declare" : "0.43",
             "Template::Declare::Tags" : "0.43",
@@ -65,45 +65,43 @@
    "provides" : {
       "PGXN::Site" : {
          "file" : "lib/PGXN/Site.pm",
-         "version" : "v0.10.3"
+         "version" : "v0.20.2"
       },
       "PGXN::Site::Controller" : {
          "file" : "lib/PGXN/Site/Controller.pm",
-         "version" : "v0.10.3"
+         "version" : "v0.20.2"
       },
       "PGXN::Site::Locale" : {
          "file" : "lib/PGXN/Site/Locale.pm",
-         "version" : "v0.10.3"
+         "version" : "v0.20.2"
       },
       "PGXN::Site::Locale::en" : {
          "file" : "lib/PGXN/Site/Locale/en.pm",
-         "version" : "v0.10.3"
+         "version" : "v0.20.2"
       },
       "PGXN::Site::Locale::fr" : {
          "file" : "lib/PGXN/Site/Locale/fr.pm",
-         "version" : "v0.10.3"
+         "version" : "v0.20.2"
       },
       "PGXN::Site::Router" : {
          "file" : "lib/PGXN/Site/Router.pm",
-         "version" : "v0.10.3"
+         "version" : "v0.20.2"
       },
       "PGXN::Site::Templates" : {
          "file" : "lib/PGXN/Site/Templates.pm",
-         "version" : "v0.10.3"
+         "version" : "v0.20.2"
       }
    },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "http://github.com/pgxn/pgxn/issues/"
+         "web" : "https://github.com/pgxn/pgxn-site/issues/"
       },
-      "homepage" : "http://www.pgxn.org/",
-      "license" : [
-         "http://www.opensource.org/licenses/postgresql"
-      ],
+      "homepage" : "https://www.pgxn.org/",
       "repository" : {
-         "url" : "http://github.com/pgxn/pgxn/tree/"
+         "url" : "https://github.com/pgxn/pgxn-site/"
       }
    },
-   "version" : "v0.10.3"
+   "version" : "v0.20.2",
+   "x_serialization_backend" : "JSON::PP version 4.06"
 }

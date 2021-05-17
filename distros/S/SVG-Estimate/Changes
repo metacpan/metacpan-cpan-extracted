@@ -1,3 +1,6 @@
+1.0115 2021-05-11
+ * Version bump to re-upload to PAUSE
+
 1.0115 2020-11-23
  * Fix implicit moveto => lineto
  * Increase number of points per curve for better estimation of min/max

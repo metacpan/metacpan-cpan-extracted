@@ -1,0 +1,15 @@
+
+INSTALL memo for "bin4tsv" : 
+
+1. Probably nothing, hopefully.
+
+  -- Because the author's intention is that this module can be used at any institutions on the earth,
+     including any government of any country as well as any company that may use old systems. 
+
+  -- The author reuquires Perl 5.14 (published 2011-05-14; just around 10 years ago as of the author is writinet this document.)
+
+2. But "Pod::Pod-PerldocJp" is recommendable to install because then the "perldoc" can show you the Japanese characters that 
+   might be provided in each command line program which is provided by this "bin4tsv" module. 
+
+
+

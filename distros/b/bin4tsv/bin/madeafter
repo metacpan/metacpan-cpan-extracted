@@ -1,0 +1,134 @@
+#!/usr/bin/perl -T 
+use v5.8 ; use strict ; use warnings ; 
+use Getopt::Std ; #getoptions 'l' , \my %o ;
+use Time::Local ; 
+use Term::ANSIColor qw[:constants] ; $Term::ANSIColor::AUTORESET = 1 ;
+
+getopts '!:~.:0dhlmpqsx',  \my %o ; 
+do { select STDERR ; HELP_MESSAGE () } if ! @ARGV && ! $o{x} ; 
+
+$o{'!'} //= '' ; 
+my $dig = $o{'.'} // 2 ; # 小数点以下何桁まで表示をするか
+my $fmt = "%0.${dig}f" ; # "%.4g" # 出力の printf形式のフォーマット
+my $info= $o{l} ? sub { lstat $_[0] }  : sub ($) { stat $_[0] }  ;
+my $t0 = timelocal ( localtime ) ; # <---- -- ただ今の時刻
+my $div = $o{d} ? 86400 : $o{h} ? 3600 : $o{m} ? 60 : undef ; # 秒数をいくつで割るか
+my $u = $o{d} ? '(d)' : $o{h} ? '(h)' : $o{m} ? '(m)' : '(s)' ; # 単位の表示
+$"="\t" ;  # print "@out" に似た様な構文が何カ所かで出現する。
+
+& main ; 
+exit ; 
+
+sub main { 
+    # 列名の入力
+    if ( ! $o{q} ) {
+		my @out = qw[atime mtime ctime] ;
+		grep { $_ .= $u } @out ; # (d) (h) (s) などの時間を単位を末尾に足す。
+        push @out, qw[per.] if $o{p} ;
+        push @out, qw[size(B)] if $o{s} ;
+		splice @out, ($o{'~'} ? 0 : @out) , 0, qw[filename]; 
+		print "@out\n" ;
+	}
+
+    $/ = "\0" if $o{0} ; 
+
+    if ( $o{x} ) 
+    { 
+        & eachFile for <> ; 
+    } 
+    else { 
+        & eachFile for @ARGV ; 
+    }  
+}
+
+sub eachFile {
+    chomp ; 
+    do { print STDERR CYAN "'$_' : Not exists.\n" ; next } unless  -e ;
+    my @w=(8,9,10)  ; 
+    #push @w, (7) if $o{s} ;
+    my @infos =  $info->($_) ; 
+    my @out = my @out0 = @infos[ @w ] ; # atime mtime ctime
+    @out = @out0 = map { $t0 - $_ } @out ;
+    @out = map { sprintf $fmt , $_ / $div } @out0  if defined $div ; 
+    @out = map { &dt ($_)} @{[ $info->($_) ]}[ 8,9,10 ]  if $o{'!'} =~ /[td]/i ;    
+    push @out, sprintf '%04o' , $infos[2] & 0777 if $o{p} ;
+    push @out, $infos[7] if $o{s} ;
+    #@out = map { &ymd ($_)} @{[ $info->($_) ]}[ 8,9,10 ]  if $o{'!'} =~ /d/i ; 
+
+    $_ .= '/' if -d ; # ディレクトリには 名前の末尾に / を追加。
+    splice @out , ($o{'~'} ? 0 : @out)  , 0 , $_  ; # ファイル名の挿入
+    print "@out\n" ;
+}
+
+sub dt ( $ ){
+	my @T = $o{'!'} =~ m/u/i ? gmtime $_[0] : localtime $_[0] ; 
+	my @ret ; 
+    if ( $o{'!'} =~ /d/i ) { 
+        push @ret , sprintf '%02d-%02d-%02d', $T[5] % 100 , $T[4]+1, $T[3] if $o{'!'} !~ /4/ ; 
+        push @ret , sprintf '%04d-%02d-%02d', $T[5] + 1900, $T[4]+1, $T[3] if $o{'!'} =~ /4/ ; 
+    }
+    push @ret , sprintf @{ [qw{Sun Mon Tue Wed Thu Fri Sat}] }[ $T[6] ]  if $o{'!'} =~ /^[^cj]*y[^cj]*$/i ; 
+    push @ret , sprintf @{ [qw{日 月 火 水 木 金 土}] }[ $T[6] ]  if $o{'!'} =~ /y.*j|j.*y/i  ; 
+    push @ret , sprintf @{ [qw{日 一 二 三 四 五 六}] }[ $T[6] ]  if $o{'!'} =~ /y.*c|c.*y/i  ; 
+	push @ret , sprintf '%02d:%02d:%02d' , @T[2,1,0] if $o{'!'} =~/t/i ; 
+	return join ' ' , @ret ;
+}
+
+## ヘルプの扱い
+sub VERSION_MESSAGE {}
+sub HELP_MESSAGE {
+    use FindBin qw[ $Script ] ; 
+    $ARGV[1] //= '' ;
+    open my $FH , '<' , $0 ;
+    while(<$FH>){
+        s/\$0/$Script/g ;
+        print $_ if s/^=head1// .. s/^=cut// and $ARGV[1] =~ /^o(p(t(i(o(ns?)?)?)?)?)?$/i ? m/^\s+\-/ : 1;
+    }
+    close $FH ;
+    exit 0 ;
+}
+
+
+=encoding utf8
+
+=head1
+
+ $0 ファイル名のリスト
+ 
+  各ファイルについて、次の時刻から現在までの秒数を出力する。Seconds after the following for each file specified.
+   (1) アクセス access (2) 更新時刻 update (3) i-nodeの変更時刻
+
+ 利用例 usage : 
+
+   $0 -m *    #  分単位でファイルの古さを表示
+   find . | xargs $0  #  ファイル名のリストの中に、空白文字を含む場合はこちらを使う。 
+   find . | $0 -x     #  xargs であふれる場合はこちらを使う。
+   $0 -! dt *  #  ファイルの時刻情報3個を，現在の日時と比較しないで出力。
+   $0 -x 改行区切りでファイル名を内容に含むファイル
+   $0 -! dt4  *       # 現在までの経過時間とは関係無く、西暦でファイル情報を表示
+   $0 -! dy -s -p  *  # 曜日を表示。ファイルサイズとファイルのパーミッションも表示。    
+
+ オプション options :
+
+    -d : 経過時間を日単位で出力する。 in day unit.
+    -h : 経過時間を時間単位で出力する。 in hour unit.
+    -m : 経過時間を分単位で出力する。 in minute unit.
+    -l : シンボリックリンクの先のファイルの情報を取得する。
+    -s : ファイルサイズも出力する。 Also add files byte sizes.
+
+    -p ; ファイルのパーミッション情報も出力する。 Also outputs File permission. 
+    -q : 通常の出力の1行目にある、atime, mtime, ctime, filename の情報を出力しない
+    -~  : ファイル名を各行の先頭に置く。 File names put in the mostleft column.
+    -. N : 小数点以下何桁まで表示をするか(秒単位なら現状意味なし)。 Digits after the decimal point in the output.
+
+    -! str: ファイルの時刻情報を出す。strに含まれる文字により、dなら日付、tなら時刻、yなら曜日、uならUTCを出力。yがある場合、jなら日本語,cなら中国語。4があれば西暦4桁
+    -x  ; xargs $0 と同じ機能がある。xargs であふれる時に便利。
+    -0  ; find で -print0 を使う場合に使う。(不要な機能である可能性が高い。)
+
+
+  開発上のメモ
+     * -t で基準時刻を指定できる様にしたい。 hg ci -d で対応できる日時形式に対応したい。
+     * 日本語のファイル名を持つディレクトリにおいて、"$0 *" (madeafter * ) が動作しない場合もあるが、cat <(echo *) もうまくいかない。zsh/bashでの設定の問題だが、注意を促すメッセージを出しても良い。
+     * -! の直後に空白文字が無いとうまく動作しない。および、-! の後にファイル名が来た時に、それを注意する機能を付加したい。	
+
+=cut

@@ -14,7 +14,7 @@ use Form::Tiny::PathValue;
 
 use namespace::clean;
 
-our $VERSION = '1.12';
+our $VERSION = '1.13';
 
 our $nesting_separator = q{.};
 our $array_marker = q{*};

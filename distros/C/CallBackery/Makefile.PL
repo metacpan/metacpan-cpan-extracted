@@ -15,6 +15,8 @@ WriteMakefile(
     'Mojolicious' => '9.12',
     'Mojolicious::Plugin::Qooxdoo' => '1.0.11',
     'Config::Grammar' => '1.13',
+    'Future::AsyncAwait' => '0.45',
+    'Syntax::Keyword::Try' => 0,
     'Locale::PO' => '0.27',
     'JSON::Validator' => 0,
     'YAML::XS' => 0,

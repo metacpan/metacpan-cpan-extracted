@@ -1,16 +1,20 @@
 Revision history for Perl module Dist::Zilla::App::Command::kwalitee
 
-0.03 2014-07-01
+0.04 2021-05-15 NEILB
+    - Include META.json in release. Thanks to MANWAR for PR.
+    - Switch to github issues for bugtracker
+
+0.03 2014-07-01 NEILB
     - Lazy load App::CPANTS::Lint. DOLMEN++
     - Make the -experimental switch actually enable that option
       in App::CPANTS::Lint. NEILB--
 
-0.02 2014-07-01
+0.02 2014-07-01 NEILB
     - Added Dist::Zilla::Plugin::Test::Kwalitee to SEE ALSO.
       Pull request from ETHER.
     - Added --experimental | -e switch, which requires version 0.03
       of App::CPANTS::Lint
 
-0.01 2014-07-01
+0.01 2014-07-01 NEILB
     - First release to CPAN
 

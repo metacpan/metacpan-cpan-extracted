@@ -1,5 +1,13 @@
 Revision history for List-Keywords
 
+0.05    2021-05-12
+        [CHANGES]
+         * Added 'reduce'
+
+        [BUGFIXES]
+         * Make sure to optimize/finalize the optree of the code block, as
+           some ops need this (e.g. for dTARG allocation)
+
 0.04    2021-04-30
         [CHANGES]
          * Implement B::Deparse hackery so code deparses properly

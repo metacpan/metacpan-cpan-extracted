@@ -1,0 +1,115 @@
+=head1 NAME
+
+UniEvent::HTTP::ServerResponse - HTTP server response class
+
+
+
+=head1 SYNOPSIS
+
+    $request->respond({
+        code => 200,
+        body => "hello",
+    });
+    
+    my $response = UE::HTTP::ServerResponse->new({
+        code => 200,
+        body = $long_body,
+        headers => {Foo => "bar"},
+        compress => Protocol::HTTP::Compression::gzip,
+    });
+    $request->respond($response);
+
+
+    my $response = UE::HTTP::ServerResponse->new({
+        code => 200,
+        chunked => 1,
+    });
+    $request->respond($response);
+    ...
+    $response->send_chunk($data1);
+    ...
+    $response->send_chunk($dataN);
+    $response->send_final_chunk();
+
+
+
+=head1 DESCRIPTION
+
+C<UniEvent::HTTP::ServerResponse> represents response for client's request on server. It holds all the properties and state of http response. Objects of this
+class are created by user and then passed to C<respond()> method of L<UniEvent::HTTP::Request>.
+
+ServerResponse has API to construct response and control its transmission.
+
+C<UniEvent::HTTP::ServerResponse> inherits from L<Protocol::HTTP::Response>. So for complete documenation you need to also read L<Protocol::HTTP::Response>'s docs.
+
+
+
+=head1 CHUNKED RESPONSE
+
+To respond with chunks, set C<chunked> property of the response to a C<true> value, and do not define body.
+In this case the response given to C<respond()> method of the request will be incomplete and you will need to call C<send_chunk()> as many times and needed and
+then finish transmission via C<send_final_chunk()>.
+
+For conveniece, to help with sending chunked responses, request object has special accessor C<response()> which returns response object which has been previously
+passed to C<respond()> method of request. This is useful if you don't want to explicitly create response object and remember the request-response pair.
+
+    $request->respond({
+        code => 200,
+        chunked => 1,
+    });
+    $request->response->send_chunk($data1);
+    ...
+    $request->response->send_chunk($dataN);
+    $request->response->send_final_chunk();
+
+
+
+=head1 COMPRESSION
+
+To respond with compression, set C<compress> property of response object, see L<Protocol::HTTP::Response> for documentation as comression logic is
+transparently implemented in C<Protocol::HTTP>.
+
+Example:
+
+    $request->respond({
+        code => 200,
+        body => $long_body,
+        compress => Protocol::HTTP::Compression::gzip,
+    });
+
+
+Chunked example:
+
+    $request->respond({
+        code => 200,
+        chunked => 1,
+        compress => Protocol::HTTP::Compression::gzip,
+    });
+    $request->response->send_chunk($data1);
+    ...
+    $request->response->send_chunk($dataN);
+    $request->response->send_final_chunk();
+
+
+
+=head1 METHODS
+
+All methods of L<Protocol::HTTP::Response> also apply.
+
+
+=head2 send_chunk($data)
+
+Should only be called on responses where C<chunked> is true. Sends an http chunk (applying possible compression, etc).
+
+
+=head2 send_final_chunk([$data])
+
+Should only be called on responses where C<chunked> is true. Sends final (empty) http chunk and finishes sending chunked http response.
+If optional C<$data> is provided, then sends C<$data> as normal chunk before final chunk.
+
+
+=head2 completed()
+
+Returns true if response has been completed, i.e. user sent response and its body.
+
+=cut

@@ -2,7 +2,7 @@ package V;
 use strict;
 
 use vars qw( $VERSION $NO_EXIT );
-$VERSION  = '0.14';
+$VERSION  = '0.15';
 
 $NO_EXIT ||= 0; # prevent import() from exit()ing and fall of the edge
 

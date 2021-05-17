@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    version 0.27
+    version 0.28
 
 SYNOPSIS
 
@@ -132,6 +132,15 @@ FUNCTIONS
       classes specified must provide the Alien::Base interface for dynamic
       libraries, which is to say they should provide a method called
       dynamic_libs that returns a list of dynamic libraries.
+
+      [version 0.28]
+
+      In 0.28 and later, if the Alien is not installed then it will be
+      ignored and this module will search in system or specified
+      directories only. This module will still throw an exception, if the
+      Alien doesn't look like a module name or if it does not provide a
+      dynamic_libs method (which is implemented by all Alien::Base
+      subclasses).
 
  assert_lib
 

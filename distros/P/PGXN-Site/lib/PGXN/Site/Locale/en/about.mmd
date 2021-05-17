@@ -1,18 +1,19 @@
 About PGXN
 ==========
 
-PGXN, the PostgreSQL Extension network, is a central distribution system for open-source PostgreSQL extension libraries. It consists of four basic parts:
+PGXN, the PostgreSQL Extension network, is a central distribution system for
+open-source PostgreSQL extension libraries. It consists of four basic parts:
 
-[PGXN Manager](http://manager.pgxn.org/)
+[PGXN Manager]
 :   An upload and distribution infrastructure for extension developers.
 
-[PGXN API](http://github.com/pgxn/pgxn-api/wiki/)
+[PGXN API]
 :   A centralized index and API of distribution metadata.
 
-[PGXN Search](/)
+[PGXN Search]
 :   This site, for searching extensions and perusing their documentation.
 
-[PGXN Client](http://pgxnclient.projects.postgresql.org/)
+[PGXN Client]
 :   A command-line client for downloading, testing, and installing extensions.
 
 The network currently consists of:
@@ -26,23 +27,59 @@ The network currently consists of:
 
 ### Why? ###
 
-One of the primary distinguishing features of [PostgreSQL](http://www.postgresql.org/)—and perhaps the number one reason to use it instead of another DBMS—is its extensibility and the large number of database extensions already available: [PostGIS](http://postgis.refractions.net/),
-[ISN](http://www.postgresql.org/docs/8.4/static/isn.html),
-[hstore](http://www.postgresql.org/docs/8.4/static/hstore.html),
-[pgTAP](http://pgtap.org/),
-[BioPostgres](http://pgfoundry.org/projects/biopostgres/),
-[PL/R](http://www.joeconway.com/plr/),
-[PL/Proxy](http://pgfoundry.org/projects/plproxy/),
-[Golconde](http://code.google.com/p/golconde/),
-[pgmemcache](http://pgfoundry.org/projects/pgmemcache/),
-and more. Especially with the formal support for extensions [coming in 9.1.0](http://www.postgresql.org/docs/9.1/static/extend-extensions.html "PostgreSQL 9.1.0 Documentation: “Packaging Related Objects into an Extension”"), PostgreSQL today is not merely a database, it’s an application development platform. However, many of these extensions are virtually unknown even among experienced users because they are hard to find.
+One of the primary distinguishing features of [PostgreSQL]—and perhaps the
+number one reason to use it instead of another DBMS—is its extensibility and the
+large number of database extensions already available: [PostGIS], [ISN],
+[hstore], [pgTAP], [BioPostgres], [PL/R], [PL/Proxy], [Golconde], [pgmemcache],
+and more. Especially with the formal support for [extensions], PostgreSQL today
+is not merely a database, it’s an application development platform. However,
+many of these extensions are virtually unknown even among experienced users
+because they are hard to find.
 
-PGXN solves the “hard to find” issue by providing centralized listings and searchable documentation for PostgreSQL extensions. Here you can easily search through extensions, browse their documentation, and download and install those that fill your needs. The site is structured to maximize the ability to find appropriate extensions and their documentation through search engines. Our hope is that the high visibility of PostgreSQL’s extensibility and the array of available extensions will drive PostgreSQL adoption by new users and application developers, expanding our community and ensuring another 10 years of the PostgreSQL Project.
+PGXN solves the “hard to find” issue by providing centralized listings and
+searchable documentation for PostgreSQL extensions. Here you can easily search
+through extensions, browse their documentation, and download and install those
+that fill your needs. The site is structured to maximize the ability to find
+appropriate extensions and their documentation through search engines. Our hope
+is that the high visibility of PostgreSQL’s extensibility and the array of
+available extensions will drive PostgreSQL adoption by new users and application
+developers, expanding our community and ensuring another 10 years of the
+PostgreSQL Project.
 
 ### Who’s Responsible for This? ###
 
-Thanks to our [terrific donors](/donors/), [I am](http://justatheory.com/ "Just a Theory"). I’m David Wheeler, inveterate Perl and PostgreSQL hacker. I love the [extensibility of PostgreSQL](http://www.postgresql.org/docs/current/static/extend.html) and have long been a fan of [CPAN](http://www.cpan.org/), the Perl community’s distributed collection of Perl software and documentation. But PostgreSQL’s extensibility is not well-known, and it’s difficult to find the extensions that do exist. PGXN is my attempt to solve that problem.
+Thanks to our [terrific donors], [I am]. I’m David Wheeler, inveterate Perl and
+PostgreSQL hacker. I love the [extensibility of PostgreSQL] and have long been a
+fan of [CPAN], the Perl community’s distributed collection of Perl software and
+documentation. But PostgreSQL’s extensibility is not well-known, and it’s
+difficult to find the extensions that do exist. PGXN is my attempt to solve that
+problem.
 
 ### Want to Help? ####
 
-The source code for all the parts of PGXN are on [GitHub](https://github.com/pgxn/). Please feel free to fork and send merge requests! And join the discussion in the [Google Group](http://groups.google.com/group/pgxn-users).
+The source code for all the parts of PGXN are on [GitHub]. Please feel free to
+fork and send merge requests! And join the discussion in the [Google Group].
+
+  [PGXN Manager]: https://manager.pgxn.org/
+  [PGXN API]: https://github.com/pgxn/pgxn-api/wiki/
+  [PGXN Search]: https://pgxn.org/
+  [PGXN Client]: https://pgxn.github.io/pgxnclient/
+  [PostgreSQL]: https://www.postgresql.org/
+  [PostGIS]: https://postgis.refractions.net/
+  [ISN]: https://www.postgresql.org/docs/current/isn.html
+  [hstore]: https://www.postgresql.org/docs/curent/static/hstore.html
+  [pgTAP]: https://pgtap.org/
+  [BioPostgres]: https://sourceforge.net/projects/biopostgres/
+  [PL/R]: https://github.com/postgres-plr/plr
+  [PL/Proxy]: https://plproxy.github.io
+  [Golconde]: https://code.google.com/archive/p/golconde/
+  [pgmemcache]: https://pgfoundry.org/projects/pgmemcache/
+  [extensions]: https://www.postgresql.org/docs/current/extend-extensions.html
+    "PostgreSQL Documentation: “Packaging Related Objects into an Extension”"
+  [terrific donors]: https://pgxn.org/donors/
+  [I am]: https://justatheory.com/ "Just a Theory"
+  [extensibility of PostgreSQL]: https://www.postgresql.org/docs/current/static/extend.html
+    "PostgreSQL Documentation: Extending SQL”"
+  [CPAN]: https://www.cpan.org/
+  [GitHub]: https://github.com/pgxn/ "PGXN on GitHub"
+  [Google Group]: https://groups.google.com/group/pgxn-users "PGXN Users Group"

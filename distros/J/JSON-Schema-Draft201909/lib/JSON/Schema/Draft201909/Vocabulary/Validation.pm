@@ -4,17 +4,17 @@ package JSON::Schema::Draft201909::Vocabulary::Validation;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Implementation of the JSON Schema Draft 2019-09 Validation vocabulary
 
-our $VERSION = '0.026';
+our $VERSION = '0.027';
 
 use 5.016;
 no if "$]" >= 5.031009, feature => 'indirect';
 no if "$]" >= 5.033001, feature => 'multidimensional';
 no if "$]" >= 5.033006, feature => 'bareword_filehandles';
+use strictures 2;
 use List::Util 'any';
 use Ref::Util 0.100 'is_plain_arrayref';
 use JSON::Schema::Draft201909::Utilities qw(is_type is_equal is_elements_unique E assert_keyword_type assert_pattern);
 use Moo;
-use strictures 2;
 use namespace::clean;
 
 with 'JSON::Schema::Draft201909::Vocabulary';
@@ -26,7 +26,7 @@ sub keywords {
     multipleOf maximum exclusiveMaximum minimum exclusiveMinimum
     maxLength minLength pattern
     maxItems minItems uniqueItems
-    minContains maxContains
+    maxContains minContains
     maxProperties minProperties required dependentRequired);
 }
 
@@ -34,6 +34,7 @@ sub _traverse_keyword_type {
   my ($self, $schema, $state) = @_;
 
   if (is_plain_arrayref($schema->{type})) {
+    abort($state, 'type array is empty') if not @{$schema->{type}};
     foreach my $type (@{$schema->{type}}) {
       return E($state, 'unrecognized type "%s"', $type//'<null>')
         if not any { ($type//'') eq $_ } qw(null boolean object array string number integer);
@@ -41,6 +42,7 @@ sub _traverse_keyword_type {
     return E($state, '"type" values are not unique') if not is_elements_unique($schema->{type});
   }
   else {
+    return if not assert_keyword_type($state, $schema, 'string');
     return E($state, 'unrecognized type "%s"', $schema->{type}//'<null>')
       if not any { ($schema->{type}//'') eq $_ } qw(null boolean object array string number integer);
   }
@@ -212,8 +214,33 @@ sub _eval_keyword_uniqueItems {
 }
 
 # Note: no effort is made to check if the 'contains' keyword has been disabled via its vocabulary.
-sub _traverse_keyword_minContains { goto \&_assert_non_negative_integer }
 sub _traverse_keyword_maxContains { goto \&_assert_non_negative_integer }
+
+sub _eval_keyword_maxContains {
+  my ($self, $data, $schema, $state) = @_;
+
+  return 1 if not exists $state->{_num_contains};
+  return 1 if not is_type('array', $data);
+
+  return E($state, 'contains too many matching items')
+    if $state->{_num_contains} > $schema->{maxContains};
+
+  return 1;
+}
+
+sub _traverse_keyword_minContains { goto \&_assert_non_negative_integer }
+
+sub _eval_keyword_minContains {
+  my ($self, $data, $schema, $state) = @_;
+
+  return 1 if not exists $state->{_num_contains};
+  return 1 if not is_type('array', $data);
+
+  return E($state, 'contains too few matching items')
+    if $state->{_num_contains} < $schema->{minContains};
+
+  return 1;
+}
 
 sub _traverse_keyword_maxProperties { goto \&_assert_non_negative_integer }
 
@@ -260,14 +287,19 @@ sub _traverse_keyword_dependentRequired {
   my ($self, $schema, $state) = @_;
 
   return if not assert_keyword_type($state, $schema, 'object');
-  return E($state, '"dependentRequired" property is not an array')
-    if any { !is_type('array', $schema->{dependentRequired}{$_}) }
-      keys %{$schema->{dependentRequired}};
-  return E($state, '"dependentRequired" property element is not a string')
-    if any { !is_type('string', $_) } map @$_, values %{$schema->{dependentRequired}};
-  return E($state, '"dependentRequired" property elements are not unique')
-    if any { !is_elements_unique($schema->{dependentRequired}{$_}) }
-      keys %{$schema->{dependentRequired}};
+
+  foreach my $property (keys %{$schema->{dependentRequired}}) {
+    E({ %$state, _schema_path_suffix => $property }, 'dependentRequired value is not an array'), next
+      if not is_type('array', $schema->{dependentRequired}{$property});
+
+    foreach my $index (0..$#{$schema->{dependentRequired}{$property}}) {
+      E({ %$state, _schema_path_suffix => $property }, 'element #%d is not a string', $index)
+        if not is_type('string', $schema->{dependentRequired}{$property}[$index]);
+    }
+
+    E({ %$state, _schema_path_suffix => $property }, 'elements are not unique')
+      if not is_elements_unique($schema->{dependentRequired}{$property});
+  }
 }
 
 sub _eval_keyword_dependentRequired {
@@ -275,12 +307,18 @@ sub _eval_keyword_dependentRequired {
 
   return 1 if not is_type('object', $data);
 
-  my @missing = grep
-    +(exists $data->{$_} && any { !exists $data->{$_} } @{ $schema->{dependentRequired}{$_} }),
-    keys %{$schema->{dependentRequired}};
+  my $valid = 1;
+  foreach my $property (keys %{$schema->{dependentRequired}}) {
+    next if not exists $data->{$property};
 
-  return 1 if not @missing;
-  return E($state, 'missing propert%s: %s', @missing > 1 ? 'ies' : 'y', join(', ', sort @missing));
+    if (my @missing = grep !exists($data->{$_}), @{$schema->{dependentRequired}{$property}}) {
+      $valid = E({ %$state, _schema_path_suffix => $property },
+        'missing propert%s: %s', @missing > 1 ? 'ies' : 'y', join(', ', @missing));
+    }
+  }
+
+  return 1 if $valid;
+  return E($state, 'not all dependencies are satisfied');
 }
 
 sub _assert_number {
@@ -309,7 +347,7 @@ JSON::Schema::Draft201909::Vocabulary::Validation - Implementation of the JSON S
 
 =head1 VERSION
 
-version 0.026
+version 0.027
 
 =head1 DESCRIPTION
 

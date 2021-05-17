@@ -62,9 +62,9 @@ test($old_salt ne $crypt->salt, "salt didn't change after an encrypt");
 test($old_key  ne $crypt->key,  "key didn't change after an encrypt");
 
 test($plaintext eq $crypt->decrypt($ciphertext1),"decrypted text doesn't match original");
-test($old_iv   eq $crypt->iv,    "original IV wasn't restored after decryption");
-test($old_salt eq $crypt->salt,  "original salt wasn't restored after decryption");
-test($old_key  eq $crypt->key,   "original key wasn't restored after decryption");
+test($old_iv    eq $crypt->iv,    "original IV wasn't restored after decryption");
+test($old_salt  eq $crypt->salt,  "original salt wasn't restored after decryption");
+test($old_key   eq $crypt->key,   "original key wasn't restored after decryption");
 
 test($crypt->passphrase eq 'test key',"get passphrase()");
 $crypt->passphrase('new key');

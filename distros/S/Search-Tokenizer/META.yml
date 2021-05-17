@@ -1,26 +1,28 @@
 ---
-abstract: Decompose a string into tokens (words)
+abstract: 'Decompose a string into tokens (words)'
 author:
-  - 'Laurent Dami <lau......da..@justice.ge.ch>'
+  - 'Laurent Dami <dami.@cpan.org>'
 build_requires:
-  Test::More: 0
+  Test::More: '0'
+  Time::HiRes: '0'
 configure_requires:
-  Module::Build: 0.40
+  Module::Build: '0.42'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.4003, CPAN::Meta::Converter version 2.120921'
+generated_by: 'Module::Build version 0.4231, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: Search-Tokenizer
 provides:
   Search::Tokenizer:
     file: lib/Search/Tokenizer.pm
-    version: 1.01
+    version: '1.02'
 requires:
-  Text::Transliterator::Unaccent: 0
-  Unicode::CaseFold: 0
+  Text::Transliterator::Unaccent: '0'
+  Unicode::CaseFold: '0'
 resources:
   license: http://dev.perl.org/licenses/
   repository: https://github.com/damil/Search-Tokenizer
-version: 1.01
+version: '1.02'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

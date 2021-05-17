@@ -107,3 +107,17 @@ TEST("constants") {
     CHECK(MONTH == DateRel("1M"));
     CHECK(YEAR  == DateRel("1Y"));
 }
+
+TEST("different timezones") {
+    auto rel = DateRel(Date("2021-05-10T17:00:00+03:00"), Date("2021-05-10T17:00:00+03:00"));
+    CHECK(rel.duration() == 0);
+
+    rel = DateRel(Date("2021-05-10T17:00:00+04:00"), Date("2021-05-10T17:00:00+03:00"));
+    CHECK(rel.duration() == 3600);
+
+    rel = DateRel(Date("2021-05-10T17:00:00+02:00"), Date("2021-05-10T17:00:00+03:00"));
+    CHECK(rel.duration() == -3600);
+
+    rel = DateRel(Date("2021-05-10T17:00:00+02:00"), Date("2021-05-10T17:00:00", tzget("Europe/Moscow")));
+    CHECK(rel.duration() == -3600);
+}

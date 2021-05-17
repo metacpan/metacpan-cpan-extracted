@@ -42,12 +42,12 @@
    },
    "resources": {
       "bugtracker": {
-         "web": "http://github.com/theory/kv-pair/issues/"
+         "web": "https://github.com/theory/kv-pair/issues/"
       },
       "repository": {
          "type": "git",
          "url": "git://github.com/theory/kv-pair.git",
-         "web": "http://github.com/theory/kv-pair/"
+         "web": "https://github.com/theory/kv-pair/"
       }
    },
    "special_files": ["Changes","Makefile","README.md","META.json"],

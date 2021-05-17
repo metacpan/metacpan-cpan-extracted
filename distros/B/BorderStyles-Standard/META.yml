@@ -25,7 +25,7 @@ resources:
   bugtracker: https://github.com/perlancar/perl-BorderStyles-Standard/issues
   homepage: https://metacpan.org/release/BorderStyles-Standard
   repository: git://github.com/perlancar/perl-BorderStyles-Standard.git
-version: '0.005'
+version: '0.006'
 x_Dist_Zilla:
   perl:
     version: '5.030000'
@@ -296,7 +296,7 @@ x_Dist_Zilla:
             -
               class: Pod::Weaver::Plugin::BorderStyle
               name: -BorderStyle
-              version: '0.001'
+              version: '0.002'
       name: '@Author::PERLANCAR/PodWeaver'
       version: '4.008'
     -

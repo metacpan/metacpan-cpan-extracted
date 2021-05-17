@@ -1,3 +1,6 @@
+0.003001 2021-05-12
+- fixed Makefile.PL
+
 0.003 2021-05-08
 - added Inline method for use with Inline::*
   See POD for more info it's use.

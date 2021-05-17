@@ -1,0 +1,65 @@
+#include <xs/CallbackDispatcher.h>
+
+MODULE = UniEvent::HTTP                PACKAGE = UniEvent::HTTP::ServerRequest
+PROTOTYPES: DISABLE
+
+BOOT {
+    Stash stash(__PACKAGE__);
+    stash.inherit("Protocol::HTTP::Request");
+}
+
+XSCallbackDispatcher* ServerRequest::receive_event () {
+    RETVAL = XSCallbackDispatcher::create(THIS->receive_event);
+}
+
+void ServerRequest::receive_callback (ServerRequest::receive_fn cb) {
+    THIS->receive_event.remove_all();
+    if (cb) THIS->receive_event.add(cb);
+}
+
+XSCallbackDispatcher* ServerRequest::partial_event () {
+    RETVAL = XSCallbackDispatcher::create(THIS->partial_event);
+}
+
+void ServerRequest::partial_callback (ServerRequest::partial_fn cb) {
+    THIS->partial_event.remove_all();
+    if (cb) THIS->partial_event.add(cb);
+}
+
+XSCallbackDispatcher* ServerRequest::drop_event () {
+    RETVAL = XSCallbackDispatcher::create(THIS->drop_event);
+}
+
+void ServerRequest::drop_callback (ServerRequest::drop_fn cb) {
+    THIS->drop_event.remove_all();
+    if (cb) THIS->drop_event.add(cb);
+}
+
+XSCallbackDispatcher* ServerRequest::finish_event () {
+    RETVAL = XSCallbackDispatcher::create(THIS->finish_event);
+}
+
+void ServerRequest::finish_callback (ServerRequest::finish_fn cb) {
+    THIS->finish_event.remove_all();
+    if (cb) THIS->finish_event.add(cb);
+}
+
+bool ServerRequest::is_done ()
+
+ServerResponseSP ServerRequest::response ()
+
+void ServerRequest::enable_partial ()
+
+void ServerRequest::respond (xs::nn<ServerResponseSP> res)
+
+void ServerRequest::send_continue ()
+
+void ServerRequest::redirect (string uri_to)
+
+void ServerRequest::drop ()
+
+bool ServerRequest::is_secure ()
+
+panda::net::SockAddr ServerRequest::sockaddr ()
+
+panda::net::SockAddr ServerRequest::peeraddr ()

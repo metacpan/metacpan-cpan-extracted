@@ -1,0 +1,35 @@
+#include "ServerRequest.h"
+#include "Server.h"
+
+namespace panda { namespace unievent { namespace http {
+
+ServerRequest::ServerRequest (ServerConnection* conn) : _connection(conn), _is_secure(conn->is_secure()) {}
+
+void ServerRequest::respond (const ServerResponseSP& res) {
+    if (!_connection) return; // response after client disconnection
+    _connection->respond(this, res);
+}
+
+void ServerRequest::send_continue () {
+    if (!_connection) return;
+    _connection->send_continue(this);
+}
+
+void ServerRequest::redirect (const string& uri) {
+    respond(new ServerResponse(302, Headers().location(uri)));
+}
+
+void ServerRequest::drop () {
+    if (!_connection || (_response && _response->completed())) return;
+    _connection->close(make_error_code(std::errc::operation_canceled));
+}
+
+net::SockAddr ServerRequest::sockaddr () const { return _connection ? _connection->sockaddr().value() : net::SockAddr{}; }
+net::SockAddr ServerRequest::peeraddr () const { return _connection ? _connection->peeraddr().value() : net::SockAddr{}; }
+
+ServerRequest::~ServerRequest () {
+    // remove garbage from response in case if user holds response without request after response is finished
+    if (_response) _response->_request = nullptr;
+}
+
+}}}

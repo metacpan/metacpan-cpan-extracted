@@ -1,0 +1,64 @@
+MODE: INLINE
+
+namespace {
+    struct XSPoolFactory : Pool::IFactory {
+        ClientSP new_client (Pool* pool) override { return make_backref<Client>(pool); }
+    };
+    
+    static XSPoolFactory xs_pool_factory;
+}
+
+MODULE = UniEvent::HTTP                PACKAGE = UniEvent::HTTP::Pool
+PROTOTYPES: DISABLE
+
+PoolSP instance (LoopSP loop = {}) {
+    if (!loop) loop = Loop::default_loop();
+    RETVAL = Pool::instance(loop);
+}
+
+#// new([$loop])
+#// new($cfg, [$loop])
+Pool* Pool::new (Sv config_or_loop = {}, LoopSP loop = {}) {
+    Pool::Config cfg;
+    
+    if (config_or_loop.is_object_ref()) {
+        loop = xs::in<LoopSP>(config_or_loop);
+    }
+    else if (config_or_loop.is_hash_ref()) {
+        cfg = xs::in<Pool::Config>(config_or_loop);
+    }
+    
+    if (!loop) loop = Loop::default_loop();
+    cfg.factory = &xs_pool_factory;
+    RETVAL = new Pool(cfg, loop);
+}
+
+Loop* Pool::loop ()
+
+ClientSP Pool::request (xs::nn<RequestSP> req)
+
+uint32_t Pool::idle_timeout (SV* newval = nullptr) {
+    if (newval) {
+        THIS->idle_timeout(SvUV(newval));
+        XSRETURN_UNDEF;
+    }
+    RETVAL = THIS->idle_timeout();
+}
+
+uint32_t Pool::max_connections (SV* newval = nullptr) {
+    if (newval) {
+        THIS->max_connections(SvUV(newval));
+        XSRETURN_UNDEF;
+    }
+    RETVAL = THIS->max_connections();
+}
+
+
+size_t Pool::size ()
+
+size_t Pool::nbusy ()
+
+SV* CLONE_SKIP (...) {
+    XSRETURN_YES;
+    PERL_UNUSED_VAR(items);
+}

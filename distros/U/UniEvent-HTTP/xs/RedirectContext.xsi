@@ -1,0 +1,31 @@
+MODULE = UniEvent::HTTP                PACKAGE = UniEvent::HTTP::RedirectContext
+PROTOTYPES: DISABLE
+
+URISP RedirectContext::uri () {
+    RETVAL = THIS->uri;
+}
+
+SslContext RedirectContext::ssl_ctx () {
+    RETVAL = THIS->ssl_ctx;
+}
+
+Hash RedirectContext::cookies () {
+    RETVAL = Hash::create(THIS->cookies.size());
+    for (const auto& elem : THIS->cookies.fields) RETVAL.store(elem.name, xs::out(elem.value));
+}
+
+Hash RedirectContext::removed_headers () {
+    auto& headers = THIS->removed_headers;
+    RETVAL = Hash::create(headers.size());
+    for (const auto& elem : headers.fields) {
+        auto len = elem.name.length();
+        char key[len];
+        std::transform(elem.name.data(), elem.name.data() + len, key, ::tolower);
+        RETVAL.store(string_view(key, len), xs::out(elem.value));
+    }
+}
+
+SV* CLONE_SKIP (...) {
+    XSRETURN_YES;
+    PERL_UNUSED_VAR(items);
+}

@@ -13,16 +13,15 @@ namespace xs { namespace callback_dispatcher {
     struct XSCallbackDispatcher {
         virtual ~XSCallbackDispatcher () {}
 
-        virtual void add                   (const Sub& cv, bool = false) = 0;
-        virtual void add_event_listener    (const Sub& cv, bool = false) = 0;
-        virtual void remove                (const Sub& cv)               = 0;
-        virtual void remove_event_listener (const Sub& cv)               = 0;
-        virtual Sv   call                  (SV** args, size_t items)     = 0;
-        virtual void remove_all            ()                            = 0;
-        virtual bool has_listeners         ()                            = 0;
-
-        void add_back                (const Sub& cv) { add(cv, true); }
-        void add_event_listener_back (const Sub& cv) { add_event_listener(cv, true); }
+        virtual void add                    (const Sub& cv)           = 0;
+        virtual void prepend                (const Sub& cv)           = 0;
+        virtual void add_event_listener     (const Sub& cv)           = 0;
+        virtual void prepend_event_listener (const Sub& cv)           = 0;
+        virtual void remove                 (const Sub& cv)           = 0;
+        virtual void remove_event_listener  (const Sub& cv)           = 0;
+        virtual Sv   call                   (SV** args, size_t items) = 0;
+        virtual void remove_all             ()                        = 0;
+        virtual bool has_listeners          ()                        = 0;
 
         template <typename Ret, class...Args, class...Rest>
         static XSCallbackDispatcher* create (CallbackDispatcher<Ret(Args...)>&, Rest&&...);
@@ -87,9 +86,11 @@ namespace xs { namespace callback_dispatcher {
               arg_convs(create_converter_pair<typename Convs::first_type::type>(std::forward<ConvArgs>(cargs))...)
         {}
 
-        void add (const Sub& sub, bool back) override { _add(sub, back, Indices{}); }
+        void add     (const Sub& sub) override { _add(sub, true, Indices{}); }
+        void prepend (const Sub& sub) override { _add(sub, false, Indices{}); }
 
-        void add_event_listener (const Sub& sub, bool back) override { _add_event_listener(sub, back, Indices{}); }
+        void add_event_listener     (const Sub& sub) override { _add_event_listener(sub, true, Indices{}); }
+        void prepend_event_listener (const Sub& sub) override { _add_event_listener(sub, false, Indices{}); }
 
         void remove (const Sub& sub) override { _remove(sub, Indices{}); }
 

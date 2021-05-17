@@ -25,6 +25,7 @@ GetOptions(
     'build|B|b'  => \(my $build),
     'unknown|u!' => \(my $report_unknown),
     'count|c'    => \(my $count),
+    'order|o'    => \(my $order),
     'path|p=s'   => \@pathes,
     "n|number:i" => \$number,
     'color|C'    => \(my $color),
@@ -129,6 +130,7 @@ while (my $record = $parser->next) {
     }
 
     $record = $record->fields(@pathes) if @pathes;
+    $record = $record->sort if $order;
 
     $writer->write($record) if $writer;
     if ($schema && $to ne 'fields') {
@@ -203,13 +205,17 @@ L<http://format.gbv.de/pica>
 PICA serialization type to enable writing parsed PICA data. Use C<fields> to
 list all fields in the data (with optional schema information).
 
-=head2 --count, -c
-
-Count number of records, holdings, items, and fields.
-
 =head2 --number, -n
 
 Stop parsing after C<n> records. Can be abbreviated as C<-1>, C<-2>...
+
+=head2 --order, -o
+
+Sort record fields by field identifier or by occurrence for level 2.
+
+=head2 --count, -c
+
+Count number of records, holdings, items, and fields.
 
 =head2 --path, -p
 

@@ -1,0 +1,8 @@
+if (NOT TARGET panda-lib)
+    find_package(panda-lib REQUIRED)
+    find_package(panda-net-sockaddr REQUIRED)
+    find_package(OpenSSL REQUIRED)
+    find_package(c-ares REQUIRED)
+    find_package(libuv REQUIRED)
+    include("${CMAKE_CURRENT_LIST_DIR}/unievent-targets.cmake")
+endif()

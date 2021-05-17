@@ -11,5 +11,3 @@ script_sections = NAME|DESCRIPTION|SYNOPSIS|AUTHOR
 
 [CodeLayout::ProhibitHardTabs]
 allow_leading_tabs = 1
-
-[-Documentation::RequirePodLinksIncludeText]

@@ -24,11 +24,11 @@ subtest 'basic load' => sub {
             my($build, $url) = @_;
             push @mock_calls, [ 'fetch', { url => $url } ];
             $url ||= $build->meta_prop->{start_url};
-            if($url eq 'https://api.github.com/repos/Perl5-Alien/dontpanic/releases')
+            if($url eq 'https://api.github.com/repos/PerlAlien/dontpanic/releases')
             {
               return \%mock_response;
             }
-            elsif($url eq 'https://api.github.com/repos/Perl5-Alien/dontpanic/tags')
+            elsif($url eq 'https://api.github.com/repos/PerlAlien/dontpanic/tags')
             {
               $mock_response{filename} = 'tags';
               return \%mock_response;
@@ -57,11 +57,11 @@ subtest 'basic load' => sub {
     local $mock_response{content} = encode_json([
       {
         tag_name => 'v1.01',
-        tarball_url => 'https://api.github.com/repos/Perl5-Alien/dontpanic/tarball/v1.01',
+        tarball_url => 'https://api.github.com/repos/PerlAlien/dontpanic/tarball/v1.01',
       },
       {
         tag_name => '1.00',
-        tarball_url => 'https://api.github.com/repos/Perl5-Alien/dontpanic/tarball/1.00',
+        tarball_url => 'https://api.github.com/repos/PerlAlien/dontpanic/tarball/1.00',
       },
     ]);
 
@@ -73,7 +73,7 @@ subtest 'basic load' => sub {
 
       share {
         plugin 'Download::GitHub' => (
-          github_user => 'Perl5-Alien',
+          github_user => 'PerlAlien',
           github_repo => 'dontpanic',
         );
       };
@@ -109,8 +109,8 @@ subtest 'basic load' => sub {
       {
         type => 'list',
         list => [
-          { filename => 'v1.01', url => 'https://api.github.com/repos/Perl5-Alien/dontpanic/tarball/v1.01', version => '1.01' },
-          { filename => '1.00',  url => 'https://api.github.com/repos/Perl5-Alien/dontpanic/tarball/1.00',  version => '1.00' },
+          { filename => 'v1.01', url => 'https://api.github.com/repos/PerlAlien/dontpanic/tarball/v1.01', version => '1.01' },
+          { filename => '1.00',  url => 'https://api.github.com/repos/PerlAlien/dontpanic/tarball/1.00',  version => '1.00' },
         ],
       },
       'response'
@@ -141,11 +141,11 @@ subtest 'basic load' => sub {
     $file->spew_utf8(encode_json([
       {
         tag_name => 'v1.01',
-        tarball_url => 'https://api.github.com/repos/Perl5-Alien/dontpanic/tarball/v1.01',
+        tarball_url => 'https://api.github.com/repos/PerlAlien/dontpanic/tarball/v1.01',
       },
       {
         tag_name => '1.00',
-        tarball_url => 'https://api.github.com/repos/Perl5-Alien/dontpanic/tarball/1.00',
+        tarball_url => 'https://api.github.com/repos/PerlAlien/dontpanic/tarball/1.00',
       },
     ]));
 
@@ -157,7 +157,7 @@ subtest 'basic load' => sub {
 
       share {
         plugin 'Download::GitHub' => (
-          github_user => 'Perl5-Alien',
+          github_user => 'PerlAlien',
           github_repo => 'dontpanic',
         );
       };
@@ -188,8 +188,8 @@ subtest 'basic load' => sub {
       {
         type => 'list',
         list => [
-          { filename => 'v1.01', url => 'https://api.github.com/repos/Perl5-Alien/dontpanic/tarball/v1.01', version => '1.01' },
-          { filename => '1.00',  url => 'https://api.github.com/repos/Perl5-Alien/dontpanic/tarball/1.00',  version => '1.00' },
+          { filename => 'v1.01', url => 'https://api.github.com/repos/PerlAlien/dontpanic/tarball/v1.01', version => '1.01' },
+          { filename => '1.00',  url => 'https://api.github.com/repos/PerlAlien/dontpanic/tarball/1.00',  version => '1.00' },
         ],
       },
       'response'
@@ -208,7 +208,7 @@ subtest 'basic load' => sub {
 
       share {
         plugin 'Download::GitHub' => (
-          github_user => 'Perl5-Alien',
+          github_user => 'PerlAlien',
           github_repo => 'dontpanic',
           prefer => 1,
           version => qr/^foo([0-9]+)$/,
@@ -246,23 +246,23 @@ subtest 'basic load' => sub {
     local $mock_response{content} = encode_json([
       {
         tag_name => 'v1.01',
-        tarball_url => 'https://api.github.com/repos/Perl5-Alien/dontpanic/tarball/v1.01',
+        tarball_url => 'https://api.github.com/repos/PerlAlien/dontpanic/tarball/v1.01',
         assets => [
           {
-              url => 'https://api.github.com/repos/Perl5-Alien/dontpanic/releases/assets/123456',
+              url => 'https://api.github.com/repos/PerlAlien/dontpanic/releases/assets/123456',
               name => 'alien-dontpanic-v1.01.tar.xz',
-              browser_download_url => 'https://github.com/repos/Perl5-Alien/dontpanic/releases/download/dontpanic-v1.01/alien-dontpanic-v1.01.tar.xz',
+              browser_download_url => 'https://github.com/repos/PerlAlien/dontpanic/releases/download/dontpanic-v1.01/alien-dontpanic-v1.01.tar.xz',
           },
           {
-              url => 'https://api.github.com/repos/Perl5-Alien/dontpanic/releases/assets/654321',
+              url => 'https://api.github.com/repos/PerlAlien/dontpanic/releases/assets/654321',
               name => 'dontpanic-the-aliens.tar.xz',
-              browser_download_url => 'https://github.com/repos/Perl5-Alien/dontpanic/releases/download/dontpanic-v1.01/dontpanic-the-aliens.tar.xz',
+              browser_download_url => 'https://github.com/repos/PerlAlien/dontpanic/releases/download/dontpanic-v1.01/dontpanic-the-aliens.tar.xz',
           },
         ]
       },
       {
         tag_name => '1.00',
-        tarball_url => 'https://api.github.com/repos/Perl5-Alien/dontpanic/tarball/1.00',
+        tarball_url => 'https://api.github.com/repos/PerlAlien/dontpanic/tarball/1.00',
       },
     ]);
 
@@ -274,7 +274,7 @@ subtest 'basic load' => sub {
 
       share {
         plugin 'Download::GitHub' => (
-          github_user => 'Perl5-Alien',
+          github_user => 'PerlAlien',
           github_repo => 'dontpanic',
           include_assets => qr/^alien/,
         );
@@ -288,14 +288,14 @@ subtest 'basic load' => sub {
       {
         type => 'list',
         list => [
-        { filename => 'v1.01', url => 'https://api.github.com/repos/Perl5-Alien/dontpanic/tarball/v1.01', version => '1.01' },
+        { filename => 'v1.01', url => 'https://api.github.com/repos/PerlAlien/dontpanic/tarball/v1.01', version => '1.01' },
         {
           filename  => 'alien-dontpanic-v1.01.tar.xz',
-          asset_url => 'https://api.github.com/repos/Perl5-Alien/dontpanic/releases/assets/123456',
+          asset_url => 'https://api.github.com/repos/PerlAlien/dontpanic/releases/assets/123456',
           version   => '1.01',
-          url       => 'https://github.com/repos/Perl5-Alien/dontpanic/releases/download/dontpanic-v1.01/alien-dontpanic-v1.01.tar.xz'
+          url       => 'https://github.com/repos/PerlAlien/dontpanic/releases/download/dontpanic-v1.01/alien-dontpanic-v1.01.tar.xz'
         },
-        { filename => '1.00',  url => 'https://api.github.com/repos/Perl5-Alien/dontpanic/tarball/1.00',  version => '1.00' },
+        { filename => '1.00',  url => 'https://api.github.com/repos/PerlAlien/dontpanic/tarball/1.00',  version => '1.00' },
         ]
       }, 'correct list of assests included';
 
@@ -307,7 +307,7 @@ subtest 'basic load' => sub {
 
       share {
         plugin 'Download::GitHub' => (
-          github_user => 'Perl5-Alien',
+          github_user => 'PerlAlien',
           github_repo => 'dontpanic',
           include_assets => 1,
         );
@@ -321,20 +321,20 @@ subtest 'basic load' => sub {
       {
         type => 'list',
         list => [
-        { filename => 'v1.01', url => 'https://api.github.com/repos/Perl5-Alien/dontpanic/tarball/v1.01', version => '1.01' },
+        { filename => 'v1.01', url => 'https://api.github.com/repos/PerlAlien/dontpanic/tarball/v1.01', version => '1.01' },
         {
           filename  => 'alien-dontpanic-v1.01.tar.xz',
-          asset_url => 'https://api.github.com/repos/Perl5-Alien/dontpanic/releases/assets/123456',
+          asset_url => 'https://api.github.com/repos/PerlAlien/dontpanic/releases/assets/123456',
           version   => '1.01',
-          url       => 'https://github.com/repos/Perl5-Alien/dontpanic/releases/download/dontpanic-v1.01/alien-dontpanic-v1.01.tar.xz'
+          url       => 'https://github.com/repos/PerlAlien/dontpanic/releases/download/dontpanic-v1.01/alien-dontpanic-v1.01.tar.xz'
         },
         {
           filename  => 'dontpanic-the-aliens.tar.xz',
-          asset_url => 'https://api.github.com/repos/Perl5-Alien/dontpanic/releases/assets/654321',
+          asset_url => 'https://api.github.com/repos/PerlAlien/dontpanic/releases/assets/654321',
           version   => '1.01',
-          url       => 'https://github.com/repos/Perl5-Alien/dontpanic/releases/download/dontpanic-v1.01/dontpanic-the-aliens.tar.xz'
+          url       => 'https://github.com/repos/PerlAlien/dontpanic/releases/download/dontpanic-v1.01/dontpanic-the-aliens.tar.xz'
         },
-        { filename => '1.00',  url => 'https://api.github.com/repos/Perl5-Alien/dontpanic/tarball/1.00',  version => '1.00' },
+        { filename => '1.00',  url => 'https://api.github.com/repos/PerlAlien/dontpanic/tarball/1.00',  version => '1.00' },
         ]
       }, 'correct list of assests included';
   };
@@ -345,11 +345,11 @@ subtest 'basic load' => sub {
     local $mock_response{content} = encode_json([
       {
         name => 'v1.01',
-        tarball_url => 'https://api.github.com/repos/Perl5-Alien/dontpanic/tarball/v1.01',
+        tarball_url => 'https://api.github.com/repos/PerlAlien/dontpanic/tarball/v1.01',
       },
       {
         name => '1.00',
-        tarball_url => 'https://api.github.com/repos/Perl5-Alien/dontpanic/tarball/1.00',
+        tarball_url => 'https://api.github.com/repos/PerlAlien/dontpanic/tarball/1.00',
       },
     ]);
 
@@ -361,7 +361,7 @@ subtest 'basic load' => sub {
 
       share {
         plugin 'Download::GitHub' => (
-          github_user => 'Perl5-Alien',
+          github_user => 'PerlAlien',
           github_repo => 'dontpanic',
           tags_only   => 1,
         );
@@ -376,12 +376,12 @@ subtest 'basic load' => sub {
         {
           filename => 'v1.01',
           version  => '1.01',
-          url      => 'https://api.github.com/repos/Perl5-Alien/dontpanic/tarball/v1.01'
+          url      => 'https://api.github.com/repos/PerlAlien/dontpanic/tarball/v1.01'
         },
         {
           version  => '1.00',
           filename => '1.00',
-          url      => 'https://api.github.com/repos/Perl5-Alien/dontpanic/tarball/1.00'
+          url      => 'https://api.github.com/repos/PerlAlien/dontpanic/tarball/1.00'
         }],
       type => 'list'
     }, 'tags';
@@ -420,7 +420,7 @@ subtest 'live tests' => sub {
 
     share {
       plugin 'Download::GitHub' => (
-        github_user => 'Perl5-Alien',
+        github_user => 'PerlAlien',
         github_repo => 'dontpanic',
       );
     };

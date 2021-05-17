@@ -8,7 +8,7 @@ use File::chdir;
 use Path::Tiny ();
 
 # ABSTRACT: Plugin for fetching a local file
-our $VERSION = '2.38'; # VERSION
+our $VERSION = '2.40'; # VERSION
 
 
 has '+url' => '';
@@ -47,7 +47,9 @@ sub init
   }
 
   $meta->register_hook( fetch => sub {
-    my(undef, $path) = @_;
+    my($build, $path, %options) = @_;
+
+    $build->log("plugin Fetch::Local does not support http_headers option") if $options{http_headers};
 
     $path ||= $self->url;
 
@@ -103,7 +105,7 @@ Alien::Build::Plugin::Fetch::Local - Plugin for fetching a local file
 
 =head1 VERSION
 
-version 2.38
+version 2.40
 
 =head1 SYNOPSIS
 

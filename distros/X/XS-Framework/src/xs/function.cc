@@ -52,31 +52,10 @@ static void XS_function_call (pTHX_ CV* cv) { xs::throw_guard(cv, [=](){
     XSRETURN(1);
 }); }
 
-static Sub clone_anon_xsub (CV* proto) {
-    dTHX;
-    CV* cv = MUTABLE_CV(newSV_type(SvTYPE(proto)));
-    CvFLAGS(cv) = CvFLAGS(proto) & ~(CVf_CLONE|CVf_WEAKOUTSIDE|CVf_CVGV_RC);
-    CvCLONED_on(cv);
-    CvFILE(cv) = CvFILE(proto);
-    CvGV_set(cv,CvGV(proto));
-    CvSTASH_set(cv, CvSTASH(proto));
-    CvISXSUB_on(cv);
-    CvXSUB(cv) = CvXSUB(proto);
-    #if PERL_VERSION >= 22
-        #ifndef PERL_IMPLICIT_CONTEXT
-            CvHSCXT(cv) = &PL_stack_sp;
-        #else
-            PoisonPADLIST(cv);
-        #endif
-    #endif
-    CvANON_on(cv);
-    return Sub::noinc(cv);
-}
-
-static PERL_THREAD_LOCAL CV* proto = newXS(nullptr, &XS_function_call, "<C++>");
+static PERL_THREAD_LOCAL CV* proto = (CV*)Sub::create(&XS_function_call).detach();
 
 Sub create_sub (IFunctionCaller* fc) {
-    auto ret = clone_anon_xsub(proto);
+    auto ret = Sub::clone_anon_xsub(proto);
     ret.payload_attach(fc, &out_marker);
     return ret;
 }

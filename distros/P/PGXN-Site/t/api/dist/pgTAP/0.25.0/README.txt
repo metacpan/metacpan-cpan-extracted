@@ -1,13 +1,13 @@
 pgTAP 0.25.0
 ============
 
-[pgTAP](http://pgtap.org) is a unit testing framework for PostgreSQL written
+[pgTAP](https://pgtap.org) is a unit testing framework for PostgreSQL written
 in PL/pgSQL and PL/SQL. It includes a comprehensive collection of
-[TAP](http://testanything.org)-emitting assertion functions, as well as the
+[TAP](https://testanything.org)-emitting assertion functions, as well as the
 ability to integrate with other TAP-emitting test frameworks. It can also be
 used in the xUnit testing style. For detailed documentation, see the
 documentation in `doc/pgtap.md` or
-[online](http://pgtap.org/documentation.html "Complete pgTAP Documentation").
+[online](https://pgtap.org/documentation.html "Complete pgTAP Documentation").
 
 To build it, just do this:
 

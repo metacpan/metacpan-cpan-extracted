@@ -1,4 +1,4 @@
-logger: trap
+logger: capture
 plugins:
     Auth::Extensible:
         no_login_handler: 1

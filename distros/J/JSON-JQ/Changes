@@ -1,5 +1,8 @@
 Revision history for Perl module JSON::JQ
 
+v0.06:
+   - fix linking problem on alphine Linux (credit to Bob Bell)
+   - more testcases
 v0.05:
    - not croak if no output available but no error raised
    - bugfixes in XS code
@@ -13,5 +16,6 @@ v0.03:
 v0.02:
    - fix access of freed memory, which leads to segfault on Linux.
    - add missing module dependency - enum.
+   - module documentation typo fixes (credit to Ben Bullock)
 v0.01:
    - initial release.

@@ -7,7 +7,7 @@ use Types::Standard qw(RoleName Str);
 
 use namespace::clean;
 
-our $VERSION = '1.12';
+our $VERSION = '1.13';
 
 with "Form::Tiny";
 

@@ -13,7 +13,7 @@ use Form::Tiny::Error;
 use Form::Tiny::FieldData;
 use Moo::Role;
 
-our $VERSION = '1.12';
+our $VERSION = '1.13';
 
 with "Form::Tiny::Form";
 
@@ -385,46 +385,47 @@ Form::Tiny - Input validator implementation centered around Type::Tiny
 
 	package MyForm;
 
-	# for role mixing, can also use Role::Tiny::With instead
-	use Moo;
+	use Form::Tiny -base;
 
-	with "Form::Tiny"; # mix in this role
+	form_filed 'my_field' => {
+		required => 1,
+	};
 
-	sub build_fields {
-		... # override this method to return an array of field defs
-	}
+	form_filed 'another_field' => {
+		required => 1,
+	};
 
 =head1 DESCRIPTION
 
 Main class of the Form::Tiny system - this is a role that provides most of the module's functionality.
 
+=head1 DOCUMENTATION INDEX
+
+=over
+
+=item * L<Form::Tiny::Manual> - main reference
+
+=item * L<Form::Tiny::Manual::Internals> - Form::Tiny without syntactic sugar
+
+=item * Most regular packages contains information on symbols they contain.
+
+=back
+
 =head1 IMPORTING
 
-Starting with version 1.10 you can enable syntactic sugar instead of bare-bones role mixing by using import flags:
+Starting with version 1.10 you can enable syntax helpers by using import flags:
 
 	package MyForm;
 
+	# imports form_field and form_cleaner helpers
 	use Form::Tiny -base;
 
-	# new syntax for defining form fields
-	form_field 'field' => (
-		...
-	);
+	# imports form_field, form_filter and form_cleaner helpers
+	use Form::Tiny -filtered;
 
-	form_field 'complex_field' => sub {
-		my ($form) = @_;
+	# fully-featured form:
+	use Form::Tiny -filtered, -strict;
 
-		return {
-			...
-		};
-	};
-
-	# new syntax for defining a form cleaner
-	form_cleaner sub {
-		...
-	};
-
-Consult L<Form::Tiny::Manual> for more examples.
 
 =head2 IMPORTED FUNCTIONS
 
@@ -435,13 +436,13 @@ Consult L<Form::Tiny::Manual> for more examples.
 
 Imported when any flag is present. $coderef gets passed the form instance and should return a hashref. Neither %arguments nor $coderef return data should include the name in the hash, it will be copied from the first argument.
 
-Note that this field definition method is not capable of returning a subclass of L<Form::Tiny::FieldDefinition>. If you need a subclass, you will need to use I<build_fields>.
+Note that this field definition method is not capable of returning a subclass of L<Form::Tiny::FieldDefinition>. If you need a subclass, you will need to use bare-bones method of form construction. Refer to L<Form::Tiny::Manual::Internals> for details.
 
 =head3 form_cleaner
 
 	form_cleaner $sub;
 
-Imported when any flag is present. It is a pretty straightforward shortcut for I<build_cleaner>. There shouldn't be more than one cleaner in a form.
+Imported when any flag is present. C<$sub> will be ran as the very last step of form validation. There can't be more than one cleaner in a form. See L</build_cleaner>.
 
 =head3 form_filter
 

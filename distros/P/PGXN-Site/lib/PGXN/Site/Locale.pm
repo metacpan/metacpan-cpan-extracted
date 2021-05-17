@@ -6,7 +6,7 @@ use parent 'Locale::Maketext';
 use I18N::LangTags::Detect;
 use File::Spec;
 use Carp;
-our $VERSION = v0.10.3;
+our $VERSION = v0.20.2;
 
 # Allow unknown phrases to just pass-through.
 our %Lexicon = (
@@ -116,7 +116,7 @@ our %Lexicon = (
     'Pick a letter at left' => 'Pick a letter at left',
     'No user nicknames found starting with "[_1]"' => 'No user nicknames found starting with “[_1]”',
 
-    donors_intro => 'All the great folks who funded the inital development of PGXN will be listed in perpetuity here on the “Donors” page of PGXN.org. All donors are invited to the PGXN Launch Party at <a href="http://www.pgcon.org/2011/">PGCon</a> in May, 2011.',
+    donors_intro => 'All the great folks who funded the inital development of PGXN will be listed in perpetuity here on the “Donors” page of PGXN.org. All donors are invited to the PGXN Launch Party at <a href="https://www.pgcon.org/2011/">PGCon</a> in May, 2011.',
 );
 
 sub accept {
@@ -210,7 +210,7 @@ method.
 Returns a PGXN::Site::Locale handle appropriate for the specified
 argument, which must take the form of the HTTP_ACCEPT_LANGUAGE string
 typically created in web server environments and specified in L<RFC
-3282|http://tools.ietf.org/html/rfc3282>. The parsing of this header is
+3282|https://tools.ietf.org/html/rfc3282>. The parsing of this header is
 handled by L<I18N::LangTags::Detect>.
 
 =head2 Instance Methods
@@ -273,10 +273,10 @@ David E. Wheeler <david.wheeler@pgexperts.com>
 
 =head1 Copyright and License
 
-Copyright (c) 2010-2013 David E. Wheeler.
+Copyright (c) 2010-2021 David E. Wheeler.
 
 This module is free software; you can redistribute it and/or modify it under
-the L<PostgreSQL License|http://www.opensource.org/licenses/postgresql>.
+the L<PostgreSQL License|https://www.opensource.org/licenses/postgresql>.
 
 Permission to use, copy, modify, and distribute this software and its
 documentation for any purpose, without fee, and without a written agreement is

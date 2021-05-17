@@ -1,0 +1,77 @@
+{
+   "abstract" : "Dice role module for CoC TRPG.",
+   "author" : [
+      "bedoshi"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Milla version v1.0.20, Dist::Zilla version 6.017, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Acme-CoC-Dice",
+   "no_index" : {
+      "directory" : [
+         "eg",
+         "examples",
+         "inc",
+         "share",
+         "t",
+         "xt"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.034"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Dist::Milla" : "v1.0.20",
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Try::Tiny" : "0",
+            "perl" : "v5.32.0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Data::Dumper" : "0",
+            "Module::Spy" : "0",
+            "Test2::Plugin::UTF8" : "0",
+            "Test2::V0" : "0",
+            "Test::Deep" : "0",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/bedoshi/Acme-CoC-Dice/issues"
+      },
+      "homepage" : "https://github.com/bedoshi/Acme-CoC-Dice",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/bedoshi/Acme-CoC-Dice.git",
+         "web" : "https://github.com/bedoshi/Acme-CoC-Dice"
+      }
+   },
+   "version" : "0.01",
+   "x_contributors" : [
+      "bedoshi <bedoshidiary.ester.freesia@gmail.com>"
+   ],
+   "x_generated_by_perl" : "v5.32.1",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.25",
+   "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later",
+   "x_static_install" : 1
+}
+

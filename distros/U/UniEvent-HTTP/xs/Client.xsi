@@ -1,0 +1,20 @@
+MODULE = UniEvent::HTTP                PACKAGE = UniEvent::HTTP::Client
+PROTOTYPES: DISABLE
+
+BOOT {
+    Stash(__PACKAGE__).inherit("UniEvent::Tcp");
+}
+
+Client* Client::new (LoopSP loop = {}) {
+    if (!loop) loop = Loop::default_loop();
+    RETVAL = make_backref<Client>(loop);
+}
+
+void Client::request (xs::nn<RequestSP> req)
+
+void Client::cancel (std::error_code err = make_error_code(std::errc::operation_canceled))
+
+SV* CLONE_SKIP (...) {
+    XSRETURN_YES;
+    PERL_UNUSED_VAR(items);
+}

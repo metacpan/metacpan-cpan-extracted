@@ -10,6 +10,10 @@ Sub Sub::create (panda::string_view sub_code) {
     return eval(code);
 }
 
+Sub Sub::create (XSUBADDR_t xsfunc) {
+    return newXS(nullptr, xsfunc, "<C++>");
+}
+
 Stash Sub::stash () const { return CvSTASH((CV*)sv); }
 
 Glob Sub::glob () const { return CvGV((CV*)sv); }
@@ -59,6 +63,27 @@ size_t Sub::_call (CV* cv, I32 flags, const CallArgs& args, SV** ret, size_t max
     PUTBACK; FREETMPS; LEAVE;
 
     return nret;
+}
+
+Sub Sub::clone_anon_xsub (const Sub& proto) {
+    dTHX;
+    CV* cv = MUTABLE_CV(newSV_type(SvTYPE(proto)));
+    CvFLAGS(cv) = CvFLAGS(proto) & ~(CVf_CLONE|CVf_WEAKOUTSIDE|CVf_CVGV_RC);
+    CvCLONED_on(cv);
+    CvFILE(cv) = CvFILE(proto);
+    CvGV_set(cv,CvGV(proto));
+    CvSTASH_set(cv, CvSTASH(proto));
+    CvISXSUB_on(cv);
+    CvXSUB(cv) = CvXSUB(proto);
+    #if PERL_VERSION >= 22
+        #ifndef PERL_IMPLICIT_CONTEXT
+            CvHSCXT(cv) = &PL_stack_sp;
+        #else
+            PoisonPADLIST(cv);
+        #endif
+    #endif
+    CvANON_on(cv);
+    return Sub::noinc(cv);
 }
 
 }

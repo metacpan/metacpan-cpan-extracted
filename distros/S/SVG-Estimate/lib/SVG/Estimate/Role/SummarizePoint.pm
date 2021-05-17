@@ -1,5 +1,5 @@
 package SVG::Estimate::Role::SummarizePoint;
-$SVG::Estimate::Role::SummarizePoint::VERSION = '1.0115';
+$SVG::Estimate::Role::SummarizePoint::VERSION = '1.0116';
 use strict;
 use Moo::Role;
 
@@ -9,7 +9,7 @@ SVG::Estimate::Role::SummarizePoint - Output information about $self->point when
 
 =head1 VERSION
 
-version 1.0115
+version 1.0116
 
 =cut
 

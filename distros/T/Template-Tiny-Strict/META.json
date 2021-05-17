@@ -52,7 +52,7 @@
    "provides" : {
       "Template::Tiny::Strict" : {
          "file" : "lib/Template/Tiny/Strict.pm",
-         "version" : "1.17"
+         "version" : "1.18"
       }
    },
    "release_status" : "stable",
@@ -67,7 +67,7 @@
          "web" : "https://github.com/Ovid/template-tiny-strict"
       }
    },
-   "version" : "1.17",
+   "version" : "1.18",
    "x_generated_by_perl" : "v5.26.2",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.25"
 }

@@ -9,6 +9,8 @@ README
 README.md
 dist.ini
 eg/jazz
+eg/play-jazz
+eg/play-rock
 lib/Data/Dataset/ChordProgressions.pm
 share/Chord-Progressions.csv
 t/00-compile.t

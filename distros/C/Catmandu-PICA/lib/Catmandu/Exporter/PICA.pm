@@ -3,48 +3,31 @@ use strict;
 use warnings;
 
 use Catmandu::Sane;
-use PICA::Writer::Plus;
-use PICA::Writer::Plain;
-use PICA::Writer::Binary;
-use PICA::Writer::XML;
-use PICA::Writer::PPXML;
+use PICA::Data qw(pica_writer);
 use Moo;
 
-our $VERSION = '1.03';
+our $VERSION = '1.04';
 
 with 'Catmandu::Exporter';
 
-has type   => ( is => 'rw', default => sub { 'xml' } );
+has type => ( is => 'rw', default => sub { 'xml' } );
 has writer => ( is => 'lazy' );
 
 sub _build_writer {
     my ($self) = @_;
-
-    my $type = lc $self->type;
-
-    if ( $type =~ /^(pica)?plus$/ ) {
-        PICA::Writer::Plus->new( fh => $self->fh );
-    } elsif ( $type eq 'binary') {
-        PICA::Writer::Binary->new( $self->fh );
-    } elsif ( $type eq 'plain') {
-        PICA::Writer::Plain->new( fh => $self->fh );
-    } elsif ( $type eq 'xml') {
-        PICA::Writer::XML->new( fh => $self->fh );
-    } elsif ( $type eq 'ppxml') {
-        PICA::Writer::PPXML->new( fh => $self->fh );
-    } else {
-        die "unknown type: $type";
-    }
+    pica_writer( $self->type, fh => $self->fh );
 }
- 
+
 sub add {
-    my ($self, $data) = @_;
+    my ( $self, $data ) = @_;
+
     # utf8::decode ???
     $self->writer->write($data);
 }
 
 sub commit {
     my ($self) = @_;
+
     # collection element is optional for type xml
     $self->writer->end if $self->writer->can('end');
 }

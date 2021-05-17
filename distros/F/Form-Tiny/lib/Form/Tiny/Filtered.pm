@@ -7,7 +7,7 @@ use Types::Standard qw(Str ArrayRef InstanceOf);
 use Form::Tiny::Filter;
 use Moo::Role;
 
-our $VERSION = '1.12';
+our $VERSION = '1.13';
 
 requires qw(pre_mangle _clear_form);
 
@@ -72,19 +72,14 @@ Form::Tiny::Filtered - early filtering for form fields
 =head1 SYNOPSIS
 
 	# in your form class
-	with qw(Form::Tiny Form::Tiny::Filtered);
+	use Form::Tiny -filtered;
 
-	# optional - only trims string by default
-	sub build_filters
-	{
-		return (
-			[Int, sub { abs shift() }],
-		);
-	}
+	# optional - only trims strings by default
+	form_filter Int, sub { abs shift() };
 
 =head1 DESCRIPTION
 
-This class is a role which is meant to be mixed in together with L<Form::Tiny> role. Having the filtered role enriches Form::Tiny by adding a filtering mechanism which can change the field value before it gets validated.
+This is a role which is meant to be mixed in together with L<Form::Tiny> role. Having the filtered role enriches Form::Tiny by adding a filtering mechanism which can change the field value before it gets validated.
 
 The filtering system is designed to perform a type check on field values and only apply a filtering subroutine when the type matches.
 

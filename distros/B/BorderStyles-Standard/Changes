@@ -1,3 +1,11 @@
+0.006   2021-02-19  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+        - [build] Rebuild with newer Pod::Weaver::Plugin::BorderStyle (0.002) to
+          show example with Text::Table::Span and Text::ANSITable.
+
+
 0.005   2021-01-31  Released-By: PERLANCAR; Urgency: medium
 
 	- Update to BorderStyle 2.0.6 (extra top & border characters).

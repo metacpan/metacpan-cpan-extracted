@@ -1,16 +1,17 @@
 use strict;
 use warnings;
-package JSON::Schema::Draft201909; # git description: v0.025-10-g4578ce8
+package JSON::Schema::Draft201909; # git description: v0.026-35-gd69148e
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Validate data against a schema
 # KEYWORDS: JSON Schema data validation structure specification
 
-our $VERSION = '0.026';
+our $VERSION = '0.027';
 
 use 5.016;  # for fc, unicode_strings features
 no if "$]" >= 5.031009, feature => 'indirect';
 no if "$]" >= 5.033001, feature => 'multidimensional';
 no if "$]" >= 5.033006, feature => 'bareword_filehandles';
+use strictures 2;
 use JSON::MaybeXS;
 use Carp qw(croak carp);
 use List::Util 1.55 qw(pairs first uniqint);
@@ -22,7 +23,6 @@ use Storable 'dclone';
 use File::ShareDir 'dist_dir';
 use Module::Runtime 'use_module';
 use Moo;
-use strictures 2;
 use MooX::TypeTiny 0.002002;
 use MooX::HandlesVia;
 use Types::Standard 1.010002 qw(Bool Int Str HasMethods Enum InstanceOf HashRef Dict CodeRef Optional slurpy);
@@ -185,7 +185,7 @@ sub traverse {
     # keyword in the schema and the '$vocabulary' keyword in the metaschema.
     vocabularies => [
       (map use_module('JSON::Schema::Draft201909::Vocabulary::'.$_)->new,
-        qw(Core Validation Applicator Format Content MetaData)),
+        qw(Core Applicator Validation Format Content MetaData)),
       $self,  # for discontinued keywords defined in the base schema
     ],
     identifiers => [],
@@ -199,6 +199,7 @@ sub traverse {
   }
   catch ($e) {
     if ($e->$_isa('JSON::Schema::Draft201909::Error')) {
+      # note: we should never be here, since traversal subs are no longer be fatal
       push @{$state->{errors}}, $e;
     }
     else {
@@ -230,7 +231,7 @@ sub evaluate {
     # traverse() pass on the schema and examination of the referenced metaschema.
     vocabularies => [
       (map use_module('JSON::Schema::Draft201909::Vocabulary::'.$_)->new,
-        qw(Core Validation Applicator Format Content MetaData)),
+        qw(Core Applicator Validation Format Content MetaData)),
       $self,  # for discontinued keywords defined in the base schema
     ],
     evaluator => $self,
@@ -338,7 +339,7 @@ sub _eval {
   # do not propagate upwards changes to depth, traversed paths,
   # but additions to annotations, errors are by reference and will be retained
   $state = { %$state };
-  delete $state->{keyword};
+  delete @{$state}{'keyword', grep /^_/, keys %$state};
 
   abort($state, 'EXCEPTION: maximum evaluation depth exceeded')
     if $state->{depth}++ > $self->max_traversal_depth;
@@ -355,7 +356,7 @@ sub _eval {
   my $schema_type = get_type($schema);
   return $schema || E($state, 'subschema is false') if $schema_type eq 'boolean';
 
-  # this should never happen, due to checks in traversal
+  # this should never happen, due to checks in traverse
   abort($state, 'invalid schema type: %s', $schema_type) if $schema_type ne 'object';
 
   my $valid = 1;
@@ -490,7 +491,11 @@ sub _get_or_load_resource {
     my $document = JSON::Schema::Draft201909::Document->new(schema => $schema, _evaluator => $self);
 
     # this should be caught by the try/catch in evaluate()
-    die [ $document->errors ] if $document->has_errors;
+    die JSON::Schema::Draft201909::Result->new(
+      output_format => $self->output_format,
+      valid => 0,
+      errors => [ $document->errors ],
+    ) if $document->has_errors;
 
     # we have already performed the appropriate collision checks, so we bypass them here
     $self->_add_resources_unsafe(
@@ -562,13 +567,13 @@ JSON::Schema::Draft201909 - Validate data against a schema
 
 =head1 VERSION
 
-version 0.026
+version 0.027
 
 =head1 SYNOPSIS
 
   use JSON::Schema::Draft201909;
 
-  $js = JSON::Schema::Draft2019->new(
+  $js = JSON::Schema::Draft201909->new(
     output_format => 'flag',
     ... # other options
   );
@@ -949,6 +954,10 @@ L<JSON::Schema::Tiny>: a more minimal implementation of the specification, with 
 =item *
 
 L<https://json-schema.org/draft/2019-09/release-notes.html>
+
+=item *
+
+L<Understanding JSON Schema|https://json-schema.org/understanding-json-schema>: tutorial-focused documentation
 
 =back
 

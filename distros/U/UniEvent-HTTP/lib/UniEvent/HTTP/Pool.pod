@@ -1,0 +1,120 @@
+=head1 NAME
+
+UniEvent::HTTP::Pool - HTTP client connections pool
+
+
+
+=head1 SYNOPSIS
+
+    my $pool = UE::HTTP::Pool->new({
+        timeout => 5,
+        max_connections => 20,
+    });
+    
+    $pool->request({
+        uri => "http://example.com",
+        timeout => 3,
+        response_callback => sub { ... },
+    });
+    
+    UE::Loop->default->run;
+
+
+
+=head1 DESCRIPTION
+
+C<UniEvent::HTTP::Pool> manages a number of http connections. Its primary goal is to utilize http keep-alive feature across http requests. It can also limit
+maximum number of simultaneous http requests to the same server.
+
+When pool makes an http request and request is keep-alive, it doesn't close the connection when request is done. It will keep the connection alive for some time,
+and if new http request is started to the same destination with the same ssl and proxy settings, it will reuse that connection. If such a connection is idle
+for C<timeout> time, pool will close it.
+
+Pool may have several connections to the same destination. For example, if you start two keep-alive requests to the same destination simultaneously, it will create two
+connections and leave them both opened after requests are finished. If later you start three more simultaneous requests to the same destination, it will reuse
+two opened connections and create third connection. The maximum number of simultaneously opened connections to a certain server can be limited by
+C<max_connections> parameter. If you start a new http request when C<max_connections> connections to that server are already opened and busy
+(by other http requests), new request will be queued and executed later when one of the connections become free.
+
+Different pool objects are isolated - they will not reuse connections from each other.
+
+For conveniency, there are singleton global pool objects, one per event loop. They can be accessed directly as C<UE::HTTP::Pool::instance($loop)> or indirectly
+via C<http_request()>, C<http_get()>, etc... functions which use global pool for provided event loop object.
+Global pools are created lazily on first use with default config.
+
+When manually created pool object goes out of scope it will close all idle connections immediately. However all busy (active) connections will stay alive and all requests
+will be finished and their callbacks will be invoked. After that, all connections will be closed.
+
+An http connection is represented by L<UniEvent::HTTP::Client> object.
+
+
+
+=head1 FUNCTIONS
+
+=head2 instance([$loop = default])
+
+Returns singleton pool object for a given L<UniEvent::Loop>. Autocreates pool object if it doesn't already exist for the loop.
+
+
+
+=head1 METHODS
+
+
+=head2 new(\%config, [$loop = default])
+
+Creates new pool with supplied config for a L<UniEvent::Loop>.
+
+C<%config> includes:
+
+=over
+
+=item timeout [=60]
+
+Max idle time for a keep-alive connection. After C<timeout> seconds of inactivity, a keep-alive connection will be closed. Can be fractional.
+
+=item max_connections [=10]
+
+Maximum number of simultaneous active http requests to a certain destination (host & port). If you start more than C<max_connections> http requests to the same
+server at once, only C<max_connections> of them will get executed immediately and the rest will wait until some of connections get free.
+
+=back
+
+
+=head2 new([$loop = default])
+
+Same as above with default config (config with default values).
+
+
+=head2 loop()
+
+Returns L<UniEvent::Loop> object - the loop this pool runs in.
+
+
+=head2 request($request || \%request_params)
+
+Executes an http request. Argument can be a L<UniEvent::HTTP::Request> object or params to its constructor.
+
+Returns L<UniEvent::HTTP::Client> http connection object which will run this request. However if C<max_connections> for this destination is reached, request
+will be queued and will not run immediately, so in this case C<undef> will be returned as it's not known at the moment which connection will run the request.
+
+
+=head2 idle_timeout([$timeout])
+
+Get/set keep-alive connection idle timeout. See C<new()> for details.
+
+
+=head2 max_connections([$count])
+
+Get/set maximum number of simultaneous active http requests to a certain destination (host & port). See C<new()> for details.
+
+
+=head2 size()
+
+Returns total number of http connections in the pool.
+
+
+=head2 nbusy()
+
+Returns total number of active(busy) http connections in the pool.
+
+=cut

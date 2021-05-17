@@ -12,7 +12,7 @@ use overload
   fallback => 1;
 
 
-has [qw(title link content id description guid published author)];
+has [qw(title link content id description published author)];
 
 has tags => sub {
   shift->dom->find('category, dc\:subject')
@@ -31,31 +31,54 @@ my %selector = (
     'published', 'pubDate', 'dc|date', 'created',
     'issued',    'updated', 'modified'
   ],
-  author => ['author > name', '|author', 'atom|author', 'dc|creator'],
+  author => ['|author', 'atom|author', 'dc|creator'],
   id     => ['id',     'guid', 'link'],
   title => ['title'],
-  link  => ['link'],
-  guid  => ['guid'],
+  link  => ['link']
 );
 
-foreach my $k (keys %selector) {
-  has $k => sub {
-    my $self = shift;
-    for my $selector (@{$selector{$k}}) {
-      if (my $p = $self->dom->at($selector, %{$self->feed->namespaces})) {
-        if ($k eq 'author' && $p->at('name')) {
-          return trim $p->at('name')->text;
-        }
-        my ($text) = grep $_, map trim($_), grep $_, $p->text, $p->content;
-        $text ||= '';
-        if ($k eq 'published') {
-          return str2time($text);
-        }
-        return $text;
+sub _get_selector {
+  my ($self, $k) = @_;
+  for my $selector (@{$selector{$k}}) {
+    if (my $p = $self->dom->at($selector, %{$self->feed->namespaces})) {
+      if ($k eq 'author' && $p->at('name')) {
+        return trim $p->at('name')->text;
       }
+      my ($text) = grep $_, map trim($_), grep $_, $p->text, $p->content;
+      $text ||= '';
+      if ($k eq 'published') {
+        return str2time($text);
+      }
+      return $text;
     }
-    return;
-  };
+  }
+};
+
+sub _set_selector {
+  my ($self, $k, $val) = @_;
+  for my $selector (@{$selector{$k}}) {
+    if (my $p = $self->dom->at($selector, %{$self->feed->namespaces})) {
+      if ($k eq 'author' && $p->at('name')) {
+        return $p->at('name')->content($val);
+      }
+      if ($k eq 'published') {
+        return $p->content(Mojo::Date->new($val)->to_datetime());  # let's pretend we're all OK with Atom dates
+      }
+      return $p->content($val);
+    }
+  }
+  # still here? I guess the element is missing, so add it?
+  # THIS is another reason to move being feed-type specific:
+  if ($k eq 'author') {
+    return $self->dom->append_content($self->dom->new_tag('author', $val));
+  }
+  return $self->dom->append_content($self->dom->new_tag($selector{$k}[0], $val));
+};
+
+
+
+foreach my $k (keys %selector) {
+  has $k => sub { return shift->_get_selector($k) || undef }
 }
 
 has enclosures => sub {
@@ -95,7 +118,14 @@ has link => sub {
 };
 
 sub to_string {
-  shift->dom->to_string;
+  my $self = shift;
+  foreach my $k (keys %selector) {
+    if ($self->$k && $self->$k ne $self->_get_selector($k)) {
+      # write it to the DOM:
+        $self->_set_selector($k, $self->$k);
+    }
+  }
+  $self->dom->to_string;
 }
 
 sub to_hash {
@@ -148,15 +178,11 @@ May be filled with C<content:encoded>, C<xhtml:body> or C<description> fields
 
 =head2  id
 
-Will be equal to C<link> or C<guid> if it is undefined and either of those fields exists
+Will be equal to C<guid> or C<link> if it is undefined and either of those fields exists
 
 =head2  description
 
 Optional - usually a shorter form of the content (may be filled with C<summary> if description is missing)
-
-=head2  guid
-
-Optional
 
 =head2  published
 

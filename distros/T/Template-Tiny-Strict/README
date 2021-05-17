@@ -3,7 +3,7 @@ NAME
     code as possible
 
 VERSION
-    version 1.17
+    version 1.18
 
 SYNOPSIS
         my $template = Template::Tiny::Strict->new(

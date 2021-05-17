@@ -13,11 +13,12 @@ $modules{$_} = $_ for qw(
   DynaLoader
   ExtUtils::MakeMaker
   FFI::Platypus
+  List::Util
   Test2::API
   Test2::Require::EnvVar
   Test2::Require::Module
+  Test2::Tools::Process
   Test2::V0
-  Test::Exit
 );
 
 
@@ -62,7 +63,7 @@ if(@keys > 0)
   spacer;
 }
 
-diag sprintf $format, 'perl ', $];
+diag sprintf $format, 'perl', "$] $^O $Config{archname}";
 
 foreach my $module (sort @modules)
 {

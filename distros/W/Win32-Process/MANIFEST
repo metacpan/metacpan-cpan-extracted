@@ -7,5 +7,5 @@ Process.pm
 Process.xs
 hints/cygwin.pl
 ppport.h
-test.pl
+t/basic.t
 typemap

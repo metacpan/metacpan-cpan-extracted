@@ -86,7 +86,7 @@ struct Sv {
     SV* operator-> () const { return sv; }
 
     bool   defined        () const { return sv && SvOK(sv); }
-    bool   is_true        () const { return SvTRUE_nomg(sv); }
+    bool   is_true        () const { return SvTRUE(sv); }
     svtype type           () const { return SvTYPE(sv); }
     bool   readonly       () const { return SvREADONLY(sv); }
     U32    use_count      () const { return sv ? SvREFCNT(sv) : 0; }
@@ -169,7 +169,7 @@ protected:
     friend void swap (Sv&, Sv&);
 
     inline bool is_undef() const { return (SvTYPE(sv) <= SVt_PVMG && !SvOK(sv)); }
-    inline bool is_scalar_unsafe() const { return (SvTYPE(sv) <= SVt_PVMG || SvTYPE(sv) == SVt_PVGV); }
+    inline bool is_scalar_unsafe() const { return (SvTYPE(sv) <= SVt_PVMG || SvTYPE(sv) == SVt_PVGV || SvTYPE(sv) == SVt_PVLV); }
     SV* sv;
 };
 

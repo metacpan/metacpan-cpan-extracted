@@ -1,6 +1,7 @@
 Error: Multiple Domains specified
 Usage: 05-cmd.t <command> [-?h] [long options...]
-	-? -h --help  show help
+	--help (or -h)  show help
+	                aka -?
 
 05-cmd.t checkdomain [long options...] <DOMAIN>
 	--profile STR   SVG Profile to validate against

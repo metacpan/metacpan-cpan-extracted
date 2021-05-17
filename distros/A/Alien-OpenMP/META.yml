@@ -3,6 +3,7 @@ abstract: 'Encapsulate system info for OpenMP'
 author:
   - 'oodler <oodler@cpan.org>'
 build_requires:
+  Devel::CheckLib: '0'
   Test::More: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
@@ -16,7 +17,7 @@ name: Alien-OpenMP
 resources:
   homepage: https://github.com/oodler577/p5-Alien-OpenMP
   repository: https://github.com/oodler577/p5-Alien-OpenMP.git
-version: '0.003'
-x_generated_by_perl: v5.32.0
+version: '0.003001'
+x_generated_by_perl: v5.32.1
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

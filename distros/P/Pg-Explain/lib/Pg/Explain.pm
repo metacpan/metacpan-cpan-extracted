@@ -32,11 +32,11 @@ Pg::Explain - Object approach at reading explain analyze output
 
 =head1 VERSION
 
-Version 1.07
+Version 1.08
 
 =cut
 
-our $VERSION = '1.07';
+our $VERSION = '1.08';
 
 =head1 SYNOPSIS
 
@@ -457,11 +457,11 @@ sub get_struct {
     my $self  = shift;
     my $reply = {};
     $reply->{ 'top_node' }       = $self->top_node->get_struct;
-    $reply->{ 'planning_time' }  = $self->planning_time if $self->planning_time;
-    $reply->{ 'execution_time' } = $self->execution_time if $self->execution_time;
-    $reply->{ 'total_runtime' }  = $self->total_runtime if $self->total_runtime;
+    $reply->{ 'planning_time' }  = $self->planning_time          if $self->planning_time;
+    $reply->{ 'execution_time' } = $self->execution_time         if $self->execution_time;
+    $reply->{ 'total_runtime' }  = $self->total_runtime          if $self->total_runtime;
     $reply->{ 'trigger_times' }  = clone( $self->trigger_times ) if $self->trigger_times;
-    $reply->{ 'query' }          = $self->query if $self->query;
+    $reply->{ 'query' }          = $self->query                  if $self->query;
 
     if ( $self->jit ) {
         $reply->{ 'jit' }                  = {};

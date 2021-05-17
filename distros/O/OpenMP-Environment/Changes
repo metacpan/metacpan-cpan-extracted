@@ -23,3 +23,6 @@ Revision history for Perl extension OpenMP::Environment.
 
 1.0.4 Fri Apr 16 23:12:00 2021
          - non-impactful, updated repo for cpan
+
+1.0.5 Fri Apr 17 23:12:01 2021
+         - POD fix

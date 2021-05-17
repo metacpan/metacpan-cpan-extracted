@@ -142,4 +142,25 @@ TEST_CASE("Scalar", "[Scalar]") {
         REQUIRE(Scalar::undef.as_number() == 0);
         REQUIRE_THROWS_AS(Ref::create(Array::create()).as_number(), std::invalid_argument);
    }
+
+    SECTION("LV") {
+        auto lv = SvREFCNT_inc(SvRV(eval_pv("\\substr('suka', 1, 2)", 1)));
+
+        SECTION("detached to a value") {
+            auto val = Scalar(lv);
+            CHECK(SvTYPE(val.get()) != SVt_PVLV);
+        }
+        SECTION("refcnt") {
+            auto rcnt = SvREFCNT(lv);
+            auto val = Scalar(lv);
+            CHECK(SvREFCNT(lv) == rcnt);
+
+            SvREFCNT_inc(lv);
+            rcnt = SvREFCNT(lv);
+            auto val2 = Scalar::noinc(lv);
+            CHECK(SvREFCNT(lv) == rcnt - 1);
+        }
+
+        SvREFCNT_dec(lv);
+    }
 }

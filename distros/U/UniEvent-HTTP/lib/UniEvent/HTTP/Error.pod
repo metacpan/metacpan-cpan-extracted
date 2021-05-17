@@ -1,0 +1,75 @@
+=head1 NAME
+
+UniEvent::HTTP::Error - HTTP error constants
+
+
+
+=head1 SYNOPSIS
+
+    use UniEvent::HTTP 'http_request';
+
+    http_request({
+        ...
+        response_callback => sub {
+            my ($req, $res, $error) = @_;
+            if ($error == UniEvent::HTTP::connect_error) { ... }
+            ...
+        },
+    })
+
+
+
+=head1 DESCRIPTION
+
+Constants provided by this package are used to check errors in various callbacks in UniEvent::HTTP.
+
+All errors are L<XS::STL::ErrorCode> objects and are of category C<UniEvent::HTTP::error_category>.
+
+    UniEvent::HTTP::connect_error->category() == UniEvent::HTTP::error_category; # true
+
+
+
+=head1 CONSTANTS
+
+=head2 connect_error
+
+Http client connect error. See nested error to find out why.
+
+
+=head2 no_redirect_uri
+
+No "Location" header or no uri in redirect response
+
+
+=head2 redirection_limit
+
+follow redirection limit exceeded
+
+
+=head2 unexpected_redirect
+
+redirection response received when redirection limit was set to 0.
+
+
+=head2 transfer_aborted
+
+server closed connection before request was fully sent
+
+
+=head2 server_stopping
+
+Passed to server request callbacks showing that request was canceled because server is stopping
+
+
+=head2 pipeline_canceled
+
+Passed to server request callbacks showing that request was canceled because it was in a pipeline and connection was closed (for example, user responded with
+non-keep-alive response on previous request in the pipeline).
+
+
+
+=head1 SEE ALSO
+
+L<Protocol::HTTP::Error>
+
+=cut

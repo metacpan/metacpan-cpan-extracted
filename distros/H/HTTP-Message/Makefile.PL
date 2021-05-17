@@ -42,6 +42,7 @@ my %WriteMakefileArgs = (
   "TEST_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0,
     "File::Spec" => 0,
+    "File::Temp" => 0,
     "PerlIO::encoding" => 0,
     "Test::More" => "0.88",
     "Time::Local" => 0,
@@ -50,7 +51,7 @@ my %WriteMakefileArgs = (
     "lib" => 0,
     "overload" => 0
   },
-  "VERSION" => "6.30",
+  "VERSION" => "6.31",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -65,6 +66,7 @@ my %FallbackPrereqs = (
   "Exporter" => "5.57",
   "ExtUtils::MakeMaker" => 0,
   "File::Spec" => 0,
+  "File::Temp" => 0,
   "HTTP::Date" => 6,
   "IO::Compress::Bzip2" => "2.021",
   "IO::Compress::Deflate" => 0,

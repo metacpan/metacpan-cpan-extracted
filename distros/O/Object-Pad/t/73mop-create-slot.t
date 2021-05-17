@@ -14,7 +14,7 @@ class AClass {
    BEGIN {
       # Most of this test has to happen at BEGIN time before AClass gets
       # sealed
-      my $classmeta = __PACKAGE__->META;
+      my $classmeta = Object::Pad::MOP::Class->for_caller;
 
       my $slotmeta = $classmeta->add_slot( '$slot' );
 

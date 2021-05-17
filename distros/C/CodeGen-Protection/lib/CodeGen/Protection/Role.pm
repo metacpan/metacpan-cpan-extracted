@@ -2,7 +2,7 @@ package CodeGen::Protection::Role;
 
 # ABSTRACT: Role to help rewrite parts of documents
 
-use v5.10.0;    # for named captures in regexes
+use v5.08.0;
 use Moo::Role;
 use Carp 'croak';
 use CodeGen::Protection::Types qw(NonEmptyStr Bool);
@@ -15,7 +15,7 @@ requires qw(
   VERSION
 );
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 has existing_code => (
     is        => 'ro',
@@ -105,7 +105,7 @@ sub _rewrite {
 
 sub _extract_before_and_after {
     my ( $self, $text ) = @_;
-    $text //= $self->existing_code;
+    $text ||= $self->existing_code;
 
     my $extract_re = $self->_regex_to_match_rewritten_document;
     my $type       = $self->document_type;
@@ -115,8 +115,8 @@ sub _extract_before_and_after {
             "Could not find the $type start and end markers in existing_code for $name."
         );
     }
-    my $digest_start = $+{digest_start};
-    my $digest_end   = $+{digest_end};
+    my $digest_start = $2;
+    my $digest_end   = $4;
 
     unless ( $digest_start eq $digest_end ) {
         croak(
@@ -124,20 +124,20 @@ sub _extract_before_and_after {
         );
     }
 
-    my $expected = $self->_get_checksum( $+{body} );
+    my $expected = $self->_get_checksum($3);
     if ( !$self->overwrite && $digest_start ne $expected ) {
         croak(
             "Checksum ($digest_start) did not match expected checksum ($expected). Set 'overwrite' to true to ignore this for $type $name"
         );
     }
-    my $before = $+{before} // '';
-    my $after  = $+{after}  // '';
+    my $before = $1 || '';
+    my $after  = $5 || '';
     return ( $before, $after );
 }
 
 sub _extract_body {
     my ( $self, $text ) = @_;
-    $text //= $self->protected_code;
+    $text ||= $self->protected_code;
 
     my $extract_re = $self->_regex_to_match_rewritten_document;
     my $name       = $self->name;
@@ -147,8 +147,8 @@ sub _extract_body {
             "Could not find the $type start and end markers in protected_code for $name"
         );
     }
-    my $digest_start = $+{digest_start};
-    my $digest_end   = $+{digest_end};
+    my $digest_start = $2;
+    my $digest_end   = $4;
 
     unless ( $digest_start eq $digest_end ) {
         croak(
@@ -156,7 +156,7 @@ sub _extract_body {
         );
     }
 
-    return $self->_remove_all_leading_and_trailing_blank_lines( $+{body} );
+    return $self->_remove_all_leading_and_trailing_blank_lines($3);
 }
 
 #
@@ -166,11 +166,11 @@ sub _extract_body {
 #
 #     my $regex = $self->_regex_to_match_rewritten_document;
 #     if ( $document =~ $regex ) {
-#         my $before       = $+{before};
-#         my $digest_start = $+{digest_start};    # checksum from start tag
-#         my $body         = $+{body};            # between start and end tags
-#         my $digest_end   = $+{digest_end};      # checksum from end tag
-#         my $after        = $+{after};
+#         my $before       = $1;
+#         my $digest_start = $2{digest_start};    # checksum from start tag
+#         my $body         = $3{body};            # between start and end tags
+#         my $digest_end   = $4{digest_end};      # checksum from end tag
+#         my $after        = $5{after};
 #     }
 #
 # This is not an attribute because we need to be able to call it as a class
@@ -181,8 +181,8 @@ sub _regex_to_match_rewritten_document {
     my $self  = shift;
     my $class = ref $self || $self;
 
-    my $digest_start_re = qr/(?<digest_start>[0-9a-f]{32})/;
-    my $digest_end_re   = qr/(?<digest_end>[0-9a-f]{32})/;
+    my $digest_start_re = qr/([0-9a-f]{32})/;
+    my $digest_end_re   = qr/([0-9a-f]{32})/;
     my $start_marker_re = sprintf $class->_start_marker_format => $class,
       $class->_version_re,
       $digest_start_re;
@@ -192,8 +192,8 @@ sub _regex_to_match_rewritten_document {
 
     # don't use the /x modifier to make this prettier unless you call
     # quotemeta on the start and end markers
-    return
-      qr/^(?<before>.*?)$start_marker_re(?<body>.*?)$end_marker_re(?<after>.*?)$/s;
+    return    # $1         $2                 $3        $4              $5
+      qr/^(.*?)$start_marker_re(.*?)$end_marker_re(.*?)$/s;
 }
 
 sub _get_checksum {
@@ -279,7 +279,7 @@ CodeGen::Protection::Role - Role to help rewrite parts of documents
 
 =head1 VERSION
 
-version 0.05
+version 0.06
 
 =head1 SYNOPSIS
 
@@ -369,7 +369,8 @@ And if you have code that can tidy Javascript, you can declare a C<_tidy> method
 
     sub _tidy {
         my ( $self, $document ) = @_;
-        my $tidied = ... return $tidied;
+        my $tidied = ...;
+        return $tidied;
     }
 
 Regarding the start and end formats. They're separate in case we have a
@@ -394,7 +395,7 @@ Creating:
 
 Or rewriting:
 
-    my $javascript = create_protected_code(
+    my $javascript = rewrite_code(
         type          => 'Javascript',
         existing_code => $javascript,
         protected_code => $rewritten_code,

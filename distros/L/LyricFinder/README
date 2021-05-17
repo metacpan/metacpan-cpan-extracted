@@ -63,11 +63,13 @@ DESCRIPTION
     LyricFinder accepts an artist name and song title, searches supported
     lyrics sites for song lyrics, and, if found, returns them as a string.
 
-    The supported and currently-installed modules are: ApiLyricsOvh (for
-    searching api.lyrics.ovh), AZLyrics (www.azlyrics.com), Genius
-    (genius.com), and Musixmatch (www.musixmatch.com). There is a special
-    module for storing and / or fetching lyrics (.lrc) files already stored
-    locally, called Cache.
+    The supported and currently-installed modules are:
+    LyricFinder::ApiLyricsOvh (for searching api.lyrics.ovh),
+    LyricFinder::AZLyrics (www.azlyrics.com), LyricFinder::Genius
+    (genius.com), LyricFinder::Letras (www.letras.mus.br), and
+    LyricFinder::Musixmatch (www.musixmatch.com). There is a special module
+    for storing and / or fetching lyrics (.lrc) files already stored
+    locally, called LyricFinder::Cache.
 
     This module is derived from the (older) Lyrics::Fetcher collection of
     modules by (c) 2007-2020 David Precious, but currently (as of December,
@@ -82,7 +84,7 @@ DESCRIPTION
     modules, but the code is derived from them, as allowed by and the
     license and credits are included here, as required by their open-source
     license. It is capable of being used as a drop-in replacement, but some
-    function names and a few other code changes will be needed.
+    function names and other code changes will be needed.
 
     We've also added methods to easily change the "user-agent" passed to the
     lyrics sites, as needed/desired by the user programatically.
@@ -130,7 +132,7 @@ DESCRIPTION
     lyrics from that site and I'll consider it! The easiest way to do this
     is to take one of the existing submodules, copy it to
     "LyricFinder::*YOURSITE*.pm and modify it (and the POD docs) to your
-    specific site's needs, test it with sever Artist / Title combinations
+    specific site's needs, test it with several Artist / Title combinations
     (see the "SYNOPSIS" code above), and send it to me (That's what I do for
     new sites)!
 
@@ -282,14 +284,20 @@ SUBROUTINES/METHODS
         currently is AZLyrics.
 
     *$string* = $finder->fetch(*$artist*, *$title* [, *$source* |
-    *\@sources*])
+    *\@sources*] [, *$limit*])
         Attempt to fetch the lyrics for the given artist and title. A single
         source site module can be specified as a string ($source) or
         multiple source modules, ie. [module1, module2...], or "random" or
         "Cache". Default: "random" (search all available sites in random
         order until lyrics found or all available sites have been searched).
         This is the primary method call, and the only one required (besides
-        new()) to be called to obtain lyrics.
+        new()) to be called to obtain lyrics. $limit (if specified) is an
+        integer number to limit the max. number of fetchers to try (normally
+        used with $source = "random") to limit the time needed to search for
+        lyrics (before giving up). If not specified, zero, or higher than
+        the number of installed fetchers, then all available (installed)
+        fetcher submodules (sites) will be tried (until one succefully finds
+        lyrics).
 
         "Cache" is a special value that limits searching to a specified
         lyrics directory on one's local hard drive. NOTE: It should NOT be

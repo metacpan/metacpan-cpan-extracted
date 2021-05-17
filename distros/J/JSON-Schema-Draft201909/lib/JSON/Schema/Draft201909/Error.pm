@@ -4,14 +4,14 @@ package JSON::Schema::Draft201909::Error;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Contains a single error from a JSON Schema evaluation
 
-our $VERSION = '0.026';
+our $VERSION = '0.027';
 
 use 5.016;
 no if "$]" >= 5.031009, feature => 'indirect';
 no if "$]" >= 5.033001, feature => 'multidimensional';
 no if "$]" >= 5.033006, feature => 'bareword_filehandles';
-use Moo;
 use strictures 2;
+use Moo;
 use MooX::TypeTiny;
 use Types::Standard qw(Str Undef);
 use namespace::clean;
@@ -66,7 +66,7 @@ JSON::Schema::Draft201909::Error - Contains a single error from a JSON Schema ev
 
 =head1 VERSION
 
-version 0.026
+version 0.027
 
 =head1 SYNOPSIS
 

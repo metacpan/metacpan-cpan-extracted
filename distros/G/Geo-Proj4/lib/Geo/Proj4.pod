@@ -2,7 +2,7 @@
 
 =head1 NAME
 
-Geo::Proj4 - PROJ.4 cartographic projections library
+Geo::Proj4 - PROJ cartographic projections library
 
 =head1 INHERITANCE
 
@@ -38,7 +38,13 @@ Geo::Proj4 - PROJ.4 cartographic projections library
 
 =head1 DESCRIPTION
 
-The Open Source PROJ.4 library converts between geographic coordinate
+B<DEPRECATED: after a stable period of about 25 years under "version 4",
+this library has seen huge changes since 2018.  The changes are too
+structural to adapt this module to match them.  You can still manually
+install this module with the '4' version with some effort: see wiki
+in git.  I have no time or use to create a new module.  Sorry.>
+
+The Open Source PROJ library converts between geographic coordinate
 systems.  It is able to convert between geodetic latitude and longitude
 (LL, most commonly the WGS84 projection), into an enormous variety of
 other cartographic projections (XY, usually UTM).
@@ -47,6 +53,11 @@ WARNING: It is not always clear what the source projection is when
 L<forward()|Geo::Proj4/"Converters"> or L<inverse()|Geo::Proj4/"Converters"> are used, i.e. in what projection system the
 source data is expected to be in.  Therefore, you can better be specific
 on both source and destination projection and use L<transform()|Geo::Proj4/"Converters">.
+
+Version '4' of this library existed that long that it became part of
+its domain name F<https://proj4.org> and this module.  However, in 2018
+it moved to version '5', and 2019 saw version '6'.  Also those versions
+are supported by this module.
 
 =head1 METHODS
 
@@ -151,12 +162,13 @@ cartographic projection (XY) represented by the Geo::Proj4 instance.
 
 WARNING: for historic reasons, latitude and longitude are assumed to be in 
 (floating point) degrees, although the library expects rads.  See
-L<forwardRad()|Geo::Proj4/"Converters">. A latitude south of the Equator and longitude west of
-the Prime Meridian given with negative values.
+L<forwardRad()|Geo::Proj4/"Converters">. A latitude South of the Equator or a longitude West of
+the Prime Meridian will give negative values.
 
 Returned are two values, usually X and Y in meters, or whatever units are
 relevant to the given projection.  When the destination projection also
-than the order of parameters will be returned as LONG,LAT (not lat,long!)
+is geodetic, than the order of parameters will be returned as LONG,LAT
+(not lat,long!)
 
 On error, C<forward> will return undef for both values.
 
@@ -174,8 +186,9 @@ radians, not degrees.
 
 =item $obj-E<gt>B<inverse>(($x,$y) | ($lat,$long))
 
-Perform an inverse projection from the (cartographic) projection represented
-by this Geo::Proj4 object, back into latitude and longitude values.
+Perform an inverse projection from the (cartographic or geodetic)
+projection represented by this Geo::Proj4 object, back into latitude
+and longitude values.
 
 WARNING: for historic reasons, latitude and longitude are assumed to be in 
 (floating point) degrees, although the library expects rads.  See
@@ -245,7 +258,7 @@ L<listEllipsoids()|Geo::Proj4/"Library introspection">, all defined LABELS can b
 
 =item Geo::Proj4-E<gt>B<libVersion>()
 
-Returns the version of the proj4 library
+Returns the version of the proj4 library.
 
 =item Geo::Proj4-E<gt>B<listDatums>()
 
@@ -310,7 +323,7 @@ L<listUnits()|Geo::Proj4/"Library introspection">, all defined LABELS can be fou
 Geo::Proj4 uses XS to wrap the PROJ.4 cartographic projections library. You
 will need to have the PROJ.4 library installed in order to build and use
 this module. You can get source code and binaries for the PROJ.4 library
-from its home page at L<http://www.remotesensing.org/proj/>.
+from its home page at L<http://proj4.org>.
 
 =head2 Projections
 
@@ -355,7 +368,7 @@ an html version of this and related modules;
 
 Effusive thanks to Frank Warmerdam (maintainer of PROJ.4) and Gerald
 Evenden (main contributor of PROJ.4). Their PROJ.4 library home page:
-L<http://www.remotesensing.org/proj/>
+L<http://proj4.org>
 
 proj(1), cs2cs(1), pj_init(3).
 

@@ -101,7 +101,7 @@ sub read_handle_perl {
     }
     my $count = 0;
     #
-    for (my $pos = 0; $pos <= $len; $pos += $DEFAULT_OSD_MAX_WRITE) {
+    for (my $pos = $off; $pos <= $len+$off; $pos += $DEFAULT_OSD_MAX_WRITE) {
         my $chunk;
         if ($pos + $DEFAULT_OSD_MAX_WRITE > $len) {
             $chunk = $len % $DEFAULT_OSD_MAX_WRITE;

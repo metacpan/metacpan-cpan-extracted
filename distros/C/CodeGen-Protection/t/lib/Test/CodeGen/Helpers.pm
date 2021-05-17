@@ -20,8 +20,8 @@ sub is_multiline_text ($$$) {
 
 sub update_version ($) {
     my $text = shift;
-    if ( $text =~ /\b(?<module>CodeGen::Protection::Format::\w+).*Checksum:/ ) {
-        my $module     = $+{module};
+    if ( $text =~ /\b(CodeGen::Protection::Format::\w+).*Checksum:/ ) {
+        my $module     = $1;
         my $version_re = $module->_version_re;
         my $version    = $module->VERSION;
         $text =~ s/\b$module(\s+)$version_re\b/$module$1$version/g;

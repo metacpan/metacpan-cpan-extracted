@@ -164,7 +164,7 @@ subtest 'verify' => sub {
 
 };
 
-sub p ($)
+sub p
 {
   my($path) = @_;
   $path =~ s{/}{\\}g if $^O eq 'MSWin32';
@@ -184,9 +184,9 @@ subtest '_cmp' => sub {
   is(
     $process->(qw( cygfoo-1.dll cygbar-2.dll cygbaz-0.dll )),
     [
-      [ 'bar', p '/bin/cygbar-2.dll', 2 ],
-      [ 'baz', p '/bin/cygbaz-0.dll', 0 ],
-      [ 'foo', p '/bin/cygfoo-1.dll', 1 ],
+      [ 'bar', p('/bin/cygbar-2.dll'), 2 ],
+      [ 'baz', p('/bin/cygbaz-0.dll'), 0 ],
+      [ 'foo', p('/bin/cygfoo-1.dll'), 1 ],
     ],
     'name first 1',
   );
@@ -194,9 +194,9 @@ subtest '_cmp' => sub {
   is(
     $process->(qw( cygbaz-0.dll cygfoo-1.dll cygbar-2.dll )),
     [
-      [ 'bar', p '/bin/cygbar-2.dll', 2 ],
-      [ 'baz', p '/bin/cygbaz-0.dll', 0 ],
-      [ 'foo', p '/bin/cygfoo-1.dll', 1 ],
+      [ 'bar', p('/bin/cygbar-2.dll'), 2 ],
+      [ 'baz', p('/bin/cygbaz-0.dll'), 0 ],
+      [ 'foo', p('/bin/cygfoo-1.dll'), 1 ],
     ],
     'name first 1',
   );
@@ -204,9 +204,9 @@ subtest '_cmp' => sub {
   is(
     $process->(qw( cygbar-2.dll cygfoo-1.dll cygbaz-0.dll )),
     [
-      [ 'bar', p '/bin/cygbar-2.dll', 2 ],
-      [ 'baz', p '/bin/cygbaz-0.dll', 0 ],
-      [ 'foo', p '/bin/cygfoo-1.dll', 1 ],
+      [ 'bar', p('/bin/cygbar-2.dll'), 2 ],
+      [ 'baz', p('/bin/cygbaz-0.dll'), 0 ],
+      [ 'foo', p('/bin/cygfoo-1.dll'), 1 ],
     ],
     'name first 1',
   );
@@ -214,9 +214,9 @@ subtest '_cmp' => sub {
   is(
     $process->(qw( cygfoo-2.dll cygfoo-0.dll cygfoo-1.dll )),
     [
-      [ 'foo', p '/bin/cygfoo-2.dll', 2, ],
-      [ 'foo', p '/bin/cygfoo-1.dll', 1, ],
-      [ 'foo', p '/bin/cygfoo-0.dll', 0, ],
+      [ 'foo', p('/bin/cygfoo-2.dll'), 2, ],
+      [ 'foo', p('/bin/cygfoo-1.dll'), 1, ],
+      [ 'foo', p('/bin/cygfoo-0.dll'), 0, ],
     ],
     'newer version first',
   );

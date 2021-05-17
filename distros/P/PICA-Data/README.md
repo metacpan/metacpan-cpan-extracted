@@ -174,15 +174,26 @@ one ore more PICA path expression. The following are virtually equivalent:
     $path->record_fields($record);
     $record->fields($path); # if $record is blessed
 
+## pica\_title( $record )
+
+Returns the record limited to level 0 fields ("title record") in sorted order.
+
 ## pica\_holdings( $record )
 
-Returns a list (as array reference) of local holding records. Also available as
-accessor `holdings`.
+Returns a list (as array reference) of local holding records, sorted by ILN.
+Level2 fields are included in sorted order. The ILN (if given) is available as
+`_id`. Also available as accessor `holdings`.
 
 ## pica\_items( $record )
 
-Returns a list (as array reference) of item records. Also available as
-accessor `items`.
+Returns a list (as array reference) of item records. The EPN (if given) is
+available as `_id` Also available as accessor `items`.
+
+## pica\_sort( $record )
+
+Returns a copy of the record with sorted fields (first level 1 fields, then
+level 2 fields not belonging to a level 1, then level 1, each followed by level
+2 sorted by EPN). Also available as accessor `sort`. 
 
 # ACCESSORS
 

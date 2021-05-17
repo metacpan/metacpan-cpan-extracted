@@ -1,0 +1,59 @@
+=head1 NAME
+
+UniEvent::HTTP::Client - HTTP client connection
+
+=head1 SYNOPSIS
+
+    my $client = UE::HTTP::Client->new();
+    
+    $client->request({
+        uri => "http://example.com",
+        timeout => 3,
+        response_callback => sub {
+            my ($request, $response, $error) = @_;
+            ...
+        },
+    });
+    
+    UE::Loop->default->run;
+
+
+
+=head1 DESCRIPTION
+
+C<UniEvent::HTTP::Client> represents single http client connection and it is the lowest-level API in C<UniEvent::HTTP>.
+For high-level API see L<UniEvent::HTTP::UserAgent>.
+
+Client can make many http requests but only one at a time (client doesn't support http pipelining for now).
+When client makes an http request and request is keep-alive, it doesn't close the connection when request is done. It will keep the connection alive,
+and if next http request targets the same destination with the same ssl and proxy settings, it will reuse that connection. If next http request targets
+another destination, connections will be closed and new connection will be established.
+
+Client object will not die until active request is finished, even if it goes out of the scope.
+
+Client inherits L<UniEvent::Tcp> handle.
+
+
+
+=head1 METHODS
+
+All methods of L<UniEvent::Tcp> also apply. Keep in mind that if you intervene in network I/O via C<UniEvent::Tcp> methods (like manually calling C<connect()>, 
+C<disconnect()>, etc...) you may break Client's behaviour.
+
+
+=head2 new([$loop = default])
+
+Creates new client object which will use C<$loop> L<UniEvent::Loop>.
+
+
+=head2 request($request || \%request_params)
+
+Executes an http request. Argument can be a L<UniEvent::HTTP::Request> object or params to its constructor.
+
+
+=head2 cancel([$error = UniEvent::SystemError::operation_canceled])
+
+Cancels current http request execution (if any). Callbacks will be called with C<$error> error (C<UniEvent::SystemError::operation_canceled> by default).
+If no request is currently executing, does nothing.
+
+=cut

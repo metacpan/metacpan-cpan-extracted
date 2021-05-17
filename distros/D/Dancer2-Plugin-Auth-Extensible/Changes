@@ -1,5 +1,12 @@
 Revision history for Dancer2-Plugin-Auth-Extensible
 
+0.710 Sat 15 May 08:02:00 BST 2021
+
+    [BUG FIXES]
+
+    * Add Test::Fatal to list of dependencies (thanks yldr)
+    * Fix config for test (thanks Nick Tonkin)
+
 0.709 Sun 19 Apr 17:44:00 BST 2020
 
     [BUG FIXES]

@@ -1,0 +1,18 @@
+MODULE = UniEvent::HTTP                PACKAGE = UniEvent::HTTP::ServerResponse
+PROTOTYPES: DISABLE
+
+BOOT {
+    Stash stash(__PACKAGE__);
+    stash.inherit("Protocol::HTTP::Response");
+}
+
+ServerResponseSP ServerResponse::new (Hash params = Hash()) {
+    RETVAL = make_backref<ServerResponse>();
+    if (params) fill(RETVAL, params);
+}
+
+void ServerResponse::send_chunk (string chunk)
+
+void ServerResponse::send_final_chunk (string chunk = {})
+
+bool ServerResponse::completed ()

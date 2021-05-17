@@ -42,7 +42,6 @@ __C__
 #include <omp.h>
 #include <stdio.h>
 void test(int num_threads) {
-  initialize_env();
   omp_set_num_threads(num_threads);
   #pragma omp parallel
   {

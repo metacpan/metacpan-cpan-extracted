@@ -63,8 +63,7 @@ subtest 'Testing non-existent files is not fatal' => sub {
         {
             ok   => 0,
             name => 'We should not be able to read non-existent files',
-            diag =>
-              qr/Cannot open 'no such file' for reading: No such file or directory/,
+            diag => qr/Cannot open 'no such file' for reading/,
         }
     );
 };

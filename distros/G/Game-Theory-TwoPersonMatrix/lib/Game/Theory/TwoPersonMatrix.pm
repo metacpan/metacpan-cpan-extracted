@@ -6,7 +6,7 @@ our $AUTHORITY = 'cpan:GENE';
 use strict;
 use warnings;
 
-our $VERSION = '0.2205';
+our $VERSION = '0.2206';
 
 use Carp;
 use Algorithm::Combinatorics qw( permutations );
@@ -44,13 +44,13 @@ sub expected_payoff
         # For each strategy of player 2...
         for my $j ( sort keys %{ $self->{2} } )
         {
+            # Expected value is the sum of the probabilities of each payoff
             if ( $self->{payoff1} && $self->{payoff2} )
             {
                 $expected_payoff->[0] += $self->{1}{$i} * $self->{2}{$j} * $self->{payoff1}[$i - 1][$j - 1];
                 $expected_payoff->[1] += $self->{1}{$i} * $self->{2}{$j} * $self->{payoff2}[$i - 1][$j - 1];
             }
             else {
-                # Expected value is the sum of the probabilities of each payoff
                 $expected_payoff += $self->{1}{$i} * $self->{2}{$j} * $self->{payoff}[$i - 1][$j - 1];
             }
         }
@@ -72,13 +72,13 @@ sub s_expected_payoff
         # For each strategy of player 2...
         for my $j ( sort keys %{ $self->{2} } )
         {
+            # Expected value is the sum of the probabilities of each payoff
             if ( $self->{payoff1} && $self->{payoff2} )
             {
                 $expected_payoff->[0] .= " + $self->{1}{$i} * $self->{2}{$j} * $self->{payoff1}[$i - 1][$j - 1]";
                 $expected_payoff->[1] .= " + $self->{1}{$i} * $self->{2}{$j} * $self->{payoff2}[$i - 1][$j - 1]";
             }
             else {
-                # Expected value is the sum of the probabilities of each payoff
                 $expected_payoff .= " + $self->{1}{$i} * $self->{2}{$j} * $self->{payoff}[$i - 1][$j - 1]";
             }
         }
@@ -512,7 +512,7 @@ Game::Theory::TwoPersonMatrix - Analyze a 2 person matrix game
 
 =head1 VERSION
 
-version 0.2205
+version 0.2206
 
 =head1 SYNOPSIS
 
@@ -528,10 +528,10 @@ version 0.2205
  );
  $g->col_reduce;
  $g->row_reduce;
- my $player = 1;
  my $x = $g->saddlepoint;
  $x = $g->oddments;
  $x = $g->expected_payoff;
+ my $player = 1;
  $x = $g->counter_strategy($player);
  $x = $g->play;
 
@@ -559,7 +559,7 @@ version 0.2205
 =head1 DESCRIPTION
 
 C<Game::Theory::TwoPersonMatrix> analyzes a two person matrix game of
-player names, strategies and utilities ("payoffs").
+player numbers, strategies and utilities ("payoffs").
 
 Players 1 and 2 are the "row" and "column" players, respectively.
 This is due to the tabular format of a matrix game:
@@ -752,7 +752,7 @@ Gene Boggs <gene@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by Gene Boggs.
+This software is copyright (c) 2021 by Gene Boggs.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

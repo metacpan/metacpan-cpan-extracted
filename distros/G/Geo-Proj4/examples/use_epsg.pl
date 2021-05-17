@@ -1,4 +1,4 @@
-#!/usr/bin/perl -w
+#!/usr/bin/env perl
 # Example contributed by Michael R. Davis, see after __END__
 
 use strict;

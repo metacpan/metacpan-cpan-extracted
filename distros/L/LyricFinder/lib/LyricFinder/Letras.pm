@@ -1,0 +1,578 @@
+package LyricFinder::Letras;
+
+use 5.008000;
+use strict;
+use warnings;
+use LWP::UserAgent;
+use HTTP::Request;
+use HTML::Strip;
+use Carp;
+
+my $Source = 'Letras';
+my $Site   = 'https://www.letras.mus.br';
+
+our $haveLyricsCache;
+BEGIN {
+	eval "use LyricFinder::Cache; \$haveLyricsCache = 1; 1";
+}
+
+# the Default HTTP User-Agent we'll send:
+our $AGENT = "Mozilla/5.0 (X11; Linux x86_64; rv:80.0) Gecko/20100101 Firefox/80.0";
+
+sub new
+{
+	my $class = shift;
+
+	my $self = {};
+	$self->{'agent'} = $AGENT;
+	$self->{'cache'} = '';
+	$self->{'Error'} = 'Ok';
+	$self->{'Source'} = $Source;
+	$self->{'Site'} = $Site;
+	$self->{'Url'} = '';
+	$self->{'Credits'} = [];
+
+	my %args = @_;
+	foreach my $i (keys %args) {
+		if ($i =~ s/^\-//) {
+			$self->{$i} = $args{"-$i"};
+		} else {
+			$self->{$i} = $args{$i};
+		}
+	}
+
+	bless $self, $class;   #BLESS IT!
+
+	return $self;
+}
+
+sub source {
+	my $self = shift;
+	return $self->{'Source'};
+}
+
+sub url {
+	my $self = shift;
+	return $self->{'Url'};
+}
+
+sub order {
+	return wantarray ? ($Source) : $Source;
+}
+
+sub tried {
+	return order ();
+}
+
+sub credits {
+	my $self = shift;
+	return wantarray ? @{$self->{'Credits'}} : join(', ', @{$self->{'Credits'}});
+}
+
+sub message {
+	my $self = shift;
+	return $self->{'Error'};
+}
+
+sub site {
+	my $self = shift;
+	return $self->{'Site'};
+}
+
+# Allow user to specify a different user-agent:
+sub agent {
+	my $self = shift;
+
+	if (defined $_[0]) {
+		$self->{'agent'} = $_[0];
+	} else {
+		return $self->{'agent'};
+	}
+}
+
+sub cache {
+	my $self = shift;
+
+	if (defined $_[0]) {
+		$self->{'cache'} = $_[0];
+	} else {
+		return $self->{'cache'};
+	}
+}
+
+#FROM:  https://github.com/clementine-player/Clementine/blob/master/data/lyrics/ultimate_providers.xml
+sub remove_accents {
+	my $str = shift;
+
+	$str =~ tr/\xc4\xc2\xc0\xc1\xc3\xe4\xe2\xe0\xe1\xe3/aaaaaaaaaa/;
+	$str =~ tr/\xcb\xca\xc8\xc9\xeb\xea\xe8\xe9/eeeeeeee/;
+	$str =~ tr/\xcf\xcc\xef\xec/iiii/;
+	$str =~ tr/\xd6\xd4\xd2\xd3\xd5\xf6\xf4\xf2\xf3\xf5/oooooooooo/;
+	$str =~ tr/\xdc\x{0016}\xd9\xda\xfc\x{0016}\xf9\xfa/uuuuuuuu/;
+	$str =~ tr/\x{0178}\xdd\xff\xfd/yyyy/;
+	$str =~ tr/\xd1\xf1/nn/;
+	$str =~ tr/\xc7\xe7/cc/;
+	$str =~ s/\xdf/ss/g;
+	return $str;
+}
+
+sub fetch {
+	my ($self, $artist_in, $song_in) = @_;
+
+	# reset the error var, change it if an error occurs.
+	$self->{'Error'} = 'Ok';
+	$self->{'Url'} = '';
+
+	unless ($artist_in && $song_in) {
+		carp($self->{'Error'} = "e:$Source.fetch() called without artist and song!");
+		return;
+	}
+
+	# first, see if we've got it cached:
+	if ($self->{'cache'} && $self->{'cache'} !~ /^\>/ && $haveLyricsCache) {
+		my $cache = new LyricFinder::Cache(-cache => $self->{'cache'});
+		if ($cache) {
+			my $lyrics = $cache->fetch($artist_in, $song_in);
+			if (defined($lyrics) && $lyrics =~ /\w/) {
+				print "..Got lyrics from cache.\n"  if ($self->{'-debug'});
+				$self->{'Source'} = 'Cache';
+				$self->{'Site'} = $cache->site();
+				$self->{'Url'} = $cache->url();
+				return $lyrics;
+			}
+		}
+	}
+
+	$self->{'Source'} = $Source;
+	$self->{'Site'} = $Site;
+
+	$artist_in = &remove_accents($artist_in);
+	$song_in = &remove_accents($song_in);
+
+	# Their URLs look like e.g.:
+#1	# https://www.letras.net/read/n/nvdes-lyrics/lightning-flow-lyrics.html
+	# https://www.letras.mus.br/<artist>/<title>
+	($self->{'Url'} = $artist_in) =~ s#\s*\/\s*# and #;  #CONVERT "artist1 / artist2" TO "artist1 and artist2"!
+	$song_in =~ s#\s*\/\s*#\-#g;                  #FIX SONGS WITH "/" IN THEM!
+	$self->{'Url'} .= "/${song_in}-lyrics";
+	$self->{'Url'} =~ s/\&/and/g;
+	$self->{'Url'} =~ s/ +/\-/g;
+#1	$self->{'Url'} =~ s/[^a-zA-Z0-9\-\/]+//g;
+#1	$self->{'Url'} = 'https://www.letras.com/' . $self->{'Url'};
+	$self->{'Url'} = 'https://www.letras.mus.br/' . $self->{'Url'};
+	$self->{'Url'} =~ tr/A-Z/a-z/;
+	my $ua = LWP::UserAgent->new(
+		ssl_opts => { verify_hostname => 0, },
+	);
+	$ua->timeout(10);
+	$ua->agent($self->{'agent'});
+	$ua->protocols_allowed(['https']);
+	$ua->cookie_jar( {} );
+	push @{ $ua->requests_redirectable }, 'GET';
+	(my $referer = $self->{'Url'}) =~ s{^(\w+)\:\/\/}{};
+	my $protocol = $1;
+	$referer =~ s{\/.+$}{\/};
+	my $host = $referer;
+	$host =~ s{\/$}{};
+	$referer = $protocol . '://' . $referer;
+	my $req = new HTTP::Request 'GET' => $self->{'Url'};
+	$req->header(
+		'Accept' =>
+			'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
+		'Accept-Language'           => 'en-US,en;q=0.5',
+		'Accept-Encoding'           => 'gzip, deflate',
+		'Connection'                => 'keep-alive',
+		'Upgrade-insecure-requests' => 1,
+		'Host'                      => $host,
+	);
+
+	my $res = $ua->request($req);
+
+	if ($res->is_success) {
+		my $lyrics = $self->_parse($res->decoded_content);
+		if ($self->{'cache'} && $self->{'cache'} !~ /^\</ && $lyrics && $haveLyricsCache) {
+			# cache the fetched lyrics, if we can:
+			my $cache = new LyricFinder::Cache(-cache => $self->{'cache'});
+			$cache->save($artist_in, $song_in, $lyrics)  if ($cache);
+		}
+		return $lyrics;
+	} else {
+		if ($res->status_line =~ /^404/) {
+			$self->{'Error'} = "..$Source - Lyrics not found.";
+		} else {
+			carp($self->{'Error'} = "e:$Source - Failed to retrieve ".$self->{'Url'}
+					.' ('.$res->status_line.').');
+		}
+		return;
+	}
+}
+
+# Internal use only functions:
+
+sub _parse {
+	my $self = shift;
+	my $html = shift;
+
+	if (my ($goodbit) = $html =~
+#1		m{\<div\s+id\=[\'\"]?inlyr[\'\"]?\>(.+?)\<\/div\>\<br\>}msi)
+		m{\<div\s+class\=\"cnt\-letra\s+p\d+\_premium\"\>(.+?)\<\/div\>}msi)
+	{
+		my $hs   = HTML::Strip->new();
+		$goodbit =~ s#\<\/?p\>#\r\n#gsi;
+		$goodbit =~ s#\<br\/?\>#\r\n#gsi;
+		my $text = $hs->parse($goodbit);
+
+		# normalize Windowsey \r\n sequences:
+		$text =~ s/\r+//gs;
+		# strip off pre & post padding with spaces:
+		$text =~ s/^ +//mg;
+		$text =~ s/ +$//mg;
+		# clear up repeated blank lines:
+		$text =~ s/(\R){2,}/\n\n/gs;
+		# and remove any blank top lines:
+		$text =~ s/^\R+//s;
+		$text =~ s/\R\R+$/\n/s;
+		$text .= "\n"  unless ($text =~ /\n$/s);
+		# now fix up for either Windows or Linux/Unix:
+		$text =~ s/\R/\r\n/gs  if ($^O =~ /Win/);
+
+		return $text;
+	} else {
+		carp($self->{'Error'} = "e:$Source - Failed to identify lyrics on result page.");
+		return '';
+	}
+}   # end of sub parse
+
+1;
+
+__END__
+
+=head1 NAME
+
+LyricFinder::Letras - Fetch song lyrics from www.letras.net.
+
+=head1 AUTHOR
+
+This module is Copyright (c) 2020 by
+
+Jim Turner, C<< <turnerjw784 at yahoo.com> >>
+		
+All rights reserved.
+
+This library is free software; you can redistribute it and/or modify it 
+under the terms of either the GNU General Public License or the Artistic 
+License, as specified in the Perl README file.
+
+NOTE:  This is a "derived work" of L<Lyrics::Fetcher> family of modules, by 
+(c) David Precious (davidp at preshweb.co.uk) (CPAN Id: BIGPRESH), as fair 
+use legal under the terms of, subject to, and licensed in terms compatable 
+and compliant with those modules.  Many thanks to David for laying the 
+groundwork for this module!
+
+=head1 SYNOPSIS
+
+    #!/usr/bin/perl
+
+    use LyricFinder::Letras;
+
+    # create a new finder object:
+    my $finder = new LyricFinder::Letras();
+
+    # fetch lyrics for a song from https://www.letras.net:
+    print $finder->fetch('Pink Floyd','Echoes');
+
+    # To fetch the source (site) name and base url:
+    print "(Lyrics courtesy: ".$finder->source().")\n";
+    print "site url:  ".$finder->site().")\n";
+
+    # To do caching:
+    $finder->cache('/tmp/lyrics');
+    #-or-
+    my $localfinder = new LyricFinder::Letras(-cache => '/tmp/lyrics');
+
+
+=head1 DESCRIPTION
+
+LyricFinder::Letras accepts an artist name and song title, searches 
+https://www.letras.net for song lyrics, and, if found, returns them as a 
+string.  It's designed to be called by LyricFinder, but can be used 
+directly as well.  In LyricFinder, it is invoked by specifying 
+I<"Letras"> as the third argument of the B<fetch>() method.
+
+In case of problems with fetching lyrics, the error string will be returned by 
+$finder->message().  If all goes well, it will have 'Ok' in it.
+
+=head1 INSTALLATION
+
+This module is installed automatically with LyricFinder installation.
+
+=head1 SUBROUTINES/METHODS
+
+=over 4
+
+=item B<new> I<LyricFinder::Letras>([ I<options> ])
+
+Creates a new finder object for fetching lyrics.  The same finder 
+object can be used for multiple fetches, so this normally only needs to be 
+called once.
+
+I<options> is a hash of option/value pairs (ie. "-option" => "value").  
+The currently-supported options are:  
+
+=over 4
+
+=item B<-agent> => I<"user-agent string">
+
+Specifies an alternate "user-agent" string sent to www.letras.net when 
+attempting to fetch lyrics.  Set the desired user-agent (ie. browser name) to 
+pass to www.letras.net.  Some sites are pickey about receiving a user-agent 
+string that corresponds to a valid / supported web-browser to prevent their 
+sites from being "scraped" by programs, such as this.  
+
+Default:  I<"Mozilla/5.0 (X11; Linux x86_64; rv:80.0) Gecko/20100101 Firefox/80.0">.
+
+NOTE:  This value will be overridden if $founder->agent("agent") is 
+called!
+
+=item B<-cache> => I<"directory">, and B<-debug> => I<integer>.
+
+Specifies a directory (ie. "/home/user/Music/Lyricsfiles") to be used for 
+disk caching.  If specified, this directory will be searched for a matching 
+lyrics (.lrc) file 
+(in this example, "/home/user/Music/LyricsFiles/I<artist>/I<title>.lrc").
+If no matching lyrics file is found (and the search module list is not 
+specifically set to "Cache" (and lyrics are found on the internet), then 
+the lyrics will be saved to the directory under "I<artist>/I<title>.lrc".
+
+Default:  none (no caching)
+
+An optional dirctional indicator ("<" or ">") can be prepended to the 
+directory to limit caching activity.  "<" allows fetching lyrics from the 
+cache directory, but will not cache (write) new lyrics found on the web 
+to the directory.  ">" (the opposite) will cache new lyrics but will never 
+attempt to fetch (read) lyrics from the cache directory.  These options may 
+be useful if one either simply wants to build a lyrics database but always 
+fetch the latest, or perhaps limit lyrics to a fixed cache but not add to 
+it, or perhaps is using a readonly directory.  The default is no indicator 
+which allows both reading and writing.
+
+Directory must be a valid directory, but may be specified as either a path 
+(ie. "/home/user/lyrics") or a URI (ie. "file:///home/user/lyrics") or 
+with a limiting directional indicator, ie. "</home/user/lyrics".  It may 
+or may not have a trailing "/" (ie. "/home/user/lyrics/").
+
+NOTE:  This value will be overridden if $founder->cache("directory") is 
+called!
+
+=item B<-debug> => I<number>
+
+Specifies whether debug information will be displayed (0: no, >0: yes).
+Default I<0> (no).  I<1> will display debug info.  There is currently only 
+one level of debug verbosity.
+
+=back 
+
+=item [ I<$current-agent string> = ] $finder->B<agent>( [ I<user-agent string> ] )
+
+Set the desired user-agent (ie. browser name) to pass to www.letras.net.  
+Some sites are pickey about receiving a user-agent 
+string that corresponds to a valid / supported web-browser to prevent their 
+sites from being "scraped" by programs, such as this.  
+
+Default:  I<"Mozilla/5.0 (X11; Linux x86_64; rv:80.0) Gecko/20100101 Firefox/80.0">
+
+If no argument is passed, it returns the current GENERAL user-agent string in 
+effect (but a different agent option is specified for a specific module may 
+have been specified and used by THAT module - see B<new>() options above).
+
+NOTE:  This will override any B<-agent> option value specified in B<new>()!
+
+=item [ I<$current-directory> = ] $finder->B<cache>( [ I<$directory> ] )
+
+Specifies a directory (ie. "/home/user/Music/Lyricsfiles") to be used for 
+disk caching.  If specified, this directory will be searched for a matching 
+lyrics (.lrc) file 
+(in this example, "/home/user/Music/LyricsFiles/I<artist>/I<title>.lrc").
+If no matching lyrics file is found (and the search module list is not 
+specifically set to "Cache" (and lyrics are found on the internet), then 
+the lyrics will be saved to the directory under "I<artist>/I<title>.lrc".
+
+An optional dirctional indicator ("<" or ">") can be prepended to the 
+directory to limit caching activity.  "<" allows fetching lyrics from the 
+cache directory, but will not cache (write) new lyrics found on the web 
+to the directory.  ">" (the opposite) will cache new lyrics but will never 
+attempt to fetch (read) lyrics from the cache directory.  These options may 
+be useful if one either simply wants to build a lyrics database but always 
+fetch the latest, or perhaps limit lyrics to a fixed cache but not add to 
+it, or perhaps is using a readonly directory.  The default is no indicator 
+which allows both reading and writing.
+
+Directory must be a valid directory, but may be specified as either a path 
+(ie. "/home/user/lyrics") or a URI (ie. "file:///home/user/lyrics") or 
+with a limiting directional indicator, ie. "</home/user/lyrics".  It may 
+or may not have a trailing "/" (ie. "/home/user/lyrics/").
+
+If no argument is passed, it returns the current GENERAL cache directory 
+string in effect (but a different directory option is specified for a specific 
+module may have been specified and used by THAT module - see B<new>() 
+options above).
+
+NOTE:  This will override any B<-cache> option value specified in B<new>()!
+
+=item [ I<$scalar> | I<@array> ] = $finder->B<credits>()
+
+Returns either a comma-separated list or an array of names credited by 
+the site with posting the lyrics on the site (if any) or an empty 
+string, if none found.  NOTE:  This site currently does not provide "credits", 
+so an empty string or array will always be returned.
+
+=item I<$string> = $finder->B<fetch>(I<$artist>, I<$title>)
+
+Attempt to fetch the lyrics for the given artist and title.  
+This is the primary method call, and the only one required to be called 
+(besides B<new>()) to obtain lyrics.
+
+Returns lyrics as a string (includes line-breaks appropriate for the user's 
+operating system), or an empty string, if no lyrics found.
+
+=item I<$scalar> = $finder->B<message>()
+
+Returns the last error string generated, or "Ok" if all's well.
+
+=item [ I<$scalar> | I<@array> ] = $finder->B<order>()
+
+LyricFinder method, included here for compatibility only that isn't 
+particularly useful here.  
+
+Returns either a comma-separated list or an array of the site modules 
+tried by the last fetch.  This is useful to see what sites are 
+being tried and in what order if I<random> order is being used.  Similar 
+to B<tried>(), except all sites being considered are shown.
+
+In the case of site submodules, such as this, it simply returns the source 
+(this module's) name, either as "Letras" or ("Letras").
+
+=item I<$scalar> = $finder->B<site>()
+
+Returns the actual base URL of the site that successfully fetched the lyrics 
+in the last successful fetch (or an empty string if the fetch failed).  
+This site's base URL on success is always:  "I<https://www.letras.net>".
+
+NOTE:  If caching is being used and lyrics are found and fetched from 
+the cache directory, B<site>() will return the cache directory in URI format, 
+ie. "file:///home/user/Music/LyricsFiles"!
+
+=item I<$scalar> = $finder->B<source>()
+
+Returns the name of the module that successfully fetched the lyrics in 
+the last successful fetch (or "none" if the fetch failed).
+This site's module name on success is always:  "I<Letras>".
+
+NOTE:  If caching is being used and lyrics are found and fetched from 
+the cache directory, B<source>() will return "I<Cache>"!
+
+=item [ I<$scalar> | I<@array> ] = $finder->B<tried>()
+
+LyricFinder method, included here for compatibility only that isn't 
+particularly useful here.  
+
+Returns either a comma-separated list or an array of the site modules 
+actually tried when fetching lyrics.  This is useful to see what sites were 
+actually hit and in what order if I<random> order is being used.  Similar 
+to B<order>(), except only sites actually hit are shown (the last one is 
+the one that successfully fetched the lyrics.
+
+In the case of site submodules, such as this, it simply returns the source 
+(this module's) name, either as "Letras" or ("Letras").
+
+=item I<$scalar> = $finder->B<url>()
+
+Returns the actual URL used to fetch the lyrics from the site (includes 
+the actual formatted search arguments passed to the site).  This can be 
+helpful in debugging, etc.
+
+NOTE:  If caching is being used and lyrics are found and fetched from 
+the cache directory, B<site>() will return the full filename of the cache 
+file fetched.
+
+=back
+
+=head1 DEPENDENCIES
+
+L<HTML::Strip>, L<HTTP::Request>, L<LWP::UserAgent>
+
+=head1 BUGS
+
+Please report any bugs or feature requests to C<bug-lyricFinder-letras 
+at rt.cpan.org>, or through the web interface at 
+L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=LyricFinder-Letras>.  
+I will be notified, and then you'll automatically be notified of progress on 
+your bug as I make changes.
+
+=head1 SUPPORT
+
+You can find documentation for this module with the perldoc command.
+
+    perldoc LyricFinder::Letras
+
+=head1 SEE ALSO
+
+LyricFinder - (L<LyricFinder>)
+
+=over 4
+
+=item * RT: CPAN's request tracker (report bugs here)
+
+L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=LyricFinder-Letras>
+
+=item * CPAN Ratings
+
+L<http://cpanratings.perl.org/d/LyricFinder-Letras>
+
+=item * Search CPAN
+
+L<http://search.cpan.org/dist/LyricFinder-Letras/>
+
+=back
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (c) 2020 Jim Turner.
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of the the Artistic License (2.0). You may obtain a
+copy of the full license at:
+
+L<http://www.perlfoundation.org/artistic_license_2_0>
+
+Any use, modification, and distribution of the Standard or Modified
+Versions is governed by this Artistic License. By using, modifying or
+distributing the Package, you accept this license. Do not use, modify,
+or distribute the Package, if you do not accept this license.
+
+If your Modified Version has been derived from a Modified Version made
+by someone other than you, you are nevertheless required to ensure that
+your Modified Version complies with the requirements of this license.
+
+This license does not grant you the right to use any trademark, service
+mark, tradename, or logo of the Copyright Holder.
+
+This license includes the non-exclusive, worldwide, free-of-charge
+patent license to make, have made, use, offer to sell, sell, import and
+otherwise transfer the Package with respect to any patent claims
+licensable by the Copyright Holder that are necessarily infringed by the
+Package. If you institute patent litigation (including a cross-claim or
+counterclaim) against any party alleging that the Package constitutes
+direct or contributory patent infringement, then this Artistic License
+to you shall terminate on the date that such litigation is filed.
+
+Disclaimer of Warranty: THE PACKAGE IS PROVIDED BY THE COPYRIGHT HOLDER
+AND CONTRIBUTORS "AS IS' AND WITHOUT ANY EXPRESS OR IMPLIED WARRANTIES.
+THE IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
+PURPOSE, OR NON-INFRINGEMENT ARE DISCLAIMED TO THE EXTENT PERMITTED BY
+YOUR LOCAL LAW. UNLESS REQUIRED BY LAW, NO COPYRIGHT HOLDER OR
+CONTRIBUTOR WILL BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, OR
+CONSEQUENTIAL DAMAGES ARISING IN ANY WAY OUT OF THE USE OF THE PACKAGE,
+EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+=cut

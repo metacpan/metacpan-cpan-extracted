@@ -1,4 +1,4 @@
-use 5.012;
+use strict;
 use XS::libcatch;
 use Test::More;
 

@@ -7,6 +7,7 @@ README
 t/00-load.t
 t/05-base.t
 t/10-shared.t
+t/11-dup_shm_key.t
 t/12-ipc_shareable.t
 t/14-partial_second.t
 t/15-interval.t

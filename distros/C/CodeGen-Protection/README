@@ -2,7 +2,7 @@ NAME
     CodeGen::Protection - Safely rewrite parts of generated code
 
 VERSION
-    version 0.05
+    version 0.06
 
 SYNOPSIS
         use CodeGen::Protection qw(:all);
@@ -23,7 +23,7 @@ SYNOPSIS
         );
 
 DESCRIPTION
-    If you might find the Tutorial to be useful.
+    If this is hard to follow, you might find the Tutorial useful.
 
     Code that writes code can be a powerful tool, especially when you need
     to generate lots of boilerplate. However, when a developer takes the

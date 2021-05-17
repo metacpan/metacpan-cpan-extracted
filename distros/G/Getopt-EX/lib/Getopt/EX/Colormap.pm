@@ -1,14 +1,15 @@
 package Getopt::EX::Colormap;
-use version; our $VERSION = version->declare("v1.23.0");
+use version; our $VERSION = version->declare("v1.23.2");
 
 use v5.14;
 use warnings;
+use utf8;
 
 use Exporter 'import';
 our @EXPORT      = qw();
 our @EXPORT_OK   = qw(
     colorize colorize24 ansi_code ansi_pair csi_code
-    colortable
+    colortable colortable6 colortable12 colortable24
     );
 our %EXPORT_TAGS = (all => [ @EXPORT_OK ]);
 our @ISA         = qw(Getopt::EX::LabeledParam);
@@ -25,6 +26,7 @@ use Getopt::EX::Func qw(callable);
 
 our $RGB24       = $ENV{GETOPTEX_RGB24};
 our $LINEAR256   = $ENV{GETOPTEX_LINEAR256};
+our $LINEAR_GREY = $ENV{GETOPTEX_LINEARGREY};
 our $NO_RESET_EL = $ENV{GETOPTEX_NO_RESET_EL};
 our $SPLIT_ANSI  = $ENV{GETOPTEX_SPLIT_ANSI};
 
@@ -40,12 +42,23 @@ my @nonlinear = do {
 };
 
 sub map_256_to_6 {
+    use integer;
     my $i = shift;
     if ($LINEAR256) {
-	int ( 5 * $i / 255 );
+	5 * $i / 255;
     } else {
+	# ( $i - 35 ) / 40;
 	$nonlinear[$i];
     }
+}
+
+sub map_to_256 {
+    my($base, $i) = @_;
+    if    ($i == 0)     { 0 }
+    elsif ($base ==  6) { $i * 40 + 55 }
+    elsif ($base == 12) { $i * 20 + 35 }
+    elsif ($base == 24) { $i * 10 + 25 }
+    else  { die }
 }
 
 sub ansi256_number {
@@ -69,16 +82,22 @@ sub ansi256_number {
 }
 
 sub rgb24_number {
+    use integer;
     my($rx, $gx, $bx) = @_;
     my($r, $g, $b, $grey);
-    if ($rx != 255 and $rx == $gx and $rx == $bx) {
-	##
-	## Divide area into 25 segments, and map to BLACK and 24 GREYS
-	##
-	$grey = int ( $rx * 25 / 255 ) - 1;
-	if ($grey < 0) {
-	    $r = $g = $b = 0;
-	    $grey = undef;
+    if ($rx != 0 and $rx != 255 and $rx == $gx and $rx == $bx) {
+	if ($LINEAR_GREY) {
+	    ##
+	    ## Divide area into 25 segments, and map to BLACK and 24 GREYS
+	    ##
+	    $grey = $rx * 25 / 255 - 1;
+	    if ($grey < 0) {
+		$r = $g = $b = 0;
+		$grey = undef;
+	    }
+	} else {
+	    ## map to 8, 18, 28, ... 238
+	    $grey = min(23, ($rx - 3) / 10);
 	}
     } else {
 	($r, $g, $b) = map { map_256_to_6 $_ } $rx, $gx, $bx;
@@ -401,8 +420,78 @@ sub colormap {
 		sprintf $format, $opt{option}, $_, $hash->{$_} // "";
 	    } sort $compare keys %{$hash};
 	},
-	"\t\$<move(0,0)>\n",
+	"\t\$<ignore>\n",
 	);
+}
+
+sub colortable6 {
+    colortableN(
+	step   => 6,
+	string => "    ",
+	line   => 2,
+	x => 1, y => 1, z => 1,
+	@_
+	);
+}
+
+sub colortable12 {
+    colortableN(
+	step   => 12,
+	string => "  ",
+	x => 1, y => 1, z => 2,
+	@_
+	);
+}
+
+# use charnames ':full';
+
+sub colortable24 {
+    colortableN(
+	step   => 24,
+#	string => "\N{UPPER HALF BLOCK}",
+	string => "\N{U+2580}",
+	shift  => 1,
+	x => 1, y => 2, z => 4,
+	@_
+	);
+}
+
+sub colortableN {
+    my %arg = (
+	shift => 0,
+	line  => 1,
+	row   => 3,
+	@_);
+    my @combi = do {
+	my @default = qw( XYZ YZX ZXY  YXZ XZY ZYX );
+	if (my @s = $arg{row} =~ /[xyz]{3}/ig) {
+	    @s;
+	} else {
+	    @default[0 .. $arg{row} - 1];
+	}
+    };
+    my @order = map {
+	my @ord = map { { X=>0, Y=>1, Z=>2 }->{$_} } /[XYZ]/g;
+	sub { @_[@ord] }
+    } map { uc } @combi;
+    binmode STDOUT, ":utf8";
+    for my $order (@order) {
+	my $rgb = sub {
+	    sprintf "#%02x%02x%02x",
+		map { map_to_256($arg{step}, $_) } $order->(@_);
+	};
+	for (my $y = 0; $y < $arg{step}; $y += $arg{y}) {
+	    my @out;
+	    for (my $z = 0; $z < $arg{step}; $z += $arg{z}) {
+		for (my $x = 0; $x < $arg{step}; $x += $arg{x}) {
+		    my $fg = $rgb->($x, $y, $z);
+		    my $bg = $rgb->($x, $y + $arg{shift}, $z);
+		    push @out, colorize "$fg/$bg", $arg{string};
+		}
+	    }
+	    print((@out, "\n") x $arg{line});
+	}
+    }
 }
 
 sub colortable {
@@ -548,7 +637,7 @@ lowercase :
     C  c  Cyan
     M  m  Magenta
     Y  y  Yellow
-    K  b  Black
+    K  k  Black
     W  w  White
 
 or RGB values and 24 grey levels if using ANSI 256 or full color

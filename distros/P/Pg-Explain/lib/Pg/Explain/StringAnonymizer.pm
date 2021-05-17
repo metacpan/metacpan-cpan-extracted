@@ -26,11 +26,11 @@ Pg::Explain::StringAnonymizer - Class to anonymize sets of strings
 
 =head1 VERSION
 
-Version 1.07
+Version 1.08
 
 =cut
 
-our $VERSION = '1.07';
+our $VERSION = '1.08';
 
 =head1 SYNOPSIS
 
@@ -217,7 +217,7 @@ sub _word {
     my $self = shift;
     my $n    = shift;
     $n = 0 unless defined $n;
-    $n = 0 if $n < 0;
+    $n = 0  if $n < 0;
     $n = 31 if $n > 31;
     my @words = qw(
         alpha     bravo      charlie    delta
@@ -228,7 +228,7 @@ sub _word {
         uniform   victor     whiskey    xray
         yankee    zulu       two        three
         four      five       six        seven
-        );
+    );
     return $words[ $n ];
 }
 

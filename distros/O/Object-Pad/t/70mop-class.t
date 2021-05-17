@@ -9,17 +9,20 @@ use Object::Pad;
 
 class Example { }
 
-is( Example->META->name, "Example", 'META->name' );
-ok(  Example->META->is_class, 'META->is_class true' );
-ok( !Example->META->is_role, 'META->is_role false' );
+my $meta = Object::Pad::MOP::Class->for_class( "Example" );
 
-is_deeply( [ Example->META->superclasses ], [], 'META->superclasses' );
+is( $meta->name, "Example", '$meta->name' );
+ok(  $meta->is_class, '$meta->is_class true' );
+ok( !$meta->is_role, '$meta->is_role false' );
 
-is_deeply( [ Example->META->roles ], [], 'META->roles' );
+is_deeply( [ $meta->superclasses ], [], '$meta->superclasses' );
+
+is_deeply( [ $meta->roles ], [], '$meta->roles' );
 
 class Example2 extends Example {}
 
-is_deeply( [ Example2->META->superclasses ], [ Example->META ],
-   'META->superclasses on subclass' );
+is_deeply( [ Object::Pad::MOP::Class->for_class( "Example2" )->superclasses ],
+   [ $meta ],
+   '$meta->superclasses on subclass' );
 
 done_testing;

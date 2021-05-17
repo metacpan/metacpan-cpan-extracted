@@ -16,7 +16,7 @@ use Text::Minify::XS v0.4.0 ();
 
 # RECOMMEND PREREQ:  Ref::Util::XS
 
-our $VERSION = 'v0.1.5';
+our $VERSION = 'v0.1.6';
 
 sub call {
     my ($self, $env) = @_;
@@ -91,7 +91,7 @@ Plack::Middleware::Text::Minify - minify text responses on the fly
 
 =head1 VERSION
 
-version v0.1.5
+version v0.1.6
 
 =head1 SYNOPSIS
 
@@ -154,6 +154,12 @@ whitespace in HTML documents, e.g. in L<Template-Toolkit|Template>
 
 then you may find it worth removing these and letting the middleware
 clean up extra whitespace.
+
+=head2 Collapsed Newlines
+
+The underlying minifier does not understand markup, so newlines will
+still be collapsed in HTML elements where whitespace is meaningful,
+e.g. C<pre> or C<textarea>.
 
 =head1 SEE ALSO
 

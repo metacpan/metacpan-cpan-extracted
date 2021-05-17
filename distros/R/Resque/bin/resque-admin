@@ -74,7 +74,7 @@ resque-admin - Tool to deal with working or stalled workers
 
 =head1 VERSION
 
-version 0.38
+version 0.41
 
 =head1 SYNOPSIS
 

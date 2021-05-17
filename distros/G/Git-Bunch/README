@@ -3,7 +3,7 @@ NAME
     repos)
 
 VERSION
-    This document describes version 0.628 of Git::Bunch (from Perl
+    This document describes version 0.629 of Git::Bunch (from Perl
     distribution Git-Bunch), released on 2021-01-31.
 
 SYNOPSIS
@@ -571,7 +571,7 @@ SOURCE
 
 BUGS
     Please report any bugs or feature requests on the bugtracker website
-    <https://rt.cpan.org/Public/Dist/Display.html?Name=Git-Bunch>
+    <https://github.com/perlancar/perl-Git-Bunch/issues>
 
     When submitting a bug or request, please include a test-file or a patch
     to an existing test-file that illustrates the bug or desired feature.
@@ -591,7 +591,11 @@ SEE ALSO
     put all my data in one big gitbunch directory; I find it simpler.
     gitbunch works for me and I use it daily.
 
-    File::RsyBak
+    Other tools on CPAN to make it easier to manage multiple git
+    repositories: got from App::GitGot, group-git from Group::Git.
+
+    Git::Bunch can be used to backup bunch. Other tools to do backup include
+    File::RsyBak.
 
 AUTHOR
     perlancar <perlancar@cpan.org>

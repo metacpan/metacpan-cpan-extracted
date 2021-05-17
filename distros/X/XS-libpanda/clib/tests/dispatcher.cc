@@ -51,12 +51,12 @@ TEST("remove callback") {
 
 TEST("remove_all in process") {
     Dispatcher d;
-    d.add_event_listener([](Event&, int) -> int {
-        return 2;
-    });
     d.add_event_listener([&](Event& e, int a) -> int {
         d.remove_all();
         return 1 + e.next(a).value_or(0);
+    });
+    d.add_event_listener([](Event&, int) -> int {
+        return 2;
     });
     REQUIRE(d(2).value_or(0) == 1);
 }
@@ -249,7 +249,7 @@ TEST("dispatcher 2 string calls") {
     d(s);
 }
 
-TEST("front order") {
+TEST("normal(back) order") {
     using Dispatcher = CallbackDispatcher<void()>;
     Dispatcher d;
     std::vector<int> res;
@@ -257,18 +257,18 @@ TEST("front order") {
     d.add([&]{ res.push_back(2); });
     d.add_event_listener([&](Dispatcher::Event& e){ res.push_back(3); e.next(); });
     d();
-    REQUIRE(res == std::vector<int>({3,2,1}));
+    REQUIRE(res == std::vector<int>({1,2,3}));
 }
 
-TEST("back order") {
+TEST("front order") {
     using Dispatcher = CallbackDispatcher<void()>;
     Dispatcher d;
     std::vector<int> res;
-    d.add_event_listener([&](Dispatcher::Event& e){ res.push_back(1); e.next(); }, true);
-    d.add([&]{ res.push_back(2); }, true);
-    d.add_back([&]{ res.push_back(3); });
+    d.prepend_event_listener([&](Dispatcher::Event& e){ res.push_back(1); e.next(); });
+    d.add([&]{ res.push_back(2); }, false);
+    d.prepend([&]{ res.push_back(3); });
     d();
-    REQUIRE(res == std::vector<int>({1,2,3}));
+    REQUIRE(res == std::vector<int>({3,2,1}));
 }
 
 TEST("const ref arg move") {

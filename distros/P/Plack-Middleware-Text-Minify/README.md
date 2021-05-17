@@ -4,7 +4,7 @@ Plack::Middleware::Text::Minify - minify text responses on the fly
 
 # VERSION
 
-version v0.1.5
+version v0.1.6
 
 # SYNOPSIS
 
@@ -71,6 +71,12 @@ whitespace in HTML documents, e.g. in [Template-Toolkit](https://metacpan.org/po
 
 then you may find it worth removing these and letting the middleware
 clean up extra whitespace.
+
+## Collapsed Newlines
+
+The underlying minifier does not understand markup, so newlines will
+still be collapsed in HTML elements where whitespace is meaningful,
+e.g. `pre` or `textarea`.
 
 # SEE ALSO
 

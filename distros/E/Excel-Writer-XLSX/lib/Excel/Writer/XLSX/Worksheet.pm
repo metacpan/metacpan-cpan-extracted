@@ -30,7 +30,7 @@ use Excel::Writer::XLSX::Utility qw(xl_cell_to_rowcol
                                     quote_sheetname);
 
 our @ISA     = qw(Excel::Writer::XLSX::Package::XMLwriter);
-our $VERSION = '1.08';
+our $VERSION = '1.09';
 
 
 ###############################################################################
@@ -111,6 +111,7 @@ sub new {
     $self->{_header_footer_scales}  = 1;
     $self->{_header_images}         = [];
     $self->{_footer_images}         = [];
+    $self->{_background_image}      = '';
 
     $self->{_margin_left}   = 0.7;
     $self->{_margin_right}  = 0.7;
@@ -206,6 +207,7 @@ sub new {
     $self->{_external_comment_links} = [];
     $self->{_external_vml_links}     = [];
     $self->{_external_table_links}   = [];
+    $self->{_external_background_links} = [];
     $self->{_drawing_links}          = [];
     $self->{_vml_drawing_links}      = [];
     $self->{_charts}                 = [];
@@ -220,6 +222,7 @@ sub new {
     $self->{_drawing_rels_id}        = 0;
     $self->{_vml_drawing_rels}       = {};
     $self->{_vml_drawing_rels_id}    = 0;
+    $self->{_has_dynamic_arrays}     = 0;
 
     $self->{_horizontal_dpi} = 0;
     $self->{_vertical_dpi}   = 0;
@@ -374,6 +377,9 @@ sub _assemble_xml_file {
 
     # Write the legacyDrawingHF element.
     $self->_write_legacy_drawing_hf();
+
+    # Write the picture element, for backgrounds.
+    $self->_write_picture();
 
     # Write the tableParts element.
     $self->_write_table_parts();
@@ -620,7 +626,7 @@ sub _encode_password {
 
 ###############################################################################
 #
-# set_column($firstcol, $lastcol, $width, $format, $hidden, $level)
+# set_column($first_col, $last_col, $width, $format, $hidden, $level)
 #
 # Set the width of a single column or a range of columns.
 # See also: _write_col_info
@@ -640,59 +646,104 @@ sub set_column {
         splice @data, 1, 1;    # $row2
     }
 
-    return if @data < 3;       # Ensure at least $firstcol, $lastcol and $width
-    return if not defined $data[0];    # Columns must be defined.
-    return if not defined $data[1];
+    # Ensure at least $first_col, $last_col and $width
+    return if @data < 3;
+
+
+    my $first_col = $data[0];
+    my $last_col  = $data[1];
+    my $width     = $data[2];
+    my $format    = $data[3];
+    my $hidden    = $data[4] || 0;
+    my $level     = $data[5];
+
+    return if not defined $first_col;    # Columns must be defined.
+    return if not defined $last_col;
 
     # Assume second column is the same as first if 0. Avoids KB918419 bug.
-    $data[1] = $data[0] if $data[1] == 0;
+    $last_col = $first_col if $last_col == 0;
 
     # Ensure 2nd col is larger than first. Also for KB918419 bug.
-    ( $data[0], $data[1] ) = ( $data[1], $data[0] ) if $data[0] > $data[1];
-
+    ( $first_col, $last_col ) = ( $last_col, $first_col )
+      if $first_col > $last_col;
 
     # Check that cols are valid and store max and min values with default row.
     # NOTE: The check shouldn't modify the row dimensions and should only modify
     #       the column dimensions in certain cases.
     my $ignore_row = 1;
     my $ignore_col = 1;
-    $ignore_col = 0 if ref $data[3];          # Column has a format.
-    $ignore_col = 0 if $data[2] && $data[4];  # Column has a width but is hidden
+    $ignore_col = 0 if ref $format;       # Column has a format.
+    $ignore_col = 0 if $width && $hidden; # Column has a width but is hidden
 
     return -2
-      if $self->_check_dimensions( 0, $data[0], $ignore_row, $ignore_col );
+      if $self->_check_dimensions( 0, $first_col, $ignore_row, $ignore_col );
     return -2
-      if $self->_check_dimensions( 0, $data[1], $ignore_row, $ignore_col );
+      if $self->_check_dimensions( 0, $last_col, $ignore_row, $ignore_col );
 
     # Set the limits for the outline levels (0 <= x <= 7).
-    $data[5] = 0 unless defined $data[5];
-    $data[5] = 0 if $data[5] < 0;
-    $data[5] = 7 if $data[5] > 7;
+    $level = 0 unless defined $level;
+    $level = 0 if $level < 0;
+    $level = 7 if $level > 7;
 
-    if ( $data[5] > $self->{_outline_col_level} ) {
-        $self->{_outline_col_level} = $data[5];
+    if ( $level > $self->{_outline_col_level} ) {
+        $self->{_outline_col_level} = $level;
     }
 
     # Store the column data based on the first column. Padded for sorting.
-    $self->{_colinfo}->{ sprintf "%05d", $data[0] } = [@data];
+    $self->{_colinfo}->{ sprintf "%05d", $first_col } = [@data];
 
     # Store the column change to allow optimisations.
     $self->{_col_size_changed} = 1;
 
     # Store the col sizes for use when calculating image vertices taking
     # hidden columns into account. Also store the column formats.
-    my $width  = $data[2];
-    my $format = $data[3];
-    my $hidden = $data[4] || 0;
-
     $width = $self->{_default_col_width} if !defined $width;
 
-    my ( $firstcol, $lastcol ) = @data;
-
-    foreach my $col ( $firstcol .. $lastcol ) {
+    foreach my $col ( $first_col .. $last_col ) {
         $self->{_col_sizes}->{$col}   = [$width, $hidden];
         $self->{_col_formats}->{$col} = $format if $format;
     }
+}
+
+###############################################################################
+#
+# set_column_pixels_($first_col, $last_col, $width, $format, $hidden, $level)
+#
+# Set the width (and properties) of a single column or a range of columns in
+# pixels rather than character units.
+#
+sub set_column_pixels {
+
+    my $self = shift;
+    my @data = @_;
+    my $cell = $data[0];
+
+    # Check for a cell reference in A1 notation and substitute row and column
+    if ( $cell =~ /^\D/ ) {
+        @data = $self->_substitute_cellref( @_ );
+
+        # Returned values $row1 and $row2 aren't required here. Remove them.
+        shift @data;    # $row1
+        splice @data, 1, 1;    # $row2
+    }
+
+    # Ensure at least $first_col, $last_col and $width
+    return if @data < 3;
+
+    my $first_col = $data[0];
+    my $last_col  = $data[1];
+    my $pixels    = $data[2];
+    my $format    = $data[3];
+    my $hidden    = $data[4] || 0;
+    my $level     = $data[5];
+    my $width;
+
+    if ($pixels) {
+        $width = _pixels_to_width( $pixels );
+    }
+
+    return $self->set_column( $first_col, $last_col, $width, $format,
+                              $hidden, $level );
 }
 
 
@@ -2585,20 +2636,9 @@ sub write_formula {
     return 0;
 }
 
-
-###############################################################################
-#
-# write_array_formula($row1, $col1, $row2, $col2, $formula, $format)
-#
-# Write an array formula to the specified row and column (zero indexed).
-#
-# $format is optional.
-#
-# Returns  0 : normal termination
-#         -1 : insufficient number of arguments
-#         -2 : row or column out of range
-#
-sub write_array_formula {
+# Internal method shared by the write_array_formula() and
+# write_dynamic_array_formula() methods.
+sub _write_array_formula {
 
     my $self = shift;
 
@@ -2616,7 +2656,7 @@ sub write_array_formula {
     my $formula = $_[4];           # The formula text string
     my $xf      = $_[5];           # The format object.
     my $value   = $_[6];           # Optional formula value.
-    my $type    = 'a';             # The data type
+    my $type    = $_[7];           # The data type
 
     # Swap last row/col with first row/col as necessary
     ( $row1, $row2 ) = ( $row2, $row1 ) if $row1 > $row2;
@@ -2664,6 +2704,53 @@ sub write_array_formula {
     }
 
     return 0;
+}
+
+
+
+###############################################################################
+#
+# write_array_formula($row1, $col1, $row2, $col2, $formula, $format)
+#
+# Write an array formula to the specified row and column (zero indexed).
+#
+# $format is optional.
+#
+# Returns  0 : normal termination
+#         -1 : insufficient number of arguments
+#         -2 : row or column out of range
+#
+sub write_array_formula {
+
+    my $self = shift;
+
+    return $self->_write_array_formula( @_, 'a' );
+}
+
+
+###############################################################################
+#
+# write_dynamic_array_formula($row1, $col1, $row2, $col2, $formula, $format)
+#
+# Write a dynamic formula to the specified row and column (zero indexed).
+#
+# $format is optional.
+#
+# Returns  0 : normal termination
+#         -1 : insufficient number of arguments
+#         -2 : row or column out of range
+#
+sub write_dynamic_array_formula {
+
+    my $self = shift;
+
+    my $error = $self->_write_array_formula( @_, 'd' );
+
+    if ( $error == 0 ) {
+        $self->{_has_dynamic_arrays} = 1;
+    }
+
+    return $error;
 }
 
 
@@ -3097,16 +3184,16 @@ sub convert_date_time {
 
 ###############################################################################
 #
-# set_row($row, $height, $XF, $hidden, $level, $collapsed)
+# set_row($row, $height, $format, $hidden, $level, $collapsed)
 #
-# This method is used to set the height and XF format for a row.
+# This method is used to set the height and properties of a row.
 #
 sub set_row {
 
     my $self      = shift;
     my $row       = shift;         # Row Number.
     my $height    = shift;         # Row height.
-    my $xf        = shift;         # Format object.
+    my $format    = shift;         # Format object.
     my $hidden    = shift || 0;    # Hidden flag.
     my $level     = shift || 0;    # Outline level.
     my $collapsed = shift || 0;    # Collapsed row.
@@ -3142,13 +3229,35 @@ sub set_row {
     }
 
     # Store the row properties.
-    $self->{_set_rows}->{$row} = [ $height, $xf, $hidden, $level, $collapsed ];
+    $self->{_set_rows}->{$row} = [ $height, $format,
+                                   $hidden, $level, $collapsed ];
 
     # Store the row change to allow optimisations.
     $self->{_row_size_changed} = 1;
 
     # Store the row sizes for use when calculating image vertices.
     $self->{_row_sizes}->{$row} = [$height, $hidden];
+}
+
+
+###############################################################################
+#
+# set_row_pixels($row, $height, $format, $hidden, $level, $collapsed)
+#
+# This method is used to set the height (in pixels) and the properties of the
+# row.
+#
+sub set_row_pixels {
+
+    my $self = shift;
+    my @data = @_;
+    my $height = $data[1];
+
+    if ( $height ) {
+        $data[1] = _pixels_to_height( $height );
+    }
+
+    return $self->set_row( @data );
 }
 
 
@@ -5449,7 +5558,6 @@ sub _size_col {
     return $pixels;
 }
 
-
 ###############################################################################
 #
 # _size_row($row)
@@ -5483,6 +5591,44 @@ sub _size_row {
     }
 
     return $pixels;
+}
+
+
+###############################################################################
+#
+# _pixels_to_width($pixels)
+#
+# Convert the width of a cell from pixels to character units.
+#
+sub _pixels_to_width {
+
+    my $pixels          = shift;
+    my $max_digit_width = 7;
+    my $padding         = 5;
+    my $width;
+
+    if ( $pixels <= 12 ) {
+        $width =  $pixels / ( $max_digit_width + $padding );
+    }
+    else {
+        $width = ( $pixels - $padding ) / $max_digit_width;
+    }
+
+    return $width;
+}
+
+
+###############################################################################
+#
+# _pixels_to_height($pixels)
+#
+# Convert the height of a cell from pixels to character units.
+#
+sub _pixels_to_height {
+
+    my $pixels = shift;
+
+    return 0.75 * $pixels;
 }
 
 
@@ -5764,7 +5910,7 @@ sub _get_range_data {
                     # Store a formula.
                     push @data, $cell->[3] || 0;
                 }
-                elsif ( $type eq 'a' ) {
+                elsif ( $type eq 'a' || $type eq 'd') {
 
                     # Store an array formula.
                     push @data, $cell->[4] || 0;
@@ -6010,6 +6156,40 @@ sub _prepare_header_image {
 
     push @{ $self->{_header_images_array} },
       [ $width, $height, $name, $position, $x_dpi, $y_dpi, $ref_id ];
+}
+
+
+###############################################################################
+#
+# set_background( $filename )
+#
+# Set the background image for the worksheet.
+#
+sub set_background {
+
+    my $self  = shift;
+    my $image = shift;
+
+    croak "Couldn't locate $image: $!" unless -e $image;
+
+    $self->{_background_image} = $image;
+}
+
+
+###############################################################################
+#
+# _prepare_background()
+#
+# Set up an image without a drawing object for the background image.
+#
+sub _prepare_background {
+
+    my $self       = shift;
+    my $image_id   = shift;
+    my $image_type = shift;
+
+    push @{ $self->{_external_background_links} },
+      [ '/image', '../media/image' . $image_id . '.' . $image_type ];
 }
 
 
@@ -7704,7 +7884,12 @@ sub _write_cell {
         $self->xml_formula_element( $token, $value, @attributes );
 
     }
-    elsif ( $type eq 'a' ) {
+    elsif ( $type eq 'a' || $type eq 'd') {
+
+        # Add metadata linkage for dynamic array formulas.
+        if ($type eq 'd') {
+            push @attributes, ( 'cm' => '1' );
+        }
 
         # Write an array formula.
         $self->xml_start_tag( 'c', @attributes );
@@ -8943,7 +9128,6 @@ sub _write_legacy_drawing {
 }
 
 
-
 ##############################################################################
 #
 # _write_legacy_drawing_hf()
@@ -8963,6 +9147,28 @@ sub _write_legacy_drawing_hf {
     my @attributes = ( 'r:id' => 'rId' . $id );
 
     $self->xml_empty_tag( 'legacyDrawingHF', @attributes );
+}
+
+
+##############################################################################
+#
+# _write_picture()
+#
+# Write the <picture> element.
+#
+sub _write_picture {
+
+    my $self = shift;
+    my $id;
+
+    return unless $self->{_background_image};
+
+    # Increment the relationship id.
+    $id = ++$self->{_rel_count};
+
+    my @attributes = ( 'r:id' => 'rId' . $id );
+
+    $self->xml_empty_tag( 'picture', @attributes );
 }
 
 

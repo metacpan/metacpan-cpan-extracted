@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use Config ();
 
-our $VERSION = '0.003';
+our $VERSION = '0.003001';
 
 # set as package variable since %Config::Config is read only, (per docs and in practice)
 our $CCNAME = $Config::Config{ccname};
@@ -128,26 +128,27 @@ C<-fopenmp> enables OpenMP support in via compiler and linker:
 
 =head2 Note On Compiler Support
 
-If used for an unsupported compiler, C<ExtUtils::MakeMaker::os_unsupported> is
-invoked, which results an exception propagating from this method being raised
-with the value of C<qq{OS unsupported\n}> (note the new line).
+If used for an unsupported compiler, C<ExtUtils::MakeMaker::os_unsupported>
+is invoked, which results an exception propagating from this method being
+raised with the value of C<qq{OS unsupported\n}> (note the new line).
 
 This module assumes that the compiler in question is the same one used to
-build C<perl>. Since the vast majority of C<perl>s are building using C<gcc>,
-initial support is targeting it. However, like C<perl>, many other compilers
-may be used.
+build C<perl>. Since the vast majority of C<perl>s are building using
+C<gcc>, initial support is targeting it. However, like C<perl>, many
+other compilers may be used.
 
-Adding support for a new compiler should be straightforward; please section on
-contributing, below.
+Adding support for a new compiler should be straightforward; please
+section on contributing, below.
 
 =head2 Contributing
 
-The biggest need is to support additional compilers. OpenMP is a well established
-standard across compilers, but there is guarantee that all compilers will use the
-same flags, library names, or header files. It should also be easy to contribute
-a patch to add this information, which is effectively its purpose. At the very least,
-please create an issue at the official issue tracker to request this support, and
-be sure to include the relevant information. Chances are the maintainers of this
+The biggest need is to support additional compilers. OpenMP is a well
+established standard across compilers, but there is no guarantee that
+all compilers will use the same flags, library names, or header files. It
+should also be easy to contribute a patch to add this information, which
+is effectively its purpose. At the very least, please create an issue
+at the official issue tracker to request this support, and be sure to
+include the relevant information. Chances are the maintainers of this
 module do not have access to an unsupported compiler.
 
 =head1 METHODS
@@ -157,15 +158,16 @@ module do not have access to an unsupported compiler.
 =item C<cflags>
 
 Returns flag used by a supported compiler to enable OpenMP. If not support,
-an empty string is provided since by definition all OpenMP programs must compile
-because OpenMP pramgas are annotations hidden behind source code comments.
+an empty string is provided since by definition all OpenMP programs
+must compile because OpenMP pramgas are annotations hidden behind source
+code comments.
 
 Example, GCC uses, C<-fopenmp>.
 
 =item C<lddlflags>
 
-Returns the flag used by the linker to enable OpenMP. This is usually the same
-as what is returned by C<cflags>.
+Returns the flag used by the linker to enable OpenMP. This is usually
+the same as what is returned by C<cflags>.
 
 Example, GCC uses, C<-fopenmp>, for this as well.
 
@@ -175,36 +177,33 @@ Used in support of L<Inline::C>'s C<with> method (inherited from
 L<Inline>). This method is not called directly, but used when compiling
 OpenMP programs with C<Inline::C>:
 
-    use Alien::OpenMP;
-    use Inline (
-        C           => 'DATA',
-        with        => qw/Alien::OpenMP/,
+    use Alien::OpenMP; use Inline (
+        C           => 'DATA', with        => qw/Alien::OpenMP/,
     );
 
 The nice, compact form above replaces this mess:
 
-    use Alien::OpenMP;
-    use Inline (
-        C           => 'DATA',
-        ccflagsex   => Alien::OpenMP::cflags(),
-        lddlflags   => join( q{ }, $Config::Config{lddlflags}, Alien::OpenMP::lddlflags() ),
+    use Alien::OpenMP; use Inline (
+        C           => 'DATA', ccflagsex   => Alien::OpenMP::cflags(),
+        lddlflags   => join( q{ }, $Config::Config{lddlflags},
+        Alien::OpenMP::lddlflags() ),
     );
 
 =item C<_check_libs>
 
 Internal method.
 
-Returns an array reference of libraries, e.g., C<gomp> for C<gcc>. It is meant
-specifically as an internal method to support L<Devel::CheckLib> in this module's
-C<Makefile.PL>.
+Returns an array reference of libraries, e.g., C<gomp> for C<gcc>. It is
+meant specifically as an internal method to support L<Devel::CheckLib>
+in this module's C<Makefile.PL>.
 
 =item C<_check_headers>
 
 Internal method.
 
-Returns an array reference of header files, e.g., C<omp.h> for C<gcc>. It is meant
-specifically as an internal method to support L<Devel::CheckLib> in this module's
-C<Makefile.PL>.
+Returns an array reference of header files, e.g., C<omp.h> for C<gcc>. It
+is meant specifically as an internal method to support L<Devel::CheckLib>
+in this module's C<Makefile.PL>.
 
 =back
 

@@ -128,3 +128,11 @@ XSCallbackDispatcher* DispatchingObject::notm () {
 cdPtrPtr* DispatchingObject::ptrptr () {
     RETVAL = &THIS->ptrptr;
 }
+
+void DispatchingObject::call_vv (size_t cnt) {
+    for (size_t i = 0; i < cnt; ++i) THIS->vv();
+}
+
+void DispatchingObject::call_vs (size_t cnt) {
+    for (size_t i = 0; i < cnt; ++i) THIS->vs("hello");
+}

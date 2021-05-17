@@ -100,6 +100,22 @@ sub cache {
 	}
 }
 
+#FROM:  https://github.com/clementine-player/Clementine/blob/master/data/lyrics/ultimate_providers.xml
+sub remove_accents {
+	my $str = shift;
+
+	$str =~ tr/\xc4\xc2\xc0\xc1\xc3\xe4\xe2\xe0\xe1\xe3/aaaaaaaaaa/;
+	$str =~ tr/\xcb\xca\xc8\xc9\xeb\xea\xe8\xe9/eeeeeeee/;
+	$str =~ tr/\xcf\xcc\xef\xec/iiii/;
+	$str =~ tr/\xd6\xd4\xd2\xd3\xd5\xf6\xf4\xf2\xf3\xf5/oooooooooo/;
+	$str =~ tr/\xdc\x{0016}\xd9\xda\xfc\x{0016}\xf9\xfa/uuuuuuuu/;
+	$str =~ tr/\x{0178}\xdd\xff\xfd/yyyy/;
+	$str =~ tr/\xd1\xf1/nn/;
+	$str =~ tr/\xc7\xe7/cc/;
+	$str =~ s/\xdf/ss/g;
+	return $str;
+}
+
 sub fetch {
 	my ($self, $artist_in, $song_in) = @_;
 
@@ -129,8 +145,12 @@ sub fetch {
 
 	$self->{'Source'} = $Source;
 	$self->{'Site'} = $Site;
+
+	$artist_in = &remove_accents($artist_in);
+	$song_in = &remove_accents($song_in);
+
 	# Their URLs look like e.g.:
-	# https://genius.com/Dire-straits-heavy-fuel-lyrics
+	# https://genius.com/<artist>-<title>-lyrics
 	($self->{'Url'} = $artist_in) =~ s#\s*\/\s*# and #;  #ONLY USE 1ST ARTIST, IF MORE THAN ONE!
 	my $artist = $artist_in;
 	(my $song = $song_in) =~ s#\s*\/\s*#\-#g;                  #FIX SONGS WITH "/" IN THEM!
@@ -179,7 +199,8 @@ sub fetch {
 		if ($res->status_line =~ /^404/) {
 			$self->{'Error'} = "..$Source - Lyrics not found.";
 		} else {
-			carp($self->{'Error'} = "e:$Source - Failed to retrieve ".$self->{'Url'}.' ('.$res->status_line.').');
+			carp($self->{'Error'} = "e:$Source - Failed to retrieve ".$self->{'Url'}
+					.' ('.$res->status_line.').');
 		}
 		return;
 	}
@@ -213,7 +234,7 @@ sub _parse {
 
 		return $text;
 	} else {
-		carp "e:$Source - Failed to identify lyrics on result page";
+		carp($self->{'Error'} = "e:$Source - Failed to identify lyrics on result page.");
 		return '';
 	}
 }   # end of sub parse

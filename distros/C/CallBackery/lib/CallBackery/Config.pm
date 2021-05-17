@@ -18,7 +18,7 @@ CallBackery gets much of its configuration from this config file.
 
 =cut
 
-use Mojo::Base -base;
+use Mojo::Base -base,-async_await;
 use CallBackery::Exception qw(mkerror);
 use CallBackery::Translate qw(trm);
 use Config::Grammar::Dynamic;
@@ -28,6 +28,7 @@ use File::Spec;
 use Locale::PO;
 use Mojo::Loader qw(load_class);
 use Mojo::JSON qw(true false);
+use Mojo::Exception;
 
 =head2 file
 
@@ -408,7 +409,7 @@ create a new instance of this plugin prototype
 
 =cut
 
-sub instantiatePlugin {
+sub _getPluginObject {
     my $self = shift;
     my $name = shift;
 
@@ -423,15 +424,30 @@ sub instantiatePlugin {
     die mkerror(39943,"No prototype for $name")
         if not defined $prototype;
 
-    my $obj = $prototype->new(
+    $prototype->new(
         user => $user,
         name => $prototype->name,
         config => $prototype->config,
         args => $args // {},
         app => $self->app,
     );
+}
+
+async sub instantiatePlugin_p {
+    my $self = shift;
+    my $obj = $self->_getPluginObject(@_);
+    my $name = $obj->name;
     die mkerror(39944,"No permission to access $name")
-        if not $obj->checkAccess;
+        if not await $self->promisify($obj->checkAccess);
+    return $obj;
+}
+
+sub instantiatePlugin {
+    my $self = shift;
+    my $obj = $self->_getPluginObject(@_);
+    my $name = $obj->name;
+    die mkerror(39944,"No permission to access $name")
+        if not $self->promiseDeath($obj->checkAccess);
     return $obj;
 }
 
@@ -631,6 +647,36 @@ sub unConfigure {
     unlink $cfg->{BACKEND}{log_file} if defined $cfg->{BACKEND}{log_file} and -f $cfg->{BACKEND}{log_file} ;
     unlink $self->secretFile if -f $self->secretFile;
     system "sync";
+}
+
+=head2 $cfg->promisify(xxx)
+
+always return a promise resolving to the value
+
+=cut
+
+sub promisify {
+    my $self = shift;
+    my $value = shift;
+    if (eval { blessed $value && $value->isa('Mojo::Promise') }){
+        return $value;
+    }
+    return Mojo::Promise->resolve($value,@_);
+}
+
+=head2 $cfg->promiseDeath(xxx)
+
+die when there is a promise response
+
+=cut
+
+sub promiseDeath {
+    my $self = shift;
+    my $value = shift;
+    if (eval { blessed $value && $value->isa('Mojo::Promise') }){
+        Mojo::Exception->throw("unexpected promise respone!");
+    }
+    return $value,@_;
 }
 
 

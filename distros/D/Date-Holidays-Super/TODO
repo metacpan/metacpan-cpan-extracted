@@ -1,9 +1,0 @@
-TODO file for Date-Holidays-Super
-
-$Id: TODO 1713 2007-02-13 22:09:46Z jonasbn $
-
-- Add diagnostics to class and POD
-
-- Move Super.pm into root directory we do not need a deep lib structure since
-  this is a one module distribution
-  

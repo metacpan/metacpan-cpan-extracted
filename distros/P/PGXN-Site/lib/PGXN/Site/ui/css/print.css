@@ -1,8 +1,9 @@
 /**************************************************************
+   NAME:    print.css
    AUTHOR:  Pat Heard (fullahead.org)
    DATE:    2006.03.19
    PURPOSE: Styles the page for print.  Techniques adopted from
-            http://www.alistapart.com/articles/goingtoprint/
+            https://www.alistapart.com/articles/goingtoprint/
  **************************************************************/
 
 body {
@@ -44,11 +45,9 @@ a:visited:after {
    font-size: 90%;
 }
 
-
 /* Don't display these elements since they're not useful on paper */
 #header,
 #mainMenu,
-.sideMenu,
 #footer {
   display: none;
 }
@@ -58,6 +57,3 @@ a:visited:after {
   margin: 0 8%;
   padding: 0;
 }
-
-
-

@@ -705,11 +705,13 @@ Converts C<$arg> to relative date and adds it to existing date object.
 
 =head4 '-', difference($arg)
 
-If second operand is a date object, then returns L<Date::Rel> object representing exact interval from left operand till right operand.
+If second operand is a date object, then returns L<Date::Rel> object representing exact interval from right operand till left operand.
 
-    $date - $date
+    $date_till - $date_from; # same as Date::Rel->new($date_from, $date_till)
     
     (date("2019-02-01") - date("2019-01-01"))->to_days == 31;
+    
+see L<Date::Rel>.
 
 Otherwise converts right operand to relative date, subtracts it from the date object and returns new date as a result. Reverse is not allowed.
 

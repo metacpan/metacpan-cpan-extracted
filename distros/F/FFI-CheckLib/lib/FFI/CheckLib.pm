@@ -3,6 +3,7 @@ package FFI::CheckLib;
 use strict;
 use warnings;
 use File::Spec;
+use List::Util 1.33 qw( any );
 use Carp qw( croak carp );
 use base qw( Exporter );
 
@@ -22,7 +23,7 @@ our @EXPORT_OK = qw(
 );
 
 # ABSTRACT: Check that a library is available for FFI
-our $VERSION = '0.27'; # VERSION
+our $VERSION = '0.28'; # VERSION
 
 
 our $system_path = [];
@@ -154,24 +155,28 @@ sub find_lib
     ? @{ $args{systempath} }
     : @$system_path;
 
-  my $any = 1 if grep { $_ eq '*' } @{ $args{lib} };
+  my $any = any { $_ eq '*' } @{ $args{lib} };
   my %missing = map { $_ => 1 } @{ $args{lib} };
   my %symbols = map { $_ => 1 } @{ $args{symbol} };
   my @found;
 
   delete $missing{'*'};
 
-  foreach my $alien (@{ $args{alien} })
+  alien: foreach my $alien (@{ $args{alien} })
   {
     unless($alien =~ /^([A-Za-z_][A-Za-z_0-9]*)(::[A-Za-z_][A-Za-z_0-9]*)*$/)
     {
-        croak "Doesn't appear to be a valid Alien name $alien";
+      croak "Doesn't appear to be a valid Alien name $alien";
     }
     unless(eval { $alien->can('dynamic_libs') })
     {
-      my $pm = "$alien.pm";
-      $pm =~ s/::/\//g;
-      require $pm;
+      {
+        my $pm = "$alien.pm";
+        $pm =~ s/::/\//g;
+        local $@ = '';
+        eval { require $pm };
+        next alien if $@;
+      }
       unless(eval { $alien->can('dynamic_libs') })
       {
         croak "Alien $alien doesn't provide a dynamic_libs method";
@@ -194,7 +199,7 @@ sub find_lib
         ? do {
           map {
             my($v, $d, $f) = File::Spec->splitpath($_);
-            _matches($f, File::Spec->catpath($v,$d));
+            _matches($f, File::Spec->catpath($v,$d,''));
           } @$path;
         }
         : do {
@@ -401,7 +406,7 @@ FFI::CheckLib - Check that a library is available for FFI
 
 =head1 VERSION
 
-version 0.27
+version 0.28
 
 =head1 SYNOPSIS
 
@@ -530,6 +535,14 @@ If no libraries can be found, try the given aliens instead.  The Alien
 classes specified must provide the L<Alien::Base> interface for dynamic
 libraries, which is to say they should provide a method called
 C<dynamic_libs> that returns a list of dynamic libraries.
+
+[version 0.28]
+
+In 0.28 and later, if the L<Alien> is not installed then it will be
+ignored and this module will search in system or specified directories
+only.  This module I<will> still throw an exception, if the L<Alien>
+doesn't look like a module name or if it does not provide a C<dynamic_libs>
+method (which is implemented by all L<Alien::Base> subclasses).
 
 =back
 

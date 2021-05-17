@@ -61,6 +61,6 @@
          "web" : "https://github.com/carygravel/gtk3-imageview"
       }
    },
-   "version" : "8",
+   "version" : "9",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

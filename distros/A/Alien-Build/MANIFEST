@@ -258,14 +258,11 @@ lib/Test/Alien/Synthetic.pm
 lib/alienfile.pm
 maint/Alien-Base-PkgConfig/Makefile.PL
 maint/ci-test-plugins.pl
+maint/cip-after-install
 maint/cip-before-install
 maint/cip-test-plugins
 maint/gen-test-archives.pl
 maint/gen.pl
-maint/travis-daemon
-maint/travis-dzil
-maint/travis-install-deps
-maint/travis-run-test
 maint/update-cmake-libpalindrome
 perlcriticrc
 t/00_diag.t
@@ -342,6 +339,7 @@ t/alien_role.t
 t/alienfile.t
 t/bin/ftpd
 t/bin/httpd
+t/lib/MyTest/CaptureNote.pm
 t/lib/MyTest/FTP.pm
 t/lib/MyTest/FauxFetchCommand.pm
 t/lib/MyTest/File.pm
@@ -361,7 +359,6 @@ xt/author/no_tabs.t
 xt/author/pod.t
 xt/author/pod_coverage.t
 xt/author/pod_spelling_system.t
-xt/author/strict.t
 xt/author/version.t
 xt/release/changes.t
 xt/release/fixme.t

@@ -1,0 +1,52 @@
+{
+   "abstract" : "Object oriented interface to Data::TreeDumper",
+   "author" : [
+      "Nadim Khemir <nadim.khemir@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.017, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Data-TreeDumper-OO",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Data::TreeDumper" : "0.24",
+            "Exporter" : "0",
+            "perl" : "5.006",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "https://github.com/cpan-janitor/Data-TreeDumper-OO",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/cpan-janitor/Data-TreeDumper-OO.git",
+         "web" : "https://github.com/cpan-janitor/Data-TreeDumper-OO"
+      }
+   },
+   "version" : "0.10",
+   "x_generated_by_perl" : "v5.28.2",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.24",
+   "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
+}
+

@@ -26,11 +26,11 @@ no_index:
 provides:
   Template::Tiny::Strict:
     file: lib/Template/Tiny/Strict.pm
-    version: '1.17'
+    version: '1.18'
 resources:
   bugtracker: https://github.com/Ovid/template-tiny-strict/issues
   homepage: https://metacpan.org/pod/Template::Tiny::Strict
   repository: https://github.com/Ovid/template-tiny-strict.git
-version: '1.17'
+version: '1.18'
 x_generated_by_perl: v5.26.2
 x_serialization_backend: 'YAML::Tiny version 1.73'

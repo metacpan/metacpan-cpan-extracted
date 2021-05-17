@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## A real Try Catch Block Implementation Using Perl Filter - ~/lib/Nice/Try.pm
-## Version v0.1.11
+## Version v1.0.0
 ## Copyright(c) 2021 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2020/05/17
-## Modified 2021/03/26
+## Modified 2021/05/14
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -20,9 +20,10 @@ BEGIN
     use IO::File;
     use PPI;
     use Filter::Util::Call;
-    use Scalar::Util;
+    use Scalar::Util ();
     use List::Util ();
-    our $VERSION = 'v0.1.11';
+    use Want ();
+    our $VERSION = 'v1.0.0';
     our $ERROR;
     our( $CATCH, $DIED, $EXCEPTION, $FINALLY, $HAS_CATCH, @RETVAL, $SENTINEL, $TRY, $WANTARRAY );
 }
@@ -33,16 +34,32 @@ our $SENTINEL = bless( {} => __PACKAGE__ . '::SENTINEL' );
 sub import
 {
     my( $this, @arguments ) = @_ ;
+    my $class = caller();
     my $hash = { @arguments };
     $hash->{debug} = 0 if( !CORE::exists( $hash->{debug} ) );
     $hash->{no_filter} = 0 if( !CORE::exists( $hash->{no_filter} ) );
     $hash->{debug_code} = 0 if( !CORE::exists( $hash->{debug_code} ) );
+    # We check if we are running under tie and if so we cannot use Want features, 
+    # because they would trigger a segmentation fault.
+    $hash->{is_tied} = 0;
+    if( $class->can( 'TIESCALAR' ) || $class->can( 'TIEHASH' ) || $class->can( 'TIEARRAY' ) )
+    {
+        $hash->{is_tied} = 1;
+    }
+    *{"${class}::caller"} = \&{"Nice::Try::caller"};
     filter_add( bless( $hash => ( ref( $this ) || $this ) ) );
 }
 
 sub unimport
 {       
     filter_del();
+}
+
+sub caller(;$)
+{
+    my $n = shift( @_ );
+    my @info = defined( $n ) ? CORE::caller( int( $n ) + 2 ) : CORE::caller(3);
+    return( @info );
 }
 
 sub filter
@@ -343,7 +360,7 @@ sub _parse
     $self->_messagef( 3, "Results found increased from %d to %d results.", scalar( @$ref ), scalar( @$alt_ref ) );
     @$ref = @$alt_ref if( scalar( @$alt_ref ) > scalar( @$ref ) );
     
-    ## $self->_message( 3, "Script code is now:\n'$elem'" );
+    # $self->_message( 3, "Script code is now:\n'$elem'" );
     
     foreach my $this ( @$ref )
     {
@@ -577,35 +594,121 @@ EOT
             {
                 $try_def->{block} = $emb;
             }
-                        
+            
+            $self->_process_loop_breaks( $try_def->{block} );
+            
             ## my $try_block = $try_def->{block}->content;
             my $try_block = $self->_serialize( $try_def->{block} );
             $try_block =~ s/^\{[[:blank:]]*|[[:blank:]]*\}$//gs;
             
             my $try_sub = <<EOT;
+CORE::local \$Nice::Try::WANT;
 CORE::local \$Nice::Try::TRY = CORE::sub
 {
     CORE::do __TRY_OPEN_NL__{ __BLOCK_PLACEHOLDER__ };__TRY__CLOSE_NL__
     CORE::return( \$Nice::Try::SENTINEL );
 };
-CORE::local ( \$Nice::Try::EXCEPTION, \$Nice::Try::DIED, \@Nice::Try::RETVAL );
+CORE::local ( \$Nice::Try::EXCEPTION, \$Nice::Try::DIED, \@Nice::Try::RETVAL, \@Nice::Try::VOID );
 __FINALLY_BLOCK__ CORE::local \$Nice::Try::HAS_CATCH = $has_catch_clause;
 CORE::local \$Nice::Try::WANTARRAY = CORE::wantarray;
+EOT
+            if( !$self->{is_tied} )
+            {
+                $try_sub .= <<EOT;
+CORE::local \$Nice::Try::NOOP = sub
+{
+    my \$ref = CORE::shift( \@_ );
+    CORE::return(sub{ CORE::return( \$ref ) });
+};
+if( CORE::defined( \$Nice::Try::WANTARRAY ) )
+{
+    eval "\\\$Nice::Try::WANT = Want::want( 'LIST' )
+            ? 'LIST'
+            : Want::want( 'HASH' )
+                ? 'HASH'
+                : Want::want( 'ARRAY' )
+                    ? 'ARRAY'
+                    : Want::want( 'OBJECT' )
+                        ? 'OBJECT'
+                        : Want::want( 'CODE' )
+                            ? 'CODE'
+                            : Want::want( 'REFSCALAR' )
+                                ? 'REFSCALAR'
+                                : Want::want( 'BOOLEAN' )
+                                    ? 'BOOLEAN'
+                                    : Want::want( 'GLOB' )
+                                        ? 'GLOB'
+                                        : Want::want( 'SCALAR' )
+                                            ? 'SCALAR'
+                                            : Want::want( 'VOID' )
+                                                ? 'VOID'
+                                                : '';";
+    undef( \$Nice::Try::WANT ) if( \$\@ );
+}
+EOT
+            }
+            $try_sub .= <<EOT;
 {
     CORE::local \$\@;
     CORE::eval 
     {
-        if( \$Nice::Try::WANTARRAY ) 
+        if( CORE::defined( \$Nice::Try::WANT ) && CORE::length( \$Nice::Try::WANT ) )
         {
-            \@Nice::Try::RETVAL = &\$Nice::Try::TRY;
+            if( \$Nice::Try::WANT eq 'OBJECT' )
+            {
+                \$Nice::Try::RETVAL[0] = Nice::Try::ObjectContext->new( &\$Nice::Try::TRY )->callback();
+            }
+            elsif( \$Nice::Try::WANT eq 'CODE' )
+            {
+                \$Nice::Try::RETVAL[0] = \$Nice::Try::NOOP->( &\$Nice::Try::TRY )->();
+            }
+            elsif( \$Nice::Try::WANT eq 'HASH' )
+            {
+                \@Nice::Try::RETVAL = \%{ &\$Nice::Try::TRY };
+            }
+            elsif( \$Nice::Try::WANT eq 'ARRAY' )
+            {
+                \@Nice::Try::RETVAL = \@{ &\$Nice::Try::TRY };
+            }
+            elsif( \$Nice::Try::WANT eq 'REFSCALAR' )
+            {
+                \$Nice::Try::RETVAL[0] = \${&\$Nice::Try::TRY};
+            }
+            elsif( \$Nice::Try::WANT eq 'GLOB' )
+            {
+                \$Nice::Try::RETVAL[0] = \*{ &\$Nice::Try::TRY };
+            }
+            elsif( \$Nice::Try::WANT eq 'LIST' )
+            {
+                \@Nice::Try::RETVAL = &\$Nice::Try::TRY;
+            }
+            elsif( \$Nice::Try::WANT eq 'BOOLEAN' )
+            {
+                \$Nice::Try::RETVAL[0] = &\$Nice::Try::TRY ? 1 : 0;
+            }
+            elsif( \$Nice::Try::WANT eq 'VOID' )
+            {
+                \$Nice::Try::VOID[0] = &\$Nice::Try::TRY;
+            }
+            elsif( \$Nice::Try::WANT eq 'SCALAR' )
+            {
+                \$Nice::Try::RETVAL[0] = &\$Nice::Try::TRY;
+            }
         }
-        elsif( defined( \$Nice::Try::WANTARRAY ) ) 
+        else
         {
-            \$Nice::Try::RETVAL[0] = &\$Nice::Try::TRY;
-        }
-        else 
-        {
-            &\$Nice::Try::TRY;
+            if( \$Nice::Try::WANTARRAY ) 
+            {
+                \@Nice::Try::RETVAL = &\$Nice::Try::TRY;
+            }
+            elsif( defined( \$Nice::Try::WANTARRAY ) ) 
+            {
+                \$Nice::Try::RETVAL[0] = &\$Nice::Try::TRY;
+            }
+            else 
+            {
+                \@Nice::Try::VOID = &\$Nice::Try::TRY;
+            }
         }
     };
     \$Nice::Try::DIED = CORE::length( \$\@ ) ? 1 : 0;
@@ -724,6 +827,7 @@ EOT
                 }
                 ## $self->_message( 3, "\$i = $i, \$total_catch = $total_catch and cond = '$cond'" );
                 ## my $block = $cdef->{block}->content;
+                $self->_process_loop_breaks( $cdef->{block} );
                 my $block = $self->_serialize( $cdef->{block} );
                 $block =~ s/^\{[[:blank:]]*|[[:blank:]]*\}$//gs;
                 my $catch_section = '';
@@ -734,17 +838,63 @@ EOT
                 CORE::return \$Nice::Try::SENTINEL;
             };
             
-            if( \$Nice::Try::WANTARRAY ) 
+            if( CORE::defined( \$Nice::Try::WANT ) && CORE::length( \$Nice::Try::WANT ) )
             {
-                \@Nice::Try::RETVAL = \&\$Nice::Try::CATCH;
+                if( \$Nice::Try::WANT eq 'OBJECT' )
+                {
+                    \$Nice::Try::RETVAL[0] = Nice::Try::ObjectContext->new( \&\$Nice::Try::CATCH )->callback();
+                }
+                elsif( \$Nice::Try::WANT eq 'CODE' )
+                {
+                    \$Nice::Try::RETVAL[0] = \$Nice::Try::NOOP->( \&\$Nice::Try::CATCH )->();
+                }
+                elsif( \$Nice::Try::WANT eq 'HASH' )
+                {
+                    \@Nice::Try::RETVAL = \%{ \&\$Nice::Try::CATCH };
+                }
+                elsif( \$Nice::Try::WANT eq 'ARRAY' )
+                {
+                    \@Nice::Try::RETVAL = \@{ \&\$Nice::Try::CATCH };
+                }
+                elsif( \$Nice::Try::WANT eq 'REFSCALAR' )
+                {
+                    \$Nice::Try::RETVAL[0] = \${\&\$Nice::Try::CATCH};
+                }
+                elsif( \$Nice::Try::WANT eq 'GLOB' )
+                {
+                    \$Nice::Try::RETVAL[0] = \*{ \&\$Nice::Try::CATCH };
+                }
+                elsif( \$Nice::Try::WANT eq 'LIST' )
+                {
+                    \@Nice::Try::RETVAL = \&\$Nice::Try::CATCH;
+                }
+                elsif( \$Nice::Try::WANT eq 'BOOLEAN' )
+                {
+                    \$Nice::Try::RETVAL[0] = \&\$Nice::Try::CATCH ? 1 : 0;
+                }
+                elsif( \$Nice::Try::WANT eq 'VOID' )
+                {
+                    \$Nice::Try::VOID[0] = \&\$Nice::Try::CATCH;
+                }
+                elsif( \$Nice::Try::WANT eq 'SCALAR' )
+                {
+                    \$Nice::Try::RETVAL[0] = \&\$Nice::Try::CATCH;
+                }
             }
-            elsif( defined( \$Nice::Try::WANTARRAY ) )
+            else
             {
-                \$Nice::Try::RETVAL[0] = \&\$Nice::Try::CATCH;
-            } 
-            else 
-            {
-                \&\$Nice::Try::CATCH;
+                if( \$Nice::Try::WANTARRAY ) 
+                {
+                    \@Nice::Try::RETVAL = \&\$Nice::Try::CATCH;
+                }
+                elsif( defined( \$Nice::Try::WANTARRAY ) )
+                {
+                    \$Nice::Try::RETVAL[0] = \&\$Nice::Try::CATCH;
+                } 
+                else 
+                {
+                    \@Nice::Try::VOID = \&\$Nice::Try::CATCH;
+                }
             }
 EOT
                 if( $cdef->{var} )
@@ -882,13 +1032,122 @@ if( CORE::defined( \$Nice::Try::WANTARRAY ) and
       ( Scalar::Util::blessed( \$Nice::Try::RETVAL[0] ) && !\$Nice::Try::RETVAL[0]->isa( 'Nice::Try::SENTINEL' ) ) 
     ) ) 
 {
-    CORE::return( \$Nice::Try::WANTARRAY ? \@Nice::Try::RETVAL : \$Nice::Try::RETVAL[0] );
+    if( \$Nice::Try::RETVAL[0] eq '__NEXT__' )
+    {
+        \$Nice::Try::BREAK = 'next';
+    }
+    elsif( \$Nice::Try::RETVAL[0] eq '__LAST__' )
+    {
+        \$Nice::Try::BREAK = 'last';
+    }
+    elsif( \$Nice::Try::RETVAL[0] eq '__REDO__' )
+    {
+        \$Nice::Try::BREAK = 'redo';
+    }
+    elsif( CORE::defined( \$Nice::Try::WANT ) && CORE::length( \$Nice::Try::WANT ) )
+    {
+        if( \$Nice::Try::WANT eq 'LIST' )
+        {
+            CORE::return( \@Nice::Try::RETVAL );
+        }
+        elsif( \$Nice::Try::WANT eq 'VOID' )
+        {
+            if( \$Nice::Try::RETVAL[0] eq '__NEXT__' )
+            {
+                \$Nice::Try::BREAK = 'next';
+            }
+            elsif( \$Nice::Try::RETVAL[0] eq '__LAST__' )
+            {
+                \$Nice::Try::BREAK = 'last';
+            }
+            elsif( \$Nice::Try::RETVAL[0] eq '__REDO__' )
+            {
+                \$Nice::Try::BREAK = 'redo';
+            }
+        }
+        elsif( \$Nice::Try::WANT eq 'OBJECT' )
+        {
+            CORE::return( \$Nice::Try::RETVAL[0] );
+        }
+        elsif( \$Nice::Try::WANT eq 'REFSCALAR' )
+        {
+            CORE::return( \\\$Nice::Try::RETVAL[0] );
+        }
+        elsif( \$Nice::Try::WANT eq 'SCALAR' )
+        {
+            CORE::return( \$Nice::Try::RETVAL[0] );
+        }
+        elsif( \$Nice::Try::WANT eq 'BOOLEAN' )
+        {
+            CORE::return( \$Nice::Try::RETVAL[0] );
+        }
+        elsif( \$Nice::Try::WANT eq 'CODE' )
+        {
+            CORE::return( \$Nice::Try::RETVAL[0] );
+        }
+        elsif( \$Nice::Try::WANT eq 'HASH' )
+        {
+            CORE::return( { \@Nice::Try::RETVAL } );
+        }
+        elsif( \$Nice::Try::WANT eq 'ARRAY' )
+        {
+            CORE::return( \\\@Nice::Try::RETVAL );
+        }
+        elsif( \$Nice::Try::WANT eq 'GLOB' )
+        {
+            CORE::return( \$Nice::Try::RETVAL[0] );
+        }
+    }
+    else
+    {
+        CORE::return( \$Nice::Try::WANTARRAY ? \@Nice::Try::RETVAL : \$Nice::Try::RETVAL[0] );
+    }
+}
+elsif( scalar( \@Nice::Try::VOID ) )
+{
+    if( \$Nice::Try::VOID[0] eq '__NEXT__' )
+    {
+        \$Nice::Try::BREAK = 'next';
+    }
+    elsif( \$Nice::Try::VOID[0] eq '__LAST__' )
+    {
+        \$Nice::Try::BREAK = 'last';
+    }
+    elsif( \$Nice::Try::VOID[0] eq '__REDO__' )
+    {
+        \$Nice::Try::BREAK = 'redo';
+    }
 }
 EOT
         $last_return_block =~ s/\n/ /gs unless( $self->{debug_code} );
         push( @$repl, $last_return_block );
         my $try_catch_code = join( '', @$repl );
-        my $token = PPI::Token->new( "; \{ $try_catch_code \}" ) || die( "Unable to create token" );
+        # my $token = PPI::Token->new( "; \{ $try_catch_code \}" ) || die( "Unable to create token" );
+        # XXX 2021-05-11 (Jacques): Need to remove blocks so that next or last statements can be effective.
+        my $envelop = <<EOT;
+; CORE::local \$Nice::Try::BREAK;
+\{
+__TRY_CATCH_CODE__
+\}
+if( \$Nice::Try::BREAK )
+{
+    if( \$Nice::Try::BREAK eq 'next' )
+    {
+        CORE::next;
+    }
+    elsif( \$Nice::Try::BREAK eq 'last' )
+    {
+        CORE::last;
+    }
+    elsif( \$Nice::Try::BREAK eq 'redo' )
+    {
+        CORE::redo;
+    }
+}
+EOT
+        $envelop =~ s/\n/ /gs unless( $self->{debug_code} );
+        $envelop =~ s/__TRY_CATCH_CODE__/$try_catch_code/;
+        my $token = PPI::Token->new( $envelop ) || die( "Unable to create token" );
         $token->set_class( 'Structure' );
         ## $self->_messagef( 3, "Token is '$token' and of class '%s' and inherit from PPI::Token? %s", $token->class, ($token->isa( 'PPI::Token' ) ? 'yes' : 'no' ) );
         my $struct = PPI::Structure->new( $token ) || die( "Unable to create PPI::Structure element" );
@@ -914,6 +1173,81 @@ EOT
     ## End foreach catch found
     
     ## $self->_message( 3, "\n\nResulting code is\n", $elem->content );
+    return( $elem );
+}
+
+sub _process_loop_breaks
+{
+    my $self = shift( @_ );
+	my $elem = shift( @_ ) || return( '' );
+    return( $elem ) if( !$elem->children );
+    $self->_messagef( 5, "Checking %d elements for '$elem'", scalar( $elem->elements ) );
+    foreach my $e ( $elem->elements )
+    {
+        $self->_messagef( 6, "Checking element: [%d] class %s with %d children and value '%s'\n", $e->line_number, $e->class, ( $e->can('elements') ? scalar( $e->elements ) : 0 ), $e->content );
+        my $class = $e->class;
+        # We found a for, foreach or while loops and we skip, because if there are any break words (next, last, redo) inside, it is not our problem.
+        if( $class eq 'PPI::Structure::For' ||
+            ( $class eq 'PPI::Statement::Compound' && $e->first_element->content =~ /^(foreach|while)$/ ) )
+        {
+            # $self->_message( 6, "Skipping it. Its first word was '", $e->first_element->content, "'" );
+            next;
+        }
+        elsif( $class eq 'PPI::Statement::Break' )
+        {
+            my $words = $e->find( 'PPI::Token::Word' );
+            $self->_messagef( 5, "Found %d word elements inside break element.", scalar( @$words ) );
+            $self->_message( 5, "Word 1 -> ", $words->[0]->content );
+            $self->_message( 5, "Word 2 -> ", $words->[1]->content ) if( scalar( @$words ) > 1 );
+            # $self->_browse( $e );
+            # If we found a break word without a label, i.e. next, last, redo, 
+            # we replace it with a special return statement
+            if( ( scalar( @$words ) == 1 ||
+                  ( scalar( @$words ) > 1 && $words->[1]->content =~ /^(for|foreach|given|if|unless|until|while)$/ )
+                ) && 
+                ( $words->[0]->content eq 'next' ||
+                  $words->[0]->content eq 'last' ||
+                  $words->[0]->content eq 'redo' ) )
+            {
+                # We add our special return value. Notice that we use 'return' and not 
+                # 'CORE::return'. See below why.
+                my $break_code = qq{return( '__} . uc( $words->[0]->content ) . qq{__' )};
+                # e.g. next if( $i == 2 );
+                # next and if are both treated as 'word' by PPI
+                if( scalar( @$words ) > 1 )
+                {
+                    ( my $ct = $e->content ) =~ s/^(next|last|redo)//;
+                    $break_code .= $ct;
+                }
+                else
+                {
+                    $break_code .= ';'
+                }
+                $self->_message( 5, "Replacing this node with: $break_code" );
+                my $break_doc = PPI::Document->new( \$break_code, readonly => 1 );
+                my $new_elem = $break_doc->first_element;
+                # $self->_browse( $new_elem );
+                $new_elem->remove;
+                $self->_message( 5, "New element is object '", sub{ overload::StrVal( $new_elem ) }, "' -> $new_elem" );
+                # Not yet implemented as of 2021-05-11 dixit PPI, so we use a hack to make it available anyhow
+                $e->replace( $new_elem );
+                # 2021-05-12 (Jacques): I have to do this workaround, because weirdly enough
+                # PPI (at least with PPI::Node version 1.270) will refuse to add our element
+                # if the 'return' word is 'CORE::return' so, we add it without and change it after
+                $new_elem->first_element->set_content( 'CORE::return' );
+                # $self->_message( 5, "return litteral value is: ", $new_elem->first_element->content );
+            }
+            next;
+        }
+        
+        if( $e->can('elements') && $e->elements )
+        {
+            $self->_process_loop_breaks( $e );
+        }
+    }
+    # $self->_message( 5, "Element now is: '", sub{ $elem->content }, "'" );
+    $self->_message( 5, "Element now is: '$elem'" );
+    # $self->_browse( $elem );
     return( $elem );
 }
 
@@ -1051,8 +1385,8 @@ sub _serialize
 
 
 {
-  package # hide from PAUSE
-    Nice::Try::ScopeGuard;
+    package # hide from PAUSE
+        Nice::Try::ScopeGuard;
 
     # older versions of perl have an issue with $@ during global destruction
     use constant UNSTABLE_DOLLARAT => ("$]" < '5.013002') ? 1 : 0;
@@ -1092,6 +1426,41 @@ sub _serialize
     }
 }
 
+{
+    package
+        Nice::Try::ObjectContext;
+
+    sub new
+    {
+        my $that = shift( @_ );
+        # print( STDERR "Got here in Nice::Try::ObjectContext->new with args '", join( "', '", @_ ), "'\n" );
+        return( bless( { val => [@_] } => ( ref( $that ) || $that ) ) );
+    }
+
+    sub callback
+    {
+        my $self = shift( @_ );
+        # print( STDERR "Got here in Nice::Try::ObjectContext->dummy with args '", join( "', '", @_ ), "'\n" );
+        return( $self->{val}->[0] );
+    }
+}
+
+{
+    package
+        PPI::Element;
+    
+    no warnings 'redefine';
+    sub replace {
+        my $self    = ref $_[0] ? shift : return undef;
+        # If our object and the other are not of the same class, PPI refuses to replace 
+        # to avoid damages to perl code
+        my $other = _INSTANCE(shift, ref $self) or return undef;
+        # die "The ->replace method has not yet been implemented";
+        $self->parent->__replace_child( $self, $other );
+        1;
+    }
+}
+
 1;
 
 __END__
@@ -1119,7 +1488,7 @@ Nice::Try - A real Try Catch Block Implementation Using Perl Filter
     }
     # Some comment
     catch( Exception $e ) {
-        return( "Caught an exception \$e" );
+        return( "Caught an exception $e" );
     }
     # More comment with space too
 
@@ -1141,9 +1510,73 @@ When run, this would produce, as one would expect:
     Cleaning up
     Ok, then
 
+Also since version 1.0.0, L<Nice::Try> is context aware:
+
+    use Want; # an awesome module which extends wantarray
+    sub info
+    {
+        my $self = shift( @_ );
+        try
+        {
+            # Do something
+            if( want('OBJECT') )
+            {
+                return( $self );
+            }
+            elsif( want('CODE') )
+            {
+                # dummy code ref for example
+                return( sub{ return( $name ); } );
+            }
+            elsif( want('LIST') )
+            {
+                return( @some_data );
+            }
+            elsif( want('ARRAY') )
+            {
+                return( \@some_data );
+            }
+            elsif( want('HASH') )
+            {
+                return({ name => $name, location => $city });
+            }
+            elsif( want('REFSCALAR') )
+            {
+                return( \$name );
+            }
+            elsif( want('SCALAR' ) )
+            {
+                return( $name ); # regular string
+            }
+            elsif( want('VOID') )
+            {
+                return;
+            }
+        }
+        catch( $e )
+        {
+            $Logger->( "Caught exception: $e" );
+        }
+    }
+
+    # regular string context
+    my $name = $o->info;
+    # code context
+    my $name = $o->info->();
+    # list context like wantarray
+    my @data = $o->info;
+    # hash context
+    my $name = $o->info->{name};
+    # array context
+    my $name = $o->info->[2];
+    # object context
+    my $name = $o->info->another_method;
+    # scalar reference context
+    my $name = ${$o->info};
+
 =head1 VERSION
 
-    v0.1.11
+    v1.0.0
 
 =head1 DESCRIPTION
 
@@ -1242,6 +1675,76 @@ Would produce:
     I am trying my best Jacques!
     Failed: But I failed
 
+=item * C<try> or C<catch> blocks can contain flow control keywords such as C<next>, C<last> and C<redo>
+
+    while( defined( my $product = $items->[++$i] ) )
+    {
+        try
+        {
+            # Do something
+            last if( !$product->active );
+        }
+        catch( $oops )
+        {
+            $log->( "Error: $oops" );
+            last;
+        }
+    }
+    continue
+    {
+        try
+        {
+            if( $product->region eq 'Asia' )
+            {
+                push( @asia, $product );
+            }
+            else
+            {
+                next;
+            }
+        }
+        catch( $e )
+        {
+            $log->( "An unexpected error has occurred. Is $product an object? $e" );
+            last;
+        }
+    }
+
+=item * Can be used with or without a C<catch> block
+
+=item * Supports a C<finally> block called in void context for cleanup for example
+
+=item * L<Nice::Try> is rich context aware, which means it can provide you with a super granual context on how to return data back to the caller based on the caller's expectation, by using a module like L<Want>.
+
+=item * Call to L<perlfunc/caller> will return the correct entry in call stack
+
+    #!/usr/bin/perl
+    BEGIN
+    {
+        use strict;
+        use warnings;
+        use Nice::Try;
+    };
+
+    {
+        &callme();
+    }
+
+    sub callme
+    {
+        try
+        {
+            my @info = caller(1); # or my @info = caller;
+            print( "Called from package $info[0] in file $info[1] at line $info[2]\n" );
+        }
+        catch( $e )
+        {
+            print( "Got an error: $e\n" );
+        }
+    }
+
+WIll yield: C<Called from package main in file ./test.pl at line 10>
+
 =back
 
 =head1 WHY USE IT?
@@ -1264,7 +1767,7 @@ For example L<TryCatch>
 
 =item 4 Others
 
-For example L<Syntax::Keyword::Try> and now perl with L<version 5.33 using experimental feature|https://perldoc.perl.org/blead/perlsyn#Try-Catch-Exception-Handling>.
+For example L<Syntax::Keyword::Try> and now perl with L<version 5.33.7 using experimental feature|https://perldoc.perl.org/blead/perlsyn#Try-Catch-Exception-Handling>.
 
 =back
 
@@ -1322,9 +1825,48 @@ will produces:
 
 In group 3, L<TryCatch> was working wonderfully, but was relying on L<Devel::Declare> which was doing some esoteric stuff and eventually the version 0.006020 broke L<TryCatch> and there seems to be no intention of correcting this breaking change.
 
-In group 4, there is L<Syntax::Keyword::Try>, which is a great alternative if you do not care about exception variable assignment or exception class filter. You can only use C<$@>
+In group 4, there is L<Syntax::Keyword::Try>, which is a great alternative if you do not care about exception class filter (it supports variable assignment since 2020-08-01 with version 0.18).
 
-Since L<perl version 5.33|https://perldoc.perl.org/blead/perlsyn#Try-Catch-Exception-Handling> you can use the try-catch block using an experimental feature which may be removed in future versions, by writing:
+Although, the following script would not work under L<Syntax::Keyword::Try> :
+
+    BEGIN
+    {
+        use strict;
+        use warnings;
+        use Syntax::Keyword::Try;
+    };
+
+    {
+        &callme();
+    }
+
+    sub callme
+    {
+        try {
+            print( "Hello there\n" );
+        }
+        catch ($e) {
+            print( "Got an error: $e\n" );
+        }
+    }
+
+This will trigger the following error:
+
+    syntax error at ./test.pl line 18, near ") {"
+    syntax error at ./test.pl line 21, near "}"
+    Execution of ./test.pl aborted due to compilation errors.
+
+That is because L<Syntax::Keyword::Try> expects to be C<used> outside of a BEGIN block like this:
+
+    use strict;
+    use warnings;
+    use Syntax::Keyword::Try;
+
+    # Rest of the script, same as above
+
+Of course, with L<Nice::Try>, there is no such constraint. You can L<perlfunc/use> L<Nice::Try> inside or outside of a C<BEGIN> block indistinctively.
+
+Since L<perl version 5.33.7|https://perldoc.perl.org/blead/perlsyn#Try-Catch-Exception-Handling> you can use the try-catch block using an experimental feature which may be removed in future versions, by writing:
 
     use feature 'try'; # will emit a warning this is experimental
 
@@ -1351,7 +1893,7 @@ But B<you cannot do>:
     {
         return( $self->error( "Something went awry with MyException: $oh_well" ) );
     }
-    # No support for 'finally' yet in perl 5.34
+    # No support for 'finally' yet in perl version 5.33.7
     finally
     {
         # do some cleanup here
@@ -1388,6 +1930,21 @@ However, because this is designed for clean-up, it is called in void context, so
 =head1 CATCHING OR NOT CATCHING?
 
 L<Nice::Try> can be used with a single C<try> block which will, in effect, behaves like an eval and the special variable C<$@> will be available as always.
+
+    try
+    {
+        die( "Oh no, something went wrong!\n" );
+    }
+    print( "Got here with $@\n" );
+
+or even:
+
+    try
+    {
+        die( "Oh no, something went wrong!\n" );
+    }
+    catch( $e ); # Not very meaningful, but it will work
+    print( "Got here with $@\n" );
 
 However, if you decide to catch class exceptions, make sure to add a default C<catch( $e )>. For example:
 
@@ -1448,6 +2005,203 @@ Since, try-catch block can be nested, the following would work too:
         # do something about it
     }
 
+=head1 LOOPS
+
+Since version v0.2.0 L<Nice::Try> supports the use of flow control keywords such as C<next>, C<last> and C<redo> inside try-catch blocks. For example:
+
+    my @names = qw( John Jack Peter Paul Mark );
+    for( $i..$#names )
+    {
+        try
+        {
+            next if( $i == 2 );
+            # some more code...
+        }
+        catch( $e )
+        {
+            print( "Got exception: $e\n" );
+        }
+    }
+
+It also works inside the catch block or inside the C<continue> block:
+
+    while( defined( my $product = $items->[++$i] ) )
+    {
+        # Do something
+    }
+    continue
+    {
+        try
+        {
+            if( $product->region eq 'Asia' )
+            {
+                push( @asia, $product );
+            }
+            else
+            {
+                next;
+            }
+        }
+        catch( $e )
+        {
+            $log->( "An unexpected error has occurred. Is $product an object? $e" );
+            last;
+        }
+    }
+
+Control flow with labels also work
+
+    ELEM: foreach my $n ( @names )
+    {
+        try
+        {
+            $n->moveAfter( $this );
+            next ELEM if( $n->value == 1234567 );
+        }
+        catch( $oops )
+        {
+            last ELEM;
+        }
+    }
+
+However, if you enclose a try-catch block inside another block, use of C<next>, C<last> or C<redo> will silently not work. This is due to perl control flow. See L<perlsyn> for more information on this. For example, the following would not yield the desired outcome:
+
+    ELEM: foreach my $n ( @names )
+    {
+        { # <--- Here is the culprit
+            try
+            {
+                $n->moveAfter( $this );
+                # This next statement will not do anything.
+                next ELEM if( $n->value == 1234567 );
+            }
+            catch( $oops )
+            {
+                # Neither would this one.
+                last ELEM;
+            }
+        }
+    }
+
+=head1 CONTEXT AWARENESS
+
+L<Nice::Try> provides a high level of granularity about the context in which your subroutine was called.
+
+Normally, you would write something like this, and it works as always:
+
+    sub info
+    {
+        try
+        {
+            # do something here
+            if( wantarray() )
+            {
+                return( @list_of_values );
+            }
+            # caller just want a scalar
+            elsif( defined( wantarray() ) )
+            {
+                return( $name );
+            }
+            # otherwise if undefined, it means we are called in void context, like:
+            # $o->info; with no expectation of return value
+        }
+        catch( $e )
+        {
+            print( "Caught an error: $e\n" );
+        }
+    }
+
+THe above is nice, but how do you differentiate cases were your caller wants a simple returned value and the one where the caller wants an object for chaining purpose, or if the caller wants an hash or array reference in return?
+
+For example:
+
+    my $val = $o->info->[2]; # wants an array reference
+    my $val = $o->info->{name} # wants an hash reference
+    # etc...
+
+Now, you can do the following:
+
+    use Want; # an awesome module which extends wantarray
+    sub info
+    {
+        my $self = shift( @_ );
+        try
+        {
+            # Do something
+            # 
+            # same as wantarray() == 1
+            if( want('LIST') )
+            {
+                return( @some_data );
+            }
+            # same as: if( defined( wantarray() ) && !wantarray() )
+            elsif( want('SCALAR' ) )
+            {
+                return( $name ); # regular string
+            }
+            # same as !defined( wantarray() )
+            elsif( want('VOID') )
+            {
+                return;
+            }
+            # For the other context below, wantarray is of no help
+            if( want('OBJECT') )
+            {
+                return( $obj ); # useful for chaining
+            }
+            elsif( want('CODE') )
+            {
+                # dummy code ref for example
+                return( sub{ return( $name ); } );
+            }
+            elsif( want('ARRAY') )
+            {
+                return( \@some_data );
+            }
+            elsif( want('HASH') )
+            {
+                return({ name => $name, location => $city });
+            }
+        }
+        catch( $e )
+        {
+            $Logger->( "Caught exception: $e" );
+        }
+    }
+
+Thus this is particularly useful if, for example, you want to differentiate if the caller just wants a return string, or an object for chaining.
+
+L<perlfunc/wantarray> would not know the difference, and other try-catch implementation would not let you benefit from using L<Want>.
+
+For example:
+
+    my $val = $o->info; # simple regular scalar context; but...
+    # here, we are called in object context and wantarray is of no help to tell the difference
+    my $val = $o->info->another_method;
+
+Other cases are:
+
+    # regular string context
+    my $name = $o->info;
+    # list context like wantarray
+    my @data = $o->info;
+
+    # code context
+    my $name = $o->info->();
+    # hash context
+    my $name = $o->info->{name};
+    # array context
+    my $name = $o->info->[2];
+    # object context
+    my $name = $o->info->another_method;
+
+See L<Want> for more information on how you can benefit from it.
+
+Currently lvalues are no implemented and will be in future releases.
+
+Also, for this rich context awareness to be used, obviously try-catch would need to be inside a subroutine, otherwise there is no rich context other than the one the regular L<perlfunc/wantarray> provides.
+
 =head1 DEBUGGING
 
 And to have L<Nice::Try> save the filtered code to a file, pass it the C<debug_file> parameter like this:
@@ -1480,7 +2234,7 @@ Jacques Deguest E<lt>F<jack@deguest.jp>E<gt>
 
 =head1 SEE ALSO
 
-L<PPI>, L<Filter::Util::Call>, L<Try::Harder>, L<Syntax::Keyword::Try>
+L<PPI>, L<Filter::Util::Call>, L<Try::Harder>, L<Syntax::Keyword::Try>, L<Exception::Class>
 
 =head1 COPYRIGHT & LICENSE
 

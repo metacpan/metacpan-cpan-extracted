@@ -1,5 +1,4 @@
-Audio-StreamGenerator-0.02.tar.gz
-Audio-StreamGenerator-0.04.tar.gz
+.editorconfig
 lib/Audio/StreamGenerator.pm
 LICENSE
 Makefile.PL

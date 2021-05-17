@@ -1,5 +1,14 @@
 Revision history for Perl extension Getopt-EX
 
+v1.23.2 2021-05-17T14:53:12Z
+
+    - Stop to use Unicode name.
+
+v1.23.1 2021-05-14T09:31:27Z
+
+    - Modify greyscale mapping strategy.
+    - Implement colortable{6,12,24} functions.
+
 v1.23.0 2021-04-22T16:48:43Z
 
     - Support some other escape sequences.

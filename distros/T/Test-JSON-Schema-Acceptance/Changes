@@ -1,5 +1,11 @@
 Revision history for Test-JSON-Schema-Acceptance
 
+1.008     2021-05-15 18:03:12Z
+        - clean up the results output when printing a custom test_dir
+        - new optional config value "test_schemas", to perform a sanity test
+          on the test schemas themselves
+        - updated test suite to commit bf383b4cf2a0b83957b232d3ba5a92222f632a08
+
 1.007     2021-04-14 00:17:32Z
         - new "results_text" attribute, containing the textual table printed
           at the end of the tests

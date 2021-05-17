@@ -2,7 +2,7 @@ package CodeGen::Protection;
 
 # ABSTRACT: Safely rewrite parts of generated code
 
-use v5.10.0;    # for named captures in regexes
+use v5.08.0;
 use strict;
 use warnings;
 use base 'Exporter';
@@ -15,26 +15,29 @@ use CodeGen::Protection::Types qw(
   Optional
 );
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 our @EXPORT_OK = qw(
   create_protected_code
   rewrite_code
 );
 our %EXPORT_TAGS = ( all => \@EXPORT_OK );
 
-sub create_protected_code {
-    state $check = compile_named(
+{
+    my $check = compile_named(
         type           => NonEmptyStr,
         protected_code => NonEmptyStr,
         tidy           => Optional [Bool],
         name           => Optional [NonEmptyStr],
         overwrite      => Optional [Bool],
     );
-    return _rewritten( $check->(@_) );
+
+    sub create_protected_code {
+        return _rewritten( $check->(@_) );
+    }
 }
 
-sub rewrite_code {
-    state $check = compile_named(
+{
+    my $check = compile_named(
         type           => NonEmptyStr,
         protected_code => NonEmptyStr,
         existing_code  => NonEmptyStr,
@@ -42,7 +45,10 @@ sub rewrite_code {
         name           => Optional [NonEmptyStr],
         overwrite      => Optional [Bool],
     );
-    return _rewritten( $check->(@_) );
+
+    sub rewrite_code {
+        return _rewritten( $check->(@_) );
+    }
 }
 
 sub _rewritten {
@@ -73,7 +79,7 @@ CodeGen::Protection - Safely rewrite parts of generated code
 
 =head1 VERSION
 
-version 0.05
+version 0.06
 
 =head1 SYNOPSIS
 
@@ -96,7 +102,8 @@ version 0.05
 
 =head1 DESCRIPTION
 
-If you might find the L<Tutorial|CodeGen::Protection::Tutorial> to be useful.
+If this is hard to follow, you might find the
+L<Tutorial|CodeGen::Protection::Tutorial> useful.
 
 Code that writes code can be a powerful tool, especially when you need to
 generate lots of boilerplate. However, when a developer takes the generated

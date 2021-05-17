@@ -18,9 +18,9 @@ namespace detail {
     template <typename T> inline panda::enable_if_unsigned_integral_t<T> _getrawnum (const SV* sv) { return SvUVX(sv); }
     template <typename T> inline panda::enable_if_floatp_t<T>            _getrawnum (const SV* sv) { return SvNVX(sv); }
 
-    template <typename T> inline panda::enable_if_signed_integral_t<T>   _getnum (SV* sv) { return SvIV_nomg(sv); }
-    template <typename T> inline panda::enable_if_unsigned_integral_t<T> _getnum (SV* sv) { return SvUV_nomg(sv); }
-    template <typename T> inline panda::enable_if_floatp_t<T>            _getnum (SV* sv) { return SvNV_nomg(sv); }
+    template <typename T> inline panda::enable_if_signed_integral_t<T>   _getnum (SV* sv) { return SvIV(sv); }
+    template <typename T> inline panda::enable_if_unsigned_integral_t<T> _getnum (SV* sv) { return SvUV(sv); }
+    template <typename T> inline panda::enable_if_floatp_t<T>            _getnum (SV* sv) { return SvNV(sv); }
 
     template <typename T> inline void _setrawnum (SV* sv, T val, panda::enable_if_signed_integral_t<T>*   = nullptr) { SvIV_set(sv, val); }
     template <typename T> inline void _setrawnum (SV* sv, T val, panda::enable_if_unsigned_integral_t<T>* = nullptr) { SvUV_set(sv, val); }
@@ -142,7 +142,7 @@ struct Simple : Scalar {
     template <class T, typename = panda::enable_if_arithmetic_t<T>>
     operator T () const { return sv ? detail::_getnum<T>(sv) : T(); }
 
-    const char* c_str () const { return sv ? SvPV_nomg_const_nolen(sv) : NULL; }
+    const char* c_str () const { return sv ? SvPV_nolen_const(sv) : NULL; }
 
     operator panda::string_view () const { return as_string<panda::string_view>(); }
 
@@ -156,7 +156,7 @@ struct Simple : Scalar {
     T as_string () const {
         if (!sv) return T();
         STRLEN len;
-        const char* buf = SvPV_nomg(sv, len);
+        const char* buf = SvPV_const(sv, len);
         return T(buf, len);
     }
 
@@ -189,12 +189,11 @@ struct Simple : Scalar {
     static void __at_perl_destroy ();
 
 private:
+    void _validate_rest();
+
     void _validate () {
-        if (!sv) return;
-        if (SvTYPE(sv) > SVt_PVMG || SvROK(sv)) {
-            reset();
-            throw std::invalid_argument("SV is not a number or string");
-        }
+        if (!sv || (SvTYPE(sv) <= SVt_PVMG && !SvROK(sv))) return;
+        _validate_rest();
     }
 };
 

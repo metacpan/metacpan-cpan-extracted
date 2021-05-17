@@ -9,13 +9,16 @@ use Object::Pad;
 
 role Example { }
 
-is( Example->META->name, "Example", 'META->name' );
-ok(  Example->META->is_role, 'META->is_role true' );
-ok( !Example->META->is_class, 'META->is_class false' );
+my $meta = Object::Pad::MOP::Class->for_class( "Example" );
+
+is( $meta->name, "Example", '$meta->name' );
+ok(  $meta->is_role, '$meta->is_role true' );
+ok( !$meta->is_class, '$meta->is_class false' );
 
 class Implementor implements Example {}
 
-is_deeply( [ Implementor->META->roles ], [ Example->META ],
-   'META->roles on implementing class' );
+is_deeply( [ Object::Pad::MOP::Class->for_class( "Implementor" )->roles ],
+   [ $meta ],
+   '$meta->roles on implementing class' );
 
 done_testing;

@@ -216,7 +216,7 @@ sub _parse {
 
 		return $text;
 	} else {
-		carp "e:$Source - Failed to identify lyrics on result page.";
+		carp($self->{'Error'} = "e:$Source - Failed to identify lyrics on result page.");
 		return '';
 	}
 } # end of sub parse

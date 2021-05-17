@@ -1,6 +1,5 @@
 use Mojo::Feed;
 use Test::More;
-use Test::Deep;
 use FindBin;
 use Mojo::File qw(path);
 use Storable qw(dclone);
@@ -17,7 +16,6 @@ my $hash_expected = {
             author => 'Melody',
             content => '<p>Hello!</p>',
             description => 'Hello again!...',
-            guid => ignore(),
             id => 'http://localhost/weblog/2004/05/entry_three.html',
             link => 'http://localhost/weblog/2004/05/entry_three.html',
             published => '1085902785',
@@ -28,7 +26,6 @@ my $hash_expected = {
             author => 'Melody',
             content => '<p>Hello!</p>',
             description => 'Hello!...',
-            guid => ignore(),
             id => 'http://localhost/weblog/2004/05/entry_two.html',
             link => 'http://localhost/weblog/2004/05/entry_two.html',
             published => '1085902765',
@@ -41,7 +38,6 @@ my $hash_expected = {
 
 <p>Why don\'t you come down to our place for a coffee and a <strong>chat</strong>?</p>',
             description => 'This is a test. Why don\'t you come down to our place for a coffee and a chat?...',
-            guid => ignore(),
             id => 'http://localhost/weblog/2004/05/test.html',
             link => 'http://localhost/weblog/2004/05/test.html',
             published => '1084086208',
@@ -63,7 +59,7 @@ subtest('Hash Structure', sub {
           or fail "parse feed ($file) returned undef", next;
       is $feed->feed_type, $feed_type_expected;
       my $hash_got = $feed->to_hash;
-      cmp_deeply $hash_got, $hash_expected, $file
+      is_deeply $hash_got, $hash_expected, $file
           or diag explain $hash_got;
   }
 }
@@ -85,11 +81,37 @@ subtest('Mutating', sub {
       $feed->items->[1]{'author'} = 'Melody';
       $feed->items->[0]{'published'} = 1085902866;
       my $hash_got = $feed->to_hash;
-      cmp_deeply $hash_got, $changed_hash, $file
+      is_deeply $hash_got, $changed_hash, $file
           or diag explain $hash_got;
   }
-
 });
 
+# This is the real test we want to write:
+subtest('Mutating and serializing', sub {
+  for my $file (sort keys %Hashes) {
+      my $path = path( $FindBin::Bin, 'samples', $file );
+      my $feed = Mojo::Feed->new(file => $path)
+          or fail "parse feed ($file) returned undef", next;
+# Now, mutate:
+      $feed->title(q{Melody's Blog});
+      $feed->items->[1]{'author'} = 'Melody';
+      $feed->items->[0]{'published'} = 1085902866;
+      my $feed2 = Mojo::Feed->new(body => "$feed");
+      is $feed2->title, $feed->title, $file . ' - change feed title';
+      is $feed2->items->[1]->author, $feed->items->[1]->author, $file . ' - change second item author';
+      is $feed2->items->[0]->published, $feed->items->[0]->published, $file . ' - change first item published time';
+  }
+});
+
+subtest('Filter Items', sub {
+  my $path = path( $FindBin::Bin, 'samples', 'atom.xml' );
+  my $feed = Mojo::Feed->new(file => $path);
+  is $feed->items->size, 2, 'first feed has 2 items';
+  # filter only items that are about sports:
+  $feed->set_items($feed->items->grep(sub { $_->tags->first(qr/sport/i) }));
+  my $feed2 = Mojo::Feed->new(body => "$feed");
+  is $feed2->items->size, 1, 'new feed has only one item';
+  is_deeply $feed2->items->map('tags')->map('to_array'), [ ['Sports'] ];
+});
 
 done_testing();

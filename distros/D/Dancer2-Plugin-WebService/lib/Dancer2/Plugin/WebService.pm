@@ -5,7 +5,7 @@
 # Joan Ntzougani, ✞
 
 package Dancer2::Plugin::WebService;
-our	$VERSION = '4.4.1';
+our	$VERSION = '4.4.2';
 use	strict;
 use	warnings;
 use Encode;
@@ -760,7 +760,7 @@ Dancer2::Plugin::WebService - RESTful Web Services with login, persistent data, 
 
 =head1 VERSION
 
-version 4.4.1
+version 4.4.2
 
 =head2 SYNOPSIS
 
@@ -1038,9 +1038,9 @@ A sample I<config.yml> is the following.
         somekeys          : { Protected: false }
         data\/m1          : { Protected: false }
         data\/m1          : { Protected: false }
-      INeedLogin_store    : { Protected: true, Groups: [ ftp , storage ] }
-      INeedLogin_delete   : { Protected: true, Groups: log }
-      INeedLogin_read     : { Protected: true }
+        INeedLogin_store  : { Protected: true, Groups: [ ftp , storage ] }
+        INeedLogin_delete : { Protected: true, Groups: log }
+        INeedLogin_read   : { Protected: true }
 
       Allowed hosts:
       - 127.*

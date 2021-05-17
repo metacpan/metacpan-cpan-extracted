@@ -32,19 +32,19 @@ This renders the following image:
 </p>
 
 <img width="451.271" height="187.542"
- src='https://fastapi.metacpan.org/source/BKB/Image-CairoSVG-0.17/examples/locust.png'>
+ src='https://fastapi.metacpan.org/source/BKB/Image-CairoSVG-0.21/examples/locust.png'>
 
 =end html
 
 (This example is included as
-L<F<synopsis.pl>|https://fastapi.metacpan.org/source/BKB/Image-CairoSVG-0.17/examples/synopsis.pl> in the distribution. The
-L<input|https://fastapi.metacpan.org/source/BKB/Image-CairoSVG-0.17/examples/locust.svg> and L<output
-files|https://fastapi.metacpan.org/source/BKB/Image-CairoSVG-0.17/examples/locust.png> are also included.)
+L<F<synopsis.pl>|https://fastapi.metacpan.org/source/BKB/Image-CairoSVG-0.21/examples/synopsis.pl> in the distribution. The
+L<input|https://fastapi.metacpan.org/source/BKB/Image-CairoSVG-0.21/examples/locust.svg> and L<output
+files|https://fastapi.metacpan.org/source/BKB/Image-CairoSVG-0.21/examples/locust.png> are also included.)
 
 =head1 VERSION
 
-This documents Image::CairoSVG version 0.17
-corresponding to git commit L<bcf7f3e01e92ea2f16c874e362c90ad677bcf34e|https://github.com/benkasminbullock/image-cairosvg/commit/bcf7f3e01e92ea2f16c874e362c90ad677bcf34e> released on Sun May 9 22:21:29 2021 +0900. 
+This documents Image::CairoSVG version 0.21
+corresponding to git commit L<c42b33aba018e51fe57e6efd943267e763cef7bb|https://github.com/benkasminbullock/image-cairosvg/commit/c42b33aba018e51fe57e6efd943267e763cef7bb> released on Mon May 17 10:35:33 2021 +0900. 
 
 =head1 DESCRIPTION
 
@@ -147,15 +147,15 @@ This example shows how to scale the output image using Cairo commands.
 <p>
 The default size looks like this:
 </p>
-<img width="36" height="36" src='https://fastapi.metacpan.org/source/BKB/Image-CairoSVG-0.17/examples/durn.png'>
+<img width="36" height="36" src='https://fastapi.metacpan.org/source/BKB/Image-CairoSVG-0.21/examples/durn.png'>
 <p>
 The scaled image looks like this:
 </p>
-<img width="200" height="200" src='https://fastapi.metacpan.org/source/BKB/Image-CairoSVG-0.17/examples/urn.png'>
+<img width="200" height="200" src='https://fastapi.metacpan.org/source/BKB/Image-CairoSVG-0.21/examples/urn.png'>
 
 =end html
 
-(This example is included as L<F<scale.pl>|https://fastapi.metacpan.org/source/BKB/Image-CairoSVG-0.17/examples/scale.pl> in the
+(This example is included as L<F<scale.pl>|https://fastapi.metacpan.org/source/BKB/Image-CairoSVG-0.21/examples/scale.pl> in the
 distribution. The original image is part of the L<Twitter Emoji
 collection|https://twemoji.twitter.com/>, F<1f3fa.svg>, representing
 C<U+1F3FA AMPHORA>. This illustration is used under the terms of
@@ -286,7 +286,14 @@ arc-drawing code and arc-parsing code was not working.
 
 =item L<Improvements to Image::CairoSVG|https://benbullock.substack.com/p/improvements-to-imagecairosvg>
 
-This illustrates some of the improvements made.
+This illustrates some of the improvements made up to version 0.16,
+such as addition of opacity, support for the <use> tag, and more
+correct drawing of circular arcs.
+
+=item L<SVG matrix and miter limit|https://benbullock.substack.com/p/svg-matrix-and-miter-limit>
+
+This documents visually the rendering improvements between version
+0.17 and version 0.18.
 
 =back
 
@@ -297,9 +304,8 @@ This illustrates some of the improvements made.
 =item CairoSVG
 
 L<CairoSVG|http://cairosvg.org/> is a Python SVG renderer in
-Cairo. Originally the elliptical arc drawing part of Image::CairoSVG
-was based on it, but this was replaced in version 0.14 of this module
-by code based on the W3 Consortium standards.
+Cairo. The elliptical arc drawing part of Image::CairoSVG is a
+translation of its code into Perl.
 
 =back
 
@@ -359,7 +365,7 @@ article at Perl Maven
 
 =item Perl Cairo tutorial
 
-The Cairo module is mostly undocumented. This L<Perl Cairo
+The Cairo CPAN module is mostly undocumented. This L<Perl Cairo
 tutorial|https://www.lemoda.net/cairo/cairo-tutorial/index.html> may
 be useful if you need to go beyond defaults.
 
@@ -376,11 +382,9 @@ L</"Demonstration website and blog articles"> above.
 
 =over
 
-=item Clip paths
+=item Default fill is incorrect in some cases
 
-Clip paths (clipping the output image to a given path) are not
-supported. These are supported in Cairo so it should be possible to
-add them.
+Default fill is not handled correctly.
 
 
 
@@ -390,13 +394,13 @@ add them.
 <tr>
 <td>
 <img height="250"
-     src="https://benkasminbullock.github.io/supertinyiconscairosvg//svg/google_maps.svg"
+     src="https://benkasminbullock.github.io/supertinyiconscairosvg//svg/fritz.svg"
      width="250">
 </td>
 
 <td>
 <img height="250"
-     src="https://benkasminbullock.github.io/supertinyiconscairosvg//png/google_maps.png"
+     src="https://benkasminbullock.github.io/supertinyiconscairosvg//png/fritz.png"
      width="250">
 </td>
 </tr>
@@ -414,13 +418,6 @@ Output of Image::CairoSVG
 
 
 
-=item Elliptical arcs
-
-Circular arcs are produced correctly but elliptical arcs in paths are
-not handled correctly. This is because there are no primitives in
-Cairo for these shapes, so they need to be implemented via Cairo
-transforms.
-
 
 
 =begin html
@@ -429,13 +426,13 @@ transforms.
 <tr>
 <td>
 <img height="250"
-     src="https://benkasminbullock.github.io/supertinyiconscairosvg//svg/react.svg"
+     src="https://benkasminbullock.github.io/supertinyiconscairosvg//svg/php.svg"
      width="250">
 </td>
 
 <td>
 <img height="250"
-     src="https://benkasminbullock.github.io/supertinyiconscairosvg//png/react.png"
+     src="https://benkasminbullock.github.io/supertinyiconscairosvg//png/php.png"
      width="250">
 </td>
 </tr>
@@ -469,6 +466,38 @@ possible to add them.
 <tr>
 <td>
 <img height="250"
+     src="https://benkasminbullock.github.io/supertinyiconscairosvg//svg/gandi.svg"
+     width="250">
+</td>
+
+<td>
+<img height="250"
+     src="https://benkasminbullock.github.io/supertinyiconscairosvg//png/gandi.png"
+     width="250">
+</td>
+</tr>
+
+<tr>
+<td>
+Input SVG
+<td>
+Output of Image::CairoSVG
+</tr>
+
+</table>
+
+=end html
+
+
+
+
+
+=begin html
+
+<table>
+<tr>
+<td>
+<img height="250"
      src="https://benkasminbullock.github.io/supertinyiconscairosvg//svg/glitch.svg"
      width="250">
 </td>
@@ -493,13 +522,9 @@ Output of Image::CairoSVG
 
 
 
-=item shadows
+=item Shadows
 
 Shadows are not supported.
-
-=item stroke-dasharray
-
-stroke-dasharray is not supported.
 
 
 
@@ -509,13 +534,49 @@ stroke-dasharray is not supported.
 <tr>
 <td>
 <img height="250"
-     src="https://benkasminbullock.github.io/supertinyiconscairosvg//svg/signal.svg"
+     src="https://benkasminbullock.github.io/supertinyiconscairosvg//svg/keepassdx.svg"
      width="250">
 </td>
 
 <td>
 <img height="250"
-     src="https://benkasminbullock.github.io/supertinyiconscairosvg//png/signal.png"
+     src="https://benkasminbullock.github.io/supertinyiconscairosvg//png/keepassdx.png"
+     width="250">
+</td>
+</tr>
+
+<tr>
+<td>
+Input SVG
+<td>
+Output of Image::CairoSVG
+</tr>
+
+</table>
+
+=end html
+
+
+
+=item Styles
+
+Styles are not supported very well.
+
+
+
+=begin html
+
+<table>
+<tr>
+<td>
+<img height="250"
+     src="https://benkasminbullock.github.io/supertinyiconscairosvg//svg/tiktok.svg"
+     width="250">
+</td>
+
+<td>
+<img height="250"
+     src="https://benkasminbullock.github.io/supertinyiconscairosvg//png/tiktok.png"
      width="250">
 </td>
 </tr>
@@ -535,15 +596,7 @@ Output of Image::CairoSVG
 
 =item Text
 
-Text rendering is not supported at all.
-
-=item Transforms
-
-Some transforms (matrix, skew) are not handled. There is some support
-for matrix transformations but the matrix transformations in L<Cairo>
-are completely undocumented so it's based on guesswork and reading the
-Cairo source code. See
-L<https://rt.cpan.org/Ticket/Display.html?id=136410>.
+Text rendering is not supported.
 
 
 
@@ -553,13 +606,13 @@ L<https://rt.cpan.org/Ticket/Display.html?id=136410>.
 <tr>
 <td>
 <img height="250"
-     src="https://benkasminbullock.github.io/supertinyiconscairosvg//svg/raspberry_pi.svg"
+     src="https://benkasminbullock.github.io/supertinyiconscairosvg//svg/calendar.svg"
      width="250">
 </td>
 
 <td>
 <img height="250"
-     src="https://benkasminbullock.github.io/supertinyiconscairosvg//png/raspberry_pi.png"
+     src="https://benkasminbullock.github.io/supertinyiconscairosvg//png/calendar.png"
      width="250">
 </td>
 </tr>
@@ -579,10 +632,10 @@ Output of Image::CairoSVG
 
 =item Units
 
-Millimetre units are quite common in Inkscape output, so these are
-supported. Inches are also supported incidentally since in SVG
-millimetres are defined as 25.4 inches, and inches are defined by
-having 96 pixels per inch, but not all other possible units are.
+Currently only pixels, millimetres, and inches are supported. 
+
+The conversion ratios are one millimetre is 25.4 inches, and one
+inch is 96 pixels.
 
 =back
 

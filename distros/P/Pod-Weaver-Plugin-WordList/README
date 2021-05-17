@@ -3,9 +3,9 @@ NAME
     distribution
 
 VERSION
-    This document describes version 0.063 of Pod::Weaver::Plugin::WordList
+    This document describes version 0.064 of Pod::Weaver::Plugin::WordList
     (from Perl distribution Pod-Weaver-Plugin-WordList), released on
-    2020-09-15.
+    2021-05-17.
 
 SYNOPSIS
     In your weaver.ini:
@@ -32,8 +32,7 @@ SOURCE
 
 BUGS
     Please report any bugs or feature requests on the bugtracker website
-    <https://rt.cpan.org/Public/Dist/Display.html?Name=Pod-Weaver-Plugin-Wor
-    dList>
+    <https://github.com/perlancar/perl-Pod-Weaver-Plugin-WordList/issues>
 
     When submitting a bug or request, please include a test-file or a patch
     to an existing test-file that illustrates the bug or desired feature.
@@ -47,7 +46,8 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2020, 2018, 2016 by perlancar@cpan.org.
+    This software is copyright (c) 2021, 2020, 2018, 2016 by
+    perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

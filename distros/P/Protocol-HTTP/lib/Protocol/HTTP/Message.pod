@@ -186,13 +186,13 @@ C<Transfer-Encoding> header will be set to C<chunked>.
 
 =head2 make_chunk($string)
 
-Wraps a string into chunk, which is ready to send. Compression may occur at this time if configured.
+Wraps a string into http chunk and returns the result. Compression may occur at this time if configured.
 
 
-=head2 final_chunk()
+=head2 final_chunk([$string])
 
-Finalizes chunked HTTP message, i.e. final (empty) chunk is returned; it is
-ready to be send over network.
+Finalizes chunked HTTP message, i.e. final (empty) chunk is returned.
+If optional C<$string> is provided, C<make_chunk($string)> is added before final chunk.
 
 
 

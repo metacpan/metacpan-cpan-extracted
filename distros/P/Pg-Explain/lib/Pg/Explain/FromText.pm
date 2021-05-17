@@ -27,11 +27,11 @@ Pg::Explain::FromText - Parser for text based explains
 
 =head1 VERSION
 
-Version 1.07
+Version 1.08
 
 =cut
 
-our $VERSION = '1.07';
+our $VERSION = '1.08';
 
 =head1 SYNOPSIS
 
@@ -311,7 +311,7 @@ sub parse_source {
         }
     }
     $self->explain->jit( Pg::Explain::JIT->new( 'lines' => $jit ) ) if defined $jit;
-    $self->explain->query( $query ) if $query;
+    $self->explain->query( $query )                                 if $query;
     return $top_node;
 }
 

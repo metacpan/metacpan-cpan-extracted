@@ -6,6 +6,7 @@ README.md
 cpanfile
 examples/extending.pl
 examples/find_old_feeds.pl
+examples/synopsis.pl
 lib/Mojo/Feed.pm
 lib/Mojo/Feed/Item.pm
 lib/Mojo/Feed/Item/Enclosure.pm

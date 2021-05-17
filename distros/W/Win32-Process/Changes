@@ -1,5 +1,21 @@
 Revision history for Perl extension Win32::Process.
 
+0.17  Wed May 12 2021
+        - Move test file into t directory [PR#3].
+          Thanks to Adam Herzog <adam@adamherzog.com>.
+
+        - Clarify Wait() method's return value in the documentation [PR#5].
+          Thanks to Zoffix Znet <cpan@zoffix.com> and Bartosz Brewinski <bbrewinski@lukasbank.pl>
+
+        - Fix Win32::Process::KillProcess() with VC9 [PR#6].
+          Thanks to Zoffix Znet <cpan@zoffix.com> and Steve Hay <shay@cpan.org>.
+
+        - Change the example so it works OOTB [PR#7].
+          Thanks to Vincent Lequertier <vi.le@autistici.org>.
+
+        - Allow "appname" and "cmdline" parameters to Create() to be NULL [PR#8].
+          Thanks to Michael Conrad <mike@nrdvana.net> and Greg Ercolano <erco@seriss.com>.
+
 0.16  Wed Dec 11 2013
 	- Really add Github repo link to META.yml
 

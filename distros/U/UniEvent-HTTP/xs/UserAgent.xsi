@@ -1,0 +1,58 @@
+MODULE = UniEvent::HTTP                PACKAGE = UniEvent::HTTP::UserAgent
+PROTOTYPES: DISABLE
+
+UserAgentSP UserAgent::new (Hash config = Hash(), LoopSP loop = {}) {
+    string serialized;
+    Simple v;
+    if ((v  = config.fetch("serialized"))) { serialized = v.as_string(); }
+
+    UserAgent::Config cfg;
+    if (config) fill(cfg, config);
+    if (!loop) loop = Loop::default_loop();
+    RETVAL = new UserAgent(loop, serialized, cfg);
+}
+
+ClientSP UserAgent::request (RequestSP request, URISP context_uri = request->uri, bool top_level = true)
+
+string UserAgent::to_string(bool include_session = false)
+
+UserAgent::Identity UserAgent::identity(SV* value = nullptr) {
+    using Identity = UserAgent::Identity;
+    if (value) {
+        Sv val(value);
+        if (!val.defined()) THIS->identity(Identity());
+        else                THIS->identity(Identity(Simple(val).as_string()));
+        XSRETURN_UNDEF;
+    }
+    RETVAL = THIS->identity();
+}
+
+URISP UserAgent::proxy (SV* value = nullptr) {
+    if (value) {
+        THIS->proxy(xs::in<URISP>(value));
+        XSRETURN_UNDEF;
+    }
+    RETVAL = THIS->proxy();
+}
+
+SslContext UserAgent::ssl_ctx (SV* value = nullptr) {
+    if (value) {
+        THIS->ssl_ctx(xs::in<SslContext>(value));
+        XSRETURN_UNDEF;
+    }
+    RETVAL = THIS->ssl_ctx();
+}
+
+
+CookieJarSP UserAgent::cookie_jar(SV* value = nullptr) {
+    if (value) {
+        THIS->cookie_jar(xs::in<CookieJarSP>(value));
+        XSRETURN_UNDEF;
+    }
+    RETVAL = THIS->cookie_jar();
+}
+
+SV* CLONE_SKIP (...) {
+    XSRETURN_YES;
+    PERL_UNUSED_VAR(items);
+}

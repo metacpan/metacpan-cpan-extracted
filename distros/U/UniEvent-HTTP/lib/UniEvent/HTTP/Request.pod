@@ -1,0 +1,373 @@
+=head1 NAME
+
+UniEvent::HTTP::Request - HTTP client request class
+
+
+
+=head1 SYNOPSIS
+
+    # explicit creation
+    my $request = UE::HTTP::Request->new({
+        uri => "http://example.com",
+        timeout => 3,
+        response_callback => sub {
+            my ($request, $response, $error) = @_;
+            ...
+        },
+    });
+    
+    http_request($request);
+
+    # implicit creation
+    http_request({
+        uri => "http://example.com",
+        timeout => 3,
+        response_callback => sub {
+            my ($request, $response, $error) = @_;
+            ...
+        },
+    });
+
+
+
+=head1 DESCRIPTION
+
+C<UniEvent::HTTP::Request> is used to make client http requests. It holds all the properties and state of http request. C<UniEvent::HTTP::Request> object is
+passed then to C<http_request()>, C<http_request_sync()>, $pool->request, $client->request or $user_agent->request functions.
+
+Once completed, a Request object can be used again to make another http request. However one request object cannot be run twice at a time.
+
+C<UniEvent::HTTP::Request> inherits from L<Protocol::HTTP::Request>. So for complete documenation you need to also read L<Protocol::HTTP::Request>'s docs.
+
+Request supports chunked transmission. If you set C<chunked> property (see L<Protocol::HTTP::Request>) to a C<true> value, then after you send this request
+via C<http_request()>, etc... you will need to send http chunks via C<send_chunk()> method and then C<send_final_chunk()> when you are done.
+
+Request supports compression. There is nothing to do and document here about compression as everything is implemented and documented in L<Protocol::HTTP>.
+
+Request supports real-time partial body receival for streaming into storage without memory consumption or incremental parsing of sub-protocol.
+See C<partial_callback()>.
+
+See detailed description in corresponding method docs.
+
+
+
+=head1 METHODS
+
+All methods of L<Protocol::HTTP::Request> also apply.
+
+
+=head2 new(\%params)
+
+Constructs a request object from hashref of params.
+
+This method is also called implicitly when you pass hashref of params to functions like C<http_request()>, $pool->request and so on, i.e. where an object of
+L<UniEvent::HTTP::Request> is expected.
+
+Params can contain:
+
+=over
+
+=item All params from L<Protocol::HTTP::Request>::new() also apply
+
+=item timeout [=20]
+
+=item follow_redirect [=true]
+
+=item redirection_limit [=20]
+
+=item tcp_nodelay [=false]
+
+=item tcp_hints
+
+=item ssl_ctx
+
+=item proxy
+
+=item response_callback
+
+=item partial_callback
+
+=item redirect_callback
+
+=item continue_callback
+
+See corresponding description of all parameters above in their setter-getter methods below.
+
+=item form
+
+Although L<Protocol::HTTP::Request>::new() supports the C<form> parameter, L<UniEvent::HTTP::Request>
+extends its possibilities to support real-time streaming of data to form.
+
+Form fields values from L<Protocol::HTTP::Request> are required to be available B<upfront>, i.e.:
+
+    my $pdf_content = ...; # obtain file content somehow
+    form => [
+        'key1' => $value1,
+        'key2' => ['a.pdf' => $pdf_content, 'application/pdf'],
+        ...
+    ]});
+
+In the L<UniEvent::HTTP> it is possible to specify any L<input stream|UniEvent::Streamer::Input>,
+which will push bytes lately, as soon as they become available. Usually, this
+L<file input|UniEvent::Streamer::FileInput>, but the data can be also be taken from
+TCP connection via L<UniEvent::Streamer::StreamInput>. This way it is possible to avoid
+reading huge files in-memory before streaming them to peer.
+
+
+    my $pdf_content = UE::Streamer::FileInput->new("path/to/my.pdf");
+    form => [
+        'key1' => $value1,
+        'key2' => ['a.pdf' => $pdf_content, 'application/pdf'],
+        ...
+    ]});
+
+The streaming is availabe only for C<multipart/form-data> method of posting data. In other words,
+C<multipart/form-data> will always be forced for you, if any streaming content is detected.
+
+=back
+
+NOTE: If you create your own request class inherited from C<UniEvent::HTTP::Request>, you must proxy to original C<new()> method and use its result as an object
+you return. By default it is a reference to undef, you can upgrade it to hash-based object via C<XS::Framework::obj2hv>:
+
+    package MyRequest;
+    use parent 'UniEvent::HTTP::Request';
+    
+    sub new {
+        my $class = shift;
+        my $self = $class->SUPER::new(@_);
+        XS::Framework::obj2hv($self);
+        $self->{prop} = "val";
+        return $self;
+    }
+
+
+=head2 timeout([$timeout])
+
+Get/set timeout for the whole request (connect + sending request + receiving response) in seconds (can be fractional). To disable timeout, set zero.
+
+If time is up, request will finish with error C<UniEvent::SystemError::timed_out>.
+
+
+=head2 follow_redirect([$bool])
+
+Get/set C<follow_redirect> flag.
+
+If set to true and the server's response code is one of C<300>, C<301>, C<302>, C<303>, C<307> or C<308>, will transparently
+make another request to the destination described in response and use that another response. 
+
+New request will be made to a location specified in C<Location> header in the response.
+Headers C<Authorization>, C<Cookie>, C<Referer> in original request get removed for security reasons; so does C<ssl_ctx> if ssl is in use.
+If precise control over this process is needed, consider setting C<redirect_callback> (see docs below).
+
+If new response is a redirection again, will repeat this procedure
+up to C<redirection_limit> times. If this limit is exceeded, request will finish with error C<UniEvent::HTTP::Error::redirection_limit>. If the limit is set to 0,
+then request will finish with error C<UniEvent::HTTP::Error::unexpected_redirect> immediately on first redirection response.
+
+If set to false, then just content of redirection response will be returned.
+
+
+=head2 redirection_limit([$cnt])
+
+Get/set redirection limit, see C<follow_redirect()>.
+
+
+=head2 tcp_nodelay([$bool])
+
+Get/set tcp nodelay feature.
+
+
+=head2 tcp_hints([$hints])
+
+Get/set DNS resolving hints. C<Hints> can be used to disambiguate domain name resolution in certain cases.
+C<$hints> should be either a binary string created via C<UniEvent::Resolver::hints()>
+
+    $request->tcp_hints(UniEvent::Resolver::hints(AF_INET, SOCK_STREAM, PF_INET));
+    
+    Or a hashref with the corresponding info
+
+    $request->tcp_hints({
+        family   => AF_INET,
+        socktype => SOCK_STREAM,
+        protocol => PF_INET,
+        flags    => 0,
+    });
+    
+See L<UniEvent::Resolver> for more info.
+
+
+=head2 ssl_ctx([$ssl_ctx])
+
+Get/set ssl context. By default, ssl context is autocreated when HTTPS location is requested, but for more precise control (validating server's certificate,
+authorizing via ssl, etc) ssl context can be created by hand via L<Net::SSLeay> module and passed here.
+
+After creating context via L<Net::SSLeay> and passing to this method, you can release context via C<CTX_free()> function from C<Net::SSLeay> as it is refcounted
+and held by request object.
+
+    my $ctx = Net::SSLeay::CTX_new();
+    Net::SSLeay::CTX_use_certificate_file($ctx, "cert/ca.pem", Net::SSLeay::FILETYPE_PEM);
+    Net::SSLeay::CTX_use_PrivateKey_file($ctx, "cert/ca.key", Net::SSLeay::FILETYPE_PEM);
+    Net::SSLeay::CTX_check_private_key($ctx) or die "wtf?";
+    
+    $request->ssl_ctx($ctx);
+    
+    Net::SSLeay::CTX_free($ctx);
+
+
+=head2 proxy([$url])
+
+Get/set socks5 proxy url as string or L<URI::XS> object. Url scheme must be C<socks5>.
+
+    $request->proxy("socks5://proxy.com:1234");
+    $request->proxy("socks5://login:pass@proxy.com:1234");
+
+
+=head2 response_callback($sub)
+
+=head2 response_event()
+
+Callbacks set via these methods will be invoked when response is fully received including all body or if an error occurs.
+
+Callback signature:
+
+    my ($request, $response, $error) = @_;
+    
+Where C<$request> is the original request object being executed.
+
+C<$response> is a L<UniEvent::HTTP::Response> object containing all http response properties.
+
+C<$error> is an optional L<XS::ErrorCode> object and if it is present then C<$response> may be undefined. If the error occured while receiving response, then
+C<$response> will present and contain everything parsed till that moment. C<$error> can be one of listed in L<UniEvent::HTTP::Error>, L<Protocol::HTTP::Error> or
+L<UniEvent::SystemError> and it can be nested, see L<XS::ErrorCode>.
+
+See L<UniEvent/"EVENT CALLBACKS"> for differences between C<_callback> and C<_event> versions of methods.
+
+
+=head2 partial_callback($sub)
+
+=head2 partial_event()
+
+Invoked one or more times, every time data arrives from network.
+
+Callback signature and meaning of params are the same as for C<response_callback>:
+
+    my ($request, $response, $error) = @_;
+    
+First time it is called when all headers arrived. From call to call response's body will grow until it's done or error occurs.
+If $response->is_done() is true or C<$error> is set, then it's the last call.
+
+The actual body part arrived is the difference between current body value and previous body value. If you only need that part, not the whole growing body
+(for writing to disk / incremental parsing / saving memory) then just clear the body on each call (because new parts just append to current $response->body value).
+
+    $request->partial_callback(sub {
+        my ($req, $res, $error) = @_;
+        if ($error) {
+            ...
+            return;
+        }
+        
+        print $fh $res->body; # or asynchronously
+        $res->body("");
+        
+        if ($res->is_done) {
+            close $fh;
+            ...
+        }
+    })
+
+If C<response_callback> is set, it will also be called after the last call to C<partial_callback>. The response body in C<response_callback> will not be the full
+response body if you cleared it in C<partial_callback>.
+
+See L<UniEvent/"EVENT CALLBACKS"> for differences between C<_callback> and C<_event> versions of methods.
+
+
+=head2 redirect_callback($sub)
+
+=head2 redirect_event()
+
+Invoked right before redirection response will be followed (if C<follow_redirect> is true).
+
+This callback gives user a control over redirection process.
+
+Callback signature:
+
+    my ($request, $response, $redirect_context) = @_;
+
+Where C<$request> is the original request object with some properties modified (uri, headers, ssl_ctx).
+
+C<$response> is the current redirection response.
+
+C<$redirect_context> is an L<UniEvent::HTTP::RedirectContext> object which stores some of original properties of request which got replaced with new ones.
+
+When this callback is called, C<$request> has already been modified for new http request which will be made after this callback returns. Request uri is changed
+to point to the new location, headers C<Authorization>, C<Cookie>, C<Referer> are removed for security reasons and C<ssl_ctx> is cleared also if any.
+No heuristics are made in order to determine if new location is the same server or not, to keep those properties intact.
+You are free to change any request properties here (restore those headers back again or set C<ssl_ctx> or whatsoever) and they will be used.
+If you want to access original values of those properties, they are stored in C<$redirect_context> - see L<UniEvent::HTTP::RedirectContext>.
+
+You are also free to C<cancel()> request here if needed.
+
+See L<UniEvent/"EVENT CALLBACKS"> for differences between C<_callback> and C<_event> versions of methods.
+
+
+=head2 continue_callback($sub)
+
+=head2 continue_event()
+
+Invoked when server sends C<100 continue> intermediate message.
+
+Normally, server can only send C<100 continue> if client agrees to receive such messages via setting C<Expect: 100-continue> header. So you will also need to set
+
+    $request->header("Expect", "100-continue")
+
+To use this callback.
+
+Callback signature:
+
+    my $request = shift; # the request object itself
+    
+See L<UniEvent/"EVENT CALLBACKS"> for differences between C<_callback> and C<_event> versions of methods.
+
+
+=head2 cancel([$error = UniEvent::SystemError::operation_canceled])
+
+Cancels request if it's active. All network activity gets stopped and C<response_callback> and C<partial_callback> are called with C<$error> which is
+C<UniEvent::SystemError::operation_canceled> by default.
+
+If request is not active (finished or not yet started) does nothing.
+
+
+=head2 transfer_completed()
+
+Returns true if request has been fully send to network including all the body. For example, if you make a chunked request, it will return false from this method
+until you finish the sequence C<send_chunk()>, C<send_chunk()>, ..., C<send_final_chunk()>.
+
+
+=head2 send_chunk($data)
+
+Should only be called on requests where C<chunked> is true. Sends an http chunk (applying possible compression, etc).
+
+
+=head2 send_final_chunk([$data])
+
+Should only be called on requests where C<chunked> is true. Sends final (empty) http chunk and finishes sending chunked http request.
+If optional C<$data> is provided, then sends C<$data> as normal chunk before final chunk.
+
+
+=head2 response_factory([$sub])
+
+Get/set response factory subroutine.
+Allows for customization of response object. If factory is set, it will be called (once per http request) and its result will be used as response object.
+It can be of any class but it must inherit L<UniEvent::HTTP::Response> and it must proxy to original C<new()> method of C<UniEvent::HTTP::Response> if you
+override it, see L<UniEvent::HTTP::Response>.
+
+Factory subroutine receives single argument - the request object and is expected to return single value - the response object.
+
+    $request->response_factory(sub {
+        my $request = shift;
+        my $response = MyResponse->new;
+        ...
+        return $response;
+    });
+
+
+=cut

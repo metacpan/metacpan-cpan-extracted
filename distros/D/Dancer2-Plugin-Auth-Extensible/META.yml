@@ -11,6 +11,7 @@ build_requires:
   Plack::Test: '0'
   Test::Deep: '0.114'
   Test::Exception: '0'
+  Test::Fatal: '0'
   Test::MockDateTime: '0'
   Test::More: '0'
   Test::Warnings: '0'
@@ -18,7 +19,7 @@ configure_requires:
   ExtUtils::MakeMaker: '0'
   File::ShareDir::Install: '0.06'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -55,5 +56,5 @@ resources:
   bugtracker: https://github.com/PerlDancer/Dancer2-Plugin-Auth-Extensible/issues
   homepage: https://github.com/PerlDancer/Dancer2-Plugin-Auth-Extensible/
   repository: https://github.com/PerlDancer/Dancer2-Plugin-Auth-Extensible
-version: '0.709'
+version: '0.710'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

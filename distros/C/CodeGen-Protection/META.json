@@ -64,27 +64,27 @@
    "provides" : {
       "CodeGen::Protection" : {
          "file" : "lib/CodeGen/Protection.pm",
-         "version" : "0.05"
+         "version" : "0.06"
       },
       "CodeGen::Protection::Format::HTML" : {
          "file" : "lib/CodeGen/Protection/Format/HTML.pm",
-         "version" : "0.05"
+         "version" : "0.06"
       },
       "CodeGen::Protection::Format::Perl" : {
          "file" : "lib/CodeGen/Protection/Format/Perl.pm",
-         "version" : "0.05"
+         "version" : "0.06"
       },
       "CodeGen::Protection::Role" : {
          "file" : "lib/CodeGen/Protection/Role.pm",
-         "version" : "0.05"
+         "version" : "0.06"
       },
       "CodeGen::Protection::Types" : {
          "file" : "lib/CodeGen/Protection/Types.pm",
-         "version" : "0.05"
+         "version" : "0.06"
       },
       "Test::CodeGen::Protection" : {
          "file" : "lib/Test/CodeGen/Protection.pm",
-         "version" : "0.05"
+         "version" : "0.06"
       }
    },
    "release_status" : "stable",
@@ -99,7 +99,7 @@
          "web" : "https://github.com/Ovid/codegen-protection"
       }
    },
-   "version" : "0.05",
+   "version" : "0.06",
    "x_generated_by_perl" : "v5.26.2",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.25"
 }

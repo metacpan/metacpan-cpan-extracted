@@ -1,5 +1,11 @@
 Revision history for Perl extension ExtUtils::Depends.
 
+0.8001
+    - Remove hack (cf https://rt.cpan.org/Ticket/Display.html?id=45224)
+      The hijacking of EUMM's `static_lib` method is now obsolete, as well as
+      causing problems.
+    - Also added a couple of code tidy-ups
+
 0.8000
     - Bump version so https://metacpan.org/pod/ExtUtils::Depends shows the
       correct _ExtUtils::Depends_ module

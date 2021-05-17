@@ -1,5 +1,9 @@
 Revision history for Perl module JSON::Server
 
+0.02 2021-05-12
+
+- Handle connections closed remotely
+
 0.01 2021-02-21
 
 - Initial version

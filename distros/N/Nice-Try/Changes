@@ -1,5 +1,15 @@
 Revision history for Perl module Nice::Try
 
+1.0.0 2021-05-14T22:59:08+0900
+    - Improved call context management using Want to properly handle contexts such as object, glob, code, hash ref, array ref, scalar ref and boolean
+    - caller correctly report caller's information.
+
+0.2.1 2021-05-12T18:23:36+0900
+    - Correction of oversight when enclosing block is called in list context
+
+0.2.0 2021-05-12T05:27:07+0900
+    - Added support for next, last and redo inside try-catch block
+
 0.1.11 2021-03-26T09:27:22+0900
     - Implemented 2 bug fixes courtesy of Tilmann Haeberle: 1) on inheritance of exception class and 2) on fall through i.e. an exception is not caught and is not bubbling up
 

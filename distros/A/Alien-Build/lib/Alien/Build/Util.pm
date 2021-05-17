@@ -8,7 +8,7 @@ use Path::Tiny qw( path );
 use Config;
 
 # ABSTRACT: Private utility functions for Alien::Build
-our $VERSION = '2.38'; # VERSION
+our $VERSION = '2.40'; # VERSION
 
 
 our @EXPORT_OK = qw( _mirror _dump _destdir_prefix _perl_config _ssl_reqs _has_ssl );
@@ -38,18 +38,7 @@ sub _mirror
       return if "$src" eq '.';
       my $dst = $dst_root->child("$src");
       $src = $src->absolute($src_root);
-      if(-d "$src")
-      {
-        if($opt->{empty_directory})
-        {
-          unless(-d $dst)
-          {
-            Alien::Build->log("mkdir $dst") if $opt->{verbose};
-            mkdir($dst) || die "unable to create directory $dst: $!";
-          }
-        }
-      }
-      elsif(-l "$src")
+      if(-l "$src")
       {
         unless(-d $dst->parent)
         {
@@ -62,6 +51,17 @@ sub _mirror
         my $target = readlink "$src";
         Alien::Build->log("ln -s $target $dst") if $opt->{verbose};
         symlink($target, $dst) || die "unable to symlink $target => $dst";
+      }
+      elsif(-d "$src")
+      {
+        if($opt->{empty_directory})
+        {
+          unless(-d $dst)
+          {
+            Alien::Build->log("mkdir $dst") if $opt->{verbose};
+            mkdir($dst) || die "unable to create directory $dst: $!";
+          }
+        }
       }
       elsif(-f "$src")
       {
@@ -149,7 +149,7 @@ Alien::Build::Util - Private utility functions for Alien::Build
 
 =head1 VERSION
 
-version 2.38
+version 2.40
 
 =head1 DESCRIPTION
 

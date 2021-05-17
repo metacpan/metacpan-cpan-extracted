@@ -34,7 +34,7 @@ use Excel::Writer::XLSX::Package::XMLwriter;
 use Excel::Writer::XLSX::Utility qw(xl_cell_to_rowcol xl_rowcol_to_cell);
 
 our @ISA     = qw(Excel::Writer::XLSX::Package::XMLwriter);
-our $VERSION = '1.08';
+our $VERSION = '1.09';
 
 
 ###############################################################################
@@ -100,6 +100,7 @@ sub new {
     $self->{_max_url_length}     = 2079;
     $self->{_has_comments}       = 0;
     $self->{_read_only}          = 0;
+    $self->{_has_metadata}       = 0;
 
     $self->{_default_format_properties} = {};
 
@@ -1159,6 +1160,9 @@ sub _store_workbook {
     # Prepare the worksheet tables.
     $self->_prepare_tables();
 
+    # Prepare the metadata file links.
+    $self->_prepare_metadata();
+
     # Package the workbook.
     $packager->_add_workbook( $self );
     $packager->_set_package_dir( $tempdir );
@@ -1784,6 +1788,7 @@ sub _prepare_drawings {
     my $ref_id           = 0;
     my %image_ids        = ();
     my %header_image_ids = ();
+    my %background_ids   = ();
 
     for my $sheet ( @{ $self->{_worksheets} } ) {
 
@@ -1793,6 +1798,7 @@ sub _prepare_drawings {
 
         my $header_image_count = scalar @{ $sheet->{_header_images} };
         my $footer_image_count = scalar @{ $sheet->{_footer_images} };
+        my $has_background     = $sheet->{_background_image};
         my $has_drawing        = 0;
 
 
@@ -1801,7 +1807,8 @@ sub _prepare_drawings {
             && !$image_count
             && !$shape_count
             && !$header_image_count
-            && !$footer_image_count )
+            && !$footer_image_count
+            && !$has_background )
         {
             next;
         }
@@ -1810,6 +1817,26 @@ sub _prepare_drawings {
         if ( $chart_count || $image_count || $shape_count ) {
             $drawing_id++;
             $has_drawing = 1;
+        }
+
+        # Prepare the background images.
+        if ( $has_background ) {
+
+            my $filename = $sheet->{_background_image};
+
+            my ( $type, $width, $height, $name, $x_dpi, $y_dpi, $md5 ) =
+              $self->_get_image_properties( $filename );
+
+            if ( exists $background_ids{$md5} ) {
+                $ref_id = $background_ids{$md5};
+            }
+            else {
+                $ref_id = ++$image_ref_id;
+                $background_ids{$md5} = $ref_id;
+                push @{ $self->{_images} }, [ $filename, $type ];
+            }
+
+            $sheet->_prepare_background($ref_id, $type);
         }
 
         # Prepare the worksheet images.
@@ -1999,6 +2026,24 @@ sub _prepare_tables {
         $sheet->_prepare_tables( $table_id + 1, $seen );
 
         $table_id += $table_count;
+    }
+}
+
+
+###############################################################################
+#
+# _prepare_metadata()
+#
+# Set the metadata rel link.
+#
+sub _prepare_metadata {
+
+    my $self = shift;
+
+    for my $sheet ( @{ $self->{_worksheets} } ) {
+        if ($sheet->{_has_dynamic_arrays}) {
+            $self->{_has_metadata} = 1;
+        }
     }
 }
 
@@ -2237,7 +2282,6 @@ sub _get_image_properties {
     my $size = length $data;
     my $md5  = md5_hex($data);
 
-
     if ( unpack( 'x A3', $data ) eq 'PNG' ) {
 
         # Test for PNGs.
@@ -2253,6 +2297,14 @@ sub _get_image_properties {
           $self->_process_jpg( $data, $filename );
 
         $self->{_image_types}->{jpeg} = 1;
+    }
+    elsif ( unpack( 'A4', $data ) eq 'GIF8' ) {
+
+        # Test for GIFs.
+        ( $type, $width, $height, $x_dpi, $y_dpi ) =
+          $self->_process_gif( $data, $filename );
+
+        $self->{_image_types}->{gif} = 1;
     }
     elsif ( unpack( 'A2', $data ) eq 'BM' ) {
 
@@ -2447,6 +2499,34 @@ sub _process_jpg {
 
     if ( not defined $height ) {
         croak "$filename: no size data found in jpeg image.\n";
+    }
+
+    return ( $type, $width, $height, $x_dpi, $y_dpi );
+}
+
+
+###############################################################################
+#
+# _process_gif()
+#
+# Extract width and height information from a GIF file.
+#
+sub _process_gif {
+
+    my $self     = shift;
+    my $data     = $_[0];
+    my $filename = $_[1];
+
+    my $type   = 'gif';
+    my $x_dpi  = 96;
+    my $y_dpi  = 96;
+
+    my $width  = unpack "v", substr $data, 6, 2;
+    my $height = unpack "v", substr $data, 8, 2;
+    print join ", ", ( $type, $width, $height, $x_dpi, $y_dpi, "\n" );
+
+    if ( not defined $height ) {
+        croak "$filename: no size data found in gif image.\n";
     }
 
     return ( $type, $width, $height, $x_dpi, $y_dpi );

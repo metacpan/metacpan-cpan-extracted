@@ -61,7 +61,7 @@
          "web" : "https://github.com/ology/Data-Dataset-ChordProgressions"
       }
    },
-   "version" : "0.0103",
+   "version" : "0.0108",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.033006"
@@ -315,7 +315,9 @@
             "config" : {
                "Dist::Zilla::Plugin::GatherDir" : {
                   "exclude_filename" : [],
-                  "exclude_match" : [],
+                  "exclude_match" : [
+                     "\\.mid"
+                  ],
                   "follow_symlinks" : 0,
                   "include_dotfiles" : 0,
                   "prefix" : "",

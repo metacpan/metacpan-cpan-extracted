@@ -45,7 +45,7 @@
             "Catmandu" : "1.20",
             "Catmandu::SRU" : "0.427",
             "Moo" : "1.0",
-            "PICA::Data" : "1.12",
+            "PICA::Data" : "1.20",
             "perl" : "v5.12.0"
          }
       },
@@ -62,47 +62,47 @@
    "provides" : {
       "Catmandu::Exporter::PICA" : {
          "file" : "lib/Catmandu/Exporter/PICA.pm",
-         "version" : "1.03"
+         "version" : "1.04"
       },
       "Catmandu::Fix::Bind::pica_each" : {
          "file" : "lib/Catmandu/Fix/Bind/pica_each.pm",
-         "version" : "1.03"
+         "version" : "1.04"
       },
       "Catmandu::Fix::Condition::pica_match" : {
          "file" : "lib/Catmandu/Fix/Condition/pica_match.pm",
-         "version" : "1.03"
+         "version" : "1.04"
       },
       "Catmandu::Fix::pica_add" : {
          "file" : "lib/Catmandu/Fix/pica_add.pm",
-         "version" : "1.03"
+         "version" : "1.04"
       },
       "Catmandu::Fix::pica_map" : {
          "file" : "lib/Catmandu/Fix/pica_map.pm",
-         "version" : "1.03"
+         "version" : "1.04"
       },
       "Catmandu::Fix::pica_set" : {
          "file" : "lib/Catmandu/Fix/pica_set.pm",
-         "version" : "1.03"
+         "version" : "1.04"
       },
       "Catmandu::Importer::PICA" : {
          "file" : "lib/Catmandu/Importer/PICA.pm",
-         "version" : "1.03"
+         "version" : "1.04"
       },
       "Catmandu::Importer::SRU::Parser::picaxml" : {
          "file" : "lib/Catmandu/Importer/SRU/Parser/picaxml.pm",
-         "version" : "1.03"
+         "version" : "1.04"
       },
       "Catmandu::Importer::SRU::Parser::ppxml" : {
          "file" : "lib/Catmandu/Importer/SRU/Parser/ppxml.pm",
-         "version" : "1.03"
+         "version" : "1.04"
       },
       "Catmandu::PICA" : {
          "file" : "lib/Catmandu/PICA.pm",
-         "version" : "1.03"
+         "version" : "1.04"
       },
       "Catmandu::Validator::PICA" : {
          "file" : "lib/Catmandu/Validator/PICA.pm",
-         "version" : "1.03"
+         "version" : "1.04"
       }
    },
    "release_status" : "stable",
@@ -116,7 +116,7 @@
          "web" : "https://github.com/gbv/Catmandu-PICA"
       }
    },
-   "version" : "1.03",
+   "version" : "1.04",
    "x_contributors" : [
       "Carsten Klee <klee@cpan.org>",
       "E. Choroba <choroba@matfyz.cz>",

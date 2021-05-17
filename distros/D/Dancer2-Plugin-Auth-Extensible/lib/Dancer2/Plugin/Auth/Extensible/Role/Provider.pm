@@ -4,7 +4,7 @@ use Crypt::SaltedHash;
 use Moo::Role;
 requires qw(authenticate_user);
 
-our $VERSION = '0.709';
+our $VERSION = '0.710';
 
 =head1 NAME
 

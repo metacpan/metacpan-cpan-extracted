@@ -1,6 +1,6 @@
 package Mail::BIMI::Constants;
 # ABSTRACT: Setup system wide constants
-our $VERSION = '3.20210301'; # VERSION
+our $VERSION = '3.20210512'; # VERSION
 use 5.20.0;
 use strict;
 use warnings;
@@ -27,7 +27,7 @@ Mail::BIMI::Constants - Setup system wide constants
 
 =head1 VERSION
 
-version 3.20210301
+version 3.20210512
 
 =head1 REQUIRES
 

@@ -1,0 +1,42 @@
+MODE: INLINE
+#include <xs/unievent/http/Plack.h>
+
+MODULE = UniEvent::HTTP                PACKAGE = UniEvent::HTTP::Plack
+PROTOTYPES: DISABLE
+
+Plack* Plack::new (Hash p = Hash()) {
+    bool multiprocess = false;
+    bool multithread  = false;
+    Sv val;
+    if ((val = p.fetch("multiprocess"))) multiprocess = val.is_true();
+    if ((val = p.fetch("multithread")))  multithread  = val.is_true();
+    
+    RETVAL = new Plack(multiprocess, multithread);
+}
+
+void Plack::bind (ServerSP server, Sub app)
+
+SslContext ssl_ctx_from_cert (string cert_file, string key_file) {
+    auto res = SslContext::create(cert_file, key_file);
+    if (!res) throw xs::out(res.error());
+    RETVAL = res.value();
+    RETVAL.retain();
+}
+
+SV* CLONE_SKIP (...) {
+    XSRETURN_YES;
+    PERL_UNUSED_VAR(items);
+}
+
+
+MODULE = UniEvent::HTTP                PACKAGE = UniEvent::HTTP::Plack::Writer
+PROTOTYPES: DISABLE
+
+void PlackWriter::write (const string& data)
+    
+void PlackWriter::close ()
+
+SV* CLONE_SKIP (...) {
+    XSRETURN_YES;
+    PERL_UNUSED_VAR(items);
+}

@@ -1,12 +1,12 @@
 package PICA::Data;
 use v5.14.1;
 
-our $VERSION = '1.19';
+our $VERSION = '1.20';
 
 use Exporter 'import';
 our @EXPORT_OK = qw(pica_parser pica_writer pica_path pica_xml_struct
-    pica_match pica_values pica_value pica_fields pica_holdings pica_items
-    pica_guess clean_pica pica_string);
+    pica_match pica_values pica_value pica_fields pica_title pica_holdings pica_items
+    pica_sort pica_guess clean_pica pica_string);
 our %EXPORT_TAGS = (all => [@EXPORT_OK]);
 
 our $ILN_PATH = PICA::Path->new('101@a');
@@ -18,6 +18,8 @@ use Encode qw(decode);
 use List::Util qw(first any);
 use IO::Handle;
 use PICA::Path;
+
+use sort 'stable';
 
 sub pica_match {
     my ($record, $path, %args) = @_;
@@ -70,79 +72,119 @@ sub pica_value {
 }
 
 sub pica_items {
-    my ($record) = @_;
+    my $holdings = pica_holdings(@_);
 
-    my $blessed = blessed($record);
-    $record = $record->{record} if reftype $record eq 'HASH';
-    my (@items, $current, $occurrence);
+    my @items;
+    foreach (@$holdings) {
+        my @fields = grep {$_->[0] =~ /^2/} @{$_->{record}};
 
-    foreach my $field (@$record) {
-        if ($field->[0] =~ /^2/) {
-
-            if (($occurrence // '') ne $field->[1]) {
-                if ($current) {
-                    push @items, $current;
-                    $current = undef;
+        while (@fields) {
+            my (@record, $epn);
+            my $occ = 1 * $fields[0]->[1];
+            while (@fields && 1 * $fields[0]->[1] == $occ) {
+                if ($fields[0]->[0] eq '203@') {
+                    ($epn) = $EPN_PATH->match_subfields($fields[0]);
                 }
-                $occurrence = $field->[1];
+                push @record, shift @fields;
             }
-
-            $current //= {record => []};
-
-            push @{$current->{record}}, [@$field];
-            if ($field->[0] eq '203@') {
-                ($current->{_id}) = $EPN_PATH->match_subfields($field);
-            }
-        }
-        elsif ($current) {
-            push @items, $current;
-            $current    = undef;
-            $occurrence = undef;
+            push @items, {record => \@record, _id => $epn};
         }
     }
 
-    push @items, $current if $current;
-
-    if ($blessed) {
-        bless $_, $blessed for @items;
+    if (blessed($_[0])) {
+        bless $_, blessed($_[0]) for @items;
     }
 
     return \@items;
 }
 
+sub pica_sort {
+    my ($record) = $_[0];
+
+    my $sorted = pica_title($record);
+
+    for my $holding (@{pica_holdings($record)}) {
+        push @{$sorted->{record}}, @{$holding->{record}},;
+    }
+
+    return $sorted;
+}
+
+sub sort_fields {
+    sort {sprintf("%s/%02d", @$a) cmp sprintf("%s/%02d", @$b)} @{$_[0]};
+}
+
+sub cmp_level2 {
+    my ($occA, $occB) = map {1 * $_->[1]} @_;
+    return $occA == $occB ? $_[0]->[0] cmp $_[1]->[0] : $occA <=> $occB;
+}
+
+sub pica_title {
+    my ($fields) = @_;
+
+    my $record = {record => [sort_fields(pica_fields($_[0], "0..."))]};
+
+    my $ppn = pica_value($record, '003@0');
+    $record->{_id} = $ppn if defined $ppn;
+
+    return blessed($_[0]) ? bless $record, blessed($_[0]) : $record;
+}
+
 sub pica_holdings {
-    my ($record) = @_;
 
-    my $blessed = blessed($record);
-    $record = $record->{record} if reftype $record eq 'HASH';
-    my (@holdings, $iln);
-    my $field_buffer = [];
+    # ignore level 0 fields
+    my @fields = grep {$_->[0] =~ /^[12]/}
+        @{reftype $_[0] eq 'HASH' ? $_[0]->{record} : $_[0]};
 
-    foreach my $field (@$record) {
-        my $tag = substr $field->[0], 0, 1;
-        if ($tag eq '0') {
-            next;
+    my @holdings;
+
+    # level 2 fields without preceding level 1
+    if (@fields) {
+        my @item;
+        while (@fields && $fields[0]->[0] =~ /^2/) {
+            push @item, shift @fields;
         }
-        elsif ($tag eq '1') {
+        if (@item) {
+            push @holdings, {record => [sort {cmp_level2($a, $b)} @item]};
+        }
+    }
+
+    while (@fields) {
+        my $iln;
+        my (@level1, @level2);
+
+        # consecutive level 1 fields (possibly split by multiple 101@)
+        while (@fields && $fields[0]->[0] =~ /^1/) {
+            my $field = shift @fields;
+
             if ($field->[0] eq '101@') {
-                my ($id) = $ILN_PATH->match_subfields($field);
-                if (defined $iln && ($id // '') ne $iln) {
-                    push @holdings, {record => $field_buffer, _id => $iln};
+                if (defined $iln) {
+                    push @holdings,
+                        {record => [sort_fields(\@level1)], _id => $iln};
+                    @level1 = ();
                 }
-                $field_buffer = [[@$field]];
-                $iln          = $id;
-                next;
+                ($iln) = $ILN_PATH->match_subfields($field);
             }
+
+            push @level1, $field;
         }
-        push @$field_buffer, [@$field];
+
+        #@level1 = sort_fields(\@level1) if @level1;
+
+        while (@fields && $fields[0]->[0] =~ /^2/) {
+            push @level2, shift @fields;
+        }
+
+        push @holdings,
+            {
+            record =>
+                [sort_fields(\@level1), sort {cmp_level2($a, $b)} @level2],
+            _id => $iln
+            };
     }
 
-    if (@$field_buffer) {
-        push @holdings, {record => $field_buffer, _id => $iln};
-    }
-
-    if ($blessed) {
-        bless $_, $blessed for @holdings;
+    if (blessed($_[0])) {
+        bless $_, blessed($_[0]) for @holdings;
     }
 
     return \@holdings;
@@ -159,8 +201,10 @@ sub pica_string {
 }
 
 *fields   = *pica_fields;
+*title    = *pica_title;
 *holdings = *pica_holdings;
 *items    = *pica_items;
+*sort     = *pica_sort;
 *match    = *pica_match;
 *value    = *pica_value;
 *values   = *pica_values;
@@ -509,15 +553,26 @@ one ore more PICA path expression. The following are virtually equivalent:
     $path->record_fields($record);
     $record->fields($path); # if $record is blessed
 
+=head2 pica_title( $record )
+
+Returns the record limited to level 0 fields ("title record") in sorted order.
+
 =head2 pica_holdings( $record )
 
-Returns a list (as array reference) of local holding records. Also available as
-accessor C<holdings>.
+Returns a list (as array reference) of local holding records, sorted by ILN.
+Level2 fields are included in sorted order. The ILN (if given) is available as
+C<_id>. Also available as accessor C<holdings>.
 
 =head2 pica_items( $record )
 
-Returns a list (as array reference) of item records. Also available as
-accessor C<items>.
+Returns a list (as array reference) of item records. The EPN (if given) is
+available as C<_id> Also available as accessor C<items>.
+
+=head2 pica_sort( $record )
+
+Returns a copy of the record with sorted fields (first level 1 fields, then
+level 2 fields not belonging to a level 1, then level 1, each followed by level
+2 sorted by EPN). Also available as accessor C<sort>. 
 
 =head1 ACCESSORS
 

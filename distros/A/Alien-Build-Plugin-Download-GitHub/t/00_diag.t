@@ -21,6 +21,7 @@ $modules{$_} = $_ for qw(
   Path::Tiny
   Test2::V0
   Test::Alien::Build
+  URI
 );
 
 
@@ -65,7 +66,7 @@ if(@keys > 0)
   spacer;
 }
 
-diag sprintf $format, 'perl ', $];
+diag sprintf $format, 'perl', "$] $^O $Config{archname}";
 
 foreach my $module (sort @modules)
 {

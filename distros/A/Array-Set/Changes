@@ -1,23 +1,33 @@
-Revision history for Array-Set
+0.061   2021-05-13  Released-By: PERLANCAR; Urgency: low
 
-0.05    2016-09-16 (PERLANCAR)
+	- No functional changes.
+
+	- [doc] Fix wording.
+
+
+0.060   2021-05-13  Released-By: PERLANCAR; Urgency: medium
+
+	- Add support for reference/undef values (option allow_refs).
+
+
+0.05    2016-09-16  Released-By: PERLANCAR
 
 	- [optimize] Provide fast version of symdiff/union when
 	  ignore_{blanks,space} are not enabled.
 
 
-0.04    2016-09-15 (PERLANCAR)
+0.04    2016-09-15  Released-By: PERLANCAR
 
 	- [optimize] Delay loading Tie::IxHash until needed.
 
 
-0.03    2016-09-15 (PERLANCAR)
+0.03    2016-09-15  Released-By: PERLANCAR
 
 	- [optimize] Provide fast version of diff/intersect when
 	  ignore_{blanks,case} are not enabled.
 
 
-0.02    2015-11-18 (PERLANCAR)
+0.02    2015-11-18  Released-By: PERLANCAR
 
 	- No functional changes.
 
@@ -25,6 +35,6 @@ Revision history for Array-Set
 	  Array::AsObject, Set::Object, Set::Tiny.
 
 
-0.01    2015-11-13 (PERLANCAR)
+0.01    2015-11-13  Released-By: PERLANCAR
 
         - First release.

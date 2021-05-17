@@ -1,0 +1,307 @@
+=head1 NAME
+
+UniEvent::HTTP::Server - efficient asynchronous http server
+
+
+
+=head1 SYNOPSIS
+
+    my $server = UE::HTTP::Server->new({
+        locations => [
+            {host => '*', port => 80},
+            {host => '*', port => 443, ssl_ctx => $ssl_ctx},
+        ]
+    }, $loop);
+    
+    $server->request_callback(sub {
+        my $request = shift;
+        if ($request->uri->path eq "/hello") {
+            $request->respond({
+                code    => 200,
+                headers => {...}
+                body    => "Hi",
+            });
+        } else {
+            $request->respond({code => 404});
+        }
+    });
+    
+    $server->run;
+    
+    $loop->run;
+
+
+
+=head1 DESCRIPTION
+
+C<UniEvent::HTTP::Server> respresents an asynchronous multiplexing http server working in single process/thread.
+To utilize several cpu cores, several server objects should be created in different processes/threads.
+Out-of-the-box multi-process/thread solution is implemented in L<UniEvent::HTTP::Manager>.
+
+Server supports keep-alive connections, compression, http pipelining, request/response body streaming.
+
+
+
+=head1 KEEP-ALIVE
+
+If an incoming request is a keep-alive request and given response is also keep-alive (by default), then server will keep the connection opened waiting for more
+requests. Connection will stay opened until either client closes it or C<max_keepalive_requests> is reached or user sends non-keep-alive response.
+
+
+
+=head1 COMPRESSION
+
+Compression / uncompression is handled by L<Protocol::HTTP> transparently. See its docs for info how to compress a response.
+
+
+
+=head1 HTTP PIPELINING
+
+When a client sends several requests in a single connection at once, server will call callbacks as requests arrive from network,
+not waiting for the responses for previous requests in the pipeline. User is not required to give responses in order - server will hold such responses and
+send them in order by itself. The API in case of pipelining is not affected - everything works as if there were no pipelining. If user gives a non-keep-alive
+response (Connection: close) for a request in the pipeline and this request is not the last one, then server will cancel all further requests in the pipeline
+and close the connection. In this case callbacks for such canceled requests will be called with error C<UniEvent::HTTP::Error::pipeline_canceled>.
+
+
+
+=head1 METHODS
+
+=head2 new([$loop = default])
+
+Creates server object which will run in C<$loop> L<UniEvent::Loop>.
+
+
+=head2 new(\%config, [$loop = default])
+
+Creates and configures server, same as:
+
+    my $server = UniEvent::HTTP::Server->new($loop);
+    $server->configure($config);
+
+
+=head2 configure(\%config)
+
+Configures server. Server can be configured multiple times even if it is running (done gracefully, without service interruption).
+
+C<config> is a hashref with the following params:
+
+=over
+
+=item locations [required]
+
+Arrayref of server locations to listen. Each location is a hashref with the following params
+
+=over
+
+=item host
+
+Host name or human-readable ip address of interface to listen. "*" will bind to all available interfaces
+
+=item port
+
+Port to listen. Can be zero, in which case server will bind to a random free port. You can then get the port server was bound to via
+
+    $server->sockaddr->port; # from the first location
+    $server->listeners->[$n]->sockaddr->port; # from the $n-th location
+
+=item reuse_port [false]
+
+If set to true, will use C<REUSE_PORT> feature when binding. This is the simplest (and efficient) way to create several server objects on the same port.
+This option is ignored on systems where it's not supported.
+
+=item backlog [4096]
+
+Defines the maximum length to which the queue of pending connections for this location may grow
+
+=item domain [AF_INET]
+
+Used when resolving C<host> domain name into IP address. Can be C<UniEvent::AF_INET> or C<UniEvent::AF_INET6>.
+
+=item ssl_ctx
+
+Enables SSL for this location. Must be an SSL context object which you can create via L<Net::SSLeay>.
+
+=item sock
+
+Allows to pass previously created socket. Socket must be bound to an address, but MUST NOT listen (C<listen()> must not be called). Server will call C<listen()>
+by itself. Useful if you want to use C<prefork-socket> scheme (i.e. create socket in master process, then fork and create server object and listen
+the same socket in multiple child processes).
+
+C<sock> and C<host>, C<port>, C<reuse_port>, C<domain> are mutually exclusive.
+
+=back
+
+
+=item idle_timeout [300]
+
+Max idle time in seconds for a keep-alive connection before server closes it. Can be fractional.
+
+=item max_headers_size [16384]
+
+Max http request headers size. If server receives request with bigger headers, callbacks will be called with error C<Protocol::HTTP::Error::headers_too_large>.
+
+=item max_body_size [unlimited]
+
+Max http request body size. If server receives request with bigger body, callbacks will be called with error C<Protocol::HTTP::Error::body_too_large>.
+
+=item tcp_nodelay [false]
+
+If set to true, will use C<tcp nodelay> feature.
+
+=item max_keepalive_requests [unlimited]
+
+Max number of requests per keep-alive connection. If limit is exceeded, server closes keep-alive connection (sending last response with
+C<Connection: close> header).
+
+=back
+
+
+=head2 loop()
+
+Returns L<UniEvent::Loop> object which server runs in.
+
+
+=head2 run()
+
+Starts server. This function will not block execution, you must call C<run()> on appropriate unievent loop afterwards.
+Thus it is possible to run more than one server in one process.
+
+
+=head2 running()
+
+Returns true if server is running.
+
+
+=head2 listeners()
+
+Returns listeners for all configured locations as arrayref of L<UniEvent::Tcp> objects. If server is not running, returns empty arrayref.
+
+
+=head2 sockaddr()
+
+Returns sockaddr of the first listener (if any) as L<Net::SockAddr> object. Effect is similar to:
+
+    $server->listeners->[0]->sockaddr;
+
+
+=head2 stop()
+
+Immediately stops the server. Will close all connections and cancel all active requests. Callbacks will be called with C<UniEvent::HTTP::Error::server_stopping>
+error.
+
+
+=head2 graceful_stop()
+
+Stops the server gracefully. Stops listening immediately and will close connections after its active requests are finished. After that, normally,
+if you don't have other active event objects in L<UniEvent> (or they are weak), event loop execution will bail out of C<run()> function.
+
+If you want to force bailing out of loop execution when server get stopped, use C<stop_callback>/C<stop_event>.
+
+
+=head2 stopping()
+
+Returns true if server is stopping now.
+
+
+=head2 stop_listening()
+
+Temporarily suspend listening for new requests. Will continue to process current active requests and receiving new requests in keep-alive connections.
+
+
+=head2 start_listening()
+
+Resumes listening for new requests after C<stop_listening()>.
+
+
+=head2 run_callback($sub)
+
+=head2 run_event()
+
+Callbacks set via these methods will be invoked right after server is started.
+
+Callback doesn't receive anything.
+
+See L<UniEvent/"EVENT CALLBACKS"> for differences between C<_callback> and C<_event> versions of methods.
+
+
+=head2 request_callback($sub)
+
+=head2 request_event()
+
+The simplest way of making http server.
+
+Callbacks set via these methods will be invoked when new request fully received (including body). Body will be located in memory.
+
+Callback signature:
+
+    my $request = shift;
+
+Where C<$request> is a L<UniEvent::HTTP::ServerRequest> object.
+
+If you don't want to have body in-memory and want precise control over how body is received, use C<route_callback>/C<route_event>.
+
+See L<UniEvent/"EVENT CALLBACKS"> for differences between C<_callback> and C<_event> versions of methods.
+
+
+=head2 route_callback($sub)
+
+=head2 route_event()
+
+Callbacks set via these methods will be invoked on new request when at least its headers are fully received.
+
+Callback signature:
+
+    my $request = shift;
+
+Where C<$request> is a L<UniEvent::HTTP::ServerRequest> object.
+
+These callbacks allows to add callbacks to the request object before it is received and control the process.
+This event is designed for URI dispatchers. URI dispatcher is a some logic that decides how this request will be processed depending on request URI, headers, etc...
+A part of this process is to decide how request (its body) will be received: part by part, as data arrives from network, or when data is fully arrived.
+
+If we decide to process request with all body available (the simplest way), we can use C<receive_callback>/C<receive_event> in request object
+
+    $request->receive_callback(sub {
+        my $request = shift;
+        # process request and send response
+    });
+
+Other way is to process data as it arrives from network via C<enable_partial()> and C<partial_callback>/C<partial_event> in request object
+
+    $request->enable_partial;
+    $request->partial_callback(sub {
+        my ($request, $error) = @_;
+        # process partial data
+        if ($request->is_done) {
+            # process request and send response
+        }
+    });
+
+See L<UniEvent::HTTP::ServerRequest> for more detailed description.
+
+
+=head2 error_callback($sub)
+
+=head2 error_event()
+
+Callbacks set via these methods will be invoked when error occured during receiving a request. But not in all cases. Only for cases when only simple callbacks
+are set for the request (which are called only when request is fully received, i.e. not a partial receival mode).
+That's because user doesn't know anything about such request yet (no callbacks has been called for this request so far), so that we don't need to do anything
+special in this case. Usually this event is used for logging purposes only.
+
+In contrast, in partial receival mode, partial callbacks might have been called for this request already and user might have started some work, so that the error
+in this case is directly delivered into request's partial callback and this event is not called.
+
+NOTE: errors occured during sending response are always delivered into request's C<drop_callback>/C<drop_event>.
+
+
+=head2 stop_callback($sub)
+
+=head2 stop_event()
+
+Callbacks set via these methods will be invoked when server has been fully stopped. In case of C<stop()> method, callbacks will be called immediately.
+In case of C<graceful_stop()> method, callbacks will be called when last active request is processed and its response is sent.
+
+
+=cut

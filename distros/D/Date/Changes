@@ -1,3 +1,5 @@
+5.2.5    13.05.2021
+           - bugfix: respect timezones in DateRel ctor from two dates
 5.2.4    19.04.2021
            - add MANIFEST.SKIP
 5.2.3    08.04.2021

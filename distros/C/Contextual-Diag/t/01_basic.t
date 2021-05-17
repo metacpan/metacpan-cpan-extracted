@@ -1,6 +1,7 @@
 use Test2::V0;
 
 use Contextual::Diag;
+use CDD;
 
 subtest 'VOID context' => sub {
     my $expected = [
@@ -154,6 +155,12 @@ subtest 'override can/isa' => sub {
     like dies {
         Contextual::Diag::Value->hoge;
     }, qr/cannot AUTOLOAD in class call/;
+};
+
+subtest 'cdd' => sub {
+    like( warnings { cdd }, [qr/^wanted VOID context/] );
+    like( warnings { my @t = cdd }, [qr/^wanted LIST context/] );
+    like( warnings { my $t = cdd }, [qr/^wanted SCALAR context/ ] );
 };
 
 done_testing;

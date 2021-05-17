@@ -9,7 +9,7 @@
 #
 # copyright at the end of the file in the pod section
 
-package Config::Model::TkUI 1.374;
+package Config::Model::TkUI 1.375;
 
 use 5.10.1;
 use strict;
@@ -94,7 +94,8 @@ my $default_config = {
 };
 
 my $main_window;
-my $config_path = path(File::HomeDir->my_home)->child('.cme/config/');
+my $home_str = File::HomeDir->my_home || '/tmp/';
+my $config_path = path($home_str)->child('.cme/config/');
 my $config_file = $config_path->child('tkui.yml');
 
 $config_path -> mkpath;
@@ -250,6 +251,7 @@ sub Populate {
     # add bottom frame
     my $bottom_frame = $cw->Frame->pack(qw/-pady 0 -fill both -expand 1/);
     my $tree_frame = $bottom_frame->Frame->pack(qw/-fill both -expand 1 -side left/);
+    my $filter_frame = $tree_frame->Frame->pack(qw/-fill x -side top/);
 
     # create the widget for tree navigation
     require Tk::Tree;
@@ -274,16 +276,16 @@ sub Populate {
         $cw->reload;
     };
 
-    my $filter_clear = $tree_frame->Button (
+    my $filter_clear = $filter_frame->Button (
         -image => $gnome_img{'window-close'},
         -command => $clear_filter
     );
     $cw->Balloon(-state => 'balloon')->attach($filter_clear, -msg => 'clear filter');
     $filter_clear->pack(-side => 'right');
-    $tree_frame->Label(-text => 'filter elements',)->pack(-side => 'left');
+    $filter_frame->Label(-text => 'filter elements',)->pack(-side => 'left');
 
     $cw->{elt_filter_value} = '';
-    my $element_filter_w = $tree_frame->Entry(
+    my $element_filter_w = $filter_frame->Entry(
         -textvariable => \$cw->{elt_filter_value},
     );
     $cw->Balloon(-state => 'balloon')->attach(

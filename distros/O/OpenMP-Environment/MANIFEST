@@ -138,17 +138,6 @@ benchmarks/NPB3.4.1/NPB3.4-OMP/UA/ua.f90
 benchmarks/NPB3.4.1/NPB3.4-OMP/UA/ua_data.f90
 benchmarks/NPB3.4.1/NPB3.4-OMP/UA/utils.f90
 benchmarks/NPB3.4.1/NPB3.4-OMP/UA/verify.f90
-benchmarks/NPB3.4.1/NPB3.4-OMP/bin/bt.S.x
-benchmarks/NPB3.4.1/NPB3.4-OMP/bin/cg.S.x
-benchmarks/NPB3.4.1/NPB3.4-OMP/bin/dc.W.x
-benchmarks/NPB3.4.1/NPB3.4-OMP/bin/ep.S.x
-benchmarks/NPB3.4.1/NPB3.4-OMP/bin/ft.S.x
-benchmarks/NPB3.4.1/NPB3.4-OMP/bin/is.S.x
-benchmarks/NPB3.4.1/NPB3.4-OMP/bin/lu.S.x
-benchmarks/NPB3.4.1/NPB3.4-OMP/bin/lu.W.x
-benchmarks/NPB3.4.1/NPB3.4-OMP/bin/mg.S.x
-benchmarks/NPB3.4.1/NPB3.4-OMP/bin/sp.S.x
-benchmarks/NPB3.4.1/NPB3.4-OMP/bin/ua.S.x
 benchmarks/NPB3.4.1/NPB3.4-OMP/common/c_print_results.c
 benchmarks/NPB3.4.1/NPB3.4-OMP/common/c_timers.c
 benchmarks/NPB3.4.1/NPB3.4-OMP/common/c_timers.h
@@ -196,6 +185,7 @@ dist.ini
 examples/01-inline-c-omp.pl
 examples/02-inline-c-omp.pl
 examples/03-inline-c-omp.pl
+examples/04-inline-c-omp-Alien::OpenMP.pl
 examples/launcher.pl
 examples/summarize_env.pl
 examples/validate_first.pl

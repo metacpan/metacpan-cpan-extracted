@@ -11,7 +11,7 @@ use Type::Utils -all;
 # this gets us compile and compile_named
 use Type::Params;
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 our @EXPORT_OK;
 
@@ -41,7 +41,7 @@ CodeGen::Protection::Types - Keep our type tools orgnanized
 
 =head1 VERSION
 
-version 0.05
+version 0.06
 
 =head1 SYNOPSIS
 

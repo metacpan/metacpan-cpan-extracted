@@ -88,8 +88,8 @@ Simple Message::make_chunk(string s) {
     RETVAL = strings_to_sv(THIS->make_chunk(s));
 }
 
-Simple Message::final_chunk() {
-    RETVAL = strings_to_sv(THIS->final_chunk());
+Simple Message::final_chunk(string s = {}) {
+    RETVAL = strings_to_sv(THIS->final_chunk(s));
 }
 
 void Message::compression () {

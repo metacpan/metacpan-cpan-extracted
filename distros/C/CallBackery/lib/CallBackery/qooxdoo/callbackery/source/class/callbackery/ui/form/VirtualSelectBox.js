@@ -514,47 +514,59 @@ qx.Class.define("callbackery.ui.form.VirtualSelectBox",
     _highlightFilterValueFunction : null,
     _searchRegExp : null,
 
-
     __addFilterInput : function()
     {
-//      var input = this.__filterInput = new qx.ui.form.TextField().set({
-      var input = this.__filterInput = new callbackery.ui.form.SearchField().set({
-        appearance : 'widget',
-        liveUpdate : true,
-        height     : 0,
-//        tabIndex   : 32000, // not tabable
-        width      : 1 // must be > 0
+      var input = this.__filterInput = qx.dom.Element.create('input',{
+          type: 'text',
+          autocomplete: 'new-password',
+          style: 'position: absolute;opacity: 0;font-size: 16px;height:0;'
       });
-      // we don't want the browser to set this
-      // works with Chrome even
-      input.getContentElement().setAttribute('autocomplete', 'new-password');
-      this._add(input);
+      var fakeInput = qx.dom.Element.create('input',{
+        type: 'text',
+        style: 'position: absolute; font-size: 16px;height:0; opacity: 0;'
+      });
+      var dropdown = this.getChildControl('dropdown');
+      this.addListenerOnce('appear',e => {
+        this.getContentElement().getDomElement().prepend(fakeInput);
+        this.getContentElement().getDomElement().prepend(input);
+      },this);
+      dropdown.addListener('appear',e => {
+        fakeInput.focus();
+        input.value=''; // drop any odd spaces
+        window.requestAnimationFrame(e => {
+          // if clicked we are already focussed
+          if (input !== document.activeElement ) {
+            input.focus();
+          }
+        },this);
+      });
 
-      var dropdown = this.getChildControl("dropdown");
-      dropdown.addListener('appear', function() {
-        // we must delay so that the focus is only set once the list is ready
-        window.setTimeout(function() {
-          input.focus();
-        }, 0);
-      }, this);
+      // mobile browsers will only focus and show the
+      // when focusing happens in the click handler
+      // so we are essentially focusing twice
+      
+      this.addListener('click', e => {
+        input.focus();
+      }, this,true);
+
       dropdown.addListener('disappear', function() {
-        input.blur();
         // clear filter
         var sel = this.getValue();
-        input.resetValue();
+        input.value='';
+        this.__updateDelegate();
         this.setValue(sel);
       }, this);
 
-      input.addListener("blur", function(e) {
-        this.close();
-      }, this);
+      var that=this;
+      input.addEventListener("change", function() {
+        that.close();
+      });
 
-      input.addListener('changeValue', function(e) {
-        if (this.__filterUpdateRunning === 0) {
-          this.__updateDelegate();
-        }
-      }, this);
-
+      input.addEventListener('input', function() {
+        if (that.__filterUpdateRunning === 0) {
+          that.__updateDelegate();
+        }  
+      });
     },
 
     __getHighlightStyleFromAppearance : function()
@@ -621,7 +633,9 @@ qx.Class.define("callbackery.ui.form.VirtualSelectBox",
     __updateDelegate : function(lastFilterValue)
     {
       this.__filterUpdateRunning++;
-      var filterValue = (lastFilterValue !== undefined) ? lastFilterValue : this.__filterInput.getValue();
+      var filterValue = (lastFilterValue !== undefined) 
+        ? lastFilterValue : this.__filterInput.value;
+      
       this.__filterValue = filterValue;
 
       // _searchRegExp is used in default _searchMatch function to avoid recreation of regexp object
@@ -659,7 +673,8 @@ qx.Class.define("callbackery.ui.form.VirtualSelectBox",
       }
       else {
         var len  = filterValue.length;
-        var last = ( len > this.__lastMatch.length+1) ? this.__filterInput.getValue().charAt(len-1) : '';
+        var last = ( len > this.__lastMatch.length+1) 
+            ? this.__filterInput.value.charAt(len-1) : '';
         filterValue = this.__lastMatch + last;
         this.__updateDelegate(filterValue);
       }

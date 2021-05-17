@@ -1,6 +1,6 @@
 package Resque;
 # ABSTRACT: Redis-backed library for creating background jobs, placing them on multiple queues, and processing them later.
-$Resque::VERSION = '0.38';
+$Resque::VERSION = '0.41';
 use Moose;
 use Scalar::Util 'blessed';
 use Moose::Util::TypeConstraints;
@@ -69,6 +69,21 @@ sub pop {
     my ( $self, $queue ) = @_;
     my $payload = $self->redis->lpop($self->key( queue => $queue ));
     return unless $payload;
+
+    $self->new_job({
+        payload => $payload,
+        queue   => $queue
+    });
+}
+
+sub blpop {
+    my ( $self, $queues, $timeout ) = @_;
+    my ( $key, $payload ) = $self->redis->blpop(( map { $self->key( queue => $_ ) } @$queues ), $timeout || 0 );
+    return unless $payload;
+
+    # clean prefix added by key().
+    my $prefix  = $self->key('queue');
+    my ($queue) = $key =~ /^$prefix:(.+)$/;
 
     $self->new_job({
         payload => $payload,
@@ -190,7 +205,7 @@ Resque - Redis-backed library for creating background jobs, placing them on mult
 
 =head1 VERSION
 
-version 0.38
+version 0.41
 
 =head1 SYNOPSIS
 
@@ -300,6 +315,15 @@ Pops a job off a queue. Queue name should be a string.
 Returns a Resque::Job object.
 
     my $resque_job = $r->pop( 'queue_name' );
+
+=head2 blpop
+
+Pops a job off an arrayref of queues prioritizing by order. Queue names should be string.
+It will block until a job is poped or the optional timeout in seconds.
+
+Returns a Resque::Job object.
+
+    my $resque_job = $r->blpop( [qw/ queue1 queue2 queue3/], 60 );
 
 =head2 size
 

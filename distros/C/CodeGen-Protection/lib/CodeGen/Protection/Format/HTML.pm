@@ -6,7 +6,7 @@ use Moo;
 use Carp 'croak';
 with 'CodeGen::Protection::Role';
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 sub _tidy {
     my ( $self, $code ) = @_;
@@ -35,7 +35,7 @@ CodeGen::Protection::Format::HTML - Safely rewrite parts of HTML documents
 
 =head1 VERSION
 
-version 0.05
+version 0.06
 
 =head1 SYNOPSIS
 

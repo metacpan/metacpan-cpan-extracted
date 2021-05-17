@@ -3,7 +3,7 @@ package Git::Bunch;
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2021-01-31'; # DATE
 our $DIST = 'Git-Bunch'; # DIST
-our $VERSION = '0.628'; # VERSION
+our $VERSION = '0.629'; # VERSION
 
 use 5.010001;
 use strict;
@@ -1263,7 +1263,7 @@ Git::Bunch - Manage gitbunch directory (directory which contain git repos)
 
 =head1 VERSION
 
-This document describes version 0.628 of Git::Bunch (from Perl distribution Git-Bunch), released on 2021-01-31.
+This document describes version 0.629 of Git::Bunch (from Perl distribution Git-Bunch), released on 2021-01-31.
 
 =head1 SYNOPSIS
 
@@ -1865,7 +1865,7 @@ Source repository is at L<https://github.com/perlancar/perl-Git-Bunch>.
 
 =head1 BUGS
 
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Git-Bunch>
+Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-Git-Bunch/issues>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
@@ -1887,7 +1887,11 @@ uncommitted changes; 2) synchronize (pull/push) to other locations. I put all my
 data in one big gitbunch directory; I find it simpler. gitbunch works for me and
 I use it daily.
 
-L<File::RsyBak>
+Other tools on CPAN to make it easier to manage multiple git repositories:
+L<got> from L<App::GitGot>, L<group-git> from L<Group::Git>.
+
+Git::Bunch can be used to backup bunch. Other tools to do backup include
+L<File::RsyBak>.
 
 =head1 AUTHOR
 

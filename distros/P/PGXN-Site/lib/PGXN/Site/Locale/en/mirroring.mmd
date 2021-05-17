@@ -3,14 +3,15 @@ Mirroring PGXN
 
 Hosting a PGXN mirror is simple. All you need is:
 
-* A reasonably fast internet connection
-* Space for storage—not much at this point
-* An [rsync](http://rsync.samba.org/) client
-* A web server
+*   A reasonably fast internet connection
+*   Space for storage—not much at this point
+*   An [rsync] client
+*   A web server
 
-The `rsync` address for the PGXN master mirror is rsync://master.pgxn.org/pgxn.
+The `rsync` address for the PGXN root mirror is `rsync://master.pgxn.org/pgxn`.
 
-Once you have the rsync client installed on your system and the disk space mapped out, add an entry to your crontab like so:
+Once you have the `rsync` client installed on your system and the disk space
+mapped out, add an entry to your crontab like so:
 
     0 20 * * * /usr/bin/rsync -az --delete rsync://master.pgxn.org/pgxn /usr/local/pgxn
 
@@ -18,7 +19,11 @@ On Windows, use AT like so:
 
     AT 20:00 /every:M,T,W,Th,F,S,Su "C:\Program Files\Rsync\rsync -az --delete rsync://master.pgxn.org/pgxn C:\Projects\PGXN"
 
-Please do not sync more than once every hour. And realistically you only need to sync once or twice a day. Next, set up a web server to serve the mirror. If your rsync is already in the subdirectory of a web server root, you should be golden. Otherwise, if you’re using [Apache](http://httpd.apache.org/), you can set up a virtual host like so (assuming that you’re `rsync`ing to `/usr/local/pgxn`):
+Please do not sync more than once every hour. And realistically you only need to
+sync once or twice a day. Next, set up a web server to serve the mirror. If your
+rsync is already in the subdirectory of a web server root, you should be golden.
+Otherwise, if you’re using [Apache], you can set up a virtual host like so
+(assuming that you’re `rsync`ing to `/usr/local/pgxn`):
 
     <VirtualHost *:80>
       DocumentRoot /usr/local/pgxn
@@ -31,7 +36,7 @@ Please do not sync more than once every hour. And realistically you only need to
       </Directory>
     </VirtualHost>
 
-For [Nginx](http://www.nginx.org/), you set set up a virtual host like this:
+For [Nginx], you set set up a virtual host like this:
 
     server {
         listen       80;
@@ -43,4 +48,10 @@ For [Nginx](http://www.nginx.org/), you set set up a virtual host like this:
         }
     }
 
-If you’d like to register your mirror, [send us email](mailto:[_1]) with all the details and we’ll get you registered.
+If you’d like to register your mirror, [send us email] with all the details and
+we’ll get you registered.
+
+  [rsync]: https://rsync.samba.org/
+  [Apache]: https://httpd.apache.org/
+  [Nginx]: https://www.nginx.org/
+  [send us email]: mailto:[_1]

@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2020-2021 -- leonerd@leonerd.org.uk
 
-package Object::Pad::MOP::Class 0.37;
+package Object::Pad::MOP::Class 0.38;
 
 use v5.14;
 use warnings;
@@ -28,6 +28,50 @@ This API should be considered experimental even within the overall context in
 which C<Object::Pad> is expermental.
 
 =cut
+
+=head1 CONSTRUCTOR
+
+=head2 for_class
+
+   $metaclass = Object::Pad::MOP::Class->for_class( $class )
+
+I<Since version 0.38.>
+
+Returns the metaclass instance associated with the given class name.
+
+=cut
+
+sub for_class
+{
+   shift;
+   my ( $targetclass ) = @_;
+
+   return $targetclass->META;
+}
+
+=head2 for_caller
+
+   $metaclass = Object::Pad::MOP::Class->for_caller;
+
+I<Since version 0.38.>
+
+A convenient shortcut for obtaining the metaclass instance of the calling
+package scope. Often handy during C<BEGIN> blocks of the class itself to
+perform adjustments or additions.
+
+   class Some::Class::Here 1.234 {
+      BEGIN {
+         my $meta = Object::Pad::MOP::Class->for_caller;
+         ...
+      }
+   }
+
+=cut
+
+sub for_caller
+{
+   return shift->for_class( caller );
+}
 
 =head1 METHODS
 

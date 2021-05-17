@@ -26,11 +26,11 @@ Pg::Explain::Analyzer - Some helper methods to analyze explains
 
 =head1 VERSION
 
-Version 1.07
+Version 1.08
 
 =cut
 
-our $VERSION = '1.07';
+our $VERSION = '1.08';
 
 =head1 SYNOPSIS
 
@@ -58,7 +58,7 @@ Takes one argument - Pg::Explain object.
 sub new {
     my $class = shift;
     my $self  = bless {}, $class;
-    croak( 'You have to provide explain object.' ) if 0 == scalar @_;
+    croak( 'You have to provide explain object.' )                 if 0 == scalar @_;
     croak( 'Too many arguments to Pg::Explain::Analyzer->new().' ) if 1 < scalar @_;
     $self->explain( shift );
     croak( 'Given explain is not an object.' )   unless ref( $self->explain );
@@ -116,7 +116,7 @@ sub all_node_paths {
         my $current_path     = [ @{ $prefix }, $node_type ];
         my $current_path_str = join ' :: ', @{ $current_path };
         push @return, $current_path unless $seen{ $current_path_str }++;
-        push @nodes, map { [ $current_path, $_ ] } $node->all_subnodes;
+        push @nodes,  map { [ $current_path, $_ ] } $node->all_subnodes;
     }
     return \@return;
 }

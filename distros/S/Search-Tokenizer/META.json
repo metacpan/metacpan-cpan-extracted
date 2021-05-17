@@ -1,27 +1,22 @@
 {
    "abstract" : "Decompose a string into tokens (words)",
    "author" : [
-      "Laurent Dami <lau......da..@justice.ge.ch>"
+      "Laurent Dami <dami.@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4003, CPAN::Meta::Converter version 2.120921",
+   "generated_by" : "Module::Build version 0.4231",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Search-Tokenizer",
    "prereqs" : {
-      "build" : {
-         "requires" : {
-            "Test::More" : "0"
-         }
-      },
       "configure" : {
          "requires" : {
-            "Module::Build" : "0.40"
+            "Module::Build" : "0.42"
          }
       },
       "runtime" : {
@@ -29,12 +24,18 @@
             "Text::Transliterator::Unaccent" : "0",
             "Unicode::CaseFold" : "0"
          }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0",
+            "Time::HiRes" : "0"
+         }
       }
    },
    "provides" : {
       "Search::Tokenizer" : {
          "file" : "lib/Search/Tokenizer.pm",
-         "version" : "1.01"
+         "version" : "1.02"
       }
    },
    "release_status" : "stable",
@@ -46,5 +47,6 @@
          "url" : "https://github.com/damil/Search-Tokenizer"
       }
    },
-   "version" : "1.01"
+   "version" : "1.02",
+   "x_serialization_backend" : "JSON::PP version 4.05"
 }

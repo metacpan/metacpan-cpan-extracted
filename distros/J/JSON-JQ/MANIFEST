@@ -3,6 +3,8 @@ lib/JSON/JQ.xs
 t/001_load.t
 t/002_basis.t
 t/003_basic_filters.t
+t/004_types_and_values.t
+t/005_builtin_operators_and_functions.t
 Build.PL
 Changes
 LICENSE

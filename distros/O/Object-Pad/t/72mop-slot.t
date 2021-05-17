@@ -13,7 +13,7 @@ class Example {
    method slot :lvalue { $slot }
 }
 
-my $classmeta = Example->META;
+my $classmeta = Object::Pad::MOP::Class->for_class( "Example" );
 
 my $slotmeta = $classmeta->get_slot( '$slot' );
 
@@ -45,7 +45,8 @@ is( $slotmeta->class->name, "Example", '$slotmeta->class gives class' );
       has @values;
    }
 
-   my $arrayslotmeta = List->META->get_slot( '@values' );
+   my $arrayslotmeta = Object::Pad::MOP::Class->for_class( "List" )
+      ->get_slot( '@values' );
 
    like( exception { no warnings; $arrayslotmeta->value( List->new ) = [] },
       qr/^Modification of a read-only value attempted at /,

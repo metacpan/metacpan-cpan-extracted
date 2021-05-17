@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    version 1.27
+    version 1.29
 
 SYNOPSIS
 
@@ -46,6 +46,8 @@ FUNCTIONS
 
  script_compiles
 
+    [version 1.05]
+
      script_compiles( $script, $test_name );
 
     The "script_compiles" test calls the script with "perl -c script.pl",
@@ -59,9 +61,9 @@ FUNCTIONS
     is running the test script (and not with the default system perl). This
     will also be shown in the diagnostic output on failure.
 
-    This function was added in version 1.05.
-
  script_runs
+
+    [version 1.05]
 
      script_runs( $script, $test_name );
      script_runs( \@script_and_arguments, $test_name );
@@ -79,7 +81,7 @@ FUNCTIONS
     test script (and not with the default system perl). This will also be
     shown in the diagnostic output on failure.
 
-    This function was added in version 1.05.
+    [version 1.09]
 
     You may pass in options as a hash as the second argument (as of version
     1.09).
@@ -91,11 +93,11 @@ FUNCTIONS
 
     interpreter_options
 
+      [version 1.25]
+
       Array reference of Perl options to be passed to the interpreter.
       Things like -w or -x can be passed this way. This may be either a
       single string or an array reference.
-
-      This option was added in version 1.25.
 
     signal
 
@@ -142,79 +144,95 @@ FUNCTIONS
 
       Same as stdout above, except for stderr.
 
+ script_fails
+
+    [ version 1.28 ]
+
+     script_fails $script, { exit => $expected_exit }, $test_name );
+     script_fails $script, \%options, $test_name;
+
+    "script_runs" may be invoked as "script_fails". The exit option is
+    mandatory when used this way. Since Perl 5.12, die usually returns 255,
+    but does not promise to do so. Fatal errors like divide by 0 also
+    return 255 often so it is not the best error code for a trapped
+    exception. script_runs needs an exit code it considers success, use
+    warn; exit; instead of die.
+
  script_stdout_is
+
+    [version 1.09]
 
      script_stdout_is $expected_stdout, $test_name;
 
     Tests if the output to stdout from the previous "script_runs" matches
     the expected value exactly.
 
-    This function was added in version 1.09.
-
  script_stdout_isnt
+
+    [version 1.09]
 
      script_stdout_is $expected_stdout, $test_name;
 
     Tests if the output to stdout from the previous "script_runs" does NOT
     match the expected value exactly.
 
-    This function was added in version 1.09.
-
  script_stdout_like
+
+    [version 1.09]
 
      script_stdout_like $regex, $test_name;
 
     Tests if the output to stdout from the previous "script_runs" matches
     the regular expression.
 
-    This function was added in version 1.09.
-
  script_stdout_unlike
+
+    [version 1.09]
 
      script_stdout_unlike $regex, $test_name;
 
     Tests if the output to stdout from the previous "script_runs" does NOT
     match the regular expression.
 
-    This function was added in version 1.09.
-
  script_stderr_is
+
+    [version 1.09]
 
      script_stderr_is $expected_stderr, $test_name;
 
     Tests if the output to stderr from the previous "script_runs" matches
     the expected value exactly.
 
-    This function was added in version 1.09.
-
  script_stderr_isnt
+
+    [version 1.09]
 
      script_stderr_is $expected_stderr, $test_name;
 
     Tests if the output to stderr from the previous "script_runs" does NOT
     match the expected value exactly.
 
-    This function was added in version 1.09.
-
  script_stderr_like
+
+    [version 1.09]
 
      script_stderr_like $regex, $test_name;
 
     Tests if the output to stderr from the previous "script_runs" matches
     the regular expression.
 
-    This function was added in version 1.09.
-
  script_stderr_unlike
+
+    [version 1.09]
 
      script_stderr_unlike $regex, $test_name;
 
     Tests if the output to stderr from the previous "script_runs" does NOT
     match the regular expression.
 
-    This function was added in version 1.09.
-
  program_runs
+
+    [version 1.26]
 
      program_runs( $program, $test_name );
      program_runs( \@program_and_arguments, $test_name );
@@ -233,9 +251,19 @@ FUNCTIONS
     See File::Spec or Path::Class for routines useful in building pathnames
     in a cross-platform way.
 
-    This function was added in version 1.26.
+ program_fails
+
+    [ version 1.28 ]
+
+     program_fails $program, { exit => $expected_exit }, $test_name;
+     program_fails $program, \%options, $test_name;
+
+    "program_runs" may be invoked as "program_fails". "program_fails" needs
+    to know the expected exit value, so exit becomes a required option.
 
  program_stdout_is
+
+    [version 1.26]
 
      program_stdout_is $expected_stdout, $test_name;
 
@@ -244,12 +272,16 @@ FUNCTIONS
 
  program_stdout_isnt
 
+    [version 1.26]
+
      program_stdout_is $expected_stdout, $test_name;
 
     Tests if the output to stdout from the previous "program_runs" does NOT
     match the expected value exactly.
 
  program_stdout_like
+
+    [version 1.26]
 
      program_stdout_like $regex, $test_name;
 
@@ -258,12 +290,16 @@ FUNCTIONS
 
  program_stdout_unlike
 
+    [version 1.26]
+
      program_stdout_unlike $regex, $test_name;
 
     Tests if the output to stdout from the previous "program_runs" does NOT
     match the regular expression.
 
  program_stderr_is
+
+    [version 1.26]
 
      program_stderr_is $expected_stderr, $test_name;
 
@@ -272,6 +308,8 @@ FUNCTIONS
 
  program_stderr_isnt
 
+    [version 1.26]
+
      program_stderr_is $expected_stderr, $test_name;
 
     Tests if the output to stderr from the previous "program_runs" does NOT
@@ -279,12 +317,16 @@ FUNCTIONS
 
  program_stderr_like
 
+    [version 1.26]
+
      program_stderr_like $regex, $test_name;
 
     Tests if the output to stderr from the previous "program_runs" matches
     the regular expression.
 
  program_stderr_unlike
+
+    [version 1.26]
 
      program_stderr_unlike $regex, $test_name;
 
@@ -317,9 +359,11 @@ AUTHOR
 
     Chris White <cxw@cpan.org>
 
+    John Karr (BRAINBUZ)
+
 COPYRIGHT AND LICENSE
 
-    This software is copyright (c) 2019 by Adam Kennedy.
+    This software is copyright (c) 2006-2021 by Adam Kennedy.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

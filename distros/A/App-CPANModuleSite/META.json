@@ -53,6 +53,6 @@
          "web" : "https://github.com/davorg/app-cpanmodulesite"
       }
    },
-   "version" : "v0.0.8",
+   "version" : "v0.0.9",
    "x_serialization_backend" : "JSON::PP version 4.06"
 }

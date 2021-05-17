@@ -14,6 +14,10 @@ use App::Cmd::Tester;
 use File::Slurp qw{ read_file write_file };
 use Net::DNS::Resolver::Mock;
 
+unless ($ENV{AUTHOR_TESTS}) {
+  plan(skip_all => 'CMD Output tests skipped');
+}
+
 my $write_data = $ENV{MAIL_BIMI_TEST_WRITE_DATA} // 0; # Set to 1 to write new test data, then check it and commit
 
 my $resolver = Net::DNS::Resolver::Mock->new;

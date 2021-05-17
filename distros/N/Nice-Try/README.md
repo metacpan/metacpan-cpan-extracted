@@ -1,1252 +1,883 @@
-\#\#----------------------------------------------------------------------------
-\#\# A real Try Catch Block Implementation Using Perl Filter -
-\~/lib/Nice/Try.pm \#\# Version v0.1.11 \#\# Copyright(c) 2021 DEGUEST
-Pte. Ltd. \#\# Author: Jacques Deguest <jack@deguest.jp> \#\# Created
-2020/05/17 \#\# Modified 2021/03/26 \#\# All rights reserved \#\# \#\#
-This program is free software; you can redistribute it and/or modify it
-\#\# under the same terms as Perl itself.
-\#\#----------------------------------------------------------------------------
-package Nice::Try; BEGIN { require 5.16.0; use strict; use warnings; use
-warnings::register; use IO::File; use PPI; use Filter::Util::Call; use
-Scalar::Util; use List::Util (); \# use Devel::Confess; our \$VERSION =
-'v0.1.11'; our \$ERROR; our( \$CATCH, \$DIED, \$EXCEPTION, \$FINALLY,
-\$HAS\_CATCH, @RETVAL, \$SENTINEL, \$TRY, \$WANTARRAY ); }
+SYNOPSIS
+========
 
-Taken from Try::Harder version 0.005
-------------------------------------
+        use Nice::Try;
 
-our \$SENTINEL = bless( {} =\> **PACKAGE** . '::SENTINEL' );
-
-sub import { my( \$this, @arguments ) = @_ ; my \$hash = { @arguments };
-\$hash-\>{debug} = 0 if( !CORE::exists( \$hash-\>{debug} ) );
-\$hash-\>{no\_filter} = 0 if( !CORE::exists( \$hash-\>{no\_filter} ) );
-\$hash-\>{debug\_code} = 0 if( !CORE::exists( \$hash-\>{debug\_code} )
-); filter\_add( bless( \$hash =\> ( ref( \$this ) \|\| \$this ) ) ); }
-
-sub unimport {\
-filter\_del(); }
-
-sub filter { my( \$self ) = @_ ; my( \$status, \$last\_line ); my \$line
-= 0; my \$code = ''; if( \$self-\>{no\_filter} ) { filter\_del();
-\$status = 1; \$self-\>*message( 3, "Skiping filtering." ); return(
-\$status ); } while( \$status = filter\_read() ) { return( \$status )
-if( \$status \< 0 ); \$line++; if( /\^**(?:DATA\|END)**/ ) {
-\$last\_line = \$*; last; } \$code .= \$*; \$* =''; } return(
-$line ) if( !$line ); unless( \$status \< 0 ) { \#\# \$self-\>*message(
-5, "Processing at line $line code:\n$code" ); my
-$doc = PPI::Document->new( \$code, readonly => 1 ) || die( "Unable to parse: ", PPI::Document->errstr, "\n$code\n\"
-); if( \$doc = \$self-\>*parse( \$doc ) ) { \$* = \$doc-\>serialize; \#
-\$doc-\>save( "./dev/debug-parsed.pl" ); \# \$status = 1; } \#\#
-Rollback else { \#
-$self->_message( 5, "Nothing found, restoring code to '$code'\" ); \$* =
-\$code; \# \$status = -1; \# filter\_del(); } if( CORE::length(
-\$last\_line ) ) { \$\_ .= \$last\_line; } } unless( \$status \<= 0 ) {
-while( \$status = filter\_read() ) { return( \$status ) if( \$status \<
-0 ); \$line++; } } \# $self->_message( 3, "Returning status '$line' with
-\$\_ set to '\$*'.\" ); if( \$self-\>{debug\_file} ) { if( my
-$fh = IO::File->new( ">$self-\>{debug\_file}\" ) ) {
-\$fh-\>binmode(':utf8' ); \$fh-\>print( \$* ); \$fh-\>close; } } \#
-filter\_del(); return( \$line ); }
-
-sub \_browse { my \$self = shift( @_ ); my \$elem = shift( @_ ); my
-\$level = shift( @_ ) \|\| 0;
-$self->_message( 4, "Checking code '$elem'.\" ); \$self-\>\_messagef( 4,
-"PPI element of class %s has children property '%s'.", \$elem-\>class,
-$elem->{children} );  return if( !$elem-\>children ); foreach my \$e (
-\$elem-\>elements ) { printf( STDERR "%sElement: \[%d\] class %s, value
-%s\n", ( '.' x \$level ), \$e-\>line\_number, \$e-\>class, \$e-\>content
-); if( \$e-\>can('children') && \$e-\>children ) { \$self-\>\_browse(
-\$e, \$level + 1 ); } } }
-
-sub *error { my \$self = shift( @_ ); if( @_ ) { my \$txt = join( '',
-map( ref( \$\_ ) eq 'CODE' ? \$*-\>() : \$\_, @_ ) );
-$txt =~ s/[\015\012]+$//g; \$ERROR = $txt;  CORE::warn( "$txt\n\" ) if(
-warnings::enabled ); return; } return( \$ERROR ); }
-
-sub *message { my \$self = shift( @_ ); my \$level = $_[0] =~ /^\d+$/ ?
-shift( @_ ) : 0; return if( \$self-\>{debug} \< \$level ); my @data =
-@_; \$stackFrame = 0; my( \$pkg, \$file, \$line, @otherInfo ) = caller(
-\$stackFrame ); my \$sub = ( caller( \$stackFrame + 1 ) )\[3\]; my
-\$sub2 = substr( \$sub, rindex( \$sub, '::' ) + 2 ); my
-$txt = "${pkg}::\${sub2}( $self ) [$line\]: \" . join( '', map( ref(
-\$\_ ) eq 'CODE' ? \$*-\>() : \$\_, @data ) ); $txt =~ s/\n$//gs; \$txt
-= '\#\#' . join( "\n\#\#", split( /\n/, \$txt ) ); CORE::print( STDERR
-\$txt, "\n" ); }
-
-sub *messagef { my \$self = shift( @_ ); my \$level = $_[0] =~ /^\d+$/ ?
-shift( @_ ) : 0; return if( \$self-\>{debug} \< \$level ); my @data =
-@_; \$stackFrame = 0; my \$fmt = shift( @data ); my( \$pkg, \$file,
-\$line, @otherInfo ) = caller( \$stackFrame ); my \$sub = ( caller(
-\$stackFrame + 1 ) )\[3\]; my \$sub2 = substr( \$sub, rindex( \$sub,
-'::' ) + 2 ); my $txt = "${pkg}::\${sub2}( $self ) [$line\]: \" .
-sprintf( \$fmt, map( ref( \$* ) eq 'CODE' ? \$*-\>() : \$*, @data ) );
-$txt =~ s/\n$//gs; \$txt = '\#\#' . join( "\n\#\#", split( /\n/, \$txt )
-); CORE::print( STDERR \$txt, "\n" ); }
-
-sub \_parse { my \$self = shift( @_ ); my \$elem = shift( @_ ); if(
-!Scalar::Util::blessed( $elem ) || !$elem-\>isa( 'PPI::Node' ) ) {
-return( \$self-\>\_error( "Element provided to parse is not a PPI::Node
-object" ) ); } my \$ref = \$elem-\>find(sub { my( \$top, \$this ) = @_;
-return( \$this-\>class eq 'PPI::Statement' && substr( \$this-\>content,
-0, 3 ) eq 'try' ); }); return( \$self-\>\_error( "Failed to find any
-try-catch clause: \$@" ) ) if( !defined( \$ref ) );
-$self->_messagef( 4, "Found %d match(es)", scalar( @$ref ) ); return if(
-!scalar( @\$ref ) );
-
-    ## 2020-09-13: PPI will return 2 or more consecutive try-catch block as 1 statement
-    ## It does not tell them apart, so we need to post process the result to effectively search within for possible for other try-catch blocks and update the @$ref array consequently
-    ## Array to contain the new version of the $ref array.
-    my $alt_ref = [];
-    $self->_message( 3, "Checking for consecutive try-catch blocks in results found by PPI" );
-    foreach my $this ( @$ref )
-    {
-        my( @block_children ) = $this->children;
-        next if( !scalar( @block_children ) );
-        my $tmp_ref = [];
-        ## to contain all the nodes to move
-        my $tmp_nodes = [];
-        my $prev_sib = $block_children[0];
-        push( @$tmp_nodes, $prev_sib );
-        my $sib;
-        while( $sib = $prev_sib->next_sibling )
-        {
-            ## We found a try-catch block. Move the buffer to $alt_ref
-            if( $sib->class eq 'PPI::Token::Word' && $sib->content eq 'try' )
-            {
-                ## Look ahead for a block...
-                my $next = $sib->snext_sibling;
-                if( $next && $next->class eq 'PPI::Structure::Block' )
-                {
-                    $self->_message( 3, "Found consecutive try-block." );
-                    ## Push the previous statement $st to the stack $alt_ref
-                    $self->_messagef( 3, "Saving previous %d nodes collected.", scalar( @$tmp_nodes ) );
-                    push( @$tmp_ref, $tmp_nodes );
-                    $tmp_nodes = [];
-                }
-            }
-            push( @$tmp_nodes, $sib );
-            $prev_sib = $sib;
-        }
-        $self->_messagef( 3, "Saving last %d nodes collected.", scalar( @$tmp_nodes ) );
-        push( @$tmp_ref, $tmp_nodes );
-        $self->_messagef( 3, "Found %d try-catch block(s) in initial PPI result.", scalar( @$tmp_ref ) );
-        ## If we did find consecutive try-catch blocks, we add each of them after the nominal one and remove the nominal one after. The nominal one should be empty by then
-        if( scalar( @$tmp_ref ) > 1 )
-        {
-            my $last_obj = $this;
-            my $spaces = [];
-            foreach my $arr ( @$tmp_ref )
-            {
-                $self->_message( 3, "Adding statement block with ", scalar( @$arr ), " children after '$last_obj'" );
-                ## Get the trailing insignificant elements at the end of the statement and move them out of the statement
-                my $insignificants = [];
-                while( scalar( @$arr ) > 0 )
-                {
-                    my $o = $arr->[-1];
-                    ## $self->_message( 3, "Checking trailing object with class '", $o->class, "' and value '$o'" );
-                    last if( $o->class eq 'PPI::Structure::Block' );
-                    unshift( @$insignificants, pop( @$arr )->remove );
-                }
-                ## $self->_messagef( 3, "%d insignificant objects found.", scalar( @$insignificants ) );
-                
-                my $st = PPI::Statement->new;
-                ## $self->_messagef( 3, "Adding the updated statement objects with %d children.", scalar( @$arr ) );
-                foreach my $o ( @$arr )
-                {
-                    ## We remove the object from its parent, because, as per the documentation, an object can only have one parent
-                    ## Without removing, this would simply fail. The object added would be empty.
-                    my $old = $o->remove || die( "Unable to remove element '$o'\n" );
-                    $st->add_element( $old );
-                }
-                my $err = '';
-                $self->_messagef( 3, "Adding the statement object after last object '%s' of class '%s' with parent with class '%s'.", Scalar::Util::refaddr( $last_obj ), $last_obj->class, $last_obj->parent->class );
-                $self->_message( 4, "In other word, adding:\n'$st'\nAFTER:\n'$last_obj'" );
-                # my $rc = $last_obj->insert_after( $st );
-                my $rc;
-                if( $last_obj->class eq 'PPI::Token::Whitespace' )
-                {
-                    $rc = $last_obj->__insert_after( $st );
-                }
-                else
-                {
-                    $rc = $last_obj->insert_after( $st );
-                }
-                
-                if( !defined( $rc ) )
-                {
-                    $err = sprintf( 'Object to be added after last try-block statement must be a PPI::Element. Class provided is \"%s\".', $st->class );
-                }
-                elsif( !$rc )
-                {
-                    $err = sprintf( "Object of class \"%s\" could not be added after object '%s' of class '%s' with parent '%s' with class '%s': '$last_obj'.", $st->class, Scalar::Util::refaddr( $last_obj ), $last_obj->class, Scalar::Util::refaddr( $last_obj->parent ), $last_obj->parent->class );
-                }
-                else
-                {
-                    $last_obj = $st;
-                    if( scalar( @$insignificants ) )
-                    {
-                        ## $self->_messagef( 3, "Adding %d trailing insignificant objects after last element of class '%s'", scalar( @$insignificants ), $last_obj->class );
-                        foreach my $o ( @$insignificants )
-                        {
-                            ## $self->_messagef( 3, "Adding trailing insignificant object of class '%s' after last element of class '%s'", $o->class, $last_obj->class );
-                            ## printf( STDERR "Inserting object '%s' (%s) of type '%s' after object '%s' (%s) of type %s who has parent '%s' of type '%s'\n", overload::StrVal( $o ), Scalar::Util::refaddr( $o ), ref( $o ), overload::StrVal( $last_obj), Scalar::Util::refaddr( $last_obj ), ref( $last_obj ), overload::StrVal( $last_obj->parent ), ref( $last_obj->parent ) );
-                            eval
-                            {
-                                $rc = $last_obj->insert_after( $o ) ||
-                                do
-                                {
-                                    warn( "Failed to insert object of class '", $o->class, "' before last object of class '", $st->class, "'\n" ) if( $self->{debug} );
-                                };
-                            };
-                            if( $@ )
-                            {
-                                if( ref( $o ) )
-                                {
-                                    warn( "Failed to insert object of class '", $o->class, "' before last object of class '", $st->class, "': $@\n" ) if( $self->{debug} );
-                                }
-                                else
-                                {
-                                    warn( "Was expecting an object to insert before last object of class '", $st->class, "', but instead got '$o': $@\n" ) if( $self->{debug} );
-                                }
-                            }
-                            elsif( !defined( $rc ) )
-                            {
-                                warn( sprintf( 'Object to be added after last try-block statement must be a PPI::Element. Class provided is \"%s\".', $o->class ) ) if( $self->{debug} );
-                            }
-                            elsif( !$rc )
-                            {
-                                warn( sprintf( "Object of class \"%s\" could not be added after object of class '%s': '$last_obj'.", $o->class, $last_obj->class ) ) if( $self->{debug} );
-                            }
-                            ## printf( STDERR "Object inserted '%s' (%s) of class '%s' now has parent '%s' (%s) of class '%s'\n", overload::StrVal( $o ), Scalar::Util::refaddr( $o ), ref( $o ), overload::StrVal( $o->parent ), Scalar::Util::refaddr( $o->parent ), ref( $o->parent ) );
-                            $o->parent( $last_obj->parent ) if( !$o->parent );
-                            $last_obj = $o;
-                        }
-                    }
-                }
-                die( $err ) if( length( $err ) );
-                push( @$alt_ref, $st );
-            }
-            my $parent = $this->parent;
-            ## Completely destroy it; it is now replaced by our updated code
-            $this->delete;
-        }
-        else
-        {
-            push( @$alt_ref, $this );
-        }
-    }
-    $self->_messagef( 3, "Results found increased from %d to %d results.", scalar( @$ref ), scalar( @$alt_ref ) );
-    @$ref = @$alt_ref if( scalar( @$alt_ref ) > scalar( @$ref ) );
-
-    ## $self->_message( 3, "Script code is now:\n'$elem'" );
-
-    foreach my $this ( @$ref )
-    {
-        $self->_browse( $this ) if( $self->{debug} >= 5 );
-        my $element_before_try = $this->previous_sibling;
-        my $try_block_ref = [];
-        ## Contains the finally block reference
-        my $fin_block_ref = [];
-        my $nodes_to_replace = [];
-        my $catch_def = [];
-        ## Replacement data
-        my $repl = [];
-        my $catch_repl = [];
-        
-        ## There is a weird bug in PPI that I have searched but could not find
-        ## If I don't attempt to stringify, I may end up with a PPI::Statement object that has no children as an array reference
-        my $ct = "$this";
-        ## $self->_message( 3, "Checking sibling elements for '$ct'" );
-        my( @block_children ) = $this->children;
-        next if( !scalar( @block_children ) );
-        my $prev_sib = $block_children[0];
-        push( @$nodes_to_replace, $prev_sib );
-        my( $inside_catch, $inside_finally );
-        my $temp = {};
-        ## Buffer of nodes found in between blocks
-        my $buff = [];
-        ## Temporary new line counter between try-catch block so we can reproduce it and ensure proper reporting of error line
-        my $nl_counter = 0;
-        my $sib;
-        while( $sib = $prev_sib->next_sibling )
-        {
-            ## $self->_messagef( 3, "Try sibling at line %d with class '%s': '%s'", $sib->line_number, $sib->class, $sib->content );
-            if( !scalar( @$try_block_ref ) )
-            {
-                ## $self->_message( 3, "\tWorking on the initial try block." );
-                if( $sib->class eq 'PPI::Structure::Block' &&
-                    substr( "$sib", 0, 1 ) eq "\{" &&
-                    substr( "$sib", -1, 1 ) eq "\}" )
-                {
-                    $temp->{block} = $sib;
-                    push( @$try_block_ref, $temp );
-                    $temp = {};
-                    if( scalar( @$buff ) )
-                    {
-                        push( @$nodes_to_replace, @$buff );
-                        $buff = [];
-                    }
-                    push( @$nodes_to_replace, $sib );
-                }
-                elsif( $sib->class eq 'PPI::Token::Whitespace' && $sib->content =~ /[\015\012]+/ )
-                {
-                    ## $self->_messagef( 4, "\tTry -> Found open new line at line %d", $sib->line_number );
-                    $temp->{open_curly_nl}++;
-                    push( @$buff, $sib );
-                }
-                ## We skip anything else until we find that try block
-                else
-                {
-                    push( @$buff, $sib );
-                    $prev_sib = $sib;
-                    next;
-                }
-            }
-            elsif( $sib->class eq 'PPI::Token::Word' && $sib->content eq 'catch' )
-            {
-                $inside_catch++;
-                if( scalar( @$buff ) )
-                {
-                    push( @$nodes_to_replace, @$buff );
-                    $buff = [];
-                }
-                push( @$nodes_to_replace, $sib );
-            }
-            elsif( $inside_catch )
-            {
-                ## $self->_message( 3, "\tWorking on a catch block." );
-                ## This is the catch list as in catch( $e ) or catch( Exception $e )
-                if( $sib->class eq 'PPI::Structure::List' )
-                {
-                    $temp->{var} = $sib;
-                    push( @$nodes_to_replace, $sib );
-                }
-                elsif( $sib->class eq 'PPI::Structure::Block' )
-                {
-                    $temp->{block} = $sib;
-                    if( scalar( @$catch_def ) )
-                    {
-                        $catch_def->[-1]->{close_curly_nl} = $nl_counter;
-                    }
-                    else
-                    {
-                        $try_block_ref->[-1]->{close_curly_nl} = $nl_counter;
-                    }
-                    $nl_counter = 0;
-                    push( @$catch_def, $temp );
-                    $temp = {};
-                    $inside_catch = 0;
-                    push( @$nodes_to_replace, $sib );
-                }
-                elsif( $sib->class eq 'PPI::Token::Whitespace' && $sib->content =~ /[\015\012]+/ )
-                {
-                    ## $self->_messagef( 4, "\tCatch -> Found open new line at line %d", $sib->line_number );
-                    $temp->{open_curly_nl}++;
-                    push( @$nodes_to_replace, $sib );
-                }
-                else
-                {
-                    push( @$nodes_to_replace, $sib );
-                }
-            }
-            elsif( $sib->class eq 'PPI::Token::Word' && $sib->content eq 'finally' )
-            {
-                $inside_finally++;
-                if( scalar( @$buff ) )
-                {
-                    push( @$nodes_to_replace, @$buff );
-                    $buff = [];
-                }
-                push( @$nodes_to_replace, $sib );
-            }
-            elsif( $inside_finally )
-            {
-                ## $self->_message( 3, "\tWorking on a finally block." );
-                ## We could ignore it, but it is best to let the developer know in case he/she counts on it somehow
-                if( $sib->class eq 'PPI::Structure::List' )
-                {
-                    die( sprintf( "the finally block does not accept any list parameters at line %d\n", $sib->line_number ) );
-                }
-                elsif( $sib->class eq 'PPI::Structure::Block' )
-                {
-                    $temp->{block} = $sib;
-                    if( scalar( @$fin_block_ref ) )
-                    {
-                        die( sprintf( "There can only be one finally block at line %d\n", $sib->line_number ) );
-                    }
-                    elsif( scalar( @$catch_def ) )
-                    {
-                        $catch_def->[-1]->{close_curly_nl} = $nl_counter;
-                    }
-                    else
-                    {
-                        $try_block_ref->[-1]->{close_curly_nl} = $nl_counter;
-                    }
-                    $nl_counter = 0;
-                    push( @$fin_block_ref, $temp );
-                    $temp = {};
-                    $inside_finally = 0;
-                    push( @$nodes_to_replace, $sib );
-                }
-                elsif( $sib->class eq 'PPI::Token::Whitespace' && $sib->content =~ /[\015\012]+/ )
-                {
-                    ## $self->_messagef( 4, "\tFinally -> Found open new line at line %d", $sib->line_number );
-                    $temp->{open_curly_nl}++;
-                    push( @$nodes_to_replace, $sib );
-                }
-                else
-                {
-                    push( @$nodes_to_replace, $sib );
-                }
-            }
-            ## Check for new lines after closing blocks. The ones before, we can account for them in each section above
-            ## We could have } catch {
-            ## or
-            ## }
-            ## catch {
-            ## etc.
-            ## This could also be new lines following the last catch block
-            elsif( $sib->class eq 'PPI::Token::Whitespace' && $sib->content =~ /[\015\012]+/ )
-            {
-                ## $self->_messagef( 4, "Between -> Found closing new line at line %d", $sib->line_number );
-                $nl_counter++;
-                push( @$buff, $sib );
-            }
-            else
-            {
-                push( @$buff, $sib );
-            }
-            $prev_sib = $sib;
-        }
-        
-        my $has_catch_clause = scalar( @$catch_def ) > 0 ? 1 : 0;
-        
-        ## Prepare the finally block, if any, and add it below at the appropriate place
-        my $fin_block = '';
-        if( scalar( @$fin_block_ref ) )
-        {
-            my $fin_def = $fin_block_ref->[0];
-            ## my $finally_block = $fin_def->{block}->content;
-            my $finally_block = $self->_serialize( $fin_def->{block} );
-            $finally_block =~ s/^\{[[:blank:]]*|[[:blank:]]*\}$//gs;
-            $fin_block = <<EOT;
-
-CORE::local \$Nice::Try::FINALLY = Nice::Try::ScopeGuard-\>\_new(sub
-**FINALLY\_OPEN\_NL**{ **BLOCK\_PLACEHOLDER**
-\_\_FINALLY\_\_CLOSE\_NL\_\_}, \@\_); EOT \$fin\_block =\~ s/\n/ /gs
-unless( \$self-\>{debug\_code} );
-$fin_block =~ s/__BLOCK_PLACEHOLDER__/$finally\_block/gs; if(
-\$fin\_def-\>{open\_curly\_nl} ) { \$fin\_block =\~
-s/**FINALLY\_OPEN\_NL**/"\n" x \$fin\_def-\>{open\_curly\_nl}/gex; }
-else { \$fin\_block =\~ s/**FINALLY\_OPEN\_NL**//gs; } if(
-\$fin\_def-\>{close\_curly\_nl} ) { \$fin\_block =\~
-s/\_\_FINALLY\_\_CLOSE\_NL\_\_/"\n" x
-\$fin\_def-\>{close\_curly\_nl}/gex; } else { \$fin\_block =\~
-s/\_\_FINALLY\_\_CLOSE\_NL\_\_//gs; } }
-
-        ## Found any try block at all?
-        if( scalar( @$try_block_ref ) )
-        {
-            ## $self->_message( 3, "Original code to remove is:\n", join( '', @$nodes_to_replace ) );
-            ## $self->_message( 3, "Try definition: ", $try_block_ref->[0]->{block}->content );
-            ## $self->_messagef( 3, "%d catch clauses found", scalar( @$catch_def ) );
-            foreach my $c ( @$catch_def )
-            {
-                ## $self->_message( 3, "Catch variable assignment: ", $c->{var} );
-                ## $self->_message( 3, "Catch block: ", $c->{block} );
-            }
-            my $try_def = $try_block_ref->[0];
-            ## $self->_messagef( 3, "Try new lines before block: %d, after block %d", $try_def->{open_curly_nl}, $try_def->{close_curly_nl} );
-            
-            ## Checking for embedded try-catch
-            ## $self->_message( 4, "Checking for embedded try-catch in ", $try_def->{block} );
-            if( my $emb = $self->_parse( $try_def->{block} ) )
-            {
-                $try_def->{block} = $emb;
-            }
-                        
-            ## my $try_block = $try_def->{block}->content;
-            my $try_block = $self->_serialize( $try_def->{block} );
-            $try_block =~ s/^\{[[:blank:]]*|[[:blank:]]*\}$//gs;
-            
-            my $try_sub = <<EOT;
-
-CORE::local \$Nice::Try::TRY = CORE::sub { CORE::do **TRY\_OPEN\_NL**{
-**BLOCK\_PLACEHOLDER** };\_\_TRY\_\_CLOSE\_NL\_\_ CORE::return(
-\$Nice::Try::SENTINEL ); }; CORE::local ( \$Nice::Try::EXCEPTION,
-\$Nice::Try::DIED, \@Nice::Try::RETVAL ); **FINALLY\_BLOCK** CORE::local
-\$Nice::Try::HAS\_CATCH = \$has\_catch\_clause; CORE::local
-\$Nice::Try::WANTARRAY = CORE::wantarray; { CORE::local \$@; CORE::eval
-{ if( \$Nice::Try::WANTARRAY ) { \@Nice::Try::RETVAL =
-&\$Nice::Try::TRY; } elsif( defined( \$Nice::Try::WANTARRAY ) ) {
-\$Nice::Try::RETVAL\[0\] = &\$Nice::Try::TRY; } else {
-&\$Nice::Try::TRY; } }; \$Nice::Try::DIED = CORE::length( \$@ ) ? 1 : 0;
-\$@ =\~ s/\[\\015\\012\]+\$//g; \$Nice::Try::EXCEPTION = \$@; };
-
-EOT \$try\_sub =\~ s/\n/ /gs unless( \$self-\>{debug\_code} );
-$try_sub =~ s/__BLOCK_PLACEHOLDER__/$try\_block/gs; if(
-\$try\_def-\>{open\_curly\_nl} ) { \$try\_sub =\~
-s/**TRY\_OPEN\_NL**/"\n" x \$try\_def-\>{open\_curly\_nl}/gex; } else {
-\$try\_sub =\~ s/**TRY\_OPEN\_NL**//gs; } if(
-\$try\_def-\>{close\_curly\_nl} ) { \$try\_sub =\~
-s/\_\_TRY\_\_CLOSE\_NL\_\_/"\n" x \$try\_def-\>{close\_curly\_nl}/gex; }
-else { \$try\_sub =\~ s/\_\_TRY\_\_CLOSE\_NL\_\_//gs; }
-
-            ## Add the final block if there is no catch block, otherwise the final block comes at the end below
-            if( !$has_catch_clause )
-            {
-                $try_sub =~ s/__FINALLY_BLOCK__/$fin_block/gs;
-            }
-            ## If it should not be here, remove the placeholder
-            else
-            {
-                $try_sub =~ s/__FINALLY_BLOCK__//gs;
-            }
-            push( @$repl, $try_sub );
-        }
-        else
-        {
-            ## $self->_message( 3, "** No try block found!!" );
-            next;
-        }
-        
-        my $if_start = <<EOT;
-
-if( \$Nice::Try::DIED ) { if( \$Nice::Try::HAS\_CATCH ) { EOT
-\$if\_start =\~ s/\n/ /gs unless(
-$self->{debug_code} );  push( @$catch\_repl,
-$if_start );  if( scalar( @$catch\_def ) ) { \#\#
-$self->_messagef( 3, "Found %d catch blocks", scalar( @$catch\_def ) );
-my $total_catch = scalar( @$catch\_def ); \#\# To count how many times
-we have else's -- obviously we should not have more than 1 my \$else =
-0; for( my \$i = 0; \$i \< \$total\_catch; \$i++ ) { my \$cdef =
-$catch_def->[$i\]; \#\# \$self-\>\_messagef( 3, "Catch No \${i} new
-lines before block: %d, after block %d", \$cdef-\>{open\_curly\_nl},
-\$cdef-\>{close\_curly\_nl} ); \#\# Checking for embedded try-catch if(
-my \$emb = \$self-\>\_parse( \$cdef-\>{block} ) ) { \$cdef-\>{block} =
-\$emb; }
-
-                if( $cdef->{var} )
-                {
-                    ## $self->_messagef( 3, "Catch assignment is: '%s'", $cdef->{var}->content );
-                    ## my $str = $cdef->{var}->content;
-                    my $str = $self->_serialize( $cdef->{var} );
-                    $str =~ s/^\([[:blank:]]*|[[:blank:]]*\)$//g;
-                    if( $str =~ /^(\S+)[[:blank:]]+(\$\S+)$/ )
-                    {
-                        my( $ex_class, $ex_var ) = ( $1, $2 );
-                        $cdef->{class} = $ex_class;
-                        $cdef->{var} = $ex_var;
-                    }
-                    else
-                    {
-                        $cdef->{var} = $str;
-                    }
-                }
-                else
-                {
-                    ## $self->_message( 3, "No Catch assignment found" );
-                }
-                if( $cdef->{block} )
-                {
-                    ## $self->_messagef( 3, "Catch block is:\n%s", $cdef->{block}->content );
-                }
-                else
-                {
-                    ## $self->_message( 3, "No catch block found!" );
-                    next;
-                }
-                my $cond;
-                if( $i == 0 )
-                {
-                    $cond = 'if';
-                }
-                elsif( $i == ( $total_catch - 1 ) )
-                {
-                    $cond = $total_catch == 1 
-                        ? 'if' 
-                        : $cdef->{class}
-                            ? 'elsif'
-                            : 'else';
-                }
-                else
-                {
-                    $cond = 'elsif';
-                }
-                ## $self->_message( 3, "\$i = $i, \$total_catch = $total_catch and cond = '$cond'" );
-                ## my $block = $cdef->{block}->content;
-                my $block = $self->_serialize( $cdef->{block} );
-                $block =~ s/^\{[[:blank:]]*|[[:blank:]]*\}$//gs;
-                my $catch_section = '';
-                my $catch_code = <<EOT;
-            CORE::local \$Nice::Try::CATCH = CORE::sub
-            {
-                CORE::do __CATCH_OPEN_NL__{ __BLOCK_PLACEHOLDER__ }; __CATCH__CLOSE_NL__
-                CORE::return \$Nice::Try::SENTINEL;
-            };
-            
-            if( \$Nice::Try::WANTARRAY ) 
-            {
-                \@Nice::Try::RETVAL = \&\$Nice::Try::CATCH;
-            }
-            elsif( defined( \$Nice::Try::WANTARRAY ) )
-            {
-                \$Nice::Try::RETVAL[0] = \&\$Nice::Try::CATCH;
-            } 
-            else 
-            {
-                \&\$Nice::Try::CATCH;
-            }
-
-EOT if( \$cdef-\>{var} ) { my \$ex\_var = \$cdef-\>{var}; \# Tilmann
-Haeberle (TH) 2021-03-25: Fix: properly test for exception class
-inheritance via -\>isa if( \$cdef-\>{class} ) { my \$ex\_class =
-\$cdef-\>{class}; \$catch\_section = \<\<EOT;
-${cond}( Scalar::Util::blessed( \$Nice::Try::EXCEPTION ) && \$Nice::Try::EXCEPTION->isa( '$ex\_class'
-) ) { CORE::local \$@ = \$Nice::Try::EXCEPTION; my \$ex\_var =
-\$Nice::Try::EXCEPTION; \$catch\_code } EOT } \#\# No class, just
-variable assignment like \$e or something else { \#\#
-\$self-\>\_message( 3, "Called here for fallback for element No
-$i" );  if( ++$else \> 1 ) { \#\# CORE::warn("Cannot have more than one
-falllback catch clause for block: ", \$cdef-\>{block}-\>content,"\n\" )
-if( warnings::enabled ); CORE::warn( "Cannot have more than one
-falllback catch clause for block:", \$self-\>\_serialize(
-\$cdef-\>{block} ), "\n" ) if( warnings::enabled ); \#\# Skip, not die.
-Not fatal, just ignored next; } $cond = "${cond}( 1 )\" if( \$cond eq
-'if' \|\| $cond eq 'elsif' );  # push( @$catch\_repl, \<\<EOT );
-\$catch\_section = \<\<EOT; \${cond} { CORE::local \$@ =
-\$Nice::Try::EXCEPTION; my \$ex\_var = \$Nice::Try::EXCEPTION;
-\$catch\_code } EOT } } \#\# No variable assignment like \$e else {
-$cond = "${cond}( 1 )\" if( \$cond eq 'if' \|\| \$cond eq 'elsif' );
-\$catch\_section = \<\<EOT; \${cond} { CORE::local \$@ =
-\$Nice::Try::EXCEPTION; \$catch\_code } EOT } \$catch\_section =\~ s/\n/
-/gs unless( \$self-\>{debug\_code} );
-$catch_section =~ s/__BLOCK_PLACEHOLDER__/$block/gs; if(
-\$cdef-\>{open\_curly\_nl} ) { \$catch\_section =\~
-s/**CATCH\_OPEN\_NL**/"\n" x \$cdef-\>{open\_curly\_nl}/gex; } else {
-\$catch\_section =\~ s/**CATCH\_OPEN\_NL**//gs; } if(
-\$cdef-\>{close\_curly\_nl} ) { \$catch\_section =\~
-s/\_\_CATCH\_\_CLOSE\_NL\_\_/"\n" x \$cdef-\>{close\_curly\_nl}/gex; }
-else {
-$catch_section =~ s/__CATCH__CLOSE_NL__//gs;  }  push( @$catch\_repl,
-\$catch\_section ); } \#\# End catch loop \# Tilmann Haeberle (TH)
-2021-03-25: Fix: put an else at the end to avoid 'fall\_through' issue
-unless an else exists already my \$if\_end; if( \$else ) { \$if\_end =
-\<\<EOT; } EOT } else { \$if\_end = \<\<EOT; else { die(
-\$Nice::Try::EXCEPTION ); } } EOT } \$if\_end =\~ s/\n/ /g unless(
-$self->{debug_code} );  push( @$catch\_repl, \$if\_end ); } \#\# No
-catch clause else { \#\# If the try-catch block is called inside an
-eval, propagate the exception \#\# Otherwise, we just make the \$@
-available my \$catch\_else = \<\<EOT; } else { if( CORE::defined(
-(CORE::caller(0))\[3\] ) && (CORE::caller(0))\[3\] eq '(eval)' ) {
-CORE::die( \$Nice::Try::EXCEPTION ); } else { \$@ =
-\$Nice::Try::EXCEPTION; } } EOT \$catch\_else =\~ s/\n/ /g unless(
-$self->{debug_code} );  push( @$catch\_repl, \$catch\_else ); }
-
-        ## Add
-        my $catch_res = scalar( @$catch_repl ) ? join( '', @$catch_repl ) : '';
-        push( @$repl, $catch_res ) if( $catch_res );
-        ## Closing the If DIED condition
-        push( @$repl, "\};" );
-
-        ## If there is a catch clause, we put the final block here, if any
-        if( $has_catch_clause && CORE::length( $fin_block ) )
-        {
-            push( @$repl, $fin_block );
-        }
-        
-        my $last_return_block = <<EOT;
-
-if( CORE::defined( \$Nice::Try::WANTARRAY ) and (
-!Scalar::Util::blessed( \$Nice::Try::RETVAL\[0\] ) or (
-Scalar::Util::blessed( \$Nice::Try::RETVAL\[0\] ) &&
-!\$Nice::Try::RETVAL\[0\]-\>isa( 'Nice::Try::SENTINEL' ) ) ) ) {
-CORE::return( \$Nice::Try::WANTARRAY ? \@Nice::Try::RETVAL :
-\$Nice::Try::RETVAL\[0\] ); } EOT \$last\_return\_block =\~ s/\n/ /gs
-unless( $self->{debug_code} );  push( @$repl, \$last\_return\_block );
-my $try_catch_code = join( '', @$repl ); my \$token = PPI::Token-\>new(
-"; { \$try\_catch\_code }" ) \|\| die( "Unable to create token" );
-\$token-\>set\_class( 'Structure' ); \#\#
-$self->_messagef( 3, "Token is '$token' and of class '%s' and inherit
-from PPI::Token? %s", $token->class, ($token-\>isa( 'PPI::Token' ) ?
-'yes' : 'no' ) ); my \$struct = PPI::Structure-\>new( \$token ) \|\|
-die("Unable to create PPI::Structure element\" ); \#\#
-$self->_message( 3, "Resulting try-catch block is:\n'$token'\" ); my
-$orig_try_catch_block = join( '', @$nodes\_to\_replace ); \#\#
-$self->_message( 3, "Original try-catch block is:\n'$orig\_try\_catch\_block'\"
-); \#\# \$self-\>\_messagef( 3, "Element before our try-catch block is
-of class %s with value '%s'", \$element\_before\_try-\>class,
-\$element\_before\_try-\>content ); if( !( my \$rc =
-\$element\_before\_try-\>insert\_after( \$token ) ) ) { \#\#
-\$self-\>\_message( 3, "Return code is defined?", CORE::defined( \$rc )
-? 'yes' : 'no', \" and is it a PPI::Element object? \", \$token-\>isa(
-'PPI::Element' ) ? 'yes' : 'no' ); \$self-\>\_error( "Failed to add
-replacement code of class '",
-$token->class, "' after '$element\_before\_try'\" ); next; } \#\#
-\$self-\>\_message( 3, "Return code is defined?", defined( \$rc ) ?
-"yes" : "no" );
-
-        for( my $k = 0; $k < scalar( @$nodes_to_replace ); $k++ )
-        {
-            my $e = $nodes_to_replace->[$k];
-            ## $self->_messagef( 4, "[$k] Removing node: $e" );
-            $e->delete || warn( "Could not remove node No $k: '$e'\n" );
-        }
-    }
-    ## End foreach catch found
-
-    ## $self->_message( 3, "\n\nResulting code is\n", $elem->content );
-    return( $elem );
-
-}
-
-Taken from PPI::Document
-------------------------
-
-sub \_serialize { my \$self = shift( @_ ); my \$ppi = shift( @_ ) \|\|
-return( '' ); my @tokens = \$ppi-\>tokens;
-
-    # The here-doc content buffer
-    my $heredoc = '';
-
-    # Start the main loop
-    my $output = '';
-    foreach my $i ( 0 .. $#tokens ) {
-        my $Token = $tokens[$i];
-
-        # Handle normal tokens
-        unless ( $Token->isa('PPI::Token::HereDoc') ) {
-            my $content = $Token->content;
-
-            # Handle the trivial cases
-            unless ( $heredoc ne '' and $content =~ /\n/ ) {
-                $output .= $content;
-                next;
-            }
-
-            # We have pending here-doc content that needs to be
-            # inserted just after the first newline in the content.
-            if ( $content eq "\n" ) {
-                # Shortcut the most common case for speed
-                $output .= $content . $heredoc;
-            } else {
-                # Slower and more general version
-                $content =~ s/\n/\n$heredoc/;
-                $output .= $content;
-            }
-
-            $heredoc = '';
-            next;
-        }
-
-        # This token is a HereDoc.
-        # First, add the token content as normal, which in this
-        # case will definitely not contain a newline.
-        $output .= $Token->content;
-
-        # Now add all of the here-doc content to the heredoc buffer.
-        foreach my $line ( $Token->heredoc ) {
-            $heredoc .= $line;
-        }
-
-        if ( $Token->{_damaged} ) {
-            # Special Case:
-            # There are a couple of warning/bug situations
-            # that can occur when a HereDoc content was read in
-            # from the end of a file that we silently allow.
-            #
-            # When writing back out to the file we have to
-            # auto-repair these problems if we aren't going back
-            # on to the end of the file.
-
-            # When calculating $last_line, ignore the final token if
-            # and only if it has a single newline at the end.
-            my $last_index = $#tokens;
-            if ( $tokens[$last_index]->{content} =~ /^[^\n]*\n$/ ) {
-                $last_index--;
-            }
-
-            # This is a two part test.
-            # First, are we on the last line of the
-            # content part of the file
-            my $last_line = List::Util::none {
-                $tokens[$_] and $tokens[$_]->{content} =~ /\n/
-                } (($i + 1) .. $last_index);
-            if ( ! defined $last_line ) {
-                # Handles the null list case
-                $last_line = 1;
-            }
-
-            # Secondly, are their any more here-docs after us,
-            # (with content or a terminator)
-            my $any_after = List::Util::any {
-                $tokens[$_]->isa('PPI::Token::HereDoc')
-                and (
-                    scalar(@{$tokens[$_]->{_heredoc}})
-                    or
-                    defined $tokens[$_]->{_terminator_line}
-                    )
-                } (($i + 1) .. $#tokens);
-            if ( ! defined $any_after ) {
-                # Handles the null list case
-                $any_after = '';
-            }
-
-            # We don't need to repair the last here-doc on the
-            # last line. But we do need to repair anything else.
-            unless ( $last_line and ! $any_after ) {
-                # Add a terminating string if it didn't have one
-                unless ( defined $Token->{_terminator_line} ) {
-                    $Token->{_terminator_line} = $Token->{_terminator};
-                }
-
-                # Add a trailing newline to the terminating
-                # string if it didn't have one.
-                unless ( $Token->{_terminator_line} =~ /\n$/ ) {
-                    $Token->{_terminator_line} .= "\n";
-                }
-            }
-        }
-
-        # Now add the termination line to the heredoc buffer
-        if ( defined $Token->{_terminator_line} ) {
-            $heredoc .= $Token->{_terminator_line};
-        }
-    }
-
-    # End of tokens
-
-    if ( $heredoc ne '' ) {
-        # If the file doesn't end in a newline, we need to add one
-        # so that the here-doc content starts on the next line.
-        unless ( $output =~ /\n$/ ) {
-            $output .= "\n";
-        }
-
-        # Now we add the remaining here-doc content
-        # to the end of the file.
-        $output .= $heredoc;
-    }
-
-    $output;
-
-}
-
-{ package \# hide from PAUSE Nice::Try::ScopeGuard;
-
-    # older versions of perl have an issue with $@ during global destruction
-    use constant UNSTABLE_DOLLARAT => ("$]" < '5.013002') ? 1 : 0;
-
-    sub _new 
-    {
-        my $this = shift( @_ );
-        return( bless( [ @_ ] => ( ref( $this ) || $this ) ) );
-    }
-
-    sub DESTROY 
-    {
-        my( $code, @args ) = @{ $_[0] };
-        # save the current exception to make it available in the finally sub,
-        # and to restore it after the eval
-        my $err = $@;
-        local $@ if( UNSTABLE_DOLLARAT );
-        eval 
-        {
-            $@ = $err;
-            $code->( @args );
-            1;
-        } 
-        or do 
-        {
-            CORE::warn
-            "Execution of finally() block $code resulted in an exception, which "
-            . '*CAN NOT BE PROPAGATED* due to fundamental limitations of Perl. '
-            . 'Your program will continue as if this event never took place. '
-            . "Original exception text follows:\n\n"
-            . (defined $@ ? $@ : '$@ left undefined...')
-            . "\n"
-            ;
-        };
-        # maybe unnecessary?
-        $@ = $err;
-    }
-
-}
-
-1;
-
-**END**
-
-=encoding utf-8
-
-=head1 NAME
-
-Nice::Try - A real Try Catch Block Implementation Using Perl Filter
-
-=head1 SYNOPSIS
-
-    use Nice::Try;
-
-    print( "Hello, I want to try\n" );
-    # Try out {
-    print( "this piece of code\n" );
-    try 
-    {
-        # Not so sure }
-        print( "I am trying!\n" );
-        die( "Bye cruel world..." );
-        # Never going to reach this
-        return( 1 );
-    }
-    # Some comment
-    catch( Exception $e ) {
-        return( "Caught an exception \$e" );
-    }
-    # More comment with space too
-
-    catch( $e ) {
-        print( "Got an error: $e\n" );
-    }
-    finally
-    {
-        print( "Cleaning up\n" );
-    }
-    print( "Ok, then\n" );
-
-When run, this would produce, as one would expect:
-
-    Hello, I want to try
-    this piece of code
-    I am trying!
-    Got an error: Bye cruel world... at ./some/script.pl line 18.
-    Cleaning up
-    Ok, then
-
-=head1 VERSION
-
-    v0.1.11
-
-=head1 DESCRIPTION
-
-L<Nice::Try> is a lightweight implementation of Try-Catch exception
-trapping block using L\<perl filter\|perlfilter\>. It behaves like you
-would expect.
-
-Here is a list of its distinctive features:
-
-=over 4
-
-=item \* No routine to import like C\<Nice::Try qw( try catch )\>. Just
-add C<use Nice::Try> in your script
-
-=item \* Properly report the right line number for the original error
-message
-
-=item \* Allows embedded try-catch block within try-catch block, such
-as:
-
-    use Nice::Try;
-
-    print( "Wow, something went awry: ", &gotcha, "\n" );
-
-    sub gotcha
-    {
         print( "Hello, I want to try\n" );
         # Try out {
-        CORE::say( 'this piece' );
+        print( "this piece of code\n" );
         try 
         {
             # Not so sure }
             print( "I am trying!\n" );
-            try
-            {
-                die( "Bye cruel world..." );
-                return( 1 );
-            }
-            catch( $err )
-            {
-                die( "Dying again with embedded error: '$err'" );
-            }
+            die( "Bye cruel world..." );
+            # Never going to reach this
+            return( 1 );
         }
+        # Some comment
         catch( Exception $e ) {
-            return( "Caught an exception \$e" );
+            return( "Caught an exception $e" );
         }
+        # More comment with space too
+
         catch( $e ) {
+            print( "Got an error: $e\n" );
+        }
+        finally
+        {
+            print( "Cleaning up\n" );
+        }
+        print( "Ok, then\n" );
+
+When run, this would produce, as one would expect:
+
+        Hello, I want to try
+        this piece of code
+        I am trying!
+        Got an error: Bye cruel world... at ./some/script.pl line 18.
+        Cleaning up
+        Ok, then
+
+Also since version 1.0.0,
+[Nice::Try](https://metacpan.org/pod/Nice::Try){.perl-module} is context
+aware:
+
+        use Want; # an awesome module which extends wantarray
+        sub info
+        {
+            my $self = shift( @_ );
             try
             {
-                print( "Got an error: $e\n" );
-                print( "Trying something else.\n" );
-                die( "No really, dying out... with error: $e\n" );
+                # Do something
+                if( want('OBJECT') )
+                {
+                    return( $self );
+                }
+                elsif( want('CODE') )
+                {
+                    # dummy code ref for example
+                    return( sub{ return( $name ); } );
+                }
+                elsif( want('LIST') )
+                {
+                    return( @some_data );
+                }
+                elsif( want('ARRAY') )
+                {
+                    return( \@some_data );
+                }
+                elsif( want('HASH') )
+                {
+                    return({ name => $name, location => $city });
+                }
+                elsif( want('REFSCALAR') )
+                {
+                    return( \$name );
+                }
+                elsif( want('SCALAR' ) )
+                {
+                    return( $name ); # regular string
+                }
+                elsif( want('VOID') )
+                {
+                    return;
+                }
             }
-            catch( $err2 )
+            catch( $e )
             {
-                return( "Returning from catch L2 with error '$err2'" );
+                $Logger->( "Caught exception: $e" );
             }
         }
-        CORE::say( "Ok, then" );
-    }
 
-=item \* No need for semicolon on the last closing brace
+        # regular string context
+        my $name = $o->info;
+        # code context
+        my $name = $o->info->();
+        # list context like wantarray
+        my @data = $o->info;
+        # hash context
+        my $name = $o->info->{name};
+        # array context
+        my $name = $o->info->[2];
+        # object context
+        my $name = $o->info->another_method;
+        # scalar reference context
+        my $name = ${$o->info};
 
-=item \* It does not rely on perl regular expression, but instead uses
-L<PPI> (short for "Perl Parsing Interface").
+VERSION
+=======
 
-=item \* Variable assignment in the catch block works. For example:
+        v1.0.0
 
-    try
-    {
-        # Something or
-        die( "Oops\n" );
-    }
-    catch( $funky_variable_name )
-    {
-        return( "Oh no: $funky_variable_name" );
-    }
+DESCRIPTION
+===========
 
-=item \* C\<\$@\> is always available too
+[Nice::Try](https://metacpan.org/pod/Nice::Try){.perl-module} is a
+lightweight implementation of Try-Catch exception trapping block using
+[perl filter](https://metacpan.org/pod/perlfilter){.perl-module}. It
+behaves like you would expect.
 
-=item \* You can return a value from try-catch blocks, even with
-embedded try-catch blocks
+Here is a list of its distinctive features:
 
-=item \* It recognises C\<@_\> inside try-catch blocks, so you can do
-something like:
+-   No routine to import like `Nice::Try qw( try catch )`. Just add
+    `use Nice::Try` in your script
+-   Properly report the right line number for the original error message
+-   Allows embedded try-catch block within try-catch block, such as:
 
-    print( &gotme( 'Jacques' ), "\n" );
+            use Nice::Try;
 
-    sub gotme
-    {
-        try
-        {
-            print( "I am trying my best $_[0]!\n" );
-            die( "But I failed\n" );
-        }
-        catch( $some_reason )
-        {
-            return( "Failed: $some_reason" );
-        }
-    }
+            print( "Wow, something went awry: ", &gotcha, "\n" );
 
-Would produce:
+            sub gotcha
+            {
+                print( "Hello, I want to try\n" );
+                # Try out {
+                CORE::say( 'this piece' );
+                try 
+                {
+                    # Not so sure }
+                    print( "I am trying!\n" );
+                    try
+                    {
+                        die( "Bye cruel world..." );
+                        return( 1 );
+                    }
+                    catch( $err )
+                    {
+                        die( "Dying again with embedded error: '$err'" );
+                    }
+                }
+                catch( Exception $e ) {
+                    return( "Caught an exception \$e" );
+                }
+                catch( $e ) {
+                    try
+                    {
+                        print( "Got an error: $e\n" );
+                        print( "Trying something else.\n" );
+                        die( "No really, dying out... with error: $e\n" );
+                    }
+                    catch( $err2 )
+                    {
+                        return( "Returning from catch L2 with error '$err2'" );
+                    }
+                }
+                CORE::say( "Ok, then" );
+            }
 
-    I am trying my best Jacques!
-    Failed: But I failed
+-   No need for semicolon on the last closing brace
+-   It does not rely on perl regular expression, but instead uses
+    [PPI](https://metacpan.org/pod/PPI){.perl-module} (short for \"Perl
+    Parsing Interface\").
+-   Variable assignment in the catch block works. For example:
 
-=back
+            try
+            {
+                # Something or
+                die( "Oops\n" );
+            }
+            catch( $funky_variable_name )
+            {
+                return( "Oh no: $funky_variable_name" );
+            }
 
-=head1 WHY USE IT?
+-   `$@` is always available too
+-   You can return a value from try-catch blocks, even with embedded
+    try-catch blocks
+-   It recognises `@_` inside try-catch blocks, so you can do something
+    like:
+
+            print( &gotme( 'Jacques' ), "\n" );
+
+            sub gotme
+            {
+                try
+                {
+                    print( "I am trying my best $_[0]!\n" );
+                    die( "But I failed\n" );
+                }
+                catch( $some_reason )
+                {
+                    return( "Failed: $some_reason" );
+                }
+            }
+
+    Would produce:
+
+            I am trying my best Jacques!
+            Failed: But I failed
+
+-   `try` or `catch` blocks can contain flow control keywords such as
+    `next`, `last` and `redo`
+
+            while( defined( my $product = $items->[++$i] ) )
+            {
+                try
+                {
+                    # Do something
+                    last if( !$product->active );
+                }
+                catch( $oops )
+                {
+                    $log->( "Error: $oops" );
+                    last;
+                }
+            }
+            continue
+            {
+                try
+                {
+                    if( $product->region eq 'Asia' )
+                    {
+                        push( @asia, $product );
+                    }
+                    else
+                    {
+                        next;
+                    }
+                }
+                catch( $e )
+                {
+                    $log->( "An unexpected error has occurred. Is $product an object? $e" );
+                    last;
+                }
+            }
+
+-   Can be used with or without a `catch` block
+-   Supports a `finally` block called in void context for cleanup for
+    example
+-   [Nice::Try](https://metacpan.org/pod/Nice::Try){.perl-module} is
+    rich context aware, which means it can provide you with a super
+    granual context on how to return data back to the caller based on
+    the caller\'s expectation, by using a module like
+    [Want](https://metacpan.org/pod/Want){.perl-module}.
+-   Call to [\"caller\" in
+    perlfunc](https://metacpan.org/pod/perlfunc#caller){.perl-module}
+    will return the correct entry in call stack
+
+            #!/usr/bin/perl
+            BEGIN
+            {
+                use strict;
+                use warnings;
+                use Nice::Try;
+            };
+
+            {
+                &callme();
+            }
+
+            sub callme
+            {
+                try
+                {
+                    my @info = caller(1); # or my @info = caller;
+                    print( "Called from package $info[0] in file $info[1] at line $info[2]\n" );
+                }
+                catch( $e )
+                {
+                    print( "Got an error: $e\n" );
+                }
+            }
+
+    WIll yield: `Called from package main in file ./test.pl at line 10`
+
+WHY USE IT?
+===========
 
 There are quite a few implementations of try-catch blocks in perl, and
 they can be grouped in 4 categories:
 
-=over 4
+1 Try-Catch as subroutines
 
-=item 1 Try-Catch as subroutines
+:   For example
+    [Try::Tiny](https://metacpan.org/pod/Try::Tiny){.perl-module}
 
-For example L<Try::Tiny>
+2 Using Perl Filter
 
-=item 2 Using Perl Filter
+:   For example
+    [Nice::Try](https://metacpan.org/pod/Nice::Try){.perl-module},
+    [Try::Harder](https://metacpan.org/pod/Try::Harder){.perl-module}
 
-For example L<Nice::Try>, L<Try::Harder>
+3 Using [Devel::Declare](https://metacpan.org/pod/Devel::Declare){.perl-module}
 
-=item 3 Using L<Devel::Declare>
+:   For example
+    [TryCatch](https://metacpan.org/pod/TryCatch){.perl-module}
 
-For example L<TryCatch>
+4 Others
 
-=item 4 Others
-
-For example L<Syntax::Keyword::Try> and now perl with L\<version 5.33
-using experimental
-feature\|https://perldoc.perl.org/blead/perlsyn\#Try-Catch-Exception-Handling\>.
-
-=back
+:   For example
+    [Syntax::Keyword::Try](https://metacpan.org/pod/Syntax::Keyword::Try){.perl-module}
+    and now perl with [version 5.33.7 using experimental
+    feature](https://perldoc.perl.org/blead/perlsyn#Try-Catch-Exception-Handling){.perl-module}.
 
 Group 1 requires the use of semi-colons like:
 
-    try
-    {
-        # Something
-    }
-    catch
-    {
-        # More code
-    };
+        try
+        {
+            # Something
+        }
+        catch
+        {
+            # More code
+        };
 
-It also imports the subroutines C<try> and C<catch> in your namespace.
+It also imports the subroutines `try` and `catch` in your namespace.
 
-And you cannot do exception variable assignment like C\<catch( \$err )\>
+And you cannot do exception variable assignment like `catch( $err )`
 
-In group 2, L<Try::Harder> does a very nice work, but relies on perl
-regular expression with L<Text::Balanced> and that makes it susceptible
-to failure if the try-catch block is not written as it expects it to be.
-For example if you put comments between try and catch, it would not work
-anymore. This is because parsing perl is famously difficult. Also, it
-does not do exception variable assignment, or catch filtered based on
-exception class like:
+In group 2,
+[Try::Harder](https://metacpan.org/pod/Try::Harder){.perl-module} does a
+very nice work, but relies on perl regular expression with
+[Text::Balanced](https://metacpan.org/pod/Text::Balanced){.perl-module}
+and that makes it susceptible to failure if the try-catch block is not
+written as it expects it to be. For example if you put comments between
+try and catch, it would not work anymore. This is because parsing perl
+is famously difficult. Also, it does not do exception variable
+assignment, or catch filtered based on exception class like:
 
-    try
-    {
-        # Something
-        die( Exception->new( "Failed!" ) );
-    }
-    catch( Exception $e )
-    {
-        # Do something if exception is an Exception class
-    }
+        try
+        {
+            # Something
+            die( Exception->new( "Failed!" ) );
+        }
+        catch( Exception $e )
+        {
+            # Do something if exception is an Exception class
+        }
 
-See L\<perlfunc/"die"\> for more information on dying with an object.
+See [\"die\" in
+perlfunc](https://metacpan.org/pod/perlfunc#die){.perl-module} for more
+information on dying with an object.
 
-Also L<Try::Harder> will die if you use only C<try> with no catch, such
-as:
+Also [Try::Harder](https://metacpan.org/pod/Try::Harder){.perl-module}
+will die if you use only `try` with no catch, such as:
 
-    use Try::Harder;
-    try
-    {
-        die( "Oops\n" );
-    }
-    # Will never reach this
-    print( "Got here with $@\n" );
+        use Try::Harder;
+        try
+        {
+            die( "Oops\n" );
+        }
+        # Will never reach this
+        print( "Got here with $@\n" );
 
 In this example, the print line will never get executed. With
-L<Nice::Try> you can use C<try> alone as an equivalent of
-L\<perlfunc/"eval"\> and the C\<\$@\> will be available too. So:
+[Nice::Try](https://metacpan.org/pod/Nice::Try){.perl-module} you can
+use `try` alone as an equivalent of [\"eval\" in
+perlfunc](https://metacpan.org/pod/perlfunc#eval){.perl-module} and the
+`$@` will be available too. So:
 
-    use Nice::Try;
-    try
-    {
-        die( "Oops\n" );
-    }
-    print( "Got here with $@\n" );
+        use Nice::Try;
+        try
+        {
+            die( "Oops\n" );
+        }
+        print( "Got here with $@\n" );
 
 will produces:
 
-    Got here with Oops
+        Got here with Oops
 
-In group 3, L<TryCatch> was working wonderfully, but was relying on
-L<Devel::Declare> which was doing some esoteric stuff and eventually the
-version 0.006020 broke L<TryCatch> and there seems to be no intention of
-correcting this breaking change.
+In group 3, [TryCatch](https://metacpan.org/pod/TryCatch){.perl-module}
+was working wonderfully, but was relying on
+[Devel::Declare](https://metacpan.org/pod/Devel::Declare){.perl-module}
+which was doing some esoteric stuff and eventually the version 0.006020
+broke [TryCatch](https://metacpan.org/pod/TryCatch){.perl-module} and
+there seems to be no intention of correcting this breaking change.
 
-In group 4, there is L<Syntax::Keyword::Try>, which is a great
-alternative if you do not care about exception variable assignment or
-exception class filter. You can only use C\<\$@\>
+In group 4, there is
+[Syntax::Keyword::Try](https://metacpan.org/pod/Syntax::Keyword::Try){.perl-module},
+which is a great alternative if you do not care about exception class
+filter (it supports variable assignment since 2020-08-01 with version
+0.18).
 
-Since L\<perl version
-5.33\|https://perldoc.perl.org/blead/perlsyn\#Try-Catch-Exception-Handling\>
+Although, the following script would not work under
+[Syntax::Keyword::Try](https://metacpan.org/pod/Syntax::Keyword::Try){.perl-module}
+:
+
+        BEGIN
+        {
+            use strict;
+            use warnings;
+            use Syntax::Keyword::Try;
+        };
+
+        {
+            &callme();
+        }
+
+        sub callme
+        {
+            try {
+                print( "Hello there\n" );
+            }
+            catch ($e) {
+                print( "Got an error: $e\n" );
+            }
+        }
+
+This will trigger the following error:
+
+        syntax error at ./test.pl line 18, near ") {"
+        syntax error at ./test.pl line 21, near "}"
+        Execution of ./test.pl aborted due to compilation errors.
+
+That is because
+[Syntax::Keyword::Try](https://metacpan.org/pod/Syntax::Keyword::Try){.perl-module}
+expects to be `used` outside of a BEGIN block like this:
+
+        use strict;
+        use warnings;
+        use Syntax::Keyword::Try;
+
+        # Rest of the script, same as above
+
+Of course, with
+[Nice::Try](https://metacpan.org/pod/Nice::Try){.perl-module}, there is
+no such constraint. You can [\"use\" in
+perlfunc](https://metacpan.org/pod/perlfunc#use){.perl-module}
+[Nice::Try](https://metacpan.org/pod/Nice::Try){.perl-module} inside or
+outside of a `BEGIN` block indistinctively.
+
+Since [perl version
+5.33.7](https://perldoc.perl.org/blead/perlsyn#Try-Catch-Exception-Handling){.perl-module}
 you can use the try-catch block using an experimental feature which may
 be removed in future versions, by writing:
 
-    use feature 'try'; # will emit a warning this is experimental
+        use feature 'try'; # will emit a warning this is experimental
 
 This new feature supports try-catch block and variable assignment, but
-no exception class, nor support for C<finally> block, so you can do:
+no exception class, nor support for `finally` block, so you can do:
 
-    try
-    {
-        # Oh no!
-        die( "Argh...\n" );
-    }
-    catch( $oh_well )
-    {
-        return( $self->error( "Something went awry: $oh_well" ) );
-    }
+        try
+        {
+            # Oh no!
+            die( "Argh...\n" );
+        }
+        catch( $oh_well )
+        {
+            return( $self->error( "Something went awry: $oh_well" ) );
+        }
 
-But B<you cannot do>:
+But **you cannot do**:
 
-    try
-    {
-        # Oh no!
-        die( MyException->new( "Argh..." ) );
-    }
-    catch( MyException $oh_well )
-    {
-        return( $self->error( "Something went awry with MyException: $oh_well" ) );
-    }
-    # No support for 'finally' yet in perl 5.34
-    finally
-    {
-        # do some cleanup here
-    }
+        try
+        {
+            # Oh no!
+            die( MyException->new( "Argh..." ) );
+        }
+        catch( MyException $oh_well )
+        {
+            return( $self->error( "Something went awry with MyException: $oh_well" ) );
+        }
+        # No support for 'finally' yet in perl version 5.33.7
+        finally
+        {
+            # do some cleanup here
+        }
 
 It is probably a matter of time until this is fully implemented in perl
 as a regular non-experimental feature.
 
-So, L<Nice::Try> is quite unique and fill the missing features, but
-because it is purely in perl and not an XS module, it is slower than XS
-module like L<Syntax::Keyword::Try>. I am not sure the difference would
-be that noticeable, since the parsing by L<PPI> is now done using an XS
-module, which makes things very fast.
+So, [Nice::Try](https://metacpan.org/pod/Nice::Try){.perl-module} is
+quite unique and fill the missing features, but because it is purely in
+perl and not an XS module, it is slower than XS module like
+[Syntax::Keyword::Try](https://metacpan.org/pod/Syntax::Keyword::Try){.perl-module}.
+I am not sure the difference would be that noticeable, since the parsing
+by [PPI](https://metacpan.org/pod/PPI){.perl-module} is now done using
+an XS module, which makes things very fast.
 
-=head1 FINALLY
+FINALLY
+=======
 
-Like with other language such as Java or JavaScript, the C<finally>
-block will be executed even if the C<try> or C<catch> block contains a
-return statement.
+Like with other language such as Java or JavaScript, the `finally` block
+will be executed even if the `try` or `catch` block contains a return
+statement.
 
 This is useful to do some clean-up. For example:
 
-    try
-    {
-        # Something worth dying
-    }
-    catch( $e )
-    {
-        return( "I failed: $e" );
-    }
-    finally
-    {
-        # Do some mop up
-        # This would be reached even if catch already returned
-        # Putting return statement here does not actually return anything.
-        # This is only for clean-up
-    }
+        try
+        {
+            # Something worth dying
+        }
+        catch( $e )
+        {
+            return( "I failed: $e" );
+        }
+        finally
+        {
+            # Do some mop up
+            # This would be reached even if catch already returned
+            # Putting return statement here does not actually return anything.
+            # This is only for clean-up
+        }
 
 However, because this is designed for clean-up, it is called in void
-context, so any C<return> statement there will not actually return
+context, so any `return` statement there will not actually return
 anything back to the caller.
 
-=head1 DEBUGGING
+CATCHING OR NOT CATCHING?
+=========================
 
-And to have L<Nice::Try> save the filtered code to a file, pass it the
-C<debug_file> parameter like this:
+[Nice::Try](https://metacpan.org/pod/Nice::Try){.perl-module} can be
+used with a single `try` block which will, in effect, behaves like an
+eval and the special variable `$@` will be available as always.
 
-    use Nice::Try debug_file => './updated_script.pl';
+        try
+        {
+            die( "Oh no, something went wrong!\n" );
+        }
+        print( "Got here with $@\n" );
 
-You can also call your script using L<Filter::ExtractSource> like this:
+or even:
 
-    perl -MFilter::ExtractSource script.pl > updated_script.pl
+        try
+        {
+            die( "Oh no, something went wrong!\n" );
+        }
+        catch( $e ); # Not very meaningful, but it will work
+        print( "Got here with $@\n" );
 
-or add C<use Filter::ExtractSource> inside it.
+However, if you decide to catch class exceptions, make sure to add a
+default `catch( $e )`. For example:
+
+        try
+        {
+            die( MyException->new( "Oh no" ) );
+        }
+        print( "Got here with $@\n" );
+
+will work and `print` will display \"Got here with Oh no\". However:
+
+        try
+        {
+            die( MyException->new( "Oh no" ) );
+        }
+        catch( Some::Exception $e )
+        {
+            # won't reach here
+        }
+
+will make your process die because of the exception not being caught,
+thus you might want to do instead:
+
+        try
+        {
+            die( MyException->new( "Oh no" ) );
+        }
+        catch( Some::Exception $e )
+        {
+            # won't reach here
+        }
+        catch( $default )
+        {
+            print( "Got you! Error was: $default\n" );
+        }
+
+And the last catch will catch the exception.
+
+Since, try-catch block can be nested, the following would work too:
+
+        try
+        {
+            try
+            {
+                die( MyException->new( "Oh no" ) );
+            }
+            catch( Some::Exception $e )
+            {
+                # won't reach here
+            }
+        }
+        catch( MyException $e )
+        {
+            print( "Got you! MyException was: $e\n" );
+        }
+        # to play it safe
+        catch( $e )
+        {
+            # do something about it
+        }
+
+LOOPS
+=====
+
+Since version v0.2.0
+[Nice::Try](https://metacpan.org/pod/Nice::Try){.perl-module} supports
+the use of flow control keywords such as `next`, `last` and `redo`
+inside try-catch blocks. For example:
+
+        my @names = qw( John Jack Peter Paul Mark );
+        for( $i..$#names )
+        {
+            try
+            {
+                next if( $i == 2 );
+                # some more code...
+            }
+            catch( $e )
+            {
+                print( "Got exception: $e\n" );
+            }
+        }
+
+It also works inside the catch block or inside the `continue` block:
+
+        while( defined( my $product = $items->[++$i] ) )
+        {
+            # Do something
+        }
+        continue
+        {
+            try
+            {
+                if( $product->region eq 'Asia' )
+                {
+                    push( @asia, $product );
+                }
+                else
+                {
+                    next;
+                }
+            }
+            catch( $e )
+            {
+                $log->( "An unexpected error has occurred. Is $product an object? $e" );
+                last;
+            }
+        }
+
+Control flow with labels also work
+
+        ELEM: foreach my $n ( @names )
+        {
+            try
+            {
+                $n->moveAfter( $this );
+                next ELEM if( $n->value == 1234567 );
+            }
+            catch( $oops )
+            {
+                last ELEM;
+            }
+        }
+
+However, if you enclose a try-catch block inside another block, use of
+`next`, `last` or `redo` will silently not work. This is due to perl
+control flow. See
+[perlsyn](https://metacpan.org/pod/perlsyn){.perl-module} for more
+information on this. For example, the following would not yield the
+desired outcome:
+
+        ELEM: foreach my $n ( @names )
+        {
+            { # <--- Here is the culprit
+                try
+                {
+                    $n->moveAfter( $this );
+                    # This next statement will not do anything.
+                    next ELEM if( $n->value == 1234567 );
+                }
+                catch( $oops )
+                {
+                    # Neither would this one.
+                    last ELEM;
+                }
+            }
+        }
+
+CONTEXT AWARENESS
+=================
+
+[Nice::Try](https://metacpan.org/pod/Nice::Try){.perl-module} provides a
+high level of granularity about the context in which your subroutine was
+called.
+
+Normally, you would write something like this, and it works as always:
+
+        sub info
+        {
+            try
+            {
+                # do something here
+                if( wantarray() )
+                {
+                    return( @list_of_values );
+                }
+                # caller just want a scalar
+                elsif( defined( wantarray() ) )
+                {
+                    return( $name );
+                }
+                # otherwise if undefined, it means we are called in void context, like:
+                # $o->info; with no expectation of return value
+            }
+            catch( $e )
+            {
+                print( "Caught an error: $e\n" );
+            }
+        }
+
+THe above is nice, but how do you differentiate cases were your caller
+wants a simple returned value and the one where the caller wants an
+object for chaining purpose, or if the caller wants an hash or array
+reference in return?
+
+For example:
+
+        my $val = $o->info->[2]; # wants an array reference
+        my $val = $o->info->{name} # wants an hash reference
+        # etc...
+
+Now, you can do the following:
+
+        use Want; # an awesome module which extends wantarray
+        sub info
+        {
+            my $self = shift( @_ );
+            try
+            {
+                # Do something
+                # 
+                # same as wantarray() == 1
+                if( want('LIST') )
+                {
+                    return( @some_data );
+                }
+                # same as: if( defined( wantarray() ) && !wantarray() )
+                elsif( want('SCALAR' ) )
+                {
+                    return( $name ); # regular string
+                }
+                # same as !defined( wantarray() )
+                elsif( want('VOID') )
+                {
+                    return;
+                }
+                # For the other context below, wantarray is of no help
+                if( want('OBJECT') )
+                {
+                    return( $obj ); # useful for chaining
+                }
+                elsif( want('CODE') )
+                {
+                    # dummy code ref for example
+                    return( sub{ return( $name ); } );
+                }
+                elsif( want('ARRAY') )
+                {
+                    return( \@some_data );
+                }
+                elsif( want('HASH') )
+                {
+                    return({ name => $name, location => $city });
+                }
+            }
+            catch( $e )
+            {
+                $Logger->( "Caught exception: $e" );
+            }
+        }
+
+Thus this is particularly useful if, for example, you want to
+differentiate if the caller just wants a return string, or an object for
+chaining.
+
+[\"wantarray\" in
+perlfunc](https://metacpan.org/pod/perlfunc#wantarray){.perl-module}
+would not know the difference, and other try-catch implementation would
+not let you benefit from using
+[Want](https://metacpan.org/pod/Want){.perl-module}.
+
+For example:
+
+        my $val = $o->info; # simple regular scalar context; but...
+        # here, we are called in object context and wantarray is of no help to tell the difference
+        my $val = $o->info->another_method;
+
+Other cases are:
+
+        # regular string context
+        my $name = $o->info;
+        # list context like wantarray
+        my @data = $o->info;
+
+        # code context
+        my $name = $o->info->();
+        # hash context
+        my $name = $o->info->{name};
+        # array context
+        my $name = $o->info->[2];
+        # object context
+        my $name = $o->info->another_method;
+
+See [Want](https://metacpan.org/pod/Want){.perl-module} for more
+information on how you can benefit from it.
+
+Currently lvalues are no implemented and will be in future releases.
+
+Also, for this rich context awareness to be used, obviously try-catch
+would need to be inside a subroutine, otherwise there is no rich context
+other than the one the regular [\"wantarray\" in
+perlfunc](https://metacpan.org/pod/perlfunc#wantarray){.perl-module}
+provides.
+
+DEBUGGING
+=========
+
+And to have
+[Nice::Try](https://metacpan.org/pod/Nice::Try){.perl-module} save the
+filtered code to a file, pass it the `debug_file` parameter like this:
+
+        use Nice::Try debug_file => './updated_script.pl';
+
+You can also call your script using
+[Filter::ExtractSource](https://metacpan.org/pod/Filter::ExtractSource){.perl-module}
+like this:
+
+        perl -MFilter::ExtractSource script.pl > updated_script.pl
+
+or add `use Filter::ExtractSource` inside it.
 
 In the updated script produced, you can add the line calling
-L<Nice::Try> to:
+[Nice::Try](https://metacpan.org/pod/Nice::Try){.perl-module} to:
 
-    use Nice::Try no_filter => 1;
+        use Nice::Try no_filter => 1;
 
-to avoid L<Nice::Try> from filtering your script
+to avoid [Nice::Try](https://metacpan.org/pod/Nice::Try){.perl-module}
+from filtering your script
 
-If you want L<Nice::Try> to produce human readable code, pass it the
-C<debug_code> parameter like this:
+If you want
+[Nice::Try](https://metacpan.org/pod/Nice::Try){.perl-module} to produce
+human readable code, pass it the `debug_code` parameter like this:
 
-    use Nice::Try debug_code => 1;
+        use Nice::Try debug_code => 1;
 
-=head1 CREDITS
+CREDITS
+=======
 
-Credits to Stephen R. Scaffidi for his implementation of L<Try::Harder>
-from which I borrowed some code.
+Credits to Stephen R. Scaffidi for his implementation of
+[Try::Harder](https://metacpan.org/pod/Try::Harder){.perl-module} from
+which I borrowed some code.
 
-=head1 AUTHOR
+AUTHOR
+======
 
-Jacques Deguest E<lt>F<jack@deguest.jp>E<gt>
+Jacques Deguest \<`jack@deguest.jp`{classes="ARRAY(0x56381478d098)"}\>
 
-=head1 SEE ALSO
+SEE ALSO
+========
 
-L<PPI>, L<Filter::Util::Call>, L<Try::Harder>, L<Syntax::Keyword::Try>
+[PPI](https://metacpan.org/pod/PPI){.perl-module},
+[Filter::Util::Call](https://metacpan.org/pod/Filter::Util::Call){.perl-module},
+[Try::Harder](https://metacpan.org/pod/Try::Harder){.perl-module},
+[Syntax::Keyword::Try](https://metacpan.org/pod/Syntax::Keyword::Try){.perl-module},
+[Exception::Class](https://metacpan.org/pod/Exception::Class){.perl-module}
 
-=head1 COPYRIGHT & LICENSE
+COPYRIGHT & LICENSE
+===================
 
-Copyright (c) 2020 DEGUEST Pte. Ltd.
+Copyright (c) 2020-2021 DEGUEST Pte. Ltd.
 
 You can use, copy, modify and redistribute this package and associated
 files under the same terms as Perl itself.
-
-=cut

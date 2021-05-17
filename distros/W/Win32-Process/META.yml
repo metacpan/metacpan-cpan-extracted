@@ -1,11 +1,11 @@
 --- #YAML:1.0
 name: Win32-Process
 abstract: Create and manipulate processes
-version: 0.16
+version: 0.17
 author:
-  - Jan Dubois <jand@activestate.com>
+  - Jan Dubois <jan@jandubois.com>
 license: perl
-requires: 
+requires:
   perl: 5.006
 resources:
   license: http://dev.perl.org/licenses/

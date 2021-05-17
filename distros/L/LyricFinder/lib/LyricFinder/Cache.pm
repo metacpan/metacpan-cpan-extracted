@@ -200,7 +200,7 @@ sub _parse {
 
 		return $text;
 	} else {
-		carp "e:$Source - Failed to identify lyrics in cache.";
+		carp($self->{'Error'} = "e:$Source - Failed to identify lyrics in cache.");
 		return;
 	}
 }   # end of sub parse

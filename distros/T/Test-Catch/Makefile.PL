@@ -13,6 +13,7 @@ my %params = (
         'Test::More'   => '1.302015',
         'Test::Simple' => '1.302096', # need $hub->nested
     },
+    MIN_PERL_VERSION => '5.18.0', # older versions have invalid headers for clang c++ 
 );
 
 write_makefile(%params);

@@ -10,7 +10,7 @@ build_requires:
 configure_requires:
   Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v3.0.9, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Minilla/v3.1.12, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -29,12 +29,12 @@ no_index:
 provides:
   Furl:
     file: lib/Furl.pm
-    version: '3.13'
+    version: '3.14'
   Furl::ConnectionCache:
     file: lib/Furl/ConnectionCache.pm
   Furl::HTTP:
     file: lib/Furl/HTTP.pm
-    version: '3.13'
+    version: '3.14'
   Furl::Headers:
     file: lib/Furl/Headers.pm
   Furl::Request:
@@ -62,30 +62,34 @@ resources:
   bugtracker: https://github.com/tokuhirom/Furl/issues
   homepage: https://github.com/tokuhirom/Furl
   repository: git://github.com/tokuhirom/Furl.git
-version: '3.13'
+version: '3.14'
 x_contributors:
-  - 'Keiji, Yoshimi <walf443@gmail.com>'
-  - 'Fuji, Goro <gfuji@cpan.org>'
-  - 'lestrrat <lestrrat+github@gmail.com>'
   - 'Audrey Tang <audreyt@audreyt.org>'
+  - 'Breno G. de Oliveira <garu@cpan.org>'
+  - 'Debabrata Deka <60925700+ddeka2910@users.noreply.github.com>'
   - 'Fuji Goro <fuji.goro@dena.jp>'
   - 'Fuji, Goro <g.psy.va@gmail.com>'
-  - 's-aska <s.aska.org@gmail.com>'
-  - 'ikasam_a <masaki.nakagawa@gmail.com>'
-  - 'xaicron <xaicron@gmail.com>'
-  - 'Neil Bowers <neil@bowers.com>'
-  - 'Toshio Ito <debug.ito@gmail.com>'
-  - 'bayashi <bayashi@cpan.org>'
-  - 'Masahiro Nagano <kazeburo@gmail.com>'
+  - 'Fuji, Goro <gfuji@cpan.org>'
+  - 'Graham Ollis <plicease@cpan.org>'
   - 'HIROSE Masaaki <hirose31@gmail.com>'
-  - 'Kazuho Oku <kazuhooku@gmail.com>'
   - 'Jari Salmela <bissei@users.noreply.github.com>'
-  - 'tarao <tarao.gnn@gmail.com>'
-  - 'kimoto <peerler@gmail.com>'
-  - 'Breno G. de Oliveira <garu@cpan.org>'
   - 'Jiro Nishiguchi <jiro@cpan.org>'
-  - 'Yasuhiro Matsumoto <mattn.jp@gmail.com>'
-  - 'Syohei YOSHIDA <syohex@gmail.com>'
-  - 'ktat <ktat.is@gmail.com>'
+  - 'Kazuho Oku <kazuhooku@gmail.com>'
+  - 'Keiji, Yoshimi <walf443@gmail.com>'
+  - 'Masahiro Nagano <kazeburo@gmail.com>'
+  - 'Neil Bowers <neil@bowers.com>'
+  - 'Shohei YOSHIDA <syohex@gmail.com>'
   - 'Shoichi Kaji <skaji@cpan.org>'
+  - 'Toshio Ito <debug.ito@gmail.com>'
+  - 'Yasuhiro Matsumoto <mattn.jp@gmail.com>'
+  - 'bayashi <bayashi@cpan.org>'
+  - 'ikasam_a <masaki.nakagawa@gmail.com>'
+  - 'itchyny <itchyny@hatena.ne.jp>'
+  - 'kimoto <peerler@gmail.com>'
+  - 'ktat <ktat.is@gmail.com>'
+  - 'lestrrat <lestrrat+github@gmail.com>'
+  - 's-aska <s.aska.org@gmail.com>'
+  - 'tarao <tarao.gnn@gmail.com>'
+  - 'xaicron <xaicron@gmail.com>'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

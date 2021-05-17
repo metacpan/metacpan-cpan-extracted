@@ -12,6 +12,8 @@
 #define PERL_CORE
 #define PERL_NO_GET_CONTEXT
 #include "EXTERN.h"
+#include "config.h"
+#undef USE_DTRACE
 #include "perl.h"
 #include "XSUB.h"
 

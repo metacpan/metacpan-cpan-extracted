@@ -1,11 +1,273 @@
 /**************************************************************
+   NAME:    html.css
+   AUTHOR:  Pat Heard (fullahead.org)
+   DATE:    2006.03.19
+   PURPOSE: Styles the html elements
+ **************************************************************/
+
+ html {
+  height: 100%;
+}
+
+body {
+  height: 100%;
+
+  margin: 0;
+  padding: 0;
+  text-align: center;
+
+  font: 400 0.9em "trebuchet ms", serif;
+  line-height: 170%;
+
+  background: #666 url(/ui/img/header.png) repeat-x top left;
+  color: #EEE;
+}
+
+h1 {
+  clear: both;
+  font: 700 2.1em "trebuchet ms", serif;
+  color: #FFF;
+}
+
+h2 {
+  font: 400 1.4em "trebuchet ms", serif;
+  color: #9FF3FF;
+}
+
+h2 a {
+  color: #29E3FF;
+}
+
+h2 a:hover {
+  color: #FFF;
+}
+
+h3 {
+  font: 400 1.2em "trebuchet ms", serif;
+  color: #F8D766;
+}
+
+h4 {
+  font: 700 1.05em "trebuchet ms", serif;
+  color: #F39F01;
+}
+
+h5 {
+  font: 700 1em "trebuchet ms", serif;
+  color: #F17400;
+}
+
+h6 {
+  font: 700 0.9em "trebuchet ms", serif;
+  color: #FF4B33;
+}
+
+h1, h2, h3, h4, h5, h6, p, dl {
+  margin: 0;
+  padding: 10px 15px;
+}
+
+li p {
+  padding: 10px 15px 10px 0;
+}
+
+table {
+  border-collapse:collapse;
+  margin: 10px 15px;
+}
+
+/* Done so the leftmost column aligns properly with the header.
+   If the leftmost column has class gradient applied to it,
+   this class isn't required. */
+.leftColumn h1, #pgxntoc h1,
+.leftColumn h2, #pgxntoc h2,
+.leftColumn h3, #pgxntoc h3,
+.leftColumn h4, #pgxntoc h4,
+.leftColumn h5, #pgxntoc h5,
+.leftColumn h6, #pgxntoc h6,
+.leftColumn p, #pgxntoc p,
+.leftColumn dl {
+  padding-left: 0;
+}
+
+a {
+  color: #8BE6FA;
+  text-decoration:none;
+}
+
+/* Uncomment this if you would like a visited link style
+a:visited {
+  text-decoration: line-through;
+} */
+
+a:hover {
+  color: #FFF;
+  text-decoration:underline;
+}
+
+b {
+  color: #FFF;
+}
+
+ol, ul {
+  margin: 10px 0 0 0;
+  padding: 0 0 0 30px;
+}
+
+ol span {
+  color: #EEE;
+}
+
+del {
+  color: #AAA;
+}
+
+code {
+  font: 400 1em courier, monospace;
+  background: #444;
+  line-height: 130%;
+  font-size:90%;
+  padding:4px;
+}
+
+pre {
+  margin: 10px 15px;
+  background: #444;
+  padding: 10px;
+  overflow: auto;
+  font: 400 1em courier, monospace;
+  line-height: 120%;
+}
+
+li pre {
+  margin: 10px 15px 10px 0;
+}
+
+pre code {
+  padding: 0;
+}
+
+.leftColumn code, #pgxntoc code {
+  margin-left: 0;
+}
+
+acronym {
+  cursor: help;
+  border-bottom: 1px solid #777;
+}
+
+dt {
+  font-weight: bold;
+  color: #F8D766;
+}
+
+dd {
+  margin-left: 0;
+  padding-left: 15px;
+}
+
+.meta dd {
+  padding-left: 45px;
+}
+
+dd pre {
+  margin: 10px 0;
+}
+
+/**************************************************************
+   Form Elements
+ **************************************************************/
+
+label {
+  display: block;
+}
+
+label#inlabel {
+  display: inline;
+}
+
+input,
+textarea,
+select {
+  padding: 2px;
+  font: 400 1em "trebuchet ms", serif;
+  color: #444;
+  background: #EEE;
+  border: 1px solid #444;
+}
+
+input:focus,
+input:hover,
+textarea:focus,
+textarea:hover,
+select:focus,
+select:hover {
+  color: #000;
+  background: #E4F7FA;
+  border: 1px solid #00DFFF;
+}
+
+input.button {
+  padding: 2px 5px;
+
+  font: 400 1.1em "trebuchet ms", serif;
+
+  color: #555;
+  background: #9FF3FF;
+  border-width: 1px;
+  border-style: solid;
+  border-color: #FFF #00DFFF #00DFFF #FFF;
+}
+
+/**************************************************************
+   Blockquote and included icons
+ **************************************************************/
+
+blockquote {
+  margin: 10px 15px;
+  padding-left: 27px;
+
+  background-color: #444;
+  background-image: url(/ui/img/quote.svg);
+  background-size: 32px;
+  background-repeat: no-repeat;
+  background-position: 5px 12px;
+}
+
+blockquote.exclamation {
+  background-image: url(/ui/img/exclamation.svg);
+  background-size: 32px;
+}
+
+blockquote.stop {
+  background-image: url(/ui/img/stop.svg);
+  background-size: 32px;
+}
+
+blockquote.go {
+  background-image: url(/ui/img/go.svg);
+  background-size: 32px;
+}
+
+/**************************************************************
+   Images
+ **************************************************************/
+
+img.floatRight {
+  margin: 5px 0px 10px 15px;
+}
+
+img.floatLeft {
+  margin: 5px 15px 10px 0px;
+}
+
+/**************************************************************
+   NAME:    layout.css
    AUTHOR:  Pat Heard (fullahead.org)
    DATE:    2006.03.19
    PURPOSE: Controls the layout of the site and styles
             the menus
  **************************************************************/
-
-
 
 /**************************************************************
    #content: Sets the width of the site.  Make changes here
@@ -21,7 +283,7 @@
 #content,
 #width {
   /* max-width hack for IE since it doesn't understand the valid css property */
-  width: expression(document.body.clientWidth > 1000 ? "1000px" : "94%");  
+  width: expression(document.body.clientWidth > 1000 ? "1000px" : "94%");
   max-width: 1000px;
   margin: 0 auto;
 }
@@ -31,7 +293,6 @@
   width: 94%;
   height: auto;
 }
-
 
 /**************************************************************
    #header: Holds the site title and header images
@@ -99,11 +360,14 @@
 
   top: 0;
   right: 32px;
+  padding-top: 48px;
+  height: 75px;
 }
 
 #header img.gear {
   position: absolute;
   z-index: 2;
+  height: 130px;
 
   top: 0;
   left: 0;
@@ -113,7 +377,7 @@
    #mainMenu: The top level site menu
  **************************************************************/
 
-#mainMenu { 
+#mainMenu {
   float: left;
   width: 100%;
   clear: both;
@@ -235,7 +499,7 @@
 
 .hsearch {
   width:665px;
-  background: #555 url(../img/gradient.jpg) repeat-x bottom left;
+  background: #555 url(/ui/img/gradient.jpg) repeat-x bottom left;
 }
 
 .hside h3 {
@@ -284,8 +548,9 @@
  **************************************************************/
 
 .res {
-  /* background: #555 url(../img/gradient.jpg) repeat-x top left;  */
-  background: url(../img/favicon.png) no-repeat 10px 19px;
+  /* background: #555 url(/ui/img/gradient.jpg) repeat-x top left;  */
+  background: url(/ui/img/icon-40.png) no-repeat 8px 18px;
+  background-size: 20px;
   padding:15px 15px 15px 35px;
 }
 
@@ -293,7 +558,7 @@
   background-color:#444;
   cursor:default;
 }
- 
+
 .res p, .res h2 {
     padding:0;
     color:white;
@@ -328,8 +593,8 @@ ul.sideMenu {
 
 .sideMenu li {
   display: inline;
-  
-  /* Needed since IE fails when you give it list-style: none; */  
+
+  /* Needed since IE fails when you give it list-style: none; */
   list-style-image: url(foo.gif);
   font: 400 1.3em "trebuchet ms", serif;
 }
@@ -343,48 +608,6 @@ ul.sideMenu {
   text-decoration: none;
 }
 
-.sideMenu li a {
-  display: block;
-  margin: 0.2em 0;
-  padding: 3px 5px;    
-  
-  text-decoration: none;
-  color: #FFF;
-} 
-
-.sideMenu li a:hover, #pgxntoc li a:hover {
-  color: #65EBFF;
-  background: #5F5F5F;
-}
-
-/* Active menu item */
-.sideMenu li.here {
-  display: block;  
-  padding: 5px;
-  color: #65EBFF;
-  background: #555;
-}
-
-/* Submenu of active menu item */
-.sideMenu li.here ul {
-  margin: 0;
-  padding: 0;
-}
-
-.sideMenu li.here ul li a {
-  padding-left: 35px;
-  font: 400 0.55em "trebuchet ms", serif;
-  color: #FFF;  
-  background: url(../img/bullet.gif) no-repeat 10px 0px;
-}
-
-.sideMenu li.here ul li a:hover {
-  color: #9FF3FF;
-  background: #5F5F5F url(../img/bullet.gif) no-repeat 10px 0px;
-}
-
-
-
 /**************************************************************
    #page: Holds the main page content.
  **************************************************************/
@@ -395,7 +618,7 @@ ul.sideMenu {
   float: left;
   width: 100%;
   clear: both;
-  
+
   padding-bottom: 4em;
 }
 
@@ -419,7 +642,7 @@ ul.sideMenu {
   width: 100%;
   clear: both;
   margin-top: -3.5em;
-  background: #000 url(../img/footer.jpg) repeat-x top left;
+  background: #000 url(/ui/img/footer.jpg) repeat-x top left;
 }
 
 /* Sets the width of the footer content */
@@ -429,8 +652,6 @@ ul.sideMenu {
   font-size: 0.85em;
   padding-top: 27px;
 }
-
-
 
 /**************************************************************
    Width classes used by the site columns
@@ -464,7 +685,6 @@ ul.sideMenu {
   width: 89%;
 }
 
-
 /**************************************************************
    Alignment classes
  **************************************************************/
@@ -484,8 +704,6 @@ ul.sideMenu {
 .alignRight {
   text-align: right;
 }
-
-
 
 /**************************************************************
    Generic display classes
@@ -525,7 +743,7 @@ ul.sideMenu {
 
 .gradient, .doc #pgxnbod {
   margin-bottom: 2em;
-  background: #555 url(../img/gradient.jpg) repeat-x bottom left; 
+  background: #555 url(/ui/img/gradient.jpg) repeat-x bottom left;
 }
 
 .error {
@@ -600,7 +818,7 @@ ul.sideMenu {
 }
 
 table td, table th {
-   padding: 5px;
+   padding: 5px
 }
 table tr {
  vertical-align:text-top;
@@ -627,7 +845,8 @@ table .dist .name, table .dist .bday {
 table .dist .name a {
   display:block;
   padding-left: 30px;
-  background: url(../img/favicon.png) no-repeat 4px 3px;
+  background: url(/ui/img/icon-44.png) no-repeat 1px 2px;
+  background-size: 20px;
 }
 
 table code {background-color:transparent;}
@@ -639,11 +858,15 @@ table code {background-color:transparent;}
 .dist .meta .download a, .dist .meta .browse a, .dist .meta a.avatar {
   display:block;
   margin:0;
-  padding:10px 10px 5px;
+  padding:6px 6px 0;
   float: right;
 }
 .dist .meta .download a:hover, .dist .meta .browse a:hover, .dist .meta a.avatar:hover {
   background:#202020;
+}
+.browse img, .download img {
+  width: 24px;
+  height: 24px;
 }
 
 .readme #pgxntoc {

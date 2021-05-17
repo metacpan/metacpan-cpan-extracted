@@ -7,22 +7,33 @@ namespace xs { namespace protocol { namespace http {
 using panda::string;
 
 static inline void msgfill (Message* m, const Hash& h) {
-    Sv sv;
-    if ((sv = h.fetch("headers")))      set_headers(m, sv);
-    if ((sv = h.fetch("body")))         m->body         = xs::in<string>(sv);
-    if ((sv = h.fetch("http_version"))) m->http_version = Simple(sv);
-    if ((sv = h.fetch("chunked")))      m->chunked      = sv.is_true();
-
-    if ((sv = h.fetch("compress"))) {
-        if (sv.is_array_ref()) {
-            Array a(sv);
-            switch (a.size()) {
-                case 2: m->compression.level = (Compression::Level)SvIV(a[1]);
-                        // fall through
-                case 1: m->compression.type  = (Compression::Type)SvIV(a[0]);
-            }
+    for (auto& row : h) {
+        auto key = row.key();
+        if (!key.length()) continue;
+        auto v = row.value();
+        switch (key[0]) {
+            case 'h':
+                if      (key == "headers")      set_headers(m, v);
+                else if (key == "http_version") m->http_version = Simple(v);
+                break;
+            case 'b':
+                if (key == "body") m->body = xs::in<string>(v);
+                break;
+            case 'c':
+                if      (key == "chunked") m->chunked = v.is_true();
+                else if (key == "compress") {
+                    if (v.is_array_ref()) {
+                        Array a(v);
+                        switch (a.size()) {
+                            case 2: m->compression.level = (Compression::Level)SvIV(a[1]);
+                                    // fall through
+                            case 1: m->compression.type  = (Compression::Type)SvIV(a[0]);
+                        }
+                    }
+                    else m->compression.type = (Compression::Type)SvIV(v);
+                }
+                break;
         }
-        else m->compression.type = (Compression::Type)SvIV(sv);
     }
 }
 
@@ -85,32 +96,55 @@ void fill_form(Request* req, const Sv& sv) {
 
 void fill (Request* req, const Hash& h) {
     msgfill(req, h);
-    Sv sv;
-    if ((sv = h.fetch("method")) && sv.defined()) set_method(req, sv);
-    if ((sv = h.fetch("uri")))                    req->uri = xs::in<URISP>(sv);
-    if ((sv = h.fetch("cookies")))                set_request_cookies(req, sv);
-
-    if ((sv = h.fetch("allow_compression"))) {
-        if (sv.is_array_ref()) {
-            Array av(sv);
-            for (auto value : av) {
-                auto val = value.as_number<uint8_t>();
-                if (is_valid_compression(val)) req->allow_compression((Compression::Type)val);
-            }
-        }
-        else {
-            uint8_t val = SvIV(sv);
-            if (is_valid_compression(val)) req->allow_compression((Compression::Type)val);
+    for (auto& row : h) {
+        auto key = row.key();
+        if (!key.length()) continue;
+        auto v = row.value();
+        switch (key[0]) {
+            case 'm':
+                if (key == "method") { if (v.defined()) set_method(req, v); }
+                break;
+            case 'u':
+                if (key == "uri") req->uri = xs::in<URISP>(v);
+                break;
+            case 'c':
+                if (key == "cookies") set_request_cookies(req, v);
+                break;
+            case 'a':
+                if (key == "allow_compression") {
+                    if (v.is_array_ref()) {
+                        Array av(v);
+                        for (auto value : av) {
+                            auto val = value.as_number<uint8_t>();
+                            if (is_valid_compression(val)) req->allow_compression((Compression::Type)val);
+                        }
+                    }
+                    else {
+                        uint8_t val = SvIV(v);
+                        if (is_valid_compression(val)) req->allow_compression((Compression::Type)val);
+                    }
+                }
+                break;
         }
     }
 }
 
 void fill (Response* res, const Hash& h) {
     msgfill(res, h);
-    Sv sv; Simple v;
-    if ((v  = h.fetch("code")))    res->code = v;
-    if ((v  = h.fetch("message"))) res->message = v.as_string();
-    if ((sv = h.fetch("cookies"))) set_response_cookies(res, sv);
+    for (auto& row : h) {
+        auto key = row.key();
+        if (!key.length()) continue;
+        auto v = row.value();
+        switch (key[0]) {
+            case 'c':
+                if      (key == "code")    res->code = Simple(v);
+                else if (key == "cookies") set_response_cookies(res, v);
+                break;
+            case 'm':
+                if (key == "message") res->message = Simple(v).as_string();
+                break;
+        }
+    }
 }
 
 void set_headers (Message* p, const Hash& hv) {

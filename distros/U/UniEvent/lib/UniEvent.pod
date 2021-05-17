@@ -314,8 +314,8 @@ To add several callbacks, simply call C<add()> method several times on that obje
     $timer->event->add(sub { ... });
     $timer->event->add(sub { ... });
     
-Keep in mind that the callbacks call order by default is reverse, i.e. the last added callback is called first.
-This behaviour can be changed, see L<XS::Framework::CallbackDispatcher> docs.
+The callbacks call order by default is in order of adding, i.e. the first added callback is called the first.
+To add callback in front C<prepend()> can be used, see L<XS::Framework::CallbackDispatcher> docs.
 
 To remove a certain callback, call C<remove()> with corresponding subroutine reference.
 

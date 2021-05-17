@@ -17,7 +17,7 @@ use Readonly;
 Readonly my $HALF     => 0.5;
 Readonly my $MAX_ZOOM => 100;
 
-our $VERSION = 8;
+our $VERSION = 9;
 
 use Glib::Object::Subclass Gtk3::DrawingArea::, signals => {
     'zoom-changed' => {
@@ -66,33 +66,42 @@ use Glib::Object::Subclass Gtk3::DrawingArea::, signals => {
         [qw/readable writable/]             # flags
     ),
     Glib::ParamSpec->float(
-        'resolution-ratio',                      # name
-        'resolution-ratio',                      # nick
-        'Ratio of x-resolution/y-resolution',    # blurb
-        0.0001,                                  # minimum
-        1000.0,                                  # maximum
-        1.0,                                     # default_value
-        [qw/readable writable/]                  # flags
+        'zoom-step',                                    # name
+        'Zoom step',                                    # nick
+        'Zoom coefficient for every scrolling step',    # blurb
+        1.0,                                            # minimum
+        10.0,                                           # maximum
+        2.0,                                            # default_value
+        [qw/readable writable/]                         # flags
+    ),
+    Glib::ParamSpec->float(
+        'resolution-ratio',                             # name
+        'resolution-ratio',                             # nick
+        'Ratio of x-resolution/y-resolution',           # blurb
+        0.0001,                                         # minimum
+        1000.0,                                         # maximum
+        1.0,                                            # default_value
+        [qw/readable writable/]                         # flags
     ),
     Glib::ParamSpec->scalar(
-        'tool',                                  # name
-        'tool',                                  # nickname
-        'Active Gtk3::ImageView::Tool',          # blurb
-        [qw/readable writable/]                  # flags
+        'tool',                                         # name
+        'tool',                                         # nickname
+        'Active Gtk3::ImageView::Tool',                 # blurb
+        [qw/readable writable/]                         # flags
     ),
     Glib::ParamSpec->scalar(
-        'selection',                                 # name
-        'Selection',                                 # nick
-        'Gdk::Rectangle hash of selected region',    # blurb
-        [qw/readable writable/]                      # flags
+        'selection',                                    # name
+        'Selection',                                    # nick
+        'Gdk::Rectangle hash of selected region',       # blurb
+        [qw/readable writable/]                         # flags
     ),
     Glib::ParamSpec->boolean(
-        'zoom-to-fit',                               # name
-        'Zoom to fit',                               # nickname
+        'zoom-to-fit',                                  # name
+        'Zoom to fit',                                  # nickname
         'Whether the zoom factor is automatically calculated to fit the window'
-        ,                                            # blurb
-        TRUE,                                        # default
-        [qw/readable writable/]                      # flags
+        ,                                               # blurb
+        TRUE,                                           # default
+        [qw/readable writable/]                         # flags
     ),
     Glib::ParamSpec->float(
         'zoom-to-fit-limit',                                         # name
@@ -272,10 +281,10 @@ sub _scroll {
     my $zoom;
     $self->set_zoom_to_fit(FALSE);
     if ( $event->direction eq 'up' ) {
-        $zoom = $self->get_zoom * 2;
+        $zoom = $self->get_zoom * $self->get('zoom-step');
     }
     else {
-        $zoom = $self->get_zoom / 2;
+        $zoom = $self->get_zoom / $self->get('zoom-step');
     }
     $self->_set_zoom_with_center( $zoom, $center_x, $center_y );
     return;
@@ -478,14 +487,14 @@ sub get_zoom_to_fit {
 sub zoom_in {
     my ($self) = @_;
     $self->set_zoom_to_fit(FALSE);
-    $self->_set_zoom_no_center( $self->get_zoom * 2 );
+    $self->_set_zoom_no_center( $self->get_zoom * $self->get('zoom-step') );
     return;
 }
 
 sub zoom_out {
     my ($self) = @_;
     $self->set_zoom_to_fit(FALSE);
-    $self->_set_zoom_no_center( $self->get_zoom / 2 );
+    $self->_set_zoom_no_center( $self->get_zoom / $self->get('zoom-step') );
     return;
 }
 
@@ -668,7 +677,7 @@ Gtk3::ImageView - Image viewer widget for Gtk3
 
 =head1 VERSION
 
-8
+9
 
 =head1 SYNOPSIS
 
@@ -740,11 +749,11 @@ Returns whether the view is currently zoom to fit or not.
 
 =head2 $view->zoom_in
 
-Doubles the current zoom.
+Increases the current zoom by C<zoom-step> times (defaults to 2).
 
 =head2 $view->zoom_out
 
-Halves the current zoom.
+Decreases the current zoom by C<zoom-step> times (defaults to 2).
 
 =head2 $view->zoom_to_fit
 

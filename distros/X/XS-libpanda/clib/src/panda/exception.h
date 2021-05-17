@@ -3,8 +3,12 @@
 #include <vector>
 #include "string.h"
 #include "refcnt.h"
+#include "function.h"
 
 namespace panda {
+
+struct ArgumentsHolder: public Refcnt { };
+using ArgumentsHolderSP = iptr<ArgumentsHolder>;
 
 struct Stackframe: public Refcnt {
     string file;
@@ -14,7 +18,8 @@ struct Stackframe: public Refcnt {
     std::uint64_t address = 0;
     std::uint64_t offset = 0;
     std::uint64_t line_no = 0;
-    std::vector<string> args;
+    ArgumentsHolderSP args;
+    virtual ~Stackframe();
 };
 
 using StackframeSP = iptr<Stackframe>;

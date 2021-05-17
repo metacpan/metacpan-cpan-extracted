@@ -9,3 +9,19 @@ Revision history for LyricFinder
         allows these in searches and encodes them in the page URL.
         - Add URI::Escape to prerequesites.
         - Small Pod/doc. tweaks.
+1.02    2021/05/11
+        - LyricFinder::Musixmatch - Fix bug that cut off first few lines 
+        of lyrics (due to their site separating an abreviated version of the 
+        first few lines from the rest of the lyrics).  Also added a 
+        "(Musixmatch status:  ok|warning|error)" line at bottom indicating 
+        what Musixmatch thinks of the state of the selected song's lyrics.
+1.03    2021/05/13
+        - Added LyricFinder::Letras (https://www.letras.mus.br).
+        - Added optional integer 4th argument to LyricFinder->fetch() to 
+        allow limiting # of sites tried (Default is to try all (currently 
+        5 sites installed) until lyrics are found.  Use this with the 
+        'random' option to limit the time spent searching before giving up.
+        If zero or >= 5 (current # of sites), all 5 sites will be tried.
+        - LyricFinder::Genius: Add conversions of accented characters to 
+        their unaccented equivalents to handle some non-English artist and 
+        song names.

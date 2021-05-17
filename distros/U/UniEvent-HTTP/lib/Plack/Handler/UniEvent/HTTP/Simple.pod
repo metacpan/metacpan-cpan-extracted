@@ -1,0 +1,20 @@
+=head1 NAME
+
+Plack::Handler::UniEvent::HTTP::Simple - Plack adapter for single process UniEvent::HTTP server
+
+
+
+=head1 SYNOPSIS
+
+  plackup -s UniEvent::HTTP::Simple --listen *:5000 -E deployment app.psgi
+
+
+
+=head1 DESCRIPTION
+
+This is an adapter to run PSGI apps as single process on UniEvent::HTTP.
+
+To run PSGI apps in multiprocess/multithread environment, see L<Plack::Handler::UniEvent::HTTP>
+
+
+=cut

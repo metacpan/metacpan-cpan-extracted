@@ -7,4 +7,4 @@ META.json
 META.yml
 README
 t/00-tokenizer.t
-t/pod.t
+xt/pod.t

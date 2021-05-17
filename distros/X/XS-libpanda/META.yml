@@ -26,5 +26,5 @@ no_index:
     - inc
 requires:
   XS::Install: v1.3.2
-version: v1.5.1
+version: v1.5.2
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

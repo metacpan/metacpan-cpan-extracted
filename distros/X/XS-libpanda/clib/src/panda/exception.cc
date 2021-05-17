@@ -17,6 +17,7 @@ static RawTraceProducer rawtrace_producer = get_default_raw_producer();
 static FrameProducers   frame_producers { get_default_bt_producer() };
 
 BacktraceInfo::~BacktraceInfo() {};
+Stackframe::~Stackframe() {};
 
 string BacktraceInfo::to_string() const noexcept {
     string r;

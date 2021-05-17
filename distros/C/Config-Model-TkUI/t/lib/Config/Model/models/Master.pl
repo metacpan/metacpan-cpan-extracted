@@ -293,6 +293,12 @@ things.
                 type       => 'leaf',
                 value_type => 'boolean',
             },
+            yes_no_boolean => {
+                type       => 'leaf',
+                value_type => 'boolean',
+                upstream_default => 'yes',
+                write_as => [ 'no', 'yes' ],
+            },
             [qw/a_string a_long_string another_string/] => {
                 type       => 'leaf',
                 value_type => 'string'

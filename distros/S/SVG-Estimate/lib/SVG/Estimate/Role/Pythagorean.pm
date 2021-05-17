@@ -1,5 +1,5 @@
 package SVG::Estimate::Role::Pythagorean;
-$SVG::Estimate::Role::Pythagorean::VERSION = '1.0115';
+$SVG::Estimate::Role::Pythagorean::VERSION = '1.0116';
 use strict;
 use Moo::Role;
 
@@ -9,7 +9,7 @@ SVG::Estimate::Role::Pythagorean - Use Pythagorean theorem to calc distance
 
 =head1 VERSION
 
-version 1.0115
+version 1.0116
 
 =head1 METHODS
 

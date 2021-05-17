@@ -4,14 +4,14 @@ package JSON::Schema::Draft201909::Result;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Contains the result of a JSON Schema evaluation
 
-our $VERSION = '0.026';
+our $VERSION = '0.027';
 
 use 5.016;
 no if "$]" >= 5.031009, feature => 'indirect';
 no if "$]" >= 5.033001, feature => 'multidimensional';
 no if "$]" >= 5.033006, feature => 'bareword_filehandles';
-use Moo;
 use strictures 2;
+use Moo;
 use MooX::TypeTiny;
 use Types::Standard qw(ArrayRef InstanceOf Enum);
 use MooX::HandlesVia;
@@ -60,6 +60,7 @@ sub BUILD {
 
 sub format {
   my ($self, $style) = @_;
+
   if ($style eq 'flag') {
     return +{ valid => $self->valid };
   }
@@ -94,12 +95,12 @@ sub format {
           or (
             not grep $keyword eq $_, qw(allOf anyOf if then else dependentSchemas contains propertyNames)
             and ($keyword ne 'oneOf' or $error ne 'no subschemas are valid')
-            and ($keyword ne 'items'    # list form of items (prefixItems)
-              or $error eq 'item not permitted' and $_->keyword_location =~ m{/[0-9]+$})
+            and ($keyword ne 'items' or $error eq 'item not permitted' )
             and ($keyword ne 'additionalItems' or $error eq 'additional item not permitted')
             and (not grep $keyword eq $_, qw(properties patternProperties)
               or $error eq 'property not permitted')
             and ($keyword ne 'additionalProperties' or $error eq 'additional property not permitted'))
+            and ($keyword ne 'dependentRequired' or $error ne 'not all dependencies are satisfied')
         );
 
         if ($keep and $keyword and $keyword =~ /^unevaluated(?:Items|Properties)$/
@@ -167,7 +168,7 @@ JSON::Schema::Draft201909::Result - Contains the result of a JSON Schema evaluat
 
 =head1 VERSION
 
-version 0.026
+version 0.027
 
 =head1 SYNOPSIS
 

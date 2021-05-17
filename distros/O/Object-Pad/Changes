@@ -1,5 +1,16 @@
 Revision history for Object-Pad
 
+0.38    2021-05-14
+        [CHANGES]
+         * Added Object::Pad::MOP::Class->for_class and ->for_caller
+           constructors
+         * Provide a generated ->DOES method on each class to account for
+           applied roles (RT136462)
+
+        [BUGFIXES]
+         * Make sure that generated accessors are recorded in the metaclass as
+           real methods, ensuring role application includes them (RT136507)
+
 0.37    2021-04-01
         [BUGFIXES]
          * Don't get confused by sub signature parameters of the same name as

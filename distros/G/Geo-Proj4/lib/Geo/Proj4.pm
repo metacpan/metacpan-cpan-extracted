@@ -1,4 +1,4 @@
-# Copyrights 2018 by [Mark Overmeer].
+# Copyrights 2021 by [Mark Overmeer].
 #  For other contributors see ChangeLog.
 # See the manual pages for details on the licensing terms.
 # Pod stripped from pm file by OODoc 2.02.
@@ -8,12 +8,12 @@
 
 package Geo::Proj4;
 use vars '$VERSION';
-$VERSION = '1.09';
+$VERSION = '1.11';
 
 
 use strict;
 use warnings;
-#our $VERSION = '0.96';
+our $VERSION = '1.11';
 
 use base 'DynaLoader';
 
@@ -100,10 +100,13 @@ sub forwardRad($$)
 }
 
 
+
 sub inverse($$) { inverse_degrees_proj4(@_) }
 
 
+
 sub inverseRad($$) { inverse_proj4(@_) }
+
 
 
 sub transform($$)
@@ -124,6 +127,7 @@ sub transform($$)
     $last_error = dualvar $err, $errtxt;
     $err ? () : $pr;
 }
+
 
 
 sub transformRad($$)
@@ -159,7 +163,9 @@ sub libVersion()
 }
 
 
+
 sub listTypes() { &def_types_proj4 }
+
 
 
 sub typeInfo($)
@@ -172,7 +178,9 @@ sub typeInfo($)
 }
 
 
+
 sub listEllipsoids() { &def_ellps_proj4 }
+
 
 
 sub ellipsoidInfo($)
@@ -183,7 +191,9 @@ sub ellipsoidInfo($)
 }
 
 
+
 sub listUnits() { &def_units_proj4 }
+
 
 
 sub unitInfo($)
@@ -195,7 +205,9 @@ sub unitInfo($)
 }
 
 
+
 sub listDatums() { &def_datums_proj4 }
+
 
 
 sub datumInfo($)
@@ -206,7 +218,5 @@ sub datumInfo($)
 }
 
 #--------------
-
-# more text in PODTAIL.txt
 
 1;

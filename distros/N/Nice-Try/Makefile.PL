@@ -22,6 +22,7 @@ my %WriteMakefileArgs = (
     	'List::Util'    => '1.33',
     	'PPI'           => '1.270',
     	'Scalar::Util'	=> '1.50',
+    	'Want'          => '0.29',
     },
     TEST_REQUIRES =>
     {

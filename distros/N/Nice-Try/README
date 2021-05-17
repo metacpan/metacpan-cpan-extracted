@@ -17,7 +17,7 @@ SYNOPSIS
         }
         # Some comment
         catch( Exception $e ) {
-            return( "Caught an exception \$e" );
+            return( "Caught an exception $e" );
         }
         # More comment with space too
 
@@ -39,8 +39,72 @@ SYNOPSIS
         Cleaning up
         Ok, then
 
+    Also since version 1.0.0, Nice::Try is context aware:
+
+        use Want; # an awesome module which extends wantarray
+        sub info
+        {
+            my $self = shift( @_ );
+            try
+            {
+                # Do something
+                if( want('OBJECT') )
+                {
+                    return( $self );
+                }
+                elsif( want('CODE') )
+                {
+                    # dummy code ref for example
+                    return( sub{ return( $name ); } );
+                }
+                elsif( want('LIST') )
+                {
+                    return( @some_data );
+                }
+                elsif( want('ARRAY') )
+                {
+                    return( \@some_data );
+                }
+                elsif( want('HASH') )
+                {
+                    return({ name => $name, location => $city });
+                }
+                elsif( want('REFSCALAR') )
+                {
+                    return( \$name );
+                }
+                elsif( want('SCALAR' ) )
+                {
+                    return( $name ); # regular string
+                }
+                elsif( want('VOID') )
+                {
+                    return;
+                }
+            }
+            catch( $e )
+            {
+                $Logger->( "Caught exception: $e" );
+            }
+        }
+
+        # regular string context
+        my $name = $o->info;
+        # code context
+        my $name = $o->info->();
+        # list context like wantarray
+        my @data = $o->info;
+        # hash context
+        my $name = $o->info->{name};
+        # array context
+        my $name = $o->info->[2];
+        # object context
+        my $name = $o->info->another_method;
+        # scalar reference context
+        my $name = ${$o->info};
+
 VERSION
-        v0.1.11
+        v1.0.0
 
 DESCRIPTION
     Nice::Try is a lightweight implementation of Try-Catch exception
@@ -141,6 +205,81 @@ DESCRIPTION
             I am trying my best Jacques!
             Failed: But I failed
 
+    *   "try" or "catch" blocks can contain flow control keywords such as
+        "next", "last" and "redo"
+
+            while( defined( my $product = $items->[++$i] ) )
+            {
+                try
+                {
+                    # Do something
+                    last if( !$product->active );
+                }
+                catch( $oops )
+                {
+                    $log->( "Error: $oops" );
+                    last;
+                }
+            }
+            continue
+            {
+                try
+                {
+                    if( $product->region eq 'Asia' )
+                    {
+                        push( @asia, $product );
+                    }
+                    else
+                    {
+                        next;
+                    }
+                }
+                catch( $e )
+                {
+                    $log->( "An unexpected error has occurred. Is $product an object? $e" );
+                    last;
+                }
+            }
+
+    *   Can be used with or without a "catch" block
+
+    *   Supports a "finally" block called in void context for cleanup for
+        example
+
+    *   Nice::Try is rich context aware, which means it can provide you with
+        a super granual context on how to return data back to the caller
+        based on the caller's expectation, by using a module like Want.
+
+    *   Call to "caller" in perlfunc will return the correct entry in call
+        stack
+
+            #!/usr/bin/perl
+            BEGIN
+            {
+                use strict;
+                use warnings;
+                use Nice::Try;
+            };
+
+            {
+                &callme();
+            }
+
+            sub callme
+            {
+                try
+                {
+                    my @info = caller(1); # or my @info = caller;
+                    print( "Called from package $info[0] in file $info[1] at line $info[2]\n" );
+                }
+                catch( $e )
+                {
+                    print( "Got an error: $e\n" );
+                }
+            }
+
+        WIll yield: "Called from package main in file ./test.pl at line 10"
+
 WHY USE IT?
     There are quite a few implementations of try-catch blocks in perl, and
     they can be grouped in 4 categories:
@@ -155,7 +294,7 @@ WHY USE IT?
         For example TryCatch
 
     4 Others
-        For example Syntax::Keyword::Try and now perl with version 5.33
+        For example Syntax::Keyword::Try and now perl with version 5.33.7
         using experimental feature
         <https://perldoc.perl.org/blead/perlsyn#Try-Catch-Exception-Handling
         >.
@@ -226,10 +365,52 @@ WHY USE IT?
     correcting this breaking change.
 
     In group 4, there is Syntax::Keyword::Try, which is a great alternative
-    if you do not care about exception variable assignment or exception
-    class filter. You can only use $@
+    if you do not care about exception class filter (it supports variable
+    assignment since 2020-08-01 with version 0.18).
 
-    Since perl version 5.33
+    Although, the following script would not work under Syntax::Keyword::Try
+    :
+
+        BEGIN
+        {
+            use strict;
+            use warnings;
+            use Syntax::Keyword::Try;
+        };
+
+        {
+            &callme();
+        }
+
+        sub callme
+        {
+            try {
+                print( "Hello there\n" );
+            }
+            catch ($e) {
+                print( "Got an error: $e\n" );
+            }
+        }
+
+    This will trigger the following error:
+
+        syntax error at ./test.pl line 18, near ") {"
+        syntax error at ./test.pl line 21, near "}"
+        Execution of ./test.pl aborted due to compilation errors.
+
+    That is because Syntax::Keyword::Try expects to be "used" outside of a
+    BEGIN block like this:
+
+        use strict;
+        use warnings;
+        use Syntax::Keyword::Try;
+
+        # Rest of the script, same as above
+
+    Of course, with Nice::Try, there is no such constraint. You can "use" in
+    perlfunc Nice::Try inside or outside of a "BEGIN" block indistinctively.
+
+    Since perl version 5.33.7
     <https://perldoc.perl.org/blead/perlsyn#Try-Catch-Exception-Handling>
     you can use the try-catch block using an experimental feature which may
     be removed in future versions, by writing:
@@ -260,7 +441,7 @@ WHY USE IT?
         {
             return( $self->error( "Something went awry with MyException: $oh_well" ) );
         }
-        # No support for 'finally' yet in perl 5.34
+        # No support for 'finally' yet in perl version 5.33.7
         finally
         {
             # do some cleanup here
@@ -302,6 +483,295 @@ FINALLY
     context, so any "return" statement there will not actually return
     anything back to the caller.
 
+CATCHING OR NOT CATCHING?
+    Nice::Try can be used with a single "try" block which will, in effect,
+    behaves like an eval and the special variable $@ will be available as
+    always.
+
+        try
+        {
+            die( "Oh no, something went wrong!\n" );
+        }
+        print( "Got here with $@\n" );
+
+    or even:
+
+        try
+        {
+            die( "Oh no, something went wrong!\n" );
+        }
+        catch( $e ); # Not very meaningful, but it will work
+        print( "Got here with $@\n" );
+
+    However, if you decide to catch class exceptions, make sure to add a
+    default "catch( $e )". For example:
+
+        try
+        {
+            die( MyException->new( "Oh no" ) );
+        }
+        print( "Got here with $@\n" );
+
+    will work and "print" will display "Got here with Oh no". However:
+
+        try
+        {
+            die( MyException->new( "Oh no" ) );
+        }
+        catch( Some::Exception $e )
+        {
+            # won't reach here
+        }
+
+    will make your process die because of the exception not being caught,
+    thus you might want to do instead:
+
+        try
+        {
+            die( MyException->new( "Oh no" ) );
+        }
+        catch( Some::Exception $e )
+        {
+            # won't reach here
+        }
+        catch( $default )
+        {
+            print( "Got you! Error was: $default\n" );
+        }
+
+    And the last catch will catch the exception.
+
+    Since, try-catch block can be nested, the following would work too:
+
+        try
+        {
+            try
+            {
+                die( MyException->new( "Oh no" ) );
+            }
+            catch( Some::Exception $e )
+            {
+                # won't reach here
+            }
+        }
+        catch( MyException $e )
+        {
+            print( "Got you! MyException was: $e\n" );
+        }
+        # to play it safe
+        catch( $e )
+        {
+            # do something about it
+        }
+
+LOOPS
+    Since version v0.2.0 Nice::Try supports the use of flow control keywords
+    such as "next", "last" and "redo" inside try-catch blocks. For example:
+
+        my @names = qw( John Jack Peter Paul Mark );
+        for( $i..$#names )
+        {
+            try
+            {
+                next if( $i == 2 );
+                # some more code...
+            }
+            catch( $e )
+            {
+                print( "Got exception: $e\n" );
+            }
+        }
+
+    It also works inside the catch block or inside the "continue" block:
+
+        while( defined( my $product = $items->[++$i] ) )
+        {
+            # Do something
+        }
+        continue
+        {
+            try
+            {
+                if( $product->region eq 'Asia' )
+                {
+                    push( @asia, $product );
+                }
+                else
+                {
+                    next;
+                }
+            }
+            catch( $e )
+            {
+                $log->( "An unexpected error has occurred. Is $product an object? $e" );
+                last;
+            }
+        }
+
+    Control flow with labels also work
+
+        ELEM: foreach my $n ( @names )
+        {
+            try
+            {
+                $n->moveAfter( $this );
+                next ELEM if( $n->value == 1234567 );
+            }
+            catch( $oops )
+            {
+                last ELEM;
+            }
+        }
+
+    However, if you enclose a try-catch block inside another block, use of
+    "next", "last" or "redo" will silently not work. This is due to perl
+    control flow. See perlsyn for more information on this. For example, the
+    following would not yield the desired outcome:
+
+        ELEM: foreach my $n ( @names )
+        {
+            { # <--- Here is the culprit
+                try
+                {
+                    $n->moveAfter( $this );
+                    # This next statement will not do anything.
+                    next ELEM if( $n->value == 1234567 );
+                }
+                catch( $oops )
+                {
+                    # Neither would this one.
+                    last ELEM;
+                }
+            }
+        }
+
+CONTEXT AWARENESS
+    Nice::Try provides a high level of granularity about the context in
+    which your subroutine was called.
+
+    Normally, you would write something like this, and it works as always:
+
+        sub info
+        {
+            try
+            {
+                # do something here
+                if( wantarray() )
+                {
+                    return( @list_of_values );
+                }
+                # caller just want a scalar
+                elsif( defined( wantarray() ) )
+                {
+                    return( $name );
+                }
+                # otherwise if undefined, it means we are called in void context, like:
+                # $o->info; with no expectation of return value
+            }
+            catch( $e )
+            {
+                print( "Caught an error: $e\n" );
+            }
+        }
+
+    THe above is nice, but how do you differentiate cases were your caller
+    wants a simple returned value and the one where the caller wants an
+    object for chaining purpose, or if the caller wants an hash or array
+    reference in return?
+
+    For example:
+
+        my $val = $o->info->[2]; # wants an array reference
+        my $val = $o->info->{name} # wants an hash reference
+        # etc...
+
+    Now, you can do the following:
+
+        use Want; # an awesome module which extends wantarray
+        sub info
+        {
+            my $self = shift( @_ );
+            try
+            {
+                # Do something
+                # 
+                # same as wantarray() == 1
+                if( want('LIST') )
+                {
+                    return( @some_data );
+                }
+                # same as: if( defined( wantarray() ) && !wantarray() )
+                elsif( want('SCALAR' ) )
+                {
+                    return( $name ); # regular string
+                }
+                # same as !defined( wantarray() )
+                elsif( want('VOID') )
+                {
+                    return;
+                }
+                # For the other context below, wantarray is of no help
+                if( want('OBJECT') )
+                {
+                    return( $obj ); # useful for chaining
+                }
+                elsif( want('CODE') )
+                {
+                    # dummy code ref for example
+                    return( sub{ return( $name ); } );
+                }
+                elsif( want('ARRAY') )
+                {
+                    return( \@some_data );
+                }
+                elsif( want('HASH') )
+                {
+                    return({ name => $name, location => $city });
+                }
+            }
+            catch( $e )
+            {
+                $Logger->( "Caught exception: $e" );
+            }
+        }
+
+    Thus this is particularly useful if, for example, you want to
+    differentiate if the caller just wants a return string, or an object for
+    chaining.
+
+    "wantarray" in perlfunc would not know the difference, and other
+    try-catch implementation would not let you benefit from using Want.
+
+    For example:
+
+        my $val = $o->info; # simple regular scalar context; but...
+        # here, we are called in object context and wantarray is of no help to tell the difference
+        my $val = $o->info->another_method;
+
+    Other cases are:
+
+        # regular string context
+        my $name = $o->info;
+        # list context like wantarray
+        my @data = $o->info;
+
+        # code context
+        my $name = $o->info->();
+        # hash context
+        my $name = $o->info->{name};
+        # array context
+        my $name = $o->info->[2];
+        # object context
+        my $name = $o->info->another_method;
+
+    See Want for more information on how you can benefit from it.
+
+    Currently lvalues are no implemented and will be in future releases.
+
+    Also, for this rich context awareness to be used, obviously try-catch
+    would need to be inside a subroutine, otherwise there is no rich context
+    other than the one the regular "wantarray" in perlfunc provides.
+
 DEBUGGING
     And to have Nice::Try save the filtered code to a file, pass it the
     "debug_file" parameter like this:
@@ -334,10 +804,11 @@ AUTHOR
     Jacques Deguest <jack@deguest.jp>
 
 SEE ALSO
-    PPI, Filter::Util::Call, Try::Harder, Syntax::Keyword::Try
+    PPI, Filter::Util::Call, Try::Harder, Syntax::Keyword::Try,
+    Exception::Class
 
 COPYRIGHT & LICENSE
-    Copyright (c) 2020 DEGUEST Pte. Ltd.
+    Copyright (c) 2020-2021 DEGUEST Pte. Ltd.
 
     You can use, copy, modify and redistribute this package and associated
     files under the same terms as Perl itself.

@@ -46,8 +46,7 @@
       "homepage" : "http://jmcnamara.github.com/excel-writer-xlsx/",
       "repository" : {
          "url" : "http://github.com/jmcnamara/excel-writer-xlsx"
-      },
-      "x_MailingList" : "http://groups.google.com/group/spreadsheet-writeexcel"
+      }
    },
-   "version" : "1.08"
+   "version" : "1.09"
 }

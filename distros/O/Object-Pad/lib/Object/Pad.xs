@@ -10,6 +10,8 @@
 
 #include "XSParseSublike.h"
 
+#include "perl-backcompat.c.inc"
+
 #ifdef HAVE_DMD_HELPER
 #  include "DMD_helper.h"
 #endif
@@ -18,17 +20,12 @@
 #  include "wrap_keyword_plugin.c.inc"
 #endif
 
-#define HAVE_PERL_VERSION(R, V, S) \
-    (PERL_REVISION > (R) || (PERL_REVISION == (R) && (PERL_VERSION > (V) || (PERL_VERSION == (V) && (PERL_SUBVERSION >= (S))))))
-
 #if HAVE_PERL_VERSION(5, 26, 0)
 #  define HAVE_PARSE_SUBSIGNATURE
 #  define HAVE_OP_ARGCHECK
 #endif
 
 #include "perl-additions.c.inc"
-
-#include "perl-backcompat.c.inc"
 
 #include "lexer-additions.c.inc"
 
@@ -329,6 +326,7 @@ struct ClassMeta {
   AV *methods;         /* each elem is a raw pointer directly to a MethodMeta */
   AV *requiremethods;  /* each elem is an SVt_PV giving a name */
   CV *foreign_new;     /* superclass is not Object::Pad, here is the constructor */
+  CV *foreign_does;    /* superclass is not Object::Pad, here is SUPER::DOES (which could be UNIVERSAL::DOES) */
   CV *initslots;       /* the INITSLOTS method body */
   AV *buildblocks;     /* the BUILD {} phaser blocks; each elem is a CV* directly */
 
@@ -1100,6 +1098,76 @@ static XS(injected_constructor)
   XSRETURN(1);
 }
 
+static XS(injected_DOES)
+{
+  dXSARGS;
+  const ClassMeta *meta = XSANY.any_ptr;
+  SV *self = ST(0);
+  SV *wantrole = ST(1);
+
+  PERL_UNUSED_ARG(items);
+
+  CV *cv_does = NULL;
+
+  while(meta != NULL) {
+    AV *roles = meta->roles;
+    I32 nroles = av_count(roles);
+
+    if(!cv_does && meta->foreign_does)
+      cv_does = meta->foreign_does;
+
+    if(sv_eq(meta->name, wantrole)) {
+      XSRETURN_YES;
+    }
+
+    int i;
+    for(i = 0; i < nroles; i++) {
+      RoleEmbedding *embedding = (RoleEmbedding *)AvARRAY(roles)[i];
+      if(sv_eq(embedding->rolemeta->name, wantrole)) {
+        XSRETURN_YES;
+      }
+    }
+
+    meta = meta->supermeta;
+  }
+
+  if (cv_does) {
+    /* return $self->DOES(@_); */
+    dSP;
+
+    ENTER;
+    SAVETMPS;
+
+    PUSHMARK(SP);
+    EXTEND(SP, 2);
+    PUSHs(self);
+    PUSHs(wantrole);
+    PUTBACK;
+
+    int count = call_sv((SV*)cv_does, G_SCALAR);
+
+    SPAGAIN;
+
+    bool ret = false;
+
+    if (count)
+      ret = POPi;
+
+    FREETMPS;
+    LEAVE;
+
+    if(ret)
+      XSRETURN_YES;
+  }
+  else {
+    /* We need to also respond to Object::Pad::UNIVERSAL and UNIVERSAL */
+    if(sv_derived_from_sv(self, wantrole, 0))
+      XSRETURN_YES;
+  }
+
+  XSRETURN_NO;
+}
+
 #define mop_create_class(type, name, super)  S_mop_create_class(aTHX_ type, name, super)
 static ClassMeta *S_mop_create_class(pTHX_ enum MetaType type, SV *name, SV *superclassname)
 {
@@ -1119,6 +1187,7 @@ static ClassMeta *S_mop_create_class(pTHX_ enum MetaType type, SV *name, SV *sup
   meta->requiremethods = newAV();
   meta->repr   = REPR_AUTOSELECT;
   meta->foreign_new = NULL;
+  meta->foreign_does = NULL;
   meta->supermeta = NULL;
   meta->pending_submeta = NULL;
   meta->roles = newAV();
@@ -1177,6 +1246,8 @@ static ClassMeta *S_mop_create_class(pTHX_ enum MetaType type, SV *name, SV *sup
       if(!meta->foreign_new)
         croak("Unable to find SUPER::new for %" SVf, superclassname);
 
+      meta->foreign_does = fetch_superclass_method_pv(meta->stash, "DOES", 4, -1);
+
       av_push(isa, newSVpvs("Object::Pad::UNIVERSAL"));
     }
 
@@ -1199,6 +1270,13 @@ static ClassMeta *S_mop_create_class(pTHX_ enum MetaType type, SV *name, SV *sup
 
     CV *newcv = newXS(SvPV_nolen(newname), injected_constructor, __FILE__);
     CvXSUBANY(newcv).any_ptr = meta;
+  }
+
+  {
+    SV *doesname = newSVpvf("%" SVf "::DOES", name);
+    SAVEFREESV(doesname);
+    CV *doescv = newXS(SvPV_nolen(doesname), injected_DOES, __FILE__);
+    CvXSUBANY(doescv).any_ptr = meta;
   }
 
   {
@@ -1578,18 +1656,25 @@ static void S_generate_slot_accessor(pTHX_ SlotMeta *slotmeta, const char *mname
 
   ENTER;
 
-  if(!mname) {
+  SV *mnamesv;
+
+  if(mname)
+    mnamesv = newSVpv(mname, 0);
+  else {
     if(SvPVX(slotmeta->name)[1] == '_')
       mname = SvPVX(slotmeta->name) + 2;
     else
       mname = SvPVX(slotmeta->name) + 1;
 
     if(type == ACCESSOR_WRITER) {
-      SV *namesv = newSVpvf("set_%s", mname);
-      SAVEFREESV(namesv);
-      mname = SvPVX(namesv);
+      mnamesv = newSVpvf("set_%s", mname);
+      mname = SvPVX(mnamesv);
     }
+    else
+      mnamesv = newSVpv(mname, 0);
   }
+
+  SAVEFREESV(mnamesv);
 
   ClassMeta *classmeta = slotmeta->class;
 
@@ -1648,6 +1733,8 @@ static void S_generate_slot_accessor(pTHX_ SlotMeta *slotmeta, const char *mname
 
   CV *cv = newATTRSUB(floor_ix, newSVOP(OP_CONST, 0, mname_fq), NULL, NULL, ops);
   CvMETHOD_on(cv);
+
+  mop_class_add_method(classmeta, mnamesv);
 
   LEAVE;
 }

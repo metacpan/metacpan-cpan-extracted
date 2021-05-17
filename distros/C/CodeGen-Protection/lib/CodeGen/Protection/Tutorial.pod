@@ -12,7 +12,7 @@ CodeGen::Protection::Tutorial — What the heck is this thing for?
 
 =head1 VERSION
 
-version 0.05
+version 0.06
 
 =head1 RATIONALE
 
@@ -28,7 +28,7 @@ you probably have a pretty good idea of what's going on here.
 For this example, imagine you're writing code to autogenerate
 L<OpenAPI|https://swagger.io/> server code. In OpenAPI, you have a JSON or
 YAML document that specifies OpenAPI routes. Ignoring the rest of the
-document, let's just look at a couple of paths that might be listed:
+document, let's just look at a path that might be listed:
 
     paths:
       /users:

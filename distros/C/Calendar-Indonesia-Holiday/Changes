@@ -1,3 +1,9 @@
+0.341   2021-05-12  Released-By: PERLANCAR; Urgency: medium
+
+	- [bugfix] Fix clash between --query and --year (both specified
+	  pos=0). We now remove --query's pos.
+
+
 0.340   2021-04-12  Released-By: PERLANCAR; Urgency: low
 
 	- [bugfix] Fix typo: May 14 2021 is day 2 of Eid Ul-Fitr, not day 1.

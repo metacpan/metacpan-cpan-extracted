@@ -4,6 +4,7 @@ LICENSE
 META.json
 README.md
 cpanfile
+lib/CDD.pm
 lib/Contextual/Diag.pm
 lib/Contextual/Diag/Value.pm
 minil.toml

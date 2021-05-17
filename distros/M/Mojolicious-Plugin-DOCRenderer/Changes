@@ -1,3 +1,6 @@
+5.02    2021-05-14 00:00:00
+        - Updated against Mojolicious 9.17.
+
 5.01    2017-08-24 00:00:00
         -  End user generated MYMETA files are not distributed.
 

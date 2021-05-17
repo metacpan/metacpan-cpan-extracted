@@ -1,0 +1,107 @@
+#include <xs/unievent/Tcp.h>
+#include <xs/net/sockaddr.h>
+#include <xs/CallbackDispatcher.h>
+
+MODE: INLINE
+
+namespace {
+    struct XSServerFactory : Server::IFactory { // we want server to create requests with backref
+        ServerRequestSP new_request (ServerConnection* c) override { return make_backref<ServerRequest>(c); }
+    };
+    static XSServerFactory xs_server_factory;
+}
+
+MODULE = UniEvent::HTTP               PACKAGE = UniEvent::HTTP::Server
+PROTOTYPES: DISABLE
+
+#// new([$loop])
+#// new($cfg, [$loop])
+Server* Server::new (Sv config_or_loop = {}, LoopSP loop = {}) {
+    panda::optional<Server::Config> cfg;
+    
+    if (config_or_loop.is_object_ref()) {
+        loop = xs::in<LoopSP>(config_or_loop);
+    }
+    else if (config_or_loop.is_hash_ref()) {
+        cfg = xs::in<Server::Config>(config_or_loop);
+    }
+    
+    if (!loop) loop = Loop::default_loop();
+    
+    if (cfg) RETVAL = new Server(cfg.value(), loop, &xs_server_factory);
+    else     RETVAL = new Server(loop, &xs_server_factory);
+}
+
+void Server::configure (Server::Config cfg)
+
+LoopSP Server::loop ()
+
+std::vector<TcpSP> Server::listeners ()
+
+SockAddr Server::sockaddr () {
+    RETVAL = THIS->sockaddr().value();
+}
+
+bool Server::running ()
+
+bool Server::stopping ()
+
+void Server::run ()
+
+void Server::stop ()
+
+void Server::graceful_stop ()
+
+void Server::start_listening ()
+
+void Server::stop_listening ()
+
+XSCallbackDispatcher* Server::run_event () {
+    RETVAL = XSCallbackDispatcher::create(THIS->run_event);
+}
+
+void Server::run_callback (Server::run_fn cb) {
+    THIS->run_event.remove_all();
+    if (cb) THIS->run_event.add(cb);
+}
+
+XSCallbackDispatcher* Server::route_event () {
+    RETVAL = XSCallbackDispatcher::create(THIS->route_event);
+}
+
+void Server::route_callback (Server::route_fn cb) {
+    THIS->route_event.remove_all();
+    if (cb) THIS->route_event.add(cb);
+}
+
+XSCallbackDispatcher* Server::request_event () {
+    RETVAL = XSCallbackDispatcher::create(THIS->request_event);
+}
+
+void Server::request_callback (ServerRequest::receive_fn cb) {
+    THIS->request_event.remove_all();
+    if (cb) THIS->request_event.add(cb);
+}
+
+XSCallbackDispatcher* Server::error_event () {
+    RETVAL = XSCallbackDispatcher::create(THIS->error_event);
+}
+
+void Server::error_callback (Server::error_fn cb) {
+    THIS->error_event.remove_all();
+    if (cb) THIS->error_event.add(cb);
+}
+
+XSCallbackDispatcher* Server::stop_event () {
+    RETVAL = XSCallbackDispatcher::create(THIS->stop_event);
+}
+
+void Server::stop_callback (Server::stop_fn cb) {
+    THIS->stop_event.remove_all();
+    if (cb) THIS->stop_event.add(cb);
+}
+
+SV* CLONE_SKIP (...) {
+    XSRETURN_YES;
+    PERL_UNUSED_VAR(items);
+}

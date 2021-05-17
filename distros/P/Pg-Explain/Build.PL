@@ -28,6 +28,10 @@ my $builder = Module::Build->new(
                 web  => 'https://gitlab.com/depesz/Pg--Explain',
                 type => 'git',
             },
+            bugtracker => {
+                web => 'https://gitlab.com/depesz/Pg--Explain/-/issues',
+            },
+            homepage => 'https://gitlab.com/depesz/Pg--Explain'
         },
     },
 );

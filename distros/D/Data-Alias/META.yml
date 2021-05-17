@@ -1,19 +1,31 @@
---- 
-abstract: Comprehensive set of aliasing operations
+---
+abstract: 'Comprehensive set of aliasing operations'
 author:
-  - 'Matthijs van Duin <xmath@cpan.org>'
-  - 'Andrew Main (Zefram) <zefram@fysh.org>'
-distribution_type: module
-generated_by: Module::Install version 0.67
+  - unknown
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  Test::More: '0.88'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010'
 license: perl
-meta-spec: 
-  url: http://module-build.sourceforge.net/META-spec-v1.3.html
-  version: 1.3
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
 name: Data-Alias
-no_index: 
-  directory: 
-    - inc
+no_index:
+  directory:
     - t
-requires: 
-  perl: 5.8.1
-version: 1.24
+    - inc
+requires:
+  Carp: '0'
+  Exporter: '0'
+  perl: '5.006'
+  strict: '0'
+  vars: '0'
+  warnings: '0'
+resources:
+  repository: https://github.com/mvduin/perl-Data-Alias.git
+version: '1.25'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

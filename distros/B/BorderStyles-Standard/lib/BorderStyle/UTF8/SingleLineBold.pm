@@ -1,9 +1,9 @@
 package BorderStyle::UTF8::SingleLineBold;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-01-31'; # DATE
+our $DATE = '2021-02-19'; # DATE
 our $DIST = 'BorderStyles-Standard'; # DIST
-our $VERSION = '0.005'; # VERSION
+our $VERSION = '0.006'; # VERSION
 
 use strict;
 use parent 'BorderStyleBase';
@@ -38,9 +38,62 @@ BorderStyle::UTF8::SingleLineBold - Bold single-line border with UTF8 characters
 
 =head1 VERSION
 
-This document describes version 0.005 of BorderStyle::UTF8::SingleLineBold (from Perl distribution BorderStyles-Standard), released on 2021-01-31.
+This document describes version 0.006 of BorderStyle::UTF8::SingleLineBold (from Perl distribution BorderStyles-Standard), released on 2021-02-19.
 
 =head1 SYNOPSIS
+
+To use with L<Text::ANSITable>:
+
+ use Text::ANSITable;
+ my $rows =
+   [
+     ["ColumName1", "ColumnNameB", "ColumnNameC"],
+     ["row1A", "row1B", "row1C"],
+     ["row2A", "row2B", "row2C"],
+     ["row3A", "row3B", "row3C"],
+   ];
+ my $t = Text::ANSITable->new;
+ $t->border_style("UTF8::SingleLineBold");
+ $t->columns($rows->[0]);
+ $t->add_row($rows->[$_]) for 1 .. $#{ $rows };
+ print $t->draw;
+
+
+Sample output:
+
+ ┏━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━━┓
+ ┃ ColumName1 ┃ ColumnNameB ┃ ColumnNameC ┃
+ ┣━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━━┫
+ ┃ row1A      ┃ row1B       ┃ row1C       ┃
+ ┃ row2A      ┃ row2B       ┃ row2C       ┃
+ ┃ row3A      ┃ row3B       ┃ row3C       ┃
+ ┗━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━━┛
+
+To use with L<Text::Table::Span>:
+
+ use Text::Table::Span qw/generate_table/;
+ my $rows =
+   [
+     ["ColumName1", "ColumnNameB", "ColumnNameC"],
+     ["row1A", "row1B", "row1C"],
+     ["row2A", "row2B", "row2C"],
+     ["row3A", "row3B", "row3C"],
+   ];
+ generate_table(rows=>$rows, header_row=>1, separate_rows=>1, border_style=>"UTF8::SingleLineBold");
+
+
+Sample output:
+
+ ┏━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━━┓
+ ┃ ColumName1 ┃ ColumnNameB ┃ ColumnNameC ┃
+ ┣━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━━┫
+ ┃ row1A      ┃ row1B       ┃ row1C       ┃
+ ┣━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━━┫
+ ┃ row2A      ┃ row2B       ┃ row2C       ┃
+ ┣━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━━┫
+ ┃ row3A      ┃ row3B       ┃ row3C       ┃
+ ┗━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━━┛
+ 
 
 To use with L<Text::Table::TinyBorderStyle>:
 
@@ -54,6 +107,7 @@ To use with L<Text::Table::TinyBorderStyle>:
    ];
  generate_table(rows=>$rows, header_row=>1, separate_rows=>1, border_style=>"BorderStyle::UTF8::SingleLineBold");
 
+
 Sample output:
 
  ┏━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━━┓
@@ -65,11 +119,6 @@ Sample output:
  ┣━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━━┫
  ┃ row3A      ┃ row3B       ┃ row3C       ┃
  ┗━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━━┛
-
-
-To use with L<Text::ANSITable>:
-
- # TODO
 
 =head1 HOMEPAGE
 

@@ -1,0 +1,143 @@
+MODE: INLINE
+#include <xs/uri.h>
+#include <xs/CallbackDispatcher.h>
+
+namespace {
+    struct XSRequest : Request, Backref {
+        Sub response_factory;
+        
+        panda::protocol::http::ResponseSP new_response () const override {
+            if (response_factory) {
+                auto self = xs::out((Request*)this);
+                return xs::in<xs::nn<Response*>>(response_factory.call(self));
+            } else {
+                return make_backref<Response>();
+            }
+        }
+        
+        ~XSRequest () override { Backref::dtor(); }
+    };
+}
+
+MODULE = UniEvent::HTTP                PACKAGE = UniEvent::HTTP::Request
+PROTOTYPES: DISABLE
+
+BOOT {
+    Stash stash(__PACKAGE__);
+    stash.inherit("Protocol::HTTP::Request");
+}
+
+RequestSP Request::new (Hash params = Hash()) {
+    RETVAL = new XSRequest();
+    if (params) fill(RETVAL, params);
+}
+
+double Request::timeout (Simple v = {}) {
+    if (v) {
+        THIS->timeout = double(v) * 1000;
+        XSRETURN_UNDEF;
+    }
+    RETVAL = double(THIS->timeout)/1000;
+}
+
+bool Request::follow_redirect (Simple v = {}) {
+    if (v) {
+        THIS->follow_redirect = v;
+        XSRETURN_UNDEF;
+    }
+    RETVAL = THIS->follow_redirect;
+}
+
+bool Request::tcp_nodelay (Simple v = {}) {
+    if (v) {
+        THIS->tcp_nodelay = v;
+        XSRETURN_UNDEF;
+    }
+    RETVAL = THIS->tcp_nodelay;
+}
+
+AddrInfoHints Request::tcp_hints (Sv v = {}) {
+    if (v) {
+        THIS->tcp_hints = xs::in<AddrInfoHints>(v);
+        XSRETURN_UNDEF;
+    }
+    RETVAL = THIS->tcp_hints;
+}
+
+uint8_t Request::redirection_limit (Simple v = {}) {
+    if (v) {
+        THIS->redirection_limit = v;
+        XSRETURN_UNDEF;
+    }
+    RETVAL = THIS->redirection_limit;
+}
+
+XSCallbackDispatcher* Request::response_event () {
+    RETVAL = XSCallbackDispatcher::create(THIS->response_event);
+}
+
+void Request::response_callback (Request::response_fn cb) {
+    THIS->response_event.remove_all();
+    if (cb) THIS->response_event.add(cb);
+}
+
+XSCallbackDispatcher* Request::partial_event () {
+    RETVAL = XSCallbackDispatcher::create(THIS->partial_event);
+}
+
+void Request::partial_callback (Request::partial_fn cb) {
+    THIS->partial_event.remove_all();
+    if (cb) THIS->partial_event.add(cb);
+}
+
+XSCallbackDispatcher* Request::redirect_event () {
+    RETVAL = XSCallbackDispatcher::create(THIS->redirect_event);
+}
+
+void Request::redirect_callback (Request::redirect_fn cb) {
+    THIS->redirect_event.remove_all();
+    if (cb) THIS->redirect_event.add(cb);
+}
+
+XSCallbackDispatcher* Request::continue_event () {
+    RETVAL = XSCallbackDispatcher::create(THIS->continue_event);
+}
+
+void Request::continue_callback (Request::continue_fn cb) {
+    THIS->continue_event.remove_all();
+    if (cb) THIS->continue_event.add(cb);
+}
+
+bool Request::transfer_completed ()
+
+void Request::send_chunk (string chunk)
+
+void Request::send_final_chunk (string chunk = {})
+
+void Request::cancel (std::error_code err = make_error_code(std::errc::operation_canceled))
+
+SslContext Request::ssl_ctx (Sv ssl_ctx = {}) {
+    if (ssl_ctx) {
+        THIS->ssl_ctx = xs::in<SslContext>(ssl_ctx);
+        XSRETURN_UNDEF;
+    }
+    RETVAL = THIS->ssl_ctx;
+}
+
+URISP Request::proxy (Sv proxy = {}) {
+    if (proxy) {
+        THIS->proxy = xs::in<URISP>(proxy);
+        XSRETURN_UNDEF;
+    }
+    RETVAL = THIS->proxy;
+}
+
+Sub Request::response_factory (Sub factory = Sub()) {
+    auto xsr = panda::dyn_cast<XSRequest*>(THIS);
+    if (!xsr) throw "response_factory can only be called on request objects created from perl";
+    if (factory) {
+        xsr->response_factory = factory;
+        XSRETURN_UNDEF;
+    }
+    RETVAL = xsr->response_factory;
+}

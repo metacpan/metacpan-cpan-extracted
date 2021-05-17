@@ -1,3 +1,10 @@
+0.06      2021-05-17 10:29:31 CEST
+
+          - Now runs on 5.8.9 (probably 5.8.0 and maybe lower)
+          - Small tweak to odd tutorial text and role docs.
+          - Fixed a locale-specific test failure. This fixes
+            https://github.com/Ovid/codegen-protection/issues/2
+
 0.05      2021-04-19 10:54:54 CEST
 
           - Added CodeGen::Protection::Tutorial

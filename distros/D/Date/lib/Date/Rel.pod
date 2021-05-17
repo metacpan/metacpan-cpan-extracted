@@ -59,6 +59,8 @@ Creates interval from two dates so that $from + $rel == $till.
 
 $from and $till can be L<Date> objects or any type that one-argument L<Date> constructor supports.
 
+If timezones of C<$from> and C<$till> differ, then C<$from> is converted to C<$till>'s timezone.
+
 
 =head4 new($reldate_object)
 

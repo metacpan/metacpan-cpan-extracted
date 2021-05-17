@@ -1,5 +1,8 @@
 Revision history for Game-Theory-TwoPersonMatrix
 
+0.2206 2021-05-13 00:27:55
+    - Improve test syntax.
+
 0.2205 2020-03-29 14:01:00
     - Use List::SomeUtils, not MoreUtils.
     - Improve documentation.

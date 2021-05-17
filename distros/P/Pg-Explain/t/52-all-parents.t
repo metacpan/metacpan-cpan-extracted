@@ -42,6 +42,6 @@ my $expect = {
     'Sort -> Nested Loop Left Join -> Index Scan'                                                                           => 1,
 };
 
-cmp_deeply( $counts, $expect, "Got all nodes" );
-cmp_deeply( [ $top_node->all_parents ], [], "Parents of top node" );
+cmp_deeply( $counts,                    $expect, "Got all nodes" );
+cmp_deeply( [ $top_node->all_parents ], [],      "Parents of top node" );
 

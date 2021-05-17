@@ -6,7 +6,7 @@ use Crypt::CBC::PBKDF;
 use bytes;
 use vars qw($VERSION);
 no warnings 'uninitialized';
-$VERSION = '3.03';
+$VERSION = '3.04';
 
 use constant RANDOM_DEVICE      => '/dev/urandom';
 use constant DEFAULT_PBKDF      => 'opensslv1';
@@ -97,6 +97,7 @@ sub new {
 	    'keysize'     => $ks,
 	    'header_mode' => $header_mode,
 	    'literal_key' => $literal_key,
+	    'literal_iv'  => defined $iv,
 	    'chain_mode'  => $chain_mode,    
 	    'make_random_salt' => $random_salt,
 	    'make_random_iv'   => $random_iv,
@@ -143,7 +144,7 @@ sub encrypt_hex (\$$) {
 
 sub decrypt_hex (\$$) {
     my ($self,$data) = @_;
-    return $self->decrypt(pack'H*',$data);
+    return $self->decrypt(pack 'H*',$data);
 }
 
 # call to start a series of encryption/decryption operations
@@ -651,7 +652,9 @@ sub _read_key_and_iv {
 	($self->{salt}) = $$input_stream =~ /^Salted__(.{8})/s;
 	croak "Ciphertext does not begin with a valid header for 'salt' header mode" unless defined $self->{salt};
 	substr($$input_stream,0,16) = '';
-	($self->{key},$self->{iv}) = $self->pbkdf_obj->key_and_iv($self->{salt},$self->{passphrase});
+	my ($k,$i) = $self->pbkdf_obj->key_and_iv($self->{salt},$self->{passphrase});
+	$self->{key} = $k unless $self->{literal_key};
+	$self->{iv}  = $i unless $self->{literal_iv};
     }
 
     elsif ($header_mode eq 'randomiv') {

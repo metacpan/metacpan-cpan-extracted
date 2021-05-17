@@ -101,11 +101,20 @@ KEYWORDS
 
     Same as "any" and "all" but with the return value inverted.
 
+ reduce
+
+       $final = reduce { CODE } INITIAL, LIST
+
+    Repeatedly calls a block of code, using the $a package lexical as an
+    accumulator and setting $b to each successive value from the list in
+    turn. The first value of the list sets the initial value of the
+    accumulator, and each returned result from the code block gives its new
+    value. The final value of the accumulator is returned.
+
 TODO
 
     More functions from List::Util:
 
-       reduce
        reductions
        pairfirst pairgrep pairmap
 

@@ -1,33 +1,42 @@
-Changes on 2021-05-11 for repository at:
+Changes on 2021-05-13 for repository at:
   Fetch URL: git@github.com:abeltje/V
   Push  URL: git@github.com:abeltje/V
 
 Enjoy!
 
-0.14 2021-05-11T10:09:04+02:00 (42a9cf7 => Abe Timmerman)
- - (Abe Timmerman, 3 seconds ago) Autocommit for distribution V 0.14
+0.15 2021-05-13T17:48:24+02:00 (9235683 => Abe Timmerman)
+ - (Abe Timmerman, 3 seconds ago) Autocommit for distribution V 0.15
    (minor)
 
-0.13_04 2021-05-11T01:30:36+02:00 (4e1e942 => Abe Timmerman)
- - (Abe Timmerman, 9 hours ago) Autocommit for distribution V 0.13_04
+0.14_01 2021-05-12T18:52:57+02:00 (33bea16 => Abe Timmerman)
+ - (Abe Timmerman, 23 hours ago) Autocommit for distribution V 0.14_01
    (test)
+
+0.14 2021-05-11T10:09:04+02:00 (3819d91 => Abe Timmerman)
+ - (Abe Timmerman, 2 days ago) Autocommit for distribution V 0.14 (minor)
+
+ - (Abe Timmerman, 23 hours ago) Update our tester-module
+ -     After reading the Test::Warnings docs (again) the CPANTesters errors
+ -     were to be expected
+
+0.13_04 2021-05-11T01:30:36+02:00 (4e1e942 => Abe Timmerman)
+ - (Abe Timmerman, 3 days ago) Autocommit for distribution V 0.13_04 (test)
 
 0.13_03 2021-05-10T18:39:36+02:00 (32ae160 => Abe Timmerman)
- - (Abe Timmerman, 16 hours ago) Autocommit for distribution V 0.13_03
-   (test)
+ - (Abe Timmerman, 3 days ago) Autocommit for distribution V 0.13_03 (test)
 
- - (Abe Timmerman, 9 hours ago) Fix more things for MSWin32
+ - (Abe Timmerman, 3 days ago) Fix more things for MSWin32
 
 0.13_02 2021-05-06T23:37:12+02:00 (f6f9add => Abe Timmerman)
- - (Abe Timmerman, 4 days ago) Autocommit for distribution V 0.13_02 (same)
+ - (Abe Timmerman, 7 days ago) Autocommit for distribution V 0.13_02 (same)
 
- - (Abe Timmerman, 16 hours ago) Update the (test)dependencies for
+ - (Abe Timmerman, 3 days ago) Update the (test)dependencies for
    t::Test::abeltje.
 
 0.13_01 2021-05-06T00:16:18+02:00 (d7f4f5f => Abe Timmerman)
- - (Abe Timmerman, 5 days ago) Autocommit for distribution V 0.13_01 (test)
+ - (Abe Timmerman, 8 days ago) Autocommit for distribution V 0.13_01 (test)
 
- - (Abe Timmerman, 4 days ago) Introduce t::Test::abeltje
+ - (Abe Timmerman, 7 days ago) Introduce t::Test::abeltje
  -     This needed some kwalitee changes, mostly in POD
 
 0.00_00 2003-03-09T23:16:24+00:00 (fc60a31 => abeltje)
@@ -133,7 +142,7 @@ Enjoy!
  -     git-svn-id: https://source.test-smoke.org/repos/cpan/trunk/V@86
    03e79c58-f747-0410-a819-f71e7ca513d9
 
- - (Abe Timmerman, 5 days ago) Fix bug with v-strings and update repository
+ - (Abe Timmerman, 8 days ago) Fix bug with v-strings and update repository
  -     Whenever a module used a v-string-version the module would return
    undef,
  -     we now use the core module 'version' to make sure we also return a
@@ -142,4 +151,4 @@ Enjoy!
  -     - Moved README to README.md and added some markdown
  -     - added a .gitignore and MANIFEST.SKIP
 
- - (Abe Timmerman, 5 days ago) Fix test to also run under 'prove'
+ - (Abe Timmerman, 8 days ago) Fix test to also run under 'prove'

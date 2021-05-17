@@ -1,4 +1,4 @@
-/* vi: set ft=c inde=: */
+/* vi: set ft=c */
 
 #define HAVE_PERL_VERSION(R, V, S) \
     (PERL_REVISION > (R) || (PERL_REVISION == (R) && (PERL_VERSION > (V) || (PERL_VERSION == (V) && (PERL_SUBVERSION >= (S))))))
@@ -122,6 +122,18 @@ static OP *S_op_sibling_splice(pTHX_ OP *parent, OP *start, int del_count, OP *i
 
   return deleted;
 }
+#endif
+
+#if HAVE_PERL_VERSION(5,28,0)
+#  define optimize_optree(op)  Perl_optimize_optree(aTHX_ op)
+#else
+#  define optimize_optree(op)
+#endif
+
+#if HAVE_PERL_VERSION(5,16,0)
+#  define finalize_optree(op)  Perl_finalize_optree(aTHX_ op)
+#else
+#  define finalize_optree(op)
 #endif
 
 #ifndef PARENT_PAD_INDEX_set

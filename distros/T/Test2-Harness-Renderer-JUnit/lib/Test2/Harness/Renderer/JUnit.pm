@@ -5,7 +5,7 @@ use 5.010000;
 use strict;
 use warnings;
 
-our $VERSION = '1.000003';
+our $VERSION = '1.000004';
 
 # This is used frequently during development to determine what different events look like so we can determine how to capture test data.
 use Data::Dumper;
@@ -132,7 +132,7 @@ sub render_event {
             }
 
             # We only want to show this alternative error if all of the tests passed but the program still exited non-zero.
-            elsif (!$test->{'testsuite'}->{'errors'} && $alternative_error) {
+            elsif ( !$test->{'testsuite'}->{'errors'} && $alternative_error ) {
                 $test->{'testsuite'}->{'errors'}++;
                 push @{ $test->{'testcase'} }, $self->xml->testcase(
                     { 'name' => "Program Ended Unexpectedly", 'time' => $stamp - $test->{'last_job_start'}, 'classname' => $test->{'testsuite'}->{'name'} },
@@ -235,6 +235,7 @@ sub render_event {
         return;
     }
 
+    # This is diag information. Append it to the last failure.
     if ( $f->{'info'} && $test->{'last_failure'} ) {
         foreach my $line ( @{ $f->{'info'} } ) {
             next unless $line->{'details'};
@@ -288,8 +289,12 @@ sub close_open_failure_testcase {
     return unless $test->{'last_failure'};
 
     my $fail = $test->{'last_failure'};
+
+    # This causes the entire suite to choke. We don't want this.
+    # If we're here already, we've already failed the test. let's just make sure the person reviewing
+    # it knows the test count was messed up.
     if ( $fail->{'test_num'} == $new_test_number ) {
-        die("The same assert number ($new_test_number) was seen twice for $test->{name}");
+        $fail->{'message'} .= "# WARNING This test number has already been seen. Duplicate TEST # in output!\n";
     }
 
     my $xml = $self->xml;

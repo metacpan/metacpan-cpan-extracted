@@ -1,6 +1,6 @@
 package Dancer2::Plugin::Auth::Extensible;
 
-our $VERSION = '0.709';
+our $VERSION = '0.710';
 
 use strict;
 use warnings;

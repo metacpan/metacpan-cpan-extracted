@@ -1,5 +1,5 @@
 package SVG::Estimate::Role::EndToPoint;
-$SVG::Estimate::Role::EndToPoint::VERSION = '1.0115';
+$SVG::Estimate::Role::EndToPoint::VERSION = '1.0116';
 use strict;
 use Moo::Role;
 
@@ -9,7 +9,7 @@ SVG::Estimate::Role::EndToPoint - Change arguments from "end" to "point", mainly
 
 =head1 VERSION
 
-version 1.0115
+version 1.0116
 
 =cut
 

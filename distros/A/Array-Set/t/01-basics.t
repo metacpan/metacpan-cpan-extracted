@@ -3,7 +3,6 @@
 use 5.010;
 use strict;
 use warnings;
-
 use Test::More 0.98;
 
 use Array::Set qw(set_diff set_symdiff set_union set_intersect);
@@ -15,6 +14,7 @@ subtest set_diff => sub {
 
     is_deeply(set_diff({ignore_case=>1}, ["a","B"], ["b","c"]), ["a"], "opt:ignore_case=1");
     is_deeply(set_diff({ignore_blanks=>1}, ["a","b "], ["b","c"]), ["a"], "opt:ignore_blanks=1");
+    is_deeply(set_diff({allow_refs=>1, ignore_blanks=>1}, ["a","b ",[],{}], ["b","c",[]]), ["a",{}], "opt:ignore_blanks=1");
 };
 
 subtest set_symdiff => sub {
@@ -24,6 +24,7 @@ subtest set_symdiff => sub {
 
     is_deeply(set_symdiff({ignore_case=>1}, ["a","B"], ["b","c"]), ["a","c"], "opt:ignore_case=1");
     is_deeply(set_symdiff({ignore_blanks=>1}, ["a","b "], ["b","c"]), ["a","c"], "opt:ignore_blanks=1");
+    is_deeply(set_symdiff({allow_refs=>1, ignore_blanks=>1}, ["a","b ",[],{}], ["b","c",[]]), ["a",{},"c"], "opt:allow_refs=1");
 };
 
 subtest set_union => sub {
@@ -33,6 +34,7 @@ subtest set_union => sub {
 
     is_deeply(set_union({ignore_case=>1}, ["a","B"], ["b","c"]), ["a","B","c"], "opt:ignore_case=1");
     is_deeply(set_union({ignore_blanks=>1}, ["a","b "], ["b","c"]), ["a","b ","c"], "opt:ignore_blanks=1");
+    is_deeply(set_union({allow_refs=>1, ignore_case=>1}, ["a","B",[],{}], ["A",[],undef]), ["a","B",[],{},undef], "opt:allow_refs=1");
 };
 
 subtest set_intersect => sub {
@@ -42,6 +44,7 @@ subtest set_intersect => sub {
 
     is_deeply(set_intersect({ignore_case=>1}, ["a","B"], ["b","c"]), ["B"], "opt:ignore_case=1");
     is_deeply(set_intersect({ignore_blanks=>1}, ["a","b "], ["b","c"]), ["b "], "opt:ignore_blanks=1");
+    is_deeply(set_intersect({allow_refs=>1, ignore_blanks=>1}, ["a","b ",[],{}], ["b","c",[]]), ["b ",[]], "opt:allow_refs=1");
 };
 
 DONE_TESTING:

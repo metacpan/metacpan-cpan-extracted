@@ -79,7 +79,7 @@ sub check_mark {
     return unless $have_time_hires;
     my ($approx, $msg) = @_;
     my $delta = Time::HiRes::time() - $last_time_mark;
-    cmp_ok($delta, '>=', $approx*0.8, $msg);
+    cmp_ok($delta, '>=', $approx*0.75, $msg);
 }
 
 sub var ($) { return "$rdir/$_[0]" }

@@ -1,0 +1,68 @@
+=pod
+
+=head1 NAME
+
+Form::Tiny::Manual::Internals - get more out of Form::Tiny
+
+=head1 DESCRIPTION
+
+=head2 How does the module work?
+
+Behind the scenes, the module introduces a couple of class methods that are used to build underlying Moo attributes. These are:
+
+=over
+
+=item * C<field_defs> attribute, built by C<build_fields> method
+
+=item * C<cleaner> attribute, built by C<build_cleaner> method
+
+=item * C<filters> attribute, built by C<build_filters> method (only with L<Form::Tiny::Filtered>)
+
+=back
+
+The regular C<form_field>, C<form_filter> and C<form_cleaner> functions are just helpers that allow you to create these builder methods with a sort of I<Domain-Specific Language>. In detail, every call to these helpers is wrapping the corresponding builder method in another method, making it possible to specify form details one step at a time.
+
+=head2 Why use the bare-bones internals instead of the helpers?
+
+One reason for that might be wanting Form::Tiny include Moose instead of Moo. Moo classes can be promoted to Moose without any problem, however you might want to use Moose-specific features like traits, which will likely not be possible.
+
+Another reason might be wanting to squish more out of Form::Tiny, either performance or customizability. You can effectively drop all magic and it becomes a simple Moo/se role with attribute builders (at a cost of little more boilerplate).
+
+=head2 Using the module without the syntactic sugar
+
+To use Form::Tiny as a Moo role you have to declare your own Moo/se class mixing in the I<Form::Tiny> role and define a I<build_fields> sub, returning a list of field definitions for the form. A class containing these two basic requirements is ready to be instantiated and passed input to be validated.
+
+C<build_fields> should return a list of hashrefs, and each which will be coerced to L<Form::Tiny::FieldDefinition>. You can provide an instance of the class yourself instead of hashrefs, which should be helpful if you're willing to use your own definition implementation.
+
+	package MyForm;
+
+	use Moose;
+
+	with qw(Form::Tiny);
+
+	sub build_fields {
+		return
+			{name => 'field1'},
+			{name => 'field2', required => 1}
+		;
+	}
+
+To add additional behavior to the form, you can also mix in the L<Form::Tiny::Filtered> and L<Form::Tiny::Strict> roles.
+
+See I<bare_bones_form.pl> example for a full example of this syntax.
+
+=head2 Mixing two types of syntax
+
+It is possible to mix I<form_field> helpers with I<build_fields> method, as well as I<form_filter> with I<build_filters>, although the author is not sure what purpose would it serve.
+
+=head1 SEE ALSO
+
+=over
+
+=item * L<Form::Tiny::Manual>
+
+=item * L<Moose>
+
+=item * L<Moo>
+
+=back

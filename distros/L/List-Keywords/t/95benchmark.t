@@ -28,12 +28,14 @@ my $LU_elapsed = 0;
 # of each type.
 
 foreach ( 1 .. 20 ) {
-   $LK_elapsed += measure {
+   my $overhead = measure {};
+
+   $LK_elapsed += -$overhead + measure {
       use List::Keywords 'first';
       my $ret;
       ( $ret = first { $_ > 50 } @nums ) for 1 .. $COUNT;
    };
-   $LU_elapsed += measure {
+   $LU_elapsed += -$overhead + measure {
       use List::Util 'first';
       my $ret;
       ( $ret = first { $_ > 50 } @nums ) for 1 .. $COUNT;

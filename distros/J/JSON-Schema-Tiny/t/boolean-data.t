@@ -61,19 +61,14 @@ subtest 'strict booleans (default)' => sub {
     evaluate(
       $_,
       $test_schema = {
-        enum => [ false, true ],
         allOf => [ { type => 'boolean' }, { type => ['boolean','object'] } ],
         anyOf => [ { const => false }, { const => true } ],
+        enum => [ false, true ],
       }
     ),
     $failure_result = {
       valid => false,
       errors => [
-        {
-          instanceLocation => '',
-          keywordLocation => '/enum',
-          error => 'value does not match',
-        },
         {
           instanceLocation => '',
           keywordLocation => '/allOf/0/type',
@@ -103,6 +98,11 @@ subtest 'strict booleans (default)' => sub {
           instanceLocation => '',
           keywordLocation => '/anyOf',
           error => 'no subschemas are valid',
+        },
+        {
+          instanceLocation => '',
+          keywordLocation => '/enum',
+          error => 'value does not match',
         },
       ],
     },
@@ -171,14 +171,6 @@ subtest '$MOJO_BOOLEANS = 1' => sub {
     { valid => true },
     'items are still all considered unique even though some are treated identically',
   );
-
-
-
-  # compare \0 to enum: [ true ]
-  # or const: true
-  # also check uniqueItems when mixing, or not mixing.
-
-  # also check \0 to enum: [ \0 ] <-- invalid.
 };
 
 done_testing;

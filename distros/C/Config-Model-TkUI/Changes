@@ -1,3 +1,9 @@
+1.375 2021-05-13
+
+   Bug fixes:
+    * leaf editor: fix UI of boolean values using yes/no in file
+    * main UI: avoid hiding filter widget when reducing window height
+
 1.374 2021-04-21
 
   UI improvements:

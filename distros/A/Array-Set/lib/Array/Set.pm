@@ -1,7 +1,9 @@
 package Array::Set;
 
-our $DATE = '2016-09-16'; # DATE
-our $VERSION = '0.05'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2021-05-13'; # DATE
+our $DIST = 'Array-Set'; # DIST
+our $VERSION = '0.061'; # VERSION
 
 use 5.010001;
 use strict;
@@ -25,7 +27,12 @@ sub _doit {
 
     my $ic  = $opts->{ignore_case};
     my $ib  = $opts->{ignore_blanks};
-    my $ign = $ic || $ib;
+    my $ar  = $opts->{allow_refs};
+    my $ign = $ic || $ib || $ar;
+
+    if ($ar) {
+        require Storable;
+    }
 
     my $i = 0;
   SET:
@@ -36,8 +43,16 @@ sub _doit {
 
             if ($ign) {
                 for (@$set) {
-                    my $k = $ic ? lc($_) : $_;
-                    $k =~ s/\s+//g if $ib;
+
+                    # determine key (this code is copy-pasted)
+                    my $k = $ar ? (ref $_ ? "R" : defined($_) ? "S":"U") : ""; # R=ref/undef, D=defined scalar, U=undef
+                    if ($k eq 'R') {
+                        $k .= Storable::freeze($_);
+                    } elsif (defined $_) {
+                        $k .= $ic ? lc($_) : $_;
+                        $k =~ s/\s+//g if $ib;
+                    }
+
                     $res{$k} = $_ unless exists $res{$k};
                 }
                 # return result
@@ -57,14 +72,30 @@ sub _doit {
             if ($ign) {
                 if ($i == 1) {
                     for (@$set) {
-                        my $k = $ic ? lc($_) : $_;
-                        $k =~ s/\s+//g if $ib;
+
+                        # determine key (this code is copy-pasted)
+                        my $k = $ar ? (ref $_ ? "R" : defined($_) ? "S":"U") : ""; # R=ref/undef, D=defined scalar, U=undef
+                        if ($k eq 'R') {
+                            $k .= Storable::freeze($_);
+                        } elsif (defined $_) {
+                            $k .= $ic ? lc($_) : $_;
+                            $k =~ s/\s+//g if $ib;
+                        }
+
                         $res{$k} = [1,$_] unless exists $res{$k};
                     }
                 } else {
                     for (@$set) {
-                        my $k = $ic ? lc($_) : $_;
-                        $k =~ s/\s+//g if $ib;
+
+                        # determine key (this code is copy-pasted)
+                        my $k = $ar ? (ref $_ ? "R" : defined($_) ? "S":"U") : ""; # R=ref/undef, D=defined scalar, U=undef
+                        if ($k eq 'R') {
+                            $k .= Storable::freeze($_);
+                        } elsif (defined $_) {
+                            $k .= $ic ? lc($_) : $_;
+                            $k =~ s/\s+//g if $ib;
+                        }
+
                         if ($res{$k} && $res{$k}[0] == $i-1) {
                             $res{$k}[0]++;
                         }
@@ -96,14 +127,30 @@ sub _doit {
             if ($ign) {
                 if ($i == 1) {
                     for (@$set) {
-                        my $k = $ic ? lc($_) : $_;
-                        $k =~ s/\s+//g if $ib;
+
+                        # determine key (this code is copy-pasted)
+                        my $k = $ar ? (ref $_ ? "R" : defined($_) ? "S":"U") : ""; # R=ref/undef, D=defined scalar, U=undef
+                        if ($k eq 'R') {
+                            $k .= Storable::freeze($_);
+                        } elsif (defined $_) {
+                            $k .= $ic ? lc($_) : $_;
+                            $k =~ s/\s+//g if $ib;
+                        }
+
                         $res{$k} = $_ unless exists $res{$k};
                     }
                 } else {
                     for (@$set) {
-                        my $k = $ic ? lc($_) : $_;
-                        $k =~ s/\s+//g if $ib;
+
+                        # determine key (this code is copy-pasted)
+                        my $k = $ar ? (ref $_ ? "R" : defined($_) ? "S":"U") : ""; # R=ref/undef, D=defined scalar, U=undef
+                        if ($k eq 'R') {
+                            $k .= Storable::freeze($_);
+                        } elsif (defined $_) {
+                            $k .= $ic ? lc($_) : $_;
+                            $k =~ s/\s+//g if $ib;
+                        }
+
                         delete $res{$k};
                     }
                 }
@@ -130,14 +177,30 @@ sub _doit {
             if ($ign) {
                 if ($i == 1) {
                     for (@$set) {
-                        my $k = $ic ? lc($_) : $_;
-                        $k =~ s/\s+//g if $ib;
+
+                        # determine key (this code is copy-pasted)
+                        my $k = $ar ? (ref $_ ? "R" : defined($_) ? "S":"U") : ""; # R=ref/undef, D=defined scalar, U=undef
+                        if ($k eq 'R') {
+                            $k .= Storable::freeze($_);
+                        } elsif (defined $_) {
+                            $k .= $ic ? lc($_) : $_;
+                            $k =~ s/\s+//g if $ib;
+                        }
+
                         $res{$k} = [1,$_] unless exists $res{$k};
                     }
                 } else {
                     for (@$set) {
-                        my $k = $ic ? lc($_) : $_;
-                        $k =~ s/\s+//g if $ib;
+
+                        # determine key (this code is copy-pasted)
+                        my $k = $ar ? (ref $_ ? "R" : defined($_) ? "S":"U") : ""; # R=ref/undef, D=defined scalar, U=undef
+                        if ($k eq 'R') {
+                            $k .= Storable::freeze($_);
+                        } elsif (defined $_) {
+                            $k .= $ic ? lc($_) : $_;
+                            $k =~ s/\s+//g if $ib;
+                        }
+
                         if (!$res{$k}) {
                             $res{$k} = [1, $_];
                         } elsif ($res{$k}[0] <= 2) {
@@ -176,10 +239,10 @@ sub _doit {
 
 sub set_diff {
     my $opts = ref($_[0]) eq 'HASH' ? shift : {};
-    if ($opts->{ignore_case} || $opts->{ignore_blanks}) {
+    if ($opts->{ignore_case} || $opts->{ignore_blanks} || $opts->{allow_refs}) {
         _doit('diff', $opts, @_);
     } else {
-        # fast version, without ib/ic
+        # fast version, without ib/ic/ar
         my $set1 = shift;
         my $res = $set1;
         while (@_) {
@@ -196,10 +259,10 @@ sub set_diff {
 
 sub set_symdiff {
     my $opts = ref($_[0]) eq 'HASH' ? shift : {};
-    if ($opts->{ignore_case} || $opts->{ignore_blanks}) {
+    if ($opts->{ignore_case} || $opts->{ignore_blanks} || $opts->{allow_refs}) {
         _doit('symdiff', $opts, @_);
     } else {
-        # fast version, without ib/ic
+        # fast version, without ib/ic/ar
         my $set1 = shift;
         my $res = $set1;
         my %set1;
@@ -223,10 +286,10 @@ sub set_symdiff {
 
 sub set_union {
     my $opts = ref($_[0]) eq 'HASH' ? shift : {};
-    if ($opts->{ignore_case} || $opts->{ignore_blanks}) {
+    if ($opts->{ignore_case} || $opts->{ignore_blanks} || $opts->{allow_refs}) {
         _doit('union', $opts, @_);
     } else {
-        # fast version, without ib/ic
+        # fast version, without ib/ic/ar
         my %mem;
         my $res = [];
         while (@_) {
@@ -240,10 +303,10 @@ sub set_union {
 
 sub set_intersect {
     my $opts = ref($_[0]) eq 'HASH' ? shift : {};
-    if ($opts->{ignore_case} || $opts->{ignore_blanks}) {
+    if ($opts->{ignore_case} || $opts->{ignore_blanks} || $opts->{allow_refs}) {
         _doit('intersect', $opts, @_);
     } else {
-        # fast version, without ib/ic
+        # fast version, without ib/ic/ar
         my $set1 = shift;
         my $res = $set1;
         while (@_) {
@@ -273,7 +336,7 @@ Array::Set - Perform set operations on arrays
 
 =head1 VERSION
 
-This document describes version 0.05 of Array::Set (from Perl distribution Array-Set), released on 2016-09-16.
+This document describes version 0.061 of Array::Set (from Perl distribution Array-Set), released on 2021-05-13.
 
 =head1 SYNOPSIS
 
@@ -295,23 +358,30 @@ This document describes version 0.05 of Array::Set (from Perl distribution Array
 =head1 DESCRIPTION
 
 This module provides routines for performing set operations on arrays. Set is
-represented as a regular Perl array. All comparison is currently done with C<eq>
-(string comparison) so currently no support for references/objects/undefs. You
-have to make sure that the arrays do not contain duplicates/undefs.
+represented as a regular Perl array. All comparison done with C<eq> (string
+comparison) by default, but if your set contains references/undef, you can
+enable C<allow_refs> option if you want to support references/undef. You have to
+make sure that the arrays do not contain duplicates; this module won't check
+that for you.
 
 Characteristics and differences with other similar modules:
 
 =over
 
+=item * array-based
+
+Set is more appropriately implemented using Perl hash, but this module
+specifically wants to support interset operations on arrays.
+
 =item * simple functional (non-OO) interface
 
-=item * functions accept more than two arguments
+=item * interset operations accept more than two arguments
 
 =item * option to do case-insensitive comparison
 
 =item * option to ignore blanks
 
-=item * preserves ordering
+=item * ordering preserved
 
 =back
 
@@ -333,6 +403,13 @@ If set to 1, will perform case-insensitive comparison.
 =item * ignore_blanks => bool (default: 0)
 
 If set to 1, will ignore blanks (C<" foo"> == C<"foo"> == C<"f o o">).
+
+=item * allow_refs => bool (default: 0)
+
+If set to 1, will serialize references using L<Storable> first to be able to
+perform the set operations on reference/undef values. Note that for reference
+values, C<ignore_case> and C<ignore_blanks> options are not meaningful and not
+observed.
 
 =back
 
@@ -385,7 +462,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2016, 2015 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

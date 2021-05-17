@@ -1,11 +1,11 @@
 use strict;
 use warnings;
-package JSON::Schema::Tiny; # git description: v0.001-16-g0881487
+package JSON::Schema::Tiny; # git description: v0.002-24-g2f7067b
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Validate data against a schema, minimally
 # KEYWORDS: JSON Schema data validation structure specification tiny
 
-our $VERSION = '0.002';
+our $VERSION = '0.003';
 
 use 5.016;  # for the unicode_strings feature
 no if "$]" >= 5.031009, feature => 'indirect';
@@ -21,7 +21,7 @@ use Storable 'dclone';
 use JSON::MaybeXS 1.004001 'is_bool';
 use Feature::Compat::Try;
 use JSON::PP ();
-use List::Util 'any';
+use List::Util 1.33 'any';
 use namespace::clean;
 use Exporter 5.57 'import';
 
@@ -49,9 +49,9 @@ sub evaluate {
     root_schema => $schema,
   };
 
-  my $result;
+  my $valid;
   try {
-    $result = _eval($data, $schema, $state)
+    $valid = _eval($data, $schema, $state)
   }
   catch ($e) {
     if (is_plain_hashref($e)) {
@@ -61,12 +61,14 @@ sub evaluate {
       E($state, 'EXCEPTION: '.$e);
     }
 
-    $result = 0;
+    $valid = 0;
   }
 
-  return $BOOLEAN_RESULT ? $result : +{
-    valid => $result ? JSON::PP::true : JSON::PP::false,
-    $result ? () : (errors => $state->{errors}),
+  warn 'result is false but there are no errors' if not $valid and not @{$state->{errors}};
+
+  return $BOOLEAN_RESULT ? $valid : +{
+    valid => $valid ? JSON::PP::true : JSON::PP::false,
+    $valid ? () : (errors => $state->{errors}),
   };
 }
 
@@ -78,7 +80,7 @@ sub _eval {
   # do not propagate upwards changes to depth, traversed paths,
   # but additions to errors are by reference and will be retained
   $state = { %$state };
-  delete $state->{keyword};
+  delete @{$state}{'keyword', grep /^_/, keys %$state};
 
   abort($state, 'EXCEPTION: maximum evaluation depth exceeded')
     if $state->{depth}++ > $MAX_TRAVERSAL_DEPTH;
@@ -96,28 +98,31 @@ sub _eval {
   return $schema || E($state, 'subschema is false') if $schema_type eq 'boolean';
   abort($state, 'invalid schema type: %s', $schema_type) if $schema_type ne 'object';
 
-  my $result = 1;
+  my $valid = 1;
 
   foreach my $keyword (
     # CORE KEYWORDS
     qw($schema $ref $defs),
+    # APPLICATOR KEYWORDS
+    qw(allOf anyOf oneOf not if dependentSchemas
+      items additionalItems contains
+      properties patternProperties additionalProperties propertyNames),
     # VALIDATOR KEYWORDS
     qw(type enum const
       multipleOf maximum exclusiveMaximum minimum exclusiveMinimum
       maxLength minLength pattern
       maxItems minItems uniqueItems
+      maxContains minContains
       maxProperties minProperties required dependentRequired),
-    # APPLICATOR KEYWORDS
-    qw(allOf anyOf oneOf not if dependentSchemas
-      items contains
-      properties patternProperties additionalProperties propertyNames),
   ) {
     next if not exists $schema->{$keyword};
 
-    my $sub = __PACKAGE__->can('_eval_keyword_'.($keyword =~ s/^\$//r));
-    $result = 0 if not $sub->($data, $schema, +{ %$state, keyword => $keyword });
+    $state->{keyword} = $keyword;
 
-    last if not $result and $state->{short_circuit};
+    my $sub = __PACKAGE__->can('_eval_keyword_'.($keyword =~ s/^\$//r));
+    $valid = 0 if not $sub->($data, $schema, $state);
+
+    last if not $valid and $state->{short_circuit};
   }
 
   # UNSUPPORTED KEYWORDS
@@ -131,7 +136,7 @@ sub _eval {
     abort({ %$state, keyword => $keyword }, 'keyword not supported');
   }
 
-  return $result;
+  return $valid;
 }
 
 # KEYWORD IMPLEMENTATIONS
@@ -180,6 +185,7 @@ sub _eval_keyword_type {
   my ($data, $schema, $state) = @_;
 
   if (is_plain_arrayref($schema->{type})) {
+    abort($state, 'type array is empty') if not @{$schema->{type}};
     foreach my $type (@{$schema->{type}}) {
       abort($state, 'unrecognized type "%s"', $type//'<null>')
         if not any { ($type//'') eq $_ } qw(null boolean object array string number integer);
@@ -193,6 +199,7 @@ sub _eval_keyword_type {
     return E($state, 'wrong type (expected one of %s)', join(', ', @{$schema->{type}}));
   }
   else {
+    return if not assert_keyword_type($state, $schema, 'string');
     abort($state, 'unrecognized type "%s"', $schema->{type}//'<null>')
       if not any { ($schema->{type}//'') eq $_ } qw(null boolean object array string number integer);
 
@@ -336,6 +343,32 @@ sub _eval_keyword_uniqueItems {
   return E($state, 'items at indices %d and %d are not unique', @$equal_indices);
 }
 
+sub _eval_keyword_maxContains {
+  my ($data, $schema, $state) = @_;
+
+  return if not assert_non_negative_integer($schema, $state);
+  return 1 if not exists $state->{_num_contains};
+  return 1 if not is_type('array', $data);
+
+  return E($state, 'contains too many matching items')
+    if $state->{_num_contains} > $schema->{maxContains};
+
+  return 1;
+}
+
+sub _eval_keyword_minContains {
+  my ($data, $schema, $state) = @_;
+
+  return if not assert_non_negative_integer($schema, $state);
+  return 1 if not exists $state->{_num_contains};
+  return 1 if not is_type('array', $data);
+
+  return E($state, 'contains too few matching items')
+    if $state->{_num_contains} < $schema->{minContains};
+
+  return 1;
+}
+
 sub _eval_keyword_maxProperties {
   my ($data, $schema, $state) = @_;
 
@@ -377,23 +410,34 @@ sub _eval_keyword_dependentRequired {
   my ($data, $schema, $state) = @_;
 
   return if not assert_keyword_type($state, $schema, 'object');
-  abort($state, '"%s" property is not an array', $state->{keyword})
-    if any { !is_type('array', $schema->{$state->{keyword}}{$_}) }
-      keys %{$schema->{$state->{keyword}}};
-  abort($state, '"%s" property element is not a string', $state->{keyword})
-    if any { !is_type('string', $_) } map @$_, values %{$schema->{$state->{keyword}}};
-  abort($state, '"%s" property elements are not unique', $state->{keyword})
-    if any { !is_elements_unique($schema->{$state->{keyword}}{$_}) }
-      keys %{$schema->{$state->{keyword}}};
+
+  foreach my $property (keys %{$schema->{dependentRequired}}) {
+    E({ %$state, _schema_path_suffix => $property }, 'dependentRequired value is not an array'), next
+      if not is_type('array', $schema->{dependentRequired}{$property});
+
+    foreach my $index (0..$#{$schema->{dependentRequired}{$property}}) {
+      abort({ %$state, _schema_path_suffix => $property }, 'element #%d is not a string', $index)
+        if not is_type('string', $schema->{dependentRequired}{$property}[$index]);
+    }
+
+    abort({ %$state, _schema_path_suffix => $property }, 'elements are not unique')
+      if not is_elements_unique($schema->{dependentRequired}{$property});
+  }
 
   return 1 if not is_type('object', $data);
 
-  my @missing = grep
-    +(exists $data->{$_} && any { !exists $data->{$_} } @{ $schema->{$state->{keyword}}{$_} }),
-    keys %{$schema->{$state->{keyword}}};
+  my $valid = 1;
+  foreach my $property (keys %{$schema->{dependentRequired}}) {
+    next if not exists $data->{$property};
 
-  return 1 if not @missing;
-  return E($state, 'missing propert%s: %s', @missing > 1 ? 'ies' : 'y', join(', ', sort @missing));
+    if (my @missing = grep !exists($data->{$_}), @{$schema->{dependentRequired}{$property}}) {
+      $valid = E({ %$state, _schema_path_suffix => $property },
+        'missing propert%s: %s', @missing > 1 ? 'ies' : 'y', join(', ', @missing));
+    }
+  }
+
+  return 1 if $valid;
+  return E($state, 'not all dependencies are satisfied');
 }
 
 sub _eval_keyword_allOf {
@@ -490,10 +534,10 @@ sub _eval_keyword_dependentSchemas {
   return 1 if not is_type('object', $data);
 
   my $valid = 1;
-  foreach my $property (sort keys %{$schema->{$state->{keyword}}}) {
+  foreach my $property (sort keys %{$schema->{dependentSchemas}}) {
     next if not exists $data->{$property}
-      or _eval($data, $schema->{$state->{keyword}}{$property},
-        +{ %$state, schema_path => jsonp($state->{schema_path}, $state->{keyword}, $property) });
+      or _eval($data, $schema->{dependentSchemas}{$property},
+        +{ %$state, schema_path => jsonp($state->{schema_path}, 'dependentSchemas', $property) });
 
     $valid = 0;
     last if $state->{short_circuit};
@@ -506,43 +550,31 @@ sub _eval_keyword_dependentSchemas {
 sub _eval_keyword_items {
   my ($data, $schema, $state) = @_;
 
-  # TODO: for draft2020-12, reject the array form of items
-  goto \&_eval_keyword_prefixItems if is_plain_arrayref($schema->{items});
+  goto \&_eval_keyword__items_array_schemas if is_plain_arrayref($schema->{items});
 
-  return 1 if not is_type('array', $data);
-
-  my $valid = 1;
-  foreach my $idx (0 .. $#{$data}) {
-    if (is_type('boolean', $schema->{items})) {
-      next if $schema->{items};
-      $valid = E({ %$state, data_path => $state->{data_path}.'/'.$idx }, 'item not permitted');
-    }
-    else {
-      next if _eval($data->[$idx], $schema->{items}, +{ %$state,
-          data_path => $state->{data_path}.'/'.$idx,
-          schema_path => $state->{schema_path}.'/items' });
-      $valid = 0;
-    }
-
-    last if $state->{short_circuit};
-  }
-
-  return E($state, 'subschema is not valid against all items') if not $valid;
-  return 1;
+  $state->{_last_items_index} //= -1;
+  goto \&_eval_keyword__items_schema;
 }
 
-sub _eval_keyword_prefixItems {
+sub _eval_keyword_additionalItems {
   my ($data, $schema, $state) = @_;
 
-  return if not assert_array_schemas($schema, $state);
+  return 1 if not exists $state->{_last_items_index};
+  goto \&_eval_keyword__items_schema;
+}
 
+# array-based items
+sub _eval_keyword__items_array_schemas {
+  my ($data, $schema, $state) = @_;
+
+  abort($state, '%s array is empty', $state->{keyword}) if not @{$schema->{$state->{keyword}}};
   return 1 if not is_type('array', $data);
 
-  my $last_index = -1;
   my $valid = 1;
+
   foreach my $idx (0 .. $#{$data}) {
     last if $idx > $#{$schema->{$state->{keyword}}};
-    $last_index = $idx;
+    $state->{_last_items_index} = $idx;
 
     if (is_type('boolean', $schema->{$state->{keyword}}[$idx])) {
       next if $schema->{$state->{keyword}}[$idx];
@@ -551,8 +583,7 @@ sub _eval_keyword_prefixItems {
     }
     else {
       next if _eval($data->[$idx], $schema->{$state->{keyword}}[$idx],
-        +{ %$state,
-          data_path => $state->{data_path}.'/'.$idx,
+        +{ %$state, data_path => $state->{data_path}.'/'.$idx,
           schema_path => $state->{schema_path}.'/'.$state->{keyword}.'/'.$idx });
     }
 
@@ -560,74 +591,69 @@ sub _eval_keyword_prefixItems {
     last if $state->{short_circuit} and not exists $schema->{additionalItems};
   }
 
-  E($state, 'subschema is not valid against all items') if not $valid;
+  return E($state, 'not all items are valid') if not $valid;
+  return 1;
+}
 
-  return $valid if not exists $schema->{additionalItems} or $last_index == $#{$data};
-  $state->{keyword} = 'additionalItems';
+# schema-based items and additionalItems
+sub _eval_keyword__items_schema {
+  my ($data, $schema, $state) = @_;
 
-  foreach my $idx ($last_index+1 .. $#{$data}) {
-    if (is_type('boolean', $schema->{additionalItems})) {
-      next if $schema->{additionalItems};
+  return 1 if not is_type('array', $data);
+  return 1 if $state->{_last_items_index} == $#{$data};
+
+  my $valid = 1;
+
+  foreach my $idx ($state->{_last_items_index}+1 .. $#{$data}) {
+    if (is_type('boolean', $schema->{$state->{keyword}})) {
+      next if $schema->{$state->{keyword}};
       $valid = E({ %$state, data_path => $state->{data_path}.'/'.$idx },
-        'additional item not permitted');
+        '%sitem not permitted', $state->{keyword} eq 'additionalItems' ? 'additional ' : '');
     }
     else {
-      next if _eval($data->[$idx], $schema->{additionalItems},
+      next if _eval($data->[$idx], $schema->{$state->{keyword}},
         +{ %$state, data_path => $state->{data_path}.'/'.$idx,
-        schema_path => $state->{schema_path}.'/additionalItems' });
+          schema_path => $state->{schema_path}.'/'.$state->{keyword} });
       $valid = 0;
     }
+
     last if $state->{short_circuit};
   }
 
-  return E($state, 'subschema is not valid against all additional items') if not $valid;
+  $state->{_last_items_index} = $#{$data};
+
+  return E($state, 'subschema is not valid against all %sitems',
+    $state->{keyword} eq 'additionalItems' ? 'additional ' : '') if not $valid;
   return 1;
 }
 
 sub _eval_keyword_contains {
   my ($data, $schema, $state) = @_;
 
-  return if exists $schema->{minContains}
-    and not assert_non_negative_integer($schema, { %$state, keyword => 'minContains' });
-  return if exists $schema->{maxContains}
-    and not assert_non_negative_integer($schema, { %$state, keyword => 'maxContains' });
-
   return 1 if not is_type('array', $data);
 
-  my $num_valid = 0;
+  $state->{_num_contains} = 0;
   my @errors;
   foreach my $idx (0 .. $#{$data}) {
     if (_eval($data->[$idx], $schema->{contains},
         +{ %$state, errors => \@errors,
           data_path => $state->{data_path}.'/'.$idx,
           schema_path => $state->{schema_path}.'/contains' })) {
-      ++$num_valid;
+      ++$state->{_num_contains};
+
       last if $state->{short_circuit}
-        and (not exists $schema->{maxContains} or $num_valid > $schema->{maxContains})
-        and ($num_valid >= ($schema->{minContains} // 1));
+        and (not exists $schema->{maxContains} or $state->{_num_contains} > $schema->{maxContains})
+        and ($state->{_num_contains} >= ($schema->{minContains}//1));
     }
   }
 
-  my $valid = 1;
-  # note: no items contained is only valid when minContains=0
-  if (not $num_valid and ($schema->{minContains} // 1) > 0) {
-    $valid = 0;
+  # note: no items contained is only valid when minContains is explicitly 0
+  if (not $state->{_num_contains} and ($schema->{minContains}//1) > 0) {
     push @{$state->{errors}}, @errors;
-    E($state, 'subschema is not valid against any item');
-    return 0 if $state->{short_circuit};
+    return E($state, 'subschema is not valid against any item');
   }
 
-  if (exists $schema->{maxContains} and $num_valid > $schema->{maxContains}) {
-    $valid = E({ %$state, keyword => 'maxContains' }, 'contains too many matching items');
-    return 0 if $state->{short_circuit};
-  }
-
-  if ($num_valid < ($schema->{minContains} // 1)) {
-    $valid = E({ %$state, keyword => 'minContains' }, 'contains too few matching items');
-    return 0 if $state->{short_circuit};
-  }
-
-  return $valid;
+  return 1;
 }
 
 sub _eval_keyword_properties {
@@ -895,7 +921,7 @@ sub E {
     .jsonp($state->{schema_path}, $state->{keyword}, delete $state->{_schema_path_suffix});
 
   undef $uri if $uri eq '' and $keyword_location eq ''
-    or ($uri->fragment // '') eq $keyword_location;
+    or ($uri->fragment//'') eq $keyword_location;
 
   push @{$state->{errors}}, {
     instanceLocation => $state->{data_path},
@@ -946,7 +972,7 @@ sub assert_array_schemas {
   my ($schema, $state) = @_;
 
   return if not assert_keyword_type($state, $schema, 'array');
-  abort($state, '"%s" array is empty') if not @{$schema->{$state->{keyword}}};
+  abort($state, '%s array is empty', $state->{keyword}) if not @{$schema->{$state->{keyword}}};
   return 1;
 }
 
@@ -966,7 +992,7 @@ JSON::Schema::Tiny - Validate data against a schema, minimally
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 SYNOPSIS
 
@@ -1118,7 +1144,7 @@ C<unevaluatedItems> and C<unevaluatedProperties> (which require annotation suppo
 
 =item *
 
-C<format>
+C<format> (does not cause an error when used)
 
 =back
 
@@ -1161,6 +1187,10 @@ L<Test::JSON::Schema::Acceptance>: contains the official JSON Schema test suite
 =item *
 
 L<https://json-schema.org>
+
+=item *
+
+L<Understanding JSON Schema|https://json-schema.org/understanding-json-schema>: tutorial-focused documentation
 
 =back
 

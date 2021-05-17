@@ -1,2 +1,8 @@
-<p>This web site is very much a work in progress.
-I'll be adding more information very soon.</p>
+<hr>
+<p>Gabor asked if
+<a href="https://dev.to/szabgab/perl-modules-with-their-own-web-site-2gmo">more
+CPAN modules should have their own web sites</a>.</p>
+<p>I replied, pointing out
+<a href="https://dev.to/davorg/simple-cpan-module-web-sites-with-github-pages-29ka">how
+easy it is to create project web sites on GitHub Pages</a>.</p>
+<p>But I wondered if we could make it even easier. This module is the result.</p>

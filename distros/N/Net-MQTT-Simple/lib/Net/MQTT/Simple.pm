@@ -3,7 +3,7 @@ package Net::MQTT::Simple;
 use strict;
 use warnings;
 
-our $VERSION = '1.25';
+our $VERSION = '1.26';
 
 # Please note that these are not documented and are subject to change:
 our $KEEPALIVE_INTERVAL = 60;
@@ -285,7 +285,7 @@ sub _parse {
         return;
     }
 
-    return if $length > (length $$bufref) + $offset;  # not enough data yet
+    return if length($$bufref) < $offset + $length;  # not enough data yet
 
     my $first_byte = unpack "C", substr $$bufref, 0, 1;
 

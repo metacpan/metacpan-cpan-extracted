@@ -1,9 +1,9 @@
 package Calendar::Indonesia::Holiday;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-04-12'; # DATE
+our $DATE = '2021-05-12'; # DATE
 our $DIST = 'Calendar-Indonesia-Holiday'; # DIST
-our $VERSION = '0.340'; # VERSION
+our $VERSION = '0.341'; # VERSION
 
 use 5.010001;
 use strict;
@@ -1345,6 +1345,7 @@ my $res = gen_read_table_func(
 die "BUG: Can't generate func: $res->[0] - $res->[1]"
     unless $res->[0] == 200;
 
+delete $SPEC{list_idn_holidays}{args}{query}{pos};
 $SPEC{list_idn_holidays}{args}{year}{pos}  = 0;
 $SPEC{list_idn_holidays}{args}{month}{pos} = 1;
 
@@ -1599,7 +1600,7 @@ Calendar::Indonesia::Holiday - List Indonesian public holidays
 
 =head1 VERSION
 
-This document describes version 0.340 of Calendar::Indonesia::Holiday (from Perl distribution Calendar-Indonesia-Holiday), released on 2021-04-12.
+This document describes version 0.341 of Calendar::Indonesia::Holiday (from Perl distribution Calendar-Indonesia-Holiday), released on 2021-05-12.
 
 =head1 SYNOPSIS
 
@@ -2436,7 +2437,7 @@ Source repository is at L<https://github.com/perlancar/perl-Calendar-Indonesia-H
 
 =head1 BUGS
 
-Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-Calendar-Indonesia-Holiday/issues>
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Calendar-Indonesia-Holiday>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
@@ -2455,7 +2456,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021, 2020, 2019, 2018, 2017, 2016, 2015, 2014, 2013, 2012, 2011 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2019, 2018, 2017, 2016, 2015, 2014, 2013, 2012, 2011 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

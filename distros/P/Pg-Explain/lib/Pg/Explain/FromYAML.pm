@@ -28,11 +28,11 @@ Pg::Explain::FromYAML - Parser for explains in YAML format
 
 =head1 VERSION
 
-Version 1.07
+Version 1.08
 
 =cut
 
-our $VERSION = '1.07';
+our $VERSION = '1.08';
 
 =head1 SYNOPSIS
 
@@ -54,7 +54,7 @@ sub parse_source {
     my $source = shift;
 
     # If this is plan from auto-explain
-    if ( $source =~ s{ \A (\s*) Query \s+ Text : \s+ " ( [^\n]* ) " \n }{}xms ) {
+    if ( $source =~ s{ \A (\s*) Query \s+ Text : \s+ " ( [^\n]* ) " \s* \n }{}xms ) {
         my ( $prefix, $query ) = ( $1, $2 );
 
         # Change prefix to two spaces in all lines

@@ -36,6 +36,8 @@ t/40role.t
 t/41role-repr.t
 t/42role-BUILD.t
 t/43role-slots.t
+t/44role-accessors.t
+t/45role-does.t
 t/49role-compat.t
 t/50croak-method.t
 t/51pragmata.t

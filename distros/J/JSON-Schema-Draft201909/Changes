@@ -1,5 +1,14 @@
 Revision history for JSON-Schema-Draft201909
 
+0.027     2021-05-15 18:13:21Z
+          - fixed error strings used for failing "dependentRequired"
+          - in terse output format, do not discard non-summary errors from
+            schema-form of items
+          - keywords in the applicator vocabulary are now applied before the
+            keywords in the validation vocabulary (true/false results are not
+            affected, but the order of annotations and errors will change)
+          - improved validation of the "date-time", "date" and "time" formats
+
 0.026     2021-04-08 20:13:27Z
           - fix scoping of annotations from uncle keywords (siblings of the
             schema's parent) that were improperly visible to unevaluatedItems,

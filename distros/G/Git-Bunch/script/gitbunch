@@ -3,7 +3,7 @@
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2021-01-31'; # DATE
 our $DIST = 'Git-Bunch'; # DIST
-our $VERSION = '0.628'; # VERSION
+our $VERSION = '0.629'; # VERSION
 
 use 5.010001;
 use strict;
@@ -39,7 +39,7 @@ gitbunch - Manage gitbunch directory (directory which contain git repos)
 
 =head1 VERSION
 
-This document describes version 0.628 of gitbunch (from Perl distribution Git-Bunch), released on 2021-01-31.
+This document describes version 0.629 of gitbunch (from Perl distribution Git-Bunch), released on 2021-01-31.
 
 =head1 SYNOPSIS
 
@@ -56,34 +56,9 @@ and do an rsync for everything else):
 
 =head1 DESCRIPTION
 
-A I<gitbunch> or I<bunch> directory is just a term I coined to refer to a
-directory which contains, well, a bunch of git repositories. It can also contain
-other stuffs like files and non-git repositories (but they must be dot-dirs).
-Example:
-
- repos/            -> a gitbunch dir
-   proj1/          -> a git repo
-   proj2/          -> ditto
-   perl-Git-Bunch/ -> ditto
-   ...
-   .videos/        -> a non-git dir
-   README.txt      -> file
-
-If you organize your data as a bunch, you can easily check the status of your
-repositories and synchronize your data between two locations, e.g. your
-computer's harddisk and an external/USB harddisk.
-
-A little bit of history: after I<git> got popular, in 2008 I started using it for
-software projects, replacing Subversion and Bazaar. Soon, I moved everything*)
-to git repositories: notes & writings, Emacs .org agenda files, configuration,
-even temporary downloads/browser-saved HTML files. I put the repositories inside
-I<$HOME/repos> and add symlinks to various places for conveniences. Thus, the
-I<$HOME/repos> became the first bunch directory.
-
-*) everything except large media files (e.g. recorded videos) which I put in
-dot-dirs inside the bunch.
-
-See also L<rsybak>, which I wrote to backup everything else.
+A (git)bunch is a directory that contains a bunch of git repositories (as well
+as dot non-git directories and regular files). This B<gitbunch> utility can help
+you perform actions on some/all of the repositories in the bunch.
 
 =head1 SUBCOMMANDS
 
@@ -829,7 +804,22 @@ You can put multiple profiles in a single file by using section names like C<[pr
 
 You can also put configuration for multiple programs inside a single file, and use filter C<program=NAME> in section names, e.g. C<[program=NAME ...]> or C<[SOMESECTION program=NAME]>. The section will then only be used when the reading program matches.
 
-Finally, you can filter a section by environment variable using the filter C<env=CONDITION> in section names. For example if you only want a section to be read if a certain environment variable is true: C<[env=SOMEVAR ...]> or C<[SOMESECTION env=SOMEVAR ...]>. If you only want a section to be read when the value of an environment variable has value equals something: C<[env=HOSTNAME=blink ...]> or C<[SOMESECTION env=HOSTNAME=blink ...]>. If you only want a section to be read when the value of an environment variable does not equal something: C<[env=HOSTNAME!=blink ...]> or C<[SOMESECTION env=HOSTNAME!=blink ...]>. If you only want a section to be read when an environment variable contains something: C<[env=HOSTNAME*=server ...]> or C<[SOMESECTION env=HOSTNAME*=server ...]>. Note that currently due to simplistic parsing, there must not be any whitespace in the value being compared because it marks the beginning of a new section filter or section name.
+You can also filter a section by environment variable using the filter C<env=CONDITION> in section names. For example if you only want a section to be read if a certain environment variable is true: C<[env=SOMEVAR ...]> or C<[SOMESECTION env=SOMEVAR ...]>. If you only want a section to be read when the value of an environment variable has value equals something: C<[env=HOSTNAME=blink ...]> or C<[SOMESECTION env=HOSTNAME=blink ...]>. If you only want a section to be read when the value of an environment variable does not equal something: C<[env=HOSTNAME!=blink ...]> or C<[SOMESECTION env=HOSTNAME!=blink ...]>. If you only want a section to be read when an environment variable contains something: C<[env=HOSTNAME*=server ...]> or C<[SOMESECTION env=HOSTNAME*=server ...]>. Note that currently due to simplistic parsing, there must not be any whitespace in the value being compared because it marks the beginning of a new section filter or section name.
+
+To load and configure plugins, you can use either the C<-plugins> parameter (e.g. C<< -plugins=DumpArgs >> or C<< -plugins=DumpArgs@before_validate_args >>), or use the C<[plugin=NAME ...]> sections, for example:
+
+ [plugin=DumpArgs]
+ -event=before_validate_args
+ -prio=99
+ 
+ [plugin=Foo]
+ -event=after_validate_args
+ arg1=val1
+ arg2=val2
+
+ 
+
+which is equivalent to setting C<< -plugins=-DumpArgs@before_validate_args@99,-Foo@after_validate_args,arg1,val1,arg2,val2 >>.
 
 List of available configuration parameters:
 
@@ -937,7 +927,7 @@ Source repository is at L<https://github.com/perlancar/perl-Git-Bunch>.
 
 =head1 BUGS
 
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Git-Bunch>
+Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-Git-Bunch/issues>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
@@ -957,6 +947,10 @@ quickly: 1) check whether there are any of my repositories which have
 uncommitted changes; 2) synchronize (pull/push) to other locations. I put all my
 data in one big gitbunch directory; I find it simpler. gitbunch works for me and
 I use it daily.
+
+
+Other tools on CPAN to make it easier to manage multiple git repositories:
+L<got> from L<App::GitGot>, L<group-git> from L<Group::Git>.
 
 =head1 AUTHOR
 

@@ -11,7 +11,7 @@ use Mojo::URL;
 use Pod::Simple::XHTML;
 use Pod::Simple::Search;
 
-our $VERSION = '5.01';
+our $VERSION = '5.02';
 
 # "Futurama - The One Bright Spot in Your Life!"
 sub register {
@@ -37,15 +37,18 @@ sub register {
   # Detect script location based on 2nd or 3rd parent (in case of Mojolicious::Lite app)
   my ( $package, $script ) = (caller(2))[0, 1];
   if ( $package eq 'Mojolicious::Lite' ) {
-        $script = (caller(3))[1];
+    $script = (caller(3))[1];
   }
   else {
-        $module ||= $package;
+    $module ||= $package;
   }
 
   my $defaults = {url => $url, module => $module, script => $script, format => 'html'};
-  return $app->routes->any(
-    "$url/:module" => $defaults => [module => qr/[^.]+/] => \&_doc);
+  return $app->routes->any("$url/:module"
+    => $defaults
+    => [format => [qw(html txt)], module => qr/[^.]+/]
+    => \&_doc
+  );
 }
 
 sub _indentation {
@@ -100,7 +103,7 @@ sub _doc {
 
   if (defined $module) {
     # Find module or redirect to CPAN
-    my $module = join '::', split('/', $c->param('module'));
+    my $module = join '::', split('/', $module);
     $path
       = Pod::Simple::Search->new->find($module, map { $_, "$_/pods" } @INC);
     return $c->redirect_to("https://metacpan.org/pod/$module")

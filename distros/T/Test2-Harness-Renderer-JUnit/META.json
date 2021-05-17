@@ -4,7 +4,7 @@
       "Todd E. Rinaldo <toddr@cpanel.net>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "artistic_2"
    ],
@@ -69,6 +69,6 @@
          "url" : "https://github.com/cpanelinc/Test2-Harness-Renderer-JUnit"
       }
    },
-   "version" : "1.000003",
-   "x_serialization_backend" : "JSON::PP version 4.02"
+   "version" : "1.000004",
+   "x_serialization_backend" : "JSON::PP version 4.04"
 }

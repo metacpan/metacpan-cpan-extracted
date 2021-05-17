@@ -294,13 +294,16 @@ PROTOTYPES: DISABLE
 
 
 BOOL
-Create(cP,appname,cmdline,inherit,flags,curdir)
+Create(cP,appname_sv,cmdline_sv,inherit,flags,curdir)
     cProcess *cP = NULL;
-    char *appname
-    char *cmdline
+    SV *appname_sv
+    SV *cmdline_sv
     BOOL inherit
     DWORD flags
     char *curdir
+INIT:
+    char *appname = SvOK(appname_sv) ? SvPV_nolen(appname_sv) : NULL;
+    char *cmdline = SvOK(cmdline_sv) ? SvPV_nolen(cmdline_sv) : NULL;
 CODE:
     RETVAL = Create(cP, appname, cmdline, inherit, flags, curdir);
 OUTPUT:
@@ -444,7 +447,12 @@ KillProcess(pid, exitcode)
     unsigned int exitcode
 CODE:
     {
-	HANDLE ph = OpenProcess(PROCESS_ALL_ACCESS, 0, pid);
+	HANDLE ph = OpenProcess(PROCESS_DUP_HANDLE        |
+	                        PROCESS_QUERY_INFORMATION |
+	                        PROCESS_SET_INFORMATION   |
+	                        PROCESS_TERMINATE         |
+	                        SYNCHRONIZE,
+	                        0, pid);
 	if (ph) {
 	    RETVAL = TerminateProcess(ph, exitcode);
 	    if (RETVAL)

@@ -3,7 +3,7 @@ package PGXN::Site::Locale::en;
 use 5.10.0;
 use utf8;
 use parent 'PGXN::Site::Locale';
-our $VERSION = v0.10.3;
+our $VERSION = v0.20.2;
 
 our %Lexicon = (
 );
@@ -29,10 +29,10 @@ David E. Wheeler <david.wheeler@pgexperts.com>
 
 =head1 Copyright and License
 
-Copyright (c) 2010-2013 David E. Wheeler.
+Copyright (c) 2010-2021 David E. Wheeler.
 
 This module is free software; you can redistribute it and/or modify it under
-the L<PostgreSQL License|http://www.opensource.org/licenses/postgresql>.
+the L<PostgreSQL License|https://www.opensource.org/licenses/postgresql>.
 
 Permission to use, copy, modify, and distribute this software and its
 documentation for any purpose, without fee, and without a written agreement is

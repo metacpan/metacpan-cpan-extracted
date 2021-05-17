@@ -4,7 +4,7 @@
 #
 # Author: Slaven Rezic
 #
-# Copyright (C) 2017 Slaven Rezic. All rights reserved.
+# Copyright (C) 2017,2018 Slaven Rezic. All rights reserved.
 # This program is free software; you can redistribute it and/or
 # modify it under the same terms as Perl itself.
 #
@@ -379,7 +379,7 @@ org2ical - convert appointments in org-mode files to .ics files
 
 =head1 DESCRIPTION
 
-Convert appointments (events; active timestamps) found in one ro more
+Convert appointments (events; active timestamps) found in one or more
 org-mode files into an ical file.
 
 The generated file may be served with a web server. Probably some kind
@@ -399,8 +399,9 @@ The path for the output ical (.ics) file. Mandatory.
 
 =item C<--domain-id I<value>>
 
-Specify the domain part of generated uids. If not given, then use the
-fqdn or short hostname.
+Specify the domain part of generated uids. If not given, then the fqdn
+(using L<hostname(1)>) or short hostname (using L<Sys::Hostname>) is
+taken.
 
 =item C<--debug>
 

@@ -1,4 +1,4 @@
-use Test2::Require::EnvVar 'EXTRA_CI';
+use Test2::Require::EnvVar 'CIPSOMETHING';
 use Test2::V0 -no_srand => 1;
 use FFI::CheckLib qw( find_lib );
 use FFI::Platypus;

@@ -1,7 +1,7 @@
 package PICA::Writer::Fields;
 use v5.14.1;
 
-our $VERSION = '1.19';
+our $VERSION = '1.20';
 
 use parent 'PICA::Writer::Base';
 

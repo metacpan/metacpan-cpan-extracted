@@ -69,20 +69,13 @@ $feed = $t->app->parse_feed(Mojo::URL->new("/atom.xml"));
 isa_ok($feed, 'HASH');
 is($feed->{title}, 'First Weblog');
 
-my $delay = Mojo::IOLoop->delay(sub {
-  my ($delay, $feed) = @_;
-  isa_ok($feed, 'HASH');
-  #say ref $feed;
-  is($feed->{title}, 'First Weblog');
-});
-my $end = $delay->begin(0);
 # parse a URL - non-blocking - this revealed a bug, yay!
 $t->app->parse_feed(Mojo::URL->new("/atom.xml"),
   sub {
     my ($feed) = @_;
-    $end->($feed);
+    isa_ok($feed, 'HASH');
+    is($feed->{title}, 'First Weblog');
   });
-$delay->wait unless (Mojo::IOLoop->is_running);
 
 ## Then try calling all of the unified API methods.
 for my $file (sort keys %Feeds) {
@@ -261,12 +254,7 @@ is( $feeds[1],  'http://example.com/foo.xml' );
 
 # Does it work the same non-blocking?
 @feeds = ();
-my $delay = Mojo::IOLoop->delay( sub {
-  shift;
-  (@feeds) = @_;
-} );
-$t->app->find_feeds('/link2_multi.html', $delay->begin(0));
-$delay->wait unless (Mojo::IOLoop->is_running);
+$t->app->find_feeds('/link2_multi.html', sub { (@feeds) = @_; })->wait();
 is( scalar @feeds, 3);
 is( $feeds[0],  'http://www.example.com/?feed=rss2' ); # abs url!
 is( $feeds[1],  'http://www.example.com/?feed=rss' ); # abs url!
@@ -294,29 +282,15 @@ is(Mojo::URL->new($feeds[0])->path, '/olaf', 'feed served as html');
 
 # we should get more info with non-blocking:
 @feeds = ();
-$delay = Mojo::IOLoop->delay(sub { shift; (@feeds) = @_; });
-
-$t->app->find_feeds('/no_link.html', $delay->begin(0) );
-$delay->wait;
+$t->app->find_feeds('/no_link.html', sub { (@feeds) = @_; } )->wait;
 is(scalar @feeds, 0, 'no feeds (nb)');
 
 @feeds = ();
 $t->app->find_feeds('/monks');
 is(scalar @feeds, 0, 'no feeds for perlmonks');
 @feeds = ();
-$delay = Mojo::IOLoop->delay(sub { shift; (@feeds) = @_; });
-$t->app->find_feeds('/monks', $delay->begin(0));
-$delay->wait;
+$t->app->find_feeds('/monks', sub { shift; (@feeds) = @_; })->wait;
 is(scalar @feeds, 0, 'no feeds for perlmonks (nb)');
-
-# @feeds = ();
-# $delay = Mojo::IOLoop->delay(sub { shift; (@feeds) = @_; });
-# $t->app->find_feeds('slashdot.org', $delay->begin(0));
-# $delay->wait();
-# is(scalar @feeds, 1, 'feed for slashdot');
-# @feeds = ();
-# @feeds = $t->app->find_feeds('slashdot.org');
-# is(scalar @feeds, 1, 'feed for slashdot');
 
 
 done_testing();
@@ -407,23 +381,14 @@ my $feed;
 $feed = $reader->parse_rss( Mojo::URL->new("/atom.xml") );
 is( $feed->{title}, 'First Weblog' );
 
-my $delay = Mojo::IOLoop->delay(
-    sub {
-        my ( $delay, $feed ) = @_;
-        is( $feed->{title}, 'First Weblog' );
-    }
-);
-my $end = $delay->begin(0);
-
 # parse a URL - non-blocking - this revealed a bug, yay!
 $reader->parse_rss(
     Mojo::URL->new("/atom.xml"),
     sub {
         my ($feed) = @_;
-        $end->($feed);
+        is( $feed->{title}, 'First Weblog' );
     }
 );
-$delay->wait unless ( Mojo::IOLoop->is_running );
 
 done_testing();
 };

@@ -21,7 +21,7 @@ JSON::Server - JSON-only server
     }
     
 
-(This example is included as L<F<synopsis.pl>|https://fastapi.metacpan.org/source/BKB/JSON-Server-0.01/examples/synopsis.pl> in the distribution.)
+(This example is included as L<F<synopsis.pl>|https://fastapi.metacpan.org/source/BKB/JSON-Server-0.02/examples/synopsis.pl> in the distribution.)
 
 
 Then test your server:
@@ -42,13 +42,13 @@ Then test your server:
 
 =head1 VERSION
 
-This documents version 0.01 of JSON-Server
-corresponding to L<git commit 557295f1d182c1a8425a5dd13c74c27a153f8c93|https://github.com/benkasminbullock/json-server/commit/557295f1d182c1a8425a5dd13c74c27a153f8c93> released on Sun Feb 21 17:00:48 2021 +0900.
+This documents version 0.02 of JSON-Server
+corresponding to L<git commit 3002d95df18b014ba750d9c37f1ea44027d29fe5|https://github.com/benkasminbullock/json-server/commit/3002d95df18b014ba750d9c37f1ea44027d29fe5> released on Wed May 12 12:04:15 2021 +0900.
 
 =head1 DESCRIPTION
 
-This sets up an internet socket through which JSON passes. Each JSON
-message should be followed by a zero byte.
+This sets up an internet socket through which JSON passes. Each
+complete JSON message must be followed by a zero byte.
 
 =head1 METHODS
 
@@ -103,6 +103,10 @@ directly without a warning being printed, use
 The port to serve on. This needs to be specified, there is no default
 value.
 
+=item verbose
+
+If set to a true value, print debugging messages to standard output.
+
 =back
 
 =head2 serve
@@ -122,10 +126,20 @@ end. The need for a zero byte might be removed at some point, but it
 removes the necessity for having to parse and re-parse the input to
 find the end of the JSON, since a zero byte is invalid as JSON.
 
-In early versions of this module the server was closing the connection
-after each message, but it now keeps the connection open
-indefinitely. You can make the server close the connection with a
-control message.
+In early trial versions of this module the server was closing the
+connection after each message, but since version 0.01 it keeps the
+connection open indefinitely. You can make the server close the
+connection with a control message.
+
+If the connection is closed remotely, C<serve> returns, so if you want
+to keep your server running, you need to enclose it in some kind of
+loop:
+
+    while (1) {
+        $js->serve ();
+    }
+
+This behaviour may be changed in future versions.
 
 =head1 JSON
 
@@ -135,8 +149,8 @@ Unlike many programming languages, Perl doesn't have C<true> and
 C<false>, which means that boolean literals (C<true> and C<false>) can
 become something of an issue when using JSON. 
 
-If you need booleans, import L<JSON::Create::Bool> from the
-L<JSON::Create> distribution.
+If you need booleans, one easy way to do it is to import
+L<JSON::Create::Bool> from the L<JSON::Create> distribution.
 
     use JSON::Create::Bool;
 

@@ -1,5 +1,8 @@
 Revision history for Perl extension Ceph::Rados.
 
+0.17  Fri 14 May 18:29:12 BST 2021
+    - fixes ranged read_handle_perl()
+
 0.14  Mon 12 Apr 17:29:09 BST 2021
     - read to handle now supports pseudo-handles (objects with a 'write' method)
 

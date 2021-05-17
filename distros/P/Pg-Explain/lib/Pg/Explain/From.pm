@@ -26,11 +26,11 @@ Pg::Explain::From - Base class for parsers of non-text explain formats.
 
 =head1 VERSION
 
-Version 1.07
+Version 1.08
 
 =cut
 
-our $VERSION = '1.07';
+our $VERSION = '1.08';
 
 =head1 SYNOPSIS
 
@@ -237,7 +237,7 @@ sub make_node_from {
     for my $buf_block ( qw(Shared Local Temp) ) {
         my @buf_block_info = ();
         for my $buf_read ( qw(Hit Read Dirtied Written) ) {
-            my $key = "$buf_block $buf_read Blocks";    # Shared Hit Blocks
+            my $key = "$buf_block $buf_read Blocks";                                  # Shared Hit Blocks
             push @buf_block_info, sprintf '%s=%d', lc $buf_read, $struct->{ $key }    # hit=12345
                 if defined $struct->{ $key }
                 and $struct->{ $key } =~ m{\A\d+\z}

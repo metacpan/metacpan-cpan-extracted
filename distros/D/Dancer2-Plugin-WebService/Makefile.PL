@@ -28,7 +28,7 @@ my %WriteMakefileArgs = (
     "XML::Hash::XS" => 0,
     "YAML::Syck" => 0
   },
-  "VERSION" => "4.4.1",
+  "VERSION" => "4.4.2",
   "test" => {
     "TESTS" => "t/*.t"
   }

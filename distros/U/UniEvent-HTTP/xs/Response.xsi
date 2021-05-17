@@ -1,0 +1,13 @@
+MODULE = UniEvent::HTTP                PACKAGE = UniEvent::HTTP::Response
+PROTOTYPES: DISABLE
+
+BOOT {
+    Stash stash(__PACKAGE__);
+    stash.inherit("Protocol::HTTP::Response");
+}
+
+ResponseSP Response::new () {
+    RETVAL = make_backref<Response>();
+}
+
+bool Response::is_done ()

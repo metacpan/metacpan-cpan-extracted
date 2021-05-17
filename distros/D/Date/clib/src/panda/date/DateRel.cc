@@ -22,9 +22,12 @@ static inline void relstr_val (char*& ptr, ptime_t val, char units) {
 void DateRel::set (const Date& from_date, const Date& till_date) {
     _sec = _min = _hour = _day = _month = _year = 0;
     _from = from_date;
+    if (from_date.timezone() != till_date.timezone() && from_date.gmtoff() != till_date.gmtoff()) {
+        _from->to_timezone(till_date.timezone());
+    }
     bool reverse = from_date > till_date;
-    auto& from = reverse ? till_date.date() : from_date.date();
-    auto& till = reverse ? from_date.date() : till_date.date();
+    auto& from = reverse ? till_date.date() : _from->date();
+    auto& till = reverse ? _from->date() : till_date.date();
 
     _sec = till.sec - from.sec;
     if (_sec < 0) { _sec += 60; _min--; }

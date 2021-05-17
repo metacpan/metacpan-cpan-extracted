@@ -12,7 +12,7 @@ class Example {
    method m { }
 }
 
-my $classmeta = Example->META;
+my $classmeta = Object::Pad::MOP::Class->for_class( "Example" );
 
 my $methodmeta = $classmeta->get_own_method( 'm' );
 

@@ -1,11 +1,12 @@
 package PICA::Writer::PPXML;
 use v5.14.1;
 
-our $VERSION = '1.19';
+our $VERSION = '1.20';
 
 use Scalar::Util qw(reftype);
 use XML::LibXML;
 use PICA::Path;
+use PICA::Data;    # qw(pica_holdings pica_items);
 
 use parent 'PICA::Writer::XML';
 
@@ -40,69 +41,31 @@ sub write_record {
     $self->write_field($_) for grep {$_->[0] =~ /^0/} @$record;
     $writer->endTag('global');
 
-    my @fields = grep {$_->[0] =~ /^[12]/} @$record;
+    for my $holding (@{PICA::Data::pica_holdings($record)}) {
+        $writer->startTag('owner', iln => $holding->{_id} // "");
 
-    while (@fields) {
-        my $iln;
-        my @local;
-
-       # collect level 1 fields up to the first level 2 field or the next 101@
-        while (@fields and $fields[0][0] =~ /^1/) {
-            if ($fields[0][0] eq '101@') {
-                last if defined $iln;
-                ($iln) = $ILN->match_subfields($fields[0]);
-            }
-            push @local, shift(@fields);
+        my @local = grep {$_->[0] =~ /^1/} @{$holding->{record}};
+        if (@local) {
+            $writer->startTag('local');
+            $self->write_field($_) for @local;
+            $writer->endTag('local');
         }
 
-        my %copy;
-        while (@fields && $fields[0][0] =~ /^2/) {
-            my $occ = 1 * $fields[0][1] // "";
-            push @{$copy{$occ}}, shift @fields;
+        for my $item (@{PICA::Data::pica_items($holding)}) {
+            $writer->startTag(
+                'copy',
+                occ      => 1 * $item->{record}->[0][1],
+                epn      => $item->{_id} // "",
+                opacflag => "",
+                status   => ""
+            );
+            $self->write_field($_) for @{$item->{record}};
+            $writer->endTag('copy');
         }
-
-        if (%copy) {
-            for my $occ (sort keys %copy) {
-                $self->write_owner($iln, \@local, $copy{$occ});
-            }
-        }
-        else {
-            $self->write_owner($iln, \@local);
-        }
+        $writer->endTag('owner');
     }
 
     $writer->endTag('record');
-}
-
-sub write_owner {
-    my ($self, $iln, $local, $copy) = @_;
-
-    my $writer = $self->{writer};
-
-    $writer->startTag('owner', iln => $iln // "");
-
-    if (@$local) {
-        $writer->startTag('local');
-        $self->write_field($_) for @$local;
-        $writer->endTag('local');
-    }
-
-    if ($copy) {
-        my $occ = 1 * $copy->[0][1] // '';
-        my ($epn)
-            = map {$EPN->match_subfields($_)} grep {$_->[0] eq '203@'} @$copy;
-        $writer->startTag(
-            'copy',
-            occ      => $occ,
-            epn      => $epn,
-            opacflag => "",
-            status   => ""
-        );
-        $self->write_field($_) for @$copy;
-        $writer->endTag('copy');
-    }
-
-    $writer->endTag('owner');
 }
 
 1;

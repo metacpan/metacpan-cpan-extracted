@@ -1,0 +1,30 @@
+bin/.exists
+bin/colchop
+bin/colorplus
+bin/colsummary
+bin/crosstable
+bin/csel
+bin/csv2tsv
+bin/expskip
+bin/freq
+bin/init.sh
+bin/latextable
+bin/madeafter
+bin/saikoro
+bin/sampler
+bin/transpose
+bin/venn
+bin4tsv-0.01.tar.gz
+INSTALL
+lib/bin4tsv.pm
+lib/bin4tsv/en.pm
+lib/bin4tsv/ja.pm
+lib/Changes
+Makefile
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+MYMETA.json
+MYMETA.yml
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

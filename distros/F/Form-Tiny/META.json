@@ -50,14 +50,16 @@
       "bugtracker" : {
          "web" : "https://github.com/brtastic/perl-form-tiny/issues"
       },
-      "homepage" : "https://metacpan.org/release/Form-Tiny",
+      "homepage" : "https://brtastic.xyz/project/form-tiny",
       "license" : [
          "https://dev.perl.org/licenses"
       ],
       "repository" : {
-         "url" : "https://github.com/brtastic/perl-form-tiny"
+         "type" : "git",
+         "url" : "https://github.com/brtastic/perl-form-tiny.git",
+         "web" : "https://github.com/brtastic/perl-form-tiny"
       }
    },
-   "version" : "1.12",
+   "version" : "1.13",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

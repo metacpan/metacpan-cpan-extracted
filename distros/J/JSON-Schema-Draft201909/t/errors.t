@@ -662,12 +662,6 @@ subtest 'errors after crossing multiple $refs using $id and $anchor' => sub {
       errors => [
         {
           instanceLocation => '',
-          keywordLocation => '/$ref/$ref/$ref/$ref/type',
-          absoluteKeywordLocation => 'http://localhost:4242/object.json#/type',
-          error => 'wrong type (expected object)',
-        },
-        {
-          instanceLocation => '',
           keywordLocation => '/$ref/$ref/$ref/$ref/anyOf/0',
           absoluteKeywordLocation => 'http://localhost:4242/object.json#/anyOf/0',
           error => 'subschema is false',
@@ -677,6 +671,12 @@ subtest 'errors after crossing multiple $refs using $id and $anchor' => sub {
           keywordLocation => '/$ref/$ref/$ref/$ref/anyOf',
           absoluteKeywordLocation => 'http://localhost:4242/object.json#/anyOf',
           error => 'no subschemas are valid',
+        },
+        {
+          instanceLocation => '',
+          keywordLocation => '/$ref/$ref/$ref/$ref/type',
+          absoluteKeywordLocation => 'http://localhost:4242/object.json#/type',
+          error => 'wrong type (expected object)',
         },
         {
           instanceLocation => '',
@@ -1084,103 +1084,6 @@ subtest 'JSON pointer escaping' => sub {
     # all the other _schema_path_suffix cases are tested in the earlier test case
     'use of _schema_path_suffix in a fatal error',
   ) if "$]" >= 5.022;
-};
-
-subtest 'invalid $schema' => sub {
-  cmp_deeply(
-    $js->evaluate(
-      1,
-      {
-        allOf => [
-          true,
-          { '$schema' => 'https://json-schema.org/draft/2019-09/schema' },
-        ],
-      },
-    )->TO_JSON,
-    {
-      valid => false,
-      errors => [
-        {
-          instanceLocation => '',
-          keywordLocation => '/allOf/1/$schema',
-          error => '$schema can only appear at the schema resource root',
-        },
-      ],
-    },
-    '$schema can only appear at the root of a schema, when there is no canonical URI',
-  );
-
-  cmp_deeply(
-    $js->evaluate(
-      1,
-      {
-        '$id' => 'https://bloop.com',
-        allOf => [
-          true,
-          { '$schema' => 'https://json-schema.org/draft/2019-09/schema' },
-        ],
-      },
-    )->TO_JSON,
-    {
-      valid => false,
-      errors => [
-        {
-          instanceLocation => '',
-          keywordLocation => '/allOf/1/$schema',
-          absoluteKeywordLocation => 'https://bloop.com#/allOf/1/$schema',
-          error => '$schema can only appear at the schema resource root',
-        },
-      ],
-    },
-    '$schema can only appear where the canonical URI has no fragment, when there is a canonical URI',
-  );
-
-  cmp_deeply(
-    $js->evaluate(
-      1,
-      {
-        '$id' => 'https://bloop2.com',
-        allOf => [
-          true,
-          {
-            '$id' => 'https://newid.com',
-            '$schema' => 'https://json-schema.org/draft/2019-09/schema',
-          },
-        ],
-      },
-    )->TO_JSON,
-    {
-      valid => true,
-    },
-    '$schema can appear adjacent to any $id',
-  );
-
-  cmp_deeply(
-    $js->evaluate(
-      1,
-      {
-        '$id' => 'https://bloop3.com',
-        '$defs' => {
-          my_def => {
-            '$schema' => 'https://json-schema.org/draft/2019-09/schema',
-          },
-        },
-        '$ref' => '#/$defs/my_def',
-      },
-    )->TO_JSON,
-    {
-      valid => false,
-      errors => [
-        {
-          instanceLocation => '',
-          keywordLocation => '/$defs/my_def/$schema',
-          absoluteKeywordLocation => 'https://bloop3.com#/$defs/my_def/$schema',
-          error => '$schema can only appear at the schema resource root',
-        },
-      ],
-    },
-    'this is still not a resource root, even in a $ref target',
-  );
 };
 
 subtest 'absoluteKeywordLocation' => sub {

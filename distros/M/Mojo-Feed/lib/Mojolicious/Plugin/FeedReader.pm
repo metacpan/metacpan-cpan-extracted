@@ -3,7 +3,7 @@ use Mojo::Base 'Mojolicious::Plugin';
 
 use Mojo::Feed::Reader;
 
-our $VERSION = "0.20";
+our $VERSION = "0.21";
 
 use Scalar::Util qw(blessed);
 
@@ -78,7 +78,7 @@ sub find_feeds {
   }
   my $promise = $self->feed_reader->discover(@_);
   if ($cb) {
-    $promise->then($cb);
+    return $promise->then($cb);
   }
   else {
     my @res;
@@ -118,19 +118,14 @@ Mojolicious::Plugin::FeedReader - Mojolicious plugin to find and parse RSS & Ato
         get '/nb' => sub {
           my $self = shift;
           $self->render_later;
-          my $delay = Mojo::IOLoop->delay(
-            sub {
-              $self->find_feeds("search.cpan.org", shift->begin(0));
-            },
+          $self->find_feeds("search.cpan.org",
             sub {
               my $feed = pop;
               $self->parse_feed($feed, shift->begin);
-            },
-            sub {
+            })->then(sub {
                 my $data = pop;
                 $self->render(template => 'uploads', items => $data->{items});
-            });
-          $delay->wait unless Mojo::IOLoop->is_running;
+            })->wait;
         };
 
         app->start;
@@ -254,11 +249,9 @@ Each item in the items array is a hashref with the following keys:
 
 =item * content (may be filled with content:encoded, xhtml:body or description fields)
 
-=item * id (will be equal to link or guid if it is undefined and either of those fields exists)
+=item * id (will be equal to guid or link if it is undefined and either of those fields exists)
 
 =item * description (optional) - usually a shorter form of the content (may be filled with summary if description is missing)
-
-=item * guid (optional)
 
 =item * published - time in epoch seconds (may be filled with pubDate, dc:date, created, issued, updated or modified)
 

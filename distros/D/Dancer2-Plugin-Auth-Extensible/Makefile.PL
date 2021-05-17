@@ -32,6 +32,7 @@ WriteMakefile(
         'Test::MockDateTime' => 0,
         'Test::More' => 0,
         'Test::Warnings' => 0,
+        'Test::Fatal' => 0
     },
     PREREQ_PM => {
         'Carp'              => 0,

@@ -1,9 +1,9 @@
 package Pod::Weaver::Plugin::BorderStyle;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-06-11'; # DATE
+our $DATE = '2021-02-19'; # DATE
 our $DIST = 'Pod-Weaver-Plugin-BorderStyle'; # DIST
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 
 use 5.010001;
 use Moose;
@@ -109,20 +109,63 @@ sub weave_section {
 
                 my $bstyle = $package;
                 my $q_bstyle = Data::Dmp::dmp($bstyle);
+                (my $bstyle_without_prefix = $bstyle) =~ s/^BorderStyle:://;
+                my $q_bstyle_without_prefix = Data::Dmp::dmp($bstyle_without_prefix);
 
 
-                require Text::Table::TinyBorderStyle;
-                my $q_output = Text::Table::TinyBorderStyle::generate_table(rows=>$rows, header_row=>1, separate_rows=>1, border_style=>$bstyle) . "\n"; $q_output =~ s/^/ /gm;
-
-              EXAMPLE_WITH_TEXT_TABLE_TINYBORDERSTYLE:
-                {
+              EXAMPLES: {
                     # TODO: use the first valid example from border style
                     # structure, if available
 
-                    next if $bstyle_struct->{args} && grep { $bstyle_struct->{args}{$_}{req} }
+                    last if $bstyle_struct->{args} && grep { $bstyle_struct->{args}{$_}{req} }
                         keys %{ $bstyle_struct->{args} };
 
+                  EXAMPLE_WITH_TEXT_ANSITABLE:
+                    {
+                        require Text::ANSITable;
+                        my $t = Text::ANSITable->new;
+                        $t->use_color(0);
+                        $t->border_style($bstyle_without_prefix);
+                        $t->columns($rows->[0]);
+                        $t->add_row($rows->[$_]) for 1 .. $#{ $rows };
+                        my $q_output = $t->draw; $q_output =~ s/^/ /gm;
+                        push @pod, <<"_";
+To use with L<Text::ANSITable>:
+
+ use Text::ANSITable;
+ my \$rows =
+$q_rows;
+ my \$t = Text::ANSITable->new;
+ \$t->border_style($q_bstyle_without_prefix);
+ \$t->columns(\$rows->[0]);
+ \$t->add_row(\$rows->[\$_]) for 1 .. \$#{ \$rows };
+ print \$t->draw;
+
+_
+                        push @pod, "\nSample output:\n\n$q_output\n" unless $bstyle_struct->{box_chars};
+                    } # EXAMPLE_WITH_TEXT_ANSITABLE
+
+                  EXAMPLE_WITH_TEXT_TABLE_SPAN: {
+                        require Text::Table::Span;
+                        my $q_output = Text::Table::Span::generate_table(rows=>$rows, header_row=>1, separate_rows=>1, border_style=>$bstyle_without_prefix) . "\n"; $q_output =~ s/^/ /gm;
+
                     push @pod, <<"_";
+To use with L<Text::Table::Span>:
+
+ use Text::Table::Span qw/generate_table/;
+ my \$rows =
+$q_rows;
+ generate_table(rows=>\$rows, header_row=>1, separate_rows=>1, border_style=>$q_bstyle_without_prefix);
+
+_
+                        push @pod, "\nSample output:\n\n$q_output\n" unless $bstyle_struct->{box_chars};
+                    } # EXAMPLE_WITH_TEXT_TABLE_SPAN
+
+                  EXAMPLE_WITH_TEXT_TABLE_TINYBORDERSTYLE: {
+                        require Text::Table::TinyBorderStyle;
+                        my $q_output = Text::Table::TinyBorderStyle::generate_table(rows=>$rows, header_row=>1, separate_rows=>1, border_style=>$bstyle) . "\n"; $q_output =~ s/^/ /gm;
+
+                        push @pod, <<"_";
 To use with L<Text::Table::TinyBorderStyle>:
 
  use Text::Table::TinyBorderStyle qw/generate_table/;
@@ -131,30 +174,15 @@ $q_rows;
  generate_table(rows=>\$rows, header_row=>1, separate_rows=>1, border_style=>$q_bstyle);
 
 _
-                    next if $bstyle_struct->{box_chars};
-                    push @pod, <<"_";
-Sample output:
+                        push @pod, "\nSample output:\n\n$q_output\n" unless $bstyle_struct->{box_chars};
+                    } # EXAMPLE_WITH_TEXT_TABLE_TINYBORDERSTYLE
 
-$q_output
-
-_
-                }
-
-              EXAMPLE_WITH_TEXT_ANSITABLE:
-                {
-                    push @pod, <<"_";
-To use with L<Text::ANSITable>:
-
- # TODO
-
-_
-                }
-
-                $self->add_text_to_section(
-                    $document, join("", @pod), 'SYNOPSIS',
-                    {ignore => 1},
-                );
-            }
+                    $self->add_text_to_section(
+                        $document, join("", @pod), 'SYNOPSIS',
+                        {ignore => 1},
+                    );
+                } # EXAMPLES
+            } # SYNOPSIS
 
             # add POD section: DESCRIPTION
             {
@@ -190,7 +218,7 @@ Pod::Weaver::Plugin::BorderStyle - Plugin to use when building distribution whic
 
 =head1 VERSION
 
-This document describes version 0.001 of Pod::Weaver::Plugin::BorderStyle (from Perl distribution Pod-Weaver-Plugin-BorderStyle), released on 2020-06-11.
+This document describes version 0.002 of Pod::Weaver::Plugin::BorderStyle (from Perl distribution Pod-Weaver-Plugin-BorderStyle), released on 2021-02-19.
 
 =head1 SYNOPSIS
 
@@ -233,7 +261,7 @@ Source repository is at L<https://github.com/perlancar/perl-Pod-Weaver-Plugin-Bo
 
 =head1 BUGS
 
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Pod-Weaver-Plugin-BorderStyle>
+Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-Pod-Weaver-Plugin-BorderStyle/issues>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
@@ -251,7 +279,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by perlancar@cpan.org.
+This software is copyright (c) 2021 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

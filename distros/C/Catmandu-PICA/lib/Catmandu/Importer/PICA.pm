@@ -2,19 +2,15 @@ package Catmandu::Importer::PICA;
 use strict;
 use warnings;
 
-our $VERSION = '1.03';
+our $VERSION = '1.04';
 
 use Catmandu::Sane;
-use PICA::Parser::XML;
-use PICA::Parser::Plus;
-use PICA::Parser::Plain;
-use PICA::Parser::Binary;
-use PICA::Parser::PPXML;
+use PICA::Data qw(pica_parser);
 use Moo;
 
 with 'Catmandu::Importer';
 
-has type   => ( is => 'ro', default => sub { 'xml' } );
+has type => ( is => 'ro', default => sub { 'xml' } );
 has parser => ( is => 'lazy' );
 
 sub _build_parser {
@@ -22,20 +18,18 @@ sub _build_parser {
 
     my $type = lc $self->type;
 
-    if ( $type =~ /^(pica)?plus$/ ) {
-        PICA::Parser::Plus->new(  $self->fh );
-    } elsif ( $type eq 'binary') {
-        PICA::Parser::Binary->new( $self->fh );
-    } elsif ( $type eq 'plain') {
-        PICA::Parser::Plain->new( $self->fh );
-    } elsif ( $type eq 'xml') {
-        $self->{encoding} = ':raw'; # set encoding to :raw to drop PerlIO layers, as required by libxml2
+    if ( $type eq 'xml' ) {
+        $self->{encoding} = ':raw'
+          ; # set encoding to :raw to drop PerlIO layers, as required by libxml2
         PICA::Parser::XML->new( $self->fh );
-    } elsif ( $type =~ m/^p(ica)?p(plus)?xml$/) {
-        $self->{encoding} = ':raw'; # set encoding to :raw to drop PerlIO layers, as required by libxml2
+    }
+    elsif ( $type =~ m/^p(ica)?p(plus)?xml$/ ) {
+        $self->{encoding} = ':raw'
+          ; # set encoding to :raw to drop PerlIO layers, as required by libxml2
         PICA::Parser::PPXML->new( $self->fh );
-    } else {
-        die "unknown type: $type";
+    }
+    else {
+        pica_parser( $type, fh => $self->fh );
     }
 }
 

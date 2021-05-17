@@ -1,13 +1,15 @@
 MODE: INLINE
 #include <xs/uri.h>
 
-struct XSRequest : Request, Backref {
-    using Request::Request;
-    
-    ResponseSP new_response () const override { return make_backref<Response>(); }
-    
-    ~XSRequest () { Backref::dtor(); }
-};
+namespace {
+    struct XSRequest : Request, Backref {
+        using Request::Request;
+        
+        ResponseSP new_response () const override { return make_backref<Response>(); }
+        
+        ~XSRequest () { Backref::dtor(); }
+    };
+}
 
 MODULE = Protocol::HTTP              PACKAGE = Protocol::HTTP::Request
 PROTOTYPES: DISABLE

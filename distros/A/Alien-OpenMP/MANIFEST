@@ -6,7 +6,6 @@ META.json
 META.yml
 Makefile.PL
 README
-README.md
 dist.ini
 lib/Alien/OpenMP.pm
 t/00-report-prereqs.t

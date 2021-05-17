@@ -67,6 +67,7 @@ olist:1 X=Bv -
 my_ref_check_list=toto 
 my_reference="titi"
 my_plain_check_list=AA,AC
+yes_no_boolean=1
 warp warp2 aa2="foo bar"
 !;
 

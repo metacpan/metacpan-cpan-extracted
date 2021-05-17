@@ -1,0 +1,71 @@
+=head1 NAME
+
+UniEvent::HTTP::Response - HTTP client response class
+
+
+
+=head1 SYNOPSIS
+
+    http_request({
+        uri => "http://example.com",
+        response_callback => sub {
+            my ($request, $response, $error) = @_;
+            say $response->code;
+            say $response->message;
+            say $response->body;
+            say Dumper($response->headers);
+            say Dumper($response->cookies);
+            ...
+        },
+    });
+    
+    my $response = http_request_sync($request);
+    say $response->body;
+    ...
+
+
+
+=head1 DESCRIPTION
+
+Objects of C<UniEvent::HTTP::Response> represent http response on client side and are passed to request callbacks. Normally, response objects are not created by
+user, instead a response object is created automatically when parsing response.
+You can customize how response object is created via C<response_factory()>, see L<UniEvent::HTTP::Request>.
+
+C<UniEvent::HTTP::Response> inherits from L<Protocol::HTTP::Response>. So for complete documenation you need to also read L<Protocol::HTTP::Response>'s docs.
+
+See detailed description in corresponding method docs.
+
+
+
+=head1 METHODS
+
+All methods of L<Protocol::HTTP::Response> also apply.
+
+
+=head2 new()
+
+Constructs a response object.
+
+NOTE: If you create your own response class inherited from C<UniEvent::HTTP::Response>, you must proxy to original C<new()> method and use its result as the object
+you return. By default it is a reference to undef, you can upgrade it to hash-based object via C<XS::Framework::obj2hv>:
+
+    package MyResponse;
+    use parent 'UniEvent::HTTP::Response';
+    
+    sub new {
+        my $self = shift->SUPER::new();
+        XS::Framework::obj2hv($self);
+        $self->{prop} = "val";
+        return $self;
+    }
+    
+    ...
+    $request->response_factory(sub { MyResponse->new });
+
+
+=head2 is_done()
+
+Returns true if response has been fully received including the whole body. This method can return false in C<partial_callback> (see L<UniEvent::HTTP::Request>) or
+if an error occurs.
+
+=cut

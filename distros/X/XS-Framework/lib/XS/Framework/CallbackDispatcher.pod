@@ -2,24 +2,36 @@
 
 XS::Framework::CallbackDispatcher - callback dispatcher for C++ events
 
+
+
 =head1 SYNOPSIS
 
-    my $callback = ...;
+    my $dispatcher = ...;
     # add simple callbacks
-    $callback->add(sub { ... });
-    my $cb = sub { ...; return "this return is ignored"; };
-    $callback->add_back($cb);
+    $dispatcher->add(sub {
+        my @args = @_;
+        ...
+    });
+    $dispatcher->prepend(sub {
+        my @args = @_;
+        ...
+    });
 
-    my $cb2 = sub { ...; return "this-is-result"; };
-    $callback->add_event_listener($cb2);
-    $callback->add_event_listener_back($cb2);
+    $dispatcher->add_event_listener(sub {
+        my ($event, @args) = @_;
+        ...
+        return $event->(@args) + 10;
+    });
+    $dispatcher->prepend_event_listener(sub { ... });
 
     # remove callbacks
-    $callback->remove($cb);
-    $callback->remove_all();
+    $dispatcher->remove($cb);
+    $dispatcher->remove_all();
 
-    say "I have no listeners" if !$callback->has_listeners();
-    $callback->call('Hi, there!');
+    say "I have no listeners" if !$dispatcher->has_listeners();
+    $dispatcher->call('Hi, there!');
+
+
 
 =head1 DESCRIPTION
 
@@ -28,8 +40,8 @@ listeners. When an event occur it is delivered to the listeners (aka callbacks).
 Schematically it is something like:
 
     my $event_source = ...; # construct it somehow
-    $event_source->add(sub { my $event = shift; say "Hey, I have ", $event; });
-    $event_source->add(sub { my $event = shift; say "Me too have ", $event; });
+    $event_source->add(sub { my $arg = shift; say "Hey, I have ", $arg; });
+    $event_source->add(sub { my $arg = shift; say "Me too have ", $arg; });
     ...
     $event_source->generate_event('boom!'); # somewhere in C++ code
 
@@ -50,6 +62,8 @@ pure perl implementation without C++ backend, you can easily create your own
 or search in CPAN.
 
 When an event occur, callbacks are invoked in the order they were added.
+
+
 
 =head2 SIMPLE and NON-SIMPLE HANDLERS
 
@@ -80,25 +94,56 @@ are polled. Otherwise, C<args> are forwarded further to the next complex
 event listener and the result is taken from it, and so on, recursively.
 The arguments can be modified/changed/substituted on demand, of course.
 
+
+
 =head1 METHODS
 
-=head2 add($code[, $back = false])
+=head2 add($code)
 
-Appends list of callbacks by additing a C<$code> into the front (or back, if 
-C<$back> is true).
+Appends list of callbacks by additing a C<$code> into the back.
 
 The return result of the C<$code> will be ignored, as it is considered simple
 callback interface. The arguments used on event creation are forwarded to 
 the simple callback(s).
 
-=head2 add_back($code)
 
-Alias for C<add($code, 1)>.
+=head2 add_weak($ref, $code)
 
-=head2 add_event_listener($code, $back);
+Helper method for capturing data by weak reference. Behaviour is the same as for C<add()>.
+C<$ref> is any object or reference and it must be captured by the closure. This method changes subroutine in a way that it captures the specified C<$ref>
+by a weak reference instead of strong reference.
+Additionally, if C<$ref> becomes C<undef> will no longer call the callback (other callbacks still may be called).
 
-Appends list of callbacks by additing a C<$code> into the front (or back, if 
-C<$back> is true).
+So that this code:
+
+    Scalar::Util::weaken(my $weak_obj = $obj);
+    $dispatcher->add(sub {
+        return unless $weak_obj;
+        ...use $weak_obj
+    });
+
+can be simplified to:
+
+    $dispatcher->add_weak($obj, sub {
+        ...use $obj
+    });
+
+This is useful if you want to avoid memory leaks caused by capturing an object which contains dispacher directly or indirectly (cyclic reference).
+
+    my $obj = ...;
+    $obj->some_event_dispatcher->add_weak($obj, sub {
+        # use $obj
+    });
+
+
+=head2 prepend($code)
+
+Same as C<add()> but adds callback to the front (will be called first).
+
+
+=head2 add_event_listener($code);
+
+Appends list of callbacks by additing a C<$code> into the back.
 
 The return result of the C<$code> will be converted into the required 
 C++ type by calling C<xs::in()>. This is considered complex callback interface,
@@ -110,21 +155,30 @@ The C<$event> is an anonynous subroutine, which allows to poll further callbacks
 It should be noted, that C<$event> B<SHOULD NOT> outlive callback dispatcher
 instance, as it leads to core dump.
 
+
+=head2 prepend_event_listener($code)
+
+Same as C<add_event_listener()> but adds callback to the front (will be called first).
+
+
 =head2 remove($code)
 
 Removes the C<$code> from the list of callbacks.
+
 
 =head2 remove_all()
 
 Clears list of callbacks.
 
+
 =head2 has_listeners()
 
 Returns C<true> if there is any callback listeners. 
 
+
 =head2 call([$arg1 [, $arg2 ...]]);
  
 Generates the C++ event, converting arguments into proper C++ type via 
-C<xs::in> and invoking with it callbacks.
+C<xs::in> and passing it to callbacks.
 
 =cut

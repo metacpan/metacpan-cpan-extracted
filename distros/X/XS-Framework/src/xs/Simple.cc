@@ -18,10 +18,23 @@ U32 Simple::hash () const {
     if (sv) {
         if (SvIsCOW_shared_hash(sv)) return SvSHARED_HASH(sv);
         U32 h; STRLEN len;
-        const char* buf = SvPV_nomg(sv, len);
+        const char* buf = SvPV(sv, len);
         PERL_HASH(h, buf, len);
         return h;
     } else return 0;
+}
+
+void Simple::_validate_rest() {
+    if (SvTYPE(sv) == SVt_PVLV) {
+        auto newval = newSVsv(sv);
+        reset();     // remove old sv
+        sv = newval; // newSVsv creates sv with refcnt=1, so no inc is required
+    }
+
+    if (SvTYPE(sv) > SVt_PVMG || SvROK(sv)) {
+        reset();
+        throw std::invalid_argument("SV is not a number or string");
+    }
 }
 
 void Simple::__at_perl_destroy () {

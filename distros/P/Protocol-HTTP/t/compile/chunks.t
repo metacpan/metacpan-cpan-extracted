@@ -23,6 +23,12 @@ subtest "make chunk + final_chunk" => sub {
         "0\r\n".
         "\r\n"
         ;
+    is $res->final_chunk('hello-world'),
+        "b\r\n".
+        "hello-world\r\n".
+        "0\r\n".
+        "\r\n"
+        ;
 };
 
 done_testing;

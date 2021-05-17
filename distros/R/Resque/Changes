@@ -1,3 +1,16 @@
+0.41      2021-05-14 14:10:04+02:00 Europe/Madrid
+
+    - Fixed mechanism to extract queue name to prevent from removing too much when queue name use simicolons
+
+0.40      2021-05-14 13:51:52+02:00 Europe/Madrid
+
+    - Extract queue name from returned key when blocking pop is used
+
+0.39      2021-05-14 12:59:28+02:00 Europe/Madrid
+
+    - Fixed test that was failing when Redis::Fast was installed reported by Slaven Rezić (#GH30)
+    - Implemented experimental support for blocking pop instead of polling (#GH2)
+
 0.38      2021-05-07 15:24:50+02:00 Europe/Madrid
 
     - Accept a hashref to initialize Redis client with custom arguments (gonzalo-radio)

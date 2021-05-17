@@ -6,7 +6,7 @@
                                                                   
 
 
-This is the README for JSON::Server version 0.01.
+This is the README for JSON::Server version 0.02.
 
 JSON::Server is a "module" for the Perl computer programming language, a
 library of computer code to install on a computer.  This document contains
@@ -26,8 +26,8 @@ four sections:
 
 JSON::Server - JSON-only server
 
-This sets up an internet socket through which JSON passes. Each JSON
-message should be followed by a zero byte.
+This sets up an internet socket through which JSON passes. Each
+complete JSON message must be followed by a zero byte.
 
 -----------------------------------------------------------------------------
 
@@ -59,11 +59,11 @@ If you have the App::cpanminus installer, you may prefer
 
     cpanm JSON::Server
 
-To install the module from the source file, JSON-Server-0.01.tar.gz, follow
+To install the module from the source file, JSON-Server-0.02.tar.gz, follow
 this sequence of commands:
 
-    tar xfz JSON-Server-0.01.tar.gz
-    cd JSON-Server-0.01
+    tar xfz JSON-Server-0.02.tar.gz
+    cd JSON-Server-0.02
     perl Makefile.PL
     make
     make install
@@ -88,6 +88,6 @@ repository on github at
 
 -----------------------------------------------------------------------------
 
-This README was written on Sun Feb 21 17:03:33 2021.
+This README was written on Wed May 12 12:04:55 2021.
 
 -----------------------------------------------------------------------------

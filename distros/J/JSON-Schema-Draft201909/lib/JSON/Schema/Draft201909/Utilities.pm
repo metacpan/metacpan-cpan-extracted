@@ -4,18 +4,18 @@ package JSON::Schema::Draft201909::Utilities;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Internal utilities for JSON::Schema::Draft201909
 
-our $VERSION = '0.026';
+our $VERSION = '0.027';
 
 use 5.016;
 no if "$]" >= 5.031009, feature => 'indirect';
 no if "$]" >= 5.033001, feature => 'multidimensional';
 no if "$]" >= 5.033006, feature => 'bareword_filehandles';
+use strictures 2;
 use B;
 use Carp 'croak';
 use JSON::MaybeXS 1.004001 'is_bool';
 use Ref::Util 0.100 qw(is_ref is_plain_arrayref is_plain_hashref);
 use Storable 'dclone';
-use strictures 2;
 use Feature::Compat::Try;
 use JSON::Schema::Draft201909::Error;
 use JSON::Schema::Draft201909::Annotation;
@@ -306,7 +306,7 @@ JSON::Schema::Draft201909::Utilities - Internal utilities for JSON::Schema::Draf
 
 =head1 VERSION
 
-version 0.026
+version 0.027
 
 =head1 SYNOPSIS
 

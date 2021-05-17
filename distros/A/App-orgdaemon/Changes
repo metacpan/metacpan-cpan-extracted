@@ -1,5 +1,12 @@
 Revision history for org-daemon.
 
+1.10	2021-05-16
+	- fix: correctly parse dates at beginning of a line
+	- suppress overeager utf8 warnings
+	- minor Pod fixes
+	- minor refactoring: stay_on_top
+	- ci work
+
 1.09	2017-12-26
 	- icon for alert toplevels
 	- warning fixes for perl < 5.12

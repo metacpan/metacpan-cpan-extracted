@@ -8,7 +8,7 @@ use File::Find;
 use File::Spec;
 use Data::Dumper;
 
-our $VERSION = '0.8000';
+our $VERSION = '0.8001';
 
 sub import {
 	my $class = shift;
@@ -152,10 +152,6 @@ EOF
 
 	sub Inline {
 		my (\$class, \$lang) = \@_;
-		if (\$lang ne 'C') {
-			warn "Warning: Inline hints not available for \$lang language\n";
-			return;
-		}
 		+{ map { (uc(\$_) => \$self->{\$_}) } qw(inc libs typemaps) };
 	}
 EOT
@@ -229,35 +225,21 @@ sub _quote_if_space { $_[0] =~ / / ? qq{"$_[0]"} : $_[0] }
 
 sub load_deps {
 	my $self = shift;
-	my @load = grep { not $self->{deps}{$_} } keys %{ $self->{deps} };
+	my @load = grep !$self->{deps}{$_}, keys %{ $self->{deps} };
+	my %in_load; @in_load{@load} = ();
 	foreach my $d (@load) {
-		my $dep = load ($d);
-		$self->{deps}{$d} = $dep;
-		if ($dep->{deps}) {
-			foreach my $childdep (@{ $dep->{deps} }) {
-				push @load, $childdep
-					unless
-						$self->{deps}{$childdep}
-					or
-						grep {$_ eq $childdep} @load;
-			}
-		}
+		$self->{deps}{$d} = my $dep = load($d);
+		my @new_deps = grep !($self->{deps}{$_} || exists $in_load{$_}),
+			@{ $dep->{deps} || [] };
+		push @load, @new_deps;
+		@in_load{@new_deps} = ();
 	}
 }
 
 sub uniquify {
 	my %seen;
-	# we use a seen hash, but also keep indices to preserve
-	# first-seen order.
-	my $i = 0;
-	foreach (@_) {
-		$seen{$_} = ++$i
-			unless exists $seen{$_};
-	}
-	#warn "stripped ".(@_ - (keys %seen))." redundant elements\n";
-	sort { $seen{$a} <=> $seen{$b} } keys %seen;
+	grep !$seen{$_}++, @_;
 }
-
 
 sub get_makefile_vars {
 	my $self = shift;
@@ -385,29 +367,6 @@ sub find_extra_libs {
 
 	return @found_libs;
 }
-
-# Hook into ExtUtils::MakeMaker to create an import library on MSWin32 when gcc
-# is used.  FIXME: Ideally, this should be done in EU::MM itself.
-package # wrap to fool the CPAN indexer
-	ExtUtils::MM;
-use Config;
-sub static_lib {
-	my $base = shift->SUPER::static_lib(@_);
-
-	return $base unless $^O =~ /MSWin32/ && $Config{cc} =~ /\bgcc\b/i;
-
-	my $DLLTOOL = $Config{'dlltool'} || 'dlltool';
-
-	return <<"__EOM__"
-# This isn't actually a static lib, it just has the same name on Win32.
-\$(INST_DYNAMIC_LIB): \$(INST_DYNAMIC)
-	$DLLTOOL --def \$(EXPORT_LIST) --output-lib \$\@ --dllname \$(DLBASE).\$(DLEXT) \$(INST_DYNAMIC)
-
-dynamic:: \$(INST_DYNAMIC_LIB)
-__EOM__
-}
-
-1;
 
 __END__
 

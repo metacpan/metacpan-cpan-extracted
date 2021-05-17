@@ -143,7 +143,7 @@ qx.Class.define("callbackery.ui.form.Auto", {
                     console.warn('Using callbackery.ui.form.VirtualSelectBox');
                     control = new callbackery.ui.form.VirtualSelectBox().set({
                         // defaults
-                        incrementalSearch : true,
+                        incrementalSearch : false,
                         highlightMode     : 'html',
                     });
                     this._boxCtrl[s.key] = control;

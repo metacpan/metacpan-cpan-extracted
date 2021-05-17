@@ -1,3 +1,5 @@
+1.5.2    xx.xx.2021
+            - change default order of adding callbacks in callback dispatcher to "BACK"
 1.5.1    19.04.2021
             - change MANIFEST.SKIP
 1.5.0    08.04.2021

@@ -1,9 +1,9 @@
 package BorderStyles::Standard;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-01-31'; # DATE
+our $DATE = '2021-02-19'; # DATE
 our $DIST = 'BorderStyles-Standard'; # DIST
-our $VERSION = '0.005'; # VERSION
+our $VERSION = '0.006'; # VERSION
 
 1;
 # ABSTRACT: A standard collection of border styles
@@ -20,7 +20,7 @@ BorderStyles::Standard - A standard collection of border styles
 
 =head1 VERSION
 
-This document describes version 0.005 of BorderStyles::Standard (from Perl distribution BorderStyles-Standard), released on 2021-01-31.
+This document describes version 0.006 of BorderStyles::Standard (from Perl distribution BorderStyles-Standard), released on 2021-02-19.
 
 =head1 BORDER STYLES
 

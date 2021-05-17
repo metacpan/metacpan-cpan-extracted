@@ -1,5 +1,9 @@
 Revision history for PICA::Data
 
+1.20 2021-05-12T15:27:58Z
+    - Implement record sorting (#59)
+    - Refactor PPXML writer (#84)
+
 1.19 2021-05-10T13:22:39Z
     - picadata: get schema via URL (#77)
     - Treat occurrence zero equal to none (#88)

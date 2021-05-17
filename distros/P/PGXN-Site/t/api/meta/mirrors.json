@@ -1,6 +1,6 @@
 [
    {
-      "uri": "http://pgxn.depesz.com/",
+      "uri": "https://pgxn.depesz.com/",
       "frequency": "every 6 hours",
       "location": "Nürnberg, Germany",
       "organization": "depesz Software",
@@ -12,7 +12,7 @@
       "notes": "access via http only"
    },
    {
-      "uri": "http://www.postgres-support.ch/pgxn/",
+      "uri": "https://www.postgres-support.ch/pgxn/",
       "frequency": "hourly",
       "location": "Basel, Switzerland, Europe",
       "organization": "micro systems",

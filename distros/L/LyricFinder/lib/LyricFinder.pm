@@ -34,7 +34,7 @@ use warnings;
 
 use vars qw(@ISA @EXPORT $VERSION);
 
-our $VERSION = '1.01';
+our $VERSION = '1.03';
 our $AGENT = "Mozilla/5.0 (X11; Linux x86_64; rv:80.0) Gecko/20100101 Firefox/80.0";
 our @FETCHERS = ();
 our $DEBUG = 0; # If you want debug messages, set debug to a true value, and
@@ -45,7 +45,7 @@ require Exporter;
 @ISA = qw(Exporter);
 @EXPORT = qw($AGENT $VERSION);
 
-my @supported_mods = (qw(ApiLyricsOvh AZLyrics Genius Musixmatch Cache));
+my @supported_mods = (qw(ApiLyricsOvh AZLyrics Genius Letras Musixmatch Cache));
 
 my %haveit;
 
@@ -145,7 +145,7 @@ sub cache {
 }
 
 sub fetch {
-	my ($self, $artist, $title, $fetcherspec) = @_;
+	my ($self, $artist, $title, $fetcherspec, $limit) = @_;
 
 	my @tryfetchers;
 	$self->{'Tried'} = '';
@@ -190,6 +190,7 @@ sub fetch {
 		push @tryfetchers, @FETCHERS;
 	}
 	$self->{'Order'} = join(',', @tryfetchers);
+	$#tryfetchers = $limit - 1  if (defined($limit) && $limit > 0 && $limit < scalar(@tryfetchers));
 
 	return $self->_fetch($artist, $title, \@tryfetchers);
 }   # end of sub fetch.
@@ -361,24 +362,26 @@ groundwork for this module!
 LyricFinder accepts an artist name and song title, searches supported 
 lyrics sites for song lyrics, and, if found, returns them as a string.
 
-The supported and currently-installed modules are:  L<ApiLyricsOvh>  
-(for searching api.lyrics.ovh), L<AZLyrics> (www.azlyrics.com), 
-L<Genius> (genius.com), and L<Musixmatch> (www.musixmatch.com).  There is a 
+The supported and currently-installed modules are:  
+L<LyricFinder::ApiLyricsOvh> (for searching api.lyrics.ovh), 
+L<LyricFinder::AZLyrics> (www.azlyrics.com), L<LyricFinder::Genius> 
+(genius.com), L<LyricFinder::Letras> (www.letras.mus.br), and 
+L<LyricFinder::Musixmatch> (www.musixmatch.com).  There is a 
 special module for storing and / or fetching lyrics (.lrc) files already 
-stored locally, called L<Cache>.
+stored locally, called L<LyricFinder::Cache>.
 
 This module is derived from the (older) Lyrics::Fetcher collection of modules 
 by (c) 2007-2020 David Precious, but currently (as of December, 2020) supports 
 more lyric sites (4) and bundles all the supported site modules together here 
-(simply install this one module).  We have reworked the "Cache" module to cache 
-lyrics files by artist and song title on disk in the user's desired location.  
-LyricFinder is also truly object-oriented making interaction with the 
-user-facing methods and data easier and more streamlined.
+(simply install this one module).  We have reworked the "Cache" module to 
+cache lyrics files by artist and song title on disk in the user's desired 
+location.  LyricFinder is also truly object-oriented making interaction with 
+the user-facing methods and data easier and more streamlined.
 
 NOTE:  This module is used completely independent of any of those modules, 
 but the code is derived from them, as allowed by and the license and credits 
 are included here, as required by their open-source license.  It is capable 
-of being used as a drop-in replacement, but some function names and a few 
+of being used as a drop-in replacement, but some function names and 
 other code changes will be needed.
 
 We've also added methods to easily change the "user-agent" passed to the 
@@ -423,7 +426,7 @@ request via email or the CPAN bug system, or (for faster service), provide a
 Perl patch module / program source that can extract lyrics from that site and 
 I'll consider it!  The easiest way to do this is to take one of the existing 
 submodules, copy it to "LyricFinder::I<YOURSITE>.pm and modify it (and the POD 
-docs) to your specific site's needs, test it with sever Artist / Title 
+docs) to your specific site's needs, test it with several Artist / Title 
 combinations (see the "SYNOPSIS" code above), and send it to me 
 (That's what I do for new sites)!
 
@@ -578,7 +581,7 @@ the site with posting the lyrics on the site (if any) or an empty
 string, if none found.  NOTE:  The only site that supports this currently 
 is B<AZLyrics>.
 
-=item I<$string> = $finder->B<fetch>(I<$artist>, I<$title> [, I<$source> | I<\@sources>])
+=item I<$string> = $finder->B<fetch>(I<$artist>, I<$title> [, I<$source> | I<\@sources>] [, I<$limit>])
 
 Attempt to fetch the lyrics for the given artist and title.
 A single source site module can be specified as a string ($source) or multiple 
@@ -586,8 +589,12 @@ source modules, ie. [module1, module2...], or "random" or "Cache".
 Default:  "random" (search all available sites in random order until lyrics 
 found or all available sites have been searched).  This is the primary 
 method call, and the only one required (besides B<new>()) to be called to 
-obtain lyrics.
-
+obtain lyrics.  $limit (if specified) is an integer number to limit the max. 
+number of fetchers to try (normally used with $source = "random") to limit 
+the time needed to search for lyrics (before giving up).  If not specified, 
+zero, or higher than the number of installed fetchers, then all available 
+(installed) fetcher submodules (sites) will be tried (until one succefully 
+finds lyrics).
 
 "Cache" is a special value that limits searching to a specified lyrics 
 directory on one's local hard drive.  NOTE:  It should NOT be included in 

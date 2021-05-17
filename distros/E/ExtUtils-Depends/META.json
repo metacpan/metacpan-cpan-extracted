@@ -5,7 +5,7 @@
       "Gtk2-Perl Team <gtk-perl-list at gnome dot org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010",
    "keywords" : [
       "XS",
       "XS extensions",
@@ -39,7 +39,7 @@
       "configure" : {
          "requires" : {
             "Data::Dumper" : "0",
-            "ExtUtils::MakeMaker" : "0",
+            "ExtUtils::MakeMaker" : "7.44",
             "File::Spec" : "0",
             "IO::File" : "0"
          }
@@ -47,6 +47,7 @@
       "runtime" : {
          "requires" : {
             "Data::Dumper" : "0",
+            "ExtUtils::MakeMaker" : "7.44",
             "File::Spec" : "0",
             "IO::File" : "0",
             "perl" : "5.006"
@@ -75,6 +76,6 @@
       },
       "x_MailingList" : "https://mail.gnome.org/mailman/listinfo/gtk-perl-list"
    },
-   "version" : "0.8000",
+   "version" : "0.8001",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

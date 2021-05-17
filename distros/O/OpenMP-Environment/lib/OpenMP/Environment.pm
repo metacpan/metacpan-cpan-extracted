@@ -5,7 +5,7 @@ use warnings;
 
 use Validate::Tiny qw/filter is_in/;
 
-our $VERSION = q{1.0.4};
+our $VERSION = q{1.0.5};
 
 our @_OMP_VARS = (
     qw/OMP_CANCELLATION OMP_DISPLAY_ENV OMP_DEFAULT_DEVICE
@@ -460,7 +460,7 @@ Example 2; Managing a range of thread scales (useful for benchmarking, testing, 
   my $env = OpenMP::Environment->new;
 
   foreach my $i (1 2 4 8 16 32 64 128 256) {
-    $env->set_omp_num_threads($i); # Note: validated
+    $env->omp_num_threads($i); # Note: validated
     my $exit_code = system(qw{/path/to/my_prog_r --opt1 x --opt2 y});
      
     if ($exit_code == 0) {
@@ -478,13 +478,13 @@ to C<OMP_NUM_THREADS>.
   my $env = OpenMP::Environment->new;
 
   foreach my $i (1 2 4 8 16 32 64 128 256) {
-    $env->set_omp_num_threads($i); # Note: validated
+    $env->omp_num_threads($i); # Note: validated
     foreach my $sched (qw/static dynamic auto/) {
       # compute chunk size
       my $chunk = get_baby_ruth($i);
       
       # set schedule using prescribed format
-      $env->set_omp_schedule(qq{$sched;$chunk}); # Note: Not validated
+      $env->omp_schedule(qq{$sched;$chunk}); # Note: Not validated
       
       my $exit_code = system(qw{/path/to/my_prog_r --opt1 x --opt2 y});
        

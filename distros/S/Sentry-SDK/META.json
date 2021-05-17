@@ -39,13 +39,13 @@
          "requires" : {
             "Clone" : "0",
             "HTTP::Status" : "0",
-            "List::Util" : "0",
+            "List::Util" : "1.44",
             "Mojolicious" : "0",
             "Readonly" : "0",
             "Time::HiRes" : "0",
             "Try::Tiny" : "0",
             "UUID::Tiny" : "0",
-            "perl" : "v5.24.0"
+            "perl" : "v5.24.1"
          },
          "suggests" : {
             "Cpanel::JSON::XS" : "0",
@@ -76,13 +76,13 @@
          "web" : "https://github.com/heiseonline/perl-sentry-sdk"
       }
    },
-   "version" : "v1.0.8",
+   "version" : "v1.0.10",
    "x_contributors" : [
       "bsd <bsd@heise.de>",
       "pmb0 <2140915+pmb0@users.noreply.github.com>"
    ],
-   "x_generated_by_perl" : "v5.30.0",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.19",
+   "x_generated_by_perl" : "v5.33.6",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.25",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later",
    "x_static_install" : 1
 }

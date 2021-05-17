@@ -4,18 +4,18 @@ package JSON::Schema::Draft201909::Document;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: One JSON Schema document
 
-our $VERSION = '0.026';
+our $VERSION = '0.027';
 
 use 5.016;
 no if "$]" >= 5.031009, feature => 'indirect';
 no if "$]" >= 5.033001, feature => 'multidimensional';
 no if "$]" >= 5.033006, feature => 'bareword_filehandles';
+use strictures 2;
 use Mojo::URL;
 use Carp 'croak';
 use List::Util 1.29 'pairs';
 use Safe::Isa;
 use Moo;
-use strictures 2;
 use MooX::TypeTiny;
 use MooX::HandlesVia;
 use Types::Standard qw(InstanceOf HashRef Str Dict ArrayRef);
@@ -145,6 +145,7 @@ sub BUILD {
   my $state = $args->{_evaluator}->traverse($self->schema,
     { canonical_schema_uri => $self->canonical_uri->clone });
 
+  # if the schema identified a canonical uri for itself, it overrides the initial value
   $self->_set_canonical_uri($state->{canonical_schema_uri});
 
   if (@{$state->{errors}}) {
@@ -179,7 +180,7 @@ JSON::Schema::Draft201909::Document - One JSON Schema document
 
 =head1 VERSION
 
-version 0.026
+version 0.027
 
 =head1 SYNOPSIS
 

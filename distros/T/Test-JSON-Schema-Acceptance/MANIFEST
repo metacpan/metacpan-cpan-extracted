@@ -97,6 +97,7 @@ share/tests/draft2019-09/type.json
 share/tests/draft2019-09/unevaluatedItems.json
 share/tests/draft2019-09/unevaluatedProperties.json
 share/tests/draft2019-09/uniqueItems.json
+share/tests/draft2019-09/unknownKeyword.json
 share/tests/draft2020-12/additionalProperties.json
 share/tests/draft2020-12/allOf.json
 share/tests/draft2020-12/anchor.json
@@ -167,6 +168,7 @@ share/tests/draft2020-12/type.json
 share/tests/draft2020-12/unevaluatedItems.json
 share/tests/draft2020-12/unevaluatedProperties.json
 share/tests/draft2020-12/uniqueItems.json
+share/tests/draft2020-12/unknownKeyword.json
 share/tests/draft3/additionalItems.json
 share/tests/draft3/additionalProperties.json
 share/tests/draft3/default.json
@@ -301,6 +303,7 @@ share/tests/draft6/refRemote.json
 share/tests/draft6/required.json
 share/tests/draft6/type.json
 share/tests/draft6/uniqueItems.json
+share/tests/draft6/unknownKeyword.json
 share/tests/draft7/additionalItems.json
 share/tests/draft7/additionalProperties.json
 share/tests/draft7/allOf.json
@@ -362,6 +365,7 @@ share/tests/draft7/refRemote.json
 share/tests/draft7/required.json
 share/tests/draft7/type.json
 share/tests/draft7/uniqueItems.json
+share/tests/draft7/unknownKeyword.json
 t/00-report-prereqs.dd
 t/00-report-prereqs.t
 t/01-basic.t

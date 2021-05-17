@@ -1,0 +1,35 @@
+#include "Request.h"
+#include "Client.h"
+#include <ostream>
+
+namespace panda { namespace unievent { namespace http {
+
+bool default_ssl_verify = true;
+
+#define CHECK_SEND_CHUNK                                                                                \
+    if (_transfer_completed) throw HttpError("can't send chunk: request has already been transfered");  \
+    if (!_client) throw HttpError("can't send chunk: request is not active");
+    
+
+void Request::send_chunk (const string& chunk) {
+    CHECK_SEND_CHUNK;
+    _client->send_chunk(this, chunk);
+}
+
+void Request::send_final_chunk (const string& chunk) {
+    CHECK_SEND_CHUNK;
+    _client->send_final_chunk(this, chunk);
+}
+
+void Request::cancel (const ErrorCode& err) {
+    if (_client) _client->cancel(err);
+}
+
+std::ostream& operator<< (std::ostream& os, const NetLoc& h) {
+    os << h.host;
+    os << ":";
+    os << to_string(h.port);
+    return os;
+}
+
+}}}

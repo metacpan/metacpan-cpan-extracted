@@ -52,4 +52,9 @@ is_deparsed
    'notall {$_ > 10;} 1..10;',
    'notall {}';
 
+is_deparsed
+   sub { reduce { $a + $b } 1 .. 5 },
+   'reduce {$a + $b;} 1..5;',
+   'reduce {}';
+
 done_testing;

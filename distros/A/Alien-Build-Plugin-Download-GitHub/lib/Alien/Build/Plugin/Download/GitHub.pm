@@ -6,12 +6,13 @@ use 5.008001;
 use Carp qw( croak );
 use Path::Tiny qw( path );
 use JSON::PP qw( decode_json );
+use URI;
 use Alien::Build::Plugin;
 use Alien::Build::Plugin::Download::Negotiate;
 use Alien::Build::Plugin::Extract::Negotiate;
 
 # ABSTRACT: Alien::Build plugin to download from GitHub
-our $VERSION = '0.06'; # VERSION
+our $VERSION = '0.07'; # VERSION
 
 
 has github_user => sub { croak("github_user is required") };
@@ -20,6 +21,8 @@ has include_assets => 0;
 has version => qr/^v?(.*)$/;
 has prefer => 0;
 has tags_only => 0;
+
+my $once = 1;
 
 sub init
 {
@@ -41,11 +44,61 @@ sub init
     format  => 'tar.gz',
   );
 
+  my %gh_fetch_options;
+  my $secret;
+
+  foreach my $name (qw( ALIEN_BUILD_GITHUB_TOKEN GITHUB_TOKEN GITHUB_PAT ))
+  {
+    if(defined $ENV{$name})
+    {
+      if(eval { Alien::Build->VERSION("2.39") })
+      {
+        $secret = $ENV{$name};
+        push @{ $gh_fetch_options{http_headers} }, Authorization => "token $secret";
+        Alien::Build->log("using the GitHub Personal Access Token in $name") if $once;
+        $once = 0;
+      }
+      else
+      {
+        if($once)
+        {
+          Alien::Build->log("You seem to have a GitHub Personal Access Token stored in $name.");
+          Alien::Build->log("Unfortunately, the version of Alien::Build you have doesn't support");
+          Alien::Build->log("sending http headers so I can't use it.  Please upgrade to Alien::Build");
+          Alien::Build->log("2.39 or better.");
+          $once = 1;
+        }
+      }
+      last;
+    }
+  }
+
   $meta->around_hook(
     fetch => sub {
       my $orig = shift;
-      my($build, $url) = @_;
-      my $res = $orig->($build, $url);
+      my($build, $url, @the_rest) = @_;
+
+      # only do special stuff when talking to GitHub API.  In particular, this
+      # avoids leaking the PAT (if specified) to other servers.
+      return $orig->($build, $url, @the_rest)
+        unless do {
+          my $uri = URI->new($url || $build->meta_prop->{start_url});
+          $uri->host eq 'api.github.com' && $uri->scheme eq 'https';
+        };
+
+      # Temporarily patch the log method so that we don't log the PAT
+      my $log = \&Alien::Build::log;
+      no warnings 'redefine';
+      local *Alien::Build::log = sub {
+        if(defined $secret)
+        {
+          $_[1] =~ s/\Q$secret\E/ '#' x length($secret) /eg;
+        }
+        goto &$log;
+      };
+      use warnings;
+
+      my $res = $orig->($build, $url, @the_rest, %gh_fetch_options);
       if($res->{type} eq 'file' && $res->{filename} =~ qr{^(?:releases|tags)$})
       {
         my $rel;
@@ -124,7 +177,7 @@ Alien::Build::Plugin::Download::GitHub - Alien::Build plugin to download from Gi
 
 =head1 VERSION
 
-version 0.06
+version 0.07
 
 =head1 SYNOPSIS
 
@@ -135,7 +188,7 @@ version 0.06
  share {
  
    plugin 'Download::GitHub' => (
-     github_user => 'Perl5-Alien',
+     github_user => 'PerlAlien',
      github_repo => 'dontpanic',
    );
  
@@ -216,12 +269,58 @@ GitHub repositories.  This is the default.
 
 =back
 
+=head1 ENVIRONMENT
+
+=over 4
+
+=item ALIEN_BUILD_GITHUB_TOKEN GITHUB_TOKEN GITHUB_PAT
+
+If one of these environment variables are set, then the GitHub API Personal
+Access Token (PAT) will be used when connecting to the GitHub API.
+
+For security reasons, the PAT will be removed from the log.  Some Fetch plugins
+(for example the C<curl> plugin) will log HTTP requests headers so this will
+make sure that your PAT is not displayed in the log.
+
+=back
+
 =head1 CAVEATS
 
-The GitHub API is rate limited.  The unauthenticated API is especially so.  This may
-render this plugin inoperative for a short time after only a little testing.  Please see
+The GitHub API is rate limited.  Once you've reach that limit, this plugin will be 
+inoperative for a period of time until the limits reset.  When using the GitHub
+API unauthenticated the limit is especially low.  This is usually not a problem when
+used in production where you only need to use the API once for each L<Alien>, but
+it can become a problem when testing an L<Alien> that uses this plugin in CI or via
+cpantesters.  In this situation you can set the C<ALIEN_BUILD_GITHUB_TOKEN> environment
+variable (or commonly used but unofficial C<GITHUB_TOKEN> or C<GITHUB_PAT>), and this
+plugin will use that in making API requests.  If you are using GitHub Actions for CI,
+then you can use the C<secrets.GITHUB_TOKEN> macro to get a PAT.
 
-L<https://github.com/Perl5-Alien/Alien-Build-Plugin-Download-GitHub/issues/3>
+If you do this it is recommended that you make some precautions where possible:
+
+=over 4
+
+=item Limit permissions
+
+Create a PAT with the bare minimum access permissions.  Consider creating a
+separate GitHub account without access to anything, and use it to generate the PAT.
+
+=item Limit scope of usage
+
+The PAT is only needed (if it is needed at all) during the build stage
+of a share install.  If you are doing this in GitHub Actions you can
+just set the environment variable for that stage:
+
+ perl Makefile.PL
+ env ALIEN_BUILD_GITHUB_TOKEN=${{ secrets.GITHUB_TOKEN }} make
+ make test
+
+Or if you are using L<Dist::Zilla>
+
+ dzil listdeps --missing | cpanm -n
+ env ALIEN_BUILD_GITHUB_TOKEN=${{ secrets.GITHUB_TOKEN }} dzil test
+
+=back
 
 =head1 AUTHOR
 

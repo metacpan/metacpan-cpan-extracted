@@ -1,14 +1,14 @@
 package WordList::ID::ColorName::PERLANCAR;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-12-27'; # DATE
+our $DATE = '2021-02-02'; # DATE
 our $DIST = 'WordList-ID-ColorName-PERLANCAR'; # DIST
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.003'; # VERSION
 
 use WordList;
 our @ISA = qw(WordList);
 
-our %STATS = ("num_words_contains_whitespace",4,"num_words_contains_unicode",0,"longest_word_len",12,"avg_word_len",6.25,"num_words",28,"num_words_contain_nonword_chars",5,"shortest_word_len",3,"num_words_contain_whitespace",4,"num_words_contain_unicode",0,"num_words_contains_nonword_chars",5); # STATS
+our %STATS = ("num_words",28,"num_words_contains_nonword_chars",5,"num_words_contain_nonword_chars",5,"longest_word_len",12,"num_words_contain_unicode",0,"avg_word_len",6.25,"shortest_word_len",3,"num_words_contain_whitespace",4,"num_words_contains_whitespace",4,"num_words_contains_unicode",0); # STATS
 
 1;
 # ABSTRACT: List of color names in Indonesian
@@ -23,7 +23,7 @@ WordList::ID::ColorName::PERLANCAR - List of color names in Indonesian
 
 =head1 VERSION
 
-This document describes version 0.002 of WordList::ID::ColorName::PERLANCAR (from Perl distribution WordList-ID-ColorName-PERLANCAR), released on 2020-12-27.
+This document describes version 0.003 of WordList::ID::ColorName::PERLANCAR (from Perl distribution WordList-ID-ColorName-PERLANCAR), released on 2021-02-02.
 
 =head1 SYNOPSIS
 
@@ -102,13 +102,15 @@ feature.
 Other WordList::ID::ColorName::* modules, e.g.
 L<WordList::ID::ColorName::HTML_ID>.
 
+L<hangman> from L<Games::Hangman>
+
 =head1 AUTHOR
 
 perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2020 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

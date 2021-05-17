@@ -6,6 +6,8 @@ pod_spelling_system:
   stopwords:
     # australian spelling.
     - localised
+    - BRAINBUZ
+    - Karr
 
 pod_coverage:
   skip: 0

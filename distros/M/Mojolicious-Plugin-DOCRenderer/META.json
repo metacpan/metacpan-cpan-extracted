@@ -4,13 +4,13 @@
       "Viliam Pucik <viliam.pucik@gmail.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "artistic_2"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Mojolicious-Plugin-DOCRenderer",
    "no_index" : {
@@ -33,7 +33,7 @@
       },
       "runtime" : {
          "requires" : {
-            "Mojolicious" : "7.43",
+            "Mojolicious" : "9.17",
             "perl" : "5.010001"
          }
       }
@@ -53,6 +53,6 @@
          "web" : "https://github.com/viliampucik/Mojolicious-Plugin-DocRenderer"
       }
    },
-   "version" : "5.01",
-   "x_serialization_backend" : "JSON::PP version 2.27400_02"
+   "version" : "5.02",
+   "x_serialization_backend" : "JSON::PP version 4.04"
 }

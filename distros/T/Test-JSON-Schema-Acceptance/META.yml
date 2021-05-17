@@ -39,7 +39,7 @@ no_index:
 provides:
   Test::JSON::Schema::Acceptance:
     file: lib/Test/JSON/Schema/Acceptance.pm
-    version: '1.007'
+    version: '1.008'
 requires:
   Feature::Compat::Try: '0'
   File::ShareDir: '0'
@@ -54,6 +54,7 @@ requires:
   Test2::Tools::Compare: '0'
   Types::Common::Numeric: '0'
   Types::Standard: '1.010002'
+  constant: '0'
   if: '0'
   namespace::clean: '0'
   perl: '5.016'
@@ -64,10 +65,10 @@ resources:
   bugtracker: https://github.com/karenetheridge/Test-JSON-Schema-Acceptance/issues
   homepage: https://github.com/karenetheridge/Test-JSON-Schema-Acceptance
   repository: https://github.com/karenetheridge/Test-JSON-Schema-Acceptance.git
-version: '1.007'
+version: '1.008'
 x_Dist_Zilla:
   perl:
-    version: '5.033008'
+    version: '5.033009'
   plugins:
     -
       class: Dist::Zilla::Plugin::Run::BeforeBuild
@@ -206,7 +207,7 @@ x_Dist_Zilla:
           Module::Metadata: '1.000037'
           version: '0.006'
       name: '@Author::ETHER/InstallGuide'
-      version: '1.200013'
+      version: '1.200014'
     -
       class: Dist::Zilla::Plugin::Test::Compile
       config:
@@ -351,79 +352,79 @@ x_Dist_Zilla:
             -
               class: Pod::Weaver::Plugin::EnsurePod5
               name: '@Author::ETHER/EnsurePod5'
-              version: '4.016'
+              version: '4.017'
             -
               class: Pod::Weaver::Plugin::H1Nester
               name: '@Author::ETHER/H1Nester'
-              version: '4.016'
+              version: '4.017'
             -
               class: Pod::Weaver::Plugin::SingleEncoding
               name: '@Author::ETHER/SingleEncoding'
-              version: '4.016'
+              version: '4.017'
             -
               class: Pod::Weaver::Plugin::Transformer
               name: '@Author::ETHER/List'
-              version: '4.016'
+              version: '4.017'
             -
               class: Pod::Weaver::Plugin::Transformer
               name: '@Author::ETHER/Verbatim'
-              version: '4.016'
+              version: '4.017'
             -
               class: Pod::Weaver::Section::Region
               name: '@Author::ETHER/header'
-              version: '4.016'
+              version: '4.017'
             -
               class: Pod::Weaver::Section::Name
               name: '@Author::ETHER/Name'
-              version: '4.016'
+              version: '4.017'
             -
               class: Pod::Weaver::Section::Version
               name: '@Author::ETHER/Version'
-              version: '4.016'
+              version: '4.017'
             -
               class: Pod::Weaver::Section::Region
               name: '@Author::ETHER/prelude'
-              version: '4.016'
+              version: '4.017'
             -
               class: Pod::Weaver::Section::Generic
               name: SYNOPSIS
-              version: '4.016'
+              version: '4.017'
             -
               class: Pod::Weaver::Section::Generic
               name: DESCRIPTION
-              version: '4.016'
+              version: '4.017'
             -
               class: Pod::Weaver::Section::Generic
               name: OVERVIEW
-              version: '4.016'
+              version: '4.017'
             -
               class: Pod::Weaver::Section::Collect
               name: ATTRIBUTES
-              version: '4.016'
+              version: '4.017'
             -
               class: Pod::Weaver::Section::Collect
               name: METHODS
-              version: '4.016'
+              version: '4.017'
             -
               class: Pod::Weaver::Section::Collect
               name: FUNCTIONS
-              version: '4.016'
+              version: '4.017'
             -
               class: Pod::Weaver::Section::Collect
               name: TYPES
-              version: '4.016'
+              version: '4.017'
             -
               class: Pod::Weaver::Section::Leftovers
               name: '@Author::ETHER/Leftovers'
-              version: '4.016'
+              version: '4.017'
             -
               class: Pod::Weaver::Section::Region
               name: '@Author::ETHER/postlude'
-              version: '4.016'
+              version: '4.017'
             -
               class: Pod::Weaver::Section::GenerateSection
               name: '@Author::ETHER/generate SUPPORT'
-              version: '4.016'
+              version: '4.017'
             -
               class: Pod::Weaver::Section::AllowOverride
               name: '@Author::ETHER/allow override SUPPORT'
@@ -431,7 +432,7 @@ x_Dist_Zilla:
             -
               class: Pod::Weaver::Section::Authors
               name: '@Author::ETHER/Authors'
-              version: '4.016'
+              version: '4.017'
             -
               class: Pod::Weaver::Section::AllowOverride
               name: '@Author::ETHER/allow override AUTHOR'
@@ -443,11 +444,11 @@ x_Dist_Zilla:
             -
               class: Pod::Weaver::Section::Legal
               name: '@Author::ETHER/Legal'
-              version: '4.016'
+              version: '4.017'
             -
               class: Pod::Weaver::Section::Region
               name: '@Author::ETHER/footer'
-              version: '4.016'
+              version: '4.017'
       name: '@Author::ETHER/PodWeaver'
       version: '4.008'
     -
@@ -529,7 +530,7 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::Git::Contributors
       config:
         Dist::Zilla::Plugin::Git::Contributors:
-          git_version: 2.30.2
+          git_version: 2.31.1
           include_authors: 0
           include_releaser: 1
           order_by: commits
@@ -596,7 +597,7 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::EnsureLatestPerl
       config:
         Dist::Zilla::Plugin::EnsureLatestPerl:
-          Module::CoreList: '5.20210320'
+          Module::CoreList: '5.20210420'
       name: '@Author::ETHER/EnsureLatestPerl'
       version: '0.008'
     -
@@ -621,7 +622,7 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.30.2
+          git_version: 2.31.1
           repo_root: .
       name: '@Author::ETHER/initial check'
       version: '2.047'
@@ -629,7 +630,7 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::Git::CheckFor::MergeConflicts
       config:
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.30.2
+          git_version: 2.31.1
           repo_root: .
       name: '@Author::ETHER/Git::CheckFor::MergeConflicts'
       version: '0.014'
@@ -637,7 +638,7 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::Git::CheckFor::CorrectBranch
       config:
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.30.2
+          git_version: 2.31.1
           repo_root: .
       name: '@Author::ETHER/Git::CheckFor::CorrectBranch'
       version: '0.014'
@@ -663,7 +664,7 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.30.2
+          git_version: 2.31.1
           repo_root: .
       name: '@Author::ETHER/after tests'
       version: '2.047'
@@ -747,7 +748,7 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.30.2
+          git_version: 2.31.1
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -760,11 +761,11 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v1.007
+          tag: v1.008
           tag_format: v%V
           tag_message: v%v%t
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.30.2
+          git_version: 2.31.1
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -801,7 +802,7 @@ x_Dist_Zilla:
             - (?^:^lib/.*\.pm$)
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.30.2
+          git_version: 2.31.1
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -823,7 +824,7 @@ x_Dist_Zilla:
             - origin
           remotes_must_exist: 1
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.30.2
+          git_version: 2.31.1
           repo_root: .
       name: '@Author::ETHER/Git::Push'
       version: '2.047'
@@ -945,7 +946,7 @@ x_authority: cpan:RELEQUEST
 x_contributors:
   - 'Karen Etheridge <ether@cpan.org>'
   - 'Daniel Perrett <dp13@sanger.ac.uk>'
-x_generated_by_perl: v5.33.8
+x_generated_by_perl: v5.33.9
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: MIT
 x_static_install: 0

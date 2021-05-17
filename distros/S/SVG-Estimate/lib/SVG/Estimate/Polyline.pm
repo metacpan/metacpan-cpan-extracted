@@ -1,5 +1,5 @@
 package SVG::Estimate::Polyline;
-$SVG::Estimate::Polyline::VERSION = '1.0115';
+$SVG::Estimate::Polyline::VERSION = '1.0116';
 use Moo;
 use Clone qw/clone/;
 use List::Util qw/pairs/;
@@ -13,7 +13,7 @@ SVG::Estimate::Polyline - Handles estimating multi-part lines.
 
 =head1 VERSION
 
-version 1.0115
+version 1.0116
 
 =head1 SYNOPSIS
 

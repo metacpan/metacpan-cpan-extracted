@@ -3,7 +3,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Provide access to hundreds of possible chord progressions
 
-our $VERSION = '0.0103';
+our $VERSION = '0.0108';
 
 use strict;
 use warnings;
@@ -15,8 +15,10 @@ use File::ShareDir qw(dist_dir);
 
 sub as_file {
     my $file = eval { dist_dir('Data-Dataset-ChordProgressions') . '/Chord-Progressions.csv' };
+
     $file = 'share/Chord-Progressions.csv'
         unless $file && -e $file;
+
     return $file;
 }
 
@@ -75,7 +77,7 @@ Data::Dataset::ChordProgressions - Provide access to hundreds of possible chord 
 
 =head1 VERSION
 
-version 0.0103
+version 0.0108
 
 =head1 SYNOPSIS
 
@@ -98,11 +100,15 @@ Each of these is divided into a C<type> of progression, depending on
 song position.  Take these types with a grain of salt.  They may or
 may not be meaningful...
 
-Each of these is a list of possible chord progressions by named chords
-and by Roman numeral notation.
-
 The named chords are meant to match the known chords of
-L<Music::Chord::Note> (listed in the source).
+L<Music::Chord::Note> (listed in the source of that module).
+
+There are a few odd chord "progressions" like
+C<"Eb7-Eb7-Eb7-Eb7","III-III-III-III">.  Strange...
+
+I stumbled across this list, saved it on my hard-drive for a long
+time, and then forgot where it came from!  Also the documentation in
+this list said nothing about who made it or how.
 
 =head1 FUNCTIONS
 

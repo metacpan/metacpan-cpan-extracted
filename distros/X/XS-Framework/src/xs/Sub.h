@@ -8,10 +8,13 @@ namespace xs {
 using xs::my_perl;
 
 struct Sub : Sv {
-    static Sub create (panda::string_view code);
+    static Sub create (panda::string_view code); // create sub by evaling perl code
+    static Sub create (XSUBADDR_t);              // create anon XSub
 
     static Sub noinc (SV* val) { return Sub(val, NONE); }
     static Sub noinc (CV* val) { return Sub(val, NONE); }
+
+    static Sub clone_anon_xsub (const Sub&);
 
     Sub (std::nullptr_t = nullptr) {}
     Sub (SV* sv, bool policy = INCREMENT) : Sv(sv, policy) { _validate(); }

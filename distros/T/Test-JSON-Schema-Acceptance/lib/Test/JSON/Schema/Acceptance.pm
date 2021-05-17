@@ -1,10 +1,10 @@
 use strict;
 use warnings;
-package Test::JSON::Schema::Acceptance; # git description: v1.006-7-ge481571
+package Test::JSON::Schema::Acceptance; # git description: v1.007-9-g5251850
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Acceptance testing for JSON-Schema based validators like JSON::Schema
 
-our $VERSION = '1.007';
+our $VERSION = '1.008';
 
 use 5.016;
 no if "$]" >= 5.031009, feature => 'indirect';
@@ -31,16 +31,26 @@ has specification => (
   isa => Str,
   lazy => 1,
   default => 'draft2020-12',
-  predicate => '_has_specification',
 );
+
+# specification version => metaschema URI
+use constant METASCHEMA => {
+  'draft2020-12'  => 'https://json-schema.org/draft/2020-12/schema',
+  'draft2019-09'  => 'https://json-schema.org/draft/2019-09/schema',
+  'draft7'        => 'http://json-schema.org/draft-07/schema#',
+  'draft6'        => 'http://json-schema.org/draft-06/schema#',
+  'draft4'        => 'http://json-schema.org/draft-04/schema#',
+};
 
 has test_dir => (
   is => 'ro',
   isa => InstanceOf['Path::Tiny'],
   coerce => sub { path($_[0])->absolute('.') },
   lazy => 1,
-  default => sub { path(dist_dir('Test-JSON-Schema-Acceptance'), 'tests', $_[0]->specification) },
+  builder => '_build_test_dir',
+  predicate => '_has_test_dir',
 );
+sub _build_test_dir { path(dist_dir('Test-JSON-Schema-Acceptance'), 'tests', $_[0]->specification) };
 
 has additional_resources => (
   is => 'ro',
@@ -68,6 +78,11 @@ has skip_dir => (
   coerce => sub { ref($_[0]) ? $_[0] : [ $_[0] ] },
   lazy => 1,
   default => sub { [] },
+);
+
+has test_schemas => (
+  is => 'ro',
+  isa => Bool,
 );
 
 has results => (
@@ -150,6 +165,33 @@ sub acceptance {
           (ref $options->{tests}{group_description} eq 'ARRAY'
             ? @{$options->{tests}{group_description}} : $options->{tests}{group_description});
 
+      my $todo;
+      $todo = Test2::Todo->new(reason => 'Test marked TODO via "todo_tests"')
+        if $options->{todo_tests}
+          and any {
+            my $o = $_;
+            (not $o->{file} or grep $_ eq $one_file->{file}, (ref $o->{file} eq 'ARRAY' ? @{$o->{file}} : $o->{file}))
+              and
+            (not $o->{group_description} or grep $_ eq $test_group->{description}, (ref $o->{group_description} eq 'ARRAY' ? @{$o->{group_description}} : $o->{group_description}))
+              and not $o->{test_description}
+          }
+          @{$options->{todo_tests}};
+
+      if ($self->test_schemas) {
+        die 'specification_version unknown: cannot evaluate schema against metaschema'
+          if not $self->specification;
+
+        my $metaspec_uri = METASCHEMA->{$self->specification};
+        my $result = $options->{validate_data}
+          ? $options->{validate_data}->($metaspec_uri, $test_group->{schema})
+          # we use the decoder here so we don't prettify the string
+          : $options->{validate_json_string}->($metaspec_uri, $self->_json_decoder->encode($test_group->{schema}));
+        if (not $result) {
+          $ctx->fail('schema for '.$one_file->{file}.': "'.$test_group->{description}.'" fails to validate against '.$metaspec_uri.':');
+          $ctx->note($self->_json_encoder->encode($result));
+        }
+      }
+
       foreach my $test (@{$test_group->{tests}}) {
         next if $options->{tests} and $options->{tests}{test_description}
           and not grep $_ eq $test->{description},
@@ -189,7 +231,7 @@ sub acceptance {
   $ctx->$diag("\n\n".$self->results_text);
   $ctx->$diag('');
 
-  if ($self->test_dir !~ /optional/
+  if ($self->test_dir !~ m{\boptional\b}
       and grep +($_->{file} !~ m{^optional/} && $_->{todo_fail} + $_->{fail}), @results) {
     # non-optional test failures will always be visible, even when not in verbose mode.
     $ctx->diag('WARNING: some non-optional tests are failing! This implementation is not fully compliant with the specification!');
@@ -223,6 +265,7 @@ sub _run_test {
 
         $result = $options->{validate_data}
           ? $options->{validate_data}->($test_group->{schema}, $test->{data})
+            # we use the decoder here so we don't prettify the string
           : $options->{validate_json_string}->($test_group->{schema}, $self->_json_decoder->encode($test->{data}));
 
         {
@@ -271,6 +314,18 @@ has _json_decoder => (
   isa => HasMethods[qw(encode decode)],
   lazy => 1,
   default => sub { JSON::MaybeXS->new(allow_nonref => 1, utf8 => 1) },
+);
+
+# used for pretty-printing diagnostics
+has _json_encoder => (
+  is => 'ro',
+  isa => HasMethods['encode'],
+  lazy => 1,
+  default => sub {
+    my $encoder = shift->_json_decoder->convert_blessed->canonical->pretty;
+    $encoder->indent_length(2) if $encoder->can('indent_length');
+    $encoder;
+  },
 );
 
 # see JSON::MaybeXS::is_bool
@@ -339,11 +394,20 @@ sub _build_results_text {
     push @lines, 'with commit '.$commit;
     push @lines, 'from '.$url.':';
   }
-  if ($self->_has_specification) {
-    push @lines, 'specification version: '.$self->specification;
+
+  my $test_dir = $self->test_dir;
+  my $orig_dir = $self->_build_test_dir;
+  if ($test_dir ne $orig_dir) {
+    if ($orig_dir->subsumes($test_dir)) {
+      $test_dir = '<base test directory>/'.substr($test_dir, length($orig_dir)+1);
+    }
+    elsif (Path::Tiny->cwd->subsumes($test_dir)) {
+      $test_dir = $test_dir->relative;
+    }
+    push @lines, 'using custom test directory: '.$test_dir;
   }
   else {
-    push @lines, 'using custom test directory: '.$self->test_dir;
+    push @lines, 'specification version: '.$self->specification;
   }
   push @lines, 'optional tests included: '.($self->include_optional ? 'yes' : 'no');
   push @lines, map 'skipping directory: '.$_, @{ $self->skip_dir };
@@ -379,7 +443,7 @@ Test::JSON::Schema::Acceptance - Acceptance testing for JSON-Schema based valida
 
 =head1 VERSION
 
-version 1.007
+version 1.008
 
 =head1 SYNOPSIS
 
@@ -522,6 +586,47 @@ Optional. Pass a string or arrayref consisting of relative path name(s) to indic
 skipped. Note that this is only useful currently with C<include_optional => 1>, as otherwise all
 subdirectories would be skipped anyway.
 
+=head2 results
+
+After calling L</acceptance>, a list of test results are provided here. It is an arrayref of
+hashrefs with four keys:
+
+=over 4
+
+=item *
+
+file - the filename
+
+=item *
+
+pass - the number of pass results for that file
+
+=item *
+
+todo_fail - the number of fail results for that file that were marked TODO
+
+=item *
+
+fail - the number of fail results for that file (not including TODO tests)
+
+=back
+
+=head2 results_text
+
+After calling L</acceptance>, a text string tabulating the test results are provided here. This is
+the same table that is printed at the end of the test run.
+
+=head2 test_schemas
+
+=for stopwords metaschema
+
+Optional. A boolean that, when true, will test every schema against its
+specification metaschema. (When set, C<specification> must also be set.)
+
+This normally should not be set as the official test suite has already been
+sanity-tested, but you may want to set this in development environments if you
+are using your own test files.
+
 =head1 SUBROUTINES/METHODS
 
 =head2 acceptance
@@ -614,36 +719,6 @@ the same hashref structure as L</tests> above, which are ORed together.
     { file => 'boolean_schema.json', test_description => 'array is invalid' },
     # .. etc
   ]
-
-=head2 results
-
-After calling L</acceptance>, a list of test results are provided here. It is an arrayref of
-hashrefs with four keys:
-
-=over 4
-
-=item *
-
-file - the filename
-
-=item *
-
-pass - the number of pass results for that file
-
-=item *
-
-todo_fail - the number of fail results for that file that were marked TODO
-
-=item *
-
-fail - the number of fail results for that file (not including TODO tests)
-
-=back
-
-=head2 results_text
-
-After calling L</acceptance>, a text string tabulating the test results are provided here. This is
-the same table that is printed at the end of the test run.
 
 =head1 ACKNOWLEDGEMENTS
 

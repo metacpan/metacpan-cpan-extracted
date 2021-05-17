@@ -1,0 +1,22 @@
+#include <xs/export.h>
+
+MODULE = UniEvent::HTTP                PACKAGE = UniEvent::HTTP
+PROTOTYPES: DISABLE
+
+BOOT {
+    Stash s(__PACKAGE__);
+    
+    Stash ecstash("UniEvent::HTTP::Error", GV_ADD);
+    xs::exp::create_constants(ecstash, {
+        {"connect_error",       xs::out(make_error_code(errc::connect_error))},
+        {"no_redirect_uri",     xs::out(make_error_code(errc::no_redirect_uri))},
+        {"redirection_limit",   xs::out(make_error_code(errc::redirection_limit))},
+        {"unexpected_redirect", xs::out(make_error_code(errc::unexpected_redirect))},
+        {"transfer_aborted",    xs::out(make_error_code(errc::transfer_aborted))},
+        {"server_stopping",     xs::out(make_error_code(errc::server_stopping))},
+        {"pipeline_canceled",   xs::out(make_error_code(errc::pipeline_canceled))},
+    });
+    xs::exp::autoexport(ecstash);
+    
+    s.add_const_sub("error_category", xs::out<const std::error_category*>(&error_category));
+}

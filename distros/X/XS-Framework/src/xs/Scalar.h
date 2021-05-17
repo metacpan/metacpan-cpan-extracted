@@ -87,11 +87,11 @@ struct Scalar : Sv {
     static void __at_perl_destroy ();
 
 private:
+    void _validate_rest();
+
     void _validate () {
-        if (!sv) return;
-        if (is_scalar_unsafe()) return;
-        reset();
-        throw std::invalid_argument("SV is not a scalar value");
+        if (!sv || SvTYPE(sv) <= SVt_PVMG || SvTYPE(sv) == SVt_PVGV) return;
+        _validate_rest();
     }
 };
 

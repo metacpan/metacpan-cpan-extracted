@@ -1,0 +1,107 @@
+=head1 NAME
+
+UniEvent::HTTP::UserAgent - non blocking HTTP user agent
+
+=head1 SYNOPSIS
+
+    my $ua = UniEvent::HTTP::UserAgent->new;
+    my $uri = 'https://crazypanda.ru';
+    my $next; $next = sub {
+        $ua->request({
+            uri               => $uri,
+            response_callback => sub {
+                my (undef, $res, $err) = @_;
+                die $err if $err;
+                my $body = say $response->body;
+                # extract somehow next link
+                $uri = ...;
+                $next = undef unless $uri;
+            },
+        });
+    };
+    $next->(), UE::Loop->default->run while $uri;
+
+
+    my $saved_cookies = $ua->to_string;
+    # save cookies to file or database, and load them later
+
+    my $ua = UniEvent::HTTP::UserAgent->new({
+        serialized => $saved_cookies,
+        identity   => 'my-identity',
+    });
+
+
+
+=head1 DESCRIPTION
+
+The user agent binds together low-level http request L<API|UniEvent::HTTP::Client>
+and L<Protocol::HTTP::CookieJar>. That way it is possible to do proper browser-like
+navigation on the Web, correcly handling cookie on transitions between pages including
+redirects.
+
+In other words with UserAgent it possible to have web browsing sessions which
+outlive perl process by persisting session (L<Protocol::HTTP::CookieJar>) on
+a storage, or examining or modifying intermediate cookies.
+
+=head1 METHODS
+
+=head2 new(\%config, [$loop = default])
+
+Creates new UserAgent object which will use C<$loop> L<UniEvent::Loop>.
+
+C<%config> includes:
+
+=over
+
+=item serialized
+
+String of the previously serialized L<Protocol::HTTP::CookieJar>.
+
+=item identity
+
+How to identity UserAgent to the remote server. The default is something like
+
+    Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/47.0.2526.111 Safari/537.36 UniEvent-HTTP/1.0
+
+=item ssl_ctx
+
+SSL context, see L<Net::SSLeay> and L<UniEvent::Stream/"use_ssl">.
+
+=item proxy
+
+The uri of proxy for making http requests. Currenlty, only socks-proxy is supported
+
+=back
+
+=head2 request($uri [, $context_uri = $uri, $top_level = true])
+
+Make a request to the specified C<$uri>, possibly injecting the required cookies from the stored sesssion.
+
+See L<Protocol::HTTP::CookieJar/"populate"> for the meaning of C<$context_uri> and C<$top_level>.
+
+L<UniEvent::HTTP::Client> is returned.
+
+=head2 to_string([$include_session = false])
+
+Helper method to stringify current CookieJar. See L<Protocol::HTTP::CookieJar/"to_string"> for details.
+
+=head2 identity([$string])
+
+Get/set UserAgent identity.
+
+=head2 proxy([$uri])
+
+Get/set proxy uri, see L<URI::XS>.
+
+=head2 ssl_ctx([$value])
+
+Get/set ssl context, see L<Net::SSLeay> and L<UniEvent::Stream/"use_ssl">.
+
+=head2 cookie_jar([$value])
+
+Get/set CookieJar.
+
+Return assiciated L<Protocol::HTTP::CookieJar> object. It is possible to examine, query and modify
+current cookies via this object.
+
+=cut

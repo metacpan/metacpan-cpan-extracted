@@ -1,6 +1,6 @@
 package Mail::BIMI::Prelude;
 # ABSTRACT: Setup system wide prelude
-our $VERSION = '3.20210301'; # VERSION
+our $VERSION = '3.20210512'; # VERSION
 use 5.20.0;
 use strict;
 use warnings;
@@ -37,7 +37,7 @@ Mail::BIMI::Prelude - Setup system wide prelude
 
 =head1 VERSION
 
-version 3.20210301
+version 3.20210512
 
 =head1 DESCRIPTION
 

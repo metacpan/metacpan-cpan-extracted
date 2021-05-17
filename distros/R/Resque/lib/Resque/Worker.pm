@@ -1,6 +1,6 @@
 package Resque::Worker;
 # ABSTRACT: Does the hard work of babysitting Resque::Job's
-$Resque::Worker::VERSION = '0.38';
+$Resque::Worker::VERSION = '0.41';
 use Moose;
 with 'Resque::Encoder';
 
@@ -45,13 +45,17 @@ has verbose   => ( is => 'rw', default => sub {0} );
 
 has cant_fork => ( is => 'rw', default => sub {0} );
 
+has cant_poll => ( is => 'rw', default => sub {0} );
+
 has child    => ( is => 'rw' );
 
 has shutdown => ( is => 'rw', default => sub{0} );
 
 has paused   => ( is => 'rw', default => sub{0} );
 
-has interval => ( is => 'rw', default => sub{5} );
+has interval => ( is => 'rw', lazy => 1, default => sub{5} );
+
+has timeout => ( is => 'rw', default => sub{30} );
 
 has autoconfig => ( is => 'rw', predicate => 'has_autoconfig' );
 
@@ -78,7 +82,7 @@ sub work {
             $self->log("Got job $job");
             $self->work_tick($job);
         }
-        elsif( $self->interval ) {
+        elsif( !$self->cant_poll && $self->interval ) {
             unless ( $waiting ) {
                 my $status = $self->paused ? "Paused" : 'Waiting for ' . join( ', ', @{$self->queues} );
                 $self->procline( $status );
@@ -174,12 +178,16 @@ sub del_queue {
 
 sub reserve {
     my $self = shift;
-    my $count = 0;
-    for my $queue ( @{$self->queues} ) {
-        if ( my $job = $self->resque->pop($queue) ) {
-            return $job;
+
+    if ( $self->cant_poll ) {
+        return $self->resque->blpop($self->queues, $self->timeout);
+    }
+    else {
+        for my $queue ( @{$self->queues} ) {
+            if ( my $job = $self->resque->pop($queue) ) {
+                return $job;
+            }
         }
-        return if ++$count == @{$self->queues};
     }
 }
 
@@ -415,7 +423,7 @@ Resque::Worker - Does the hard work of babysitting Resque::Job's
 
 =head1 VERSION
 
-version 0.38
+version 0.41
 
 =head1 ATTRIBUTES
 
@@ -451,6 +459,13 @@ By default, the worker will fork the job out and control the
 children process. This make the worker more resilient to
 memory leaks.
 
+=head2 cant_poll
+
+Set it to a true value to stop this worker from polling for jobs and
+use experimental blocking pop instead.
+
+See timeout().
+
 =head2 child
 
 PID of current running child.
@@ -466,6 +481,13 @@ When true, this worker won't proccess more jobs till false.
 =head2 interval
 
 Float representing the polling frequency. The default is 5 seconds, but for a semi-active app you may want to use a smaller value.
+
+=head2 timeout
+
+Integer representing the blocking timeout. The default is not to block but to poll queues (see inverval),
+so this attribute will be completely ignored unless dont_poll().
+The default is 30 seconds. Setting it to 0 will make reserve() to block until some job is assigned to this
+workers and will prevent autoconfig() to be called until it happen.
 
 =head2 autoconfig
 

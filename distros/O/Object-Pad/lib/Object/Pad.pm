@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2019-2020 -- leonerd@leonerd.org.uk
 
-package Object::Pad 0.37;
+package Object::Pad 0.38;
 
 use v5.14;
 use warnings;
@@ -21,6 +21,8 @@ if( $] >= 5.020 ) {
 }
 
 require mro;
+
+require Object::Pad::MOP::Class;
 
 =head1 NAME
 

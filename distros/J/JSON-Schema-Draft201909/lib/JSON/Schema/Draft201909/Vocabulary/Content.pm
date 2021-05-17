@@ -4,16 +4,16 @@ package JSON::Schema::Draft201909::Vocabulary::Content;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Implementation of the JSON Schema Draft 2019-09 Content vocabulary
 
-our $VERSION = '0.026';
+our $VERSION = '0.027';
 
 use 5.016;
 no if "$]" >= 5.031009, feature => 'indirect';
 no if "$]" >= 5.033001, feature => 'multidimensional';
 no if "$]" >= 5.033006, feature => 'bareword_filehandles';
+use strictures 2;
 use Storable 'dclone';
 use JSON::Schema::Draft201909::Utilities qw(is_type A assert_keyword_type);
 use Moo;
-use strictures 2;
 use namespace::clean;
 
 with 'JSON::Schema::Draft201909::Vocabulary';
@@ -73,7 +73,7 @@ JSON::Schema::Draft201909::Vocabulary::Content - Implementation of the JSON Sche
 
 =head1 VERSION
 
-version 0.026
+version 0.027
 
 =head1 DESCRIPTION
 

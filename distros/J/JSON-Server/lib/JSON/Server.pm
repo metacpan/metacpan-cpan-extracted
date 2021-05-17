@@ -3,11 +3,11 @@ use warnings;
 use strict;
 use Carp;
 use utf8;
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 use IO::Socket;
 use IO::Select;
-use JSON::Create '0.30_04', ':all';
+use JSON::Create '0.34', ':all';
 use JSON::Parse '0.61', ':all';
 
 $SIG{PIPE} = sub {
@@ -103,7 +103,13 @@ sub serve
 		my $max = 1000;
 		while (! defined $data || length ($data) == $max) {
 		    $data = '';
-		    $fh->recv ($data, $max);
+		    my $recv_ret = $fh->recv ($data, $max);
+		    if (! defined $recv_ret) {
+			if ($gs->{verbose}) {
+			    vmsg ("recv had an error $@");
+			}
+			last;
+		    }
 		    $got .= $data;
 		    if ($got =~ s/\x{00}$//) {
 			last;
@@ -119,7 +125,10 @@ sub serve
 		vmsg ("Received " . length ($got) . " bytes of data");
 	    }
 	    if (length ($got) == 0) {
-		next;
+		if ($gs->{verbose}) {
+		    vmsg ("Connection was closed");
+		}
+		return;
 	    }
 	    if (! valid_json ($got)) {
 		if ($gs->{verbose}) {
@@ -179,6 +188,9 @@ sub respond
 	$gs->reply ($fh, {error => "Handler crashed: $@"});
 	return;
     }
+    if ($gs->{verbose}) {
+	vmsg ("Replying");
+    }
     $gs->reply ($fh, $reply);
 }
 
@@ -186,16 +198,25 @@ sub reply
 {
     my ($gs, $fh, $msg) = @_;
     my $json_msg = $gs->{jc}->create ($msg);
+    if ($gs->{verbose}) {
+	vmsg ("Sending $json_msg");
+    }
     $json_msg .= chr (0);
     my $sent = $fh->send ($json_msg);
     if (! defined $sent) {
 	warn "Error sending: $@\n";
+    }
+    if ($gs->{verbose}) {
+	vmsg ("Sent");
     }
 }
 
 sub JSON::Server::close
 {
     my ($gs, $fh) = @_;
+    if ($gs->{verbose}) {
+	vmsg ("Closing connection");
+    }
     $fh->close ();
 }
 

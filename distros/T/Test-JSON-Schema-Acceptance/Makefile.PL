@@ -37,6 +37,7 @@ my %WriteMakefileArgs = (
     "Test2::Tools::Compare" => 0,
     "Types::Common::Numeric" => 0,
     "Types::Standard" => "1.010002",
+    "constant" => 0,
     "if" => 0,
     "namespace::clean" => 0,
     "strict" => 0,
@@ -59,7 +60,7 @@ my %WriteMakefileArgs = (
     "open" => 0,
     "utf8" => 0
   },
-  "VERSION" => "1.007",
+  "VERSION" => "1.008",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -90,6 +91,7 @@ my %FallbackPrereqs = (
   "Test::Warnings" => 0,
   "Types::Common::Numeric" => 0,
   "Types::Standard" => "1.010002",
+  "constant" => 0,
   "feature" => 0,
   "if" => 0,
   "lib" => 0,

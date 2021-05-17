@@ -1,0 +1,56 @@
+#include "http.h"
+
+namespace panda { namespace unievent { namespace http {
+
+static thread_local struct {
+    LoopSP sync_loop;
+    bool   busy = false;
+} tls;
+
+struct BusyGuard {
+    BusyGuard (bool* busy) : busy(busy) {
+        if (*busy) throw panda::exception("recursive syncronous http request detected");
+        *busy = true;
+    }
+    ~BusyGuard () { *busy = false; }
+private:
+    bool* busy;
+};
+
+static thread_local Pool* sync_pool;
+
+expected<ResponseSP, ErrorCode> http_request_sync (const RequestSP& req) {
+    auto pool = sync_pool;
+    if (!pool) {
+        tls.sync_loop = new Loop();
+        pool = sync_pool = Pool::instance(tls.sync_loop);
+    }
+    
+    BusyGuard busy_guard(&tls.busy);
+    
+    expected<ResponseSP, ErrorCode> ret;
+    req->response_event.add([&ret](auto&, auto& res, auto& err) {
+        if (err) ret = make_unexpected(err);
+        else     ret = res;
+    });
+    
+    auto loop = pool->loop();
+    // catch all EOFs from timed out keep-alive connections, otherwise current request may catch false-positive EOF
+    if (!pool->empty()) loop->run(Loop::RunMode::NOWAIT_FORCE);
+    pool->request(req);
+    loop->run(); // ue-http must have no event leaks or run() will never complete
+    
+    return ret;
+}
+
+void http_get (const URISP& uri, const Request::response_fn& cb, const LoopSP& loop) {
+    auto req = Request::Builder().uri(uri).method(Request::Method::Get).response_callback(cb).build();
+    http_request(req, loop);
+}
+
+expected<ResponseSP, ErrorCode> http_get (const URISP& uri) {
+    auto req = Request::Builder().uri(uri).method(Request::Method::Get).build();
+    return http_request_sync(req);
+}
+
+}}}

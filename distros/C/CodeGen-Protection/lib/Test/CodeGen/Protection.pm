@@ -65,7 +65,7 @@ Test::CodeGen::Protection - Test functions for generated files
 
 =head1 VERSION
 
-version 0.05
+version 0.06
 
 =head2 C<is_protected_document_ok($format, $code, $message)>
 

@@ -1,13 +1,138 @@
+MODE: INLINE
+
+namespace {
+    static OP* pp_padsv_proxy (pTHX) {
+        return PL_ppaddr[OP_PADSV](aTHX);
+    }
+    
+    // adds "return unless defined $weak_ref" perl code to the top of subroutine
+    static void add_weak_ref_check (const Sub& sub, PADOFFSET i) {
+        auto root = CvROOT(sub);
+        if (root->op_type != OP_LEAVESUB) throw "bad closure";
+        auto lineseq = cUNOPx(root)->op_first;
+        if (lineseq->op_type != OP_LINESEQ) throw "bad closure";
+        
+        OP* orig_start = CvSTART(sub);
+
+        // return if this CV has already been injected
+        if (orig_start->op_ppaddr == pp_padsv_proxy) return;
+        
+        // check if we've already done this on another CVs with the same proto
+        auto check_op = cLISTOPx(lineseq)->op_first;
+        if (check_op && check_op->op_type == OP_NULL) {
+            check_op = cUNOPx(check_op)->op_first;
+            if (check_op->op_type == OP_OR) {
+                check_op = cLISTOPx(check_op)->op_first;
+                if (check_op && check_op->op_type == OP_DEFINED) {
+                    check_op = cUNOPx(check_op)->op_first;
+                    if (check_op->op_ppaddr == pp_padsv_proxy) {
+                        CvSTART(sub) = check_op;
+                        return;
+                    }
+                }
+            }
+        }
+        
+        /* We're creating here the optree and insert it into the beginning
+         * 
+            5    or LOGOP(0x560e863d99d0) ===> 6 [nextstate 0x560e863d9df8]
+                 PARENT ===> 7 [null 0x560e863d9998]
+                 FLAGS = (VOID,KIDS,SLABBED)
+                 PRIVATE = (0x1)
+                 OTHER ===> 8 [pushmark 0x560e863d9ab8]
+                 |
+            4    +--defined UNOP(0x560e863d9a10) ===> 5 [or 0x560e863d99d0]
+                 |   FLAGS = (SCALAR,KIDS,SLABBED,MORESIB)
+                 |   PRIVATE = (0x1)
+                 |   |
+            2    |   +--padsv OP(0x560e863d9a48) ===> 4 [defined 0x560e863d9a10]
+                 |       TARG = 1
+                 |       FLAGS = (SCALAR,SLABBED)
+                 |
+            9    +--return LISTOP(0x560e863d9a78) ===> 6 [nextstate 0x560e863d9df8]
+                     FLAGS = (UNKNOWN,KIDS,SLABBED)
+                     |
+            8        +--pushmark OP(0x560e863d9ab8) ===> 9 [return 0x560e863d9a78]
+                         FLAGS = (SCALAR,SLABBED)
+        */
+        
+        auto old_PL_compcv = PL_compcv;
+        PL_compcv = sub; // older perls require compilation context during OP creation
+        
+        OP* op_pushmark = newOP(OP_PUSHMARK, 0);
+        OP* op_return = newLISTOP(OP_RETURN, 0, op_pushmark, nullptr);
+        op_pushmark->op_next = op_return;
+        
+        OP* op_padsv = newOP(OP_PADSV, 0);
+        op_padsv->op_targ = i; // set correct index in padlist
+        op_padsv->op_ppaddr = pp_padsv_proxy; // for marking that we've already done this
+        OP* op_defined = newUNOP(OP_DEFINED, 0, op_padsv);
+        op_padsv->op_next = op_defined;
+        
+        OP* op_null = newLOGOP(OP_OR, OPf_WANT_VOID, op_defined, op_return);
+        OP* op_or = cUNOPx(op_null)->op_first;
+        
+        op_defined->op_next = op_or;
+        op_or->op_next = orig_start; // this is the true case
+        op_return->op_next = orig_start; // doesnt matter what next
+        cLOGOPx(op_or)->op_other = op_pushmark; // this is the false case
+
+        // add the whole generated tree to OP_LINESEQ (our top-op is op_null). It is not required for execution, but required for correct
+        // work of op_free and also debug modules like B::Concise and others.
+        op_sibling_splice(lineseq, NULL, 0, op_null);
+        
+        CvSTART(sub) = op_padsv; // set new entry op
+        
+        PL_compcv = old_PL_compcv; // restore orig value
+    }
+}
+
+
 MODULE = XS::Framework                PACKAGE = XS::Framework::CallbackDispatcher
 PROTOTYPES: DISABLE
 
-void XSCallbackDispatcher::add (Sub cv, bool back = false)
+void XSCallbackDispatcher::add (Sub cv)
 
-void XSCallbackDispatcher::add_back (Sub cv)
+void XSCallbackDispatcher::add_weak (Ref ref, Sub sub) {
+    if (!sub) throw "callback must be defined";
+    if (!ref) throw "data to weaken must be defined";
+    
+    auto refval = ref.value();
+    SV** varptr = nullptr;
+    auto padlist = CvPADLIST(sub);
+    PADOFFSET i;
+    if (padlist) {
+        SV** vars = AvARRAY(PadlistARRAY(padlist)[1]);
+        auto padlist_names = PadlistNAMES(padlist);
+        auto pnames = PadnamelistARRAY(padlist_names);
+        for (i = 1; i <= PadnamelistMAX(padlist_names); ++i) {
+            auto padname = pnames[i];
+            if (!padname || !PadnamePV(padname) || !PadnameOUTER(padname)) continue;
+            auto var = vars[i];
+            if (SvROK(var) && SvRV(var) == refval) {
+                varptr = &vars[i];
+                break;
+            }
+        }
+    }
+    if (!varptr) throw "passed argument is not captured by subroutine";
+    
+    if (SvWEAKREF(*varptr)) XSRETURN_EMPTY;
 
-void XSCallbackDispatcher::add_event_listener (Sub cv, bool back = false)
+    SvREFCNT_dec_NN(*varptr);
+    *varptr = newRV(ref.value());
+    sv_rvweaken(*varptr);
+    
+    add_weak_ref_check(sub, i);
+    
+    THIS->add(sub);
+}
 
-void XSCallbackDispatcher::add_event_listener_back (Sub cv)
+void XSCallbackDispatcher::prepend (Sub cv)
+
+void XSCallbackDispatcher::add_event_listener (Sub cv)
+
+void XSCallbackDispatcher::prepend_event_listener (Sub cv)
 
 void XSCallbackDispatcher::remove (Sub cv)
 

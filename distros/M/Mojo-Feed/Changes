@@ -1,5 +1,10 @@
 Revision history for Perl extension Mojo-Feed
 
+0.21 2021-05-12T21:26:08Z
+
+    - Remove *guid* attribute
+    - Remove use of Mojo::IOLoop::Delay from tests and examples (thanks Slaven Rezić!)
+
 0.20 2020-07-23T15:09:18Z
 
     - Added *entries* attribute as an alias for *items*

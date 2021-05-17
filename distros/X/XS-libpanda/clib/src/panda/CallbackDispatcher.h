@@ -73,31 +73,32 @@ public:
         }
     };
 
-    void add_event_listener (const Callback& callback, bool back = false) {
+    void add_event_listener (const Callback& callback, bool back = true) {
         if (!callback) return;
         if (back) listeners.push_back(Wrapper(callback));
         else      listeners.push_front(Wrapper(callback));
     }
 
-    void add_event_listener (Callback&& callback, bool back = false) {
+    void add_event_listener (Callback&& callback, bool back = true) {
         if (!callback) return;
         if (back) listeners.push_back(Wrapper(std::forward<Callback>(callback)));
         else      listeners.push_front(Wrapper(std::forward<Callback>(callback)));
     }
 
-    void add (const SimpleCallback& callback, bool back = false) {
+    void add (const SimpleCallback& callback, bool back = true) {
         if (!callback) return;
         if (back) listeners.push_back(Wrapper(callback));
         else      listeners.push_front(Wrapper(callback));
     }
 
-    void add (SimpleCallback&& callback, bool back = false) {
+    void add (SimpleCallback&& callback, bool back = true) {
         if (!callback) return;
         if (back) listeners.push_back(Wrapper(std::forward<SimpleCallback>(callback)));
         else      listeners.push_front(Wrapper(std::forward<SimpleCallback>(callback)));
     }
 
-    template <class T> void add_back (T&& callback) { add(std::forward<T>(callback), true); }
+    template <class T> void prepend_event_listener (T&& callback) { add_event_listener(std::forward<T>(callback), false); }
+    template <class T> void prepend                (T&& callback) { add(std::forward<T>(callback), false); }
 
     auto operator() (add_const_ref_t<Args>... args) -> decltype(std::declval<Wrapper>()(std::declval<Event&>(), args...)) {
         auto iter = listeners.begin();

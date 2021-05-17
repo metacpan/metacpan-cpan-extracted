@@ -1,5 +1,8 @@
 Revision history for HTTP-Message
 
+6.31      2021-05-11 18:07:37Z
+    - Fix test writing to files (GH#156) (Michal Josef Špaček)
+
 6.30      2021-05-10 14:55:55Z
     - Don't inherit from Exporter anymore (GH#155) (Max Maischein)
     - Remove superfluous Perl version requirement. This module requires Perl

@@ -210,6 +210,8 @@ The L<CallBackery::Command::shell> sets the userId to C<__SHELL>. If a
 plugin should be configurable interactively it must allow access to
 the C<__SHELL> user.
 
+checkAccess can also return a promise or be an async method
+
 =cut
 
 has checkAccess => sub {

@@ -1,0 +1,20 @@
+0.004   2021-05-15  Released-By: PERLANCAR; Urgency: low
+
+	- No functional changes.
+
+	- [doc] Fix example in Synopsis.
+
+
+0.003   2021-01-31  Released-By: PERLANCAR; Urgency: medium
+
+        - Rename module/dist Log::ger::{Plugin,Format}::HashArgs.
+
+
+0.002   2020-03-11  Released-By: PERLANCAR; Urgency: medium
+
+	- Bump v to 2 to comply to Log::ger 0.037.
+
+
+0.001    2020-03-09  Released-By: PERLANCAR
+
+         - First release.

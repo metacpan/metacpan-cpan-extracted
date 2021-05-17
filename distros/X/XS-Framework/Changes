@@ -1,3 +1,9 @@
+1.4.1  15.05.2021
+           - change default order of callbacks in callback dispatcher, normalize method names
+1.4.0  13.05.2021
+           - support magical scalars
+           - support PVLV in scalars & simples
+           - add add_weak() to callback dispatcher
 1.3.4  08.04.2021
            - wrapper for perl exceptions
            - function typemap now support threads in threaded perl (typemap-in should be used with caution)

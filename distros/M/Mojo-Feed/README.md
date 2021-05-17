@@ -23,18 +23,18 @@ Mojo::Feed - Mojo::DOM-based parsing of RSS & Atom feeds
 
 # DESCRIPTION
 
-[Mojo::Feed](https://metacpan.org/pod/Mojo%3A%3AFeed) is an Object Oriented module for identifying,
+[Mojo::Feed](https://metacpan.org/pod/Mojo::Feed) is an Object Oriented module for identifying,
 fetching and parsing RSS and Atom Feeds.  It relies on
-[Mojo::DOM](https://metacpan.org/pod/Mojo%3A%3ADOM) for XML/HTML parsing. Date parsing is done with [HTTP::Date](https://metacpan.org/pod/HTTP%3A%3ADate).
+[Mojo::DOM](https://metacpan.org/pod/Mojo::DOM) for XML/HTML parsing. Date parsing is done with [HTTP::Date](https://metacpan.org/pod/HTTP::Date).
 
-[Mojo::Feed](https://metacpan.org/pod/Mojo%3A%3AFeed) represents the parsed RSS/Atom feed; you can construct it
+[Mojo::Feed](https://metacpan.org/pod/Mojo::Feed) represents the parsed RSS/Atom feed; you can construct it
 by setting an XML string as the `body` attribute, by setting the `file` or `url`
-attributes to a [Mojo::File](https://metacpan.org/pod/Mojo%3A%3AFile) or [Mojo::URL](https://metacpan.org/pod/Mojo%3A%3AURL) respectively, or by using a
-[Mojo::Feed::Reader](https://metacpan.org/pod/Mojo%3A%3AFeed%3A%3AReader) object.
+attributes to a [Mojo::File](https://metacpan.org/pod/Mojo::File) or [Mojo::URL](https://metacpan.org/pod/Mojo::URL) respectively, or by using a
+[Mojo::Feed::Reader](https://metacpan.org/pod/Mojo::Feed::Reader) object.
 
 # ATTRIBUTES
 
-[Mojo::Feed](https://metacpan.org/pod/Mojo%3A%3AFeed) implements the following attributes.
+[Mojo::Feed](https://metacpan.org/pod/Mojo::Feed) implements the following attributes.
 
 ## body
 
@@ -42,11 +42,11 @@ The original decoded string of the feed.
 
 ## dom
 
-The parsed feed as [Mojo::DOM](https://metacpan.org/pod/Mojo%3A%3ADOM) object.
+The parsed feed as [Mojo::DOM](https://metacpan.org/pod/Mojo::DOM) object.
 
 ## source
 
-The source of the feed; either a [Mojo::File](https://metacpan.org/pod/Mojo%3A%3AFile) or [Mojo::URL](https://metacpan.org/pod/Mojo%3A%3AURL) object, or
+The source of the feed; either a [Mojo::File](https://metacpan.org/pod/Mojo::File) or [Mojo::URL](https://metacpan.org/pod/Mojo::URL) object, or
 undef if the feed source was a string.
 
 ## title
@@ -63,7 +63,7 @@ Web page URL associated with the feed
 
 ## items
 
-[Mojo::Collection](https://metacpan.org/pod/Mojo%3A%3ACollection) of [Mojo::Feed::Item](https://metacpan.org/pod/Mojo%3A%3AFeed%3A%3AItem) objects representing feed news items
+[Mojo::Collection](https://metacpan.org/pod/Mojo::Collection) of [Mojo::Feed::Item](https://metacpan.org/pod/Mojo::Feed::Item) objects representing feed news items
 
 ## entries
 
@@ -83,12 +83,12 @@ Time in epoch seconds (may be filled with pubDate, dc:date, created, issued, upd
 
 ## url
 
-A [Mojo::URL](https://metacpan.org/pod/Mojo%3A%3AURL) object from which to load the file. If set, it will set `source`. The `url` attribute
+A [Mojo::URL](https://metacpan.org/pod/Mojo::URL) object from which to load the file. If set, it will set `source`. The `url` attribute
 may change when the feed is loaded if the user agent receives a redirect.
 
 ## file
 
-A [Mojo::File](https://metacpan.org/pod/Mojo%3A%3AFile) object from which to read the file. If set, it will set `source`.
+A [Mojo::File](https://metacpan.org/pod/Mojo::File) object from which to read the file. If set, it will set `source`.
 
 ## is\_valid
 
@@ -100,15 +100,15 @@ Detect type of feed - returns one of "RSS 1.0", "RSS 2.0", "Atom 0.3", "Atom 1.0
 
 # METHODS
 
-[Mojo::Feed](https://metacpan.org/pod/Mojo%3A%3AFeed) inherits all methods from
-[Mojo::Base](https://metacpan.org/pod/Mojo%3A%3ABase) and implements the following new ones.
+[Mojo::Feed](https://metacpan.org/pod/Mojo::Feed) inherits all methods from
+[Mojo::Base](https://metacpan.org/pod/Mojo::Base) and implements the following new ones.
 
 ## new
 
     my $feed = Mojo::Feed->new;
     my $feed = Mojo::Feed->new( body => $string);
 
-Construct a new [Mojo::Feed](https://metacpan.org/pod/Mojo%3A%3AFeed) object.
+Construct a new [Mojo::Feed](https://metacpan.org/pod/Mojo::Feed) object.
 
 ## to\_hash
 
@@ -136,7 +136,7 @@ Dotan Dimet
 
 Mario Domgoergen
 
-Some tests adapted from [Feed::Find](https://metacpan.org/pod/Feed%3A%3AFind) and [XML:Feed](XML:Feed), Feed auto-discovery adapted from [Feed::Find](https://metacpan.org/pod/Feed%3A%3AFind).
+Some tests adapted from [Feed::Find](https://metacpan.org/pod/Feed::Find) and [XML:Feed](XML:Feed), Feed auto-discovery adapted from [Feed::Find](https://metacpan.org/pod/Feed::Find).
 
 # COPYRIGHT AND LICENSE
 

@@ -1,5 +1,9 @@
 Changelog for Catmandu-PICA
 
+1.04 2021-05-17T08:55:01Z
+  - Update PICA::Data dependency, fixes #11
+  - Refactor importer and exporter
+
 1.03 2020-07-14T10:48:48Z
  - Fix Unicode bug, require PICA::Data 1.12
 

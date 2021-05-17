@@ -6,7 +6,7 @@ use Moo;
 use Carp 'croak';
 with qw(CodeGen::Protection::Role);
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 sub _tidy {
     my ( $self, $code ) = @_;
@@ -66,7 +66,7 @@ CodeGen::Protection::Format::Perl - Safely rewrite parts of Perl documents
 
 =head1 VERSION
 
-version 0.05
+version 0.06
 
 =head1 SYNOPSIS
 

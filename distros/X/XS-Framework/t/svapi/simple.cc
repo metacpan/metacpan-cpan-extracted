@@ -397,4 +397,26 @@ TEST_CASE("Simple", "[Simple]") {
             REQUIRE(o.at(0) == '1');
         }
     }
+
+    SECTION("LV") {
+        auto lv = SvREFCNT_inc(SvRV(eval_pv("\\substr('suka', 1, 2)", 1)));
+
+        SECTION("detached to a value") {
+            auto val = Simple(lv);
+            CHECK(SvTYPE(val.get()) != SVt_PVLV);
+            CHECK(val.as_string() == "uk");
+        }
+        SECTION("refcnt") {
+            auto rcnt = SvREFCNT(lv);
+            auto val = Simple(lv);
+            CHECK(SvREFCNT(lv) == rcnt);
+
+            SvREFCNT_inc(lv);
+            rcnt = SvREFCNT(lv);
+            auto val2 = Simple::noinc(lv);
+            CHECK(SvREFCNT(lv) == rcnt - 1);
+        }
+
+        SvREFCNT_dec(lv);
+    }
 }

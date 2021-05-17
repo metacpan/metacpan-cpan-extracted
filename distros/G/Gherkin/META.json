@@ -52,7 +52,7 @@
          "web" : "https://github.com/cucumber/gherkin-perl"
       }
    },
-   "version" : "18.1.1",
+   "version" : "19.0.1",
    "x_generated_by_perl" : "v5.30.0",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.25",
    "x_spdx_expression" : "MIT"

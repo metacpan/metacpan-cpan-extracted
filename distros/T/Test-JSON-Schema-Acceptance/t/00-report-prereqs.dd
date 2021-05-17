@@ -51,6 +51,7 @@ do { my $x = {
                                       'Test2::Tools::Compare' => '0',
                                       'Types::Common::Numeric' => '0',
                                       'Types::Standard' => '1.010002',
+                                      'constant' => '0',
                                       'if' => '0',
                                       'namespace::clean' => '0',
                                       'perl' => '5.016',

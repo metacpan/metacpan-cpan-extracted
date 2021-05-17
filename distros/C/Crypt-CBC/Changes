@@ -1,4 +1,7 @@
 Revision history for Perl extension Crypt::CBC.
+3.04	 Mon 17 May 2021 10:58:37 AM EDT
+        - Fixed bug involving manually-specified IV not being used in some circumstances.
+	
 3.03    Sun 18 Apr 2021 10:54:19 PM EDT
 	- Fixed bug which caused an extraneous block of garbage data to be appended to encrypted
 	  string when "nopadding" specified and plaintext is even multiple of blocksize.

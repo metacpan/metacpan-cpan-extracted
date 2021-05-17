@@ -155,11 +155,9 @@ clib/tests/tcp/connect.cc
 clib/tests/tcp/ssl.cc
 clib/tests/timer.cc
 clib/tests/util.cc
-clib/tests/var/77518-412776091/file
-clib/tests/var/77649-412776091/file
-clib/tests/var/77713-412776091/file
 clib/tests/var/streamer/fout.txt
 clib/tests/work.cc
+clib/unievent-config.cmake
 examples/ca.key
 examples/ca.pem
 examples/crafted-http-get.plx

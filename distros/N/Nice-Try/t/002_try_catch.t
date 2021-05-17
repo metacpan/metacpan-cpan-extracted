@@ -1,11 +1,12 @@
 # -*- perl -*-
-
-use strict;
-use warnings;
-
-use Test::More qw( no_plan );
-
-use Nice::Try;
+BEGIN
+{
+    use strict;
+    use warnings;
+    use Test::More qw( no_plan );
+    use Nice::Try;
+    # use Nice::Try debug => 6, debug_file => './dev/debug_try_catch.pl', debug_code => 1;
+};
 
 # Credits to Steve Scaffidi for his test suit
 

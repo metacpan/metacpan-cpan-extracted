@@ -50,7 +50,6 @@ lib/CallBackery/qooxdoo/callbackery/source/class/callbackery/ui/form/renderer/No
 lib/CallBackery/qooxdoo/callbackery/source/class/callbackery/ui/form/UploadButton.js
 lib/CallBackery/qooxdoo/callbackery/source/class/callbackery/ui/form/UploadToolbarButton.js
 lib/CallBackery/qooxdoo/callbackery/source/class/callbackery/ui/form/VirtualSelectBox.js
-lib/CallBackery/qooxdoo/callbackery/source/class/callbackery/ui/form/SearchField.js
 lib/CallBackery/qooxdoo/callbackery/source/class/callbackery/ui/Header.js
 lib/CallBackery/qooxdoo/callbackery/source/class/callbackery/ui/__init__.js
 lib/CallBackery/qooxdoo/callbackery/source/class/callbackery/ui/Login.js

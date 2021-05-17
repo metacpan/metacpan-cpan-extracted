@@ -70,7 +70,7 @@ subtest 'lib with name like libname-1-2___.dll' => sub {
 };
 
 
-sub p ($)
+sub p
 {
   my($path) = @_;
   $path =~ s{/}{\\}g if $^O eq 'MSWin32';
@@ -90,9 +90,9 @@ subtest '_cmp' => sub {
   is(
     $process->(qw( foo-1.dll bar-2.dll baz-0.dll )),
     [
-      [ 'bar', p 'C:/bin/bar-2.dll', 2 ],
-      [ 'baz', p 'C:/bin/baz-0.dll', 0 ],
-      [ 'foo', p 'C:/bin/foo-1.dll', 1 ],
+      [ 'bar', p('C:/bin/bar-2.dll'), 2 ],
+      [ 'baz', p('C:/bin/baz-0.dll'), 0 ],
+      [ 'foo', p('C:/bin/foo-1.dll'), 1 ],
     ],
     'name first 1',
   );
@@ -100,9 +100,9 @@ subtest '_cmp' => sub {
   is(
     $process->(qw( baz-0.dll foo-1.dll bar-2.dll )),
     [
-      [ 'bar', p 'C:/bin/bar-2.dll', 2 ],
-      [ 'baz', p 'C:/bin/baz-0.dll', 0 ],
-      [ 'foo', p 'C:/bin/foo-1.dll', 1 ],
+      [ 'bar', p('C:/bin/bar-2.dll'), 2 ],
+      [ 'baz', p('C:/bin/baz-0.dll'), 0 ],
+      [ 'foo', p('C:/bin/foo-1.dll'), 1 ],
     ],
     'name first 1',
   );
@@ -110,9 +110,9 @@ subtest '_cmp' => sub {
   is(
     $process->(qw( bar-2.dll foo-1.dll baz-0.dll )),
     [
-      [ 'bar', p 'C:/bin/bar-2.dll', 2 ],
-      [ 'baz', p 'C:/bin/baz-0.dll', 0 ],
-      [ 'foo', p 'C:/bin/foo-1.dll', 1 ],
+      [ 'bar', p('C:/bin/bar-2.dll'), 2 ],
+      [ 'baz', p('C:/bin/baz-0.dll'), 0 ],
+      [ 'foo', p('C:/bin/foo-1.dll'), 1 ],
     ],
     'name first 1',
   );
@@ -120,9 +120,9 @@ subtest '_cmp' => sub {
   is(
     $process->(qw( foo-2.dll foo-0.dll foo-1.dll )),
     [
-      [ 'foo', p 'C:/bin/foo-2.dll', 2, ],
-      [ 'foo', p 'C:/bin/foo-1.dll', 1, ],
-      [ 'foo', p 'C:/bin/foo-0.dll', 0, ],
+      [ 'foo', p('C:/bin/foo-2.dll'), 2, ],
+      [ 'foo', p('C:/bin/foo-1.dll'), 1, ],
+      [ 'foo', p('C:/bin/foo-0.dll'), 0, ],
     ],
     'newer version first',
   );

@@ -23,7 +23,7 @@ is $@, "Missing required parameters api_url, errors_to, errors_from, and feedbac
     'Should get proper error for missing parameters';
 
 ok my $app = PGXN::Site::Router->app(
-    api_url         => 'http://api.pgxn.org/',
+    api_url         => 'https://api.pgxn.org/',
     private_api_url => 'file:t/api',
     errors_to       => 'alerts@pgxn.org',
     errors_from     => 'api@pgxn.org',
@@ -41,9 +41,9 @@ test_psgi $app => sub {
 # Test static file.
 test_psgi $app => sub {
     my $cb = shift;
-    ok my $res = $cb->(GET '/ui/css/html.css'), 'Fetch /pub/ui/css/html.css';
+    ok my $res = $cb->(GET '/ui/css/layout.css'), 'Fetch /pub/ui/css/layout.css';
     is $res->code, 200, 'Should get 200 response';
-    file_contents_is 'lib/PGXN/Site/ui/css/html.css', $res->content,
+    file_contents_is 'lib/PGXN/Site/ui/css/layout.css', $res->content,
         'The file should have been served';
 };
 
@@ -118,7 +118,7 @@ test_psgi $app => sub {
             "Should redirect to localhost referrer";
 
         # Set the referrer to another site.
-        $req->referrer('http://example.com/search?q=hi');
+        $req->referrer('https://example.com/search?q=hi');
         ok $res = $cb->($req), "Fetch $uri with external referrer";
         ok !$res->is_success, 'Should not be a success';
         is $res->code, 303, 'Should get 303 response';

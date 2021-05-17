@@ -1,0 +1,10 @@
+Revision history for Dancer2-Plugin-Syntax-ParamKeywords
+
+0.2.0     2021-05-14 16:02:19-04:00 America/New_York
+
+    - Fix broken dependencies
+
+0.1.0     2021-05-13 11:45:39-04:00 America/New_York
+
+    - Initial release
+

@@ -17,7 +17,7 @@ use overload
   '""'     => sub { shift->to_string },
   fallback => 1;
 
-our $VERSION = "0.20";
+our $VERSION = "0.21";
 
 has charset => 'UTF-8';
 
@@ -56,10 +56,11 @@ has dom => sub {
   return Mojo::DOM->new($self->text);
 };
 
-has root => sub { shift->dom->children->first };
+# The top node, not the root
+has top => sub { shift->dom->children->first };
 
 has feed_type => sub {
-  my $top     = shift->root;
+  my $top     = shift->top;
   my $tag     = $top->tag;
   my $version = $top->attr('version');
   my $ns      = $top->namespace;
@@ -74,7 +75,7 @@ has feed_type => sub {
 };
 
 has namespaces => sub {
-  my $top = shift->root;
+  my $top = shift->top;
   my $namespaces = { atom => $top->namespace };  # only Atom feeds declare a namespace?
   my $attrs = $top->attr;
   for my $at (keys %$attrs) {
@@ -97,9 +98,8 @@ my %generic = (
   link     => ['link:not([rel])', 'link[rel=alternate]'],
 );
 
-foreach my $k (keys %generic) {
-  has $k => sub {
-    my $self = shift;
+sub _get_selector {
+  my ($self, $k) = @_;
     for my $generic (@{$generic{$k}}) {
       if (my $p = $self->dom->at("channel > $generic, feed > $generic", %{$self->namespaces})) {
         if ($k eq 'author' && $p->at('name')) {
@@ -112,8 +112,24 @@ foreach my $k (keys %generic) {
         return $text;
       }
     }
-    return;
-  };
+};
+
+sub _set_selector {
+  my ($self, $k, $val) = @_;
+    for my $generic (@{$generic{$k}}) {
+      if (my $p = $self->dom->at("channel > $generic, feed > $generic", %{$self->namespaces})) {
+        if ($k eq 'author' && $p->at('name')) {
+          return $p->at('name')->content($val);
+        }
+        if ($k eq 'published') {
+          return $p->content(Mojo::Date->new($val)->to_datetime());  # let's pretend we're all OK with Atom dates
+        }
+        return $p->content($val);
+      }
+    }
+};
+foreach my $k (keys %generic) {
+  has $k => sub { return shift->_get_selector($k) || undef; };
 }
 
 has items => sub {
@@ -124,6 +140,14 @@ has items => sub {
 
 # alias
 sub entries { shift->items() };
+
+# change the underlying DOM when we change the items list:
+sub set_items {
+  my ($self, $new_items) = @_;
+  $self->dom->find('item, entry')->each(sub { $_->remove() });
+  $new_items->each(sub { $self->top->append($_->dom) });
+  return $self->items($new_items);
+};
 
 has is_valid => sub {
   shift->dom->children->first->tag =~ /^(feed|rss|rdf|rdf:rdf)$/i;
@@ -249,7 +273,15 @@ sub to_hash {
 }
 
 sub to_string {
-  shift->dom->to_string;
+  my $self = shift;
+  foreach my $k (keys %generic) {
+    if ($self->$k && $self->$k ne $self->_get_selector($k)) {
+      # write it to the DOM:
+        $self->_set_selector($k, $self->$k);
+    }
+  }
+  $self->items->each(sub { $_->to_string });  # maybe break this out to a sync method
+  $self->dom->to_string;
 }
 
 1;

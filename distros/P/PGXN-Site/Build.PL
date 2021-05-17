@@ -32,6 +32,26 @@ my $class = Module::Build->subclass(
                 }
             }
         }
+        sub ACTION_tarball_name { print shift->dist_dir . ".tar.gz\n" }
+        sub ACTION_latest_changes {
+            my $self = shift;
+            (my $dv = $self->dist_version) =~ s/^v//;
+            open my $in, '<:raw', 'Changes' or die "Cannot open Changes: $!\n";
+            open my $out, '>:raw', 'latest_changes.md' or die "Cannot open latest_changes.md: $!\n";
+            while (<$in>) { last if /^\Q$dv\E\b/ }
+            print {$out} "Changes for v$dv\n";
+            while (<$in>) {
+                last if /^\s*$/;
+                chomp;
+                if (s/^\s+-/-  /) {
+                    print {$out} "\n";
+                } else {
+                    s/^\s+/ /;
+                }
+                print {$out} $_;
+            }
+            $self->add_to_cleanup('latest_changes.md');
+        }
     },
 );
 
@@ -72,7 +92,7 @@ my $build = $class->new(
         'Plack::Request'               => '0.9956',
         'Plack::Response'              => '0.9956',
         'Router::Resource'             => '0.11',
-        'SemVer'                       => '0.2.0',
+        'SemVer'                       => '0.10.0',
         'Software::License'            => '0.102340',
         'Template::Declare'            => '0.43',
         'Template::Declare::Tags'      => '0.43',
@@ -87,12 +107,12 @@ my $build = $class->new(
     },
     meta_merge => {
         resources => {
-            homepage   => 'http://www.pgxn.org/',
-            bugtracker => 'http://github.com/pgxn/pgxn/issues/',
-            repository => 'http://github.com/pgxn/pgxn/tree/',
+            homepage   => 'https://www.pgxn.org/',
+            bugtracker => 'https://github.com/pgxn/pgxn-site/issues/',
+            repository => 'https://github.com/pgxn/pgxn-site/',
         },
     },
 );
 
-$build->add_build_element($_) for qw(css gif png jpg js mmd eps svg);
+$build->add_build_element($_) for qw(css gif png jpg js mmd eps svg json ico);
 $build->create_build_script;

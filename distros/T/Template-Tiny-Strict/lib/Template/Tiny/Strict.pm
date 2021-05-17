@@ -6,7 +6,7 @@ package Template::Tiny::Strict;
 
 use strict;
 
-our $VERSION = '1.17';
+our $VERSION = '1.18';
 
 # Evaluatable expression
 my $EXPR = qr/ [a-z_][\w.]* /xs;
@@ -75,7 +75,7 @@ sub new {
         TRIM          => $arg_for{TRIM},
         forbid_undef  => $arg_for{forbid_undef},
         forbid_unused => $arg_for{forbid_unused},
-        name          => ( $arg_for{name} // 'template' ),
+        name          => ( $arg_for{name} || 'template' ),
         _undefined    => {},
         _used         => {},
     } => $class;
@@ -98,7 +98,6 @@ sub process {
     $self->{_undefined} = {};
     $self->{_used}      = {};
 
-    local $@  = '';
     local $^W = 0;
 
     # Preprocess to establish unique matching tag sets
@@ -265,7 +264,7 @@ Template::Tiny::Strict - Template Toolkit reimplemented in as little code as pos
 
 =head1 VERSION
 
-version 1.17
+version 1.18
 
 =head1 SYNOPSIS
 

@@ -21,7 +21,7 @@ use Carp;
 use Excel::Writer::XLSX::Package::XMLwriter;
 
 our @ISA     = qw(Excel::Writer::XLSX::Package::XMLwriter);
-our $VERSION = '1.08';
+our $VERSION = '1.09';
 
 
 ###############################################################################
@@ -329,6 +329,22 @@ sub _add_custom_properties {
     my $custom = "/docProps/custom.xml";
 
     $self->_add_override( $custom, $app_document . 'custom-properties+xml' );
+}
+
+
+###############################################################################
+#
+# _add_metadata()
+#
+# Add the metadata file to the ContentTypes overrides.
+#
+sub _add_metadata {
+
+    my $self   = shift;
+    my $custom = "/xl/metadata.xml";
+
+    $self->_add_override( $custom,
+        $app_document . 'spreadsheetml.sheetMetadata+xml' );
 }
 
 

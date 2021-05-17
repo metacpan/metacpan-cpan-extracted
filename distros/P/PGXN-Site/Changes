@@ -1,5 +1,46 @@
 Revision history for Perl extension PGXN::Site
 
+0.20.2  2021-05-16T02:15:33Z
+      - Fixed the Safari pin tab icon.
+      - Restored the blue margin on the right and at the bottom of the logo
+        icon.
+      - Fixed the incomplete sentence on the identity page (/art).
+      - Removed Safari mask-icon, as Safari will use the regular favicon in
+        more recent versions, and its styling wasn't quite right in any case,
+        since no background color was supported.
+      - Simplified the favicon config, removing older stuff and stuff unlikely
+        to be used.
+      - Merged html.css into layout.css, to reduce the number of files to load.
+      - Added PNG links to the art page.
+
+0.20.1  2021-05-14T19:31:35Z
+      - Fixed broken logo links on the art page.
+      - Fixed favicon errors and expanded and improved favicon support for
+        various browsers.
+      - Added an item to the FAQ on auto-releasing to PGXN from GitHub
+        workflows.
+
+0.20.0  2021-05-14T03:04:15Z
+      - Switched to shorter name for license links.
+      - Removed the border around linked images, removed the colors for list
+        items, and softened the color for definition terms.
+      - Removed the `Capfile` and `eg` directory from the source (and distribution).
+        Examples for managing PGXN can now be found in the pgxn/pgxn-ops
+        repository on GitHub.
+      - Updated URLs to HTTPS wherever possible and fixed some broken links.
+      - Reformatted the Multimarkdown text in the source code to be
+        user-friendly as plain text.
+      - Now require SemVer v0.10.0 for compatibility with proper support for the
+        semver 2.0.0 spec (aside from version parts larger than 32 bits).
+      - Eliminated unwanted indentation in code blocks. Thanks to Hans Ginzel
+        for the report! (#11).
+      - Updated the FAQ. It was pretty seriously out of date in a few ways.
+      - Replaced low-res icons with SVGs from the
+        [icons8 flat color collection](https://icons8.github.io/flat-color-icons/).
+      - Replaced logo graphics with high-res PNGs.
+      - Added support for different resolution favicons and other OS and browser
+        chrome stuff.
+
 0.10.3  2013-11-06T07:22:46Z
       - Updated Dalibo logo.
       - Removed sponsors from the home page. Now showing the five most recent
@@ -98,7 +139,7 @@ Revision history for Perl extension PGXN::Site
         to release a distribution.
       - Added redirect from `/meta/spec.html` to the new URL, `/spec/`.
       - Added links to the Google group to the About and FAQ pages.
-      - Made the background tranparent in `code` elements inside tables.
+      - Made the background transparent in `code` elements inside tables.
 
 0.6.0   2011-04-20T05:35:52
       - Requests should now all be returned with an appropriate

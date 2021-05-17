@@ -7,7 +7,7 @@
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model::Tk::LeafEditor 1.374;
+package Config::Model::Tk::LeafEditor 1.375;
 
 use strict;
 use warnings;
@@ -67,25 +67,10 @@ sub Populate {
     my $balloon = $cw->Balloon( -state => 'balloon' );
 
     if ( $vt eq 'string' ) {
-        $cw->{e_widget} = $ed_frame->Scrolled(
-            'Text',
-            -height     => 5,
-            -scrollbars => 'ow',
-        )->pack(@fbe1);
-        $cw->{e_widget}->tagConfigure(qw/value -lmargin1 2 -lmargin2 2 -rmargin 2/);
-        $cw->reset_value;
-        my $bframe = $cw->add_buttons($ed_frame);
-        $bframe->Button(
-            -text    => 'Cleanup',
-            -command => sub { $cw->cleanup },
-        )->pack( -side => 'left' );
-        my $ext_ed_b = $bframe->Button(
-            -text    => 'Ext editor',
-            -command => sub { $cw->exec_external_editor },
-            -state   => defined $ENV{EDITOR} ? 'normal' : 'disabled',
-        )->pack( -side => 'left' );
-        $balloon->attach( $ext_ed_b,
-            -msg => "Run external editor (if EDITOR environment variable is set" );
+        $cw->add_string_editor($leaf, $ed_frame, $balloon);
+    }
+    elsif ( $vt eq 'boolean' and $leaf->write_as) {
+        $cw->add_written_as_boolean_editor($leaf, $ed_frame);
     }
     elsif ( $vt eq 'boolean' ) {
         $ed_frame->Checkbutton(
@@ -147,6 +132,52 @@ sub Populate {
 
     # don't call directly SUPER::Populate as it's LeafViewer's populate
     $cw->Tk::Frame::Populate($args);
+}
+
+sub add_string_editor {
+    my ($cw, $leaf, $ed_frame, $balloon) = @_;
+
+    $cw->{e_widget} = $ed_frame->Scrolled(
+        'Text',
+        -height     => 5,
+        -scrollbars => 'ow',
+    )->pack(@fbe1);
+    $cw->{e_widget}->tagConfigure(qw/value -lmargin1 2 -lmargin2 2 -rmargin 2/);
+    $cw->reset_value;
+
+    my $bframe = $cw->add_buttons($ed_frame);
+    $bframe->Button(
+        -text    => 'Cleanup',
+        -command => sub { $cw->cleanup },
+    )->pack( -side => 'left' );
+
+    my $ext_ed_b = $bframe->Button(
+        -text    => 'Ext editor',
+        -command => sub { $cw->exec_external_editor },
+        -state   => defined $ENV{EDITOR} ? 'normal' : 'disabled',
+    )->pack( -side => 'left' );
+
+    $balloon->attach(
+        $ext_ed_b,
+        -msg => "Run external editor (if EDITOR environment variable is set"
+    );
+}
+
+sub add_written_as_boolean_editor {
+    my ($cw, $leaf, $ed_frame) = @_;
+
+    my $vref = \$cw->{value};
+
+    my $rb_frame = $ed_frame->Frame->pack();
+    foreach my $value (@{$leaf->write_as}) {
+        $rb_frame->Radiobutton(
+            -text     => $value,
+            -value    => $value,
+            -variable => $vref,
+            -command  => sub { $cw->try },
+        )->pack(-side => 'left');
+    }
+    $cw->add_buttons($ed_frame);
 }
 
 sub cleanup {

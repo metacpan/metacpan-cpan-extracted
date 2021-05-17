@@ -26,8 +26,8 @@ requires:
   perl: '5.010001'
 resources:
   bugtracker: https://github.com/brtastic/perl-form-tiny/issues
-  homepage: https://metacpan.org/release/Form-Tiny
+  homepage: https://brtastic.xyz/project/form-tiny
   license: https://dev.perl.org/licenses
-  repository: https://github.com/brtastic/perl-form-tiny
-version: '1.12'
+  repository: https://github.com/brtastic/perl-form-tiny.git
+version: '1.13'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

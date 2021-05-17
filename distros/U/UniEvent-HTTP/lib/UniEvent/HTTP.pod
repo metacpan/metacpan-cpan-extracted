@@ -1,0 +1,448 @@
+=head1 NAME
+
+UniEvent::HTTP - extremely fast sync/async http client and server framework
+
+
+
+=head1 SYNOPSIS
+
+    # asynchronous request
+    UniEvent::HTTP::http_request({
+        uri     => "https://example.com",
+        timeout => 5,
+        response_callback => sub {
+            my ($request, $response, $error) = @_;
+            if ($error) {
+                warn $error;
+                return;
+            }
+            say Dumper($response->headers);
+            say $response->body;
+        },
+    });
+    
+    # simple API
+    UniEvent::HTTP::http_get("http://mysite.com", sub {
+        my ($request, $response, $error) = @_;
+        say $res->body;
+    });
+    
+    UniEvent::Loop->default->run;
+    
+    # synchronous request
+    my $response = UniEvent::HTTP::http_get("https://example.com");
+    my $response = UniEvent::HTTP::http_request_sync({ uri => "https://example.com", timeout => 3});
+    
+    # more control
+    UniEvent::HTTP::http_request({
+        uri               => "https://example.com",
+        method            => Protocol::HTTP::METHOD_POST,
+        headers           => {...},
+        cookies           => {...},
+        timeout           => 5,
+        follow_redirect   => 1,
+        tcp_nodelay       => 1,
+        redirection_limit => 5,
+        ssl_ctx           => $ssl_ctx,
+        proxy             => "socks5://myproxy.com:8080",
+        tcp_hints         => $hints,
+        compress          => Protocol::HTTP::Compression::gzip,
+        allow_compression => [Protocol::HTTP::Compression::gzip, Protocol::HTTP::Compression::deflate],
+        body              => $body,
+        response_callback => sub {...},
+        redirect_callback => sub {...},
+        partial_callback  => sub {...},
+        continue_callback => sub {...},
+    });
+    
+    
+    # http server
+    my $server = UniEvent::HTTP::Server->new({
+        idle_timeout           => 60,
+        max_headers_size       => 16384,
+        max_body_size          => 1_000_000,
+        tcp_nodelay            => 1,
+        max_keepalive_requests => 1000,
+        locations              => [
+            {
+                host => "*",
+                port => 80,
+                reuse_port => 1,
+                backlog => 1024,
+            },
+            {
+                host => "*",
+                port => 443,
+                reuse_port => 1,
+                backlog => 1024,
+                ssl_ctx => $ssl_ctx,
+            },
+        ],
+    });
+    
+    $server->request_callback(sub {
+        my $request = shift;
+        if ($request->uri->path eq "/hello") {
+            $request->respond({
+                code    => 200,
+                headers => {...}
+                body    => "Hi",
+            });
+        } else {
+            $request->respond({code => 404});
+        }
+    });
+    
+    my $sig = UE::signal SIGINT, sub {
+        $server->stop;
+    };
+    
+    $server->run;
+    UE::Loop->default->run;
+    
+    
+    # run via plack
+    plackup -s UniEvent::HTTP::Simple --listen *:5000 -E deployment app.psgi
+
+    # personal pool
+    my $pool = UE::HTTP::Pool->new({ max_connections => 10 });
+    $pool->request({
+        uri => "...",
+        response_callback => sub {...},
+    });
+    
+    # personal client
+    my $client = UE::HTTP::Client->new;
+    $client->request({
+        uri => "...",
+        response_callback => sub {...},
+    });
+    
+    # user agent for http session, keeping cookies between requests, like browsers
+    my $ua = UE::HTTP::UserAgent->new;
+    $ua->request({
+        uri => "https://mysite.com/authorize?login=1&password=2",
+        response_callback => sub {
+            ...
+            $ua->request({
+                uri => "https://mysite.com/get_info",
+                ...
+            });
+        },
+    });
+    
+    my $serialized = $ua->to_string;
+    ...
+    my $ua = UE::HTTP::UserAgent->new({serialized => $serialized}); # load session data
+    $ua->request({
+        uri => "https://mysite.com/get_info",
+        ...
+    });
+   
+
+
+=head1 DESCRIPTION
+
+UniEvent::HTTP is a perl port of C++ panda::unievent::http framework. It contains both synchronous and asynchronous http client and asynchronous
+http server framework.
+
+It is built on top of L<Protocol::HTTP> http protocol implementation and L<UniEvent> event framework. This library is an L<UniEvent> user, so you need to
+run C<UniEvent>'s loop for it to work.
+
+C<UniEvent::HTTP> supports many features, including various request methods, cookies, request forms, chunks, compression, keep-alive, connection pools and so on.
+
+See L<UniEvent::HTTP::Manager> if you need async multi-process http server with process management.
+
+
+
+=head1 CLIENT
+
+Client http requests are made via C<http_get()>, C<http_request()>, L<UniEvent::HTTP::Pool>, L<UniEvent::HTTP::Client> and L<UniEvent::HTTP::UserAgent>.
+
+The short description is given below, for full reference see corresponding package's docs.
+
+
+=head2 Simple API
+
+The simple interface is to use C<http_request()> function
+
+    http_request($request);
+    
+Where C<$request> is a L<UniEvent::HTTP::Request> object or hashref which its constructor supports. Callbacks set in request object will be called during request
+or after it's finished. See L<UniEvent::HTTP::Request> for more info.
+
+The even more simpler interface is C<http_get()> function
+
+    http_get($uri, $callback);
+    
+which is the same as
+
+    http_request({
+        uri               => $uri,
+        response_callback => $callback,
+        method            => UE::HTTP::Request::METHOD_GET,
+    });
+
+
+=head2 Pool
+
+L<UniEvent::HTTP::Pool> represents a pool of http client connections which makes use of http keep-alive feature and restricts the maximum number of 
+running http requests at a time for certain destination.
+
+Requests made via the same pool object share the same keep-alive connections. Any number of simultaneous requests can be made via one pool but not all of them
+may be executing at the same time (depending on request uris and config, see L<UniEvent::HTTP::Pool>).
+
+    my $pool = UE::HTTP::Pool->new;
+    $pool->request({uri => "http://example.com", ...});
+    # .. after request is done
+    $pool->request({uri => "http://example.com", ...}); # will reuse connection
+    
+Simple methods like C<http_request()>, C<http_get()> use global per-loop connection pool.
+
+
+=head2 Client
+
+L<UniEvent::HTTP::Client> represents a single http client connection and is the lowest-level API. 
+
+    my $client = UE::HTTP::Client->new;
+    $client->request({
+        uri               => $uri,
+        response_callback => $callback,
+    });
+
+Only one request can be made via client at a time. To execute next request you must wait till active request finishes.
+
+
+
+=head1 SERVER
+
+The short description is given below, for full reference see corresponding package's docs.
+
+Server is an object to be run in single process/thread. If you need to make use of all processor cores, you need to create server in each process/thread.
+See L<UniEvent::HTTP::Manager>.
+
+Server is created via
+
+    my $server = UE::HTTP::Server->new($config);
+
+And then is run by
+
+    $server->run;
+    
+Method C<run()> doesn't block anything, it just creates and activates various event handles in L<UniEvent>. You must run the appropriate event loop afterwards.
+
+
+=head2 Receiving requests
+
+There are two main methods of receiving http requests.
+
+The first is setting C<request_callback>. It is called when request is fully received in-memory (including request body).
+
+    $server->request_callback(sub {
+        my $request = shift;
+        say $request->method_str;
+        say $request->uri;
+        say Dumper($request->headers);
+        say $request->body;
+        ...
+    });
+
+The second is setting C<route_callback> which is called as early as possible but after all headers arrived. It is expected that user will decide how to process
+the request depending on it's URI and other properties.
+
+    $server->route_callback(sub {
+        my $request = shift;
+        say $request->method_str;
+        say $request->uri;
+        say Dumper($request->headers);
+        say $request->body; # ! may be empty or partially available !
+        
+        if ($request->uri->path eq "/path1") {
+            # process request when it's fully received in-memory
+            $request->receive_callback(sub {
+                my $request = shift;
+                say $request->body; # now it's fully available in-memory
+            });
+        }
+        elsif ($request->uri->path eq "/put_file") {
+            $request->enable_partial;
+            $request->partial_callback(sub {
+                my ($request, $error) = @_;
+                say $request->body; # will grow from call to call
+                # write $request->body to disk or do whatever
+                $request->body(""); # clear body to avoid in-memory accumulation
+                
+                if ($request->is_done) {
+                    # request is fully received - finish stuff and send response
+                }
+            });
+        }
+    });
+
+If uri is "/path1" we process request as in example before, after fully receiving all request.
+
+If uri is "/put_file" we enable partial mode and set C<partial_callback> which will be called one or more times, every time new data arrives from network. When
+it is called for the last time, $request->is_done() will be true. In this callback request's properties like C<body()> get filled with more and more data. We
+can use incremental parsing or write data to disk asynchronously or whatsoever. If any error occurs during request receival, callback will be called with
+C<$error> indicating error occured. In this case no more calls will be made and $request->is_done will not be true.
+
+
+=head2 Sending response
+
+Regardless of the way request is received, a response can be given asynchronously at any time - immediately or some time on the future.
+
+Response can be fully given at once including body, or can be given partially - without body. The latter case is used to respond with chunks.
+
+    # respond immediately
+    $server->request_callback(sub {
+        my $request = shift;
+        $request->respond({
+            code => 200,
+            body => "hi",
+        });
+    });
+
+    # respond later
+    $server->request_callback(sub {
+        my $request = shift;
+        
+        $someobject->when_some_event_occurs(sub {
+            $request->respond({
+                code => 200,
+                body => "hi",
+            });
+        });
+    });
+
+    # respond with chunks
+    $server->request_callback(sub {
+        my $request = shift;
+        $request->respond({
+            code    => 200,
+            chunked => 1,
+        });
+        
+        $someobject->on_file_read(sub {
+            ...
+            $request->response->send_chunk($data);
+            
+            if ($last) {
+                $request->response->send_final_chunk;
+            }
+        });
+    });
+
+
+
+=head1 FUNCTIONS
+
+=head2 http_request($request || \%request_params, [$loop = default])
+
+Starts asynchronous http request in the given event L<UniEvent::Loop|$loop>. The same as
+
+    UniEvent::HTTP::Pool::instance($loop)->request($request);
+
+See L<UniEvent::HTTP::Request> and L<UniEvent::HTTP::Pool> for more info.
+
+
+=head2 http_request_sync($request || \%request_params)
+
+Does http request synchronously and returns result as L<UniEvent::HTTP::Response> object.
+
+    my $response = http_request_sync({....});
+
+Any callbacks set in C<request> will be called during request execution as if request was async. However it is not allowed to start another synchronous http
+request recursively from those callbacks. All callbacks will be called before the function returns.
+
+If an error occurs during request, function may return undef instead of response or incomplete response object if error occured after we started receiving
+response. If you need to inspect error, use multiple return value context
+
+    my ($response, $error) = http_request_sync({....});
+    
+In case of error, C<$error> will be an L<XS::ErrorCode> object.
+
+The similar effect can be achieved with
+
+    my $loop = UE::Loop->new;
+    
+    my ($response, $error);
+    http_request({
+        response_callback => sub { (undef, $response, $error) = @_; }
+    }, $loop);
+    
+    $loop->run;
+    # use $response from here
+
+
+=head2 http_get($uri, [$response_callback], [$loop = default])
+
+Simpler form of http request with method GET.
+
+If C<$response_callback> is given, then it is a shortcut for asynchronous http request
+
+    http_request({
+        uri => $uri,
+        response_callback => $response_callback,
+    }, $loop);
+
+Otherwise, it is a shortcut for synchronous http request
+
+    http_request_sync({uri => $uri});
+
+
+
+=head1 STORING ARBITRARY DATA IN REQUEST/RESPONSE/ETC OBJECTS
+
+All this library's objects stores all its data in a place inaccessible from perl code.
+You can't get access to it, neither corrupt it, so that you can freely store arbitrary data in objects as in hashref.
+By default, for efficiency, objects are created as blessed references to C<undef>, so you need to upgrade it first to hashref via C<XS::Framework>.
+
+    XS::Framework::obj2hv($request);
+    $request->{property} = "value";
+
+
+
+=head1 REFERENCE
+
+L<UniEvent::HTTP::Request>
+
+L<UniEvent::HTTP::Response>
+
+L<UniEvent::HTTP::Pool>
+
+L<UniEvent::HTTP::Client>
+
+L<UniEvent::HTTP::RedirectContext>
+
+L<UniEvent::HTTP::UserAgent>
+
+
+L<UniEvent::HTTP::Server>
+
+L<UniEvent::HTTP::ServerRequest>
+
+L<UniEvent::HTTP::ServerResponse>
+
+L<Plack::Handler::UniEvent::HTTP::Simple>
+
+
+
+=head1 AUTHOR
+
+Pronin Oleg <syber@crazypanda.ru> 
+
+Ivan Baidakou <dmol@cpan.org>
+
+Grigory Smorkalov <g.smorkalov@crazypanda.ru>
+
+Andrew Selivanov <andrew.selivanov@gmail.com>
+
+Crazy Panda LTD
+
+
+
+=head1 LICENSE
+
+You may distribute this code under the same terms as Perl itself.
+
+=cut

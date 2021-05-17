@@ -59,6 +59,7 @@ do { my $x = {
                    'requires' => {
                                    'ExtUtils::MakeMaker' => '0',
                                    'File::Spec' => '0',
+                                   'File::Temp' => '0',
                                    'PerlIO::encoding' => '0',
                                    'Test::More' => '0.88',
                                    'Time::Local' => '0',

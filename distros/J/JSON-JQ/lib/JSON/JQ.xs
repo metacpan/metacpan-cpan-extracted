@@ -188,7 +188,7 @@ static void my_debug_cb(void * data, jv input) {
     fprintf(stderr, "\n");
 }
 
-inline void assert_isa(pTHX_ SV * self) {
+static inline void assert_isa(pTHX_ SV * self) {
     if (!sv_isa(self, "JSON::JQ")) {
         croak("self is not a JSON::JQ object");
     }

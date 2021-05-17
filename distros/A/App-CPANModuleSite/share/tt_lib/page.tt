@@ -31,6 +31,11 @@
           font-size: 3.5rem;
         }
       }
+      @media (max-width: 768px) {
+        .sidebar {
+          display: none;
+        }
+      }
     </style>
 
   </head>
@@ -47,9 +52,9 @@
 </header>
 
 <main>
-  <div class="container">
+  <div class="container-fluid">
     <div class="row">
-      <div class="col-3">
+      <div class="col-3 sidebar">
         <h2>Documentation</h2>
 [% doc_links %]
         <h2>Other links</h2>

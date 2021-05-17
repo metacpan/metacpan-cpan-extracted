@@ -1,5 +1,23 @@
 Revision history for Data-Dataset-ChordProgressions
 
+0.0108 2021-05-15 09:41:31
+    - Remove unused code from the eg/play-rock program.
+
+0.0107 2021-05-15 09:24:36
+    - Fix an error in eg/play-rock.
+
+0.0106 2021-05-13 07:41:53
+    - Improve eg/play-rock.
+    - Improve documentation.
+
+0.0105 2021-05-12 23:18:13
+    - Add the eg/play-rock MIDI program.
+
+0.0104 2021-05-11 13:24:47
+    - Fix typos in the shared CSV.
+    - Remove the two instances of the "5 chord".
+    - Add the eg/play-jazz MIDI program.
+
 0.0103 2021-05-11 06:05:39
     - Replace "Aug" with "aug" (augmented) in the shared CSV.
     - Improve the eg/jazz program.

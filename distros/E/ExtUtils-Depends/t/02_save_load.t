@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 40;
+use Test::More tests => 41;
 
 use FindBin;
 use lib "$FindBin::Bin/lib";
@@ -51,6 +51,9 @@ $dep_info->save_config ($IFpm);
 open my $iffh, '>>', $IFpm or die "write $IFpm: $!";
 print $iffh qq{\nwarn "LOADING\\n";\n1;\n};
 undef $iffh;
+
+# test utility function
+is_deeply [ExtUtils::Depends::uniquify(qw(a c b c a b))], [qw(a c b)];
 
 # --------------------------------------------------------------------------- #
 

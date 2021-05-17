@@ -1,5 +1,10 @@
 Revision history for Perl extension Form::Tiny.
 
+1.13  Sat May 15 23:00:00 2021
+	- improve documentation
+	- move documentation on bare-bones to Manual::Internals
+	- fix distribution metadata
+
 1.12  Wed Jan 6 20:00:00 2021
 	- form_field now accepts coderefs
 	- add default value configuration for form fields

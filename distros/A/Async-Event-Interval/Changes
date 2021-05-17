@@ -1,5 +1,11 @@
 Revision history for Fork-Event-Interval
 
+1.04    2021-05-11
+    - Fix issue in t/45-params.t where done_testing() may have been called
+      multiple times (fixes #5)
+    - Fix issue where _rand_shm_key() could generate non-unique shared memory
+      segment keys (fixes #4)
+
 1.03    2021-05-05
     - Added events() class function, returns hash reference details of each
       event that's been created

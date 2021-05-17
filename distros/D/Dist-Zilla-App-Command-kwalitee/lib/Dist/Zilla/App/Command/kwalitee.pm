@@ -1,5 +1,5 @@
 package Dist::Zilla::App::Command::kwalitee;
-$Dist::Zilla::App::Command::kwalitee::VERSION = '0.03';
+$Dist::Zilla::App::Command::kwalitee::VERSION = '0.04';
 use 5.008003;
 use strict;
 use warnings;

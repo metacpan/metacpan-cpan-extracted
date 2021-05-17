@@ -22,6 +22,9 @@ t/013_exception_inheritance.t
 t/014_nested.t
 t/015_eof.t
 t/016_eot.t
+t/017_loop.t
+t/018_context_aware.t
+t/019.caller.t
 t/900_pod.t
 t/999_kwalitee.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)

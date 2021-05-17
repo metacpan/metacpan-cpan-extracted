@@ -1,5 +1,8 @@
 Revision history for Perl extension Contextual-Diag
 
+0.04 2021-05-13T14:09:56Z
+    - feat: add shortcut `CDD` #2
+
 0.03 2021-05-10T01:18:16Z
     - eliminate dependence on Contextual::Return #1
 

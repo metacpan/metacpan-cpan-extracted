@@ -54,13 +54,17 @@
       }
    },
    "provides" : {
+      "CDD" : {
+         "file" : "lib/CDD.pm",
+         "version" : "0.04"
+      },
       "Contextual::Diag" : {
          "file" : "lib/Contextual/Diag.pm",
-         "version" : "0.03"
+         "version" : "0.04"
       },
       "Contextual::Diag::Value" : {
          "file" : "lib/Contextual/Diag/Value.pm",
-         "version" : "0.03"
+         "version" : "0.04"
       }
    },
    "release_status" : "stable",
@@ -74,7 +78,7 @@
          "web" : "https://github.com/kfly8/p5-Contextual-Diag"
       }
    },
-   "version" : "0.03",
+   "version" : "0.04",
    "x_authority" : "cpan:KFLY",
    "x_serialization_backend" : "JSON::PP version 4.04",
    "x_static_install" : 1

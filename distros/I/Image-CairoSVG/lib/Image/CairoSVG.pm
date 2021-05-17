@@ -3,11 +3,11 @@ use warnings;
 use strict;
 use utf8;
 
-our $VERSION = '0.17';
+our $VERSION = '0.21';
 
 # Core modules
-use Carp qw/carp croak confess cluck/;
-use Math::Trig qw!acos pi rad2deg deg2rad!;
+use Carp qw/carp croak confess/;
+use Math::Trig qw!acos pi rad2deg deg2rad tan!;
 use Scalar::Util 'looks_like_number';
 
 # Modules the user needs to install
@@ -22,6 +22,24 @@ our $default_surface_size = 100;
 # This is what the SVG standard says the default colour is.
 
 our @defaultrgb = (0, 0, 0);
+
+use constant {
+
+    # The Cairo default value for the miter limit is slightly different to
+    # the SVG default value, so this needs to be set initially to draw
+    # SVGs correctly.
+
+    # Cairo's default value is 10:
+    # https://www.cairographics.org/manual/cairo-cairo-t.html#cairo-set-miter-limit
+
+    # SVG's default value is 4:
+    # https://www.w3.org/TR/SVG11/painting.html#StrokeMiterlimitProperty
+    # https://svgwg.org/svg2-draft/painting.html#StrokeMiterlimitProperty
+    SVG_MITERLIMIT => 4,
+    true => 1,
+    false => 0,
+};
+
 
 sub new
 {
@@ -78,6 +96,7 @@ sub make_cr
 	# We won't be able to do very much without a context.
 	croak "Cairo::Context->create failed";
     }
+    $self->{cr}->set_miter_limit (SVG_MITERLIMIT);
 }
 
 sub render
@@ -115,13 +134,21 @@ sub render
     return $self->{surface};
 }
 
+# These elements are not rendered.
+
+my %no_render = (
+    clipPath => true,
+    defs => true,
+    title => true,
+);
+
 # Actually render
 
 sub _render
 {
     my ($self, $element, $pattr) = @_;
     my $tag = $element->{tag};
-    if ($tag eq 'defs' || $tag eq 'title') {
+    if ($no_render{$tag}) {
 	# Put the title into the output PNG as text, etc.
 	return;
     }
@@ -135,18 +162,25 @@ sub _render
     $self->_draw_end ($element);
 }
 
-sub processUse
+sub x_id
 {
-    my ($self, %attr) = @_;
+    my (%attr) = @_;
     my $id = $attr{'xlink:href'};
     if (! $id) {
 	$id = $attr{href};
     }
     if (! $id) {
-	carp "No xlink:href/href in <use>";
-	return;
+	carp "No xlink:href/href found";
+	return undef;
     }
     $id =~ s/^#//;
+    return $id;
+}
+
+sub processUse
+{
+    my ($self, %attr) = @_;
+    my $id = x_id (%attr);
     my $element = $self->get_id ($id);
     if (! $element) {
 	carp "ID $id in use not found";
@@ -214,12 +248,17 @@ sub _draw
 	}
     }
 
+    # If true, do not draw (fill or stroke) the current object.
     my $nodraw;
 
+    if ($self->{_clipping}) {
+	$self->msg ("_clipping, not rendering");
+	$nodraw = true;
+    }
     $self->do_svg_attr (%attr);
     if ($tag eq 'svg' || $tag eq 'g') {
 	# These are non-rendering, i.e. don't result in visual output.
-	$nodraw = 1;
+	$nodraw = true;
     }
     elsif ($tag eq 'path') {
 	$self->path (%attr);
@@ -252,6 +291,9 @@ sub _draw
 	# renderer. Its children are probably used by a <use> element.
 	confess "<defs> element reached";
     }
+    elsif ($tag eq 'clipPath') {
+	confess "<clipPath> element reached";
+    }
     elsif ($tag eq 'linearGradient') {
 	$self->linearGradient (%attr);
     }
@@ -260,7 +302,7 @@ sub _draw
 	    # There are probably many of these since this module is
 	    # not up to spec, so only complain if the user wants
 	    # "verbose" messages.
-	    carp "Unable to draw SVG element '<$tag>'";
+	    $self->msg ("Unable to draw SVG element '<$tag>'");
 	    $nodraw = 1;
 	}
     }
@@ -268,6 +310,34 @@ sub _draw
 	$self->do_fill_stroke (\%attr);
     }
     return \%attr;
+}
+
+sub do_clip_path
+{
+    my ($self, $id) = @_;
+    $id =~ s!url\(#(.*?)\)!$1!;
+    my $element = $self->get_id ($id);
+    if (! $element) {
+	carp "ID $id in clip-path not found";
+	return;
+    }
+    my $tag = $element->{tag};
+    if ($tag ne 'clipPath') {
+	carp "Cannot clip to non-clipPath '$tag'";
+	return;
+    }
+    $self->msg ("Clipping to $id");
+    $self->{_clipping} = true;
+    $self->{depth}++;
+    my $children = $element->{child};
+    for my $child (@$children) {
+	$self->_render ($child);
+    }
+    $self->{_clipping} = false;
+    $self->msg ("Finished clipping to $id");
+    $self->{depth}--;
+    my $cr = $self->{cr};
+    $cr->clip ();
 }
 
 sub _draw_end
@@ -665,26 +735,16 @@ sub path
     }
 }
 
-# This is a Perl translation of 
-# https://www.w3.org/TR/SVG/implnote.html#ArcImplementationNotes
+# This is a Perl translation of the arc drawing code in
+# https://github.com/Kozea/CairoSVG/blob/master/cairosvg/path.py
 
 sub svg_arc
 {
     my ($self, $element) = @_;
     my $cr = $self->{cr};
-    # Radii
-    my $rx = $element->{rx};
-    my $ry = $element->{ry};
-    # End points
-    my $x2 = $element->{x};
-    my $y2 = $element->{y};
-
-    # rx=0 or ry=0 means straight line
-    if ($rx == 0 || $ry == 0) {
-	$self->msg ("Arc has a zero radius rx=$rx or ry=$ry, treating as straight line");
-	$cr->line_to ($x2, $y2);
-	return;
-    }
+    my ($x1, $y1) = $cr->get_current_point ();
+    my ($rx, $ry) = ($element->{rx}, $element->{ry});
+    my $rotation = deg2rad ($element->{x_axis_rotation});
     my $fa = $element->{large_arc_flag};
     my $fs = $element->{sweep_flag};
     if ($fa != 0 && $fa != 1) {
@@ -693,145 +753,59 @@ sub svg_arc
     if ($fs != 0 && $fs != 1) {
 	croak "sweep-flag must be either 0 or 1";
     }
-    $self->msg ("A: inputs: large-arc-flag: $fa, sweep-flag: $fs");
-    # Start points
-    my ($x1, $y1) = $cr->get_current_point ();
-    $self->msg ("A: inputs: arc start: ($x1, $y1)");
-    $self->msg ("A: inputs: arc end: ($x2, $y2)");
-    $self->msg ("A: inputs: radii: ($rx, $ry)");
-    my $phi = deg2rad ($element->{x_axis_rotation});
-    $self->msg ("A: inputs: φ = $phi radians");
-    my ($xd, $yd) = (($x1-$x2)/2, ($y1-$y2)/2);
-    #    $self->msg ("Midpoint of vector from end to start: ($xd, $yd)");
-    my $s = sin $phi;
-    my $c = cos $phi;
-    #    $self->msg ("sin φ = $s, cos φ = $c");
-    # Eq. 5.1
-    my ($x1d, $y1d) = ($xd * $c + $yd * $s, - $xd * $s + $yd * $c);
-    $self->msg ("Rotated midpoint: x1' = $x1d, y1' = $y1d");
-    my $factor;
-    my $lambda = ($x1d/$rx)**2 + ($y1d/$ry)**2;
-    if ($lambda > 1) {
-	$self->msg ("$lambda > 1, increasing radii");
-	my $sqrtlambda = sqrt ($lambda);
+    my $x3 = $element->{x};
+    my $y3 = $element->{y};
+    $x3 -= $x1;
+    $y3 -= $y1;
+    my $radii_ratio = $ry / $rx;
+    my ($xe, $ye) = rotate ($x3, $y3, -$rotation);
+    $ye /= $radii_ratio;
 
-	$rx *= $sqrtlambda;
-	$ry *= $sqrtlambda;
-	$factor = 0;
+    my $angle = point_angle (0, 0, $xe, $ye);
+
+    $xe = sqrt ($xe**2 + $ye**2);
+    $ye = 0;
+    my $xe2 = $xe / 2;
+    if ($rx < $xe2) {
+	$rx = $xe2;
     }
-    else {
-	my $den = ($rx * $y1d)**2 + ($ry * $x1d)**2;
-	my $num = ($rx * $ry)**2 - $den;
-	#    $self->msg ("den = $den, num = $num");
-	$factor = sqrt ($num / $den);
-    }
-    #    $self->msg ("factor = $factor");
-    my $sign = 1;
+    my $xc = $xe2;
+    my $yc = sqrt ($rx**2 - $xc**2);
     if ($fa == $fs) {
-	$sign = -1;
+	$yc = - $yc;
     }
-    $factor *= $sign;
-    my $cxd =   $factor * $rx * $y1d / $ry;
-    my $cyd = - $factor * $ry * $x1d / $rx;
-    #    $self->msg ("A: transformed centre: ($cxd, $cyd)");
-    # Eq 5.3
-    my $cx = ($c * $cxd - $s * $cyd) + ($x1 + $x2) / 2;
-    my $cy = ($s * $cxd + $c * $cyd) + ($y1 + $y2) / 2;
-    $self->msg (sprintf ("A: centre of ellipse: (%.2f, %.2f)", $cx, $cy));
-    my @vec1 = (1,0);
-    # Eq. 5.5
-    my $xv2 = ($x1d - $cxd)/$rx;
-    my $yv2 = ($y1d - $cyd)/$ry;
-    my @vec2 = ($xv2, $yv2);
-    my $theta1 = vangle (\@vec1, \@vec2);
-    my $theta1d = rad2deg ($theta1);
-    $self->msg (sprintf ("Start angle θ1 = %.2f (%.2f°)", $theta1, $theta1d));
-    # Eq. 5.6
-    my $xv3 = (-$x1d - $cxd)/$rx;
-    my $yv3 = (-$y1d - $cyd)/$ry;
-    my @vec3 = ($xv3, $yv3);
-    #    $self->msg ("vec2 = @vec2");
-    #    $self->msg ("vec3 = @vec3");
-    my $dt = vangle (\@vec2, \@vec3);
-    my $dtd = rad2deg ($dt);
-    $self->msg ("Swept angle initially: Δθ = $dt ($dtd)");
-    if ($fs == 0) {
-
-	# if fS = 0 and the right side of (eq. 5.6) is greater than 0,
-	# then subtract 360°, whereas if fS = 1 and the right side of
-	# (eq. 5.6) is less than 0, then add 360°. In all other cases
-	# leave it as is.
-
-	if ($dt > 0) {
-	    $dt -= 2*pi;
-	}
-    }
-    elsif ($fs == 1) {
-	if ($dt < 0) {
-	    $dt += 2*pi;
-	}
-    }
-    $dtd = rad2deg ($dt);
-    $self->msg (sprintf ("Swept angle Δθ = %.2f (%.2f°)", $dt, $dtd));
-
+    ($xe, $ye) = _rotate ($xe, 0, $angle);
+    ($xc, $yc) = _rotate ($xc, $yc, $angle);
+    my $angle1 = _point_angle ($xc, $yc, 0, 0);
+    my $angle2 = _point_angle ($xc, $yc, $xe, $ye);
+    $cr->save ();
+    $cr->translate ($x1, $y1);
+    $cr->rotate ($rotation);
+    $cr->scale (1, $radii_ratio);
     if ($fs) {
-	$cr->arc ($cx, $cy, $rx, $theta1, $theta1+$dt);
+	$cr->arc ($xc, $yc, $rx, $angle1, $angle2);
     }
     else {
-	$cr->arc_negative ($cx, $cy, $rx, $theta1, $theta1+$dt);
+	$cr->arc_negative ($xc, $yc, $rx, $angle1, $angle2);
     }
+    $cr->restore ();
+    
 }
 
-# Helper for svg_arc
-
-# Eq. 5.4 of
-# https://www.w3.org/TR/SVG/implnote.html#ArcImplementationNotes
-
-sub vangle
+sub _point_angle
 {
-    my ($u, $v) = @_;
-    my $ulen = vlen ($u);
-    my $vlen = vlen ($v);
-    my $sign;
-    my $vdot = vdot ($u, $v);
-    my $cross = vcross ($u, $v);
-    if ($cross == 0) {
-	if ($vdot < 0) {
-	    $sign = -1;
-	}
-	else {
-	    $sign = 1;
-	}
-    }
-    else {
-	$sign = $cross / abs ($cross);
-    }
-    my $value = $vdot / ($ulen * $vlen);
-    return $sign * acos ($value);
+    my ($cx, $cy, $px, $py) = @_;
+    return atan2 ($py - $cy, $px - $cx);
 }
 
-# Helper for vangle
-
-sub vdot
+sub _rotate
 {
-    my ($u, $v) = @_;
-    return $u->[0] * $v->[0] + $u->[1] * $v->[1];
-}
-
-# Helper for vangle
-
-sub vcross
-{
-    my ($u, $v) = @_;
-    return $u->[0] * $v->[1] - $u->[1] * $v->[0];
-}
-
-# Helper for vangle
-
-sub vlen
-{
-    my ($v) = @_;
-    return sqrt ($v->[0]**2 + $v->[1]**2);
+    my ($x, $y, $angle) = @_;
+    my $s = sin $angle;
+    my $c = cos $angle;
+    my $xr = $c * $x - $s * $y;
+    my $yr = $c * $y + $s * $x;
+    return ($xr, $yr);
 }
 
 # Quadratic bezier curve shim for Cairo
@@ -887,6 +861,8 @@ my %units = (
     px => 1,
 );
 
+# Return units and a scale
+
 sub svg_units_scale
 {
     my ($thing) = @_;
@@ -906,33 +882,20 @@ sub svg_units_scale
 	if ($u) {
 	    return ($number * $u, $u);
 	}
+	carp "Unknown unit $unit";
+	return ($number, 1);
     }
+    carp "Failed to convert SVG units '$thing'";
+    return (undef, 1);
 }
 
 sub svg_units
 {
-    my ($thing) = @_;
-    if (! defined $thing) {
-	return 0;
-    }
-    if ($thing eq '') {
-	return 0;
-    }
-    if (looks_like_number ($thing)) {
-	return $thing;
-    }
-    if ($thing =~ /([0-9\.]+)(\w+)/) {
-	my $number = $1;
-	my $unit = $2;
-	my $u = $units{$unit};
-	if ($u) {
-	    return $number * $u;
-	}
-    }
-
-    carp "Failed to convert SVG units '$thing'";
-    return undef;
+    my ($value, undef) = svg_units_scale (@_);
+    return $value;
 }
+
+my $fpnum = qr!-?(?:[0-9]*\.[0-9]+|0|[0-9]+)!;
 
 # We have a path in the cairo surface and now we have to do the SVG
 # instructions specified by "%attr".
@@ -982,6 +945,8 @@ sub do_svg_attr
     }
     my $fill_rule = $attr{'fill-rule'};
     if ($fill_rule) {
+	# Cairo supports the same two things as SVG, but with
+	# different names.
 	if ($fill_rule eq 'nonzero') {
 	    $cr->set_fill_rule ('winding');
 	}
@@ -991,6 +956,26 @@ sub do_svg_attr
 	else {
 	    carp "Unhandled value '$fill_rule' for 'fill-rule' attribute";
 	}
+    }
+    my $miterlimit = $attr{'stroke-miterlimit'};
+    if (defined $miterlimit) {
+	$cr->set_miter_limit ($miterlimit);
+    }
+    my $clip_path = $attr{'clip-path'};
+    if (defined $clip_path) {
+	$self->do_clip_path ($clip_path);
+    }
+    my $stroke_dashoffset = $attr{'stroke-dashoffset'};
+    my $stroke_dasharray = $attr{'stroke-dasharray'};
+    if ($stroke_dasharray) {
+	my @sd;
+	while ($stroke_dasharray =~ /($fpnum)/g) {
+	    push @sd, $1;
+	}
+	if (! defined $stroke_dashoffset) {
+	    $stroke_dashoffset = 0;
+	}
+	$cr->set_dash ($stroke_dashoffset, @sd);
     }
 }
 
@@ -1016,7 +1001,7 @@ sub do_transforms
     my $cr = $self->{cr};
     # Transformers - robots in disguise
     my $transform = $attr{transform};
-    while ($transform =~ /((?:translate|scale|rotate|matrix)\s*\([^\)]*\))/g) {
+    while ($transform =~ /((?:translate|scale|rotate|matrix|skewX|skewY)\s*\([^\)]*\))/g) {
 	my $change = $1;
 	if ($change =~ /translate\s*\(\s*($num)($sepnum)\s*\)/) {
 	    my $x = $1;
@@ -1043,7 +1028,8 @@ sub do_transforms
 	    rotate\s*\(
 	    \s*($num)\s*
 	    (?:($sepnum)($sepnum))?
-	    \s*\)/x) {
+	    \s*\)
+	/x) {
 	    my $angle = $1;
 	    my $x = $2;
 	    my $y = $3;
@@ -1069,6 +1055,28 @@ sub do_transforms
 	    next;
 	}
 	if ($change =~ m!
+	    skew([XY])\s*
+	    \(\s*
+	    ($num)
+	    \s*\)
+	!x) {
+	    my $xy = $1;
+	    my $angle = deg2rad ($2);
+	    my $t = tan ($angle);
+	    my @nums;
+	    if ($xy eq 'X') {
+		@nums = (1, 0, $t, 1, 0, 0);
+	    }
+	    elsif ($xy eq 'Y') {
+		@nums = (1, $t, 0, 1, 0, 0);
+	    }	
+	    else {
+		die "$xy should be either X or Y";
+	    }
+	    multiply ($cr, \@nums);
+	    next;
+	}
+	if ($change =~ m!
 	    matrix\s*
 	    \(\s*
 	    ($num)
@@ -1078,17 +1086,10 @@ sub do_transforms
 	    ($sepnum)
 	    ($sepnum)
 	    \s*\)
-	    !x) {
+	!x) {
 	    my @nums = ($1, $2, $3, $4, $5, $6);
 	    @nums = map {sepnum ($_)} @nums;
-	    $self->msg ("Matrix @nums");
-	    my $m = Cairo::Matrix->init (@nums);
-	    my $matrix = $cr->get_matrix ();
-	    $matrix = $matrix->multiply ($m);
-# I'm not yet sure how to implement the translate part.
-	    #$matrix =
-# $matrix->translate (-$nums[4]/2, $nums[5]);
-	    $cr->set_matrix ($matrix);
+	    multiply ($cr, \@nums);
 	    next;
 	}
     }
@@ -1096,6 +1097,15 @@ sub do_transforms
     # if ($transform) {
     # 	warn "Unhandled '$transform'";
     # }
+}
+
+sub multiply
+{
+    my ($cr, $nums) = @_;
+    my $matrix = $cr->get_matrix ();
+    my $m = Cairo::Matrix->init (@$nums);
+    $matrix = $m->multiply ($matrix);
+    $cr->set_matrix ($matrix);
 }
 
 sub linearGradient
@@ -1109,10 +1119,13 @@ sub do_fill_stroke
     my $cr = $self->{cr};
     my $fill = $attr->{fill};
     my $stroke = $attr->{stroke};
-    # These can be undefined
+    # To save doing lots of checks here, the set_colour method is
+    # designed so that these opacity values can be undefined if they
+    # are not present in $attr.
     my $fill_opacity = $attr->{'fill-opacity'};
     my $stroke_opacity = $attr->{'stroke-opacity'};
     my $opacity = $attr->{opacity};
+    # I haven't checked whether this is the correct priority.
     if (defined $opacity && ! defined $fill_opacity) {
 	$fill_opacity = $opacity;
     }
@@ -1122,6 +1135,9 @@ sub do_fill_stroke
 
     if ($fill && $fill ne 'none') {
 	if ($stroke && $stroke ne 'none') {
+	    # I haven't checked whether it should be fill before
+	    # stroke, but the results of doing it this way look right,
+	    # so presumably this is what the standard says to do.
 	    $self->set_colour ($fill, $fill_opacity);
 	    $cr->fill_preserve ();
 	    $self->msg ("Filling with $fill");
@@ -1142,7 +1158,7 @@ sub do_fill_stroke
     }
     elsif (! $fill && ! $stroke) {
 	$self->msg ("Filling with black");
-	# Fill with black seems to be the default.
+	# Filling with black is the default action.
 	$self->set_colour ('#000000', $fill_opacity);
 	$cr->fill ();
     }

@@ -1,3 +1,30 @@
+0.38.3 2021-05-17 16:12:40 +0200 Tobias Oetiker <tobi@oetiker.ch>
+
+ - run the mayAnonymous check as a last ditch effort ... 
+
+0.38.2 2021-05-17 15:44:51 +0200 Tobias Oetiker <tobi@oetiker.ch>
+
+ - even more promisification
+
+0.38.1 2021-05-17 14:42:29 +0200 Tobias Oetiker <tobi@oetiker.ch>
+
+ - make Config.pm also async aware ... hopefully in a backward compatible manner
+
+0.38.0 2021-05-14 16:18:59 +0200 Tobias Oetiker <tobi@oetiker.ch>
+
+ - allow checkAccess to return a promise. This required lots of
+   async changes in RpcService.
+ - Callbackery does require Future::AsyncAwait now. Async methods
+   can not use signatures yet to keep compatible with perl 5.22
+
+0.37.3 2021-05-11 20:27:43 +0200 Tobias Oetiker <tobi@oetiker.ch>
+
+ - set incrementalSearch property to false by default
+
+0.37.2 2021-05-11 18:30:25 +0200 Tobias Oetiker <tobi@oetiker.ch>
+
+ - make incremental search work on mobile devices
+
 0.37.1 2021-05-10 09:54:11 +0200 Tobias Oetiker <tobi@oetiker.ch>
 
  - support for reconfigurePluginOnAppear to have tabs rebuilt on open

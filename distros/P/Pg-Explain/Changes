@@ -1,5 +1,9 @@
 Revision history for Pg-Explain
 
+1.08    2021/05/15
+        - Provide links to bugtracker and homepage for CPAN
+        per report from Eugen Konkov
+
 1.07    2021/04/14
         - Parse query text from auto-explain plans.
         Missing functionality reported by Jamey Courtney.

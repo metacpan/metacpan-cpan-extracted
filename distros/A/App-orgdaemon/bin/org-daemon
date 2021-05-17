@@ -4,7 +4,7 @@
 #
 # Author: Slaven Rezic
 #
-# Copyright (C) 2009,2013,2014,2015,2016,2017 Slaven Rezic. All rights reserved.
+# Copyright (C) 2009,2013,2014,2015,2016,2017,2019,2020,2021 Slaven Rezic. All rights reserved.
 # This program is free software; you can redistribute it and/or
 # modify it under the same terms as Perl itself.
 #
@@ -18,7 +18,7 @@ package # hide from PAUSE indexer
 use strict;
 use 5.008; # scalar open
 
-our $VERSION = '1.09';
+our $VERSION = '1.10';
 
 use Getopt::Long;
 use List::Util qw(max);
@@ -254,13 +254,13 @@ sub update_lb {
 	my @segmented_dates; # ([$dateobj, [$text, $tags, $scheduled, $orgdate]], ...)
 	for my $date (@dates) {
 	    my $formatted_text = $date->formatted_text;
-	    if ($formatted_text =~ s{\s+(<.*?>)}{}) {
+	    if ($formatted_text =~ s{(?:^|\s+)(<.*?>)}{}) {
 		my $orgdate = $1;
 		my($scheduled, $tags);
-		if ($formatted_text =~ s{\s+(SCHEDULED:)$}{}) {
+		if ($formatted_text =~ s{(?:^|\s+)(SCHEDULED:)$}{}) {
 		    $scheduled = $1;
 		}
-		if ($formatted_text =~ s{\s+(:\S+:)$}{}) {
+		if ($formatted_text =~ s{(?:^|\s+)(:\S+:)$}{}) {
 		    $tags = $1;
 		}
 		my $text = $formatted_text;
@@ -490,19 +490,7 @@ sub check_for_alarms {
 			       });
 	    }
 
-	    $Tk::platform = $Tk::platform; # peacify -w
-	    if ($Tk::platform eq 'unix') {
-		my($wrapper) = $t->wrapper;
-		# set sticky flag for gnome and fvwm2
-		eval q{
-		    $t->property('set','_WIN_STATE','CARDINAL',32,[1],$wrapper); # sticky
-		    $t->property('set','_WIN_LAYER','CARDINAL',32,[6],$wrapper); # ontop
-		};
-		warn $@ if $@;
-	    }
-
-	    eval { $t->attributes(-topmost => 1) };
-	    warn $@ if $@;
+	    stay_on_top($t);
 
 	    $window_for_date{$date_id} = $t;
 	}
@@ -672,6 +660,7 @@ sub find_dates_in_org_file {
     open $fh, "<", \$buf
 	or die "Cannot open scalar, should not happen!";
     binmode $fh, ':encoding(utf-8)'; # a modern default
+    no if $] >= 5.030, warnings => 'utf8'; # perl warns also on utf8 sequences like 0xfffe. However, suppressing this warning seems to work only since perl 5.30
     while(defined(my $textline = <$fh>)) {
 	$linenumber++;
 	chomp $textline;
@@ -781,6 +770,23 @@ sub open_warning {
 	warn "Can't open $file: $!";
     }
     $open_warning{$file}++;
+}
+
+sub stay_on_top {
+    my $t = shift;
+    no warnings 'once';
+    if ($Tk::platform eq 'unix') {
+	my($wrapper) = $t->wrapper;
+	# set sticky flag for gnome and fvwm2
+	eval q{
+	$t->property('set','_WIN_STATE','CARDINAL',32,[1],$wrapper); # sticky
+	$t->property('set','_WIN_LAYER','CARDINAL',32,[6],$wrapper); # ontop
+	};
+	warn $@ if $@;
+    }
+    
+    eval { $t->attributes(-topmost => 1) };
+    warn $@ if $@;
 }
 
 return 1 if caller;

@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2021 -- leonerd@leonerd.org.uk
 
-package List::Keywords 0.04;
+package List::Keywords 0.05;
 
 use v5.14;
 use warnings;
@@ -82,6 +82,7 @@ The C<List::Keyword> version here ran 26% faster.
 
 my %KEYWORD_OK = map { $_ => 1 } qw(
    first any all none notall
+   reduce
 );
 
 sub import
@@ -115,6 +116,11 @@ sub B::Deparse::pp_firstwhile
                            "firstwhile[op_private=$private]";
 
    return B::Deparse::mapop(@_, $name);
+}
+
+sub B::Deparse::pp_reducewhile
+{
+   return B::Deparse::mapop(@_, "reduce");
 }
 
 =head1 KEYWORDS
@@ -156,11 +162,20 @@ Same as L</any> and L</all> but with the return value inverted.
 
 =cut
 
+=head2 reduce
+
+   $final = reduce { CODE } INITIAL, LIST
+
+Repeatedly calls a block of code, using the C<$a> package lexical as an
+accumulator and setting C<$b> to each successive value from the list in turn.
+The first value of the list sets the initial value of the accumulator, and
+each returned result from the code block gives its new value. The final value
+of the accumulator is returned.
+
 =head1 TODO
 
 More functions from C<List::Util>:
 
-   reduce
    reductions
    pairfirst pairgrep pairmap
 

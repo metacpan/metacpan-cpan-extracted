@@ -191,9 +191,25 @@ subtest 'alien' => sub {
 
   subtest 'invalid name' => sub {
 
-    local $@ = '';
-    eval { FFI::CheckLib::find_lib( lib => 'bar', alien => ['x..y']) };
-    like "$@", qr/Doesn't appear to be a valid Alien name x\.\.y/;
+    is dies { FFI::CheckLib::find_lib( lib => 'bar', alien => ['x..y']) }, match qr/Doesn't appear to be a valid Alien name x\.\.y/;
+
+  };
+
+  subtest 'no dynamic_libs method' => sub {
+
+    {
+      package Alien::libbaz;
+      $INC{'Alien/libbaz.pm'} = __PACKAGE__;
+    }
+
+    is dies { FFI::CheckLib::find_lib( lib => 'baz', alien => ['Alien::libbaz']) }, match qr/Alien Alien::libbaz doesn't provide a dynamic_libs method/;
+  };
+
+  subtest 'not installed' => sub {
+
+    try_ok {
+      FFI::CheckLib::find_lib( lib => 'baz', alien => ['Alien::libnotinstalled']);
+    };
 
   };
 

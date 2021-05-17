@@ -1,0 +1,7 @@
+Revision history for MIDI-Bassline-Walk
+
+0.0101 2021-05-17 10:25:54
+    - Improve documentation.
+
+0.0100 2021-05-17 09:55:25
+    - Mint with Dist::Zilla.

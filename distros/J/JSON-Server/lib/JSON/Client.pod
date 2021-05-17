@@ -9,8 +9,8 @@ JSON::Client - Example client for JSON::Server
 
 =head1 VERSION
 
-This documents version 0.01 of JSON::Client
-corresponding to L<git commit 557295f1d182c1a8425a5dd13c74c27a153f8c93|https://github.com/benkasminbullock/json-server/commit/557295f1d182c1a8425a5dd13c74c27a153f8c93> released on Sun Feb 21 17:00:48 2021 +0900.
+This documents version 0.02 of JSON::Client
+corresponding to L<git commit 3002d95df18b014ba750d9c37f1ea44027d29fe5|https://github.com/benkasminbullock/json-server/commit/3002d95df18b014ba750d9c37f1ea44027d29fe5> released on Wed May 12 12:04:15 2021 +0900.
 
 =head1 DESCRIPTION
 

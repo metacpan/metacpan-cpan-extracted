@@ -1,0 +1,311 @@
+=head1 NAME
+
+UniEvent::HTTP::ServerRequest - HTTP server request class
+
+
+
+=head1 SYNOPSIS
+
+    # simple
+    
+    $server->request_callback(sub {
+        my $request = shift;
+        say $request->method_str;
+        say $request->uri;
+        say $request->body;
+        say Dumper($request->headers);
+        
+        $request->respond({
+            code => 200,
+            body => "hello",
+        });
+    });
+    
+    #request body streaming
+    
+    $server->route_callback(sub {
+        my $request = shift;
+        
+        if ($request->uri == "/upload_data") {
+            # open $fh
+            $request->enable_partial;
+            $request->partial_callback(sub {
+                my ($request, $error) = @_;
+                if ($error) {
+                    log("something went wrong: $error");
+                    # delete file
+                }
+                # write $request->body to $fh
+                $request->body("");
+                
+                if ($request->is_done) {
+                    # close $fh
+                    $request->respond({
+                        code => 200,
+                        body => "uploaded!",
+                    });
+                }
+            });
+        }
+    });
+    
+    # tracking if response no longer needed
+    
+    $server->request_callback(sub {
+        my $request = shift;
+        
+        start_hard_work_calculating_response_data($request, sub {
+            my $request = shift;
+            $request->respond({
+                code => 200,
+                body => $data,
+            });
+        });
+        
+        $request->drop_event(sub {
+            my ($request, $error) = @_;
+            log("request has been canceled because: $error");
+            cancel_hard_work_for($request);
+        });
+    });
+
+
+
+
+=head1 DESCRIPTION
+
+C<UniEvent::HTTP::ServerRequest> is used to represent client's request on server. It holds all the properties and state of http request. It is passed to various
+callbacks listening for request receiving events in server.
+
+ServerRequest has API to control how certain request will be received and API for responding on request.
+
+C<UniEvent::HTTP::ServerRequest> inherits from L<Protocol::HTTP::Request>. So for complete documenation you need to also read L<Protocol::HTTP::Request>'s docs.
+
+
+
+=head1 METHODS
+
+All methods of L<Protocol::HTTP::Request> also apply.
+
+
+=head2 receive_callback($sub)
+
+=head2 receive_event()
+
+Callbacks set via these methods will be invoked when request is fully received including all body. Use this event when you decide to fully receive the request in 
+memory and process request when it's fully available.
+
+Callback signature:
+
+    my $request = shift; # request object itself
+
+Setting callbacks for this event is only meaningful in server's C<route_callback>/C<route_event> as it is the only place where you can access not yet received
+request object.
+
+See L<UniEvent/"EVENT CALLBACKS"> for differences between C<_callback> and C<_event> versions of methods.
+
+
+=head2 partial_callback($sub)
+
+=head2 partial_event()
+
+Callbacks set via these methods will be invoked one or more times as data (body) arrives from network for the request. Partial receival mode must be enabled
+via C<enable_partial()>, otherwise no callbacks will be called. Use this event if you decide to process body on-the-fly by parts as they arrives from nertwork.
+For example, to incremental parse content or to write body to disk without consuming memory.
+
+Callback signature:
+
+    my ($request, $error) = @_;
+
+Where C<$request> is the request object itself. From call to call request's body will grow until it's done or error occurs.
+If $request->is_done() is true or C<$error> is set, then it's the last call.
+
+See L<UniEvent::HTTP::Request>'s C<partial_callback> description for details as behaviour is the same.
+
+    $server->route_callback(sub {
+        my $request = shift;
+        
+        if ($request->uri == "/upload_data") {
+            # open $fh
+            $request->enable_partial;
+            $request->partial_callback(sub {
+                my ($request, $error) = @_;
+                if ($error) {
+                    log("something went wrong: $error");
+                    # delete file
+                }
+                # write $request->body to $fh
+                $request->body("");
+                
+                if ($request->is_done) {
+                    # close $fh
+                    $request->respond({
+                        code => 200,
+                        body => "uploaded!",
+                    });
+                }
+            });
+        }
+    });
+
+Setting callbacks for this event is only meaningful in server's C<route_callback>/C<route_event> as it is the only place where you can access not yet received
+request object.
+
+See L<UniEvent/"EVENT CALLBACKS"> for differences between C<_callback> and C<_event> versions of methods.
+
+
+=head2 drop_callback($sub)
+
+=head2 drop_event()
+
+Callbacks set via these methods will be invoked when response for the fully received request is no longer needed. The reasons why it's not needed anymore
+may be: connection loss, I/O errors, manual dropping request, timeout, etc...
+
+Callback signature:
+
+    my ($request, $error) = @_;
+
+Where C<$request> is the request object itself.
+C<$error> is a L<XS::ErrorCode> object which explains why the response is no longer needed. 
+
+IMPORTANT: for requests that are not yet fully received (not C<is_done()>), these callbacks will not be called, because in this case other error-reporting
+method is used. For partial-mode requests, partial callbacks will be called with error. For non-partial-mode requests no actions required because user doesn't
+know yet about such requests as callbacks like C<receive_callback> or C<request_callback> in server are only invoked when request is fully received. Such scenarios
+are reported into general error callbacks in server: C<error_callback>.
+
+The main goal of this event is to allow user to cancel some hard work he started to generate response for the request when the response is no longer needed.
+For conveniency, C<UniEvent::HTTP> doesn't require a user to check if connection is still alive or check for I/O errors, thus it just silently ignores all data
+that user sends in this case. So that this event is solely a matter of optimisation, it just signals user that no one is waiting for the results anymore.
+
+    $server->request_callback(sub {
+        my $request = shift;
+        
+        start_hard_work_calculating_response_data($request, sub {
+            my $request = shift;
+            $request->respond({
+                code => 200,
+                body => $data,
+            });
+        });
+        
+        $request->drop_event(sub {
+            my ($request, $error) = @_;
+            log("request has been canceled because: $error");
+            cancel_hard_work_for($request);
+        });
+    });
+
+See L<UniEvent/"EVENT CALLBACKS"> for differences between C<_callback> and C<_event> versions of methods.
+
+
+=head2 finish_callback($sub)
+
+=head2 finish_event()
+
+Callbacks set via these methods will be invoked when http request cycle is finished, i.e. when response for the request is fully given and sent to network and
+server is about to forget this request and its response.
+
+Callback signature:
+
+    my $request = shift; # request object itself
+
+
+=head2 enable_partial()
+
+Enables partial receival mode for the request. Enabling this mode is only meaningful in server's C<route_callback>/C<route_event> as it is the only place where
+you can access not yet received request object.
+
+
+=head2 is_done()
+
+Returns true if request has been fully received (including body). Useful in partial mode callbacks.
+
+
+=head2 is_secure()
+
+Returns true if the request is made using SSL (HTTPS).
+
+    if ($request->uri == "/admin" && !$request->is_secure) {
+        $request->redirect("https://mysite.com/admin");
+        return;
+    }
+
+=head2 sockaddr()
+
+Returns address of the location which client is connected to. I.e. it is one of the $server->listeners address.
+If you have only one listener, then the returned address will be equal to $server->sockaddr. Address returned as L<Net::SockAddr> object.
+
+
+=head2 peeraddr()
+
+Returns client's address as L<Net::SockAddr> object.
+May return C<undef> if connection is no longer alive or request-response cycle has been finished.
+
+    if ($request->uri == "/admin" && $request->peeraddr->ip ne '1.1.1.1') {
+        $request->respond({code => 403});
+        return;
+    }
+
+
+=head2 respond($response || \%response_params)
+
+Send response for the request. Argument can be a L<UniEvent::HTTP::ServerResponse> object or params to its constructor. If response is not complete (for example
+chunked response started) then further activity on response object is required.
+
+    $request->respond({
+        code => 200,
+        body => "hi",
+        headers => {Foo => "bar"},
+    });
+    
+    my $response = UE::HTTP::ServerResponse->new({code => 404});
+    $request->respond($response);
+    
+    $request->respond({
+        code => 200,
+        chunked => 1,
+    });
+    ...
+    # later
+    $request->response->send_chunk($data1);
+    ...
+    $request->response->send_chunk($dataN);
+    $request->response->send_final_chunk;
+    
+
+Does nothing if request has been dropped.
+
+
+=head2 response()
+
+Returns response object (L<UniEvent::HTTP::ServerResponse>) associated with the request. Will return C<undef> if C<respond()> has not been called yet.
+Useful for responses which is sent by parts (chunked) and thus further response object iteraction is required.
+
+
+=head2 redirect($uri)
+
+Sends redirection response. C<$uri> may be a string or anything that stringifies.
+
+The same as
+
+    $request->respond({
+        code => 302,
+        headers => {Location => "$uri"},
+    });
+
+
+=head2 send_continue()
+
+Sends C<100-continue> intermediate response to client during request receival.
+
+Does nothing if request is HTTP/1.0 or client didn't ask for that (no C<Expect: 100-continue> header).
+
+Will throw if response for the request has already been sent or started.
+
+
+=head2 drop()
+
+Drop the request and make response no longer needed.
+Underlying connection will be closed and C<drop_callback/event> will be called with error C<UniEvent::SystemError::operation_canceled>.
+
+=cut

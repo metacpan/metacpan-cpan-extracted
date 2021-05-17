@@ -22,11 +22,11 @@ no_index:
 requires:
   IO::Select: '1.42'
   IO::Socket: '1.43'
-  JSON::Create: '0.31'
+  JSON::Create: '0.34'
   JSON::Parse: '0.61'
   perl: '5.006001'
 resources:
   bugtracker: https://github.com/benkasminbullock/json-server/issues
   repository: git://github.com/benkasminbullock/json-server.git
-version: '0.01'
+version: '0.02'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

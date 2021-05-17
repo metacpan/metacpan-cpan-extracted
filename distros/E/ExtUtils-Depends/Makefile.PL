@@ -8,6 +8,7 @@ my %prereqs = (
 	'File::Spec' => 0,
 	'Data::Dumper' => 0,
 	'IO::File' => 0,
+	'ExtUtils::MakeMaker' => '7.44', # no need for Win32 static_lib hack
 );
 
 my %meta_merge = (

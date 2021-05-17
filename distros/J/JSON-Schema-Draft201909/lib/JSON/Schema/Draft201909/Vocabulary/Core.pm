@@ -4,15 +4,15 @@ package JSON::Schema::Draft201909::Vocabulary::Core;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Implementation of the JSON Schema Draft 2019-09 Core vocabulary
 
-our $VERSION = '0.026';
+our $VERSION = '0.027';
 
 use 5.016;
 no if "$]" >= 5.031009, feature => 'indirect';
 no if "$]" >= 5.033001, feature => 'multidimensional';
 no if "$]" >= 5.033006, feature => 'bareword_filehandles';
+use strictures 2;
 use JSON::Schema::Draft201909::Utilities qw(is_type abort assert_keyword_type canonical_schema_uri E assert_uri_reference assert_uri);
 use Moo;
-use strictures 2;
 use namespace::clean;
 
 with 'JSON::Schema::Draft201909::Vocabulary';
@@ -69,7 +69,6 @@ sub _traverse_keyword_schema {
   my ($self, $schema, $state) = @_;
 
   return if not assert_keyword_type($state, $schema, 'string');
-
   assert_uri($state, $schema);
 
   return E($state, '$schema can only appear at the schema resource root')
@@ -91,7 +90,6 @@ sub _traverse_keyword_anchor {
   my ($self, $schema, $state) = @_;
 
   return if not assert_keyword_type($state, $schema, 'string');
-
   return E($state, '$anchor value "%s" does not match required syntax', $schema->{'$anchor'})
     if $schema->{'$anchor'} !~ /^[A-Za-z][A-Za-z0-9_:.-]+$/;
 
@@ -237,7 +235,7 @@ JSON::Schema::Draft201909::Vocabulary::Core - Implementation of the JSON Schema 
 
 =head1 VERSION
 
-version 0.026
+version 0.027
 
 =head1 DESCRIPTION
 

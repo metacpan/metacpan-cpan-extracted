@@ -4,15 +4,15 @@ package JSON::Schema::Draft201909::Vocabulary::Format;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Implementation of the JSON Schema Draft 2019-09 Format vocabulary
 
-our $VERSION = '0.026';
+our $VERSION = '0.027';
 
 use 5.016;
 no if "$]" >= 5.031009, feature => 'indirect';
 no if "$]" >= 5.033001, feature => 'multidimensional';
 no if "$]" >= 5.033006, feature => 'bareword_filehandles';
+use strictures 2;
 use JSON::Schema::Draft201909::Utilities qw(is_type E A assert_keyword_type);
 use Moo;
-use strictures 2;
 use Feature::Compat::Try;
 use namespace::clean;
 
@@ -29,7 +29,7 @@ sub keywords {
 
   my $is_datetime = sub {
     eval { require Time::Moment; 1 } or return 1;
-    eval { Time::Moment->from_string($_[0]) } ? 1 : 0,
+    eval { Time::Moment->from_string(uc($_[0])) } ? 1 : 0,
   };
   my $is_email = sub {
     eval { require Email::Address::XS; Email::Address::XS->VERSION(1.01); 1 } or return 1;
@@ -65,8 +65,25 @@ sub keywords {
 
   my $formats = +{
     'date-time' => $is_datetime,
-    date => sub { $is_datetime->($_[0].'T00:00:00Z') },
-    time => sub { $is_datetime->('2000-01-01T'.$_[0]) },
+    date => sub { $_[0] =~ /^\d{4}-(\d\d)-(\d\d)$/ && $is_datetime->($_[0].'T00:00:00Z') },
+    time => sub {
+      return if $_[0] !~ /^(\d\d):(\d\d):(\d\d)(?:\.\d+)?([Zz]|([+-])(\d\d):(\d\d))$/
+        or $1 > 23
+        or $2 > 59
+        or $3 > 60
+        or (defined($6) and $6 > 23)
+        or (defined($7) and $7 > 59);
+
+      return 1 if $3 <= 59;
+      return $1 == 23 && $2 == 59 if uc($4) eq 'Z';
+
+      my $sign = $5 eq '+' ? 1 : -1;
+      my $hour_zulu = $1 - $6*$sign;
+      my $min_zulu = $2 - $7*$sign;
+      $hour_zulu -= 1 if $min_zulu < 0;
+
+      return $hour_zulu%24 == 23 && $min_zulu%60 == 59;
+    },
     duration => sub { $_[0] =~ $duration_re && $_[0] !~ m{[.,][0-9]+[A-Z].} },
     email => sub { $is_email->($_[0]) && $_[0] !~ /[^[:ascii:]]/ },
     'idn-email' => $is_email,
@@ -158,7 +175,7 @@ JSON::Schema::Draft201909::Vocabulary::Format - Implementation of the JSON Schem
 
 =head1 VERSION
 
-version 0.026
+version 0.027
 
 =head1 DESCRIPTION
 

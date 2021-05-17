@@ -7,7 +7,6 @@ Form::Tiny::Manual - reference for working with Form::Tiny
 =head1 SYNOPSIS
 
 	use Form::Tiny -base;
-	use Form::Tiny::Error;
 	use Types::Common::String qw(SimpleStr);
 	use Types::Common::Numeric qw(PositiveInt);
 
@@ -53,11 +52,11 @@ The module itself isn't much more than a hashref filter - it accepts one as inpu
 
 I<(Note that not every step on that pipeline is ran every time - it depends on form configuration)>
 
-The module always tries to get as much data from input as possible and copy that into output. It will never copy any data that is not explicitly specified in the form fields configuration.
+The module always tries to get as much data from input as possible and copy that into output. B<It will never copy any data that is not explicitly specified in the form fields configuration>.
 
 =head2 Moose-like syntax sugar
 
-Starting with version 1.10, Form::Tiny now allows you to define forms much like you would define a Moose class. The new syntax is presented below:
+Starting with version 1.10, Form::Tiny now allows and encourages you to define forms much like you would define a Moose class. The new syntax is presented below:
 
 	use Form::Tiny -base, -filtered; # -strict is also possible
 
@@ -81,7 +80,7 @@ Starting with version 1.10, Form::Tiny now allows you to define forms much like 
 	# will filter Int values before they get validated
 	form_filter Int, sub { abs shift };
 
-Adding any argument to C<use Form::Tiny> line will cause it to enable the new syntax. Currently supported flags are:
+Adding any argument to C<use Form::Tiny> line will cause it to enable this syntax. Currently supported flags are:
 
 =over
 
@@ -93,11 +92,11 @@ Adding any argument to C<use Form::Tiny> line will cause it to enable the new sy
 
 =back
 
-This way you can have syntax that resembles and mixes in with Moose syntax better, and avoid a lot of boilerplate. This may however be a suboptimal option if for example you want your class to use Moose instead of Moo or have more control over class building.
+This way you can have syntax that resembles and mixes in with Moose syntax. This may however be a suboptimal option if for example you want your class to use Moose instead of Moo or have more control over class building.
 
 =head2 Composing as a role
 
-To use Form::Tiny as a Moo role you have to declare your own class (preferably Moo / Moose) mixing in the I<Form::Tiny> role and define a I<build_fields> sub, returning a list of field definitions for the form. A class containing these two basic requirements is ready to be instantiated and passed input to be validated.
+If you don't want to have Moo imported automatically or want to create something a bit more complicated or custom, see L<Form::Tiny::Manual::Internals>.
 
 =head2 Basic usage
 
@@ -131,11 +130,9 @@ The example below illustrates how a form class could be used to validate data.
 
 =head2 Form building
 
-If you imported I<Form::Tiny> with flags, you can use I<form_field> function to declare form fields, just like you would use I<has> to declare class properties in Moose. Every class applying the I<Form::Tiny> role explicitly has to have a sub called I<build_fields>, which should return a list of hashrefs.
+You can use I<form_field> function to declare form fields, just like you would use I<has> to declare class properties in Moo/se.
 
-Each of field definition will be coerced into an object of the L<Form::Tiny::FieldDefinition> class. When using I<build_fields> you can also provide an instance of the class yourself, which should be helpful if you're willing to use your own definition implementation.
-
-	# syntactic sugar version
+Each of field definition will be coerced into an object of the L<Form::Tiny::FieldDefinition> class.
 
 	form_field 'some_name';
 	form_field 'another_name' => (
@@ -151,22 +148,7 @@ Each of field definition will be coerced into an object of the L<Form::Tiny::Fie
 		};
 	};
 
-	# explicit builder version
-
-	sub build_fields {
-		return (
-			# first field
-			# note the name is required in this form
-			{ name => "some_name" },
-
-			# second field
-			MyFieldDefinition->new(...),
-		);
-	}
-
-The only required element of this hashref is key I<name>, which contains the string with name of the field in the form input. In I<form_field>, the name should not be given explicitly, as it will be overwritten by the first argument to that function. Other possible elements are:
-
-Note that it is possible to mix I<form_field> together with I<build_fields>, but should be very rarely necessary.
+The only required element of this hashref is key I<name>, which contains the string with name of the field in the form input. In I<form_field>, the name B<should not> be given explicitly, as it will be automatically overwritten by the first argument to that function. Other possible elements are:
 
 =over
 
@@ -253,14 +235,14 @@ A subroutine like the one above should either be returned by I<build_cleaner> me
 		return sub { ... }; # cleaner sub
 	}
 
-	# or (when imported with -flags) ...
+	# or
 	form_cleaner sub { ... };
 
-Cleaning sub is also allowed to change the $data, which is a hash reference to the runnig copy of the input. Note that this is the final step in the validation process, so anything that is in $data after cleaning will be available in the form's I<fields> after validation.
+Cleaning sub is also allowed to change the $data, which is a hash reference to the running copy of the input. Note that this is the final step in the validation process, so anything that is in $data after cleaning will be available in the form's I<fields> after validation.
 
 =head2 Optional behavior
 
-Attaching more behavior to the form is possible by overriding I<pre_mangle> and I<pre_validate> methods in the final class. These methods do nothing by default, but roles that are introducing extra behavior set up C<around> hooks for them. It's okay not to invoke the SUPER version of these methods if you're overriding them.
+Attaching more behavior to the form is possible by overriding I<pre_mangle> and I<pre_validate> methods in the final class. These methods do nothing by default, but roles that are introducing extra behavior set up C<around> hooks for them. It's okay not to invoke the SUPER version of these methods if you're overriding them, but you need to explicitly return the value you're passed in these methods.
 
 B<pre_mangle> is fired for every field, just before it is changed ("mangled"). In addition to an object reference, this method will be passed the definition of the field (L<Form::Tiny::FieldDefinition>) and a scalar value of the field. The field must exist in the input data for this method to fire, but can be undefined. The return value of this method will become the new value for the field.
 
@@ -269,6 +251,7 @@ B<pre_mangle> is fired for every field, just before it is changed ("mangled"). I
 
 		# do something with $value
 
+		# don't forget to return!
 		return $value;
 	}
 
@@ -279,6 +262,7 @@ B<pre_validate> is fired just once for the form, before any field is validated. 
 
 		# do something with $input_data
 
+		# don't forget to return!
 		return $input_data;
 	}
 
@@ -301,13 +285,13 @@ Enables initial filtering for the input fields. By default, this will only cause
 The module also enables a way to create a form without the need of a dedicated package. This is done with the L<Form::Tiny::Inline> class. This requires the user to pass all the data to the constructor, as shown in the example:
 
 	my $form = Form::Tiny::Inline # An inline form ...
-	           ->is(qw/Strict/)   # ... with the strict role mixed in ...
+	           ->is(qw/Strict/)   # ... with the strict role mixed in (strict mode) ...
 	           ->new(             # ... will be created with properties:
 		field_defs => [{name => "my_field"}],
 		cleaner => sub { ... },
 	);
 
-The names changes a little - the regular I<build_fields> builder method becomes a I<field_defs> property, I<build_cleaner> becomes just a I<cleaner> property. This is because these methods implemented in classes are only builders for the underlying Moo properties, and with inline class these properties have to be assigned directly, not built.
+The names changes a little - form_fields calls become a I<field_defs> property, I<form_cleaner> becomes just a I<cleaner> property. For filtered forms, I<form_filter> becomes I<filters> property.
 
 =head2 Advanced topics
 
@@ -339,7 +323,7 @@ Other example is two nested arrays that not necessarily contain a hash at the en
 
 =head3 Nested forms
 
-Every form class created with the I<Form::Tiny> role mixed in can be used as a field definition type in other form. The outer and inner forms will validate independently, but inner form errors will be added to outer form with the outer field name prepended.
+Every form class created with I<Form::Tiny> is a consumer of L<Form::Tiny::Form> role, and can be used as a field definition type in other form. The outer and inner forms will validate independently, but inner form errors will be added to outer form with the outer field name prepended.
 
 	# in Form2
 	# everything under "nested" key will be validated using Form1 instance
@@ -360,7 +344,6 @@ It is possible and often very helpful to have both form and class fields inside 
 
 	use Form::Tiny -base;
 	use Types::Standard qw(Str);
-	use Form::Tiny::Error;
 
 	has 'user' => (
 		is => 'rw',

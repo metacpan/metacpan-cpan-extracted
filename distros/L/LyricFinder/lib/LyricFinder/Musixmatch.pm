@@ -202,12 +202,28 @@ sub _parse {
 	my $self = shift;
 	my $html = shift;
 
-	if (my ($goodbit) = $html =~
-		m{\<\/div\>\s*\<p\s+class\=\"mxm\-lyrics\_+content\s*">\<span\s+class\=\"lyrics\_+content\_+ok\"\>(.+?)\<\/span\>}msi)
-	{
-		my $hs   = HTML::Strip->new();
-		my $text = $hs->parse($goodbit);
-
+	my $goodbit = '';
+	my $text = '';
+	my $mm_status = '';
+	my $hs   = HTML::Strip->new();
+	#METHOD 1:  MERGE LYRICS FROM BOTH (OR MORE?) LYRIC "SPANS" MM LIKES TO BREAK LYRICS UP INTO
+	#2 SEPARATE SPAN TAGS:  A SHORT (ABBREVIATED) PART, FOLLOWED BY THE REST OF THE LYRICS:
+	while ($html =~ s#\<span\s+class\=\"lyrics\_\_content\_\_(ok|warning|error)\"\>(.+?)\<\/span\>##s) {
+		$mm_status = $1;
+		$goodbit = $2;
+		$text .= $hs->parse($goodbit) . "\r\n";
+	}
+	unless ($text =~ /[a-z]/i) {  #IF METHOD 1 FAILS, THE FULL LYRICS ARE OFTEN FOUND IN THE FIRST "body":
+		$html =~ s#\\\"#\x02#gs;  #PROTECT ESCAPED QUOTES
+		if ($html =~ m#\"body\"\:\"([^\"]+)#s) {
+			$mm_status = 'error!';
+			($goodbit = $1) =~ s#\x02#\"#gs;
+			$text .= $hs->parse($goodbit);
+			$text =~ s#\\n#\n#gs;  #line-feeds are encoded literally in the JSON block.
+		}
+	}
+	if ($text =~ /[a-z]/i) {
+		$text .= "\r\n(Musixmatch status: $mm_status)";
 		# normalize Windowsey \r\n sequences:
 		$text =~ s/\r+//gs;
 		# strip off pre & post padding with spaces:
@@ -224,7 +240,7 @@ sub _parse {
 
 		return $text;
 	} else {
-		carp "e:$Source - Failed to identify lyrics on result page.";
+		carp($self->{'Error'} = "e:$Source - Failed to identify lyrics on result page.");
 		return '';
 	}
 }   # end of sub parse
@@ -284,6 +300,16 @@ https://www.musixmatch.com for song lyrics, and, if found, returns them as a
 string.  It's designed to be called by LyricFinder, but can be used 
 directly as well.  In LyricFinder, it is invoked by specifying 
 I<"Musixmatch"> as the third argument of the B<fetch>() method.
+
+NOTE:  Musixmatch flags lyrics with a status of either "ok", "warning", or 
+"error".  "warning" seems to mean "pending review", and when flagged "error", 
+thir site says "We detected some issues".  I don't know if this means someone's 
+complained about correctness, profanity, etc.  Therefore, we append:  
+(Musixmatch status: I<status>) to the end of the returned lyrics.  The calling 
+program can grep for and strip this off, if undesired.  There are some 
+rare cases where no lyrics are found the normal way and we have to try a 
+backup method to extract them.  In those cases, we set the status 
+to "error!".
 
 In case of problems with fetching lyrics, the error string will be returned by 
 $finder->message().  If all goes well, it will have 'Ok' in it.

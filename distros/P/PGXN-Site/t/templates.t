@@ -22,7 +22,7 @@ use Plack::Request;
 use HTTP::Message::PSGI;
 
 #plan 'no_plan';
-plan tests => 220;
+plan tests => 238;
 
 Template::Declare->init( dispatch_to => ['PGXN::Site::Templates'] );
 
@@ -157,27 +157,29 @@ sub test_wrapper {
 
     # Check the head element.
     $tx->ok('/html/head', 'Test head', sub {
-        $tx->is('count(./*)', 6, qq{Should have 6 elements below "head"});
+        $tx->is('count(./*)', 11, qq{Should have 11 elements below "head"});
+        # Title.
         $tx->is(
             './title',
             'PGXN: PostgreSQL Extension Network',
             'Should have the page title',
         );
-        $tx->is(
-            './meta[@name="keywords"]/@content',
-            'PostgreSQL, extensions, PGXN, PostgreSQL Extension Network',
-            'Should have keywords meta element',
-        );
-        $tx->is(
-            './meta[@name="description"]/@content',
-            'Search all indexed extensions, distributions, users, and tags on the PostgreSQL Extension Network.',
-            'Should have description meta element',
-        );
 
+        # Check the meta tags.
+        for my $spec (
+            ['keywords', 'PostgreSQL, extensions, PGXN, PostgreSQL Extension Network'],
+            ['description', 'Search all indexed extensions, distributions, users, and tags on the PostgreSQL Extension Network.'],
+        ) {
+            $tx->is(
+                qq{./meta[\@name="$spec->[0]"]/\@content}, $spec->[1],
+                "Should have $spec->[0] keywords meta element",
+            );
+        }
+
+        # Check the stylesheets.
         my $i = 0;
         my $v = PGXN::Site->version_string;
         for my $spec (
-            [ html   => 'screen, projection, tv' ],
             [ layout => 'screen, projection, tv' ],
             [ print  => 'print'                  ],
         ) {
@@ -186,7 +188,7 @@ sub test_wrapper {
                 $tx->is(
                     './@href',
                     "/ui/css/$spec->[0].css?$v",
-                    "CSS $i should linke to $spec->[0].css"
+                    "CSS $i should link to $spec->[0].css"
                 );
                 $tx->is(
                     './@rel',
@@ -204,6 +206,76 @@ sub test_wrapper {
                     "$spec->[0] should be for $spec->[1]"
                 );
             });
+        }
+
+        # Check the SVG icon.
+        ++$i;
+        $tx->ok("./link[$i]", "Test SVG icon", sub {
+            $tx->is(
+                './@rel', 'icon',
+                "SVG Icon should be an icon",
+            );
+            $tx->is(
+                './@href', "/ui/img/icon.svg",
+                "SVG Icon link to icon.svg",
+            );
+        });
+
+        # Check the ICO icon.
+        ++$i;
+        $tx->ok("./link[$i]", "Test ICO icon", sub {
+            $tx->is(
+                './@rel', 'icon',
+                "ICO Icon should be an icon",
+            );
+            $tx->is(
+                './@href', "/ui/img/icon.ico",
+                "ICO Icon link to icon.ico",
+            );
+        });
+
+        # Check the favicons.
+        for my $size (qw(256 32)) {
+            ++$i;
+            $tx->ok("./link[$i]", "Test $size icon", sub {
+                $tx->is(
+                    './@rel', 'icon',
+                    qq{Icon $size should be an "icon"},
+                );
+                $tx->is(
+                    './@href', "/ui/img/icon-$size.png",
+                    "Icon $size link to icon-$size.png",
+                );
+                $tx->is(
+                    './@type', 'image/png',
+                    "Icon $size type should be img/png",
+                );
+                $tx->is(
+                    './@sizes', "${size}x${size}",
+                    "Icon $size type should be sized",
+                );
+            });
+        }
+
+        # Check the other icon and UI stuff.
+        for my $spec (
+            {
+                rel   => 'apple-touch-icon',
+                href  => '/ui/img/icon-180.png',
+                sizes => '180x180',
+            },
+            {
+                rel  => 'manifest',
+                href => '/ui/manifest.json',
+            },
+        ) {
+            ++$i;
+            $tx->ok("./link[$i]", "Test link $i", sub {
+                while (my ($k, $v) = each %{ $spec }) {
+                    $tx->is("./\@$k", $v, "Link $i rel should be $v");
+                }
+            });
+            
         }
     }); # /head
 
@@ -290,43 +362,43 @@ sub test_wrapper {
                 $tx->like('./text()', qr{\bdesign\b}, 'Text should contain "design"');
                 $tx->like('./text()', qr{\blogo\b}, 'Text should contain "logo"');
                 $tx->ok('./a[1]', 'Test first anchor', sub {
-                    $tx->is('./@href', 'http://www.justatheory.com/', 'Should link to justatheory.com');
+                    $tx->is('./@href', 'https://www.justatheory.com/', 'Should link to justatheory.com');
                     $tx->is('./@title', 'Go to Just a Theory', 'Should have link title');
                     $tx->is('./text()', 'theory', 'Should have text "theory"');
                 });
                 $tx->is('./span[1][@class="grey"]', '|', 'Should have spacer span');
                 $tx->ok('./a[2]', 'Test second anchor', sub {
-                    $tx->is('./@href', 'http://fullahead.org/', 'Should link to fullahead.org');
+                    $tx->is('./@href', 'https://fullahead.org/', 'Should link to fullahead.org');
                     $tx->is('./@title', 'Go to Fullahead', 'Should have link title');
                     $tx->is('./text()', 'Fullahead', 'Should have text "Fullahead"');
                 });
                 $tx->is('./span[2][@class="grey"]', '|', 'Should have spacer span');
                 $tx->ok('./a[3]', 'Test third anchor', sub {
-                    $tx->is('./@href', 'http://www.strongrrl.com/', 'Should link to strongrrl.com');
+                    $tx->is('./@href', 'https://www.strongrrl.com/', 'Should link to strongrrl.com');
                     $tx->is('./@title', 'Go to Strongrrl', 'Should have link title');
                     $tx->is('./text()', 'Strongrrl', 'Should have text "Strongrrl"');
                 });
             }); # /span.floatLeft
 
-                        # [ 'http://blog.pgxn.org/',    'Blog',       'Blog'    ],
-                        # [ 'http://twitter.com/pgxn/', 'Twitter',    'Twitter' ],
+                        # [ 'https://blog.pgxn.org/',    'Blog',       'Blog'    ],
+                        # [ 'https://twitter.com/pgxn/', 'Twitter',    'Twitter' ],
             $tx->ok('./span[2]', 'Test the first span' => sub {
                 $tx->is('./@class', 'floatRight', 'Should be floatRight');
                 $tx->is('count(./*)', 13, 'Should have 11 elements below #floatRight');
                 $tx->ok('./a[1]', 'Test blog anchor', sub {
-                    $tx->is('./@href', 'http://blog.pgxn.org/', 'Should link to blog');
+                    $tx->is('./@href', 'https://blog.pgxn.org/', 'Should link to blog');
                     $tx->is('./@title', 'PGXN Blog', 'Should have link title');
                     $tx->is('./text()', 'Blog', 'Should have text "Blog"');
                 });
                 $tx->is('./span[1][@class="grey"]', '|', 'Should have spacer span');
                 $tx->ok('./a[2]', 'Test Twitter anchor', sub {
-                    $tx->is('./@href', 'http://twitter.com/pgxn/', 'Should link to /mirroring/');
+                    $tx->is('./@href', 'https://twitter.com/pgxn/', 'Should link to /mirroring/');
                     $tx->is('./@title', 'Follow PGXN on Twitter', 'Should have link title');
                     $tx->is('./text()', 'Twitter', 'Should have text "Twitter"');
                 });
                 $tx->is('./span[2][@class="grey"]', '|', 'Should have spacer span');
                 $tx->ok('./a[3]', 'Test PGXN Manager anchor', sub {
-                    $tx->is('./@href', 'http://manager.pgxn.org/', 'Should link to manager');
+                    $tx->is('./@href', 'https://manager.pgxn.org/', 'Should link to manager');
                     $tx->is('./@title', 'Release it on PGXN', 'Should have link title');
                     $tx->is('./text()', 'Release It', 'Should have text "Release It"');
                 });

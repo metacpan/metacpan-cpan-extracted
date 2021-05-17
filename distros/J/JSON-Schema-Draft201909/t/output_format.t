@@ -17,7 +17,7 @@ my $js = JSON::Schema::Draft201909->new(short_circuit => 0, collect_annotations 
 is($js->output_format, 'basic', 'output_format defaults to basic');
 
 my $result = $js->evaluate(
-  { alpha => 1, beta => 1, foo => 1, gamma => [ 0, 1 ], zulu => 2 },
+  { alpha => 1, beta => 1, foo => 1, gamma => [ 0, 1 ], theta => [ 1 ], zulu => 2 },
   {
     required => [ 'bar' ],
     allOf => [
@@ -36,6 +36,7 @@ my $result = $js->evaluate(
         additionalItems => false,
         unevaluatedItems => false,
       },
+      theta => { items => false },
     },
     patternProperties => { 'o' => false },
     additionalProperties => false,
@@ -51,11 +52,6 @@ cmp_deeply(
   {
     valid => false,
     errors => [
-      {
-        instanceLocation => '',
-        keywordLocation => '/required',
-        error => 'missing property: bar',
-      },
       {
         instanceLocation => '',
         keywordLocation => '/allOf/0/type',
@@ -134,7 +130,7 @@ cmp_deeply(
       {
         instanceLocation => '/gamma',
         keywordLocation => '/properties/gamma/items',
-        error => 'subschema is not valid against all items',
+        error => 'not all items are valid',
       },
       {
         instanceLocation => '/gamma/1',
@@ -155,6 +151,16 @@ cmp_deeply(
         instanceLocation => '/gamma',
         keywordLocation => '/properties/gamma/unevaluatedItems',
         error => 'subschema is not valid against all additional items',
+      },
+      {
+        instanceLocation => '/theta/0',
+        keywordLocation => '/properties/theta/items',
+        error => 'item not permitted',
+      },
+      {
+        instanceLocation => '/theta',
+        keywordLocation => '/properties/theta/items',
+        error => 'subschema is not valid against all items',
       },
       {
         instanceLocation => '',
@@ -185,7 +191,7 @@ cmp_deeply(
         instanceLocation => '/'.$_,
         keywordLocation => '/unevaluatedProperties',
         error => 'additional property not permitted',
-      }, qw(alpha beta foo gamma zulu)),
+      }, qw(alpha beta foo gamma theta zulu)),
       {
         instanceLocation => '',
         keywordLocation => '/unevaluatedProperties',
@@ -200,6 +206,11 @@ cmp_deeply(
         instanceLocation => '',
         keywordLocation => '/propertyNames',
         error => 'not all property names are valid',
+      },
+      {
+        instanceLocation => '',
+        keywordLocation => '/required',
+        error => 'missing property: bar',
       },
     ],
   },
@@ -221,11 +232,6 @@ cmp_deeply(
   {
     valid => false,
     errors => [
-      {
-        instanceLocation => '',
-        keywordLocation => '/required',
-        error => 'missing property: bar',
-      },
       {
         instanceLocation => '',
         keywordLocation => '/allOf/0/type',
@@ -292,6 +298,12 @@ cmp_deeply(
       # we do have a schema covering them at /properties/gamma/items -- those subschemas just
       # evaluated to false
       # - "summary" error from /properties/gamma/unevaluatedItems is omitted
+      {
+        instanceLocation => '/theta/0',
+        keywordLocation => '/properties/theta/items',
+        error => 'item not permitted',
+      },
+      # - "summary" error from /properties/theta/items is omitted
       # - "summary" error from /properties is omitted
       {
         instanceLocation => '/foo',
@@ -305,10 +317,8 @@ cmp_deeply(
         error => 'additional property not permitted',
       },
       # - "summary" error from /additionalProperties is omitted
-      # - /properties/alpha/unevaluatedProperties error at /alpha is removed because it is also
-      #   covered at /properties/alpha
-      # - /unevaluatedProperties errors at /beta, /gamma are removed because they are also covered
-      #   at /properties/{alpha,beta}
+      # - /unevaluatedProperties errors at all top level properties are removed because they are
+      #   also covered by failures at /additionalProperties
       # - "summary" error from /unevaluatedProperties is omitted
       {
         instanceLocation => '/zulu',
@@ -316,6 +326,11 @@ cmp_deeply(
         error => 'pattern does not match',
       },
       # - "summary" error from /propertyNames is omitted
+      {
+        instanceLocation => '',
+        keywordLocation => '/required',
+        error => 'missing property: bar',
+      },
     ],
   },
   'terse format omits errors from redundant applicator keywords',

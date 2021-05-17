@@ -3,7 +3,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: MIDI pitches for guitar chord voicings
 
-our $VERSION = '0.0604';
+our $VERSION = '0.0608';
 
 use strict;
 use warnings;
@@ -211,7 +211,7 @@ MIDI::Chord::Guitar - MIDI pitches for guitar chord voicings
 
 =head1 VERSION
 
-version 0.0604
+version 0.0608
 
 =head1 SYNOPSIS
 
@@ -233,13 +233,24 @@ version 0.0604
 
 =head1 DESCRIPTION
 
-C<MIDI::Chord::Guitar> provides MIDI pitches for common chord voicings
-of an C<E A D G B E> tuned guitar.
+C<MIDI::Chord::Guitar> provides MIDI pitch numbers for common chord
+voicings of an C<E A D G B E> tuned guitar.
 
 =for html <p>Here is a handy diagram of ISO MIDI pitches laid out on a guitar neck:</p>
 <img src="https://raw.githubusercontent.com/ology/MIDI-Chord-Guitar/main/guitar-position-midi-octaves.png">
 <p>And here is a companion diagram of MIDI pitch numbers laid out on a guitar neck:</p>
 <img src="https://raw.githubusercontent.com/ology/MIDI-Chord-Guitar/main/guitar-position-midi-numbers.png">
+
+In order to craft a MIDI-Perl program with appropriate
+transformations, cross-reference the voicing CSV included in this
+distribution, with the diagrams above.  Check out the fingering
+column, and choose the best voicing to use.
+
+Alternatively, inspect the results of the C<fingering> method for each
+chord, and select those that are appropriate.
+
+For guitar, "appropriate" means to consider bass movement and melodic
+phrasing, etc.
 
 =head1 ATTRIBUTES
 

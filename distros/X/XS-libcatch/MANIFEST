@@ -9,7 +9,6 @@ clib/single_include/catch2/catch_reporter_tap.hpp
 clib/single_include/catch2/catch_reporter_teamcity.hpp
 lib/XS/libcatch.pm
 lib/XS/libcatch.pod
-libcatch.bs
 Makefile.PL
 MANIFEST			This list of files
 MANIFEST.SKIP

@@ -58,6 +58,7 @@ install(DIRECTORY backend-uv/include/ DESTINATION include FILES_MATCHING PATTERN
 install(TARGETS ${PROJECT_NAME} EXPORT ${PROJECT_NAME}-targets ARCHIVE DESTINATION lib)
 
 install(EXPORT ${PROJECT_NAME}-targets
-    FILE ${PROJECT_NAME}-config.cmake
+    FILE ${PROJECT_NAME}-targets.cmake
     DESTINATION lib/cmake/${PROJECT_NAME}
 )
+install(FILES ${PROJECT_NAME}-config.cmake DESTINATION lib/cmake/${PROJECT_NAME})

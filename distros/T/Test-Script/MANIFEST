@@ -15,6 +15,7 @@ t/01_use.t
 t/bin/bad.pl
 t/bin/four.pl
 t/bin/good.pl
+t/bin/liveordie.pl
 t/bin/print.pl
 t/bin/signal.pl
 t/bin/stdin.pl
@@ -23,6 +24,7 @@ t/bin/taint.pl
 t/bin/warnon.pl
 t/bug_gh9.t
 t/test_script__exports.t
+t/test_script__fails.t
 t/test_script__import.t
 t/test_script__program_runs.t
 t/test_script__program_stderr.t
