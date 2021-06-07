@@ -1,0 +1,138 @@
+#!/bin/bash
+
+func=(
+    c216
+    g6
+    g24
+    c16
+    c8
+)
+
+while getopts "hnvxc:0123456789" OPT; do
+    case $OPT in
+	h)
+	    echo ${0##*/} -[hnvx] -c# -[1..${#func[@]}]
+	    echo -e "\t-h  : show this message"
+	    echo -e "\t-n  : dry-run"
+	    echo -e "\t-v  : verbose"
+	    echo -e "\t-x  : transpose 216 color"
+	    echo -e "\t-c# : vertical columns"
+	    i=0; for func in ${func[@]}; do
+		printf "\t-%d  : %s\n" $((++i)) $func
+	    done
+	    exit;;
+	n) dryrun=1;;
+	v) verbose=1;;
+	x) xpose=1;;
+	c) column="$OPTARG";;
+	[1-9]) exec[(($OPT-1))]=1;;
+    esac
+done
+shift $((OPTIND - 1))
+
+: ${column:=6}
+
+((${#exec[@]} == 0)) && exec=("${func[@]}")
+
+run() {
+    for ((i = 0; i < ${#func[@]}; i++))
+    do
+	if [ ${exec[$i]} ]
+	then
+	    [ ${verbose} ] && echo ${func[$i]}
+	    ${func[$i]}
+	fi
+    done
+}
+
+c216() {
+    [ ${xpose} ] && v216 || h216
+}
+
+h216() {
+    local color=()
+    for f in \
+	%d{0,1,2,3,4,5}{0,1,2,3,4,5} \
+	{0,1,2,3,4,5}%d{0,1,2,3,4,5} \
+	{0,1,2,3,4,5}{0,1,2,3,4,5}%d
+    do
+	color+=($(printf "$f $f $f $f $f $f" 0 1 2 3 4 5))
+    done
+    ct -w36 "${color[@]}"
+}
+
+v216() {
+    for c in 0 1 2 3 4 5
+    do
+	local color=()
+	for b in 0 1 2 3 4 5
+	do
+	    local format=("%d$b$c" "$c%d$b" "$b$c%d" "$b%d$c" "$c$b%d" "%d$c$b")
+	    for f in ${format[@]:0:$column}
+	    do
+		color+=($(printf "$f $f $f $f $f $f" 0 1 2 3 4 5))
+	    done
+	done
+	ct -w$((column * 6)) "${color[@]}"
+    done
+}
+
+g6() {
+    ct -c20 000 111 222 333 444 555
+}
+
+g24() {
+    ct L00 \
+       L01 L02 L03 L04 L05 L06 L07 L08 L09 L10 L11 L12 \
+       L13 L14 L15 L16 L17 L18 L19 L20 L21 L22 L23 L24 \
+       L25
+}
+
+c16() {
+    ct -w8 \
+       R G B C M Y K W \
+       r g b c m y k w
+}
+
+c8() {
+    ct 500 050 005 055 505 550 000 555
+}
+
+read_array() { IFS=$'\n' read -r -d '' -a ${1} || true ; }
+
+ct() {
+    local OPTIND cell=4 column=999 option=()
+    while getopts "c:nw:" OPT; do
+	case $OPT in
+            c) cell="$OPTARG";;
+            n) option+=(-n);;
+	    w) column="$OPTARG";;
+	esac
+    done
+    shift $((OPTIND - 1))
+
+    local args=()
+    while (($#))
+    do
+	local tmp=()
+	read_array tmp < <( mkopt $cell "${@:1:$column}" && printf '\0' )
+	args+=("${tmp[@]}" "\n")
+	(($# <= column)) && break
+	shift $column
+    done
+    if [ $dryrun ]; then
+	echo ansiecho -jne "${option[@]}" "${args[@]}"
+    else
+	ansiecho -jne "${option[@]}" "${args[@]}"
+    fi
+}
+
+mkopt() {
+    local cell=$(($1 - 1)); shift
+    for c in "$@"
+    do
+	printf -- "-c\n%s/%s\n %-${cell}s\n" $c $c $c
+    done
+}
+
+run

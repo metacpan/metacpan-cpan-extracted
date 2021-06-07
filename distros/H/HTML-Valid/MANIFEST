@@ -29,5 +29,6 @@ tidy-html5.c
 tidy-html5.h
 typemap
 Valid.xs
+version-up.pl
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

@@ -16,10 +16,10 @@ name: DateTime-Format-MySQL
 provides:
   DateTime::Format::MySQL:
     file: lib/DateTime/Format/MySQL.pm
-    version: '0.06'
+    version: '0.0701'
 requires:
   DateTime: '0'
   DateTime::Format::Builder: '0.6'
 resources:
   license: http://dev.perl.org/licenses/
-version: '0.06'
+version: '0.0701'

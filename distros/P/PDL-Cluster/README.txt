@@ -7,7 +7,7 @@ ABSTRACT
 REQUIREMENTS
     *   PDL
 
-        Tested version 2.017
+        Tested versions 2.017, 2.019
 
 DESCRIPTION
     PDL::Cluster provides PDL wrappers for the open source C clustering
@@ -43,7 +43,7 @@ AUTHOR
     microarray data.
 
 COPYRIGHT
-    PDL::Cluster is a set of wrappers aroound the C Clustering library for
+    PDL::Cluster is a set of wrappers around the C Clustering library for
     cDNA microarray data.
 
     *   The C clustering library for cDNA microarray data. Copyright (C)
@@ -54,10 +54,10 @@ COPYRIGHT
         University of Tokyo, 4-6-1 Shirokanedai, Minato-ku, Tokyo 108-8639,
         Japan. Contact: michiel.dehoon 'AT' riken.jp
 
-        See the files README.cluster, cluster.c, and cluster.h in the
+        See the files README.cluster, ccluster.c, and ccluster.h in the
         PDL::Cluster distribution for details.
 
-    *   PDL::Cluster wrappers (c) 2005-2018, Bryan Jurish. All rights
+    *   PDL::Cluster wrappers (c) 2005-2021, Bryan Jurish. All rights
         reserved. This package is free software, and entirely without
         warranty. You may redistribute it and/or modify it under the same
         terms as Perl itself.

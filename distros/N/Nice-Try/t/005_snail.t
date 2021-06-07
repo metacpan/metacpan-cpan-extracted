@@ -5,7 +5,6 @@ BEGIN
     use warnings;
     use Test::More qw( no_plan );
     use Nice::Try;
-    # use Nice::Try debug => 6, debug_file => './dev/debug_snail.pl', debug_code => 1;
 };
 
 # Credits to Steve Scaffidi for his test suit

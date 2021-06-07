@@ -18,12 +18,13 @@ no_index:
     - t
     - inc
 requires:
+  File::chdir: '0.10'
   Mojolicious: '8.00'
 resources:
   bugtracker: https://github.com/jhthorsen/mojolicious-plugin-webpack/issues
   homepage: https://github.com/jhthorsen/mojolicious-plugin-webpack
   repository: https://github.com/jhthorsen/mojolicious-plugin-webpack.git
-version: '0.14'
+version: '1.01'
 x_contributors:
   - 'Jan Henning Thorsen'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

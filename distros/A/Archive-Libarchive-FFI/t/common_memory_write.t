@@ -34,10 +34,10 @@ foreach my $name (qw( foo bar baz ))
 
   subtest $name => sub {
     plan tests => 8;
-  
+
     my $entry = eval { archive_entry_new() };
     ok $entry, 'archive_entry_new';
-  
+
     $r = archive_entry_set_pathname($entry, $name);
     is $r, ARCHIVE_OK, 'archive_entry_set_pathname';
 
@@ -55,7 +55,7 @@ foreach my $name (qw( foo bar baz ))
 
     my $len = eval { archive_write_data($a, $data{$name}) };
     is $len, length($data{$name}), 'archive_write_data';;
-  
+
     $r = archive_entry_free($entry);
     is $r, ARCHIVE_OK, 'archive_entry_free';
   };

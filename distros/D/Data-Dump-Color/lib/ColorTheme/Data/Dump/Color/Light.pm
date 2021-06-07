@@ -1,9 +1,9 @@
 package ColorTheme::Data::Dump::Color::Light;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-02-13'; # DATE
+our $DATE = '2021-06-05'; # DATE
 our $DIST = 'Data-Dump-Color'; # DIST
-our $VERSION = '0.243'; # VERSION
+our $VERSION = '0.245'; # VERSION
 
 use parent 'ColorThemeBase::Static::FromStructColors';
 use Term::ANSIColor;
@@ -51,7 +51,7 @@ ColorTheme::Data::Dump::Color::Light - Light color theme for Data::Dump::Color (
 
 =head1 VERSION
 
-This document describes version 0.243 of ColorTheme::Data::Dump::Color::Light (from Perl distribution Data-Dump-Color), released on 2021-02-13.
+This document describes version 0.245 of ColorTheme::Data::Dump::Color::Light (from Perl distribution Data-Dump-Color), released on 2021-06-05.
 
 =head1 DESCRIPTION
 

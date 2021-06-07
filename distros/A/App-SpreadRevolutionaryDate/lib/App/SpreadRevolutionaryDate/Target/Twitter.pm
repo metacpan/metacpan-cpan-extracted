@@ -10,7 +10,7 @@
 use 5.014;
 use utf8;
 package App::SpreadRevolutionaryDate::Target::Twitter;
-$App::SpreadRevolutionaryDate::Target::Twitter::VERSION = '0.29';
+$App::SpreadRevolutionaryDate::Target::Twitter::VERSION = '0.31';
 # ABSTRACT: Target class for L<App::SpreadRevolutionaryDate> to handle spreading on Twitter.
 
 use Moose;
@@ -111,7 +111,7 @@ App::SpreadRevolutionaryDate::Target::Twitter - Target class for L<App::SpreadRe
 
 =head1 VERSION
 
-version 0.29
+version 0.31
 
 =head1 METHODS
 
@@ -140,6 +140,10 @@ Spreads a message to Twitter. Takes one mandatory argument: C<$msg> which should
 =item L<App::SpreadRevolutionaryDate::Target::Freenode>
 
 =item L<App::SpreadRevolutionaryDate::Target::Freenode::Bot>
+
+=item L<App::SpreadRevolutionaryDate::Target::Liberachat>
+
+=item L<App::SpreadRevolutionaryDate::Target::Liberachat::Bot>
 
 =item L<App::SpreadRevolutionaryDate::MsgMaker>
 

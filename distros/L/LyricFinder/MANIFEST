@@ -1,5 +1,6 @@
 Changes
 lib/LyricFinder.pm
+lib/LyricFinder/_Class.pm
 lib/LyricFinder/ApiLyricsOvh.pm
 lib/LyricFinder/AZLyrics.pm
 lib/LyricFinder/Cache.pm

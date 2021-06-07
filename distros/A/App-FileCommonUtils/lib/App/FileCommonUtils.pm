@@ -1,7 +1,7 @@
 package App::FileCommonUtils;
 
-our $DATE = '2019-04-16'; # DATE
-our $VERSION = '0.001'; # VERSION
+our $DATE = '2021-05-25'; # DATE
+our $VERSION = '0.002'; # VERSION
 
 1;
 # ABSTRACT: CLIs for File::Common
@@ -18,7 +18,7 @@ App::FileCommonUtils - CLIs for File::Common
 
 =head1 VERSION
 
-This document describes version 0.001 of App::FileCommonUtils (from Perl distribution App-FileCommonUtils), released on 2019-04-16.
+This document describes version 0.002 of App::FileCommonUtils (from Perl distribution App-FileCommonUtils), released on 2021-05-25.
 
 =head1 SYNOPSIS
 
@@ -54,7 +54,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2019 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

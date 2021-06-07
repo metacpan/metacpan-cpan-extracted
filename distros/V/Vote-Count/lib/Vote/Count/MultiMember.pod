@@ -1,0 +1,112 @@
+# Abstract Vote::Count::MultiMember - Overview of Multi Member elections and Vote::Count support for them.
+
+=pod
+
+=encoding utf8
+
+=head1 VERSION 2.00
+
+=head1 NAME
+
+Vote::Count::MultiMember - Overview of Multi Member and Proportional Elections and Vote::Count support for them.
+
+=head1 DESCRIPTION
+
+Multi Member Elections can be a good way of obtaining proportionality or at least minority representation. Instead of electing one representative for a seat, several are chosen.
+
+Proportional Methods seek to obtain proportionality at the level of the entire body and may incorporate single member, multi-member, or elect a large body directly.
+
+=head1 Overview of Multi-Member and Proportional Methods
+
+=head2 Non STV Methods
+
+These Non STV Methods are relatively easy to implement, if Ranked or Range Ballots are used, regular Vote::Count methods can easily be used. None of these has or needs any explicit support from Vote::Count.
+
+=head3 Vote for One
+
+Voters each pick one choice and the top choices are chosen to fill the seats. Depending on the number of seats and the distribution of factions this can be very inefficient and force voters to attempt to coordinate their votes. If there are three seats and one faction has 2/3 of the support, the large faction needs to offer two choices and make sure their votes are split evenly between the two.
+
+=head3 Approval
+
+Voters mark as many choices as they please, and the seats are filled by the top vote getters. Voters may Bullet Vote for a strongly preferred choice, and the largest coordinated faction can capture all of the seats.
+
+=head3 Cumulative Approval
+
+Cumulative Approval gives the voter a fixed number of votes that they can distribute among choices. Factions that can coordinate and optimize their voting strategy can still gain considerable advantage with this system.
+
+=head3 X 0f Y
+
+Restricts the number of choices parties can offer and the number of choices a voter can select. Vote for up to X choices, but Y choices will be elected. This method can be used to guarantee minority seats in a body, but will not efficiently allocate those seats. X of Y is tabulated in the same manner as Approval.
+
+=head3 Party Lists (Proportional)
+
+Parties put forward a list of choices, voters vote for the Party, the seats are apportioned. Party Lists also have the advantage that if a seat opens up during the term for any reason, the vacancy can immediately be filled by the next choice on the list.
+
+=head3 Under Hang (Proportional)
+
+Combines District Elections with Party Lists. Voters elect representatives in their district via single member election. For the entire body the votes are tabulated by Party across all districts, based on the total Party vote under represented parties are awarded seats. Common Variations include setting a fixed number of seats to be available for Under Hang, and allowing Voters to select a Party for the Under Hang awards, which may be different than that of the Candidate they vote for in their district.
+
+=head1 Single Transferable Vote (STV)
+
+Voters cast a single ranked ballot which may be transferred at times to multiple choices.
+
+A quota based on the number of valid ballots is set, there are two common formulas for this. The Droop Quota is B<1 + ( Ballots ÷ ( Number of Choices + 1 ) )>, which is the lowest possible quota for which it is impossible to elect more choices than seats. The Hare Quota is simply B<Ballots ÷ Number of Choices>.
+
+Choices that exceed the quota are elected. The amount by which the choice exceeded the quota is the Surplus, this is redistributed to the next highest choice on the ballot. The process of transferring surplus votes is referred to as Surplus-Transfer.
+
+Typically if no choice reaches the quota, a choice is eliminated and their ballots are redistributed. When the number of choices remaining and seats remaining are equal, all the remaining choices are typically elected.
+
+=head3 Surplus Transfer Methods
+
+In some older methods the surplus was distributed Randomly -- surplus ballots would be picked randomly for distribution to their next choice. This method is not reproducible across runs, and won't be supported by Vote::Count, ever. If you have the misfortune to have inherited this as an election rule, keep hand counting until you can change the rules.
+
+Modern rules use a fractional transfer. Consider that several seats are being elected and many of the ballots for the choices which have met quota have another choice that has also met quota as their next choice. Each time surplus votes are transferred, each choice has more surplus which must then be distributed, which results in more surplus and transferring more fractions of votes. When using Real Number math this process will often be infinite, most STV methods limit the number of transfers to prevent this.
+
+=head3 Vote Charging
+
+Surplus Transfer methods can be explained in an alternate fashion as charging the ballots (as if they were a roll of small coins) for each choice they help elect. Restating STV in this fashion may make it easier to explain. Any method written as Surplus Transfer can be implemented equivalently in Vote Charge.
+
+L<Vote::Count::Charge> implements STV as Vote Charging with Integer Math. The use of Integer Math forces Truncation/Round Down as the rounding rule, setting a vote's value to 100,000 is equivalent to floating point with five decimal places and rounding down.
+
+=head2 Scoring
+
+With Approval, Ranked or Range Ballots each possible outcome of the election can be used to generate scores based on the voter preferences, the outcome generating the highest score is chosen.
+
+Methods of this type encounter all of the problems with the underlying methods and the author is not aware of any implementations that are widely used or strongly supported.
+
+=head2 Optimization
+
+Seek the solution that leaves the least unused votes. Typically this type of method uses a calculation based on Surplus Transfer, and considers all possible combinations to find the set of winners which leaves the least unused vote. The author is not aware of any implementations that are widely used or strongly supported, L<Vote::Count> does not currently attempt to implement an optimization method, but may consider them in the future.
+
+=head1 Implementations in Vote::Count
+
+Simpler methods such as Vote for One and Approval based methods can be implemented using more general methods such as L<Vote::Count::TopCount|Vote::Count::TopCount>, and L<Vote::Count::Approval|Vote::Count::Approval>.
+
+Surplus Transfer methods can be implemented by Vote Charging through L<Vote::Count::Charge|Vote::Count::Charge>. L<Vote::Count::Method::WIGM|Vote::Count::Method::WIGM> implements Weighted Inclusive Gregory equivalent to the rules for Scotland's Councils.
+
+#FOOTER
+
+=pod
+
+BUG TRACKER
+
+L<https://github.com/brainbuz/Vote-Count/issues>
+
+AUTHOR
+
+John Karr (BRAINBUZ) brainbuz@cpan.org
+
+CONTRIBUTORS
+
+Copyright 2019-2021 by John Karr (BRAINBUZ) brainbuz@cpan.org.
+
+LICENSE
+
+This module is released under the GNU Public License Version 3. See license file for details. For more information on this license visit L<http://fsf.org>.
+
+SUPPORT
+
+This software is provided as is, per the terms of the GNU Public License. Professional support and customisation services are available from the author.
+
+=cut
+

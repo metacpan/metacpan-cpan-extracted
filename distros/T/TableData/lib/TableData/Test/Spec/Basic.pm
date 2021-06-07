@@ -1,9 +1,9 @@
 package TableData::Test::Spec::Basic;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-04-11'; # DATE
+our $DATE = '2021-06-01'; # DATE
 our $DIST = 'TableData'; # DIST
-our $VERSION = '0.1.5'; # VERSION
+our $VERSION = '0.2.1'; # VERSION
 
 use strict;
 use warnings;
@@ -17,38 +17,49 @@ my $rows = [
     {a=>3, b=>4},
     {a=>"5 2", b=>"6,2"},
 ];
+my $columns = [qw/a b/];
 
 sub new {
     my $class = shift;
-    bless {index=>0}, $class;
+    bless {pos=>0}, $class;
 }
 
 sub _rows {
-    my $table = shift;
     $rows;
 }
 
-sub get_row_arrayref {
+sub reset_iterator {
     my $self = shift;
-    return undef unless $rows->[ $self->{index} ];
-    my $hashref = $rows->[ $self->{index}++ ];
-    [map {$hashref->{$_}} sort keys %$hashref];
+    $self->{pos} = 0;
+}
+
+sub get_iterator_pos {
+    my $self = shift;
+    $self->{pos};
+}
+
+sub has_next_item {
+    my $self = shift;
+    $self->{pos} < @$rows;
+}
+
+sub get_next_item {
+    my $self = shift;
+    die "StopIteration" if $self->{pos} >= @$rows;
+    my $row_hashref = $rows->[ $self->{pos}++ ];
+    [map {$row_hashref->{$_}} @$columns];
+}
+
+sub get_next_row_hashref {
+    my $self = shift;
+    die "StopIteration" if $self->{pos} >= @$rows;
+    $rows->[ $self->{pos}++ ];
 }
 
 sub get_row_hashref {
     my $self = shift;
     return undef unless $rows->[ $self->{index} ];
     $rows->[ $self->{index}++ ];
-}
-
-sub get_row_iterator_index {
-    my $self = shift;
-    $self->{index};
-}
-
-sub reset_row_iterator {
-    my $self = shift;
-    $self->{index} = 0;
 }
 
 sub get_column_count {
@@ -78,7 +89,7 @@ TableData::Test::Spec::Basic - A test table data
 
 =head1 VERSION
 
-This document describes version 0.1.5 of TableData::Test::Spec::Basic (from Perl distribution TableData), released on 2021-04-11.
+This document describes version 0.2.1 of TableData::Test::Spec::Basic (from Perl distribution TableData), released on 2021-06-01.
 
 =for Pod::Coverage ^(.+)$
 

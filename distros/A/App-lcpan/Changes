@@ -1,3 +1,51 @@
+1.068   2021-06-05  Released-By: PERLANCAR; Urgency: medium
+
+	- [ux] [doc] Add description and cross-mention between mentions-for-mods
+	  and mentions-for-all-mods.
+
+        - [build] Rebuild to bump dependency version to attempt to fix
+          RT#136715.
+
+
+1.067   2021-06-03  Released-By: PERLANCAR; Urgency: medium
+
+	- [subcommand related-mods] Add option --(no-)submodules.
+
+
+1.066   2021-05-31  Released-By: PERLANCAR; Urgency: medium
+
+	- [subcommand rdeps] Accept option --dist.
+
+	- [subcommand deps] Accept option --module.
+
+
+1.065   2021-05-25  Released-By: PERLANCAR; Urgency: medium
+
+	- [subcommand rdeps] Allow finding revdeps for unindexed modules
+	  (this is already in the database, we just need to give it to
+	  user).
+
+
+1.064   2021-04-21  Released-By: PERLANCAR; Urgency: medium
+
+	- [subcommand related-mods] Add option: --with-content-paths.
+
+
+1.063   2021-02-13  Released-By: PERLANCAR; Urgency: medium
+
+	[subcommand authors]
+
+	- Add options --sort, --result-limit, --result-start, --random.
+
+	[subcommands dists, mods, rels]
+
+        - Add options --random, --result-limit, --result-start.
+
+	[subcommand rdeps-scripts]
+
+        - Add option --author.
+
+
 1.062   2020-08-13  Released-By: PERLANCAR; Urgency: medium
 
 	- [bugfix] Fix completion of whatsnew's --my-author.

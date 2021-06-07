@@ -1,7 +1,9 @@
 NAME
+
     Web::PageMeta - get page open-graph / meta data
 
 SYNOPSIS
+
         use Web::PageMeta;
         my $page = Web::PageMeta->new(url => "https://www.apa.at/");
         say $page->title;
@@ -23,7 +25,7 @@ SYNOPSIS
             say 'title> '.$pv->title;
             say 'img_size> '.length($pv->image_data);
         }
-
+    
         # alternativelly instead of Future->wait_all()
         use Future::Utils qw( fmap_void );
         fmap_void(
@@ -33,53 +35,66 @@ SYNOPSIS
         )->get;
 
 DESCRIPTION
-    Get (not only) open-graph web page meta data. can be used in both normal
-    and async code.
+
+    Get (not only) open-graph web page meta data. can be used in both
+    normal and async code.
 
     For any other than 200 http status codes during data downloads,
     HTTP::Exception is thrown.
 
 ACCESSORS
-  new
+
+ new
+
     Constructor, only "url" is required.
 
-  url
+ url
+
     HTTP url to fetch data from.
 
-  user_agent
+ user_agent
+
     User-Agent header to use for http requests. Default is one from Chrome
     89.0.4389.90.
 
-  extra_headers
+ extra_headers
+
     HashRef with extra http request headers.
 
-  cookie_jar
+ cookie_jar
+
     Accepts optional HTTP::Cookies compatible object that must provide
-    "get_cookies()" method. If set will send http cookie headers with each
+    get_cookies() method. If set will send http cookie headers with each
     request.
 
-  title
+ title
+
     Returns title of the page.
 
-  description
+ description
+
     Returns description of the page.
 
-  image
+ image
+
     Returns image location of the page.
 
-  image_data
+ image_data
+
     Returns image binary data of "image" link.
 
     Will throw 404 exception if there is not "image" link.
 
-  page_meta
+ page_meta
+
     Returns hash ref with all open-graph data.
 
-  extra_scraper
-    Web::Scraper object to fetch image, title or description from different
-    than default location.
+ extra_scraper
 
-        use Web::Scraper;
+    Web::Scraper::LibXML object to fetch image, title or description from
+    different than default location.
+
+        use Web::Scraper::LibXML;
         use Web::PageMeta;
         my $escraper = scraper {
             process_first '.slider .camera_wrap div', 'image' => '@data-src';
@@ -89,35 +104,43 @@ ACCESSORS
             extra_scraper => $escraper,
         );
 
-  page_body_hdr
+ page_body_hdr
+
     Returns array ref with page [$body,$headers]. Can be useful for
     post-processing or special/additional data extractions.
 
-  fetch_page_meta_ft
+ fetch_page_meta_ft
+
     Returns future object for fetching paga meta data. See "ASYNC USE". On
     done "page_meta" hash is returned.
 
-  fetch_image_data_ft
+ fetch_image_data_ft
+
     Returns future object for fetching image data. See "ASYNC USE" On done
     "image_data" scalar is returned.
 
-  fetch_page_body_hdr_ft
+ fetch_page_body_hdr_ft
+
     Returns future object for fetching page content and headers. See "ASYNC
     USE" On done "page_body_hdr" array ref is returned.
 
 ASYNC USE
+
     To run multiple page meta data or image http requests in parallel or to
     be used in async programs "fetch_page_meta_ft" and fetch_image_data_ft
     returning Future object can be used. See "SYNOPSIS" or t/02_async.t for
     sample use.
 
 SEE ALSO
-    <https://ogp.me/>
+
+    https://ogp.me/
 
 AUTHOR
-    Jozef Kutej, "<jkutej at cpan.org>"
+
+    Jozef Kutej, <jkutej at cpan.org>
 
 LICENSE AND COPYRIGHT
+
     Copyright 2021 jkutej@cpan.org
 
     This program is free software; you can redistribute it and/or modify it

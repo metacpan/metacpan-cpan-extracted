@@ -28,11 +28,11 @@ Pg::Explain::FromXML - Parser for explains in XML format
 
 =head1 VERSION
 
-Version 1.08
+Version 1.09
 
 =cut
 
-our $VERSION = '1.08';
+our $VERSION = '1.09';
 
 =head1 SYNOPSIS
 
@@ -77,6 +77,10 @@ sub normalize_node_struct {
         else {
             $struct->{ 'Group Key' } = [ $items ];
         }
+    }
+
+    if ( $struct->{ 'Conflict Arbiter Indexes' } ) {
+        $struct->{ 'Conflict Arbiter Indexes' } = [ $struct->{ 'Conflict Arbiter Indexes' }->{ 'Item' } ];
     }
     return $struct;
 }

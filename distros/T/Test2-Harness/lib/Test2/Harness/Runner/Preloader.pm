@@ -2,7 +2,7 @@ package Test2::Harness::Runner::Preloader;
 use strict;
 use warnings;
 
-our $VERSION = '1.000054';
+our $VERSION = '1.000057';
 
 use Carp qw/confess croak/;
 use Fcntl qw/LOCK_EX LOCK_UN/;
@@ -12,6 +12,7 @@ use Test2::Harness::Util qw/open_file file2mod mod2file lock_file unlock_file/;
 use Test2::Harness::Runner::Preloader::Stage;
 
 use File::Spec();
+use List::Util qw/pairgrep/;
 
 BEGIN {
     local $@;
@@ -245,7 +246,7 @@ sub check {
 
     print "$$ $0 - Runner detected a change in one or more preloaded modules...\n";
 
-    my %CNI = reverse %INC;
+    my %CNI = reverse pairgrep { $b } %INC;
     my @todo;
     for my $file (keys %$changed) {
         my $rel = $CNI{$file};

@@ -5,13 +5,13 @@
       "Douglas Burke <dburke@cfa.harvard.edu>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4229",
+   "generated_by" : "Module::Build version 0.4231",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "PDL-IO-NDF",
    "prereqs" : {
@@ -30,8 +30,14 @@
          "requires" : {
             "Astro::FITS::Header" : "3",
             "NDF" : "1.51",
-            "PDL" : "v2.4.0"
+            "PDL" : "2.040"
          }
+      }
+   },
+   "provides" : {
+      "PDL::IO::NDF" : {
+         "file" : "lib/PDL/IO/NDF.pm",
+         "version" : "1.07"
       }
    },
    "release_status" : "stable",
@@ -44,6 +50,6 @@
          "url" : "git://github.com/Starlink/perl-PDL-IO-NDF.git"
       }
    },
-   "version" : "1.06",
-   "x_serialization_backend" : "JSON::PP version 2.27400_02"
+   "version" : "1.07",
+   "x_serialization_backend" : "JSON::PP version 4.04"
 }

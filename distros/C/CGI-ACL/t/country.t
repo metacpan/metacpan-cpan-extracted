@@ -2,7 +2,7 @@
 
 use strict;
 use warnings;
-use Test::Most tests => 26;
+use Test::Most tests => 35;
 use Test::Carp;
 use Test::NoWarnings;
 
@@ -15,11 +15,11 @@ COUNTRY: {
 	my $acl = new_ok('CGI::ACL');
 
 	$acl->deny_country('gb');
-	$ENV{'REMOTE_ADDR'} = '212.159.106.41';
+	$ENV{'REMOTE_ADDR'} = '212.159.106.41';	# F9
 
 	my $lingua = new_ok('CGI::Lingua', [ supported => ['en'] ]);
 
-	is($lingua->country, 'gb');
+	is($lingua->country(), 'gb');
 	ok($acl->all_denied(lingua => $lingua));
 
 	my @country_list = (
@@ -31,7 +31,7 @@ COUNTRY: {
 
 	ok($acl->all_denied({ lingua => $lingua }));
 
-	$acl->allow_ip({ ip => '212.159.106.0/24' });
+	$acl->allow_ip({ ip => '212.159.106.0/24' });	# F9
 
 	ok(!$acl->all_denied($lingua));
 
@@ -45,8 +45,11 @@ COUNTRY: {
 
 	$acl = new_ok('CGI::ACL');
 
+	# Test countries in an array
 	@country_list = ('GB', 'US');
 	$acl->deny_country('*')->allow_country(country => \@country_list);
+
+	ok(!$acl->all_denied(lingua => new_ok('CGI::Lingua', [ supported => [ 'en' ] ])));
 
 	ok(!$acl->all_denied(lingua => new_ok('CGI::Lingua', [ supported => [ 'en' ] ])));
 
@@ -57,6 +60,21 @@ COUNTRY: {
 	$ENV{'REMOTE_ADDR'} = '87.226.159.0';	# RT
 
 	ok($acl->all_denied(lingua => new_ok('CGI::Lingua', [ supported => [ 'en' ] ])));
+
+	$ENV{'REMOTE_ADDR'} = '127.0.0.1';
+	ok($acl->all_denied(new_ok('CGI::Lingua', [ supported => [ 'en' ] ])));
+
+	# Test country in a scalar
+	$acl = new_ok('CGI::ACL');
+	$acl->deny_country('*')->allow_country('US');
+
+	$ENV{'REMOTE_ADDR'} = '212.159.106.41';	# F9
+
+	ok($acl->all_denied(lingua => new_ok('CGI::Lingua', [ supported => [ 'en' ] ])));
+
+	$ENV{'REMOTE_ADDR'} = '130.14.25.184';	# NCBI
+
+	ok(!$acl->all_denied(lingua => new_ok('CGI::Lingua', [ supported => [ 'en' ] ])));
 
 	does_carp(sub { $acl->deny_country() });
 	does_carp(sub { $acl->deny_country(\'not a ref to a hash') });

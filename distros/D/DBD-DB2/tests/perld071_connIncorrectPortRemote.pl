@@ -24,7 +24,7 @@ $hostaddr = gethostbyname($HOSTNAME);
 $ipaddr = inet_ntoa($hostaddr);
 
 check_value("CONNECT", "DBI::err", -30081);
-$expMsg = "[IBM][CLI Driver] SQL30081N  A communication error has been detected.  Communication protocol being used: \"TCP/IP\".  Communication API being used: \"SOCKETS\".  Location where the error was detected: \"$ipaddr\".  Communication function detecting the error: \"connect\".  Protocol specific error code(s): \"111\", \"*\", \"*\".  SQLSTATE=08001\n";
+$expMsg = "[IBM][CLI Driver] SQL30081N  A communication error has been detected. Communication protocol being used: \"TCP/IP\".  Communication API being used: \"SOCKETS\".  Location where the error was detected: \"$ipaddr\".  Communication function detecting the error: \"connect\".  Protocol specific error code(s): \"111\", \"*\", \"*\".  SQLSTATE=08001\n";
 
 check_value("CONNECT", "DBI::errstr", $expMsg);
 check_value("CONNECT", "DBI::state", "08001");

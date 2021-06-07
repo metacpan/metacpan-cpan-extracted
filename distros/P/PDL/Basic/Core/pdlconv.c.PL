@@ -141,10 +141,6 @@ void pdl_converttype( pdl** aa, int targtype, Logical changePerl ) {
     STRLEN   nbytes;
     int   diffsize;
     PDL_Indx   i;
-#if (PERL_VERSION >= 5) && (PERL_SUBVERSION >= 57)
-    dXSARGS;
-#endif
-
     PDLDEBUG_f(printf("pdl_converttype %p, %d, %d, %d\n", (void*)a, a->datatype,
     	targtype, changePerl);)
 
@@ -164,21 +160,14 @@ void pdl_converttype( pdl** aa, int targtype, Logical changePerl ) {
 
       if (diffsize) {
          b = a->data;                      /* pointer to old data */
-         a->data     = pdl_malloc(nbytes); /* Space for changed data */
+         a->data     = pdl_smalloc(nbytes); /* Space for changed data */
       }
       else{
          b = a->data; /* In place */
       }
 
     }else{
-
        die("Sorry, temporary type casting is not allowed now");
-
-       b = a->data;          /* Ptr to old data */
-       a = pdl_tmp();        /* Brand new scratch pdl */
-/*       pdl_clone(*aa,  a);  */ /* Copy old pdl entries */
-       a->data     = pdl_malloc(nbytes); /* Space for changed data */
-       *aa = a;              /* Change passed value to new address */
     }
 
     /* Do the conversion as nested switch statements */
@@ -335,7 +324,7 @@ void ** pdl_twod( pdl* x ) {
 
    size=pdl_howbig(x->datatype);
 
-   p = pdl_malloc( ny*sizeof(void*) ); /* 1D array of ptrs p[i] */
+   p = pdl_smalloc( ny*sizeof(void*) ); /* 1D array of ptrs p[i] */
    for (i=0;i<ny;i++)
        p[i] = (void*) &xx[i*nx*size];
 

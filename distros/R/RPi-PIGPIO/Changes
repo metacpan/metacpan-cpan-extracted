@@ -1,5 +1,7 @@
 Revision history for WWW-Session
 
+0.017  2021-05-25
+      Fixed usleep times for BMP180 to allow correct readings
 0.016  2018-03-06
       Added support for PWM - thanks to Dane Buson
 0.015  2018-01-02

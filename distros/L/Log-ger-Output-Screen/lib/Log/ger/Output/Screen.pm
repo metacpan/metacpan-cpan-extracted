@@ -1,9 +1,9 @@
 package Log::ger::Output::Screen;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-03-13'; # DATE
+our $DATE = '2021-03-25'; # DATE
 our $DIST = 'Log-ger-Output-Screen'; # DIST
-our $VERSION = '0.016'; # VERSION
+our $VERSION = '0.017'; # VERSION
 
 use strict;
 use warnings;
@@ -93,6 +93,8 @@ sub get_hooks {
     my $color_depth = do {
         if (defined $plugin_conf{color_depth}) {
             $plugin_conf{color_depth};
+        } elsif (defined $ENV{COLOR_DEPTH}) {
+            $ENV{COLOR_DEPTH};
         } elsif (!$use_color) {
             0;
         } elsif (defined $ENV{COLORTERM} && $ENV{COLORTERM} eq 'truecolor') {
@@ -145,7 +147,7 @@ Log::ger::Output::Screen - Output log to screen
 
 =head1 VERSION
 
-version 0.016
+version 0.017
 
 =head1 SYNOPSIS
 
@@ -189,6 +191,10 @@ Coderef. When defined, will pass the formatted message (but being applied with
 colors) to this custom formatter.
 
 =head1 ENVIRONMENT
+
+=head2 COLOR_DEPTH
+
+Will be used as a default for L</color_depth> configuration.
 
 =head2 NO_COLOR
 

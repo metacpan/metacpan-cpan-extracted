@@ -1,6 +1,6 @@
 package Test::Excel;
 
-$Test::Excel::VERSION   = '1.46';
+$Test::Excel::VERSION   = '1.49';
 $Test::Excel::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ Test::Excel - Interface to test and compare Excel files (.xls/.xlsx).
 
 =head1 VERSION
 
-Version 1.46
+Version 1.49
 
 =cut
 
@@ -186,10 +186,12 @@ sub compare_excel {
         my $gotSheetName   = $gotWorkSheet;
         my $expSheetName   = $expWorkSheet;
 
-        if (uc($gotSheetName) ne uc($expSheetName)) {
-            my $error = "ERROR: Sheetname mismatch. Got: [$gotSheetName] exp: [$expSheetName].\n";
-            _log_message($error);
-            return 0;
+        unless (exists $spec->{ALL}) {
+            if (uc($gotSheetName) ne uc($expSheetName)) {
+                my $error = "ERROR: Sheetname mismatch. Got: [$gotSheetName] exp: [$expSheetName].\n";
+                _log_message($error);
+                return 0;
+            }
         }
 
         my $got_sheet = $got->sheet($gotSheetName);
@@ -222,9 +224,11 @@ sub compare_excel {
                 my $gotData = $got_sheet->cell($col, $row);
                 my $expData = $exp_sheet->cell($col, $row);
 
-                next if ( defined($spec)
-                          && exists($spec->{uc($gotSheetName)}->{$col}->{$row})
-                          && ($spec->{uc($gotSheetName)}->{$col}->{$row} == $IGNORE) );
+                next if (defined($spec)
+                         && (($spec->{ALL}->{$col}->{$row} == $IGNORE)
+                             ||
+                             (exists($spec->{uc($gotSheetName)}->{$col}->{$row})
+                              && $spec->{uc($gotSheetName)}->{$col}->{$row} == $IGNORE)));
 
                 if (defined($gotData) && defined($expData)) {
                     if (($gotData =~ /^[-+]?[0-9]*\.?[0-9]+([eE][-+]?[0-9]+)?$/)
@@ -250,7 +254,7 @@ sub compare_excel {
                                 else {
                                     _log_message("INFO: [NUMBER]:[$gotSheetName]:[STD][".(
                                                      $row)."][".($col)."]:[$gotData][$expData] ... ");
-                                    $compare_with = $rule->{tolerance};
+                                    $compare_with = $rule->{tolerance} || 0;
                                 }
 
                                 if (defined $compare_with && ($compare_with < $difference)) {
@@ -456,20 +460,23 @@ sub _cells_within_range {
 
     return unless defined $range;
 
-    die("ERROR: Invalid range [$range].\n") unless ($range =~ /(\w+\d+):(\w+\d+)/);
-
-    my $from = $1;
-    my $to   = $2;
-    my ($min_col, $min_row) = Test::Excel::_column_row($from);
-    my ($max_col, $max_row) = Test::Excel::_column_row($to);
-
-    $min_col = Test::Excel::_letter_to_number($min_col);
-    $max_col = Test::Excel::_letter_to_number($max_col);
-
     my $cells = [];
-    for (my $row = $min_row; $row <= $max_row; $row++) {
-        for (my $col = $min_col; $col <= $max_col; $col++) {
-            push @{$cells}, { col => $col, row => $row };
+    foreach my $_range (split /\,/,$range) {
+        die("ERROR: Invalid range [$_range].\n")
+            unless ($_range =~ /(\w+\d+):(\w+\d+)/);
+
+        my $from = $1;
+        my $to   = $2;
+        my ($min_col, $min_row) = Test::Excel::_column_row($from);
+        my ($max_col, $max_row) = Test::Excel::_column_row($to);
+
+        $min_col = Test::Excel::_letter_to_number($min_col);
+        $max_col = Test::Excel::_letter_to_number($max_col);
+
+        for (my $row = $min_row; $row <= $max_row; $row++) {
+            for (my $col = $min_col; $col <= $max_col; $col++) {
+                push @{$cells}, { col => $col, row => $row };
+            }
         }
     }
 
@@ -573,10 +580,13 @@ sub _validate_rule {
               'error_limit'     => 6,
               'swap_check'      => 7,
               'test'            => 8,};
+
     foreach (keys %{$rule}) {
-        die("ERROR: Invalid key found in the rule definitions.\n")
+        die("ERROR: Invalid key '$_' found in the rule definitions.\n")
             unless exists($valid->{$_});
     }
+
+    return if (exists $rule->{spec} && (keys %$rule == 1));
 
     if ((exists($rule->{spec}) && defined($rule->{spec}))
         || (exists($rule->{sheet}) && defined($rule->{sheet}))) {

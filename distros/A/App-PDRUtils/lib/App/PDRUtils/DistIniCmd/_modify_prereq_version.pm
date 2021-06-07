@@ -1,7 +1,7 @@
 package App::PDRUtils::DistIniCmd::_modify_prereq_version;
 
-our $DATE = '2019-07-25'; # DATE
-our $VERSION = '0.121'; # VERSION
+our $DATE = '2021-05-25'; # DATE
+our $VERSION = '0.122'; # VERSION
 
 use 5.010001;
 use strict;
@@ -102,7 +102,7 @@ App::PDRUtils::DistIniCmd::_modify_prereq_version - Common routines for set_prer
 
 =head1 VERSION
 
-This document describes version 0.121 of App::PDRUtils::DistIniCmd::_modify_prereq_version (from Perl distribution App-PDRUtils), released on 2019-07-25.
+This document describes version 0.122 of App::PDRUtils::DistIniCmd::_modify_prereq_version (from Perl distribution App-PDRUtils), released on 2021-05-25.
 
 =head1 HOMEPAGE
 
@@ -126,7 +126,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019, 2018, 2017, 2016 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2019, 2018, 2017, 2016 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

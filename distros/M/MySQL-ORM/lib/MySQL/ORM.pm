@@ -9,7 +9,7 @@ use Data::Printer alias => 'pdump';
 use SQL::Abstract::Complete;
 use MySQL::Util::Lite;
 
-our $VERSION = '0.17';
+our $VERSION = '0.18';
 
 =head1 SYNOPSIS
 
@@ -87,6 +87,7 @@ has _prune_ddl => (
 			distinct  => 1,
 			left_join => 1,
 			order_by  => 1,
+			limit     => 1
 		};
 	}
 );

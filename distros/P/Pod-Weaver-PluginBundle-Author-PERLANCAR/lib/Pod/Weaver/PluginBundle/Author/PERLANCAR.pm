@@ -1,9 +1,9 @@
 package Pod::Weaver::PluginBundle::Author::PERLANCAR;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2017-01-11'; # DATE
+our $DATE = '2021-06-04'; # DATE
 our $DIST = 'Pod-Weaver-PluginBundle-Author-PERLANCAR'; # DIST
-our $VERSION = '0.28'; # VERSION
+our $VERSION = '0.290'; # VERSION
 
 use 5.010001;
 
@@ -38,6 +38,7 @@ sub mvp_bundle_config {
         [ '@Author::PERLANCAR/Source::DefaultGitHub', _exp('Source::DefaultGitHub'), {} ],
         [ '@Author::PERLANCAR/Bugs::DefaultRT', _exp('Bugs::DefaultRT'), {} ],
         [ '@Author::PERLANCAR/Authors', _exp('Authors'), {} ],
+        [ '@Author::PERLANCAR/Contributors', _exp('Contributors'), {} ],
         [ '@Author::PERLANCAR/Legal', _exp('Legal'), {} ],
 
         [ '@Author::PERLANCAR/Rinci', _exp('-Rinci'), {} ],
@@ -67,7 +68,7 @@ Pod::Weaver::PluginBundle::Author::PERLANCAR - PERLANCAR's default Pod::Weaver c
 
 =head1 VERSION
 
-This document describes version 0.28 of Pod::Weaver::PluginBundle::Author::PERLANCAR (from Perl distribution Pod-Weaver-PluginBundle-Author-PERLANCAR), released on 2017-01-11.
+This document describes version 0.290 of Pod::Weaver::PluginBundle::Author::PERLANCAR (from Perl distribution Pod-Weaver-PluginBundle-Author-PERLANCAR), released on 2021-06-04.
 
 =head1 SYNOPSIS
 
@@ -92,7 +93,7 @@ Please visit the project's homepage at L<https://metacpan.org/release/Pod-Weaver
 
 =head1 SOURCE
 
-Source repository is at L<https://github.com/perlancar/perl-Pod-Weaver-PluginBundle-Author-SHARYANTO>.
+Source repository is at L<https://github.com/perlancar/perl-Pod-Weaver-PluginBundle-Author-PERLANCAR>.
 
 =head1 BUGS
 
@@ -114,7 +115,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2017, 2016, 2015, 2014, 2013 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

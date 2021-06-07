@@ -5,7 +5,7 @@ use File::Temp;
 use POSIX::AtFork;
 use Test::mysqld::Pool;
 
-our $VERSION = '0.09';
+our $VERSION = '0.10';
 
 sub load {
     my ($class, $prove) = @_;
@@ -45,29 +45,36 @@ sub load {
 
     $ENV{ PERL_APP_PROVE_PLUGIN_MYSQLPOOL_SHARE_FILE } = $share_file->filename;
 
-    POSIX::AtFork->add_to_child( \&child_hook );
+    POSIX::AtFork->add_to_child(create_child_hook($$));
 
     1;
 }
 
-sub child_hook {
-    my ($call) = @_;
+sub create_child_hook {
+    my ($ppid) = @_;
+    return sub {
+        my ($call) = @_;
 
-    # we're in the test process
+        # we're in the test process
 
-    # prove uses 'fork' to create child processes
-    # our own 'ps -o pid ...' uses 'backtick'
-    # only hook 'fork'
-    ($call eq 'fork')
-        or return;
+        # prove uses 'fork' to create child processes
+        # our own 'ps -o pid ...' uses 'backtick'
+        # only hook 'fork'
+        ($call eq 'fork')
+            or return;
 
-    my $share_file = $ENV{ PERL_APP_PROVE_PLUGIN_MYSQLPOOL_SHARE_FILE }
-        or return;
+        # restrict only direct child of prove
+        (getppid() == $ppid)
+            or return;
 
-    my $dsn = Test::mysqld::Pool->new( share_file => $share_file )->alloc;
+        my $share_file = $ENV{ PERL_APP_PROVE_PLUGIN_MYSQLPOOL_SHARE_FILE }
+            or return;
 
-    # use this in tests
-    $ENV{ PERL_TEST_MYSQLPOOL_DSN } = $dsn;
+        my $dsn = Test::mysqld::Pool->new( share_file => $share_file )->alloc;
+
+        # use this in tests
+        $ENV{ PERL_TEST_MYSQLPOOL_DSN } = $dsn;
+    };
 }
 
 {

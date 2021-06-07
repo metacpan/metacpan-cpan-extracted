@@ -493,9 +493,8 @@ sub encodepdu {
          } 
       }
    }
-   my $mod4=length($message) % 4;
-   for (my $i=0;$i<$mod4;$i++) {
-      $message.=chr(0);
+   while (length($message) % 4 != 0) {
+     $message.=chr(0);
    }
  
    return $class->toT32LV(chr($version).chr($reserved).chr($messageclass).chr($messagetype),$message);

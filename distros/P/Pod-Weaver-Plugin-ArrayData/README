@@ -3,9 +3,9 @@ NAME
     ArrayData::* distribution
 
 VERSION
-    This document describes version 0.001 of Pod::Weaver::Plugin::ArrayData
+    This document describes version 0.003 of Pod::Weaver::Plugin::ArrayData
     (from Perl distribution Pod-Weaver-Plugin-ArrayData), released on
-    2021-05-11.
+    2021-05-20.
 
 SYNOPSIS
     In your weaver.ini:
@@ -32,8 +32,7 @@ SOURCE
 
 BUGS
     Please report any bugs or feature requests on the bugtracker website
-    <https://rt.cpan.org/Public/Dist/Display.html?Name=Pod-Weaver-Plugin-Arr
-    ayData>
+    <https://github.com/perlancar/perl-Pod-Weaver-Plugin-ArrayData/issues>
 
     When submitting a bug or request, please include a test-file or a patch
     to an existing test-file that illustrates the bug or desired feature.

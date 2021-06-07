@@ -1,5 +1,6 @@
 Changes
 lib/StreamFinder.pm
+lib/StreamFinder/_Class.pm
 lib/StreamFinder/Anystream.pm
 lib/StreamFinder/Apple.pm
 lib/StreamFinder/Bitchute.pm

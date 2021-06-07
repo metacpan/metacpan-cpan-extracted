@@ -1,7 +1,7 @@
 package App::ParseCPANChanges;
 
-our $DATE = '2019-08-02'; # DATE
-our $VERSION = '0.071'; # VERSION
+our $DATE = '2021-05-25'; # DATE
+our $VERSION = '0.072'; # VERSION
 
 use 5.010001;
 use strict;
@@ -18,15 +18,21 @@ $SPEC{parse_cpan_changes} = {
 	    summary => 'If not specified, will look for file called '.
 		'Changes/ChangeLog in current directory',
 	    pos => 0,
-            description => <<'_',
-
-To read from standard input, use `-`.
-
-_
 	},
         class => {
             schema => 'perl::modname*',
             default => 'CPAN::Changes',
+        },
+        unbless => {
+            summary => 'Whether to return Perl objects as unblessed refs',
+            schema => 'bool*',
+            default => 1,
+            description => <<'_',
+
+If you set this to false, you'll need to use an output format that can handle
+serializing Perl objects, e.g. on the CLI using `--format=perl`.
+
+_
         },
     },
 };
@@ -34,28 +40,23 @@ sub parse_cpan_changes {
     require Data::Structure::Util;
 
     my %args = @_;
-
+    my $unbless = $args{unbless} // 1;
     my $class = $args{class} // 'CPAN::Changes';
     (my $class_pm = "$class.pm") =~ s!::!/!g;
     require $class_pm;
 
     my $file = $args{file};
-    my $ch;
     if (!$file) {
 	for (qw/Changes ChangeLog/) {
 	    do { $file = $_; last } if -f $_;
 	}
-    } elsif ($file eq '-') {
-        local $/;
-        $ch = $class->load_string(scalar <STDIN>);
-    } else {
-        $ch = $class->load($file);
     }
     return [400, "Please specify file ".
                 "(or run in directory where Changes file exists)"]
         unless $file;
 
-    [200, "OK", Data::Structure::Util::unbless($ch)];
+    my $ch = $class->load($file);
+    [200, "OK", $unbless ? Data::Structure::Util::unbless($ch) : $ch];
 }
 
 1;
@@ -73,7 +74,7 @@ App::ParseCPANChanges - Parse CPAN Changes file
 
 =head1 VERSION
 
-This document describes version 0.071 of App::ParseCPANChanges (from Perl distribution App-ParseCPANChanges), released on 2019-08-02.
+This document describes version 0.072 of App::ParseCPANChanges (from Perl distribution App-ParseCPANChanges), released on 2021-05-25.
 
 =head1 DESCRIPTION
 
@@ -87,7 +88,7 @@ L<CPAN::Changes>. See L<parse-cpan-changes> for more details.
 
 Usage:
 
- parse_cpan_changes(%args) -> [status, msg, payload, meta]
+ parse_cpan_changes(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Parse CPAN Changes file.
 
@@ -101,19 +102,25 @@ Arguments ('*' denotes required arguments):
 
 =item * B<file> => I<filename>
 
-If not specified, will look for file called Changes/ChangeLog in current directory.
+If not specified, will look for file called ChangesE<sol>ChangeLog in current directory.
 
-To read from standard input, use C<->.
+=item * B<unbless> => I<bool> (default: 1)
+
+Whether to return Perl objects as unblessed refs.
+
+If you set this to false, you'll need to use an output format that can handle
+serializing Perl objects, e.g. on the CLI using C<--format=perl>.
+
 
 =back
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
+($reason) is a string containing error message, or "OK" if status is
+200. Third element ($payload) is optional, the actual result. Fourth
+element (%result_meta) is called result metadata and is optional, a hash
 that contains extra information.
 
 Return value:  (any)
@@ -153,7 +160,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019, 2016, 2015, 2014, 2013 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2020, 2019, 2016, 2015, 2014, 2013 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

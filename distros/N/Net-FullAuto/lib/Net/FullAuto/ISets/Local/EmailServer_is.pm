@@ -104,6 +104,8 @@ my $configure_emailserver=sub {
    my $sudo=($^O eq 'cygwin')?'':
          'sudo env "LD_LIBRARY_PATH='.
          '/usr/local/lib64:$LD_LIBRARY_PATH" "PATH=$PATH" ';
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      "hostnamectl set-hostname mail.$domain_url");
    ($stdout,$stderr)=setup_aws_security(
       'EmailServerSecurityGroup','EmailServer.com Security Group');
    ($stdout,$stderr)=$handle->cmd($sudo.'id www-data');
@@ -184,7 +186,7 @@ my $configure_emailserver=sub {
          }
       }
       ($stdout,$stderr)=$handle->cmd($sudo.
-         "rm -rf /opt/source/* ~/fa\* /var/www/html/emailserver",
+         "rm -rf /opt/source/* ~/fa\* /var/www/html/roundcube",
          '3600','__display__');
       ($stdout,$stderr)=$handle->cmd($sudo.
          'mkdir -vp /var/www/html','__display__');
@@ -195,7 +197,7 @@ my $configure_emailserver=sub {
       ($stdout,$stderr)=$handle->cmd($sudo.
          "yum -y groupinstall 'Development tools'",'__display__');
       ($stdout,$stderr)=$handle->cmd($sudo.
-         'yum -y install openssl-devel icu cyrus-sasl '.
+         'yum -y install icu cyrus-sasl '.
          ' cyrus-sasl-devel libtool-ltdl-devel libjpeg-turbo-devel'.
          ' freetype-devel libpng-devel java-1.7.0-openjdk-devel'.
          ' unixODBC unixODBC-devel libtool-ltdl libtool-ltdl-devel'.
@@ -204,7 +206,7 @@ my $configure_emailserver=sub {
          ' libpng-devel.x86_64 freetype-devel.x86_64 expat-devel'.
          ' oniguruma oniguruma-devel tcl tcl-devel git-all'.
          ' lzip libffi-devel libc-client-devel texinfo cmake'.
-         ' systemd-devel',
+         ' systemd-devel bind-utils',
          '__display__');
       ($stdout,$stderr)=$handle->cmd($sudo.
          'yum -y update','__display__');
@@ -376,6 +378,9 @@ if ($do==1) {
    }
    chomp($public_ip);
    $public_ip='127.0.0.1' unless $public_ip;
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      "dig -x $public_ip +short");
+   my $ptr=$stdout;
    
    unless ($^O eq 'cygwin') {
       ($stdout,$stderr)=$handle->cmd($sudo.'yum install -y '.
@@ -399,55 +404,61 @@ if ($do==1) {
               ->[0]->{IpRanges}->[0]->{CidrIp};
       $c='aws ec2 authorize-security-group-ingress '.
          '--group-name EmailServerSecurityGroup --protocol '.
-         'tcp --port 22 --cidr '.$cidr." 2>&1";
+         'tcp --port 22 --cidr '.$cidr." 2>&1"; # SSH
       ($hash,$output,$error)=run_aws_cmd($c);
       Net::FullAuto::FA_Core::handle_error($error) if $error
          && $error!~/already exists/;
       $c='aws ec2 authorize-security-group-ingress '.
          '--group-name EmailServerSecurityGroup --protocol '.
-         'tcp --port 80 --cidr '.$cidr." 2>&1";
+         'tcp --port 80 --cidr '.$cidr." 2>&1"; # HTTP
       ($hash,$output,$error)=run_aws_cmd($c);
       Net::FullAuto::FA_Core::handle_error($error) if $error
          && $error!~/already exists/;
       $c='aws ec2 authorize-security-group-ingress '.
          '--group-name EmailServerSecurityGroup --protocol '.
-         'tcp --port 443 --cidr '.$cidr." 2>&1";
+         'tcp --port 443 --cidr '.$cidr." 2>&1"; # HTTPS
       ($hash,$output,$error)=run_aws_cmd($c);
       Net::FullAuto::FA_Core::handle_error($error) if $error
          && $error!~/already exists/;
       $c='aws ec2 authorize-security-group-ingress '.
          '--group-name EmailServerSecurityGroup --protocol '.
-         'tcp --port 25 --cidr '.$cidr." 2>&1";
+         'tcp --port 25 --cidr '.$cidr." 2>&1"; # SMTP
       ($hash,$output,$error)=run_aws_cmd($c);
       Net::FullAuto::FA_Core::handle_error($error) if $error
          && $error!~/already exists/;
       $c='aws ec2 authorize-security-group-ingress '.
          '--group-name EmailServerSecurityGroup --protocol '.
-         'tcp --port 465 --cidr '.$cidr." 2>&1";
+         'tcp --port 465 --cidr '.$cidr." 2>&1"; # SMTPS
       ($hash,$output,$error)=run_aws_cmd($c);
       Net::FullAuto::FA_Core::handle_error($error) if $error
          && $error!~/already exists/;
       $c='aws ec2 authorize-security-group-ingress '.
          '--group-name EmailServerSecurityGroup --protocol '.
-         'tcp --port 587 --cidr '.$cidr." 2>&1";
+         'tcp --port 587 --cidr '.$cidr." 2>&1"; # AMAZON SES
       ($hash,$output,$error)=run_aws_cmd($c);
       Net::FullAuto::FA_Core::handle_error($error) if $error
          && $error!~/already exists/;
       $c='aws ec2 authorize-security-group-ingress '.
          '--group-name EmailServerSecurityGroup --protocol '.
-         'tcp --port 110 --cidr '.$cidr." 2>&1";
+         'tcp --port 110 --cidr '.$cidr." 2>&1"; # POP3
       ($hash,$output,$error)=run_aws_cmd($c);
       Net::FullAuto::FA_Core::handle_error($error) if $error
          && $error!~/already exists/;
       $c='aws ec2 authorize-security-group-ingress '.
          '--group-name EmailServerSecurityGroup --protocol '.
-         'tcp --port 995 --cidr '.$cidr." 2>&1";
+         'tcp --port 995 --cidr '.$cidr." 2>&1"; # POP3S
       ($hash,$output,$error)=run_aws_cmd($c);
       Net::FullAuto::FA_Core::handle_error($error) if $error
          && $error!~/already exists/;
       $c='aws ec2 authorize-security-group-ingress '.
          '--group-name EmailServerSecurityGroup --protocol '.
-         'tcp --port 143 --cidr '.$cidr." 2>&1";
+         'tcp --port 143 --cidr '.$cidr." 2>&1"; # IMAP
+      ($hash,$output,$error)=run_aws_cmd($c);
+      Net::FullAuto::FA_Core::handle_error($error) if $error
+         && $error!~/already exists/;
+      $c='aws ec2 authorize-security-group-ingress '.
+         '--group-name EmailServerSecurityGroup --protocol '.
+         'tcp --port 993 --cidr '.$cidr." 2>&1"; # IMAPS
       ($hash,$output,$error)=run_aws_cmd($c);
       Net::FullAuto::FA_Core::handle_error($error) if $error
          && $error!~/already exists/;
@@ -614,6 +625,38 @@ if ($do==1) {
       ($stdout,$stderr)=$handle->cmd($sudo.
          'rm -rfv build','__display__');
    }
+   ($stdout,$stderr)=$handle->cwd('/opt/source');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'git clone --recursive https://github.com/madler/zlib.git',
+      '__display__');
+   ($stdout,$stderr)=$handle->cwd('zlib');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'wget -qO- https://zlib.net');
+   $stdout=~s/^.*?Current release:.*?zlib (.*?)[<].*$/$1/s;
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      "git checkout v$stdout",'__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      './configure','__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'make install','__display__');
+   ($stdout,$stderr)=$handle->cwd('/opt/source');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'git clone --recursive https://github.com/openssl/openssl.git',
+      '__display__');
+   ($stdout,$stderr)=$handle->cwd('openssl');
+   ($stdout,$stderr)=$handle->cmd($sudo.'git -P tag -l');
+   $stdout=~s/^.*(OpenSSL_1_1_1.)\n.*$/$1/s;
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      "git checkout $stdout",'__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      './config','__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'make install','__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'cp -v *.pc /usr/local/lib/pkgconfig',
+      '__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'ldconfig -v','__display__');
    ($stdout,$stderr)=$handle->cwd('/opt/source');
    ($stdout,$stderr)=$handle->cmd($sudo.
       'git clone https://gitlab.gnome.org/GNOME/libxml2.git',
@@ -821,55 +864,6 @@ if ($do==1) { # INSTALL LATEST VERSION OF NGINX
       ($stdout,$stderr)=$handle->cmd($sudo.
          "rm -rfv $pcre.tar.gz",'__display__');
    }
-   ($stdout,$stderr)=$handle->cmd($sudo.
-      "wget -qO- http://zlib.net/index.html");
-   my $zlib_ver=$stdout;
-   my $sha__256=$stdout;
-   $zlib_ver=~s/^.*? source code, version (\d+\.\d+\.\d+).*$/$1/s;
-   $sha__256=~s/^.*?SHA-256 hash [<]tt[>](.*?)[<][\/]tt[>].*$/$1/s;
-   foreach my $count (1..3) {
-      ($stdout,$stderr)=$handle->cmd($sudo.
-	 "wget --random-wait --progress=dot ".
-         "http://zlib.net/zlib-$zlib_ver.tar.gz",'__display__');
-      $checksum=$sha__256;
-      ($stdout,$stderr)=$handle->cmd($sudo.
-         "sha256sum -c - <<<\"$checksum zlib-$zlib_ver.tar.gz\"",
-         '__display__');
-      unless ($stderr) {
-         print(qq{ + CHECKSUM Test for zlib-$zlib_ver *PASSED* \n});
-         last
-      } elsif ($count>=3) {
-         print "FATAL ERROR! : CHECKSUM Test for ".
-               "zlib-$zlib_ver.tar.gz *FAILED* ",
-               "after $count attempts\n";
-         cleanup;
-      }
-      ($stdout,$stderr)=$handle->cmd($sudo.
-         "rm -rvf zlib-$zlib_ver.tar.gz",'__display__');
-   }
-   ($stdout,$stderr)=$handle->cmd($sudo."tar xvf zlib-$zlib_ver.tar.gz",
-      '__display__');
-   my $ossl='openssl-1.1.1c';
-   foreach my $count (1..3) {
-      $checksum='71b830a077276cbeccc994369538617a21bee808';
-      ($stdout,$stderr)=$handle->cmd($sudo.
-         "wget --random-wait --progress=dot ".
-         "https://www.openssl.org/source/$ossl.tar.gz",
-         '__display__');
-      ($stdout,$stderr)=$handle->cmd($sudo.
-         "sha1sum -c - <<<\"$checksum $ossl.tar.gz\"",'__display__');
-      unless ($stderr) {
-         print(qq{ + CHECKSUM Test for $ossl *PASSED* \n});
-         last
-      } elsif ($count>=3) {
-         print "FATAL ERROR! : CHECKSUM Test for $ossl.tar.gz *FAILED* ",
-               "after $count attempts\n";
-         cleanup;
-      }
-      ($stdout,$stderr)=$handle->cmd($sudo.
-         "rm -rvf $ossl.tar.gz",'__display__');
-   }
-   ($stdout,$stderr)=$handle->cmd($sudo."tar xvf $ossl.tar.gz",'__display__');
    ($stdout,$stderr)=$handle->cwd("/opt/source");
    # https://www.liberiangeek.net/2015/10/
    # how-to-install-self-signed-certificates-on-nginx-webserver/
@@ -1003,8 +997,6 @@ END
       '__display__');
    ($stdout,$stderr)=$handle->cmd($sudo."chkconfig --add nginx");
    ($stdout,$stderr)=$handle->cmd($sudo."chkconfig --level 345 nginx on");
-   ($stdout,$stderr)=$handle->cmd($sudo.
-      'yum -y install certbot-nginx','__display__');
    # https://www.digitalocean.com/community/tutorials/
    # how-to-secure-nginx-with-let-s-encrypt-on-centos-7
    my $make_nginx='./configure --user=www-data '.
@@ -1017,14 +1009,15 @@ END
                   '--error-log-path=/var/log/nginx/error.log '.
                   '--http-log-path=/var/log/nginx/access.log '.
                   "--with-http_ssl_module --with-pcre=objs/lib/$pcre ".
-                  "--with-zlib=objs/lib/zlib-$zlib_ver ".
+                  "--with-zlib=/opt/source/zlib ".
                   '--with-http_gzip_static_module '.
                   '--with-http_ssl_module '.
                   '--with-file-aio '.
                   '--with-http_realip_module '.
                   '--without-http_scgi_module '. 
                   '--without-http_uwsgi_module '.
-                  '--with-http_v2_module';
+                  '--with-http_v2_module '.
+                  '--with-openssl=/opt/source/openssl';
    ($stdout,$stderr)=$handle->cmd($sudo.$make_nginx,'__display__');
    ($stdout,$stderr)=$handle->cmd($sudo.
       "sed -i 's/-Werror //' ./objs/Makefile");
@@ -1040,7 +1033,7 @@ END
       "sed -i '0,/root   html/{//d;}' $nginx_path/nginx/nginx.conf");
    ($stdout,$stderr)=$handle->cmd($sudo.
       "sed -i '0,/index  index.html/{//d;}' $nginx_path/nginx/nginx.conf");
-   $ad="            root /var/www/html/emailserver;%NL%".
+   $ad="            root /var/www/html/roundcube;%NL%".
        '            index  index.php  index.html index.htm;%NL%'.
        '            try_files $uri $uri/ /index.php?$args;';
    $ad=<<END;
@@ -1050,12 +1043,26 @@ $ad
 END
    $handle->cmd_raw($sudo.$ad);
    $ad='%NL%        location ~ .php$ {'.
-       "%NL%            root /var/www/html/emailserver;".
-       "%NL%            fastcgi_pass 127.0.0.1:9000;".
-       "%NL%            fastcgi_index index.php;".
-       "%NL%            fastcgi_param SCRIPT_FILENAME ".
+       '%NL%            root /var/www/html/roundcube;'.
+       '%NL%            fastcgi_pass unix:/run/php-fpm/www.sock;'.
+       '%NL%            fastcgi_index index.php;'.
+       '%NL%            fastcgi_param SCRIPT_FILENAME '.
        '$document_root$fastcgi_script_name;'.
-       "%NL%            include fastcgi_params;".
+       '%NL%            include fastcgi_params;'.
+       '%NL%        }'.
+       '%NL%'.
+       '%NL%        location ~ ^/(README.md|INSTALL|LICENSE|CHANGELOG|UPGRADING)$ {'.
+       '%NL%            deny all;'.
+       '%NL%        }'.
+       '%NL%'.
+       '%NL%        location ~ ^/(config|temp|logs)/ {'.
+       '%NL%            deny all;'.
+       '%NL%        }'.
+       '%NL%'.
+       '%NL%        location ~ /\. {'.
+       '%NL%            deny all;'.
+       '%NL%            access_log off;'.
+       '%NL%            log_not_found off;'.
        '%NL%        }%NL%';
    ($stdout,$stderr)=$handle->cmd($sudo.
        "sed -i \'/404/a$ad\' $nginx_path/nginx/nginx.conf");
@@ -1157,8 +1164,8 @@ END
       ($stdout,$stderr)=$handle->cmd("touch script/first_time_start.flag");
    } else {
       ($stdout,$stderr)=$handle->cmd($sudo.
-         "sed -i 's/server_name  localhost/".
-         "server_name $domain_url www.$domain_url/' ".
+         "sed -i \'s/server_name  localhost/".
+         "server_name mail.$domain_url/\' ".
          "$nginx_path/nginx/nginx.conf");
       ($stdout,$stderr)=$handle->cmd($sudo.
          "sed -i 's/#user  nobody;/user  www-data;/' ".
@@ -1167,10 +1174,12 @@ END
          "sed -i 's/#error_page  404              /404.html;/".
          "error_page  404              /404.html;/' ".
          "$nginx_path/nginx/nginx.conf");
-      ($stdout,$stderr)=$handle->cmd($sudo.'service nginx start',
-         '__display__');
-      ($stdout,$stderr)=$handle->cmd($sudo.'service nginx status -l',
-         '__display__');
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         'systemctl enable nginx.service','__display__');
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         'service nginx start','__display__');
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         'service nginx status -l','__display__');
       ($stdout,$stderr)=$handle->cwd("$nginx_path/nginx");
       test_for_amazon_ec2();
       if ($main::amazon) {
@@ -1197,127 +1206,27 @@ END
          ($stdout,$stderr)=$handle->cmd("${sudo}sed -i \"s/%SQ%/\'/g\" ".
             'certbot-auto');
          ($stdout,$stderr)=$handle->cmd($sudo.
-            "certbot --debug --nginx -d $domain_url -d www.$domain_url",
+            "certbot --debug --nginx -d mail.$domain_url",
             '__display__');
       } else {
-         foreach my $num (1..3) {
-            sleep 3;
-            ($stdout,$stderr)=clean_filehandle($handle);
-            $handle->print($sudo.
-               "certbot --nginx -d $domain_url -d www.$domain_url");
-            $prompt=$handle->prompt();
-            my $output='';
-            while (1) {
-               $output.=fetch($handle);
-               last if $output=~/$prompt/;
-               print $output;
-               if (-1<index $output,'Attempt to reinstall') {
-                  $handle->print('1');
-                  $output='';
-               } elsif (-1<index $output,'No redirect') {
-                  $handle->print('2');
-                  $output='';
-               } elsif (-1<index $output,'Enter email address') {
-                  $handle->print('brian.kelly@fullauto.com');
-                  $output='';
-               } elsif (-1<index $output,'Terms of Service') {
-                  $handle->print('Y');
-                  $output='';
-               } elsif (-1<index $output,'Would you be willing') {
-                  $handle->print('Y');
-                  $output='';
-               } elsif ((-1<index $output,'existing certificate')
-                     && (-1==index $output,'--duplicate')) {
-                  $handle->print('C');
-                  $output='';
-               }
-            }
-            ($stdout,$stderr)=clean_filehandle($handle);
-            ($stdout,$stderr)=$handle->cmd($sudo.
-               'grep Certbot /etc/nginx/nginx.conf');
-            last if $stdout;
-         }
+         ($stdout,$stderr)=$handle->cmd($sudo.
+            'yum -y install certbot-nginx','__display__');
       }
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         'certbot certonly -n --nginx --debug --agree-tos --email '.
+         "$email_address -d mail.$domain_url",
+         '__display__');
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         'certbot certonly -n --nginx --debug --agree-tos --email '.
+         "$email_address -d postfixadmin.$domain_url",
+         '__display__');
       # https://ssldecoder.org
-$do=0;
-if ($do==1) {
-
-#resolver_timeout 5s;
-#resolver 127.0.0.1 [::1]:5353;
-#add_header Strict-Transport-Security "max-age=63072000; includeSubDomains;" always;
-#add_header X-Frame-Options https://video.get-wisdom.com;
-
-      ($stdout,$stderr)=$handle->cmd(
-         "sed -i '/^ssl_certificate_key/assl_dhparam /etc/letsencrypt".
-         "/ssl-dhparams.pem;' $nginx_path/nginx/nginx.conf");
-      ($stdout,$stderr)=$handle->cmd(
-         "sed -i '/^ssl_dhparam/a# https://cipherli.st/' ".
-         "$nginx_path/nginx/nginx.conf");
-      ($stdout,$stderr)=$handle->cmd(
-         "sed -i '/cipherli.st/assl_protocols TLSv1 TLSv1.1 TLSv1.2 TLSv1.3;' ".
-         "$nginx_path/nginx/nginx.conf");
-      ($stdout,$stderr)=$handle->cmd(
-         "sed -i '/^ssl_protocols/assl_prefer_server_ciphers on;' ".
-         "$nginx_path/nginx/nginx.conf");
-      ($stdout,$stderr)=$handle->cmd(
-         "sed -i '/^ssl_prefer_server_ciphers/assl_ciphers ".
-         "HIGH:!aNULL:!MD5;' ".
-         "$nginx_path/nginx/nginx.conf");
-      ($stdout,$stderr)=$handle->cmd(
-         "sed -i '/^ssl_ciphers ECDHE/assl_ecdh_curve secp384r1;' ".
-         "$nginx_path/nginx/nginx.conf");
-      ($stdout,$stderr)=$handle->cmd(
-         "sed -i '/^ssl_ecdh_curve/assl_session_timeout  180m;' ".
-         "$nginx_path/nginx/nginx.conf"); 
-      ($stdout,$stderr)=$handle->cmd(
-         "sed -i '/^ssl_session_timeout/assl_session_cache shared:SSL:10m;' ".
-         "$nginx_path/nginx/nginx.conf");
-      ($stdout,$stderr)=$handle->cmd(
-         "sed -i '/^ssl_session_cache/assl_session_tickets off;' ".
-         "$nginx_path/nginx/nginx.conf");
-      ($stdout,$stderr)=$handle->cmd(
-         "sed -i '/^ssl_session_tickets/assl_stapling on;' ".
-         "$nginx_path/nginx/nginx.conf");
-      ($stdout,$stderr)=$handle->cmd(
-         "sed -i '/^ssl_stapling/assl_stapling_verify on;' ".
-         "$nginx_path/nginx/nginx.conf");
-      ($stdout,$stderr)=$handle->cmd(
-         "sed -i '/^ssl_stapling_verify/a#resolver 127.0.0.1 [::1]:5353 valid=300s;' ".
-         "$nginx_path/nginx/nginx.conf");
-      ($stdout,$stderr)=$handle->cmd(
-         "sed -i '/valid=/aresolver_timeout 5s;' ".
-         "$nginx_path/nginx/nginx.conf");
-      ($stdout,$stderr)=$handle->cmd(
-         "sed -i '/resolver_timeout/aadd_header Strict-Transport-Security ".
-         "\"max-age=63072000; includeSubDomains;\" always;' ".
-         "$nginx_path/nginx/nginx.conf");
-      ($stdout,$stderr)=$handle->cmd(
-         "sed -i '/Strict-Transport-Security/aadd_header ".
-         "X-Frame-Options \"ALLOW-FROM https://video.$domain_url\";' ".
-         "$nginx_path/nginx/nginx.conf");
-      ($stdout,$stderr)=$handle->cmd(
-         "sed -i '/X-Frame-Options/aadd_header X-Content-Type-Options nosniff;' ".
-         "$nginx_path/nginx/nginx.conf");
-      ($stdout,$stderr)=$handle->cmd(
-         "sed -i '/X-Content-Type-Options/aadd_header X-XSS-Protection \"1; ".
-         "mode=block\" always;' ".
-         "$nginx_path/nginx/nginx.conf");
-      ($stdout,$stderr)=$handle->cmd(
-         "sed -i '/X-XSS-Protection/aadd_header X-Robots-Tag none;' ".
-         "$nginx_path/nginx/nginx.conf");
-      ($stdout,$stderr)=$handle->cmd(
-         "sed -i '/X-Robots-Tag/aadd_header Content-Security-Policy ".
-         "\"default-src \'self\' \'unsafe-inline\' \'unsafe-eval\' ".
-         "http: https: \*.$domain_url gmpg.org; img-src http: ".
-         "https: data: ws.sharethis.com s.w.org \*.gravatar.com ".
-         "themes.googleusercontent.com emailserver.org; font-src ".
-         "\'self\' \'unsafe-inline\' http: https: data: ".
-         "fonts.googleapis.com fonts.gstatic.com\";");
-}
-      ($stdout,$stderr)=$handle->cmd($sudo."service nginx restart",
-         '__display__');
-      ($stdout,$stderr)=$handle->cmd($sudo."service nginx status -l",
-         '__display__');
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         'systemctl enable nginx.service','__display__');
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         'service nginx restart','__display__');
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         'service nginx status -l','__display__');
    }
 }
 
@@ -1501,9 +1410,8 @@ END
          ($stdout,$stderr)=$handle->cwd('mariadb');
       }
       ($stdout,$stderr)=$handle->cmd($sudo.
-         'groupadd mysql');
-      ($stdout,$stderr)=$handle->cmd($sudo.
-         'useradd -r -g mysql mysql');
+         'useradd mysql --system -s /usr/bin/nologin '.
+         '--user-group --no-create-home');
       ($stdout,$stderr)=$handle->cmd($sudo.
          'ls -1 /opt/source/mariadb/_CPack_Packages/Linux/RPM/*rpm',
          '__display__');
@@ -1624,6 +1532,8 @@ END
       ($stdout,$stderr)=$handle->cmd($sudo.
          'mv -v ~/sql_mode.cnf /etc/my.cnf.d/sql_mode.cnf',
          '__display__');
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         'systemctl enable mysql.service','__display__');
       ($stdout,$stderr)=$handle->cmd($sudo.
          'service mysql start','__display__');
       ($stdout,$stderr)=$handle->cmd($sudo.
@@ -1819,7 +1729,44 @@ END
          $cmd_sent++;
          sleep 1;
          next;
-      } elsif ($cmd_sent>=17 && $output=~/MariaDB.*?>\s*$/) {
+      } elsif ($cmd_sent==17 && $output=~/MariaDB.*?>\s*$/) {
+         my $cmd='CREATE DATABASE postfixadmin CHARACTER SET '.
+                 'utf8 COLLATE utf8_general_ci;';
+         print "$cmd\n";
+         $handle->print($cmd);
+         $cmd_sent++;
+         sleep 1;
+         next;
+      } elsif ($cmd_sent==18 && $output=~/MariaDB.*?>\s*$/) {
+         my $cmd='DROP USER postfixadmin@localhost;';
+         print "$cmd\n";
+         $handle->print($cmd);
+         $cmd_sent++;
+         sleep 1;
+         next;
+      } elsif ($cmd_sent==19 && $output=~/MariaDB.*?>\s*$/) {
+         my $cmd='CREATE USER postfixadmin@localhost IDENTIFIED BY '.
+                 "'".$service_and_cert_password."';";
+         $handle->print($cmd);
+         $cmd_sent++;
+         sleep 1;
+         next;
+      } elsif ($cmd_sent==20 && $output=~/MariaDB.*?>\s*$/) {
+         my $cmd='GRANT ALL ON postfixadmin.* TO postfixadmin@localhost '.
+                 'IDENTIFIED BY '.
+                 "'".$service_and_cert_password."';";
+         $handle->print($cmd);
+         $cmd_sent++;
+         sleep 1;
+         next;
+      } elsif ($cmd_sent==21 && $output=~/MariaDB.*?>\s*$/) {
+         my $cmd="FLUSH PRIVILEGES;";
+         print "$cmd\n";
+         $handle->print($cmd);
+         $cmd_sent++;
+         sleep 1;
+         next;
+      } elsif ($cmd_sent>=22 && $output=~/MariaDB.*?>\s*$/) {
          print "quit\n";
          $handle->print('quit');
          sleep 1;
@@ -1950,6 +1897,7 @@ END
          '--enable-intl '.
          '--enable-exif '.
          '--enable-mbstring '.
+         '--with-gmp '.
          '--with-sodium '.
          '--enable-mysqlnd '.
          '--with-mysql-sock=/var/lib/mysql/mysql.sock '.
@@ -1981,6 +1929,9 @@ END
          '__display__');
       ($stdout,$stderr)=$handle->cmd($sudo.
          "sed -i \'s/post_max_size = 8M/post_max_size = 500M/\' ".
+         "/usr/local/php$vn/etc/php.ini");
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         "sed -i \'s#;date.timezone =#date.timezone = \"America/Chicago\"#\' ".
          "/usr/local/php$vn/etc/php.ini");
       ($stdout,$stderr)=$handle->cmd($sudo.
          "sed -i \'s/upload_max_filesize = 2M/upload_max_filesize = 500M/\' ".
@@ -2040,6 +1991,9 @@ END
          "sed -i 's/\;env.PATH./env[PATH]/' ".
          '/usr/local/php'.$vn.'/etc/php-fpm.d/www.conf');
       ($stdout,$stderr)=$handle->cmd($sudo.
+         "sed -i 's/;listen.mode = 0660/listen.mode = 0666/' ".
+         '/usr/local/php'.$vn.'/etc/php-fpm.d/www.conf');
+      ($stdout,$stderr)=$handle->cmd($sudo.
          'ln -s /usr/local/php'.$vn.'/sbin/php-fpm /usr/sbin/php-fpm');
       #
       # echo-ing/streaming files over ssh can be tricky. Use echo -e
@@ -2074,11 +2028,11 @@ END
       ($stdout,$stderr)=$handle->cmd($sudo.'mkdir -vp /run/php-fpm',
          '__display__');
       ($stdout,$stderr)=$handle->cmd($sudo.
-         'chkconfig --levels 235 php-fpm on');
-      ($stdout,$stderr)=$handle->cmd($sudo.'service php-fpm start',
-         '__display__');
-      ($stdout,$stderr)=$handle->cmd($sudo.'service php-fpm status -l',
-         '__display__');
+         'systemctl enable php-fpm.service','__display__');
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         'service php-fpm start','__display__');
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         'service php-fpm status -l','__display__');
       $prompt=$handle->prompt();
       ($stdout,$stderr)=$handle->cwd('/opt/source');
       ($stdout,$stderr)=$handle->cmd($sudo.
@@ -2108,9 +2062,42 @@ END
       ($stdout,$stderr)=$handle->cmd($sudo.
          "/usr/local/php$vn/bin/pecl install $version",
          '__display__');
+      $version='';
       ($stdout,$stderr)=$handle->cmd($sudo.
          'bash -c "echo extension=mailparse.so > '.
          '/usr/local/php'.$vn.'/etc/conf.d/mailparse.ini"');
+      ($stdout,$stderr)=$handle->cwd('/opt/source');
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         'wget --random-wait --progress=dot '.
+         'https://download.imagemagick.org/'.
+         'ImageMagick/download/ImageMagick.zip',
+         '__display__');
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         'unzip ImageMagick.zip','__display__');
+      ($stdout,$stderr)=$handle->cwd('ImageMag*');
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         './configure --with-modules','__display__');
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         'make install','__display__');
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         'ldconfig -v /usr/local/lib','__display__');
+      ($stdout,$stderr)=$handle->cwd('/opt/source');
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         'wget -qO- https://pecl.php.net/package/imagick');
+      $stdout=~s/^.*?get\/(imagick-.*?).tgz.*$/$1/s;
+      $version=$stdout;
+      $handle->print($sudo.
+         "/usr/local/php$vn/bin/pecl install $version");
+      $prompt=$handle->prompt();
+      while (1) {
+         my $output.=fetch($handle);
+         last if $output=~/$prompt/;
+         print $output;
+         if (-1<index $output,'autodetect') {
+            $handle->print('');
+            $output='';
+         } sleep 1;
+      }
       ($stdout,$stderr)=$handle->cmd($sudo.'service php-fpm start',
          '__display__');
       ($stdout,$stderr)=$handle->cmd($sudo.'service php-fpm status -l',
@@ -2150,11 +2137,16 @@ END
 
 
 END
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'useradd postfix --system --uid 4098 -s /usr/bin/nologin '.
+      '--user-group --no-create-home');
    ($stdout,$stderr)=$handle->cwd('/opt/source');
    print $install_postfix;
    sleep 5;
    # https://www.linuxbabe.com/redhat/run-your-own-email-server-centos-postfix-smtp-server
    # https://www.christianroessler.net/tech/2014/howto-server-debian-with-apache-phpfpm-virtual-postfix-dovecot-flatfiles-ssl-tls.html#9
+   # https://astroman.org/blog/2017/04/e-mail-server-hosting-on-amazon-ec2/
+   # https://noknow.info/it/os/install_dovecot_from_source?lang=en
    ($stdout,$stderr)=$handle->cmd($sudo.
       'wget -qO- http://ftp.porcupine.org/mirrors/postfix-release/index.html');
    $stdout=~s/^.*?href=["]([^"]+)?["][>]Source code.*$/$1/s;
@@ -2169,11 +2161,12 @@ END
    $gtarfile=~s/.tar.gz$//;
    ($stdout,$stderr)=$handle->cwd($gtarfile);
    ($stdout,$stderr)=$handle->cmd($sudo.
-      'make -f Makefile.init makefiles \'CCARGS=-DHAS_MYSQL '.
-      '-I/usr/include/mysql\' \'AUXLIBS_MYSQL=-L/usr/lib64/mysql '.
-      '-lmysqlclient -lz -lm\'','__display__');
+      'make makefiles CCARGS="-DUSE_TLS -DHAS_MYSQL -DUSE_SASL_AUTH '.
+      '-DUSE_CYRUS_SASL -I/usr/include/sasl" AUXLIBS="-L/usr/lib '.
+      '-lsasl2 -lssl -lcrypto" AUXLIBS_MYSQL="L/usr/lib64/mysql '.
+      '-lmysqlclient -lz -lm"','__display__');
    ($stdout,$stderr)=$handle->cmd($sudo.
-      "make",'__display__');
+      'make','__display__');
    $handle->print($sudo.'make install');
    $prompt=$handle->prompt();
    while (1) {
@@ -2217,151 +2210,111 @@ END
       }
       next;
    }
-
-   my $aliases=<<END;
-#
-# mysql config file for local(8) aliases(5) lookups
-#
-
-# The user name and password to log into the mysql server.
-user = mailuser 
-password = $service_and_cert_password
-
-# The database name on the servers.
-dbname = mail
-
-# For Postfix 2.2 and later The SQL query template.
-# See mysql_table(5) for details.
-query = SELECT forw_addr FROM mxaliases WHERE alias='%s' AND status='paid'
-
-# For Postfix releases prior to 2.2. See mysql_table(5) for details.
-select_field = forw_addr
-table = mxaliases
-where_field = alias
-# Don't forget the leading "AND"!
-additional_conditions = AND status = 'paid'
-
-# This is necessary to make UTF8 queries work for Postfix 2.11 .. 3.1,
-# and is the default setting as of Postfix 3.2.
-option_group = client
-END
-   ($stdout,$stderr)=$handle->cmd("echo -e \"$aliases\" > ".
-      "${home_dir}mysql_aliases.cf");
    ($stdout,$stderr)=$handle->cmd($sudo.
-      "mv -v ${home_dir}mysql_aliases.cf /etc/postfix",
-      '__display__');
-   my $virtual=<<END;
-user = mailuser
+      'mkdir -vp /etc/postfix/sql','__display__');
+   my $mysql_virtual_domains_maps=<<END;
+user = postfixadmin
 password = $service_and_cert_password
-dbname = mail
-table = domains
-select_field = 'virtual'
-where_field = domain
+hosts = 127.0.0.1
+dbname = postfixadmin
+query = SELECT domain FROM domain WHERE domain='\\x25s' AND active = '1'
+#query = SELECT domain FROM domain WHERE domain='\\x25s'
+#optional query to use when relaying for backup MX
+#query = SELECT domain FROM domain WHERE domain='\\x25s' AND backupmx = '0' AND active = '1'
+#expansion_limit = 100
+END
+   ($stdout,$stderr)=$handle->cmd("echo -e \"$mysql_virtual_domains_maps\" > ".
+      "${home_dir}mysql_virtual_domains_maps.cf");
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      "mv -v ${home_dir}mysql_virtual_domains_maps.cf /etc/postfix/sql",
+      '__display__');
+   my $mysql_virtual_mailbox_maps=<<END;
+user = postfixadmin
+password = $service_and_cert_password
+hosts = 127.0.0.1
+dbname = postfixadmin
+query = SELECT maildir FROM mailbox WHERE username='\\x25s' AND active = '1'
+#expansion_limit = 100
+END
+   ($stdout,$stderr)=$handle->cmd("echo -e \"$mysql_virtual_mailbox_maps\" > ".
+      "${home_dir}mysql_virtual_mailbox_maps.cf");
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      "mv -v ${home_dir}mysql_virtual_mailbox_maps.cf /etc/postfix/sql",
+      '__display__');
+   my $mysql_virtual_alias_mailbox_maps=<<END;
+user = postfixadmin
+password = $service_and_cert_password
+dbname = postfixadmin
+query = SELECT maildir FROM mailbox,alias_domain WHERE alias_domain.alias_domain = '\\x25d' and mailbox.username = CONCAT('\\x25u', '\@', alias_domain.target_domain) AND mailbox.active = 1 AND alias_domain.active='1'
 hosts = 127.0.0.1
 END
-   ($stdout,$stderr)=$handle->cmd("echo -e \"$virtual\" > ".
-      "${home_dir}mysql-virtual_domains.cf");
+   ($stdout,$stderr)=$handle->cmd(
+      "echo -e \"$mysql_virtual_alias_mailbox_maps\" > ".
+      "${home_dir}mysql_virtual_alias_mailbox_maps.cf");
    ($stdout,$stderr)=$handle->cmd($sudo.
-      "mv -v ${home_dir}mysql-virtual_domains.cf /etc/postfix",
+      "mv -v ${home_dir}mysql_virtual_alias_mailbox_maps.cf /etc/postfix/sql",
       '__display__');
-   my $forward=<<END;
-user = mailuser
+   my $mysql_virtual_alias_maps=<<END;
+user = postfixadmin
 password = $service_and_cert_password
-dbname = mail
-table = forwardings
-select_field = destination
-where_field = source
+dbname = postfixadmin
+query = SELECT goto FROM alias WHERE address='\\x25s' AND active = '1'
+#expansion_limit = 100
 hosts = 127.0.0.1
 END
-   ($stdout,$stderr)=$handle->cmd("echo -e \"$forward\" > ".
-      "${home_dir}mysql-virtual_forwardings.cf");
+   ($stdout,$stderr)=$handle->cmd("echo -e \"$mysql_virtual_alias_maps\" > ".
+      "${home_dir}mysql_virtual_alias_maps.cf");
    ($stdout,$stderr)=$handle->cmd($sudo.
-      "mv -v ${home_dir}mysql-virtual_forwardings.cf /etc/postfix",
+      "mv -v ${home_dir}mysql_virtual_alias_maps.cf /etc/postfix/sql",
       '__display__');
-   my $mailboxes=<<END;
-user = mailuser
+   my $mysql_virtual_alias_domain_maps=<<END;
+user = postfixadmin
 password = $service_and_cert_password
-dbname = mail
-table = users
-select_field = CONCAT(SUBSTRING_INDEX(email,'\@',-1),'/',SUBSTRING_INDEX(email,'\@',1),'/')
-where_field = email
+dbname = postfixadmin
+query = SELECT goto FROM alias,alias_domain WHERE alias_domain.alias_domain = '\\x25d' and alias.address = CONCAT('\\x25u', '\@', alias_domain.target_domain) AND alias.active = 1 AND alias_domain.active='1'
 hosts = 127.0.0.1
 END
-   ($stdout,$stderr)=$handle->cmd("echo -e \"$mailboxes\" > ".
-      "${home_dir}mysql-virtual_mailboxes.cf");
+   ($stdout,$stderr)=$handle->cmd(
+      "echo -e \"$mysql_virtual_alias_domain_maps\" > ".
+      "${home_dir}mysql_virtual_alias_domain_maps.cf");
    ($stdout,$stderr)=$handle->cmd($sudo.
-      "mv -v ${home_dir}mysql-virtual_mailboxes.cf /etc/postfix",
+      "mv -v ${home_dir}mysql_virtual_alias_domain_maps.cf /etc/postfix/sql",
       '__display__');
-   my $email2=<<END;
-user = mailuser
+   my $mysql_virtual_alias_domain_catchall_maps=<<END;
+# handles catch-all settings of target-domain
+user = postfixadmin
 password = $service_and_cert_password
-dbname = mail
-table = users
-select_field = email
-where_field = email
+dbname = postfixadmin
+query = SELECT goto FROM alias,alias_domain WHERE alias_domain.alias_domain = '\\x25d' and alias.address = CONCAT('\@', alias_domain.target_domain) AND alias.active = 1 AND alias_domain.active='1'
 hosts = 127.0.0.1
 END
-   ($stdout,$stderr)=$handle->cmd("echo -e \"$email2\" > ".
-      "${home_dir}mysql-virtual_email2email.cf");
+   ($stdout,$stderr)=$handle->cmd(
+      "echo -e \"$mysql_virtual_alias_domain_catchall_maps\" > ".
+      "${home_dir}mysql_virtual_alias_domain_catchall_maps.cf");
    ($stdout,$stderr)=$handle->cmd($sudo.
-      "mv -v ${home_dir}mysql-virtual_email2email.cf /etc/postfix",
-      '__display__');
-   my $transport=<<END;
-user = mailuser
-password = $service_and_cert_password
-dbname = mail
-table = transport
-select_field = transport
-where_field = domain
-hosts = 127.0.0.1
-END
-   ($stdout,$stderr)=$handle->cmd("echo -e \"$transport\" > ".
-      "${home_dir}mysql-virtual_transports.cf");
+      "mv -v ${home_dir}mysql_virtual_alias_domain_catchall_maps.cf ".
+      "/etc/postfix/sql",'__display__');
    ($stdout,$stderr)=$handle->cmd($sudo.
-      "mv -v ${home_dir}mysql-virtual_transports.cf /etc/postfix",
-      '__display__');
-   my $limit=<<END;
-user = mailuser
-password = $service_and_cert_password
-dbname = mail
-table = users
-select_field = quota
-where_field = email
-hosts = 127.0.0.1
-END
-   ($stdout,$stderr)=$handle->cmd("echo -e \"$limit\" > ".
-      "${home_dir}mysql-virtual_mailbox_limit_maps.cf");
+      'chmod -v 0640 /etc/postfix/sql/*','__display__');
    ($stdout,$stderr)=$handle->cmd($sudo.
-      "mv -v ${home_dir}mysql-virtual_mailbox_limit_maps.cf /etc/postfix",
-      '__display__');
-   my $destination=<<END;
-user = mailuser
-password = $service_and_cert_password
-dbname = mail
-table = transport
-select_field = domain
-where_field = domain
-hosts = 127.0.0.1
-END
-   ($stdout,$stderr)=$handle->cmd("echo -e \"$destination\" > ".
-      "${home_dir}mysql-mydestination.cf");
+      'setfacl -R -m u:postfix:rx /etc/postfix/sql/','__display__');
    ($stdout,$stderr)=$handle->cmd($sudo.
-      "mv -v ${home_dir}mysql-mydestination.cf /etc/postfix",
-      '__display__');
+      'useradd dovenull --system --uid 4099 -s /usr/bin/nologin '.
+      '--user-group --no-create-home');
    ($stdout,$stderr)=$handle->cmd($sudo.
-      'chmod -v 640 /etc/postfix/mysql-*.cf','__display__');
+      'useradd dovecot --system --uid 5000 -s /usr/bin/nologin '.
+      '--user-group --no-create-home');
    ($stdout,$stderr)=$handle->cmd($sudo.
-      'groupadd -g 4098 dovenull');
+      'gpasswd -a dovecot mail','__display__');
    ($stdout,$stderr)=$handle->cmd($sudo.
-      'useradd -u 4098 -r -g dovenull -s /usr/bin/nologin dovenull');
+      'useradd vmail --system --uid 2000 -s /usr/bin/nologin '.
+      '--user-group --no-create-home');
    ($stdout,$stderr)=$handle->cmd($sudo.
-      'groupadd -g 4099 dovecot');
+      'mkdir -v /var/vmail','__display__');
    ($stdout,$stderr)=$handle->cmd($sudo.
-      'useradd -u 4099 -r -g dovecot -s /usr/bin/nologin dovecot');
+      'chown -Rv vmail:vmail /var/vmail/','__display__');
    ($stdout,$stderr)=$handle->cmd($sudo.
-      'groupadd -g 5000 vmail');
-   ($stdout,$stderr)=$handle->cmd($sudo.
-      'useradd -u 5000 -r -g vmail -s /usr/bin/nologin vmail');
+      'chcon -Rv -t mail_spool_t /var/vmail/','__display__');
    #($stdout,$stderr)=$handle->cmd($sudo.
    #   'openssl req -new -outform PEM -out /etc/postfix/smtpd.cert '.
    #   '-newkey rsa:2048 -nodes -keyout /etc/postfix/smtpd.key '.
@@ -2377,31 +2330,23 @@ END
    ($stdout,$stderr)=$handle->cmd($sudo.
       "postconf -e \"inet_interfaces = all\"",'__display__');
    ($stdout,$stderr)=$handle->cmd($sudo.
-      'postconf -e \'mydestination = localhost, '.
-      'proxy:mysql:/etc/postfix/mysql-mydestination.cf\'',
+      'postconf -e "mydestination = '.$domain_url.', \$myhostname, '.
+      'localhost.\$mydomain, localhost"',
       '__display__');
    ($stdout,$stderr)=$handle->cmd($sudo.
-      'postconf -e \'virtual_alias_maps = proxy:mysql:'.
-      '/etc/postfix/mysql-virtual_forwardings.cf, '.
-      'mysql:/etc/postfix/mysql-virtual_email2email.cf\'',
-      '__display__');
+      'postconf -e "myhostname = mail.'.$domain_url.'"','__display__');
    ($stdout,$stderr)=$handle->cmd($sudo.
-      'postconf -e \'virtual_mailbox_domains = '.
-      'proxy:mysql:/etc/postfix/mysql-virtual_domains.cf\'',
-      '__display__');
+      'postconf -e "mydomain = '.$domain_url.'"','__display__');
    ($stdout,$stderr)=$handle->cmd($sudo.
-      'postconf -e \'virtual_mailbox_maps = proxy:mysql:'.
-      '/etc/postfix/mysql-virtual_mailboxes.cf\'',
-      '__display__');
+      'postconf -e "myorigin = '.$domain_url.'"','__display__');
    ($stdout,$stderr)=$handle->cmd($sudo.
-      'postconf -e \'virtual_mailbox_base = /home/vmail\'',
-      '__display__');
+      'postconf -e "virtual_mailbox_base = /var/vmail"','__display__');
    ($stdout,$stderr)=$handle->cmd($sudo.
-      'postconf -e \'virtual_uid_maps = static:5000\'',
-      '__display__');
+      'postconf -e "virtual_minimum_uid = 2000"','__display__');
    ($stdout,$stderr)=$handle->cmd($sudo.
-      'postconf -e \'virtual_gid_maps = static:5000\'',
-      '__display__');
+      'postconf -e "virtual_uid_maps = static:2000"','__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'postconf -e "virtual_gid_maps = static:2000"','__display__');
    ($stdout,$stderr)=$handle->cmd($sudo.
       'postconf -e \'smtpd_sasl_auth_enable = yes\'',
       '__display__');
@@ -2416,16 +2361,18 @@ END
       '= permit_mynetworks, permit_sasl_authenticated, '.
       'reject_unauth_destination\'',
       '__display__');
+   # https://serverfault.com/questions/803920/postfix-configure-to-use-tlsv1-2
+   # https://www.howtoforge.com/howto_postfix_smtp_auth_tls_howto
    ($stdout,$stderr)=$handle->cmd($sudo.
       'postconf -e \'smtpd_use_tls = yes\'',
       '__display__');
    ($stdout,$stderr)=$handle->cmd($sudo.
       "postconf -e \'smtpd_tls_cert_file = ".
-      "/etc/letsencrypt/live/$domain_url/fullchain.pem\'",
+      "/etc/letsencrypt/live/mail.$domain_url/fullchain.pem\'",
       '__display__');
    ($stdout,$stderr)=$handle->cmd($sudo.
       "postconf -e \'smtpd_tls_key_file = ".
-      "/etc/letsencrypt/live/$domain_url/privkey.pem\'",
+      "/etc/letsencrypt/live/mail.$domain_url/privkey.pem\'",
       '__display__');
    ($stdout,$stderr)=$handle->cmd($sudo.
       'postconf -e \'strict_rfc821_envelopes = yes\'',
@@ -2434,37 +2381,37 @@ END
       'postconf -e \'disable_vrfy_command = yes\'',
       '__display__');
    ($stdout,$stderr)=$handle->cmd($sudo.
-      'postconf -e \'transport_maps = proxy:mysql:'.
-      '/etc/postfix/mysql-virtual_transports.cf\'',
+      'postconf -e \'message_size_limit = 0\'',
+      '__display__');
+   #($stdout,$stderr)=$handle->cmd($sudo.
+   #   'postconf -e \'proxy_read_maps = $local_recipient_maps '.
+   #   '$mydestination $virtual_alias_maps $virtual_alias_domains '.
+   #   '$virtual_mailbox_maps $virtual_mailbox_domains '.
+   #   '$relay_recipient_maps $relay_domains $canonical_maps '.
+   #   '$sender_canonical_maps $recipient_canonical_maps '.
+   #   '$relocated_maps $transport_maps $mynetworks '.
+   #   '$virtual_mailbox_limit_maps\'',
+   #   '__display__');
+   $ad=<<END;
+mailbox_transport = lmtp:unix:private/dovecot-lmtp
+smtputf8_enable = no
+virtual_mailbox_domains = proxy:mysql:/etc/postfix/sql/mysql_virtual_domains_maps.cf
+virtual_mailbox_maps =
+   proxy:mysql:/etc/postfix/sql/mysql_virtual_mailbox_maps.cf,
+   proxy:mysql:/etc/postfix/sql/mysql_virtual_alias_domain_mailbox_maps.cf
+virtual_alias_maps =
+   proxy:mysql:/etc/postfix/sql/mysql_virtual_alias_maps.cf,
+   proxy:mysql:/etc/postfix/sql/mysql_virtual_alias_domain_maps.cf,
+   proxy:mysql:/etc/postfix/sql/mysql_virtual_alias_domain_catchall_maps.cf
+virtual_transport = lmtp:unix:private/dovecot-lmtp
+END
+   ($stdout,$stderr)=$handle->cmd("echo -e \"$ad\" >> ".
+      "~/main_cf");
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'mv -fv ~/main_cf /etc/postfix/main.cf',
       '__display__');
    ($stdout,$stderr)=$handle->cmd($sudo.
-      'postconf -e \'virtual_create_maildirsize = yes\'',
-      '__display__');
-   ($stdout,$stderr)=$handle->cmd($sudo.
-      'postconf -e \'virtual_mailbox_extended = yes\'',
-      '__display__');
-   ($stdout,$stderr)=$handle->cmd($sudo.
-      'postconf -e \'virtual_mailbox_limit_maps = '.
-      'proxy:mysql:/etc/postfix/mysql-virtual_mailbox_limit_maps.cf\'',
-      '__display__');
-   ($stdout,$stderr)=$handle->cmd($sudo.
-      'postconf -e \'virtual_mailbox_limit_override = yes\'',
-      '__display__');
-   ($stdout,$stderr)=$handle->cmd($sudo.
-      'postconf -e \'virtual_maildir_limit_message = '.
-      '"Account is over quota"\'',
-      '__display__');
-   ($stdout,$stderr)=$handle->cmd($sudo.
-      'postconf -e \'virtual_overquota_bounce = yes\'',
-      '__display__');
-   ($stdout,$stderr)=$handle->cmd($sudo.
-      'postconf -e \'proxy_read_maps = $local_recipient_maps '.
-      '$mydestination $virtual_alias_maps $virtual_alias_domains '.
-      '$virtual_mailbox_maps $virtual_mailbox_domains '.
-      '$relay_recipient_maps $relay_domains $canonical_maps '.
-      '$sender_canonical_maps $recipient_canonical_maps '.
-      '$relocated_maps $transport_maps $mynetworks '.
-      '$virtual_mailbox_limit_maps\'',
+      'chown -R root:root /etc/postfix/main.cf',
       '__display__');
    if ($main::amazon) {
       ($stdout,$stderr)=$handle->cmd($sudo.
@@ -2475,7 +2422,8 @@ END
           '\'smtp_sasl_password_maps = hash:/etc/postfix/sasl_passwd\' '.
           '\'smtp_use_tls = yes\' '.
           '\'smtp_tls_security_level = encrypt\' '.
-          '\'smtp_tls_note_starttls_offer = yes\'',
+          '\'smtp_tls_note_starttls_offer = yes\' '.
+          '\'smtpd_tls_received_header = yes\'',
           '__display__');
       #
       # echo-ing/streaming files over ssh can be tricky. Use echo -e
@@ -2501,14 +2449,14 @@ END
       sleep 1;
       $c="aws iam delete-user --user-name ses_postfix_email";
       ($hash,$output,$error)=run_aws_cmd($c);
-      $c="aws iam create-user --user-name gnusocial_email";
+      $c="aws iam create-user --user-name ses_postfix_email";
       ($hash,$output,$error)=run_aws_cmd($c);
-      $c="aws iam create-access-key --user-name gnusocial_email";
+      $c="aws iam create-access-key --user-name ses_postfix_email";
       ($hash,$output,$error)=run_aws_cmd($c);
       $hash||={};
       my $access_id=$hash->{AccessKey}->{AccessKeyId};
       my $secret_access_key=$hash->{AccessKey}->{SecretAccessKey};
-      my $python_smtp_generator<<END;
+      my $python_smtp_generator=<<END;
 #\\x21/usr/bin/env python3
 
 import hmac
@@ -2581,7 +2529,7 @@ END
       ($smtppass,$stderr)=$handle->cmd(
          "python smtp_credentials_generate.py $secret_access_key us-west-2");
       my $sasl_password=<<"END";
-[email-smtp.us-west-2.amazonaws.com]:587 ses_postfix_email:$smtppass
+[email-smtp.us-west-2.amazonaws.com]:587 $access_id:$smtppass
 END
       ($stdout,$stderr)=$handle->cmd("echo -e \"$sasl_password\" > ".
          "sasl_passwd");
@@ -2630,10 +2578,32 @@ END
       ($hash,$output,$error)=run_aws_cmd($c);
       ($stdout,$stderr)=$handle->cmd($sudo.
          'rm -rfv ./sespolicy','__display__');
-      ($stdout,$stderr)=$handle->cmd($sudo.
-         'postconf -e \'smtp_tls_CAfile = /etc/ssl/certs/ca-bundle.crt\'',
-         '__display__');
    }
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'postconf -e \'smtp_tls_CAfile = /etc/ssl/certs/ca-bundle.crt\'',
+      '__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'postconf -e \'postscreen_access_list = '.
+      'permit_mynetworks cidr:/etc/postfix/postscreen_access.cidr\'',
+      '__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'postconf -e \'postscreen_blacklist_action = drop\'',
+      '__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo.'ifconfig');
+   $stdout=~s/^.*?inet (.*?) .*$/$1/s;
+   $ad=<<END;
+#permit my own IP addresses.
+$public_ip/32             permit
+$stdout/32             permit
+END
+   ($stdout,$stderr)=$handle->cmd("echo -e \"$ad\" > ".
+      "~/postscreen_access.cidr");
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'mv -fv ~/postscreen_access.cidr /etc/postfix',
+      '__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'chown -v root:root /etc/postfix/postscreen_access.cidr',
+      '__display__');
    $ad='submission inet n       -       -       -       -       smtpd%NL%'.
           '  -o syslog_name=postfix/submission%NL%'.
           '  -o smtpd_tls_security_level=encrypt%NL%'.
@@ -2656,6 +2626,20 @@ END
    ($stdout,$stderr)=$handle->cmd($sudo.
        "sed -i \'s/%NL%/\'\"`echo \\\\\\n`/g\" ".
        "/etc/postfix/master.cf");
+   ($stdout,$stderr)=$handle->cmd($sudo.
+       "sed -i \'s/^smtp      inet/Xsmtp      inet/\' ".
+       "/etc/postfix/master.cf");
+   ($stdout,$stderr)=$handle->cmd($sudo.
+       "sed -i \'s/#smtp      inet/smtp      inet/\' ".
+       "/etc/postfix/master.cf");
+   ($stdout,$stderr)=$handle->cmd($sudo.
+       "sed -i \'s/#smtpd/smtpd/\' /etc/postfix/master.cf");
+   ($stdout,$stderr)=$handle->cmd($sudo.
+       "sed -i \'s/#dnsblog/dnsblog/\' /etc/postfix/master.cf");
+   ($stdout,$stderr)=$handle->cmd($sudo.
+       "sed -i \'s/#tlsproxy/tlsproxy/\' /etc/postfix/master.cf");
+   ($stdout,$stderr)=$handle->cmd($sudo.
+       "sed -i \'s/Xsmtp/#smtp/\' /etc/postfix/master.cf");
    # https://www.linode.com/community/questions/11498/postfix-does-not-start-correctly-on-linode-reboot-not-always
    #
    # echo-ing/streaming files over ssh can be tricky. Use echo -e
@@ -2689,11 +2673,160 @@ ExecStop=/usr/sbin/postfix stop
 WantedBy=multi-user.target
 END
    ($stdout,$stderr)=$handle->cmd("echo -e \"$ad\" > ".
-      "/etc/systemd/system/postfix.service");
+      "~/postfix.service");
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'mv -fv ~/postfix.service /etc/systemd/system',
+      '__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'systemctl daemon-reload');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'systemctl enable postfix.service','__display__');
    ($stdout,$stderr)=$handle->cmd($sudo.
       "yum -y install nmap",'__display__');
    ($stdout,$stderr)=$handle->cmd($sudo.
       "yum -y install telnet",'__display__');
+
+#https://github.com/postfixadmin/postfixadmin/releases/latest
+
+   my $install_postfixadmin=<<'END';
+
+
+          o o    o .oPYo. ooooo    .oo o     o     o o    o .oPYo.
+          8 8b   8 8        8     .P 8 8     8     8 8b   8 8    8
+          8 8`b  8 `Yooo.   8    .P  8 8     8     8 8`b  8 8
+          8 8 `b 8     `8   8   oPooo8 8     8     8 8 `b 8 8   oo
+          8 8  `b8      8   8  .P    8 8     8     8 8  `b8 8    8
+          8 8   `8 `YooP'   8 .P     8 8oooo 8oooo 8 8   `8 `YooP8
+          ........................................................
+          ::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+
+                        _    __ _                 _           _
+        _ __   ___  ___| |_ / _(_)_  __  __ _  __| |_ __ ___ (_)_ __
+       | '_ \ / _ \/ __| __| |_| \ \/ / / _` |/ _` | '_ ` _ \| | '_ \
+       | |_) | (_) \__ \ |_|  _| |>  < | (_| | (_| | | | | | | | | | |
+       | .__/ \___/|___/\__|_| |_/_/\_(_)__,_|\__,_|_| |_| |_|_|_| |_|
+       |_|
+
+
+
+
+       (postfix.admin is **NOT** a sponsor of the FullAuto© Project.)
+
+
+END
+   ($stdout,$stderr)=$handle->cwd('/opt/source');
+   print $install_postfixadmin;
+   sleep 5;
+
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'wget -qO- https://github.com/postfixadmin/'.
+      'postfixadmin/releases/latest');
+   $stdout=~s/^.*?return_to.*?(postfixadmin-.*?)["].*$/$1/s;
+   my $pfix=$stdout;
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'wget --random-wait --progress=dot '.
+      'https://github.com/postfixadmin/postfixadmin'.
+      "/archive/$pfix.tar.gz",'__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      "tar xvf $pfix.tar.gz",'__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      "mv -v *$pfix /var/www/html/postfixadmin",
+      '__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'mkdir -vp /var/www/html/postfixadmin/templates_c',
+      '__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'setfacl -R -m u:www-data:rwx /var/www/html/postfixadmin/templates_c/',
+      '__display__');
+   #($stdout,$stderr)=$handle->cmd($sudo.
+   #   'chcon -t httpd_sys_rw_content_t '.
+   #   '/var/www/html/postfixadmin/templates_c/ -R',
+   #   '__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'setsebool -P httpd_can_network_connect 1',
+      '__display__');
+   # sudo setfacl -R -m u:nginx:rwx /var/lib/php/opcache/
+   # /var/lib/php/session/ /var/lib/php/wsdlcache/
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'setfacl -R -m u:www-data:rx /etc/letsencrypt/live/ '.
+      '/etc/letsencrypt/archive/','__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'php -r \'echo password_hash("password", PASSWORD_DEFAULT);\'');
+   my $pfapassword=$stdout;
+   #
+   # echo-ing/streaming files over ssh can be tricky. Use echo -e
+   #          and replace these characters with thier HEX
+   #          equivalents (use an external editor for quick
+   #          search and replace - and paste back results.
+   #          use copy/paste or cat file and copy/paste results.):
+   #
+   #          !  -   \\x21     `  -  \\x60   * - \\x2A
+   #          "  -   \\x22     \  -  \\x5C
+   #          $  -   \\x24     %  -  \\x25
+   #
+   $ad=<<END;
+<?php
+\\x24CONF['configured'] = true;
+\\x24CONF['database_type'] = 'mysqli';
+\\x24CONF['database_host'] = 'localhost';
+\\x24CONF['database_port'] = '3306';
+\\x24CONF['database_user'] = 'postfixadmin';
+\\x24CONF['database_password'] = \'$service_and_cert_password\';
+\\x24CONF['database_name'] = 'postfixadmin';
+\\x24CONF['encrypt'] = 'dovecot:SHA512';
+\\x24CONF['dovecotpw'] = \\x22/usr/bin/doveadm pw -r 12\\x22;
+\\x24CONF['setup_password'] = \'$pfapassword\';
+END
+   ($stdout,$stderr)=$handle->cmd("echo -e \"$ad\" > ".
+      "~/pfa_config");
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'mv -fv ~/pfa_config '.
+      '/var/www/html/postfixadmin/config.local.php',
+      '__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'chown -R www-data:www-data /var/www/html/postfixadmin',
+      '__display__');
+   $ad=<<END;
+    server {
+        listen 80;
+        listen [::]:80;
+        server_name postfixadmin.$domain_url;
+
+        root /var/www/html/postfixadmin/public/;
+        index index.php index.html;
+
+        access_log /var/log/nginx/postfixadmin_access.log;
+        error_log /var/log/nginx/postfixadmin_error.log;
+
+        location / {
+            try_files \\x24uri \\x24uri/ /index.php;
+        }
+
+        location ~ ^/(.+\\x5C.php)\\x24 {
+            try_files \\x24uri =404;
+            fastcgi_pass unix:/run/php-fpm/www.sock;
+            fastcgi_index index.php;
+            fastcgi_param SCRIPT_FILENAME \\x24document_root\\x24fastcgi_script_name;
+            include /etc/nginx/fastcgi_params;
+        }
+    }
+}
+END
+   ($stdout,$stderr)=$handle->cmd(
+      "cp -v /etc/nginx/nginx.conf ~/nginx.conf",
+      '__display__');
+   ($stdout,$stderr)=$handle->cmd(
+      'sed -i \'/}/,$!b;/}/{x;/./p;x;h};/}/!H;$!d;x;s/^}$//M\' ~/nginx.conf');
+   ($stdout,$stderr)=$handle->cmd("echo -e \"$ad\" >> ".
+      "~/nginx.conf");
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'mv -v ~/nginx.conf /etc/nginx/nginx.conf',
+      '__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'service nginx restart','__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'service nginx status -l','__display__');
 
    my $install_dovecot=<<'END';
 
@@ -2739,7 +2872,7 @@ END
    $gtarfile=~s/.tar.gz$//;
    ($stdout,$stderr)=$handle->cwd($gtarfile);
    ($stdout,$stderr)=$handle->cmd($sudo.
-      "./configure",'__display__');
+      "./configure --with-mysql ",'__display__');
    ($stdout,$stderr)=$handle->cmd($sudo.
       "make",'__display__');
    ($stdout,$stderr)=$handle->cmd($sudo.
@@ -2755,7 +2888,7 @@ END
    ($stdout,$stderr)=$handle->cmd($sudo.
       "cp -v conf.d/10-mail.conf /usr/local/etc/dovecot/conf.d",
       '__display__');
-   $ad='mail_location = maildir:/var/mail/vhosts/%d/%n';
+   $ad='mail_location = maildir:/var/vmail/%d/%n/';
    ($stdout,$stderr)=$handle->cmd($sudo.
       "sed -i \'s*#mail_location =*$ad*\' ".
       "/usr/local/etc/dovecot/conf.d/10-mail.conf");
@@ -2764,16 +2897,13 @@ END
       "sed -i \'s/#mail_privileged_group =/$ad/\' ".
       "/usr/local/etc/dovecot/conf.d/10-mail.conf");
    ($stdout,$stderr)=$handle->cmd($sudo.
-      "sudo mkdir -vp /var/mail/vhosts/$domain_url",
+      "sudo mkdir -vp /var/vmail/$domain_url",
       '__display__');
    ($stdout,$stderr)=$handle->cmd($sudo.
-      'chown -Rv vmail:vmail /var/mail/','__display__');
+      'chown -Rv vmail:vmail /var/vmail/','__display__');
    ($stdout,$stderr)=$handle->cmd($sudo.
       "cp -v conf.d/10-auth.conf /usr/local/etc/dovecot/conf.d",
       '__display__');
-   ($stdout,$stderr)=$handle->cmd($sudo.
-      "sed -i \'s/#disable_/disable_/\' ".
-      "/usr/local/etc/dovecot/conf.d/10-auth.conf");
    ($stdout,$stderr)=$handle->cmd($sudo.
       "sed -i \'s/#disable_/disable_/\' ".
       "/usr/local/etc/dovecot/conf.d/10-auth.conf");
@@ -2781,25 +2911,54 @@ END
    ($stdout,$stderr)=$handle->cmd($sudo.
       "sed -i \'s/auth_mechanisms = plain/$ad/\' ".
       "/usr/local/etc/dovecot/conf.d/10-auth.conf");
-   my $id='!include auth-sql.conf.ext';
+   $ad='auth_username_format = %u';
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      "sed -i \'s/#auth_username_format = %Lu/$ad\' ".
+      "/usr/local/etc/dovecot/conf.d/10-auth.conf");
+   $ad='!include auth-sql.conf.ext';
    ($stdout,$stderr)=$handle->cmd($sudo.
       "sed -i \'s/#!include auth-sql.conf.ext/$ad/\' ".
       "/usr/local/etc/dovecot/conf.d/10-auth.conf");
+   $ad='#!include auth-system.conf.ext';
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      "sed -i \'s/!include auth-system.conf.ext/$ad/\' ".
+      "/usr/local/etc/dovecot/conf.d/10-auth.conf");
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'cp -v /usr/local/etc/dovecot/conf.d/10-auth.conf ~',
+      '__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'chmod -v 777 ~/10-auth.conf','__display__');
+   $ad=<<END;
+auth_debug = yes
+auth_debug_passwords = yes
+END
+   ($stdout,$stderr)=$handle->cmd(
+      "echo -e \"$ad\" >> ~/10-auth.conf");
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'mv -v ~/10-auth.conf /usr/local/etc/dovecot/conf.d/10-auth.conf',
+      '__display__');
    ($stdout,$stderr)=$handle->cmd($sudo.
       "cp -v conf.d/auth-sql.conf.ext ".
       "/usr/local/etc/dovecot/conf.d",
       '__display__');
    ($stdout,$stderr)=$handle->cmd($sudo.
-      "sed -i \'s/args = \/etc/args = \/usr\/local\/etc/\' ".
+      "sed -i \'s#args = /etc#args = /usr/local/etc#\' ".
       "/usr/local/etc/dovecot/conf.d/auth-sql.conf.ext");
    ($stdout,$stderr)=$handle->cmd($sudo.
       "cp -v dovecot-sql.conf.ext /usr/local/etc/dovecot",
       '__display__');
    $ad='%NL%'.
        'driver = mysql%NL%'.
-       "connect = host=127.0.0.1 dbname=mail user=mailuser password=$service_and_cert_password%NL%".
+       'connect = host=127.0.0.1 dbname=postfixadmin '.
+       "user=postfixadmin password=$service_and_cert_password%NL%".
        'default_pass_scheme = SHA512-CRYPT%NL%'.
-       'password_query = SELECT email as user, password FROM virtual_users WHERE email=%SQ%%u%SQ%;';
+       'password_query = SELECT username as user, '.
+       'password FROM mailbox WHERE username=%SQ%%u%SQ% AND '.
+       'active=%SQ%1%SQ%%NL%'.
+       'user_query = SELECT maildir, 2000 AS uid, 2000 AS gid '.
+       'FROM mailbox WHERE username = %SQ%%u%SQ% and '.
+       'active=%SQ%1%SQ%%NL%'.
+       'iterate_query = SELECT username AS user FROM mailbox';
    ($stdout,$stderr)=$handle->cmd($sudo.
        "sed -i \'/iterate_query/a$ad\' ".
        "/usr/local/etc/dovecot/dovecot-sql.conf.ext");
@@ -2871,9 +3030,9 @@ END
    ($stdout,$stderr)=$handle->cmd($sudo.
        "sed -i \"s/X}/#}/\" ".
        "/usr/local/etc/dovecot/conf.d/10-master.conf");
-   ($stdout,$stderr)=$handle->cmd($sudo.
-       "sed -i \"/mode = 0600X/a%SP%%SP%%SP%%SP%user = vmail\" ".
-       "/usr/local/etc/dovecot/conf.d/10-master.conf");
+   #($stdout,$stderr)=$handle->cmd($sudo.
+   #    "sed -i \"/mode = 0600X/a%SP%%SP%%SP%%SP%user = vmail\" ".
+   #    "/usr/local/etc/dovecot/conf.d/10-master.conf");
    ($stdout,$stderr)=$handle->cmd($sudo.
        "sed -i \"s/0600X/0600/\" ".
        "/usr/local/etc/dovecot/conf.d/10-master.conf");
@@ -2908,12 +3067,56 @@ END
        "/usr/local/etc/dovecot/conf.d/10-ssl.conf");
    ($stdout,$stderr)=$handle->cmd($sudo.
        "sed -i \"s*ssl/certs/dovecot.pem*".
-       "letsencrypt/live/$domain_url/fullchain.pem*\" ".
+       "letsencrypt/live/mail.$domain_url/fullchain.pem*\" ".
        "/usr/local/etc/dovecot/conf.d/10-ssl.conf");
    ($stdout,$stderr)=$handle->cmd($sudo.
        "sed -i \"s*ssl/private/dovecot.pem*".
-       "letsencrypt/live/$domain_url/privkey.pem*\" ".
+       "letsencrypt/live/mail.$domain_url/privkey.pem*\" ".
        "/usr/local/etc/dovecot/conf.d/10-ssl.conf");
+   $ad=<<END;
+
+service stats {
+    unix_listener stats-reader {
+    user = www-data
+    group = www-data
+    mode = 0660
+}
+
+unix_listener stats-writer {
+    user = www-data
+    group = www-data
+    mode = 0660
+  }
+}
+END
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'cp -v /usr/local/etc/dovecot/conf.d/10-master.conf ~',
+      '__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'chmod -v 777 ~/10-master.conf','__display__');
+   ($stdout,$stderr)=$handle->cmd(
+      "echo -e \"$ad\" >> ~/10-master.conf");
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'mv -v ~/10-master.conf /usr/local/etc/dovecot/conf.d/10-master.conf',
+      '__display__');
+   my $name=getpwuid($<);
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      "gpasswd -a $name dovecot",'__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      "ls -1 /usr/local/etc/dovecot/conf.d");
+   foreach my $file (split /\n/, $stdout) {
+      next if $file=~/\.+$/;
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         "chmod -v 660 /usr/local/etc/dovecot/conf.d/$file",
+         '__display__');
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         "chown -v vmail:dovecot /usr/local/etc/dovecot/conf.d/$file",
+         '__display__');
+   }
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      "gpasswd -d $name dovecot",'__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'gpasswd -a www-data dovecot','__display__');
    ($stdout,$stderr)=$handle->cwd("/opt/source/$gtarfile");
    ($stdout,$stderr)=$handle->cmd($sudo.
        "cp -v dovecot.service.in /etc/systemd/system/dovecot.service",
@@ -2932,10 +3135,17 @@ END
    ($stdout,$stderr)=$handle->cmd($sudo.
        'systemctl daemon-reload');
    ($stdout,$stderr)=$handle->cmd($sudo.
-       'service dovecot restart');
+       'systemctl enable saslauthd.service','__display__');
    ($stdout,$stderr)=$handle->cmd($sudo.
-       'service dovecot status -l',
-       '__display__');
+       'service saslauthd restart','__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+       'service saslauthd status -l','__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+       'systemctl enable dovecot.service'.'__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+       'service dovecot restart','__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+       'service dovecot status -l','__display__');
    ($stdout,$stderr)=$handle->cwd('/opt/source');
    my $install_roundcube=<<'END';
 
@@ -2963,6 +3173,10 @@ END
 
 
 END
+   # http://charmingwebdesign.com/setup-roundcube-use-amazon-ses-send-email/
+   # https://astroman.org/blog/2017/04/e-mail-server-hosting-on-amazon-ec2/
+   # https://speedkills.io/email-server-aws/
+   # https://www.linode.com/community/questions/10148/postfix-dovecot-mysql-amazon-ses
    ($stdout,$stderr)=$handle->cwd('/opt/source');
    print $install_roundcube;
    sleep 5;
@@ -3008,6 +3222,17 @@ END
    ($stdout,$stderr)=$handle->cmd($sudo.
       "cp -Rv $gtarfile/* /var/www/html/roundcube",
       '__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      "setfacl -R -m u:www-data:rwx /var/www/html/roundcube/temp/ ".
+      "/var/www/html/roundcube/logs/",'__display__');
+
+
+#$config['smtp_server'] = 'localhost';
+#$config['smtp_port'] = 25;
+#$config['smtp_auth_type'] = '';
+#$config['smtp_user'] = '';
+#$config['smtp_pass'] = '';
+
 
    my $install_redis=<<'END';
 
@@ -3062,10 +3287,8 @@ END
    ($stdout,$stderr)=$handle->cmd($sudo.
       'sysctl net.core.somaxconn=65535');
    ($stdout,$stderr)=$handle->cmd($sudo.
-      'groupadd -g 5001 redis');
-   ($stdout,$stderr)=$handle->cmd($sudo.
-      'useradd -u 5001 -r -g redis -s /usr/bin/nologin '.
-      'redis');
+      'useradd redis --system --uid 5002 -s /usr/bin/nologin '.
+      '--user-group --no-create-home');
    ($stdout,$stderr)=$handle->cmd($sudo.
       'mkdir -vp /usr/local/var/lib/redis','__display__');
    ($stdout,$stderr)=$handle->cmd($sudo.
@@ -3171,6 +3394,8 @@ END
    ($stdout,$stderr)=$handle->cmd($sudo.
       'systemctl daemon-reload');
    ($stdout,$stderr)=$handle->cmd($sudo.
+      'systemctl enable redis.service','__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo.
       'service redis restart','__display__');
    ($stdout,$stderr)=$handle->cmd($sudo.
       'service redis status -l','__display__');
@@ -3241,10 +3466,8 @@ END
    ($stdout,$stderr)=$handle->cmd($sudo.
       'systemctl daemon-reload');
    ($stdout,$stderr)=$handle->cmd($sudo.
-      'groupadd -g 5002 unbound');
-   ($stdout,$stderr)=$handle->cmd($sudo.
-      'useradd -u 5002 -r -g unbound -s /usr/bin/nologin '.
-      'unbound');
+      'useradd unbound --system --uid 5003 -s /usr/bin/nologin '.
+      '--user-group --no-create-home');
    ($stdout,$stderr)=$handle->cmd($sudo.
       'sed -i \'s/nameserver/#nameserver/\' '.
       '/etc/resolv.conf');
@@ -3252,9 +3475,9 @@ END
       'sed -i \'/nameserver/anameserver 127.0.0.1\' '.
       '/etc/resolv.conf');
    ($stdout,$stderr)=$handle->cmd($sudo.
-      'systemctl enable unbound');
+      'systemctl enable unbound.service','__display__');
    ($stdout,$stderr)=$handle->cmd($sudo.
-      'service unbound restart');
+      'service unbound restart','__display__');
    ($stdout,$stderr)=$handle->cmd($sudo.
       'service unbound status -l','__display__');
 
@@ -3363,11 +3586,15 @@ END
       'make install','__display__');
    ($stdout,$stderr)=$handle->cwd('/opt/source');
    ($stdout,$stderr)=$handle->cmd($sudo.
-      'git clone --recursive https://github.com/threatstack/libmagic.git',
-      '__display__');
+      'git clone https://github.com/file/file.git '.
+      'libmagic','__display__');
    ($stdout,$stderr)=$handle->cwd('libmagic');
    ($stdout,$stderr)=$handle->cmd($sudo.
-      './autogen.sh','__display__');
+      'aclocal -I .','__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'libtoolize --copy --force');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'autoreconf -ifv','__display__');
    ($stdout,$stderr)=$handle->cmd($sudo.
       './configure','__display__');
    ($stdout,$stderr)=$handle->cmd($sudo.
@@ -3384,6 +3611,10 @@ END
    #   "--depth=1 --branch=release-$stdout",'__display__');
    ($stdout,$stderr)=$handle->cwd('/opt/source');
    ($stdout,$stderr)=$handle->cwd('rspamd');
+   ($stdout,$stderr)=$handle->cmd($sudo.'git -P tag -l');
+   $stdout=~s/^.*\n(.*)$/$1/s;
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      "git checkout $stdout",'__display__');
    ($stdout,$stderr)=$handle->cmd($sudo.
       'mkdir -v rspamd.build','__display__');
    ($stdout,$stderr)=$handle->cwd('rspamd.build');
@@ -3440,9 +3671,8 @@ END
       'sed -i \'s#/etc#/usr/local/etc#\' '.
       '/etc/systemd/system/rspamd.service');
    ($stdout,$stderr)=$handle->cmd($sudo.
-      'groupadd -g 5003 _rspamd');
-   ($stdout,$stderr)=$handle->cmd($sudo.
-      'useradd -u 5003 -r -g _rspamd -s /usr/bin/nologin _rspamd');
+      'useradd _rspamd --system --uid 5004 -s /usr/bin/nologin '.
+      '--user-group --no-create-home');
    ($stdout,$stderr)=$handle->cmd($sudo.
       'mkdir -vp /var/log/rspamd','__display__');
    ($stdout,$stderr)=$handle->cmd($sudo.
@@ -3452,9 +3682,9 @@ END
    ($stdout,$stderr)=$handle->cmd($sudo.
       'chown -v _rspamd:_rspamd /var/lib/rspamd','__display__');
    ($stdout,$stderr)=$handle->cmd($sudo.
-      'systemctl enable rspamd');
+      'systemctl enable rspamd.service','__display__');
    ($stdout,$stderr)=$handle->cmd($sudo.
-      'service rspamd restart');
+      'service rspamd restart','__display__');
    ($stdout,$stderr)=$handle->cmd($sudo.
       'service rspamd status -l','__display__');
 
@@ -3846,6 +4076,11 @@ END
 
    Make sure the DNS A/AAAA record(s) for this domain
    contain(s) this IP address --> $public_ip
+
+   A      @                       $public_ip
+   A      mail.domain_url         $public_ip
+   CNAME  mail                    @
+   CNAME  postfixadmin            @
 
 
    Domain URL

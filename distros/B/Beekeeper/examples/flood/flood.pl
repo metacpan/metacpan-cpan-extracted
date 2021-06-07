@@ -27,7 +27,7 @@ my $Help = "
 Usage: flood [OPTIONS]
 Flood with requests a test worker pool.
 
-  -t, --type str   type of requests to be made (N, J, B or A)
+  -t, --type str   type of requests to be made (N, S, A or F)
   -c, --count N    how many requests to be made
   -r, --rate  N    sustain a rate of N requests per second
   -s, --size  N    size in KB of requests, default is 0
@@ -39,9 +39,9 @@ To create a burst of 5000 notifications:
 
   flood --type N --count 5000
 
-To create a constant load of 100 jobs per second:
+To create a constant load of 100 requests per second:
 
-  flood --type J --rate 100
+  flood --type S --rate 100
 
 Run a predefined set of benchmarks
 
@@ -86,11 +86,11 @@ sub time_this {
     my $payload = { data => 'X' x ($size * 1024) };
 
     my $type = $args{'type'} || 'N';
-    my @async_jobs;
+    my @async_calls;
     my $code;
 
     if ($type =~ m/^N(otification)?/i) {
-        $type = 'notification';
+        $type = 'notifications';
         $code = sub {
             $client->send_notification(
                 method => 'myapp.test.flood', 
@@ -98,35 +98,35 @@ sub time_this {
             );
         };
     }
-    elsif ($type =~ m/^J(ob)?/i) {
-        $type = 'sync job';
+    elsif ($type =~ m/^S(ync)?/i) {
+        $type = 'sync calls';
         $code = sub {
-            $client->do_job(
+            $client->call_remote(
                 method => 'myapp.test.echo', 
                 params => $payload,
             );
         };
     }
-    elsif ($type =~ m/^B(ackground)?(.job)?/i) {
-        $type = 'background job';
+    elsif ($type =~ m/^A(sync)?/i) {
+        $type = 'async calls';
         $code = sub {
-            $client->do_background_job(
+            push @async_calls, $client->call_remote_async(
                 method => 'myapp.test.echo', 
                 params => $payload,
             );
         };
     }
-    elsif ($type =~ m/^A(sync)?(.job)?/i) {
-        $type = 'async job';
+    elsif ($type =~ m/^F(ire)?/i) {
+        $type = 'fire & forget';
         $code = sub {
-            push @async_jobs, $client->do_async_job(
+            $client->fire_remote(
                 method => 'myapp.test.echo', 
                 params => $payload,
             );
         };
     }
     else {
-        die "type must be one of (N)otification, (J)ob, (B)ackground job or (A)sinc job\n";
+        die "type must be one of (N)otification, (S)ync, (A)sync or (F)ire and forget\n";
     }
 
     my $rate = $args{'rate'} ? (1 / $args{'rate'}) : 0;
@@ -140,7 +140,7 @@ sub time_this {
     }
 
     local $| = 1;
-    printf( "%s %-16s of %3s Kb  ", $max_count, $type.'s', $size ) if (!$rate);
+    printf( "%s %-15s of %3s Kb  ", $max_count, $type, $size ) if (!$rate);
 
     my $count = 0;
     my $start = time();
@@ -166,9 +166,9 @@ sub time_this {
         }
     }
 
-    if ($type eq 'async job') {
-        $client->wait_all_jobs;
-        @async_jobs = ();
+    if ($type eq 'async call') {
+        $client->wait_async_calls;
+        @async_calls = ();
     }
 
     my $ellapsed = time() - $start - $sleept;
@@ -176,7 +176,7 @@ sub time_this {
     my $tps = sprintf("%.0f", $count / $ellapsed);
     my $avg = sprintf("%.2f", $ellapsed / $count * 1000);
 
-    printf( "%s %-16s of %3s Kb  ", $count, $type.'s', $size ) if ($rate);
+    printf( "%s %-15s of %3s Kb  ", $count, $type, $size ) if ($rate);
     printf( "in %6s sec  %6s /sec %6s ms each\n", $took, $tps, $avg );
 }
 
@@ -194,15 +194,15 @@ sub run_benchmarks {
 
     print "\n";
 
-    # Jobs
+    # Sync calls
     foreach (@sizes) {
-        time_this( type => 'J', count => $count, size => $_ );
+        time_this( type => 'S', count => $count, size => $_ );
         sleep 1;
     }
 
     print "\n";
 
-    # Async jobs
+    # Async calls
     foreach (@sizes) {
         time_this( type => 'A', count => $count, size => $_ );
         sleep 1;
@@ -210,9 +210,9 @@ sub run_benchmarks {
 
     print "\n";
 
-    # Background jobs
+    # Fire calls
     foreach (@sizes) {
-        time_this( type => 'B', count => $count, size => $_ );
+        time_this( type => 'F', count => $count, size => $_ );
         sleep 1;
     }
 

@@ -1,6 +1,13 @@
 Revision history for Plasp
 
-1.05 2021-05-04T15:44:24Z
+1.07 2021-05-27T18:16:13Z
+1.07    Wed May 26 16:22:05 2021 -0400
+        - Fix incorrect handling of Hash::MultiValue fields
+        - When field was converted to Hash::MultiValue, the supporting function
+          was not properly updated
+1.06    Tue May 18 21:46:10 2021 -0700
+        - Don't encode all HTML entities
+        - Apache::ASP only did <>&'"
 1.05    Tue May 4 11:18:10 2021 -0400
         - Fix %ENV values leakage!
 1.04    Mon Apr 12 12:33:13 2021 -0400

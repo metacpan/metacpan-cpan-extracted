@@ -28,7 +28,7 @@ $zv = cos($rv) / (3 + $rv);
 #################################
 
 # first, some very basic stuff. Testing implicit domains, multiple curves in
-# arguments, packed in piddles, etc
+# arguments, packed in ndarrays, etc
 
 sub prompt {
     print $_[0]. "   (Press <RETURN> to continue)";

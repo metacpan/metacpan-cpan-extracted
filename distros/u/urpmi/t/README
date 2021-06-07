@@ -4,7 +4,7 @@ The tests are running the following way:
 02create_pkgs.t	builds the various RPMs needed by the others tests
 cfg.t		tests reading/writing the config files
 pod.t		check for POD errors in files (optional)
-superuser--*.t
+superuser--*.t  tests needing to be run as root
 
 The first tests just ensure that basic things in urpmi works.
 

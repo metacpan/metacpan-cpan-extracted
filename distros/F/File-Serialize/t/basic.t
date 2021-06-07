@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 use Test::Exception;
 use Test::Requires;
 
@@ -19,6 +19,7 @@ for my $serializer (
         YAML::XS
         Data::Dumper
         JSON5
+        Markdown
     /
 ) {
     subtest $serializer => sub {
@@ -30,7 +31,7 @@ for my $serializer (
         my $ext = $serializer->extension;
         my $x = deserialize_file( "t/corpus/foo.$ext", { serializers => [ $serializer ] } );
 
-        is_deeply $x => { foo => 'bar' };
+        is $x => { foo => 'bar' };
 
         my $time = scalar localtime;
 

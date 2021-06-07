@@ -13,8 +13,7 @@ __DATA__
 <html>
   <head>
     <title>Mojolicious ♥ Webpack</title>
-    %= asset 'example.js'
-    %= asset 'example.css'
+    %= asset 'webpack-example.css'
   </head>
   <body>
     <h1>Mojolicious ♥ Webpack</h1>
@@ -23,5 +22,6 @@ __DATA__
       together with <a href="https://mojolicious.org/">Mojolicious</a>.
     </p>
     <div id="vue_app"></div>
+    %= asset 'webpack-example.js'
   </body>
 </html>

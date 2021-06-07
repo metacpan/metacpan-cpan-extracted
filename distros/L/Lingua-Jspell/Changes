@@ -1,5 +1,8 @@
 Revision history for Lingua-Jspell
 
+1.95 June 4, 2021
+   - Use HTTPs to fetch dictionary
+
 1.94 February 22, 2020
    - validate prefix/suffix before replacing it;
 

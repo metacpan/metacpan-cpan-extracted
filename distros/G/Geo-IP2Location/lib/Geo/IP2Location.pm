@@ -25,8 +25,9 @@ package Geo::IP2Location;
 use strict;
 use vars qw(@ISA $VERSION @EXPORT);
 use Math::BigInt;
+use bigint;
 
-$VERSION = '8.50';
+$VERSION = '8.51';
 require Exporter;
 @ISA = qw(Exporter);
 
@@ -1239,8 +1240,8 @@ sub validate_ip {
 		$ipnum = $obj->ip2no($ip);
 	} else {
 		#expand ipv6 address
+		$ip = $obj->expand_ipv6_address($ip);
 		if ($obj->ip_is_ipv6($ip)) {
-			$ip = $obj->expand_ipv6_address($ip);
 			#ipv6 address
 			$ipv = 6;
 			$ipnum = $obj->hex2int($ip);
@@ -1368,6 +1369,10 @@ sub ip_is_ipv4 {
 	my $obj = shift(@_);
 	my $ip = shift(@_);
 	if ($ip =~ m/^$IPv4_re$/) {
+		my @octet = split(/\./, $ip);
+		foreach my $i (0 .. $#octet) {
+			return 0 if (($octet[$i] > 255) || ($octet[$i] < 0));
+		}
 		return 1;
 	} else {
 		return 0;
@@ -1591,7 +1596,7 @@ L<IP2Location Product Page|https://www.ip2location.com>
 
 =head1 VERSION
 
-8.50
+8.51
 
 =head1 AUTHOR
 

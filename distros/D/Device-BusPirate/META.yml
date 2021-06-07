@@ -8,7 +8,7 @@ build_requires:
 configure_requires:
   Module::Build: '0.4004'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.4224, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Module::Build version 0.4231, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -17,37 +17,38 @@ name: Device-BusPirate
 provides:
   Device::BusPirate:
     file: lib/Device/BusPirate.pm
-    version: '0.20'
+    version: '0.22'
   Device::BusPirate::Mode:
     file: lib/Device/BusPirate/Mode.pm
-    version: '0.20'
+    version: '0.22'
   Device::BusPirate::Mode::BB:
     file: lib/Device/BusPirate/Mode/BB.pm
-    version: '0.20'
+    version: '0.22'
   Device::BusPirate::Mode::I2C:
     file: lib/Device/BusPirate/Mode/I2C.pm
-    version: '0.20'
+    version: '0.22'
   Device::BusPirate::Mode::SPI:
     file: lib/Device/BusPirate/Mode/SPI.pm
-    version: '0.20'
+    version: '0.22'
   Device::BusPirate::Mode::UART:
     file: lib/Device/BusPirate/Mode/UART.pm
-    version: '0.20'
+    version: '0.22'
   Device::Chip::Adapter::BusPirate:
     file: lib/Device/Chip/Adapter/BusPirate.pm
-    version: '0.20'
+    version: '0.22'
 requires:
   Device::Chip::Adapter: '0.02'
   Device::Chip::ProtocolBase::SPI: '0'
   Future: '0'
-  Future::AsyncAwait: '0.25'
+  Future::AsyncAwait: '0.47'
   Future::IO: '0.04'
   Future::Mutex: '0'
   IO::Termios: '0.07'
   List::Util: '1.33'
   Module::Pluggable: '0'
   Time::HiRes: '0'
+  perl: '5.014'
 resources:
   license: http://dev.perl.org/licenses/
-version: '0.20'
+version: '0.22'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

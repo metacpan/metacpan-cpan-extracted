@@ -46,6 +46,7 @@ my $right_ret_ar = [
 	'AC1032',
 	'AC1033',
 	'AC1034',
+	'AC1035',
 ];
 is_deeply(
 	\@ret,

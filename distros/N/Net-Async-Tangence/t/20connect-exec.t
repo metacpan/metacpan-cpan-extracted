@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 
-use strict;
+use v5.14;
 use warnings;
 
 use Test::More;
@@ -19,7 +19,7 @@ $loop->add( $client );
 my $serverpath = "t/server.pl";
 
 eval {
-   $client->connect_url( "exec:///$serverpath" )->get; 1;
+   $client->connect_url( "exec:///$^X?$serverpath" )->get; 1;
 } or plan skip_all => "Unable to exec $serverpath";
 pass "Connected via EXEC";
 

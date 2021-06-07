@@ -1,5 +1,36 @@
 Revision history for XS-Parse-Keyword
 
+0.06    2021-06-01
+        [BREAKING CHANGES]
+         * ABI version is now 1 - this will require a from-source rebuild of
+           all modules using it.
+
+        [CHANGES]
+         * Renamed XPK_STRING to XPK_LITERAL
+         * Support probe on the four bracketed scope types
+         * Added _OPT-suffixed versions of the four bracketed scope types
+         * Added more token types:
+            + XPK_LEXVAR_MY
+            + XPK_COMMA
+            + XPK_PREFIXED_BLOCK
+            + XPK_SEQUENCE
+
+0.05    2021-05-31
+        [CHANGES]
+         * Added context-setting variants of block/expr types:
+            + XPK_BLOCK_SCALARCTX, XPK_BLOCK_LISTCTX
+            + XPK_TERMEXPR_SCALARCTX
+            + XPK_LISTEXPR_LISTCTX
+
+0.04    2021-05-24
+        [CHANGES]
+         * Added many more token types: XPK_LEXVARNAME, XPK_ATTRIBUTES,
+           XPK_VSTRING, XPK_VSTRING_OPT, XPK_EQUALS
+         * Added XPK_COMMALIST structure type
+         * Defined hooks flags XPK_FLAG_STMT, XPK_FLAG_EXPR, XPK_FLAG_AUTOSEMI
+         * API change to the way .build is invoked, allowing greater future
+           compatibility for args structures
+
 0.03    2021-04-27
         [BUGFIXES]
          * Fix the `VAR never introduced at ...` warnings from uses of

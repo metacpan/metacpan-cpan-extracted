@@ -1,0 +1,381 @@
+#!/usr/bin/env perl
+
+use v5.14;
+use warnings;
+use App::ansiecho;
+
+App::ansiecho->new->run(splice @ARGV);
+
+exit;
+
+__END__
+
+=encoding utf-8
+
+=head1 NAME
+
+ansiecho - Echo command with ANSI terminal code
+
+=head1 VERSION
+
+Version 0.02
+
+=head1 SYNOPSIS
+
+ansiecho -c R Red -c M/551 Magenta/Yellow -c FSDB BlinkReverseBoldBlue
+
+ansiecho -f '[ %12s ]' -c SR -f '%+06d' 123
+
+ansiecho -C '555/(132,0,41)' d i g i t a l
+
+=head1 DESCRIPTION
+
+=head2 ECHO
+
+B<ansiecho> print arguments with ANSI terminal escape sequence
+according to the given color specification.
+
+In a simple case, B<ansiecho> behave exactly same as L<echo> command.
+
+    ansiecho a b c
+
+Like L<echo> command, option B<-n> disables to print newline at the
+end.  Option B<-j> (or B<--join>) removes white space between
+arguments.
+
+=head2 COLOR
+
+You can specify color of each argument by preceding with B<-c> option:
+
+    ansiecho -c R a -c GI b -c BD c
+
+This command print strings C<a>, C<b> and C<c> according to the color
+spec of C<R> (Red), C<GI> (I<Green Italic>) and C<BD> (B<Blue Bold>)
+respectively.
+
+Foreground/Background color can be specified by 8+8 standard colors,
+24 gray scales, 6x6x6 216 colors, RGB values or color names, with
+special effects such as I (Italic), D (Double-struck; Bold), S
+(Stand-out; Reverse Video) and such.
+
+Color example:
+
+    RGB  6x6x6    12bit      24bit           color name
+    ===  =======  =========  =============  ==================
+    B    005      #00F       (0,0,255)      <blue>
+     /M     /505      /#F0F   /(255,0,255)  /<magenta>
+    K/W  000/555  #000/#FFF  000000/FFFFFF  <black>/<white>
+    R/G  500/050  #F00/#0F0  FF0000/00FF00  <red>/<green>
+    W/w  L03/L20  #333/#ccc  303030/c6c6c6  <dimgrey>/<lightgrey>
+
+More information is described in L<COLOR SPEC> section.
+
+12bit/24bit colors are converted to 216 colors because most terminal
+can not display them.  If you are using full-color terminal, such as
+iTerm2 on Mac, use B<--rgb24> option or set C<GETOPTEX_RGB24>
+environment variable to produce full-color sequence.
+
+=head2 FORMAT
+
+Format string can be specified with B<-f> option, and it behaves like
+a L<printf> command.
+
+    ansiecho -f '[ %5s : %5s : %5s ]' -c R RED -c G GREEN -c B BLUE
+
+You can use backslash escape characters in the format string.
+See L<STRING LITERAL> section.
+
+Formatted result becomes a single argument, and can be a subject of
+other operation.  In next example, numbers are formatted, colored, and
+gave to other format.
+
+    ansiecho -f '\N{ALARM CLOCK} %s' -c KF/544 -f ' %02d:%02d:%02d ' 1 2 3
+
+Formatting is done by Perl C<sprintf> function.  See
+L<perlfunc/sprintf> for detail.
+
+=head2 ANSI SEQUENCE
+
+With normal usage, B<ansiecho> print given argument with introducer
+and reset sequences.
+
+To get just a desired sequence, use B<-s> option.  Next example
+produce ANSI terminal sequence to indicate C<deeppink> color with
+C<lightyellow> background.
+
+    ansiecho -n -s '<deeppink>/<lightyellow>'
+
+You will get the next result with 256-color terminal:
+
+    ^[[38;5;198;48;5;230m
+
+and the next with full-color terminal:
+
+    ^[[38;2;255;20;147;48;2;255;255;224m
+
+Option B<-z> does almost same thing, but it append a sequence to the
+final argument.  Next two commands are equivalent.
+
+    ansiecho -c R Red
+    ansiecho -s R Red -z ZE
+
+Color spec C<ZE> produces RESET and ERASE LINE sequence.
+
+Because B<-s> and B<-z> does not produce RESET sequence, you can use
+them to accumulate the effects.
+
+    ansiecho -s R R -s U RU -s I RUI -s S RUIS -s F RUISF -z Z
+
+=head1 OPTIONS
+
+In general, argument strings can include backslash escaped characters.
+For example, C<\n> stands for a new line.  As for normal argument
+other than option parameter, option B<--escape> can control this
+behavior.  See L<STRING LITERAL> section.
+
+=over 7
+
+=item B<-n>
+
+Do not print newline at the end.
+
+=item B<-e>, B<-->[B<-no>]B<escape>
+
+Enable interpretation of backslash escapes in the normal string
+argument.  This option is enabled by default, unlink normal L<echo(1)>
+command.  Use B<--no-escape> to disable it.
+
+=item B<-j>, B<--join>
+
+Do not print space between arguments.
+
+=item B<-c> I<spec> I<string>
+
+Print I<string> in a color given by I<spec>.
+
+=item B<-f> I<format> I<args> ...
+
+Print I<args> in a given I<format>.
+
+The result of B<-f> sequence ends up to a single argument, and can be
+a subject of other B<-c> or B<-f> option.
+
+Number of arguments are calculated from the number of C<%> characters
+in the format string except C<%%>.  Variable width and precision
+parameter C<*> can be used like C<%*s> or C<%*.*s>.
+
+Format string also can be made by B<-f> option.  Next command works,
+but second one is better.
+
+    ansiecho -f -f '%%%ds' 16 hello
+
+    ansiecho -f '%*s' 16 hello
+
+=item B<-C> I<spec>
+
+Option B<-C> set permanent color which is applied to all following
+arguments until option B<-E> found.
+
+Next command prints only a word C<Yellow> in yellow, but second one
+print C<Yellow>, C<Brick>, and C<Road> in yellow.
+
+    ansiecho Follow the -cYS Yellow Brick Road
+
+    ansiecho Follow the -CYS Yellow Brick Road
+
+You may want to color the phrase instead.
+
+    ansiecho Follow the -cYS "Yellow Brick Road"
+
+Option C<-C> can be used multiple times mixed with C<-F> option.  See
+below.
+
+=item B<-F> I<format>
+
+As with the C<-C> option, C<-F> defines a format which is applied to
+all arguments until option B<-E> found.  Format string have to include
+single C<%s> placeholder.
+
+    ansiecho Follow the -CYS -F ' %s ' Yellow Brick Road
+
+Option B<-C> and B<-F> can be used repeatedly, and they will take
+effect in the reverse order of their appearance.
+
+Next command show argument C<A> in underline/bold with blinking red
+arrow.
+
+    ansiecho -cRF -f'->%s' -cUD A B C
+
+Next one does the same thing for all arguments.
+
+    ansiecho -CRF -F'->%s' -CUD A B C
+
+=item B<-E> I<spec>
+
+Terminate B<-C> and B<-F> effects.
+
+=item B<-s> I<spec>
+
+=item B<-z> I<spec>
+
+Add raw ANSI sequence given by I<spec>.  Option B<-s> add the sequence
+to the new argument, while B<-z> add to the final argument.  There are
+no difference when used with B<-j> option or with single-or-less
+argument.
+
+=item B<-r> I<string> (raw)
+
+Append next string to the final argument with backslash escape
+interpretation.
+
+This option can be used to stringify the option argument.  Next
+example does not work without B<-r>.
+
+    ansiecho -c R -r -c
+
+    ansiecho -f %s -r -c
+
+In these cases, be aware that string I<-c> is mixed up with next
+argument.
+
+=item B<--separate> I<string>
+
+Set separator string between each arguments.  Option B<-j> is a
+short-cut for B<--separate ''>.
+
+=item B<-->[B<no>]B<rgb24>
+
+Produce 24bit full-color sequence for 12bit/24bit specified colors.
+They are converted to 216 colors by default.
+
+=back
+
+=head1 STRING LITERAL
+
+This is a backslash escape samples described in L<perlop/"Quote and
+Quote-like Operators">.
+
+    Sequence     Description
+    \t           tab               (HT, TAB)
+    \n           newline           (NL)
+    \r           return            (CR)
+    \f           form feed         (FF)
+    \b           backspace         (BS)
+    \a           alarm (bell)      (BEL)
+    \e           escape            (ESC)
+    \x{263A}     hex char          (example: SMILEY)
+    \x1b         restricted range hex char (example: ESC)
+    \N{name}     named Unicode character or character sequence
+    \N{U+263D}   Unicode character (example: FIRST QUARTER MOON)
+    \c[          control char      (example: chr(27))
+    \o{23072}    octal char        (example: SMILEY)
+    \033         restricted range octal char  (example: ESC)
+
+=head1 COLOR SPEC
+
+This is a brief summary.  Read L<Getopt::EX::Colormap/COLOR SPEC> for
+complete description.
+
+Color specification is a combination of single uppercase character
+representing 8 colors, and alternative (usually brighter) colors in
+lowercase :
+
+    R  r  Red
+    G  g  Green
+    B  b  Blue
+    C  c  Cyan
+    M  m  Magenta
+    Y  y  Yellow
+    K  k  Black
+    W  w  White
+
+or RGB values and 24 grey levels if using ANSI 256 or full color
+terminal :
+
+    (255,255,255)      : 24bit decimal RGB colors
+    #000000 .. #FFFFFF : 24bit hex RGB colors
+    #000    .. #FFF    : 12bit hex RGB 4096 colors
+    000 .. 555         : 6x6x6 RGB 216 colors
+    L00 .. L25         : Black (L00), 24 grey levels, White (L25)
+
+or color names enclosed by angle bracket :
+
+    <red> <blue> <green> <cyan> <magenta> <yellow>
+    <aliceblue> <honeydue> <hotpink> <mooccasin>
+    <medium_aqua_marine>
+
+with other special effects :
+
+    N    None
+    Z  0 Zero (reset)
+    D  1 Double-struck (boldface)
+    P  2 Pale (dark)
+    I  3 Italic
+    U  4 Underline
+    F  5 Flash (blink: slow)
+    Q  6 Quick (blink: rapid)
+    S  7 Stand-out (reverse video)
+    V  8 Vanish (concealed)
+    X  9 Crossed out
+
+    E    Erase Line
+
+    ;    No effect
+    /    Toggle foreground/background
+    ^    Reset to foreground
+    ~    Cancel following effect
+
+Samples:
+
+    RGB  6x6x6    12bit      24bit           color name
+    ===  =======  =========  =============  ==================
+    B    005      #00F       (0,0,255)      <blue>
+     /M     /505      /#F0F   /(255,0,255)  /<magenta>
+    K/W  000/555  #000/#FFF  000000/FFFFFF  <black>/<white>
+    R/G  500/050  #F00/#0F0  FF0000/00FF00  <red>/<green>
+    W/w  L03/L20  #333/#ccc  303030/c6c6c6  <dimgrey>/<lightgrey>
+
+=head1 INSTALL
+
+=head2 CPANMINUS
+
+From CPAN archive:
+
+    $ cpanm App::ansiecho
+    or
+    $ curl -sL http://cpanmin.us | perl - App::ansiecho
+
+From GIT repository:
+
+    cpanm https://github.com/kaz-utashiro/App-ansiecho.git
+
+=head1 SEE ALSO
+
+L<perlop/"Quote and Quote-like Operators">
+
+L<Getopt::EX::Colormap>
+
+L<https://en.wikipedia.org/wiki/ANSI_escape_code>
+
+L<Graphics::ColorNames::X>
+
+L<https://en.wikipedia.org/wiki/X11_color_names>
+
+L<App::ansifold>, L<App::ansicolumn>
+
+=head1 AUTHOR
+
+Kazumasa Utashiro
+
+=head1 LICENSE
+
+Copyright 2021 Kazumasa Utashiro.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=cut
+
+#  LocalWords:  perl ARGV utf ansiecho RGB printf sprintf deeppink
+#  LocalWords:  lightyellow cpanm Kazumasa Utashiro perlfunc perlop
+#  LocalWords:  Unicode Cyan cyan stringify CPANMINUS CPAN

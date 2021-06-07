@@ -1,5 +1,7 @@
 Revision history for Perl extension Sys::Info::Driver::OSX.
 
+0.7960 2021-05-31 BURAK
+
 0.7959 2018-12-25 BURAK
     - Migrate to dzil.
 

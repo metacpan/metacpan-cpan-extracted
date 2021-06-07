@@ -10,7 +10,7 @@ use Params::Validate ':all';
 
 our ($VERSION, @EXPORT_OK, %EXPORT_TAGS, @subs);
 
-$VERSION = '0.06';
+$VERSION = '0.07';
 @subs = qw(exact_wrap fuzzy_wrap);
 @EXPORT_OK = @subs;
 %EXPORT_TAGS = ('all' => [ @subs ]);
@@ -85,9 +85,10 @@ C<Text::Wrap::Smart::XS> is the faster companion of C<Text::Wrap::Smart>.
  @chunks = exact_wrap($text [, $wrap_at ]);
 
 Wrap a text of varying length into exact chunks (except the last one,
-which consists of the remaining text). Optionally a wrapping length
-may be specified; if no length is supplied, a default of 160 will be
-assumed.
+which consists of the remaining text).
+
+Optionally a wrapping length may be specified; if no length is supplied,
+a default of 160 will be assumed.
 
 =head2 fuzzy_wrap
 
@@ -97,9 +98,10 @@ Wrap a text of varying length into chunks of fuzzy length (the boundary
 is normally calculated from the last whitespace preceding the wrapping length,
 and if no remaining whitespace could be find, the end of text; if the wrapping
 length is smaller than the size of a word, greedy wrapping will be applied: all
-characters until the first whitespace encountered form a chunk). Optionally a
-wrapping length may be specified; if no length is supplied, a default of 160
-will be assumed.
+characters until the first whitespace encountered form a chunk).
+
+Optionally a wrapping length may be specified; if no length is supplied,
+a default of 160 will be assumed.
 
 =head1 EXPORT
 
@@ -115,6 +117,10 @@ C<:all - *()>
 
 The wrapping length will not be applied directly, but is used
 to calculate the average length to split text into chunks.
+
+Text will be normalized prior to being processed, i.e. leading
+and trailing whitespace will be chopped off before each remaining
+whitespace is converted to a literal space.
 
 =head1 SEE ALSO
 

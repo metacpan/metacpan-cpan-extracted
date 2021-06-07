@@ -31,7 +31,7 @@ my $min_perl_vers = version->parse( $min_perl );
 my $manifest = ExtUtils::Manifest::maniread();
 
 foreach my $fn ( sort keys %{ $manifest } ) {
-    $fn =~ m{ \A xt/ }smx
+    $fn =~ m{ \A (?: xt | tools ) / }smx
 	and next;
     is_perl( $fn )
 	or next;

@@ -10,7 +10,7 @@ use Carp;
 
 
 
-our $VERSION = "0.019";
+our $VERSION = "0.020";
 
 use Text::Layout::FontDescriptor;
 
@@ -40,6 +40,27 @@ my %fonts;
 my @dirs;
 my $loader;
 my $debug = 0;
+
+my $weights =
+  [ 100 => 'thin',
+    100 => 'hairline',
+    200 => 'extra light',
+    200 => 'ultra light',
+    300 => 'light',		# supported
+    350 => 'book',		# supported
+    400 => 'normal',		# supported
+    400 => 'regular',		# supported
+    500 => 'medium',		# supported
+    600 => 'semi bold',		# supported 'semi'
+    600 => 'demi bold',
+    700 => 'bold',		# supported
+    800 => 'extra bold',
+    800 => 'ultra bold',
+    900 => 'black',
+    900 => 'heavy',		# supported
+    950 => 'extra black',
+    950 => 'ultra black',
+  ];
 
 =head2 METHODS
 
@@ -125,12 +146,11 @@ sub register_font {
     $props = pop(@_) if UNIVERSAL::isa( $_[-1], 'HASH' );
     my ( $font, $family, $style, $weight ) = @_;
 
-    if ( $style && !$weight && $style =~ s/^bold//i ) {
-	$weight = "bold";
+    if ( $style && !$weight && $style =~ s/^(heavy|bold|semi(?:bold)?|medium|book|light)//i ) {
+	$weight = $1;
     }
     $style  = _norm_style( $style   // "normal" );
     $weight = _norm_weight( $weight // "normal" );
-
     my $ff;
     if ( $font =~ /\.[ot]tf$/ ) {
 	if ( $font =~ m;^/; ) {
@@ -356,8 +376,8 @@ On Linux, fallback using fontconfig.
 
 =cut
 
-my $stylep  = qr/^( (?:bold)? (?:oblique|italic)  )$/ix;
-my $weightp = qr/^( (?:bold)  (?:oblique|italic)? )$/ix;
+my $stylep  = qr/^( (?:heavy|bold|semi(?:bold)?|medium|book|light)? (?:oblique|italic)  )$/ix;
+my $weightp = qr/^( (?:heavy|bold|semi(?:bold)?|medium|book|light)  (?:oblique|italic)? )$/ix;
 
 sub from_string {
     shift if UNIVERSAL::isa( $_[0], __PACKAGE__ );
@@ -405,7 +425,7 @@ sub parse {
 	    $style = "italic";
 	}
 	elsif ( $t =~ $weightp ) {
-	    $weight = "bold";
+	    $weight = $1;
 	}
 	elsif ( $t eq "normal" ) {
 	    $style = $weight = "";
@@ -447,12 +467,12 @@ sub from_filename {
 		 ( .*? )
 		 -?
 		 (roman?|normal|regular)?
-		 (light|book|bold)?
+		 (light|book|medium|semi(?:bold)?|bold|heavy)?
 		 (italic|ital|oblique|obli)?
 		 $/ix ) {
 	$family = $1       if $1;
 	$style  = "italic" if $4;
-	$weight = "bold"   if $3 && $3 =~ /^(bold)$/;
+	$weight = $3       if $3;
     }
 
     my $fd = Text::Layout::FontDescriptor->new
@@ -494,7 +514,7 @@ sub _norm_style {
 sub _norm_weight {
     my ( $weight ) = @_;
     $weight = lc $weight;
-    return "bold" if $weight =~ $weightp;
+    return $1 if $weight =~ $weightp;
 
     carp("Unhandled font weight: $weight\n")
       unless $weight =~ /^(regular|normal)?$/;
@@ -571,13 +591,20 @@ See L<Text::Layout>, L<Text::Layout::FontDescriptor>, L<HarfBuzz::Shaper>.
 sub _dump {
     foreach my $family ( sort keys %fonts ) {
 	foreach my $style ( qw( normal italic ) ) {
-	    foreach my $weight ( qw( normal bold ) ) {
+	    foreach my $weight ( qw( normal light book medium semi semibold bold heavy ) ) {
 		my $f = $fonts{$family}{$style}{$weight};
 		next unless $f;
 		printf STDERR ( "%-13s %s%s%s%s%s %s\n",
 				$family,
 				$style eq 'normal' ? "-" : "i",
-				$weight eq 'normal' ? "-" : "b",
+				$weight eq 'bold' ? "b"
+				: $weight eq 'light' ? "l"
+				: $weight eq 'book' ? "k"
+				: $weight eq 'medium' ? "m"
+				: $weight eq 'semi' ? "s"
+				: $weight eq 'semibold' ? "s"
+				: $weight eq 'heavy' ? "h"
+				: "-",
 				$f->{shaping} ? "s" : "-",
 				$f->{interline} ? "l" : "-",
 				$f->{font} ? "+" : " ",

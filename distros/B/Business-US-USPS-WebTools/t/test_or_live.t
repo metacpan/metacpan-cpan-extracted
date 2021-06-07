@@ -15,8 +15,8 @@ subtest testing => sub {
 	ok( $webtools->_testing, "I think I'm testing" );
 
 	is( ! $webtools->_live, 1, "I don't think I'm live!" );
-	is( $webtools->_api_host, "testing.shippingapis.com", "Testing host is right" );
-	is( $webtools->_api_path, "/ShippingAPITest.dll", "Testing path is right" );
+	is( $webtools->_api_host, "stg-production.shippingapis.com", "Testing host is right" );
+	is( $webtools->_api_path, "/ShippingAPI.dll", "Testing path is right" );
 	};
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #

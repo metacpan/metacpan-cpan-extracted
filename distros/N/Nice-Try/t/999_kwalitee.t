@@ -1,5 +1,4 @@
 # -*- perl -*-
-
 BEGIN 
 {
 	use Test::More;

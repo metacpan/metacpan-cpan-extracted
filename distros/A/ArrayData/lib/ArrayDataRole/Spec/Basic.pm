@@ -1,9 +1,9 @@
 package ArrayDataRole::Spec::Basic;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-05-07'; # DATE
+our $DATE = '2021-05-18'; # DATE
 our $DIST = 'ArrayData'; # DIST
-our $VERSION = '0.2.2'; # VERSION
+our $VERSION = '0.2.3'; # VERSION
 
 use Role::Tiny;
 use Role::Tiny::With;
@@ -17,10 +17,32 @@ with 'Role::TinyCommons::Collection::GetItemByPos';
 
 # provides
 
+my @role_prefixes = qw(ArrayDataRole Role::TinyCommons::Collection);
 sub apply_roles {
-    my ($obj, @ad_roles) = @_;
-    Role::Tiny->apply_roles_to_object(
-        $obj, map { "ArrayDataRole::$_" } @ad_roles);
+    my ($obj, @unqualified_roles) = @_;
+
+    my @roles_to_apply;
+  ROLE:
+    for my $ur (@unqualified_roles) {
+      PREFIX:
+        for my $prefix (@role_prefixes) {
+            my ($mod, $modpm);
+            $mod = "$prefix\::$ur";
+            ($modpm = "$mod.pm") =~ s!::!/!g;
+            eval { require $modpm; 1 };
+            unless ($@) {
+                #print "D:$mod\n";
+                push @roles_to_apply, $mod;
+                next ROLE;
+            }
+        }
+        die "Can't find role '$ur' to apply (searched these prefixes: ".
+            join(", ", @role_prefixes);
+    }
+
+    Role::Tiny->apply_roles_to_object($obj, @roles_to_apply);
+
+    # return something useful
     $obj;
 }
 
@@ -41,7 +63,7 @@ ArrayDataRole::Spec::Basic - Required methods for all ArrayData::* modules
 
 =head1 VERSION
 
-This document describes version 0.2.2 of ArrayDataRole::Spec::Basic (from Perl distribution ArrayData), released on 2021-05-07.
+This document describes version 0.2.3 of ArrayDataRole::Spec::Basic (from Perl distribution ArrayData), released on 2021-05-18.
 
 =head1 DESCRIPTION
 
@@ -92,12 +114,18 @@ From L<Role::TinyCommons::Iterator::GetItemByPos>.
 
 Usage:
 
- $obj->apply_roles('R1', ...)
+ $obj->apply_roles('R1', 'R2', ...)
 
-Apply ArrayDataRole::* roles (ArrayDataRole::R1, ...) to object. It's basically
-a shortcut for:
+Apply roles to object. R1, R2, ... are unqualified role names that will be
+searched under C<ArrayDataRole::*> or C<Role::TinyCommons::Collection::*>
+namespace. It's a convenience shortcut for C<< Role::Tiny->apply_roles_to_object
+>>.
 
- Role::Tiny->apply_roles_to_object($obj, 'ArrayDataRole::R1', ...);
+Return the object, so you can do something like this:
+
+ my $obj = ArrayData::Word::ID::KBBI->new->apply_roles('FindItem::Iterator', 'PickItems::Iterator');
+
+ my $obj = ArrayData::Word::ID::KBBI->new->apply_roles('BinarySearch::LinesInHandle');
 
 =head1 HOMEPAGE
 

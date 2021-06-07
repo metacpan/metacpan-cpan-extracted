@@ -2,7 +2,7 @@ package Bio::MUST::Core::Taxonomy;
 # ABSTRACT: NCBI Taxonomy one-stop shop
 # CONTRIBUTOR: Loic MEUNIER <loic.meunier@doct.uliege.be>
 # CONTRIBUTOR: Mick VAN VLIERBERGHE <mvanvlierberghe@doct.uliege.be>
-$Bio::MUST::Core::Taxonomy::VERSION = '0.210610';
+$Bio::MUST::Core::Taxonomy::VERSION = '0.211470';
 use Moose;
 use namespace::autoclean;
 
@@ -112,7 +112,7 @@ has '_' . $_ . '_for' => (
 has '_dupes_for' => (
     traits   => ['Hash'],
     is       => 'ro',
-    isa      => 'HashRef[HashRef[Num]]',
+    isa      => 'HashRef[HashRef[Str]]',
     lazy     => 1,
     builder  => '_build_dupes_for',
     handles  => {
@@ -332,9 +332,9 @@ sub _build_dupes_for {
         next TAXON if @{$taxids} < 2;
 
         # build hash of partial lineage => taxon_id only for duplicate taxa
-        no warnings 'uninitialized';    # avoid undef due to 2-level lineages
+        no warnings 'uninitialized';    # avoid undef due to 2-4-level lineages
         my %taxid_for = map {
-            ( join q{; }, ( $tax->get_taxonomy($_) )[-3..-1] ) => $_
+            ( join q{; }, ( $tax->get_taxonomy($_) )[-5..-1] ) => $_
         } @{$taxids};
         use warnings;
 
@@ -686,7 +686,7 @@ sub get_taxonomy_from_seq_id {
 
         # case 2: ArrayRef that just must be dereferenced
         ArrayRef => sub {
-            wantarray ? @$seq_id : $seq_id
+            wantarray ? @{$seq_id} : $seq_id
         },
     );
 }
@@ -713,8 +713,8 @@ sub get_taxid_from_taxonomy {               ## no critic (RequireArgUnpacking)
 
         # then try to disambiguate duplicate taxa
         my $dupes_for = $self->dupes_for($taxon);
-        no warnings 'uninitialized';        # avoid undef due to 2-level lineages
-        $taxon_id = $dupes_for->{ join q{; }, @taxonomy[-3..-1] };
+        no warnings 'uninitialized';    # avoid undef due to 2-4-level lineages
+        $taxon_id = $dupes_for->{ join q{; }, @taxonomy[-5..-1] };
         use warnings;
         if ($taxon_id) {
             carp "[BMC] Note: managed to disambiguate $taxon based on lineage!";
@@ -1449,6 +1449,23 @@ sub setup_taxdir {
     my $tax_dir = shift;
     my $args    = shift // {};          # HashRef (should not be empty...)
 
+    my $source = $args->{source};
+
+    $class->_setup_ncbi_taxdir($tax_dir, $args)
+        if $source eq 'ncbi';
+
+    $class->_setup_gtdb_taxdir($tax_dir)
+        if $source eq 'gtdb';
+
+    return;
+}
+
+
+sub _setup_ncbi_taxdir {
+    my $class   = shift;
+    my $tax_dir = shift;
+    my $args    = shift // {};          # HashRef (should not be empty...)
+
     my $gi_mapper = $args->{gi_mapper} // 0;
 
     # setup local directory
@@ -1653,6 +1670,7 @@ sub _make_gca_files {
     return;
 }
 
+
 # http://www.ncbi.nlm.nih.gov/news/11-21-2013-strain-id-changes/
 #
 # Planned change in bacterial strain-level information management
@@ -1738,6 +1756,252 @@ sub _make_gca_files {
 # These changes will occur in January 2014. We will be releasing more
 # information as the date approaches.
 
+sub _setup_gtdb_taxdir {
+    my $class   = shift;
+    my $tax_dir = shift;
+
+    # setup local directory
+    $tax_dir = dir( glob $tax_dir );
+    $tax_dir->mkpath();
+
+    ### Installing GTDB Taxonomy database to: $tax_dir->stringify
+    ### Please be patient...
+
+    # setup remote archive access
+    my $base = 'https://data.gtdb.ecogenomic.org/releases/latest';
+    my @targets = (
+        'ar122_metadata.tar.gz' , 'bac120_metadata.tar.gz',
+        'FILE_DESCRIPTIONS', 'METHODS', 'RELEASE_NOTES', 'VERSION'
+    );
+
+    for my $target (@targets) {
+        my $url = "$base/$target";
+
+        ### Downloading: $url
+        my $zipfile = file($tax_dir, $target)->stringify;
+        my $ret_code = getstore($url, $zipfile);
+        croak "[BMC] Error: cannot download $url: error $ret_code; aborting!"
+            unless $ret_code == 200;
+
+        if ($target =~ m/metadata/xms) {
+            ### Unarchiving: $zipfile
+            system("tar -xzf $zipfile -C $tax_dir");
+            file($zipfile)->remove;
+        }
+    }
+
+    my $arc_file = file($tax_dir, 'ar122_metadata*.tsv');
+    my $bac_file = file($tax_dir, 'bac120_metadata*.tsv');
+    my $new_arcfile = file($tax_dir, 'archaea_metadata.tsv');
+    my $new_bacfile = file($tax_dir, 'bacteria_metadata.tsv');
+
+    # change file name to avoid GTDB version in basename
+    $new_arcfile->remove if -e $new_arcfile;
+    $new_bacfile->remove if -e $new_bacfile;
+    system("mv $arc_file $new_arcfile");
+    system("mv $bac_file $new_bacfile");
+
+    # return true on success (only check main files)
+    if ( -r $new_arcfile && -r $new_bacfile ) {
+        ### Successfully downloaded metadata files!
+    }
+
+    else {
+        ### Failed installation!
+        return 0;
+    }
+
+    # concatenate metadata TSV files
+    my $prok_file = file($tax_dir, 'prok_metadata.tsv');
+    $prok_file->remove if -e $prok_file;
+    system("cat $new_arcfile $new_bacfile > $prok_file");
+
+    # create hash from metadata file
+    my $table_for = _read_gtdb_metadata($prok_file);
+
+    # hash for rank code
+    my %rank_for = map {
+       $_ eq 'superkingdom' ? 'd__' : substr($_, 0, 1) . '__' => $_
+    } qw (superkingdom phylum class order family genus species);
+
+    # setup taxonomic tree
+    my %tree = (
+        1 => {
+            rank      => 'no rank',
+            name      => 'root',
+            uniq_name => q{},
+            children => {
+                2 => {
+                    rank => 'no rank',
+                    name => 'cellular organisms',
+                    children => {},
+                },
+            },
+        }
+    );
+
+    # fill up taxonomic tree
+    for my $gca ( keys %{$table_for} ) {
+
+        # get GTDB taxonomy
+        my $lineage = $table_for->{$gca}{'gtdb_taxonomy'};
+        my @taxonomy = split q{;}, $lineage;
+
+        my $tree_ref  = $tree{1}{children}{2}{children};
+
+        # count duplicate taxon in lineage
+        my %count_for = count_by { substr( $_, 3, length()-1 ) } @taxonomy;
+
+        while (my $gtdb_taxon = shift @taxonomy) {
+
+            # get taxon rank
+            my ($rank_code, $taxon) = ($gtdb_taxon) =~ m/^([a-z]__)(.*)/xms;
+            my $rank = $rank_for{$rank_code};
+
+            # create taxid for taxon
+            my $taxon_id = $rank_code . lc($taxon =~ tr/A-Za-z0-9//cdr);
+
+            # create taxid entry (if not yet existing)
+            unless ( $tree_ref->{$taxon_id} ) {
+                $tree_ref->{$taxon_id}{name} = $taxon;
+                $tree_ref->{$taxon_id}{rank} = $rank;
+            }
+
+            # set a unique name (if duplicate taxon)
+            my $uniq_name = $count_for{$taxon} > 1
+                ? $taxon . ' <' . lc $rank . '>' : q{};
+            # ... and add it in hash
+            $tree_ref->{$taxon_id}{uniq_name} = $uniq_name
+                if $uniq_name;
+
+            # store GCA|F
+            if ($rank eq 'species') {
+
+                # change GCF to GCA and store it
+                if ($gca =~ m/^GCF/xms) {
+                    (my $new_gca = $gca ) =~ s/GCF/GCA/xms;
+                    push @{ $tree_ref->{$taxon_id}{gca} }, $new_gca;
+                }
+
+                push @{ $tree_ref->{$taxon_id}{gca} }, $gca;
+            }
+
+            # setup children entry if lineage not yet exhausted
+            if (@taxonomy) {
+                $tree_ref->{$taxon_id}{children} //= {};
+                $tree_ref = $tree_ref->{$taxon_id}{children}
+            }
+        }
+    }
+
+    # taxid files
+    my $name_file = file($tax_dir, 'names.dmp');
+    my $node_file = file($tax_dir, 'nodes.dmp');
+    open my $name_out, '>', $name_file;
+    open my $node_out, '>', $node_file;
+
+    # gca files
+    my $gcanamefile = file($tax_dir, 'gca0-names.dmp');
+    my $gcanodefile = file($tax_dir, 'gca0-nodes.dmp');
+    open my $gcaname_out, '>', $gcanamefile;
+    open my $gcanode_out, '>', $gcanodefile;
+
+    # create empty additional dmp files
+    file($tax_dir, 'delnodes.dmp')->spew;
+    file($tax_dir, 'merged.dmp'  )->spew;
+
+    # write regular dmp files (first recursive call)
+    _write_dmp_files( $name_out, $node_out, $gcaname_out, $gcanode_out,
+        1, 1, $tree{1} );
+
+    if ( -r $name_file && -r $node_file ) {
+        ### Successfully wrote taxid files!
+    }
+
+    if ( -r $gcanamefile && -r $gcanodefile ) {
+        ### Successfully wrote GCA-based files!
+    }
+
+    return;
+}
+
+sub _read_gtdb_metadata {
+    my $infile = shift;
+
+    open my $in, '<', $infile;
+
+    my %table_for;
+    my @keys;
+
+    LINE:
+    while (my $line = <$in>) {
+        chomp $line;
+
+        if ($line =~ m/^accession/xms) {
+            (undef, @keys) = split /\t/xms, $line;
+            next LINE;
+	    }
+
+        my ($gca, @values) = split /\t/xms, $line;
+        $gca =~ s/GB_|RS_//xms;
+        $table_for{$gca} = { mesh @keys, @values };
+    }
+
+    return \%table_for;
+}
+
+sub _write_dmp_files {                      ## no critic (ProhibitManyArgs)
+    my ($name_out, $node_out, $gcaname_out, $gcanode_out,
+        $taxon_id, $parent, $tree_ref) = @_;
+
+    my $name      = $tree_ref->{name     };
+    my $rank      = $tree_ref->{rank     };
+    my $uniq_name = $tree_ref->{uniq_name} // q{};
+    my $gcas      = $tree_ref->{gca      } // [];
+
+    # write gca files
+    if ($gcas) {
+        _append2dmp($gcaname_out, $gcanode_out,
+            $_, $parent, $name, $rank, $uniq_name)
+            for sort @{$gcas};
+    }
+
+    # write taxid files
+    _append2dmp($name_out, $node_out,
+        $taxon_id, $parent, $name, $rank, $uniq_name);
+
+    my $children_for = $tree_ref->{children};
+    return unless $children_for;
+
+    $parent = $taxon_id;
+
+    _write_dmp_files( $name_out, $node_out, $gcaname_out, $gcanode_out,
+        $_, $parent, $children_for->{$_} )
+        for sort keys %{$children_for};
+
+    return;
+}
+
+sub _append2dmp {                           ## no critic (ProhibitManyArgs)
+    my ($name_out, $node_out,
+        $taxon_id, $parent, $name, $rank, $uniq_name) = @_;
+
+    # write names file
+    say {$name_out} join "\t",
+        $taxon_id , '|',
+        $name     , '|',
+        $uniq_name, '|',
+        'scientific name'
+    ;
+
+    # write nodes file
+    say {$node_out} join "\t",
+        $taxon_id, '|', $parent, '|', $rank,
+        ( join "\t", '|', q{} ) x 10;
+
+    return;
+}
+
 no Moose::Util::TypeConstraints;
 
 __PACKAGE__->meta->make_immutable;
@@ -1753,7 +2017,7 @@ Bio::MUST::Core::Taxonomy - NCBI Taxonomy one-stop shop
 
 =head1 VERSION
 
-version 0.210610
+version 0.211470
 
 =head1 SYNOPSIS
 

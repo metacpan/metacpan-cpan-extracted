@@ -2,10 +2,54 @@ use strict;
 use warnings;
 use Test::More tests => 17*3 + 31*2;
 use IPC::Open3;
+use Config ();
 
 delete $ENV{RELEASE_TESTING};
 
-my @perl = ($^X, map "-I$_", @INC, 't/lib');
+my @perl = $^X =~ /(.*)/s;
+
+{
+  my $taint;
+  local $^W = 0;
+  local $@;
+  local $SIG{__DIE__};
+  local $SIG{__WARN__} = sub {
+    $taint = 1;
+    push @perl, '-t';
+  };
+  if (!eval { eval substr($ENV{PATH}, 0, 0); 1 }) {
+    $taint = 1;
+    push @perl, '-T';
+  }
+  if ($taint) {
+    $ENV{PATH} = '/';
+    delete @ENV{'IFS', 'CDPATH', 'ENV', 'BASH_ENV'};
+  }
+}
+
+my %inc;
+{
+  my $cmd = join ' ', map qq{"$_"}, @perl, '-le', 'print for @INC';
+  my @inc = `$cmd`;
+  chomp @inc;
+  @inc{@inc} = ();
+}
+my @need_inc;
+my $i = -1;
+push @need_inc, $INC[$i]
+  while ++$i < @INC && !exists $inc{$INC[$i]};
+
+my $inc_extension = qr/[\\\/]\Q$Config::Config{archname}\E|[\\\/]\Q$Config::Config{version}\E(?:[\\\/]\Q$Config::Config{archname}\E)?/;
+
+my $bare;
+for my $path (@need_inc) {
+  unless (defined $bare and $path =~ /\A\Q$bare\E$inc_extension\z/) {
+    $bare = $path;
+    push @perl, "-I$path";
+  }
+}
+
+push @perl, "-It/lib";
 
 my $missing = "Module::Does::Not::Exist::".time;
 
@@ -32,7 +76,7 @@ for my $api (
         if $e;
       "$_ $o";
     } @load;
-    printf "# Checking against ".join(', ', @using)."\n"
+    print "# Checking against ".join(', ', @using)."\n"
       if @using;
     my $check = sub {
       my ($args, $match, $name) = @_;

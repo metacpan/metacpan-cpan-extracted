@@ -1,5 +1,9 @@
 Revision history for Plack-Middleware-Text-Minify:
 
+v0.2.0    2021-05-21 14:05:48+01:00 Europe/London
+  [Enhancements]
+  - Do not minify if the `psgix.no-minify` key is true.
+
 v0.1.6    2021-05-15 17:10:03+01:00 Europe/London
   [Documentation]
   - Added note about multiple newlines.

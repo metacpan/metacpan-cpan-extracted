@@ -4,6 +4,11 @@ History for the Lab-Measurement Perl distribution
 This document is work in progress (in the sense of adding
 historical information).
 
+3.751 2021-06-01
+  * Move IRC channel to Libera Chat
+  * OI_IPS: add get_switch_heater
+  * XPRESS: add phase sweep and osc. output sweep for SR lock in
+
 3.750 2021-05-01
   * Start driver for SignalRecovery 7265 lock-in
   * Start driver for Keithley 2450 sourcemeter

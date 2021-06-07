@@ -1,4 +1,4 @@
-package Dist::Zilla::Plugin::Author::Plicease::Init2 2.63 {
+package Dist::Zilla::Plugin::Author::Plicease::Init2 2.64 {
 
   use 5.020;
   use Moose;
@@ -385,7 +385,7 @@ Dist::Zilla::Plugin::Author::Plicease::Init2 - Dist::Zilla initialization tasks 
 
 =head1 VERSION
 
-version 2.63
+version 2.64
 
 =head1 DESCRIPTION
 
@@ -674,7 +674,8 @@ jobs:
       matrix:
         cip_tag:
           - static
-          - "5.33"
+          - "5.35"
+          - "5.34"
           - "5.32"
           - "5.30"
           - "5.28"
@@ -1049,10 +1050,3 @@ jobs:
         run: |
           export PATH="/c/cx/bin:$PATH"
           perl -S dzil test -v
-
-      - name: CPAN log
-        if: ${{ failure() }}
-        run: |
-          cat ~/.cpanm/latest-build/build.log
-
-

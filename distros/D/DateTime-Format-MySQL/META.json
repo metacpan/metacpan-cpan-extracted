@@ -34,7 +34,7 @@
    "provides" : {
       "DateTime::Format::MySQL" : {
          "file" : "lib/DateTime/Format/MySQL.pm",
-         "version" : "0.06"
+         "version" : "0.0701"
       }
    },
    "release_status" : "stable",
@@ -43,5 +43,5 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.06"
+   "version" : "0.0701"
 }

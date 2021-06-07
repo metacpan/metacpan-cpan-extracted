@@ -16,6 +16,12 @@
   </developer>
   <helper>
     <foaf:Person>
+      <foaf:name>Mike Whitaker</foaf:name>
+      <foaf:mbox rdf:resource="mailto:mike@altrion.org" />
+    </foaf:Person>
+  </helper>
+  <helper>
+    <foaf:Person>
       <foaf:name>moltar</foaf:name>
       <foaf:mbox rdf:resource="mailto:moltar@moltar.net" />
     </foaf:Person>
@@ -45,6 +51,18 @@
     <Version>
       <revision rdf:datatype="http://www.w3.org/2001/XMLSchema#string">0.1.0</revision>
       <dc:issued rdf:datatype="http://www.w3.org/2001/XMLSchema#date">2016-01-03</dc:issued>
+    </Version>
+  </release>
+  <release>
+    <Version>
+      <revision rdf:datatype="http://www.w3.org/2001/XMLSchema#string">0.2.0</revision>
+      <dc:issued rdf:datatype="http://www.w3.org/2001/XMLSchema#date">2016-04-02</dc:issued>
+    </Version>
+  </release>
+  <release>
+    <Version>
+      <revision rdf:datatype="http://www.w3.org/2001/XMLSchema#string">0.2.1</revision>
+      <dc:issued rdf:datatype="http://www.w3.org/2001/XMLSchema#date">2021-05-30</dc:issued>
     </Version>
   </release>
   <programming-language>Perl</programming-language>

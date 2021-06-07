@@ -4,11 +4,13 @@
 # examples in order to allow them being run out of the box. To disable ToyBroker
 # set "use_toybroker" to false in pool.config.json
 
-{
-    "listen_addr" : "127.0.0.1",
-    "listen_port" : "61613",
+[
+    {
+        "listen_addr" : "127.0.0.1",
+        "listen_port" : "1883",
 
-    "users" : {
-        "test" : { "password" : "abc123" },
+        "users" : {
+            "backend" : { "password" : "def456" },
+        },
     },
-}
+]

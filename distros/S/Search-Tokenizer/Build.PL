@@ -9,8 +9,7 @@ my $builder = Module::Build->new(
     dist_version_from   => 'lib/Search/Tokenizer.pm',
     requires            => { 'Text::Transliterator::Unaccent' => 0,
                              'Unicode::CaseFold'              => 0, },
-    test_requires       => { 'Test::More'                     => 0,
-                             'Time::HiRes'                    => 0  },
+    test_requires       => { 'Test::More'                     => 0  },
     add_to_cleanup      => [ 'Search-Tokenizer-*' ],
     meta_merge => {
       resources => {

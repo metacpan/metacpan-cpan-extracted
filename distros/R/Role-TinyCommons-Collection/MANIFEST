@@ -8,10 +8,15 @@ Makefile.PL
 README
 dist.ini
 lib/Role/TinyCommons/Collection.pm
+lib/Role/TinyCommons/Collection/CompareItems.pm
 lib/Role/TinyCommons/Collection/FindItem.pm
+lib/Role/TinyCommons/Collection/FindItem/Iterator.pm
+lib/Role/TinyCommons/Collection/GetItemByKey.pm
+lib/Role/TinyCommons/Collection/GetItemByPos.pm
 lib/Role/TinyCommons/Collection/PickItems.pm
 lib/Role/TinyCommons/Collection/PickItems/Iterator.pm
-lib/Role/TinyCommons/Collection/PickItems/RandomSeek.pm
+lib/Role/TinyCommons/Collection/PickItems/RandomPos.pm
+lib/Role/TinyCommons/Collection/PickItems/RandomSeekLines.pm
 lib/Role/TinyCommons/Collection/SelectItems.pm
 t/00-compile.t
 t/author-critic.t

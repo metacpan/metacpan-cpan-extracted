@@ -28,8 +28,7 @@ WriteMakefile(
 		'autodie' => 0,
 		'IPC::System::Simple' => 0,
 		'WWW::RT::CPAN' => 0
-	},
-	PREREQ_PM => {
+	}, PREREQ_PM => {
 		'Carp' => 0,
 		'namespace::clean' => 0,
 		'Net::CIDR' => 0,
@@ -43,9 +42,11 @@ WriteMakefile(
 				type => 'git',
 				url => 'git://github.com/nigelhorne/CGI-ACL.git',
 				web => 'https://github.com/nigelhorne/CGI-ACL',
-			},
-			bugtracker => {
-				web => 'https://rt.cpan.org/Public/Dist/Display.html?Name=CGI-ACL',
+				repository => 'https://github.com/nigelhorne/CGI-ACL',
+			}, bugtracker => {
+				# web => 'https://rt.cpan.org/Public/Dist/Display.html?Name=CGI-ACL',
+				web => 'https://github.com/nigelhorne/CGI-ACL/issues',
+				url => 'https://github.com/nigelhorne/CGI-ACL/issues',
 				mailto => 'bug-CGI-ACL@rt.cpan.org'
 			}
 		},

@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20210309172132;
+our $VERSION = 1.20210602223300;
 
 my $formatters = [
                 {
@@ -44,39 +44,31 @@ my $formatters = [
 my $validators = {
                 'fixed_line' => '
           (?:
+            (?:
+              3[0-2]|
+              4[257]|
+              5[34]|
+              9[78]
+            )\\d|
             64[1-9]|
-            7730|
             85[02-46-9]
-          )\\d{4}|
-          (?:
-            3[0-2]|
-            4[257]|
-            5[34]|
-            77[0-24]|
-            9[78]
-          )\\d{5}
+          )\\d{4}
         ',
                 'geographic' => '
           (?:
+            (?:
+              3[0-2]|
+              4[257]|
+              5[34]|
+              9[78]
+            )\\d|
             64[1-9]|
-            7730|
             85[02-46-9]
-          )\\d{4}|
-          (?:
-            3[0-2]|
-            4[257]|
-            5[34]|
-            77[0-24]|
-            9[78]
-          )\\d{5}
+          )\\d{4}
         ',
                 'mobile' => '
-          77(?:
-            3[1-9]|
-            [5-9]\\d
-          )\\d{4}|
           (?:
-            7[0-689]|
+            7\\d|
             8[18]
           )\\d{6}
         ',
@@ -92,12 +84,12 @@ my $validators = {
         '
               };
 my %areanames = ();
-$areanames{en} = {"67547", "Morobe",
-"6759", "Islands",
-"67542", "Madang",
-"6753", "NCD",
-"67545", "Sepik",
+$areanames{en} = {"6759", "Islands",
 "6755", "Highlands",
+"67547", "Morobe",
+"6753", "NCD",
+"67542", "Madang",
+"67545", "Sepik",
 "6756", "MP\/Gulf\/Tabubil\/Kiunga",};
 
     sub new {

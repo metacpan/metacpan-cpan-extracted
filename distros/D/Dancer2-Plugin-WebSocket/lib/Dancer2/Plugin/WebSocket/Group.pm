@@ -1,7 +1,7 @@
 package Dancer2::Plugin::WebSocket::Group;
 our $AUTHORITY = 'cpan:YANICK';
 # ABSTACT: Grouping of connections to send messages to
-$Dancer2::Plugin::WebSocket::Group::VERSION = '0.2.0';
+$Dancer2::Plugin::WebSocket::Group::VERSION = '0.3.1';
 
 use strict;
 use warnings;
@@ -26,7 +26,7 @@ sub targets {
 
     my $channels = Set::Tiny->new( @{$self->channels} );
 
-    return grep { 
+    return grep {
         $_->in_channel($channels) and
         ( !$omit_self or $self->source->id != $_->id )
     } values %{ $self->source->manager->connections };
@@ -46,6 +46,7 @@ sub broadcast {
     $_->send(@args) for $self->targets(1);
 }
 
+
 1;
 
 __END__
@@ -60,7 +61,7 @@ Dancer2::Plugin::WebSocket::Group
 
 =head1 VERSION
 
-version 0.2.0
+version 0.3.1
 
 =head1 SYNOPSIS
 
@@ -103,13 +104,15 @@ Send the message to all connections of the group, except the original connection
         }
     }
 
+=back
+
 =head1 AUTHOR
 
 Yanick Champoux <yanick@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019, 2017 by Yanick Champoux.
+This software is copyright (c) 2021, 2019, 2017 by Yanick Champoux.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

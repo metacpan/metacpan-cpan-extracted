@@ -1,3 +1,8 @@
+0.009   2021-05-22  Released-By: PERLANCAR; Urgency: medium
+
+	- [ux] Mention using cpanm-cpanmodules in the generated POD.
+
+
 0.008   2021-02-18  Released-By: PERLANCAR; Urgency: medium
 
 	- [bugfix] Forgot to bump prereq Pod::From::Acme::CPANModules to

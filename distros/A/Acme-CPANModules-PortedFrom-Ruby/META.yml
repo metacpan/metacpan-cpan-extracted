@@ -20,7 +20,7 @@ resources:
   bugtracker: https://github.com/perlancar/perl-Acme-CPANModules-PortedFrom-Ruby/issues
   homepage: https://metacpan.org/release/Acme-CPANModules-PortedFrom-Ruby
   repository: git://github.com/perlancar/perl-Acme-CPANModules-PortedFrom-Ruby.git
-version: '0.005'
+version: '0.006'
 x_Dist_Zilla:
   perl:
     version: '5.030000'

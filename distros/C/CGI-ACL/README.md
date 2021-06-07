@@ -1,15 +1,17 @@
-[![Linux Build Status](https://travis-ci.org/nigelhorne/CGI-ACL.svg?branch=master)](https://travis-ci.org/nigelhorne/CGI-ACL)
-[![Windows Build status](https://ci.appveyor.com/api/projects/status/5wa2lsb6c86x9jp0?svg=true)](https://ci.appveyor.com/project/nigelhorne/cgi-acl)
-[![Dependency Status](https://dependencyci.com/github/nigelhorne/CGI-ACL/badge)](https://dependencyci.com/github/nigelhorne/CGI-ACL)
-[![Coverage Status](https://coveralls.io/repos/github/nigelhorne/CGI-ACL/badge.svg?branch=master)](https://coveralls.io/github/nigelhorne/CGI-ACL?branch=master)
+[![Travis Status](https://travis-ci.org/nigelhorne/CGI-ACL.svg?branch=master)](https://travis-ci.org/nigelhorne/CGI-ACL)
+[![Appveyor status](https://ci.appveyor.com/api/projects/status/5wa2lsb6c86x9jp0?svg=true)](https://ci.appveyor.com/project/nigelhorne/cgi-acl)
+[![Coveralls Status](https://coveralls.io/repos/github/nigelhorne/CGI-ACL/badge.svg?branch=master)](https://coveralls.io/github/nigelhorne/CGI-ACL?branch=master)
+[![CPAN](https://img.shields.io/cpan/v/CGI-ACL.svg)](http://search.cpan.org/~nhorne/CGI-ACL/)
+[![Kritika Analysis Status](https://kritika.io/users/nigelhorne/repos/5642353356298438/heads/master/status.svg)](https://kritika.io/users/nigelhorne/repos/5642353356298438/heads/master/)
+[![Kwalitee](https://cpants.cpanauthors.org/dist/CGI-ACL.png)](http://cpants.cpanauthors.org/dist/CGI-ACL)
 
-# CGI::ACL
+# NAME
 
-Decide whether to allow a client to run this script
+CGI::ACL - Decide whether to allow a client to run this script
 
 # VERSION
 
-Version 0.03
+Version 0.04
 
 # SYNOPSIS
 
@@ -20,7 +22,7 @@ Does what it says on the tin.
 
     my $acl = CGI::ACL->new();
     # ...
-    my $denied = $acl->all_denied(info => CGI::Lingua->new());
+    my $denied = $acl->all_denied(info => CGI::Lingua->new(supported => 'en'));
 
 # SUBROUTINES/METHODS
 
@@ -57,11 +59,12 @@ Give a country, or a reference to a list of countries, that we will allow to acc
 
     # Allow only the UK and US to connect to us
     my @allow_list = ('GB', 'US');
-    my $acl = CGI::ACL->new()->deny_country->('*')->allow_country(country => \@allow_list);
+    my $acl = CGI::ACL->new()->deny_country('*')->allow_country(country => \@allow_list);
 
 ## all\_denied
 
-If any of the restrictions return false then return false, which should allow access
+If any of the restrictions return false then return false, which should allow access.
+Note that by default localhost isn't allowed access, call allow\_ip('127.0.0.1') to enable it.
 
     use CGI::Lingua;
     use CGI::ACL;
@@ -95,7 +98,7 @@ automatically be notified of progress on your bug as I make changes.
 
 # SEE ALSO
 
-[CGI::Lingua](https://metacpan.org/pod/CGI::Lingua)
+[CGI::Lingua](https://metacpan.org/pod/CGI%3A%3ALingua)
 
 # SUPPORT
 
@@ -105,20 +108,32 @@ You can find documentation for this module with the perldoc command.
 
 You can also look for information at:
 
+- MetaCPAN
+
+    [https://metacpan.org/release/CGI-ACL](https://metacpan.org/release/CGI-ACL)
+
 - RT: CPAN's request tracker
 
-    [http://rt.cpan.org/NoAuth/Bugs.html?Dist=CGI-ACL](http://rt.cpan.org/NoAuth/Bugs.html?Dist=CGI-ACL)
+    [https://rt.cpan.org/NoAuth/Bugs.html?Dist=CGI-ACL](https://rt.cpan.org/NoAuth/Bugs.html?Dist=CGI-ACL)
+
+- CPANTS
+
+    [http://cpants.cpanauthors.org/dist/CGI-ACL](http://cpants.cpanauthors.org/dist/CGI-ACL)
+
+- CPAN Testers' Matrix
+
+    [http://matrix.cpantesters.org/?dist=CGI-ACL](http://matrix.cpantesters.org/?dist=CGI-ACL)
 
 - CPAN Ratings
 
     [http://cpanratings.perl.org/d/CGI-ACL](http://cpanratings.perl.org/d/CGI-ACL)
 
-- Search CPAN
+- CPAN Testers Dependencies
 
-    [http://search.cpan.org/dist/CGI-ACL/](http://search.cpan.org/dist/CGI-ACL/)
+    [http://deps.cpantesters.org/?module=CGI::ACL](http://deps.cpantesters.org/?module=CGI::ACL)
 
 # LICENSE AND COPYRIGHT
 
-Copyright 2017,2018 Nigel Horne.
+Copyright 2017-2021 Nigel Horne.
 
 This program is released under the following licence: GPL2

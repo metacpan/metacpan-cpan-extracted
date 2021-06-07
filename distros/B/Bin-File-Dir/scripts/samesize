@@ -1,0 +1,121 @@
+#!/usr/bin/perl 
+use 5.014 ; use strict ; use warnings  ;
+use feature qw [ say ] ;
+use Time::HiRes qw[gettimeofday tv_interval] ; 
+use Term::ANSIColor qw [ :constants color ] ; $Term::ANSIColor::AUTORESET = 1 ; 
+use File::Spec::Functions qw[ catfile splitdir rel2abs updir ] ; 
+use Getopt::Std ; 
+use List::Util qw [ max min sum sum0 reduce uniq ] ;
+use Cwd qw [ getcwd abs_path ] ;
+use POSIX qw[ strftime ] ;
+#use Digest::SHA1 qw[ sha1 sha1_hex sha1_base64 ]; 
+use Digest::MD5  qw(md5 md5_hex md5_base64);
+
+sub dtwhen ( $ ) ;
+
+my $time_start = [ gettimeofday ] ; 
+my $t0 = $time_start -> [0] ;
+
+#say dtwhen ( $t0 ) ;
+getopts '0:2b:Df:nos' , \my%o ; 
+
+my @files = @ARGV ? @ARGV : glob '*' ;
+
+$o{2} = 1 if $o{D} ; # <--- 要注意。 不用意のこの行はコメントアウトや除去をしないように。
+$o{0} //= 1 ; # <--- 要注意。 不用意のこの行はコメントアウトや除去をしないように。
+& main ; 
+exit 0 ;
+
+END{ print RESET "" } ;
+
+sub main () {
+
+  my %s2f ;
+  for ( @files ) {
+  	next if -d $_ ;
+  	my $size = ( lstat $_ ) [7] ; # <--  -- lstat で良いのか
+  	next if defined $o{b} && $size < $o{b} ;
+  	push @{$s2f{$size}} , $_ ;
+  	my @out = ( $size , $_ ) ;
+  	#say join "\t" , @out ;
+  }
+
+  my $least = $o{f} // 2 ; # ? 1 : 2 ;
+  my @sizes  = sort {$a<=>$b} grep {  @{ $s2f { $_ } } >= $least } keys %s2f ; 
+  my $nfmt = do { my $t = max @sizes , 0 ; my $d = length "$t" ; "%${d}s" } ; # <-- %${d}u ?? 
+  for my $size ( @sizes ) { 
+  	#next if @{ $s2f{$size} } == 1 ;
+  	my @files = sort @{ $s2f{$size} } ; # ファイルの一覧
+  	@files = sort {(stat $a)[9] <=> (stat $b)[9] } @files if $o{n} // $o{o} ;
+  	@files = reverse @files if $o{n} ;
+  	my %seenD ; # 既に見たハッシュダイジェスト値
+  	for ( @files ) { 
+      my @t3 =  (stat $_)[8,9,10] ; # <-- stat にしたのを便宜上の変更
+
+  	  my $ctx = Digest::MD5->new;
+  	  unless ($o{0}){
+  	    open my $FH, '<', $_ or die  "Can't open '$_': $!";
+  	    binmode $FH ; 
+	    $ctx->addfile( $FH );
+	  #while ( <$FH> ) { $ctx -> add ( $_ ) }
+	    close $FH ;
+	  }
+
+	  utime @t3[0,1] , $_ unless $o{0} ; # <- -- --- 時刻情報を破壊するので注意。もしくは秒の小数点以下の情報が消える。
+      my $digest = $o{0} ? '---' : $ctx->hexdigest ;
+      next if $o{2} && ! $seenD{ $digest } ++ ;
+      if ( $o{D} && ! $o{0} ) { unlink $_ ; next } ; 
+  	  my @out = ( sprintf ($nfmt , $size)  , $digest , map ( dtwhen $_ , @t3 ) , $_ ) ;
+  	  say join "\t" , @out ;
+
+  	}
+  }
+}
+
+sub dtwhen ( $ ) { 
+
+	my $fmt = abs ( $_[0] - $t0 ) >= 86400 * 180 ? '%Y-%m-%d' : $o{s} ? '%m-%d %H:%M:%S' : '%m-%d %H:%M';
+	strftime $fmt , localtime $_[0] ;
+}
+
+
+
+END{
+  exit if exists $o{v} && $o{v} eq "0" ;
+  say STDERR " --  " , REVERSE ITALIC " Process time: " , CLEAR " " , 
+  sprintf( "%.6f", tv_interval $time_start , [ gettimeofday ] ) , " second(s)." ;
+}
+
+## ヘルプの扱い
+sub VERSION_MESSAGE {}
+sub HELP_MESSAGE {
+    use FindBin qw[ $Script ] ; 
+    $ARGV[1] //= '' ;
+    open my $FH , '<' , $0 ;
+    while(<$FH>){
+        s/\$0/$Script/g ;
+        print $_ if s/^=head1// .. s/^=cut// and $ARGV[1] =~ /^o(p(t(i(o(ns?)?)?)?)?)?$/i ? m/^\s+\-/ : 1;
+    }
+    close $FH ;
+    $o{v} = 0 ;
+    exit 0 ;
+}
+
+=encoding utf8
+=head1
+
+  このコマンドについては、ファイルの時刻情報を書き換えたり、消去する機能があるのに、デバグなどが不十分なので、
+  その危険性を理解して使うこと。
+
+　$0 files .. 
+
+ オプション:
+   -0 0 : MD5ハッシュ値を算出する。ファイルのアクセス時刻やinode時刻を変える危険を確認する効果がある。
+   -b N : 処理対象とする最小のバイトサイズを指定。0バイトファイルを避けるなら1を指定。
+   -f N : 少なくとも何回出現したものだけを取り出すかの指定。初期値は2。
+   -n : 同じファイルサイズなら書換日時の新しい順 (newer)
+   -o : 同じファイルサイズなら書換日時の古い順 (older)
+   -s : 180日以内について、日時情報は秒単位で表示。
+
+   -2 : 同じファイルサイズで，同じハッシュ値のものについて、2番目以降を取り出す。
+   -D : 同じファイルサイズで，同じハッシュ値のものについて、2番目以降をファイル除去する。<-- 破壊的, 危険

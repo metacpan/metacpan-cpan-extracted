@@ -28,15 +28,9 @@
       "runtime" : {
          "requires" : {
             "AnyEvent" : "0",
-            "AnyEvent::Handle" : "0",
-            "Carp" : "0",
-            "Getopt::Long" : "0",
             "JSON::XS" : "0",
-            "POSIX" : "0",
-            "Sys::Hostname" : "0",
             "Term::ReadKey" : "0",
-            "Time::HiRes" : "0",
-            "perl" : "v5.8.0"
+            "perl" : "v5.8.9"
          }
       },
       "test" : {
@@ -49,99 +43,111 @@
    "provides" : {
       "Beekeeper" : {
          "file" : "lib/Beekeeper.pm",
-         "version" : "0.02"
-      },
-      "Beekeeper::Bus::STOMP" : {
-         "file" : "lib/Beekeeper/Bus/STOMP.pm",
-         "version" : "0.02"
+         "version" : "0.04"
       },
       "Beekeeper::Client" : {
          "file" : "lib/Beekeeper/Client.pm",
-         "version" : "0.02"
+         "version" : "0.04"
       },
       "Beekeeper::Config" : {
          "file" : "lib/Beekeeper/Config.pm",
-         "version" : "0.02"
+         "version" : "0.04"
       },
       "Beekeeper::JSONRPC" : {
          "file" : "lib/Beekeeper/JSONRPC.pm",
-         "version" : "0.02"
-      },
-      "Beekeeper::JSONRPC::AuthHeaders" : {
-         "file" : "lib/Beekeeper/JSONRPC/AuthHeaders.pm",
-         "version" : "0.02"
+         "version" : "0.04"
       },
       "Beekeeper::JSONRPC::Error" : {
          "file" : "lib/Beekeeper/JSONRPC/Error.pm",
-         "version" : "0.02"
+         "version" : "0.04"
       },
       "Beekeeper::JSONRPC::Notification" : {
          "file" : "lib/Beekeeper/JSONRPC/Notification.pm",
-         "version" : "0.02"
+         "version" : "0.04"
       },
       "Beekeeper::JSONRPC::Request" : {
          "file" : "lib/Beekeeper/JSONRPC/Request.pm",
-         "version" : "0.02"
+         "version" : "0.04"
       },
       "Beekeeper::JSONRPC::Response" : {
          "file" : "lib/Beekeeper/JSONRPC/Response.pm",
-         "version" : "0.02"
+         "version" : "0.04"
       },
       "Beekeeper::Logger" : {
          "file" : "lib/Beekeeper/Logger.pm",
-         "version" : "0.02"
+         "version" : "0.04"
+      },
+      "Beekeeper::MQTT" : {
+         "file" : "lib/Beekeeper/MQTT.pm",
+         "version" : "0.04"
       },
       "Beekeeper::Service::LogTail" : {
          "file" : "lib/Beekeeper/Service/LogTail.pm",
-         "version" : "0.02"
+         "version" : "0.04"
       },
       "Beekeeper::Service::LogTail::Worker" : {
          "file" : "lib/Beekeeper/Service/LogTail/Worker.pm",
-         "version" : "0.02"
+         "version" : "0.04"
       },
       "Beekeeper::Service::Router" : {
          "file" : "lib/Beekeeper/Service/Router.pm",
-         "version" : "0.02"
+         "version" : "0.04"
       },
       "Beekeeper::Service::Router::Worker" : {
          "file" : "lib/Beekeeper/Service/Router/Worker.pm",
-         "version" : "0.02"
+         "version" : "0.04"
       },
       "Beekeeper::Service::Sinkhole::Worker" : {
          "file" : "lib/Beekeeper/Service/Sinkhole/Worker.pm",
-         "version" : "0.02"
+         "version" : "0.04"
       },
       "Beekeeper::Service::Supervisor" : {
          "file" : "lib/Beekeeper/Service/Supervisor.pm",
-         "version" : "0.02"
+         "version" : "0.04"
       },
       "Beekeeper::Service::Supervisor::Worker" : {
          "file" : "lib/Beekeeper/Service/Supervisor/Worker.pm",
-         "version" : "0.02"
+         "version" : "0.04"
+      },
+      "Beekeeper::Service::ToyBroker::Client" : {
+         "file" : "lib/Beekeeper/Service/ToyBroker/Worker.pm",
+         "version" : "0.04"
+      },
+      "Beekeeper::Service::ToyBroker::SharedSubscription" : {
+         "file" : "lib/Beekeeper/Service/ToyBroker/Worker.pm",
+         "version" : "0.04"
+      },
+      "Beekeeper::Service::ToyBroker::Subscription" : {
+         "file" : "lib/Beekeeper/Service/ToyBroker/Worker.pm",
+         "version" : "0.04"
+      },
+      "Beekeeper::Service::ToyBroker::TopicFilter" : {
+         "file" : "lib/Beekeeper/Service/ToyBroker/Worker.pm",
+         "version" : "0.04"
       },
       "Beekeeper::Service::ToyBroker::Worker" : {
          "file" : "lib/Beekeeper/Service/ToyBroker/Worker.pm",
-         "version" : "0.02"
+         "version" : "0.04"
       },
       "Beekeeper::Worker" : {
          "file" : "lib/Beekeeper/Worker.pm",
-         "version" : "0.02"
+         "version" : "0.04"
       },
       "Beekeeper::Worker::Util" : {
          "file" : "lib/Beekeeper/Worker/Util.pm",
-         "version" : "0.02"
+         "version" : "0.04"
       },
       "Beekeeper::Worker::Util::SharedCache" : {
          "file" : "lib/Beekeeper/Worker/Util/SharedCache.pm",
-         "version" : "0.02"
+         "version" : "0.04"
       },
       "Beekeeper::WorkerPool" : {
          "file" : "lib/Beekeeper/WorkerPool.pm",
-         "version" : "0.02"
+         "version" : "0.04"
       },
       "Beekeeper::WorkerPool::Daemon" : {
          "file" : "lib/Beekeeper/WorkerPool/Daemon.pm",
-         "version" : "0.02"
+         "version" : "0.04"
       }
    },
    "release_status" : "stable",
@@ -156,7 +162,7 @@
          "web" : "https://github.com/jmico/beekeeper"
       }
    },
-   "version" : "0.02",
+   "version" : "0.04",
    "x_generated_by_perl" : "v5.28.1",
    "x_serialization_backend" : "JSON::XS version 3.04"
 }

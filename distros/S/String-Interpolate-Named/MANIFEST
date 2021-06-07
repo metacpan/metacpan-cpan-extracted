@@ -7,6 +7,11 @@ t/00-load.t
 t/10-basic.dat
 t/10-basic.t
 t/11-arrays.t
+t/12-sub.t
+t/13-act.dat
+t/13-act.t
+t/13-sub.t
+t/14-kpat.t
 t/20-multi.dat
 t/20-multi.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)

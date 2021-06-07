@@ -2,6 +2,18 @@
 
 #define TEST(name) TEST_CASE("time-tz: " name, "[time-tz]")
 
+#ifdef _WIN32
+  #define TEST_NO_SETENV
+#endif
+
+#ifdef __FreeBSD__
+  #include <osreldate.h>
+  #if __FreeBSD_version <= 1201000
+    #define TEST_NO_SETENV
+  #endif
+#endif
+
+
 TEST("available timezones(embed)") {
     auto list = available_timezones();
     CHECK(list.size() == 1212);
@@ -126,22 +138,20 @@ TEST("tzset") {
     CHECK(tzlocal()->name == "America/New_York");
 }
 
-#ifndef _WIN32
+#ifndef TEST_NO_SETENV 
+    TEST("tzset via ENV{TZ}") {
+        setenv("TZ", "Europe/Moscow", 1);
+        panda::time::tzset();
+        CHECK(tzlocal()->name == "Europe/Moscow");
 
-TEST("tzset via ENV{TZ}") {
-    setenv("TZ", "Europe/Moscow", 1);
-    panda::time::tzset();
-    CHECK(tzlocal()->name == "Europe/Moscow");
+        setenv("TZ", "America/New_York", 1);
+        panda::time::tzset();
+        CHECK(tzlocal()->name == "America/New_York");
 
-    setenv("TZ", "America/New_York", 1);
-    panda::time::tzset();
-    CHECK(tzlocal()->name == "America/New_York");
-
-    unsetenv("TZ");
-    panda::time::tzset();
-    CHECK(tzlocal()->name);
-}
-
+        unsetenv("TZ");
+        panda::time::tzset();
+        CHECK(tzlocal()->name);
+    }
 #endif
 
 

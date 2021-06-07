@@ -1,16 +1,20 @@
 NAME
 
-    Archive::Libarchive::Any - Perl bindings to libarchive
+    (Deprecated) Archive::Libarchive::Any - Perl bindings to libarchive
 
 VERSION
 
-    version 0.0900
+    version 0.0901
 
 SYNOPSIS
 
      use Archive::Libarchive::Any;
 
 DESCRIPTION
+
+    NOTE: This module has been deprecated in favor of Archive::Libarchive.
+    It provides a better thought out object-oriented interface and is
+    easier to maintain.
 
     This module provides bindings for libarchive using either
     Archive::Libarchive::XS or Archive::Libarchive::FFI. The interface is

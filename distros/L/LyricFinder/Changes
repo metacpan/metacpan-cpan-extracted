@@ -25,3 +25,37 @@ Revision history for LyricFinder
         - LyricFinder::Genius: Add conversions of accented characters to 
         their unaccented equivalents to handle some non-English artist and 
         song names.
+1.10    2021/05/26
+        - Refactor all modules to combine all common methods into a separate 
+        internal module:  LyricFinder::_Class (new) to greatly simplify and 
+        eliminate redundant code.  This should make creating new site modules 
+        much simpler (now most if not all functions other than new(), fetch(), 
+        and the internal function _parse() should not be required in site 
+        modules unless it's necessary to override)!
+        This better follows proper object-oriented programming standards.
+        - LyricFinder::Genius - Fix failure to fetch lyrics due to changes in 
+        their site (to increase obfuscation, I presume).
+        - LyricFinder::Musixmatch - Add "-nostatus" option to suppress the 
+        additional "status" message appended to Musixmatch lyrics.  NOTE: this 
+        option will also be used in future to suppress any additional info. 
+        that may be offered by other sites as well (only actual lyrics will 
+        be returned, if specified).
+        - Upgrade default user-agent to Mozilla Firefox v84.
+        - Fixed bug preventing caching fetched lyrics if -cache directory had 
+        the ">" (write-only) option prepended.
+1.11    2021/05/26
+        - Doc fixes, namely "-nostatus" should be "-noextra" and the effect 
+        (if specified) is to SUPPRESS the extra status message, if any!
+        Docs implied the opposite.
+1.20    2021/05/29
+        - Added LyricFinder option "-omit" to specify submodules that you 
+        have installed to NOT be used, ie. -omit => "AZLyrics,Genius".  
+        This can limit which submodules will be used for "all" or "random" 
+        searches.
+        - Added image_url() function to return the cover-art image on some 
+        lyric sites (currently Genius and Musixmatch).  For other sites and 
+        songs that do not provide an image, an empty string is returned.
+        - LyricFinder::Letras - Verify that lyrics page returned matches the 
+        artist / title being searched for and fail (return no lyrics) if not.
+        (Letras has been shown to try to "guess" the song if they do not have 
+        the one you're asking for)!

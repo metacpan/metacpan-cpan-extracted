@@ -25,7 +25,7 @@ is $r, ARCHIVE_OK, 'archive_entry_set_mode';
 is eval { archive_entry_mode($e) }, 0644, 'archive_entry_mode (0644)';
 diag $@ if $@;
 
-SKIP: { 
+SKIP: {
   skip 'test requires archive_entry_perm', 1 unless Archive::Libarchive::Any->can('archive_entry_perm');
   is eval { archive_entry_perm($e) }, 0644, 'archive_entry_perm(0644)';
   diag $@ if $@;
@@ -144,10 +144,10 @@ subtest fflags => sub {
 
   $r = archive_entry_fflags($e, my $set, my $clear);
   is $r, ARCHIVE_OK, 'archive_entry_fflags';
-  
+
   is $set, 0x55, 'set';
   is $clear, 0xaa, 'clear';
-  
+
   subtest fflags_text => sub {
     plan skip_all => 'converting fflags bitmap ot string is system-dependent (test requires FreeBSD)'
       unless $^O eq 'freebsd';
@@ -155,23 +155,23 @@ subtest fflags => sub {
 
     my $fflags = archive_entry_fflags_text($e);
     is $fflags, 'uappnd,nouchg,nodump,noopaque,uunlnk', 'archive_entry_fflags_text';
-    
+
     $r = eval { archive_entry_set_fflags_text($e, " ,nouappnd, nouchg, dump,uunlnk") };
     diag $@ if $@;
     is $r, ARCHIVE_OK, 'archive_entry_set_fflags_text';
-    
+
     $r = archive_entry_fflags($e, $set, $clear);
     is $r, ARCHIVE_OK, 'archive_entry_fflags';
     is $set, 16, 'set';
     is $clear, 7, 'clear';
   };
-};  
+};
 
 subtest link => sub {
   plan skip_all => 'requires archive_entry_set_hardlink'
     unless Archive::Libarchive::Any->can('archive_entry_set_hardlink');
   plan tests => 7;
-  
+
   $r = archive_entry_set_hardlink($e, "hardlinkname");
   is $r, ARCHIVE_OK, 'archive_entry_set_hardlink hardlinkname';
   $r = archive_entry_set_symlink($e, undef);
@@ -183,7 +183,7 @@ subtest link => sub {
   $r = eval { archive_entry_set_link($e, "link") };
   diag $@ if $@;
   is $r, ARCHIVE_OK, 'archive_entry_set_link';
-  
+
   is archive_entry_hardlink($e), "link", 'archive_entry_hardlink = link';
   is archive_entry_symlink($e), undef, 'archive_entry_symlink = undef';
 };
@@ -192,28 +192,28 @@ subtest xattr => sub {
   plan tests => 24;
   $r = archive_entry_xattr_add_entry($e, "xattr1", "xattrvalue1\0");
   is $r, ARCHIVE_OK, 'archive_entry_xattr_add_entry';
-    
+
   is archive_entry_xattr_reset($e), 1, 'archive_entry_xattr_reset';
-    
+
   $r = archive_entry_xattr_next($e, my $xname, my $xval);
   is $r, ARCHIVE_OK, 'archive_entry_xattr_next';
-   
+
   is $xname, 'xattr1',        'xname = xattr1';
   is $xval,  "xattrvalue1\0", 'xval  = xattrvaue1';
   is length $xval, 12,        'len   = 12';
-  
+
   is archive_entry_xattr_count($e), 1, 'archive_entry_xattr_count';
-    
+
   $r = archive_entry_xattr_next($e, $xname, $xval);
   is $r, ARCHIVE_WARN, 'archive_entry_xattr_next';
   is $xname, undef,       'xname = undef';
   is $xval, undef,        'xval  = undef';
-    
+
   $r = archive_entry_xattr_clear($e);
   is $r, ARCHIVE_OK, 'archive_entry_xattr_clear';
-    
+
   is archive_entry_xattr_reset($e), 0, 'archive_entry_xattr_reset';
-    
+
   $r = archive_entry_xattr_next($e, $xname, $xval);
   is $r, ARCHIVE_WARN, 'archive_entry_xattr_next';
   is $xname, undef,       'xname = undef';

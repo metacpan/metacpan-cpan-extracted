@@ -10,8 +10,8 @@
 use 5.014;
 use utf8;
 package App::SpreadRevolutionaryDate::MsgMaker::RevolutionaryDate::Locale::es;
-$App::SpreadRevolutionaryDate::MsgMaker::RevolutionaryDate::Locale::es::VERSION = '0.29';
-# ABSTRACT: French localization of (part of) L<DateTime::Calendar::FrenchRevolutionary::Locale::fr>
+$App::SpreadRevolutionaryDate::MsgMaker::RevolutionaryDate::Locale::es::VERSION = '0.31';
+# ABSTRACT: Spanish localization of (part of) L<DateTime::Calendar::FrenchRevolutionary::Locale::fr>
 
 use Moose;
 with 'App::SpreadRevolutionaryDate::MsgMaker::RevolutionaryDate::Locale';
@@ -490,11 +490,11 @@ __END__
 
 =head1 NAME
 
-App::SpreadRevolutionaryDate::MsgMaker::RevolutionaryDate::Locale::es - French localization of (part of) L<DateTime::Calendar::FrenchRevolutionary::Locale::fr>
+App::SpreadRevolutionaryDate::MsgMaker::RevolutionaryDate::Locale::es - Spanish localization of (part of) L<DateTime::Calendar::FrenchRevolutionary::Locale::fr>
 
 =head1 VERSION
 
-version 0.29
+version 0.31
 
 =head1 DESCRIPTION
 
@@ -519,6 +519,10 @@ This modules adds Spanish translations to L<DateTime::Calendar::FrenchRevolution
 =item L<App::SpreadRevolutionaryDate::Target::Freenode>
 
 =item L<App::SpreadRevolutionaryDate::Target::Freenode::Bot>
+
+=item L<App::SpreadRevolutionaryDate::Target::Liberachat>
+
+=item L<App::SpreadRevolutionaryDate::Target::Liberachat::Bot>
 
 =item L<App::SpreadRevolutionaryDate::MsgMaker::RevolutionaryDate>
 

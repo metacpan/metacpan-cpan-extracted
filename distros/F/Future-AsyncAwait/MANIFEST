@@ -3,12 +3,10 @@ Changes
 hax/cx_pushblock.c.inc
 hax/cx_pusheval.c.inc
 hax/docatch.c.inc
-hax/lexer-additions.c.inc
 hax/perl-additions.c.inc
 hax/perl-backcompat.c.inc
 hax/README
 hax/save_clearpadrange.c.inc
-hax/wrap_keyword_plugin.c.inc
 lib/Future/AsyncAwait.h
 lib/Future/AsyncAwait.pm
 lib/Future/AsyncAwait.xs

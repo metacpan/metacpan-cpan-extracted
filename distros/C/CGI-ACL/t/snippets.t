@@ -5,20 +5,20 @@ use warnings;
 use File::Spec;
 use Test::Most;
 
-if(not $ENV{RELEASE_TESTING}) {
-	plan(skip_all => 'Author tests not required for installation');
-}
+if($ENV{AUTHOR_TESTING}) {
+	eval 'use Test::Pod::Snippets';
 
-eval "use Test::Pod::Snippets";
+	if($@) {
+		plan(skip_all => 'Test::Pod::Snippets required for testing POD code snippets');
+	} else {
+		my $tps = Test::Pod::Snippets->new();
 
-if($@) {
-	plan skip_all => 'Test::Pod::Snippets required for testing POD code snippets';
+		my @modules = qw/ CGI::ACL /;
+
+		$tps->runtest(module => $_, testgroup => 1) for @modules;
+
+		done_testing();
+	}
 } else {
-	my $tps = Test::Pod::Snippets->new;
-
-	my @modules = qw/ CGI::ACL /;
-
-	$tps->runtest( module => $_, testgroup => 1 ) for @modules;
-
-	done_testing();
+	plan(skip_all => 'Author tests not required for installation');
 }

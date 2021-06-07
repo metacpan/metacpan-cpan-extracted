@@ -26,7 +26,7 @@
   use strict;
   use warnings;
   use vars qw(%areanames %fixed_line_regexes %mobile_regexes);
-our $VERSION = 1.20210309172029;
+our $VERSION = 1.20210602223213;
 
 
 
@@ -7744,6 +7744,7 @@ our $VERSION = 1.20210309172029;
     '1364' => "Kentucky",
     '1365' => "Ontario",
     '1367' => "Quebec",
+    '1368' => "Alberta",
     '1380' => "Ohio",
     '1385' => "Utah",
     '1386' => "Florida",
@@ -10953,6 +10954,7 @@ our $VERSION = 1.20210309172029;
     '1443949' => "Annapolis\,\ MD",
     '1443977' => "Baltimore\,\ MD",
     '1445' => "Philadelphia",
+    '1447' => "Illinois",
     '1450' => "Quebec",
     '1450218' => "Vaudreuil\-Dorion\,\ QC",
     '1450224' => "Pr\Ã\©vost\,\ QC",
@@ -11134,6 +11136,7 @@ our $VERSION = 1.20210309172029;
     '1469916' => "Dallas\,\ TX",
     '1469952' => "McKinney\,\ TX",
     '1470' => "Georgia",
+    '1474' => "Saskatchewan",
     '1475' => "Connecticut",
     '1478' => "Georgia",
     '1478218' => "Perry\,\ GA",
@@ -14990,6 +14993,7 @@ our $VERSION = 1.20210309172029;
     '1571292' => "Manassas\,\ VA",
     '1571379' => "Manassas\,\ VA",
     '1571434' => "Sterling\,\ VA",
+    '1572' => "Oklahoma",
     '1573' => "Missouri",
     '1573204' => "Jackson\,\ MO",
     '1573214' => "Columbia\,\ MO",
@@ -25964,6 +25968,7 @@ our $VERSION = 1.20210309172029;
     '1832934' => "Magnolia\,\ TX",
     '1838' => "New\ York",
     '1839' => "South\ Carolina",
+    '1840' => "California",
     '1843' => "South\ Carolina",
     '1843207' => "North\ Charleston\,\ SC",
     '1843208' => "Hardeeville\,\ SC",
@@ -26617,7 +26622,7 @@ our $VERSION = 1.20210309172029;
     '1850983' => "Milton\,\ FL",
     '1850994' => "Milton\,\ FL",
     '1850997' => "Monticello\,\ FL",
-    '1854' => "Ohio",
+    '1854' => "South\ Carolina",
     '1856' => "New\ Jersey",
     '1856205' => "Vineland\,\ NJ",
     '1856216' => "Cherry\ Hill\,\ NJ",

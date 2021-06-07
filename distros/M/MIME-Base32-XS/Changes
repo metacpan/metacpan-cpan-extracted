@@ -1,11 +1,25 @@
-0.01 2020-03-02T14:30:00Z
-    - First release.
+1.01 2021-05-20T22:38:00Z
+    - Replaced uint64_t to unsigned long long to solve problem with Windows.
 
-0.02 2020-03-02T18:40:00Z
-    - Solved errors in pod and Makefile.
+1.00 2021-05-18T19:52:00Z
+    - Added index32 to improve performance
+    - Added typemap to provide uint64_t
+    - Fixed ordering of file Changes
 
-0.03 2020-03-02T19:00:00Z
-    - Renamed Base32.xs to XS.xs.
+0.09 2020-03-03T19:16:00Z
+    - Solved error in decode.
+
+0.08 2020-03-03T15:02:00Z
+    - Solved errors left shift count and right shift count in OS Windows.
+
+0.07 2020-03-03T00:02:00Z
+    - trying solve problem version.
+
+0.06 2020-03-03T00:02:00Z
+    - Solved problem variable $VERSION.
+
+0.05 2020-03-02T20:12:00Z
+    - Solved error in doc.
 
 0.04 2020-03-02T20:00:00Z
     - module : MIME::Base32::XS
@@ -16,17 +30,11 @@
              exceeded; try restarting transaction >. Please report the
              case to the PAUSE admins at modules@perl.org.
 
-0.05 2020-03-02T20:12:00Z
-    - Solved error in doc.
+0.03 2020-03-02T19:00:00Z
+     - Renamed Base32.xs to XS.xs.
 
-0.06 2020-03-03T00:02:00Z
-    - Solved problem variable $VERSION.
+0.02 2020-03-02T18:40:00Z
+     - Solved errors in pod and Makefile.
 
-0.07 2020-03-03T00:02:00Z
-    - trying solve problem version.
-
-0.08 2020-03-03T15:02:00Z
-    - Solved errors left shift count and right shift count in OS Windows.
-
-0.09 2020-03-03T19:16:00Z
-    - Solved error in decode.
+0.01 2020-03-02T14:30:00Z
+    - First release.

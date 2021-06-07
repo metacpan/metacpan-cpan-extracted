@@ -2,13 +2,14 @@ package XML::Feed::Util;
 use strict;
 use warnings;
 
-our $VERSION = '0.61';
+our $VERSION = '0.63';
 
 use base qw( Exporter );
 use DateTime::Format::Flexible;
 use DateTime::Format::ISO8601;
 use DateTime::Format::Natural;
 use DateTime::Format::W3CDTF;
+use DateTime::Format::Mail;
 
 our @EXPORT_OK = qw(
     format_w3cdtf
@@ -18,10 +19,12 @@ our @EXPORT_OK = qw(
 );
 
 sub format_w3cdtf {
-    my $date = DateTime::Format::W3CDTF->format_datetime(shift);
+    my $dt = shift;
+
+    my $date = DateTime::Format::W3CDTF->format_datetime($dt);
 
     # Add timezone "Z" if "floating" DateTime.
-    $date =~ s/(:\d\d(?:\.\d+)?)\s*$/$1Z/;
+    $date .= 'Z' if $dt->time_zone->is_floating;
 
     return $date;
 }
@@ -45,7 +48,7 @@ sub parse_mail_date {
 
     $ts = _strip_spaces($ts);
 
-    return eval { DateTime::Format::Mail(loose => 1)->parse_datetime($ts) }
+    return eval { DateTime::Format::Mail->new(loose => 1)->parse_datetime($ts) }
         || parse_datetime($ts);
 };
 

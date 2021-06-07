@@ -1,0 +1,45 @@
+<explain xmlns="http://www.postgresql.org/2009/explain">
+  <Query>
+    <Plan>
+      <Node-Type>Bitmap Heap Scan</Node-Type>
+      <Parallel-Aware>false</Parallel-Aware>
+      <Async-Capable>false</Async-Capable>
+      <Relation-Name>part_1</Relation-Name>
+      <Alias>part_1</Alias>
+      <Startup-Cost>16.01</Startup-Cost>
+      <Total-Cost>23.85</Total-Cost>
+      <Plan-Rows>2</Plan-Rows>
+      <Plan-Width>1367</Plan-Width>
+      <Actual-Startup-Time>0.181</Actual-Startup-Time>
+      <Actual-Total-Time>4.626</Actual-Total-Time>
+      <Actual-Rows>26</Actual-Rows>
+      <Actual-Loops>1</Actual-Loops>
+      <Recheck-Cond>(plan ~ 'wha'::text)</Recheck-Cond>
+      <Rows-Removed-by-Index-Recheck>4</Rows-Removed-by-Index-Recheck>
+      <Exact-Heap-Blocks>29</Exact-Heap-Blocks>
+      <Lossy-Heap-Blocks>0</Lossy-Heap-Blocks>
+      <Plans>
+        <Plan>
+          <Node-Type>Bitmap Index Scan</Node-Type>
+          <Parent-Relationship>Outer</Parent-Relationship>
+          <Parallel-Aware>false</Parallel-Aware>
+          <Async-Capable>false</Async-Capable>
+          <Index-Name>part_1_trgm</Index-Name>
+          <Startup-Cost>0.00</Startup-Cost>
+          <Total-Cost>16.01</Total-Cost>
+          <Plan-Rows>2</Plan-Rows>
+          <Plan-Width>0</Plan-Width>
+          <Actual-Startup-Time>0.038</Actual-Startup-Time>
+          <Actual-Total-Time>0.038</Actual-Total-Time>
+          <Actual-Rows>30</Actual-Rows>
+          <Actual-Loops>1</Actual-Loops>
+          <Index-Cond>(plan ~ 'wha'::text)</Index-Cond>
+        </Plan>
+      </Plans>
+    </Plan>
+    <Planning-Time>1.243</Planning-Time>
+    <Triggers>
+    </Triggers>
+    <Execution-Time>4.687</Execution-Time>
+  </Query>
+</explain>

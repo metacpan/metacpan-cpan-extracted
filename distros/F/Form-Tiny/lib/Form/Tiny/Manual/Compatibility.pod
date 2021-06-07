@@ -1,0 +1,126 @@
+=pod
+
+=head1 NAME
+
+Form::Tiny::Manual::Compatibility - backward compatibility notice
+
+=head1 DESCRIPTION
+
+This documentation page is listing all non-backward compatible changes in usage of Form::Tiny, together with recipes on how to fix them.
+
+=head1 CHANGES
+
+=head2 Filtered forms no longer trim strings by default
+
+I<Changed in 2.00>
+
+In the past, declaring a form as filtered caused it to trim strings before validation by default.
+
+This behavior was removed due to difficulty in designing a sane interface that would allow opting out of it. An exception of inline forms (L<Form::Tiny::Inline>) was introduced, which still trim by default when declared to be capable of filtering.
+
+As this behavior is often needed, a keyword was introduced that allows to enable it in a form:
+
+	use Form::Tiny -filtered;
+	form_trim_strings;
+
+=head2 Sub-based form fields are resolved dynamically
+
+I<Changed in 2.00>
+
+In version I<2.00> a field definition which is built by a subroutine is called a dynamic field, since it cannot be resolved in the form metaclass due to access to form object as its first argument. Due to changes on where the field definitions are stored, these subroutines are no longer ran once for each form object, but rather multiple times, possibly even during a single validation process.
+
+This behavior is more correct, as class fields which you can access might change between validations, and old field building would not take it into account. However, it also means that subroutines that build form fields B<must not> to contain any form of non-determinism (like random number generation) or (to less degree) something variable in time (like datetime or access to busy database entries).
+
+=head2 Dynamic (sub-based) form fields need to return a name
+
+I<Changed in 2.00>
+
+Previously, this syntax was allowed:
+
+	form_field 'my_field' => sub {
+		return {
+			type => Int,
+		};
+	};
+
+Due to changes on how form_field handles its arguments and how fields are resolved, this now only accepts a subroutine reference, which in turn has to return name explicitly:
+
+	form_field sub {
+		return {
+			name => 'my_field',
+			type => Int,
+		};
+	};
+
+=head2 Hooks system has been overhauled
+
+I<Changed in 2.00>
+
+Previously, hooks were just a primitive system based on method overriding:
+
+	sub pre_validate
+	{
+		my ($self, $data) = @_;
+
+		...; # actual hook code
+		return $data;
+	}
+
+This system was hard to handle and often buggy due to roles not copying methods over rather than actual method resolution. It was replaced by a new, much more powerful system:
+
+	form_hook before_validate => sub {
+		my ($self, $data) = @_;
+
+		...; # actual hook code
+		return $data;
+	};
+
+In the process, C<pre> word in hooks names became C<before>, multiple hooks became possible, and new hooks were added.
+
+=head2 Field names now need double backslash escaping
+
+I<Changed in 2.00>
+
+Previously, backslash C<\> could only be used in field names before the dot C<.> to avoid its meaning of nesting operator. There was no way to escape a star C<*> to have it as a literal hash key name rather than meaning an array.
+
+It has been changed so that backslash escapes every special character in field names. This means that a backslash must be escaped by another backslash to have a literal backslash:
+
+	form_field '\\.'; # a literal dot
+	form_field '\\\\.'; # syntax error - a literal backslash followed by a nesting separator
+	form_field '\\\\\\.'; # a literal backslash followed by a literal dot
+
+=head2 Old builder syntax is no longer supported
+
+I<Changed in 2.00>
+
+In the past, it was possible to define a form by defining three methods in the package: C<build_fields>, C<build_cleaner> and C<build_filters>. This was a part of the initial implementation and was later scraped when form metaobject was introduced.
+
+If you happened to use the module during its early days, you must adjust your code to the new DSL style. It should not require drastic changes, but rather moving declarations out from class methods to DSL keywords. Refer to L<Form::Tiny/"Form domain-specific language"> for details.
+
+=head2 Input data is no longer deep cloned before validation
+
+I<Changed in 2.01 - considered bugfix>
+
+In previous versions, the validation process started off by deep cloning the input by calling C<Storable::dclone> on it. It was unnecessary and had the potential to lead to subtle bugs.
+
+The validation process is cloning most of the input by itself by mangling fields and then putting them back in the result hashref, much alike the input one, but completely separate. However, if you specify that a field should be an object of certain type, that will not get cloned. Same for explicit array and hash references (not those specified as a path, like C<key1.key2>). Removing deep cloning fixed that, as those would get cloned anyway.
+
+So now, if you specify your field to contain something that is not a reference, it will get cloned. If you specify something that is a reference, it will not get cloned, and changing it will also change that single key in the input hash. You have all the power to decide.
+
+If you still want to deep clone your input data you can use the C<reformat> hook for that. See L<Form::Tiny::Manual/"Hooks">.
+
+=head1 FUTURE COMPATIBILITY
+
+Starting from version I<2.00>, any backward incompatible changes will only be introduced to the module after a 3 month deprecation period. This does not cover bug fixes and changes to internal methods not meant to be used or depended on.
+
+=head2 Current deprecations
+
+None at the moment.
+
+=head1 SEE ALSO
+
+=over
+
+=item * L<Form::Tiny::Manual>
+
+=back

@@ -6,7 +6,7 @@ generate range ballots from data structures for testing.
 
 =cut
 
-use 5.022;
+use 5.024;
 
 use JSON::MaybeXS;
 use YAML::XS;
@@ -18,7 +18,7 @@ use Storable 3.15 qw(dclone);
 my $coder = Cpanel::JSON::XS->new->ascii->pretty;
 
 # This is the tennessee example inferred to Range Ballot
-# 
+#
 my $tennessee = {
   choices => [ "CHATTANOOGA", "KNOXVILLE", "MEMPHIS", "NASHVILLE" ],
   depth   => 5,

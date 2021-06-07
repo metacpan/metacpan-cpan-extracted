@@ -8,9 +8,11 @@ Makefile.PL
 README
 README.md
 bin/git-issue
+bin/git-issue-commit-hook
 dist.ini
 lib/App/Git/IssueManager.pm
 lib/App/Git/IssueManager/Add.pm
+lib/App/Git/IssueManager/AddHook.pm
 lib/App/Git/IssueManager/Assign.pm
 lib/App/Git/IssueManager/Close.pm
 lib/App/Git/IssueManager/Config.pm
@@ -18,6 +20,8 @@ lib/App/Git/IssueManager/Del.pm
 lib/App/Git/IssueManager/Get.pm
 lib/App/Git/IssueManager/Init.pm
 lib/App/Git/IssueManager/List.pm
+lib/App/Git/IssueManager/Modify.pm
 lib/App/Git/IssueManager/Open.pm
 lib/App/Git/IssueManager/Start.pm
+lib/App/Git/IssueManager/Status.pm
 weaver.ini

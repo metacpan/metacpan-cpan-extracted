@@ -3,6 +3,14 @@ use alienfile;
 use strict;
 use warnings;
 
+use ExtUtils::CppGuess;
+
+my $guess = ExtUtils::CppGuess->new;
+my $cppstdflag = $guess->cpp_standard_flag('C++11');
+
+die "Need to have full C++11 support, compiler @{[ (split ' ', $guess->compiler_command)[0] ]} only supports $cppstdflag"
+	if ( $guess->is_gcc || $guess->is_clang ) && $cppstdflag =~ /\Qc++0x\E/;
+
 share {
 	requires 'Net::SSLeay' => 0;
 	requires 'IO::Socket::SSL' => 0;
@@ -47,6 +55,7 @@ share {
 		my $cflags = "-I$prefix/include";
 		my $libs = "";
 
+		$build->runtime_prop->{cppstdflag}    = $cppstdflag;
 		$build->runtime_prop->{cflags}        = $cflags;
 		$build->runtime_prop->{cflags_static} = $cflags;
 		$build->runtime_prop->{libs}          = $libs;

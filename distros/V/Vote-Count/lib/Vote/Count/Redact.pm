@@ -2,7 +2,7 @@ package Vote::Count::Redact;
 
 use strict;
 use warnings;
-use 5.022;
+use 5.024;
 use feature qw /postderef signatures/;
 use Storable 3.15 qw(dclone);
 
@@ -10,13 +10,13 @@ use namespace::autoclean;
 
 no warnings 'experimental';
 
-our $VERSION='1.10';
+our $VERSION='2.00';
 
 =head1 NAME
 
 Vote::Count::Redact
 
-=head1 VERSION 1.10
+=head1 VERSION 2.00
 
 Methods for Redacting Ballots.
 
@@ -36,7 +36,7 @@ use Exporter::Easy ( OK => [qw( RedactSingle RedactPair RedactBullet )], );
 
 Takes a list (array) of choices to be converted to bullet votes. Returns a modified BallotSet where all votes that had a first choice vote for a member of the list are votes for only that choice.
 
-  my $newBallotSet = RedactBullet( $VoteCountObject->BallotSet(), 'A', 'B', 'F');
+  my $newBallotSet = RedactBullet( $Election->BallotSet(), 'A', 'B', 'F');
 
 =cut
 
@@ -85,13 +85,9 @@ REDACTSINGLELOOP:
 
 =head2 RedactPair
 
-For a Ballot Set and two choices, on each ballot where both appear it removes the later one and all subsequent choices, returning a completely independent new BallotSet. It is necessary to remove later choices, because otherwise the ballot would be voting against the target later choice, not merely not voting for.
+For a Ballot Set and two choices, on each ballot where both appear it removes the later one and all subsequent choices, returning a completely independent new BallotSet. If the later choices were left intact, they would become votes against the redacted choices in those pairings.
 
   my $newBallotSet = RedactPair( $VoteCountObject->BallotSet(), 'A', 'B');
-
-=head3 Todo for RedactPair
-
-Add options to only apply to first choice votes, either making them bullets or only redacting the opposing choice from first choice votes.
 
 =cut
 
@@ -150,11 +146,15 @@ John Karr (BRAINBUZ) brainbuz@cpan.org
 
 CONTRIBUTORS
 
-Copyright 2019 by John Karr (BRAINBUZ) brainbuz@cpan.org.
+Copyright 2019-2021 by John Karr (BRAINBUZ) brainbuz@cpan.org.
 
 LICENSE
 
 This module is released under the GNU Public License Version 3. See license file for details. For more information on this license visit L<http://fsf.org>.
+
+SUPPORT
+
+This software is provided as is, per the terms of the GNU Public License. Professional support and customisation services are available from the author.
 
 =cut
 

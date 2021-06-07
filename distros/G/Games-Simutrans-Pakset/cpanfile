@@ -1,0 +1,14 @@
+requires 'perl', 'v5.32';
+
+# requires 'Some::Module', 'VERSION';
+requires 'List::Util';
+requires 'Path::ExpandTilde';
+requires 'Mojo::Base';
+requires 'Mojo::Path';
+requires 'Mojo::File';
+requires 'Data::DeepAccess';
+requires 'Imager';
+
+on test => sub {
+    requires 'Test::More', '0.96';
+};

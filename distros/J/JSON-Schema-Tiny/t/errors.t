@@ -983,6 +983,60 @@ subtest 'absoluteKeywordLocation' => sub {
     },
     'absoluteKeywordLocation is not included when the path equals keywordLocation, even if a $ref is present',
   );
+
+  cmp_deeply(
+    evaluate(
+      1,
+      {
+        '$id' => 'https://localhost:1234/bloop',
+        allOf => [
+          {
+            '$id' => 'foo.json',
+            type => 'object',
+          },
+          {
+            '$id' => 'bar/',
+            allOf => [
+              {
+                '$id' => 'alpha',
+                type => 'object',
+              },
+            ],
+          },
+        ],
+      },
+    ),
+    {
+      valid => false,
+      errors => [
+        {
+          instanceLocation => '',
+          keywordLocation => '/allOf/0/type',
+          absoluteKeywordLocation => 'https://localhost:1234/foo.json#/type',
+          error => 'wrong type (expected object)',
+        },
+        {
+          instanceLocation => '',
+          keywordLocation => '/allOf/1/allOf/0/type',
+          absoluteKeywordLocation => 'https://localhost:1234/bar/alpha#/type',
+          error => 'wrong type (expected object)',
+        },
+        {
+          instanceLocation => '',
+          keywordLocation => '/allOf/1/allOf',
+          absoluteKeywordLocation => 'https://localhost:1234/bar/#/allOf',
+          error => 'subschema 0 is not valid',
+        },
+        {
+          instanceLocation => '',
+          keywordLocation => '/allOf',
+          absoluteKeywordLocation => 'https://localhost:1234/bloop#/allOf',
+          error => 'subschemas 0, 1 are not valid',
+        },
+      ],
+    },
+    'absoluteKeywordLocation reflects the canonical schema uri as it changes when passing through $id',
+  );
 };
 
 done_testing;

@@ -1,0 +1,150 @@
+#!/usr/bin/perl
+
+use 5.001 ; use strict ; use warnings ; 
+use Getopt::Std ; getopts '!@:3d:grt:' , \my %o ; 
+use Term::ANSIColor qw [ :constants color ] ; $Term::ANSIColor::AUTORESET = 1 ;
+use autodie qw[ open ] ; 
+use PerlIO::gzip ;
+use FindBin qw[ $Script ]  ;
+use Time::HiRes qw[ time ] ; # <-- この非標準モジュールが未インストールならどうする?
+
+sub files_open ( ) ; 
+sub main_body ( ) ; 
+sub closing ( ) ;
+sub cyc_rep ( $ ) ; 
+
+$/ = "\r\n" if $o{r} ;
+$o{f} //= 0 ; # ファイルが読みと無いときに、何回まで読み直しを許容するか。
+$| = 1 if $o{'!'}  ;
+my $osep = do { $o{d} //= $ENV{osep} // "\t" ; eval qq[qq[$o{d}]] } ; # 出力時の区切り文字
+my @FH ; # ファイルハンドラの配列
+my $argnum = scalar @ARGV ; 
+my $out_ln = 0 ; # 出力行数
+my $cyc_len = $o{'@'} // 1e5 ; # 何行毎にレポートを発生させるか。
+my ( $time00 , $time0 ) = ( time ) x 2 ; # 計算時間測定用
+
+files_open ( ) ; 
+main_body ( ) ;
+closing ( ) ; 
+exit 0 ; 
+
+
+## 以下は関数。
+
+sub files_open ( ) { 
+	$SIG{INT} = sub { closing ; exit 130 } ; 
+	for ( 0 .. $argnum - 1  ) { 
+		if ( ! $o{g} ) { 
+			open $FH [ $_ ] , '<' , $ARGV [ $_ ] ; # "<:gzip(gzip)"
+			binmode $FH [ $_ ] , ':gzip(gzip)' ; # < -- 速度比較をせよ。
+		}
+		else { 
+			open $FH [ $_ ] , '-|' , 'gzcat' , $ARGV[$_] ; # open $FH, "gzcat '$ARGV[$_]' |" より良いと思った
+		}
+	}
+}
+
+sub closing ( ) { 
+	# ファイルを閉じる。
+	close $_ for @FH ;
+
+	# 2次情報を標準エラー出力に出力する。
+	my $sec = time - $time00 ; 
+	$sec = sprintf $o{3} ? '%0.3f' : '%0.0f' , $sec ;
+	$out_ln =~ s/(?<=\d)(?=(\d\d\d)+($|\D))/,/g ; # 3桁毎にコンマで区切る
+	print STDERR CYAN $out_ln , " " ;
+ 	my $dtfmt = dtfmtlocal () ; 
+	print STDERR GREEN "$out_ln lines output. $sec sec in total ($Script $dtfmt)\n" ; 
+}
+
+sub main_body ( ) { 
+	my $tolerance = $o{t} ; 
+	while ( 1 ) { 
+		my @out ; 
+		my $readables = 0 ; 
+
+		for ( 0 .. $argnum - 1 ) { 
+			my $fh = $FH [ $_ ] ;
+			my $str = <$fh> ;
+			defined $str ? $readables ++ : ( $str = '' )  ;
+			push @out , $str ;
+		}
+
+		if ( $readables == 0 ) { 
+			$tolerance -- ;
+			last if $tolerance < 0 ;
+			print STDERR RED "An unreadable line occurs after readin $out_ln lines.\n" ;
+			next
+		}
+
+		chomp @out ; # 各要素について行末の改行文字を除去する。
+		print "$out_ln:\t" if $o{':'} ; # 行番号の出力
+		print join ( $osep , @out ) , "\n" ; 
+		cyc_rep ( $out_ln ) if ++ $out_ln % $cyc_len == 0 ; # <-- "++" に要注意。保守時において。
+	}
+}
+
+sub cyc_rep ( $ ) { 
+  local $| = 1 ; 
+  (my$num=$_[0]) =~ s/(?<=\d)(?=(\d\d\d)+($|\D))/,/g ; # 3桁毎にコンマで区切る
+  my $time_shown = sprintf '%02d:%02d:%02d' , ( localtime ) [2,1,0] ; 
+  my $sec = time - $time0 ; 
+  $sec = sprintf $o{3} ? '%0.3f' : '%0.0f' , $sec ;
+
+  $time0 = time ; 
+
+  print STDERR GREEN $num , ":\t" , $time_shown ;  
+  print STDERR GREEN "\t" ,  $sec , " sec.\t($Script)" ; 
+  print STDERR RESET "\n" ;
+}
+
+sub dtfmtlocal ( ) {
+    my @f = @{[localtime]}[5,4,3,2,1,0] ;
+    $f[0] += 1900 ;
+    $f[1] += 1 ;
+    return sprintf ( "%04u-%02u-%02u %02u:%02u:%02u" , @f ) ;
+}
+
+# ヘルプの扱い
+sub VERSION_MESSAGE {}
+sub HELP_MESSAGE {
+    use FindBin qw[ $Script ] ; 
+    $ARGV[1] //= '' ;
+    open my $FH , '<' , $0 ;
+    while(<$FH>){
+        s/\$0/$Script/g ;
+        print $_ if s/^=head1// .. s/^=cut// and $ARGV[1] =~ /^o(p(t(i(o(ns?)?)?)?)?)?$/i ? m/^\s+\-/ : 1;
+    }
+    close $FH ;
+    exit 0 ;
+}
+
+=encoding utf8
+
+=head1
+
+ $0  some1.gz  some2.gz ... 
+
+  Unixの paste のように、複数のファイルの各行を横に並べる。
+
+ オプション: 
+   -d str : 出力の区切り文字
+   -g ; gzcat コマンドを使ってファイルを読み取るようにする。PerlIO::gzip を読取りに使わない。
+
+   -r : 入力の改行が "\r\n" を仮定する。(出力は "\n" のまま。)
+   -t num : gzファイルが読み取れない場合に何回繰り返して読み取るか。(tolerance)
+   -3 : 秒数の表示を小数点以下3桁にする。
+   -! ; 出力をバッファに貯めない。
+
+ 環境変数 :
+    $osep : 出力の区切り文字しとして使われるが、-d str で指定すると上書きされる。
+
+ 利用例: 
+     $0 -d , file1 file2 file3  # -d で出力区切り文字を指定している。
+     osep=, $0 file1 file2 file3  # 環境変数を出力区切り文字を指定している。
+
+ 注意点 ; 
+    gzip 圧縮をしたファイルを複数、単純に連結(concat, cat)しても、gzcat では問題無いが
+    PerlIO::gzipでは問題が起こる。連結時の最初のファイルを読み終わった後、次を読むことができない。
+
+ =cut

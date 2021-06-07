@@ -1,0 +1,8 @@
+#!/bin/bash
+
+set -ex
+
+. ./maint/ref-config
+
+./maint/ref-build
+docker push plicease/libarchive-ref:$REF_TAG

@@ -1,5 +1,5 @@
 This file contains message digests of all files listed in MANIFEST,
-signed via the Module::Signature module, version 0.83.
+signed via the Module::Signature module, version 0.87.
 
 To verify the content in this distribution, first make sure you have
 Module::Signature installed, then type:
@@ -12,16 +12,16 @@ the distribution may already have been compromised, and you should
 not run its Makefile.PL or Build.PL.
 
 -----BEGIN PGP SIGNED MESSAGE-----
-Hash: SHA512
+Hash: RIPEMD160
 
-SHA256 5da724b79039eff5641634dc5441f53205e4e4fbb1b306d9380c59c64004f5ca Changes
-SHA256 ccce9e08d185a42d60d65e7b4ecc60cfcadb7ea1138aed02aa3c5d7fdda6df2d Detect.pm
-SHA256 9984f7b209d43761721f55f57d3b943c1d5308788d8d1818642db5deac235044 LICENSE
+SHA256 27e57837989a6ad910972abdcfbde48fb9d276c47aed655bd94c2a0450e9edab Changes
+SHA256 a6d64907d15410fdc44dfee0cd17aa502d7248cfb98a029a971c2faf4d6dee46 Detect.pm
+SHA256 df90c63e005650319cec1060a7a92b33abae8c22de8f95dffee72423c7a80ac8 LICENSE
 SHA256 4c16b86fb8800ecfb9ae41e15a749369cc6593307e5fa8880dfebdee3120402d MANIFEST
-SHA256 93d9c43140815246f6b3782e01104da75be88269fe920875488db5cbd718a916 META.yml
-SHA256 8bdeb649e23135f71632c0ee99f74ace2bd5f523fc19ece9327ec5f5bb45910e Makefile.PL
-SHA256 75220766cd2a5e67ccc3c3cdd16f7c5f53df1a4c2c39d4c7cbd9f11014a3be3c README
-SHA256 aa0abe536dcbfeecc1fc535c0554e22da48860c9fa487cf3bea53654b2ece780 examples/ex1.pl
+SHA256 249003eae3bd296fc49949410635300fa6fd11cf265f855503510a1feadc7202 META.yml
+SHA256 90769813d85e58f354e772ae85bff11a674c5377e0a2bcc58c5aa6c1b40c1b3c Makefile.PL
+SHA256 7c207f9ffe463837b99b9b9f0b9ed578f815d3a984960cd5d6589f42f0a52992 README
+SHA256 da238c5ea97b694da620105070c6f484ef0e2cc2acd5c024e2059aa17899cc57 examples/ex1.pl
 SHA256 11a96044af0be20c1acf627ae965b35f0c360e7535619647c96c77ed3d92de6a examples/ex2.pl
 SHA256 67d139199c03b8bf8447a5a62f0d0b6dc1bd5bf6dbe04de6d21998c577823ed6 inc/Module/Install.pm
 SHA256 8bd506c33fb78f10f6451413e931ca23541fcc4eebe05fcb7c7c9577341223c4 inc/Module/Install/AuthorRequires.pm
@@ -35,7 +35,7 @@ SHA256 53825bc78e4c910b888160bc148c8bc211be58e02b99c8edcbf4854f95faa049 inc/Modu
 SHA256 26b166ff62aacdb55317d1659f160aa4935097eea9810ea980e6d747206b5dc0 inc/Module/Install/Win32.pm
 SHA256 5f73a6851a91ea44e65b924f918743ad6e860620ad7a38a39d0295e0c5652a9f inc/Module/Install/WriteAll.pm
 SHA256 67f9524041b2b5451ef262062c804f5291f3d13c6d0bbc6be49adff08e81ca85 t/CAD-AutoCAD-Detect/01-use.t
-SHA256 13fe87417e8e648a21f4b685d90238dee3d801c74d845e22cd679b0fec6f3ff1 t/CAD-AutoCAD-Detect/02-version.t
+SHA256 4db32e58cf169eab339233b4e922f1db8be897bd09bcdb449b0f2dd29743c851 t/CAD-AutoCAD-Detect/02-version.t
 SHA256 7adf8d0c899a086ff095feccbea6b5fea37bce28606608074510159947d3bb2f t/CAD-AutoCAD-Detect/03-detect_dwg_file.t
 SHA256 4c17b604c4684af9639e1d638e8134ebf794d3585ef48bfcbc48cb90b5f5b6b8 t/data/ex1.dwg
 SHA256 d059ccec3a1d429f8fd117a95642733a676c63393130d6be951cf158f1d6e38b t/data/ex2.dwg
@@ -45,12 +45,15 @@ SHA256 69d65704edb421ee170df6230ad47902284863ecab9cc93461f9e9f2848b1a47 xt/CAD-A
 SHA256 11a24d66d30805aada00cd209e4241e8ae48a11dfe9234bb8a38ae7a143d0aca xt/CAD-AutoCAD-Detect/02-pod.t
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCgAdFiEEAxWqUSy7qDLVZJQKKyiOZjWerHYFAl7FuBgACgkQKyiOZjWe
-rHbFQgf+I9fdwGJFj9VaiZ5zsfltO9OVC6lRF3re9vashmn/EqNgZz/S/D5oOI82
-5MKGXJhUK4bRnG77S2Q6rHVouzZOss2B1KB+WWVzD0gVnlflZ2iclhkf7RLTiohq
-yrMmrqQgahbfleioc/kfk8VjM5EyKUXMPfMHXn31BGr45sZbkifkmmjL3RSQj+ym
-pbc/1TaodKf1bjN2LxY1zA0P88zQy89uAu4sowcvTr9Yg6wtWuGWkmWgUyZtqn9j
-bMxs1Ot/DwaqAHBGnJAaCCINiFJr5OeFv+7zR5ZEspI5VOQK9K2WwYwvEmEiaqrv
-V5Q1lvso8ZveRl4doP04sw6IMqfJSg==
-=pIvw
+iQGzBAEBAwAdFiEERTLc1QTxqWhVvPeegmqNLzlXaRcFAmCyX68ACgkQgmqNLzlX
+aRddiAv+NPZiKbbWSrFuLdsM0caRdy0KptaMBe/k2SG2ucSSzWV6q8BiOhuc/iFU
+HRUwMduTebfpeTrWOiF+xeshzBbf1qh0nU6V97BszmAJlkez7thwxFkwboh1lMTj
+hp1YRQPQIS37UxjASx8rtfZNg9undFohfk4euN/DXGW04/Wnazrb0rYt4VCd2yIg
+Mv3RHopuEFsCFG9l+oLu/AfjiOJhzAl0QjJ2gwLITiXje8H3DArrNy+QZqKBe8W5
+kjcxQYcR6wOsBqE9cF9EMUbPO6pccIZEfHntXVlJGXsavoJ86km6sDfyXWWXqZbr
+ReQEW4x8eoeYwaa501MOVAlXIldEbC2OWtIrDFrATMAzV8w/Bm12cnmRx9wAtoQw
+fy3NH/I0sKOWSrsUEinlBZeRdkoiFuO/u/AQc0TT7p+KrvMBCTORaYEJtFFL3H8N
+rymzEMrXa8Ec6HoIy7JGnPnY5Yg3xckDDZaK7D23SQ4+4/Qa+myYSIZclKQb6tWw
+CexRoI6W
+=lMGQ
 -----END PGP SIGNATURE-----

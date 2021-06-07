@@ -1,5 +1,10 @@
 Revision history for Test-JSON-Schema-Acceptance
 
+1.009     2021-06-05 17:48:22Z
+        - always include specification_version in results
+        - pad results with more whitespace, to minimize diffs
+        - updated test suite to commit 8a3a542bfe6b671a51f4e39cdc0dbbf543e8903d
+
 1.008     2021-05-15 18:03:12Z
         - clean up the results output when printing a custom test_dir
         - new optional config value "test_schemas", to perform a sanity test

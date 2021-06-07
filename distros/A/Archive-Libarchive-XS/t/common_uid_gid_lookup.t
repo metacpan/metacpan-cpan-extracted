@@ -49,10 +49,10 @@ subtest 'Same thing with uname lookup....' => sub {
   my $r = eval { archive_write_disk_set_user_lookup($a, \$umagic, \&user_lookup, \&user_cleanup) };
   diag $@ if $@;
   is $r, ARCHIVE_OK, 'archive_write_disk_set_user_lookup';
-  
+
   is archive_write_disk_uid($a, "FOO",    0),  2, 'uid FOO    0 = 2';
   is archive_write_disk_uid($a, "NOTFOO", 1), 74, 'uid NOTFOO 1 = 74';
-  
+
   $r = eval { archive_write_disk_set_user_lookup($a, undef, undef, undef) };
   diag $@ if $@;
   is $r, ARCHIVE_OK, 'archive_write_disk_set_user_lookup';

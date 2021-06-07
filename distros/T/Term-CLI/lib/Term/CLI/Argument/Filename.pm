@@ -18,11 +18,12 @@
 #
 #=============================================================================
 
-use 5.014_001;
+package Term::CLI::Argument::Filename  0.052003 {
 
-package Term::CLI::Argument::Filename  0.052001 {
+use 5.014;
+use strict;
+use warnings;
 
-use Modern::Perl 1.20140107;
 use Moo 1.000001;
 use namespace::clean 0.25;
 
@@ -58,7 +59,7 @@ Term::CLI::Argument::Filename - class for file name arguments in Term::CLI
 
 =head1 VERSION
 
-version 0.052001
+version 0.052003
 
 =head1 SYNOPSIS
 

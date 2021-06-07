@@ -2,19 +2,19 @@
 use strict;
 use warnings;
 
-use 5.022;
+use 5.024;
 
 use ExtUtils::MakeMaker;
 
 my %WriteMakefileArgs = (
-  "ABSTRACT" => "toolkit for implementing voting methods.",
+  "ABSTRACT" => "Toolkit for implementing voting methods.",
   "AUTHOR" => "John Karr <brainbuz\@cpan.org>",
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0
   },
   "DISTNAME" => "Vote-Count",
   "LICENSE" => "gpl",
-  "MIN_PERL_VERSION" => "5.022",
+  "MIN_PERL_VERSION" => "5.024",
   "NAME" => "Vote::Count",
   "PREREQ_PM" => {
     "Carp" => 0,
@@ -26,6 +26,7 @@ my %WriteMakefileArgs = (
     "List::Util" => 0,
     "Math::BigInt::GMP" => "1.6003",
     "Math::BigRat" => 0,
+    "Mojo::Template" => 0,
     "Moose" => 0,
     "Moose::Role" => 0,
     "Path::Tiny" => "0.108",
@@ -33,9 +34,12 @@ my %WriteMakefileArgs = (
     "Sort::Hash" => 0,
     "Storable" => "3.15",
     "String::TtyLength" => "0.02",
+    "Test2::API" => 0,
     "Time::Piece" => 0,
     "Try::Tiny" => 0,
+    "Vote::Count::Charge::Utility" => 0,
     "YAML::XS" => 0,
+    "base" => 0,
     "feature" => 0,
     "namespace::autoclean" => 0,
     "parent" => 0,
@@ -54,9 +58,10 @@ my %WriteMakefileArgs = (
     "Test::Exception" => 0,
     "Test::Fatal" => 0,
     "Test::More" => 0,
+    "Vote::Count::Charge::TestBalance" => 0,
     "lib" => 0
   },
-  "VERSION" => "1.10",
+  "VERSION" => "2.00",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -76,6 +81,7 @@ my %FallbackPrereqs = (
   "List::Util" => 0,
   "Math::BigInt::GMP" => "1.6003",
   "Math::BigRat" => 0,
+  "Mojo::Template" => 0,
   "Moose" => 0,
   "Moose::Role" => 0,
   "Path::Tiny" => "0.108",
@@ -83,6 +89,7 @@ my %FallbackPrereqs = (
   "Sort::Hash" => 0,
   "Storable" => "3.15",
   "String::TtyLength" => "0.02",
+  "Test2::API" => 0,
   "Test2::Bundle::More" => 0,
   "Test2::Tools::Exception" => 0,
   "Test2::Tools::Warnings" => 0,
@@ -92,7 +99,10 @@ my %FallbackPrereqs = (
   "Test::More" => 0,
   "Time::Piece" => 0,
   "Try::Tiny" => 0,
+  "Vote::Count::Charge::TestBalance" => 0,
+  "Vote::Count::Charge::Utility" => 0,
   "YAML::XS" => 0,
+  "base" => 0,
   "feature" => 0,
   "lib" => 0,
   "namespace::autoclean" => 0,

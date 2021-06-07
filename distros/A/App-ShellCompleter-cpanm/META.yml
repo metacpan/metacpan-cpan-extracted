@@ -17,27 +17,31 @@ meta-spec:
   version: '1.4'
 name: App-ShellCompleter-cpanm
 recommends:
-  App::lcpan: '1.039'
+  App::lcpan: '1.058'
 requires:
   Complete::File: '0.440'
-  Complete::Module: '0.12'
+  Complete::Module: '0.262'
   Complete::Util: '0.608'
   Getopt::Long::Complete: '0'
-  Log::ger: '0.027'
-  Perinci::CmdLine::Util::Config: '1.722'
+  Log::ger: '0.038'
+  Perinci::CmdLine::Util::Config: '1.724'
   experimental: '0'
   perl: '5.010001'
   strict: '0'
   warnings: '0'
 resources:
-  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-ShellCompleter-cpanm
+  bugtracker: https://github.com/perlancar/perl-App-BashCompleter-cpanm/issues
   homepage: https://metacpan.org/release/App-ShellCompleter-cpanm
   repository: git://github.com/perlancar/perl-App-BashCompleter-cpanm.git
-version: '0.20'
+version: '0.210'
 x_Dist_Zilla:
   perl:
     version: '5.030000'
   plugins:
+    -
+      class: Dist::Zilla::Plugin::PERLANCAR::CheckPendingRelease
+      name: '@Author::PERLANCAR/PERLANCAR::CheckPendingRelease'
+      version: '0.001'
     -
       class: Dist::Zilla::Plugin::GatherDir
       config:
@@ -103,17 +107,13 @@ x_Dist_Zilla:
       name: '@Author::PERLANCAR/@Filter/ConfirmRelease'
       version: '6.012'
     -
-      class: Dist::Zilla::Plugin::FileFinder::ByName
-      name: '@Author::PERLANCAR/FileFinder::ByName PERLANCAR'
-      version: '6.012'
-    -
       class: Dist::Zilla::Plugin::ExecDir
       name: '@Author::PERLANCAR/ExecDir script'
       version: '6.012'
     -
       class: Dist::Zilla::Plugin::PERLANCAR::BeforeBuild
       name: '@Author::PERLANCAR/PERLANCAR::BeforeBuild'
-      version: '0.599'
+      version: '0.603'
     -
       class: Dist::Zilla::Plugin::Rinci::AbstractFromMeta
       name: '@Author::PERLANCAR/Rinci::AbstractFromMeta'
@@ -129,7 +129,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::PERLANCAR::MetaResources
       name: '@Author::PERLANCAR/PERLANCAR::MetaResources'
-      version: '0.040'
+      version: '0.042'
     -
       class: Dist::Zilla::Plugin::CheckChangeLog
       name: '@Author::PERLANCAR/CheckChangeLog'
@@ -156,7 +156,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::IfBuilt
       name: '@Author::PERLANCAR/IfBuilt'
-      version: '0.02'
+      version: '0.03'
     -
       class: Dist::Zilla::Plugin::MetaJSON
       name: '@Author::PERLANCAR/MetaJSON'
@@ -166,9 +166,9 @@ x_Dist_Zilla:
       name: '@Author::PERLANCAR/MetaConfig'
       version: '6.012'
     -
-      class: Dist::Zilla::Plugin::Authority
-      name: '@Author::PERLANCAR/Authority'
-      version: '1.009'
+      class: Dist::Zilla::Plugin::PERLANCAR::Authority
+      name: '@Author::PERLANCAR/PERLANCAR::Authority'
+      version: '0.001'
     -
       class: Dist::Zilla::Plugin::OurDate
       name: '@Author::PERLANCAR/OurDate'
@@ -292,7 +292,7 @@ x_Dist_Zilla:
             -
               class: Pod::Weaver::Plugin::PERLANCAR::SortSections
               name: '@Author::PERLANCAR/PERLANCAR::SortSections'
-              version: '0.07'
+              version: '0.082'
       name: '@Author::PERLANCAR/PodWeaver'
       version: '4.008'
     -
@@ -314,7 +314,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::Rinci::EmbedValidator
       name: '@Author::PERLANCAR/Rinci::EmbedValidator'
-      version: '0.250'
+      version: '0.251'
     -
       class: Dist::Zilla::Plugin::SetScriptShebang
       name: '@Author::PERLANCAR/SetScriptShebang'
@@ -342,9 +342,11 @@ x_Dist_Zilla:
       config:
         Dist::Zilla::Plugin::Test::Perl::Critic::Subset:
           finder:
-            - '@Author::PERLANCAR/FileFinder::ByName PERLANCAR'
+            - ':ExecFiles'
+            - ':InstallModules'
+            - ':TestFiles'
       name: '@Author::PERLANCAR/Test::Perl::Critic::Subset'
-      version: 3.001.003
+      version: 3.001.005
     -
       class: Dist::Zilla::Plugin::Test::Rinci
       name: '@Author::PERLANCAR/Test::Rinci'

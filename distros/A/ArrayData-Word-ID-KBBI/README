@@ -3,8 +3,8 @@ NAME
     Indonesia
 
 VERSION
-    This document describes version 0.002 of ArrayData::Word::ID::KBBI (from
-    Perl distribution ArrayData-Word-ID-KBBI), released on 2021-05-11.
+    This document describes version 0.004 of ArrayData::Word::ID::KBBI (from
+    Perl distribution ArrayData-Word-ID-KBBI), released on 2021-05-20.
 
 SYNOPSIS
      use ArrayData::Word::ID::KBBI;
@@ -15,7 +15,7 @@ SYNOPSIS
      $wl->reset_iterator;
      while ($wl->has_next_item) {
          my $word = $wl->get_next_item;
-         ... # do something about the word
+         ... # do something with the word
      }
 
      # Another way to iterate
@@ -31,19 +31,13 @@ SYNOPSIS
      # Get all words from the list
      my @all_words = $wl->get_all_items;
 
-     # Find an item (by iterating). See Role::TinyCommons::Collection::FindItem for more details.
-     my @found = ${wl}->find_item(item => 'foo');
-     my $has_item = ${wl}->has_item('foo'); # bool
+     # Find an item.
+     my @found = $wl->find_item(item => 'foo');
+     my $has_item = $wl->has_item('foo'); # bool
 
-     # Find an item by binary searching (only when data source is filehandle and the data is sorted)
-     Role::Tiny->apply_roles_to_object($wl, 'ArrayData::BinarySearch::LinesInHandle');
-     my @found = ${wl}->find_item(item => 'foo');
-     my $has_item = ${wl}->has_item('foo'); # bool
-
-     # Pick one or several random words (apply one of these roles first: Role::TinyCommons::Collection::PickItems::{Iterator,RandomSeek})
-     Role::Tiny->apply_roles_to_object($wl, 'Role::TinyCommons::Collection::PickItems::Iterator');
-     my $word = ${wl}->pick_item;
-     my @words = ${wl}->pick_items(n=>3);
+     # Pick one or several random words.
+     my $word = $wl->pick_item;
+     my @words = $wl->pick_items(n=>3);
 
 DESCRIPTION
 HOMEPAGE
@@ -56,8 +50,7 @@ SOURCE
 
 BUGS
     Please report any bugs or feature requests on the bugtracker website
-    <https://rt.cpan.org/Public/Dist/Display.html?Name=ArrayData-Word-ID-KBB
-    I>
+    <https://github.com/perlancar/perl-ArrayData-Word-ID-KBBI/issues>
 
     When submitting a bug or request, please include a test-file or a patch
     to an existing test-file that illustrates the bug or desired feature.

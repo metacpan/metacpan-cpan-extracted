@@ -1,7 +1,7 @@
 package Sort::BySpec;
 
-our $DATE = '2017-02-17'; # DATE
-our $VERSION = '0.03'; # VERSION
+our $DATE = '2021-05-01'; # DATE
+our $VERSION = '0.040'; # VERSION
 
 use 5.010001;
 use strict 'subs', 'vars';
@@ -223,7 +223,7 @@ Sort::BySpec - Sort array (or create a list sorter) according to specification
 
 =head1 VERSION
 
-This document describes version 0.03 of Sort::BySpec (from Perl distribution Sort-BySpec), released on 2017-02-17.
+This document describes version 0.040 of Sort::BySpec (from Perl distribution Sort-BySpec), released on 2021-05-01.
 
 =head1 SYNOPSIS
 
@@ -288,7 +288,9 @@ respectively. This avoids the package scoping issue of C<$a> and C<$b>, making
 your sorter subroutine works everywhere without any special workaround.
 
 Finally, aside from strings and regexes, you can also specify a coderef matcher
-for more complex matching:
+for more complex matching. Just like in the case of regex, right after the
+coderef you can optionally specify a sort subroutine (another coderef) to tell
+how to sort matching elements. For example:
 
  my $sorter = sort_by_spec(spec => [
      # put odd numbers first, in ascending order
@@ -333,9 +335,11 @@ Code to return sort keys from data elements.
 
 This is just like C<xform> in C<Sort::ByExample>.
 
+
 =back
 
 Return value:  (code)
+
 
 
 =head2 sort_by_spec
@@ -353,7 +357,7 @@ Examples:
 =item * Sort according to a sequence of scalars (like Sort::ByExample):
 
  sort_by_spec(
- spec  => ["foo", "bar", "baz"],
+   spec  => ["foo", "bar", "baz"],
    array => [1, 2, 3, "bar", "a", "b", "c", "baz"]
  );
 
@@ -364,7 +368,7 @@ Result:
 =item * Like previous example, but reversed:
 
  sort_by_spec(
- spec    => ["foo", "bar", "baz"],
+   spec    => ["foo", "bar", "baz"],
    array   => [1, 2, 3, "bar", "a", "b", "c", "baz"],
    reverse => 1
  );
@@ -376,7 +380,7 @@ Result:
 =item * Put integers first (in descending order), then a sequence of scalars, then others (in ascending order):
 
  sort_by_spec(
- spec  => [
+   spec  => [
               qr/\A\d+\z/,
               sub { $_[1] <=> $_[0] },
               "foo",
@@ -413,6 +417,7 @@ If set to true, will reverse the sort order.
 Code to return sort keys from data elements.
 
 This is just like C<xform> in C<Sort::ByExample>.
+
 
 =back
 
@@ -451,7 +456,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017, 2015 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2017, 2015 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

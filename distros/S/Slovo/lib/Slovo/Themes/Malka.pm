@@ -141,6 +141,8 @@ layout 'site',
   left        => $left,
   right       => $right,
   title       => $page_title->{title} . ' ⸙ ' . $celina->{title},
+  tstamp      => Time::Piece->new($celina->{tstamp})->ymd,
+  created_at  => Time::Piece->new($celina->{created_at})->ymd,
   ;
 %>
 <%=
@@ -212,17 +214,29 @@ layout 'site',
 <!-- from __DATA__ -->
 <!-- <%=$domain->{templates} %> -->
   <head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <link rel="shortcut icon" href="/img/favicon.ico" type="image/x-icon">
-    <link rel="canonical" href="/<%=$canonical_path %>">
-    
-    <meta name="author" content="<%= $author %>">
-    <meta name="description" content="<%= $description %>">
-    <meta name="generator" content="Slovo <%= $Slovo::VERSION .'/'. $Slovo::CODENAME %>">
-    <meta name="keywords" content="<%= $keywords %>">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <link rel="shortcut icon" href="/img/favicon.ico" type="image/x-icon" />
+    % my $base = url_for->base;
+    % $canonical_path =~ s|^/|| if $base =~ m|/$|;
+    <link rel="canonical" href="<%= $base . $canonical_path %>" />
+
     <title><%= title %></title>
+    <meta name="author" content="<%= $author %>" />
+    <meta name="description" content="<%= $description %>" />
+    <meta name="generator" content="Slovo <%= $Slovo::VERSION .'/'. $Slovo::CODENAME %>" />
+    <meta name="keywords" content="<%= $keywords %>" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="<%= $domain->{site_name} %>" />
+    <meta property="og:title" content="<%= title %>" />
+    <meta property="og:url" content="<%= $base . $canonical_path %>" />
+    <meta property="og:type" content="article" />
+    <meta property="og:article:author" content="<%= $author %>" />
+    <meta property="og:description" content="<%= $description %>" />
+    <meta property="og:locale" content="<%= $l %>" />
+    <meta property="og:published_time" content="<%= $created_at %>" />
+    <meta property="og:modified_time" content="<%= $tstamp %>" />
     <link rel="stylesheet" href="/css/malka/chota_all_min.css" />
     <link rel="stylesheet" href="/css/fonts.css" />
     <link rel="stylesheet" href="/css/malka/site.css" />
@@ -489,6 +503,8 @@ layout 'site',
   left        => $left,
   right       => $right,
   title       => $page_title->{title},
+  tstamp      => Time::Piece->new($page_title->{tstamp})->ymd,
+  created_at  => Time::Piece->new($page_title->{created_at})->ymd,
   ;
 
 # Get the body for each page under the home page.
@@ -545,6 +561,8 @@ layout 'site',
   left        => $left,
   right       => $right,
   title       => $page_title->{title},
+  tstamp      => Time::Piece->new($page_title->{tstamp})->ymd,
+  created_at  => Time::Piece->new($page_title->{created_at})->ymd,
   ;
 %>
 %= include 'partials/_zaglawie' => (celina => $page_title, level => 1);

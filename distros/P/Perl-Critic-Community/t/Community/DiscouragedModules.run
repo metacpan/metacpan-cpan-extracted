@@ -1,0 +1,60 @@
+## name GoodModules
+## failures 0
+## cut
+
+use lib::relative;
+use Cpanel::JSON::XS;
+use Dancer2;
+use DBIx::Class;
+use Dir::Self;
+use Exception::Class;
+use File::Slurp::Tiny;
+use Future;
+use Future::AsyncAwait;
+use IO::Async::Loop;
+use IO::Socket::IP;
+use JSON::MaybeXS;
+use JSON::PP;
+use Mad::Mapper;
+use Mojo::DOM;
+use Mojo::IOLoop;
+use Mojo::File;
+use Mojo::JSON;
+use Mojo::Template;
+use Mojolicious;
+use Moo;
+use Moose;
+use Path::Tiny;
+use Plack;
+use POE;
+use Switch::Plain;
+use Syntax::Keyword::Try;
+use Template;
+use Text::Xslate;
+with 'Throwable';
+use Try;
+use Try::Tiny;
+use Web::Simple;
+use XML::LibXML;
+use XML::TreeBuilder;
+use XML::Twig;
+
+## name BadModules
+## failures 15
+## cut
+
+use Any::Moose;
+use AnyEvent;
+use Class::DBI;
+use CGI;
+use Coro;
+use Error;
+use File::Slurp;
+use FindBin;
+use HTML::Template;
+use IO::Socket::INET6;
+use JSON::Any;
+use JSON::XS;
+use Net::IRC;
+use Switch;
+use XML::Simple;

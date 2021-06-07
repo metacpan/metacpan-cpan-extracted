@@ -1,0 +1,113 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+use App::CPAN::Get;
+
+our $VERSION = 0.02;
+
+# Run.
+exit App::CPAN::Get->new->run;
+
+# Print version.
+sub VERSION_MESSAGE {
+	print $VERSION."\n";
+	exit 0;
+}
+
+__END__
+
+=pod
+
+=encoding utf8
+
+=head1 NAME
+
+cpan-get - Script to fetch module from CPAN archive.
+
+=head1 SYNOPSIS
+
+ cpan-get [-h] [--version] module_name
+
+=head1 DESCRIPTION
+
+Vision of this module is:
+
+ * intuitive name for script which fetching module from CPAN
+ * intuitive caching mechanism (switch for source)
+ * simple dependencies to modules, which doing one thing (not CPAN module) SIC!
+ * testable and tested distribution
+
+=head1 ARGUMENTS
+
+=over 8
+
+=item * C<-h>
+
+ Print help.
+
+=item * C<--version>
+
+ Print version of script.
+
+=item * C<module_name>
+
+ Perl module name.
+ e.g. App::Pod::Example
+
+=back
+
+=head1 EXAMPLE
+
+ cpan-get App::Pod::Example
+
+=head1 SEE ALSO
+
+=over
+
+=item L<cpan>
+
+easily interact with CPAN from the command line
+
+C<cpan -g Some::Module>
+
+=item L<cpanspec>
+
+Generate a spec file for a CPAN module
+
+C<cpanspec -D App::Pod::Example>
+
+=item L<sourcepan>
+
+fetch source archives from CPAN
+
+C<sourcepan --git App::Pod::Example>
+
+=back
+
+=head1 REPOSITORY
+
+L<https://github.com/michal-josef-spacek/App-CPAN-Get>
+
+=head1 AUTHOR
+
+Michal Josef Špaček L<mailto:skim@cpan.org>
+
+L<http://skim.cz>
+
+=head1 ACKNOWLEDGMENTS
+
+ Paul Evans for notes about usage.
+
+=head1 LICENSE AND COPYRIGHT
+
+© 2021 Michal Josef Špaček
+
+BSD 2-Clause License
+
+=head1 VERSION
+
+0.02
+
+=cut

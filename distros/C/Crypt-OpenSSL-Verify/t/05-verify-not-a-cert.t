@@ -10,7 +10,7 @@ eval {
     my $not_cert = 'foo!';
     $ret = $v->verify($not_cert);
 };
-ok($@ =~ /x509 is not of type Crypt::OpenSSL::X509/);
+ok($@ =~ /Crypt::OpenSSL::X509/);
 ok(!$ret);
 
 $v = Crypt::OpenSSL::Verify->new(
@@ -28,7 +28,7 @@ eval {
     my $not_cert = 'foo!';
     $ret = $v->verify($not_cert);
 };
-ok($@ =~ /x509 is not of type Crypt::OpenSSL::X509/);
+ok($@ =~ /Crypt::OpenSSL::X509/);
 ok(!$ret);
 
 done_testing;

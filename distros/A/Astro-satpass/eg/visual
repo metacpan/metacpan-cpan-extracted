@@ -13,7 +13,7 @@ use HTTP::Date;
 use LWP::UserAgent;
 use Pod::Usage;
 
-our $VERSION = '0.119';
+our $VERSION = '0.120';
 
 my %opt;
 
@@ -84,6 +84,20 @@ if ( $opt{merge} ) {
 	defined( $found{$oid} = dor( $vsnames{$oid}, $quicksat{$oid} ) )
 	    or delete $found{$oid};
     }
+    # Unless we have numbers for selected bodies, make them the value
+    # back-calculated from Heavens-Above
+    my %heavens_above_mag = (
+	25544	=> -1.8,
+	48274	=> 3.2,
+    );
+    delete $found{25544};	# Override the old value.
+    my %oid_comment;
+    foreach my $oid ( keys %heavens_above_mag ) {
+	defined $found{$oid}
+	    and next;
+	$found{$oid} = $heavens_above_mag{$oid};
+	$oid_comment{$oid} = 'From Heavens-Above';
+    }
     $opt{decayed}
 	and decayed( \%found );
     local $Data::Dumper::Terse = 1;
@@ -93,6 +107,9 @@ if ( $opt{merge} ) {
     $output =~ s/ [}] \s* \z /);\n/smx;
     $output =~ s/ ' ( -? \d+ [.] \d+ ) ' /$1/smxg;
     $output =~ s/ (?<= \d ) (?: (?= \n ) | \z ) /,/smxg;
+    foreach my $oid ( keys %oid_comment ) {
+	$output =~ s/ \b ( $oid \b [^\n]* ) /$1 # $oid_comment{$oid}/smx;
+    }
     my @asserted = map { "-$_" } grep { $opt{$_} } qw{ decayed merge };
     print <<"EOD";
 # The following is all the Celestrak visual list that have magnitudes in

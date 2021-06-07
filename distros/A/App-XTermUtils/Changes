@@ -1,3 +1,9 @@
+0.007   2021-05-26  Released-By: PERLANCAR; Urgency: high
+
+	- [build] Rebuild to update Sah coercion module names (old Sah coercion
+          modules have been purged from CPAN).
+
+
 0.006   2019-11-27  Released-By: PERLANCAR; Urgency: medium
 
 	- Add fgcolor CLIs.

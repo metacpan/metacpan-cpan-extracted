@@ -18,11 +18,11 @@
 #
 #=============================================================================
 
-use 5.014_001;
+package Term::CLI::Role::ArgumentSet  0.052003 {
 
-package Term::CLI::Role::ArgumentSet  0.052001 {
-
-use Modern::Perl 1.20140107;
+use 5.014;
+use strict;
+use warnings;
 
 use Types::Standard 1.000005 qw(
     ArrayRef
@@ -98,7 +98,7 @@ Term::CLI::Role::ArgumentSet - Role for (sub-)commands in Term::CLI
 
 =head1 VERSION
 
-version 0.052001
+version 0.052003
 
 =head1 SYNOPSIS
 

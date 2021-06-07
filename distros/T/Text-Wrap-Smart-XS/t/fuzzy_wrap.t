@@ -3,12 +3,12 @@
 use strict;
 use warnings;
 
-use Test::More tests => 112;
+use Test::More tests => 60 * 2;
 use Text::Wrap::Smart::XS qw(fuzzy_wrap);
 
 my $join = sub { local $_ = shift; chomp; s/\n/ /g; $_ };
 
-my $text = <<'EOT';
+my $text = $join->(<<'EOT');
 Lorem ipsum dolor sit amet, consectetur adipiscing elit.
 Curabitur vel diam nec nisi pellentesque gravida a sit amet
 metus. Fusce non volutpat arcu. Lorem ipsum dolor sit amet,
@@ -132,7 +132,32 @@ sub test_wrap
     my @strings = fuzzy_wrap($text, $wrap_at);
 
     my $length = $wrap_at ? $wrap_at : 'default';
-    my $message = "(wrapping length: $length) ($newline)";
+    my $message = "(wrapping length: $length) ($newline) [ordinary]";
+
+    is(@strings, $count, "$message amount of substrings");
+    is_deeply(\@strings, $expected, "$message splitted at word boundary");
+}
+
+my $expected = [qw(foo bar)];
+
+@entries = (
+    [ "foo\tbar", $expected, 2, 1 ],
+    [ "foo\nbar", $expected, 2, 1 ],
+    [ "foo\fbar", $expected, 2, 1 ],
+    [ "foo\rbar", $expected, 2, 1 ],
+);
+
+foreach my $entry (@entries) {
+    test_wrap_whitespace(@$entry);
+}
+
+sub test_wrap_whitespace
+{
+    my ($text, $expected, $count, $wrap_at) = @_;
+
+    my @strings = fuzzy_wrap($text, $wrap_at);
+
+    my $message = '(wrapping length: greedy) [whitespace]';
 
     is(@strings, $count, "$message amount of substrings");
     is_deeply(\@strings, $expected, "$message splitted at word boundary");

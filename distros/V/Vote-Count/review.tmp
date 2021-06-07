@@ -1,0 +1,35 @@
+
+    * Vote::Count
+    * Vote::Count::Approval
+    * Vote::Count::Borda
+    Vote::Count::BottomRunOff
+    Vote::Count::Catalog
+    Vote::Count::Charge
+    Vote::Count::Charge::Cascade
+    Vote::Count::Common
+    Vote::Count::Floor
+    Vote::Count::Helper
+    Vote::Count::Helper::FullCascadeCharge
+    Vote::Count::Helper::NthApproval
+    Vote::Count::Helper::Table
+    Vote::Count::Helper::TestBalance;
+    Vote::Count::IRV
+    Vote::Count::Log
+    Vote::Count::Matrix
+    Vote::Count::Method::Cascade
+    Vote::Count::Method::CondorcetDropping
+    Vote::Count::Method::CondorcetIRV
+    Vote::Count::Method::CondorcetVsIRV
+    Vote::Count::Method::MinMax
+    Vote::Count::Method::STAR
+    Vote::Count::Method::WIGM
+    Vote::Count::MultiMember
+    Vote::Count::Overview
+    Vote::Count::Range
+    Vote::Count::RankCount
+    Vote::Count::ReadBallots
+    Vote::Count::Redact
+    Vote::Count::Score
+    Vote::Count::Start
+    Vote::Count::TieBreaker
+    * Vote::Count::TopCount

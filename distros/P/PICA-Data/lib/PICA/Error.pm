@@ -5,22 +5,22 @@ use overload fallback => 1, '""' => \&message;
 
 sub new {
     my $class = shift;
-    my $field = shift;
+    my ($tag, $occ) = @{shift(@_)};
 
-    my $error = {
-        tag => $field->[0],
-        (($field->[1] // '' ne '') ? (occurrence => $field->[1]) : ()), @_
-    };
+    my $error = {tag => $tag, @_};
+    $occ = 0 if substr($tag, 0, 1) eq 2;
+    $error->{occurrence} = $occ if $occ;
 
     # add error messages
-    my $id = join '/', grep {($_ // '') ne ''} @$field[0 .. 1];
-    $error->{message} = _field_error_message($error, $id)
-        unless $error->{message};
+    my $id = join '/', grep {$_} $tag, $occ;
 
     while (my ($code, $sf) = each %{$error->{subfields} // {}}) {
         $sf->{code} = $code;
         $sf->{message} = _subfield_error_message($sf, $id);
     }
+
+    $error->{message} = _field_error_message($error, $id)
+        unless $error->{message};
 
     bless $error, $class;
 }
@@ -66,8 +66,13 @@ sub _field_error_message {
         "field $id is not repeatable";
     }
     elsif ($error->{subfields}) {
-        my $sf = join '', keys %{$error->{subfields}};
-        "invalid subfield" . (length $sf > 1 ? "s $id\$$sf" : " $id\$$sf");
+        my %sf = %{$error->{subfields}};
+        my $invalid = grep {$_->{message} !~ /^unknown/} values %sf;
+        ($invalid ? "invalid" : "unknown")
+            . " subfield"
+            . (length keys %sf > 1 ? "s" : "")
+            . " $id\$"
+            . join '', sort keys %sf;
     }
     elsif ($error->{deprecated}) {
         "deprecated field $id";

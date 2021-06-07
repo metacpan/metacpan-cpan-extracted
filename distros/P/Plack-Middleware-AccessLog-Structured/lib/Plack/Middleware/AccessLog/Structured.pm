@@ -1,5 +1,5 @@
 package Plack::Middleware::AccessLog::Structured;
-$Plack::Middleware::AccessLog::Structured::VERSION = '0.001002';
+$Plack::Middleware::AccessLog::Structured::VERSION = '0.002000';
 use parent qw(Plack::Middleware);
 
 # ABSTRACT: Access log middleware which creates structured log messages
@@ -9,11 +9,9 @@ use warnings;
 
 use Carp;
 use MRO::Compat;
-use Time::HiRes;
+use Time::Moment;
 use Plack::Util::Accessor qw(logger callback extra_field);
 use Net::Domain qw(hostname hostfqdn);
-use DateTime;
-use Time::HiRes;
 use JSON;
 
 
@@ -36,13 +34,13 @@ sub new {
 sub call {
 	my ($self, $env) = @_;
 
-	my $t_before = Time::HiRes::time();
+	my $t_before = Time::Moment->now_utc();
 	my $res = $self->app->($env);
 
 	return $self->response_cb($res, sub {
 		my ($cb_res) = @_;
 
-		my $t_after = Time::HiRes::time();
+		my $t_after = Time::Moment->now_utc();
 		my $h = Plack::Util::headers($cb_res->[1]);
 		my $content_type = $h->get('Content-Type');
 		my $log_entry = {
@@ -65,9 +63,9 @@ sub call {
 			content_length   => Plack::Util::content_length($cb_res->[2]) || $h->get('Content-Length'),
 			content_type     => defined $content_type ? "$content_type" : undef,
 			# Timing
-			request_duration => ( $t_after - $t_before ) * 1000,
-			date             => DateTime->from_epoch(epoch => $t_before)->strftime('%Y-%m-%dT%H:%M:%S.%3NZ'),
-			epochtime        => $t_before,
+			request_duration => ( $t_before->delta_microseconds($t_after) / 1000 ),
+			date             => $t_before->strftime('%FT%T%3fZ'),
+			epochtime        => $t_before->strftime('%s.%3N'),
 		};
 
 		if ($self->extra_field()) {
@@ -113,7 +111,7 @@ Plack::Middleware::AccessLog::Structured - Access log middleware which creates s
 
 =head1 VERSION
 
-version 0.001002
+version 0.002000
 
 =head1 SYNOPSIS
 
@@ -224,7 +222,7 @@ Manfred Stock <mstock@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by Manfred Stock.
+This software is copyright (c) 2021 by Manfred Stock.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

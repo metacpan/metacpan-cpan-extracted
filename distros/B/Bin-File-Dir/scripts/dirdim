@@ -1,0 +1,116 @@
+#!/usr/bin/perl
+use 5.001 ; use strict ; use warnings ; 
+use Time::HiRes qw[gettimeofday tv_interval] ; 
+my $time_start = [ gettimeofday ] ; 
+use Getopt::Std ; getopts '.cdvy' , \my%o ; 
+use Term::ANSIColor qw [ :constants ] ; $Term::ANSIColor::AUTORESET = 1 ; 
+use File::Spec::Functions qw[catfile splitdir ] ; 
+use List::Util qw[ minstr maxstr ] ;
+my $T = catfile '', '' ; # OS毎に異なる可能性のある、ファイルパスの区切り文字を取得。 
+
+& HELP_MESSAGE unless @ARGV ; 
+& measure_simple ; 
+exit 0 ; 
+
+sub measure_simple { 
+  my @tmp ;
+  push @tmp , "Non-dir-child-files" , CYAN "Dir-child-files"  ;
+  push @tmp , BRIGHT_BLUE "max_depth all-files" if defined $o{d} ;
+  push @tmp , BRIGHT_CYAN "Given directory" ;
+  push @tmp , BRIGHT_BLUE "A file name at the max depth" if defined $o{d} ;
+  push @tmp , ("fileName_minstr" , (BRIGHT_WHITE "fileName_maxstr" ) ) if $o{v} ; 
+  print join "\t" , @tmp ; 
+  print "\n--\n" ;
+  
+  my ($y,$z) = (0,0) ; # 結果的に処理対象となったものとそうでないもの
+  for ( @ARGV ) { 
+    chomp ;
+    #do { print "notExists\t$_\n" ; next ; } if ! -e $_  ; 
+    do { print join("\t",'','',$_,YELLOW "not a directory."),"\n" if ! $o{y} ; $z++ ; next } if ! -d $_  ; 
+    opendir my $dh , $_ or do { warn "$_ does not open.\n" ; next } ;
+    my @files = grep {! /\A\.{1,2}\Z/ } readdir $dh  ; 
+    @files = grep {/\A\./ } @files if $o{'.'} ; 
+    @files = grep {! /\A\./ } @files if $o{c} ; 
+    #my $dnum = do { my $t = $_ ; grep { -d "$t$T$_" and  $_ = $_.$T } @files } ; 
+    my @ddir = do { my $t = $_ ; grep { -d "$t$T$_" and  $_ = $_.$T } @files } ; 
+    my $dnum = (scalar @ddir) . do { my $t = $_ ; my @L = grep {-l "$t$T$_"} @ddir ; my $l = @L ; $l == 0 ? "" : FAINT "($l)"  }  ;
+    #my $pnum = (scalar @files) - $dnum ;
+    my @pfile =do { my $t = $_ ; grep { ! -d "$t$T$_" } @files } ; 
+    my $pnum = (scalar @pfile ). do { my $t = $_ ; my @L = grep {-l "$t$T$_"} @pfile ; my $l = @L ; $l == 0 ? "" : FAINT "($l)"  }  ;
+    my ($dp, $dn , $finum, $links ) = max_depth ( $_ ) if $o{d} ;
+
+    my @out ; 
+    push @out , $pnum , CYAN $dnum ;
+    push @out , BRIGHT_BLUE "$dp\t$finum" . ($links ? FAINT "($links)" : '') if defined $dp ; # 最も深い所の深さ  それと数えたファイル数
+    push @out , BRIGHT_CYAN $_ . $T ; 
+    push @out , BRIGHT_BLUE $dn if defined $dn ; # 最も深い所にあるファイルの名前
+    if ( $o{v} ) { 
+    	my $f1 = minstr @files ;
+    	my $f2 = maxstr @files ; 
+    	push @out , ($f1) if defined $f1 ; 
+    	push @out , (BRIGHT_WHITE $f2) if defined $f1 && $f1 ne $f2 ;
+    }
+    print join "\t", @out ; 
+    print "\n" ; 
+    $y ++ ;
+    closedir $dh ; 
+  }
+  my $time_elapsed = tv_interval ( $time_start , [ gettimeofday ] ) ;
+  print STDERR BRIGHT_BLUE "$y entries are processed. $z entrie(s) are suppressed. $time_elapsed seconds in calculation. ($0)\n" ;
+}
+
+use File::Find qw[find ] ; 
+
+
+sub max_depth ( $ ) { 
+  my $d = 0 ; # 最大の深さ
+  my $dname = '' ; # 最も深い所にあるファイルの名前
+  my $t ; # 仮変数
+  my $n = 0 ; # ついでにファイルの個数も数える。
+  my $l = 0 ; # リンクファイルの個数
+   #find ( {wanted => sub { -d $_ and $t = splitdir ( $_ ) and  $d = $t if $t > $d } }  , $_[0] ) ; 
+   find ( {
+    no_chdir => 1 , 
+    #wanted => sub { -d $_ and my @t = splitdir ( $_ ); $d=@t and $dname=$_ if @t> $d }}  , $_[0] ) ; 
+    wanted => sub { $n++ ; $l ++ if -l $_ ; my @t = splitdir ( $_ ); $d=@t and $dname=$_ if @t> $d }}  , $_[0] ) ; 
+   $d .= '/' if -d $d ;
+   return $d, $dname , $n , $l ;
+}
+
+sub VERSION_MESSAGE {}
+sub HELP_MESSAGE {
+  use FindBin qw[ $Script ] ;
+  $ARGV[1] //= '' ;
+  open my $FH , '<' , $0 ;
+  while(<$FH>){
+    s/\$0/$Script/g ;
+    print $_ if $ARGV[1] eq 'opt' ? m/^\ +\-/ : s/^=head1// .. s/^=cut// ;
+  }
+  close $FH ;
+  exit 0 ;
+}
+
+=encoding utf8
+
+=head1
+
+ $0 args..
+
+  引数args で指定されたディレクトリの直下にある、非ディリクトリファイルの数とディレトリの数を出力する。
+  シンボリックファイルの個数は括弧内に示す。 
+
+ オプション: 
+
+  -.  : ファイル名がピリオドで始まるファイル(隠しファイルと言われる)について調べる。
+  -c  : ファイル名がピリオドで始まるファイル(隠しファイルと言われる)は対象外とする。(-.とは正反対の条件)
+  -v  : ファイル名の(文字列としての)最小値と最大値も出力する。(verbose)
+
+  -y  : ディレクトリ以外のものについて何もメッセージを出さない。
+
+  -d  ; 最も深い所にあるファイルの名前とその深さを示す。さらに、findで見つかるファイルの個数も出力。
+
+ 開発上のメモ: 
+   * -d d が少し奇妙である。もともと -d N (-d 数) で設計するつもりでいた。
+   * glob の */../*のような探索と File::Find による探索の違いを発見した。dirdimとdirdigで共通化の検討が必要。
+   * Ctrl-Cを押下した時の挙動を決めたい。
+=cut

@@ -14,7 +14,7 @@ Archive::Libarchive::XS::Constant - Constants reference for libarchive perl bind
 
 =head1 VERSION
 
-version 0.0902
+version 0.0903
 
 =head1 SYNOPSIS
 
@@ -102,6 +102,8 @@ constants using the C<:const> export tag).
 
 =item ARCHIVE_ENTRY_ACL_ENTRY_FILE_INHERIT
 
+=item ARCHIVE_ENTRY_ACL_ENTRY_INHERITED
+
 =item ARCHIVE_ENTRY_ACL_ENTRY_INHERIT_ONLY
 
 =item ARCHIVE_ENTRY_ACL_ENTRY_NO_PROPAGATE_INHERIT
@@ -138,9 +140,15 @@ constants using the C<:const> export tag).
 
 =item ARCHIVE_ENTRY_ACL_READ_NAMED_ATTRS
 
+=item ARCHIVE_ENTRY_ACL_STYLE_COMPACT
+
 =item ARCHIVE_ENTRY_ACL_STYLE_EXTRA_ID
 
 =item ARCHIVE_ENTRY_ACL_STYLE_MARK_DEFAULT
+
+=item ARCHIVE_ENTRY_ACL_STYLE_SEPARATOR_COMMA
+
+=item ARCHIVE_ENTRY_ACL_STYLE_SOLARIS
 
 =item ARCHIVE_ENTRY_ACL_SYNCHRONIZE
 
@@ -246,6 +254,8 @@ constants using the C<:const> export tag).
 
 =item ARCHIVE_FILTER_XZ
 
+=item ARCHIVE_FILTER_ZSTD
+
 =item ARCHIVE_FORMAT_7ZIP
 
 =item ARCHIVE_FORMAT_AR
@@ -325,6 +335,10 @@ constants using the C<:const> export tag).
 =item ARCHIVE_READDISK_HONOR_NODUMP
 
 =item ARCHIVE_READDISK_MAC_COPYFILE
+
+=item ARCHIVE_READDISK_NO_ACL
+
+=item ARCHIVE_READDISK_NO_FFLAGS
 
 =item ARCHIVE_READDISK_NO_TRAVERSE_MOUNTS
 

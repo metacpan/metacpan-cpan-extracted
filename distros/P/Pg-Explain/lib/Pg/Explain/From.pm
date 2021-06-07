@@ -26,11 +26,11 @@ Pg::Explain::From - Base class for parsers of non-text explain formats.
 
 =head1 VERSION
 
-Version 1.08
+Version 1.09
 
 =cut
 
-our $VERSION = '1.08';
+our $VERSION = '1.09';
 
 =head1 SYNOPSIS
 
@@ -209,8 +209,29 @@ sub make_node_from {
         $new_node->add_extra_info( 'Workers Launched: ' . $struct->{ 'Workers Launched' } );
     }
 
+    if ( $struct->{ 'Recheck Cond' } ) {
+        $new_node->add_extra_info( 'Recheck Cond: ' . $struct->{ 'Recheck Cond' } );
+        if ( $struct->{ 'Rows Removed by Index Recheck' } ) {
+            $new_node->add_extra_info( 'Rows Removed by Index Recheck: ' . $struct->{ 'Rows Removed by Index Recheck' } );
+        }
+    }
+
+    if ( $struct->{ 'Join Filter' } ) {
+        $new_node->add_extra_info( 'Join Filter: ' . $struct->{ 'Join Filter' } );
+        if ( $struct->{ 'Rows Removed by Join Filter' } ) {
+            $new_node->add_extra_info( 'Rows Removed by Join Filter: ' . $struct->{ 'Rows Removed by Join Filter' } );
+        }
+    }
+
     $new_node->add_extra_info( 'Index Cond: ' . $struct->{ 'Index Cond' } ) if $struct->{ 'Index Cond' };
-    $new_node->add_extra_info( 'Filter: ' . $struct->{ 'Filter' } )         if $struct->{ 'Filter' };
+
+    if ( $struct->{ 'Filter' } ) {
+        $new_node->add_extra_info( 'Filter: ' . $struct->{ 'Filter' } );
+        if ( defined $struct->{ 'Rows Removed by Filter' } ) {
+            $new_node->add_extra_info( 'Rows Removed by Filter: ' . $struct->{ 'Rows Removed by Filter' } );
+        }
+    }
+
     if ( $struct->{ 'Node Type' } eq 'Sort' ) {
         if ( 'ARRAY' eq ref $struct->{ 'Sort Key' } ) {
             $new_node->add_extra_info( 'Sort Key: ' . join( ', ', @{ $struct->{ 'Sort Key' } } ) );
@@ -246,6 +267,23 @@ sub make_node_from {
         push @buf_info, join ' ', lc $buf_block, @buf_block_info if @buf_block_info;
     }
     $new_node->add_extra_info( 'Buffers: ' . join ', ', @buf_info ) if @buf_info;
+
+    if ( $struct->{ 'Conflict Resolution' } ) {
+        $new_node->add_extra_info( 'Conflict Resolution: ' . $struct->{ 'Conflict Resolution' } );
+        if ( $struct->{ 'Conflict Arbiter Indexes' } ) {
+            $new_node->add_extra_info( 'Conflict Arbiter Indexes: ' . join( ', ', @{ $struct->{ 'Conflict Arbiter Indexes' } } ) );
+        }
+        if ( $struct->{ 'Conflict Filter' } ) {
+            $new_node->add_extra_info( 'Conflict Filter: ' . $struct->{ 'Conflict Filter' } );
+            if ( defined $struct->{ 'Rows Removed by Conflict Filter' } ) {
+                $new_node->add_extra_info( 'Rows Removed by Conflict Filter: ' . $struct->{ 'Rows Removed by Conflict Filter' } );
+            }
+        }
+    }
+
+    $new_node->add_extra_info( 'Tuples Inserted: ' . $struct->{ 'Tuples Inserted' } ) if defined $struct->{ 'Tuples Inserted' };
+
+    $new_node->add_extra_info( 'Conflicting Tuples: ' . $struct->{ 'Conflicting Tuples' } ) if defined $struct->{ 'Conflicting Tuples' };
 
     if ( $struct->{ 'Plans' } ) {
         my @plans;

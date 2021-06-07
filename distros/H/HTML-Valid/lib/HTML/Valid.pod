@@ -49,6 +49,11 @@ outputs
     
     line 1 column 1 - Warning: missing <!DOCTYPE> declaration
     line 1 column 1 - Warning: inserting implicit <body>
+    line 2 column 1 - Info: missing optional end tag </li>
+    line 3 column 1 - Info: missing optional end tag </li>
+    line 4 column 1 - Info: missing optional end tag </li>
+    line 5 column 1 - Info: missing optional end tag </li>
+    line 6 column 1 - Info: missing optional end tag </li>
     line 1 column 1 - Warning: missing </ul>
     line 1 column 1 - Warning: inserting missing 'title' element
     Info: Document content looks like HTML5
@@ -59,11 +64,11 @@ outputs
 
 =head1 VERSION
 
-This documents HTML::Valid version 0.07
-corresponding to git commit L<9945d9d51a2d7c8a1e6e92e46c77dc93ee02a2ab|https://github.com/benkasminbullock/html-valid/commit/9945d9d51a2d7c8a1e6e92e46c77dc93ee02a2ab> released on Sat Dec 30 13:41:36 2017 +0900.
+This documents HTML::Valid version 0.08
+corresponding to git commit L<e5beaaba00502cc4aba10db6bba5b0758f64726d|https://github.com/benkasminbullock/html-valid/commit/e5beaaba00502cc4aba10db6bba5b0758f64726d> released on Thu May 20 08:07:15 2021 +0900.
 
 This Perl module is built on top of the L</HTML Tidy> library version
-5.6.0.
+5.7.28.
 
 
 =head1 DESCRIPTION
@@ -1283,12 +1288,22 @@ A small HTML validator: really all this does is make sure your tags are balanced
 
 =back
 
+=head1 DEPENDENCIES
+
+=over
+
+=item L<JSON::Parse>
+
+This is used to read a file of options
+
+=back
+
 =head1 BUILD PROCESS
 
 This module is built from L</HTML Tidy> source code using a script
 which converts the HTML Tidy library into a single C file. This is
-available in the github repository as L<F<tools/make-c-file.pl>|https://github.com/benkasminbullock/html-valid/blob/9945d9d51a2d7c8a1e6e92e46c77dc93ee02a2ab/tools/make-c-file.pl>, but is not in the CPAN distribution. This also includes extra C
-functions in L<F<extra.c>|https://github.com/benkasminbullock/html-valid/blob/9945d9d51a2d7c8a1e6e92e46c77dc93ee02a2ab/extra.c> into the library to access
+available in the github repository as L<F<tools/make-c-file.pl>|https://github.com/benkasminbullock/html-valid/blob/e5beaaba00502cc4aba10db6bba5b0758f64726d/tools/make-c-file.pl>, but is not in the CPAN distribution. This also includes extra C
+functions in L<F<extra.c>|https://github.com/benkasminbullock/html-valid/blob/e5beaaba00502cc4aba10db6bba5b0758f64726d/extra.c> into the library to access
 internals which are not part of the public interface. This is used for
 creating the machine-readable file of option documentation included
 above in L</OPTIONS> and for creating the tables of tags and
@@ -1300,46 +1315,64 @@ Ben Bullock <bkb@cpan.org>
 
 =head1 COPYRIGHT AND LICENCE
 
-HTML::Valid is based on HTML Tidy, which is under the following copyright:
+HTML::Valid is based on HTML Tidy, which is under L<the following copyright|https://github.com/htacg/tidy-html5/blob/next/README/LICENSE.md>:
 
-    Copyright (c) 1998-2008 World Wide Web Consortium
-    (Massachusetts Institute of Technology, European Research
-    Consortium for Informatics and Mathematics, Keio University).
-    All Rights Reserved.
+=head2 HTML Tidy
 
-    COPYRIGHT NOTICE:
+=head3 HTML parser and pretty printer
 
-    This software and documentation is provided "as is," and
-    the copyright holders and contributing author(s) make no
-    representations or warranties, express or implied, including
-    but not limited to, warranties of merchantability or fitness
-    for any particular purpose or that the use of the software or
-    documentation will not infringe any third party patents,
-    copyrights, trademarks or other rights.
+Copyright (c) 1998-2016 World Wide Web Consortium
+(Massachusetts Institute of Technology, European Research 
+Consortium for Informatics and Mathematics, Keio University).
+All Rights Reserved.
 
-    The copyright holders and contributing author(s) will not be held
-    liable for any direct, indirect, special or consequential damages
-    arising out of any use of the software or documentation, even if
-    advised of the possibility of such damage.
+Additional contributions (c) 2001-2016 University of Toronto, Terry Teague, 
+@geoffmcl, HTACG, and others.
 
-    Permission is hereby granted to use, copy, modify, and distribute
-    this source code, or portions hereof, documentation and executables,
-    for any purpose, without fee, subject to the following restrictions:
+=head4 Contributing Author(s):
 
-    1. The origin of this source code must not be misrepresented.
-    2. Altered versions must be plainly marked as such and must
-    not be misrepresented as being the original source.
-    3. This Copyright notice may not be removed or altered from any
-    source or altered source distribution.
+  Dave Raggett <dsr@w3.org>
 
+The contributing author(s) would like to thank all those who
+helped with testing, bug fixes and suggestions for improvements. 
+This wouldn't have been possible without your help.
 
+=head2 COPYRIGHT NOTICE:
 
+This software and documentation is provided "as is," and
+the copyright holders and contributing author(s) make no
+representations or warranties, express or implied, including
+but not limited to, warranties of merchantability or fitness
+for any particular purpose or that the use of the software or
+documentation will not infringe any third party patents,
+copyrights, trademarks or other rights. 
+
+The copyright holders and contributing author(s) will not be held
+liable for any direct, indirect, special or consequential damages
+arising out of any use of the software or documentation, even if
+advised of the possibility of such damage.
+
+Permission is hereby granted to use, copy, modify, and distribute
+this source code, or portions hereof, documentation and executables,
+for any purpose, without fee, subject to the following restrictions:
+
+1. The origin of this source code must not be misrepresented.
+2. Altered versions must be plainly marked as such and must
+not be misrepresented as being the original source.
+3. This Copyright notice may not be removed or altered from any
+source or altered source distribution.
+
+The copyright holders and contributing author(s) specifically
+permit, without fee, and encourage the use of this source code
+as a component for supporting the Hypertext Markup Language in
+commercial products. If you use this source code in a product,
+acknowledgement is not required but would be appreciated.
 
 
 
 
 The Perl parts of this distribution are copyright (C) 
-2015-2017
+2015-2021
 Ben Bullock and may be used under either the above licence terms, or
 the usual Perl conditions, either the GNU General Public Licence or
 the Perl Artistic Licence.

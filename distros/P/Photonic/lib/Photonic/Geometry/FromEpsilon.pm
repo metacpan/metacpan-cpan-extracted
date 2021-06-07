@@ -1,5 +1,5 @@
 package Photonic::Geometry::FromEpsilon;
-$Photonic::Geometry::FromEpsilon::VERSION = '0.015';
+$Photonic::Geometry::FromEpsilon::VERSION = '0.016';
 
 =encoding UTF-8
 
@@ -38,8 +38,9 @@ use namespace::autoclean;
 use Carp;
 use Moose;
 use MooseX::StrictConstructor;
+use Photonic::Types;
 
-has 'epsilon'=>(is=>'ro', isa=>'PDL::Complex', required=>1,
+has 'epsilon'=>(is=>'ro', isa=>'Photonic::Types::PDLComplex', required=>1,
 		documentation=>'Dielectric function as function of position');
 
 has 'B' =>(is=>'ro', isa=>'PDL', init_arg=>undef, builder=>'_B', lazy=>1,
@@ -75,7 +76,7 @@ Photonic::Geometry::FromEpsilon
 
 =head1 VERSION
 
-version 0.015
+version 0.016
 
 =head1 SYNOPSIS
 
@@ -110,7 +111,7 @@ default, it is the number of voxels or pixels.
 
 =back
 
-=head1 ACCESORS (read only)
+=head1 ACCESSORS (read only)
 
 =over 4
 

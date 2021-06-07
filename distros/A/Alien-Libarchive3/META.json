@@ -4,7 +4,7 @@
       "Graham Ollis <plicease@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.017, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -17,18 +17,18 @@
       "build" : {
          "requires" : {
             "Alien::Build" : "0.71",
-            "Alien::Build::MM" : "0.40",
-            "Config" : "0",
+            "Alien::Build::MM" : "0.32",
             "ExtUtils::MakeMaker" : "6.52"
          }
       },
       "configure" : {
          "requires" : {
-            "Alien::Build" : "0.40",
+            "Alien::Build" : "0.32",
             "Alien::Build::MM" : "0.71",
             "Alien::Build::Plugin::Build::SearchDep" : "0.35",
             "ExtUtils::CBuilder" : "0",
             "ExtUtils::MakeMaker" : "6.52",
+            "FFI::CheckLib" : "0.28",
             "perl" : "5.006"
          }
       },
@@ -36,10 +36,14 @@
          "requires" : {
             "File::Spec" : "0",
             "FindBin" : "0",
+            "Perl::Critic" : "0",
+            "Test2::Require::Module" : "0.000060",
+            "Test2::Tools::PerlCritic" : "0",
+            "Test2::V0" : "0.000060",
             "Test::CPAN::Changes" : "0",
             "Test::EOL" : "0",
             "Test::Fixme" : "0.07",
-            "Test::More" : "0.94",
+            "Test::More" : "0.98",
             "Test::NoTabs" : "0",
             "Test::Pod" : "0",
             "Test::Pod::Coverage" : "0",
@@ -67,20 +71,21 @@
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://github.com/plicease/Alien-Libarchive3/issues"
+         "web" : "https://github.com/uperl/Alien-Libarchive3/issues"
       },
       "homepage" : "https://metacpan.org/pod/Alien::Libarchive3",
       "repository" : {
          "type" : "git",
-         "url" : "git://github.com/plicease/Alien-Libarchive3.git",
-         "web" : "https://github.com/plicease/Alien-Libarchive3"
+         "url" : "git://github.com/uperl/Alien-Libarchive3.git",
+         "web" : "https://github.com/uperl/Alien-Libarchive3"
       }
    },
-   "version" : "0.29",
+   "version" : "0.32",
    "x_alienfile" : {
-      "dzil_plugin" : "0.22",
+      "generated_by" : "Dist::Zilla::Plugin::AlienBuild version 0.31",
       "requires" : {
          "share" : {
+            "Alien::Build::Plugin::Gather::IsolateDynamic" : "0.48",
             "Alien::LZO" : "0",
             "Alien::Libbz2" : "0",
             "Alien::Libxml2" : "0",
@@ -89,18 +94,19 @@
             "Archive::Tar" : "0",
             "Config" : "0",
             "Env::ShellWords" : "0.01",
-            "HTML::LinkExtor" : "0",
             "HTTP::Tiny" : "0.044",
             "IO::Zlib" : "0",
+            "Mojo::DOM58" : "1.00",
             "Sort::Versions" : "0",
             "URI" : "0",
             "URI::Escape" : "0"
          },
-         "system" : {
-            "Config" : "0"
-         }
+         "system" : {}
       }
    },
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0233"
+   "x_generated_by_perl" : "v5.34.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.26",
+   "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later",
+   "x_use_unsafe_inc" : 0
 }
 

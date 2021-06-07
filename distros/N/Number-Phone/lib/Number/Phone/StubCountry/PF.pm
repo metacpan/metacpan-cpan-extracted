@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20210309172132;
+our $VERSION = 1.20210602223300;
 
 my $formatters = [
                 {
@@ -32,8 +32,16 @@ my $formatters = [
                 },
                 {
                   'format' => '$1 $2 $3 $4',
-                  'leading_digits' => '[48]',
+                  'leading_digits' => '
+            4|
+            8[7-9]
+          ',
                   'pattern' => '(\\d{2})(\\d{2})(\\d{2})(\\d{2})'
+                },
+                {
+                  'format' => '$1 $2 $3 $4',
+                  'leading_digits' => '8',
+                  'pattern' => '(\\d{3})(\\d{2})(\\d{2})(\\d{2})'
                 }
               ];
 
@@ -54,20 +62,20 @@ my $validators = {
                 'pager' => '',
                 'personal_number' => '',
                 'specialrate' => '(44\\d{4})',
-                'toll_free' => '',
+                'toll_free' => '80[0-5]\\d{6}',
                 'voip' => '499\\d{5}'
               };
 my %areanames = ();
 $areanames{en} = {"689405", "Îles\ du\ Vent\(IDV\)",
-"689498", "Polynesia",
-"689496", "Polynesia",
-"689406", "Îles\ Sous\-le\-vent\(ISLV\)",
-"689495", "Polynesia",
-"689408", "Îles\ du\ Vent\(IDV\)",
-"6894088", "Polynesia",
 "689404", "Îles\ du\ Vent\(IDV\)",
+"689496", "Polynesia",
+"689494", "Polynesia",
+"689495", "Polynesia",
+"689406", "Îles\ Sous\-le\-vent\(ISLV\)",
 "689409", "Remote\ Archipelago",
-"689494", "Polynesia",};
+"689498", "Polynesia",
+"6894088", "Polynesia",
+"689408", "Îles\ du\ Vent\(IDV\)",};
 
     sub new {
       my $class = shift;

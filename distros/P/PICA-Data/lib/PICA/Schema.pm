@@ -1,7 +1,7 @@
 package PICA::Schema;
 use v5.14.1;
 
-our $VERSION = '1.20';
+our $VERSION = '1.24';
 
 use Exporter 'import';
 our @EXPORT_OK = qw(field_identifier check_value clean_pica);
@@ -23,6 +23,17 @@ sub check {
         = clean_pica($record, error => sub {push @errors, shift}, %options)
         or return @errors;
 
+    my @errors = map {$self->check_record($_->{record}, %options)}
+        PICA::Data::pica_split($record);
+
+    my %seen;
+    return grep {not $seen{"$_"}++} @errors;
+}
+
+sub check_record {
+    my ($self, $record, %options) = @_;
+
+    my @errors;
     $options{counter} = {};
 
     my %field_identifiers;
@@ -30,13 +41,22 @@ sub check {
         my $id = $self->field_identifier($field);
         $field_identifiers{$id} = 1;
         my $error = $self->check_field($field, %options, _field_id => $id);
-        if ($error and !grep {$_ eq $error} @errors) {
-            push @errors, $error;
+        if ($error) {
+            push @errors, $error unless grep {$_ eq $error} @errors;
+        }
+        if ($options{annotate}) {
+            my $annotation = ' ';
+            if ($error) {
+                $annotation = $error->{message} =~ /^unknown/ ? '?' : '!';
+            }
+            PICA::Data::pica_annotation($field, $annotation);
         }
     }
 
-    # check whether required fields exist
+    # check whether required fields exist for this record level
+    my $level = substr $record->[0][0], 0, 1;
     for my $id (keys %{$self->{fields}}) {
+        next if $level ne substr $id, 0, 1;
         my $field = $self->{fields}{$id};
         if ($field->{required} && !$field_identifiers{$id}) {
             push @errors,
@@ -84,8 +104,7 @@ sub check_field {
     }
 
     if ($opts{counter} && !$spec->{repeatable}) {
-        my $tag_occ = join '/', grep {defined} @$field[0, 1];
-        if ($opts{counter}{$tag_occ}++) {
+        if ($opts{counter}{$id}++) {
             return PICA::Error->new($field, repeated => 1);
         }
     }
@@ -158,12 +177,13 @@ sub check_annotation {
 
     if (@subfields % 2) {
         return "Field annotation not allowed"
-            if defined $options{annotated} && !$options{annotation};
+            if defined $options{check_annotation}
+            && !$options{check_annotation};
 
         return "Annotation must not be non-alphanumeric character"
             if pop(@subfields) !~ /^[^A-Za-z0-9]\z/;
     }
-    elsif ($options{annotated}) {
+    elsif ($options{check_annotation}) {
         return "Missing field annotation";
     }
 }
@@ -219,11 +239,13 @@ sub field_identifier {
 
     if ($fields && !exists $fields->{"$tag/$occ"}) {
 
-        # TODO: we could create an index to speed up this slows lookup
+        # TODO: we could create an index to speed up this slow lookup
         for my $id (keys %$fields) {
             return $id
                 if $id =~ /^$tag\/(..)-(..)$/ && $occ >= $1 && $occ <= $2;
         }
+
+        # TODO: support x fields with field counter
     }
 
     return $occ ne '' ? "$tag/$occ" : $tag;
@@ -237,10 +259,12 @@ sub TO_JSON {
 sub abbreviated {
     my ($self) = @_;
     my $abbr = dclone($self->TO_JSON);
-    for (values %{$abbr->{fields} // {}}) {
-        delete $_->{tag};
-        delete $_->{occurrence};
-        for (values %{$_->{subfields} // {}}) {
+    delete $abbr->{total};
+    for my $field (values %{$abbr->{fields} // {}}) {
+        delete $field->{tag};
+        delete $field->{occurrence};
+        delete $field->{total};
+        for my $sf (values %{$field->{subfields} // {}}) {
             delete $_->{code};
         }
     }
@@ -354,7 +378,7 @@ See L<PICA::Schema::Builder> to automatically construct schemas from PICA
 sample records.
 
 Schema information can also be used for documentation of records with
-L<PICA::Writer::Fields> and L<PICA::Writer::XML>.
+L<PICA::Writer::XML>.
 
 =head1 METHODS
 
@@ -405,7 +429,7 @@ Don't report errors resulting on wrong subfield order.
 
 Don't check subfields at all.
 
-=item annotated
+=item check_annotation
 
 Require or forbid annotated fields if set to true or false.
 Otherwise just check whether given annotation is a valid character.
@@ -419,8 +443,8 @@ C<check>. Returns a L<PICA::Error> on schema violation.
 
 =head2 abbreviated
 
-Return an abbreviated data structure of the schema without inferable fields
-such as C<tag>, C<occurrence> and C<code>.
+Return an abbreviated data structure of the schema without inferable and
+calculated fields such as C<tag>, C<occurrence>, C<code>, and C<total>.
 
 =head1 FUNCTIONS
 
@@ -463,9 +487,7 @@ a L<subfield error|PICA::Error/SUBFIELD ERRORS> without C<message> key.
 
 =head1 LIMITATIONS
 
-The current version does not properly validate required field on level 1 and 2.
-
-Field types have neither been implemented yet.
+Fields types and deprecated (sub)fields in Avram Schemas are not fully supported yet.
 
 =head1 SEE ALSO
 

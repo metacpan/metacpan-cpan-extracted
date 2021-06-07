@@ -383,12 +383,14 @@ sub run ($) {
         $bucket_count = 10;
     };
     # clean up
+    croak($self->{_prog} . ": no buckets\n") if ($bucket_count <= 0);
     $bucket_start = $bucket_end - $bucket_width * $bucket_count
         if (!defined($bucket_start));
     $bucket_end = $bucket_start + $bucket_width * $bucket_count
         if (!defined($bucket_end));
     $bucket_width = ($bucket_end - $bucket_start) / $bucket_count
         if (!defined($bucket_width));
+    $bucket_width = $bucket_end / $bucket_count if ($bucket_width == 0);
     $bucket_count = ($bucket_end - $bucket_start) / $bucket_width
         if (!defined($bucket_count));
     $bucket_width += 0.0;

@@ -4,13 +4,13 @@
       "Ron Savage (ron@savage.net.au)"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.143240",
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "artistic_2"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "MarpaX-Languages-Lua-Parser",
    "no_index" : {
@@ -42,24 +42,30 @@
             "Moo" : "2.000001",
             "Path::Tiny" : "0.068",
             "Pod::Usage" : "1.63",
-            "Test::More" : "1.001014",
-            "Test::Pod" : "1.48",
             "Types::Standard" : "1.000005",
             "open" : "0",
-            "perl" : "0",
             "strict" : "0",
             "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "1.001014",
+            "Test::Pod" : "1.48"
          }
       }
    },
    "release_status" : "stable",
    "resources" : {
-      "bugtracker" : {
-         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=MarpaX-Languages-Lua-Parser"
-      },
       "license" : [
          "http://www.perlfoundation.org/artistic_license_2_0"
-      ]
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/ronsavage/MarpaX-Languages-Lua-Parser.git",
+         "web" : "https://github.com/ronsavage/MarpaX-Languages-Lua-Parser"
+      }
    },
-   "version" : "1.04"
+   "version" : "1.05",
+   "x_serialization_backend" : "JSON::PP version 4.02"
 }

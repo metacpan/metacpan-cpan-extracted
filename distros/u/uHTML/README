@@ -1,0 +1,15 @@
+
+This archive contains the uHTML library. uHTML is an elegant way to extend HTML
+by defining new tags according to the requirements of a particular website.
+It allows to connect tags with code chunks and insert function results into
+the tag attributes. It is irrelevant if a tag is part of a regular tag set
+or means an extension of it. A function connected to a tag can leave it unchanged,
+modify it, replace it with a generated content or skip it completely.
+
+Please check the documentation included with the files and http://www.uhtml.de
+for installation instructions and bindings to webservers.
+
+It is allowed to use this library under the actual GNU LGPL.
+
+Please report errors to uHTML@Place.Ug
+

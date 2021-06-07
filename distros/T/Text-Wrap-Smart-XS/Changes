@@ -1,5 +1,51 @@
 Revision history for Perl extension Text::Wrap::Smart::XS.
 
+0.07  2021-05-24  <schubiger@cpan.org>
+
+ - Merged development version to stable.
+
+ - Const size.
+
+0.06_04  2021-05-23  <schubiger@cpan.org>
+
+ - Free string if returning early.
+
+ - Test wrapping with greedy length.
+
+ - Divide function descriptions into paragraphs.
+
+ - Add metadata repository link.
+
+ - Simplify test counts.
+
+0.06_03  2021-05-21  <schubiger@cpan.org>
+
+ - Return early when empty string.
+
+ - Move calculating average to a function.
+
+ - New macro SAVE_STRING().
+
+ - Note that text is being preprocessed.
+
+0.06_02  2021-05-16  <schubiger@cpan.org>
+
+ - Handle substitution of form feeds/tabs.
+
+ - Trim whitespace at begin/end of text.
+
+ - Convert multiple spaces to single ones.
+
+ - Rename subst_newlines() to subst_to_spaces().
+
+ - subst_to_spaces(): amend naming of variable.
+
+ - Add/adjust tests.
+
+0.06_01  2021-04-30  <schubiger@cpan.org>
+
+ - Tweak subst_newlines().
+
 0.06  2011-09-12  <schubiger@cpan.org>
 
  - Merged development version to stable.

@@ -18,10 +18,10 @@ my $ref = holidays( 2019 );
 ok $ref->{ '0101' }, 'ny';
 is $ref->{ '0102' }, undef, 'not ny before 2020';
 
-my $ref = holidays( 9001 );
+my $ref = holidays( 5201 );
 ok $ref->{ '0101' }, 'ny';
 ok $ref->{ '0102' }, 'ny';
 ok $ref->{ '0308' }, 'women day';
-ok $ref->{ '0101' }, 'new year';
-is $ref->{ '0310' }, undef, 'bad luck';
+ok $ref->{ '0522' }, 'radonitsa';
+is $ref->{ '0312' }, undef, 'bad luck';
 

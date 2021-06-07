@@ -8,13 +8,13 @@ build_requires:
   File::Temp: '0'
   FindBin: '0'
   Module::Build: '0.28'
-  Test::More: '0.94'
+  Test::More: '0.98'
   open: '0'
   utf8: '0'
 configure_requires:
   Module::Build: '0.28'
 dynamic_config: '1'
-generated_by: 'Dist::Zilla version 5.039, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Dist::Zilla version 6.017, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -24,6 +24,11 @@ requires:
   perl: '5.008'
 resources:
   bugtracker: https://github.com/plicease/Archive-Libarchive-Any/issues
-  homepage: http://perl.wdlabs.com/Archive-Libarchive-Any
+  homepage: https://metacpan.org/pod/Archive::Libarchive::Any
   repository: git://github.com/plicease/Archive-Libarchive-Any.git
-version: '0.0900'
+version: '0.0901'
+x_deprecated: 1
+x_generated_by_perl: v5.34.0
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'
+x_use_unsafe_inc: 0

@@ -1,23 +1,21 @@
+bin/makerandom
 Changes
-MANIFEST
-README
-
-Makefile.PL
-
+Crypt-Random-1.53.tar.gz
 lib/Crypt/Random.pm
 lib/Crypt/Random/Generator.pm
-lib/Crypt/Random/Provider/File.pm
 lib/Crypt/Random/Provider/devrandom.pm
 lib/Crypt/Random/Provider/devurandom.pm
 lib/Crypt/Random/Provider/egd.pm
+lib/Crypt/Random/Provider/File.pm
 lib/Crypt/Random/Provider/rand.pm
-
-bin/makerandom
+Makefile.PL
+MANIFEST
+META.json			Module JSON meta-data (added by MakeMaker)
+META.yml			Module meta-data (added by MakeMaker)
+README
+t/chisquare.t
+t/generator.t
 t/makerandom_itv.t
+t/octet_string.t
 t/pari_misfeature.t
 t/random.t
-t/octet_string.t
-t/generator.t
-
-META.yml                                 Module meta-data (added by MakeMaker)
-META.json                                Module JSON meta-data (added by MakeMaker)

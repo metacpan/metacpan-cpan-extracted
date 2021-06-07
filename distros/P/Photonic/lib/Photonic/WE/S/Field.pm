@@ -1,5 +1,5 @@
 package Photonic::WE::S::Field;
-$Photonic::WE::S::Field::VERSION = '0.015';
+$Photonic::WE::S::Field::VERSION = '0.016';
 
 =encoding UTF-8
 
@@ -9,7 +9,7 @@ Photonic::WE::S::Field
 
 =head1 VERSION
 
-version 0.015
+version 0.016
 
 =head1 COPYRIGHT NOTICE
 
@@ -63,7 +63,7 @@ Initializes the structure.
 
 $nr Photonic::WE::S::AllH is a Haydock calculator for the
 structure, *initialized* with the flag keepStates=>1
-(Photonic::Types::WE::S::AllHSave, as defined in Photonic::Types).
+(Photonic::Types::AllHSave, as defined in Photonic::Types).
 
 $nh is the maximum number of Haydock coefficients to use.
 
@@ -77,7 +77,7 @@ dielectric functions of the host $epsA and the particle $epsB.
 
 =back
 
-=head1 ACCESORS (read only)
+=head1 ACCESSORS (read only)
 
 =over 4
 
@@ -140,19 +140,19 @@ use PDL::NiceSlice;
 use PDL::Complex;
 use PDL::FFTW3;
 use Photonic::WE::S::AllH;
-use Photonic::ExtraUtils qw(cgtsv);
+use Photonic::Utils qw(cgtsv);
 use Photonic::Types;
 use Photonic::Iterator;
 use Moose;
 use MooseX::StrictConstructor;
 
-has 'nr'=>(is=>'ro', isa=>'Photonic::Types::WE::S::AllHSave', required=>1,
+has 'nr'=>(is=>'ro', isa=>'Photonic::Types::AllHSave', required=>1,
            documentation=>'Haydock recursion calculator');
-has 'Es'=>(is=>'ro', isa=>'ArrayRef[PDL::Complex]', init_arg=>undef,
+has 'Es'=>(is=>'ro', isa=>'ArrayRef[Photonic::Types::PDLComplex]', init_arg=>undef,
            writer=>'_Es', documentation=>'Field coefficients');
 has 'filter'=>(is=>'ro', isa=>'PDL', predicate=>'has_filter',
                documentation=>'Optional reciprocal space filter');
-has 'field'=>(is=>'ro', isa=>'PDL::Complex', init_arg=>undef,
+has 'field'=>(is=>'ro', isa=>'Photonic::Types::PDLComplex', init_arg=>undef,
            writer=>'_field', documentation=>'Calculated real space field');
 has 'nh' =>(is=>'ro', isa=>'Num', required=>1,
 	    documentation=>'Desired no. of Haydock coefficients');
@@ -160,11 +160,11 @@ has 'smallH'=>(is=>'ro', isa=>'Num', required=>1, default=>1e-7,
     	    documentation=>'Convergence criterium for Haydock coefficients');
 has 'smallE'=>(is=>'ro', isa=>'Num', required=>1, default=>1e-7,
     	    documentation=>'Convergence criterium for use of Haydock coeff.');
-#has 'epsA'=>(is=>'ro', isa=>'PDL::Complex', init_arg=>undef, writer=>'_epsA',
+#has 'epsA'=>(is=>'ro', isa=>'Photonic::Types::PDLComplex', init_arg=>undef, writer=>'_epsA',
 #    documentation=>'Dielectric function of host');
-#has 'epsB'=>(is=>'ro', isa=>'PDL::Complex', init_arg=>undef, writer=>'_epsB',
+#has 'epsB'=>(is=>'ro', isa=>'Photonic::Types::PDLComplex', init_arg=>undef, writer=>'_epsB',
 #        documentation=>'Dielectric function of inclusions');
-#has 'u'=>(is=>'ro', isa=>'PDL::Complex', init_arg=>undef, writer=>'_u',
+#has 'u'=>(is=>'ro', isa=>'Photonic::Types::PDLComplex', init_arg=>undef, writer=>'_u',
 #    documentation=>'Spectral variable');
 
 sub BUILD {
@@ -194,19 +194,16 @@ sub evaluate {
     $rhs->slice((0)).=1;
     $rhs=$rhs->r2C;
     #coefficients of g^{-1}E
-    my ($giEs_coeff, $info)= cgtsv($subdiag, $diag, $supradiag, $rhs);
-    die "Error solving tridiag system" unless $info == 0;
-    #
-    my @giEs= map {PDL->pdl($_)->complex} @{$giEs_coeff->unpdl};
+    my $giEs= cgtsv($subdiag, $diag, $supradiag, $rhs);
     #states are ri,xy,pm,nx,ny...
-    my $ndims=$self->nr->B->ndims; # num. of dims of space
     my @dims=$self->nr->B->dims; # actual dims of space
+    my $ndims=@dims; # num. of dims of space
     #field is ri,xy,pm,nx,ny...
-    my $field_G=PDL->zeroes(2, $ndims, 2, @dims)->complex;
+    my $field_G=PDL->zeroes($ndims, 2, @dims)->r2C;
     #print $field_G->info, "\n";
     #field is ri,xy,pm,nx,ny...
     for(my $n=0; $n<$nh; ++$n){
-	my $giE_G=$giEs[$n]*$stateit->nextval; #En ^G|psi_n>
+	my $giE_G=$giEs->(:,$n)*$stateit->nextval; #En ^G|psi_n>
 	$field_G+=$giE_G;
     }
     #
@@ -221,7 +218,7 @@ sub evaluate {
     ##filter RandI for each cartesian
     $Esp *= $self->filter->(*1) if $self->has_filter;
     ##get cartesian out of the way, fourier transform, put cartesian.
-    my $field_R=ifftn($Esp->mv(1,-1)->real, $ndims)->mv(-1,1)->complex;
+    my $field_R=ifftn($Esp->mv(1,-1), $ndims)->mv(-1,1);
     $field_R*=$self->nr->B->nelem; #scale to have unit macroscopic field
     #result is ri,xy,nx,ny...
     $self->_field($field_R);

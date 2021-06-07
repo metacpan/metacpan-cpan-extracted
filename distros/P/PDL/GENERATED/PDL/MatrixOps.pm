@@ -153,21 +153,22 @@ use strict;
 
 Return an identity matrix of the specified size.  If you hand in a
 scalar, its value is the size of the identity matrix; if you hand in a
-dimensioned PDL, the 0th dimension is the size of the matrix.
+dimensioned PDL, the 0th dimension is the first two dimensions of the
+matrix, with higher dimensions preserved.
 
 =cut
 
 sub identity {
   my $n = shift;
-  my $out = ((UNIVERSAL::isa($n,'PDL')) ? 
-	  (  ($n->getndims > 0) ? 
-	     zeroes($n->dim(0),$n->dim(0)) : 
-	     zeroes($n->at(0),$n->at(0))
-	  ) :
-	  zeroes($n,$n)
-	  );
-  my $tmp; # work around perl -d "feature"
-  ($tmp = $out->diagonal(0,1))++;
+  my $out =
+    !UNIVERSAL::isa($n,'PDL') ? zeroes($n,$n) :
+    $n->getndims == 0 ? zeroes($n->at(0),$n->at(0)) :
+    undef;
+  if (!defined $out) {
+    my @dims = $n->dims;
+    $out = zeroes(@dims[0, 0, 2..$#dims]);
+  }
+  (my $tmp = $out->diagonal(0,1))++; # work around perl -d "feature"
   $out;
 }
 
@@ -285,9 +286,7 @@ sub inv {
     barf("PDL::inv: got a singular matrix or LU decomposition\n");
   }
 
-  my $idenA = $x->zeros;
-  $idenA->diagonal(0,1) .= 1;
-  my $out = lu_backsub($lu,$perm,$par,$idenA)->xchg(0,1)->sever;
+  my $out = lu_backsub($lu,$perm,$par,identity($x))->transpose->sever;
 
   return $out
     unless($x->is_inplace);
@@ -455,7 +454,7 @@ sub determinant {
 
 Eigenvalues and -vectors of a symmetric square matrix.  If passed
 an asymmetric matrix, the routine will warn and symmetrize it, by taking
-the average value.  That is, it will solve for 0.5*($a+$a->mv(0,1)).
+the average value.  That is, it will solve for 0.5*($a+$a->transpose).
 
 It's threadable, so if C<$a> is 3x3x100, it's treated as 100 separate 3x3
 matrices, and both C<$ev> and C<$e> get extra dimensions accordingly.
@@ -501,7 +500,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
       barf "Need real square matrix for eigens_sym" 
             if $#d < 1 or $d[0] != $d[1];
       my ($n) = $d[0];
-      my ($sym) = 0.5*($x + $x->mv(0,1));
+      my ($sym) = 0.5*($x + $x->transpose);
       my ($err) = PDL::max(abs($sym));
       barf "Need symmetric component non-zero for eigens_sym"
           if $err == 0;
@@ -523,7 +522,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
       
       &PDL::_eigens_sym_int($lt, $ev, $e);
 
-      return $ev->xchg(0,1), $e
+      return $ev->transpose, $e
 	if(wantarray);
       $e;                #just eigenvalues
    }
@@ -618,7 +617,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
       my $n = $d[0];
       barf "Need real square matrix for eigens" 
             if $#d < 1 or $d[0] != $d[1];
-      my $deviation = PDL::max(abs($x - $x->mv(0,1)))/PDL::max(abs($x));
+      my $deviation = PDL::max(abs($x - $x->transpose))/PDL::max(abs($x));
       if ( $deviation <= 1e-5 ) {
           #taken from eigens_sym code
 
@@ -631,7 +630,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
       
           &PDL::_eigens_sym_int($lt, $ev, $e);
 
-          return $ev->xchg(0,1), $e   if wantarray;
+          return $ev->transpose, $e   if wantarray;
           return $e;  #just eigenvalues
       }
       else {
@@ -652,7 +651,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
           &PDL::_eigens_int($x->clump(0,1), $ev, $e);
 
-          return $ev->index(0)->xchg(0,1)->sever, $e->index(0)->sever
+          return $ev->index(0)->transpose->sever, $e->index(0)->sever
               if(wantarray);
           return $e->index(0)->sever;  #just eigenvalues
       }
@@ -851,7 +850,7 @@ sub lu_decomp {
       $parity = $in->((0),(0))->ones;
    }
 
-   my($scales) = $in->abs->maximum; # elementwise by rows
+   my($scales) = $in->copy->abs->maximum; # elementwise by rows
 
    if(($scales==0)->sum) {
       return undef;
@@ -1075,28 +1074,28 @@ Solve A x = B for matrix A, by back substitution into A's LU decomposition.
 
   # using lu_backsub
   ($lu,$perm,$par) = lu_decomp($A);
-  $x = lu_backsub($lu,$perm,$par, $B->xchg(0,1))->xchg(0,1);
+  $x = lu_backsub($lu,$perm,$par, $B->transpose)->transpose;
 
   # or with Slatec LINPACK
   use PDL::Slatec;
   gefa($lu=$A->copy, $ipiv=null, $info=null);
   # 1 = do transpose because Fortran's idea of rows vs columns
-  gesl($lu, $ipiv, $x=$B->xchg(0,1)->copy, 1);
-  $x = $x->inplace->xchg(0,1);
+  gesl($lu, $ipiv, $x=$B->transpose->copy, 1);
+  $x = $x->inplace->transpose;
 
   # or with LAPACK
   use PDL::LinearAlgebra::Real;
   getrf($lu=$A->copy, $ipiv=null, $info=null);
-  getrs($lu, 1, $x=$B->xchg(0,1)->copy, $ipiv, $info=null); # again, need transpose
-  $x=$x->inplace->xchg(0,1);
+  getrs($lu, 1, $x=$B->transpose->copy, $ipiv, $info=null); # again, need transpose
+  $x=$x->inplace->transpose;
 
   # or with GSL
   use PDL::GSL::LINALG;
   LU_decomp(my $lu=$A->copy, my $p=null, my $signum=null);
   # $B and $x, first dim is because GSL treats as vector, higher dims thread
   # so we transpose in and back out
-  LU_solve($lu, $p, $B->xchg(0,1), my $x=null);
-  $x=$x->inplace->xchg(0,1);
+  LU_solve($lu, $p, $B->transpose, my $x=null);
+  $x=$x->inplace->transpose;
 
   # proof of the pudding is in the eating:
   print $A x $x;
@@ -1208,22 +1207,8 @@ sub lu_backsub {
 THREAD_OK:
 
    # Permute the vector and make a copy if necessary.
-   my $out;
-   # my $nontrivial = ! (($perm==(PDL->xvals($perm->dims)))->all);
-   my $nontrivial = ! (($perm==$perm->xvals)->clump(-1)->andover);
-
-   if($nontrivial) {
-      if($y->is_inplace) {
-         $y .= $y->dummy(1,$y->dim(0))->index($perm->dummy(1,1))->sever;   # TODO: check threading
-         $out = $y;
-      } else {
-         $out = $y->dummy(1,$y->dim(0))->index($perm->dummy(1,1))->sever;  # TODO: check threading
-      }
-   } else {
-      # should check for more matrix dims to thread over
-      # but ignore the issue for now
-      $out = ($y->is_inplace ? $y : $y->copy);
-   }
+   my $out = $y->dummy(1,$y->dim(0))->index($perm->dummy(1));
+   $out = $out->sever if !$y->is_inplace;
    print STDERR "lu_backsub: starting with \$out" . pdl($out->dims) . "\n" if $PDL::debug;
 
    # Make sure threading over lu happens OK...
@@ -1233,7 +1218,6 @@ THREAD_OK:
       do {
          $out = $out->dummy(-1,$lu->dim($out->ndims+1));
       } while($out->ndims < $lu->ndims-1);
-      $out = $out->sever;
    }
 
    ## Do forward substitution into L
@@ -1251,7 +1235,7 @@ THREAD_OK:
    my $ludiag = $lu->diagonal(0,1);
    {
       my $tmp; # work around for perl -d "feature"
-      ($tmp = $out->index($n1)) /= $ludiag->index($n1)->dummy(0,1);        # TODO: check threading
+      ($tmp = $out->index($n1)) /= $ludiag->index($n1)->dummy(0);        # TODO: check threading
    }
 
    for ($row=$n1; $row>0; $row--) {
@@ -1260,9 +1244,13 @@ THREAD_OK:
       ($tmp = $out->index($r1)) -= ($lu->($row:$n1,$r1) *                  # TODO: check thread dims
          $out->($row:$n1)
       )->sumover;
-      ($tmp = $out->index($r1)) /= $ludiag->index($r1)->dummy(0,1);        # TODO: check thread dims
+      ($tmp = $out->index($r1)) /= $ludiag->index($r1)->dummy(0);        # TODO: check thread dims
    }
 
+   if ($y->is_inplace) {
+     $y->setdims([$out->dims]) if !PDL::all($y->shape == $out->shape); # assgn needs same shape
+     $y .= $out;
+   }
    $out;
 }
 
@@ -1352,20 +1340,6 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 ;
-
-
-sub eigen_c {
-	print STDERR "eigen_c is no longer part of PDL::MatrixOps or PDL::Math; use eigens instead.\n";
-
-##	my($mat) = @_;
-##	my $s = $mat->getdim(0);
-##	my $z = zeroes($s * ($s+1) / 2);
-##	my $ev = zeroes($s);
-##	squaretotri($mat,$z);
-##	my $k = 0 * $mat;
-##	PDL::eigens($z, $k, $ev);
-##	return ($ev, $k);
-}
 
 
 =head1 AUTHOR

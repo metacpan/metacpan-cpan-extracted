@@ -454,7 +454,8 @@ method _sort_sig (ArrayRef :$sig!) {
 }
 
 method _get_method_sigx (Bool :$exclude_autoinc = 0,
-						 Bool :$want_order_by = 0) {
+						 Bool :$want_order_by = 0,
+						 Bool :$want_limit = 0) {
 
 	my @sig = $self->_get_method_sig_array(
 		exclude_autoinc => $exclude_autoinc,
@@ -480,6 +481,11 @@ method _get_method_sigx (Bool :$exclude_autoinc = 0,
 		my $line = sprintf '    %s :%s%s', 'ArrayRef', '$', 'order_by';
 		push @sig, $line;
 	}
+	
+	if($want_limit) {
+        my $line = sprintf '    %s :%s%s', 'Num|Undef', '$', 'limit';
+        push @sig, $line;
+    }
 
 	return join( ",\n", @sig );
 }
@@ -616,6 +622,10 @@ method _get_method_selectx {
 				}
 				$sql.= "order by " . join(', ', @order);
 			}
+			
+			if ($limit) {
+			    $sql.=" limit $limit";
+			}
 		
 			my $sth = $self->dbh->prepare($sql);
 			$sth->execute(@bind);
@@ -631,7 +641,7 @@ method _get_method_selectx {
 
 	return $self->method_maker->make_method(
 		name => 'selectx',
-		sig  => $self->_get_method_sigx( want_order_by => 1 ),
+		sig  => $self->_get_method_sigx( want_order_by => 1, want_limit => 1 ),
 		body => join( "\n", @body )
 	);
 }
@@ -714,6 +724,7 @@ method _get_method_sig_array (
 	                ArrayRef :$columns = [],
 			            Bool :$exclude_autoinc = 0, 
 	  				    Bool :$want_order_by = 0,
+	  				    Bool :$want_limit = 0,
 	MySQL::Util::Lite::Table :$table
 ) {
 
@@ -749,6 +760,11 @@ method _get_method_sig_array (
 		my $line = sprintf '    %s :%s%s', 'ArrayRef', '$', 'order_by';
 		push @sig, $line;
 	}
+	
+	if($want_limit) {
+	    my $line = sprintf '    %s :%s%s', 'Num|Undef', '$', 'limit';
+        push @sig, $line;
+	}
 
 	return @sig;
 }
@@ -756,6 +772,7 @@ method _get_method_sig_array (
 method _get_method_sig ( ArrayRef :$columns = [],
 					     Bool :$exclude_autoinc = 0, 
 						 Bool :$want_order_by = 0,
+						 Bool :$want_limit = 0,
 						 ) {
 
 	return join( ",\n", $self->_get_method_sig_array(@_) );
@@ -763,14 +780,14 @@ method _get_method_sig ( ArrayRef :$columns = [],
 
 method _get_method_select {
 
-	my $sig = $self->_get_method_sig( want_order_by => 1 );
+	my $sig = $self->_get_method_sig( want_order_by => 1, want_limit => 1 );
 
 	my $body .= q{
     	my %a = @_;
     	my %where;
 
     	foreach my $arg (keys %a) {
-    		next if $arg eq 'order_by';
+    		next if $arg eq 'order_by' || $arg eq 'limit';
        		$where{$arg} = $a{$arg}; 
     	}
 	   
@@ -778,6 +795,7 @@ method _get_method_select {
 	    $s{table} = $self->table_name;
 	    $s{where} = \%where;
 	    $s{order_by} = $order_by if $order_by;
+	    $s{other}    = { limit => $limit } if $limit;
 	     
     	my $rows = $self->SUPER::select(%s);
 

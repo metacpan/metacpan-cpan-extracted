@@ -7,13 +7,15 @@
 # dovix <dovix2003@yahoo.com>, 2003-2005
 # el-cuco <cuco3001@yahoo.com>, 2003
 # lev polvoi <lev@israsrv.net.il>, 2003
-# Omer I.S. <omeritzicschwartz@gmail.com>, 2020
+# Omeritzics Games <omeritzicschwartz@gmail.com>, 2020-2021
+# Omeritzics Games <omeritzicschwartz@gmail.com>, 2020-2021
+# Yaron Shahrabani <sh.yaron@gmail.com>, 2021
 msgid ""
 msgstr ""
 "Project-Id-Version: Mageia\n"
 "POT-Creation-Date: 2020-07-10 17:41+0100\n"
-"PO-Revision-Date: 2020-11-21 21:30+0000\n"
-"Last-Translator: Omer I.S. <omeritzicschwartz@gmail.com>\n"
+"PO-Revision-Date: 2021-05-12 18:32+0000\n"
+"Last-Translator: Omeritzics Games <omeritzicschwartz@gmail.com>\n"
 "Language-Team: Hebrew (http://www.transifex.com/MageiaLinux/mageia/language/"
 "he/)\n"
 "Language: he\n"
@@ -41,7 +43,7 @@ msgstr "נא להמתין..."
 #: ../gurpm/RPMProgressDialog.pm:290
 #, c-format
 msgid "Verifying package signatures..."
-msgstr "כעת בבדיקת חתימות החבילות..."
+msgstr "חתימות החבילות נבדקות..."
 
 #: ../gurpm/RPMProgressDialog.pm:309 ../urpm/install.pm:108
 #, c-format
@@ -56,7 +58,7 @@ msgstr "כעת בהסרת החבילה „%s”..."
 #: ../gurpm/RPMProgressDialog.pm:316
 #, c-format
 msgid "Installing package `%s' (%s/%s)..."
-msgstr "כעת בהתקנת החבילה „%s” (%s/%s)..."
+msgstr "כעת בהתקנת החבילה „%s”‏ (‏‏%s/%s)..."
 
 #: ../gurpm/RPMProgressDialog.pm:345
 #, c-format
@@ -73,12 +75,12 @@ msgstr "ביטול"
 #: ../urpm/media.pm:1833
 #, c-format
 msgid "...retrieving failed: %s"
-msgstr "...האחזור כשל: %s"
+msgstr "...האחזור נכשל: %s"
 
 #: ../gurpmi:50
 #, c-format
 msgid "RPM installation"
-msgstr "התקנת חבילות תוכנה"
+msgstr "התקנה מ־RPM"
 
 #: ../gurpmi:64
 #, c-format
@@ -88,7 +90,7 @@ msgstr "שגיאה: אין אפשרות למצוא את הקובץ %s, הפעו�
 #: ../gurpmi:65 ../gurpmi2:174 ../gurpmi2:203
 #, c-format
 msgid "_Ok"
-msgstr "_המשך"
+msgstr "אי_שור"
 
 #: ../gurpmi:85
 #, c-format
@@ -194,7 +196,7 @@ msgstr "  --auto-select  - לבחור אוטומטית את החבילות לש�
 #, c-format
 msgid ""
 "  --force        - force invocation even if some packages do not exist.\n"
-msgstr "  --force        - אלץ הפעלה גם אם חלק מהחבילות חסרות.\n"
+msgstr "  --force        - לאלץ הפעלה גם אם חלק מהחבילות חסרות.\n"
 
 #: ../gurpmi.pm:61 ../urpmi:131
 #, c-format
@@ -208,7 +210,7 @@ msgstr ""
 #: ../gurpmi.pm:63 ../urpmf:36 ../urpmi:68 ../urpmq:43
 #, c-format
 msgid "  --media        - use only the given media, separated by comma.\n"
-msgstr "  --media        - שימוש רק במקורות המסופקים, מופרדים ע\"י פסיק\n"
+msgstr "  --media        - שימוש במאגרים הנתונים בלבד, הפרדתם באמצעות פסיק\n"
 
 #: ../gurpmi.pm:64 ../urpmi:147
 #, c-format
@@ -236,7 +238,7 @@ msgstr "  --test         - רק וידוא שהתקנת החבילה יכולה 
 #, c-format
 msgid ""
 "  --searchmedia  - use only the given media to search requested packages.\n"
-msgstr "  --searchmedia  - השתמש רק במקור הנתון לחיפוש החבילות המבוקשות.\n"
+msgstr "  --searchmedia  - שימוש במאגר הנתון בלבד לחיפוש החבילות המבוקשות.\n"
 
 #: ../gurpmi.pm:115
 #, c-format
@@ -246,12 +248,12 @@ msgstr "לא צוינו חבילות"
 #: ../gurpmi2:47
 #, c-format
 msgid "Must be root"
-msgstr "יש להיות משתמש־על"
+msgstr "נדרשות הרשאות משתמש שורש (root)"
 
 #: ../gurpmi2:77
 #, c-format
 msgid "Preparing packages installation..."
-msgstr "כעת בהכנת חבילות להתקנה..."
+msgstr "החבילות להתקנה בהכנה..."
 
 #: ../gurpmi2:92 ../urpmi:506
 #, c-format
@@ -286,7 +288,7 @@ msgstr " (לשדרוג)"
 #: ../gurpmi2:171
 #, c-format
 msgid " (to install)"
-msgstr " (להתקין)"
+msgstr " (להתקנה)"
 
 #: ../gurpmi2:174
 #, c-format
@@ -301,7 +303,7 @@ msgstr "אחת החבילות הבאות נדרשת:"
 #: ../gurpmi2:204
 #, c-format
 msgid "_Abort"
-msgstr "_בטל"
+msgstr "_ביטול"
 
 #: ../gurpmi2:239
 #, c-format
@@ -317,17 +319,17 @@ msgstr ""
 #: ../gurpmi2:250 ../urpmi:617
 #, c-format
 msgid "%s of additional disk space will be used."
-msgstr "יעשה שימוש ב-%s שטח כונן נוסף."
+msgstr "%s נוספים משטח הכונן ינוצלו."
 
 #: ../gurpmi2:251 ../urpmi:618
 #, c-format
 msgid "%s of disk space will be freed."
-msgstr "%s שטח בכונן יפונה."
+msgstr "%s יפונו מתוך שטח הכונן."
 
 #: ../gurpmi2:252 ../urpmi:619
 #, c-format
 msgid "%s of packages will be retrieved."
-msgstr "%s של חבילות יאוחזרו."
+msgstr "%s חבילות יאוחזרו."
 
 #: ../gurpmi2:253 ../urpmi:620
 #, c-format
@@ -358,7 +360,7 @@ msgstr "אין אפשרות לקרוא חבילות מהמאגר, הפעולה �
 #: ../gurpmi2:287 ../urpmi:636
 #, c-format
 msgid "Please insert the medium named \"%s\""
-msgstr "נא להכניס את המדיה בשם \"%s\""
+msgstr "נא להכניס את אמצעי ההתקנה בשם \"%s\""
 
 #: ../gurpmi2:307
 #, c-format
@@ -376,6 +378,8 @@ msgid ""
 "Installation failed, some files are missing:\n"
 "%s"
 msgstr ""
+"ההתקנה נכשלה, חלק מהקבצים חסרים:\n"
+"%s"
 
 #: ../gurpmi2:339
 #, c-format
@@ -400,7 +404,7 @@ msgstr "ההתקנה הסתיימה"
 #: ../gurpmi2:363 ../urpmi:694
 #, c-format
 msgid "restarting urpmi"
-msgstr "מפעיל מחדש את urpmi"
+msgstr "כעת בהפעלת urpmi מחדש"
 
 #: ../gurpmi2:386
 #, c-format
@@ -464,7 +468,7 @@ msgstr ""
 #: ../urpm.pm:195
 #, c-format
 msgid "fail to create directory %s"
-msgstr "כישלון ביצירת התיקייה %s"
+msgstr "יצירת התיקייה %s נכשלה"
 
 #: ../urpm.pm:196
 #, c-format
@@ -494,7 +498,7 @@ msgstr "אין אפשרות לפתוח את בסיס הנתונים של החב�
 #: ../urpm.pm:443
 #, c-format
 msgid "invalid rpm file name [%s]"
-msgstr "שם החבילה [%s] אינו תקין"
+msgstr "שם לא תקין לחבילת RPM ‏[%s]"
 
 #: ../urpm.pm:449
 #, c-format
@@ -519,17 +523,17 @@ msgstr "אין אפשרות לפענח את קובץ המפרט %s [%s]"
 #: ../urpm.pm:472
 #, c-format
 msgid "unable to register rpm file"
-msgstr "אין אפשרות לבצע רישום של החבילה"
+msgstr "אין אפשרות לרשום את קובץ ה־rpm"
 
 #: ../urpm.pm:474
 #, c-format
 msgid "Incompatible architecture for rpm [%s]"
-msgstr "האריכטקטורה אינה תואמת את חבילת התוכנה [%s]"
+msgstr "הארכיטקטורה אינה תואמת את rpm ‏[%s]"
 
 #: ../urpm.pm:478
 #, c-format
 msgid "error registering local packages"
-msgstr "חלה שגיאה בעת רישום חבילות מקומיות"
+msgstr "שגיאה ברישום חבילות מקומיות"
 
 #: ../urpm.pm:590
 #, c-format
@@ -589,7 +593,7 @@ msgstr "לא ניתן להשתמש ב-%s עם %s"
 #: ../urpm/args.pm:520
 #, c-format
 msgid "Too many arguments\n"
-msgstr "יותר מדי משתנים\n"
+msgstr "יותר מדי ארגומנטים\n"
 
 #: ../urpm/args.pm:528
 #, c-format
@@ -601,10 +605,10 @@ msgid ""
 "\n"
 "usage:\n"
 msgstr ""
-"גרסת %s %s\n"
+"גרסה %s של %s\n"
 "%s\n"
-"זוהי תוכנה חופשית וניתן להפיצה בהתאם לתנאי הרישיון GNU GPL.\n"
-"\n"
+"זוהי תכנה חופשית ויש להפיצה מחדש תחת התנאים של הרישיון הציבורי הכללי של "
+"GNU.\n"
 "\n"
 "שימוש:\n"
 
@@ -616,7 +620,7 @@ msgstr "זכויות היוצרים (C) ‏%s שמורות ל־%s"
 #: ../urpm/bug_report.pm:67 ../urpmi:256
 #, c-format
 msgid "Copying failed"
-msgstr "ההעתקה כשלה"
+msgstr "ההעתקה נכשלה"
 
 #: ../urpm/cdrom.pm:79
 #, c-format
@@ -673,7 +677,7 @@ msgstr ""
 #: ../urpm/download.pm:201
 #, c-format
 msgid "Please enter your credentials for accessing proxy\n"
-msgstr "עליך להגדיר את פרטי ההתחברות לשרת המתווך\n"
+msgstr "נא לספק את פרטי ההתחברות לשרת המתווך\n"
 
 #: ../urpm/download.pm:202
 #, c-format
@@ -683,7 +687,7 @@ msgstr "שם משתמש:"
 #: ../urpm/download.pm:202
 #, c-format
 msgid "Password:"
-msgstr "ססמה:"
+msgstr "סיסמה:"
 
 #: ../urpm/download.pm:288
 #, c-format
@@ -703,7 +707,7 @@ msgstr "%s כשל: הסתיים עם %d"
 #: ../urpm/download.pm:331
 #, c-format
 msgid "copy failed"
-msgstr "ההעתקה כשלה"
+msgstr "ההעתקה נכשלה"
 
 #: ../urpm/download.pm:337
 #, c-format
@@ -743,7 +747,7 @@ msgstr "לא ניתן להפעיל את prozilla\n"
 #: ../urpm/download.pm:687
 #, c-format
 msgid "aria2 is missing\n"
-msgstr ""
+msgstr "‏aria2 חסר\n"
 
 #: ../urpm/download.pm:736
 #, c-format
@@ -753,7 +757,7 @@ msgstr "כשל בהורדת %s"
 #: ../urpm/download.pm:854
 #, c-format
 msgid "        %s%% of %s completed, ETA = %s, speed = %s"
-msgstr "        %s%% מ-%s הושלמו, זמן נותר = %s, מהירות = %s"
+msgstr "        %s%% מתוך %s הושלמו, זמן נותר = %s, מהירות = %s"
 
 #: ../urpm/download.pm:855
 #, c-format
@@ -763,7 +767,7 @@ msgstr "        %s%% הורדו, מהירות = %s"
 #: ../urpm/download.pm:940
 #, c-format
 msgid "retrieving %s"
-msgstr "מאחזר %s"
+msgstr "כעת באחזור %s"
 
 #: ../urpm/download.pm:958
 #, c-format
@@ -788,7 +792,7 @@ msgstr "אין אפשרות לטפל בפרוטוקול: %s"
 #: ../urpm/get_pkgs.pm:28
 #, c-format
 msgid "cleaning %s and %s"
-msgstr "מנקה את %s ואת %s"
+msgstr "כעת בניקוי %s ו־%s"
 
 #: ../urpm/get_pkgs.pm:140
 #, c-format
@@ -818,12 +822,12 @@ msgstr "אין אפשרות להתקין את החבילה %s"
 #: ../urpm/install.pm:248
 #, c-format
 msgid "removing bad rpm (%s) from %s"
-msgstr "מסיר חבילה תקולה (%s) מתוך %s"
+msgstr "כעת בהסרת חבילת RPM פגומה (%s) מתוך %s"
 
 #: ../urpm/install.pm:249 ../urpm/install.pm:397
 #, c-format
 msgid "removing %s failed: %s"
-msgstr "הסרת %s כשלה: %s"
+msgstr "הסרת %s נכשלה: %s"
 
 #: ../urpm/install.pm:298
 #, c-format
@@ -844,7 +848,7 @@ msgstr "אין אפשרות לבצע את ההעברה"
 #: ../urpm/install.pm:395
 #, c-format
 msgid "removing installed rpms (%s) from %s"
-msgstr "מסיר חבילות מותקנות (%s) מתוך %s"
+msgstr "כעת בהסרת חבילות מותקנות (%s) מתוך %s"
 
 #: ../urpm/install.pm:404
 #, c-format
@@ -889,12 +893,12 @@ msgstr ""
 #: ../urpm/lock.pm:114
 #, c-format
 msgid "%s database is locked. Waiting..."
-msgstr "מסד הנתונים %s נעול. כעת בהמתנה..."
+msgstr "מסד הנתונים %s נעול. בהמתנה..."
 
 #: ../urpm/lock.pm:115
 #, c-format
 msgid "aborting"
-msgstr "כעת בנטישה"
+msgstr "כעת בביטול"
 
 #: ../urpm/main_loop.pm:58
 #, c-format
@@ -912,7 +916,7 @@ msgid ""
 "Installation failed, bad rpms:\n"
 "%s"
 msgstr ""
-"ההתקנה כשלה, חבילות תקולות:\n"
+"ההתקנה כשלה, חבילות RPM פגומות:\n"
 "%s"
 
 #: ../urpm/main_loop.pm:108
@@ -936,28 +940,28 @@ msgstr "לחבילות הבאות יש בעיה בחתימות"
 #: ../urpm/main_loop.pm:140
 #, c-format
 msgid "Do you want to continue installation ?"
-msgstr "האם להמשיך בתהליך ההתקנה?"
+msgstr "האם להמשיך בהתקנה ?"
 
 #: ../urpm/main_loop.pm:155 ../urpm/main_loop.pm:184 ../urpm/main_loop.pm:291
 #: ../urpm/main_loop.pm:299
 #, c-format
 msgid "Installation failed"
-msgstr "ההתקנה כשלה"
+msgstr "ההתקנה נכשלה"
 
 #: ../urpm/main_loop.pm:159
 #, c-format
 msgid "removing installed rpms (%s)"
-msgstr "מסיר חבילות מותקנות (%s)"
+msgstr "כעת בהסרת חבילות מותקנות (%s)"
 
 #: ../urpm/main_loop.pm:185
 #, c-format
 msgid "Try to continue anyway?"
-msgstr ""
+msgstr "לנסות להמשיך בכל זאת?"
 
 #: ../urpm/main_loop.pm:237
 #, c-format
 msgid "installing %s from %s"
-msgstr "מתקין את %s מתוך %s"
+msgstr "כעת בהתקנת %s מתוך %s"
 
 #: ../urpm/main_loop.pm:239
 #, c-format
@@ -972,12 +976,12 @@ msgstr "מפיץ %s"
 #: ../urpm/main_loop.pm:292
 #, c-format
 msgid "Try installation without checking dependencies?"
-msgstr ""
+msgstr "לנסות להתקין בלי לבדוק את התלויות?"
 
 #: ../urpm/main_loop.pm:300
 #, c-format
 msgid "Try harder to install (--force)?"
-msgstr ""
+msgstr "לנסות לכפות את ההתקנה (‎--force‏)?"
 
 #: ../urpm/main_loop.pm:591
 #, c-format
@@ -987,7 +991,7 @@ msgstr "החבילות עדכניות"
 #: ../urpm/main_loop.pm:602 ../urpm/parallel.pm:340
 #, c-format
 msgid "Installation is possible"
-msgstr "ניתן לבצע את ההתקנה"
+msgstr "ההתקנה אפשרית"
 
 #: ../urpm/md5sum.pm:55
 #, c-format
@@ -1073,7 +1077,7 @@ msgstr "תחילת חיפוש: %s סיום: %s"
 #: ../urpm/media.pm:861
 #, c-format
 msgid "skipping package %s"
-msgstr "מדלג על חבילה %s"
+msgstr "דילוג על החבילה %s"
 
 #: ../urpm/media.pm:877
 #, c-format
@@ -1093,12 +1097,12 @@ msgstr ""
 #: ../urpm/media.pm:1014
 #, c-format
 msgid "adding medium \"%s\" before remote medium \"%s\""
-msgstr "מוסיף את המקור \"%s\" לפני המקור המרוחק \"%s\""
+msgstr "המאגר \"%s\" מתווסף לפני המאגר המרוחק \"%s\""
 
 #: ../urpm/media.pm:1020
 #, c-format
 msgid "adding medium \"%s\""
-msgstr "כעת בהוספת המאגר \"%s\""
+msgstr "המאגר \"%s\" מתווסף"
 
 #: ../urpm/media.pm:1044
 #, c-format
@@ -1148,7 +1152,7 @@ msgstr "בחירת מדיה מרובה:%s"
 #: ../urpm/media.pm:1347
 #, c-format
 msgid "removing medium \"%s\""
-msgstr "מסיר מאגר \"%s\""
+msgstr "כעת בהסרת מאגר \"%s\""
 
 #: ../urpm/media.pm:1438
 #, c-format
@@ -1158,7 +1162,7 @@ msgstr "כעת בהגדרת urpmi מחדש למאגר \"%s\""
 #: ../urpm/media.pm:1472
 #, c-format
 msgid "...reconfiguration failed"
-msgstr "...ההגדרה מחדש כשלה"
+msgstr "...ההגדרה מחדש נכשלה"
 
 #: ../urpm/media.pm:1478
 #, c-format
@@ -1178,7 +1182,7 @@ msgstr "המקור \"%s\" עדכני"
 #: ../urpm/media.pm:1526
 #, c-format
 msgid "examining synthesis file [%s]"
-msgstr "בודק את קובץ הsynthesis [%s]"
+msgstr "כעת בבדיקת קובץ synthesis [%s]"
 
 #: ../urpm/media.pm:1546
 #, c-format
@@ -1188,12 +1192,12 @@ msgstr "בעיה בקריאת קובץ מיזוג של מאגר \"%s\""
 #: ../urpm/media.pm:1559 ../urpm/media.pm:1654
 #, c-format
 msgid "copying [%s] for medium \"%s\"..."
-msgstr "מעתיק [%s] עבור המקורר \"%s\"..."
+msgstr "כעת בהעתקת [%s] עבור מאגר \"%s\"..."
 
 #: ../urpm/media.pm:1561 ../urpm/media.pm:1631 ../urpm/media.pm:1884
 #, c-format
 msgid "...copying failed"
-msgstr "...ההעתקה כשלה"
+msgstr "...ההעתקה נכשלה"
 
 #: ../urpm/media.pm:1627
 #, c-format
@@ -1228,7 +1232,7 @@ msgstr "genhdlist2 כשל על %s"
 #: ../urpm/media.pm:1735
 #, c-format
 msgid "comparing %s and %s"
-msgstr "מחשב את %s ואת %s"
+msgstr "כעת בחישוב של %s ושל %s"
 
 #: ../urpm/media.pm:1765
 #, c-format
@@ -1238,7 +1242,7 @@ msgstr "קובץ hdlist %s לא תקף עבור מאגר \"%s\""
 #: ../urpm/media.pm:1791
 #, c-format
 msgid "copying MD5SUM file of \"%s\"..."
-msgstr "מעתיק קובץ MD5SUM של \"%s\"..."
+msgstr "קובץ ה־MD5SUM של \"%s\" מועתק..."
 
 #: ../urpm/media.pm:1831
 #, c-format
@@ -1253,7 +1257,7 @@ msgstr ""
 #: ../urpm/media.pm:1866
 #, c-format
 msgid "retrieving source synthesis of \"%s\"..."
-msgstr "מוריד את קובץ synthesis של \"%s\"..."
+msgstr "כעת בהורדת קובץ synthesis של \"%s\"..."
 
 #: ../urpm/media.pm:1932
 #, c-format
@@ -1278,7 +1282,7 @@ msgstr "לא נמצא קובץ synthesis עבור מאגר \"%s\""
 #: ../urpm/media.pm:2022
 #, c-format
 msgid "updated medium \"%s\""
-msgstr "המקור \"%s\" עודכן"
+msgstr "המאגר \"%s\" עודכן"
 
 #: ../urpm/media.pm:2187
 #, c-format
@@ -1303,12 +1307,12 @@ msgstr ""
 #: ../urpm/mirrors.pm:306
 #, c-format
 msgid "getting mirror list from %s"
-msgstr "מייבא רשימת אתרי מראה מ- %s"
+msgstr "כעת בקבלת רשימת אתרי המַּראָה מתוך %s"
 
 #: ../urpm/msg.pm:74 ../urpmi:492 ../urpmi:510 ../urpmi:628
 #, c-format
 msgid "Nn"
-msgstr "Nn"
+msgstr "NnלKkמ"
 
 #. -PO: Add here the keys which might be pressed in the "Yes"-case.
 #: ../urpm/msg.pm:75 ../urpme:38 ../urpmi.addmedia:133
@@ -1319,12 +1323,12 @@ msgstr "כfFטyY"
 #: ../urpm/msg.pm:100 ../urpme:158 ../urpmi.addmedia:136
 #, c-format
 msgid " (y/N) "
-msgstr " (כן/*לא) "
+msgstr " (y/N) "
 
 #: ../urpm/msg.pm:129
 #, c-format
 msgid "Sorry, bad choice, try again\n"
-msgstr "מצטער ,בחירה רעה, יש לנסות שנית\n"
+msgstr "סליחה, הבחירה גרועה, נא לנסות שוב\n"
 
 #: ../urpm/msg.pm:160
 #, c-format
@@ -1339,7 +1343,7 @@ msgstr "גרסה"
 #: ../urpm/msg.pm:160
 #, c-format
 msgid "Release"
-msgstr "שחרור"
+msgstr "גרסה"
 
 #: ../urpm/msg.pm:160
 #, c-format
@@ -1349,12 +1353,12 @@ msgstr "ארכיטקטורה"
 #: ../urpm/msg.pm:169
 #, c-format
 msgid "(recommended)"
-msgstr ""
+msgstr "(מומלץ)"
 
 #: ../urpm/msg.pm:184
 #, c-format
 msgid "medium \"%s\""
-msgstr "מקור \"%s\""
+msgstr "מאגר \"%s\""
 
 #: ../urpm/msg.pm:184
 #, c-format
@@ -1364,7 +1368,7 @@ msgstr ""
 #: ../urpm/msg.pm:198
 #, c-format
 msgid "B"
-msgstr "B"
+msgstr "ב׳"
 
 #: ../urpm/msg.pm:198
 #, c-format
@@ -1492,7 +1496,7 @@ msgstr ""
 #: ../urpm/removable.pm:45
 #, c-format
 msgid "unable to access medium \"%s\"."
-msgstr "אין אפשרות לגשת למדיה \"%s\"."
+msgstr "אין אפשרות לגשת למאגר \"%s\"."
 
 #: ../urpm/removable.pm:85 ../urpm/removable.pm:100
 #, c-format
@@ -1558,7 +1562,7 @@ msgstr "עקב תלות %s שלא מולאה"
 #: ../urpm/select.pm:631
 #, c-format
 msgid "trying to promote %s"
-msgstr "מנסה לקדם %s"
+msgstr "קידום %s בניסיון"
 
 #: ../urpm/select.pm:632
 #, c-format
@@ -1580,7 +1584,7 @@ msgid ""
 "The following packages have to be removed for others to be upgraded:\n"
 "%s"
 msgstr ""
-"החבילות הבאות עומדות להימחק בכדי שניתן יהיה לשדרג חבילות אחרות: \n"
+"החבילות הבאות עומדות להימחק כדי שניתן יהיה לשדרג חבילות אחרות:\n"
 "%s"
 
 #: ../urpm/select.pm:701
@@ -1636,7 +1640,7 @@ msgstr ""
 #: ../urpm/sys.pm:235
 #, c-format
 msgid "You should restart your computer for %s"
-msgstr ""
+msgstr "יש להפעיל את מחשבך מחדש בשביל %s"
 
 #: ../urpm/sys.pm:237
 #, c-format
@@ -1646,7 +1650,7 @@ msgstr ""
 #: ../urpm/sys.pm:239
 #, c-format
 msgid "You should restart %s for %s"
-msgstr ""
+msgstr "יש להפעיל את %s מחדש בשביל %s"
 
 #: ../urpm/sys.pm:377
 #, c-format
@@ -1743,10 +1747,10 @@ msgstr "חבילה לא מוכרת"
 #, c-format
 msgid "Removing the following package will break your system:"
 msgid_plural "Removing the following packages will break your system:"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
-msgstr[3] ""
+msgstr[0] "הסרת החבילה הבאה תקלקל את המערכת שלך:"
+msgstr[1] "הסרת החבילות הבאות תקלקל את המערכת שלך:"
+msgstr[2] "הסרת החבילות הבאות תקלקל את המערכת שלך:"
+msgstr[3] "הסרת החבילות הבאות תקלקל את המערכת שלך:"
 
 #: ../urpme:123
 #, c-format
@@ -1763,10 +1767,10 @@ msgstr ""
 msgid "To satisfy dependencies, the following package will be removed"
 msgid_plural ""
 "To satisfy dependencies, the following %d packages will be removed"
-msgstr[0] "בכדי לענות על התלויות החבילה הבאה תוסר"
-msgstr[1] "כדי לענות על התלויות, %d החבילות הבאות ייוסרו"
-msgstr[2] "כדי לענות על התלויות, %d החבילות הבאות ייוסרו"
-msgstr[3] "כדי לענות על התלויות, %d החבילות הבאות ייוסרו"
+msgstr[0] "על מנת לענות על התלויות, החבילה הבאה תוסר"
+msgstr[1] "על מנת לענות על התלויות, %d החבילות הבאות יוסרו"
+msgstr[2] "על מנת לענות על התלויות, %d החבילות הבאות יוסרו"
+msgstr[3] "על מנת לענות על התלויות, %d החבילות הבאות יוסרו"
 
 #: ../urpme:151
 #, c-format
@@ -1794,7 +1798,7 @@ msgstr ""
 #: ../urpme:180
 #, c-format
 msgid "Removal failed"
-msgstr "ההסרה כשלה"
+msgstr "ההסרה נכשלה"
 
 #: ../urpme:182
 #, c-format
@@ -1908,7 +1912,7 @@ msgstr ""
 #: ../urpmf:53
 #, c-format
 msgid "List of tags:\n"
-msgstr "רשימת תגים:\n"
+msgstr "רשימת תגיות:\n"
 
 #: ../urpmf:54
 #, c-format
@@ -1943,7 +1947,7 @@ msgstr ""
 #: ../urpmf:60
 #, c-format
 msgid "  --conflicts    - conflict tags\n"
-msgstr ""
+msgstr "  --conflicts    - conflict tags\n"
 
 #: ../urpmf:61
 #, c-format
@@ -1978,7 +1982,7 @@ msgstr "  --group        - קבוצה\n"
 #: ../urpmf:67
 #, c-format
 msgid "  --license      - license\n"
-msgstr ""
+msgstr "  --license      - רישיון\n"
 
 #: ../urpmf:68
 #, c-format
@@ -1988,7 +1992,7 @@ msgstr "  --name         - שם החבילה\n"
 #: ../urpmf:69
 #, c-format
 msgid "  --obsoletes    - obsoletes tags\n"
-msgstr ""
+msgstr "  --obsoletes    - obsoletes tags\n"
 
 #: ../urpmf:70
 #, c-format
@@ -1998,12 +2002,12 @@ msgstr "  --packager     - האורז\n"
 #: ../urpmf:71
 #, c-format
 msgid "  --provides     - provides tags\n"
-msgstr ""
+msgstr "  --provides     - provides tags\n"
 
 #: ../urpmf:72
 #, c-format
 msgid "  --requires     - requires tags\n"
-msgstr ""
+msgstr "  --requires     - requires tags\n"
 
 #: ../urpmf:73
 #, c-format
@@ -2033,7 +2037,7 @@ msgstr "  --url          - url\n"
 #: ../urpmf:78
 #, c-format
 msgid "  --vendor       - vendor\n"
-msgstr ""
+msgstr "  --vendor       - יצרן\n"
 
 #: ../urpmf:79
 #, c-format
@@ -2106,7 +2110,7 @@ msgstr ""
 #: ../urpmi:82
 #, c-format
 msgid "  --no-install   - don't install packages (only download)\n"
-msgstr "  --no-install   - אל תתקין חבילות (הורדה בלבד)\n"
+msgstr "  --no-install   - לא להתקין חבילות (להוריד בלבד)\n"
 
 #: ../urpmi:83 ../urpmq:54
 #, c-format
@@ -2156,7 +2160,7 @@ msgstr "  --clean        - remove rpm from cache before anything else.\n"
 #: ../urpmi:95
 #, c-format
 msgid "  --noclean      - don't clean rpms from cache.\n"
-msgstr "  --noclean      - אל תמחק חבילות מהמטמון.\n"
+msgstr "  --noclean      - לא למחוק חבילות RPM מהמטמון.\n"
 
 #: ../urpmi:97
 #, c-format
@@ -2438,13 +2442,13 @@ msgstr "%s (לשדרוג)"
 #: ../urpmi:432
 #, c-format
 msgid "%s: %s (to install)"
-msgstr "%s: %s (להתקין)"
+msgstr "%s: %s (להתקנה)"
 
 #. -PO: here format is "<package_name> (to install)"
 #: ../urpmi:434
 #, c-format
 msgid "%s (to install)"
-msgstr "%s (להתקין)"
+msgstr "%s (להתקנה)"
 
 #: ../urpmi:440
 #, c-format
@@ -2456,7 +2460,7 @@ msgstr "על מנת לענות על התלות \"%s\" דרושה אחת החבי
 #: ../urpmi:443
 #, c-format
 msgid "What is your choice? (1-%d) "
-msgstr "מה היא בחירתך? (1-%d)"
+msgstr "מה בחירתך? (1-%d)"
 
 #: ../urpmi:485
 #, c-format
@@ -2487,12 +2491,12 @@ msgid ""
 "Continue installation anyway?"
 msgstr ""
 "\n"
-"האם להמשיך בכל זאת?"
+"להמשיך את ההתקנה בכל זאת?"
 
 #: ../urpmi:494 ../urpmi:512 ../urpmi:629 ../urpmi.addmedia:136
 #, c-format
 msgid " (Y/n) "
-msgstr "אישור/ביטול (*כ/ל) "
+msgstr " (Y/n) "
 
 #: ../urpmi:505
 #, c-format
@@ -2650,7 +2654,9 @@ msgstr "  --no-probe     - אל תנסה למצוא כל קובץ synthesis.\n"
 msgid ""
 "  --distrib      - automatically create all media from an installation\n"
 "                   medium.\n"
-msgstr "  --distrib      - יצירה אוטומטית של כל המקורות מתקליטורי ההתקנה\n"
+msgstr ""
+"  --distrib      - יצירת כל המאגרים מאמצעי\n"
+"                   התקנה.\n"
 
 #: ../urpmi.addmedia:76
 #, c-format
@@ -2776,7 +2782,7 @@ msgstr "רק מנהל מערכת מורשה להסיר מאגר"
 #: ../urpmi.removemedia:71
 #, c-format
 msgid "nothing to remove (use urpmi.addmedia to add a media)\n"
-msgstr "אין מה להסיר (יש להשתמש ב urpmi.addmedia לצורך הוספת מאגר)\n"
+msgstr "אין מה להסיר (יש להשתמש ב־urpmi.addmedia כדי להוסיף מאגר)\n"
 
 #: ../urpmi.removemedia:77
 #, c-format
@@ -2784,8 +2790,8 @@ msgid ""
 "the entry to remove is missing\n"
 "(one of %s)\n"
 msgstr ""
-"שום כניסה המיועדת להסרה אינה חסרה\n"
-"(אחד מ %s)\n"
+"הערך להסרה חסר\n"
+"(אחד מ־%s)\n"
 
 #: ../urpmi.update:31
 #, c-format
@@ -2804,7 +2810,7 @@ msgstr "  --update       - עדכון מאגר העדכון בלבד.\n"
 #: ../urpmi.update:46
 #, c-format
 msgid "  --force-key    - force update of gpg key.\n"
-msgstr "  --force-key    - אלץ עדכון מפתח gpg.\n"
+msgstr "  --force-key    - לאלץ עדכון מפתח gpg.\n"
 
 #: ../urpmi.update:47
 #, c-format
@@ -2829,7 +2835,7 @@ msgstr ""
 #: ../urpmi.update:52
 #, c-format
 msgid "  -f             - force updating synthesis\n"
-msgstr "  -f             - אלץ עדכון synthesis\n"
+msgstr "  -f             - אילוץ עדכון synthesis\n"
 
 #: ../urpmi.update:53
 #, c-format
@@ -2844,7 +2850,7 @@ msgstr "רק מנהל מערכת מורשה לעדכן מאגר"
 #: ../urpmi.update:87
 #, c-format
 msgid "nothing to update (use urpmi.addmedia to add a media)\n"
-msgstr "אין מה לעדכן (יש להשתמש ב urpmi.addmedia לצורך הוספת מאגר)\n"
+msgstr "אין מה לעדכן (יש להשתמש ב־urpmi.addmedia כדי להוסיף מאגר)\n"
 
 #: ../urpmi.update:88
 #, c-format
@@ -2852,8 +2858,8 @@ msgid ""
 "the entry to update is missing\n"
 "(one of %s)\n"
 msgstr ""
-"לא חסרה שום כניסה המיועדת לעדכון\n"
-"(אחד מ %s)\n"
+"הערך לעדכון חסר\n"
+"(אחד מ־%s)\n"
 
 #: ../urpmi.update:99
 #, c-format
@@ -2863,12 +2869,12 @@ msgstr "\"%s\""
 #: ../urpmi.update:100
 #, c-format
 msgid "ignoring media %s"
-msgstr "כעת בהתעלמות ממאגר %s"
+msgstr "התעלמות ממאגר %s"
 
 #: ../urpmi.update:100
 #, c-format
 msgid "enabling media %s"
-msgstr "כעת בהפעלת המאגר %s"
+msgstr "הפעלת המאגר %s"
 
 #: ../urpmq:44
 #, c-format
@@ -3129,12 +3135,12 @@ msgstr "אשף התקנת תוכנה"
 
 #: ../gurpmi.desktop.in.h:2
 msgid "Graphical front end to install RPM files"
-msgstr "גישור גלוי גרפי להתקנת חבילות RPM"
+msgstr "ממשק גרפי להתקנה מקובצי RPM"
 
 #: ../polkit/org.mageia.gurpmi2.policy.in.h:1
 msgid "Run Mageia Package Installer"
-msgstr ""
+msgstr "הפעלת אשף התקנת החבילות של Mageia"
 
 #: ../polkit/org.mageia.gurpmi2.policy.in.h:2
 msgid "Authentication is required to run Mageia Package Installer"
-msgstr ""
+msgstr "אימות נדרש להפעלת אשף התקנת החבילות של Mageia"

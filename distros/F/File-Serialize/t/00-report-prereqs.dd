@@ -12,10 +12,10 @@ do { my $x = {
                     },
        'runtime' => {
                       'recommends' => {
-                                      'JSON5' => '0',
-                                      'JSON::MaybeXS' => '0',
-                                      'YAML::Tiny' => '0'
-                                    },
+                                        'JSON5' => '0',
+                                        'JSON::MaybeXS' => '0',
+                                        'YAML::Tiny' => '0'
+                                      },
                       'requires' => {
                                       'Class::Load' => '0',
                                       'Exporter::Tiny' => '0',
@@ -30,7 +30,7 @@ do { my $x = {
                                       'Role::Tiny' => '0',
                                       'feature' => '0',
                                       'parent' => '0',
-                                      'perl' => 'v5.16.0',
+                                      'perl' => 'v5.20.0',
                                       'strict' => '0',
                                       'warnings' => '0'
                                     }
@@ -44,10 +44,12 @@ do { my $x = {
                                    'File::Spec' => '0',
                                    'IO::Handle' => '0',
                                    'IPC::Open3' => '0',
+                                   'Test2::V0' => '0',
                                    'Test::Exception' => '0',
                                    'Test::More' => '0',
                                    'Test::Requires' => '0',
                                    'Test::Warnings' => '0',
+                                   'perl' => 'v5.20.0',
                                    'utf8' => '0'
                                  }
                  }

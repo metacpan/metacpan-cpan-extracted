@@ -1,5 +1,52 @@
 Revision history for MIDI-Bassline-Walk
 
+0.0207 2021-05-31 01:03:17
+    - Improve documentation slightly.
+    - Add the eg/walking program to illustrate usage.
+
+0.0206 2021-05-31 00:17:52
+    - Resort the guitar pitches.
+
+0.0205 2021-05-30 23:45:04
+    - Improve documentation.
+    - Add the "guitar" attribute to transpose-up, notes below E2.
+
+0.0204 2021-05-19 21:31:41
+    - Allow an empty scale, thereby walking only the notes of the chord.
+    - Improve documentation.
+
+0.0203 2021-05-19 12:59:18
+    - Restrict note skipping to major or minor scales.
+
+0.0202 2021-05-19 11:58:45
+    - Fix ugly logic typos.
+
+0.0201 2021-05-19 11:24:55
+    - Improve documentation.
+
+0.0200 2021-05-19 11:15:17
+    - Add the scale attribute.
+
+0.0106 2021-05-19 02:31:21
+    - Don't drop the 5th note from a 5 chord.
+    - Handle enharmonics in the matching process.
+
+0.0105 2021-05-18 12:53:19
+    - Don't drop the 7th note from a maj7 chord.
+
+0.0104 2021-05-17 20:19:08
+    - Improve documentation.
+    - Use croak instead of die.
+
+0.0103 2021-05-17 19:55:01
+    - Improve test.
+    - Improve documentation.
+    - Improve verbose output.
+
+0.0102 2021-05-17 17:26:40
+    - Attempt to fix diminished and augmented chords...
+    - Improve documentation.
+
 0.0101 2021-05-17 10:25:54
     - Improve documentation.
 

@@ -59,6 +59,7 @@ lib/Bio/MUST/Core/Seq.pm
 lib/Bio/MUST/Core/SeqId.pm
 lib/Bio/MUST/Core/SeqMask.pm
 lib/Bio/MUST/Core/SeqMask/Freqs.pm
+lib/Bio/MUST/Core/SeqMask/Pmsf.pm
 lib/Bio/MUST/Core/SeqMask/Profiles.pm
 lib/Bio/MUST/Core/SeqMask/Rates.pm
 lib/Bio/MUST/Core/Taxonomy.pm
@@ -84,6 +85,7 @@ t/genetic_code.t
 t/id_list.t
 t/id_mapper.t
 t/moose_ncbi.t
+t/pmsf.t
 t/profiles.t
 t/rates.t
 t/seq.t
@@ -220,6 +222,8 @@ test/leaf_4_fra_bact.list
 test/life.cls
 test/life_html.cls
 test/lifemrch.fra
+test/long-leaf-seqs.idl
+test/long-leaf-tree.tre
 test/map_coords.ali
 test/mask.ali
 test/misleading.idl
@@ -232,6 +236,7 @@ test/nuclideal_0.25.ali
 test/nuclideal_0.5.ali
 test/nuclideal_1.ali
 test/nuclideal_2.ali
+test/obs-ppred-freqs-glb.tsv
 test/obs-ppred-freqs-reorder.tsv
 test/obs-ppred-freqs.tsv
 test/obs.idl
@@ -375,6 +380,10 @@ test/temp_degap_nowrap.fasta
 test/temp_prefix.fasta
 test/test-delta.rates
 test/test-othr.meansiterates
+test/test-pmsf-archaea.sitefreq
+test/test-pmsf-chi-square.stats
+test/test-pmsf-euka.sitefreq
+test/test-pmsf.ali
 test/test-self.meansiterates
 test/test_recode_expected.ali
 test/test_uc_expected.ali

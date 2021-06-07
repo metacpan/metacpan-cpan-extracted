@@ -1,11 +1,12 @@
 #!perl
 
-# Note: This script is a CLI  for Riap function /App/ParseSearchStringFromURL/parse_search_string_from_url
-# and generated automatically using Perinci::CmdLine::Gen version 0.483
+# Note: This script is a CLI for Riap function /App/ParseSearchStringFromURL/parse_search_string_from_url
+# and generated automatically using Perinci::CmdLine::Gen version 0.498
 
-our $DATE = '2017-11-06'; # DATE
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2021-05-26'; # DATE
 our $DIST = 'App-ParseSearchStringFromURL'; # DIST
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.003'; # VERSION
 
 use 5.010001;
 use strict;
@@ -13,10 +14,12 @@ use warnings;
 
 use Perinci::CmdLine::Any;
 
-Perinci::CmdLine::Any->new(
+my $cmdline = Perinci::CmdLine::Any->new(
     url => "/App/ParseSearchStringFromURL/parse_search_string_from_url",
     program_name => "parse-search-string-from-url",
-)->run;
+);
+
+$cmdline->run;
 
 # ABSTRACT: Parse search string from URL
 # PODNAME: parse-search-string-from-url
@@ -33,13 +36,17 @@ parse-search-string-from-url - Parse search string from URL
 
 =head1 VERSION
 
-This document describes version 0.002 of parse-search-string-from-url (from Perl distribution App-ParseSearchStringFromURL), released on 2017-11-06.
+This document describes version 0.003 of parse-search-string-from-url (from Perl distribution App-ParseSearchStringFromURL), released on 2021-05-26.
 
 =head1 SYNOPSIS
 
 Usage:
 
- % parse-search-string-from-url [options] <url> ...
+ % parse-search-string-from-url [--config-path=path | -c]
+     [--config-profile=profile | -P] [--detail] [--format=name] [--json]
+     [-l] [--module=s] [--(no)naked-res] [--no-config | -C] [--no-detail]
+     [--no-env] [--nodetail] [--page-result[=program]] [--urls-json=s]
+     [--urls=s] [--view-result[=program]] <url> ...
 
 =head1 OPTIONS
 
@@ -63,13 +70,11 @@ Valid values:
 
  ["URI::ParseSearchString","URI::ParseSearchString::More"]
 
-=item B<--url>=I<s@>*
-
-Can be specified multiple times.
-
 =item B<--urls-json>=I<s>
 
-See C<--url>.
+See C<--urls>.
+
+=item B<--urls>=I<s>*
 
 =back
 
@@ -77,17 +82,15 @@ See C<--url>.
 
 =over
 
-=item B<--config-path>=I<filename>
+=item B<--config-path>=I<s>, B<-c>
 
 Set path to configuration file.
 
-Can be specified multiple times.
-
-=item B<--config-profile>=I<s>
+=item B<--config-profile>=I<s>, B<-P>
 
 Set configuration profile to use.
 
-=item B<--no-config>
+=item B<--no-config>, B<-C>
 
 Do not use any configuration file.
 
@@ -139,6 +142,14 @@ you want to pipe the result for more post-processing. In this case you can use
 
     [1,2,3]
 
+
+=item B<--page-result>
+
+Filter output through a pager.
+
+=item B<--view-result>
+
+View output using a viewer.
 
 =back
 
@@ -204,7 +215,22 @@ You can put multiple profiles in a single file by using section names like C<[pr
 
 You can also put configuration for multiple programs inside a single file, and use filter C<program=NAME> in section names, e.g. C<[program=NAME ...]> or C<[SOMESECTION program=NAME]>. The section will then only be used when the reading program matches.
 
-Finally, you can filter a section by environment variable using the filter C<env=CONDITION> in section names. For example if you only want a section to be read if a certain environment variable is true: C<[env=SOMEVAR ...]> or C<[SOMESECTION env=SOMEVAR ...]>. If you only want a section to be read when the value of an environment variable has value equals something: C<[env=HOSTNAME=blink ...]> or C<[SOMESECTION env=HOSTNAME=blink ...]>. If you only want a section to be read when the value of an environment variable does not equal something: C<[env=HOSTNAME!=blink ...]> or C<[SOMESECTION env=HOSTNAME!=blink ...]>. If you only want a section to be read when an environment variable contains something: C<[env=HOSTNAME*=server ...]> or C<[SOMESECTION env=HOSTNAME*=server ...]>. Note that currently due to simplistic parsing, there must not be any whitespace in the value being compared because it marks the beginning of a new section filter or section name.
+You can also filter a section by environment variable using the filter C<env=CONDITION> in section names. For example if you only want a section to be read if a certain environment variable is true: C<[env=SOMEVAR ...]> or C<[SOMESECTION env=SOMEVAR ...]>. If you only want a section to be read when the value of an environment variable has value equals something: C<[env=HOSTNAME=blink ...]> or C<[SOMESECTION env=HOSTNAME=blink ...]>. If you only want a section to be read when the value of an environment variable does not equal something: C<[env=HOSTNAME!=blink ...]> or C<[SOMESECTION env=HOSTNAME!=blink ...]>. If you only want a section to be read when an environment variable contains something: C<[env=HOSTNAME*=server ...]> or C<[SOMESECTION env=HOSTNAME*=server ...]>. Note that currently due to simplistic parsing, there must not be any whitespace in the value being compared because it marks the beginning of a new section filter or section name.
+
+To load and configure plugins, you can use either the C<-plugins> parameter (e.g. C<< -plugins=DumpArgs >> or C<< -plugins=DumpArgs@before_validate_args >>), or use the C<[plugin=NAME ...]> sections, for example:
+
+ [plugin=DumpArgs]
+ -event=before_validate_args
+ -prio=99
+ 
+ [plugin=Foo]
+ -event=after_validate_args
+ arg1=val1
+ arg2=val2
+
+ 
+
+which is equivalent to setting C<< -plugins=-DumpArgs@before_validate_args@99,-Foo@after_validate_args,arg1,val1,arg2,val2 >>.
 
 List of available configuration parameters:
 
@@ -212,7 +238,7 @@ List of available configuration parameters:
  format (see --format)
  module (see --module)
  naked_res (see --naked-res)
- urls (see --url)
+ urls (see --urls)
 
 =head1 ENVIRONMENT
 
@@ -238,7 +264,7 @@ Source repository is at L<https://github.com/perlancar/perl-App-ParseSearchStrin
 
 =head1 BUGS
 
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-ParseSearchStringFromURL>
+Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-App-ParseSearchStringFromURL/issues>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
@@ -250,7 +276,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2017 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

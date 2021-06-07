@@ -1,0 +1,185 @@
+#!/usr/bin/perl
+use 5.001 ; use strict ; use warnings ; 
+use Getopt::Std ; getopts 'cf:g:i:nkKqrvy:=~@:' ,\my %o ; 
+use List::Util qw/minstr maxstr sum/ ; 
+use Term::ANSIColor qw/:constants color / ; $Term::ANSIColor::AUTORESET = 1 ;
+use FindBin qw[ $Script ] ;
+
+sub Reading ( ) ; 
+sub Resulting ( ) ; 
+sub sigint1 ( ) ; 
+sub sigint2 ( ) ; 
+sub cyc_rep ( ) ;
+sub y_init ( ) ; 
+sub y_filter ( $ ) ; 
+
+my $cyc_len = $o{'@'} // 1e7 ; # 何行毎にレポートを発生させるか。
+my ( $time0 , $time00 ) = ( time ) x 2 ; 
+my @y_ranges ; # 出力される値の範囲が指定された場合の挙動を指定する。
+my %kv ; ## $kv{ key } { value } , key が1列目。value が2列目以降。出現回数が記録される。
+$o{f} //= 1 ; # どの位置(区切り文字の何列目)でキーとバリューを分けるか。
+
+y_init ; 
+Reading ;
+Resulting ;
+exit  ;
+
+sub Reading ( ) {
+    # 読取り　
+    $SIG{INT} = \&sigint1 ;
+    $o{i} //= "\t" ; 
+    my $isep = eval qq[qq[$o{i}]] ; 
+    <> if $o{'='} ; # 先頭行は単純に読み飛ばす。
+ 	while( <> ) {
+		chomp ; 
+        my @F = split /$isep/o, $_ , $o{f} + 1 ;
+        my $k = join $isep , splice @F , 0 , $o{f} ; 
+        my $v = $F[0] // '' ; # 場合によっては、 // '' の計算は不要かも知れない。
+        ($k,$v) = ($v,$k) if $o{'~'} ; # キーとバリューの反転 
+		$v = defined $v ? $v : '#undef#' ;  # <-- -  列が足りない時に現れる
+		$kv{$k}{$v} ++ ; 
+        cyc_rep if $cyc_len && $. % $cyc_len == 0 ; # 最初は剰余0でなくて1としていたが、出力の理解に問題があり得たので変更。
+	}
+}
+
+sub Resulting ( ) { 
+    $SIG{INT} = sub { print color('reset') ; die } ; 
+
+    # 表示順序についての処理
+    my @k = keys %kv ;
+    if ( $o{n} ) { @k = sort { $kv{$a} <=> $kv{$b} } @k }   # -n オプションによりコンテンツの数であらかじめ、ソートする 
+    elsif ( $o{K} ) { @k = sort { $a <=> $b } @k }  # -k オプションによりキー文字列であらかじめ、ソートする 
+    elsif ( $o{k} || 1 ) { @k = sort { $a cmp $b } @k }     # -k オプションによりキー文字列であらかじめ、ソートする 
+    else { 1 } ; 
+
+    @k = reverse @k if $o{r} ;   # r オプションで逆順ソート
+
+    # 出力
+    my $count = 0 ;
+    for(@k){
+        my @values = keys %{$kv{$_}} ; 
+        next unless y_filter scalar @values ; # 異なる個数が指定の値の範囲内でなければ、表示しない。 
+        my @out ; 
+        push @out, $_ ,scalar @values ; # , '$' ;		# 各キーで異なるバリュー値の個数を表示する
+        push @out, ( sum values %{$kv{$_}} ) . '#' if $o{c} ; # -c オプションにより、 各キーの単純な出現回数を表示する。
+        push @out, minstr(@values) , '..' , maxstr(@values) if $o{v} ;
+        push @out, ':' , sort splice @values , 0 , $o{g} if $o{g} ; # sort はとりあえず見やすくするため必要。
+        print join (  "\t" , @out ) , "\n" ;
+    }
+
+    # 2次情報
+    my $sec = time - $time00 ; # このプログラムの処理にかかった秒数。比較する2個の時刻は秒単位なので、±1秒未満の誤差は発生する。
+    (my $Rlines = $. ) =~ s/(?<=\d)(?=(\d\d\d)+($|\D))/,/g ; # 3桁毎にコンマで区切る
+    print STDERR CYAN "$Rlines lines processed. ($Script ; $sec sec.)\n" unless $o{q} ;
+
+}
+
+# Ctrl-C が押された時の処理。1秒間待ってその後4秒以内にCtrl-C が押されたら、次の段階に進む
+sub sigint1 ( ) { 
+    alarm 0 ;
+    print STDERR YELLOW "$.-th line processing. ", scalar localtime() , "\n"  ; 
+    # sleep 1 ; 
+    $SIG{ALRM} = sub { $SIG{INT} = \&sigint1 } ; 
+    alarm 4 ; 
+    $SIG{INT} = \&sigint2 ; 
+} ;  
+
+sub sigint2 ( ) { 
+    alarm 0 ; 
+    print color('cyan') ; Resulting ; print color('reset') ;  
+    # sleep 1 ; 
+    $SIG{ALRM} = sub { $SIG{INT} = \&sigint1 }  ; 
+    alarm 4 ;
+    $SIG{INT} = sub { die } 
+} ;
+
+sub cyc_rep ( ) {
+    use FindBin '$Script' ;
+    $| = 1 ; 
+    my $num = $. ; 
+    $num =~ s/(?<=\d)(?=(\d\d\d)+($|\D))/,/g ; # 3桁毎にコンマで区切る
+    print STDERR GREEN $num , ":\t" , sprintf "%02d:%02d:%02d" , ( localtime )[2,1,0] ;  #  <-- 標準出力に書込み
+    print STDERR "\t" , GREEN  time - $time0 , " sec.\t($Script)" ; 
+    $time0 = time ;
+    print STDERR "\n" ;
+}
+
+
+# 次の2個の関数は、出力すべき値の範囲をフィルターの様に指定する。
+
+sub y_init ( ) { 
+    $o{y} //= '' ;
+    my @ranges = split /,/ , $o{y} , -1 ; 
+    grep { $_ = $_ . ".." . $_ unless m/\.\./ } @ranges ; # .. で囲まれていない数 x は x..xに書き換え
+    for ( @ranges ) { 
+        m/^(\d*)\.\.(\d*)/ ; 
+        push @y_ranges , [  ( $1 || 1 ) ,  ( $2 || "Inf" ) ] ; 
+    }
+}
+
+sub y_filter ( $ ) { 
+    return not 0 unless @y_ranges ; # 指定が無かった場合はとにかく真を変えす。
+    for ( @y_ranges ) { 
+        return not 0 if $_->[0] <= $_[0] && $_[0] <= $_->[1] ;
+    }
+    return not 1 ; 
+}
+
+
+# ヘルプの扱い
+sub VERSION_MESSAGE {}
+sub HELP_MESSAGE{
+    use FindBin qw [ $Script ] ; 
+    $ARGV[1] //= '' ;
+    open my $FH , '<' , $0 ;
+    while( <$FH> ){
+        s/\$0/$Script/g ;
+        print $_ if $ARGV[1] eq 'opt' ? m/^\ +\-/ : s/^=head1// .. s/^=cut// ;
+    }
+    close $FH ;
+    exit 0 ;
+}
+
+
+=encoding utf8
+
+=head1 
+  $0
+
+ 主要な用途: 
+
+  各キーが異なるバリューの値をいくつ持つかを表示する。
+  通常、1列目がキー列であり、2列目以降がバリュー列であると見なす。
+
+ オプション: 
+
+  [基本]
+ -c : 各キーの出現個数も表示。
+ -i str ; 区切り文字の指定。未指定ならタブ文字。
+ -g num : 具体的な該当文字列を num個表示する。 コロン文字の列の後に。
+ -y ranges : 異なるバリューの個数を出力する際に、ranges で値の範囲を指定できる。範囲は,と..で指定する。
+
+  [応用]
+ -f num : 左から num 列とそれ以外で、キーとバリューを分離する。未指定なら num = 1 。
+ -n : 出現個数の昇順で並べ替え
+ -k : キーのアルファベット順に並べ替え
+ -K : キーの数値順に並べ替え
+ -q : 最後の2次情報を出力しない。( なお、 -@ 0 により、途中のレポートも出さない。 )
+ -r : 上記の表示順序を逆順にする。
+ -v : さらに冗長に表示する(最小と最大を表示する)
+ 
+  [補助]
+ -= : 開始行をヘッダと見なし、読み飛ばす。 
+ -~ : 2列の並びを、キーとバリューが、それぞれ2列目、1列目と見なす。
+ -@ num : 一定行数を読み取る毎に、補助情報を表示。未指定なら1000万行ずつ。出力しない場合は 0 を指定。 
+ 
+ Ctrl-C を押したときの挙動: 
+
+  1. 処理中の行番号の表示。
+  2. そして、4秒以内に再びCtrl+C が押下されると、それまでの集計状態を表示。
+  3. さらにそれから4秒以内にCtrl+Cが押下されると、停止する。
+
+ 開発上のメモ : 
+   結果的に何行を出力したのか、二次情報が欲しい。
+
+=cut

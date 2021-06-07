@@ -1,7 +1,7 @@
 {
    "abstract" : "Maintain and serve a PGXN web site",
    "author" : [
-      "David E. Wheeler <david.wheeler@pgexperts.com>"
+      "David E. Wheeler <david@justatheory.com>"
    ],
    "dynamic_config" : 1,
    "generated_by" : "Module::Build version 0.4231",
@@ -65,31 +65,31 @@
    "provides" : {
       "PGXN::Site" : {
          "file" : "lib/PGXN/Site.pm",
-         "version" : "v0.20.2"
+         "version" : "v0.22.0"
       },
       "PGXN::Site::Controller" : {
          "file" : "lib/PGXN/Site/Controller.pm",
-         "version" : "v0.20.2"
+         "version" : "v0.22.0"
       },
       "PGXN::Site::Locale" : {
          "file" : "lib/PGXN/Site/Locale.pm",
-         "version" : "v0.20.2"
+         "version" : "v0.22.0"
       },
       "PGXN::Site::Locale::en" : {
          "file" : "lib/PGXN/Site/Locale/en.pm",
-         "version" : "v0.20.2"
+         "version" : "v0.22.0"
       },
       "PGXN::Site::Locale::fr" : {
          "file" : "lib/PGXN/Site/Locale/fr.pm",
-         "version" : "v0.20.2"
+         "version" : "v0.22.0"
       },
       "PGXN::Site::Router" : {
          "file" : "lib/PGXN/Site/Router.pm",
-         "version" : "v0.20.2"
+         "version" : "v0.22.0"
       },
       "PGXN::Site::Templates" : {
          "file" : "lib/PGXN/Site/Templates.pm",
-         "version" : "v0.20.2"
+         "version" : "v0.22.0"
       }
    },
    "release_status" : "stable",
@@ -102,6 +102,6 @@
          "url" : "https://github.com/pgxn/pgxn-site/"
       }
    },
-   "version" : "v0.20.2",
+   "version" : "v0.22.0",
    "x_serialization_backend" : "JSON::PP version 4.06"
 }

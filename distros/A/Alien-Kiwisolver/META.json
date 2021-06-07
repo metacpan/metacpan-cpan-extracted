@@ -18,13 +18,15 @@
          "requires" : {
             "Alien::Build" : "0.32",
             "Alien::Build::MM" : "0.32",
-            "ExtUtils::MakeMaker" : "6.52"
+            "ExtUtils::MakeMaker" : "6.52",
+            "URI" : "0"
          }
       },
       "configure" : {
          "requires" : {
             "Alien::Build" : "0.32",
             "Alien::Build::MM" : "0.32",
+            "ExtUtils::CppGuess" : "0.22",
             "ExtUtils::MakeMaker" : "6.52",
             "perl" : "5.006"
          }
@@ -59,7 +61,7 @@
          "web" : "https://github.com/Intertangle/p5-Alien-Kiwisolver"
       }
    },
-   "version" : "0.002",
+   "version" : "0.003",
    "x_alienfile" : {
       "generated_by" : "Dist::Zilla::Plugin::AlienBuild version 0.31",
       "requires" : {

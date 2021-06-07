@@ -3,9 +3,8 @@ use Mojolicious::Lite;
 use FindBin;
 BEGIN { unshift @INC, "$FindBin::Bin/../../lib" }
 
-plugin Webpack =>
-  {process => ['svelte'], dependencies => {core => 'rollup', svelte => [qw(rollup-plugin-svelte svelte)]}};
-get '/' => 'index';
+plugin Webpack => {engine => 'Mojo::Alien::rollup', process => [qw(svelte css js)]};
+get '/'        => 'index';
 app->start;
 
 __DATA__
@@ -14,7 +13,7 @@ __DATA__
 <html>
   <head>
     <title>Mojolicious ♥ Webpack</title>
-    %= asset 'example.css'
+    %= asset 'rollup-example.css'
   </head>
   <body>
     <h1>Mojolicious ♥ Rollup</h1>
@@ -32,6 +31,6 @@ $ $EDITOR rollup.config.js
 $ perl lite.pl webpack -c ./rollup.config.js</pre>
 
     <h2>The generated application</h2>
-    %= asset 'example.js'
+    %= asset 'rollup-example.js'
   </body>
 </html>

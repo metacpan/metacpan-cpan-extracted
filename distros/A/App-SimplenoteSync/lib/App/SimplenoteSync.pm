@@ -1,8 +1,5 @@
 package App::SimplenoteSync;
-{
-  $App::SimplenoteSync::VERSION = '0.2.0';
-}
-
+$App::SimplenoteSync::VERSION = '0.2.1';
 # ABSTRACT: Synchronise text notes with simplenoteapp.com
 
 use v5.10;
@@ -397,7 +394,8 @@ method _process_local_notes {
         }
 
         if (!defined $note->key) {
-            $self->logger->error("Skipping [%s]: failed to find a key");
+            $self->logger->errorf("Skipping [%s]: failed to find a key",
+                $note->file->basename);
             next;
         }
 
@@ -515,7 +513,10 @@ __PACKAGE__->meta->make_immutable;
 1;
 
 __END__
+
 =pod
+
+=encoding UTF-8
 
 =for :stopwords Ioan Rogers Fletcher T. Penney github
 
@@ -525,7 +526,7 @@ App::SimplenoteSync - Synchronise text notes with simplenoteapp.com
 
 =head1 VERSION
 
-version 0.2.0
+version 0.2.1
 
 =head1 AUTHORS
 
@@ -543,7 +544,7 @@ Fletcher T. Penney <owner@fletcherpenney.net>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2012 by Ioan Rogers.
+This software is Copyright (c) 2021 by Ioan Rogers.
 
 This is free software, licensed under:
 
@@ -556,8 +557,7 @@ web interface at L<https://github.com/ioanrogers/App-SimplenoteSync/issues>.
 
 =head1 SOURCE
 
-The development version is on github at L<http://github.com/ioanrogers/App-SimplenoteSync>
+The development version is on github at L<https://github.com/ioanrogers/App-SimplenoteSync>
 and may be cloned from L<git://github.com/ioanrogers/App-SimplenoteSync.git>
 
 =cut
-

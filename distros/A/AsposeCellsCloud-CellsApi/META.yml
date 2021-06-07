@@ -20,7 +20,7 @@ provides:
     file: lib/AsposeCellsCloud/ApiFactory.pm
   AsposeCellsCloud::CellsApi:
     file: lib/AsposeCellsCloud/CellsApi.pm
-    version: 21.1
+    version: 21.5
   AsposeCellsCloud::Configuration:
     file: lib/AsposeCellsCloud/Configuration.pm
   AsposeCellsCloud::Object::AboveAverage:
@@ -73,6 +73,8 @@ provides:
     file: lib/AsposeCellsCloud/Object/CellsObjectOperateTaskParameter.pm
   AsposeCellsCloud::Object::ConvertWorksheetTaskParameter:
     file: lib/AsposeCellsCloud/Object/ConvertWorksheetTaskParameter.pm
+  AsposeCellsCloud::Object::WorksheetOperateParameter:
+    file: lib/AsposeCellsCloud/Object/WorksheetOperateParameter.pm    
   AsposeCellsCloud::Object::CellsResponse:
     file: lib/AsposeCellsCloud/Object/CellsResponse.pm
   AsposeCellsCloud::Object::Chart:

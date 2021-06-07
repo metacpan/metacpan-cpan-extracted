@@ -1,5 +1,5 @@
 package Photonic::Roles::UseMask;
-$Photonic::Roles::UseMask::VERSION = '0.015';
+$Photonic::Roles::UseMask::VERSION = '0.016';
 
 =encoding UTF-8
 
@@ -9,7 +9,7 @@ Photonic::Roles::UseMask
 
 =head1 VERSION
 
-version 0.015
+version 0.016
 
 =head1 COPYRIGHT NOTICE
 
@@ -73,7 +73,6 @@ reciprocal vector for each even dimension of reciprocal space.
 use namespace::autoclean;
 use PDL::Lite;
 use PDL::NiceSlice;
-use PDL::Complex;
 use Moose::Role;
 
 has 'use_mask'=>(is=>'ro', default=>1, documentation=>'Use mask if present');

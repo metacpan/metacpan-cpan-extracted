@@ -211,7 +211,7 @@ SPVM_ENV* SPVM_API_create_env(SPVM_COMPILER* compiler) {
     SPVM_API_unweaken,
     SPVM_API_alloc_memory_block_zero,
     SPVM_API_free_memory_block,
-    SPVM_API_memory_blocks_count,
+    SPVM_API_get_memory_blocks_count,
     SPVM_API_get_type_name_raw,
     SPVM_API_get_type_name,
     SPVM_API_new_env,
@@ -5520,10 +5520,10 @@ SPVM_OBJECT* SPVM_API_concat(SPVM_ENV* env, SPVM_OBJECT* string1, SPVM_OBJECT* s
   return str;
 }
 
-int32_t SPVM_API_memory_blocks_count(SPVM_ENV* env) {
+int32_t SPVM_API_get_memory_blocks_count(SPVM_ENV* env) {
   (void)env;
   
-  return env->memory_blocks_count;
+  return (int32_t)(intptr_t)env->memory_blocks_count;
 }
 
 void SPVM_API_free_weaken_back_refs(SPVM_ENV* env, SPVM_WEAKEN_BACKREF* weaken_backref_head) {
@@ -6170,7 +6170,9 @@ int32_t SPVM_API_object_basic_type_id(SPVM_ENV* env, SPVM_OBJECT* object) {
 int32_t SPVM_API_length(SPVM_ENV* env, SPVM_OBJECT* object) {
   (void)env;
   
-  return object->length;
+  int32_t length = object->length;
+  
+  return length;
 }
 
 int8_t* SPVM_API_get_elems_byte(SPVM_ENV* env, SPVM_OBJECT* object) {
@@ -6218,9 +6220,10 @@ double* SPVM_API_get_elems_double(SPVM_ENV* env, SPVM_OBJECT* object) {
 SPVM_OBJECT* SPVM_API_get_elem_object(SPVM_ENV* env, SPVM_OBJECT* array, int32_t index) {
   (void)env;
   
-  SPVM_OBJECT* oval = SPVM_API_GET_OBJECT_NO_WEAKEN_ADDRESS(((void**)((intptr_t)array + env->object_header_byte_size))[index]);
+  SPVM_OBJECT* object_maybe_weaken = ((SPVM_OBJECT**)((intptr_t)array + env->object_header_byte_size))[index];
+  SPVM_OBJECT* object = SPVM_API_GET_OBJECT_NO_WEAKEN_ADDRESS(object_maybe_weaken);
   
-  return oval;
+  return object;
 }
 
 void SPVM_API_set_elem_object(SPVM_ENV* env, SPVM_OBJECT* array, int32_t index, SPVM_OBJECT* oval) {
@@ -6685,7 +6688,8 @@ SPVM_OBJECT* SPVM_API_get_field_object(SPVM_ENV* env, SPVM_OBJECT* object, int32
   SPVM_FIELD* field = SPVM_LIST_fetch(compiler->fields, field_id);
   
   // Get field value
-  void* value = SPVM_API_GET_OBJECT_NO_WEAKEN_ADDRESS(*(void**)((intptr_t)object + env->object_header_byte_size + field->offset));
+  SPVM_OBJECT* value_maybe_weaken = *(SPVM_OBJECT**)((intptr_t)object + env->object_header_byte_size + field->offset);
+  SPVM_OBJECT* value = SPVM_API_GET_OBJECT_NO_WEAKEN_ADDRESS(value_maybe_weaken);
   
   return value;
 }
@@ -6787,10 +6791,12 @@ void* SPVM_API_alloc_memory_block_zero(SPVM_ENV* env, int64_t byte_size) {
   void* block = calloc(1, (size_t)byte_size);
   
   if (block) {
-    env->memory_blocks_count++;
+    int32_t memory_blocks_count = (int32_t)(intptr_t)env->memory_blocks_count;
+    memory_blocks_count++;
+    env->memory_blocks_count = (void*)(intptr_t)memory_blocks_count;
   
 #ifdef SPVM_DEBUG_ALLOC_MEMORY_COUNT
-  fprintf(stderr, "[ALLOC_MEMORY %p %d]\n", block, (int32_t)env->memory_blocks_count);
+  fprintf(stderr, "[ALLOC_MEMORY %p %d]\n", block, (int32_t)(intptr_t)env->memory_blocks_count);
 #endif
   }
   else {
@@ -6803,9 +6809,12 @@ void* SPVM_API_alloc_memory_block_zero(SPVM_ENV* env, int64_t byte_size) {
 void SPVM_API_free_memory_block(SPVM_ENV* env, void* block) {
 
   if (block) {
-    env->memory_blocks_count--;
+    int32_t memory_blocks_count = (int32_t)(intptr_t)env->memory_blocks_count;
+    memory_blocks_count--;
+    env->memory_blocks_count = (void*)(intptr_t)memory_blocks_count;
+    
 #ifdef SPVM_DEBUG_ALLOC_MEMORY_COUNT
-    fprintf(stderr, "[FREE_MEMORY %p %d]\n", block, (int32_t)env->memory_blocks_count);
+    fprintf(stderr, "[FREE_MEMORY %p %d]\n", block, (int32_t)(intptr_t)env->memory_blocks_count);
 #endif
     free(block);
   }
@@ -6862,7 +6871,8 @@ double SPVM_API_get_package_var_double(SPVM_ENV* env, int32_t packagke_var_id) {
 SPVM_OBJECT* SPVM_API_get_package_var_object(SPVM_ENV* env, int32_t packagke_var_id) {
 
   // Get field value
-  void* value = SPVM_API_GET_OBJECT_NO_WEAKEN_ADDRESS(((SPVM_VALUE*)(env->package_vars_heap))[packagke_var_id].oval);
+  SPVM_OBJECT* value_maybe_weaken = (SPVM_OBJECT*)((SPVM_VALUE*)(env->package_vars_heap))[packagke_var_id].oval;
+  SPVM_OBJECT* value = SPVM_API_GET_OBJECT_NO_WEAKEN_ADDRESS(value_maybe_weaken);
   
   return value;
 }

@@ -1,5 +1,5 @@
 package Photonic::WE::R2::EpsilonTensor;
-$Photonic::WE::R2::EpsilonTensor::VERSION = '0.015';
+$Photonic::WE::R2::EpsilonTensor::VERSION = '0.016';
 
 =encoding UTF-8
 
@@ -9,7 +9,7 @@ Photonic::WE::R2::EpsilonTensor
 
 =head1 VERSION
 
-version 0.015
+version 0.016
 
 =head1 COPYRIGHT NOTICE
 
@@ -79,7 +79,7 @@ response $epsA is taken from the metric.
 
 =back
 
-=head1 ACCESORS (read only)
+=head1 ACCESSORS (read only)
 
 =over 4
 
@@ -96,19 +96,14 @@ The macroscopic dielectric tensor of the last operation
 
 use namespace::autoclean;
 use PDL::Lite;
-use PDL::NiceSlice;
-use PDL::Complex;
 use PDL::MatrixOps;
-use Storable qw(dclone);
-use PDL::IO::Storable;
-#use Photonic::WE::R2::AllH;
 use Photonic::Types;
 use Moose;
 use MooseX::StrictConstructor;
 
 extends 'Photonic::WE::R2::Wave';
 
-has 'epsilonTensor' =>  (is=>'ro', isa=>'PDL::Complex', init_arg=>undef,
+has 'epsilonTensor' =>  (is=>'ro', isa=>'Photonic::Types::PDLComplex', init_arg=>undef,
              writer=>'_epsilonTensor',
              documentation=>'Wave operator from last evaluation');
 

@@ -1,19 +1,19 @@
 package
   Archive::Libarchive::Any::_version;
 
-# PODNAME: Archive::Libarchive::Any
-our $VERSION = '0.0900'; # VERSION
+# PODNAME: (Deprecated) Archive::Libarchive::Any
+our $VERSION = '0.0901'; # VERSION
 
 use strict;
 use warnings;
 
 BEGIN {
   my $ok = 0;
-  
+
   my @list = qw( XS FFI );
   unshift @list, $ENV{ARCHIVE_LIBARCHIVE_ANY}
     if defined $ENV{ARCHIVE_LIBARCHIVE_ANY};
-  
+
   foreach my $impl (@list)
   {
     next if $impl eq 'Any';
@@ -39,7 +39,7 @@ package Archive::Libarchive::Any;
 
 if(0) {
 
-our $VERSION = '0.0900'; # VERSION
+our $VERSION = '0.0901'; # VERSION
 
 }
 
@@ -54,17 +54,21 @@ __END__
 
 =head1 NAME
 
-Archive::Libarchive::Any - Perl bindings to libarchive
+(Deprecated) Archive::Libarchive::Any - Perl bindings to libarchive
 
 =head1 VERSION
 
-version 0.0900
+version 0.0901
 
 =head1 SYNOPSIS
 
  use Archive::Libarchive::Any;
 
 =head1 DESCRIPTION
+
+B<NOTE>: This module has been deprecated in favor of L<Archive::Libarchive>.
+It provides a better thought out object-oriented interface and is easier
+to maintain.
 
 This module provides bindings for libarchive using either
 L<Archive::Libarchive::XS> or L<Archive::Libarchive::FFI>.

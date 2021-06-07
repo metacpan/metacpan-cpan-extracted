@@ -1,10 +1,14 @@
-/* vi: set ft=c inde=: */
+/* vi: set ft=c : */
 
 #define HAVE_PERL_VERSION(R, V, S) \
     (PERL_REVISION > (R) || (PERL_REVISION == (R) && (PERL_VERSION > (V) || (PERL_VERSION == (V) && (PERL_SUBVERSION >= (S))))))
 
 #ifndef NOT_REACHED
 #  define NOT_REACHED  assert(0)
+#endif
+
+#ifndef SvTRUE_NN
+#  define SvTRUE_NN(sv)  SvTRUE(sv)
 #endif
 
 #if !HAVE_PERL_VERSION(5, 18, 0)
@@ -63,6 +67,11 @@ typedef SV PADNAME;
 
 #ifndef OpMORESIB_set
 #  define OpMORESIB_set(op,sib)  ((op)->op_sibling = (sib))
+#endif
+
+#ifndef OpLASTSIB_set
+   /* older perls don't need to store this at all */
+#  define OpLASTSIB_set(op,parent)
 #endif
 
 #ifndef op_convert_list

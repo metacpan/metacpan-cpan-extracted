@@ -1,5 +1,11 @@
 Changes file for Test::Differences
 
+0.68   2021-05-18
+    - Revert undocumented change that was causing unreasonably verbose output
+      See https://github.com/DrHyde/perl-modules-Test-Differences/issues/5
+    - Improve documentation about text vs data mode and eq_or_diff_{text,data}
+      See https://github.com/DrHyde/perl-modules-Test-Differences/issues/8
+
 0.67   2019-03-06
     - Correctly compare subroutine references
 

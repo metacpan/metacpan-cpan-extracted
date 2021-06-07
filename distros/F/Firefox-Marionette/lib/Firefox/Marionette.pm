@@ -9,6 +9,7 @@ use Firefox::Marionette::Window::Rect();
 use Firefox::Marionette::Element::Rect();
 use Firefox::Marionette::Timeouts();
 use Firefox::Marionette::Capabilities();
+use Firefox::Marionette::Certificate();
 use Firefox::Marionette::Profile();
 use Firefox::Marionette::Proxy();
 use Firefox::Marionette::Exception();
@@ -49,11 +50,12 @@ our @EXPORT_OK =
   qw(BY_XPATH BY_ID BY_NAME BY_TAG BY_CLASS BY_SELECTOR BY_LINK BY_PARTIAL);
 our %EXPORT_TAGS = ( all => \@EXPORT_OK );
 
-our $VERSION = '1.05';
+our $VERSION = '1.06';
 
 sub _ANYPROCESS                     { return -1 }
 sub _COMMAND                        { return 0 }
 sub _DEFAULT_HOST                   { return 'localhost' }
+sub _DEFAULT_PORT                   { return 2828 }
 sub _MARIONETTE_PROTOCOL_VERSION_3  { return 3 }
 sub _WIN32_ERROR_SHARING_VIOLATION  { return 0x20 }
 sub _NUMBER_OF_MCOOKIE_BYTES        { return 16 }
@@ -79,11 +81,12 @@ sub _OLD_PROTOCOL_NAME_INDEX        { return 2 }
 sub _OLD_PROTOCOL_PARAMETERS_INDEX  { return 3 }
 sub _OLD_INITIAL_PACKET_SIZE        { return 66 }
 sub _READ_LENGTH_OF_OPEN3_OUTPUT    { return 50 }
-sub _DEFAULT_WINDOW_WIDTH           { return 1024 }
-sub _DEFAULT_WINDOW_HEIGHT          { return 768 }
+sub _DEFAULT_WINDOW_WIDTH           { return 1920 }
+sub _DEFAULT_WINDOW_HEIGHT          { return 1080 }
 sub _DEFAULT_DEPTH                  { return 24 }
 sub _LOCAL_READ_BUFFER_SIZE         { return 8192 }
 sub _WIN32_PROCESS_INHERIT_FLAGS    { return 0 }
+sub _DEFAULT_CERT_TRUST             { return 'C,,' }
 
 sub _WATERFOX_CURRENT_VERSION_EQUIV {
     return 68;
@@ -159,13 +162,12 @@ sub _download_directory {
     my ($self) = @_;
     my $directory;
     eval {
-        my $context = $self->context();
-        $self->context('chrome');
+        my $context = $self->_context('chrome');
         $directory =
           $self->script( 'let branch = Components.classes["' . q[@]
               . 'mozilla.org/preferences-service;1"].getService(Components.interfaces.nsIPrefService).getBranch(""); return branch.getStringPref ? branch.getStringPref("browser.download.downloadDir") : branch.getComplexValue("browser.download.downloadDir", Components.interfaces.nsISupportsString).data;'
           );
-        $self->context($context);
+        $self->_context($context);
     } or do {
         chomp $EVAL_ERROR;
         Carp::carp(
@@ -796,6 +798,176 @@ sub _compatibility_checks_for_older_marionette {
     return;
 }
 
+sub _strip_pem_prefix_whitespace_and_postfix {
+    my ( $self, $pem_encoded_string ) = @_;
+    my $stripped_certificate;
+    if (   ( $pem_encoded_string =~ s/^\-{5}BEGIN[ ]CERTIFICATE\-{5}\s*//smx )
+        && ( $pem_encoded_string =~ s/\s*\-{5}END[ ]CERTIFICATE\-{5}\s*//smx ) )
+    {
+        $stripped_certificate = join q[], split /\s+/smx, $pem_encoded_string;
+    }
+    else {
+        Firefox::Marionette::Exception->throw(
+            'Certificate must be PEM encoded');
+    }
+    return $stripped_certificate;
+}
+
+sub add_certificate {
+    my ( $self, %parameters ) = @_;
+    my $trust = $parameters{trust} ? $parameters{trust} : _DEFAULT_CERT_TRUST();
+    my $import_certificate;
+    if ( $parameters{string} ) {
+        $import_certificate = $self->_strip_pem_prefix_whitespace_and_postfix(
+            $parameters{string} );
+    }
+    elsif ( $parameters{path} ) {
+        my $pem_encoded_certificate =
+          $self->_read_certificate_from_disk( $parameters{path} );
+        $import_certificate = $self->_strip_pem_prefix_whitespace_and_postfix(
+            $pem_encoded_certificate);
+    }
+    else {
+        Firefox::Marionette::Exception->throw(
+'No certificate has been supplied.  Please use the string or path parameters'
+        );
+    }
+    $self->_import_certificate( $import_certificate, $trust );
+    return $self;
+}
+
+sub _certificate_interface_preamble {
+    my ($self) = @_;
+
+    return <<'_JS_';
+var certificateNew = Components.classes["@mozilla.org/security/x509certdb;1"].getService(Components.interfaces.nsIX509CertDB);
+var certificateDatabase = certificateNew;
+try {
+    certificateDatabase = Components.classes["@mozilla.org/security/x509certdb;1"].getService(Components.interfaces.nsIX509CertDB2);
+} catch (e) {
+}
+_JS_
+}
+
+sub _import_certificate {
+    my ( $self, $certificate, $trust ) = @_;
+
+    # security/manager/ssl/nsIX509CertDB.idl
+    my $old    = $self->_context('chrome');
+    my $result = $self->script(
+        $self->_compress_script(
+            $self->_certificate_interface_preamble() . <<"_JS_") );
+certificateDatabase.addCertFromBase64("$certificate", "$trust", "");
+_JS_
+    $self->_context($old);
+    return $result;
+}
+
+sub certificate_as_pem {
+    my ( $self, $certificate ) = @_;
+
+    # security/manager/ssl/nsIX509CertDB.idl
+    # security/manager/ssl/nsIX509Cert.idl
+    my $encoded_db_key = URI::Escape::uri_escape( $certificate->db_key() );
+    my $old            = $self->_context('chrome');
+    my $certificate_base64_string = MIME::Base64::encode_base64(
+        (
+            pack 'C*',
+            @{
+                $self->script(
+                    $self->_compress_script(
+                        $self->_certificate_interface_preamble()
+                          . <<"_JS_") ) } ), q[] );
+return certificateDatabase.findCertByDBKey(decodeURIComponent("$encoded_db_key"), {}).getRawDER({});
+_JS_
+    $self->_context($old);
+
+    my $certificate_in_pem_form =
+        "-----BEGIN CERTIFICATE-----\n"
+      . ( join "\n", unpack '(A64)*', $certificate_base64_string )
+      . "\n-----END CERTIFICATE-----\n";
+    return $certificate_in_pem_form;
+}
+
+sub delete_certificate {
+    my ( $self, $certificate ) = @_;
+
+    # security/manager/ssl/nsIX509CertDB.idl
+    my $encoded_db_key = URI::Escape::uri_escape( $certificate->db_key() );
+    my $old            = $self->_context('chrome');
+    my $certificate_base64_string = $self->script(
+        $self->_compress_script(
+            $self->_certificate_interface_preamble() . <<"_JS_") );
+let certificate = certificateDatabase.findCertByDBKey(decodeURIComponent("$encoded_db_key"), {});
+return certificateDatabase.deleteCertificate(certificate);
+_JS_
+    $self->_context($old);
+    return $self;
+}
+
+sub certificates {
+    my ($self)       = @_;
+    my $old          = $self->_context('chrome');
+    my $certificates = $self->script(
+        $self->_compress_script(
+            $self->_certificate_interface_preamble() . <<'_JS_') );
+let result = certificateDatabase.getCerts();
+if (Array.isArray(result)) {
+    return result;
+} else {
+    let certEnum = result.getEnumerator();
+    let certificates = new Array();
+    while(certEnum.hasMoreElements()) {
+        certificates.push(certEnum.getNext().QueryInterface(Components.interfaces.nsIX509Cert));
+    }
+    return certificates;
+}
+_JS_
+    $self->_context($old);
+    my @certificates;
+    foreach my $certificate ( @{$certificates} ) {
+        push @certificates, Firefox::Marionette::Certificate->new($certificate);
+    }
+    return @certificates;
+}
+
+sub _read_certificate_from_disk {
+    my ( $self, $path ) = @_;
+    my $handle = FileHandle->new( $path, Fcntl::O_RDONLY() )
+      or Firefox::Marionette::Exception->throw(
+        "Failed to open certificate '$path' for reading:$EXTENDED_OS_ERROR");
+    my $certificate = q[];
+    my $result;
+    while ( $result = $handle->read( my $buffer, _LOCAL_READ_BUFFER_SIZE() ) ) {
+        $certificate .= $buffer;
+    }
+    defined $result
+      or Firefox::Marionette::Exception->throw(
+        "Failed to read from '$path':$EXTENDED_OS_ERROR");
+    $handle->close()
+      or Firefox::Marionette::Exception->throw(
+        "Failed to close '$path':$EXTENDED_OS_ERROR");
+    return $certificate;
+}
+
+sub _read_certificates_from_disk {
+    my ( $self, $trust ) = @_;
+    my @certificates;
+    if ($trust) {
+        if ( ref $trust ) {
+            foreach my $path ( @{$trust} ) {
+                my $certificate = $self->_read_certificate_from_disk($path);
+                push @certificates, $certificate;
+            }
+        }
+        else {
+            my $certificate = $self->_read_certificate_from_disk($trust);
+            push @certificates, $certificate;
+        }
+    }
+    return @certificates;
+}
+
 sub new {
     my ( $class, %parameters ) = @_;
     my $self = $class->_init(%parameters);
@@ -806,11 +978,19 @@ sub new {
         ( $session_id, $capabilities ) = $self->_reconnect(%parameters);
     }
     else {
+        my @certificates =
+          $self->_read_certificates_from_disk( $parameters{trust} );
         @arguments = $self->_setup_arguments(%parameters);
         $self->_launch(@arguments);
         my $socket = $self->_setup_local_connection_to_firefox(@arguments);
         ( $session_id, $capabilities ) =
           $self->_initial_socket_setup( $socket, $parameters{capabilities} );
+        foreach my $certificate (@certificates) {
+            $self->add_certificate(
+                string => $certificate,
+                trust  => _DEFAULT_CERT_TRUST()
+            );
+        }
     }
 
     if ( ($session_id) && ($capabilities) && ( ref $capabilities ) ) {
@@ -931,11 +1111,11 @@ sub _clean_local_extension_directory {
 
 sub har {
     my ($self)  = @_;
-    my $context = $self->context('content');
+    my $context = $self->_context('content');
     my $log     = $self->script(<<'_JS_');
 return (async function() { return await HAR.triggerExport() })();
 _JS_
-    $self->context($context);
+    $self->_context($context);
     return { log => $log };
 }
 
@@ -1069,6 +1249,8 @@ sub _setup_arguments {
     push @arguments, $self->_check_visible(%parameters);
     if ( $parameters{profile_name} ) {
         $self->{profile_name} = $parameters{profile_name};
+        $self->{profile_path} =
+          Firefox::Marionette::Profile->path( $parameters{profile_name} );
         push @arguments, ( '-P', $self->{profile_name} );
     }
     else {
@@ -1144,49 +1326,8 @@ _RDF_
         if ( $self->{_har} ) {
             push @arguments, '--devtools';
         }
-        if ( $parameters{trust} ) {
-            $self->_add_certificates( $profile_directory, %parameters );
-        }
     }
     return @arguments;
-}
-
-sub _add_certificates {
-    my ( $self, $profile_directory, %parameters ) = @_;
-    my @paths;
-    if ( ref $parameters{trust} ) {
-        @paths = @{ $parameters{trust} };
-    }
-    else {
-        @paths = ( $parameters{trust} );
-    }
-    $self->{_trust_count} ||= 0;
-    foreach my $path (@paths) {
-        $self->{_trust_count} += 1;
-        if ( $self->_ssh() ) {
-            $self->{_cert_directory} = $self->_make_remote_directory(
-                $self->_remote_catfile( $self->{_root_directory}, 'certs' ) );
-            my $remote_path = $self->_remote_catfile( $self->{_cert_directory},
-                'root_ca_' . $self->{_trust_count} . '.cer' );
-            my $handle = FileHandle->new( $path, Fcntl::O_RDONLY() )
-              or Firefox::Marionette::Exception->throw(
-                "Failed to open '$path' for reading:$EXTENDED_OS_ERROR");
-            $self->_put_file_via_scp( $handle, $remote_path, $path );
-            $path = $remote_path;
-        }
-        foreach my $type (qw(dbm sql)) {
-            my $binary    = 'certutil';
-            my @arguments = (
-                '-A',
-                '-d' => $type . q[:] . $profile_directory,
-                '-i' => $path,
-                '-n' => 'Firefox::Marionette Root CA ' . $self->{_trust_count},
-                '-t' => 'TC,,',
-            );
-            $self->execute( $binary, @arguments );
-        }
-    }
-    return;
 }
 
 sub _write_mime_types_via_ssh {
@@ -1418,6 +1559,11 @@ sub _search_for_version_in_application_ini {
             my $config =
               Config::INI::Reader->read_handle($application_ini_handle);
             if ( my $app = $config->{App} ) {
+                if ( $app->{SourceRepository} eq
+                    'https://hg.mozilla.org/releases/mozilla-beta' )
+                {
+                    $self->{developer_edition} = 1;
+                }
                 return join q[ ], $app->{Vendor}, $app->{Name}, $app->{Version};
             }
         }
@@ -3939,6 +4085,11 @@ sub _get_marionette_port {
                 "Failed to close '$self->{profile_path}':$EXTENDED_OS_ERROR");
         }
     }
+    if ( defined $port ) {
+    }
+    else {
+        $port = _DEFAULT_PORT();
+    }
     return $port;
 }
 
@@ -4475,7 +4626,7 @@ sub _validate_request_header_merge {
 
 sub _set_headers {
     my ($self) = @_;
-    $self->context('chrome');
+    my $old    = $self->_context('chrome');
     my $script = <<'_JS_';
 (function() {
     let observerService = Components.classes["@mozilla.org/observer-service;1"].getService(Components.interfaces.nsIObserverService);
@@ -4562,7 +4713,7 @@ _JS_
 }).register();
 _JS_
     $self->script( $self->_compress_script($script) );
-    $self->context('content');
+    $self->_context($old);
     return;
 }
 
@@ -5556,6 +5707,137 @@ sub chrome_window_handle {
     return $self->_response_result_value($response);
 }
 
+sub key_down {
+    my ( $self, $key ) = @_;
+    return { type => 'keyDown', value => $key };
+}
+
+sub key_up {
+    my ( $self, $key ) = @_;
+    return { type => 'keyUp', value => $key };
+}
+
+sub pause {
+    my ( $self, $duration ) = @_;
+    return { type => 'pause', duration => $duration };
+}
+
+sub mouse_move {
+    my ( $self, @parameters ) = @_;
+    my %arguments;
+    if ( $parameters[0]->isa('Firefox::Marionette::Element') ) {
+        my $rect = $parameters[0]->rect();
+        $arguments{x} = $rect->pos_x() + ( $rect->width() / 2 );
+        if ( $arguments{x} != int $arguments{x} ) {
+            $arguments{x} = int $arguments{x} + 1;
+        }
+        $arguments{y} = $rect->pos_y() + ( $rect->height() / 2 );
+        if ( $arguments{y} != int $arguments{y} ) {
+            $arguments{y} = int $arguments{y} + 1;
+        }
+    }
+    else {
+        %arguments = @parameters;
+    }
+    return { type => 'pointerMove', pointerType => 'mouse', %arguments };
+}
+
+sub mouse_down {
+    my ( $self, $button ) = @_;
+    return {
+        type        => 'pointerDown',
+        pointerType => 'mouse',
+        button      => ( $button || 0 )
+    };
+}
+
+sub mouse_up {
+    my ( $self, $button ) = @_;
+    return {
+        type        => 'pointerUp',
+        pointerType => 'mouse',
+        button      => ( $button || 0 )
+    };
+}
+
+sub perform {
+    my ( $self, @actions ) = @_;
+    my $message_id = $self->_new_message_id();
+    my $previous_type;
+    my @action_sequence;
+    foreach my $parameter_action (@actions) {
+        my $marionette_action = {};
+        foreach my $key ( sort { $a cmp $b } keys %{$parameter_action} ) {
+            $marionette_action->{$key} = $parameter_action->{$key};
+        }
+        my $type;
+        my %arguments;
+        if (   ( $marionette_action->{type} eq 'keyUp' )
+            || ( $marionette_action->{type} eq 'keyDown' ) )
+        {
+            $type = 'key';
+        }
+        elsif (( $marionette_action->{type} eq 'pointerMove' )
+            || ( $marionette_action->{type} eq 'pointerDown' )
+            || ( $marionette_action->{type} eq 'pointerUp' ) )
+        {
+            $type = 'pointer';
+            %arguments =
+              ( pointerType => delete $marionette_action->{pointerType} );
+        }
+        elsif ( $marionette_action->{type} eq 'pause' ) {
+            if ( defined $previous_type ) {
+                $type = $previous_type;
+            }
+            else {
+                $type = 'none';
+            }
+        }
+        else {
+            Firefox::Marionette::Exception->throw(
+'Unknown action type in sequence.  keyUp, keyDown, pointerMove, pointerDown, pointerUp or pause are the only known types'
+            );
+        }
+        $self->{next_action_sequence_id}++;
+        my $id = $self->{next_action_sequence_id};
+        if ( ( defined $previous_type ) && ( $type eq $previous_type ) ) {
+            push @{ $action_sequence[-1]{actions} }, $marionette_action;
+        }
+        else {
+            push @action_sequence,
+              {
+                type => $type,
+                id   => 'seq' . $id,
+                %arguments, actions => [$marionette_action]
+              };
+        }
+        $previous_type = $type;
+    }
+    $self->_send_request(
+        [
+            _COMMAND(), $message_id,
+            $self->_command('WebDriver:PerformActions'),
+            { actions => \@action_sequence },
+
+        ]
+    );
+    my $response = $self->_get_response($message_id);
+    return $self;
+}
+
+sub release {
+    my ( $self, @actions ) = @_;
+    my $message_id = $self->_new_message_id();
+    $self->_send_request(
+        [
+            _COMMAND(), $message_id, $self->_command('WebDriver:ReleaseActions')
+        ]
+    );
+    my $response = $self->_get_response($message_id);
+    $self->{next_action_sequence_id} = 0;
+    return $self;
+}
+
 sub chrome_window_handles {
     my ( $self, $element ) = @_;
     my $message_id = $self->_new_message_id();
@@ -6324,7 +6606,24 @@ sub _terminate_xvfb {
     return;
 }
 
+sub content {
+    my ($self) = @_;
+    $self->_context('content');
+    return $self;
+}
+
+sub chrome {
+    my ($self) = @_;
+    $self->_context('chrome');
+    return $self;
+}
+
 sub context {
+    my ( $self, $new ) = @_;
+    return $self->_context($new);
+}
+
+sub _context {
     my ( $self, $new ) = @_;
     my $message_id = $self->_new_message_id();
     $self->_send_request(
@@ -6698,7 +6997,10 @@ sub await {
 sub developer {
     my ($self) = @_;
     $self->_initialise_version();
-    if (   ( defined $self->{_initial_version} )
+    if ( $self->{developer_edition} ) {
+        return 1;
+    }
+    elsif (( defined $self->{_initial_version} )
         && ( $self->{_initial_version}->{minor} )
         && ( $self->{_initial_version}->{minor} =~ /b\d+$/smx ) )
     {
@@ -6907,8 +7209,9 @@ sub _convert_request_to_old_protocols {
 sub _send_request {
     my ( $self, $object ) = @_;
     $object = $self->_convert_request_to_old_protocols($object);
-    my $json   = JSON->new()->convert_blessed()->encode($object);
-    my $length = length $json;
+    my $encoder = JSON->new()->convert_blessed()->ascii();
+    my $json    = $encoder->encode($object);
+    my $length  = length $json;
     if ( $self->_debug() ) {
         warn ">> $length:$json\n";
     }
@@ -7094,7 +7397,7 @@ Firefox::Marionette - Automate the Firefox browser with the Marionette protocol
 
 =head1 VERSION
 
-Version 1.05
+Version 1.06
 
 =head1 SYNOPSIS
 
@@ -7136,6 +7439,31 @@ Please note that when closing the connection via the client you can end-up in a 
 =head2 active_element
 
 returns the active element of the current browsing context's document element, if the document element is non-null.
+
+=head2 add_certificate
+
+accepts a hash as a parameter and adds the specified certificate to the Firefox database with the supplied or default trust.  Allowed keys are below;
+
+=over 4
+
+=item * path - a file system path to a single L<PEM encoded X.509 certificate|https://datatracker.ietf.org/doc/html/rfc7468#section-5>.
+
+=item * string - a string containg a single L<PEM encoded X.509 certificate|https://datatracker.ietf.org/doc/html/rfc7468#section-5>
+
+=item * trust - This is the L<trustargs|https://www.mankier.com/1/certutil#-t> value for L<NSS|https://wiki.mozilla.org/NSS>.  If defaults to 'C,,';
+
+=back
+
+    use Firefox::Marionette();
+
+    my $pem_encoded_string = <<'_PEM_';
+    -----BEGIN CERTIFICATE-----
+    MII..
+    -----END CERTIFICATE-----
+    _PEM_
+    my $firefox = Firefox::Marionette->new()->add_certificate(string => $pem_encoded_string);
+
+This method returns L<itself|Firefox::Marionette> to aid in chaining methods.
 
 =head2 add_cookie
 
@@ -7257,9 +7585,54 @@ accepts a subroutine reference as a parameter and then executes the subroutine. 
 
 returns the L<capabilities|Firefox::Marionette::Capabilities> of the current firefox binary.  You can retrieve L<timeouts|Firefox::Marionette::Timeouts> or a L<proxy|Firefox::Marionette::Proxy> with this method.
 
+=head2 certificate_as_pem
+
+accepts a L<certificate stored in the Firefox database|Firefox::Marionette::Certificate> as a parameter and returns a L<PEM encoded X.509 certificate|https://datatracker.ietf.org/doc/html/rfc7468#section-5> as a string.
+
+    use Firefox::Marionette();
+
+    my $firefox = Firefox::Marionette->new();
+
+    # Generating a ca-bundle.crt to STDOUT from the current firefox instance
+
+    foreach my $certificate (sort { $a->display_name() cmp $b->display_name } $firefox->certificates()) {
+        if ($certificate->is_ca_cert()) {
+            print '# ' . $certificate->display_name() . "\n" . $firefox->certificate_as_pem($certificate) . "\n";
+        }
+    }
+
+=head2 certificates
+
+returns a list of all known L<certificates in the Firefox database|Firefox::Marionette::Certificate>.
+
+    use Firefox::Marionette();
+    use v5.10;
+
+    # Sometimes firefox can neglect old certificates.  See https://bugzilla.mozilla.org/show_bug.cgi?id=1710716
+
+    my $firefox = Firefox::Marionette->new();
+    foreach my $certificate (grep { $_->is_ca_cert() && $_->not_valid_after() < time } $firefox->certificates()) {
+        say "The " . $certificate->display_name() " . certificate has expired and should be removed";
+    }
+
+This method returns L<itself|Firefox::Marionette> to aid in chaining methods.
+
 =head2 child_error
 
 This method returns the $? (CHILD_ERROR) for the Firefox process, or undefined if the process has not yet exited.
+
+=head2 chrome
+
+changes the scope of subsequent commands to chrome context.  This allows things like interacting with firefox menu's and buttons outside of the browser window.
+
+    use Firefox::Marionette();
+    use v5.10;
+
+    my $firefox = Firefox::Marionette->new()->chrome();
+    $firefox->script(...); # running script in chrome context
+    $firefox->content();
+
+See the L<context|Firefox::Marionette#context> method for an alternative methods for changing the context.
 
 =head2 chrome_window_handle
 
@@ -7295,6 +7668,19 @@ closes the current chrome window (that is the entire window, not just the tabs).
 
 closes the current window/tab.  It returns a list of still available window/tab handles.
 
+=head2 content
+
+changes the scope of subsequent commands to browsing context.  This is the default for when firefox starts and restricts commands to operating in the browser window only.
+
+    use Firefox::Marionette();
+    use v5.10;
+
+    my $firefox = Firefox::Marionette->new()->chrome();
+    $firefox->script(...); # running script in chrome context
+    $firefox->content();
+
+See the L<context|Firefox::Marionette#context> method for an alternative methods for changing the context.
+
 =head2 context
 
 accepts a string as the first parameter, which may be either 'content' or 'chrome'.  It returns the context type that is Marionette's current target for browsing context scoped commands.
@@ -7303,9 +7689,14 @@ accepts a string as the first parameter, which may be either 'content' or 'chrom
     use v5.10;
 
     my $firefox = Firefox::Marionette->new();
+    if ($firefox->context() eq 'content') {
+       say "I knew that was going to happen";
+    }
     my $old_context = $firefox->context('chrome');
     $firefox->script(...); # running script in chrome context
     $firefox->context($old_context);
+
+See the L<content|Firefox::Marionette#content> and L<chrome|Firefox::Marionette#chrome> methods for alternative methods for changing the context.
 
 =head2 cookies
 
@@ -7336,6 +7727,25 @@ accepts an L<element|Firefox::Marionette::Element> as the first parameter and a 
 =head2 current_chrome_window_handle 
 
 see L<chrome_window_handle|Firefox::Marionette#chrome_window_handle>.
+
+=head2 delete_certificate
+
+accepts a L<certificate stored in the Firefox database|Firefox::Marionette::Certificate> as a parameter and deletes/distrusts the certificate from the Firefox database.
+
+    use Firefox::Marionette();
+    use v5.10;
+
+    my $firefox = Firefox::Marionette->new();
+    foreach my $certificate ($firefox->certificates()) {
+        if ($certificate->is_ca_cert()) {
+            $firefox->delete_certificate($certificate);
+        } else {
+            say "This " . $certificate->display_name() " certificate is NOT a certificate authority, therefore it is not being deleted";
+        }
+    }
+    say "Good luck visiting a HTTPS website!";
+
+This method returns L<itself|Firefox::Marionette> to aid in chaining methods.
 
 =head2 delete_cookie
 
@@ -7874,6 +8284,37 @@ returns a L<JSON|JSON> object that has been parsed from the page source of the c
 
     say Firefox::Marionette->new()->go('https://fastapi.metacpan.org/v1/download_url/Firefox::Marionette")->json()->{version};
 
+=head2 key_down
+
+accepts a parameter describing a key and returns an action for use in the L<perform|Firefox::Marionette#perform> method that corresponding with that key being depressed.
+
+    use Firefox::Marionette();
+    use Firefox::Marionette::Keys qw(:all);
+
+    my $firefox = Firefox::Marionette->new();
+
+    $firefox->chrome()->perform(
+                                 $firefox->key_down(CONTROL()),
+                                 $firefox->key_down('l'),
+                               )->release()->content();
+
+=head2 key_up
+
+accepts a parameter describing a key and returns an action for use in the L<perform|Firefox::Marionette#perform> method that corresponding with that key being released.
+
+    use Firefox::Marionette();
+    use Firefox::Marionette::Keys qw(:all);
+
+    my $firefox = Firefox::Marionette->new();
+
+    $firefox->chrome()->perform(
+                                 $firefox->key_down(CONTROL()),
+                                 $firefox->key_down('l'),
+                                 $firefox->pause(20),
+                                 $firefox->key_up('l'),
+                                 $firefox->key_up(CONTROL())
+                               )->content();
+
 =head2 loaded
 
 returns true if C<document.readyState === "complete">
@@ -7912,6 +8353,18 @@ returns a list of MIME types that will be downloaded by firefox and made availab
 
 minimises the firefox window. This method returns L<itself|Firefox::Marionette> to aid in chaining methods.
 
+=head2 mouse_down
+
+accepts a parameter describing which mouse button the method should apply to (L<left|Firefox::Marionette::Buttons#LEFT>, L<middle|Firefox::Marionette::Buttons#MIDDLE> or L<right|Firefox::Marionette::Buttons#RIGHT>) and returns an action for use in the L<perform|Firefox::Marionette#perform> method that corresponding with a mouse button being depressed.
+
+=head2 mouse_move
+
+accepts a L<element|Firefox::Marionette::Element> parameter, or a C<( x =E<gt> 0, y =E<gt> 0 )> type hash manually describing exactly where to move the mouse to and returns an action for use in the L<perform|Firefox::Marionette#perform> method that corresponding with such a mouse movement, either to the specified co-ordinates or to the middle of the supplied L<element|Firefox::Marionette::Element> parameter.
+
+=head2 mouse_up
+
+accepts a parameter describing which mouse button the method should apply to (L<left|Firefox::Marionette::Buttons#LEFT>, L<middle|Firefox::Marionette::Buttons#MIDDLE> or L<right|Firefox::Marionette::Buttons#RIGHT>) and returns an action for use in the L<perform|Firefox::Marionette#perform> method that corresponding with a mouse button being released.
+
 =head2 new
  
 accepts an optional hash as a parameter.  Allowed keys are below;
@@ -7924,11 +8377,11 @@ accepts an optional hash as a parameter.  Allowed keys are below;
 
 =item * chatty - Firefox is extremely chatty on the network, including checking for the lastest malware/phishing sites, updates to firefox/etc.  This option is therefore off ("0") by default, however, it can be switched on ("1") if required.  Even with chatty switched off, L<connections to firefox.settings.services.mozilla.com will still be made|https://bugzilla.mozilla.org/show_bug.cgi?id=1598562#c13>.  The only way to prevent this seems to be to set firefox.settings.services.mozilla.com to 127.0.0.1 via L</etc/hosts|https://en.wikipedia.org/wiki//etc/hosts>.  NOTE: that this option only works when profile_name/profile is not specified.
 
-=item * console - show the L<browser console|https://developer.mozilla.org/en-US/docs/Tools/Browser_Console/> when the browser is launched.
+=item * console - show the L<browser console|https://developer.mozilla.org/en-US/docs/Tools/Browser_Console/> when the browser is launched.  This defaults to "0" (off).
 
-=item * debug - should firefox's debug to be available via STDERR. This defaults to "0". Any ssh connections will also be printed to STDERR.
+=item * debug - should firefox's debug to be available via STDERR. This defaults to "0". Any ssh connections will also be printed to STDERR.  This defaults to "0" (off).
 
-=item * developer - only allow a L<developer edition|https://www.mozilla.org/en-US/firefox/developer/> to be launched.
+=item * developer - only allow a L<developer edition|https://www.mozilla.org/en-US/firefox/developer/> to be launched. This defaults to "0" (off).
 
 =item * firefox - use the specified path to the L<Firefox|https://firefox.org/> binary, rather than the default path.
 
@@ -7942,7 +8395,7 @@ accepts an optional hash as a parameter.  Allowed keys are below;
 
 =item * mime_types - any MIME types that Firefox will encounter during this session.  MIME types that are not specified will result in a hung browser (the File Download popup will appear).
 
-=item * nightly - only allow a L<nightly release|https://www.mozilla.org/en-US/firefox/channel/desktop/#nightly> to be launched.
+=item * nightly - only allow a L<nightly release|https://www.mozilla.org/en-US/firefox/channel/desktop/#nightly> to be launched.  This defaults to "0" (off).
 
 =item * port - if the "host" parameter is also set, use L<ssh|https://man.openbsd.org/ssh.1> to create and automate firefox via the specified port.  See L<REMOTE AUTOMATION OF FIREFOX VIA SSH|Firefox::Marionette#REMOTE-AUTOMATION-OF-FIREFOX-VIA-SSH>.
 
@@ -7962,7 +8415,7 @@ accepts an optional hash as a parameter.  Allowed keys are below;
 
 =item * survive - if this is set to a true value, firefox will not automatically exit when the object goes out of scope.  See the reconnect parameter for an experimental technique for reconnecting.
 
-=item * trust - give a path to a L<root certificate|https://en.wikipedia.org/wiki/Root_certificate> that will be trusted for this session.  The certificate will be imported by the L<NSS certutil|https://developer.mozilla.org/en-US/docs/Mozilla/Projects/NSS/tools/NSS_Tools_certutil> binary.  If this binary does not exist in the L<PATH|https://en.wikipedia.org/wiki/PATH_(variable)>, an exception will be thrown.  For Linux/BSD systems, L<NSS certutil|https://developer.mozilla.org/en-US/docs/Mozilla/Projects/NSS/tools/NSS_Tools_certutil> should be available via your package manager.  For OS X and Windows based platforms, it will be more difficult.
+=item * trust - give a path to a L<root certificate|https://en.wikipedia.org/wiki/Root_certificate> encoded as a L<PEM encoded X.509 certificate|https://datatracker.ietf.org/doc/html/rfc7468#section-5> that will be trusted for this session.
 
 =item * timeouts - a shortcut to allow directly providing a L<timeout|Firefox::Marionette::Timeout> object, instead of needing to use timeouts from the capabilities parameter.  Overrides the timeouts provided (if any) in the capabilities parameter.
 
@@ -8029,6 +8482,10 @@ returns true if the L<current version|Firefox::Marionette#browser_version> of fi
 
 returns a list of all the recognised names for paper sizes, such as A4 or LEGAL.
 
+=head2 pause
+
+accepts a parameter in milliseconds and returns a corresponding action for the L<perform|Firefox::Marionette#perform> method that will cause a pause in the chain of actions given to the L<perform|Firefox::Marionette#perform> method.
+
 =head2 pdf
 
 returns a L<File::Temp|File::Temp> object containing a PDF encoded version of the current page for printing.
@@ -8066,6 +8523,34 @@ accepts a optional hash as the first parameter with the following allowed keys;
             ...
     }
 
+=head2 perform
+
+accepts a list of actions (see L<mouse_up|Firefox::Marionette#mouse_up>, L<mouse_down|Firefox::Marionette#mouse_down>, L<mouse_move|Firefox::Marionette#mouse_move>, L<pause|Firefox::Marionette#pause>, L<key_down|Firefox::Marionette#key_down> and L<key_up|Firefox::Marionette#key_up>) and performs these actions in sequence.  This allows fine control over interactions, including sending right clicks to the browser and sending Control, Alt and other special keys.  The L<release|Firefox::Marionette#release> method will complete outstanding actions (such as L<mouse_up|Firefox::Marionette#mouse_up> or L<key_up|Firefox::Marionette#key_up> actions).
+
+    use Firefox::Marionette();
+    use Firefox::Marionette::Keys qw(:all);
+    use Firefox::Marionette::Buttons qw(:all);
+
+    my $firefox = Firefox::Marionette->new();
+
+    $firefox->chrome()->perform(
+                                 $firefox->key_down(CONTROL()),
+                                 $firefox->key_down('l'),
+                                 $firefox->key_up('l'),
+                                 $firefox->key_up(CONTROL())
+                               )->content();
+
+    $firefox->go('https://metacpan.org');
+    my $help_button = $firefox->find_class('btn search-btn help-btn');
+    $firefox->perform(
+			          $firefox->mouse_move($help_button),
+			          $firefox->mouse_down(RIGHT_BUTTON()),
+			          $firefox->pause(4),
+			          $firefox->mouse_up(RIGHT_BUTTON()),
+		);
+
+See the L<release|Firefox::Marionette#release> method for an alternative for manually specifying all the L<mouse_up|Firefox::Marionette#mouse_up> and L<key_up|Firefox::Marionette#key_up> methods
+
 =head2 property
 
 accepts an L<element|Firefox::Marionette::Element> as the first parameter and a scalar attribute name as the second parameter.  It returns the current value of the property with the supplied name.  This method will return the current content, the L<attribute|Firefox::Marionette#attribute> method will return the initial content.
@@ -8093,6 +8578,29 @@ accepts a L<element|Firefox::Marionette::Element> as the first parameter and ret
 =head2 refresh
 
 refreshes the current page.  The browser will wait for the page to completely refresh or the session's L<page_load|Firefox::Marionette::Timeouts#page_load> duration to elapse before returning, which, by default is 5 minutes.  This method returns L<itself|Firefox::Marionette> to aid in chaining methods.
+
+=head2 release
+
+completes any outstanding actions issued by the L<perform|Firefox::Marionette#perform> method.
+
+    use Firefox::Marionette();
+    use Firefox::Marionette::Keys qw(:all);
+    use Firefox::Marionette::Buttons qw(:all);
+
+    my $firefox = Firefox::Marionette->new();
+
+    $firefox->chrome()->perform(
+                                 $firefox->key_down(CONTROL()),
+                                 $firefox->key_down('l'),
+                               )->release()->content();
+
+    $firefox->go('https://metacpan.org');
+    my $help_button = $firefox->find_class('btn search-btn help-btn');
+    $firefox->perform(
+			          $firefox->mouse_move($help_button),
+			          $firefox->mouse_down(RIGHT_BUTTON()),
+			          $firefox->pause(4),
+		)->release();
 
 =head2 screen_orientation
 
@@ -8443,10 +8951,6 @@ Currently the following Marionette methods have not been implemented;
 
 =over
  
-=item * WebDriver:ReleaseAction
-
-=item * WebDriver:PerformActions
-
 =item * WebDriver:SetScreenOrientation
 
 =back
@@ -8487,6 +8991,8 @@ David Dick  C<< <ddick@cpan.org> >>
 Thanks to the entire Mozilla organisation for a great browser and to the team behind Marionette for providing an interface for automation.
  
 Thanks to L<Jan Odvarko|http://www.softwareishard.com/blog/about/> for creating the L<HAR Export Trigger|https://github.com/firefox-devtools/har-export-trigger> extension for Firefox.
+
+Thanks to L<Mike Kaply|https://mike.kaply.com/about/> for his L<post|https://mike.kaply.com/2015/02/10/installing-certificates-into-firefox/> describing importing certificates into Firefox.
 
 Thanks also to the authors of the documentation in the following sources;
 

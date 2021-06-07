@@ -3,7 +3,7 @@
 #
 # dbrvstatdiff
 #
-# Copyright (C) 1991-2018 by John Heidemann <johnh@isi.edu>
+# Copyright (C) 1991-2021 by John Heidemann <johnh@isi.edu>
 #
 # This program is distributed under terms of the GNU general
 # public license, version 2.  See the file COPYING
@@ -265,9 +265,10 @@ from two experiments, and to use dbrvstatdiff to see if they are different.
 
 =head1 SEE ALSO
 
-L<Fsdb>.
-L<dbcolstats>.
-L<dbcolcopylast>.
+L<Fsdb>,
+L<dbcolstats>,
+L<dbcolcopylast>,
+L<dbcolscorrelate>.
 
 
 =head1 CLASS FUNCTIONS
@@ -552,7 +553,7 @@ sub run ($) {
 
 =head1 AUTHOR and COPYRIGHT
 
-Copyright (C) 1991-2018 by John Heidemann <johnh@isi.edu>
+Copyright (C) 1991-2021 by John Heidemann <johnh@isi.edu>
 
 This program is distributed under terms of the GNU general
 public license, version 2.  See the file COPYING

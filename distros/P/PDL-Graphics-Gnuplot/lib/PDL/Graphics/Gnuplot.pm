@@ -474,12 +474,12 @@ When making a simple 2D plot, if exactly 1 dimension is missing,
 PDL::Graphics::Gnuplot will use C<sequence(N)> as the domain. This is
 why code like C<plot(pdl(1,5,3,4,4) )> works. Only one PDL is given
 here, but the plot type ("lines" by default) requires 2 elements per
-tuple. We are thus exactly 1 piddle short; C<sequence(5)> is used as
+tuple. We are thus exactly 1 ndarray short; C<sequence(5)> is used as
 the missing domain PDL.  This is thus equivalent to
 C<plot(sequence(5), pdl(1,5,3,4,4) )>.
 
 If plotting in 3d or displaying an image, an implicit domain will be
-used if we are exactly 2 piddles short. In this case,
+used if we are exactly 2 ndarrays short. In this case,
 PDL::Graphics::Gnuplot will use a 2D grid as a domain. Example:
 
  my $xy = zeros(21,21)->ndcoords - pdl(10,10);
@@ -487,8 +487,8 @@ PDL::Graphics::Gnuplot will use a 2D grid as a domain. Example:
         with => 'points', inner($xy, $xy));
  gplot( with => 'image',  sin(rvals(51,51)) );
 
-Here the only given piddle has dimensions (21,21). This is a 3D plot, so we are
-exactly 2 piddles short. Thus, PDL::Graphics::Gnuplot generates an implicit
+Here the only given ndarray has dimensions (21,21). This is a 3D plot, so we are
+exactly 2 ndarrays short. Thus, PDL::Graphics::Gnuplot generates an implicit
 domain, corresponding to a 21-by-21 grid.
 
 C<PDL::Graphics::Gnuplot> requires explicit separators between tuples
@@ -1760,7 +1760,7 @@ details.
 
 =head2 2D plotting
 
-If we're plotting a piddle $y of y-values to be plotted sequentially (implicit
+If we're plotting an ndarray $y of y-values to be plotted sequentially (implicit
 domain), all you need is
 
   gplot($y);
@@ -1834,7 +1834,7 @@ Gnuplot >= 4.4):
 
   splot(square => 1, $x, $y, $z);
 
-If $xy is a 2D piddle, we can plot it as a height map on an implicit domain
+If $xy is a 2D ndarray, we can plot it as a height map on an implicit domain
 
   splot($xy);
 
@@ -1961,8 +1961,8 @@ a 3-tuple: X, Y, and R.
    );
 
 This is a 3d plot with variable size and color. There are 5 values in
-the tuple.  The first 2 piddles have dimensions (N,2); all the other
-piddles have a single dimension. The "cdim=>1" specifies that each column
+the tuple.  The first 2 ndarrays have dimensions (N,2); all the other
+ndarrays have a single dimension. The "cdim=>1" specifies that each column
 of data should be one-dimensional. Thus the PDL threading generates 2
 distinct curves, with varying values for x,y and identical values for
 everything else.  To label the curves differently, 2 different sets of
@@ -2019,7 +2019,7 @@ our $echo_eating = 0;                             # Older versions of gnuplot on
 our $debug_echo = 0;                              # If set, mock up Losedows half-duplex pipes
 
 
-our $VERSION = '2.016';
+our $VERSION = '2.017';
 $VERSION = eval $VERSION;
 
 our $gp_version = undef;    # eventually gets the extracted gnuplot(1) version number.
@@ -4727,6 +4727,37 @@ no PDL::NiceSlice;
 
 }
 
+=pod
+
+=head2 pause_until_close
+
+=for usage
+
+  $w->pause_until_close;
+
+=for ref
+
+Wait until the active interactive plot window is closed (e.g., by clicking the
+close button, hitting the close key-binding which defaults to C<q>).
+
+C<pause_until_close> blocks execution until the close event.
+
+=cut
+
+sub pause_until_close {
+    my $this = shift;
+
+    barf "pause_until_close: $this->{terminal} terminal doesn't support mousing\n"
+        unless($this->{mouse});
+
+    _printGnuplotPipe($this, 'main', <<'EOC');
+pause mouse close
+EOC
+    _checkpoint($this, "main", {notimeout=>1});
+
+    return;
+}
+
 ######################################################################
 ######################################################################
 ######################################################################
@@ -5503,7 +5534,7 @@ $cOpt = [$cOptionsTable, $cOptionsAbbrevs, "curve option"];
 #               * the main plot object (for access to plot options)
 #               * the plot chunk (for access to curve options),
 #               * all the data passed in for that curve.
-#              It should return the new data piddle list, and modify the chunk 'with' list and curve options in place.
+#              It should return the new data ndarray list, and modify the chunk 'with' list and curve options in place.
 #              While it has access to plot options, it probably shouldn't modify them.
 
 our $plotStyleProps ={

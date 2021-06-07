@@ -1,5 +1,5 @@
 package Git::Repository::Plugin;
-$Git::Repository::Plugin::VERSION = '1.324';
+$Git::Repository::Plugin::VERSION = '1.325';
 use strict;
 use warnings;
 use 5.006;

@@ -1,0 +1,151 @@
+#!/usr/bin/perl 
+
+use 5.014 ; use warnings ; # 5.001だった
+use feature qw[ say ] ;
+use Time::HiRes qw [ gettimeofday tv_interval ] ;
+my ${ dt_start } = [ gettimeofday ] ; 
+use Term::ANSIColor qw[ :constants ] ; $Term::ANSIColor::AUTORESET = 1 ; 
+END{ $0 =~ s/.*\///;say STDERR DARK BOLD ITALIC YELLOW sprintf "\t--- %0.6f sec calculation ($0)." , tv_interval ${ dt_start } } ; 
+use Getopt::Std ; getopts '1cC:f:i:lrs:uv=!^*:@' , \my%o ; # 5.014 で何度も実行済み
+use Encode qw[ decode_utf8 encode_utf8 ] ; 
+eval 'use Text::VisualWidth::UTF8 qw[ width ] ; 1 ' or die 'Installing Text::VisualWidth::UTF8 is necessary.' if $o{v} ;
+use List::MoreUtils qw[ firstidx lastidx ] ;
+no warnings ;
+* charlen = $o{v} ? * Text::VisualWidth::UTF8::width : sub { length $_[0] }  ; 
+use warnings ;
+sub mainproc ; # メインの処理
+
+$| = 1 if $o{'!'} ; # オートフラッシュの設定
+my $i = do { $o{i} //= "\t" ; eval qq[qq[$o{i}]] } ;  # 区切り文字の指定処理
+my $o = defined $o{f} ? do { $o{f} =~ m/^(\d*)(.*)$/ ; eval qq[qq[$2]] } : $i ; # 出力の区切り文字
+
+mainproc ; 
+exit 0 ; 
+
+## メインの処理
+sub mainproc { 
+
+  # -l 0 で 改行文字をとる。  
+  * preProcN = $o{l}//'' eq '0' ? sub { chomp } : sub { } ; # 改行文字を取るかどうか。
+  # -u で utf8 とみなす。-rで chompしない。下記で2x2=4通りの処理
+  * preProcU = $o{u} ? sub { $_ = decode_utf8 $_ } : sub { } ; 
+  # -s str で空白に関する処理 SpaceTreatMent 
+  * sptr = defined $o{s} ? $o{s} eq '0' ? sub { s/\s//gr } : sub { s/\S//gr } : sub { $_ } ; # 非破壊フラグ$_
+  # -l は行全体の長さ, -cは各行中の列の本数, それが指定しないときに、それぞれのセルの文字列長さ
+  * mainTreat = defined $o{l} ? sub{ & charlen ( & sptr ($_) ) } : 
+                sub{ chomp ; map { & charlen($_) } map{ & sptr } split /$i/,$_,-1 } ; #  単純に各セルの文字列長さを算出。
+  $o{C} .= '1' if $o{c} ;
+  * colcnt = defined $o{C} ? 
+                $o{C} eq '0' ? sub { @_= scalar grep { $_ eq '0' } @_  } : 
+                $o{C} =~/^(0-|-0)$/ ? sub { @_ = scalar grep { $_ ne '0' } @_  } : 
+                $o{C} =~ /^0be$/i ? sub { @_ = ( ( 1 + firstidx { $_ eq '0'} @_ ) , (1 + lastidx { $_ eq '0'} @_ ) )} : # end or finish
+                $o{C} =~ /^0[b]$/i ? sub { @_ = 1 + firstidx { $_ eq '0'} @_ } : # end or finish
+                $o{C} =~ /^0[e]$/i ? sub { @_ = 1 + lastidx { $_ eq '0'} @_ } : # start or begin
+                $o{C} =~ /^-0be$/i ? sub { @_ = ( ( 1 + firstidx { $_ ne '0'} @_ ) , (1 + lastidx { $_ ne '0'} @_ ) )} : # end or finish
+                $o{C} =~ /^-0[b]$/i ? sub { @_ = 1 + firstidx { $_ ne '0'} @_ } : # end or finish
+                $o{C} =~ /^-0[e]$/i ? sub { @_ = 1 + lastidx { $_ ne '0'} @_ } : # start or begin
+                sub { @_ = ( scalar @_ ) } : sub { } ; 
+  * incOrg = $o{1} ? $o{u} ? sub { chomp ; $_ = encode_utf8 $_ ; push @_ , "|$_" } : sub { chomp ; push @_ , "|$_" } : sub {  } ; # -1 で元の入力も出す
+  * incFNa  = $o{'@'} ? sub { push @_ , $ARGV } : sub { } ;  # -@ で与えられたファイル名を出す 
+  # 出力を固定長にする場合の処理。
+  * fmtwdt = defined $o{f} && $o{f}=~/^(\d+)/ ? 
+     do { my $d = $1 ; sub { grep { $_ = sprintf "%$d".'d' , $_ ; $_ = "*" x $d if length $_ > $d }  @_ }  } : 
+     sub { } ; 
+
+  print do { my $t = <> } if $o{'='} ; # -= で先頭行をまずそのまま出力して、メインの処理対象としない。
+  while ( <> ) { 
+    & preProcN ; # 改行文字の処理
+    & preProcU ; # UTF8に関わる処理
+    #& sptr ;
+    #& preProcS ; # 空白文字についての処理
+    @_ = & mainTreat ; 
+    & colcnt ; # 条件にあった列の数を数えるような処理 -cが指定されている場合に。
+    & incFNa ; #ファイル名を末尾に付加 
+    & fmtwdt ; 
+    & incOrg ; # 入力した文字列を末尾に付加
+    say join $o , @_ ; 
+    say "^\t$ARGV" if eof && $o{'^'} ; 
+    #do { $| = 1 ; print '' ; $|= 0 } if $. % $o{'*'} == 1 ; 
+  } 
+} ;
+
+
+## ヘルプの扱い
+sub VERSION_MESSAGE {}
+sub HELP_MESSAGE {
+    use FindBin qw[ $Script ] ; 
+    $ARGV[1] //= '' ;
+    open my $FH , '<' , $0 ;
+    while(<$FH>){
+        s/\$0/$Script/g ;
+        print $_ if s/^=head1// .. s/^=cut// and $ARGV[1] =~ /^o(p(t(i(o(ns?)?)?)?)?)?$/i ? m/^\s+\-/ : 1;
+    }
+    close $FH ;
+    exit 0 ;
+}
+
+
+######
+#
+#  widths 
+#    2015.02 - 2015.05 下野寿之
+#    2019.10.08 大きく手を加えた。
+#####
+
+=encoding utf8 
+
+=head1
+
+ $0 
+
+ 入力データを各行を区切り文字ごとに区切って、文字の長さに変換して出力する。
+ 行末の改行文字は特にオプションで指示のない限り、長さ計算の対象ではない。
+
+オプション :
+
+  -i str : 区切り文字の変更。
+  -l 0 :  各行の全体の長さを算出。行末文字を含めない。
+  -l + :  各行の全体の長さを算出。行末文字を含めた長さとする。
+
+  -s 0 :  空白文字を除去して処理する。i.e. 非空白文字のみが処理対象
+  -s 1 :  非空白文字を除去して処理する。 i.e. 空白文字のみが処理対象。(1の部分は0以外の何でも良い)
+  
+  -u   :  utf-8 とみなして、長さを計算する。そうでなければ、単純なバイト長になる。
+  -v   :  utf-8 の文字幅で長さを計算する(半角は1、全角は2)。(visual-width)
+
+  -C 0 :  上記の処理で0を与える列の数を数える。(columns count)
+  -C 0b :  上記の処理で0を与える列の最初の位置を与える。無ければ0。  
+  -C 0e :  上記の処理で0を与える列の最後の位置を与える。無ければ0。  
+  -C 0be :  上記の処理で0を与える列の最初と最後の位置を与える。無ければ0。  
+  -C -0 :  上記の処理で0を与えない列の数を数える。-0でなくて0-の2文字も可。
+  -C -0b :  上記の処理で0を与えない列の最初の位置を与える。無ければ0。  
+  -C -0e :  上記の処理で0を与えない列の最後の位置を与える。無ければ0。  
+  -C -0be :  上記の処理で0を与えない列の最初と最後の位置を与える。無ければ0。  
+  -C 1 :  列の数を数える。(1の部分は実際には0または-0で無ければ何でも良い)
+  -c : これは -C 1 と同じ(列の数を数える)。
+
+  -=   :  1行目を(ヘッダと見なして)そのまま出力する。
+  -1   :  各行について、元の文字列を右側に付加する。
+  -@   :  ファイル名を行末に出力。(output filename)
+  -^   :  ファイルを読み終わった後に、ファイル名を出力する。"^(タブ文字)ファイル名" が出力される。
+  -!  : フラッシュする。バッファに貯めない。 
+
+  -f 'Ns' : Nは数字でsは文字列。Nで固定長で数を表示し、区切り文字がsとなる。溢れた場合は*を表示
+  
+
+  --help : この $0 のヘルプメッセージを出す。  perldoc -t $0 | cat でもほぼ同じ。
+  --help opt : オプションのみのヘルプを出す。opt以外でも options と先頭が1文字以上一致すれば良い。
+ 
+ヒント: 
+
+  $0 -= some.tsv | colsummary -= とすると、長さの分布が得られる。
+
+開発上のメモ: 
+   * セル中の空白文字を無視する様な設定を実装したい。
+   * 正規表現で無視する文字列を指定できるようにしたい。
+   * Unicodeの全角空白はきちんと処理をするはず。
+   * 空行に対して、1列目を0文字と見なすのが妥当だと思われるが、現状、空行を返す。
+
+
+
+=cut

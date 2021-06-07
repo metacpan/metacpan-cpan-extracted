@@ -1,8 +1,8 @@
 package App::pause::Unpacked;
 
-our $DATE = '2019-06-05'; # DATE
+our $DATE = '2021-05-26'; # DATE
 our $DIST = 'App-pause-Unpacked'; # DIST
-our $VERSION = '0.490'; # VERSION
+our $VERSION = '0.491'; # VERSION
 
 1;
 # ABSTRACT: A CLI for PAUSE (unpacked version)
@@ -19,7 +19,7 @@ App::pause::Unpacked - A CLI for PAUSE (unpacked version)
 
 =head1 VERSION
 
-This document describes version 0.490 of App::pause::Unpacked (from Perl distribution App-pause-Unpacked), released on 2019-06-05.
+This document describes version 0.491 of App::pause::Unpacked (from Perl distribution App-pause-Unpacked), released on 2021-05-26.
 
 =head1 DESCRIPTION
 
@@ -54,7 +54,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019, 2015 by perlancar@cpan.org.
+This software is copyright (c) 2021 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

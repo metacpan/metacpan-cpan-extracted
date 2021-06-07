@@ -4,13 +4,13 @@
       "Graham Bell <g.bell@jach.hawaii.edu>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4003, CPAN::Meta::Converter version 2.120921",
+   "generated_by" : "Module::Build version 0.4231",
    "license" : [
-      "open_source"
+      "gpl_3"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Starlink-ATL",
    "prereqs" : {
@@ -21,26 +21,32 @@
       },
       "configure" : {
          "requires" : {
-            "Module::Build" : "0.40"
+            "Module::Build" : "0.42"
          }
       },
       "runtime" : {
          "requires" : {
+            "Pod::Usage" : "0",
             "Starlink::AST" : "1.02"
          }
       }
    },
    "provides" : {
+      "Starlink::ATL" : {
+         "file" : "lib/Starlink/ATL.pm",
+         "version" : "0.05"
+      },
       "Starlink::ATL::Region" : {
          "file" : "lib/Starlink/ATL/Region.pm",
-         "version" : "0.04"
+         "version" : "0.05"
       }
    },
    "release_status" : "stable",
    "resources" : {
       "license" : [
-         "http://www.gnu.org/licenses/gpl-3.0.txt"
+         "http://opensource.org/licenses/gpl-3.0.html"
       ]
    },
-   "version" : "0.04"
+   "version" : "0.05",
+   "x_serialization_backend" : "JSON::PP version 4.04"
 }

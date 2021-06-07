@@ -1,10 +1,9 @@
 # -*- perl -*-
 use strict;
 use warnings;
-
 use Test::More qw( no_plan );
-
 use Nice::Try;
+our $DEBUG = 0;
 
 # Credits to Steve Scaffidi for his test suit
 
@@ -16,7 +15,7 @@ use Nice::Try;
     }
     catch( $e )
     {
-        like( $e, qr/^My bad at (\S+) line 15/, 'correct line number' );
+        like( $e, qr/^My bad at (\S+) line 14/, 'correct line number' );
     }
 }
 
@@ -44,7 +43,7 @@ use Nice::Try;
     {
         isa_ok( $e, 'Exception', 'assigned exception variable with class' );
         is( "$e", 'Oops', 'assigned exception variable message' );
-        is( $e->line, 41, 'assigned exception variable method' );
+        is( $e->line, 40, 'assigned exception variable method' );
     }
     catch( $e )
     {
@@ -129,6 +128,160 @@ use Nice::Try;
     isa_ok( $should_reach, 'Exception', 'caught exception' );
 }
 
+{
+    my $should_reach;
+    try
+    {
+        die( Exception->new( "Arghhh" => 401 ) );
+    }
+    catch( Exception $oopsie where { $_->message =~ /Arghhh/ && $_->code == 500 } )
+    {
+        diag( "Should not reach here." ) if( $DEBUG );
+    }
+    catch( Exception $oopsie where { $_->message =~ /Arghhh/ && $_->code == 401 } )
+    {
+        $should_reach++;
+    }
+    catch( Exception $oh_well )
+    {
+        diag( "Reached default. Failed." ) if( $DEBUG );
+    }
+    catch( $default )
+    {
+        diag( "Reached default, failed." ) if( $DEBUG );
+    }
+    is( $should_reach, 1, 'class exception with where clause' );
+}
+
+{
+    my $should_reach;
+    try
+    {
+        die( Exception->new( "Arghhh" => 401 ) );
+    }
+    catch( $oopsie isa Exception where { $_->message =~ /Arghhh/ && $_->code == 500 } )
+    {
+        diag( "Should not reach here." ) if( $DEBUG );
+    }
+    catch( $oopsie isa Exception where { $_->message =~ /Arghhh/ && $_->code == 401 } )
+    {
+        $should_reach++;
+    }
+    catch( Exception $oh_well )
+    {
+        diag( "Should not reach here either." ) if( $DEBUG );
+    }
+    catch( $default )
+    {
+        diag( "Reached default, failed." ) if( $DEBUG );
+    }
+    is( $should_reach, 1, 'class exception using isa with where clause' );
+}
+
+{
+    my $should_reach;
+    try
+    {
+        die( Exception->new( "Arghhh" => 404 ) );
+    }
+    catch( $oopsie isa Exception where { $_->message =~ /Arghhh/ && $_->code == 500 } )
+    {
+        diag( "Should not reach here." ) if( $DEBUG );
+    }
+    catch( $oopsie isa Exception where { $_->message =~ /Arghhh/ && $_->code == 401 } )
+    {
+        diag( "Should not reach here either." ) if( $DEBUG );
+    }
+    catch( $oh_well isa Exception )
+    {
+        $should_reach++;
+    }
+    catch( $default )
+    {
+        diag( "Reached default, failed." ) if( $DEBUG );
+    }
+    is( $should_reach, 1, 'class exception using isa without where clause' );
+}
+
+{
+    my $should_reach;
+    try
+    {
+        die( Exception->new( "Arghhh" => 404 ) );
+    }
+    catch( $oopsie isa Exception where { $_->message =~ /Arghhh/ && $_->code == 500 } )
+    {
+        diag( "Should not reach here." ) if( $DEBUG );
+    }
+    catch( $oopsie isa Exception where { $_->message =~ /Arghhh/ && $_->code == 401 } )
+    {
+        diag( "Should not reach here either." ) if( $DEBUG );
+    }
+    catch( $oh_well isa( 'Exception' ) )
+    {
+        $should_reach++;
+    }
+    catch( $default )
+    {
+        diag( "Reached default, failed." ) if( $DEBUG );
+    }
+    is( $should_reach, 1, 'class exception using isa, single quotes without where clause' );
+}
+
+{
+    my $should_reach;
+    try
+    {
+        die( Exception->new( "Arghhh" => 404 ) );
+    }
+    catch( $oopsie isa Exception where { $_->message =~ /Arghhh/ && $_->code == 500 } )
+    {
+        diag( "Should not reach here." ) if( $DEBUG );
+    }
+    catch( $oopsie isa Exception where { $_->message =~ /Arghhh/ && $_->code == 401 } )
+    {
+        diag( "Should not reach here either." ) if( $DEBUG );
+    }
+    catch( $oh_well isa("Exception") )
+    {
+        $should_reach++;
+    }
+    catch( $default )
+    {
+        diag( "Reached default, failed." ) if( $DEBUG );
+    }
+    is( $should_reach, 1, 'class exception using isa, double quotes without where clause' );
+}
+
+{
+    my $should_reach;
+    try
+    {
+        die( "Oh no!\n" );
+    }
+    catch( Exception $oopsie where { $_->message =~ /Arghhh/ && $_->code == 500 } )
+    {
+        diag( "Should not reach here." ) if( $DEBUG );
+    }
+    catch( Exception $oopsie where { $_->message =~ /Arghhh/ && $_->code == 401 } )
+    {
+        diag( "Should not reach here either." ) if( $DEBUG );
+    }
+    catch( Exception $oh_well )
+    {
+        diag( "Should not reach here either." ) if( $DEBUG );
+    }
+    catch( $oopsie where { /Oh no/ } )
+    {
+        $should_reach++;
+    }
+    catch( $default )
+    {
+        diag( "Reached default, failed." ) if( $DEBUG );
+    }
+    is( $should_reach, 1, 'error caught with where clause' );
+}
+
 done_testing;
 
 package Exception;
@@ -142,12 +295,21 @@ BEGIN
 sub new
 {
     my $that = shift( @_ );
-    my $msg = join( '', @_ );
+    my( $msg, $code );
+    if( scalar( @_ ) == 2 && $_[1] =~ /^\d+$/ )
+    {
+        ( $msg, $code ) = @_;
+    }
+    else
+    {
+        $msg = join( '', @_ );
+    }
     my( $p, $f, $l ) = caller;
     my $sub = (caller(1))[3];
     my $hash = 
     {
     message => $msg,
+    code    => $code,
     package => $p,
     file => $f,
     line => $l,
@@ -157,6 +319,8 @@ sub new
 }
 
 sub as_string { $_[0]->{message} };
+
+sub code { $_[0]->{code} };
 
 sub file { $_[0]->{file} };
 

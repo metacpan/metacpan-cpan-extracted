@@ -1,0 +1,93 @@
+# PODNAME: Zapp::Guides
+# ABSTRACT: Introducing Zapp
+
+__END__
+
+=pod
+
+=head1 NAME
+
+Zapp::Guides - Introducing Zapp
+
+=head1 VERSION
+
+version 0.004
+
+=head1 DESCRIPTION
+
+Zapp is a graphical workflow builder. Zapp provides a UI for building
+parameterized workflows (plans), and provides a UI for end-users to run
+those jobs and see the results.
+
+=head2 Project Goals
+
+=head3 Consumer Friendliness
+
+The user that is running plans and examining results should have an intuitive, safe
+experience. An untrained user should be able to run plans to perform the tasks they
+need.
+
+=head3 Planning Flexibility
+
+Analysts or domain experts should be able to start building plans with
+minimal training. L<Formulas|Zapp::Formula> resemble Microsoft Excel,
+a well-known, commonly-used development environment.
+
+=head3 Developer Power
+
+Developers should have the power to L<create new tasks|Zapp::Task> that
+can be added to plans, as well as L<custom types|Zapp::Type> to handle
+user input, and L<triggers|Zapp::Trigger> (future development) which
+can automatically run jobs. Specialized job types can L<ask for input
+from a user|Zapp::Task::Action>.
+
+=head3 Automation Magic
+
+Analysts should be able to configure automations (using L<triggers|Zapp::Trigger>)
+which respond to events from other applications (like Slack, JIRA, or BitBucket).
+This can be used for L<release approval workflows|Zapp::Task::Action::Confirm>
+or continuous integration (CI) jobs (future development).
+
+=head3 Task Transparency
+
+Scheduled jobs and maintenance tasks keep the business running. Zapp can
+provide users with a view of which tasks run, when they run, and what
+they did. Jobs can be stopped and started if necessary. When a job
+fails, the user can choose to restart it from a particular point.
+
+Runbooks are documentation for common operations tasks. Zapp's goal is
+to turn that documentation into automation. Even extraordinary
+operations tasks should be safe operations tasks: Reviews and approval
+processes take time, and time is critical when the application is down.
+
+=head1 GETTING STARTED
+
+=head2 Web Application
+
+To run the Zapp web application, use the C<zapp daemon> command:
+
+    $ zapp daemon
+    Web application available at http://127.0.0.1:3000
+
+=head2 Job Runner
+
+To run the job runner, use the C<zapp minion worker> command:
+
+    $ zapp minion worker
+
+=head1 SEE ALSO
+
+L<Mojolicious::Plugin::Minion::Admin>
+
+=head1 AUTHOR
+
+Doug Bell <preaction@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2021 by Doug Bell.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

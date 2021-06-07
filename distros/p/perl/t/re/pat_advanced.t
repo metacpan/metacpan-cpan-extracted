@@ -7,8 +7,8 @@
 BEGIN {
     chdir 't' if -d 't';
     require './test.pl';
-    require './charset_tools.pl';
     set_up_inc(qw '../lib .');
+    require './charset_tools.pl';
     skip_all_if_miniperl("miniperl can't load Tie::Hash::NamedCapture, need for %+ and %-");
 }
 
@@ -993,14 +993,6 @@ sub run_tests {
             like ($@, qr/charnames alias definitions may not contain a sequence of multiple spaces/, "Multiple spaces in a row in a charnames alias is fatal");
             eval q [use utf8; () = "\N{TOO  MANY SPACES}"];
             like ($@, qr/charnames alias definitions may not contain a sequence of multiple spaces/,  "... same under utf8");
-        }
-
-        undef $w;
-        {
-            () = eval q ["\N{TRAILING SPACE }"];
-            like ($@, qr/charnames alias definitions may not contain trailing white-space/, "Trailing white-space in a charnames alias is fatal");
-            eval q [use utf8; () = "\N{TRAILING SPACE }"];
-            like ($@, qr/charnames alias definitions may not contain trailing white-space/, "... same under utf8");
         }
 
         undef $w;
@@ -2565,12 +2557,9 @@ EOF
     {   # GH $17278 assertion fails
         fresh_perl_is('use locale;
                        my $A_grave = "\N{LATIN CAPITAL LETTER A WITH GRAVE}";
-                       utf8::encode($A_grave);
                        my $a_grave = "\N{LATIN SMALL LETTER A WITH GRAVE}";
-                       utf8::encode($a_grave);
 
                        my $z="q!$a_grave! =~ m!(?^i)[$A_grave]!";
-                       utf8::decode($z);
                        print eval $z, "\n";',
                        1,
                        {}, "GH #17278");

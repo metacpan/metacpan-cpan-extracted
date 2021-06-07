@@ -7,7 +7,7 @@ subtest 'archive_entry_stat' => sub {
   plan tests => 10;
 
   my $entry = archive_entry_new();
-  
+
   archive_entry_set_dev($entry, 0x1234);
   archive_entry_set_ino($entry, 0x5678);
   archive_entry_set_mode($entry, 0400);
@@ -21,7 +21,7 @@ subtest 'archive_entry_stat' => sub {
 
   my($dev, $ino, $mode, $nlink, $uid, $gid, $rdev, $atime, $mtime, $ctime) = eval { archive_entry_stat($entry) };
   diag $@ if $@;
-  
+
   is $dev,   0x1234,    'dev';
   is $ino,   0x5678,    'ino';
   is $mode,  0400,      'mode';
@@ -34,17 +34,17 @@ subtest 'archive_entry_stat' => sub {
   is $ctime, 123456769, 'ctime';
 
   archive_entry_free($entry);
-  
+
 };
 
 subtest 'archive_entry_set_stat' => sub {
   plan tests => 10;
 
   my $entry = archive_entry_new();
-  
+
   eval { archive_entry_set_stat($entry,0x1234,0x5678,0400,1,500,501,0x1357,123456789,123456779,123456769) };
   diag $@ if $@;
-  
+
   my $dev   = archive_entry_dev($entry);
   my $ino   = archive_entry_ino($entry);
   my $mode  = archive_entry_mode($entry);
@@ -68,6 +68,6 @@ subtest 'archive_entry_set_stat' => sub {
   is $ctime, 123456769, 'ctime';
 
   archive_entry_free($entry);
-  
+
 };
 

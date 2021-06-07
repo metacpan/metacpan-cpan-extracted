@@ -1,0 +1,6 @@
+
+INSTALL memo for "App::Bin4TSV" : 
+
+   cpanm --save-dist App::Bin4TSV
+
+   

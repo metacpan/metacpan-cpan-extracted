@@ -1,0 +1,71 @@
+#!/usr/bin/perl
+use 5.014 ; 
+use warnings ; 
+use Encode qw[ encode_utf8 decode_utf8 ]; 
+use Term::ANSIColor qw[ :constants color ] ; 
+$Term::ANSIColor::AUTORESET = 1 ; 
+
+use Getopt::Std ; 
+getopts '' , \my %o ; 
+
+my @givecolor = map { color ( $_ ) } 
+ ( 
+    'dark white' , 'faint bold red', # 'dark on_bright_red black', # 0 1 
+    'red ', 'bright_red' , 'yellow' ,  # 2 3 4
+    'green', 'bright_blue',  'bold magenta', # 5 6 7 
+    'white', 'bold bright_white' # 8 9 
+ ) ;
+
+while ( <> ) { 
+
+	$_ = decode_utf8 $_ ;
+	my @cha = split /([0-9]|\e\[[\d;]*m)/, $_ , -1 ;  # "\e" = "\x1b" 
+	#my @cha = split /([0-9])/, $_ , -1 ; 
+	my $prevnum = 0 ; # 直前の文字が数字だったどうかのフラグ
+	for ( @cha ) { 
+		if ( m/^[0-9]$/ ) { 
+			$prevnum = 1 ;
+			#$_ = color ( 'reset' ) . $givecolor [ $_ ] . $_ ;
+			$_ = $givecolor [ $_ ] . $_ ;
+		} elsif ( $prevnum -- ) {
+			$_ = color ('reset') . $_ ;
+		}
+	}
+	my $out = join '' , @cha ; 
+	print encode_utf8 ( $out ) ;
+}
+
+## ヘルプの扱い
+sub VERSION_MESSAGE {}
+sub HELP_MESSAGE {
+  use FindBin qw[ $Script ] ; 
+  $ARGV[1] //= '' ;
+  open my $FH , '<' , $0 ;
+  while(<$FH>){
+    s/\$0/$Script/g ;
+    print $_ if s/^=head1// .. s/^=cut// and $ARGV[1] =~ /^o(p(t(i(o(ns?)?)?)?)?)?$/i ? m/^\s+\-/ : 1;
+  }
+  close $FH ;
+  exit 0 ;
+}
+
+=encoding utf8
+
+=head1
+
+コマンド
+
+  $0 
+
+   数字に、電気抵抗のカラーコードに似た色を被せる。
+
+オプション:  
+   まだ無し。
+ 
+  
+開発メモ: 
+   * 8色を使い回している。256色が使える場合の指定が可能としたい。
+   * このプログラムがutf8を前提にしていることは問題あるかも。
+   * cat ?? | resistorcc | resistorcc のように2回重ねて実行してもレイアウトが崩れないようにしたが、バイト数がどんどん膨らむ。
+
+=cut

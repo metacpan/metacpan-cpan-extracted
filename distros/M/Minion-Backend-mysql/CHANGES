@@ -1,5 +1,54 @@
 Revision history for Perl extension Minion::Backend::mysql.
 
+0.29      2021-06-07 10:38:25-05:00 America/Chicago
+
+  [Fixed]
+
+  - Sped up enqueue by only using a transaction when needed. `no_txn`
+    will still always disable enqueue transactions.
+
+0.28      2021-06-04 17:49:59-05:00 America/Chicago
+
+  [Fixed]
+
+  - Improved performance of stats function, listing jobs (which also is
+    used to get a single job's information), and repairing jobs with
+    missing workers
+
+0.27      2021-06-03 15:08:43-05:00 America/Chicago
+
+  [Fixed]
+
+  - Improved performance of old job cleanup
+
+0.26      2021-05-27 17:26:48-05:00 America/Chicago
+
+  [Fixed]
+
+  - Improved performance of the notes table by adding an index. Thanks
+    @larryl of Grant Street Group for the patch!
+  - Fixed rudely clobbering a $@ when updating notes
+  - Fixed missing cleanup queries in reset
+  - Removed the transaction around the dequeue. This allows the race to
+    happen between SELECT and UPDATE, but now we check who wins the
+    race. The loser goes back to try another SELECT. Thanks @larryl for
+    the SQL.
+
+  [Added]
+
+  - Added a `no_txn` attribute to disable the transaction around the
+    `enqueue` queries. I do not recommend using this in production,
+    but it helps make testing easier: Tests can be performed in
+    a transaction, and then the transaction rolled back to undo any
+    changes before the next test.
+
+0.25      2021-05-21 21:32:59-05:00 America/Chicago
+
+  [Fixed]
+
+  - Fixed compatibility with DBD::MariaDB. Thanks @saintserge for the
+    patch! [Github #35]
+
 0.24      2021-04-12 19:04:09-04:00 America/Detroit
 
   [NOTE]

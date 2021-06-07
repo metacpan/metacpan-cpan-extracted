@@ -221,9 +221,15 @@ sub get_fullauto_instance {
    $error=~s/^\s*//;
    $error=~s/: /:\n   /;
    &exit_on_error($error) if $error;
-   my $instance='';
-   my $ipaddress=Socket::inet_ntoa((gethostbyname(
-                 $Net::FullAuto::FA_Core::local_hostname))[4]);
+   my ($stdout,$stderr)=('','');
+   my $handle=connect_shell();
+   ($stdout,$stderr)=$handle->cmd(
+      'curl -X PUT "http://169.254.169.254/latest/api/token" '.
+      '-H "X-aws-ec2-metadata-token-ttl-seconds: 21600"');
+   ($stdout,$stderr)=$handle->cmd(
+      "curl -H \"X-aws-ec2-metadata-token: $stdout\" ".
+      'http://169.254.169.254/latest/meta-data/local-ipv4');
+   my $ipaddress=$stdout;
    foreach my $res (@{$hash->{Reservations}}) {
       foreach my $inst (@{$res->{Instances}}) {
          my $pip=$inst->{PrivateIpAddress}||'';

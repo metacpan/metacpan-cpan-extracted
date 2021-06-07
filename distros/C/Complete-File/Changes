@@ -1,3 +1,19 @@
+0.443   2021-02-08  Released-By: PERLANCAR; Urgency: medium
+
+	- Update to Complete::Path 0.251 (add options recurse_matching,
+	  exclude_leaf, exclude_dir).
+
+
+0.442   2021-02-02  Released-By: PERLANCAR; Urgency: medium
+
+	- [ux] Add shortcut alias -r -> --recurse for CLI.
+
+
+0.441   2021-02-02  Released-By: PERLANCAR; Urgency: medium
+
+	- Update to Complete::Path 0.250 (add option 'recurse').
+
+
 0.440   2019-12-18  Released-By: PERLANCAR; Urgency: medium
 
 	- Add workaround to force path mode in completion answer.

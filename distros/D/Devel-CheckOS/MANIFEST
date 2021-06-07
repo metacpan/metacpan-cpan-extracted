@@ -116,5 +116,7 @@ t/multilevel-names.t
 t/pod.t
 t/script.t
 t/unknown-debian.t
+lib/Devel/AssertOS/MacOSX/v11.pm
+lib/Devel/AssertOS/Linux/Devuan.pm
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

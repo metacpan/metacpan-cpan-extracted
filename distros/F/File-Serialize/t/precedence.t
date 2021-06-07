@@ -1,7 +1,8 @@
 use strict;
 use warnings;
 
-use Test::More tests => 1;
+use Test2::V0;
+plan tests => 1;
 
 use Test::Requires +{
     map { $_ => 0 } qw/ YAML::Tiny YAML::XS /
@@ -9,7 +10,7 @@ use Test::Requires +{
 
 use File::Serialize;
 
-is( 
-    File::Serialize->_serializer({ format => 'yaml' }) => 'File::Serialize::Serializer::YAML::XS' 
+is(
+    File::Serialize->_serializer({ format => 'yaml' }) => 'File::Serialize::Serializer::YAML::XS'
 );
 

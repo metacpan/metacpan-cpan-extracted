@@ -5,7 +5,7 @@
 #
 
 use Convert::ASN1;
-BEGIN { require 't/funcs.pl' }
+BEGIN { require './t/funcs.pl' }
 
 $^W=0 if $] < 5.005; # BigInt in 5.004 has undef issues
 

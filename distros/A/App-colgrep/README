@@ -1,0 +1,13 @@
+
+This module provides a Unix-like command `colgrep'. 
+This commad will "grep" along a specified column over all the row of a given file,
+and every (the whole) row which is hit by that "grep" will be output. 
+
+
+=head1 DESCRIPTION
+
+
+
+ Copyright (c) 2021 Toshiyuki SHIMONO. All rights reserved.
+ This program is free software; you can redistribute it and/or
+ modify it under the same terms as Perl itself.

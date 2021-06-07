@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2016-2021 -- leonerd@leonerd.org.uk
 
-package Syntax::Keyword::Try 0.24;
+package Syntax::Keyword::Try 0.25;
 
 use v5.14;
 use warnings;
@@ -45,10 +45,9 @@ plugins and manipulate optrees to provide new syntax and behaviours for perl
 code.
 
 Syntax similar to this module has now been added to core perl, starting at
-development version 5.33.7, and is expected to become generally available when
-perl 5.34 is released. If you are writing new code, it is suggested that you
-instead use the L<Feature::Compat::Try> module instead, as that will enable
-the core feature on those supported perl versions, falling back to
+version 5.34.0. If you are writing new code, it is suggested that you instead
+use the L<Feature::Compat::Try> module instead, as that will enable the core
+feature on those supported perl versions, falling back to
 C<Syntax::Keyword::Try> on older perls.
 
 =head1 Experimental Features
@@ -62,8 +61,6 @@ a more fine-grained approach you can instead use the import line for this
 module to only silence this module's warnings selectively:
 
    use Syntax::Keyword::Try qw( try :experimental(typed) );
-
-   use Syntax::Keyword::Try qw( try :experimental(try_value) ); # deprecated
 
    use Syntax::Keyword::Try qw( try :experimental );  # all of the above
 
@@ -234,56 +231,6 @@ that may more easily be forward-compatible with that feature instead, you
 should consider using L<Syntax::Keyword::Defer> rather than using C<finally>
 statements.
 
-=head1 VALUE SEMANTICS
-
-=over 4
-
-B<Warning:> the feature described in this section was experimental and is now
-deprecated. This experiment has existed for a while, though given that since
-version 0.22 the regular C<try> syntax already behaves fine inside a C<do>
-block, there is no longer any reason for this experimental feature to exist.
-It will print a deprecation warning, and eventually will be removed in a later
-version. You should use C<do { try ... }> instead.
-
-Additionally, on I<perl> versions 5.18 and later, it will produce a warning
-in the C<experimental> category.
-
-=back
-
-The syntax provided by this module may be used as a value-yielding expression.
-Because this syntax is new, experimental, and somewhat surprising, it must be
-specifically requested by name C<try_value>:
-
-   use Syntax::Keyword::Try qw( try try_value );
-
-   my $result = try do { ... } catch { ... };
-
-Also, on Perl versions 5.24 and later:
-
-   my $result = try do { ... } finally { ... };
-
-   my $result = try do { ... } catch { ... } finally { ... };
-
-Specifically, note that the expression must be spelled as C<try do { ... }> so
-that the syntax is distinct from that used by control-flow statements. The
-interposed C<do> keyword reminds the reader, and instructs the syntax parser,
-that this will be an expression, not a statement. It is not necessary to
-similarly notate the C<catch> or C<finally> blocks.
-
-In this case, the syntax behaves syntactically like an expression, and may
-appear anywhere a normal expression is allowed. It follows similar semantics
-to the purely control-flow case; if the code in the C<try> block does not
-throw an exception, then the expression as a whole yields whatever value the
-C<try> expression did. If it fails, then the C<catch> block is executed and
-the expression yields its resulting value instead. A C<finally> block, if
-present, will be evaluated for side-effects before the rest of the expression
-returns.
-
-Remember that, as in the control-flow case, the C<return> keyword will cause
-the entire containing function to return, not just the C<try> block.
-
-=cut
-
 =head1 OTHER MODULES
 
 There are already quite a number of modules on CPAN that provide a
@@ -310,8 +257,7 @@ L<Syntax::Feature::Try>
 =back
 
 In addition, core perl itself gained a C<try/catch> syntax based on this
-module at developemnt version 5.33.7, and should become generally available
-when 5.34 is released. It will be available as C<use feature 'try'>.
+module at version 5.34.0. It is available as C<use feature 'try'>.
 
 They are compared here, by feature:
 
@@ -366,11 +312,10 @@ modules make no statement either way.
 =head2 Value Semantics
 
 Like L<Try> and L<Syntax::Feature::Try>, the syntax provided by this module
-only works as a syntax-level statement and not an expression when the
-experimental C<try_value> feature described above has not been enabled. You
-cannot assign from the result of a C<try> block. A common workaround is to
-wrap the C<try/catch> statement inside a C<do> block, where its final
-expression can be captured and used as a value.
+only works as a syntax-level statement and not an expression. You cannot
+assign from the result of a C<try> block. A common workaround is to wrap
+the C<try/catch> statement inside a C<do> block, where its final expression
+can be captured and used as a value.
 
 The same C<do> block wrapping also works for the core C<feature 'try'>.
 
@@ -422,7 +367,7 @@ sub import
    $class->import_into( $caller, @_ );
 }
 
-my @EXPERIMENTAL = qw( typed try_value );
+my @EXPERIMENTAL = qw( typed );
 
 sub import_into
 {
@@ -433,7 +378,6 @@ sub import_into
 
    my %syms = map { $_ => 1 } @syms;
    $^H{"Syntax::Keyword::Try/try"}++ if delete $syms{try};
-   $^H{"Syntax::Keyword::Try/try_value"}++ if delete $syms{try_value};
 
    # Largely for Feature::Compat::Try's benefit
    $^H{"Syntax::Keyword::Try/no_finally"}++ if delete $syms{"-no_finally"};
@@ -453,7 +397,10 @@ sub import_into
    # Ignore requests for these, as they come automatically with `try`
    delete @syms{qw( catch finally )};
 
-   $^H{"Syntax::Keyword::Try/try_value"}++ if $^H{"Syntax::Keyword::Try/experimental(try_value)"};
+   if( $syms{try_value} or $syms{":experimental(try_value)"} ) {
+      croak "The 'try_value' experimental feature is now removed\n" .
+            "Instead, you should use  do { try ... }  to yield a value from a try/catch statement";
+   }
 
    croak "Unrecognised import symbols @{[ keys %syms ]}" if keys %syms;
 }

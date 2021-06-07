@@ -1,0 +1,174 @@
+#!/usr/bin/perl 
+use 5.014 ; use warnings ; 
+use Time::HiRes qw [ gettimeofday tv_interval ] ;
+my ${ dt_start } = [ gettimeofday ] ; 
+use FindBin qw[ $Script ] ; 
+use List::Util qw[ sum sum0 ];
+use Getopt::Std ; 
+use Term::ANSIColor qw/:constants color/ ; $Term::ANSIColor::AUTORESET = 1 ; 
+
+@ARGV = ( ( grep m/^-/ , @ARGV ) , ( grep !m/^-/ , @ARGV ) ) if ! grep /^--$/ , @ARGV ; # 
+getopts '=e:q:v:1' => \my %o ; 
+my $flag_v0 = defined $o{v} && $o{v} eq 0 ; 
+do { select STDERR ; HELP_MESSAGE () } if  ! @ARGV ; 
+
+& proc_split ; 
+
+my @fq ; # 各ファイルにおいて、各行の文字列の頻度表を格納する
+my %fq_ ; # 全ファイルにおいて、..
+my $N = 0 ; # 対象ファイルの個数を数える。
+
+if ( $o{1} ) 
+{
+  & pairwise_cmp ; 
+  & secondary_info ; 
+  exit 0 ;
+}
+
+& read_all ;
+& usual_proc ; 
+& secondary_info ; 
+exit 0 ; 
+
+sub proc_split 
+{
+  my $pid = fork ; 
+  # die "Cannot fork: $!" unless defined $pid ; ### !! fork 失敗の場合は次のif文は実行しない
+  if ( $pid ) { 
+    wait ; 
+    my $procsec = tv_interval ${ dt_start } ; 
+    #print STDERR BOLD ITALIC DARK CYAN "($Script + memory release --> " . $procsec . " sec.)\n" ;
+    exit ;
+  }
+}
+
+
+sub pairwise_cmp 
+{
+  # READING 
+  my $dummy = <> if $o{'='} ;
+  while ( <> ) { 
+      chomp ; 
+      $fq[$N]{$_} ++ ; 
+      $fq_{$_} ++ ;
+      if ( eof ) { $N++ ; my $dummy = <> if $o{'='} && ! eof() ; last } ; 
+  }
+  while ( <> ) { 
+      chomp ; 
+      $fq[$N]{$_} ++ if exists $fq_{$_} ;
+      #$fq_{$_} ++ ;
+      if ( eof ) { $N++ ; my $dummy = <> if $o{'='} && ! eof() } ; 
+  }
+
+  # Printing
+  say join "\t", "*", (map {"file$_"} 1 .. $N) ; # , $flag_v0 ? () :  ('strmin','strmax') ; 
+  #my @out ; 
+  #push @out , scalar keys %fq_ ; 
+  say join "\t" , 'freq' , map { sum0 values %{$fq[$_]} }  0 .. $N-1 ;
+  say join "\t" , 'card' , map { scalar keys %{$fq[$_]} }  0 .. $N-1 ;
+  #for my $B ( sort { $a <=> $b } keys %bfq_ ) { 
+  #    my @out = map { $_ // 0 } map { $bfq { $B } [$_] } 0 .. $N -1   ;
+  #    push @out , $bfq_min{$B} , $bfq_max{$B}  if ! $flag_v0 ;
+  #say join "\t" , $bfq_{$B} , @out ; #, 
+  #}
+
+}
+
+
+sub read_all 
+{
+  # READING 
+  my $dummy = <> if $o{'='} ;
+  while ( <> ) { 
+      chomp ; 
+      $_ = eval $o{e} if exists $o{e} ;
+      $fq[$N]{$_} ++ ; 
+      $fq_{$_} ++ ;
+      if ( eof ) { $N++ ; my $dummy = <> if $o{'='} && ! eof() } ; #<-- eofの括弧ある無しを使い分けた
+  }
+}
+
+# 普通に数える。
+sub usual_proc 
+{
+  # Summing 
+  my %bfq ; # 添え字は、どの集合に含まれるかを2進数で考えた数 2番目の添え字はファイル番号 0始まり
+  my %bfq_ ; 
+  my %bfq_min ; 
+  my %bfq_max ;# 最小と最大を具体的な値として格納
+  for my $k ( keys %fq_ ) { 
+      my @which = grep { exists $fq[$_]{$k} } 0 .. $N-1 ; # その文字列をどのファイルが持つか
+      my $B = sum0 map { 1 << $_ } @which ; # ビットパターン
+      $bfq_ { $B } ++ ; 
+      $bfq { $B } [ $_ ] += $fq [ $_ ] { $k } for @which ; 
+      next if $flag_v0 ;
+      $bfq_min{$B} //= $k ; $bfq_min{$B} = $k if $bfq_min{$B} gt $k ; 
+      $bfq_max{$B} //= $k ; $bfq_max{$B} = $k if $bfq_max{$B} lt $k ; 
+  }
+
+  # Printing
+  say join "\t", "cardi.", (map {"file$_"} 1 .. $N) , $flag_v0 ? () :  ('strmin','strmax') ; 
+  for my $B ( sort { $bfq_min{$a} cmp $bfq_min{$b} } keys %bfq_ ) { 
+      my @out = map { $_ // 0 } map { $bfq { $B } [$_] } 0 .. $N -1   ;
+      eval { $bfq_min{$B} = qq["$bfq_min{$B}"] ;$bfq_max{$B} = qq["$bfq_max{$B}"] } unless exists $o{q} and $o{q} eq 0 ; 
+      push @out , ($bfq_min{$B} ne $bfq_max{$B})? ($bfq_min{$B} , $bfq_max{$B}) : $bfq_min{$B} ,"" if ! $flag_v0 ;
+      say join "\t" , qq[$bfq_{$B}.] , @out ; #, 
+  }
+}
+
+sub secondary_info 
+{ 
+  my $procsec = tv_interval ${ dt_start } ; #time - $time0 ; # このプログラムの処理にかかった秒数。比較する2個の時刻は秒単位なので、±1秒未満の誤差は発生する。
+  * d3 = sub { $_[0] =~ s/(?<=\d)(?=(\d\d\d)+($|\D))/,/gr } ;
+  print STDERR BOLD ITALIC DARK CYAN & d3 ( $. ) . " lines processed. " ; 
+  print STDERR BOLD ITALIC DARK CYAN "($Script ; " . $procsec . " sec.)\n" ;
+}
+
+# ヘルプの扱い
+sub VERSION_MESSAGE {}
+sub HELP_MESSAGE {
+    use FindBin qw[ $Script ] ; 
+    $ARGV[1] //= '' ;
+    open my $FH , '<' , $0 ;
+    while(<$FH>){
+        s/\$0/$Script/g ;
+        print $_ if s/^=head1// .. s/^=cut// and $ARGV[1] =~ /^o(p(t(i(o(ns?)?)?)?)?)?$/i ? m/^\s+\-/ : 1;
+    }
+    close $FH ;
+    exit 0 ;
+}
+=encoding utf8
+=head1
+    
+    $0 ファイル名の並び
+
+    入力: 改行区切りで値の書き込まれた1個またはそれ以上のファイル
+
+    出力:
+      ファイルが n 個入力として与えられた場合、それらn個のファイルに
+      出現した各行の値について、それがどのファイルに出現したかに応じて、最大
+      2 ** n -1 通りに分類し、各分類(出力の各行(縦方向)に相当)において
+      異なる値が何通り出現したか(横方向の第1列目)、それらの値がi番目の
+      ファイルに何回出現したか(横方向の第i+1列目)の数を出力する。
+
+    オプション: 
+       -= : 入力の各ファイルにおいて、1行目を読み飛ばす。
+       -1 : 1番目のファイルの各行を、残り(n-1)個と単にそれぞれ比較。
+       -e perl_cmd_string ; 各行をchompした後の$_について、どう加工するか指定。-e 'substr $_,0,4' など。
+       -q 0 : 値をクオーテーションで囲まない。
+       -v 0 : 出力の各行において、右側の2列に、各分類の文字列としての最小値と最大値は出力しない。
+
+    利用例(実験例) : 
+       cat somefile | venn 
+           # somefile の行数と、異なる行の値の個数が分かる。
+       venn <(seq 1 3)  <(seq 3 5)  <(seq 5 18) 
+           # <( .. ) はプロセス置換なので、Unix-like のシェルでないと動かない可能性はある。
+       venn -v0 <(saikoro)  <(saikoro) <(saikoro)
+           # saikoro はこの$0を作った著者がこの$0と共に提供される別のプログラム。
+
+    開発メモ: 
+      * 入力したファイル名を出力するようにしたい。
+      * 共通して計数対象としない値を -#で指定可能としたい。
+      * 文字列の min と max 以外 *も* 出力できるようにしたい。
+ 
+=cut

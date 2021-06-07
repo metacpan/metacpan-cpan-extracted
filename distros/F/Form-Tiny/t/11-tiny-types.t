@@ -1,31 +1,21 @@
 use v5.10;
 use warnings;
 use Test::More;
-use Form::Tiny;
 
 {
 
 	package TestForm;
-	use Moo;
+	use Form::Tiny -base;
 	use Types::Common::String qw(StrLength LowerCaseStr);
 	use Types::Common::Numeric qw(IntRange);
 
-	with "Form::Tiny";
+	form_field 'string' => (
+		type => StrLength [1, 10] &LowerCaseStr,
+	);
 
-	sub build_fields
-	{
-		(
-			{
-				name => "string",
-				type => StrLength [1, 10] &LowerCaseStr,
-			},
-
-			{
-				name => "integer",
-				type => (IntRange [2, 8])->where(q{ $_ % 2 == 0 }),
-			}
-		)
-	}
+	form_field "integer" => (
+		type => (IntRange [2, 8])->where(q{ $_ % 2 == 0 }),
+	);
 
 	1;
 }

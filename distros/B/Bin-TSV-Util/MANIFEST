@@ -1,0 +1,24 @@
+Changes
+INSTALL
+lib/Bin/TSV/Util.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README
+scripts/colchop
+scripts/colgrep
+scripts/colhashS
+scripts/collen
+scripts/colorplus
+scripts/colpairs
+scripts/colsplit
+scripts/colsummary
+scripts/crosstable
+scripts/inarow
+scripts/join2
+scripts/joinn
+scripts/keyvalues
+scripts/kvcmp
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

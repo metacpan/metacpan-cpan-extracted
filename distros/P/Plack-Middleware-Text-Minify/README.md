@@ -4,7 +4,7 @@ Plack::Middleware::Text::Minify - minify text responses on the fly
 
 # VERSION
 
-version v0.1.6
+version v0.2.0
 
 # SYNOPSIS
 
@@ -26,6 +26,9 @@ builder {
 
 This middleware uses [Text::Minify::XS](https://metacpan.org/pod/Text::Minify::XS) to remove indentation and
 trailing whitespace from text content.
+
+It will be disabled if the `psgix.no-minify` environment key is set
+to a true value. (Added in v0.2.0.)
 
 # ATTRIBUTES
 

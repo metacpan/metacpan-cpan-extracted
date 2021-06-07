@@ -1,153 +1,64 @@
 package LyricFinder::Genius;
 
-use 5.008000;
 use strict;
 use warnings;
-use LWP::UserAgent;
-use HTTP::Request;
-use HTML::Strip;
 use Carp;
-
-my $Source = 'Genius';
-my $Site   = 'https://genius.com';
+use HTML::Strip;
+use parent 'LyricFinder::_Class';
 
 our $haveLyricsCache;
 BEGIN {
+	$haveLyricsCache = 0;
 	eval "use LyricFinder::Cache; \$haveLyricsCache = 1; 1";
 }
 
-# the Default HTTP User-Agent we'll send:
-our $AGENT = "Mozilla/5.0 (X11; Linux x86_64; rv:80.0) Gecko/20100101 Firefox/80.0";
+my $Source = 'Genius';
+my $Site   = 'https://genius.com';
+my $DEBUG  = 0;
 
 sub new
 {
 	my $class = shift;
 
-	my $self = {};
-	$self->{'agent'} = $AGENT;
-	$self->{'cache'} = '';
-	$self->{'Error'} = 'Ok';
-	$self->{'Source'} = $Source;
-	$self->{'Site'} = $Site;
-	$self->{'Url'} = '';
-	$self->{'Credits'} = [];
-
-	my %args = @_;
-	foreach my $i (keys %args) {
-		if ($i =~ s/^\-//) {
-			$self->{$i} = $args{"-$i"};
-		} else {
-			$self->{$i} = $args{$i};
-		}
-	}
+	my $self = $class->SUPER::new($Source, @_);
+	@{$self->{'_fetchers'}} = ($Source);
+	unshift(@{$self->{'_fetchers'}}, 'Cache')  if ($haveLyricsCache
+			&& $self->{'-cache'} && $self->{'-cache'} !~ /^\>/);
 
 	bless $self, $class;   #BLESS IT!
 
 	return $self;
 }
 
-sub source {
-	my $self = shift;
-	return $self->{'Source'};
-}
-
-sub url {
-	my $self = shift;
-	return $self->{'Url'};
-}
-
-sub order {
-	return wantarray ? ($Source) : $Source;
-}
-
-sub tried {
-	return order ();
-}
-
-sub credits {
-	my $self = shift;
-	return wantarray ? @{$self->{'Credits'}} : join(', ', @{$self->{'Credits'}});
-}
-
-sub message {
-	my $self = shift;
-	return $self->{'Error'};
-}
-
-sub site {
-	my $self = shift;
-	return $self->{'Site'};
-}
-
-# Allow user to specify a different user-agent:
-sub agent {
-	my $self = shift;
-
-	if (defined $_[0]) {
-		$self->{'agent'} = $_[0];
-	} else {
-		return $self->{'agent'};
-	}
-}
-
-sub cache {
-	my $self = shift;
-
-	if (defined $_[0]) {
-		$self->{'cache'} = $_[0];
-	} else {
-		return $self->{'cache'};
-	}
-}
-
-#FROM:  https://github.com/clementine-player/Clementine/blob/master/data/lyrics/ultimate_providers.xml
-sub remove_accents {
-	my $str = shift;
-
-	$str =~ tr/\xc4\xc2\xc0\xc1\xc3\xe4\xe2\xe0\xe1\xe3/aaaaaaaaaa/;
-	$str =~ tr/\xcb\xca\xc8\xc9\xeb\xea\xe8\xe9/eeeeeeee/;
-	$str =~ tr/\xcf\xcc\xef\xec/iiii/;
-	$str =~ tr/\xd6\xd4\xd2\xd3\xd5\xf6\xf4\xf2\xf3\xf5/oooooooooo/;
-	$str =~ tr/\xdc\x{0016}\xd9\xda\xfc\x{0016}\xf9\xfa/uuuuuuuu/;
-	$str =~ tr/\x{0178}\xdd\xff\xfd/yyyy/;
-	$str =~ tr/\xd1\xf1/nn/;
-	$str =~ tr/\xc7\xe7/cc/;
-	$str =~ s/\xdf/ss/g;
-	return $str;
-}
-
 sub fetch {
 	my ($self, $artist_in, $song_in) = @_;
 
-	# reset the error var, change it if an error occurs.
-	$self->{'Error'} = 'Ok';
-	$self->{'Url'} = '';
+	$self->_debug("Genius::fetch($artist_in, $song_in)!");
 
-	unless ($artist_in && $song_in) {
-		carp($self->{'Error'} = "e:$Source.fetch() called without artist and song!");
-		return;
-	}
+	return ''  unless ($self->_check_inputs($artist_in, $song_in));
+	return ''  if ($self->{'Error'} ne 'Ok');
 
 	# first, see if we've got it cached:
-	if ($self->{'cache'} && $self->{'cache'} !~ /^\>/ && $haveLyricsCache) {
-		my $cache = new LyricFinder::Cache(-cache => $self->{'cache'});
+	$self->_debug("i:haveCache=$haveLyricsCache= -cachedir=".$self->{'-cache'}."=");
+	if ($haveLyricsCache && $self->{'-cache'} && $self->{'-cache'} !~ /^\>/) {
+		my $cache = new LyricFinder::Cache(%{$self});
 		if ($cache) {
 			my $lyrics = $cache->fetch($artist_in, $song_in);
 			if (defined($lyrics) && $lyrics =~ /\w/) {
-				print "..Got lyrics from cache.\n"  if ($self->{'-debug'});
+				$self->_debug("..Got lyrics from cache.");
 				$self->{'Source'} = 'Cache';
 				$self->{'Site'} = $cache->site();
 				$self->{'Url'} = $cache->url();
+
 				return $lyrics;
 			}
 		}
 	}
 
-	$self->{'Source'} = $Source;
 	$self->{'Site'} = $Site;
 
-	$artist_in = &remove_accents($artist_in);
-	$song_in = &remove_accents($song_in);
+	$artist_in = $self->_remove_accents($artist_in);
+	$song_in = $self->_remove_accents($song_in);
 
 	# Their URLs look like e.g.:
 	# https://genius.com/<artist>-<title>-lyrics
@@ -158,88 +69,47 @@ sub fetch {
 	$self->{'Url'} =~ s/\&/and/g;
 	$self->{'Url'} =~ s/ +/\-/g;
 	$self->{'Url'} =~ s/[^a-zA-Z0-9\-]+//g;
-	$self->{'Url'} = 'https://genius.com/' . $self->{'Url'};
+	$self->{'Url'} = $Site . '/' . $self->{'Url'};
 
-	my $ua = LWP::UserAgent->new(
-		ssl_opts => { verify_hostname => 0, },
-	);
-	$ua->timeout(10);
-	$ua->agent($self->{'agent'});
-	$ua->protocols_allowed(['https']);
-	$ua->cookie_jar( {} );
-	push @{ $ua->requests_redirectable }, 'GET';
-	(my $referer = $self->{'Url'}) =~ s{^(\w+)\:\/\/}{};
-	my $protocol = $1;
-	$referer =~ s{\/.+$}{\/};
-	my $host = $referer;
-	$host =~ s{\/$}{};
-	$referer = $protocol . '://' . $referer;
-	my $req = new HTTP::Request 'GET' => $self->{'Url'};
-	$req->header(
-		'Accept' =>
-			'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
-		'Accept-Language'           => 'en-US,en;q=0.5',
-		'Accept-Encoding'           => 'gzip, deflate',
-		'Connection'                => 'keep-alive',
-		'Upgrade-insecure-requests' => 1,
-		'Host'                      => $host,
-	);
-
-	my $res = $ua->request($req);
-
-	if ($res->is_success) {
-		my $lyrics = $self->_parse($res->decoded_content);
-		if ($self->{'cache'} && $self->{'cache'} !~ /^\</ && $lyrics && $haveLyricsCache) {
-			# cache the fetched lyrics, if we can:
-			my $cache = new LyricFinder::Cache(-cache => $self->{'cache'});
-			$cache->save($artist_in, $song_in, $lyrics)  if ($cache);
-		}
-		return $lyrics;
-	} else {
-		if ($res->status_line =~ /^404/) {
-			$self->{'Error'} = "..$Source - Lyrics not found.";
-		} else {
-			carp($self->{'Error'} = "e:$Source - Failed to retrieve ".$self->{'Url'}
-					.' ('.$res->status_line.').');
-		}
-		return;
+	my $lyrics = $self->_web_fetch($artist_in, $song_in);
+	if ($lyrics && $haveLyricsCache && $self->{'-cache'} && $self->{'-cache'} !~ /^\</) {
+		$self->_debug("=== WILL CACHE LYRICS! ===");
+		# cache the fetched lyrics, if we can:
+		my $cache = new LyricFinder::Cache(%{$self});
+		$cache->save($artist_in, $song_in, $lyrics)  if ($cache);
 	}
+	return $lyrics;
 }
-
-# Internal use only functions:
 
 sub _parse {
 	my $self = shift;
 	my $html = shift;
 
+	$self->_debug("Genius::_parse()!");
 	if (my ($goodbit) = $html =~
-		m{\<div\s+class\=\"lyrics\"\>(.+)\<\!\-\-\/sse\-\-\>}msi)
+#			m{\<div\s+class\=\"lyrics\"\>(.+)\<\!\-\-\/sse\-\-\>}msi)
+			m{\<div\s+id\=\"lyrics\"[^\>]*\>(.+?)\<h1}msi)
 	{
 		my $hs   = HTML::Strip->new();
+		$goodbit =~ s#\<\/?p\>#\r\n#gsi;
+		$goodbit =~ s#\<br\/?\>#\r\n#gsi;
 		my $text = $hs->parse($goodbit);
 
-		# normalize Windowsey \r\n sequences:
-		$text =~ s/\r+//gs;
-		# strip off pre & post padding with spaces:
-		$text =~ s/^ +//mg;
-		$text =~ s/ +$//mg;
-		# clear up repeated blank lines:
-		$text =~ s/(\R){2,}/\n\n/gs;
-		# and remove any blank top lines:
-		$text =~ s/^\R+//s;
-		$text =~ s/\R\R+$/\n/s;
-		$text .= "\n"  unless ($text =~ /\n$/s);
-		# now fix up for either Windows or Linux/Unix:
-		$text =~ s/\R/\r\n/gs  if ($^O =~ /Win/);
+		#WHILE WE'RE AT IT, SEE IF WE HAVE A COVER IMAGE?!:
+		if ($html =~ m#\<noscript\>\s*\<img\s+src\=\"([^\"]+)#s) {
+			my $imgurl = $1;
+			$imgurl = 'https:' . $imgurl  if ($imgurl =~ m#^//#);
+			$self->{'image_url'} = $imgurl;
+		}
 
-		return $text;
+		return $self->_normalize_lyric_text($self->_html2text($text));
 	} else {
 		carp($self->{'Error'} = "e:$Source - Failed to identify lyrics on result page.");
 		return '';
 	}
-}   # end of sub parse
+}
 
-1;
+1
 
 __END__
 
@@ -313,7 +183,8 @@ object can be used for multiple fetches, so this normally only needs to be
 called once.
 
 I<options> is a hash of option/value pairs (ie. "-option" => "value").  
-The currently-supported options are:  
+If an "-option" is specified with no "value" given, the default value will 
+be I<1> ("I<true>").  The currently-supported options are:  
 
 =over 4
 
@@ -325,7 +196,7 @@ pass to genius.com.  Some sites are pickey about receiving a user-agent
 string that corresponds to a valid / supported web-browser to prevent their 
 sites from being "scraped" by programs, such as this.  
 
-Default:  I<"Mozilla/5.0 (X11; Linux x86_64; rv:80.0) Gecko/20100101 Firefox/80.0">.
+Default:  I<"Mozilla/5.0 (X11; Linux x86_64; rv:84.0) Gecko/20100101 Firefox/84.0">.
 
 NOTE:  This value will be overridden if $founder->agent("agent") is 
 called!
@@ -430,6 +301,12 @@ This is the primary method call, and the only one required to be called
 
 Returns lyrics as a string (includes line-breaks appropriate for the user's 
 operating system), or an empty string, if no lyrics found.
+
+=item I<$scalar> = $finder->B<image_url>()
+
+Returns a URL for a cover-art image, if one found on the lyrics page.  
+If no image is found, an empty string will be returned if this method 
+is called.
 
 =item I<$scalar> = $finder->B<message>()
 

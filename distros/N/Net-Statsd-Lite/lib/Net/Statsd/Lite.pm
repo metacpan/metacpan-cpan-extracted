@@ -22,7 +22,7 @@ use namespace::autoclean;
 # RECOMMEND PREREQ: Ref::Util::XS
 # RECOMMEND PREREQ: Type::Tiny::XS
 
-our $VERSION = 'v0.6.1';
+our $VERSION = 'v0.6.2';
 
 
 has host => (
@@ -227,7 +227,7 @@ Net::Statsd::Lite - A lightweight StatsD client that supports multimetric packet
 
 =head1 VERSION
 
-version v0.6.1
+version v0.6.2
 
 =head1 SYNOPSIS
 
@@ -258,9 +258,17 @@ It supports the following features:
 
 =over
 
-=item Multiple metrics can be sent in a single UDP packet.
+=item *
 
-=item It supports the meter and histogram metric types.
+Multiple metrics can be sent in a single UDP packet.
+
+=item *
+
+It supports the meter and histogram metric types.
+
+=item *
+
+It can extended to support extensions such as tagging.
 
 =back
 

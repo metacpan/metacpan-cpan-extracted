@@ -350,6 +350,7 @@ t/regression/errors_facet.t
 t/regression/fork_first.t
 t/regression/inherit_trace.t
 t/regression/no_name_in_subtest.t
+t/regression/skip_reason_object_ipc.t
 t/regression/todo_and_facets.t
 t/zzz-check-breaks.t
 xt/author/pod-spell.t

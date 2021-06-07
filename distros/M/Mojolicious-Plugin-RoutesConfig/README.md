@@ -22,7 +22,7 @@ Mojolicious::Plugin::RoutesConfig - Describe routes in configuration
       ],
     }
 
-    # Mojolicious
+    # in YourApp::startup()
     my $config = $app->plugin('Config');
     # or even
     my $config = $app->plugin('RoutesConfig');
@@ -31,7 +31,7 @@ Mojolicious::Plugin::RoutesConfig - Describe routes in configuration
     $app->plugin('RoutesConfig', {file => $app->home->child('etc/routes_admin.conf')});
     $app->plugin('RoutesConfig', {file => $app->home->child('etc/routes_site.conf')});
 
-    # Mojolicious::Lite
+    # in  YourLiteApp
     my $config = plugin 'Config';
     plugin 'RoutesConfig', $config;
     plugin 'RoutesConfig', {file => app->home->child('etc/routes_admin.conf')};
@@ -39,7 +39,7 @@ Mojolicious::Plugin::RoutesConfig - Describe routes in configuration
 
 # DESCRIPTION
 
-[Mojolicious::Plugin::RoutesConfig](https://metacpan.org/pod/Mojolicious::Plugin::RoutesConfig) allows you to define your routes in
+[Mojolicious::Plugin::RoutesConfig](https://metacpan.org/pod/Mojolicious%3A%3APlugin%3A%3ARoutesConfig) allows you to define your routes in
 configuration file or in a separate file, for example
 `$MOJO_HOME/etc/plugins/routes.conf`. This way you can quickly enable and
 disable parts of your application without editing its source code.
@@ -49,14 +49,14 @@ just instead of methods you use method names as keys and suitable references as
 values which will be dereferenced and passed as arguments to the respective
 method. If `$parameters` is a reference to CODE it will be executed and
 whatever it returns will be the parameters for the respective method.For
-allowed keys look at ["METHODS" in Mojolicious::Routes::Route](https://metacpan.org/pod/Mojolicious::Routes::Route#METHODS). Look at
+allowed keys look at ["METHODS" in Mojolicious::Routes::Route](https://metacpan.org/pod/Mojolicious%3A%3ARoutes%3A%3ARoute#METHODS). Look at
 `t/blog/etc/complex_routes.conf` for inspiration. You can have all your routes
 defined in the configuration file as it is Perl and you have the `app` object
 available.
 
 # METHODS
 
-[Mojolicious::Plugin::RoutesConfig](https://metacpan.org/pod/Mojolicious::Plugin::RoutesConfig) inherits all methods from [Mojolicious::Plugin::Config](https://metacpan.org/pod/Mojolicious::Plugin::Config) and implements the following new ones.
+[Mojolicious::Plugin::RoutesConfig](https://metacpan.org/pod/Mojolicious%3A%3APlugin%3A%3ARoutesConfig) inherits all methods from [Mojolicious::Plugin::Config](https://metacpan.org/pod/Mojolicious%3A%3APlugin%3A%3AConfig) and implements the following new ones.
 
 ## register
 
@@ -82,9 +82,4 @@ LICENSE file included with this module.
 
 # SEE ALSO
 
-[Mojolicious::Guides::Routing](https://metacpan.org/pod/Mojolicious::Guides::Routing), [Mojolicious::Routes](https://metacpan.org/pod/Mojolicious::Routes),
-[Mojolicious::Routes::Route](https://metacpan.org/pod/Mojolicious::Routes::Route), [Mojolicious::Plugin::Config](https://metacpan.org/pod/Mojolicious::Plugin::Config)
-
-[Slovo](https://metacpan.org/pod/Slovo) has a pretty advanced routes configuration using
-[Mojolicious::Plugin::RoutesConfig](https://metacpan.org/pod/Mojolicious::Plugin::RoutesConfig).  Please look at
-Slovo/lib/Slovo/resources/etc/routes.conf.
+[Mojolicious::Routes](https://metacpan.org/pod/Mojolicious%3A%3ARoutes), [Mojolicious::Routes::Route](https://metacpan.org/pod/Mojolicious%3A%3ARoutes%3A%3ARoute), [Mojolicious::Plugin::Config](https://metacpan.org/pod/Mojolicious%3A%3APlugin%3A%3AConfig)

@@ -10,7 +10,7 @@ App::Prove::Plugin::MySQLPool - pool of Test::mysqld-s reused while testing
 
 # DESCRIPTION
 
-App::Prove::Plugin::MySQLPool is a [prove](https://metacpan.org/pod/prove) plugin to speedup your tests using a pool of [Test::mysqld](https://metacpan.org/pod/Test::mysqld)s.
+App::Prove::Plugin::MySQLPool is a [prove](https://metacpan.org/pod/prove) plugin to speedup your tests using a pool of [Test::mysqld](https://metacpan.org/pod/Test%3A%3Amysqld)s.
 
 If you're using Test::mysqld, and have a lot of tests using it, annoyed by the mysql startup time slowing your tests, this module is for you.
 
@@ -20,7 +20,7 @@ Next, each mysqld instance optionally calls
 
     MyApp::Test::DB->prepare( $mysqld );
 
-You can CREATE TABLEs using [GitDDL](https://metacpan.org/pod/GitDDL) or [DBIx::Class::Schema::Loader](https://metacpan.org/pod/DBIx::Class::Schema::Loader) or others,
+You can CREATE TABLEs using [GitDDL](https://metacpan.org/pod/GitDDL) or [DBIx::Class::Schema::Loader](https://metacpan.org/pod/DBIx%3A%3AClass%3A%3ASchema%3A%3ALoader) or others,
 or bulk insert master data before start testing.
 
 MyApp::Test::DB only needs to implement a `prepare` sub.
@@ -62,7 +62,7 @@ Masakazu Ohtsuka <o.masakazu@gmail.com>
 
 # SEE ALSO
 
-[prove](https://metacpan.org/pod/prove), [Test::mysqld](https://metacpan.org/pod/Test::mysqld)
+[prove](https://metacpan.org/pod/prove), [Test::mysqld](https://metacpan.org/pod/Test%3A%3Amysqld)
 
 # LICENSE
 

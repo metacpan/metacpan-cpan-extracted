@@ -21,6 +21,7 @@ MANIFEST.SKIP
 META.yml
 PKCS12.pm
 PKCS12.xs
+ppport.h
 README
 t/pkcs12.t
 t/pod-coverage.t

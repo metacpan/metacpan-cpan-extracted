@@ -16,7 +16,7 @@ my $pipe = UV::Pipe->new;
 isa_ok($pipe, 'UV::Pipe');
 
 $pipe->bind($path);
-END { unlink $path; }
+END { unlink $path if $path; }
 
 ok(-S $path, 'Path created as a socket');
 

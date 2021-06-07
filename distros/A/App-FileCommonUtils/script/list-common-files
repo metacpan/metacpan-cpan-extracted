@@ -1,11 +1,12 @@
 #!perl
 
 # Note: This script is a CLI for Riap function /File/Common/list_common_files
-# and generated automatically using Perinci::CmdLine::Gen version 0.488
+# and generated automatically using Perinci::CmdLine::Gen version 0.498
 
-our $DATE = '2019-04-16'; # DATE
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2021-05-25'; # DATE
 our $DIST = 'App-FileCommonUtils'; # DIST
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 
 use 5.010001;
 use strict;
@@ -37,13 +38,16 @@ list-common-files - List files that are found in {all,more than one} directories
 
 =head1 VERSION
 
-This document describes version 0.001 of list-common-files (from Perl distribution App-FileCommonUtils), released on 2019-04-16.
+This document describes version 0.002 of list-common-files (from Perl distribution App-FileCommonUtils), released on 2021-05-25.
 
 =head1 SYNOPSIS
 
 Usage:
 
- % list-common-files [options] <dir> ...
+ % list-common-files [--detail] [--dir=s+] [--dirs-json=s] [--format=name]
+     [--json] [--min-occurrence=s] [--(no)naked-res] [--no-detail]
+     [--nodetail] [--page-result[=program]] [--view-result[=program]] <dir>
+     ...
 
 =head1 DESCRIPTION
 
@@ -60,13 +64,38 @@ C<*> marks required options.
 
 =over
 
+=item B<--detail>
+
+Whether to return detailed result per file.
+
+If set to true, instead of an array of filenames:
+
+    ["file1", "file2"]
+
+it will instead return a hash with filename as key and another hash containing
+detailed information:
+
+    {
+        "file1" => {
+            dirs => ["dir1", "dir2"], # in which dirs the file is found
+        },
+        "file2" => {
+            ...
+        },
+    }
+
+
 =item B<--dir>=I<s@>*
+
+Can also be specified as the 1st command-line argument and onwards.
 
 Can be specified multiple times.
 
 =item B<--dirs-json>=I<s>
 
 See C<--dir>.
+
+Can also be specified as the 1st command-line argument and onwards.
 
 =item B<--min-occurrence>=I<s>
 
@@ -108,6 +137,14 @@ you want to pipe the result for more post-processing. In this case you can use
 
     [1,2,3]
 
+
+=item B<--page-result>
+
+Filter output through a pager.
+
+=item B<--view-result>
+
+View output using a viewer.
 
 =back
 
@@ -181,7 +218,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2019 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

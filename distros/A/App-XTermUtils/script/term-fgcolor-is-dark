@@ -1,11 +1,12 @@
 #!perl
 
 # Note: This script is a CLI for Riap function /XTerm/Util/term_fgcolor_is_dark
-# and generated automatically using Perinci::CmdLine::Gen version 0.491
+# and generated automatically using Perinci::CmdLine::Gen version 0.498
 
-our $DATE = '2019-11-27'; # DATE
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2021-05-26'; # DATE
 our $DIST = 'App-XTermUtils'; # DIST
-our $VERSION = '0.006'; # VERSION
+our $VERSION = '0.007'; # VERSION
 
 use 5.010001;
 use strict;
@@ -37,13 +38,17 @@ term-fgcolor-is-dark - Check if terminal text (foreground) color is dark
 
 =head1 VERSION
 
-This document describes version 0.006 of term-fgcolor-is-dark (from Perl distribution App-XTermUtils), released on 2019-11-27.
+This document describes version 0.007 of term-fgcolor-is-dark (from Perl distribution App-XTermUtils), released on 2021-05-26.
 
 =head1 SYNOPSIS
 
 Usage:
 
- % term-fgcolor-is-dark [options]
+ % term-fgcolor-is-dark [--format=name] [--json] [--(no)naked-res]
+     [--no-query-terminal] [--no-quiet] [--no-read-colorfgbg]
+     [--noquery-terminal] [--noquiet] [--noread-colorfgbg]
+     [--page-result[=program]] [-q] [--query-terminal] [--quiet]
+     [--read-colorfgbg] [--view-result[=program]]
 
 =head1 DESCRIPTION
 
@@ -101,6 +106,14 @@ you want to pipe the result for more post-processing. In this case you can use
 
     [1,2,3]
 
+
+=item B<--page-result>
+
+Filter output through a pager.
+
+=item B<--view-result>
+
+View output using a viewer.
 
 =back
 
@@ -162,7 +175,7 @@ Source repository is at L<https://github.com/perlancar/perl-App-XTermUtils>.
 
 =head1 BUGS
 
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-XTermUtils>
+Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-App-XTermUtils/issues>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
@@ -174,7 +187,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019, 2018 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2019, 2018 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -1,15 +1,13 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2020 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2020-2021 -- leonerd@leonerd.org.uk
 
-package Metrics::Any::Adapter::DogStatsd;
+package Metrics::Any::Adapter::DogStatsd 0.03;
 
-use strict;
+use v5.14;
 use warnings;
 use base qw( Metrics::Any::Adapter::Statsd );
-
-our $VERSION = '0.02';
 
 use Carp;
 
@@ -42,7 +40,7 @@ sub _tags
    }
 
    return "" unless @tags;
-   return "#" . join( ",", @tags );
+   return "|#" . join( ",", @tags );
 }
 
 sub send

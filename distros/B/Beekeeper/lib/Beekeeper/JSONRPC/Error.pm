@@ -3,70 +3,8 @@ package Beekeeper::JSONRPC::Error;
 use strict;
 use warnings;
 
-our $VERSION = '0.01';
+our $VERSION = '0.04';
 
-=head1 NAME
- 
-Beekeeper::JSONRPC::Error - Representation of a JSON-RPC error.
- 
-=head1 VERSION
- 
-Version 0.01
-
-=head1 SYNOPSIS
-
-  my $client = Beekeeper::Client->instance;
-  
-  my $resp = $client->do_job(
-      method => 'myapp.svc.foo',
-      params => { foo => 'bar' },
-  );
-  
-  unless ($resp->success) {
-      # Error response
-      die $resp->code . $resp->message;
-  }
-
-=head1 DESCRIPTION
-
-Objects of this class represents a JSON-RPC error (see L<http://www.jsonrpc.org/specification>).
-
-When a RPC call could not be executed successfully the worker replies with a 
-Beekeeper::JSONRPC::Error object. These objects may be returned also due to  
-client side errors, like network disconnections or timeouts.
-
-Method C<Beekeeper::Client-\>do_job> returns objects of this class on failure.
-
-=head1 ACCESSORS
-
-=over 4
-
-=item message
-
-A string providing a short description of the error.
-
-=item code
-
-A number that indicates the error type that occurred.
-
-=item data
-
-Arbitrary value or data structure containing additional information about the error.
-This may be present or not.
-
-=item id
-
-The id of the request it is responding to. It is unique per client connection,
-and it is used for response matching.
-
-=item success
-
-Always returns false. Used to determine if a method was executed successfully
-or not ($response->result cannot be trusted as it may be undefined on success).
-
-=back
-
-=cut
 
 use overload '""' => sub { $_[0]->{error}->{message} };
 
@@ -93,13 +31,6 @@ sub success { 0 }
 
 sub TO_JSON { return { %{$_[0]} } }
 
-
-=head1 Predefined errors
-
-Error codes from and including -32768 to -32000 are reserved for predefined
-errors of the JSON-RPC spec.
-
-=cut
 
 sub parse_error {
     shift->new(
@@ -191,7 +122,77 @@ sub server_error {
 
 1;
 
+__END__
+
+=pod
+
 =encoding utf8
+
+=head1 NAME
+ 
+Beekeeper::JSONRPC::Error - Representation of a JSON-RPC error.
+ 
+=head1 VERSION
+ 
+Version 0.04
+
+=head1 SYNOPSIS
+
+  my $client = Beekeeper::Client->instance;
+  
+  my $resp = $client->call_remote(
+      method => 'myapp.svc.foo',
+      params => { foo => 'bar' },
+  );
+  
+  unless ($resp->success) {
+      # Error response
+      die $resp->code . $resp->message;
+  }
+
+=head1 DESCRIPTION
+
+Objects of this class represents a JSON-RPC error (see L<http://www.jsonrpc.org/specification>).
+
+When a RPC call could not be executed successfully the worker replies with a 
+Beekeeper::JSONRPC::Error object. These objects may be returned also due to  
+client side errors, like network disconnections or timeouts.
+
+Method C<Beekeeper::Client-\>call_remote> returns objects of this class on failure.
+
+=head1 ACCESSORS
+
+=over 4
+
+=item message
+
+A string providing a short description of the error.
+
+=item code
+
+A number that indicates the error type that occurred.
+
+=item data
+
+Arbitrary value or data structure containing additional information about the error.
+This may be present or not.
+
+=item id
+
+The id of the request it is responding to. It is unique per client connection,
+and it is used for response matching.
+
+=item success
+
+Always returns false. Used to determine if a method was executed successfully
+or not ($response->result cannot be trusted as it may be undefined on success).
+
+=back
+
+=head1 Predefined errors
+
+Error codes from and including -32768 to -32000 are reserved for predefined
+errors of the JSON-RPC spec.
 
 =head1 AUTHOR
 
@@ -199,7 +200,7 @@ José Micó, C<jose.mico@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright 2015 José Micó.
+Copyright 2015-2021 José Micó.
 
 This is free software; you can redistribute it and/or modify it under the same 
 terms as the Perl 5 programming language itself.

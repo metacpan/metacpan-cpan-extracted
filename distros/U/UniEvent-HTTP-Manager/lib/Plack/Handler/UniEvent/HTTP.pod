@@ -1,0 +1,47 @@
+=head1 NAME
+
+Plack::Handler::UniEvent::HTTP - Plack adapter for UniEvent::HTTP::Manager, extremely fast event loop http server
+
+
+
+=head1 SYNOPSIS
+
+  plackup -s UniEvent::HTTP -E deployment --port 9090 --min_servers 1 --max_servers 10 --min_load 0.2 --max_load 0.7
+
+
+
+=head1 DESCRIPTION
+
+This is an adapter to run PSGI apps on UniEvent::HTTP::Manager multiprocess/multithread server.
+
+Command line arguments (in addition to plack's default arguments) have the same name as in config in method C<new()> of L<UniEvent::HTTP::Manager>.
+
+Value for "--worker_model" should be either "prefork" or "thread"
+
+Value for "--bind_model" should be either "reuse_port" or "duplicate"
+
+
+
+=head1 SEE ALSO
+
+L<UniEvent::HTTP::Manager>
+
+L<UniEvent::HTTP>
+
+L<UniEvent>
+
+
+
+=head1 AUTHOR
+
+Pronin Oleg <syber@cpan.org> 
+
+Crazy Panda LTD
+
+
+
+=head1 LICENSE
+
+You may distribute this code under the same terms as Perl itself.
+
+=cut

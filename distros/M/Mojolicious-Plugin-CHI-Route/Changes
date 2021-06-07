@@ -1,0 +1,14 @@
+0.05 2021-05-22
+        - Fixed dependencies.
+
+0.04 2021-05-21
+        - Initial release on CPAN.
+
+0.03 2021-04-10
+        - Fix behaviour for empty keys.
+
+0.02 2021-03-19
+        - Add ETag and Last-Modified support.
+
+0.01 2021-03-18
+        - Initial commit.

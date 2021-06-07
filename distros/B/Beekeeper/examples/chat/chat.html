@@ -2,16 +2,10 @@
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
-<script language="Javascript" type="text/javascript" src="js/stomp.js"></script>
-<script language="Javascript" type="text/javascript" src="js/beekeeper.js"></script>
-<script language="Javascript" type="text/javascript" src="js/chat.js"></script>
-<script language="Javascript" type="text/javascript" src="config.js"></script>
-<script language="Javascript" type="text/javascript">
-
-var chat = new Chat;
-chat.connect();
-
-</script>
+<script language="Javascript" type="text/javascript" defer src="https://unpkg.com/mqtt@4.2.6/dist/mqtt.min.js"></script>
+<script language="Javascript" type="text/javascript" defer src="js/config.js"></script>
+<script language="Javascript" type="text/javascript" defer src="js/beekeeper.js"></script>
+<script language="Javascript" type="text/javascript" defer src="js/chat.js"></script>
 <style type="text/css">
 
 body {
@@ -23,37 +17,70 @@ body {
 #chat {
     overflow: auto;
     height: 300px; 
-    width: 480px;
+    width: 390px;
     font-family: sans-serif;
-    border: solid 2px #6699CC;
+    background-color: #F0F0F0;
+    border: solid 1px #CCCCCC;
     border-radius: 4px;
+    scroll-behavior: smooth;
 }
 
-#chat div {
+#chat .bubble {
+    font-weight: 500;
     border: solid 1px #CCCCCC;
-    border-radius: 6px;
-    padding: 6px;
-    margin: 3px;
+    padding: 8px;
+    padding-top: 10px;
+    margin: 8px;
+    border-radius: 10px;
+}
+
+#chat .sender {
+    position: relative;
+    font-weight: 700;
+    font-size: 8pt;
+    color: #333399;
+    top: -4px;
+}
+
+#chat .no_sender .sender {
+    display: none;
+}
+
+#chat .outgoing {
+    border-top-right-radius: 0px;
+    background-color: #CCFFCC;
+    margin-left: 30px;
+}
+
+#chat .incoming {
+    background-color: #FFFFFF;
+    border-top-left-radius: 0px;
+    margin-right: 30px;
+}
+
+#chat .public {
+    background-color: #FFFFFF;
+}
+
+#chat .private {
+    background-color: #FFD090;
 }
 
 #chat .error {
-    background-color: #FFA0A0;
+    background-color: #E03030;
+    color: #FFFFFF;
 }
 
 #chat .info {
     background-color: #FFFFA0;
 }
 
-#chat .ucast {
-    background-color: #A0FFA0;
-}
-
 #cmd {
     font-size: 12pt; font-family: sans-serif;
-    width: 380px;
+    width: 280px;
     color: #000000;
     padding: 6px; 
-    border: solid 2px #6699CC;
+    border: solid 1px #999999;
     border-radius: 4px;
 }
  
@@ -63,17 +90,27 @@ body {
     color: #000000;
     padding: 6px; 
     margin: 6px;
-    border: solid 2px #6699CC;
-    background-color: #6699CC;
+    border: solid 1px #999999;
+    background-color: #CCCCCC;
     border-radius: 4px;
 }
 
 #help {
     padding: 20px;
+    padding-left: 10px;
 }
 
 #help i {
     color: #333333;
+    width: 80px;
+}
+
+#username {
+    width: 130px;
+}
+
+#password {
+    width: 130px;
 }
 
 </style>

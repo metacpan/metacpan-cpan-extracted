@@ -25,11 +25,13 @@ possible, otherwise in
 finally in <a href="QuickTime.html#Keys">Keys</a>,
 but this order may be changed by setting the PREFERRED level of the
 appropriate table in the config file (see
-<a href="../config.html#PREF">example.config</a> in the full distribution for
-an example).  ExifTool currently writes only top-level metadata in
-QuickTime-based files; it extracts other track-specific and timed
-metadata, but can not yet edit tags in these locations (with the
-exception of track-level date/time tags).</p>
+<a href="../config.html#PREF">example.config</a> in the full distribution for an
+example).  Note that some tags with the same name but different ID&#39;s may
+exist in the same location, but the family 7 group names may be used to
+differentiate these.  ExifTool currently writes only top-level metadata in
+QuickTime-based files; it extracts other track-specific and timed metadata,
+but can not yet edit tags in these locations (with the exception of
+track-level date/time tags).</p>
 
 <p>Alternate language tags may be accessed for
 <a href="QuickTime.html#ItemList">ItemList</a> and
@@ -54,8 +56,8 @@ local time when extracting.</p>
 
 <p>When writing string-based date/time tags, the system time zone is added if
 the PrintConv option is enabled and no time zone is specified.  This is
-because Apple software may display a crazy values if the time zone is
-missing for some tags.</p>
+because Apple software may display crazy values if the time zone is missing
+for some tags.</p>
 
 <p>See
 <a href="https://developer.apple.com/library/archive/documentation/QuickTime/QTFF/">https://developer.apple.com/library/archive/documentation/QuickTime/QTFF/</a>
@@ -197,7 +199,7 @@ roll, yaw, speed, altitude)</span></span></td></tr>
 <td>'udat'</td>
 <td>GPSLog</td>
 <td class=c>no</td>
-<td>&nbsp;</td></tr>
+<td><span class=s><span class=n>(parsed to extract GPS separately when ExtractEmbedded is used)</span></span></td></tr>
 <tr class=b>
 <td>'udta'</td>
 <td>UserData</td>
@@ -288,7 +290,7 @@ roll, yaw, speed, altitude)</span></span></td></tr>
 <h2><a name='Stream'>QuickTime Stream Tags</a></h2>
 <p>Timed metadata extracted from QuickTime media data and some AVI videos when
 the ExtractEmbedded option is used.  Although most of these tags are
-combined into the single table below, ExifTool currently reads 49 different
+combined into the single table below, ExifTool currently reads 51 different
 formats of timed GPS metadata from video files.</p>
 <blockquote>
 <table class=frame><tr><td>
@@ -403,68 +405,72 @@ formats of timed GPS metadata from video files.</p>
 <td class=c>no</td>
 <td>&nbsp;</td></tr>
 <tr>
+<td>KiloCalories</td>
+<td class=c>no</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
 <td>PreviewInfo</td>
 <td class=c>-</td>
 <td>--&gt; <a href='QuickTime.html#PreviewInfo'>QuickTime PreviewInfo Tags</a></td></tr>
-<tr class=b>
+<tr>
 <td>RVMI_gReV
   <br>RVMI_sReV</td>
 <td class=c>-<br>-</td>
 <td>--&gt; <a href='QuickTime.html#RVMI_gReV'>QuickTime RVMI_gReV Tags</a>
   <br>--&gt; <a href='QuickTime.html#RVMI_sReV'>QuickTime RVMI_sReV Tags</a></td></tr>
-<tr>
+<tr class=b>
 <td>RawGSensor</td>
 <td class=c>no</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>SampleDateTime</td>
 <td class=c>no</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>SampleDuration</td>
 <td class=c>no</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>SampleTime</td>
 <td class=c>no</td>
 <td><span class=s><span class=n>(sample decoding time)</span></span></td></tr>
-<tr>
+<tr class=b>
 <td>Text</td>
 <td class=c>no</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>TimeCode</td>
 <td class=c>no</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>Unknown00?</td>
 <td class=c>no</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>Unknown01?</td>
 <td class=c>no</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>Unknown02?</td>
 <td class=c>no</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>Unknown03?</td>
 <td class=c>no</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>UserLabel</td>
 <td class=c>no</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>VerticalSpeed</td>
 <td class=c>no</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>VideoTimeStamp</td>
 <td class=c>no</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>camm0
   <br>camm1
   <br>camm2
@@ -482,33 +488,33 @@ formats of timed GPS metadata from video files.</p>
   <br>--&gt; <a href='QuickTime.html#camm5'>QuickTime camm5 Tags</a>
   <br>--&gt; <a href='QuickTime.html#camm6'>QuickTime camm6 Tags</a>
   <br>--&gt; <a href='QuickTime.html#camm7'>QuickTime camm7 Tags</a></td></tr>
-<tr>
+<tr class=b>
 <td>fdsc</td>
 <td class=c>-</td>
 <td>--&gt; <a href='GoPro.html#fdsc'>GoPro fdsc Tags</a></td></tr>
-<tr class=b>
+<tr>
 <td>gpmd_GoPro
   <br>gpmd_Rove</td>
 <td class=c>-<br>-</td>
 <td>--&gt; <a href='GoPro.html#GPMF'>GoPro GPMF Tags</a>
   <br>--&gt; <a href='QuickTime.html#Stream'>QuickTime Stream Tags</a></td></tr>
-<tr>
+<tr class=b>
 <td>marl</td>
 <td class=c>-</td>
 <td>--&gt; <a href='QuickTime.html#marl'>QuickTime marl Tags</a></td></tr>
-<tr class=b>
+<tr>
 <td>mebx</td>
 <td class=c>-</td>
 <td>--&gt; <a href='QuickTime.html#Keys'>QuickTime Keys Tags</a></td></tr>
-<tr>
+<tr class=b>
 <td>mett</td>
 <td class=c>-</td>
 <td>--&gt; <a href='Parrot.html#mett'>Parrot mett Tags</a></td></tr>
-<tr class=b>
+<tr>
 <td>rtmd</td>
 <td class=c>-</td>
 <td>--&gt; <a href='Sony.html#rtmd'>Sony rtmd Tags</a></td></tr>
-<tr>
+<tr class=b>
 <td>tx3g</td>
 <td class=c>-</td>
 <td>--&gt; <a href='QuickTime.html#tx3g'>QuickTime tx3g Tags</a></td></tr>
@@ -806,281 +812,316 @@ changed via <a href="../config.html#PREF">the config file</a>.</p>
 <tr>
 <td>'Encoded_With'</td>
 <td>EncodedWith</td>
-<td class=c>string</td>
+<td class=c>yes</td>
 <td>&nbsp;</td></tr>
 <tr class=b>
 <td>'album'</td>
 <td>Album</td>
-<td class=c>string</td>
+<td class=c>yes</td>
 <td>&nbsp;</td></tr>
 <tr>
+<td>'apple.photos.variation-identifier'</td>
+<td>ApplePhotosVariationIdentifier</td>
+<td class=c>int64s</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
 <td>'artist'</td>
 <td>Artist</td>
-<td class=c>string</td>
+<td class=c>yes</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>'artwork'</td>
 <td>Artwork</td>
-<td class=c>string</td>
+<td class=c>yes</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>'author'</td>
 <td>Author</td>
-<td class=c>string</td>
+<td class=c>yes</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>'camera.framereadouttimeinmicroseconds'</td>
 <td>FrameReadoutTime</td>
-<td class=c>string</td>
+<td class=c>yes</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>'camera.identifier'</td>
 <td>CameraIdentifier</td>
-<td class=c>string</td>
+<td class=c>yes</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>'collection.user'</td>
 <td>UserCollection</td>
-<td class=c>string</td>
+<td class=c>yes</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>'com.android.version'</td>
 <td>AndroidVersion</td>
-<td class=c>string</td>
+<td class=c>yes</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>'com.apple.photos.captureMode'</td>
 <td>CaptureMode</td>
-<td class=c>string</td>
+<td class=c>yes</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>'comment'</td>
 <td>Comment</td>
-<td class=c>string</td>
+<td class=c>yes</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>'copyright'</td>
 <td>Copyright</td>
-<td class=c>string</td>
-<td>&nbsp;</td></tr>
-<tr>
-<td>'creationdate'</td>
-<td>CreationDate</td>
-<td class=c>string</td>
+<td class=c>yes</td>
 <td>&nbsp;</td></tr>
 <tr class=b>
-<td>'description'</td>
-<td>Description</td>
-<td class=c>string</td>
+<td>'creationdate'</td>
+<td>CreationDate</td>
+<td class=c>yes</td>
 <td>&nbsp;</td></tr>
 <tr>
+<td>'description'</td>
+<td>Description</td>
+<td class=c>yes</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
 <td>'detected-face'</td>
 <td>FaceInfo</td>
 <td class=c>-</td>
 <td>--&gt; <a href='QuickTime.html#FaceInfo'>QuickTime FaceInfo Tags</a></td></tr>
-<tr class=b>
+<tr>
 <td>'detected-face.bounds'</td>
 <td>DetectedFaceBounds</td>
 <td class=c>no</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>'detected-face.face-id'</td>
 <td>DetectedFaceID</td>
 <td class=c>no</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>'detected-face.roll-angle'</td>
 <td>DetectedFaceRollAngle</td>
 <td class=c>no</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>'detected-face.yaw-angle'</td>
 <td>DetectedFaceYawAngle</td>
 <td class=c>no</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>'direction.facing'</td>
 <td>CameraDirection</td>
-<td class=c>string</td>
+<td class=c>yes</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>'direction.motion'</td>
 <td>CameraMotion</td>
-<td class=c>string</td>
+<td class=c>yes</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>'director'</td>
 <td>Director</td>
-<td class=c>string</td>
+<td class=c>yes</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>'displayname'</td>
 <td>DisplayName</td>
-<td class=c>string</td>
+<td class=c>yes</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>'genre'</td>
 <td>Genre</td>
-<td class=c>string</td>
-<td>&nbsp;</td></tr>
-<tr>
-<td>'information'</td>
-<td>Information</td>
-<td class=c>string</td>
+<td class=c>yes</td>
 <td>&nbsp;</td></tr>
 <tr class=b>
-<td>'keywords'</td>
-<td>Keywords</td>
-<td class=c>string</td>
+<td>'information'</td>
+<td>Information</td>
+<td class=c>yes</td>
 <td>&nbsp;</td></tr>
 <tr>
+<td>'keywords'</td>
+<td>Keywords</td>
+<td class=c>yes</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
 <td>'live-photo-info'</td>
 <td>LivePhotoInfo</td>
 <td class=c>no</td>
 <td>&nbsp;</td></tr>
+<tr>
+<td>'live-photo.auto'</td>
+<td>LivePhotoAuto</td>
+<td class=c>int8u</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>'live-photo.vitality-score'</td>
+<td>LivePhotoVitalityScore</td>
+<td class=c>float</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>'live-photo.vitality-scoring-version'</td>
+<td>LivePhotoVitalityScoringVersion</td>
+<td class=c>int64s</td>
+<td>&nbsp;</td></tr>
 <tr class=b>
 <td>'location.ISO6709'</td>
 <td>GPSCoordinates</td>
-<td class=c>string</td>
-<td>&nbsp;</td></tr>
+<td class=c>yes</td>
+<td><span class=s><span class=n>(Google Photos may ignore this if the coorinates have more than 5 digits
+after the decimal)</span></span></td></tr>
 <tr>
+<td>'location.accuracy.horizontal'</td>
+<td>LocationAccuracyHorizontal</td>
+<td class=c>yes</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
 <td>'location.body'</td>
 <td>LocationBody</td>
-<td class=c>string</td>
+<td class=c>yes</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>'location.date'</td>
 <td>LocationDate</td>
-<td class=c>string</td>
-<td>&nbsp;</td></tr>
-<tr>
-<td>'location.name'</td>
-<td>LocationName</td>
-<td class=c>string</td>
+<td class=c>yes</td>
 <td>&nbsp;</td></tr>
 <tr class=b>
-<td>'location.note'</td>
-<td>LocationNote</td>
-<td class=c>string</td>
+<td>'location.name'</td>
+<td>LocationName</td>
+<td class=c>yes</td>
 <td>&nbsp;</td></tr>
 <tr>
+<td>'location.note'</td>
+<td>LocationNote</td>
+<td class=c>yes</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
 <td>'location.role'</td>
 <td>LocationRole</td>
-<td class=c>string</td>
+<td class=c>yes</td>
 <td><span class=s>0 = Shooting Location
   <br>1 = Real Location
   <br>2 = Fictional Location</span></td></tr>
-<tr class=b>
+<tr>
 <td>'make'</td>
 <td>Make</td>
-<td class=c>string</td>
+<td class=c>yes</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>'model'</td>
 <td>Model</td>
-<td class=c>string</td>
+<td class=c>yes</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>'player.movie.audio.balance'</td>
 <td>Balance</td>
-<td class=c>string</td>
-<td>&nbsp;</td></tr>
-<tr>
-<td>'player.movie.audio.bass'</td>
-<td>Bass</td>
-<td class=c>string</td>
+<td class=c>yes</td>
 <td>&nbsp;</td></tr>
 <tr class=b>
-<td>'player.movie.audio.gain'</td>
-<td>AudioGain</td>
-<td class=c>string</td>
+<td>'player.movie.audio.bass'</td>
+<td>Bass</td>
+<td class=c>yes</td>
 <td>&nbsp;</td></tr>
 <tr>
+<td>'player.movie.audio.gain'</td>
+<td>AudioGain</td>
+<td class=c>yes</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
 <td>'player.movie.audio.mute'</td>
 <td>Mute</td>
 <td class=c>int8u</td>
 <td><span class=s>0 = Off
   <br>1 = On</span></td></tr>
-<tr class=b>
+<tr>
 <td>'player.movie.audio.pitchshift'</td>
 <td>PitchShift</td>
-<td class=c>string</td>
+<td class=c>yes</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>'player.movie.audio.treble'</td>
 <td>Trebel</td>
-<td class=c>string</td>
+<td class=c>yes</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>'player.movie.visual.brightness'</td>
 <td>Brightness</td>
-<td class=c>string</td>
+<td class=c>yes</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>'player.movie.visual.color'</td>
 <td>Color</td>
-<td class=c>string</td>
+<td class=c>yes</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>'player.movie.visual.contrast'</td>
 <td>Contrast</td>
-<td class=c>string</td>
+<td class=c>yes</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>'player.movie.visual.tint'</td>
 <td>Tint</td>
-<td class=c>string</td>
+<td class=c>yes</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>'player.version'</td>
 <td>PlayerVersion</td>
-<td class=c>string</td>
+<td class=c>yes</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>'producer'</td>
 <td>Producer</td>
-<td class=c>string</td>
+<td class=c>yes</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>'publisher'</td>
 <td>Publisher</td>
-<td class=c>string</td>
-<td>&nbsp;</td></tr>
-<tr>
-<td>'rating.user'</td>
-<td>UserRating</td>
-<td class=c>string</td>
+<td class=c>yes</td>
 <td>&nbsp;</td></tr>
 <tr class=b>
-<td>'software'</td>
-<td>Software</td>
-<td class=c>string</td>
+<td>'rating.user'</td>
+<td>UserRating</td>
+<td class=c>yes</td>
 <td>&nbsp;</td></tr>
 <tr>
+<td>'software'</td>
+<td>Software</td>
+<td class=c>yes</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
 <td>'still-image-time'</td>
 <td>StillImageTime</td>
 <td class=c>no</td>
 <td><span class=s><span class=n>(this tag always has a value of -1; the time of the still image is obtained
 from the associated SampleTime)</span></span></td></tr>
-<tr class=b>
+<tr>
 <td>'title'</td>
 <td>Title</td>
-<td class=c>string</td>
-<td>&nbsp;</td></tr>
-<tr>
-<td>'version'</td>
-<td>Version</td>
-<td class=c>string</td>
+<td class=c>yes</td>
 <td>&nbsp;</td></tr>
 <tr class=b>
+<td>'version'</td>
+<td>Version</td>
+<td class=c>yes</td>
+<td>&nbsp;</td></tr>
+<tr>
 <td>'video-orientation'</td>
 <td>VideoOrientation</td>
 <td class=c>no</td>
-<td>&nbsp;</td></tr>
-<tr>
+<td><table class=cols><tr>
+  <td>1 = Horizontal (normal)
+  <br>2 = Mirror horizontal
+  <br>3 = Rotate 180
+  <br>4 = Mirror vertical
+  <br>5 = Mirror horizontal and rotate 270 CW
+  <br>6 = Rotate 90 CW
+  <br>7 = Mirror horizontal and rotate 90 CW
+  <br>8 = Rotate 270 CW</td></tr></table>
+</td></tr>
+<tr class=b>
 <td>'year'</td>
 <td>Year</td>
-<td class=c>string</td>
+<td class=c>yes</td>
 <td>&nbsp;</td></tr>
 </table></td></tr></table></blockquote>
 
@@ -1257,7 +1298,14 @@ subtitle text in some other videos.</p>
   <br>&#39;hevc&#39; = High Efficiency Image Format HEVC sequence (.HEICS)
   <br>&#39;isc2&#39; = ISMACryp 2.0 Encrypted File
   <br>&#39;iso2&#39; = MP4 Base Media v2 [ISO 14496-12:2005]
-  <br>&#39;isom&#39; = MP4  Base Media v1 [IS0 14496-12:2003]
+  <br>&#39;iso3&#39; = MP4 Base Media v3
+  <br>&#39;iso4&#39; = MP4 Base Media v4
+  <br>&#39;iso5&#39; = MP4 Base Media v5
+  <br>&#39;iso6&#39; = MP4 Base Media v6
+  <br>&#39;iso7&#39; = MP4 Base Media v7
+  <br>&#39;iso8&#39; = MP4 Base Media v8
+  <br>&#39;iso9&#39; = MP4 Base Media v9
+  <br>&#39;isom&#39; = MP4 Base Media v1 [IS0 14496-12:2003]
   <br>&#39;jpm &#39; = JPEG 2000 Compound Image (.JPM) [ISO 15444-6]
   <br>&#39;jpx &#39; = JPEG 2000 with extensions (.JPX) [ISO 15444-2]
   <br>&#39;mif1&#39; = High Efficiency Image Format still image (.HEIF)
@@ -1547,9 +1595,9 @@ this table support alternate languages which are accessed by adding a
 3-character ISO 639-2 language code and an optional ISO 3166-1 alpha 2
 country code to the tag name (eg. &quot;ItemList:Title-fra&quot; or
 &quot;ItemList::Title-fra-FR&quot;).  When creating a new Meta box to contain the
-ItemList directory, by default ExifTool does not specify a
-<a href="QuickTime.html#Handler">Handler</a>, but the
-API <a href="../ExifTool.html#QuickTimeHandler">QuickTimeHandler</a> option may be used to include an &#39;mdir&#39; Handler box.</p>
+ItemList directory, by default ExifTool adds an &#39;mdir&#39; (Metadata) Handler
+box because Apple software may ignore ItemList tags otherwise, but the API
+<a href="../ExifTool.html#QuickTimeHandler">QuickTimeHandler</a> option may be set to 0 to avoid this.</p>
 <blockquote>
 <table class=frame><tr><td>
 <table class=inner cellspacing=1>
@@ -7371,8 +7419,8 @@ symbol in these tag ID&#39;s for the Ricoh Theta Z1 and maybe other models)</spa
 <tr>
 <td>'clsf'</td>
 <td>Classification</td>
-<td class=c>no</td>
-<td>&nbsp;</td></tr>
+<td class=c title=' / = Avoid'>undef/</td>
+<td><span class=s><span class=n>(string in the form &quot;Entity=XXXX Index=### XXXXX&quot;, used in 3gp videos)</span></span></td></tr>
 <tr class=b>
 <td>'cmid'</td>
 <td>CameraID</td>
@@ -7458,12 +7506,13 @@ containing this tag, but perhaps only if it is missing a time zone)</span></span
 <td>'kywd'</td>
 <td>Keywords</td>
 <td class=c>no</td>
-<td>&nbsp;</td></tr>
+<td><span class=s><span class=n>(not writable because Apple doesn&#39;t follow the 3gp specification)</span></span></td></tr>
 <tr>
 <td>'loci'</td>
 <td>LocationInformation</td>
-<td class=c>no</td>
-<td>&nbsp;</td></tr>
+<td class=c title=' / = Avoid'>undef/</td>
+<td><span class=s><span class=n>(string in the form &quot;XXXXX Role=XXX Lat=XXX Lon=XXX Alt=XXX Body=XXX
+Notes=XXX&quot;, used in 3gp videos)</span></span></td></tr>
 <tr class=b>
 <td>'lrcu'</td>
 <td>LyricsURI</td>
@@ -7537,8 +7586,8 @@ containing this tag, but perhaps only if it is missing a time zone)</span></span
 <tr class=b>
 <td>'rtng'</td>
 <td>Rating</td>
-<td class=c>no</td>
-<td>&nbsp;</td></tr>
+<td class=c title=' / = Avoid'>undef/</td>
+<td><span class=s><span class=n>(string in the form &quot;Entity=XXXX Criteria=XXXX XXXXX&quot;, used in 3gp videos)</span></span></td></tr>
 <tr>
 <td>'scen'</td>
 <td>Scene</td>
@@ -7587,8 +7636,8 @@ containing this tag, but perhaps only if it is missing a time zone)</span></span
 <tr>
 <td>'urat'</td>
 <td>UserRating</td>
-<td class=c>no</td>
-<td>&nbsp;</td></tr>
+<td class=c title=' / = Avoid'>undef/</td>
+<td><span class=s><span class=n>(used in 3gp videos)</span></span></td></tr>
 <tr class=b>
 <td>'uuid'</td>
 <td>GarminSoftware
@@ -7609,8 +7658,8 @@ yaw, pitch and roll angles in degrees)</span></span></td></tr>
 <tr>
 <td>'yrrc'</td>
 <td>Year</td>
-<td class=c>no</td>
-<td>&nbsp;</td></tr>
+<td class=c title=' / = Avoid'>undef/</td>
+<td><span class=s><span class=n>(used in 3gp videos)</span></span></td></tr>
 <tr class=b>
 <td>"&copy;ART"</td>
 <td>Artist</td>
@@ -8703,7 +8752,7 @@ yaw, pitch and roll angles in degrees)</span></span></td></tr>
 
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
-<br><i>Last revised Jan 21, 2021</i>
+<br><i>Last revised May 20, 2021</i>
 <p class=lf><a href='index.html'>&lt;-- ExifTool Tag Names</a></p>
 </body>
 </html>

@@ -1,0 +1,112 @@
+#!/usr/bin/perl
+
+use strict ;
+
+package uHTML::psgi ;
+
+use version ; our $VERSION = "1.0" ;
+
+require uHTML ;
+require uHTML::request ;
+
+sub
+{
+  my $env = shift ;
+
+  $env->{'PATH_INFO'} = $env->{'URI'} ;  #nginx+PLACK needs it for the compability with Apache CGI
+  $uHTML::FileName = '' ;
+
+  my $request = uHTML::request->new( $env ) ;
+  return [ 200, $request->Headers(), $request->HTML() ] if $request ;
+  return [ 404, [ 'Content-Type' => 'text/plain' ], [ 'Not Found' ] ] ;
+}
+
+__END__
+
+
+######################################
+######################################
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+=over 2
+
+=item B<uHTML::psgi> - standard B<psgi> binding for plack
+
+=back
+
+=head1 VERSION
+
+Version 1.0
+
+=head1 DESCRIPTION
+
+Standard B<uHTML> binding for plackup. It works well with FCGI.
+
+
+=head1 SYNOPSIS
+
+To use it with a webserver (e.g. nginx) a service file must be created and a appropriate
+system service need to be started. Here an example with systemd.
+
+=head2 plack systemd service:
+
+B< >
+
+=over 3
+
+  [Unit]
+  Description=Fast CGI uHTML Server
+  After=network.target
+  Requires=psgi.service
+
+  [Service]
+  User=uhtml
+  Group=www
+  ExecStart=/usr/bin/plackup -E deployment -s FCGI -S /var/run/psgi/uHTML -a /usr/lib/perl5/vendor_perl/5.26.1/uHTML/psgi
+  WorkingDirectory=/tmp
+  Restart=on-failure
+
+  [Install]
+  WantedBy=multi-user.target
+
+=back
+
+To ensure that the directory C</var/run/psgi> exists another service is needed:
+
+=over 3
+
+  [Unit]
+  Description=Create psgi socket directory
+
+  [Service]
+  Type=oneshot
+  ExecStart=/bin/bash -c 'if [[ ! -d /var/run/psgi ]] ; then mkdir /var/run/psgi ; chown uhtml.www /var/run/psgi ; chmod 770 /var/run/psgi ; fi'
+
+  [Install]
+  WantedBy=multi-user.target
+
+=back
+
+
+=head1 SEE ALSO
+
+perl(1), plack(3), plackup(1), nginx(8), systemd(1), systemd.service(5), http://www.uhtml.de
+
+
+=head1 AUTHOR
+
+Roland Mosler (Roland.Mosler@Place.Ug)
+
+=head1 COPYRIGHT
+
+Copyright 2009 Roland Mosler.  All rights reserved.
+
+This library is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+

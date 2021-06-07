@@ -1,0 +1,89 @@
+#!/usr/bin/perl
+use 5.001 ; use strict ; use warnings ; 
+use Cwd qw[ cwd getcwd abs_path chdir]; # getcwd を使う為
+use Encode qw[ encode_utf8 decode_utf8 ] ;
+use List::Util qw[ minstr maxstr min ] ; 
+use Getopt::Std ; getopts 'dfg:lq' ,\my %o ;
+
+$o{g} //= 1 ; # 上に上がるごとに、その階層にあるファイルの名前を取り出すが、..を挟んで両端のそれぞれから何個を取り出すか
+
+sub seeAround ( ) ; 
+sub moveUp ( ) ;
+#sub getcwd ( @ ) ;
+#*getcwd = *cwd ;
+
+my $status = chdir $ARGV[0] if defined $ARGV[0] ;
+print "Cannot change directory into $ARGV[0], so the current directory is set to process.\n" if defined $status && ! $status ; 
+my $dir0 =  getcwd ;  # 最初のディレクトリ
+my $len = length $dir0 ; # 左の列を揃えるために、空白で埋めるために長さを取り出す
+my $spl = ' ' x $len ; 
+do { 
+	my @x = @{ seeAround () } ; 
+	$x[0] = substr $x[0] . $spl , 0 , $len ; # 左から決まったの長さで切る
+	print join ( "\t" , @x  ) , "\n" ;
+	#print getcwd, "\n" ;
+}
+while ( & moveUp ) ;
+
+sub seeAround ( ) { 
+	my $dir = getcwd ; 
+	my @files = sort glob '*' ; 
+	@files = grep { -d } @files if $o{d} ;
+	@files = grep { -f } @files if $o{f} ;
+	@files = grep { -l } @files if $o{l} ; # symbolic link files
+	grep { $_ .= '/' if -d $_ } @files ; # ディレクトルであれば末尾に/(スラッシュ)を付加。
+	my $fn = scalar @files ; 
+	#grep $_ = decode_utf8 quotemeta encode_utf8 $_ , @files if $o{q}  ; # -q 
+	my @files1 = splice @files , 0 , $o{g} ; 
+	my @files2 = splice @files , - min ( $o{g}, scalar @files ) , $o{g} ; 
+	#print "$dir\t$f1\t$f2\n" ;
+	return [ $dir , $fn , ! @files2 ? "@files1" : ! @files ? "@files1 @files2" : "@files1 .. @files2" ] ; 
+}
+
+sub moveUp ( ) { 
+	my $dir0 = getcwd ;
+	my $status = chdir '..' ;  # <-- -  シンボリックリンクからは始めると、Unixのcd .. と異なり、絶対パスを上がってしまう。
+	my $dir1 = getcwd ; 
+	return undef if $dir0 eq $dir1 ; 
+	return $dir1 ;
+}
+
+
+## ヘルプの扱い
+sub VERSION_MESSAGE {}
+sub HELP_MESSAGE {
+    use FindBin qw[ $Script ] ; 
+    $ARGV[1] //= '' ;
+    open my $FH , '<' , $0 ;
+    while(<$FH>){
+        s/\$0/$Script/g ;
+        print $_ if s/^=head1// .. s/^=cut// and $ARGV[1] =~ /^o(p(t(i(o(ns?)?)?)?)?)?$/i ? m/^\s+\-/ : 1;
+    }
+    close $FH ;
+    exit 0 ;
+}
+
+
+=encoding utf8 
+
+=head1
+
+ updir 
+
+   今いるディリクトリから上の階層に向かって順次ディレクトリを上がって行って、
+   様子を見る。
+
+ -g N ; 出力に現れる各ディレクトリにおけるファイル群の名前文字列の範囲を示すのに、両端の何個を取り出すか
+
+ -d   : only directory files 
+ -f   ; only plain files
+ -l   ; only symbolic link files 
+
+ 
+ ヒント : 
+   表示の各行を逆順にするには  updir | tac とする。
+
+ 開発メモ : 
+  * シンボリックリンクから始めても、絶対パスで上に上がって行く問題がある。オプションで解決可能としたい。
+
+=cut

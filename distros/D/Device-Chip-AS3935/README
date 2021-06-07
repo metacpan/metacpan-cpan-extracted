@@ -1,0 +1,111 @@
+NAME
+
+    Device::Chip::AS3935 - chip driver for AS3935
+
+SYNOPSIS
+
+       use Device::Chip::AS3935;
+       use Future::AsyncAwait;
+    
+       my $chip = Device::Chip::AS3935->new;
+       await $chip->mount( Device::Chip::Adapter::...->new );
+    
+       if( ( await $chip->read_int )->{INT_L} ) {
+          printf "Lightning detected %dkm away\n", await $chip->read_distance;
+       }
+
+DESCRIPTION
+
+    This Device::Chip subclass provides specific communcation to an ams
+    AS3935 lightning detector chip attached to a computer via an I²C
+    adapter.
+
+    The reader is presumed to be familiar with the general operation of
+    this chip; the documentation here will not attempt to explain or define
+    chip-specific concepts or features, only the use of this module to
+    access them.
+
+METHODS
+
+    The following methods documented in an await expression return Future
+    instances.
+
+ reset
+
+       await $chip->reset;
+
+    Sends a reset command to initialise the configuration back to defaults.
+
+ calibrate_rco
+
+       await $chip->calibrate_rco;
+
+    Sends a calibrate command to request the chip perform its internal RC
+    oscillator calibration.
+
+ read_config
+
+       $config = await $chip->read_config;
+
+    Returns a HASH reference of the contents of configuration registers
+    using fields named from the data sheet.
+
+       AFE_GB       => 0 .. 31
+       PWD          => "active" | "powerdown"
+       NF_LEV       => 0 .. 7
+       WDTH         => 0 .. 15
+       CL_STAT      => bool
+       MIN_NUM_LIGH => 1 | 5 | 9 | 16
+       SREJ         => 0 .. 15
+       LCO_FDIV     => 16 | 32 | 64 | 128
+       MASK_DIST    => bool
+       DISP_LCO     => bool
+       DISP_SRCO    => bool
+       DISP_TRCO    => bool
+       TUN_CAP      => 0 .. 15
+
+    Additionally, the following keys are provided calculated from those, as
+    a convenience.
+
+       afe        => "indoor" | "outdoor"
+       noisefloor => int (in units of µVrms)
+
+ change_config
+
+       await $chip->change_config( %changes );
+
+    Writes updates to the configuration registers.
+
+ read_calib_status
+
+       $status = await $chip->read_calib_status;
+
+    Returns a 4-element HASH reference indicating the calibration status:
+
+       TRCO_CALIB_DONE => bool
+       TRCO_CALIB_NOK  => bool
+       SRCO_CALIB_DONE => bool
+       SRCO_CALIB_NOK  => bool
+
+ read_int
+
+       $ints = await $chip->read_int;
+
+    Returns a 3-element HASH reference containing the three interrupt
+    flags:
+
+       INT_NH => bool
+       INT_D  => bool
+       INT_L  => bool
+
+ read_distance
+
+       $distance = await $chip->read_distance;
+
+    Returns an integer giving the estimated lightning distance, in km, or
+    undef if it is below the detection limit.
+
+AUTHOR
+
+    Paul Evans <leonerd@leonerd.org.uk>
+

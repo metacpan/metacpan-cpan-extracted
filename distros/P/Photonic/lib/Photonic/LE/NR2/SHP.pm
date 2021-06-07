@@ -1,5 +1,5 @@
 package Photonic::LE::NR2::SHP;
-$Photonic::LE::NR2::SHP::VERSION = '0.015';
+$Photonic::LE::NR2::SHP::VERSION = '0.016';
 
 =encoding UTF-8
 
@@ -9,7 +9,7 @@ Photonic::LE::NR2::SHP
 
 =head1 VERSION
 
-version 0.015
+version 0.016
 
 =head1 COPYRIGHT NOTICE
 
@@ -44,10 +44,8 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA  02110-1301 USA
 =head1 SYNOPSIS
 
    use Photonic::LE::NR2::SHP;
-   my $nrshp=Photonic::LE::NR2::SHP->
-             new(nrf=>$nrf, densityA=>$dA, densityB=>$dB));
-
-
+   my $nrshp=Photonic::LE::NR2::SHP->new(
+             nrf=>$nrf, densityA=>$dA, densityB=>$dB);
 
 =head1 DESCRIPTION
 
@@ -73,7 +71,7 @@ $dB is the density of polarizable entities in medium B
 
 =back
 
-=head1 ACCESORS (read only)
+=head1 ACCESSORS (read only)
 
 =over 4
 
@@ -106,7 +104,6 @@ Number of dimensions of the system
 use namespace::autoclean;
 use PDL::Lite;
 use PDL::NiceSlice;
-use PDL::Complex;
 use Moose;
 use MooseX::StrictConstructor;
 

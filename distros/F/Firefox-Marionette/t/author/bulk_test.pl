@@ -13,6 +13,7 @@ if (exists $ENV{COUNT}) {
 	$0 = "Test run number $ENV{COUNT}";
 }
 $ENV{RELEASE_TESTING} = 1;
+$ENV{FIREFOX_ALARM} = 1;
 my $cwd = Cwd::cwd();
 our $pid;
 if ($pid = fork) {
@@ -44,11 +45,15 @@ foreach my $entry (reverse sort { $a cmp $b } @entries) {
 	my $entry_version;
 	if ($entry =~ /^firefox\-([\d.]+)(?:esr|a\d+)?$/smx) {
 		($entry_version) = ($1);
+	} elsif ($entry eq 'firefox-nightly') {
+	} elsif ($entry eq 'firefox-developer') {
 	} elsif ($entry =~ /^waterfox/smx) {
 	} else {
 		die "Unrecognised entry '$entry' in $path";
 	}
 	if ($entry =~ /^waterfox/smx) {
+	} elsif ($entry eq 'firefox-nightly') {
+	} elsif ($entry eq 'firefox-developer') {
 	} else {
 		my $path_to_binary = File::Spec->catfile($path, $entry, 'firefox');
 		my $old_version;
@@ -67,6 +72,8 @@ warn "Den is correct";
 foreach my $entry (reverse sort { $a cmp $b } @entries) {
 	my $entry_version;
 	if ($entry =~ /^waterfox/smx) {
+	} elsif ($entry eq 'firefox-nightly') {
+	} elsif ($entry eq 'firefox-developer') {
 	} elsif ($entry =~ /^firefox\-([\d.]+)(?:esr|a\d+)?$/smx) {
 		($entry_version) = ($1);
 	} else {
@@ -88,6 +95,8 @@ foreach my $entry (reverse sort { $a cmp $b } @entries) {
 		die "$path_to_binary old '$old_output' could not be parsed";
 	}
 	if ($entry =~ /^waterfox/smx) {
+	} elsif ($entry eq 'firefox-nightly') {
+	} elsif ($entry eq 'firefox-developer') {
 	} elsif ($old_version ne $entry_version) {
 		die "$old_version does not equal $entry_version for $path_to_binary";
 	}

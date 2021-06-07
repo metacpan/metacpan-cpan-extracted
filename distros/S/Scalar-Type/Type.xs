@@ -9,7 +9,6 @@ SV* _scalar_type(SV* argument) {
     if(SvIOK(argument)) {
         if(SvPOK(argument)) {
             /* int is also a string, better see if it's not int-ified 007 */
-            /* is %ld OK in 32-bit land? */
             sprintf(num_as_str, "%" IVdf, SvIVX(argument));
             rval = (
                 (strcmp(SvPVX(argument), num_as_str)) == 0

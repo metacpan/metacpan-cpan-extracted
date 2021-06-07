@@ -12,7 +12,7 @@ use XS::Install::Payload;
 use XS::Install::CMake;
 use Data::Dumper;
 
-our $VERSION = '1.3.2';
+our $VERSION = '1.3.3';
 my $THIS_MODULE = 'XS::Install';
 
 our @EXPORT_OK = qw/write_makefile not_available/;
@@ -788,6 +788,7 @@ sub process_cmake_test {
     _string_merge($cflags, $test->{CCFLAGS});
     _string_merge($cflags, $test->{DEFINE});
     _string_merge($cflags, $test->{OPTIMIZE});
+    $cflags =~ s/-o \$@//;
 
     foreach my $info (@$clib) {
         my $cmake_target = $info->{CMAKE_TARGET};

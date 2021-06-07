@@ -1,0 +1,33 @@
+---
+abstract: 'User specific extension of HTML code'
+author:
+  - 'Roland Mosler'
+  - uHTML@Place.Ug
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010'
+license: lgpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: uHTML
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Exporter: '0'
+  IO::Handle: '0'
+  LWP::MediaTypes: '0'
+  POSIX: '0'
+  Time::Local: '0'
+  URI::Escape: '0'
+  perl: '5.018001'
+  strict: '0'
+  version: '0'
+resources: {}
+version: '1.02'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

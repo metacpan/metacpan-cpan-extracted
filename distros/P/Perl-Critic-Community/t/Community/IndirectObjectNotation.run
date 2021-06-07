@@ -1,0 +1,17 @@
+## name IndirectCalls
+## failures 4
+## cut
+
+my $foo = new Foo;
+my $foo = new Foo @args;
+my $bar = new $foo;
+my $bar = new $foo @args;
+
+## name DirectCalls
+## failures 0
+## cut
+
+my $foo = Foo->new;
+my $foo = Foo->new(@args);
+my $bar = $foo->new;
+my $bar = $foo->new(@args);

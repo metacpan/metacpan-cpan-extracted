@@ -160,10 +160,24 @@ SKIP: {
     my $tree = $class->load($infile);
     cmp_store(
         obj => $tree, method => 'store_grp',
-        file => "seqid-grp-nbs.grp",
+        file => 'seqid-grp-nbs.grp',
         test => 'wrote expected .grp file from .tre file (smart SeqIds)',
     );
 }
+
+{
+    my $infile = file('test', 'long-leaf-tree.tre');
+    my $tree = $class->load($infile);
+    my $list = $tree->long_leaf_list(1.5);
+
+    cmp_store(
+        obj  => $list, method => 'store',
+        file => 'long-leaf-seqs.idl',
+        test => 'wrote expected list of long leaf ids'
+    );
+}
+
+
 
 # TODO: test this!
 # {

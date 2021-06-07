@@ -119,21 +119,23 @@ qx.Class.define("callbackery.ui.Screen", {
                             rich: true
                         });
 
-                        var btnRow     = new qx.ui.container.Composite(new qx.ui.layout.HBox(10, 'right'));
-
                         var okBtnLabel = disclaimerCfg.okButtonLabel ? that.xtr(disclaimerCfg.okButtonLabel)
                                                                      : that.xtr('OK');
-                        var okBtn = new qx.ui.form.Button(okBtnLabel).set({enabled : false});
+                        var okBtn = new qx.ui.form.Button(okBtnLabel).set({
+                            enabled: false
+                        });
                         okBtn.addListener('execute', function() {
                             content.show();
                             disclaimerContainer.hide();
                         }, that);
-                        btnRow.add(okBtn);
 
                         var check = new qx.ui.form.CheckBox(that.xtr(disclaimerCfg.label)).set({
-                            rich: true
+                            rich: true, value: false
                         });
-                        check.bind('changeValue', okBtn, 'enabled');
+                        check.bind('value', okBtn, 'enabled');
+
+                        var btnRow     = new qx.ui.container.Composite(new qx.ui.layout.HBox(10, 'right'));
+                        btnRow.add(okBtn);
 
                         disclaimerContainer.add(disclaimer);
                         disclaimerContainer.add(check);

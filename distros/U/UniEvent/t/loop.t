@@ -140,4 +140,27 @@ subtest 'kill mortals after loop iteration' => sub {
     subtest "global loop"  => $test, UE::Loop->global_loop;
 };
 
+subtest "track load average" => sub {
+    my $test = new UE::Test::Async(2, 2);
+    $test->loop->track_load_average(1);
+    my $p = MyTest::make_p2p($test->loop);
+    $p->{sconn}->read_event->add(sub {
+        $test->happens();
+        select undef, undef, undef, 0.01;
+    });
+    $p->{sconn}->eof_event->add(sub {
+        $test->happens();
+        select undef, undef, undef, 0.01;
+        $test->loop->stop();
+    });
+    $p->{client}->write("epta");
+    $p->{client}->disconnect();
+
+    my $t = UE::timer 1, sub { select undef, undef, undef, 0.01 }, $test->loop;
+    
+    $test->run();
+
+    cmp_ok $test->loop->get_load_average(), '>', 0, "we got load average";
+};
+
 done_testing();

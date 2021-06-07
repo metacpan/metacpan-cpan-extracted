@@ -1,0 +1,34 @@
+## name OpenOneArg
+## failures 2
+## cut
+
+open FILE or die;
+open my $fh;
+
+## name OpenTwoArgs
+## failures 2
+## cut
+
+open FILE, "<$filename" or die;
+open my $fh, "<$filename";
+
+## name OpenThreeArgs
+## failures 0
+## cut
+
+open FILE, '<', $filename or die;
+open my $fh, '<', $filename;
+
+## name OpenFourArgs
+## failures 0
+## cut
+
+open my $fh, '-|', 'ls', '-al';
+
+## name OpenFork
+## failures 0
+## cut
+
+open my $child, '-|';
+open my $child, '|-';
+

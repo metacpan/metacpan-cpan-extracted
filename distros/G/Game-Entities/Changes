@@ -1,0 +1,25 @@
+Revision history for Game-Entities
+
+0.004     2021-06-03 18:48:26+01:00 Europe/London
+    Fixes:
+        - Expanded documentation to include a section on perforance
+          and references to EnTT and its role as a reference
+          implementation. Some minor typos were fixed as well.
+
+0.003     2021-05-30 17:44:47+01:00 Europe/London
+
+    Fixes:
+        - Added abstract to documentation
+
+0.002     2021-05-30 17:30:05+01:00 Europe/London
+
+    Fixes:
+        - Removed all non-core dependencies
+        - Avoid combination of prototype and signature in test class
+          to allow tests to pass in Perl 5.22.
+        - Clarify distinction between component and component names
+          in documentation.
+
+0.001     2021-05-29 00:15:39+01:00 Europe/London
+
+        First version.

@@ -1,9 +1,9 @@
 package ArrayData::Test::Spec::Basic;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-05-07'; # DATE
+our $DATE = '2021-05-18'; # DATE
 our $DIST = 'ArrayData'; # DIST
-our $VERSION = '0.2.2'; # VERSION
+our $VERSION = '0.2.3'; # VERSION
 
 use strict;
 use warnings;
@@ -85,7 +85,7 @@ ArrayData::Test::Spec::Basic - A test table data
 
 =head1 VERSION
 
-This document describes version 0.2.2 of ArrayData::Test::Spec::Basic (from Perl distribution ArrayData), released on 2021-05-07.
+This document describes version 0.2.3 of ArrayData::Test::Spec::Basic (from Perl distribution ArrayData), released on 2021-05-18.
 
 =for Pod::Coverage ^(.+)$
 

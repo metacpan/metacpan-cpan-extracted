@@ -1,7 +1,7 @@
 package Dist::Zilla::PluginBundle::Author::PERLANCAR;
 
-our $DATE = '2020-09-27'; # DATE
-our $VERSION = '0.603'; # VERSION
+our $DATE = '2021-06-04'; # DATE
+our $VERSION = '0.604'; # VERSION
 
 use Moose;
 with 'Dist::Zilla::Role::PluginBundle::Easy';
@@ -32,6 +32,7 @@ sub configure {
         'CheckChangeLog',
         'CheckMetaResources',
         'CheckSelfDependency',
+        'Git::Contributors',
         'CopyrightYearFromGit',
         'IfBuilt',
         'MetaJSON',
@@ -77,7 +78,7 @@ Dist::Zilla::PluginBundle::Author::PERLANCAR - Dist::Zilla like PERLANCAR when y
 
 =head1 VERSION
 
-This document describes version 0.603 of Dist::Zilla::PluginBundle::Author::PERLANCAR (from Perl distribution Dist-Zilla-PluginBundle-Author-PERLANCAR), released on 2020-09-27.
+This document describes version 0.604 of Dist::Zilla::PluginBundle::Author::PERLANCAR (from Perl distribution Dist-Zilla-PluginBundle-Author-PERLANCAR), released on 2021-06-04.
 
 =head1 SYNOPSIS
 
@@ -140,9 +141,29 @@ feature.
 
 perlancar <perlancar@cpan.org>
 
+=head1 CONTRIBUTORS
+
+=for stopwords Alexandr Ciornii perlancar (@pc-office) Steven Haryanto (on Asus Zenbook)
+
+=over 4
+
+=item *
+
+Alexandr Ciornii <alexchorny@gmail.com>
+
+=item *
+
+perlancar (@pc-office) <perlancar@gmail.com>
+
+=item *
+
+Steven Haryanto (on Asus Zenbook) <stevenharyanto@gmail.com>
+
+=back
+
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020, 2019, 2018, 2017, 2016, 2015, 2014, 2013, 2012 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2020, 2019, 2018, 2017, 2016, 2015, 2014, 2013, 2012 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

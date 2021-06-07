@@ -2,8 +2,8 @@ NAME
     App::ParseCPANChanges - Parse CPAN Changes file
 
 VERSION
-    This document describes version 0.071 of App::ParseCPANChanges (from
-    Perl distribution App-ParseCPANChanges), released on 2019-08-02.
+    This document describes version 0.072 of App::ParseCPANChanges (from
+    Perl distribution App-ParseCPANChanges), released on 2021-05-25.
 
 DESCRIPTION
     This distribution provides a simple command-line wrapper for
@@ -13,7 +13,7 @@ FUNCTIONS
   parse_cpan_changes
     Usage:
 
-     parse_cpan_changes(%args) -> [status, msg, payload, meta]
+     parse_cpan_changes(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
     Parse CPAN Changes file.
 
@@ -28,16 +28,22 @@ FUNCTIONS
         If not specified, will look for file called Changes/ChangeLog in
         current directory.
 
-        To read from standard input, use "-".
+    *   unbless => *bool* (default: 1)
+
+        Whether to return Perl objects as unblessed refs.
+
+        If you set this to false, you'll need to use an output format that
+        can handle serializing Perl objects, e.g. on the CLI using
+        "--format=perl".
 
     Returns an enveloped result (an array).
 
-    First element (status) is an integer containing HTTP status code (200
-    means OK, 4xx caller error, 5xx function error). Second element (msg) is
-    a string containing error message, or 'OK' if status is 200. Third
-    element (payload) is optional, the actual result. Fourth element (meta)
-    is called result metadata and is optional, a hash that contains extra
-    information.
+    First element ($status_code) is an integer containing HTTP status code
+    (200 means OK, 4xx caller error, 5xx function error). Second element
+    ($reason) is a string containing error message, or "OK" if status is
+    200. Third element ($payload) is optional, the actual result. Fourth
+    element (%result_meta) is called result metadata and is optional, a hash
+    that contains extra information.
 
     Return value: (any)
 
@@ -72,8 +78,8 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2019, 2016, 2015, 2014, 2013 by
-    perlancar@cpan.org.
+    This software is copyright (c) 2021, 2020, 2019, 2016, 2015, 2014, 2013
+    by perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

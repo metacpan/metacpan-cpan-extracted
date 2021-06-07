@@ -1,5 +1,9 @@
-Revision history for App-audioinfo
+0.002   2021-05-25  Released-By: PERLANCAR; Urgency: high
 
-0.001   2016-12-13 (PERLANCAR) (unreleased)
+	- [build] Rebuild to update Sah coercion module names (old Sah coercion
+          modules have been purged from CPAN).
+
+
+0.001   2016-12-13  Released-By: PERLANCAR
 
         - First release.

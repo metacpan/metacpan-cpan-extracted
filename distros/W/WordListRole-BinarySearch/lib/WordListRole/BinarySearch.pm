@@ -3,7 +3,7 @@ package WordListRole::BinarySearch;
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2021-04-25'; # DATE
 our $DIST = 'WordListRole-BinarySearch'; # DIST
-our $VERSION = '0.005'; # VERSION
+our $VERSION = '0.006'; # VERSION
 
 use strict 'subs', 'vars';
 use warnings;
@@ -53,7 +53,7 @@ WordListRole::BinarySearch - Provide word_exists() that uses binary search
 
 =head1 VERSION
 
-This document describes version 0.005 of WordListRole::BinarySearch (from Perl distribution WordListRole-BinarySearch), released on 2021-04-25.
+This document describes version 0.006 of WordListRole::BinarySearch (from Perl distribution WordListRole-BinarySearch), released on 2021-04-25.
 
 =head1 SYNOPSIS
 

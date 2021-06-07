@@ -1,14 +1,17 @@
 package PICA::Schema::Builder;
 use v5.14.1;
 
-our $VERSION = '1.20';
+our $VERSION = '1.24';
 
 use PICA::Schema qw(field_identifier);
 use Scalar::Util qw(reftype);
+use Storable qw(dclone);
+
+use parent 'PICA::Schema';
 
 sub new {
     my $class = shift;
-    bless {fields => {}, counter => 0}, $class;
+    bless {fields => {}, total => 0, @_}, $class;
 }
 
 sub add {
@@ -33,16 +36,14 @@ sub add {
 
         # field has not been inspected yet
         if (!$fields->{$id}) {
-            $fields->{$id} = {counter => 0, tag => $tag, subfields => {},};
+            $fields->{$id} = {total => 0, tag => $tag, subfields => {},};
             $fields->{$id}{occurrence} = $occ if $occ > 0 && length $id gt 4;
-            $fields->{$id}{required} = \1 unless $self->{counter};
-        }
-        else {
-            $fields->{$id}{counter}++;
+            $fields->{$id}{required} = \1 unless $self->{total};
         }
 
         my $subfields = $fields->{$id}{subfields};
         my %subfield_codes;
+        pop @content if @content % 2;    # remove annotation
         while (@content) {
             my ($code, $value) = splice(@content, 0, 2);
 
@@ -57,7 +58,7 @@ sub add {
             if (!$subfields->{$code}) {
                 $subfields->{$code} = {code => $code};
                 $subfields->{$code}{required} = \1
-                    unless $fields->{$id}{counter};
+                    unless $fields->{$id}{total};
             }
         }
 
@@ -65,6 +66,8 @@ sub add {
         for (grep {!$subfield_codes{$_}} keys %$subfields) {
             delete $subfields->{$_}{required};
         }
+
+        $fields->{$id}{total}++;
     }
 
     # fields not given in this record are not required
@@ -72,22 +75,16 @@ sub add {
         delete $fields->{$_}{required};
     }
 
-    $self->{counter}++;
+    $self->{total}++;
 }
 
 sub schema {
-    my ($self) = @_;
-    PICA::Schema->new(
-        {
-            fields => {
-                map {
-                    my %field = %{$self->{fields}{$_}};
-                    delete $field{counter};
-                    $_ => \%field;
-                } keys %{$self->{fields}}
-            }
-        }
-    );
+    my $schema = dclone($_[0]->TO_JSON);
+    my $fields = $schema->{fields};
+
+    delete $fields->{$_} for grep {!$fields->{$_}{total}} keys %$fields;
+
+    return PICA::Schema->new($schema);
 }
 
 1;
@@ -99,7 +96,7 @@ PICA::Schema::Builder - Create Avram Schema from examples
 
 =head1 SYNOPSIS
 
-  my $builder = PICA::Schema::Builder->new;
+  my $builder = PICA::Schema::Builder->new( title => 'My Schema' );
 
   while (my $record = get_some_pica_record()) {
       $builder->add($record);
@@ -116,6 +113,13 @@ which fields occurr in all records (C<required>), whether a field has been
 repeated in a record (C<repeatable>), and the same information for subfields
 (C<subfields>). Subfield order is not taken into account.
 
+This class is a subclass of L<PICA::Schema>.
+
+=head1 CONSTRUCTOR
+
+The builder can be initialized with information of an existing builder or
+schema, in particular C<fields> and C<total>.
+
 =head1 METHODS
 
 =head2 add( $record )
@@ -124,7 +128,8 @@ Analyse an additional PICA record.
 
 =head2 schema
 
-Return a L<PICA::Schema> that all analyzed records conform to.
+Return a L<PICA::Schema> that all analyzed records conform to. This methods
+creates a deep copy and removes all fields with C<total> zero.
 
 =head1 SEE ALSO
 

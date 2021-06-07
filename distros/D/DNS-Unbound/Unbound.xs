@@ -7,6 +7,8 @@
 #include <stdio.h>
 #include <string.h>
 
+#define UNUSED(x) (void)(x)
+
 typedef struct ub_ctx dns_unbound_ub_ctx;
 
 SV* _ub_result_to_svhv_and_free (struct ub_result* result) {
@@ -350,10 +352,16 @@ _resolve( dns_unbound_ub_ctx *ctx, SV *name, int type, int class = 1 )
     OUTPUT:
         RETVAL
 
-BOOT:
-    HV *stash = gv_stashpv("DNS::Unbound", FALSE);
 #if HAS_UB_VERSION
-    newCONSTSUB(stash, "unbound_version", newSVpv( ub_version(), 0 ));
+SV*
+unbound_version(...)
+    CODE:
+        UNUSED(items);
+        RETVAL = newSVpv( ub_version(), 0 );
+
+    OUTPUT:
+        RETVAL
+
 #endif
 
 void

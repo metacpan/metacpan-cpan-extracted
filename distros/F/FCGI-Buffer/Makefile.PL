@@ -59,13 +59,15 @@ WriteMakefile(
     META_MERGE => {
     	'meta-spec' => { version => 2 },
     	resources => {
-    		repository => {
+		repository => {
 			type => 'git',
 			url => 'git://github.com/nigelhorne/FCGI-Buffer.git',
 			web => 'https://github.com/nigelhorne/FCGI-Buffer',
-    		},
-		bugtracker => {
-			web => 'https://rt.cpan.org/Public/Dist/Display.html?Name=FCGI-Buffer',
+			repository => 'https://github.com/nigelhorne/FCGI-Buffer',
+		}, bugtracker => {
+			# web => 'https://rt.cpan.org/Public/Dist/Display.html?Name=FCGI-Buffer',
+			web => 'https://github.com/nigelhorne/FCGI-Buffer/issues',
+			url => 'https://github.com/nigelhorne/FCGI-Buffer/issues',
 			mailto => 'bug-FCGI-Buffer@rt.cpan.org'
 		}
 	},

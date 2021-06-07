@@ -1,5 +1,18 @@
 Revision history for Syntax-Construct
 
+1.021   2021-05-25
+        - Fix tests on locale sensitive Perl builds
+
+1.020   2021-05-24
+        - Fix perldelta links
+        - Add "method-on-any-string" for 5.018
+        - Add "RE_COMPILE_RECURSION_LIMIT" for 5.030
+        - Improve doc and error messages
+
+1.019   2021-05-24
+        - Perl 5.34 was released
+        - pack byte order modifiers added to 5.010
+
 1.018   2020-07-05
         - Better links in perldelta
 

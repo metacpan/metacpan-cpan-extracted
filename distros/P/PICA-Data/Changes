@@ -1,5 +1,33 @@
 Revision history for PICA::Data
 
+1.24 2021-06-07T08:51:52Z
+    - Add method to split record
+    - Make path optional in pica_fields
+    - picadata: allow to parse multiple files
+    - picadata: load schema from PICA_SCHEMA for more commands
+    - Extend schema checking to level 1 and level 2
+
+1.23 2021-06-03T10:19:24Z
+    - Move picadata implementation into module App::picadata
+    - Rewrite picadata to use commands (#101)
+    - Add picadata command 'explain' (#99)
+    - picadata: read schema from environment variable PICA_SCHEMA if needed
+    - Remove PICA::Writer::[Sub]fields
+
+1.22 2021-05-26T12:54:35Z
+    - Add PICA::Writer::Subfields
+    - Support parsing WinIBW download format (#34)
+
+1.21 2021-05-18T09:23:25Z
+    - Add function pica_annotation
+    - Add accessor ->id and function pica_id
+    - Rename option annotated to annotate
+    - Support using field annotations for schema checking (#89)
+    - picadata: add option -a/-A/-annotated (#94)
+    - picadata: ignore empty records
+    - picadata: Expect UTF-8 on STDIN (#92)
+    - picadata: exit code on validation errors (#95)
+
 1.20 2021-05-12T15:27:58Z
     - Implement record sorting (#59)
     - Refactor PPXML writer (#84)

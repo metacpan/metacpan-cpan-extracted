@@ -1,5 +1,6 @@
 Changes
 CONTRIBUTORS.txt
+CONTRIBUTING.md
 inc/Module/Install.pm
 inc/Module/Install/Base.pm
 inc/Module/Install/Can.pm
@@ -95,6 +96,7 @@ lib/Zonemaster/LDNS/RR/AFSDB.pm
 lib/Zonemaster/LDNS/RR/APL.pm
 lib/Zonemaster/LDNS/RR/ATMA.pm
 lib/Zonemaster/LDNS/RR/CAA.pm
+lib/Zonemaster/LDNS/RR/CDNSKEY.pm
 lib/Zonemaster/LDNS/RR/CDS.pm
 lib/Zonemaster/LDNS/RR/CERT.pm
 lib/Zonemaster/LDNS/RR/CNAME.pm

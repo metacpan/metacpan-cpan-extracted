@@ -1,11 +1,11 @@
 #
-# Copyright (C) 2015-2017 Joelle Maslak
+# Copyright (C) 2015-2021 Joelle Maslak
 # All Rights Reserved - See License
 #
 
 package JCM::Boilerplate;
 # ABSTRACT: Default Boilerplate for Joelle Maslak's Code
-$JCM::Boilerplate::VERSION = '2.202310';
+$JCM::Boilerplate::VERSION = '2.211420';
 use strict;
 use warnings;
 
@@ -53,7 +53,7 @@ sub import ( $self, $type = 'script' ) {
     English->import::into($target);
     Smart::Comments->import::into( $target, '-ENV', '###' );
 
-    feature->import::into( $target, 'postderef' );    # Not needed if feature budle >= 5.23.1
+    feature->import::into( $target, 'postderef' );    # Not needed if feature bundle >= 5.23.1
 
     # We haven't been using this
     # feature->import::into($target, 'refaliasing');
@@ -75,6 +75,27 @@ sub import ( $self, $type = 'script' ) {
     warnings->unimport::out_of( $target, 'experimental::re_strict' );
     re->import( 'strict' );
 
+    if ( $PERL_VERSION ge v5.32.0 ) {
+        # Turn off indirect syntax
+        feature->unimport::out_of( $target, 'indirect' );
+
+        # Turn on isa
+        feature->import::into( $target, 'isa' );
+        warnings->unimport::out_of( $target, 'experimental::isa' );
+    }
+
+    if ( $PERL_VERSION ge v5.34.0 ) {
+        # Turn off multidimensional "array" emulation
+        feature->unimport::out_of( $target, 'multidimensional' );
+
+        # Turn off bareword filehandles
+        feature->unimport::out_of( $target, 'bareword_filehandles' );
+
+        # Turn on Try/Catch
+        feature->import::into( $target, 'try' );
+        warnings->unimport::out_of( $target, 'experimental::try' );
+    }
+
     return;
 }
 
@@ -92,7 +113,7 @@ JCM::Boilerplate - Default Boilerplate for Joelle Maslak's Code
 
 =head1 VERSION
 
-version 2.202310
+version 2.211420
 
 =head1 SYNOPSIS
 

@@ -8,7 +8,7 @@
 #
 
 use 5.014_001;
-use Modern::Perl 1.20140107;
+use warnings;
 
 sub Main() {
     Term_CLI_ReadLine_test->SKIP_CLASS(

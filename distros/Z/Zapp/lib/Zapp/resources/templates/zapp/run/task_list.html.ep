@@ -1,0 +1,106 @@
+<%
+    use Mojo::Loader qw( data_section );
+    my $run = stash( 'run' ) ? stash( 'run' ) : {};
+    my $tasks = $run->{tasks} // stash( 'tasks' ) // [];
+    my %state_bg = (
+        active => 'list-group-item-primary',
+        finished => 'list-group-item-success',
+        failed => 'list-group-item-danger',
+        stopped => 'list-group-item-warning',
+        killed => 'list-group-item-secondary',
+    );
+%>
+
+<div class="list-group list-group-horizontal text-center flex-wrap task-tabs">
+    <%= tag a => href => '#tab-info', id => 'tab-info-label',
+        class => 'list-group-item list-group-item-action col flex-grow-0 ' . ( !$run->{state} || $run->{state} eq 'inactive' ? 'active list-group-item-primary' : 'list-group-item-success' ),
+        'data-toggle' => 'tab', role => 'tab', 'aria-controls' => 'tab-info',
+        ( 'aria-selected' => 'true' )x!!( !$run->{state} || $run->{state} eq 'inactive' ),
+        begin %>
+        <i class="fa fa-info-circle" aria-hidden="true"></i>
+    <% end %>
+    % for my $i ( 0..$#$tasks ) {
+        % my $task = $tasks->[$i];
+        <%= tag a => href => '#tab-task-' . $task->{task_id}, id => 'tab-task-' . $task->{task_id} . '-label',
+            'data-task-label' => $task->{task_id},
+            class => join( ' ',
+                'list-group-item', 'list-group-item-action', 'text-nowrap', 'flex-grow-1', 'flex-shrink', 'w-auto',
+                (
+                    # Show the active task for active runs
+                    ($run->{state}//'') eq 'active' && $task->{state} eq 'active' ? ('active')
+                    # Show the last task for finished runs
+                    : ($run->{state}//'') eq 'finished' && $i == $#$tasks ? ('active')
+                    # Show the failed/killed/stop task for runs
+                    : ($run->{state}//'') eq 'failed' && $task->{state} eq 'failed' ? ('active')
+                    : ($run->{state}//'') eq 'stopped' && $task->{state} eq 'stopped' && ( $i == 0 || $tasks->[$i-1]{state} ne 'stopped' ) ? ('active')
+                    : ($run->{state}//'') eq 'killed' && $task->{state} eq 'killed' && ( $i == 0 || $tasks->[$i-1]{state} ne 'killed' ) ? ('active')
+                    # Tasks that have not run cannot be seen yet
+                    # XXX: Some tasks have info about what they _will_
+                    # do when they are run.
+                    : $task->{state} eq 'inactive' ? ('disabled')
+                    : ()
+                ),
+                $state_bg{ $task->{state} }//'',
+            ),
+            'data-toggle' => 'tab', role => 'tab', 'aria-controls' => 'tab-task-' . $task->{task_id},
+            ( 'aria-selected' => 'true' )x!!( $task->{state} eq 'active' ),
+            ( 'aria-disabled' => 'true', tabindex => '-1' )x!!( $task->{state} eq 'inactive' ),
+        begin %>
+            %= $task->{label} || $task->{name} || ( ( $task->{class} // '' ) =~ s/^Zapp::Task:://r )
+        <% end %>
+    % }
+</div>
+
+<div class="tab-content">
+    <div class="tab-pane <%= !$run->{state} || $run->{state} eq 'inactive' ? 'show active' : '' %>"
+        id="tab-info" role="tabpanel" aria-labelledby="tab-info-label"
+    >
+        <h2>Info</h2>
+        <dl>
+            <dt>Started: </dt>
+            <dd data-run="started"><%= $run->{started} // 'N/A' %></dd>
+            <dt>Finished: </dt>
+            <dd data-run="finished"><%= $run->{finished} // 'N/A' %></dd>
+            <dt>State: </dt>
+            <dd data-run="state"><%= $run->{state} %></dd>
+        </dl>
+
+        % if ( my @inputs = @{ $run->{input} // [] } ) {
+            <h2>Input</h2>
+            <dl>
+            % for my $input ( @inputs ) {
+                <dt><%= $input->{label} || ( $input->{name} =~ s/_/ /gr ) %></dt>
+                % my $type = $self->app->zapp->types->{ $input->{type} } or die qq{Could not find type "$input->{type}"};
+                <dd>
+                    %= $type->display_value( $c, $input->{config}, $input->{value} )
+                </dd>
+            % }
+            </dl>
+        % }
+    </div>
+
+    % for my $i ( 0..$#{ $run->{tasks} } ) {
+        % my $task = $run->{tasks}[ $i ];
+        <%= tag div => 'data-task-output' => $task->{task_id},
+            id => "tab-task-$task->{task_id}",
+            role => "tabpanel", 'aria-labelledby' => "tab-task-$task->{task_id}-label",
+            class => join( ' ',
+                'tab-pane',
+                (
+                    # Show the active task for active runs
+                    $run->{state} eq 'active' && $task->{state} eq 'active' ? ('show', 'active')
+                    # Show the last task for finished runs
+                    : $run->{state} eq 'finished' && $i == $#{ $run->{tasks} } ? ('show', 'active')
+                    # Show the failed/killed/stop task for runs
+                    : $run->{state} eq 'failed' && $task->{state} eq 'failed' ? ('active')
+                    : $run->{state} eq 'stopped' && $task->{state} eq 'stopped' && ( $i == 0 || $run->{tasks}[$i-1]{state} ne 'stopped' ) ? ('active')
+                    : $run->{state} eq 'killed' && $task->{state} eq 'killed' && ( $i == 0 || $run->{tasks}[$i-1]{state} ne 'killed' ) ? ('active')
+                    : ()
+                ),
+            ),
+        begin %>
+            %= include inline => data_section( $task->{class}, 'output.html.ep' ) // '', task => $task;
+        % end
+    % }
+
+</div>

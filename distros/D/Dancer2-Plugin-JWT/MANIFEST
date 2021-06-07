@@ -13,5 +13,6 @@ t/01-basic.t
 t/02-exception.t
 t/03-jwe.t
 t/04-undefined-secret.t
+t/05-optional-returns.t
 xt/author/pod-syntax.t
 xt/release/cpan-changes.t

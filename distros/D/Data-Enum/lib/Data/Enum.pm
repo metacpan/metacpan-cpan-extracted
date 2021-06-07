@@ -15,7 +15,7 @@ use Scalar::Util qw/ blessed refaddr /;
 
 use overload ();
 
-our $VERSION = 'v0.2.1';
+our $VERSION = 'v0.2.2';
 
 
 my %Cache;
@@ -25,6 +25,8 @@ sub new {
     my $this = shift;
 
     my @values = uniqstr( sort map { "$_" } @_ );
+
+    die "has no values" unless @values;
 
     die "values must be alphanumeric" if !!grep { /\W/ } @values;
 
@@ -111,7 +113,7 @@ Data::Enum - fast, immutable enumeration classes
 
 =head1 VERSION
 
-version v0.2.1
+version v0.2.2
 
 =head1 SYNOPSIS
 

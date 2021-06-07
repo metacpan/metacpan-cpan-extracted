@@ -1,6 +1,12 @@
-0.071   2019-08-02  Released-By: PERLANCAR; Urgency: medium
+0.072   2021-05-25  Released-By: PERLANCAR; Urgency: high
 
-	- [ux] Read from STDIN when file is '-'.
+	- [build] Rebuild to update Sah coercion module names (old Sah coercion
+          modules have been purged from CPAN).
+
+
+0.071   2020-10-06  Released-By: PERLANCAR; Urgency: medium
+
+	- Add option --no-unbless.
 
 
 0.070   2019-07-03  Released-By: PERLANCAR; Urgency: medium

@@ -1,5 +1,5 @@
 package Photonic::LE::NR2::SHChiTensor;
-$Photonic::LE::NR2::SHChiTensor::VERSION = '0.015';
+$Photonic::LE::NR2::SHChiTensor::VERSION = '0.016';
 
 =encoding UTF-8
 
@@ -9,7 +9,7 @@ Photonic::LE::NR2::SHChiTensor
 
 =head1 VERSION
 
-version 0.015
+version 0.016
 
 =head1 COPYRIGHT NOTICE
 
@@ -45,7 +45,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA  02110-1301 USA
 
    use Photonic::LE::NR2::SHChiTensor;
    my $chi=Photonic::LE::NR2::SHChiTensor->new(geometry=>$g,
-           $densityA=>$dA, $densityB=>$dB, nh=>$nh, nhf=>$nhf,
+           densityA=>$dA, densityB=>$dB, nh=>$nh, nhf=>$nhf,
            filter=>$f, filterflag=>$ff);
    my $chiTensor=$chi->evaluate($epsA1, $epsB1, $epsA2, $epsB2);
 
@@ -81,16 +81,22 @@ haydock coefficients and continued fraction.
 Returns the macroscopic second Harmonic susceptibility function for a
 given value of the dielectric functions of the host $epsA and the
 particle $epsB at the fundamental 1 and second harmonic 2 frequency.
-$kind is an optional letter for testing purposes with values 'd' for
-dipolar, 'q' for quadrupolar, 'e' for external and 'f' for full
-selfconsistent calculation (the default). Mask is a mask with ones and
-zeroes, to evaluate the contribution of certain regions to the
-susceptibility.
 
+$kind is an optional letter for testing purposes with values
+'d' for dipolar contribution,
+'q' for quadrupolar contribution,
+'e' for external contribution (dipolar+quadrupolar),
+'l' for self consistent polarization without macroscopic depolarization,
+'a' for self-consistent polarization (alternative, dubious),
+'el' for longitudinal projection of external polarization
+'f' for full selfconsistent calculation (the default).
+
+Mask is a mask with ones and zeroes, to evaluate the contribution of
+certain regions to the susceptibility.
 
 =back
 
-=head1 ACCESORS (read only)
+=head1 ACCESSORS (read only)
 
 =over 4
 
@@ -143,7 +149,7 @@ means don't check.
 
 =back
 
-=head1 ACCESORS (missing)
+=head1 ACCESSORS (missing)
 
 =over 4
 
@@ -162,17 +168,16 @@ use PDL::Complex;
 use PDL::MatrixOps;
 use Storable qw(dclone);
 use PDL::IO::Storable;
+use Photonic::Utils qw(make_haydock tensor);
 use Photonic::Types;
 use Photonic::LE::NR2::EpsTensor;
-use Photonic::Utils qw(cmatmult);
-
 use Moose;
 
-has 'nh' =>(is=>'ro', isa=>'Num', required=>1, lazy=>1, builder=>'_nh',
+has 'nh' =>(is=>'ro', isa=>'Num', required=>1,
 	    documentation=>'Desired no. of Haydock coefficients');
 has 'smallE'=>(is=>'ro', isa=>'Num', required=>1, default=>1e-7,
     	    documentation=>'Convergence criterium for use of Haydock coeff.');
-has 'epsL'=>(is=>'ro', isa=>'PDL::Complex', init_arg=>undef,
+has 'epsL'=>(is=>'ro', isa=>'Photonic::Types::PDLComplex', init_arg=>undef,
 	     writer=>'_epsL',
 	     documentation=>'Value of dielectric function'  );
 has 'nhActual'=>(is=>'ro', isa=>'Num', init_arg=>undef,
@@ -182,16 +187,9 @@ has 'converged'=>(is=>'ro', isa=>'Num', init_arg=>undef,
 		  writer=>'_converged',
 		  documentation=>'The calculation did converge');
 
-sub _nh { #build desired number of Haydock coeffs to use.
-    my $self=shift;
-    return $self->nr->nh; #defaults to coefficients desired
-}
-
-
-
 #required parameters
 has 'geometry'=>(is=>'ro', isa => 'Photonic::Types::Geometry',
-    handles=>[qw(B dims r G GNorm L scale f)],required=>1
+    handles=>[qw(B dims r G GNorm L scale f ndims)],required=>1
 );
 has 'densityA'=>(is=>'ro', isa=>'Num', required=>1,
          documentation=>'Normalized dipole entities density in medium A');
@@ -208,13 +206,13 @@ has 'filter'=>(is=>'ro', isa=>'PDL', predicate=>'has_filter',
                documentation=>'Optional reciprocal space filter');
 
 #accesors
-has 'epsA1'=>(is=>'ro', isa=>'PDL::Complex', init_arg=>undef, writer=>'_epsA1',
+has 'epsA1'=>(is=>'ro', isa=>'Photonic::Types::PDLComplex', init_arg=>undef, writer=>'_epsA1',
     documentation=>'Dielectric function of host');
-has 'epsB1'=>(is=>'ro', isa=>'PDL::Complex', init_arg=>undef, writer=>'_epsB1',
+has 'epsB1'=>(is=>'ro', isa=>'Photonic::Types::PDLComplex', init_arg=>undef, writer=>'_epsB1',
         documentation=>'Dielectric function of inclusions');
-has 'epsA2'=>(is=>'ro', isa=>'PDL::Complex', init_arg=>undef, writer=>'_epsA2',
+has 'epsA2'=>(is=>'ro', isa=>'Photonic::Types::PDLComplex', init_arg=>undef, writer=>'_epsA2',
     documentation=>'Dielectric function of host');
-has 'epsB2'=>(is=>'ro', isa=>'PDL::Complex', init_arg=>undef, writer=>'_epsB2',
+has 'epsB2'=>(is=>'ro', isa=>'Photonic::Types::PDLComplex', init_arg=>undef, writer=>'_epsB2',
         documentation=>'Dielectric function of inclusions');
 has 'nrshp' =>(is=>'ro', isa=>'ArrayRef[Photonic::LE::NR2::SHP]',
             init_arg=>undef, lazy=>1, builder=>'_build_nrshp',
@@ -231,6 +229,19 @@ has 'smallH'=>(is=>'ro', isa=>'Num', required=>1, default=>1e-7,
 has 'smallE'=>(is=>'ro', isa=>'Num', required=>1, default=>1e-7,
     	    documentation=>'Convergence criterium for use of Haydock coeff.');
 
+with 'Photonic::Roles::KeepStates', 'Photonic::Roles::UseMask';
+
+my %KIND2METHOD = (
+  f => 'P2',
+  l => 'selfConsistentVecL',
+  a => 'P2LMCalt',
+  d => 'dipolar',
+  q => 'quadrupolar',
+  e => 'external',
+  el => 'externalVecL',
+);
+my %KIND2SUBTRACT = map +($_=>1), qw(f l a);
+
 sub evaluate {
     my $self=shift;
     $self->_epsA1(my $epsA1=shift);
@@ -238,31 +249,23 @@ sub evaluate {
     $self->_epsA2(my $epsA2=shift);
     $self->_epsB2(my $epsB2=shift);
     my %options=@_; #the rest are options. Currently, kind and mask.
-    my $kind=lc($options{kind}); # Undocumented, for testing: Use full (f) P2 or
-		    # (d) dipolar or  (q) quadrupolar or (e) external
+    my $kind=lc($options{kind}//'f');
     my $mask=$options{mask};
     my $nd=$self->geometry->B->ndims;
     my $epsT=$self->epsTensor->evaluate($epsA2, $epsB2);
     my @P2M; #array of longitudinal polarizations along different directions.
+    my $method = $KIND2METHOD{$kind};
     foreach(@{$self->nrshp}){
 	my $nrsh=Photonic::LE::NR2::SH->new(
 	    shp=>$_, epsA1=>$epsA1, epsB1=>$epsB1, epsA2=>$epsA2,
 	    epsB2=>$epsB2, filterflag=>0);
 	# RorI, XorY,nx,ny
 	# dipolar, quadrupolar, external, full
-	my $P2;
-	$P2=$nrsh->P2 if not defined $kind;
-	$P2=$nrsh->P2 if $kind eq 'f';
-	$P2=$nrsh->selfConsistentVecL if $kind eq 'l';
-	$P2=$nrsh->P2LMCalt if $kind eq 'a';
-	$P2=$nrsh->dipolar if $kind eq 'd';
-	$P2=$nrsh->quadrupolar if $kind eq 'q';
-	$P2=$nrsh->external if $kind eq 'e';
-	$P2=$nrsh->externalVecL if $kind eq 'el';
+	my $P2 = $nrsh->$method;
 	my $P2M=$P2->mv(0,-1)->mv(0,-1)
 	    ->clump(-3) #linear index, RorI, XorY
 	    ->mv(-2,0) #RorI, index, XorY
-	    ->complex->sumover  #RorI, XorY
+	    ->sumover  #RorI, XorY
 	    /$self->geometry->npoints;
 	my $k=$_->nrf->nr->geometry->Direction0;
 	my $FPChi=$epsT-identity($nd); #four pi chi linear 2w
@@ -274,40 +277,24 @@ sub evaluate {
 	if (defined $mask){ # is there a real mask?
 	    $f=$mask->sum/$self->geometry->npoints; #filling fraction
 				#of mask
-	    $P2=$P2*$mask->(*1); #masked polarization
+	    $P2*=$mask->(*1); #masked polarization
 	    $P2Mmask=$P2->mv(0,-1)->mv(0,-1) #masked macroscopic polarization
 	    ->clump(-3) #linear index, RorI, XorY
 	    ->mv(-2,0) #RorI, index, XorY
-	    ->complex->sumover  #RorI, XorY
+	    ->sumover  #RorI, XorY
 		/$self->geometry->npoints;
 	}
-	$P2Mmask = $P2Mmask + $f*$Dep2 if $kind eq 'f' or $kind eq 'l'
-	    or $kind eq 'a'; # substract masked macro depolarization field
+	$P2Mmask += $f*$Dep2 if $KIND2SUBTRACT{$kind}; # subtract masked macro depolarization field
 	push @P2M, $P2Mmask;
     }
     #NOTE. Maybe I have to correct response to D-> response to E
     #I have to convert from the array of polarizations for given
     #directions to the actual cartesian chi's.
-    #$reP2M and $imP2M have cartesian, dyad indices
-    my $reP2M=PDL->pdl([map {$_->re} @P2M]);
-    my $imP2M=PDL->pdl([map {$_->im} @P2M]);
-    my ($lu, $perm, $parity)=@{$self->geometry->unitDyadsLU};
-    #$reChi, $imChi have cartesian, dyad indices
+    #$P2Mp has cartesian, dyad indices
+    my $P2Mp = PDL->pdl(@P2M)->complex;
     #Get cartesian indices out of the way, solve the system of
     #equations, and move the cartesian indices back
-    my $reChi=lu_backsub($lu, $perm, $parity, $reP2M->mv(0,-1))->mv(-1,0);
-    my $imChi=lu_backsub($lu, $perm, $parity, $imP2M->mv(0,-1))->mv(-1,0);
-    #chi has three cartesian indices
-    my $chiTensor=PDL->zeroes(2, $nd, $nd, $nd)->complex;
-    #convert dyadic to cartesian indices
-    my $n=0;
-    for my $i(0..$nd-1){
-	for my $j($i..$nd-1){
-	    $chiTensor->(:,:,($i),($j)).=$reChi(:,$n)+i*$imChi(:,$n);
-	    $chiTensor->(:,:,($j),($i)).=$reChi(:,$n)+i*$imChi(:,$n);
-	    ++$n;
-	}
-    }
+    my $chiTensor=tensor($P2Mp->mv(1,-1), $self->geometry->unitDyadsLU, $nd, 3, sub { $_[0]->mv(-1,1) });
     $self->_chiTensor($chiTensor);
     return $chiTensor;
 }
@@ -316,16 +303,10 @@ sub evaluate {
 
 sub _build_nrshp { # One Haydock coefficients calculator per direction0
     my $self=shift;
-    my @nrshp;
+    my $nr = make_haydock($self, 'Photonic::LE::NR2::AllH', 1);
+    my ($i, @nrshp) = 0;
     foreach(@{$self->geometry->unitPairs}){
-	my $g=dclone($self->geometry); #clone geometry
-	#OJO: Cuánto vale el campo macroscópico? Hay que normalizar esto?
-	$g->Direction0($_); #add G0 direction
-	#Build a corresponding LE::NR2::AllH structure
-	my $nr=Photonic::LE::NR2::AllH->new(
-	    nh=>$self->nh, geometry=>$g, keepStates=>1,
-	    reorthogonalize=>$self->reorthogonalize, smallH=>$self->smallH);
-	my @args=(nr=>$nr, nh=>$self->nhf, smallE=>$self->smallE);
+	my @args=(nr=>$nr->[$i++], nh=>$self->nhf, smallE=>$self->smallE);
 	push @args, filter=>$self->filter if $self->has_filter;
 	my $nrf=Photonic::LE::NR2::Field->new(@args);
 	my $nrshp=Photonic::LE::NR2::SHP->
@@ -333,7 +314,7 @@ sub _build_nrshp { # One Haydock coefficients calculator per direction0
 		densityB=>$self->densityB);
 	push @nrshp, $nrshp;
     }
-    return [@nrshp]
+    \@nrshp;
 }
 
 sub _build_epsTensor {

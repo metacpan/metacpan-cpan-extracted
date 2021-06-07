@@ -2,13 +2,13 @@
 # Yes, we want to make sure things work in taint mode
 
 #
-# Copyright (C) 2015-2020 Joelle Maslak
+# Copyright (C) 2015-2021 Joelle Maslak
 # All Rights Reserved - See License
 #
 
 # Basic testing
 
-use Test::More tests => 14;
+use Test::More tests => 17;
 
 # Instantiate the object
 require_ok('JCM::Boilerplate');
@@ -139,7 +139,7 @@ SKIP: {
     if (!defined $ret) {
         pass('Indirect syntax dies');
     } else {
-        fail('Indirect syntax passes');
+        fail('Indirect syntax does not die');
     }
 }
 
@@ -173,5 +173,61 @@ SKIP: {
         fail('isa not working');
     } else {
         pass('isa works');
+    }
+}
+
+# Verify bareword filehandles don't work.
+SKIP: {
+    skip "No bareword filehandle test only works on >= 5.34", 1 if $PERL_VERSION lt v5.34.0;
+    local $SIG{__WARN__} = sub { };
+
+    $ret = eval '
+        use JTM::Boilerplate;
+
+        open FH, ">>a.txt";
+        1;
+    ';
+    if (!defined $ret) {
+        pass('Bareword filehandle dies');
+    } else {
+        fail('Bareword filehandle does not die');
+    }
+}
+
+# Verify multidimensional array emulation doesn't work.
+SKIP: {
+    skip "No multidimensional test only works on >= 5.34", 1 if $PERL_VERSION lt v5.34.0;
+    local $SIG{__WARN__} = sub { };
+
+    $ret = eval '
+    use JTM::Boilerplate;
+
+        my %foo;
+        $foo{"1", "2"} = 3;
+        1;
+    ';
+    if (!defined $ret) {
+        pass('Multidimensional emulation dies');
+    } else {
+        fail('Multidimensional emulation does not die');
+    }
+}
+
+# Verify try/catch
+SKIP: {
+    skip "try/catch only woks on >= 5.34", 1 if $PERL_VERSION lt v5.34.0;
+    $ret = eval '
+        use JTM::Boilerplate;
+
+        try {
+            my $foo = 1 / 0;    # Div by zero
+        } catch ($e) {
+            return 1;
+        }
+    ';
+    if (defined $ret and $ret == 1) {
+        pass('try/catch working');
+    } else {
+        fail('try/catch not working');
     }
 }

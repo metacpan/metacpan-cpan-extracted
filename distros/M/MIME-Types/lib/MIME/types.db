@@ -1,4 +1,4 @@
-2211:EXTENSIONS
+2214:EXTENSIONS
 #;application/x-mathcad
 %;application/x-trash
 123;application/vnd.lotus-1-2-3
@@ -405,7 +405,7 @@ dae;model/vnd.collada+xml
 daf;application/vnd.mobius.daf
 dar;application/x-dar
 dart;application/vnd.dart
-dat;application/x-ns-proxy-autoconfig
+dat;application/octet-stream
 dataless;application/vnd.fdsn.mseed
 davmount;application/davmount+xml
 dbf;application/vnd.dbf
@@ -1561,6 +1561,7 @@ sac;application/tamp-sequence-adjust-confirm
 saf;application/vnd.yamaha.smaf-audio
 sam;application/x-amipro
 sami;application/x-sami
+sarif-external-properties;application/sarif-external-properties+json
 sarif;application/sarif+json
 sav;application/x-spss
 saveme;application/octet-stream
@@ -1636,6 +1637,7 @@ shaclc;text/shaclc
 shape;application/x-dia-shape
 shar;application/x-shar
 shc;text/shaclc
+shex;text/shex
 shf;application/shf+xml
 shn;application/x-shorten
 shp;application/vnd.shp
@@ -1997,6 +1999,7 @@ w61;application/x-wordperfect6.1
 w6w;application/msword
 wad;application/x-doom
 wadl;application/vnd.sun.wadl+xml
+wasm;application/wasm
 wav;audio/vnd.dts
 wax;audio/x-ms-wax
 wb1;application/x-qpro
@@ -2011,8 +2014,8 @@ wdp;image/vnd.ms-photo
 web;application/vnd.xara
 weba;audio/x-webm
 webapp;application/x-web-app-manifest+json
-webm;video/x-webm
-webp;image/x-webp
+webm;image/webm
+webp;image/webp
 wg;application/vnd.pmi.widget
 wgt;application/widget
 wif;application/watcherinfo+xml
@@ -2086,21 +2089,21 @@ xap;application/x-silverlight-app
 xar;application/vnd.xara
 xav;application/xcap-att+xml
 xbap;application/x-ms-xbap
-xbd;application/vnd.fujixerox.docuworks.binder
+xbd;application/vnd.fujifilm.fb.docuworks.binder
 xbel;application/x-xbel
 xbl;application/xml
 xbm;image/x-xbitmap
 xca;application/xcap-caps+xml
 xcf;application/x-xcf
 xcs;application/calendar+xml
-xct;application/vnd.fujixerox.docuworks.container
+xct;application/vnd.fujifilm.fb.docuworks.container
 xdd;application/bacnet-xdd+zip
 xdf;application/mrb-consumer+xml
 xdm;application/vnd.syncml.dm+xml
 xdp;application/vnd.adobe.xdp+xml
 xdr;video/x-amt-demorun
 xdssc;application/dssc+xml
-xdw;application/vnd.fujixerox.docuworks
+xdw;application/vnd.fujifilm.fb.docuworks
 xel;application/xcap-el+xml
 xenc;application/xenc+xml
 xer;application/patch-ops-error+xml
@@ -2737,10 +2740,12 @@ x-zip-compressed;zip;
 x-zmachine;z1,z2,z3,z4,z5,z6,z7,z8;
 x-zoo;zoo;
 
-531:application:I:
+534:application:I:
 1d-interleaved-parityfec;;
 3gpdash-qoe-report+xml;;
 3gpp-ims+xml;;
+3gpphal+json;;
+3gpphalforms+json;;
 activemessage;;
 activity+json;;
 alto-costmap+json;;
@@ -2860,6 +2865,7 @@ news-groupinfo;;
 news-transmission;;
 nlsml+xml;;
 nss;;
+oauth-authz-req+jwt;;
 opc-nodeset+xml;;
 oscore;;
 parityfec;;
@@ -3270,7 +3276,7 @@ yang-data+xml;;
 yang-patch+json;;
 yang-patch+xml;;
 
-961:application:I:E
+967:application:I:E
 a2l;a2l;
 aml;aml;
 andrew-inset;ez;
@@ -3447,6 +3453,7 @@ rpki-manifest;mft;
 rpki-roa;roa;
 rtf;rtf,rtx;8bit
 sarif+json;sarif,json;
+sarif-external-properties+json;sarif-external-properties;
 sbml+xml;sbml;
 scim+json;scim,scm;
 scvp-cv-request;SCQ;
@@ -3690,6 +3697,10 @@ vnd.frogans.fnc;FNC;
 vnd.frogans.ltf;LTF;
 vnd.fsc.weblauch;fsc;7bit
 vnd.fsc.weblaunch;fsc;
+vnd.fujifilm.fb.docuworks.binder;xbd;
+vnd.fujifilm.fb.docuworks.container;xct;
+vnd.fujifilm.fb.docuworks;xdw;
+vnd.fujifilm.fb.jfi+xml;xml;
 vnd.fujitsu.oasys2;oa2;
 vnd.fujitsu.oasys3;oa3;
 vnd.fujitsu.oasys;oas;
@@ -4202,6 +4213,7 @@ vnd.zul;zir,zirz;
 vnd.zzazz.deck+xml;zaz;
 voicexml+xml;vxml;
 voucher-cms+json;vcj;
+wasm;wasm;
 watcherinfo+xml;wif,xml;
 webpush-options+json;json;
 widget;wgt;
@@ -4936,7 +4948,7 @@ vnd.latex-z;;
 vnd.motorola.reflex;;
 vnd.radisys.msml-basic-layout;;
 
-65:text:I:E
+66:text:I:E
 cache-manifest;appcache,manifest;
 calendar;ics,icz,ifb,vcs;
 cql;CQL;
@@ -4960,6 +4972,7 @@ richtext;rtx,rt,rtf;8bit
 rtf;rtf;8bit
 sgml;sgml,sgm;
 shaclc;shaclc,shc;
+shex;shex;
 spdx;spdx;
 tab-separated-values;tsv;
 troff;t,tr,roff,man,me,ms;

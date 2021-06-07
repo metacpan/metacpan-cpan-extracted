@@ -30,12 +30,12 @@ sub attach_function ($$$;$)
   $arg_types = [] unless defined $arg_types;
   my $install_name = $name;
   ( $name, $install_name ) = @{ $name } if ref $name;
-  
+
   foreach my $lib (@libs)
   {
     my $ffi = eval { FFI::Raw->new($lib, $name, $rv_type, @$arg_types) };
     next if $@;
-    
+
     my $base_sub = sub {
       my @args = @_;
       my $ret = eval {
@@ -44,12 +44,12 @@ sub attach_function ($$$;$)
       die "$name: $@" if $@;
       return $ret;
     };
-    
+
     no strict 'refs';
     *{join '::', $pkg, $install_name} = $wrapper ? sub { $wrapper->($base_sub, @_) } : $base_sub;
     return;
   }
-  
+
   die "unable to find $name\n";
 }
 
@@ -74,7 +74,7 @@ Archive::Libarchive::FFI::SweetLite
 
 =head1 VERSION
 
-version 0.0901
+version 0.0902
 
 =head1 AUTHOR
 

@@ -4,11 +4,8 @@ README.cluster
 Makefile.PL
 pdlmaker.plm
 Cluster.pd
-Cluster.xs
-Cluster.c
-Cluster.pm
-cluster.c
-cluster.h
+ccluster.c
+ccluster.h
 t/00_basic.t
 t/01_utils.t
 t/020_clusterdistance.t

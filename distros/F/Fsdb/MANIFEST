@@ -84,6 +84,7 @@ lib/Fsdb/IO/Writer.pm
 lib/Fsdb/Support.pm
 lib/Fsdb/Support/DelayPassComments.pm
 lib/Fsdb/Support/Freds.pm
+lib/Fsdb/Support/IPv6.pm
 lib/Fsdb/Support/NamedTmpfile.pm
 lib/Fsdb/Support/OS.pm
 lib/Fsdb/Support/TDistribution.pm
@@ -194,6 +195,9 @@ TEST/dbcolhisto_ex_R.out
 TEST/dbcolhisto_ex_S.cmd
 TEST/dbcolhisto_ex_S.in
 TEST/dbcolhisto_ex_S.out
+TEST/dbcolhisto_same.cmd
+TEST/dbcolhisto_same.in
+TEST/dbcolhisto_same.out
 TEST/dbcolize_blank_lines.cmd
 TEST/dbcolize_blank_lines.in
 TEST/dbcolize_blank_lines.out
@@ -266,6 +270,15 @@ TEST/dbcolpercentile_rank_broken_order.cmd
 TEST/dbcolpercentile_rank_broken_order.out
 TEST/dbcolpercentile_unsorted.cmd
 TEST/dbcolpercentile_unsorted.out
+TEST/dbcolpercentile_weighted.cmd
+TEST/dbcolpercentile_weighted.in
+TEST/dbcolpercentile_weighted.out
+TEST/dbcolpercentile_weighted2.cmd
+TEST/dbcolpercentile_weighted2.in
+TEST/dbcolpercentile_weighted2.out
+TEST/dbcolpercentile_weighted_unsorted.cmd
+TEST/dbcolpercentile_weighted_unsorted.in
+TEST/dbcolpercentile_weighted_unsorted.out
 TEST/dbcolrename_double_dest.cmd
 TEST/dbcolrename_double_dest.out
 TEST/dbcolrename_double_source.cmd

@@ -4,16 +4,20 @@ use 5.006002;
 use strict;
 use warnings;
 
-our $VERSION = '1.018';
+our $VERSION = '1.021';
 
-my %introduces = ( '5.032' => [qw[
+my %introduces = do { no warnings 'qw';
+                 ( '5.034' => [qw[
+                                 {,n} 0o blanks-in-curlies
+                             ]],
+                   '5.032' => [qw[
                                   unicode13.0 chained-comparisons
                                   unicode-identifier-status
                                   unicode-name-property
                              ]],
                    '5.030' => [qw[
                                   unicode12.1 uniprop_wildcards qr'N
-                                  turkic-casing
+                                  turkic-casing ^RE_COMPILE_RECURSION_LIMIT
                              ]],
                    '5.028' => [qw[
                                  delete% unicode10.0 state@=
@@ -35,7 +39,7 @@ my %introduces = ( '5.032' => [qw[
                                  s-utf8-delimiters
                               ]],
                    '5.018' => [qw[
-                                 computed-labels while-each
+                                 computed-labels while-each method-on-any-string
                               ]],
                    '5.014' => [qw[
                                  ?^ /r /d /l /u /a auto-deref
@@ -51,7 +55,7 @@ my %introduces = ( '5.032' => [qw[
                                  // ?PARNO ?<> ?| quant+ regex-verbs
                                  \K \R \v \h \gN readline()
                                  stack-file-test recursive-sort /p
-                                 lexical-$_
+                                 lexical-$_ pack<
                               ]],
                    '5.008001' => [qw[
                                  s-utf8-delimiters-hack
@@ -59,7 +63,7 @@ my %introduces = ( '5.032' => [qw[
                    old => [qw[
                                  ?? for-qw @_=split
                           ]],
-                 );
+                 )};
 
 my %removed = ( 'auto-deref'             => '5.024',
                 'lexical-$_'             => '5.024',
@@ -77,6 +81,7 @@ my %alias = (
     '\V' => '\v',
     'defined-or' => '//',
     'lexical-default-variable' => 'lexical-$_',
+    'pack-byte-order-modifiers' => 'pack<',
     'readline-argv' => 'readline()',
     'regex-generic-linebreak' => '\R',
     'regex-horizontal-whitespace' => '\h',
@@ -148,9 +153,13 @@ my %alias = (
     # 5.030
     'named-char-in-single-quoted-regex' => "qr'N",
     'unicode-12.1' => 'unicode12.1',
+    're-compile-recursion-limit' => '^RE_COMPILE_RECURSION_LIMIT',
     # 5.032
     'unicode-13.0' => 'unicode13.0',
     'unicode-identifier-type' => 'unicode-identifier-status',
+    # 5.034
+    'empty-left-quantifier' => '{,n}',
+    'octal-literals' => '0o',
 );
 
 my %_introduced = map {
@@ -215,7 +224,9 @@ sub import {
             ($min_version, $constr) = ($introduced{$_}, $name)
                 if $introduced{$_} gt $min_version;
         } elsif (! $removed{$_}) {
-            die "Unknown construct `$name' at ", _position(), ".\n"
+            die "Unknown construct `$name' at ",
+                _position(),
+                ". Try upgrading Syntax::Construct first.\n"
         }
 
         if ($removed{$_}) {
@@ -242,7 +253,7 @@ sub import {
         if $max_version le $nearest_stable;
 
     die "Unsupported construct $constr at ", _position(),
-        sprintf " (Perl %.3f needed)\n", $min_version
+        sprintf " (Perl %s needed)\n", $min_version
         unless $min_version le $];
 
     $_->() for @actions;
@@ -256,7 +267,7 @@ Syntax::Construct - Explicitly state which non-feature constructs are used in th
 
 =head1 VERSION
 
-Version 1.018
+Version 1.021
 
 =head1 SYNOPSIS
 
@@ -290,7 +301,7 @@ them (but see L<Perl::MinimumVersion> on how to extract the
 information from existing code).
 
 Using C<use Syntax::Construct qw( // );> doesn't really change
-anything if you're running Perl 5.10+, but it gives much better error
+anything if you're running Perl 5.010+, but it gives much better error
 messages in older versions:
 
   Unsupported construct //
@@ -329,12 +340,12 @@ Some programmers just use all the I<non-features> their current Perl
 version provides without any notice. This leads to weird error
 messages in older Perl versions.
 
-Some other programmers will place C<use 5.22;> towards the top of the
+Some other programmers will place C<use 5.022;> towards the top of the
 script, even if the only I<non-feature> they use is the C<//> operator
-available in 5.10 already. This prevents users of older versions of
+available in 5.010 already. This prevents users of older versions of
 Perl to run the script, even if it would otherwise be easily possible.
 
-The kindest programmers will add C<use 5.10; # //> towards the top of
+The kindest programmers will add C<use 5.010; # //> towards the top of
 the script. But it means they have to remember or find out what
 version introduced the I<non-feature> they use.
 
@@ -344,9 +355,9 @@ makes it easier for users of older Perl versions to migrate your code
 to their system. And finally, it improves the error messages they get.
 
 Similarly, it's a good practice to keep specifying C<use feature qw{
-postderef };> even if it's a no-op since 5.24: it makes your script
+postderef };> even if it's a no-op since 5.024: it makes your script
 available for people running older Perl versions. The same applies to
-C<use charnames> in 5.16 and later, etc.
+C<use charnames> in 5.016 and later, etc.
 
 =head1 EXPORT
 
@@ -365,7 +376,7 @@ construct was introduced.
 =item removed
 
 Same as C<introduced>, but for removed constructs (e.g. auto-deref in
-5.24).
+5.024).
 
 =back
 
@@ -375,7 +386,7 @@ Same as C<introduced>, but for removed constructs (e.g. auto-deref in
 
 =head3 s-utf8-delimiters-hack
 
-See below. The hack doesn't seem to work in 5.008 and older.
+See below. The hack doesn't seem to work in 5.008 and older. Removed in 5.020.
 
 =head2 5.010
 
@@ -464,9 +475,15 @@ Alias: regex-preserve-match-captures
 
 =head3 lexical-$_
 
-L<perl5100delta/Lexical $_>.
+L<perl5100delta/Lexical $_>. Removed in 5.024.
 
 Alias: lexical-default-variable
+
+=head3 pack<
+
+See L<perl5100delta/Byte-order-modifiers-for-pack()-and-unpack()>
+
+Alias: pack-byte-order-modifiers
 
 =head2 5.012
 
@@ -555,6 +572,7 @@ Alias: regex-restrict-ascii-range
 L<perl5140delta/Array and hash container functions accept
 references>. See also C<push>, C<pop>, C<shift>, C<unshift>,
 C<splice>, C<keys>, C<values>, and C<each> in L<perlfunc>.
+Removed in 5.024.
 
 =head3 ^GLOBAL_PHASE
 
@@ -595,6 +613,10 @@ L<perl5180delta/Computed Labels>
 
 See in L<perl5180delta/Selected Bug Fixes> or C<each> in L<perlfunc>.
 
+=head3 method-on-any-string
+
+See [perl #105922] in L<perl5180delta/Selected Bug Fixes>.
+
 =head2 5.020
 
 =head3 attr-prototype
@@ -606,7 +628,7 @@ Alias: attribute-prototype
 =head3 drand48
 
 L<perl5200delta/rand now uses a consistent random number generator>.
-Note that on OpenBSD, Perl 5.20+ uses the system's own C<drand48>
+Note that on OpenBSD, Perl 5.020+ uses the system's own C<drand48>
 unless seeded.
 
 =head3 %slice
@@ -802,32 +824,59 @@ B<Beware:> the actual behaviour depends on the operating system's
 locale support. E.g. FreeBSD, DragonFly, and Solaris are known not to
 support it.
 
+=head3 ^RE_COMPILE_RECURSION_LIMIT
+
+Not mentioned in any Delta. See L<perlvar/${^RE_COMPILE_RECURSION_LIMIT}>.
+
+Alias: re-compile-recursion-limit
+
 =head2 5.032
 
 =head3 unicode13.0
 
-L<perldelta/Unicode 13.0 is supported>
+L<perl5320delta/Unicode 13.0 is supported>
 
 Alias: unicode-13.0
 
 =head3 chained-comparisons
 
-L<perldelta/Chained comparisons capability>
+L<perl5320delta/Chained comparisons capability>
 
 =head3 unicode-identifier-status
 
-L<perldelta/New Unicode properties Identifier_Status and Identifier_Type supported>
+L<perl5320delta/New Unicode properties Identifier_Status and Identifier_Type supported>
 
 Alias: unicode-identifier-type
 
 =head3 unicode-name-property
 
-L<It is now possible to write \p{Name=...} in perldelta|perldelta/It>
+L<It is now possible to write \p{Name=...} in perl5320delta|perl5320delta/It>
+
+=head2 5.034
+
+=head3 {,n}
+
+L<perldelta/qr/%7B,n%7D/ is now accepted>
+
+Alias: empty-left-quantifier
+
+=head3 0o
+
+L<perldelta/New octal syntax 0oddddd>
+
+Alias: octal-literals
+
+=head3 blanks-in-curlies
+
+L<perldelta/Blanks freely allowed within but adjacent to curly braces>
 
 =for completeness
 =head2 old
 
 =head2 Removed Constructs
+
+Only constructs not mentioned above are listed here, i.e. constructs
+that were introduced before 5.008001.
 
 =head3 ??
 
@@ -836,18 +885,18 @@ explicit operator has been removed>.
 
 =head3 for-qw
 
-Removed in 5.18. See L<perl5180delta/qw(...)-can-no-longer-be-used-as-parentheses>.
+Removed in 5.018. See L<perl5180delta/qw(...)-can-no-longer-be-used-as-parentheses>.
 
 =head3 @_=split
 
-Removed in 5.12, but documented in 5.14. See L<perl5140delta/split()-and-@_>.
+Removed in 5.012, but documented in 5.014. See L<perl5140delta/split()-and-@_>.
 
 Alias: split-populates-@_
 
 =head2 Accepted Features
 
 Some features have been accepted in Perl (C<postderef> and
-C<postderef_qq> in 5.24, C<lexical_subs> in 5.26). In the spirit of
+C<postderef_qq> in 5.024, C<lexical_subs> in 5.026). In the spirit of
 Syntax::Construct, you should still declare them, even if their usage
 has no effect in newer Perl versions to provide meaningful error
 messages to users of older versions.
@@ -869,8 +918,8 @@ see below.
 =head2 Unstable Perl Versions
 
 In development versions of Perl, the removal of constructs is tested
-against the coming stable version -- e.g., 5.23 forbids all the
-removed constructs of 5.24. The behaviour of the module in such
+against the coming stable version -- e.g., 5.023 forbids all the
+removed constructs of 5.024. The behaviour of the module in such
 circumstances might still be, um, unstable.
 
 =head1 SUPPORT
@@ -893,10 +942,6 @@ Feel free to report issues and submit pull requests.
 
 L<https://metacpan.org/pod/Syntax::Construct>
 
-=item * AnnoCPAN: Annotated CPAN documentation
-
-L<http://annocpan.org/dist/Syntax-Construct>
-
 =item * CPAN Ratings
 
 L<http://cpanratings.perl.org/d/Syntax-Construct>
@@ -909,11 +954,11 @@ L<http://search.cpan.org/dist/Syntax-Construct/>
 
 =head1 SEE ALSO
 
-L<Perl::MinimumVersion>
+L<Perl::MinimumVersion>, L<Perl::MinimumVersion::Fast>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2013 - 2020 E. Choroba.
+Copyright 2013 - 2021 E. Choroba.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of the the Artistic License (2.0). You may obtain a

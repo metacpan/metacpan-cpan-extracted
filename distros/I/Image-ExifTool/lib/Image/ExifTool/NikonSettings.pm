@@ -17,7 +17,7 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 
-$VERSION = '1.00';
+$VERSION = '1.03';
 
 sub ProcessNikonSettings($$$);
 
@@ -911,14 +911,14 @@ my %infoD6 = (
     },
     0x05a => [{ # CSf6-b-1 and CSf6-b-2 (D6), CSf5-b-1 and CSf5-b-2 (Z7_2), (continued from above)
         Name => 'CmdDialsChangeMainSub',
-        Condition => '$$self{CmdDialsChangeMainSubExposure} == 1',
+        Condition => '$$self{CmdDialsChangeMainSubExposure} and $$self{CmdDialsChangeMainSubExposure} == 1',
         PrintConv => {
             1 => 'Autofocus On, Exposure On',
             2 => 'Autofocus Off, Exposure On',
         },
     },{
         Name => 'CmdDialsChangeMainSub',
-        Condition => '$$self{CmdDialsChangeMainSubExposure} == 2',
+        Condition => '$$self{CmdDialsChangeMainSubExposure} and $$self{CmdDialsChangeMainSubExposure} == 2',
         PrintConv => {
             1 => 'Autofocus On, Exposure On (Mode A)',
             2 => 'Autofocus Off, Exposure On (Mode A)',
@@ -1014,7 +1014,7 @@ my %infoD6 = (
     }],
     0x08b => [{ # CSf6-a-1 and CSf6-a-2 (D6), CSf5-a-1 and CSf5-a-2 (Z7_2), (continued from above)
         Name => 'CmdDialsReverseRotation',
-        Condition => '$$self{CmdDialsReverseRotExposureComp} == 1',
+        Condition => '$$self{CmdDialsReverseRotExposureComp} and $$self{CmdDialsReverseRotExposureComp} == 1',
         PrintConv => {
             1 => 'No',
             2 => 'Shutter Speed & Aperture',
@@ -1283,7 +1283,7 @@ my %infoD6 = (
         PrintConv => {
             1 => 'Enable',
             2 => 'Enable (Standby Timer Active)',
-            3 => 'Diaable',
+            3 => 'Disable',
         },
     },
     0x0ab => { # CSf11 (D6)
@@ -1313,7 +1313,7 @@ my %infoD6 = (
             1 => 'Power Aperture (Open)',
             2 => 'Exposure Compensation',
             3 => 'Subject Tracking',
-            4 => 'LiveView Info Display On/Off)',
+            4 => 'LiveView Info Display On/Off',
             5 => 'Grid Display',
             6 => 'Zoom (Low)',
             7 => 'Zoom (1:1)',
@@ -1357,7 +1357,7 @@ my %infoD6 = (
             1 => 'Power Aperture (Close)',
             2 => 'Exposure Compensation',
             3 => 'Subject Tracking',
-            4 => 'LiveView Info Display On/Off)',
+            4 => 'LiveView Info Display On/Off',
             5 => 'Grid Display',
             6 => 'Zoom (Low)',
             7 => 'Zoom (1:1)',
@@ -1545,10 +1545,10 @@ my %infoD6 = (
             12 => 'None',
         },
     },
-    0x0fb => { Name => 'SecondarySlotFunction',    PrintConv => \%tagSecondarySlotFunction },    # tag name selected to maintain compatibility with older cameras # (Z7_2)
-    0x0fb => { Name => 'SecondarySlotFunction',    PrintConv => \%tagSecondarySlotFunction }, # (D6)
-    0x0fc => { Name => 'SilentPhotography',        PrintConv => \%onOff }, # (D6,Z7_2)   # tag is associated with Silent LiveView Photography (as distinguisehed from Silent Interval or Silent Focus Shift)
-    0x0fd => { Name => 'ExtendedShuttterSpeeds',   PrintConv => \%onOff }, # CSd7 (D6), CSd6 (Z7_2)
+    0x0fb => { Name => 'SecondarySlotFunction', PrintConv => \%tagSecondarySlotFunction },    # tag name selected to maintain compatibility with older cameras # (Z7_2)
+    0x0fb => { Name => 'SecondarySlotFunction', PrintConv => \%tagSecondarySlotFunction }, # (D6)
+    0x0fc => { Name => 'SilentPhotography',     PrintConv => \%onOff }, # (D6,Z7_2)   # tag is associated with Silent LiveView Photography (as distinguisehed from Silent Interval or Silent Focus Shift)
+    0x0fd => { Name => 'ExtendedShutterSpeeds', PrintConv => \%onOff }, # CSd7 (D6), CSd6 (Z7_2)
     0x109 => { # (D6,Z7_2)
         Name => 'BracketSet',
         RawConv => '$$self{BracketSet} = $val',
@@ -1578,7 +1578,7 @@ my %infoD6 = (
         },
     },{
         Name => 'BracketProgram',
-        Condition => '$$self{BracketSet} == 4',
+        Condition => '$$self{BracketSet} and $$self{BracketSet} == 4',
         Notes => 'White Balance Bracketing',
         RawConv => '$$self{BracketProgram} = $val',
         PrintConv =>  {
@@ -1595,7 +1595,7 @@ my %infoD6 = (
         },
     },{
         Name => 'BracketProgram',
-        Condition => '$$self{BracketSet} == 5',
+        Condition => '$$self{BracketSet} and $$self{BracketSet} == 5',
         Notes => 'Active-D Bracketing',
         RawConv => '$$self{BracketProgram} = $val',
         Mask => 0x0f,
@@ -1802,9 +1802,9 @@ my %infoD6 = (
         },
     },
     0x139 => { Name => 'PlaybackFlickUp', RawConv => '$$self{PlaybackFlickUp} = $val', PrintConv => \%flickUpDownD6 }, # CSf12-1-a # (D6)
-    0x13a => { Name => 'PlaybackFlickUpRating', Condition => '$$self{PlaybackFlickUp} == 1', Notes => 'Meaningful only when PlaybackFlickUp is Rating', PrintConv => \%flickUpDownRatingD6 }, # CSf12-1-b # (D6)
+    0x13a => { Name => 'PlaybackFlickUpRating', Condition => '$$self{PlaybackFlickUp} and $$self{PlaybackFlickUp} == 1', Notes => 'Meaningful only when PlaybackFlickUp is Rating', PrintConv => \%flickUpDownRatingD6 }, # CSf12-1-b # (D6)
     0x13b => { Name => 'PlaybackFlickDown', RawConv => '$$self{PlaybackFlickDown} = $val', PrintConv => \%flickUpDownD6 }, # CSf12-2-a # (D6)
-    0x13c => { Name => 'PlaybackFlickDownRating', Condition => '$$self{PlaybackFlickDown} == 1', Notes => 'Meaningful only when PlaybackFlickDown is Rating', PrintConv => \%flickUpDownRatingD6 }, # CSf12-2-b # (D6)
+    0x13c => { Name => 'PlaybackFlickDownRating', Condition => '$$self{PlaybackFlickDown} and $$self{PlaybackFlickDown} == 1', Notes => 'Meaningful only when PlaybackFlickDown is Rating', PrintConv => \%flickUpDownRatingD6 }, # CSf12-2-b # (D6)
     0x13d => {  # CSg2-d (D6)
         Name => 'MovieFunc3Button',
         PrintConv => {
@@ -1875,7 +1875,7 @@ my %infoD6 = (
     0x164 => { # CSg7-a (Z7_2)
         Name => 'VerticalMovieFuncButton',
         PrintConv => {
-            1 => 'LiveView Info Display On/Off)',
+            1 => 'LiveView Info Display On/Off',
             2 => 'Record Movies',
             3 => 'Exposure Compensation',
             4 => 'ISO',
@@ -1917,6 +1917,15 @@ my %infoD6 = (
             8 => 'Auto',
             9 => 'Auto (People)',
             10 => 'Auto (Animals)',
+        },
+    },
+    0x170 => { Name => 'PreferSubSelectorCenter', PrintConv => \%offOn }, # CSf13 (D6 firmware v1.2.0)
+    0x174 => { # CSa17-d (D6 firmware v1.2.0)
+        Name => 'FocusPointSelectionSpeed',
+        PrintConv => {
+            1 => 'Normal',
+            2 => 'High',
+            3 => 'Very High',
         },
     },
 );

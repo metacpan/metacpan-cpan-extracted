@@ -1,0 +1,194 @@
+#!/usr/bin/perl
+use 5.014 ; use strict ; use warnings ;  # the functions requires 5.10 for "state", 5.14 for srand. 
+use Getopt::Std ; getopts '12$:=p:q:u:LS', \my%o ;  
+use Math::Trig qw/pi/ ; # 5.4から
+use Scalar::Util qw/looks_like_number/ ; # 5.7.3から
+use Term::ANSIColor qw/:constants color/ ;  $Term::ANSIColor::AUTORESET = 1 ;
+use Time::HiRes qw/sleep usleep gettimeofday tv_interval/ ; # 5.7.3から
+use Encode ;
+
+#$SIG{INT} = sub { & info ; exit 130 } ;
+my $time0 = [ gettimeofday ] ;
+my ${binFlag} = 1 if defined $o{u} && $o{u} eq '0' ;
+
+$o{'$'} //= 'end' ;  # 文字の終端を表す記号
+$o{p} //= '' ;  # 文字を切り分けるパターン。正規表現
+binmode STDOUT, 'utf8' unless $binFlag ;
+
+sub main () ; 
+* main = $o{L} ? * bylen : $o{S} ? * blanks : * normal ; # <-- mainの定義はここである。
+& main ; 
+exit 0 ;
+
+# どんな種類の空白かを数えるモード:
+sub blanks ( ) { 
+  my $header = <> if $o{'='} ; 
+  my %seen ; # 同じ行が来たかどうかの判定に使う。数が集計される。
+  my %counts ;
+
+  while ( <> ) { 
+    next if $o{1} && $seen{$_} ++ ; 
+    chomp ; 
+    $_ = decode_utf8 $_ unless $binFlag ; 
+    my @blanks = m/[[:blank:]]/g ; # <-- -  perldoc  perlrecharclass　perlunicode を参照するのが良いかも Unicode文字プロパティ
+    #print "XX" if @blanks ;
+    $counts { $_ } ++ for @blanks ; 
+  }
+
+  for ( sort keys %counts ) { 
+    print  sprintf "U+%X %s:\t%d\n", ord ($_) , $_ , $counts { $_ } ; 
+  }
+}
+
+# 長さ毎に数えるモード:
+sub bylen ( ) { 
+	my $header = <> if $o{'='} ; 
+	my %seen ; # 同じ行が来たかどうかの判定に使う。数が集計される。
+	my %M ; # 文字列長さごとの文字列最小値と文字列最大値を格納する。
+	my %frq ; # 文字列長ごとの頻度
+	while ( <> ) {
+		next if $o{1} && $seen{$_} ++ ;
+		chomp ;
+		$_ = decode_utf8 $_ unless $binFlag ;
+		my $len = length $_ ; 
+		$frq{$len} ++ ;
+		$M{$len}[0] = $_ if ! defined $M{$len}[0] || $M{$len}[0] gt $_ ; 
+		$M{$len}[1] = $_ if ! defined $M{$len}[1] || $M{$len}[1] lt $_ ; 		
+		$M{$len}[2] = $_ if ! $o{2} && ! defined $M{$len}[2] ; 
+		$M{$len}[3] = $_ if ! $o{2} ; 
+
+	}
+
+	print join ( "\t", map {UNDERLINE $_} qw[length freq min_str max_str] , ! $o{2} ? qw[first_str last_str ]:() ) , "\n" ;
+	for ( sort { $a <=> $b } keys %M ) {  # 数値 (文字列の長さを表す)でソート 
+    my @t = @{ $M{$_} } ;
+    grep { defined $_ and $_ = qq['$_'] } @t unless defined $o{q} && $o{q} eq '0' ;
+    $t[1] = '' if $t[1] eq $t[0] ; 
+    $t[2] = '' if defined $t[2] and $t[2] eq $t[0] || $t[2] eq $t[1]; 
+    $t[3] = '' if defined $t[3] and $t[3] eq $t[0] || $t[3] eq $t[1]; 
+		print join ( "\t" , $_ , $frq{$_}, @t ) , "\n" ;
+	}
+}
+
+# 普通のモード:
+sub normal ( ) {
+	my %S ; # $S{$char}[$pos] のように使う。 出現回数の集計表
+	my $maxlen = 0 ; # 文字列の最大長
+	my $header = <> if $o{'='} ; 
+	my %seen ; # 同じ行が来たかどうかの判定に使う。数が集計される。
+
+	while ( <> ) { 
+		next if $o{1} && $seen{$_} ++ ;
+		chomp ;
+		$_ = decode_utf8 $_ unless $binFlag ;
+		my @c = split /$o{p}/, $_ , 0 ; # <-- - 区切る
+		$S{ qq['$c[$_]'] }[ $_ ] ++ for 0 .. $#c ; # <-- クォーテーションを付加するようにした。    
+		$S{ $o{'$'} } [ @c ] ++ ; # 文字列終端記号の足し合わせ
+		$maxlen = @c if $maxlen < @c ; # 最大長の保管
+	}
+
+	# 出力
+	print join ("\t" , map {UNDERLINE GREEN $_} '' , 1 .. $maxlen + 1 ) , "\n" ;
+	for ( sort {$a eq $o{'$'} ? 1 : ( length ($a) <=> length($b) || $a cmp $b ) } keys %S ){ # <-- ソート順には注意したい
+		my @tmp = map { $_ // 0 } @{ $S{$_} } [ 0 .. $maxlen ] ; 
+    s/(^\')|(\'$)//g if defined $o{q} && $o{q} eq '0' ;
+		print join ( "\t" , YELLOW ($_) , @tmp ) , "\n" ; 
+	}
+}
+
+
+=x
+## ヘルプとバージョン情報
+BEGIN {
+  our $VERSION = 0.02 ;
+  $Getopt::Std::STANDARD_HELP_VERSION = 1 ; 
+  grep { m/--help/} @ARGV and *VERSION_MESSAGE = sub {} ; 
+   # 目安: 
+   #   0.21 : 人になんとか提供できる段階で 0.21 を目安とする。
+   #   1.00 以上 : 英語版のヘルプをきちんと出すことが必要条件。
+   #   2.00 以上 : テストコードが含むことが必要条件。
+
+   # 0.01 : 2018-06-28 2個の大きな機能を最初に作った。
+   # 0.02 : 2018-06-29 空白文字を分類して集計する機能を実装した。
+}  
+
+sub HELP_MESSAGE {
+    use FindBin qw[ $Script $Bin ] ;
+    sub EnvJ ( ) { $ENV{LANG} =~ m/^ja_JP/ ? 1 : 0 } ; # # ja_JP.UTF-8 
+    sub en( ) { grep ( /^en(g(i(sh?)?)?)?/i , @ARGV ) ? 1 : 0 } # English という文字列を先頭から2文字以上を含むか 
+    sub ja( ) { grep ( /^jp$|^ja(p(a(n?)?)?)?/i , @ARGV ) ? 1 : 0 } # jp または japan という文字列を先頭から2文字以上を含むか 
+    sub opt( ) { grep (/^opt(i(o(ns?)?)?)?$/i, @ARGV ) ? 1 : 0 } # options という文字列を先頭から3文字以上含むから
+    sub noPOD ( ) { grep (/^no-?pod\b/i, @ARGV) ? 1 : 0 } # POD を使わないと言う指定がされているかどうか
+    my $jd = "JapaneseManual" ;
+    my $flagE = ! ja && ( en || ! EnvJ ) ; # 英語にするかどうかのフラグ
+
+    exec "perldoc $0" if $flagE &&  ! opt && ! noPOD   ; 
+    $ARGV[1] //= '' ;
+    open my $FH , '<' , $0 ;
+    while(<$FH>){
+        s/\Qboxmuller\E/$Script/gi ;
+        s/\$Bin/$Bin/gi ;
+        if ( s/^=head1\b\s*// .. s/^=cut\b\s*// ) { 
+            if ( s/^=begin\s+$jd\b\s*// .. s/^=end\s+$jd\b\s*// xor $flagE ) {
+                print $_ if ! opt || m/^\s+\-/  ; 
+            }
+        } 
+    }
+    close $FH ;
+    exit 0 ;
+}
+=cut
+## ヘルプの扱い
+sub VERSION_MESSAGE {}
+sub HELP_MESSAGE {
+    use FindBin qw[ $Script ] ; 
+    $ARGV[1] //= '' ;
+    open my $FH , '<' , $0 ;
+    while(<$FH>){
+        s/\$0/$Script/g ;
+        print $_ if s/^=head1// .. s/^=cut// and $ARGV[1] =~ /^o(p(t(i(o(ns?)?)?)?)?)?$/i ? m/^\s+\-/ : 1;
+    }
+    close $FH ;
+    $o{v} = 0 ;
+    exit 0 ;
+}
+=encoding utf8 
+
+=begin JapaneseManual 
+
+=head1
+
+  digitdist 
+    改行区切りの値に対して，先頭から$n$桁目にどんな文字が現れたかを集計する。
+    (出力表は縦は出現した文字で、$n$が増えると右方向の、クロス集計表が出力される。)
+    -L が指定されると、文字列長ごとの、文字列の最小値と最大値が出力される。
+
+  オプション: 
+   -=     : 先頭行を読み飛ばす
+   -1     : データで全く同じ行が2回以上来たら、読み飛ばす。	
+   -u 0   : バイナリで処理する(通常は UTF-8で処理をする)
+   -p str : 正規表現によるパターンの指定。 '^(....)(...)(.)$' 等を指定する。
+   -q 0   : 出力で文字をシングルクォーテーションで囲まない。    
+   -$ str : 文字列の終端を表す出力用の記号をENDから変更する。
+
+   -L     ; 文字列長毎に、文字列の最小値と最大値を取り出す。
+   -2     ; -L の指定がある場合に、最初に出現した文字列と、最後に出現した文字列を取り出しているが、それを止める。
+
+   -S     ; 空白文字を分類して数える。(長音文字も対応したい。少画数の文字も集計したい。) 
+
+   --help  : このオンラインヘルプを表示する。
+   --version : バージョン情報を表示する。  
+
+  使い方の例 : 
+    1. 何も分からない文字列集合について、具体的な値の様子を確かめる最初の1歩である。
+    2. ルールを発見する。極めて少数の例から、データの値の破損やテスト値を見つける。
+    3. 特異な値について、更に深く調べる対象とする。
+
+  開発上のメモ : 
+    * 出力する各行のソート順は指定できるようにした方が便利そう。
+    * -Lの場合に、-g N の指定により、最小値N個、最大値N個を取り出せるようにしても良いかも。
+    * -Lの場合に出力する出現文字列について、出現頻度も出力出来る様にしたい。
+
+=end JapaneseManual
+
+=cut

@@ -3,13 +3,11 @@ NAME
     convention
 
 VERSION
-    This document describes version 0.004 of Acme::CPANModules::NO_COLOR
+    This document describes version 0.005 of Acme::CPANModules::NO_COLOR
     (from Perl distribution Acme-CPANModules-NO_COLOR), released on
-    2020-02-18.
+    2021-05-09.
 
 DESCRIPTION
-    Modules that follow the NO_COLOR convention.
-
     The NO_COLOR convention (see https://no-color.org) lets user disable
     color output of console programs by defining an environment variable
     called NO_COLOR. The existence of said environment variable, regardless
@@ -18,7 +16,9 @@ DESCRIPTION
     If you know of other modules that should be listed here, please contact
     me.
 
-INCLUDED MODULES
+ACME::CPANMODULES ENTRIES
+    *   App::DiffTarballs
+
     *   App::hr
 
     *   Color::ANSI::Util
@@ -42,9 +42,16 @@ INCLUDED MODULES
     *   Text::ANSITable
 
 FAQ
-  What are ways to use this module?
-    Aside from reading it, you can install all the listed modules using
-    cpanmodules:
+  What is an Acme::CPANModules::* module?
+    An Acme::CPANModules::* module, like this module, contains just a list
+    of module names that share a common characteristics. It is a way to
+    categorize modules and document CPAN. See Acme::CPANModules for more
+    details.
+
+  What are ways to use this Acme::CPANModules module?
+    Aside from reading this Acme::CPANModules module's POD documentation,
+    you can install all the listed modules (entries) using cpanmodules CLI
+    (from App::cpanmodules distribution):
 
         % cpanmodules ls-entries NO_COLOR | cpanm -n
 
@@ -52,9 +59,13 @@ FAQ
 
         % perl -MAcme::CM::Get=NO_COLOR -E'say $_->{module} for @{ $LIST->{entries} }' | cpanm -n
 
-    This module also helps lcpan produce a more meaningful result for "lcpan
-    related-mods" when it comes to finding related modules for the modules
-    listed in this Acme::CPANModules module.
+    or directly:
+
+        % perl -MAcme::CPANModules::NO_COLOR -E'say $_->{module} for @{ $Acme::CPANModules::NO_COLOR::LIST->{entries} }' | cpanm -n
+
+    This Acme::CPANModules module also helps lcpan produce a more meaningful
+    result for "lcpan related-mods" command when it comes to finding related
+    modules for the modules listed in this Acme::CPANModules module.
 
 HOMEPAGE
     Please visit the project's homepage at
@@ -81,7 +92,7 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2020, 2018 by perlancar@cpan.org.
+    This software is copyright (c) 2021, 2020, 2018 by perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

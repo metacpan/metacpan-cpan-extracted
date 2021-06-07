@@ -23,6 +23,7 @@ WriteMakefile(
     dist       => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean      => { FILES    => 'Test-Differences-*' },
     META_MERGE => {
+        license   => [ qw(artistic_1 gpl_1) ],
         resources => {
             repository => 'https://github.com/DrHyde/Test-Differences',
             bugtracker => 'https://github.com/DrHyde/Test-Differences/issues',

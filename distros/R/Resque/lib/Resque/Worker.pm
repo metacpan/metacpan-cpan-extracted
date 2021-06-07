@@ -1,6 +1,6 @@
 package Resque::Worker;
 # ABSTRACT: Does the hard work of babysitting Resque::Job's
-$Resque::Worker::VERSION = '0.41';
+$Resque::Worker::VERSION = '0.42';
 use Moose;
 with 'Resque::Encoder';
 
@@ -38,7 +38,12 @@ has stat => (
     default => sub { Resque::Stat->new( resque => $_[0]->resque ) }
 );
 
-has id => ( is => 'rw', lazy => 1, default => sub { $_[0]->_stringify } );
+has id => (
+    is      => 'rw',
+    lazy    => 1,
+    clearer => '_clear_id',
+    default => sub { $_[0]->_stringify }
+);
 sub _string { $_[0]->id } # can't point overload to a mo[o|u]se attribute :-(
 
 has verbose   => ( is => 'rw', default => sub {0} );
@@ -61,7 +66,7 @@ has autoconfig => ( is => 'rw', predicate => 'has_autoconfig' );
 
 sub pause { $_[0]->paused(1) }
 
-sub unpause         { $_[0]->paused(0) }
+sub unpause { $_[0]->paused(0) }
 
 sub shutdown_please {
     print "Shutting down...\n";
@@ -212,7 +217,12 @@ sub done_working {
 
 sub started {
     my $self = shift;
-    _parsedate( $self->redis->get( $self->key( worker => $self->id => 'started' ) ) );
+    _parsedate( $self->_started );
+}
+
+sub _started {
+    my $self = shift;
+    $self->redis->get( $self->key( worker => $self->id => 'started' ) );
 }
 
 sub _parsedate {
@@ -223,7 +233,8 @@ sub _parsedate {
 
 sub set_started {
     my $self = shift;
-    $self->redis->set( $self->key( worker => $self->id => 'started' ), DateTime->now->strftime('%Y-%m-%d %H:%M:%S %Z') );
+    my $date = shift || DateTime->now->strftime('%Y-%m-%d %H:%M:%S %Z');
+    $self->redis->set( $self->key( worker => $self->id => 'started' ), $date );
 }
 
 sub processing {
@@ -231,9 +242,22 @@ sub processing {
     eval { $self->encoder->decode( $self->redis->get( $self->key( worker => $self->id ) ) ) } || {};
 }
 
+sub processing_map {
+    my $self = shift;
+    return {} unless @_;
+
+    my @ids  = map { ref($_) ? $_->id : $_ } @_;
+    my @proc = map { ($_ && $self->encoder->decode($_)) || {} }
+               $self->redis->mget( map { $self->key( worker => $_ ) } @ids );
+
+    my $count = 0;
+    return { map { $_ => $proc[$count++] } @ids };
+}
+
 sub processing_started {
     my $self = shift;
-    my $run_at = $self->processing->{run_at} || return;
+    my $proc = shift || $self->processing;
+    my $run_at = $proc->{run_at} || return;
     _parsedate($run_at);
 }
 
@@ -307,8 +331,30 @@ sub prune_dead_workers {
 
 sub register_worker {
     my $self = shift;
-    $self->redis->sadd( $self->key( 'workers'), $self->id );
+    $self->_register_id;
     $self->set_started;
+}
+
+sub _register_id {
+    my $self = shift;
+    $self->redis->sadd( $self->key( 'workers'), $self->id );
+}
+
+sub refresh_id {
+    my $self = shift;
+    my $id = $self->_stringify;
+    return if $id eq $self->id; # unchanged?
+    my $start = $self->_started || die "Can't refresh_id before start";
+    my $proc  = $self->stat->get("processed:$self");
+    my $fail  = $self->stat->get("failed:$self");
+    $self->redis->multi;
+    $self->_unregister_id;
+    $self->id($id);
+    $self->_register_id;
+    $self->set_started($start);
+    $self->stat->set("processed:$self", $proc);
+    $self->stat->set("failed:$self", $fail);
+    $self->redis->exec;
 }
 
 sub unregister_worker {
@@ -330,10 +376,16 @@ sub unregister_worker {
         }
     }
 
+    $self->_unregister_id;
+
+}
+
+# clear worker registry keys
+sub _unregister_id {
+    my $self = shift;
     $self->redis->srem( $self->key('workers'), $self->id );
     $self->redis->del( $self->key( worker => $self->id ) );
     $self->redis->del( $self->key( worker => $self->id => 'started' ) );
-
     $self->stat->clear("processed:$self");
     $self->stat->clear("failed:$self");
 }
@@ -389,18 +441,23 @@ sub failed {
 sub find {
     my ( $self, $worker_id ) = @_;
     if ( $self->exists( $worker_id ) ) {
-        my @queues = split ',', (split( ':', $worker_id))[-1];
-        return __PACKAGE__->new(
-            resque => $self->resque,
-            queues => \@queues,
-            id     => $worker_id
-        );
+        return $self->_from_id( $worker_id );
     }
+}
+
+sub _from_id {
+    my ( $self, $worker_id ) = @_;
+    my @queues = split ',', (split( ':', $worker_id))[-1];
+    __PACKAGE__->new(
+        resque => $self->resque,
+        queues => \@queues,
+        id     => $worker_id
+    );
 }
 
 sub all {
     my $self = shift;
-    my @w = grep {$_} map { $self->find($_) } $self->redis->smembers( $self->key('workers') );
+    my @w = map { $self->_from_id($_) } $self->redis->smembers( $self->key('workers') );
     return wantarray ? @w : \@w;
 }
 
@@ -423,7 +480,7 @@ Resque::Worker - Does the hard work of babysitting Resque::Job's
 
 =head1 VERSION
 
-version 0.41
+version 0.42
 
 =head1 ATTRIBUTES
 
@@ -604,6 +661,12 @@ Returns a hash explaining the Job we're currently processing, if any.
 
 $worker->processing();
 
+=head2 processing_map
+
+Returns a hashref of processing info for a given worker or worker ID list
+
+$worker->processing( $worker1, $worker2, $worker3->id );
+
 =head2 processing_started
 
 What time did this worker started to work on current job?
@@ -683,6 +746,19 @@ lifecycle on startup.
 
 $worker->register_worker();
 
+=head2 refresh_id
+
+Do the dirty work after changing the queues on an already
+register_worker().
+
+This will update backend on a single transactionto reflex
+current queues by changing this worker ID which need to
+unregister_worker() and register_worker() again while
+keeping stat() and started().
+
+Only useful when you dinamically update queues and want to
+watch it on the web interface.
+
 =head2 unregister_worker
 
 Unregisters ourself as a worker. Useful when shutting down.
@@ -714,7 +790,7 @@ my $jobs_run = $worker->processed( $boolean );
 How many failed jobs has this worker seen.
 Pass a true argument to increment by one before retrieval.
 
-my $jobs_run = $worker->processed( $boolean );
+my $jobs_run = $worker->failed( $boolean );
 
 =head2 find
 

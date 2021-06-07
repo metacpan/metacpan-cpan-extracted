@@ -1,0 +1,315 @@
+=encoding UTF-8
+
+=head1 NAME
+
+Game::Entities - A simple entity registry for ECS designs
+
+=head1 SYNOPSIS
+
+    my $ECS = Game::Entities->new;
+
+    # Create an entity with a possibly empty set of components
+    $guid = $ECS->create(
+        Collidable->new,
+        Drawable->new,
+        Consumable->new,
+    );
+
+    # CRUD operations on an entity's components
+    $ECS->add( $guid => Equipable->new );      # It is now equipable
+    $ECS->delete( $guid => 'Consumable' );     # It is no longer consumable
+    $item = $ECS->get( $guid => 'Equipable' );
+
+    # A system operates on sets of entities defined by a view
+    $view = $ECS->view(qw( Drawable Equipable ));
+
+    # You can iterate over the set with a callback
+    # The callback will get the GUID and the components in the order requested
+    $view->each( sub ( $guid, $draw, $item ) {
+        draw_equipment( $draw, $item );
+    });
+
+    # Or you can do the same iterating over the components
+    for ( $view->components ) {
+        my ( $draw, $item ) = @$_;
+        draw_equipment( $draw, $item );
+    }
+
+    # Or over the entity GUIDs
+    for my $guid ( $view->entities ) {
+        my ( $draw, $item ) = $ECS->get( $guid => qw( Drawable Equipable ) );
+        draw_equipment( $draw, $item );
+    }
+
+    # Or you can iterate over the view directly and get both
+    for ( @{ $view } ) {
+        my ( $guid, $draw, $item ) = ( $_->[0], @{ $_->[1] } );
+
+        if ( $ECS->get( $guid => 'Consumable' ) ) {
+            say 'This is equipment you can eat!';
+        }
+
+        ...
+    }
+
+    # Delete the entity and all its components
+    $ECS->delete($guid);
+
+    $ECS->clear; # Delete all entities and components
+
+=head1 DESCRIPTION
+
+Game::Entities is a minimalistic entity manager designed for applications
+using an ECS architecture.
+
+If you don't know what this means, Mick West's
+L<Evolve Your Hierarchy|http://cowboyprogramming.com/2007/01/05/evolve-your-heirachy>
+might be a good place to start.
+
+=head2 On Stability
+
+This distribution is currently B<experimental>, and as such, its API might
+still change without warning. Any change, breaking or not, will be noted in
+the change log, so if you wish to use it, please pin your dependencies and
+make sure to check the change log before upgrading.
+
+=head1 CONCEPTS
+
+Throughout this documentation, there are a couple of key concepts that will
+be used repeatedly:
+
+=head2 GUID
+
+Entities are represented by an opaque global unique identifier: a GUID. GUIDs
+used by Game::Entities are opaque to the user, and represent a particular
+version of an entity which will remain valid as long as that entity is not
+deleted (with C<delete> or C<clear>).
+
+Each Game::Entities registry supports up to 1,048,575 (2^20 - 1) simultaneous
+valid entity GUIDs.
+
+=head2 Valid entities
+
+An entity's GUID is valid from the time it is created with C<create> until the
+time it is deleted. An entity's GUID can be stored and used as an identifier
+anywhere in the program at any point during this time, but must not be used
+outside it.
+
+=head2 Components
+
+As far as Game::Entities is concerned, any reference of any type can be used
+as a component and added to an entity. This includes blessed and non-blessd
+references.
+
+Entities can have any number of components attached to them, but they will
+only ever have one component of any one type (as identified by C<ref>).
+
+=head2 Views
+
+A group of components defines a view, which is composed of all entities that
+have all of that view's components. This means that all the entities for the
+view for components C<A>, C<B>, and C<C> will have I<at least> all those
+components, but could of course have any others as well.
+
+The main purpose of views is to make it possible to iterate as fast as
+possible over any group of entities that have a set of common components.
+
+=head1 METHODS
+
+=head2 new
+
+    $ECS = Game::Entities->new;
+
+Creates a new entity registry. The constructor takes no arguments.
+
+=head2 create
+
+    $guid = $ECS->create(@components)
+
+Creates a new entity and returns its GUID. If called with a list of components,
+these will be added to the entity before returning.
+
+=head2 add
+
+    $ECS->add( $guid, @components );
+
+Takes an entity's GUID and a component, and adds that component to the
+specified entity. If the entity already had a component of that type, calling
+this method will silently overwrite it.
+
+Multiple components can be specified, and they will all be added in the order
+they were provided.
+
+=head2 get
+
+    $component  = $ECS->get( $guid, $component_name  );
+    @components = $ECS->get( $guid, @component_names );
+
+Takes an entity's GUID and the name of a component as a string, and retrieves
+the component with that name for the specified entity, if it exists. If the
+entity has no component by that name, this method returns undefined instead.
+
+Multiple components names can be specified, and they will all be retrieved and
+returned in the order they were provided.
+
+When called with a single target component name, this method returns a scalar.
+When called with a list of components names, it will return a list.
+
+=head2 delete
+
+    $ECS->delete( $guid );
+    $ECS->delete( $guid, @component_names );
+
+When called with only an entity's GUID, it deletes all components from the
+entity, and marks that entity's GUID as invalid.
+
+When called with one or more additional component names,the components by
+those names will be removed from the specified entity in the order provided.
+Deleting a component from an entity is an idempotent process.
+
+=head2 check
+
+    $bool = $ECS->check( $guid => $component_name );
+
+Takes an entity's GUID and a component name and returns a truthy value if the
+specified entity has a component by that name, or a falsy value otherwise.
+
+=head2 valid
+
+    $ECS->valid($guid);
+
+Takes an entity's GUID and returns a truthy value if the specified entity is
+valid, or a falsy value otherwise. An entity is valid if it has been created
+and not yet deleted.
+
+=head2 created
+
+    $count = $ECS->created;
+
+Returns the number of entities that have been created. Calling C<clear>
+resets this number.
+
+=head2 alive
+
+    $count = $ECS->alive;
+
+Returns the number of created entities that are still valid. That is:
+entities that have been created and not yet deleted.
+
+=head2 clear
+
+    $ECS->clear;
+
+Resets the internal storage of the registry. Calling this method leaves no
+trace from the previous state.
+
+=head2 view
+
+    $view = $ECS->view;
+    $view = $ECS->view(@component_names);
+
+Takes a set of one or more component names, and returns an internal object
+representing a I<view> for that specific set of components. Entities in the
+view are in no specific order, and this order is not guaranteed to remain the
+same.
+
+As a special case, calling this method with no arguments will generate a
+view which is guaranteed have all entities that were valid at the moment the
+view ws created.
+
+Once a view has been created, it should remain valid as long as none of the
+components in the view's set are added or deleted from any entity. Once this
+is done, the data returned by the view object is no longer guaranteed to be
+accurate. For this reason, it is not recommended to keep hold of view objects
+for longer than it takes to run an iteration.
+
+The view object can be used as an array reference to iterate over the pair
+of entity GUIDs and component sets. When used in this way, each value will
+be an array reference holding the GUID as the first value, and a nested array
+reference with the list of components as the second value.
+
+    for my $pair ( $ECS->view(@component_names)->@* ) {
+        my ( $guid, @components ) = ( $pair->[0], $pair->[1]->@* );
+        # Do something with the data
+    }
+
+The pairs returned when used in this way are returned by calling C<pairs> in
+L<List::Util|List::Util/pairs>.
+
+Apart from this, the interface for the view object is documented below:
+
+=head3 each
+
+    $view->each( sub ( $guid, @components ) { ... } );
+
+Takes a code reference which will be called once per entity in the view.
+
+The code reference will be called with the GUID for the current entity as the
+first parameter, and the components in the requested set in the
+order they were specified.
+
+If the view was created with no components (in other words, if it's a view
+of all entities), the list of components passed to the code reference will be
+empty.
+
+Within the callback, it is safe to add or delete entities, as well as to add
+or remove components from those entities.
+
+=head3 entities
+
+    @guids = $view->entities;
+
+Returns a list of only the GUIDs of the entities in this view.
+
+=head3 components
+
+    @components = $view->components;
+
+Returns a list of array references, each of which will hold the list of
+components for a single entity in the view. The components will be in the
+order provided when the view was created.
+
+Useful for iterating like
+
+    for ( $ECS->view(qw( A B C )) )->components ) {
+        my ( $a, $b, $c ) = @$_;
+        ...
+    }
+
+=head1 PERFORMANCE
+
+Game::Entities aims to implement a simple entity that is as fast as possible.
+Specifically, this means tht it needs to be fast enough to be used in game
+development, which is the natural use case for ECS designs.
+
+To this end, the library caches component iterators which are invalidated
+every time one of the components relevant to that iterator is either added
+or removed from any entity. This should make the common case of systems
+operating over sets of components that tend to be relatively stable
+(eg. across game frames) as fast as possible.
+
+The distribution includes two tests in its extended suite to test the
+performance with iterations over large number of entities
+(C<xt/short-loops.t>), and many iterations over small numbers of entities
+(C<xt/long-loops.t>). Please refer to these files for accurate estimations.
+
+=head1 SEE ALSO
+
+=over
+
+=item L<EnTT|https://skypjack.github.io/entt>
+
+Much of the design and API of this distribution is based on that of the
+entity registry in EnTT (famously used in Minecraft). A significant part
+of the credit for the algorithms and data structures used by Game::Entities
+falls on the EnTT developers and L<the blog posts|https://skypjack.github.io>
+they've made to explain how they work.
+
+=back
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright 2021 José Joaquín Atria
+
+This library is free software; you can redistribute it and/or modify it under
+the Artistic License 2.0.

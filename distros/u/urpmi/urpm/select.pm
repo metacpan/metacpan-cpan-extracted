@@ -728,10 +728,10 @@ sub should_we_migrate_back_rpmdb_db_version {
 
     my ($pkg) = urpm::select::selected_packages_providing($urpm, $state, 'rpm') or return;
     urpm::select::was_pkg_name_installed($state->{rejected}, 'rpm') and return;
-    my ($rooted_librpm_version) = map { _libdb_version($_) } $pkg->requires; # perl_checker: $self = revision
+    my ($rooted_libbdb_version) = map { _libdb_version($_) } $pkg->requires; # perl_checker: $self = revision
     my $rooted_rpm_version = version->new("v" . $pkg->version); # perl_checker: $self = revision
 
-    my $urpmi_librpm_version = _libdb_version(scalar `ldd /bin/rpm`); # perl_checker: $self = revision
+    my $urpmi_libbdb_version = _libdb_version(scalar `ldd /bin/rpm`); # perl_checker: $self = revision
 
     if (_rpm_version() ge v4.9.0) { # perl_checker: $self = revision
 	if ($rooted_rpm_version && $rooted_rpm_version ge v4.9) {
@@ -740,8 +740,8 @@ sub should_we_migrate_back_rpmdb_db_version {
 	    $urpm->{need_migrate_rpmdb} = '4.8';
 	    return 1;
 	}
-    } elsif ($urpmi_librpm_version ge v4.6) {
-	if ($rooted_librpm_version && $rooted_librpm_version ge v4.6) {
+    } elsif ($urpmi_libbdb_version ge v4.6) {
+	if ($rooted_libbdb_version && $rooted_libbdb_version ge v4.6) {
 	    $urpm->{debug} and $urpm->{debug}("chrooted db version used by librpm is at least as good as non-rooted one");
 	} else {
 	    foreach my $bin ('db_dump', 'db42_load') {
@@ -751,6 +751,27 @@ sub should_we_migrate_back_rpmdb_db_version {
 	    }
 	    $urpm->{need_migrate_rpmdb} = '4.6';
 	    return 1;
+	}
+    }
+    0;
+}
+
+sub migrate_forward_rpmdb_db_if_needed {
+    my ($urpm, $state) = @_;
+
+    my ($pkg) = selected_packages_providing($urpm, $state, 'rpm') or return;
+    my $rooted_rpm_version = version->new("v" . $pkg->version); # perl_checker: $self = revision
+    my $rpm_version = _rpm_version(); # perl_checker: $self = revision
+
+    if ($rpm_version ge v4.16.0) {
+	if ($rooted_rpm_version && $rooted_rpm_version ge v4.16) {
+	    $urpm->{debug} and $urpm->{debug}("chrooted db version used by librpm is at least as good as non-rooted one");
+	    if (-f "$urpm->{root}/var/lib/rpm/Packages") {
+		$urpm->{debug} and $urpm->{debug}("Migrating chrooted db");
+		$urpm->{need_migrate_rpmdb_now} = '4.16';
+		urpm::sys::migrate_forward_rpmdb_db_version($urpm, $urpm->{root});
+		return 1;
+	    }
 	}
     }
     0;

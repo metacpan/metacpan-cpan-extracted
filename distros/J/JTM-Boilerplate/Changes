@@ -1,3 +1,9 @@
+2.211420  2021-05-22 03:11:56+00:00 UTC
+ Joelle Maslak <jmaslak@antelopenet>
+ * Take advantage of 5.34 features
+ * Normalize JCM::Bootstrap w/ JTM::Bootstrap
+ * Drop support for Perl < 5.22
+
 2.202310  2020-08-18 16:22:33+00:00 UTC
  Joelle Maslak <jmaslak@antelope.net>
  * Enable "no feature qw(indirect)" on 5.32+

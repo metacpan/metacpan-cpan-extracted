@@ -3,9 +3,9 @@ NAME
     into your POD
 
 VERSION
-    This document describes version 0.042 of
+    This document describes version 0.044 of
     Dist::Zilla::Plugin::InsertCodeOutput (from Perl distribution
-    Dist-Zilla-Plugin-InsertCodeOutput), released on 2020-02-21.
+    Dist-Zilla-Plugin-InsertCodeOutput), released on 2021-05-21.
 
 SYNOPSIS
     In dist.ini:
@@ -46,8 +46,8 @@ SOURCE
 
 BUGS
     Please report any bugs or feature requests on the bugtracker website
-    <https://rt.cpan.org/Public/Dist/Display.html?Name=Dist-Zilla-Plugin-Ins
-    ertCodeOutput>
+    <https://github.com/perlancar/perl-Dist-Zilla-Plugin-InsertCodeOutput/is
+    sues>
 
     When submitting a bug or request, please include a test-file or a patch
     to an existing test-file that illustrates the bug or desired feature.
@@ -66,7 +66,7 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2020, 2019, 2018, 2015, 2014 by
+    This software is copyright (c) 2021, 2020, 2019, 2018, 2015, 2014 by
     perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under

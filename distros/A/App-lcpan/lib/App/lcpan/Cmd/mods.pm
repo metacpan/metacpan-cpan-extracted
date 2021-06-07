@@ -1,7 +1,7 @@
 package App::lcpan::Cmd::mods;
 
-our $DATE = '2020-08-13'; # DATE
-our $VERSION = '1.062'; # VERSION
+our $DATE = '2021-06-05'; # DATE
+our $VERSION = '1.068'; # VERSION
 
 use 5.010;
 use strict;
@@ -35,7 +35,7 @@ App::lcpan::Cmd::mods - Alias for 'modules'
 
 =head1 VERSION
 
-This document describes version 1.062 of App::lcpan::Cmd::mods (from Perl distribution App-lcpan), released on 2020-08-13.
+This document describes version 1.068 of App::lcpan::Cmd::mods (from Perl distribution App-lcpan), released on 2021-06-05.
 
 =head1 FUNCTIONS
 
@@ -44,7 +44,7 @@ This document describes version 1.062 of App::lcpan::Cmd::mods (from Perl distri
 
 Usage:
 
- handle_cmd(%args) -> [status, msg, payload, meta]
+ handle_cmd(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Alias for 'modules'.
 
@@ -121,7 +121,7 @@ Select modules belonging to certain namespace(s).
 
 When there are more than one query, perform OR instead of AND logic.
 
-=item * B<perl_version> => I<str> (default: "v5.30.0")
+=item * B<perl_version> => I<str> (default: "v5.34.0")
 
 Set base Perl version for determining core modules.
 
@@ -130,6 +130,18 @@ Set base Perl version for determining core modules.
 Search query.
 
 =item * B<query_type> => I<str> (default: "any")
+
+=item * B<random> => I<true>
+
+Random sort.
+
+=item * B<result_limit> => I<uint>
+
+Only return a certain number of records.
+
+=item * B<result_start> => I<posint> (default: 1)
+
+Only return starting from the n'th record.
 
 =item * B<sort> => I<array[str]> (default: ["module"])
 
@@ -159,12 +171,12 @@ off.
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -194,7 +206,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020, 2019, 2018, 2017, 2016, 2015 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2020, 2019, 2018, 2017, 2016, 2015 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

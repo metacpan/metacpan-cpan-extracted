@@ -1,3 +1,8 @@
+0.003002 2021-05-20
+- fixed Makefile.PL (again)..
+  made sure Devel::CheckLib is added
+  to META.json by dzil
+
 0.003001 2021-05-12
 - fixed Makefile.PL
 

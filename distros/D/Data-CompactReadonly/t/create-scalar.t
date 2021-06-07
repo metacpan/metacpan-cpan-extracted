@@ -3,6 +3,7 @@ use warnings;
 no warnings qw(portable overflow);
 
 use File::Temp qw(tempfile);
+use Scalar::Type qw(:all);
 use Test::More;
 use lib 't/lib';
 use TestFloat;
@@ -18,7 +19,6 @@ is(my $data = Data::CompactReadonly->read($filename), undef, "can create a Null 
 
 foreach my $tuple (
     [0,                    7], # Byte
-    ['0',                  7], # Byte
     [0x01,                 7],
     [0x0102,               8],
     [0x010203,             9],
@@ -65,24 +65,43 @@ foreach my $length (1, 1000) {
 }
 
 foreach my $test ( # torture tests
-    ['007',   10], # Text
-    ['000',   10], # Text
-    ['00.7',  11], # Text
-    ['00.07', 12], # Text
-    ['0.07',  14, 'cmp_float'], # Float
-    ['7.01',  14, 'cmp_float'], # Float
-    ['7.0',   10], # Text
-    ['7.00',  11], # Text
-    ['7.10',  11], # Text
+    ['007',   10, 'Text'],
+    [007,     7,  'Int'],
+    ['7',     8,  'Text'],
+    [7,       7,  'Int'],
+    [7.0,     14, 'Float'],
+    ['000',   10, 'Text'],
+    ['0',     8,  'Text'],
+    [0,       7,  'Int'],
+    [0.0,     14, 'Float'],
+    ['00.7',  11, 'Text'],
+    ['00.07', 12, 'Text'],
+    [0.07,    14, 'Float'],
+    ['0.07',  11, 'Text'],
+    [7.01,    14, 'Float'],
+    ['7.01',  11, 'Text'],
+    ['7.0',   10, 'Text'],
+    ['7.00',  11, 'Text'],
+    ['7.10',  11, 'Text'],
 ) {
-    my($value, $filesize, $cmp_float) = @{$test};
+    my($value, $filesize, $type) = @{$test};
     Data::CompactReadonly->create($filename, $value);
-    if($cmp_float) {
-        cmp_float($data = Data::CompactReadonly->read($filename), $value, "can create a file with value '$value'");
-    } else {
-        is($data = Data::CompactReadonly->read($filename), $value, "can create a file with value '$value'");
-    }
-    is((stat($filename))[7], $filesize, "... file is expected size for data $value") || diag(`hexdump -C $filename`);
+
+    my $data = Data::CompactReadonly->read($filename);
+    
+    $type eq 'Text' ?
+        ok($data eq $value, "can create a file with text value '$value'") &&
+        is(type($data), 'SCALAR', "... and read back an SV of the right type"):
+    $type eq 'Float' ?
+        cmp_float($data, $value, "can create a file with float value $value") &&
+        is(type($data), 'NUMBER', "... and read back an SV of the right type"):
+    $type eq 'Int' ?
+        ok($data == $value, "can create a file with integer value $value") &&
+        is(type($data), 'INTEGER', "... and read back an SV of the right type"):
+    die("WTF is a $type?\n");
+
+    is((stat($filename))[7], $filesize, "... and file is expected size")
+        || diag(`hexdump -C $filename`);
 }
 
 done_testing;

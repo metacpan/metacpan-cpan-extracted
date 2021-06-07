@@ -1,5 +1,9 @@
 Revision history for Business-Fixflo
 
+0.42     2021-05-25
+        - Support proxy on UA in Business::Fixflo::Client (GH #2, thanks to voidhaze)
+        - Add Warrenties to Business::Fixflo::Property
+
 0.41     2021-02-22
         - Add AgencyId to Business::Fixflo::Issue
 

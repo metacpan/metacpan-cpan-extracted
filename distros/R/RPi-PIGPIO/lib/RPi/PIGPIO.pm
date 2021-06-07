@@ -206,7 +206,7 @@ Usage:
 use strict;
 use warnings;
 
-our $VERSION     = '0.016';
+our $VERSION     = '0.017';
 
 use Exporter 5.57 'import';
 
@@ -1631,7 +1631,9 @@ sub i2c_zip {
 }
 
 
-=head2 write_pwm
+=head2 PWM
+
+=head3 write_pwm
 
 Sets the voltage level on a GPIO pin to a value from 0-255 (PWM) 
 approximating a lower voltage.  Useful for dimming LEDs for example.

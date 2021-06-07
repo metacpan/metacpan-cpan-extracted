@@ -4,13 +4,13 @@
       "Bastian Friedrich <bastian.friedrich@collax.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.140640",
+   "generated_by" : "ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "unknown"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Linux-Fanotify",
    "no_index" : {
@@ -39,5 +39,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "v1.1.1"
+   "version" : "v1.2.0",
+   "x_serialization_backend" : "JSON::PP version 4.04"
 }

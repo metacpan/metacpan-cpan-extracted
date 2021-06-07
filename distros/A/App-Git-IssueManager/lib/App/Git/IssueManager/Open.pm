@@ -49,7 +49,7 @@ App::Git::IssueManager::Open - class implementing the open issue command of the 
 
 =head1 VERSION
 
-version 0.1
+version 0.2
 
 =head1 AUTHOR
 

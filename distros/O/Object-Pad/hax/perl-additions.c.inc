@@ -1,4 +1,4 @@
-/* vi: set ft=c */
+/* vi: set ft=c : */
 
 #ifndef av_count
 #  define av_count(av)           (AvFILL(av) + 1)
@@ -157,7 +157,7 @@ static OP *S_newLOGOP_CUSTOM(pTHX_ OP *(*func)(pTHX), U32 flags, OP *first, OP *
   return o;
 }
 
-static char *PL_savetype_name[] = {
+static char *PL_savetype_name[] PERL_UNUSED_DECL = {
   /* These have been present since 5.16 */
   [SAVEt_ADELETE]             = "ADELETE",
   [SAVEt_AELEM]               = "AELEM",

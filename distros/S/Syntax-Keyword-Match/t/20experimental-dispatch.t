@@ -34,4 +34,27 @@ sub match_case
       for sort keys %expect;
 }
 
+# overloaded 'eq' operator
+{
+   my $equal;
+   package Greedy {
+      use overload 'eq' => sub { $equal };
+   }
+
+   sub greedy_is_ten
+   {
+      match(bless [], "Greedy" : eq) {
+         case("ten")    { return "YES" }
+         case("twenty") { return "NO" }
+         default        { return "NO" }
+      }
+   }
+
+   $equal = 1;
+   is( greedy_is_ten, "YES", 'Greedy is 10 when set' );
+
+   $equal = 0;
+   is( greedy_is_ten, "NO", 'Greedy is not 10 when unset' );
+}
+
 done_testing;

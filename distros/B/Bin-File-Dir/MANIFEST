@@ -1,0 +1,17 @@
+Changes
+INSTALL
+lib/Bin/File/Dir.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README
+scripts/depthdepth
+scripts/dirdig
+scripts/dirdim
+scripts/dirhier
+scripts/fileday
+scripts/samesize
+scripts/updir
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

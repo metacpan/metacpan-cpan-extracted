@@ -27,6 +27,15 @@ sub skippable {
 
 
 my %tests = (
+    '5.034' => [
+        [ '{,n}',
+          '"ac" =~ /ab{,1}c/', 1 ],
+        [ '0o',
+          '0o12 == 10', 1 ],
+        [ 'blanks-in-curlies',
+          '"\x{ 61 }"', 'a' ]
+    ],
+
     '5.032' => [
         [ 'unicode13.0',
           '"\N{NINJA}\N{DODO}"'
@@ -61,6 +70,8 @@ my %tests = (
               '": testing locale not supported"',
               "", '1'),
           1 ],
+        [ '^RE_COMPILE_RECURSION_LIMIT',
+          'defined ${^RE_COMPILE_RECURSION_LIMIT}', 1 ],
     ],
 
     '5.028' => [
@@ -157,6 +168,8 @@ my %tests = (
           . '$k .= $_, $v .= $h{$_} while each %h;'
           . '$k =~ /^[ABC]{3}$/ && $v =~ /^[abc]{3}$/ ',
           1 ],
+        [ 'method-on-any-string',
+          '"3foo"->CORE::uc', '3FOO' ],
     ],
 
     '5.014' => [
@@ -257,7 +270,10 @@ my %tests = (
           '"abc" =~ /b/p;${^PREMATCH}', 'a'],
         [ 'lexical-$_',
           '$_ = 7; { my $_ = 42; } $_ ', 7 ],
+        [ 'pack<',
+          'pack "s<s>", 9, 12', "\x09\x00\x00\x0c" ],
     ],
+
     '5.008001' => [
         [ 's-utf8-delimiters-hack',
           eval q{qq{ my \$string = "a"; use utf8; \$string =~ s\N{U+2759}a\N{U+2759}\N{U+2759}b\N{U+2759}; \$string }}, 'b' ],
@@ -267,9 +283,8 @@ my %tests = (
 my $count = 0;
 
 for my $version (keys %tests) {
-    my $vf = sprintf '%.3f', $version;
     my @triples = @{ $tests{$version} };
-    my $can = eval { require ( 0 + $version) };
+    my $can = eval { require (0 + "$version") };
     $count += @triples;
     for my $triple (@triples) {
         my $removed_version = Syntax::Construct::removed($triple->[0]);
@@ -297,7 +312,7 @@ for my $version (keys %tests) {
             }
         } else {
             like($load_error,
-                 qr/^Unsupported construct \Q$triple->[0]\E at .*?02-constructs\.t line [0-9]+ \(Perl \Q$vf\E needed\)\n/,
+                 qr/^Unsupported construct \Q$triple->[0]\E at .*?02-constructs\.t line [0-9]+ \(Perl \Q$version\E needed\)\n/,
                  "$triple->[0] not supported");
             if (($value || "") ne 'SKIPPED'
                 && ($triple->[3] || "") ne MAY_WORK_IN_OLDER

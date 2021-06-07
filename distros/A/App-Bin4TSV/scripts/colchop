@@ -1,0 +1,97 @@
+#!/usr/bin/perl 
+use 5.014 ; use warnings ; 
+use Getopt::Std ; getopts ':.:/:!bg:h:uvwy:' => \my%o ; # 5.014 で何度か実行済み
+use Encode qw[ decode_utf8 ] ; 
+use List::Util qw [ any ] ; 
+eval 'use Text::VisualWidth::UTF8 qw[trim width]; 1' or die 'Be Text::VisualWidth::UTF8 installed.' if $o{v} ; 
+
+* trim = * Text::VisualWidth::UTF8::trim if $o{v} ; # 単に警告を回避するために、次行以外にこの行を挿入。
+* trim = $o{v} ? * Text::VisualWidth::UTF8::trim : sub { substr ( $_[0], 0 , $_[1] ) } ; 
+
+$| = 1 if $o{'!'} ; # オートフラッシュの設定　<- -- 必要か?
+$o{h} //= 0 ; # 左から何列は手を加えないかを洗わす。
+# 出力する文字列の長さの最大値と折り返し数の最大値
+my ($tlen, $tmax) = do { ($o{g}//='') =~ m/(\d*)\D?(\d*)/ ; ( $1 || 6 , $2 // 2 || "Inf")  } ; 
+#say STDERR $tlen,' ', $tmax;
+my $existNext = $o{'.'} // '.' ; # また表示が足りない時に、セル末に挿入する文字列
+my $iosep = $o{'/'} // "\t" ; # 入出力の区切り文字
+
+binmode STDIN, ":encoding(utf8)" if ! $o{w} && $o{u} ;   # binmode の指定は、 substr関数に影響する。
+binmode STDIN, ":encoding(cp932)" if $o{w} ; # <-- - SJIS <<? "cp932" 絵文字も考えたい
+binmode STDOUT,":encoding(utf8)" if $o{u} || $o{w} ;  #$/ = "\r\n" if $o{W} ;
+
+& main ; 
+exit ; 
+
+sub aLinOut ( @ ) { 
+  my @cells ;
+  for ( 1 .. $#_ ) { # 各マスの文字列について..  ( $_ は1始まりで左から何番目かを表す )
+    push @cells , undef and next if ! defined $_[$_] ; # 未定義なら未定義として
+    my $str = $_ <= $o{h} ? $_[$_] : trim ( $_[$_] , $tlen ) ; # -h で左からいくつかの列は保護する指定があれば、そのようにして ..
+    $_[$_] =~ s/^\Q$str\E// ; 
+    $_[$_] = undef if $_[$_] =~ m/^$/ ;
+    push @cells , $str . ( defined $_[$_] ? $existNext : '' ) ;
+  }
+  unshift @cells , "$_[0]" if defined $_[0] ;
+  say join $iosep , map { $_ // '' } @cells ;  
+}
+
+sub main ( ) { 
+  while ( <> ) { 
+    chomp ; 
+    my $lc = "$.:" if $o{':'} ;  # -:  指定で、行番号を1回だけ表示 LineCount
+    my @F = split /$iosep/o , $_ , -1 ; 
+    #for ( my $t=0 ; ++$t <= $tmax ; ) { aLinOut ($lc, @F) ; $lc = '' ; last if ! any { defined $_ } @F } 
+    for ( my $t=0 ; ++$t <= $tmax ; ) { aLinOut $lc, @F ; last if ! any { defined $_ } @F } 
+  }
+}
+
+
+## ヘルプの扱い
+sub VERSION_MESSAGE {}
+sub HELP_MESSAGE {
+    use FindBin qw[ $Script ] ; 
+    $ARGV[1] //= '' ;
+    open my $FH , '<' , $0 ;
+    while(<$FH>){
+        s/\$0/$Script/g ;
+        print $_ if s/^=head1// .. s/^=cut// and $ARGV[1] =~ /^o(p(t(i(o(ns?)?)?)?)?)?$/i ? m/^\s+\-/ : 1;
+    }
+    close $FH ;
+    exit 0 ;
+}
+
+=encoding utf8 
+
+=head1
+
+ $0 -bg (バイト数)(,折り返しの最大値)
+ $0 -ug (UTF-8の文字数)(,折り返しの最大値)
+ $0 -vg (半角文字幅)(,折り返しの最大値) 
+
+  タブ文字などで区切られた各フィールドを、指定された幅のみ表示する。
+   Unix/Linux の　tabs コマンドで表示設定を変えながら見るのも良い。
+   ビューアless を起動中に -x N(数) と入力してEnter するもの良い。
+
+オプション :
+
+  -b : バイト数で計算する。
+  -u :  utf-8 とみなして、長さを計算する。そうでなければ、単純なバイト長になる。
+  -v :  utf-8 の文字幅で長さを計算する(半角は1、全角は2)。(visual-width)
+
+  -g N1,N2  : N1は何文字ずつ取り出すか。未指定なら 6。N2は最大何回取り出すか。0なら無制限。未指定なら2。
+  -h N ; 左からN列のセルは、折り返す処理をしない。<-- 
+  -w    ; CP932 (SJIS)として処理をする。
+
+  -. STRING ; セル内改行の末尾に付ける文字列を | から変更する。
+  -/ REGEX : 入出力の区切り文字のタブ文字からの変更。
+  -: ; 行番号を出力。
+  -!  : フラッシュする。バッファに貯めない。 
+  --help : この $0 のヘルプメッセージを出す。  perldoc -t $0 | cat でもほぼ同じ。
+  --help opt : オプションのみのヘルプを出す。opt以外でも options と先頭が1文字以上一致すれば良い。
+ 
+ 開発メモ : 
+  * 半角空白で、最大許容幅に足りない分を埋めるオプションを実装したい。
+  * -wのテストができてないはず。
+
+=cut

@@ -323,21 +323,18 @@ has 'Form' => (
             $self->asp->req->body_parameters->flatten,
             $self->asp->req->uploads->flatten,
         );
-    },
-    handles_via => 'Hash',
-    handles     => {
-        _get_FormField => 'get',
-    },
+    }
 );
 
 sub Form {
     my ( $self, $name ) = @_;
 
+    my $form = $self->_get_Form;
     if ( $name ) {
-        my $value = $self->_get_FormField( $name );
-        return wantarray && ref $value eq 'ARRAY' ? @$value : $value;
+        my @values = $form->get_all( $name );
+        return wantarray ? @values : $values[0];
     } else {
-        return $self->_get_Form;
+        return $form;
     }
 }
 
@@ -363,20 +360,17 @@ has 'Params' => (
     reader      => '_get_Params',
     lazy        => 1,
     default     => sub { shift->asp->req->parameters },
-    handles_via => 'Hash',
-    handles     => {
-        _get_Param => 'get',
-    },
 );
 
 sub Params {
     my ( $self, $name ) = @_;
 
+    my $params = $self->_get_Params;
     if ( $name ) {
-        my $param = $self->_get_Param( $name );
-        return wantarray && ref $param eq 'ARRAY' ? @$param : $param;
+        my @values = $params->get_all( $name );
+        return wantarray ? @values : $values[0];
     } else {
-        return $self->_get_Params;
+        return $params;
     }
 }
 
@@ -395,20 +389,17 @@ has 'QueryString' => (
     reader      => '_get_QueryString',
     lazy        => 1,
     default     => sub { shift->asp->req->query_parameters },
-    handles_via => 'Hash',
-    handles     => {
-        _get_Query => 'get',
-    },
 );
 
 sub QueryString {
     my ( $self, $name ) = @_;
 
+    my $qparams = $self->_get_QueryString;
     if ( $name ) {
-        my $qparam = $self->_get_Query( $name );
-        return wantarray && ref $qparam eq 'ARRAY' ? @$qparam : $qparam;
+        my @values = $qparams->get_all( $name );
+        return wantarray ? @values : $values[0];
     } else {
-        return $self->_get_QueryString;
+        return $qparams;
     }
 }
 

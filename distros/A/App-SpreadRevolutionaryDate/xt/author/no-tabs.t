@@ -22,6 +22,8 @@ my @files = (
     'lib/App/SpreadRevolutionaryDate/Target.pm',
     'lib/App/SpreadRevolutionaryDate/Target/Freenode.pm',
     'lib/App/SpreadRevolutionaryDate/Target/Freenode/Bot.pm',
+    'lib/App/SpreadRevolutionaryDate/Target/Liberachat.pm',
+    'lib/App/SpreadRevolutionaryDate/Target/Liberachat/Bot.pm',
     'lib/App/SpreadRevolutionaryDate/Target/Mastodon.pm',
     'lib/App/SpreadRevolutionaryDate/Target/Twitter.pm',
     't/00-compile.t',

@@ -3,7 +3,7 @@ package App::perlimports::CLI;
 use Moo;
 use utf8;
 
-our $VERSION = '0.000006';
+our $VERSION = '0.000007';
 
 use App::perlimports           ();
 use App::perlimports::Document ();
@@ -12,11 +12,10 @@ use Getopt::Long::Descriptive qw( describe_options );
 use List::Util qw( uniq );
 use Log::Dispatch ();
 use Path::Tiny qw( path );
-use Pod::Usage qw( pod2usage );
 use Types::Standard qw( ArrayRef HashRef InstanceOf Object Str );
 
 has _args => (
-    is      => 'rw',
+    is      => 'ro',
     isa     => HashRef,
     lazy    => 1,
     builder => '_build_args',
@@ -37,14 +36,14 @@ has _never_exports => (
 );
 
 has _opts => (
-    is      => 'rw',
+    is      => 'ro',
     isa     => InstanceOf ['Getopt::Long::Descriptive::Opts'],
     lazy    => 1,
     default => sub { $_[0]->_args->{opts} },
 );
 
 has _usage => (
-    is      => 'rw',
+    is      => 'ro',
     isa     => Object,
     lazy    => 1,
     default => sub { $_[0]->_args->{usage} },
@@ -64,6 +63,12 @@ sub _build_args {
         [
             'ignore-modules=s',
             'Comma-separated list of modules to ignore.'
+        ],
+        [],
+        [
+            'cache!',
+            '(Experimental.) Cache some objects in order to speed up subsequent runs. Defaults to no cache.',
+            { default => 0 },
         ],
         [],
         [
@@ -169,7 +174,8 @@ sub run {
 
     if ( $opts->verbose_help ) {
         print $self->_usage->text;
-        print pod2usage();
+        require Pod::Usage;    ## no perlimports
+        print Pod::Usage::pod2usage();
         return;
     }
 
@@ -205,6 +211,7 @@ sub run {
     my ( $stdout, $tidied ) = capture_stdout(
         sub {
             my $pi_doc = App::perlimports::Document->new(
+                cache    => $opts->cache,
                 filename => $opts->filename,
                 @{ $self->_ignore_modules }
                 ? ( ignore_modules => $self->_ignore_modules )
@@ -246,7 +253,7 @@ App::perlimports::CLI - CLI arg parsing for C<perlimports>
 
 =head1 VERSION
 
-version 0.000006
+version 0.000007
 
 =head1 DESCRIPTION
 

@@ -1,5 +1,5 @@
 package Photonic::LE::NP::EpsTensor;
-$Photonic::LE::NP::EpsTensor::VERSION = '0.015';
+$Photonic::LE::NP::EpsTensor::VERSION = '0.016';
 
 =encoding UTF-8
 
@@ -39,7 +39,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA  02110-1301 USA
 
 =head1 VERSION
 
-version 0.015
+version 0.016
 
 =head1 SYNOPSIS
 
@@ -63,7 +63,7 @@ functions of the components.
 
 Initializes the structure.
 
-$e PDL::Complex is the dielectric function as a complex scalar field
+$e complex PDL is the dielectric function as a complex scalar field
 
 $g Photonic::Geometry describing the structure
 
@@ -76,13 +76,13 @@ $k is a flag to keep states in Haydock calculations (default 0)
 
 =back
 
-=head1 ACCESORS (read only)
+=head1 ACCESSORS (read only)
 
 =over 4
 
 =item * epsilon
 
-A PDL::Complex PDL giving the value of the dielectric function epsilon
+A complex PDL giving the value of the dielectric function epsilon
 for each pixel of the system
 
 =item * keepStates
@@ -122,18 +122,15 @@ don't check.
 
 use namespace::autoclean;
 use PDL::Lite;
-use PDL::NiceSlice;
-use PDL::Complex;
-use PDL::MatrixOps;
-use Storable qw(dclone);
-use PDL::IO::Storable;
+use Photonic::Utils qw(tensor make_haydock);
+use List::Util qw(all);
 use Photonic::LE::NP::AllH;
 use Photonic::LE::NP::EpsL;
 use Photonic::Types;
 use Moose;
 use MooseX::StrictConstructor;
 
-has 'epsilon'=>(is=>'ro', isa=>'PDL::Complex', required=>1);
+has 'epsilon'=>(is=>'ro', isa=>'Photonic::Types::PDLComplex', required=>1);
 has 'geometry'=>(is=>'ro', isa => 'Photonic::Types::Geometry',
     handles=>[qw(B dims r G GNorm L scale f)],required=>1
 );
@@ -156,58 +153,19 @@ has 'converged'=>(is=>'ro', init_arg=>undef, writer=>'_converged',
 
 sub _build_epsTensor {
     my $self=shift;
-    my @eps; #array of @eps along different directions.
-    my $converged=1;
-    foreach(@{$self->epsL}){
-	push @eps, $_->epsL;
-	$converged &&=$_->converged;
-    }
-    $self->_converged($converged);
-    my $reEpsL=PDL->pdl([map {$_->re} @eps]);
-    my $imEpsL=PDL->pdl([map {$_->im} @eps]);
-    my ($lu, $perm, $parity)=@{$self->geometry->unitDyadsLU};
-    my $reEps=lu_backsub($lu, $perm, $parity, $reEpsL);
-    my $imEps=lu_backsub($lu, $perm, $parity, $imEpsL);
-    my $nd=$self->geometry->B->ndims;
-    my $epsTensor=PDL->zeroes(2, $nd, $nd)->complex;
-    my $n=0;
-    for my $i(0..$nd-1){
-	for my $j($i..$nd-1){
-	    $epsTensor->(:,($i),($j)).=$reEps->($n)+i*$imEps->($n);
-	    $epsTensor->(:,($j),($i)).=$reEps->($n)+i*$imEps->($n);
-	    ++$n;
-	}
-    }
-    return $epsTensor;
+    $self->_converged(all { $_->converged } @{$self->epsL});
+    tensor(pdl([map $_->epsL, @{$self->epsL}]), $self->geometry->unitDyadsLU, $self->geometry->B->ndims, 2);
 }
 
 sub _build_nr { # One Haydock coefficients calculator per direction0
     my $self=shift;
-    my @nr;
-    foreach(@{$self->geometry->unitPairs}){
-	my $g=dclone($self->geometry); #clone geometry
-	$g->Direction0($_); #add G0 direction
-	#Build a corresponding LE::NP::AllH structure
-	my $nr=Photonic::LE::NP::AllH->new(
-	    epsilon=>$self->epsilon, geometry=>$g, smallH=>$self->smallH,
-	    nh=>$self->nh, keepStates=>$self->keepStates,
-	    reorthogonalize=>$self->reorthogonalize);
-	push @nr, $nr;
-    }
-    return [@nr]
+    make_haydock($self, 'Photonic::LE::NP::AllH', 1, 'epsilon');
 }
 
 sub _build_epsL {
     my $self=shift;
-    my @eps;
-    foreach(@{$self->nr}){
-	my $e=Photonic::LE::NP::EpsL->
-	    new(nr=>$_, nh=>$self->nh, smallE=>$self->smallE);
-	push @eps, $e;
-    }
-    return [@eps]
+    [ map Photonic::LE::NP::EpsL->new(nr=>$_, nh=>$self->nh, smallE=>$self->smallE), @{$self->nr} ];
 }
-
 
 __PACKAGE__->meta->make_immutable;
 

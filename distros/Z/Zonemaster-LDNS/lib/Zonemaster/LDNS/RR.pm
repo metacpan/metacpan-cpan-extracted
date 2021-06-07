@@ -10,6 +10,7 @@ use Zonemaster::LDNS::RR::AFSDB;
 use Zonemaster::LDNS::RR::APL;
 use Zonemaster::LDNS::RR::ATMA;
 use Zonemaster::LDNS::RR::CAA;
+use Zonemaster::LDNS::RR::CDNSKEY;
 use Zonemaster::LDNS::RR::CDS;
 use Zonemaster::LDNS::RR::CERT;
 use Zonemaster::LDNS::RR::CNAME;

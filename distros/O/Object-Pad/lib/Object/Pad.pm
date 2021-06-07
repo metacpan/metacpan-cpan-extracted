@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2019-2020 -- leonerd@leonerd.org.uk
 
-package Object::Pad 0.38;
+package Object::Pad 0.40;
 
 use v5.14;
 use warnings;
@@ -443,7 +443,13 @@ Declares that this role requires a method of the given name from any class
 that implements it. It is an error at compiletime if the implementing class
 does not provide such a method.
 
-=head1 IMPLIED PRAGMATA
+=head1 CREPT FEATURES
+
+While not strictly part of being an object system, this module has
+nevertheless gained a number of behaviours by feature creep, as they have been
+found useful.
+
+=head2 Implied Pragmata
 
 In order to encourage users to write clean, modern code, the body of the
 C<class> block acts as if the following pragmata are in effect:
@@ -463,6 +469,12 @@ within the body. As long as you write code that is in a clean, modern style
 find any new restrictions to be majorly problematic. Either the code will
 continue to run unaffected, or you may have to make some small alterations to
 bring it into a conforming style.
+
+=head2 Yield True
+
+A C<class> statement or block will yield a true boolean value. This means that
+it can be used directly inside a F<.pm> file, avoiding the need to explicitly
+yield a true value from the end of it.
 
 =head1 SUBCLASSING CLASSIC PERL CLASSES
 

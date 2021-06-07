@@ -1,5 +1,5 @@
 package Finance::Dogechain::Address;
-$Finance::Dogechain::Address::VERSION = '1.20210418.2306';
+$Finance::Dogechain::Address::VERSION = '1.20210605.1754';
 use Mojo::Base -base, -signatures, 'Finance::Dogechain::Base';
 
 has 'address';
@@ -41,15 +41,18 @@ Finance::Dogechain::Address - class representing addresses in the Dogechain API
 
     use Finance::Dogechain::Address;
 
-    my $address = Finance::Dogechain::Address(
+    my $address = Finance::Dogechain::Address->new(
         address => 'DDMczmdPkpHMCaAJGEno11hMRc46A2uKsj',
     );
 
-    for my $transaction ($address->{txs}->@*) { ... }
+    my $balance  = $address->balance;
+    my $received = $address->received;
+    my $sent     = $address->sent;
+    my $unspent  = $address->unspent;
 
 =head1 DESCRIPTION
 
-C<Finance::Dogechain::Address> represents transactions in the Dogechain API. It
+C<Finance::Dogechain::Address> represents addresses in the Dogechain API. It
 inherits methods from C<Finance::Dogechain::Base> and provides several of its
 own.
 

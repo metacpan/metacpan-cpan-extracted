@@ -1,7 +1,9 @@
 use strict;
 use warnings;
 
-use Test::More tests => 3;
+use Test2::V0;
+
+plan tests => 3;
 
 use Test::Requires;
 
@@ -14,7 +16,6 @@ use File::Serialize {
 
 test_requires 'YAML';
 
-
 serialize_file 't/corpus/add_ext' => { a => 'b' };
 
 my $file = path('t/corpus/add_ext.yml');
@@ -22,7 +23,7 @@ my $file = path('t/corpus/add_ext.yml');
 ok $file->exists, 'the right file is created';
 like $file->slurp_utf8 => qr/a:\s+b/, 'has the right content';
 
-is_deeply deserialize_file( 't/corpus/add_ext' ), { a => 'b' }, 
+is deserialize_file( 't/corpus/add_ext' ), { a => 'b' },
     "can deserialize too";
 
 

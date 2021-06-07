@@ -1,4 +1,31 @@
-Revision history for Perl module Nice::Try
+1.1.1 2021-06-08T05:53:45+0900
+    - Corrected a syntax warning in handling the loop control words
+
+1.1.0 2021-06-06T18:40:53+0900
+    - Added granular exception class catching
+
+1.0.7 2021-06-06T08:42:32+0900
+    - Corrected an issue with loop control clashing with context.
+    - Improved handling of context and returned value when using do { try {} catch {} }
+
+1.0.6 2021-06-05T12:09:43+0900
+    - Corrected defective test unit 021_forks.t
+
+1.0.5 2021-06-05T06:36:18+0900
+    - Fixes for issues #2 and #3 thanks to Smylers
+
+1.0.4 2021-06-04T12:01:18+0900
+    - Added detection of forks (threads emulation that works better than threads itself)'
+
+1.0.3 2021-05-20T22:51:47+0900
+    - Added the option of deactivating the use of Want with 'dont_want'
+    - Added detection of threaded environment and dectivation of Want'
+
+1.0.2 2021-05-19T09:42:32+0900
+    - Corrected a minor bug when value is returned in boolean context
+
+1.0.1 2021-05-17T23:29:23+0900
+    - Corrected a small bug in caller adjustment
 
 1.0.0 2021-05-14T22:59:08+0900
     - Improved call context management using Want to properly handle contexts such as object, glob, code, hash ref, array ref, scalar ref and boolean

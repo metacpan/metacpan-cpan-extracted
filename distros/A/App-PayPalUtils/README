@@ -2,8 +2,8 @@ NAME
     App::PayPalUtils - CLI utilities related to PayPal
 
 VERSION
-    This document describes version 0.003 of App::PayPalUtils (from Perl
-    distribution App-PayPalUtils), released on 2018-11-07.
+    This document describes version 0.004 of App::PayPalUtils (from Perl
+    distribution App-PayPalUtils), released on 2021-05-25.
 
 DESCRIPTION
     This distribution includes a few CLI utilities related to PayPal:
@@ -34,7 +34,7 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2018, 2016 by perlancar@cpan.org.
+    This software is copyright (c) 2021, 2018, 2016 by perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

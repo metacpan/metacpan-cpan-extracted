@@ -16,7 +16,7 @@
 #
 # This script is normally invoked from regen.pl.
 
-$VERSION = '1.47';
+$VERSION = '1.51';
 
 BEGIN {
     require './regen/regen_lib.pl';
@@ -119,6 +119,8 @@ my $tree = {
                                     [ 5.029, DEFAULT_ON ],
                                 'experimental::isa' =>
                                     [ 5.031, DEFAULT_ON ],
+                                'experimental::try' =>
+                                    [ 5.033, DEFAULT_ON ],
                         }],
 
         'missing'       => [ 5.021, DEFAULT_OFF],
@@ -144,16 +146,16 @@ sub valueWalk
     my ($k, $v) ;
 
     foreach $k (sort keys %$tre) {
-	$v = $tre->{$k};
-	die "duplicate key $k\n" if defined $list{$k} ;
-	die "Value associated with key '$k' is not an ARRAY reference"
-	    if !ref $v || ref $v ne 'ARRAY' ;
+        $v = $tre->{$k};
+        die "duplicate key $k\n" if defined $list{$k} ;
+        die "Value associated with key '$k' is not an ARRAY reference"
+            if !ref $v || ref $v ne 'ARRAY' ;
 
-	my ($ver, $rest) = @{ $v } ;
-	push @{ $v_list{$ver} }, $k;
+        my ($ver, $rest) = @{ $v } ;
+        push @{ $v_list{$ver} }, $k;
 
-	if (ref $rest)
-	  { valueWalk ($rest) }
+        if (ref $rest)
+          { valueWalk ($rest) }
 
     }
 
@@ -164,8 +166,8 @@ sub orderValues
     my $index = 0;
     foreach my $ver ( sort { $a <=> $b } keys %v_list ) {
         foreach my $name (@{ $v_list{$ver} } ) {
-	    $ValueToName{ $index } = [ uc $name, $ver ] ;
-	    $NameToValue{ uc $name } = $index ++ ;
+            $ValueToName{ $index } = [ uc $name, $ver ] ;
+            $NameToValue{ uc $name } = $index ++ ;
         }
     }
 
@@ -181,21 +183,21 @@ sub walk
     my ($k, $v) ;
 
     foreach $k (sort keys %$tre) {
-	$v = $tre->{$k};
-	die "duplicate key $k\n" if defined $list{$k} ;
-	die "Can't find key '$k'"
-	    if ! defined $NameToValue{uc $k} ;
+        $v = $tre->{$k};
+        die "duplicate key $k\n" if defined $list{$k} ;
+        die "Can't find key '$k'"
+            if ! defined $NameToValue{uc $k} ;
         push @{ $list{$k} }, $NameToValue{uc $k} ;
-	die "Value associated with key '$k' is not an ARRAY reference"
-	    if !ref $v || ref $v ne 'ARRAY' ;
+        die "Value associated with key '$k' is not an ARRAY reference"
+            if !ref $v || ref $v ne 'ARRAY' ;
 
-	my ($ver, $rest) = @{ $v } ;
-	if (ref $rest)
-	  { push (@{ $list{$k} }, walk ($rest)) }
-	elsif ($rest == DEFAULT_ON)
-	  { push @def, $NameToValue{uc $k} }
+        my ($ver, $rest) = @{ $v } ;
+        if (ref $rest)
+          { push (@{ $list{$k} }, walk ($rest)) }
+        elsif ($rest == DEFAULT_ON)
+          { push @def, $NameToValue{uc $k} }
 
-	push @list, @{ $list{$k} } ;
+        push @list, @{ $list{$k} } ;
     }
 
    return @list ;
@@ -205,15 +207,15 @@ sub walk
 
 sub mkRange
 {
-    my @a = @_ ;
-    my @out = @a ;
+    my @in = @_ ;
+    my @out = @in ;
 
-    for my $i (1 .. @a - 1) {
-      	$out[$i] = ".."
-          if $a[$i] == $a[$i - 1] + 1
-             && ($i >= @a  - 1 || $a[$i] + 1 == $a[$i + 1] );
+    for my $i (1 .. @in - 1) {
+        $out[$i] = ".."
+          if $in[$i] == $in[$i - 1] + 1
+             && ($i >= @in  - 1 || $in[$i] + 1 == $in[$i + 1] );
     }
-    $out[-1] = $a[-1] if $out[-1] eq "..";
+    $out[-1] = $in[-1] if $out[-1] eq "..";
 
     my $out = join(",",@out);
 
@@ -234,30 +236,30 @@ sub warningsTree
     my $rv = '';
 
     while ($k = shift @keys) {
-	$v = $tre->{$k};
-	die "Value associated with key '$k' is not an ARRAY reference"
-	    if !ref $v || ref $v ne 'ARRAY' ;
+        $v = $tre->{$k};
+        die "Value associated with key '$k' is not an ARRAY reference"
+            if !ref $v || ref $v ne 'ARRAY' ;
 
         my $offset ;
-	if ($tre ne $tree) {
-	    $rv .= $prefix . "|\n" ;
-	    $rv .= $prefix . "+- $k" ;
-	    $offset = ' ' x ($max + 4) ;
-	}
-	else {
-	    $rv .= $prefix . "$k" ;
-	    $offset = ' ' x ($max + 1) ;
-	}
+        if ($tre ne $tree) {
+            $rv .= $prefix . "|\n" ;
+            $rv .= $prefix . "+- $k" ;
+            $offset = ' ' x ($max + 4) ;
+        }
+        else {
+            $rv .= $prefix . "$k" ;
+            $offset = ' ' x ($max + 1) ;
+        }
 
-	my ($ver, $rest) = @{ $v } ;
-	if (ref $rest)
-	{
-	    my $bar = @keys ? "|" : " ";
-	    $rv .= " -" . "-" x ($max - length $k ) . "+\n" ;
-	    $rv .= warningsTree ($rest, $prefix . $bar . $offset )
-	}
-	else
-	  { $rv .= "\n" }
+        my ($ver, $rest) = @{ $v } ;
+        if (ref $rest)
+        {
+            my $bar = @keys ? "|" : " ";
+            $rv .= " -" . "-" x ($max - length $k ) . "+\n" ;
+            $rv .= warningsTree ($rest, $prefix . $bar . $offset )
+        }
+        else
+          { $rv .= "\n" }
     }
 
     return $rv;
@@ -267,12 +269,12 @@ sub warningsTree
 
 sub mkHexOct
 {
-    my ($f, $max, @a) = @_ ;
+    my ($f, $max, @bits) = @_ ;
     my $mask = "\x00" x $max ;
     my $string = "" ;
 
-    foreach (@a) {
-	vec($mask, $_, 1) = 1 ;
+    foreach (@bits) {
+        vec($mask, $_, 1) = 1 ;
     }
 
     foreach (unpack("C*", $mask)) {
@@ -288,14 +290,14 @@ sub mkHexOct
 
 sub mkHex
 {
-    my($max, @a) = @_;
-    return mkHexOct("x", $max, @a);
+    my($max, @bits) = @_;
+    return mkHexOct("x", $max, @bits);
 }
 
 sub mkOct
 {
-    my($max, @a) = @_;
-    return mkHexOct("o", $max, @a);
+    my($max, @bits) = @_;
+    return mkHexOct("o", $max, @bits);
 }
 
 ###########################################################################
@@ -317,9 +319,9 @@ my ($index, $warn_size);
 
   print $warn <<'EOM';
 
-#define Off(x)			((x) / 8)
-#define Bit(x)			(1 << ((x) % 8))
-#define IsSet(a, x)		((a)[Off(x)] & Bit(x))
+#define Perl_Warn_Off_(x)           ((x) / 8)
+#define Perl_Warn_Bit_(x)           (1 << ((x) % 8))
+#define PerlWarnIsSet_(a, x)        ((a)[Perl_Warn_Off_(x)] & Perl_Warn_Bit_(x))
 
 
 #define G_WARN_OFF		0 	/* $^W == 0 */
@@ -334,7 +336,7 @@ my ($index, $warn_size);
 #define pWARN_NONE		(STRLEN *) &PL_WARN_NONE   /* no  warnings 'all' */
 
 #define specialWARN(x)		((x) == pWARN_STD || (x) == pWARN_ALL ||	\
-				 (x) == pWARN_NONE)
+                                 (x) == pWARN_NONE)
 
 /* if PL_warnhook is set to this value, then warnings die */
 #define PERL_WARNHOOK_FATAL	(&PL_sv_placeholder)
@@ -371,10 +373,6 @@ EOM
       push @names, $name;
       $last_ver = $version ;
   }
-  print $warn "\n\n/*\n" ;
-
-  print $warn map { "=for apidoc Amnh||$_\n" } @names;
-  print $warn "\n=cut\n*/\n\n" ;
 
   print $warn tab(6, '#define WARNsize'),	" $warn_size\n" ;
   print $warn tab(6, '#define WARN_ALLstring'), ' "', ('\125' x $warn_size) , "\"\n" ;
@@ -383,12 +381,12 @@ EOM
   print $warn <<'EOM';
 
 #define isLEXWARN_on \
-	cBOOL(PL_curcop && PL_curcop->cop_warnings != pWARN_STD)
+        cBOOL(PL_curcop && PL_curcop->cop_warnings != pWARN_STD)
 #define isLEXWARN_off \
-	cBOOL(!PL_curcop || PL_curcop->cop_warnings == pWARN_STD)
+        cBOOL(!PL_curcop || PL_curcop->cop_warnings == pWARN_STD)
 #define isWARN_ONCE	(PL_dowarn & (G_WARN_ON|G_WARN_ONCE))
-#define isWARN_on(c,x)	(IsSet((U8 *)(c + 1), 2*(x)))
-#define isWARNf_on(c,x)	(IsSet((U8 *)(c + 1), 2*(x)+1))
+#define isWARN_on(c,x)	(PerlWarnIsSet_((U8 *)(c + 1), 2*(x)))
+#define isWARNf_on(c,x)	(PerlWarnIsSet_((U8 *)(c + 1), 2*(x)+1))
 
 #define DUP_WARNINGS(p) Perl_dup_warnings(aTHX_ p)
 
@@ -409,54 +407,35 @@ perl program becomes C<WARN_VOID> when used in XS code and passed to one of
 the calls below.
 
 =for apidoc Am|bool|ckWARN|U32 w
+=for apidoc_item ||ckWARN2|U32 w1|U32 w2
+=for apidoc_item ||ckWARN3|U32 w1|U32 w2|U32 w3
+=for apidoc_item ||ckWARN4|U32 w1|U32 w2|U32 w3|U32 w4
+These return a boolean as to whether or not warnings are enabled for any of
+the warning category(ies) parameters:  C<w>, C<w1>, ....
 
-Returns a boolean as to whether or not warnings are enabled for the warning
-category C<w>.  If the category is by default enabled even if not within the
-scope of S<C<use warnings>>, instead use the L</ckWARN_d> macro.
+Should any of the categories by default be enabled even if not within the
+scope of S<C<use warnings>>, instead use the C<L</ckWARN_d>> macros.
+
+The categories must be completely independent, one may not be subclassed from
+the other.
 
 =for apidoc Am|bool|ckWARN_d|U32 w
+=for apidoc_item ||ckWARN2_d|U32 w1|U32 w2
+=for apidoc_item ||ckWARN3_d|U32 w1|U32 w2|U32 w3
+=for apidoc_item ||ckWARN4_d|U32 w1|U32 w2|U32 w3|U32 w4
 
-Like C<L</ckWARN>>, but for use if and only if the warning category is by
+Like C<L</ckWARN>>, but for use if and only if the warning category(ies) is by
 default enabled even if not within the scope of S<C<use warnings>>.
 
-=for apidoc Am|bool|ckWARN2|U32 w1|U32 w2
+=for apidoc Am|U32|packWARN|U32 w1
+=for apidoc_item ||packWARN2|U32 w1|U32 w2
+=for apidoc_item ||packWARN3|U32 w1|U32 w2|U32 w3
+=for apidoc_item ||packWARN4|U32 w1|U32 w2|U32 w3|U32 w4
 
-Like C<L</ckWARN>>, but takes two warnings categories as input, and returns
-TRUE if either is enabled.  If either category is by default enabled even if
-not within the scope of S<C<use warnings>>, instead use the L</ckWARN2_d>
-macro.  The categories must be completely independent, one may not be
-subclassed from the other.
-
-=for apidoc Am|bool|ckWARN2_d|U32 w1|U32 w2
-
-Like C<L</ckWARN2>>, but for use if and only if either warning category is by
-default enabled even if not within the scope of S<C<use warnings>>.
-
-=for apidoc Am|bool|ckWARN3|U32 w1|U32 w2|U32 w3
-
-Like C<L</ckWARN2>>, but takes three warnings categories as input, and returns
-TRUE if any is enabled.  If any of the categories is by default enabled even
-if not within the scope of S<C<use warnings>>, instead use the L</ckWARN3_d>
-macro.  The categories must be completely independent, one may not be
-subclassed from any other.
-
-=for apidoc Am|bool|ckWARN3_d|U32 w1|U32 w2|U32 w3
-
-Like C<L</ckWARN3>>, but for use if and only if any of the warning categories
-is by default enabled even if not within the scope of S<C<use warnings>>.
-
-=for apidoc Am|bool|ckWARN4|U32 w1|U32 w2|U32 w3|U32 w4
-
-Like C<L</ckWARN3>>, but takes four warnings categories as input, and returns
-TRUE if any is enabled.  If any of the categories is by default enabled even
-if not within the scope of S<C<use warnings>>, instead use the L</ckWARN4_d>
-macro.  The categories must be completely independent, one may not be
-subclassed from any other.
-
-=for apidoc Am|bool|ckWARN4_d|U32 w1|U32 w2|U32 w3|U32 w4
-
-Like C<L</ckWARN4>>, but for use if and only if any of the warning categories
-is by default enabled even if not within the scope of S<C<use warnings>>.
+These macros are used to pack warning categories into a single U32 to pass to
+macros and functions that take a warning category parameter.  The number of
+categories to pack is given by the name, with a corresponding number of
+category parameters passed.
 
 =cut
 
@@ -497,14 +476,18 @@ is by default enabled even if not within the scope of S<C<use warnings>>.
     !specialWARN(PL_curcop->cop_warnings) &&			        \
     (isWARNf_on(PL_curcop->cop_warnings, unpackWARN1(x)) ||	        \
       (unpackWARN2(x) &&                                                \
-	(isWARNf_on(PL_curcop->cop_warnings, unpackWARN2(x)) ||	        \
-	  (unpackWARN3(x) &&                                            \
-	    (isWARNf_on(PL_curcop->cop_warnings, unpackWARN3(x)) ||	\
-	      (unpackWARN4(x) &&                                        \
-		isWARNf_on(PL_curcop->cop_warnings, unpackWARN4(x)))))))))
+        (isWARNf_on(PL_curcop->cop_warnings, unpackWARN2(x)) ||	        \
+          (unpackWARN3(x) &&                                            \
+            (isWARNf_on(PL_curcop->cop_warnings, unpackWARN3(x)) ||	\
+              (unpackWARN4(x) &&                                        \
+                isWARNf_on(PL_curcop->cop_warnings, unpackWARN4(x)))))))))
 
-/* end of file warnings.h */
 EOM
+
+  print $warn "\n\n/*\n" ;
+  print $warn map { "=for apidoc Amnh||$_\n" } @names;
+  print $warn "\n=cut\n*/\n\n" ;
+  print $warn "/* end of file warnings.h */\n";
 
   read_only_bottom_close_and_rename($warn);
 }
@@ -545,8 +528,8 @@ foreach my $k (sort keys  %list) {
     my @list = sort { $a <=> $b } @$v ;
 
     print $pm tab(6, "    '$k'"), '=> "',
-		mkHex($warn_size, map $_ * 2 , @list),
-		'", # [', mkRange(@list), "]\n" ;
+                mkHex($warn_size, map $_ * 2 , @list),
+                '", # [', mkRange(@list), "]\n" ;
 }
 
 print $pm ");\n\n" ;
@@ -558,15 +541,15 @@ foreach my $k (sort keys  %list) {
     my @list = sort { $a <=> $b } @$v ;
 
     print $pm tab(6, "    '$k'"), '=> "',
-		mkHex($warn_size, map $_ * 2 + 1 , @list),
-		'", # [', mkRange(@list), "]\n" ;
+                mkHex($warn_size, map $_ * 2 + 1 , @list),
+                '", # [', mkRange(@list), "]\n" ;
 }
 
 print $pm ");\n\n" ;
 print $pm "# These are used by various things, including our own tests\n";
 print $pm tab(6, 'our $NONE'), '=  "', ('\0' x $warn_size) , "\";\n" ;
 print $pm tab(6, 'our $DEFAULT'), '=  "', mkHex($warn_size, map $_ * 2, @def),
-			   '", # [', mkRange(sort { $a <=> $b } @def), "]\n" ;
+                           '"; # [', mkRange(sort { $a <=> $b } @def), "]\n" ;
 print $pm tab(6, 'our $LAST_BIT'), '=  ' . "$index ;\n" ;
 print $pm tab(6, 'our $BYTES'),    '=  ' . "$warn_size ;\n" ;
 while (<DATA>) {
@@ -607,16 +590,16 @@ sub _expand_bits {
     my $want_len = ($LAST_BIT + 7) >> 3;
     my $len = length($bits);
     if ($len != $want_len) {
-	if ($bits eq "") {
-	    $bits = "\x00" x $want_len;
-	} elsif ($len > $want_len) {
-	    substr $bits, $want_len, $len-$want_len, "";
-	} else {
-	    my $a = vec($bits, $Offsets{all} >> 1, 2);
-	    $a |= $a << 2;
-	    $a |= $a << 4;
-	    $bits .= chr($a) x ($want_len - $len);
-	}
+        if ($bits eq "") {
+            $bits = "\x00" x $want_len;
+        } elsif ($len > $want_len) {
+            substr $bits, $want_len, $len-$want_len, "";
+        } else {
+            my $x = vec($bits, $Offsets{all} >> 1, 2);
+            $x |= $x << 2;
+            $x |= $x << 4;
+            $bits .= chr($x) x ($want_len - $len);
+        }
     }
     return $bits;
 }
@@ -629,21 +612,21 @@ sub _bits {
 
     $mask = _expand_bits($mask);
     foreach my $word ( @_ ) {
-	if ($word eq 'FATAL') {
-	    $fatal = 1;
-	    $no_fatal = 0;
-	}
-	elsif ($word eq 'NONFATAL') {
-	    $fatal = 0;
-	    $no_fatal = 1;
-	}
-	elsif ($catmask = $Bits{$word}) {
-	    $mask |= $catmask ;
-	    $mask |= $DeadBits{$word} if $fatal ;
-	    $mask = ~(~$mask | $DeadBits{$word}) if $no_fatal ;
-	}
-	else
-	  { Croaker("Unknown warnings category '$word'")}
+        if ($word eq 'FATAL') {
+            $fatal = 1;
+            $no_fatal = 0;
+        }
+        elsif ($word eq 'NONFATAL') {
+            $fatal = 0;
+            $no_fatal = 1;
+        }
+        elsif ($catmask = $Bits{$word}) {
+            $mask |= $catmask ;
+            $mask |= $DeadBits{$word} if $fatal ;
+            $mask = ~(~$mask | $DeadBits{$word}) if $no_fatal ;
+        }
+        else
+          { Croaker("Unknown warnings category '$word'")}
     }
 
     return $mask ;
@@ -658,16 +641,24 @@ sub bits
 
 sub import
 {
-    shift;
-
-    my $mask = ${^WARNING_BITS} // ($^W ? $Bits{all} : $DEFAULT) ;
+    my $invocant = shift;
 
     # append 'all' when implied (empty import list or after a lone
     # "FATAL" or "NONFATAL")
     push @_, 'all'
-	if !@_ || (@_==1 && ($_[0] eq 'FATAL' || $_[0] eq 'NONFATAL'));
+        if !@_ || (@_==1 && ($_[0] eq 'FATAL' || $_[0] eq 'NONFATAL'));
 
-    ${^WARNING_BITS} = _bits($mask, @_);
+    my @fatal = ();
+    foreach my $warning (@_) {
+        if($warning =~ /^(NON)?FATAL$/) {
+            @fatal = ($warning);
+        } elsif(substr($warning, 0, 1) ne '-') {
+            my $mask = ${^WARNING_BITS} // ($^W ? $Bits{all} : $DEFAULT) ;
+            ${^WARNING_BITS} = _bits($mask, @fatal, $warning);
+        } else {
+            $invocant->unimport(substr($warning, 1));
+        }
+    }
 }
 
 sub unimport
@@ -682,14 +673,14 @@ sub unimport
 
     $mask = _expand_bits($mask);
     foreach my $word ( @_ ) {
-	if ($word eq 'FATAL') {
-	    next;
-	}
-	elsif ($catmask = $Bits{$word}) {
-	    $mask = ~(~$mask | $catmask | $DeadBits{$word});
-	}
-	else
-	  { Croaker("Unknown warnings category '$word'")}
+        if ($word eq 'FATAL') {
+            next;
+        }
+        elsif ($catmask = $Bits{$word}) {
+            $mask = ~(~$mask | $catmask | $DeadBits{$word});
+        }
+        else
+          { Croaker("Unknown warnings category '$word'")}
     }
 
     ${^WARNING_BITS} = $mask ;
@@ -712,71 +703,71 @@ sub __chk
     my $has_level   = $wanted & LEVEL  ;
 
     if ($has_level) {
-	if (@_ != ($has_message ? 3 : 2)) {
-	    my $sub = (caller 1)[3];
-	    my $syntax = $has_message
-		? "category, level, 'message'"
-		: 'category, level';
-	    Croaker("Usage: $sub($syntax)");
+        if (@_ != ($has_message ? 3 : 2)) {
+            my $sub = (caller 1)[3];
+            my $syntax = $has_message
+                ? "category, level, 'message'"
+                : 'category, level';
+            Croaker("Usage: $sub($syntax)");
         }
     }
     elsif (not @_ == 1 || @_ == ($has_message ? 2 : 0)) {
-	my $sub = (caller 1)[3];
-	my $syntax = $has_message ? "[category,] 'message'" : '[category]';
-	Croaker("Usage: $sub($syntax)");
+        my $sub = (caller 1)[3];
+        my $syntax = $has_message ? "[category,] 'message'" : '[category]';
+        Croaker("Usage: $sub($syntax)");
     }
 
     my $message = pop if $has_message;
 
     if (@_) {
-	# check the category supplied.
-	$category = shift ;
-	if (my $type = ref $category) {
-	    Croaker("not an object")
-		if exists $builtin_type{$type};
-	    $category = $type;
-	    $isobj = 1 ;
-	}
-	$offset = $Offsets{$category};
-	Croaker("Unknown warnings category '$category'")
-	    unless defined $offset;
+        # check the category supplied.
+        $category = shift ;
+        if (my $type = ref $category) {
+            Croaker("not an object")
+                if exists $builtin_type{$type};
+            $category = $type;
+            $isobj = 1 ;
+        }
+        $offset = $Offsets{$category};
+        Croaker("Unknown warnings category '$category'")
+            unless defined $offset;
     }
     else {
-	$category = (caller(1))[0] ;
-	$offset = $Offsets{$category};
-	Croaker("package '$category' not registered for warnings")
-	    unless defined $offset ;
+        $category = (caller(1))[0] ;
+        $offset = $Offsets{$category};
+        Croaker("package '$category' not registered for warnings")
+            unless defined $offset ;
     }
 
     my $i;
 
     if ($isobj) {
-	my $pkg;
-	$i = 2;
-	while (do { { package DB; $pkg = (caller($i++))[0] } } ) {
-	    last unless @DB::args && $DB::args[0] =~ /^$category=/ ;
-	}
-	$i -= 2 ;
+        my $pkg;
+        $i = 2;
+        while (do { { package DB; $pkg = (caller($i++))[0] } } ) {
+            last unless @DB::args && $DB::args[0] =~ /^$category=/ ;
+        }
+        $i -= 2 ;
     }
     elsif ($has_level) {
-	$i = 2 + shift;
+        $i = 2 + shift;
     }
     else {
-	$i = _error_loc(); # see where Carp will allocate the error
+        $i = _error_loc(); # see where Carp will allocate the error
     }
 
     # Default to 0 if caller returns nothing.  Default to $DEFAULT if it
     # explicitly returns undef.
     my(@callers_bitmask) = (caller($i))[9] ;
     my $callers_bitmask =
-	 @callers_bitmask ? $callers_bitmask[0] // $DEFAULT : 0 ;
+         @callers_bitmask ? $callers_bitmask[0] // $DEFAULT : 0 ;
     length($callers_bitmask) > ($offset >> 3) or $offset = $Offsets{all};
 
     my @results;
     foreach my $type (FATAL, NORMAL) {
-	next unless $wanted & $type;
+        next unless $wanted & $type;
 
-	push @results, vec($callers_bitmask, $offset + $type - 1, 1);
+        push @results, vec($callers_bitmask, $offset + $type - 1, 1);
     }
 
     # &enabled and &fatal_enabled
@@ -784,19 +775,19 @@ sub __chk
 
     # &warnif, and the category is neither enabled as warning nor as fatal
     return if ($wanted & (NORMAL | FATAL | MESSAGE))
-		      == (NORMAL | FATAL | MESSAGE)
-	&& !($results[0] || $results[1]);
+                      == (NORMAL | FATAL | MESSAGE)
+        && !($results[0] || $results[1]);
 
     # If we have an explicit level, bypass Carp.
     if ($has_level and @callers_bitmask) {
-	# logic copied from util.c:mess_sv
-	my $stuff = " at " . join " line ", (caller $i)[1,2];
-	$stuff .= sprintf ", <%s> %s %d",
-			   *${^LAST_FH}{NAME},
-			   ($/ eq "\n" ? "line" : "chunk"), $.
-	    if $. && ${^LAST_FH};
-	die "$message$stuff.\n" if $results[0];
-	return warn "$message$stuff.\n";
+        # logic copied from util.c:mess_sv
+        my $stuff = " at " . join " line ", (caller $i)[1,2];
+        $stuff .= sprintf ", <%s> %s %d",
+                           *${^LAST_FH}{NAME},
+                           ($/ eq "\n" ? "line" : "chunk"), $.
+            if $. && ${^LAST_FH};
+        die "$message$stuff.\n" if $results[0];
+        return warn "$message$stuff.\n";
     }
 
     require Carp;
@@ -820,15 +811,15 @@ sub register_categories
     my @names = @_;
 
     for my $name (@names) {
-	if (! defined $Bits{$name}) {
-	    $Offsets{$name}  = $LAST_BIT;
-	    $Bits{$name}     = _mkMask($LAST_BIT++);
-	    $DeadBits{$name} = _mkMask($LAST_BIT++);
-	    if (length($Bits{$name}) > length($Bits{all})) {
-		$Bits{all} .= "\x55";
-		$DeadBits{all} .= "\xaa";
-	    }
-	}
+        if (! defined $Bits{$name}) {
+            $Offsets{$name}  = $LAST_BIT;
+            $Bits{$name}     = _mkMask($LAST_BIT++);
+            $DeadBits{$name} = _mkMask($LAST_BIT++);
+            if (length($Bits{$name}) > length($Bits{all})) {
+                $Bits{all} .= "\x55";
+                $DeadBits{all} .= "\xaa";
+            }
+        }
     }
 }
 
@@ -894,7 +885,10 @@ warnings - Perl pragma to control optional warnings
     no warnings;
 
     use warnings "all";
-    no warnings "all";
+    no warnings "uninitialized";
+
+    # or equivalent to those last two ...
+    use warnings qw(all -uninitialized);
 
     use warnings::register;
     if (warnings::enabled()) {
@@ -943,17 +937,17 @@ Similarly all warnings are disabled in a block by either of these:
 For example, consider the code below:
 
     use warnings;
-    my @a;
+    my @x;
     {
         no warnings;
-	my $b = @a[0];
+        my $y = @x[0];
     }
-    my $c = @a[0];
+    my $z = @x[0];
 
 The code in the enclosing block has warnings enabled, but the inner
 block has them disabled.  In this case that means the assignment to the
-scalar C<$c> will trip the C<"Scalar value @a[0] better written as $a[0]">
-warning, but the assignment to the scalar C<$b> will not.
+scalar C<$z> will trip the C<"Scalar value @x[0] better written as $x[0]">
+warning, but the assignment to the scalar C<$y> will not.
 
 =head2 Default Warnings and Optional Warnings
 
@@ -965,21 +959,56 @@ would get a warning whether you wanted it or not.
 For example, the code below would always produce an C<"isn't numeric">
 warning about the "2:".
 
-    my $a = "2:" + 3;
+    my $x = "2:" + 3;
 
 With the introduction of lexical warnings, mandatory warnings now become
 I<default> warnings.  The difference is that although the previously
 mandatory warnings are still enabled by default, they can then be
 subsequently enabled or disabled with the lexical warning pragma.  For
 example, in the code below, an C<"isn't numeric"> warning will only
-be reported for the C<$a> variable.
+be reported for the C<$x> variable.
 
-    my $a = "2:" + 3;
+    my $x = "2:" + 3;
     no warnings;
-    my $b = "2:" + 3;
+    my $y = "2:" + 3;
 
 Note that neither the B<-w> flag or the C<$^W> can be used to
 disable/enable default warnings.  They are still mandatory in this case.
+
+=head2 "Negative warnings"
+
+As a convenience, you can (as of Perl 5.34) pass arguments to the
+C<import()> method both positively and negatively. Negative warnings
+are those with a C<-> sign prepended to their names; positive warnings
+are anything else. This lets you turn on some warnings and turn off
+others in one command. So, assuming that you've already turned on a
+bunch of warnings but want to tweak them a bit in some block, you can
+do this:
+
+    {
+        use warnings qw(uninitialized -redefine);
+        ...
+    }
+
+which is equivalent to:
+
+    {
+        use warnings qw(uninitialized);
+        no warnings qw(redefine);
+        ...
+    }
+
+The argument list is processed in the order you specify. So, for example, if you
+don't want to be warned about use of experimental features, except for C<somefeature>
+that you really dislike, you can say this:
+
+    use warnings qw(all -experimental experimental::somefeature);
+
+which is equivalent to:
+
+    use warnings 'all';
+    no warnings  'experimental';
+    use warnings 'experimental::somefeature';
 
 =head2 What's wrong with B<-w> and C<$^W>
 
@@ -996,20 +1025,20 @@ a block of code.  You might expect this to be enough to do the trick:
 
      {
          local ($^W) = 0;
-	 my $a =+ 2;
-	 my $b; chop $b;
+         my $x =+ 2;
+         my $y; chop $y;
      }
 
 When this code is run with the B<-w> flag, a warning will be produced
-for the C<$a> line:  C<"Reversed += operator">.
+for the C<$x> line:  C<"Reversed += operator">.
 
 The problem is that Perl has both compile-time and run-time warnings.  To
 disable compile-time warnings you need to rewrite the code like this:
 
      {
          BEGIN { $^W = 0 }
-	 my $a =+ 2;
-	 my $b; chop $b;
+         my $x =+ 2;
+         my $y; chop $y;
      }
 
 And note that unlike the first example, this will permanently set C<$^W>
@@ -1024,7 +1053,7 @@ the first will not.
 
     sub doit
     {
-        my $b; chop $b;
+        my $y; chop $y;
     }
 
     doit();
@@ -1050,7 +1079,7 @@ warnings are (or aren't) produced:
 X<-w>
 
 This is  the existing flag.  If the lexical warnings pragma is B<not>
-used in any of you code, or any of the modules that you use, this flag
+used in any of your code, or any of the modules that you use, this flag
 will enable warnings everywhere.  See L</Backward Compatibility> for
 details of how this flag interacts with lexical warnings.
 
@@ -1183,7 +1212,7 @@ The L<strictures|strictures/VERSION-2> module on CPAN offers one example of
 a warnings subset that the module's authors believe is relatively safe to
 fatalize.
 
-B<NOTE:> users of FATAL warnings, especially those using
+B<NOTE:> Users of FATAL warnings, especially those using
 C<< FATAL => 'all' >>, should be fully aware that they are risking future
 portability of their programs by doing so.  Perl makes absolutely no
 commitments to not introduce new warnings or warnings categories in the
@@ -1250,6 +1279,9 @@ use:
 
    use v5.20;       # Perl 5.20 or greater is required for the following
    use warnings 'FATAL';  # short form of "use warnings FATAL => 'all';"
+
+However, you should still heed the guidance earlier in this section against
+using C<use warnings FATAL => 'all';>.
 
 If you want your program to be compatible with versions of Perl before
 5.20, you must use C<< use warnings FATAL => 'all'; >> instead.  (In
@@ -1392,12 +1424,12 @@ C<Derived>.
     use Original;
     use Derived;
     use warnings 'Derived';
-    my $a = Original->new();
-    $a->doit(1);
-    my $b = Derived->new();
-    $a->doit(1);
+    my $x = Original->new();
+    $x->doit(1);
+    my $y = Derived->new();
+    $x->doit(1);
 
-When this code is run only the C<Derived> object, C<$b>, will generate
+When this code is run only the C<Derived> object, C<$y>, will generate
 a warning.
 
     Odd numbers are unsafe at main.pl line 7

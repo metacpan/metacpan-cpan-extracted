@@ -1,0 +1,145 @@
+#!/usr/bin/perl
+use 5.014 ; use strict; use warnings;
+use Time::HiRes qw [ gettimeofday tv_interval ] ;
+my ${ dt_start } = [ gettimeofday ] ; 
+use Scalar::Util qw/looks_like_number/;
+use Getopt::Std; getopts "=~1:c:f:ghqu", \my%o;
+use Term::ANSIColor qw[ :constants ] ; 
+use feature qw[ say ] ; 
+sub readInput () ;  # 入力の読取り 
+sub printOutput () ; # 出力の書き出し
+
+eval { use bigint qw[ hex ]} if $o{h} ;
+
+$| = 1 unless $o{u} ;
+my $sum = 0 ; # 求めたい合計値
+my $lln = 0 ; # 加算対象となった行の数
+my $nlln = 0 ; # 非加算対象の行の数
+my $header = undef ; # -= が指定された場合にヘッダ行を格納。
+
+my $fp = $o{f} >=0 ? $o{f} - 1 : $o{f} if defined $o{f} ; # どの列を抽出するか
+my $fps = $fp >=0 ? $fp + 1 : 0 if defined $o{f} ; # splitで使う。
+
+my ${ ctrl_c } = sub { 
+  $Term::ANSIColor::AUTORESET = 0 ; 
+  my $lt = sprintf '%04d-%02d-%02d %02d:%02d:%02d' , do {my @t = @{[localtime]}[5,4,3,2,1,0] ; $t[0]+=1900 ; $t[1]++ ; @t } ; 
+  my $ln = $. ; $ln =~ s/(?<=\d)(?=(\d\d\d)+($|\D))/,/g ; # 3桁毎にコンマで区切る 
+  say ITALIC DARK BOLD sprintf " The current result ($lt): %s lines have been processed." , $ln ;
+  printOutput ; 
+  say YELLOW 'Push Ctrl+\ or Ctrl+Z to stop the calculation.' ;
+  print RESET '' ;  
+}  ;
+
+readInput ;
+printOutput ; 
+exit 0 ; 
+
+sub readInput () { 
+  chomp ( $header = <> ) if $o{'='} ; # ヘッダ行
+  $SIG{ INT } = $ { ctrl_c }  ;
+  # 型グロブ/シンボルテーブルを使ってみた。
+  #my $org ; # 入力の元の文字列
+  * orgStore = defined $o{1} && $o{1} ? sub { @_ =  ($_) } : sub { @_ = () } ; 
+  * colChoose = defined $fp ? sub { $_ = [ split ] -> [ $fp ] }  : sub {  } ; 
+  * caseHex = defined $o{h} ? sub { $_ = hex $_ } : sub {} ; 
+  * outOfCount = defined $o{c} && $o{c} == 0 ? sub {  } : sub { do { $nlln ++ ; goto LOOP } if ! & get_num } ; 
+  * theSumming = $o{h} ? sub { $sum += $_ } : sub { $sum = "$sum" + "$_" } ;
+  * get_num  = $o{g} ? sub {   m/[-\.\d]+/ ; $_ = $& ; looks_like_number $_  } : sub { looks_like_number $_ }  ;
+  * progress = defined $o{1} && $o{1} eq '0' ? sub { () } :
+      ! $o{'~'} ? sub{ s/(^|[^0123456789.eEfF+-])(\d+)/$1+$2/g ; "$sum"."\t<= $_" } : # eEfFなどとある部分はこれで良いのか?
+      sub { s/(^|[^+-0123456789.eEfF+-])(\d+)/$1+$2/g ; "$_\t"."=> $sum" } ; 
+  * doPrint = defined $o{1} && $o{1} eq '0' ? sub { } : sub { say join "\t" , @_ } ; 
+      
+  LOOP : while( <> ) {
+    chomp ;
+    & orgStore ;
+    & colChoose ; 
+    & caseHex ;
+    & outOfCount ; # LOOPにジャンプすることがある。
+    & theSumming ; # <-- ここで足し算の計算をする
+    #$sum = "$sum" + "$_"  ;
+    #$sum = "$sum + $_  ;
+    $lln ++ ;
+    unshift @_ , & progress ; 
+    # @_ = & progress ; 
+    & doPrint ; 
+  }
+}
+
+sub printOutput () { 
+  #my $FH = $o{1} ? \* STDOUT : \*STDERR ; # <-- 意味があったのか???
+  select $o{1} ? \* STDOUT : \*STDERR ; # <-- 意味があったのか???
+  print  $o{q}? '' : 'header=' , qq{'$header'\t} if $o{'='} ;
+  my $fmt = $o{q} ? "%s\t%d\t%g\t%s" : "%s <- sum ;\t%d + %d <- counted + not ; \t%s <- average ;" ;
+  #$fmt = "%50X <- sum ;\t%d + %d <- counted + not ;" if $o{h} ; 
+  my $quot = $lln != 0 ? $sum/$lln : "NaN" ;
+  if ( "$quot" > $quot ) { $quot = "$quot" . '..(-)' } 
+  elsif ( "$quot" < $quot ) { $quot = "$quot" . '..(+)' }
+  #if ( $o{h} ) { say sprintf( & hex8 ( $sum)  ; return } ;
+  $sum = & hex8 ( $sum ) if $o{h} ; 
+  say sprintf ($fmt , $sum, $lln, $nlln , "$quot") , sprintf "\t%0.6f sec calculation (summing)." , tv_interval ${ dt_start } ; 
+}
+
+sub hex8 { 
+  my @out = '' ;
+  my $n = $_ [0] ; $n = 0 if $n eq "NaN" ;
+  my $c = 12 ; 
+  do {my $t = $n % 16**8 ; $n = int $n /16**8 ; unshift @out , sprintf "%08x" , $t ; say $n } while ($n != 0 && $c--) ;
+  my $out = join " " , @out ;
+  $out =~ s/^00+/0x 0/; 
+  return $out ;
+}
+
+
+sub VERSION_MESSAGE {}
+sub HELP_MESSAGE{
+    use FindBin qw[ $Script ] ;
+    $ARGV[1] //= '' ;
+    open my $FH , '<' , $0 ;
+    while(<$FH>){
+        s/\$0/$Script/g ;
+        print $_ if $ARGV[1] eq 'opt' ? m/^\ +\-/ : s/^=head1// .. s/^=cut// ;
+    }
+    close $FH ;
+    exit 0 ;
+}
+
+=encoding utf8
+=head1
+
+    $0 
+
+    入力の値を1行ずつに単純に足し合わせる。補助情報として、何行が数として扱われたか、平均値など出力する。
+    10進数で加算を行う。
+    数かどうかの判定は Scalar::Util の looks_like_number 関数を使っている。値は単純に足している。atof など使っていない。
+
+ 出力: 
+   1. 合計値
+   2. 合計に使われた数の個数
+   3. 合計に使われなかった行の数
+   4. 平均値
+   5. 計算に使った秒数(小数点以下6桁)
+
+ オプション: 
+   -= : 最初の行をヘッダと見なし、それが何であったかを最後に出力する。
+   -1 0 : 累計の途中の結果を表示しない。
+   -1 1 : 途中の結果に加えて、元の入力文字列を右側に連結して出力。
+   -c 0 : 数値であるかどうかのチェックをしない。高速化のため。
+   -f N : AWK形式で入力の各行を分割し N番目の列の値を取り出す。
+   -g : 数で無くとも、できるだけ数の部分を取り出して計算する。
+   -h : 入力する数は16進数として対応。 md5sum でディリクトリの中のファイル群の一致を見るとき便利。
+   -q : 冗長な文字列(sum=.. , ave=.. など) を表示しない。
+   -~ : 累計と値の出力順序を反転する。
+
+ 
+   -u : 出力のバッファリングをしない。
+   -f N : AWK形式で列にバラバラにして、1始まりで左からN番目を取り出す。負の数は-1だと最も右の列。
+
+  開発上のメモ: 
+    * [split " " , $_ , $fps] がうまく いかなかったので [split] としたが、良かったのか?
+    --
+    * bin4tsv/summing  先頭の数字の累計和を取り出すようにしながら、各列全文字列の表示を行番号と共にするようにせよ。
+    * 足す場所のフィールド番号もAWK形式で(AWKの空白区切りで)指定できるようにせよ。
+    * -Fで区切り文字を指定できるようにせよ。
+
+=cut

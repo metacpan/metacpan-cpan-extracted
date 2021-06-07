@@ -5,7 +5,7 @@ use strict;
 use Carp;
 use Git;
 
-use version; our $VERSION = qv('0.1.0'); # Work with a few files
+use version; our $VERSION = qv('0.1.1'); # Work with a few files
 
 # Other recommended modules (uncomment to use):
 #  use IO::Prompt;
@@ -24,7 +24,7 @@ sub new {
   my @these_revs;
   if ( $files_arrayref ) {
     @these_revs = $repo->command('rev-list', '--all', '--', join(" ", @$files_arrayref));
-  } else { 
+  } else {
     @these_revs = $repo->command('rev-list', '--all');
   }
   my @commit_info;

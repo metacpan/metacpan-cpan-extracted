@@ -1,6 +1,6 @@
 package POE::Component::IRC::Plugin::BotTraffic;
 our $AUTHORITY = 'cpan:HINRIK';
-$POE::Component::IRC::Plugin::BotTraffic::VERSION = '6.90';
+$POE::Component::IRC::Plugin::BotTraffic::VERSION = '6.91';
 use strict;
 use warnings FATAL => 'all';
 use POE::Component::IRC::Plugin qw( :ALL );

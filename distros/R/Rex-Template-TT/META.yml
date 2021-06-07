@@ -1,25 +1,42 @@
 ---
-abstract: unknown
+abstract: 'Rex template evaluation using Template::Toolkit'
 author:
-  - unknown
+  - 'Nicolas Leclercq <nicolas.private@gmail.com>'
+  - 'Jan Gehring <krimdomu@googlemail.com>'
 build_requires:
-  ExtUtils::MakeMaker: 0
+  File::Temp: '0'
+  Rex::Commands::File: '1.012'
+  Test2::Tools::Exports: '0'
+  Test2::Tools::LoadModule: '0'
+  Test2::V0: '0.000071'
 configure_requires:
-  ExtUtils::MakeMaker: 0
-dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 6.62, CPAN::Meta::Converter version 2.112150'
-license: unknown
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.017, CPAN::Meta::Converter version 2.150010'
+license: apache
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: Rex-Template-TT
-no_index:
-  directory:
-    - t
-    - inc
+provides:
+  Rex::Template::TT:
+    file: lib/Rex/Template/TT.pm
+    version: v1.0.0
 requires:
-  Rex: 0
-  Template: 0
+  Rex: '0'
+  Rex::Helper::Path: '0'
+  Template: '0'
+  perl: v5.10.0
 resources:
-  repository: https://github.com/krimdomu/rex-template-tt
-version: v0.33.1
+  bugtracker: https://github.com/RexOps/Rex-Template-TT/issues
+  repository: https://github.com/RexOps/Rex-Template-TT.git
+version: 1.0.0
+x_contributors:
+  - 'Erik Huelsmann <ehuels@gmail.com>'
+  - 'Ferenc Erki <ferki@adjust.com>'
+  - 'Jan <krimdomu@googlemail.com>'
+  - 'Jan Gehring <jan.gehring@yandex.com>'
+  - 'Nicolas Leclercq <nicolas.leclercq@cloudwatt.com>'
+x_generated_by_perl: v5.24.4
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: Apache-2.0

@@ -26,7 +26,7 @@ no_index:
 provides:
   namespace::allclean:
     file: lib/namespace/allclean.pm
-    version: '0.02'
+    version: '0.03'
 requires:
   B::Hooks::EndOfScope: '0.12'
   namespace::clean: '0.20'
@@ -35,7 +35,7 @@ resources:
   bugtracker: https://github.com/kfly8/p5-namespace-allclean/issues
   homepage: https://github.com/kfly8/p5-namespace-allclean
   repository: git://github.com/kfly8/p5-namespace-allclean.git
-version: '0.02'
+version: '0.03'
 x_authority: cpan:KFLY
 x_contributors:
   - 'kobaken <kfly@cpan.org>'

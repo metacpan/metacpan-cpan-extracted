@@ -175,7 +175,7 @@ if(eval { require Alien::Libarchive; 1 })
   diag 'Alien::Libarchive cflags = ' . $alien->cflags;
   diag 'Alien::Libarchive libs   = ' . $alien->libs;
   diag 'version                  = ' . eval { Archive::Libarchive::Any::archive_version_number() };
-  
+
   diag '';
   diag '';
 }

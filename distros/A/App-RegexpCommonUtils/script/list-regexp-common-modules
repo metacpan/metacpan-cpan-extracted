@@ -1,0 +1,71 @@
+#!perl
+
+our $DATE = '2021-05-25'; # DATE
+our $VERSION = '0.003'; # VERSION
+
+#use 5.010001;
+use strict;
+use warnings;
+
+use PERLANCAR::Module::List;
+
+my $res = PERLANCAR::Module::List::list_modules(
+    'Regexp::Common::', {list_modules=>1, recurse=>1});
+for (sort keys %$res) {
+    s/\ARegexp::Common:://;
+    print "$_\n";
+}
+
+# ABSTRACT: List all installed Regexp::Common::* modules
+# PODNAME: list-regexp-common-modules
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+list-regexp-common-modules - List all installed Regexp::Common::* modules
+
+=head1 VERSION
+
+This document describes version 0.003 of list-regexp-common-modules (from Perl distribution App-RegexpCommonUtils), released on 2021-05-25.
+
+=head1 SYNOPSIS
+
+ % list-regexp-common-modules
+
+=head1 DESCRIPTION
+
+This is a simple script to list all installed C<Regexp::Common::*> modules.
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/App-RegexpCommonUtils>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-App-RegexpCommonUtils>.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-RegexpCommonUtils>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2021, 2016 by perlancar@cpan.org.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

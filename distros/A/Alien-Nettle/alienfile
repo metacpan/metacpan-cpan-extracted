@@ -1,4 +1,5 @@
 use alienfile;
+use Config;
 
 plugin 'PkgConfig' => 'nettle';
 
@@ -14,5 +15,14 @@ share {
   plugin Extract => 'tar.gz';
 
   plugin 'Build::Autoconf' => ();
+
+  my @configure_flags = qw( --disable-shared );
+  push @configure_flags, '--disable-assembler' if $^O eq 'MSWin32' && $Config{myuname} =~ /strawberry-perl/;
+
+  build [
+    "%{configure} @configure_flags",
+    '%{make}',
+    '%{make} install',
+  ];
 
 };

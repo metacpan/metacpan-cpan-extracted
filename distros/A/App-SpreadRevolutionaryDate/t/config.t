@@ -29,7 +29,7 @@ isa_ok($spread_revolutionary_date->config, 'App::SpreadRevolutionaryDate::Config
 is($spread_revolutionary_date->config->test, 1, 'Test option set');
 is($spread_revolutionary_date->config->locale, 'fr', 'Locale option value');
 
-is_deeply($spread_revolutionary_date->config->targets, ['twitter', 'mastodon', 'freenode'], 'Default targets options set by default');
+is_deeply($spread_revolutionary_date->config->targets, ['twitter', 'mastodon', 'freenode', 'liberachat'], 'Default targets options set by default');
 
 ok($spread_revolutionary_date->config->twitter, 'Twitter option set by default');
 ok($spread_revolutionary_date->config->mastodon, 'Mastodon option set by default');
@@ -85,6 +85,16 @@ access_token    = 'AccessToken'
 
 [freenode]
 # See https://freenode.net/kb/answer/registration to register
+nickname      = 'NickName'
+password      = 'Password'
+test_channels = '#TestChannel1'
+test_channels = '#TestChannel2'
+channels      = '#Channel1'
+channels      = '#Channel2'
+channels      = '#Channel3'
+
+[liberachat]
+# See https://libera.chat/guides/registration to register
 nickname      = 'NickName'
 password      = 'Password'
 test_channels = '#TestChannel1'

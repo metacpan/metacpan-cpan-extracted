@@ -1,5 +1,3 @@
-.includepath
-.project
 bin/mysql-orm.pl
 build.sh
 Changes

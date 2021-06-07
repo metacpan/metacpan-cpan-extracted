@@ -63,8 +63,9 @@ S_mro_get_linear_isa_c3(pTHX_ HV* stash, U32 level)
 
     /* For a better idea how the rest of this works, see the much clearer
        pure perl version in Algorithm::C3 0.01:
-       http://search.cpan.org/src/STEVAN/Algorithm-C3-0.01/lib/Algorithm/C3.pm
-       (later versions go about it differently than this code for speed reasons)
+       https://fastapi.metacpan.org/source/STEVAN/Algorithm-C3-0.01/lib/Algorithm/C3.pm
+       (later versions of this module go about it differently than this code
+       for speed reasons)
     */
 
     if(isa && AvFILLp(isa) >= 0) {
@@ -253,13 +254,13 @@ S_mro_get_linear_isa_c3(pTHX_ HV* stash, U32 level)
                hierarchy is not C3-incompatible */
             if(!winner) {
                 SV *errmsg;
-                I32 i;
+                Size_t i;
 
                 errmsg = newSVpvf(
                            "Inconsistent hierarchy during C3 merge of class '%" HEKf "':\n\t"
                             "current merge results [\n",
                             HEKfARG(stashhek));
-                for (i = 0; i <= av_tindex(retval); i++) {
+                for (i = 0; i < av_count(retval); i++) {
                     SV **elem = av_fetch(retval, i, 0);
                     sv_catpvf(errmsg, "\t\t%" SVf ",\n", SVfARG(*elem));
                 }

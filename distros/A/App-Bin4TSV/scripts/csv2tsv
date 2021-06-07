@@ -1,0 +1,359 @@
+#!/usr/bin/perl -t
+use 5.014 ; use strict ; use warnings ;  # Confirmed also for 5.010 
+use Time::HiRes qw [ gettimeofday tv_interval ] ;
+my ${ dt_start } = [ gettimeofday ] ; 
+use Getopt::Std ; getopts '~2ae:n:s:t:vQ@:', \my %o ;
+use Text::CSV_XS ;  #  Not a core module.
+use FindBin qw [ $Script ] ; 
+use Term::ANSIColor qw[ :constants color ] ; $Term::ANSIColor::AUTORESET = 1 ; 
+use Encode ;# Encode was first released with perl v5.7.3
+#$| = 1 ;
+END{
+  my $lt = sprintf '%04d-%02d-%02d %02d:%02d:%02d' , do {my @t = @{[localtime]}[5,4,3,2,1,0] ; $t[0]+=1900 ; $t[1]++ ; @t } ; 
+  say STDERR CYAN FAINT BOLD tv_interval( ${ dt_start } ) , " seconds spent ($0 $lt)"; 
+}
+
+$SIG{INT} = sub { 
+ say STDERR YELLOW FAINT BOLD UNDERLINE qq[Analysis using the function of the perl function `caller': ("~" means undefined.)] ;
+ for ( 0..59 ) { 
+    my @out = caller ($_)  ; 
+    last unless @out ; 
+    say STDERR YELLOW FAINT BOLD "$_ : " , map { $out[$_] //= '~' ; "[$_] $out[$_] " } 0..$#out ; 
+
+ }
+ exit 1 ; 
+} ;
+
+
+grep { $_ = decode_utf8 $_ if defined $_ } $o{e} , $o{t}, $o{n} ;
+$o{e} //= qw[ \ ] ;  # エスケープしたい文字列につける文字
+$o{s} //= ',' ; # フィールドの区切り文字を指定
+$o{'@'} //= 5 ; # 何も入力が無い場合に，何秒おきに警告を出すか
+
+
+my $alarmF = 0 ; # 警告を出すか出さないか。
+& alarmset ; # 入力が 一定秒数以内に始まらない場合に、画面に注意を表示する。
+& rev and exit 0 if $o{'~'} ;
+& main and exit 0 ; 
+
+# 入力が無いときに，注意を表示する仕組み
+sub alarmset { 
+  # return unless -t ;
+  # $alarmF = 1 ; 
+  # $SIG{ALRM} = sub { 
+  #  print STDERR GREEN "[$Script] Waiting CSV-formatted input from STDIN..\n" ;
+  #  $SIG{ALRM} = sub { print STDERR GREEN "." ; alarm $o{'@'} } ; 
+  #   alarm $o{'@'} ; 
+  #} ; 
+  $SIG{ALRM} = sub { print STDERR GREEN BOLD FAINT "$. lines have read. " ; alarm $o{'@'} } ; 
+  alarm $o{'@'} ; 
+}
+
+# 逆操作。 TSV -> CSV 
+sub rev ( ) { 
+  grep { $_ = quotemeta $_ if defined $_ } $o{e} , $o{n} , $o{t} ; 
+  my $csv = Text::CSV_XS->new( { binary => 1 , sep_char => $o{s} , always_quote => $o{a} } ) ;  # if binary =0 then UTF-8 character cause trouble
+
+  while ( <> ){ 
+    # do { $alarmF = 0 ; alarm 0 } if $alarmF ;
+    chomp ; 
+    s/\r$// ;
+    my @F = split /\t/, $_ , -1 ; 
+    for ( @F ){
+      & escrev ($o{t} , "\t") if defined $o{t} && $o{t} ne '' ; # エスケープされた文字を考慮しつつ、-t から タブ文字を復元する。
+      & escrev ($o{n} , "\n") if defined $o{n} && $o{n} ne '' ; # エスケープされた文字を考慮しつつ、-n から 改行文字を復元する。
+    }
+    my $status = $csv -> print ( * STDOUT, [ @F ] ) ;
+    print STDERR BRIGHT_RED "Something wrong at line $.\n" unless $status ; 
+    print "\n" ;
+  }
+  print STDERR CYAN qq[[$Script -~] "$ARGV": $. lines input has processed.\n] unless $o{Q} ;
+  return 1 ;
+
+  sub escrev { 
+    my $bef = $_[0] ;
+    my $aft = $_[1] ;
+    s/(?<!$o{e})$bef/$aft/g ;  # 否定的後読みは (?<!pattern)　; 肯定的後読みは (?<=pattern)
+    s/$o{e}$bef/$bef/g ; #print STDERR BLUE "$o{e}, $o{n}\n" ;
+  }
+}
+
+sub main ( ) {
+
+  binmode * STDOUT , ":utf8" ; # Necessry because Text::CSV_XS decodes UTF8 input.
+  binmode * STDERR , ":utf8" ; # Necessry because Text::CSV_XS decodes UTF8 input.
+
+  my $linepos = 1 ; # CSV で読み込んでいるので、$. は2以上増えることがある。読み取る度に、 $linepos から $. 行目までと認識するため。
+  my %cols ; # 何個の列を何行が持っていたかを表す。3列の行が120行存在した、などを表す。
+  our $csv = Text::CSV_XS -> new ( { binary => 1 , sep_char => $o{s} , auto_diag => 1 } ) ;  # if binary => 0 then when "\n" is included in a cell it cause trouble.
+  push my @trans , grep {$_} do { [ "\t" , $o{t} ] if defined $o{t} } , do { [ "\n" , $o{n} ] if defined $o{n} } ; # 文字列置換の指定。
+  my @warnstr ; # 警告対象の文字列。改行やタブ文字など
+  my @escape ; # エスケープ対象の文字列
+  unless ($o{Q}) { 
+    push @warnstr , $o{t} if defined $o{t} ; 
+    push @warnstr , $o{n} if defined $o{n} ; 
+    @warnstr = grep { $_ ne '' } @warnstr ;
+    @escape = map { quotemeta $_ } @warnstr ; # この時点で -vのものははいっていない
+    push @warnstr , "\t" if $o{v} || ! defined $o{t} ; 
+    push @warnstr , "\n" if $o{v} || ! defined $o{n} ; 
+  }
+
+  # 入力を読取り、処理して出力。
+  my $posV = 0 ; # 出力上の縦方向の位置を表す
+  while ( my $x = $csv -> getline( *ARGV ) ) {  # 次行以下を読むこと↓
+       # *ARGVはOld(er) support と perldoc Text::CSV_XSに記載あり。将来サポートされないかも。
+       # geline でよくエラーが起こる。なぜだ? <--- - - 
+    do { $alarmF = 0 ; alarm 0 } if $alarmF ;
+    $posV ++ ; 
+    $cols{ @$x } ++ ; # この行は、列を何個持っていたかの数から，後で，何個の行が何個の列を持っていたか情報表示をするようにする。
+    my $posH = 0 ; # 出力上のセルの水平位置を表す。 
+    for my $cell ( @$x ) { 
+      $posH ++ ;
+      warnprint ( $cell , \@warnstr, [ $linepos , $posV , $posH ] ) unless $o{Q} ; # 要注意文字列に対して、警告を表示する。
+      $cell =~ s/(?=$_)/$o{e}/g for @escape ;       # エスケープする /
+      $cell =~ s/$trans[$_]->[0]/$trans[$_]->[1]/g for 0 .. $#trans ; # -tと-nの処理を加える。
+    }
+    # 出力処理
+    print join ( "\t", @$x ) . "\n" ;  
+    print "\n" if $o{2} ; #   # 出力各行の間に空行を挿入する場合の処理
+    $linepos = $. + 1 ; # <- 入力の何行目を改行区切りで数えた $. に +1 している。tricky!
+  }
+  $csv->eof; # <-- - 必要か?
+  & info ( $. , \%cols ) unless $o{Q} ; 
+  return 1 ; 
+
+  sub info {
+    my $out1 = qq[[$Script] "$ARGV": $_[0] lines] ;
+    my $out2 = keys %{ $_[1] } ? "=> columns x rows: " . join " + " , map { "${_} x ${$_[1]}{$_}"} sort {$a<=>$b} keys %{ $_[1] } : '' ;
+    print STDERR CYAN qq[$out1 $out2 \n] ;
+  }
+
+  sub warnprint { 
+    my $cell = $_[0] ;
+    my ( $linepos , $posV , $posH ) = @{ $_[2] } ;
+    for my $seek ( @{ $_[1] } ) { 
+      next unless $cell =~ m/\Q$seek\E/ ; 
+      my $S = do { local $_ = $seek ; s/\n/\\n/g ; s/\t/\\t/g ; $_ } ; #quotemeta $seek ; 
+      my $L = ($linepos == $.) ? $linepos : "$linepos-$." ; 
+      my $C = do { local $_ = $cell ; s/\n/\e[44m\\n\e[40m/gs ; s/\t/\e[44m\\t\e[40m/gs ; "\e[0m\e[4m$_" } ; # 背景を青くする。
+      my $sout = qq[[$Script] Warning: "$S" detected at "$ARGV": input line $L; output cell (Row: $posV, Col: $posH): ${C}\n] ; 
+      print STDERR BRIGHT_RED $sout ; 
+    }
+  }
+  # エラー処理 (Text::CSV_XS のエラー処理)  , このプログラムの変数の使い方が理由で、この位置にENDを置いた。
+  END { 
+    #exit if $o{'~'} ;
+    exit if ! defined $csv ; 
+    my @tmp = $csv -> error_diag () ; # ($cde, $str, $pos, $rec, $fld) = $csv->error_diag ();
+    if ( $tmp[0] != 2012 ) {  # perldoc Text::CSV_XS で 2012 を参照。EOFを意味する。
+      print STDERR BRIGHT_RED join (":",@tmp),"\n" ;
+      print STDERR ON_BRIGHT_RED BLACK "_ERROR_INPUT at line $.: " ; 
+      #use Data::Dumper ; #print STDERR UNDERLINE Dumper $csv  ; 
+      print STDERR UNDERLINE BRIGHT_RED $csv ->{_ERROR_INPUT} ; 
+      exit 1 ; 
+    }
+  }
+}
+
+## ヘルプとバージョン情報
+BEGIN {
+  our $VERSION = 0.56 ;
+  $Getopt::Std::STANDARD_HELP_VERSION = 1 ; 
+  grep { m/--help/} @ARGV and *VERSION_MESSAGE = sub {} ; 
+    # 最初は 0.21 を目安とする。
+    # 1.00 以上とする必要条件は英語版のヘルプをきちんと出すこと。
+    # 2.00 以上とする必要条件はテストコードが含むこと。
+   # 0.51 : 英文マニュアルをPOD形式にする。
+   # 0.52 : revの機能をデバグ
+   # 0.53 : エスケープ文字が余分に現れるバグを訂正。更にリファクタ。更にシェバングに-Tを加えた。
+   # 0.54 : revで2次情報を出すようにした。STDERRで非ASCIIに対応。
+   # 0.55 : CSVのフィールドの区分文字を変更可能とした。Text::CSV_XSでエラーが起きたときに、入力行の内容を表示するようにした。さらに -Tを-tにした(perldocが起動できなかったため)。
+   # 0.56 : マニュアルの英語の部分を2箇所訂正。
+}  
+sub HELP_MESSAGE {
+    use FindBin qw[ $Script $Bin ] ;
+    sub EnvJ ( ) { $ENV{LANG} =~ m/^ja_JP/ ? 1 : 0 } ; # # ja_JP.UTF-8 
+    sub en( ) { grep ( /^en(g(i(sh?)?)?)?/i , @ARGV ) ? 1 : 0 } # English という文字列を先頭から2文字以上を含むか 
+    sub ja( ) { grep ( /^jp$|^ja(p(a(n?)?)?)?/i , @ARGV ) ? 1 : 0 } # jp または japan という文字列を先頭から2文字以上を含むか 
+    sub opt( ) { grep (/^opt(i(o(ns?)?)?)?$/i, @ARGV ) ? 1 : 0 } # options という文字列を先頭から3文字以上含むから
+    sub noPOD ( ) { grep (/^no-?p(od?)?\b/i, @ARGV) ? 1 : 0 } # POD を使わないと言う指定がされているかどうか
+    my $jd = "JapaneseManual" ;
+    my $flagE = ! ja && ( en || ! EnvJ ) ; # 英語にするかどうかのフラグ
+    exec "perldoc $0" if $flagE &&  ! opt ; #&& ! noPOD   ; 
+    $ARGV[1] //= '' ;
+    open my $FH , '<' , $0 ;
+    while(<$FH>){
+        s/\Q'=script='\E/$Script/gi ;
+        s/\Q'=bin='\E/$Bin/gi ;
+        if ( s/^=head1\b\s*// .. s/^=cut\b\s*// ) { 
+            if ( s/^=begin\s+$jd\b\s*// .. s/^=end\s+$jd\b\s*// xor $flagE ) {
+                print $_ if ! opt || m/^\s+\-/  ; 
+            }
+        } 
+    }
+    close $FH ;
+    exit 0 ;
+}
+
+=encoding utf8 
+
+=head1 NAME
+
+csv2tsv
+
+=head1 VERSION 
+
+0.55 (2018-07-09 Mon)
+
+=head1 SYNOPSIS
+
+csv2tsv [B<-t> str] [B<-n> str] [-v] [-Q] [-2] [B<-~>] file
+
+=head1 DESCRIPTION 
+
+Transforms CSV formatted data (cf. RFC4180) into TSV formated data.
+Input is assumed to be UTF-8.
+(The input line ends can be both CRLF or LF. The output line ends are LF.)
+Warnings/errors would be properly printed on STDERR (as far as the author of
+this program experienced).
+
+=head1 EXAMPLE 
+
+csv2tsv file.csv > file.tsv     
+
+csv2tsv B<-n> '[\n]' file.csv > file.tsv       
+  # "\n" in the CSV cell will be transfomed to [\n].
+
+csv2tsv B<-t> TAB file.csv > file.tsv       
+  # "\t" in the CSV cell will be transfomed to "TAB". UTF-8 characters can be specified.
+
+B<for> i B<in> *.csv ; B<do> csv2tsv -n'"\n"' -t'"\t"' $i > ${i/csv/tsv} ; B<done>
+  # BASH or ZSH is required to use this "for" statement. Useful for multiple CSV files.
+
+For the safety, when '-t' or '-n' is set with string character specification,
+a B<warning> is displayed every time a values in the input cells matches the specified string charatcter
+unless B<-Q> is set.
+
+csv2tsv < file.csv > file.tsv     
+  # file name information cannot be passed to "csv2tsv". So the warning messages may lack a few information.
+
+=head1 OPTION
+
+=over 4
+
+=item B<-e> str
+
+Escape character(s) to be used to attach previous to the string matched to the string specified by -t or -n.
+
+=item B<-t> str 
+
+What the input TAB character will be replaced with is specified. 
+
+=item B<-n> str 
+
+What "\n" character in the input CSV cell will be replaced with is specified. 
+
+=item B<-s> char
+
+Set CSV field separator anything different from ",". 
+
+=item -v 
+
+Always tell the existence of "\t" or "\n" even if "-t str" or "-n str" is specified. 
+
+=item -Q 
+
+No warning even if "\t" or "\n" is included in the cell of input. 
+
+=item -2 
+
+Double space output, to find "\n" anormality by human eyes. 
+(For a kind expediency when this program author was firstly making this program)
+
+=item B<-~>
+
+The opposite conversion of csv2tsv, i.e. B<TSV to CSV> conversion.
+TABs and LINEENDs will be recovered if the intput was generated by this program "csv2tsv" with the
+same specification of "-t", "-n" and "-e".
+
+=item B<-a>
+
+Always enclose all the fields by the double quotations when transforming TSV to CSV.
+
+=item --help 
+
+Shows this help.
+
+=item --help ja 
+
+Shows Japanese help.
+
+=item --version
+
+Shows the version information of this program. 
+
+=back 
+
+=head1 AUTHOR
+
+Toshiyuki Shimono
+  bin4tsv@gmail.com
+
+=head1 HISTORY 
+
+ 2015-09-28 : Firstly created on a whim.    
+ 2016-07-06 : Some options are added such as -2.    
+ 2016-08-03 : Response to tab and enter characgers.     
+ 2018-06-24 : Once realeased on CPAN for the sake of Table::Hack.    
+ 2018-07-04 : Refinements to options. English manual is added. 
+ 2018-07-09 : -s and -a is added. Enabled to show the error input by Text::CSV_XS.
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright 2018 "Toshiyuki Shimono".
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see L<http://www.gnu.org/licenses/>.
+
+=begin JapaneseManual
+
+  csv2tsv file.csv > file.tsv 
+  csv2tsv < file.csv > file.tsv 
+
+  CSV 形式(RFC 4180)のファイルを TSV形式(タブ文字区切り) に変換する。
+  出力については、文字コード UTF-8 で改行コードは "\n" となる。
+
+ オプション:
+
+   -e st  : -t または -e で指定された文字列に一致する文字列の直前にエスケープを目的に入れる文字列。
+   -t str : 入力のタブ文字を何に置き換えるかを文字列で指定する。空文字列が指定されない限り、エスケープも考慮される。
+   -n str : 入力の改行文字を何に置き換えるかを文字列で指定する。空文字列が指定されない限り、エスケープも考慮される。
+   -s char ; CSVのフィールドの区切り文字を指定。コンマから変更するため。
+   -v    :  タブ文字と改行文字の存在を必ず指摘する。(-t や -n の指定があれば，通常、何も指摘の表示はしない。)
+   -Q : 入力のレコード内に、タブ文字または改行文字があっても、警告を出さない。付けることで高速化はする。(no check)
+   -2 : レコードの区切りを単一の \n ではなくて、2個続けた \n\n にする。CSVのセル内に改行文字がある場合に使うかもしれない。
+
+   -~ : TSV形式からCSV形式に変換。 -t と -n と -e の指定でこのプログラムで変換済みと仮定して、タブも改行も復元。
+   -a ; 全てのフィールドを必ず，ダブルクォーテーションで囲むようにする。
+   -@ N : 未入力の警告をN秒後に出すようにする。
+
+   --help : この $0 のヘルプメッセージを出す。  perldoc -t $0 | cat でもほぼ同じ。
+   --help opt : オプションのみのヘルプを出す。opt以外でも options と先頭が1文字以上一致すれば良い。
+   --help en : 英文マニュアルを表示する
+   --version : このプログラムのバージョン情報を表示する。
+
+  開発上のメモ: 
+   * テストを書くべし。
+   * taintを検出すべく-T を指定していたが、ヘルプのために perldoc が起動できなくなったので、-tにした。
+
+=cut

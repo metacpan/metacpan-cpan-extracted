@@ -1,7 +1,7 @@
 # file: Makefile.PL
 # CGI::AuthRegister - AuthRegister Module for Simple CGI Authentication and
 #   Registration in Perl
-# (c) 2012-20 Vlado Keselj (cpan:vlado vlado.ca http://vlado.ca)
+# (c) 2012-21 Vlado Keselj (cpan:vlado vlado.ca http://vlado.ca)
 use ExtUtils::MakeMaker;
 
 WriteMakefile(

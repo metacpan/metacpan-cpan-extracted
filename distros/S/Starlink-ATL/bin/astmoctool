@@ -1,0 +1,270 @@
+#!/usr/bin/env perl
+
+=head1 NAME
+
+astmoctool - Utility for manipulating MOC files using AST
+
+=head1 USAGE
+
+Command line options are processed in the order given.  These can either
+be the names of files to read, or options giving other operations to
+perform.  For example to load a file and then display information:
+
+    astmoctool MOC.fits --info
+
+Note: AST performs all MOC operations at a particular "MaxOrder" value.
+This will be determined by the first loaded MOC or can be specified
+via the "--max-order" option.  Cells smaller than this order are ignored.
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<--info>
+
+Display information about the current MOC.
+
+=item B<--output> FILENAME
+
+Write the current MOC to the given file.
+
+=item B<--intersection> FILENAME
+
+Perform an intersection between the current MOC and the MOC in the given file.
+
+=item B<--subtract> FILENAME
+
+Subtract the MOC in the given file from the current MOC.
+
+=item B<--show>
+
+Display a description of the current AST MOC object.
+
+=item B<--max-order>
+
+Set the maximum order.  This must be done before any MOC is loaded.
+
+=back
+
+=cut
+
+use strict;
+
+use IO::File;
+use Pod::Usage;
+
+use Astro::FITS::CFITSIO;
+use Starlink::AST;
+
+moc_tool(@ARGV);
+
+sub moc_tool {
+    my @args = @_;
+
+    my $moc = undef;
+    my $initialize_moc = sub {
+        my $options = shift // '';
+        $moc = new Starlink::AST::Moc($options);
+    };
+
+
+    my %command = map {my ($opts, $func) = @$_; map {$_ => $func} @$opts} (
+        [[qw/--info -i/], sub {
+            die 'A MOC has not yet been defined' unless defined $moc;
+            printf "Max. order: %i (%f\")\n", $moc->GetI('MaxOrder'), $moc->GetD('MaxRes');
+            printf "Min. order: %i (%f\")\n", $moc->GetI('MinOrder'), $moc->GetD('MinRes');
+            printf "Area: %f sq. deg.\n", $moc->GetD('MocArea') / 3600.0;
+            printf "Cells: %i\n", $moc->GetI('MocLength');
+            printf "Type: %i-byte\n", $moc->GetI('MocType');
+        }],
+        [[qw/--output -o/], sub {
+            my $filename = shift @args;
+            die 'No output filename specified' unless defined $filename;
+            die "Output file '$filename' already exists" if -e $filename;
+            die 'A MOC has not yet been defined' unless defined $moc;
+            write_moc($moc, $filename);
+        }],
+        [[qw/--intersection/], sub {
+            my $filename = shift @args;
+            die 'No intersection filename specified' unless defined $filename;
+            die 'A MOC has not yet been defined' unless defined $moc;
+            read_moc($moc, $filename, Starlink::AST::Region::AST__AND(),  0);
+        }],
+        [[qw/--subtract/], sub {
+            my $filename = shift @args;
+            die 'No subtraction filename specified' unless defined $filename;
+            die 'A MOC has not yet been defined' unless defined $moc;
+            read_moc($moc, $filename, Starlink::AST::Region::AST__AND(),  1);
+        }],
+        [[qw/--show/], sub {
+            die 'A MOC has not yet been defined' unless defined $moc;
+            $moc->Show();
+        }],
+        [[qw/--max-order/], sub {
+            my $max_order = shift @args;
+            die 'No maximum order specified' unless defined $max_order;
+            die 'Maximum order must be between 0 and 27'
+                if $max_order < 0 or $max_order > 27;
+            die 'Can not set maximum order: a MOC has already been defined'
+                if defined $moc;
+            $initialize_moc->(sprintf 'MaxOrder=%i', $max_order);
+        }],
+        [[qw/--help -h/], sub {
+            pod2usage(-vebose => 1, -exitval => 'NOEXIT');
+        }],
+    );
+
+    while (scalar @args) {
+        my $arg = shift @args;
+
+        if (exists $command{$arg}) {
+            $command{$arg}->();
+        }
+        elsif (-e $arg) {
+            $initialize_moc->() unless defined $moc;
+            read_moc($moc, $arg, Starlink::AST::Region::AST__OR(),  0);
+        }
+        else {
+            die "File or command '$arg' not found";
+        }
+    }
+};
+
+sub write_moc {
+    my ($moc, $filename) = @_;
+
+    if ($filename =~ /\.fits?$/i) {
+        # MOC FITS writing routine based on "atl_mocft.f".
+
+        my $data = $moc->GetMocData();
+        my $fc = $moc->GetMocHeader();
+        my $status = 0;
+        my $fptr = Astro::FITS::CFITSIO::create_file($filename, $status);
+        die 'Error opening FITS file' if $status;
+
+        $fptr->insert_key_log('SIMPLE', 1, '', $status);
+        $fptr->insert_key_lng('BITPIX', 8, '', $status);
+        $fptr->insert_key_lng('NAXIS', 0, '', $status);
+        $fptr->insert_key_log('EXTEND', 1, '', $status);
+        die 'Error writing primary headers' if $status;
+
+        $fptr->create_hdu($status);
+        die 'Error creating HDU' if $status;
+
+        $fc->Clear('Card');
+        for (;;) {
+            last unless $fc->FindFits('%f', my $card, 1);
+            $fptr->write_record($card, $status);
+        }
+        die 'Error writing MOC headers' if $status;
+
+        my $type = $moc->GetI('MocType');
+        if ($type == 4) {
+            $fptr->write_col_lng(1, 1, 1, (scalar @$data), $data, $status);
+        }
+        elsif ($type == 8) {
+            $fptr->write_col_lnglng(1, 1, 1, (scalar @$data), $data, $status);
+        }
+        else {
+            die 'MOC type not recognized';
+        }
+        die 'Error writing MOC data' if $status;
+
+        $fptr->close_file($status);
+        die 'Error closing FITS file' if $status;
+    }
+    elsif ($filename eq '-') {
+        print $moc->GetMocString(0), "\n";
+    }
+    else {
+        my $json = $filename =~ /\.json$/i;
+
+        my $fh = new IO::File($filename, 'w');
+        die "Could not open file '$filename' for writing" unless defined $fh;
+        print $fh $moc->GetMocString($json ? 1 : 0);
+        close $fh;
+    }
+}
+
+sub read_moc{
+    my ($moc, $filename, $mode, $negate) = @_;
+
+    if ($filename =~ /\.fits?$/i) {
+        # MOC FITS reading routine based on similar code in GAIA.
+
+        my $status = 0;
+        my $fptr = Astro::FITS::CFITSIO::open_file(
+            $filename, Astro::FITS::CFITSIO::READONLY(), $status);
+        die 'Error opening FITS file' if $status;
+
+        $fptr->get_num_hdus(my $nhdu, $status);
+        die 'Error getting number of HDUs' if $status;
+
+        # Assume simple MOC file: only one extension which is the MOC.
+        die 'Unexpected number of HDUs' unless $nhdu = 2;
+        my $ihdu = 2;
+
+        $fptr->movabs_hdu($ihdu, my $hdutype, $status);
+        die 'Error selecting HDU' if $status;
+        die 'HDU is not a binary table'
+            unless $hdutype == Astro::FITS::CFITSIO::BINARY_TBL();
+
+        $fptr->read_key(Astro::FITS::CFITSIO::TINT(),
+            'MOCORDER', my $mocorder, my $mocorder_comment, $status);
+        die 'Error reading MOCORDER' if $status;
+
+        $fptr->read_key(Astro::FITS::CFITSIO::TINT(),
+            'NAXIS2', my $moclen, my $moclen_comment, $status);
+        die 'Error reading NAXIS2' if $status;
+
+        $fptr->read_key(Astro::FITS::CFITSIO::TSTRING(),
+            'TFORM1', my $tform1, my $tform1_comment, $status);
+        die 'Error reading TFORM1' if $status;
+
+        my @data;
+        if ($tform1 =~ /^1?J$/) {
+            $fptr->read_col_lng(1, 1, 1, $moclen, 0, \@data, my $anynull, $status);
+        }
+        elsif ($tform1 =~ /^1?K$/) {
+            $fptr->read_col_lnglng(1, 1, 1, $moclen, 0, \@data, my $anynull, $status);
+        }
+        else {
+            die 'Unrecognized TFORM1';
+        }
+        die 'Error reading MOC data' if $status;
+
+        $moc->AddMocData($mode, $negate, $mocorder, \@data);
+
+        $fptr->close_file($status);
+        die 'Error closing FITS file' if $status;
+    }
+    else {
+        local $/;
+        my $fh = new IO::File($filename);
+        die "Could not open file '$filename' for reading" unless defined $fh;
+        my $buff = <$fh>;
+        close $fh;
+
+        $moc->AddMocString($mode, $negate, -1, $buff);
+    }
+}
+
+__END__
+
+=head1 COPYRIGHT
+
+Copyright (C) 2019-2021 East Asian Observatory
+All Rights Reserved.
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.

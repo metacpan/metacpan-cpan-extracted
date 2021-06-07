@@ -43,7 +43,7 @@ Issues are currently reported using CPAN [bug tracker](https://git.deguest.jp/ja
 
 ## More information
 
-Please refer to the [README](https://metacpan.org/source/JDEGUEST/Nice-Try-v0.2.1/README.md)
+Please refer to the [README](https://metacpan.org/source/JDEGUEST/Nice-Try-v1.1.0/README.md)
 
 ## Author
 

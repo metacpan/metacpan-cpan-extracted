@@ -14,4 +14,5 @@ t/business_days.t
 t/coveredtime.t
 t/holidays.t
 t/pod.t
+t/radonitsa.t
 t/short_business_days.t

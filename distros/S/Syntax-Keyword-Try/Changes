@@ -1,5 +1,12 @@
 Revision history for Syntax-Keyword-Try
 
+0.25    2021-06-01
+        [CHANGES]
+         * Rewrite parsing logic to use XS::Parse::Keyword 0.06
+         * Removed the new-deprecated `try do { ... }` experimental syntax
+         * Updated docs now that 5.34 is officially released, including
+           `use feature 'try'`.
+
 0.24    2021-05-10
         [CHANGES]
          * Deprecate the `try do { ... }` (experimental) syntax now that

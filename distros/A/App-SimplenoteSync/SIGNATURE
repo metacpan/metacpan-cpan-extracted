@@ -1,5 +1,5 @@
 This file contains message digests of all files listed in MANIFEST,
-signed via the Module::Signature module, version 0.68.
+signed via the Module::Signature module, version 0.87.
 
 To verify the content in this distribution, first make sure you have
 Module::Signature installed, then type:
@@ -12,49 +12,35 @@ the distribution may already have been compromised, and you should
 not run its Makefile.PL or Build.PL.
 
 -----BEGIN PGP SIGNED MESSAGE-----
-Hash: SHA512
+Hash: RIPEMD160
 
-SHA1 f9e07727cbfe253e02ff855cfbd4b392427312d7 Build.PL
-SHA1 5a63566681dc3d3485f7b360a0ea9ac9c4bc92be Changes
-SHA1 39e445531501775d4e1ed2908a62bef6cbdd8082 LICENSE
-SHA1 9d82d20b47fa3e1e6f8fca0664d9d69d5354b188 MANIFEST
-SHA1 c1e953a80336228bd9f1dbdb5d9a5020bed07a72 META.json
-SHA1 ae79d93f409ed752a8dc2f9b0d46d11af00e59b9 README.mkdn
-SHA1 1488163b06c01f54fb8cde88aed4f0e539e81140 bin/simplenotesync
-SHA1 fa9e1e74d2dd3bed9495fce1cf1561fb5628d9e0 dist.ini
-SHA1 a8b73e7a094a03e8342bb7f5f22622bbba9d4333 lib/App/SimplenoteSync.pm
-SHA1 0f22f5c8dfd2cd1e55ef8aacd8dcc49ecf3357e6 lib/App/SimplenoteSync.pm~
-SHA1 87492ade61ec613e7674eda0906780592437f4e8 lib/App/SimplenoteSync/Note.pm
-SHA1 6e524bc51c651ec1744722315f4cf525a2d0fd5e script/strip_tags.sh
-SHA1 3cbe905b92fbc69d59a06031d5ce6c837b352aa2 t/00-compile.t
-SHA1 39790949cc1a8442ea07d04c74826570c2978472 t/1_note.t
-SHA1 7560934f73c5b456c221d04e391cb24ab5692f20 t/2_utf8_note.t
-SHA1 fb38403ec5c9455b0d124ecff068e4982971d49e t/utf8_note.txt
-SHA1 4ecd064972de5144a8d86a74c249aa9f5b062ff8 weaver.ini
-SHA1 b0f2ac0b28f663d98de8369e26c2dc3fd3d4e52d xt/author/critic.t
-SHA1 e3094e32340a9a0dcb90d91b77d66e61cbf7fa14 xt/perlcriticrc
-SHA1 98143fd89a26270feb9c17990090134e102b6a76 xt/perltidyrc
-SHA1 28ef20a73b7cf9b85585e2b7db6fc80424289134 xt/release/cpan-changes.t
-SHA1 c6cd63148d20bda841ee21381cd6e9a62b7e6863 xt/release/kwalitee.t
-SHA1 7b52b909acf6cd52733f8f226f92147ed76a2717 xt/release/meta-json.t
-SHA1 4c599e8a4ebb7a899f90ee3c235a64fdbc7e2c06 xt/release/pod-coverage.t
-SHA1 4146b75714ac972231d12d4fb93e764817a5eb0b xt/release/pod-linkcheck.t
-SHA1 fae7a9531fdd000d4075a378b828a7aa2508491d xt/release/pod-no404s.t
-SHA1 9934d36e45e1143c1a54658bc48872e0591af41b xt/release/pod-syntax.t
+SHA256 043bd29d3b69615fbaba3bcfecf531b4ffc655da7d1d83aa31ee039276726e6c Build.PL
+SHA256 ef2373200a860ee53b363644c1066ee09ed937352a3d66e97307881fef87cb90 Changes
+SHA256 7388e4936e4505e3b0ab337da55b5b964f9625564bb044fb19b66971c5e4288c LICENSE
+SHA256 9a5f73852d197ab55eff00269efd9c9e32ab23bc6209a9d56d85ae74d2d7eaab MANIFEST
+SHA256 c6721551e3b63b67a1410f66e0ed9a2bc944719f969b5bc6fdfa906f8e658b8c META.json
+SHA256 9f32c9682bf1905882cc24d644494827e0d2cf3333705f9fc1fdef076786bd6e bin/simplenotesync
+SHA256 a0a307205c1b42a52f0159b3b11de98651a945bc30421baff8f4fa34d157e49d dist.ini
+SHA256 5a38efbfe7417b96bae2dfca00d06496cf523f4152b752c89164446db5b2a0d2 lib/App/SimplenoteSync.pm
+SHA256 8f9daacaba55a1a8f5e8c7e26f83bd7391e32cc624589262746684742eee09fe lib/App/SimplenoteSync/Note.pm
+SHA256 33938e03a56263a750a6590bb993b071f0fd9739d3d762d80eaee789d5b2f5ee script/strip_tags.sh
+SHA256 6b3f3480e9fd1a91d1a13c68427014db7b64b3c7f77841ff7485a39309534206 t/01-note.t
+SHA256 311ac233a0c0870b24a302cdca22524db5dd7a9620d9d2978cce06a04944b035 t/02-utf8_note.t
+SHA256 e0084609a607b4a2cb0ed0cd8ca4f25f01e72b356bbf4d8c49329a440ea946dd t/utf8_note.txt
+SHA256 0fb207eae3de12ec3ee38ecf37c7145b6f567daeb8d75b109d0efb353e99ed10 weaver.ini
+SHA256 39e9df4da38853c9725c5f5a7bb6b4c5e6ea48465d545ad8f3d2508c680df034 xt/perlcriticrc
+SHA256 e055a4f06aff701d80e39e5397405229fe035dd50eb7c49c3432249426fdd328 xt/perltidyrc
 -----BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.12 (GNU/Linux)
 
-iQIcBAEBCgAGBQJP2qt0AAoJEOpmRc2kYGBPSxoP/jCXo0PtsDdLbTerfYwFw2aV
-4l7ONdvc+xPmg8XjReDbbgRNCZUQOYl93/TBiHL1AJoHzZ4dOkYIAIjJvi9hFyg3
-HOYCQw39qD86Ehk8ys+phBYI7BQLEO+iNobAaeggy4Y2iL1xLq/o7vSici+uc2b5
-IS3cvU0Uvq/b/3nj5JygKzXRvhR3mZjaUenMJlBVg9c/6nPutJVyoYHPtXCFbZWF
-EjOBsAVmEGTfB9kmVdy+GIr19EN25KkqqTdtt/McTDNdBPdxvvgZHf6U/2hq0n/i
-Q+0QexH2BQNwvFccGDtXOqYMm78gmxRsMYIcw8OYAhwwo7ylTLPF+5/IpuNVmV4J
-qHyDFLNRnEtzcSDTWB4JvDNlWLP+Tx1jVKDFQXtBieFGYIwgygSdu20BI78N5VRg
-mQ+BVBOsl0VrPlVHLtJltH8PeNueV3xS+KAqZl7iSy7mQuk9/zHefU30yxRGMrMP
-HMBChSB+wzBD/MvK56eoHhaTQ04Vk3mk7Q1XCPaYTq3WF3AnF3p5wwREPmQRKeJZ
-V31B4VtnAttZOwtu0QaqHSDghOih1U5d5hJvk+SP+lbpFMEAocYQXCfqsVv7loFy
-7TLCrod2PJpvK4TuKHPXxXB0kZ7xM2z/THyjKifZefEmTpuSuTSlma39Tli9MCBS
-Dt9BbtX9KXaVtYhMwl+L
-=HM7F
+iQGzBAEBAwAdFiEE8yrDhIfmTcHpKT/J0zu3t5NbEiUFAmC8QawACgkQ0zu3t5Nb
+EiXUlwv/bOectUAqdRComhjKn6o702jv1GQvC0k8u/oFNBLiP/hzgFtaVIyEmY1a
+1vHlUpCB/7zFqGFd0hSVVwJSaqQ+3KAjLAXvYSEpD2HsJbZ9TYmH4TVzGzFu88Au
+a8OhhSiCi6hPhW6yQdTtyyI3cD2k6JjHk1t/Y0z1fiO8fp+cKtN0jt+sZeNxm1iA
+ehuyBvdtXM6cdZXvl4D8lqqNudPzGWSADiiZMog49k5mbiu5GYRgxyDbstUFChm3
+beocrDu47CbmebpaBq82TfBPkJdML17kAhGTg1SL16fmJzifFrg4zhD2Z8hXKBo0
+O4zJnFYnFw3j5y8Fzrg95eY0g5o8pUKbPGeGm8Du4A9R9a8ebPzR2ylHhXIYsdI5
+6oy0CW9Q66JlY/JAx54l694ree/x/vNvmVExdxHTV7FjUV++X8Jyu5Rl3H1w3vPk
+2aTR1TCm2wLXlNcEGSIqRRremjK79SeR7hwMCQuSVTQ18VZiBB5mAY+bb93IIIgc
+pjkmAw3T
+=rhiY
 -----END PGP SIGNATURE-----

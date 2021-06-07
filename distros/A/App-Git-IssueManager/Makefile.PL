@@ -14,7 +14,8 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "App-Git-IssueManager",
   "EXE_FILES" => [
-    "bin/git-issue"
+    "bin/git-issue",
+    "bin/git-issue-commit-hook"
   ],
   "LICENSE" => "gpl",
   "NAME" => "App::Git::IssueManager",
@@ -30,12 +31,13 @@ my %WriteMakefileArgs = (
     "MooseX::App" => 0,
     "MooseX::App::Command" => 0,
     "Term::ANSIColor" => 0,
-    "Text::ANSITable" => 0,
+    "Text::ANSITable" => "0.602",
     "Try::Tiny" => 0,
     "strict" => 0,
+    "utf8" => 0,
     "warnings" => 0
   },
-  "VERSION" => "0.1",
+  "VERSION" => "0.2",
   "test" => {
     "TESTS" => ""
   }
@@ -54,9 +56,10 @@ my %FallbackPrereqs = (
   "MooseX::App" => 0,
   "MooseX::App::Command" => 0,
   "Term::ANSIColor" => 0,
-  "Text::ANSITable" => 0,
+  "Text::ANSITable" => "0.602",
   "Try::Tiny" => 0,
   "strict" => 0,
+  "utf8" => 0,
   "warnings" => 0
 );
 

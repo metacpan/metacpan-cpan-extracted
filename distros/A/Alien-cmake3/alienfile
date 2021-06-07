@@ -62,9 +62,15 @@ my $binary_format;
 
 # use binary release on Linux, Windws 32/64 bit
 # do not use binary release on OS X as it comes as a .app bundle
+# TODO: add aarch64 detection
 if($^O eq 'linux' && $Config{archname} =~ /^x86_64/)
 {
   $binary_release_name = 'Linux-x86_64';
+  $binary_format       = 'tar.gz';
+}
+elsif($^O eq 'linux' && $Config{archname} =~ /^aarch64/)
+{
+  $binary_release_name = 'Linux-aarch64';
   $binary_format       = 'tar.gz';
 }
 elsif($^O eq 'MSWin32' && $Config{ptrsize} == 4)
@@ -79,7 +85,20 @@ elsif($^O eq 'MSWin32' && $Config{ptrsize} == 8)
 }
 elsif($^O eq 'darwin' && $Config{ptrsize} == 8)
 {
-  $binary_release_name = 'Darwin-x86_64';
+  my($major, $minor, $patch) = map {
+    my $v = $_;
+    $v =~ s/^\s+//;
+    $v =~ s/\s+$//;
+    $v;
+  } split /\./, [split /:/, `sw_vers|grep ProductVersion`]->[1];
+  if($major >= 11 || ($major == 10 && $minor >= 13))
+  {
+    $binary_release_name = 'macos-universal';
+  }
+  else
+  {
+    $binary_release_name = 'macos10.10-universal';
+  }
   $binary_format       = 'tar.gz';
 }
 

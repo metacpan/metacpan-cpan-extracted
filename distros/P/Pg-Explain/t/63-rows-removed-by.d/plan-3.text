@@ -1,0 +1,7 @@
+Nested Loop  (cost=0.00..22.92 rows=132 width=523) (actual time=0.009..0.824 rows=1980 loops=1)
+  Join Filter: (d.oid > c.oid)
+  Rows Removed by Join Filter: 402
+  ->  Seq Scan on pg_database d  (cost=0.00..1.01 rows=1 width=258) (actual time=0.004..0.005 rows=6 loops=1)
+  ->  Seq Scan on pg_class c  (cost=0.00..16.96 rows=396 width=265) (actual time=0.001..0.024 rows=397 loops=6)
+Planning Time: 0.555 ms
+Execution Time: 0.940 ms

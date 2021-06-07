@@ -47,14 +47,24 @@ sub build_requires {
 }
 
 sub ccflags {
+    my ( undef, $opt ) = @_;
+
+    $opt
+	or confess( 'Bug - \%opt argument required' );
+
     my @ccflags;
 
     my ( $darwin_version ) = split qr{ [.] }smx, ( uname() )[2];
     $darwin_version >= 8
 	and push @ccflags, '-DTIGER';
 
-    $darwin_version >= 19
-	and push @ccflags, '-DCATALINA';
+    # Darwin 15 = macOS 10.11 = El Capitan
+    if ( $opt->{t} ) {
+	$opt->{u}
+	    and die "Please do not assert both -t and -u. It is too confusing.\n";
+    } elsif ( $opt->{u} || $darwin_version >= 15 ) {
+	push @ccflags, '-DUTF_8_PLAIN_TEXT';
+    }
 
     system "$Config{cc} -fsyntax-only inc/trytypes.c 2>/dev/null";
     $?

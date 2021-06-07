@@ -14,7 +14,7 @@ use Carp;
 use Time::HiRes qw< time >;
 
 # ABSTRACT: Easier filters for OpenSMTPd in perl
-our $VERSION = 'v0.0.1'; # VERSION
+our $VERSION = 'v0.0.2'; # VERSION
 
 my @report_fields = qw< version timestamp subsystem event session suffix >;
 my %report_events = (
@@ -405,7 +405,7 @@ OpenSMTPd::Filter - Easier filters for OpenSMTPd in perl
 
 =head1 VERSION
 
-version v0.0.1
+version v0.0.2
 
 =head1 SYNOPSIS
 

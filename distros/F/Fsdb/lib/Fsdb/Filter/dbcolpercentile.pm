@@ -2,7 +2,7 @@
 
 #
 # dbcolpercentile.pm
-# Copyright (C) 1997-2018 by John Heidemann <johnh@isi.edu>
+# Copyright (C) 1997-2021 by John Heidemann <johnh@isi.edu>
 #
 # This program is distributed under terms of the GNU general
 # public license, version 2.  See the file COPYING
@@ -13,21 +13,29 @@ package Fsdb::Filter::dbcolpercentile;
 
 =head1 NAME
 
-dbcolpercentile - compute percentiles or ranks for an existing column
+dbcolpercentile - compute percentiles or ranks for an existing numeric column
 
 =head1 SYNOPSIS
 
-    dbcolpercentile [-rplhS] column
+    dbcolpercentile [-rplhS] [--mode MODE] [--value WEIGHT_COL] column
 
 =head1 DESCRIPTION
 
-Compute a percentile of a column of numbers.
-The new column will be called I<percentile> or I<rank>.
-Non-numeric records are handled as in other programs.
+Compute a percentile, ranking, or weighted percentile of a column of numbers.
+The new column will be called I<percentile> or I<rank> or I<weighted>
+depending on the mode.
+
+Ordering is given by the specifed column.
+
+In weighted mode, by default the same column as ordering is used for weighting.
+Alternatively, give a different column for weighting with C<-v>.
+
+Non-numeric values are ignored.
 
 If the data is pre-sorted and only a rank is requested,
 no extra storage is required.
 In all other cases, a full copy of data is buffered on disk.
+
 
 =head1 OPTIONS
 
@@ -36,15 +44,21 @@ In all other cases, a full copy of data is buffered on disk.
 =item B<-p> or B<--percentile> or B<--mode percentile>
 
 Show percentile (default).
-Percentile is the percentage of the cumulative values at or lower than the current value, relative to the total count.
+Percentile is the fraction of the cumulative values at or lower than the current value, relative to the total count.
 
 =item B<-P> or B<--rank> or B<--nopercentile> or B<--mode rank>
 
 Compute ranks instead of percentiles.
 
-=item B<--fraction>
+=item B<-w WEIGHT_COL> or B<--weighted WEIGHT_COL> or B<--mode weighted>
 
-Show fraction (percentage, except between 0 and 1, not cumulative fraction).
+Compute the weighted percentile.
+Here values define not only the ordering, but the fraction of the total
+sum, and percentile is the fraction of sum of cumulative values
+in the weighting column (relative to their sum),
+for all ranking colums at or lower than the current ranking column.
+If the weight column is not specified
+(with C<--mode weighted>), it is the same as the ranking column.
 
 =item B<-a> or B<--include-non-numeric>
 
@@ -56,6 +70,10 @@ as zero rather than just ignoring them).
 Assume data is already sorted.
 With one -S, we check and confirm this precondition.
 When repeated, we skip the check.
+
+=item B<-N NAME> or B<--new-name NAME>
+
+Give the NAME of the new column.
 
 =item B<-f FORMAT> or B<--format FORMAT>
 
@@ -69,29 +87,12 @@ Also uses environment variable TMPDIR, if -T is
 not specified.
 Default is /tmp.
 
-=back
+=item B<-e> EmptyValue or B<--empty>
 
-Sort specification options (can be interspersed with column names):
-
-=over 4
-
-=item B<-r> or B<--descending>
-
-sort in reverse order (high to low)
-
-=item B<-R> or B<--ascending>
-
-sort in normal order (low to high)
-
-=item B<-n> or B<--numeric>
-
-sort numerically (default)
-
-=item B<-N> or B<--lexical>
-
-sort lexicographically
+Specify the value any non-numeric rows get, if in weighted mode.
 
 =back
+
 
 =for comment
 begin_standard_fsdb_options
@@ -243,6 +244,8 @@ sub set_defaults ($) {
     $self->{_pre_sorted} = 0;
     $self->{_target_column} = undef;
     $self->{_save_in_filename} = undef;
+    $self->{_destination_column} = undef;
+    $self->{_weight_column} = undef;
     $self->{_format} = "%.5g";
     $self->set_default_tmpdir;
 }
@@ -266,19 +269,21 @@ sub parse_options ($@) {
 	'a|include-non-numeric!' => \$self->{_include_non_numeric},
 	'autorun!' => \$self->{_autorun},
 	'd|debug+' => \$self->{_debug},
+	'e|empty=s' => \$self->{_empty},
 	'f|format=s' => \$self->{_format},
 	'i|input=s' => sub { $self->parse_io_option('input', @_); },
 	'log!' => \$self->{_logprog},
 	'o|output=s' => sub { $self->parse_io_option('output', @_); },
-	'fraction' => sub { $self->{_mode} = 'fraction'; },
-	'm|mode=s' => sub { $self->{_mode} = $_[0]; },
+	'm|mode=s' => \$self->{_mode},
+	'N|new-name=s' => \$self->{_destination_column},
 	'p|percentile' => sub { $self->{_mode} = 'percentile'; },
 	'P|nopercentile|rank' => sub { $self->{_mode} = 'rank'; },
 	'S|pre-sorted+' => \$self->{_pre_sorted},
 	'T|tmpdir|tempdir=s' => \$self->{_tmpdir},
-	# sort key options:
-	'n|numeric' => sub { $self->{_sort_as_numeric} = 1; },
-	'N|lexical' => sub { $self->{_sort_as_numeric} = undef; },
+	'w|weighted=s' => \$self->{_weight_column},
+	# ONLY SOME sort key options:
+#	'n|numeric' => sub { $self->{_sort_as_numeric} = 1; },
+#	'N|lexical' => sub { $self->{_sort_as_numeric} = undef; },
 	'r|descending' => sub { $self->{_sort_order} = -1; },
 	'R|ascending' => sub { $self->{_sort_order} = 1; },
 	) or pod2usage(2);
@@ -297,8 +302,11 @@ sub setup ($) {
     my($self) = @_;
 
     # check mode
-    croak($self->{_prog} . ": unkown mode " . $self->{_mode} . " (must be rank, fraction, or percentile).\n")
-        unless ($self->{_mode} eq 'percentile' || $self->{_mode} eq 'fraction' || $self->{_mode} eq 'rank');
+    if (defined($self->{_weight_column})) {
+        $self->{_mode} = 'weighted';
+    };
+    croak($self->{_prog} . ": unknown mode " . $self->{_mode} . " (must be rank, weighted, or percentile).\n")
+        unless ($self->{_mode} eq 'percentile' || $self->{_mode} eq 'weighted' || $self->{_mode} eq 'rank');
 
     # assign default sort order, if not specified
     if (!defined($self->{_sort_order})) {
@@ -306,6 +314,12 @@ sub setup ($) {
 	warn "defaulting sort order to " . ($self->{_sort_order} == 1 ? "ascending" : "descending") . "\n" if ($self->{_debug});
     };
 
+    # assign a weighting, if required
+    if (!defined($self->{_weight_column})) {
+        $self->{_weight_column} = $self->{_target_column};
+    };
+
+    
     #
     # input
     #
@@ -316,7 +330,7 @@ sub setup ($) {
 	$self->finish_io_option('input', -comment_handler => $self->create_delay_comments_sub);
 	$self->{_sorter_fred} = undef;
     } else {
-	# not sorted, so sort it and read that
+    	# not sorted, so sort it and read that
 	my @sort_args = ('--nolog', $self->{_target_column});
 	unshift(@sort_args, '--descending') if ($self->{_sort_order} == -1);
 	unshift(@sort_args, ($self->{_sort_as_numeric} ? '--numeric' : '--lexical'));
@@ -328,13 +342,14 @@ sub setup ($) {
     $self->{_target_coli} = $self->{_in}->col_to_i($self->{_target_column});
     croak($self->{_prog} . ": target column " . $self->{_target_column} . " is not in input stream.\n")
 	if (!defined($self->{_target_coli}));
+    $self->{_weight_coli} = $self->{_in}->col_to_i($self->{_weight_column});
+    croak($self->{_prog} . ": weight column " . $self->{_weight_column} . " is not in input stream.\n")
+	if (!defined($self->{_weight_coli}));
 
     #
     # output
     #
-    $self->{_destination_column} = $self->{_mode};
-    croak($self->{_prog} . ": internal error: bad rank mode\n")
-	if (!defined($self->{_destination_column}));
+    $self->{_destination_column} //= $self->{_mode};
 
     $self->finish_io_option('output', -clone => $self->{_in}, -outputheader => 'delay');
     $self->{_out}->col_create($self->{_destination_column})
@@ -342,25 +357,30 @@ sub setup ($) {
     $self->{_destination_coli} = $self->{_out}->col_to_i($self->{_destination_column});
 }
 
-=head2 _count_rows
+=head2 _determine_total
 
-    $n = $self->_count_rows()
+    $n = $self->_determinte_total()
 
-Interpose a filter on C<$self->{_in}> that counts the rows.
+Interpose a filter on C<$self->{_in}> that counts the rows (for rank or percentile)
+or sums the value (for weighted percentile).
 
 =cut
-sub _count_rows() {
+sub _determine_total() {
     my($self) = shift @_;
 
     my $orig_in = $self->{_in};
     $self->{_save_in_filename} = Fsdb::Support::NamedTmpfile::alloc($self->{_tmpdir});
     my($save_sink) = new Fsdb::IO::Writer(-file => $self->{_save_in_filename}, -clone => $orig_in);
-    my($n_rows, $n_counts) = 0;
+    my($n_counts) = 0;
+    my $sum = 0;
     my $read_fastpath_sub = $orig_in->fastpath_sub();
     my $write_fastpath_sub = $save_sink->fastpath_sub();
     my $fref;
+    my($xf) = $self->{_target_coli};
+    my($wf) = $self->{_weight_coli};
     while ($fref = &$read_fastpath_sub()) {
-	$n_rows++;
+	$n_counts++;
+        $sum += $fref->[$wf];
 	&$write_fastpath_sub($fref);
     };
     $save_sink->error and croak($self->{_prog} . ": error writing temporary file.\n");
@@ -368,7 +388,13 @@ sub _count_rows() {
 
     # reopen _in with our saved data
     $self->{_in} = new Fsdb::IO::Reader(-file => $self->{_save_in_filename});
-    return $n_rows;
+    if ($self->{_mode} eq 'percentile' || $self->{_mode} eq 'rank') {
+        return $n_counts;
+    } elsif ($self->{_mode} eq 'weighted') {
+        return $sum;
+    } else {
+        croak($self->{_prog} . ": unknown mode " . $self->{_mode} . "\n");
+    };
 }
 
 =head2 run
@@ -381,13 +407,9 @@ Internal: run over each rows.
 sub run ($) {
     my($self) = @_;
 
-    my $percentile_scaling = 1;
-    my $n;
-    if ($self->{_mode} eq 'percentile') {
-	$n = $self->_count_rows;
-        $percentile_scaling = 1.0 / $n;
-    } elsif ($self->{_mode} eq 'fraction') {
-        die;
+    my $total;
+    if ($self->{_mode} eq 'percentile' || $self->{_mode} eq 'weighted') {
+	$total = $self->_determine_total() * 1.0;  # force to floating point
     };
 
     my $read_fastpath_sub = $self->{_in}->fastpath_sub();
@@ -395,12 +417,15 @@ sub run ($) {
     my $fref;
     my($mode) = $self->{_mode};
     my $i = ($mode eq 'rank' ? 1 : 0);
+    my $sum = 0;
     my $result;  # this row
     my $last = undef;
     my $in_run = undef;
     my $run_i = undef;
     my $x;
+    my $xw;
     my($xf) = $self->{_target_coli};
+    my($wf) = $self->{_weight_coli};
     my($of) = $self->{_destination_coli};
     my($check_sort_order) = ($self->{_pre_sorted} == 1) ? $self->{_sort_order} : undef;
     warn "will check sort order for " . $self->{_sort_order} . ".\n" if ($self->{_debugt} && $check_sort_order);
@@ -408,33 +433,48 @@ sub run ($) {
     while ($fref = &$read_fastpath_sub()) {
 
         $x = $fref->[$xf];
-	$result = $i++;
-	if ($mode eq 'percentile') {
-	    $result = ($n - $result) * $percentile_scaling;
-	    $result = $self->numeric_formatting($result);
-	};
+        $xw = $fref->[$wf];
 
 	if ($x !~ /$is_numeric_regexp/) {
-	    $last = undef;   # non-numeric always ends run
+            # pass through non-numeric
+            $result = $self->{_empty};
+        } elsif ($mode eq 'percentile') {
+            $result = ($total - $i) / $total;
+	    $result = $self->numeric_formatting($result);
+        } elsif ($mode eq 'rank') {
+            $result = $i;
+        } elsif ($mode eq 'weighted') {
+            if ($xw !~ /$is_numeric_regexp/) {
+                $result = $self->{_empty};
+            } else {
+                $result = ($total - $sum) / $total;
+                $result = $self->numeric_formatting($result);
+            };
+        } else {
+            croak($self->{_prog} . ": unknown mode $mode\n");
+        };
+        $sum += $xw;
+        $i++;
+
+	# check for runs
+        # Note that we do STRING compare (knock on wood).
+	if (defined($last) && $x eq $last) {
+            # in a run
+	    $result = $run_i;
+	    $in_run = 1;
 	} else {
-	    # check for runs
-	    if (defined($last) && $x == $last) {
-		# in a run
-		$result = $run_i;
-		$in_run = 1;
-	    } else {
-		# sanity check
-		if ($check_sort_order) {
-		    if (defined($last)) {
-		        my $order = ($x <=> $last);
-			croak($self->{_prog} . ": data out of order between $last and $x, should be in " . ($check_sort_order == -1 ? "descending" : "ascending") . " order.\n")
-			    if ($order != $check_sort_order);
-		    };
+	    # sanity check
+	    if ($check_sort_order) {
+	        if (defined($last)) {
+                    # xxx: we enforce numeric order here, but we don't strictly have to do that.
+		    my $order = ($x <=> $last);
+		    croak($self->{_prog} . ": data out of order between $last and $x, should be in " . ($check_sort_order == -1 ? "descending" : "ascending") . " order.\n")
+			if ($order != $check_sort_order);
 		};
-		# change
-		$last = $x;
-		$in_run = undef;
 	    };
+	    # change
+	    $last = $x;
+	    $in_run = undef;
 	};
 
 	$fref->[$of] = $result;
@@ -452,7 +492,7 @@ sub run ($) {
 
 =head1 AUTHOR and COPYRIGHT
 
-Copyright (C) 1991-2018 by John Heidemann <johnh@isi.edu>
+Copyright (C) 1991-2021 by John Heidemann <johnh@isi.edu>
 
 This program is distributed under terms of the GNU general
 public license, version 2.  See the file COPYING

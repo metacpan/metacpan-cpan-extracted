@@ -4,7 +4,7 @@ package Dist::Zilla::MintingProfile::Author::ETHER;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Mint distributions like ETHER does
 
-our $VERSION = '0.160';
+our $VERSION = '0.161';
 
 no if "$]" >= 5.031009, feature => 'indirect';
 no if "$]" >= 5.033001, feature => 'multidimensional';
@@ -42,7 +42,7 @@ Dist::Zilla::MintingProfile::Author::ETHER - Mint distributions like ETHER does
 
 =head1 VERSION
 
-version 0.160
+version 0.161
 
 =head1 SYNOPSIS
 
@@ -114,7 +114,7 @@ L<http://dzil.org/#mailing-list>.
 There is also an irc channel available for users of this distribution, at
 L<C<#distzilla> on C<irc.perl.org>|irc://irc.perl.org/#distzilla>.
 
-I am also usually active on irc, as 'ether' at C<irc.perl.org> and C<irc.freenode.org>.
+I am also usually active on irc, as 'ether' at C<irc.perl.org> and C<irc.libera.chat>.
 
 =head1 AUTHOR
 

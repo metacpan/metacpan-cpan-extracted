@@ -1,0 +1,96 @@
+#!/usr/bin/perl
+use 5.014 ; use strict ; use warnings ; 
+use Getopt::Std ; getopts "ab:di=:,:~" , \my%o ;  
+
+my %idAlloc ; # 各行の文字列に対して、与えるべき連番
+my $givingID = ( $o{b} //= "1" )  ; # 連番の最初の番号に当たるものを指定する。
+&initProc ; 
+&mainProc ; 
+exit 0 ;
+
+sub initProc { 
+  $o{','} = "\t" ;
+  $o{','} = eval qq[qq[$o{','}]] ; 
+}
+
+sub mainProc { 
+  if ( exists $o{'='} )  { 
+    $o{'='} = eval qq[qq[$o{'='}]] ;
+    my $header = <> ;
+    chomp $header ; 
+    print "$o{'='}$o{','}$header\n" ;  
+  }
+  while ( <> ) {
+    chomp ; 
+    print exists $idAlloc{ $_ } ? "1\t" : "\t" if $o{d} ; 
+    $idAlloc{ $_ } = $givingID++ if $o{'~'} || ! exists $idAlloc { $_ } ;  
+    print $o{i} ? "$idAlloc{$_}\n" : $o{a} ? "$_\t$idAlloc{$_}\n" :  "$idAlloc{$_}\t$_\n"  ;       
+  }
+}
+
+
+## ヘルプとバージョン情報
+BEGIN {
+  our $VERSION = 0.11 ;
+  $Getopt::Std::STANDARD_HELP_VERSION = 1 ; 
+  grep { m/--help/} @ARGV and *VERSION_MESSAGE = sub {} ; 
+   # shuffler 
+   #  Produced by Toshiyuki Shimono in Tokyo, 2016-01-25 ~ 2016-10-13 ; 2018-03-25 English added.
+   # 目安: 
+   #   0.21 : 人になんとか提供できる段階で 0.21 を目安とする。
+   #   1.00 以上 : 英語版のヘルプをきちんと出すことが必要条件。
+   #   2.00 以上 : テストコードが含むことが必要条件。
+}  
+
+sub HELP_MESSAGE {
+    use FindBin qw[ $Script ] ; 
+    $ARGV[1] //= '' ;
+    open my $FH , '<' , $0 ;
+    while(<$FH>){
+        s/\$0/$Script/g ;
+        print $_ if s/^=head1// .. s/^=cut// and $ARGV[1] =~ /^o(p(t(i(o(ns?)?)?)?)?)?$/i ? m/^\s+\-/ : 1;
+    }
+    close $FH ;
+    exit 0 ;
+}
+
+=encoding utf8
+
+=head1
+
+ idmaker 
+  
+  改行区切りのリストに対して、連番でidを与える。
+  同じ文字列が出現したら、既に与えたid を返す。
+  つまり、異なるidが同じ文字列に与えられないようにする。
+  n番目に入力された行に対応する出力は、n番目に出力される。
+  
+
+ オプション: 
+
+  -a : 連番を後ろにつける。 
+  -b str : 最初の連番を与える。未指定なら 1。英字+数字の形式であれば、Perlのインクリメントがされる。
+  -d : 連番が重複しているかどうかの情報を各行の先頭列に与える。その列に、重複が検出されると 1 が書き込まれる。
+  -i : 連番のみ出力。
+  -= str : 連番に対応する列名を str で指定する。
+  -~ : 重複があっても、連番を増やす。
+
+  --help : オンラインヘルプの表示
+  --help opt : オプションのヘルプのみ表示
+  --version : このプログラムのバージョン情報を表示。  
+
+ 例: 
+
+  idmaker < inputfile  
+    # inputfile の各行の先頭に、1から始まる連番が付与される。
+    # inputfile に既に出現した文字列が出現すると、最初につけた番号が表示される。
+    # 出力行数は入力行数と同じで、最後に付与された番号は、入力の異なる文字列の数に一致する。
+
+ idmaker -b "A01" 
+    # A01, A02, .... A99 , B00, B01, ..  のように連番が振られる。 
+
+ 開発上のメモ: 
+   * 割り当てる数を、ランダムな数や文字列を可能とするようにしたい。
+
+=cut
+

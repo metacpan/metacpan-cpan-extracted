@@ -1,0 +1,177 @@
+#!/usr/bin/perl  
+use 5.014 ; use strict ; use warnings ; 
+use Getopt::Std ; getopts "1b:g:p:s:" , \my %o ; 
+use Term::ANSIColor qw[ :constants color ] ; $Term::ANSIColor::AUTORESET = 1 ; 
+use FindBin qw [ $Script ] ;
+
+
+$SIG{INT} = sub { & info ; exit 130 } ; 
+my ( $s1 , $s2 ) = map { eval qq[$_] } split /[,x]/, $o{g} // '6,1' , 2 ; # 行列のように並べるサイズ
+$s2 //= 1 ; 
+my $n = $o{b} // 1 ; # 二項分布のパラメータで試行の回数
+my $p = $o{p} // 0.5 ; # 二項分布のパラメータで、成功確率
+my $seed = defined $o{s} ? srand $o{s} : srand ; # 乱数シード
+
+& main ;
+& info ; 
+exit 0 ;
+
+sub info ( )  { 
+  print STDERR CYAN "Used random seed : $seed ( $Script -s $seed -p $p -b $n -g ${s1}x${s2} )\n" unless $o{1} ;
+}
+
+sub main ( ) { 
+  for ( 1 .. $s1 ) { 
+    print join "\t" , map { & binomGen } 1 .. $s2 ; 
+    print "\n" ; 
+  }
+}
+
+sub binomGen (  ) { 
+    my $s = 0  ;
+    $s +=  rand () < $p for 1 .. $n ;
+    return $s ; 
+}
+
+## ヘルプとバージョン情報
+BEGIN {
+  $Getopt::Std::STANDARD_HELP_VERSION = 1 ; 
+  grep { m/--help/} @ARGV and *VERSION_MESSAGE = sub {} ; 
+  our $VERSION = 0.12 ;
+    # 最初は 0.21 を目安とする。
+    # 1.00 以上とする必要条件は英語版のヘルプをきちんと出すこと。
+    # 2.00 以上とする必要条件はテストコードが含むこと。
+    # 0.12  英語マニュアルを PODにする。
+}  
+sub HELP_MESSAGE {
+    use FindBin qw[ $Script $Bin ] ;
+    sub EnvJ ( ) { $ENV{LANG} =~ m/^ja_JP/ ? 1 : 0 } ; # # ja_JP.UTF-8 
+    sub en( ) { grep ( /^en(g(i(sh?)?)?)?/i , @ARGV ) ? 1 : 0 } # English という文字列を先頭から2文字以上を含むか 
+    sub ja( ) { grep ( /^jp$|^ja(p(a(n?)?)?)?/i , @ARGV ) ? 1 : 0 } # jp または japan という文字列を先頭から2文字以上を含むか 
+    sub opt( ) { grep (/^opt(i(o(ns?)?)?)?$/i, @ARGV ) ? 1 : 0 } # options という文字列を先頭から3文字以上含むから
+    sub noPOD ( ) { grep (/^no-?pod\b/i, @ARGV) ? 1 : 0 } # POD を使わないと言う指定がされているかどうか
+    my $jd = "JapaneseManual" ;
+    my $flagE = ! ja && ( en || ! EnvJ ) ; # 英語にするかどうかのフラグ
+
+    exec "perldoc $0" if $flagE &&  ! opt && ! noPOD   ; 
+    $ARGV[1] //= '' ;
+    open my $FH , '<' , $0 ;
+    while(<$FH>){
+        s/\Q'=script='\E/$Script/gi ;
+        s/\Q'=bin='\E/$Bin/gi ;
+        if ( s/^=head1\b\s*// .. s/^=cut\b\s*// ) { 
+            if ( s/^=begin\s+$jd\b\s*// .. s/^=end\s+$jd\b\s*// xor $flagE ) {
+                print $_ if ! opt || m/^\s+\-/  ; 
+            }
+        } 
+        #print $_ if /^=head1/ .. /^=cut\b/ and opt ? m/^\s+\-/ : 1 and ( EnvJ && ! en xor s/^=begin $jd\b// .. s/^=end $jd\b// ) ;
+    }
+    close $FH ;
+    exit 0 ;
+
+}
+=encoding utf8 
+
+=head1 NAME
+
+cointoss 
+
+=head1 VERSION
+
+0.12 (2018-07-03)
+
+=head1 SYNOPSIS
+
+cointoss [B<-p> success_probability] [B<-b> trials] [B<-g> how_many] [B<-s> seed] [B<-1>]
+
+cointoss [B<--help> [ja] ] [B<--version>]
+
+=head1 DESCRIPTION
+
+Generates random numbers obeying Bernoulli and a binomial distribution.
+
+=head1 OPTION
+
+=over 4
+
+=item B<-b> N 
+
+The number of trials for a binomial distribution. It is the Bernoulli distribution when N=1.
+
+=item B<-g> N  or B<-g> N,N
+
+How many random numbers you want. Given N,N or NxN form, a random matrix will be yielded.
+
+=item B<-p> N 
+
+The success probability for the binomial distribution.
+
+=item B<-s> N
+
+The random seed. The residual divided by 2**32 is essential.
+
+=item B<-1>
+
+The secondary information such as the random seed used will be suppressed. 
+
+=item B<--help>
+
+Shows this online help manual.
+
+=item B<--help ja>
+
+Shows the Japanese online help manual.
+
+=item B<--vesrion>
+
+Shows the version number of this program.
+
+=back
+
+=head1 HISTORY
+
+This program has been made since 2016-08-08 (Mon)
+as a part of TSV hacking toolset for table data.
+
+=head1 AUTHOR
+
+"Toshiyuki Shimono", C<< <bin4tsv at gmail.com> >>
+
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright 2018 "Toshiyuki Shimono".
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see L<http://www.gnu.org/licenses/>.
+
+=begin JapaneseManual 
+
+  $0 -p rate -n size -g rows,cols
+
+  ベルヌーイ分布もしくは二項分布(binomial distribution)に従う乱数の生成。
+
+ オプション: 
+   -b N : 二項分布の試行回数(整数)。未指定なら1(ベルヌーイ分布に従う乱数が生成される)。
+   -g N1,N2 : N1行N2列の行列の形で出力。横方向はタブ文字区切り。,の代わりにxの文字でも良い。
+   -p N : 二項分布の成功確率(0以上1以下の数)。未指定なら0.5。	
+   -s N : 乱数シードの設定。再現性を確保するため。Nの2^32(=約4.3億)による剰余がシードとなる。
+   -1   : 2次情報の抑制。通常シード情報などは標準エラー出力で色つきで出力されるがそれを抑制する。
+
+  --help : この $0 のヘルプメッセージを出す。  perldoc -t $0 | cat でもほぼ同じ。
+  --help opt : オプションのみのヘルプを出す。opt以外でも options と先頭が1文字以上一致すれば良い。
+  --version : バージョン情報の表示。
+ 
+  開発メモ :
+      * -g で Infも指定可能としたい。poissonコマンドを参照。ただし、速度比較をせよ。
+ =cut

@@ -1,8 +1,8 @@
 #!perl
 
-our $DATE = '2019-06-05'; # DATE
+our $DATE = '2021-05-26'; # DATE
 our $DIST = 'App-pause-Unpacked'; # DIST
-our $VERSION = '0.490'; # VERSION
+our $VERSION = '0.491'; # VERSION
 
 use 5.010001;
 use strict;
@@ -30,7 +30,7 @@ pause-unpacked - A CLI for PAUSE (unpacked version)
 
 =head1 VERSION
 
-This document describes version 0.490 of pause-unpacked (from Perl distribution App-pause-Unpacked), released on 2019-06-05.
+This document describes version 0.491 of pause-unpacked (from Perl distribution App-pause-Unpacked), released on 2021-05-26.
 
 =head1 SYNOPSIS
 
@@ -50,13 +50,13 @@ users should just use L<pause>.
 
 Delete older versions of distributions.
 
-Developer releases will not be deleted.
+Currently does not look for releases in subdirectories.
 
-To delete developer releases, you can use C<delete_files> (rm), e.g. from the
-command line:
+By default does not include developer (trial) releases. To include that, use
+C<--include-dev>.
 
- % pause rm 'My-Module-*TRIAL*'; # delete a dist's trial releases
- % pause rm '*TRIAL*' '*_*'; # delete all files containing TRIAL or underscore
+To only cleanup developer releases, you can use C<--include-dev> and
+C<--exclude-nondev>.
 
 
 =head2 B<ls>
@@ -110,7 +110,7 @@ C<*> marks required options.
 
 =over
 
-=item B<--config-path>=I<filename>, B<-c>
+=item B<--config-path>=I<s>, B<-c>
 
 Set path to configuration file.
 
@@ -171,6 +171,10 @@ Do not use any configuration file.
 
 Do not read environment for default options.
 
+=item B<--page-result>
+
+Filter output through a pager.
+
 =item B<--password>=I<s>
 
 PAUSE password.
@@ -189,27 +193,11 @@ Number of retries when received 5xx HTTP error from server.
 
 Default value:
 
- 35
+ 5
 
-=item B<--retry-delay>=I<s>
+The retry uses an exponential backoff strategy of delaying 3, 6, 12, 24, ...,
+3600, 3600, ... seconds.
 
-How long to wait before retrying (deprecated).
-
-This setting is now deprecated. Will use a constant backoff strategy of delaying
-this many seconds. The default (when this setting is not specified) is now to
-use an exponential backoff strategy of delaying 3, 6, 12, 24, ..., 3600, 3600,
-... seconds. The default `retries` of 35 makes this strategy retries for a
-little over a day (88941 seconds). The terminal delay setting (default 3600
-seconds) can be set via `retry_max_delay`.
-
-
-=item B<--retry-max-delay>=I<s>
-
-How long to wait at most before retrying.
-
-Default value:
-
- 3600
 
 =item B<--subcommands>
 
@@ -235,6 +223,10 @@ Shortcut for --log-level=info.
 
 Display program's version and exit.
 
+=item B<--view-result>
+
+View output using a viewer.
+
 =back
 
 =head2 Options for subcommand cleanup
@@ -244,6 +236,12 @@ Display program's version and exit.
 =item B<--detail>, B<-l>
 
 Whether to return detailed records.
+
+=item B<--exclude-nondev>
+
+=item B<--include-dev>
+
+Whether to include cleaning up non-dev releases.
 
 =item B<--num-keep>=I<s>, B<-n>
 
@@ -287,6 +285,8 @@ Whether to return detailed records.
 
 File name/wildcard pattern.
 
+Can also be specified as the 1st command-line argument and onwards.
+
 Can be specified multiple times.
 
 =item B<--files-json>=I<s>
@@ -294,6 +294,8 @@ Can be specified multiple times.
 File names/wildcard patterns (JSON-encoded).
 
 See C<--file>.
+
+Can also be specified as the 1st command-line argument and onwards.
 
 =item B<--mtime-max>=I<s>
 
@@ -313,6 +315,10 @@ See C<--file>.
 
 Whether to return detailed records.
 
+=item B<--exclude-nondev>
+
+=item B<--include-dev>
+
 =item B<--newest>
 
 Only show newest non-dev version.
@@ -322,7 +328,7 @@ Dev versions will be skipped.
 
 =item B<--newest-n>=I<s>
 
-Only show this number of newest non-dev versions.
+Only show this number of newest versions.
 
 Dev versions will be skipped.
 
@@ -341,6 +347,8 @@ Whether to return detailed records.
 
 Module name/wildcard pattern.
 
+Can also be specified as the 1st command-line argument and onwards.
+
 Can be specified multiple times.
 
 =item B<--modules-json>=I<s>
@@ -348,6 +356,8 @@ Can be specified multiple times.
 Module names/wildcard patterns (JSON-encoded).
 
 See C<--module>.
+
+Can also be specified as the 1st command-line argument and onwards.
 
 =item B<--type>=I<s>
 
@@ -363,6 +373,8 @@ Only list modules matching certain type.
 
 File name/wildcard pattern.
 
+Can also be specified as the 1st command-line argument and onwards.
+
 Can be specified multiple times.
 
 =item B<--files-json>=I<s>
@@ -370,6 +382,8 @@ Can be specified multiple times.
 File names/wildcard patterns (JSON-encoded).
 
 See C<--file>.
+
+Can also be specified as the 1st command-line argument and onwards.
 
 =back
 
@@ -381,6 +395,8 @@ See C<--file>.
 
 File name/wildcard pattern.
 
+Can also be specified as the 1st command-line argument and onwards.
+
 Can be specified multiple times.
 
 =item B<--files-json>=I<s>
@@ -388,6 +404,8 @@ Can be specified multiple times.
 File names/wildcard patterns (JSON-encoded).
 
 See C<--file>.
+
+Can also be specified as the 1st command-line argument and onwards.
 
 =item B<--protect-file>=I<s@>
 
@@ -411,6 +429,8 @@ See C<--protect-file>.
 
 File name/wildcard pattern.
 
+Can also be specified as the 1st command-line argument and onwards.
+
 Can be specified multiple times.
 
 =item B<--files-json>=I<s>
@@ -418,6 +438,8 @@ Can be specified multiple times.
 File names/wildcard patterns (JSON-encoded).
 
 See C<--file>.
+
+Can also be specified as the 1st command-line argument and onwards.
 
 =back
 
@@ -439,6 +461,8 @@ files will alleviate this problem.
 
 File name/wildcard pattern.
 
+Can also be specified as the 1st command-line argument and onwards.
+
 Can be specified multiple times.
 
 =item B<--files-json>=I<s>
@@ -446,6 +470,8 @@ Can be specified multiple times.
 File names/wildcard patterns (JSON-encoded).
 
 See C<--file>.
+
+Can also be specified as the 1st command-line argument and onwards.
 
 =item B<--subdir>=I<s>
 
@@ -507,7 +533,22 @@ You can put multiple profiles in a single file by using section names like C<[pr
 
 You can also put configuration for multiple programs inside a single file, and use filter C<program=NAME> in section names, e.g. C<[program=NAME ...]> or C<[SOMESECTION program=NAME]>. The section will then only be used when the reading program matches.
 
-Finally, you can filter a section by environment variable using the filter C<env=CONDITION> in section names. For example if you only want a section to be read if a certain environment variable is true: C<[env=SOMEVAR ...]> or C<[SOMESECTION env=SOMEVAR ...]>. If you only want a section to be read when the value of an environment variable has value equals something: C<[env=HOSTNAME=blink ...]> or C<[SOMESECTION env=HOSTNAME=blink ...]>. If you only want a section to be read when the value of an environment variable does not equal something: C<[env=HOSTNAME!=blink ...]> or C<[SOMESECTION env=HOSTNAME!=blink ...]>. If you only want a section to be read when an environment variable contains something: C<[env=HOSTNAME*=server ...]> or C<[SOMESECTION env=HOSTNAME*=server ...]>. Note that currently due to simplistic parsing, there must not be any whitespace in the value being compared because it marks the beginning of a new section filter or section name.
+You can also filter a section by environment variable using the filter C<env=CONDITION> in section names. For example if you only want a section to be read if a certain environment variable is true: C<[env=SOMEVAR ...]> or C<[SOMESECTION env=SOMEVAR ...]>. If you only want a section to be read when the value of an environment variable equals some string: C<[env=HOSTNAME=blink ...]> or C<[SOMESECTION env=HOSTNAME=blink ...]>. If you only want a section to be read when the value of an environment variable does not equal some string: C<[env=HOSTNAME!=blink ...]> or C<[SOMESECTION env=HOSTNAME!=blink ...]>. If you only want a section to be read when the value of an environment variable includes some string: C<[env=HOSTNAME*=server ...]> or C<[SOMESECTION env=HOSTNAME*=server ...]>. If you only want a section to be read when the value of an environment variable does not include some string: C<[env=HOSTNAME!*=server ...]> or C<[SOMESECTION env=HOSTNAME!*=server ...]>. Note that currently due to simplistic parsing, there must not be any whitespace in the value being compared because it marks the beginning of a new section filter or section name.
+
+To load and configure plugins, you can use either the C<-plugins> parameter (e.g. C<< -plugins=DumpArgs >> or C<< -plugins=DumpArgs@before_validate_args >>), or use the C<[plugin=NAME ...]> sections, for example:
+
+ [plugin=DumpArgs]
+ -event=before_validate_args
+ -prio=99
+ 
+ [plugin=Foo]
+ -event=after_validate_args
+ arg1=val1
+ arg2=val2
+
+ 
+
+which is equivalent to setting C<< -plugins=-DumpArgs@before_validate_args@99,-Foo@after_validate_args,arg1,val1,arg2,val2 >>.
 
 List of available configuration parameters:
 
@@ -518,13 +559,13 @@ List of available configuration parameters:
  naked_res (see --naked-res)
  password (see --password)
  retries (see --retries)
- retry_delay (see --retry-delay)
- retry_max_delay (see --retry-max-delay)
  username (see --username)
 
 =head2 Configuration for subcommand cleanup
 
  detail (see --detail)
+ include_dev (see --include-dev)
+ include_nondev (see --exclude-nondev)
  num_keep (see --num-keep)
  protect_files (see --protect-file)
 
@@ -541,6 +582,8 @@ List of available configuration parameters:
 =head2 Configuration for subcommand ls-dists
 
  detail (see --detail)
+ include_dev (see --include-dev)
+ include_nondev (see --exclude-nondev)
  newest (see --newest)
  newest_n (see --newest-n)
 
@@ -609,7 +652,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019, 2015 by perlancar@cpan.org.
+This software is copyright (c) 2021 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

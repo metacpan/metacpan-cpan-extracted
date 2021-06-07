@@ -314,61 +314,19 @@ use warnings;
 use URI::Escape;
 use HTML::Entities ();
 use LWP::UserAgent ();
-use vars qw(@ISA @EXPORT);
+use parent 'StreamFinder::_Class';
 
 my $DEBUG = 0;
-my $bummer = ($^O =~ /MSWin/);
-my %uops = ();
-my @userAgentOps = ();
-
-require Exporter;
-
-@ISA = qw(Exporter);
-@EXPORT = qw(get getURL getType getID getTitle getIconURL getIconData getImageURL getImageData);
 
 sub new
 {
 	my $class = shift;
 	my $url = shift;
 
-	my $self = {};
 	return undef  unless ($url);
 
-	my $homedir = $bummer ? $ENV{'HOMEDRIVE'} . $ENV{'HOMEPATH'} : $ENV{'HOME'};
-	$homedir ||= $ENV{'LOGDIR'}  if ($ENV{'LOGDIR'});
-	$homedir =~ s#[\/\\]$##;
-	foreach my $p ("${homedir}/.config/StreamFinder/config", "${homedir}/.config/StreamFinder/Reciva/config") {
-		if (open IN, $p) {
-			my ($atr, $val);
-			while (<IN>) {
-				chomp;
-				next  if (/^\s*\#/o);
-				($atr, $val) = split(/\s*\=\>\s*/o, $_, 2);
-				eval "\$uops{$atr} = $val";
-			}
-			close IN;
-		}
-	}
-	foreach my $i (qw(agent from conn_cache default_headers local_address ssl_opts max_size
-			max_redirect parse_head protocols_allowed protocols_forbidden requests_redirectable
-			proxy no_proxy)) {
-		push @userAgentOps, $i, $uops{$i}  if (defined $uops{$i});
-	}
-	push (@userAgentOps, 'agent', 'Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101 Firefox/68.0')
-			unless (defined $uops{'agent'});
-#	push (@userAgentOps, 'ssl_opts', {verify_hostname => 0, SSL_version => 'TLSv1'})
-#			unless (defined $uops{'ssl_opts'});  #THIS STUPID SIGHT FORCES USE OF ANCIENT TLSv1?!
-	$uops{'timeout'} = 10  unless (defined $uops{'timeout'});
-	$DEBUG = $uops{'debug'}  if (defined $uops{'debug'});
-
-	while (@_) {
-		if ($_[0] =~ /^\-?debug$/o) {
-			shift;
-			$DEBUG = (defined($_[0]) && $_[0] =~/^[0-9]$/) ? shift : 1;
-		} else {
-			shift;
-		}
-	}	
+	my $self = $class->SUPER::new('Reciva', @_);
+	$DEBUG = $self->{'debug'}  if (defined $self->{'debug'});
 
 	unless ($url =~ /^https?\:/) {
 		$self->{'id'} = $url;
@@ -379,24 +337,23 @@ sub new
 	$self->{'id'} ||= $1  if ($url2 =~ /(\d\d+)/);
 	return undef  unless ($self->{'id'});
 
-
 	#NOTE:  THIS IS A 2-STEP FETCH:  1) FETCH THE UNALTERED URL TO GET THE ICON, 2) FETCH ALTERED ONE FOR STREAMS!:
 	my $html = '';
-	print STDERR "-0(Reciva): ID=".$self->{'id'}."= AGENT=".join('|',@userAgentOps)."=\n"  if ($DEBUG);
-	my $ua = LWP::UserAgent->new(@userAgentOps);
-	if (defined $uops{'reciva_ssl_opts'}) {
+	print STDERR "-0(Reciva): ID=".$self->{'id'}."= AGENT=".join('|',@{$self->{'_userAgentOps'}})."=\n"  if ($DEBUG);
+	my $ua = LWP::UserAgent->new(@{$self->{'_userAgentOps'}});
+	if (defined $self->{'reciva_ssl_opts'}) {
 		my @sslkeys = $ua->ssl_opts();
 		for (my $i=0;$i<=$#sslkeys;$i++) {
 			$self->{'_default_ssl_opts'}->{$sslkeys[$i]} = $ua->ssl_opts($sslkeys[$i]);
 		}
-		my %reciva_ssl_ops = %{$uops{'reciva_ssl_opts'}};
+		my %reciva_ssl_ops = %{$self->{'reciva_ssl_opts'}};
 		foreach my $i (keys %reciva_ssl_ops) {
 			$i =~ s/^reciva_//o;
 			$self->{'_reciva_ssl_opts'}->{$i} = $reciva_ssl_ops{$i};
 			$ua->ssl_opts($i, $reciva_ssl_ops{$i});
 		}
 	}
-	$ua->timeout($uops{'timeout'});
+	$ua->timeout($self->{'timeout'});
 	$ua->cookie_jar({});
 	$ua->env_proxy;
 	print STDERR "i:STEP 1: FETCHING URL ($url)...\n"  if ($DEBUG);
@@ -528,17 +485,13 @@ sub new
 
 	$self->{'total'} = $self->{'cnt'};
 	$self->{'streams'} = \@streams;
-	print STDERR "-SUCCESS: 1st stream=".${$self->{'streams'}}[0]."=\n"  if ($DEBUG);
+	$self->{'Url'} = ($self->{'total'} > 0) ? $self->{'streams'}->[0] : '';
+	print STDERR "--SUCCESS: 1st stream=".$self->{'Url'}."= total=".$self->{'total'}."=\n"
+			if ($DEBUG && $self->{'cnt'} > 0);
+
 	bless $self, $class;   #BLESS IT!
 
 	return $self;
-}
-
-sub get
-{
-	my $self = shift;
-
-	return wantarray ? @{$self->{'streams'}} : ${$self->{'streams'}}[0];
 }
 
 sub getURL   #LIKE GET, BUT ONLY RANDOMLY SELECT ONE TO RETURN:
@@ -551,8 +504,8 @@ sub getURL   #LIKE GET, BUT ONLY RANDOMLY SELECT ONE TO RETURN:
 		my $plType = $1;
 		my $firstStream = ${$self->{'streams'}}[$idx];
 		print STDERR "-getURL($idx): NOPLAYLISTS and (".${$self->{'streams'}}[$idx].")\n"  if ($DEBUG);
-		my $ua = LWP::UserAgent->new(@userAgentOps);	
-		$ua->timeout($uops{'timeout'});
+		my $ua = LWP::UserAgent->new(@{$self->{'_userAgentOps'}});	
+		$ua->timeout($self->{'timeout'});
 		$ua->cookie_jar({});
 		$ua->env_proxy;
 		if ($firstStream =~ /\breciva\b/ && defined $self->{'_reciva_ssl_opts'}) {
@@ -614,42 +567,12 @@ sub getURL   #LIKE GET, BUT ONLY RANDOMLY SELECT ONE TO RETURN:
 	return ${$self->{'streams'}}[$idx];
 }
 
-sub count
-{
-	my $self = shift;
-	return $self->{'total'};  #TOTAL NUMBER OF PLAYABLE STREAM URLS FOUND.
-}
-
-sub getType
-{
-	my $self = shift;
-	return 'Reciva';  #STATION TYPE (FOR PARENT StreamFinder MODULE).
-}
-
-sub getID
-{
-	my $self = shift;
-	return $self->{'id'};  #STATION'S RECIVA-ID.
-}
-
-sub getTitle
-{
-	my $self = shift;
-	return $self->{'title'};  #STATION'S TITLE(DESCRIPTION), IF ANY.
-}
-
-sub getIconURL
-{
-	my $self = shift;
-	return $self->{'iconurl'};  #URL TO THE STATION'S THUMBNAIL ICON, IF ANY.
-}
-
 sub getIconData
 {
 	my $self = shift;
 	return ()  unless ($self->{'iconurl'});
-	my $ua = LWP::UserAgent->new(@userAgentOps);		
-	$ua->timeout($uops{'timeout'});
+	my $ua = LWP::UserAgent->new(@{$self->{'_userAgentOps'}});		
+	$ua->timeout($self->{'timeout'});
 	$ua->cookie_jar({});
 	$ua->env_proxy;
 	if ($self->{'iconurl'} =~ /\breciva\b/ && defined $self->{'_reciva_ssl_opts'}) {
@@ -677,18 +600,12 @@ sub getIconData
 	return ($image_ext, $art_image);
 }
 
-sub getImageURL
-{
-	my $self = shift;
-	return $self->{'imageurl'};  #URL TO THE STATION'S BANNER IMAGE, IF ANY.
-}
-
 sub getImageData
 {
 	my $self = shift;
 	return ()  unless ($self->{'imageurl'});
-	my $ua = LWP::UserAgent->new(@userAgentOps);		
-	$ua->timeout($uops{'timeout'});
+	my $ua = LWP::UserAgent->new(@{$self->{'_userAgentOps'}});		
+	$ua->timeout($self->{'timeout'});
 	$ua->cookie_jar({});
 	$ua->env_proxy;
 	if ($self->{'imageurl'} =~ /\breciva\b/ && defined $self->{'_reciva_ssl_opts'}) {

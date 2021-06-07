@@ -1,0 +1,60 @@
+#!/usr/bin/perl
+use 5.014 ; use strict ; use warnings ; 
+use Getopt::Std ; getopts 'd:s' ,\my%o ; 
+use FindBin qw [ $Script ] ; 
+use Term::ANSIColor qw[ :constants color ] ; $Term::ANSIColor::AUTORESET = 1 ; 
+use Scalar::Util qw[ looks_like_number ] ; 
+use List::Util qw[ min max ] ; 
+
+$o{d} //= 1 ; # 色を1段階上げるのに、数値がいくつ高い必要があるか。
+
+
+while ( <> ) { 
+	my @F = do { chomp ; split /\t/o, $_ , -1 } ; 
+	for ( @F ) { 
+		if ( looks_like_number ( $_ ) ) { 
+			my $n = $o{s} ? sqrt ( $_ ) : $_ ;
+			my $d = max 0, min 5, int $n / $o{d} ; 
+			my $c = "on_rgb00$d" ;
+			$_ = color ($c) . $_ . color ('reset') ; 
+		}
+	}
+	say join "\t", @F ; 
+}
+
+
+=encoding utf8 
+
+=head1
+
+  $0
+    TSVファイルにおいて、数値のセルに対して背景に色を付ける。
+
+  オプション: 
+
+    -d N ; 数値/N に対応して6段階の色を付ける。
+    -s ; 数値に対して平方根を作用させる。
+
+
+=cut 
+
+## ヘルプとバージョン情報
+BEGIN {
+  $Getopt::Std::STANDARD_HELP_VERSION = 1 ; 
+  grep { m/--help/} @ARGV and *VERSION_MESSAGE = sub {} ; 
+  our $VERSION = 0.11 ;
+    # 最初は 0.21 を目安とする。
+    # 1.00 以上とする必要条件は英語版のヘルプをきちんと出すこと。
+    # 2.00 以上とする必要条件はテストコードが含むこと。
+}  
+sub HELP_MESSAGE{
+    use FindBin qw[ $Script ] ; 
+    $ARGV[1] //= '' ;
+    open my $FH , '<' , $0 ;
+    while(<$FH>){
+        s/\$0/$Script/g ;
+        print $_ if $ARGV[1] eq 'opt' ? m/^\ +\-/ : s/^=head1// .. s/^=cut// ;
+    }
+    close $FH ;
+    exit 0 ;
+}

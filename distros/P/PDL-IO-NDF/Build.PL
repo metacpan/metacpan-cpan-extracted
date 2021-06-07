@@ -5,13 +5,10 @@ use warnings;
 use Module::Build;
 use File::Spec;
 
-# Can not read a VERSION from a .PL file
-
 my $build = Module::Build->new
   (
    module_name => "PDL::IO::NDF",
    license => "perl",
-   dist_version => '1.06',
    dist_abstract => 'Read PDLs from NDF files and write PDLs to NDF files',
    dist_author => [
                    'Tim Jenness <tjenness@cpan.org>',
@@ -25,7 +22,7 @@ my $build = Module::Build->new
                 },
    requires => {
                 'Astro::FITS::Header' => 3.0,
-                'PDL' => "2.4.0",
+                'PDL' => '2.040',
                 'NDF' => 1.51,
                 },
    configure_requires => {

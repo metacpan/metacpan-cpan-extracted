@@ -4,42 +4,39 @@ NAME
 
 VERSION
 
-    version 0.04
+    version 0.05
 
 SYNOPSIS
+
+    In your Makefile.PL:
+
+     use ExtUtils::MakeMaker;
+     use Alien::Base::Wrapper ();
+    
+     WriteMakefile(
+       Alien::Base::Wrapper->new('Alien::Nettle')->mm_args2(
+         # MakeMaker args
+         NAME => 'My::XS',
+         ...
+       ),
+     );
 
     In your Build.PL:
 
      use Module::Build;
-     use Alien::Nettle;
+     use Alien::Base::Wrapper qw( Alien::Nettle !export );
+    
      my $builder = Module::Build->new(
        ...
        configure_requires => {
          'Alien::Nettle' => '0',
          ...
        },
-       extra_compiler_flags => Alien::Nettle->cflags,
-       extra_linker_flags   => Alien::Nettle->libs,
+       Alien::Base::Wrapper->mb_args,
        ...
      );
-     
+    
      $build->create_build_script;
-
-    In your Makefile.PL:
-
-     use ExtUtils::MakeMaker;
-     use Config;
-     use Alien::Nettle;
-     
-     WriteMakefile(
-       ...
-       CONFIGURE_REQUIRES => {
-         'Alien::Nettle' => '0',
-       },
-       CCFLAGS => Alien::Nettle->cflags . " $Config{ccflags}",
-       LIBS    => [ Alien::Nettle->libs ],
-       ...
-     );
 
 DESCRIPTION
 

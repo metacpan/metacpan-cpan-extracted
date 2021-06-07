@@ -1,0 +1,535 @@
+#!/usr/bin/perl
+#
+# EdelStamp (C) 2000-2016, ON-X, All rights reserved.
+# Author: Peter Sylvester <peter.sylvester@gmail.com>
+# This program is free software; you can redistribute it and/or
+# modify it under the same terms as Perl itself.
+#
+# Function: Create RFC 3161 time stamps
+#           Runs as CGI when REQUEST_METHOD is present.
+#        
+# Input:    The program needs three environment variables:
+#           TSAKeyFile         name of a pem encoded RS private key
+#           TSACertificateFile name of a der encoded certficate for the key
+#           TSAPolicy          a list of dot separated numbers
+#
+#           If the program finds REQUEST_METHOD, httpd context is assumed
+#           program reads a time stamp request from STDIN
+#           The REQUEST_METHOD must be POST
+#
+# Output:   A time stamp response (if http response is 200) to STDOUT.
+#           if under http context headers are prepended.
+#           Not details of errors are provided when status=2=rejected
+#
+# Errors:   Error details are written to STDERR and can be written to Syslog in
+#           and httpd context:
+#           Environement varibles SyslogOptions and SyslogFacility are used for parameterization
+#           See perl module Sys::Syslog fpr details        
+# Notes:    Policy on input is ignored, hash algorithms are not checked and copied as is.
+#           Since the maximim size of a request is limited, it is unlikely that a request
+#           contains the data instead of a hash.           
+# Example:  The following example are for the apache httpd server configuration 
+#
+#   ScriptAlias "/tsa/" "/var/www/cgi-bin/"
+#		<Directory "/var/www/cgi-bin">
+#			AllowOverride None
+#			Options +ExecCGI -MultiViews +SymLinksIfOwnerMatch
+#			Require all granted
+#            SetEnv TSACertificateFile /etc/apache2/pki/TSA.der
+#            SetEnv TSAKeyFile /etc/apache2/pki/TSA.key
+#            SetEnv TSAPolicy 1.2.3.4.1
+#            SetEnv TSATimeout 15
+#            SetEnv TSARequestLimit 500
+#            SetEnv SyslogOptions "nofatal,ndelay,pid"
+#            SetEnv SyslogFacility "user"
+#		</Directory>
+
+use strict;
+use warnings;
+
+use Convert::ASN1;
+use Time::HiRes;
+use Digest::SHA qw(sha256 sha1);
+use Crypt::OpenSSL::RSA;
+
+#{status=> {status=>2}} hard coded.
+my $rejected = "\x30\x05\x30\x03\x02\x01\x02";
+
+binmode(STDOUT);
+binmode(STDIN);
+binmode(STDERR,':utf8');
+
+# we like to test out a web server.
+my $HTTP = defined $ENV{'REQUEST_METHOD'} ;
+
+# and we can do syslog
+my $SYSLOG = ($HTTP && defined $ENV{'SyslogOptions'});
+if ($SYSLOG) { 
+    use Sys::Syslog ;
+    $ENV{'SyslogFacility'} = 'user' unless $ENV{'SyslogFacility'} ;
+    openlog('EdelStamp', $ENV{'SyslogOptions'}, $ENV{'SyslogFacility'}) or dieif(1,'Cannot open Syslog');
+}
+
+print "Content-Type: application/timestamp-response\n"
+     ."Content-Transfer-Encoding: binary\n" if $HTTP;
+
+# To be or not to be sorry
+sub dieif {
+   my ($cond,$text) = @_;
+   return unless $cond;
+   print "Content-Length: ".length($rejected)."\n\n" if $HTTP;
+   print $rejected;
+   print STDERR "$text\n";
+   syslog("info", $ENV{'REMOTE_ADDR'} . " $text") if $SYSLOG;
+   exit ;
+}
+# To leave some traces
+sub log {
+   my ($text) = @_;
+   print STDERR "$text\n";
+   syslog("info", $ENV{'REMOTE_ADDR'} . " $text") if $SYSLOG;
+}
+
+# Ok, start parse the ASN. It would be nice to have them directly.
+
+my $asn = Convert::ASN1->new;
+$asn->prepare(q<
+TimeStampReq ::= SEQUENCE  {
+   version                      INTEGER ,
+   messageImprint               MessageImprint,
+   reqPolicy             TSAPolicyId              OPTIONAL,
+   nonce                 INTEGER                  OPTIONAL,
+   certReq               BOOLEAN                  OPTIONAL,
+   extensions            [0] IMPLICIT Extensions  OPTIONAL 
+ }
+
+MessageImprint ::= SEQUENCE  {
+        hashAlgorithm                AlgorithmIdentifier,
+        hashedMessage                OCTET STRING  }
+
+AlgorithmIdentifier  ::=  SEQUENCE  {
+     algorithm               OBJECT IDENTIFIER,
+     parameters              NULL }
+
+TSAPolicyId ::= OBJECT IDENTIFIER
+
+Extensions  ::=  SEQUENCE OF Extension
+
+Extension  ::=  SEQUENCE  {
+     extnID      OBJECT IDENTIFIER,
+     critical    BOOLEAN OPTIONAL,
+     extnValue OCTET STRING }
+
+TimeStampResp ::= SEQUENCE  {
+     status                  PKIStatusInfo,
+     timeStampToken          TimeStampToken     OPTIONAL  }
+
+PKIStatusInfo ::= SEQUENCE {
+    status        PKIStatus,
+    statusString  PKIFreeText     OPTIONAL,
+    failInfo      PKIFailureInfo  OPTIONAL  }
+
+PKIStatus ::= INTEGER
+
+PKIFailureInfo ::= BIT STRING
+
+PKIFreeText ::= SEQUENCE OF UTF8String
+
+TimeStampToken ::= SEQUENCE {
+        contentType ContentType,
+        content [0] EXPLICIT SignedData }
+      ContentType ::= OBJECT IDENTIFIER 
+
+TSTInfo ::= SEQUENCE  {
+   version                      INTEGER ,
+   policy                       TSAPolicyId,
+   messageImprint               MessageImprint,
+   serialNumber                 INTEGER,
+   genTime                      GeneralizedTime,
+   accuracy                     Accuracy                 OPTIONAL,
+   ordering                     BOOLEAN                  OPTIONAL,
+   nonce                        INTEGER                  OPTIONAL,
+   tsa                          [0] GeneralName          OPTIONAL,
+   extensions                   [1] IMPLICIT Extensions   OPTIONAL  
+}
+
+Accuracy ::= SEQUENCE {
+         seconds        INTEGER              OPTIONAL,
+         millis     [0] INTEGER              OPTIONAL,
+         micros     [1] INTEGER              OPTIONAL  
+}
+
+Attribute ::= SEQUENCE {
+	type			AttributeType,
+	values			SET OF AttributeValue
+	}
+
+AttributeType ::= OBJECT IDENTIFIER
+
+AttributeValue ::= ANY 
+
+AttributeTypeAndValue ::= SEQUENCE {
+	type			AttributeType,
+	value			AttributeValue
+	}
+
+Name ::= CHOICE { -- only one possibility for now 
+	rdnSequence		RDNSequence 			
+	}
+
+RDNSequence ::= SEQUENCE OF RelativeDistinguishedName
+
+DistinguishedName ::= RDNSequence
+
+RelativeDistinguishedName ::= 
+	SET OF AttributeTypeAndValue  --SET SIZE (1 .. MAX) OF
+
+DirectoryString ::= CHOICE {
+	teletexString		TeletexString,  --(SIZE (1..MAX)),
+	printableString		PrintableString,  --(SIZE (1..MAX)),
+	bmpString		BMPString,  --(SIZE (1..MAX)),
+	universalString		UniversalString,  --(SIZE (1..MAX)),
+	utf8String		UTF8String,  --(SIZE (1..MAX)),
+	ia5String		IA5String  --added for EmailAddress
+	}
+
+Certificate ::= SEQUENCE  {
+	tbsCertificate		TBSCertificate,
+	signatureAlgorithm	AlgorithmIdentifier,
+	signature		BIT STRING
+	}
+
+TBSCertificate  ::=  SEQUENCE  {
+	version		    [0] EXPLICIT Version OPTIONAL,  --DEFAULT v1
+	serialNumber		CertificateSerialNumber,
+	signature		AlgorithmIdentifier,
+	issuer			Name,
+	validity		Validity,
+	subject			Name,
+	subjectPublicKeyInfo	SubjectPublicKeyInfo,
+	issuerUniqueID	    [1] IMPLICIT UniqueIdentifier OPTIONAL,
+		-- If present, version shall be v2 or v3
+	subjectUniqueID	    [2] IMPLICIT UniqueIdentifier OPTIONAL,
+		-- If present, version shall be v2 or v3
+	extensions	    [3] EXPLICIT Extensions OPTIONAL
+		-- If present, version shall be v3
+	}
+
+Version ::= INTEGER  --{  v1(0), v2(1), v3(2)  }
+CertificateSerialNumber ::= INTEGER
+
+Validity ::= SEQUENCE {
+	notBefore		Time,
+	notAfter		Time
+	}
+
+UniqueIdentifier ::= BIT STRING
+
+SubjectPublicKeyInfo ::= SEQUENCE {
+	algorithm		AlgorithmIdentifier,
+	subjectPublicKey	BIT STRING
+	}
+
+AlgorithmIdentifier ::= SEQUENCE {
+	algorithm		OBJECT IDENTIFIER,
+	parameters		ANY
+	}
+
+GeneralNames ::= SEQUENCE OF GeneralName
+GeneralName ::= CHOICE {
+     otherName                       [0]     AnotherName,
+     rfc822Name                      [1]     IA5String,
+     dNSName                         [2]     IA5String,
+     x400Address                     [3]     ANY, --ORAddress,
+     directoryName                   [4]     Name,
+     ediPartyName                    [5]     EDIPartyName,
+     uniformResourceIdentifier       [6]     IA5String,
+     iPAddress                       [7]     OCTET STRING,
+     registeredID                    [8]     OBJECT IDENTIFIER }
+
+AnotherName ::= SEQUENCE {
+     type    OBJECT IDENTIFIER,
+     value      [0] EXPLICIT ANY } --DEFINED BY type-id }
+
+EDIPartyName ::= SEQUENCE {
+     nameAssigner            [0]     DirectoryString OPTIONAL,
+     partyName               [1]     DirectoryString }
+
+IssuerAltName ::= GeneralNames
+
+SubjectDirectoryAttributes ::= SEQUENCE OF Attribute
+
+EncapsulatedContentInfo ::= SEQUENCE {
+     eContentType ContentType,
+     eContent [0] EXPLICIT OCTET STRING OPTIONAL }
+
+ContentType ::= OBJECT IDENTIFIER
+
+CMSVersion ::= INTEGER 
+
+DigestAlgorithmIdentifiers ::= SET OF DigestAlgorithmIdentifier
+
+DigestAlgorithmIdentifier ::= AlgorithmIdentifier
+
+SignerInfo ::= SEQUENCE {
+     version CMSVersion,
+     sid SignerIdentifier,
+     digestAlgorithm DigestAlgorithmIdentifier,
+     signedAttrs [0] IMPLICIT SignedAttributes OPTIONAL,
+     signatureAlgorithm SignatureAlgorithmIdentifier,
+     signature SignatureValue,
+     unsignedAttrs [1] IMPLICIT UnsignedAttributes OPTIONAL }
+SignerIdentifier ::= CHOICE {
+     issuerAndSerialNumber IssuerAndSerialNumber,
+     subjectKeyIdentifier [0] OCTET STRING }
+
+SignatureAlgorithmIdentifier ::= AlgorithmIdentifier
+
+SignedAttributes ::= SET OF ANY
+UnsignedAttributes ::= SET OF ANY
+CMSAttribute ::= SEQUENCE {
+   attrType OBJECT IDENTIFIER,
+   attrValues  SET OF CMSAttributeValue }
+
+CMSAttributeValue ::= ANY
+SignatureValue ::= OCTET STRING
+IssuerAndSerialNumber ::= SEQUENCE {
+     issuer Name,
+     serialNumber CertificateSerialNumber }
+CertificateSerialNumber ::= INTEGER
+
+SigningTime ::= Time
+Time ::= CHOICE {
+     utcTime UTCTime,
+     generalTime GeneralizedTime }
+MessageDigest ::= OCTET STRING
+SignedData ::= SEQUENCE {
+        version CMSVersion,
+       digestAlgorithms DigestAlgorithmIdentifiers,
+        encapContentInfo EncapsulatedContentInfo,
+          certificates [0] IMPLICIT CertificateSet OPTIONAL,
+--        crls [1] IMPLICIT RevocationInfoChoices OPTIONAL,
+        signerInfos SignerInfos }
+DigestAlgorithmIdentifiers ::= SET OF DigestAlgorithmIdentifier
+SignerInfos ::= SET OF SignerInfo
+CertificateSet ::= SET OF CertificateChoices
+SigningCertificate ::=  SEQUENCE {
+       certs        SEQUENCE OF ESSCertID,
+       policies     SEQUENCE OF PolicyInformation OPTIONAL }
+
+PolicyInformation ::= SEQUENCE {
+     policyIdentifier   CertPolicyId,
+     policyQualifiers   SEQUENCE OF
+             PolicyQualifierInfo } --OPTIONAL }
+CertPolicyId ::= OBJECT IDENTIFIER
+PolicyQualifierInfo ::= SEQUENCE {
+       policyQualifierId  PolicyQualifierId,
+       qualifier        ANY } --DEFINED BY policyQualifierId }
+PolicyQualifierId ::=
+     OBJECT IDENTIFIER --( id-qt-cps | id-qt-unotice )
+-- CPS pointer qualifier
+CPSuri ::= IA5String
+-- user notice qualifier
+UserNotice ::= SEQUENCE {
+     noticeRef        NoticeReference OPTIONAL,
+     explicitText     DisplayText OPTIONAL}
+
+NoticeReference ::= SEQUENCE {
+     organization     DisplayText,
+     noticeNumbers    SEQUENCE OF INTEGER }
+
+DisplayText ::= CHOICE {
+     visibleString    VisibleString  ,
+     bmpString        BMPString      ,
+     utf8String       UTF8String      }
+
+ESSCertID ::=  SEQUENCE {
+        certHash     OCTET STRING,  -- SHA1 hash of entire certificate
+        issuerSerial IssuerSerial OPTIONAL }
+IssuerSerial ::= SEQUENCE {
+        issuer       GeneralNames,
+        serialNumber CertificateSerialNumber }
+CertificateChoices ::= CHOICE {
+     certificate ANY -- we already have it encoded
+--     v2AttrCert [2] IMPLICIT AttributeCertificateV2,
+--     other [3] IMPLICIT OtherCertificateFormat 
+}
+  >) or &dieif(1, "Bad ASN1 definitions: " . $asn->error) ;
+
+# a little helper
+sub asnfind {
+   my ($macro) = @_;
+   my $asn_macro = $asn->find($macro) or &dieif(1,"No ASN1 syntax for '$macro'");
+   return $asn_macro;
+}
+# can we give a response?
+my $asn_resp = &asnfind('TimeStampResp');
+$asn_resp->configure('encoding','DER');
+
+# can we parse?
+my $asn_tspreq = &asnfind('TimeStampReq');
+&dieif(!$HTTP || $ENV{CONTENT_TYPE} ne 'application/timestamp-query',"Invalid content type received");
+&dieif(!$HTTP || $ENV{'REQUEST_METHOD'} ne 'POST',"Request Method is not POST");
+
+# requests are small, we don't want large files here and we timeout, 
+# we don't care about contentlength
+
+my $cnt=$ENV{'TSATimeout'}+0; $cnt=15 unless $cnt>2 && $cnt<120;
+my $limit=$ENV{'TSARequestLimit'}+0; $limit=300 unless $limit>5 && $cnt<20000;
+
+# normally a request comes in one packet, but we never know.
+my $pdu='';
+while ($cnt-- >0) {
+   my $asn_tspreq = &asnfind('TimeStampReq');
+   my $next;
+   read STDIN, $next, $limit;  
+   if ($next eq '') {
+      sleep(1); 
+   } else {
+      $pdu .= $next; 
+      &dieif(($cnt <= 0),"Timeout");
+      &dieif((length($pdu)>$limit),"Request too long");
+      my $tspreq = $asn_tspreq->decode($pdu);
+   }
+   last unless $asn_tspreq->error() ;
+}
+
+my $tspreq = $asn_tspreq->decode($pdu);
+&dieif($asn_tspreq->error(),'Invalid request');
+&dieif($tspreq->{'version'} != 1,'Invalid version');
+
+# get policy, cert and key
+{
+   &dieif(!$ENV{'TSAPolicy'});
+   my $asn_policyid=&asnfind('TSAPolicyId'); 
+   $asn_policyid->encode($ENV{'TSAPolicy'});
+   &dieif($asn_policyid->error(),"Invalid TSAPolicy syntax");
+} 
+my $tsa_cert;
+my $tsa_cert_asn;
+my $certDigest;
+  { # get certificate
+	my $filename = $ENV{'TSACertificateFile'} or &dieif(1, "Missing environment variable 'TSACertificateFile'");
+        my ($dev,$ino,$mode,$nlink,$uid,$gid,$rdev,$size,
+        $atime,$mtime,$ctime,$blksize,$blocks) = stat $filename;
+	open TSACERT, "<$filename" or &dieif(1, "cannot open TSACertificateFile '$filename'");
+	binmode TSACERT;
+	read TSACERT, $tsa_cert_asn, $size;
+	close TSACERT;
+        $certDigest=sha1($tsa_cert_asn);
+	my $asn_cert=&asnfind('Certificate'); 
+	$tsa_cert = $asn_cert->decode( $tsa_cert_asn) or &dieif(1, $asn_cert->error());
+  }
+my $tsa_key;
+  { # get key
+	my $filename = $ENV{'TSAKeyFile'} or &dieif(1, "Missing environment variable 'TSAKeyFile'");;
+        my ($dev,$ino,$mode,$nlink,$uid,$gid,$rdev,$size,
+        $atime,$mtime,$ctime,$blksize,$blocks) = stat $filename;
+	open TSAKEY, "<$filename" or &dieif(1,"cannot open TSAKeyFile '$filename'");
+	binmode TSAKEY;
+        my $tsa_key_pem;
+	read TSAKEY, $tsa_key_pem, $size;  
+	close TSAKEY;
+        $tsa_key = Crypt::OpenSSL::RSA->new_private_key($tsa_key_pem) or &dieif(1,"TSAKeyFile '$filename' cannot be decoded");
+  }
+
+# some magic
+my $time = Time::HiRes::gettimeofday() ;
+my $now = int($time);
+my $serial = ($time-1288070000)*1000000*100000 +$$;
+my $TSTInfo_asn = &asnfind('TSTInfo');
+$TSTInfo_asn->configure('encoding','DER');
+$TSTInfo_asn->configure('encode',{time=>'withzone'});
+$TSTInfo_asn->configure('encode',{timezone=>0});
+
+# TBD: Add whatever logic you want to fill the TSTInfo, e.g. accurancy, take policy from input.
+# check the validity of the digest, OIDs + length. 
+
+my $tstinfo = {
+      version=>1, 
+      policy=>$ENV{'TSAPolicy'},
+      messageImprint=> $tspreq->{'messageImprint'},
+      genTime=>$now,
+      serialNumber=>$serial,
+      tsa=>{directoryName=>$tsa_cert->{'tbsCertificate'}->{'subject'}}
+};
+$tstinfo->{'nonce'} = $tspreq->{'nonce'} if defined $tspreq->{'nonce'};
+
+# encode the content
+my $tstinfostr=$TSTInfo_asn->encode($tstinfo) || &dieif(1,"Cannot encode TSTINFO:" .$TSTInfo_asn->error()); 
+
+# and hash it with sha256
+
+my $DigestAlgorithmIdentifiers=[];
+$DigestAlgorithmIdentifiers->[0]={algorithm=>'2 16 840 1 101 3 4 2 1',parameters=>"\x05\x00"};
+my $DigestAlgorithmIdentifiers_asn = &asnfind('DigestAlgorithmIdentifiers') ;
+my $contentDigest=sha256($tstinfostr);
+
+# encode message attributes
+
+my @CMSAttributeList;
+my $CMSAttribute_asn = &asnfind('CMSAttribute'); 
+  {
+     my $CMSAttributevalue_asn = &asnfind('ContentType');
+     my $l = []; $l->[0] = $CMSAttributevalue_asn->encode('1.2.840.113549.1.9.16.1.4');
+     my $CMSAttribute={attrType=>'1.2.840.113549.1.9.3', attrValues=>$l};
+     push @CMSAttributeList,$CMSAttribute_asn->encode($CMSAttribute); 
+  }
+  {
+     my $CMSAttributevalue_asn = &asnfind('SigningTime') ;
+     my $l = []; $l->[0] = $CMSAttributevalue_asn->encode(generalTime=>$now);
+     my $CMSAttribute={attrType=>'1.2.840.113549.1.9.5', attrValues=>$l};
+     push @CMSAttributeList,$CMSAttribute_asn->encode($CMSAttribute); 
+  }
+  {
+     my $CMSAttributevalue_asn = &asnfind('MessageDigest') ;
+     my $l = []; $l->[0] = $CMSAttributevalue_asn->encode($contentDigest);
+     my $CMSAttribute={attrType=>'1.2.840.113549.1.9.4', attrValues=>$l};
+     push @CMSAttributeList,$CMSAttribute_asn->encode($CMSAttribute); 
+  }
+  {
+     my $CMSAttributevalue_asn = &asnfind('SigningCertificate') ;
+     my $SC=[]; $SC->[0] = {certHash=>$certDigest};
+     my $l = []; $l->[0] = $CMSAttributevalue_asn->encode({certs=>$SC});
+     my $CMSAttribute={attrType=>'1.2.840.113549.1 9.16.2.12', attrValues=>$l};
+      push @CMSAttributeList,$CMSAttribute_asn->encode($CMSAttribute); 
+  } 
+my @SortedAttributes = sort @CMSAttributeList; # needed for DER, just to be sure.
+my $CMSAttributes_asn = &asnfind('SignedAttributes') ;
+my $TBSattrs=$CMSAttributes_asn->encode(\@SortedAttributes) or &dieif(1,$CMSAttributes_asn->error());
+
+# create and sign a signerinfo
+$tsa_key->use_sha256_hash();
+my $SignerInfos=[]; $SignerInfos->[0] = {
+     version =>1,  
+     digestAlgorithm=>$DigestAlgorithmIdentifiers->[0],
+     sid=>{issuerAndSerialNumber=>{issuer=>$tsa_cert->{'tbsCertificate'}->{'issuer'},
+           serialNumber=>$tsa_cert->{'tbsCertificate'}->{'serialNumber'},}},
+     signedAttrs=>\@SortedAttributes,
+     signatureAlgorithm=>$DigestAlgorithmIdentifiers->[0],
+     signature=>$tsa_key->sign($TBSattrs),
+   };
+# finish the token and response
+my $CertificateSet=[]; $CertificateSet->[0]={certificate=>$tsa_cert_asn};
+my $TimeStampToken={
+   contentType=>'1 2 840 113549 1 7 2',
+   content=>{
+      version=>3,
+      digestAlgorithms=>$DigestAlgorithmIdentifiers,
+      encapContentInfo=>{ 
+         eContentType=>'1.2.840.113549.1.9.16.1.4',
+         eContent=>$tstinfostr
+      },
+      certificates=>$CertificateSet,
+      signerInfos=>$SignerInfos,
+   }};
+my $response = $asn_resp->encode({status=> {status=>0},timeStampToken=>$TimeStampToken}) or &dieif(1,"Cannot create Timestampresponse");
+print STDOUT "Content-Disposition: Attachment; filename=$now-$$.tsr\n";
+print STDOUT "Content-Length:" .length($response) . "\n\n" if $HTTP; print STDOUT $response;
+
+my $messageImprint_asn  = &asnfind('MessageImprint');
+my $messageImprint= $messageImprint_asn->encode($tspreq->{'messageImprint'}) or &dieif(1,$messageImprint_asn->error());
+
+&log('ReceivedHash ' . unpack('H*', $messageImprint) . ' SignedAtributes ' . unpack("H*",$TBSattrs) ) ;
+# This is the end (for now)
+

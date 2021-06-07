@@ -1,6 +1,6 @@
 #!/usr/bin/env perl
 
-use 5.022;
+use 5.024;
 
 # Using Test2, important to specify which version of Test2
 # since later versions may break things.
@@ -43,12 +43,12 @@ subtest 'STAR' => sub {
     1, 'STAR returned true for tie when there was a tie' );
   is( $tietop->STAR( $tietop->Active() )->{'winner'} ,
     0, 'STAR returned false for winner when there was a tie' );
-  $fastfood->SetActive( 
+  $fastfood->SetActive(
     { 'CARLS' => 1, 'KFC' => 1, 'WIMPY' => 1 });
   my $result1 = $fastfood->STAR();
   is( $result1->{'winner'},
     'CARLS', 'Changed ActiveSet for fastfood, confirmed winner' );
-  my $result2 = $fastfood->STAR( 
+  my $result2 = $fastfood->STAR(
     { 'QUICK' => 1, 'KFC' => 1, 'WENDYS' => 1 } );
   is( $result2->{'winner'},
     'WENDYS', 'passed another ActiveSet as argument' );
@@ -101,7 +101,7 @@ my $fixset = Vote::Count::Method::STAR->new(
             }
         },
     ];
-    
+
   is( $fixset->STAR()->{'winner'}, 0, "A Tie" );
 };
 

@@ -1,6 +1,6 @@
 package Bio::Palantir::Refiner;
 # ABSTRACT: front-end class for Bio::Palantir::Refiner module, wich handles the refinement of NRPS/PKS BGC annotations
-$Bio::Palantir::Refiner::VERSION = '0.201670';
+$Bio::Palantir::Refiner::VERSION = '0.211420';
 use Moose;
 use namespace::autoclean;
 
@@ -72,7 +72,7 @@ Bio::Palantir::Refiner - front-end class for Bio::Palantir::Refiner module, wich
 
 =head1 VERSION
 
-version 0.201670
+version 0.211420
 
 =head1 DESCRIPTION
 

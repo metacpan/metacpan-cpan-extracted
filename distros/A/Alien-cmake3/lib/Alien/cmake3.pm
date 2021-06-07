@@ -6,7 +6,7 @@ use 5.008001;
 use base qw( Alien::Base );
 
 # ABSTRACT: Find or download or build cmake 3 or better
-our $VERSION = '0.05'; # VERSION
+our $VERSION = '0.06'; # VERSION
 
 
 sub exe
@@ -41,7 +41,7 @@ Alien::cmake3 - Find or download or build cmake 3 or better
 
 =head1 VERSION
 
-version 0.05
+version 0.06
 
 =head1 SYNOPSIS
 
@@ -62,7 +62,7 @@ From L<alienfile>
    plugin 'Build::CMake';
    build [
      # this is the default build step, if you do not specify one.
-     [ '%{cmake}', -G => '%{cmake_generator}', '-DCMAKE_POSITION_INDEPENDENT_CODE:BOOL=true', '-DCMAKE_INSTALL_PREFIX:PATH=%{.install.prefix}', '.' ],
+     [ '%{cmake3}', -G => '%{cmake_generator}', '-DCMAKE_POSITION_INDEPENDENT_CODE:BOOL=true', '-DCMAKE_INSTALL_PREFIX:PATH=%{.install.prefix}', '.' ],
      '%{make}',
      '%{make} install',
    ];
@@ -93,7 +93,7 @@ The name of the C<cmake> executable.
 
  %{cmake3}
 
-The name of the <cmake> executable.
+The name of the C<cmake> executable.
 
 =head1 SEE ALSO
 

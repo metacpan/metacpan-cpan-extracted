@@ -3,8 +3,8 @@ use warnings;
 use strict;
 use Carp;
 use utf8;
-our $VERSION = '0.12';
-use C::Tokenize '0.14', ':all';
+our $VERSION = '0.13';
+use C::Tokenize '0.18', ':all';
 use Text::LineNumber;
 use File::Slurper 'read_text';
 use Carp qw/croak carp cluck confess/;
@@ -134,22 +134,22 @@ sub check_perl_prefix
 # Regular expression to match a C declaration.
 
 my $declare_re = qr/
-		       (
-			   (
-			       (?:
-				   (?:$reserved_re|$word_re)
-				   (?:\b|\s+)
-			       |
-				   \*\s*
-			       )+
-			   )
-			   (
-			       $word_re
-			   )
-		       )
-		       # Match initial value.
-		       \s*(?:=[^;]+)?;
-		   /x;
+    (
+	(
+	    (?:
+		(?:$reserved_re|$word_re)
+		(?:\b|\s+)
+	    |
+		\*\s*
+	    )+
+	)
+	(
+	    $word_re
+	)
+    )
+    # Match initial value.
+    \s*(?:=[^;]+)?;
+/x;
 
 # Read the declarations.
 
@@ -227,15 +227,15 @@ sub cleanup
 # Regex to match (void) in XS function call.
 
 my $void_re = qr/
-		    $word_re\s*
-		    \(\s*void\s*\)\s*
-		    (?=
-			# CODE:, PREINIT:, etc.
-			[A-Z]+:
-#		    |
-			# Normal C function start
-#			\{
-		    )
+    $word_re\s*
+    \(\s*void\s*\)\s*
+    (?=
+	# CODE:, PREINIT:, etc.
+	[A-Z]+:
+	#		    |
+	# Normal C function start
+	#			\{
+    )
 /xsm;
 
 # Look for (void) XS functions
@@ -254,19 +254,22 @@ check_hash_comments
     my ($o) = @_;
     while ($o->{xs} =~ /^#\s*(\w*)/gsm) {
 	my $hash = $1;
-	if ($hash !~ /^(?:
-			  define|
-			  else|
-			  endif|
-			  error|
-			  ifdef|
-			  ifndef|
-			  if|
-			  include|
-			  line|
-			  undef|
-			  warning|
-			  ZZZZZZZZZZZ)(\s+|$)/x) {
+	if ($hash !~ /
+	    ^(?:
+		define|
+		elif|
+		else |
+		endif|
+		error|
+		ifdef|
+		ifndef|
+		if |
+		include|
+		line|
+		undef|
+		warning|
+		ZZZZZZZZZZZ)(\s+|$
+	    )/x) {
 	    $o->report ("Put whitespace before # in comments");
 	}
     }

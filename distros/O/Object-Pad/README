@@ -431,7 +431,13 @@ KEYWORDS
     class that implements it. It is an error at compiletime if the
     implementing class does not provide such a method.
 
-IMPLIED PRAGMATA
+CREPT FEATURES
+
+    While not strictly part of being an object system, this module has
+    nevertheless gained a number of behaviours by feature creep, as they
+    have been found useful.
+
+ Implied Pragmata
 
     In order to encourage users to write clean, modern code, the body of
     the class block acts as if the following pragmata are in effect:
@@ -452,6 +458,12 @@ IMPLIED PRAGMATA
     problematic. Either the code will continue to run unaffected, or you
     may have to make some small alterations to bring it into a conforming
     style.
+
+ Yield True
+
+    A class statement or block will yield a true boolean value. This means
+    that it can be used directly inside a .pm file, avoiding the need to
+    explicitly yield a true value from the end of it.
 
 SUBCLASSING CLASSIC PERL CLASSES
 

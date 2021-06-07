@@ -3,12 +3,10 @@
 #
 #  (C) Paul Evans, 2011 -- leonerd@leonerd.org.uk
 
-package Net::Async::Tangence;
+package Net::Async::Tangence 0.16;
 
-use strict;
+use v5.14;
 use warnings;
-
-our $VERSION = '0.15';
 
 =head1 NAME
 

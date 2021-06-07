@@ -3,7 +3,7 @@ package Mojolicious::Plugin::JSONRPC2;
 use Mojo::Base 'Mojolicious::Plugin';
 use Carp;
 
-our $VERSION = 'v2.0.3';
+our $VERSION = 'v2.0.4';
 
 use JSON::XS;
 # to ensure callback runs on notification
@@ -87,7 +87,7 @@ Mojolicious::Plugin::JSONRPC2 - JSON-RPC 2.0 over HTTP
 
 =head1 VERSION
 
-This document describes Mojolicious::Plugin::JSONRPC2 version v2.0.3
+This document describes Mojolicious::Plugin::JSONRPC2 version v2.0.4
 
 
 =head1 SYNOPSIS

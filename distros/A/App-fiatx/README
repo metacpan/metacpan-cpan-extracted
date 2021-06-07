@@ -2,92 +2,54 @@ NAME
     App::fiatx - Fiat currency exchange rate tool
 
 VERSION
-    This document describes version 0.007 of App::fiatx (from Perl
-    distribution App-fiatx), released on 2018-06-27.
+    This document describes version 0.008 of App::fiatx (from Perl
+    distribution App-fiatx), released on 2021-05-26.
 
 SYNOPSIS
     See the included script fiatx.
 
 FUNCTIONS
-  sources
+  fiatx
     Usage:
 
-     sources() -> [status, msg, result, meta]
+     fiatx(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
-    List available sources.
-
-    This function is not exported.
-
-    No arguments.
-
-    Returns an enveloped result (an array).
-
-    First element (status) is an integer containing HTTP status code (200
-    means OK, 4xx caller error, 5xx function error). Second element (msg) is
-    a string containing error message, or 'OK' if status is 200. Third
-    element (result) is optional, the actual result. Fourth element (meta)
-    is called result metadata and is optional, a hash that contains extra
-    information.
-
-    Return value: (any)
-
-  spot_rates
-    Usage:
-
-     spot_rates(%args) -> [status, msg, result, meta]
-
-    Get spot (latest) rate(s) from a source.
+    Currency exchange rate tool.
 
     This function is not exported.
 
     Arguments ('*' denotes required arguments):
 
-    *   db_name* => *str*
+    *   action => *str* (default: "get_spot_rates")
+
+    *   db_name => *str*
 
     *   db_password => *str*
 
     *   db_username => *str*
+
+    *   default_quote_currency => *fiat_or_cryptocurrency*
 
     *   max_age_cache => *nonnegint* (default: 14400)
 
         Above this age (in seconds), we retrieve rate from remote source
         again.
 
-    *   pair => *currency::pair*
+    *   query => *str*
 
-    *   per_type => *bool*
-
-        Return one row of result per rate type.
-
-        This allow seeing notes and different mtime per rate type, which can
-        be different between different types of the same source.
-
-    *   source => *str* (default: ":all")
-
-        Ask for a specific remote source.
-
-        If you want a specific remote source, you can specify it here. The
-        default is ':any' which is to pick the first source that returns a
-        recent enough current rate.
-
-        Other special values: ":highest" to return highest rate of all
-        sources, ":lowest" to return lowest rate of all sources, ':newest'
-        to return rate from source with the newest last update time,
-        ':oldest' to return rate from source with the oldest last update
-        time, ':average' to return arithmetic average of all sources.
-
-    *   type => *str*
-
-        Which rate is wanted? e.g. sell, buy.
+    *   sources => *array[str]*
 
     Returns an enveloped result (an array).
 
-    First element (status) is an integer containing HTTP status code (200
-    means OK, 4xx caller error, 5xx function error). Second element (msg) is
-    a string containing error message, or 'OK' if status is 200. Third
-    element (result) is optional, the actual result. Fourth element (meta)
-    is called result metadata and is optional, a hash that contains extra
-    information.
+    First element ($status_code) is an integer containing HTTP-like status
+    code (200 means OK, 4xx caller error, 5xx function error). Second
+    element ($reason) is a string containing error message, or something
+    like "OK" if status is 200. Third element ($payload) is the actual
+    result, but usually not present when enveloped result is an error
+    response ($status_code is not 2xx). Fourth element (%result_meta) is
+    called result metadata and is optional, a hash that contains extra
+    information, much like how HTTP response headers provide additional
+    metadata.
 
     Return value: (any)
 
@@ -100,7 +62,7 @@ SOURCE
 
 BUGS
     Please report any bugs or feature requests on the bugtracker website
-    <https://rt.cpan.org/Public/Dist/Display.html?Name=App-fiatx>
+    <https://github.com/perlancar/perl-App-fiatx/issues>
 
     When submitting a bug or request, please include a test-file or a patch
     to an existing test-file that illustrates the bug or desired feature.
@@ -108,11 +70,77 @@ BUGS
 SEE ALSO
     Finance::Currency::FiatX
 
+                my @rows;
+        my $resmeta = {};
+
+        if ($args{per_type}) {
+            for (@$rows0) {
+                delete $_->{source} unless $source eq ':all';
+                push @rows, $_;
+            }
+            $resmeta->{'table.fields'}        = ['source', 'pair', 'type' , 'rate' , 'note'];
+            $resmeta->{'table.field_formats'} = [undef   , undef , undef  , $fnum8 , undef ];
+            $resmeta->{'table.field_aligns'}  = ['left'  , 'left', 'right', 'right', 'left'];
+            unless ($source eq ':all') {
+                shift @{ $resmeta->{'table.fields'} };
+                shift @{ $resmeta->{'table.field_formats'} };
+                shift @{ $resmeta->{'table.field_aligns'} };
+            }
+        } else {
+            my %sources;
+            for my $r (@$rows0) {
+                my $src = $r->{source} // '';
+                $sources{ $src }++;
+            }
+
+            for my $src (sort keys %sources) {
+                my %per_pair_rates;
+                for my $r (@$rows0) {
+                    next unless ($r->{source} // '') eq $src;
+                    $per_pair_rates{ $r->{pair} } //= {
+                        pair => $r->{pair},
+                        mtime => 0,
+                    };
+                    $per_pair_rates{ $r->{pair} }{source} = $src
+                        unless $source eq $src;
+                    next unless $r->{type} =~ /^(buy|sell)/;
+                    $per_pair_rates{ $r->{pair} }{ $r->{type} } = $r->{rate};
+                    $per_pair_rates{ $r->{pair} }{mtime} = $r->{mtime}
+                        if $per_pair_rates{ $r->{pair} }{mtime} < $r->{mtime};
+                }
+                for my $pair (sort keys %per_pair_rates) {
+                    push @rows, $per_pair_rates{$pair};
+                }
+            }
+            $resmeta->{'table.fields'}        = ['source', 'pair', 'buy'  , 'sell' , 'mtime'           ];
+            $resmeta->{'table.field_formats'} = [undef   , undef , $fnum8 , $fnum8 , 'iso8601_datetime'];
+            $resmeta->{'table.field_aligns'}  = ['left'  , 'left', 'right', 'right', 'left'];
+            if ($source =~ /\A\w+\z/) {
+                shift @{ $resmeta->{'table.fields'} };
+                shift @{ $resmeta->{'table.field_formats'} };
+                shift @{ $resmeta->{'table.field_aligns'} };
+            }
+            $resmeta->{'table.field_align_code'}  = sub { $_[0] =~ /^(buy|sell)/ ? 'right' : undef },
+            $resmeta->{'table.field_format_code'} = sub { $_[0] =~ /^(buy|sell)/ ? $fnum8  : undef },
+        }
+
+      FILTER_ROWS:
+        {
+            my @rows_f;
+            for (@rows) {
+                next if $pair && $_->{pair} ne $pair;
+                push @rows_f, $_;
+            }
+            @rows = @rows_f;
+        }
+
+        [200, "OK", \@rows, $resmeta];
+
 AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2018 by perlancar@cpan.org.
+    This software is copyright (c) 2021, 2018 by perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

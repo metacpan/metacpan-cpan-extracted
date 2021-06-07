@@ -36,53 +36,55 @@ sub months
 sub days
 {
     # http://www.tarver-genealogy.net/aids/spanish/sp_dates_num.html#days
-    return (
-        qr{\blunes\b}     => 1, # Monday
-        qr{\bmartes\b}    => 2, # Tuesday
-        qr{\bmiércoles\b} => 3, # Wednesday
-        qr{\bjueves\b}    => 4, # Thursday
-        qr{\bviernes\b}   => 5, # Friday
-        qr{\bsábado\b}    => 6, # Saturday
-        qr{\bdomingo\b}   => 7, # Sunday
-    );
+    return [
+        {q{lunes}     => 1}, # Monday
+        {q{martes}    => 2}, # Tuesday
+        {q{miércoles} => 3}, # Wednesday
+        {q{jueves}    => 4}, # Thursday
+        {q{viernes}   => 5}, # Friday
+        {q{sábado}    => 6}, # Saturday
+        {q{domingo}   => 7}, # Sunday
+    ];
 }
 
 sub day_numbers
 {
     # http://www.tarver-genealogy.net/aids/spanish/sp_dates_num.html#days
     return (
-        qr{primero}                 => 1, # first
-        qr{segundo}                 => 2, # second
-        qr{tercero}                 => 3, # third
-        qr{cuarto}                  => 4, # fourth
-        qr{quinto}                  => 5, # fifth
-        qr{sexto}                   => 6, # sixth
-        qr{septimo}                 => 7, # seventh
-        qr{octavo}                  => 8, # eighth
-        qr{nono|noveno}             => 9, # ninth
-        qr{decimo}                  => 10, # tenth
-        qr{undecimo|decimoprimero}  => 11, # eleventh
-        qr{duodecimo|decimosegundo} => 12, # twelfth
-        qr{decimotercero}           => 13, # thirteenth
-        qr{decimocuarto}            => 14, # fourteenth
-        qr{decimoquinto}            => 15, # fifteenth
-        qr{decimosexto}             => 16, # sixteenth
-        qr{decimo\sseptimo}         => 17, # seventeenth
-        qr{decimoctavo}             => 18, # eithteenth
-        qr{decimonono}              => 19, # ninteenth
-        qr{vigesimo}                => 20, # twentieth
-        qr{vigesimo\sprimero}       => 21, # twenty first
-        qr{vigesimo\ssegundo}       => 22, # twenty second
-        qr{vigesimo\stercero}       => 23, # twenty third
-        qr{vigesimo\scuarto}        => 24, # twenty fourth
-        qr{veinticuatro}            => 24, # twenty four
-        qr{vigesimo\squinto}        => 25, # twenty fifth
-        qr{vigesimo\ssexto}         => 26, # twenty sixth
-        qr{vigesimo\sseptimo}       => 27, # twenty seventh
-        qr{vigesimo\soctavo}        => 28, # twenty eighth
-        qr{vigesimo\snono}          => 29, # twenty ninth
-        qr{trigesimo}               => 30, # thirtieth
-        qr{trigesimo\sprimero}      => 31, # thirty first
+        q{primero}           => 1, # first
+        q{segundo}           => 2, # second
+        q{tercero}           => 3, # third
+        q{cuarto}            => 4, # fourth
+        q{quinto}            => 5, # fifth
+        q{sexto}             => 6, # sixth
+        q{septimo}           => 7, # seventh
+        q{octavo}            => 8, # eighth
+        q{nono|noveno}       => 9, # ninth
+        q{decimo}            => 10, # tenth
+        q{undecimo}          => 11, # eleventh
+        q{decimoprimero}     => 11, # eleventh
+        q{duodecimo}         => 12, # twelfth
+        q{decimosegundo}     => 12, # twelfth
+        q{decimotercero}     => 13, # thirteenth
+        q{decimocuarto}      => 14, # fourteenth
+        q{decimoquinto}      => 15, # fifteenth
+        q{decimosexto}       => 16, # sixteenth
+        q{decimo septimo}    => 17, # seventeenth
+        q{decimoctavo}       => 18, # eithteenth
+        q{decimonono}        => 19, # ninteenth
+        q{vigesimo}          => 20, # twentieth
+        q{vigesimo primero}  => 21, # twenty first
+        q{vigesimo segundo}  => 22, # twenty second
+        q{vigesimo tercero}  => 23, # twenty third
+        q{vigesimo cuarto}   => 24, # twenty fourth
+        q{veinticuatro}      => 24, # twenty four
+        q{vigesimo quinto}   => 25, # twenty fifth
+        q{vigesimo sexto}    => 26, # twenty sixth
+        q{vigesimo septimo}  => 27, # twenty seventh
+        q{vigesimo octavo}   => 28, # twenty eighth
+        q{vigesimo nono}     => 29, # twenty ninth
+        q{trigesimo}         => 30, # thirtieth
+        q{trigesimo primero} => 31, # thirty first
     );
 }
 

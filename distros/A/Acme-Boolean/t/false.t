@@ -1,7 +1,7 @@
 use Acme::Boolean;
 use Test::More;
 
-plan tests => 8;
+plan tests => 19;
 
 ok !untrue;
 ok !wrong;
@@ -10,4 +10,15 @@ ok !errorneous;
 ok !fallacious;
 ok !untruthful;
 ok !nah;
-ok !Acme::Boolean::no;
+ok !&no;
+ok !UNREAL;
+ok !FISHY;
+ok ! NO;
+ok ! NO NO;
+ok ! NO NO NO;
+ok ! NO NO NO NO;
+ok ! NO NO NO NO NO;
+ok ! NO NO NO NO NO NO;
+ok ! &no;
+ok ! &no(&no);
+ok ! NO really not fishy;

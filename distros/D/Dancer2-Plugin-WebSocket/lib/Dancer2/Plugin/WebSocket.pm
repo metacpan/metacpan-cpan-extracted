@@ -1,7 +1,7 @@
 package Dancer2::Plugin::WebSocket;
 our $AUTHORITY = 'cpan:YANICK';
 # ABSTRACT: add a websocket interface to your Dancers app
-$Dancer2::Plugin::WebSocket::VERSION = '0.2.0';
+$Dancer2::Plugin::WebSocket::VERSION = '0.3.1';
 
 use v5.12.0;
 
@@ -17,6 +17,11 @@ has serializer => (
         require JSON::MaybeXS;
         JSON::MaybeXS->new( ref $serializer ? %$serializer : () );
     },
+);
+
+has login => (
+    is => 'ro',
+    from_config => sub { 0 },
 );
 
 has mount_path => (
@@ -45,6 +50,12 @@ has 'on_error' => (
                     ["Error: " . $env->{"plack.app.websocket.error"}]];
         }
     },
+);
+
+has 'on_login' => (
+    is => 'rw',
+    plugin_keyword => 'websocket_on_login',
+    default => sub { sub { } },
 );
 
 has connections => (
@@ -78,6 +89,12 @@ sub websocket_mount :PluginKeyword {
         on_establish => sub {
             my $conn = shift; ## Plack::App::WebSocket::Connection object
             my $env = shift;  ## PSGI env
+
+            if ($self->login) {
+                if (!$self->on_login->($conn, $env)) {
+                    return;
+                }
+            }
 
             require Moo::Role;
 
@@ -131,7 +148,7 @@ Dancer2::Plugin::WebSocket - add a websocket interface to your Dancers app
 
 =head1 VERSION
 
-version 0.2.0
+version 0.3.1
 
 =head1 SYNOPSIS
 
@@ -160,6 +177,7 @@ F<config.yml>:
         WebSocket:
             # default values
             serializer: 0
+            login: 0
             mount_path: /ws
 
 F<MyApp.pm>:
@@ -266,6 +284,40 @@ connection
 object and the Plack
 C<$env> hash as arguments.
 
+=head2 websocket_on_login sub { ... }
+
+    websocket_on_login sub {
+        my( $conn, $env ) = @_;
+        ...;
+    };
+
+Code invoked when a new socket is opened. Gets the
+connection object and the Plack C<$env> hash as arguments.
+
+Example: return true if user is logged in and the webapp http_cookie is the same as the websocket.
+
+    my $login_conn;
+    my $cookie_name = 'example.session';
+
+    hook before => sub {
+        if (defined cookies->{$cookie_name}) {
+            $login_conn->{'cookie_id'} = cookies->{$cookie_name}->value;
+        }
+        $login_conn->{'login'} = logged_in_user ? 1 : 0;
+    };
+
+    websocket_on_login sub {
+        my( $conn, $env ) = @_;
+
+        my ($cookie_id) = ($env->{'HTTP_COOKIE'} =~ /$cookie_name=(.*);?/g);
+        if (($login_conn->{'login'}) and ($login_conn->{'cookie_id'} eq $cookie_id)) {
+            return 1;
+        } else {
+            warn "require login";
+            return 0;
+        }
+    };
+
 =head2 websocket_on_close sub { ... }
 
     websocket_on_close sub {
@@ -365,7 +417,7 @@ Yanick Champoux <yanick@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019, 2017 by Yanick Champoux.
+This software is copyright (c) 2021, 2019, 2017 by Yanick Champoux.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

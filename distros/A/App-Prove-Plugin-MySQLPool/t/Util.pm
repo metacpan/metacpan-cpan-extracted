@@ -4,13 +4,16 @@ use warnings;
 use utf8;
 use parent qw/Exporter/;
 
-use App::Prove;
 use Test::More;
 use File::Temp qw/ tempfile /;
+use File::Basename qw/ dirname /;
+use File::Spec::Functions qw/ catdir updir /;
 use DBI;
 use POSIX;
 
 our @EXPORT = qw/run_test exit_status_is/;
+
+my $PACKAGE_ROOT_DIR = catdir(dirname(__FILE__), updir());
 
 # thanks to http://cpansearch.perl.org/src/TOKUHIROM/Test-Pretty-0.24/t/Util.pm
 sub run_test {
@@ -40,15 +43,28 @@ sub run_test {
         open(STDOUT, ">", $filename) or die "Cannot redirect";
         open(STDERR, ">", $filename) or die "Cannot redirect";
 
-        my $prove = App::Prove->new();
-        $prove->process_args( '--norc',
-                              '-v',
-                              ($includes ? "-I$includes" : ()),
-                              ($preparer ? "-PMySQLPool=$preparer"
-                                         : "-PMySQLPool"),
-                              '-j'.(scalar @$tests),
-                              @$tests );
-        exit( $prove->run() ? 0 : 1 );
+        my @args = (
+            '--norc',
+            '-v',
+            '-l',
+            "-I$PACKAGE_ROOT_DIR",
+            ($includes ? "-I$includes" : ()),
+            ($preparer ? "-PMySQLPool=$preparer"
+             : "-PMySQLPool"),
+            '-j'.(scalar @$tests),
+            @$tests,
+        );
+
+        ### Should *NOT* use App::Prove (or App::ForkProve) directry
+        #
+        # The current process has already loaded Test::More module.
+        # Test::More has many side-effects in the implementations,
+        # and it makes complex problem in the child process. (and Test2 also)
+        # So it should separate the perl interpriter from the current process
+        # to avoid the side-effects by Test::More and any other modules.
+        my $runner = $options->{ runner } || 'prove';
+        exec $runner, @args;
+        die "faield to exec $runner: $!";
     }
 }
 
@@ -58,8 +74,8 @@ sub exit_status_is {
     if ($^O eq 'MSWin32') {
         is($?, $expected);
     } else {
-        ok(POSIX::WIFEXITED($?));
-        is(POSIX::WEXITSTATUS($?), $expected);
+        ok(POSIX::WIFEXITED($?), 'exited');
+        is(POSIX::WEXITSTATUS($?), $expected, 'expected status');
     }
 }
 

@@ -23,13 +23,13 @@ produces output
     /usr/home/ben/projects/xs-check/examples/synopsis.xs:3: len is not a STRLEN variable (unsigned int ).
 
 
-(This example is included as L<F<synopsis.pl>|https://fastapi.metacpan.org/source/BKB/XS-Check-0.12/examples/synopsis.pl> in the distribution.)
+(This example is included as L<F<synopsis.pl>|https://fastapi.metacpan.org/source/BKB/XS-Check-0.13/examples/synopsis.pl> in the distribution.)
 
 
 =head1 VERSION
 
-This documents version 0.12 of XS-Check
-corresponding to L<git commit 09c996b41cd1b91df7a1bb10a3b5624bb361939f|https://github.com/benkasminbullock/xs-check/commit/09c996b41cd1b91df7a1bb10a3b5624bb361939f> released on Sun May 9 10:44:08 2021 +0900.
+This documents version 0.13 of XS-Check
+corresponding to L<git commit 74c31d3e805ada02c70f12d92dd4eba400ed6e09|https://github.com/benkasminbullock/xs-check/commit/74c31d3e805ada02c70f12d92dd4eba400ed6e09> released on Wed May 26 06:44:38 2021 +0900.
 
 =head1 DESCRIPTION
 
@@ -96,7 +96,7 @@ produces output
     Remove the 'Perl_' prefix from Perl_croak at 1.
 
 
-(This example is included as L<F<reporter.pl>|https://fastapi.metacpan.org/source/BKB/XS-Check-0.12/examples/reporter.pl> in the distribution.)
+(This example is included as L<F<reporter.pl>|https://fastapi.metacpan.org/source/BKB/XS-Check-0.13/examples/reporter.pl> in the distribution.)
 
 
 This was added in version 0.07 of the module..
@@ -140,7 +140,7 @@ produces output
     1: Remove the 'Perl_' prefix from Perl_croak.
 
 
-(This example is included as L<F<set-file.pl>|https://fastapi.metacpan.org/source/BKB/XS-Check-0.12/examples/set-file.pl> in the distribution.)
+(This example is included as L<F<set-file.pl>|https://fastapi.metacpan.org/source/BKB/XS-Check-0.13/examples/set-file.pl> in the distribution.)
 
 
 This was added in version 0.08 of the module.
@@ -198,9 +198,9 @@ created with only a tenth element.
 
 For an extended discussion, see L<http://blogs.perl.org/users/ben_bullock/2020/02/av-fetch-can-return-null.html>.
 
-Currently this check does not actually check that the returned value
-is checked for non-nullness before being dereferenced, only that there
-is nothing of the form C<* av_fetch> in your code.
+This check does not actually check that the returned value is checked
+for non-nullness before being dereferenced, only that there is nothing
+of the form C<* av_fetch> in your code.
 
 This was added in version 0.09 of the module.
 
@@ -209,7 +209,7 @@ This was added in version 0.09 of the module.
 The XS manual suggests putting whitespace before # comments to
 distinguish them from preprocessor statements.
 
-See L<https://perldoc.perl.org/perlxs#Inserting-POD,-Comments-and-C-Preprocessor-Directives>.
+See L<https://perldoc.perl.org/perlxs#Inserting-POD,-Comments-and-C-Preprocessor-Directives>. 
 
 =over
 
@@ -232,9 +232,21 @@ check of seeing whether you have added one to C<av_len>.
 
 This was added in version 0.10 of the module.
 
+=head2 Use SvPVbyte or SvPVutf8 rather than SvPV
+
+To work around Perl's strings sometimes being in an ambiguous state,
+it is better to specify either SvPVbyte or SvPVutf8 and friends rather
+than plain SvPV. This check is also applied to the similar functions
+like SvPV_nolen.
+
+The reasons for this are documented in C<perldoc perlapi> for Perl
+versions from C<5.34> onwards.
+
+This was added in version 0.12 of the module.
+
 =head1 LIMITATIONS
 
-As of 0.12, the module has the following limitations.
+As of 0.13, the module has the following limitations.
 
 =over
 
@@ -248,7 +260,7 @@ the following doesn't get dealt with properly:
 =item UTF-8 only
 
 L</check_file> uses L<File::Slurper/read_text> to read the text, which
-means it only takes UTF-8.
+means it only accepts text encoded as UTF-8.
 
 =item Variable declarations rely on a simplistic hack
 

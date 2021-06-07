@@ -18,3 +18,6 @@ t/12_facebook_ads.t
 t/13_facebook_posts.t
 t/14_other_ads.t
 t/15_pageview.t
+t/16_google_plus.pl
+t/17_twitter.t
+t/18_android_app.t

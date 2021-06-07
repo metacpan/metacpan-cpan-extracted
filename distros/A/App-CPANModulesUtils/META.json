@@ -28,14 +28,15 @@
             "Test::Rinci" : "0.151"
          },
          "x_spec" : {
-            "Acme::CPANModules" : "v0.1.0",
-            "Rinci" : "v1.1.90"
+            "Acme::CPANModules" : "v0.1.7",
+            "Rinci" : "v1.1.96"
          }
       },
       "runtime" : {
          "requires" : {
             "Acme::CPANModulesUtil::FeatureMatrix" : "0",
             "App::lcpan::Call" : "0.11",
+            "CPAN::Module::FromURL" : "0.05",
             "Data::Dump" : "0",
             "Data::Sah::Coerce::perl::To_str::From_str::normalize_perl_modname" : "0",
             "Data::Sah::Compiler::perl::TH::array" : "0",
@@ -46,13 +47,15 @@
             "Data::Sah::Filter::perl::Path::strip_slashes_when_on_unix" : "0",
             "File::Path" : "0",
             "File::Slurper" : "0",
-            "Log::ger" : "0.027",
+            "HTML::LinkExtor" : "0",
+            "HTTP::Tiny" : "0.057",
+            "Log::ger" : "0.038",
             "Perinci::CmdLine::Any" : "0",
-            "Perinci::CmdLine::Lite" : "1.820",
+            "Perinci::CmdLine::Lite" : "1.827",
             "Perinci::Sub::XCompletion::perl_modname" : "0",
             "Sah::Schema::filename" : "0",
             "Sah::Schema::nonnegint" : "0",
-            "Sah::Schema::perl::modname" : "0",
+            "Sah::Schema::perl::modname" : "0.035",
             "Sah::Schema::true" : "0",
             "perl" : "5.010001",
             "strict" : "0",
@@ -71,7 +74,7 @@
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=App-CPANModulesUtils"
+         "web" : "https://github.com/perlancar/perl-App-CPANModulesUtils/issues"
       },
       "homepage" : "https://metacpan.org/release/App-CPANModulesUtils",
       "repository" : {
@@ -80,7 +83,7 @@
          "web" : "https://github.com/perlancar/perl-App-CPANModulesUtils"
       }
    },
-   "version" : "0.004",
+   "version" : "0.005",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.030000"
@@ -88,23 +91,33 @@
       "plugins" : [
          {
             "class" : "Dist::Zilla::Plugin::GenPericmdScript",
-            "name" : "GenPericmdScript gen-acme-cpanmodules-module-from-acme-cpanlists-list",
-            "version" : "0.421"
+            "name" : "GenPericmdScript acme-cpanmodules-for",
+            "version" : "0.423"
          },
          {
             "class" : "Dist::Zilla::Plugin::GenPericmdScript",
             "name" : "GenPericmdScript draw-feature-matrix-from-acme-cpanmodules-module",
-            "version" : "0.421"
+            "version" : "0.423"
          },
          {
             "class" : "Dist::Zilla::Plugin::GenPericmdScript",
-            "name" : "GenPericmdScript acme_cpanmodules_for",
-            "version" : "0.421"
+            "name" : "GenPericmdScript gen-acme-cpanmodules-module-from-acme-cpanlists-list",
+            "version" : "0.423"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::GenPericmdScript",
+            "name" : "GenPericmdScript gen-acme-cpanmodules-module-from-webpage",
+            "version" : "0.423"
          },
          {
             "class" : "Dist::Zilla::Plugin::InsertExecsList",
             "name" : "InsertExecsList",
             "version" : "0.02"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::PERLANCAR::CheckPendingRelease",
+            "name" : "@Author::PERLANCAR/PERLANCAR::CheckPendingRelease",
+            "version" : "0.001"
          },
          {
             "class" : "Dist::Zilla::Plugin::GatherDir",
@@ -188,11 +201,6 @@
             "version" : "6.012"
          },
          {
-            "class" : "Dist::Zilla::Plugin::FileFinder::ByName",
-            "name" : "@Author::PERLANCAR/FileFinder::ByName PERLANCAR",
-            "version" : "6.012"
-         },
-         {
             "class" : "Dist::Zilla::Plugin::ExecDir",
             "name" : "@Author::PERLANCAR/ExecDir script",
             "version" : "6.012"
@@ -200,7 +208,7 @@
          {
             "class" : "Dist::Zilla::Plugin::PERLANCAR::BeforeBuild",
             "name" : "@Author::PERLANCAR/PERLANCAR::BeforeBuild",
-            "version" : "0.599"
+            "version" : "0.603"
          },
          {
             "class" : "Dist::Zilla::Plugin::Rinci::AbstractFromMeta",
@@ -220,7 +228,7 @@
          {
             "class" : "Dist::Zilla::Plugin::PERLANCAR::MetaResources",
             "name" : "@Author::PERLANCAR/PERLANCAR::MetaResources",
-            "version" : "0.040"
+            "version" : "0.042"
          },
          {
             "class" : "Dist::Zilla::Plugin::CheckChangeLog",
@@ -256,7 +264,7 @@
          {
             "class" : "Dist::Zilla::Plugin::IfBuilt",
             "name" : "@Author::PERLANCAR/IfBuilt",
-            "version" : "0.02"
+            "version" : "0.03"
          },
          {
             "class" : "Dist::Zilla::Plugin::MetaJSON",
@@ -269,9 +277,9 @@
             "version" : "6.012"
          },
          {
-            "class" : "Dist::Zilla::Plugin::Authority",
-            "name" : "@Author::PERLANCAR/Authority",
-            "version" : "1.009"
+            "class" : "Dist::Zilla::Plugin::PERLANCAR::Authority",
+            "name" : "@Author::PERLANCAR/PERLANCAR::Authority",
+            "version" : "0.001"
          },
          {
             "class" : "Dist::Zilla::Plugin::OurDate",
@@ -425,7 +433,7 @@
                      {
                         "class" : "Pod::Weaver::Plugin::PERLANCAR::SortSections",
                         "name" : "@Author::PERLANCAR/PERLANCAR::SortSections",
-                        "version" : "0.080"
+                        "version" : "0.082"
                      }
                   ]
                }
@@ -456,7 +464,7 @@
          {
             "class" : "Dist::Zilla::Plugin::Rinci::EmbedValidator",
             "name" : "@Author::PERLANCAR/Rinci::EmbedValidator",
-            "version" : "0.250"
+            "version" : "0.251"
          },
          {
             "class" : "Dist::Zilla::Plugin::SetScriptShebang",
@@ -491,12 +499,14 @@
             "config" : {
                "Dist::Zilla::Plugin::Test::Perl::Critic::Subset" : {
                   "finder" : [
-                     "@Author::PERLANCAR/FileFinder::ByName PERLANCAR"
+                     ":ExecFiles",
+                     ":InstallModules",
+                     ":TestFiles"
                   ]
                }
             },
             "name" : "@Author::PERLANCAR/Test::Perl::Critic::Subset",
-            "version" : "3.001.003"
+            "version" : "3.001.005"
          },
          {
             "class" : "Dist::Zilla::Plugin::Test::Rinci",

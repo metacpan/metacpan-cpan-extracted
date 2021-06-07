@@ -4,6 +4,8 @@ require 5.001;
 
 use strict;
 use warnings;
+use Carp;
+use parent 'LyricFinder::_Class';
 
 # LyricFinder - A Derived work, by (c) 2020 Jim Turner <turnerjw784 at yahoo.com> of:
 #
@@ -32,20 +34,10 @@ use warnings;
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-use vars qw(@ISA @EXPORT $VERSION);
+our $VERSION = '1.20';
+our $DEBUG = 0;  # If you want debug messages, set debug to a true value
 
-our $VERSION = '1.03';
-our $AGENT = "Mozilla/5.0 (X11; Linux x86_64; rv:80.0) Gecko/20100101 Firefox/80.0";
-our @FETCHERS = ();
-our $DEBUG = 0; # If you want debug messages, set debug to a true value, and
-				# messages will be output with warn.
-
-require Exporter;
-
-@ISA = qw(Exporter);
-@EXPORT = qw($AGENT $VERSION);
-
-my @supported_mods = (qw(ApiLyricsOvh AZLyrics Genius Letras Musixmatch Cache));
+my @supported_mods = (qw(Cache ApiLyricsOvh AZLyrics Genius Letras Musixmatch));
 
 my %haveit;
 
@@ -53,51 +45,47 @@ foreach my $module (@supported_mods)
 {
 	$haveit{$module} = 0;
 	eval "use LyricFinder::$module; \$haveit{$module} = 1; 1";
-	push @FETCHERS, $module  if ($haveit{$module} && $module ne 'Cache');
 }
 
 sub new
 {
 	my $class = shift;
 
-	my $self = {};
-	$self->{'agent'} =   $AGENT;
-	$self->{'cache'} =   '';
-	$self->{'Error'} =   'Ok';
-	$self->{'Source'} =  'none';
-	$self->{'Site'} =    '';
-	$self->{'Order'} =   '';
-	$self->{'Tried'} =   '';
-	$self->{'Url'} = '';
-	$self->{'Credits'} = [];
-
-	my %args = @_;
-	foreach my $i (keys %args) {
-		if ($i =~ s/^\-//) {
-			$self->{$i} = $args{"-$i"};
+	#EXTRACT ANY MAIN-SPECIFIC ARGUMENTS (NOT TO BE PASSED TO SUBMODULES):
+	my @args = ();
+	while (@_) {
+		my $arg = shift(@_);
+		if ($arg =~ /^\-omit$/o) {   #ALLOW USER TO OMIT SPECIFIC INSTALLED SUBMODULE(S):
+			my $omit = shift(@_);
+			my @omitModules = ref($omit) ? @{$omit} : split(/\,\s*/, $omit);
+			foreach my $omit (@omitModules)
+			{
+				$haveit{$omit} = 0  if (defined($haveit{$omit}) && $haveit{$omit});
+			}
 		} else {
-			$self->{$i} = $args{$i};
+			push @args, $arg;
 		}
 	}
-	$self->{'debug'} = $DEBUG  unless (defined $self->{'debug'});
+
+	my $self = $class->SUPER::new('', @args);
+#	@{$self->{'_fetchers'}} = @FETCHERS;
+	@{$self->{'_fetchers'}} = ();
+	@{$self->{'_FETCHERS'}} = ();
+	#NOTE:  UPPER CASE _FETCHERS USED FOR "random" AND "all", & *NEVER* INCLUDES CACHE (1ST SUBMODULE TRIES CACHE)!:
+	#LOWER CASE _fetchers INCLUDES CACHE FIRST IF CACHE DIRECTORY AND IT'S NOT WRITEONLY, AS THIS IS FOR ORDER/TRIED LIST!
+	foreach my $module (@supported_mods)
+	{
+		next  unless ($haveit{$module} && $module ne 'Cache');
+		push @{$self->{'_FETCHERS'}}, $module;
+		push @{$self->{'_fetchers'}}, $module;
+	}
+	
+	unshift(@{$self->{'_fetchers'}}, 'Cache')  if ($haveit{'Cache'}
+			&& $self->{'-cache'} && $self->{'-cache'} !~ /^\>/);
 
 	bless $self, $class;   #BLESS IT!
 
 	return $self;
-}
-
-sub sources {
-	return wantarray ? @FETCHERS : \@FETCHERS;
-}
-
-sub source {
-	my $self = shift;
-	return $self->{'Source'};
-}
-
-sub url {
-	my $self = shift;
-	return $self->{'Url'};
 }
 
 sub order {
@@ -110,153 +98,57 @@ sub tried {
 	return wantarray ? split(/\,/, $self->{'Tried'}) : $self->{'Tried'};
 }
 
-sub credits {
-	my $self = shift;
-	return wantarray ? @{$self->{'Credits'}} : join(', ', @{$self->{'Credits'}});
-}
-
-sub message {
-	my $self = shift;
-	return $self->{'Error'};
-}
-
-sub site {
-	my $self = shift;
-	return $self->{'Site'};
-}
-
-# Allow user to specify a different user-agent:
-sub agent {
-	my $self = shift;
-	if (defined $_[0]) {
-		$self->{'agent'} = $_[0];
-	} else {
-		return $self->{'agent'};
-	}
-}
-
-sub cache {
-	my $self = shift;
-	if (defined $_[0]) {
-		$self->{'cache'} = $_[0];
-	} else {
-		return $self->{'cache'};
-	}
-}
-
-sub fetch {
-	my ($self, $artist, $title, $fetcherspec, $limit) = @_;
-
-	my @tryfetchers;
-	$self->{'Tried'} = '';
-	$fetcherspec = 'random'  unless (defined($fetcherspec) && $fetcherspec);
-	$self->{'Source'} = 'none';
-	if ( $fetcherspec && !ref $fetcherspec && $fetcherspec !~ m'^auto$'i) {
-		# we've been given a specific fetcher to use:
-		if (grep /$fetcherspec/, @FETCHERS) {
-			push @tryfetchers, $fetcherspec;
-		} elsif ($fetcherspec =~ m'^random$'i) {
-			my $random_fetcher;
-			my %usedSources = ();
-			my $usedcnt = 0;
-			while ($usedcnt <= $#FETCHERS) {
-				$random_fetcher = int(rand(scalar @FETCHERS));
-				unless ($usedSources{$FETCHERS[$random_fetcher]}) {
-					push @tryfetchers, $FETCHERS[$random_fetcher];
-					$usedSources{$FETCHERS[$random_fetcher]} = 1;
-					$usedcnt++;
-				}
-			}
-		} elsif ($fetcherspec =~ m'^Cache$'i) {
-			@tryfetchers = ('Cache');
-		} elsif ($fetcherspec =~ m'^All$'i) {
-			push @tryfetchers, @FETCHERS;
-		} else { 
-			warn "$fetcherspec isn't a valid fetcher";
-			$self->{'Error'} = "s:Source (module) $fetcherspec isn't installed or is invalid!";
-			return;
-		}
-	} elsif (ref $fetcherspec eq 'ARRAY') {
-		# we've got an arrayref of fetchers to use:
-		for my $fetcher (@$fetcherspec) {
-			if (grep /$fetcher/, @FETCHERS) {
-				push @tryfetchers, $fetcher;
-			} else {
-				warn "$fetcher isn't a valid fetcher, ignoring";
-			}
-		}
-	} else {  #really shouldn't end up here (since default=random now), but leaving in for now.
-		# OK, try all available fetchers.
-		push @tryfetchers, @FETCHERS;
-	}
-	$self->{'Order'} = join(',', @tryfetchers);
-	$#tryfetchers = $limit - 1  if (defined($limit) && $limit > 0 && $limit < scalar(@tryfetchers));
-
-	return $self->_fetch($artist, $title, \@tryfetchers);
-}   # end of sub fetch.
-
-# actual implementation method - takes params $artist, $title, and an
-# arrayref of site modules to try.  Returns the result from the first
-# site that succeeded, or undef if all fail. ("fetchers" are site modules)
 sub _fetch {
 	my ($self, $artist, $title, $fetchers) = @_;
 
+	$self->_debug("LyricFinder::_fetch($artist, $title, $fetchers)!");
 	if (!$artist || !$title || ref $artist || ref $title) {
-		warn "_fetch called incorrectly";
+		carp("e:_fetch() called without artist and title.");
 		return;
 	}
 
 	if (!$fetchers || ref $fetchers ne 'ARRAY') {
-		warn "_fetch not given arrayref of fetchers to try";
+		carp("e:_fetch not given arrayref of fetchers to try");
 		return;
 	}
 
-fetcher:
 	for my $fetcher (@$fetchers) {
 		$self->{'Url'} = '';
-		$self->_debug("Trying fetcher $fetcher for artist:$artist title:$title");
-		print STDERR "----TRYING FETCHER=$fetcher= ----\n"  if ($self->{'debug'});
+		$self->_debug("..Trying fetcher $fetcher for artist:$artist title:$title");
 
 		my $fetcherpkg = __PACKAGE__ . "::$fetcher";
 		my $finderModule = 0;
-		eval "\$finderModule = new ${fetcherpkg}(\%{\$self->{'$fetcher'}});";
+		eval "\$finderModule = new ${fetcherpkg}(\%{\$self});";
 		if ($@ || !$finderModule) {
-			warn "Failed to load sub-module $fetcherpkg ($@)";
-			next fetcher;
+			carp("w:Failed to load sub-module $fetcherpkg ($@)");
+			next;
 		}
 		
 		# OK, we require()d this fetcher, try using it:
-		$finderModule->agent($self->agent())  unless (defined $self->{$fetcher}->{'-agent'});
-		$finderModule->cache($self->cache())  unless (defined $self->{$fetcher}->{'-cache'});
 		$self->{'Error'} = 'Ok';
-		$self->_debug("Source module $fetcher loaded OK");
+		$self->_debug("..Source module $fetcher loaded OK");
 		$self->{'Tried'} .= "$fetcher,";
 		if (!$finderModule->can('fetch')) {
-			$self->_debug("Source LyricFinder::$fetcher can't ->fetch($finderModule->{'Error'})");
-			next fetcher;
+			$self->_debug("e:Source LyricFinder::$fetcher can't ->fetch($finderModule->{'Error'})");
+			next;
 		}
 	
-		$self->_debug("Trying to fetch with $fetcher");
-		my $f = $finderModule->fetch($artist, $title);
+		$self->_debug("..Trying to fetch with $fetcher");
+		my $lyrics = $finderModule->fetch($artist, $title);
 		$self->{'Error'} = $finderModule->message();
 		$self->{'Url'} = $finderModule->url();
 		if ($self->{'Error'} eq 'Ok') {
-			$self->_debug("Source $fetcher returned lyrics");
-			if (defined($f) && $f) {
-				my $lyrics = _html2text($f);
-				if ($lyrics =~ /\S/o) {
-					$self->{'Source'} = $finderModule->source();;
-					$self->{'Site'} = $finderModule->site();
-					@{$self->{'Credits'}} = $finderModule->credits();
-					$self->{'Tried'} =~ s/\,$//;
-					print STDERR "-------FETCHED FROM=".$self->{'Source'}."=\n"  if ($self->{'debug'});
+			$self->_debug("..Source: $fetcher returned lyrics");
+			if (defined($lyrics) && $lyrics =~ /\S/o) {
+				$self->{'Source'} = $finderModule->source();;
+				$self->{'Site'} = $finderModule->site();
+				$self->{'image_url'} = $finderModule->image_url();
+				@{$self->{'Credits'}} = $finderModule->credits();
+				$self->{'Tried'} =~ s/\,$//;
+				$self->_debug("i:Lyrics fetched from: ".$self->{'Source'});
 
-					return $lyrics;
-				}
+				return $lyrics;
 			}
-		}
-		else {
-			next fetcher;
 		}
 	}
 
@@ -266,31 +158,64 @@ fetcher:
 	$self->{'Tried'} =~ s/\,$//;
 	
 	return undef;
-}   # end of sub _fetch
-
-# nasty way to strip out HTML
-sub _html2text {
-	my $str = shift;
-	return ''  unless (defined $str);
-
-	$str =~ s/<br(.*?)>/\n/go;
-	$str =~ s/&gt;/>/go;
-	$str =~ s/&lt;/</go;
-	$str =~ s/&amp;/&/go;
-	$str =~ s/&quot;/\"/go;
-	$str =~ s/<.*?>//go;
-	return $str;
 }
 
+sub fetch {
+	my ($self, $artist, $title, $fetcherspec, $limit) = @_;
 
-sub _debug {
-	my $self = shift;
-	my $msg = shift;
-	
-	warn $msg if $self->{'debug'};
-}
+	my @tryfetchers = ();
 
-1;
+	$self->_debug("LyricFinder::fetch($artist, $title, $fetcherspec)!");
+	$self->{'Tried'} = '';
+
+	$fetcherspec = 'random'  unless (defined($fetcherspec) && $fetcherspec);
+	$self->{'Source'} = 'none';
+	if ( $fetcherspec && !ref $fetcherspec && $fetcherspec !~ m'^auto$'i) {
+		# we've been given a specific fetcher to use:
+		if (grep /$fetcherspec/, @{$self->{'_FETCHERS'}}) {
+			push @tryfetchers, $fetcherspec;
+		} elsif ($fetcherspec =~ m'^random$'i) {
+			my $random_fetcher;
+			my %usedSources = ();
+			my $usedcnt = 0;
+			while ($usedcnt <= $#{$self->{'_FETCHERS'}}) {
+				$random_fetcher = int(rand(scalar @{$self->{'_FETCHERS'}}));
+				unless ($usedSources{${$self->{'_FETCHERS'}}[$random_fetcher]}) {
+					push @tryfetchers, ${$self->{'_FETCHERS'}}[$random_fetcher];
+					$usedSources{${$self->{'_FETCHERS'}}[$random_fetcher]} = 1;
+					$usedcnt++;
+				}
+			}
+		} elsif ($fetcherspec =~ m'^Cache$'i && $haveit{'Cache'}) {
+			@tryfetchers = ('Cache');
+		} elsif ($fetcherspec =~ m'^All$'i) {
+			push @tryfetchers, @{$self->{'_FETCHERS'}};
+		} else { 
+			carp($self->{'Error'} = "s:Source (module) $fetcherspec isn't installed or is invalid!");
+			return;
+		}
+	} elsif (ref $fetcherspec eq 'ARRAY') {
+		# we've got an arrayref of fetchers to use:
+		for my $fetcher (@$fetcherspec) {
+			if (grep /$fetcher/, @{$self->{'_FETCHERS'}}) {
+				push @tryfetchers, $fetcher;
+			} else {
+				carp("e:$fetcher isn't a valid fetcher, ignoring");
+			}
+		}
+	} else {  #really shouldn't end up here (since default=random now), but leaving in for now.
+		# OK, try all available fetchers.
+		push @tryfetchers, @{$self->{'_FETCHERS'}};
+	}
+	$self->{'Order'} = join(',', @tryfetchers);
+	$#tryfetchers = $limit - 1  if (defined($limit) && $limit > 0 && $limit < scalar(@tryfetchers));
+
+	return $self->_fetch($artist, $title, \@tryfetchers);
+}   # end of sub fetch.
+
+1
+
+__END__
 
 =head1 NAME
 
@@ -372,7 +297,7 @@ stored locally, called L<LyricFinder::Cache>.
 
 This module is derived from the (older) Lyrics::Fetcher collection of modules 
 by (c) 2007-2020 David Precious, but currently (as of December, 2020) supports 
-more lyric sites (4) and bundles all the supported site modules together here 
+more lyric sites (5) and bundles all the supported site modules together here 
 (simply install this one module).  We have reworked the "Cache" module to 
 cache lyrics files by artist and song title on disk in the user's desired 
 location.  LyricFinder is also truly object-oriented making interaction with 
@@ -453,19 +378,21 @@ object can be used for multiple fetches from multiple sites, so this
 normally only needs to be called once.
 
 I<options> is a hash of option/value pairs (ie. "-option" => "value").  
-The currently-supported options are:  
+If an "-option" is specified with no "value" given, the default value will 
+be I<1> ("I<true>").  The currently-supported options are:  
 
 =over 4
 
 =item B<-agent> => I<"user-agent string">
 
 Specifies an alternate "user-agent" string sent to the lyric sites when 
-attempting to fetch lyrics.  Set the desired user-agent (ie. browser name) to 
-pass to the lyrics sites.  Some sites are pickey about receiving a user-agent 
-string that corresponds to a valid / supported web-browser to prevent their 
-sites from being "scraped" by programs, such as this.
+attempting to fetch lyrics.  Get / set the desired user-agent 
+(ie. browser name) to pass to the lyrics sites.  Some sites are pickey about 
+receiving a user-agent string that corresponds to a valid / supported 
+web-browser to prevent their sites from being "scraped" by programs, such 
+as this.
 
-Default:  I<"Mozilla/5.0 (X11; Linux x86_64; rv:80.0) Gecko/20100101 Firefox/80.0">.
+Default:  I<"Mozilla/5.0 (X11; Linux x86_64; rv:84.0) Gecko/20100101 Firefox/84.0">.
 
 NOTE:  This value will be overridden if $founder->agent("agent") is 
 called!  NOTE:  See below how to specify a different agent for a specific 
@@ -481,7 +408,7 @@ If no matching lyrics file is found (and the search module list is not
 specifically set to "Cache" (and lyrics are found on the internet), then 
 the lyrics will be saved to the directory under "I<artist>/I<title>.lrc".
 
-Default:  none (no caching)
+Default:  I<none> (no caching)
 
 An optional dirctional indicator ("<" or ">") can be prepended to the 
 directory to limit caching activity.  "<" allows fetching lyrics from the 
@@ -509,16 +436,40 @@ Specifies whether debug information will be displayed (0: no, >0: yes).
 Default I<0> (no).  I<1> will display debug info.  There is currently only 
 one level of debug verbosity.
 
-=item B<site-module-name> => { I<"-option"> => I<value> [, I<"-option"> => I<value> ... ] }
+=item B<-noextra> => I<0 | 1> (I<false> or I<true>)
 
-Specifies these same options for a specific site fetcher module.  These values 
+Some sites (currently, only Musixmatch) may append some additional 
+information below the lyrics text.  If specified or given a I<true> value, 
+this will be suppressed and only the actual song lyrics returned.    
+Default I<0> (false) - show any additional site-specific information.
+
+=item B<-omit> => I<"site-module[,site-module2...]]>
+
+Permits omitting specific sites which are currently installed from being 
+searched (namely when using I<random> or I<all>).  For example, to 
+exclude the Musixmatch site, specify:  I<-omit> => I<"Musixmatch">, which 
+will cause LyricFinder::Musixmatch to not be considered for lyrics search.  
+Default is for all installed sites (submodules) to be considered.  
+NOTE:  The site list can be specified as a comma-separated string OR as 
+an array reference, ie. I<-omit => [ qw(Musixmatch Genius) ]>.
+
+=item B<-site-module-name> => { I<"-option"> => I<value> [, I<"-option"> => I<value> ... ] }
+
+Specifies options for a specific site fetcher module.  These values 
 will override any of the general option values specified for that specific 
 module or calls to the general B<agent>() method, if it is used to fetch 
 lyrics.  Examples would be if one needed to specify a different user-agent 
 for one of the sites, or wished to cache lyrics fetched by sites to specific 
-directories for some reason.
+directories for some reason.  By default, top-level options are passed to 
+the various sites, so this should only be needed in special cases.
+
+Example:  "-Musixmatch => { -noextra => 1 }"
 
 Default:  none (no site-specific options)
+
+NOTE:  The "-cache" (cache-directory) option is needed by the main LyricFinder 
+module and the site submodules in order to use the caching feature, so passing 
+"-Cache => {-cache => I<directory>}" will NOT work (the way one might assume)!
 
 =back 
 
@@ -581,7 +532,7 @@ the site with posting the lyrics on the site (if any) or an empty
 string, if none found.  NOTE:  The only site that supports this currently 
 is B<AZLyrics>.
 
-=item I<$string> = $finder->B<fetch>(I<$artist>, I<$title> [, I<$source> | I<\@sources>] [, I<$limit>])
+=item I<$string> = $finder->B<fetch>(I<$artist>, I<$title> [, I<$source> | I<\@sources> [, I<$limit>]])
 
 Attempt to fetch the lyrics for the given artist and title.
 A single source site module can be specified as a string ($source) or multiple 
@@ -605,10 +556,17 @@ If an array reference (a list) of modules are provided, they will be searched
 in the order they appear in the list.
 
 The currently-installed and supported modules are:  ApiLyricsOvh, AZLyrics, 
-Genius, and Musixmatch (NOTE the "x" in the spelling of "Musixmatch")!
+Genius, Letras, and Musixmatch (NOTE the "x" in the spelling of "Musixmatch")!
 
 Returns lyrics as a string (includes line-breaks appropriate for the user's 
 operating system), or an empty string, if no lyrics found.
+
+=item I<$scalar> = $finder->B<image_url>()
+
+Returns a URL for a cover-art image, if one found on the lyrics page.  
+Currently, only the LyricFinder::Genius and LyricFinder::Musixmatch 
+sites contain cover-art images.  For the other sites, or if no image 
+is found, an empty string will be returned if this method is called.
 
 =item I<$scalar> = $finder->B<message>()
 
@@ -662,7 +620,7 @@ The current version# of LyricFinder
 
 =head1 DEPENDENCIES
 
-L<HTML::Strip>, L<HTTP::Request>, L<LWP::UserAgent>
+L<HTML::Strip>, L<HTTP::Request>, L<LWP::UserAgent>, L<URI::Escape>
 
 =head1 BUGS
 

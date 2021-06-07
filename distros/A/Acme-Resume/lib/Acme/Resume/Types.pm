@@ -2,9 +2,9 @@ use Moops;
 use strict;
 use warnings;
 
-# PODNAME: Acme::Resume::Types
-our $VERSION = '0.0102'; # VERSION
 # ABSTRACT: Declares types
+# PODNAME: Acme::Resume::Types
+our $VERSION = '0.0103';
 
 library Acme::Resume::Types
 
@@ -88,7 +88,7 @@ Acme::Resume::Types - Declares types
 
 =head1 VERSION
 
-Version 0.0102, released 2016-01-27.
+Version 0.0103, released 2021-05-29.
 
 =head1 SOURCE
 
@@ -104,7 +104,7 @@ Erik Carlsson <info@code301.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by Erik Carlsson.
+This software is copyright (c) 2021 by Erik Carlsson.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

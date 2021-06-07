@@ -3,7 +3,33 @@ package Beekeeper::Service::LogTail;
 use strict;
 use warnings;
 
-our $VERSION = '0.01';
+our $VERSION = '0.04';
+
+
+use Beekeeper::Client;
+
+sub tail {
+    my ($class, %filters) = @_;
+
+    my $client = Beekeeper::Client->instance;
+
+    my $guard = $client->__use_authorization_token('BKPR_ADMIN');
+
+    my $resp = $client->call_remote(
+        method => '_bkpr.logtail.tail',
+        params => \%filters,
+    );
+
+    return $resp->result;
+}
+
+1;
+
+__END__
+
+=pod
+
+=encoding utf8
 
 =head1 NAME
 
@@ -11,7 +37,7 @@ Beekeeper::Service::LogTail - Buffer log entries
 
 =head1 VERSION
 
-Version 0.01
+Version 0.04
 
 =head1 SYNOPSIS
 
@@ -28,14 +54,16 @@ Version 0.01
 =head1 DESCRIPTION
 
 By default all workers use a C<Beekeeper::Logger> logger which logs errors and
-warnings both to files and to a topic C</topic/log> on the message bus.
+warnings both to files and to a topic C<log/{level}/{service}> on the message bus.
 
-This service keeps an in memory buffer of every log entry sent to that topic in 
+This service keeps an in-memory buffer of every log entry sent to that topic in 
 every broker in a logical message bus.
 
 The command line tool C<bkpr-log> use this service to inspect logs in real time. 
 
-This can be used to shovel logs to an external log management system.
+Please note that receiving all log traffic on a single process does not scale
+at all, so a better strategy will be needed for inspecting logs of big real world
+applications.
 
 =head1 METHODS
 
@@ -59,32 +87,9 @@ C<message>: Regex that applies to error messages.
 
 C<after>: Return only entries generated after given timestamp.
 
-=cut
-
-
-use Beekeeper::Client;
-
-sub tail {
-    my ($class, %filters) = @_;
-
-    my $client = Beekeeper::Client->instance;
-
-    my $resp = $client->do_job(
-        method => '_bkpr.logtail.tail',
-        __auth => 'BKPR_ADMIN',
-        params => \%filters,
-    );
-
-    return $resp->result;
-}
-
-1;
-
 =head1 SEE ALSO
  
 L<bkpr-log>.
-
-=encoding utf8
 
 =head1 AUTHOR
 
@@ -92,7 +97,7 @@ José Micó, C<jose.mico@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright 2015 José Micó.
+Copyright 2015-2021 José Micó.
 
 This is free software; you can redistribute it and/or modify it under the same 
 terms as the Perl 5 programming language itself.

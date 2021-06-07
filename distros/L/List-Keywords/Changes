@@ -1,5 +1,21 @@
 Revision history for List-Keywords
 
+0.08    2021-05-31
+        [CHANGES]
+         * Use the new XPK_*CTX versions of token macros to simplify needing
+           to call op_contextualize() / op_scope()
+
+0.07    2021-05-27
+        [CHANGES]
+         * Added 'reductions'
+
+        [BUGFIXES]
+         * Remember to declare dependency on XS::Parse::Keyword 0.04
+
+0.06    2021-05-24
+        [CHANGES]
+         * Updated for XS::Parse::Keyword 0.04 API change
+
 0.05    2021-05-12
         [CHANGES]
          * Added 'reduce'

@@ -1,7 +1,7 @@
 package App::ModuleAbstractCwaliteeUtils;
 
-our $DATE = '2019-08-02'; # DATE
-our $VERSION = '0.003'; # VERSION
+our $DATE = '2021-05-25'; # DATE
+our $VERSION = '0.004'; # VERSION
 
 1;
 # ABSTRACT: CLI Utilities related to module Abstract cwalitee
@@ -18,7 +18,7 @@ App::ModuleAbstractCwaliteeUtils - CLI Utilities related to module Abstract cwal
 
 =head1 VERSION
 
-This document describes version 0.003 of App::ModuleAbstractCwaliteeUtils (from Perl distribution App-ModuleAbstractCwaliteeUtils), released on 2019-08-02.
+This document describes version 0.004 of App::ModuleAbstractCwaliteeUtils (from Perl distribution App-ModuleAbstractCwaliteeUtils), released on 2021-05-25.
 
 =head1 DESCRIPTION
 
@@ -60,7 +60,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2019 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

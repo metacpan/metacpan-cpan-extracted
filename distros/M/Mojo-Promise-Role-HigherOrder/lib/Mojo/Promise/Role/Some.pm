@@ -3,7 +3,7 @@ use Mojo::Base '-role';
 
 use strict;
 
-our $VERSION = '1.003';
+our $VERSION = '1.005';
 
 =encoding utf8
 
@@ -73,6 +73,7 @@ sub some {
 				$remaining--;
 				push @resolved, [ @_ ];
 				$some->resolve( @resolved ) if @resolved == $n;
+				return;
 				},
 			sub {
 				# I keep trying to come up with a situation where
@@ -86,7 +87,8 @@ sub some {
 				# believe it.
 				$remaining--;
 				push @rejected, [ @_ ];
-				$some->reject( @rejected ) if @rejected > @$promises - $n
+				$some->reject( @rejected ) if @rejected > @$promises - $n;
+				return;
 				},
 			)
 		}

@@ -1,0 +1,177 @@
+NAME
+
+    FFI::C::Stat - Object-oriented FFI interface to native stat and lstat
+
+VERSION
+
+    version 0.02
+
+SYNOPSIS
+
+     use FFI::C::Stat;
+     
+     my $stat = FFI::C::Stat->new("foo.txt");
+     print "size = ", $stat->size;
+
+DESCRIPTION
+
+    Perl comes with perfectly good stat, lstat functions, however if you
+    are writing FFI bindings for a library that use the C stat structure,
+    you are out of luck there. This module provides an FFI friendly
+    interface to the C stat function, which uses an object similar to
+    File::stat, except the internals are a real C struct that you can pass
+    into C APIs that need it.
+
+    Supposing you have a C function:
+
+     void
+     my_cfunction(struct stat *s)
+     {
+       ...
+     }
+
+    You can bind my_cfunction like this:
+
+     use FFI::Platypus 1.00;
+     
+     my $ffi = FFI::Platypus->new( api => 1 );
+     $ffi->type('object(FFI::C::Stat)' => 'stat');
+     $ffi->attach( my_cfunction => ['stat'] => 'void' );
+
+CONSTRUCTORS
+
+ new
+
+     my $stat = FFI::C::Stat->new(*HANDLE,   %options);
+     my $stat = FFI::C::Stat->new($filename, %options);
+
+    You can create a new instance of this class by calling the new method
+    and passing in either a file or directory handle, or by passing in the
+    filename path.
+
+    Options:
+
+    symlink
+
+      Use lstat instead of stat, that is if the filename is a symlink, stat
+      the symlink instead of the target.
+
+ clone
+
+     my $stat = FFI::C::Stat->clone($other_stat);
+
+    Creates a clone of $stat. The argument $stat can be either a
+    FFI::C::Stat instance, or an opaque pointer to a stat structure. The
+    latter case is helpful when writing bindings to a method that returns a
+    stat structure, since you won't be wanting to free the pointer that
+    belongs to the callee.
+
+    C:
+
+     struct stat *
+     my_cfunction()
+     {
+       static struct stat stat;  /* definitely do not want to free static memory */
+       ...
+       return stat;
+     }
+
+    Perl:
+
+     $ffi->attach( my_cfunction => [] => 'opaque' => sub {
+       my $xsub = shift;
+       my $ptr = $xsub->();
+       return FFI::C::Stat->clone($ptr);
+     });
+
+PROPERTIES
+
+ dev
+
+     my $id = $stat->dev;
+
+    The ID of device containing file.
+
+ ino
+
+     my $inode = $stat->ino;
+
+    The inode number.
+
+ mode
+
+     my $mode = $stat->mode;
+
+    The file type and mode.
+
+ nlink
+
+     my $n = $stat->nlink;
+
+    The number of hard links.
+
+ uid
+
+     my $uid = $stat->uid;
+
+    The User ID owner.
+
+ gid
+
+     my $gid = $stat->gid;
+
+    The Group ID owner.
+
+ rdev
+
+     my $id = $stat->rdev;
+
+    The ID of device (if special file)
+
+ size
+
+     my $size = $stat->size;
+
+    Returns the size of the file in bytes.
+
+ atime
+
+     my $time = $stat->atime;
+
+    The time of last access.
+
+ mtime
+
+     my $time = $stat->mtime;
+
+    The time of last modification.
+
+ ctime
+
+     my $time = $stat->ctime;
+
+    The time of last status change.
+
+ blksize
+
+     my $size = $stat->blksize;
+
+    The filesystem-specific preferred I/O block size.
+
+ blocks
+
+     my $count = $stat->blocks;
+
+    Number of blocks allocated.
+
+AUTHOR
+
+    Graham Ollis <plicease@cpan.org>
+
+COPYRIGHT AND LICENSE
+
+    This software is copyright (c) 2021 by Graham Ollis.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

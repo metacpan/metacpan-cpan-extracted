@@ -5,7 +5,7 @@
 #
 
 use Convert::ASN1;
-BEGIN { require 't/funcs.pl' }
+BEGIN { require './t/funcs.pl' }
 
 if ($] < 5.007) {
   print "1..0\n";

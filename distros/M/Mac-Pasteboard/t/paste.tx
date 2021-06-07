@@ -74,9 +74,6 @@ done_testing;
 sub test_paste (@) {	## no critic (ProhibitSubroutinePrototypes, RequireArgUnpacking)
     my $got = shift;
     my $want = shift;
-    my ($ext_got, $ext_want);
-    ($got, $ext_got) = groom_paste ($got);
-    ($want, $ext_want) = groom_paste ($want);
     local $Test::Builder::Level = $Test::Builder::Level + 1;
     my $ref = ref $want;
     if ( REGEXP_REF eq $ref ) {
@@ -102,18 +99,6 @@ sub flavorize {
 	or die "Unable to find $sub()";
     $code->( $flavor );
     return;
-}
-
-sub groom_paste {
-    my $data = shift;
-    if (!defined $data) {
-	return ($data, 'undef');
-    } elsif (!ref $data) {
-	chomp $data;
-	return ($data, "'$data'");
-    } else {
-	return ($data, $data);
-    }
 }
 
 1;

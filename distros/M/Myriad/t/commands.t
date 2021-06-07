@@ -53,9 +53,11 @@ subtest "service command" => sub {
     $INC{'Ta/Sibling2.pm'} = 1;
     ######
 
+    my $metaclass = Object::Pad::MOP::Class->for_class('Myriad');
+
     my $myriad = Myriad->new;
     my $command = new_ok('Myriad::Commands'=> ['myriad', $myriad]);
-    $myriad->META->get_slot('$config')->value($myriad) = Myriad::Config->new();
+    $metaclass->get_slot('$config')->value($myriad) = Myriad::Config->new();
 
     # Wrong Service(module) name
     like( exception { wait_for_future( $command->service('Ta-wrong') )->get } , qr/unsupported/, 'Died when passing wrong format name');
@@ -69,7 +71,7 @@ subtest "service command" => sub {
 
     # Command to run multiple services should not be allowed when service_name option is set
     my $srv_run_name = 'service.test.one';
-    $myriad->META->get_slot('$config')->value($myriad) = Myriad::Config->new( commandline => ['--service_name', $srv_run_name] );
+    $metaclass->get_slot('$config')->value($myriad) = Myriad::Config->new( commandline => ['--service_name', $srv_run_name] );
     like (exception {wait_for_future( $command->service('Ta::') )->get}, qr/You cannot pass a service/, 'Not able to load multiple due to set service_name');
     # However allowed to run 1
     wait_for_future( $command->service('Ta::Sibling1')->get->{code}->() )->get;

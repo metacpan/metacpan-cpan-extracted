@@ -1,0 +1,14 @@
+Changes
+INSTALL
+lib/Bin/Gen/Rand.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README
+scripts/boxmuller
+scripts/cointoss
+scripts/horsekicks
+scripts/saikoro
+scripts/t1generate
+scripts/t2generate

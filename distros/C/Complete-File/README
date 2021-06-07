@@ -2,8 +2,8 @@ NAME
     Complete::File - Completion routines related to files
 
 VERSION
-    This document describes version 0.440 of Complete::File (from Perl
-    distribution Complete-File), released on 2019-12-18.
+    This document describes version 0.443 of Complete::File (from Perl
+    distribution Complete-File), released on 2021-02-08.
 
 DESCRIPTION
 FUNCTIONS
@@ -26,6 +26,8 @@ FUNCTIONS
         This is most useful when combined with "starting_path" option to
         prevent user going up/outside the starting path.
 
+    *   exclude_leaf => *bool*
+
     *   filter => *str|code*
 
         Only return items matching this filter.
@@ -45,6 +47,10 @@ FUNCTIONS
         it wants the item to be included.
 
     *   handle_tilde => *bool* (default: 1)
+
+    *   recurse => *bool*
+
+    *   recurse_matching => *str* (default: "level-by-level")
 
     *   starting_path => *str* (default: ".")
 
@@ -74,10 +80,7 @@ FUNCTIONS
 
     *   exclude_dir => *bool*
 
-        This is also an alternative to specifying full "filter". Set this to
-        true if you do not want directories.
-
-        If you only want directories, take a look at "complete_dir()".
+    *   exclude_leaf => *bool*
 
     *   file_ext_filter => *re|array[str]*
 
@@ -115,6 +118,10 @@ FUNCTIONS
 
     *   handle_tilde => *bool* (default: 1)
 
+    *   recurse => *bool*
+
+    *   recurse_matching => *str* (default: "level-by-level")
+
     *   starting_path => *str* (default: ".")
 
     *   word* => *str* (default: "")
@@ -133,7 +140,7 @@ SOURCE
 
 BUGS
     Please report any bugs or feature requests on the bugtracker website
-    <https://rt.cpan.org/Public/Dist/Display.html?Name=Complete-File>
+    <https://github.com/perlancar/perl-Complete-File/issues>
 
     When submitting a bug or request, please include a test-file or a patch
     to an existing test-file that illustrates the bug or desired feature.
@@ -147,7 +154,7 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2019, 2017, 2016, 2015 by
+    This software is copyright (c) 2021, 2019, 2017, 2016, 2015 by
     perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under

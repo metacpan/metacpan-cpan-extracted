@@ -12,12 +12,12 @@ Photonic - A perl package for calculations on photonics and metamaterials.
 
 =head1 VERSION
 
-Version 0.015
+Version 0.016
 
 =cut
 
 
-$Photonic::VERSION = '0.015';
+$Photonic::VERSION = '0.016';
 
 =head1 COPYRIGHT NOTICE
 
@@ -80,10 +80,6 @@ This file. This package.
 
 Couple of examples of characteristic functions, helpful for fast
 tests.
-
-=item L<Photonic::ExtraUtils>
-
-Call some fortran utility routines from perl.
 
 =item L<Photonic::Geometry>
 

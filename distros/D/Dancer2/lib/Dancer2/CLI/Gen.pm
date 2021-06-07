@@ -1,7 +1,8 @@
 package Dancer2::CLI::Gen;
 # ABSTRACT: Create new Dancer2 application
-$Dancer2::CLI::Gen::VERSION = '0.301002';
+$Dancer2::CLI::Gen::VERSION = '0.301004';
 use Moo;
+use URI;
 use HTTP::Tiny;
 use Path::Tiny;
 use JSON::MaybeXS;
@@ -9,6 +10,12 @@ use Dancer2::Template::Simple;
 use Module::Runtime qw( use_module is_module_name );
 use CLI::Osprey
     desc => 'Helper script to create new Dancer2 applications';
+
+# For git integration
+use Symbol;
+use IPC::Open3 qw();
+use Try::Tiny;
+use File::Which;
 
 option application => (
     is            => 'ro',
@@ -72,6 +79,31 @@ option skel => (
     },
 );
 
+option docker => (
+    is       => 'ro',
+    short    => 'c',
+    doc      => 'create a dockerfile (container definition)',
+    required => 0,
+    default  => 0,
+);
+
+option git => (
+    is         => 'ro',
+    short      => 'g',
+    doc        => 'init git repository',
+    required   => 0,
+    default    => 0,
+);
+
+option remote => ( 
+    is         => 'ro',
+    short      => 'r',
+    doc        => 'URI for git repository (implies -g)',
+    format     => 's',
+    format_doc => 'URI',
+    required   => 0,
+);
+
 # Last chance to validate args before we attempt to do something with them
 sub BUILD {
     my ( $self, $args ) = @_;
@@ -80,6 +112,12 @@ sub BUILD {
 Invalid application name. Application names must not contain single colons, 
 dots, hyphens or start with a number.
     }) unless is_module_name( $self->application );
+
+    if ( my $remote = $self->remote ) {
+        my $scheme = URI->new( $remote )->scheme // $self->remote; # This feels dirty
+        $self->osprey_usage( 1, "'$remote' must be a valid URI to git repository")
+            unless $scheme =~ / ^ git \@ .+ : .+ \.git $ | ^ http /x;
+    }
 
     my $path = $self->app_path;
     -d $path or $self->osprey_usage( 1, "path: directory '$path' does not exist" );
@@ -110,21 +148,72 @@ sub run {
         }
     }
 
+    if( $self->docker ) {
+        push @$files_to_copy, [ path( $self->parent_command->_dist_dir, 'docker/Dockerfile' ), "$app_name/Dockerfile" ];
+    }
+
     my $vars = {
         appname          => $app_name,
         appfile          => $app_file,
+        apppath          => $app_path,
         appdir           => File::Spec->rel2abs( $app_path ),
+        apppath          => $app_path,
         perl_interpreter => $self->_get_perl_interpreter,
         cleanfiles       => $self->_get_dashed_name( $app_name ),
         dancer_version   => $self->parent_command->_dancer2_version,
+        docker           => $self->docker,
     };
 
     $self->_copy_templates( $files_to_copy, $vars, $self->overwrite );
     $self->_create_manifest( $files_to_copy, $app_path );
     $self->_add_to_manifest_skip( $app_path);
 
+    $self->_check_git( $vars );
     $self->_check_yaml;
-    $self->_how_to_run( $app_path );
+    $self->_how_to_run( $vars );
+}
+
+sub _check_git {
+    my( $self, $vars ) = @_;
+
+    if( my $remote = $self->remote or $self->git ) {
+        my $app_name  = $vars->{ appname };
+        my $git_error = qq{
+*****
+
+WARNING: Couldn't initialize a git repo despite being asked to do so.
+
+To resolve this, cd to your application directory and run the following 
+commands:
+
+  git init
+  git add .
+  git commit -m"Initial commit of $app_name by Dancer2"
+};
+
+        my $git = which 'git';
+        -x $git or die "Can't execute git: $!";
+
+        #my $dist_dir  = $self->parent_command->_dist_dir;
+        my $app_path  = $vars->{ apppath };
+        my $gitignore = path( $self->parent_command->_dist_dir, '.gitignore' );
+        path( $gitignore )->copy( $app_path );
+
+        chdir File::Spec->rel2abs( $app_path ) or die "Can't cd to $app_path: $!";
+        if( _run_shell_cmd( 'git', 'init') != 0 or 
+            _run_shell_cmd( 'git', 'add', '.') != 0 or 
+            _run_shell_cmd( 'git', 'commit', "-m 'Initial commit of $app_name by Dancer2'" ) != 0 ) {
+            print $git_error;
+        }
+        else {
+            if( $self->remote && 
+                _run_shell_cmd( 'git', 'remote', 'add', 'origin', $self->remote ) != 0 ) {
+                print $git_error;
+                print "  git remote add origin " . $self->remote . "\n";
+            }
+        }
+        print "\n*****\n";
+    }
 }
 
 sub _check_yaml {
@@ -149,16 +238,40 @@ following commands:
 }
 
 sub _how_to_run {
-    my( $self, $app_path ) = @_;
-    print qq{
+    my( $self, $vars ) = @_;
+
+    my $app_path = $vars->{ apppath };
+    my $app_name = $vars->{ appname };
+    if( $vars->{ docker } ) {
+        my $image = lc $app_name;
+        print qq{
 Your new application is ready! To run it:
 
         cd $app_path
+        docker build -t ${image} .
+        docker run -d -p 5000:4000 --name $app_name ${image}
+
+where 5000 is the external port, and 4000 is the port your application
+runs on inside of the container.
+
+(note: you may need to run the docker commands with sudo)
+
+You may also run your app without Docker:
+};
+    } else {
+        print "\nYour new application is ready! To run it:\n";
+    }
+    print qq{
+        cd $app_path
         plackup bin/app.psgi
 
+To access your application, point your browser to http://localhost:5000
+
 If you need community assistance, the following resources are available:
-- Dancer website: http://perldancer.org
-- Mailing list: http://lists.perldancer.org/mailman/listinfo/dancer-users
+- Dancer website: https://perldancer.org
+- Twitter: https://twitter.com/PerlDancer/
+- GitHub: https://github.com/PerlDancer/Dancer2/
+- Mailing list: https://lists.perldancer.org/mailman/listinfo/dancer-users
 - IRC: irc.perl.org#dancer
 
 Happy Dancing!
@@ -312,6 +425,28 @@ connection, or pass -x to gen to bypass this check in the future.\n\n";
     }
 }
 
+# Shell out to run git
+sub _run_shell_cmd {
+    my @cmds = @_;
+
+    my $exit_status = try {
+        my $pid = IPC::Open3::open3(
+            my $stdin, 
+            my $stdout, 
+            my $stderr = Symbol::gensym,
+            @cmds,
+        );
+
+        waitpid( $pid, 0 );
+        return $? >> 8;
+    } catch {
+        print STDERR "$_\n";
+        return 1;
+    };
+
+    return $exit_status;
+}
+
 1;
 
 __END__
@@ -326,7 +461,7 @@ Dancer2::CLI::Gen - Create new Dancer2 application
 
 =head1 VERSION
 
-version 0.301002
+version 0.301004
 
 =head1 AUTHOR
 

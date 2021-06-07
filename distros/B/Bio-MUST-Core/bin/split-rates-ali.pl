@@ -1,6 +1,6 @@
 #!/usr/bin/env perl
 # PODNAME: split-rates-ali.pl
-# ABSTRACT: Split ALI files into subsets of sites based on evolutionary rates
+# ABSTRACT: Split ALI files into subsets of sites based on site-wise statistics
 
 use Modern::Perl '2011';
 use autodie;
@@ -12,7 +12,6 @@ use Bio::MUST::Core;
 use Bio::MUST::Core::Utils qw(change_suffix secure_outfile);
 use aliased 'Bio::MUST::Core::Ali';
 use aliased 'Bio::MUST::Core::SeqMask';
-use aliased 'Bio::MUST::Core::SeqMask::Rates';
 
 
 # TODO: generalize this to other executables through Utils?
@@ -27,14 +26,21 @@ if ($ARGV_phylip) {
     $out_args{chunk} = -1;
 }
 
+my $class = 'Bio::MUST::Core::SeqMask::Rates';
+my $delta = 'delta_rates';
+if ($ARGV_sitefreq) {
+    $class = 'Bio::MUST::Core::SeqMask::Pmsf';
+    $delta = 'chi_square_stats';
+}
+
 # optionally load other rates file for deltas
 my $other_rates;
-   $other_rates = Rates->load($ARGV_other_rates) if $ARGV_other_rates;
+   $other_rates = $class->load($ARGV_other_rates) if $ARGV_other_rates;
 
 for my $infile (@ARGV_infiles) {
 
     ### Processing: $infile
-    my $rates = Rates->load($infile);
+    my $rates = $class->load($infile);
 
     $infile =~ s/$_//xms for @ARGV_in_strip;
     my $alifile = change_suffix($infile, $suffix);
@@ -46,9 +52,20 @@ for my $infile (@ARGV_infiles) {
     $ali->apply_mask( SeqMask->variable_mask($ali) ) if $ARGV_del_const;
 
     # optionally use delta rates instead of raw rates if available
-    $rates = $rates->delta_rates($other_rates) if $other_rates;
+    if ($other_rates) {
+        $rates = $rates->$delta($other_rates);
 
-    ### Computing masks from rates
+        # optionally dump stats resulting from delta operation
+        if ($ARGV_dump_stats) {
+            my $outfile = secure_outfile(
+                change_suffix($infile, '.stats'), $ARGV_out_suffix
+            );
+            ### Dumping site-wise stats to: $outfile
+            $rates->store($outfile);
+        }
+    }
+
+    ### Computing masks from stats
     my %args;
     $args{percentile} = 1 if $ARGV_percentile;
     $args{cumulative} = 1 if $ARGV_cumulative;
@@ -72,11 +89,11 @@ __END__
 
 =head1 NAME
 
-split-rates-ali.pl - Split ALI files into subsets of sites based on evolutionary rates
+split-rates-ali.pl - Split ALI files into subsets of sites based on site-wise statistics
 
 =head1 VERSION
 
-version 0.210610
+version 0.211470
 
 =head1 USAGE
 
@@ -88,7 +105,7 @@ version 0.210610
 
 =item <infiles>
 
-Path to input RATES files [repeatable argument].
+Path to input RATE(S) (or SITEFREQ) files [repeatable argument].
 
 =for Euclid: infiles.type: readable
     repeatable
@@ -132,14 +149,28 @@ Delete constant sites just as the C<-dc> option of PhyloBayes [default: no].
 Assume infiles and outfiles are in PHYLIP format (instead of ALI format)
 [default: no].
 
+=item --sitefreq
+
+Assume infile are IQ-TREE SITEFREQ files instead of RATE(S) files [default: no].
+
 =item --other-rates=<file>
 
-Optional additional rates file of the same length as the main infile(s) that
-will be used to compute rate deltas [default: none]. Currently, rate deltas
-are defined as the absolute difference between the two rates at each site.
-This could be improved by, e.g., computing relative deltas.
+Optional additional RATE(S) (or SITEFREQ) file of the same length as the main
+infile(s) that will be used to compute rate deltas [default: none]. Currently,
+rate deltas are defined as the absolute difference between the two rates at each
+site. This could be improved by, e.g., computing relative deltas.
+
+When SITEFREQ are provided instead of RATE(S), deltas correspond to chi-square
+test statistics computed between the two SITEFREQ files at each site.
 
 =for Euclid: file.type: readable
+
+=item --dump-stats
+
+Output site-wise stats resulting from the comparison of a pair of infiles of
+the same length (see C<--other-rates> option) [default: no]. The values are
+either delta rates or chi-square statistics dependending on the infiles type
+(see C<--sitefreq> option).
 
 =item --bin-number=<n>
 

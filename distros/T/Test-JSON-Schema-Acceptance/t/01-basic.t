@@ -33,7 +33,7 @@ cmp_deeply(
   $events->[0],
   all(
     isa('Test2::Event::Note'),
-    methods(message => 'running tests in '.$accepter->test_dir.'...'),
+    methods(message => 'running tests in '.$accepter->test_dir.' against draft7...'),
   ),
   'first test event is the note',
 );

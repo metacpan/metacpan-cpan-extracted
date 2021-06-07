@@ -14,11 +14,11 @@ Cache::Memcached::Fast - Perl client for B<memcached>, in C language
 
 =head1 VERSION
 
-Version 0.26.
+Version 0.27.
 
 =cut
 
-our $VERSION = '0.26';
+our $VERSION = '0.27';
 
 
 =head1 SYNOPSIS
@@ -1234,7 +1234,7 @@ B<gat> command first appeared in B<memcached> 1.5.3.
 
 =item C<gats>
 
-  $memd->gets($expiration_time, $key);
+  $memd->gats($expiration_time, $key);
 
 Update the expiration time and Retrieve the value and its CAS for a I<$key>.
 

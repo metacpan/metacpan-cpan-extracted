@@ -18,57 +18,57 @@ name: UV
 provides:
   UV:
     file: lib/UV.pm
-    version: '1.907'
+    version: '1.909'
   UV::Async:
     file: lib/UV/Async.pm
-    version: '1.907'
+    version: '1.909'
   UV::Check:
     file: lib/UV/Check.pm
-    version: '1.907'
+    version: '1.909'
   UV::Exception:
     file: lib/UV.pm
   UV::Handle:
     file: lib/UV/Handle.pm
-    version: '1.907'
+    version: '1.909'
   UV::Idle:
     file: lib/UV/Idle.pm
-    version: '1.907'
+    version: '1.909'
   UV::Loop:
     file: lib/UV/Loop.pm
-    version: '1.907'
+    version: '1.909'
   UV::Pipe:
     file: lib/UV/Pipe.pm
-    version: '1.907'
+    version: '1.909'
   UV::Poll:
     file: lib/UV/Poll.pm
-    version: '1.907'
+    version: '1.909'
   UV::Prepare:
     file: lib/UV/Prepare.pm
-    version: '1.907'
+    version: '1.909'
   UV::Process:
     file: lib/UV/Process.pm
-    version: '1.907'
+    version: '1.909'
   UV::Req:
     file: lib/UV/Req.pm
-    version: '1.907'
+    version: '1.909'
   UV::Signal:
     file: lib/UV/Signal.pm
-    version: '1.907'
+    version: '1.909'
   UV::Stream:
     file: lib/UV/Stream.pm
-    version: '1.907'
+    version: '1.909'
   UV::TCP:
     file: lib/UV/TCP.pm
-    version: '1.907'
+    version: '1.909'
   UV::TTY:
     file: lib/UV/TTY.pm
-    version: '1.907'
+    version: '1.909'
   UV::Timer:
     file: lib/UV/Timer.pm
-    version: '1.907'
+    version: '1.909'
   UV::UDP:
     file: lib/UV/UDP.pm
-    version: '1.907'
+    version: '1.909'
 requires:
   Carp: '0'
   Exporter: '5.57'
@@ -76,5 +76,5 @@ requires:
   XSLoader: '0.14'
 resources:
   license: http://dev.perl.org/licenses/
-version: '1.907'
+version: '1.909'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

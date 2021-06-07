@@ -1,11 +1,125 @@
+NAME
+    App::TextFragmentUtils - CLI utilities related to Text::Fragment
+
+VERSION
+    This document describes version 0.002 of App::TextFragmentUtils (from
+    Perl distribution App-TextFragmentUtils), released on 2021-05-25.
+
 DESCRIPTION
+    This distributions provides the following command-line utilities related
+    to text fragment:
 
-    This distributions provides the following command-line utilities
-    related to text fragment:
+    *   get-fragment
 
-    # INSERT_EXECS_LIST
+    *   list-fragments
+
+FUNCTIONS
+  get_fragment
+    Usage:
+
+     get_fragment(%args) -> [$status_code, $reason, $payload, \%result_meta]
+
+    Get fragment with a certain ID in text.
+
+    If there are multiple occurences of the fragment with the same ID ,
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   comment_style => *str* (default: "shell")
+
+        Comment style.
+
+    *   filename* => *filename*
+
+    *   id* => *str*
+
+        Fragment ID.
+
+    *   label => *str* (default: "FRAGMENT")
+
+        Comment label.
+
+    Returns an enveloped result (an array).
+
+    First element ($status_code) is an integer containing HTTP status code
+    (200 means OK, 4xx caller error, 5xx function error). Second element
+    ($reason) is a string containing error message, or "OK" if status is
+    200. Third element ($payload) is optional, the actual result. Fourth
+    element (%result_meta) is called result metadata and is optional, a hash
+    that contains extra information.
+
+    Return value: Fragment (array)
+
+    Will return status 200 if fragment is found. Result will be a hash with
+    the following keys: "raw" (string), "payload" (string), "attrs" (hash),
+    "id" (string, can also be found in attributes).
+
+    Return 404 if fragment is not found.
+
+  list_fragments
+    Usage:
+
+     list_fragments(%args) -> [$status_code, $reason, $payload, \%result_meta]
+
+    List fragments in text.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   comment_style => *str* (default: "shell")
+
+        Comment style.
+
+    *   filename* => *filename*
+
+    *   label => *str* (default: "FRAGMENT")
+
+        Comment label.
+
+    Returns an enveloped result (an array).
+
+    First element ($status_code) is an integer containing HTTP status code
+    (200 means OK, 4xx caller error, 5xx function error). Second element
+    ($reason) is a string containing error message, or "OK" if status is
+    200. Third element ($payload) is optional, the actual result. Fourth
+    element (%result_meta) is called result metadata and is optional, a hash
+    that contains extra information.
+
+    Return value: List of fragments (array)
+
+    Will return status 200 if operation is successful. Result will be an
+    array of fragments, where each fragment is a hash containing these keys:
+    "raw" (string), "payload" (string), "attrs" (hash), "id" (string, can
+    also be found in attributes).
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/App-TextFragmentUtils>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-App-TextFragmentUtils>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=App-TextFragmentUtils
+    >
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
 
 SEE ALSO
-
     Text::Fragment
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2021, 2016 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

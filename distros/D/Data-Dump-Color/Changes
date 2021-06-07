@@ -1,7 +1,27 @@
+0.245   2021-06-05  Released-By: PERLANCAR; Urgency: medium
+
+	- Avoid another case of undef warnings.
+
+	- Handle NO_COLOR (NO_COLOR is handled by ColorThemeUtil::ANSI
+	  also, but we directly handle it to be slightly more efficient.
+
+	- [doc] Update FAQ item on color theme.
+
+	- [doc] Fix GitHub issue/PR number in Changes.
+
+
+0.244   2021-06-04  Released-By: PERLANCAR; Urgency: medium
+
+	- Enable warnings, since vars.pm requires warnings.pm anyway, so no
+	  startup-time saving was accomplished.
+
+	- Avoid warning caused by duplicate declaration (GH#10).
+
+
 0.243   2021-02-13  Released-By: PERLANCAR; Urgency: medium
 
 	- Make Scalar::Util::LooksLikeNumber an optional prereq, to make
-	  Data::Dump::Color fatpackable [GH#8].
+	  Data::Dump::Color fatpackable (GH#8).
 
 
 0.242   2021-02-06  Released-By: PERLANCAR; Urgency: medium
@@ -55,13 +75,13 @@
 
 0.19     2013-11-13  Released-By: SHARYANTO
 
-         - Last fix broke other alignment, second try [reported by Scott Baker].
+         - Last fix broke other alignment, second try (reported by Scott Baker).
 
 
 0.18     2013-11-13  Released-By: SHARYANTO
 
          - Fix another index comment alignment bug: multiline vs singleline
-           [spotted by Scott Baker].
+           (spotted by Scott Baker).
 
 
 0.17     2013-10-31  Released-By: SHARYANTO
@@ -72,8 +92,8 @@
 
 0.16     2013-10-18  Released-By: SHARYANTO
 
-         - Colorize float differently, quote stringy numbers [suggested by Scott
-           Baker].
+         - Colorize float differently, quote stringy numbers (suggested by Scott
+           Baker).
 
          - Add example script (reworked from Scott Baker's version).
 
@@ -115,8 +135,8 @@
          - Remove original Data::Dump documentation. This module's docs now only
            explains what's different from Data::Dump.
 
-         - Add 'require Win32::Console::ANSI' on Windows [suggested by dhorne,
-           RT#88560].
+         - Add 'require Win32::Console::ANSI' on Windows (suggested by dhorne,
+           RT#88560).
 
          - Better color support (colors for keywords, symbols, array indices,
            and hash keys) and fixes to make output similar again to Data::Dump.

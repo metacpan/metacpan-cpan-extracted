@@ -1,68 +1,98 @@
 package Mojolicious::Plugin::Webpack;
 use Mojo::Base 'Mojolicious::Plugin';
 
-use Carp 'confess';
-use Mojo::File 'path';
-use Mojo::JSON;
+use Carp qw(carp croak);
+use Mojo::File qw(path);
 use Mojo::Path;
 use Mojo::Util;
 
-use constant LAZY => $ENV{MOJO_WEBPACK_LAZY} ? 1 : 0;
+use constant DEBUG => $ENV{MOJO_WEBPACK_DEBUG} && 1;
 
-our $VERSION = '0.14';
+our @CARP_NOT;
+our $VERSION = '1.01';
 
-sub assets_dir { shift->{assets_dir} }
-sub out_dir    { shift->{out_dir} }
-sub node_env   { shift->{node_env} }
-sub route      { shift->{route} }
+has engine => undef;
+
+sub asset_map {
+  my $self = shift;
+
+  # Production
+  return $self->{asset_map} if $self->{cache_asset_map};
+
+  # Development or initial load
+  my $produced  = $self->engine->asset_map;
+  my %asset_map = (development => {}, production => {});
+  for my $rel_name (keys %$produced) {
+    my $asset  = $produced->{$rel_name};
+    my $helper = $asset->{ext} eq 'js' ? 'javascript' : $asset->{ext} eq 'css' ? 'stylesheet' : 'image';
+    $asset_map{$asset->{mode}}{$asset->{name}} = {%$asset, helper => $helper, rel_name => $rel_name};
+  }
+
+  my $mode = $self->engine->mode;
+  $self->{asset_map} = $asset_map{production};
+  for my $name (keys %{$asset_map{development}}) {
+    $mode eq 'development'
+      ? ($self->{asset_map}{$name} = $asset_map{development}{$name})
+      : ($self->{asset_map}{$name} ||= $asset_map{development}{$name});
+  }
+
+  return $self->{asset_map};
+}
 
 sub register {
   my ($self, $app, $config) = @_;
-  $self->{route} = $app->routes->any([qw(HEAD GET)] => '/asset/*name')->name('webpack.asset');
 
-  $self->{$_} = path $config->{$_} for grep { $config->{$_} } qw(assets_dir out_dir);
-  $self->{node_env} = $config->{node_env} || ($app->mode eq 'development' ? 'development' : 'production');
-  $self->{assets_dir} ||= $self->_build_assets_dir($app);
-  $self->{out_dir}    ||= $self->_build_out_dir($app);
+  my $asset_path = ($config->{asset_path} ||= '/asset');    # EXPERIMENTAL
+  $asset_path .= '/';
+  $app->routes->any([qw(HEAD GET)] => "$asset_path*name")->name('webpack.asset');
 
   $app->helper(($config->{helper} || 'asset') => sub { $self->_helper(@_) });
-  $app->hook(after_static => \&_after_static_hook) unless $config->{no_after_static_hook};
-  $app->plugin('Webpack::Builder' => $config) if $ENV{MOJO_WEBPACK_BUILD};
-  $self->_register_assets;
+  $self->_build_engine($app, $config);
+  $app->plugins->emit_hook(before_webpack_start => $self);
+
+  my $cache_control = 'no-cache';
+  if (my $build_method = $ENV{MOJO_WEBPACK_BUILD}) {
+    $build_method = 'exec'  if $build_method =~ m!exec|watch!;
+    $build_method = 'build' if $build_method ne 'exec';
+    $self->engine->_d('MOJO_WEBPACK_BUILD=%s', $build_method) if DEBUG;
+    $self->engine->$build_method;    # "exec" will take over the current process
+  }
+  else {
+    $self->asset_map;
+    $self->{cache_asset_map} = !defined $ENV{MOJO_WEBPACK_BUILD};
+    $cache_control = $config->{cache_control} // 'max-age=86400' if $self->{cache_asset_map};
+  }
+
+  $app->hook(
+    after_static => sub {
+      my $c = shift;
+      $c->res->headers->cache_control($cache_control) if index($c->req->url->path, $asset_path) == 0;
+    }
+  );
 }
 
 sub url_for {
   my ($self, $c, $name) = @_;
-  my $asset = $self->{assets}{$name} or confess qq(Unknown asset name "$name".);
-  return $c->url_for('webpack.asset', $asset->[1]);
+  _unknown_asset($name) unless my $asset = $self->asset_map->{$name};
+  return $c->url_for('webpack.asset', {name => $asset->{rel_name}});
 }
 
-sub _after_static_hook {
-  my $c = shift;
+sub _build_engine {
+  my ($self, $app, $config) = @_;
 
-  my $asset_path = $c->app->{'webpack.asset.path'} ||= do {
-    my $p = Mojo::Path->new($c->asset->route->render({name => 'name.ext'}));
-    pop @$p;
-    $p->to_string;
-  };
+  # Custom engine
+  my $engine = $config->{engine} || 'Mojo::Alien::webpack';
 
-  $c->res->headers->cache_control(LAZY ? 'no-cache' : 'max-age=86400') if 0 == index $c->req->url->path, $asset_path;
-}
+  # Build default engine
+  $engine = eval "require $engine;$engine->new" || die "Could not load engine $engine: $@";
+  $engine->assets_dir($app->home->rel_file('assets'));
+  $engine->config($app->home->rel_file($engine->isa('Mojo::Alien::rollup') ? 'rollup.config.js' : 'webpack.config.js'));
+  $engine->include($config->{process} || ['js']);
+  $engine->mode($app->mode eq 'development' ? 'development' : 'production');
+  $engine->out_dir(path($app->static->paths->[0], grep $_, split '/', $config->{asset_path})->to_abs);
 
-sub _build_assets_dir {
-  my ($self, $app) = @_;
-  my $dir = $app->home->rel_file('assets');
-  $dir->make_path unless -d $dir;
-  return $dir;
-}
-
-sub _build_out_dir {
-  my ($self, $app) = @_;
-  my $route = Mojo::Path->new($self->route->render({name => 'name.ext'}));
-  pop @$route;
-  my $dir = path $app->static->paths->[0], @$route;
-  $dir->make_path unless -d $dir;
-  return $dir;
+  map { $engine->_d('%s = %s', $_, $engine->$_) } qw(config assets_dir out_dir mode) if DEBUG;
+  return $self->{engine} = $engine;
 }
 
 sub _helper {
@@ -70,38 +100,14 @@ sub _helper {
   return $self                   if @_ == 2;
   return $self->$name($c, @args) if $name =~ m!^\w+$!;
 
-  $self->_register_assets if LAZY;    # Lazy read the generated markup
-  my $asset = $self->{assets}{$name} or confess qq(Unknown asset name "$name".);
-  my ($tag_helper, $route_args) = @$asset;
-  return $c->$tag_helper($c->url_for('webpack.asset', $route_args), @args);
+  _unknown_asset($name) unless my $asset = $self->asset_map->{$name};
+  my $helper = $asset->{helper} || 'url_for';
+  return $c->$helper($c->url_for('webpack.asset', {name => $asset->{rel_name}}), @args);
 }
 
-sub _register_assets {
-  my $self           = shift;
-  my $is_dev         = $self->node_env ne 'production' ? 1 : 0;
-  my $path_to_markup = $self->out_dir->child(sprintf 'webpack.%s.html',
-    $ENV{WEBPACK_CUSTOM_NAME} || ($is_dev ? 'development' : 'production'));
-
-  unless (-e $path_to_markup) {
-    warn "[Webpack] Could not find $path_to_markup. Sure webpack has been run?"
-      if !$ENV{HARNESS_VERSION} or $ENV{HARNESS_IS_VERBOSE};
-    return,;
-  }
-
-  my $markup  = Mojo::DOM->new($path_to_markup->slurp);
-  my $name_re = qr{(.*)\.\w+\.(css|js)$}i;
-
-  $markup->find('link')->each(sub {
-    my $name = shift->{href} // '';
-    my $file_is_dev = $name =~ m!development! ? 1 : 0;
-    $self->{assets}{"$1.$2"} = [stylesheet => {name => $name}] if $is_dev == $file_is_dev and $name =~ $name_re;
-  });
-
-  $markup->find('script')->each(sub {
-    my $name = shift->{src} // '';
-    my $file_is_dev = $name =~ m!development! ? 1 : 0;
-    $self->{assets}{"$1.$2"} = [javascript => {name => $name}] if $is_dev == $file_is_dev and $name =~ $name_re;
-  });
+sub _unknown_asset {
+  local @CARP_NOT = qw(Mojolicious::Plugin::EPRenderer Mojolicious::Plugin::Webpack Mojolicious::Renderer);
+  croak qq(Unknown asset name "$_[0]".);
 }
 
 1;
@@ -114,36 +120,22 @@ Mojolicious::Plugin::Webpack - Mojolicious ♥ Webpack
 
 =head1 SYNOPSIS
 
-Check out
-L<https://github.com/jhthorsen/mojolicious-plugin-webpack/tree/master/example/webpack>
-for a working example.
+=head2 Define entrypoint
 
-=head2 Define assets
+Create a file "./assets/index.js" relative to you application directory with
+the following content:
 
-One or more assets need to be defined. The minimum is to create one
-L<entry point|https://webpack.js.org/concepts/#entry> and add it to
-the C<webpack.custom.js> file.
-
-  # Entrypoint: ./assets/entry-cool_beans.js
-  // This will result in one css and one js asset.
-  import '../css/css-example.css';
-  console.log('I'm loaded!');
-
-  # Config file: ./assets/webpack.custom.js
-  module.exports = function(config) {
-    config.entry = {
-      'cool_beans': './assets/entry-cool_beans.js',
-    };
-  };
+  console.log('Cool beans!');
 
 =head2 Application
 
-Your lite or full app, need to load L<Mojolicious::Plugin::Webpack> and
-tell it what kind of assets it should be able to process:
+Your L<Mojolicious> application need to load the
+L<Mojolicious::Plugin::Webpack> plugin and tell it what kind of assets it
+should be able to process:
 
   $app->plugin(Webpack => {process => [qw(js css)]});
 
-See L</register> for more config options.
+See L</register> for more configuration options.
 
 =head2 Template
 
@@ -153,19 +145,19 @@ helper:
   %= asset "cool_beans.css"
   %= asset "cool_beans.js"
 
-=head2 Start application
+=head2 Run the application
 
 You can start the application using C<daemon>, C<hypnotoad> or any Mojolicious
 server you want, but if you want rapid development you should use
 C<mojo webpack>, which is an alternative to C<morbo>:
 
   $ mojo webpack -h
-  $ mojo webpack ./myapp.pl
+  $ mojo webpack ./script/myapp.pl
 
 However if you want to use another daemon and force C<webpack> to run, you need
 to set the C<MOJO_WEBPACK_BUILD> environment variable to "1". Example:
 
-  MOJO_WEBPACK_BUILD=1 ./myapp.pl daemon
+  MOJO_WEBPACK_BUILD=1 ./script/myapp.pl daemon
 
 =head2 Testing
 
@@ -182,7 +174,7 @@ file like "build-assets.t":
   $ENV{MOJO_MODE}          = 'production';
   $ENV{MOJO_WEBPACK_BUILD} = 1;
   use FindBin;
-  require "$FindBin::Bin/../myapp.pl";
+  require "$FindBin::Bin/../script/myapp.pl";
   my $t = Test::Mojo->new;
 
   # Find all the tags and make sure they can be loaded
@@ -197,47 +189,31 @@ file like "build-assets.t":
 =head1 DESCRIPTION
 
 L<Mojolicious::Plugin::Webpack> is a L<Mojolicious> plugin to make it easier to
-work with L<https://webpack.js.org/>. This plugin will...
+work with L<https://webpack.js.org/> or L<https://rollupjs.org/>. This plugin
+will...
 
 =over 2
 
 =item 1.
 
-Generate a minimal C<package.json> and a Webpack config file. Doing this
-manually is possible, but it can be quite time consuming to figure out all the
-bits and pieces if you are not already familiar with Webpack.
-
-  ./package.json
-  ./webpack.config.js
+Generate a minimal C<package.json> and a Webpack or Rollup config file. Doing
+this manually is possible, but it can be quite time consuming to figure out all
+the bits and pieces if you are not already familiar with Webpack.
 
 =item 2.
 
-Generate a C<webpack.custom.js> which is meant to be the end user config file
-where you can override any part of the default config. You are free to modify
-C<webpack.config.js> directly, but doing so will prevent
-L<Mojolicious::Plugin::Webpack> from patching it in the future.
-
-The default C<webpack.custom.js> file will simply define an "entry" which is
-the starting point of your application.
-
-  ./assets/webpack.custom.js
+Load the entrypoint "./assets/index.js", which is the starting point of your
+client side application. The entry file can load JavaScript, CSS, SASS, ... as
+long as the appropriate processing plugin is loaded.
 
 =item 3.
 
-Generate an entry file, which is the starting point of your client side
-application. The entry file can load JavaScript, CSS, SASS, ... as long as the
-appropriate processing plugin is loaded by Webpack.
-
-  ./assets/my_app.js
-
-=item 4.
-
 It can be difficult to know exactly which plugins to use with Webpack. Because
-of this, L<Mojolicious::Plugin::Webpack> has some predefined rules for which
+of this L<Mojolicious::Plugin::Webpack> has some predefined rules for which
 Nodejs dependencies to fetch and  install. None of the nodejs modules are
 required in production though, so it will only be installed while developing.
 
-=item 5.
+=item 4.
 
 While developing, the webpack executable will be started automatically next to
 L<Mojo::Server::Morbo>. Webpack will be started with the appropriate switches
@@ -245,51 +221,25 @@ to watch your source files and re-compile on change.
 
 =back
 
-There is also support for L<https://rollupjs.org/>. See L</Rollup> for more
-information.
-
-L<Mojolicious::Plugin::Webpack> is currently EXPERIMENTAL, but it's unlikely it
-will change dramatically.
-
-After creating the file, you can run the command below to get a development
-server:
-
-  $ perl myapp.pl webpack -c rollup.config.js
-
-If you want to do L</Testing>, you have to set the environment variable
-C<MOJO_WEBPACK_CONFIG> in addition to L<TEST_BUILD_ASSETS>:
-
-  $ENV{MOJO_WEBPACK_CONFIG} = 'rollup.config.js';
-
 =head2 Rollup
 
 L<rollup.js|https://rollupjs.org/> is an alternative to Webpack. Both
-accomplish more or less the same thing, but in different ways. There might be a
-"Rollup" plugin in the future, but for now this plugin supports both.
+accomplish more or less the same thing, but in different ways.
 
-For now, you need to write your own "rollup.config.js" file. See
-L<https://github.com/jhthorsen/mojolicious-plugin-webpack/tree/master/example/rollup>
-for a working example.
+To be able to use rollup, you have to load this plugin with a different engine:
 
-=head1 MIGRATING FROM ASSETPACK
+  $app->plugin(Webpack => {engine => 'Mojo::Alien::rollup', process => [qw(js css)]});
 
-Are you already a user of L<Mojolicious::Plugin::AssetPack>?
-L<Mojolicious::Plugin::Webpack> will automatically detect your C<assetpack.def>
-file and convert it into a custom webpack config, so you don't have to do
-much, except changing how you load the plugin:
+=head2 Notice
 
-  # AssetPack
-  $app->plugin(AssetPack => {pipes => [qw(Sass JavaScript)]});
-
-  # Webpack
-  $app->plugin(Webpack => {process => [qw(sass js)]});
+L<Mojolicious::Plugin::Webpack> is currently EXPERIMENTAL.
 
 =head1 HELPERS
 
 =head2 asset
 
   # Call a method or access an attribute in this class
-  my $path = $app->asset->out_dir;
+  my $path = $app->asset->engine->out_dir;
 
   # Call a method, but from inside a mojo template
   %= asset->url_for($c, "cool_beans.css")
@@ -301,65 +251,85 @@ much, except changing how you load the plugin:
   %= asset "cool_beans.css", media => "print"
   %= asset(url_for => "cool_beans.css")
 
-This helper will return the plugin instance if no arguments is passed in, or a
-HTML tag created with either L<Mojolicious::Plugin::TagHelpers/javascript> or
-L<Mojolicious::Plugin::TagHelpers/stylesheet> if a valid asset name is passed
-in.
+The most basic usage of this helper is to create a HTML tag using
+L<Mojolicious::Plugin::TagHelpers/javascript> or
+L<Mojolicious::Plugin::TagHelpers/stylesheet> if a valid asset name is passed in.
 
-You can also use it to call a method and pass on C<$c> by passing in a method
-name as the first argument, such as L</url_for>.
+On the other hand, the helper will return the plugin instance if no arguments
+are passed in, allowing you to call any of the L</METHODS> or access the
+L</ATTRIBUTES>.
+
+=head1 HOOKS
+
+=head2 before_webpack_start
+
+  $app->before_webpack_start(sub { my $webpack = shift; ... });
+
+Emitted right before the plugin starts building or loading in the generated
+assets. Useful if you want to change any of the L</engine> attributes from the
+defaults.
 
 =head1 ATTRIBUTES
 
-=head2 assets_dir
+=head2 engine
 
-  $path = $self->assets_dir;
+  $engine = $webpack->engine;
 
-Holds a L<Mojo::File> object pointing to the private directoy where source
-files are read from. Defaults value is:
-
-  $app->home->rel_file("assets");
-
-=head2 node_env
-
-  $str = $self->node_env;
-
-Used to set C<NODE_ENV> environment value.
-
-Defaults value is "development" if L<Mojolicious/mode> is "development" and
-"production" otherwise. This value usually tells webpack to either minify the
-assets or generate readable output while developing.
-
-=head2 out_dir
-
-  $path = $self->out_dir;
-
-Holds a L<Mojo::File> object pointing to the public directoy where processed
-assets are written to. Default value is:
-
-  $app->static->paths->[0] . "/asset";
-
-=head2 route
-
-  $route = $self->route;
-
-Holds a L<Mojolicious::Routes::Route> object that generates the URLs to a
-processed asset. Default value is C</asset/*name>.
+Returns a L<Mojo::Alien::webpack> or L<Mojo::Alien::rollup> object.
 
 =head1 METHODS
 
+=head2 asset_map
+
+  $hash_ref = $webpack->asset_map;
+
+Reads all the generated files in L</asset_path> and returns a hash-ref like
+this:
+
+  {
+    "relative/output.js" => {               # Key is a friendly name, withouc checksum
+      ext      => 'css',                    # File extension
+      helper   => 'javascript',             # Mojolicious helper used to render the asset
+      rel_name => "relatibe/output.xyz.js", # Relative filename with checksum
+    },
+    ...
+  }
+
+Note that changing this hash might change how L</asset> and L</url_for> behaves!
+
 =head2 register
 
-  $self->register($app, \%config);
+  $webpack->register($app, \%config);
   $app->plugin("Webpack", \%config);
 
 Used to register this plugin into your L<Mojolicious> app.
 
-The C<%config> passed when loading this plugin can have any of the
-L<Mojolicious::Plugin::Webpack::Builder/ATTRIBUTES>, in addition to these
+The C<%config> passed when loading this plugin can have any of these
 attributes:
 
 =over 2
+
+=item * asset_path
+
+Can be used to specify an alternative static directory to output the built
+assets to.
+
+Default: "/asset".
+
+=item * cache_control
+
+Used to set the response "Cache-Control" header for built assets.
+
+Default: "no-cache" while developing and "max-age=86400" in production.
+
+=item * engine
+
+Must be a valid engine class name. Examples:
+
+  $app->plugin("Webpack", {engine => 'Mojo::Alien::rollup'});
+  $app->plugin("Webpack", {engine => 'Mojo::Alien::webpack'});
+
+Default: L<Mojo::Alien::webpack>.
 
 =item * helper
 
@@ -367,11 +337,17 @@ Name of the helper that will be added to your application.
 
 Default: "asset".
 
+=item * process
+
+Used to specify L<Mojo::Alien::webpack/include> or  L<Mojo::Alien::rollup/include>.
+
+Default: C<['js']>.
+
 =back
 
 =head2 url_for
 
-  $url = $self->url_for($c, $asset_name);
+  $url = $webpack->url_for($c, $asset_name);
 
 Returns a L<Mojo::URL> for a given asset.
 
@@ -381,15 +357,13 @@ Jan Henning Thorsen
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2018, Jan Henning Thorsen
+Copyright (C) Jan Henning Thorsen
 
 This program is free software, you can redistribute it and/or modify it under
 the terms of the Artistic License version 2.0.
 
 =head1 SEE ALSO
 
-L<Mojolicious::Plugin::Webpack::Builder>.
-
-L<Mojolicious::Plugin::AssetPack>.
+L<Mojo::Alien::rollup>, L<Mojo::Alien::webpack>.
 
 =cut

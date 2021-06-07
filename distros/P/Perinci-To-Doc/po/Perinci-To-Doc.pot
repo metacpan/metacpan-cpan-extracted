@@ -6,9 +6,9 @@
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: Perinci-To-Doc 0.863\n"
+"Project-Id-Version: Perinci-To-Doc 0.876\n"
 "Report-Msgid-Bugs-To: perlancar@cpan.org\n"
-"POT-Creation-Date: 2018-10-10 11:32+0700\n"
+"POT-Creation-Date: 2021-05-24 07:46+0700\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,137 +17,145 @@ msgstr ""
 "Content-Type: text/plain; charset=CHARSET\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: lib/Perinci/Sub/To/POD.pm:58
+#: lib/Perinci/Sub/To/POD.pm:65
 msgid "Alias for"
 msgstr ""
 
-#: lib/Perinci/Sub/To/POD.pm:241
+#: lib/Perinci/Sub/To/POD.pm:255
 msgid "Examples"
 msgstr ""
 
-#: lib/Perinci/Sub/To/POD.pm:256
+#: lib/Perinci/Sub/To/POD.pm:270
 msgid "This function is not exported by default, but exportable."
 msgstr ""
 
-#: lib/Perinci/Sub/To/POD.pm:258
+#: lib/Perinci/Sub/To/POD.pm:272
 msgid "This function is exported by default."
 msgstr ""
 
-#: lib/Perinci/Sub/To/POD.pm:260
+#: lib/Perinci/Sub/To/POD.pm:274
 msgid "This function is not exported."
 msgstr ""
 
-#: lib/Perinci/Sub/To/POD.pm:268
+#: lib/Perinci/Sub/To/POD.pm:282
 msgid "This function supports reverse operation."
 msgstr ""
 
-#: lib/Perinci/Sub/To/POD.pm:271
+#: lib/Perinci/Sub/To/POD.pm:285
 msgid "Pass -reverse=>1 to reverse operation."
 msgstr ""
 
-#: lib/Perinci/Sub/To/POD.pm:276
+#: lib/Perinci/Sub/To/POD.pm:290
 msgid "This function supports undo operation."
 msgstr ""
 
-#: lib/Perinci/Sub/To/POD.pm:280
+#: lib/Perinci/Sub/To/POD.pm:294
 msgid ""
 "To undo, pass -undo_action=>'undo' to function. You will also need to pass -"
 "undo_data. For more details on undo protocol, see L<Rinci::Undo>."
 msgstr ""
 
-#: lib/Perinci/Sub/To/POD.pm:288
+#: lib/Perinci/Sub/To/POD.pm:302
 msgid ""
 "Required if you pass -undo_action=>'undo'. For more details on undo "
 "protocol, see L<Rinci::function::Undo>."
 msgstr ""
 
-#: lib/Perinci/Sub/To/POD.pm:294
+#: lib/Perinci/Sub/To/POD.pm:308
 msgid "This function supports dry-run operation."
 msgstr ""
 
-#: lib/Perinci/Sub/To/POD.pm:297
+#: lib/Perinci/Sub/To/POD.pm:311
 msgid "Pass -dry_run=>1 to enable simulation mode."
 msgstr ""
 
-#: lib/Perinci/Sub/To/POD.pm:300
+#: lib/Perinci/Sub/To/POD.pm:314
 msgid "This function is pure (produce no side effects)."
 msgstr ""
 
-#: lib/Perinci/Sub/To/POD.pm:302
+#: lib/Perinci/Sub/To/POD.pm:316
 msgid "This function is immutable (returns same result for same arguments)."
 msgstr ""
 
-#: lib/Perinci/Sub/To/POD.pm:305
+#: lib/Perinci/Sub/To/POD.pm:319
 msgid ""
 "This function is idempotent (repeated invocations with same arguments has "
 "the same effect as single invocation)."
 msgstr ""
 
-#: lib/Perinci/Sub/To/POD.pm:312
+#: lib/Perinci/Sub/To/POD.pm:326
 msgid "This function supports transactions."
 msgstr ""
 
-#: lib/Perinci/Sub/To/POD.pm:316
+#: lib/Perinci/Sub/To/POD.pm:330
 msgid "For more information on transaction, see L<Rinci::Transaction>."
 msgstr ""
 
-#: lib/Perinci/Sub/To/POD.pm:324 lib/Perinci/Sub/To/Text.pm:40
+#: lib/Perinci/Sub/To/POD.pm:338 lib/Perinci/Sub/To/Text.pm:42
 msgid "Arguments"
 msgstr ""
 
-#: lib/Perinci/Sub/To/POD.pm:325 lib/Perinci/Sub/To/Text.pm:41
+#: lib/Perinci/Sub/To/POD.pm:339 lib/Perinci/Sub/To/Text.pm:43
 msgid "'*' denotes required arguments"
 msgstr ""
 
-#: lib/Perinci/Sub/To/POD.pm:341 lib/Perinci/Sub/To/POD.pm:371
-#: lib/Perinci/Sub/To/Text.pm:56
+#: lib/Perinci/Sub/To/POD.pm:355 lib/Perinci/Sub/To/POD.pm:388
+#: lib/Perinci/Sub/To/Text.pm:58
 msgid "default"
 msgstr ""
 
-#: lib/Perinci/Sub/To/POD.pm:353
+#: lib/Perinci/Sub/To/POD.pm:370
 msgid "No arguments"
 msgstr ""
 
-#: lib/Perinci/Sub/To/POD.pm:358
+#: lib/Perinci/Sub/To/POD.pm:375
 msgid "Special arguments"
 msgstr ""
 
-#: lib/Perinci/Sub/To/POD.pm:382 lib/Perinci/Sub/To/Text.pm:78
+#: lib/Perinci/Sub/To/POD.pm:399 lib/Perinci/Sub/To/Text.pm:80
 msgid ""
 "Returns an enveloped result (an array).\n"
 "\n"
-"First element (status) is an integer containing HTTP status code\n"
+"First element ($status_code) is an integer containing HTTP-like status code\n"
 "(200 means OK, 4xx caller error, 5xx function error). Second element\n"
-"(msg) is a string containing error message, or 'OK' if status is\n"
-"200. Third element (payload) is optional, the actual result. Fourth\n"
-"element (meta) is called result metadata and is optional, a hash\n"
-"that contains extra information."
+"($reason) is a string containing error message, or something like \"OK\" if "
+"status is\n"
+"200. Third element ($payload) is the actual result, but usually not present "
+"when enveloped result is an error response ($status_code is not 2xx). "
+"Fourth\n"
+"element (%result_meta) is called result metadata and is optional, a hash\n"
+"that contains extra information, much like how HTTP response headers provide "
+"additional metadata."
 msgstr ""
 
-#: lib/Perinci/Sub/To/POD.pm:392 lib/Perinci/Sub/To/Text.pm:75
+#: lib/Perinci/Sub/To/POD.pm:409 lib/Perinci/Sub/To/Text.pm:77
 msgid "Return value"
 msgstr ""
 
-#: lib/Perinci/Sub/To/Text.pm:72
+#: lib/Perinci/Sub/To/Text.pm:74
 msgid "This function dies on error."
 msgstr ""
 
-#: lib/Perinci/To/POD.pm:43 lib/Perinci/To/Text.pm:34
+#: lib/Perinci/To/POD.pm:50 lib/Perinci/To/Text.pm:36
 msgid "Name"
 msgstr ""
 
-#: lib/Perinci/To/POD.pm:56 lib/Perinci/To/Text.pm:47
+#: lib/Perinci/To/POD.pm:63 lib/Perinci/To/Text.pm:49
 msgid "Version"
 msgstr ""
 
-#: lib/Perinci/To/POD.pm:69 lib/Perinci/To/Text.pm:62
+#: lib/Perinci/To/POD.pm:76 lib/Perinci/To/Text.pm:64
 msgid "Description"
 msgstr ""
 
-#: lib/Perinci/To/POD.pm:108 lib/Perinci/To/Text.pm:83
+#: lib/Perinci/To/POD.pm:115 lib/Perinci/To/Text.pm:85
 msgid "Functions"
 msgstr ""
 
-#: lib/Perinci/To/POD.pm:137
+#: lib/Perinci/To/POD.pm:142 lib/Perinci/To/Text.pm:107
+msgid "Methods"
+msgstr ""
+
+#: lib/Perinci/To/POD.pm:182
 msgid "SEE ALSO"
 msgstr ""

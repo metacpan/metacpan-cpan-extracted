@@ -1,0 +1,223 @@
+NAME
+
+    Type::Tie::Aggregate - like Type::Tie, but slower and more
+    flexible
+
+VERSION
+
+    version 0.001
+
+SYNOPSIS
+
+        use Type::Tie::Aggregate;
+        use Types::Standard qw(Dict Optional Num Str);
+    
+        ttie my %hash, Dict[name => Str, age => Optional[Num]], (
+            name    => 'John Doe',
+            age     => 42,
+        );
+    
+        $hash{name} = 'Jane Doe';   # ok
+        $hash{age}++;               # ok
+        $hash{age} = 'forty-two;    # dies
+        delete $hash{name};         # dies ('name' is mandatory)
+    
+        # Unfortunately this does not work, because the hash is
+        # momentarily cleared and will no longer pass the type constraint
+        # (which requires a 'name' key).
+        %hash = (name => 'J. Random Hacker');
+    
+        # Use this instead (also more efficient).
+        (tied %hash)->initialize(name => 'J. Random Hacker');
+
+DESCRIPTION
+
+    Like Type::Tie, this module exports a single function: ttie. Also
+    like Type::Tie, ttie ties a variable to a type constraint
+    (coercions will be honored).
+
+    However, unlike Type::Tie, when an assignment happens on a
+    variable tied with ttie, the entire variable will be re-checked,
+    not just the value that was added. This is much more expensive,
+    of course, but can be very useful for structured types such as
+    Dict from Types::Standard as show in the "SYNOPSIS".
+
+    Any type constraints supporting the Type::API interface should
+    work, not just Type::Tiny types. However, in the examples that
+    follow, all type constraints are from Types::Standard unless
+    specified otherwise.
+
+ Initialization and Re-initialization
+
+    Since some types don't allow empty values (see the "SYNOPSIS"),
+    values may need to be given when initializing the type. For
+    example, this is invalid:
+
+        ttie my %hash, Dict[name => Str]; # dies
+
+    No values were given to initialize %hash, so %hash failed the
+    type constraint Dict[name = Str]> (which requires a name key).
+    Instead, this should be done:
+
+        ttie my %hash, Dict[name => Str], (name => 'My Name');
+
+    This initializes %hash with the value (name => 'My Name') before
+    any type checking is performed, so, at the end of the day, %hash
+    passes the type constraint.
+
+    Another important thing to note is that when a variable is
+    re-initialized, it is temporarily emptied. So the following is
+    invalid:
+
+        ttie my %hash, Dict[name => Str], (name => 'My Name');
+        %hash = (name => 'Other Name'); # dies
+
+    Instead, the initialize method should be used on the tied object,
+    like so:
+
+        ttie my %hash, Dict[name => Str], (name => 'My Name');
+        (tied %hash)->initialize(name => 'Other Name'); # ok
+
+    This is also more efficient than the previous method.
+
+ Deep Tying
+
+    ttie ties variables deeply, meaning that if any references
+    contained within the variable are changed, the entire variable is
+    rechecked against the type constraint. Blessed objects are not
+    deeply tied, but tied references are and the functionality of
+    these tied references is preserved.
+
+    For example, the following Does The Right Thing(TM):
+
+        ttie my %hash, HashRef[ArrayRef[Int]];
+        $hash{foo} = [1, 2, 3];     # ok
+        $hash{foo}[0] = 'one';      # dies
+        $hash{bar} = [3, 2, 1];     # ok
+        push @{$hash{bar}}, 'zero'; # dies
+
+    This also works:
+
+        use List::Util qw(all);
+        use Tie::RefHash;
+    
+        ttie my @array, ArrayRef[HashRef[Int]];
+    
+        my $scalar_key = 'scalar';
+        my @array_key = (1, 2, 3);
+        tie my %refhash, 'Tie::RefHash', (
+            \$scalar_key    => 1,
+            \@array_key     => 2,
+        );
+    
+        push @array, \%refhash;
+    
+        $array[0]{\$scalar_key} = 'foo';    # dies
+        $array[0]{\@array_key} = 42;        # ok
+        all { ref ne '' } keys %{$array[0]}; # true
+
+    Currently, circular references are not handled correctly (see
+    "Circular References").
+
+FUNCTIONS
+
+ ttie
+
+        ttie my $scalar, TYPE, $init_val;
+        ttie my @array, TYPE, @init_val;
+        ttie my %hash, TYPE, %init_val;
+
+    Tie $scalar, @array, or %hash to TYPE and initialize with
+    $init_val, @init_val, or %init_val.
+
+METHODS
+
+ initialize
+
+        (tied $scalar)->initialize($init_val);
+        (tied @array)->initialize(@init_val);
+        (tied %hash)->initialize(%init_val);
+
+    Re-initialize $scalar, @array, or %hash. This is necessary
+    because some types don't allow an empty value, and the variable
+    will temporarily be emptied (except for scalars) if initialized
+    the usual way (e.g., @array = qw(foo bar baz)). This is also more
+    efficient than conventional initialization.
+
+    See "Initialization and Re-initialization" for more info.
+
+ type
+
+        my $type = (tied VAR)->type;
+
+    Return the type constraint for VAR. Note that the type cannot
+    currently be set, only read.
+
+CAVEATS
+
+ Re-initialization
+
+    Re-initialization of tied variables using @array = @init or %hash
+    = %init does not always work. Use (tied
+    @array)->initialize(@init) and (tied %hash)->initialize(%init)
+    instead. See "Initialization and Re-initialization" for more
+    information.
+
+ Retying References
+
+    If a variable tied to a type contains a reference, then that
+    reference cannot be contained by any other variable tied to a
+    type. For example, the following will die:
+
+        my $arrayref = [42];
+        ttie my @num_array, ArrayRef[ArrayRef[Num]], ($arrayref);
+        ttie my @str_array, ArrayRef[ArrayRef[Str]], ($arrayref);
+
+    If this were allowed, it would not be clear whether push
+    @$arrayref, 'foo' should die or not. This behavior may be changed
+    in a later release, but you probably should not be doing this
+    regardless.
+
+ Circular References
+
+    Circular references are not handled correctly. Hopefully this
+    will be fixed in a future release.
+
+BUGS
+
+    Please report any bugs or feature requests on the bugtracker
+    website
+    https://rt.cpan.org/Public/Dist/Display.html?Name=Type-Tie-Aggregate
+    or by email to bug-Type-Tie-Aggregate@rt.cpan.org
+    <mailto:bug-Type-Tie-Aggregate@rt.cpan.org>.
+
+    When submitting a bug or request, please include a test-file or a
+    patch to an existing test-file that illustrates the bug or
+    desired feature.
+
+SEE ALSO
+
+      * Type::Tie
+
+AUTHOR
+
+    Asher Gordon <AsDaGo@posteo.net>
+
+COPYRIGHT AND LICENSE
+
+    Copyright (C) 2021 Asher Gordon <AsDaGo@posteo.net>
+
+    This program is free software: you can redistribute it and/or
+    modify it under the terms of the GNU General Public License as
+    published by the Free Software Foundation, either version 3 of
+    the License, or (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+    General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program. If not, see
+    <http://www.gnu.org/licenses/>.
+

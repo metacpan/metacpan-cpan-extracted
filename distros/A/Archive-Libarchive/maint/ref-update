@@ -1,0 +1,5 @@
+#!/bin/sh
+
+set -ex
+
+./maint/ref-exec perl -Ilib -Imaint/lib maint/ref-update.pl

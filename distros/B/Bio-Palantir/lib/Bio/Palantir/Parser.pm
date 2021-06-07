@@ -1,6 +1,6 @@
 package Bio::Palantir::Parser;
 # ABSTRACT: front-end class for Bio::Palantir::Parser module, wich handles the parsing of biosynML.xml and regions.js antiSMASH reports
-$Bio::Palantir::Parser::VERSION = '0.201670';
+$Bio::Palantir::Parser::VERSION = '0.211420';
 use Moose;
 use namespace::autoclean;
 
@@ -77,29 +77,27 @@ sub _convert_js2biosynml {
     my $json = File::Temp->new(suffix => '.json');
 
     open my $in, '<', $js;
-
     chomp( my @lines = <$in> );
 
     open my $out, '>', $json->filename;
     for my $i (0 .. @lines - 1) {
 
         if ($i == 0) {
-            say {$out} '{' . "\n" . '  "recordData": [';
+            say {$out} '{';
+        }
+        
+        if (substr($lines[$i], 0, 3) eq 'var') {
+
+            # extract the block name and its sigil type
+            # type may contains two characters if the var is empty
+            my ($key, $sigil) = $lines[$i]
+                =~ m/var \s ([A-Za-z\_]+) \s=\s ([\[\]{}]+);?$/xms;
+
+            say {$out} "  \"$key\": $sigil";  
         }
 
-        elsif ($lines[$i] =~ m/all_regions/xms) {
-           say {$out} '  "all_regions": {';
-        }
-
-        elsif ($lines[$i] =~ m/details_data/xms) {
-           say {$out} '  "details_data": {';
-        }
-
-        elsif ($i == @lines - 2) {
-            say {$out} '    }';
-        }
-
-        elsif ($i == @lines - 1) {
+        elsif ($i == @lines - 1) { 
+            # do not convert the ';' in a ','
             say {$out} '  }';
         }
         
@@ -112,6 +110,11 @@ sub _convert_js2biosynml {
 
     print {$out} '}';
     close $out;
+
+    open my $in2, '<', $json->filename;
+    while (my $line = <$in>){
+        print $line;
+    }
 
     my $root = json_file_to_perl($json->filename);
 
@@ -160,7 +163,13 @@ sub _convert_js2biosynml {
     # parse the second part of the report
     my $domain_id = 1; 
     my $module_id = 1;
-    $region_for = $root->{details_data}; # reassigning the region_for var
+
+    # use a fix for antiSMASH 5.1.1
+    $region_for = $root->{details_data}{nrpspks}
+        ? $root->{details_data}{nrpspks}
+        : $root->{details_data}
+    ; # reassigning the region_for var
+
     for my $region (keys %{ $region_for }) {
 
         my $cluster_name = $region_for->{$region}{id};
@@ -380,7 +389,7 @@ Bio::Palantir::Parser - front-end class for Bio::Palantir::Parser module, wich h
 
 =head1 VERSION
 
-version 0.201670
+version 0.211420
 
 =head1 SYNOPSIS
 

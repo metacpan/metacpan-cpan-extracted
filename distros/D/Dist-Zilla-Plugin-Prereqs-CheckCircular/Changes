@@ -1,21 +1,27 @@
-0.006   2018-01-14 (PERLANCAR)
+0.007   2021-05-31  Released-By: PERLANCAR; Urgency: medium
+
+	- [bugfix] Use --module option of 'lcpan deps' when we want to
+	  specify module names instead of distribution names.
+
+
+0.006   2018-01-14  Released-By: PERLANCAR
 
 	- [Bugfix] Don't call 'lcpan deps' when there are no modules to
 	  check.
 
 
-0.005   2017-07-07 (PERLANCAR)
+0.005   2017-07-07  Released-By: PERLANCAR
 
         - Switch from (ab)using InstallTool phase to using AfterBuild phase to
           do our stuffs, to be compatible with DZP:StaticInstall.
 
 
-0.004   2017-07-04 (PERLANCAR)
+0.004   2017-07-04  Released-By: PERLANCAR
 
         - Skip checking if lcpan is not available [thanks José Joaquín Atria].
 
 
-0.003   2016-10-07 (PERLANCAR)
+0.003   2016-10-07  Released-By: PERLANCAR
 
 	- Allow skipping checking circular deps via environment variable
 	  DZIL_CHECKCIRCULAR_SKIP.
@@ -24,13 +30,13 @@
 	  level because the check might take several seconds.
 
 
-0.002   2016-09-29 (PERLANCAR)
+0.002   2016-09-29  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- [doc] Rewording of Description.
 
 
-0.001   2016-09-29 (PERLANCAR)
+0.001   2016-09-29  Released-By: PERLANCAR
 
          - First release.

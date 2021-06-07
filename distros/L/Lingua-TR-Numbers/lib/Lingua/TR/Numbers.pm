@@ -1,5 +1,5 @@
 package Lingua::TR::Numbers;
-$Lingua::TR::Numbers::VERSION = '0.34';
+$Lingua::TR::Numbers::VERSION = '0.35';
 use 5.010;
 use utf8;
 use strict;
@@ -26,10 +26,13 @@ use constant TENS         => map { 10 * $_ } 1..9;
 use constant LAST_ELEMENT => -1;
 use constant PREV_ELEMENT => -2;
 use constant CHUNK_MAX    => 100;
-use base qw( Exporter );
+use parent qw( Exporter );
 use Carp qw( croak );
 
-BEGIN { *DEBUG = sub () {0} if ! defined &DEBUG } # setup a DEBUG constant
+BEGIN {
+    my $DEBUG = 0 + ( $ENV{DEBUG} || 0 );
+    *DEBUG = sub () { $DEBUG }
+}
 
 our @EXPORT_OK   = qw( num2tr num2tr_ordinal );
 our %EXPORT_TAGS =   ( all => \@EXPORT_OK    );
@@ -231,7 +234,10 @@ sub _groupify {
     my($basic, $multnum, $raw) = @_;
     return  $basic unless $multnum;  # the first group is unitless
     _log "  Groupifying $basic x $multnum mults\n" if DEBUG > 2;
-    return "$basic $MULT{$multnum}"  if  $MULT{$multnum};
+
+    if ( $MULT{$multnum} ) {
+        return $multnum == 1 && $raw == 1 ? $MULT{$multnum} : "$basic $MULT{$multnum}";
+    }
     # Otherwise it must be huuuuuge, so fake it with scientific notation
     return $basic . ' çarpı on üzeri ' . num2tr( $raw * 3 );
 }
@@ -277,7 +283,7 @@ Lingua::TR::Numbers
 
 =head1 VERSION
 
-version 0.34
+version 0.35
 
 =head1 SYNOPSIS
 

@@ -240,8 +240,14 @@ is ($attrib, undef, $t);
 #
 
 $t='DB handle attribute "Username" returns the same value as DBI_USER';
-$attrib = $dbh->{Username};
-is ($attrib, $testuser, $t);
+SKIP: {
+    if (! length $testuser) {
+        skip ('Cannot test $dbh->{Username} unless DBI_USER is set', 1);
+    }
+
+    $attrib = $dbh->{Username};
+    is ($attrib, $testuser, $t);
+}
 
 #
 # Test of the "PrintWarn" database handle attribute
@@ -1003,7 +1009,7 @@ $dbh->pg_cancel();
 is ($sth->{pg_async_status}, -1, $t);
 $t=q{Database handle attribute "pg_async_status" returns a -1 after a cancel};
 is ($dbh->{pg_async_status}, -1, $t);
-sleep 2;
+sleep 3;
 
 #
 # Test of the handle attribute "Active"

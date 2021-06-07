@@ -1,5 +1,10 @@
 Revision history for FFI-Platypus-Type-Enum},
 
+0.05      2021-05-26 20:53:20 -0600
+  - Add rev => 'dualvar' option (gh#15)
+  - Multiple packages can be specified for constant generation
+    by passing in an array reference (gh#12, gh#16)
+
 0.04      2020-09-27 05:21:25 -0600
   - Add value aliases (gh#6)
   - Fix confusing typos in documentation related to rev (gh#8, gh#10)

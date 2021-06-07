@@ -20,4 +20,5 @@ t/101_use_strict.t
 t/102_use_warnings.t
 t/103_no_dot_in_INC.t
 t/104_no_multidimensional.t
+t/105_use_feature_signatures.t
 t/201_podtest.t

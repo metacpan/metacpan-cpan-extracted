@@ -14,7 +14,7 @@ Lab::Measurement::Manual - API documentation manual for Lab::Measurement
 
 =head1 VERSION
 
-version 3.750
+version 3.751
 
 =head1 OVERVIEW
 
@@ -471,6 +471,10 @@ alias: C<Lab::Moose::Connection::VISA_GPIB>
 =item * L<Lab::XPRESS::Sweep::Level>
 
 =item * L<Lab::XPRESS::Sweep::LogBlock>
+
+=item * L<Lab::XPRESS::Sweep::SignalRecoveryPhase>
+
+=item * L<Lab::XPRESS::Sweep::SignalRecoveryOscOut>
 
 =back
 

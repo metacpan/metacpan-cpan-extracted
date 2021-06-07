@@ -2,7 +2,7 @@ package App::Yath::Command::run;
 use strict;
 use warnings;
 
-our $VERSION = '1.000054';
+our $VERSION = '1.000057';
 
 use App::Yath::Options;
 
@@ -348,7 +348,32 @@ Can be specified multiple times
 
 =item --no-changed-only
 
-Only search for tests for changed files (Requires --coverage-from, also requires a list of changes either from the --changed option, or a plugin that implements changed_files())
+Only search for tests for changed files (Requires --coverage-from, also requires a list of changes either from the --changed option, or a plugin that implements changed_files() or changed_diff())
+
+
+=item --changes-diff path/to/diff.diff
+
+=item --no-changes-diff
+
+Path to a diff file that should be used to find changed files for use with --changed-only. This must be in the same format as `git diff -W --minimal -U1000000`
+
+
+=item --changes-filter-file path/to/file
+
+=item --no-changes-filter-file
+
+Specify one or more files to check for changes. Changes to other files will be ignored
+
+Can be specified multiple times
+
+
+=item --changes-filter-pattern '(apple|pear|orange)'
+
+=item --no-changes-filter-pattern
+
+Specify a pattern for change checking. When only running tests for changed files this will limit which files are checked for changes. Only files that match this pattern will be checked. Your pattern will be inserted unmodified into a `$file =~ m/$pattern/` check.
+
+Can be specified multiple times
 
 
 =item --changes-plugin Git

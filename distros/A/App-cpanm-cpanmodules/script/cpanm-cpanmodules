@@ -1,0 +1,107 @@
+#!perl
+
+our $DATE = '2021-05-22'; # DATE
+our $VERSION = '0.001'; # VERSION
+
+# FRAGMENT id=shcompgen-hint command=_cpanm-cpanmodules
+
+use strict 'subs', 'vars';
+use warnings;
+
+use App::lcpan::Call;
+
+my @new_argv;
+for my $arg (@ARGV) {
+    # not a module name
+    unless ($arg =~ /\A[A-Za-z0-9_]+(::[A-Za-z0-9_]+)*\z/) {
+        push @new_argv, $arg;
+        next;
+    }
+    my $mod = $arg =~ /^Acme::CPANModules::/ ? $arg : "Acme::CPANModules::$arg";
+    (my $modpm = "$mod.pm") =~ s!::!/!g;
+    eval { require $modpm; 1 } or do {
+        warn "cpanm-cpanmodules: Can't load $mod, assuming you want to install $mod instead\n";
+        push @new_argv, $mod;
+        next;
+    };
+    my $list = ${"$mod\::LIST"};
+    unless (ref $list eq 'HASH' && $list->{entries}) {
+        warn "cpanm-cpanmodules: Can't get entries from $mod, assuming you want to install $mod instead\n";
+        push @new_argv, $mod;
+        next;
+    }
+    my @mods = map { $_->{module} } @{$list->{entries}};
+    warn "cpanm-cpanmodules: Replacing $arg with modules listed in $mod: ".join(" ", @mods) if $ENV{DEBUG};
+    push @new_argv, @mods;
+}
+
+print join(" ", "cpanm", @new_argv), "\n" if $ENV{DEBUG};
+system {"cpanm"} "cpanm", @new_argv;
+
+# ABSTRACT: Install all modules that is listed in an Acme::CPANModules:: module
+# PODNAME: cpanm-cpanmodules
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+cpanm-cpanmodules - Install all modules that is listed in an Acme::CPANModules:: module
+
+=head1 VERSION
+
+This document describes version 0.001 of cpanm-cpanmodules (from Perl distribution App-cpanm-cpanmodules), released on 2021-05-22.
+
+=head1 DESCRIPTION
+
+L<cpanm-cpanmodules> is a simplistic wrapper over L<cpanm>. This command:
+
+ % cpanm-cpanmodules -n FooThis
+
+will load L<Acme::CPANModules::FooThis>, get all the entries from it, and
+substitute it into the arguments, so the command that gets executed is something
+like:
+
+ % cpanm-cpanmodules -n App::HTTPThis App::HTTPSThis App::DAVThis App::FTPThis App::CGIThis
+
+It's basically a convenience shortcut (with tab completion as bonus) for:
+
+ % perl -MAcme::CPANModules::FooThis -E'say $_->{module} for @{ $Acme::CPANModules::FooThis::LIST->{entries} }' | cpanm -n
+
+That's about it.
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/App-cpanm-cpanmodules>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-App-cpanm-cpanmodules>.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-App-cpanm-cpanmodules/issues>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 SEE ALSO
+
+L<cpanm-task> from L<App::cpanm::task>
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2021 by perlancar@cpan.org.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

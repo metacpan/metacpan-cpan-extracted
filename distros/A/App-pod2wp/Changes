@@ -1,11 +1,17 @@
-0.004   2017-07-03 (PERLANCAR)
+0.005   2021-05-25  Released-By: PERLANCAR; Urgency: high
+
+	- [build] Rebuild to update Sah coercion module names (old Sah coercion
+          modules have been purged from CPAN).
+
+
+0.004   2017-07-03  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- Switch from Log::Any to Log::ger.
 
 
-0.003   2017-06-17 (PERLANCAR)
+0.003   2017-06-17  Released-By: PERLANCAR
 
         - No functional changes.
 
@@ -13,13 +19,13 @@
           in the POD.
 
 
-0.002   2017-06-16 (PERLANCAR)
+0.002   2017-06-16  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- [doc] Mention org2wp, html2wp, wp-xmlprc.
 
 
-0.001   2016-12-29 (PERLANCAR)
+0.001   2016-12-29  Released-By: PERLANCAR
 
         - First release.

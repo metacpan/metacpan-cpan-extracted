@@ -6,47 +6,40 @@ use warnings;
 use base 'Tests::Service::Base';
 
 use Test::More;
-use Time::HiRes 'sleep';
-
-
-sub start_test_workers : Test(startup) {
-    my $self = shift;
-
-    $self->start_workers('Tests::Service::Worker');
-};
-
-sub test_00_compile_client : Test(1) {
-    my $self = shift;
-
-    use_ok('Beekeeper::Service::Supervisor');
-}
 
 
 sub test_01_client : Test(9) {
     my $self = shift;
 
+    $self->start_workers('Tests::Service::Worker');
+
     my $svc = 'Beekeeper::Service::Supervisor';
 
     my $workers = $svc->get_workers_status;
+
+    @$workers = grep { $_->{class} ne 'Beekeeper::Service::ToyBroker::Worker' } @$workers;
 
     # $workers = [
     #
     # {
     #   'host'  => 'hostname',
-    #   'jps'   => '0.00',
     #   'pool'  => 'test-pool',
     #   'pid'   => 4916,
-    #   'load'  => '0.00',
-    #   'nps'   => '0.00',
     #   'mem'   => '0.00',
+    #   'cps'   => '0.00',
+    #   'nps'   => '0.00',
     #   'cpu'   => '0.00',
+    #   'load'  => '0.00',
     #   'queue' => ['test'],
     #   'class' => 'Tests::Service::Worker'
     # }, ...
 
-    is( scalar @$workers, $self->using_toybroker ? 4 : 3 );
+    is( scalar @$workers, 3 );
 
     my $services = $svc->get_services_status;
+
+    delete $services->{'Beekeeper::Service::ToyBroker::Worker'};
+
     ok( exists $workers->[0]->{'class'} );
     ok( exists $workers->[0]->{'queue'} );
     is( $workers->[0]->{'pool'}, 'test-pool' );
@@ -55,14 +48,14 @@ sub test_01_client : Test(9) {
     #
     # 'Tests::Service::Worker' => {
     #     'mem'   => '0.00',
+    #     'cps'   => '0.00'
+    #     'nps'   => '0.00',
     #     'cpu'   => '0.00',
     #     'load'  => '0.00',
-    #     'nps'   => '0.00',
-    #     'jps'   => '0.00'
     #     'count' => 2,
     # }, ...
 
-    is( scalar keys %$services, $self->using_toybroker ? 3 : 2 );
+    is( scalar keys %$services, 2 );
     ok( exists $services->{'Tests::Service::Worker'} );
     ok( exists $services->{'Beekeeper::Service::Supervisor::Worker'} );
 

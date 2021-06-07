@@ -141,7 +141,7 @@ sub read_sensor {
     
     # Read the temperature
     $pi->i2c_write_byte_data($handle, REG_MEAS, CRV_TEMP);
-    usleep(5);
+    usleep(5000);
     my (undef, $temp_data) = $pi->i2c_read_i2c_block_data($handle, REG_MSB, 2);
     
     my $UT = ($temp_data->[0] << 8) + $temp_data->[1];
@@ -157,7 +157,7 @@ sub read_sensor {
     
     # Read the atmosferic pressure
     $pi->i2c_write_byte_data($handle, REG_MEAS, CRV_PRES + ($OVERSAMPLE << 6));
-    usleep(40);
+    usleep(40000);
     my (undef, $presure_data) = $pi->i2c_read_i2c_block_data($handle, REG_MSB, 3);
     
     my $UP = (($presure_data->[0] << 16) + ($presure_data->[1] << 8) + $presure_data->[2]) >> (8 - $OVERSAMPLE);

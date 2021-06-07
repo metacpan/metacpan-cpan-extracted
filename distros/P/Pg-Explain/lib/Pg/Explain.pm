@@ -32,11 +32,11 @@ Pg::Explain - Object approach at reading explain analyze output
 
 =head1 VERSION
 
-Version 1.08
+Version 1.09
 
 =cut
 
-our $VERSION = '1.08';
+our $VERSION = '1.09';
 
 =head1 SYNOPSIS
 
@@ -184,7 +184,7 @@ sub source_filtered {
     $source =~ s/^╔(═)+╗\r?\n//gm;
 
     # Remove quotes around lines, both ' and "
-    $source =~ s/^(["'])(.*)\1\r?\n/$2\n/gm;
+    $source =~ s/^(["'])(.*)\1(\r?\n|\z)/$2\n/gm;
 
     # Remove "+" line continuations
     $source =~ s/\s*\+\r?\n/\n/g;
@@ -289,6 +289,7 @@ sub parse_source {
     my $self = shift;
 
     my $source = $self->source_filtered;
+
     my $parser;
 
     if ( $source =~ m{^\s*<explain xmlns="http://www.postgresql.org/2009/explain">}m ) {

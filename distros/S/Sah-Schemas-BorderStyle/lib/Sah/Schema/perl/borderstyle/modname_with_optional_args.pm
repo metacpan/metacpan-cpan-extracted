@@ -1,16 +1,16 @@
 package Sah::Schema::perl::borderstyle::modname_with_optional_args;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-01-26'; # DATE
+our $DATE = '2021-02-02'; # DATE
 our $DIST = 'Sah-Schemas-BorderStyle'; # DIST
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 
 use Sah::PSchema 'get_schema';
 use Sah::PSchema::perl::modname_with_optional_args; # not yet detected automatically by a dzil plugin
 
 our $schema = get_schema(
     'perl::modname_with_optional_args',
-    {ns_prefix=>'BorderStyle'},
+    {ns_prefix=>'BorderStyle', complete_recurse=>1},
     {
         summary => 'Perl module in the BorderStyle::* namespace, without the namespace prefix, with optional args e.g. "Test::CustomChar=char,x"',
     }
@@ -31,7 +31,7 @@ Sah::Schema::perl::borderstyle::modname_with_optional_args - Perl module in the 
 
 =head1 VERSION
 
-This document describes version 0.001 of Sah::Schema::perl::borderstyle::modname_with_optional_args (from Perl distribution Sah-Schemas-BorderStyle), released on 2021-01-26.
+This document describes version 0.002 of Sah::Schema::perl::borderstyle::modname_with_optional_args (from Perl distribution Sah-Schemas-BorderStyle), released on 2021-02-02.
 
 =head1 SYNOPSIS
 

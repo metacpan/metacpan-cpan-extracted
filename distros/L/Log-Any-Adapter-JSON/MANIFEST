@@ -17,3 +17,4 @@ t/012-pipe.t
 t/013-context.t
 t/014-output-unformatted.t
 t/015-localtime.t
+t/016-scalar-ref.t

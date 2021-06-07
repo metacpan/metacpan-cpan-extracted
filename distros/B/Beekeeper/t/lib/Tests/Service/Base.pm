@@ -10,9 +10,10 @@ use base 'Test::Class';
 use Beekeeper::Client;
 use Beekeeper::Config;
 use Beekeeper::Service::Supervisor;
+use AnyEvent::Impl::Perl;
 use Time::HiRes 'sleep';
 
-use constant DEBUG => 0;
+our $DEBUG = 0;
 
 =head1 Tests::Beekeeper::Service
 
@@ -33,125 +34,181 @@ Stop all workers. Called automatically when the test ends.
 
 use Tests::Service::Config;
 
-my $Broker;
-my $supervisor_pid;
-my $toybroker_pid;
-my @forked_pids;
+my $Supervisor_pid;
+my $Toybroker_pid;
+my %Worker_pids;
 
 sub using_toybroker {
-    return ($Broker =~ m/ToyBroker/);
+    return $Toybroker_pid ? 1 : 0;
+}
+
+sub automated_testing {
+    return ($ENV{'AUTOMATED_TESTING'} || $ENV{'PERL_BATCH'}) ? 1 : 0;
+}
+
+sub _sleep {
+    my ($self, $time) = @_;
+    # Run tests really slow on limited hardware of smoke testers
+    $time *= 10 if $self->automated_testing;
+    sleep $time;
 }
 
 sub check_01_supported_os : Test(startup => 1) {
-    my $class = shift;
+    my $self = shift;
 
-    unless ($^O eq 'linux' || $^O eq 'freebsd') {
-        BAIL_OUT "OS unsupported";
+    unless ($^O eq 'linux') {
+        $self->BAILOUT("OS unsupported");
     }
 
     ok( 1, "Supported OS ($^O)");
 }
 
 sub check_02_broker_connection : Test(startup => 1) {
-    my $class = shift;
+    my $self = shift;
     my $server;
     my $error;
 
     local $SIG{'__WARN__'} = sub { $error = @_ };
 
-    # Try to connect to broker
-    my $config = Beekeeper::Config->get_bus_config( bus_id => 'test' );
-    my $bus = Beekeeper::Bus::STOMP->new( %$config, timeout => 1 );
-    $Broker = eval { $bus->connect( blocking => 1 ); $bus->{server} };
+    unless ($self->automated_testing) {
 
-    # Disconect now, otherwise forked workers will inherit this connection
-    $bus->disconnect( blocking => 1 ) if $Broker;
-    %$bus = (); undef $bus;
+        # Try to connect to broker
+        my $config = Beekeeper::Config->get_bus_config( bus_id => 'test' );
+        my $bus = Beekeeper::MQTT->new( %$config, timeout => 1 );
 
-    if ($Broker) {
-        ok( 1, "Can connect to STOMP broker $Broker");
-        return;
+        my $broker_host = eval { 
+            $bus->connect( blocking => 1 );
+            $bus->{server_prop}->{host}; 
+        };
+
+        # Disconect now, otherwise forked workers will inherit this connection
+        $bus->disconnect if $broker_host;
+        %$bus = (); undef $bus;
+
+        if ($broker_host) {
+            ok( 1, "Running tests on MQTT broker at $broker_host");
+            return;
+        }
     }
 
-    # Spawn a ToyBroker
-    $toybroker_pid = $class->_spawn_worker('Beekeeper::Service::ToyBroker::Worker');
-    $Broker = 'ToyBroker';
+    # If no real broker is available, spawn a ToyBroker
+    $Toybroker_pid = $self->_spawn_worker('Beekeeper::Service::ToyBroker::Worker');
 
-    # Wait until ToyBroker is ready
-    sleep (($ENV{'AUTOMATED_TESTING'} || $ENV{'PERL_BATCH'}) ? 2 : 0.5 );
+    # Wait a bit until ToyBroker is ready
+    $self->_sleep( 0.5 );
 
-    ok( 1, "Using ToyBroker");
+    my $is_running = kill(0, $Toybroker_pid);
+
+    unless ($is_running) {
+        # Probably address already in use by another broker or a ToyBroker zombie
+        $self->stop_all_workers;
+        $self->FAIL_ALL("Could not start ToyBroker, no MQTT broker available to run tests");
+    }
+
+    ok( 1, "Running tests on ToyBroker");
 }
 
 sub stop_test_workers : Test(shutdown) {
-    my $class = shift;
+    my $self = shift;
 
     # Stop forked workers when test ends
-    $class->stop_all_workers;
+    $self->stop_all_workers;
 }
 
 sub start_workers {
-    my ($class, $worker_class, %config) = @_;
+    my ($self, $worker_class, %config) = @_;
 
     my $workers_count = $config{'workers_count'} ||= 2;
     my $no_wait = delete $config{'no_wait'};
-    my @pids;
 
-    unless ($supervisor_pid) {
+    unless ($Supervisor_pid) {
 
         ## First call  
 
-        # Spawn a supervisor
-        $supervisor_pid = $class->_spawn_worker('Beekeeper::Service::Supervisor::Worker');
-
-        # Wait until supervisor is running (this blocks for few seconds)
-        diag "Waiting for supervisor" if DEBUG;
-        my $max_wait = 100;
-        while ($max_wait--) {
-            my $status = Beekeeper::Service::Supervisor->get_services_status( class => 'Beekeeper::Service::Supervisor::Worker' );
-            my $running = $status->{'Beekeeper::Service::Supervisor::Worker'}->{count} || 0;
-            last if $running == 1;
-            Time::HiRes::sleep(0.1);
-        }
+        my $supervisor_class = 'Beekeeper::Service::Supervisor::Worker';
 
         $SIG{'USR2'} = sub {
-            # Send by childs when worker does not compile
-            $class->BAILOUT("$worker_class does not compile");
+            # Send by child when supervisor does not compile
+            $self->stop_all_workers;
+            $self->FAIL_ALL("Could not start supervisor: $supervisor_class does not compile");
         };
+
+        # Spawn a supervisor
+        $Supervisor_pid = $self->_spawn_worker( $supervisor_class, foreground => 0 ); #TODO: does not quit on foreground
+
+        # Wait until supervisor is running
+        $self->_sleep( 0.5 );
+
+        # Verify that it is running
+        my $status = eval { 
+            Beekeeper::Service::Supervisor->get_services_status( 
+                class   => $supervisor_class,
+                timeout => 1,
+            );
+        };
+        unless ($status && $status->{$supervisor_class}->{count}) {
+            $self->stop_all_workers;
+            $self->FAIL_ALL("Could not start supervisor");
+        }
     }
+
+    $SIG{'USR2'} = sub {
+        # Send by childs when workers do not compile
+        $self->stop_all_workers;
+        $self->FAIL_ALL("Could not start workers: $worker_class does not compile");
+    };
+
+    my $already_running = grep { $_ eq $worker_class } values %Worker_pids;
+    my @started_pids;
 
     # Spawn workers
     for (1..$workers_count) {
-        my $pid = $class->_spawn_worker($worker_class, %config);
-        push @forked_pids, $pid;
-        push @pids, $pid;
+
+        my $pid = $self->_spawn_worker($worker_class, %config);
+
+        $Worker_pids{$pid} = $worker_class;
+        push @started_pids, $pid;
+
+        $self->_sleep( 0.1 );
     }
 
-    return @pids if $no_wait;
+    unless ($no_wait) {
 
-    # Wait until workers are running
-    diag "Waiting for $workers_count $worker_class workers" if DEBUG;
-    my $max_wait = 100;
-    while ($max_wait--) {
-        my $status = Beekeeper::Service::Supervisor->get_services_status( class => $worker_class );
-        my $running = $status->{$worker_class}->{count} || 0;
-        last if $running == $workers_count;
-        Time::HiRes::sleep(0.1);
+        # Wait until workers are running
+        diag "Waiting for $workers_count $worker_class workers" if $DEBUG;
+
+        my $max_wait = 20;
+        while ($max_wait--) {
+            $self->_sleep( 0.1 );
+            my $status = Beekeeper::Service::Supervisor->get_services_status(
+                class   => $worker_class,
+                timeout => 1,
+            );
+            my $running = $status->{$worker_class}->{count} || 0;
+            last if $running == $workers_count + $already_running;
+        }
+
+        unless ($max_wait > 0) {
+            $self->stop_all_workers;
+            $self->FAIL_ALL("Failed to start $workers_count workers $worker_class");
+        }
     }
 
-    return @pids;
+    return @started_pids;
 }
 
 sub stop_all_workers {
-    my $class = shift;
+    my $self = shift;
 
-    $class->stop_workers('INT', @forked_pids);
-    $class->stop_workers('INT', $supervisor_pid) if $supervisor_pid;
-    $class->stop_workers('INT', $toybroker_pid) if $toybroker_pid;
+    $self->stop_workers('INT', keys %Worker_pids) if keys %Worker_pids;
+    $self->stop_workers('INT', $Supervisor_pid)   if $Supervisor_pid;
+    $self->stop_workers('INT', $Toybroker_pid)    if $Toybroker_pid;
 }
 
+my $leaving;
+
 sub stop_workers {
-    my ($class, $signal, @pids) = @_;
+    my ($self, $signal, @pids) = @_;
 
     # Signal workers to quit
     foreach my $worker_pid (@pids) {
@@ -159,16 +216,29 @@ sub stop_workers {
     }
 
     # Wait until test workers are gone
-    diag "Waiting for workers to quit" if DEBUG;
-    my $max_wait = 100;
-    while (@pids && $max_wait--) {
-        @pids = grep { kill(0, $_) } @pids;
-        Time::HiRes::sleep(0.1);
+    diag "Waiting for workers to quit" if $DEBUG;
+    my $max_wait = 20;
+    my @lingering = @pids;
+    while (@lingering && $max_wait--) {
+        @lingering = grep { kill(0, $_) } @lingering;
+        $self->_sleep( 0.1 );
     }
-};
+
+    foreach my $worker_pid (@pids) {
+        next if grep { $_ eq $worker_pid } @lingering;
+        delete $Worker_pids{$worker_pid};
+    }
+
+    if (@lingering) {
+        $leaving && return;
+        $leaving = 1;
+        $self->stop_all_workers;
+        $self->FAIL_ALL("Failed to stop workers " . join(', ', values %Worker_pids));
+    }
+}
 
 sub _spawn_worker {
-    my ($class, $worker_class, %config) = @_;
+    my ($self, $worker_class, %config) = @_;
 
     # Mimic Beekeeper::WorkerPool->spawn_worker
 
@@ -193,7 +263,7 @@ sub _spawn_worker {
 
     srand();
 
-    # Destroy inherithed STOMP connection
+    # Destroy inherithed MQTT connection
     if ($Beekeeper::Client::singleton) {
         $Beekeeper::Client::singleton->{_BUS}->{handle}->destroy;
         undef $Beekeeper::Client::singleton;
@@ -223,24 +293,30 @@ sub _spawn_worker {
 
     # Mocked worker config
     my $worker_config = {
-        #TODO: send log to a temp file, so it can be inspected 
         log_file => '/dev/null',
         %config
     };
 
-    my $foreground = $config{foreground} || DEBUG;
+    my $foreground = exists $config{foreground} ? $config{foreground} : $DEBUG;
 
-    my $worker = $worker_class->new(
-        pool_config => $pool_config,
-        bus_config  => $bus_cfg,
-        parent_pid  => $parent_pid,
-        pool_id     => $pool_config->{pool_id},
-        bus_id      => $pool_config->{bus_id},
-        config      => $worker_config,
-        foreground  => $foreground,
-    );
+    eval {
 
-    $worker->__work_forever;
+        my $worker = $worker_class->new(
+            pool_config => $pool_config,
+            bus_config  => $bus_cfg,
+            parent_pid  => $parent_pid,
+            pool_id     => $pool_config->{pool_id},
+            bus_id      => $pool_config->{bus_id},
+            config      => $worker_config,
+            foreground  => $foreground,
+        );
+
+        $worker->__work_forever;
+    };
+
+    if ($DEBUG && $@) {
+        diag "$worker_class died: $@";
+    }
 
     CORE::exit;
 }

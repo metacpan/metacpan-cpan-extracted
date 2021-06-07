@@ -4,6 +4,11 @@ The contributors that suggested a given feature are shown in [].  [by ...]
 indicates the contributor was also the author of the fix; Thanks!
 
 
+* Verilog-Perl 3.478 2021-06-06
+
+****  Fix ${ENVVAR} expansion (#1671). [Henry Hsieh]
+
+
 * Verilog-Perl 3.476 2021-04-13
 
 ****  Fix parameter type = struct. [Nathan Chrisman]

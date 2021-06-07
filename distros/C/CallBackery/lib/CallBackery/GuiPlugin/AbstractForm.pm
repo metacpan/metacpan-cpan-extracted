@@ -3,6 +3,8 @@ use Carp qw(carp croak);
 use CallBackery::Translate qw(trm);
 use CallBackery::Exception qw(mkerror);
 use Mojo::Promise;
+use Mojo::JSON qw(encode_json);
+use Mojo::Util qw(dumper);
 
 =head1 NAME
 
@@ -211,7 +213,7 @@ sub getFieldValue {
             return $entry->{getter}->($self);
         }
         else {
-            warn 'Plugin instance'.$self->name." field $field has a broken getter\n";
+            $self->log->warn('Plugin instance'.$self->name." field $field has a broken getter\n");
         }
     }
     return $self->getConfigValue($self->name.'::'.$field);
@@ -292,8 +294,16 @@ sub massageConfig {
             # prepend plugin name (see also screenCfg above)
             my $name = $self->name . '_' . $button->{name};
             $button->{name} = $name;
-            die "Plugin instance name $name is not unique\n"
-                if $cfg->{PLUGIN}{prototype}{$name};
+            # allow same plugin multiple times
+            if ($cfg->{PLUGIN}{prototype}{$name}) {
+                my $newCfg = encode_json($button->{backend});
+                my $oldCfg = encode_json($cfg->{PLUGIN}{prototype}{$name}{backend});
+                if ($oldCfg ne 'null' and $newCfg ne $oldCfg) {
+                    $self->log->warn("oldCfg=" . dumper $oldCfg);
+                    $self->log->warn("newCfg=", dumper $newCfg);
+                    die "Not unique plugin instance name $name not allowed as backend config is different\n";
+                }
+            }
             my $popup = $cfg->{PLUGIN}{prototype}{$name}
                 = $self->app->config->loadAndNewPlugin($button->{backend}{plugin});
             $popup->config($button->{backend}{config});

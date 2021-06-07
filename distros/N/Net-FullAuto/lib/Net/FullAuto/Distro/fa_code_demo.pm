@@ -67,6 +67,7 @@ sub hello_world_old {
 
     #print "\nFIRST PARAMETER=$_[0]\n";
     #print "SECOND PARAMETER=$_[1]\n";
+    my $localhost=connect_shell();
     my $hostname=$localhost->cmd('hostname');
     my $stdout='';
     my $stderr='';
@@ -137,6 +138,7 @@ sub menu_demo {
       Banner => "\n   Choose a /bin Utility :\n\n"
    );
 
+   my $unattended=0;
    my @selections=&Menu(\%Menu_1,$unattended);
    print "\nSELECTIONS = @selections\n";
 
@@ -196,6 +198,7 @@ sub compare_fa_code {
 
    my ($solaris_ssh,$solaris_sftp,$laptop_sftp,$output,$stderr)=
       ('','','','','');
+   my $localhost=connect_shell();
    ($solaris_ssh,$stderr)=connect_ssh('Solaris');
    ($solaris_sftp,$stderr)=connect_sftp('Solaris');
    print "SFTP_CONNECT_STDERR=$stderr\n" if $stderr;
@@ -267,6 +270,7 @@ sub remote_hostname {
 sub get_file_from_one {
 
    my ($computer_one,$stdout,$stderr);         # Scope Variables
+   my $localhost=connect_shell();
 
    $computer_one=connect_reverse('REMOTE COMPUTER ONE'); # Connect
                                                # to Remote Host via

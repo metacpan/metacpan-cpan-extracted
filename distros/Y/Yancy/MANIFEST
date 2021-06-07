@@ -124,11 +124,15 @@ lib/Yancy/Guides.pod
 lib/Yancy/Guides/Accounts.pod
 lib/Yancy/Guides/Cookbook.pod
 lib/Yancy/Guides/Editor.pod
+lib/Yancy/Guides/Model.pod
 lib/Yancy/Guides/Schema.pod
 lib/Yancy/Guides/Tutorial.pod
 lib/Yancy/Guides/Upgrading.pod
 lib/Yancy/I18N.pm
 lib/Yancy/I18N/en.pm
+lib/Yancy/Model.pm
+lib/Yancy/Model/Item.pm
+lib/Yancy/Model/Schema.pm
 lib/Yancy/Plugin/Auth.pm
 lib/Yancy/Plugin/Auth/Basic.pm
 lib/Yancy/Plugin/Auth/Github.pm
@@ -212,6 +216,7 @@ t/lib/Local/Test.pm
 t/lib/Yancy/Backend/Brokentest.pm
 t/lib/Yancy/Backend/Test.pm
 t/lib/Yancy/Plugin/Test.pm
+t/model.t
 t/plugin/auth.t
 t/plugin/auth/basic.t
 t/plugin/auth/github.t

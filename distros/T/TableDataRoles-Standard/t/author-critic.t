@@ -15,7 +15,7 @@ use warnings;
 
 use Test::Perl::Critic (-profile => "") x!! -e "";
 
-my $filenames = ['lib/TableData/AOH.pm','lib/TableData/DBI.pm','lib/TableData/Sample/DeNiro.pm','lib/TableData/Test/Source/AOH.pm','lib/TableData/Test/Source/CSVDATA.pm','lib/TableData/Test/Source/DBI.pm','lib/TableData/Test/Source/Iterator.pm','lib/TableDataRole/Source/AOH.pm','lib/TableDataRole/Source/CSVDATA.pm','lib/TableDataRole/Source/DBI.pm','lib/TableDataRole/Source/Iterator.pm','lib/TableDataRole/Util/CSV.pm','lib/TableDataRole/Util/Random.pm','lib/TableDataRoles/Standard.pm'];
+my $filenames = ['lib/TableData/AOH.pm','lib/TableData/DBI.pm','lib/TableData/Sample/DeNiro.pm','lib/TableData/Test/Source/AOH.pm','lib/TableData/Test/Source/CSVInDATA.pm','lib/TableData/Test/Source/DBI.pm','lib/TableData/Test/Source/Iterator.pm','lib/TableDataRole/Source/AOH.pm','lib/TableDataRole/Source/CSVInDATA.pm','lib/TableDataRole/Source/DBI.pm','lib/TableDataRole/Source/Iterator.pm','lib/TableDataRole/Util/CSV.pm','lib/TableDataRoles/Standard.pm'];
 unless ($filenames && @$filenames) {
     $filenames = -d "blib" ? ["blib"] : ["lib"];
 }

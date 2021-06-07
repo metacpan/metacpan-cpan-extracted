@@ -8,7 +8,7 @@ BEGIN {
     chdir 't' if -d 't';
 }
 
-print "1..188\n";
+print "1..190\n";
 
 sub failed {
     my ($got, $expected, $name) = @_;
@@ -243,7 +243,7 @@ eval q[
 like($@, qr/Missing right curly/, 'nested sub syntax error' );
 
 eval q[
-    sub { my ($a,$b,$c,$d,$e,$f,$g,$h,$i,$j,$k,$l,$m,$n,$o,$p,$q,$r,$s,$r);
+    sub { my ($a,$b,$c,$d,$e,$f,$g,$h,$i,$j,$k,$l,$m,$n,$o,$p,$q,$r,$s);
 	    sub { my $z
 ];
 like($@, qr/Missing right curly/, 'nested sub syntax error 2' );
@@ -256,7 +256,7 @@ eval q[
 like($@, qr/Can't locate DieDieDie.pm/, 'croak cleanup' );
 
 eval q[
-    sub { my ($a,$b,$c,$d,$e,$f,$g,$h,$i,$j,$k,$l,$m,$n,$o,$p,$q,$r,$s,$r);
+    sub { my ($a,$b,$c,$d,$e,$f,$g,$h,$i,$j,$k,$l,$m,$n,$o,$p,$q,$r,$s);
 	    use DieDieDie;
 ];
 
@@ -265,7 +265,7 @@ like($@, qr/Can't locate DieDieDie.pm/, 'croak cleanup 2' );
 
 eval q[
     my @a;
-    my ($a,$b,$c,$d,$e,$f,$g,$h,$i,$j,$k,$l,$m,$n,$o,$p,$q,$r,$s,$r);
+    my ($a,$b,$c,$d,$e,$f,$g,$h,$i,$j,$k,$l,$m,$n,$o,$p,$q,$r,$s);
     @a =~ s/a/b/; # compile-time error
     use DieDieDie;
 ];
@@ -513,16 +513,18 @@ is $@, "Illegal division by zero at maggapom line 2.\n",
 is +(${[{a=>214}]}[0])->{a}, 214, '($array[...])->{...}';
 
 # This used to fail an assertion because of the OPf_SPECIAL flag on an
-# OP_GV that started out as an OP_CONST.  No test output is necessary, as
-# successful parsing is sufficient.
-sub FILE1 () { 1 }
-sub dummy { tell FILE1 }
+# OP_GV that started out as an OP_CONST.
+
+  sub FILE1 () { 1 }
+  sub dummy { tell FILE1 }
 
 # More potential multideref assertion failures
 # OPf_PARENS on OP_RV2SV in subscript
-$x[($_)];
+  $x[($_)];
+  is(1,1, "PASS: Previous line successfully parsed. OPf_PARENS on OP_RV2SV");
 # OPf_SPECIAL on OP_GV in subscript
-$x[FILE1->[0]];
+  $x[FILE1->[0]];
+  is(1,1, "PASS: Previous line successfully parsed. OPf_SPECIAL on OP_GV");
 
 # Used to crash [perl #123542]
 eval 's /${<>{}) //';
@@ -637,10 +639,10 @@ check($this_file, 3, "bare line");
 # line 5
 check($this_file, 5, "bare line with leading space");
 
-#line 7 
+#line 7
 check($this_file, 7, "trailing space still valid");
 
-# line 11 
+# line 11
 check($this_file, 11, "leading and trailing");
 
 #	line 13
@@ -664,7 +666,7 @@ check(qr/^CLINK CLOINK BZZT$/, 31, "filename with spaces in quotes");
 #line 37 "THOOM	THOOM"
 check(qr/^THOOM	THOOM$/, 37, "filename with tabs in quotes");
 
-#line 41 "GLINK PLINK GLUNK DINK" 
+#line 41 "GLINK PLINK GLUNK DINK"
 check(qr/^GLINK PLINK GLUNK DINK$/, 41, "a space after the quotes");
 
 #line 43 "BBFRPRAFPGHPP

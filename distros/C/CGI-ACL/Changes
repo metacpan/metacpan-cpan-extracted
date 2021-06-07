@@ -1,5 +1,9 @@
 Revision history for CGI-ACL
 
+0.04	Fri May 21 14:54:04 EDT 2021
+	Do something sensible if the remote country can't be determined
+	By default, localhost is not allowed access
+
 0.03	Fri Dec  7 11:19:53 EST 2018
 	Added allow_country and deny_country('*')
 

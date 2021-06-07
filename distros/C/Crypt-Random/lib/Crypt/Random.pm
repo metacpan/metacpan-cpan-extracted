@@ -21,7 +21,7 @@ use Data::Dumper;
 use Class::Loader;
 use Crypt::Random::Generator;
 
-$VERSION     = 1.52;
+$VERSION     = 1.54;
 
 
 sub _pickprovider { 
@@ -96,8 +96,9 @@ sub makerandom_itv {
 
     my $itv    = Mod ( 0, $b - $a );
     my $size   = length ( $itv ) * 5;
-    my $random = makerandom %params, Size => $size;
+    #my $random = makerandom %params, Size => $size; # extra we can get rid of it
 
+    my $random;
     do { $random = makerandom %params, Size => $size, Uniform => 1 } # should always be uniform
     while ( $random >= (PARI(2)**$size) - ((PARI(2)**$size) % lift($b-$a)));
 

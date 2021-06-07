@@ -17,6 +17,7 @@ lib/NewFangle/FFI.pm
 lib/NewFangle/Segment.pm
 lib/NewFangle/Transaction.pm
 maint/cip-before-install
+newrelic-dashboard-result.png
 perlcriticrc
 t/00_diag.t
 t/lib/LiveTest.pm

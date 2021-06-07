@@ -15,7 +15,7 @@ configure_requires:
   ExtUtils::MakeMaker: '0'
   File::ShareDir::Install: '0.06'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 5.043, CPAN::Meta::Converter version 2.150001'
+generated_by: 'Dist::Zilla version 6.017, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -24,13 +24,13 @@ name: Dancer-Plugin-Swagger
 provides:
   Dancer::Plugin::Swagger:
     file: lib/Dancer/Plugin/Swagger.pm
-    version: v0.2.0
+    version: v0.3.0
   Dancer::Plugin::Swagger::Path:
     file: lib/Dancer/Plugin/Swagger/Path.pm
-    version: v0.2.0
+    version: v0.3.0
   Dancer::Plugin::Swagger::Response:
     file: lib/Dancer/Plugin/Swagger/Response.pm
-    version: v0.2.0
+    version: v0.3.0
 requires:
   Carp: '0'
   Class::Load: '0'
@@ -43,6 +43,7 @@ requires:
   Hash::Merge: '0'
   JSON: '0'
   List::AllUtils: '0'
+  Module::Version: '0'
   Moo: '0'
   MooX::Singleton: '0'
   MooseX::MungeHas: '0'
@@ -55,9 +56,15 @@ resources:
   bugtracker: https://github.com/yanick/Dancer-Plugin-Swagger/issues
   homepage: https://github.com/yanick/Dancer-Plugin-Swagger
   repository: https://github.com/yanick/Dancer-Plugin-Swagger.git
-version: 0.2.0
+version: 0.3.0
 x_author_pledge:
   version: 1
 x_authority: cpan:YANICK
+x_contributor_covenant:
+  version: 0.02
 x_contributors:
+  - 'Mike Whitaker <mike@altrion.org>'
   - 'moltar <moltar@moltar.net>'
+x_generated_by_perl: v5.30.0
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

@@ -1,19 +1,19 @@
 use strict;
 use warnings;
-use 5.022;
+use 5.024;
 use feature qw /postderef signatures/;
 
 package Vote::Count::Borda;
 
 use Moose::Role;
 
-our $VERSION='1.10';
+our $VERSION='2.00';
 
 =head1 NAME
 
 Vote::Count::Borda
 
-=head1 VERSION 1.10
+=head1 VERSION 2.00
 
 =cut
 
@@ -40,9 +40,9 @@ has 'bordadepth' => (
 
 # Many real world Borda implmentations use 1
 # for unranked default. The way unranked choices are valued
-# relies on NonApproval (from Approval), which does not 
-# support overriding the Active Set. Because this is a low 
-# priority function the limitation is acceptable. 
+# relies on NonApproval (from Approval), which does not
+# support overriding the Active Set. Because this is a low
+# priority function the limitation is acceptable.
 has 'unrankdefault' => (
   is      => 'rw',
   isa     => 'Int',
@@ -67,11 +67,11 @@ The Borda Count is trying to Cardinally value Preferential choices, for this rea
 
 =head1 Variations on the Borda Count
 
-One major criticism of the count is that when there are many choices the difference between a first and second choice becomes negligible. A large number of alternative weightings have been used to address this. 
+One major criticism of the count is that when there are many choices the difference between a first and second choice becomes negligible. A large number of alternative weightings have been used to address this.
 
 =head2 Borda Depth (bordadepth parameter)
 
-One of the simpler variations is to fix the depth, when the depth is set to a certain number the weighting is as if the ballot had that many choices, and choices ranked lower than the depth are scored 0. If there are eight choices and a depth of 3, a first choice is worth 3, a 3rd 1, and later choices are ignored 
+One of the simpler variations is to fix the depth, when the depth is set to a certain number the weighting is as if the ballot had that many choices, and choices ranked lower than the depth are scored 0. If there are eight choices and a depth of 3, a first choice is worth 3, a 3rd 1, and later choices are ignored
 
 =head2 Borda Weight (bordaweight parameter)
 
@@ -79,7 +79,7 @@ Some of the popular alternate weighting systems include:
 
 =over
 
-=item * different scaling such as 1/x where x is the position of the choice (1 is worth 1, 3 is 1/3). 
+=item * different scaling such as 1/x where x is the position of the choice (1 is worth 1, 3 is 1/3).
 
 =item * Another popular alternative is to score for one less than the number of choices -- in a five choice race first is worth 4 and last is worth 0.
 
@@ -99,7 +99,7 @@ When Creating a VoteCount object a custom Borda weight may be set by passing a c
 
 =head2 unrankdefault
 
-Jean-Charles de Borda expected voters to rank all available choices. When they fail to do this the unranked choices need to be handled. The default in Vote::Count is to score unranked choices as 0. However, it is also common to score them as 1. Vote::Count permits using any Integer for this valuation.  
+Jean-Charles de Borda expected voters to rank all available choices. When they fail to do this the unranked choices need to be handled. The default in Vote::Count is to score unranked choices as 0. However, it is also common to score them as 1. Vote::Count permits using any Integer for this valuation.
 
   my $VC2 = Vote::Count->new(
     BallotSet   => read_ballots('t/data/data2.txt'),
@@ -164,16 +164,16 @@ sub Borda ( $self, $active = undef ) {
   my %BallotSet = $self->BallotSet()->%*;
   my %ballots   = ();
   if ( defined $active ) {
-    die q/unrankdefault other than 0 is not compatible with overriding the 
+    die q/unrankdefault other than 0 is not compatible with overriding the
         Active Set. To fix this use the SetActive method to update the active
         set, then call this (Borda) method without passing an active set./
     if $self->unrankdefault();
   }
   $active = $self->Active() unless defined $active;
   %ballots = %{ _bordashrinkballot( \%BallotSet, $active ) };
-  my %BordaTable = ( map { $_ => {} } keys( $active->%* ) );  
-BORDALOOPACTIVE:    
-  for my $b ( keys %ballots ) { 
+  my %BordaTable = ( map { $_ => {} } keys( $active->%* ) );
+BORDALOOPACTIVE:
+  for my $b ( keys %ballots ) {
     my @votes  = $ballots{$b}->{'votes'}->@* ;
     my $bcount = $ballots{$b}->{'count'};
     for ( my $i = 0 ; $i < scalar(@votes) ; $i++ ) {
@@ -185,7 +185,7 @@ BORDALOOPACTIVE:
   if ( $self->unrankdefault() ) {
     my $unranked = $self->NonApproval()->RawCount();
     for my $u ( keys $unranked->%* ) {
-      $BordaCounted->{$u} += $unranked->{$u} * $self->unrankdefault() 
+      $BordaCounted->{$u} += $unranked->{$u} * $self->unrankdefault()
     }
   }
   return Vote::Count::RankCount->Rank($BordaCounted);
@@ -207,10 +207,15 @@ John Karr (BRAINBUZ) brainbuz@cpan.org
 
 CONTRIBUTORS
 
-Copyright 2020,2019 by John Karr (BRAINBUZ) brainbuz@cpan.org.
+Copyright 2019-2021 by John Karr (BRAINBUZ) brainbuz@cpan.org.
 
 LICENSE
 
 This module is released under the GNU Public License Version 3. See license file for details. For more information on this license visit L<http://fsf.org>.
 
+SUPPORT
+
+This software is provided as is, per the terms of the GNU Public License. Professional support and customisation services are available from the author.
+
 =cut
+

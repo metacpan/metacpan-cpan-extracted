@@ -1,6 +1,7 @@
-#!/usr/bin/perl
+#!/usr/bin/env perl
 
-use Modern::Perl;
+use 5.014;
+use warnings;
 use FindBin;
 use lib ("$FindBin::Bin/../lib");
 

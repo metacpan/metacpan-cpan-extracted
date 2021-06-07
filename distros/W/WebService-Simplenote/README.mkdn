@@ -4,7 +4,7 @@ WebService::Simplenote - Note-taking through simplenoteapp.com
 
 # VERSION
 
-version 0.2.1
+version 0.2.2
 
 # SYNOPSIS
 
@@ -46,41 +46,41 @@ Will `die` if unable to connect/login. Returns `undef` for other errors.
 
 - WebService::Simplenote->new($args)
 
-Requires the `email` and `password` for your simplenote account. You can also
-provide a [Log::Any](http://search.cpan.org/perldoc?Log::Any) compatible `logger`.
+    Requires the `email` and `password` for your simplenote account. You can also
+    provide a [Log::Any](https://metacpan.org/pod/Log%3A%3AAny) compatible `logger`.
 
 - get\_remote\_index
 
-Returns a hashref of [WebService::Simplenote::Note](http://search.cpan.org/perldoc?notes). The notes are keyed by id.
+    Returns a hashref of [WebService::Simplenote::Note](https://metacpan.org/pod/notes). The notes are keyed by id.
 
 - get\_note($note\_id)
 
-Retrieves a note from the remote server and returns it as a [WebService::Simplenote::Note](http://search.cpan.org/perldoc?WebService::Simplenote::Note).
-`$note_id` is an alphanumeric key generated on the server side.
+    Retrieves a note from the remote server and returns it as a [WebService::Simplenote::Note](https://metacpan.org/pod/WebService%3A%3ASimplenote%3A%3ANote).
+    `$note_id` is an alphanumeric key generated on the server side.
 
 - put\_note($note)
 
-Puts a [WebService::Simplenote::Note](http://search.cpan.org/perldoc?WebService::Simplenote::Note) to the remote server
+    Puts a [WebService::Simplenote::Note](https://metacpan.org/pod/WebService%3A%3ASimplenote%3A%3ANote) to the remote server
 
 - delete\_note($note\_id)
 
-Delete the specified note from the server. The note should be marked as `deleted`
-beforehand.
+    Delete the specified note from the server. The note should be marked as `deleted`
+    beforehand.
 
 # TESTING
 
 Setting the environment variables `SIMPLENOTE_USER` and `SIMPLENOTE_PASS` will enable remote tests.
-If you want to run the remote tests __MAKE SURE YOU MAKE A BACKUP OF YOUR NOTES FIRST!!__
+If you want to run the remote tests **MAKE SURE YOU MAKE A BACKUP OF YOUR NOTES FIRST!!**
 
 # SEE ALSO
 
 Designed for use with Simplenote:
 
-<http://www.simplenoteapp.com/>
+&lt;http://www.simplenoteapp.com/>
 
 Based on SimplenoteSync:
 
-<http://fletcherpenney.net/other\_projects/simplenotesync/>
+&lt;http://fletcherpenney.net/other\_projects/simplenotesync/>
 
 # AUTHORS
 
@@ -89,7 +89,7 @@ Based on SimplenoteSync:
 
 # COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2012 by Ioan Rogers.
+This software is Copyright (c) 2021 by Ioan Rogers.
 
 This is free software, licensed under:
 
@@ -102,5 +102,5 @@ web interface at [https://github.com/ioanrogers/WebService-Simplenote/issues](ht
 
 # SOURCE
 
-The development version is on github at [http://github.com/ioanrogers/WebService-Simplenote](http://github.com/ioanrogers/WebService-Simplenote)
+The development version is on github at [https://github.com/ioanrogers/WebService-Simplenote](https://github.com/ioanrogers/WebService-Simplenote)
 and may be cloned from [git://github.com/ioanrogers/WebService-Simplenote.git](git://github.com/ioanrogers/WebService-Simplenote.git)

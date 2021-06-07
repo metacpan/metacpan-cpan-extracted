@@ -14,7 +14,7 @@ use File::Basename qw(basename);
 use SemVer;
 use Gravatar::URL;
 #use namespace::autoclean; # Do not use; breaks sort {}
-our $VERSION = v0.20.2;
+our $VERSION = v0.22.0;
 
 my $l = PGXN::Site::Locale->get_handle('en');
 sub T { $l->maketext(@_) }
@@ -22,13 +22,10 @@ sub T { $l->maketext(@_) }
 BEGIN { create_wrapper wrapper => sub {
     my ($code, $req, $args) = @_;
     $l = PGXN::Site::Locale->accept($req->env->{HTTP_ACCEPT_LANGUAGE});
+    my $v = PGXN::Site->version_string;
     outs_raw '<!DOCTYPE html>';
     html {
-        attr {
-            xmlns      => 'https://www.w3.org/1999/xhtml',
-            'xml:lang' => 'en',
-            lang       => 'en',
-        };
+        lang is 'en';
         outs_raw( "\n", join "\n",
             '<!--',
             '____________________________________________________________',
@@ -41,16 +38,11 @@ BEGIN { create_wrapper wrapper => sub {
         );
 
         head {
+            meta {
+                name is 'viewport';
+                content is 'width=device-width, initial-scale=1.0';
+            };
             title { $args->{title} };
-            meta {
-                name is 'keywords';
-                content is 'PostgreSQL, extensions, PGXN, PostgreSQL Extension Network';
-            };
-            meta {
-                name is 'description';
-                content is 'Search all indexed extensions, distributions, '
-                         . 'users, and tags on the PostgreSQL Extension Network.';
-            };
             for my $spec (
                 [ layout => 'screen, projection, tv' ],
                 [ print  => 'print'                  ],
@@ -58,7 +50,7 @@ BEGIN { create_wrapper wrapper => sub {
                 link {
                     rel   is 'stylesheet';
                     type  is 'text/css';
-                    href  is "/ui/css/$spec->[0].css?" . PGXN::Site->version_string;
+                    href  is "/ui/css/$spec->[0].css?$v";
                     media is $spec->[1];
                 };
             }
@@ -95,6 +87,33 @@ BEGIN { create_wrapper wrapper => sub {
                 rel is 'manifest';
                 href is "/ui/manifest.json";
             };
+
+            # Metadata. Twitter and Facebook unfurls as described in
+            # https://medium.com/p/e64b4bb9254
+            my $desc = $args->{description} || T 'Search all indexed extensions, distributions, users, and tags on the PostgreSQL Extension Network.';
+            for my $spec (
+                [ name => 'generator', content => "PGXN::Site $v" ],
+                [ name => 'keywords', content => $args->{keywords} || 'PostgreSQL, extensions, PGXN, PostgreSQL Extension Network' ],
+                [ name => 'description', content => $desc ],
+                [ property => 'og:type', content => 'website' ],
+                [ property => 'og:url',  content => $args->{base_url} . $req->path ],
+                [ property => 'og:title', content => $args->{title} ],
+                [ property => 'og:site_name', content => T 'hometitle' ],
+                [ property => 'og:description', content => $desc ],
+                [ property => 'og:image', content => "$args->{base_url}/ui/img/icon-512.png" ],
+                [ name => 'twitter:card', content => 'summary' ],
+                [ name => 'twitter:site', content => '@pgxn' ],
+                [ name => 'twitter:title', content => $args->{title} ],
+                [ name => 'twitter:description', content => $desc ],
+                [ name => 'twitter:image', content => "$args->{base_url}/ui/img/icon-512.png" ],
+                [ name => 'twitter:image:alt', content => 'PGXN gear logo' ],
+                ( $args->{user_twitter}
+                    ? [ name => 'twitter:creator', content => '@' .$args->{user_twitter} ]
+                    : ()
+                ),
+            ) {
+                meta { attr sub { @{ $spec } } }
+            }
         }; # /head
 
         body {
@@ -142,10 +161,9 @@ BEGIN { create_wrapper wrapper => sub {
                             class is 'floatRight';
                             my $path = $req->uri->path;
                             for my $spec (
-                                [ '/recent/', 'Recent Releases',            'Recent'  ],
-                                [ '/users/',  'PGXN Users',                 'Users'   ],
-                                [ '/about/',  'About PGXN',                 'About'   ],
-                                [ '/faq/',    'Frequently Asked Questions', 'FAQ'     ],
+                                [ '/users/',  'PGXN Users',      'Users'  ],
+                                [ '/tags/',   'Release Tags',    'Tags'   ],
+                                [ '/recent/', 'Recent Releases', 'Recent' ],
                             ) {
                                 li {
                                     class is 'here' if $path eq $spec->[0];
@@ -172,31 +190,6 @@ BEGIN { create_wrapper wrapper => sub {
                     id is 'width';
                     span {
                         class is 'floatLeft';
-                        outs +PGXN::Site->version_string;
-                        span { class is 'grey'; '|' };
-                        outs 'code';
-                        a {
-                            href is 'https://www.justatheory.com/';
-                            title is T 'Go to [_1]', 'Just a Theory';
-                            'theory';
-                        };
-                        span { class is 'grey'; '|' };
-                        outs ' design';
-                        a {
-                            href is 'https://fullahead.org/';
-                            title is T 'Go to [_1]', 'Fullahead';
-                            'Fullahead';
-                        };
-                        span { class is 'grey'; '|' };
-                        outs ' logo';
-                        a {
-                            href is 'https://www.strongrrl.com/';
-                            title is T 'Go to [_1]', 'Strongrrl';
-                            'Strongrrl';
-                        };
-                    }; # /span.floatLeft
-                    span {
-                        class is 'floatRight';
                         a {
                             href is 'https://blog.pgxn.org/';
                             title is T 'PGXN Blog';
@@ -214,23 +207,25 @@ BEGIN { create_wrapper wrapper => sub {
                             title is T 'Release it on PGXN';
                             T 'Release It';
                         };
+                    };
+                    span {
+                        class is 'floatRight';
+                        a {
+                            href is '/about/';
+                            title is T 'About PGXN';
+                            T 'About';
+                        };
+                        span { class is 'grey'; '|' };
+                        a {
+                            href is '/faq/';
+                            title is T 'Frequently Asked Questions';
+                            T 'FAQ';
+                        };
                         span { class is 'grey'; '|' };
                         a {
                             href is '/mirroring/';
                             title is T 'Mirroring';
                             T 'Mirroring';
-                        };
-                        span { class is 'grey'; '|' };
-                        a {
-                            href is '/donors/';
-                            title is T 'Donors';
-                            T 'Donors';
-                        };
-                        span { class is 'grey'; '|' };
-                        a {
-                            href is '/art/';
-                            title is T 'Identity';
-                            T 'Identity';
                         };
                         span { class is 'grey'; '|' };
                         a {
@@ -254,7 +249,7 @@ template home => sub {
             div {
                 class is 'hsearch floatLeft';
                 show search_form => {
-                    id       => 'homesearch',
+                    id        => 'homesearch',
                     in        => 'doc',
                     autofocus => 1,
                 };
@@ -294,7 +289,7 @@ template home => sub {
             }; # /div.hside floatLeft gradient
 
         }; # /div#homepage
-    } $req, { title => T 'hometitle' };
+    } $req, { %{ $args }, title => T 'hometitle' };
 };
 
 sub _title_with($) {
@@ -331,9 +326,9 @@ template distribution => sub {
                             href is URI->new($args->{api_url} . $dist->source_path);
                             title is T 'Browse [_1] [_2]', $dist->name, $dist->version;
                             img {
-                            src is '/ui/img/package.svg';
-                            alt is T 'Browse';
-                        };
+                                src is '/ui/img/opened_folder.svg';
+                                alt is T 'Browse';
+                            };
                         };
                     }; # /span.download
                 }; # /div.controls
@@ -382,7 +377,7 @@ template distribution => sub {
                         dt { class is 'other'; T 'Other Releases' };
                         dd {
                             select {
-                                onchange is 'window.location.href = this.options[this.selectedIndex].value';
+                                id is 'vnav';
                                 my $version = $dist->version;
                                 for my $rel (@rels) {
                                     # Include release status in the option name?
@@ -390,10 +385,16 @@ template distribution => sub {
                                         value is '/dist/' . lc $dist->name . lc "/$rel->{version}/";
                                         selected is 'selected' if $rel->{version} eq $version;
                                         (my $date = $rel->{date}) =~ s{T.+}{};
-                                        $dist->name . " $rel->{version} — $date";
+                                        "$rel->{version} — $date";
                                     };
                                 }
                             };
+                            script {
+                                # https://content-security-policy.com/examples/allow-inline-script/
+                                # Hash for Content-Security-Policy header to allow this JS to execute.
+                                # script-src 'sha256-GN1zhliF5ZZMDFdFdgbLI+BAIxikH+5wEBDQEdf4Ryk='
+                                outs_raw q{document.getElementById("vnav").addEventListener("change",function(){window.location.href=this.options[this.selectedIndex].value})};
+                            }
                         };
                     }
                     dt { T 'Abstract' };
@@ -603,7 +604,11 @@ template distribution => sub {
             }
         }; # /div#page
     } $req, {
-        title => _title_with $args->{dist_name} . ': ' . $dist->abstract,
+        %{ $args },
+        title        => _title_with $args->{dist_name} . ': ' . $dist->abstract,
+        description  => $dist->description,
+        keywords     => join(', ' => $dist->tags),
+        user_twitter => $args->{user}->twitter,
         crumb => sub {
             li { a {
                 href is '/user/' . lc $dist->user;
@@ -622,7 +627,6 @@ template distribution => sub {
     };
 };
 
-
 template document => sub {
     my ($self, $req, $args) = @_;
     my $dist = $args->{dist};
@@ -636,7 +640,11 @@ template document => sub {
             outs_raw $args->{body};
         }; # /div#page
     } $req, {
+        %{ $args },
         title => _title_with $title . ($info->{abstract} ? ": $info->{abstract}" : ''),
+        description  => $info->{abstract},
+        keywords     => join(', ' => $dist->tags),
+        user_twitter => $args->{user}->twitter,
         crumb => sub {
             li { a {
                 href is '/user/' . lc $dist->user;
@@ -674,14 +682,15 @@ template spec => sub {
             outs_raw $args->{body};
         }; # /div#page
     } $req, {
-        title => _title_with $title,
+        %{ $args },
+        title       => _title_with $title,
+        description => 'The PGXN distribution metadata specification',
     };
 };
 
 template user => sub {
     my ($self, $req, $args) = @_;
     my $user = $args->{user};
-    my $api  = $args->{api};
 
     wrapper {
         div {
@@ -697,7 +706,8 @@ template user => sub {
                             rating  => 'pg',
                             email   => $user->email,
                             size    => 80,
-                            default => $req->base . 'ui/img/shirt.png',
+                            https   => 1,
+                            default => "$args->{base_url}/ui/img/shirt.png",
                         );
                     };
                 };
@@ -734,14 +744,40 @@ template user => sub {
             show release_table => $req, $user->releases, $args;
         }; # /div#page
     } $req, {
-        title => _title_with $user->name . ' (' . $user->nickname . ')',
+        %{ $args },
+        title        => _title_with $user->name . ' (' . $user->nickname . ')',
+        description => T('Contact and extension release information for PGXN user "[_1]"', $user->nickname),
+        keywords    => 'PostgreSQL, extensions, PGXN, PostgreSQL Extension Network, user, ' . $user->nickname,
+    };
+};
+
+template tags => sub {
+    my ($self, $req, $args) = @_;
+    wrapper {
+        div {
+            id is 'page';
+            div {
+                class is 'gradient';
+                h1 { T 'Release Tags' };
+                show search_form => {
+                    id        => 'homesearch',
+                    in        => 'tags',
+                    autofocus => 1,
+                };
+                outs_raw $args->{cloud}->html;
+            };
+        };
+    } $req, {
+        %{ $args },
+        title       => T('Tags'),
+        description => T('Search for tags on PostgreSQL extension releases on PGXN'),
+        keywords    => 'PostgreSQL, extensions, PGXN, PostgreSQL Extension Network, tags, search',
     };
 };
 
 template tag => sub {
     my ($self, $req, $args) = @_;
     my $tag = $args->{tag};
-    my $api = $args->{api};
     my $title = T 'Tag: [_1]', $tag->name;
 
     wrapper {
@@ -752,7 +788,10 @@ template tag => sub {
             show release_table => $req, $tag->releases, $args;
         }; # /div#page
     } $req, {
-        title => _title_with $title,
+        %{ $args },
+        title       => _title_with $title,
+        description => T('A list of PGXN extensions tagged "[_1]"', $tag),
+        keywords    => "PostgreSQL, extensions, PGXN, PostgreSQL Extension Network, tags, $tag",
     };
 };
 
@@ -776,55 +815,65 @@ template recent => sub {
             }; # /div.gradient
         }; # div#page
     } $req, {
-        title => _title_with $title,
-    }
+        %{ $args },
+        title       => _title_with $title,
+        description => T('Recent PostgreSQL extension releases on PGXN'),
+        keywords    => 'PostgreSQL, extensions, PGXN, PostgreSQL Extension Network, distribution, release, recent',
+    };
 };
 
 template users => sub {
     my ($self, $req, $args) = @_;
-    my $api   = $args->{api};
     my $users = $args->{users};
-    my $title = T 'Users';
+    my $title = T 'Search Users';
     my $char  = $args->{char} || '';
 
     wrapper {
         div {
-            class is 'width10 floatLeft leftColumn';
-            ul {
-                my $uri = $req->uri->path;
-                for my $c ('a'..'z') {
-                    li {
-                        $c eq $char ? $c : a {
-                            href is "$uri?c=$c";
-                            $c;
-                        };
+            id is 'page';
+            div {
+                class is 'gradient';
+                if ($char && $users) {
+                    h1 { $title = T 'Nicknames starting with "[_1]"', $char }
+                    id is 'results';
+                    if (@{ $users }) {
+                        $args->{params} = [ c => $char ];
+                        show 'results/users' => $users;
+                    } else {
+                        h3 { T 'None found' };
+                    }
+                } else {
+                    h1 { $title };
+                    show search_form => {
+                        id => 'homesearch',
+                        in => 'users',
+                    };
+                    h3 { T 'Or select a letter' };
+                    ul {
+                        id is 'llist';
+                        my $uri = $req->uri->path;
+                        for my $c ('a'..'z') {
+                            li {
+                                a {
+                                    href is "$uri?c=$c";
+                                    $c;
+                                };
+                            };
+                        }
                     };
                 }
             };
         };
-        div {
-            class is 'width90 floatRight gradient';
-            h1 { $title };
-            if ($users) {
-                id is 'results';
-                if (@{ $users }) {
-                    $args->{params} = [ c => $char ];
-                    show 'results/users' => $users;
-                } else {
-                    p { T 'No user nicknames found starting with "[_1]"', $char };
-                }
-            } else {
-                h3 { T '<- Select a letter' };
-            }
-        };
     } $req, {
-        title => _title_with $title,
+        %{ $args },
+        title       => _title_with $title,
+        description => T('Search for PostgreSQL Extension Network users'),
+        keywords    => 'PostgreSQL, extensions, PGXN, PostgreSQL Extension Network, users, search',
     };
 };
 
 template search => sub {
     my ($self, $req, $args) = @_;
-    my $api  = $args->{api};
     my $res = $args->{results};
 
     wrapper {
@@ -846,7 +895,10 @@ template search => sub {
             }; # /div.gradient
         }; # div#page
     } $req, {
-        title => $args->{results}{query} . ' / ' . T('PGXN Search'),
+        %{ $args },
+        title       => $args->{results}{query} . ' / ' . T('PGXN Search'),
+        description => T('PGXN [_1] search results for "[_2]"', $args->{in}, $args->{results}{query}),
+        keywords    => 'PostgreSQL, extensions, PGXN, PostgreSQL Extension Network, search',
         crumb => sub {
             li {
                 class is 'notmenu';
@@ -1045,7 +1097,10 @@ template feedback => sub {
             };
         };
     } $req, {
-        title => _title_with T 'Feedback',
+        %{ $args },
+        title       => _title_with T 'Feedback',
+        description => T('Submit feedback to PGXN or join the mail list'),
+        keywords    => 'PostgreSQL, extensions, PGXN, PostgreSQL Extension Network, contact, email, questions, community',
     };
 };
 
@@ -1063,7 +1118,10 @@ template about => sub {
             };
         };
     } $req, {
-        title => _title_with T 'About PGXN',
+        %{ $args },
+        title       => _title_with T 'About PGXN',
+        description => T('Background on PGXN'),
+        keywords    => 'PostgreSQL, extensions, PGXN, PostgreSQL Extension Network, metadata, about, manager, api, client, search',
     };
 };
 
@@ -1184,7 +1242,7 @@ template donors => sub {
                                 'Schemaverse';
                             }};
                             li {a{
-                                href is 'http:/www.midstorm.org/~telles//';
+                                href is 'https://github.com/fabiotr/';
                                 'Fábio Telles Rodriguez';
                             }};
                             li {a{
@@ -1202,7 +1260,10 @@ template donors => sub {
             };
         };
     } $req, {
-        title => _title_with $title,
+        %{ $args },
+        title       => _title_with $title,
+        description => T('donor description'),
+        keywords    => 'PostgreSQL, extensions, PGXN, PostgreSQL Extension Network, donors, support, funding thanks',
     };
 };
 
@@ -1217,7 +1278,10 @@ template art => sub {
             };
         };
     } $req, {
-        title => _title_with 'Identity',
+        %{ $args },
+        title       => _title_with 'Identity',
+        description => T('identity description'),
+        keywords    => 'PostgreSQL, extensions, PGXN, PostgreSQL Extension Network, identity, logo, gear, type, download, asset',
     };
 };
 
@@ -1232,7 +1296,10 @@ template faq => sub {
             };
         };
     } $req, {
-        title => _title_with 'FAQ',
+        %{ $args },
+        title       => _title_with 'FAQ',
+        description => T('faq description'),
+        keywords    => 'PostgreSQL, extensions, PGXN, PostgreSQL Extension Network, faq, questions, answers, releasing, registring, client, conttributing',
     };
 };
 
@@ -1247,7 +1314,10 @@ template mirroring => sub {
             };
         };
     } $req, {
-        title => _title_with T 'Mirroring PGXN',
+        %{ $args },
+        title       => _title_with T('Mirroring PGXN'),
+        description => T('mirroring description'),
+        keywords    => 'PostgreSQL, extensions, PGXN, PostgreSQL Extension Network, mirror, rsync',
     };
 };
 
@@ -1266,6 +1336,7 @@ my $err = sub {
             };
         };
     } $req, {
+        %{ $args },
         title => _title_with T $args->{title},
     };
 };
@@ -1273,6 +1344,7 @@ my $err = sub {
 template notfound => sub {
     my ($self, $req, $args) = @_;
     $err->($req => {
+        %{ $args },
         class   => 'exclamation',
         title   => T('Not Found'),
         message => T('Resource not found.'),
@@ -1282,6 +1354,7 @@ template notfound => sub {
 template badrequest => sub {
     my ($self, $req, $args) = @_;
     $err->($req => {
+        %{ $args },
         class   => 'stop',
         title   => T('Bad Request'),
         message => T(
@@ -1294,6 +1367,7 @@ template badrequest => sub {
 template servererror => sub {
     my ($self, $req, $args) = @_;
     $err->($req => {
+        %{ $args },
         class   => 'stop',
         title   => T('Internal Server Error'),
         message => T('Internal server error.'),
@@ -1311,7 +1385,6 @@ template search_form => sub {
             class is 'query';
             input {
                 type      is 'text';
-                class     is 'width50';
                 name      is 'q';
                 autofocus is 'autofocus' if $args->{autofocus};
                 value     is $args->{query};
@@ -1388,7 +1461,7 @@ template release_table => sub {
                             href is URI->new($args->{api_url} . $api->source_path_for($dist => $info->{version}));
                             title is T 'Browse [_1] [_2]', $dist, $info->{version};
                             img {
-                                src is '/ui/img/package.svg';
+                                src is '/ui/img/opened_folder.svg';
                                 alt is T 'Browse';
                             };
                         }
@@ -1513,7 +1586,7 @@ sub _license($) {
     return $class;
 }
 
-# XXX https://rt.cpan.org/Ticket/Display.html?id=67706
+# XXX https://github.com/Perl-Toolchain-Gang/Software-License/issues/78
 sub _license_name($) {
     my $class = ref $_[0] || $_[0];
     my ($name) = $class =~ /([^:]+)$/; # Grab the package name.
@@ -1628,7 +1701,7 @@ Translates the string using L<PGXN::Site::Locale>.
 
 =head1 Author
 
-David E. Wheeler <david.wheeler@pgexperts.com>
+David E. Wheeler <david@justatheory.com>
 
 =head1 Copyright and License
 

@@ -8,6 +8,7 @@ requires 'Scalar::Util', '0';
 requires 'XML::LibXML', '1.78';
 requires 'XML::LibXML', '2';
 requires 'XML::Writer', '0';
+requires 'Text::Abbrev', '0';
 
 # don't included here because Dist::Zilla::App::Command::listdeps would include it
 # recommends 'Catmandu::PICA';

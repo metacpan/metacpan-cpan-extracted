@@ -6,4 +6,4 @@ use Test::More 'tests' => 2;
 use Test::NoWarnings;
 
 # Test.
-is($Java::Release::Obj::VERSION, 0.03, 'Version.');
+is($Java::Release::Obj::VERSION, 0.06, 'Version.');

@@ -1,5 +1,5 @@
 Name:           perl-Term-CLI
-Version:        0.052001
+Version:        0.052002
 Release:        1%{?dist}
 Summary:        CLI interpreter based on Term::ReadLine
 License:        GPL+ or Artistic
@@ -19,7 +19,6 @@ BuildRequires:  perl(Getopt::Long) >= 2.42
 BuildRequires:  perl(List::Util) >= 1.38
 BuildRequires:  perl(Locale::Maketext) >= 1.25
 BuildRequires:  perl(Locale::Maketext::Lexicon::Gettext) >= 1.00
-BuildRequires:  perl(Modern::Perl) >= 1.20140107
 BuildRequires:  perl(Moo) >= 1.000001
 BuildRequires:  perl(Moo::Role)
 BuildRequires:  perl(namespace::clean) >= 0.25
@@ -49,7 +48,6 @@ Requires:       perl(Getopt::Long) >= 2.42
 Requires:       perl(List::Util) >= 1.38
 Requires:       perl(Locale::Maketext) >= 1.25
 Requires:       perl(Locale::Maketext::Lexicon::Gettext) >= 1.00
-Requires:       perl(Modern::Perl) >= 1.20140107
 Requires:       perl(Moo) >= 1.000001
 Requires:       perl(Moo::Role)
 Requires:       perl(namespace::clean) >= 0.25
@@ -63,26 +61,6 @@ Requires:       perl(Text::ParseWords) >= 3.29
 Requires:       perl(Types::Standard) >= 1.000005
 Requires:       perl(warnings) >= 1.00
 Requires:       perl(:MODULE_COMPAT_%(eval "`%{__perl} -V:version`"; echo $version))
-Provides:       perl(Term::CLI) = 0.052001
-Provides:       perl(Term::CLI::Argument) = 0.052001
-Provides:       perl(Term::CLI::Argument::Bool) = 0.052001
-Provides:       perl(Term::CLI::Argument::Enum) = 0.052001
-Provides:       perl(Term::CLI::Argument::Filename) = 0.052001
-Provides:       perl(Term::CLI::Argument::Number) = 0.052001
-Provides:       perl(Term::CLI::Argument::Number::Float) = 0.052001
-Provides:       perl(Term::CLI::Argument::Number::Int) = 0.052001
-Provides:       perl(Term::CLI::Argument::String) = 0.052001
-Provides:       perl(Term::CLI::Base) = 0.052001
-Provides:       perl(Term::CLI::Command) = 0.052001
-Provides:       perl(Term::CLI::Command::Help) = 0.052001
-Provides:       perl(Term::CLI::Element) = 0.052001
-Provides:       perl(Term::CLI::L10N) = 0.052001
-Provides:       perl(Term::CLI::L10N::en) = 0.052001
-Provides:       perl(Term::CLI::L10N::nl) = 0.052001
-Provides:       perl(Term::CLI::ReadLine) = 0.052001
-Provides:       perl(Term::CLI::Role::ArgumentSet) = 0.052001
-Provides:       perl(Term::CLI::Role::CommandSet) = 0.052001
-Provides:       perl(Term::CLI::Role::HelpText) = 0.052001
 
 %description
 Implement an easy-to-use command line interpreter based on
@@ -118,7 +96,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_mandir}/man3/*
 
 %changelog
-* Thu Jan 21 2021 Steven Bakker <sbakker@cpan.org> 0.052001-1
+* Thu May 19 2021 Steven Bakker <sbakker@cpan.org> 0.052002-1
+- New upstream release.
+* Fri Apr 30 2021 Steven Bakker <sbakker@cpan.org> 0.052001-1
 - New upstream release.
 * Mon Nov 18 2019 Steven Bakker <sbakker@cpan.org> 0.051007-1
 - New upstream release.

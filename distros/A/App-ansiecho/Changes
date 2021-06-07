@@ -1,0 +1,13 @@
+Revision history for Perl script App-ansiecho
+
+0.02 2021-05-21T07:16:40Z
+
+    - Add -C,-F,-E options.
+    - Abolish -c:color:string notation.
+    - Make --escape (-e) option as default.
+    - Now format string can be made by -f.
+
+0.01 2021-05-19T08:25:13Z
+
+    - original version
+

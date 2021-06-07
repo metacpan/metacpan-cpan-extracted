@@ -54,13 +54,13 @@ subtest valid_params => sub {
             year        => 2012,
         },
         {
-            competition => 'World Championships Paris 2011',
+            competition => 'European Championships Istanbul 2011',
             rank_short  => undef,
             place       => 1,
             year        => 2011,
-            name_short  => 'WC Paris 2011',
+            name_short  => 'European Championship',
             sort_by     => '10-1',
-            points      => 500
+            points      => 180
         }
       ],
       'Returns data structure for valid competitor';

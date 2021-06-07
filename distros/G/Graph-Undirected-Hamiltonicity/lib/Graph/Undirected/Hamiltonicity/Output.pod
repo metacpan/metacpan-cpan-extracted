@@ -1,0 +1,64 @@
+=head1 NAME
+
+Graph::Undirected::Hamiltonicity::Output - convenience subroutines for
+printing output in various formats.
+
+=head1 VERSION
+
+Version 0.01
+
+
+=head1 SYNOPSIS
+
+The output() subroutine examines an environment variable called
+HC_OUTPUT_FORMAT to determine the output format. The output format
+can be one of:
+
+=over 4
+
+=item * 'html' : output in HTML form, with graphs embedded as inline SVG.
+
+=item * 'text' : output in text form, with graphs converted to edge-lists.
+
+=item * 'none' : do no generate any output.
+
+=back
+
+    use Graph::Undirected::Hamiltonicity::Output;
+
+    output("Foo<BR/>");
+    # in html mode, say "Foo<BR/>"
+    # in text mode, say "Foo"
+    # in none mode, print nothing.
+
+    output($g); # $g is a Graph::Undirected
+    # in html mode, print the SVG to draw this graph
+    # in text mode, print the adjacency-list of this graph
+    # in none mode, print nothing.
+
+
+    output($g, { required => 1 });
+    # Indicates that the graph should be formatted
+    # as a graph of "required" edges only.
+
+
+=head1 EXPORT
+
+Exports the output() subroutine by default.
+
+=head1 SUBROUTINES
+
+
+=head2 output
+
+This subroutine produces output polymorphically, based on the state of the
+HC_OUTPUT_FORMAT environment variable, and on the input.
+
+It is overloaded to output literal HTML, text stripped from HTML, and
+SVG embedded inline.
+
+=head1 AUTHOR
+
+Ashwin Dixit, C<< <ashwin at ownlifeful dot com> >>
+
+=cut

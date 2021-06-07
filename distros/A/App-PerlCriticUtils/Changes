@@ -1,8 +1,14 @@
-0.002   2018-09-30 (PERLANCAR)
+0.003   2021-05-25  Released-By: PERLANCAR; Urgency: high
+
+	- [build] Rebuild to update Sah coercion module names (old Sah coercion
+          modules have been purged from CPAN).
+
+
+0.002   2018-09-30  Released-By: PERLANCAR
 
 	- Add utility: pcplist.
 
 
-0.001   2017-08-02 (PERLANCAR)
+0.001   2017-08-02  Released-By: PERLANCAR
 
         - First release.

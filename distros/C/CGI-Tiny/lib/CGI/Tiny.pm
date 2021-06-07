@@ -1,13 +1,17 @@
 package CGI::Tiny;
 # ABSTRACT: Common Gateway Interface, with no frills
 
+# This file is part of CGI::Tiny which is released under:
+#   The Artistic License 2.0 (GPL Compatible)
+# See the documentation for CGI::Tiny for full license details.
+
 use strict;
 use warnings;
 use Carp ();
 use IO::Handle ();
 use Exporter ();
 
-our $VERSION = '0.016';
+our $VERSION = '1.000';
 
 use constant DEFAULT_REQUEST_BODY_LIMIT => 16777216;
 use constant DEFAULT_REQUEST_BODY_BUFFER => 262144;
@@ -95,7 +99,10 @@ my %HTTP_STATUS = (
   sub cgi (&) {
     my ($handler) = @_;
     $cgi ||= bless {pid => $$}, __PACKAGE__;
-    _debug_command($cgi, [@ARGV]) if @ARGV and !defined $ENV{REQUEST_METHOD};
+    if (@ARGV and !defined $ENV{REQUEST_METHOD}) {
+      require CGI::Tiny::_Debug;
+      CGI::Tiny::_Debug::debug_command($cgi, [@ARGV]);
+    }
     my ($error, $errored);
     {
       local $@;
@@ -146,6 +153,7 @@ sub _handle_error {
 sub set_error_handler          { $_[0]{on_error} = $_[1]; $_[0] }
 sub set_request_body_buffer    { $_[0]{request_body_buffer} = $_[1]; $_[0] }
 sub set_request_body_limit     { $_[0]{request_body_limit} = $_[1]; $_[0] }
+sub set_multipart_form_options { $_[0]{multipart_form_options} = $_[1]; $_[0] }
 sub set_multipart_form_charset { $_[0]{multipart_form_charset} = $_[1]; $_[0] }
 sub set_input_handle           { $_[0]{input_handle} = $_[1]; $_[0] }
 sub set_output_handle          { $_[0]{output_handle} = $_[1]; $_[0] }
@@ -170,27 +178,6 @@ sub server_name       { defined $ENV{SERVER_NAME} ? $ENV{SERVER_NAME} : '' }
 sub server_port       { defined $ENV{SERVER_PORT} ? $ENV{SERVER_PORT} : '' }
 sub server_protocol   { defined $ENV{SERVER_PROTOCOL} ? $ENV{SERVER_PROTOCOL} : '' }
 sub server_software   { defined $ENV{SERVER_SOFTWARE} ? $ENV{SERVER_SOFTWARE} : '' }
-
-sub query_params      { [map { [@$_] } @{$_[0]->_query_params->{ordered}}] }
-sub query_param_names { [@{$_[0]->_query_params->{names}}] }
-sub query_param       { my $p = $_[0]->_query_params->{keyed}; exists $p->{$_[1]} ? $p->{$_[1]}[-1] : undef }
-sub query_param_array { my $p = $_[0]->_query_params->{keyed}; exists $p->{$_[1]} ? [@{$p->{$_[1]}}] : [] }
-
-sub _query_params {
-  my ($self) = @_;
-  unless (exists $self->{query_params}) {
-    $self->{query_params} = {names => \my @names, ordered => \my @ordered, keyed => \my %keyed};
-    foreach my $pair (split /[&;]/, $self->query) {
-      my ($name, $value) = split /=/, $pair, 2;
-      $value = '' unless defined $value;
-      do { tr/+/ /; s/%([0-9a-fA-F]{2})/chr hex $1/ge; utf8::decode $_ } for $name, $value;
-      push @names, $name unless exists $keyed{$name};
-      push @ordered, [$name, $value];
-      push @{$keyed{$name}}, $value;
-    }
-  }
-  return $self->{query_params};
-}
 
 sub headers {
   my ($self) = @_;
@@ -230,6 +217,38 @@ sub _cookies {
     }
   }
   return $self->{request_cookies};
+}
+
+sub params      { [map { [@$_] } @{$_[0]->_query_params->{ordered}}, @{$_[0]->_body_params->{ordered}}] }
+sub param_names { my $q = $_[0]->_query_params; [@{$q->{names}}, grep { !exists $q->{keyed}{$_} } @{$_[0]->_body_params->{names}}] }
+sub param       {
+  my ($self, $name) = @_;
+  my $p = $self->_body_params->{keyed};
+  return $p->{$name}[-1] if exists $p->{$name};
+  my $q = $self->_query_params->{keyed};
+  return exists $q->{$name} ? $q->{$name}[-1] : undef;
+}
+sub param_array { [map { exists $_->{$_[1]} ? @{$_->{$_[1]}} : () } $_[0]->_query_params->{keyed}, $_[0]->_body_params->{keyed}] }
+
+sub query_params      { [map { [@$_] } @{$_[0]->_query_params->{ordered}}] }
+sub query_param_names { [@{$_[0]->_query_params->{names}}] }
+sub query_param       { my $p = $_[0]->_query_params->{keyed}; exists $p->{$_[1]} ? $p->{$_[1]}[-1] : undef }
+sub query_param_array { my $p = $_[0]->_query_params->{keyed}; exists $p->{$_[1]} ? [@{$p->{$_[1]}}] : [] }
+
+sub _query_params {
+  my ($self) = @_;
+  unless (exists $self->{query_params}) {
+    $self->{query_params} = {names => \my @names, ordered => \my @ordered, keyed => \my %keyed};
+    foreach my $pair (split /[&;]/, $self->query) {
+      my ($name, $value) = split /=/, $pair, 2;
+      $value = '' unless defined $value;
+      do { tr/+/ /; s/%([0-9a-fA-F]{2})/chr hex $1/ge; utf8::decode $_ } for $name, $value;
+      push @names, $name unless exists $keyed{$name};
+      push @ordered, [$name, $value];
+      push @{$keyed{$name}}, $value;
+    }
+  }
+  return $self->{query_params};
 }
 
 sub body {
@@ -283,10 +302,19 @@ sub _body_params {
       $default_charset = 'UTF-8' unless defined $default_charset;
       foreach my $part (@{$self->_body_multipart}) {
         next if defined $part->{filename};
-        my ($name, $value, $headers) = @$part{'name','content','headers'};
+        my ($name, $headers, $content, $file) = @$part{'name','headers','content','file'};
         if (length $default_charset) {
           require Encode;
           $name = Encode::decode($default_charset, "$name");
+        }
+        my $value = '';
+        if (defined $content) {
+          $value = $content;
+        } elsif (defined $file) {
+          binmode $file;
+          seek $file, 0, 0;
+          $value = do { local $/; readline $file };
+          seek $file, 0, 0;
         }
         my $value_charset;
         if (defined $headers->{'content-type'}) {
@@ -332,7 +360,7 @@ sub _body_uploads {
       $default_charset = 'UTF-8' unless defined $default_charset;
       foreach my $part (@{$self->_body_multipart}) {
         next unless defined $part->{filename};
-        my ($name, $filename, $file, $size, $headers) = @$part{'name','filename','file','size','headers'};
+        my ($name, $filename, $size, $headers, $file, $content) = @$part{'name','filename','size','headers','file','content'};
         if (length $default_charset) {
           require Encode;
           $name = Encode::decode($default_charset, "$name");
@@ -340,10 +368,11 @@ sub _body_uploads {
         }
         my $upload = {
           filename     => $filename,
-          file         => $file,
           size         => $size,
           content_type => $headers->{'content-type'},
         };
+        $upload->{file} = $file if defined $file;
+        $upload->{content} = $content if defined $content;
         push @names, $name unless exists $keyed{$name};
         push @ordered, [$name, $upload];
         push @{$keyed{$name}}, $upload;
@@ -370,9 +399,8 @@ sub _body_multipart {
   my ($self) = @_;
   unless (exists $self->{body_parts}) {
     $self->{body_parts} = [];
-    my ($boundary_quoted, $boundary_unquoted) = $ENV{CONTENT_TYPE} =~ m/;\s*boundary\s*=\s*(?:"((?:\\[\\"]|[^"])+)"|([^";]+))/i;
-    $boundary_quoted =~ s/\\([\\"])/$1/g if defined $boundary_quoted;
-    my $boundary = defined $boundary_quoted ? $boundary_quoted : $boundary_unquoted;
+    require CGI::Tiny::Multipart;
+    my $boundary = CGI::Tiny::Multipart::extract_multipart_boundary($ENV{CONTENT_TYPE});
     unless (defined $boundary) {
       $self->{response_status} = "400 $HTTP_STATUS{400}" unless $self->{headers_rendered};
       die "Malformed multipart/form-data request\n";
@@ -385,10 +413,12 @@ sub _body_multipart {
     } else {
       $length = $self->_body_length;
       $input = defined $self->{input_handle} ? $self->{input_handle} : *STDIN;
-      binmode $input;
     }
 
-    my $parts = _parse_multipart($input, $length, $boundary, $self->{request_body_buffer} || $ENV{CGI_TINY_REQUEST_BODY_BUFFER});
+    my $parts = CGI::Tiny::Multipart::parse_multipart_form_data($input, $length, $boundary, {
+      buffer_size => $self->{request_body_buffer} || $ENV{CGI_TINY_REQUEST_BODY_BUFFER},
+      %{$self->{multipart_form_options} || {}},
+    });
     unless (defined $parts) {
       $self->{response_status} = "400 $HTTP_STATUS{400}" unless $self->{headers_rendered};
       die "Malformed multipart/form-data request\n";
@@ -626,7 +656,7 @@ sub response_status_code {
 sub _response_headers {
   my ($self, $type, $content_length, $location) = @_;
   my $headers_str = '';
-  return $headers_str if defined $ENV{CGI_TINY_DEBUG_METHOD} and !$ENV{CGI_TINY_DEBUG_VERBOSE};
+  return $headers_str if defined $self->{debug_method} and !$self->{debug_verbose};
   my %headers_set;
   foreach my $header (@{$self->{response_headers} || []}) {
     my ($name, $value) = @$header;
@@ -700,131 +730,6 @@ sub _json {
   return $self->{json};
 }
 
-sub _parse_multipart {
-  my ($input, $length, $boundary, $buffer_size) = @_;
-  $buffer_size = 0 + ($buffer_size || DEFAULT_REQUEST_BODY_BUFFER);
-  my $buffer = "\r\n";
-  my $next_boundary = "\r\n--$boundary\r\n";
-  my $end_boundary = "\r\n--$boundary--";
-  my (%state, @parts);
-  READER: while ($length > 0) {
-    if (ref $input eq 'SCALAR') {
-      $buffer .= $$input;
-      $length = 0;
-    } else {
-      my $chunk = $length < $buffer_size ? $length : $buffer_size;
-      last unless my $read = read $input, $buffer, $chunk, length $buffer;
-      $length -= $read;
-    }
-
-    unless ($state{parsing_headers} or $state{parsing_body}) {
-      my $next_pos = index $buffer, $next_boundary;
-      my $end_pos = index $buffer, $end_boundary;
-      if ($next_pos >= 0 and ($end_pos < 0 or $end_pos > $next_pos)) {
-        substr $buffer, 0, $next_pos + length($next_boundary), '';
-        $state{parsing_headers} = 1;
-        push @parts, $state{part} = {headers => {}, name => undef, filename => undef, size => 0};
-      } elsif ($end_pos >= 0) {
-        $state{done} = 1;
-        last; # end of multipart data
-      } else {
-        next; # read more to find start of multipart data
-      }
-    }
-
-    while (length $buffer) {
-      if ($state{parsing_headers}) {
-        while ((my $pos = index $buffer, "\r\n") >= 0) {
-          if ($pos == 0) { # end of headers
-            $state{parsing_headers} = 0;
-            $state{parsing_body} = 1;
-            $state{parsed_optional_crlf} = 0;
-            last;
-          }
-
-          my $header = substr $buffer, 0, $pos + 2, '';
-          my ($name, $value) = split /\s*:\s*/, $header, 2;
-          return undef unless defined $value;
-          $value =~ s/\s*\z//;
-
-          $state{part}{headers}{lc $name} = $value;
-          if (lc $name eq 'content-disposition') {
-            while ($value =~ m/;\s*([^=\s]+)\s*=\s*(?:"((?:\\[\\"]|[^"])*)"|([^";]*))/ig) {
-              my ($field_name, $field_quoted, $field_unquoted) = ($1, $2, $3);
-              next unless lc $field_name eq 'name' or lc $field_name eq 'filename';
-              $field_quoted =~ s/\\([\\"])/$1/g if defined $field_quoted;
-              $state{part}{lc $field_name} = defined $field_quoted ? $field_quoted : $field_unquoted;
-            }
-          }
-        }
-        next READER if $state{parsing_headers}; # read more to find end of headers
-      } else {
-        my $append = '';
-        my $next_pos = index $buffer, $next_boundary;
-        my $end_pos = index $buffer, $end_boundary;
-        if ($next_pos >= 0 and ($end_pos < 0 or $end_pos > $next_pos)) {
-          if (!$state{parsed_optional_crlf} and $next_pos >= 2) {
-            substr $buffer, 0, 2, '';
-            $next_pos -= 2;
-            $state{parsed_optional_crlf} = 1;
-          }
-          $append = substr $buffer, 0, $next_pos, '';
-          substr $buffer, 0, length($next_boundary), '';
-          $state{parsing_body} = 0;
-          $state{parsing_headers} = 1;
-        } elsif ($end_pos >= 0) {
-          if (!$state{parsed_optional_crlf} and $end_pos >= 2) {
-            substr $buffer, 0, 2, '';
-            $end_pos -= 2;
-            $state{parsed_optional_crlf} = 1;
-          }
-          $append = substr $buffer, 0, $end_pos; # no replacement, we're done here
-          $state{parsing_body} = 0;
-          $state{done} = 1;
-        } elsif (length($buffer) > length($next_boundary) + 2) {
-          if (!$state{parsed_optional_crlf}) {
-            substr $buffer, 0, 2, '';
-            $state{parsed_optional_crlf} = 1;
-          }
-          $append = substr $buffer, 0, length($buffer) - length($next_boundary), '';
-        }
-
-        if (defined $state{part}{filename}) {
-          # create temp file even if empty
-          unless (defined $state{part}{file}) {
-            require File::Temp;
-            $state{part}{file} = File::Temp->new;
-            binmode $state{part}{file};
-          }
-          if (length $append) {
-            $state{part}{file}->print($append);
-            $state{part}{size} += length $append;
-          }
-          unless ($state{parsing_body}) { # finalize temp file
-            $state{part}{file}->flush;
-            seek $state{part}{file}, 0, 0;
-          }
-        } else {
-          $state{part}{content} = '' unless defined $state{part}{content};
-          if (length $append) {
-            $state{part}{content} .= $append;
-            $state{part}{size} += length $append;
-          }
-        }
-
-        last READER if $state{done};         # end of multipart data
-        next READER if $state{parsing_body}; # read more to find end of part
-
-        # new part started
-        push @parts, $state{part} = {headers => {}, name => undef, filename => undef, size => 0};
-      }
-    }
-  }
-  return undef unless $state{done};
-
-  return \@parts;
-}
-
 {
   my @DAYS_OF_WEEK = qw(Sun Mon Tue Wed Thu Fri Sat);
   my @MONTH_NAMES = qw(Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec);
@@ -866,74 +771,6 @@ sub _parse_multipart {
 {
   my %ESCAPES = ('&' => '&amp;', '<' => '&lt;', '>' => '&gt;', '"' => '&quot;', '\'' => '&#39;');
   sub escape_html { (my $escaped = $_[0]) =~ s/([&<>"'])/$ESCAPES{$1}/ge; $escaped }
-}
-
-{
-  my %methods = (get => 1, head => 1, post => 1, put => 1, delete => 1);
-  sub _debug_command {
-    my ($cgi, $argv) = @_;
-    return 1 unless @$argv;
-    my $command = shift @$argv;
-    if (exists $methods{$command}) {
-      $ENV{CGI_TINY_DEBUG_METHOD} = uc $command;
-      $ENV{CGI_TINY_DEBUG_VERBOSE} = 1 if uc($command) eq 'HEAD';
-
-      require Getopt::Long;
-      Getopt::Long::Configure('default', 'gnu_getopt', 'no_ignore_case');
-      Getopt::Long::GetOptionsFromArray($argv,
-        'content|c=s' => \my $content,
-        'cookie|C=s' => \my @cookies,
-        'header|H=s' => \my @headers,
-        'verbose|v' => \$ENV{CGI_TINY_DEBUG_VERBOSE},
-      ) or die "Failed to parse debug command options\n";
-
-      my ($path) = @$argv;
-
-      if (defined $content) {
-        open my $in_fh, '<', \$content or die "Failed to open in-memory handle to request content: $!\n";
-        $cgi->set_input_handle($in_fh);
-      }
-
-      foreach my $header (@headers) {
-        my ($name, $value) = split /\s*:\s*/, $header, 2;
-        next unless defined $value;
-        $name =~ tr/-/_/;
-        if (defined $ENV{"HTTP_\U$name"}) {
-          $ENV{"HTTP_\U$name"} .= ", $value";
-        } else {
-          $ENV{"HTTP_\U$name"} = $value;
-        }
-      }
-
-      $ENV{HTTP_CONTENT_LENGTH} = length $content if defined $content;
-      $ENV{HTTP_CONTENT_LENGTH} = '' unless defined $ENV{HTTP_CONTENT_LENGTH};
-      $ENV{HTTP_CONTENT_TYPE} = 'application/octet-stream' if $ENV{HTTP_CONTENT_LENGTH} and !defined $ENV{HTTP_CONTENT_TYPE};
-      $ENV{HTTP_COOKIE} = join '; ', @cookies if @cookies;
-
-      my $query;
-      ($path, $query) = split /\?/, $path, 2 if defined $path;
-      $ENV{AUTH_TYPE} = '' unless defined $ENV{AUTH_TYPE};
-      $ENV{CONTENT_LENGTH} = $ENV{HTTP_CONTENT_LENGTH};
-      $ENV{CONTENT_TYPE} = $ENV{HTTP_CONTENT_TYPE};
-      $ENV{GATEWAY_INTERFACE} = 'CGI/1.1' unless defined $ENV{GATEWAY_INTERFACE};
-      $ENV{PATH_INFO} = defined $path ? $path : '';
-      $ENV{PATH_TRANSLATED} = '' unless defined $ENV{PATH_TRANSLATED};
-      $ENV{QUERY_STRING} = defined $query ? $query : '';
-      $ENV{REMOTE_ADDR} = '127.0.0.1' unless defined $ENV{REMOTE_ADDR};
-      $ENV{REMOTE_HOST} = do { require Sys::Hostname; Sys::Hostname::hostname() } unless defined $ENV{REMOTE_HOST};
-      $ENV{REMOTE_IDENT} = '' unless defined $ENV{REMOTE_IDENT};
-      $ENV{REMOTE_USER} = '' unless defined $ENV{REMOTE_USER};
-      $ENV{REQUEST_METHOD} = uc $command;
-      $ENV{SCRIPT_NAME} = do { require File::Basename; '/' . File::Basename::basename($0) } unless defined $ENV{SCRIPT_NAME};
-      $ENV{SERVER_NAME} = do { require Sys::Hostname; Sys::Hostname::hostname() } unless defined $ENV{SERVER_NAME};
-      $ENV{SERVER_PORT} = 80 unless defined $ENV{SERVER_PORT};
-      $ENV{SERVER_PROTOCOL} = 'HTTP/1.0' unless defined $ENV{SERVER_PROTOCOL};
-      $ENV{SERVER_SOFTWARE} = "CGI::Tiny/$VERSION" unless defined $ENV{SERVER_SOFTWARE};
-    } else {
-      die "Unknown debug command $command\n";
-    }
-    return 1;
-  }
 }
 
 1;

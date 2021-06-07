@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use 5.022;
+use 5.024;
 use feature qw /postderef signatures/;
 
 package Vote::Count::Score;
@@ -10,13 +10,13 @@ use Moose::Role;
 # use Storable 3.15 qw(dclone);
 # use Try::Tiny;
 
-our $VERSION='1.10';
+our $VERSION='2.00';
 
 =head1 NAME
 
 Vote::Count::Score
 
-=head1 VERSION 1.10
+=head1 VERSION 2.00
 
 =cut
 
@@ -101,10 +101,15 @@ John Karr (BRAINBUZ) brainbuz@cpan.org
 
 CONTRIBUTORS
 
-Copyright 2019 by John Karr (BRAINBUZ) brainbuz@cpan.org.
+Copyright 2019-2021 by John Karr (BRAINBUZ) brainbuz@cpan.org.
 
 LICENSE
 
 This module is released under the GNU Public License Version 3. See license file for details. For more information on this license visit L<http://fsf.org>.
 
+SUPPORT
+
+This software is provided as is, per the terms of the GNU Public License. Professional support and customisation services are available from the author.
+
 =cut
+

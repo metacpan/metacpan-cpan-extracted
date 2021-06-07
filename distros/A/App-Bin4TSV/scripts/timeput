@@ -1,0 +1,96 @@
+#!/usr/bin/perl
+
+use 5.008 ; use strict ; use warnings ; 
+use Getopt::Std ; getopts ".:!1dsr" , \my %o ; 
+use Time::HiRes qw[ gettimeofday tv_interval ] ; # Perl 5.7.3からコアモジュール
+use Term::ANSIColor qw[color] ; 
+
+my $t0simple = time ; # エポック秒の取得 
+my $t0precise= [ gettimeofday ] if $o{s} ; # 「起動した時刻」の記録
+$| = 1 if $o{'!'}  ;
+& main () ; 
+exit ; 
+
+sub main ( ) { 
+
+  our $dig = $o{'.'} if defined $o{'.'} ; # 桁数 (表示する秒の小数点以下の桁数)
+  our $d6 = 1e6 / 10 ** $dig if defined $dig ; 
+
+  sub timenow ( ) ; 
+  * timenow = * hhmmss0 ; 
+  * timenow = * hhmmssD if $dig ; 
+  * timenow = * ymdhms if $o{d} ; # 日付情報も出す場合 (yy-MM-dd hh:mm:ss) となる。
+  * timenow = * secondsSince0 if $o{s} ; 
+  * timenow = * secondsSinceD if $o{s} && $dig ; 
+
+  if ( $o{1} ) { 
+    print timenow() , "\t" , $_ while <> ; # 色無しで、単に時刻情報を先頭に付けて表示。
+  } else {
+    print color('green') . timenow . color('reset') . "\t" . $_ while <> ; # 着色して表示。
+  }
+
+  sub hhmmss0 ( ) { 
+    return sprintf "%02d:%02d:%02d" , @{[localtime]}  [2,1,0] ; 
+  }
+  sub hhmmssD ( ) { 
+    my ($sec, $msec) = gettimeofday ; 
+    return sprintf '%02d:%02d:%02d.%0'. $dig . 'd' , @{[localtime($sec)]} [2,1,0] , int $msec / $d6 ; #$msec/(1e6/10**$d) ; 
+  }
+  sub hhmmss3 ( ) { 
+    my ($sec, $msec) = gettimeofday ; 
+    return sprintf "%02d:%02d:%02d.%03d" , @{[localtime($sec)]} [2,1,0] , int $msec / 1e3 ; 
+  }
+  sub hhmmss6 ( ) { 
+    my ($sec, $msec) = gettimeofday ; 
+    return sprintf "%02d:%02d:%02d.%06d" , @{[localtime($sec)]} [2,1,0] , $msec ; 
+  }
+  sub ymdhms ( ) { 
+    my @f = localtime ; 
+    $f[4] += 1 ; 
+    $f[5] += 1900 ; 
+    return sprintf '%02d-%02d-%02d %02d:%02d:%02d' , @f[5,4,3,2,1,0] ;
+  }
+
+  sub secondsSince0 ( ) { return sprintf "%0.0f" , time - $t0simple } 
+  sub secondsSinceD ( ) { return sprintf '%0.' . $dig . 'f' , tv_interval ( $t0precise) }
+}
+
+
+## ヘルプの扱い
+sub VERSION_MESSAGE {}
+sub HELP_MESSAGE{
+    use FindBin qw[ $Script ] ; 
+    $ARGV[1] //= '' ;
+    open my $FH , '<' , $0 ;
+    while(<$FH>){
+        s/\$0/$Script/g ;
+        print $_ if $ARGV[1] eq 'opt' ? m/^\ +\-/ : s/^=head1// .. s/^=cut// ;
+    }
+    close $FH ;
+    exit 0 ;
+}
+
+=encoding utf8 
+
+=head1
+
+ $0 
+
+  $0 は入力を可能な限り読取り、その各行の先頭に読み取った時刻の情報を
+  タブ区切りで出力する。
+
+ オプション : 
+    -1 : 日時情報に色(ANSIエスケープシーケンス)を付けない。(読み取った行には、-1があっても無くても	色を付けない。)
+    -d : 日付(年4桁-月2桁-日2桁) を出力。
+    -s : $0 を起動してからの秒数を出力。
+
+    -. N : 秒数を小数点以下 N 桁出力する。N = 0, 1, 2, 3, 4, 5, 6 が有効。
+    -! : 出力のバッファリングをしない。
+
+  開発メモ : 
+    * 開始からの秒数も、日時も同時に表示するようにオプションを設計したい。
+    * -! に意味はあるのか? unbuffer コマンドの使い方も調べて検討したい。
+    * microsec コマンドを使って、このプログラム $0 のプログラムを微妙に変えたとき( print文中の.を,に変えるなど) 効率がどうなるか調べたい。
+    * 関数内関数を使う為に、my ではなくて our を使ったが、本当にそれで良かったのか?
+    * 上記の4個の問題が解決したら、英文のマニュアルも用意しよう。
+=cut 

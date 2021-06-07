@@ -32,7 +32,7 @@ Lingua::Jspell - Perl interface to the Jspell morphological analyser.
 
 =cut
 
-our $VERSION = '1.94';
+our $VERSION = '1.95';
 our $JSPELL;
 our $JSPELLLIB;
 our $MODE = { nm => "af", flags => 0 };
@@ -1023,7 +1023,7 @@ sub hash2str {
     chop($c);
   } elsif ($i eq "f1") {
     for (keys %$r) {
-      $c .= "\n  ", any2str($_,"compact"). "=". any2str($r->{$_},"compact"). "\n";
+      $c .= "\n  ". any2str($_,"compact"). "=". any2str($r->{$_},"compact"). "\n";
     }
     chop($c);
   } else {

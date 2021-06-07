@@ -34,7 +34,7 @@ WriteMakefile(
     "PDL" => 0,
   },
   PREREQ_PM => {
-    "PDL" => '2.034', # native complex
+    "PDL" => '2.047', # ci() -> i()
   },
   TEST_REQUIRES =>  {
     "Test::More" => '0.88', # done_testing

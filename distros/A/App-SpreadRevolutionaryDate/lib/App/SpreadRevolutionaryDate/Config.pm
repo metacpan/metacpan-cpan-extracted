@@ -10,7 +10,7 @@
 use 5.014;
 use utf8;
 package App::SpreadRevolutionaryDate::Config;
-$App::SpreadRevolutionaryDate::Config::VERSION = '0.29';
+$App::SpreadRevolutionaryDate::Config::VERSION = '0.31';
 # ABSTRACT: Companion class of L<App::SpreadRevolutionaryDate>, to handle configuration file and command line arguments, subclass of L<AppConfig>.
 
 use Moose;
@@ -70,7 +70,8 @@ sub new {
                                       'acab' => {ARGCOUNT => ARGCOUNT_NONE, ALIAS => 'a'},
                                       'twitter' => {ARGCOUNT => ARGCOUNT_NONE, ALIAS => 't'},
                                       'mastodon' => {ARGCOUNT => ARGCOUNT_NONE, ALIAS => 'm'},
-                                      'freenode' => {ARGCOUNT => ARGCOUNT_NONE, ALIAS => 'f'});
+                                      'freenode' => {ARGCOUNT => ARGCOUNT_NONE, ALIAS => 'f'},
+                                      'liberachat' => {ARGCOUNT => ARGCOUNT_NONE, ALIAS => 'lt'});
   $config_targets->parse_file($filename);
   # Rewind command line arguments and process them
   @ARGV = @orig_argv;
@@ -90,12 +91,13 @@ sub new {
   }
 
   # Set default targets if no target specified
-  if (!$config_targets->twitter && !$config_targets->mastodon && !$config_targets->freenode && !scalar(@targets)) {
-    push @targets, 'twitter', 'mastodon', 'freenode';
+  if (!$config_targets->twitter && !$config_targets->mastodon && !$config_targets->freenode && !$config_targets->liberachat && !scalar(@targets)) {
+    push @targets, 'twitter', 'mastodon', 'freenode', 'liberachat';
     $config_targets->targets(@targets);
     $config_targets->twitter(1);
     $config_targets->mastodon(1);
     $config_targets->freenode(1);
+    $config_targets->liberachat(1);
   }
 
   # Guess attributes for each target associated class
@@ -161,6 +163,7 @@ sub new {
     'twitter' => {ARGCOUNT => ARGCOUNT_NONE, ALIAS => 't'},
     'mastodon' => {ARGCOUNT => ARGCOUNT_NONE, ALIAS => 'm'},
     'freenode' => {ARGCOUNT => ARGCOUNT_NONE, ALIAS => 'f'},
+    'liberachat' => {ARGCOUNT => ARGCOUNT_NONE, ALIAS => 'lt'},
     'twitter_consumer_key' => {ARGCOUNT => ARGCOUNT_ONE, ALIAS => 'tck'},
     'twitter_consumer_secret' => {ARGCOUNT => ARGCOUNT_ONE, ALIAS => 'tcs'},
     'twitter_access_token' => {ARGCOUNT => ARGCOUNT_ONE, ALIAS => 'tat'},
@@ -173,6 +176,10 @@ sub new {
     'freenode_password' => {ARGCOUNT => ARGCOUNT_ONE, ALIAS => 'fp'},
     'freenode_test_channels' => {ARGCOUNT => ARGCOUNT_LIST, ALIAS => 'ftc'},
     'freenode_channels' => {ARGCOUNT => ARGCOUNT_LIST, ALIAS => 'fc'},
+    'liberachat_nickname' => {ARGCOUNT => ARGCOUNT_ONE, ALIAS => 'ln'},
+    'liberachat_password' => {ARGCOUNT => ARGCOUNT_ONE, ALIAS => 'lp'},
+    'liberachat_test_channels' => {ARGCOUNT => ARGCOUNT_LIST, ALIAS => 'ltc'},
+    'liberachat_channels' => {ARGCOUNT => ARGCOUNT_LIST, ALIAS => 'lc'},
     'revolutionarydate_acab' => {ARGCOUNT => ARGCOUNT_NONE, ALIAS => 'ra'},
     'promptuser_default' => {ARGCOUNT => ARGCOUNT_ONE, ALIAS => 'pud'},
   );
@@ -216,12 +223,13 @@ sub new {
   }
 
   # Set default targets if no target specified
-  if (!$self->twitter && !$self->mastodon && !$self->freenode && !scalar(@targets)) {
-    push @targets, 'twitter', 'mastodon', 'freenode';
+  if (!$self->twitter && !$self->mastodon && !$self->freenode && !$self->liberachat && !scalar(@targets)) {
+    push @targets, 'twitter', 'mastodon', 'freenode', 'liberachat';
     map { $self->targets($_); } @targets;
     $self->twitter(1);
     $self->mastodon(1);
     $self->freenode(1);
+    $self->liberachat(1);
   }
 
   # Check mandatory arguments for each target
@@ -320,14 +328,15 @@ Usage: $0 <OPTIONS>
     --conf|-c <file>: path to configuration file (default: ~/.config/spread-revolutionary-date/spread-revolutionary-date.conf or ~/.spread-revolutionary-date.conf)'
     --version|-v': print out version
     --help|-h|-?': print out this help
-    --targets|-tg <target_1> [--targets|-tg <target_2> […--targets|-tg <target_n>]]': define targets (default: twitter, mastodon, freenode)
+    --targets|-tg <target_1> [--targets|-tg <target_2> […--targets|-tg <target_n>]]': define targets (default: twitter, mastodon, freenode, liberachat)
     --msgmaker|-mm <MsgMakerClass>: define message maker (default: RevolutionaryDate)
     --locale|-l <fr|en|it|es>: define locale (default: fr for msgmaker=RevolutionaryDate, en otherwise)
-    --test|--no|-n: do not spread, just print out message or spread to test channels for Freenode
+    --test|--no|-n: do not spread, just print out message or spread to test channels for Freenode or Liberachat
     --acab|-a: DEPRECATED, use --revolutionarydate-acab
     --twitter|-t: DEPRECATED, use --targets=twitter
     --mastodon|-m: DEPRECATED, use --targets=mastodon
     --freenode|-f: DEPRECATED, use --targets=freenode
+    --liberachat|-lt: DEPRECATED, use --targets=liberachat
     --twitter_consumer_key|-tck <key>: define Twitter consumer key
     --twitter_consumer_secret|-tcs <secret>: define Twitter consumer secret
     --twitter_access_token|-tat <token>: define Twitter access token
@@ -340,6 +349,10 @@ Usage: $0 <OPTIONS>
     --freenode_password|-fp <passwd>: define Freenode password
     --freenode_test_channels|-ftc <channel_1>  [--freenode_test_channels|-ftc <channel_2> […--freenode_test_channels|-ftc <channel_n>]]: define Freenode channels
     --freenode_channels|-fc <channel_1>  [--freenode_channels|-fc <channel_2> […--freenode_channels|-fc <channel_n>]]: define Freenode test channels
+    --liberachat_nickname|-ln <nick>: define Liberachat nickname
+    --liberachat_password|-lp <passwd>: define Liberachat password
+    --liberachat_test_channels|-ltc <channel_1>  [--liberachat_test_channels|-ltc <channel_2> […--liberachat_test_channels|-ltc <channel_n>]]: define Liberachat channels
+    --liberachat_channels|-lc <channel_1>  [--liberachat_channels|-lc <channel_2> […--liberachat_channels|-lc <channel_n>]]: define Liberachat test channels
     --revolutionarydate_acab | -ra: pretend it is 01:31:20 (default: false)
     --promptuser_default|-pud <msg>: define default message when --msgmaker=PromptUser (default: 'Goodbye old world, hello revolutionary worlds')
 USAGE
@@ -369,7 +382,7 @@ App::SpreadRevolutionaryDate::Config - Companion class of L<App::SpreadRevolutio
 
 =head1 VERSION
 
-version 0.29
+version 0.31
 
 =head1 METHODS
 
@@ -391,7 +404,7 @@ Checks whether target configuration options are set to authenticate on specified
 
 =head2 get_target_arguments
 
-Takes one mandatory argument: C<target> as a string in lower case, without any underscore (like C<'twitter'>, C<'mastodon'> or C<'freenode'>). Returns a hash with configuration options relative to the passed C<target> argument. If C<test> option is true, any value for an option starting with C<"test_"> will be set for the option with the same name without C<"test_"> (eg. values of C<test_channels> are set to option C<channels> for C<Freenode> target).
+Takes one mandatory argument: C<target> as a string in lower case, without any underscore (like C<'twitter'>, C<'mastodon'>, C<'freenode'> or C<'liberachat'>). Returns a hash with configuration options relative to the passed C<target> argument. If C<test> option is true, any value for an option starting with C<"test_"> will be set for the option with the same name without C<"test_"> (eg. values of C<test_channels> are set to option C<channels> for C<Liberachat> target).
 
 =head2 get_msgmaker_arguments
 
@@ -418,6 +431,10 @@ Prints usage with command line parameters and exits.
 =item L<App::SpreadRevolutionaryDate::Target::Freenode>
 
 =item L<App::SpreadRevolutionaryDate::Target::Freenode::Bot>
+
+=item L<App::SpreadRevolutionaryDate::Target::Liberachat>
+
+=item L<App::SpreadRevolutionaryDate::Target::Liberachat::Bot>
 
 =item L<App::SpreadRevolutionaryDate::MsgMaker>
 

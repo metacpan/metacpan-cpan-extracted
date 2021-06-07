@@ -33,11 +33,11 @@ _
 
 is($t->get_column_count, 2);
 is_deeply([$t->get_column_names], [qw/i t/]);
-$t->reset_row_iterator;
-is_deeply($t->get_row_arrayref, [qw/1 one/]);
-is_deeply($t->get_row_hashref , {i=>2, t=>'two'});
-$t->reset_row_iterator;
-is_deeply($t->get_row_hashref , {i=>1, t=>'one'});
+$t->reset_iterator;
+is_deeply($t->get_next_item, [qw/1 one/]);
+is_deeply($t->get_next_row_hashref , {i=>2, t=>'two'});
+$t->reset_iterator;
+is_deeply($t->get_next_row_arrayref , [1, 'one']);
 is($t->get_row_count, 3);
 
 done_testing;

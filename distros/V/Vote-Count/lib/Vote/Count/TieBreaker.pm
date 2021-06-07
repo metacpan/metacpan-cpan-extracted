@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use 5.022;
+use 5.024;
 
 use feature qw /postderef signatures/;
 
@@ -14,13 +14,13 @@ use Data::Dumper;
 use Vote::Count::RankCount;
 use Carp;
 
-our $VERSION = '1.10';
+our $VERSION='2.00';
 
 =head1 NAME
 
 Vote::Count::TieBreaker
 
-=head1 VERSION 1.10
+=head1 VERSION 2.00
 
 =head1 Synopsis
 
@@ -35,7 +35,7 @@ Vote::Count::TieBreaker
 
 =head1 Tie Breakers
 
-The most important thing for a Tie Breaker to do is it should use some reproducible difference in the Ballots to pick a winner from a Tie. The next thing it should do is make sense. Finally, the ideal Tie Breaker will resolve when there is any difference to be found. Arguably the best use of Borda Count is as a Tie Breaker, First Choice votes and Approval are also other great choices.
+The most important thing for a Tie Breaker to do is it should use some reproducible difference in the Ballots to pick a winner from a Tie. The next thing it should do is make sense. Finally, the ideal Tie Breaker will resolve when there is any difference to be found. The only fully resolvable method is unfortunately Random, but that is not reproducable between runs. Precedence sets a fixed resolution order and can be used to make Random reproducible.
 
 TieBreakMethod is specified as an argument to Vote::Count->new(). The TieBreaker is called internally from the resolution method via the TieBreaker function, which requires the caller to pass its TieBreakMethod.
 
@@ -196,6 +196,8 @@ The Precedence list takes the choices of the election one per line. Choices defe
    TieBreakMethod => 'precedence',
    PrecedenceFile => '/path/to/precedencefile');
 
+A compound Tie Breaker can be created with a precedence list and any other methods that create an ordered list (Top Count, Approval, Borda), that can then be used for a new Precdence File. This is slight different than using Precedence as a fall back as the methods are normally checked against the current state, this variant only used the initial state.
+
 =head2 CreatePrecedenceRandom
 
 Creates a Predictable Psuedo Random Precedence file, and returns the list. Randomizes the choices using the number of ballots as the Random Seed for Perl's built in rand() function. For any given Ballot File, it will always return the same list. If the precedence filename argument is not given it defaults to '/tmp/precedence.txt'. This is the best solution to use where the Rules call for Random, in a large election the number of ballots cast will be sufficiently random, while anyone with access to Perl can reproduce the Precedence file.
@@ -328,17 +330,18 @@ sub TieBreaker ( $I, $tiebreaker, $active, @tiedchoices ) {
 }
 
 sub UnTieList ( $I, $method, @tied ) {
+  no warnings 'uninitialized';
   return $I->_precedence_sort( @tied ) if ( lc($method) eq 'precedence' );
-  unless ( $I->TieBreakerFallBackPrecedence() ) {
+  unless ( $I->TieBreakerFallBackPrecedence() or $I->TieBreakMethod eq 'precedence') {
     croak
 "TieBreakerFallBackPrecedence must be enabled or the specified method must be precedence to use UnTieList";
   }
+  return @tied if scalar(@tied) == 1;
   my @ordered = ();
   my %active  = ( map { $_ => 1 } @tied );
   # method should be topcount borda or approval which all take argument of active.
   my $RC = $I->$method(\%active)->HashByRank();
 
-  # my $nonrc   = 0;
   for my $level ( sort { $a <=> $b } ( keys $RC->%* ) ) {
     my @l = @{ $RC->{$level} };
     my @suborder =
@@ -364,7 +367,6 @@ sub UntieActive ( $I, $method1, $method2='precedence' ) {
   }
   my @ordered = ();
   my $first   = $I->$method1()->HashByRank();
-
   for my $level ( sort { $a <=> $b } ( keys %{$first} ) ) {
     my @l = @{ $first->{$level} };
     my @suborder =
@@ -373,7 +375,6 @@ sub UntieActive ( $I, $method1, $method2='precedence' ) {
       : $I->UnTieList( $method2, @l );
     push @ordered, @suborder;
   }
-  my $position = 0;
   return Vote::Count::RankCount->newFromList( @ordered );
 }
 
@@ -393,10 +394,15 @@ John Karr (BRAINBUZ) brainbuz@cpan.org
 
 CONTRIBUTORS
 
-Copyright 2019 by John Karr (BRAINBUZ) brainbuz@cpan.org.
+Copyright 2019-2021 by John Karr (BRAINBUZ) brainbuz@cpan.org.
 
 LICENSE
 
 This module is released under the GNU Public License Version 3. See license file for details. For more information on this license visit L<http://fsf.org>.
 
+SUPPORT
+
+This software is provided as is, per the terms of the GNU Public License. Professional support and customisation services are available from the author.
+
 =cut
+

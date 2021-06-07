@@ -30,6 +30,7 @@
       },
       "runtime" : {
          "requires" : {
+            "File::chdir" : "0.10",
             "Mojolicious" : "8.00"
          }
       },
@@ -51,7 +52,7 @@
          "web" : "https://github.com/jhthorsen/mojolicious-plugin-webpack"
       }
    },
-   "version" : "0.14",
+   "version" : "1.01",
    "x_contributors" : [
       "Jan Henning Thorsen"
    ],

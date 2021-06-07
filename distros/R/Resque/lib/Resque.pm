@@ -1,6 +1,6 @@
 package Resque;
 # ABSTRACT: Redis-backed library for creating background jobs, placing them on multiple queues, and processing them later.
-$Resque::VERSION = '0.41';
+$Resque::VERSION = '0.42';
 use Moose;
 use Scalar::Util 'blessed';
 use Moose::Util::TypeConstraints;
@@ -94,6 +94,16 @@ sub blpop {
 sub size {
     my ( $self, $queue ) = @_;
     $self->redis->llen( $self->key( queue => $queue ) );
+}
+
+sub size_map {
+    my ( $self, $queues ) = @_;
+    my $res = {};
+    for my $q (@$queues) {
+        $self->redis->llen( $self->key( queue => $q ), sub{ $res->{$q} = $_[0] } )
+    }
+    $self->redis->wait_all_responses;
+    $res;
 }
 
 sub peek {
@@ -205,7 +215,7 @@ Resque - Redis-backed library for creating background jobs, placing them on mult
 
 =head1 VERSION
 
-version 0.41
+version 0.42
 
 =head1 SYNOPSIS
 
@@ -331,6 +341,15 @@ Returns the size of a queue.
 Queue name should be a string.
 
     my $size = $r->size();
+
+=head2 size_map
+
+Returns a hashref with the size of an arrayref of queues.
+Queue names should be strings.
+
+    my $sizes = $r->size_map([qw/ queue1 queue2 queue3 /]);
+
+This method is very fast as it will pipeline all operations.
 
 =head2 peek
 

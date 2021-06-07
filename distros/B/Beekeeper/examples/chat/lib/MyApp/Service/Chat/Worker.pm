@@ -9,7 +9,9 @@ use base 'MyApp::Service::Base';
 sub on_startup {
     my $self = shift;
 
-    $self->accept_jobs(
+    $self->setup_myapp_stuff;
+
+    $self->accept_remote_calls(
         'myapp.chat.message'  => 'send_message',
         'myapp.chat.pmessage' => 'send_private_message',
         'myapp.chat.notice'   => 'send_notice',
@@ -21,9 +23,15 @@ sub send_message {
     my ($self, $params) = @_;
 
     my $msg  = $params->{'message'};
-    my $from = $self->get_current_user_uuid;
+    my $from = $self->uuid;
 
     return unless (defined $msg && length $msg);
+
+    # Trim html tags
+    $msg =~ s/<.*?>//sg;
+
+    # Filter profanities
+    $msg =~ s/\b(ass|shit)\b/***/sg;
 
     # Broadcast to all frontend clients
     $self->send_notification(
@@ -39,7 +47,7 @@ sub send_private_message {
     # For simplicity, this example avoids resolving username <--> uuid 
     my $uuid = $params->{'to_user'};
     my $msg  = $params->{'message'};
-    my $from = $self->get_current_user_uuid;
+    my $from = $self->uuid;
 
     return unless (defined $msg && length $msg);
 

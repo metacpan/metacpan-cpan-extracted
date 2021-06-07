@@ -1,7 +1,7 @@
 package App::cryp::arbit;
 
-our $DATE = '2018-12-03'; # DATE
-our $VERSION = '0.009'; # VERSION
+our $DATE = '2021-05-26'; # DATE
+our $VERSION = '0.010'; # VERSION
 
 use 5.010001;
 use strict;
@@ -1898,7 +1898,7 @@ App::cryp::arbit - Cryptocurrency arbitrage utility
 
 =head1 VERSION
 
-This document describes version 0.009 of App::cryp::arbit (from Perl distribution App-cryp-arbit), released on 2018-12-03.
+This document describes version 0.010 of App::cryp::arbit (from Perl distribution App-cryp-arbit), released on 2021-05-26.
 
 =head1 SYNOPSIS
 
@@ -2007,7 +2007,7 @@ passing C<$r> around. The keys that are used by routines in this module:
 
 Usage:
 
- arbit(%args) -> [status, msg, payload, meta]
+ arbit(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Perform arbitrage.
 
@@ -2122,7 +2122,7 @@ perform arbitrage.
 
 =item * B<quote_currencies> => I<array[fiat_or_cryptocurrency]>
 
-The currencies to exchange (buy/sell) the target currencies.
+The currencies to exchange (buyE<sol>sell) the target currencies.
 
 You can have fiat currencies as the quote currencies, to buy/sell the target
 (base) currencies during arbitrage. For example, to arbitrage LTC against USD
@@ -2145,6 +2145,7 @@ Which strategy to use for arbitration.
 
 Strategy is implemented in a C<App::cryp::arbit::Strategy::*> perl module.
 
+
 =back
 
 Special arguments:
@@ -2153,27 +2154,28 @@ Special arguments:
 
 =item * B<-dry_run> => I<bool>
 
-Pass -dry_run=>1 to enable simulation mode.
+Pass -dry_run=E<gt>1 to enable simulation mode.
 
 =back
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
+
 
 
 =head2 check_orders
 
 Usage:
 
- check_orders(%args) -> [status, msg, payload, meta]
+ check_orders(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Check the orders that have been created.
 
@@ -2202,25 +2204,27 @@ filled immediately. This setting sets a limit on how long should an order be
 left open. After this limit is reached, we cancel the order. The imbalance of
 the arbitrage transaction will be recorded.
 
+
 =back
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
+
 
 
 =head2 collect_orderbooks
 
 Usage:
 
- collect_orderbooks(%args) -> [status, msg, payload, meta]
+ collect_orderbooks(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Collect orderbooks into the database.
 
@@ -2262,7 +2266,7 @@ How many seconds to wait between rounds (in seconds).
 
 =item * B<quote_currencies> => I<array[fiat_or_cryptocurrency]>
 
-The currencies to exchange (buy/sell) the target currencies.
+The currencies to exchange (buyE<sol>sell) the target currencies.
 
 You can have fiat currencies as the quote currencies, to buy/sell the target
 (base) currencies during arbitrage. For example, to arbitrage LTC against USD
@@ -2273,25 +2277,27 @@ BTC, "the USD of cryptocurrencies"). For example, to arbitrage XMR and LTC
 against BTC, C<base_currencies> is ['XMR', 'LTC'] and C<quote_currencies> is
 ['BTC'].
 
+
 =back
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
+
 
 
 =head2 dump_cryp_config
 
 Usage:
 
- dump_cryp_config() -> [status, msg, payload, meta]
+ dump_cryp_config() -> [$status_code, $reason, $payload, \%result_meta]
 
 This function is not exported.
 
@@ -2299,21 +2305,22 @@ No arguments.
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
+
 
 
 =head2 get_profit_report
 
 Usage:
 
- get_profit_report(%args) -> [status, msg, payload, meta]
+ get_profit_report(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Get profit report.
 
@@ -2343,25 +2350,27 @@ Example:
 
  --usd-rate IDR=14500 --usd-rate THB=33.25
 
+
 =back
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
+
 
 
 =head2 list_order_pairs
 
 Usage:
 
- list_order_pairs(%args) -> [status, msg, payload, meta]
+ list_order_pairs(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 List created order pairs.
 
@@ -2383,25 +2392,27 @@ Arguments ('*' denotes required arguments):
 
 =item * B<time_start> => I<date>
 
+
 =back
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
+
 
 
 =head2 show_opportunities
 
 Usage:
 
- show_opportunities(%args) -> [status, msg, payload, meta]
+ show_opportunities(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Show arbitrage opportunities.
 
@@ -2492,7 +2503,7 @@ perform arbitrage.
 
 =item * B<quote_currencies> => I<array[fiat_or_cryptocurrency]>
 
-The currencies to exchange (buy/sell) the target currencies.
+The currencies to exchange (buyE<sol>sell) the target currencies.
 
 You can have fiat currencies as the quote currencies, to buy/sell the target
 (base) currencies during arbitrage. For example, to arbitrage LTC against USD
@@ -2509,22 +2520,35 @@ Which strategy to use for arbitration.
 
 Strategy is implemented in a C<App::cryp::arbit::Strategy::*> perl module.
 
+
 =back
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/App-cryp-arbit>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-App-cryp-arbit>.
+
 =head1 BUGS
 
-Please report all bug reports or feature requests to L<mailto:stevenharyanto@gmail.com>.
+Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-App-cryp-arbit/issues>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
 
 =head1 SEE ALSO
 
@@ -2534,7 +2558,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2018 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -11,7 +11,7 @@ sub echo {
 
     my $client = Beekeeper::Client->instance;
 
-    my $resp = $client->do_job(
+    my $resp = $client->call_remote(
         method => 'myapp.test.echo',
         params => { string => $str },
     );

@@ -1,0 +1,97 @@
+=head1 NAME
+
+Graph::Undirected::Hamiltonicity::Transforms - subroutines that apply transformations to undirected graphs.
+
+=head1 VERSION
+
+Version 0.01
+
+=head1 SUBROUTINES
+
+=head2 get_required_graph
+
+For each vertex in the graph that has degree == 2,
+mark the edges adjacent to the vertex as "required".
+
+Create a graph that has the same vertices as the input graph,
+but only the edges marked "required".
+
+Return the "required" graph, and also a copy of the original graph,
+with the required edges marked.
+
+     use Graph::Undirected::Hamiltonicity::Transforms qw(&get_required_graph);
+
+     my ( $required_graph, $g1 ) = get_required_graph( $g );
+
+=head2 delete_non_required_neighbors
+
+Delete all non-required edges adjacent to vertices adjacent to 
+2 required edges.
+
+Return the graph with the edges deleted, and also the number of edges deleted.
+
+     use Graph::Undirected::Hamiltonicity::Transforms qw(&delete_non_required_neighbors);
+
+     my ($deleted_edges, $g1) = delete_non_required_neighbors( $g );
+
+=head2 swap_vertices
+
+For a given graph, and two specified vertices, modify the graph so that 
+the neighbors of vertex1 become the neighbors of vertex2 and vice versa.
+
+     use Graph::Undirected::Hamiltonicity::Transforms qw(&swap_vertices);
+
+     my $g1 = swap_vertices( $g, 3, 7 );
+
+     # $g1 is like $g, with vertices 3 and 7 swapped.
+
+=head2 get_common_neighbors
+
+For a given graph, and two specified vertices, return a reference to 
+a hash whose keys are all the vertices that vertex1 and vertex2 share 
+as common neighbors.
+
+     use Graph::Undirected::Hamiltonicity::Transforms qw(&get_common_neighbors);
+
+     my %common_neighbors = %{ get_common_neighbors( $g, 3, 7 ) };
+
+=head2 string_to_graph
+
+Take a string and convert it to an undirected graph.
+The string should be in the same format as the output of
+Graph::Undirected::stringify()
+
+     use Graph::Undirected::Hamiltonicity::Transforms qw(&string_to_graph);
+
+     my $g = string_to_graph('0=1,0=2,0=6,1=3,1=7,2=3,2=4,3=5,4=5,4=6,5=7,6=7');
+
+=head2 get_random_isomorph
+
+Takes an input graph, and swaps its vertices randomly, so that the
+resultant graph is an isomorph of the input graph, but probably not
+identical to the original graph.
+
+     use Graph::Undirected::Hamiltonicity::Transforms qw(&get_random_isomorph);
+
+     my $g1 = get_random_isomorph( $g );
+
+=head2 add_random_edges
+
+Add random edges to a given graph.
+
+     use Graph::Undirected::Hamiltonicity::Transforms qw(&add_random_edges);
+
+     my $g1 = add_random_edges( $g, 7 );
+
+     # $g1 is like $g, but with 7 extra edges.
+
+=head1 SUPPORT
+
+Please report issues L<on GitHub|https://github.com/ownlifeful/Graph-Undirected-Hamiltonicity/issues>.
+
+=head1 AUTHOR
+
+Ashwin Dixit, C<< <ashwin at ownlifeful dot com> >>
+
+=cut
+

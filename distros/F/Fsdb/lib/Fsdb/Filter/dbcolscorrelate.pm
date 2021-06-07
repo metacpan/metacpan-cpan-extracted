@@ -2,7 +2,7 @@
 
 #
 # dbcolscorrelate.pm
-# Copyright (C) 1998-2018 by John Heidemann <johnh@isi.edu>
+# Copyright (C) 1998-2021 by John Heidemann <johnh@isi.edu>
 #
 # This program is distributed under terms of the GNU general
 # public license, version 2.  See the file COPYING
@@ -141,7 +141,8 @@ end_standard_fsdb_options
 
 L<Fsdb>,
 L<dbcolstatscores>,
-L<dbcolsregression>.
+L<dbcolsregression>,
+L<dbrvstatdiff>.
 
 
 =head1 CLASS FUNCTIONS
@@ -392,7 +393,7 @@ sub run ($) {
 
 =head1 AUTHOR and COPYRIGHT
 
-Copyright (C) 1991-2018 by John Heidemann <johnh@isi.edu>
+Copyright (C) 1998-2021 by John Heidemann <johnh@isi.edu>
 
 This program is distributed under terms of the GNU general
 public license, version 2.  See the file COPYING

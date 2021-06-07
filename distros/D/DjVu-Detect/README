@@ -1,0 +1,122 @@
+NAME
+    DjVu::Detect - Detect DjVu files.
+
+SYNOPSIS
+     use DjVu::Detect qw(detect_djvu_file detect_djvu_chunk);
+
+     my $has_djvu_chunk = detect_djvu_chunk($file, $chunk_name);
+     my $is_djvu = detect_djvu_file($file);
+
+DESCRIPTION
+    This Perl module detect DjVu files through magic string and detect if
+    DjVu file has chunk type.
+
+    List of supported files: djvu
+
+SUBROUTINES
+  "detect_djvu_chunk"
+     my $has_djvu_chunk = detect_djvu_chunk($file, $chunk_name);
+
+    Detect if DjVu file contain DjVu chunk.
+
+    Returns 1/0.
+
+  "detect_djvu_file"
+     my $is_djvu = detect_djvu_file($file);
+
+    Detect if file is DjVu file by magic string of IFF and first 'FORM'
+    chunk.
+
+    Returns 1/0.
+
+ERRORS
+     detect_djvu_chunk():
+             Program 'djvudump' doesn't exists.
+
+     detect_dwg_file():
+             Cannot close file '%s'.
+             Cannot open file '%s'.
+
+EXAMPLE1
+     use strict;
+     use warnings;
+
+     use DjVu::Detect qw(detect_djvu_file);
+     use File::Temp qw(tempfile);
+     use IO::Barf qw(barf);
+     use MIME::Base64;
+
+     # Data in base64.
+     my $data = <<'END';
+     QVQmVEZPUk0=
+     END
+
+     # Temp file.
+     my (undef, $temp_file) = tempfile();
+
+     # Save data to file.
+     barf($temp_file, decode_base64($data));
+
+     # Check file.
+     my $is_djvu = detect_djvu_file($temp_file);
+
+     # Print out.
+     if ($is_djvu) {
+             print "File '$temp_file' is DjVu file.\n";
+     } else {
+             print "File '$temp_file' isn't DjVu file.\n";
+     }
+
+     # Output like:
+     # File '%s' isn't DjVu file.
+
+EXAMPLE2
+     use strict;
+     use warnings;
+
+     use DjVu::Detect qw(detect_djvu_file);
+
+     # Arguments.
+     if (@ARGV < 1) {
+             print STDERR "Usage: $0 file\n";
+             exit 1;
+     }
+     my $file = $ARGV[0];
+
+     # Check DjVu file.
+     my $is_djvu = detect_djvu_file($file);
+
+     # Print out.
+     if ($is_djvu) {
+             print "File '$file' is DjVu file.\n";
+     } else {
+             print "File '$file' isn't Djvu file.\n";
+     }
+
+     # Output:
+     # Usage: __SCRIPT__ file
+
+DEPENDENCIES
+    Error::Pure, Exporter, File::Which.
+
+REPOSITORY
+    <https://github.com/michal-josef-spacek/DjVu-Detect>
+
+TEST FILES
+    Test file 11a7ffc0-c61e-11e6-ac1c-001018b5eb5c.djvu is generated from
+    scanned book edition from
+    <http://www.digitalniknihovna.cz/mzk/view/uuid:814e66a0-b6df-11e6-88f6-005056827e52?page=uuid:11a7ffc0-c61e-11e6-ac1c-001018b5eb5c>
+
+AUTHOR
+    Michal Josef Špaček <mailto:skim@cpan.org>
+
+    <http://skim.cz>
+
+LICENSE AND COPYRIGHT
+    © 2021 Michal Josef Špaček
+
+    BSD 2-Clause License
+
+VERSION
+    0.02
+

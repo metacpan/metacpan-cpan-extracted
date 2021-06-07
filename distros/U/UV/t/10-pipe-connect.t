@@ -15,7 +15,7 @@ my $listensock = IO::Socket::UNIX->new(
     Local => $path,
     Listen => 1,
 ) or die "Cannot create listening socket - $@"; # yes $@
-END { unlink $path; }
+END { unlink $path if $path; }
 
 my $pipe = UV::Pipe->new;
 isa_ok($pipe, 'UV::Pipe');

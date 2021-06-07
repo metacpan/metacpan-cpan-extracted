@@ -1,7 +1,7 @@
 package Bio::MUST::Core::Tree;
 # ABSTRACT: Thin wrapper around Bio::Phylo trees
 # CONTRIBUTOR: Valerian LUPO <valerian.lupo@doct.uliege.be>
-$Bio::MUST::Core::Tree::VERSION = '0.210610';
+$Bio::MUST::Core::Tree::VERSION = '0.211470';
 use Moose;
 # use MooseX::SemiAffordanceAccessor;
 use namespace::autoclean;
@@ -9,12 +9,13 @@ use namespace::autoclean;
 use autodie;
 use feature qw(say);
 
-use Smart::Comments;
+use Smart::Comments '####';
 
 use Carp;
 use Const::Fast;
 use File::Basename;
 use List::AllUtils qw(uniq);
+use Statistics::Descriptive;
 use Tie::IxHash;
 
 use Bio::Phylo::IO qw(parse);
@@ -23,6 +24,7 @@ use Bio::MUST::Core::Types;
 use Bio::MUST::Core::Constants qw(:files);
 use Bio::MUST::Core::Utils qw(:filenames);
 use aliased 'Bio::MUST::Core::SeqId';
+use aliased 'Bio::MUST::Core::IdList';
 with 'Bio::MUST::Core::Roles::Commentable',
      'Bio::MUST::Core::Roles::Listable';
 
@@ -56,20 +58,20 @@ sub all_seq_ids {
     # Note2: this order is consistent with FigTree display as well, but not
     # with Seaview (and njplot) renderings
 
-    my @full_ids;
+    my @seq_ids;
 
     $self->tree->visit_depth_first(
         # collect tip names and convert them to SeqIds
         -pre => sub {
             my $node = shift;
             if ($node->is_terminal) {
-                push @full_ids, SeqId->new( full_id => $node->get_name );
+                push @seq_ids, SeqId->new( full_id => $node->get_name );
             }
             return;
         },
      );
 
-    return @full_ids;
+    return @seq_ids;
 }
 
 
@@ -228,6 +230,37 @@ sub collapse_subtrees {
      );
 
     return;
+}
+
+# Note: very naive approach and not applicable in practice.
+# Should probably use the derivative of branch length increase in log space.
+# Meanwhile: use treeshrink
+
+sub long_leaf_list {
+    my $self = shift;
+    my $fact = shift // 1.5;
+
+    my @tips = @{ $self->tree->get_terminals };
+
+    # compute terminal branch length distribution
+    my @lengths = map { $_->get_branch_length } @tips;
+    #### list: sort { $a <=> $b } @lengths
+    my $stat = Statistics::Descriptive::Full->new;
+       $stat->add_data( \@lengths );
+
+    my ($q1, $q3) = ( $stat->quantile(1), $stat->quantile(3) );
+    #### $q1
+    #### $q3
+    #### iqr: $q3-$q1
+    #### $fact
+    my $threshold = $q3 + $fact * ($q3 - $q1);
+    #### $threshold
+
+    my @seq_ids =  map { SeqId->new( full_id => $_->get_name ) }
+                  grep { $_->get_branch_length > $threshold    } @tips;
+
+    #### n: scalar @seq_ids
+    return IdList->new( ids => \@seq_ids );
 }
 
 # TREE-MATCHING METHODS
@@ -557,7 +590,7 @@ Bio::MUST::Core::Tree - Thin wrapper around Bio::Phylo trees
 
 =head1 VERSION
 
-version 0.210610
+version 0.211470
 
 =head1 SYNOPSIS
 

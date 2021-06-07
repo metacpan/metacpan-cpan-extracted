@@ -7,7 +7,8 @@
 # of the licenses in the directory LICENSES.
 #
 
-use strict 1.00;
+use 5.014;
+use warnings;
 
 use Test::More 1.001002;
 use Test::Compile v1.2.0;

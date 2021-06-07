@@ -1,7 +1,7 @@
 package App::cryp::mn;
 
-our $DATE = '2018-04-06'; # DATE
-our $VERSION = '0.003'; # VERSION
+our $DATE = '2021-05-26'; # DATE
+our $VERSION = '0.004'; # VERSION
 
 use 5.010001;
 use strict;
@@ -166,7 +166,7 @@ App::cryp::mn - Manage your masternodes
 
 =head1 VERSION
 
-This document describes version 0.003 of App::cryp::mn (from Perl distribution App-cryp-mn), released on 2018-04-06.
+This document describes version 0.004 of App::cryp::mn (from Perl distribution App-cryp-mn), released on 2021-05-26.
 
 =head1 SYNOPSIS
 
@@ -179,7 +179,7 @@ Please see included script L<cryp-mn>.
 
 Usage:
 
- list_coins(%args) -> [status, msg, result, meta]
+ list_coins(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 List supported coins.
 
@@ -191,25 +191,27 @@ Arguments ('*' denotes required arguments):
 
 =item * B<detail> => I<bool>
 
+
 =back
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
+
 
 
 =head2 list_masternodes
 
 Usage:
 
- list_masternodes(%args) -> [status, msg, result, meta]
+ list_masternodes(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 List your masternodes.
 
@@ -227,16 +229,17 @@ Arguments ('*' denotes required arguments):
 
 =item * B<with_status> => I<bool>
 
+
 =back
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -250,7 +253,7 @@ Source repository is at L<https://github.com/perlancar/perl-App-cryp-mn>.
 
 =head1 BUGS
 
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-cryp-mn>
+Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-App-cryp-mn/issues>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
@@ -266,7 +269,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2018 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -4,7 +4,7 @@
       "Burak Gursoy <burak@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Dist::Zilla version 6.007, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.017, CPAN::Meta::Converter version 2.150010",
    "keywords" : [
       "sys",
       "system",
@@ -37,6 +37,7 @@
             "Capture::Tiny" : "0",
             "Mac::PropertyList" : "0",
             "Sys::Info::Base" : "0.7802",
+            "parent" : "0",
             "perl" : "5.010"
          }
       },
@@ -65,7 +66,9 @@
          "web" : "https://github.com/burak/CPAN-Sys-Info-Driver-OSX"
       }
    },
-   "version" : "0.7959",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0217"
+   "version" : "0.7960",
+   "x_generated_by_perl" : "v5.34.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.26",
+   "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }
 

@@ -1,3 +1,12 @@
+0.009   2021-06-01  Released-By: PERLANCAR; Urgency: medium; Backward-Incompatible: yes
+
+	- [Incompatible change] Update to TableData 0.2.0.
+
+	- [Removed] Remove TableDataRole::Util::Random.
+
+	- Rename TableDataRole::Source::CSV{,In}DATA.
+
+
 0.008   2021-04-13  Released-By: PERLANCAR; Urgency: medium
 
 	- Add role: TableDataRole::Source::AOH.

@@ -25,7 +25,7 @@ $Archive::Libarchive::FFI::on_attach = sub {
   print ")";
   print ")" if $ret == FFI::Raw::str;
   print ";\n";
-  
+
   print "}\n";
 };
 

@@ -6,18 +6,18 @@
 #
 # Each pool definition must contain the following parameters:
 #
-#  - pool-id : arbitrary identifier of worker pool
-#  - bus-id  : identifier of logical bus used by worker processes
+#  - pool_id : arbitrary identifier of worker pool
+#  - bus_id  : identifier of logical bus used by worker processes
 #  - workers : a map of worker classes and its config hashes
 #
 # To start the worker pool use the "bkpr" command:
 #
-# $ bkpr --pool-id "myapp" start
+# $ bkpr --pool "myapp" start
 
 [
     {
-        "pool-id"       : "myapp",
-        "bus-id"        : "backend",
+        "pool_id"       : "myapp",
+        "bus_id"        : "backend",
         "description"   : "pool of MyApp workers",
         "use_toybroker" :  1,
 

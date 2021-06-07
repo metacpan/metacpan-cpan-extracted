@@ -4,14 +4,19 @@ use Mojo::Base 'Mojolicious::Plugin';
 use File::Spec::Functions qw(splitdir updir catdir file_name_is_absolute);
 use Cwd qw(abs_path);
 
-our $VERSION = '1.0.11';
+our $VERSION = '1.0.12';
 
 sub register {
     my ($self, $app, $conf) = @_;
 
     # Config
     $conf ||= {};
-    my $root = ($conf->{prefix} || '') . '/';
+    if ($conf->{prefix}) {
+        $conf->{prefix} =~ s{^/+}{};
+        $conf->{prefix} .= '/';
+        $conf->{prefix} =~ s{/+/$}{/};
+    } 
+    my $root = ($conf->{prefix} || '/');
     my $path = $conf->{path} || 'jsonrpc';
     my $r = $app->routes;
 
@@ -21,8 +26,7 @@ sub register {
             action      => 'dispatch',
             $conf->{namespace} ? ( namespace   => $conf->{namespace}):(),
         );
-    }    
-
+    }
     if ($ENV{QX_SRC_MODE}){
         my $qx_app_src = abs_path(
             $ENV{QX_SRC_PATH} && file_name_is_absolute($ENV{QX_SRC_PATH})
@@ -70,14 +74,19 @@ sub register {
     }
     else {
         # redirect root to index.html
-        $r->any('/' => sub { shift->reply->static('index.html')});
+        $r->any('/' => sub { shift->reply->static('/index.html')});
         if ($root ne '/'){
             $app->hook(before_dispatch => sub {
                 my $self = shift;
                 my $file = $self->req->url->path->to_string;
-                if ($file =~ s{^$root/*}{} and -r $app->home->rel_file('public/'.$file)){
-                    $self->req->url->path('/'.$file);
-                    return $app->static->dispatch($self);
+                if ($file =~ s|^/${root}|/|){
+                    if ($file eq '/') {
+                        $file = '/index.html';
+                    }
+                    if (-r $app->home->rel_file('public'.$file)){
+                        $self->req->url->path($file);
+                        return $app->static->dispatch($self);
+                    }
                 }
            });
         }

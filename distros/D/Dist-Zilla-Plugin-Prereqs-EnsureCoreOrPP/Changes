@@ -1,18 +1,22 @@
-Revision history for Dist-Zilla-Plugin-Prereqs-EnsureCoreOrPP
+0.100   2021-05-31  Released-By: PERLANCAR; Urgency: medium
 
-0.09    2016-02-19 (PERLANCAR)
+	- [bugfix] Use --module option of 'lcpan deps' when we want to
+	  specify module names instead of distribution names.
+
+
+0.09    2016-02-19  Released-By: PERLANCAR
 
 	- [Bugfix] Do not regard prerequisite 'perl' as a module.
 
 
-0.08    2016-02-14 (PERLANCAR)
+0.08    2016-02-14  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- Adjust to App::lcpan::Call 0.07.
 
 
-0.07    2015-10-03 (PERLANCAR)
+0.07    2015-10-03  Released-By: PERLANCAR
 
 	- No functional changes.
 
@@ -20,36 +24,36 @@ Revision history for Dist-Zilla-Plugin-Prereqs-EnsureCoreOrPP
 	  App::depak).
 
 
-0.06    2015-05-15 (PERLANCAR)
+0.06    2015-05-15  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- Forgot to use App::lcpan::Call in EnsurePP.pm.
 
 
-0.05    2015-05-15 (PERLANCAR)
+0.05    2015-05-15  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- Use App::lcpan::Call.
 
 
-0.04    2015-04-21 (PERLANCAR)
+0.04    2015-04-21  Released-By: PERLANCAR
 
 	- [ux] Show all errors before bailing out.
 
 
-0.03    2015-04-21 (PERLANCAR)
+0.03    2015-04-21  Released-By: PERLANCAR
 
 	- [Bugfix] Incorrect usage of is_still_core (must be called as
           Module::CoreList::More->is_still_core).
 
 
-0.02    2015-04-21 (PERLANCAR)
+0.02    2015-04-21  Released-By: PERLANCAR
 
 	- Fix logic, add DZP:Prereqs::EnsurePP.
 
 
-0.01     2015-04-21 (PERLANCAR) - Happy Kartiny Day
+0.01     2015-04-21  Released-By: PERLANCAR; Message: Happy Kartini Day
 
          - First release.

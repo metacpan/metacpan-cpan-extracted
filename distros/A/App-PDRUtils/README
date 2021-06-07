@@ -2,8 +2,8 @@ NAME
     App::PDRUtils - Collection of utilities for perl dist repos
 
 VERSION
-    This document describes version 0.121 of App::PDRUtils (from Perl
-    distribution App-PDRUtils), released on 2019-07-25.
+    This document describes version 0.122 of App::PDRUtils (from Perl
+    distribution App-PDRUtils), released on 2021-05-25.
 
 SYNOPSIS
     This distribution provides the following command-line utilities related
@@ -38,7 +38,7 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2019, 2018, 2017, 2016 by
+    This software is copyright (c) 2021, 2019, 2018, 2017, 2016 by
     perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under

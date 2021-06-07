@@ -1,10 +1,10 @@
 {
    "abstract" : "Always use the C</a> or C</aa> modifier with regular expressions.",
    "author" : [
-      "Jonas B. Nielsen <jonasbn@cpan.org>"
+      "Jonas B. <jonasbn@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.017, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "artistic_2"
    ],
@@ -62,7 +62,7 @@
    "provides" : {
       "Perl::Critic::Policy::RegularExpressions::RequireDefault" : {
          "file" : "lib/Perl/Critic/Policy/RegularExpressions/RequireDefault.pm",
-         "version" : "2.01"
+         "version" : "2.02"
       }
    },
    "release_status" : "stable",
@@ -77,8 +77,9 @@
          "web" : "https://github.com/jonasbn/perl-critic-policy-regularexpressions-requiredefault"
       }
    },
-   "version" : "2.01",
-   "x_generated_by_perl" : "v5.28.0",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.07"
+   "version" : "2.02",
+   "x_generated_by_perl" : "v5.32.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.25",
+   "x_spdx_expression" : "Artistic-2.0"
 }
 

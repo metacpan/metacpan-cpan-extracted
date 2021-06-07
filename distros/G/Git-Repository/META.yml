@@ -44,7 +44,7 @@ requires:
 resources:
   bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=Git-Repository
   repository: https://github.com/book/Git-Repository.git
-version: '1.324'
+version: '1.325'
 x_contributors:
   - 'H.Merijn Brand <hmbrand@cpan.org>'
   - 'Jan Pazdziora <janpaz@cpan.org>'

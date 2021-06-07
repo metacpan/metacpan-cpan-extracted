@@ -1,3 +1,15 @@
+0.38.6 2021-06-02 22:15:24 +0200 Tobias Oetiker <tobi@oetiker.ch>
+
+ - fix access checker promise blocker
+
+0.38.5 2021-05-27 11:37:03 +0200 Tobias Oetiker <tobi@oetiker.ch>
+
+ - fix binding for confirmation popup box
+
+0.38.4 2021-05-21 08:42:39 +0200 Tobias Oetiker <tobi@oetiker.ch>
+
+ - allow for multiple actions to share the same plugin instance as long as they share the same config
+
 0.38.3 2021-05-17 16:12:40 +0200 Tobias Oetiker <tobi@oetiker.ch>
 
  - run the mayAnonymous check as a last ditch effort ... 
@@ -122,7 +134,7 @@
  - actually enable referential integrity
 
 0.35.9 2021-03-24 17:48:02 +0100 Tobias Oetiker <tobi@oetiker.ch>
-
+ - INTERNAL CHANGE! Instances of Popup Actions are now name Origin_ActionName and not just ActionName
  - release cardlist update
 
 0.35.8 2021-03-22 16:21:48 +0100 Tobias Oetiker <tobi@oetiker.ch>

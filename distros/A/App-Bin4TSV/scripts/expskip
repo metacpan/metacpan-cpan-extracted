@@ -1,0 +1,158 @@
+#! env perl
+
+#  expskip 
+#    Producec by Toshiyuki Shimono, Tokyo., 2016-01 ~ 07 , 2018-3
+#    最初は、ファイルの先頭と最後の3行のみを出していたが、
+#    途中を指数関数的な行番号を出すようにしてみた。
+#     ファイル名は headtail, pickall, expskip と変遷している。
+
+use 5.014 ; use warnings ;
+use Getopt::Std ; getopts "b:e:f:gtp:qzA:B:E",\my%o ; 
+use Term::ANSIColor qw[ color :constants ] ; $Term::ANSIColor::AUTORESET = 1 ; 
+use FindBin qw [ $Script ] ; 
+eval "use PerlIO::gzip;1" or die "Can't import PerlIO::gzip despite -z instruction. ($Script)\n" if $o{z} ; 
+
+sub lineOut ( $ ) ; # lineOutのような関数名いくつかのうち、どれかが使われる。
+sub eachFile ( $ ) ; 
+sub niceNumber ( $ ) ; 
+$| = 1 ; 
+my (@nums0, @nums) ;  
+$o{b} //= 10 ; # 基数の指定
+$o{e} //= 2 ;  # 最初と最後のそれぞれ何行を出力するか
+$o{f} //= 1 ;  # 開始行を指定する。 
+$o{A} //= 0 ;  # 合致する行の何行後までさらに続けて出力するか 
+$o{B} //= 0 ;  # 合致する行の何行前にさかのぼって続けて出力するか
+
+& Init ; 
+& traverse ;  
+exit 0 ;
+
+# (出力する)書式の指定
+
+sub Init ( ) { 
+
+  sub lineOutSub ( $ ) ; # lineOutのような関数名いくつかのうち、どれかが使われる。
+  sub lineOutColon ( $ ) { $_[0]->[0], ":\t", $_[0]->[1] }   # 行番号にコロン(:) を付加して出力
+  sub lineOutG ( $ ) { GREEN $_[0]->[0] , RESET "\t", $_[0]->[1] }   
+  sub lineOutQ ( $ ) { $_[0]->[1] }   
+  sub lineOutTime ( $ ) { sprintf("%02d:%02d:%02d\t", @{[localtime]}[2,1,0]), lineOutSub $_[0] }
+  * lineOutSub = $o{g} ? * lineOutG : $o{q} ? * lineOutQ : * lineOutColon ; 
+  * lineOut = $o{t}? *lineOutTime : * lineOutSub ;
+
+  select * STDERR if $o{E} ; #<-- BOLD DARKを STDERRの後に追加するとどうなるか?
+  @nums0 = do { 
+   my %t =(0=>['Inf'],1=>[1],2=>[1,2,4,8],5=>[1,2,5],7=>[1,1.5,2,3,5,7],8=>[1,1.5,2,3,5,8],9=>[1..$o{b}-1]) ; 
+   my @t = @{$t{$o{p}//1}} ; 
+   grep {$_ < $o{b} || $_ == 'Inf'} @t 
+  } ;
+}
+
+sub traverse ( ) { 
+  my $fnFlag = @ARGV > 1 ; 
+  while ( 1 ) { 
+    my $fn = shift @ARGV  ; # ファイル名
+    my $fh ; # ファイルハンドル
+    if ( defined $fn ) { 
+        open $fh , "<" , $fn or warn "File `$fn' does not open." and next ; 
+    } else { 
+        $fh = *STDIN ;
+    }
+    binmode $fh , ":gzip(autopop)" if $o{z}  ; 
+    say $fn if $fnFlag ;
+    eachFile $fh ; 
+    close $fh ; 
+    last if ! @ARGV  ;
+    print "\n" ; # ファイル間の空行
+  }
+}
+
+sub eachFile ( $ ) { 
+  #$. = 0 ;
+  @nums = @nums0 ;
+  my $fh = $_[0] ; 
+  my $rd ; # この数が正なら出力する。キリの良い数などのトリガーで一定値が格納されて、1ずつ減る仕組み。
+  my @stockLines ; # いくつかの行の、文字列を格納する。
+  * flag_E = $o{E} ? sub { print STDOUT $_ } :sub {} ; # -E の時はSTDERRに出しつつも、そのままteeのように出す
+  # 最初の方は、まず一定量読む。
+  if ( $o{e} > 0 ) { 
+    while ( <$fh> ) { 
+     & flag_E ;
+     push @stockLines , [ $. , $_ ]  ; 
+     last if $. >= $o{e} ; 
+    }
+  }
+  print lineOut $_ for @stockLines ;
+
+  # 条件に一致するもののみ出力する。
+  while ( <$fh> ) { 
+     & flag_E ;
+     push @stockLines , [ $. , $_ ]  ; # pushとshiftを対にしてFIFOのような仕組み
+     my $lf = shift @stockLines ; 
+     $rd = $o{A}+1 if niceNumber $lf->[0] ;
+     print lineOut $lf if $rd -- > 0  && $lf->[0] > $o{e} ; 
+  }
+  print lineOut $_ for grep { $_->[0] > $o{e} } @stockLines ;   # 最後に残っているものを書き出す
+}
+
+# 関数
+sub niceNumber ( $ ) { 
+    my $head = shift @nums ;    # 数珠を回すようなイメージで処理をする
+    while ( $head < $_[0] ) { push @nums , $head * $o{b} ; $head = shift @nums }
+    if ( $head < $_[0] + 1 ) { push @nums , $head * $o{b} ; return $_[0] >= $o{f} } # $_[0]がfloor $head に一致
+    unshift @nums, $head ; 
+    return $_[0] >= $head - $o{B} && $_[0] <= $head + $o{A} && $_[0] >= $o{f} ;  
+}
+
+## ヘルプの扱い
+sub VERSION_MESSAGE {}
+sub HELP_MESSAGE {
+    use FindBin qw[ $Script ] ; 
+    $ARGV[1] //= '' ;
+    open my $FH , '<' , $0 ;
+    while(<$FH>){
+        s/\$0/$Script/g ;
+        print $_ if s/^=head1// .. s/^=cut// and $ARGV[1] =~ /^o(p(t(i(o(ns?)?)?)?)?)?$/i ? m/^\s+\-/ : 1;
+    }
+    close $FH ;
+    exit 0 ;
+}
+
+=encoding utf8
+
+=head1
+
+ $0 [-z] [-A 0] [-B 0] [-1289] [-f 1] [-n 3]  
+
+   大きなテキストファイルの全体を把握しやすいように、
+   途中の適当な数の行数の位置、及び最後の数行を表示する。
+
+   途中は 10, 20, 50 , 100, 200, 500 , 1000 .. 行目など切りの良い数字の行数で表示をする。
+   その途中の行番号については、開始行を -f num のように指定することが出来る。
+
+オプション: 
+   -b num : 10倍ごと、という指定を変更する。たとえば、2や3、1.5などを指定できる。
+   -e num : 最初と最後のそれぞれ何行を必ず出力するか。デフォルトでは3 。0 も指定可能。(Edge)
+   -f num : 開始行の指定
+   -g : 行番号が緑色で出力される。
+   -q : 行番号無しで出力する。( -q が無いと、行番号が : の列の前に出力される。)
+   -z ; 入力は、gzip 形式と仮定する。
+   -B num きりの良い数の何行前から表示するか。連続表示に用いる。
+   -A num きりの良い数の何行後まで表示するか。連続表示に用いる。
+
+   -p 0 : キリの良い数では出力しない。単に、3行もしくは、-n で指定された行数を、最初と最後のみ出力。
+   -p 1 : キリの良い数を、1, 10, 100 ,1000 .. 行に限定する。
+   -p 2 : キリの良い数を 1, 2, 4, 8, 10, 20, 40, 80... とする。
+   -p 7 : キリの良い数を 1, 1.5 , 2, 3, 5 , 7 ... の1倍、10倍、100倍.. とする。
+   -p 8 : キリの良い数を 1, 1.5 , 2, 3, 5 , 8 ... の1倍、10倍、100倍.. とする。
+   -p 9 : キリの良い数を 上1桁以外が全て0の数と見なす。
+
+   -E ; 入力を標準出力にそのまま通過させつつ、通常の機能で出力させるものは、標準エラー出力に出す。時に便利機能。
+   -t ; 出力時の時刻情報を 行頭に付加。
+
+  --help : この $0 のヘルプメッセージを出す。  perldoc -t $0 | cat でもほぼ同じ。
+  --help opt : オプションのみのヘルプを出す。opt以外でも options と先頭が1文字以上一致すれば良い。
+
+ 開発上のメモ: 
+   * キーボードからの入力待ちの場合は、-tで検出して、ALRMシグナルで受付を促すようにしたい。
+
+=cut

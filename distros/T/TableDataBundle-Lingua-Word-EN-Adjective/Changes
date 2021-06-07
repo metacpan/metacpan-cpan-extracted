@@ -1,0 +1,9 @@
+0.002   2021-06-01  Released-By: PERLANCAR; Urgency: medium
+
+        - Rename from TablesCollection-Words-EN-Adjectives to
+          TableDataBundle::Lingua::Word::EN::Adjective. Follow TableData 0.2.0.
+
+
+0.001   2021-03-05  Released-By: PERLANCAR
+
+        - First release.

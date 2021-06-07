@@ -1,7 +1,7 @@
 package App::lcpan::Cmd::deps_phases;
 
-our $DATE = '2017-07-28'; # DATE
-our $VERSION = '0.007'; # VERSION
+our $DATE = '2021-06-01'; # DATE
+our $VERSION = '0.010'; # VERSION
 
 use 5.010001;
 use strict;
@@ -54,7 +54,7 @@ App::lcpan::Cmd::deps_phases - List all known prereq phases
 
 =head1 VERSION
 
-This document describes version 0.007 of App::lcpan::Cmd::deps_phases (from Perl distribution App-lcpan-CmdBundle-deps), released on 2017-07-28.
+This document describes version 0.010 of App::lcpan::Cmd::deps_phases (from Perl distribution App-lcpan-CmdBundle-deps), released on 2021-06-01.
 
 =head1 DESCRIPTION
 
@@ -67,7 +67,7 @@ This module handles the L<lcpan> subcommand C<deps-phases>.
 
 Usage:
 
- handle_cmd(%args) -> [status, msg, result, meta]
+ handle_cmd(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 List all known prereq phases.
 
@@ -79,7 +79,7 @@ Arguments ('*' denotes required arguments):
 
 =item * B<cpan> => I<dirname>
 
-Location of your local CPAN mirror, e.g. /path/to/cpan.
+Location of your local CPAN mirror, e.g. E<sol>pathE<sol>toE<sol>cpan.
 
 Defaults to C<~/cpan>.
 
@@ -87,16 +87,29 @@ Defaults to C<~/cpan>.
 
 Filename of index.
 
+If C<index_name> is a filename without any path, e.g. C<index.db> then index will
+be located in the top-level of C<cpan>. If C<index_name> contains a path, e.g.
+C<./index.db> or C</home/ujang/lcpan.db> then the index will be located solely
+using the C<index_name>.
+
+=item * B<use_bootstrap> => I<bool> (default: 1)
+
+Whether to use bootstrap database from App-lcpan-Bootstrap.
+
+If you are indexing your private CPAN-like repository, you want to turn this
+off.
+
+
 =back
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -122,7 +135,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017, 2016 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2017, 2016 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -126,8 +126,30 @@ a normal unified diff) or 25 lines.
 
 =item * C<data_type>
 
-C<text> or C<data>. See C<eq_or_diff_text> and C<eq_or_diff_data> to
-understand this. You can usually ignore this.
+C<text> or C<data>. This normally defaults to C<data>. If, however, neither of
+C<$got> or C<$expected> is a reference then  it defaults to C<text>. You can
+also force one or the other by calling C<eq_or_diff_text> or
+C<eq_or_diff_data>.
+
+The difference is that in text mode lines are numbered from 1, but in data mode
+from 0 (and are refered to as 'elements' (Elt) instead of lines):
+
+    # +---+-------+----------+
+    # | Ln|Got    |Expected  |
+    # +---+-------+----------+
+    # *  1|'foo'  |'bar'     *
+    # +---+-------+----------+
+
+    # +----+---------+----+----------+
+    # | Elt|Got      | Elt|Expected  |
+    # +----+---------+----+----------+
+    # *   0|[        *   0|'bar'     *
+    # *   1|  'foo'  *    |          |
+    # *   2|]        *    |          |
+    # +----+---------+----+----------+
+
+The difference is purely cosmetic, it makes no difference to how comparisons
+are performed.
 
 =item * C<Sortkeys>
 
@@ -318,7 +340,7 @@ if you do this.
 
 =cut
 
-our $VERSION = "0.67"; # or "0.001_001" for a dev release
+our $VERSION = "0.68"; # or "0.001_001" for a dev release
 $VERSION = eval $VERSION;
 
 use Exporter;
@@ -388,10 +410,48 @@ sub eq_or_diff_data { $_[3] = { data_type => "data" }; goto &eq_or_diff; }
 ## references and a shallow one for scalars.
 my $joint = chr(0) . "A" . chr(1);
 
+sub _isnt_ARRAY_of_scalars {
+    return 1 if ref ne "ARRAY";
+    return scalar grep ref, @$_;
+}
+
+sub _isnt_HASH_of_scalars {
+    return 1 if ref ne "HASH";
+    return scalar grep ref, values %$_;
+}
+
+use constant ARRAY_of_scalars           => "ARRAY of scalars";
+use constant ARRAY_of_ARRAYs_of_scalars => "ARRAY of ARRAYs of scalars";
+use constant ARRAY_of_HASHes_of_scalars => "ARRAY of HASHes of scalars";
+use constant HASH_of_scalars            => "HASH of scalars";
+
+sub _grok_type {
+    local $_ = shift if @_;
+    return "SCALAR" unless ref;
+    if ( ref eq "ARRAY" ) {
+        return undef unless @$_;
+        return ARRAY_of_scalars
+          unless _isnt_ARRAY_of_scalars;
+        return ARRAY_of_ARRAYs_of_scalars
+          unless grep _isnt_ARRAY_of_scalars, @$_;
+        return ARRAY_of_HASHes_of_scalars
+          unless grep _isnt_HASH_of_scalars, @$_;
+        return 0;
+    }
+    elsif ( ref eq 'HASH' ) {
+        return HASH_of_scalars
+          unless _isnt_HASH_of_scalars($_);
+        return 0;
+    }
+}
+
 sub eq_or_diff {
     my ( @vals, $name, $options );
     $options = pop if @_ > 2 && ref $_[-1];
     ( $vals[0], $vals[1], $name ) = @_;
+
+    my @types = map { _grok_type($_) } @vals;
+    my $dump_it = !$types[0] || !$types[1];
 
     my($data_type, $filename_a, $filename_b);
     if($options) {
@@ -433,7 +493,8 @@ sub eq_or_diff {
         $context = $options->{context}
           if exists $options->{context};
 
-        $context = 2**31 unless defined $context;
+        $context = $dump_it ? 2**31 : grep( @$_ > 25, $got, $expected ) ? 3 : 25
+            unless defined $context;
 
         confess "context must be an integer: '$context'\n"
           unless $context =~ /\A\d+\z/;

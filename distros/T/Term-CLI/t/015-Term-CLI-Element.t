@@ -8,7 +8,7 @@
 #
 
 use 5.014_001;
-use Modern::Perl 1.20140107;
+use warnings;
 
 our $ELT_NAME = 'test_elt';
 

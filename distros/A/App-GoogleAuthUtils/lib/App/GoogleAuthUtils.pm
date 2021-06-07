@@ -1,7 +1,7 @@
 package App::GoogleAuthUtils;
 
-our $DATE = '2018-04-18'; # DATE
-our $VERSION = '0.004'; # VERSION
+our $DATE = '2021-05-25'; # DATE
+our $VERSION = '0.005'; # VERSION
 
 use 5.010001;
 use strict;
@@ -119,7 +119,7 @@ App::GoogleAuthUtils - Utilities related to Google Authenticator
 
 =head1 VERSION
 
-This document describes version 0.004 of App::GoogleAuthUtils (from Perl distribution App-GoogleAuthUtils), released on 2018-04-18.
+This document describes version 0.005 of App::GoogleAuthUtils (from Perl distribution App-GoogleAuthUtils), released on 2021-05-25.
 
 =head1 DESCRIPTION
 
@@ -138,7 +138,7 @@ This distributions provides the following command-line utilities:
 
 Usage:
 
- gen_google_auth_qrcode(%args) -> [status, msg, result, meta]
+ gen_google_auth_qrcode(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Generate Google authenticator QR code (barcode) from a secret key.
 
@@ -149,7 +149,7 @@ Examples:
 =item * Example #1:
 
  gen_google_auth_qrcode(
- secret_key => "6XDT6TSOGR5SCWKHXZ4DFBRXJVZGAKAW",
+   secret_key => "6XDT6TSOGR5SCWKHXZ4DFBRXJVZGAKAW",
    issuer => "example.com"
  );
 
@@ -179,15 +179,16 @@ Arguments ('*' denotes required arguments):
 
 =item * B<secret_key>* => I<str>
 
+
 =back
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
+($reason) is a string containing error message, or "OK" if status is
+200. Third element ($payload) is optional, the actual result. Fourth
+element (%result_meta) is called result metadata and is optional, a hash
 that contains extra information.
 
 Return value:  (any)
@@ -218,7 +219,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2018 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

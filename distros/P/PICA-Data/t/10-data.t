@@ -28,13 +28,28 @@ foreach (keys %map) {
 is_deeply [$record->value('1...b')], ['9330'], '->value';
 is_deeply [$record->value('234X')], [], '->value (empty)';
 
-is_deeply $record->fields('010@'), [['010@', '', 'a' => 'chi']], '->field';
+is_deeply $record->fields('010@'), [['010@', '', 'a' => 'chi']], '->fields';
+is @{$record->fields}, 18, '->fields';
 
 is_deeply $record->fields('003@', '010@'),
     [['003@', '', '0' => '12345'], ['010@', '', 'a' => 'chi']],
-    '->field(...)';
+    '->fields(...)';
+
+is $record->id, '12345', '->id';
 
 is_deeply $record->fields('?!*~'), [], 'invalid PICA path';
 is scalar @{pica_fields($record, '1...')}, 5, 'pica_fields';
+
+my $field = ['000@', '', '0', '0'];
+my $annotated = [@$field, ' '];
+is pica_annotation($field), undef, 'no annotation';
+is pica_annotation($annotated), ' ', 'get annotation';
+
+pica_annotation($annotated, 'x');
+is pica_annotation($annotated), 'x', 'set annotation';
+pica_annotation($field, ' ');
+pica_annotation($annotated, undef);
+is pica_annotation($field), ' ', 'added annotation';
+is pica_annotation($annotated), undef, 'removed annotation';
 
 done_testing;

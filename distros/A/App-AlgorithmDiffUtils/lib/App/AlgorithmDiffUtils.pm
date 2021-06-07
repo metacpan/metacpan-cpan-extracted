@@ -1,7 +1,7 @@
 package App::AlgorithmDiffUtils;
 
-our $DATE = '2017-08-16'; # DATE
-our $VERSION = '0.002'; # VERSION
+our $DATE = '2021-05-25'; # DATE
+our $VERSION = '0.003'; # VERSION
 
 use strict;
 use warnings;
@@ -147,7 +147,7 @@ App::AlgorithmDiffUtils - CLI utilities based on Algorithm::Diff
 
 =head1 VERSION
 
-This document describes version 0.002 of App::AlgorithmDiffUtils (from Perl distribution App-AlgorithmDiffUtils), released on 2017-08-16.
+This document describes version 0.003 of App::AlgorithmDiffUtils (from Perl distribution App-AlgorithmDiffUtils), released on 2021-05-25.
 
 =head1 SYNOPSIS
 
@@ -176,7 +176,7 @@ This distribution includes several utilities:
 
 Usage:
 
- algodiff_compact_diff(%args) -> [status, msg, result, meta]
+ algodiff_compact_diff(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Perform compact_diff() on two files.
 
@@ -190,25 +190,27 @@ Arguments ('*' denotes required arguments):
 
 =item * B<file2>* => I<filename>
 
+
 =back
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
+($reason) is a string containing error message, or "OK" if status is
+200. Third element ($payload) is optional, the actual result. Fourth
+element (%result_meta) is called result metadata and is optional, a hash
 that contains extra information.
 
 Return value:  (any)
+
 
 
 =head2 algodiff_diff
 
 Usage:
 
- algodiff_diff(%args) -> [status, msg, result, meta]
+ algodiff_diff(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Perform diff() on two files.
 
@@ -222,25 +224,27 @@ Arguments ('*' denotes required arguments):
 
 =item * B<file2>* => I<filename>
 
+
 =back
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
+($reason) is a string containing error message, or "OK" if status is
+200. Third element ($payload) is optional, the actual result. Fourth
+element (%result_meta) is called result metadata and is optional, a hash
 that contains extra information.
 
 Return value:  (any)
+
 
 
 =head2 algodiff_hunks
 
 Usage:
 
- algodiff_hunks(%args) -> [status, msg, result, meta]
+ algodiff_hunks(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Show hunks information.
 
@@ -254,25 +258,27 @@ Arguments ('*' denotes required arguments):
 
 =item * B<file2>* => I<filename>
 
+
 =back
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
+($reason) is a string containing error message, or "OK" if status is
+200. Third element ($payload) is optional, the actual result. Fourth
+element (%result_meta) is called result metadata and is optional, a hash
 that contains extra information.
 
 Return value:  (any)
+
 
 
 =head2 algodiff_lcs
 
 Usage:
 
- algodiff_lcs(%args) -> [status, msg, result, meta]
+ algodiff_lcs(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Perform LCS() on two files.
 
@@ -286,25 +292,27 @@ Arguments ('*' denotes required arguments):
 
 =item * B<file2>* => I<filename>
 
+
 =back
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
+($reason) is a string containing error message, or "OK" if status is
+200. Third element ($payload) is optional, the actual result. Fourth
+element (%result_meta) is called result metadata and is optional, a hash
 that contains extra information.
 
 Return value:  (any)
+
 
 
 =head2 algodiff_sdiff
 
 Usage:
 
- algodiff_sdiff(%args) -> [status, msg, result, meta]
+ algodiff_sdiff(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Perform sdiff() on two files.
 
@@ -318,15 +326,16 @@ Arguments ('*' denotes required arguments):
 
 =item * B<file2>* => I<filename>
 
+
 =back
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
+($reason) is a string containing error message, or "OK" if status is
+200. Third element ($payload) is optional, the actual result. Fourth
+element (%result_meta) is called result metadata and is optional, a hash
 that contains extra information.
 
 Return value:  (any)
@@ -353,7 +362,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2017 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

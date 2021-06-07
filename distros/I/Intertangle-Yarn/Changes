@@ -1,3 +1,14 @@
+0.002 2021-05-30 13:22:24-0400
+
+  Bug fixes
+
+   - Updates implementation of Data::Printer filter to use new API from
+     Data::Printer. Bumps version of Data::Printer to at least v1.0.0.
+
+     Fixes <https://rt.cpan.org/Public/Bug/Display.html?id=133545>. SREZIC++.
+
+     See <https://github.com/Intertangle/p5-Intertangle-Yarn/pull/9>.
+
 0.001 2020-10-17 00:55:16-0500
 
   Features

@@ -11,7 +11,7 @@ Business::Fixflo - Perl library for interacting with the Fixflo API
 
 # VERSION
 
-0.39
+0.42
 
 # DESCRIPTION
 
@@ -150,7 +150,7 @@ Get a \[list of\] issue(s) / agenc(y|ies) / propert(y|ies) / property address(es
 
     my $issue     = $ff->issue( $id );
 
-Will return a [Business::Fixflo::Paginator](https://metacpan.org/pod/Business::Fixflo::Paginator) object (when calling endpoints
+Will return a [Business::Fixflo::Paginator](https://metacpan.org/pod/Business%3A%3AFixflo%3A%3APaginator) object (when calling endpoints
 that return lists of items) or a Business::Fixflo:: object for the Issue,
 Agency, etc.
 
@@ -168,7 +168,7 @@ through and these will be correctly changed into strings when calling the API:
         Keywords => 'NW1',
     );
 
-Refer to the [Business::Fixflo::Paginator](https://metacpan.org/pod/Business::Fixflo::Paginator) documentation for what to do with
+Refer to the [Business::Fixflo::Paginator](https://metacpan.org/pod/Business%3A%3AFixflo%3A%3APaginator) documentation for what to do with
 the returned paginator object.
 
 Note the property method can take a flag to indicate that the passed $id is an
@@ -197,29 +197,29 @@ Fixflo credentials)
 
 # SEE ALSO
 
-[Business::Fixflo::Address](https://metacpan.org/pod/Business::Fixflo::Address)
+[Business::Fixflo::Address](https://metacpan.org/pod/Business%3A%3AFixflo%3A%3AAddress)
 
-[Business::Fixflo::Agency](https://metacpan.org/pod/Business::Fixflo::Agency)
+[Business::Fixflo::Agency](https://metacpan.org/pod/Business%3A%3AFixflo%3A%3AAgency)
 
-[Business::Fixflo::Client](https://metacpan.org/pod/Business::Fixflo::Client)
+[Business::Fixflo::Client](https://metacpan.org/pod/Business%3A%3AFixflo%3A%3AClient)
 
-[Business::Fixflo::Issue](https://metacpan.org/pod/Business::Fixflo::Issue)
+[Business::Fixflo::Issue](https://metacpan.org/pod/Business%3A%3AFixflo%3A%3AIssue)
 
-[Business::Fixflo::IssueDraft](https://metacpan.org/pod/Business::Fixflo::IssueDraft)
+[Business::Fixflo::IssueDraft](https://metacpan.org/pod/Business%3A%3AFixflo%3A%3AIssueDraft)
 
-[Business::Fixflo::IssueDraftMedia](https://metacpan.org/pod/Business::Fixflo::IssueDraftMedia)
+[Business::Fixflo::IssueDraftMedia](https://metacpan.org/pod/Business%3A%3AFixflo%3A%3AIssueDraftMedia)
 
-[Business::Fixflo::Landlord](https://metacpan.org/pod/Business::Fixflo::Landlord)
+[Business::Fixflo::Landlord](https://metacpan.org/pod/Business%3A%3AFixflo%3A%3ALandlord)
 
-[Business::Fixflo::LandlordProperty](https://metacpan.org/pod/Business::Fixflo::LandlordProperty)
+[Business::Fixflo::LandlordProperty](https://metacpan.org/pod/Business%3A%3AFixflo%3A%3ALandlordProperty)
 
-[Business::Fixflo::Paginator](https://metacpan.org/pod/Business::Fixflo::Paginator)
+[Business::Fixflo::Paginator](https://metacpan.org/pod/Business%3A%3AFixflo%3A%3APaginator)
 
-[Business::Fixflo::Property](https://metacpan.org/pod/Business::Fixflo::Property)
+[Business::Fixflo::Property](https://metacpan.org/pod/Business%3A%3AFixflo%3A%3AProperty)
 
-[Business::Fixflo::PropertyAddress](https://metacpan.org/pod/Business::Fixflo::PropertyAddress)
+[Business::Fixflo::PropertyAddress](https://metacpan.org/pod/Business%3A%3AFixflo%3A%3APropertyAddress)
 
-[Business::Fixflo::QuickViewPanel](https://metacpan.org/pod/Business::Fixflo::QuickViewPanel)
+[Business::Fixflo::QuickViewPanel](https://metacpan.org/pod/Business%3A%3AFixflo%3A%3AQuickViewPanel)
 
 [http://www.fixflo.com/Tech/Api/V2/Urls](http://www.fixflo.com/Tech/Api/V2/Urls)
 

@@ -4,42 +4,85 @@
 
 #include "ppport.h"
 
-#define PRE_PROCESS(text, string, t) \
-    subst_newlines (text, &string);  \
-    if (string)                      \
-      t = string;                    \
-    else                             \
-      t = (char *)text;              \
+#define PRE_PROCESS(text, string, t) do {        \
+    char ch;                                     \
+    subst_to_spaces (trim (text, &ch), &string); \
+    *(char *)(text + strlen (text)) = ch;        \
+    spaces_to_space (string);                    \
+    t = string;                                  \
+} while (0)
 
-void
-subst_newlines (const char *text, char **string)
+#define FINALIZE_STRING() do { \
+    *dest = '\0';              \
+    *string = buf;             \
+    return;                    \
+} while (0)
+
+#define IS_WHITESPACE(ws) \
+    (ws == ' ' || ws == '\f' || ws == '\n' || ws == '\r' || ws == '\t')
+
+#define SAVE_STRING(str, size, t)        \
+    Newx (str, size + 1, char);          \
+                                         \
+    strncpy (str, t, size);              \
+    *(str + size) = '\0';                \
+                                         \
+    t += size;                           \
+                                         \
+    EXTEND (SP, 1);                      \
+    PUSHs (sv_2mortal(newSVpv(str, 0))); \
+                                         \
+    Safefree (str);
+
+static const char *
+trim (const char *text, char *ch)
 {
-  if (strpbrk (text, "\n\r"))
+    char *p;
+
+    p = (char *)text + strlen (text);
+    while (p > text && IS_WHITESPACE (*(p - 1)))
+      p--;
+    *ch = *p;
+    *p = '\0';
+
+    p = (char *)text;
+    while (IS_WHITESPACE (*p))
+      p++;
+    return p;
+}
+
+static void
+subst_to_spaces (const char *text, char **string)
+{
+  if (strpbrk (text, "\f\n\r\t"))
     {
       const char *src = text;
       char *dest;
-      char *buf, *nl;
+      char *buf, *ws;
       const char *eot = text + strlen (text);
-      buf = dest = malloc (strlen (text) + 1);
-      while ((nl = strpbrk (src, "\n\r")))
+      Newx (buf, strlen (text) + 1, char);
+      dest = buf;
+      while ((ws = strpbrk (src, "\f\n\r\t")))
         {
-          char *p = nl;
-          strncpy (dest, src, nl - src);
-          dest += nl - src;
-          src  += nl - src;
-          switch (*nl)
+          char *p = ws;
+          strncpy (dest, src, ws - src);
+          dest += ws - src;
+          src  += ws - src;
+          switch (*ws)
             {
+              case '\f': p++; break; /* Form Feed */
               case '\n': p++; break; /* LF */
               case '\r': p++; break; /* CR */
-              default:        break; /* never reached */
+              case '\t': p++; break; /* Tab */
+              default:     abort (); /* never reached */
             }
-          if (*nl == '\r' && *p == '\n') /* CRLF */
+          if (*ws == '\r' && *p == '\n') /* CRLF */
             p++;
-          src += p - nl;
+          src += p - ws;
           if (p < eot)
             *dest++ = ' ';
           else
-            goto end_of_text;
+            FINALIZE_STRING ();
         }
       if (src < eot)
         {
@@ -47,10 +90,35 @@ subst_newlines (const char *text, char **string)
           dest += eot - src;
           src  += eot - src;
         }
-      end_of_text:
-      *dest = '\0';
-      *string = buf;
+      FINALIZE_STRING ();
     }
+  else
+    *string = savepv (text);
+}
+
+static void
+spaces_to_space (char *string)
+{
+    char *s, *p;
+    s = p = string;
+
+    while (*p)
+      {
+        while (*p == ' ' && *(p + 1) == ' ')
+          p++;
+        *s++ = *p++;
+      }
+    *s = '\0';
+}
+
+static unsigned long
+calc_average (unsigned long length, unsigned int wrap_at)
+{
+    unsigned int i;
+    i = length / wrap_at;
+    if (length % wrap_at != 0)
+      i++;
+    return ceil ((double)length / (double)i);
 }
 
 MODULE = Text::Wrap::Smart::XS                PACKAGE = Text::Wrap::Smart::XS
@@ -61,7 +129,6 @@ xs_exact_wrap (text, wrap_at)
       unsigned int wrap_at;
     PROTOTYPE: $$
     INIT:
-      unsigned int i;
       unsigned long average, length, offset;
       char *string = NULL;
       char *eot, *t;
@@ -70,27 +137,20 @@ xs_exact_wrap (text, wrap_at)
       length = strlen (t);
       eot = t + length;
 
-      i = length / wrap_at;
-      if (length % wrap_at != 0)
-        i++;
-      average = ceil ((float)length / (float)i);
+      if (length == 0)
+        {
+          Safefree (string);
+          XSRETURN_EMPTY;
+        }
+
+      average = calc_average (length, wrap_at);
 
       for (offset = 0; offset < length && *t; offset += average)
         {
           char *str;
-          unsigned long size = average > (eot - t) ? (eot - t) : average;
+          const unsigned long size = average > (eot - t) ? (eot - t) : average;
 
-          Newx (str, size + 1, char);
-
-          strncpy (str, t, size);
-          *(str + size) = '\0';
-
-          t += size;
-
-          EXTEND (SP, 1);
-          PUSHs (sv_2mortal(newSVpv(str, 0)));
-
-          Safefree (str);
+          SAVE_STRING (str, size, t);
         }
 
       Safefree (string);
@@ -101,7 +161,6 @@ xs_fuzzy_wrap (text, wrap_at)
       unsigned int wrap_at;
     PROTOTYPE: $$
     INIT:
-      unsigned int i;
       unsigned long average, length;
       char *string = NULL;
       char *t;
@@ -109,10 +168,13 @@ xs_fuzzy_wrap (text, wrap_at)
       PRE_PROCESS (text, string, t);
       length = strlen (t);
 
-      i = length / wrap_at;
-      if (length % wrap_at != 0)
-        i++;
-      average = ceil ((float)length / (float)i);
+      if (length == 0)
+        {
+          Safefree (string);
+          XSRETURN_EMPTY;
+        }
+
+      average = calc_average (length, wrap_at);
 
       while (*t)
         {
@@ -132,9 +194,8 @@ xs_fuzzy_wrap (text, wrap_at)
                   /* advance pos to space */
                   remaining -= ptr - s;
                   p = s = ptr;
-                  /* skip spaces */
-                  while (*p == ' ')
-                    p++;
+                  /* skip space */
+                  p++;
                   /* advance pos after space */
                   remaining -= p - s;
                   /* get distance to next space */
@@ -155,21 +216,9 @@ xs_fuzzy_wrap (text, wrap_at)
           if (!size)
             break;
 
-          Newx (str, size + 1, char);
-
-          strncpy (str, t, size);
-          *(str + size) = '\0';
-
-          t += size;
-
-          EXTEND (SP, 1);
-          PUSHs (sv_2mortal(newSVpv(str, 0)));
-
-          Safefree (str);
+          SAVE_STRING (str, size, t);
 
           if (*t)
-            t++;
-          while (*t == ' ')
             t++;
         }
 

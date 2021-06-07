@@ -1,7 +1,8 @@
 package t::Colourable;
 
-use strict;
+use v5.14;
+use warnings;
 
 use Tangence::Constants;
 
-1;
+0x55AA;

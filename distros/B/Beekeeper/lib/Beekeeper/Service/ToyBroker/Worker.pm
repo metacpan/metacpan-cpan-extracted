@@ -3,37 +3,19 @@ package Beekeeper::Service::ToyBroker::Worker;
 use strict;
 use warnings;
 
-our $VERSION = '0.01';
+our $VERSION = '0.04';
 
-=head1 NAME
-
-Beekeeper::Service::ToyBroker::Worker - Basic STOMP 1.2 broker
-
-=head1 VERSION
-
-Version 0.01
-
-=head1 DESCRIPTION
-
-ToyBroker implements the STOMP subset needed to run a Beekeeper worker pool.
-
-Being single threaded it does not scale at all, but it is handy for development
-or running tests.
-
-=cut
-
+use AnyEvent::Impl::Perl;
 use Beekeeper::Worker ':log';
 use base 'Beekeeper::Worker';
 
+use Beekeeper::MQTT qw(:const :decode);
 use Beekeeper::Config;
 
-use AnyEvent;
 use AnyEvent::Handle;
 use AnyEvent::Socket;
 use Scalar::Util 'weaken';
-
-our $MAX_MESSAGE_SIZE;
-our $MAX_HEADERS_SIZE;
+use Carp;
 
 use constant DEBUG => 0;
 
@@ -51,6 +33,12 @@ sub new {
         $self->{_LOGGER}->{_BUS} = $self->{_BUS};
 
         $self->SUPER::__init_worker;
+
+        $self->{_WORKER}->{report_status_timer} = AnyEvent->timer(
+            after    => 0, 
+            interval => 1,
+            cb       => sub { $self->__report_status },
+        );
     };
 
     if ($@) {
@@ -69,217 +57,542 @@ sub on_startup    { }
 sub on_shutdown {
     my $self = shift;
 
-    # Wait for clients gracefully disconnects
-    for (1..50) {
-        last unless (keys %{$self->{connections}} <= 1); # our one
+    log_info "Shutting down";
+
+    # Wait for clients to gracefully disconnect
+    for (1..60) {
+        my $conn_count = scalar keys %{$self->{connections}};
+        last if $conn_count <= 1; # our one
         my $wait = AnyEvent->condvar;
-        my $tmr = AnyEvent->timer( after => 0.1, cb => $wait );
+        my $tmr = AnyEvent->timer( after => 0.5, cb => $wait );
         $wait->recv;
     }
 
+    undef $self->{_LOGGER}->{_BUS};
+
     # Get rid of our connection to ourselves
-    $self->{_BUS}->disconnect( blocking => 1 );
+    $self->{_BUS}->disconnect;
 }
 
 sub authorize_request {
     my ($self, $req) = @_;
 
-    return REQUEST_AUTHORIZED;
+    return BKPR_REQUEST_AUTHORIZED;
 }
 
 sub start_broker {
-    my $self = shift;
+    my ($self) = @_;
+
+    $self->{connections} = {};
+    $self->{clients}     = {};
+    $self->{topics}      = {};
+    $self->{users}       = {};
+
+    my $config = Beekeeper::Config->read_config_file( 'toybroker.config.json' );
+
+    # Start a default listener if no config found
+    $config = [ {} ] unless defined $config;
+
+    foreach my $listener (@$config) {
+
+        if ($listener->{users}) {
+            %{$self->{users}} = ( %{$self->{users}}, %{$listener->{users}} );
+        }
+
+        $self->start_listener( $listener );
+    }
+}
+
+sub start_listener {
+    my ($self, $listener) = @_;
     weaken($self);
 
-    my $config = Beekeeper::Config->read_config_file( 'toybroker.config.json' ) || {};
+    my $max_packet_size = $listener->{'max_packet_size'} || 65536;
 
-    $MAX_MESSAGE_SIZE = $config->{'max_message_size'} || 65536;
-    $MAX_HEADERS_SIZE = $config->{'max_headers_size'} ||  1024;
+    my $addr = $listener->{'listen_addr'} || '127.0.0.1';  # Must be an IPv4 or IPv6 address
+    my $port = $listener->{'listen_port'} ||  1883;
 
-    my $listen_addr = $config->{'listen_addr'} || '127.0.0.1';  # Must be an IPv4 or IPv6 address
-    my $listen_port = $config->{'listen_port'} ||  61613;
+    ($addr) = ($addr =~ m/^([\w\.:]+)$/);  # untaint
+    ($port) = ($port =~ m/^(\d+)$/);
 
-    ($listen_addr) = ($listen_addr =~ m/^([\w\.:]+)$/);  # untaint
-    ($listen_port) = ($listen_port =~ m/^(\d+)$/);
+    log_info "Listening on $addr:$port";
 
-    $self->{users_cfg}   = $config->{users};
-    $self->{connections} = {};
-    $self->{queues}      = {};
-    $self->{topics}      = {};
+    $self->{"listener-$addr-$port"} = tcp_server ($addr, $port, sub {
+        my ($FH, $host, $port) = @_;
 
-    $self->{broker} = tcp_server ($listen_addr, $listen_port, sub {
-        my ($fh, $host, $port) = @_;
+        my $packet_type;
+        my $packet_flags;
 
-        my $login_tmr = AnyEvent->timer( after => 5, cb => sub {
-            $fh->push_shutdown unless $fh->{authorized};
-        });
+        my $rbuff_len;
+        my $packet_len;
 
-        my $frame_cmd;
-        my %frame_hdr;
-        my $body_lenght;
+        my $mult;
+        my $offs;
+        my $byte;
 
-        $self->{connections}->{"$fh"} = AnyEvent::Handle->new(
-            fh => $fh,
+        my $fh; $fh = AnyEvent::Handle->new(
+            fh => $FH,
+            keepalive => 1,
+            no_delay => 1,
             on_read => sub {
-                my $fh = $_[0];
-                my $raw_headers;
-                my ($line, $key, $value);
 
-                PARSE_FRAME: {
+                PARSE_PACKET: {
 
-                    unless ($frame_cmd) {
+                    $rbuff_len = length $fh->{rbuf};
 
-                        # Parse header
-                        $fh->{rbuf} =~ s/ ^.*?           # ignore heading garbage (just in case)
-                                          \n*            # ignore client heartbeats
-                                         ([A-Z]+)\n      # frame command
-                                         (.*?)           # one or more lines of headers
-                                          \n\n           # end of headers
-                                        //sx or last;
+                    return unless $rbuff_len >= 2;
 
-                        $frame_cmd   = $1;
-                        $raw_headers = $2;
+                    unless ($packet_type) {
 
-                        foreach $line (split(/\n/, $raw_headers)) {
-                            ($key, $value) = split(/:/, $line, 2);
-                            # On duplicated headers only the first one is valid
-                            $frame_hdr{$key} = $value unless (exists $frame_hdr{$key});
+                        $packet_len = 0;
+                        $mult = 1;
+                        $offs = 1;
+
+                        PARSE_LEN: {
+                            $byte = unpack "C", substr( $fh->{rbuf}, $offs++, 1 );
+                            $packet_len += ($byte & 0x7f) * $mult;
+                            last unless ($byte & 0x80);
+                            return if ($offs >= $rbuff_len); # Not enough data
+                            $mult *= 128;
+                            redo if ($offs < 5);
                         }
 
-                        # content-length may be explicitly specified or not
-                        $body_lenght = $frame_hdr{'content-length'};
-                        $body_lenght = -1 unless (defined $body_lenght);
+                        if ($packet_len > $max_packet_size) {
+                            $self->disconnect($fh, reason_code => 0x95);
+                            return;
+                        }
+
+                        $byte = unpack('C', substr( $fh->{rbuf}, 0, 1 ));
+                        $packet_type  = $byte >> 4;
+                        $packet_flags = $byte & 0x0F;
                     }
 
-                    if ($body_lenght >= 0) {
-                        # If body lenght is known wait until readed enough data
-                        return if (length $fh->{rbuf} < $body_lenght + 1);
+                    if ($rbuff_len < ($offs + $packet_len)) {
+                        # Not enough data
+                        return;
+                    }
+
+                    # Consume packet from buffer
+                    my $packet = substr($fh->{rbuf}, 0, ($offs + $packet_len), '');
+
+                    # Trim fixed header from packet
+                    substr($packet, 0, $offs, '');
+
+                    if ($packet_type == MQTT_PUBLISH) {
+
+                        $self->_receive_publish($fh, \$packet, $packet_flags);
+                    }
+                    elsif ($packet_type == MQTT_PUBACK) {
+
+                        $self->_receive_puback($fh, \$packet);
+                    }
+                    elsif ($packet_type == MQTT_PINGREQ) {
+
+                        $self->pingresp($fh);
+                    }
+                    elsif ($packet_type == MQTT_PINGRESP) {
+
+                        $self->_receive_pingresp($fh);
+                    }
+                    elsif ($packet_type == MQTT_SUBSCRIBE) {
+
+                        $self->_receive_subscribe($fh, \$packet);
+                    }
+                    elsif ($packet_type == MQTT_UNSUBSCRIBE) {
+
+                        $self->_receive_unsubscribe($fh, \$packet);
+                    }
+                    elsif ($packet_type == MQTT_CONNECT) {
+
+                        $self->_receive_connect($fh, \$packet);
+                    }
+                    elsif ($packet_type == MQTT_DISCONNECT) {
+
+                        $self->_receive_disconnect($fh, \$packet);
+                    }
+                    elsif ($packet_type == MQTT_PUBREC) {
+
+                        $self->_receive_pubrec($fh, \$packet);
+                    }
+                    elsif ($packet_type == MQTT_PUBREL) {
+                        
+                        $self->_receive_pubrel($fh, \$packet);
+                    }
+                    elsif ($packet_type == MQTT_PUBCOMP) {
+
+                        $self->_receive_pubcomp($fh, \$packet);
+                    }
+                    elsif ($packet_type == MQTT_AUTH) {
+
+                        $self->_receive_auth($fh, \$packet);
                     }
                     else {
-                        # If body lenght is unknown wait until readed frame separator
-                        $body_lenght = index($fh->{rbuf}, "\x00");
-                        return if ($body_lenght == -1);
-                    }
-
-                    my $body = substr($fh->{rbuf}, 0, $body_lenght + 1, '');
-                    chop $body; # remove frame separator
-
-                    if ($frame_cmd eq 'SEND') {
-                        $self->send( $fh, \%frame_hdr, \$body );
-                    }
-                    elsif ($frame_cmd eq 'ACK') {
-                        $self->ack( $fh, \%frame_hdr );
-                    }
-                    elsif ($frame_cmd eq 'NACK') {
-                        $self->nack( $fh, \%frame_hdr );
-                    }
-                    elsif ($frame_cmd eq 'SUBSCRIBE') {
-                        $self->subscribe( $fh, \%frame_hdr );
-                    }
-                    elsif ($frame_cmd eq 'UNSUBSCRIBE') {
-                        $self->unsubscribe( $fh, \%frame_hdr );
-                    }
-                    elsif ($frame_cmd eq 'CONNECT') {
-                        $self->connect( $fh, \%frame_hdr, "$host:$port" );
-                    }
-                    elsif ($frame_cmd eq 'DISCONNECT') {
-                        $self->disconnect( $fh, \%frame_hdr );
-                    }
-                    elsif ($frame_cmd eq 'BEGIN') {
-                        $self->error( $fh, "BEGIN is not implemented");
-                    }
-                    elsif ($frame_cmd eq 'COMMIT') {
-                        $self->error( $fh, "COMMIT is not implemented");
-                    }
-                    elsif ($frame_cmd eq 'ABORT') {
-                        $self->error( $fh, "ABORT is not implemented");
-                    }
-                    else {
-                        $self->error($fh, "Invalid command $frame_cmd");
+                        # Protocol error
+                        log_warn "Received packet with unknown type $packet_type";
+                        $self->disconnect($fh, reason_code => 0x81);
+                        return;
                     }
 
                     # Prepare for next frame
-                    undef $frame_cmd;
-                    undef $body_lenght;
-                    %frame_hdr = ();
+                    undef $packet_type;
 
-                    redo PARSE_FRAME if (defined $fh->{rbuf} && length $fh->{rbuf} >= 10);
-                }
-
-                if (defined $fh->{rbuf}) {
-                    if (length $fh->{rbuf} > (defined $frame_cmd ? $MAX_MESSAGE_SIZE : $MAX_HEADERS_SIZE)) {
-                        $self->_shutdown($fh);
-                    }
+                    # Handle could have been destroyed at this point
+                    redo PARSE_PACKET if defined $fh->{rbuf};
                 }
             },
             on_eof => sub {
-                # Clean client disconenction
-                my $fh = $_[0];
-                $self->_shutdown($fh);
+                # Clean disconnection, client will not write anymore
+                $self->remove_client($fh);
+                delete $self->{connections}->{"$fh"};
             },
             on_error => sub {
-                my $fh = $_[0];
-                DEBUG && log_error "@_\n";
-                $self->_shutdown($fh);
+                log_error "$_[2]\n";
+                $self->remove_client($fh);
+                delete $self->{connections}->{"$fh"};
             }
         );
+
+        $self->{connections}->{"$fh"} = $fh;
+
+        #TODO: Close connection on login timeout
+        # my $login_tmr = AnyEvent->timer( after => 5, cb => sub {
+        #     $self->_shutdown($fh) unless $self->get_client($fh);
+        # });
     });
 }
 
-sub connect {
-    my ($self, $fh, $hdr, $remote_addr) = @_;
+sub _receive_connect {
+    my ($self, $fh, $packet) = @_;
 
-    my $user = $hdr->{'login'};
-    my $pass = $hdr->{'passcode'};
+    my %prop;
+    my $offs = 0;
 
-    my $users_cfg = $self->{users_cfg};
+    # 3.1.2.1  Protocol Name  (utf8 string)
+    $prop{'protocol_name'} = _decode_utf8_str($packet, \$offs);
 
-    unless (exists $users_cfg->{$user}) {
-        # User does not exist
-        $self->error($fh, 'Not authorized');
+    # 3.1.2.2  Protocol Version  (byte)
+    $prop{'protocol_version'} = _decode_byte($packet, \$offs);
+
+    # 3.1.2.3  Connect Flags  (byte)
+    my $flags = _decode_byte($packet, \$offs);
+    $prop{'clean_start'} = 1 if $flags & 0x02;   # 3.1.2.4  Clean Start
+    $prop{'username'}    = 1 if $flags & 0x80;   # 3.1.2.8  User Name Flag
+    $prop{'password'}    = 1 if $flags & 0x40;   # 3.1.2.9  Password Flag
+    $prop{'will_flag'}   = 1 if $flags & 0x04;   # 3.1.2.5  Will Flag
+    $prop{'will_qos'}    = ($flags & 0x18) >> 3; # 3.1.2.6  Will QoS
+    $prop{'will_retain'} = 1 if $flags & 0x20;   # 3.1.2.7  Will Retain
+
+    # 3.1.2.10  Keep Alive  (short int)
+    $prop{'keep_alive'} = _decode_int_16($packet, \$offs);
+
+    # 3.1.2.11.1  Properties Length  (variable length int)
+    my $prop_len = _decode_var_int($packet, \$offs);
+    my $prop_end = $offs + $prop_len;
+
+    while ($offs < $prop_end) {
+
+        my $prop_id = _decode_byte($packet, \$offs);
+
+        if ($prop_id == MQTT_SESSION_EXPIRY_INTERVAL) {
+            # 3.1.2.11.2  Session Expiry Interval  (long int)
+            $prop{'session_expiry_interval'} = _decode_int_32($packet, \$offs);
+        }
+        elsif ($prop_id == MQTT_RECEIVE_MAXIMUM) {
+            # 3.1.2.11.3  Receive Maximum  (short int)
+            $prop{'receive_maximum'} = _decode_int_16($packet, \$offs);
+        }
+        elsif ($prop_id == MQTT_MAXIMUM_PACKET_SIZE) {
+            # 3.1.2.11.4  Maximum Packet Size  (long int)
+            $prop{'maximum_packet_size'} = _decode_int_32($packet, \$offs);
+        }
+        elsif ($prop_id == MQTT_TOPIC_ALIAS_MAXIMUM) {
+            # 3.1.2.11.5  Topic Alias Maximum  (short int)
+            $prop{'topic_alias_maximum'} = _decode_int_16($packet, \$offs);
+        }
+        elsif ($prop_id == MQTT_REQUEST_RESPONSE_INFORMATION) {
+            # 3.1.2.11.6  Request Response Information  (byte)  
+            $prop{'request_response_information'} = _decode_byte($packet, \$offs);
+        }
+        elsif ($prop_id == MQTT_REQUEST_PROBLEM_INFORMATION) {
+            # 3.1.2.11.7  Request Problem Information  (byte)
+            $prop{'request_problem_information'} = _decode_byte($packet, \$offs);
+        }
+        elsif ($prop_id == MQTT_USER_PROPERTY) {
+            # 3.1.2.11.8  User Property  (utf8 string pair)
+            my $key = _decode_utf8_str($packet, \$offs);
+            my $val = _decode_utf8_str($packet, \$offs);
+            $prop{$key} = $val;
+        }
+        elsif ($prop_id == MQTT_AUTHENTICATION_METHOD) {
+            # 3.1.2.11.9  Authentication Method  (utf8 string)
+            $prop{'authentication_method'} = _decode_utf8_str($packet, \$offs);
+        }
+        elsif ($prop_id == MQTT_AUTHENTICATION_DATA) {
+            # 3.1.2.11.10  Authentication Data  (binary data)
+            $prop{'authentication_data'} = _decode_binary_data($packet, \$offs);
+        }
+        else {
+            # Protocol error
+            log_warn "Received CONNECT with unknown property $prop_id";
+            $self->_shutdown($fh);
+            return; 
+        }
+    }
+
+    # 3.1.3.1  Client Identifier  (utf8 string)
+    $prop{'client_identifier'} = _decode_utf8_str($packet, \$offs);
+
+    if ($prop{'will'}) {
+
+        # 3.1.3.2.1  Will Properties Length
+        my $prop_len = _decode_var_int($packet, \$offs);
+
+        #TODO: 3.1.3.2  Will Properties
+        $offs += $prop_len;
+
+        # 3.1.3.3  Will Topic  (utf8 string)
+        $prop{'will_topic'} = _decode_utf8_str($packet, \$offs);
+
+        # 3.1.3.4  Will Payload  (binary data)
+        $prop{'will_payload'} = _decode_binary_data($packet, \$offs);
+    }
+
+    if ($prop{'username'}) {
+        # 3.1.3.5  Username  (utf8 string)
+        $prop{'username'} = _decode_utf8_str($packet, \$offs);
+    }
+
+    if ($prop{'password'}) {
+        # 3.1.3.6  Password  (binary data)
+        $prop{'password'} = _decode_utf8_str($packet, \$offs);
+    }
+
+    unless ($prop{'protocol_version'} eq '5') {
+        log_warn "Received CONNECT with unsupported protocol version";
+        $self->_shutdown($fh);
         return;
     }
 
-    unless ($users_cfg->{$user}->{'password'} eq $pass) {
-        # Wrong password
-        $self->error($fh, 'Not authorized');
-        return;
-    }
-
-    $fh->push_write(
-        "CONNECTED\n"                 .
-        "server:ToyBroker $VERSION\n" .
-        "version:1.2\n\n"             .
-        "\x00"
-    );
-
-    $fh->{user}  = $user;
-    $fh->{vhost} = $hdr->{'host'} || '';
-
-    $fh->{authorized}  = 1;
-    $fh->{topic_subs}  = {};
-    $fh->{queue_subs}  = {};
-    $fh->{pending_ack} = {};
-
-    $self->{connections}->{"$fh"} = $fh;
+    $self->add_client($fh, \%prop);
 }
 
-sub disconnect {
-    my ($self, $fh, $hdr) = @_;
+sub connack {
+    my ($self, $fh, %args) = @_;
 
-    $self->receipt($fh, $hdr);
+    my $reason_code     = delete $args{'reason_code'};
+    my $session_present = delete $args{'session_present'};
+
+    # 3.2.2.3  Properties
+
+    my $raw_prop;
+
+    if (exists $args{'session_expiry_interval'}) {
+        # 3.2.2.3.2  Session Expiry Interval  (long int)
+        $raw_prop .= pack("C N", MQTT_SESSION_EXPIRY_INTERVAL, delete $args{'session_expiry_interval'});
+    }
+
+    if (exists $args{'receive_maximum'}) {
+        # 3.2.2.3.3  Receive Maximum  (short int)
+        $raw_prop .= pack("C n", MQTT_RECEIVE_MAXIMUM, delete $args{'receive_maximum'});
+    }
+
+    if (exists $args{'maximum_qos'}) {
+        # 3.2.2.3.4  Maximum QoS  (byte)
+        $raw_prop .= pack("C C", MQTT_MAXIMUM_QOS, delete $args{'maximum_qos'});
+    }
+
+    if (exists $args{'retain_available'}) {
+        # 3.2.2.3.5  Retain Available  (byte)
+        $raw_prop .= pack("C C", MQTT_RETAIN_AVAILABLE, delete $args{'retain_available'});
+    }
+
+    if (exists $args{'maximum_packet_size'}) {
+        # 3.2.2.3.6  Maximum Packet Size  (long int)
+        $raw_prop .= pack("C N", MQTT_MAXIMUM_PACKET_SIZE, delete $args{'maximum_packet_size'});
+    }
+
+    if (exists $args{'assigned_client_identifier'}) {
+        # 3.2.2.3.7  Assigned Client Identifier  (utf8 string)
+        utf8::encode( $args{'assigned_client_identifier'} );
+        $raw_prop .= pack("C n/a*", MQTT_ASSIGNED_CLIENT_IDENTIFIER, delete $args{'assigned_client_identifier'});
+    }
+
+    if (exists $args{'topic_alias_maximum'}) {
+        # 3.2.2.3.8  Topic Alias Maximum  (short int)
+        $raw_prop .= pack("C n", MQTT_TOPIC_ALIAS_MAXIMUM, delete $args{'topic_alias_maximum'});
+    }
+
+    if (exists $args{'reason_string'}) {
+        # 3.2.2.3.9  Reason String  (utf8 string)
+        utf8::encode( $args{'reason_string'} );
+        $raw_prop .= pack("C n/a*", MQTT_REASON_STRING, delete $args{'reason_string'});
+    }
+
+    if (exists $args{'wildcard_subscription_available'}) {
+        # 3.2.2.3.11  Wildcard Subscription Available  (byte)
+        $raw_prop .= pack("C C", MQTT_WILDCARD_SUBSCRIPTION_AVAILABLE, delete $args{'wildcard_subscription_available'});
+    }
+
+    if (exists $args{'subscription_identifier_available'}) {
+        # 3.2.2.3.12  Subscription Identifiers Available  (byte)
+        $raw_prop .= pack("C C", MQTT_SUBSCRIPTION_IDENTIFIER_AVAILABLE, delete $args{'subscription_identifier_available'});
+    }
+
+    if (exists $args{'shared_subscription_available'}) {
+        # 3.2.2.3.13  Shared Subscription Available  (byte)
+        $raw_prop .= pack("C C", MQTT_SHARED_SUBSCRIPTION_AVAILABLE, delete $args{'shared_subscription_available'});
+    }
+
+    if (exists $args{'server_keep_alive'}) {
+        # 3.2.2.3.14  Server Keep Alive  (short int)
+        $raw_prop .= pack("C n", MQTT_SERVER_KEEP_ALIVE, delete $args{'server_keep_alive'});
+    }
+
+    if (exists $args{'response_information'}) {
+        # 3.2.2.3.15  Response Information  (utf8 string)
+        utf8::encode( $args{'response_information'} );
+        $raw_prop .= pack("C n/a*", MQTT_RESPONSE_INFORMATION, delete $args{'response_information'});
+    }
+
+    if (exists $args{'server_reference'}) {
+        # 3.2.2.3.16  Server Reference  (utf8 string)
+        utf8::encode( $args{'server_reference'} );
+        $raw_prop .= pack("C n/a*", MQTT_SERVER_REFERENCE, delete $args{'server_reference'});
+    }
+
+    if (exists $args{'authentication_method'}) {
+        # 3.2.2.3.17  Authentication Method  (utf8 string)
+        utf8::encode( $args{'authentication_method'} );
+        $raw_prop .= pack("C n/a*", MQTT_AUTHENTICATION_METHOD, delete $args{'authentication_method'});
+    }
+
+    if (exists $args{'authentication_data'}) {
+        # 3.2.2.3.18 Authentication Data  (binary data)
+        $raw_prop .= pack("C n/a*", MQTT_AUTHENTICATION_DATA, delete $args{'authentication_data'});
+    }
+
+    foreach my $key (keys %args) {
+        # 3.2.2.3.10  User Property  (utf8 string pair)
+        my $val = $args{$key};
+        next unless defined $val;
+        utf8::encode( $key );
+        utf8::encode( $val );
+        $raw_prop .= pack("C n/a* n/a*", MQTT_USER_PROPERTY, $key, $val);
+    }
+
+    # 3.2.2  Variable Header
+
+    # 3.2.2.1  Acknowledge flags  (byte)
+    my $raw_mqtt = pack("C", $reason_code || 0);
+
+    # 3.2.2.2  Reason code  (byte)
+    $raw_mqtt .= pack("C", $session_present ? 0x01 : 0);
+
+    # 3.2.2.3  Properties
+    $raw_mqtt .= _encode_var_int(length $raw_prop);
+    $raw_mqtt .= $raw_prop;
+
+    $fh->push_write( 
+        pack("C", MQTT_CONNACK << 4)      .  # 3.2.1  Packet type 
+        _encode_var_int(length $raw_mqtt) .  # 3.2.1  Packet length
+        $raw_mqtt
+    );
+}
+
+sub _receive_disconnect {
+    my ($self, $fh, $packet) = @_;
+
+    # Handle abbreviated packet
+    $$packet = "\x00\x00" if (length $$packet == 0);
+
+    # 3.14.2.1  Reason Code  (byte)
+    my $offs = 0;
+    my $reason_code = _decode_byte($packet, \$offs);
+
+    # 3.14.2.2.1  Property Length  (variable length int)
+    my $prop_len = _decode_var_int($packet, \$offs);
+    my $prop_end = $offs + $prop_len;
+
+    my %prop = (
+        'reason_code' => $reason_code,
+    );
+
+    while ($offs < $prop_end) {
+
+        my $prop_id = _decode_byte($packet, \$offs);
+
+        if ($prop_id == MQTT_SESSION_EXPIRY_INTERVAL) {
+            # 3.14.2.2.2  Session Expiry Interval  (long int)
+            $prop{'session_expiry_interval'} = _decode_int_32($packet, \$offs);
+        }
+        elsif ($prop_id == MQTT_REASON_STRING) {
+            # 3.14.2.2.3  Reason String  (utf8 string)
+            $prop{'reason_string'} = _decode_utf8_str($packet, \$offs);
+        }
+        elsif ($prop_id == MQTT_USER_PROPERTY) {
+            # 3.14.2.2.4  User Property  (utf8 string pair)
+            my $key = _decode_utf8_str($packet, \$offs);
+            my $val = _decode_utf8_str($packet, \$offs);
+            $prop{$key} = $val;
+        }
+        elsif ($prop_id == MQTT_SERVER_REFERENCE) {
+            # 3.14.2.2.5  Server Reference  (utf8 string)
+            $prop{'server_reference'} = _decode_utf8_str($packet, \$offs);
+        }
+        else {
+            # Protocol error
+            log_warn "Received DISCONNECT with unknown property $prop_id";
+            $self->_shutdown($fh);
+            return;
+        }
+    }
 
     $self->_shutdown($fh);
 }
 
-sub error {
-    my ($self, $fh, $msg) = @_;
+sub disconnect {
+    my ($self, $fh, %args) = @_;
 
-    $fh->push_write(
-        "ERROR\n"           .
-        "message: $msg\n\n" .
-        "$msg\n"            .
-        "\x00"
+    my $reason_code = delete $args{'reason_code'};
+
+    # 3.14.2.2  Properties
+
+    my $raw_prop = '';
+
+    if (exists $args{'reason_string'}) {
+        # 3.14.2.2.3  Reason String  (utf8 string)
+        utf8::encode( $args{'reason_string'} );
+        $raw_prop .= pack("C n/a*", MQTT_REASON_STRING, delete $args{'reason_string'});
+    }
+
+    if (exists $args{'server_reference'}) {
+        # 3.14.2.2.5  Server Reference  (utf8 string)
+        utf8::encode( $args{'server_reference'} );
+        $raw_prop .= pack("C n/a*", MQTT_SERVER_REFERENCE, delete $args{'server_reference'});
+    }
+
+    foreach my $key (keys %args) {
+        # 3.14.2.2.4  User Property  (utf8 string pair)
+        my $val = $args{$key};
+        next unless defined $val;
+        utf8::encode( $key );
+        utf8::encode( $val );
+        $raw_prop .= pack("C n/a* n/a*", MQTT_USER_PROPERTY, $key, $val);
+    }
+
+    # 3.14.2  Variable Header
+
+    # 3.14.2.1  Disconnect Reason Code  (byte)
+    my $raw_mqtt = pack("C", $reason_code || 0);
+
+    # 3.14.2.2  Properties
+    $raw_mqtt .= _encode_var_int(length $raw_prop);
+    $raw_mqtt .= $raw_prop;
+
+    $fh->push_write( 
+        pack("C", MQTT_DISCONNECT << 4)   .  # 3.14.1  Packet type 
+        _encode_var_int(length $raw_mqtt) .  # 3.14.1  Packet length
+        $raw_mqtt
     );
 
     $self->_shutdown($fh);
@@ -288,349 +601,957 @@ sub error {
 sub _shutdown {
     my ($self, $fh) = @_;
 
-    if ($fh->{authorized}) {
-
-        # Clear_subscriptions
-
-        my $topic_subs  = $fh->{topic_subs};
-        my $queue_subs  = $fh->{queue_subs};
-        my $pending_ack = $fh->{pending_ack};
-
-        foreach my $sub_id (keys %$topic_subs) {
-            my $dest = delete $topic_subs->{$sub_id};
-            $self->_unsubscribe_from_topic( $fh, $dest );
-        }
-
-        foreach my $sub_id (keys %$queue_subs) {
-            my $dest = delete $queue_subs->{$sub_id};
-            $self->_unsubscribe_from_queue( $fh, $dest );
-        }
-
-        foreach my $ack_id (keys %$pending_ack) {
-            my $sent_msg = delete $pending_ack->{$ack_id};
-            $self->_send_to_queue( @$sent_msg );
-        }
-    }
-
-    $fh->push_shutdown;
+    $self->remove_client($fh);
 
     delete $self->{connections}->{"$fh"};
 }
 
-sub receipt {
-    my ($self, $fh, $hdr) = @_;
+sub _receive_subscribe {
+    my ($self, $fh, $packet) = @_;
 
-    return unless $hdr->{'receipt'};
+    # 3.8.2  Packet identifier  (short int)
+    my $offs = 0;
+    my $packet_id = _decode_int_16($packet, \$offs);
 
-    $fh->push_write(
-        "RECEIPT\n"                      .
-        "receipt-id:$hdr->{receipt}\n\n" .
-        "\x00"
+    # 3.8.2.1  Properties Length  (variable length int)
+    my $prop_len = _decode_var_int($packet, \$offs);
+    my $prop_end = $offs + $prop_len;
+    my %prop;
+
+    while ($offs < $prop_end) {
+
+        my $prop_id = _decode_byte($packet, \$offs);
+
+        if ($prop_id == MQTT_SUBSCRIPTION_IDENTIFIER) {
+            # 3.8.2.1.2  Subscription Identifier  (variable len int)
+            $prop{'subscription_identifier'} = _decode_var_int($packet, \$offs);
+        }
+        elsif ($prop_id == MQTT_USER_PROPERTY) {
+            # 3.8.2.1.3  User Property  (utf8 string pair)
+            my $key = _decode_utf8_str($packet, \$offs);
+            my $val = _decode_utf8_str($packet, \$offs);
+            $prop{$key} = $val;
+        }
+        else {
+            # Protocol error
+            log_warn "Received SUBSCRIBE with unexpected property $prop_id";
+            $self->disconnect($fh, reason_code => 0x81);
+            return;
+        }
+    }
+
+    # 3.8.3  Payload
+
+    my @reason_codes;
+
+    while ($offs < length $$packet) {
+
+        # 3.8.3  Topic Filter  (utf8 string)
+        $prop{'topic_filter'} = _decode_utf8_str($packet, \$offs);
+
+        # 3.8.3.1  Subscription Options  (byte)
+        my $options = _decode_byte($packet, \$offs);
+
+        $prop{'maximum_qos'}         = ($options & 0x03);
+        $prop{'no_local'}            = ($options & 0x04) >> 2;
+        $prop{'retain_as_published'} = ($options & 0x08) >> 3;
+        $prop{'retain_handling'}     = ($options & 0x30) >> 4;
+
+        my $reason_code = $self->subscribe_client($fh, \%prop);
+
+        push @reason_codes, $reason_code;
+    }
+
+    $self->suback( $fh, 
+        packet_id    => $packet_id,
+        reason_codes => \@reason_codes,
     );
 }
 
-sub subscribe {
-    my ($self, $fh, $hdr) = @_;
+sub suback {
+    my ($self, $fh, %args) = @_;
 
-    my $dest   = $hdr->{destination};
-    my $sub_id = $hdr->{id};
+    my $packet_id    = delete $args{'packet_id'};
+    my $reason_codes = delete $args{'reason_codes'};
 
-    unless ($dest && $dest =~ m|^/[-\w]+/[-*#\w]+(\.[-*#\w]+)*$|) {
-        $self->error($fh, "Invalid destination");
+    # 3.9.2.1  Properties
+
+    my $raw_prop = '';
+
+    if (exists $args{'reason_string'}) {
+        # 3.9.2.1.2  Reason String  (utf8 string)
+        utf8::encode( $args{'reason_string'} );
+        $raw_prop .= pack("C n/a*", MQTT_REASON_STRING, delete $args{'reason_string'});
+    }
+
+    foreach my $key (keys %args) {
+        # 3.9.2.1.3  User Property  (utf8 string pair)
+        my $val = $args{$key};
+        next unless defined $val;
+        utf8::encode( $key );
+        utf8::encode( $val );
+        $raw_prop .= pack("C n/a* n/a*", MQTT_USER_PROPERTY, $key, $val);
+    }
+
+    # 3.9.2  Variable Header
+
+    # 3.9.2  Packet id  (short int)
+    my $raw_mqtt = pack("n", $packet_id);
+
+    # 3.9.2.1  Properties
+    $raw_mqtt .= _encode_var_int(length $raw_prop);
+    $raw_mqtt .= $raw_prop;
+
+    # 3.9.3  Payload
+
+    foreach my $code (@$reason_codes) {
+        # 3.9.3  Reason Codes  (byte)
+        $raw_mqtt .= pack("C", $code);
+    }
+
+    $fh->push_write( 
+        pack("C", MQTT_SUBACK << 4)       .  # 3.9.1  Packet type 
+        _encode_var_int(length $raw_mqtt) .  # 3.9.1  Packet length
+        $raw_mqtt
+    );
+}
+
+sub _receive_unsubscribe {
+    my ($self, $fh, $packet) = @_;
+
+    # 3.10.2  Packet identifier  (short int)
+    my $offs = 0;
+    my $packet_id = _decode_int_16($packet, \$offs);
+
+    # 3.10.2.1  Properties Length  (variable length int)
+    my $prop_len = _decode_var_int($packet, \$offs);
+    my $prop_end = $offs + $prop_len;
+    my %prop;
+
+    while ($offs < $prop_end) {
+
+        my $prop_id = _decode_byte($packet, \$offs);
+
+        if ($prop_id == MQTT_USER_PROPERTY) {
+            # 3.10.2.1.2  User Property  (utf8 string pair)
+            my $key = _decode_utf8_str($packet, \$offs);
+            my $val = _decode_utf8_str($packet, \$offs);
+            $prop{$key} = $val;
+        }
+        else {
+            # Protocol error
+            log_warn "Received UNSUBSCRIBE with unexpected property $prop_id";
+            $self->disconnect($fh, reason_code => 0x81);
+            return;
+        }
+    }
+
+    # 3.10.3  Payload
+
+    my @reason_codes;
+
+    while ($offs < length $$packet) {
+
+        # 3.10.3  Topic Filter  (utf8 string)
+        $prop{'topic_filter'} = _decode_utf8_str($packet, \$offs);
+
+        my $reason_code = $self->unsubscribe_client($fh, \%prop);
+
+        push @reason_codes, $reason_code;
+    }
+
+    $self->unsuback( $fh, 
+        packet_id    => $packet_id,
+        reason_codes => \@reason_codes,
+    );
+}
+
+sub unsuback {
+    my ($self, $fh, %args) = @_;
+
+    my $packet_id    = delete $args{'packet_id'};
+    my $reason_codes = delete $args{'reason_codes'};
+
+    # 3.11.2.1  Properties
+
+    my $raw_prop = '';
+
+    if (exists $args{'reason_string'}) {
+        # 3.11.2.1.2  Reason String  (utf8 string)
+        utf8::encode( $args{'reason_string'} );
+        $raw_prop .= pack("C n/a*", MQTT_REASON_STRING, delete $args{'reason_string'});
+    }
+
+    foreach my $key (keys %args) {
+        # 3.11.2.1.3  User Property  (utf8 string pair)
+        my $val = $args{$key};
+        next unless defined $val;
+        utf8::encode( $key );
+        utf8::encode( $val );
+        $raw_prop .= pack("C n/a* n/a*", MQTT_USER_PROPERTY, $key, $val);
+    }
+
+    # 3.14.2  Variable Header
+
+    # 3.11.2  Packet id  (short int)
+    my $raw_mqtt = pack("n", $packet_id);
+
+    # 3.11.2.1  Properties
+    $raw_mqtt .= _encode_var_int(length $raw_prop);
+    $raw_mqtt .= $raw_prop;
+
+    # 3.11.3  Payload
+
+    foreach my $code (@$reason_codes) {
+        # 3.11.3  Reason Codes  (byte)
+        $raw_mqtt .= pack("C", $code);
+    }
+
+    $fh->push_write( 
+        pack("C", MQTT_UNSUBACK << 4)     .  # 3.11.1  Packet type 
+        _encode_var_int(length $raw_mqtt) .  # 3.11.1  Packet length
+        $raw_mqtt
+    );
+}
+
+sub pingreq {
+    my ($self, $fh) = @_;
+
+    $fh->push_write( 
+        pack( "C C",
+            MQTT_PINGREQ << 4,  # 3.12.1  Packet type 
+            0,                  # 3.12.1  Remaining length
+        )
+    );
+}
+
+sub pingresp {
+    my ($self, $fh) = @_;
+
+    $fh->push_write( 
+        pack( "C C",
+            MQTT_PINGRESP << 4,  # 3.13.1  Packet type 
+            0,                   # 3.13.1  Remaining length
+        )
+    );
+}
+
+sub _receive_pingresp {
+    my ($self, $fh) = @_;
+
+    # No action taken
+}
+
+sub _receive_publish {
+    my ($self, $fh, $packet, $flags) = @_;
+
+    # 3.3.2.1  Topic Name  (utf8 str)
+    my $topic = unpack("n/a", $$packet);
+    my $offs = 2 + length $topic;
+    utf8::decode($topic);
+
+    my %prop = (
+        'topic' => $topic,
+        'qos'   => ($flags & 0x6) >> 1,
+        'dup'   => ($flags & 0x8) >> 3,
+    );
+
+    # 3.3.2.2  Packet Identifier  (short int)
+    if ($prop{'qos'} > 0) {
+        $prop{'packet_id'} = unpack("n", substr($$packet, $offs, 2));
+        $offs += 2;
+    }
+
+    # 3.3.2.3.1  Properties Length  (variable length int)
+    my $prop_len = _decode_var_int($packet, \$offs);
+    my $prop_end = $offs + $prop_len;
+
+    my @subscr_ids;
+    my $prop_id;
+
+    while ($offs < $prop_end) {
+
+        $prop_id = unpack("C", substr($$packet, $offs, 1));
+        $offs += 1;
+
+        if ($prop_id == MQTT_PAYLOAD_FORMAT_INDICATOR) {
+            # 3.3.2.3.2  Payload Format Indicator  (byte)
+            $prop{'payload_format'} = unpack("C", substr($$packet, $offs, 1));
+            $offs += 1;
+        }
+        elsif ($prop_id == MQTT_MESSAGE_EXPIRY_INTERVAL) {
+            # 3.3.2.3.3  Message Expiry Interval  (long int)
+            $prop{'message_expiry_interval'} = unpack("N", substr($$packet, $offs, 4));
+            $offs += 4;
+        }
+        elsif ($prop_id == MQTT_TOPIC_ALIAS) {
+            # 3.3.2.3.4  Topic Alias  (short int)
+            my $alias = unpack("n", substr($$packet, $offs, 2));
+            $offs += 2;
+            if (length $topic) {
+                $fh->{topic_alias}->{$alias} = $topic;
+            }
+            else {
+                $prop{'topic'} = $fh->{topic_alias}->{$alias};
+            }
+        }
+        elsif ($prop_id == MQTT_RESPONSE_TOPIC) {
+            # 3.3.2.3.5  Response Topic  (utf8 string)
+            my $resp_topic = unpack("n/a", substr($$packet, $offs));
+            $offs += 2 + length $resp_topic;
+            utf8::decode( $resp_topic );
+            $prop{'response_topic'} = $resp_topic;
+        }
+        elsif ($prop_id == MQTT_CORRELATION_DATA) {
+            # 3.3.2.3.6  Correlation Data  (binary data)
+            $prop{'correlation_data'} = unpack("n/a", substr($$packet, $offs));
+            $offs += 2 + length $prop{'correlation_data'};
+        }
+        elsif ($prop_id == MQTT_USER_PROPERTY) {
+            # 3.3.2.3.7  User Property  (utf8 string pair)
+            my ($key, $val) = unpack("n/a n/a", substr($$packet, $offs));
+            $offs += 4 + length($key) + length($val);
+            utf8::decode( $key );
+            utf8::decode( $val );
+            $prop{$key} = $val;
+        }
+        elsif ($prop_id == MQTT_SUBSCRIPTION_IDENTIFIER) {
+            # 3.3.2.3.8  Subscription Identifier  (variable int)
+            push @subscr_ids, _decode_var_int($packet, \$offs);
+        }
+        elsif ($prop_id == MQTT_CONTENT_TYPE) {
+            # 3.3.2.3.9  Content Type  (utf8 string)
+            my $content_type = unpack("n/a", substr($$packet, $offs));
+            $offs += 2 + length $content_type;
+            utf8::decode( $content_type );
+            $prop{'content_type'} = $content_type;
+        }
+        else {
+            # Protocol error
+            log_warn "Received PUBLISH with unknown property $prop_id";
+            $self->disconnect($fh, reason_code => 0x81);
+            return;
+        }
+    }
+
+    # Trim variable header from packet, the remaining is the payload
+    substr($$packet, 0, $prop_end, '');
+
+    if ($prop{'payload_format'}) {
+        # Payload is UTF-8 Encoded Character Data
+        utf8::decode( $$packet );
+    }
+
+    if ($prop{'qos'} == 1) {
+        # Acknowledge received message
+        $self->puback( $fh, packet_id => $prop{'packet_id'} );
+        delete $prop{'packet_id'};
+    }
+
+    $prop{'payload'} = $packet;
+
+    $self->incoming_message($fh, \%prop);
+}
+
+sub publish {
+    my ($self, $fh, %args) = @_;
+
+    my $topic     = delete $args{'topic'};
+    my $payload   = delete $args{'payload'};
+    my $qos       = delete $args{'qos'};
+    my $dup       = delete $args{'duplicate'};
+    my $retain    = delete $args{'retain'};
+    my $packet_id = delete $args{'packet_id'};
+    my $on_puback = delete $args{'on_puback'};
+
+    croak "Message topic was not specified" unless defined $topic;
+
+    $payload = '' unless defined $payload;
+    my $payload_ref = (ref $payload eq 'SCALAR') ? $payload : \$payload;
+
+    #TODO: 3.3.2.3.4  Topic Alias
+    my $topic_alias;
+
+    # 3.3.1.2  QoS level
+    my $flags = 0;
+    $flags |= $qos << 1 if $qos;
+    $flags |= 0x04      if $dup;
+    $flags |= 0x01      if $retain;
+
+    my $raw_prop = '';
+
+    if (utf8::is_utf8( $$payload_ref )) {
+        # 3.3.2.3.2  Payload Format Indicator  (byte)
+        $raw_prop .= pack("C C", MQTT_PAYLOAD_FORMAT_INDICATOR, 0x01);
+        utf8::encode( $$payload_ref );
+    }
+
+    if (exists $args{'message_expiry_interval'}) {
+        # 3.3.2.3.3  Message Expiry Interval  (long int)
+        $raw_prop .= pack("C N", MQTT_MESSAGE_EXPIRY_INTERVAL, delete $args{'message_expiry_interval'});
+    }
+
+    if ($topic_alias) {
+        # 3.3.2.3.4  Topic Alias  (short int)
+        $raw_prop .= pack("C n", MQTT_TOPIC_ALIAS, $topic_alias);
+    }
+
+    if (exists $args{'response_topic'}) {
+        # 3.3.2.3.5  Response Topic  (utf8 string)
+        utf8::encode( $args{'response_topic'} );
+        $raw_prop .= pack("C n/a*", MQTT_RESPONSE_TOPIC, delete $args{'response_topic'});
+    }
+
+    if (exists $args{'correlation_data'}) {
+        # 3.3.2.3.6  Correlation Data  (binary data)
+        $raw_prop .= pack("C n/a*", MQTT_CORRELATION_DATA, delete $args{'correlation_data'});
+    }
+
+    if (exists $args{'subscription_identifier'}) {
+        # 3.3.2.3.8  Subscription Identifier  (variable int)
+        $raw_prop .= pack("C", MQTT_SUBSCRIPTION_IDENTIFIER) .
+                    _encode_var_int( delete $args{'subscription_identifier'} );
+    }
+
+    if (exists $args{'content_type'}) {
+        # 3.3.2.3.9  Content Type  (utf8 string)
+        utf8::encode( $args{'content_type'} );
+        $raw_prop .= pack("C n/a*", MQTT_CONTENT_TYPE, delete $args{'content_type'});
+    }
+
+    foreach my $key (keys %args) {
+        # 3.3.2.3.7  User Property  (utf8 string pair)
+        my $val = $args{$key};
+        next unless defined $val;
+        utf8::encode( $key );
+        utf8::encode( $val );
+        $raw_prop .= pack("C n/a* n/a*", MQTT_USER_PROPERTY, $key, $val);
+    }
+
+    # 3.3.2.1  Topic name  (utf8 string)
+    utf8::encode( $topic );
+    my $raw_mqtt = pack("n/a*", $topic);
+
+    # 3.3.2.2  Packet identifier  (short int)
+    $raw_mqtt .= pack("n", $packet_id) if $packet_id;
+
+    # 3.3.2.3  Properties
+    $raw_mqtt .= _encode_var_int(length $raw_prop);
+    $raw_mqtt .= $raw_prop;
+
+    # 3.3.3  Payload
+    $raw_mqtt .= $$payload_ref;
+
+    $raw_mqtt = pack("C", MQTT_PUBLISH << 4 | $flags) .  # 3.3.1  Packet type 
+                _encode_var_int(length $raw_mqtt)     .  # 3.3.1  Packet length
+                $raw_mqtt;
+
+    $self->{_WORKER}->{notif_count}++;  # track outgoing messages for stats
+
+    $fh->push_write( $raw_mqtt );
+}
+
+sub puback {
+    my ($self, $fh, %args) = @_;
+
+    croak "Missing packet_id" unless $args{'packet_id'};
+
+    my $raw_mqtt = pack( 
+        "C C n C", 
+        MQTT_PUBACK << 4,           # 3.4.1    Packet type 
+        3,                          # 3.4.1    Remaining length
+        $args{'packet_id'},         # 3.4.2    Packet identifier
+        $args{'reason_code'} || 0,  # 3.4.2.1  Reason code
+    );
+
+    $fh->push_write( $raw_mqtt );
+}
+
+sub _receive_puback {
+    my ($self, $fh, $packet) = @_;
+
+    my ($packet_id, $reason_code) = unpack("n C", $$packet);
+    $reason_code = 0 unless defined $reason_code;
+
+    $self->get_client($fh)->on_puback($packet_id);
+}
+
+sub _receive_pubrec {
+    my ($self, $fh, $packet) = @_;
+
+    $self->disconnect($fh, reason_code => 0x9B);
+}
+
+sub _receive_pubrel {
+    my ($self, $fh, $packet) = @_;
+
+    $self->disconnect($fh, reason_code => 0x9B);
+}
+
+sub _receive_pubcomp {
+    my ($self, $fh, $packet) = @_;
+
+    $self->disconnect($fh, reason_code => 0x9B);
+}
+
+sub _receive_pubauth {
+    my ($self, $fh, $packet) = @_;
+
+    $self->disconnect($fh, reason_code => 0x9B);
+}
+
+
+#------------------------------------------------------------------------------
+
+sub add_client {
+    my ($self, $fh, $prop) = @_;
+    weaken($self);
+
+    my $client_id = $prop->{'client_identifier'};
+    my $username  = $prop->{'username'};
+    my $password  = $prop->{'password'};
+
+    my $users_cfg = $self->{'users'};
+    my $authorized;
+
+    AUTH: {
+
+        last unless (length $client_id);
+        last unless (length $username);
+        last unless (length $password);
+
+        last unless ($users_cfg);
+        last unless ($users_cfg->{$username});
+        last unless ($users_cfg->{$username}->{'password'} eq $password);
+
+        $authorized = 1;
+    }
+
+    unless ($authorized) {
+        log_warn('Client not authorized');
+        $self->_shutdown($fh);
         return;
     }
 
-    if ($dest =~ s|^/(temp-)?topic/||) {
+    my $client = Beekeeper::Service::ToyBroker::Client->new(
+        client_id => $client_id,
+        publish   => sub { $self->publish($fh, @_) },
+    );
 
-        my $temp = $1;
+    $self->{clients}->{"$fh"} = $client;
 
-        $dest = $fh->{vhost} .'/'. $dest;
+    $self->connack( $fh, maximum_qos => 1 );
+}
 
-        if ($temp && exists $self->{topics}->{$dest}) {
-            $self->error($fh, "Forbidden destination");
-            return;
-        }
+sub get_client {
+    my ($self, $fh) = @_;
 
-        if (exists $fh->{topic_subs}->{$sub_id}) {
-            $self->error($fh, "Subscription id already in use");
-            return;
-        }
+    return $self->{clients}->{"$fh"};
+}
 
-        $fh->{topic_subs}->{$sub_id} = $dest;
+sub remove_client {
+    my ($self, $fh) = @_;
 
-        my $dest_re = $dest;
-        $dest_re =~ s/\./\\./g;
-        $dest_re =~ s/\*/[^.]+/g;
-        $dest_re =~ s/\#/.+/g;
+    my $client = $self->{clients}->{"$fh"};
 
-        my $topic = $self->{topics}->{$dest} ||= {
-            subscribers => [],
-            dest_regex  => qr/^${dest_re}$/,
-        };
+    return unless $client;  # called on eof after DISCONNECT 
 
-        push @{$topic->{subscribers}}, {
-            fh_id  => "$fh",
-            sub_id => $sub_id,
-            msg_id => 1,
-        };
+    foreach my $topic_filter (keys %{$client->{subscriptions}}) {
+
+        $self->unsubscribe_client($fh, { topic_filter => $topic_filter });
     }
-    elsif ($dest =~ s|^/(temp-)?queue/||) {
 
-        my $temp = $1;
+    $client->resend_unacked_messages;
 
-        $dest = $fh->{vhost} .'/'. $dest;
+    delete $self->{clients}->{"$fh"};
+}
 
-        if ($temp && exists $self->{queues}->{$dest}) {
-            $self->error($fh, "Forbidden destination");
-            return;
+sub incoming_message {
+    my ($self, $fh, $message) = @_;
+
+    my @topics = values %{$self->{topics}};
+
+    foreach my $topic (@topics) {
+
+        next unless $message->{'topic'} =~ $topic->{topic_regex};
+
+        foreach my $subscription (values %{$topic->{subscriptions}}) {
+
+            $subscription->send_message( $message );
         }
+    }
+}
 
-        if (exists $fh->{queue_subs}->{$sub_id}) {
-            $self->error($fh, "Subscription with same id already exists");
-            return;
-        }
+sub _validate_filter {
+    my ($self, $topic_filter) = @_;
 
-        $fh->{queue_subs}->{$sub_id} = $dest;
+    return unless defined $topic_filter;
 
-        my $ack_mode = $hdr->{ack} || 'auto';
-        my $prefetch = $hdr->{'prefetch-count'};
-        my $ack = ($ack_mode eq 'client') ? 1 : 0;
+    $topic_filter =~ s|^\$share/([-\w]+)/||;
 
-        my $queue = $self->{queues}->{$dest} ||= {
-            subscribers => [],
-            messages    => [],
-        };
+    my $shared_group = $1;
 
-        push @{$queue->{subscribers}}, {
-            fh_id  => "$fh",
-            sub_id => $sub_id,
-            ack    => $ack,
-            msg_id => 1,
-        };
+    return unless $topic_filter =~ m/^ (( [-\w]+ | \+ ) \/)* ( [-\w]+ | \+ | \# ) $/x;
 
-        $self->_service_queue($dest);
+    return ($topic_filter, $shared_group);
+}
+
+sub subscribe_client {
+    my ($self, $fh, $prop) = @_;
+
+    my ($topic_filter, $shared_group) = $self->_validate_filter( $prop->{'topic_filter'} );
+
+    return 0x8F unless defined $topic_filter;  # "Topic Filter invalid"
+
+    #TODO: Access permissions
+
+    my $topic = $self->{topics}->{$topic_filter};
+
+    unless ($topic) {
+        $topic = Beekeeper::Service::ToyBroker::TopicFilter->new( $topic_filter );
+        $self->{topics}->{$topic_filter} = $topic;
+    }
+
+    my $client = $self->{clients}->{"$fh"};
+
+    my $granted_qos = $prop->{'maximum_qos'} ? 1 : 0;
+
+    my $subscription = Beekeeper::Service::ToyBroker::Subscription->new(
+        id       => $prop->{'subscription_identifier'},
+        no_local => $prop->{'no_local'},
+        max_qos  => $granted_qos,
+        client   => $client,
+    );
+
+    if ($shared_group) {
+        $topic->add_shared_subscription( $subscription, $shared_group );
     }
     else {
-
-        $self->error($fh, "Invalid destination");
-        return;
+        $topic->add_subscription( $subscription, $client->client_id );
     }
 
-    $self->receipt($fh, $hdr);
+    $client->{subscriptions}->{$prop->{topic_filter}} = 1;
+
+    return $granted_qos;
 }
 
-sub unsubscribe {
-    my ($self, $fh, $hdr) = @_;
+sub unsubscribe_client {
+    my ($self, $fh, $prop) = @_;
 
-    my $sub_id = $hdr->{id};
-    my $dest;
+    my ($topic_filter, $shared_group) = $self->_validate_filter( $prop->{'topic_filter'} );
 
-    if ($dest = delete $fh->{queue_subs}->{$sub_id}) {
+    return 0x8F unless defined $topic_filter;  # "Topic Filter invalid"
 
-        $self->_unsubscribe_from_queue($fh, $dest);
-    }
-    elsif ($dest = delete $fh->{topic_subs}->{$sub_id}) {
+    my $topic = $self->{topics}->{$topic_filter};
 
-        $self->_unsubscribe_from_topic($fh, $dest);
+    return 0x11 unless defined $topic;  # "No subscription existed"
+
+    my $client = $self->{clients}->{"$fh"};
+    my $client_id = $client->client_id;
+    my $success;
+
+    if ($shared_group) {
+        $success = $topic->remove_shared_subscription( $client_id, $shared_group );
     }
     else {
-        $self->error($fh, "Invalid subscription id");
-        return;
+        $success = $topic->remove_subscription( $client_id );
     }
 
-    $self->receipt($fh, $hdr);
+    delete $self->{topics}->{$topic_filter} unless $topic->has_subscriptions;
+
+    delete $client->{subscriptions}->{$prop->{topic_filter}};
+
+    return $success ? 0x00 : 0x11;
 }
 
-sub _unsubscribe_from_queue {
-    my ($self, $fh, $dest) = @_;
 
-    my $queue = $self->{queues}->{$dest} || return;
+package Beekeeper::Service::ToyBroker::Client;
 
-    @{$queue->{subscribers}} = grep { $_->{fh_id} ne "$fh" } @{$queue->{subscribers}};
+sub new {
+    my ($class, %args) = @_;
 
-    delete $self->{queues}->{$dest} unless (@{$queue->{subscribers}} || @{$queue->{messages}});
-}
-
-sub _unsubscribe_from_topic {
-    my ($self, $fh, $dest) = @_;
-
-    my $topic = $self->{topics}->{$dest} || return;
-
-    @{$topic->{subscribers}} = grep { $_->{fh_id} ne "$fh" } @{$topic->{subscribers}};
-
-    delete $self->{topics}->{$dest} unless @{$topic->{subscribers}};
-}
-
-sub send {
-    my ($self, $fh, $hdr, $msg) = @_;
-
-    my $dest = delete $hdr->{destination};
-
-    if ($dest =~ s|^/(temp-)?queue/||) {
-
-        # Need to copy because these are refs to the parser buffer
-        my %hdr_copy = %$hdr;
-        my $msg_copy = $$msg;
-
-        $dest = $fh->{vhost} .'/'. $dest;
-        $self->_send_to_queue($dest, \%hdr_copy, \$msg_copy);
-
-        $self->{_WORKER}->{jobs_count}++;
-    }
-    elsif ($dest =~ s|^/(temp-)?topic/||) {
-
-        $dest = $fh->{vhost} .'/'. $dest;
-        $self->_send_to_topic($dest, $hdr, $msg);
-
-        $self->{_WORKER}->{notif_count}++;
-    }
-    else {
-        $self->error($fh, "Invalid destination");
-        return;
-    }
-
-    $self->receipt($fh, $hdr);
-}
-
-sub _send_to_topic {
-    my ($self, $dest, $hdr, $msg) = @_;
-
-    $hdr->{'content-length'} = length($$msg);
-
-    foreach my $topic (keys %{$self->{topics}}) {
-
-        next unless ($dest =~ $self->{topics}->{$topic}->{dest_regex});
-
-        my $subscribers = $self->{topics}->{$topic}->{subscribers};
-
-        foreach my $subscr (@$subscribers) {
-
-            my $fh = $self->{connections}->{$subscr->{fh_id}};
-            next unless $fh;
-
-            $subscr->{msg_id}++;
-
-            $hdr->{'subscription'} = $subscr->{sub_id};
-            $hdr->{'message-id'}   = $subscr->{msg_id};
-
-            my $headers = join '', map { "$_:$hdr->{$_}\n" } keys %$hdr;
-
-            $fh->push_write(
-                "MESSAGE\n" .
-                $headers    .
-                "\n"        .
-                $$msg       .
-                "\x00"
-            );
-
-            # $self->{_WORKER}->{notif_count}++; # outbound
-        }
-    }
-}
-
-sub _send_to_queue {
-    my ($self, $dest, $hdr, $msg) = @_;
-
-    my $queue = $self->{queues}->{$dest} ||= {
-        subscribers => [],
-        messages    => [],
+    my $self = {
+        client_id     => $args{'client_id'},
+        publish       => $args{'publish'},
+        subscriptions => {},
+        pending_ack   => {},
+        packet_seq    => 1,
     };
 
-    push @{$queue->{messages}}, [ $hdr, $msg ];
-
-    $self->_service_queue($dest);
+    bless $self, $class;
 }
 
-sub _service_queue {
-    my ($self, $dest) = @_;
+sub client_id {
+    my ($self) = @_;
 
-    my $queue       = $self->{queues}->{$dest};
-    my $subscribers = $queue->{subscribers};
-    my $messages    = $queue->{messages};
+    $self->{client_id};
+}
 
-    return unless @$messages && @$subscribers;
+sub publish {
+    my ($self, $message, $sender) = @_;
+
+    my $packet_id;
+
+    if ($message->{'qos'}) {
+
+        $packet_id = $self->{packet_seq}++;
+        $self->{packet_seq} = 1 if ($packet_id == 0xFFFF);
+
+        $self->{pending_ack}->{$packet_id} = [ $message, $sender ];
+    }
+
+    local $message->{'packet_id'} = $packet_id if $packet_id;
+
+    $self->{publish}->( %$message );
+}
+
+sub on_puback {
+    my ($self, $packet_id) = @_;
+
+    delete $self->{pending_ack}->{$packet_id};
+}
+
+sub resend_unacked_messages {
+    my ($self) = @_;
+
+    my $pending_ack = $self->{pending_ack};
+
+    foreach my $packet_id (keys %$pending_ack) {
+
+        my $unacked = delete $pending_ack->{$packet_id};
+
+        my ($message, $sender) = @$unacked;
+
+        next unless $sender->has_subscriptions;
+
+        $message->{'duplicate'} = 1;
+
+        $sender->send_message( $message );
+    }
+}
+
+
+package Beekeeper::Service::ToyBroker::TopicFilter;
+
+sub new {
+    my ($class, $topic_filter) = @_;
+
+    my $topic_regex = $topic_filter;
+    $topic_regex =~ s/\+/[^\/]+/g;
+    $topic_regex =~ s/\#/.+/g;
+
+    my $self = {
+        subscriptions => {},
+        topic_filter  => $topic_filter,
+        topic_regex   => qr/^${topic_regex}$/,
+    };
+
+    bless $self, $class;
+}
+
+sub has_subscriptions {
+    my ($self) = @_;
+
+    return (scalar keys %{$self->{subscriptions}}) ? 1 : 0;
+}
+
+sub add_subscription {
+    my ($self, $subscription, $client_id) = @_;
+
+    $self->{subscriptions}->{"client/$client_id"} = $subscription;
+}
+
+sub add_shared_subscription {
+    my ($self, $subscription, $shared_group) = @_;
+
+    my $shared = $self->{subscriptions}->{"shared/$shared_group"};
+
+    unless ($shared) {
+        $shared = Beekeeper::Service::ToyBroker::SharedSubscription->new;
+        $self->{subscriptions}->{"shared/$shared_group"} = $shared;
+    }
+
+    $shared->add_subscription( $subscription );
+}
+
+sub remove_subscription {
+    my ($self, $client_id) = @_;
+
+    my $existed = delete $self->{subscriptions}->{"client/$client_id"};
+
+    return $existed ? 1 : 0;
+}
+
+sub remove_shared_subscription {
+    my ($self, $client_id, $shared_group) = @_;
+
+    my $shared = $self->{subscriptions}->{"shared/$shared_group"};
+
+    return 0 unless $shared;
+
+    my $success = $shared->remove_subscription( $client_id );
+
+    delete $self->{subscriptions}->{"shared/$shared_group"} unless $shared->has_subscriptions;
+
+    return $success;
+}
+
+
+package Beekeeper::Service::ToyBroker::Subscription;
+
+sub new {
+    my $class = shift;
+
+    my $self = {
+        id       => undef,
+        max_qos  => undef,
+        no_local => undef,
+        client   => undef,
+        @_
+    };
+
+    bless $self, $class;
+}
+
+sub client {
+    my ($self) = @_;
+
+    $self->{client};
+}
+
+sub has_subscriptions {
+    my ($self) = @_;
+
+    return (scalar keys %{$self->{subscriptions}}) ? 1 : 0;
+}
+
+sub send_message {
+    my ($self, $message, $sender) = @_;
+
+    local $message->{'subscription_identifier'} = $self->{id} if $self->{id};
+
+    local $message->{'qos'} = 0 if ($self->{max_qos} == 0);
+
+    $self->{client}->publish( $message, $sender || $self );
+}
+
+
+package Beekeeper::Service::ToyBroker::SharedSubscription;
+
+sub new {
+    my ($class, %args) = @_;
+
+    my $self = {
+        subscriptions => {},
+        subscr_keys   => [],
+    };
+
+    bless $self, $class;
+}
+
+sub add_subscription {
+    my ($self, $subscription) = @_;
+
+    my $client_id = $subscription->client->client_id;
+
+    push @{$self->{subscr_keys}}, "client/$client_id";
+
+    $self->{subscriptions}->{"client/$client_id"} = $subscription;
+}
+
+sub remove_subscription {
+    my ($self, $client_id) = @_;
+
+    my $subscr_keys = $self->{subscr_keys};
+    @$subscr_keys = grep { $_ ne "client/$client_id" } @$subscr_keys;
+
+    my $existed = delete $self->{subscriptions}->{"client/$client_id"};
+
+    return $existed ? 1 : 0;
+}
+
+sub has_subscriptions {
+    my ($self) = @_;
+
+    return (scalar keys %{$self->{subscriptions}}) ? 1 : 0;
+}
+
+sub send_message {
+    my ($self, $message) = @_;
 
     # Round robin
-    my $next = pop @$subscribers;
-    unshift @$subscribers, $next;
+    my $subscr_keys = $self->{subscr_keys};
+    my $next = shift @$subscr_keys;
+    push @$subscr_keys, $next;
 
-    foreach my $subscr (@$subscribers) {
+    my $subscription = $self->{subscriptions}->{$next};
 
-        my $fh = $self->{connections}->{$subscr->{fh_id}};
-        next unless $fh;
+    #TODO: Prefer idle subscriptions
 
-        my $ack_id = $subscr->{sub_id} .':'. $subscr->{msg_id};
-        next if ($subscr->{ack} && $fh->{pending_ack}->{$ack_id});
-
-        $next = shift @$messages;
-        my ($hdr, $msg) = @$next;
-
-        $subscr->{msg_id}++;
-
-        $hdr->{'content-length'} = length($$msg);
-        $hdr->{'subscription'}   = $subscr->{sub_id};
-        $hdr->{'message-id'}     = $subscr->{msg_id};
-
-        if ($subscr->{ack}) {
-            $ack_id = $subscr->{sub_id} .':'. $subscr->{msg_id};
-            $fh->{pending_ack}->{$ack_id} = [ $dest, $hdr, $msg ];
-            $hdr->{'ack'} = $ack_id;
-        }
-
-        my $headers = join '', map { "$_:$hdr->{$_}\n" } keys %$hdr;
-
-        $fh->push_write(
-            "MESSAGE\n" .
-            $headers    .
-            "\n"        .
-            $$msg       .
-            "\x00"
-        );
-
-        # $self->{_WORKER}->{jobs_count}++; # outbound
-
-        last unless @$messages;
-    }
-}
-
-sub ack {
-    my ($self, $fh, $hdr) = @_;
-
-    my $ack_id = $hdr->{'id'} ||                                     # STOMP 1.2                 
-                 $hdr->{'subscription'} .':'. $hdr->{'message-id'};  # STOMP 1.1
-
-    #  $sent_msg = [$dest, $hdr, $msg]
-    my $sent_msg = delete $fh->{pending_ack}->{$ack_id};
-
-    unless ($sent_msg) {
-        $self->error($fh, "Unmatched ACK");
-        return;
-    }
-
-    $self->receipt($fh, $hdr);
-
-    $self->_service_queue( $sent_msg->[0] );
-}
-
-sub nack {
-    my ($self, $fh, $hdr) = @_;
-
-    my $ack_id = $hdr->{'id'} ||                                     # STOMP 1.2                 
-                 $hdr->{'subscription'} .':'. $hdr->{'message-id'};  # STOMP 1.1
-
-    #  $sent_msg = [$dest, $hdr, $msg]
-    my $sent_msg = delete $fh->{pending_ack}->{$ack_id};
-
-    unless ($sent_msg) {
-        $self->error($fh, "Unmatched NACK");
-        return;
-    }
-
-    $sent_msg->[1]->{'redelivered'}++;
-
-    $self->receipt($fh, $hdr);
-
-    $self->_send_to_queue( @$sent_msg );
+    $subscription->send_message( $message, $self );
 }
 
 1;
+
+__END__
+
+=pod
+
+=encoding utf8
+
+=head1 NAME
+
+Beekeeper::Service::ToyBroker::Worker - Basic MQTT 5 broker
+
+=head1 VERSION
+
+Version 0.04
+
+=head1 DESCRIPTION
+
+ToyBroker implements a small MQTT subset needed to run a Beekeeper worker pool.
+
+Being single threaded it does not scale at all, but it is suitable for development
+or running tests.
+
+ToyBroker is configured from file C<toybroker.config.json>, which is looked for 
+in ENV C<BEEKEEPER_CONFIG_DIR>, C<~/.config/beekeeper> and then C</etc/beekeeper>.
+
+Example configuration:
+
+  [
+      {
+          "listen_addr" : "127.0.0.1",
+          "listen_port" : "1883",
+  
+          "users" : {
+              "backend" : { "password" : "def456" },
+          },
+      },
+      {
+          "listen_addr" : "127.0.0.1",
+          "listen_port" : "8001",
+  
+          "users" : {
+              "frontend" : { "password" : "abc123" },
+              "router"   : { "password" : "ghi789" },
+          },
+      },
+  ]
+
+=head1 AUTHOR
+
+José Micó, C<jose.mico@gmail.com>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright 2021 José Micó.
+
+This is free software; you can redistribute it and/or modify it under the same 
+terms as the Perl 5 programming language itself.
+
+This software is distributed in the hope that it will be useful, but it is 
+provided “as is” and without any express or implied warranties. For details, 
+see the full text of the license in the file LICENSE.
+
+=cut

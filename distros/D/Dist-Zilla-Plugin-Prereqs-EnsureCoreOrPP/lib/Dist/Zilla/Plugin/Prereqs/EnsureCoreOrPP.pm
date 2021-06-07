@@ -1,7 +1,9 @@
 package Dist::Zilla::Plugin::Prereqs::EnsureCoreOrPP;
 
-our $DATE = '2016-02-19'; # DATE
-our $VERSION = '0.09'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2021-05-31'; # DATE
+our $DIST = 'Dist-Zilla-Plugin-Prereqs-EnsureCoreOrPP'; # DIST
+our $VERSION = '0.100'; # VERSION
 
 use 5.010001;
 use strict;
@@ -25,7 +27,7 @@ sub setup_installer {
     $self->log(["Listing prereqs ..."]);
     my $res = call_lcpan_script(argv=>[
         "deps", "-R",
-        grep {$_ ne 'perl'} keys %$rr_prereqs]);
+        grep {$_ ne 'perl'} map {("--module", "$_")} keys %$rr_prereqs]);
     $self->log_fatal(["Can't lcpan deps: %s - %s", $res->[0], $res->[1]])
         unless $res->[0] == 200;
     my $has_err;
@@ -63,7 +65,7 @@ Dist::Zilla::Plugin::Prereqs::EnsureCoreOrPP - Make sure that prereqs (and their
 
 =head1 VERSION
 
-This document describes version 0.09 of Dist::Zilla::Plugin::Prereqs::EnsureCoreOrPP (from Perl distribution Dist-Zilla-Plugin-Prereqs-EnsureCoreOrPP), released on 2016-02-19.
+This document describes version 0.100 of Dist::Zilla::Plugin::Prereqs::EnsureCoreOrPP (from Perl distribution Dist-Zilla-Plugin-Prereqs-EnsureCoreOrPP), released on 2021-05-31.
 
 =head1 SYNOPSIS
 
@@ -108,6 +110,8 @@ feature.
 
 L<App::FatPacker>, L<App::depak>
 
+L<Dist::Zilla::Plugin::Prereqs::EnsureCore>
+
 L<Dist::Zilla::Plugin::Prereqs::EnsurePP>
 
 Related plugins: L<Dist::Zilla::Plugin::CheckPrereqsIndexed>,
@@ -122,7 +126,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2016, 2015 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

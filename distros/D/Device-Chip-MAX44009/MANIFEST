@@ -1,0 +1,12 @@
+Build.PL
+Changes
+lib/Device/Chip/MAX44009.pm
+MANIFEST			This list of files
+t/00use.t
+t/01config.t
+t/02read.t
+t/99pod.t
+README
+LICENSE
+META.yml
+META.json

@@ -1,0 +1,17 @@
+#!/bin/bash
+
+set -ex
+
+. ./maint/ref-config
+
+if [ -z "${ARCHIVE_LIBARCHIVE_REF_BUILD_FLAGS}" ]; then
+  export ARCHIVE_LIBARCHIVE_REF_BUILD_FLAGS="--build-arg BUILDKIT_INLINE_CACHE=1"
+fi
+
+cd maint/ref
+docker build -t plicease/libarchive-ref:$REF_TAG \
+  --build-arg latest=$REF_LATEST                 \
+  --build-arg oldest=$REF_OLDEST                 \
+  --build-arg unsupported=$REF_UNSUPPORTED       \
+  $ARCHIVE_LIBARCHIVE_REF_BUILD_FLAGS            \
+  .

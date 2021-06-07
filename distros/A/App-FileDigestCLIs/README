@@ -1,8 +1,37 @@
+NAME
+    App::FileDigestCLIs - CLIs for File::Digest
+
+VERSION
+    This document describes version 0.002 of App::FileDigestCLIs (from Perl
+    distribution App-FileDigestCLIs), released on 2021-05-25.
+
 SYNOPSIS
-
 DESCRIPTION
-
     This distribution includes several utilities:
 
-    #INSERT_EXECS_LIST
+    *   digest-files
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/App-FileDigestCLIs>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-App-FileDigestCLIs>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=App-FileDigestCLIs>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2021, 2016 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

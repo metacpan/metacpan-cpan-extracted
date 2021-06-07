@@ -27,12 +27,18 @@ use Future::AsyncAwait;
       precision => 3;
 
    async method measure_width () { return 4.56; };
+
+   declare_sensor size =>
+      units     => "metres",
+      precision => 2;
+
+   async method read_size () { return 30, 50; };
 }
 
 my $chip = TestChip->new;
 
 my @sensors = $chip->list_sensors;
-is( scalar @sensors, 2, '$chip->list_sensors yields 2 sensors' );
+is( scalar @sensors, 3, '$chip->list_sensors yields 3 sensors' );
 
 {
    my $sensor = $sensors[0];
@@ -45,12 +51,20 @@ is( scalar @sensors, 2, '$chip->list_sensors yields 2 sensors' );
    is( await $sensor->read, 1.234, '$sensor->read yields reading' );
 
    is( $sensor->format( await $sensor->read ), "1.23", '$sensor->format returns string' );
+
+   is( $sensor->format( undef ), undef, '$sensor->format undef yields undef' );
 }
 
 {
    my $sensor = $sensors[1];
 
    is( await $sensor->read, 4.56, 'sensor with method declaration calls alternate method' );
+}
+
+{
+   my $sensor = $sensors[2];
+
+   is_deeply( [ await $sensor->read ], [ 30 ], 'sensor is read as a single scalar' );
 }
 
 done_testing;

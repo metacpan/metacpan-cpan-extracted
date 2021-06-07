@@ -32,7 +32,7 @@
       },
       "runtime" : {
          "requires" : {
-            "PDL" : "2.034"
+            "PDL" : "2.047"
          }
       },
       "test" : {
@@ -53,7 +53,7 @@
          "web" : "https://github.com/PDLPorters/pdl-linearalgebra"
       }
    },
-   "version" : "0.18",
+   "version" : "0.20",
    "x_IRC" : "irc://irc.perl.org/#pdl",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

@@ -47,7 +47,7 @@ resources:
   bugtracker: https://github.com/perlancar/perl-Perinci-To-Doc/issues
   homepage: https://metacpan.org/release/Perinci-To-Doc
   repository: git://github.com/perlancar/perl-Perinci-To-Doc.git
-version: '0.875'
+version: '0.877'
 x_Dist_Zilla:
   perl:
     version: '5.030000'

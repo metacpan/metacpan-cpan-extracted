@@ -4,7 +4,7 @@
       "Paul Evans <leonerd@leonerd.org.uk>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4224",
+   "generated_by" : "Module::Build version 0.4231",
    "license" : [
       "perl_5"
    ],
@@ -21,7 +21,8 @@
       },
       "runtime" : {
          "requires" : {
-            "IO::Socket::INET" : "0"
+            "IO::Socket::INET" : "0",
+            "perl" : "5.014"
          }
       },
       "test" : {
@@ -34,15 +35,15 @@
    "provides" : {
       "Metrics::Any::Adapter::DogStatsd" : {
          "file" : "lib/Metrics/Any/Adapter/DogStatsd.pm",
-         "version" : "0.02"
+         "version" : "0.03"
       },
       "Metrics::Any::Adapter::SignalFx" : {
          "file" : "lib/Metrics/Any/Adapter/SignalFx.pm",
-         "version" : "0.02"
+         "version" : "0.03"
       },
       "Metrics::Any::Adapter::Statsd" : {
          "file" : "lib/Metrics/Any/Adapter/Statsd.pm",
-         "version" : "0.02"
+         "version" : "0.03"
       }
    },
    "release_status" : "stable",
@@ -51,6 +52,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.02",
-   "x_serialization_backend" : "JSON::PP version 4.04"
+   "version" : "0.03",
+   "x_serialization_backend" : "JSON::PP version 4.05"
 }

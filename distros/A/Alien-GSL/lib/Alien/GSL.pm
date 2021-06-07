@@ -2,11 +2,11 @@ package Alien::GSL;
 
 use strict;
 use warnings;
+use 5.008001;
 
-our $VERSION = '1.02';
-$VERSION = eval $VERSION;
+our $VERSION = '1.03';
 
-use parent 'Alien::Base';
+use base 'Alien::Base';
 
 1;
 
@@ -80,7 +80,7 @@ L<Math::GSL>
 
 =head1 SOURCE REPOSITORY
 
-L<https://github.com/Perl5-Alien/Alien-GSL>
+L<https://github.com/PerlAlien/Alien-GSL>
 
 =head1 AUTHOR
 

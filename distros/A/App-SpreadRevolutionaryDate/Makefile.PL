@@ -16,7 +16,7 @@ use 5.014;
 use ExtUtils::MakeMaker;
 
 my %WriteMakefileArgs = (
-  "ABSTRACT" => "Spread date and time from Revolutionary (Republican) Calendar on Twitter, Mastodon and Freenode.",
+  "ABSTRACT" => "Spread date and time from Revolutionary (Republican) Calendar on Twitter, Mastodon, Freenode and Liberachat.",
   "AUTHOR" => "G\x{e9}rald S\x{e9}drati-Dinet <gibus\@cpan.org>",
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0
@@ -68,7 +68,7 @@ my %WriteMakefileArgs = (
     "strict" => 0,
     "warnings" => 0
   },
-  "VERSION" => "0.29",
+  "VERSION" => "0.31",
   "test" => {
     "TESTS" => "t/*.t"
   }

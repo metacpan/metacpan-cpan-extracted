@@ -31,7 +31,6 @@
       },
       "test" : {
          "requires" : {
-            "Test::Fatal" : "0",
             "Test::More" : "0.88"
          }
       }
@@ -39,11 +38,11 @@
    "provides" : {
       "XS::Parse::Keyword" : {
          "file" : "lib/XS/Parse/Keyword.pm",
-         "version" : "0.03"
+         "version" : "0.06"
       },
       "XS::Parse::Keyword::Builder" : {
          "file" : "lib/XS/Parse/Keyword/Builder.pm",
-         "version" : "0.03"
+         "version" : "0.06"
       }
    },
    "release_status" : "stable",
@@ -52,6 +51,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.03",
+   "version" : "0.06",
    "x_serialization_backend" : "JSON::PP version 4.05"
 }

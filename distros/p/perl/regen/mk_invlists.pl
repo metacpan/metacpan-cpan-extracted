@@ -52,7 +52,7 @@ my $table_name_prefix = "UNI_";
 my $enum_name_re = qr / ^ [[:alpha:]] \w* $ /ax;
 
 my $out_fh = open_new('charclass_invlists.h', '>',
-		      {style => '*', by => 'regen/mk_invlists.pl',
+                      {style => '*', by => 'regen/mk_invlists.pl',
                       from => "Unicode::UCD"});
 
 my $in_file_pound_if = "";
@@ -1029,13 +1029,20 @@ sub _Perl_IVCF {
     }
 
     # Now go through and make some adjustments.  We add synthetic entries for
-    # two cases.
-    # 1) Two or more code points can fold to the same multiple character,
+    # three cases.
+    # 1) If the fold of a Latin1-range character is above that range, some
+    #    coding in regexec.c can be saved by creating a reverse map here.  The
+    #    impetus for this is that U+B5 (MICRO SIGN) folds to the Greek small
+    #    mu (U+3BC).  That fold isn't done at regex pattern compilation time
+    #    if it means that the pattern would have to be translated into UTF-8,
+    #    whose operation is slower.  At run time, having this reverse
+    #    translation eliminates some special cases in the code.
+    # 2) Two or more code points can fold to the same multiple character,
     #    sequence, as U+FB05 and U+FB06 both fold to 'st'.  This code is only
     #    for single character folds, but FB05 and FB06 are single characters
     #    that are equivalent folded, so we add entries so that they are
     #    considered to fold to each other
-    # 2) If two or more above-Latin1 code points fold to the same Latin1 range
+    # 3) If two or more above-Latin1 code points fold to the same Latin1 range
     #    one, we also add entries so that they are considered to fold to each
     #    other.  This is so that under /aa or /l matching, where folding to
     #    their Latin1 range code point is illegal, they still can fold to each
@@ -1048,9 +1055,28 @@ sub _Perl_IVCF {
         # scalar
         if (scalar $new{$fold}->@* == 1) {
             $new{$fold} = $new{$fold}[0];
+
+            # Handle case 1) above: if there were a Latin1 range code point
+            # whose fold is above that range, this creates an extra entry that
+            # maps the other direction, and would save some special case code.
+            # (The one current case of this is handled in the else clause
+            # below.)
+            $new{$new{$fold}} = $fold if $new{$fold} < 256 && $fold > 255;
         }
         else {
 
+            # Handle case 1) when there are multiple things that fold to an
+            # above-Latin1 code point, at least one of which is in Latin1.
+            if (! $folds_to_string && $fold > 255) {
+                foreach my $cp ($new{$fold}->@*) {
+                    if ($cp < 256) {
+                        my @new_entry = grep { $_ != $cp } $new{$fold}->@*;
+                        push @new_entry, $fold;
+                        $new{$cp}->@* = @new_entry;
+                    }
+                }
+            }
+                
             # Otherwise, sort numerically.  This places the highest code point
             # in the list at the tail end.  This is because Unicode keeps the
             # lowercase code points as higher ordinals than the uppercase, at
@@ -3303,7 +3329,7 @@ for my $i (0 .. @perl_prop_synonyms - 1) {
 }
 
 my $uni_pl = open_new('lib/unicore/uni_keywords.pl', '>',
-		      {style => '*', by => 'regen/mk_invlists.pl',
+                      {style => '*', by => 'regen/mk_invlists.pl',
                       from => "Unicode::UCD"});
 {
     print $uni_pl "\%Unicode::UCD::uni_prop_ptrs_indices = (\n";
@@ -3326,8 +3352,10 @@ sub token_name
 }
 
 my $keywords_fh = open_new('uni_keywords.h', '>',
-		  {style => '*', by => 'regen/mk_invlists.pl',
+                  {style => '*', by => 'regen/mk_invlists.pl',
                   from => "mph.pl"});
+
+print $keywords_fh "\n#if defined(PERL_CORE) || defined(PERL_EXT_RE_BUILD)\n\n";
 
 my ($second_level, $seed1, $length_all_keys, $smart_blob, $rows)
                         = MinimalPerfectHash::make_mph_from_hash(\%keywords);
@@ -3335,6 +3363,7 @@ print $keywords_fh MinimalPerfectHash::make_algo($second_level, $seed1,
                                                  $length_all_keys, $smart_blob,
                                                  $rows, undef, undef, undef,
                                                  'match_uniprop' );
+print $keywords_fh "\n#endif /* #if defined(PERL_CORE) || defined(PERL_EXT_RE_BUILD) */\n";
 
 push @sources, 'regen/mph.pl';
 read_only_bottom_close_and_rename($keywords_fh, \@sources);

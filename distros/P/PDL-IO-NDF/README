@@ -19,7 +19,7 @@ Requires the following modules from CPAN
    PDL
    Astro::FITS::Header
 
-PDL 2.4.x or newer is required.
+PDL 2.040 or newer is required.
 
 You will also need the NDF module available from
 git://github.com/Starlink/perl-NDF.git and the NDF library

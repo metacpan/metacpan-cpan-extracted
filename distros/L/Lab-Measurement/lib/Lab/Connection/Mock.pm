@@ -1,6 +1,6 @@
 package Lab::Connection::Mock;
 #ABSTRACT: ???
-$Lab::Connection::Mock::VERSION = '3.750';
+$Lab::Connection::Mock::VERSION = '3.751';
 use v5.20;
 
 use warnings;
@@ -129,7 +129,7 @@ Lab::Connection::Mock - ???
 
 =head1 VERSION
 
-version 3.750
+version 3.751
 
 =head1 COPYRIGHT AND LICENSE
 

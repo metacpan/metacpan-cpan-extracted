@@ -1,0 +1,5 @@
+Seq Scan on pg_class  (cost=0.00..17.95 rows=66 width=265) (actual time=0.026..0.261 rows=67 loops=1)
+  Filter: (relkind = 'r'::"char")
+  Rows Removed by Filter: 330
+Planning Time: 1.434 ms
+Execution Time: 0.499 ms

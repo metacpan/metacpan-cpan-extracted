@@ -3,12 +3,13 @@ package Form::Tiny::Error;
 use v5.10;
 use warnings;
 use Moo;
-use Types::Standard qw(Maybe Str Object ArrayRef InstanceOf);
+use Types::Standard qw(Maybe Str);
+use Types::TypeTiny qw(StringLike);
 use Carp qw(confess);
 
 use namespace::clean;
 
-our $VERSION = '1.13';
+our $VERSION = '2.01';
 
 use overload
 	q{""} => "as_string",
@@ -18,11 +19,13 @@ has "field" => (
 	is => "ro",
 	isa => Maybe [Str],
 	writer => "set_field",
+	default => sub { undef },
 );
 
 has "error" => (
 	is => "ro",
-	isa => Str | Object,
+	isa => StringLike,
+	writer => 'set_error',
 	builder => "_default_error",
 );
 
@@ -105,15 +108,19 @@ Form::Tiny::Error - form error wrapper
 	my $field = $error->field; # field name or undef
 	my $data = $error->error; # error message or nested error object
 
+	# concatenated error message: "$field - $data"
 	my $message = $error->as_string;
+
+	# change error message
+	$error->set_error('new_message');
 
 =head1 DESCRIPTION
 
-Form errors feature field name which caused validation error, error message and automatic stringification.
+The form errors class features field name which caused validation error, error message and automatic stringification.
 
 The C<< $error->error >> can return a nested error object in case of nested forms.
 
-A couple of in-place subclasses are provided to differentiate the type of error which occured. There are:
+A couple of in-place subclasses are provided to differentiate the type of error which occured. These are:
 
 =over
 

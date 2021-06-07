@@ -3,8 +3,8 @@
  * Author: Salvador Fandino <sfandino@yahoo.com>, Dave Rolsky <autarch@urth.org>
  * Version: 2.1
  *
- * Generated on: 2016-01-01 07:50:27
- * Math::Int64 version: 0.53
+ * Generated on: 2017-08-15 16:56:23
+ * Math::Int64 version: 0.54
  * Module::CAPIMaker version: 
  */
 

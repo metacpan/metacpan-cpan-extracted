@@ -1,5 +1,9 @@
 Revision history for IO-Async-Loop-Epoll
 
+0.22    2021-05-27
+        [BUGFIXES]
+         * Fix for zero timeout when using fakeevents
+
 0.21    2020-05-05
         [CHANGES]
          * Support IO::Async 0.76

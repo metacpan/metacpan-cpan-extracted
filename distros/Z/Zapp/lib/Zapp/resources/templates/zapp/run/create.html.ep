@@ -1,0 +1,17 @@
+<%
+    layout 'zapp';
+    use Mojo::JSON qw( encode_json );
+    use Zapp::Util qw( prefix_field );
+%>
+
+
+<header>
+    <h1><%= stash( 'label' ) // stash( 'name' ) %></h1>
+    %= link_to 'zapp.list_plans', class => 'btn btn-secondary', begin
+        <i class="fa fa-arrow-left"></i> Back to Plans
+    % end
+</header>
+<div class="mb-3 text-break text-pre-wrap"><%= stash 'description' %></div>
+
+%= include 'zapp/partials/run_form'
+%= include 'zapp/run/task_list', tasks => $tasks

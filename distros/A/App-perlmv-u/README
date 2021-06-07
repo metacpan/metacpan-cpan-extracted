@@ -2,8 +2,8 @@ NAME
     App::perlmv::u - Rename files using Perl code, with undo/redo
 
 VERSION
-    This document describes version 0.005 of App::perlmv::u (from Perl
-    distribution App-perlmv-u), released on 2017-08-19.
+    This document describes version 0.006 of App::perlmv::u (from Perl
+    distribution App-perlmv-u), released on 2021-05-25.
 
 DESCRIPTION
     See included script perlmv-u.
@@ -12,7 +12,7 @@ FUNCTIONS
   clear_history
     Usage:
 
-     clear_history() -> [status, msg, result, meta]
+     clear_history() -> [$status_code, $reason, $payload, \%result_meta]
 
     Clear undo history.
 
@@ -22,19 +22,19 @@ FUNCTIONS
 
     Returns an enveloped result (an array).
 
-    First element (status) is an integer containing HTTP status code (200
-    means OK, 4xx caller error, 5xx function error). Second element (msg) is
-    a string containing error message, or 'OK' if status is 200. Third
-    element (result) is optional, the actual result. Fourth element (meta)
-    is called result metadata and is optional, a hash that contains extra
-    information.
+    First element ($status_code) is an integer containing HTTP status code
+    (200 means OK, 4xx caller error, 5xx function error). Second element
+    ($reason) is a string containing error message, or "OK" if status is
+    200. Third element ($payload) is optional, the actual result. Fourth
+    element (%result_meta) is called result metadata and is optional, a hash
+    that contains extra information.
 
     Return value: (any)
 
   history
     Usage:
 
-     history() -> [status, msg, result, meta]
+     history() -> [$status_code, $reason, $payload, \%result_meta]
 
     Show undo history.
 
@@ -44,19 +44,19 @@ FUNCTIONS
 
     Returns an enveloped result (an array).
 
-    First element (status) is an integer containing HTTP status code (200
-    means OK, 4xx caller error, 5xx function error). Second element (msg) is
-    a string containing error message, or 'OK' if status is 200. Third
-    element (result) is optional, the actual result. Fourth element (meta)
-    is called result metadata and is optional, a hash that contains extra
-    information.
+    First element ($status_code) is an integer containing HTTP status code
+    (200 means OK, 4xx caller error, 5xx function error). Second element
+    ($reason) is a string containing error message, or "OK" if status is
+    200. Third element ($payload) is optional, the actual result. Fourth
+    element (%result_meta) is called result metadata and is optional, a hash
+    that contains extra information.
 
     Return value: (any)
 
   move_multiple
     Usage:
 
-     move_multiple(%args) -> [status, msg, result, meta]
+     move_multiple(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
     This function is not exported.
 
@@ -80,39 +80,39 @@ FUNCTIONS
 
     *   -tx_action => *str*
 
-        For more information on transaction, see Rinci::Transaction.
+        For more information on transaction, see L<Rinci::Transaction>.
 
     *   -tx_action_id => *str*
 
-        For more information on transaction, see Rinci::Transaction.
+        For more information on transaction, see L<Rinci::Transaction>.
 
     *   -tx_recovery => *str*
 
-        For more information on transaction, see Rinci::Transaction.
+        For more information on transaction, see L<Rinci::Transaction>.
 
     *   -tx_rollback => *str*
 
-        For more information on transaction, see Rinci::Transaction.
+        For more information on transaction, see L<Rinci::Transaction>.
 
     *   -tx_v => *str*
 
-        For more information on transaction, see Rinci::Transaction.
+        For more information on transaction, see L<Rinci::Transaction>.
 
     Returns an enveloped result (an array).
 
-    First element (status) is an integer containing HTTP status code (200
-    means OK, 4xx caller error, 5xx function error). Second element (msg) is
-    a string containing error message, or 'OK' if status is 200. Third
-    element (result) is optional, the actual result. Fourth element (meta)
-    is called result metadata and is optional, a hash that contains extra
-    information.
+    First element ($status_code) is an integer containing HTTP status code
+    (200 means OK, 4xx caller error, 5xx function error). Second element
+    ($reason) is a string containing error message, or "OK" if status is
+    200. Third element ($payload) is optional, the actual result. Fourth
+    element (%result_meta) is called result metadata and is optional, a hash
+    that contains extra information.
 
     Return value: (any)
 
   perlmv
     Usage:
 
-     perlmv(%args) -> [status, msg, result, meta]
+     perlmv(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
     Rename files using Perl code, with undo/redo.
 
@@ -145,19 +145,19 @@ FUNCTIONS
 
     Returns an enveloped result (an array).
 
-    First element (status) is an integer containing HTTP status code (200
-    means OK, 4xx caller error, 5xx function error). Second element (msg) is
-    a string containing error message, or 'OK' if status is 200. Third
-    element (result) is optional, the actual result. Fourth element (meta)
-    is called result metadata and is optional, a hash that contains extra
-    information.
+    First element ($status_code) is an integer containing HTTP status code
+    (200 means OK, 4xx caller error, 5xx function error). Second element
+    ($reason) is a string containing error message, or "OK" if status is
+    200. Third element ($payload) is optional, the actual result. Fourth
+    element (%result_meta) is called result metadata and is optional, a hash
+    that contains extra information.
 
     Return value: (any)
 
   redo
     Usage:
 
-     redo() -> [status, msg, result, meta]
+     redo() -> [$status_code, $reason, $payload, \%result_meta]
 
     Redo last undone action.
 
@@ -167,19 +167,19 @@ FUNCTIONS
 
     Returns an enveloped result (an array).
 
-    First element (status) is an integer containing HTTP status code (200
-    means OK, 4xx caller error, 5xx function error). Second element (msg) is
-    a string containing error message, or 'OK' if status is 200. Third
-    element (result) is optional, the actual result. Fourth element (meta)
-    is called result metadata and is optional, a hash that contains extra
-    information.
+    First element ($status_code) is an integer containing HTTP status code
+    (200 means OK, 4xx caller error, 5xx function error). Second element
+    ($reason) is a string containing error message, or "OK" if status is
+    200. Third element ($payload) is optional, the actual result. Fourth
+    element (%result_meta) is called result metadata and is optional, a hash
+    that contains extra information.
 
     Return value: (any)
 
   undo
     Usage:
 
-     undo(%args) -> [status, msg, result, meta]
+     undo(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
     Undo last action.
 
@@ -191,12 +191,12 @@ FUNCTIONS
 
     Returns an enveloped result (an array).
 
-    First element (status) is an integer containing HTTP status code (200
-    means OK, 4xx caller error, 5xx function error). Second element (msg) is
-    a string containing error message, or 'OK' if status is 200. Third
-    element (result) is optional, the actual result. Fourth element (meta)
-    is called result metadata and is optional, a hash that contains extra
-    information.
+    First element ($status_code) is an integer containing HTTP status code
+    (200 means OK, 4xx caller error, 5xx function error). Second element
+    ($reason) is a string containing error message, or "OK" if status is
+    200. Third element ($payload) is optional, the actual result. Fourth
+    element (%result_meta) is called result metadata and is optional, a hash
+    that contains extra information.
 
     Return value: (any)
 
@@ -222,7 +222,7 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2017 by perlancar@cpan.org.
+    This software is copyright (c) 2021, 2017 by perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

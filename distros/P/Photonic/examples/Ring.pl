@@ -36,7 +36,6 @@ use strict;
 use warnings;
 use feature qw(say);
 use Getopt::Long;
-use List::Util;
 use constant PI=>4*atan2(1,1);
 
 use Photonic::Geometry::FromB;
@@ -48,8 +47,8 @@ use PDL;
 use PDL::NiceSlice;
 use PDL::Complex;
 
-set_autopthread_targ(4);;
-set_autopthread_size(4);;
+set_autopthread_targ(4);
+set_autopthread_size(4);
 
 # It is a bidimensional problem where the macroscopic dielectric
 # tensor components are calculated into the polarization direction

@@ -1,5 +1,10 @@
 Revision history for Perl module XS::Check
 
+0.13 2021-05-26
+
+- Document additions of version 0.12
+- Add #elif to allowed preprocessor statements
+
 0.12 2021-05-09
 
 - Warn to specify byte or utf8 with SvPV

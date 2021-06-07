@@ -16,11 +16,15 @@ use My::Module::Meta;
 # the contents of the Makefile that is written.
 
 my %opt;
-getopts ('ny', \%opt) or die <<'EOD';
+getopts ('ntuy', \%opt) or die <<'EOD';
 The only legal options are
-  -n = answer all questions 'no'.
+  -n = answer all questions 'no';
+  -t = use traditional Mac default text flavor;
+  -u = use UTF-8 as default text flavor;
   -y = answer all questions 'yes'.
-You may not assert both of these at once - it is too confusing.
+You may not assert both -n and -y, nor both -t and -u.
+The default text flavor is UTF-8 for macOS 10.14 Mojave and later, and
+traditional for 10.13 High Sierra and earlier.
 EOD
 
 my $meta = My::Module::Meta->new();
@@ -35,7 +39,7 @@ push @clean_files, 'pbl';	# Just in case we built it.
 
 (my $mmv = ExtUtils::MakeMaker->VERSION) =~ s/_//g;
 
-my @ccflags = $meta->ccflags();
+my @ccflags = $meta->ccflags( \%opt );
 
 my %args = (
     ABSTRACT	=> $meta->abstract(),

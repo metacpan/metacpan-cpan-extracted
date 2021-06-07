@@ -17,7 +17,7 @@ name: Device-Chip-TSL256x
 provides:
   Device::Chip::TSL256x:
     file: lib/Device/Chip/TSL256x.pm
-    version: '0.05'
+    version: '0.06'
 requires:
   Data::Bitfield: '0'
   Device::Chip: '0.03'
@@ -27,5 +27,5 @@ requires:
   perl: '5.026'
 resources:
   license: http://dev.perl.org/licenses/
-version: '0.05'
+version: '0.06'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

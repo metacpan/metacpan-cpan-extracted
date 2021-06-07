@@ -3,6 +3,8 @@
  *
  *  (C) Paul Evans, 2021 -- leonerd@leonerd.org.uk
  */
+#define PERL_NO_GET_CONTEXT
+
 #include "EXTERN.h"
 #include "perl.h"
 #include "XSUB.h"
@@ -26,7 +28,8 @@
 
 #include "dispatchop.h"
 
-static OP *newPADSVOP(I32 type, I32 flags, PADOFFSET padix)
+#define newPADSVOP(type, flags, padix)  MY_newPADSVOP(aTHX_ type, flags, padix)
+static OP *MY_newPADSVOP(pTHX_ I32 type, I32 flags, PADOFFSET padix)
 {
   OP *op = newOP(type, flags);
   op->op_targ = padix;
@@ -39,11 +42,19 @@ static OP *pp_dispatch_numeq(pTHX)
   dTARGET;
   int idx;
 
+  bool has_magic = SvAMAGIC(TARG);
+
   for(idx = 0; idx < n_cases; idx++) {
     SV *val = values[idx];
 
+    SV *ret;
+    if(has_magic &&
+        (ret = amagic_call(TARG, val, eq_amg, 0))) {
+      if(SvTRUE(ret))
+        return dispatch[idx];
+    }
     /* stolen from core's pp_hot.c / pp_eq() */
-    if((SvIOK_notUV(TARG) && SvIOK_notUV(val)) ?
+    else if((SvIOK_notUV(TARG) && SvIOK_notUV(val)) ?
         SvIVX(TARG) == SvIVX(val) : (Perl_do_ncmp(aTHX_ TARG, val) == 0))
       return dispatch[idx];
   }
@@ -57,9 +68,20 @@ static OP *pp_dispatch_streq(pTHX)
   dTARGET;
   int idx;
 
-  for(idx = 0; idx < n_cases; idx++)
-    if(sv_eq(TARG, values[idx]))
+  bool has_magic = SvAMAGIC(TARG);
+
+  for(idx = 0; idx < n_cases; idx++) {
+    SV *val = values[idx];
+
+    SV *ret;
+    if(has_magic &&
+        (ret = amagic_call(TARG, val, seq_amg, 0))) {
+      if(SvTRUE(ret))
+        return dispatch[idx];
+    }
+    else if(sv_eq(TARG, val))
       return dispatch[idx];
+  }
 
   return cDISPATCHOP->op_other;
 }
@@ -79,13 +101,13 @@ static OP *pp_dispatch_isa(pTHX)
 }
 #endif
 
-static OP *build_cases(pTHX_ OPCODE matchtype, PADOFFSET padix, size_t n_cases, XSParseKeywordPiece *args, OP *elseop)
+static OP *build_cases(pTHX_ OPCODE matchtype, PADOFFSET padix, size_t n_cases, XSParseKeywordPiece *args[], OP *elseop)
 {
   assert(n_cases);
 
   if(n_cases == 1) {
-    OP *caseop = args[0].op;
-    OP *block  = op_scope(args[1].op);
+    OP *caseop = args[0]->op;
+    OP *block  = op_scope(args[1]->op);
     OP *testop = NULL;
 
     switch(matchtype) {
@@ -121,7 +143,7 @@ static OP *build_cases(pTHX_ OPCODE matchtype, PADOFFSET padix, size_t n_cases, 
 
   int idx;
   for(idx = 0; idx < n_cases; idx++)
-    assert(args[idx*2].op->op_type == OP_CONST);
+    assert(args[idx*2]->op->op_type == OP_CONST);
   assert(matchtype != OP_MATCH);
 
   ENTER;
@@ -136,15 +158,7 @@ static OP *build_cases(pTHX_ OPCODE matchtype, PADOFFSET padix, size_t n_cases, 
 
   DISPATCHOP *o = alloc_DISPATCHOP();
   o->op_type = OP_CUSTOM;
-  o->op_private = 0;
-  o->op_next = NULL;
-#if HAVE_PERL_VERSION(5,26,0)
-  o->op_sibparent = NULL;
-#else
-  o->op_sibling = NULL;
-#endif
   o->op_targ = padix;
-  o->op_flags = 0;
 
   switch(matchtype) {
 #ifdef HAVE_OP_ISA
@@ -163,8 +177,8 @@ static OP *build_cases(pTHX_ OPCODE matchtype, PADOFFSET padix, size_t n_cases, 
   OP *retop = newUNOP(OP_NULL, 0, (OP *)o);
 
   for(idx = 0; idx < n_cases; idx++) {
-    OP *caseop = args[idx*2].op;
-    OP *block  = op_scope(args[idx*2+1].op);
+    OP *caseop = args[idx*2]->op;
+    OP *block  = op_scope(args[idx*2+1]->op);
 
     values[idx] = SvREFCNT_inc(cSVOPx(caseop)->op_sv);
     op_free(caseop);
@@ -193,7 +207,7 @@ static OP *build_cases(pTHX_ OPCODE matchtype, PADOFFSET padix, size_t n_cases, 
   return retop;
 }
 
-static int build_match(pTHX_ OP **out, XSParseKeywordPiece *args, size_t nargs, void *hookdata)
+static int build_match(pTHX_ OP **out, XSParseKeywordPiece *args[], size_t nargs, void *hookdata)
 {
   /* args:
    *   [0]: topic expression
@@ -204,10 +218,10 @@ static int build_match(pTHX_ OP **out, XSParseKeywordPiece *args, size_t nargs, 
    *   [3+2*ncases]: true if default exists
    *   [LAST]: default case if present
    */
-  OP *topic = args[0].op;
-  OPCODE matchtype = args[1].i;
-  int ncases = args[2].i;
-  bool with_default = args[3 + 2*ncases].i;
+  OP *topic = args[0]->op;
+  OPCODE matchtype = args[1]->i;
+  int ncases = args[2]->i;
+  bool with_default = args[3 + 2*ncases]->i;
 
   bool use_dispatch = hv_fetchs(GvHV(PL_hintgv), "Syntax::Keyword::Match/experimental(dispatch)", 0);
 
@@ -225,13 +239,13 @@ static int build_match(pTHX_ OP **out, XSParseKeywordPiece *args, size_t nargs, 
 
   OP *o = NULL;
   if(with_default)
-    o = op_scope(args[3 + 2*ncases + 1].op);
+    o = op_scope(args[3 + 2*ncases + 1]->op);
 
   int n_consts = 0;
   int idx;
   for (idx = 1 + 2*ncases; idx > 2; idx -= 2) {
     /* TODO: forbid the , operator in the case label */
-    OP *caseop = args[idx].op;
+    OP *caseop = args[idx]->op;
 
     switch(matchtype) {
 #ifdef HAVE_OP_ISA
@@ -243,7 +257,7 @@ static int build_match(pTHX_ OP **out, XSParseKeywordPiece *args, size_t nargs, 
 #endif
       case OP_SEQ:
       case OP_EQ:
-        args[idx].op = op_contextualize(caseop, G_SCALAR);
+        args[idx]->op = op_contextualize(caseop, G_SCALAR);
         if(use_dispatch && caseop->op_type == OP_CONST) {
           n_consts++;
           continue;
@@ -302,6 +316,6 @@ static const struct XSParseKeywordHooks hooks_match = {
 MODULE = Syntax::Keyword::Match    PACKAGE = Syntax::Keyword::Match
 
 BOOT:
-  boot_xs_parse_keyword(0);
+  boot_xs_parse_keyword(0.04);
 
   register_xs_parse_keyword("match", &hooks_match, NULL);

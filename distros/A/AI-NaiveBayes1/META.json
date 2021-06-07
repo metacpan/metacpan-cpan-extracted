@@ -1,7 +1,7 @@
 {
    "abstract" : "Naive Bayes Classification",
    "author" : [
-      "Vlado Keselj http://web.cs.dal.ca/~vlado"
+      "Vlado Keselj https://web.cs.dal.ca/~vlado"
    ],
    "dynamic_config" : 1,
    "generated_by" : "ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.150001",
@@ -37,5 +37,5 @@
       }
    },
    "release_status" : "stable",
-   "version" : "2.007"
+   "version" : "2.012"
 }

@@ -1,6 +1,6 @@
 #!/usr/bin/env perl
 
-use 5.022;
+use 5.024;
 # Using Test2, important to specify which version of Test2
 # since later versions may break things.
 use Test2::V0;
@@ -78,7 +78,7 @@ like(
     "test that debug flag warned on a testing log event"
 );
 $VC3->Debug( 0 );
-ok( no_warnings { $VC3->logd( 'retesting') }, 
+ok( no_warnings { $VC3->logd( 'retesting') },
   "not warning on log after debug flag switched off");
 
 done_testing();

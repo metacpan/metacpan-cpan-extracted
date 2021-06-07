@@ -50,6 +50,16 @@ Copy the value of the string, and return a new string.
 
 If the argument string is undef, return undef.
 
+=head2 hex
+
+  sub hex : int ($hex_string : string)
+
+Convert hex string to int value.
+
+the hex string must be defined, otherwise a exception occurs.
+
+the hex string must be a valid expression which is represented by a regex "^([0-9a-fA-F]{1,8})$", otherwise a exception occurs.
+
 =head2 index
 
   sub index : int ($string : string, $sub_string : string, $position : int)
@@ -278,3 +288,10 @@ If the convertion fails, a exception occuer.
   my $string = "1.25";
   my $num = to_double($string);
 
+=head2 trim_ascii_space
+
+  sub trim_ascii_space : string ($string : string)
+
+Remove right and left spaces of the string. These spaces is ascii standard spaces which can be checked by C<is_space> method.
+
+If the argument string is undef, return undef.

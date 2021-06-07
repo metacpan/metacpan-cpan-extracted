@@ -69,6 +69,14 @@ my %exp_count_for = (
             test => 'wrote expected reordered observed freqs .tsv file',
             args => { reorder => 1 },
         );
+
+        my $freqs_glb = $profiles->ppred_freqs($ali);
+
+        cmp_store(
+            obj => $freqs_glb, method => 'store',
+            file => 'obs-ppred-freqs-glb.tsv',
+            test => 'wrote expected (global) observed freqs .tsv file',
+        );
     }
 }
 

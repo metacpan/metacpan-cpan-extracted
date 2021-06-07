@@ -4,7 +4,7 @@ Net::Statsd::Lite - A lightweight StatsD client that supports multimetric packet
 
 # VERSION
 
-version v0.6.1
+version v0.6.2
 
 # SYNOPSIS
 
@@ -37,6 +37,7 @@ It supports the following features:
 
 - Multiple metrics can be sent in a single UDP packet.
 - It supports the meter and histogram metric types.
+- It can extended to support extensions such as tagging.
 
 Note that the specification requires the measured values to be
 integers no larger than 64-bits, but ideally 53-bits.

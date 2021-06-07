@@ -1,0 +1,501 @@
+=head1 NAME
+
+UniEvent::HTTP::Manager - extremely fast asynchronous preforking / threading event based web server
+
+
+
+=head1 SYNOPSIS
+
+    my $mgr = UniEvent::HTTP::Manager->new({
+        min_servers  => 3,
+        max_servers  => 20,
+        min_load     => 0.2,
+        max_load     => 0.7,
+        max_requests => 10000,
+        worker_model => UniEvent::HTTP::Manager::WORKER_PREFORK,
+        bind_model   => UniEvent::HTTP::Manager::BIND_REUSE_PORT,
+        server       => { locations => [{host => 'localhost', port => 8080}], },
+    });
+    
+    # called in different processes/threads, simple API
+    $mgr->request_callback(sub {
+        my $request = shift;
+        $request->respond({
+            code => 200,
+            body => "hi",
+        });
+    });
+    
+    # more detailed tuning
+    # called once per lifetime of worker process/thread
+    $mgr->spawn_callback(sub {
+        my $server = shift; # UniEvent::HTTP::Server object
+        # set callbacks in worker's server instance
+        $server->route_callback(sub {
+            ...
+        });
+    });
+
+    $mgr->run;
+
+    # run via Plack
+    plackup -s UniEvent::HTTP -E deployment --port 9090 --min_servers 1 --max_servers 10 --min_load 0.2 --max_load 0.7
+
+
+
+=head1 DESCRIPTION
+
+This module provides multi-process (or multi-thread) web server build on top of L<UniEvent::HTTP::Server>.
+It creates an instance of L<UniEvent::HTTP::Server> in each process/thread and maintain certain number of workers defined by config.
+
+L<UniEvent::HTTP::Server> is a full-featured asynchronous RFC-compliant event based http server, so does this module.
+
+Main features are:
+
+=over
+
+=item REAL high performance, faster than nginx
+
+For example, on AMD Ryzen 3950x + Debian 10, up to 1.500.000 keep-alive http requests per second with 16 workers (up to 100.000 per second per worker).
+
+=item Automatic workers management
+
+Adds workers when load increases and shutdowns when load decreases.
+
+=item Multiple listen interfaces support
+
+=item On-the-fly reconfiguration
+
+Including addresses/ports to listen, number of workers, etc...
+
+=item SSL support
+
+=item Asynchronous event loop based
+
+You can create timers, signals, custom tcp connections, etc... and run it in workers or master process. L<UniEvent> should be used as event loop
+framework.
+
+=item Support for graceful restart/stop
+
+Without interrupting any http request
+
+=item Blocking code support
+
+Request processing logic doesn't have to be asynchronous. Load management will nicely work even in this case (if using "min_load/max_load").
+This allows for smooth migration from synchronous to asynchronous code base in web servers.
+
+=item PSGI/Plack compatible
+
+Can run any PSGI applications and frameworks (performance penalties may apply).
+
+See L<Plack::Handler::UniEvent::HTTP>
+
+=item All the features inherited from L<UniEvent::HTTP::Server> like:
+
+=over
+
+=item HTTP/1.1 support
+
+Chunked requests and responses, keep-alive and pipeline requests
+
+=item Compression support
+
+incoming and outgoing
+
+=item Request/response streaming
+
+Directly into / from target without temporary files or memory consumption
+
+=back
+
+See L<UniEvent::HTTP> for the description of all features
+
+=back
+
+This module is a perl port of C++ panda::unievent::http::manager library.
+
+
+
+=head1 USING HTTP MANAGER
+
+First thing to do is to create an http manager object
+
+    my $manager = UE::HTTP::Manager->new({ ...config... });
+
+Config describes http manager parameters like how many workers there should be depending on various circumstances, how often to check for workers state,
+minimum worker time to live, maximum requests per worker, etc..., and the http server config itself in C<server> key. Http server config is not
+described here as it is directly passed to L<UniEvent::HTTP::Server>, so read its docs.
+
+At this point no workers are spawned and thus no http server objects are created yet. To add listeners to http server objects, you need to add
+callback for spawing a worker.
+
+    $manager->spawn_callback(sub {
+        my $server = shift;
+        ...
+    });
+
+This callback is called each time a new worker process/thread is created and is called in that worker's process/thread context.
+It is passed an http server object (L<UniEvent::HTTP::Server>) created with config from C<server> key of main config.
+
+We should add request processing and other callbacks to the server object at this point.
+
+    $manager->spawn_callback(sub {
+        my $server = shift;
+        
+        $server->request_callback(sub {
+            my $request = shift;
+            if ($request->uri->path eq "/hello") {
+                $request->respond({
+                    code    => 200,
+                    headers => {...},
+                    body    => "Hi",
+                });
+            } else {
+                $request->respond({code => 404});
+            }
+        });
+        
+        $server->error_callback(sub {
+            ...
+        });
+        
+        $server->stop_callback(sub {
+            # do the cleanup
+        });
+    });
+
+For more control over how request is processed server's C<route_callback> may be used. See L<UniEvent::HTTP::Server>.
+
+If you only need C<request_callback> on server, simple API can be used
+
+    $manager->request_callback(sub { ... });
+
+It will set that callback in each http server it spawns.
+
+
+After setting up things web server should be run
+
+    $manager->run;
+
+And this function will not return until server is stopped (it will run the event loop).
+
+
+To stop the web server C<stop()> can be called at any time.
+
+See docs below for detailed explanation on how it works.
+
+
+
+=head1 EVENT LOOPS IN HTTP MANAGER
+
+If you're not familiar with event loop programming you should probably first read docs about it. For example L<UniEvent> or L<AnyEvent>.
+
+Manager has two event loops: the one it runs in the master process/thread and the one it runs in worker processes/threads.
+
+Http manager is built on top of L<UniEvent> event loop framework and, unlike L<AnyEvent>, it allows for having multiple event loop objects.
+
+By default, manager creates separate non-default loop object which it runs in master process. It as accessible via $manager->loop(). You should use
+that loop to create your own event handles that you wish to run in master process.
+
+In worker processes/threads by default, the default loop is used (UniEvent::Loop->default). This is for convenience, as in this case you may not
+pass an event loop object to event handles constructors as it is defaulted to default loop.
+
+    # in worker
+    my $timer = UE::timer 10, sub { ... }; # runs in default loop
+
+To change this defaults, you may pass a pair of loop objects to manager's constructor (see C<new()>) and it will use them in master/worker processes.
+
+NOTE: if prefork model is used and you create event handles in master process, it is recommended that master and worker loops are different loops.
+If they are the same, you will have to remove all master process' event handles when worker is spawned (from worker process, in C<spawn_callback> code).
+Not doing so will lead to master process' code execution in workers. The http manager framework itself always cleans up its master process resources
+in workers.
+
+NOTE: if thread model is used, workers loop will always be default loop, because loop objects are not thread-safe and the default loop is the only
+loop that differs in each thread (it is thread-local). If you pass workers loop object different from default loop it will croak.
+Master thread's loop can be anything (default or not) and no resources should be released in C<spawn_callback>.
+By default, like in prefork model, master loop is non-default loop.
+
+Example showing how to add timers in master process and worker process:
+
+    my $manager = UE::HTTP::Manager->new({...});
+    my $master_timer = UE::timer 1, sub {
+        # master's maintenance work
+    }, $manager->loop;
+    
+    $manager->spawn_callback(sub {
+        my $server = shift;
+        ...
+        my $worker_timer = UE::timer 1, sub {
+            # worker's maintenance work
+        };
+        
+        # as this callback returns before server is run, we need to hold $worker_timer somewhere, otherwise it will immediately be "garbage-collected"
+        # for example, we hold by closure
+        # also stopping timer in server's stop callback becomes mandatory if "force_worker_stop" config parameter is set to false, see docs for new()
+        $server->stop_callback(sub {
+            $worker_timer->stop; 
+        });
+        
+    });
+    
+    $manager->run;
+
+
+
+=head1 METHODS
+
+=head2 new(\%config, [$master_loop = private loop], [$worker_loop = default loop])
+
+Creates web server instance. Config is a hashref with the following supported parameters
+(square brackets marks required parameters or its default values if not passed):
+
+=over
+
+=item server [required]
+
+Config for L<UniEvent::HTTP::Server> object which is created in each worker when it is spawned. See L<UniEvent::HTTP::Server> docs for description.
+
+
+=item min_servers [1]
+
+Minimum number of workers at any time. Number of workers will not drop below this value despite of any circumstances.
+
+
+=item max_servers [max(number of CPUs, min_servers)]
+
+Maximum number of active workers. Default value is number of CPUs on the machine or C<min_servers> if it is higher.
+
+NOTE: Number of workers MAY temporarily exceed this value when some workers get restarted (due to max requests or bulk workers restart).
+In such cases manager starts a new worker to replace some old worker, waits until new worker gets fully initialized and ready to process requests,
+then it signals the old worker to stop (which can take time if old worker is currently active, i.e. processing some request).
+Usually this process takes fractions of a second (however it is a subject to change if your code for example in C<spawn_callback> is slow)
+and occurs rarely so it's not a big deal.
+ 
+ 
+=item min_spare_servers
+
+The minimum number of servers to have waiting for requests.
+Minimum and maximum numbers should not be set to close to each other or the server may spawn and kill workers too often.
+
+This option is added for compability with other web servers only, as it is unclear what "waiting for requests" means for asynchronous web server.
+In C<UniEvent::HTTP::Manager> a worker is spare if number of requests it is currently processing is 0. Because in asynchronous server any worker
+is waiting for requests at any time. This option is NOT very USEFUL, especially if you code is asynchronous or partially asynchronous.
+Use it only if all of your request processing handlers are blocking.
+
+NOTE: it is recommended to use C<min_load>/C<max_load> instead.
+
+
+=item max_spare_servers [min(min_servers + min_spare_servers, max_servers), only if min_spare_servers is set]
+
+The maximum number of servers to have waiting for requests. See C<min_spare_servers> for explanation.
+
+NOTE: it is recommended to use C<min_load>/C<max_load> instead.
+
+
+=item max_load [0.7, if min_spare_servers is not set]
+
+Maximum average workers busy load, before spawning more workers (fractional, 1 = 100% load). This value is not a CPU load, it is somewhat more useful, see
+L<UniEvent>, C<track_load_average()> for details what this value means. If average busy load on workers becomes higher that configured value, manager
+will start more workers until busy load gets lower than configured value.
+
+
+=item min_load [max_load*0.5, if max_load is set]
+
+Minimum average workers load, before stopping excess workers. If average busy load on workers becomes lower that configured value, manager
+will start stopping workers until busy load gets higher than configured value.
+
+
+=item load_average_period [3]
+
+How many last seconds to collect busy load for. If you use C<min/max_spare_servers> instead of C<min/max_load> this value is not used.
+
+
+=item max_requests [0]
+
+Maximum number of requests per worker. If worker reaches this number, new replacing worker is started and after that this worker gets stopped.
+0 means do not limit number of requests.
+
+
+=item min_worker_ttl [60]
+
+Minimum number of seconds a worker will live. This property has higher priority than C<min/max_load>, C<max_requests>, etc...
+That means that if, for example, a worker has reached maximum number of requests but started less than C<min_worker_ttl> seconds ago,
+it will live until it reaches C<min_worker_ttl>. Second example is when manager wants to stop some workers due to C<min_load> setting and
+no workers are older than C<min_worker_ttl>, then no workers will be stopped until someone reaches C<min_worker_ttl>.
+
+
+=item check_interval [1]
+
+Interval in seconds between main manager checks (to see if we can kill off some excess workers or if we need to spawn more workers, etc...). Can be
+fractional.
+
+
+=item activity_timeout [0]
+
+This setting helps dealing with hanged workers. If worker is not responding to manager during this number of seconds it gets killed. If you set this
+setting, ensure that you don't have heavy handlers that lasts more than C<activity_timeout> without returning to loop
+(this is especially important if you have code that does blocking I/O). 0 means disable this feature.
+
+
+=item termination_timeout [10]
+
+Maximum number of seconds for a worker to finish its stuff after manager requested it to stop.
+If this amount of time is exceeded then worker gets killed. 0 means unlimited time for worker to finish.
+
+
+=item force_worker_stop [true]
+
+This option controls what to do when a worker (previously requested to stop) has stopped (finished all active requests and sent all responses). 
+
+If set to C<true>, worker will call $loop->stop() and thus exit immediately.
+
+If set to C<false> worker will do nothing and the loop will bail out of execution (i.e. worker will exit) if (or when) there are no more active event
+loop handles. This allows for possible user's custom event handles (not related to http server) to finish. However keep in mind that if there will
+be any endless and strong (non-weak) event handle (for example, a non-weak timer), loop (and worker) will never finish and will be killed by
+C<termination_timeout> (or never if C<termination_timeout> is 0).
+
+
+=item bind_model [BIND_REUSE_PORT on Unix, BIND_DUPLICATE on Windows]
+
+Controls how manager will create listening sockets.
+Should be either C<UniEvent::HTTP::Manager::BIND_REUSE_PORT> or C<UniEvent::HTTP::Manager::BIND_DUPLICATE>.
+
+If C<UniEvent::HTTP::Manager::BIND_DUPLICATE> is set, manager will create listening sockets for all locations in master process once and use the same
+sockets in each worker. So that they will be accepting the same sockets.
+The advantage of this method is that it allows to start web server with some advanced privileges, bind sockets to ports like 80, 443, etc... 
+in master process and then drop privileges, for example, in manager's C<start_callback> (see docs below).
+The disadvantage is that it may impact performance significantly in case of many running workers and very high number of new connections per second
+(i.e. when keep-alive is not utilized much and your requests handlers are small and fast). This is not a technical disadvantage of this library, but
+the OS itself.
+
+If C<UniEvent::HTTP::Manager::BIND_REUSE_PORT> is set, manager will not create any sockets, instead each worker will create listening sockets by itself
+and bind it to the same addresses and ports making use of C<REUSE_PORT> feature. This way each worker will accept its own sockets and the OS will
+distribute the load between them. This method has a WAY LESS performance penalties when a lot of processes/threads are accepting a lot of new
+connections per second on the same addresses/ports.
+
+Alternatively, you can create sockets by yourself and pass it in C<sock> property of an item in L<UniEvent::HTTP::Server>'s C<locations> part of config.
+In this case C<bind_model> is ignored (or applied only to those locations for which you didn't pass C<sock>). You can even create sockets in worker
+processes (in C<spawn_callback>) and reconfigure worker's http server there. Keep in mind that in these cases sockets you create must be bound to
+an address/port but not listening yet (C<listen()> must not be called). See L<UniEvent::HTTP::Server> docs for more info.
+
+
+=item worker_model [WORKER_PREFORK on Unix, WORKER_THREAD on Windows]
+
+MPM (multiprocessing module). Should be either C<UniEvent::HTTP::Manager::WORKER_PREFORK> or C<UniEvent::HTTP::Manager::WORKER_THREAD>.
+C<UniEvent::HTTP::Manager::WORKER_PREFORK> is not supported on Windows. C<UniEvent::HTTP::Manager::WORKER_THREAD> is supported only on threaded perls.
+C<UniEvent::HTTP::Manager::WORKER_THREAD> support for perl is highly experimental for now and should not be used yet.
+
+=back
+
+
+=head2 loop()
+
+Returns L<UniEvent::Loop> object in which manager runs (event loop of master process).
+
+
+=head2 run()
+
+Runs the web server. This function will run the event loop and thus will not return until the server is stopped.
+
+
+=head2 restart_workers()
+
+Restarts all workers. At first, manager will start new workers for replacing the old ones and thus double the workers count. When corresponding
+new working is initialized and ready, corresponding old worker will be sent a signal to stop. It will finish all active requests and exit. After this
+process the number of workers will become as before. So that this process may exceed C<max_workers> configuration parameter temporarily.
+
+If this method is called shortly after previous call, when previous process hasn't yet finished, then another new workers set will be spawned tripling
+the number of workers that was before the first call to C<restart_workers()>.
+
+
+=head2 reconfigure(\%config)
+
+Reconfigures the web server. Supported parameters are the same as in C<new()>, except for C<bind_model> and C<worker_model> which can't be
+changed. All other parameters can be changed on-the-fly. Manager may gracefully restart all workers during this process (or may not, if significant
+parameters hasn't been changed).
+
+L<This method may return error|UniEvent/"OPTIONAL ERRORS">
+
+
+=head2 start_callback($sub)
+
+=head2 start_event()
+
+Callbacks set via these methods will be invoked right after server is started, i.e. created and bound all sockets, right before entering the event loop.
+
+It is a good place, for example, to drop privileges if process has been started with advanced privileges.
+
+Callback doesn't receive anything.
+
+See L<UniEvent/"EVENT CALLBACKS"> for differences between C<_callback> and C<_event> versions of methods.
+
+
+=head2 spawn_callback($sub)
+
+=head2 spawn_event()
+
+Callbacks set via these methods will be invoked when a new worker is spawned, in proccess/thread of worker.
+
+Callback signature:
+
+    my $server = shift;
+
+Where C<$server> is personal L<UniEvent::HTTP::Server> instance which will run in this worker.
+
+This callback is usually used for setting callbacks in server instance and for creating custom event handles in worker (timers, signal handlers, etc...) 
+
+See L<UniEvent/"EVENT CALLBACKS"> for differences between C<_callback> and C<_event> versions of methods.
+
+
+=head2 request_callback($sub)
+
+=head2 request_event()
+
+Callbacks set via these methods will be directly passed to worker's L<UniEvent::HTTP::Server> instance when spawning a new worker.
+
+It is the same as
+
+    $manager->spawn_callback(sub {
+        my $server = shift;
+        $server->request_callback($sub);
+        $server->request_event->...;
+    });
+
+See L<UniEvent::HTTP::Server> docs for API.
+
+
+
+=head1 MULTI-THREAD WORKER MODEL FOR THREADED PERL
+
+This support is HIGHLY EXPERIMENTAL and should not be used in production for now. Because of numerious issues in dependency XS modules with perl-threads,
+it will likely crash in perl destruction phase (when any worker dies), however it may work if number of workers is fixed.
+
+This will be fixed in the future as multi-thread model is the only possible model for MS Windows (it doesn't support prefork model). However it is not
+a short task because supporting and handling ugly perl threads in XS modules and making it work with normal C-threads in C++ framework is anything but
+not a simple task.
+
+
+
+=head1 SEE ALSO
+
+L<Plack::Handler::UniEvent::HTTP>
+
+L<UniEvent::HTTP>
+
+L<UniEvent>
+
+
+
+=head1 AUTHOR
+
+Pronin Oleg <syber@cpan.org> 
+
+Crazy Panda LTD
+
+
+
+=head1 LICENSE
+
+You may distribute this code under the same terms as Perl itself.
+
+=cut

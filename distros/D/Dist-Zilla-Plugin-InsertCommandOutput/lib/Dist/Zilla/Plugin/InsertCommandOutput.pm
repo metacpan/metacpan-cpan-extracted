@@ -1,7 +1,9 @@
 package Dist::Zilla::Plugin::InsertCommandOutput;
 
-our $DATE = '2019-02-04'; # DATE
-our $VERSION = '0.052'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2021-05-21'; # DATE
+our $DIST = 'Dist-Zilla-Plugin-InsertCommandOutput'; # DIST
+our $VERSION = '0.054'; # VERSION
 
 use 5.010001;
 use strict;
@@ -29,11 +31,15 @@ sub munge_files {
 
 sub munge_file {
     my ($self, $file) = @_;
-    my $content = $file->content;
-    if ($content =~ s{^#\s*COMMAND:\s*(.*)\s*$}{$self->_command_output($1)."\n"}egm) {
+    my $content_as_bytes = $file->encoded_content;
+    if ($content_as_bytes =~ s{^#\s*COMMAND:\s*(.*)\s*(\R|\z)}{
+        my $output = $self->_command_output($1);
+        $output .= "\n" unless $output =~ /\R\z/;
+        $output;
+    }egm) {
         $self->log(["inserting output of command '%s' in %s", $1, $file->name]);
-        $self->log_debug(["output of command: %s", $content]);
-        $file->content($content);
+        $self->log_debug(["output of command: %s", $content_as_bytes]);
+        $file->encoded_content($content_as_bytes);
     }
 }
 
@@ -66,7 +72,7 @@ Dist::Zilla::Plugin::InsertCommandOutput - Insert the output of command into you
 
 =head1 VERSION
 
-This document describes version 0.052 of Dist::Zilla::Plugin::InsertCommandOutput (from Perl distribution Dist-Zilla-Plugin-InsertCommandOutput), released on 2019-02-04.
+This document describes version 0.054 of Dist::Zilla::Plugin::InsertCommandOutput (from Perl distribution Dist-Zilla-Plugin-InsertCommandOutput), released on 2021-05-21.
 
 =head1 SYNOPSIS
 
@@ -98,7 +104,7 @@ Source repository is at L<https://github.com/perlancar/perl-Dist-Zilla-Plugin-In
 
 =head1 BUGS
 
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Dist-Zilla-Plugin-InsertCommandOutput>
+Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-Dist-Zilla-Plugin-InsertCommandOutput/issues>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
@@ -121,7 +127,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019, 2018, 2015, 2014 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2019, 2018, 2015, 2014 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

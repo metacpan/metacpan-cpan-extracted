@@ -1,0 +1,168 @@
+NAME
+
+    Perl::Critic::Community - Community-inspired Perl::Critic policies
+
+SYNOPSIS
+
+      $ perlcritic --theme community script.pl
+      $ perlcritic --theme community lib/
+      
+      # .perlcriticrc
+      theme = community
+      severity = 1
+
+DESCRIPTION
+
+    A set of Perl::Critic policies to enforce the practices generally
+    recommended by subsets of the Perl community, particularly on IRC.
+    Formerly known as Perl::Critic::Freenode. Because this policy "theme"
+    is designed to be used with zero configuration on the command line,
+    some duplication will occur if it is used in combination with core
+    Perl::Critic policies.
+
+AFFILIATION
+
+    This module has no functionality, but instead contains documentation
+    for this distribution and acts as a means of pulling other modules into
+    a bundle. All of the Policy modules contained herein will have an
+    "AFFILIATION" section announcing their participation in this grouping.
+
+POLICIES
+
+    Perl::Critic::Policy::Community::AmpersandSubCalls
+
+      Don't use & to call subroutines
+
+    Perl::Critic::Policy::Community::ArrayAssignAref
+
+      Don't assign an anonymous arrayref to an array
+
+    Perl::Critic::Policy::Community::BarewordFilehandles
+
+      Don't use bareword filehandles other than built-ins
+
+    Perl::Critic::Policy::Community::ConditionalDeclarations
+
+      Don't declare variables conditionally
+
+    Perl::Critic::Policy::Community::ConditionalImplicitReturn
+
+      Don't end a subroutine with a conditional block
+
+    Perl::Critic::Policy::Community::DeprecatedFeatures
+
+      Avoid features that have been deprecated or removed from Perl
+
+    Perl::Critic::Policy::Community::DiscouragedModules
+
+      Various modules discouraged from use
+
+    Perl::Critic::Policy::Community::DollarAB
+
+      Don't use $a or $b as variable names outside sort()
+
+    Perl::Critic::Policy::Community::Each
+
+      Don't use each() to iterate through a hash
+
+    Perl::Critic::Policy::Community::EmptyReturn
+
+      Don't use return with no arguments
+
+    Perl::Critic::Policy::Community::IndirectObjectNotation
+
+      Don't call methods indirectly
+
+    Perl::Critic::Policy::Community::LexicalForeachIterator
+
+      Don't use undeclared foreach loop iterators
+
+    Perl::Critic::Policy::Community::LoopOnHash
+
+      Don't loop over hashes
+
+    Perl::Critic::Policy::Community::ModPerl
+
+      Don't use mod_perl to write web applications
+
+    Perl::Critic::Policy::Community::MultidimensionalArrayEmulation
+
+      Don't use multidimensional array emulation
+
+    Perl::Critic::Policy::Community::OpenArgs
+
+      Always use the three-argument form of open()
+
+    Perl::Critic::Policy::Community::OverloadOptions
+
+      Don't use overload without specifying a bool overload and enabling
+      fallback
+
+    Perl::Critic::Policy::Community::PackageMatchesFilename
+
+      Module files should declare a package matching the filename
+
+    Perl::Critic::Policy::Community::POSIXImports
+
+      Don't use POSIX without specifying an import list
+
+    Perl::Critic::Policy::Community::PreferredAlternatives
+
+      Various modules with preferred alternatives
+
+    Perl::Critic::Policy::Community::Prototypes
+
+      Don't use function prototypes
+
+    Perl::Critic::Policy::Community::StrictWarnings
+
+      Always use strict and warnings, or a module that imports these
+
+    Perl::Critic::Policy::Community::Threads
+
+      Interpreter-based threads are officially discouraged
+
+    Perl::Critic::Policy::Community::Wantarray
+
+      Don't write context-sensitive functions using wantarray()
+
+    Perl::Critic::Policy::Community::WarningsSwitch
+
+      Scripts should not use the -w switch on the shebang line
+
+    Perl::Critic::Policy::Community::WhileDiamondDefaultAssignment
+
+      Don't use while with implicit assignment to $_
+
+CONFIGURATION AND ENVIRONMENT
+
+    All policies included are in the "community" theme. See the
+    Perl::Critic documentation for how to make use of this.
+
+AUTHOR
+
+    Dan Book, dbook@cpan.org
+
+CONTRIBUTORS
+
+    Graham Knop (haarg)
+
+    H.Merijn Brand (Tux)
+
+    John SJ Anderson (genehack)
+
+    Matt S Trout (mst)
+
+    William Taylor (willt)
+
+COPYRIGHT AND LICENSE
+
+    Copyright 2015, Dan Book.
+
+    This library is free software; you may redistribute it and/or modify it
+    under the terms of the Artistic License version 2.0.
+
+SEE ALSO
+
+    Perl::Critic
+

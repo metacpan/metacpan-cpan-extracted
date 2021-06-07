@@ -10,10 +10,12 @@ t/00_compile.t
 t/01_env_dsn.t
 t/02_prepare.t
 t/03_includes.t
+t/04_fork_hooks.t
 t/Util.pm
 t/lib/Util.pm
 t/plx/1.plx
 t/plx/2.plx
+t/plx/fork_hooks.plx
 t/plx/prepare.plx
 xt/02_perlcritic.t
 xt/perlcriticrc

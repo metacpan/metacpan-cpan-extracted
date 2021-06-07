@@ -1,11 +1,11 @@
 package App::lcpan::Cmd::related_mods;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-08-13'; # DATE
+our $DATE = '2021-06-05'; # DATE
 our $DIST = 'App-lcpan'; # DIST
-our $VERSION = '1.062'; # VERSION
+our $VERSION = '1.068'; # VERSION
 
-use 5.010;
+use 5.010001;
 use strict;
 use warnings;
 use Log::ger;
@@ -39,6 +39,10 @@ _
             summary => 'Return score-related fields',
             schema => 'bool*',
         },
+        with_content_paths => {
+            summary => 'Return the list of content paths where the module and a related module are mentioned together',
+            schema => 'bool*',
+        },
         sort => {
             schema => ['array*', of=>['str*', in=>[map {($_,"-$_")} qw/score num_mentions num_mentions_together pct_mentions_together module/]], min_len=>1],
             default => ['-score', '-num_mentions'],
@@ -47,6 +51,24 @@ _
             summary => 'Skip modules from the same distribution',
             schema => 'bool*',
             tags => ['category:filtering'],
+        },
+        submodules => {
+            summary => 'Whether to include submodules',
+            schema => 'bool*',
+            description => <<'_',
+
+If set to true, will only show related submodules, e.g. `lcpan related-modules
+Foo::Bar` will only show `Foo::Bar::Baz`, `Foo::Bar::Quz`, and so on.
+
+If set to false, will only show related modules that are not submodules, e.g.
+`lcpan related-modules Foo::Bar` will show `Baz`, `Foo::Baz`, but not
+`Foo::Bar::Baz`.
+
+_
+            cmdline_aliases => {
+                exclude_submodules => {is_flag=>1, summary=>"Equivalent to --no-submodules", code=>sub {$_[0]{submodules}=0}},
+                include_submodules => {is_flag=>1, summary=>"Equivalent to --submodules", code=>sub {$_[0]{submodules}=1}},
+            },
         },
     },
 };
@@ -58,6 +80,10 @@ sub handle_cmd {
 
     my $modules = $args{modules};
     my $modules_s = join(",", map {$dbh->quote($_)} @$modules);
+
+    if ($args{with_content_paths} && @$modules > 1) {
+        return [412, "Sorry, --with-content-paths currently works with only one specified module"];
+    }
 
     my $limit = $args{limit};
 
@@ -89,6 +115,15 @@ sub handle_cmd {
         }
         push @where, "f.dist_name NOT IN (".join(", ", map { $dbh->quote($_) } @dist_names).")";
     }
+    if ($args{submodules}) {
+        for my $module (@$modules) {
+            push @where, "m2.name LIKE " . $dbh->quote("$module\::%");
+        }
+    } elsif (defined $args{submodules} && !$args{submodules}) {
+        for my $module (@$modules) {
+            push @where, "m2.name NOT LIKE " . $dbh->quote("$module\::%");
+        }
+    }
 
     my @order = map {/(-?)(.+)/; $2 . ($1 ? " DESC" : "")} @{$args{sort}};
 
@@ -113,12 +148,34 @@ GROUP BY m2.name
 LIMIT $limit
 ";
 
+    my $sql_with_content_paths;
+    my $sth_with_content_paths;
+    if ($args{with_content_paths}) {
+        $sql_with_content_paths = "SELECT
+  path
+FROM content c
+WHERE
+  EXISTS(SELECT id FROM mention WHERE module_id=(SELECT id FROM module WHERE name=?) AND source_content_id=c.id) AND
+  EXISTS(SELECT id FROM mention WHERE module_id=(SELECT id FROM module WHERE name=?) AND source_content_id=c.id)
+";
+        $sth_with_content_paths = $dbh->prepare($sql_with_content_paths);
+    }
+
     my @res;
     my $sth = $dbh->prepare($sql);
     $sth->execute();
     while (my $row = $sth->fetchrow_hashref) {
         unless ($args{with_scores}) {
             delete $row->{$_} for qw(num_mentions num_mentions_together pct_mentions_together score);
+        }
+        if ($args{with_content_paths}) {
+            my @content_paths;
+            $sth_with_content_paths->execute($modules->[0], $row->{module});
+            while (my $row2 = $sth_with_content_paths->fetchrow_arrayref) {
+                push @content_paths, $row2->[0];
+            }
+            $sth_with_content_paths->finish;
+            $row->{content_paths} = \@content_paths;
         }
         push @res, $row;
     }
@@ -143,7 +200,7 @@ App::lcpan::Cmd::related_mods - List other modules related to module(s)
 
 =head1 VERSION
 
-This document describes version 1.062 of App::lcpan::Cmd::related_mods (from Perl distribution App-lcpan), released on 2020-08-13.
+This document describes version 1.068 of App::lcpan::Cmd::related_mods (from Perl distribution App-lcpan), released on 2021-06-05.
 
 =head1 FUNCTIONS
 
@@ -152,7 +209,7 @@ This document describes version 1.062 of App::lcpan::Cmd::related_mods (from Per
 
 Usage:
 
- handle_cmd(%args) -> [status, msg, payload, meta]
+ handle_cmd(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 List other modules related to module(s).
 
@@ -195,12 +252,27 @@ Skip modules from the same distribution.
 
 =item * B<sort> => I<array[str]> (default: ["-score","-num_mentions"])
 
+=item * B<submodules> => I<bool>
+
+Whether to include submodules.
+
+If set to true, will only show related submodules, e.g. C<lcpan related-modules
+Foo::Bar> will only show C<Foo::Bar::Baz>, C<Foo::Bar::Quz>, and so on.
+
+If set to false, will only show related modules that are not submodules, e.g.
+C<lcpan related-modules Foo::Bar> will show C<Baz>, C<Foo::Baz>, but not
+C<Foo::Bar::Baz>.
+
 =item * B<use_bootstrap> => I<bool> (default: 1)
 
 Whether to use bootstrap database from App-lcpan-Bootstrap.
 
 If you are indexing your private CPAN-like repository, you want to turn this
 off.
+
+=item * B<with_content_paths> => I<bool>
+
+Return the list of content paths where the module and a related module are mentioned together.
 
 =item * B<with_scores> => I<bool>
 
@@ -211,12 +283,12 @@ Return score-related fields.
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -242,7 +314,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020, 2019, 2018, 2017, 2016, 2015 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2020, 2019, 2018, 2017, 2016, 2015 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

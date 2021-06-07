@@ -32,12 +32,16 @@ if (
 # See lib/ExtUtils/MakeMaker.pm for details of how to influence
 # the contents of the Makefile that is written.
 WriteMakefile(
-    NAME               => 'Graphics::TIFF',
-    VERSION_FROM       => 'lib/Graphics/TIFF.pm',    # finds $VERSION
-    PREREQ_PM          => { Readonly => 0 },         # e.g., Module::Name => 1.1
+    NAME         => 'Graphics::TIFF',
+    VERSION_FROM => 'lib/Graphics/TIFF.pm',    # finds $VERSION
+    PREREQ_PM    => {
+        Readonly => 0,
+        ( $OSNAME =~ /mswin/i ) ? ( "Alien::libtiff" => 0 ) : (),
+    },
     CONFIGURE_REQUIRES => {
         'ExtUtils::Depends'   => 0,
-        'ExtUtils::PkgConfig' => 0
+        'ExtUtils::PkgConfig' => 0,
+        ( $OSNAME =~ /mswin/i ) ? ( "Alien::libtiff" => 0 ) : (),
     },
     TEST_REQUIRES => {
         'File::Spec'     => 0,
@@ -55,6 +59,9 @@ WriteMakefile(
                 web  => 'https://github.com/carygravel/graphics-tiff',
             },
         },
+
+        # because Alien::libtiff is only required for Windows
+        dynamic_config => 1,
     },
     clean => { FILES => '$(SOURCE_TIDY)' },
 
@@ -81,7 +88,7 @@ sub MY::postamble {
 
     # GNU Make extensions that BSD make doesn't like.
     # Author-only stuff, so comment out for non-Linux.
-    if ( $OSNAME ne 'linux' ) { return }
+    if ( $OSNAME ne 'linux' ) { return '' }
     return <<'END';
 SHELL = bash
 MANIFEST = $(shell cat MANIFEST)
@@ -96,7 +103,7 @@ tardist : README
 README : lib/Graphics/TIFF.pm
 	pod2readme $< $@
 
-tidy : MANIFEST $(SOURCE_TIDY)
+tidy : MANIFEST $(SOURCE_TIDY) README
 
 %.tdy : %
 	perltidy $* && if ! diff -q $@ $* > /dev/null; then cp $@ $*; fi

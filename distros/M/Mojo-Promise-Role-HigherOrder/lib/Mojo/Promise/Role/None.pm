@@ -3,7 +3,7 @@ use Mojo::Base '-role';
 
 use strict;
 
-our $VERSION = '1.003';
+our $VERSION = '1.005';
 
 =encoding utf8
 
@@ -44,8 +44,8 @@ sub none {
 
 	my $count = 0;
 	$_->then(
-		sub { $none->reject( @_ ) },
-		sub { $count++; $none->resolve if $count == @promises }
+		sub { $none->reject( @_ ); return },
+		sub { $count++; $none->resolve if $count == @promises; return }
 		) foreach @promises;
 
 	return @promises ? $none : $none->resolve;

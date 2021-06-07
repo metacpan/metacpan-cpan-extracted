@@ -248,6 +248,12 @@ sub print_need_restart() {
     print "$_\n" foreach values %$h;
 }
 
+=item migrate_back_rpmdb_db_to_4_6($urpm, $root)
+
+Downgrade rpmdb from  external libdb-4.6.so to internal DB 4.3.27 (mdv2008.1 -> mdv2009.0)
+
+=cut
+
 sub migrate_back_rpmdb_db_to_hash_8 {
     my ($urpm, $root) = @_;
 
@@ -266,6 +272,12 @@ sub migrate_back_rpmdb_db_to_hash_8 {
     }
 }
 
+=item migrate_back_rpmdb_db_to_4_6($urpm, $root)
+
+Downgrade rpmdb from rpm-4.9 to 4.8.1 (both linked with db4.8.30) db (eg: when installing mga1 in a chroot from mga2+, mga#4590)
+
+=cut
+
 sub migrate_back_rpmdb_db_to_4_6 {
     my ($urpm, $root) = @_;
     $urpm->{info}("migrating back the created rpm db from rpm-4.9 to rpm-4.6/4.8");
@@ -275,6 +287,12 @@ sub migrate_back_rpmdb_db_to_4_6 {
 	$urpm->{error}("rpm db downgrade failed. You will not be able to run rpm chrooted");
     }
 }
+
+=item migrate_back_rpmdb_db_version($urpm, $root)
+
+Check if we need to migrate back rpmdb to an older libdb after completing the upgrade/installation.
+
+=cut
 
 sub migrate_back_rpmdb_db_version {
     my ($urpm, $root) = @_;
@@ -286,6 +304,39 @@ sub migrate_back_rpmdb_db_version {
     }
 
     clean_rpmdb_shared_regions($root);
+}
+
+=item migrate_rpmdb_to_sqlite($urpm, $root)
+
+Migrate rpmdb to the new sqlite backend.
+
+=cut
+
+sub migrate_rpmdb_to_sqlite {
+    my ($urpm, $root) = @_;
+    $urpm->{info}("migrating db from bdb to sqlite (rpm >= 4.16)");
+    # Whatever is the default backend:
+    URPM::add_macro('_db_backend sqlite');
+    if (system('chroot', $root, 'rpm', '--rebuilddb') == 0) {
+	$urpm->{log}("rpm db converted to sqlite successfully");
+    } else {
+	$urpm->{error}("rpm db conversion failed. You will not be able to run rpm >= 4.17");
+    }
+}
+
+=item migrate_forward_rpmdb_db_version($urpm, $root)
+
+Check if we need to migrate rpmdb to a new backend prior to use it
+and do it if needed.
+
+=cut
+
+sub migrate_forward_rpmdb_db_version {
+    my ($urpm, $root) = @_;
+
+    if ($urpm->{need_migrate_rpmdb_now} eq '4.16') {
+	migrate_rpmdb_to_sqlite($urpm, $root);
+    }
 }
 
 

@@ -1,6 +1,6 @@
 #!/usr/bin/env perl
 
-use 5.022;
+use 5.024;
 
 # Using Test2, important to specify which version of Test2
 # since later versions may break things.
@@ -114,8 +114,8 @@ subtest 'condorcet winner does violate later harm (burlington2009)' => sub {
     note $T2->logd();
 };
 
-subtest 
-  'Edge Cases where Later votes of IRV winner change Condorcet Winner' 
+subtest
+  'Edge Cases where Later votes of IRV winner change Condorcet Winner'
   => sub {
     my $beatby2 = Vote::Count::Method::CondorcetVsIRV->new(
         'BallotSet'      => $ballots_twobeatirv,
@@ -128,15 +128,15 @@ subtest
     {
     my $todo = todo "this should expose a bug";
     {
-        my $winb2 = $beatby2->CondorcetVsIRV( 
+        my $winb2 = $beatby2->CondorcetVsIRV(
             'simple' => 1, 'debug' => 1 );
-        is($winb2->{'winner'}, 
+        is($winb2->{'winner'},
             'CONDORCET1',
             "The first Condorcet winner should be the winner not the second.");
     };
         my $fixloop = $fixesloop->CondorcetVsIRV( 'simple' => 1);
-        is($fixloop->{'winner'}, 
-            'IRV', 
+        is($fixloop->{'winner'},
+            'IRV',
             "Because the unredacted ballots did not have a condorcet winner, the IRV winner should win.");
 
 };

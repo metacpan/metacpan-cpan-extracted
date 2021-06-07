@@ -17,7 +17,6 @@ WriteMakefile(
     MIN_PERL_VERSION => '5.14.0',
     PREREQ_PM => {
 	'Carp'                           => '0',
-	'ExtUtils::F77'                  => '1.23',
 	'IO::File'                       => '0',
 	'List::Util'                     => '0',
 	'Machine::Epsilon'               => '0',
@@ -25,19 +24,17 @@ WriteMakefile(
 	'Moose::Role'                    => '0',
 	'Moose::Util::TypeConstraints'   => '0',
 	'MooseX::StrictConstructor'      => '0',
-	'PDL'                            => '0',
+	'PDL'                            => '2.045', # PDL::Complex can be assigned real values
 	'PDL::Complex'                   => '2.009',
 	'PDL::Constants'                 => '0',
 	'PDL::Core'                      => '0',
 	'PDL::Core::Dev'                 => '0',
-	'PDL::Exporter'                  => '0',
-	'PDL::FFTW3'                     => '0',
 	'PDL::IO::Pic'                   => '0',
 	'PDL::IO::Storable'              => '0',
 	'PDL::Lite'                      => '0',
 	'PDL::MatrixOps'                 => '0',
 	'PDL::NiceSlice'                 => '0',
-	'PDL::FFTW3'                     => '0',
+	'PDL::FFTW3'                     => '0.12', # accept PDL::Complex
 	'PDL::LinearAlgebra'             => '0.15', # cgtsv
 	'Storable'                       => '0',
     },

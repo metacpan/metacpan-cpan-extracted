@@ -5,7 +5,7 @@ use strict;
 use warnings FATAL => 'all';
 use Carp;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 our @ISA       = qw/Exporter/;
 our @EXPORT    = qw/gen_yp_rules/;
@@ -195,7 +195,6 @@ sub gen_yp_rules {
                 $yapp .= "$rule: '[' ${rule}_items ']';\n";
                 if (@$children == 0) {
                     # simple array
-                    $yapp .= "${rule}: '[' ${rule}_items ']';\n";
                     $yapp .= "${rule}_items: TEXT ${rule}_items | TEXT;\n";
                 }
                 else {

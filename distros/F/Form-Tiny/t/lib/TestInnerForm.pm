@@ -1,15 +1,12 @@
 package TestInnerForm;
 
-use Moo;
+use Form::Tiny -strict;
 use Types::Standard qw(Int);
-use Form::Tiny::Error;
 
-with qw/Form::Tiny Form::Tiny::Strict/;
-
-sub build_fields
-{
-	{name => "optional"},
-		{name => "int", type => Int, required => 1},;
-}
+form_field "optional";
+form_field "int" => (
+	type => Int,
+	required => 1
+);
 
 1;

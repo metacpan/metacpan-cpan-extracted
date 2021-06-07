@@ -7,12 +7,24 @@ use base 'MyApp::Service::Base';
 
 use Beekeeper::Service::Router ':all';
 use MyApp::Service::Chat;
+use Beekeeper::Worker;
 
+
+sub authorize_request {
+    my ($self, $req) = @_;
+
+    # Make an exception over the MyApp::Service::Base rule of requiring a logged user
+    return BKPR_REQUEST_AUTHORIZED if $req->{method} eq 'myapp.auth.login';
+
+    return $self->SUPER::authorize_request($req);
+}
 
 sub on_startup {
     my $self = shift;
 
-    $self->accept_jobs(
+    $self->setup_myapp_stuff;
+
+    $self->accept_remote_calls(
         'myapp.auth.login'  => 'login',
         'myapp.auth.logout' => 'logout',
         'myapp.auth.kick'   => 'kick',
@@ -29,10 +41,11 @@ sub login {
     # mapping, and username and password are not verified at all
     my $uuid = $username;
 
-    $self->set_current_user_uuid( $uuid );
+    # The authentication data will be present on all subsequent requests
+    $self->set_authentication_data( $uuid );
 
-    # Assign an address to the user connection in order to push messages to him
-    $self->bind_connection( "frontend.user-$uuid" );
+    # Make the authentication data persist and assign an arbitrary address to the user
+    $self->bind_remote_session( address => "frontend.user-$uuid" );
 
     MyApp::Service::Chat->send_notice(
         to_uuid => $uuid,
@@ -45,14 +58,14 @@ sub login {
 sub logout {
     my ($self, $params) = @_;
 
-    my $uuid = $self->get_current_user_uuid;
+    my $uuid = $self->get_authentication_data;
 
     MyApp::Service::Chat->send_notice(
         to_uuid => $uuid,
         message => "Bye!",
     );
 
-    $self->unbind_connection;
+    $self->unbind_remote_session;
 
     return 1;
 }
@@ -65,10 +78,10 @@ sub kick {
 
     MyApp::Service::Chat->send_notice(
         to_uuid => $kick_uuid,
-        message => "You were kicked",
+        message => "Sorry, you were kicked",
     );
 
-    $self->unbind_address( "frontend.user-$kick_uuid" );
+    $self->unbind_remote_address( address => "frontend.user-$kick_uuid" );
 
     return 1;
 }

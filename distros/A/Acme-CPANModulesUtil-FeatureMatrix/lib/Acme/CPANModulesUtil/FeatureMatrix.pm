@@ -1,7 +1,9 @@
 package Acme::CPANModulesUtil::FeatureMatrix;
 
-our $DATE = '2019-01-12'; # DATE
-our $VERSION = '0.002'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2021-02-20'; # DATE
+our $DIST = 'Acme-CPANModulesUtil-FeatureMatrix'; # DIST
+our $VERSION = '0.004'; # VERSION
 
 use 5.010001;
 use strict 'subs', 'vars';
@@ -26,6 +28,8 @@ $SPEC{draw_feature_matrix} = {
     },
 };
 sub draw_feature_matrix {
+    require Data::Sah::Resolve;
+    require Data::Sah::Util::Type;
     require Markdown::To::POD;
     require Text::Table::Any;
 
@@ -59,6 +63,7 @@ sub draw_feature_matrix {
 
     # generate table and collect notes
     my @notes;
+    my %note_nums; # text => num
     my $note_num = 0;
     my @rows;
 
@@ -87,27 +92,41 @@ sub draw_feature_matrix {
         for my $e (@{ $list->{entries} }) {
             my @row = ($e->{module});
             for my $fname (@features) {
-                my $f;
-                if (!$e->{features} || !defined($f = $e->{features}{$fname})) {
-                    push @row, "N/A";
-                    next;
+                my $ftype = Data::Sah::Util::Type::get_type(
+                    Data::Sah::Resolve::resolve_schema(
+                        $list->{entry_features}{$fname}{schema} // 'bool'
+                    ));
+
+                my $fvalue0;
+                my $fvalue;
+                if (!$e->{features} || !defined($e->{features}{$fname})) {
+                    $fvalue = "N/A";
+                } else {
+                    $fvalue0 = $e->{features}{$fname};
+                    $fvalue = ref $fvalue0 eq 'HASH' ? $fvalue0->{value} : $fvalue0;
+                    $fvalue = !defined($fvalue) ? "N/A" :
+                        $ftype eq 'bool' ? ($fvalue ? "yes" : "no") : $fvalue;
                 }
-                if (!ref $f) {
-                    push @row, $f ? "yes" : "no";
-                    next;
-                }
-                my $fv = defined($f->{value}) ? ($f->{value} ? "yes" : "no") : "N/A";
+
                 my $has_note;
-                if ($f->{summary}) {
+                my $this_note_num;
+                if (ref $fvalue0 eq 'HASH' && $fvalue0->{summary}) {
                     $has_note++;
-                    $note_num++;
-                    my $note = "=item $note_num. $f->{summary}\n\n";
-                    if ($f->{description}) {
-                        $note .= Markdown::To::POD::markdown_to_pod($f->{description}) . "\n\n";
+
+                    my $note_text = $fvalue0->{summary};
+                    if ($fvalue0->{description}) {
+                        $note_text .= Markdown::To::POD::markdown_to_pod($fvalue0->{description}) . "\n\n";
                     }
-                    push @notes, $note;
+
+                    if ($this_note_num = $note_nums{$note_text}) {
+                        # reuse the same text from another note
+                    } else {
+                        $note_num++;
+                        push @notes, "=item $note_num. $note_text\n\n";
+                        $note_nums{$note_text} = $this_note_num = $note_num;
+                    }
                 }
-                push @row, $fv . ($has_note ? " *$note_num)" : "");
+                push @row, $fvalue . ($has_note ? " *$this_note_num)" : "");
             }
             push @rows, \@row;
         }
@@ -143,7 +162,7 @@ Acme::CPANModulesUtil::FeatureMatrix - Draw features matrix of modules in an Acm
 
 =head1 VERSION
 
-This document describes version 0.002 of Acme::CPANModulesUtil::FeatureMatrix (from Perl distribution Acme-CPANModulesUtil-FeatureMatrix), released on 2019-01-12.
+This document describes version 0.004 of Acme::CPANModulesUtil::FeatureMatrix (from Perl distribution Acme-CPANModulesUtil-FeatureMatrix), released on 2021-02-20.
 
 =head1 FUNCTIONS
 
@@ -165,6 +184,7 @@ Arguments ('*' denotes required arguments):
 =item * B<cpanmodule>* => I<perl::modname>
 
 Name of Acme::CPANModules::* module, without the prefix.
+
 
 =back
 
@@ -189,7 +209,7 @@ Source repository is at L<https://github.com/perlancar/perl-Acme-CPANModulesUtil
 
 =head1 BUGS
 
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Acme-CPANModulesUtil-FeatureMatrix>
+Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-Acme-CPANModulesUtil-FeatureMatrix/issues>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
@@ -205,7 +225,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2019 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

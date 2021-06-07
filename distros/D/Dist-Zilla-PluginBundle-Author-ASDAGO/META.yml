@@ -1,0 +1,435 @@
+---
+abstract: "ASDAGO's Dist::Zilla plugin bundle"
+author:
+  - 'Asher Gordon <AsDaGo@posteo.net>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.019, CPAN::Meta::Converter version 2.150010'
+license: gpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Dist-Zilla-PluginBundle-Author-ASDAGO
+requires:
+  Dist::Zilla: '0'
+  Dist::Zilla::Plugin::AutoPrereqs: '0'
+  Dist::Zilla::Plugin::Bugtracker: '0'
+  Dist::Zilla::Plugin::FakeRelease: '0'
+  Dist::Zilla::Plugin::Git::Contributors: '0'
+  Dist::Zilla::Plugin::Git::GatherDir: '0'
+  Dist::Zilla::Plugin::Git::NextVersion: '0'
+  Dist::Zilla::Plugin::MetaConfig: '0'
+  Dist::Zilla::Plugin::MetaJSON: '0'
+  Dist::Zilla::Plugin::MetaResourcesFromGit: '0'
+  Dist::Zilla::Plugin::NextRelease: '0'
+  Dist::Zilla::Plugin::PkgVersion: '0'
+  Dist::Zilla::Plugin::PodSyntaxTests: '0'
+  Dist::Zilla::Plugin::PodWeaver: '0'
+  Dist::Zilla::Plugin::ReadmeAnyFromPod: '0'
+  Dist::Zilla::Plugin::Test::ChangesHasContent: '0'
+  Dist::Zilla::PluginBundle::Basic: '0'
+  Dist::Zilla::PluginBundle::Filter: '0'
+  Dist::Zilla::PluginBundle::Git: '0'
+  Dist::Zilla::Role::PluginBundle::Config::Slicer: '0'
+  Dist::Zilla::Role::PluginBundle::Easy: '0'
+  Dist::Zilla::Role::PluginBundle::PluginRemover: '0'
+  Moose: '0'
+  Pod::Weaver::Config::Assembler: '0'
+  Pod::Weaver::Plugin::SingleEncoding: '0'
+  Pod::Weaver::Plugin::Transformer: '0'
+  Pod::Weaver::PluginBundle::CorePrep: '0'
+  Pod::Weaver::Section::Authors: '0'
+  Pod::Weaver::Section::Bugs: '0'
+  Pod::Weaver::Section::Collect: '0'
+  Pod::Weaver::Section::Contributors: '0'
+  Pod::Weaver::Section::Generic: '0'
+  Pod::Weaver::Section::Leftovers: '0'
+  Pod::Weaver::Section::Legal: '0'
+  Pod::Weaver::Section::Name: '0'
+  Pod::Weaver::Section::Region: '0'
+  Text::Wrap: '0'
+  feature: '0'
+  namespace::autoclean: '0'
+  perl: v5.18.0
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Dist-Zilla-PluginBundle-Author-ASDAGO
+  repository: https://git.savannah.nongnu.org/git/Dist-Zilla-PluginBundle-Author-ASDAGO.git
+version: '0.001'
+x_Dist_Zilla:
+  perl:
+    version: '5.032001'
+  plugins:
+    -
+      class: Dist::Zilla::Plugin::PruneCruft
+      name: '@Author::ASDAGO/@Filter/PruneCruft'
+      version: '6.019'
+    -
+      class: Dist::Zilla::Plugin::ManifestSkip
+      name: '@Author::ASDAGO/@Filter/ManifestSkip'
+      version: '6.019'
+    -
+      class: Dist::Zilla::Plugin::MetaYAML
+      name: '@Author::ASDAGO/@Filter/MetaYAML'
+      version: '6.019'
+    -
+      class: Dist::Zilla::Plugin::License
+      name: '@Author::ASDAGO/@Filter/License'
+      version: '6.019'
+    -
+      class: Dist::Zilla::Plugin::ExtraTests
+      name: '@Author::ASDAGO/@Filter/ExtraTests'
+      version: '6.019'
+    -
+      class: Dist::Zilla::Plugin::ExecDir
+      name: '@Author::ASDAGO/@Filter/ExecDir'
+      version: '6.019'
+    -
+      class: Dist::Zilla::Plugin::ShareDir
+      name: '@Author::ASDAGO/@Filter/ShareDir'
+      version: '6.019'
+    -
+      class: Dist::Zilla::Plugin::MakeMaker
+      config:
+        Dist::Zilla::Role::TestRunner:
+          default_jobs: 1
+      name: '@Author::ASDAGO/@Filter/MakeMaker'
+      version: '6.019'
+    -
+      class: Dist::Zilla::Plugin::Manifest
+      name: '@Author::ASDAGO/@Filter/Manifest'
+      version: '6.019'
+    -
+      class: Dist::Zilla::Plugin::TestRelease
+      name: '@Author::ASDAGO/@Filter/TestRelease'
+      version: '6.019'
+    -
+      class: Dist::Zilla::Plugin::ConfirmRelease
+      name: '@Author::ASDAGO/@Filter/ConfirmRelease'
+      version: '6.019'
+    -
+      class: Dist::Zilla::Plugin::UploadToCPAN
+      name: '@Author::ASDAGO/@Filter/UploadToCPAN'
+      version: '6.019'
+    -
+      class: Dist::Zilla::Plugin::Git::Check
+      config:
+        Dist::Zilla::Plugin::Git::Check:
+          untracked_files: die
+        Dist::Zilla::Role::Git::DirtyFiles:
+          allow_dirty:
+            - Changes
+            - dist.ini
+          allow_dirty_match: []
+          changelog: Changes
+        Dist::Zilla::Role::Git::Repo:
+          git_version: 2.30.2
+          repo_root: .
+      name: '@Author::ASDAGO/@Git/Check'
+      version: '2.047'
+    -
+      class: Dist::Zilla::Plugin::Git::Commit
+      config:
+        Dist::Zilla::Plugin::Git::Commit:
+          add_files_in: []
+          commit_msg: v%V%n%n%c
+          signoff: 0
+        Dist::Zilla::Role::Git::DirtyFiles:
+          allow_dirty:
+            - Changes
+            - dist.ini
+          allow_dirty_match: []
+          changelog: Changes
+        Dist::Zilla::Role::Git::Repo:
+          git_version: 2.30.2
+          repo_root: .
+        Dist::Zilla::Role::Git::StringFormatter:
+          time_zone: local
+      name: '@Author::ASDAGO/@Git/Commit'
+      version: '2.047'
+    -
+      class: Dist::Zilla::Plugin::Git::Tag
+      config:
+        Dist::Zilla::Plugin::Git::Tag:
+          branch: ~
+          changelog: Changes
+          signed: 1
+          tag: v0.001
+          tag_format: v%V
+          tag_message: 'Release version %V.'
+        Dist::Zilla::Role::Git::Repo:
+          git_version: 2.30.2
+          repo_root: .
+        Dist::Zilla::Role::Git::StringFormatter:
+          time_zone: local
+      name: '@Author::ASDAGO/@Git/Tag'
+      version: '2.047'
+    -
+      class: Dist::Zilla::Plugin::Git::Push
+      config:
+        Dist::Zilla::Plugin::Git::Push:
+          push_to:
+            - origin
+          remotes_must_exist: 1
+        Dist::Zilla::Role::Git::Repo:
+          git_version: 2.30.2
+          repo_root: .
+      name: '@Author::ASDAGO/@Git/Push'
+      version: '2.047'
+    -
+      class: Dist::Zilla::Plugin::Git::NextVersion
+      config:
+        Dist::Zilla::Plugin::Git::NextVersion:
+          first_version: '0.001'
+          version_by_branch: 0
+          version_regexp: (?^:^v(.+)$)
+        Dist::Zilla::Role::Git::Repo:
+          git_version: 2.30.2
+          repo_root: .
+      name: '@Author::ASDAGO/Git::NextVersion'
+      version: '2.047'
+    -
+      class: Dist::Zilla::Plugin::Git::Contributors
+      config:
+        Dist::Zilla::Plugin::Git::Contributors:
+          git_version: 2.30.2
+          include_authors: 0
+          include_releaser: 1
+          order_by: name
+          paths: []
+      name: '@Author::ASDAGO/Git::Contributors'
+      version: '0.036'
+    -
+      class: Dist::Zilla::Plugin::MetaConfig
+      name: '@Author::ASDAGO/MetaConfig'
+      version: '6.019'
+    -
+      class: Dist::Zilla::Plugin::MetaJSON
+      name: '@Author::ASDAGO/MetaJSON'
+      version: '6.019'
+    -
+      class: Dist::Zilla::Plugin::NextRelease
+      name: '@Author::ASDAGO/NextRelease'
+      version: '6.019'
+    -
+      class: Dist::Zilla::Plugin::Test::ChangesHasContent
+      name: '@Author::ASDAGO/Test::ChangesHasContent'
+      version: '0.011'
+    -
+      class: Dist::Zilla::Plugin::PodSyntaxTests
+      name: '@Author::ASDAGO/PodSyntaxTests'
+      version: '6.019'
+    -
+      class: Dist::Zilla::Plugin::Git::GatherDir
+      config:
+        Dist::Zilla::Plugin::GatherDir:
+          exclude_filename:
+            - LICENSE
+          exclude_match: []
+          follow_symlinks: 0
+          include_dotfiles: 0
+          prefix: ''
+          prune_directory: []
+          root: .
+        Dist::Zilla::Plugin::Git::GatherDir:
+          include_untracked: 0
+      name: '@Author::ASDAGO/Git::GatherDir'
+      version: '2.047'
+    -
+      class: Dist::Zilla::Plugin::Bugtracker
+      name: '@Author::ASDAGO/Bugtracker'
+      version: '1.111080'
+    -
+      class: Dist::Zilla::Plugin::MetaResourcesFromGit
+      name: '@Author::ASDAGO/MetaResourcesFromGit'
+      version: '1.103620'
+    -
+      class: Dist::Zilla::Plugin::PkgVersion
+      name: '@Author::ASDAGO/PkgVersion'
+      version: '6.019'
+    -
+      class: Dist::Zilla::Plugin::PodWeaver
+      config:
+        Dist::Zilla::Plugin::PodWeaver:
+          config_plugins:
+            - '@Author::ASDAGO'
+          finder:
+            - ':InstallModules'
+            - ':ExecFiles'
+          plugins:
+            -
+              class: Pod::Weaver::Plugin::EnsurePod5
+              name: '@CorePrep/EnsurePod5'
+              version: '4.015'
+            -
+              class: Pod::Weaver::Plugin::H1Nester
+              name: '@CorePrep/H1Nester'
+              version: '4.015'
+            -
+              class: Pod::Weaver::Plugin::SingleEncoding
+              name: '@Author::ASDAGO/SingleEncoding'
+              version: '4.015'
+            -
+              class: Pod::Weaver::Section::Name
+              name: '@Author::ASDAGO/Name'
+              version: '4.015'
+            -
+              class: Pod::Weaver::Section::Version
+              name: '@Author::ASDAGO/Version'
+              version: '4.015'
+            -
+              class: Pod::Weaver::Section::Region
+              name: '@Author::ASDAGO/prelude'
+              version: '4.015'
+            -
+              class: Pod::Weaver::Section::Generic
+              name: SYNOPSIS
+              version: '4.015'
+            -
+              class: Pod::Weaver::Section::Generic
+              name: DESCRIPTION
+              version: '4.015'
+            -
+              class: Pod::Weaver::Section::Generic
+              name: OVERVIEW
+              version: '4.015'
+            -
+              class: Pod::Weaver::Section::Collect
+              name: FUNCTIONS
+              version: '4.015'
+            -
+              class: Pod::Weaver::Section::Collect
+              name: VARIABLES
+              version: '4.015'
+            -
+              class: Pod::Weaver::Section::Collect
+              name: OVERLOADS
+              version: '4.015'
+            -
+              class: Pod::Weaver::Section::Collect
+              name: METHODS
+              version: '4.015'
+            -
+              class: Pod::Weaver::Section::Collect
+              name: ATTRIBUTES
+              version: '4.015'
+            -
+              class: Pod::Weaver::Section::Leftovers
+              name: '@Author::ASDAGO/Leftovers'
+              version: '4.015'
+            -
+              class: Pod::Weaver::Section::Region
+              name: '@Author::ASDAGO/postlude'
+              version: '4.015'
+            -
+              class: Pod::Weaver::Section::Bugs
+              name: '@Author::ASDAGO/Bugs'
+              version: '4.015'
+            -
+              class: Pod::Weaver::Section::Generic
+              name: 'SEE ALSO'
+              version: '4.015'
+            -
+              class: Pod::Weaver::Section::Generic
+              name: ACKNOWLEDGMENTS
+              version: '4.015'
+            -
+              class: Pod::Weaver::Section::Generic
+              name: ACKNOWLEDGEMENTS
+              version: '4.015'
+            -
+              class: Pod::Weaver::Section::Contributors
+              name: '@Author::ASDAGO/Contributors'
+              version: '0.009'
+            -
+              class: Pod::Weaver::Section::Authors
+              name: '@Author::ASDAGO/Authors'
+              version: '4.015'
+            -
+              class: Pod::Weaver::Section::Legal
+              name: '@Author::ASDAGO/Legal'
+              version: '4.015'
+            -
+              class: Pod::Weaver::Plugin::Transformer
+              name: '@Author::ASDAGO/List'
+              version: '4.015'
+      name: '@Author::ASDAGO/PodWeaver'
+      version: '4.008'
+    -
+      class: Dist::Zilla::Plugin::AutoPrereqs
+      name: '@Author::ASDAGO/AutoPrereqs'
+      version: '6.019'
+    -
+      class: Dist::Zilla::Plugin::ReadmeAnyFromPod
+      config:
+        Dist::Zilla::Role::FileWatcher:
+          version: '0.006'
+      name: '@Author::ASDAGO/ReadmeAnyFromPod'
+      version: '0.163250'
+    -
+      class: Dist::Zilla::Plugin::FileFinder::ByName
+      name: DistZillaBundles
+      version: '6.019'
+    -
+      class: Dist::Zilla::Plugin::FileFinder::ByName
+      name: PodWeaverBundles
+      version: '6.019'
+    -
+      class: Dist::Zilla::Plugin::AutoPrereqs
+      name: DistZillaPrereqs
+      version: '6.019'
+    -
+      class: Dist::Zilla::Plugin::AutoPrereqs
+      name: PodWeaverPrereqs
+      version: '6.019'
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':InstallModules'
+      version: '6.019'
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':IncModules'
+      version: '6.019'
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':TestFiles'
+      version: '6.019'
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':ExtraTestFiles'
+      version: '6.019'
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':ExecFiles'
+      version: '6.019'
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':PerlExecFiles'
+      version: '6.019'
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':ShareFiles'
+      version: '6.019'
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':MainModule'
+      version: '6.019'
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':AllFiles'
+      version: '6.019'
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':NoFiles'
+      version: '6.019'
+  zilla:
+    class: Dist::Zilla::Dist::Builder
+    config:
+      is_trial: '0'
+    version: '6.019'
+x_generated_by_perl: v5.32.1
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: GPL-3.0-or-later

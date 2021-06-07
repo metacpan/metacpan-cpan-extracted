@@ -1,7 +1,9 @@
 package Module::Abstract::Cwalitee;
 
-our $DATE = '2019-09-15'; # DATE
-our $VERSION = '0.006'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2021-06-06'; # DATE
+our $DIST = 'Module-Abstract-Cwalitee'; # DIST
+our $VERSION = '0.008'; # VERSION
 
 use 5.010001;
 use strict 'subs', 'vars';
@@ -54,6 +56,9 @@ $SPEC{calc_module_abstract_cwalitee} = {
             req => 1,
             pos => 0,
         },
+        module => {
+            schema => 'perl::modname*',
+        },
     },
     examples => [
         {
@@ -76,7 +81,7 @@ sub calc_module_abstract_cwalitee {
         %fargs,
         code_init_r => sub {
             return {
-                # module => ...
+                module => $fargs{module},
                 abstract => $fargs{abstract},
             },
         },
@@ -98,7 +103,7 @@ Module::Abstract::Cwalitee - Calculate the cwalitee of your module Abstract
 
 =head1 VERSION
 
-This document describes version 0.006 of Module::Abstract::Cwalitee (from Perl distribution Module-Abstract-Cwalitee), released on 2019-09-15.
+This document describes version 0.008 of Module::Abstract::Cwalitee (from Perl distribution Module-Abstract-Cwalitee), released on 2021-06-06.
 
 =head1 SYNOPSIS
 
@@ -129,7 +134,7 @@ cwalitee", and so on.
 
 Usage:
 
- calc_module_abstract_cwalitee(%args) -> [status, msg, payload, meta]
+ calc_module_abstract_cwalitee(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Examples:
 
@@ -142,88 +147,93 @@ Examples:
 Result:
 
  [
-   {
-     indicator => "not_empty",
-     num => 1,
-     result => 1,
-     result_summary => "",
-     severity => 3,
-   },
-   {
-     indicator => "language_english",
-     num => 2,
-     result => 1,
-     result_summary => "",
-     severity => 3,
-   },
-   {
-     indicator => "no_shouting",
-     num => 3,
-     result => 1,
-     result_summary => "",
-     severity => 3,
-   },
-   {
-     indicator => "not_end_with_dot",
-     num => 4,
-     result => 1,
-     result_summary => "",
-     severity => 3,
-   },
-   {
-     indicator => "not_module_name",
-     num => 5,
-     result => 1,
-     result_summary => "",
-     severity => 3,
-   },
-   {
-     indicator => "not_multiline",
-     num => 6,
-     result => 1,
-     result_summary => "",
-     severity => 3,
-   },
-   {
-     indicator => "not_redundant",
-     num => 7,
-     result => 1,
-     result_summary => "",
-     severity => 3,
-   },
-   {
-     indicator => "not_start_with_lowercase_letter",
-     num => 8,
-     result => 1,
-     result_summary => "",
-     severity => 3,
-   },
-   {
-     indicator => "not_template",
-     num => 9,
-     result => 1,
-     result_summary => "",
-     severity => 3,
-   },
-   {
-     indicator => "not_too_long",
-     num => 10,
-     result => 1,
-     result_summary => "",
-     severity => 3,
-   },
-   {
-     indicator => "not_too_short",
-     num => 11,
-     result => 1,
-     result_summary => "",
-     severity => 3,
-   },
-   {
-     indicator => "Score",
-     result => "100.00",
-     result_summary => "11 out of 11",
-   },
+   200,
+   "OK",
+   [
+     {
+       indicator => "not_empty",
+       num => 1,
+       result => 1,
+       result_summary => "",
+       severity => 3,
+     },
+     {
+       indicator => "language_english",
+       num => 2,
+       result => 1,
+       result_summary => "",
+       severity => 3,
+     },
+     {
+       indicator => "no_shouting",
+       num => 3,
+       result => 1,
+       result_summary => "",
+       severity => 3,
+     },
+     {
+       indicator => "not_end_with_dot",
+       num => 4,
+       result => 1,
+       result_summary => "",
+       severity => 3,
+     },
+     {
+       indicator => "not_module_name",
+       num => 5,
+       result => 1,
+       result_summary => "",
+       severity => 3,
+     },
+     {
+       indicator => "not_multiline",
+       num => 6,
+       result => 1,
+       result_summary => "",
+       severity => 3,
+     },
+     {
+       indicator => "not_redundant",
+       num => 7,
+       result => 1,
+       result_summary => "",
+       severity => 3,
+     },
+     {
+       indicator => "not_start_with_lowercase_letter",
+       num => 8,
+       result => 1,
+       result_summary => "",
+       severity => 3,
+     },
+     {
+       indicator => "not_template",
+       num => 9,
+       result => 1,
+       result_summary => "",
+       severity => 3,
+     },
+     {
+       indicator => "not_too_long",
+       num => 10,
+       result => 1,
+       result_summary => "",
+       severity => 3,
+     },
+     {
+       indicator => "not_too_short",
+       num => 11,
+       result => 1,
+       result_summary => "",
+       severity => 3,
+     },
+     {
+       indicator => "Score",
+       result => "100.00",
+       result_summary => "11 out of 11",
+     },
+   ],
+   { "func.score" => "100.00", "func.score_summary" => "11 out of 11" },
  ]
 
 =item * Example of a not-so-good Abstract:
@@ -233,84 +243,89 @@ Result:
 Result:
 
  [
-   {
-     indicator => "not_empty",
-     num => 1,
-     result => 1,
-     result_summary => "",
-     severity => 3,
-   },
-   {
-     indicator => "language_english",
-     num => 2,
-     result => 1,
-     result_summary => "",
-     severity => 3,
-   },
-   {
-     indicator => "no_shouting",
-     num => 3,
-     result => 0,
-     result_summary => "All-caps",
-     severity => 3,
-   },
-   {
-     indicator => "not_end_with_dot",
-     num => 4,
-     result => 1,
-     result_summary => "",
-     severity => 3,
-   },
-   {
-     indicator => "not_module_name",
-     num => 5,
-     result => 1,
-     result_summary => "",
-     severity => 3,
-   },
-   {
-     indicator => "not_multiline",
-     num => 6,
-     result => 1,
-     result_summary => "",
-     severity => 3,
-   },
-   {
-     indicator => "not_redundant",
-     num => 7,
-     result => 0,
-     result_summary => "Saying 'PERL MODULE TO' is redundant, omit it",
-     severity => 3,
-   },
-   {
-     indicator => "not_start_with_lowercase_letter",
-     num => 8,
-     result => 1,
-     result_summary => "",
-     severity => 3,
-   },
-   {
-     indicator => "not_template",
-     num => 9,
-     result => 1,
-     result_summary => "",
-     severity => 3,
-   },
-   {
-     indicator => "not_too_long",
-     num => 10,
-     result => 1,
-     result_summary => "",
-     severity => 3,
-   },
-   {
-     indicator => "not_too_short",
-     num => 11,
-     result => 1,
-     result_summary => "",
-     severity => 3,
-   },
-   { indicator => "Score", result => 81.82, result_summary => "9 out of 11" },
+   200,
+   "OK",
+   [
+     {
+       indicator => "not_empty",
+       num => 1,
+       result => 1,
+       result_summary => "",
+       severity => 3,
+     },
+     {
+       indicator => "language_english",
+       num => 2,
+       result => 1,
+       result_summary => "",
+       severity => 3,
+     },
+     {
+       indicator => "no_shouting",
+       num => 3,
+       result => 0,
+       result_summary => "All-caps",
+       severity => 3,
+     },
+     {
+       indicator => "not_end_with_dot",
+       num => 4,
+       result => 1,
+       result_summary => "",
+       severity => 3,
+     },
+     {
+       indicator => "not_module_name",
+       num => 5,
+       result => 1,
+       result_summary => "",
+       severity => 3,
+     },
+     {
+       indicator => "not_multiline",
+       num => 6,
+       result => 1,
+       result_summary => "",
+       severity => 3,
+     },
+     {
+       indicator => "not_redundant",
+       num => 7,
+       result => 0,
+       result_summary => "Saying 'PERL MODULE TO' is redundant, omit it",
+       severity => 3,
+     },
+     {
+       indicator => "not_start_with_lowercase_letter",
+       num => 8,
+       result => 1,
+       result_summary => "",
+       severity => 3,
+     },
+     {
+       indicator => "not_template",
+       num => 9,
+       result => 1,
+       result_summary => "",
+       severity => 3,
+     },
+     {
+       indicator => "not_too_long",
+       num => 10,
+       result => 1,
+       result_summary => "",
+       severity => 3,
+     },
+     {
+       indicator => "not_too_short",
+       num => 11,
+       result => 1,
+       result_summary => "",
+       severity => 3,
+     },
+     { indicator => "Score", result => 81.82, result_summary => "9 out of 11" },
+   ],
+   { "func.score" => 81.82, "func.score_summary" => "9 out of 11" },
  ]
 
 =back
@@ -351,16 +366,19 @@ Only use indicators having these statuses.
 
 Minimum indicator severity.
 
+=item * B<module> => I<perl::modname>
+
+
 =back
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -370,7 +388,7 @@ Return value:  (any)
 
 Usage:
 
- list_module_abstract_cwalitee_indicators(%args) -> [status, msg, payload, meta]
+ list_module_abstract_cwalitee_indicators(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Examples:
 
@@ -383,17 +401,22 @@ Examples:
 Result:
 
  [
-   "language_english",
-   "no_shouting",
-   "not_empty",
-   "not_end_with_dot",
-   "not_module_name",
-   "not_multiline",
-   "not_redundant",
-   "not_start_with_lowercase_letter",
-   "not_template",
-   "not_too_long",
-   "not_too_short",
+   200,
+   "OK",
+   [
+     "language_english",
+     "no_shouting",
+     "not_empty",
+     "not_end_with_dot",
+     "not_module_name",
+     "not_multiline",
+     "not_redundant",
+     "not_start_with_lowercase_letter",
+     "not_template",
+     "not_too_long",
+     "not_too_short",
+   ],
+   {},
  ]
 
 =item * List only certain names, show details:
@@ -406,30 +429,35 @@ Result:
 Result:
 
  [
-   {
-     module   => "Module::Abstract::Cwalitee::Core",
-     name     => "not_template",
-     priority => 50,
-     severity => 3,
-     status   => "stable",
-     summary  => undef,
-   },
-   {
-     module   => "Module::Abstract::Cwalitee::Core",
-     name     => "not_too_long",
-     priority => 50,
-     severity => 3,
-     status   => "stable",
-     summary  => undef,
-   },
-   {
-     module   => "Module::Abstract::Cwalitee::Core",
-     name     => "not_too_short",
-     priority => 50,
-     severity => 3,
-     status   => "stable",
-     summary  => undef,
-   },
+   200,
+   "OK",
+   [
+     {
+       module   => "Module::Abstract::Cwalitee::Core",
+       name     => "not_template",
+       priority => 50,
+       severity => 3,
+       status   => "stable",
+       summary  => undef,
+     },
+     {
+       module   => "Module::Abstract::Cwalitee::Core",
+       name     => "not_too_long",
+       priority => 50,
+       severity => 3,
+       status   => "stable",
+       summary  => undef,
+     },
+     {
+       module   => "Module::Abstract::Cwalitee::Core",
+       name     => "not_too_short",
+       priority => 50,
+       severity => 3,
+       status   => "stable",
+       summary  => undef,
+     },
+   ],
+   {},
  ]
 
 =back
@@ -474,16 +502,17 @@ Maximum severity.
 
 Minimum severity.
 
+
 =back
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -515,7 +544,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2019 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

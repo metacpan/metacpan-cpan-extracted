@@ -6,7 +6,6 @@ use warnings;
 use base 'Tests::Service::Base';
 
 use Test::More;
-use Time::HiRes 'sleep';
 
 
 sub start_test_workers : Test(startup) {
@@ -16,21 +15,20 @@ sub start_test_workers : Test(startup) {
     $self->start_workers('Beekeeper::Service::LogTail::Worker');
 };
 
-sub test_00_compile_client : Test(2) {
+sub test_01_compile : Test(2) {
     my $self = shift;
 
-    use_ok('Beekeeper::Service::LogTail');
     use_ok('Tests::Service::Client');
+    use_ok('Beekeeper::Service::LogTail');
 }
 
-
-sub test_01_client : Test(11) {
+sub test_02_client : Test(11) {
     my $self = shift;
 
     # Cause a warning
     Tests::Service::Client->notify( 'test.fail' => { 'warn' => 'Foo' });
 
-    sleep 0.1;
+    $self->_sleep( 0.2 );
 
     my $svc = 'Beekeeper::Service::LogTail';
 
@@ -46,7 +44,7 @@ sub test_01_client : Test(11) {
     # Cause an error
     Tests::Service::Client->notify( 'test.fail' => { 'die'  => 'Bar' });
 
-    sleep 0.1;
+    $self->_sleep( 0.2 );
 
     $logged = $svc->tail;
     $last = $logged->[-1];

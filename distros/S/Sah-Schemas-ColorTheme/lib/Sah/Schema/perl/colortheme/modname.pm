@@ -1,16 +1,16 @@
 package Sah::Schema::perl::colortheme::modname;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-01-26'; # DATE
+our $DATE = '2021-02-02'; # DATE
 our $DIST = 'Sah-Schemas-ColorTheme'; # DIST
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.003'; # VERSION
 
 use Sah::PSchema 'get_schema';
 use Sah::PSchema::perl::modname; # not yet detected automatically by a dzil plugin
 
 our $schema = get_schema(
     'perl::modname',
-    {ns_prefix=>'ColorTheme'},
+    {ns_prefix=>'ColorTheme', complete_recurse=>1},
     {
         summary => 'Perl module in the ColorTheme::* namespace, without the namespace prefix, e.g. "Test::Random"',
     }
@@ -31,7 +31,7 @@ Sah::Schema::perl::colortheme::modname - Perl module in the ColorTheme::* namesp
 
 =head1 VERSION
 
-This document describes version 0.002 of Sah::Schema::perl::colortheme::modname (from Perl distribution Sah-Schemas-ColorTheme), released on 2021-01-26.
+This document describes version 0.003 of Sah::Schema::perl::colortheme::modname (from Perl distribution Sah-Schemas-ColorTheme), released on 2021-02-02.
 
 =head1 SYNOPSIS
 

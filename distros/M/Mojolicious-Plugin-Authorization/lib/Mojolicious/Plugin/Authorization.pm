@@ -1,6 +1,6 @@
 package Mojolicious::Plugin::Authorization;
 BEGIN {
-  $Mojolicious::Plugin::Authorization::VERSION = '1.05';
+  $Mojolicious::Plugin::Authorization::VERSION = '1.06';
 }
 use Mojo::Base 'Mojolicious::Plugin';
 # The dog is good, but our real competition is the Hypnotoad.
@@ -18,14 +18,18 @@ sub register {
     my $fail_render    = $args->{fail_render};
     $app->routes->add_condition(has_priv => sub {
         my ($r, $c, $captures, $priv) = @_;
-        my $res = ($priv && $has_priv_cb->($c,$priv)) ? 1 : 0;
+        my $extradata;
+        ($priv, $extradata) = @$priv if (ref($priv) eq 'ARRAY');
+        my $res = ($priv && $has_priv_cb->($c,$priv,$extradata)) ? 1 : 0;
         $c->render( %$fail_render ) if $fail_render && ! $res;
         return $res;
     });
     for my $helper_name ( qw/ is_role is / ) {
         $app->routes->add_condition($helper_name => sub {
             my ($r, $c, $captures, $role) = @_;
-            my $res = ($role && $is_role_cb->($c,$role)) ? 1 : 0;
+            my $extradata;
+            ($role, $extradata) = @$role if (ref($role) eq 'ARRAY');
+            my $res = ($role && $is_role_cb->($c,$role,$extradata)) ? 1 : 0;
             $c->render( %$fail_render ) if $fail_render && ! $res;
             return $res;
         });
@@ -62,7 +66,7 @@ Mojolicious::Plugin::Authorization - A plugin to make Authorization a bit easier
 
 =head1 VERSION
 
-version 1.05
+version 1.06
 
 =head1 SYNOPSIS
 
@@ -202,8 +206,9 @@ it uses L<Mojolicious::Lite> and this plugin.
 This plugin also exports a routing condition you can use in order to limit access to certain documents to only
 sessions that have a privilege.
 
-    $r->route('/delete_all')->over(has_priv => 'delete_all')->to('mycontroller#delete_all');
-    my $delete_all_only = $r->route('/members')->over(has_priv => 'delete_all')->to('members#delete_all');
+    $r->route('/delete_all')->requires(has_priv => 'delete_all')->to('mycontroller#delete_all');
+    $r->route('/delete_all')->requires(has_priv => ['delete_all', $extradata])->to('mycontroller#delete_all');
+    my $delete_all_only = $r->route('/members')->requires(has_priv => 'delete_all')->to('members#delete_all');
     $delete_all_only->route('delete')->to('members#delete_all');
 
 If the session does not have the 'delete_all' privilege, these routes will not be considered by the dispatcher and unless you have set up a catch-all route,
@@ -212,8 +217,9 @@ If the session does not have the 'delete_all' privilege, these routes will not b
 Another condition you can use to limit access to certain documents to only those sessions that
 have a role.
 
-    $r->route('/view_all')->over(is => 'ADMIN')->to('mycontroller#view_all');
-    my $view_all_only = $r->route('/members')->over(is => 'view_all')->to('members#view_all');
+    $r->route('/view_all')->requires(is => 'ADMIN')->to('mycontroller#view_all');
+    $r->route('/view_all')->requires(is => ['ADMIN', $extradata])->to('mycontroller#view_all');
+    my $view_all_only = $r->route('/members')->requires(is => 'view_all')->to('members#view_all');
     $view_all_only->route('view')->to('members#view_all');
 
 If the session is not the 'ADMIN' role, these routes will not be considered by the dispatcher and unless you have set up a catch-all route,
@@ -282,6 +288,10 @@ Roland Lammel
 Lee Johnson
 
     -   For the latest updates for version 1.04
+    
+Matt Altus
+
+    -   For the Allow extra data via conditional routing enhancement 
     
 =head1 LICENSE AND COPYRIGHT
 

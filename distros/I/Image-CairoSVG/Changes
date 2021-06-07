@@ -1,5 +1,11 @@
 Revision log for Perl module "Image::CairoSVG"
 
+0.22 2021-05-31
+
+- Partial support for radial and linear gradients
+- rgb triplet colour support
+- Fix error with 0 attributes not being set
+
 0.21 2021-05-17
 
 - Support stroke-dasharray and stroke-dashoffset

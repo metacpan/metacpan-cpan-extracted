@@ -1,5 +1,5 @@
 package Photonic::WE::R2::Wave;
-$Photonic::WE::R2::Wave::VERSION = '0.015';
+$Photonic::WE::R2::Wave::VERSION = '0.016';
 
 =encoding UTF-8
 
@@ -9,7 +9,7 @@ Photonic::WE::R2::Wave
 
 =head1 VERSION
 
-version 0.015
+version 0.016
 
 =head1 COPYRIGHT NOTICE
 
@@ -78,7 +78,7 @@ response $epsA is taken from the metric.
 
 =back
 
-=head1 ACCESORS (read only)
+=head1 ACCESSORS (read only)
 
 =over 4
 
@@ -93,20 +93,14 @@ The macroscopic wave operator of the last operation
 =cut
 
 use namespace::autoclean;
-use PDL::Lite;
-use PDL::NiceSlice;
-use PDL::Complex;
-use PDL::MatrixOps;
-use Storable qw(dclone store);
-use PDL::IO::Storable;
-#use Photonic::WE::R2::AllH;
+use Photonic::Utils qw(wave_operator);
 use Photonic::Types;
 use Moose;
 use MooseX::StrictConstructor;
 
 extends 'Photonic::WE::R2::Green';
 
-has 'waveOperator' =>  (is=>'ro', isa=>'PDL::Complex', init_arg=>undef,
+has 'waveOperator' =>  (is=>'ro', isa=>'Photonic::Types::PDLComplex', init_arg=>undef,
              writer=>'_waveOperator',
              documentation=>'Wave operator from last evaluation');
 
@@ -114,16 +108,9 @@ around 'evaluate' => sub {
     my $orig=shift;
     my $self=shift;
     my $green=$self->$orig(@_);
-    #make a real matrix from [[R -I][I R]] to solve complex eq.
-    my $greenreim=$green->re->append(-$green->im)
-       ->glue(1,$green->im->append($green->re))->sever; #copy vs sever?
-    my($lu, $perm, $par)=$greenreim->lu_decomp;
-    my $d=$self->geometry->ndims;
-    my $idreim=identity($d)->glue(1,PDL->zeroes($d,$d))->mv(0,-1);
-    my $wavereim=lu_backsub($lu,$perm,$par,$idreim);
-    my $wave=$wavereim->reshape($d,2,$d)->mv(1,0)->complex;
+    my $wave = wave_operator($green, $self->geometry->ndims);
     $self->_waveOperator($wave);
-    return $wave;
+    $wave;
 };
 
 __PACKAGE__->meta->make_immutable;

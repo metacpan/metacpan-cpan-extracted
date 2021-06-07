@@ -4,7 +4,7 @@ use strict;
 use warnings;
 
 # ABSTRACT: libarchive callback functions
-our $VERSION = '0.0902'; # VERSION
+our $VERSION = '0.0903'; # VERSION
 
 
 package
@@ -20,7 +20,7 @@ use constant {
   CB_SEEK        => 6,
   CB_BUFFER      => 7,
 };
-    
+
 my %callbacks;
 
 sub ARCHIVE_FATAL ();
@@ -69,7 +69,7 @@ sub _myread
   my($archive) = @_;
   my ($status, $buffer) = eval {
     $callbacks{$archive}->[CB_READ]->(
-      $archive, 
+      $archive,
       $callbacks{$archive}->[CB_DATA],
     )
   };
@@ -87,7 +87,7 @@ sub _mywrite
   my($archive, $buffer) = @_;
   my $status = eval {
     $callbacks{$archive}->[CB_WRITE]->(
-      $archive, 
+      $archive,
       $callbacks{$archive}->[CB_DATA],
       $buffer,
     )
@@ -179,7 +179,7 @@ Archive::Libarchive::XS::Callback - libarchive callback functions
 
 =head1 VERSION
 
-version 0.0902
+version 0.0903
 
 =head1 SYNOPSIS
 
@@ -227,7 +227,7 @@ and C<ARCHIVE_FATAL> will be passed back to libarchive.
 
 There is a data field for callbacks associated with each $archive object.
 It can be any native Perl type (example: scalar, hashref, coderef, etc).
-You can set this by calling 
+You can set this by calling
 L<archive_read_set_callback_data|Archive::Libarchive::XS::Function#archive_read_set_callback_data>,
 or by passing the data argument when you "open" the archive using
 L<archive_read_open|Archive::Libarchive::XS::Function#archive_read_open>,
@@ -247,7 +247,7 @@ The data field will be passed into each callback as its second argument.
 According to the libarchive, this is never needed, but you can register
 a callback to happen when you open.
 
-Can also be set when you call 
+Can also be set when you call
 L<archive_read_open|Archive::Libarchive::XS::Function#archive_read_open>,
 L<archive_read_open2|Archive::Libarchive::XS::Function#archive_read_open2> or
 L<archive_write_open|Archive::Libarchive::XS::Function#archive_write_open>.
@@ -264,7 +264,7 @@ This callback is called whenever libarchive is ready for more data to
 process.  It doesn't take in any additional arguments, but it expects
 two return values, a status and a buffer containing the data.
 
-Can also be set when you call 
+Can also be set when you call
 L<archive_read_open|Archive::Libarchive::XS::Function#archive_read_open> or
 L<archive_read_open2|Archive::Libarchive::XS::Function#archive_read_open2>.
 
@@ -278,7 +278,7 @@ L<archive_read_open2|Archive::Libarchive::XS::Function#archive_read_open2>.
  my $status2 = archive_write_open($archive, undef, $mywrite, undef);
 
 This callback is called whenever libarchive has data it wants to send
-to output.  The callback itself takes one additional argument, a 
+to output.  The callback itself takes one additional argument, a
 buffer containing the data to write.
 
 It should return the actual number of bytes written by you, or an
@@ -294,7 +294,7 @@ status value for an error.
 
 The skip callback takes one additional argument, $request.
 
-Can also be set when you call 
+Can also be set when you call
 L<archive_read_open2|Archive::Libarchive::XS::Function#archive_read_open2>.
 
 =head2 seek
@@ -318,7 +318,7 @@ C<fseek> function.
 
 Called when the archive (either input or output) should be closed.
 
-Can also be set when you call 
+Can also be set when you call
 L<archive_read_open|Archive::Libarchive::XS::Function#archive_read_open>,
 L<archive_read_open2|Archive::Libarchive::XS::Function#archive_read_open2> or
 L<archive_write_open|Archive::Libarchive::XS::Function#archive_write_open>.
@@ -343,7 +343,7 @@ Called by archive_write_disk_gid to determine appropriate GID.
 
 =head2 user name lookup
 
- my $status = archive_read_disk_set_uname_lookup($archive, $data, sub 
+ my $status = archive_read_disk_set_uname_lookup($archive, $data, sub
    my($data, $uid) = @_;
    ... # should return the name for $uid, or undef
  }, undef);
@@ -352,7 +352,7 @@ Called by archive_read_disk_uname to determine appropriate user name.
 
 =head2 group name lookup
 
- my $status = archive_read_disk_set_gname_lookup($archive, $data, sub 
+ my $status = archive_read_disk_set_gname_lookup($archive, $data, sub
    my($data, $gid) = @_;
    ... # should return the name for $gid, or undef
  }, undef);

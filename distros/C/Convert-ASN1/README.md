@@ -47,7 +47,7 @@ origin and upstream remotes setup as in the guide linked to above.
     git fetch upstream git checkout -b mybranch upstream/master
 
 this will checkout a new branch called _mybranch_ from the latest
-code the the master branch of the upstream repository.
+code in the master branch of the upstream repository.
 
 Once you have finished push that branch to your origin repository
 with

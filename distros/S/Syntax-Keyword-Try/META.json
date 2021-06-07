@@ -21,11 +21,13 @@
       },
       "configure" : {
          "requires" : {
-            "Module::Build" : "0.4004"
+            "Module::Build" : "0.4004",
+            "XS::Parse::Keyword::Builder" : "0.06"
          }
       },
       "runtime" : {
          "requires" : {
+            "XS::Parse::Keyword" : "0.06",
             "perl" : "5.014"
          }
       },
@@ -38,11 +40,11 @@
    "provides" : {
       "Syntax::Keyword::Try" : {
          "file" : "lib/Syntax/Keyword/Try.pm",
-         "version" : "0.24"
+         "version" : "0.25"
       },
       "Syntax::Keyword::Try::Deparse" : {
          "file" : "lib/Syntax/Keyword/Try/Deparse.pm",
-         "version" : "0.24"
+         "version" : "0.25"
       }
    },
    "release_status" : "stable",
@@ -52,6 +54,6 @@
       ],
       "x_IRC" : "irc://irc.perl.org/#io-async"
    },
-   "version" : "0.24",
+   "version" : "0.25",
    "x_serialization_backend" : "JSON::PP version 4.05"
 }

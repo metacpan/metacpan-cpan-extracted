@@ -10,7 +10,7 @@ SKIP: {
       unless (
         -d '.git'
         and eval {
-            $git = `git ls-tree --name-status -r HEAD | egrep -v '^\.(git|be)'`;
+            $git = `git ls-tree --name-status -r HEAD | grep -E -v '^\.git'`;
         }
       );
     is( $git, `cat MANIFEST`, 'MANIFEST up to date' );

@@ -1,0 +1,9 @@
+Revision history for Archive-Libarchive-Peek},
+
+0.02      2021-06-01 12:40:19 -0600
+  - Add as_hash method.  New feature requires Perl 5.22 (gh#2)
+
+0.01      2021-05-31 13:10:06 -0600
+  - initial version
+
+

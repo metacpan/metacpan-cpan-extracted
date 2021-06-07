@@ -5,9 +5,9 @@ use strict;
 use warnings;
 no warnings 'redefine';
 
-our $VERSION = '1.1';
+our $VERSION = '1.2';
 
-sub matches { map { "Linux::$_" } qw(Raspbian Ubuntu RealDebian UnknownDebianLike) }
+sub matches { map { "Linux::$_" } qw(Raspbian Ubuntu RealDebian UnknownDebianLike Devuan) }
 
 sub os_is { Devel::CheckOS::os_is(matches()) }
 
@@ -17,7 +17,7 @@ Devel::CheckOS::die_unsupported() unless(os_is());
 
 =head1 COPYRIGHT and LICENCE
 
-Copyright 2007 - 2020 David Cantrell
+Copyright 2007 - 2021 David Cantrell
 
 This software is free-as-in-speech software, and may be used, distributed, and modified under the terms of either the GNU General Public Licence version 2 or the Artistic Licence. It's up to you which one you use. The full text of the licences can be found in the files GPL2.txt and ARTISTIC.txt, respectively.
 

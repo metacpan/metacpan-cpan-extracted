@@ -22,16 +22,8 @@
 
 package PDL::Graphics::TriD::Mesh;
 
-BEGIN {
-   use PDL::Config;
-   if ( $PDL::Config{USE_POGL} ) {
-      eval "use OpenGL $PDL::Config{POGL_VERSION} qw(:all)";
-      eval 'use PDL::Graphics::OpenGL::Perl::OpenGL';
-   } else {
-      eval 'use PDL::Graphics::OpenGL';
-   }
-}
-
+use OpenGL qw(:all);
+use PDL::Graphics::OpenGL::Perl::OpenGL;
 use PDL::LiteF;
 @ISA=qw/PDL::Graphics::TriD::Object/;
 
@@ -49,7 +41,7 @@ sub new {
 		Data => $data,
 	};
 	PDL::Primitive::axisvalues($this->{Vertices}->slice('(0),:,:'));
-	PDL::Primitive::axisvalues($this->{Vertices}->slice('(1),:,:')->xchg(0,1));
+	PDL::Primitive::axisvalues($this->{Vertices}->slice('(1),:,:')->transpose);
 	PDL::Ops::assgn($this->{Data},$this->{Vertices}->slice('(2),:,:'));
 	bless $this,$type;
 }

@@ -1,6 +1,6 @@
 #!/usr/bin/env perl
 
-use 5.022;
+use 5.024;
 
 # Using Test2, important to specify which version of Test2
 # since later versions may break things.

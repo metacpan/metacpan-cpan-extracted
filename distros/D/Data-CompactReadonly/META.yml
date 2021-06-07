@@ -21,6 +21,7 @@ requires:
   Data::IEEE754: '0'
   Devel::StackTrace: '0'
   File::Temp: '0'
+  Scalar::Type: v0.1.1
   Scalar::Util: '0'
   String::Binary::Interpolation: '0'
   Test::Differences: '0'
@@ -29,5 +30,5 @@ requires:
 resources:
   bugtracker: https://github.com/DrHyde/perl-modules-Data-CompactReadonly/issues
   repository: https://github.com/DrHyde/perl-modules-Data-CompactReadonly
-version: v0.0.5
+version: v0.0.6
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

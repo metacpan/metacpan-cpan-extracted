@@ -3,6 +3,7 @@ use warnings;
 no warnings 'void';
 
 use Test::More;
+use Test::Exception;
 
 use Scalar::Type qw(is_* type);
 use B;
@@ -13,11 +14,14 @@ select(STDERR); $| = 1;
 select(STDOUT); $| = 1;
 
 subtest "is_integer" => sub {
+    ok(is_integer(0), '0 is an integer');
+    ok(is_integer(-0), '-0 is an integer');
     ok(is_integer(1), '1 is an integer');
     ok(is_integer(-1), '-1 is an integer');
     ok(!is_integer("1"), '"1" is not an integer');
     ok(!is_integer(1.0), '1.0 is not an integer');
     ok(!is_integer(1.1), '1.1 is not an integer');
+    ok(!is_integer(0.0), '0.0 is not an integer');
 
     ok(is_integer(0x12),    '0x12 is an integer');
     ok(!is_integer("0x12"), '"0x12" is not an integer');
@@ -25,16 +29,27 @@ subtest "is_integer" => sub {
     # the IV slot in the SV got filled
     my $foo = "1"; $foo += 0;
     ok(is_integer($foo), '"1" + 0 gets its IV slot filled, is an integer');
+
+    undef $foo;
+    ok(!is_integer($foo), "after undef-ing, it's no longer an integer");
 };
 
 subtest "is_number" => sub {
     ok(is_number(1), '1 is a number');
     ok(is_number(1.0), '1.0 is a number');
     ok(is_number(1.1), '1.1 is a number');
+    ok(is_number(0.0), '0.0 is a number');
     ok(!is_number("1"), '"1" is not a number');
     ok(!is_number("1.0"), '"1.0" is not a number');
-    ok(is_number(0x12),    '0x12 is a number');
     ok(!is_number("0x12"), '"0x12" is not a number');
+    my $foo = 0x12;
+    ok(is_number($foo), '0x12 is a number');
+
+    my $bar = "12.10";
+    ok(!is_number($bar), '"12.10" is not a number');
+    $bar + 0;
+    ok(!is_number($bar), '"12.10" is still not a number after being used in a numeric context');
+    note(capture_stderr { Dump($bar) });
 };
 
 subtest "integers written as exponents are weird" => sub {
@@ -158,13 +173,30 @@ subtest "references" => sub {
     is(type(B::svref_2object(\1)), 'B::IV', 'blessed scalars return their class');
 };
 
-subtest "type returns the documented values" => sub {
+subtest "type returns the documented values for non-reference types" => sub {
     is(type(1), 'INTEGER', '1 is of type INTEGER');
     is(type(1.0), 'NUMBER', '1.0 is of type NUMBER');
     is(type(1.1), 'NUMBER', '1.1 is of type NUMBER');
     is(type("1"), 'SCALAR', '"1" is of type SCALAR');
     is(type("1.0"), 'SCALAR', '"1.0" is of type SCALAR');
     is(type("1.1"), 'SCALAR', '"1.1" is of type SCALAR');
+    is(type(undef), 'UNDEF', 'undef is of type UNDEF');
 };
+
+throws_ok(
+    sub { type() },
+    qr{::type requires an argument at t/all.t line},
+    "type() requires an argument"
+);
+throws_ok(
+    sub { is_number() },
+    qr{::is_number requires an argument at t/all.t line},
+    "is_number() requires an argument"
+);
+throws_ok(
+    sub { is_integer() },
+    qr{::is_integer requires an argument at t/all.t line},
+    "is_integer() requires an argument"
+);
 
 done_testing;

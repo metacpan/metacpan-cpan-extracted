@@ -1,0 +1,31 @@
+---
+abstract: 'Multi-way tree in Pure Perl with an even or odd number of keys per node.'
+author:
+  - philiprbrenan@gmail.com
+build_requires: {}
+configure_requires:
+  Module::Build: '0.4224'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4231, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Tree-Multi
+provides:
+  Tree::Multi:
+    file: lib/Tree/Multi.pm
+    version: '20210605'
+requires:
+  Carp: '0'
+  Data::Dump: '0'
+  Data::Table::Text: '20200101'
+  Test2::API: '0'
+  Test::Most: '0'
+  feature: '0'
+resources:
+  bugtracker: https://github.com/philiprbrenan/TreeMulti/issues
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/philiprbrenan/TreeMulti
+version: '20210605'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

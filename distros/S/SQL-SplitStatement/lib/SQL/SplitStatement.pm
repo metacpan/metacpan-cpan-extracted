@@ -1,17 +1,14 @@
-## no critic
-package SQL::SplitStatement;
-BEGIN {
-  $SQL::SplitStatement::VERSION = '1.00020';
-}
-## use critic
-
 use strict;
 use warnings;
+package SQL::SplitStatement;
+
+our $VERSION = '1.00023';
+
 
 use base 'Class::Accessor::Fast';
 
 use Carp qw(croak);
-use SQL::Tokenizer 0.22 qw(tokenize_sql);
+use SQL::SplitStatement::Tokenizer qw(tokenize_sql);
 use List::MoreUtils qw(firstval firstidx each_array);
 use Regexp::Common qw(delimited);
 
@@ -65,7 +62,7 @@ my $IS_RE                 = qr/^IS$/i;
 my $TYPE_RE               = qr/^TYPE$/i;
 my $BODY_RE               = qr/^BODY$/i;
 my $DROP_RE               = qr/^DROP$/i;
-my $CRUD_RE               = qr/^(?:DELETE|INSERT|SELECT|UPDATE)$/i;
+my $CRUD_RE               = qr/^(?:DELETE|INSERT|SELECT|UPDATE|REPLACE)$/i;
 
 my $GRANT_REVOKE_RE       = qr/^(?:GRANT|REVOKE)$/i;;
 my $CREATE_ALTER_RE       = qr/^(?:CREATE|ALTER)$/i;
@@ -754,43 +751,39 @@ __END__
 
 SQL::SplitStatement - Split any SQL code into atomic statements
 
-=head1 VERSION
-
-version 1.00020
-
 =head1 SYNOPSIS
 
     # Multiple SQL statements in a single string
-my $sql_code = <<'SQL';
-CREATE TABLE parent(a, b, c   , d    );
-CREATE TABLE child (x, y, "w;", "z;z");
-/* C-style comment; */
-CREATE TRIGGER "check;delete;parent;" BEFORE DELETE ON parent WHEN
-    EXISTS (SELECT 1 FROM child WHERE old.a = x AND old.b = y)
-BEGIN
-    SELECT RAISE(ABORT, 'constraint failed;'); -- Inline SQL comment
-END;
--- Standalone SQL; comment; with semicolons;
-INSERT INTO parent (a, b, c, d) VALUES ('pippo;', 'pluto;', NULL, NULL);
-SQL
-    
-use SQL::SplitStatement;
-    
-my $sql_splitter = SQL::SplitStatement->new;
-my @statements = $sql_splitter->split($sql_code);
-    
-# @statements now is:
-#
-# (
-#     'CREATE TABLE parent(a, b, c   , d    )',
-#     'CREATE TABLE child (x, y, "w;", "z;z")',
-#     'CREATE TRIGGER "check;delete;parent;" BEFORE DELETE ON parent WHEN
-#     EXISTS (SELECT 1 FROM child WHERE old.a = x AND old.b = y)
-# BEGIN
-#     SELECT RAISE(ABORT, \'constraint failed;\');
-# END',
-#     'INSERT INTO parent (a, b, c, d) VALUES (\'pippo;\', \'pluto;\', NULL, NULL)'
-# )
+    my $sql_code = <<'SQL';
+    CREATE TABLE parent(a, b, c   , d    );
+    CREATE TABLE child (x, y, "w;", "z;z");
+    /* C-style comment; */
+    CREATE TRIGGER "check;delete;parent;" BEFORE DELETE ON parent WHEN
+        EXISTS (SELECT 1 FROM child WHERE old.a = x AND old.b = y)
+    BEGIN
+        SELECT RAISE(ABORT, 'constraint failed;'); -- Inline SQL comment
+    END;
+    -- Standalone SQL; comment; with semicolons;
+    INSERT INTO parent (a, b, c, d) VALUES ('pippo;', 'pluto;', NULL, NULL);
+    SQL
+        
+    use SQL::SplitStatement;
+        
+    my $sql_splitter = SQL::SplitStatement->new;
+    my @statements = $sql_splitter->split($sql_code);
+        
+    # @statements now is:
+    #
+    # (
+    #     'CREATE TABLE parent(a, b, c   , d    )',
+    #     'CREATE TABLE child (x, y, "w;", "z;z")',
+    #     'CREATE TRIGGER "check;delete;parent;" BEFORE DELETE ON parent WHEN
+    #     EXISTS (SELECT 1 FROM child WHERE old.a = x AND old.b = y)
+    # BEGIN
+    #     SELECT RAISE(ABORT, \'constraint failed;\');
+    # END',
+    #     'INSERT INTO parent (a, b, c, d) VALUES (\'pippo;\', \'pluto;\', NULL, NULL)'
+    # )
 
 =head1 DESCRIPTION
 
@@ -1042,19 +1035,19 @@ placeholders as explained above.
 Here is an example:
 
     # 4 statements (valid SQLite SQL)
-my $sql_code = <<'SQL';
-CREATE TABLE state (id, name);
-INSERT INTO  state (id, name) VALUES (?, ?);
-CREATE TABLE city  (id, name, state_id);
-INSERT INTO  city  (id, name, state_id) VALUES (?, ?, ?)
-SQL
-    
-my $splitter = SQL::SplitStatement->new;
-    
-my ( $statements, $placeholders )
-    = $splitter->split_with_placeholders( $sql_code );
-    
-# $placeholders now is: [0, 2, 0, 3]
+    my $sql_code = <<'SQL';
+    CREATE TABLE state (id, name);
+    INSERT INTO  state (id, name) VALUES (?, ?);
+    CREATE TABLE city  (id, name, state_id);
+    INSERT INTO  city  (id, name, state_id) VALUES (?, ?, ?)
+    SQL
+        
+    my $splitter = SQL::SplitStatement->new;
+        
+    my ( $statements, $placeholders )
+        = $splitter->split_with_placeholders( $sql_code );
+        
+    # $placeholders now is: [0, 2, 0, 3]
 
 where the returned C<$placeholders> list(ref) is to be read as follows: the
 first statement contains 0 placeholders, the second 2, the third 0 and the
@@ -1236,10 +1229,6 @@ You can also look for information at:
 
 =over 4
 
-=item * RT: CPAN's request tracker
-
-L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=SQL-SplitStatement>
-
 =item * AnnoCPAN: Annotated CPAN documentation
 
 L<http://annocpan.org/dist/SQL-SplitStatement>
@@ -1248,9 +1237,9 @@ L<http://annocpan.org/dist/SQL-SplitStatement>
 
 L<http://cpanratings.perl.org/d/SQL-SplitStatement>
 
-=item * Search CPAN
+=item * On MetaCPAN
 
-L<http://search.cpan.org/dist/SQL-SplitStatement/>
+L<https://metacpan.org/pod/SQL::SplitStatement/>
 
 =back
 

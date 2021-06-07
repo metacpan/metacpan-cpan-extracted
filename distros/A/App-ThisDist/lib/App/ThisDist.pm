@@ -1,9 +1,9 @@
 package App::ThisDist;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-10-11'; # DATE
+our $DATE = '2021-04-02'; # DATE
 our $DIST = 'App-ThisDist'; # DIST
-our $VERSION = '0.007'; # VERSION
+our $VERSION = '0.009'; # VERSION
 
 use strict;
 use warnings;
@@ -202,7 +202,7 @@ App::ThisDist - Print Perl {distribution,module,author,...} associated with curr
 
 =head1 VERSION
 
-This document describes version 0.007 of App::ThisDist (from Perl distribution App-ThisDist), released on 2020-10-11.
+This document describes version 0.009 of App::ThisDist (from Perl distribution App-ThisDist), released on 2021-04-02.
 
 =head1 DESCRIPTION
 
@@ -211,6 +211,8 @@ See included scripts:
 =over
 
 =item * L<this-dist>
+
+=item * L<this-mod>
 
 =back
 
@@ -226,7 +228,7 @@ Usage:
 
 If C<$dir> is not specified, will default to current directory. If
 C<$extract_version> is set to true, will also try to extract distribution
-version and will return "?" when unable to do so.
+version and will return "?" for version when version cannot be found.
 
 =head1 HOMEPAGE
 
@@ -238,7 +240,7 @@ Source repository is at L<https://github.com/perlancar/perl-App-ThisDist>.
 
 =head1 BUGS
 
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-ThisDist>
+Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-App-ThisDist/issues>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
@@ -254,7 +256,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2020 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

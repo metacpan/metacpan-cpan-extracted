@@ -13,7 +13,7 @@ BEGIN {
         require Win32;
     }
 }
-our $VERSION = '1.05';
+our $VERSION = '1.06';
 
 sub _ANY_PORT           { return 0 }
 sub _GETPWUID_DIR_INDEX { return 7 }
@@ -76,7 +76,7 @@ sub names {
     return @names;
 }
 
-sub existing {
+sub path {
     my ( $class, $name ) = @_;
     my $profile_ini_directory = $class->_profile_ini_directory();
     my $config                = $class->_read_ini_file($profile_ini_directory);
@@ -122,6 +122,12 @@ sub existing {
               File::Spec->catfile( $config->{$first_key}->{Path}, 'prefs.js' );
         }
     }
+    return $path;
+}
+
+sub existing {
+    my ( $class, $name ) = @_;
+    my $path = $class->path($name);
     if ( ($path) && ( -f $path ) ) {
         return $class->parse($path);
     }
@@ -343,13 +349,16 @@ sub as_string {
     my $string = q[];
     foreach my $key ( sort { $a cmp $b } keys %{ $self->{keys} } ) {
         my $value = $self->{keys}->{$key}->{value};
-        if (   ( defined $value ) && ( $value eq 'true' )
-            || ( $value eq 'false' )
-            || ( $value =~ /^\d+$/smx ) )
+        if (
+            ( defined $value )
+            && (   ( $value eq 'true' )
+                || ( $value eq 'false' )
+                || ( $value =~ /^\d{1,6}$/smx ) )
+          )
         {
             $string .= "user_pref(\"$key\", $value);\n";
         }
-        else {
+        elsif ( defined $value ) {
             $value =~ s/\\/\\\\/smxg;
             $value =~ s/"/\\"/smxg;
             $string .= "user_pref(\"$key\", \"$value\");\n";
@@ -422,7 +431,7 @@ Firefox::Marionette::Profile - Represents a prefs.js Firefox Profile
 
 =head1 VERSION
 
-Version 1.05
+Version 1.06
 
 =head1 SYNOPSIS
 
@@ -474,6 +483,10 @@ accepts a profile name and returns a L<profile|Firefox::Marionette::Profile> obj
 =head2 parse
 
 accepts a path as the parameter.  This path should be to a C<prefs.js> file.  Parses the file and returns it as a L<profile|Firefox::Marionette::Profile>.
+
+=head2 path
+
+accepts a profile name and returns the corresponding path to the C<prefs.js> file.
 
 =head2 save
 

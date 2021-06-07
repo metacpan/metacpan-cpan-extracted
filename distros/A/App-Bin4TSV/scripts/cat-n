@@ -1,0 +1,70 @@
+#!/usr/bin/perl
+use 5.001 ; use strict ; use warnings ; 
+use Getopt::Std ; getopts ":=!,:T:", \my %o ; 
+use Term::ANSIColor qw[ :constants color ] ; $Term::ANSIColor::RESET = 1 ;
+
+sub lineNumber ( ) ;
+
+$! = 1 if $o{'!'} ; 
+$o{','} //= "\t" ;
+$o{','} = eval qq[qq[$o{','}]] ;
+$o{T} //= 2 ; # 他のコマンドで、似た様なCtrl-Cに対する処理を想定して、長めの10秒が妥当かも知れない。
+
+$SIG{INT} = \&sigint1 ;  
+
+# メインの処理
+if ( ! $o{':'} ) { 
+  print lineNumber() , "$o{','}$_" while ( <> ) ; 
+} 
+else {  
+  print lineNumber() , ":$o{','}$_" while ( <> ) ; 
+}
+
+sub lineNumber ( ) { 
+  return $o{'='} ? $. == 1 ? "=" : $. - 1 : $. ;
+}
+
+# Ctrl-C が押下された時の処理
+sub sigint1 {     
+    use FindBin qw[ $Script ] ;
+    print STDERR "\n" , YELLOW "$.-th line is processing ($Script). " , scalar localtime () , color('reset') , "\n"  ; 
+    sleep $o{T}  ; 
+    $SIG{ALRM} = sub { $SIG{INT} = \&sigint1 } ; 
+    $SIG{INT} = sub { die } ; 
+    alarm $o{T} ;
+}
+
+# ヘルプの扱い
+sub VERSION_MESSAGE {}
+sub HELP_MESSAGE {
+    use FindBin qw[ $Script ] ; 
+    $ARGV[1] //= '' ;
+    open my $FH , '<' , $0 ;
+    while(<$FH>){
+        s/\$0/$Script/g ;
+        print $_ if s/^=head1// .. s/^=cut// and $ARGV[1] =~ /^o(p(t(i(o(ns?)?)?)?)?)?$/i ? m/^\s+\-/ : 1;
+    }
+    close $FH ;
+    exit 0 ;
+}
+=encoding utf8
+
+=head1
+
+   $0 
+
+  Unixのコマンドを使った cat -n と同じように、各行の先頭に行番号を付加する。
+  ただし、余計な空白文字などは入らない。行番号と元の入力文字列の間には
+  タブ文字のみが入る。
+  
+  なお、Ctrl-C を押下されたときに、何行目を処理しているかを標準エラー出力に出す。
+
+オプション: 
+   
+  -= ; 先頭行の行番号を = 、2行目から行番号を1から始める。
+  -: ; 行番号の直後にコロン文字(:) を付加する。
+  -, str ; 行番号との間の区切り文字の指定。未指定ならば、タブ文字。
+  -! ; バッファリングをしない。出力があれば、バッファに蓄えずに、すぐ出力する。
+
+  -T num ; Ctrl-C を押下されたときに、num秒動作を停止する。さらにnum秒以内に同じキーが押されたら、終了する。未指定なら2秒。
+=cut

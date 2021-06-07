@@ -1,10 +1,11 @@
 package Data::CompactReadonly::V0::Node;
-our $VERSION = '0.0.5';
+our $VERSION = '0.0.6';
 
 use warnings;
 use strict;
 
 use Fcntl qw(:seek);
+use Scalar::Type qw(is_*);
 
 use Devel::StackTrace;
 use Data::CompactReadonly::V0::Text;
@@ -146,27 +147,19 @@ sub _type_map_from_data {
              ? 'Dictionary::'.do { $class->_sub_type_for_collection_of_length(scalar(keys %{$data})) ||
                                    die("$class: Invalid: Dictionary too long");
                          } :
-           $data =~ /
-               ^-?                       # don't want to numify 00.7 (but 0.07 is fine)
-               ( 0 | [1-9][0-9]* )       # 0, or 1-9 followed by any number of digits
-               \.                        # decimal point
-               [0-9]*[1-9]               # digits, must not end in zero
-               ([eE][+-]?[0-9]+)?$       # exponent
-           /x
-             ? 'Scalar::Float' :
-           $data =~ /
-               ^(-?)                     # don't want to numify 007
-               ( 0 | [1-9][0-9]* )$      # 0, or 1-9 followed by any number of digits
-           /x
+           is_integer($data)
              ? do {
-                 my $bytes = $class->_bytes_required_for_int($2);
-                 $bytes == 1 ? 'Scalar::'.($1 ? 'Negative' : '').'Byte' :
-                 $bytes == 2 ? 'Scalar::'.($1 ? 'Negative' : '').'Short' :
-                 $bytes == 3 ? 'Scalar::'.($1 ? 'Negative' : '').'Medium' :
-                 $bytes == 4 ? 'Scalar::'.($1 ? 'Negative' : '').'Long' :
-                 $bytes <  9 ? 'Scalar::'.($1 ? 'Negative' : '').'Huge' :
-                               'Scalar::Float'
-             } :
+                 my $neg = $data < 0 ? 'Negative' : '';
+                 my $bytes = $class->_bytes_required_for_int(abs($data));
+                 $bytes == 1 ? "Scalar::${neg}Byte"   :
+                 $bytes == 2 ? "Scalar::${neg}Short"  :
+                 $bytes == 3 ? "Scalar::${neg}Medium" :
+                 $bytes == 4 ? "Scalar::${neg}Long"   :
+                 $bytes <  9 ? "Scalar::${neg}Huge"
+                             : "Scalar::Float"
+               } :
+           is_number($data)
+             ? 'Scalar::Float' :
            !ref($data)
              ? $class->_text_type_for_data($data)
              : die("Can't yet create from '$data'\n");

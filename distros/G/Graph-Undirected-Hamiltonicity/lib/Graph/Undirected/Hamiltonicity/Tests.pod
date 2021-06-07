@@ -1,0 +1,140 @@
+=head1 NAME
+
+Graph::Undirected::Hamiltonicity::Tests - a collection of subroutines to decide whether the input Graph::Undirected is Hamiltonian.
+
+=head1 VERSION
+
+Version 0.01
+
+=head1 SYNOPSIS
+
+Each subroutine in this module:
+
+Takes: a Graph::Undirected
+
+Returns: ($is_hamilton, $reason)
+
+    $is_hamilton can be one of: $DONT_KNOW, $GRAPH_IS_HAMILTONIAN, $GRAPH_IS_NOT_HAMILTONIAN
+
+    $reason is a string describing the reason for the test conclusion, if any.
+
+
+Here is an example:
+
+    use Graph::Undirected::Hamiltonicity::Tests qw(&test_trivial);
+    use Graph::Undirected::Hamiltonicity::Spoof qw(&spoof_known_hamiltonian_graph);
+
+    my $g = spoof_known_hamiltonian_graph(30, 50); ### 30 vertices, 50 edges
+
+    my ( $is_hamiltonian, $reason ) = test_trivial($g);
+    ...
+
+=head1 EXPORT
+
+Symbols exported by default are:
+
+=over 4
+
+=item * $DONT_KNOW
+
+=item * $GRAPH_IS_HAMILTONIAN
+
+=item * $GRAPH_IS_NOT_HAMILTONIAN
+
+=back
+
+All subroutines can be loaded with the qw(:all) tag.
+
+    use Graph::Undirected::Hamiltonicity::Tests qw(:all);
+
+The subroutines that can be imported individually, by name, are:
+
+=over 4
+
+=item * &test_articulation_vertex
+
+=item * &test_canonical
+
+=item * &test_graph_bridge
+
+=item * &test_min_degree
+
+=item * &test_dirac
+
+=item * &test_required_max_degree
+
+=item * &test_required_cyclic
+
+=item * &test_trivial
+
+=back
+
+=head1 SUBROUTINES
+
+=head2 test_trivial
+
+Takes a Graph::Undirected and applies some constant-time tests
+for Hamiltonicity.
+
+=head2 test_canonical
+
+Tests to see if the input Graph::Undirected is a super-graph of the
+"canonical" Hamiltonian Cycle.
+
+The "canonical" Hamiltonian Cycle is an isomorph of a graph
+in which all the edges can be arranged into a regular polygon.
+
+=head2 test_min_degree
+
+If the graph has a vertex with degree < 2, the graph does not have a
+Hamiltonian Cycle.
+
+=head2 test_articulation_vertex
+
+If the graph contains a vertex, removing which would make the graph
+unconnected, the graph is not Hamiltonian.
+
+Such a vertex is called an Articulation Vertex.
+
+=head2 test_graph_bridge
+
+If the graph contains an edge, removing which would make the graph
+unconnected, the graph is not Hamiltonian.
+
+Such an edge is called a Graph Bridge.
+
+=head2 test_dirac
+
+A simple graph with v vertices (v >= 3) is Hamiltonian if every vertex 
+has degree v / 2 or greater. -- Dirac (1952)
+https://en.wikipedia.org/wiki/Hamiltonian_path
+
+
+=head2 test_required_max_degree
+
+Takes a Graph::Undirected, which is the "required graph" of the input.
+The "required graph" contains the same vertices as the input graph, but
+only the edges that the algorithm has marked "required".
+
+If any vertex in the "required graph" has a degree of more than 2,
+then the input graph cannot be Hamiltonian.
+
+=head2 test_required_cyclic
+
+If the "required graph" contains a cycle with fewer than v vertices,
+then the input graph is not Hamiltonian.
+
+If the cycle has the same number of edges as vertices,
+then the input graph is Hamiltonian.
+
+=head1 SUPPORT
+
+Please report issues L<on GitHub|https://github.com/ownlifeful/Graph-Undirected-Hamiltonicity/issues>.
+
+=head1 AUTHOR
+
+Ashwin Dixit, C<< <ashwin at ownlifeful dot com> >>
+
+=cut
+
+

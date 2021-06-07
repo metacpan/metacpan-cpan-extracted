@@ -227,7 +227,8 @@ sub invalidate_cancel {
 
 =item invalidate_cancel($self)
 
-Disable the "Cancel" button if any.
+Disable the "Cancel" button if any and make it insensitive so that it'll never
+be usable again.
 
 =cut
 

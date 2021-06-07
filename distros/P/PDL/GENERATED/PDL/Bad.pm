@@ -395,7 +395,7 @@ it is possible to perform this calculation over I<any> dimension.
 
 =for example
 
- $spectrum = nbadover $image->xchg(0,1)
+ $spectrum = nbadover $image->transpose
 
 =for bad
 
@@ -440,7 +440,7 @@ I<any> dimension.
 
 =for example
 
- $spectrum = ngoodover $image->xchg(0,1)
+ $spectrum = ngoodover $image->transpose
 
 =for bad
 

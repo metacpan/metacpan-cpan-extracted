@@ -1,3 +1,9 @@
+0.008 2021-05-22 14:55:14-0400
+  - Update download URL. See
+    <https://github.com/EntropyOrg/p5-Alien-UDUNITS2/pull/14>.
+  - Extract cflags/libs for share install to alienfile. See
+    <https://github.com/EntropyOrg/p5-Alien-UDUNITS2/pull/15>.
+
 0.007 2020-05-10 16:39:02-0500
   - No changes since 0.006_01.
 

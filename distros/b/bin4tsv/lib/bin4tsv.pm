@@ -1,11 +1,7 @@
 package bin4tsv ; 
 
-our $VERSION = 0.01 ; 
-
-package bin4tsv::ja ;
-our $VERSION = 0.01 ;
-
-=encoding utf8
+our $VERSION = '0.0124' ; 
+our $DATE = '2021-05-22' ; 
 
 =head1 NAME
  

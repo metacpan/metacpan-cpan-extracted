@@ -70,3 +70,13 @@ test_channels = '#TestChannel2'
 channels      = '#Channel1'
 channels      = '#Channel2'
 channels      = '#Channel3'
+
+[liberachat]
+# See https://libera.chat/guides/registration to register
+nickname      = 'NickName'
+password      = 'Password'
+test_channels = '#TestChannel1'
+test_channels = '#TestChannel2'
+channels      = '#Channel1'
+channels      = '#Channel2'
+channels      = '#Channel3'

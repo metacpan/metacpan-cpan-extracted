@@ -44,7 +44,7 @@ use TestUtils;
 #Check greenp for simple 1D system
 my ($ea, $eb)=(r2C(1), r2C(2));
 my $f=6/11;
-my $eps=$ea*(zeroes(11,1)->xvals<5)+ $eb*(zeroes(11,1)->xvals>=5)+0*i;
+my $eps=r2C($ea*(zeroes(11,1)->xvals<5)+ $eb*(zeroes(11,1)->xvals>=5));
 my $g=Photonic::Geometry::FromEpsilon
     ->new(epsilon=>$eps);
 my $m=Photonic::WE::S::Metric->new(

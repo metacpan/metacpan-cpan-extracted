@@ -1,9 +1,7 @@
 Build.PL
 Changes
-hax/lexer-additions.c.inc
 hax/perl-additions.c.inc
 hax/perl-backcompat.c.inc
-hax/wrap_keyword_plugin.c.inc
 lib/Syntax/Keyword/Try.pm
 lib/Syntax/Keyword/Try.xs
 lib/Syntax/Keyword/Try/Deparse.pm
@@ -24,8 +22,6 @@ t/13die-in-finally.t
 t/14try-localises.t
 t/15context.t
 t/16final-expr.t
-t/20try-do.t
-t/21try-do-finally.t
 t/30compat.t
 t/70deparse.t
 t/80await+SKT.t

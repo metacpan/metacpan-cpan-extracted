@@ -21,9 +21,8 @@ Mojo::Util::monkey_patch(
   'Mojo::Server::Morbo' => run => sub { $worker_pid = $Mojolicious::Command::Author::webpack::WORKER_PID });
 ok $INC{'Mojo/Server/Morbo.pm'}, 'Mojo::Server::Morbo got loaded';
 
-like $cmd->_script_name, qr{$0},                    'script name';
-like $cmd->description,  qr{Webpack},               'description';
-like $cmd->usage,        qr{mojo webpack .*my_app}, 'usage';
+like $cmd->description, qr{Webpack},               'description';
+like $cmd->usage,       qr{mojo webpack .*my_app}, 'usage';
 
 ok !$worker_pid, 'worker pid';
 eval { $cmd->run };
@@ -32,13 +31,11 @@ ok !$main::env->{fork}, 'not yet forked webpack';
 is_deeply $main::env->{exec}, [mojo => webpack => $0], 'exec mojo webpack, since starting from application';
 
 delete $main::env->{exec};
-$cmd->_script_name('mojo');
+local $0 = 'mojo';
 $cmd->run($0);
 is_deeply $main::env->{fork}, [], 'forked webpack';
 is_deeply $main::env->{kill}, [42], 'killed webpack';
 ok !$main::env->{exec}, 'did not exec mojo webpack, since mojo is started';
-is $main::env->{MOJO_WEBPACK_BUILD}, '--watch', 'env --watch';
-is $cmd->_webpack_pid, 42, 'webpack pid';
 is $worker_pid, $$, 'worker pid';
 
 for my $arg (qw(--backend -b)) {

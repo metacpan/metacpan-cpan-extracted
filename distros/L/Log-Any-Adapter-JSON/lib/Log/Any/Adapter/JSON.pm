@@ -1,13 +1,13 @@
 package Log::Any::Adapter::JSON;
 
-our $VERSION = '1.12';
+our $VERSION = '1.15';
 
 use strict;
 use warnings;
 use feature 'say';
 
 use Carp qw/ croak confess /;
-use JSON::MaybeXS;
+use Cpanel::JSON::XS;
 use Path::Tiny;
 use Time::Moment;
 use strictures 2;
@@ -128,12 +128,12 @@ sub _prepare_log_entry {
         }
     }
 
-    my $serializer = JSON::MaybeXS->new(
-        utf8      => 0,
-        pretty    => 0,
-        indent    => 0,
-        canonical => 1,
-    );
+    my $serializer = Cpanel::JSON::XS->new
+                                     ->utf8(0)
+                                     ->pretty(0)
+                                     ->indent(0)
+                                     ->canonical(1)
+                                     ->allow_stringify(1);
 
     return $serializer->encode( \%log_entry );
 }
@@ -176,7 +176,7 @@ __END__
 
 =head1 VERSION
 
-version 1.12
+version 1.15
 
 =encoding utf8
 

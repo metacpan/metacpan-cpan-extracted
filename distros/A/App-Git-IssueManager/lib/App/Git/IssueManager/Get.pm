@@ -71,7 +71,7 @@ App::Git::IssueManager::Get - class implementing the get issue command of the GI
 
 =head1 VERSION
 
-version 0.1
+version 0.2
 
 =head1 AUTHOR
 

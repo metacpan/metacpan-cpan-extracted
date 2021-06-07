@@ -16,12 +16,14 @@ use Text::Minify::XS v0.4.0 ();
 
 # RECOMMEND PREREQ:  Ref::Util::XS
 
-our $VERSION = 'v0.1.6';
+our $VERSION = 'v0.2.0';
 
 sub call {
     my ($self, $env) = @_;
 
     my $res = $self->app->($env);
+
+    return $res if $env->{'psgix.no-minify'};
 
     my $method = $env->{REQUEST_METHOD};
     unless ($method =~ /^(GET|POST)$/) {
@@ -91,7 +93,7 @@ Plack::Middleware::Text::Minify - minify text responses on the fly
 
 =head1 VERSION
 
-version v0.1.6
+version v0.2.0
 
 =head1 SYNOPSIS
 
@@ -111,6 +113,9 @@ version v0.1.6
 
 This middleware uses L<Text::Minify::XS> to remove indentation and
 trailing whitespace from text content.
+
+It will be disabled if the C<psgix.no-minify> environment key is set
+to a true value. (Added in v0.2.0.)
 
 =head1 ATTRIBUTES
 

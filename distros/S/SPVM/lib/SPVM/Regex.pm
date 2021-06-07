@@ -16,16 +16,32 @@ SPVM::Regex - Regular expression
     my $target = "zabcz";
     my $match = $re->match($target, 0);
   }
-  
+
+  # Pattern match - UTF-8
+  {
+    my $re = SPVM::Regex->new("あ+");
+    my $target = "いあああい";
+    my $match = $re->match($target, 0);
+  }
+
+  # Pattern match - Character class and the nagation
+  {
+    my $re = SPVM::Regex->new("[A-Z]+[^A-Z]+");
+    my $target = "ABCzab";
+    my $match = $re->match($target, 0);
+  }
+
   # Pattern match with captures
   {
     my $re = SPVM::Regex->new("^(\w+) (\w+) (\w+)$");
     my $target = "abc1 abc2 abc3";
     my $match = $re->match($target, 0);
     
-    my $cap1 = $re->caps->[0];
-    my $cap2 = $re->caps->[1];
-    my $cpa3 = $re->caps->[2];
+    if ($match) {
+      my $cap1 = $re->captures->[0];
+      my $cap2 = $re->captures->[1];
+      my $cpa3 = $re->captures->[2];
+    }
   }
   
   # Replace
@@ -46,7 +62,7 @@ SPVM::Regex - Regular expression
     
     # "ppzABbcCz"
     my $result = $re->replace_cb($target, 0, sub : string ($self : self, $re : SPVM::Regex) {
-      return "AB" . $re->caps->[0] . "C";
+      return "AB" . $re->captures->[0] . "C";
     });
   }
 
@@ -66,7 +82,7 @@ SPVM::Regex - Regular expression
     
     # "ppzABCbcPQRSzABCbcPQRSz"
     my $result = $re->replace_all_cb($target, 0, sub : string ($self : self, $re : SPVM::Regex) {
-      return "ABC" . $re->caps->[0] . "PQRS";
+      return "ABC" . $re->captures->[0] . "PQRS";
     });
   }
   
@@ -76,7 +92,7 @@ L<SPVM::Regex> provides regular expression functions.
 
 =head1 REGULAR EXPRESSION SYNTAX
 
-L<SPVM::Regex> provides subset of Perl regular expression.
+L<SPVM::Regex> provides the subset of Perl regular expression. The target string and regex string is interpretted as UTF-8 string.
   
   # Quantifier
   +     more than or equals to 1 repeats
@@ -85,54 +101,69 @@ L<SPVM::Regex> provides subset of Perl regular expression.
   {m,n} repeats between m and n
   
   # Regular expression character
-  ^  first of string
-  $  last of string
-  \d [0-9]
-  \D not \d
-  \s " ", "\t", "\f", "\r", "\n"
-  \S not \s
-  \w [a-zA-Z0-9_]
-  \W not \w
+  ^    first of string
+  $    last of string
+  .    all character except "\n"
   
-  # Character class
+  #    Default mode     ASCII mode
+  \d   Not supported    [0-9]
+  \D   Not supported    not \d
+  \s   Not supported    " ", "\t", "\f", "\r", "\n"
+  \S   Not supported    not \s
+  \w   Not supported    [a-zA-Z0-9_]
+  \W   Not supported    not \w
+  
+  # Character class and the negatiton
   [a-z0-9]
+  [^a-z0-9]
   
   # Capture
   (foo)
 
-Subset support only linear execution of pattern matching.
+B<Regex Options:>
 
-L<SPVM::Regex> do not support the following regular expression
+  s    single line mode
+  a    ascii mode
 
-  # Do not support
-  . any character except for \n
-  | or
+Regex options is used by C<new_with_options> method.
 
-L<SPVM::Regex> do not support the same set of characters after quantifier.
+  my $re = SPVM::Regex->new("^ab+c", "sa");
+
+B<Limitations:>
+
+L<SPVM::Regex> do not support the same set of characters after a quantifier.
       
-  # Compile error
+  # A exception occurs
   SPVM::Regex->new("a*a");
   SPVM::Regex->new("a?a");
   SPVM::Regex->new("a+a");
   SPVM::Regex->new("a{1,3}a")
       
-If 0 width quantifir is between two same set of characters after quantifier, it is invalid.
+If 0 width quantifir is between two same set of characters after a quantifier, it is invalid.
       
-  # Compile error
+  # A exception occurs
   SPVM::Regex->new("\d+\D*\d+");
   SPVM::Regex->new("\d+\D?\d+");
 
 =head1 STATIC METHODS
 
+=head2 new
+
   my $re = SPVM::Regex->new("^ab+c");
 
-Create a new L<SPVM::Regex> object and compile the specific regex.
+Create a new L<SPVM::Regex> object and compile the regex.
+
+=head2 new_with_options
+
+  my $re = SPVM::Regex->new("^ab+c", "s");
+
+Create a new L<SPVM::Regex> object and compile the regex with the options.
 
 =head1 INSTANCE METHODS
 
-=head2 caps
+=head2 captures
 
-  sub caps : string[] ()
+  sub captures : string[] ()
 
 Get the strings captured by "match" method.
 
@@ -140,13 +171,13 @@ Get the strings captured by "match" method.
 
   sub match_start : int ()
 
-Get the start byte offset of the string matched by "match" method or "match_offset" method.
+Get the start byte offset of the string matched by "match" method method.
 
 =head2 match_length
 
   sub match_length : int ()
 
-Get the byte length of the string matched by "match" method or "match_offset" method.
+Get the byte length of the string matched by "match" method method.
 
 =head2 replace_count
 
@@ -162,7 +193,7 @@ Execute pattern matching to the specific string and the start byte offset of the
 
 If the pattern match succeeds, 1 is returned, otherwise 0 is returned.
 
-You can get captured strings using "caps" method,
+You can get captured strings using "captures" method,
 and get the byte offset of the matched whole string using "match_start" method,
 and get the length of the matched whole string using "match_length" method.
 

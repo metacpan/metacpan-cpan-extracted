@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2021 -- leonerd@leonerd.org.uk
 
-package XS::Parse::Keyword 0.03;
+package XS::Parse::Keyword 0.06;
 
 use v5.14;
 use warnings;
@@ -55,6 +55,33 @@ installed by C<XS::Parse::Keyword> itself.
 
 The C<XSParseKeywordHooks> structure provides the following hook stages, which
 are invoked in the given order.
+
+=head2 flags
+
+The following flags are defined:
+
+=over 4
+
+=item C<XPK_FLAG_EXPR>
+
+The parse or build function is expected to return C<KEYWORD_PLUGIN_EXPR>.
+
+=item C<XPK_FLAG_STMT>
+
+The parse or build function is expected to return C<KEYWORD_PLUGIN_STMT>.
+
+These two flags are largely for the benefit of giving static information at
+registration time to assist static parsing or other related tasks to know what
+kind of grammatical element this keyword will produce.
+
+=item C<XPK_FLAG_AUTOSEMI>
+
+The syntax forms a complete statement, which should be followed by a statement
+separator semicolon (C<;>). This semicolon is optional at the end of a block.
+
+The semicolon, if present, will be consumed automatically.
+
+=back
 
 =head2 The C<permit> Stage
 
@@ -108,7 +135,7 @@ result value.
 This is the most generic and powerful of the options, but requires the most
 amount of implementation work.
 
-   int (*build)(pTHX_ OP **out, XSParseKeywordPiece *args, size_t npieces, void *hookdata);
+   int (*build)(pTHX_ OP **out, XSParseKeywordPiece *args[], size_t nargs, void *hookdata);
 
 If C<parse> is not present, this is called instead after parsing a sequence of
 arguments, of types given by the I<pieces> field; which should be a zero-
@@ -137,6 +164,11 @@ function, using a C<union> type consisting of the following fields:
       CV *cv;
       SV *sv;
       int i;
+      struct {
+         SV *name;
+         SV *value;
+      } attr;
+      PADOFFSET padix;
    } XSParseKeywordPiece;
 
 Which field is set depends on the type of the piece.
@@ -157,14 +189,63 @@ relating some optional part of them is present in the incoming source text. In
 this case, the pieces relating to those optional parts must support "probing".
 This ability is also noted below.
 
-The type of each piece should be one of the following macro values:
+The type of each piece should be one of the following macro values. Some
+macros additionally take a set of typeflags; taken from the following list:
+
+=over 2
+
+=item * XPK_TYPEFLAG_SCOPED
+
+On C<XPK_BLOCK_flags>, this will wrap the returned optree in its own lexical
+scope, by calling C<op_scope()>.
+
+=item * XPK_TYPEFLAG_G_VOID, XPK_TYPEFLAG_G_SCALAR, XPK_TYPEFLAG_G_LIST
+
+On optree-returning types, will contextualize the returned optree to put it in
+the given context, by calling C<op_contextualize()>.
+
+=back
+
+Where both a plain and a C<_flags>-suffixed version of the macro exists, the
+flags version will take the flags in an additional argument, and the non-flags
+version will pass zero extra flags.
 
 =head2 XPK_BLOCK
 
 I<atomic, emits op.>
 
+   XPK_BLOCK
+
+   XPK_BLOCK_flags(flags)
+
 A brace-delimited block of code is expected, passed as an optree in the I<op>
 field. This will be parsed as a block within the current function scope.
+
+Permits the flags C<XPK_TYPEFLAG_SCOPED> and C<XPK_TYPEFLAG_G_*>.
+
+=head2 XPK_BLOCK_SCALARCTX, XPK_BLOCK_LISTCTX
+
+Shortcuts for C<XPK_BLOCK_flags()> which wrap a scalar or list-context scope
+around the block.
+
+=head2 XPK_PREFIXED_BLOCK
+
+I<structural, emits op.>
+
+   XPK_PREFIXED_BLOCK(pieces ...)
+
+Some pieces are expected, followed by a brace-delimited block of code, which
+is passed as an optree in the I<op> field. The prefix pieces are parsed first,
+and their results are passed before the block itself.
+
+The entire sequence, including the prefix items, is contained within a pair of
+C<block_start()> / C<block_end()> calls. This permits the prefix pieces to
+introduce new items into the lexical scope of the block - for example by the
+use of C<XPK_LEXVAR_MY>.
+
+A call to C<intro_my()> is automatically made at the end of the prefix pieces,
+before the block itself is parsed, ensuring any new lexical variables are now
+visible.
 
 =head2 XPK_ANONSUB
 
@@ -178,15 +259,37 @@ field.
 
 I<atomic, emits op.>
 
+   XPK_TERMEXPR
+
+   XPK_TERMEXPR_flags(flags)
+
 A term expression is expected, parsed using C<parse_termexpr()>, and passed as
 an optree in the I<op> field.
+
+Permits the flags C<XPK_TYPEFLAG_G_*>
+
+=head2 XPK_TERMEXPR_SCALARCTX
+
+A shortcut for C<XPK_TERMEXPR_flags()> which puts the expression in scalar
+context.
 
 =head2 XPK_LISTEXPR
 
 I<atomic, emits op.>
 
+   XPK_LISTEXPR
+
+   XPK_LISTEXPR_flags(flags)
+
 A list expression is expected, parsed using C<parse_listexpr()>, and passed as
 an optree in the I<op> field.
+
+Permits the flags C<XPK_TYPEFLAG_G_*>
+
+=head2 XPK_LISTEXPR_LISTCTX
+
+A shortcut for C<XPK_LISTEXPR_flags()> which puts the expression in list
+context.
 
 =head2 XPK_IDENT
 
@@ -204,17 +307,76 @@ A bareword package name is expected, and passed as an SV containing a PV in
 the I<sv> field. A package name is similar to an identifier, except it permits
 double colons in the middle.
 
-=head2 XPK_COLON
+=head2 XPK_LEXVARNAME
 
-I<atomic, emits nothing.>
+I<atomic, emits sv.>
 
-A literal colon character (C<:>) is expected. No argument value is passed.
+   XPK_LEXVARNAME(kind)
 
-=head2 XPK_STRING
+A lexical variable name is expected, and passed as an SV containing a PV in
+the I<sv> field. The C<kind> argument specifies what kinds of variable are
+permitted, and should be a bitmask of one or more bits from
+C<XPK_LEXVAR_SCALAR>, C<XPK_LEXVAR_ARRAY> and C<XPK_LEXVAR_HASH>. A convenient
+shortcut C<XPK_LEXVAR_ANY> permits all three.
+
+=head2 XPK_ATTRIBUTES
+
+I<atomic, emits i followed by more args.>
+
+A list of C<:>-prefixed attributes is expected, in the same format as sub or
+variable attributes. An optional leading C<:> indicates the presence of
+attributes, then one or more of them are parsed. Attributes may be optionally
+separated by additional C<:>s, but this is not required.
+
+Each attribute is expected to be an identifier name, followed by an optional
+value wrapped in parentheses. Whitespace is B<NOT> permitted between the name
+and value, as per standard Perl parsing rules.
+
+   :attrname
+   :attrname(value)
+
+The I<i> field indicates how many attributes were found. That number of
+additional arguments are then passed, each containing two SVs in the
+I<attr.name> and I<attr.value> fields. This number may be zero.
+
+It is not an error for there to be no attributes present, or for the optional
+colon to be missing. In this case I<i> will be set to zero.
+
+=head2 XPK_VSTRING
+
+I<atomic, can probe, emits sv.>
+
+A version string is expected, of the form C<v1.234> including the leading C<v>
+character. It is passed as a L<version> SV object in the I<sv> field.
+
+=head2 XPK_VSTRING_OPT
+
+Identical to C<XPK_VSTRING> except it is optional; if no version string is
+found then I<sv> is set to C<NULL>.
+
+=head2 XPK_LEXVAR_MY
+
+I<atomic, emits padix.>
+
+   XPK_LEXVAR_MY(kind)
+
+A lexical variable name is expected, added to the current pad as if specified
+in a C<my> expression, and passed as the pad index in the I<padix> field.
+
+The C<kind> argument specifies what kinds of variable are permitted, as per
+C<XPK_LEXVARNAME>.
+
+=head2 XPK_COMMA, XPK_COLON, XPK_EQUALS
 
 I<atomic, can probe, emits nothing.>
 
-   XPK_STRING("literal")
+A literal character (C<,>, C<:> or C<=>) is expected. No argument value is passed.
+
+=head2 XPK_LITERAL
+
+I<atomic, can probe, emits nothing.>
+
+   XPK_LITERAL("literal")
 
 A literal string match is expected. No argument value is passed.
 
@@ -223,6 +385,22 @@ easy to abuse to make syntaxes which confuse humans and code tools alike.
 Generally it is best reserved just for the first component of a
 C<XPK_OPTIONAL> or C<XPK_REPEATED> sequence, to provide a "secondary keyword"
 that such a repeated item can look out for.
+
+This was previously called C<XPK_STRING>, and is provided as a synonym for
+back-compatibility but new code should use this new name instead.
+
+=head2 XPK_SEQUENCE
+
+I<structural, might support probe, emits nothing.>
+
+   XPK_SEQUENCE(pieces ...)
+
+A structural type which contains a number of pieces. This is normally
+equivalent to simply placing the pieces in sequence inside their own
+container, but it is useful inside C<XPK_CHOICE> or C<XPK_TAGGEDCHOICE>.
+
+An C<XPK_SEQUENCE> supports probe if its first contained piece does; i.e.
+is transparent to probing.
 
 =head2 XPK_OPTIONAL
 
@@ -256,6 +434,10 @@ options. An ordered list of types is provided, all of which must support
 probe. This will pass an argument whose I<i> field gives the index of the
 first choice that was accepted. The first option takes the value 0.
 
+As each of the options is interpreted as an alternative, not a sequence, you
+should use C<XPK_SEQUENCE> if a sequence of multiple items should be
+considered as a single alternative.
+
 It is not an error if no choice matches. At that point, the I<i> field will be
 set to -1.
 
@@ -277,9 +459,23 @@ which is passed in the I<i> field.
 
    XPK_TAG(value)
 
+As each of the options is interpreted as an alternative, not a sequence, you
+should use C<XPK_SEQUENCE> if a sequence of multiple items should be
+considered as a single alternative.
+
+=head2 XPK_COMMALIST
+
+I<structural, emits i.>
+
+A structural type which expects to find one or more repeats of its contained
+pieces, separated by literal comma (C<,>) characters. This is somewhat similar
+to C<XPK_REPEATED>, except that it needs at least one copy, needs commas
+between its items, but does not require that the first contained piece support
+probe (the comma itself is sufficient to indicate a repeat).
+
 =head2 XPK_PARENSCOPE
 
-I<structural, emits nothing.>
+I<structural, can probe, emits nothing.>
 
    XPK_PARENSCOPE(pieces ...)
 
@@ -288,7 +484,7 @@ parentheses as C<( ... )>. This will pass no extra arguments.
 
 =head2 XPK_BRACKETSCOPE
 
-I<structural, emits nothing.>
+I<structural, can probe, emits nothing.>
 
    XPK_BRACKETSCOPE(pieces ...)
 
@@ -297,7 +493,7 @@ square brackets as C<[ ... ]>. This will pass no extra arguments.
 
 =head2 XPK_BRACESCOPE
 
-I<structural, emits nothing.>
+I<structural, can probe, emits nothing.>
 
    XPK_BRACESCOPE(pieces ...)
 
@@ -310,7 +506,7 @@ constrained syntax that should not just accept an arbitrary block.
 
 =head2 XPK_CHEVRONSCOPE
 
-I<structural, emits nothing.>
+I<structural, can probe, emits nothing.>
 
    XPK_CHEVRONSCOPE(pieces ...)
 
@@ -320,6 +516,23 @@ angle brackets as C<< < ... > >>. This will pass no extra arguments.
 Remember that expressions like C<< a > b >> are valid term expressions, so the
 contents of this scope shouldn't allow arbitrary expressions or the closing
 bracket will be ambiguous.
+
+=head2 XPK_PARENSCOPE_OPT, XPK_BRACKETSCOPE_OPT, XPK_BRACESCOPE_OPT, XPK_CHEVRONSCOPE_OPT
+
+I<structural, can probe, emits i.>
+
+   XPK_PARENSCOPE_OPT(pieces ...)
+   XPK_BRACKETSCOPE_OPT(pieces ...)
+   XPK_BRACESCOPE_OPT(pieces ...)
+   XPK_CHEVERONSCOPE_OPT(pieces ...)
+
+Each of the four C<XPK_...SCOPE> macros above has an optional variant, whose
+name is suffixed by C<_OPT>. These pass an argument whose I<i> field is either
+true or false, indicating whether the scope was found, followed by the values
+from the scope itself.
+
+This is a convenient shortcut to nesting the scope within a C<XPK_OPTIONAL>
+macro.
 
 =cut
 

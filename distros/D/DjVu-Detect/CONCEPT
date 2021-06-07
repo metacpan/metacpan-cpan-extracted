@@ -1,0 +1,4 @@
+CONCEPT
+=======
+Detect if file is DjVu file.
+Detect if DjVu file contain chunk with name.

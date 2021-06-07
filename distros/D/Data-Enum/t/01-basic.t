@@ -1,15 +1,24 @@
-use Test::More;
+use Test::Most;
 
 use Scalar::Util qw/ refaddr /;
 
 use_ok("Data::Enum");
 
+throws_ok {
+    Data::Enum->new;
+} qr/has no values/, "no values";
+
+throws_ok {
+    Data::Enum->new(qw/ yes no! /);
+} qr/values must be alphanumeric/, "invalid values";
+
 ok my $colors = Data::Enum->new(qw/ red green blue /), 'new class';
 
 is_deeply [ $colors->values ], [qw/ blue green red /], 'values';
 
-ok !eval { $colors->new("pink") }, "bad enum caught";
-like $@, qr/invalid value: 'pink'/, "expected error";
+throws_ok {
+ $colors->new("pink")
+} qr/invalid value: 'pink'/;
 
 ok my $red = $colors->new("red"), "new item";
 
@@ -30,11 +39,18 @@ is "$red", "red", "stringify";
 ok $red eq "red", "equality";
 ok $red eq $red, "equality";
 ok $colors->new("red") eq $red, "equality";
+ok "red" eq $red, "equality";
 
 ok my $ro = $colors->new($red), "implicit clone";
 is $ro, $red, "equality";
 
 my $blue = $colors->new("blue");
+
+ok $red ne "blue", "inequality";
+ok $red ne "bllue", "inequality";
+ok $red ne $blue, "inequality";
+ok $colors->new("green") ne $red, "inequality";
+ok "blue" ne $red, "inequality";
 
 ok !( $colors->new("blue") eq $red ), "equality";
 ok $colors->new("blue") eq $blue, "equality";
@@ -60,8 +76,9 @@ isnt $sizes->new("small"), $alt->new("blue"), "members of different classes are 
 
 is $$red, "red", "deref";
 
-ok !eval { $$red = "pink" }, 'changing value failed';
-like $@, qr/Modification of a read-only value attempted/, "error when changing value";
+throws_ok {
+ $$red = "pink"
+} qr/Modification of a read-only value attempted/, "error when changing value";
 
 is "$red", "red", "unchanged";
 

@@ -45,7 +45,7 @@ make_default_store($fn);
 #Check haydock coefficients for simple 1D system
 my ($ea, $eb)=(1+2*i, 3+4*i);
 my $f=6/11;
-my $eps=$ea*(zeroes(11)->xvals<5)+ $eb*(zeroes(11)->xvals>=5)+0*i;
+my $eps=r2C($ea*(zeroes(11)->xvals<5)+ $eb*(zeroes(11)->xvals>=5));
 my $g=Photonic::Geometry::FromEpsilon
     ->new(epsilon=>$eps, Direction0=>pdl([1]));
 my $a=Photonic::LE::S::AllH->new(geometry=>$g, nh=>10);
@@ -61,7 +61,7 @@ ok(Cagree($b2s->[1], ($eb-$ea)**2*$f*(1-$f)), "1D L b_1^2");
 ok(Cagree(pdl($b2s)->complex, (pdl($bs)->complex)**2), "1D L b2==b^2");
 
 #View 1D system as 2D. Transverse direction
-my $epst=$ea*(zeroes(1,11)->xvals<5)+ $eb*(zeroes(1,11)->xvals>=5)+0*i;
+my $epst=r2C($ea*(zeroes(1,11)->xvals<5)+ $eb*(zeroes(1,11)->xvals>=5));
 my $gt=Photonic::Geometry::FromEpsilon
    ->new(epsilon=>$epst, Direction0=>pdl([1,0])); #trans
 my $at=Photonic::LE::S::AllH->new(geometry=>$gt, nh=>10);

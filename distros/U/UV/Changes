@@ -1,5 +1,15 @@
 Revision history for Perl extension UV
 
+1.909 2021-05-26
+    - Avoid use-after-free bug when ->close'ing newly listened client
+      connections
+    - Account for different errno value on MSWin32 in unit test
+
+1.908 2021-05-18
+    - Don't attempt to unlink $path at END time if the entire test was skipped
+    - A better implementation of pipepair for testing that might work on
+      MSWin32
+
 1.907 2021-04-09
     - Various small fixes from @Corion to improve unit testing on MSWin32
 

@@ -1,6 +1,6 @@
 #!/usr/bin/env perl
 
-use 5.022;
+use 5.024;
 
 use feature qw /postderef signatures/;
 use Path::Tiny;

@@ -56,7 +56,8 @@ SKIP: {
     ok( !$@ );
 
     my @answer = $p2->answer;
-    is( scalar( @answer ), 3, 'expected number of NS records in answer' );
+    cmp_ok( scalar( @answer ), '<=', 6, 'at most 6 NS records in answer (iis.se)' );
+    cmp_ok( scalar( @answer ), '>=', 2, 'at least 2 NS records in answer (iis.se)' );
     my %known_ns = map { $_ => 1 } qw[ns.nic.se. i.ns.se. ns3.nic.se.];
     foreach my $rr ( @answer ) {
         isa_ok( $rr, 'Zonemaster::LDNS::RR::NS' );

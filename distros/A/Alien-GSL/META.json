@@ -1,10 +1,10 @@
 {
-   "abstract" : "Easy installation of the GNU Scientific Library",
+   "abstract" : "Easy installation of the GSL library",
    "author" : [
       "Joel A. Berger <joel.a.berger@gmail.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4224",
+   "generated_by" : "ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -13,45 +13,73 @@
       "version" : 2
    },
    "name" : "Alien-GSL",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
    "prereqs" : {
       "build" : {
          "requires" : {
-            "IO::Socket::SSL" : "1.56",
-            "Net::SSLeay" : "1.49"
+            "Alien::Build" : "0.32",
+            "Alien::Build::MM" : "0.32",
+            "ExtUtils::MakeMaker" : "6.52"
          }
       },
       "configure" : {
          "requires" : {
-            "Alien::Base::ModuleBuild" : "0",
-            "Module::Build" : "0.38"
+            "Alien::Build" : "1.19",
+            "Alien::Build::MM" : "0.32",
+            "ExtUtils::MakeMaker" : "6.52"
          }
       },
       "runtime" : {
          "requires" : {
-            "Alien::Base" : "0",
-            "parent" : "0",
-            "perl" : "v5.8.1"
+            "Alien::Base" : "2.21",
+            "Alien::Build" : "0.25"
          }
-      }
-   },
-   "provides" : {
-      "Alien::GSL" : {
-         "file" : "lib/Alien/GSL.pm",
-         "version" : "1.02"
+      },
+      "test" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.52",
+            "Test2::V0" : "0",
+            "Test::Alien" : "0"
+         }
       }
    },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://github.com/Perl5-Alien/Alien-GSL/issues"
+         "web" : "https://github.com/PerlAlien/Alien-GSL/issues"
       },
-      "license" : [
-         "http://dev.perl.org/licenses/"
-      ],
+      "homepage" : "https://metacpan.org/pod/Alien::GSL",
       "repository" : {
-         "url" : "https://github.com/Perl5-Alien/Alien-GSL"
+         "type" : "git",
+         "url" : "https://github.com/PerlAlien/Alien-GSL.git",
+         "web" : "https://github.com/PerlAlien/Alien-GSL"
+      },
+      "x_IRC" : "irc://irc.perl.org/#native"
+   },
+   "version" : "1.03",
+   "x_alienfile" : {
+      "generated_by" : "Alien::Build::MM version 2.40",
+      "requires" : {
+         "share" : {
+            "Alien::Build::Plugin::Gather::IsolateDynamic" : "0.48",
+            "Archive::Tar" : "0",
+            "Config" : "0",
+            "HTTP::Tiny" : "0.044",
+            "IO::Socket::SSL" : "1.56",
+            "IO::Zlib" : "0",
+            "Mojo::DOM58" : "1.00",
+            "Net::SSLeay" : "1.49",
+            "Sort::Versions" : "0",
+            "URI" : "0",
+            "URI::Escape" : "0"
+         },
+         "system" : {}
       }
    },
-   "version" : "1.02",
-   "x_serialization_backend" : "JSON::PP version 2.97001"
+   "x_serialization_backend" : "JSON::PP version 4.06"
 }

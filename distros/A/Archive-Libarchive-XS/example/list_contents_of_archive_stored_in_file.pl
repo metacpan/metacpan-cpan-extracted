@@ -18,7 +18,7 @@ if($r != ARCHIVE_OK)
 while (archive_read_next_header($a, my $entry) == ARCHIVE_OK)
 {
   print archive_entry_pathname($entry), "\n";
-  archive_read_data_skip($a); 
+  archive_read_data_skip($a);
 }
 
 $r = archive_read_free($a);

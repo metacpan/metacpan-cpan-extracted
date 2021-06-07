@@ -1,7 +1,7 @@
 package TAP::DOM::Archive;
 our $AUTHORITY = 'cpan:SCHWIGON';
 # ABSTRACT: Handle TAP:Archive files
-$TAP::DOM::Archive::VERSION = '0.92';
+$TAP::DOM::Archive::VERSION = '0.93';
 use 5.006;
 use strict;
 use warnings;
@@ -49,6 +49,7 @@ sub _read_tap_from_archive
         require YAML::Tiny;
         require IO::String;
         require IO::Zlib;
+        require Scalar::Util;
 
         my $content;
         if ($args->{filecontent}) {
@@ -56,7 +57,10 @@ sub _read_tap_from_archive
         } else {
             $content = do {
                 local $/;
-                open my $F, '<', $args->{source} or die 'Can not read '.$args->{source};
+                my $F = Scalar::Util::openhandle($args->{source});
+                if (!defined $F) {
+                    open $F, '<', $args->{source} or die 'Can not read '.$args->{source};
+                }
                 <$F>
             };
         }
@@ -66,7 +70,9 @@ sub _read_tap_from_archive
         my $TARZ         = IO::Zlib->new($TARSTR, "rb");
         my $tar          = Archive::Tar->new($TARZ);
 
-        my $meta         = YAML::Tiny::Load($tar->get_content("meta.yml"));
+        my ($meta_yml)   = grep { $tar->contains_file($_) } qw{meta.yml ./meta.yml};
+        my $meta         = YAML::Tiny::Load($tar->get_content($meta_yml));
+
         my @tap_sections = map {
             # try different variants of filenames that meta.yml gave us
             my $f1 = $_;                  # original name as-is
@@ -104,6 +110,7 @@ TAP::DOM::Archive - Handle TAP:Archive files
  # Create a DOM from TAP archive file
  use TAP::DOM::Archive;
  my $tapdom = TAP::DOM::Archive->new( source => $taparchive_filename );
+ my $tapdom = TAP::DOM::Archive->new( source => $taparchive_filehandle );
  print Dumper($tapdom);
 
 =head1 DESCRIPTION
@@ -155,7 +162,7 @@ Steffen Schwigon <ss5@renormalist.net>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by Steffen Schwigon.
+This software is copyright (c) 2021 by Steffen Schwigon.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

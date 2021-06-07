@@ -1,3 +1,38 @@
+0.9005 2021-05-27
+  - add SPVM::Regex "." regular expression character.
+  - add SPVM::Regex single line mode option "s"
+  - add SPVM::Regex ascii mode and don't support \d, \D, \w, \W, \s, \S without ascii mode option
+  - Fix SPVM::Math->pi and SPVM::Math->e tests. Values is compared as numbers instead of strings
+0.9004 2021-05-26
+  - remove escape charcter \b of string literal
+  - add raw escape character of string literal
+    \p
+    \P
+    \X
+    \g
+    \k
+    \K
+    \v
+    \V
+    \h
+    \H
+    \R
+    \b
+    \B
+    \A
+    \Z
+    \z
+    \G
+    \N
+    \1, \2, \3, \4, \5, \6, \7, \8, \9
+
+0.9003 2021-05-21
+  - add SPVM::StringUtil->hex method
+  - rename SPVM::Regex->caps method to SPVM::Regex->captures
+0.9002 2021-05-20
+  - add SPVM::StringUtil->trim_ascii_space method
+  - fix memory blocks count internal bugs
+  - fix Windows unexpected native api memory bug about get_field_object. I don't know the reason, but it was maybe type problem.
 0.9001 2021-05-11
   - remove SPVM::Time->strptime because this method is too complex as version 1.0 core module.
   - remove SPVM::Time->strftime because this method is too complex as version 1.0 core module.

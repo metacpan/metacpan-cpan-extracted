@@ -37,7 +37,15 @@ foreach (@{$tests->{tests}}) {
 
 {
     my $record = pica_parser('plain', fh => 't/files/bgb.example')->next;
-    my $schema = PICA::Schema->new({});
+    my $schema = PICA::Schema->new({
+        fields => {
+            '201B' => {
+                subfields => {
+                    x => { required => 1 }
+                }
+            }
+        }
+    });
     is scalar($schema->check($record)), 77, "report errors only once";
 
     $record = [undef,['003@','','0','123']];

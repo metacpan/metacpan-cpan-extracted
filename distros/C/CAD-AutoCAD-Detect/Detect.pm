@@ -12,7 +12,7 @@ use Readonly;
 # Constants.
 Readonly::Array our @EXPORT => qw(detect_dwg_file);
 
-our $VERSION = 0.02;
+our $VERSION = 0.03;
 
 # Detect DWG file.
 sub detect_dwg_file {
@@ -108,7 +108,7 @@ Returns magic string or undef.
  }
 
  # Output like:
- # File '%s' isn't DWG file.
+ # File '%s' is DWG file.
 
 =head1 EXAMPLE2
 
@@ -157,12 +157,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-© 2020 Michal Josef Špaček
+© 2020-2021 Michal Josef Špaček
 
 BSD 2-Clause License
 
 =head1 VERSION
 
-0.02
+0.03
 
 =cut

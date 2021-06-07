@@ -32,9 +32,14 @@ t/exp-7.xls
 t/got-7.xls
 t/exp-8.xls
 t/got-8.xls
+t/exp-9.xls
+t/got-9.xls
+t/exp-10.xls
+t/got-10.xls
 t/spec-1.txt
 t/spec-2.txt
 t/spec-3.txt
+t/spec-4.txt
 xt/pod.t
 xt/manifest.t
 xt/meta-json.t

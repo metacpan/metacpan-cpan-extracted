@@ -1,7 +1,7 @@
 package Module::Abstract::CwaliteeCommon;
 
-our $DATE = '2019-09-15'; # DATE
-our $VERSION = '0.006'; # VERSION
+our $DATE = '2021-06-06'; # DATE
+our $VERSION = '0.008'; # VERSION
 
 1;
 # ABSTRACT: Common routines/data for Module::Abstract::Cwalitee
@@ -18,7 +18,7 @@ Module::Abstract::CwaliteeCommon - Common routines/data for Module::Abstract::Cw
 
 =head1 VERSION
 
-This document describes version 0.006 of Module::Abstract::CwaliteeCommon (from Perl distribution Module-Abstract-Cwalitee), released on 2019-09-15.
+This document describes version 0.008 of Module::Abstract::CwaliteeCommon (from Perl distribution Module-Abstract-Cwalitee), released on 2021-06-06.
 
 =head1 HOMEPAGE
 
@@ -42,7 +42,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2019 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

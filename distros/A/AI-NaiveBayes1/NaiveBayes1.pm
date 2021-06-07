@@ -1,4 +1,4 @@
-# (c) 2003-20 Vlado Keselj http://web.cs.dal.ca/~vlado
+# (c) 2003-21 Vlado Keselj https://web.cs.dal.ca/~vlado
 
 package AI::NaiveBayes1;
 use strict;
@@ -6,7 +6,7 @@ require Exporter;
 use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
 @EXPORT = qw(new);
 use vars qw($Version);
-$Version = $VERSION = '2.007';
+$Version = $VERSION = '2.012';
 
 use vars @EXPORT_OK;
 
@@ -757,34 +757,28 @@ book), page 86):
 
 =head1 HISTORY
 
-Algorithms::NaiveBayes by Ken Williams was not what I needed so I
-wrote this one.  Algorithms::NaiveBayes is oriented towards text
+L<Algorithm::NaiveBayes> by Ken Williams was not what I needed so I
+wrote this one.  L<Algorithm::NaiveBayes> is oriented towards text
 categorization, it includes smoothing, and log probabilities.  This
 module is a generic, basic Naive Bayes algorithm.
 
 =head1 THANKS
 
-I would like to thank Yung-chung Lin (xern@ cpan. org) for his
-implementation of the Gaussian model for continuous variables,
-and the following people for bug reports, support, and comments (in
-no particular order):
+I would like to thank Daniel Bohmer for documentation corrections,
+Yung-chung Lin (cpan:xern) for the implementation of the Gaussian model
+for continuous variables, and the following people for bug reports, support,
+and comments (in no particular order):
 
-Michael Stevens
+Michael Stevens, Tom Dyson, Dan Von Kohorn, Craig Talbert,
+Andrew Brian Clegg,
 
-Tom Dyson
-
-Dan Von Kohorn
-
-CPAN-testers: Andreas Koenig, Alexandr Ciornii, jlatour, Jost.Krieger,
-tvmaly, Matthew Musgrove, Michael Stevens, Nigel Horne, Graham Crookham
-
-Craig Talbert
-
-and Andrew Brian Clegg.
+and CPAN-testers, including: Andreas Koenig, Alexandr Ciornii, jlatour,
+Jost.Krieger, tvmaly, Matthew Musgrove, Michael Stevens, Nigel Horne,
+Graham Crookham, David Cantrell (dcantrell).
 
 =head1 AUTHOR
 
-Copyright 2003-20 Vlado Keselj http://web.cs.dal.ca/~vlado.
+Copyright 2003-21 Vlado Keselj L<https://web.cs.dal.ca/~vlado>.
 In 2004 Yung-chung Lin provided implementation of the Gaussian model for
 continous variables.
 
@@ -792,12 +786,12 @@ This script is provided "as is" without expressed or implied warranty.
 This is free software; you can redistribute it and/or modify it under
 the same terms as Perl itself.
 
-The module is available on CPAN (F<http://search.cpan.org/~vlado>), and
-F<http://web.cs.dal.ca/~vlado/srcperl/>.  The latter site is
+The module is available on CPAN (L<https://metacpan.org/author/VLADO>), and
+L<https://web.cs.dal.ca/~vlado/srcperl/>.  The latter site is
 updated more frequently.
 
 =head1 SEE ALSO
 
-Algorithms::NaiveBayes, perl.
+L<Algorithm::NaiveBayes>, L<perl>.
 
 =cut

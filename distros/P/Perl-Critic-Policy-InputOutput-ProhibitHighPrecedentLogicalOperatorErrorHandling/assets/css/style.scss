@@ -1,0 +1,21 @@
+---
+---
+
+@import "{{ site.theme }}";
+
+.page-header {
+    background-position: center center;
+    background-image: url("../images/michael-mroczek-199379-unsplash-blurred.jpg");
+    left: 0;
+    right: 0;
+    background-color: #fff;
+}
+
+.main-content {
+    h1, h2, h3, h4, h5, h6 {
+        margin-top: 2rem;
+        margin-bottom: 1rem;
+        font-weight: normal;
+        color: #222;
+    }
+}

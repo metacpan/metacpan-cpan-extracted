@@ -14,7 +14,7 @@ Archive::Libarchive::XS::Function - libarchive function reference
 
 =head1 VERSION
 
-version 0.0902
+version 0.0903
 
 =head1 SYNOPSIS
 

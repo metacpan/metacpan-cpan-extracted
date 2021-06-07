@@ -1,11 +1,15 @@
 package Finance::Dogechain;
-$Finance::Dogechain::VERSION = '1.20210418.2306';
+$Finance::Dogechain::VERSION = '1.20210605.1754';
 use strict;
 use warnings;
 
 use Finance::Dogechain::Address;
 use Finance::Dogechain::Block;
 use Finance::Dogechain::Transaction;
+
+sub Address     { return Finance::Dogechain::Address->new(     @_ ) }
+sub Block       { return Finance::Dogechain::Block->new(       @_ ) }
+sub Transaction { return Finance::Dogechain::Transaction->new( @_ ) }
 
 'to the moon';
 __END__
@@ -16,6 +20,13 @@ __END__
 Finance::Dogechain - use the dogecoin.info API from Perl
 
 =head1 SYNOPSIS
+
+    my $address     = Finance::Dogechain::Address(     address        => '...' );
+    my $block       = Finance::Dogechain::Block(       block_id       => '...' );
+    my $transaction = Finance::Dogechain::Transaction( transaction_id => '...' );
+
+These methods are helper wrappers for constructors for the actual objects
+provided by this distribution.
 
 See L<Finance::Dogechain::Address>, L<Finance::Dogechain::Block>, and L<Finance::Dogechain::Transaction>.
 

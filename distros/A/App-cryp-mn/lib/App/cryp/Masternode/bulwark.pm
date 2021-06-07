@@ -1,7 +1,7 @@
 package App::cryp::Masternode::bulwark;
 
-our $DATE = '2018-04-06'; # DATE
-our $VERSION = '0.003'; # VERSION
+our $DATE = '2021-05-26'; # DATE
+our $VERSION = '0.004'; # VERSION
 
 use 5.010001;
 use strict;
@@ -165,7 +165,7 @@ App::cryp::Masternode::bulwark - Bulwark (BWK) Masternode driver for App::cryp
 
 =head1 VERSION
 
-This document describes version 0.003 of App::cryp::Masternode::bulwark (from Perl distribution App-cryp-mn), released on 2018-04-06.
+This document describes version 0.004 of App::cryp::Masternode::bulwark (from Perl distribution App-cryp-mn), released on 2021-05-26.
 
 =for Pod::Coverage ^(.+)$
 
@@ -179,7 +179,7 @@ Source repository is at L<https://github.com/perlancar/perl-App-cryp-mn>.
 
 =head1 BUGS
 
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-cryp-mn>
+Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-App-cryp-mn/issues>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
@@ -191,7 +191,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2018 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

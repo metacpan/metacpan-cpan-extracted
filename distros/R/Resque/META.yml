@@ -51,7 +51,7 @@ resources:
   bugtracker: https://github.com/diegok/resque-perl/issues
   homepage: https://github.com/diegok/resque-perl
   repository: https://github.com/diegok/resque-perl.git
-version: '0.41'
+version: '0.42'
 x_Dist_Zilla:
   perl:
     version: '5.032000'
@@ -167,7 +167,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v0.41
+          tag: v0.42
           tag_format: v%V
           tag_message: v%V
         Dist::Zilla::Role::Git::Repo:

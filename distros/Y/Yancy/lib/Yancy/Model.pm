@@ -1,0 +1,265 @@
+package Yancy::Model;
+our $VERSION = '1.073';
+# ABSTRACT: Model layer for Yancy apps
+
+#pod =head1 SYNOPSIS
+#pod
+#pod     # XXX: Allow using backend strings
+#pod     my $model = Yancy::Model->new( backend => $backend );
+#pod
+#pod     my $schema = $model->schema( 'foo' );
+#pod
+#pod     my $id = $schema->create( $data );
+#pod     my $count = $schema->delete( $id );
+#pod     my $count = $schema->delete( $where );
+#pod     my $count = $schema->set( $id, $data );
+#pod     my $count = $schema->set( $where, $data );
+#pod
+#pod     my $item = $schema->get( $id );
+#pod     my ( $items, $total ) = $schema->list( $where, $opts );
+#pod     for my $item ( @$items ) {
+#pod     }
+#pod
+#pod     my $success = $row->set( $data );
+#pod     my $success = $row->delete();
+#pod     my $data = $row->to_hash;
+#pod
+#pod =head1 DESCRIPTION
+#pod
+#pod B<NOTE>: This module is experimental and its API may change before
+#pod Yancy v2!
+#pod
+#pod L<Yancy::Model> is a framework for your business logic. L<Yancy::Model>
+#pod contains a number of schemas, L<Yancy::Model::Schema> objects. Each
+#pod schema contains a number of items, L<Yancy::Model::Item> objects.
+#pod
+#pod For information on how to extend this module to add your own schema
+#pod and item methods, see L<Yancy::Guides::Model>.
+#pod
+#pod =head1 SEE ALSO
+#pod
+#pod L<Yancy::Guides::Model>
+#pod
+#pod =cut
+
+use Mojo::Base -base;
+use Scalar::Util qw( blessed );
+use Mojo::Util qw( camelize );
+use Mojo::Loader qw( load_class );
+
+#pod =attr backend
+#pod
+#pod A L<Yancy::Backend> object.
+#pod
+#pod =cut
+
+has backend => sub { die "backend is required" };
+
+#pod =attr namespaces
+#pod
+#pod An array of namespaces to find Schema and Item classes. Defaults to C<[ 'Yancy::Model' ]>.
+#pod
+#pod =cut
+
+has namespaces => sub { [qw( Yancy::Model )] };
+
+has _schema => sub { {} };
+
+#pod =method find_class
+#pod
+#pod Find a class of the given type for an object of the given name. The name is run
+#pod through L<Mojo::Util/camelize> before lookups.
+#pod
+#pod     unshift @{ $model->namespaces }, 'MyApp';
+#pod     # MyApp::Schema::User
+#pod     $class = $model->find_class( Schema => 'user' );
+#pod     # MyApp::Item::UserProfile
+#pod     $class = $model->find_class( Item => 'user_profile' );
+#pod
+#pod If a specific class cannot be found, a generic class for the type is found instead.
+#pod
+#pod     # MyApp::Schema
+#pod     $class = $model->find_class( Schema => 'not_found' );
+#pod     # MyApp::Item
+#pod     $class = $model->find_class( Item => 'not_found' );
+#pod
+#pod =cut
+
+sub find_class {
+    my ( $self, $type, $name ) = @_;
+    # First, a specific class for this named type.
+    for my $namespace ( @{ $self->namespaces } ) {
+        my $class = "${namespace}::${type}::" . camelize( $name );
+        if ( my $e = load_class $class ) {
+            if ( ref $e ) {
+                die "Could not load $class: $e";
+            }
+            # Not found, try the next one
+            next;
+        }
+        # No error, so this is the class we want
+        return $class;
+    }
+
+    # Finally, try to find a generic type class
+    for my $namespace ( @{ $self->namespaces } ) {
+        my $class = "${namespace}::${type}";
+        if ( my $e = load_class $class ) {
+            if ( ref $e ) {
+                die "Could not load $class: $e";
+            }
+            # Not found, try the next one
+            next;
+        }
+        # No error, so this is the class we want
+        return $class;
+    }
+
+    die "Could not find class for type $type or name $name";
+}
+
+#pod =method read_schema
+#pod
+#pod Read the schema from the L</backend> and prepare schema objects using L</find_class>
+#pod to find the correct classes.
+#pod
+#pod =cut
+
+sub read_schema {
+    my ( $self ) = @_;
+    my $schema = $self->backend->read_schema;
+    for my $name ( keys %$schema ) {
+        $self->schema( $name, $schema->{ $name } );
+    }
+    return $self;
+}
+
+#pod =method schema
+#pod
+#pod Get or set a schema object.
+#pod
+#pod     $model = $model->schema( user => MyApp::Model::User->new );
+#pod     $schema = $model->schema( 'user' );
+#pod
+#pod =cut
+
+# XXX: Preload namespaces' Schema:: and Item:: classes?
+sub schema {
+    my ( $self, $name, $data ) = @_;
+    return $self->_schema->{ $name } if !$data;
+
+    if ( !blessed $data ) {
+        my $class = $self->find_class( Schema => $name );
+        $data = $class->new( { %$data, model => $self, name => $name } );
+    }
+
+    $self->_schema->{$name} = $data;
+    return $self;
+}
+
+1;
+
+__END__
+
+=pod
+
+=head1 NAME
+
+Yancy::Model - Model layer for Yancy apps
+
+=head1 VERSION
+
+version 1.073
+
+=head1 SYNOPSIS
+
+    # XXX: Allow using backend strings
+    my $model = Yancy::Model->new( backend => $backend );
+
+    my $schema = $model->schema( 'foo' );
+
+    my $id = $schema->create( $data );
+    my $count = $schema->delete( $id );
+    my $count = $schema->delete( $where );
+    my $count = $schema->set( $id, $data );
+    my $count = $schema->set( $where, $data );
+
+    my $item = $schema->get( $id );
+    my ( $items, $total ) = $schema->list( $where, $opts );
+    for my $item ( @$items ) {
+    }
+
+    my $success = $row->set( $data );
+    my $success = $row->delete();
+    my $data = $row->to_hash;
+
+=head1 DESCRIPTION
+
+B<NOTE>: This module is experimental and its API may change before
+Yancy v2!
+
+L<Yancy::Model> is a framework for your business logic. L<Yancy::Model>
+contains a number of schemas, L<Yancy::Model::Schema> objects. Each
+schema contains a number of items, L<Yancy::Model::Item> objects.
+
+For information on how to extend this module to add your own schema
+and item methods, see L<Yancy::Guides::Model>.
+
+=head1 ATTRIBUTES
+
+=head2 backend
+
+A L<Yancy::Backend> object.
+
+=head2 namespaces
+
+An array of namespaces to find Schema and Item classes. Defaults to C<[ 'Yancy::Model' ]>.
+
+=head1 METHODS
+
+=head2 find_class
+
+Find a class of the given type for an object of the given name. The name is run
+through L<Mojo::Util/camelize> before lookups.
+
+    unshift @{ $model->namespaces }, 'MyApp';
+    # MyApp::Schema::User
+    $class = $model->find_class( Schema => 'user' );
+    # MyApp::Item::UserProfile
+    $class = $model->find_class( Item => 'user_profile' );
+
+If a specific class cannot be found, a generic class for the type is found instead.
+
+    # MyApp::Schema
+    $class = $model->find_class( Schema => 'not_found' );
+    # MyApp::Item
+    $class = $model->find_class( Item => 'not_found' );
+
+=head2 read_schema
+
+Read the schema from the L</backend> and prepare schema objects using L</find_class>
+to find the correct classes.
+
+=head2 schema
+
+Get or set a schema object.
+
+    $model = $model->schema( user => MyApp::Model::User->new );
+    $schema = $model->schema( 'user' );
+
+=head1 SEE ALSO
+
+L<Yancy::Guides::Model>
+
+=head1 AUTHOR
+
+Doug Bell <preaction@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2021 by Doug Bell.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

@@ -1,3 +1,17 @@
+0.009   2021-04-02  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+	- [doc] Add more recipes in Synopsis; add recipes for this-mod.
+
+	- [doc] Mention this-{dist,mod}-on-metacpan.
+
+
+0.008   2021-02-20  Released-By: PERLANCAR; Urgency: medium
+
+	- Add utility: this-mod.
+
+
 0.007   2020-10-11  Released-By: PERLANCAR; Urgency: medium
 
 	- Add option --extract-version (-V) to extract version.

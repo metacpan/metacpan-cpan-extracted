@@ -2,7 +2,7 @@
 
 print "1..26\n";
 
-BEGIN { require 't/funcs.pl' }
+BEGIN { require './t/funcs.pl' }
 
 use Convert::ASN1;
 

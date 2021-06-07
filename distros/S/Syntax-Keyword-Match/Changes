@@ -1,5 +1,9 @@
 Revision history for Syntax-Keyword-Match
 
+0.04    2021-05-24
+        [CHANGES]
+         * Updated for XS::Parse::Keyword 0.04 API change
+
 0.03    2021-04-21
         [CHANGES]
          * Added :experimental(dispatch) feature for more efficient runtime

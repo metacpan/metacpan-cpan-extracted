@@ -1,7 +1,7 @@
 use Modern::Perl;
 package Intertangle::Yarn::Graphene;
 # ABSTRACT: Load the Graphene graphic types library
-$Intertangle::Yarn::Graphene::VERSION = '0.001';
+$Intertangle::Yarn::Graphene::VERSION = '0.002';
 use Glib::Object::Introspection;
 use DynaLoader;
 
@@ -73,7 +73,7 @@ package Intertangle::Yarn::Graphene::DataPrinterRole {
 	}
 
 	sub _data_printer {
-		my ($self, $prop) = @_;
+		my ($self, $ddp) = @_;
 
 		my $FIELDS = Package::Stash->new( ref $self )->get_symbol( '@FIELDS' );
 		my $data = {
@@ -82,13 +82,17 @@ package Intertangle::Yarn::Graphene::DataPrinterRole {
 
 		my $text = '';
 
-		$text .= $prop->{colored} ? "(@{[colored(['green'], ref($self))]}) " : "(@{[ ref($self) ]}) ";
-		$text .= Data::Printer::np($data, %$prop, _current_indent => 0, multiline => 0, );
+		$text .= "(";
+		$text .= $ddp->maybe_colorize( ref($self), 'class' );
+		$text .= ") ";
+		my $ml_save = $ddp->multiline(0);
+		$text .= $ddp->parse($data);
+		$ddp->multiline($ml_save);
 
 		$text;
 	}
 }
-$Intertangle::Yarn::Graphene::DataPrinterRole::VERSION = '0.001';
+$Intertangle::Yarn::Graphene::DataPrinterRole::VERSION = '0.002';
 
 
 package Intertangle::Yarn::Graphene::Size {
@@ -113,7 +117,7 @@ package Intertangle::Yarn::Graphene::Size {
 		+{ map { $_ => $_[0]->$_ } @FIELDS };
 	}
 }
-$Intertangle::Yarn::Graphene::Size::VERSION = '0.001';
+$Intertangle::Yarn::Graphene::Size::VERSION = '0.002';
 
 package Intertangle::Yarn::Graphene::Point {
 	our @FIELDS = qw(x y);
@@ -159,7 +163,7 @@ package Intertangle::Yarn::Graphene::Point {
 		);
 	}
 }
-$Intertangle::Yarn::Graphene::Point::VERSION = '0.001';
+$Intertangle::Yarn::Graphene::Point::VERSION = '0.002';
 
 package Intertangle::Yarn::Graphene::Point3D {
 	our @FIELDS = qw(x y z);
@@ -185,7 +189,7 @@ package Intertangle::Yarn::Graphene::Point3D {
 		+{ map { $_ => $_[0]->$_ } @FIELDS };
 	}
 }
-$Intertangle::Yarn::Graphene::Point3D::VERSION = '0.001';
+$Intertangle::Yarn::Graphene::Point3D::VERSION = '0.002';
 
 package Intertangle::Yarn::Graphene::Vec2 {
 	our @FIELDS = qw(x y);
@@ -241,7 +245,7 @@ package Intertangle::Yarn::Graphene::Vec2 {
 		);
 	}
 }
-$Intertangle::Yarn::Graphene::Vec2::VERSION = '0.001';
+$Intertangle::Yarn::Graphene::Vec2::VERSION = '0.002';
 
 package Intertangle::Yarn::Graphene::Vec3 {
 	our @FIELDS = qw(x y z);
@@ -288,7 +292,7 @@ package Intertangle::Yarn::Graphene::Vec3 {
 		+{ map { $_ => $_[0]->$_ } @FIELDS };
 	}
 }
-$Intertangle::Yarn::Graphene::Vec3::VERSION = '0.001';
+$Intertangle::Yarn::Graphene::Vec3::VERSION = '0.002';
 
 package Intertangle::Yarn::Graphene::Rect {
 	our @FIELDS = qw(origin size);
@@ -307,7 +311,7 @@ package Intertangle::Yarn::Graphene::Rect {
 		$rect;
 	}
 }
-$Intertangle::Yarn::Graphene::Rect::VERSION = '0.001';
+$Intertangle::Yarn::Graphene::Rect::VERSION = '0.002';
 
 package Intertangle::Yarn::Graphene::Matrix {
 	use Module::Load;
@@ -368,7 +372,7 @@ package Intertangle::Yarn::Graphene::Matrix {
 	}
 
 	sub _data_printer {
-		my ($self, $prop) = @_;
+		my ($self, $ddp) = @_;
 
 		BEGIN {
 			eval {
@@ -379,8 +383,12 @@ package Intertangle::Yarn::Graphene::Matrix {
 
 		my $text = '';
 
-		$text .= $prop->{colored} ? "(@{[colored(['green'], ref($self))]}) " : "(@{[ ref($self) ]}) ";
-		$text .= Data::Printer::np($self->to_ArrayRef, %$prop, _current_indent => 0, multiline => 0, );
+		$text .= "(";
+		$text .= $ddp->maybe_colorize( ref($self), 'class' );
+		$text .= ") ";
+		my $ml_save = $ddp->multiline(0);
+		$text .= $ddp->parse($self->to_ArrayRef);
+		$ddp->multiline($ml_save);
 
 		$text;
 	}
@@ -437,7 +445,7 @@ package Intertangle::Yarn::Graphene::Matrix {
 		$_[0]->multiply( $_[1] );
 	}
 }
-$Intertangle::Yarn::Graphene::Matrix::VERSION = '0.001';
+$Intertangle::Yarn::Graphene::Matrix::VERSION = '0.002';
 
 1;
 
@@ -453,7 +461,7 @@ Intertangle::Yarn::Graphene - Load the Graphene graphic types library
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 METHODS
 

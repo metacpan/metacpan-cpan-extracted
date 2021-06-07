@@ -1,9 +1,9 @@
 package Sys::Info::Driver::OSX::OS;
-$Sys::Info::Driver::OSX::OS::VERSION = '0.7959';
+$Sys::Info::Driver::OSX::OS::VERSION = '0.7960';
 use strict;
 use warnings;
 
-use base qw( Sys::Info::Base );
+use parent qw( Sys::Info::Base );
 use Carp qw( croak );
 use Cwd;
 use POSIX ();
@@ -338,7 +338,7 @@ Sys::Info::Driver::OSX::OS
 
 =head1 VERSION
 
-version 0.7959
+version 0.7960
 
 =head1 SYNOPSIS
 

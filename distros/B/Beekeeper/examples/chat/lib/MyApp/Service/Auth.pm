@@ -23,7 +23,7 @@ sub client {
 sub login {
     my ($self, %args) = @_;
 
-    $self->client->do_job(
+    $self->client->call_remote(
         method => 'myapp.auth.login',
         params => {
             username => $args{'username'},
@@ -35,7 +35,7 @@ sub login {
 sub logout {
     my ($self) = @_;
 
-    $self->client->do_job(
+    $self->client->call_remote(
         method => 'myapp.auth.logout',
     );
 }
@@ -43,7 +43,7 @@ sub logout {
 sub kick {
     my ($self, %args) = @_;
 
-    $self->client->do_job(
+    $self->client->call_remote(
         method => 'myapp.auth.kick',
         params => { 
             username => $args{'username'},

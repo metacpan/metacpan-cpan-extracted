@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2021 -- leonerd@leonerd.org.uk
 
-package List::Keywords 0.05;
+package List::Keywords 0.08;
 
 use v5.14;
 use warnings;
@@ -82,7 +82,7 @@ The C<List::Keyword> version here ran 26% faster.
 
 my %KEYWORD_OK = map { $_ => 1 } qw(
    first any all none notall
-   reduce
+   reduce reductions
 );
 
 sub import
@@ -131,6 +131,8 @@ sub B::Deparse::pp_reducewhile
 
    $val = first { CODE } LIST
 
+I<Since verison 0.03.>
+
 Repeatedly calls the block of code, with C<$_> locally set to successive
 values from the given list. Returns the value and stops at the first item to
 make the block yield a true value. If no such item exists, returns C<undef>.
@@ -158,6 +160,8 @@ the block yield a false value. If no such item exists, returns true.
    $bool = none { CODE } LIST
    $bool = notall { CODE } LISt
 
+I<Since verison 0.03.>
+
 Same as L</any> and L</all> but with the return value inverted.
 
 =cut
@@ -166,17 +170,30 @@ Same as L</any> and L</all> but with the return value inverted.
 
    $final = reduce { CODE } INITIAL, LIST
 
+I<Since verison 0.05.>
+
 Repeatedly calls a block of code, using the C<$a> package lexical as an
 accumulator and setting C<$b> to each successive value from the list in turn.
 The first value of the list sets the initial value of the accumulator, and
 each returned result from the code block gives its new value. The final value
 of the accumulator is returned.
 
+=head2 reductions
+
+   @partials = reductions { CODE } INITIAL, LIST
+
+I<Since version 0.06.>
+
+Similar to C<reduce>, but returns a full list of all the partial results of
+every invocation, beginning with the initial value itself and ending with the
+final result.
+
+=cut
+
 =head1 TODO
 
 More functions from C<List::Util>:
 
-   reductions
    pairfirst pairgrep pairmap
 
 Maybe also consider some from L<List::UtilsBy>.

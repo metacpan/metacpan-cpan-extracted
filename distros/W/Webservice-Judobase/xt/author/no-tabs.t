@@ -10,11 +10,13 @@ my @files = (
     'lib/Webservice/Judobase.pm',
     'lib/Webservice/Judobase.pod',
     'lib/Webservice/Judobase/Competitor.pm',
+    'lib/Webservice/Judobase/Competitor.pod',
     'lib/Webservice/Judobase/Contests.pm',
+    'lib/Webservice/Judobase/Contests.pod',
     'lib/Webservice/Judobase/General.pm',
+    'lib/Webservice/Judobase/General.pod',
     't/00-Basic.t',
-    't/00-compile.t',
-    't/01-SubModules.t'
+    't/00-compile.t'
 );
 
 notabs_ok($_) foreach @files;

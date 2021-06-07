@@ -1,9 +1,9 @@
 package Sah::SchemaR::perl::borderstyle::modname_with_optional_args;
 
-our $DATE = '2021-01-26'; # DATE
-our $VERSION = '0.001'; # VERSION
+our $DATE = '2021-02-02'; # DATE
+our $VERSION = '0.002'; # VERSION
 
-our $rschema = ["str",[{description=>"\nPerl module name with optional arguments which will be used as import arguments,\njust like the `-MMODULE=ARGS` shortcut that `perl` provides. Examples:\n\n    Foo\n    Foo::Bar\n    Foo::Bar=arg1,arg2\n\nSee also: `perl::modname`.\n\n",examples=>[{valid=>0,value=>""},{valid=>1,value=>"Foo::Bar"},{valid=>1,value=>"Foo::Bar=arg1,arg2"},{valid=>1,validated_value=>"Foo::Bar=arg1,arg2",value=>"Foo-Bar=arg1,arg2"}],match=>"[A-Za-z_][A-Za-z_0-9]*(::[A-Za-z_0-9]+)*(?:=.*)?",summary=>"Perl module name (e.g. Foo::Bar) with optional arguments (e.g. Foo::Bar=arg1,arg2)","x.completion"=>"perl_modname","x.perl.coerce_rules"=>["From_str::normalize_perl_modname"]},{summary=>"Perl module in the BorderStyle::* namespace, without the namespace prefix, with optional args e.g. \"Test::CustomChar=char,x\"","x.completion"=>["perl_modname",{ns_prefix=>"BorderStyle"}],"x.perl.coerce_rules"=>[["From_str::normalize_perl_modname",{ns_prefix=>"BorderStyle"}]]}],["perl::modname_with_optional_args","str"]];
+our $rschema = ["str",[{description=>"\nPerl module name with optional arguments which will be used as import arguments,\njust like the `-MMODULE=ARGS` shortcut that `perl` provides. Examples:\n\n    Foo\n    Foo::Bar\n    Foo::Bar=arg1,arg2\n\nSee also: `perl::modname`.\n\n",examples=>[{valid=>0,value=>""},{valid=>1,value=>"Foo::Bar"},{valid=>1,value=>"Foo::Bar=arg1,arg2"},{valid=>1,validated_value=>"Foo::Bar=arg1,arg2",value=>"Foo-Bar=arg1,arg2"}],match=>"[A-Za-z_][A-Za-z_0-9]*(::[A-Za-z_0-9]+)*(?:=.*)?",summary=>"Perl module name (e.g. Foo::Bar) with optional arguments (e.g. Foo::Bar=arg1,arg2)","x.completion"=>"perl_modname","x.perl.coerce_rules"=>["From_str::normalize_perl_modname"]},{summary=>"Perl module in the BorderStyle::* namespace, without the namespace prefix, with optional args e.g. \"Test::CustomChar=char,x\"","x.completion"=>["perl_modname",{ns_prefix=>"BorderStyle",recurse=>1,recurse_matching=>"all-at-once"}],"x.perl.coerce_rules"=>[["From_str::normalize_perl_modname",{ns_prefix=>"BorderStyle"}]]}],["perl::modname_with_optional_args","str"]];
 
 1;
 # ABSTRACT: Perl module in the BorderStyle::* namespace, without the namespace prefix, with optional args e.g. "Test::CustomChar=char,x"
@@ -20,7 +20,7 @@ Sah::SchemaR::perl::borderstyle::modname_with_optional_args - Perl module in the
 
 =head1 VERSION
 
-This document describes version 0.001 of Sah::SchemaR::perl::borderstyle::modname_with_optional_args (from Perl distribution Sah-Schemas-BorderStyle), released on 2021-01-26.
+This document describes version 0.002 of Sah::SchemaR::perl::borderstyle::modname_with_optional_args (from Perl distribution Sah-Schemas-BorderStyle), released on 2021-02-02.
 
 =head1 DESCRIPTION
 

@@ -1,5 +1,5 @@
 package Photonic::Roles::KeepStates;
-$Photonic::Roles::KeepStates::VERSION = '0.015';
+$Photonic::Roles::KeepStates::VERSION = '0.016';
 
 =encoding UTF-8
 
@@ -9,7 +9,7 @@ Photonic::Roles::KeepStates
 
 =head1 VERSION
 
-version 0.015
+version 0.016
 
 =head1 COPYRIGHT NOTICE
 
@@ -54,7 +54,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA  02110-1301 USA
 Fields that have been factored as they are common in different
 Photonic subpackages to calculate the electromagnetic field
 
-=head1 ACCESORS (read only)
+=head1 ACCESSORS (read only)
 
 =head2 keepStates
 

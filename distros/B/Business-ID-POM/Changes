@@ -1,3 +1,10 @@
+0.003   2021-06-04  Released-By: PERLANCAR; Urgency: medium
+
+	- [ux] Allow 'POM' prefix in specified code.
+
+	- Recognize traditional medicine company type 4 (only found in TI).
+
+
 0.002   2019-11-25  Released-By: PERLANCAR; Urgency: low
 
 	- No functional changes.

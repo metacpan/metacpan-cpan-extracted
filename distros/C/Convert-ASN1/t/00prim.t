@@ -8,7 +8,7 @@ use Convert::ASN1 qw(:all);
 
 print "1..186\n";
 
-BEGIN { require 't/funcs.pl' }
+BEGIN { require './t/funcs.pl' }
 
 ntest 1, 129,      asn_tag(ASN_CONTEXT, 1);
 ntest 2, 0x201f,   asn_tag(ASN_UNIVERSAL, 32);

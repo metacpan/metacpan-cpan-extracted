@@ -6,14 +6,19 @@ use warnings;
 
 use Test::More;
 
-plan tests => 6 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 11 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'Role/TinyCommons/Collection.pm',
+    'Role/TinyCommons/Collection/CompareItems.pm',
     'Role/TinyCommons/Collection/FindItem.pm',
+    'Role/TinyCommons/Collection/FindItem/Iterator.pm',
+    'Role/TinyCommons/Collection/GetItemByKey.pm',
+    'Role/TinyCommons/Collection/GetItemByPos.pm',
     'Role/TinyCommons/Collection/PickItems.pm',
     'Role/TinyCommons/Collection/PickItems/Iterator.pm',
-    'Role/TinyCommons/Collection/PickItems/RandomSeek.pm',
+    'Role/TinyCommons/Collection/PickItems/RandomPos.pm',
+    'Role/TinyCommons/Collection/PickItems/RandomSeekLines.pm',
     'Role/TinyCommons/Collection/SelectItems.pm'
 );
 

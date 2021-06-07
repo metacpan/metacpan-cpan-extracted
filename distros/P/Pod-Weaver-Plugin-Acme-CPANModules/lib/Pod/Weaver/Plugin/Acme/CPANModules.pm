@@ -1,9 +1,9 @@
 package Pod::Weaver::Plugin::Acme::CPANModules;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-02-18'; # DATE
+our $DATE = '2021-05-22'; # DATE
 our $DIST = 'Pod-Weaver-Plugin-Acme-CPANModules'; # DIST
-our $VERSION = '0.008'; # VERSION
+our $VERSION = '0.009'; # VERSION
 
 use 5.010001;
 use Moose;
@@ -83,8 +83,13 @@ document CPAN. See L<Acme::CPANModules> for more details.
 =head2 What are ways to use this Acme::CPANModules module?
 
 Aside from reading this Acme::CPANModules module's POD documentation, you can
-install all the listed modules (entries) using L<cpanmodules> CLI (from
-L<App::cpanmodules> distribution):
+install all the listed modules (entries) using L<cpanm-cpanmodules> script (from
+L<App::cpanm::cpanmodules> distribution):
+
+ % cpanm-cpanmodules -n ).$ac_name.q(
+
+Alternatively you can use the L<cpanmodules> CLI (from L<App::cpanmodules>
+distribution):
 
     % cpanmodules ls-entries ).$ac_name.q( | cpanm -n
 
@@ -153,7 +158,7 @@ Pod::Weaver::Plugin::Acme::CPANModules - Plugin to use when building Acme::CPANM
 
 =head1 VERSION
 
-This document describes version 0.008 of Pod::Weaver::Plugin::Acme::CPANModules (from Perl distribution Pod-Weaver-Plugin-Acme-CPANModules), released on 2021-02-18.
+This document describes version 0.009 of Pod::Weaver::Plugin::Acme::CPANModules (from Perl distribution Pod-Weaver-Plugin-Acme-CPANModules), released on 2021-05-22.
 
 =head1 SYNOPSIS
 

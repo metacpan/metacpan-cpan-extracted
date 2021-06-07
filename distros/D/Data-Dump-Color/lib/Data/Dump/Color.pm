@@ -5,14 +5,15 @@
 package Data::Dump::Color;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-02-13'; # DATE
+our $DATE = '2021-06-05'; # DATE
 our $DIST = 'Data-Dump-Color'; # DIST
-our $VERSION = '0.243'; # VERSION
+our $VERSION = '0.245'; # VERSION
 
 use 5.010001;
 use strict 'subs', 'vars';
-use vars qw(@EXPORT @EXPORT_OK $VERSION $DEBUG);
 use subs qq(dump);
+use vars qw(@EXPORT @EXPORT_OK $VERSION $DEBUG);
+use warnings;
 
 require Exporter;
 *import = \&Exporter::import;
@@ -42,7 +43,8 @@ $TRY_BASE64 = 50 unless defined $TRY_BASE64;
 $INDENT = "  " unless defined $INDENT;
 $INDEX = 1 unless defined $INDEX;
 $LENTHRESHOLD = 500 unless defined $LENTHRESHOLD;
-$COLOR = $ENV{COLOR} // (-t STDOUT) // 1;
+$COLOR = (defined $ENV{NO_COLOR} ? 0 : undef) //
+    $ENV{COLOR} // (-t STDOUT) // 1;
 $COLOR_THEME = $ENV{DATA_DUMP_COLOR_THEME} //
     (($ENV{TERM} // "") =~ /256/ ? 'Default256' : 'Default16');
 our $ct_obj;
@@ -54,7 +56,7 @@ sub _col {
     return $str unless $COLOR;
 
     my $ansi = '';
-    my $item = $ct_obj->get_item_color($item);
+    $item = $ct_obj->get_item_color($item);
     if (defined $item) {
         $ansi = ColorThemeUtil::ANSI::item_color_to_ansi($item);
     }
@@ -511,8 +513,8 @@ sub _dump
             #say "DEBUG: key=<$key>, vpad=<$vpad>, val=<$val>, lenvlastline=<$lenvlastline>, cpad=<$cpad>" if $DEBUG;
             my $visaid = "";
             $visaid .= sprintf("%s{%${idxwidth}i}", "." x @$idx, $i) if $INDEX;
-            $visaid .= " klen=".length($origk) if length($origk) >= $LENTHRESHOLD;
-            $visaid .= " vlen=".length($origv) if length($origv) >= $LENTHRESHOLD;
+            $visaid .= " klen=".length($origk) if defined $origk && length($origk) >= $LENTHRESHOLD;
+            $visaid .= " vlen=".length($origv) if defined $origv && length($origv) >= $LENTHRESHOLD;
 	    $out  .= "$kpad$key => $val," . ($nl && length($visaid) ? " $cpad# $visaid" : "") . $nl;
 	    $cout .= $kpad._col(key=>$key)." => $cval,".($nl && length($visaid) ? " $cpad"._col(comment => "# $visaid") : "") . $nl;
             $i++;
@@ -765,7 +767,7 @@ Data::Dump::Color - Like Data::Dump, but with color
 
 =head1 VERSION
 
-This document describes version 0.243 of Data::Dump::Color (from Perl distribution Data-Dump-Color), released on 2021-02-13.
+This document describes version 0.245 of Data::Dump::Color (from Perl distribution Data-Dump-Color), released on 2021-06-05.
 
 =head1 SYNOPSIS
 
@@ -841,8 +843,8 @@ Additional variables include:
 =item $COLOR => BOOL (default: undef)
 
 Whether to force-enable or disable color. If unset, color output will be
-determined from C<$ENV{COLOR}> or when in interactive terminal (when C<-t
-STDOUT> is true).
+determined from L</NO_COLOR>, L</COLOR> environment variables, or whether
+running in interactive terminal (when C<-t STDOUT> is true).
 
 =item $COLOR_THEME => str
 
@@ -884,30 +886,26 @@ off, you can set environment COLOR to 0, or C<$Data::Dump::Color::COLOR> to 0.
 
 =head2 How do I customize colors?
 
-Fiddle the colors in C<%Data::Dump::Color::COLORS>. There will probably be
-proper color theme support in the future (based on
-L<SHARYANTO::Role::ColorTheme>.
+Create a color theme and give it a name under
+C<ColorTheme::Data::Dump::Color::*>. See an existing color theme for example,
+e.g. L<ColorTheme::Data::Dump::Color::Default256>.
 
 =head1 ENVIRONMENT
 
-=over
-
-=item * DATA_DUMP_COLOR_THEME
+=head2 DATA_DUMP_COLOR_THEME
 
 Set color theme. Name will be searched under C<ColorTheme::Data::Dump::Color::*>
 or C<ColorTheme::*>.
 
-=item * NO_COLOR
+=head2 NO_COLOR
 
 Can be used to disable color. Takes precedence over the C<COLOR> environment.
 See L<https://no-color.org> for more details.
 
-=item * COLOR
+=head2 COLOR
 
 If set, then will force color output on or off. By default, will only output
 color when in interactive terminal. This is consulted when C<$COLOR> is not set.
-
-=back
 
 =head1 HOMEPAGE
 
@@ -932,6 +930,22 @@ L<Data::Dump>, L<JSON::Color>, L<YAML::Tiny::Color>
 =head1 AUTHOR
 
 perlancar <perlancar@cpan.org>
+
+=head1 CONTRIBUTORS
+
+=for stopwords Scott Baker Steven Haryanto
+
+=over 4
+
+=item *
+
+Scott Baker <bakerscot@cpan.org>
+
+=item *
+
+Steven Haryanto <sharyanto@cpan.org>
+
+=back
 
 =head1 COPYRIGHT AND LICENSE
 

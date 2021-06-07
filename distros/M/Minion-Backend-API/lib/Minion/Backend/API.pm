@@ -1,10 +1,9 @@
 package Minion::Backend::API;
 use Mojo::Base 'Minion::Backend';
-
 use Mojo::UserAgent;
 use Carp 'croak';
 
-our $VERSION = 0.05;
+our $VERSION = 0.06;
 
 has 'ua';
 has 'url';

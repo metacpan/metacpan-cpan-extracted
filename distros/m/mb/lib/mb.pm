@@ -11,7 +11,7 @@ package mb;
 use 5.00503;    # Universal Consensus 1998 for primetools
 # use 5.008001; # Lancaster Consensus 2013 for toolchains
 
-$VERSION = '0.27';
+$VERSION = '0.28';
 $VERSION = $VERSION;
 
 # internal use
@@ -236,7 +236,7 @@ sub confess {
     }
     print STDERR "\n", @_, "\n";
     print STDERR CORE::reverse @confess;
-    exit;
+    die;
 }
 
 #---------------------------------------------------------------------
@@ -2905,10 +2905,34 @@ sub parse_expr {
         $parsed .= "mb::_$1";
     }
 
-    # printf <<HEREDOC
-    # print  <<HEREDOC
-    # say    <<HEREDOC
-    elsif (/\G ( printf | print | say ) (?= (?: \s+ | [#] .* )* << ) /xgc) {
+    # Carp::carp    <<HEREDOC
+    # Carp::cluck   <<HEREDOC
+    # Carp::confess <<HEREDOC
+    # Carp::croak   <<HEREDOC
+    # carp          <<HEREDOC
+    # cluck         <<HEREDOC
+    # confess       <<HEREDOC
+    # croak         <<HEREDOC
+    # die           <<HEREDOC
+    # print         <<HEREDOC
+    # printf        <<HEREDOC
+    # say           <<HEREDOC
+    # warn          <<HEREDOC
+    elsif (/\G ( 
+        Carp::carp    |
+        Carp::cluck   |
+        Carp::confess |
+        Carp::croak   |
+        carp          |
+        cluck         |
+        confess       |
+        croak         |
+        die           |
+        print         |
+        printf        |
+        say           |
+        warn
+    ) (?= (?: \s+ | [#] .* )* << ) /xgc) {
         $parsed .= $1;
         # without $parsed .= parse_ambiguous_char();
     }
@@ -6604,20 +6628,7 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 =head1 SEE ALSO
 
- perlunicode, Encode, open, utf8, bytes, Arabic, Big5, Big5HKSCS, CP932::R2,
- CP932IBM::R2, CP932NEC::R2, CP932X::R2, Char::Arabic, Char::Big5HKSCS,
- Char::Big5Plus, Char::Cyrillic, Char::EUCJP, Char::EUCTW, Char::GB18030,
- Char::GBK, Char::Greek, Char::HP15, Char::Hebrew, Char::INFORMIXV6ALS,
- Char::JIS8, Char::KOI8R, Char::KOI8U, Char::KPS9566, Char::Latin1,
- Char::Latin10, Char::Latin2, Char::Latin3, Char::Latin4, Char::Latin5,
- Char::Latin6, Char::Latin7, Char::Latin8, Char::Latin9, Char::OldUTF8,
- Char::Sjis, Char::TIS620, Char::UHC, Char::USASCII, Char::UTF2,
- Char::Windows1252, Char::Windows1258, Cyrillic, GBK, Greek, IOas::CP932,
- IOas::CP932IBM, IOas::CP932NEC, IOas::CP932X, IOas::SJIS2004, Jacode,
- Jacode4e, Jacode4e::RoundTrip, KOI8R, KOI8U, KPS9566, KSC5601, Latin1,
- Latin10, Latin2, Latin3, Latin4, Latin5, Latin6, Latin7, Latin8, Latin9,
- Modern::Open, SJIS2004::R2, Sjis, UTF2, UTF8::R2, Windows1250, Windows1252,
- Windows1254, Windows1257, Windows1258.
+ perlunicode, perlunifaq, perluniintro, perlunitut, utf8, bytes,
 
  PERL PUROGURAMINGU
  Larry Wall, Randal L.Schwartz, Yoshiyuki Kondo
@@ -6723,10 +6734,6 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  Erik Olson, Brian Jepson, David Futato, Dick Hardt
  ISBN 10:1-56592-409-6
  http://shop.oreilly.com/product/9781565924093.do
-
- Announcing Perl 7
- Jun 24, 2020 by brian d foy
- https://www.perl.com/article/announcing-perl-7/
 
  MODAN Perl NYUMON
  By Daisuke Maki
@@ -6873,6 +6880,47 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  http://blade.nagaokaut.ac.jp/cgi-bin/scat.rb/ruby/ruby-list/12392
  http://blade.nagaokaut.ac.jp/cgi-bin/scat.rb/ruby/ruby-list/12393
  http://blade.nagaokaut.ac.jp/cgi-bin/scat.rb/ruby/ruby-list/19156
+
+ Announcing Perl 7
+ https://www.perl.com/article/announcing-perl-7/
+
+ Perl 7 is coming
+ https://www.effectiveperlprogramming.com/2020/06/perl-7-is-coming/
+
+ A vision for Perl 7 and beyond
+ https://xdg.me/a-vision-for-perl-7-and-beyond/
+
+ On Perl 7 and the Perl Steering Committee
+ https://lwn.net/Articles/828384/
+  
+ Perl7 and the future of Perl
+ http://www.softpanorama.org/Scripting/Language_wars/perl7_and_the_future_of_perl.shtml
+
+ Perl 7: A Risk-Benefit Analysis
+ http://blogs.perl.org/users/grinnz/2020/07/perl-7-a-risk-benefit-analysis.html
+
+ Perl 7 By Default
+ http://blogs.perl.org/users/grinnz/2020/08/perl-7-by-default.html
+
+ Perl 7: A Modest Proposal
+ https://dev.to/grinnz/perl-7-a-modest-proposal-434m
+
+ Perl 7 FAQ
+ https://gist.github.com/Grinnz/be5db6b1d54b22d8e21c975d68d7a54f
+
+ Perl 7, not quite getting better yet
+ http://blogs.perl.org/users/leon_timmermans/2020/06/not-quite-getting-better-yet.html
+
+ Re: Announcing Perl 7
+ https://www.nntp.perl.org/group/perl.perl5.porters/2020/06/msg257566.html
+ https://www.nntp.perl.org/group/perl.perl5.porters/2020/06/msg257568.html
+ https://www.nntp.perl.org/group/perl.perl5.porters/2020/06/msg257572.html
+
+ Changed defaults - Are they best for newbies?
+ https://www.nntp.perl.org/group/perl.perl5.porters/2020/08/msg258221.html
+
+ A vision for Perl 7 and beyond
+ https://web.archive.org/web/20200927044106/https://xdg.me/archive/2020-a-vision-for-perl-7-and-beyond/
 
  TANABATA - The Star Festival - common legend of east asia
  https://ja.wikipedia.org/wiki/%E4%B8%83%E5%A4%95

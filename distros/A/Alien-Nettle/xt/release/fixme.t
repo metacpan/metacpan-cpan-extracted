@@ -1,8 +1,8 @@
 use strict;
 use warnings;
 use Test::More;
-BEGIN { 
-  plan skip_all => 'test requires Test::Fixme' 
+BEGIN {
+  plan skip_all => 'test requires Test::Fixme'
     unless eval q{ use Test::Fixme 0.14; 1 };
 };
 use Test::Fixme 0.07;

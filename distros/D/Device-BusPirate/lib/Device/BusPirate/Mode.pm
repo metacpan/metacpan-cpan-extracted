@@ -1,14 +1,12 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2014-2019 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2014-2021 -- leonerd@leonerd.org.uk
 
-package Device::BusPirate::Mode;
+package Device::BusPirate::Mode 0.22;
 
-use strict;
+use v5.14;
 use warnings;
-
-our $VERSION = '0.20';
 
 use Carp;
 

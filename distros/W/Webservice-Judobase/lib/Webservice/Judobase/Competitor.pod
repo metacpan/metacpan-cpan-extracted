@@ -1,0 +1,65 @@
+
+=encoding UTF-8
+
+=head1 NAME
+
+Webservice::Judobase::Competitor - Athlete information from Judobase API.
+
+=head1 ATTRIBUTES
+
+=head2 ua
+
+User agent is passed in from the base class.
+
+=head2 url
+
+URL for the API, passed in from the base class.
+
+
+=head1 METHODS
+
+=head2 best_results( id => INT )
+
+Returns an array of hashes of competition results for a specific athlete.
+
+=head2 birthdays_competitors( min_age => INT )
+
+Returns an array of hashes of athletes over a certain age.
+
+=head2 contests( id => INT )
+
+Returns an array of hashes of contest for a specific athlete.
+
+=head2 contests_statistics( id => INT )
+
+TBD.
+
+=head2 fights_statistics( id => INT )
+
+TBD.
+
+=head2 info( id => INT )
+
+TBD.
+
+=head2 wrl_current( id => INT )
+
+TBD.
+
+=head1 AUTHOR
+
+Lance Wicks <lancew@cpan.org>
+
+=head1 CONTRIBUTORS
+
+=head1 COPYRIGHT
+
+This software is Copyright (c) 2016-2021 by Lance Wicks.
+
+=head1 LICENSE
+
+This is free software; you can redistribute it and/or modify it under the same terms as the Perl 5 programming language system itself.
+See the LICENSE file in the distribution on CPAN for full text.
+
+=head1 SEE ALSO
+

@@ -34,8 +34,10 @@
       "runtime" : {
          "requires" : {
             "Capture::Tiny" : "0",
+            "Carp" : "0",
             "Devel::Peek" : "0",
             "Scalar::Util" : "0",
+            "Test::Exception" : "0",
             "Test::More" : "0.96"
          }
       }
@@ -49,6 +51,6 @@
          "url" : "https://github.com/DrHyde/perl-modules-Scalar-Type"
       }
    },
-   "version" : "v0.0.4",
+   "version" : "v0.1.1",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

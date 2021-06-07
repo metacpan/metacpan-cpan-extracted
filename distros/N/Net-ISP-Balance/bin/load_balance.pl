@@ -215,6 +215,7 @@ use Getopt::Long qw(:config no_ignore_case);
 use Carp 'croak';
 use Pod::Usage 'pod2usage';
 use constant LOCK_TIMEOUT => 30;  # if two processes running simultaneously, length of time second will wait for first
+my          $lsm_pid_path = Net::ISP::Balance->lsm_pid_path();
 
 my ($DEBUG,$VERBOSE,$STATUS,$KILL,$HELP,$FLUSH,$VERSION);
 my $result = GetOptions('debug' => \$DEBUG,
@@ -299,7 +300,7 @@ exit 0;
 sub do_status {
     my $state = $bal->event();
     my @svc = sort $bal->isp_services;
-    printf("%-12s %-8s %-8s %-3s\n",
+    printf("%-12s %-12s %-12s %-3s\n",
 	   'Service',
 	   'Device',
 	   'State',
@@ -308,20 +309,41 @@ sub do_status {
 	my $preferred = $bal->preferred_service;
 	my $routing   = $bal->operating_mode eq 'failover' ? $_ eq $preferred
 	                                                   : $state->{$_} eq 'up';
-	printf("%-12s %-8s %-8s %-3s\n",
+	printf("%-12s %-12s %-12s %-3s\n",
 		   $_,
-		   $bal->dev($_),
+		   $bal->vdev($_),
 		   $state->{$_}||'unknown',
 		   $routing ? 'yes' : 'no',
 
 	    );
     }
 
-    if ($< == 0)  { # running as root
-	kill(USR1 => `cat /var/run/lsm.pid`);
+    my $pid         = lsm_pid();
+    my $lsm_running = $pid && lsm_running($pid) ? "running ($pid)" : 'not running';
+    print "\nLink monitoring daemon (lsm) process: $lsm_running\n";
+
+    if ($< == 0 && $pid)  { # running as root
+	kill(USR1 => $pid);
 	print STDERR "See syslog for detailed link monitoring information from lsm.\n";
     }
     exit 0;
+}
+
+sub lsm_running {
+    my $pid = shift;
+    $pid ||= lsm_pid();
+    return unless $pid;
+    return kill(0=>$pid) if $< == 0;  # running as root so we can try signaling
+    # otherwise we check whether this pid is listed in /proc
+    return -e "/proc/$pid";
+}
+
+sub lsm_pid {
+    -e $lsm_pid_path          or return;
+    open my $fh,$lsm_pid_path or return;
+    chomp (my $pid = <$fh>);
+    close $fh;
+    return $pid;
 }
 
 sub do_kill_lsm {
@@ -330,34 +352,27 @@ sub do_kill_lsm {
 }
 
 sub kill_lsm {
-    my $lsm_running = -e '/var/run/lsm.pid' && kill(0=>`cat /var/run/lsm.pid`);
+    my $pid         = lsm_pid();
+    my $lsm_running = $pid && kill(0=>$pid);
     if ($lsm_running) {
-	kill(TERM => `cat /var/run/lsm.pid`);
-	print STDERR "lsm process killed\n";
+	kill(TERM => $pid);
+	print STDERR "foolsm process killed\n";
+	syslog('warning',"foolsm process killed");
     }
+    unlink $lsm_pid_path;
 }
 
 sub start_or_reload_lsm {
     my $bal = shift;
 
     my $config_changed = write_lsm_config($bal);
-    my $lsm_conf       = $bal->lsm_conf_file;
-    my $lsm_pid        = -e '/var/run/lsm.pid' && `cat /var/run/lsm.pid`;
-    chomp($lsm_pid);
+    my $lsm_pid        = lsm_pid();
 
-    my $lsm_running = $lsm_pid && kill(0=>$lsm_pid);
-
-    if (!$lsm_running) {
-	print STDERR  "Starting lsm link status monitoring daemon\n";    
-	syslog('info',"Starting lsm link status monitoring daemon");    
+    if (!lsm_running($lsm_pid)) {
+	print STDERR  "Starting foolsm link status monitoring daemon\n";    
+	syslog('info',"Starting foolsm link status monitoring daemon");    
 	$bal->start_lsm();
     }
-    elsif ($ARGV[0] && $ARGV[0] eq 'long_down') {
-	print STDERR  "Reloading lsm link status monitoring daemon\n";    
-	syslog('info',"Reloading lsm link status monitoring daemon");    
-	kill(HUP => $lsm_pid);
-    }
-    
 }
 
 sub write_lsm_config {

@@ -1,0 +1,109 @@
+Changelog for DBIx-Class-Storage-DBI-mysql-Retryable
+
+v1.0.0 2021-05-19T20:33:03
+ - Add basic files (Brendan Byrd)
+ - Remove pedantic stringification protection for $error (Brendan Byrd)
+ - Protect $@ from modification by parse_error_class (Andrew Hewus Fresh)
+ - Add dependency for Algorithm::Backoff::RetryTimeouts (Brendan Byrd)
+ - Reverse logic of disable_retryable to enable_retryable (Brendan Byrd)
+ - Fix unit tests to work with DBD::SQLite (Brendan Byrd)
+ - Skip aggressive_timeouts tests on ancient versions of DBD::mysql
+   (Brendan Byrd)
+ - Only force disconnects if the connection seems to be in a broken state
+   (Brendan Byrd)
+ - Fix POD to document new helper classes (Brendan Byrd)
+ - Enhance warn_on_retryable_error and exception messages (Brendan Byrd)
+ - Use Algorithm::Backoff::RetryTimeouts for attempts/timeout timing
+   (Brendan Byrd)
+ - Protect $@ during eval in _set_retryable_session_timeouts call (Brendan
+   Byrd)
+ - Don't retry connection errors if they aren't considered transient
+   (Brendan Byrd)
+ - Remove reference to MySQLHacks (Brendan Byrd)
+ - Use DBIx::ParseError::MySQL for error message parsing (Brendan Byrd)
+ - Initial Commit (Brendan Byrd)
+ - Fix bug in is_dbi_error_retryable that mutated the exception object
+   (Brendan Byrd)
+ - DRY out the target running code in _blockrunner_do (Brendan Byrd)
+ - Protect any _connect calls, including the initial connection, with a
+   retry cycle (Brendan Byrd)
+ - Protect ensure_connected call with an eval inside the retry handler
+   (Brendan Byrd)
+ - Use $storage->dbh in unit test to ensure we always get a live $dbh
+   (Brendan Byrd)
+ - Add DRY code for timeout string sets (Brendan Byrd)
+ - Make sure the coderef arguments are the same ones documented in DBIC
+   (Brendan Byrd)
+ - Move certain aggressive timeouts to a new aggressive_timeouts boolean
+   (Brendan Byrd)
+ - Fix the max_attempts exception check to be a tad looser (Brendan Byrd)
+ - Make Retryable.t pass against a (default) SQLite DB (Brendan Byrd)
+ - Add Test2::Tools::Explain to test requires (Brendan Byrd)
+ - Factor in the exponential backoff when figuring out if sleep gets called
+   (Brendan Byrd)
+ - Add large warning for coderef-based connect_info (Brendan Byrd)
+ - Add the usual localization of $@ and __DIE__ (Brendan Byrd)
+ - Fix cpanfile deps (Brendan Byrd)
+ - Add unit tests for Retryable (Brendan Byrd)
+ - Initial port of Retryable (Brendan Byrd)
+ - Import the DBIx::* CDTest test files including Helper additions (Brendan
+   Byrd)
+
+v0.0.6 2020-05-15T15:45:54
+ - PEX-15723: Fix bug in is_dbi_error_retryable that mutated the exception
+   object (Brendan Byrd)
+
+v0.0.5 2020-03-13T15:08:10
+ - PEX-12534c: DRY out the target running code in _blockrunner_do (Brendan
+   Byrd)
+ - PEX-12534c: Protect any _connect calls, including the initial
+   connection, with a retry cycle (Brendan Byrd)
+ - PEX-12534c: Protect ensure_connected call with an eval inside the retry
+   handler (Brendan Byrd)
+
+v0.0.4 2020-02-27T20:15:20
+ - PEX-12534b: Use $storage->dbh in unit test to ensure we always get a
+   live $dbh (Brendan Byrd)
+ - PEX-12534b: Add DRY code for timeout string sets (Brendan Byrd)
+ - PEX-12534b: Make sure the coderef arguments are the same ones documented
+   in DBIC (Brendan Byrd)
+ - PEX-12534b: Move certain aggressive timeouts to a new
+   aggressive_timeouts boolean (Brendan Byrd)
+
+v0.0.3 2020-02-20T16:54:25
+ - TS-57605: Account for TCB's quote_names while removing the "UPDATE DUAL"
+   piece (Brendan Byrd)
+
+v0.0.2 2020-02-14T00:35:29
+ - PEX-12534a: Move stub module to match the distro name (Brendan Byrd)
+
+v0.0.1 2020-02-06T21:57:52
+ - PEX-12534: Fix the max_attempts exception check to be a tad looser
+   (Brendan Byrd)
+ - PEX-12534: Make Retryable.t pass against a (default) SQLite DB (Brendan
+   Byrd)
+ - Update dist files (Andrew Hewus Fresh)
+ - PEX-12534: Add Test2::Tools::Explain to test requires (Brendan Byrd)
+ - PEX-12534: Add in some missing POD sections (Brendan Byrd)
+ - PEX-12534: Factor in the exponential backoff when figuring out if sleep
+   gets called (Brendan Byrd)
+ - PEX-12534: Add large warning for coderef-based connect_info (Brendan
+   Byrd)
+ - PEX_12534: Add extra comments for MySQLHacks (Brendan Byrd)
+ - PEX-12534: Switch to ABSTRACT/VERSION comments for DZIL in MySQLHacks
+   (Brendan Byrd)
+ - PEX-12534: Add the usual localization of $@ and __DIE__ (Brendan Byrd)
+ - PEX-12534: Fix cpanfile deps (Brendan Byrd)
+ - PEX-12534: Create dummy DBIx::Class::MySQL module (Brendan Byrd)
+ - PEX-12534: Add unit tests for Retryable (Brendan Byrd)
+ - PEX-12534: Add DBIx::Class::Storage::DBI::mysql::Retryable (Brendan
+   Byrd)
+ - PEX-12534: Add new unit test for MySQLHacks (Brendan Byrd)
+ - PEX-12534: Import the DBIx::* CDTest test files including Helper
+   additions (Brendan Byrd)
+ - PEX-12534: Use a more accurate column_info hash in multi_table_update
+   (Brendan Byrd)
+ - PEX-12534: Fix crashes from multi_table_update for users of
+   prune_unused_joins (Brendan Byrd)
+ - PEX-12534: Port MySQLHacks from gsg-epay to dbic-mysql (Brendan Byrd)
+ - Initial commit (Brendan Byrd)

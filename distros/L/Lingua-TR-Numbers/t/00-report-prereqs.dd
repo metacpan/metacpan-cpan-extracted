@@ -17,8 +17,8 @@ do { my $x = {
                                       'Carp' => '0',
                                       'Exporter' => '0',
                                       'Text::Unidecode' => '0.04',
-                                      'base' => '0',
                                       'constant' => '0',
+                                      'parent' => '0',
                                       'perl' => '5.010',
                                       'strict' => '0',
                                       'subs' => '0',
@@ -35,8 +35,7 @@ do { my $x = {
                                    'File::Spec' => '0',
                                    'IO::Handle' => '0',
                                    'IPC::Open3' => '0',
-                                   'Test::More' => '0',
-                                   'blib' => '1.01'
+                                   'Test::More' => '0'
                                  }
                  }
      };

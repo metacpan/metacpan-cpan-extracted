@@ -1,7 +1,7 @@
 package File::Serialize;
 our $AUTHORITY = 'cpan:YANICK';
 # ABSTRACT: DWIM file serialization/deserialization
-$File::Serialize::VERSION = '1.3.0';
+$File::Serialize::VERSION = '1.5.0';
 use v5.16.0;
 
 use feature 'current_sub';
@@ -23,6 +23,8 @@ use Module::Pluggable
 use parent 'Exporter::Tiny';
 
 our @EXPORT = qw/ serialize_file deserialize_file transerialize_file /;
+
+our $implicit_transform;
 
 sub _generate_serialize_file {
     my( undef, undef, undef, $global )= @_;
@@ -103,8 +105,13 @@ sub _generate_transerialize_file {
         while( my $step = shift @chain) {
             if ( ref $step eq 'CODE' ) {
                 local $_ = $data;
+                if( $implicit_transform  ) {
+                    $step->($data);
+                    $data = $_;
+                }
+                else {
                 $data = $step->($data);
-            }
+            }}
             elsif ( ref $step eq 'ARRAY' ) {
                 die "subranch step can only be the last step of the chain"
                     if @chain;
@@ -179,7 +186,7 @@ File::Serialize - DWIM file serialization/deserialization
 
 =head1 VERSION
 
-version 1.3.0
+version 1.5.0
 
 =head1 SYNOPSIS
 
@@ -196,14 +203,14 @@ version 1.3.0
 =head1 DESCRIPTION
 
 I<File::Serialize> provides a common, simple interface to
-file serialization -- you provide the file path, the data to serialized, and 
-the module takes care of the rest. Even the serialization format, unless 
+file serialization -- you provide the file path, the data to serialized, and
+the module takes care of the rest. Even the serialization format, unless
 specified
 explicitly as part of the options, is detected from the file extension.
 
 =head1 IMPORT
 
-I<File::Serialize> imports the three functions 
+I<File::Serialize> imports the three functions
 C<serialize_file>, C<deserialize_file> and C<transerialize_file> into the current namespace.
 A default set of options can be set for both by passing a hashref as
 an argument to the 'use' statement.
@@ -222,6 +229,8 @@ be used.
 
 =item YAML
 
+L<File::Serialize::Serialize::YAML::XS>
+
 L<File::Serialize::Serialize::YAML::Tiny>
 
 =item JSON
@@ -236,9 +245,13 @@ L<File::Serialize::Serializer::TOML>
 
 L<File::Serialize::Serializer::XML::Simple>
 
-=item jsony 
+=item jsony
 
 L<File::Serialize::Serializer::JSONY>
+
+=item Markdown
+
+L<File::Serialize::Serializer::Markdown>
 
 =back
 
@@ -257,11 +270,11 @@ Explicitly provides the serializer to use.
 
 =item add_extension => $boolean
 
-If true, the canonical extension of the serializing format will be 
+If true, the canonical extension of the serializing format will be
 appended to the file. Requires the parameter C<format> to be given as well.
 
     # will create 'foo.yml', 'foo.json' and 'foo.toml'
-    serialize_file 'foo', $data, { format => $_, add_extension => 1 } 
+    serialize_file 'foo', $data, { format => $_, add_extension => 1 }
         for qw/ yaml json toml /;
 
 =item pretty => $boolean
@@ -282,7 +295,7 @@ Defaults to being C<true> because, after all, this is the twenty-first century.
 
 =item allow_nonref => $boolean
 
-If set to true, allow to serialize non-ref data. 
+If set to true, allow to serialize non-ref data.
 
 Defaults to C<true>.
 
@@ -318,14 +331,14 @@ from that variable.
 =head2 transerialize_file $input, @transformation_chain
 
 C<transerialize_file> is a convenient wrapper that allows you to
-deserialize a file, apply any number of transformations to its 
+deserialize a file, apply any number of transformations to its
 content and re-serialize the result.
 
-C<$input> can be a filename, a L<Path::Tiny> object or the raw data 
+C<$input> can be a filename, a L<Path::Tiny> object or the raw data
 structure to be worked on.
 
     transerialize_file 'foo.json' => 'foo.yaml';
-    
+
     # equivalent to
     serialize_file 'foo.yaml' => deserialize_file 'foo.json'
 
@@ -352,9 +365,9 @@ and the transformed data is going to be whatever the sub returns.
     } => 'inexpensive.json';
 
     # chaining transforms
-    transerialize_file $data 
-        => sub { 
-            my %inventory = %$_; 
+    transerialize_file $data
+        => sub {
+            my %inventory = %$_;
             +{ map { $_ => $inventory{$_}{price} } keys %inventory } }
         => sub {
             my %inventory = %$_;
@@ -363,18 +376,23 @@ and the transformed data is going to be whatever the sub returns.
 
     # same as above, but with Perl 5.20 signatures and List::Util pair*
     # helpers
-    transerialize_file $data 
+    transerialize_file $data
         => sub($inventory) { +{ pairmap  { $a => $b->{price} } %$inventory } }
-        => sub($inventory) { +{ pairgrep { $b <= 20 }          %$inventory } } 
+        => sub($inventory) { +{ pairgrep { $b <= 20 }          %$inventory } }
         => 'inexpensive.json';
+
+If you prefer to have your transform functions modify the structure in-place
+in C<$_> and don't want to have to explicitly return it, you can set
+the global variable C<$File::Serialize::implicit_transform> to C<true>.
+WARNING: this changes the behavior of ALL transforms.
 
 =item \%destinations
 
 A hashref of destination file with their options. The current state of the data will
-be serialized to those destination. If no options need to be passed, the 
+be serialized to those destination. If no options need to be passed, the
 value can be C<undef>.
 
-    transerialize_file $data => { 
+    transerialize_file $data => {
         'beginning.json' => { pretty => 1 },
         'beginning.yml'  => undef
     } => sub { ... } => {
@@ -382,14 +400,14 @@ value can be C<undef>.
         'end.yml'  => undef
     };
 
-=item [ \@subchain1, \@subchain2, ... ] 
+=item [ \@subchain1, \@subchain2, ... ]
 
 Run the subchains given in C<@branches> on the current data. Must be the last
 step of the chain.
 
     my @data = 1..10;
 
-    transerialize_file \@data 
+    transerialize_file \@data
         => { 'all.json' => undef }
         => [
            [ sub { [ grep { $_ % 2 } @$_ ] }     => 'odd.json'  ],
@@ -421,7 +439,7 @@ Yanick Champoux <yanick@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019, 2017, 2016, 2015 by Yanick Champoux.
+This software is copyright (c) 2021, 2019, 2017, 2016, 2015 by Yanick Champoux.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

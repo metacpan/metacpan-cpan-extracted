@@ -9,7 +9,7 @@ requires 'Syntax::Keyword::Defer', '>= 0.05';
 requires 'Future', '>= 0.47';
 requires 'Future::Queue';
 requires 'Future::AsyncAwait', '>= 0.50';
-requires 'Object::Pad', '>= 0.37';
+requires 'Object::Pad', '>= 0.38';
 requires 'Role::Tiny', '>= 2.002004';
 # Streams
 requires 'Ryu', '>= 3.000';

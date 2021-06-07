@@ -3,26 +3,34 @@ package Form::Tiny::FieldDefinition;
 use v5.10;
 use warnings;
 use Moo;
-use Types::Standard qw(Enum Bool HasMethods CodeRef Maybe Str);
+use Types::Standard qw(Enum Bool HasMethods CodeRef InstanceOf);
 use Types::Common::String qw(NonEmptySimpleStr);
+use Types::TypeTiny qw(StringLike);
 use Carp qw(croak);
 use Scalar::Util qw(blessed);
 
-use Form::Tiny::Utils;
+use Form::Tiny::Utils qw(try);
 use Form::Tiny::Error;
+use Form::Tiny::Path;
 use Form::Tiny::PathValue;
 
 use namespace::clean;
 
-our $VERSION = '1.13';
-
-our $nesting_separator = q{.};
-our $array_marker = q{*};
+our $VERSION = '2.01';
 
 has "name" => (
 	is => "ro",
 	isa => NonEmptySimpleStr,
 	required => 1,
+);
+
+has "name_path" => (
+	is => "ro",
+	isa => InstanceOf ["Form::Tiny::Path"],
+	reader => "get_name_path",
+	init_arg => undef,
+	lazy => 1,
+	default => sub { Form::Tiny::Path->from_name(shift->name) },
 );
 
 has "required" => (
@@ -54,12 +62,11 @@ has "default" => (
 	is => "ro",
 	isa => CodeRef,
 	predicate => 1,
-	writer => "set_default",
 );
 
 has "message" => (
 	is => "ro",
-	isa => Str,
+	isa => StringLike,
 	predicate => 1,
 );
 
@@ -85,9 +92,10 @@ sub BUILD
 	if ($self->has_default) {
 
 		croak "default value for an array field is unsupported"
-			if scalar grep { $_ eq $array_marker } $self->get_name_path;
+			if scalar grep { $_ eq 'ARRAY' } @{$self->get_name_path->meta};
 	}
 
+	# special case for subforms - set automatic adjustments
 	if ($self->is_subform && !$self->is_adjusted) {
 		$self->set_adjustment(sub { $self->type->fields });
 	}
@@ -98,15 +106,6 @@ sub is_subform
 	my ($self) = @_;
 
 	return $self->has_type && $self->type->DOES("Form::Tiny::Form");
-}
-
-sub get_name_path
-{
-	my ($self) = @_;
-
-	my $sep = quotemeta $nesting_separator;
-	my @parts = split /(?<!\\)$sep/, $self->name;
-	return map { s/\\$sep/$nesting_separator/g; $_ } @parts;
 }
 
 sub hard_required
@@ -164,7 +163,7 @@ sub get_default
 		my $default = $self->default->($form);
 		if (!$self->has_type || $self->type->check($default)) {
 			return Form::Tiny::PathValue->new(
-				path => [$self->get_name_path],
+				path => $self->get_name_path->path,
 				value => $default,
 			);
 		}
@@ -195,13 +194,14 @@ sub validate
 	}
 
 	if (!$valid) {
-		if ($self->is_subform && ref $error eq ref []) {
+		if ($self->is_subform && ref $error eq 'ARRAY') {
 			foreach my $exception (@$error) {
 				if (defined blessed $exception && $exception->isa("Form::Tiny::Error")) {
-					$exception->set_field(
-						join $nesting_separator,
-						$self->name, ($exception->field // ())
-					);
+					my $path = $self->get_name_path;
+					$path = $path->clone->append(HASH => $exception->field)
+						if defined $exception->field;
+
+					$exception->set_field($path->join);
 				}
 				else {
 					$exception = Form::Tiny::Error::DoesNotValidate->new(
@@ -250,13 +250,15 @@ Form::Tiny::FieldDefinition - definition of a field to be validated
 
 =head1 DESCRIPTION
 
-Main class of the Form::Tiny system - this is a role that provides most of the module's functionality.
+This class keeps all the data for a field definition and contains method that handle single field validation.
 
 =head1 ATTRIBUTES
 
-Each of the attributes can be accessed by calling its name as a function on Form::Tiny::FieldDefinition object. See L<Form::Tiny::Manual> for more in depth examples.
+Each of the attributes can be accessed by calling its name as a function on Form::Tiny::FieldDefinition object. See L<Form::Tiny::Manual> for more examples.
 
 =head2 name
+
+The only required attribute for the constructor.
 
 A string which should specify the hash structure path of the field.
 
@@ -264,33 +266,35 @@ Special characters are:
 
 =over
 
-=item * dot [.], which specifies nesting. Can be escaped with backslash [\]
+=item * dot [.], which specifies nesting
 
 =item * star [*], which specifies any number of array elements, but only if it is the only character on level, like a.*.b
 
 =back
 
+They both can be escaped by a backslash C<\> to lose their special meaning.
+
 =head2 required
 
-A field is not required by default (value 0), which means that its absence does not produce an error.
+A field is not required by default (value C<0>), which means that its absence does not produce an error.
 
-A field can also be soft required ("soft") or hard required ("hard" or 1).
+A field can also be soft required (C<"soft">) or hard required (C<"hard"> or C<1>).
 
-Soft required field errors only if it is undefined or not present in the input data.
+Soft required field produce errors only if it is undefined or not present in the input data.
 
 Hard required field also checks if the field is not an empty string.
 
 =head2 type
 
-A type is where you can plug in a Type::Tiny check. It has to be an instance of a class that provider I<validate> and I<check> methods, just like Type::Tiny. This can also be a different Form::Tiny form instance.
+The type attribute is where you can plug in a Type::Tiny type object. It has to be an instance of a class that provider I<validate> and I<check> methods, just like Type::Tiny. This can also be a Form::Tiny form instance.
 
 B<predicate:> I<has_type>
 
 =head2 coerce
 
-Coercions take place just before the validation. By default, values are not coerced. Specifying value I<1> will turn on coercions from the type object.
+Coercions take place just before the validation. By default, values are not coerced. Specifying value I<1> will cause the field to use coercions from the type object.
 
-It can also be a code reference which will be called to coerce the value.
+It can also be a code reference which will be called to coerce the value, passing in a field value as its only argument.
 
 =head2 adjust
 
@@ -328,27 +332,15 @@ B<predicate:> I<has_data>
 
 =head2 is_subform
 
-Checks if the field definition's type is a form - mixes in L<Form::Tiny::Form> role.
+Checks if the field definition's type is a form - whether it mixes in L<Form::Tiny::Form> role.
 
 =head2 get_name_path
 
-Parses and returns the name of the field as an array - a path to get the value in a hash.
+Parses and returns the name of the field as an object of L<Form::Tiny::Path> class.
 
 =head2 hard_required
 
 Checks if the field is hard-required (any of the two values which are allowed for this flag)
-
-=head2 get_coerced
-
-Coerces and returns a scalar value, according to the definition.
-
-=head2 get_adjusted
-
-Adjusts and returns a scalar value, according to the definition.
-
-=head2 get_default
-
-Returns a L<Form::Tiny::PathValue> object with the default value for this field definition.
 
 =head2 validate
 

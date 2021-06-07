@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<title><%= title %></title>
+%= stylesheet '/yancy/bootstrap.css'
+%= stylesheet '/yancy/font-awesome/css/font-awesome.css'
+%= javascript '/yancy/jquery.js'
+%= javascript '/yancy/popper.js'
+%= javascript '/yancy/bootstrap.js'
+<style>
+    .text-pre-wrap {
+        white-space: pre-wrap;
+    }
+    main header {
+        display: flex;
+        justify-content: space-between;
+        align-items: baseline;
+    }
+    .buttons {
+        margin: 0.2em 0 1em 0;
+    }
+    .task-bar {
+        display: flex;
+        align-items: center;
+    }
+    .task-bar > * {
+        padding: 0.5em;
+    }
+    .task-bar > :last-child {
+        flex: 1 1 100%;
+    }
+    .task-finished {
+        background: palegreen;
+    }
+    .task-failed {
+        background: red;
+    }
+</style>
+%= content 'after_head'
+
+<body>
+    <header class="container">
+        <nav class="navbar navbar-expand-md navbar-light bg-light">
+            %= link_to Zapp => 'zapp.list_plans', class => 'navbar-brand'
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+                <div class="navbar-nav">
+                    %= link_to Plans => 'zapp.list_plans', class => join( ' ', 'nav-link', ('active')x!!(current_route =~ /plans?$/) )
+                    %= link_to Runs => 'zapp.list_runs', class => join( ' ', 'nav-link', ('active')x!!(current_route =~ /runs?$/) )
+                    %#= link_to Triggers => 'zapp.list_triggers', class => join( ' ', 'nav-link', ('active')x!!(current_route =~ /triggers?$/) )
+                </div>
+            </div>
+        </nav>
+    </header>
+    <main class="container">
+        %= content
+    </main>
+</body>

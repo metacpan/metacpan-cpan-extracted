@@ -30,51 +30,69 @@ sub months
 
 sub days
 {
-    return (
-        qr{\bMon(?:day)?\b}i    => 1,
-        qr{\bTue(?:sday)?\b}i   => 2,
-        qr{\bWed(?:nesday)?\b}i => 3,
-        qr{\bThu(?:rsday)?\b}i  => 4,
-        qr{\bFri(?:day)?\b}i    => 5,
-        qr{\bSat(?:urday)?\b}i  => 6,
-        qr{\bSun(?:day)?\b}i    => 7,
-    );
+    # order is important here, otherwise
+    # we end up removing "Mon" and leaving "day"
+    return [
+        {Monday    => 1},
+        {Mon       => 1},
+        {Tuesday   => 2},
+        {Tue       => 2},
+        {Wednesday => 3},
+        {Wed       => 3},
+        {Thursday  => 4},
+        {Thurs     => 4},
+        {Thu       => 4},
+        {Friday    => 5},
+        {Fri       => 5},
+        {Saturday  => 6},
+        {Sat       => 6},
+        {Sunday    => 7},
+        {Sun       => 7},
+    ];
 }
 
 sub day_numbers
 {
     return (
-        qr{first}            => 1,
-        qr{second}           => 2,
-        qr{third}            => 3,
-        qr{fourth}           => 4,
-        qr{fifth}            => 5,
-        qr{sixth}            => 6,
-        qr{seventh}          => 7,
-        qr{eighth}           => 8,
-        qr{ninth}            => 9,
-        qr{tenth}            => 10,
-        qr{eleventh}         => 11,
-        qr{twelfth}          => 12,
-        qr{thirteenth}       => 13,
-        qr{fourteenth}       => 14,
-        qr{fifteenth}        => 15,
-        qr{sixteenth}        => 16,
-        qr{seventeenth}      => 17,
-        qr{eithteenth}       => 18,
-        qr{ninteenth}        => 19,
-        qr{twentieth}        => 20,
-        qr{twenty\s?first}   => 21,
-        qr{twenty\s?second}  => 22,
-        qr{twenty\s?third}   => 23,
-        qr{twenty\s?fourth}  => 24,
-        qr{twenty\s?fifth}   => 25,
-        qr{twenty\s?sixth}   => 26,
-        qr{twenty\s?seventh} => 27,
-        qr{twenty\s?eighth}  => 28,
-        qr{twenty\s?ninth}   => 29,
-        qr{thirtieth}        => 30,
-        qr{thirty\s?first}   => 31,
+        q{first}          => 1,
+        q{second}         => 2,
+        q{third}          => 3,
+        q{fourth}         => 4,
+        q{fifth}          => 5,
+        q{sixth}          => 6,
+        q{seventh}        => 7,
+        q{eighth}         => 8,
+        q{ninth}          => 9,
+        q{tenth}          => 10,
+        q{eleventh}       => 11,
+        q{twelfth}        => 12,
+        q{thirteenth}     => 13,
+        q{fourteenth}     => 14,
+        q{fifteenth}      => 15,
+        q{sixteenth}      => 16,
+        q{seventeenth}    => 17,
+        q{eithteenth}     => 18,
+        q{ninteenth}      => 19,
+        q{twentieth}      => 20,
+        q{twentyfirst}    => 21,
+        q{twenty first}   => 21,
+        q{twentysecond}   => 22,
+        q{twenty second}  => 22,
+        q{twentythird}    => 23,
+        q{twenty third}   => 23,
+        q{twentyfourth}   => 24,
+        q{twenty fourth}  => 24,
+        q{twentyfifth}    => 25,
+        q{twenty fifth}   => 25,
+        q{twentysixth}    => 26,
+        q{twenty sixth}   => 26,
+        q{twentyseventh}  => 27,
+        q{twenty seventh} => 27,
+        q{twentyninth}    => 29,
+        q{twenty ninth}   => 29,
+        q{thirtieth}      => 30,
+        q{thirtyfirst}    => 31,
+        q{thirty first}   => 31,
     );
 }
 
@@ -104,7 +122,7 @@ sub remove_strings
         # remove ' of ' as in '16th of November 2003'
         qr{\bof\b}i,
         # remove number extensions. 1st, etc
-        # these must be followed by a digit, which
+        # these must be following a digit, which
         # is not captured.
         qr{(?<=\d)(?:st|nd|rd|th)\b,?}i,
         # next sunday

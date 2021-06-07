@@ -139,7 +139,7 @@ generate_bgc_report.pl - Generates PDF/Word reports from antiSMASH results
 
 =head1 VERSION
 
-version 0.201670
+version 0.211420
 
 =head1 NAME
 

@@ -1,5 +1,12 @@
 Revision history for String-Interpolate-Named
 
+1.01	2021-05-18
+
+	Allow variable lookup using a callback.
+	Allow selection of activator. Caveat emptor.
+	Allow setting of the pattern to match key names. Caveat emptor.
+	Fix problem with true/false parts being false.
+
 1.00	2019-10-31
 
 	Fix backslash escapes. \| hides the | from being seen as a |,

@@ -1,0 +1,69 @@
+chunk
+stat list
+stat list
+stat
+varlist
+var
+Name
+result
+=
+explist
+exp
+exp
+exp
+exp
+exp
+Number
+1
++
+exp
+Number
+2
++
+exp
+Number
+3
++
+exp
+Number
+4
++
+exp
+Number
+5
+stat
+functioncall
+prefixexp
+var
+prefixexp
+var
+Name
+io
+.
+Name
+write
+args
+(
+optional explist
+explist
+exp
+String
+double quoted string
+"Testing multi-line comment. Using "
+exp
+var
+Name
+_VERSION
+exp
+String
+double quoted string
+", result="
+exp
+var
+Name
+result
+exp
+String
+double quoted string
+"\n"
+)

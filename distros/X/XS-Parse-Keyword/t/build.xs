@@ -10,12 +10,12 @@
 
 #include "XSParseKeyword.h"
 
-static int build(pTHX_ OP **out, XSParseKeywordPiece *args, size_t npieces, void *hookdata)
+static int build(pTHX_ OP **out, XSParseKeywordPiece *args[], size_t nargs, void *hookdata)
 {
   /* concat the exprs together */
   *out = newBINOP(OP_CONCAT, 0,
-    newBINOP(OP_CONCAT, 0, args[0].op, newSVOP(OP_CONST, 0, newSVpvs("|"))),
-    args[1].op);
+    newBINOP(OP_CONCAT, 0, args[0]->op, newSVOP(OP_CONST, 0, newSVpvs("|"))),
+    args[1]->op);
 
   return KEYWORD_PLUGIN_EXPR;
 }
@@ -26,7 +26,7 @@ static const struct XSParseKeywordHooks hooks_build = {
   .pieces = (const struct XSParseKeywordPieceType []){
     XPK_BLOCK,
     XPK_TERMEXPR,
-    0,
+    {0}
   },
   .build = &build,
 };

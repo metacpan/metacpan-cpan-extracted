@@ -1,3 +1,13 @@
+0.877   2021-05-24  Released-By: PERLANCAR; Urgency: medium
+
+	- Tweak generated subroutine result documentation some more.
+
+
+0.876   2021-05-23  Released-By: PERLANCAR; Urgency: medium
+
+	- Tweak generated subroutine result documentation.
+
+
 0.875   2021-02-21  Released-By: PERLANCAR; Urgency: medium
 
 	- Remove debug print.

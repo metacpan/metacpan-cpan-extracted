@@ -1,6 +1,6 @@
 --- #YAML:1.0
 name                        : DBD-Pg
-version                     : 3.14.2
+version                     : 3.15.0
 abstract                    : DBI PostgreSQL interface
 author:              
   - Greg Sabino Mullane <greg@turnstep.com>
@@ -30,10 +30,10 @@ recommends:
 provides:
   DBD::Pg:
     file                    : Pg.pm
-    version                 : 3.14.2
+    version                 : 3.15.0
   Bundle::DBD::Pg:
     file                    : lib/Bundle/DBD/Pg.pm
-    version                 : 3.14.2
+    version                 : 3.15.0
 
 keywords:
   - Postgres
@@ -45,10 +45,10 @@ keywords:
 resources:
   homepage                  : http://search.cpan.org/dist/DBD-Pg/
   license                   : http://dev.perl.org/licenses/
-  bugtracker                : http://rt.cpan.org/Public/Dist/Display.html?Name=DBD-Pg
+  bugtracker                : https://github.com/bucardo/dbdpg/issues
   repository                : https://github.com/bucardo/dbdpg
   MailingList               : http://www.nntp.perl.org/group/perl.dbd.pg/
-  IRC                       : irc://irc.freenode.net/#postgresql
+  IRC                       : irc://irc.libera.chat/#postgresql
 
 meta-spec:
   version                   : 1.4

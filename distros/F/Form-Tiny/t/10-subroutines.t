@@ -2,37 +2,29 @@ use v5.10;
 use warnings;
 use Test::More;
 use Data::Dumper;
-use Form::Tiny;
 
 {
 
 	package TestForm;
-	use Moo;
+	use Form::Tiny -base;
 	use Types::Standard qw(Str);
 
-	with "Form::Tiny";
+	form_field 'sub_based' => (
+		name => "sub_based",
+		type => Str->where(q{ /\A0x[0-9a-fA-F]+\z/ }),
 
-	sub build_fields
-	{
-		(
-			{
-				name => "sub_based",
-				type => Str->where(q{ /\A0x[0-9a-fA-F]+\z/ }),
-
-				coerce => sub {
-					my $val = shift;
-					if (defined $val && $val =~ /\A[0-9]+\z/) {
-						return "0x" . sprintf("%x", $val);
-					}
-					return $val;
-				},
-
-				adjust => sub {
-					return lc shift;
-				},
+		coerce => sub {
+			my $val = shift;
+			if (defined $val && $val =~ /\A[0-9]+\z/) {
+				return "0x" . sprintf("%x", $val);
 			}
-		)
-	}
+			return $val;
+		},
+
+		adjust => sub {
+			return lc shift;
+		},
+	);
 
 	1;
 }

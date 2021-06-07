@@ -1,5 +1,5 @@
 package Bio::Palantir::Roles::Modulable::Component;
-$Bio::Palantir::Roles::Modulable::Component::VERSION = '0.201670';
+$Bio::Palantir::Roles::Modulable::Component::VERSION = '0.211420';
 use Moose;
 use namespace::autoclean;
 
@@ -119,7 +119,7 @@ Bio::Palantir::Roles::Modulable::Component
 
 =head1 VERSION
 
-version 0.201670
+version 0.211420
 
 =head1 SYNOPSIS
 

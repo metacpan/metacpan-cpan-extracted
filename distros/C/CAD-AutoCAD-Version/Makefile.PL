@@ -20,8 +20,7 @@ readme_from 'Version.pm';
 recursive_author_tests('xt');
 requires 'Class::Utils' => 0.03;
 requires 'Readonly' => 0;
-resources 'bugtracker' => 'https://rt.cpan.org/Public/Dist/Display.html'.
-	'?Name=CAD-AutoCAD-Version';
+resources 'bugtracker' => 'https://github.com/michal-josef-spacek/CAD-AutoCAD-Version/issues';
 resources 'homepage' => 'https://github.com/michal-josef-spacek/CAD-AutoCAD-Version';
 resources 'repository' => 'git://github.com/michal-josef-spacek/CAD-AutoCAD-Version';
 test_requires 'English' => 0;
@@ -29,7 +28,7 @@ test_requires 'Error::Pure::Utils' => 0;
 test_requires 'Test::More' => 0;
 test_requires 'Test::NoWarnings' => 0;
 tests_recursive;
-version '0.04';
+version '0.05';
 
 # Run.
 WriteAll();

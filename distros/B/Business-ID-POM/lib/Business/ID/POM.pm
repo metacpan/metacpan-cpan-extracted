@@ -1,8 +1,9 @@
 package Business::ID::POM;
 
-our $DATE = '2019-11-25'; # DATE
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2021-06-04'; # DATE
 our $DIST = 'Business-ID-POM'; # DIST
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.003'; # VERSION
 
 use 5.010001;
 use warnings;
@@ -24,8 +25,8 @@ $SPEC{parse_pom_reg_code} = {
         'the Indonesian National Agency of Drug and Food Control (POM)',
     description => <<'_',
 
-This routine does not check whether the code actually exists. Use
-<https://cekbpom.pom.go.id/> for that.
+This routine does not check whether the specified code is actually registered.
+Use <https://cekbpom.pom.go.id/> for that.
 
 _
     args => {
@@ -40,7 +41,7 @@ _
         {args=>{code=>'MD 224510107115'}},
         {args=>{code=>'DBL9624502804A1'}},
         {args=>{code=>'NC14191300159'}},
-        {args=>{code=>'TR092699241'}},
+        {args=>{code=>'POM TR092699241'}},
         {args=>{code=>'FF182600791'}},
     ],
 };
@@ -52,6 +53,8 @@ sub parse_pom_reg_code {
 
     $code = uc($code);
     $code =~ s/[^0-9A-Z]+//g;
+
+    $code =~ s/^POM//;
 
     $code =~ /\A([A-Z]+)([0-9A-Z]+)\z/
         or return [400, "Invalid syntax, code needs to be letters followed by digits/letters"];
@@ -178,7 +181,11 @@ sub parse_pom_reg_code {
         if    ($res->{trad_company_type_code} == 1) { $res->{trad_company_type_id} = 'pabrik farmasi' }
         elsif ($res->{trad_company_type_code} == 2) { $res->{trad_company_type_id} = 'pabrik jamu' }
         elsif ($res->{trad_company_type_code} == 3) { $res->{trad_company_type_id} = 'perusahaan jamu' }
-        else { return [400, "Invalid traditional medicine company type code ($res->{trad_company_type_code}), valid code is 1/2/3"] }
+        elsif ($res->{trad_company_type_code} == 4) { $res->{trad_company_type_id} = 'pabrik luar negeri' } # not documented, i guessed
+        else {
+            $res->{trad_company_type_id} = '?';
+            log_warn "Unknown traditional medicine company type code ($res->{trad_company_type_code}), known code is 1/2/3/4";
+        }
 
         if    ($res->{trad_packaging_code} == 1) { $res->{trad_packaging_id} = 'rajangan' }
         elsif ($res->{trad_packaging_code} == 2) { $res->{trad_packaging_id} = 'serbuk' }
@@ -225,7 +232,7 @@ Business::ID::POM - Parse food/drug registration code published by the Indonesia
 
 =head1 VERSION
 
-This document describes version 0.002 of Business::ID::POM (from Perl distribution Business-ID-POM), released on 2019-11-25.
+This document describes version 0.003 of Business::ID::POM (from Perl distribution Business-ID-POM), released on 2021-06-04.
 
 =head1 DESCRIPTION
 
@@ -258,9 +265,9 @@ P-IRT
 
 Usage:
 
- parse_pom_reg_code(%args) -> [status, msg, payload, meta]
+ parse_pom_reg_code(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
-Parse food/drug registration code published by the Indonesian National Agency of Drug and Food Control (POM).
+Parse foodE<sol>drug registration code published by the Indonesian National Agency of Drug and Food Control (POM).
 
 Examples:
 
@@ -272,16 +279,21 @@ Examples:
 
 Result:
 
- {
-   category_code             => "MD",
-   category_id               => "Makanan (M), dalam negeri (D)",
-   food_company_code         => 107,
-   food_company_product_code => 115,
-   food_packaging_code       => 2,
-   food_province_code        => 10,
-   food_type_code            => 245,
-   number                    => 224510107115,
- }
+ [
+   200,
+   "OK",
+   {
+     category_code             => "MD",
+     category_id               => "Makanan (M), dalam negeri (D)",
+     food_company_code         => 107,
+     food_company_product_code => 115,
+     food_packaging_code       => 2,
+     food_province_code        => 10,
+     food_type_code            => 245,
+     number                    => 224510107115,
+   },
+   {},
+ ]
 
 =item * Example #2:
 
@@ -289,20 +301,25 @@ Result:
 
 Result:
 
- {
-   category_code             => "DBL",
-   category_id               => "Obat merek dagang (D), bebas (B), lokal (L)",
-   drug_category_code        => "B",
-   drug_company_code         => 245,
-   drug_company_product_code => "028",
-   drug_dosage_form_code     => "04",
-   drug_dosage_form_id       => "kaplet (04)",
-   drug_origin_code          => "L",
-   drug_packaging_serial     => 1,
-   drug_strength_serial      => "A",
-   drug_year                 => 1996,
-   number                    => "9624502804A1",
- }
+ [
+   200,
+   "OK",
+   {
+     category_code             => "DBL",
+     category_id               => "Obat merek dagang (D), bebas (B), lokal (L)",
+     drug_category_code        => "B",
+     drug_company_code         => 245,
+     drug_company_product_code => "028",
+     drug_dosage_form_code     => "04",
+     drug_dosage_form_id       => "kaplet (04)",
+     drug_origin_code          => "L",
+     drug_packaging_serial     => 1,
+     drug_strength_serial      => "A",
+     drug_year                 => 1996,
+     number                    => "9624502804A1",
+   },
+   {},
+ ]
 
 =item * Example #3:
 
@@ -310,37 +327,47 @@ Result:
 
 Result:
 
- {
-   category_code => "NC",
-   category_id => "Kosmetik (N), Eropa (C)",
-   cosmetic_category_code => "C",
-   cosmetic_country_code => 14,
-   cosmetic_group_code => 13,
-   cosmetic_notification_code => "00159",
-   cosmetic_year => 2019,
-   number => 14191300159,
- }
+ [
+   200,
+   "OK",
+   {
+     category_code => "NC",
+     category_id => "Kosmetik (N), Eropa (C)",
+     cosmetic_category_code => "C",
+     cosmetic_country_code => 14,
+     cosmetic_group_code => 13,
+     cosmetic_notification_code => "00159",
+     cosmetic_year => 2019,
+     number => 14191300159,
+   },
+   {},
+ ]
 
 =item * Example #4:
 
- parse_pom_reg_code(code => "TR092699241");
+ parse_pom_reg_code(code => "POM TR092699241");
 
 Result:
 
- {
-   category_code => "TR",
-   category_id => "Obat traditional (T), dalam negeri (R)",
-   number => "092699241",
-   trad_company_product_serial => 9924,
-   trad_company_type_code => 2,
-   trad_company_type_id => "pabrik jamu",
-   trad_origin => "R",
-   trad_packaging_code => 6,
-   trad_packaging_id => "cairan",
-   trad_packaging_volume => "15ml",
-   trad_packaging_volume_code => 1,
-   trad_year => 2009,
- }
+ [
+   200,
+   "OK",
+   {
+     category_code => "TR",
+     category_id => "Obat traditional (T), dalam negeri (R)",
+     number => "092699241",
+     trad_company_product_serial => 9924,
+     trad_company_type_code => 2,
+     trad_company_type_id => "pabrik jamu",
+     trad_origin => "R",
+     trad_packaging_code => 6,
+     trad_packaging_id => "cairan",
+     trad_packaging_volume => "15ml",
+     trad_packaging_volume_code => 1,
+     trad_year => 2009,
+   },
+   {},
+ ]
 
 =item * Example #5:
 
@@ -348,16 +375,21 @@ Result:
 
 Result:
 
- {
-   category_code => "FF",
-   category_id => "Fitofarma (FF)",
-   number => 182600791,
- }
+ [
+   200,
+   "OK",
+   {
+     category_code => "FF",
+     category_id => "Fitofarma (FF)",
+     number => 182600791,
+   },
+   {},
+ ]
 
 =back
 
-This routine does not check whether the code actually exists. Use
-L<https://cekbpom.pom.go.id/> for that.
+This routine does not check whether the specified code is actually registered.
+Use L<https://cekbpom.pom.go.id/> for that.
 
 This function is not exported by default, but exportable.
 
@@ -369,16 +401,17 @@ Arguments ('*' denotes required arguments):
 
 Input POM code to be parsed.
 
+
 =back
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -408,7 +441,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2019 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

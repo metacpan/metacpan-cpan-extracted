@@ -3,105 +3,35 @@ package Beekeeper::Client;
 use strict;
 use warnings;
 
-our $VERSION = '0.01';
+our $VERSION = '0.04';
 
-=head1 NAME
- 
-Beekeeper::Client - Make RPC calls through message bus
-
-=head1 VERSION
- 
-Version 0.01
-
-=head1 SYNOPSIS
-
-  my $client = Beekeeper::Client->instance;
-  
-  $client->send_notification(
-      method => "my.service.foo",
-      params => { foo => $foo },
-  );
-  
-  my $resp = $client->do_job(
-      method => "my.service.bar",
-      params => { %args },
-  );
-  
-  die uneless $resp->success;
-  
-  print $resp->result;
-  
-  my $req = $client->do_async_job(
-      method     => "my.service.baz",
-      params     => { %args },
-      on_success => sub {
-          my $resp = shift;
-          print resp->result;
-      },
-      on_error => sub {
-          my $error = shift;
-          die error->message;
-      },
-  );
-  
-  $client->wait_all_jobs;
-
-=encoding utf8
-
-=head1 DESCRIPTION
-
-This module connects to the message broker and makes RPC calls through message bus.
-
-There are four different methods to do so:
-
-  ┌───────────────────┬──────────────┬────────┬────────┬────────┐
-  │ method            │ sent to      │ queued │ result │ blocks │
-  ├───────────────────┼──────────────┼────────┼────────┼────────┤
-  │ do_job            │ 1 worker     │ yes    │ yes    │ yes    │
-  │ do_async_job      │ 1 worker     │ yes    │ yes    │ no     │
-  │ do_background_job │ 1 worker     │ yes    │ no     │ no     │
-  │ send_notification │ many workers │ no     │ no     │ no     │
-  └───────────────────┴──────────────┴────────┴────────┴────────┘
-
-All methods in this module are exported by default to C<Beekeeper::Worker>.
-
-=head1 CONSTRUCTOR
-
-=head3 instance( %args )
-
-Connects to the message broker and returns a singleton instance.
-
-Unless explicit connection parameters to the broker are provided tries 
-to connect using the configuration from config file C<bus.config.json>.
-
-=cut
-
-use Beekeeper::Bus::STOMP;
+use Beekeeper::MQTT;
 use Beekeeper::JSONRPC;
 use Beekeeper::Config;
 
 use JSON::XS;
 use Sys::Hostname;
 use Time::HiRes;
+use Digest::SHA 'sha256_hex';
 use Carp;
 
-use constant TXN_CLIENT_SIDE => 1;
-use constant TXN_SERVER_SIDE => 2;
-use constant QUEUE_LANES     => 2;
-use constant REQ_TIMEOUT     => 60;
+use constant QUEUE_LANES => 2;
+use constant REQ_TIMEOUT => 60;
 
 use Exporter 'import';
 
 our @EXPORT_OK = qw(
     send_notification
-    do_job
-    do_async_job
-    do_background_job
-    wait_all_jobs
-    set_auth_tokens
-    get_auth_tokens
+    call_remote
+    call_remote_async
+    fire_remote
+    wait_async_calls
+    get_authentication_data
+    set_authentication_data
+
     __do_rpc_request
-    __create_reply_queue
+    __create_response_topic
+    __use_authorization_token
 );
 
 our %EXPORT_TAGS = ('worker' => \@EXPORT_OK );
@@ -119,19 +49,18 @@ sub new {
 
     $self->{_CLIENT} = {
         forward_to     => $args{'forward_to'},
-        reply_queue    => undef,
-        correlation_id => undef,
+        response_topic => undef,
         in_progress    => undef,
-        transaction    => undef,
-        transaction_id => undef,
         curr_request   => undef,
-        auth_tokens    => undef,
-        session_id     => undef,
+        caller_id      => undef,
+        caller_addr    => undef,
+        auth_data      => undef,
         async_cv       => undef,
+        correlation_id => 1,
         callbacks      => {},
     };
 
-    unless (exists $args{'host'} && exists $args{'user'} && exists $args{'pass'}) {
+    unless (exists $args{'host'} && exists $args{'username'} && exists $args{'password'}) {
 
         # Get broker connection parameters from config file
 
@@ -154,15 +83,28 @@ sub new {
                 # Use default parameters (if any)
                 my ($default) = grep { $config->{$_}->{default} } keys %$config;
                 croak "No default bus defined into config file bus.config.json" unless $default;
-                $bus_id = $config->{$default}->{'bus-id'};
+                $bus_id = $config->{$default}->{'bus_id'};
                 %args = ( %{$config->{$default}}, bus_id => $bus_id, %args );
             }
         }
     }
 
-    $self->{_BUS} = Beekeeper::Bus::STOMP->new( %args );
+    # Start a fresh new MQTT session on connect
+    $args{'clean_start'} = 1;
 
-    # Connect to STOMP broker
+    # Make the MQTT session ends when the connection is closed
+    $args{'session_expiry_interval'} = 0;
+
+    # Keep only 1 unacked message (of QoS 1) in flight
+    $args{'receive_maximum'} = 1;
+
+    # Do not use topic aliases
+    $args{'topic_alias_maximum'} = 0;
+
+
+    $self->{_BUS} = Beekeeper::MQTT->new( %args );
+
+    # Connect to MQTT broker
     $self->{_BUS}->connect( blocking => 1 );
 
     bless $self, $class;
@@ -187,35 +129,6 @@ sub instance {
 }
 
 
-=head1 METHODS
-
-=head3 send_notification ( %args )
-
-Broadcast a notification to the message bus.
-
-All clients and workers listening for C<method> will receive it. If no one is listening
-the notification is lost.
-
-=over 4
-
-=item method
-
-A string with the name of the notification being sent with format C<"{service_class}.{method}">.
-
-=item params
-
-An arbitrary value or data structure sent with the notification. It could be undefined, 
-but it should not contain blessed references that cannot be serialized as JSON.
-
-=item address
-
-A string with the name of the remote bus when sending notifications to another logical 
-bus. Notifications to another bus need a router shoveling them.
-
-=back
-
-=cut
-
 sub send_notification {
     my ($self, %args) = @_;
 
@@ -237,55 +150,34 @@ sub send_notification {
 
     my %send_args;
 
-    my $local_bus = $self->{_BUS}->{cluster};
+    my $local_bus = $self->{_BUS}->{bus_role};
 
     $remote_bus = $self->{_CLIENT}->{forward_to} unless (defined $remote_bus);
 
     if (defined $remote_bus) {
-        $send_args{'destination'}  = "/queue/msg.$remote_bus-" . int(rand(QUEUE_LANES)+1);
-        $send_args{'x-forward-to'} = "/topic/msg.$remote_bus.$service.$method";
-        $send_args{'x-forward-to'} .= "\@$addr" if (defined $addr && $addr =~ s/^\.//);
+
+        $send_args{'topic'}  = "msg/$remote_bus-" . int( rand(QUEUE_LANES) + 1 );
+        $send_args{'topic'} =~ tr|.|/|;
+
+        $send_args{'fwd_to'} = "msg/$remote_bus/$service/$method";
+        $send_args{'fwd_to'} .= "\@$addr" if (defined $addr && $addr =~ s/^\.//);
+        $send_args{'fwd_to'} =~ tr|.|/|;
     }
     else {
-        $send_args{'destination'} = "/topic/msg.$local_bus.$service.$method";
+        $send_args{'topic'} = "msg/$local_bus/$service/$method";
+        $send_args{'topic'} =~ tr|.|/|;
     }
 
-    if (exists $args{'__auth'}) {
-        $send_args{'x-auth-tokens'} = $args{'__auth'};
-    }
-    else {
-        $send_args{'x-auth-tokens'} = $self->{_CLIENT}->{auth_tokens}  if defined $self->{_CLIENT}->{auth_tokens};
-        $send_args{'x-session'}     = $self->{_CLIENT}->{session_id}   if defined $self->{_CLIENT}->{session_id};
+    $send_args{'auth'} = $self->{_CLIENT}->{auth_data} if defined $self->{_CLIENT}->{auth_data};
+    $send_args{'clid'} = $self->{_CLIENT}->{caller_id} if defined $self->{_CLIENT}->{caller_id};
+
+    if (exists $args{'buffer_id'}) {
+        $send_args{'buffer_id'} = $args{'buffer_id'};
     }
 
-    if ($self->{transaction}) {
-        my $hdr = $self->{transaction} == TXN_CLIENT_SIDE ? 'buffer_id' : 'transaction';
-        $send_args{$hdr} = $self->{transaction_id};
-    }
-
-    $self->{_BUS}->send( body => \$json, %send_args );
+    $self->{_BUS}->publish( payload => \$json, %send_args );
 }
 
-=head3 accept_notifications ( $method => $callback, ... )
-
-Make this client start accepting specified notifications from message bus.
-
-C<$method> is a string with the format "{service_class}.{method}". A default
-or fallback handler can be specified using a wildcard as "{service_class}.*".
-
-C<$callback> is a coderef that will be called when a notification is received.
-When executed, the callback will receive a parameter C<$params> which contains
-the notification value or data structure sent.
-
-Note that callbacks will not be executed timely if AnyEvent loop is not running.
-
-=head3 stop_accepting_notifications ( $method, ... )
-
-Make this client stop accepting specified notifications from message bus.
-
-C<$method> must be one of the strings used previously in C<accept_notifications>.
-
-=cut
 
 sub accept_notifications {
     my ($self, %args) = @_;
@@ -310,12 +202,14 @@ sub accept_notifications {
 
         #TODO: Allow to accept private notifications without subscribing
 
-        my $local_bus = $self->{_BUS}->{cluster};
+        my $local_bus = $self->{_BUS}->{bus_role};
+
+        my $topic = "msg/$local_bus/$service/$method";
+        $topic =~ tr|.*|/#|;
 
         $self->{_BUS}->subscribe(
-            destination    => "/topic/msg.$local_bus.$service.$method",
-            ack            => 'auto', # means none
-            on_receive_msg => sub {
+            topic      => $topic,
+            on_publish => sub {
                 my ($body_ref, $msg_headers) = @_;
 
                 local $@;
@@ -345,18 +239,15 @@ sub accept_notifications {
                 }
 
                 $cb->($request->{params}, $request);
+            },
+            on_suback => sub {
+                my ($success, $prop) = @_;
+                croak "Could not subscribe to $topic" unless $success;
             }
         );
     }
 }
 
-=head3 stop_accepting_notifications ( $method, ... )
-
-Make this client stop accepting specified notifications from message bus.
-
-C<$method> must be one of the strings used previously in C<accept_notifications>.
-
-=cut
 
 sub stop_accepting_notifications {
     my ($self, @methods) = @_;
@@ -375,11 +266,14 @@ sub stop_accepting_notifications {
             next;
         }
 
-        my $local_bus = $self->{_BUS}->{cluster};
+        my $local_bus = $self->{_BUS}->{bus_role};
+
+        my $topic = "msg/$local_bus/$service/$method";
+        $topic =~ tr|.*|/#|;
 
         $self->{_BUS}->unsubscribe(
-            destination => "/topic/msg.$local_bus.$service.$method",
-            on_success  => sub {
+            topic       => $topic,
+            on_unsuback => sub {
 
                 delete $self->{_CLIENT}->{callbacks}->{"msg.$fq_meth"};
 
@@ -394,103 +288,23 @@ sub stop_accepting_notifications {
                     $req_method =~ m/^([\.\w-]+)\.([\w-]+)$/;
                     not ($service eq $1 && ($method eq '*' || $method eq $2));
                 } @$job_queue;
-            }
+            },
         );
     }
 }
 
-=head3 do_job ( %args )
 
-Makes a synchronous RPC call to a service worker through the message bus.
+our $AE_WAITING;
 
-It will wait (in the event loop) until a response is received, wich will be either
-an C<Beekeeper::JSONRPC::Response> object or a C<Beekeeper::JSONRPC::Error>.
-
-On error it will die unless C<raise_error> option is set to false.
-
-This method accepts the following parameters:
-
-=over 4
-
-=item method
-
-A string with the name of the method to be invoked with format C<"{service_class}.{method}">.
-
-=item params
-
-An arbitrary value or data structure to be passed as parameters to the defined method. 
-It could be undefined, but it should not contain blessed references that cannot be 
-serialized as JSON.
-
-=item address
-
-A string with the name of the remote bus when calling methods of workers connected
-to another logical bus. Requests to another bus need a router shoveling them.
-
-=item timeout
-
-Time in seconds before cancelling the request and returning an error response. If the
-request takes too long but otherwise was executed successfully the response will
-eventually arrive but it will be ignored.
-
-=item raise_error
- 
-If set to true (the default) dies with the received error message when a call returns
-an error response. If set to false returns a C<Beekeeper::JSONRPC::Error> instead.
-
-=back
-
-=head3 do_async_job ( %args )
-
-Makes an asynchronous RPC call to a service worker through the message bus.
-
-It returns immediately a C<Beekeeper::JSONRPC::Request> object which, once completed,
-will have a defined C<response>.
-
-This method  accepts parameters C<method>, C<params>, C<address> and C<timeout> 
-the same as C<do_job>. Additionally two callbacks can be specified:
-
-=over 4
-
-=item on_success
-
-Callback which will be executed after receiving a successful response with a
-C<Beekeeper::JSONRPC::Response> object as parameter. Must be a coderef.
-
-=item on_error
-
-Callback which will be executed after receiving an error response with a
-C<Beekeeper::JSONRPC::Error> object as parameter. Must be a coderef.
-
-=back
-
-=head3 do_background_job ( %args )
-
-Makes an asynchronous RPC call to a service worker through the message bus but
-does not expect to receive any response, it is a fire and forget call.
-
-It returns undef immediately.
-
-This method  accepts parameters C<method>, C<params>, C<address> and C<timeout> 
-the same as C<do_job>.
-
-=head3 wait_all_jobs
-
-Wait (in the event loop) until all calls made by C<do_async_job> are completed.
-
-=cut
-
-our $WAITING;
-
-sub do_job {
+sub call_remote {
     my $self = shift;
 
     my $req = $self->__do_rpc_request( @_, req_type => 'SYNCHRONOUS' );
 
     # Make AnyEvent allow one level of recursive condvar blocking, as we may
     # block both in $worker->__work_forever and in $client->__do_rpc_request
-    $WAITING && croak "Recursive condvar blocking wait attempted";
-    local $WAITING = 1;
+    $AE_WAITING && croak "Recursive condvar blocking wait attempted";
+    local $AE_WAITING = 1;
     local $AnyEvent::CondVar::Base::WAITING = 0;
 
     # Block until a response is received or request timed out
@@ -506,7 +320,7 @@ sub do_job {
     return $resp;
 }
 
-sub do_async_job {
+sub call_remote_async {
     my $self = shift;
 
     my $req = $self->__do_rpc_request( @_, req_type => 'ASYNCHRONOUS' );
@@ -514,7 +328,7 @@ sub do_async_job {
     return $req;
 }
 
-sub do_background_job {
+sub fire_remote {
     my $self = shift;
 
     # Send job to a worker, but do not wait for result
@@ -541,33 +355,29 @@ sub __do_rpc_request {
 
     my %send_args;
 
-    my $local_bus = $self->{_BUS}->{cluster};
+    my $local_bus = $self->{_BUS}->{bus_role};
 
     $remote_bus = $client->{forward_to} unless (defined $remote_bus);
 
-    # Local bus request sent to:   /queue/req.{local_bus}.{service_class}
-    # Remote bus request sent to:  /queue/req.{remote_bus}
+    # Local bus request sent to:  req/{local_bus}/{service_class}
+    # Remote bus request sent to: req/{remote_bus}
 
     if (defined $remote_bus) {
-        $send_args{'destination'}  = "/queue/req.$remote_bus-" . int(rand(QUEUE_LANES)+1);
-        $send_args{'x-forward-to'} = "/queue/req.$remote_bus.$service";
-        $send_args{'x-forward-to'} .= "\@$addr" if (defined $addr && $addr =~ s/^\.//);
+
+        $send_args{'topic'} = "req/$remote_bus-" . int( rand(QUEUE_LANES) + 1 );
+        $send_args{'topic'} =~ tr|.|/|;
+
+        $send_args{'fwd_to'} = "req/$remote_bus/$service";
+        $send_args{'fwd_to'} .= "\@$addr" if (defined $addr && $addr =~ s/^\.//);
+        $send_args{'fwd_to'} =~ tr|.|/|;
     }
     else {
-        $send_args{'destination'} = "/queue/req.$local_bus.$service";
+        $send_args{'topic'} = "req/$local_bus/$service";
+        $send_args{'topic'} =~ tr|.|/|;
     }
 
-    if (exists $args{'__auth'}) {
-        $send_args{'x-auth-tokens'} = $args{'__auth'};
-    }
-    else {
-        $send_args{'x-auth-tokens'} = $client->{auth_tokens}  if defined $client->{auth_tokens};
-        $send_args{'x-session'}     = $client->{session_id}   if defined $client->{session_id};
-    }
-
-    my $timeout = $args{'timeout'} || REQ_TIMEOUT;
-    $send_args{'expiration'} = int( $timeout * 1000 );
-
+    $send_args{'auth'} = $client->{auth_data} if defined $client->{auth_data};
+    $send_args{'clid'} = $client->{caller_id} if defined $client->{caller_id};
 
     my $BACKGROUND  = $args{req_type} eq 'BACKGROUND';
     my $SYNCHRONOUS = $args{req_type} eq 'SYNCHRONOUS';
@@ -581,25 +391,28 @@ sub __do_rpc_request {
         params  => $args{'params'},
     };
 
-    # Reuse or create a private reply queue which will receive the response
-    my $reply_queue = $client->{reply_queue} || $self->__create_reply_queue;
-    $send_args{'reply-to'} = $reply_queue;
+    # Reuse or create a private topic which will receive responses
+    $send_args{'response_topic'} = $client->{response_topic} ||
+                                   $self->__create_response_topic;
 
     unless ($BACKGROUND) {
         # Assign an unique request id (unique only for this client)
-        $req_id = int(rand(90000000)+10000000) . '-' . $client->{correlation_id}++;
+        $req_id = $client->{correlation_id}++;
         $req->{'id'} = $req_id;
     }
 
     my $json = encode_json($req);
 
-    if ($BACKGROUND && $self->{transaction}) {
-        my $hdr = $self->{transaction} == TXN_CLIENT_SIDE ? 'buffer_id' : 'transaction';
-        $send_args{$hdr} = $self->{transaction_id};
+    if (exists $args{'buffer_id'}) {
+        $send_args{'buffer_id'} = $args{'buffer_id'};
     }
 
     # Send request
-    $self->{_BUS}->send( body => \$json, %send_args );
+    $self->{_BUS}->publish( 
+        payload => \$json,
+        qos     => 1,
+        %send_args,
+    );
 
     if ($BACKGROUND) {
          # Nothing else to do
@@ -640,6 +453,7 @@ sub __do_rpc_request {
     if ($__now != time) { $__now = time; AnyEvent->now_update }
 
     # Request timeout timer
+    my $timeout = $args{'timeout'} || REQ_TIMEOUT;
     $req->{_timeout} = AnyEvent->timer( after => $timeout, cb => sub {
         my $req = delete $client->{in_progress}->{$req_id};
         $req->{_response} = Beekeeper::JSONRPC::Error->request_timeout;
@@ -651,21 +465,19 @@ sub __do_rpc_request {
     return $req;
 }
 
-sub __create_reply_queue {
+sub __create_response_topic {
     my $self = shift;
     my $client = $self->{_CLIENT};
 
-    # Create an exclusive auto-delete queue for receiving RPC responses.
+    # Subscribe to an exclusive topic for receiving RPC responses
 
-    my $reply_queue = '/temp-queue/tmp.';
-    $reply_queue .= ('A'..'Z','a'..'z','0'..'9')[rand 62] for (1..16);
-    $client->{reply_queue} = $reply_queue;
+    my $response_topic = 'priv/' . $self->{_BUS}->{client_id};
+    $client->{response_topic} = $response_topic;
 
     $self->{_BUS}->subscribe(
-        destination    => $reply_queue,
-        ack            => 'auto',  # means none
-        exclusive      => 1,       # implicit in most brokers
-        on_receive_msg => sub {
+        topic       => $response_topic,
+        maximum_qos => 0,
+        on_publish  => sub {
             my ($body_ref, $msg_headers) = @_;
 
             local $@;
@@ -727,117 +539,298 @@ sub __create_reply_queue {
                 $cb->($resp->{params}, $resp);
             }
         },
+        on_suback => sub {
+            my ($success, $prop) = @_;
+            croak "Could not subscribe to $response_topic" unless $success;
+        }
     );
 
-    return $reply_queue;
+    return $response_topic;
 }
 
-sub wait_all_jobs {
-    my $self = shift;
+sub wait_async_calls {
+    my ($self) = @_;
 
-    # Wait for all pending jobs
+    # Wait for all pending async requests
     my $cv = delete $self->{_CLIENT}->{async_cv};
+    return unless defined $cv;
 
     # Make AnyEvent to allow one level of recursive condvar blocking, as we may
     # block both in $worker->__work_forever and here
-    $WAITING && croak "Recursive condvar blocking wait attempted";
-    local $WAITING = 1;
+    $AE_WAITING && croak "Recursive condvar blocking wait attempted";
+    local $AE_WAITING = 1;
     local $AnyEvent::CondVar::Base::WAITING = 0;
 
     $cv->recv;
 }
 
-=head3 set_auth_tokens ( @tokens )
 
-Add arbitrary auth tokens to subsequent jobs requests or notifications sent.
+sub get_authentication_data {
+    my ($self) = @_;
 
-Workers get the caller tokens already set when executing jobs or notifications 
-callbacks, and then these are piggybacked automatically.
-
-This framework doesn't give any special meaning to these tokens.
-
-=head3 get_auth_tokens
-
-Get the list of current auth tokens in use.
-
-=cut
-
-sub set_auth_tokens {
-    my ($self, @tokens) = @_;
-
-    foreach my $token (@tokens) {
-        croak "Invalid token $token" unless (defined $token && length $token && $token !~ m/[\x00\n\|]/);
-    }
-
-    $self->{_CLIENT}->{auth_tokens} = join('|', @tokens);
+    $self->{_CLIENT}->{auth_data};
 }
 
-sub get_auth_tokens {
-    my $self = shift;
+sub set_authentication_data {
+    my ($self, $data) = @_;
 
-    return split(/\|/, $self->{_CLIENT}->{auth_tokens});
+    $self->{_CLIENT}->{auth_data} = $data;
 }
 
+sub __use_authorization_token {
+    my ($self, $token) = @_;
 
-# Transactions are currently unsupported as few brokers implements them
+    my $secret = 'salt'; #TODO: read from config file
 
-sub ___begin_transaction {
-    my ($self, %args) = @_;
+    my $adata_ref = \$self->{_CLIENT}->{auth_data};
 
-    croak "Already in a transaction" if $self->{transaction};
+    my $guard = Beekeeper::Client::Guard->new( $adata_ref );
 
-    $self->{transaction_id}++;
+    $$adata_ref = sha256_hex($token . $secret);
 
-    if ($args{'client_side'}) {
-        # Client side
-        $self->{transaction} = TXN_CLIENT_SIDE;
-    }
-    else {
-        # Server side
-        $self->{transaction} = TXN_SERVER_SIDE;
-        $self->{_BUS}->begin( transaction => $self->{transaction_id} );
-    }
-}
-
-sub ___commit_transaction {
-    my $self = shift;
-
-    croak "No transaction was previously started" unless $self->{transaction};
-
-    if ($self->{transaction} == TXN_CLIENT_SIDE) {
-        # Client side
-        $self->{_BUS}->flush_buffer( buffer_id => $self->{transaction_id} );
-    }
-    else {
-        # Server side
-        $self->{_BUS}->commit( transaction => $self->{transaction_id} );
-    }
-
-    $self->{transaction} = undef;
-}
-
-sub ___abort_transaction {
-    my $self = shift;
-
-    croak "No transaction was previously started" unless $self->{transaction};
-
-    if ($self->{transaction} == TXN_CLIENT_SIDE) {
-        # Client side
-        $self->{_BUS}->discard_buffer( buffer_id => $self->{transaction_id} );
-    }
-    else {
-        # Server side
-        $self->{_BUS}->abort( transaction => $self->{transaction_id} );
-    }
-
-    $self->{transaction} = undef;
+    return $guard;
 }
 
 1;
 
+package    # hide from PAUSE 
+    Beekeeper::Client::Guard;
+
+sub new {
+    my ($class, $ref) = @_;
+
+    bless [$ref, $$ref], $class;
+}
+
+sub DESTROY {
+
+    ${$_[0]->[0]} = $_[0]->[1];
+}
+
+1;
+
+__END__
+
+=pod
+
+=encoding utf8
+
+=head1 NAME
+ 
+Beekeeper::Client - Make RPC calls through message bus
+
+=head1 VERSION
+ 
+Version 0.04
+
+=head1 SYNOPSIS
+
+  my $client = Beekeeper::Client->instance;
+  
+  $client->send_notification(
+      method => "my.service.foo",
+      params => { foo => $foo },
+  );
+  
+  my $resp = $client->call_remote(
+      method => "my.service.bar",
+      params => { %args },
+  );
+  
+  die uneless $resp->success;
+  
+  print $resp->result;
+  
+  my $req = $client->call_remote_async(
+      method     => "my.service.baz",
+      params     => { %args },
+      on_success => sub {
+          my $resp = shift;
+          print resp->result;
+      },
+      on_error => sub {
+          my $error = shift;
+          die error->message;
+      },
+  );
+  
+  $client->wait_async_calls;
+
+=head1 DESCRIPTION
+
+This module connects to the message broker and makes RPC calls through message bus.
+
+There are four different methods to do so:
+
+  ┌───────────────────┬──────────────┬────────┬────────┬────────┐
+  │ method            │ sent to      │ queued │ result │ blocks │
+  ├───────────────────┼──────────────┼────────┼────────┼────────┤
+  │ call_remote       │ 1 worker     │ yes    │ yes    │ yes    │
+  │ call_remote_async │ 1 worker     │ yes    │ yes    │ no     │
+  │ fire_remote       │ 1 worker     │ yes    │ no     │ no     │
+  │ send_notification │ many workers │ no     │ no     │ no     │
+  └───────────────────┴──────────────┴────────┴────────┴────────┘
+
+All methods in this module are exported by default to C<Beekeeper::Worker>.
+
+=head1 CONSTRUCTOR
+
+=head3 instance( %args )
+
+Connects to the message broker and returns a singleton instance.
+
+Unless explicit connection parameters to the broker are provided tries 
+to connect using the configuration from config file C<bus.config.json>.
+
+=head1 METHODS
+
+=head3 send_notification ( %args )
+
+Broadcast a notification to the message bus.
+
+All clients and workers listening for C<method> will receive it. If no one is listening
+the notification is lost.
+
+=over 4
+
+=item method
+
+A string with the name of the notification being sent with format C<"{service_class}.{method}">.
+
+=item params
+
+An arbitrary value or data structure sent with the notification. It could be undefined, 
+but it should not contain blessed references that cannot be serialized as JSON.
+
+=item address
+
+A string with the name of the remote bus when sending notifications to another logical 
+bus. Notifications to another bus need a router shoveling them.
+
+=back
+
+=head3 accept_notifications ( $method => $callback, ... )
+
+Make this client start accepting specified notifications from message bus.
+
+C<$method> is a string with the format "{service_class}.{method}". A default
+or fallback handler can be specified using a wildcard as "{service_class}.*".
+
+C<$callback> is a coderef that will be called when a notification is received.
+When executed, the callback will receive a parameter C<$params> which contains
+the notification value or data structure sent.
+
+Note that callbacks will not be executed timely if AnyEvent loop is not running.
+
+=head3 stop_accepting_notifications ( $method, ... )
+
+Make this client stop accepting specified notifications from message bus.
+
+C<$method> must be one of the strings used previously in C<accept_notifications>.
+
+=head3 stop_accepting_notifications ( $method, ... )
+
+Make this client stop accepting specified notifications from message bus.
+
+C<$method> must be one of the strings used previously in C<accept_notifications>.
+
+=head3 call_remote ( %args )
+
+Makes a synchronous RPC call to a service worker through the message bus.
+
+It will wait (in the event loop) until a response is received, wich will be either
+an C<Beekeeper::JSONRPC::Response> object or a C<Beekeeper::JSONRPC::Error>.
+
+On error it will die unless C<raise_error> option is set to false.
+
+This method accepts the following parameters:
+
+=over 4
+
+=item method
+
+A string with the name of the method to be invoked with format C<"{service_class}.{method}">.
+
+=item params
+
+An arbitrary value or data structure to be passed as parameters to the defined method. 
+It could be undefined, but it should not contain blessed references that cannot be 
+serialized as JSON.
+
+=item address
+
+A string with the name of the remote bus when calling methods of workers connected
+to another logical bus. Requests to another bus need a router shoveling them.
+
+=item timeout
+
+Time in seconds before cancelling the request and returning an error response. If the
+request takes too long but otherwise was executed successfully the response will
+eventually arrive but it will be ignored.
+
+=item raise_error
+ 
+If set to true (the default) dies with the received error message when a call returns
+an error response. If set to false returns a C<Beekeeper::JSONRPC::Error> instead.
+
+=back
+
+=head3 call_remote_async ( %args )
+
+Makes an asynchronous RPC call to a service worker through the message bus.
+
+It returns immediately a C<Beekeeper::JSONRPC::Request> object which, once completed,
+will have a defined C<response>.
+
+This method  accepts parameters C<method>, C<params>, C<address> and C<timeout> 
+the same as C<call_remote>. Additionally two callbacks can be specified:
+
+=over 4
+
+=item on_success
+
+Callback which will be executed after receiving a successful response with a
+C<Beekeeper::JSONRPC::Response> object as parameter. Must be a coderef.
+
+=item on_error
+
+Callback which will be executed after receiving an error response with a
+C<Beekeeper::JSONRPC::Error> object as parameter. Must be a coderef.
+
+=back
+
+=head3 fire_remote ( %args )
+
+Fire and forget an asynchronous RPC call to a service worker through the message bus.
+
+It returns undef immediately, there is no way to know if the call was executed
+successfully or not.
+
+This method accepts parameters C<method>, C<params> and C<address> the same as C<call_remote>.
+
+=head3 wait_async_calls
+
+Wait (running the event loop) until all calls made by C<call_remote_async> are completed
+either by success, error or timeout.
+
+=head3 set_authentication_data ( $data )
+
+Add an arbitrary authentication data blob to subsequent calls or notifications sent.
+
+This data persists for client lifetime in standalone clients. Within worker context
+it persists until the end of current request only, and will be piggybacked on
+calls made to another workers within the scope of current request.
+
+The meaning of this data is application specific, this framework doesn't give 
+any special one to it.
+
+=head3 get_authentication_data
+
+Gets the current authentication data blob.
+
 =head1 SEE ALSO
  
-L<Beekeeper::Bus::STOMP>, L<Beekeeper::Worker>.
+L<Beekeeper::MQTT>, L<Beekeeper::Worker>.
 
 =head1 AUTHOR
 
@@ -845,7 +838,7 @@ José Micó, C<jose.mico@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright 2015 José Micó.
+Copyright 2015-2021 José Micó.
 
 This is free software; you can redistribute it and/or modify it under the same 
 terms as the Perl 5 programming language itself.

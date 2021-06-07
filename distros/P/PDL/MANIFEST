@@ -3,6 +3,7 @@ Basic/Bad/bad.pd
 Basic/Bad/Makefile.PL
 Basic/Complex/complex.pd
 Basic/Complex/Makefile.PL
+Basic/Complex/t/complex.t
 Basic/Constants.pm
 Basic/Core/Basic.pm
 Basic/Core/Char.pm
@@ -24,14 +25,13 @@ Basic/Core/pdldataswitch.c.PL
 Basic/Core/pdlhash.c
 Basic/Core/pdlmagic.c
 Basic/Core/pdlmagic.h
+Basic/Core/pdlperl.h.PL
 Basic/Core/pdlsections.g
 Basic/Core/pdlsimple.h.PL
-Basic/Core/pdltest.c
 Basic/Core/pdlthread.c
 Basic/Core/pdlthread.h
 Basic/Core/ppport.h
 Basic/Core/typemap
-Basic/Core/typemap.pdl
 Basic/Core/Types.pm.PL
 Basic/default.perldlrc
 Basic/Gen/Inline/Makefile.PL
@@ -426,7 +426,6 @@ Libtmp/FFT/fftn.h
 Libtmp/FFT/Makefile.PL
 Libtmp/FFT/t/fft.t
 Libtmp/Filter/Linear.pm
-Libtmp/Filter/LinPred.pm
 Libtmp/Filter/Makefile.PL
 Libtmp/Fit/Gaussian/gauss.c
 Libtmp/Fit/Gaussian/gaussian.pd
@@ -547,12 +546,6 @@ Libtmp/ImageRGB/ppm_quant.c
 Libtmp/ImageRGB/t/imagergb.t
 Libtmp/ImageRGB/t/picnorgb.t
 Libtmp/ImageRGB/t/picrgb.t
-Libtmp/Interpolate/Interpolate.pm
-Libtmp/Interpolate/Makefile.PL
-Libtmp/Interpolate/Slatec/Makefile.PL
-Libtmp/Interpolate/Slatec/Slatec.pm
-Libtmp/Interpolate/t/interp.t
-Libtmp/Interpolate/t/interp_slatec.t
 Libtmp/Makefile.PL
 Libtmp/Minuit/FCN.c
 Libtmp/Minuit/Makefile.PL
@@ -564,7 +557,9 @@ Libtmp/Minuit/t/minuit.t
 Libtmp/Simplex/Makefile.PL
 Libtmp/Simplex/Simplex.pm
 Libtmp/Simplex/t/simplex.t
+Libtmp/Slatec/Gaussian.pm
 Libtmp/Slatec/Linfit.pm
+Libtmp/Slatec/LinPred.pm
 Libtmp/Slatec/LM.pm
 Libtmp/Slatec/Makefile.PL
 Libtmp/Slatec/slatec.pd
@@ -731,7 +726,6 @@ t/basic.t
 t/bigmem.t
 t/bool.t
 t/clump.t
-t/complex.t
 t/config.t
 t/constants.t
 t/constructor.t

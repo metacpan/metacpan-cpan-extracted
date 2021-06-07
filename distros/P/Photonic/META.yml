@@ -26,7 +26,6 @@ no_index:
     - inc
 requires:
   Carp: '0'
-  ExtUtils::F77: '1.23'
   IO::File: '0'
   List::Util: '0'
   Machine::Epsilon: '0'
@@ -34,13 +33,12 @@ requires:
   Moose::Role: '0'
   Moose::Util::TypeConstraints: '0'
   MooseX::StrictConstructor: '0'
-  PDL: '0'
+  PDL: '2.045'
   PDL::Complex: '2.009'
   PDL::Constants: '0'
   PDL::Core: '0'
   PDL::Core::Dev: '0'
-  PDL::Exporter: '0'
-  PDL::FFTW3: '0'
+  PDL::FFTW3: '0.12'
   PDL::IO::Pic: '0'
   PDL::IO::Storable: '0'
   PDL::LinearAlgebra: '0.15'
@@ -51,5 +49,5 @@ requires:
   perl: '5.014000'
 resources:
   repository: https://github.com/wlmb/Photonic
-version: '0.015'
+version: '0.016'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

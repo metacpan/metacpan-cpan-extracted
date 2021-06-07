@@ -1,3 +1,5 @@
+v1.0002 googleads.g.doubleclick.net should be considered as paid cpc
+v1.0001 Fixes
 v0.8 Handle Google Adwords requests that don't have a referer
 v0.7 Handle android-app:// referals
      Don't crash on unknown scheme

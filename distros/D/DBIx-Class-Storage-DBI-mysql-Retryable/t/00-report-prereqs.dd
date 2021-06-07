@@ -1,0 +1,42 @@
+do { my $x = {
+       'configure' => {
+                        'requires' => {
+                                        'ExtUtils::MakeMaker' => '7.1101'
+                                      }
+                      },
+       'develop' => {
+                      'requires' => {
+                                      'Dist::Zilla::PluginBundle::Author::GSG' => '0'
+                                    }
+                    },
+       'runtime' => {
+                      'requires' => {
+                                      'Algorithm::Backoff::RetryTimeouts' => '0',
+                                      'Context::Preserve' => '0',
+                                      'DBD::mysql' => '0',
+                                      'DBI' => '1.630',
+                                      'DBIx::Class' => '0',
+                                      'DBIx::ParseError::MySQL' => '0',
+                                      'namespace::clean' => '0',
+                                      'perl' => 'v5.10.0'
+                                    }
+                    },
+       'test' => {
+                   'recommends' => {
+                                     'CPAN::Meta' => '2.120900'
+                                   },
+                   'requires' => {
+                                   'Class::Load' => '0',
+                                   'ExtUtils::MakeMaker' => '0',
+                                   'File::Spec' => '0',
+                                   'IO::Handle' => '0',
+                                   'IPC::Open3' => '0',
+                                   'Path::Class' => '0',
+                                   'Test2::Suite' => '0',
+                                   'Test2::Tools::Explain' => '0',
+                                   'Test::More' => '0'
+                                 }
+                 }
+     };
+  $x;
+ }

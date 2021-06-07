@@ -322,9 +322,10 @@ fanotify_read(notgrp, max = 0)
 			bundle->needs_response = 0;
 		}
 
-		eventref = newRV_noinc(event);
+		eventref = newRV_inc(event);
 		sv_bless(eventref, gv_stashpv(PERLCLASS_EVENT, GV_ADD | SVf_UTF8));
 		SvREADONLY_on(eventref);
+		sv_2mortal(eventref);
 
 		XPUSHs(eventref);
 

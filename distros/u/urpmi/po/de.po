@@ -3,6 +3,7 @@
 #
 # Translators:
 # Ettore Atalan <atalanttore@googlemail.com>, 2018
+# Klaus Christian Harke <k.c.harke@gmx.net>, 2021
 # psyca, 2014-2017,2019-2020
 # Marc Lattemann, 2014
 # Oliver Burger <obgr_seneca@mageia.org>, 2013
@@ -11,8 +12,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Mageia\n"
 "POT-Creation-Date: 2020-07-10 17:41+0100\n"
-"PO-Revision-Date: 2020-07-10 16:45+0000\n"
-"Last-Translator: psyca\n"
+"PO-Revision-Date: 2021-02-07 11:35+0000\n"
+"Last-Translator: Klaus Christian Harke <k.c.harke@gmx.net>\n"
 "Language-Team: German (http://www.transifex.com/MageiaLinux/mageia/language/"
 "de/)\n"
 "Language: de\n"
@@ -105,7 +106,7 @@ msgstr ""
 "%s\n"
 "\n"
 "Sie wollten es wahrscheinlich nicht auf dem Rechner installieren "
-"(Installieren bietet die Möglichkeit, den Quellcode zu ändern und zu "
+"(Quellpakete installiert man, um den Quellcode zu ändern und neu zu "
 "kompilieren)\n"
 "\n"
 "Was wollen Sie machen?"

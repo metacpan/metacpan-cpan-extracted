@@ -4,13 +4,13 @@
       "JJ Merelo <jmerelo@CPAN.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150005",
    "license" : [
       "unknown"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : 2
+      "version" : "2"
    },
    "name" : "GitHub-Actions",
    "no_index" : {
@@ -44,14 +44,16 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.0.5",
-   "x_bugtracker" : {
-      "web" : "https://github.com/JJ/perl-GitHub-Actions/issues"
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/JJ/perl-GitHub-Actions/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/JJ/perl-GitHub-Actions/",
+         "web" : "https://github.com/JJ/perl-GitHub-Actions/"
+      }
    },
-   "x_repository" : {
-      "type" : "git",
-      "url" : "https://github.com/JJ/perl-GitHub-Actions/",
-      "web" : "https://github.com/JJ/perl-GitHub-Actions/"
-   },
-   "x_serialization_backend" : "JSON::PP version 4.06"
+   "version" : "0.0.6",
+   "x_serialization_backend" : "JSON::PP version 2.27400"
 }

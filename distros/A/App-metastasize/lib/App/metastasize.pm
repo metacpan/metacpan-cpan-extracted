@@ -1,7 +1,7 @@
 package App::metastasize;
 
-our $DATE = '2017-02-11'; # DATE
-our $VERSION = '0.001'; # VERSION
+our $DATE = '2021-05-25'; # DATE
+our $VERSION = '0.002'; # VERSION
 
 1;
 # ABSTRACT: Rename functions and variables in a Perl script/module using metasyntactic/random variables
@@ -18,7 +18,7 @@ App::metastasize - Rename functions and variables in a Perl script/module using 
 
 =head1 VERSION
 
-This document describes version 0.001 of App::metastasize (from Perl distribution App-metastasize), released on 2017-02-11.
+This document describes version 0.002 of App::metastasize (from Perl distribution App-metastasize), released on 2021-05-25.
 
 =head1 SYNOPSIS
 
@@ -46,7 +46,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2017 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

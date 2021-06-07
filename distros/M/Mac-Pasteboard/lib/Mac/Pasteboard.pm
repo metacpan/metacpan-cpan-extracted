@@ -61,7 +61,7 @@ use constant CODE_REF	=> ref sub {};
     our @EXPORT = @funcs;	## no critic (ProhibitAutomaticExportation)
 }
 
-our $VERSION = '0.014';
+our $VERSION = '0.015';
 our $XS_VERSION = $VERSION;
 our $ALPHA_VERSION = $VERSION;
 $VERSION =~ s/_//g;
@@ -166,6 +166,9 @@ sub copy {
 	    and push @arg, qw{ -pboard find };
 	open my $fh, '|-', 'pbcopy', @arg,
 	    or croak "Unable to open pipe to pbcopy: $!";
+	# FIXME this branch of the condidion is to go away. If I need it
+	# to work in the interim I need to import _my_binmode from
+	# inc/My/Module/Test.pm so I can properly encode the data.
 	print { $fh } $data;
 	close $fh;
 	return $? ? coreFoundationUnknownError() : !1;
@@ -1165,7 +1168,7 @@ copy of the pasteboard has been synchronized.
 =head3 defaultEncode
 
 This constant specifies the default value of the C<encode> attribute.
-This is true under macOS 10.15 Catalina and later, and false under
+This is true under macOS 10.11 El Capitan and later, and false under
 earlier versions.
 
 =head1 BUGS

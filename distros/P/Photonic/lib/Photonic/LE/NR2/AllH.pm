@@ -1,5 +1,5 @@
 package Photonic::LE::NR2::AllH;
-$Photonic::LE::NR2::AllH::VERSION = '0.015';
+$Photonic::LE::NR2::AllH::VERSION = '0.016';
 
 =encoding UTF-8
 
@@ -9,7 +9,7 @@ Photonic::LE::NR2::AllH
 
 =head1 VERSION
 
-version 0.015
+version 0.016
 
 =head1 COPYRIGHT NOTICE
 
@@ -82,7 +82,7 @@ Iterate the calculation of Haydock coefficients and states. See L<Photonic::Role
 
 =back
 
-=head1 ACCESORS (read only)
+=head1 ACCESSORS (read only)
 
 =over 4
 
@@ -108,10 +108,6 @@ Array of Haydock b coefficients squared
 =cut
 
 use namespace::autoclean;
-use Machine::Epsilon;
-use PDL::Lite;
-use PDL::NiceSlice;
-#use Photonic::Utils qw(HProd);
 use Moose;
 use MooseX::StrictConstructor;
 extends 'Photonic::LE::NR2::OneH';

@@ -1,0 +1,125 @@
+name: linux
+
+on:
+  push:
+    branches:
+      - '*'
+    tags-ignore:
+      - '*'
+  pull_request:
+
+jobs:
+  perl:
+
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        cip:
+          - tag: "5.35"
+            install_type: system
+          - tag: "5.35"
+            install_type: share
+          - tag: "5.34"
+            install_type: system
+          - tag: "5.34"
+            install_type: share
+          - tag: "5.32"
+            install_type: system
+          - tag: "5.32"
+            install_type: share
+          - tag: "5.30"
+            install_type: system
+          - tag: "5.30"
+            install_type: share
+          - tag: "5.28"
+            install_type: system
+          - tag: "5.28"
+            install_type: share
+          - tag: "5.26"
+            install_type: system
+          - tag: "5.26"
+            install_type: share
+          - tag: "5.24"
+            install_type: system
+          - tag: "5.24"
+            install_type: share
+          - tag: "5.22"
+            install_type: system
+          - tag: "5.22"
+            install_type: share
+          - tag: "5.20"
+            install_type: system
+          - tag: "5.20"
+            install_type: share
+#          - tag: "5.18"
+#            install_type: system
+#          - tag: "5.18"
+#            install_type: share
+          - tag: "5.16"
+            install_type: system
+          - tag: "5.16"
+            install_type: share
+          - tag: "5.14"
+            install_type: system
+          - tag: "5.14"
+            install_type: share
+          - tag: "5.12"
+            install_type: system
+          - tag: "5.12"
+            install_type: share
+          - tag: "5.10"
+            install_type: system
+          - tag: "5.10"
+            install_type: share
+          - tag: "5.8"
+            install_type: system
+          - tag: "5.8"
+            install_type: share
+
+    env:
+      CIP_TAG: ${{ matrix.cip.tag }}
+      CIP_ENV: ALIEN_INSTALL_TYPE=${{ matrix.cip.install_type }}
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Bootstrap CIP
+        run: |
+          curl -L https://raw.githubusercontent.com/uperl/cip/main/bin/github-bootstrap | bash
+
+      - name: Cache-Key
+        id: cache-key
+        run: |
+          echo -n '::set-output name=key::'
+          cip cache-key
+
+      - name: Cache CPAN modules
+        uses: actions/cache@v2
+        with:
+          path: ~/.cip
+          key: ${{ runner.os }}-build-1-${{ steps.cache-key.outputs.key }}
+          restore-keys: |
+            ${{ runner.os }}-build-1-${{ steps.cache-key.outputs.key }}
+
+      - name: Start-Container
+        run: |
+          cip start
+
+      - name: Diagnostics
+        run: |
+          cip diag
+
+      - name: Install-Dependencies
+        run: |
+          cip install
+
+      - name: Build + Test
+        run: |
+          cip script
+
+      - name: CPAN log
+        if: ${{ failure() }}
+        run: |
+          cip exec bash -c 'cat $HOME/.cpanm/latest-build/build.log'

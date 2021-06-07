@@ -1,5 +1,7 @@
 package Graphics::Framebuffer;
 
+
+
 =head1 NAME
 
 Graphics::Framebuffer - A Simple Framebuffer Graphics Library
@@ -86,11 +88,11 @@ Contains a hash of every font found in the system in the format:
 
 =over 6
 
- 'FaceName' => {
-     'path' => 'Path To Font',
-     'font' => 'File Name of Font'
- },
- ...
+# 'FaceName' => {
+#     'path' => 'Path To Font',
+#     'font' => 'File Name of Font'
+# },
+# ...
 
 =back
 
@@ -361,7 +363,7 @@ BEGIN {
     require Exporter;
 
     # set the version for version checking
-    our $VERSION   = '6.48';
+    our $VERSION   = '6.49';
     our @ISA       = qw(Exporter);
     our @EXPORT_OK = qw(
       FBIOGET_VSCREENINFO
@@ -440,10 +442,15 @@ sub DESTROY { # Always clean up after yourself before exiting
 # use Inline 'info', 'noclean', 'noisy'; # Only needed for debugging
 
 use Inline C => <<'C_CODE','name' => 'Graphics::Framebuffer', 'VERSION' => $VERSION;
-/* Copyright 2018-2019 Richard Kelsch, All Rights Reserved
+/* Copyright 2018-2021 Richard Kelsch, All Rights Reserved
    See the Perl documentation for Graphics::Framebuffer for licensing information.
 
-   Version:  6.31
+   Version:  6.48
+
+   You may wonder why the stack is so heavily used when the global structures
+   have the needed values.  Well, the module can emulate another graphics mode
+   that may not be the one being displayed.  This means using the two structures
+   would break functionality.  Therefore, the data from Perl is passed along.
 */
 
 #include <stdlib.h>
@@ -485,7 +492,7 @@ use Inline C => <<'C_CODE','name' => 'Graphics::Framebuffer', 'VERSION' => $VERS
 struct fb_var_screeninfo vinfo;
 struct fb_fix_screeninfo finfo;
 
-// This gets the framebuffer info and populates the above structures, then runs them to Perl
+// This gets the framebuffer info and populates the above structures, then sends them to Perl
 void c_get_screen_info(char *fb_file) {
     int fbfd = open(fb_file,O_RDWR);
     ioctl(fbfd, FBIOGET_FSCREENINFO, &finfo);
@@ -549,6 +556,7 @@ void c_get_screen_info(char *fb_file) {
     Inline_Stack_Done;
 }
 
+// Sets the framebuffer to text mode, which enables the cursor
 void c_text_mode(char *tty_file) 
 {
    int tty_fd = open(tty_file,O_RDWR);
@@ -556,6 +564,7 @@ void c_text_mode(char *tty_file)
    close(tty_fd);
 }
 
+// Sets the framebuffer to graphics mode, which disables the cursor
 void c_graphics_mode(char *tty_file) 
 {
    int tty_fd = open(tty_file,O_RDWR);
@@ -874,6 +883,7 @@ void c_plot(
     }
 }
 
+// Draws a line
 void c_line(
     char *framebuffer,
     short x1, short y1, short x2, short y2,
@@ -935,7 +945,7 @@ void c_line(
     }
 }
 
-/* Reads in rectangular screen data as a string to a previously allocated buffer */
+// Reads in rectangular screen data as a string to a previously allocated buffer
 void c_blit_read(
     char *framebuffer,
     short screen_width, short screen_height,
@@ -985,7 +995,7 @@ void c_blit_read(
     }
 }
 
-/* Blits a rectangle of graphics to the screen using the specified draw mode */
+// Blits a rectangle of graphics to the screen using the specified draw mode
 void c_blit_write(
     char *framebuffer,
     short screen_width, short screen_height,
@@ -1007,7 +1017,7 @@ void c_blit_write(
     short vertical;
     unsigned int bline = w * bytes_per_pixel;
 
-    /* Fastest is unclipped normal mode */
+    // Fastest is unclipped normal mode
     if (draw_mode == NORMAL_MODE && x >= x_clip && xx <= xx_clip && y >= y_clip && yy <= yy_clip) {
         unsigned char *source = blit_data;
         unsigned char *dest   = &framebuffer[(fb_y * bytes_per_line) + (fb_x * bytes_per_pixel)];
@@ -1807,7 +1817,7 @@ void c_blit_write(
     }
 }
 
-/* Fast rotate blit graphics data */
+// Fast rotate blit graphics data
 void c_rotate(
     char *image,
     char *new_img,
@@ -1857,6 +1867,7 @@ void c_rotate(
     }
 }
 
+// Horizontally mirror blit graphics data
 void c_flip_horizontal(char* pixels, short width, short height, unsigned char bytes_per_pixel) {
     short y;
     short x;
@@ -1876,6 +1887,7 @@ void c_flip_horizontal(char* pixels, short width, short height, unsigned char by
     }
 }
 
+// Vertically flip blit graphics data
 void c_flip_vertical(char *pixels, short width, short height, unsigned char bytes_per_pixel) {
     unsigned int bufsize = width * bytes_per_pixel;        // Bytes per line
     unsigned char *row  = malloc(bufsize);                 // Allocate a temporary buffer
@@ -1890,6 +1902,7 @@ void c_flip_vertical(char *pixels, short width, short height, unsigned char byte
     free(row); // Release the temporary buffer
 }
 
+// Horizontally and vertically flip blit graphics data
 void c_flip_both(char* pixels, short width, short height, unsigned char bytes_per_pixel) {
     c_flip_vertical(
         pixels,
@@ -1905,7 +1918,7 @@ void c_flip_both(char* pixels, short width, short height, unsigned char bytes_pe
 
 /* bitmap conversions */
 
-/* Convert an RGB565 bitmap to an RGB888 bitmap */
+// Convert an RGB565 bitmap to an RGB888 bitmap
 void c_convert_16_24( char* buf16, unsigned int size16, char* buf24, unsigned char color_order ) {
     unsigned int loc16 = 0;
     unsigned int loc24 = 0;
@@ -1933,6 +1946,7 @@ void c_convert_16_24( char* buf16, unsigned int size16, char* buf24, unsigned ch
     }
 }
 
+// Convert an RGB565 bitmap to a RGB8888 bitmap
 void c_convert_16_32( char* buf16, unsigned int size16, char* buf32, unsigned char color_order ) {
     unsigned int loc16 = 0;
     unsigned int loc32 = 0;
@@ -1964,6 +1978,7 @@ void c_convert_16_32( char* buf16, unsigned int size16, char* buf32, unsigned ch
     }
 }
 
+// Convert a RGB888 bitmap to a RGB565 bitmap
 void c_convert_24_16(char* buf24, unsigned int size24, char* buf16, unsigned char color_order) {
     unsigned int loc16 = 0;
     unsigned int loc24 = 0;
@@ -1985,6 +2000,7 @@ void c_convert_24_16(char* buf24, unsigned int size24, char* buf16, unsigned cha
     }
 }
 
+// Convert a RGB8888 bitmap to a RGB565 bitmap
 void c_convert_32_16(char* buf32, unsigned int size32, char* buf16, unsigned char color_order) {
     unsigned int loc16    = 0;
     unsigned int loc32    = 0;
@@ -2007,6 +2023,7 @@ void c_convert_32_16(char* buf32, unsigned int size32, char* buf16, unsigned cha
     }
 }
 
+// Convert a RGB8888 bitmap to a RGB888 bitmap
 void c_convert_32_24(char* buf32, unsigned int size32, char* buf24, unsigned char color_order) {
     unsigned int loc24 = 0;
     unsigned int loc32 = 0;
@@ -2018,6 +2035,7 @@ void c_convert_32_24(char* buf32, unsigned int size32, char* buf24, unsigned cha
     }
 }
 
+// Convert a RGB888 bitmap to a RGB8888 bitmap
 void c_convert_24_32(char* buf24, unsigned int size24, char* buf32, unsigned char color_order) {
     unsigned int loc32 = 0;
     unsigned int loc24 = 0;
@@ -2035,6 +2053,7 @@ void c_convert_24_32(char* buf24, unsigned int size24, char* buf32, unsigned cha
     }
 }
 
+// Convert any type RGB bitmap to a monochrome bitmap of the same type
 void c_monochrome(char *pixels, unsigned int size, unsigned char color_order, unsigned char bytes_per_pixel) {
     unsigned int idx;
     unsigned char r;
@@ -2120,6 +2139,9 @@ our @COLORORDER = (qw( RGB RBG BGR BRG GBR GRB ));
 
 With the exception of "new" and some other methods that only expect one parameter, the methods expect a single hash reference to be passed.  This may seem unusual, but it was chosen for speed, and speed is important in a Perl graphics module.
 
+=cut
+
+sub new {
 =head2 B<new>
 
 This instantiates the framebuffer object
@@ -2265,7 +2287,6 @@ Why do many video cards use the BGR color order?  Simple, their GPUs operate wit
 
 =cut
 
-sub new {
     my $class = shift;
 
     # I would have liked to make this a lot more organized, but over the years it
@@ -2970,8 +2991,8 @@ sub _reset {
     system('reset');
 }
 
-# Fixes the mapping if Perl garbage collects (naughty Perl)
 sub _fix_mapping { # File::Map SHOULD make this obsolete
+    # Fixes the mapping if Perl garbage collects (naughty Perl)
     my $self = shift;
     unmap($self->{'SCREEN'}); # Unmap missing on some File::Maps
     unless (defined($self->{'FB'})) {
@@ -2985,8 +3006,8 @@ sub _fix_mapping { # File::Map SHOULD make this obsolete
     $self->{'SCREEN_ADDRESS'} = map_handle($self->{'SCREEN'}, $self->{'FB'}, '+<', 0, $self->{'fscreeninfo'}->{'smem_len'});
 }
 
-# Determine the color order the video card uses
 sub _color_order {
+    # Determine the color order the video card uses
     my $self = shift;
 
     my $ro = $self->{'vscreeninfo'}->{'bitfields'}->{'red'}->{'offset'};
@@ -3021,28 +3042,29 @@ sub _screen_close {
     delete($self->{'SCREEN'});
 }
 
+sub text_mode {
 =head2 text_mode
 
 Sets the TTY into text mode, where text can interfere with the display
 
 =cut
 
-sub text_mode {
     my $self = shift;
     c_text_mode($self->{'this_tty'});
 }
 
+sub graphics_mode {
 =head2 graphics_mode
 
 Sets the TTY in exclusive graphics mode, where text and cursor cannot interfere with the display.  Please remember, you must call text_mode before exiting, else your console will not show any text!
 
 =cut
 
-sub graphics_mode {
     my $self = shift;
     c_graphics_mode($self->{'this_tty'});
 }
 
+sub screen_dimensions {
 =head2 screen_dimensions
 
 When called in an array/list context:
@@ -3079,7 +3101,6 @@ When called in a scalar context, it returns a hash reference:
 
 =cut
 
-sub screen_dimensions {
     my $self = shift;
     if (wantarray) {
         return ($self->{'XRES'}, $self->{'YRES'}, $self->{'BITS'});
@@ -3102,6 +3123,7 @@ sub screen_dimensions {
     }
 }
 
+sub get_font_list {
 # Splash is now pulled in via "Graphics::Framebuffer::Splash"
 
 =head2 splash
@@ -3153,7 +3175,6 @@ When passing a name, it will return a hash reference (if only one match), or an 
 
 =cut
 
-sub get_font_list {
     my $self     = shift;
     my ($filter) = @_;
 
@@ -3173,6 +3194,7 @@ sub get_font_list {
     return ($self->{'FONTS'});
 }
 
+sub draw_mode {
 =head2 draw_mode
 
 Sets or returns the drawing mode, depending on how it is called.
@@ -3240,7 +3262,6 @@ Sets or returns the drawing mode, depending on how it is called.
 =back
 =cut
 
-sub draw_mode {
     my $self = shift;
     if (@_) {
         my $mode = int(shift);
@@ -3251,6 +3272,7 @@ sub draw_mode {
     }
 }
 
+sub normal_mode {
 =head2 normal_mode
 
 This is an alias to draw_mode(NORMAL_MODE)
@@ -3263,11 +3285,11 @@ This is an alias to draw_mode(NORMAL_MODE)
 
 =cut
 
-sub normal_mode {
     my $self = shift;
     $self->draw_mode(NORMAL_MODE);
 }
 
+sub xor_mode {
 =head2 xor_mode
 
 This is an alias to draw_mode(XOR_MODE)
@@ -3280,11 +3302,11 @@ This is an alias to draw_mode(XOR_MODE)
 
 =cut
 
-sub xor_mode {
     my $self = shift;
     $self->draw_mode(XOR_MODE);
 }
 
+sub or_mode {
 =head2 or_mode
 
 This is an alias to draw_mode(OR_MODE)
@@ -3297,11 +3319,11 @@ This is an alias to draw_mode(OR_MODE)
 
 =cut
 
-sub or_mode {
     my $self = shift;
     $self->draw_mode(OR_MODE);
 }
 
+sub alpha_mode {
 =head2 alpha_mode
 
 This is an alias to draw_mode(ALPHA_MODE)
@@ -3314,11 +3336,11 @@ This is an alias to draw_mode(ALPHA_MODE)
 
 =cut
 
-sub alpha_mode {
     my $self = shift;
     $self->draw_mode(ALPHA_MODE);
 }
 
+sub and_mode {
 =head2 and_mode
 
 This is an alias to draw_mode(AND_MODE)
@@ -3331,11 +3353,11 @@ This is an alias to draw_mode(AND_MODE)
 
 =cut
 
-sub and_mode {
     my $self = shift;
     $self->draw_mode(AND_MODE);
 }
 
+sub mask_mode {
 =head2 mask_mode
 
 This is an alias to draw_mode(MASK_MODE)
@@ -3348,11 +3370,11 @@ This is an alias to draw_mode(MASK_MODE)
 
 =cut
 
-sub mask_mode {
     my $self = shift;
     $self->draw_mode(MASK_MODE);
 }
 
+sub unmask_mode {
 =head2 unmask_mode
 
 This is an alias to draw_mode(UNMASK_MODE)
@@ -3365,11 +3387,11 @@ This is an alias to draw_mode(UNMASK_MODE)
 
 =cut
 
-sub unmask_mode {
     my $self = shift;
     $self->draw_mode(UNMASK_MODE);
 }
 
+sub add_mode {
 =head2 add_mode
 
 This is an alias to draw_mode(ADD_MODE)
@@ -3382,11 +3404,11 @@ This is an alias to draw_mode(ADD_MODE)
 
 =cut
 
-sub add_mode {
     my $self = shift;
     $self->draw_mode(ADD_MODE);
 }
 
+sub subtract_mode {
 =head2 subtract_mode
 
 This is an alias to draw_mode(SUBTRACT_MODE)
@@ -3399,11 +3421,11 @@ This is an alias to draw_mode(SUBTRACT_MODE)
 
 =cut
 
-sub subtract_mode {
     my $self = shift;
     $self->draw_mode(SUBTRACT_MODE);
 }
 
+sub multiply_mode {
 =head2 multiply_mode
 
 This is an alias to draw_mode(MULTIPLY_MODE)
@@ -3416,11 +3438,11 @@ This is an alias to draw_mode(MULTIPLY_MODE)
 
 =cut
 
-sub multiply_mode {
     my $self = shift;
     $self->draw_mode(MULTIPLY_MODE);
 }
 
+sub divide_mode {
 =head2 divide_mode
 
 This is an alias to draw_mode(DIVIDE_MODE)
@@ -3433,11 +3455,11 @@ This is an alias to draw_mode(DIVIDE_MODE)
 
 =cut
 
-sub divide_mode {
     my $self = shift;
     $self->draw_mode(DIVIDE_MODE);
 }
 
+sub clear_screen {
 =head2 clear_screen
 
 Fills the entire screen with the background color
@@ -3454,7 +3476,6 @@ You can add an optional parameter to turn the console cursor on or off too.
 
 =cut
 
-sub clear_screen {
     # Fills the entire screen with the background color fast #
     my $self   = shift;
     my $cursor = shift || '';
@@ -3478,25 +3499,18 @@ sub clear_screen {
     $self->_flush_screen();
 }
 
+sub cls {
 =head2 cls
 
-The same as clear_screen
-
-=over 4
-
- $fb->cls();      # Leave cursor as-is
- $fb->cls('OFF'); # Turn cursor off
- $fb->cls('ON');  # Turn cursor on
-
-=back
+This is an alias to 'clear_screen'
 
 =cut
 
-sub cls {
     my $self = shift;
     $self->clear_screen(@_);
 }
 
+sub attribute_reset {
 =head2 attribute_reset
 
 Resets the plot point at 0,0.  Resets clipping to the current screen size.  Resets the global color to whatever 'FOREGROUND' is set to, and the global background color to whatever 'BACKGROUND' is set to, and resets the drawing mode to NORMAL.
@@ -3509,7 +3523,6 @@ Resets the plot point at 0,0.  Resets clipping to the current screen size.  Rese
 
 =cut
 
-sub attribute_reset {
     my $self = shift;
 
     $self->{'X'} = 0;
@@ -3520,6 +3533,7 @@ sub attribute_reset {
     $self->clip_reset;
 }
 
+sub plot {
 =head2 plot
 
 Set a single pixel in the set foreground color at position x,y with the given pixel size (or default).  Clipping applies.
@@ -3540,7 +3554,6 @@ With 'pixel_size', if a positive number greater than 1, is drawn with square pix
 
 =cut
 
-sub plot {
     my $self   = shift;
     my $params = shift;
 
@@ -3639,17 +3652,18 @@ sub plot {
     $self->{'Y'} = $y;
 }
 
+sub setpixel {
 =head2 setpixel
 
 Same as 'plot' above
 
 =cut
 
-sub setpixel {
     my $self = shift;
     $self->plot(shift);
 }
 
+sub pixel {
 =head2 pixel
 
 Returns the color of the pixel at coordinate x,y, if it lies within the clipping region.  It returns undefined if outside of the clipping region.
@@ -3666,13 +3680,12 @@ $pixel is a hash reference in the form:
     'blue'  => integer value, # 0 - 255
     'alpha' => integer value, # 0 - 255
     'hex'   => hexadecimal string of the values from 00000000 to FFFFFFFF
-    'raw'   => 16/24/32bit encoded string
+    'raw'   => 16/24/32bit encoded string (depending on screen mode)
  }
 
 =back
 =cut
 
-sub pixel {
     my $self   = shift;
     my $params = shift;
 
@@ -3733,17 +3746,18 @@ sub pixel {
     return (undef);
 }
 
+sub get_pixel {
 =head2 get_pixel
 
-Returns the color of the pixel at coordinate x,y.  It is the same as 'pixel' above.
+Alias for 'pixel'.
 
 =cut
 
-sub get_pixel {
     my $self = shift;
     return ($self->pixel(shift));
 }
 
+sub last_plot {
 =head2 last_plot
 
 Returns the last plotted position
@@ -3775,7 +3789,6 @@ This returns the position as a two element array:
 
 =cut
 
-sub last_plot {
     my $self = shift;
     if (wantarray) {
         return ($self->{'X'}, $self->{'Y'});
@@ -3783,6 +3796,7 @@ sub last_plot {
     return ({ 'x' => $self->{'X'}, 'y' => $self->{'Y'} });
 }
 
+sub line {
 =head2 line
 
 Draws a line, in the foreground color, from point x,y to point xx,yy.  Clipping applies.
@@ -3802,7 +3816,6 @@ Draws a line, in the foreground color, from point x,y to point xx,yy.  Clipping 
 
 =cut
 
-sub line {
     my $self   = shift;
     my $params = shift;
 
@@ -3812,6 +3825,7 @@ sub line {
     $self->drawto($params);
 }
 
+sub angle_line {
 =head2 angle_line
 
 Draws a line, in the global foreground color, from point x,y at an angle of 'angle', of length 'radius'.  Clipping applies.
@@ -3833,7 +3847,6 @@ Draws a line, in the global foreground color, from point x,y at an angle of 'ang
 
 =cut
 
-sub angle_line {
     my $self   = shift;
     my $params = shift;
 
@@ -3852,6 +3865,7 @@ sub angle_line {
     $self->line($params);
 }
 
+sub drawto {
 =head2 drawto
 
 Draws a line, in the foreground color, from the last plotted position to the position x,y.  Clipping applies.
@@ -3871,7 +3885,6 @@ Draws a line, in the foreground color, from the last plotted position to the pos
 
 =cut
 
-sub drawto {
     ##########################################################################
     # For Perl, Perfectly horizontal line drawing is optimized by using the  #
     # BLIT functions.  This assists greatly with drawing filled objects.  In #
@@ -4041,6 +4054,7 @@ sub drawto {
 }
 
 sub _flush_screen {
+    # Since the framebuffer is mappeed as a string device, Perl buffers the output, and this must be flushed.
     my $self = shift;
     unless ($self->{'DEVICE'} eq 'EMULATED') {
         select(STDERR);
@@ -4051,6 +4065,7 @@ sub _flush_screen {
 }
 
 sub _adj_plot {
+    # Part of antialiased drawing
     my $self = shift;
     my $x    = shift;
     my $y    = shift;
@@ -4117,6 +4132,7 @@ sub _draw_line_antialiased {
     $self->set_color($saved);
 }
 
+sub bezier {
 =head2 bezier
 
 Draws a Bezier curve, based on a list of control points.
@@ -4152,7 +4168,6 @@ Draws a Bezier curve, based on a list of control points.
 
 =cut
 
-sub bezier {
     my $self   = shift;
     my $params = shift;
 
@@ -4175,17 +4190,18 @@ sub bezier {
     }
 }
 
+sub cubic_bezier {
 =head2 cubic_bezier
 
-DISCONTINUED, use 'bezier' instead.
+DISCONTINUED, use 'bezier' instead (now just an alias to 'bezier')
 
 =cut
 
-sub cubic_bezier {
     my $self = shift;
     $self->bezier(shift);
 }
 
+sub draw_arc {
 =head2 draw_arc
 
 Draws an arc/pie/poly arc of a circle at point x,y.
@@ -4234,7 +4250,6 @@ Draws an arc/pie/poly arc of a circle at point x,y.
 
 =cut
 
-sub draw_arc {
     # This isn't exactly the fastest routine out there, hence the "granularity" parameter, but it is pretty neat.  Drawing lines between points smooths and compensates for high granularity settings.
     my $self   = shift;
     my $params = shift;
@@ -4250,6 +4265,12 @@ sub draw_arc {
     my $mode  = int($params->{'mode'}       || 0);
     my $size  = int($params->{'pixel_size'} || 1);
     my $bytes = $self->{'BYTES'};
+
+    $start_degrees -= 90;
+    $end_degrees   -= 90;
+    $start_degrees += 360 if ($start_degrees < 0);
+    $end_degrees   += 360 if ($end_degrees < 0);
+
     unless ($self->{'ACCELERATED'} && $mode == PIE) {    # ($mode == PIE || $mode == ARC)) {
         my ($sx, $sy, $degrees, $ox, $oy) = (0, 0, 1, 1, 1);
         my @coords;
@@ -4373,10 +4394,6 @@ sub draw_arc {
                     );
                 }
             }
-            $start_degrees -= 90;
-            $end_degrees   -= 90;
-            $start_degrees += 360 if ($start_degrees < 0);
-            $end_degrees   += 360 if ($end_degrees < 0);
             my %p = (
                 'x'      => $radius,
                 'y'      => $radius,
@@ -4465,6 +4482,7 @@ sub draw_arc {
     }
 }
 
+sub arc {
 =head2 arc
 
 Draws an arc of a circle at point x,y.  This is an alias to draw_arc above, but no mode parameter needed.
@@ -4504,7 +4522,6 @@ Draws an arc of a circle at point x,y.  This is an alias to draw_arc above, but 
 
 =cut
 
-sub arc {
     my $self   = shift;
     my $params = shift;
 
@@ -4512,6 +4529,7 @@ sub arc {
     $self->draw_arc($params);
 }
 
+sub filled_pie {
 =head2 filled_pie
 
 Draws a filled pie wedge at point x,y.  This is an alias to draw_arc above, but no mode parameter needed.
@@ -4553,7 +4571,7 @@ Draws a filled pie wedge at point x,y.  This is an alias to draw_arc above, but 
         }
     },
     'texture'  => { # Same as what blit_read or load_image returns
-        'width'  => 320,
+       'width'  => 320,
         'height' => 240,
         'image'  => $raw_image_data
     },
@@ -4567,7 +4585,6 @@ Draws a filled pie wedge at point x,y.  This is an alias to draw_arc above, but 
 
 =cut
 
-sub filled_pie {
     my $self   = shift;
     my $params = shift;
 
@@ -4575,6 +4592,7 @@ sub filled_pie {
     $self->draw_arc($params);
 }
 
+sub poly_arc {
 =head2 poly_arc
 
 Draws a poly arc of a circle at point x,y.  This is an alias to draw_arc above, but no mode parameter needed.
@@ -4614,7 +4632,6 @@ Draws a poly arc of a circle at point x,y.  This is an alias to draw_arc above, 
 
 =cut
 
-sub poly_arc {
     my $self   = shift;
     my $params = shift;
 
@@ -4622,6 +4639,7 @@ sub poly_arc {
     $self->draw_arc($params);
 }
 
+sub ellipse {
 =head2 ellipse
 
 Draw an ellipse at center position x,y with XRadius, YRadius.  Either a filled ellipse or outline is drawn based on the value of $filled.  The optional factor value varies from the default 1 to change the look and nature of the output.
@@ -4663,7 +4681,6 @@ Draw an ellipse at center position x,y with XRadius, YRadius.  Either a filled e
 
 =cut
 
-sub ellipse {
     # The routine even works properly for XOR mode when filled ellipses are drawn as well.  This was solved by drawing only if the X or Y position changed.
     my $self   = shift;
     my $params = shift;
@@ -4868,6 +4885,7 @@ sub ellipse {
     $self->{'RAW_FOREGROUND_COLOR'} = $saved;
 }
 
+sub circle {
 =head2 circle
 
 Draws a circle at point x,y, with radius 'radius'.  It can be an outline, solid filled, or gradient filled.  Outlined circles can have any pixel size.
@@ -4905,7 +4923,6 @@ Draws a circle at point x,y, with radius 'radius'.  It can be an outline, solid 
 
 # This also doubles as the rounded box routine.
 
-sub circle {
     my $self   = shift;
     my $params = shift;
 
@@ -5156,6 +5173,7 @@ sub _rfpart {
     return (1 - _fpart(shift));
 }
 
+sub polygon {
 =head2 polygon
 
 Creates a polygon drawn in the foreground color value.  The parameter 'coordinates' is a reference to an array of x,y values.  The last x,y combination is connected automatically with the first to close the polygon.  All x,y values are absolute, not relative.
@@ -5200,7 +5218,6 @@ It is up to you to make sure the coordinates are "sane".  Weird things can resul
 
 =cut
 
-sub polygon {
     my $self   = shift;
     my $params = shift;
 
@@ -5225,9 +5242,8 @@ sub polygon {
     }
 }
 
-# Does point x,y fall inside the polygon described in coordinates?  Not yet used.
-
 sub _point_in_polygon {
+    # Does point x,y fall inside the polygon described in coordinates?  Not yet used.
     my $self   = shift;
     my $params = shift;
 
@@ -5519,6 +5535,7 @@ sub _generate_fill {
     return ($gradient);
 }
 
+sub box {
 =head2 box
 
 Draws a box from point x,y to point xx,yy, either as an outline, if 'filled' is 0, or as a filled block, if 'filled' is 1.  You may also add a gradient or texture.
@@ -5558,7 +5575,6 @@ Draws a box from point x,y to point xx,yy, either as an outline, if 'filled' is 
 
 =cut
 
-sub box {
     my $self   = shift;
     my $params = shift;
 
@@ -5642,6 +5658,7 @@ sub box {
     }
 }
 
+sub rbox {
 =head2 rbox
 
 Draws a box at point x,y with the width 'width' and height 'height'.  It draws a frame if 'filled' is 0 or a filled box if 'filled' is 1. 'pixel_size' only applies if 'filled' is 0.  Filled boxes draw faster than frames. Gradients or textures are also allowed.
@@ -5681,7 +5698,6 @@ Draws a box at point x,y with the width 'width' and height 'height'.  It draws a
 
 =cut
 
-sub rbox {
     my $self   = shift;
     my $params = shift;
 
@@ -5690,6 +5706,7 @@ sub rbox {
     $self->box($params);
 }
 
+sub set_color {
 =head2 set_color
 
 Sets the drawing color in red, green, and blue, absolute 8 bit values.
@@ -5708,7 +5725,6 @@ Even if you are in 16 bit color mode, use 8 bit values.  They will be automatica
 =back
 =cut
 
-sub set_color {
     my $self   = shift;
     my $params = shift;
     my $name   = shift || 'RAW_FOREGROUND_COLOR';
@@ -5769,27 +5785,18 @@ sub set_color {
     }
 }
 
+sub set_foreground_color {
 =head2 set_foreground_color
 
-Sets the drawing color in red, green, and blue, absolute values.  This is the same as 'set_color' above.
+This is an alias to 'set_color'
 
-=over 4
-
- $fb->set_foreground_color({
-    'red'   => 255,
-    'green' => 255,
-    'blue'  => 0,
-    'alpha' => 255
- });
-
-=back
 =cut
 
-sub set_foreground_color {
     my $self = shift;
     $self->set_color(shift);
 }
 
+sub set_b_color {
 =head2 set_b_color
 
 Sets the background color in red, green, and blue values.
@@ -5808,25 +5815,27 @@ The same rules as set_color apply.
 =back
 =cut
 
-sub set_b_color {
     my $self = shift;
     $self->set_color(shift, 'RAW_BACKGROUND_COLOR');
 }
 
+sub set_background_color {
 =head2 set_background_color
 
-Same as set_b_color
+This is an alias to 'set_b_color'
 
 =cut
 
-sub set_background_color {
     my $self = shift;
     $self->set_color(shift, 'RAW_BACKGROUND_COLOR');
 }
 
+sub fill {
 =head2 fill
 
 Does a flood fill starting at point x,y.  It samples the color at that point and determines that color to be the "background" color, and proceeds to fill in, with the current foreground color, until the "background" color is replaced with the new color.
+
+NOTE:  The accelerated version of this routine may (and it is a small may) have issues.  If you find any issues, then temporarily turn off C-acceleration when calling this method.
 
 =over 4
 
@@ -5838,7 +5847,6 @@ Does a flood fill starting at point x,y.  It samples the color at that point and
 
 =cut
 
-sub fill {
     my $self   = shift;
     my $params = shift;
 
@@ -5974,6 +5982,7 @@ sub fill {
     }
 }
 
+sub replace_color {
 =head2 replace_color
 
 This replaces one color with another inside the clipping region.  Sort of like a fill without boundary checking.
@@ -6001,7 +6010,6 @@ In 32 bit mode, the replaced alpha channel is ALWAYS set to 255.
 
 =cut
 
-sub replace_color {
     my $self   = shift;
     my $params = shift;
 
@@ -6100,6 +6108,7 @@ sub replace_color {
     $self->{'DRAW_MODE'} = $old_mode;
 }
 
+sub blit_copy {
 =head2 blit_copy
 
 Copies a square portion of screen graphic data from x,y,w,h to x_dest,y_dest.  It copies in the current drawing mode.
@@ -6119,23 +6128,13 @@ Copies a square portion of screen graphic data from x,y,w,h to x_dest,y_dest.  I
 
 =cut
 
-sub blit_copy {
     my $self   = shift;
     my $params = shift;
 
     $self->blit_write({ %{ $self->blit_read({ 'x' => int($params->{'x'}), 'y' => int($params->{'y'}), 'width' => int($params->{'width'}), 'height' => int($params->{'height'}) }) }, 'x' => int($params->{'x_dest'}), 'y' => int($params->{'y_dest'}) });
 }
 
-=head2 blit_flip
-
- NO LONGER USED
-
-=cut
-
-sub blit_flip {
-    return;
-}
-
+sub blit_move {
 =head2 blit_move
 
 Moves a square portion of screen graphic data from x,y,w,h to x_dest,y_dest.  It moves in the current drawing mode.  It differs from "blit_copy" in that it removes the graphic from the original location (via XOR).
@@ -6158,7 +6157,6 @@ It also returns the data moved like "blit_read"
 
 =cut
 
-sub blit_move {
     my $self   = shift;
     my $params = shift;
 
@@ -6179,6 +6177,7 @@ sub blit_move {
     return($image);
 }
 
+sub play_animation {
 =head2 play_animation
 
 Plays an animation sequence loaded from "load_image"
@@ -6202,7 +6201,6 @@ You need to enclose this in a loop if you wish it to play more than once.
 
 =cut
 
-sub play_animation {
     my $self  = shift;
     my $image = shift;
     my $rate  = shift || 1;
@@ -6218,11 +6216,12 @@ sub play_animation {
     }
 }
 
+sub acceleration {
 =head2 acceleration
 
 Enables/Disables all Imager or C language acceleration.
 
-In 24 and 32 bit modes, GFB uses the Imager library to do some drawing.  In some cases, these may not function as they should on some systems.  This method allows you to toggle this acceleration on or off.
+GFB uses the Imager library to do some drawing.  In some cases, these may not function as they should on some systems.  This method allows you to toggle this acceleration on or off.
 
 When acceleration is off, the underlying (slower) Perl algorithms are used.  It is advisable to leave acceleration on for those methods which it functions correctly, and only shut it off when calling the problem ones.
 
@@ -6249,7 +6248,6 @@ When called without parameters, it returns the current setting.
 
 =cut
 
-sub acceleration {
     my $self = shift;
     if (scalar(@_)) {
         my $set = shift;
@@ -6266,39 +6264,40 @@ sub acceleration {
     return ($self->{'ACCELERATED'});
 }
 
+sub perl {
 =head2 perl
 
 This is an alias to "acceleration(PERL)"
 
 =cut
 
-sub perl {
     my $self = shift;
     $self->acceleration(PERL);
 }
 
+sub software {
 =head2 software
 
 This is an alias to "acceleration(SOFTWARE)"
 
 =cut
 
-sub software {
     my $self = shift;
     $self->acceleration(SOFTWARE);
 }
 
+sub hardware {
 =head2 hardware
 
 This is an alias to "acceleration(HARDWARE)"
 
 =cut
 
-sub hardware {
     my $self = shift;
     $self->acceleration(HARDWARE);
 }
 
+sub blit_read {
 =head2 blit_read
 
 Reads in a square portion of screen data at x,y,width,height, and returns a hash reference with information about the block, including the raw data as a string, ready to be used with 'blit_write'.
@@ -6332,11 +6331,8 @@ Returns:
 
 All you have to do is change X and Y, and just pass it to "blit_write" and it will paste it there.
 
-* Acceleration mode affects this (although even the Perl one works pretty fast).
-
 =cut
 
-sub blit_read {
     my $self   = shift;
     my $params = shift;    # $self->_blit_adjust_for_clipping(shift);
 
@@ -6381,6 +6377,7 @@ sub blit_read {
     return ({ 'x' => $x, 'y' => $y, 'width' => $w, 'height' => $h, 'image' => $scrn });
 }
 
+sub blit_write {
 =head2 blit_write
 
 Writes a previously read block of screen data at x,y,width,height.
@@ -6399,11 +6396,8 @@ It takes a hash reference.  It draws in the current drawing mode.
 
 =back
 
-* Acceleration mode affects this (although even the Perl one works pretty fast).
-
 =cut
 
-sub blit_write {
     my $self    = shift;
     my $pparams = shift;
     return unless(defined($pparams));
@@ -6416,8 +6410,8 @@ sub blit_write {
     my $w = int($params->{'width'}  || 1);
     my $h = int($params->{'height'} || 1);
 
-    my $draw_mode      = $self->{'DRAW_MODE'};
-    my $bytes          = $self->{'BYTES'};
+    my $draw_mode = $self->{'DRAW_MODE'};
+    my $bytes     = $self->{'BYTES'};
 
     return unless (defined($params->{'image'}) && $params->{'image'} ne '' && $h && $w);
 
@@ -6568,9 +6562,9 @@ sub blit_write {
     }
 }
 
-# Chops up the blit image to stay within the clipping (and screen) boundaries
-# This prevents nasty crashes
 sub _blit_adjust_for_clipping {
+    # Chops up the blit image to stay within the clipping (and screen) boundaries
+    # This prevents nasty crashes
     my $self    = shift;
     my $pparams = shift;
 
@@ -6634,6 +6628,7 @@ sub _blit_adjust_for_clipping {
     return ($params);
 }
 
+sub blit_transform {
 =head2 blit_transform
 
 This performs transformations on your blit objects.
@@ -6732,7 +6727,6 @@ It returns the transformed image in the same format the other BLIT methods use. 
 
 =cut
 
-sub blit_transform {
     my $self   = shift;
     my $params = shift;
 
@@ -6985,6 +6979,7 @@ sub blit_transform {
     }
 }
 
+sub clip_reset {
 =head2 clip_reset
 
 Turns off clipping, and resets the clipping values to the full size of the screen.
@@ -6996,8 +6991,7 @@ Turns off clipping, and resets the clipping values to the full size of the scree
 =back
 =cut
 
-# Clipping is not really turned off.  It's just set to the screen borders.  To turn off clipping for real is asking for crashes.
-sub clip_reset {
+    # Clipping is not really turned off.  It's just set to the screen borders.  To turn off clipping for real is asking for crashes.
     my $self = shift;
 
     $self->{'X_CLIP'}  = 0;
@@ -7010,22 +7004,18 @@ sub clip_reset {
     ## region is defined under the screen dimensions.
 }
 
+sub clip_off {
 =head2 clip_off
 
-Turns off clipping, and resets the clipping values to the full size of the screen.  It is the same as clip_reset.
+This is an alias to 'clip_reset'
 
-=over 4
-
- $fb->clip_off();
-
-=back
 =cut
 
-sub clip_off {
     my $self = shift;
     $self->clip_reset();
 }
 
+sub clip_set {
 =head2 clip_set
 
 Sets the clipping rectangle starting at the top left point x,y and ending at bottom right point xx,yy.
@@ -7042,7 +7032,6 @@ Sets the clipping rectangle starting at the top left point x,y and ending at bot
 =back
 =cut
 
-sub clip_set {
     my $self   = shift;
     my $params = shift;
 
@@ -7060,6 +7049,7 @@ sub clip_set {
     $self->{'CLIPPED'} = TRUE;
 }
 
+sub clip_rset {
 =head2 clip_rset
 
 Sets the clipping rectangle to point x,y,width,height
@@ -7076,7 +7066,6 @@ Sets the clipping rectangle to point x,y,width,height
 =back
 =cut
 
-sub clip_rset {
     my $self   = shift;
     my $params = shift;
 
@@ -7086,6 +7075,7 @@ sub clip_rset {
     $self->clip_set($params);
 }
 
+sub monochrome {
 =head2 monochrome
 
 Removes all color information from an image, and leaves everything in greyscale.
@@ -7115,7 +7105,6 @@ It applies the following formula to calculate greyscale:
 
 =cut
 
-sub monochrome {
     my $self   = shift;
     my $params = shift;
 
@@ -7177,6 +7166,7 @@ sub monochrome {
     return ($params->{'image'});
 }
 
+sub ttf_print {
 =head2 ttf_print
 
 Prints TrueType text on the screen at point x,y in the rectangle width,height, using the color 'color', and the face 'face' (using the Imager library as its engine).
@@ -7234,11 +7224,8 @@ Here's a shortcut:
 
 Failures of this method are usually due to it not being able to find the font.  Make sure you have the right path and name.
 
-This works best in 24 or 32 bit color modes.  If you are running in 16 bit mode, then output will be slower, as Imager only works in bit modes >= 24; and this module has to convert its output to your device's 16 bit colors.  Which means the larger the characters and wider the string, the longer it will take to display.  The splash screen is an excellent example of this behavior.
-
 =cut
 
-sub ttf_print {
     ##############################################################################
     # Yes, this is a "hack".                                                     #
     # -------------------------------------------------------------------------- #
@@ -7398,17 +7385,18 @@ sub ttf_print {
     return ($params);
 }
 
+sub ttf_paragraph {
 =head2 ttf_paragraph
 
-Very similar to an ordinary "print", but uses TTF fonts instead.  It will automatically wrap text like a terminal.
+Very similar to an ordinary Perl "print", but uses TTF fonts instead.  It will automatically wrap text like a terminal.
 
 This uses no bounding boxes, and is only needed to be called once.  It uses a very simple wrapping model.
 
-It's "box" is simply the clipping rectangle.  All text will be fit and wrapped within the clipping rectangle.
+It uses the clipping rectangle.  All text will be fit and wrapped within the clipping rectangle.
 
-Text is started at "x" and wrapped to "x".
+Text is started at "x" and wrapped to "x" for each line, no indentation.
 
-* This does NOT scroll text.  It merely truncates what doesn't fit.  It returns where in the text string it last printed before truncation.  It's also slow.
+* This does NOT scroll text.  It merely truncates what doesn't fit.  It returns where in the text string it last printed before truncation.  It's also quite slow.
 
 =over 4
 
@@ -7442,7 +7430,6 @@ Text is started at "x" and wrapped to "x".
 
 =cut
 
-sub ttf_paragraph {
     my $self   = shift;
     my $params = shift;
 
@@ -7552,8 +7539,8 @@ sub ttf_paragraph {
     return ($savepos);
 }
 
-# Gather in and find all the fonts
 sub _gather_fonts {
+    # Gather in and find all the fonts
     my $self = shift;
     my $path = shift;
 
@@ -7577,6 +7564,7 @@ sub _gather_fonts {
     }
 }
 
+sub get_face_name {
 =head2 get_face_name
 
 Returns the TrueType face name based on the parameters passed.
@@ -7588,7 +7576,6 @@ Returns the TrueType face name based on the parameters passed.
 
 =cut
 
-sub get_face_name {
     my $self   = shift;
     my $params = shift;
 
@@ -7605,6 +7592,7 @@ sub get_face_name {
     return ($file);
 }
 
+sub load_image {
 =head2 load_image
 
 Loads an image at point x,y[,width,height].  To display it, pass it to blit_write.
@@ -7731,7 +7719,6 @@ If the image has multiple frames, then a reference to an array of hashes is retu
 
 =cut
 
-sub load_image {
     my $self   = shift;
     my $params = shift;
 
@@ -7750,7 +7737,7 @@ sub load_image {
                 'allow_incomplete' => TRUE,
                 'raw_datachannels' => max(3, $self->{'BYTES'}), # One of these is bound to work
                 'datachannels'     => max(3, $self->{'BYTES'}),
-            ); 
+            );
         };
         warn __LINE__ . " $@" if ($@ && $self->{'SHOW_ERRORS'});
     } else {
@@ -7958,6 +7945,7 @@ sub load_image {
     return (undef); # Ouch
 }
 
+sub screen_dump {
 =head2 screen_dump
 
 Dumps the screen to a file given in 'file' in the format given in 'format'
@@ -7972,7 +7960,7 @@ The most widely used format.  This is a "lossy" format.  The default quality set
 
 =item B<GIF>
 
-The CompuServe "Graphics Interchange Format".  A very old and outdated format, but still widely used.  It only allows 256 "indexed" colors, so quality is very lacking.  The "dither" paramter determines how colors are translated from 24 bit truecolor to 8 bit indexed.
+The CompuServe "Graphics Interchange Format".  A very old and outdated format made specifically for VGA graphics modes, but still widely used.  It only allows up to 256 "indexed" colors, so quality is very lacking.  The "dither" paramter determines how colors are translated from 24 bit truecolor to 8 bit indexed.
 
 =item B<PNG>
 
@@ -8009,7 +7997,6 @@ The Tagged Image File Format.  Sort of an older version of PNG (but not the same
 
 =cut
 
-sub screen_dump {
     my $self   = shift;
     my $params = shift;
 
@@ -8051,9 +8038,10 @@ sub screen_dump {
     $img->write(%p);
 }
 
-# Convert 16 bit bitmap to 24 bit bitmap
+### Bitmap conversion routines ###
 
 sub _convert_16_to_24 {
+    # Convert 16 bit bitmap to 24 bit bitmap
     my $self        = shift;
     my $img         = shift;
     my $color_order = shift;
@@ -8087,11 +8075,8 @@ sub _convert_16_to_24 {
     return ($new_img);
 }
 
-### Bitmap conversion routines ###
-
-# Convert 8 bit bitmap to 32 bit bitmap
-
 sub _convert_8_to_32 {
+    # Convert 8 bit bitmap to 32 bit bitmap
     my $self        = shift;
     my $img         = shift;
     my $color_order = shift;
@@ -8108,9 +8093,8 @@ sub _convert_8_to_32 {
     return($new_img);
 }
 
-# Convert 8 bit bitmap to 24 bit bitmap
-
 sub _convert_8_to_24 {
+    # Convert 8 bit bitmap to 24 bit bitmap
     my $self        = shift;
     my $img         = shift;
     my $color_order = shift;
@@ -8127,9 +8111,8 @@ sub _convert_8_to_24 {
     return($new_img);
 }
 
-# Convert 8 bit bitmap to 16 bit bitmap
-
 sub _convert_8_to_16 {
+    # Convert 8 bit bitmap to 16 bit bitmap
     my $self        = shift;
     my $img         = shift;
     my $color_order = shift;
@@ -8146,9 +8129,8 @@ sub _convert_8_to_16 {
     return($new_img);
 }
 
-# Convert 16 bit bitmap to 32 bit bitmap
-
 sub _convert_16_to_32 {
+    # Convert 16 bit bitmap to 32 bit bitmap
     my $self        = shift;
     my $img         = shift;
     my $color_order = shift;
@@ -8182,9 +8164,8 @@ sub _convert_16_to_32 {
     return ($new_img);
 }
 
-# Convert 24 bit bitmap to 16 bit bitmap
-
 sub _convert_24_to_16 {
+    # Convert 24 bit bitmap to 16 bit bitmap
     my $self        = shift;
     my $img         = shift;
     my $color_order = shift;
@@ -8219,9 +8200,8 @@ sub _convert_24_to_16 {
     return ($new_img);
 }
 
-# Convert 32 bit bitmap to a 16 bit bitmap
-
 sub _convert_32_to_16 {
+    # Convert 32 bit bitmap to a 16 bit bitmap
     my $self        = shift;
     my $img         = shift;
     my $color_order = shift;
@@ -8256,9 +8236,8 @@ sub _convert_32_to_16 {
     return ($new_img);
 }
 
-# Convert a 32 bit bitmap to a 24 bit bitmap.
-
 sub _convert_32_to_24 {
+    # Convert a 32 bit bitmap to a 24 bit bitmap.
     my $self        = shift;
     my $img         = shift;
     my $color_order = shift;
@@ -8293,9 +8272,8 @@ sub _convert_32_to_24 {
     return ($new_img);
 }
 
-# Convert a 24 bit bitmap to a 32 bit bipmap
-
 sub _convert_24_to_32 {
+    # Convert a 24 bit bitmap to a 32 bit bipmap
     my $self        = shift;
     my $img         = shift;
     my $color_order = shift;
@@ -8330,6 +8308,7 @@ sub _convert_24_to_32 {
     return ($new_img);
 }
 
+sub RGB565_to_RGB888 {
 =head2 RGB565_to_RGB888
 
 Convert a 16 bit color value to a 24 bit color value.  This requires the color to be a two byte packed string.
@@ -8342,7 +8321,6 @@ Convert a 16 bit color value to a 24 bit color value.  This requires the color t
 
 =cut
 
-sub RGB565_to_RGB888 {
     my $self   = shift;
     my $params = shift;
 
@@ -8357,6 +8335,22 @@ sub RGB565_to_RGB888 {
         $b = $rgb565 & 31;
         $g = ($rgb565 >> 5) & 63;
         $r = ($rgb565 >> 11) & 31;
+    } elsif ($color_order == BRG) {
+        $b = $rgb565 & 31;
+        $r = ($rgb565 >> 5) & 63;
+        $g = ($rgb565 >> 11) & 31;
+    } elsif ($color_order == RBG) {
+        $r = $rgb565 & 31;
+        $b = ($rgb565 >> 5) & 63;
+        $g = ($rgb565 >> 11) & 31;
+    } elsif ($color_order == GRB) {
+        $g = $rgb565 & 31;
+        $r = ($rgb565 >> 5) & 63;
+        $b = ($rgb565 >> 11) & 31;
+    } elsif ($color_order == GBR) {
+        $g = $rgb565 & 31;
+        $b = ($rgb565 >> 5) & 63;
+        $r = ($rgb565 >> 11) & 31;
     }
     $r = int($r * 527 + 23) >> 6;
     $g = int($g * 259 + 33) >> 6;
@@ -8367,7 +8361,7 @@ sub RGB565_to_RGB888 {
         ($r, $g, $b) = ($b, $g, $r);
     } elsif ($color_order == BRG) {
         ($r, $g, $b) = ($b, $r, $g);
-#    } elsif ($color_order == RGB) {
+#    } elsif ($color_order == RGB) { # Redundant, but here for clarity
     } elsif ($color_order == RBG) {
         ($r, $g, $b) = ($r, $b, $g);
     } elsif ($color_order == GRB) {
@@ -8379,6 +8373,7 @@ sub RGB565_to_RGB888 {
     return ({ 'color' => $color });
 }
 
+sub RGB565_to_RGBA8888 {
 =head2 RGB565_to_RGB8888
 
 Convert a 16 bit color value to a 32 bit color value.  This requires the color to be a two byte packed string.  The alpha value is either a value passed in or the default 255.
@@ -8392,7 +8387,6 @@ Convert a 16 bit color value to a 32 bit color value.  This requires the color t
 
 =cut
 
-sub RGB565_to_RGBA8888 {
     my $self   = shift;
     my $params = shift;
 
@@ -8408,6 +8402,22 @@ sub RGB565_to_RGBA8888 {
         $b = $rgb565 & 31;
         $g = ($rgb565 >> 5) & 63;
         $r = ($rgb565 >> 11) & 31;
+    } elsif ($color_order == BRG) {
+        $b = $rgb565 & 31;
+        $r = ($rgb565 >> 5) & 63;
+        $g = ($rgb565 >> 11) & 31;
+    } elsif ($color_order == RBG) {
+        $r = $rgb565 & 31;
+        $b = ($rgb565 >> 5) & 63;
+        $g = ($rgb565 >> 11) & 31;
+    } elsif ($color_order == GRB) {
+        $g = $rgb565 & 31;
+        $r = ($rgb565 >> 5) & 63;
+        $b = ($rgb565 >> 11) & 31;
+    } elsif ($color_order == GBR) {
+        $g = $rgb565 & 31;
+        $b = ($rgb565 >> 5) & 63;
+        $r = ($rgb565 >> 11) & 31;
     }
     $r = int($r * 527 + 23) >> 6;
     $g = int($g * 259 + 33) >> 6;
@@ -8416,7 +8426,7 @@ sub RGB565_to_RGBA8888 {
     my $color;
     if ($color_order == BGR) {
         ($r, $g, $b) = ($b, $g, $r);
-#    } elsif ($color_order == RGB) {
+#    } elsif ($color_order == RGB) { # Redundant
     } elsif ($color_order == BRG) {
         ($r, $g, $b) = ($b, $r, $g);
     } elsif ($color_order == RBG) {
@@ -8430,6 +8440,7 @@ sub RGB565_to_RGBA8888 {
     return ({ 'color' => $color });
 }
 
+sub RGB888_to_RGB565 {
 =head2 RGB888_to_RGB565
 
 Convert 24 bit color value to a 16 bit color value.  This requires a three byte packed string.
@@ -8444,7 +8455,6 @@ This simply does a bitshift, nothing more.
 
 =cut
 
-sub RGB888_to_RGB565 {
     my $self   = shift;
     my $params = shift;
 
@@ -8481,6 +8491,7 @@ sub RGB888_to_RGB565 {
     return ({ 'color' => $n_data });
 }
 
+sub RGBA8888_to_RGB565 {
 =head2 RGBA8888_to_RGB565
 
 Convert 32 bit color value to a 16 bit color value.  This requires a four byte packed string.
@@ -8495,7 +8506,6 @@ This simply does a bitshift, nothing more
 
 =cut
 
-sub RGBA8888_to_RGB565 {
     my $self   = shift;
     my $params = shift;
 
@@ -8536,6 +8546,7 @@ sub RGBA8888_to_RGB565 {
     return ({ 'color' => $n_data });
 }
 
+sub RGB888_to_RGBA8888 {
 =head2 RGB888_to_RGBA8888
 
 Convert 24 bit color value to a 32 bit color value.  This requires a three byte packed string.  The alpha value is either a value passed in or the default 255.
@@ -8551,7 +8562,6 @@ This just simply adds an alpha value.  No actual color conversion is done.
 
 =cut
 
-sub RGB888_to_RGBA8888 {
     my $self   = shift;
     my $params = shift;
 
@@ -8567,6 +8577,7 @@ sub RGB888_to_RGBA8888 {
     return ({ 'color' => $n_data });
 }
 
+sub RGBA8888_to_RGB888 {
 =head2 RGBA8888_to_RGB888
 
 Convert 32 bit color value to a 24 bit color value.  This requires a four byte packed string.
@@ -8581,7 +8592,6 @@ This just removes the alpha value.  No color conversion is actually done.
 
 =cut
 
-sub RGBA8888_to_RGB888 {
     my $self   = shift;
     my $params = shift;
 
@@ -8596,21 +8606,22 @@ sub RGBA8888_to_RGB888 {
     return ({ 'color' => $n_data });
 }
 
+sub vsync {
 =head2 vsync
 
 Waits for vertical sync
 
-* Not all framebuffer drivers have this capability and ignore this call.  Results may vary.
+* Not all framebuffer drivers have this capability and ignore this call.  Results may vary, as this cannot be emulated.
 
 Waits for the vertical blank before returning
 
 =cut
 
-sub vsync {
     my $self = shift;
     _set_ioctl(FBIO_WAITFORVSYNC, 'I', $self->{'FB'}, 0);
 }
 
+sub which_console {
 =head2 which_console
 
 Returns the active console and the expected console
@@ -8619,7 +8630,6 @@ Returns the active console and the expected console
 
 =cut
 
-sub which_console {
     my $self = shift;
     $self->{'THIS_CONSOLE'} = _slurp('/sys/class/tty/tty0/active');
     $self->{'THIS_CONSOLE'} =~ s/\D+//gs;
@@ -8627,6 +8637,7 @@ sub which_console {
     return ($self->{'THIS_CONSOLE'}, $self->{'CONSOLE'});
 }
 
+sub active_console {
 =head2 active_console
 
 Indicates if the current console is the expected console.  It returns true or false.
@@ -8637,7 +8648,6 @@ Indicates if the current console is the expected console.  It returns true or fa
 
 =cut
 
-sub active_console {
     my $self = shift;
     my ($current, $original) = $self->which_console();
     if ($current == $original) {
@@ -8646,6 +8656,7 @@ sub active_console {
     return (FALSE);
 }
 
+sub wait_for_console {
 =head2 wait_for_console
 
 Blocks actions until the expected console is active.  The expected console is determined at the time the module is initialized.
@@ -8656,7 +8667,6 @@ If a TRUE or FALSE is passed to this, then you can enable or disable blocking fo
 
 =cut
 
-sub wait_for_console {
     my $self = shift;
     if (scalar(@_)) {
         $self->{'WAIT_FOR_CONSOLE'} = (shift =~ /^(true|on|1|enable)$/i) ? TRUE : FALSE;
@@ -8667,23 +8677,25 @@ sub wait_for_console {
     }
 }
 
+## These are pulled in via the Mouse module
+
 =head2 initialize_mouse
 
 Turns on/off the mouse handler.
 
 Note:  This uses Perl's "alarm" feature.  If you want to use threads, then don't use this to turn on the mouse.
 
- $fb->initialize_mouse(1);  # Turn on the mouse handler
+# $fb->initialize_mouse(1);  # Turn on the mouse handler
 
 or
 
- $fb->initialize_mouse(0);  # Turn off the mouse handler
+# $fb->initialize_mouse(0);  # Turn off the mouse handler
 
 =head2 poll_mouse
 
 The mouse handler.  The "initialize_mouse" routine sets this as the "alarm" routine to handle mouse events.
 
-An alarm handler just works, but can possibly block if used as an alarm handler.
+An alarm handler just works, but can possibly block if used as ... an alarm handler.
 
 I suggest running it in a thread instead, using your own code.
 
@@ -8693,11 +8705,11 @@ Returns the mouse coordinates.
 
 Return as an array:
 
- my ($mouseb, $mousex, $mousey) =  $fb->get_mouse();
+# my ($mouseb, $mousex, $mousey) =  $fb->get_mouse();
 
 Return as a hash reference:
 
- my $mouse = $fb->get_mouse();
+# my $mouse = $fb->get_mouse();
 
 Returns
 
@@ -8832,9 +8844,9 @@ This module is highly CPU dependent.  So the more optimized your Perl installati
 
 =head2 THREADS
 
-The module can NOT have separate threads calling the same object.  You WILL crash. However, you can instantiate an object for each thread to use on the same framebuffer, and it will work just fine.
+The module (using the 'threads' module) canNOT have separate threads calling the same object.  You WILL crash. However, you can instantiate an object for each thread to use on the same framebuffer, and it will work just fine.
 
-See the "examples" directory for "threadstest.pl" as an example of a threading script that uses this module.  Just add the number of threads you want it to use to the command line when you run it.
+See the "examples/multiprocessing" directory for "threads_primitives.pl" as an example of a threading script that uses this module.
 
 =head2 FORKS
 
@@ -8850,7 +8862,9 @@ Use "blit_read" and "blit_write" to save portions of the screen instead of redra
 
 =head2 SPRITES
 
-Someone asked me about sprites.  Well, that's what blitting is for.  You'll have to do your own collision detection.  Using the "XOR" drawing mode, you can "erase" a sprite by rewriting it to the screen via xor.
+Someone asked me about sprites.  Well, that's what blitting is for.  You'll have to do your own collision detection.  Using the "XOR" drawing mode, you can "erase" a sprite by rewriting it to the screen via XOR.
+
+Most framebuffer drivers do not have access to GPU features.  It's just a memory map of the framebuffer.
 
 Listen folks, this library does everything in software, so your results will vary depending on CPU speed and screen resolution, as well as blit resolution.
 
@@ -8864,19 +8878,17 @@ Pixel sizes over 1 utilize a filled "box" or "circle" (negative numbers for circ
 
 =head2 MULTIPLE "HEADS" (monitors)
 
-As long as each framebuffer for each display is accessible, you can open an instance of the module for each framebuffer and access both.
+As long as each framebuffer for each display is accessible, you can open an instance of the module for each framebuffer and access each screen.
 
 =head2 MAKING WINDOWS
 
 So, you want to be able to manage some sort of windows...
 
-You just instantiate a new instance of the module per "Window" and give it its own clipping region.  This region is your drawing space for your window.  The threading example does this.
+You just instantiate a new instance of the module per "Window" and give it its own clipping region.  This region is your drawing space for your window.
 
 It is up to you to actually decorate (draw) the windows.
 
-Perhaps in the future I may add windowing ability, but not right now, as it can be pretty involved (especially redraw tracking and event managing).
-
-Nothing is preventing you from writing your own window handler.
+Nothing is preventing you from writing your own window handler, although I recommend just using X-Windows (and a different module) for that anyway.
 
 =head2 RUNNING IN MICROSOFT WINDOWS
 
@@ -8892,7 +8904,7 @@ This isn't a design choice, nor preference, nor some anti-Windows ego trip.  It'
 
 Ok, you've installed the module, but can't seem to get it to work properly.  Here  are some things you can try:
 
-** make sure you turn on the "SHOW_ERRORS" parameter when calling "new" to create the object.  This helps with troubleshooting.
+** make sure you turn on the "SHOW_ERRORS" parameter when calling "new" to create the object.  This helps with troubleshooting (but turn it back off for normal use).
 
 =over 4
 
@@ -9000,7 +9012,7 @@ Richard Kelsch <rich@rk-internet.com>
 
 =head1 COPYRIGHT
 
-Copyright 2003-2020 Richard Kelsch, All Rights Reserved.
+Copyright 2003-2021 Richard Kelsch, All Rights Reserved.
 
 This program is free software; you can redistribute it and/or modify it under the GNU software license.
 
@@ -9012,7 +9024,7 @@ A copy of this license is included in the 'LICENSE' file in this distribution.
 
 =head1 VERSION
 
-Version 6.48 (Apr 14, 2020)
+Version 6.49 (Jun 04, 2021)
 
 =head1 THANKS
 

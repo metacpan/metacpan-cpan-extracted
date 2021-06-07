@@ -9,35 +9,30 @@ no if "$]" >= 5.033006, feature => 'bareword_filehandles';
 use open ':std', ':encoding(UTF-8)'; # force stdin, stdout, stderr into utf8
 
 use Test::More;
-use List::Util 1.50 'head';
 use Path::Tiny;
-
-BEGIN {
-  my @variables = qw(AUTHOR_TESTING AUTOMATED_TESTING EXTENDED_TESTING);
-
-  plan skip_all => 'These tests may fail if the test suite continues to evolve! They should only be run with '
-      .join(', ', map $_.'=1', head(-1, @variables)).' or '.$variables[-1].'=1'
-    if not -d '.git' and not grep $ENV{$_}, @variables;
-}
 
 use if $ENV{AUTHOR_TESTING}, 'Test::Warnings' => ':fail_on_warning';
 use Test::JSON::Schema::Acceptance 1.007;
 use JSON::Schema::Tiny 'evaluate';
 
+BEGIN {
+  foreach my $env (qw(AUTHOR_TESTING AUTOMATED_TESTING EXTENDED_TESTING NO_TODO TEST_DIR NO_SHORT_CIRCUIT)) {
+    note $env.': '.($ENV{$env}//'');
+  }
+  note '';
+}
+
 sub acceptance_tests {
   my (%options) = @_;
 
-  my $version = delete $options{specification};
-
+  local $Test::Builder::Level = $Test::Builder::Level + 1;
   my $accepter = Test::JSON::Schema::Acceptance->new(
-    $ENV{TEST_DIR}
-      ? (test_dir => $ENV{TEST_DIR})
-      : (
-        specification => $version,
-        include_optional => 1,
-        skip_dir => 'optional/format',
-      ),
+    specification => 'draft2019-09',
+    include_optional => 1,
     verbose => 1,
+    test_schemas => 0,
+    %{$options{acceptance}},
+    $ENV{TEST_DIR} ? (test_dir => $ENV{TEST_DIR}) : (),
   );
 
   my $encoder = JSON::MaybeXS->new(allow_nonref => 1, utf8 => 0, convert_blessed => 1, canonical => 1, pretty => 1);
@@ -60,7 +55,6 @@ sub acceptance_tests {
       die 'results inconsistent between short_circuit = false and true'
         if not $ENV{NO_SHORT_CIRCUIT} and ($result->{valid} xor $result_short->{valid});
 
-
       # if any errors contain an exception, generate a warning so we can be sure
       # to count that as a failure (an exception would be caught and perhaps TODO'd).
       # (This might change if tests are added that are expected to produce exceptions.)
@@ -75,10 +69,10 @@ sub acceptance_tests {
       $result->{valid};
     },
     @ARGV ? (tests => { file => \@ARGV }) : (),
-    %options,
+    %{$options{test} // {}},
   );
 
-  path($ENV{RESULTS_FILE} // ('t/results/'.$version.'.txt'))->spew_utf8($accepter->results_text)
+  path('t/results/'.$options{output_file})->spew_utf8($accepter->results_text)
     if -d '.git' or $ENV{AUTHOR_TESTING} or $ENV{RELEASE_TESTING};
 }
 

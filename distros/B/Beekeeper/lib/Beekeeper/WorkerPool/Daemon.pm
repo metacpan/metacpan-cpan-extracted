@@ -3,55 +3,7 @@ package Beekeeper::WorkerPool::Daemon;
 use strict;
 use warnings;
 
-
-our $VERSION = '0.01';
-
-=head1 NAME
-
-Beekeeper::WorkerPool::Daemon - Daemonize processes
-
-=head1 VERSION
-
-Version 0.01
-
-=head1 SYNOPSIS
-
-  package MyDaemon;
-  use base 'Beekeeper::WorkerPool::Daemon';
-  
-  sub main {
-      my $self = shift;
-      my $quit = 0;
-  
-      $SIG{'TERM'} = sub { $quit = 1 };
-      $SIG{'INT'}  = sub { $quit = 1 };
-  
-      while (!$quit) {
-          # Do something here...
-          sleep 1;
-      }
-  }
-
-Then, the daemon can be executed with a script like this:
-
-  #!/usr/bin/perl -wT
-  use strict;
-  use warnings;
-  use MyDaemon;
-  
-  $ENV{PATH} = '/bin'; # untaint
-  
-  my $daemon = MyDaemon->new->run;
-
-=head1 DESCRIPTION
-
-This is a base module for creating daemons. It takes care of daemonization tasks
-commonly found in init.d scripts: forking, redirecting output, writing pid files, 
-start/stop/restart control commands, etc.
-
-It is used by the command line tool C<bkpr> to daemonize itself.
-
-=cut
+our $VERSION = '0.04';
 
 use POSIX;
 use Fcntl qw(:DEFAULT :flock);
@@ -606,7 +558,56 @@ sub main {
 
 1;
 
+__END__
+
+=pod
+
 =encoding utf8
+
+=head1 NAME
+
+Beekeeper::WorkerPool::Daemon - Daemonize processes
+
+=head1 VERSION
+
+Version 0.04
+
+=head1 SYNOPSIS
+
+  package MyDaemon;
+  use base 'Beekeeper::WorkerPool::Daemon';
+  
+  sub main {
+      my $self = shift;
+      my $quit = 0;
+  
+      $SIG{'TERM'} = sub { $quit = 1 };
+      $SIG{'INT'}  = sub { $quit = 1 };
+  
+      while (!$quit) {
+          # Do something here...
+          sleep 1;
+      }
+  }
+
+Then, the daemon can be executed with a script like this:
+
+  #!/usr/bin/perl -wT
+  use strict;
+  use warnings;
+  use MyDaemon;
+  
+  $ENV{PATH} = '/bin'; # untaint
+  
+  my $daemon = MyDaemon->new->run;
+
+=head1 DESCRIPTION
+
+This is a base module for creating daemons. It takes care of daemonization tasks
+commonly found in init.d scripts: forking, redirecting output, writing pid files, 
+start/stop/restart control commands, etc.
+
+It is used by the command line tool C<bkpr> to daemonize itself.
 
 =head1 AUTHOR
 
@@ -614,7 +615,7 @@ José Micó, C<jose.mico@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright 2015 José Micó.
+Copyright 2015-2021 José Micó.
 
 This is free software; you can redistribute it and/or modify it under the same 
 terms as the Perl 5 programming language itself.

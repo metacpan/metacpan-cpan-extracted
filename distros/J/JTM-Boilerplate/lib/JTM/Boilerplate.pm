@@ -1,11 +1,11 @@
 #
-# Copyright (C) 2015-2020 Joelle Maslak
+# Copyright (C) 2015-2021 Joelle Maslak
 # All Rights Reserved - See License
 #
 
 package JTM::Boilerplate;
 # ABSTRACT: Default Boilerplate for Joelle Maslak's Code
-$JTM::Boilerplate::VERSION = '2.202310';
+$JTM::Boilerplate::VERSION = '2.211420';
 use strict;
 use warnings;
 
@@ -84,6 +84,18 @@ sub import ( $self, $type = 'script' ) {
         warnings->unimport::out_of( $target, 'experimental::isa' );
     }
 
+    if ( $PERL_VERSION ge v5.34.0 ) {
+        # Turn off multidimensional "array" emulation
+        feature->unimport::out_of( $target, 'multidimensional' );
+
+        # Turn off bareword filehandles
+        feature->unimport::out_of( $target, 'bareword_filehandles' );
+
+        # Turn on Try/Catch
+        feature->import::into( $target, 'try' );
+        warnings->unimport::out_of( $target, 'experimental::try' );
+    }
+
     return;
 }
 
@@ -101,7 +113,7 @@ JTM::Boilerplate - Default Boilerplate for Joelle Maslak's Code
 
 =head1 VERSION
 
-version 2.202310
+version 2.211420
 
 =head1 SYNOPSIS
 

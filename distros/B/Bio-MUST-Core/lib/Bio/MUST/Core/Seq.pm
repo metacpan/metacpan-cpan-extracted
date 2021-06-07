@@ -3,7 +3,7 @@ package Bio::MUST::Core::Seq;
 # CONTRIBUTOR: Catherine COLSON <ccolson@doct.uliege.be>
 # CONTRIBUTOR: Arnaud DI FRANCO <arnaud.difranco@gmail.com>
 # CONTRIBUTOR: Valerian LUPO <valerian.lupo@doct.uliege.be>
-$Bio::MUST::Core::Seq::VERSION = '0.210610';
+$Bio::MUST::Core::Seq::VERSION = '0.211470';
 use Moose;
 use MooseX::SemiAffordanceAccessor;
 use namespace::autoclean;
@@ -400,7 +400,7 @@ Bio::MUST::Core::Seq - Nucleotide or protein sequence
 
 =head1 VERSION
 
-version 0.210610
+version 0.211470
 
 =head1 SYNOPSIS
 

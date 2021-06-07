@@ -1,5 +1,19 @@
 Revision history for Device-Inverter-KOSTAL-PIKO
 
+0.12    2021-06-07
+        - recognize 0 values for floats
+
+0.11    2021-06-07
+        - removed handling of device name from …::File
+
+0.1     2021-06-06
+        - added support for determining the current device status
+
+0.04    2021-06-06
+        - added homepage and repository URLs
+        - replaced my e-mail address,
+          since <fany@cpan.org> keeps being broken
+
 0.03    2017-01-03
         - Fixed test suite
         - added sample script for cron job

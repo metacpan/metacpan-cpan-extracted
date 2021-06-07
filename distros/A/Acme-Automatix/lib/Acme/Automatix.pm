@@ -10,11 +10,11 @@ Acme::Automatix - The release of Acme::Automatix is automatix!
 
 =head1 VERSION
 
-Version 0.07
+Version 0.10
 
 =cut
 
-our $VERSION = '0.07';
+our $VERSION = '0.10';
 
 
 =head1 SYNOPSIS

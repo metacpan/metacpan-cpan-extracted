@@ -1,3 +1,13 @@
+1.87    2021-05-25
+
+- Add support for Devuan Linux
+
+1.86    2021-05-20
+
+- Belatedly add doco on Debian family to Families.pod
+
+- Add Mac OS 11 (Big Sur)
+
 1.85    2020-10-15      Add Linux::Raspbian and Linux::Ubuntu;
                         Add Linux::RealDebian for *actual* Debian Linux;
                         Add Linux::UnknownDebianLike for anything else that's like Debian;
@@ -9,7 +19,7 @@
                         Add MSYS (reported by perl in MinGW environments)
 
 1.83    2020-02-15      Remove dependency on Data::Compare, which in turn
-                          depends on non-pure-perl XS in CLone.pm
+                          depends on non-pure-perl XS in Clone.pm
 
 1.82    2020-02-15      Fix build bug affecting perl 5.8 when AUTOMATED_TESTING
                           is set (https://github.com/DrHyde/perl-modules-Devel-CheckOS/pull/23)

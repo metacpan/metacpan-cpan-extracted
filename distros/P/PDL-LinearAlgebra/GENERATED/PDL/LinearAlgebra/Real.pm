@@ -29,16 +29,19 @@ use strict;
     PDL;
   my $warningFlag;
   BEGIN{
-  	$warningFlag = $^W;
-        $^W = 0;
- }
+    $warningFlag = $^W;
+    $^W = 0;
+  }
 
   use overload (
-		'x'     =>  sub {PDL::mmult($_[0], $_[1])},
- );
- 
- BEGIN{ $^W = $warningFlag;}
+    'x' => sub {
+      $_[0]->type->real
+        ? PDL::mmult($_[0], $_[1])
+        : PDL::cmmult($_[0], $_[1])
+    },
+  );
 
+  BEGIN{ $^W = $warningFlag;}
 }
 
 =encoding Latin-1
@@ -65,7 +68,7 @@ Blas vector routine use increment.
 =head1 DESCRIPTION
 
 This module provides an interface to parts of the real lapack library.
-These routines accept either float or double piddles.
+These routines accept either float or double ndarrays.
 
 
 
@@ -2233,7 +2236,7 @@ manner.
             eigenvalues are computed to high relative accuracy when
             possible in future releases.  The current code does not
             make any guarantees about high relative accuracy, but
-            furure releases will. See J. Barlow and J. Demmel,
+            future releases will. See J. Barlow and J. Demmel,
             "Computing Accurate Eigensystems of Scaled Diagonally
             Dominant Matrices", LAPACK Working Note #7, for a discussion
             of which matrices define their eigenvalues to high relative
@@ -3921,7 +3924,7 @@ Solve the BLS using a divide and conquer approach.
 
 =item 3
 
-Apply back all the Householder tranformations to solve
+Apply back all the Householder transformations to solve
 the original least squares problem.
 
 =back
@@ -8454,7 +8457,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 Performs a series of row interchanges on the matrix A.   
 One row interchange is initiated for each of rows k1 through k2 of A.
-Dosen't use PDL indice (start = 1).   
+Doesn't use PDL indices (start = 1).
 
     Arguments   
     =========   
@@ -8698,7 +8701,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for ref
 
-Combine two pidlles into a single piddle.
+Combine two ndarrays into a single ndarray.
 This routine does backward and forward dataflow automatically.
 
 
@@ -8730,7 +8733,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for ref
 
-Combine two pidlles into a single piddle.
+Combine two ndarrays into a single ndarray.
 This routine does backward and forward dataflow automatically.
 
 

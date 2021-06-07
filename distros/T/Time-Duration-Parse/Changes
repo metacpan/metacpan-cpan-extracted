@@ -1,5 +1,9 @@
 Revision history for Perl extension Time::Duration::Parse
 
+0.16 2021-05-19 NEILB
+    - Switched to plain Exporter, instead of Exporter::Lite.
+      Thanks to Graham Knop for PR.
+
 0.15 2019-05-12 NEILB
     - Added support for fractional parts of seconds in hh:mm:ss.ssss
     - Added L<> links to Time::Duration and duration_exact in that module.

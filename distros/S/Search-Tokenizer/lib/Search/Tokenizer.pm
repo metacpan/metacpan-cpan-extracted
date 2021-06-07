@@ -1,15 +1,20 @@
 package Search::Tokenizer;
 use warnings;
 use strict;
-use Unicode::CaseFold ();
+use Carp              qw(croak);
+use Unicode::CaseFold qw(fc);    # because CORE::fc only came with Perl 5.16
 
-our $VERSION = '1.02';
+our $VERSION = '1.03';
+
+#======================================================================
+# MAIN FUNCTIONALITY
+#======================================================================
 
 sub new {
   my $class = shift;
 
   # defaults
-  my $regex           = qr/\w+/;
+  my $regex           = qr/\p{Word}+/;
   my $lower           = 1;
   my $filter          = undef;
   my $filter_in_place = undef;
@@ -17,26 +22,29 @@ sub new {
 
   # parse arguments
   unshift @_, "regex" if @_ == 1; # positional API
-  while (my $arg = shift) {
-    my $val = shift;
-    $arg .= "=>" . (ref($val) || "NOREF");
+  while (my ($arg, $val) = splice(@_, 0, 2)) {
+    $arg .= "=>" . (ref($val) || "SCALAR");
+  CHECK:
     for ($arg) {
-      /^regex=>Regexp$/         and do { $regex = $val;           last};
-      /^lower=>NOREF$/          and do { $lower = !!$val;         last};
-      /^filter=>CODE$/          and do { $filter = $val;          last};
-      /^filter_in_place=>CODE$/ and do { $filter_in_place = $val; last};
-      /^stopwords=>HASH$/       and do { $stopwords = $val;       last};
-      die "Invalid option or invalid operand: $arg";
+      /^regex=>Regexp$/         and do { $regex = $val;           last CHECK};
+      /^lower=>SCALAR$/         and do { $lower = !!$val;         last CHECK};
+      /^filter=>CODE$/          and do { $filter = $val;          last CHECK};
+      /^filter_in_place=>CODE$/ and do { $filter_in_place = $val; last CHECK};
+      /^stopwords=>HASH$/       and do { $stopwords = $val;       last CHECK};
+      croak "Invalid option or invalid operand: $arg";
     }
   }
 
   # check that regex doest not match the empty string
   not "" =~ $regex
-    or die "regex $regex matches the empty string: cannot tokenize";
+    or croak "regex $regex matches the empty string: cannot tokenize";
 
   # return tokenizer factory: closure
   return sub { 
-    my $string = shift;
+    my ($string, @other_args) = @_;
+    not @other_args
+      or croak "too many args -- just a single string is expected";
+
     my $term_index = -1;
 
     # return tokenizer : additional closure on $string and $term_index
@@ -63,7 +71,7 @@ sub new {
         $term = Unicode::CaseFold::fc($term) if $lower;
         $term = $filter->($term)             if $filter;
         $filter_in_place->($term)            if $filter_in_place;
-        undef $term            if $stopwords and $stopwords->{$term};
+        undef $term                          if $stopwords and $stopwords->{$term};
 
         # if $term was not cancelled by filters above, return it
         if ($term) {
@@ -72,11 +80,16 @@ sub new {
         }
       } # otherwise, loop again to extract next term
 
-      # otherwise, no more term in input string, return undef or empty list
+      # otherwise, that's the end of the input string, return undef or empty list
       return;
     };
   };
 }
+
+#======================================================================
+# BUILTIN TOKENIZERS
+#======================================================================
+
 
 sub word {
   __PACKAGE__->new(regex => qr/\w+/, @_);
@@ -100,6 +113,22 @@ sub unaccent {
   __PACKAGE__->new(regex           => qr/\p{Word}+/,
                    filter_in_place => $unaccenter,
                    %args);
+}
+
+
+#======================================================================
+# UTILITY FUNCTION
+#======================================================================
+
+sub unroll {
+  my $iterator   = shift;
+  my $no_details = shift;
+  my @results;
+
+  while (my @r = $iterator->() ) {
+    push @results, $no_details ? $r[0] : \@r;
+  }
+  return @results;
 }
 
 
@@ -138,7 +167,7 @@ Search::Tokenizer - Decompose a string into tokens (words)
 
 This module builds an iterator function that will progressively
 extract terms from a given input string. Terms are defined by a
-regular expression (for example C<\w+>).  Term matching relies on the
+regular expression (for example C<\w+>).  Extraction of terms relies on the
 builtin "global match" operator of Perl (the 'g' flag), and therefore
 is quite efficient.
 
@@ -175,15 +204,15 @@ named arguments, has the following available options :
 
 C<$regex> is a compiled regular expression that
 specifies how to match a term; that regular expression should I<not>
-match the empty string (otherwise the tokenizer would enter an
-infinite loop). The default is C<qr/\w+/>. Here are some examples of more
+match the empty string (otherwise the tokenizer would enter into an
+infinite loop). The default is C<qr/\p{Word}+/>. Here are some examples of more
 advanced regexes :
+
+  # perl's basic notion of "word"
+  $regex = qr/\w+/;
 
   # take 'locale' into account
   $regex = do {use locale; qr/\w+/}; 
-
-  # rely on Unicode's definition of "word characters"
-  $regex = qr/\p{Word}+/;
 
   # words like "don't", "it's" are treated as a single term
   $regex = qr/\w+(?:'\w+)?/;
@@ -193,8 +222,8 @@ advanced regexes :
 
 =item C<< lower => $bool >>
 
-If true, the term returned by the C<$regex> is 
-converted to lowercase (or more precisely: is 
+If true, the term returned by the C<$regex> is
+converted to lowercase (or more precisely: is
 "case-folded" through L<Unicode::CaseFold/fc>).
 This option is activated by default.
 
@@ -216,7 +245,7 @@ or from L<Text::Transliterator::Unaccent|Text::Transliterator::Unaccent>.
 =item C<< stopwords => $hashref >>
 
 The keys in C<$hashref> are terms to cancel (usually : common terms
-for which indexing would consume lots of resources with little 
+for which indexing would consume lots of resources with little
 added value). Values in the hash should evaluate to true.
 Lists of stopwords for various languages may be found in
 the L<Lingua::StopWords|Lingua::StopWords> module.
@@ -239,20 +268,21 @@ we get the term sequence
   ("upon", 4,  5,  9, 1)
   ("time", 4, 12, 16, 3)
 
-where terms "once" and "a" in positions 0 and 2 have been canceled.
+where terms "once" and "a" in positions 0 and 2 have been canceled,
+so the only remaining terms are in positions 1 and 3.
 
 =head2 Creating an iterator
 
   my $iterator = $tokenizer->($text);
 
   # loop over terms ..
-  while (my $term = $iterator->()) { 
-    work_with_term($term); 
+  while (my $term = $iterator->()) {
+    work_with_term($term);
   }
 
   # .. or loop over terms with detailed information
-  while (my @term_details = $iterator->()) { 
-    work_with_details(@term_details); # ($term, $len, $start, $end, $index) 
+  while (my @term_details = $iterator->()) {
+    work_with_details(@term_details); # ($term, $len, $start, $end, $index)
   }
 
 The tokenizer takes one string argument and returns an iterator.  The
@@ -261,40 +291,40 @@ string, until the string is exhausted, at which point the iterator
 returns an empty result.
 
 If called in a scalar context, the iterator returns just a string; if
-called in a list context, it returns a tuple composed from
+called in a list context, it returns a tuple composed from :
 
 =over
 
 =item $term
 
-the term (after filtering)
+the term (after filtering);
 
 =item $len
 
-the term length
+the length of this term;
 
 =item $start
 
-the starting offset in the string where this term was found
+the starting offset in the string where this term was found;
 
 =item $end
 
-the end offset (where the search for the next term will start)
+the end offset. This is also the place where the search for the next term will start;
 
 =item $index
 
-the index of this term within the string, starting at 0
+the position of this term within the string, starting at 0.
 
 =back
 
-Length and start/end offsets are computed in characters, not in bytes
-(note for SQLite users : the C layer in SQLite needs byte values, but
+Length and start/end offsets are computed in characters, not in bytes.
+Note for SQLite users : the C layer in SQLite needs byte values, but
 the conversion will be automatically taken care of by the C
-implementation in L<DBD::SQLite>).
+implementation in L<DBD::SQLite>.
 
 Beware that ($end - $start) is the length of the original
-term extracted by the regex, while $len is the length
-of the final $term, after filtering; both
+extracted term, while $len is the length
+of the final $term, after filtering; both lengths
 may differ, especially if stemming is being applied.
 
 =head1 BUILTIN TOKENIZERS
@@ -331,6 +361,18 @@ as C<new()>: for example
 
   use Search::Tokenizer;
   my $tokenizer = Search::Tokenizer::unaccent(lower => 0, stopwords => ...);
+
+
+=head1 UNROLLING THE ITERATOR
+
+=head2 unroll
+
+  my @tokens = Search::Tokenizer::unroll($iterator, $no_details);
+
+This utility method returns the list of all tokens obtained from repetitive
+calls to the C<$iterator>. The C<$no_details> argument is optional; if true,
+the results are just strings, instead of tuples with positional information.
+
 
 =head1 SEE ALSO
 

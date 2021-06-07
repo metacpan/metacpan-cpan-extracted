@@ -1,4 +1,5 @@
 AUTHOR_PLEDGE
+CODE_OF_CONDUCT.md
 CONTRIBUTORS
 Changes
 INSTALL
@@ -7,7 +8,6 @@ MANIFEST
 META.json
 META.yml
 Makefile.PL
-README
 README.mkdn
 SIGNATURE
 cpanfile
@@ -29,5 +29,4 @@ t/00-report-prereqs.dd
 t/00-report-prereqs.t
 t/basic.t
 t/definition.t
-xt/release/pause-permissions.t
 xt/release/unused-vars.t

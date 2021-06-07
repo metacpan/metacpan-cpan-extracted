@@ -11,7 +11,7 @@ use List::Keywords 'reduce';
 {
    is( ( reduce { die "ARGH" } () ), undef, 'reduce on empty list yields undef' );
 
-   is( ( reduce { die "ARGH" } 123 ), 123, 'reduce on singletone list yields value directly' );
+   is( ( reduce { die "ARGH" } 123 ), 123, 'reduce on singleton list yields value directly' );
 }
 
 # basic sum

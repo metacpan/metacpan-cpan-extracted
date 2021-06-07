@@ -1,0 +1,27 @@
+Changes
+INSTALL
+lib/Bin/Data/1D.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+README
+README.md
+scripts/alluniq
+scripts/cat-n
+scripts/chars2code
+scripts/digitdemog
+scripts/entrolines
+scripts/expskip
+scripts/freq
+scripts/gzpaste
+scripts/headomit
+scripts/idmaker
+scripts/linedigest
+scripts/lminusl
+scripts/sampler
+scripts/summing
+scripts/uniq-c
+scripts/venn
+scripts/wc-l
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

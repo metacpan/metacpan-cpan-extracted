@@ -1,4 +1,4 @@
-package Dist::Zilla::Plugin::Author::Plicease::Upload 2.63 {
+package Dist::Zilla::Plugin::Author::Plicease::Upload 2.64 {
 
   use 5.020;
   use Moose;
@@ -101,7 +101,7 @@ Dist::Zilla::Plugin::Author::Plicease::Upload - Upload a dist to CPAN
 
 =head1 VERSION
 
-version 2.63
+version 2.64
 
 =head1 SYNOPSIS
 

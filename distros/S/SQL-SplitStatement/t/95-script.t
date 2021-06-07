@@ -84,8 +84,8 @@ cmp_ok (
 
 $oss = "\n--#\n"; $ofs = "\n--###\n";
 
-$statements = test_script(
-    [ '-s', $oss, '-f', $ofs, '-E', @files ],
+($stderr, $statements) = test_script(
+    [ '-s', $oss, '-f', $ofs, '-m', @files ],
     $oss, $ofs
 );
 
@@ -103,7 +103,6 @@ cmp_ok (
     scalar( @{ $statements->[1] } ), '==', 7,
     'number of statements in the second file - empty statements'
 );
-
 #######
 
 ($stderr, $statements) = test_script(

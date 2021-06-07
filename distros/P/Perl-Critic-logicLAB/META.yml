@@ -1,13 +1,25 @@
 ---
 abstract: 'Perl::Critic policies implemented and used by logicLAB'
 author:
-  - 'Jonas B. Nielsen (jonasbn), <jonasbn@cpan.org>'
-build_requires: {}
+  - 'Jonas B. <jonasbn@cpan.org>'
+build_requires:
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Module::Build: '0.30'
+  Pod::Coverage::TrustPod: '0'
+  Test::Fatal: '0'
+  Test::Kwalitee: '1.21'
+  Test::More: '0'
+  Test::Pod: '1.41'
+  Test::Pod::Coverage: '1.08'
+  Test::Tester: '1.302111'
 configure_requires:
-  Module::Build: '0.42'
-dynamic_config: 1
-generated_by: 'Module::Build version 0.4205, CPAN::Meta::Converter version 2.142060'
-license: artistic
+  ExtUtils::MakeMaker: '0'
+  Module::Build: '0.30'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.017, CPAN::Meta::Converter version 2.150010'
+license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
@@ -15,8 +27,10 @@ name: Perl-Critic-logicLAB
 provides:
   Perl::Critic::logicLAB:
     file: lib/Perl/Critic/logicLAB.pm
-    version: '0.09'
+    version: '0.11'
 requires:
+  Perl::Critic::Policy::InputOutput::ProhibitHighPrecedentLogicalOperatorErrorHandling: '0'
+  Perl::Critic::Policy::RegularExpressions::RequireDefault: '0'
   Perl::Critic::Policy::logicLAB::ModuleBlacklist: '0'
   Perl::Critic::Policy::logicLAB::ProhibitShellDispatch: '0'
   Perl::Critic::Policy::logicLAB::ProhibitUseLib: '0'
@@ -24,13 +38,12 @@ requires:
   Perl::Critic::Policy::logicLAB::RequireParamsValidate: '0'
   Perl::Critic::Policy::logicLAB::RequireSheBang: '0'
   Perl::Critic::Policy::logicLAB::RequireVersionFormat: '0'
-  perl: v5.6.0
+  perl: '5.006'
 resources:
-  bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=Perl-Critic-logicLAB
-  homepage: http://logiclab.jira.com/wiki/display/PCLL/Home
-  license: http://opensource.org/licenses/artistic-license.php
-  projectChangelog: http://logiclab.jira.com/browse/PCLL#selectedTab=com.atlassian.jira.plugin.system.project%3Achangelog-panel
-  projectSite: http://logicLAB.jira.com/browse/PCLL
-  projectWiki: http://logiclab.jira.com/wiki/display/PCLL/Home
-  repository: https://github.com/jonasbn/pcll
-version: '0.09'
+  bugtracker: https://github.com/jonasbn/pcll/issues
+  homepage: https://github.com/jonasbn/perl-critic-logiclab
+  repository: https://github.com/jonasbn/pcll.git
+version: '0.11'
+x_generated_by_perl: v5.32.0
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: Artistic-2.0

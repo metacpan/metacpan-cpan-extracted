@@ -21,11 +21,11 @@ FCGI::Buffer - Verify, Cache and Optimise FCGI Output
 
 =head1 VERSION
 
-Version 0.15
+Version 0.16
 
 =cut
 
-our $VERSION = '0.15';
+our $VERSION = '0.16';
 
 =head1 SYNOPSIS
 
@@ -81,6 +81,7 @@ But that's simple:
 To temporarily prevent the use of server-side caches, for example whilst
 debugging before publishing a code change, set the NO_CACHE environment variable
 to any non-zero value.
+This will also stop ETag being added to the header.
 If you get errors about Wide characters in print it means that you've
 forgotten to emit pure HTML on non-ascii characters.
 See L<HTML::Entities>.
@@ -102,9 +103,14 @@ Create an FCGI::Buffer object.  Do one of these for each FCGI::Accept.
 
 # FIXME: Call init() on any arguments that are given
 sub new {
-	my $class = shift;
+	my $proto = shift;
+	my $class = ref($proto) || $proto;
 
-	return unless($class);
+	# Use FCGI::Buffer->new(), not FCGI::Buffer::new()
+	if(!defined($class)) {
+		carp(__PACKAGE__, ' use ->new() not ::new() to instantiate');
+		return;
+	}
 
 	my $buf = IO::String->new();
 
@@ -402,7 +408,7 @@ sub DESTROY {
 						push @{$self->{o}}, 'X-Cache-Lookup: HIT';
 					}
 				} else {
-					carp "Error retrieving data for key $key";
+					carp( __PACKAGE__, ": error retrieving data for key $key");
 				}
 			}
 
@@ -512,7 +518,7 @@ sub DESTROY {
 					if($self->{logger}) {
 						$self->{logger}->debug('Set Last-Modified to ', HTTP::Date::time2str($self->{cobject}->created_at()));
 					}
-					push @{$self->{o}}, "Last-Modified: " . HTTP::Date::time2str($self->{cobject}->created_at());
+					push @{$self->{o}}, 'Last-Modified: ' . HTTP::Date::time2str($self->{cobject}->created_at());
 				}
 			}
 		} else {
@@ -616,7 +622,7 @@ sub DESTROY {
 							my $script_name = $ENV{'SCRIPT_NAME'};
 							$copy =~ s/<a\s+href="(\?.+?)"/<a href="$script_name$1"/gi;
 
-							# Avoide Wide character
+							# Avoid Wide character
 							unless($self->{_encode_loaded}) {
 								require Encode;
 								$self->{_encode_loaded} = 1;
@@ -644,9 +650,9 @@ sub DESTROY {
 				if($self->{generate_last_modified}) {
 					$self->{cobject} = $self->{cache}->get_object($key);
 					if(defined($self->{cobject})) {
-						push @{$self->{o}}, "Last-Modified: " . HTTP::Date::time2str($self->{cobject}->created_at());
+						push @{$self->{o}}, 'Last-Modified: ' . HTTP::Date::time2str($self->{cobject}->created_at());
 					} else {
-						push @{$self->{o}}, "Last-Modified: " . HTTP::Date::time2str(time);
+						push @{$self->{o}}, 'Last-Modified: ' . HTTP::Date::time2str(time);
 					}
 				}
 			}
@@ -674,6 +680,17 @@ sub DESTROY {
 	} elsif($self->{info}) {
 		my $host_name = $self->{info}->host_name();
 		push @{$self->{o}}, ("X-Cache: MISS from $host_name", "X-Cache-Lookup: MISS from $host_name");
+		if($self->{generate_last_modified}) {
+			if(my $age = $self->_my_age()) {
+				push @{$self->{o}}, 'Last-Modified: ' . HTTP::Date::time2str($age);
+			}
+		}
+		if($ENV{'HTTP_IF_MODIFIED_SINCE'} && ($self->{status} != 304) && $self->{generate_304}) {
+			$self->_check_modified_since({
+				since => $ENV{'HTTP_IF_MODIFIED_SINCE'},
+				modified => $self->_my_age()
+			});
+		}
 		if($self->_save_to($unzipped_body, $dbh) && $encoding) {
 			$self->_compress({ encoding => $encoding });
 		}
@@ -687,7 +704,7 @@ sub DESTROY {
 			if($self->{logger}) {
 				$self->{logger}->debug("Set ETag to $self->{etag}");
 			}
-		} elsif($self->{logger} && (($self->{status} == 200) || $self->{status} == 304) && $self->{body} && !$self->is_cached()) {
+		} elsif($self->{logger} && (($self->{status} == 200) || $self->{status} == 304) && $self->{body} && (!$ENV{'NO_CACHE'}) && !$self->is_cached()) {
 			# open(my $fout, '>>', '/tmp/FCGI-bug');
 			# print $fout "BUG: ETag not generated, status $self->{status}:\n",
 				# $headers,
@@ -816,7 +833,7 @@ sub _check_modified_since {
 		$self->{logger}->debug("_check_modified_since: Compare $$params{modified} with $s");
 	}
 	if($$params{modified} <= $s) {
-		push @{$self->{o}}, "Status: 304 Not Modified";
+		push @{$self->{o}}, 'Status: 304 Not Modified';
 		$self->{status} = 304;
 		$self->{send_body} = 0;
 		if($self->{logger}) {
@@ -1047,8 +1064,11 @@ sub init {
 	if(defined($params{save_to}) && $self->can_cache()) {
 		if(my $dir = $params{'save_to'}->{'directory'}) {
 			if(! -d $dir) {
-				Carp::carp("$dir isn't a directory");
-				return;
+				mkdir $dir;
+				if(! -d $dir) {
+					Carp::carp("$dir isn't a directory");
+					return;
+				}
 			}
 			if(! -w $dir) {
 				Carp::carp("$dir isn't writeable");
@@ -1056,8 +1076,8 @@ sub init {
 			}
 		}
 		$self->{save_to} = $params{save_to};
-		if(!exists($params{save_to})) {
-			$self->{save_to} = 600;
+		if(!exists($params{save_to}->{'ttl'})) {
+			$self->{save_to}->{'ttl'} = 600;
 		}
 	} elsif(exists($params{'save_to'}) && !defined($params{'save_to'})) {
 		delete $self->{'save_to'};
@@ -1218,6 +1238,10 @@ sub is_cached {
 	unless($self->{cache}) {
 		if($self->{logger}) {
 			$self->{logger}->debug("is_cached: cache hasn't been enabled");
+			my $i = 0;
+                        while((my @call_details = (caller($i++)))) {
+                                $self->{logger}->debug($call_details[1], ':', $call_details[2], ' calling function ', $call_details[3]);
+                        }
 		}
 		return 0;
 	}
@@ -1652,7 +1676,7 @@ The licence for cgi_buffer is:
 
     This software is provided 'as is' without warranty of any kind."
 
-The rest of the program is Copyright 2015-2020 Nigel Horne,
+The rest of the program is Copyright 2015-2021 Nigel Horne,
 and is released under the following licence: GPL2
 
 =cut

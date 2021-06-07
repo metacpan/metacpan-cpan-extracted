@@ -8,40 +8,10 @@ use ExtUtils::MakeMaker::Config;
 use File::Spec;
 
 # file globals(!)
-my ($pdl_f77conf, $forcebuild);
-my ($seen_f77conf);
+my ($pdl_f77conf, $seen_f77conf);
 
 sub checkbuggysetup {
     # detect buggy Perl setups
-    if (!$forcebuild &&
-	$Config{osname} eq 'solaris' &&
-	($Config{cc} =~ /gcc/ || $Config{gccversion} ne '') &&
-	$Config{usemymalloc} eq 'y'
-	) {
-	die <<'EOM';
-
-FATAL BUG IN YOUR PERL SETUP DETECTED. BUILD TERMINATED.
-
-On this platform the combination of gcc and the Perl malloc
-are buggy. The optimizations lead to random coredumps
-and make PDL essentially unusable.
-
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-WORKAROUND: YOU MUST RECOMPILE PERL WITH 'usemymalloc=n' !!!
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-You may override and force the build by including the
-'FORCE' switch:
-
-  perl Makefile.PL FORCE
-
-However, you will most likely end up with an unusable
-PDL build unless *all* optimizations are disabled!
-YOU HAVE BEEN WARNED!!
-
-EOM
-  }
-
     my($dot);
     for(@INC) {$dot += $_ eq '.'}
     $dot-- if($INC[-1] eq '.');
@@ -166,45 +136,16 @@ use warnings;
 	if (/^F77CONF=(.*)$/) {
 		$seen_f77conf=1;
 		$pdl_f77conf=$1; ();
-	} elsif (/^FORCE$/i) {
-		$forcebuild=1;
-		();
         } else {
 		$_
 	}
 } @ARGV;
-
-warn "WARNING: forcing build...\n" if $forcebuild;
 
 checkbuggysetup(); # check for buggy Perl setups
 
 # needs to be called before any of the make_XX routines
 getpdl_config();
 $seen_f77conf = check_f77conf($seen_f77conf);
-
-# Check environment for SKIP_KNOWN_PROBLEMS
-if (!defined($PDL::Config{SKIP_KNOWN_PROBLEMS}) and defined($ENV{SKIP_KNOWN_PROBLEMS})) {
-   $PDL::Config{SKIP_KNOWN_PROBLEMS} = $ENV{SKIP_KNOWN_PROBLEMS};
-   warn "Makefile.PL: setting SKIP_KNOWN_PROBLEMS Config from environment value: $ENV{SKIP_KNOWN_PROBLEMS}";
-}
-# Add check for POGL if USE_POGL is enabled
-if (!defined($PDL::Config{USE_POGL}) or +$PDL::Config{USE_POGL}) {
-   eval "use OpenGL $PDL::Config{POGL_VERSION} qw();";
-   if ($@) {
-      if (defined($PDL::Config{USE_POGL})) {
-         warn "Makefile.PL: DEPENDENCY ERROR: USE_POGL requires at least OpenGL version $PDL::Config{POGL_VERSION}!\n";
-         exit 0;
-      } else {
-         warn "Makefile.PL: OpenGL-$PDL::Config{POGL_VERSION} not found, setting \$PDL::Config{USE_POGL} => 0\n";
-         $PDL::Config{USE_POGL} = 0;
-      }
-   } else {
-      # Have OpenGL so set USE_POGL option if needed
-      $PDL::Config{USE_POGL} ||= 1;
-   }
-} else {
-   warn "Makefile.PL: Have \$PDL::Config{USE_POGL} => 0 so skipping TriD build with POGL\n";
-}
 
 # this will make PDL::Core::Dev's functions available
 # in Makefile.PL files in all subdirectories
@@ -213,34 +154,38 @@ require "./Basic/Core/Dev.pm"; PDL::Core::Dev->import();
 my @podpms = map { $_.".pod", '$(INST_LIBDIR)/PDL/' . $_ .".pod"}
   qw/Bugs/;
 
-my @prereq = (
-           'Convert::UU'         => 0,         # for PDL::IO::Dumper
-           'Data::Dumper'        => 2.121,     # for PDL::IO::Dumper
-	   'File::Map'           => 0.57,      # test new mmap implementation
-	   'Filter::Util::Call'  => 0,         # for PDL::NiceSlice
-	   'Filter::Simple'      => 0.88,      # for new PDL::NiceSlice
-	   'Inline'              => 0.83,      # fixed ILSM-finding
-	   'Inline::C'           => 0.62,
-           'List::Util'          => '1.33',
-	   'Pod::Parser'         => 0,         # version TBD for PDL::Doc
-	   'Pod::Select'         => 0,         # version TBD for PDL::Doc
-           'Scalar::Util'        => 0,
-           'Storable'            => 1.03,      # for PDL::IO::Storable
-           'Term::ReadKey'       => 2.34,      #for perldl shell
-           'Text::Balanced'      => 1.89,      # for PDL::NiceSlice
-           'autodie'             => 0,         # for PDL::Graphics::LUT, Centos 7 doesn't have
-           'Math::Complex'       => 0,
-	  );
-
-# add OpenGL version dependency for CPAN to follow
-push @prereq, ('OpenGL' => $PDL::Config{POGL_VERSION}) if $PDL::Config{USE_POGL};
-
-# push @prereq, ('ExtUtils::F77' => 1.10) unless $seen_f77conf;
+my @cpan_deps = my @prereq = (
+  'Convert::UU'         => 0,         # for PDL::IO::Dumper
+  'Data::Dumper'        => 2.121,     # for PDL::IO::Dumper
+  'File::Map'           => 0.57,      # test new mmap implementation
+  'Filter::Util::Call'  => 0,         # for PDL::NiceSlice
+  'Filter::Simple'      => 0.88,      # for new PDL::NiceSlice
+  'List::Util'          => '1.33',
+  'Pod::Parser'         => 0,         # version TBD for PDL::Doc
+  'Pod::Select'         => 0,         # version TBD for PDL::Doc
+  'Scalar::Util'        => 0,
+  'Storable'            => 1.03,      # for PDL::IO::Storable
+  'Term::ReadKey'       => 2.34,      #for perldl shell
+  'Text::Balanced'      => 1.89,      # for PDL::NiceSlice
+  'Math::Complex'       => 0,
+);
+my %min_version = (
+  'OpenGL' => '0.70', # see also Graphics/Makefile.PL
+  'ExtUtils::F77' => '1.26', # eg 1.20 can leave off -lgfortran
+  'Inline'              => 0.83,      # fixed ILSM-finding
+  'Inline::C'           => 0.62,
+);
+for my $opt_dep (sort keys %min_version) {
+  (my $file = $opt_dep) =~ s#::#/#g;
+  next if !eval { require "$file.pm"; 1 }; # not installed, fine
+  next if eval { $opt_dep->VERSION($min_version{$opt_dep}); 1 };
+  push @prereq, $opt_dep => $min_version{$opt_dep};
+}
 
 my @exe_files = qw(perldl pdldoc);
 push @exe_files, "pdl$Config{exe_ext}" if $^O !~ /MSWin/;
 my @cleanup = ("pdl$Config{exe_ext}", qw(
-    pdldoc.db pdldoc.pod perldl.pod Changes.new
+  pdldoc.db pdldoc.pod perldl.pod
 ));
 
 ##############################
@@ -308,6 +253,8 @@ my %makefile_hash = (
            suggests => {
               'Astro::FITS::Header' => 0,
            },
+           recommends => \%min_version,
+           requires => { @cpan_deps },
         },
      },
   },

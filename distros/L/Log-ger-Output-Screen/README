@@ -2,7 +2,7 @@ NAME
     Log::ger::Output::Screen - Output log to screen
 
 VERSION
-    version 0.016
+    version 0.017
 
 SYNOPSIS
      use Log::ger::Output Screen => (
@@ -38,6 +38,9 @@ CONFIGURATION
     applied with colors) to this custom formatter.
 
 ENVIRONMENT
+  COLOR_DEPTH
+    Will be used as a default for "color_depth" configuration.
+
   NO_COLOR
     Can be set (to anything) to disable color by default, if "/use_color" is
     not set. Consulted before "COLOR".

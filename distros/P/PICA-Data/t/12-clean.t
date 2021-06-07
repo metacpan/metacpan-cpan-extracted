@@ -30,10 +30,10 @@ check([['123A','','a', 'b', 'a']],
     ["Annotation must not be non-alphanumeric character"], 'report invalid annotation');
 
 check([['123A','','a', 'b', 'a']],
-    ["Field annotation not allowed"], 'report unwanted annotation', annotated => 0);
+    ["Field annotation not allowed"], 'report unwanted annotation', check_annotation => 0);
 
 check([['123A','','a', 'b']],
-    ["Missing field annotation"], 'report missing annotation', annotated => 1);
+    ["Missing field annotation"], 'report missing annotation', check_annotation => 1);
 
 check([['234A',$_,'a','x']], [], 'be lax on occurrences')
     for '', undef, 0, 1, '1', '999'; 

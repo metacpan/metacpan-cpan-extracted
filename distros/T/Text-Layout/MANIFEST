@@ -12,6 +12,8 @@ README
 t/00-load.t
 t/100-pdfapi.t
 t/102-pdfapi.t
+t/150-pdfbuilder.t
+t/152-pdfbuilder.t
 tests/pdfapi1.pl
 tests/pdfapi2.pl
 tests/md1.pl

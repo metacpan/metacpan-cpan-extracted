@@ -1,0 +1,9 @@
+Revision history for the module "Bin::File::Dir" : 
+
+0.300   2021-05-26
+        最初に作成。5個のコマンドを収録。
+        csel csv2tsv joinn mtranspose xlsx2tsv
+
+0.310   2021-05-28T23:40+0900
+        joinnをjoin2に変更。N個のファイルをデータセットと見なし、joinするような別のコマンドをjoinn と命名したくなったため。
+        .gitignore と MANIFEST.SKIP の書き換え。https://gist.github.com/miyagawa/4966350 に基づいて。

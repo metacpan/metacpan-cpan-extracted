@@ -1,0 +1,35 @@
+Zapp
+
+Zapp is a graphical workflow builder that provides a UI to build and
+execute jobs.
+
+For documentation on running and using Zapp, see Zapp::Guides.
+
+This file documents the main application class, Zapp. This class can be
+used to embed Zapp into an existing Mojolicious application
+<https://docs.mojolicious.org/Mojolicious/Guides/Routing#Embed-applicati
+ons>, or can be extended to add customizations.
+
+INSTALLATION
+
+This is a Perl module distribution. It should be installed with whichever
+tool you use to manage your installation of Perl, e.g. any of
+
+  cpanm .
+  cpan  .
+  cpanp -i .
+
+Consult http://www.cpan.org/modules/INSTALL.html for further instruction.
+Should you wish to install this module manually, the procedure is
+
+  perl Makefile.PL
+  make
+  make test
+  make install
+
+COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2021 by Doug Bell.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

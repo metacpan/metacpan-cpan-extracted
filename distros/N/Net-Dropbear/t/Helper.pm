@@ -27,6 +27,11 @@ chmod 0500, glob("$FindBin::Bin/test*");
 my $last_pty;
 $SIG{'CHLD'} = 'IGNORE';
 
+if ( $< <= 0 )
+{
+  $Net::Dropbear::SSHd::_will_run_as_root = 1;
+}
+
 sub needed_output
 {
   my %test_map;

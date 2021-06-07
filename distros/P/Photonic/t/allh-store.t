@@ -122,7 +122,7 @@ my $fn = make_fn(); #output file name
 	push @readstates, fd_retrieve($fh);
 	push @savedstates, $si->nextval;
     }
-    ok(agree(pdl(@readstates)->real, pdl(@savedstates)->real), "1D T states");
+    ok(Cagree(pdl(@readstates), pdl(@savedstates)), "1D T states");
 }
 
 done_testing;

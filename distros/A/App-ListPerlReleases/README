@@ -2,8 +2,8 @@ NAME
     App::ListPerlReleases - List Perl releases
 
 VERSION
-    This document describes version 0.001 of App::ListPerlReleases (from
-    Perl distribution App-ListPerlReleases), released on 2018-06-24.
+    This document describes version 0.003 of App::ListPerlReleases (from
+    Perl distribution App-ListPerlReleases), released on 2021-05-29.
 
 SYNOPSIS
     See the included script list-perl-releases.
@@ -16,7 +16,7 @@ FUNCTIONS
   list_perl_releases
     Usage:
 
-     list_perl_releases(%args) -> [status, msg, result, meta]
+     list_perl_releases(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
     List of Perl releases.
 
@@ -31,6 +31,10 @@ FUNCTIONS
         Return array of full records instead of just ID fields.
 
         By default, only the key (ID) field is returned per result entry.
+
+    *   exclude_fields => *array[str]*
+
+        Select fields to return.
 
     *   fields => *array[str]*
 
@@ -60,30 +64,60 @@ FUNCTIONS
         with '-' to specify descending order instead of the default
         ascending.
 
-    *   tarball => *filename*
+    *   tarball => *str*
 
         Only return records where the 'tarball' field equals specified
         value.
 
-    *   tarball.in => *array[filename]*
+    *   tarball.contains => *str*
+
+        Only return records where the 'tarball' field contains specified
+        text.
+
+    *   tarball.in => *array[str]*
 
         Only return records where the 'tarball' field is in the specified
         values.
 
-    *   tarball.is => *filename*
+    *   tarball.is => *str*
 
         Only return records where the 'tarball' field equals specified
         value.
 
-    *   tarball.isnt => *filename*
+    *   tarball.isnt => *str*
 
         Only return records where the 'tarball' field does not equal
         specified value.
 
-    *   tarball.not_in => *array[filename]*
+    *   tarball.max => *str*
+
+        Only return records where the 'tarball' field is less than or equal
+        to specified value.
+
+    *   tarball.min => *str*
+
+        Only return records where the 'tarball' field is greater than or
+        equal to specified value.
+
+    *   tarball.not_contains => *str*
+
+        Only return records where the 'tarball' field does not contain
+        specified text.
+
+    *   tarball.not_in => *array[str]*
 
         Only return records where the 'tarball' field is not in the
         specified values.
+
+    *   tarball.xmax => *str*
+
+        Only return records where the 'tarball' field is less than specified
+        value.
+
+    *   tarball.xmin => *str*
+
+        Only return records where the 'tarball' field is greater than
+        specified value.
 
     *   version => *str*
 
@@ -150,12 +184,12 @@ FUNCTIONS
 
     Returns an enveloped result (an array).
 
-    First element (status) is an integer containing HTTP status code (200
-    means OK, 4xx caller error, 5xx function error). Second element (msg) is
-    a string containing error message, or 'OK' if status is 200. Third
-    element (result) is optional, the actual result. Fourth element (meta)
-    is called result metadata and is optional, a hash that contains extra
-    information.
+    First element ($status_code) is an integer containing HTTP status code
+    (200 means OK, 4xx caller error, 5xx function error). Second element
+    ($reason) is a string containing error message, or "OK" if status is
+    200. Third element ($payload) is optional, the actual result. Fourth
+    element (%result_meta) is called result metadata and is optional, a hash
+    that contains extra information.
 
     Return value: (any)
 
@@ -186,7 +220,7 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2018 by perlancar@cpan.org.
+    This software is copyright (c) 2021, 2018 by perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

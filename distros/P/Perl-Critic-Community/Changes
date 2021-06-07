@@ -1,0 +1,136 @@
+v1.0.0    2021-05-27 02:44:33 EDT
+  - Rename to Perl::Critic::Community and move policies to the 'community'
+    theme (Freenode modules and theme remain as legacy aliases)
+
+0.033     2020-12-21 19:39:58 EST
+  - Update various recommendations for alternatives in DiscouragedModules policy
+  - Add better examples for EmptyReturn (#39) and Each policies
+
+0.032     2019-11-11 11:09:08 EST
+  - Add check for CORE::wantarray and CORE'wantarray to WantArray policy (simcop2387 #37)
+
+0.031     2019-09-25 19:00:39 EDT
+  - Add FindBin to DiscouragedModules policy (#31)
+  - Add MultidimensionalArrayEmulation policy (#35)
+
+0.030     2019-08-26 11:27:15 EDT
+  - Allow signature_enablers to be configured for Prototypes policy (#34)
+
+0.029     2019-04-26 13:12:43 EDT
+  - Added LexicalForeachIterator policy
+  - Require PPI 1.252+ allowing simplifications to the DeprecatedFeatures and
+    WhileDiamondDefaultAssignment policies
+
+0.028     2018-11-29 19:32:49 EST
+  - Split out lower severity violations from DiscouragedModules policy into a
+    new PreferredAlternatives policy. Perl::Critic does not support filtering
+    individual violations by severity, only policies, so this will allow
+    separately configuring and filtering these violations.
+  - Fixed DiscouragedModules and DeprecatedFeatures policy violations to report
+    severity as configured.
+  - Fixed DeprecatedFeatures to avoid false positives on method calls with the
+    same name as autoderef functions.
+  - Added /\C/, chdir(''), and bare here-docs to DeprecatedFeatures policy.
+
+0.027     2018-06-20 20:17:06 EDT
+  - Add LoopOnHash policy
+
+0.026     2018-02-16 20:50:14 EST
+  - Update Prototypes policy to recognize more ways of activating the signatures feature
+
+0.025     2018-02-11 01:31:58 EST
+  - Fix DeprecatedFeatures to recognize correctly-parsed postderef in PPI 1.237+
+  - Avoid warning from running PackageMatchesFilename policy on a document without a filename (willt #29)
+  - Fix another false positive in DollarAB policy
+
+0.024     2017-08-16 22:39:53 EDT
+  - Make PackageMatchesFilename more robust against infinite loops
+
+0.023     2017-08-16 22:22:40 EDT
+  - Fix issue where PackageMatchesFilename policy would loop infinitely
+
+0.022     2017-08-16 22:17:38 EDT
+  - Also consider -W a violation of WarningsSwitch policy
+  - Fix false positive in DollarAB policy where $a or $b is within another block
+  - Add PackageMatchesFilename policy
+
+0.021     2017-06-03 19:49:16 EDT
+  - Be more lenient when trying to detect postderef for DeprecatedFeatures autoderef violations
+
+0.020     2017-05-15 20:45:02 EDT
+  - Updates to documentation for DeprecatedFeatures and DiscouragedModules policies
+  - Add require ::Foo::Bar to DeprecatedFeatures policy
+  - Remove qr//xx from DeprecatedFeatures policy as this is now a valid regex modifier in 5.26.
+
+0.019     2017-01-29 22:13:34 EST
+  - Add autoderef to DeprecatedFeatures policy
+
+0.018     2016-12-08 21:32:40 EST
+  - Add IndirectObjectNotation policy
+
+0.017     2016-09-29 17:24:15 EDT
+  - DeprecatedFeatures will now consider "use UNIVERSAL;" a policy violation
+  - Add OverloadOptions policy
+
+0.016     2016-07-02 17:53:20 EDT
+  - Support <<>> operator in WhileDiamondDefaultAssignment policy
+  - Fixes for DeprecatedFeatures checking of /xx violations
+
+0.015     2016-07-02 03:20:35 EDT
+  - add ArrayAssignAref policy
+  - update DeprecatedFeatures policy with features deprecated in 5.22 and to be removed in 5.26
+
+0.014     2016-01-26 20:45:18 EST
+  - allow pairwise in DollarAB policy
+  - allow DollarAB pair functions to be extended
+
+0.013     2015-12-17 18:07:03 EST
+  - Add ConditionalDeclarations policy
+
+0.012     2015-10-16 15:13:21 EDT
+  - add IO::Socket::INET6 to discouraged modules
+  - Fix EmptyReturn to avoid reporting violations in void context functions
+  - Add POSIXImports policy
+  - Add ConditionalImplicitReturn policy
+
+0.011     2015-09-15 13:32:44 EDT
+  - add Getopt::Std to discouraged modules
+  - Fix EmptyReturn to catch more cases
+  - Add DeprecatedFeatures policy
+
+0.010     2015-08-28 17:11:40 EDT
+  - Fix Changes
+  - Change installer to Module::Build::Tiny
+
+0.009     2015-08-27 15:09:22 EDT
+  - Add Class::DBI, Error.pm, and Readonly.pm to discouraged modules
+
+0.008     2015-08-25 21:42:10 EDT
+  - Various documentation updates
+  - Add Switch.pm to discouraged modules
+
+0.007     2015-08-15 17:18:23 EDT
+  - fix StrictWarnings parsing of "use VERSION" (Tux)
+  - handle readline/readdir/each in WhileDiamondDefaultAssignment
+
+0.006     2015-07-30 22:34:15 EDT
+  - just use core policy for AmpersandSubCalls
+  - add clarification for policies that are similar to core policies
+
+0.005     2015-07-13 10:49:45 EDT
+  - fix false positives in DollarAB policy
+
+0.004     2015-07-01 17:21:16 EDT
+  - use default strict/warnings importers from Perl::Critic::Utils::Constants
+
+0.003     2015-06-27 17:53:00 EDT
+  - allow prototypes containing &
+  - add Each polciy
+  - make StrictWarnings policy configurable with extra importers
+
+0.002     2015-06-27 00:07:19 EDT
+  - add AmpersandSubCalls policy
+  - add policy abstracts
+
+0.001     2015-06-26 21:01:32 EDT
+  - First release

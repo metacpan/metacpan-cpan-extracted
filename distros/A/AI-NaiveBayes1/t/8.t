@@ -3,6 +3,7 @@
 use Test::More tests => 2;
 use_ok("AI::NaiveBayes1");
 
+use lib '.';
 require 't/auxfunctions.pl';
 
 my $nb;

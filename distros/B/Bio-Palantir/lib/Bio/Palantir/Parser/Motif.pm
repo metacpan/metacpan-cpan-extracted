@@ -1,6 +1,6 @@
 package Bio::Palantir::Parser::Motif;
 # ABSTRACT: BiosynML DTD-derived internal class
-$Bio::Palantir::Parser::Motif::VERSION = '0.201670';
+$Bio::Palantir::Parser::Motif::VERSION = '0.211420';
 use Moose;
 use namespace::autoclean;
 
@@ -166,7 +166,7 @@ Bio::Palantir::Parser::Motif - BiosynML DTD-derived internal class
 
 =head1 VERSION
 
-version 0.201670
+version 0.211420
 
 =head1 SYNOPSIS
 

@@ -1,0 +1,44 @@
+Changes
+INSTALL.SKIP
+lib/Plack/Handler/UniEvent/HTTP.pm
+lib/Plack/Handler/UniEvent/HTTP.pod
+lib/UniEvent/HTTP/Manager.pm
+lib/UniEvent/HTTP/Manager.pod
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+misc/app.psgi
+misc/mytest.plx
+misc/run_xs.plx
+src/panda/unievent/http/manager.h
+src/panda/unievent/http/manager/Child.cc
+src/panda/unievent/http/manager/Child.h
+src/panda/unievent/http/manager/Manager.cc
+src/panda/unievent/http/manager/Manager.h
+src/panda/unievent/http/manager/Mpm.cc
+src/panda/unievent/http/manager/Mpm.h
+src/panda/unievent/http/manager/PreFork.cc
+src/panda/unievent/http/manager/PreFork.h
+src/panda/unievent/http/manager/StlThread.cc
+src/panda/unievent/http/manager/StlThread.h
+src/panda/unievent/http/manager/Thread.cc
+src/panda/unievent/http/manager/Thread.h
+src/panda/unievent/http/manager/unix.icc
+src/panda/unievent/http/manager/windows.icc
+src/xs/unievent/http/manager.cc
+src/xs/unievent/http/manager.h
+t/02-prefork-spawn_callback.t
+t/03-prefork-request.t
+t/04-prefork-master-death.t
+t/10-mpm.cc
+t/10-mpm.t
+t/11-thread-model.cc
+t/11-thread-model.t
+t/lib/IPCToken.pm
+t/lib/MyTest.pm
+t/lib/MyTest.xs
+t/plack-handler.t
+xs/main.xs
+xs/PerlThread.h
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

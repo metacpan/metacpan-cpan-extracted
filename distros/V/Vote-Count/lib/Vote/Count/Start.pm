@@ -1,6 +1,8 @@
 package Vote::Count::Start;
 
-use 5.022;
+use 5.024;
+use strict;
+use warnings;
 use feature qw/postderef signatures/;
 no warnings qw/experimental/;
 use Path::Tiny 0.108;
@@ -11,13 +13,13 @@ use Try::Tiny;
 use Vote::Count;
 use Vote::Count::ReadBallots 'read_ballots';
 
-our $VERSION='1.10';
+our $VERSION='2.00';
 
 =head1 NAME
 
 Vote::Count::Start
 
-=head1 VERSION 1.10
+=head1 VERSION 2.00
 
 =cut
 
@@ -39,7 +41,7 @@ Vote::Count::Start
 
 =head1 Description
 
-Does common startup steps useful accross methods. Written to avoid a lot of Boiler Plate for the common case of running an election and beginning with a summary of the votes and the winners by the basic simple methods
+Does common startup steps useful accross methods. It includes a lot of the boiler plate for common usage. Use for resolving elections where the rules don't require customization, or as an example for writing more customized methods.
 
 =over
 
@@ -154,7 +156,7 @@ sub _do_approval ( $Election ) {
 
 sub _do_borda ( $Election ) {
   my $Borda = $Election->Approval();
-  $Election->logv( "\Borda Count", $Borda->RankTable(), );
+  $Election->logv( "Borda Count", $Borda->RankTable(), );
   my $AWinner = $Borda->Leader();
   if ( $AWinner->{'winner'} ) {
     $Election->logt( "Borda Winner: " . $AWinner->{'winner'}, '' );
@@ -228,11 +230,15 @@ John Karr (BRAINBUZ) brainbuz@cpan.org
 
 CONTRIBUTORS
 
-Copyright 2019 by John Karr (BRAINBUZ) brainbuz@cpan.org.
+Copyright 2019-2021 by John Karr (BRAINBUZ) brainbuz@cpan.org.
 
 LICENSE
 
 This module is released under the GNU Public License Version 3. See license file for details. For more information on this license visit L<http://fsf.org>.
+
+SUPPORT
+
+This software is provided as is, per the terms of the GNU Public License. Professional support and customisation services are available from the author.
 
 =cut
 

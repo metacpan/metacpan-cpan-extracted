@@ -1,11 +1,12 @@
 package App::fiatx;
 
-our $DATE = '2018-06-27'; # DATE
-our $VERSION = '0.007'; # VERSION
+our $DATE = '2021-05-26'; # DATE
+our $VERSION = '0.008'; # VERSION
 
 use 5.010001;
 use strict;
 use warnings;
+use Log::ger;
 
 use Finance::Currency::FiatX;
 
@@ -19,7 +20,6 @@ $SPEC{':package'} = {
 our %args_db = (
     db_name => {
         schema => 'str*',
-        req => 1,
         tags => ['category:database-connection'],
     },
     # XXX db_host
@@ -34,16 +34,19 @@ our %args_db = (
     },
 );
 
-our %arg_per_type = (
-    per_type => {
-        summary => 'Return one row of result per rate type',
-        schema => 'bool*',
-        description => <<'_',
+my %arg_sources = (
+    sources => {
+        'x.name.is_plural' => 1,
+        'x.name.singular' => 'source',
+        schema => ['array*', of=>['str*']],
+        cmdline_aliases => {s=>{}},
+    },
+);
 
-This allow seeing notes and different mtime per rate type, which can be
-different between different types of the same source.
-
-_
+my %arg_type = (
+    type => {
+        schema => 'str*',
+        cmdline_aliases => {t=>{}},
     },
 );
 
@@ -61,98 +64,212 @@ sub _connect {
     );
 }
 
-$SPEC{sources} = {
+$SPEC{fiatx} = {
     v => 1.1,
-    summary => 'List available sources',
-    args => {
-    },
-};
-sub sources {
-    require PERLANCAR::Module::List;
-
-    my @res;
-    my $mods = PERLANCAR::Module::List::list_modules(
-        'Finance::Currency::FiatX::Source::', {list_modules=>1});
-    unless (keys %$mods) {
-        return [412, "No source modules available"];
-    }
-    for my $src (sort keys %$mods) {
-        $src =~ s/^Finance::Currency::FiatX::Source:://;
-        push @res, $src;
-    }
-
-    [200, "OK", \@res];
-}
-
-my %arg_0_source = (
-    source => {
-        %{ $Finance::Currency::FiatX::arg_source{source} },
-        pos => 0,
-        default => ':all',
-    },
-);
-
-my %arg_1_pair = (
-    pair => {
-        schema => 'currency::pair*',
-        pos => 1,
-    },
-);
-
-my %arg_2_type = (
-    type => {
-        %{ $Finance::Currency::FiatX::args_spot_rate{type} },
-        pos => 2,
-    },
-);
-
-$SPEC{spot_rates} = {
-    v => 1.1,
-    summary => 'Get spot (latest) rate(s) from a source',
+    summary => 'Currency exchange rate tool',
     args => {
         %args_db,
         %Finance::Currency::FiatX::args_caching,
-        %arg_0_source,
-        %arg_1_pair,
-        %arg_2_type,
-        %arg_per_type,
+        %arg_sources,
+        query => {
+            schema => 'str*',
+            pos => 0,
+        },
+        action => {
+            schema => 'str*',
+            default => 'get_spot_rates',
+            cmdline_aliases => {
+                l => {is_flag=>1, summary=>"Shortcut for --action=list_sources", code=>sub{ $_[0]{action} = 'list_sources' }},
+            },
+        },
+        default_quote_currency => {
+            schema => 'fiat_or_cryptocurrency*',
+        },
     },
 };
-sub spot_rates {
+sub fiatx {
     my %args = @_;
 
-    my $source = $args{source};
-    my $pair   = $args{pair};
-    my $type   = $args{type};
+    my $action = $args{action} // 'get_spot_rates';
+    my $type = $args{type};
 
-    my ($from, $to); ($from, $to) = $pair =~ m!(.+)/(.+)! if $pair;
-
-    my $dbh = _connect(\%args);
-
-    my $rows0;
-
-    if ($source ne ':all' && $pair && $type) {
-        my $bres = Finance::Currency::FiatX::get_spot_rate(
-            dbh => $dbh,
-            max_age_cache => $args{max_age_cache},
-            source        => $source,
-            from          => $from,
-            to            => $to,
-            type          => $type,
-        );
-        return $bres unless $bres->[0] == 200 || $bres->[0] == 304;
-        $rows0 = [$bres->[2]];
-    } else {
-        my $bres = Finance::Currency::FiatX::get_all_spot_rates(
-            dbh => $dbh,
-            max_age_cache => $args{max_age_cache},
-            source        => $source,
-        );
-        return $bres unless $bres->[0] == 200 || $bres->[0] == 304;
-        $rows0 = $bres->[2];
+    if ($action eq 'list_sources') {
+        return Finance::Currency::FiatX::list_rate_sources();
     }
 
-    my @rows;
+    my $sources = $args{sources} // [];
+    push @$sources, ':any' unless @$sources;
+    {
+        my $special;
+        my $num_special = 0;
+        my $num_regular = 0;
+        for (@$sources) {
+            if (/\Q:/) {
+                $special //= $_; $num_special++;
+            } else {
+                $num_regular++;
+            }
+        }
+        return [400, "Cannot mix special source '$special' with others"]
+            if $num_special && @$sources > 1;
+    }
+
+    return [400, "Please specify db_name"] unless defined $args{db_name};
+    my $dbh = _connect(\%args);
+
+    if ($action eq 'get_spot_rates') {
+
+        my $query = $args{query} // '';
+        my @res;
+
+        if ($query eq '') {
+            # user requests all currency pairs
+            for my $source (@$sources) {
+                my $bres = Finance::Currency::FiatX::get_all_spot_rates(
+                    dbh => $dbh,
+                    max_age_cache => $args{max_age_cache},
+                    source        => $source,
+                );
+                unless ($bres->[0] == 200) {
+                    log_warn "Can't get spot rates from source '$source': $bres->[0] - $bres->[1]";
+                    next;
+                }
+                push @res, @{ $bres->[2] };
+            }
+            log_warn "Can't get any rates" unless @res;
+            return [200, "OK", \@res];
+        }
+
+        my ($from, $to);
+        if ($query =~ m!\A(\w+)/(\w+)\z!) {
+            # user specifies a currency pair e.g. "USD/IDR"
+            ($from, $to) = ($1, $2);
+        } elsif ($query =~ /\A\w+\z/) {
+            # user specifies a base currency e.g. "USD"
+            $from = $query;
+            $to = $args{default_quote_currency}
+                or return [400, "You specified '$query' but do not define default_quote_currency"];
+        } else {
+            return [400, "Invalid query, please specify currency code or pair"];
+        }
+
+        for my $source (@$sources) {
+            my $bres = Finance::Currency::FiatX::get_spot_rate(
+                dbh => $dbh,
+                max_age_cache => $args{max_age_cache},
+                source        => $source,
+                from          => $from,
+                to            => $to,
+                type          => $type,
+            );
+            unless ($bres->[0] == 200) {
+                log_warn "Can't get spot rates from source '$source': $bres->[0] - $bres->[1]";
+                next;
+            }
+
+            push @res, $bres->[2];
+        }
+        log_warn "Can't get any rates" unless @res;
+        return [200, "OK", \@res];
+
+    } else {
+
+        return [400, "Invalid action '$action'"];
+
+    }
+}
+
+1;
+# ABSTRACT: Fiat currency exchange rate tool
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+App::fiatx - Fiat currency exchange rate tool
+
+=head1 VERSION
+
+This document describes version 0.008 of App::fiatx (from Perl distribution App-fiatx), released on 2021-05-26.
+
+=head1 SYNOPSIS
+
+See the included script L<fiatx>.
+
+=head1 FUNCTIONS
+
+
+=head2 fiatx
+
+Usage:
+
+ fiatx(%args) -> [$status_code, $reason, $payload, \%result_meta]
+
+Currency exchange rate tool.
+
+This function is not exported.
+
+Arguments ('*' denotes required arguments):
+
+=over 4
+
+=item * B<action> => I<str> (default: "get_spot_rates")
+
+=item * B<db_name> => I<str>
+
+=item * B<db_password> => I<str>
+
+=item * B<db_username> => I<str>
+
+=item * B<default_quote_currency> => I<fiat_or_cryptocurrency>
+
+=item * B<max_age_cache> => I<nonnegint> (default: 14400)
+
+Above this age (in seconds), we retrieve rate from remote source again.
+
+=item * B<query> => I<str>
+
+=item * B<sources> => I<array[str]>
+
+
+=back
+
+Returns an enveloped result (an array).
+
+First element ($status_code) is an integer containing HTTP-like status code
+(200 means OK, 4xx caller error, 5xx function error). Second element
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
+
+Return value:  (any)
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/App-fiatx>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-App-fiatx>.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-App-fiatx/issues>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 SEE ALSO
+
+L<Finance::Currency::FiatX>
+
+            my @rows;
     my $resmeta = {};
 
     if ($args{per_type}) {
@@ -217,139 +334,6 @@ sub spot_rates {
     }
 
     [200, "OK", \@rows, $resmeta];
-}
-
-1;
-# ABSTRACT: Fiat currency exchange rate tool
-
-__END__
-
-=pod
-
-=encoding UTF-8
-
-=head1 NAME
-
-App::fiatx - Fiat currency exchange rate tool
-
-=head1 VERSION
-
-This document describes version 0.007 of App::fiatx (from Perl distribution App-fiatx), released on 2018-06-27.
-
-=head1 SYNOPSIS
-
-See the included script L<fiatx>.
-
-=head1 FUNCTIONS
-
-
-=head2 sources
-
-Usage:
-
- sources() -> [status, msg, result, meta]
-
-List available sources.
-
-This function is not exported.
-
-No arguments.
-
-Returns an enveloped result (an array).
-
-First element (status) is an integer containing HTTP status code
-(200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
-
-Return value:  (any)
-
-
-=head2 spot_rates
-
-Usage:
-
- spot_rates(%args) -> [status, msg, result, meta]
-
-Get spot (latest) rate(s) from a source.
-
-This function is not exported.
-
-Arguments ('*' denotes required arguments):
-
-=over 4
-
-=item * B<db_name>* => I<str>
-
-=item * B<db_password> => I<str>
-
-=item * B<db_username> => I<str>
-
-=item * B<max_age_cache> => I<nonnegint> (default: 14400)
-
-Above this age (in seconds), we retrieve rate from remote source again.
-
-=item * B<pair> => I<currency::pair>
-
-=item * B<per_type> => I<bool>
-
-Return one row of result per rate type.
-
-This allow seeing notes and different mtime per rate type, which can be
-different between different types of the same source.
-
-=item * B<source> => I<str> (default: ":all")
-
-Ask for a specific remote source.
-
-If you want a specific remote source, you can specify it here. The default is
-':any' which is to pick the first source that returns a recent enough current
-rate.
-
-Other special values: C<:highest> to return highest rate of all sources,
-C<:lowest> to return lowest rate of all sources, ':newest' to return rate from
-source with the newest last update time, ':oldest' to return rate from source
-with the oldest last update time, ':average' to return arithmetic average of all
-sources.
-
-=item * B<type> => I<str>
-
-Which rate is wanted? e.g. sell, buy.
-
-=back
-
-Returns an enveloped result (an array).
-
-First element (status) is an integer containing HTTP status code
-(200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
-
-Return value:  (any)
-
-=head1 HOMEPAGE
-
-Please visit the project's homepage at L<https://metacpan.org/release/App-fiatx>.
-
-=head1 SOURCE
-
-Source repository is at L<https://github.com/perlancar/perl-App-fiatx>.
-
-=head1 BUGS
-
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-fiatx>
-
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
-
-=head1 SEE ALSO
-
-L<Finance::Currency::FiatX>
 
 =head1 AUTHOR
 
@@ -357,7 +341,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2018 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

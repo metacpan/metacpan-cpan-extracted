@@ -1,5 +1,5 @@
 package Finance::Dogechain::Base;
-$Finance::Dogechain::Base::VERSION = '1.20210418.2306';
+$Finance::Dogechain::Base::VERSION = '1.20210605.1754';
 use Mojo::Base -base, -signatures;
 use Mojo::UserAgent;
 use Net::SSLeay;

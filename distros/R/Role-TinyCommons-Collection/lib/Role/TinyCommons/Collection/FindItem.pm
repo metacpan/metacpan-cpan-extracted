@@ -1,9 +1,9 @@
 package Role::TinyCommons::Collection::FindItem;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-04-20'; # DATE
+our $DATE = '2021-05-20'; # DATE
 our $DIST = 'Role-TinyCommons-Collection'; # DIST
-our $VERSION = '0.003'; # VERSION
+our $VERSION = '0.008'; # VERSION
 
 use Role::Tiny;
 
@@ -34,7 +34,7 @@ Role::TinyCommons::Collection::FindItem - The find_item() interface
 
 =head1 VERSION
 
-This document describes version 0.003 of Role::TinyCommons::Collection::FindItem (from Perl distribution Role-TinyCommons-Collection), released on 2021-04-20.
+This document describes version 0.008 of Role::TinyCommons::Collection::FindItem (from Perl distribution Role-TinyCommons-Collection), released on 2021-05-20.
 
 =head1 SYNOPSIS
 
@@ -88,10 +88,11 @@ Usage:
 
  my @results = $obj->find_item(%args);
 
-Find an item. Must return either 0 (if not found) or 1 (if found) item. If
+Find an item. Must return the found items as a list. By default must return
+either 0-item list if item is not found, or 1-item list if item is found. If
 L</all> mode is turned on, can return more than one item. The item(s) themselves
 must be returned, unless L</return_pos> mode is enabled, in which the positions
-are returned.
+are returned instead.
 
 Arguments:
 

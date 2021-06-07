@@ -4,6 +4,23 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## [0.63] - 2021-05-25
+
+### Fixed
+
+* Fixed a bug with non-UTC time zones (thanks @nanto)
+
+## [0.62] - 2021-05-24
+
+### Fixed
+
+* Fixed a broken constructor call (thanks @bbkr)
+* Reduced some code complexity
+
+### Added
+
+* Added an explicit "use" statement
+
 ## [0.61] - 2021-01-28
 
 ### Fixed

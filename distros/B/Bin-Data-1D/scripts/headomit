@@ -1,0 +1,109 @@
+#!/usr/bin/perl
+use 5.014 ; use strict ; use warnings ; 
+use Getopt::Std ; getopts ':!_12cfh:t:v' , \my%o ;
+use Term::ANSIColor qw[ :constants ] ; $Term::ANSIColor::AUTORESET = 1 ;
+use FindBin qw[ $Script ] ; 
+use feature qw[ say ] ;
+sub subinfo ( )  ;
+sub show ; 
+
+$o{h} //= 1 ; 
+my $fc = 0 ; # それまでに読んだファイルの数 (file count)
+my $pc = 0 ; # 標準出力に出力した行数 (print count)
+my $ic = 0 ; # 入力した行数 (input count)
+
+$| = 1 if $o{'!'} ;
+
+& main ; 
+#subinfo ;
+END { subinfo } ;
+exit ; 
+
+sub main ( ) { 
+  my $head = '' ; # 最初の行
+  * show0 = sub { print "$_" ; $pc ++ } ;#$o{f} ? 
+  * flag_n = $o{':'} ? sub { $_ = "$.:\t$_" } : sub {} ; 
+  * flag_f = $o{f} ? sub { $_ = "$ARGV\t$_" } :sub {} ; 
+  * show = $o{2} ? sub { & show0 if $_ ne $head }  : * show0 ; 
+  my $slen = $o{t} // undef ; 
+  my @s = () ; #undef) x $slen if defined $slen ; # 読んだ行を一定の長さ蓄える。
+  #* stock = defined $o{t} ? sub { push @s , $_ ; $_ = @s > $slen ? shift @s : undef ; goto LOOP_END unless defined $_ } : sub {} ; 
+  * stock = defined $o{t} ? sub { push @s , $_ ; $_ = @s > $slen ? shift @s : goto LOOP_END } : sub {} ; # goto がトリッキーだが意図通り動作。
+  * flag_c = $o{c} ? sub { } : sub { $ic += $. ; $. = 0 ; 1 } ;
+  START1 :
+  #exit eof () ;
+  do { $head .= <> ; if ( eof ) { ++$fc ; &flag_c ; exit if eof () ; goto START1} } for 1 .. $o{h} ;# ; $lc ++ } ; 
+  do { $_ = $head ; & show0 } if $o{1} ; # 最初のファイルだけ先頭行を表示する。
+  EACH_INPUT_LINE :
+  while ( <> ) {
+    & flag_n ;
+    & flag_f ;
+    & stock ; 
+    show ; 
+    LOOP_END :
+    if ( eof ) {
+      @s = () ; 
+      & flag_c ; #do{ $ic += $. ; $. = 0 } if ! $o{c} ; 
+      $fc ++ ; 
+      unless ( eof () ) { # 最後のフォルダで無い限り
+      	#do { my $t = <> for 1 .. $o{h} } if ! $o{2} ;
+        START2 : 
+        exit if eof () ;
+        do { do { my $t = <> ; if (eof) { ++$fc ; &flag_c ; goto START2 } } for 1.. $o{h}  } if ! $o{2} ;
+      	say '' if $o{'_'} ;
+
+      }  
+    }
+  }	 
+}
+
+sub d3 { $_[0] =~ s/(?<=\d)(?=(\d\d\d)+($|\D))/,/gr } 
+sub subinfo ( ) { 
+  $ic += $. ; 
+  $_ = d3 $_ for $ic, $pc, $fc ;
+  print STDERR DARK ITALIC BOLD CYAN "# of files: $fc, lines output/input: $pc/$ic. ($Script)\n" if $o{v} ; 
+}
+
+# ヘルプの扱い
+sub VERSION_MESSAGE {}
+sub HELP_MESSAGE {
+    use FindBin qw[ $Script ] ; 
+    $ARGV[1] //= '' ;
+    open my $FH , '<' , $0 ;
+    while(<$FH>){
+        s/\$0/$Script/g ;
+        print $_ if s/^=head1// .. s/^=cut// and $ARGV[1] =~ /^o(p(t(i(o(ns?)?)?)?)?)?$/i ? m/^\s+\-/ : 1;
+    }
+    close $FH ;
+    exit 0 ;
+}
+
+=encoding utf8
+
+=head1
+
+$0 ファイル1 ファイル2 ファイル3 .. 
+cat file | $0 
+
+機能: 
+   各ファイルの先頭行は出力しないで、連結する。
+   連結の継ぎ目は、直前のファイルに改行文字が無ければ、自動的に追加される。
+
+オプション: 
+  -h N : 最初のN行を表示しない。未指定なら1。
+  -t N : 各ファイルの末尾N行を出力しない。
+  -1  ; 最初のファイルについては、必ず先頭行(-hで指定したN行)を表示する。(!! ただし今の所、-:と-fのどちらともうまくいってない!! )
+  -2  ; 出力しないのは、各ファイルの先頭行というルールから、最初のファイルの先頭行と文字列として一致する行、に変更する。(-h でN>1ではうまくいかない)
+  -_  ; 各ファイルの最後で 空行を出力。
+
+  -f  ; ファイル名も各行の先頭に出力する。
+  -:  ; 行番番号を出力する。
+  -c  ; 行番号を出力する際に、ファイル毎に分けずに、一連の番号を出力する。(continuous)
+
+  # -=  ; (標準出力には出さなかった) 各ファイルの先頭行を標準エラー出力に出力する。
+  -v  ; 何個のファイルを処理したかを標準エラー出力に出力する。
+  -!  ; バッファに貯めない。
+
+
+=end
+

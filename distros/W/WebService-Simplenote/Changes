@@ -1,256 +1,130 @@
 Changelog for WebService-Simplenote
 
-0.2.1 2012-06-15T03:43:48
- [Ioan Rogers <ioanr@cpan.org>]
- - Perltidy broke the methods!
+0.2.2 2021-06-06T03:45:26Z
+ - Deprecate dist (Ioan Rogers)
 
+0.2.1 2012-06-15T03:43:37Z
+ - Perltidy broke the methods! (Ioan Rogers)
 
-v0.2.0 2012-06-15T03:00:30
- [Ioan Rogers <ioanr@cpan.org>]
- - Releasing v0.2.0
-
- - Use cookies for auth token, closes #3
-
- - Support http proxy from environment [closes github #2]
-
- - Merge branch 'master' of github.com:ioanrogers/WebService-Simplenote
-
- - Move Method::Signatures use to work around github
-   schwern/method-signatures#41
-
+0.2.0 2012-06-15T03:00:30Z
+ - Releasing v0.2.0 (Ioan Rogers)
+ - Use cookies for auth token, closes #3 (Ioan Rogers)
+ - Support http proxy from environment [closes github #2] (Ioan Rogers)
  - Move Method::Signatures use to work around
-   github:schwern/method-signatures#41
-
- - Using Method::Signatures
-
- - Using JSON directly, no longer depending on MooseX::Storage.
-
- - Fix changelog output
-
-
-v0.1.2 2012-05-04T08:37:45
- [Ioan Rogers <ioanr@cpan.org>]
- - Bump version
-
- - Support paginated index
-
- - Don't track timetracker config
-
- - Specify the simplenote api version used
-
- - Fixed pod formatting
-
-
-v0.1.1 2012-04-14T20:31:14
- [Ioan Rogers <ioanr@cpan.org>]
- - Explicitly list JSON::Any as a prereq (via MooseX::Storage)
-
-
-v0.1.0 2012-04-14T01:41:23
- [Fletcher T. Penney <fletcher@Ivory-2.local>]
- - Don't download modified notes that are flagged as deleted in index (I
-   hope!)
-
- - include title or key in network warnings
-
- - add flag to notify of each network request
-
- - whitespace change
-
- - add note for future reference
-
- - quote directory names in error messages to make it easier to notice
-   improper spaces
-
- - Update README
-
- - Allow '\ ' in pathnames in .simplenotesyncrc
-
- - Add support for MacRoman text files (e.g. from Notational Velocity),
-   improve documentation
-
- - Fixed bug that prevented sync if local directory did *not* have spaces
-
- - I think I found the solution to sync problems - fixed in debug first
-
- - Update debug instructions
-
- - Added more tests to debug.pl
-
- - added instructions to debug
-
- - Added debug utility
-
- - turn debug back off by default
-
- - Update README
-
- - Properly handle it when notes are renamed on Simplenote
-
- - Update README
-
- - Update README
-
- - Update README
-
- - Check for titles that are too long and create a trimmed version of it
-   for the filename
-
- - Update README
-
- - Update README
-
- - fix bug in deleteNote when not changing server
-
- - Split 'safety mode' into separate settings for local and remote
-   modification settings
-
- - Update README
-
- - more informative error message when login fails
-
- - Add a 'safety mode' to avoid writing any changes; show specific error
-   when Crypt::SSLeay not installed
-
- - update README
-
- - disable upcoming conflict resolution by default
-
- - Added error checking to detect incorrect data in rc file
-
- - update README
-
- - update README
-
- - update README
-
- - change file name
-
- - change file name
-
- - Change name to SimplenoteSync
-
- - strip special characters from note's title when saving locally
-
- - Update readme
-
- - Clean up code, add comments, improve collision handling on sync
-
- - improve error message when no rc file
-
- - centralize filename <=> title routines; remove Time::Local dependency
-
- - update README
-
- - update README
-
- - fix project name again
-
- - update README
-
- - Unify project name to SimpleSync
-
- - fix appearance of README
-
- - add readme
-
- - initialize git repository
-
-
- [Fletcher T. Penney <fletcher@Ivory.local>]
- - add warning about data loss
-
- - remove css
-
- - Update readme, move to MD format
-
-
- [Fletcher T. Penney <fletcher@ivory.wlan.musc.edu>]
- - disable flags by default
-
-
- [Fletcher T. Penney <fletcher@sheba.gateway.2wire.net>]
- - add nuclear option command
-
- - update SimplenoteSync status information
-
- - fix file time request on non-mac systems (I think...  thanks to
-   harpchad)
-
- - bundle Crypt::SSLeay in SimplenoteSync package
-
- - set default file extension if config only has 3 lines
-
- - Fourth line of simplenotesyncrc file allows changing the extension of
-   filenames
-
-
- [Ioan Rogers <ioan.rogers@gmail.com>]
- - Tidied
-
- - Documentation changes
-
- - Log from notes
-
- - Tidied
-
- - * Migrated out app specific stuff
-   * Improve content->title and call via trigger
-
- - TimeTracker project
-
- - Improved note test, and only serialise built attrs
-
- - Mostly switched to MooseX::Storage
-
- - Breaking app and webservice api into different modules
-
- - Renaming to WebService::Simplenote
-
- - Separate out storage
-
- - Rearragned and tidied a bit. Changed way title is generated
-
- - * rename test properly
-   * remove sync_dir serialisation, not needed
-
- - Rename tests
-
- - * POD moving
-   * started to factor out storage backends
-   * MooseX::Storage instead of JSON, can also be used for metadata/sync_db
-
- - Not needed anymore
-
- - gets, puts, deletes properly, need to split storage out
-
- - Good enough to download notes with new api
-
- - Ignore log files
-
- - Removing mention of Crypt::SSLeay, cpan will handle https requirements
-
- - Adding original author to dist.ini
-
- - Initial modularisation
-
- - Reorg for modularisation
-
-
- [Ioan Rogers <ioanr@cpan.org>]
- - Tidied
-
- - Use array traits for tags
-
- - key can't be read-only
-
- - Documentation improvements, ability to delete
-
- - Documentation and example script
-
- - Clean up dist.ini
-
+   github:schwern/method-signatures#41 (Ioan Rogers)
+ - Move Method::Signatures use to work around github
+   schwern/method-signatures#41 (Ioan Rogers)
+ - Using Method::Signatures (Ioan Rogers)
+ - Using JSON directly, no longer depending on MooseX::Storage. (Ioan
+   Rogers)
+ - Fix changelog output (Ioan Rogers)
+
+0.1.2 2012-05-04T08:37:45Z
+ - Bump version (Ioan Rogers)
+ - Support paginated index (Ioan Rogers)
+ - Don't track timetracker config (Ioan Rogers)
+ - Specify the simplenote api version used (Ioan Rogers)
+ - Fixed pod formatting (Ioan Rogers)
+
+0.1.1 2012-04-14T20:31:14Z
+ - Explicitly list JSON::Any as a prereq (via MooseX::Storage) (Ioan
+   Rogers)
+
+0.1.0 2012-04-14T01:41:23Z
+ - Tidied (Ioan Rogers)
+ - Use array traits for tags (Ioan Rogers)
+ - key can't be read-only (Ioan Rogers)
+ - Documentation improvements, ability to delete (Ioan Rogers)
+ - Documentation and example script (Ioan Rogers)
+ - Clean up dist.ini (Ioan Rogers)
  - Doc improvement, use no_*_updates instead of allow_*_updates for easier
-   command line
-
-
+   command line (Ioan Rogers)
+ - Documentation changes (Ioan Rogers)
+ - Log from notes (Ioan Rogers)
+ - Migrated out app specific stuff * Improve content->title and call via
+   trigger (Ioan Rogers)
+ - TimeTracker project (Ioan Rogers)
+ - Improved note test, and only serialise built attrs (Ioan Rogers)
+ - Mostly switched to MooseX::Storage (Ioan Rogers)
+ - Breaking app and webservice api into different modules (Ioan Rogers)
+ - Renaming to WebService::Simplenote (Ioan Rogers)
+ - Separate out storage (Ioan Rogers)
+ - Rearragned and tidied a bit. Changed way title is generated (Ioan
+   Rogers)
+ - rename test properly * remove sync_dir serialisation, not needed (Ioan
+   Rogers)
+ - Rename tests (Ioan Rogers)
+ - POD moving * started to factor out storage backends * MooseX::Storage
+   instead of JSON, can also be used for metadata/sync_db (Ioan Rogers)
+ - Not needed anymore (Ioan Rogers)
+ - gets, puts, deletes properly, need to split storage out (Ioan Rogers)
+ - Good enough to download notes with new api (Ioan Rogers)
+ - Ignore log files (Ioan Rogers)
+ - Removing mention of Crypt::SSLeay, cpan will handle https requirements
+   (Ioan Rogers)
+ - Adding original author to dist.ini (Ioan Rogers)
+ - Initial modularisation (Ioan Rogers)
+ - Reorg for modularisation (Ioan Rogers)
+ - add nuclear option command (Fletcher T. Penney)
+ - update SimplenoteSync status information (Fletcher T. Penney)
+ - fix file time request on non-mac systems (I think...  thanks to
+   harpchad) (Fletcher T. Penney)
+ - add warning about data loss (Fletcher T. Penney)
+ - remove css (Fletcher T. Penney)
+ - Update readme, move to MD format (Fletcher T. Penney)
+ - bundle Crypt::SSLeay in SimplenoteSync package (Fletcher T. Penney)
+ - set default file extension if config only has 3 lines (Fletcher T.
+   Penney)
+ - disable flags by default (Fletcher T. Penney)
+ - Don't download modified notes that are flagged as deleted in index (I
+   hope!) (Fletcher T. Penney)
+ - include title or key in network warnings (Fletcher T. Penney)
+ - add flag to notify of each network request (Fletcher T. Penney)
+ - whitespace change (Fletcher T. Penney)
+ - Fourth line of simplenotesyncrc file allows changing the extension of
+   filenames (Fletcher T. Penney)
+ - add note for future reference (Fletcher T. Penney)
+ - quote directory names in error messages to make it easier to notice
+   improper spaces (Fletcher T. Penney)
+ - Update README (Fletcher T. Penney)
+ - Allow '\ ' in pathnames in .simplenotesyncrc (Fletcher T. Penney)
+ - Add support for MacRoman text files (e.g. from Notational Velocity),
+   improve documentation (Fletcher T. Penney)
+ - Fixed bug that prevented sync if local directory did *not* have spaces
+   (Fletcher T. Penney)
+ - I think I found the solution to sync problems - fixed in debug first
+   (Fletcher T. Penney)
+ - Update debug instructions (Fletcher T. Penney)
+ - Added more tests to debug.pl (Fletcher T. Penney)
+ - added instructions to debug (Fletcher T. Penney)
+ - Added debug utility (Fletcher T. Penney)
+ - turn debug back off by default (Fletcher T. Penney)
+ - Properly handle it when notes are renamed on Simplenote (Fletcher T.
+   Penney)
+ - Check for titles that are too long and create a trimmed version of it
+   for the filename (Fletcher T. Penney)
+ - fix bug in deleteNote when not changing server (Fletcher T. Penney)
+ - Split 'safety mode' into separate settings for local and remote
+   modification settings (Fletcher T. Penney)
+ - more informative error message when login fails (Fletcher T. Penney)
+ - Add a 'safety mode' to avoid writing any changes; show specific error
+   when Crypt::SSLeay not installed (Fletcher T. Penney)
+ - update README (Fletcher T. Penney)
+ - disable upcoming conflict resolution by default (Fletcher T. Penney)
+ - Added error checking to detect incorrect data in rc file (Fletcher T.
+   Penney)
+ - change file name (Fletcher T. Penney)
+ - Change name to SimplenoteSync (Fletcher T. Penney)
+ - strip special characters from note's title when saving locally (Fletcher
+   T. Penney)
+ - Update readme (Fletcher T. Penney)
+ - Clean up code, add comments, improve collision handling on sync
+   (Fletcher T. Penney)
+ - improve error message when no rc file (Fletcher T. Penney)
+ - centralize filename <=> title routines; remove Time::Local dependency
+   (Fletcher T. Penney)
+ - fix project name again (Fletcher T. Penney)
+ - Unify project name to SimpleSync (Fletcher T. Penney)
+ - fix appearance of README (Fletcher T. Penney)
+ - add readme (Fletcher T. Penney)
+ - initialize git repository (Fletcher T. Penney)

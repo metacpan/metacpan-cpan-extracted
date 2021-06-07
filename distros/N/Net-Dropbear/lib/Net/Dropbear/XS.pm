@@ -3,13 +3,13 @@ package Net::Dropbear::XS;
 use strict;
 use warnings;
 
-our $VERSION = '0.13';
+our $VERSION = '0.14';
 
 require XSLoader;
 XSLoader::load( 'Net::Dropbear', $VERSION );
 
 use parent qw/Exporter/;
-our @export = qw/HOOK_COMPLETE HOOK_CONTINUE HOOK_FAILURE/;
+our @EXPORT_OK = qw/HOOK_COMPLETE HOOK_CONTINUE HOOK_FAILURE/;
 
 # Preloaded methods go here.
 

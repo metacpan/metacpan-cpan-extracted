@@ -2,161 +2,35 @@ package Form::Tiny;
 
 use v5.10;
 use warnings;
-use Types::Standard qw(Str Maybe ArrayRef InstanceOf HashRef Bool CodeRef);
 use Carp qw(croak);
-use Storable qw(dclone);
-use Scalar::Util qw(blessed);
+use Types::Standard qw(Str);
 use Import::Into;
 
-use Form::Tiny::FieldDefinition;
-use Form::Tiny::Error;
-use Form::Tiny::FieldData;
-use Moo::Role;
+use Form::Tiny::Form;
+use Form::Tiny::Utils qw(trim :meta_handlers);
+require Moo;
 
-our $VERSION = '1.13';
-
-with "Form::Tiny::Form";
-
-has "field_defs" => (
-	is => "ro",
-	isa => ArrayRef [
-		(InstanceOf ["Form::Tiny::FieldDefinition"])
-		->plus_coercions(HashRef, q{ Form::Tiny::FieldDefinition->new($_) })
-	],
-	coerce => 1,
-	lazy => 1,
-	default => sub {
-		my ($self) = @_;
-		my @data = $self->can('build_fields') ? $self->build_fields : ();
-		return shift @data
-			if @data == 1 && ref $data[0] eq ref [];
-		return \@data;
-	},
-	trigger => \&_clear_form,
-	writer => "set_field_defs",
-);
-
-has "input" => (
-	is => "ro",
-	writer => "set_input",
-	trigger => \&_clear_form,
-);
-
-has "fields" => (
-	is => "ro",
-	isa => Maybe [HashRef],
-	writer => "_set_fields",
-	clearer => "_clear_fields",
-	init_arg => undef,
-);
-
-has "valid" => (
-	is => "ro",
-	isa => Bool,
-	writer => "_set_valid",
-	lazy => 1,
-	builder => "_validate",
-	clearer => 1,
-	predicate => "is_validated",
-	init_arg => undef,
-);
-
-has "errors" => (
-	is => "ro",
-	isa => ArrayRef [InstanceOf ["Form::Tiny::Error"]],
-	default => sub { [] },
-	init_arg => undef,
-);
-
-has "cleaner" => (
-	is => "ro",
-	isa => Maybe [CodeRef],
-	default => sub {
-		my ($self) = @_;
-		return $self->can("build_cleaner") ? $self->build_cleaner : undef;
-	},
-);
-
-sub BUILD
-{
-	my ($self) = @_;
-	$self->field_defs;    # build fields
-}
+our $VERSION = '2.01';
 
 sub import
 {
 	my ($package, $caller) = (shift, scalar caller);
-	return unless @_;
 
 	my @wanted = @_;
-	my @wanted_subs = qw(form_field form_cleaner);
-	my @wanted_roles = qw(Form::Tiny);
+	my @wanted_subs = qw(form_field form_cleaner form_hook);
+	my @wanted_roles;
 
-	my %subs = (
-		form_field => sub {
-			my ($name, @params) = @_;
-			my $is_coderef = @params == 1 && ref $params[0] eq 'CODE';
+	my %subs = %{$package->_generate_helpers($caller)};
+	my %behaviors = %{$package->_get_behaviors};
 
-			my $previous = $caller->can('build_fields') // sub { () };
-			no strict 'refs';
-			no warnings 'redefine';
+	unless (scalar grep { $_ eq -nomoo } @wanted) {
+		Moo->import::into($caller);
+	}
 
-			*{"${caller}::build_fields"} = sub {
-				my %real_params = (
-					(
-						$is_coderef
-						? %{$params[0]->(@_)}
-						: @params
-					),
-					name => $name,
-				);
-
-				return (
-					$previous->(@_),
-					\%real_params
-				);
-			};
-		},
-		form_cleaner => sub {
-			my ($sub) = @_;
-
-			no strict 'refs';
-			*{"${caller}::build_cleaner"} = sub {
-				return $sub;
-			};
-		},
-		form_filter => sub {
-			my ($type, $sub) = @_;
-			my $previous = $caller->can('build_filters') // sub { () };
-
-			no strict 'refs';
-			no warnings 'redefine';
-			*{"${caller}::build_filters"} = sub {
-				return (
-					$previous->(@_),
-					[$type, $sub],
-				);
-			};
-		},
+	require Moo::Role;
+	Moo::Role->apply_roles_to_package(
+		$caller, 'Form::Tiny::Form'
 	);
-
-	my %behaviors = (
-		-base => {
-			subs => [],
-			roles => [],
-		},
-		-strict => {
-			subs => [],
-			roles => [qw(Form::Tiny::Strict)],
-		},
-		-filtered => {
-			subs => [qw(form_filter)],
-			roles => [qw(Form::Tiny::Filtered)],
-		},
-	);
-
-	require Moo;
-	Moo->import::into($caller);
 
 	foreach my $type (@wanted) {
 		croak "no Form::Tiny import behavior for: $type"
@@ -165,12 +39,11 @@ sub import
 		push @wanted_roles, @{$behaviors{$type}->{roles}};
 	}
 
+	create_form_meta($caller, @wanted_roles);
+
 	{
 		no strict 'refs';
-
-		Moo::Role->apply_roles_to_package(
-			$caller, @wanted_roles
-		);
+		no warnings 'redefine';
 
 		*{"${caller}::$_"} = $subs{$_} foreach @wanted_subs;
 	}
@@ -178,199 +51,62 @@ sub import
 	return;
 }
 
-sub _clear_form
+sub _generate_helpers
 {
-	my ($self) = @_;
+	my ($package, $caller) = @_;
 
-	$self->_clear_fields;
-	$self->clear_valid;
-	$self->_clear_errors;
+	my $field_context;
+	return {
+		form_field => sub {
+			$field_context = ref $_[0] eq '' ? $_[0] : undef;
+			$caller->form_meta->add_field(@_);
+		},
+		form_cleaner => sub {
+			$field_context = undef;
+			$caller->form_meta->add_hook(cleanup => @_);
+		},
+		form_hook => sub {
+			$field_context = undef;
+			$caller->form_meta->add_hook(@_);
+		},
+		form_filter => sub {
+			$field_context = undef;
+			$caller->form_meta->add_filter(@_);
+		},
+		field_filter => sub {
+			if (@_ == 2) {
+				croak 'field_filter called in invalid context'
+					unless defined $field_context;
+				unshift @_, $field_context;
+			}
+			$caller->form_meta->add_field_filter(@_);
+		},
+		form_trim_strings => sub {
+			$field_context = undef;
+			$caller->form_meta->add_filter(Str, \&trim);
+		},
+	};
 }
 
-sub pre_mangle { $_[2] }
-sub pre_validate { $_[1] }
-
-sub _mangle_field
+sub _get_behaviors
 {
-	my ($self, $def, $path_value) = @_;
-
-	my $current = $path_value->value;
-
-	# if the parameter is required (hard), we only consider it if not empty
-	if (!$def->hard_required || ref $current || length($current // "")) {
-
-		# coerce, validate, adjust
-		$current = $def->get_coerced($self, $current);
-		if ($def->validate($self, $current)) {
-			$current = $def->get_adjusted($current);
-		}
-
-		$path_value->set_value($current);
-		return 1;
-	}
-
-	return;
-}
-
-sub _find_field
-{
-	my ($self, $fields, $field_def) = @_;
-
-	my @found;
-	my $traverser;
-	$traverser = sub {
-		my ($curr_path, $next_path, $value) = @_;
-
-		if (@$next_path == 0) {
-			push @found, [$curr_path, $value];
-		}
-		else {
-			my $next = shift @$next_path;
-			my $want_array = $next eq $Form::Tiny::FieldDefinition::array_marker;
-
-			if ($want_array && ref $value eq ref []) {
-				for my $index (0 .. $#$value) {
-					return    # may be an error, exit early
-						unless $traverser->([@$curr_path, $index], [@$next_path], $value->[$index]);
-				}
-
-				if (@$value == 0) {
-					if (@$next_path > 0) {
-						return;
-					}
-					else {
-						# we had aref here, so we want it back in resulting hash
-						push @found, [$curr_path, [], 1];
-					}
-				}
-			}
-			elsif (!$want_array && ref $value eq ref {} && exists $value->{$next}) {
-				push @$curr_path, $next;
-				return $traverser->($curr_path, $next_path, $value->{$next});
-			}
-			else {
-				return;
-			}
-		}
-
-		return 1;    # all ok
+	my $empty = {
+		subs => [],
+		roles => [],
 	};
 
-	my @parts = $field_def->get_name_path;
-	if ($traverser->([], \@parts, $fields)) {
-		return Form::Tiny::FieldData->new(items => \@found);
-	}
-	return;
-}
-
-sub _assign_field
-{
-	my ($self, $fields, $field_def, $path_value) = @_;
-
-	my @arrays = map { $_ eq $Form::Tiny::FieldDefinition::array_marker } $field_def->get_name_path;
-	my @parts = @{$path_value->path};
-	my $current = \$fields;
-	for my $i (0 .. $#parts) {
-
-		# array_path will contain array indexes for each array marker
-		if ($arrays[$i]) {
-			$current = \${$current}->[$parts[$i]];
-		}
-		else {
-			$current = \${$current}->{$parts[$i]};
-		}
-	}
-
-	$$current = $path_value->value;
-}
-
-sub _validate
-{
-	my ($self) = @_;
-	my $dirty = {};
-	$self->_clear_errors;
-
-	if (ref $self->input eq ref {}) {
-		my $fields = $self->pre_validate(dclone($self->input));
-		foreach my $validator (@{$self->field_defs}) {
-			my $curr_f = $validator->name;
-
-			my $current_data = $self->_find_field($fields, $validator);
-			if (defined $current_data) {
-				my $all_ok = 1;
-
-				# This may have multiple iterations only if there's an array
-				foreach my $path_value (@{$current_data->items}) {
-					unless ($path_value->structure) {
-						$path_value->set_value($self->pre_mangle($validator, $path_value->value));
-						$all_ok = $self->_mangle_field($validator, $path_value) && $all_ok;
-					}
-					$self->_assign_field($dirty, $validator, $path_value);
-				}
-
-				# found and valid, go to the next field
-				next if $all_ok;
-			}
-
-			# for when it didn't pass the existence test
-			if ($validator->has_default) {
-				$self->_assign_field($dirty, $validator, $validator->get_default($self));
-			}
-			elsif ($validator->required) {
-				$self->add_error(Form::Tiny::Error::DoesNotExist->new(field => $curr_f));
-			}
-		}
-	}
-	else {
-		$self->add_error(Form::Tiny::Error::InvalidFormat->new);
-	}
-
-	$self->cleaner->($self, $dirty)
-		if defined $self->cleaner && !$self->has_errors;
-
-	my $form_valid = !$self->has_errors;
-	$self->_set_fields($form_valid ? $dirty : undef);
-
-	return $form_valid;
-}
-
-sub check
-{
-	my ($self, $input) = @_;
-
-	$self->set_input($input);
-	return $self->valid;
-}
-
-sub validate
-{
-	my ($self, $input) = @_;
-
-	return if $self->check($input);
-	return $self->errors;
-}
-
-sub add_error
-{
-	my ($self, $error) = @_;
-	croak "error has to be an instance of Form::Tiny::Error"
-		unless blessed $error && $error->isa("Form::Tiny::Error");
-
-	push @{$self->errors}, $error;
-	return;
-}
-
-sub has_errors
-{
-	my ($self) = @_;
-	return @{$self->errors} > 0;
-}
-
-sub _clear_errors
-{
-	my ($self) = @_;
-	@{$self->errors} = ();
-	return;
+	return {
+		-base => $empty,
+		-nomoo => $empty,
+		-strict => {
+			subs => [],
+			roles => [qw(Form::Tiny::Meta::Strict)],
+		},
+		-filtered => {
+			subs => [qw(form_filter field_filter form_trim_strings)],
+			roles => [qw(Form::Tiny::Meta::Filtered)],
+		},
+	};
 }
 
 1;
@@ -386,161 +122,147 @@ Form::Tiny - Input validator implementation centered around Type::Tiny
 	package MyForm;
 
 	use Form::Tiny -base;
+	use Types::Standard qw(Int);
 
-	form_filed 'my_field' => {
+	form_field 'my_field' => (
 		required => 1,
-	};
+	);
 
-	form_filed 'another_field' => {
-		required => 1,
-	};
+	form_field 'another_field' => (
+		type => Int,
+		default => sub { 0 },
+	);
 
 =head1 DESCRIPTION
 
-Main class of the Form::Tiny system - this is a role that provides most of the module's functionality.
+Form::Tiny is a customizable hashref validator with DSL for form building.
 
 =head1 DOCUMENTATION INDEX
 
 =over
 
-=item * L<Form::Tiny::Manual> - main reference
+=item * L<Form::Tiny::Manual> - Main reference
 
-=item * L<Form::Tiny::Manual::Internals> - Form::Tiny without syntactic sugar
+=item * L<Form::Tiny::Manual::Compatibility> - See backwards compatibility notice
 
-=item * Most regular packages contains information on symbols they contain.
+=item * L<Form::Tiny::Manual::Internals> - How to mess with Form::Tiny internals
+
+=item * L<Form::Tiny::Form> - Form class added interface specification
+
+=item * L<Form::Tiny::Error> - Form error class specification
+
+=item * L<Form::Tiny::FieldDefinition> - Field definition class specification
+
+=item * L<Form::Tiny::Hook> - Hook class specification
+
+=item * L<Form::Tiny::Filter> - Filter class specification
 
 =back
 
 =head1 IMPORTING
 
-Starting with version 1.10 you can enable syntax helpers by using import flags:
+When imported, Form::Tiny will turn a package it is imported into a Moo class that does the L<Form::Tiny::Form> role. It will also install helper functions in your package that act as a domain-specific language (DSL) for building your form.
 
 	package MyForm;
 
-	# imports form_field and form_cleaner helpers
-	use Form::Tiny -base;
-
-	# imports form_field, form_filter and form_cleaner helpers
-	use Form::Tiny -filtered;
+	# imports only basic helpers
+	use Form::Tiny;
 
 	# fully-featured form:
 	use Form::Tiny -filtered, -strict;
 
+After C<use Form::Tiny> statement, your package gains all the Moo keywords, some Form::Tiny keywords (see L</"Available import flags">) and all L<Form::Tiny::Form> methods.
 
-=head2 IMPORTED FUNCTIONS
+=head2 Available import flags
+
+=over
+
+=item * C<-base>
+
+This flag is here only for backwards compatibility. It does not do anything particular on its own.
+
+Installed functions: C<form_field form_cleaner form_hook>
+
+=item * C<-nomoo>
+
+This flag stops Form::Tiny from importing Moo into your namespace. Unless you use a different class system (like L<Moose>) will have to declare your own constructor.
+
+Installed functions: same as C<-base>
+
+=item * C<-filtered>
+
+This flag enables filters in your form.
+
+Installed functions: all of C<-base> plus C<form_filter field_filter form_trim_strings>
+
+=item * C<-strict>
+
+This flag makes your form check for strictness before the validation.
+
+Installed functions: same as C<-base>
+
+=back
+
+=head2 Form domain-specific language
 
 =head3 form_field
 
 	form_field $name => %arguments;
-	form_field $name => $coderef;
+	form_field $coderef;
+	form_field $object;
 
-Imported when any flag is present. $coderef gets passed the form instance and should return a hashref. Neither %arguments nor $coderef return data should include the name in the hash, it will be copied from the first argument.
+This helper declares a new field for your form. Each style of calling this function should contain keys that meet the specification of L<Form::Tiny::FieldDefinition>, or an object of this class directly.
 
-Note that this field definition method is not capable of returning a subclass of L<Form::Tiny::FieldDefinition>. If you need a subclass, you will need to use bare-bones method of form construction. Refer to L<Form::Tiny::Manual::Internals> for details.
+In the first (hash) version, C<%arguments> need to be a plain hash (not a hashref) and should B<not> include the name in the hash, as it will be overriden by the first argument C<$name>. This form also sets the context for the form being built: see L<Form::Tiny::Manual/"Context"> for details.
+
+In the second (coderef) version, C<$coderef> gets passed the form instance as its only argument and should return a hashref or a constructed object of L<Form::Tiny::FieldDefinition>. A hashref must contain a C<name>. Note that this creates I<dynamic field>, which will be resolved repeatedly during form validation. As such, it should not contain any randomness.
+
+If you need a subclass of the default implementation, and you don't need a dynamic field, you can use the third style of the call, which takes a constructed object of L<Form::Tiny::FieldDefinition> or its subclass.
+
+=head3 form_hook
+
+	form_hook $stage => $coderef;
+
+This creates a new hook for C<$stage>. Each stage may have multiple hooks and each will pass different arguments to the C<$coderef>. Refer to L<Form::Tiny::Manual/Hooks> for details.
 
 =head3 form_cleaner
 
-	form_cleaner $sub;
+	form_cleaner $coderef;
 
-Imported when any flag is present. C<$sub> will be ran as the very last step of form validation. There can't be more than one cleaner in a form. See L</build_cleaner>.
+A shortcut for C<< form_hook cleanup => $coderef; >>.
 
 =head3 form_filter
 
-	form_filter $type, $sub;
+	form_filter $type, $coderef;
 
-Imported when the -filtered flag is present. $type should be a Type::Tiny (or compatible) type check. For each input field that passes that check, $sub will be ran. See L<Form::Tiny::Filtered> for details on filters.
+C<$type> should be a Type::Tiny (or compatible) type check. For each input field that passes that check, C<$coderef> will be ran. See L<Form::Tiny::Manual/"Filters"> for details on filters.
 
-=head1 ADDED INTERFACE
+=head3 field_filter
 
-This section describes the interface added to your class after mixing in the Form::Tiny role.
+	field_filter $type, $coderef; # uses current context
+	field_filter $name => $type, $coderef;
 
-=head2 ATTRIBUTES
+Same as C<form_filter>, but is narrowed down to a single form field identified by its name. Name can be omitted and the current context will be used. See L<Form::Tiny::Manual/"Context"> for details on context.
 
-Each of the attributes can be accessed by calling its name as a function on Form::Tiny object.
+=head3 form_trim_strings
 
-=head3 field_defs
+	form_trim_strings;
 
-Contains an array reference of L<Form::Tiny::FieldDefinition> instances. A coercion from a hash reference can be performed upon writing.
+This helper takes no arguments, but causes your form to filter string values by calling L<Form::Tiny::Utils::trim> on them.
 
-B<writer:> I<set_field_defs>
+This was enabled by default once. Refer to L<Form::Tiny::Manual::Compatibility/"Filtered forms no longer trim strings by default"> for details.
 
-B<built by:> I<build_fields>
+=head1 TODO
 
-=head3 input
+=over
 
-Contains the input data passed to the form.
+=item * Document and test meta classes
 
-B<writer:> I<set_input>
+=item * More tests for form inheritance
 
-=head3 fields
+=item * More examples
 
-Contains the validated and cleaned fields set after the validation is complete. Cannot be specified in the constructor.
-
-=head3 valid
-
-Contains the result of the validation - a boolean value. Gets produced lazily upon accessing it, so calling C<< $form->valid; >> validates the form automatically.
-
-B<clearer:> I<clear_valid>
-
-B<predicate:> I<is_validated>
-
-=head3 errors
-
-Contains an array reference of form errors which were detected by the last performed validation. Each error is an instance of L<Form::Tiny::Error>.
-
-B<predicate:> I<has_errors>
-
-=head2 METHODS
-
-This section describes standalone methods available in the module - they are not directly connected to any of the attributes.
-
-=head3 new
-
-This is a Moose-flavored constructor for the class. It accepts a hash or hash reference of parameters, which are the attributes specified above.
-
-=head3 check
-
-=head3 validate
-
-These methods are here to ensure that a Form::Tiny instance can be used as a type validator itself by other form classes.
-
-I<check> returns a boolean value that indicates whether the validation of input data was successful.
-
-I<validate> does the same thing, but instead of returning a boolean it returns a list of errors that were detected, or undef if none.
-
-Both methods take input data as the only argument.
-
-=head3 add_error
-
-Adds an error to form - should be called with an instance of L<Form::Tiny::Error> as its only argument. This should only be done during validation with customization methods listed below.
-
-=head1 CUSTOMIZATION
-
-A form instance can be customized by overriding any of the following methods:
-
-=head2 build_fields
-
-This method should return an array or array reference of field definitions: either L<Form::Tiny::FieldDefinition> instances or hashrefs which can be used to construct these instances.
-
-It is passed a single argument, which is the class instance. It can be used to add errors in coderefs or to use class fields in form building.
-
-=head2 build_cleaner
-
-An optional cleaner is a function that will be called as the very last step of the validation process. It can be used to have a broad look on all of the validated form fields at once and introduce any synchronization errors, like a field requiring other field to be set.
-
-Using I<add_error> inside this function will cause the form to fail the validation process.
-
-In I<build_cleaner> method you're required to return a subroutine reference that will be called with two arguments: a form being validated and a set of "dirty" fields - validated and ready to be cleaned. This subroutine should not return the data - its return value will be discarded.
-
-=head2 pre_mangle
-
-This method is called every time an input field value is about to be changed by coercing and adjusting. It gets passed two arguments: an instance of L<Form::Tiny::FieldDefinition> and a value obtained from input data.
-
-This method should return a new value for the field, which will replace the old one.
-
-=head2 pre_validate
-
-This method is called once before the validation process has started. It gets passed a deep copy of input data and is expected to return a value that will be used to obtain every field value during validation.
+=back
 
 =head1 AUTHOR
 

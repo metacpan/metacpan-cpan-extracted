@@ -34,6 +34,7 @@
          "requires" : {
             "File::SortedSeek::PERLANCAR" : "0",
             "Role::Tiny" : "0",
+            "perl" : "5.010001",
             "strict" : "0",
             "warnings" : "0"
          }
@@ -43,7 +44,8 @@
             "File::Spec" : "0",
             "IO::Handle" : "0",
             "IPC::Open3" : "0",
-            "Test::More" : "0"
+            "Test::More" : "0",
+            "WordList::Char::Latin1::UpperCaseLetter" : "0"
          }
       }
    },
@@ -59,7 +61,7 @@
          "web" : "https://github.com/perlancar/perl-WordListRole-BinarySearch"
       }
    },
-   "version" : "0.005",
+   "version" : "0.006",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.030002"
@@ -525,6 +527,17 @@
                }
             },
             "name" : "DevelopX_spec",
+            "version" : "6.014"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Prereqs",
+            "config" : {
+               "Dist::Zilla::Plugin::Prereqs" : {
+                  "phase" : "test",
+                  "type" : "requires"
+               }
+            },
+            "name" : "TestRequires",
             "version" : "6.014"
          },
          {

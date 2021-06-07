@@ -8,7 +8,7 @@
 #
 
 package Log::Dispatch::FileRotate::Mutex;
-$Log::Dispatch::FileRotate::Mutex::VERSION = '1.36';
+$Log::Dispatch::FileRotate::Mutex::VERSION = '1.38';
 # ABSTRACT: Flock Based File Mutex.
 
 use strict;
@@ -149,7 +149,7 @@ Log::Dispatch::FileRotate::Mutex - Flock Based File Mutex.
 
 =head1 VERSION
 
-version 1.36
+version 1.38
 
 =head1 SYNOPSIS
 

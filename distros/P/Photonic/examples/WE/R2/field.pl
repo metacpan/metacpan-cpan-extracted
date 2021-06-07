@@ -78,8 +78,6 @@ sub plotfield {
     my $field=shift;
     my $fieldt=tile($field->mv(0,-1)->mv(0,-1),	3,3)->mv(-1,0)->mv(-1,0);
     my $fieldabs=$fieldt->Cabs2->sumover->sqrt;
-#    my $fieldR=$fieldt->((0))->real/$fieldabs->(*1); #real part
-#    my $fieldI=$fieldt->((1))->real/$fieldabs->(*1); #imaginary part
     my $fieldR=$fieldt->re->norm; #real part normalized
     my $fieldI=$fieldt->im->norm; #imaginary part normalized
     $wf->plot(

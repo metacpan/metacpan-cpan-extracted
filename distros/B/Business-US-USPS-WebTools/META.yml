@@ -27,5 +27,5 @@ resources:
   bugtracker: https://github.com/ssimms/business-us-usps-webtools/issues
   homepage: https://github.com/ssimms/business-us-usps-webtools
   repository: https://github.com/ssimms/business-us-usps-webtools.git
-version: '1.124'
+version: '1.125'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

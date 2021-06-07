@@ -1,19 +1,18 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2015-2020 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2015-2021 -- leonerd@leonerd.org.uk
 
-package Device::Chip::Adapter::BusPirate;
+package Device::Chip::Adapter::BusPirate 0.22;
 
-use strict;
+use v5.14;
 use warnings;
 use base qw( Device::Chip::Adapter );
-
-our $VERSION = '0.20';
 
 use Carp;
 
 use Future::AsyncAwait;
+use Future::Mutex;
 
 use Device::BusPirate;
 
@@ -129,7 +128,9 @@ async sub make_protocol_I2C
 
    my $mode = await $self->_enter_mode_I2C;
 
-   return Device::Chip::Adapter::BusPirate::_I2C->new( $mode );
+   my $mutex = $self->{mutex} //= Future::Mutex->new;
+
+   return Device::Chip::Adapter::BusPirate::_I2C->new( $mode, $mutex );
 }
 
 async sub make_protocol_UART
@@ -163,9 +164,9 @@ use List::Util qw( first );
 sub new
 {
    my $class = shift;
-   my ( $mode ) = @_;
+   my ( $mode, $mutex ) = @_;
 
-   bless { mode => $mode }, $class;
+   bless { mode => $mode, mutex => $mutex }, $class;
 }
 
 sub sleep
@@ -380,22 +381,74 @@ sub DESTROY
    $self->{mode}->pullup( 0 )->get if $self->{mode};
 }
 
-sub write
-{
-    my $self = shift;
-    $self->{mode}->send( $self->{addr}, @_ );
-}
-
-sub write_then_read
-{
-    my $self = shift;
-    $self->{mode}->send_then_recv( $self->{addr}, @_ );
-}
-
-sub read
+async sub write
 {
    my $self = shift;
-   $self->{mode}->recv( $self->{addr}, @_ );
+   my ( $bytes ) = @_;
+
+   await $self->txn(sub { shift->write( $bytes ) });
+}
+
+async sub read
+{
+   my $self = shift;
+   my ( $len ) = @_;
+
+   return await $self->txn(sub { shift->read( $len ) });
+}
+
+async sub write_then_read
+{
+   my $self = shift;
+   my ( $write_bytes, $read_len ) = @_;
+
+   return await $self->txn(async sub {
+      my ( $helper ) = @_;
+      await $helper->write( $write_bytes );
+      return await $helper->read( $read_len );
+   });
+}
+
+sub txn
+{
+   my $self = shift;
+   my ( $code ) = @_;
+
+   defined( my $addr = $self->{addr} ) or
+      croak "Cannot ->txn without a defined addr";
+
+   my $helper = $self->{txn_helper} //= bless( [ $self->{mode}, $self->{addr} ], "Device::Chip::Adapter::BusPirate::_I2C::Txn" );
+
+   return $self->{mutex}->enter(sub {
+      return $code->( $helper )->followed_by(sub {
+         my ( $f ) = @_;
+         return $self->{mode}->stop_bit->then( sub { $f } );
+      });
+   });
+}
+
+package
+   Device::Chip::Adapter::BusPirate::_I2C::Txn;
+
+async sub write
+{
+   my $self = shift;
+   my ( $bytes ) = @_;
+   my ( $mode, $addr ) = @$self;
+
+   await $mode->start_bit;
+   await $mode->write( chr( $addr << 1 | 0 ) . $bytes );
+}
+
+async sub read
+{
+   my $self = shift;
+   my ( $len ) = @_;
+   my ( $mode, $addr ) = @$self;
+
+   await $mode->start_bit;
+   await $mode->write( chr( $addr << 1 | 1 ) );
+   return await $mode->read( $len );
 }
 
 package

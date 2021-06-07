@@ -3,9 +3,10 @@ abstract: 'Access log middleware which creates structured log messages'
 author:
   - 'Manfred Stock <mstock@cpan.org>'
 build_requires:
-  File::Find: '0'
-  File::Temp: '0'
+  File::Spec: '0'
   HTTP::Request::Common: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
   Module::Build: '0.28'
   Plack::Test: '0'
   Test::Class: '0'
@@ -13,10 +14,11 @@ build_requires:
   Test::Exception: '0'
   Test::More: '0.88'
   lib: '0'
+  perl: '5.006'
 configure_requires:
   Module::Build: '0.28'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -27,17 +29,17 @@ no_index:
     - perlcritic.rc
 requires:
   Carp: '0'
-  DateTime: '0'
   JSON: '0'
   MRO::Compat: '0'
   Net::Domain: '0'
   Plack::Middleware: '0'
   Plack::Util::Accessor: '0'
-  Time::HiRes: '0'
+  Time::Moment: '0'
   parent: '0'
   strict: '0'
   warnings: '0'
 resources:
   repository: git://github.com/mstock/Plack-Middleware-AccessLog-Structured.git
-version: '0.001002'
-x_serialization_backend: 'YAML::Tiny version 1.70'
+version: '0.002000'
+x_generated_by_perl: v5.28.1
+x_serialization_backend: 'YAML::Tiny version 1.73'

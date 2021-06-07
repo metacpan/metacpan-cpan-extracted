@@ -1,0 +1,87 @@
+{
+   "abstract" : "Command to produce ANSI terminal code",
+   "author" : [
+      "Kazumasa Utashiro"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v3.1.12",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "App-ansiecho",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.07",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Encode" : "0",
+            "Getopt::EX" : "v1.23.2",
+            "Getopt::EX::Colormap" : "0",
+            "Getopt::EX::Long" : "0",
+            "List::Util" : "0",
+            "Moo" : "0",
+            "Pod::Usage" : "0",
+            "Text::ANSI::Printf" : "2.01",
+            "perl" : "v5.14.0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Command::Runner" : "0",
+            "Test::More" : "0.98"
+         }
+      }
+   },
+   "provides" : {
+      "App::ansiecho" : {
+         "file" : "lib/App/ansiecho.pm",
+         "version" : "0.02"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/kaz-utashiro/App-ansiecho/issues"
+      },
+      "homepage" : "https://github.com/kaz-utashiro/App-ansiecho",
+      "repository" : {
+         "url" : "git://github.com/kaz-utashiro/App-ansiecho.git",
+         "web" : "https://github.com/kaz-utashiro/App-ansiecho"
+      }
+   },
+   "version" : "0.02",
+   "x_authority" : "cpan:UTASHIRO",
+   "x_contributors" : [
+      "Kazumasa Utashiro <kaz@utashiro.com>"
+   ],
+   "x_serialization_backend" : "JSON::PP version 4.04",
+   "x_static_install" : 1
+}

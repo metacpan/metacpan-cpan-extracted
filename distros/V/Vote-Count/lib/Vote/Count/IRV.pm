@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use 5.022;
+use 5.024;
 use feature qw /postderef signatures/;
 
 package Vote::Count::IRV;
@@ -13,13 +13,13 @@ with 'Vote::Count::TieBreaker';
 
 use Storable 3.15 'dclone';
 
-our $VERSION='1.10';
+our $VERSION='2.00';
 
 =head1 NAME
 
 Vote::Count::IRV
 
-=head1 VERSION 1.10
+=head1 VERSION 2.00
 
 =cut
 
@@ -158,7 +158,7 @@ Supports the Vote::Count logt, logv, and logd methods for providing details of t
 
 Uses TieBreaker from the TieBreaker Role. The default is 'all', which is to not break ties. 'none' the default for the Matrix (Condorcet) Object should not be used for IRV.
 
-All was chosen as the module default because it is Later Harm safe. Modified Grand Junction is the most resolvable and is the recommended option.
+All was chosen as the module default because it is Later Harm safe. Modified Grand Junction is extremely resolvable and simple.
 
 In the event that the tie-breaker returns a tie eliminate all that remain tied is used, unless that would eliminate all choices, in which case the election returns a tie.
 
@@ -178,10 +178,15 @@ John Karr (BRAINBUZ) brainbuz@cpan.org
 
 CONTRIBUTORS
 
-Copyright 2019 by John Karr (BRAINBUZ) brainbuz@cpan.org.
+Copyright 2019-2021 by John Karr (BRAINBUZ) brainbuz@cpan.org.
 
 LICENSE
 
 This module is released under the GNU Public License Version 3. See license file for details. For more information on this license visit L<http://fsf.org>.
 
+SUPPORT
+
+This software is provided as is, per the terms of the GNU Public License. Professional support and customisation services are available from the author.
+
 =cut
+

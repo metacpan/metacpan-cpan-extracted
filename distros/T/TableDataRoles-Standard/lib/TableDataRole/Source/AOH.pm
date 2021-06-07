@@ -1,9 +1,9 @@
 package TableDataRole::Source::AOH;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-04-13'; # DATE
+our $DATE = '2021-06-01'; # DATE
 our $DIST = 'TableDataRoles-Standard'; # DIST
-our $VERSION = '0.008'; # VERSION
+our $VERSION = '0.009'; # VERSION
 
 use 5.010001;
 use Role::Tiny;
@@ -19,7 +19,7 @@ sub new {
 
     bless {
         aoh => $aoh,
-        index => 0,
+        pos => 0,
         # buffer => undef,
         # column_names => undef,
         # column_idxs  => undef,
@@ -53,18 +53,16 @@ sub get_column_names {
     wantarray ? @{ $self->{column_names} } : $self->{column_names};
 }
 
-sub get_row_hashref {
+sub has_next_item {
     my $self = shift;
-    my $aoh = $self->{aoh};
-    return undef unless $self->{index} < @{$aoh};
-    $aoh->[ $self->{index}++ ];
+    $self->{pos} < @{$self->{aoh}};
 }
 
-sub get_row_arrayref {
+sub get_next_item {
     my $self = shift;
     my $aoh = $self->{aoh};
-    return undef unless $self->{index} < @{$aoh};
-    my $row_hashref = $aoh->[ $self->{index}++ ];
+    die "StopIteration" unless $self->{pos} < @{$aoh};
+    my $row_hashref = $aoh->[ $self->{pos}++ ];
     my $row_aryref = [];
     for (keys %$row_hashref) {
         my $idx = $self->{column_idxs}{$_};
@@ -74,19 +72,27 @@ sub get_row_arrayref {
     $row_aryref;
 }
 
+sub get_next_row_hashref {
+    my $self = shift;
+    my $aoh = $self->{aoh};
+    die "StopIteration" unless $self->{pos} < @{$aoh};
+    $aoh->[ $self->{pos}++ ];
+}
+
 sub get_row_count {
     my $self = shift;
     scalar(@{ $self->{aoh} });
 }
 
-sub reset_row_iterator {
+sub reset_iterator {
     my $self = shift;
-    $self->{index} = 0;
+    delete $self->{buffer};
+    $self->{pos} = 0;
 }
 
-sub get_row_iterator_index {
+sub get_iterator_pos {
     my $self = shift;
-    $self->{index};
+    $self->{pos};
 }
 
 1;
@@ -104,7 +110,7 @@ TableDataRole::Source::AOH - Get table data from an array of hashes
 
 =head1 VERSION
 
-This document describes version 0.008 of TableDataRole::Source::AOH (from Perl distribution TableDataRoles-Standard), released on 2021-04-13.
+This document describes version 0.009 of TableDataRole::Source::AOH (from Perl distribution TableDataRoles-Standard), released on 2021-06-01.
 
 =head1 SYNOPSIS
 
@@ -130,7 +136,7 @@ Source repository is at L<https://github.com/perlancar/perl-TableDataRoles-Stand
 
 =head1 BUGS
 
-Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-TableDataRoles-Standard/issues>
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=TableDataRoles-Standard>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired

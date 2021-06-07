@@ -6,7 +6,7 @@
 use v5.26;
 use Object::Pad 0.19;
 
-package Device::Chip::TSL256x 0.05;
+package Device::Chip::TSL256x 0.06;
 class Device::Chip::TSL256x
    extends Device::Chip;
 
@@ -325,8 +325,17 @@ async method read_lux ()
       $lux = 0;
    }
 
+   my $saturation = ( $msec == 402 ) ? 0xFFFF :
+                    ( $msec == 101 ) ? 0x9139 : 0x13B7;
+
+   # Detect sensor saturation
+   if( $data0 == $saturation or $data1 == $saturation ) {
+      # The sensor saturates at well under 50klux
+      $lux = 50_000;
+   }
+
    if( $_agc_enabled ) {
-      if( $gain == 1 and $data0 < 0x1000 and $data1 < 0x1000 ) {
+      if( $gain == 1 and $data0 < 0x0800 and $data1 < 0x0800 ) {
          $_smallcount++;
          await $self->change_config( GAIN => 16 ) if $_smallcount >= 4;
       }

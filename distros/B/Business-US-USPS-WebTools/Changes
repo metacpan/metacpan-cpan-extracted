@@ -1,5 +1,21 @@
 Revision history for Perl module Business::US::USPS::WebTools
 
+1.125 2021-05-19
+        * Updated API endpoints.  Always use HTTPS.
+
+        * Removed two tests that started failing due to changes in the API
+          response.
+
+        * Skip tracking tests (which are disabled anyway) rather than failing if
+          test credentials aren't set.
+
+        * Access to the testing/staging environment is no longer granted by
+          default and testing against the production environment is allowed
+          (load/stress testing isn't), so tests are now run against the
+          production API by default.  To run against the testing/staging
+          environment, set USPS_WEBTOOLS_ENVIRONMENT to TESTING while setting up
+          your credentials.
+
 1.124 2020-09-18
         * New maintainer
 

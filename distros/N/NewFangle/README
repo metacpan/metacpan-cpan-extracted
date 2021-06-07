@@ -4,14 +4,24 @@ NAME
 
 VERSION
 
-    version 0.06
+    version 0.07
 
 SYNOPSIS
 
      use NewFangle;
-     my $app = NewFangle::App->new('MyApp', $license_key);
-     my $txn = $app->start_transaction('my transaction');
+     my $app = NewFangle::App->new({app_name => 'MyApp', license_key => $license_key});
+     my $txn = $app->start_web_transaction('my transaction');
      $txn->end;
+
+    Or using a NewFangle::Config:
+
+     use NewFangle;
+     my $config = NewFangle::Config->new(
+       app_name => 'MyApp',
+       license_key => $license_key,
+     );
+     my $app = NewFangle::App->new($config);
+     my $txn = $app->start_web_transaction('my transaction');
 
 DESCRIPTION
 
@@ -30,6 +40,13 @@ DESCRIPTION
     reproduce everything that is in the C-SDK documentation, so it is
     recommended that you review it before getting started.
 
+    This module requires a running newrelic-daemon. If you forget, the
+    service newrelic-infra will return an initialization diagnostic like
+    this:
+
+     2021-05-27 06:41:27.160 +0000 (23284 23284) error: failed to connect to the daemon using a timeout of 0 ms at the path /tmp/.newrelic.sock
+     2021-05-27 06:41:27.160 +0000 (23284 23284) error: error initialising libnewrelic; cannot create application
+
     I've called this module NewFangle in the hopes that one day NewRelic
     will write native Perl bindings and they can use the more obvious
     NewRelic namespace.
@@ -37,6 +54,10 @@ DESCRIPTION
 FUNCTIONS
 
     These may be imported on request using Exporter.
+
+    For instance:
+
+     use NewFangle qw( newrelic_init );
 
  newrelic_configure_log
 
@@ -79,7 +100,7 @@ FUNCTIONS
     meaningful when running in a docker or similar container.
 
     This requires a properly patched NewRelic C-SDK to work, since the base
-    C-SDK doesn't currently support setting the language or version. If you
+    C-SDK doesn't currently support overriding the hostname. If you
     installed with Alien::libnewrelic then it should have been properly
     patched for you.
 

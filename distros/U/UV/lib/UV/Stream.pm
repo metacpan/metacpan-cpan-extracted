@@ -1,6 +1,6 @@
 package UV::Stream;
 
-our $VERSION = '1.907';
+our $VERSION = '1.909';
 
 use strict;
 use warnings;

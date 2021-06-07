@@ -22,7 +22,7 @@ sub on_startup {
 
     $self->{Cache} = $self->shared_cache( id => "test", max_age => 20 );
 
-    $self->accept_jobs(
+    $self->accept_remote_calls(
         'cache.set'  => 'set',
         'cache.get'  => 'get',
         'cache.del'  => 'del',
@@ -36,7 +36,7 @@ sub on_startup {
 sub authorize_request {
     my ($self, $req) = @_;
 
-    return REQUEST_AUTHORIZED;
+    return BKPR_REQUEST_AUTHORIZED;
 }
 
 sub get {

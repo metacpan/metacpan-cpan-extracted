@@ -1,7 +1,7 @@
 # file: AuthRegister.pm
 # CGI::AuthRegister - AuthRegister Module for Simple CGI Authentication and
 #   Registration in Perl
-# (c) 2012-20 Vlado Keselj http://vlado.ca
+# (c) 2012-21 Vlado Keselj http://vlado.ca
 
 package CGI::AuthRegister;
 use strict;
@@ -9,7 +9,7 @@ use vars qw($NAME $ABSTRACT $VERSION);
 $NAME     = 'AuthRegister';
 $ABSTRACT = 'AuthRegister Module for Simple CGI Authentication and '.
   'Registration in Perl';
-$VERSION  = '1.402'; # Last update: 2020-11-09
+$VERSION  = '1.403'; # Last update: 2021-04-19
 
 use CGI qw(:standard);
 # Useful diagnostics:
@@ -32,7 +32,7 @@ use vars qw(@ISA @EXPORT);
   set_new_session store_log
  );
 
-use vars qw( $AddAuthenticatedUser
+use vars qw( $AddAuthenticatedUser $AllowSignup
   $DBdir $DBusers $DBpwd $DBsessions $DBusersCas $DBpwdCas
   $DBsessionsCas $DBcasTokens $DebugLevel
   $Email_admin $Email_from $Email_bcc $Error $ErrorInternal
@@ -42,6 +42,7 @@ use vars qw( $AddAuthenticatedUser
   $User $UserEmail $UserId $SendLogs $SecretSalt);
 $AddAuthenticatedUser = ''; # If user is authenticated and not in database,
       # add user to the database. (it should replace $LDAPaddUsers)!!!
+$AllowSignup = ''; # 1 to allow new user signup
 $DBdir      = 'db'; # directory for stored data (822 db, sessions)
 $DBusers    = 'users.db';      # Users db
 $DBusersCas = 'users-cas.db';  # CAS users db
@@ -287,10 +288,12 @@ sub require_login {
   my $HTMLstart = "<HTML><HEAD><TITLE>$title</TITLE><BODY><h1>$title</h1>\n";
   my $Formstart = "<form action=\"$ENV{SCRIPT_NAME}\" method=\"post\">";
   my $Back = "<a href=\"$ENV{SCRIPT_NAME}\">Click here for the main page.</a>\n";
+  local *tr = sub { my($a,$b) = @_; return "<tr><td align=right>$a:</td><td>".
+    ($a=~/password/i?password_field(-name=>$b):textfield(-name=>$b)).
+    "</td></tr>\n"; };
   my $LoginForm =  "<p>Please log in to access the site:<br>\n".$Formstart.
-    "<table><tr><td align=right>Userid or email:</td><td>".
-    textfield(-name=>"userid")."</td></tr>\n<tr><td align=right>".
-    "Password:</td><td>".password_field(-name=>"password")."</td></tr>\n".
+    "<table>\n".&tr('Userid or email','userid').
+    &tr('Password','password').
     '<tr><td>&nbsp;</td><td><input type="submit" name="request_type" value="Login"/>'.
     "</td></tr></table></form>\n";
   my $SendResetForm = "<p>If you forgot your password, it may be possible to ".
@@ -301,8 +304,15 @@ sub require_login {
     "Or, you can reqest password to be reset and sent to you:<br>\n".
     $Formstart."Email: ".textfield(-name=>"email_reset")."\n".
     '<input type="submit" name="request_type" value="Reset_Password"/>'.
-    "</form>\n";
-
+    "</form>\n".
+    ($AllowSignup?("<a href=\"$ENV{SCRIPT_NAME}?signup\">".
+		   "Register new user</a>\n"):'');
+  my $RegistrationForm = $Formstart.
+    "<table>\n".&tr('Userid','reg_userid').&tr('Email','reg_email').
+    &tr('Password','reg_password').&tr('Confirm password','reg_password2').
+    '<tr><td>&nbsp;</td><td><input type="submit" name="request_type" value="Register"/>'.
+    "</td></tr></table></form>\n";
+  
   &analyze_cookie;
   if ($SessionId ne '' && param('keywords') eq 'logout') {
     logout(); print header_delete_cookie(),$HTMLstart,
@@ -310,6 +320,14 @@ sub require_login {
 
   if ($SessionId ne '') { print header(); return 1; }
 
+  if (param('keywords') eq 'signup' && $AllowSignup) {
+    print header(), $HTMLstart, "<h2>New Registration</h2>\n",
+      $RegistrationForm; exit; }
+  elsif (param('confirmation_code')) {
+    print header(), $HTMLstart, "<h2>Email Confirmation</h2>\n";
+    &email_confirmation(param('confirmation_code')); exit;
+  }
+  
   my $Request_type = param('request_type');
 
   if ($Request_type eq 'Login') {
@@ -337,6 +355,11 @@ sub require_login {
       "your email is registered at this site.\n".
       "If you do not receive remider, you can contact the administrator.\n",
       $LoginForm, $SendResetForm; exit;
+  }
+  elsif ($Request_type eq 'Register' && $AllowSignup) {
+    $|=1; print header(), $HTMLstart;
+    &register_new_user;
+    exit;
   }
   else { # should be: $Request_type eq ''
     print header(), $HTMLstart, $LoginForm, $SendResetForm; exit; }
@@ -408,10 +431,12 @@ sub _require_login_using_cas {
   my $u = ($AddAuthenticatedUser ? &get_user_by_userid_or_add($username) :
 	   &get_user_unique('userid', $username));
   if ($u eq '') {
-    $Error.="408-ERR: no userid ($username)\n";
+    $Error.="411-ERR: no userid ($username) in users.db\n";
     $LogReport.=$Error; &store_log;
     print header(); if ($retStatus) { return 'login failed'; }
-    print $HTMLstart, "Unsuccessful login!\n"; &store_log; exit; }
+    print $HTMLstart,
+      "Unsuccessful login! (username not in users.db, ERR-414)\n";
+    &store_log; exit; }
   $User = $u; &set_new_session($User);
   $LogReport.="User $UserEmail logged in.\n"; &store_log;
   print header_session_cookie(); return 1;
@@ -491,6 +516,78 @@ sub analyze_cookie {
 }
 
 ########################################################################
+# Section: User Management
+
+sub register_new_user {
+  my $reg_userid = param('reg_userid'); my $reg_email = param('reg_email');
+  my $reg_password = param('reg_password');
+  my $reg_password2 = param('reg_password2');
+  if ($reg_userid !~ /^(\w|[.-])+$/) {
+    $Error = "Userid must consist of \w . or - characters.";
+    print $Error; exit; }
+  if (!&emailcheckok($reg_email)) { print "Invalid email."; exit; }
+  if ($reg_password eq '') { print "Empty password."; exit; }
+  if ($reg_password ne $reg_password2) {
+    print "Passwords do not match."; exit; }
+  my $confirmation_code = &random_string(12,'0'..'9','A'..'Z','a'..'z');
+  my $dbf = "$DBdir/$DBusers";
+  if (!-f $dbf && !&check_db_files) { print "No db file."; exit; }
+  if (!&lock_mkdir($dbf)) { print "DB lock fail."; exit; }
+  my $dbfc = getfile($dbf); my $db_ref = &read_db($dbfc);
+  if (ref($db_ref) ne 'ARRAY') {
+    print "ERR-540: Cound not read db file."; &unlock_mkdir($dbf); exit; }
+  my @db = @{ $db_ref };
+  local *fin = sub { my $url="https://$ENV{SERVER_NAME}$ENV{SCRIPT_NAME}";
+    print "\nUser browser back button to edit data, or click ".
+          "<a href=\"$url\">Home</a>.\n"; &unlock_mkdir($dbf); exit; };		       
+  for my $u (@db) {
+    if ($u->{userid} eq $reg_userid) { print "Userid already exists."; &fin; }
+    if ($u->{email} eq $reg_email) { print "Email already exists."; &fin; }
+  }
+  $dbfc =~ s/\n+$/\n/s;
+  $dbfc.="\nuserid:$reg_userid\nemail:$reg_email\n".
+    "status:disabled, waiting for confirmation code $confirmation_code\n";
+  putfile($dbf,$dbfc);
+  &unlock_mkdir($dbf);
+  &password_set($reg_email,$reg_password,'md5');
+  if ($Error) { print "Error: $Error"; exit; }
+  print "New user registered.\n";
+  print "<br>An email is being sent to confirm your email ".
+    "address...\n";
+  my $httpsconfirm = "https://$ENV{SERVER_NAME}$ENV{SCRIPT_NAME}?".
+    "confirmation_code=$confirmation_code";
+  my $msg = "Hi,\n\nPlease click or visit the following link to confirm ".
+    "your registration at the site $SiteId:\n\n".
+    "$httpsconfirm\n\nBest regards,\n$SiteId Admin\n";
+  &send_email_to($reg_email, "Subject: $SiteId Email Confirmation", $msg);
+  print "<br>Email sent. Use the sent link to confirm your email.\n";
+}
+
+sub email_confirmation {
+  my $confirmation_code = shift;
+  my $dbf = "$DBdir/$DBusers";
+  if (!-f $dbf && !&check_db_files) { print "No db file."; exit; }
+  if (!&lock_mkdir($dbf)) { print "DB lock fail."; exit; }
+  my $dbfc = getfile($dbf); my $db_ref = &read_db($dbfc);
+  if (ref($db_ref) ne 'ARRAY') {
+    print "ERR-540: Cound not read db file."; &unlock_mkdir($dbf); exit; }
+  my @db = @{ $db_ref }; my $flag = '';
+  for my $u (@db) {
+    if (defined($u->{status}) and
+	$u->{status} =~ /^disabled, waiting for confirmation code (\S+)/ and
+	$1 eq $confirmation_code) {
+      $u->{status} =~
+	s/^disabled, waiting for confirmation code (\S+)/email confirmed/;
+      $flag = 1; last; } }
+  if (!$flag) { print "Invalid confirmation code.\n"; &unlock_mkdir($dbf);
+		return; }
+  _db8_update("file=$dbf", \@db);
+  &unlock_mkdir($dbf);
+  print "Email confirmed.\n<a href=\"https://$ENV{SERVER_NAME}".
+    "$ENV{SCRIPT_NAME}\">Login page</a>\n";
+}
+
+########################################################################
 # Section: Session Management
 
 # params: $email, opt: pwstore type: md5 raw
@@ -509,11 +606,32 @@ sub reset_password {
     $content .= "$email ";
     if   ($pwstore eq 'raw') { $content.="raw:$password" }
     elsif($pwstore eq 'md5') { $content.="md5:".md5_base64($password) }
-    #else                     { $content.="md5:".md5_base64($password) }
     else                     { $content.="raw:$password" }
     $content .= "\n";
     putfile $pwdf, $content; chmod 0600, $pwdf; &unlock_mkdir($pwdf);
     return $password;
+  }
+
+# $pwstoretype:md5,raw
+sub password_set {
+  my $email = shift; my $pwd = shift; my $pwstoretype = shift;
+  $pwstoretype = 'md5' if $pwstoretype eq '';
+  my $pwdf = "$DBdir/$DBpwd";
+  if (!&check_db_files) { $Error.="AuthERR-587:\n"; return '' }
+  if (!&lock_mkdir($pwdf)) { $Error.="AuthErr-588:\n"; return ''; }
+  local *PH; open(PH, $pwdf) or croak($!);
+  my $newrow = "$email ";
+  if ($pwstoretype eq 'md5') { $newrow.="md5:".md5_base64($pwd)."\n" }
+  else { $newrow.="raw:$pwd\n" }
+  my $content = '';
+  while (<PH>) {
+    my ($e,$p) = split;
+    if ($e eq $email) { $content.=$newrow; $newrow=''; }
+    else { $content.=$_ }
+  }
+  $content.=$newrow; $newrow=''; close(PH);
+  putfile $pwdf, $content; chmod 0600, $pwdf; &unlock_mkdir($pwdf);
+  return 1;
 }
 
 sub md5_base64 {
@@ -618,6 +736,8 @@ sub set_new_session {
 # Return 1 if OK, '' otherwise
 sub password_check {
   my $u = shift; my $password = shift;
+  if (defined($u->{status}) and $u->{status}=~/^\s*disabled\b/)
+  { return '' }
   if ($LDAPuse) { return &password_check_ldap($u->{userid}, $password); }
   my $pwstored = &find_password($u->{email});
   if ($pwstored =~ /^raw:/) {
@@ -918,6 +1038,77 @@ sub check_db_files {
   return 1;
 }
 
+# _db8_update - updates given db with minimal changes
+# Usage: db8_update($strOrFile, $db)
+# 2013-2017 Vlado Keselj, version 1.4; documentation in DB822.txt
+# Example: &db8_update("file=$filename", $db);
+sub _db8_update {
+  my $arg = shift; my $db=shift; my $file='';
+  if ($arg =~ /^file=/) {
+    $file = $'; die "file=''!?" if $file eq '';
+    local *F; open(F, $file) or die "cannot open $file:$!";
+    $arg = join('', <F>);
+    close(F);
+  }
+  
+  my $arg_save = $arg; my $dbi = 0; my $argcopy = '';
+  while ($arg) {
+    # allow comments and space betwen records
+    if ($arg =~ /^(\s*\n|[ \t]*#.*\n)*/) { $argcopy.=$&; $arg = $'; }
+    my $record;
+    if ($arg =~ /\n(\n+)/) { $record = "$`\n"; $arg = $1.$'; }
+    else { $record = $arg; $arg = ''; }
+    if ($dbi > $#{$db}) { last }
+    my $r = {}; my %savedkeys = ();
+    while ($record) {
+      my $avpair = '';
+      if ($record =~ /^.*/) { $avpair = $& }
+      while ($record =~ /^(.*)(\\\n|\n[ \t]+)(.*)/)
+	{ $record = "$1 $3$'"; $avpair.= $2.$3; }
+      $record =~ /^([^\n:]*):(.*)\n/ or die;
+      my $k = $1; my $v = $2; $record = $';
+      $avpair .= "\n";
+      if (exists($r->{$k})) {
+	my $c = 0;
+	while (exists($r->{"$k-$c"})) { ++$c }
+	$k = "$k-$c";
+      }
+      $r->{$k} = $v;
+      if (exists($db->[$dbi]->{$k}) && $db->[$dbi]->{$k} eq $v)
+	{ $argcopy .= $avpair }
+      elsif (exists($db->[$dbi]->{$k})) {
+	my $newv = $db->[$dbi]->{$k}; $newv =~ s/\s/ /g; #to be improved
+	$argcopy .= "$k:$newv\n";
+      } # else skip it
+      $savedkeys{$k} = 1;
+    }
+    for my $k (keys %{ $db->[$dbi] }) {
+      if (!exists($savedkeys{$k})) {
+	my $newv = $db->[$dbi]->{$k}; $newv =~ s/\s/ /g; #to be improved
+	$argcopy .= "$k:$newv\n";
+      }
+    }
+    ++$dbi;
+ }
+
+ while ($dbi <= $#{$db}) {
+   $argcopy .= "\n";
+   for my $k (sort(keys(%{ $db->[$dbi] }))) {
+     my $newv = $db->[$dbi]->{$k}; $newv =~ s/\s/ /g; #to be improved
+     $argcopy .= "$k:$newv\n";
+   }
+   ++$dbi;
+ }
+
+ if ($file ne '') {
+   if ($argcopy ne $arg_save) {
+     #rename($file, "$file.bak");
+     local *F; open(F,">$file"); print F $argcopy; close(F);
+   }
+   return;
+ } else { return $argcopy }
+} # end of _db8_update
+
 sub _db8_remove {
   my $dbf = shift; my $kdel = shift; my $vdel = shift;
   die unless $kdel =~ /^k=/; $kdel = $';
@@ -1037,10 +1228,26 @@ sub read_db_record {
   return $r;
 }
 
+# parameters: $n - sequence length; @_ domain elements
+sub random_string {
+    my $n = shift;
+    return '' if $n < 1;
+    my @r = map { $_[rand($#_+1)] } (1..$n);
+    return join('',@r);
+}
+
 sub putfile($@) {
     my $f = shift; local *F;
     if (!open(F, ">$f")) { $Error.="325-ERR:Cannot write ($f):$!\n"; return; }
     for (@_) { print F } close(F);
+}
+
+sub getfile($) {
+    my $f = shift; local *F;
+    if (!open(F, "<$f")) {
+      $Error.="ERR-1099:getfile:cannot open $f:$!"; return; }
+    my @r = <F>; close(F);
+    return wantarray ? @r : join ('', @r);
 }
 
 ########################################################################
@@ -1941,6 +2148,25 @@ __END__
 CGI::AuthRegister - Simple CGI Authentication and Registration in Perl
 
 =head1 SYNOPSIS
+
+A simple example in which new users are allowed to register and confirm their
+email is the following CGI script index.cgi (included as
+examples/8-simple-auto-register/index.cgi):
+
+  #!/usr/bin/perl
+  use CGI::AuthRegister;
+
+  &import_dir_and_config; # Even with no config file uses current dir as name
+  $CGI::AuthRegister::AllowSignup = 1; # allow new user signup (registration)
+  &require_https;  # Require HTTPS connection
+  &require_login;  # Require login and print HTTP header, and handles logout
+
+  print "<html><body>Successfully logged in as $UserEmail\n";
+  print "<p>To logout, click here:\n",
+    "<a href=\"$ENV{SCRIPT_NAME}?logout\">Logout</a>\n";
+
+It assumes that the script will be able to create directories and files
+and send email using sendmail.
 
 Create sub-directory db in your CGI directory, and the file
 db/users.db, which may look as follows (RFC822-like format):

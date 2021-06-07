@@ -6,18 +6,11 @@ use Data::Dumper;
 {
 
 	package TestForm;
-	use Moo;
+	use Form::Tiny;
 
-	with qw(
-		Form::Tiny
+	form_field 'a.*.*' => (
+		required => 1
 	);
-
-	sub build_fields
-	{
-		(
-			{name => 'a.*.*', required => 1},
-		)
-	}
 }
 
 my @data = (

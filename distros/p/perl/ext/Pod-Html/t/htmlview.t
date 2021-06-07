@@ -7,7 +7,9 @@ BEGIN {
 use strict;
 use Test::More tests => 1;
 
-convert_n_test("htmlview", "html rendering", "--quiet");
+convert_n_test("htmlview", "html rendering", {
+     quiet  => 1,
+} );
 
 __DATA__
 <?xml version="1.0" ?>
@@ -45,15 +47,15 @@ __DATA__
 
 <h1 id="SYNOPSIS">SYNOPSIS</h1>
 
-<pre><code>    use My::Module;
+<pre><code>use My::Module;
 
-    my $module = My::Module-&gt;new();</code></pre>
+my $module = My::Module-&gt;new();</code></pre>
 
 <h1 id="DESCRIPTION">DESCRIPTION</h1>
 
 <p>This is the description.</p>
 
-<pre><code>    Here is a verbatim section.</code></pre>
+<pre><code>Here is a verbatim section.</code></pre>
 
 <p>This is some more regular text.</p>
 
@@ -207,7 +209,7 @@ some text
 
 <p>This is an email link: mailto:foo@bar.com</p>
 
-<pre><code>    This is a link in a verbatim block &lt;a href=&quot;http://perl.org&quot;&gt; Perl &lt;/a&gt;</code></pre>
+<pre><code>This is a link in a verbatim block &lt;a href=&quot;http://perl.org&quot;&gt; Perl &lt;/a&gt;</code></pre>
 
 <h1 id="SEE-ALSO">SEE ALSO</h1>
 

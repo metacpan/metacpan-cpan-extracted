@@ -1,9 +1,9 @@
 package Dist::Zilla::Plugin::InsertCodeResult;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-02-21'; # DATE
+our $DATE = '2021-05-21'; # DATE
 our $DIST = 'Dist-Zilla-Plugin-InsertCodeResult'; # DIST
-our $VERSION = '0.052'; # VERSION
+our $VERSION = '0.054'; # VERSION
 
 use 5.010001;
 use strict;
@@ -31,16 +31,18 @@ sub munge_files {
 
 sub munge_file {
     my ($self, $file) = @_;
-    my $content = $file->content;
-    if ($content =~ s{
-                         ^\#\s*CODE:\s*(.*)\s*$ |
-                         ^\#\s*BEGIN_CODE\s*\R((?:.|\R)*?)^\#\s*END_CODE\s*(?:\R|\z)
-                 }{
-                     $self->_code_result($1 // $2)."\n"
-                 }egmx) {
+    my $content_as_bytes = $file->encoded_content;
+    if ($content_as_bytes =~ s{
+                                  ^\#\s*CODE:\s*(.*)\s*(\R|\z) |
+                                  ^\#\s*BEGIN_CODE\s*\R((?:.|\R)*?)^\#\s*END_CODE\s*(?:\R|\z)
+                          }{
+                              my $res = $self->_code_result($1 // $2);
+                              $res .= "\n" unless $res =~ /\R\z/;
+                              $res;
+                          }egmx) {
         $self->log(["inserting result of code '%s' in %s", $1 // $2, $file->name]);
-        $self->log_debug(["content of %s after code result insertion: '%s'", $file->name, $content]);
-        $file->content($content);
+        $self->log_debug(["content of %s after code result insertion: '%s'", $file->name, $content_as_bytes]);
+        $file->encoded_content($content_as_bytes);
     }
 }
 
@@ -80,7 +82,7 @@ Dist::Zilla::Plugin::InsertCodeResult - Insert the result of Perl code into your
 
 =head1 VERSION
 
-This document describes version 0.052 of Dist::Zilla::Plugin::InsertCodeResult (from Perl distribution Dist-Zilla-Plugin-InsertCodeResult), released on 2020-02-21.
+This document describes version 0.054 of Dist::Zilla::Plugin::InsertCodeResult (from Perl distribution Dist-Zilla-Plugin-InsertCodeResult), released on 2021-05-21.
 
 =head1 SYNOPSIS
 
@@ -124,7 +126,7 @@ Source repository is at L<https://github.com/perlancar/perl-Dist-Zilla-Plugin-In
 
 =head1 BUGS
 
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Dist-Zilla-Plugin-InsertCodeResult>
+Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-Dist-Zilla-Plugin-InsertCodeResult/issues>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
@@ -142,7 +144,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020, 2019, 2018, 2015, 2014 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2020, 2019, 2018, 2015, 2014 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

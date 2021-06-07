@@ -7,6 +7,7 @@ use lib 'blib/lib', 'blib/arch'; ## no critic
 use Data::Dumper;
 use DBI;
 use Cwd;
+use Test::More qw//;
 use 5.008001;
 select(($|=1,select(STDERR),$|=1)[1]);
 
@@ -97,7 +98,7 @@ sub connect_database {
         = get_test_settings();
 
     if ($debug) {
-        diag "Test settings:
+        Test::More::diag "Test settings:
 dsn: $testdsn
 user: $testuser
 helpconnect: $helpconnect
@@ -109,28 +110,28 @@ initdb: $initdb
 error: $error
 version: $version
 ";
-        for my $key ( grep { /^DBDPG/ } keys %ENV ) {
-            diag "ENV $key = $ENV{$key}\n";
+        for my $key ( grep { /^DBDPG/ } sort keys %ENV ) {
+            Test::More::diag "ENV $key = $ENV{$key}\n";
         }
     }
 
     ## Did we fail last time? Fail this time too, but quicker!
     if ($testdsn =~ /FAIL!/) {
-        $debug and diag 'Previous failure detected';
+        $debug and Test::More::diag 'Previous failure detected';
         return $helpconnect, "Previous failure ($error)", undef;
     }
 
     ## We may want to force an initdb call
     if ((!$helpconnect and $ENV{DBDPG_TESTINITDB})
             or (exists $ENV{DBDPG_INITDB} and $initdb ne $ENV{DBDPG_INITDB})) {
-        $debug and diag 'Jumping to INITDB';
+        $debug and Test::More::diag 'Jumping to INITDB';
         goto INITDB;
     }
 
     ## Got a working DSN? Give it an attempt
     if ($testdsn and $testuser) {
 
-        $debug and diag "Trying with $testuser and $testdsn";
+        $debug and Test::More::diag "Trying with $testuser and $testdsn";
 
         ## Used by t/01connect.t
         if ($arg->{dbreplace}) {
@@ -146,7 +147,7 @@ version: $version
             1;
         };
 
-        $debug and diag "Connection failed: $@";
+        $debug and Test::More::diag "Connection failed: $@";
 
         if ($@ =~ /invalid connection option/ or $@ =~ /dbbarf/) {
             return $helpconnect, $@, undef;
@@ -372,10 +373,7 @@ version: $version
             $su = $testuser = '';
 
             ## Figure out a valid directory - returns empty if nothing available
-            $testdir = find_tempdir();
-            if (!$testdir) {
-                return $helpconnect, 'Unable to create a temp directory', undef;
-            }
+            $testdir = File::Temp::tempdir('dbdpg_testdatabase_XXXXXX', TMPDIR => 1, CLEANUP => 0);
 
             my $readme = "$testdir/README";
             if (open $fh, '>', $readme) {
@@ -488,7 +486,7 @@ version: $version
         }
         $@ = '';
 
-        $debug and diag "Port to use: $testport";
+        $debug and Test::More::diag "Port to use: $testport";
 
         my $conf = "$testdir/data/postgresql.conf";
         my $cfh;
@@ -496,12 +494,12 @@ version: $version
         ## If there is already a pid file, do not modify the config
         ## We assume a previous run put it there, so we extract the port
         if (-e "$testdir/data/postmaster.pid") {
-            $debug and diag qq{File "$testdir/data/postmaster.pid" exists};
+            $debug and Test::More::diag qq{File "$testdir/data/postmaster.pid" exists};
             open my $cfh, '<', $conf or die qq{Could not open "$conf": $!\n};
             while (<$cfh>) {
                 if (/^\s*port\s*=\s*([0-9]+)/) {
                     $testport = $1;
-                    $debug and diag qq{Found port $testport inside conf file\n};
+                    $debug and Test::More::diag qq{Found port $testport inside conf file\n};
                 }
             }
             close $cfh or die qq{Could not close "$conf": $!\n};
@@ -511,10 +509,10 @@ version: $version
             ## Change to this new port and fire it up
             if (! open $cfh, '>>', $conf) {
                 $@ = qq{Could not open "$conf": $!};
-                $debug and diag qq{Failed to open "$conf"};
+                $debug and Test::More::diag qq{Failed to open "$conf"};
                 last GETHANDLE; ## Fail - no conf file
             }
-            $debug and diag qq{Writing to "$conf"};
+            $debug and Test::More::diag qq{Writing to "$conf"};
             print {$cfh} "\n\n## DBD::Pg testing parameters\n";
             print {$cfh} "port=$testport\n";
             print {$cfh} "max_connections=11\n";
@@ -569,7 +567,7 @@ version: $version
                 chdir $testdir;
                 $COM = qq{su -m $su -c "$COM"};
             }
-            $debug and diag qq{Running: $COM};
+            $debug and Test::More::diag qq{Running: $COM};
             eval {
                 $info = qx{$COM};
             };
@@ -591,7 +589,7 @@ version: $version
             $testdsn .= ";host=$testdir/data/socket";
         }
 
-        $debug and diag qq{Test DSN: $testdsn};
+        $debug and Test::More::diag qq{Test DSN: $testdsn};
         my $loop = 1;
       STARTUP: {
             eval {
@@ -602,7 +600,7 @@ version: $version
             ## We used to check the message, but LANG problems may complicate that.
             if ($@) {
 
-                $debug and diag qq{Connection error: $@\n};
+                $debug and Test::More::diag qq{Connection error: $@\n};
 
                 if ($@ =~ /database "postgres" does not exist/) {
                     ## Old server, so let's create a postgres database manually
@@ -622,7 +620,7 @@ version: $version
                 if ($@ =~ /role "postgres" does not exist/) {
                     ## Probably just created with the current user, so use that
                     if (exists $ENV{USER} and length $ENV{USER}) {
-                        $debug and diag qq{Switched to new user: $testuser\n};
+                        $debug and Test::More::diag qq{Switched to new user: $testuser\n};
                         eval {
                             $dbh = DBI->connect($testdsn, $ENV{USER}, '',
                                                 {RaiseError => 1, PrintError => 0, AutoCommit => 1});
@@ -678,7 +676,7 @@ version: $version
     $ENV{DBI_DSN} = $testdsn;
     $ENV{DBI_USER} = $testuser;
 
-    $debug and diag "Got a database handle ($dbh)";
+    $debug and Test::More::diag "Got a database handle ($dbh)";
 
     if (!$arg->{quickreturn} or 1 != $arg->{quickreturn}) {
         ## non-ASCII parts of the tests assume UTF8
@@ -691,7 +689,7 @@ version: $version
     }
 
     if ($arg->{quickreturn}) {
-        $debug and diag 'Returning via quickreturn';
+        $debug and Test::More::diag 'Returning via quickreturn';
         return $helpconnect, '', $dbh;
     }
 
@@ -707,13 +705,13 @@ version: $version
     }
     else {
 
-        $debug and diag 'Attempting to cleanup database';
+        $debug and Test::More::diag 'Attempting to cleanup database';
         cleanup_database($dbh);
 
         eval {
             $dbh->do("CREATE SCHEMA $S");
         };
-        $@ and $debug and diag "Create schema error: $@";
+        $@ and $debug and Test::More::diag "Create schema error: $@";
         if ($@ =~ /Permission denied/ and $helpconnect != 16) {
             ## Okay, this ain't gonna work, let's try initdb
             goto INITDB;
@@ -770,23 +768,6 @@ sub is_super {
 
 }
 
-sub find_tempdir {
-
-    if (eval { require File::Temp; 1; }) {
-        return File::Temp::tempdir('dbdpg_testdatabase_XXXXXX', TMPDIR => 1, CLEANUP => 0);
-    }
-
-    ## Who doesn't have File::Temp?! :)
-    for my $num (1..100) {
-        my $tempdir = "/tmp/dbdpg_testdatabase_ABCDEF$num";
-        next if -e $tempdir;
-        mkdir $tempdir or return '';
-        return $tempdir;
-    }
-    return '';
-
-} ## end of find_tempdir
-
 
 sub get_test_settings {
 
@@ -810,7 +791,7 @@ sub get_test_settings {
     my ($testdsn, $testuser, $testdir, $error) = ('','','','?');
     my ($helpconnect, $su, $uid, $version) = (0,'','',0);
     my $inerror = 0;
-    if (-e $helpfile) {
+    if (-e $helpfile and ! $ENV{DBDPG_TEST_NOHELPFILE}) {
         open $fh, '<', $helpfile or die qq{Could not open "$helpfile": $!\n};
         while (<$fh>) {
             if ($inerror) {

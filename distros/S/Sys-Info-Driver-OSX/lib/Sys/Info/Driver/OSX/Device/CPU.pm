@@ -1,8 +1,8 @@
 package Sys::Info::Driver::OSX::Device::CPU;
-$Sys::Info::Driver::OSX::Device::CPU::VERSION = '0.7959';
+$Sys::Info::Driver::OSX::Device::CPU::VERSION = '0.7960';
 use strict;
 use warnings;
-use base qw(Sys::Info::Base);
+use parent qw(Sys::Info::Base);
 use Carp qw( croak );
 use POSIX ();
 use Sys::Info::Driver::OSX;
@@ -63,6 +63,9 @@ sub identify {
             $speed *= 1000;
         }
 
+        my $proc_num = $cpu->{number_processors};
+        $proc_num =~ s/proc (\d+).*/$1/; # M1 asymmetric cores
+
         push @{ $self->{META_DATA} }, {
             serial_number                => $cpu->{serial_number},
             architecture                 => $arch,
@@ -81,7 +84,7 @@ sub identify {
             L2_cache                     => { max_cache_size => $cache_size },
             flags                        => @flags ? [ sort @flags ] : undef,
             ( $byteorder ? (byteorder    => $byteorder):()),
-        } for 1..$cpu->{number_processors};
+        } for 1..$proc_num;
     }
 
     return $self->_serve_from_cache(wantarray);
@@ -128,7 +131,7 @@ Sys::Info::Driver::OSX::Device::CPU
 
 =head1 VERSION
 
-version 0.7959
+version 0.7960
 
 =head1 SYNOPSIS
 

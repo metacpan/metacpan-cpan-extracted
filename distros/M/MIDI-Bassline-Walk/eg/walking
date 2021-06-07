@@ -1,0 +1,26 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+
+use lib map { "$ENV{HOME}/sandbox/$_/lib" } qw(MIDI-Util);
+use MIDI::Util qw(setup_score);
+use MIDI::Bassline::Walk;
+
+my $reps   = shift || 2;
+my @chords = @ARGV ? @ARGV : qw(Am Dm Am Em);
+
+my $score = setup_score(patch => 35);
+
+my $bassline = MIDI::Bassline::Walk->new(
+    verbose => 1,
+#    scale => sub { $_[0] =~ /^[A-G][#b]?m/ ? 'pminor' : 'pentatonic' },
+);
+
+for (1 .. $reps) {
+    for my $chord (@chords) {
+        my $notes = $bassline->generate($chord, 4);
+        $score->n('qn', $_) for @$notes;
+    }
+}
+
+$score->write_score("$0.mid");

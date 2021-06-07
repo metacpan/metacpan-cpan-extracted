@@ -1,5 +1,38 @@
 Revision history for Perl extension PGXN::Site
 
+0.22.0  2021-05-29T21:32:54Z
+      - Reorganized the nav and footer links. There are now fewer of them, and
+        the nav links focus on content, while the footer focuses on metadata.
+      - Added a "Colophon" section to the About page, including links to credit
+        the original site and logo designers, as well as the typeface and icons.
+      - Added the "generator" meta element to the header to report the version,
+        since it, too, has been removed from the footer.
+      - Added /tags/, with the search form defaulting to searching tags, and
+        the tag cloud, since it does not appear on the home page on mobile.
+      - Increased the line size of search results and list tables.
+      - Added a search form to the Users page, and moved the list of letters
+        to search to a horizontal list.
+      - Opened up the spacing in block quotes so that the icon doesn't crowd
+        the text. Applies to error, warning, and success blocks, too.
+      - Knocked 40px off the height of the header on mobile devices.
+      - Added OpenGraph/Twitter unfurl support to all pages. Should make
+        excerpts look nicer for links posted on social media.
+
+0.21.0  2021-05-28T02:07:56Z
+      - Added required --base-url option. Required for absolute URLs, such as
+        the fallback icon for Gravatar.
+      - Moved the code to load another distribution version from the version
+        select list to a script element, so that it can be allowed via a
+        content security policy hash.
+      - Increased the size of the download and browse buttons on the
+        distribution page.
+      - Updated the layout to be responsive for usability and readability on
+        mobile an tablet devices.
+
+0.20.3  2021-05-23T14:02:05Z
+      - Switched to HTTPS for Gravatar images.
+      - Updated the browse and download icons to more pleasing variants.
+
 0.20.2  2021-05-16T02:15:33Z
       - Fixed the Safari pin tab icon.
       - Restored the blue margin on the right and at the bottom of the logo

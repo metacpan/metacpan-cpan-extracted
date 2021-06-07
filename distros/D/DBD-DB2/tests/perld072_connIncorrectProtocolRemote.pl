@@ -20,7 +20,7 @@ $string = "dbi:DB2:DATABASE=$DATABASE; HOSTNAME=$HOSTNAME; PORT=$PORT; PROTOCOL=
 $dbh = DBI->connect($string, $userid, $password, {PrintError => 0});
 
 check_value("CONNECT", "DBI::err", -1013);
-$expMsg = "[IBM][CLI Driver] SQL1013N  The database alias name or database name \" \" could not be found.  SQLSTATE=42705\n";
+$expMsg = "[IBM][CLI Driver] SQL1013N  The database alias name or database name \"\" could not be found.  SQLSTATE=42705\n";
 
 check_value("CONNECT", "DBI::errstr", $expMsg);
 check_value("CONNECT", "DBI::state", "08001");

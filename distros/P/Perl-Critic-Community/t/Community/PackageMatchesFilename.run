@@ -1,0 +1,27 @@
+## name MatchesFilename
+## failures 0
+## filename path/to/My/Package.pm
+## cut
+
+package My::Package;
+
+## name MatchesEndFilename
+## failures 0
+## filename path/to/My/Package.pm
+## cut
+
+package Package;
+
+## name NoMatchingFilename
+## failures 1
+## filename path/to/My/Package.pm
+## cut
+
+package MyPackage;
+
+## name NotModule
+## failures 0
+## filename path/to/My/File.t
+## cut
+
+package MyFile;

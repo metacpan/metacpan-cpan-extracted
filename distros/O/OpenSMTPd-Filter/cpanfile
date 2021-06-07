@@ -1,7 +1,7 @@
 requires 'perl', 'v5.16';
 
 on test => sub {
-	requires 'Test2::V0';
+	requires 'Test2::V0', '0.000121';
 };
 
 on 'develop' => sub {

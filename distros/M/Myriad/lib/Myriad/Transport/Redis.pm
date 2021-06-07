@@ -2,7 +2,7 @@ package Myriad::Transport::Redis;
 
 use Myriad::Class extends => qw(IO::Async::Notifier);
 
-our $VERSION = '0.006'; # VERSION
+our $VERSION = '0.007'; # VERSION
 our $AUTHORITY = 'cpan:DERIV'; # AUTHORITY
 
 =pod
@@ -229,7 +229,7 @@ async method read_from_stream (%args) {
         return map {
             my ($id, $args) = $_->@*;
             $log->tracef('Item from stream %s is ID %s and args %s', $stream, $id, $args);
-            return {
+            +{
                 stream => $self->remove_prefix($stream),
                 id     => $id,
                 data   => $args,

@@ -3,10 +3,10 @@ use warnings;
 use strict;
 use utf8;
 
-our $VERSION = '0.21';
+our $VERSION = '0.22';
 
 # Core modules
-use Carp qw/carp croak confess/;
+use Carp qw/carp croak confess cluck/;
 use Math::Trig qw!acos pi rad2deg deg2rad tan!;
 use Scalar::Util 'looks_like_number';
 
@@ -139,10 +139,13 @@ sub render
 my %no_render = (
     clipPath => true,
     defs => true,
+    linearGradient => true,
+    radialGradient => true,
     title => true,
 );
 
-# Actually render
+# This is the rendering routine for an element and its children. The
+# rendering routine for individual objects is "_draw".
 
 sub _render
 {
@@ -152,15 +155,18 @@ sub _render
 	# Put the title into the output PNG as text, etc.
 	return;
     }
-    my $attr = $self->_draw ($element, $pattr);
+    my ($attr, $restore) = $self->_draw ($element, $pattr);
     $self->{depth}++;
     my $child = $element->{child};
     for (@$child) {
 	$self->_render ($_, $attr);
     }
     $self->{depth}--;
-    $self->_draw_end ($element);
+    $self->_draw_end ($element, $restore);
 }
+
+# Extract the ID in an href from a list of attributes. This has to
+# deal with both xlink:href and href.
 
 sub x_id
 {
@@ -176,6 +182,9 @@ sub x_id
     $id =~ s/^#//;
     return $id;
 }
+
+# Process a <use> element. We can't easily call this routine "use"
+# since that is a Perl keyword.
 
 sub processUse
 {
@@ -207,6 +216,9 @@ sub processUse
 	$cr->restore ();
     }
 }
+
+# This is the rendering routine for individual items in the SVG
+# document such as a circle.
 
 sub _draw
 {
@@ -243,7 +255,7 @@ sub _draw
 	stroke-opacity
 	stroke-width
     !) {
-	if ($pattr->{$key} && ! $attr{$key}) {
+	if ($pattr->{$key} && ! defined $attr{$key}) {
 	    $attr{$key} = $pattr->{$key};
 	}
     }
@@ -255,7 +267,7 @@ sub _draw
 	$self->msg ("_clipping, not rendering");
 	$nodraw = true;
     }
-    $self->do_svg_attr (%attr);
+    my $restore = $self->do_svg_attr (%attr);
     if ($tag eq 'svg' || $tag eq 'g') {
 	# These are non-rendering, i.e. don't result in visual output.
 	$nodraw = true;
@@ -283,6 +295,8 @@ sub _draw
     }
     elsif ($tag eq 'use') {
 	$self->processUse (%attr);
+	# The element is rendered within processUse.
+	$nodraw = true;
     }
     elsif ($tag eq 'defs') {
 	# Throw an exception. Arriving here is a bug, we should have
@@ -291,11 +305,8 @@ sub _draw
 	# renderer. Its children are probably used by a <use> element.
 	confess "<defs> element reached";
     }
-    elsif ($tag eq 'clipPath') {
-	confess "<clipPath> element reached";
-    }
-    elsif ($tag eq 'linearGradient') {
-	$self->linearGradient (%attr);
+    elsif ($no_render{$tag}) {
+	confess "<$tag> element reached";
     }
     else {
 	if ($self->{verbose}) {
@@ -309,7 +320,7 @@ sub _draw
     if (! $nodraw) {
 	$self->do_fill_stroke (\%attr);
     }
-    return \%attr;
+    return (\%attr, $restore);
 }
 
 sub do_clip_path
@@ -342,13 +353,10 @@ sub do_clip_path
 
 sub _draw_end
 {
-    my ($self, $element) = @_;
+    my ($self, $element, $restore) = @_;
     my $tag = $element->{tag};
     $self->msg ("</$tag>");
-    # Only use the actual attributes, not the inherited ones, although
-    # the transform attribute is probably not inherited.
-    my $attr = $element->{attr};
-    if ($attr->{transform}) {
+    if ($restore) {
 	my $cr = $self->{cr};
 	$cr->restore ();
     }
@@ -419,7 +427,7 @@ sub svg
 	$self->{surface} = $surface;
 	$self->make_cr ();
     }
-	my $cr = $self->{cr};
+    my $cr = $self->{cr};
     if (defined $min_x && defined $min_y && ($min_x != 0 || $min_y != 0)) {
 	$cr->translate (-$min_x, -$min_y);
     }
@@ -875,14 +883,17 @@ sub svg_units_scale
     if (looks_like_number ($thing)) {
 	return ($thing, 1);
     }
-    if ($thing =~ /([0-9\.]+)(\w+)/) {
+    if ($thing =~ /([0-9\.]+)%$/) {
+	return (undef,1);
+    }
+    if ($thing =~ /([0-9\.]+)(\w+)$/) {
 	my $number = $1;
 	my $unit = $2;
 	my $u = $units{$unit};
 	if ($u) {
 	    return ($number * $u, $u);
 	}
-	carp "Unknown unit $unit";
+	carp "Unknown unit $unit in '$thing'";
 	return ($number, 1);
     }
     carp "Failed to convert SVG units '$thing'";
@@ -897,12 +908,26 @@ sub svg_units
 
 my $fpnum = qr!-?(?:[0-9]*\.[0-9]+|0|[0-9]+)!;
 
+# Save the drawing context if necessary.
+
+sub save
+{
+    my ($self, $restore_ref) = @_;
+    if (! $$restore_ref) {
+	my $cr = $self->{cr};
+	$cr->save ();
+	$$restore_ref = 1;
+    }
+}
+
 # We have a path in the cairo surface and now we have to do the SVG
 # instructions specified by "%attr".
 
 sub do_svg_attr
 {
     my ($self, %attr) = @_;
+
+    my $restore;
 
     # Copy attributes from "self".
 
@@ -927,24 +952,28 @@ sub do_svg_attr
     my $cr = $self->{cr};
     my $stroke_width = $attr{"stroke-width"};
     if ($stroke_width) {
+	$self->save (\$restore);
 	$stroke_width = svg_units ($stroke_width);
 	$cr->set_line_width ($stroke_width);
     }
     my $linecap = $attr{"stroke-linecap"};
     if ($linecap) {
+	$self->save (\$restore);
 	$cr->set_line_cap ($linecap);
     }
     my $linejoin = $attr{"stroke-linejoin"};
     if ($linejoin) {
+	$self->save (\$restore);
 	$cr->set_line_join ($linejoin);
     }
     my $transform = $attr{transform};
     if ($transform) {
-	$cr->save ();
+	$self->save (\$restore);
 	$self->do_transforms (%attr);
     }
     my $fill_rule = $attr{'fill-rule'};
     if ($fill_rule) {
+	$self->save (\$restore);
 	# Cairo supports the same two things as SVG, but with
 	# different names.
 	if ($fill_rule eq 'nonzero') {
@@ -959,6 +988,7 @@ sub do_svg_attr
     }
     my $miterlimit = $attr{'stroke-miterlimit'};
     if (defined $miterlimit) {
+	$self->save (\$restore);
 	$cr->set_miter_limit ($miterlimit);
     }
     my $clip_path = $attr{'clip-path'};
@@ -968,6 +998,7 @@ sub do_svg_attr
     my $stroke_dashoffset = $attr{'stroke-dashoffset'};
     my $stroke_dasharray = $attr{'stroke-dasharray'};
     if ($stroke_dasharray) {
+	$self->save (\$restore);
 	my @sd;
 	while ($stroke_dasharray =~ /($fpnum)/g) {
 	    push @sd, $1;
@@ -977,6 +1008,7 @@ sub do_svg_attr
 	}
 	$cr->set_dash ($stroke_dashoffset, @sd);
     }
+    return $restore;
 }
 
 # The reason this is as complicated as it is is because SVG accepts
@@ -1108,11 +1140,6 @@ sub multiply
     $cr->set_matrix ($matrix);
 }
 
-sub linearGradient
-{
-    my ($self, %attr) = @_;
-}
-
 sub do_fill_stroke
 {
     my ($self, $attr) = @_;
@@ -1143,7 +1170,7 @@ sub do_fill_stroke
 	    $self->msg ("Filling with $fill");
 	    $self->set_colour ($stroke, $stroke_opacity);
 	    $cr->stroke ();
-	    $self->msg ("Stroking with $stroke");
+	    $self->msg ("Stroking after fill with $stroke");
 	}
 	else {
 	    $self->set_colour ($fill, $fill_opacity);
@@ -1153,7 +1180,7 @@ sub do_fill_stroke
     }
     elsif ($stroke && $stroke ne 'none') {
 	$self->set_colour ($stroke, $stroke_opacity);
-	$self->msg ("Stroking with $stroke");
+	$self->msg ("Stroking only with $stroke");
 	$cr->stroke ();
     }
     elsif (! $fill && ! $stroke) {
@@ -1324,18 +1351,34 @@ sub name2colour
     my ($colour) = @_;
     my $c = $color2rgb{lc $colour};
     if (! $c) {
+	warn "Unknown colour $colour";
 	return @defaultrgb;
     }
-    return map {$_/256} @$c;
+    return map {$_/255} @$c;
 }
 
-sub set_colour
+# Hex digit
+my $h = qr/[0-9a-f]/i;
+my $hh = qr/$h$h/;
+# One argument of an rgb() command.
+my $rgb = qr/[0-9\.]+%?/;
+my $com = qr/\s*,\s*/;
+
+sub rgb
 {
-    my ($self, $colour, $opacity) = @_;
-    my $cr = $self->{cr};
-    # Hex digit
-    my $h = qr/[0-9a-f]/i;
-    my $hh = qr/$h$h/;
+    my ($val) = @_;
+    if ($val =~ s/%$//) {
+	return $val / 100;
+    }
+    return $val / 255;
+}
+
+sub string_to_rgb
+{
+    my ($colour) = @_;
+    if (! defined $colour) {
+	confess "No color";
+    }
     my @c = @defaultrgb;
     if ($colour eq 'black') {
 	@c = (0, 0, 0);
@@ -1349,10 +1392,28 @@ sub set_colour
     elsif ($colour =~ /^#($hh)($hh)($hh)$/) {
 	@c = (hex ($1)/255, hex ($2)/255, hex ($3)/255);
     }
+    elsif ($colour =~ /^rgb\s*\(($rgb)$com($rgb)$com($rgb)\)\s*$/) {
+	@c = (rgb ($1), rgb ($2), rgb ($3));
+    }
     else {
 	@c = name2colour ($colour);
     }
+    return @c;
+}
+
+
+sub set_colour
+{
+    my ($self, $colour, $opacity) = @_;
+    my $cr = $self->{cr};
+    if ($colour =~ /^url\(#(.*?)\)/) {
+	my $gid = $1;
+	$self->use_gradient ($gid);
+	return;
+    }
+    my @c = string_to_rgb ($colour);
     if (defined $opacity) {
+	$self->msg ("Setting opacity to $opacity");
 	if ($opacity > 1 || $opacity < 0) {
 	    carp "Opacity value $opacity out of bounds";
 	    $opacity = 1;
@@ -1363,6 +1424,165 @@ sub set_colour
 	$cr->set_source_rgb (@c);
     }
 }
+
+# https://developer.mozilla.org/en-US/docs/Web/SVG/Element/linearGradient
+
+my %linearDefaults = (
+    x1 => '0%',
+    y1 => '0%',
+    x2 => '100%',
+    y2 => '0%',
+);
+
+# https://developer.mozilla.org/en-US/docs/Web/SVG/Element/radialGradient
+
+my %radialDefaults = (
+    cx => '50%',
+    cy => '50%',
+    fr => '0%',
+    r => '50%',
+    # These should be set to the values of cx and cy if they are not
+    # defined separately.
+    fx => 'error',
+    fy => 'error',
+);
+
+# These are the arguments in the order which Cairo requires.
+
+my @rgargs = qw!fx fy fr cx cy r!;
+
+sub use_gradient
+{
+    my ($self, $gid) = @_;
+    my $element = $self->get_id ($gid);
+    if (! $element) {
+	carp "Could not find element with ID $gid";
+	return;
+    }
+    my $cr = $self->{cr};
+    my $tag = $element->{tag};
+    my $attr = $element->{attr};
+    my $children = $element->{child};
+    my $pat;
+    my $noscale;
+    my $gradientUnits = $attr->{gradientUnits};
+    if (defined $gradientUnits && $gradientUnits eq 'userSpaceOnUse') {
+	$noscale = 1;
+    }
+    my ($x1, $y1, $x2, $y2) = $cr->fill_extents ();
+    if ($tag eq 'linearGradient') {
+	my @args;
+	my $i = 0;
+	for (qw!x1 y1 x2 y2!) {
+	    if ($attr->{$_}) {
+		$args[$i] = $attr->{$_};
+	    }
+	    else {
+		$args[$i] = $linearDefaults{$_};
+	    }
+	    $i++;
+	}
+	for (@args) {
+	    if ($_ =~ s/\%$//) {
+		$_ /= 100;
+	    }
+	}
+	if (! $noscale) {
+	    my $xdiff = $x2 - $x1;
+	    my $ydiff = $y2 - $y1;
+	    $args[0] = adjust ($args[0], $x1, $xdiff);
+	    $args[1] = adjust ($args[1], $y1, $ydiff);
+	    $args[2] = adjust ($args[2], $x1, $xdiff);
+	    $args[3] = adjust ($args[3], $y1, $ydiff);
+	}
+	$self->msg ("Linear gradient arguments: @args");
+	$pat = Cairo::LinearGradient->create (@args);
+	read_stops ($children, $pat);
+	$cr->set_source ($pat);
+	return;
+    }
+    elsif ($tag eq 'radialGradient') {
+	my %args;
+	for (@rgargs) {
+	    if ($attr->{$_}) {
+		$args{$_} = $attr->{$_};
+	    }
+	    else {
+		$args{$_} = $radialDefaults{$_};
+	    }
+	}
+	if (! defined $attr->{fx}) {
+	    $args{fx} = $args{cx};
+	}
+	if (! defined $attr->{fy}) {
+	    $args{fy} = $args{cy};
+	}
+	for (@rgargs) {
+	    if ($args{$_} =~ s/\%$//) {
+		$args{$_} /= 100;
+	    }
+	}
+	if (! $noscale) {
+	    my $xdiff = $x2 - $x1;
+	    my $ydiff = $y2 - $y1;
+	    my $rdiff = $xdiff;
+	    if ($xdiff != $ydiff) {
+		$rdiff = sqrt (($xdiff ** 2 + $ydiff ** 2)/2);
+	    }
+	$self->msg ("Radial gradient arguments: @args{@rgargs}\n");
+	    $args{fx} = adjust ($args{fx}, $x1, $xdiff);
+	    $args{fy} = adjust ($args{fy}, $y1, $ydiff);
+	    $args{fr} = adjust ($args{fr},   0, $rdiff);
+	    $args{cx} = adjust ($args{cx}, $x1, $xdiff);
+	    $args{cy} = adjust ($args{cy}, $y1, $ydiff);
+	    $args{r}  = adjust ($args{r},    0, $rdiff);
+	}
+	$self->msg ("Radial gradient arguments: @args{@rgargs}\n");
+	$pat = Cairo::RadialGradient->create (@args{@rgargs});
+	read_stops ($children, $pat);
+	$cr->set_source ($pat);
+	return;
+    }
+    else {
+	carp "Don't know what to do with tag '$tag'";
+	return;
+    }
+}
+
+sub read_stops
+{
+    my ($children, $pat) = @_;
+    for my $child (@$children) {
+	my $cattr = $child->{attr};
+	my $offset = $cattr->{offset};
+	if (! defined $offset) {
+	    $offset = 0;
+	}
+	if ($offset =~ s/\%$//) {
+	    $offset /= 100;
+	}
+	my $stop_colour = $cattr->{'stop-color'};
+	my @rgb = @defaultrgb;
+	if (defined $stop_colour) {
+	    @rgb = string_to_rgb ($stop_colour);
+	}
+	my $stop_opacity = $cattr->{'stop-opacity'};
+	if (defined $stop_opacity) {
+	    $pat->add_color_stop_rgba ($offset, @rgb, $stop_opacity);
+	}
+	else {
+	    $pat->add_color_stop_rgb ($offset, @rgb);
+	}
+    }
+}
+
+sub adjust
+{
+    my ($value, $start, $diff) = @_;
+    $value = $start + $value * $diff;
+    return $value;
+}
+
 
 sub surface
 {

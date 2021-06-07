@@ -1,7 +1,7 @@
 README
 Build.PL
 Changes
-lib/PDL/IO/NDF.pm.PL
+lib/PDL/IO/NDF.pm
 MANIFEST
 t/ndf.t
 t/scuba2.t

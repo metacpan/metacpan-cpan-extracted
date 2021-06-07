@@ -2,14 +2,11 @@ use ExtUtils::MakeMaker;
 use Config;
 use strict;
 
-our $VERSION = "1.30";
+our $VERSION = "1.33";
 
 my %err = ();
 
-# Symbian cross-compiling environment.
-my $IsSymbian = exists $ENV{SDK} && -d "$ENV{SDK}\\epoc32";
-
-my $IsMSWin32 = $^O eq 'MSWin32' && !$IsSymbian;
+my $IsMSWin32 = $^O eq 'MSWin32';
 
 unlink "Errno.pm" if -f "Errno.pm";
 unlink "Errno.tmp" if -f "Errno.tmp";
@@ -21,11 +18,18 @@ if ($Config{gccversion} ne '' && $^O eq 'MSWin32') {
     # MinGW complains "warning: #pragma system_header ignored outside include
     # file" if the header files are processed individually, so include them
     # all in .c file and process that instead.
+    my %seen;
     open INCS, '>', 'includes.c' or
 	die "Cannot open includes.c";
     foreach $file (@files) {
 	next if $file eq 'errno.c';
 	next unless -f $file;
+	if ( $file eq 'avx512vpopcntdqvlintrin.h' || $file eq 'avx512bwintrin.h' ) {
+		# "Never use <avx512bwintrin.h> directly; include <immintrin.h> instead."
+		# "Never use <avx512vpopcntdqvlintrin.h> directly; include <immintrin.h> instead."
+		$file = 'immintrin.h';
+	}
+	next if ++$seen{$file} > 1;
 	print INCS qq[#include "$file"\n];
     }
     close INCS;
@@ -143,15 +147,11 @@ sub get_files {
 	$file{$linux_errno_h} = 1;
     } elsif ($^O eq 'haiku') {
 	# hidden in a special place
-	$file{'/boot/develop/headers/posix/errno.h'} = 1;
+	$file{'/boot/system/develop/headers/posix/errno.h'} = 1;
 
     } elsif ($^O eq 'vos') {
 	# avoid problem where cpp returns non-POSIX pathnames
 	$file{'/system/include_library/errno.h'} = 1;
-    } elsif ($IsSymbian) {
-        my $SDK = $ENV{SDK};
-        $SDK =~ s!\\!/!g;
-	$file{"$SDK/epoc32/include/libc/sys/errno.h"} = 1;
     } else {
 	open(CPPI, '>', 'errno.c') or
 	    die "Cannot open errno.c";
@@ -244,12 +244,7 @@ sub write_errno_pm {
 		$inhibit_linemarkers;
 	    open(CPPO,"$cpp errno.c |") or
 		die "Cannot run '$cpp errno.c'";
-	} elsif ($IsSymbian) {
-            my $cpp = "gcc -E -I$ENV{SDK}\\epoc32\\include\\libc" .
-		$inhibit_linemarkers ." -";
-	    open(CPPO,"$cpp < errno.c |")
-		or die "Cannot exec $cpp";
-        } else {
+	} else {
 	    my $cpp = default_cpp() . $inhibit_linemarkers;
 	    open(CPPO,"$cpp < errno.c |")
 		or die "Cannot exec $cpp";

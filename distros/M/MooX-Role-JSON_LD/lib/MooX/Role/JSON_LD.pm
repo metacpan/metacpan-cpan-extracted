@@ -160,7 +160,7 @@ use MRO::Compat;
 use Types::Standard qw[ArrayRef HashRef InstanceOf Str is_CodeRef is_HashRef
   is_ArrayRef is_Ref is_Object];
 
-our $VERSION = '1.0.0';
+our $VERSION = '1.0.1';
 
 requires qw[json_ld_type json_ld_fields];
 
@@ -202,6 +202,29 @@ sub _resolve_nested {
         : $val;
 }
 
+sub process_hash {
+  my $self = shift;
+  my ($data, $field) = @_;
+
+  my @keys = keys %$field;
+  my @vals = values %$field;
+
+  # Originally, this code used 'each', but there seemed
+  # to be some circumstances where the internet iterator
+  # got confused - particularly when an object contained
+  # a sub-object of the same type.
+  for my $x (0 .. $#keys) {
+    my $key = $keys[$x];
+    my $val = $vals[$x];
+
+    if (defined (my $res = is_CodeRef($val)
+                   ? $val->($self)
+                   : $self->$val)) {
+        $data->{$key} = _resolve_nested($res);
+    }
+  }
+}
+
 sub json_ld_data {
   my $self = shift;
 
@@ -215,26 +238,8 @@ sub json_ld_data {
     if (is_Ref($field)) {
 
       if (is_HashRef($field)) {
-
-        my @keys = keys %$field;
-        my @vals = values %$field;
-
-        # Originally, this code used 'each', but there seemed
-        # to be some circumstances where the internet iterator
-        # got confused - particularly when an object contained
-        # a sub-object of the same type.
-        for my $x (0 .. $#keys) {
-          my $key = $keys[$x];
-          my $val = $vals[$x];
-
-          if (defined (my $res = is_CodeRef($val)
-                       ? $val->($self)
-                       : $self->$val)) {
-            $data->{$key} = _resolve_nested($res);
-          }
-        }
-      }
-      else {
+        $self->process_hash($data, $field);
+      } else {
         carp "Weird JSON-LD reference: " . ref $field;
         next;
       }

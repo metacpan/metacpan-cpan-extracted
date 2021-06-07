@@ -119,8 +119,7 @@ WriteMakefile(
     AUTHOR              => 'John Heidemann <johnh@isi.edu>',
     VERSION_FROM        => 'lib/Fsdb.pm',
     ABSTRACT_FROM       => 'lib/Fsdb.pm',
-    ($] >= 5.010 ?
-      (LICENSE 		=> 'gpl_2',) : ()),
+    LICENSE 		=> 'gpl_2',
     EXE_FILES       => [ map "bin/$_", @programs_to_install ],
     PL_FILES            => {},
     PREREQ_PM => {
@@ -203,7 +202,7 @@ $(SPEC_PREFIX).spec: lib/Fsdb.pm
 rpms: $(SPEC_PREFIX).spec
 	cp Fsdb-$(VERSION).tar.gz $$HOME/rpmbuild/SOURCES
 	cp $(SPEC_PREFIX).spec $$HOME/rpmbuild/SPECS
-	( cd $$HOME/rpmbuild; rpmbuild --sign -ba SPECS/$(SPEC_PREFIX).spec; )
+	( cd $$HOME/rpmbuild; rpmbuild -ba SPECS/$(SPEC_PREFIX).spec && rpmsign --addsign RPMS/$(RPM_ARCH)/$(RPM_PREFIX)-$(VERSION)-1$(RPM_DIST).$(RPM_ARCH).rpm && rpmsign --addsign SRPMS/$(RPM_PREFIX)-$(VERSION)-1$(RPM_DIST).src.rpm; )
 	cp $$HOME/rpmbuild/RPMS/$(RPM_ARCH)/$(RPM_PREFIX)-$(VERSION)-1$(RPM_DIST).$(RPM_ARCH).rpm .
 	cp $$HOME/rpmbuild/SRPMS/$(RPM_PREFIX)-$(VERSION)-1$(RPM_DIST).src.rpm .
 

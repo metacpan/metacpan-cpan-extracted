@@ -1,5 +1,5 @@
 package Date::Holidays::BY;
-our $VERSION = '0.2021.1'; # VERSION
+our $VERSION = '1.2021.1'; # VERSION
 
 =encoding utf8
 
@@ -42,6 +42,7 @@ use warnings;
 use strict;
 use utf8;
 use base 'Exporter';
+use Carp;
 
 our @EXPORT_OK = qw(
     is_holiday
@@ -58,9 +59,10 @@ INACCURATE_TIMES_SINCE after this year dates of holidays and working day shift a
 
 =cut
 
+use List::Util;
+
 our $HOLIDAYS_VALID_SINCE = 2017; # TODO add all old
 our $INACCURATE_TIMES_SINCE = 2022;
-
 
 =head2 $Date::Holidays::BY::strict
 
@@ -70,10 +72,6 @@ Default is 0.
 =cut
 
 our $strict = 0;
-
-use Carp;
-use Time::Piece;
-use List::Util qw/ first /;
 
 # internal date formatting alike ISO 8601: MMDD
 my @REGULAR_HOLIDAYS = (
@@ -112,7 +110,10 @@ my @REGULAR_HOLIDAYS = (
         name => 'Рождество Христово (католическое Рождество)',
         days => '1225',
     },
-    # Radonitsa - second tuesday after orthodox Easter - Easter is celebrated on the first Sunday after the spring full moon. The full moon is... oh no. Goes to HOLIDAYS_SPECIAL
+    {
+        name => 'Радоница',
+        days => \&_radonitsa_mmdd,
+    },
 );
 
 my %HOLIDAYS_SPECIAL = (
@@ -139,6 +140,21 @@ my %SHORT_BUSINESS_DAYS = (
 	2021 => [ qw( ) ],
 );
 
+
+
+sub _radonitsa_mmdd {
+    my $year=$_[0];
+    if ($year < 1583 || $year > 7666) {croak "Module has limitation in counting Easter outside the period 1583-7666";}
+    require Date::Easter;
+    my ($easter_month, $easter_day) = Date::Easter::orthodox_easter($year);
+    my $radonitsa_month = $easter_month;
+    my $radonitsa_day = $easter_day + 9;
+    if ( $radonitsa_day > 30 ) {
+        $radonitsa_month++;
+        $radonitsa_day -= 30;
+    }
+return _get_date_key($radonitsa_month, $radonitsa_day);
+}
 
 =head2 is_holiday( $year, $month, $day )
 
@@ -209,10 +225,12 @@ sub _get_regular_holidays_by_year {
 
 sub _resolve_yhash_value {
     my ($value, $year) = @_;
+    return $value->($year)  if ref $value eq 'CODE';
     return $value  if ref $value ne 'HASH';
 
-    my $ykey = first {$year >= $_} reverse sort keys %$value;
+    my $ykey = List::Util::first {$year >= $_} reverse sort keys %$value;
     return  if !$ykey;
+    return $value->{$ykey}->($year)  if ref $value->{$ykey} eq 'CODE';
     return $value->{$ykey};
 }
 
@@ -231,6 +249,7 @@ sub is_business_day {
     return 0  if is_holiday( $year, $month, $day );
 
     # check if date is a weekend
+    require Time::Piece;
     my $t = Time::Piece->strptime( "$year-$month-$day", '%Y-%m-%d' );
     my $wday = $t->day;
     return 1  unless $wday eq 'Sat' || $wday eq 'Sun';
@@ -269,7 +288,7 @@ sub _get_date_key {
 
 =head1 LICENSE
 
-This software is copyright (c) 2020 by Vladimir Varlamov.
+This software is copyright (c) 2021 by Vladimir Varlamov.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

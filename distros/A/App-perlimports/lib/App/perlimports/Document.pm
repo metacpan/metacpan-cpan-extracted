@@ -3,18 +3,17 @@ package App::perlimports::Document;
 use Moo;
 use utf8;
 
-our $VERSION = '0.000006';
+our $VERSION = '0.000007';
 
 use App::perlimports::Annotations ();
 use App::perlimports::Include     ();
-use Data::Printer;
 use File::Basename qw( fileparse );
 use List::Util qw( any uniq );
 use Module::Runtime qw( module_notional_filename );
 use MooX::StrictConstructor;
 use Path::Tiny qw( path );
 use PPI::Document 1.270 ();
-use PPIx::QuoteLike               ();
+use PPIx::Utils::Classification qw( is_hash_key is_method_call );
 use String::InterpolatedVariables ();
 use Sub::HandlesVia;
 use Try::Tiny qw( catch try );
@@ -30,6 +29,21 @@ has _annotations => (
         return App::perlimports::Annotations->new(
             ppi_document => shift->ppi_document );
     },
+);
+
+has _cache => (
+    is       => 'ro',
+    isa      => Bool,
+    init_arg => 'cache',
+    lazy     => 1,
+    default  => 0,
+);
+
+has _cache_dir => (
+    is      => 'ro',
+    isa     => InstanceOf ['Path::Tiny'],
+    lazy    => 1,
+    builder => '_build_cache_dir',
 );
 
 has _export_list => (
@@ -135,6 +149,13 @@ has ppi_document => (
     builder => '_build_ppi_document',
 );
 
+has possible_imports => (
+    is      => 'ro',
+    isa     => ArrayRef [Object],
+    lazy    => 1,
+    builder => '_build_possible_imports',
+);
+
 has _ppi_selection => (
     is       => 'ro',
     isa      => Object,
@@ -223,8 +244,12 @@ my %default_ignore = (
     'Test::Exception'                => 1,
     'Test::Needs'                    => 1,
     'Test::Number::Delta'            => 1,
+    'Test::Pod'                      => 1,
+    'Test::Pod::Coverage'            => 1,
     'Test::Requires::Git'            => 1,
     'Test::RequiresInternet'         => 1,
+    'Test::Warnings'                 => 1,
+    'Test::Whitespaces'              => 1,
     'Test::XML'                      => 1,
     'Types::Standard'                => 1,
 );
@@ -289,10 +314,55 @@ sub _build_includes {
     ) || [];
 }
 
+sub _build_possible_imports {
+    my $self   = shift;
+    my $before = $self->ppi_document->find(
+        sub {
+                   $_[1]->isa('PPI::Token::Word')
+                || $_[1]->isa('PPI::Token::Symbol')
+                || $_[1]->isa('PPI::Token::Label')
+                || $_[1]->isa('PPI::Token::Prototype');
+        }
+    ) || [];
+
+    my @after;
+    for my $word ( @{$before} ) {
+
+        # Without the sub name check, we accidentally turn
+        # use List::Util ();
+        # sub any { }
+        #
+        # into
+        #
+        # use List::Util qw( any );
+        # sub any {}
+        next if $self->is_sub_name("$word");
+
+        my $isa_symbol = $word->isa('PPI::Token::Symbol');
+
+        next if !$isa_symbol && is_method_call($word);
+
+        # A hash key might, for example, be a variable.
+        if (
+            !$isa_symbol
+            && !(
+                   $word->statement
+                && $word->statement->isa('PPI::Statement::Variable')
+            )
+            && is_hash_key($word)
+        ) {
+            next;
+        }
+
+        push @after, $word;
+    }
+
+    return \@after;
+}
+
 sub _build_ppi_document {
-    my $self    = shift;
-    my $content = path( $self->_filename )->slurp;
-    return PPI::Document->new( \$content );
+    my $self = shift;
+    return PPI::Document->new( $self->_filename );
 }
 
 # Create a key for every included module.
@@ -574,6 +644,26 @@ sub inspector_for {
         return $self->_get_inspector_for($module);
     }
 
+    if ( $self->_cache ) {
+        require Sereal::Decoder;    ## no perlimports
+        my $decoder = Sereal::Decoder->new( {} );
+        my $file    = $self->_cache_file_for_module($module);
+        my $inspector;
+        if ( -e $file ) {
+            try {
+                $inspector = $decoder->decode_from_file($file);
+                $self->_set_inspector_for( $module, $inspector );
+            }
+            catch {
+                $self->logger->error($_);
+            };
+            if ($inspector) {
+                $self->logger->info("Using cached version of $module");
+                return $inspector;
+            }
+        }
+    }
+
     try {
         $self->_set_inspector_for(
             $module,
@@ -625,7 +715,7 @@ sub _build_tidied_document {
             my $error = $_;
             $self->logger->error( 'Error in ' . $self->_filename );
             $self->logger->error( 'Trying to format: ' . $include );
-            $self->logger->error( 'Error is: ' . np($error) );
+            $self->logger->error( 'Error is: ' . $error );
         };
 
         # If this is a module with bare imports which is not used anywhere,
@@ -677,6 +767,8 @@ sub _build_tidied_document {
         }
     }
 
+    $self->_maybe_cache_inspectors;
+
     # We need to do this in order to preserve HEREDOCs.
     # See https://metacpan.org/pod/PPI::Document#serialize
     return $self->_ppi_selection->serialize;
@@ -698,6 +790,53 @@ sub _remove_with_trailing_characters {
     return;
 }
 
+sub _build_cache_dir {
+    my $self = shift;
+
+    my $cache_dir;
+    my $base_path
+        = defined $ENV{HOME} && -d path( $ENV{HOME}, '.cache' )
+        ? path( $ENV{HOME}, '.cache' )
+        : path('/tmp');
+
+    $cache_dir = $base_path->child( 'perlimports', $VERSION );
+    $cache_dir->mkpath;
+
+    return $cache_dir;
+}
+
+sub _cache_file_for_module {
+    my $self   = shift;
+    my $module = shift;
+
+    return $self->_cache_dir->child($module);
+}
+
+sub _maybe_cache_inspectors {
+    my $self = shift;
+    return unless $self->_cache;
+
+    my @names = sort $self->all_inspector_names;
+    $self->logger->info("maybe cache");
+    return unless @names;
+
+    my $append = 0;
+    require Sereal::Encoder;    ## no perlimports
+    my $encoder = Sereal::Encoder->new(
+        { croak_on_bless => 0, undef_unknown => 1, } );
+
+    for my $name ( $self->all_inspector_names ) {
+        $self->logger->info("I would like to cache $name");
+        my $file = $self->_cache_file_for_module($name);
+        $encoder->encode_to_file(
+            $file,
+            $self->inspector_for($name),
+            $append
+        );
+    }
+    return;
+}
+
 1;
 
 # ABSTRACT: Make implicit imports explicit
@@ -714,7 +853,7 @@ App::perlimports::Document - Make implicit imports explicit
 
 =head1 VERSION
 
-version 0.000006
+version 0.000007
 
 =head2 inspector_for( $module_name )
 

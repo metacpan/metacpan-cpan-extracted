@@ -133,9 +133,9 @@ __PACKAGE__->method_documentation({
     	format => '',
     	read_only => '',
     		},
-    'string' => {
+    'title' => {
     	datatype => 'string',
-    	base_name => 'string',
+    	base_name => 'Title',
     	description => '',
     	format => '',
     	read_only => '',
@@ -200,7 +200,7 @@ __PACKAGE__->method_documentation({
 
 __PACKAGE__->swagger_types( {
     'operate_type' => 'string',
-    'string' => 'string',
+    'title' => 'string',
     'area' => 'string',
     'category_data' => 'string',
     'upper_left_row' => 'int',
@@ -213,7 +213,7 @@ __PACKAGE__->swagger_types( {
 
 __PACKAGE__->attribute_map( {
     'operate_type' => 'OperateType',
-    'string' => 'string',
+    'title' => 'Title',
     'area' => 'Area',
     'category_data' => 'CategoryData',
     'upper_left_row' => 'UpperLeftRow',

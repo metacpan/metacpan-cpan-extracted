@@ -8,7 +8,7 @@ Script to test the synopsis code sample!
 
 # Synopsis
 
-  use 5.022; # Minimum Perl, or any later Perl.
+  use 5.024; # Minimum Perl, or any later Perl.
   use feature qw /postderef signatures/;
 
   use Vote::Count;

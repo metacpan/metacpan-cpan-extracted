@@ -21,6 +21,9 @@
          "share",
          "t",
          "xt"
+      ],
+      "package" : [
+         "CGI::Tiny::_Debug"
       ]
    },
    "prereqs" : {
@@ -71,7 +74,11 @@
    "provides" : {
       "CGI::Tiny" : {
          "file" : "lib/CGI/Tiny.pm",
-         "version" : "0.016"
+         "version" : "1.000"
+      },
+      "CGI::Tiny::Multipart" : {
+         "file" : "lib/CGI/Tiny/Multipart.pm",
+         "version" : "1.000"
       }
    },
    "release_status" : "stable",
@@ -86,7 +93,7 @@
          "web" : "https://github.com/Grinnz/CGI-Tiny"
       }
    },
-   "version" : "0.016",
+   "version" : "1.000",
    "x_contributors" : [
       "Dan Book <grinnz@grinnz.com>"
    ],

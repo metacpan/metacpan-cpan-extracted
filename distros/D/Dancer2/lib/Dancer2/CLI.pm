@@ -1,6 +1,6 @@
 package Dancer2::CLI;
 # ABSTRACT: Dancer2 CLI application
-$Dancer2::CLI::VERSION = '0.301002';
+$Dancer2::CLI::VERSION = '0.301004';
 use Moo;
 use CLI::Osprey;
 use File::Share 'dist_dir';
@@ -42,7 +42,7 @@ Dancer2::CLI - Dancer2 CLI application
 
 =head1 VERSION
 
-version 0.301002
+version 0.301004
 
 =head1 AUTHOR
 

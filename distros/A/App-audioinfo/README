@@ -1,0 +1,70 @@
+NAME
+    App::audioinfo - Get information from audio files
+
+VERSION
+    This document describes version 0.002 of App::audioinfo (from Perl
+    distribution App-audioinfo), released on 2021-05-25.
+
+FUNCTIONS
+  audioinfo
+    Usage:
+
+     audioinfo(%args) -> [$status_code, $reason, $payload, \%result_meta]
+
+    Get information from audio files.
+
+    This is a CLI front-end for AudioFile::Info.
+
+    This function is not exported.
+
+    This function supports dry-run operation.
+
+    Arguments ('*' denotes required arguments):
+
+    *   filenames* => *array[filename]*
+
+    *   plugins => *hash*
+
+        What plugin to use for each file type.
+
+    Special arguments:
+
+    *   -dry_run => *bool*
+
+        Pass -dry_run=>1 to enable simulation mode.
+
+    Returns an enveloped result (an array).
+
+    First element ($status_code) is an integer containing HTTP status code
+    (200 means OK, 4xx caller error, 5xx function error). Second element
+    ($reason) is a string containing error message, or "OK" if status is
+    200. Third element ($payload) is optional, the actual result. Fourth
+    element (%result_meta) is called result metadata and is optional, a hash
+    that contains extra information.
+
+    Return value: (any)
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/App-audioinfo>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-App-audioinfo>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=App-audioinfo>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2021, 2016 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

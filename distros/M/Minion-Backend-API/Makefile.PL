@@ -37,7 +37,8 @@ WriteMakefile(
     TEST_REQUIRES => {
         'Test::More' => 0,
         'Minion' => 0,
-        'Mojolicious' => '7.13'
+        'Mojolicious' => '7.13',
+        'List::Util' => 0
     },
 
     test => {

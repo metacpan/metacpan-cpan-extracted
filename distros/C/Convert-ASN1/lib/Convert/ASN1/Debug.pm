@@ -3,10 +3,7 @@
 # modify it under the same terms as Perl itself.
 
 package Convert::ASN1;
-{
-  $Convert::ASN1::VERSION = '0.27';
-}
-
+$Convert::ASN1::VERSION = '0.31';
 ##
 ## just for debug :-)
 ##

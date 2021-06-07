@@ -1,5 +1,5 @@
 package Yancy::Plugin::Auth::Password;
-our $VERSION = '1.070';
+our $VERSION = '1.073';
 # ABSTRACT: A simple password-based auth
 
 #pod =encoding utf8
@@ -268,6 +268,25 @@ our $VERSION = '1.070';
 #pod     % if ( !$c->yancy->auth->current_user ) {
 #pod         %= $c->yancy->auth->login_form
 #pod     % }
+#pod
+#pod The login form will create a C<return_to> hidden field to try to bring
+#pod the user back to what they were doing when they were asked to log in.
+#pod This field defaults to the value of the C<return_to> parameter or the
+#pod value of the C<return_to> flash value. If neither is set, it defaults to
+#pod the HTTP referrer if the form is displayed on the login page (under the
+#pod URL C</yancy/auth/password>) or the current page.
+#pod
+#pod     # Redirect user to login page, and return them here
+#pod     under sub( $c ) {
+#pod         return 1 if $c->yancy->auth->current_user;
+#pod         $c->flash({ return_to => $c->req->url });
+#pod         $c->redirect_to('yancy.auth.password.login');
+#pod         return undef;
+#pod     }
+#pod
+#pod     # Build a link to log in and then redirect to the dashboard
+#pod     $c->url_for( 'yancy.auth.password.login' )
+#pod         ->query({ return_to => $c->url_for( 'dashboard' ) });
 #pod
 #pod =head2 yancy.auth.logout
 #pod
@@ -549,6 +568,8 @@ sub login_form {
         # If we've specified one, go there directly
         = $c->req->param( 'return_to' )
         ? $c->req->param( 'return_to' )
+        # Check flash storage, perhaps from a redirect to the login form
+        : $c->flash('return_to') ? $c->flash('return_to')
         # If this is the login page, go back to referer
         : $c->current_route =~ /^yancy\.auth/
             && $c->req->headers->referrer
@@ -777,7 +798,7 @@ Yancy::Plugin::Auth::Password - A simple password-based auth
 
 =head1 VERSION
 
-version 1.070
+version 1.073
 
 =head1 SYNOPSIS
 
@@ -1046,6 +1067,25 @@ Return an HTML string containing the rendered login form.
         %= $c->yancy->auth->login_form
     % }
 
+The login form will create a C<return_to> hidden field to try to bring
+the user back to what they were doing when they were asked to log in.
+This field defaults to the value of the C<return_to> parameter or the
+value of the C<return_to> flash value. If neither is set, it defaults to
+the HTTP referrer if the form is displayed on the login page (under the
+URL C</yancy/auth/password>) or the current page.
+
+    # Redirect user to login page, and return them here
+    under sub( $c ) {
+        return 1 if $c->yancy->auth->current_user;
+        $c->flash({ return_to => $c->req->url });
+        $c->redirect_to('yancy.auth.password.login');
+        return undef;
+    }
+
+    # Build a link to log in and then redirect to the dashboard
+    $c->url_for( 'yancy.auth.password.login' )
+        ->query({ return_to => $c->url_for( 'dashboard' ) });
+
 =head2 yancy.auth.logout
 
 Log out any current account. Use this in your own controller actions to
@@ -1168,7 +1208,7 @@ Doug Bell <preaction@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by Doug Bell.
+This software is copyright (c) 2021 by Doug Bell.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

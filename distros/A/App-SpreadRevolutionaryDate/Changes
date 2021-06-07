@@ -1,6 +1,17 @@
 Changelog for App-SpreadRevolutionaryDate
 
-0.29 2020-11-07T15:57:44
+0.31 2021-06-02T18:23:35
+ - Update doc with command line options for liberachat fixed
+ - Fix command line options for liberachat
+
+0.30 2021-06-02T09:12:34Z
+ - Add xtests for Liberachat target
+ - Add Liberachat target
+ - Fix regexp in test to accept HTTP 401 error message from twitter
+ - Fix test to accept HTTP 401 error message from twitter
+ - Fix typo in comment
+
+0.29 2020-11-07T15:57:44Z
  - Process multinline messages (with \n) in targets, useful with -pud
    option
  - Upgrade travis perl releases

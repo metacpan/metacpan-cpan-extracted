@@ -1,3 +1,4 @@
+use v5;
 use strict;
 use warnings;
 
@@ -6,12 +7,14 @@ use Module::Build;
 my $build = Module::Build->new(
    module_name => 'Device::BusPirate',
    requires => {
+      'perl' => '5.014',
+
       'Device::Chip::Adapter' => '0.02',
       'Device::Chip::ProtocolBase::SPI' => 0,
       'Future' => 0,
       'Future::Mutex' => 0,
       'Future::IO' => '0.04',
-      'Future::AsyncAwait' => '0.25', # RT129303
+      'Future::AsyncAwait' => '0.47', # toplevel await
       'IO::Termios' => '0.07',
       'List::Util' => '1.33',
       'Module::Pluggable' => 0,

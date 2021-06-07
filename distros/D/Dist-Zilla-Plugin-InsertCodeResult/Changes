@@ -1,6 +1,19 @@
+0.054   2021-05-21  Released-By: PERLANCAR; Urgency: medium
+
+	- [bugfix] Don't add extraneous newline to output.
+
+
+0.053   2021-02-21  Released-By: PERLANCAR; Urgency: medium
+
+	- [bugfix] Use encoded_content() (content as bytes) instead of
+	  content() so we don't have to deal with encodings.
+
+
 0.052   2020-02-21  Released-By: PERLANCAR; Urgency: medium
 
 	- Allow multiline code with #BEGIN_CODE .. #END_CODE syntax.
+
+        - [doc] Mention DZP:InsertCodeOutput.
 
 
 0.051   2019-02-04  Released-By: PERLANCAR

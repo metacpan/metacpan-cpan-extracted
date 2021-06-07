@@ -1,5 +1,9 @@
 Revision history for Search-Tokenizer
 
+1.03  18.05.2021
+  - moved the utf8 speed test to xt/, as it fails on some cpantesters platforms
+  - added the utility function unroll()
+
 1.02  12.05.2021
   - avoid using @- and @+ arrays, as they are too slow on utf8 strings
     (see https://github.com/Perl/perl5/issues/18786)

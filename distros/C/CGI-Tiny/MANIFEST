@@ -11,10 +11,14 @@ README
 dist.ini
 lib/CGI/Tiny.pm
 lib/CGI/Tiny.pod
+lib/CGI/Tiny/Multipart.pm
+lib/CGI/Tiny/Multipart.pod
+lib/CGI/Tiny/_Debug.pm
 prereqs.yml
 t/00-report-prereqs.dd
 t/00-report-prereqs.t
 t/cgi.t
 t/functions.t
+t/multipart.t
 xt/author/pod-coverage.t
 xt/author/pod-syntax.t

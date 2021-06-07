@@ -1,0 +1,669 @@
+<%
+    use Mojo::Loader qw( data_section );
+    use Zapp::Util qw(
+        get_path_from_data prefix_field rename_field
+        parse_zapp_attrs
+    );
+    layout 'zapp';
+    my $plan = stash( 'plan' ) // {};
+%>
+
+<style>
+/**************************************************************************************
+ * Zapp form classes for use by task arg forms
+ */
+[data-zapp-if] {
+    display: none;
+}
+[data-zapp-if].zapp-visible {
+    display: block;
+}
+
+</style>
+
+%# The form for the main task fields
+% my $task_tmpl = begin
+    % my $task = shift;
+    <div class="task-form bg-light border border-secondary rounded p-3 mt-3 shadow">
+        <input type="hidden" name="task_id" value="<%= $task->{task_id} // '' %>" />
+        <input type="hidden" name="class" value="<%= $task->{class} %>" />
+        <header class="form-row align-items-center justify-content-between">
+            <h3 class="col-auto" data-task-type>
+                <%= ( $task->{class} // '' ) =~ s/^Zapp::Task:://r %>
+            </h3>
+            <div class="col-auto align-self-start btn-toolbar" role="toolbar">
+                <div class="btn-group btn-group-sm mr-2" role="group" aria-label="Move Task">
+                    <button type="button" class="btn btn-sm btn-outline-secondary task-move-up" aria-label="Move Task Up">
+                        <i class="fa fa-chevron-up"></i>
+                    </button>
+                    <button type="button" class="btn btn-sm btn-outline-secondary task-move-down" aria-label="Move Task Down">
+                        <i class="fa fa-chevron-down"></i>
+                    </button>
+                </div>
+                <div class="btn-group btn-group-sm" role="group">
+                    <button type="button" class="btn btn-sm btn-outline-danger task-remove" aria-label="Remove task">
+                        <i class="fa fa-times-circle"></i>
+                    </button>
+                </div>
+            </div>
+        </header>
+        <div class="form-group">
+            <label class="mb-1" for="name">Task Name</label>
+            %= text_field "name", $task->{name}, placeholder => 'Task Name', class => 'form-control'
+        </div>
+        <div class="form-group">
+            <label class="mb-1" for="label">Task Label</label>
+            %= text_field "label", $task->{label}, placeholder => 'Task Label', class => 'form-control'
+        </div>
+        <div class="form-group">
+            <label for="description">Task Description</label>
+            <%= include 'zapp/textarea',
+                name => 'description',
+                value => $task->{description},
+                args => [
+                    placeholder => 'Task description',
+                ],
+            %>
+        </div>
+
+        <section class="all-input">
+            <div data-input-form></div>
+        </section>
+
+    </div>
+% end
+
+%# The form for plan inputs
+% my $input_tmpl = begin
+    % my ( $input_num, $input ) = @_;
+
+    <div class="input-form bg-light border border-secondary rounded p-3 mt-3 shadow">
+        <header class="form-row align-items-center justify-content-between">
+            <h3 class="col-auto" data-input-type>
+                <%= $input->{type} %>
+            </h3>
+            %= hidden_field "input[$input_num].type", $input->{type}
+            <div class="col-auto align-self-start btn-toolbar" role="toolbar">
+                <div class="btn-group btn-group-sm mr-2" role="group" aria-label="Move Input">
+                    <button type="button" class="btn btn-sm btn-outline-secondary input-move-up" aria-label="Move Input Up">
+                        <i class="fa fa-chevron-up"></i>
+                    </button>
+                    <button type="button" class="btn btn-sm btn-outline-secondary input-move-down" aria-label="Move Input Down">
+                        <i class="fa fa-chevron-down"></i>
+                    </button>
+                </div>
+                <div class="btn-group btn-group-sm" role="group">
+                    <button type="button" class="btn btn-sm btn-outline-danger input-remove" aria-label="Remove input">
+                        <i class="fa fa-times-circle"></i>
+                    </button>
+                </div>
+            </div>
+        </header>
+        <div class="form-row">
+            <div class="col-auto">
+                <label for="input[<%= $input_num %>].name">Name</label>
+                %= text_field "input[$input_num].name", $input->{name}, placeholder => 'Name', class => 'form-control'
+            </div>
+            <div class="col-auto">
+                <label for="input[<%= $input_num %>].label">Label</label>
+                %= text_field "input[$input_num].label", $input->{label}, placeholder => 'Label', class => 'form-control'
+            </div>
+            <div class="col">
+                <% if ( my $type_name = $input->{type} ) {
+                    my $type = $c->zapp->types->{ $type_name }
+                        or die qq{Could not find type "$type_name"};
+                    my $input_field = include inline => $type->config_field( $c, $input->{config} ), self => $type, input => $input;
+                    my $input_dom = prefix_field( $input_field, "input[$input_num]" );
+                    %><%== $input_dom %><%
+                } else {
+                    %><span data-input-value></span><%
+                } %>
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="col">
+                <label for="input[<%= $input_num %>].description">Description</label>
+                <%= include 'zapp/textarea',
+                    name => "input[$input_num].description",
+                    value => $input->{description},
+                    args => [
+                        placeholder => 'Input description',
+                    ],
+                %>
+            </div>
+        </div>
+    </div>
+% end
+
+<template id="task-form">
+    %= $task_tmpl->( {} )
+</template>
+<template id="input-form">
+    %= $input_tmpl->( 0, {} )
+</template>
+
+% for my $class ( @{ stash 'tasks' } ) {
+    <template data-task-class="<%= $class %>">
+        %= include inline => data_section( $class, 'input.html.ep' )
+    </template>
+% }
+% for my $type_name ( sort keys $c->zapp->types->%* ) {
+    % my $type = $c->zapp->types->{ $type_name };
+    <template data-type-input="<%= $type_name %>">
+        %= include inline => $type->config_field( $c ), config => {}, input => {}, self => $type
+    </template>
+% }
+
+%= form_for current_route, method => 'POST', id => 'plan', enctype => 'multipart/form-data', begin
+    <header class="form-row align-items-center">
+        <h1 class="col-auto">Edit Plan</h1>
+        %= link_to 'zapp.list_plans', class => 'btn btn-secondary', begin
+            <i class="fa fa-arrow-left"></i> Back to Plans
+        % end
+    </header>
+    % if ( my $errors = stash 'errors' ) {
+        <div class="alert alert-danger">
+            There are some errors in your plan.
+            <ul>
+                % for my $error ( @$errors ) {
+                <li><%== $error->{error} %></li>
+                % }
+            </ul>
+        </div>
+    % }
+    <div class="form-group">
+        <label class="mb-1" for="label">Plan Label</label>
+        <input id="label" class="form-control" name="label" type="text" placeholder="Plan Label" value="<%= $plan->{label} %>">
+        <!-- XXX: Add folders to organize plans -->
+    </div>
+    <div class="form-group">
+        <label for="description">Plan Description</label>
+        <%= include 'zapp/textarea',
+            name => 'description',
+            value => $plan->{description},
+            args => [
+                placeholder => 'Plan description',
+                id => 'description',
+            ],
+        %>
+    </div>
+
+    <div class="input-container my-2">
+        <h2>Input</h2>
+        <ul id="all-inputs" class="list-unstyled">
+            % for my $input_num ( 0 .. $#{ $plan->{inputs} } ) {
+                % my $input = $plan->{inputs}[ $input_num ];
+                <li data-input-form>
+                    <%
+                        my $input_form = $input_tmpl->( $input_num, { %$input, value => $input->{value} } );
+                        my $input_dom = Mojo::DOM->new( $input_form );
+                        if ( $input_num == 0 ) {
+                            my $btn = $input_dom->at( '.input-move-up' );
+                            $btn->attr( class => join ' ', $btn->attr( 'class' ), 'disabled' );
+                        }
+                        if ( $input_num == $#{ $plan->{inputs} } ) {
+                            my $btn = $input_dom->at( '.input-move-down' );
+                            $btn->attr( class => join ' ', $btn->attr( 'class' ), 'disabled' );
+                        }
+                    %><%== $input_dom %>
+                </li>
+            % }
+        </ul>
+        <select class="add-input form-control col-auto">
+            <option>Add Input...</option>
+            % for my $type_name ( sort keys $c->zapp->types->%* ) {
+                %= tag option => ( value => $type_name ), ucfirst $type_name
+            % }
+        </select>
+    </div>
+
+    <div class="task-container my-2">
+        <h2>Tasks</h2>
+        <div id="all-tasks">
+            <% for my $task_num ( 0 .. $#{ $plan->{tasks} } ) { %>
+                <section data-task-form class="task"><%
+                    my $task = $plan->{tasks}[ $task_num ];
+                    my $input_form = include inline => data_section( $task->{class}, 'input.html.ep' ), input => $task->{input};
+                    my $input_dom = Mojo::DOM->new( $input_form );
+                    $input_dom = parse_zapp_attrs( $input_dom, $task->{input} );
+                    $input_dom = prefix_field( $input_dom, 'input' );
+
+                    my $task_form = $task_tmpl->( $task );
+                    my $task_dom = Mojo::DOM->new( $task_form );
+                    $task_dom->at( '[data-input-form]' )->replace( $input_dom );
+                    $task_dom = prefix_field( $task_dom, "task[$task_num]" );
+                    if ( $task_num == 0 ) {
+                        my $btn = $task_dom->at( '.task-move-up' );
+                        $btn->attr( class => join ' ', $btn->attr( 'class' ), 'disabled' );
+                    }
+                    if ( $task_num == $#{ $plan->{tasks} } ) {
+                        my $btn = $task_dom->at( '.task-move-down' );
+                        $btn->attr( class => join ' ', $btn->attr( 'class' ), 'disabled' );
+                    }
+                    %><%== $task_dom %></section><%
+            } %>
+        </div>
+
+        <div class="my-3">
+            <select class="add-task form-control">
+                <option>Add Task...</option>
+                % for my $class ( @{ stash 'tasks' } ) {
+                    %= tag option => ( value => $class ), $class =~ s/Zapp::Task:://r
+                % }
+            </select>
+        </div>
+    </div>
+
+    <button name="save-plan" class="btn btn-primary">Save Plan</button>
+% end
+
+%= javascript begin
+function delegateEvent( eventName, elementSelector, handler ) {
+    document.addEventListener(eventName, function(e) {
+        for (var target = e.target; target && target != this; target = target.parentNode) {
+            if (target.matches(elementSelector)) {
+                handler.call(target, e);
+                break;
+            }
+        }
+    }, false);
+}
+
+function prefixField( el, prefix ) {
+    var inputs = el.querySelectorAll( 'input,select,textarea' );
+    inputs.forEach( function ( el ) {
+        var sep = el.name.startsWith( '[' ) ? '' : '.';
+        el.name = `${prefix}${sep}${el.name}`;
+        el.id = el.name;
+    } );
+
+    var labels = el.querySelectorAll( 'label' );
+    labels.forEach( function ( el ) {
+        if ( el.attributes.for ) {
+            var sep = el.attributes.for.value.startsWith( '[' ) ? '' : '.';
+            el.attributes.for.value = `${prefix}${sep}${el.attributes.for.value}`;
+        }
+    } );
+
+    // Also prefix any included templates
+    el.querySelectorAll( 'template' ).forEach(
+        function ( tmpl ) {
+            prefixField( tmpl.content, prefix );
+        }
+    );
+
+    return el;
+}
+
+function addTask( event ) {
+    // XXX: Focus on task name element after adding form
+    var inputSelector = 'input,select,textarea',
+        sel = event.target,
+        opt = sel.options[ sel.selectedIndex ],
+        type = opt.innerText,
+        cls = opt.value,
+        allTasks = document.querySelector( '#all-tasks' ),
+        beforeTask = sel.closest( '[data-task-form]' ),
+        taskIdx = beforeTask ? allTasks.indexOf( beforeTask ) : allTasks.childElementCount,
+        taskTmpl = document.querySelector( 'template#task-form' ).content.cloneNode(true),
+        taskForm = document.createElement( 'div' ),
+        inputTmpl = document.querySelector( `[data-task-class="${cls}"]` ).content,
+        inputForm = inputTmpl.cloneNode(true);
+    sel.selectedIndex = 0;
+
+    prefixField( inputForm, 'input' );
+    taskForm.dataset.taskForm = true;
+    taskForm.appendChild( taskTmpl );
+    taskForm.querySelector( '[data-input-form]' ).replaceWith( inputForm );
+    var taskType = taskForm.querySelector( '[data-task-type]' );
+    taskType.innerHTML = type;
+    var taskClassInput = taskForm.querySelector( 'input[name=class]' );
+    taskClassInput.value = cls;
+    prefixField( taskForm, `task[${taskIdx}]` );
+
+    if ( beforeTask ) {
+        beforeTask.insertAdjacentElement( 'beforebegin', taskForm );
+    }
+    else {
+        allTasks.appendChild( taskForm );
+    }
+
+    reindexTasks();
+    taskForm.scrollIntoView({block: "start", inline: "nearest"});
+}
+
+function removeTask( event ) {
+    var button = event.target,
+        task = button.closest( '[data-task-form]' ),
+        allTasks = document.getElementById( 'all-tasks' );
+    allTasks.removeChild( task );
+    reindexTasks();
+}
+
+// Reindex all tasks
+function reindexTasks() {
+    var allTasks = document.getElementById( 'all-tasks' );
+    allTasks.querySelectorAll( '[data-task-form]' ).forEach( function ( taskForm, i ) {
+        var taskInputs = taskForm.querySelectorAll( 'input,select,textarea' );
+        taskInputs.forEach( function ( el ) {
+            el.name = el.name.replace( /^task\[\d+\]/, `task[${i}]` );
+            el.id = el.name;
+        } );
+        var taskLabels = taskForm.querySelectorAll( 'label' );
+        taskLabels.forEach( function ( el ) {
+            el.attributes.for.value = el.attributes.for.value.replace( /^task\[\d+\]/, `task[${i}]` );
+        } );
+
+        if ( i == 0 ) {
+            taskForm.querySelector( '.task-move-up' ).classList.add( 'disabled' );
+        }
+        else {
+            taskForm.querySelector( '.task-move-up' ).classList.remove( 'disabled' );
+        }
+        if ( i == allTasks.children.length - 1 ) {
+            taskForm.querySelector( '.task-move-down' ).classList.add( 'disabled' );
+        }
+        else {
+            taskForm.querySelector( '.task-move-down' ).classList.remove( 'disabled' );
+        }
+    } );
+}
+
+function moveTaskUp( event ) {
+    var button = event.target,
+        task = button.closest( '[data-task-form]' ),
+        prevTask = task.previousElementSibling;
+    if ( !prevTask ) {
+        return;
+    }
+    prevTask.insertAdjacentElement( 'beforebegin', task );
+    reindexTasks();
+    task.scrollIntoView({block: "start", inline: "nearest"});
+}
+
+function moveTaskDown( event ) {
+    var button = event.target,
+        task = button.closest( '[data-task-form]' ),
+        nextTask = task.nextElementSibling;
+    if ( !nextTask ) {
+        return;
+    }
+    nextTask.insertAdjacentElement( 'afterend', task );
+    reindexTasks();
+    task.scrollIntoView({block: "start", inline: "nearest"});
+}
+
+function addInput( event ) {
+    // Clone the blank row from the template
+    var select = event.target,
+        inputType = select.options[ select.selectedIndex ].value,
+        list = select.previousElementSibling,
+        input = select.parentNode,
+        newInput = document.querySelector( 'template#input-form' ).content.cloneNode(true),
+        newIndex = list.querySelectorAll('li').length,
+        valueTmpl = document.querySelector( `[data-type-input="${inputType}"]` ).content,
+        valueForm = valueTmpl.cloneNode(true);
+        ;
+
+    valueForm.querySelectorAll( 'input,select,textarea' ).forEach(
+        function( el ) {
+            el.name = el.name.replace( /^value/, 'value' );
+        }
+    );
+    valueForm.querySelectorAll( 'label' ).forEach(
+        function( el ) {
+            if ( el.attributes.for ) {
+                el.attributes.for.value = el.attributes.for.value.replace( /^value/, 'value' );
+            }
+        }
+    );
+    prefixField( valueForm, 'input[0]' );
+    newInput.querySelector( '[data-input-value]' ).replaceWith( valueForm );
+
+    // Set type
+    newInput.querySelector( '[name="input[0].type"]' ).attributes.getNamedItem( 'value' ).value = inputType;
+    newInput.querySelector( '[data-input-type]' ).innerHTML = inputType;
+
+    // Fix indexes
+    newInput.querySelectorAll( 'input,select,textarea' ).forEach( function (el) {
+        el.name = el.name.replace( /input\[\d+\]/, 'input[' + newIndex + ']' );
+        el.id = el.name;
+    } );
+
+    // Append
+    var newRow = document.createElement( 'li' );
+    newRow.dataset.inputForm = true;
+    newRow.appendChild( newInput );
+    list.appendChild( newRow );
+
+    select.selectedIndex = 0;
+    // XXX: Focus input name field
+    reindexInputs();
+    newRow.scrollIntoView({block: "start", inline: "nearest"});
+}
+
+function removeInput( event ) {
+    event.preventDefault();
+    var button = event.target,
+        row = button.closest( '.input-form' ).parentElement,
+        list = row.parentElement;
+
+    row.parentNode.removeChild( row );
+    reindexInputs();
+}
+
+function reindexInputs() {
+    var allInputs = document.getElementById( 'all-inputs' );
+    allInputs.querySelectorAll( '[data-input-form]' ).forEach( function ( inputForm, i ) {
+        var inputInputs = inputForm.querySelectorAll( 'input,select,textarea' );
+        inputInputs.forEach( function ( el ) {
+            el.name = el.name.replace( /^input\[\d+\]/, `input[${i}]` );
+            el.id = el.name;
+        } );
+        var inputLabels = inputForm.querySelectorAll( 'label' );
+        inputLabels.forEach( function ( el ) {
+            if ( el.attributes.for.value ) {
+                el.attributes.for.value = el.attributes.for.value.replace( /^input\[\d+\]/, `input[${i}]` );
+            }
+        } );
+
+        if ( i == 0 ) {
+            inputForm.querySelector( '.input-move-up' ).classList.add( 'disabled' );
+        }
+        else {
+            inputForm.querySelector( '.input-move-up' ).classList.remove( 'disabled' );
+        }
+        if ( i == allInputs.children.length - 1 ) {
+            inputForm.querySelector( '.input-move-down' ).classList.add( 'disabled' );
+        }
+        else {
+            inputForm.querySelector( '.input-move-down' ).classList.remove( 'disabled' );
+        }
+    } );
+}
+
+function moveInputUp( event ) {
+    var button = event.target,
+        input = button.closest( '[data-input-form]' ),
+        prevInput = input.previousElementSibling;
+    if ( !prevInput ) {
+        return;
+    }
+    prevInput.insertAdjacentElement( 'beforebegin', input );
+    reindexInputs();
+    input.scrollIntoView({block: "start", inline: "nearest"});
+}
+
+function moveInputDown( event ) {
+    var button = event.target,
+        input = button.closest( '[data-input-form]' ),
+        nextInput = input.nextElementSibling;
+    if ( !nextInput ) {
+        return;
+    }
+    nextInput.insertAdjacentElement( 'afterend', input );
+    reindexInputs();
+    input.scrollIntoView({block: "start", inline: "nearest"});
+}
+
+function checkZappExpressions( event ) {
+    var match = event.target.name.match( /^task\[\d+\]\.input\./ );
+    if ( !match ) return;
+    var task = event.target.closest( '[data-task-form]' ),
+        input = {};
+    task.querySelectorAll( '[name^="' + match[0] + '"]').forEach( function ( el ) {
+        var name = el.name, key = name.replace( match[0], '' );
+        input[ key ] = el.value;
+    } );
+
+    // Find all data-zapp-if
+    task.querySelectorAll( '[data-zapp-if]' ).forEach( function ( el ) {
+        var expr = el.dataset.zappIf,
+            exprMatch = expr.match( /\s*(.+?)\s*(==|!=|>|<|>=|<=|eq|ne|gt|lt|ge|le)\s*(.+)/ );
+        if ( exprMatch ) {
+            var lhs = exprMatch[1],
+                op = exprMatch[2],
+                rhs = exprMatch[3];
+
+            if ( lhs.match( /^['"]/ ) ) {
+                lhs = lhs.substring( 1, lhs.length-1 );
+            }
+            else if ( !lhs.match( /^\d/ ) ) {
+                lhs = input[ lhs ];
+            }
+
+            if ( rhs.match( /^['"]/ ) ) {
+                rhs = rhs.substring( 1, rhs.length-1 );
+            }
+            else if ( !rhs.match( /^\d/ ) ) {
+                rhs = input[ rhs ];
+            }
+
+            var opFunc = {},
+                ops = [
+                    '==', '!=', '>', '<', '>=', '<=',
+                    'eq', 'ne', 'gt', 'lt', 'ge', 'le'
+                ],
+                opMap = {
+                    eq: '==', ne: '!=',
+                    gt: '>', lt: '<',
+                    ge: '>=', le: '<='
+                };
+            ops.forEach( function ( op ) {
+                eval( "opFunc[ op ] = function ( lhs, rhs ) { return lhs " + ( opMap[op] || op ) + " rhs; }" );
+            } );
+            if ( opFunc[ op ] && opFunc[ op ]( lhs, rhs ) ) {
+                el.classList.add( 'zapp-visible' );
+            }
+            else {
+                el.classList.remove( 'zapp-visible' );
+            }
+        }
+        else {
+            // Look for leading !
+            var invert = expr.match( /^!/ );
+            if ( invert ) {
+                expr = expr.replace( /^!/, '' );
+            }
+            // Find arg value and check for booleans
+            if ( ( !invert && input[ expr ] ) || ( invert && !input[ expr ] ) ) {
+                el.classList.add( 'zapp-visible' );
+            }
+            else {
+                el.classList.remove( 'zapp-visible' );
+            }
+        }
+    });
+
+}
+
+function changeTaskTab( event ) {
+    event.preventDefault();
+    var tabNavItem = event.target,
+        tabNavListItem = tabNavItem.closest( 'li' ),
+        tabContainer = tabNavItem.closest( '.task-tabs' ),
+        tabNav = tabContainer.querySelector( '.task-tabs-nav' ),
+        tabIndex = Array.prototype.indexOf.call( tabNav.childNodes, tabNavListItem ),
+        tabPaneContainer = tabContainer.querySelector( '.task-tabs-content' );
+    tabNav.querySelectorAll( '.task-tabs-nav .active' ).forEach( function (el) {
+        el.classList.remove( 'active' );
+    } );
+    tabNav.childNodes[ tabIndex ].querySelector('a').classList.add( 'active' );
+    tabPaneContainer.querySelectorAll( '.task-tabs-content > .tab-pane.show.active' ).forEach( function (el) {
+        el.classList.remove( 'show', 'active' );
+    } );
+    tabPaneContainer.childNodes[ tabIndex ].classList.add( 'show', 'active' );
+}
+
+function addArrayRow( event ) {
+    var btn = event.target,
+        arrayEl = btn.closest( '[data-zapp-array]' ),
+        rows = arrayEl.querySelectorAll( '[data-zapp-array-row]' ),
+        lastRow = rows[ rows.length - 1 ],
+        tmplEl = arrayEl.querySelector( 'template' ),
+        newRow = tmplEl.content.cloneNode( true ).children[0];
+    // Elements inside template should already be prefixed
+    lastRow.insertAdjacentElement( 'afterend', newRow );
+    reindexArray( arrayEl );
+}
+
+function removeArrayRow( event ) {
+    var btn = event.target,
+        arrayEl = btn.closest( '[data-zapp-array]' ),
+        rowEl = btn.closest( '[data-zapp-array-row]' );
+    arrayEl.removeChild( rowEl );
+    reindexArray( arrayEl );
+}
+
+function reindexArray( arrayEl ) {
+    // XXX: Templates inside tasks/inputs need to be edited as well
+    var arrayDepth = 1;
+    var parentNode = arrayEl.parentNode;
+    while ( parentNode.closest( '[data-zapp-array]' ) ) {
+        arrayDepth++;
+        parentNode = parentNode.parentNode.closest( '[data-zapp-array]' );
+    }
+    arrayEl.querySelectorAll( '[data-zapp-array-row]' ).forEach(
+        function ( el, i ) {
+            el.querySelectorAll( 'input,select,textarea' ).forEach(
+                function ( el ) {
+                    var parts = el.name.split( /(\[[\d#]+\])/ );
+                    if ( parts.length <= arrayDepth * 2 + 1 ) {
+                        return;
+                    }
+                    parts[ arrayDepth * 2 + 1 ] = '[' + i + ']';
+                    el.name = parts.join( "" );
+                    el.id = el.name;
+                }
+            );
+            el.querySelectorAll( 'label' ).forEach(
+                function ( el ) {
+                    if ( el.attributes.for ) {
+                        var parts = el.attributes.for.value.split( /(\[[\d#]+\])/ );
+                        parts[ arrayDepth * 2 + 1 ] = '[' + i + ']';
+                        el.attributes.for.value = parts.join( "" );
+                    }
+                }
+            );
+        }
+    );
+}
+
+document.addEventListener('DOMContentLoaded', function ( event ) {
+    delegateEvent( 'change', 'select.add-task', addTask );
+    delegateEvent( 'click', 'button.task-remove', removeTask );
+    delegateEvent( 'click', 'button.task-move-up', moveTaskUp );
+    delegateEvent( 'click', 'button.task-move-down', moveTaskDown );
+    delegateEvent( 'change', '*', checkZappExpressions );
+    delegateEvent( 'change', 'select.add-input', addInput );
+    delegateEvent( 'click', 'button.input-move-up', moveInputUp );
+    delegateEvent( 'click', 'button.input-move-down', moveInputDown );
+    delegateEvent( 'click', 'button.input-remove', removeInput );
+    delegateEvent( 'click', 'button[data-zapp-array-add]', addArrayRow );
+    delegateEvent( 'click', 'button[data-zapp-array-remove]', removeArrayRow );
+});
+
+% for my $js ( grep !!$_, map { data_section( $_, 'input.js.ep' ) } @{ stash 'tasks' } ) {
+    %= include inline => $js
+% }
+% end

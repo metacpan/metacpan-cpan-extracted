@@ -3,11 +3,11 @@ NAME
     data
 
 SPECIFICATION VERSION
-    0.1
+    0.2
 
 VERSION
-    This document describes version 0.1.5 of TableData (from Perl
-    distribution TableData), released on 2021-04-11.
+    This document describes version 0.2.1 of TableData (from Perl
+    distribution TableData), released on 2021-06-01.
 
 SYNOPSIS
     Use one of the "TableData::*" modules.
@@ -42,12 +42,38 @@ DESCRIPTION
 NAMESPACE ORGANIZATION
     "TableData" (this module) is the specification.
 
+    All the modules under "TableData::*" are modules with actual table data.
+    The entity mentioned in the module name should be singular, not plural
+    (e.g. "TableData::Person::AcmeInc" instead of
+    "TableData::Persons::AcmeInc" or "TableData::People::AcmeInc".
+
+    More specific subnamespaces for more specific types of table data:
+
+    *   "TableData::Locale::*" for locale-related data
+
+        Examples: "TableData::Locale::Country" (list of countries in the
+        world), TableData::Locale::US::State (list of US states),
+        "TableData::Locale::ID::Province" (list of Indonesian provinces).
+
+    *   "TableData::Lingua::*" for human-language-related data
+
+        Examples: TableData::Lingua::Word::EN::Adjective::TalkEnglish (list
+        of top adjectives from talkenglish.com website, along with some
+        other data like frequency). All "TableData::Lingua::Word::*" modules
+        should contain the column "word" so they are usable from
+        applications like word games.
+
     "TableDataRole::*" the roles.
 
-    All the modules under "TableData::*" will be modules with actual table
-    data.
+    "TableDataRoles::*" is the name for distribution that contain several
+    role modules.
 
-    "TableDataCollection-*" name for distribution that contains several
+    "TableDataBase::*" for base classes.
+
+    "TableDataBases::*" is the name for distribution that contain several
+    "TableDataBase" modules.
+
+    "TableDataBundle-*" name for distribution that contains several
     "TableData" modules.
 
 FAQ

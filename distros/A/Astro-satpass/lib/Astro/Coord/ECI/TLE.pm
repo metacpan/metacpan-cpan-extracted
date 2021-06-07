@@ -229,7 +229,7 @@ package Astro::Coord::ECI::TLE;
 use strict;
 use warnings;
 
-our $VERSION = '0.119';
+our $VERSION = '0.120';
 
 use base qw{ Astro::Coord::ECI Exporter };
 
@@ -8148,12 +8148,12 @@ sub _next_elevation_screen {
 #
 #   $ eg/visual -merge
 #
-# Last-Modified: Mon, 08 Mar 2021 21:35:13 GMT
+# Last-Modified: Tue, 18 May 2021 19:01:39 GMT
 
 # The following constants are unsupported, and may be modified or
 # revoked at any time. They exist to support
 # xt/author/magnitude_status.t
-use constant _CELESTRAK_VISUAL => 'Mon, 08 Mar 2021 21:35:13 GMT';
+use constant _CELESTRAK_VISUAL => 'Tue, 18 May 2021 19:01:39 GMT';
 use constant _MCCANTS_VSNAMES  => 'Thu, 25 May 2017 00:30:11 GMT';
 use constant _MCCANTS_QUICKSAT => 'Mon, 14 Sep 2020 13:12:56 GMT';
 
@@ -8286,7 +8286,7 @@ use constant _MCCANTS_QUICKSAT => 'Mon, 14 Sep 2020 13:12:56 GMT';
   '25064' => 5.0,
   '25400' => 3.5,
   '25407' => 3.5,
-  '25544' => -0.5,
+  '25544' => -1.8, # From Heavens-Above
   '25723' => 5.0,
   '25732' => 5.0,
   '25860' => 4.5,
@@ -8410,6 +8410,7 @@ use constant _MCCANTS_QUICKSAT => 'Mon, 14 Sep 2020 13:12:56 GMT';
   '40382' => 3.4,
   '41395' => 3.9,
   '42689' => 4.9,
+  '48274' => 3.2, # From Heavens-Above
 );
 
 1;

@@ -65,6 +65,7 @@ t/tle_misc.t
 t/tle_parse.t
 t/tle_pass.t
 t/tle_pass_extra.t
+tools/heavens-above-mag
 xt/author/basic.t
 xt/author/changes.t
 xt/author/critic.t

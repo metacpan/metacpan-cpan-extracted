@@ -1,0 +1,44 @@
+---
+abstract: 'MySQL-specific DBIC storage engine with retry support'
+author:
+  - 'Grant Street Group <developers@grantstreet.com>'
+build_requires:
+  Class::Load: '0'
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Path::Class: '0'
+  Test2::Suite: '0'
+  Test2::Tools::Explain: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '7.1101'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.015, CPAN::Meta::Converter version 2.150010'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: DBIx-Class-Storage-DBI-mysql-Retryable
+provides:
+  DBIx::Class::Storage::DBI::mysql::Retryable:
+    file: lib/DBIx/Class/Storage/DBI/mysql/Retryable.pm
+    version: v1.0.0
+requires:
+  Algorithm::Backoff::RetryTimeouts: '0'
+  Context::Preserve: '0'
+  DBD::mysql: '0'
+  DBI: '1.630'
+  DBIx::Class: '0'
+  DBIx::ParseError::MySQL: '0'
+  namespace::clean: '0'
+  perl: v5.10.0
+resources:
+  bugtracker: https://github.com/GrantStreetGroup/DBIx-Class-Storage-DBI-mysql-Retryable/issues
+  repository: git://github.com/GrantStreetGroup/DBIx-Class-Storage-DBI-mysql-Retryable.git
+version: v1.0.0
+x_generated_by_perl: v5.18.2
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: Artistic-2.0
+x_static_install: 1

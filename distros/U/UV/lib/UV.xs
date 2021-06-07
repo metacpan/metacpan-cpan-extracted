@@ -4,9 +4,6 @@
 #include "perl.h"
 #include "XSUB.h"
 
-#define NEED_newCONSTSUB
-#include "ppport.h"
-
 #include <assert.h>
 #include <stdlib.h>
 
@@ -113,11 +110,12 @@ static HV *make_errstash(pTHX_ int err)
  * UV::Handle *
  **************/
 
-#define FIELDS_UV__Handle \
-    SV *selfrv;           \
-    dTHXfield(perl)       \
-    SV *data;             \
-    SV *on_close;
+#define FIELDS_UV__Handle     \
+    SV *selfrv;               \
+    dTHXfield(perl)           \
+    SV *data;                 \
+    SV *on_close;             \
+    bool destroy_after_close;
 
 typedef struct UV__Handle {
     uv_handle_t *h;
@@ -128,11 +126,12 @@ typedef struct UV__Handle {
     Newxc(var, sizeof(*var) + sizeof(type), char, void); \
     var->h = (type *)((char *)var + sizeof(*var));
 
-#define INIT_UV__Handle(handle)  { \
-  handle->h->data = handle;        \
-  storeTHX(handle->perl);          \
-  handle->data     = NULL;         \
-  handle->on_close = NULL;         \
+#define INIT_UV__Handle(handle)  {      \
+  handle->h->data = handle;             \
+  storeTHX(handle->perl);               \
+  handle->data     = NULL;              \
+  handle->on_close = NULL;              \
+  handle->destroy_after_close = FALSE;  \
 }
 
 static void destroy_handle(UV__Handle self);
@@ -162,28 +161,26 @@ static void on_close_cb(uv_handle_t *handle)
     if(!handle || !handle->data) return;
 
     self = handle->data;
-    if(!(cb = self->on_close) || !SvOK(cb)) return;
 
-    dTHXa(self->perl);
-    dSP;
-    ENTER;
-    SAVETMPS;
+    if((cb = self->on_close) && SvOK(cb)) {
+        dTHXa(self->perl);
+        dSP;
+        ENTER;
+        SAVETMPS;
 
-    PUSHMARK(SP);
-    EXTEND(SP, 1);
-    mPUSHs(newRV_inc(self->selfrv));
-    PUTBACK;
+        PUSHMARK(SP);
+        EXTEND(SP, 1);
+        mPUSHs(newRV_inc(self->selfrv));
+        PUTBACK;
 
-    call_sv(cb, G_DISCARD|G_VOID);
+        call_sv(cb, G_DISCARD|G_VOID);
 
-    FREETMPS;
-    LEAVE;
-}
+        FREETMPS;
+        LEAVE;
+    }
 
-static void on_close_then_destroy(uv_handle_t *handle)
-{
-    on_close_cb(handle);
-    destroy_handle(handle->data);
+    if(self->destroy_after_close)
+        destroy_handle(handle->data);
 }
 
 /**************
@@ -1175,9 +1172,8 @@ DESTROY(UV::Handle self)
             $self->stop() if ($self->can('stop') && !$self->closing() && !$self->closed());
          */
         if(!uv_is_closing(self->h))
-            uv_close(self->h, on_close_then_destroy);
-        else
-            destroy_handle(self);
+            uv_close(self->h, on_close_cb);
+        self->destroy_after_close = TRUE;
 
 bool
 closed(UV::Handle self)

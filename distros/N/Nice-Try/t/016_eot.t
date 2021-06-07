@@ -3,10 +3,7 @@ BEGIN
 {
     use strict;
     use warnings;
-
     use Test::More qw( no_plan );
-
-    ## use Nice::Try debug => 5, debug_file => './dev/debug.pl';
     use Nice::Try;
 };
 

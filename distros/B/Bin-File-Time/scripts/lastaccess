@@ -1,0 +1,83 @@
+#!/usr/bin/perl
+use 5.014 ; use strict ; use warnings ; 
+use File::Find ; 
+use Time::HiRes qw[ stat tv_interval time gettimeofday ] ;
+use Getopt::Std ; getopts ',:d:g:x:',\my %o ; 
+use Term::ANSIColor qw[ :constants ] ; $Term::ANSIColor::AUTORESET = 1 ;
+use Pod::Perldoc ;
+use feature qw[ say ] ;
+
+$o{d} //= 1 ; # ディレトクリに対する処理を抑制するかどうか。0が明示的に与えられたら抑制。
+$o{g} //= 12 ; # 最近アクセスされたファイルを最大何個取り出すか
+my $start_time = [ gettimeofday ] ;
+main () ; exit 0 ;
+
+sub main { 
+	my @sdir = defined $o{x} ? ($o{x}) : @ARGV ? @ARGV : qw[ . ] ; 
+	our @ Files = () ;  
+
+	find ( { wanted => \& wanted , no_chdir => 1 } , @sdir ) ;
+
+	sub wanted {
+		my @s = stat $_ ;
+		my $atime = $s[8] ;
+		my $bytes = $s[7] ; 
+		push @ Files , ff->new ( $_ , $atime, $bytes ) if ! ( -d _ && do { $_.='/' ;1} ) || $o{d} ; 
+	}  
+
+	my $now = time ; 
+    $_ ->{ elapsed } = $now -  $_->{atime} for  @Files  ; 
+	@ Files = sort {  $a ->{elapsed} <=> $b->{elapsed} } @Files ; 
+
+	say join "\t", "Diff_seconds", "Seconds_before", "Byte_size", "File_name" ; 
+	my $mrec0 = 0 ; 
+	my $shown = 0 ;
+	for ( splice @Files , 0 , $o{g} ) { 
+		my @t ; 
+		my $mrec = $_->{elapsed} ; 
+		push @t , sprintf "%0.6f" , $mrec - $mrec0 ;
+		push @t , sprintf "%0.6f" , $mrec ; 
+		push @t , $_->{bytes}, $_->{name} ; 
+		$t[2] =~ s/(?<=\d)(?=(\d\d\d)+($|\D))/,/g if $o{','} // '' ne "0" ; 
+		say join "\t" , @t ;
+		$shown ++ ; 
+		$mrec0 = $mrec ; 
+	}
+	my $num = @ Files ; 
+	my $elps = sprintf "%.6f" , tv_interval $start_time ; 
+	say STDERR CYAN "Files processed : $num ; Shown above : $shown ;  Elapsed seconds : $elps" ;
+}
+
+sub HELP_MESSAGE { # <-- - サブコマンドが呼ばれているときはそのヘルプが呼ばれる。
+    local @ARGV = do { my ($x,@y) = 0 ; 1 while ( @y = caller $x++ )[ 0 ] eq "Getopt::Std" ; $y[1] } ;
+    Pod::Perldoc -> run ;
+}
+sub VERSION_MESSAGE { $ Getopt::Std::STANDARD_HELP_VERSION = 1 }  # <- here?
+
+
+package ff ;
+
+sub new ( $ ) { #say 1 ;
+	my $ins = { name => $_[1] , atime => $_[2] , bytes => $_[3] } ; 
+	return bless $ins ;
+} 
+
+=encoding utf8
+
+=head1 NAME
+
+ lastaccess DIRNAME 
+
+ DIRNAMEの下にあるファイルで、最後にアクセスされた順にファイルを表示する。
+
+ オプション: 
+   -d 0 ; 途中で現れるディレクトリに対する処理を抑制する。
+   -g N : 最大最近の何個を取り出すかの指定。未指定なら12。
+   -x STR : DIRNAME の指定
+   -, 0 : 3桁区切りのコンマを抑制する。
+
+  開発メモ : 
+    * ソートを行っているので、数十万個を超えるファイルがその下の階層のどこかにある場合は計算リソースが気になる。工夫が必要。
+    * 各ファイルのパスの文字列をそのままメモリ上に載せているので、パス名ではないただのファイル名で十分なはずを、何倍も無駄をしている。改良したい。
+
+=cut

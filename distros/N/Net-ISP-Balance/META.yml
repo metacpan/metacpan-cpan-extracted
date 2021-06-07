@@ -6,7 +6,7 @@ build_requires: {}
 configure_requires:
   Module::Build: '0'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.4224, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Module::Build version 0.4231, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -15,7 +15,7 @@ name: Net-ISP-Balance
 provides:
   Net::ISP::Balance:
     file: lib/Net/ISP/Balance.pm
-    version: '1.28'
+    version: '1.31'
 requires:
   DB_File: '0'
   Net::Netmask: '0'
@@ -23,5 +23,5 @@ requires:
   perl: v5.8.0
 resources:
   license: http://dev.perl.org/licenses/
-version: '1.28'
+version: '1.31'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

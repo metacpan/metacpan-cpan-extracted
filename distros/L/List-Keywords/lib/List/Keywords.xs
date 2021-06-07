@@ -32,9 +32,6 @@ static LOGOP *MY_allocLOGOP_CUSTOM(pTHX_ OP *(*func)(pTHX), U32 flags, OP *first
 static OP *build_blocklist(pTHX_ OP *block, OP *list,
   OP *(*pp_start)(pTHX), OP *(*pp_while)(pTHX), U8 op_private)
 {
-  block = op_contextualize(op_scope(block), G_SCALAR);
-  list  = op_contextualize(list, G_ARRAY);
-
   /* Follow the same optree shape as grep:
    *   LOGOP whileop
    *     LISTOP startop
@@ -187,17 +184,17 @@ static OP *pp_firstwhile(pTHX)
   return cLOGOP->op_other;
 }
 
-static int build_first(pTHX_ OP **out, XSParseKeywordPiece *args, size_t nargs, void *hookdata)
+static int build_first(pTHX_ OP **out, XSParseKeywordPiece *args[], size_t nargs, void *hookdata)
 {
-  *out = build_blocklist(aTHX_ args[0].op, args[1].op,
+  *out = build_blocklist(aTHX_ args[0]->op, args[1]->op,
     &pp_firststart, &pp_firstwhile, SvIV((SV *)hookdata));
   return KEYWORD_PLUGIN_EXPR;
 }
 
 static const struct XSParseKeywordPieceType pieces_blocklist[] = {
-  XPK_BLOCK,
-  XPK_LISTEXPR,
-  0,
+  XPK_BLOCK_SCALARCTX,
+  XPK_LISTEXPR_LISTCTX,
+  {0},
 };
 
 static const struct XSParseKeywordHooks hooks_first = {
@@ -234,14 +231,21 @@ static const struct XSParseKeywordHooks hooks_notall = {
 static XOP xop_reducestart;
 static XOP xop_reducewhile;
 
+enum {
+  REDUCE_REDUCE,
+  REDUCE_REDUCTIONS,
+};
+
 static OP *pp_reducestart(pTHX)
 {
   dSP;
+  U8 mode = PL_op->op_private;
 
   if(PL_stack_base + TOPMARK == SP) {
     /* Empty */
     (void)POPMARK;
-    XPUSHs(&PL_sv_undef);
+    if(GIMME_V == G_SCALAR)
+      XPUSHs(&PL_sv_undef);
     RETURNOP(PL_op->op_next->op_next);
   }
 
@@ -253,6 +257,8 @@ static OP *pp_reducestart(pTHX)
   }
 
   PL_stack_sp = PL_stack_base + TOPMARK + 1;
+  if(mode == REDUCE_REDUCTIONS)
+    PUSHMARK(PL_stack_sp);
   PUSHMARK(PL_stack_sp);
 
   ENTER_with_name("reduce");
@@ -267,6 +273,9 @@ static OP *pp_reducestart(pTHX)
 
   /* Initial accumulator */
   SV *sv = PL_stack_base[TOPMARK];
+
+  if(mode == REDUCE_REDUCTIONS)
+    PL_stack_base[PL_markstack_ptr[-1]++] = sv_mortalcopy(sv);
 
   if(SvPADTMP(sv)) {
     sv = PL_stack_base[TOPMARK] = sv_mortalcopy(sv);
@@ -296,15 +305,35 @@ static OP *pp_reducestart(pTHX)
 static OP *pp_reducewhile(pTHX)
 {
   dSP;
+  U8 mode = PL_op->op_private;
   dPOPss;
+
+  if(mode == REDUCE_REDUCTIONS)
+    PL_stack_base[PL_markstack_ptr[-1]++] = SvPADTMP(sv) ? sv_mortalcopy(sv) : sv;
 
   (*PL_markstack_ptr)++;
 
   if(UNLIKELY(PL_stack_base + *PL_markstack_ptr > SP)) {
+    U8 gimme = GIMME_V;
     LEAVE_with_name("reduce");
-    (void)POPMARK;
-    SP = PL_stack_base + POPMARK;
-    PUSHs(SvREFCNT_inc(sv));
+
+    if(mode == REDUCE_REDUCTIONS) {
+      (void)POPMARK;
+      I32 items = --*PL_markstack_ptr - PL_markstack_ptr[-1];
+      (void)POPMARK;
+      SP = PL_stack_base + POPMARK;
+      if(gimme == G_SCALAR) {
+        SP[1] = SP[items];
+        SP += 1;
+      }
+      else if(gimme == G_ARRAY)
+        SP += items;
+    }
+    else {
+      (void)POPMARK;
+      SP = PL_stack_base + POPMARK;
+      PUSHs(SvREFCNT_inc(sv));
+    }
     RETURN;
   }
 
@@ -329,7 +358,7 @@ static OP *pp_reducewhile(pTHX)
   return cLOGOP->op_other;
 }
 
-static int build_reduce(pTHX_ OP **out, XSParseKeywordPiece *args, size_t nargs, void *hookdata)
+static int build_reduce(pTHX_ OP **out, XSParseKeywordPiece *args[], size_t nargs, void *hookdata)
 {
 #if !HAVE_PERL_VERSION(5,20,0)
   GV *firstgv  = gv_fetchpvs("a", GV_ADD|GV_NOTQUAL, SVt_PV);
@@ -339,8 +368,8 @@ static int build_reduce(pTHX_ OP **out, XSParseKeywordPiece *args, size_t nargs,
   GvMULTI_on(secondgv);
 #endif
 
-  *out = build_blocklist(aTHX_ args[0].op, args[1].op,
-    &pp_reducestart, &pp_reducewhile, 0);
+  *out = build_blocklist(aTHX_ args[0]->op, args[1]->op,
+    &pp_reducestart, &pp_reducewhile, SvIV((SV *)hookdata));
   return KEYWORD_PLUGIN_EXPR;
 }
 
@@ -351,10 +380,17 @@ static const struct XSParseKeywordHooks hooks_reduce = {
   .build = &build_reduce,
 };
 
+static const struct XSParseKeywordHooks hooks_reductions = {
+  .permit_hintkey = "List::Keywords/reductions",
+
+  .pieces = pieces_blocklist,
+  .build = &build_reduce,
+};
+
 MODULE = List::Keywords    PACKAGE = List::Keywords
 
 BOOT:
-  boot_xs_parse_keyword(0);
+  boot_xs_parse_keyword(0.05);
 
   register_xs_parse_keyword("first", &hooks_first, newSViv(0));
 
@@ -378,7 +414,8 @@ BOOT:
   XopENTRY_set(&xop_firstwhile, xop_class, OA_LOGOP);
   Perl_custom_op_register(aTHX_ &pp_firstwhile, &xop_firstwhile);
 
-  register_xs_parse_keyword("reduce", &hooks_reduce, NULL);
+  register_xs_parse_keyword("reduce",     &hooks_reduce,     newSViv(REDUCE_REDUCE));
+  register_xs_parse_keyword("reductions", &hooks_reductions, newSViv(REDUCE_REDUCTIONS));
 
   XopENTRY_set(&xop_reducestart, xop_name, "reducestart");
   XopENTRY_set(&xop_reducestart, xop_desc, "reduce");

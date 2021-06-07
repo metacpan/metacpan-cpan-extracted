@@ -1,6 +1,6 @@
 /*
 
-  Copyright (c) 2002-2020 Greg Sabino Mullane and others: see the Changes file
+  Copyright (c) 2002-2021 Greg Sabino Mullane and others: see the Changes file
   Portions Copyright (c) 2002 Jeffrey W. Baker
   Portions Copyright (c) 1997-2000 Edmund Mergl
   Portions Copyright (c) 1994-1997 Tim Bunce
@@ -514,7 +514,7 @@ int dbd_db_ping (SV * dbh)
     }
 
     /* No matter what state we are in, send an empty query to the backend */
-    result = PQexec(imp_dbh->conn, "/* DBD::Pg ping test v3.14.2 */");
+    result = PQexec(imp_dbh->conn, "/* DBD::Pg ping test v3.15.0 */");
     status = PQresultStatus(result);
     PQclear(result);
     if (PGRES_FATAL_ERROR == status) {
@@ -1068,8 +1068,7 @@ SV * dbd_st_FETCH_attrib (SV * sth, imp_sth_t * imp_sth, SV * keysv)
     int               fields, x;
 
     if (TSTART_slow) TRC(DBILOGFP, "%sBegin dbd_st_FETCH (key: %s)\n", THEADER_slow, key);
-    
-    
+
     /* Some can be done before we have a result: */
     switch (kl) {
 
@@ -1089,6 +1088,9 @@ SV * dbd_st_FETCH_attrib (SV * sth, imp_sth_t * imp_sth, SV * keysv)
                 SvREFCNT_dec(key);
             }
             retsv = newRV_noinc((SV*)pvhv);
+        }
+        else if (strEQ("pg_async", key)) {
+            retsv = newSViv((IV)imp_sth->async_flag);
         }
         break;
 
@@ -1309,11 +1311,9 @@ SV * dbd_st_FETCH_attrib (SV * sth, imp_sth_t * imp_sth, SV * keysv)
         }
         break;
 
-    case 8: /* pg_async  NULLABLE */
+    case 8: /* NULLABLE */
 
-        if (strEQ("pg_async", key))
-            retsv = newSViv((IV)imp_sth->async_flag);
-        else if (strEQ("NULLABLE", key)) {
+        if (strEQ("NULLABLE", key)) {
             AV *av = newAV();
             PGresult *result;
             int status = -1;
@@ -3995,7 +3995,7 @@ static int pg_st_deallocate_statement (pTHX_ SV * sth, imp_sth_t * imp_sth)
                 if (TRACE4_slow)
                     TRC(DBILOGFP, "%sRolling back to savepoint %s\n", THEADER_slow, SvPV_nolen(sp));
                 sprintf(cmd, "rollback to %s", SvPV_nolen(sp));
-                strncpy(tempsqlstate, imp_dbh->sqlstate, strlen(imp_dbh->sqlstate)+1);
+                strncpy(tempsqlstate, imp_dbh->sqlstate, 6);
                 status = _result(aTHX_ imp_dbh, cmd);
                 Safefree(cmd);
             }
@@ -4031,7 +4031,7 @@ static int pg_st_deallocate_statement (pTHX_ SV * sth, imp_sth_t * imp_sth)
     Safefree(imp_sth->prepare_name);
     imp_sth->prepare_name = NULL;
     if (tempsqlstate[0]) {
-        strncpy(imp_dbh->sqlstate, tempsqlstate, strlen(tempsqlstate)+1);
+        strncpy(imp_dbh->sqlstate, tempsqlstate, 6);
     }
 
     if (TEND_slow) TRC(DBILOGFP, "%sEnd pg_st_deallocate_statement\n", THEADER_slow);

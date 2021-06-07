@@ -1,5 +1,53 @@
 Revision history for FunctionalPerl
 
+0.72.66 2021-5-23
+    - website: add blog, with post about perl weekly challenge
+    - 113-1*: improvements
+
+0.72.65 2021-5-22
+    - 113-1-represent_integer: fix and improve the Haskell version
+
+0.72.64 2021-5-22
+    - sequences: change `any` to return the last false value
+    - List: silence recursion warning in list_map
+    - TransparentLazy: never use `FORCE` transparently
+    - Create FP::Either
+    - 113-1-represent_integer: improvements, add more performant
+      algorithm, and a (currently non-working) Haskell version
+
+0.72.63 2021-5-21
+    - Repl: use FP_REPL_HOME env var if present
+    - t/repl.t: stop spamming the real repl history (and settings?)
+    - TransparentLazy: fix lazyLight
+    - Lazy,TransparentLazy: document behaviour of `lazyLight` in the
+      face of side effects
+    - Perl Weekly Challenges 113-1-represent_integer: use __SUB__
+      instead of FP::fix
+
+0.72.62 2021-5-20
+    - fix a multitude of newly introduced test and dependency bugs
+
+0.72.61 2021-5-20
+    - List: add map_with_tail, insertion_variants, fix `car` and
+      `car_and_cdr` for lazyT, fix cons method
+    - Lazy: add `lazyT_if`, add docstrings
+    - Array: change `any` to return the found true value, like List's
+      `any`
+    - SortedPureArray: 'finish' by adding `sortedpurearray_by`
+      function (and docstring); add it to FunctionalPerl's :sequences
+      tag
+    - Add this week's Perl Weekly Challenges
+
+0.72.60 2021-5-16
+    - Create FP::SortedPureArray, add `as_sorted_by` method to
+      PureArray
+    - Optional: add `have`
+    - Create examples/perl-weekly-challenges/111-1-searchmatrix
+    - Create FP::Id / FP::Abstract::Id
+    - Create FP::Collection
+    - xperlfunc: `xmkdir_p`: take optional mask argument
+    - doc tweak
+
 0.72.59 2021-5-2
     - Repl: avoid taint check failures (if easily possible)
     - Documentation

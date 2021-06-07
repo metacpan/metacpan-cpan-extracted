@@ -1,4 +1,4 @@
-/* vi: set ft=c inde=: */
+/* vi: set ft=c */
 
 /* needed for compatibility with perls 5.14 and older */
 #ifndef newCONSTSUB_flags

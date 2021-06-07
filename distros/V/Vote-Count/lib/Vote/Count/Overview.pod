@@ -1,0 +1,440 @@
+# ABSTRACT: Overview of Preferential Election methods and introduction to Vote::Count.
+
+=pod
+
+=head1 NAME
+
+Vote::Count::Overview
+
+=head1 DESCRIPTION
+
+An Overview of Alternative Voting and Preferential Methods and Introduction to Vote::Count.
+
+=head1 VERSION 2.00
+
+=head2 A Toolkit for determining the outcome of Preferential Ballots.
+
+Provides a Toolkit for implementing multiple voting systems, allowing a wide range of method options. Vote::Count provides a lot of options to facilitate writing code to match your election rules.
+
+=head1 Preferential Voting Methods
+
+Several alternatives to the familiar vote for one ballot type have been proposed. Some of these alternatives are:
+
+=over
+
+=item
+
+Approval: Voters indicate multiple choices
+
+=item
+
+Ranked: Voters indicate a preference order among choices. Also known as Ordinal.
+
+=item
+
+Range: Voters assign a value to choices. Also known as Score or Cardinal. Typically Range Ballots allow multiple choices to be assigned the same value, if that is not allowed, the ballot may be interpreted as either a Cardinal or Ordinal Ballot.
+
+=item
+
+Yes/No and Yes/No/Neutral: Voters indicate which of the 3 states they view each choice, un-ranked choices default to Neutral.
+
+=back
+
+L<Vote::Count> is only concerned with Preferential Ballots: the Ranked and Range Ballot Types. While Yes/No/Neutral can be viewed as a Cardinal ballot type, neither it nor any of the methods devised for it are implemented in L<Vote::Count>.
+
+=head2 Brief Review of Voting Methods
+
+I<Vote for One> ballots are resolved by one of two methods: I<Majority> and I<Plurality>. Majority vote requires a majority of votes to win (but frequently produces no winner), and Plurality which selects the choice with the most votes.
+
+Numerous methods have been proposed and tried for choosing the winner of I<Preferential Ballots>. To compare these methods a number of criteria have been developed. While Mathematicians often treat these criteria as absolutes, from a policy perspective it may be more valuable to see them as a spectrum where a method may be considered to satisfy or fail with varying degrees of severity. From a policy perspective it is appropriate to group most of the criteria into a single group: Consistency, and then highlight the more important sub-criteria. Finally Mathematicians, typically, do not directly consider Complexity, but from a policy perspective this is just as important as any of the other criteria, and is definitely a scale not an absolute.
+
+=head3 The Criteria for Resolving Ranked Choice (including Score) Ballots
+
+=head4 Later Harm
+
+Marking a later Choice on a Ballot should not cause a Voter's higher ranked choice to lose.
+
+=head4 Condorcet Criteria
+
+I<Condorcet Loser> states that a method should not choose a winner that would be defeated in a direct match up to all other choices.
+
+I<Condorcet Winner> states a choice which defeats all others in direct match-ups should be the Winner.
+
+I<Smith Criteria> the winner should belong to the smallest set of choices which defeats all choices outside of that set.
+
+=head4 Consistency Criteria
+
+The Consistency Criteria collectively state: Changes to non-winning alternatives that would not obviously alter the outcome should not change the winner. Adding or removing non-winning choices, or altering the votes for non-winning choices, except in a manner which directly changes the outcome should not alter the outcome. If votes are moved between non-winning alternatives in a manner that has no direct affect on the winner, the winner should not change. Changes to non-winning choices which increase support for the winner should not then cause a different choice to win.
+
+To illustrate inconsistency: suppose every morning we vote on a flavor of Ice Cream and Chocolate always wins; one morning the three voters who always vote 1:RockyRoad 2:Chocolate discover that a member of the group has a nut allergy and vote for just Chocolate, consistency is violated if Chocolate loses on that day. This example illustrates B<Independence of Irrelevant Alternatives>, and B<Monotonic> Consistency, which can be considered a subcategory of Irrelevant Alternatives.
+
+B<Clone Independence>. Cloning occurs when similar choices are available, such as Vanilla and Vanilla Bean. If one or both of the clones would win without the presence of the other, the presence of both should not cause a non-clone to win. Cloning effects are extremely common in real world elections, and poor clone performance should be considered a serious shortcoming.
+
+The cases described above: Monotonicity, Independence of Irrelevant Alternatives and Clone Independence are usually discussed as separate criteria rather than components of one. Additional sub-criteria that haven't been mentioned include: Reversal Symmetry, Participation Consistency, and Later No Help (which could also be considered a sub-criteria of Later Harm).
+
+=head4 Complexity
+
+Is it feasible to count 100 ballots by hand? How difficult is it to understand the process (can the average middle school student understand it at all)? How many steps? People by their nature are likely to reject things they don't understand, and conversely are likely to embrace something that makes sense, especially if it took a little bit of effort to understand.
+
+=head4 Resolvability
+
+I<Majority> meets all of the above criteria, however, unless votes are restricted to two choices, it will frequently fail to provide a winner, or even a tie. No method can be completely impervious to ties. Methods that are not Resolvable are frequently combined with other methods, I<Instant Runoff Voting> is a compound method with I<Majority>, and all usable I<Condorcet> Methods combine seeking a Condorcet Winner with some other process.
+
+=head4 Incentive for Strategic Voting
+
+Voting systems have weaknesses which can incentivize voters to vote in an insincere manner. Later Harm Violation is a strong driver for tactical voting. Inconsistency may create circumstances by which a coordinated block of voters can boost or harm a choice, this vulnerability type is often referred to as an attack.
+
+=head3 Arrow's Theorem
+
+Arrows Theorem states that it is impossible to have a system that can resolve Ranked Choice Ballots which meets Later Harm and Condorcet Winner. To extend the notion, if it is impossible to meet two criteria it is truly impossible to meet five. Every method  has a trade off, where it will fail some criteria and fail them to different degrees.
+
+=head3 Popular Ranked Choice Resolution Systems
+
+=head4 Instant Runoff Voting (IRV is also known as Hare System, Alternative Vote)
+
+Seeks a Majority Winner. If there is none the lowest choice is eliminated until there is a Majority Winner or all remaining choices have the same number of votes.
+
+=over
+
+=item *
+
+Easy to Hand Count and Easy to Understand.
+
+=item *
+
+Meets Later Harm.
+
+=item *
+
+Fails Condorcet Winner (but meets Condorcet Loser).
+
+=item *
+
+Fails many Consistency Criteria (The example given for Monotonic Consistency failure can happen with IRV). IRV handles clones poorly.
+
+=back
+
+=head4 Borda Count and Scoring
+
+When Range (Cardinal) Ballots are used, the scores assigned by the voters are tallied to score the choices.
+
+Since Scoring is native to Range Ballots, to use the approach to resolve Ranked Ballots requires a method of assigning scores.
+
+Borda Count Scores choices on a ballot based on their position. Borda supporters often disagree about the weighting rule to use in the scoring. Iterative Borda Methods (Baldwin, Nansen) eliminate the lowest choice(s) and recalculate the Borda score ignoring eliminated choices (if your second choice is eliminated your third choice is promoted).
+
+=over
+
+=item *
+
+Easy to Understand.
+
+=item *
+
+Fails Later Harm.
+
+=item *
+
+Fails Condorcet Winner.
+
+=item *
+
+Inconsistent.
+
+=item *
+
+The basic Borda Method is vulnerable to a Cloning Attack, but not Range Ballot Scoring and iterative Borda methods.
+
+=back
+
+=head4 Condorcet
+
+Technically this family of methods should be called Condorcet Pairwise, because any method that meets both Condorcet Criteria is technically a Condorcet Method. However, in discussion and throughout this software collection the term Condorcet will refer to  methods which uses a Matrix of Wins and Losses derived from direct pairing of choices and seeks to identify a Condorcet Winner.
+
+The basic Condorcet Method will frequently fail to identify a winner. One possibility is a Loop (Condorcet's Paradox) Where A > B, B > C, and C > A. Another possibility is a knot (not an accepted term, but one which will be used in this documentation). To make Condorcet resolvable a second method is typically used to resolve Loops and Knots.
+
+=over
+
+=item *
+
+Complexity Varies among sub-methods.
+
+=item *
+
+Fails Later Harm. The Later Harm effect is much lower than with Approval or Borda, because Later Harm manifests when the later choice defeats the preferred choice in pairing. Using an IRV based method for the fallback when there isn't a Condorcet Winner also limits the Later Harm effect.
+
+=item *
+
+Meets both Condorcet Criteria.
+
+=item *
+
+When a Condorcet Winner is present Consistency is very high. When there is no Condorcet Winner this Consistency applies between a Dominant (Smith) Set and the rest of the choices, but not within the Smith Set.
+
+=back
+
+=head3 Range (Score) Voting Systems
+
+Most Methods for Ranked Choice Ballots can be used for Range Ballots.
+
+Voters rate the choices on a scale, with the highest rating being their most favored (the inverse of Ranked where 1 is the best), the scores from all the votes are added together for a ranking. I<STAR>, creates a virtual runoff between the top two Choices.
+
+Advocates claim that this Ballot Style is a better expression of voter preference. Where it shows a clear advantage is in allowing Voters to directly mitigate Later Harm by ranking a strongly favored choice with the highest score and weaker choices with the lowest. The downside to this strategy is that the voter is giving little help to later choices reaching the automatic runoff. Given a case with two roughly equal main factions, where one faction gives strong support to all of its options, and the other faction's supporters give weak support to all later choices; the runoff will be between the two best choices of the first faction, even if the choices of the second faction all defeat any of the first's choices in pairwise comparison.
+
+The Range Ballot resolves the Borda weighting problem and allows the voter to manage the later harm effect, so it is clearly a better choice than Borda. Condorcet and IRV can resolve Range Ballots, but ignore the extra information and would prefer strict ordinality (not allowing equal ranking).
+
+Voters may find the Range Ballot to be more complex than the Ranked Choice Ballot.
+
+=head1 Objective and Motivation
+
+I wanted to be able to evaluate alternative methods for resolving elections and couldn't find a flexible enough existing library in any of the popular general purpose and web development languages: Perl, PHP, Python, Ruby, JavaScript, nor in the newer language Julia (created as an alternative to R and other math languages). More recently I was writing a bylaws proposal to use RCV and found that the existing libraries and services were not only constrained in what options they can provide, but also didn't always document them clearly, making it a challenge to have a method described in bylaws where it could be guaranteed hand and machine counts would agree.
+
+The objective is to have a library that can handle any of the myriad variants that one might consider either from a study perspective or what is called for by the elections rules of our entity.
+
+=head1 Vote::Count Basics
+
+=head1 Synopsis
+
+  use 5.024; # Minimum Perl, or any later Perl.
+  use feature qw /postderef signatures/;
+
+  use Vote::Count;
+  use Vote::Count::ReadBallots;
+  use Vote::Count::Method::CondorcetDropping;
+
+  # example uses biggerset1 from the distribution test data.
+  my $ballotset = read_ballots 't/data/biggerset1.txt' ;
+  my $CondorcetElection =
+    Vote::Count::Method::CondorcetDropping->new(
+      'BallotSet' => $ballotset ,
+      'DropStyle' => 'all',
+      'DropRule'  => 'topcount',
+    );
+  # ChoicesAfterFloor a hashref of choices meeting the
+  # ApprovalFloor which defaulted to 5%.
+  my $ChoicesAfterFloor = $CondorcetElection->ApprovalFloor();
+  # Apply the ChoicesAfterFloor to the Election.
+  $CondorcetElection->SetActive( $ChoicesAfterFloor );
+  # Get Smith Set and the Election with it as the Active List.
+  my $SmithSet = $CondorcetElection->Matrix()->SmithSet() ;
+  $CondorcetElection->logt(
+    "Dominant Set Is: " . join( ', ', keys( $SmithSet->%* )));
+  my $Winner = $CondorcetElection->RunCondorcetDropping( $SmithSet )->{'winner'};
+
+  # Create an object for IRV, use the same Floor as Condorcet
+
+  my $IRVElection = Vote::Count->new(
+    'BallotSet' => $ballotset,
+    'Active' => $ChoicesAfterFloor );
+  # Get a RankCount Object for the
+  my $Plurality = $IRVElection->TopCount();
+  my $PluralityWinner = $Plurality->Leader();
+  $IRVElection->logv( "Plurality Results", $Plurality->RankTable);
+  if ( $PluralityWinner->{'winner'}) {
+    $IRVElection->logt( "Plurality Winner: ", $PluralityWinner->{'winner'} )
+  } else {
+    $IRVElection->logt(
+      "Plurality Tie: " . join( ', ', $PluralityWinner->{'tied'}->@*) )
+  }
+  my $IRVResult = $IRVElection->RunIRV();
+
+  # Now print the logs and winning information.
+  say $CondorcetElection->logv();
+  say $IRVElection->logv();
+  say '*'x60;
+  say "Plurality Winner: $PluralityWinner->{'winner'}";
+  say "IRV Winner: $IRVResult->{'winner'}";
+  say "Condorcet Winner: $Winner";
+
+=head2 Reading Ballots
+
+The L<Vote::Count::ReadBallots|Vote::Count::ReadBallots> library provides functionality for reading files from disc. Currently it defines a format for a ballot file and reads that from disk. In the future additional formats may be added. Range Ballots may be in either JSON or YAML formats.
+
+=head2 L<RankCount|Vote::Count::RankCount> Object
+
+Votes are frequently put into a tabular form by some criteria, such as L<Approval|Vote::Count::Approval> or L<Top Count|Vote::Count::TopCount>. Performing such operations returns a L<Vote::Count::RankCount> object.
+
+=head2 Voting Method and Component Modules
+
+The Modules in the space Vote::Count::%Component% provide functionality needed to create a functioning Voting Method. These are mostly consumed as Roles by Vote::Count, some such as RankCount and Matrix return their own objects.
+
+The Modules in the space Vote::Count::Method::%Something% implement a Voting Method that isn't globally available. The Borda and IRV modules for example are loaded into every Vote::Count object. These Modules inherit the parent Vote::Count and all of the Components available to it. These modules all return a Hash Reference with the following key: I<winner>, some return additional keys. Methods that can be tied will have additional keys I<tie> and I<tied>. When there is no winner the value of I<winner> will be false.
+
+=head2 Vote::Count Module
+
+The Core Module requires a Ballot Set (which can be obtained from ReadBallots).
+
+  my $Election = Vote::Count->new(
+      BallotSet => read_ballots( $ballotfile ),
+      ...
+  );
+
+The Documentation for the Vote::Count Module is in L<Vote::Count::Common>
+
+=head1 Minimum Perl Version
+
+It is the policy of Vote::Count to only develop with recent versions of Perl. Support for older versions will be dropped when they either require additional maintenance or impair adoption of new features.
+
+=head1 Catalog of Methods
+
+Directory of Vote Counting Methods linking to the Vote::Count module for it.
+
+=head3 Consumed As Roles By Vote::Count
+
+=over
+
+=item *
+
+L<Vote::Count::Approval>
+
+=item *
+
+L<Vote::Count::BottomRunOff>
+
+=item *
+
+L<Vote::Count::Borda>
+
+=item *
+
+L<Vote::Count::Floor>
+
+=item *
+
+L<Vote::Count::IRV>
+
+=item *
+
+L<Vote::Count::TopCount>
+
+=item *
+
+L<Vote::Count::Redact>
+
+=item *
+
+L<Vote::Count::Score>
+
+=item *
+
+L<Vote::Count::TieBreaker>
+
+=back
+
+=head3 Return Their Own Objects
+
+=over
+
+=item *
+
+L<Vote::Count::Matrix>
+
+=item *
+
+L<Vote::Count::RankCount>
+
+=back
+
+=head3 Voting Methods
+
+=over
+
+=item *
+
+L<Vote::Count::Method::CondorcetDropping>
+
+=item *
+
+L<Vote::Count::Method::CondorcetIRV>
+
+=item *
+
+L<Vote::Count::Method::CondorcetVsIRV>
+
+=item *
+
+L<Vote::Count::Method::MinMax>
+
+=item *
+
+L<Vote::Count::Method::STAR>
+
+=back
+
+=head3 Non Object Oriented Components
+
+=over
+
+=item *
+
+L<Vote::Count::Redact>
+
+L<Vote Count Helpers|Vote::Count::Helper>
+
+=back
+
+=head3 Example Folder
+
+=head3 Utilities
+
+=over
+
+=item *
+
+L<Vote::Count::ReadBallots>
+
+=item *
+
+L<Vote::Count::Start>
+
+=back
+
+=head3 Additional Documentation
+
+=over
+
+=item *
+
+L<Catalog|Vote::Count::Catalog>
+
+=item *
+
+L<Multi Member|https://metacpan.org/pod/distribution/Vote-Count/lib/Vote/MultiMember.pod>
+
+=item *
+
+L<Vote::Count::Start|https://metacpan.org/pod/Vote::Count::Start>
+
+=back
+
+=head1 Call for Contributions
+
+This project needs contributions from Programmers and Mathematicians. Review and citations from Mathematicians are urgently requested, because in addition to being a Tool-set for implementing vote counting this documentation will for many also be the manual. From coders there is a lot of help that could be given: any well known method could use a write up if it is easy to implement with the toolkit (see Benham) or a code submission if it is not. Currently Tiedeman, SSD, and Kemmeny-Young are unimplemented.
+
+=cut
+
+#FOOTER
+
+=pod
+
+BUG TRACKER
+
+L<https://github.com/brainbuz/Vote-Count/issues>
+
+AUTHOR
+
+John Karr (BRAINBUZ) brainbuz@cpan.org
+
+CONTRIBUTORS
+
+Copyright 2019-2021 by John Karr (BRAINBUZ) brainbuz@cpan.org.
+
+LICENSE
+
+This module is released under the GNU Public License Version 3. See license file for details. For more information on this license visit L<http://fsf.org>.
+
+SUPPORT
+
+This software is provided as is, per the terms of the GNU Public License. Professional support and customisation services are available from the author.
+
+=cut
+

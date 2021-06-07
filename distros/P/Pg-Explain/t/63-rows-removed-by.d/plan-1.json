@@ -1,0 +1,25 @@
+[
+  {
+    "Plan": {
+      "Node Type": "Seq Scan",
+      "Parallel Aware": false,
+      "Async Capable": false,
+      "Relation Name": "pg_class",
+      "Alias": "pg_class",
+      "Startup Cost": 0.00,
+      "Total Cost": 17.95,
+      "Plan Rows": 66,
+      "Plan Width": 265,
+      "Actual Startup Time": 0.025,
+      "Actual Total Time": 0.259,
+      "Actual Rows": 67,
+      "Actual Loops": 1,
+      "Filter": "(relkind = 'r'::\"char\")",
+      "Rows Removed by Filter": 330
+    },
+    "Planning Time": 1.460,
+    "Triggers": [
+    ],
+    "Execution Time": 0.503
+  }
+]

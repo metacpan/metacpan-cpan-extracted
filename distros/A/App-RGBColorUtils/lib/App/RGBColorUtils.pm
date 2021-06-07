@@ -1,7 +1,7 @@
 package App::RGBColorUtils;
 
-our $DATE = '2019-07-12'; # DATE
-our $VERSION = '0.001'; # VERSION
+our $DATE = '2021-05-26'; # DATE
+our $VERSION = '0.002'; # VERSION
 
 use 5.010001;
 use strict;
@@ -101,7 +101,7 @@ App::RGBColorUtils - CLI utilities related to RGB color
 
 =head1 VERSION
 
-This document describes version 0.001 of App::RGBColorUtils (from Perl distribution App-RGBColorUtils), released on 2019-07-12.
+This document describes version 0.002 of App::RGBColorUtils (from Perl distribution App-RGBColorUtils), released on 2021-05-26.
 
 =head1 DESCRIPTION
 
@@ -122,7 +122,7 @@ This distributions provides the following command-line utilities:
 
 Usage:
 
- rgb_is_dark(%args) -> [status, msg, payload, meta]
+ rgb_is_dark(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Check if RGB color is dark.
 
@@ -136,16 +136,17 @@ Arguments ('*' denotes required arguments):
 
 =item * B<quiet> => I<true>
 
+
 =back
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -155,7 +156,7 @@ Return value:  (any)
 
 Usage:
 
- rgb_is_light(%args) -> [status, msg, payload, meta]
+ rgb_is_light(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Check if RGB color is light.
 
@@ -169,16 +170,17 @@ Arguments ('*' denotes required arguments):
 
 =item * B<quiet> => I<true>
 
+
 =back
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -192,7 +194,7 @@ Source repository is at L<https://github.com/perlancar/perl-App-RGBColorUtils>.
 
 =head1 BUGS
 
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-RGBColorUtils>
+Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-App-RGBColorUtils/issues>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
@@ -208,7 +210,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2019 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

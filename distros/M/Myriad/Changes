@@ -1,14 +1,22 @@
 
 Revision history for Myriad
 
+0.007     2021-05-21 14:22:03+00:00 UTC
+    [Bugs fixed]
+    - RPC reading multiple items from stream but processing only one.
+
+    [Dependencies]
+    - Object::Pad - Use officially documented way to obtain metaclasses.
+
 0.006     2021-05-07 04:16:11+00:00 UTC
     [API Changes]
     - `fmap_void`, `fmap_concat` and `fmap_scalar` are imported from Future::Utils into classes by default
-    - RPC streams are now organized differently there will be a stream for each method 
-      instead of one stream per service to migrate use the script in bin/myriad-migrate-rpc-streams.pl
+    - RPC streams are now organized differently - there will be a stream for each method
+    instead of one stream per service. To migrate, use the script in `bin/myriad-migrate-rpc-streams.pl`
+
     [Bugs fixed]
-    - The RPC reads will not block each other if multiple services have been loaded into one myriad
-      process
+    - RPC reads no longer not block each other when multiple services have been loaded into one Myriad
+    process
 
 0.005     2021-04-30 12:52:41+00:00 UTC
     [Bugs fixed]

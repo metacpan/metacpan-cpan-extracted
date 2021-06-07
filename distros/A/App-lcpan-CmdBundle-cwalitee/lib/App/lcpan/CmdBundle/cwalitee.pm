@@ -1,7 +1,7 @@
 package App::lcpan::CmdBundle::cwalitee;
 
-our $DATE = '2020-01-19'; # DATE
-our $VERSION = '0.003'; # VERSION
+our $DATE = '2021-06-06'; # DATE
+our $VERSION = '0.004'; # VERSION
 
 1;
 # ABSTRACT: More lcpan subcommands related to cwalitee
@@ -18,7 +18,7 @@ App::lcpan::CmdBundle::cwalitee - More lcpan subcommands related to cwalitee
 
 =head1 VERSION
 
-This document describes version 0.003 of App::lcpan::CmdBundle::cwalitee (from Perl distribution App-lcpan-CmdBundle-cwalitee), released on 2020-01-19.
+This document describes version 0.004 of App::lcpan::CmdBundle::cwalitee (from Perl distribution App-lcpan-CmdBundle-cwalitee), released on 2021-06-06.
 
 =head1 SYNOPSIS
 
@@ -36,9 +36,19 @@ This bundle provides the following lcpan subcommands:
 
 =item * L<lcpan cwalitee-of-script-abstract|App::lcpan::Cmd::cwalitee_of_script_abstract>
 
+=item * L<lcpan mods-with-abstract-cwalitee|App::lcpan::Cmd::mods_with_abstract_cwalitee>
+
 =item * L<lcpan cwalitee-of-release-changes|App::lcpan::Cmd::cwalitee_of_release_changes>
 
+=item * L<lcpan dists-with-changes-cwalitee|App::lcpan::Cmd::dists_with_changes_cwalitee>
+
 =back
+
+=head1 CONTRIBUTOR
+
+=for stopwords perlancar (on netbook-dell-xps13)
+
+perlancar (on netbook-dell-xps13) <perlancar@gmail.com>
 
 =head1 HOMEPAGE
 
@@ -72,7 +82,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020, 2019 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2020, 2019 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

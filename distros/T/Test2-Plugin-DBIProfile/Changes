@@ -1,3 +1,15 @@
+0.002006  2021-05-18 15:12:21-07:00 America/Los_Angeles
+
+    - Fix another bug, I should add a test for this when I have a moment
+
+0.002005  2021-05-18 14:58:50-07:00 America/Los_Angeles
+
+    - Fix bug in fallback
+
+0.002004  2021-05-18 13:01:54-07:00 America/Los_Angeles
+
+    - Add fallback in case of forking
+
 0.002003  2019-08-29 09:26:43-07:00 America/Los_Angeles
 
     - Remove unnecessary Data::Dumper require

@@ -21,24 +21,24 @@ myopen(struct archive *archive, void *client_data)
 {
   int count;
   int status;
-  
+
   dSP;
   ENTER;
   SAVETMPS;
   PUSHMARK(SP);
   XPUSHs(sv_2mortal(newSViv(PTR2IV((void*)archive))));
   PUTBACK;
-  
+
   count = call_pv("Archive::Libarchive::XS::_myopen", G_SCALAR);
-  
+
   SPAGAIN;
-  
+
   status = POPi;
-  
+
   PUTBACK;
   FREETMPS;
   LEAVE;
-  
+
   return status;
 }
 
@@ -49,25 +49,25 @@ myread(struct archive *archive, void *client_data, const void **buffer)
   __LA_INT64_T status;
   STRLEN len;
   SV *sv_buffer;
-  
+
   dSP;
   ENTER;
   SAVETMPS;
   PUSHMARK(SP);
   XPUSHs(sv_2mortal(newSViv(PTR2IV((void*)archive))));
   PUTBACK;
-  
+
   count = call_pv("Archive::Libarchive::XS::_myread", G_ARRAY);
 
   SPAGAIN;
-  
+
   sv_buffer = SvRV(POPs);
   status = SvI64(POPs);
   if(status == ARCHIVE_OK)
   {
     *buffer = (void*) SvPV(sv_buffer, len);
   }
-  
+
   PUTBACK;
   FREETMPS;
   LEAVE;
@@ -83,7 +83,7 @@ myskip(struct archive *archive, void *client_data, __LA_INT64_T request)
 {
   int count;
   __LA_INT64_T status;
-  
+
   dSP;
   ENTER;
   SAVETMPS;
@@ -91,17 +91,17 @@ myskip(struct archive *archive, void *client_data, __LA_INT64_T request)
   XPUSHs(sv_2mortal(newSViv(PTR2IV((void*)archive))));
   XPUSHs(sv_2mortal(newSVi64(request)));
   PUTBACK;
-  
+
   count = call_pv("Archive::Libarchive::XS::_myskip", G_SCALAR);
-  
+
   SPAGAIN;
-  
+
   status = SvI64(POPs);
-  
+
   PUTBACK;
   FREETMPS;
   LEAVE;
-  
+
   return status;
 }
 
@@ -110,24 +110,24 @@ myclose(struct archive *archive, void *client_data)
 {
   int count;
   int status;
-  
+
   dSP;
   ENTER;
   SAVETMPS;
   PUSHMARK(SP);
   XPUSHs(sv_2mortal(newSViv(PTR2IV((void*)archive))));
   PUTBACK;
-  
+
   count = call_pv("Archive::Libarchive::XS::_myclose", G_SCALAR);
-  
+
   SPAGAIN;
-  
+
   status = POPi;
-  
+
   PUTBACK;
   FREETMPS;
   LEAVE;
-  
+
   return status;
 }
 
@@ -136,7 +136,7 @@ myseek(struct archive *archive, void *client_data, __LA_INT64_T offset, int when
 {
   int count;
   __LA_INT64_T status;
-  
+
   dSP;
   ENTER;
   SAVETMPS;
@@ -145,17 +145,17 @@ myseek(struct archive *archive, void *client_data, __LA_INT64_T offset, int when
   XPUSHs(sv_2mortal(newSVi64(offset)));
   XPUSHs(sv_2mortal(newSViv(whence)));
   PUTBACK;
-  
+
   count = call_pv("Archive::Libarchive::XS::_myskip", G_SCALAR);
-  
+
   SPAGAIN;
-  
+
   status = SvI64(POPs);
-  
+
   PUTBACK;
   FREETMPS;
   LEAVE;
-  
+
   return status;
 }
 
@@ -164,7 +164,7 @@ mywrite(struct archive *archive, void *client_data, const void *buffer, size_t l
 {
   int count;
   __LA_INT64_T status;
-  
+
   dSP;
   ENTER;
   SAVETMPS;
@@ -172,17 +172,17 @@ mywrite(struct archive *archive, void *client_data, const void *buffer, size_t l
   XPUSHs(sv_2mortal(newSViv(PTR2IV((void*)archive))));
   XPUSHs(sv_2mortal(newSVpvn(buffer, length)));
   PUTBACK;
-  
+
   count = call_pv("Archive::Libarchive::XS::_mywrite", G_SCALAR);
-  
+
   SPAGAIN;
-  
+
   status = SvI64(POPs);
 
   PUTBACK;
   FREETMPS;
   LEAVE;
-  
+
   return status;
 }
 
@@ -213,16 +213,16 @@ mylookup_write_lookup(void *d, const char *name, int64_t id)
     PUTBACK;
 
     count = call_sv(data->lookup_callback, G_SCALAR);
-    
+
     SPAGAIN;
-    
+
     if(count >= 1)
       value = SvI64(POPs);
-    
+
     PUTBACK;
     FREETMPS;
     LEAVE;
-    
+
     return value;
   }
   else
@@ -252,11 +252,11 @@ mylookup_read_lookup(void *d, int64_t id)
       XPUSHs(data->perl_data);
     XPUSHs(sv_2mortal(newSVi64(id)));
     PUTBACK;
-    
+
     count = call_sv(data->lookup_callback, G_SCALAR);
-    
+
     SPAGAIN;
-    
+
     if(count >= 1)
     {
       sv = POPs;
@@ -272,11 +272,11 @@ mylookup_read_lookup(void *d, int64_t id)
         count = 0;
       }
     }
-    
+
     PUTBACK;
     FREETMPS;
     LEAVE;
-    
+
     if(count >= 1)
       return data->value;
   }
@@ -288,7 +288,7 @@ static void
 mylookup_cleanup(void *d)
 {
   struct lookup_callback_data *data = (struct lookup_callback_data *)d;
-  
+
   if(data->cleanup_callback != NULL)
   {
     dSP;
@@ -300,10 +300,10 @@ mylookup_cleanup(void *d)
     else
       XPUSHs(data->perl_data);
     PUTBACK;
-  
+
     call_sv(data->cleanup_callback, G_DISCARD|G_VOID);
   }
-  
+
   if(data->perl_data != NULL)
     SvREFCNT_dec(data->perl_data);
   if(data->lookup_callback != NULL)
@@ -312,7 +312,7 @@ mylookup_cleanup(void *d)
     SvREFCNT_dec(data->cleanup_callback);
   if(data->value != NULL)
     Safefree(data->value);
-  
+
   Safefree(data);
 }
 
@@ -420,7 +420,7 @@ archive_read_disk_set_uname_lookup(archive, data, lookup_callback, cleanup_callb
   CODE:
     if(SvOK(cleanup_callback) || SvOK(lookup_callback))
       RETVAL = archive_read_disk_set_uname_lookup(archive, new_lookup_callback(data,lookup_callback,cleanup_callback), &mylookup_read_lookup, &mylookup_cleanup);
-    else 
+    else
       RETVAL = archive_read_disk_set_uname_lookup(archive, NULL, NULL, NULL);
   OUTPUT:
     RETVAL
@@ -646,7 +646,7 @@ for details of the level numbering.
 
 #if HAS_archive_filter_code
 
-int 
+int
 archive_filter_code(archive, level)
     struct archive *archive
     int level
@@ -675,16 +675,16 @@ archive_filter_bytes(archive, level)
 
  my $count = archive_filter_count($archive);
 
-Returns the number of filters in the current pipeline. For read archive handles, these 
-filters are added automatically by the automatic format detection. For write archive 
+Returns the number of filters in the current pipeline. For read archive handles, these
+filters are added automatically by the automatic format detection. For write archive
 handles, these filters are added by calls to the various C<archive_write_add_filter_XXX>
-functions. Filters in the resulting pipeline are numbered so that filter 0 is the filter 
-closest to the format handler. As a convenience, functions that expect a filter number 
-will accept -1 as a synonym for the highest-numbered filter. For example, when reading 
-a uuencoded gzipped tar archive, there are three filters: filter 0 is the gunzip filter, 
-filter 1 is the uudecode filter, and filter 2 is the pseudo-filter that wraps the archive 
+functions. Filters in the resulting pipeline are numbered so that filter 0 is the filter
+closest to the format handler. As a convenience, functions that expect a filter number
+will accept -1 as a synonym for the highest-numbered filter. For example, when reading
+a uuencoded gzipped tar archive, there are three filters: filter 0 is the gunzip filter,
+filter 1 is the uudecode filter, and filter 2 is the pseudo-filter that wraps the archive
 read functions. In this case, requesting C<archive_position(a,(-1))> would be a synonym
-for C<archive_position(a,(2))> which would return the number of bytes currently read from 
+for C<archive_position(a,(2))> which would return the number of bytes currently read from
 the archive, while C<archive_position(a,(1))> would return the number of bytes after
 uudecoding, and C<archive_position(a,(0))> would return the number of bytes after decompression.
 
@@ -692,7 +692,7 @@ uudecoding, and C<archive_position(a,(0))> would return the number of bytes afte
 
 #if HAS_archive_filter_count
 
-int 
+int
 archive_filter_count(archive);
     struct archive *archive;
 
@@ -709,7 +709,7 @@ details of the numbering.
 
 #if HAS_archive_filter_name
 
-const char * 
+const char *
 _archive_filter_name(archive, level)
     struct archive *archive;
     int level;
@@ -948,9 +948,9 @@ _archive_read_open_filename(archive, filename, block_size)
 
  my $status = archive_read_open_memory($archive, $buffer);
 
-Like C<archive_read_open>, except that it uses a Perl scalar that holds the 
-content of the archive.  This function does not make a copy of the data stored 
-in C<$buffer>, so you should not modify the buffer until you have free the 
+Like C<archive_read_open>, except that it uses a Perl scalar that holds the
+content of the archive.  This function does not make a copy of the data stored
+in C<$buffer>, so you should not modify the buffer until you have free the
 archive using C<archive_read_free>.
 
 Bad things will happen if the buffer falls out of scope and is deallocated
@@ -1223,7 +1223,7 @@ _archive_write_add_filter_by_name(archive, name)
 
  my $status = archive_write_add_filter_program($archive, $cmd);
 
-The archive will be fed into the specified compression program. 
+The archive will be fed into the specified compression program.
 The output of that program is blocked and written to the client
 write callbacks.
 
@@ -1276,13 +1276,13 @@ _archive_write_set_format_by_name(archive, name)
 
  my $status = archive_write_open_filename($archive, $filename);
 
-A convenience form of C<archive_write_open> that accepts a filename.  If you have 
-not invoked C<archive_write_set_bytes_in_last_block>, then 
-C<archive_write_open_filename> will adjust the last-block padding depending on the 
-file: it will enable padding when writing to standard output or to a character or 
-block device node, it will disable padding otherwise.  You can override this by 
-manually invoking C<archive_write_set_bytes_in_last_block> before C<calling 
-archive_write_open>.  The C<archive_write_open_filename> function is safe for use 
+A convenience form of C<archive_write_open> that accepts a filename.  If you have
+not invoked C<archive_write_set_bytes_in_last_block>, then
+C<archive_write_open_filename> will adjust the last-block padding depending on the
+file: it will enable padding when writing to standard output or to a character or
+block device node, it will disable padding otherwise.  You can override this by
+manually invoking C<archive_write_set_bytes_in_last_block> before C<calling
+archive_write_open>.  The C<archive_write_open_filename> function is safe for use
 with tape drives or other block-oriented devices.
 
 If you pass in C<undef> as the C<$filename>, libarchive will write the
@@ -1608,7 +1608,7 @@ archive_write_close(archive)
 
  my $status = archive_write_disk_set_options($archive, $flags);
 
-The options field consists of a bitwise OR of one or more of the 
+The options field consists of a bitwise OR of one or more of the
 following values:
 
 =over 4
@@ -1692,12 +1692,12 @@ archive_entry_unset_mtime(entry)
 
  my $status = archive_write_finish_entry($archive)
 
-Close out the entry just written.  Ordinarily, 
-clients never need to call this, as it is called 
-automatically by C<archive_write_next_header> and 
+Close out the entry just written.  Ordinarily,
+clients never need to call this, as it is called
+automatically by C<archive_write_next_header> and
 C<archive_write_close> as needed.  However, some
-file attributes are written to disk only after 
-the file is closed, so this can be necessary 
+file attributes are written to disk only after
+the file is closed, so this can be necessary
 if you need to work with the file on disk right away.
 
 =cut
@@ -1714,7 +1714,7 @@ This convenience function installs a standard set of user and
 group lookup functions.  These functions use C<getpwnam> and
 C<getgrnam> to convert names to ids, defaulting to the ids
 if the names cannot be looked up.  These functions also implement
-a simple memory cache to reduce the number of calls to 
+a simple memory cache to reduce the number of calls to
 C<getpwnam> and C<getgrnam>.
 
 =cut
@@ -1782,10 +1782,10 @@ archive_write_set_skip_file(archive, dev, ino)
 
  my $status = archive_write_set_format_option($archive, $module, $option, $value);
 
-Specifies an option that will be passed to currently-registered format 
+Specifies an option that will be passed to currently-registered format
 readers.
 
-If option and value are both C<undef>, these functions will do nothing 
+If option and value are both C<undef>, these functions will do nothing
 and C<ARCHIVE_OK> will be returned.  If option is C<undef> but value
 is not, these functions will do nothing and C<ARCHIVE_FAILED> will
 be returned.
@@ -1825,7 +1825,7 @@ _archive_write_set_format_option(archive, module, option, value)
 Specifies an option that will be passed to currently-registered filters
 (including decompression filters).
 
-If option and value are both C<undef>, these functions will do nothing 
+If option and value are both C<undef>, these functions will do nothing
 and C<ARCHIVE_OK> will be returned.  If option is C<undef> but value
 is not, these functions will do nothing and C<ARCHIVE_FAILED> will
 be returned.
@@ -1862,9 +1862,9 @@ _archive_write_set_filter_option(archive, module, option, value)
 
  my $status = archive_write_set_option($archive, $module, $option, $value);
 
-Calls C<archive_write_set_format_option>, then 
-C<archive_write_set_filter_option>. If either function returns 
-C<ARCHIVE_FATAL>, C<ARCHIVE_FATAL> will be returned immediately.  
+Calls C<archive_write_set_format_option>, then
+C<archive_write_set_filter_option>. If either function returns
+C<ARCHIVE_FATAL>, C<ARCHIVE_FATAL> will be returned immediately.
 Otherwise, greater of the two values will be returned.
 
 =cut
@@ -1888,7 +1888,7 @@ _archive_write_set_option(archive, module, option, value)
 
  my $status = archive_write_set_options($archive, $options);
 
-options is a comma-separated list of options.  If options is C<undef> or 
+options is a comma-separated list of options.  If options is C<undef> or
 empty, C<ARCHIVE_OK> will be returned immediately.
 
 Individual options have one of the following forms:
@@ -1897,7 +1897,7 @@ Individual options have one of the following forms:
 
 =item option=value
 
-The option/value pair will be provided to every module.  Modules that do 
+The option/value pair will be provided to every module.  Modules that do
 not accept an option with this name will ignore it.
 
 =item option
@@ -1910,7 +1910,7 @@ The option will be provided to every module with a NULL value.
 
 =item module:option=value, module:option, module:!option
 
-As above, but the corresponding option and value will be provided only 
+As above, but the corresponding option and value will be provided only
 to modules whose name matches module.
 
 =back
@@ -1934,11 +1934,11 @@ _archive_write_set_options(archive, options)
 
  my $status = archive_write_set_bytes_per_block($archive, $bytes_per_block);
 
-Sets the block size used for writing the archive data.  Every call to 
-the write callback function, except possibly the last one, will use this 
-value for the length.  The default is to use a block size of 10240 
-bytes.  Note that a block size of zero will suppress internal blocking 
-and cause writes to be sent directly to the write callback as they 
+Sets the block size used for writing the archive data.  Every call to
+the write callback function, except possibly the last one, will use this
+value for the length.  The default is to use a block size of 10240
+bytes.  Note that a block size of zero will suppress internal blocking
+and cause writes to be sent directly to the write callback as they
 occur.
 
 =cut
@@ -1956,15 +1956,15 @@ archive_write_set_bytes_per_block(archive, bpb)
 
  my $status = archive_write_set_bytes_in_last_block($archive, $bytes_in_last_block);
 
-Sets the block size used for writing the last block.  If this value is 
-zero, the last block will be padded to the same size as the other 
-blocks.  Otherwise, the final block will be padded to a multiple of this 
-size.  In particular, setting it to 1 will cause the final block to not 
-be padded.  For compressed output, any padding generated by this option 
-is applied only after the compression.  The uncompressed data is always 
-unpadded.  The default is to pad the last block to the full block size 
-(note that C<archive_write_open_filename> will set this based on the file 
-type).  Unlike the other "set" functions, this function can be called 
+Sets the block size used for writing the last block.  If this value is
+zero, the last block will be padded to the same size as the other
+blocks.  Otherwise, the final block will be padded to a multiple of this
+size.  In particular, setting it to 1 will cause the final block to not
+be padded.  For compressed output, any padding generated by this option
+is applied only after the compression.  The uncompressed data is always
+unpadded.  The default is to pad the last block to the full block size
+(note that C<archive_write_open_filename> will set this based on the file
+type).  Unlike the other "set" functions, this function can be called
 after the archive is opened.
 
 =cut
@@ -1982,8 +1982,8 @@ archive_write_set_bytes_in_last_block(archive, bpb)
 
  my $count = archive_write_get_bytes_per_block($archive);
 
-Retrieve the block size to be used for writing.  A value of -1 here 
-indicates that the library should use default values.  A value of zero 
+Retrieve the block size to be used for writing.  A value of -1 here
+indicates that the library should use default values.  A value of zero
 indicates that internal blocking is suppressed.
 
 =cut
@@ -2000,7 +2000,7 @@ archive_write_get_bytes_per_block(archive)
 
  my $count = archive_write_get_bytes_per_block($archive);
 
-Retrieve the currently-set value for last block size.  A value of -1 
+Retrieve the currently-set value for last block size.  A value of -1
 here indicates that the library should use default values.
 
 =cut
@@ -2079,10 +2079,10 @@ _archive_write_disk_gid(archive, a2, a3)
 
  my $status = archive_write_disk_set_skip_file($archive, $device, $inode);
 
-Records the device and inode numbers of a file that should not be 
-overwritten.  This is typically used to ensure that an extraction 
-process does not overwrite the archive from which objects are being 
-read.  This capability is technically unnecessary but can be a 
+Records the device and inode numbers of a file that should not be
+overwritten.  This is typically used to ensure that an extraction
+process does not overwrite the archive from which objects are being
+read.  This capability is technically unnecessary but can be a
 significant performance optimization in practice.
 
 =cut
@@ -2119,21 +2119,21 @@ archive_seek_data(archive, offset, whence)
 
  my $status = archive_read_set_format_option($archive, $module, $option, $value);
 
-Specifies an option that will be passed to currently-registered format 
+Specifies an option that will be passed to currently-registered format
 readers.
 
-If option and value are both C<undef>, these functions will do nothing 
-and C<ARCHIVE_OK> will be returned.  If option is C<undef> but value is 
-not, these functions will do nothing and C<ARCHIVE_FAILED> will be 
+If option and value are both C<undef>, these functions will do nothing
+and C<ARCHIVE_OK> will be returned.  If option is C<undef> but value is
+not, these functions will do nothing and C<ARCHIVE_FAILED> will be
 returned.
 
-If module is not C<undef>, option and value will be provided to the filter 
-or reader named module.  The return value will be that of the module.  
+If module is not C<undef>, option and value will be provided to the filter
+or reader named module.  The return value will be that of the module.
 If there is no such module, C<ARCHIVE_FAILED> will be returned.
 
-If module is C<NULL>, option and value will be provided to every registered 
-module.  If any module returns C<ARCHIVE_FATAL>, this value will be 
-returned immediately.  Otherwise, C<ARCHIVE_OK> will be returned if any 
+If module is C<NULL>, option and value will be provided to every registered
+module.  If any module returns C<ARCHIVE_FATAL>, this value will be
+returned immediately.  Otherwise, C<ARCHIVE_OK> will be returned if any
 module accepts the option, and C<ARCHIVE_FAILED> in all other cases.
 
 =cut
@@ -2157,21 +2157,21 @@ _archive_read_set_format_option(archive, module, options, value)
 
  my $status = archive_read_set_filter_option($archive, $module, $option, $value);
 
-Specifies an option that will be passed to currently-registered filters 
+Specifies an option that will be passed to currently-registered filters
 (including decompression filters).
 
-If option and value are both C<undef>, these functions will do nothing 
-and C<ARCHIVE_OK> will be returned.  If option is C<undef> but value is 
-not, these functions will do nothing and C<ARCHIVE_FAILED> will be 
+If option and value are both C<undef>, these functions will do nothing
+and C<ARCHIVE_OK> will be returned.  If option is C<undef> but value is
+not, these functions will do nothing and C<ARCHIVE_FAILED> will be
 returned.
 
-If module is not C<undef>, option and value will be provided to the filter 
-or reader named module.  The return value will be that of the module.  
+If module is not C<undef>, option and value will be provided to the filter
+or reader named module.  The return value will be that of the module.
 If there is no such module, C<ARCHIVE_FAILED> will be returned.
 
-If module is C<NULL>, option and value will be provided to every registered 
-module.  If any module returns C<ARCHIVE_FATAL>, this value will be 
-returned immediately.  Otherwise, C<ARCHIVE_OK> will be returned if any 
+If module is C<NULL>, option and value will be provided to every registered
+module.  If any module returns C<ARCHIVE_FATAL>, this value will be
+returned immediately.  Otherwise, C<ARCHIVE_OK> will be returned if any
 module accepts the option, and C<ARCHIVE_FAILED> in all other cases.
 
 =cut
@@ -2195,9 +2195,9 @@ _archive_read_set_filter_option(archive, module, option, value)
 
  my $status = archive_read_set_option($archive, $module, $option, $value);
 
-Calls C<archive_read_set_format_option> then 
-C<archive_read_set_filter_option>.  If either function returns 
-C<ARCHIVE_FATAL>, C<ARCHIVE_FATAL> will be returned immediately.  
+Calls C<archive_read_set_format_option> then
+C<archive_read_set_filter_option>.  If either function returns
+C<ARCHIVE_FATAL>, C<ARCHIVE_FATAL> will be returned immediately.
 Otherwise, greater of the two values will be returned.
 
 =cut
@@ -2221,18 +2221,18 @@ _archive_read_set_option(archive, module, option, value)
 
  my $status = archive_read_set_options($archive, $options);
 
-options is a comma-separated list of options.  If options is C<undef> or 
+options is a comma-separated list of options.  If options is C<undef> or
 empty, C<ARCHIVE_OK> will be returned immediately.
 
-Calls C<archive_read_set_option> with each option in turn.  If any 
-C<archive_read_set_option> call returns C<ARCHIVE_FATAL>, 
+Calls C<archive_read_set_option> with each option in turn.  If any
+C<archive_read_set_option> call returns C<ARCHIVE_FATAL>,
 C<ARCHIVE_FATAL> will be returned immediately.
 
 =over 4
 
 =item option=value
 
-The option/value pair will be provided to every module.  Modules that do 
+The option/value pair will be provided to every module.  Modules that do
 not accept an option with this name will ignore it.
 
 =item option
@@ -2245,7 +2245,7 @@ The option will be provided to every module with an C<undef> value.
 
 =item module:option=value, module:option, module:!option
 
-As above, but the corresponding option and value will be provided only 
+As above, but the corresponding option and value will be provided only
 to modules whose name matches module.
 
 =back
@@ -2372,7 +2372,7 @@ _archive_write_open(archive, data, open_cb, write_cb, close_cb)
 Freeze the settings, open the archive, and prepare for reading entries.  This is the most
 generic version of this call, which accepts four callback functions.  Most clients will
 want to use C<archive_read_open_filename>, C<archive_read_open_FILE>, C<archive_read_open_fd>,
-or C<archive_read_open_memory> instead.  The library invokes the client-provided functions to 
+or C<archive_read_open_memory> instead.  The library invokes the client-provided functions to
 obtain raw bytes from the archive.
 
 =cut
@@ -2937,7 +2937,7 @@ values.
 
 int
 archive_entry_fflags(entry, sv_set, sv_clear)
-    struct archive_entry *entry 
+    struct archive_entry *entry
     SV *sv_set
     SV *sv_clear
   CODE:
@@ -3303,7 +3303,7 @@ archive_read_disk_new()
 =head2 archive_read_disk_set_behavior
 
  my $status = archive_read_disk_set_behavior($archive, $flags);
- 
+
 Undocumented libarchive function.
 
 =cut
@@ -3618,7 +3618,7 @@ has indicated the presence of extended ACL entries.
 
 int
 archive_entry_acl_next(entry, want_type, type, permset, tag, qual, name)
-    struct archive_entry *entry 
+    struct archive_entry *entry
     int want_type
     SV *type
     SV *permset
@@ -3649,7 +3649,7 @@ archive_entry_acl_next(entry, want_type, type, permset, tag, qual, name)
 
 converts the ACL entries for the given type mask into a string.  In addition to the normal type flags,
 C<ARCHIVE_ENTRY_ACL_STYLE_EXTRA_ID> and C<ARCHIVE_ENTRY_ACL_STYLE_MARK_DEFAULT> can be specified
-to further customize the result.  The returned long string is valid until the next call to 
+to further customize the result.  The returned long string is valid until the next call to
 L<#archive_entry_acl_clear>, L<#archive_entry_acl_add_entry>, L<#archive_entry_acl_text>.
 
 =cut
@@ -3806,10 +3806,10 @@ archive_entry_set_rdevminor(entry, minor)
 
  my $status = archive_entry_set_mac_metadata($entry, $buffer);
 
-The mac_metadata property is Storage for Mac OS-specific 
-AppleDouble metadata information.  Apple-format tar files 
-store a separate binary blob containing encoded metadata 
-with ACL, extended attributes, etc. This provides a place 
+The mac_metadata property is Storage for Mac OS-specific
+AppleDouble metadata information.  Apple-format tar files
+store a separate binary blob containing encoded metadata
+with ACL, extended attributes, etc. This provides a place
 to store that blob.
 
 This method sets the blob.  The C name for this function is
@@ -3960,7 +3960,7 @@ archive_read_open_filenames(archive, filenames, block_size)
 
  my $linkresolver = archive_entry_linkresolver_new();
 
-Allocate a new link resolver.  
+Allocate a new link resolver.
 
 =cut
 
@@ -4205,7 +4205,7 @@ archive_entry_nlink(entry)
 
  my $status = archive_entry_linkify($linkresolver, $entry1, $entry2)
 
-Behavior depends on the link resolver strategy 
+Behavior depends on the link resolver strategy
 (L<#archive_entry_linkresolver_set_strategy>).  See libarchive documentation
 (C<archive_entry_linkify(3)>) for details.
 
@@ -4223,7 +4223,7 @@ archive_entry_linkify(linkresolver, entry1, entry2)
     SV *entry2
   CODE:
     struct archive_entry *e1=NULL,*e2=NULL;
-    
+
     /* INPUT */
     if(SvOK(entry1))
       e1 = INT2PTR(struct archive_entry *, SvIV(entry1));
@@ -4243,7 +4243,7 @@ archive_entry_linkify(linkresolver, entry1, entry2)
     else
       sv_setiv(entry2, PTR2IV(e2));
     RETVAL = ARCHIVE_OK;
-    
+
   OUTPUT:
     RETVAL
     entry1
@@ -4676,7 +4676,7 @@ attributes (xattr) for an archive entry:
  {
    last if $r == ARCHIVE_WARN;
    die archive_error_string($a) if $r < ARCHIVE_OK;
-   
+
    # do something with $name and $value
  }
 
@@ -4790,7 +4790,7 @@ Return the next sparse region for the entry.  Example:
  {
    last if $r == ARCHIVE_WARN;
    die archive_error_string($a) if $r < ARCHIVE_OK;
-   
+
    # do something with $name and $value
  }
 
@@ -4869,7 +4869,7 @@ int
 _archive_match_exclude_pattern_from_file(archive, filename, null_separator)
     struct archive *archive
     const char *filename
-    int null_separator 
+    int null_separator
   CODE:
     RETVAL = archive_match_exclude_pattern_from_file(archive, filename, null_separator);
   OUTPUT:
@@ -4952,7 +4952,7 @@ int
 _archive_match_include_pattern_from_file(archive, filename, null_separator)
     struct archive *archive
     const char *filename
-    int null_separator 
+    int null_separator
   CODE:
     RETVAL = archive_match_include_pattern_from_file(archive, filename, null_separator);
   OUTPUT:
@@ -5149,6 +5149,10 @@ _constant(name)
         else if(!strcmp(name, "ARCHIVE_ENTRY_ACL_ENTRY_FILE_INHERIT"))
           RETVAL = ARCHIVE_ENTRY_ACL_ENTRY_FILE_INHERIT;
 #endif
+#ifdef ARCHIVE_ENTRY_ACL_ENTRY_INHERITED
+        else if(!strcmp(name, "ARCHIVE_ENTRY_ACL_ENTRY_INHERITED"))
+          RETVAL = ARCHIVE_ENTRY_ACL_ENTRY_INHERITED;
+#endif
 #ifdef ARCHIVE_ENTRY_ACL_ENTRY_INHERIT_ONLY
         else if(!strcmp(name, "ARCHIVE_ENTRY_ACL_ENTRY_INHERIT_ONLY"))
           RETVAL = ARCHIVE_ENTRY_ACL_ENTRY_INHERIT_ONLY;
@@ -5221,6 +5225,10 @@ _constant(name)
         else if(!strcmp(name, "ARCHIVE_ENTRY_ACL_READ_NAMED_ATTRS"))
           RETVAL = ARCHIVE_ENTRY_ACL_READ_NAMED_ATTRS;
 #endif
+#ifdef ARCHIVE_ENTRY_ACL_STYLE_COMPACT
+        else if(!strcmp(name, "ARCHIVE_ENTRY_ACL_STYLE_COMPACT"))
+          RETVAL = ARCHIVE_ENTRY_ACL_STYLE_COMPACT;
+#endif
 #ifdef ARCHIVE_ENTRY_ACL_STYLE_EXTRA_ID
         else if(!strcmp(name, "ARCHIVE_ENTRY_ACL_STYLE_EXTRA_ID"))
           RETVAL = ARCHIVE_ENTRY_ACL_STYLE_EXTRA_ID;
@@ -5228,6 +5236,14 @@ _constant(name)
 #ifdef ARCHIVE_ENTRY_ACL_STYLE_MARK_DEFAULT
         else if(!strcmp(name, "ARCHIVE_ENTRY_ACL_STYLE_MARK_DEFAULT"))
           RETVAL = ARCHIVE_ENTRY_ACL_STYLE_MARK_DEFAULT;
+#endif
+#ifdef ARCHIVE_ENTRY_ACL_STYLE_SEPARATOR_COMMA
+        else if(!strcmp(name, "ARCHIVE_ENTRY_ACL_STYLE_SEPARATOR_COMMA"))
+          RETVAL = ARCHIVE_ENTRY_ACL_STYLE_SEPARATOR_COMMA;
+#endif
+#ifdef ARCHIVE_ENTRY_ACL_STYLE_SOLARIS
+        else if(!strcmp(name, "ARCHIVE_ENTRY_ACL_STYLE_SOLARIS"))
+          RETVAL = ARCHIVE_ENTRY_ACL_STYLE_SOLARIS;
 #endif
 #ifdef ARCHIVE_ENTRY_ACL_SYNCHRONIZE
         else if(!strcmp(name, "ARCHIVE_ENTRY_ACL_SYNCHRONIZE"))
@@ -5437,6 +5453,10 @@ _constant(name)
         else if(!strcmp(name, "ARCHIVE_FILTER_XZ"))
           RETVAL = ARCHIVE_FILTER_XZ;
 #endif
+#ifdef ARCHIVE_FILTER_ZSTD
+        else if(!strcmp(name, "ARCHIVE_FILTER_ZSTD"))
+          RETVAL = ARCHIVE_FILTER_ZSTD;
+#endif
 #ifdef ARCHIVE_FORMAT_7ZIP
         else if(!strcmp(name, "ARCHIVE_FORMAT_7ZIP"))
           RETVAL = ARCHIVE_FORMAT_7ZIP;
@@ -5592,6 +5612,14 @@ _constant(name)
 #ifdef ARCHIVE_READDISK_MAC_COPYFILE
         else if(!strcmp(name, "ARCHIVE_READDISK_MAC_COPYFILE"))
           RETVAL = ARCHIVE_READDISK_MAC_COPYFILE;
+#endif
+#ifdef ARCHIVE_READDISK_NO_ACL
+        else if(!strcmp(name, "ARCHIVE_READDISK_NO_ACL"))
+          RETVAL = ARCHIVE_READDISK_NO_ACL;
+#endif
+#ifdef ARCHIVE_READDISK_NO_FFLAGS
+        else if(!strcmp(name, "ARCHIVE_READDISK_NO_FFLAGS"))
+          RETVAL = ARCHIVE_READDISK_NO_FFLAGS;
 #endif
 #ifdef ARCHIVE_READDISK_NO_TRAVERSE_MOUNTS
         else if(!strcmp(name, "ARCHIVE_READDISK_NO_TRAVERSE_MOUNTS"))

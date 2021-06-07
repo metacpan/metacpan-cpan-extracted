@@ -1,5 +1,5 @@
 package Photonic::WE::R2::Metric;
-$Photonic::WE::R2::Metric::VERSION = '0.015';
+$Photonic::WE::R2::Metric::VERSION = '0.016';
 
 =encoding UTF-8
 
@@ -9,7 +9,7 @@ Photonic::WE::R2::Metric
 
 =head1 VERSION
 
-version 0.015
+version 0.016
 
 =head1 COPYRIGHT NOTICE
 
@@ -67,7 +67,7 @@ $k. $q and $k are real.
 
 =back
 
-=head1 ACCESORS (read only)
+=head1 ACCESSORS (read only)
 
 =over 4
 
@@ -85,10 +85,7 @@ use namespace::autoclean;
 use PDL::Lite;
 use PDL::MatrixOps;
 use PDL::NiceSlice;
-use PDL::Complex;
-use List::Util;
 use Carp;
-use Photonic::Types;
 use Moose;
 use MooseX::StrictConstructor;
 
@@ -107,7 +104,7 @@ sub _value {
     my $eps=$self->epsilon;
     my $k=$self->wavevector;
     croak "Wave vector must be ".$self->ndims."-dimensional vector" unless
-	[$k->dims]->[0]==$self->ndims and $k->ndims==1;
+	$k->dim(0)==$self->ndims and $k->ndims==1;
     my $kPG = $k+$G; #xyz nx ny nz
     # (k+G)(k+G) diad
     my $kPGkPG = $kPG->outer($kPG); #xyz xyz nx ny nz

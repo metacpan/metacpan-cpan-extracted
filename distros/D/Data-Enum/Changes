@@ -1,5 +1,14 @@
 Revision history for Data-Enum:
 
+v0.2.2    2021-05-21 17:03:37+01:00 Europe/London
+ [Bug Fixes]
+ - Constructor now fails if there are no values.
+
+ [Tests]
+ - Changed tests to use Test::Most with Test::Exception.
+
+ - Added more tests.
+
 v0.2.1    2021-04-30 11:26:32+01:00 Europe/London
  [Enhancements]
  - Add `predicates` method.

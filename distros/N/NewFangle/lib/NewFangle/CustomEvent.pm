@@ -1,4 +1,4 @@
-package NewFangle::CustomEvent 0.06 {
+package NewFangle::CustomEvent 0.07 {
 
   use strict;
   use warnings;
@@ -42,7 +42,7 @@ NewFangle::CustomEvent - NewRelic custom event class
 
 =head1 VERSION
 
-version 0.06
+version 0.07
 
 =head1 SYNOPSIS
 

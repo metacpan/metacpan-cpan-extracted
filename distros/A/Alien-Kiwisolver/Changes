@@ -1,3 +1,32 @@
+0.003 2021-05-31 19:53:43-0400
+
+  - No change from v0.002_003.
+
+0.002_003 2021-05-30 13:09:53-0400
+
+  Bug fixes
+
+   - Use C++ standard flag from ExtUtils::CppGuess to determine if C++
+     compiler has support for C++11.
+
+     See <https://github.com/Intertangle/p5-Alien-Kiwisolver/pull/9>,
+     <https://github.com/tsee/extutils-cppguess/pull/24>.
+
+0.002_002 2021-05-05 19:58:56-0400
+
+  Bug fixes
+
+   - C++ headers: Avoid Perl's "seed" macro that breaks <algorithm> by
+     including <algorithm> first.
+
+0.002_001 2021-05-02 11:41:12-0400
+
+  Bug fixes
+
+   - Add explicit prereq on URI. Thanks to SREZIC for the bug report.
+
+     Fixes <https://rt.cpan.org/Public/Bug/Display.html?id=133546>.
+
 0.002 2021-04-11 23:53:13-0500
 
   Bug fixes

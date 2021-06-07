@@ -1,5 +1,9 @@
 Revision history for HTTP-Message
 
+6.32      2021-05-18 18:54:27Z
+    - Use File::Spec for MSWin32 on Content-Disposition filename (GH#157)
+      (tzccinct)
+
 6.31      2021-05-11 18:07:37Z
     - Fix test writing to files (GH#156) (Michal Josef Špaček)
 

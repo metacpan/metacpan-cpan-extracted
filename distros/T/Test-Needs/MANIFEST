@@ -8,6 +8,7 @@ t/find_missing.t
 t/lib/BrokenModule.pm
 t/lib/ModuleWithVersion.pm
 t/lib/TestScript.pm
+t/numify_version.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)
 README                                   README file (added by Distar)

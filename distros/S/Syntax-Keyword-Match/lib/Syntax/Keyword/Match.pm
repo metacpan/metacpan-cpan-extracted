@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2021 -- leonerd@leonerd.org.uk
 
-package Syntax::Keyword::Match 0.03;
+package Syntax::Keyword::Match 0.04;
 
 use v5.14;
 use warnings;
@@ -50,9 +50,9 @@ Some of the features of this module are currently marked as experimental (even
 within the context that the module itself is experimental). They will provoke
 warnings in the C<experimental> category, unless silenced.
 
-   use Syntax::Keyword::Match qw( try :experimental(dispatch) );
+   use Syntax::Keyword::Match qw( match :experimental(dispatch) );
 
-   use Syntax::Keyword::Match qw( try :experimental );  # all of the above
+   use Syntax::Keyword::Match qw( match :experimental );  # all of the above
 
 =cut
 
@@ -176,6 +176,64 @@ provides a block of code to run if the controlling expression's value did not
 match any of the given C<case> labels.
 
 =cut
+
+=head1 COMPARISONS
+
+As this syntax is fairly similar to a few other ideas, the following
+comparisons may be useful.
+
+=head2 Core perl's given/when syntax
+
+Compared to core perl's C<given/when> syntax (available with
+C<use feature 'switch'>), this syntax is initially visually very similar but
+actually behaves very differently. Core's C<given/when> uses the smartmatch
+(C<~~>) operator for its comparisons, which is complex, subtle, and hard to
+use correctly - doubly-so when comparisons against values stored in variables
+rather than literal constants are involved. It can be unpredictable whether
+string or numerical comparison are being used, for example. By comparison,
+this module requires the programmer to specify the comparison operator. The
+choice of string or numerical comparison is given in the source code - there
+can be no ambiguity.
+
+Additionally, the C<isa> operator is also permitted, which has no equivalent
+ability in smartmatch.
+
+Also, the C<given/when> syntax permits mixed code within a C<given> block
+which is run unconditionally, or at least, until the first successful C<when>
+statement is encountered. The syntax provided by this module requires that the
+only code inside a C<match> block be a sequence of C<case> statements. No
+other code is permitted.
+
+=head2 Switch::Plain
+
+Like this module, L<Switch::Plain> also provides a syntax where the programmer
+specifies whether the comparison is made using stringy or numerical semantics.
+C<Switch::Plain> also permits additional conditions to be placed on C<case>
+blocks, whereas this module does not.
+
+Additionally, the C<isa> operator is also permitted, which has no equivalent
+ability in C<Switch::Plain>.
+
+=head2 C's switch/case
+
+The C programming language provides a similar sort of syntax, using keywords
+named C<switch> and C<case>. One key difference between that and the syntax
+provided for Perl by this module is that in C the C<case> labels really are
+just labels. The C<switch> part of the statement effectively acts as a sort of
+computed C<goto>. This often leads to bugs caused by forgetting to put a
+C<break> at the end of a sequence of statements before the next C<case> label;
+a situation called "fallthrough". Such a mistake is impossible with this
+module, because every C<case> is provided by a block. Once execution has
+finished with the block, the entire C<match> statement is finished. There is
+no possibility of accidental fallthrough.
+
+C's syntax only permits compiletime constants for C<case> labels, whereas this
+module will also allow the result of any runtime expression.
+
+Code written in C will perform identically even if any of the C<case> labels
+and associated code are moved around into a different order. The syntax
+provided by this module notionally performs all of its tests in the order they
+are written in, and any changes of that order might cause a different result.
 
 =head1 TODO
 

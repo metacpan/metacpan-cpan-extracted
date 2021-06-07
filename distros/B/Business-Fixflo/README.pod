@@ -11,7 +11,7 @@ Business::Fixflo - Perl library for interacting with the Fixflo API
 
 =head1 VERSION
 
-0.41
+0.42
 
 =head1 DESCRIPTION
 
@@ -107,7 +107,7 @@ use warnings;
 use Moo;
 with 'Business::Fixflo::Version';
 
-$Business::Fixflo::VERSION = '0.41';
+$Business::Fixflo::VERSION = '0.42';
 
 use Carp qw/ confess /;
 

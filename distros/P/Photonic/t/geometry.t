@@ -36,14 +36,11 @@ use PDL::Complex;
 use Photonic::Geometry::FromB;
 use Photonic::Geometry::FromImage2D;
 use Photonic::Geometry::FromEpsilon;
-use Test::More tests => 39;
+use Photonic::Utils qw(lu_solve);
+use lib 't/lib';
+use TestUtils;
+use Test::More;
 my $pi=4*atan2(1,1);
-
-sub agree {
-    my $a=shift;
-    my $b=shift//0;
-    return (($a-$b)*($a-$b))->sum<=1e-7;
-}
 
 my $B=zeroes(11,11)->rvals<=5;
 my $g=Photonic::Geometry::FromB->new(B=>$B);
@@ -91,8 +88,10 @@ ok(agree($g->cUnitPairs->[0]->re, pdl(1,0)/sqrt(2))
    && agree($g->cUnitPairs->[0]->im, pdl(0,1)/sqrt(2)),
    "cunitpairs");
 ok(agree($g->unitDyads, pdl([1,0,0],[.5,1,.5],[0,0,1])), "unitDyads");
-ok(agree(lu_backsub(@{$g->unitDyadsLU}, $g->unitDyads->transpose),
-	 identity(3)), "unitDyadsLU");
+
+my $got = lu_solve($g->unitDyadsLU, $g->unitDyads->transpose->r2C);
+ok(Cagree($got, identity(3)), "unitDyadsLU");
+
 ok(agree($g->Vec2LC_G(zeroes(11,11)->ndcoords->r2C)->re,
 	 (zeroes(11,11)->ndcoords*$g->GNorm)->sumover),
    "Vec2LC");
@@ -103,6 +102,7 @@ SKIP: {
 	unless rpiccan("PNG");
     my $gw=Photonic::Geometry::FromImage2D->new(path=>'data/white.png');
     ok(defined $gw, "Create geometry from Image");
+    ok(all($gw->B==ones(11, 11)), "lazy-build B");
     ok($gw->npoints==11*11, "npoints");
     ok($gw->f==1, "filling fraction of white");
     my $gb=Photonic::Geometry::FromImage2D->new(path=>'data/black.png');
@@ -111,8 +111,10 @@ SKIP: {
 	path=>'data/black.png', inverted=>1);
     ok($gbi->f==1, "filling fraction of inverted black");
 }
-my $eps=zeroes(11,11)+0*i;
+my $eps=r2C(zeroes(11,11));
 my $ge=Photonic::Geometry::FromEpsilon->new(epsilon=>$eps);
 ok(defined $ge, "Create geometry from epsilon");
 is($ge->ndims, 2, "Number of dimensions");
 ok(agree(pdl($ge->dims),pdl(11,11)), "Size of each dimension");
+
+done_testing;

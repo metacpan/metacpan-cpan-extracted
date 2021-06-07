@@ -50,7 +50,7 @@
  *
  * Some blurb for perlapi.pod:
 
-=head1 Obsolete backwards compatibility functions
+ head1 Obsolete backwards compatibility functions
 
 Some of these are also deprecated.  You can exclude these from
 your compiled Perl by adding this option to Configure:
@@ -85,6 +85,7 @@ Perl_ref(pTHX_ OP *o, I32 type)
 }
 
 /*
+=for apidoc_section $SV
 =for apidoc sv_unref
 
 Unsets the RV status of the SV, and decrements the reference count of
@@ -243,11 +244,11 @@ Perl_sv_force_normal(pTHX_ SV *sv)
  */
 
 void
-Perl_sv_setsv(pTHX_ SV *dstr, SV *sstr)
+Perl_sv_setsv(pTHX_ SV *dsv, SV *ssv)
 {
     PERL_ARGS_ASSERT_SV_SETSV;
 
-    sv_setsv_flags(dstr, sstr, SV_GMAGIC);
+    sv_setsv_flags(dsv, ssv, SV_GMAGIC);
 }
 
 /* sv_catpvn() is now a macro using Perl_sv_catpvn_flags();
@@ -262,20 +263,12 @@ Perl_sv_catpvn(pTHX_ SV *dsv, const char* sstr, STRLEN slen)
     sv_catpvn_flags(dsv, sstr, slen, SV_GMAGIC);
 }
 
-/*
-=for apidoc sv_catpvn_mg
-
-Like C<sv_catpvn>, but also handles 'set' magic.
-
-=cut
-*/
-
 void
-Perl_sv_catpvn_mg(pTHX_ SV *sv, const char *ptr, STRLEN len)
+Perl_sv_catpvn_mg(pTHX_ SV *dsv, const char *sstr, STRLEN len)
 {
     PERL_ARGS_ASSERT_SV_CATPVN_MG;
 
-    sv_catpvn_flags(sv,ptr,len,SV_GMAGIC|SV_SMAGIC);
+    sv_catpvn_flags(dsv,sstr,len,SV_GMAGIC|SV_SMAGIC);
 }
 
 /* sv_catsv() is now a macro using Perl_sv_catsv_flags();
@@ -283,27 +276,19 @@ Perl_sv_catpvn_mg(pTHX_ SV *sv, const char *ptr, STRLEN len)
  */
 
 void
-Perl_sv_catsv(pTHX_ SV *dstr, SV *sstr)
+Perl_sv_catsv(pTHX_ SV *dsv, SV *sstr)
 {
     PERL_ARGS_ASSERT_SV_CATSV;
 
-    sv_catsv_flags(dstr, sstr, SV_GMAGIC);
+    sv_catsv_flags(dsv, sstr, SV_GMAGIC);
 }
 
-/*
-=for apidoc sv_catsv_mg
-
-Like C<sv_catsv>, but also handles 'set' magic.
-
-=cut
-*/
-
 void
-Perl_sv_catsv_mg(pTHX_ SV *dsv, SV *ssv)
+Perl_sv_catsv_mg(pTHX_ SV *dsv, SV *sstr)
 {
     PERL_ARGS_ASSERT_SV_CATSV_MG;
 
-    sv_catsv_flags(dsv,ssv,SV_GMAGIC|SV_SMAGIC);
+    sv_catsv_flags(dsv,sstr,SV_GMAGIC|SV_SMAGIC);
 }
 
 /*
@@ -321,9 +306,9 @@ Perl_sv_iv(pTHX_ SV *sv)
     PERL_ARGS_ASSERT_SV_IV;
 
     if (SvIOK(sv)) {
-	if (SvIsUV(sv))
-	    return (IV)SvUVX(sv);
-	return SvIVX(sv);
+        if (SvIsUV(sv))
+            return (IV)SvUVX(sv);
+        return SvIVX(sv);
     }
     return sv_2iv(sv);
 }
@@ -343,9 +328,9 @@ Perl_sv_uv(pTHX_ SV *sv)
     PERL_ARGS_ASSERT_SV_UV;
 
     if (SvIOK(sv)) {
-	if (SvIsUV(sv))
-	    return SvUVX(sv);
-	return (UV)SvIVX(sv);
+        if (SvIsUV(sv))
+            return SvUVX(sv);
+        return (UV)SvIVX(sv);
     }
     return sv_2uv(sv);
 }
@@ -365,7 +350,7 @@ Perl_sv_nv(pTHX_ SV *sv)
     PERL_ARGS_ASSERT_SV_NV;
 
     if (SvNOK(sv))
-	return SvNVX(sv);
+        return SvNVX(sv);
     return sv_2nv(sv);
 }
 
@@ -388,8 +373,8 @@ Perl_sv_pvn(pTHX_ SV *sv, STRLEN *lp)
     PERL_ARGS_ASSERT_SV_PVN;
 
     if (SvPOK(sv)) {
-	*lp = SvCUR(sv);
-	return SvPVX(sv);
+        *lp = SvCUR(sv);
+        return SvPVX(sv);
     }
     return sv_2pv(sv, lp);
 }
@@ -401,8 +386,8 @@ Perl_sv_pvn_nomg(pTHX_ SV *sv, STRLEN *lp)
     PERL_ARGS_ASSERT_SV_PVN_NOMG;
 
     if (SvPOK(sv)) {
-	*lp = SvCUR(sv);
-	return SvPVX(sv);
+        *lp = SvCUR(sv);
+        return SvPVX(sv);
     }
     return sv_2pv_flags(sv, lp, 0);
 }
@@ -605,6 +590,7 @@ Perl_gv_efullname3(pTHX_ SV *sv, const GV *gv, const char *prefix)
 }
 
 /*
+=for apidoc_section $GV
 =for apidoc gv_fetchmethod
 
 See L</gv_fetchmethod_autoload>.
@@ -638,12 +624,12 @@ Perl_hv_magic(pTHX_ HV *hv, GV *gv, int how)
 
 bool
 Perl_do_open(pTHX_ GV *gv, const char *name, I32 len, int as_raw,
-	     int rawmode, int rawperm, PerlIO *supplied_fp)
+             int rawmode, int rawperm, PerlIO *supplied_fp)
 {
     PERL_ARGS_ASSERT_DO_OPEN;
 
     return do_openn(gv, name, len, as_raw, rawmode, rawperm,
-		    supplied_fp, (SV **) NULL, 0);
+                    supplied_fp, (SV **) NULL, 0);
 }
 
 bool
@@ -702,6 +688,7 @@ Perl_is_utf8_string_loc(const U8 *s, const STRLEN len, const U8 **ep)
 }
 
 /*
+=for apidoc_section $SV
 =for apidoc sv_nolocking
 
 Dummy routine which "locks" an SV when there is no locking module present.
@@ -773,14 +760,14 @@ Perl_save_list(pTHX_ SV **sarg, I32 maxsarg)
     PERL_ARGS_ASSERT_SAVE_LIST;
 
     for (i = 1; i <= maxsarg; i++) {
-	SV *sv;
-	SvGETMAGIC(sarg[i]);
-	sv = newSV(0);
-	sv_setsv_nomg(sv,sarg[i]);
-	SSCHECK(3);
-	SSPUSHPTR(sarg[i]);		/* remember the pointer */
-	SSPUSHPTR(sv);			/* remember the value */
-	SSPUSHUV(SAVEt_ITEM);
+        SV *sv;
+        SvGETMAGIC(sarg[i]);
+        sv = newSV(0);
+        sv_setsv_nomg(sv,sarg[i]);
+        SSCHECK(3);
+        SSPUSHPTR(sarg[i]);		/* remember the pointer */
+        SSPUSHPTR(sv);			/* remember the value */
+        SSPUSHUV(SAVEt_ITEM);
     }
 }
 
@@ -819,6 +806,7 @@ Perl_sv_usepvn(pTHX_ SV *sv, char *ptr, STRLEN len)
 }
 
 /*
+=for apidoc_section $pack
 =for apidoc unpack_str
 
 The engine implementing C<unpack()> Perl function.  Note: parameters C<strbeg>,
@@ -829,8 +817,8 @@ C<unpackstring> instead.
 
 SSize_t
 Perl_unpack_str(pTHX_ const char *pat, const char *patend, const char *s,
-		const char *strbeg, const char *strend, char **new_s, I32 ocnt,
-		U32 flags)
+                const char *strbeg, const char *strend, char **new_s, I32 ocnt,
+                U32 flags)
 {
     PERL_ARGS_ASSERT_UNPACK_STR;
 
@@ -846,7 +834,7 @@ Perl_unpack_str(pTHX_ const char *pat, const char *patend, const char *s,
 
 The engine implementing C<pack()> Perl function.  Note: parameters
 C<next_in_list> and C<flags> are not used.  This call should not be used; use
-C<packlist> instead.
+C<L</packlist>> instead.
 
 =cut
 */
@@ -882,7 +870,7 @@ Perl_hv_fetch_ent(pTHX_ HV *hv, SV *keysv, I32 lval, U32 hash)
     PERL_ARGS_ASSERT_HV_FETCH_ENT;
 
     return (HE *)hv_common(hv, keysv, NULL, 0, 0, 
-		     (lval ? HV_FETCH_LVALUE : 0), NULL, hash);
+                     (lval ? HV_FETCH_LVALUE : 0), NULL, hash);
 }
 
 SV *
@@ -891,15 +879,15 @@ Perl_hv_delete_ent(pTHX_ HV *hv, SV *keysv, I32 flags, U32 hash)
     PERL_ARGS_ASSERT_HV_DELETE_ENT;
 
     return MUTABLE_SV(hv_common(hv, keysv, NULL, 0, 0, flags | HV_DELETE, NULL,
-				hash));
+                                hash));
 }
 
 SV**
 Perl_hv_store_flags(pTHX_ HV *hv, const char *key, I32 klen, SV *val, U32 hash,
-		    int flags)
+                    int flags)
 {
     return (SV**) hv_common(hv, NULL, key, klen, flags,
-			    (HV_FETCH_ISSTORE|HV_FETCH_JUST_SV), val, hash);
+                            (HV_FETCH_ISSTORE|HV_FETCH_JUST_SV), val, hash);
 }
 
 SV**
@@ -909,14 +897,14 @@ Perl_hv_store(pTHX_ HV *hv, const char *key, I32 klen_i32, SV *val, U32 hash)
     int flags;
 
     if (klen_i32 < 0) {
-	klen = -klen_i32;
-	flags = HVhek_UTF8;
+        klen = -klen_i32;
+        flags = HVhek_UTF8;
     } else {
-	klen = klen_i32;
-	flags = 0;
+        klen = klen_i32;
+        flags = 0;
     }
     return (SV **) hv_common(hv, NULL, key, klen, flags,
-			     (HV_FETCH_ISSTORE|HV_FETCH_JUST_SV), val, hash);
+                             (HV_FETCH_ISSTORE|HV_FETCH_JUST_SV), val, hash);
 }
 
 bool
@@ -928,11 +916,11 @@ Perl_hv_exists(pTHX_ HV *hv, const char *key, I32 klen_i32)
     PERL_ARGS_ASSERT_HV_EXISTS;
 
     if (klen_i32 < 0) {
-	klen = -klen_i32;
-	flags = HVhek_UTF8;
+        klen = -klen_i32;
+        flags = HVhek_UTF8;
     } else {
-	klen = klen_i32;
-	flags = 0;
+        klen = klen_i32;
+        flags = 0;
     }
     return cBOOL(hv_common(hv, NULL, key, klen, flags, HV_FETCH_ISEXISTS, 0, 0));
 }
@@ -946,15 +934,15 @@ Perl_hv_fetch(pTHX_ HV *hv, const char *key, I32 klen_i32, I32 lval)
     PERL_ARGS_ASSERT_HV_FETCH;
 
     if (klen_i32 < 0) {
-	klen = -klen_i32;
-	flags = HVhek_UTF8;
+        klen = -klen_i32;
+        flags = HVhek_UTF8;
     } else {
-	klen = klen_i32;
-	flags = 0;
+        klen = klen_i32;
+        flags = 0;
     }
     return (SV **) hv_common(hv, NULL, key, klen, flags,
-			     lval ? (HV_FETCH_JUST_SV | HV_FETCH_LVALUE)
-			     : HV_FETCH_JUST_SV, NULL, 0);
+                             lval ? (HV_FETCH_JUST_SV | HV_FETCH_LVALUE)
+                             : HV_FETCH_JUST_SV, NULL, 0);
 }
 
 SV *
@@ -966,14 +954,14 @@ Perl_hv_delete(pTHX_ HV *hv, const char *key, I32 klen_i32, I32 flags)
     PERL_ARGS_ASSERT_HV_DELETE;
 
     if (klen_i32 < 0) {
-	klen = -klen_i32;
-	k_flags = HVhek_UTF8;
+        klen = -klen_i32;
+        k_flags = HVhek_UTF8;
     } else {
-	klen = klen_i32;
-	k_flags = 0;
+        klen = klen_i32;
+        k_flags = 0;
     }
     return MUTABLE_SV(hv_common(hv, NULL, key, klen, k_flags, flags | HV_DELETE,
-				NULL, 0));
+                                NULL, 0));
 }
 
 AV *
@@ -1115,6 +1103,7 @@ Perl_sv_2bool(pTHX_ SV *const sv)
 
 
 /*
+=for apidoc_section $custom
 =for apidoc custom_op_name
 Return the name for a given custom op.  This was once used by the C<OP_NAME>
 macro, but is no longer: it has only been kept for compatibility, and
@@ -1149,9 +1138,9 @@ Perl_newSUB(pTHX_ I32 floor, OP *o, OP *proto, OP *block)
 }
 
 SV *
-Perl_sv_mortalcopy(pTHX_ SV *const oldstr)
+Perl_sv_mortalcopy(pTHX_ SV *const oldsv)
 {
-    return Perl_sv_mortalcopy_flags(aTHX_ oldstr, SV_GMAGIC);
+    return Perl_sv_mortalcopy_flags(aTHX_ oldsv, SV_GMAGIC);
 }
 
 void
@@ -1177,6 +1166,7 @@ ASCII_TO_NEED(const UV enc, const UV ch)
 }
 
 /*
+=for apidoc_section $unicode
 =for apidoc is_utf8_char
 
 Tests if some arbitrary number of bytes begins in a valid UTF-8
@@ -1271,6 +1261,8 @@ Looks up the type of the lexical variable at position C<po> in the
 currently-compiling pad.  If the variable is typed, the stash of the
 class to which it is typed is returned.  If not, C<NULL> is returned.
 
+Use L<perlintern/C<PAD_COMPNAME_TYPE>> instead.
+
 =cut
 */
 
@@ -1288,7 +1280,7 @@ Perl_instr(const char *big, const char *little)
 {
     PERL_ARGS_ASSERT_INSTR;
 
-    return instr((char *) big, (char *) little);
+    return instr(big, little);
 }
 
 SV *

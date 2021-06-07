@@ -39,9 +39,9 @@ can_ok $tif, qw(Close ReadDirectory ReadEXIFDirectory GetField);
 
 is( $tif->ReadDirectory, 0, 'ReadDirectory' );
 
-TODO: {
-    local $TODO = "Don't know how to create TIFF with EXIF on the fly, "
-      . 'and reading an empty one crashes some implementations';
+SKIP: {
+    skip "Don't know how to create TIFF with EXIF on the fly, "
+      . 'and reading an empty one crashes some implementations', 1;
     is( $tif->ReadEXIFDirectory(0), 0, 'ReadEXIFDirectory' );
 }
 

@@ -165,6 +165,10 @@ XSCallbackDispatcher* Loop::fork_event () {
 
 ResolverSP Loop::resolver ()
 
+void Loop::track_load_average (uint32_t for_last_n_seconds)
+
+double Loop::get_load_average ()
+
 void Loop::start_debug_tracer (Sub s) {
     THIS->new_handle_event.add([s](const LoopSP&, Handle* h){
         Sv stack = s.call();

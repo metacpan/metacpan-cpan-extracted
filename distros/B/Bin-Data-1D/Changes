@@ -1,0 +1,29 @@
+Revision history for the module "Bin::Data::1D" : 
+
+0.100   2021-05-25T17:50+0900
+        最初に作成。7個のコマンドを入れた。
+        freq expskip sampler cat-n summing chars2code gzpaste
+
+0.110   2021-05-25T22:30+0900
+        さらに9個のコマンドを追加。
+        linedigest idmaker uniq-c wc-l headomit lminusl alluniq digitdemog entrolines
+
+0.111   2021-05-25T23:10+0900
+        Makefile.PL で動作違いがあったので訂正。scriptsに0.100のように7個しかファイルが足されないのを計16個にした。
+
+0.112   2021-05-26T00:20+0900
+       	Failed というエラーがPAUSEから来たので対応を試みた。
+        PODの書式を整えた。
+
+0.113   2021-05-26T00:50+0900
+        PODのエラーに対応。
+
+0.114   2021-05-26T01:05+0900
+        モジュール作成の方法をよくマスターしていないことに起因すると思われるエラー。もう一度試す。
+
+0.120   2021-05-27T16:50+0900
+        vennを追加。
+
+0.130   2021-05-29T00:15+0900
+        モジュール名の記載に間違いがあったので手で修正(vimのエディタで)。
+        MANIFEST.SKIP と .gitignore も新しくした。

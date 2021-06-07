@@ -1,7 +1,7 @@
 package JobCenter::Client::Mojo;
 use Mojo::Base 'Mojo::EventEmitter';
 
-our $VERSION = '0.44'; # VERSION
+our $VERSION = '0.45'; # VERSION
 
 #
 # Mojo's default reactor uses EV, and EV does not play nice with signals
@@ -32,7 +32,7 @@ use Sys::Hostname;
 use JSON::RPC2::TwoWay 0.05;
 # JSON::RPC2::TwoWay depends on JSON::MaybeXS anyways, so it can be used here
 # without adding another dependency
-use JSON::MaybeXS qw();
+use JSON::MaybeXS qw(JSON);
 use MojoX::NetstringStream 0.06; # for the enhanced close
 
 # us
@@ -73,7 +73,8 @@ sub new {
 	$self->{debug} = $args{debug} // 1;
 	$self->{jobs} = {};
 	$self->{json} = $json;
-	$self->{jsonobject} = $args{jsonobject}  // JSON::MaybeXS->new(utf8 => 1),
+	$self->{jsonobject} = $args{jsonobject} //
+		JSON::MaybeXS->new(utf8 => 1, allow_nonref => 1),
 	$self->{ping_timeout} = $args{ping_timeout} // 300;
 	$self->{log} = $log;
 	$self->{method} = $method;
@@ -273,11 +274,11 @@ sub call_nb {
 		$inargs = $self->{jsonobject}->decode($inargs);
 		croak 'inargs is not a json object' unless ref $inargs eq 'HASH';
 		if ($clenv) {
-			$clenv = decode_json($clenv);
+			$clenv = $self->{jsonobject}->decode($clenv);
 			croak 'clenv is not a json object' unless ref $clenv eq 'HASH';
 		}
 		if ($reqauth) {
-			$reqauth = decode_json($reqauth);
+			$reqauth = $self->{jsonobject}->decode($reqauth);
 			croak 'reqauth is not a json object' unless ref $reqauth eq 'HASH';
 		}
 	} else {
@@ -379,6 +380,44 @@ sub find_jobs {
 
 	return $err, @$jobs if ref $jobs eq 'ARRAY';
 	return $err;
+}
+
+sub check_if_lock_exists {
+	my ($self, $locktype, $lockvalue) = @_;
+	croak('no locktype?') unless $locktype;
+	croak('no lockvalue?') unless $lockvalue;
+
+	my ($done, $err, $found);
+	JobCenter::Client::Mojo::Steps->new(ioloop => $self->ioloop)->steps([
+	sub {
+		my $steps = shift;
+		# fixme: check results?
+		$self->conn->call(
+			'check_if_lock_exists',
+			{ locktype => $locktype, lockvalue => $lockvalue },
+			$steps->next()
+		);
+	},
+	sub {
+		#say 'find_jobs call returned: ', Dumper(\@_);
+		my ($steps, $e, $r) = @_;
+		$done++; # received something so done waiting
+		if ($e) {
+			$self->log->error("find_jobs got error $e->{message} ($e->{code})");
+			$err = $e->{message};
+			return;
+		}
+		$found = $r;
+	}], sub {
+		my ($err) = @_;
+		$done++;
+		$self->log->error("something went wrong with check_if_lock_exists: $err");
+	});
+
+	$self->_loop(sub { !$done });
+
+	$found = $self->{jsonobject}->encode($found) if $self->{json};
+	return $found;
 }
 
 sub get_api_status {
@@ -1006,6 +1045,16 @@ If the job was still running when the get_job_status_nb call was made then
 this callback will be called on completion of the job.
 
 =back
+
+=head2 check_if_lock_exists
+
+$found = $client->find_jobs($locktype, $lockvalue);
+
+Checks if a lock with the given locktype and lockvalue exists. (I.e. a job
+is currently running that holds that lock.
+
+Returns true if the lock exists, null if the locktype does not exist, false
+otherwise.
 
 =head2 find_jobs
 

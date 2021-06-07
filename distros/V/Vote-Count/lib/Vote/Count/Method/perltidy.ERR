@@ -1,7 +1,0 @@
-Perltidy version is 20200619
-
-<stdin>: Begin Error Output Stream
-
-154: my $qf =  $I->{'lastquota'} - ( $) $I->QuotaTrigger );  
-                                     -- ^
-found Scalar where operator expected (previous token underlined)

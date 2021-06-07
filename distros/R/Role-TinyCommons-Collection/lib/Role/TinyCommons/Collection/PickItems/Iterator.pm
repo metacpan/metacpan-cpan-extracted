@@ -1,9 +1,9 @@
 package Role::TinyCommons::Collection::PickItems::Iterator;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-04-20'; # DATE
+our $DATE = '2021-05-20'; # DATE
 our $DIST = 'Role-TinyCommons-Collection'; # DIST
-our $VERSION = '0.003'; # VERSION
+our $VERSION = '0.008'; # VERSION
 
 # enabled by Role::Tiny
 #use strict;
@@ -43,7 +43,7 @@ sub pick_items {
 }
 
 1;
-# ABSTRACT: Provide pick_items() from a resettable iterator
+# ABSTRACT: Provide pick_items() that picks by iterating all items once
 
 __END__
 
@@ -53,20 +53,23 @@ __END__
 
 =head1 NAME
 
-Role::TinyCommons::Collection::PickItems::Iterator - Provide pick_items() from a resettable iterator
+Role::TinyCommons::Collection::PickItems::Iterator - Provide pick_items() that picks by iterating all items once
 
 =head1 VERSION
 
-This document describes version 0.003 of Role::TinyCommons::Collection::PickItems::Iterator (from Perl distribution Role-TinyCommons-Collection), released on 2021-04-20.
+This document describes version 0.008 of Role::TinyCommons::Collection::PickItems::Iterator (from Perl distribution Role-TinyCommons-Collection), released on 2021-05-20.
 
 =head1 DESCRIPTION
 
-This role provides pick_items() that picks random items by doing a one-time full
-scan (or iteration) of a resettable iterator.
+This role provides C<pick_items()> that picks random items by doing a one-time
+full scan (or iteration) of a resettable iterator. The algorithm is a modified
+form of one that was presented in Learning Perl book.
 
 Note that for a huge collection, this might not be a good idea. If your
-collection support C<get_item_at_pos> and an efficient C<get_item_count>, you
-can use L<Role::TinyCommons::FindItems::RandomSeek>.
+collection supports a fast C<get_item_at_pos> and an efficient
+C<get_item_count>, you can use L<Role::TinyCommons::FindItems::RandomPos>. If
+your collection's items are lines from a filehandle, you can use
+L<Role::TinyCommons::FindItems::RandomSeekLines>.
 
 =for Pod::Coverage ^(.+)$
 

@@ -5,6 +5,7 @@ author:
 build_requires:
   DBD::SQLite: 0
   ExtUtils::MakeMaker: 6.59
+  Test::NoWarnings: 0
 configure_requires:
   ExtUtils::MakeMaker: 6.59
 distribution_type: module
@@ -17,7 +18,6 @@ meta-spec:
 name: Zonemaster-Backend
 no_index:
   directory:
-    - CodeSnippets
     - inc
     - share
     - t
@@ -47,12 +47,12 @@ requires:
   Router::Simple::Declare: 0
   Starman: 0
   String::ShellQuote: 0
-  Try::Tiny: 0.24
-  Zonemaster::Engine: 4.001
-  Zonemaster::LDNS: 2.001
+  Try::Tiny: 0.12
+  Zonemaster::Engine: 4.002
+  Zonemaster::LDNS: 2.002
   perl: 5.14.2
 resources:
   bugtracker: https://github.com/zonemaster/zonemaster-backend/issues
   license: http://opensource.org/licenses/bsd-license.php
   repository: https://github.com/zonemaster/zonemaster-backend
-version: 6.1.0
+version: 6.2.0

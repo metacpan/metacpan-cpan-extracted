@@ -75,7 +75,7 @@ C<:doc> -> L<FP::Docstring>
 
 C<:equal> -> L<FP::Equal>
 
-C<:failures> -> L<FP::Failure>
+C<:failures> -> L<FP::Either>, L<FP::Failure>
 
 C<:fix> -> L<FP::fix>
 
@@ -101,7 +101,7 @@ C<:rare> -> C<:csv>, C<:dbi>, C<:fix>, C<:git>, C<:paths>, C<:trampolines>
 
 C<:repl> -> L<FP::Repl>, L<FP::Repl::AutoTrap>
 
-C<:sequences> -> C<:streams>, L<FP::Array>, L<FP::Array_sort>, L<FP::List>, L<FP::MutableArray>, L<FP::PureArray>, L<FP::StrictList>
+C<:sequences> -> C<:streams>, L<FP::Array>, L<FP::Array_sort>, L<FP::List>, L<FP::MutableArray>, L<FP::PureArray>, L<FP::SortedPureArray>, L<FP::StrictList>
 
 C<:sets> -> L<FP::HashSet>, L<FP::OrderedCollection>
 
@@ -137,7 +137,7 @@ our @EXPORT      = ();
 our @EXPORT_OK   = qw(expand_import_tags);
 our %EXPORT_TAGS = ();
 
-our $VERSION = "0.72.59";
+our $VERSION = "0.72.66";
 
 # Export tag to modules and/or other tags; each module will be
 # imported with ":all" by default. Where a module name contains " = ",
@@ -151,7 +151,7 @@ our $export_desc = +{
     ":streams"         => [qw(FP::Stream FP::IOStream FP::Weak)],
     ":lazy"            => [qw(FP::Lazy :streams FP::Weak)],
     ":transparentlazy" => [qw(FP::TransparentLazy :streams FP::Weak)],
-    ":failures"        => [qw(FP::Failure)],
+    ":failures"        => [qw(FP::Failure FP::Either)],
 
     ":doc"   => [qw(FP::Docstring)],
     ":show"  => [qw(FP::Show)],
@@ -180,6 +180,7 @@ our $export_desc = +{
         qw(FP::List FP::StrictList FP::MutableArray
             FP::Array FP::Array_sort
             FP::PureArray
+            FP::SortedPureArray
             :streams)
     ],
     ":maps"           => [qw(FP::Hash FP::PureHash)],

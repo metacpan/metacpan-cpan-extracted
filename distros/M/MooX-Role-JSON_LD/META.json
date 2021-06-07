@@ -4,7 +4,7 @@
       "Dave Cross <dave@perlhacks.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -54,11 +54,11 @@
          "web" : "https://github.com/davorg/moox-role-json_ld"
       }
    },
-   "version" : "v1.0.0",
+   "version" : "v1.0.1",
    "x_contributors" : [
       "Robert Rothenberg <rrwo@cpan.org>",
       "Mohammad S Anwar <mohammad.anwar@yahoo.com>",
       "Anirvan Chatterjee <anirvan@cpan.org>"
    ],
-   "x_serialization_backend" : "JSON::PP version 4.04"
+   "x_serialization_backend" : "JSON::PP version 4.06"
 }

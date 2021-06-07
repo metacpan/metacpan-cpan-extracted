@@ -1,7 +1,9 @@
 package Vote::Count::ReadBallots;
 
-use 5.022;
+use 5.024;
 use feature qw/postderef signatures/;
+use strict;
+use warnings;
 no warnings qw/experimental/;
 use Path::Tiny 0.108;
 use Carp;
@@ -11,13 +13,13 @@ use YAML::XS;
 
 # ABSTRACT: Read Ballots for Vote::Count. Toolkit for vote counting.
 
-our $VERSION='1.10';
+our $VERSION='2.00';
 
 =head1 NAME
 
 Vote::Count::ReadBallots
 
-=head1 VERSION 1.10
+=head1 VERSION 2.00
 
 =head1 SYNOPSIS
 
@@ -225,6 +227,7 @@ sub read_range_ballots ( $source, $format = 'json' ) {
 1;
 
 #buildpod
+
 #FOOTER
 
 =pod
@@ -239,11 +242,15 @@ John Karr (BRAINBUZ) brainbuz@cpan.org
 
 CONTRIBUTORS
 
-Copyright 2019 by John Karr (BRAINBUZ) brainbuz@cpan.org.
+Copyright 2019-2021 by John Karr (BRAINBUZ) brainbuz@cpan.org.
 
 LICENSE
 
 This module is released under the GNU Public License Version 3. See license file for details. For more information on this license visit L<http://fsf.org>.
+
+SUPPORT
+
+This software is provided as is, per the terms of the GNU Public License. Professional support and customisation services are available from the author.
 
 =cut
 

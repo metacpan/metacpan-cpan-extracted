@@ -1,0 +1,48 @@
+## name ScalarAccess
+## failures 0
+## cut
+
+$foo{bar};
+$foo{'bar'};
+$$foo{ bar };
+$foo{'bar,baz'};
+$foo{bar(1,2)};
+$foo{bar 1, 2};
+
+## name Slices
+## failures 0
+## cut
+
+@foo {'bar','baz'};
+@{foo}{qw(bar baz)};
+@{$foo{bar}}{a => 'b'};
+@{@foo[0]}{'a','b'};
+@$foo{'a','b'};
+$foo->@{'a','b'};
+%foo{'bar','baz'};
+%{foo}{'bar','baz'};
+%{$foo{bar}}{'a','b'};
+%{@foo[0]}{'a','b'};
+%$foo{'a','b'};
+$foo->%{'a','b'};
+
+## name MAE
+## failures 10
+## cut
+
+$foo{'bar','baz'};
+${foo} {qw(bar baz)};
+$foo{bar}{a => 'b'};
+${@foo[0]}{'a','b'};
+$$foo {'a','b'};
+{1,2}->{'bar','baz'};
+foo->[2]{'bar','baz'};
+$foo{bar (1),2};
+$foo{1,bar 2};
+$foo{bar, 2};
+
+## name Nested
+## failures 3
+## cut
+
+$foo->{ $bar->{'a','b'} => $baz->{qw(a b)} };

@@ -3,8 +3,8 @@ NAME
     Indonesian National Agency of Drug and Food Control (POM)
 
 VERSION
-    This document describes version 0.002 of Business::ID::POM (from Perl
-    distribution Business-ID-POM), released on 2019-11-25.
+    This document describes version 0.003 of Business::ID::POM (from Perl
+    distribution Business-ID-POM), released on 2021-06-04.
 
 DESCRIPTION
     This module can be used to validate food/drug registration codes
@@ -33,7 +33,7 @@ FUNCTIONS
   parse_pom_reg_code
     Usage:
 
-     parse_pom_reg_code(%args) -> [status, msg, payload, meta]
+     parse_pom_reg_code(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
     Parse food/drug registration code published by the Indonesian National
     Agency of Drug and Food Control (POM).
@@ -46,16 +46,21 @@ FUNCTIONS
 
         Result:
 
-         {
-           category_code             => "MD",
-           category_id               => "Makanan (M), dalam negeri (D)",
-           food_company_code         => 107,
-           food_company_product_code => 115,
-           food_packaging_code       => 2,
-           food_province_code        => 10,
-           food_type_code            => 245,
-           number                    => 224510107115,
-         }
+         [
+           200,
+           "OK",
+           {
+             category_code             => "MD",
+             category_id               => "Makanan (M), dalam negeri (D)",
+             food_company_code         => 107,
+             food_company_product_code => 115,
+             food_packaging_code       => 2,
+             food_province_code        => 10,
+             food_type_code            => 245,
+             number                    => 224510107115,
+           },
+           {},
+         ]
 
     *   Example #2:
 
@@ -63,20 +68,25 @@ FUNCTIONS
 
         Result:
 
-         {
-           category_code             => "DBL",
-           category_id               => "Obat merek dagang (D), bebas (B), lokal (L)",
-           drug_category_code        => "B",
-           drug_company_code         => 245,
-           drug_company_product_code => "028",
-           drug_dosage_form_code     => "04",
-           drug_dosage_form_id       => "kaplet (04)",
-           drug_origin_code          => "L",
-           drug_packaging_serial     => 1,
-           drug_strength_serial      => "A",
-           drug_year                 => 1996,
-           number                    => "9624502804A1",
-         }
+         [
+           200,
+           "OK",
+           {
+             category_code             => "DBL",
+             category_id               => "Obat merek dagang (D), bebas (B), lokal (L)",
+             drug_category_code        => "B",
+             drug_company_code         => 245,
+             drug_company_product_code => "028",
+             drug_dosage_form_code     => "04",
+             drug_dosage_form_id       => "kaplet (04)",
+             drug_origin_code          => "L",
+             drug_packaging_serial     => 1,
+             drug_strength_serial      => "A",
+             drug_year                 => 1996,
+             number                    => "9624502804A1",
+           },
+           {},
+         ]
 
     *   Example #3:
 
@@ -84,37 +94,47 @@ FUNCTIONS
 
         Result:
 
-         {
-           category_code => "NC",
-           category_id => "Kosmetik (N), Eropa (C)",
-           cosmetic_category_code => "C",
-           cosmetic_country_code => 14,
-           cosmetic_group_code => 13,
-           cosmetic_notification_code => "00159",
-           cosmetic_year => 2019,
-           number => 14191300159,
-         }
+         [
+           200,
+           "OK",
+           {
+             category_code => "NC",
+             category_id => "Kosmetik (N), Eropa (C)",
+             cosmetic_category_code => "C",
+             cosmetic_country_code => 14,
+             cosmetic_group_code => 13,
+             cosmetic_notification_code => "00159",
+             cosmetic_year => 2019,
+             number => 14191300159,
+           },
+           {},
+         ]
 
     *   Example #4:
 
-         parse_pom_reg_code(code => "TR092699241");
+         parse_pom_reg_code(code => "POM TR092699241");
 
         Result:
 
-         {
-           category_code => "TR",
-           category_id => "Obat traditional (T), dalam negeri (R)",
-           number => "092699241",
-           trad_company_product_serial => 9924,
-           trad_company_type_code => 2,
-           trad_company_type_id => "pabrik jamu",
-           trad_origin => "R",
-           trad_packaging_code => 6,
-           trad_packaging_id => "cairan",
-           trad_packaging_volume => "15ml",
-           trad_packaging_volume_code => 1,
-           trad_year => 2009,
-         }
+         [
+           200,
+           "OK",
+           {
+             category_code => "TR",
+             category_id => "Obat traditional (T), dalam negeri (R)",
+             number => "092699241",
+             trad_company_product_serial => 9924,
+             trad_company_type_code => 2,
+             trad_company_type_id => "pabrik jamu",
+             trad_origin => "R",
+             trad_packaging_code => 6,
+             trad_packaging_id => "cairan",
+             trad_packaging_volume => "15ml",
+             trad_packaging_volume_code => 1,
+             trad_year => 2009,
+           },
+           {},
+         ]
 
     *   Example #5:
 
@@ -122,14 +142,19 @@ FUNCTIONS
 
         Result:
 
-         {
-           category_code => "FF",
-           category_id => "Fitofarma (FF)",
-           number => 182600791,
-         }
+         [
+           200,
+           "OK",
+           {
+             category_code => "FF",
+             category_id => "Fitofarma (FF)",
+             number => 182600791,
+           },
+           {},
+         ]
 
-    This routine does not check whether the code actually exists. Use
-    <https://cekbpom.pom.go.id/> for that.
+    This routine does not check whether the specified code is actually
+    registered. Use <https://cekbpom.pom.go.id/> for that.
 
     This function is not exported by default, but exportable.
 
@@ -141,12 +166,15 @@ FUNCTIONS
 
     Returns an enveloped result (an array).
 
-    First element (status) is an integer containing HTTP status code (200
-    means OK, 4xx caller error, 5xx function error). Second element (msg) is
-    a string containing error message, or 'OK' if status is 200. Third
-    element (payload) is optional, the actual result. Fourth element (meta)
-    is called result metadata and is optional, a hash that contains extra
-    information.
+    First element ($status_code) is an integer containing HTTP-like status
+    code (200 means OK, 4xx caller error, 5xx function error). Second
+    element ($reason) is a string containing error message, or something
+    like "OK" if status is 200. Third element ($payload) is the actual
+    result, but usually not present when enveloped result is an error
+    response ($status_code is not 2xx). Fourth element (%result_meta) is
+    called result metadata and is optional, a hash that contains extra
+    information, much like how HTTP response headers provide additional
+    metadata.
 
     Return value: (any)
 
@@ -172,7 +200,7 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2019 by perlancar@cpan.org.
+    This software is copyright (c) 2021, 2019 by perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

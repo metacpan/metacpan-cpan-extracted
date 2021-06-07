@@ -1,5 +1,5 @@
 package Photonic::CharacteristicFunctions;
-$Photonic::CharacteristicFunctions::VERSION = '0.015';
+$Photonic::CharacteristicFunctions::VERSION = '0.016';
 
 =encoding UTF-8
 
@@ -55,12 +55,11 @@ sub ellipse { #f y e determinan univocamente el problema  general de inclusion
     my $a=PDL->pdl(1,1);
     my $z=PDL->zeroes(2*$N+1,2*$N+1); #change to admit arbitrary lattice
     my $r=$z->PDL::ndcoords-PDL->pdl($N,$N);
-    if(($e>=1.0 && $ff<PI/(4.0*$e)) || ($e<=1.0 && $ff<PI*$e/4.0)){
-	$a=sqrt($ff/PI)*(PDL->pdl(1.0/sqrt($e),sqrt($e)));
-	$a*=2*$N+1;
-    }else{croak "filling fraction very large: overlaping of ellipses ! \n"}
-    my $t=($r->((1))/$a->((1)))**2+($r->((0))/$a->((0)))**2<=1.0;
-    return $t;
+    croak "filling fraction very large: overlaping of ellipses ! \n"
+	if !(($e>=1.0 && $ff<PI/(4.0*$e)) || ($e<=1.0 && $ff<PI*$e/4.0));
+    $a=sqrt($ff/PI)*(PDL->pdl(1.0/sqrt($e),sqrt($e)));
+    $a*=2*$N+1;
+    ($r->((1))/$a->((1)))**2+($r->((0))/$a->((0)))**2<=1.0;
 }
 
 sub triangle { #smooth triangle for testing
@@ -105,7 +104,7 @@ Photonic::CharacteristicFunctions
 
 =head1 VERSION
 
-version 0.015
+version 0.016
 
 =head1 SYNOPSIS
 

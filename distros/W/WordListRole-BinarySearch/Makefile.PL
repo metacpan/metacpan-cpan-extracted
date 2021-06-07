@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-
+use 5.010001;
 
 use ExtUtils::MakeMaker;
 
@@ -14,6 +14,7 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "WordListRole-BinarySearch",
   "LICENSE" => "perl",
+  "MIN_PERL_VERSION" => "5.010001",
   "NAME" => "WordListRole::BinarySearch",
   "PREREQ_PM" => {
     "File::SortedSeek::PERLANCAR" => 0,
@@ -25,9 +26,10 @@ my %WriteMakefileArgs = (
     "File::Spec" => 0,
     "IO::Handle" => 0,
     "IPC::Open3" => 0,
-    "Test::More" => 0
+    "Test::More" => 0,
+    "WordList::Char::Latin1::UpperCaseLetter" => 0
   },
-  "VERSION" => "0.005",
+  "VERSION" => "0.006",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -41,6 +43,7 @@ my %FallbackPrereqs = (
   "IPC::Open3" => 0,
   "Role::Tiny" => 0,
   "Test::More" => 0,
+  "WordList::Char::Latin1::UpperCaseLetter" => 0,
   "strict" => 0,
   "warnings" => 0
 );

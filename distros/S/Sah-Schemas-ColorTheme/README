@@ -2,8 +2,8 @@ NAME
     Sah::Schemas::ColorTheme - Sah schemas related to ColorTheme
 
 VERSION
-    This document describes version 0.002 of Sah::Schemas::ColorTheme (from
-    Perl distribution Sah-Schemas-ColorTheme), released on 2021-01-26.
+    This document describes version 0.003 of Sah::Schemas::ColorTheme (from
+    Perl distribution Sah-Schemas-ColorTheme), released on 2021-02-02.
 
 DESCRIPTION
     I use "color themes" to refer to modules in the ColorTheme::* (or

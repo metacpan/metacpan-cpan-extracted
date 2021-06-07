@@ -28,6 +28,7 @@ PDL::Core::Dev::loadmod_Types();
 # version 13 for complex data types (native complex support)
 # version 14: NaN support for native complex, per-PDL badval on
 # version 15: threadid, ndims become PDL_Indx
+# FOR NEXT VERSION DELETE .tmp AND RENAME pdl_barf/pdl_warn/pdlnew WITHOUT pdl_?
 use vars qw( $pdl_core_version );
 $pdl_core_version = 15;
 
@@ -72,7 +73,14 @@ print OUT <<'!NO!SUBS!';
 #undef CONTEXT
 #endif
 
+#ifdef PDL_IN_CORE
+#define PDL_CORE_(func) pdl_##func
+#else
+#define PDL_CORE_(func) PDL->func
+#endif
+
 #include "pdl.h"
+#include "pdlperl.h"
 #include "pdlthread.h"
 /* the next one causes trouble in c++ compiles - exclude for now */
 #ifndef __cplusplus
@@ -114,31 +122,48 @@ static const union {unsigned char c[8]; double d;}
  *  This is needed because segfaults happen when perl's croak is called
  *  during one of the spawned pthreads for PDL processing.
  */
-#define barf PDL->pdl_barf
+#define barf PDL_CORE_(pdl_barf)
 #undef warn
-#define warn PDL->pdl_warn
+#define warn PDL_CORE_(pdl_warn)
 
+#define PDL_XS_SCALAR(type, ctype, val) \
+  SV *b_SV = NULL; \
+  pdl  *b; \
+  int nreturn = 1; \
+  int ndims = 0; \
+  PDL_Indx *pdims; \
+  pdims = (PDL_Indx *) pdl_smalloc( ndims * sizeof(*pdims) ); \
+  b = pdl_create(PDL_PERM); \
+  pdl_setdims(b, pdims, ndims); \
+  b->datatype = type; \
+  pdl_allocdata(b); \
+  ((ctype *)b->data)[0] = val; \
+  b_SV = sv_newmortal(); \
+  pdl_SetSV_PDL(b_SV, b); \
+  if (nreturn > 0) EXTEND(SP, nreturn); \
+  ST(0) = b_SV; \
+  XSRETURN(nreturn);
 
 typedef int Logical;
 
 /*************** Function prototypes *********************/
 
-
 /* pdlcore.c */
 
 size_t  pdl_howbig (int datatype);           /* Size of data type (bytes) */
-pdl*    SvPDLV ( SV* sv );                   /* Map SV* to pdl struct */
-void	SetSV_PDL( SV *sv, pdl *it );	     /* Outputting a pdl from.. */
+pdl*    pdl_SvPDLV ( SV* sv );               /* Map SV* to pdl struct */
+void	pdl_SetSV_PDL( SV *sv, pdl *it );     /* Outputting a pdl from.. */
 SV*     pdl_copy( pdl* a, char* option );     /* call copy method */
 PDL_Indx *    pdl_packdims ( SV *sv, PDL_Indx *ndims ); /* Pack dims[] into SV aref */
 void    pdl_unpackdims ( SV *sv, PDL_Indx *dims,  /* Unpack */
                          PDL_Indx ndims );
-void*   pdl_malloc ( STRLEN nbytes );           /* malloc memory - auto free()*/
+void*   pdl_smalloc ( STRLEN nbytes );           /* malloc memory - auto free()*/
 
 void pdl_makescratchhash(pdl *ret, PDL_Anyval data);
 PDL_Indx pdl_safe_indterm(PDL_Indx dsz, PDL_Indx at, char *file, int lineno);
-void pdl_barf(const char* pat,...); /* General croaking utility */
-void pdl_warn(const char* pat,...); /* General warn utility */
+/* doubled for binary-compat with redundantly-named Core member */
+void pdl_pdl_barf(const char* pat,...); /* General croaking utility */
+void pdl_pdl_warn(const char* pat,...); /* General warn utility */
 PDL_Indx av_ndcheck(AV* av, AV* dims, int level, int *datalevel);
 pdl* pdl_from_array(AV* av, AV* dims, int type, pdl* p);
 
@@ -173,10 +198,8 @@ void pdl_destroytransform(pdl_trans *trans,int ensure);
 
 pdl *pdl_hard_copy(pdl *src);
 
-#define pdl_new() pdl_create(PDL_PERM)
-#define pdl_tmp() pdl_create(PDL_TMP)
-pdl* pdl_external_new();
-pdl* pdl_external_tmp();
+pdl* pdl_pdlnew();
+pdl* pdl_tmp();
 pdl* pdl_create(int type);
 void pdl_destroy(pdl *it);
 void pdl_setdims(pdl* it, PDL_Indx* dims, PDL_Indx ndims);

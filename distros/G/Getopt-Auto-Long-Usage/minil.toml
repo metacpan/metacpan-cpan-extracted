@@ -1,0 +1,8 @@
+name = "Getopt-Auto-Long-Usage"
+# badges = ["travis-ci.com"]
+authority="cpan:KSTRZEROK"
+
+module_maker="ModuleBuildTiny"
+static_install = "auto"
+
+license = "mit"

@@ -114,8 +114,8 @@ The pedantic checks are:
 
 It's annoying to have lines wrap when displaying pod documentation in a
 terminal window.  This checks that all verbatim lines fit in a standard 80
-column window, even when using a pager that reserves a column for its own use.
-(Thus the check is for a net of 79 columns.)
+column window, even when using a pager that reserves 2 columns for its own
+use.  (Thus the check is for a net of 78 columns.)
 For those lines that don't fit, it tells you how much needs to be cut in
 order to fit.
 
@@ -359,8 +359,9 @@ my $known_issues = File::Spec->catfile($data_dir, 'known_pod_issues.dat');
 my $MANIFEST = File::Spec->catfile(File::Spec->updir($original_dir), 'MANIFEST');
 my $copy_fh;
 
-my $MAX_LINE_LENGTH = 79;   # 79 columns
-my $INDENT = 7;             # default nroff indent
+my $MAX_LINE_LENGTH = 78;   # 78 columns
+my $INDENT = 4;             # Lines other than '=head' lines are indented at
+                            # least this much
 
 # Our warning messages.  Better not have [('"] in them, as those are used as
 # delimiters for variable parts of the messages by poderror.
@@ -895,7 +896,7 @@ package My::Pod::Checker {      # Extend Pod::Checker
         return $self->SUPER::start_Para(@_);
     }
 
-    sub start_item_text {
+    sub start_item {
         my $self = shift;
         check_see_but_not_link($self);
 
@@ -903,6 +904,13 @@ package My::Pod::Checker {      # Extend Pod::Checker
         $start_line{$addr} = $_[0]->{start_line};
         $running_CFL_text{$addr} = "";
         $running_simple_text{$addr} = "";
+
+    }
+
+    sub start_item_text {
+        my $self = shift;
+        start_item($self);
+        my $addr = Scalar::Util::refaddr $self;
 
         # This is the only =item that is linkable
         $linkable_item{$addr} = 1;
@@ -912,24 +920,14 @@ package My::Pod::Checker {      # Extend Pod::Checker
 
     sub start_item_number {
         my $self = shift;
-        check_see_but_not_link($self);
-
-        my $addr = Scalar::Util::refaddr $self;
-        $start_line{$addr} = $_[0]->{start_line};
-        $running_CFL_text{$addr} = "";
-        $running_simple_text{$addr} = "";
+        start_item($self);
 
         return $self->SUPER::start_item_number(@_);
     }
 
     sub start_item_bullet {
         my $self = shift;
-        check_see_but_not_link($self);
-
-        my $addr = Scalar::Util::refaddr $self;
-        $start_line{$addr} = $_[0]->{start_line};
-        $running_CFL_text{$addr} = "";
-        $running_simple_text{$addr} = "";
+        start_item($self);
 
         return $self->SUPER::start_item_bullet(@_);
     }

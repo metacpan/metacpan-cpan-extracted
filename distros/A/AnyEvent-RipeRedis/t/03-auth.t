@@ -95,7 +95,7 @@ sub t_invalid_password {
       "$t_name_prefix; command error message" );
   is( $t_cmd_err->code, E_OPRN_ERROR, "$t_name_prefix; command error code" );
   isa_ok( $t_cli_err, 'AnyEvent::RipeRedis::Error' );
-  like( $t_cli_err->message, qr/^ERR invalid password/,
+  like( $t_cli_err->message, qr/^(?:ERR invalid password|WRONGPASS )/,
       "$t_name_prefix; client error message" );
   is( $t_cli_err->code, E_OPRN_ERROR, "$t_name_prefix; client error code" );
 

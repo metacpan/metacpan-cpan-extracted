@@ -1,3 +1,19 @@
+0.003 2021-06-01 22:58:57-0400
+
+  Documentation
+
+   - Fixes <https://rt.cpan.org/Public/Bug/Display.html?id=136677>.
+     See <https://github.com/ebassi/graphene/issues/228>.
+     DJERIUS++ for the report.
+
+0.002 2021-05-30 12:59:28-0400
+
+  Build changes
+
+   - Update build option for introspection. This is now a feature that must be
+     enabled instead of just a boolean. See <https://github.com/ebassi/graphene/pull/200>
+     and <https://github.com/Intertangle/p5-Alien-Graphene/pull/7>.
+
 0.001 2020-10-17 00:51:37-0500
 
   Features

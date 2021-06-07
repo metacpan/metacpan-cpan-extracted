@@ -29,10 +29,11 @@ my %WriteMakefileArgs = (
     "Dancer2" => "0.300000",
     "Data::Dumper" => 0,
     "HTTP::Request::Common" => 0,
+    "HTTP::Status" => 0,
     "Test::More" => 0,
     "Test::WWW::Mechanize::PSGI" => 0
   },
-  "VERSION" => "0.018",
+  "VERSION" => "0.019",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -45,6 +46,7 @@ my %FallbackPrereqs = (
   "Dancer2::Plugin" => 0,
   "Data::Dumper" => 0,
   "HTTP::Request::Common" => 0,
+  "HTTP::Status" => 0,
   "Test::More" => 0,
   "Test::WWW::Mechanize::PSGI" => 0,
   "URI" => 0,

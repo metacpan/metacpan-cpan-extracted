@@ -1,5 +1,12 @@
 Revision history for Net-Dropbear
 
+0.14  2021-05-28 00:04:42 EDT
+        * Move global variables out of headers into c files to fix allow it to
+          be correctly compiled with new default -fno-common in GCC 10 (GH#5)
+        * Allow root to test and install module
+        * Export Constants correctly
+        * Update to Dropbear 2020.81
+
 0.13  2020-03-21 10:49:42 EDT
         * Improve tests to avoid infinte hangs on bad tests
         * Handle newer versions of openssh that print extra information

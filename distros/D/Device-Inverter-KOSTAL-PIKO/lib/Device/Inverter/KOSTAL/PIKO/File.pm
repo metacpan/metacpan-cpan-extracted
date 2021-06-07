@@ -1,11 +1,10 @@
 package Device::Inverter::KOSTAL::PIKO::File;
 
-use 5.01;
-use strict;
+use 5.014;
 use utf8;
 use warnings;
 
-our $VERSION = '0.03';
+our $VERSION = '0.1';
 
 use Mouse;
 use Carp qw(carp confess croak);
@@ -97,17 +96,6 @@ sub BUILD {
                 {    # Name:	piko
                     my ( $line, %c ) =
                       $self->get_header_line(qr/^Name:\s+(?<name>.*?)\s*$/);
-                    unless ( $self->inverter->has_name ) {
-                        $self->inverter->name( $c{name} );
-                    }
-                    elsif ( ( my $name = $self->inverter->name ) ne $c{name} ) {
-                        carp(
-                            $self->errmsg(
-                                    'Conflicting inverter names: '
-                                  . qq("$name" vs. "$c{name}")
-                            )
-                        );
-                    }
                 }
                 {    # akt. Zeit:	  12345678
                     my ( $line, %c ) = $self->get_header_line($RE_zeit);

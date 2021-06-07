@@ -4,7 +4,19 @@ DBD::DB2::Changes - List of changes
 
 =cut
 
+=head2 Changes in DBD::DB2 1.89, May 26, 2021
+
+  Fix building with DBI installed in local::lib and some test cases fixed. Tested on 5.18 and above.
+
+=head2 Changes in DBD::DB2 1.88, May 21, 2021
+
+  README file changes. Tested on 5.18 and above.
+
 =head2 Changes in DBD::DB2 1.87, April 07, 2021
+
+  Uploaded but deleted due to duplicate entry.
+
+=head2 Changes in DBD::DB2 1.86, April 07, 2021
 
   Fixed RHEL-8 related issue in C code compilation. Tested on 5.18 and above.
 

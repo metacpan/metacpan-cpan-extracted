@@ -1,0 +1,15 @@
+use alienfile;
+
+plugin 'PkgConfig' => (pkg_name => 'gsl');
+
+share {
+  start_url 'https://ftp.gnu.org/gnu/gsl';
+  plugin Download => (
+    filter => qr/^gsl-([\d\.]+)\.tar\.gz$/,
+    version => qr/^gsl-([\d\.]+)\.tar\.gz$/,
+    prefer => 1,
+  );
+  plugin Extract => 'tar.gz';
+  plugin 'Build::Autoconf';
+  plugin 'Gather::IsolateDynamic';
+};

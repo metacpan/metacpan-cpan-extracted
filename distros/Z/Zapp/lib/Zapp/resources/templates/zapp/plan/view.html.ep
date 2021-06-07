@@ -1,0 +1,66 @@
+<%
+    layout 'zapp';
+%>
+
+<header>
+    <h1><%= $plan->{label} %></h1>
+    <div>
+        %= link_to 'zapp.edit_plan', $plan, class => 'btn btn-outline-secondary edit', begin
+            <i class="fa fa-pencil"></i> Edit
+        % end
+        %= link_to 'zapp.delete_plan', $plan, class => 'btn btn-outline-danger delete', begin
+            <i class="fa fa-times-circle"></i> Delete...
+        % end
+    </div>
+</header>
+
+<div><%= $plan->{description} %></div>
+
+<div class="row">
+    <div class="col">
+        <h2>Run</h2>
+        %= include 'zapp/partials/run_form', inputs => $plan->{inputs}
+    </div>
+    <div class="col">
+        <div class="d-flex justify-content-between align-items-center">
+            <h2>Triggers</h2>
+            <div class="dropdown">
+                <button class="btn btn-secondary dropdown-toggle" type="button" id="add-trigger" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <i class="fa fa-plus"></i> Add Trigger
+                </button>
+                <div class="dropdown-menu add-trigger-types" aria-labelledby="add-trigger">
+                    % for my $type ( keys %{ $c->zapp->triggers // {} } ) {
+                        <%= link_to $type,
+                            url_for('zapp.edit_trigger')->query( type => $type ),
+                            { plan_id => $plan->{plan_id} },
+                            class => 'dropdown-item',
+                        %>
+                    % }
+                </div>
+            </div>
+        </div>
+        % if ( my @triggers = @{ stash( 'triggers' ) // [] } ) {
+            % for my $trigger ( @triggers ) {
+                <%= link_to 'zapp.edit_trigger', { plan_id => $plan->{plan_id}, trigger_id => $trigger->{trigger_id} },
+                    class => 'btn btn-link', begin %>
+                    %= $trigger->{label}
+                % end
+            % }
+        % }
+        % else {
+            No triggers.
+        % }
+
+        <h2>Recent Runs</h2>
+        % if ( my @runs = @{ stash( 'runs' ) // [] } ) {
+            % for my $run ( @runs ) {
+                %= include 'zapp/partials/run', run => $run
+            % }
+            %# XXX: Add "More..." link
+        % }
+        % else {
+            No recent runs.
+        % }
+    </div>
+</div>
+

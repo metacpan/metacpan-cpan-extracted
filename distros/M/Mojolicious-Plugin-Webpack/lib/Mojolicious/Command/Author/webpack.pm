@@ -13,76 +13,61 @@ our $WORKER_PID = -1;
 
 has description => 'Start application with HTTP, WebSocket and Webpack development server';
 has usage       => sub { shift->extract_usage };
-
-has _morbo => sub {
-  require Mojo::Server::Morbo;
-  Mojo::Server::Morbo->new;
-};
-
-has _script_name => $0;
-has _webpack_pid => undef;
+has _morbo      => sub { require Mojo::Server::Morbo; Mojo::Server::Morbo->new };
 
 sub run {
-  my ($self, $app) = shift->_parse_argv(@_);
-
-  local $ENV{MOJO_WEBPACK_DEBUG} //= $ENV{MORBO_VERBOSE} // 0;
-  local $ENV{MOJO_WEBPACK_LAZY} = 1;
-
-  $self->_start_webpack($app);
-  warn "[Webpack] Webpack has pid @{[$self->_webpack_pid]}.\n" if $ENV{MORBO_VERBOSE} and !SILENT;
-
-  $self->_run_morbo($app);
-
-  warn "[Webpack/$$] Reaping webpack with pid @{[$self->_webpack_pid]}...\n" if $ENV{MORBO_VERBOSE} and !SILENT;
-  1 while kill $self->_webpack_pid;
-}
-
-sub _exec_mojo_webpack {
   my ($self, @argv) = @_;
-  warn "[Webpack] exec mojo webpack @argv ...\n" if $ENV{MORBO_VERBOSE} and !SILENT;
-  { exec mojo => webpack => @argv };
-  die "exec mojo @argv: $!";
-}
 
-sub _parse_argv {
-  my ($self, @argv) = @_;
-  my @orig_argv = @argv;
+  # Need to run "mojo webpack" and not "./myapp.pl webpack" to have a clean environment
+  return $self->_exec_mojo_webpack($0, @argv) unless path($0)->basename eq 'mojo';
 
+  # Parse command line options
   getopt \@argv,
+    'B|build'     => \my $build,
     'b|backend=s' => \$ENV{MOJO_MORBO_BACKEND},
-    'c|config=s'  => \$ENV{MOJO_WEBPACK_CONFIG},
     'h|help'      => \my $help,
     'l|listen=s'  => \my @listen,
     'm|mode=s'    => \$ENV{MOJO_MODE},
     'v|verbose'   => \$ENV{MORBO_VERBOSE},
     'w|watch=s'   => \my @watch;
 
-  # Need to run "mojo webpack" and not "./myapp.pl webpack" to have a clean environment
-  $self->_exec_mojo_webpack($self->_script_name, @orig_argv) if path($self->_script_name)->basename ne 'mojo';
-
   die join "\n\n", $self->description, $self->usage if $help or !(my $app = shift @argv);
+  return $self->_build($app) if $build;
 
+  # Start rollup/webpack
+  my $builder_pid = $self->_start_builder($app);
+  say "Bundler started with pid $builder_pid." if +($ENV{MORBO_VERBOSE} // 1) == 1;
+
+  # Set up and start morbo - Mojo::Server::Morbo::run() will block until the the app is killed
+  local $ENV{MOJO_WEBPACK_BUILD} = '';    # Silence initial "Sure ... has been run ..." warning
+  local $WORKER_PID = $$;
   $self->_morbo->backend->watch(\@watch)  if @watch;
   $self->_morbo->daemon->listen(\@listen) if @listen;
+  $self->_morbo->run($app);
 
-  return ($self, $app);
+  # Stop rollup/webpack after the app is killed
+  warn "[Webpack] [$$] Reaping builder with pid $builder_pid...\n" if $ENV{MORBO_VERBOSE} and !SILENT;
+  1 while kill $builder_pid;
 }
 
-sub _run_morbo {
-  local $WORKER_PID = $$;
-  shift->_morbo->run(shift);
-}
-
-sub _start_webpack {
+sub _build {
   my ($self, $app) = @_;
+  $ENV{MOJO_WEBPACK_BUILD} ||= 'build';
+  Mojo::Server->new->load_app($app);
+}
 
-  local $ENV{MOJO_WEBPACK_BUILD} = '--watch';
+sub _exec_mojo_webpack {
+  my ($self, @argv) = @_;
+  warn "Switching to `mojo webpack @argv` ...\n" unless SILENT;
+  { exec qw(mojo webpack), @argv };
+  die "exec mojo @argv: $!";
+}
+
+sub _start_builder {
+  my ($self, $app) = @_;
   die "Can't fork: $!" unless defined(my $pid = fork);
-
-  # Manager
-  return $self->_webpack_pid($pid) if $pid;
-
-  # Webpack worker
+  return $pid if $pid;
+  local $ENV{MOJO_WEBPACK_BUILD} = 'watch';
   Mojo::Server->new->load_app($app);
   exit $!;
 }
@@ -104,12 +89,13 @@ Mojolicious::Command::Author::webpack - Mojolicious HTTP, WebSocket and Webpack 
     mojo webpack -m production -l https://*:443 -l http://[::]:3000 ./myapp.pl
     mojo webpack -l 'https://*:443?cert=./server.crt&key=./server.key' ./myapp.pl
     mojo webpack -w /usr/local/lib -w public -w myapp.conf ./myapp.pl
+    mojo webpack --build --mode production
+    MOJO_NPM_BINARY=pnpm mojo webpack --build
 
   Options:
+    -B, --build                    Build the assets and exit
     -b, --backend <name>           Morbo backend to use for reloading, defaults
                                    to "Poll"
-    -c, --config <file>            If you want to use a custom config file, such
-                                   as "rollup.config.js" for https://rollupjs.org.
     -h, --help                     Show this message
     -l, --listen <location>        One or more locations you want to listen on,
                                    defaults to the value of MOJO_LISTEN or

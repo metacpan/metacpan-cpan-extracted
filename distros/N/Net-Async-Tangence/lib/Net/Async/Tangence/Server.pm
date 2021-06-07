@@ -3,15 +3,13 @@
 #
 #  (C) Paul Evans, 2010-2020 -- leonerd@leonerd.org.uk
 
-package Net::Async::Tangence::Server;
+package Net::Async::Tangence::Server 0.16;
 
-use strict;
+use v5.14;
 use warnings;
 
 use IO::Async::Listener '0.36';
 use base qw( IO::Async::Listener );
-
-our $VERSION = '0.15';
 
 use Carp;
 

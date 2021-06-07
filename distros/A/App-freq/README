@@ -1,0 +1,11 @@
+
+This module provides a Unix-like command `freq'. 
+The function is similar to `sort | uniq -c' also with many useful functions.
+
+=head1 DESCRIPTION
+
+
+
+ Copyright (c) 2021 Toshiyuki SHIMONO. All rights reserved.
+ This program is free software; you can redistribute it and/or
+ modify it under the same terms as Perl itself.

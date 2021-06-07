@@ -1,5 +1,10 @@
 Revision history for Perl extension Task-BeLike-ZAKAME
 
+0.23 2021-05-28T02:25:12Z
+
+    - Add optional Mojolicious dependencies as recommends
+    - Switch Perl::Critic::Freenode to Perl::Critic::Community
+
 0.22 2020-09-14T04:41:44Z
 
     - Move less-used modules to suggests (to consider dropping later)

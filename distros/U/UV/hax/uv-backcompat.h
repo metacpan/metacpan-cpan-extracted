@@ -1,4 +1,4 @@
-/* vi: set ft=c inde=: */
+/* vi: set ft=c */
 
 /* pulled from sys/signal.h in case we don't have it in Windows */
 #if !defined(SIGPROF)

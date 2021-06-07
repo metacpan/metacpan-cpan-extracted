@@ -1,6 +1,6 @@
 # ABSTRACT: encapsulation of Dancer2 packages
 package Dancer2::Core::App;
-$Dancer2::Core::App::VERSION = '0.301002';
+$Dancer2::Core::App::VERSION = '0.301004';
 use Moo;
 use Carp               qw<croak carp>;
 use Scalar::Util       'blessed';
@@ -1275,7 +1275,7 @@ sub redirect {
     my $destination = shift;
     my $status      = shift;
 
-    if ($destination =~ m{^/[^/]}) {
+    if ($destination =~ m{^/(?!/)}) {
         # If the app is mounted to something other than "/", we must
         # preserve its path.
         my $script_name = $self->request->script_name;
@@ -1695,7 +1695,7 @@ Dancer2::Core::App - encapsulation of Dancer2 packages
 
 =head1 VERSION
 
-version 0.301002
+version 0.301004
 
 =head1 DESCRIPTION
 

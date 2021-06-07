@@ -4,7 +4,7 @@ File::Serialize - DWIM file serialization/deserialization
 
 # VERSION
 
-version 1.3.0
+version 1.5.0
 
 # SYNOPSIS
 
@@ -23,14 +23,14 @@ $data_copy = deserialize_file '/path/to/file.json';
 # DESCRIPTION
 
 _File::Serialize_ provides a common, simple interface to
-file serialization -- you provide the file path, the data to serialized, and 
-the module takes care of the rest. Even the serialization format, unless 
+file serialization -- you provide the file path, the data to serialized, and
+the module takes care of the rest. Even the serialization format, unless
 specified
 explicitly as part of the options, is detected from the file extension.
 
 # IMPORT
 
-_File::Serialize_ imports the three functions 
+_File::Serialize_ imports the three functions
 `serialize_file`, `deserialize_file` and `transerialize_file` into the current namespace.
 A default set of options can be set for both by passing a hashref as
 an argument to the 'use' statement.
@@ -49,6 +49,8 @@ be used.
 
 - YAML
 
+    [File::Serialize::Serialize::YAML::XS](https://metacpan.org/pod/File::Serialize::Serialize::YAML::XS)
+
     [File::Serialize::Serialize::YAML::Tiny](https://metacpan.org/pod/File::Serialize::Serialize::YAML::Tiny)
 
 - JSON
@@ -63,9 +65,13 @@ be used.
 
     [File::Serialize::Serializer::XML::Simple](https://metacpan.org/pod/File::Serialize::Serializer::XML::Simple)
 
-- jsony 
+- jsony
 
     [File::Serialize::Serializer::JSONY](https://metacpan.org/pod/File::Serialize::Serializer::JSONY)
+
+- Markdown
+
+    [File::Serialize::Serializer::Markdown](https://metacpan.org/pod/File::Serialize::Serializer::Markdown)
 
 # OPTIONS
 
@@ -82,12 +88,12 @@ will be passed to the serializer.
 
 - add\_extension => $boolean
 
-    If true, the canonical extension of the serializing format will be 
+    If true, the canonical extension of the serializing format will be
     appended to the file. Requires the parameter `format` to be given as well.
 
     ```perl
     # will create 'foo.yml', 'foo.json' and 'foo.toml'
-    serialize_file 'foo', $data, { format => $_, add_extension => 1 } 
+    serialize_file 'foo', $data, { format => $_, add_extension => 1 }
         for qw/ yaml json toml /;
     ```
 
@@ -109,7 +115,7 @@ will be passed to the serializer.
 
 - allow\_nonref => $boolean
 
-    If set to true, allow to serialize non-ref data. 
+    If set to true, allow to serialize non-ref data.
 
     Defaults to `true`.
 
@@ -151,10 +157,10 @@ my $data = deserialize_file \$json;
 ## transerialize\_file $input, @transformation\_chain
 
 `transerialize_file` is a convenient wrapper that allows you to
-deserialize a file, apply any number of transformations to its 
+deserialize a file, apply any number of transformations to its
 content and re-serialize the result.
 
-`$input` can be a filename, a [Path::Tiny](https://metacpan.org/pod/Path::Tiny) object or the raw data 
+`$input` can be a filename, a [Path::Tiny](https://metacpan.org/pod/Path::Tiny) object or the raw data
 structure to be worked on.
 
 ```perl
@@ -186,9 +192,9 @@ Each element of the `@transformation_chain` can be
     } => 'inexpensive.json';
 
     # chaining transforms
-    transerialize_file $data 
-        => sub { 
-            my %inventory = %$_; 
+    transerialize_file $data
+        => sub {
+            my %inventory = %$_;
             +{ map { $_ => $inventory{$_}{price} } keys %inventory } }
         => sub {
             my %inventory = %$_;
@@ -197,20 +203,25 @@ Each element of the `@transformation_chain` can be
 
     # same as above, but with Perl 5.20 signatures and List::Util pair*
     # helpers
-    transerialize_file $data 
+    transerialize_file $data
         => sub($inventory) { +{ pairmap  { $a => $b->{price} } %$inventory } }
-        => sub($inventory) { +{ pairgrep { $b <= 20 }          %$inventory } } 
+        => sub($inventory) { +{ pairgrep { $b <= 20 }          %$inventory } }
         => 'inexpensive.json';
     ```
+
+    If you prefer to have your transform functions modify the structure in-place
+    in `$_` and don't want to have to explicitly return it, you can set
+    the global variable `$File::Serialize::implicit_transform` to `true`.
+    WARNING: this changes the behavior of ALL transforms.
 
 - \\%destinations
 
     A hashref of destination file with their options. The current state of the data will
-    be serialized to those destination. If no options need to be passed, the 
+    be serialized to those destination. If no options need to be passed, the
     value can be `undef`.
 
     ```perl
-    transerialize_file $data => { 
+    transerialize_file $data => {
         'beginning.json' => { pretty => 1 },
         'beginning.yml'  => undef
     } => sub { ... } => {
@@ -219,7 +230,7 @@ Each element of the `@transformation_chain` can be
     };
     ```
 
-- \[ \\@subchain1, \\@subchain2, ... \] 
+- \[ \\@subchain1, \\@subchain2, ... \]
 
     Run the subchains given in `@branches` on the current data. Must be the last
     step of the chain.
@@ -227,7 +238,7 @@ Each element of the `@transformation_chain` can be
     ```perl
     my @data = 1..10;
 
-    transerialize_file \@data 
+    transerialize_file \@data
         => { 'all.json' => undef }
         => [
            [ sub { [ grep { $_ % 2 } @$_ ] }     => 'odd.json'  ],
@@ -258,7 +269,7 @@ Yanick Champoux <yanick@cpan.org> [![endorse](http://api.coderwall.com/yanick/en
 
 # COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019, 2017, 2016, 2015 by Yanick Champoux.
+This software is copyright (c) 2021, 2019, 2017, 2016, 2015 by Yanick Champoux.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

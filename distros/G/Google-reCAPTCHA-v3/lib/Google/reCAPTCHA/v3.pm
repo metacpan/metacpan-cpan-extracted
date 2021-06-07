@@ -1,6 +1,6 @@
 package Google::reCAPTCHA::v3;
 
-our $VERSION = '0.1.0';
+our $VERSION = '0.1.1';
 use warnings; 
 use strict;
 
@@ -95,6 +95,8 @@ sub request {
 	);	
 }
 
+sub DESTROY {}
+
 1;
 
 __END__
@@ -142,7 +144,7 @@ See: L<https://developers.google.com/recaptcha/docs/verify>.
 	);
 
 Requires one paramater, C<-secret>, which should be your Google reCAPTCHA v3 site secret key. 
-Returns a new Google::reAPTCHA::v3 object. 
+Returns a new Google::reCAPTCHA::v3 object. 
 	
 =head2 request
 
@@ -165,7 +167,7 @@ of your app.
 
 Optionally, you can pass, C<-remoteip>, which should be your user's IP address.
 
-request returns a hashref of what's return from the service, with the following keys: 
+C<request> returns a hashref of the response returned from the service, with the following keys: 
 
 =over
 

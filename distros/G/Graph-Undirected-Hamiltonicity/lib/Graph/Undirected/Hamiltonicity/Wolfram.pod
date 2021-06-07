@@ -1,0 +1,54 @@
+=head1 NAME
+
+Graph::Undirected::Hamiltonicity::Wolfram - determine the Hamiltonicity of a given graph using the Wolfram Open Cloud.
+
+=head1 VERSION
+
+Version 0.01
+
+=head1 SYNOPSIS
+
+    use Graph::Undirected::Hamiltonicity::Wolfram;
+
+    my $result;
+    eval {
+        # $g is a Graph::Undirected
+        $result = is_hamiltonian_per_wolfram( $g );
+    };
+    die $@ if $@;
+
+   if ( $result ) {
+       say "Graph is Hamiltonian.";
+   } else {
+        say "Graph is not Hamiltonian.";
+   }
+
+
+=head1 EXPORT
+
+The is_hamiltonian_per_wolfram() subroutine is exported by default.
+
+=head1 SUBROUTINES
+
+=head2 is_hamiltonian_per_wolfram
+
+Takes: a Graph::Undirected
+
+Returns: 1     if the graph is Hamiltonian according to the Wolfram Open Cloud,
+         0     if the graph is non-Hamiltonian
+
+Throws: an exception if an error is encountered.
+
+=head1 SEE ALSO
+
+L<WOLFRAM.md|https://github.com/ownlifeful/Graph-Undirected-Hamiltonicity/blob/master/WOLFRAM.md>
+
+=head1 SUPPORT
+
+Please report issues L<on GitHub|https://github.com/ownlifeful/Graph-Undirected-Hamiltonicity/issues>.
+
+=head1 AUTHOR
+
+Ashwin Dixit, C<< <ashwin at ownlifeful dot com> >>
+
+=cut

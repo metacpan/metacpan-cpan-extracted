@@ -4,7 +4,6 @@ author:
   - 'Paul Evans <leonerd@leonerd.org.uk>'
 build_requires:
   ExtUtils::CBuilder: '0'
-  Test::Fatal: '0'
   Test::More: '0.88'
 configure_requires:
   Module::Build: '0.4004'
@@ -18,13 +17,13 @@ name: XS-Parse-Keyword
 provides:
   XS::Parse::Keyword:
     file: lib/XS/Parse/Keyword.pm
-    version: '0.03'
+    version: '0.06'
   XS::Parse::Keyword::Builder:
     file: lib/XS/Parse/Keyword/Builder.pm
-    version: '0.03'
+    version: '0.06'
 requires:
   perl: '5.014'
 resources:
   license: http://dev.perl.org/licenses/
-version: '0.03'
+version: '0.06'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

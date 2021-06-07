@@ -7,12 +7,15 @@ use UV;
 use UV::Loop ();
 use UV::Poll qw(UV_WRITABLE);
 
+use lib "t/lib";
+use UVTestHelpers qw(pipepair);
+
 # TODO: It's likely this test doesn't actually pass on some platform or other;
 # MSWin32 maybe?
 # Feel free to 
 #   plan skip_all ... if $^O eq "MSWin32"
 
-pipe my ( $rd, $wr ) or die "Unable to pipe() - $!";
+my ( $rd, $wr ) = pipepair;
 
 my $poll_cb_called = 0;
 my ( $poll_cb_status, $poll_cb_events );

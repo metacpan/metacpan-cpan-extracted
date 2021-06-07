@@ -3,7 +3,7 @@ use Mojo::Base '-role';
 
 use strict;
 
-our $VERSION = '1.003';
+our $VERSION = '1.005';
 
 =encoding utf8
 
@@ -20,6 +20,9 @@ Mojo::Promise::Role::Any - Fulfill with the first fulfilled promise
 		->any( @promises );
 
 =head1 DESCRIPTION
+
+NOTE: Mojolicious 8.73 adds C<any()> as a stable feature, so you don't
+need this role.
 
 Make a new promise that fulfills with the first fulfilled promise, and
 rejects otherwise. The result is a flat list of the arguments for the
@@ -51,8 +54,8 @@ sub any {
 
 	my $count = 0;
 	$_->then(
-		sub { $any->resolve( @_ ) },
-		sub { $count++; $any->reject if $count == @promises }
+		sub { $any->resolve( @_ ); return },
+		sub { $count++; $any->reject if $count == @promises; return }
 		) foreach @promises;
 
 	return @promises ? $any : $any->reject;

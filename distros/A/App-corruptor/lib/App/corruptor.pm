@@ -1,7 +1,7 @@
 package App::corruptor;
 
-our $DATE = '2017-08-10'; # DATE
-our $VERSION = '0.001'; # VERSION
+our $DATE = '2021-05-25'; # DATE
+our $VERSION = '0.002'; # VERSION
 
 use 5.010001;
 use strict;
@@ -118,7 +118,7 @@ App::corruptor - Corrupt files by writing random bytes/blocks to them
 
 =head1 VERSION
 
-This document describes version 0.001 of App::corruptor (from Perl distribution App-corruptor), released on 2017-08-10.
+This document describes version 0.002 of App::corruptor (from Perl distribution App-corruptor), released on 2021-05-25.
 
 =head1 FUNCTIONS
 
@@ -127,9 +127,9 @@ This document describes version 0.001 of App::corruptor (from Perl distribution 
 
 Usage:
 
- corruptor(%args) -> [status, msg, result, meta]
+ corruptor(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
-Corrupt files by writing random bytes/blocks to them.
+Corrupt files by writing random bytesE<sol>blocks to them.
 
 Examples:
 
@@ -159,6 +159,7 @@ Arguments ('*' denotes required arguments):
 
 How much random data is written as proportion of file size (in percent).
 
+
 =back
 
 Special arguments:
@@ -167,17 +168,17 @@ Special arguments:
 
 =item * B<-dry_run> => I<bool>
 
-Pass -dry_run=>1 to enable simulation mode.
+Pass -dry_run=E<gt>1 to enable simulation mode.
 
 =back
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
+($reason) is a string containing error message, or "OK" if status is
+200. Third element ($payload) is optional, the actual result. Fourth
+element (%result_meta) is called result metadata and is optional, a hash
 that contains extra information.
 
 Return value:  (any)
@@ -209,7 +210,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by perlancar@cpan.org.
+This software is copyright (c) 2021 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

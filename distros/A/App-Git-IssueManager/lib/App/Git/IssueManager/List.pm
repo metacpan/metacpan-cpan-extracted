@@ -7,7 +7,7 @@ extends qw(App::Git::IssueManager);
 use Git::LowLevel;
 use Git::IssueManager;
 use Git::IssueManager::Issue;
-use Text::ANSITable;
+use Text::ANSITable 0.602;
 use Term::ANSIColor;
 use Try::Tiny;
 use Data::Dumper;
@@ -68,8 +68,7 @@ sub run
   my $t = Text::ANSITable->new;
   $t->use_utf8(1);
   $t->use_color(1);
-  $t->use_box_chars(1);
-  $t->border_style('Default::single_boxchar');
+  $t->border_style('UTF8::SingleLine');
   $t->columns(["ID", "Subject", "Type", "Priority", "Severity", "Status", "Author", "Worker"]);
   @stati=@{$self->show_status};
   for my $i (@issues)
@@ -103,7 +102,7 @@ App::Git::IssueManager::List - class implementing the add issue command of the G
 
 =head1 VERSION
 
-version 0.1
+version 0.2
 
 =head1 AUTHOR
 

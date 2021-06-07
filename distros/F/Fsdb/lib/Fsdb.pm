@@ -33,7 +33,7 @@ Fsdb - a flat-text database for shell scripting
 
 
 =cut
-our $VERSION = '2.71';
+our $VERSION = '2.73';
 
 =head1 SYNOPSIS
 
@@ -153,7 +153,8 @@ now the third column, not the second.
 
 =item *
 
-A series of actions are self-documenting (each program records what it does).
+A series of actions are self-documenting
+(the provenance of processsing done to produce each output is recorded in comments).
 
 =over 4
 
@@ -214,7 +215,7 @@ the shell) and look at the output.
 To the best of my knowledge, the original implementation of
 this idea was C</rdb>, a commercial product described in the book
 I<UNIX relational database management: application development in the UNIX environment>
-by Rod Manis, Evan Schaffer, and Robert Jorgensen (and
+by Rod Manis, Evan Schaffer, and Robert Jorgensen (1988 by Prentice Hall, and
 also at the web page L<http://www.rdb.com/>).  Fsdb is an incompatible
 re-implementation of their idea without any accelerated indexing or
 forms support.  (But it's free, and probably has better statistics!).
@@ -235,34 +236,19 @@ L<http://www.isi.edu/~johnh/SOFTWARE/FSDB/index.html>.
 
 =head1 WHAT'S NEW
 
-=head2 2.71, 2020-11-16
-Fix a race condition breaking test suites.
+=head2 2.73, 2021-05-18
+Updates dbcolpercentile with C<--weighted>, and with more ipv6.
 
 =over 4
 
-=item BUG FIX
+=item ENHANCEMENT
 
-Suppress a race condition in L<dbcolmerge> was sometimes throwing the error
-"Fsdb::Support::Freds: ending, but running process: dbmerge:xargs"
-in the dbmerge_0_xargs test case, on exit.
+L<dbcolpercentile> now has a C<--weighted> option.
 
 =item ENHANCEMENT
 
-L<dbcolcreate> now supports C<--header>.
-
-=item BUG FIX
-
-Fixed several spelling errors in deprecated programs
-and removed information about the no-longer existing FreeBSD and MacOS ports.
-Thanks to Calvin Ardi for the patch.
-
-=item BUG FIX
-
-L<dbmerge> now handles --xargs when only one file is provided
-(and passes the file through unchanged).
-It also throws a clean error with --xargs if zero files are provided.
-(To support L<dbmerge>, L<dbcol> now has an internal C<--saveoutput> option.)
-Thanks to Yuri Pradkin for reporting the unhandled corner-case.
+The new L<Fsdb::Support::IPv6> package includes
+ipv6_zeroize and ipv6_normalize to rewrite ipv6 print addresses.
 
 =back
 
@@ -3670,6 +3656,38 @@ It also throws a clean error with --xargs if zero files are provided.
 Thanks to Yuri Pradkin for reporting the unhandled corner-case.
 
 =back
+
+=head2 2.71, 2020-11-16
+Fix a race condition breaking test suites.
+
+=over 4
+
+=item BUG FIX
+
+Suppress a race condition in L<dbcolmerge> was sometimes throwing the error
+"Fsdb::Support::Freds: ending, but running process: dbmerge:xargs"
+in the dbmerge_0_xargs test case, on exit.
+
+=back
+
+=head2 2.72, 2020-12-01
+A small bug and a packaging improvement.
+
+=over 4
+
+=item BUG FIX
+
+L<dbcolhisto> now handles the degenerate case where 
+everything has the same value (previously it would throw
+"illegal division by zero").
+
+=item ENHANCEMENT
+
+The spec for Fedora now includes C<make> as BuildRequires,
+something required for Fedora 34.
+
+=back
+
 
 =head1 AUTHOR
 

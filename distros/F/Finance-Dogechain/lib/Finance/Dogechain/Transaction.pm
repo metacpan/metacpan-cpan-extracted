@@ -1,23 +1,29 @@
 package Finance::Dogechain::Transaction;
-$Finance::Dogechain::Transaction::VERSION = '1.20210418.2306';
+$Finance::Dogechain::Transaction::VERSION = '1.20210605.1754';
 use Mojo::Base -base, -signatures, 'Finance::Dogechain::Base';
 use Finance::Dogechain::Address;
 
 has 'tx_id';
-
-sub transaction($self) {
+has 'transaction', sub($self) {
     my $tx = $self->return_field_if_success( '/transaction/' . $self->tx_id, 'transaction' );
 
-    if ($tx) {
-        $self->convert_addresses_in_place( $tx->{inputs}, $tx->{outputs} );
-    }
+    convert_addresses_in_place( $tx->{inputs}, $tx->{outputs} ) if $tx;
 
     return $tx;
+};
+
+sub inputs($self) {
+    return $self->transaction->{inputs};
 }
 
-sub convert_addresses_in_place($self, @items) {
+sub outputs($self) {
+    return $self->transaction->{outputs};
+}
+
+sub convert_addresses_in_place(@items) {
     while (my $items = shift @items) {
         for my $item (@$items) {
+            say $item->{address};
             $item->{address} = Finance::Dogechain::Address->new( address => $item->{address} );
         }
     }
@@ -39,12 +45,12 @@ Finance::Dogechain::Transaction - class representing transactions in the Dogecha
 
     use Finance::Dogechain::Transaction;
 
-    my $tx = Finance::Dogechain::Transaction(
+    my $tx = Finance::Dogechain::Transaction->new(
         tx_id => '9b7707711014114bdfc6352d803e3175a8dfa25eb2b7fcfb6e29e0a031cf2d27'
     );
 
-    for my $input_address  (map { $_->{address} $tx->{inputs}->@*)  { ... }
-    for my $output_address (map { $_->{address} $tx->{outputs}->@*) { ... }
+    for my $input_address  (map { $_->{address} } $tx->inputs->@*)  { ... }
+    for my $output_address (map { $_->{address} } $tx->outputs->@*) { ... }
 
 =head1 DESCRIPTION
 
@@ -83,6 +89,14 @@ Returns an undefined value (C<undef> in scalar context or an empty list in list
 context) if the HTTP call did not succeed.
 
 Returns C<0> if the HTTP call did succeed but the API returned an unsuccessful payload.
+
+=head2 inputs()
+
+Returns a reference to an array of hashes representing transaction inputs.
+
+=head2 outputs()
+
+Returns a reference to an array of hashes representing transaction outputs.
 
 =head2 TO_JSON()
 

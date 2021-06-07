@@ -1,6 +1,8 @@
 use strict;
 
-use Test::More tests => 3;
+use Test2::V0;
+
+plan tests => 3;
 
 use Test::Requires 'JSON::MaybeXS';
 
@@ -30,7 +32,7 @@ sub Path::Tiny::spew_utf8 { $file = $_[1]; }
 
     use Test::More;
 
-    use File::Serialize { pretty => 0 }; 
+    use File::Serialize { pretty => 0 };
 
     serialize_file( "foo.json" => { a => 'b' } );
 

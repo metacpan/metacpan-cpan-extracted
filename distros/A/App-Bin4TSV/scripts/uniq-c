@@ -1,0 +1,147 @@
+#!/usr/bin/perl
+use 5.001 ; use strict ; use warnings ;
+use Getopt::Std ; getopts '01y:!.:,:~@:' , \my%o ;
+use Term::ANSIColor qw[ color :constants ] ; $Term::ANSIColor::AUTORESET = 1 ;
+use FindBin qw[ $Script ] ;
+
+sub sigint () ; # Ctrl-C が押下された時の動作
+sub dtfmtlocal () ; # 現在の日時を返す
+sub choreOpt () ; # コマンド引数の処理
+sub mainCore() ; 
+sub y_init () ; 
+sub y_filter ($) ;
+sub cyc_rep () ;
+
+my $printOut ; # 各行でどういう出力処理をするか。オプションで書き換わる。
+my $prevline ; # 直前行の内容
+my $count = 1 ;
+my @y_ranges ; 
+my $cyc_len = $o{'@'} // 1e5 ; # 何行毎にレポートを発生させるか。
+my ( $time0 , $time00 ) = ( time ) x 2 ; 
+
+y_init ; 
+choreOpt ;
+mainCore ; 
+
+sub mainCore () { 
+    $SIG{INT} = \&sigint ;
+    chomp ( $prevline = <> ) ;
+    $count = 1 ; 
+    while ( <> ) {
+      cyc_rep if $cyc_len && $. % $cyc_len == 0 ; 
+      chomp ; 
+      if ( $prevline eq $_ && $count != $o{'.'} ) {
+          $count ++ ;
+          next ;
+      }
+      $printOut -> () if y_filter ( $count ) ; 
+      $count = 1 ;
+      $prevline = $_  ;
+    }
+    $printOut -> () if y_filter ( $count ) ; 
+}
+
+sub choreOpt () { 
+    $| = 1 if $o{'!'} ;
+    $o{'.'} //= 0 ;
+    $o{','} = do { $o{','}//= "\t"  ; eval qq[qq[$o{','}]] } ; 
+    
+    $printOut = 
+        $o{0} ? 
+            sub { print "$prevline$/" } :
+        $o{1} ?
+            sub { print "$count$/" } : 
+        $o{'~'} ? 
+            sub { print "$prevline$o{','}$count$/" } :  
+            sub { print "$count$o{','}$prevline$/" } ;  
+}
+
+sub sigint () {
+    alarm 0 ;
+    print STDERR $/ , color('yellow') , "$count+\t$prevline\t" , dtfmtlocal , "($Script)" ,"$/" , color( 'reset') ;
+    $SIG{INT} = sub { sigint ; die "`$Script' stopped because of double `Ctrl-C' signals within 1 second.\n" } ;
+    alarm 1 ;
+    $SIG{ALRM} = sub { $SIG{ INT } = \&sigint } ;
+}
+
+sub dtfmtlocal () {
+    my @f = @{[localtime]}[5,4,3,2,1,0] ;
+    $f[0] += 1900 ;
+    $f[1] += 1 ;
+    return sprintf ( "%04u-%02u-%02u %02u:%02u:%02u" , @f ) ;
+}
+
+# 次の2個の関数は、出力すべき値の範囲をフィルターの様に指定する。
+sub y_init ( ) { 
+    $o{y} //= '' ;
+    my @ranges = split /,/ , $o{y} , -1 ; 
+    grep { $_ = $_ . ".." . $_ unless m/\.\./ } @ranges ; # .. で囲まれていない数 x は x..xに書き換え
+    for ( @ranges ) { 
+        m/^(\d*)\.\.(\d*)/ ; 
+        push @y_ranges , [  ( $1 || 1 ) ,  ( $2 || "Inf" ) ] ; 
+    }
+}
+
+sub y_filter ( $ ) { 
+    return not 0 unless @y_ranges ; # 指定が無かった場合はとにかく真を変えす。
+    for ( @y_ranges ) { 
+        return not 0 if $_->[0] <= $_[0] && $_[0] <= $_->[1] ;
+    }
+    return not 1 ; 
+}
+
+sub cyc_rep ( ) {
+    use FindBin '$Script' ;
+    $| = 1 ; 
+    my $num = $. ; 
+    $num =~ s/(?<=\d)(?=(\d\d\d)+($|\D))/,/g ; # 3桁毎にコンマで区切る
+    print STDERR GREEN $num , ":\t" , sprintf "%02d:%02d:%02d" , ( localtime )[2,1,0] ;  #  <-- 標準出力に書込み
+    print STDERR "\t" , GREEN  time - $time0 , " sec.\t($Script)" ; 
+    $time0 = time ;
+    print STDERR "\n" ;
+}
+
+# ヘルプの扱い
+sub VERSION_MESSAGE {}
+sub HELP_MESSAGE {
+    use FindBin qw[ $Script ] ; 
+    $ARGV[1] //= '' ;
+    open my $FH , '<' , $0 ;
+    while(<$FH>){
+        s/\$0/$Script/g ;
+        print $_ if s/^=head1// .. s/^=cut// and $ARGV[1] =~ /^o(p(t(i(o(ns?)?)?)?)?)?$/i ? m/^\s+\-/ : 1;
+    }
+    close $FH ;
+    exit 0 ;
+}
+
+
+=encoding utf8
+
+=head1
+ $0
+
+  Unixコマンドの  uniq を使った uniq -c の代替。
+  同じ入力が連続して何個続いた火を出力する。
+  実行中に Ctrl+Cキーを押したら途中までの結果を表示する。
+  (文字コードの問題で uniq がうまく機能しない場合も使える。)
+
+オプション :
+
+ [入力上のオプション]
+  -, str : 個数とそれに対応する文字列の区切りを str に変更。未指定ならタブ文字。
+  -. num  : 同じ行がnum行に達するごとに表示をして、カウントを連続個数にリセット。
+
+ [出力上のオプション]
+  -0  : 個数を表示せずに、同一であるとみなした行のみを1行表示する。
+  -1  : 個数のみ表示する。
+  -~  : 個数を行の先頭ではなくて、末尾に表示する。
+  -!  : 出力をバッファにためずに、すぐフラッシュアウトするようにする。
+  -y ranges : 個数を出力する際に、出力する値の範囲をranges で値の範囲を指定できる。範囲は,と..で指定する。
+
+ [副次的な情報出力についてのオプション]
+  -@ num : 一定行数を読み取る毎に、補助情報を表示。未指定なら1000万行ずつ。出力しない場合は 0 を指定。  
+
+
+=cut
+

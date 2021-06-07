@@ -3,7 +3,6 @@ use strict;
 use warnings;
 
 # PODCLASSNAME
-# VERSION
 
 resume Tester {
 

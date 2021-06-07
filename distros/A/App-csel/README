@@ -1,0 +1,11 @@
+
+This module provides a Unix-like command `csel'. 
+It proves easier interface than AWK by using -p, -d, -h, -t options of `csel'.
+
+=head1 DESCRIPTION
+
+
+
+ Copyright (c) 2021 Toshiyuki SHIMONO. All rights reserved.
+ This program is free software; you can redistribute it and/or
+ modify it under the same terms as Perl itself.

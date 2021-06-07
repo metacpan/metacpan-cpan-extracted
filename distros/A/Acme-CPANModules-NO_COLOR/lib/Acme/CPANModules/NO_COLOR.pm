@@ -1,7 +1,9 @@
 package Acme::CPANModules::NO_COLOR;
 
-our $DATE = '2020-02-18'; # DATE
-our $VERSION = '0.004'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2021-05-09'; # DATE
+our $DIST = 'Acme-CPANModules-NO_COLOR'; # DIST
+our $VERSION = '0.005'; # VERSION
 
 our $LIST = {
     summary => "Modules that follow the NO_COLOR convention",
@@ -16,6 +18,7 @@ If you know of other modules that should be listed here, please contact me.
 
 _
     entries => [
+        {module=>'App::DiffTarballs'},
         {module=>'App::hr'},
         {module=>'Color::ANSI::Util'},
         {module=>'Data::Dump::Color'},
@@ -49,11 +52,9 @@ Acme::CPANModules::NO_COLOR - Modules that follow the NO_COLOR convention
 
 =head1 VERSION
 
-This document describes version 0.004 of Acme::CPANModules::NO_COLOR (from Perl distribution Acme-CPANModules-NO_COLOR), released on 2020-02-18.
+This document describes version 0.005 of Acme::CPANModules::NO_COLOR (from Perl distribution Acme-CPANModules-NO_COLOR), released on 2021-05-09.
 
 =head1 DESCRIPTION
-
-Modules that follow the NO_COLOR convention.
 
 The NO_COLOR convention (see https://no-color.org) lets user disable color
 output of console programs by defining an environment variable called NO_COLOR.
@@ -62,9 +63,11 @@ that programs should not use colored output.
 
 If you know of other modules that should be listed here, please contact me.
 
-=head1 INCLUDED MODULES
+=head1 ACME::CPANMODULES ENTRIES
 
 =over
+
+=item * L<App::DiffTarballs>
 
 =item * L<App::hr>
 
@@ -92,10 +95,17 @@ If you know of other modules that should be listed here, please contact me.
 
 =head1 FAQ
 
-=head2 What are ways to use this module?
+=head2 What is an Acme::CPANModules::* module?
 
-Aside from reading it, you can install all the listed modules using
-L<cpanmodules>:
+An Acme::CPANModules::* module, like this module, contains just a list of module
+names that share a common characteristics. It is a way to categorize modules and
+document CPAN. See L<Acme::CPANModules> for more details.
+
+=head2 What are ways to use this Acme::CPANModules module?
+
+Aside from reading this Acme::CPANModules module's POD documentation, you can
+install all the listed modules (entries) using L<cpanmodules> CLI (from
+L<App::cpanmodules> distribution):
 
     % cpanmodules ls-entries NO_COLOR | cpanm -n
 
@@ -103,9 +113,13 @@ or L<Acme::CM::Get>:
 
     % perl -MAcme::CM::Get=NO_COLOR -E'say $_->{module} for @{ $LIST->{entries} }' | cpanm -n
 
-This module also helps L<lcpan> produce a more meaningful result for C<lcpan
-related-mods> when it comes to finding related modules for the modules listed
-in this Acme::CPANModules module.
+or directly:
+
+    % perl -MAcme::CPANModules::NO_COLOR -E'say $_->{module} for @{ $Acme::CPANModules::NO_COLOR::LIST->{entries} }' | cpanm -n
+
+This Acme::CPANModules module also helps L<lcpan> produce a more meaningful
+result for C<lcpan related-mods> command when it comes to finding related
+modules for the modules listed in this Acme::CPANModules module.
 
 =head1 HOMEPAGE
 
@@ -135,7 +149,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020, 2018 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2020, 2018 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -21,4 +21,18 @@ eval "use Pod::Coverage $min_pc";
 plan skip_all => "Pod::Coverage $min_pc required for testing POD coverage"
     if $@;
 
-all_pod_coverage_ok();
+#JWT:WE WANT TO SKIP POD COVERAGE ON "PRIVATE" MODULES LIKE "StreamFinder::_Class"!:
+my @submodules = all_modules();
+my $testplan = 0;
+#1: CALCULATE # MODULES WE WANT TO TEST:
+foreach my $submodule (@submodules) {
+	$testplan++  unless ($submodule =~ /\:\:\_/o);
+}
+
+#TEST ALL NON-PRIVATE MODULES:
+plan tests => $testplan;
+foreach my $submodule (@submodules) {
+	pod_coverage_ok($submodule)  unless ($submodule =~ /\:\:\_/o);
+}
+
+#all_pod_coverage_ok();  #JWT:SEEMS 2B NO WAY TO EXCLUDE SPECIFIC MODULES?!

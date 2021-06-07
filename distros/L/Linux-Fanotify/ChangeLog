@@ -1,12 +1,16 @@
 Change log for Linux::Fanotify
 
-20140717	[ 1.0 ]
-	- Initial release
+20210520	[ 1.2.0 ]
+	- Fix memory leak in event allocation
+
+20150804	[ 1.1.1 ]
+	- Improve "make test" behavior on machines w/o fanotify support
+	- (no functional modification)
 
 20140722	[ 1.1 ]
 	- New autoclose variables for events and fanotify groups
 	- Documentation updates
 
-20150804	[ 1.1.1 ]
-	- Improve "make test" behavior on machines w/o fanotify support
-	- (no functional modification)
+20140717	[ 1.0 ]
+	- Initial release
+

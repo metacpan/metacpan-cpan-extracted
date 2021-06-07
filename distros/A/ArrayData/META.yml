@@ -29,7 +29,7 @@ resources:
   bugtracker: https://github.com/perlancar/perl-ArrayData/issues
   homepage: https://metacpan.org/release/ArrayData
   repository: git://github.com/perlancar/perl-ArrayData.git
-version: 0.2.2
+version: 0.2.3
 x_Dist_Zilla:
   perl:
     version: '5.030000'

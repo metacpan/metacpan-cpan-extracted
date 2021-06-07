@@ -1,0 +1,15 @@
+
+1.0.0   2021-06-05
+   [Changed]
+     - Ported module Rex::Ext::TemplateToolkit from rex-recipes to CPAN
+       and renamed it to Rex::Template::TT (overwriting the original, less
+       feature-rich version by Jan Gehring -- with his permission)
+     - Abort processing on error (instead of logging an error and continuing)
+   [Fixed]
+     - Syntax error in match operator ('~=' instead of '=~')
+     - Don't try to resolve scalar refs passed into `template_toolkit()` to
+       on-disk paths (they are meant to provide template content in-memory)
+   [Added]
+     - GitHub Actions based Continuous Integration
+     - Tests for `template_toolkit()` and integration with Rex's `template()`
+

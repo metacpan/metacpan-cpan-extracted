@@ -1,9 +1,9 @@
 package ArrayDataRole::Source::Iterator;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-05-03'; # DATE
+our $DATE = '2021-05-10'; # DATE
 our $DIST = 'ArrayDataRoles-Standard'; # DIST
-our $VERSION = '0.005'; # VERSION
+our $VERSION = '0.006'; # VERSION
 
 use 5.010001;
 use Role::Tiny;
@@ -100,7 +100,7 @@ ArrayDataRole::Source::Iterator - Get array data from an iterator
 
 =head1 VERSION
 
-This document describes version 0.005 of ArrayDataRole::Source::Iterator (from Perl distribution ArrayDataRoles-Standard), released on 2021-05-03.
+This document describes version 0.006 of ArrayDataRole::Source::Iterator (from Perl distribution ArrayDataRoles-Standard), released on 2021-05-10.
 
 =head1 SYNOPSIS
 

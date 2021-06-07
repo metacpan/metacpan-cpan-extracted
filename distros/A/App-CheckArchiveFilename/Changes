@@ -1,15 +1,19 @@
-Revision history for App-CheckArchiveFilename
+0.004   2021-05-25  Released-By: PERLANCAR; Urgency: high
 
-0.003   2016-09-09 (PERLANCAR)
+	- [build] Rebuild to update Sah coercion module names (old Sah coercion
+          modules have been purged from CPAN).
+
+
+0.003   2016-09-09  Released-By: PERLANCAR
 
 	- [ux] Some columns have not been positioned.
 
 
-0.002   2016-09-09 (PERLANCAR)
+0.002   2016-09-09  Released-By: PERLANCAR
 
 	- Also show compressor types for compressed non-archives.
 
 
-0.001   2016-09-09 (PERLANCAR)
+0.001   2016-09-09  Released-By: PERLANCAR
 
         - First release.

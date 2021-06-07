@@ -2,7 +2,7 @@
 
 use strict; use warnings;
 
-use Test::More tests => 6;
+use Test::More;
 
 use Test::Excel;
 use File::Spec::Functions;
@@ -37,6 +37,18 @@ is(compare_excel(
     { sheet => 'MySheet2|MySheet3', tolerance => 10**-12, sheet_tolerance => 0.20 }
 ), 1);
 
+is(compare_excel(
+    catfile('t', 'got-9.xls'),
+    catfile('t', 'exp-9.xls'),
+    { spec => catfile('t', 'spec-4.txt') }
+), 1);
+
+is(compare_excel(
+    catfile('t', 'got-10.xls'),
+    catfile('t', 'exp-10.xls'),
+    { spec => catfile('t', 'spec-4.txt') }
+), 0);
+
 eval
 {
     compare_excel(
@@ -46,3 +58,5 @@ eval
     );
 };
 like($@, qr/ERROR: Invalid format data/);
+
+done_testing;

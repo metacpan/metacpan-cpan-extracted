@@ -1,0 +1,13 @@
+% layout 'zapp';
+<h2><%= $heading %></h2>
+<p>Add a note about why this is happening:</p>
+%= form_for $next, class => 'form', => begin
+    <div class="form-group">
+        <label>Note text</label>
+        %= text_area 'note', class => 'form-control'
+    </div>
+    <div class="form-row justify-content-end">
+        %= link_to 'Cancel', 'zapp.get_run', class => 'btn btn-secondary'
+        <button class="btn btn-primary"><%= $heading %></button>
+    </div>
+% end

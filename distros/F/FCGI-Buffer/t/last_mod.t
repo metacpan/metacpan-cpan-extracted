@@ -3,7 +3,7 @@
 # Check FCGI::Buffer correctly sets the Last-Modified header when requested
 
 # Running like this will test this script works without some modules installed
-#	perl -MTest::Without::Module=CHI -w -Iblib/lib t/last_mod.t 
+#	perl -MTest::Without::Module=CHI -w -Iblib/lib t/last_mod.t
 #	perl -MTest::Without::Module=DateTime::Format::HTTP -w -Iblib/lib t/last_mod.t
 
 use strict;

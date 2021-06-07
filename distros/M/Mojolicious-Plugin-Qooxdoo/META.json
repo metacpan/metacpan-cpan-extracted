@@ -52,6 +52,6 @@
          "url" : "https://github.com/oetiker/Mojolicious-Plugin-Qooxdoo"
       }
    },
-   "version" : "v1.0.11",
+   "version" : "v1.0.12",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

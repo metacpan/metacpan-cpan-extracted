@@ -6,7 +6,7 @@
 use v5.26;
 use Object::Pad 0.35;
 
-package Device::Chip::Adapter 0.16;
+package Device::Chip::Adapter 0.18;
 role Device::Chip::Adapter :repr(HASH) :compat(invokable);
 
 use utf8;
@@ -492,6 +492,25 @@ Performs a complete I²C transaction to first send the given bytes to the slave
 chip then reads the give number of bytes back, returning them. These two
 operations must be performed within a single I²C transaction using a repeated
 start condition.
+
+=head2 txn
+
+   $result = await $i2c->txn( async sub {
+      my ( $helper ) = @_;
+      ...
+   } );
+
+Performs a complete custom I²C transaction. Within the code block invoked by
+the transaction, the C<write> and C<read> methods may be called on the passed
+C<$helper> instance, but they will B<not> cause stop conditions to be sent on
+the wire. A stop condition will be sent after the code has finished. The
+return value from this method will be whatever is returned by the inner code
+block.
+
+This method acts as a mutex lock, ensuring only one transaction can run
+concurrently. This mutex is also used by the C<read>, C<write> and
+C<write_then_read> methods (which may optionally be implemented in terms of
+the C<txn> method internally).
 
 =cut
 

@@ -3,7 +3,8 @@
 # MATLAB to use familiar syntax to create arrays, (2) to allow
 # cut-n-paste of PDL print output as input for scripts and programs,
 # and (3) to allow easy ways to construct nan and inf values in ndarrays.
-#
+# (4) to allow complex numbers to be round-tripped in native
+# complex (i.e. Math::Complex) format
 
 use strict;
 use warnings;
@@ -49,10 +50,28 @@ $expected = pdl(1.2e3, 4, 5.e-7);
 $got = pdl q[1.2e3 4 5.e-7];
 ok(all($got == $expected), "Correctly interprets [1.2e3 4 5.e-7]");
 
+for (
+  '[i 1-i]',
+  ['[-i 1 -i]', qr/(-0)?-i 1 (-0)?-i/],
+  ['[-i 1 -i 1]', qr/(-0)?-i 1 (-0)?-i 1/],
+  ['[-i 1-i 1]', qr/(-0)?-i 1-i 1/],
+  '[i 1+i]',
+  ['[i 1 +i]', '[i 1 i]'],
+  ['[i 2e+2+i]', '[i 200+i]'],
+  ['[i 2e2+i]', '[i 200+i]'],
+  '[2i 1-2i]',
+  '[2i 1+2i]',
+  '[0.5-2i 1.5-2i]',
+  '[0.5 0.5-2i 2i 1.5 1.5-2i]',
+) {
+  my ($input, $expected) = ref($_) ? @$_ : ($_, $_);
+  my $got = eval { pdl($input).'' };
+  is $@, '', "parsed '$input' with no exception";
+  $expected = qr/\A\Q$expected\E\z/ if !ref $expected;
+  like $got, $expected, "complex number round-tripped '$input'";
+}
+
 # Signs and operators #
-# This functionality does not with the parsed (as opposed to eval'd) method
-# for building the pdl-from-string. I'm commenting out the tests that will
-# fail.
 # Now some more interesting tests
 my $t5 = pdl "[1 -4]";
 $compare = pdl [1, -4];
@@ -153,9 +172,9 @@ ok($bad_values->at(2) == -$bad_values->at(1), "negative inf is numerically equal
 ok($bad_values->isbad->at(3), 'properly handles bad values')
 	or diag("Third bad value should be BAD but it describes itself as " . $bad_values->slice(3));
 
-my $infty = pdl 'inf';
-my $min_inf = pdl '-inf';
-my $nan = pdl 'nan';
+my $infty = inf();
+my $min_inf = -inf();
+my $nan = nan();
 
 my $nan2 = $^O =~ /MSWin32/i && !$ActivePerl::VERSION && $Config{cc} ne 'cl' ? pdl (-((-1) ** 0.5))
                              : pdl '-nan';
@@ -261,6 +280,10 @@ ok(all($got == $expected), 'q[1 pi] returns [1 4*atan2(1,1)]')
 	or diag("Got $got");
 $got = pdl q[1 PI];
 ok(all($got == $expected), 'q[1 PI] returns [1 4*atan2(1,1)]')
+	or diag("Got $got");
+$expected = pdl(4 * atan2(1,1), 1);
+$got = pdl q[pi 1];
+ok(all($got == $expected), 'q[pi 1] returns [4*atan2(1,1) 1]')
 	or diag("Got $got");
 
 # Security checks #

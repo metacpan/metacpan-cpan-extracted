@@ -1,6 +1,6 @@
 package Bio::Palantir::Parser::Cluster;
 # ABSTRACT: BiosynML DTD-derived internal class
-$Bio::Palantir::Parser::Cluster::VERSION = '0.201670';
+$Bio::Palantir::Parser::Cluster::VERSION = '0.211420';
 use Moose;
 use namespace::autoclean;
 
@@ -159,7 +159,7 @@ Bio::Palantir::Parser::Cluster - BiosynML DTD-derived internal class
 
 =head1 VERSION
 
-version 0.201670
+version 0.211420
 
 =head1 SYNOPSIS
 

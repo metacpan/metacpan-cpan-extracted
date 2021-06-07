@@ -15,13 +15,13 @@
 #
 #=============================================================================
 
-use 5.014_001;
-
 package Term::CLI::L10N::nl;
 
-our $VERSION = 0.052001;
+use 5.014;
+use strict;
+use warnings;
 
-use Modern::Perl 1.20140107;
+our $VERSION = 0.052003;
 
 use parent 0.228 qw( Term::CLI::L10N );
 
@@ -301,7 +301,7 @@ Term::CLI::L10N::nl - Dutch localizations for Term::CLI
 
 =head1 VERSION
 
-version 0.052001
+version 0.052003
 
 =head1 SYNOPSIS
 

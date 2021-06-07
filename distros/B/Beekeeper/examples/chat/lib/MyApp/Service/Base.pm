@@ -6,39 +6,33 @@ use warnings;
 use Beekeeper::Worker ':log';
 use base 'Beekeeper::Worker';
 
-use Carp;
-
 
 # Common base class for all MyApp services
 
 sub authorize_request {
     my ($self, $req) = @_;
 
-    if ($req->{method} eq 'myapp.auth.login') {
-        return REQUEST_AUTHORIZED;
-    }
+    my $uuid = $self->get_authentication_data;
 
-    my ($uuid) = $req->get_auth_tokens;
-
+    # Require an user logged in
     return unless $uuid;
 
-    return REQUEST_AUTHORIZED;
+    # Create a per request stash 
+    $self->{stash} = { uuid => $uuid };
+
+    return BKPR_REQUEST_AUTHORIZED;
 }
 
-sub set_current_user_uuid {
-    my ($self, $uuid) = @_;
+sub setup_myapp_stuff {
+    my ($self) = @_;
 
-    croak "Invalid uuid $uuid" unless ($uuid =~ m/^[\w-]+$/);
-
-    $self->set_auth_tokens( $uuid, 'CHAT_USER' );
+    # $self->{dbh} = DBI->connect ...
+    # $self->{cache} = Cache->new ...
 }
 
-sub get_current_user_uuid {
-    my $self = shift;
-
-    my ($uuid) = $self->get_auth_tokens;
-
-    return $uuid;
-}
+sub dbh   { $_[0]->{dbh}   }
+sub cache { $_[0]->{cache} }
+sub stash { $_[0]->{stash} }
+sub uuid  { $_[0]->{stash}->{uuid} }
 
 1;

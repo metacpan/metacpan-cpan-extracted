@@ -28,7 +28,7 @@ resources:
   bugtracker: https://github.com/perlancar/perl-Log-ger-Output-Screen/issues
   homepage: https://metacpan.org/release/Log-ger-Output-Screen
   repository: git://github.com/perlancar/perl-Log-ger-Output-Screen.git
-version: '0.016'
+version: '0.017'
 x_Dist_Zilla:
   perl:
     version: '5.030000'

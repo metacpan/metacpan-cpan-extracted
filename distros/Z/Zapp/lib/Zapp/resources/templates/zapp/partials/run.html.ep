@@ -1,0 +1,49 @@
+<%
+    use Time::Piece;
+    my %state_badge_class = (
+        inactive => 'badge badge-primary',
+        active => 'badge badge-primary',
+        killed => 'badge badge-secondary',
+        failed => 'badge badge-danger',
+        stopped => 'badge badge-warning',
+        finished => 'badge badge-success',
+    );
+    my $since = sub {
+        my ( $dt ) = @_;
+        my $since = time - Time::Piece->strptime( $dt, '%Y-%m-%d %H:%M:%S' )->epoch;
+        return $since < 30 ? 'a few seconds ago'
+            : $since < 90 ? 'a minute ago'
+            : $since < 300 ? 'a few minutes ago'
+            : $since < 3600 ? sprintf( '%d minutes ago', $since / 60 )
+            : $since < 86400 ? sprintf( '%d hours ago', $since / 3600 )
+            : $since < 86400 * 7 ? sprintf( '%d days ago', $since / 86400 )
+            : $since < 86400 * 30 ? sprintf( '%d weeks ago', $since / 86400 * 7 )
+            : $since < 86400 * 365 ? sprintf( '%d months ago', $since / 86400 * 30 )
+            : sprintf( '%d years ago', $since / 3600 * 24 * 365 )
+            ;
+    };
+%>
+% if ( $run->{finished} ) {
+    <a href="<%= url_for 'zapp.get_run', $run %>" data-run-finished class="btn btn-link">
+        <span data-run-state class="<%= $state_badge_class{ $run->{state} } %>"><%= $run->{state} %></span>
+        %= tag time => ( datetime => $run->{finished} ), begin
+            %= $since->( $run->{finished} )
+        % end
+    </a>
+% }
+% elsif ( $run->{started} ) {
+    <a href="<%= url_for 'zapp.get_run', $run %>" data-run-started class="btn btn-link">
+        <span data-run-state class="<%= $state_badge_class{ $run->{state} } %>">active</span> since
+        %= tag time => ( datetime => $run->{started} ), begin
+            %= $since->( $run->{started} )
+        % end
+    </a>
+% }
+% else {
+    <a href="<%= url_for 'zapp.get_run', $run %>" data-run-created class="btn btn-link">
+        <span data-run-state class="<%= $state_badge_class{ $run->{state} } %>">inactive</span> since
+        %= tag time => ( datetime => $run->{created} ), begin
+            %= $since->( $run->{created} )
+        % end
+    </a>
+% }

@@ -1,0 +1,88 @@
+#!perl
+
+our $DATE = '2021-05-22'; # DATE
+our $VERSION = '0.001'; # VERSION
+
+# FRAGMENT id=shcompgen-hint command=_cpanm-task
+
+use strict 'subs', 'vars';
+use warnings;
+
+use App::lcpan::Call;
+
+my @new_argv;
+for my $arg (@ARGV) {
+    # not a module name
+    unless ($arg =~ /\A[A-Za-z0-9_]+(::[A-Za-z0-9_]+)*\z/) {
+        push @new_argv, $arg;
+        next;
+    }
+    my $mod = $arg =~ /^Task::/ ? $arg : "Task::$arg";
+    push @new_argv, $mod;
+}
+
+print join(" ", "cpanm", @new_argv), "\n" if $ENV{DEBUG};
+system {"cpanm"} "cpanm", @new_argv;
+
+# ABSTRACT: Install Task modules
+# PODNAME: cpanm-task
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+cpanm-task - Install Task modules
+
+=head1 VERSION
+
+This document describes version 0.001 of cpanm-task (from Perl distribution App-cpanm-task), released on 2021-05-22.
+
+=head1 DESCRIPTION
+
+L<cpanm-task> is a simplistic wrapper over L<cpanm>. This command:
+
+ % cpanm-task -n Foo
+
+is equivalent to:
+
+ % cpanm -n Task::Foo
+
+Currently that's about it. This script only gives shell tab completion
+convenience.
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/App-cpanm-task>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-App-cpanm-task>.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-App-cpanm-task/issues>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 SEE ALSO
+
+L<cpanm-cpanmodules> from L<App::cpanm::cpanmodules>
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2021 by perlancar@cpan.org.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

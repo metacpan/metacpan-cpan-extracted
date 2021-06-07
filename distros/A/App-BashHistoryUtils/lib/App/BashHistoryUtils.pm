@@ -1,7 +1,7 @@
 package App::BashHistoryUtils;
 
-our $DATE = '2017-03-21'; # DATE
-our $VERSION = '0.06'; # VERSION
+our $DATE = '2021-05-26'; # DATE
+our $VERSION = '0.070'; # VERSION
 
 use 5.010001;
 use strict;
@@ -222,7 +222,7 @@ App::BashHistoryUtils - CLI utilities related to bash history file
 
 =head1 VERSION
 
-This document describes version 0.06 of App::BashHistoryUtils (from Perl distribution App-BashHistoryUtils), released on 2017-03-21.
+This document describes version 0.070 of App::BashHistoryUtils (from Perl distribution App-BashHistoryUtils), released on 2021-05-26.
 
 =head1 DESCRIPTION
 
@@ -245,7 +245,7 @@ This distribution includes the following CLI utilities:
 
 Usage:
 
- delete_bash_history_entries(%args) -> [status, msg, result, meta]
+ delete_bash_history_entries(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Delete matching entries from bash history file.
 
@@ -258,7 +258,7 @@ Arguments ('*' denotes required arguments):
 
 =over 4
 
-=item * B<histfile> => I<str> (default: "/home/s1/.bash_history")
+=item * B<histfile> => I<str> (default: "/home/u1/.bash_history")
 
 =item * B<ignore_case> => I<bool>
 
@@ -284,6 +284,7 @@ Match entries using a regex pattern.
 
 Strip timestamps.
 
+
 =back
 
 Special arguments:
@@ -292,27 +293,28 @@ Special arguments:
 
 =item * B<-dry_run> => I<bool>
 
-Pass -dry_run=>1 to enable simulation mode.
+Pass -dry_run=E<gt>1 to enable simulation mode.
 
 =back
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
+
 
 
 =head2 each_bash_history_entry
 
 Usage:
 
- each_bash_history_entry(%args) -> [status, msg, result, meta]
+ each_bash_history_entry(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Run Perl code for each bash history entry.
 
@@ -329,7 +331,7 @@ Perl code to run for each entry.
 Inside the code, you can set C<$PRINT> to 0 to suppress the output of the entry.
 You can modify C<$_> to modify the entry. C<$TS> (timestamp) is also available.
 
-=item * B<histfile> => I<str> (default: "/home/s1/.bash_history")
+=item * B<histfile> => I<str> (default: "/home/u1/.bash_history")
 
 =item * B<ignore_case> => I<bool>
 
@@ -347,25 +349,27 @@ Match entries younger than a certain age.
 
 Strip timestamps.
 
+
 =back
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
+
 
 
 =head2 grep_bash_history_entries
 
 Usage:
 
- grep_bash_history_entries(%args) -> [status, msg, result, meta]
+ grep_bash_history_entries(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Show matching entries from bash history file.
 
@@ -375,7 +379,7 @@ Arguments ('*' denotes required arguments):
 
 =over 4
 
-=item * B<histfile> => I<str> (default: "/home/s1/.bash_history")
+=item * B<histfile> => I<str> (default: "/home/u1/.bash_history")
 
 =item * B<ignore_case> => I<bool>
 
@@ -397,16 +401,17 @@ Match entries using a regex pattern.
 
 Strip timestamps.
 
+
 =back
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -420,7 +425,7 @@ Source repository is at L<https://github.com/perlancar/perl-App-BashHistoryUtils
 
 =head1 BUGS
 
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-BashHistoryUtils>
+Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-App-BashHistoryUtils/issues>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
@@ -436,7 +441,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017, 2016, 2015 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2017, 2016, 2015 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

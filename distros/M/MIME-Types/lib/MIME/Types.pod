@@ -254,8 +254,8 @@ missing, please contact the maintainer for inclusion.
 
 =head1 SEE ALSO
 
-This module is part of MIME-Types distribution version 2.20,
-built on April 22, 2021. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of MIME-Types distribution version 2.21,
+built on May 28, 2021. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 

@@ -166,13 +166,13 @@ TROUBLESHOOTING
   Ask For Help
 
     If none of these ideas work, then send me an email, and I may be able to
-    get it functioning for you.  Please run the F<dump.pl> script inside the
+    get it functioning for you.  Please run the "dump.pl" script inside the
     "examples" directory inside this module's package:
 
        perl dump.pl
 
-    Please include the dump file it creates (dump.log) B<as an attachment> to
-    your email.  Please do I<not> include it inline as part of the message
+    Please include the dump file it creates (dump.log) as an attachment to
+    your email.  Please do not include it inline as part of the message
     text.
 
     Also, please include a copy of your code (or at least the portion of it
@@ -191,5 +191,5 @@ TROUBLESHOOTING
     will help you.  Please be patient, as I do have other responsibilities
     that may delay a response, but a response will come.
 
-    ** Making the subject of your email "B<PERL GFB HELP>" is most helpful for
+    ** Making the subject of your email "PERL GFB HELP" is most helpful for
        me, and likely will get your email seen sooner.

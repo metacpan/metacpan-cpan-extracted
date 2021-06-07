@@ -1,5 +1,5 @@
 package Photonic::Roles::ReorthogonalizeC;
-$Photonic::Roles::ReorthogonalizeC::VERSION = '0.015';
+$Photonic::Roles::ReorthogonalizeC::VERSION = '0.016';
 
 =encoding UTF-8
 
@@ -9,7 +9,7 @@ Photonic::Roles::ReorthogonalizeC
 
 =head1 VERSION
 
-version 0.015
+version 0.016
 
 =head1 COPYRIGHT NOTICE
 
@@ -123,12 +123,12 @@ use Moose::Role;
 
 has 'previous_W' =>(is=>'ro',
      writer=>'_previous_W', lazy=>1, init_arg=>undef,
-     default=>sub{(0+0*i)->(:,*1)},
+     default=>sub{r2C(0)->(:,*1)},
      documentation=>"Row of error matrix"
 );
 has 'current_W' =>(is=>'ro',
      writer=>'_current_W', lazy=>1, init_arg=>undef,
-     default=>sub{(0+0*i)->(:,*1)},
+     default=>sub{r2C(0)->(:,*1)},
      documentation=>"Row of error matrix"
 );
 has 'next_W' =>(is=>'ro',
@@ -155,9 +155,9 @@ has '_justorthogonalized'=>(
 sub _build_next_W {
     my $self=shift;
 #    my $g_np1=$self->next_g;
-#    return ($g_np1+0*i)->(:,*1);
+#    return r2C($g_np1)->(:,*1);
     my $g_n=$self->current_g;
-    return ($g_n+0*i)->(:,*1);
+    return r2C($g_n)->(:,*1);
 }
 
 around '_fullorthogonalize_indeed' => sub {
@@ -207,7 +207,7 @@ sub _checkorthogonalize {
 	$next_W=$next_W+_arg($next_W)*2*$self->normOp*$self->noise;
 	$next_W=$next_W/$self->next_b;
     }
-    $next_W=($self->noise+0*i)->(:,*1) if $n==1;
+    $next_W=r2C($self->noise)->(:,*1) if $n==1;
     $next_W=$next_W->transpose->append([[$self->noise],[0]])
 	->transpose->complex if $n>=2;
     $next_W=$next_W->transpose->append(r2C($self->next_g)->transpose)

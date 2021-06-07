@@ -310,8 +310,8 @@ the main page is sent.
 
 has 'Headers' => (
     is  => 'rw',
-    isa => ArrayRef
-        default => sub { [] },
+    isa => ArrayRef,
+    default => sub { [] },
 );
 
 sub AddHeader {

@@ -79,8 +79,8 @@ needed_output(
     undef, {
       $ok_str         => 'Got into the passwd hook',
       $not_forced_str => 'Did not force username',
-      "Exit before auth (user '$port', 0 fails)" =>
-          'SSH quit with a good username',
+      'Exit before auth from <' => 'SSH quit before auth',
+      "/(user '$port', 0 fails)" => 'SSH quit with a good username',
     }
   );
 
@@ -95,8 +95,8 @@ needed_output(
     undef, {
       $ok_str     => 'Got into the passwd hook',
       $forced_str => 'Did force username',
-      "Exit before auth (user '$port', 0 fails)" =>
-          'SSH quit with an overridden bad username',
+      'Exit before auth from <' => 'SSH quit before auth',
+      "/(user '$port', 0 fails)" => 'SSH quit with an overridden bad username',
     }
   );
 

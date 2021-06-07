@@ -44,24 +44,26 @@
          }
       },
       "runtime" : {
+         "recommends" : {
+            "ExtUtils::F77" : "1.26",
+            "Inline" : "0.83",
+            "Inline::C" : "0.62",
+            "OpenGL" : "0.70"
+         },
          "requires" : {
             "Convert::UU" : "0",
             "Data::Dumper" : "2.121",
             "File::Map" : "0.57",
             "Filter::Simple" : "0.88",
             "Filter::Util::Call" : "0",
-            "Inline" : "0.83",
-            "Inline::C" : "0.62",
             "List::Util" : "1.33",
             "Math::Complex" : "0",
-            "OpenGL" : "0.70",
             "Pod::Parser" : "0",
             "Pod::Select" : "0",
             "Scalar::Util" : "0",
             "Storable" : "1.03",
             "Term::ReadKey" : "2.34",
             "Text::Balanced" : "1.89",
-            "autodie" : "0",
             "perl" : "5.010"
          },
          "suggests" : {
@@ -91,6 +93,6 @@
       },
       "x_IRC" : "irc://irc.perl.org/#pdl"
    },
-   "version" : "2.047",
+   "version" : "2.050",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

@@ -37,14 +37,10 @@ use Photonic::Geometry::FromB;
 use Photonic::WE::R2::Metric;
 use Photonic::WE::S::Metric;
 use Test::More tests => 9;
+use lib 't/lib';
+use TestUtils;
 
 #my $pi=4*atan2(1,1);
-
-sub agree {
-    my $a=shift;
-    my $b=shift//0;
-    return (($a-$b)*($a-$b))->sum<=1e-7;
-}
 
 my $B=zeroes(11)->xvals<5; #1D system
 my $g=Photonic::Geometry::FromB->new(B=>$B);

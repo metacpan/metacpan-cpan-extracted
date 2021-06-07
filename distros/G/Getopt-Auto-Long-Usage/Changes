@@ -1,0 +1,17 @@
+Revision history for Perl extension Getopt-Auto-Long-Usage
+
+0.03 2021-05-28T10:39:27Z
+
+    - fix descriptions for --no-*
+    - configurable ': '
+
+0.02 2021-05-26T13:34:42Z
+
+    - + bash2opt, bashgetopt
+    - docs
+
+0.01 2021-05-24T22:11:18Z
+
+    - original version
+
+

@@ -39,7 +39,7 @@ no_index:
 provides:
   Test::JSON::Schema::Acceptance:
     file: lib/Test/JSON/Schema/Acceptance.pm
-    version: '1.008'
+    version: '1.009'
 requires:
   Feature::Compat::Try: '0'
   File::ShareDir: '0'
@@ -65,10 +65,10 @@ resources:
   bugtracker: https://github.com/karenetheridge/Test-JSON-Schema-Acceptance/issues
   homepage: https://github.com/karenetheridge/Test-JSON-Schema-Acceptance
   repository: https://github.com/karenetheridge/Test-JSON-Schema-Acceptance.git
-version: '1.008'
+version: '1.009'
 x_Dist_Zilla:
   perl:
-    version: '5.033009'
+    version: '5.034000'
   plugins:
     -
       class: Dist::Zilla::Plugin::Run::BeforeBuild
@@ -597,7 +597,7 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::EnsureLatestPerl
       config:
         Dist::Zilla::Plugin::EnsureLatestPerl:
-          Module::CoreList: '5.20210420'
+          Module::CoreList: '5.20210520'
       name: '@Author::ETHER/EnsureLatestPerl'
       version: '0.008'
     -
@@ -761,7 +761,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v1.008
+          tag: v1.009
           tag_format: v%V
           tag_message: v%v%t
         Dist::Zilla::Role::Git::Repo:
@@ -946,7 +946,7 @@ x_authority: cpan:RELEQUEST
 x_contributors:
   - 'Karen Etheridge <ether@cpan.org>'
   - 'Daniel Perrett <dp13@sanger.ac.uk>'
-x_generated_by_perl: v5.33.9
+x_generated_by_perl: v5.34.0
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: MIT
 x_static_install: 0

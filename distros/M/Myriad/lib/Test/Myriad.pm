@@ -3,7 +3,7 @@ package Test::Myriad;
 use strict;
 use warnings;
 
-our $VERSION = '0.006'; # VERSION
+our $VERSION = '0.007'; # VERSION
 our $AUTHORITY = 'cpan:DERIV'; # AUTHORITY
 
 use IO::Async::Loop;
@@ -56,7 +56,7 @@ sub add_service {
     my ($pkg, $meta);
     if (my $service = delete $args{service}) {
         $pkg = $service;
-        $meta = $service->META;
+        $meta = Object::Pad::MOP::Class->for_class(ref $service);
     } elsif ($service = delete $args{name}) {
         die 'The name should look like a Perl package name' unless $service =~ /::/;
         $pkg  = $service;

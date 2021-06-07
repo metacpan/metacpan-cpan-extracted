@@ -1,5 +1,5 @@
 package Photonic::LE::S::OneH;
-$Photonic::LE::S::OneH::VERSION = '0.015';
+$Photonic::LE::S::OneH::VERSION = '0.016';
 
 =encoding UTF-8
 
@@ -9,7 +9,7 @@ Photonic::LE::S::OneH
 
 =head1 VERSION
 
-version 0.015
+version 0.016
 
 =head1 COPYRIGHT NOTICE
 
@@ -70,13 +70,13 @@ function $e and optional smallness parameter  $s.
 
 =back
 
-=head1 ACCESORS (read only)
+=head1 ACCESSORS (read only)
 
 =over 4
 
 =item * epsilon
 
-A PDL::Complex PDL giving the value of the dielectric function epsilon
+A complex PDL giving the value of the dielectric function epsilon
 for each pixel of the system
 
 =item * geometry Photonic::Types::GeometryG0
@@ -151,7 +151,7 @@ Returns 0, as there is no need to change sign.
 
 =item * _firstState
 
-Returns the fisrt state.
+Returns the first state.
 
 =back
 
@@ -162,35 +162,25 @@ use PDL::Lite;
 use PDL::NiceSlice;
 use PDL::FFTW3;
 use PDL::Complex;
-use List::Util;
 use Carp;
 use Photonic::Types;
-use Photonic::Utils qw(SProd);
+use Photonic::Utils qw(SProd any_complex);
 use Moose;
 use MooseX::StrictConstructor;
 
-has 'epsilon'=>(is=>'ro', isa=>'PDL::Complex', required=>1, lazy=>1,
-		builder=>'_epsilon');
 has 'geometry'=>(is=>'ro', isa => 'Photonic::Types::GeometryG0',
     handles=>[qw(B ndims dims r G GNorm L scale f pmGNorm)],required=>1
     );
 has 'complexCoeffs'=>(is=>'ro', init_arg=>undef, default=>1,
 		      documentation=>'Haydock coefficients are complex');
-with 'Photonic::Roles::OneH', 'Photonic::Roles::UseMask';
-
-sub _epsilon {
-    my $self=shift;
-    die "Coudln't obtain dielectric function from geometry" unless
-	$self->geometry->can('epsilon');
-    return $self->geometry->epsilon;
-}
+with 'Photonic::Roles::OneH', 'Photonic::Roles::UseMask', 'Photonic::Roles::EpsFromGeometry';
 
 #Required by Photonic::Roles::OneH
 
 sub _firstState { #\delta_{G0}
     my $self=shift;
-    my $v=PDL->zeroes(2,2,@{$self->dims})->complex; #ri:pm:nx:ny
-    my $arg="(0),:" . ",(0)" x $self->ndims; #(0),(0),... ndims+1 times
+    my $v=PDL->zeroes(2,@{$self->dims})->r2C; #ri:pm:nx:ny
+    my $arg=join ',', "(0)", ':', ("(0)") x $self->ndims; #(0),(0),... ndims+1 times
     $v->slice($arg).=1/sqrt(2);
     return $v;
 }
@@ -199,7 +189,7 @@ sub applyOperator {
     my $psi_G=shift;
     my $mask=undef;
     $mask=$self->mask if $self->use_mask;
-    confess "State should be complex" unless $psi_G->isa('PDL::Complex');
+    confess "State should be complex" unless any_complex($psi_G);
     #Each state is a spinor with two wavefunctions \psi_{k,G} and
     #\psi_{-k,G}, thus the index plus or minus k, pm.
     #Notation ri=real or imaginary, pm=+ or - k, xy=cartesian
@@ -214,11 +204,8 @@ sub applyOperator {
     # is the same.
     #Take inverse Fourier transform over all space dimensions,
     #thread over cartesian and pmk indices
-    #Notice that (i)fftn wants a real 2,nx,ny... piddle, not a complex
-    #one. Thus, I have to convert complex to real and back here and
-    #downwards.
     #real space ^G|psi>
-    my $Gpsi_R=ifftn($Gpsi_G->real, $self->ndims)->complex;
+    my $Gpsi_R=ifftn($Gpsi_G, $self->ndims);
     # $Gpsi_R is ri:nx:ny...i:pmk
     # $self->epsilon is ri:nx:ny...
     #Multiply by the dielectric function in Real Space. Thread
@@ -226,7 +213,7 @@ sub applyOperator {
     my $eGpsi_R=$self->epsilon*$Gpsi_R; #Epsilon could be tensorial!
     #$eGpsi_R is ri:nx:ny,...i:pmk
     #Transform to reciprocal space
-    my $eGpsi_G=fftn($eGpsi_R->real, $self->ndims)->complex->mv(-1,1);
+    my $eGpsi_G=fftn($eGpsi_R, $self->ndims)->mv(-1,1);
     #$eGpsi_G is ri:pmk:nx:ny...:i
     #Scalar product with pmGnorm: i:pm:nx:ny...
     my $GeGpsi_G=($eGpsi_G*$self->pmGNorm->mv(0,-1)) #^Ge^G|psi>

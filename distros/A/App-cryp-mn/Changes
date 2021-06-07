@@ -1,4 +1,10 @@
-0.003   2018-04-06 (PERLANCAR)
+0.004   2021-05-26  Released-By: PERLANCAR; Urgency: high
+
+	- [build] Rebuild to update Sah coercion module names (old Sah coercion
+          modules have been purged from CPAN).
+
+
+0.003   2018-04-06  Released-By: PERLANCAR
 
 	- [Incompatible change] Rename subcommand ls to ls-masternodes
 
@@ -10,13 +16,13 @@
 	- Add shcompgen hint to CLI.
 
 
-0.002   2018-04-03 (PERLANCAR)
+0.002   2018-04-03  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- Fix wording and copy-paste mistake.
 
 
-0.001   2018-04-03 (PERLANCAR)
+0.001   2018-04-03  Released-By: PERLANCAR
 
         - First, early release.

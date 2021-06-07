@@ -1,6 +1,10 @@
 Changelog for OpenSMTPd-Filter
 
-v0.0.1 2021-05-15T18:46:03
+v0.0.2 2021-05-18T02:26:50
+ - Update README (Andrew Hewus Fresh)
+ - Require version of Test2::Suite with Mock tracking (Andrew Hewus Fresh)
+
+v0.0.1 2021-03-20T00:47:22
  - Add a poor DMARC example (Andrew Hewus Fresh)
  - Use HELO SPF check if no address is sent (Andrew Hewus Fresh)
  - Add Mail::DKIM::Verifier example (Andrew Hewus Fresh)

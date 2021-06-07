@@ -1,7 +1,7 @@
 #!perl
 
-our $DATE = '2020-08-13'; # DATE
-our $VERSION = '1.062'; # VERSION
+our $DATE = '2021-06-05'; # DATE
+our $VERSION = '1.068'; # VERSION
 
 use 5.010;
 use strict;
@@ -65,7 +65,7 @@ lcpan - Manage your local CPAN mirror
 
 =head1 VERSION
 
-This document describes version 1.062 of lcpan (from Perl distribution App-lcpan), released on 2020-08-13.
+This document describes version 1.068 of lcpan (from Perl distribution App-lcpan), released on 2021-06-05.
 
 =head1 SYNOPSIS
 
@@ -608,13 +608,22 @@ This subcommand is a shortcut for:
 
 List PODs which mention all specified module(s).
 
+This subcommand searches PODs that mention all of the specified modules. To
+search for PODs that mention I<any> of the specified modules, see the
+C<mentions-for-mods> subcommand.
+
+
 =head2 B<mentions-for-mod>
 
 List POD mentions for module(s).
 
 This subcommand is a shortcut for:
 
- % lcpan mentions --type known-module --mentioned-module MOD
+ % lcpan mentions --type known-module --mentioned-module <module1> [module2] ...
+
+This searches PODs that mention either C<module1>, C<module2>, and so on. To
+search for PODs that mention I<all> of the modules, see the
+C<mentions-for-all-mods> subcommand.
 
 
 =head2 B<mentions-for-script>
@@ -751,9 +760,12 @@ List reverse dependencies.
 
 List scripts that depend on specified modules.
 
-This is basically rdeps + dist_scripts. Equivalent to something like:
+This is currently implemented as rdeps + dist_scripts (find distributions that
+depend on specified modules, and list all scripts in those distributions):
 
  % lcpan rdeps Some::Module | td select dist | xargs lcpan dist-scripts Some::Module
+
+so not really accurate.
 
 
 =head2 B<rel>
@@ -1048,6 +1060,10 @@ Shortcut for --log-level=info.
 
 Display program's version and exit.
 
+=item B<--view-result>
+
+View output using a viewer.
+
 =back
 
 =head2 Options for subcommand author
@@ -1055,6 +1071,8 @@ Display program's version and exit.
 =over
 
 =item B<--author>=I<s>*
+
+Can also be specified as the 1st command-line argument.
 
 =back
 
@@ -1093,6 +1111,8 @@ Equivalent to --phase ALL --rel ALL.
 See C<--phase>.
 
 =item B<--author>=I<s>*
+
+Can also be specified as the 1st command-line argument.
 
 =item B<--broken>
 
@@ -1193,7 +1213,7 @@ Set base Perl version for determining core modules.
 
 Default value:
 
- "v5.30.0"
+ "v5.34.0"
 
 =item B<--phase>=I<s>
 
@@ -1241,11 +1261,13 @@ Equivalent to --phase ALL --rel ALL.
 
 See C<--phase>.
 
+=item B<--author-arg>=I<s>*
+
+Can also be specified as the 1st command-line argument.
+
 =item B<--author-isnt>=I<s@>
 
 Can be specified multiple times.
-
-=item B<--author>=I<s>*
 
 =item B<--author>=I<s@>
 
@@ -1289,7 +1311,7 @@ Set base Perl version for determining core modules.
 
 Default value:
 
- "v5.30.0"
+ "v5.34.0"
 
 =item B<--phase>=I<s>
 
@@ -1311,6 +1333,8 @@ Default value:
 
 =item B<--author>=I<s>*
 
+Can also be specified as the 1st command-line argument.
+
 =item B<--detail>, B<-l>
 
 =item B<--latest>
@@ -1322,6 +1346,8 @@ Default value:
 =over
 
 =item B<--author>=I<s>*
+
+Can also be specified as the 1st command-line argument.
 
 =item B<--detail>, B<-l>
 
@@ -1350,6 +1376,8 @@ Equivalent to --phase ALL --rel ALL.
 See C<--phase>.
 
 =item B<--author>=I<s>*
+
+Can also be specified as the 1st command-line argument.
 
 =item B<--phase>=I<s>
 
@@ -1399,11 +1427,17 @@ See C<--user-author>.
 
 =item B<--author>=I<s>*
 
+Can also be specified as the 1st command-line argument.
+
 =item B<--detail>, B<-l>
 
 =item B<--full-path>
 
 =item B<--latest>
+
+=item B<--random>
+
+Random sort.
 
 =item B<--sort-json>=I<s>
 
@@ -1424,6 +1458,8 @@ Can be specified multiple times.
 =over
 
 =item B<--author>=I<s>*
+
+Can also be specified as the 1st command-line argument.
 
 =item B<--detail>, B<-l>
 
@@ -1457,6 +1493,8 @@ Search query (JSON-encoded).
 
 See C<--query>.
 
+Can also be specified as the 1st command-line argument and onwards.
+
 =item B<--query-type>=I<s>
 
 Default value:
@@ -1470,6 +1508,40 @@ Valid values:
 =item B<--query>=I<s@>
 
 Search query.
+
+Can also be specified as the 1st command-line argument and onwards.
+
+Can be specified multiple times.
+
+=item B<--random>
+
+Random sort.
+
+=item B<--result-limit>=I<s>
+
+Only return a certain number of records.
+
+=item B<--result-start>=I<s>
+
+Only return starting from the n'th record.
+
+Default value:
+
+ 1
+
+=item B<--sort-json>=I<s>
+
+Sort the result (JSON-encoded).
+
+See C<--sort>.
+
+=item B<--sort>=I<s@>
+
+Sort the result.
+
+Default value:
+
+ ["id"]
 
 Can be specified multiple times.
 
@@ -1537,6 +1609,8 @@ See C<--phase>.
 
 Module or dist or script name.
 
+Can also be specified as the 1st command-line argument.
+
 =back
 
 =head2 Options for subcommand contents
@@ -1569,6 +1643,8 @@ Search query (JSON-encoded).
 
 See C<--query>.
 
+Can also be specified as the 1st command-line argument and onwards.
+
 =item B<--query-type>=I<s>
 
 Default value:
@@ -1583,6 +1659,8 @@ Valid values:
 
 Search query.
 
+Can also be specified as the 1st command-line argument and onwards.
+
 Can be specified multiple times.
 
 =back
@@ -1592,6 +1670,8 @@ Can be specified multiple times.
 =over
 
 =item B<--module>=I<s>*
+
+Can also be specified as the 1st command-line argument.
 
 =item B<--overwrite>, B<-o>
 
@@ -1609,6 +1689,8 @@ Whether to overwrite existing file.
 
 =item B<--release>=I<s>*
 
+Can also be specified as the 1st command-line argument.
+
 =back
 
 =head2 Options for subcommand copy-script
@@ -1623,6 +1705,8 @@ Whether to overwrite existing file.
 
 =item B<--script>=I<s>*
 
+Can also be specified as the 1st command-line argument.
+
 =back
 
 =head2 Options for subcommand delete-rel
@@ -1634,6 +1718,8 @@ Whether to overwrite existing file.
 Whether to delete the release file from the filesystem too.
 
 =item B<--release>=I<s>*
+
+Can also be specified as the 1st command-line argument.
 
 =back
 
@@ -1677,9 +1763,11 @@ Alias for --exclude-indexed --include-unindexed.
 
 See C<--exclude-unindexed>.
 
-=item B<--dist>=I<s@>*
+=item B<--dist>=I<s@>
 
 Distribution names (with optional version suffix, e.g. Foo-Bar@1.23).
+
+Can also be specified as the 1st command-line argument and onwards.
 
 Can be specified multiple times.
 
@@ -1688,6 +1776,8 @@ Can be specified multiple times.
 Distribution names (with optional version suffix, e.g. Foo-Bar@1.23) (JSON-encoded).
 
 See C<--dist>.
+
+Can also be specified as the 1st command-line argument and onwards.
 
 =item B<--dont-uniquify>
 
@@ -1752,13 +1842,21 @@ Default value:
 
  1
 
+=item B<--module>=I<s@>
+
+Can be specified multiple times.
+
+=item B<--modules-json>=I<s>
+
+See C<--module>.
+
 =item B<--perl-version>=I<s>, B<-V>
 
 Set base Perl version for determining core modules.
 
 Default value:
 
- "v5.30.0"
+ "v5.34.0"
 
 =item B<--phase>=I<s>
 
@@ -1832,11 +1930,15 @@ Exclude non-core modules.
 
 =item B<--module>=I<s@>*
 
+Can also be specified as the 1st command-line argument and onwards.
+
 Can be specified multiple times.
 
 =item B<--modules-json>=I<s>
 
 See C<--module>.
+
+Can also be specified as the 1st command-line argument and onwards.
 
 =item B<--perl-version>=I<s>, B<-V>
 
@@ -1844,7 +1946,7 @@ Set base Perl version for determining core modules.
 
 Default value:
 
- "v5.30.0"
+ "v5.34.0"
 
 =item B<--phase>=I<s>
 
@@ -1866,6 +1968,8 @@ Default value:
 
 =item B<--dist>=I<s>*
 
+Can also be specified as the 1st command-line argument.
+
 =back
 
 =head2 Options for subcommand dist-contents
@@ -1879,6 +1983,8 @@ Filter by author.
 =item B<--detail>, B<-l>
 
 =item B<--dist>=I<s>*
+
+Can also be specified as the 1st command-line argument.
 
 =item B<--file-id>=I<s>
 
@@ -1898,6 +2004,8 @@ When there are more than one query, perform OR instead of AND logic.
 
 =item B<--dist>=I<s>*
 
+Can also be specified as the 1st command-line argument.
+
 =back
 
 =head2 Options for subcommand dist-mods
@@ -1907,6 +2015,8 @@ When there are more than one query, perform OR instead of AND logic.
 =item B<--detail>, B<-l>
 
 =item B<--dist>=I<s>*
+
+Can also be specified as the 1st command-line argument.
 
 =back
 
@@ -1921,6 +2031,8 @@ Equivalent to --phase ALL --rel ALL.
 See C<--phase>.
 
 =item B<--dist>=I<s>*
+
+Can also be specified as the 1st command-line argument.
 
 =item B<--level>=I<s>, B<-l>
 
@@ -1960,6 +2072,8 @@ See C<--level>.
 
 Distribution names (e.g. Foo-Bar).
 
+Can also be specified as the 1st command-line argument and onwards.
+
 Can be specified multiple times.
 
 =item B<--dists-json>=I<s>
@@ -1967,6 +2081,8 @@ Can be specified multiple times.
 Distribution names (e.g. Foo-Bar) (JSON-encoded).
 
 See C<--dist>.
+
+Can also be specified as the 1st command-line argument and onwards.
 
 =back
 
@@ -1978,6 +2094,8 @@ See C<--dist>.
 
 Distribution names (e.g. Foo-Bar).
 
+Can also be specified as the 1st command-line argument and onwards.
+
 Can be specified multiple times.
 
 =item B<--dists-json>=I<s>
@@ -1986,6 +2104,8 @@ Distribution names (e.g. Foo-Bar) (JSON-encoded).
 
 See C<--dist>.
 
+Can also be specified as the 1st command-line argument and onwards.
+
 =back
 
 =head2 Options for subcommand dist2rel
@@ -1993,6 +2113,8 @@ See C<--dist>.
 =over
 
 =item B<--dist>=I<s>*
+
+Can also be specified as the 1st command-line argument.
 
 =item B<--full-path>
 
@@ -2056,6 +2178,8 @@ Search query (JSON-encoded).
 
 See C<--query>.
 
+Can also be specified as the 1st command-line argument and onwards.
+
 =item B<--query-type>=I<s>
 
 Default value:
@@ -2070,9 +2194,27 @@ Valid values:
 
 Search query.
 
+Can also be specified as the 1st command-line argument and onwards.
+
 Can be specified multiple times.
 
+=item B<--random>
+
+Random sort.
+
 =item B<--rel-mtime-newer-than>=I<s>
+
+=item B<--result-limit>=I<s>
+
+Only return a certain number of records.
+
+=item B<--result-start>=I<s>
+
+Only return starting from the n'th record.
+
+Default value:
+
+ 1
 
 =item B<--sort-json>=I<s>
 
@@ -2180,6 +2322,8 @@ If the name matches both module name and script name, the module will be chosen.
 To choose the script, use `--script` (`-s`).
 
 
+Can also be specified as the 1st command-line argument.
+
 =item B<--raw>
 
 Dump raw POD instead of rendering it.
@@ -2204,6 +2348,8 @@ See C<--format-arg>.
 
 =item B<--dist>=I<s>*
 
+Can also be specified as the 1st command-line argument.
+
 =back
 
 =head2 Options for subcommand extract-mod
@@ -2212,6 +2358,8 @@ See C<--format-arg>.
 
 =item B<--module>=I<s>*
 
+Can also be specified as the 1st command-line argument.
+
 =back
 
 =head2 Options for subcommand extract-rel
@@ -2219,6 +2367,8 @@ See C<--format-arg>.
 =over
 
 =item B<--release>=I<s>*
+
+Can also be specified as the 1st command-line argument.
 
 =back
 
@@ -2229,6 +2379,8 @@ See C<--format-arg>.
 =item B<--all>, B<-a>
 
 =item B<--script>=I<s>*
+
+Can also be specified as the 1st command-line argument.
 
 =back
 
@@ -2268,11 +2420,15 @@ Default value:
 
 =item B<--file>=I<s@>*
 
+Can also be specified as the 1st command-line argument and onwards.
+
 Can be specified multiple times.
 
 =item B<--files-json>=I<s>
 
 See C<--file>.
+
+Can also be specified as the 1st command-line argument and onwards.
 
 =back
 
@@ -2476,11 +2632,15 @@ See C<--mentioned-script>.
 
 =item B<--module>=I<s@>*
 
+Can also be specified as the 1st command-line argument and onwards.
+
 Can be specified multiple times.
 
 =item B<--modules-json>=I<s>
 
 See C<--module>.
+
+Can also be specified as the 1st command-line argument and onwards.
 
 =item B<--type>=I<s>
 
@@ -2574,11 +2734,15 @@ See C<--mentioned-script>.
 
 =item B<--script>=I<s@>*
 
+Can also be specified as the 1st command-line argument and onwards.
+
 Can be specified multiple times.
 
 =item B<--scripts-json>=I<s>
 
 See C<--script>.
+
+Can also be specified as the 1st command-line argument and onwards.
 
 =item B<--updated-since-last-index-update>
 
@@ -2680,11 +2844,15 @@ See C<--mentioner-script>.
 
 =item B<--module>=I<s@>*
 
+Can also be specified as the 1st command-line argument and onwards.
+
 Can be specified multiple times.
 
 =item B<--modules-json>=I<s>
 
 See C<--module>.
+
+Can also be specified as the 1st command-line argument and onwards.
 
 =item B<--updated-since-last-index-update>
 
@@ -2786,11 +2954,15 @@ See C<--mentioner-script>.
 
 =item B<--module>=I<s@>*
 
+Can also be specified as the 1st command-line argument and onwards.
+
 Can be specified multiple times.
 
 =item B<--modules-json>=I<s>
 
 See C<--module>.
+
+Can also be specified as the 1st command-line argument and onwards.
 
 =item B<--updated-since-last-index-update>
 
@@ -2892,11 +3064,15 @@ See C<--mentioner-script>.
 
 =item B<--script>=I<s@>*
 
+Can also be specified as the 1st command-line argument and onwards.
+
 Can be specified multiple times.
 
 =item B<--scripts-json>=I<s>
 
 See C<--script>.
+
+Can also be specified as the 1st command-line argument and onwards.
 
 =item B<--updated-since-last-index-update>
 
@@ -2918,6 +3094,8 @@ Include only records that are updated since certain date.
 
 =item B<--module>=I<s>*
 
+Can also be specified as the 1st command-line argument.
+
 =back
 
 =head2 Options for subcommand mod-contents
@@ -2936,6 +3114,8 @@ Filter by file ID.
 
 =item B<--module>=I<s>*
 
+Can also be specified as the 1st command-line argument.
+
 =item B<--or>
 
 When there are more than one query, perform OR instead of AND logic.
@@ -2950,11 +3130,15 @@ When there are more than one query, perform OR instead of AND logic.
 
 =item B<--module>=I<s@>*
 
+Can also be specified as the 1st command-line argument and onwards.
+
 Can be specified multiple times.
 
 =item B<--modules-json>=I<s>
 
 See C<--module>.
+
+Can also be specified as the 1st command-line argument and onwards.
 
 =back
 
@@ -2964,11 +3148,15 @@ See C<--module>.
 
 =item B<--module>=I<s@>*
 
+Can also be specified as the 1st command-line argument and onwards.
+
 Can be specified multiple times.
 
 =item B<--modules-json>=I<s>
 
 See C<--module>.
+
+Can also be specified as the 1st command-line argument and onwards.
 
 =back
 
@@ -2979,6 +3167,8 @@ See C<--module>.
 =item B<--full-path>
 
 =item B<--module>=I<s>*
+
+Can also be specified as the 1st command-line argument.
 
 =back
 
@@ -3052,13 +3242,15 @@ Set base Perl version for determining core modules.
 
 Default value:
 
- "v5.30.0"
+ "v5.34.0"
 
 =item B<--query-json>=I<s>, B<-q>
 
 Search query (JSON-encoded).
 
 See C<--query>.
+
+Can also be specified as the 1st command-line argument and onwards.
 
 =item B<--query-type>=I<s>
 
@@ -3074,7 +3266,25 @@ Valid values:
 
 Search query.
 
+Can also be specified as the 1st command-line argument and onwards.
+
 Can be specified multiple times.
+
+=item B<--random>
+
+Random sort.
+
+=item B<--result-limit>=I<s>
+
+Only return a certain number of records.
+
+=item B<--result-start>=I<s>
+
+Only return starting from the n'th record.
+
+Default value:
+
+ 1
 
 =item B<--sort-json>=I<s>
 
@@ -3180,11 +3390,15 @@ Return at most this number of results.
 
 =item B<--module>=I<s@>*
 
+Can also be specified as the 1st command-line argument and onwards.
+
 Can be specified multiple times.
 
 =item B<--modules-json>=I<s>
 
 See C<--module>.
+
+Can also be specified as the 1st command-line argument and onwards.
 
 =back
 
@@ -3193,6 +3407,8 @@ See C<--module>.
 =over
 
 =item B<--module>=I<s>*
+
+Can also be specified as the 1st command-line argument.
 
 =back
 
@@ -3266,13 +3482,15 @@ Set base Perl version for determining core modules.
 
 Default value:
 
- "v5.30.0"
+ "v5.34.0"
 
 =item B<--query-json>=I<s>, B<-q>
 
 Search query (JSON-encoded).
 
 See C<--query>.
+
+Can also be specified as the 1st command-line argument and onwards.
 
 =item B<--query-type>=I<s>
 
@@ -3288,7 +3506,25 @@ Valid values:
 
 Search query.
 
+Can also be specified as the 1st command-line argument and onwards.
+
 Can be specified multiple times.
+
+=item B<--random>
+
+Random sort.
+
+=item B<--result-limit>=I<s>
+
+Only return a certain number of records.
+
+=item B<--result-start>=I<s>
+
+Only return starting from the n'th record.
+
+Default value:
+
+ 1
 
 =item B<--sort-json>=I<s>
 
@@ -3462,6 +3698,8 @@ Search query (JSON-encoded).
 
 See C<--query>.
 
+Can also be specified as the 1st command-line argument and onwards.
+
 =item B<--query-type>=I<s>
 
 Default value:
@@ -3475,6 +3713,8 @@ Valid values:
 =item B<--query>=I<s@>
 
 Search query.
+
+Can also be specified as the 1st command-line argument and onwards.
 
 Can be specified multiple times.
 
@@ -3588,6 +3828,18 @@ Filter certain author (JSON-encoded).
 
 See C<--author>.
 
+=item B<--dist>=I<s@>
+
+Distribution names (e.g. Foo-Bar).
+
+Can be specified multiple times.
+
+=item B<--dists-json>=I<s>
+
+Distribution names (e.g. Foo-Bar) (JSON-encoded).
+
+See C<--dist>.
+
 =item B<--dont-uniquify>
 
 Allow showing multiple modules for different dists.
@@ -3607,13 +3859,17 @@ Default value:
 
  1
 
-=item B<--module>=I<s@>*
+=item B<--module>=I<s@>
+
+Can also be specified as the 1st command-line argument and onwards.
 
 Can be specified multiple times.
 
 =item B<--modules-json>=I<s>
 
 See C<--module>.
+
+Can also be specified as the 1st command-line argument and onwards.
 
 =item B<--phase>=I<s>
 
@@ -3657,6 +3913,10 @@ Equivalent to --phase ALL --rel ALL.
 
 See C<--phase>.
 
+=item B<--author>=I<s>, B<-a>
+
+Filter by author.
+
 =item B<--level>=I<s>, B<-l>
 
 Recurse for a number of levels (-1 means unlimited).
@@ -3667,11 +3927,15 @@ Default value:
 
 =item B<--module>=I<s@>*
 
+Can also be specified as the 1st command-line argument and onwards.
+
 Can be specified multiple times.
 
 =item B<--modules-json>=I<s>
 
 See C<--module>.
+
+Can also be specified as the 1st command-line argument and onwards.
 
 =item B<--phase>=I<s>
 
@@ -3699,11 +3963,25 @@ See C<--level>.
 
 =item B<--release>=I<s>*
 
+Can also be specified as the 1st command-line argument.
+
 =back
 
 =head2 Options for subcommand related-mods
 
 =over
+
+=item B<--exclude-submodules>
+
+Equivalent to --no-submodules.
+
+See C<--submodules>.
+
+=item B<--include-submodules>
+
+Equivalent to --submodules.
+
+See C<--submodules>.
 
 =item B<--limit>=I<s>
 
@@ -3715,11 +3993,15 @@ Default value:
 
 =item B<--module>=I<s@>*
 
+Can also be specified as the 1st command-line argument and onwards.
+
 Can be specified multiple times.
 
 =item B<--modules-json>=I<s>
 
 See C<--module>.
+
+Can also be specified as the 1st command-line argument and onwards.
 
 =item B<--skip-same-dist>
 
@@ -3737,6 +4019,22 @@ Default value:
 
 Can be specified multiple times.
 
+=item B<--submodules>
+
+Whether to include submodules.
+
+If set to true, will only show related submodules, e.g. `lcpan related-modules
+Foo::Bar` will only show `Foo::Bar::Baz`, `Foo::Bar::Quz`, and so on.
+
+If set to false, will only show related modules that are not submodules, e.g.
+`lcpan related-modules Foo::Bar` will show `Baz`, `Foo::Baz`, but not
+`Foo::Bar::Baz`.
+
+
+=item B<--with-content-paths>
+
+Return the list of content paths where the module and a related module are mentioned together.
+
 =item B<--with-scores>
 
 Return score-related fields.
@@ -3748,6 +4046,8 @@ Return score-related fields.
 =over
 
 =item B<--release>=I<s>*
+
+Can also be specified as the 1st command-line argument.
 
 =back
 
@@ -3809,6 +4109,8 @@ Search query (JSON-encoded).
 
 See C<--query>.
 
+Can also be specified as the 1st command-line argument and onwards.
+
 =item B<--query-type>=I<s>
 
 Default value:
@@ -3823,7 +4125,25 @@ Valid values:
 
 Search query.
 
+Can also be specified as the 1st command-line argument and onwards.
+
 Can be specified multiple times.
+
+=item B<--random>
+
+Random sort.
+
+=item B<--result-limit>=I<s>
+
+Only return a certain number of records.
+
+=item B<--result-start>=I<s>
+
+Only return starting from the n'th record.
+
+Default value:
+
+ 1
 
 =item B<--sort-json>=I<s>
 
@@ -3927,6 +4247,8 @@ Search query (JSON-encoded).
 
 See C<--query>.
 
+Can also be specified as the 1st command-line argument and onwards.
+
 =item B<--query-type>=I<s>
 
 Default value:
@@ -3941,7 +4263,25 @@ Valid values:
 
 Search query.
 
+Can also be specified as the 1st command-line argument and onwards.
+
 Can be specified multiple times.
+
+=item B<--random>
+
+Random sort.
+
+=item B<--result-limit>=I<s>
+
+Only return a certain number of records.
+
+=item B<--result-start>=I<s>
+
+Only return starting from the n'th record.
+
+Default value:
+
+ 1
 
 =item B<--sort-json>=I<s>
 
@@ -3993,6 +4333,8 @@ See C<--query-type>.
 
 =item B<--script>=I<s>*
 
+Can also be specified as the 1st command-line argument.
+
 =back
 
 =head2 Options for subcommand script2author
@@ -4003,11 +4345,15 @@ See C<--query-type>.
 
 =item B<--script>=I<s@>*
 
+Can also be specified as the 1st command-line argument and onwards.
+
 Can be specified multiple times.
 
 =item B<--scripts-json>=I<s>
 
 See C<--script>.
+
+Can also be specified as the 1st command-line argument and onwards.
 
 =back
 
@@ -4019,11 +4365,15 @@ See C<--script>.
 
 =item B<--script>=I<s@>*
 
+Can also be specified as the 1st command-line argument and onwards.
+
 Can be specified multiple times.
 
 =item B<--scripts-json>=I<s>
 
 See C<--script>.
+
+Can also be specified as the 1st command-line argument and onwards.
 
 =back
 
@@ -4035,11 +4385,15 @@ See C<--script>.
 
 =item B<--script>=I<s@>*
 
+Can also be specified as the 1st command-line argument and onwards.
+
 Can be specified multiple times.
 
 =item B<--scripts-json>=I<s>
 
 See C<--script>.
+
+Can also be specified as the 1st command-line argument and onwards.
 
 =back
 
@@ -4053,11 +4407,15 @@ See C<--script>.
 
 =item B<--script>=I<s@>*
 
+Can also be specified as the 1st command-line argument and onwards.
+
 Can be specified multiple times.
 
 =item B<--scripts-json>=I<s>
 
 See C<--script>.
+
+Can also be specified as the 1st command-line argument and onwards.
 
 =back
 
@@ -4085,6 +4443,8 @@ Search query (JSON-encoded).
 
 See C<--query>.
 
+Can also be specified as the 1st command-line argument and onwards.
+
 =item B<--query-type>=I<s>
 
 Default value:
@@ -4098,6 +4458,8 @@ Valid values:
 =item B<--query>=I<s@>
 
 Search query.
+
+Can also be specified as the 1st command-line argument and onwards.
 
 Can be specified multiple times.
 
@@ -4147,11 +4509,15 @@ Return at most this number of results.
 
 =item B<--script>=I<s@>*
 
+Can also be specified as the 1st command-line argument and onwards.
+
 Can be specified multiple times.
 
 =item B<--scripts-json>=I<s>
 
 See C<--script>.
+
+Can also be specified as the 1st command-line argument and onwards.
 
 =back
 
@@ -4166,6 +4532,8 @@ Module or script name.
 If the name matches both module name and script name, the module will be chosen.
 To choose the script, use `--script` (`-s`).
 
+
+Can also be specified as the 1st command-line argument.
 
 =item B<--script>, B<-s>
 
@@ -4213,6 +4581,8 @@ Search query (JSON-encoded).
 
 See C<--query>.
 
+Can also be specified as the 1st command-line argument and onwards.
+
 =item B<--query-type>=I<s>
 
 Default value:
@@ -4227,7 +4597,13 @@ Valid values:
 
 Search query.
 
+Can also be specified as the 1st command-line argument and onwards.
+
 Can be specified multiple times.
+
+=item B<--random>
+
+Random sort.
 
 =item B<--sort-json>=I<s>
 
@@ -4408,6 +4784,8 @@ modules.
 
 =item B<--module>=I<s>*
 
+Can also be specified as the 1st command-line argument.
+
 =back
 
 =head1 COMPLETION
@@ -4526,7 +4904,22 @@ You can put multiple profiles in a single file by using section names like C<[pr
 
 You can also put configuration for multiple programs inside a single file, and use filter C<program=NAME> in section names, e.g. C<[program=NAME ...]> or C<[SOMESECTION program=NAME]>. The section will then only be used when the reading program matches.
 
-Finally, you can filter a section by environment variable using the filter C<env=CONDITION> in section names. For example if you only want a section to be read if a certain environment variable is true: C<[env=SOMEVAR ...]> or C<[SOMESECTION env=SOMEVAR ...]>. If you only want a section to be read when the value of an environment variable has value equals something: C<[env=HOSTNAME=blink ...]> or C<[SOMESECTION env=HOSTNAME=blink ...]>. If you only want a section to be read when the value of an environment variable does not equal something: C<[env=HOSTNAME!=blink ...]> or C<[SOMESECTION env=HOSTNAME!=blink ...]>. If you only want a section to be read when an environment variable contains something: C<[env=HOSTNAME*=server ...]> or C<[SOMESECTION env=HOSTNAME*=server ...]>. Note that currently due to simplistic parsing, there must not be any whitespace in the value being compared because it marks the beginning of a new section filter or section name.
+You can also filter a section by environment variable using the filter C<env=CONDITION> in section names. For example if you only want a section to be read if a certain environment variable is true: C<[env=SOMEVAR ...]> or C<[SOMESECTION env=SOMEVAR ...]>. If you only want a section to be read when the value of an environment variable equals some string: C<[env=HOSTNAME=blink ...]> or C<[SOMESECTION env=HOSTNAME=blink ...]>. If you only want a section to be read when the value of an environment variable does not equal some string: C<[env=HOSTNAME!=blink ...]> or C<[SOMESECTION env=HOSTNAME!=blink ...]>. If you only want a section to be read when the value of an environment variable includes some string: C<[env=HOSTNAME*=server ...]> or C<[SOMESECTION env=HOSTNAME*=server ...]>. If you only want a section to be read when the value of an environment variable does not include some string: C<[env=HOSTNAME!*=server ...]> or C<[SOMESECTION env=HOSTNAME!*=server ...]>. Note that currently due to simplistic parsing, there must not be any whitespace in the value being compared because it marks the beginning of a new section filter or section name.
+
+To load and configure plugins, you can use either the C<-plugins> parameter (e.g. C<< -plugins=DumpArgs >> or C<< -plugins=DumpArgs@before_validate_args >>), or use the C<[plugin=NAME ...]> sections, for example:
+
+ [plugin=DumpArgs]
+ -event=before_validate_args
+ -prio=99
+ 
+ [plugin=Foo]
+ -event=after_validate_args
+ arg1=val1
+ arg2=val2
+
+ 
+
+which is equivalent to setting C<< -plugins=-DumpArgs@before_validate_args@99,-Foo@after_validate_args,arg1,val1,arg2,val2 >>.
 
 List of available configuration parameters:
 
@@ -4571,7 +4964,7 @@ List of available configuration parameters:
 
 =head2 Configuration for subcommand author-deps-by-dependent-count
 
- author (see --author)
+ author (see --author-arg)
  authors (see --author)
  authors_arent (see --author-isnt)
  include_core (see --exclude-core)
@@ -4613,6 +5006,7 @@ List of available configuration parameters:
  detail (see --detail)
  full_path (see --full-path)
  latest (see --latest)
+ random (see --random)
  sort (see --sort)
 
 =head2 Configuration for subcommand author-scripts
@@ -4629,6 +5023,10 @@ List of available configuration parameters:
  or (see --or)
  query (see --query)
  query_type (see --query-type)
+ random (see --random)
+ result_limit (see --result-limit)
+ result_start (see --result-start)
+ sort (see --sort)
 
 =head2 Configuration for subcommand authors-by-dist-count
 
@@ -4708,6 +5106,7 @@ List of available configuration parameters:
  include_noncore (see --exclude-noncore)
  include_unindexed (see --exclude-unindexed)
  level (see --level)
+ modules (see --module)
  perl_version (see --perl-version)
  phase (see --phase)
  rel (see --rel)
@@ -4789,7 +5188,10 @@ List of available configuration parameters:
  or (see --or)
  query (see --query)
  query_type (see --query-type)
+ random (see --random)
  rel_mtime_newer_than (see --rel-mtime-newer-than)
+ result_limit (see --result-limit)
+ result_start (see --result-start)
  sort (see --sort)
  updated_since (see --updated-since)
  updated_since_last_index_update (see --updated-since-last-index-update)
@@ -4992,6 +5394,9 @@ List of available configuration parameters:
  perl_version (see --perl-version)
  query (see --query)
  query_type (see --query-type)
+ random (see --random)
+ result_limit (see --result-limit)
+ result_start (see --result-start)
  sort (see --sort)
  updated_since (see --updated-since)
  updated_since_last_index_update (see --updated-since-last-index-update)
@@ -5039,6 +5444,9 @@ List of available configuration parameters:
  perl_version (see --perl-version)
  query (see --query)
  query_type (see --query-type)
+ random (see --random)
+ result_limit (see --result-limit)
+ result_start (see --result-start)
  sort (see --sort)
  updated_since (see --updated-since)
  updated_since_last_index_update (see --updated-since-last-index-update)
@@ -5093,6 +5501,7 @@ List of available configuration parameters:
  added_since_last_n_index_updates (see --added-since-last-n-index-updates)
  authors (see --author)
  authors_arent (see --author-isnt)
+ dists (see --dist)
  dont_uniquify (see --dont-uniquify)
  flatten (see --flatten)
  level (see --level)
@@ -5105,6 +5514,7 @@ List of available configuration parameters:
 
 =head2 Configuration for subcommand rdeps-scripts
 
+ author (see --author)
  level (see --level)
  modules (see --module)
  phase (see --phase)
@@ -5120,6 +5530,8 @@ List of available configuration parameters:
  modules (see --module)
  skip_same_dist (see --skip-same-dist)
  sort (see --sort)
+ submodules (see --submodules)
+ with_content_paths (see --with-content-paths)
  with_scores (see --with-scores)
 
 =head2 Configuration for subcommand release
@@ -5146,6 +5558,9 @@ List of available configuration parameters:
  or (see --or)
  query (see --query)
  query_type (see --query-type)
+ random (see --random)
+ result_limit (see --result-limit)
+ result_start (see --result-start)
  sort (see --sort)
  updated_since (see --updated-since)
  updated_since_last_index_update (see --updated-since-last-index-update)
@@ -5171,6 +5586,9 @@ List of available configuration parameters:
  or (see --or)
  query (see --query)
  query_type (see --query-type)
+ random (see --random)
+ result_limit (see --result-limit)
+ result_start (see --result-start)
  sort (see --sort)
  updated_since (see --updated-since)
  updated_since_last_index_update (see --updated-since-last-index-update)
@@ -5247,6 +5665,7 @@ List of available configuration parameters:
  packages (see --package)
  query (see --query)
  query_type (see --query-type)
+ random (see --random)
  sort (see --sort)
 
 =head2 Configuration for subcommand update
@@ -5327,7 +5746,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020, 2019, 2018, 2017, 2016, 2015 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2020, 2019, 2018, 2017, 2016, 2015 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

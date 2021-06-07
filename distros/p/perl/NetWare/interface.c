@@ -41,58 +41,58 @@ ClsPerlHost::~ClsPerlHost()
 
 ClsPerlHost::VersionNumber()
 {
-	return 0;
+        return 0;
 }
 
 bool
 ClsPerlHost::RegisterWithThreadTable()
 {
-	return(fnRegisterWithThreadTable());
+        return(fnRegisterWithThreadTable());
 }
 
 bool
 ClsPerlHost::UnregisterWithThreadTable()
 {
-	return(fnUnregisterWithThreadTable());
+        return(fnUnregisterWithThreadTable());
 }
 
 int
 ClsPerlHost::PerlCreate(PerlInterpreter *my_perl)
 {
 /*	if (!(my_perl = perl_alloc()))		// Allocate memory for Perl.
-		return (1);*/
+                return (1);*/
     perl_construct(my_perl);
 
-	return 1;
+        return 1;
 }
 
 int
 ClsPerlHost::PerlParse(PerlInterpreter *my_perl, int argc, char** argv, char** env)
 {
-	return(perl_parse(my_perl, xs_init, argc, argv, env));		// Parse the command line.
+        return(perl_parse(my_perl, xs_init, argc, argv, env));		// Parse the command line.
 }
 
 int
 ClsPerlHost::PerlRun(PerlInterpreter *my_perl)
 {
-	return(perl_run(my_perl));	// Run Perl.
+        return(perl_run(my_perl));	// Run Perl.
 }
 
 int
 ClsPerlHost::PerlDestroy(PerlInterpreter *my_perl)
 {
-	return(perl_destruct(my_perl));		// Destructor for Perl.
+        return(perl_destruct(my_perl));		// Destructor for Perl.
 }
 
 void
 ClsPerlHost::PerlFree(PerlInterpreter *my_perl)
 {
-	perl_free(my_perl);			// Free the memory allocated for Perl.
+        perl_free(my_perl);			// Free the memory allocated for Perl.
 
-	// Remove the thread context set during Perl_set_context
-	// This is added here since for web script there is no other place this gets executed
-	// and it cannot be included into cgi2perl.xs unless this symbol is exported.
-	Remove_Thread_Ctx();
+        // Remove the thread context set during Perl_set_context
+        // This is added here since for web script there is no other place this gets executed
+        // and it cannot be included into cgi2perl.xs unless this symbol is exported.
+        Remove_Thread_Ctx();
 }
 
 /*============================================================================================
@@ -109,72 +109,58 @@ ClsPerlHost::PerlFree(PerlInterpreter *my_perl)
 
 static void xs_init(pTHX)
 {
-	char *file = __FILE__;
+        char *file = __FILE__;
 
-	dXSUB_SYS;
-	newXS("DynaLoader::boot_DynaLoader", boot_DynaLoader, file);
+        dXSUB_SYS;
+        newXS("DynaLoader::boot_DynaLoader", boot_DynaLoader, file);
 }
 
 
 EXTERN_C
 int RunPerl(int argc, char **argv, char **env)
 {
-	int exitstatus = 0;
-	ClsPerlHost nlm;
+        int exitstatus = 0;
+        ClsPerlHost nlm;
 
-	PerlInterpreter *my_perl = NULL;		// defined in Perl.h
-	PerlInterpreter *new_perl = NULL;		// defined in Perl.h
+        PerlInterpreter *my_perl = NULL;		// defined in Perl.h
+        PerlInterpreter *new_perl = NULL;		// defined in Perl.h
 
-	#ifdef PERL_GLOBAL_STRUCT
-		#define PERLVAR(prefix,var,type)
-		#define PERLVARA(prefix,var,type)
-		#define PERLVARI(prefix,var,type,init) PL_Vars.prefix##var = init;
-		#define PERLVARIC(prefix,var,type,init) PL_Vars.prefix##var = init;
+        PERL_SYS_INIT(&argc, &argv);
 
-		#include "perlvars.h"
+        if (!(my_perl = perl_alloc()))		// Allocate memory for Perl.
+                return (1);
 
-		#undef PERLVAR
-		#undef PERLVARA
-		#undef PERLVARI
-		#undef PERLVARIC
-	#endif
+        if(nlm.PerlCreate(my_perl))
+        {
+                PL_perl_destruct_level = 0;
 
-	PERL_SYS_INIT(&argc, &argv);
+                if(!nlm.PerlParse(my_perl, argc, argv, env))
+                {
+                        #if defined(TOP_CLONE) && defined(USE_ITHREADS)		// XXXXXX testing
+                                new_perl = perl_clone(my_perl, 1);
 
-	if (!(my_perl = perl_alloc()))		// Allocate memory for Perl.
-		return (1);
+                                (void) perl_run(new_perl);	// Run Perl.
+                                PERL_SET_THX(my_perl);
+                        #else
+                                (void) nlm.PerlRun(my_perl);
+                        #endif
+                }
+                exitstatus = nlm.PerlDestroy(my_perl);
+        }
+        if(my_perl)
+                nlm.PerlFree(my_perl);
 
-	if(nlm.PerlCreate(my_perl))
-	{
-		PL_perl_destruct_level = 0;
+        #ifdef USE_ITHREADS
+                if (new_perl)
+                {
+                        PERL_SET_THX(new_perl);
+                        exitstatus = nlm.PerlDestroy(new_perl);
+                        nlm.PerlFree(my_perl);
+                }
+        #endif
 
-		if(!nlm.PerlParse(my_perl, argc, argv, env))
-		{
-			#if defined(TOP_CLONE) && defined(USE_ITHREADS)		// XXXXXX testing
-				new_perl = perl_clone(my_perl, 1);
-
-				(void) perl_run(new_perl);	// Run Perl.
-				PERL_SET_THX(my_perl);
-			#else
-				(void) nlm.PerlRun(my_perl);
-			#endif
-		}
-		exitstatus = nlm.PerlDestroy(my_perl);
-	}
-	if(my_perl)
-		nlm.PerlFree(my_perl);
-
-	#ifdef USE_ITHREADS
-		if (new_perl)
-		{
-			PERL_SET_THX(new_perl);
-			exitstatus = nlm.PerlDestroy(new_perl);
-			nlm.PerlFree(my_perl);
-		}
-	#endif
-
-	PERL_SYS_TERM();
-	return exitstatus;
+        PERL_SYS_TERM();
+        return exitstatus;
 }
 
 
@@ -187,7 +173,7 @@ int RunPerl(int argc, char **argv, char **env)
 //
 IPerlHost* AllocStdPerl()
 {
-	return (IPerlHost*) new ClsPerlHost();
+        return (IPerlHost*) new ClsPerlHost();
 }
 
 
@@ -199,7 +185,7 @@ IPerlHost* AllocStdPerl()
 //
 void FreeStdPerl(IPerlHost* pPerlHost)
 {
-	if (pPerlHost)
-		delete (ClsPerlHost*) pPerlHost;
+        if (pPerlHost)
+                delete (ClsPerlHost*) pPerlHost;
 }
 

@@ -20,15 +20,44 @@ Judobase API easier
 
 To be written.
 
+=head1 SUBLASSES / INTERFACES / ATTRIBUTES
+
+=head2 competitor
+
+Interface to Webservice::Judobase::Competitor, lazy builds by default using the $ua and $url (to API) from this class.
+
+=head2 contests
+
+Interface to Webservice::Judobase::Contests, lazy builds by default using the $ua and $url (to API) from this class.
+
+=head2 general
+
+Interface to Webservice::Judobase::General, lazy builds by default using the $ua and $url (to API) from this class.
+
+
+=head1 METHODS
+
+=head2 status()
+
+Basic status check for the API.
+
+Returns 1, if API returns 200, 0 if not.
+
+
 =head1 AUTHOR
 
 Lance Wicks <lancew@cpan.org>
 
 =head1 CONTRIBUTORS
 
-=head1 COPYRIGHT AND LICENSE
+=head1 COPYRIGHT
 
-This software is Copyright (c) 2016 by Lance Wicks.
+This software is Copyright (c) 2016-2021 by Lance Wicks.
+
+=head1 LICENSE
+
+This is free software; you can redistribute it and/or modify it under the same terms as the Perl 5 programming language system itself.
+See the LICENSE file in the distribution on CPAN for full text.
 
 =head1 SEE ALSO
 

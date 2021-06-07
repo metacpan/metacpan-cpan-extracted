@@ -18,11 +18,12 @@
 #
 #=============================================================================
 
-use 5.014_001;
+package Term::CLI  0.052003 {
 
-package Term::CLI  0.052001 {
+use 5.014;
+use strict;
+use warnings;
 
-use Modern::Perl 1.20140107;
 use Text::ParseWords 3.29 qw( parse_line );
 use Term::CLI::ReadLine;
 use FindBin 1.50;
@@ -469,7 +470,7 @@ Term::CLI - CLI interpreter based on Term::ReadLine
 
 =head1 VERSION
 
-version 0.052001
+version 0.052003
 
 =head1 SYNOPSIS
 
@@ -906,7 +907,7 @@ function.
 The signal handlers will ensure the terminal is in a sane state.
 
 
-The following signal handlers discard the the current input line, restore
+The following signal handlers discard the current input line, restore
 any previous signal handler, and re-throw the signal:
 C<HUP>, C<INT>, C<QUIT>, C<ALRM>, C<TERM>, C<TTIN>, C<TTOU>, C<TSTP>.
 

@@ -4,7 +4,7 @@
       "Paul Evans <leonerd@leonerd.org.uk>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4224",
+   "generated_by" : "Module::Build version 0.4231",
    "license" : [
       "perl_5"
    ],
@@ -35,38 +35,39 @@
             "IO::Async::Test" : "0",
             "Tangence::Client" : "0.25",
             "Tangence::Server" : "0.19",
-            "URI" : "0"
+            "URI" : "0",
+            "perl" : "5.014"
          }
       }
    },
    "provides" : {
       "Net::Async::Tangence" : {
          "file" : "lib/Net/Async/Tangence.pm",
-         "version" : "0.15"
+         "version" : "0.16"
       },
       "Net::Async::Tangence::Client" : {
          "file" : "lib/Net/Async/Tangence/Client.pm",
-         "version" : "0.15"
+         "version" : "0.16"
       },
       "Net::Async::Tangence::Client::via::sshexec" : {
          "file" : "lib/Net/Async/Tangence/Client/via/sshexec.pm",
-         "version" : "0.15"
+         "version" : "0.16"
       },
       "Net::Async::Tangence::Client::via::sshunix" : {
          "file" : "lib/Net/Async/Tangence/Client/via/sshunix.pm",
-         "version" : "0.15"
+         "version" : "0.16"
       },
       "Net::Async::Tangence::Protocol" : {
          "file" : "lib/Net/Async/Tangence/Protocol.pm",
-         "version" : "0.15"
+         "version" : "0.16"
       },
       "Net::Async::Tangence::Server" : {
          "file" : "lib/Net/Async/Tangence/Server.pm",
-         "version" : "0.15"
+         "version" : "0.16"
       },
       "Net::Async::Tangence::ServerProtocol" : {
          "file" : "lib/Net/Async/Tangence/ServerProtocol.pm",
-         "version" : "0.15"
+         "version" : "0.16"
       }
    },
    "release_status" : "stable",
@@ -75,6 +76,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.15",
-   "x_serialization_backend" : "JSON::PP version 4.04"
+   "version" : "0.16",
+   "x_serialization_backend" : "JSON::PP version 4.05"
 }

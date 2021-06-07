@@ -17,6 +17,7 @@ do { my $x = {
                                       'Capture::Tiny' => '0',
                                       'Mac::PropertyList' => '0',
                                       'Sys::Info::Base' => '0.7802',
+                                      'parent' => '0',
                                       'perl' => '5.010'
                                     }
                     },

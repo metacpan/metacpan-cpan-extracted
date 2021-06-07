@@ -34,7 +34,7 @@ resources:
   bugtracker: https://github.com/bedoshi/Acme-CoC-Dice/issues
   homepage: https://github.com/bedoshi/Acme-CoC-Dice
   repository: https://github.com/bedoshi/Acme-CoC-Dice.git
-version: '0.01'
+version: '0.02'
 x_contributors:
   - 'bedoshi <bedoshidiary.ester.freesia@gmail.com>'
 x_generated_by_perl: v5.32.1

@@ -4,13 +4,13 @@
       "Tom Heady (cpan@punch.net)"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.1002, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "DateTime-Format-Flexible",
    "no_index" : {
@@ -22,11 +22,7 @@
    "prereqs" : {
       "build" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0",
-            "Test::Exception" : "0",
-            "Test::MockTime" : "0",
-            "Test::NoWarnings" : "0",
-            "Test::Simple" : "0.44"
+            "ExtUtils::MakeMaker" : "0"
          }
       },
       "configure" : {
@@ -39,12 +35,19 @@
             "DateTime" : "0",
             "DateTime::Format::Builder" : "0.74",
             "DateTime::TimeZone" : "0",
-            "List::MoreUtils" : "0",
-            "Module::Pluggable" : "0"
+            "List::MoreUtils" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Exception" : "0",
+            "Test::MockTime" : "0",
+            "Test::NoWarnings" : "0",
+            "Test::Simple" : "0.44"
          }
       }
    },
    "release_status" : "stable",
-   "version" : "0.32",
-   "x_serialization_backend" : "JSON::PP version 2.27300_01"
+   "version" : "0.33",
+   "x_serialization_backend" : "JSON::PP version 4.04"
 }

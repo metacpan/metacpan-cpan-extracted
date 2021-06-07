@@ -1,0 +1,15 @@
+0.003   2021-05-20  Released-By: PERLANCAR; Urgency: medium
+
+	- Add module ArrayData::Char::Latin1::UpperCaseLetter.
+
+
+0.002   2021-05-20  Released-By: PERLANCAR; Urgency: low
+
+	- No functional changes.
+
+	- Reword comments.
+
+
+0.001   2021-05-20  Released-By: PERLANCAR
+
+        - First release, converted from WordLists-Char-Latin1.

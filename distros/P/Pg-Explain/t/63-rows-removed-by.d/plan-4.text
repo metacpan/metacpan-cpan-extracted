@@ -1,0 +1,10 @@
+Insert on test  (cost=0.00..0.01 rows=0 width=0) (actual time=0.237..0.239 rows=0 loops=1)
+  Conflict Resolution: UPDATE
+  Conflict Arbiter Indexes: test_pkey
+  Conflict Filter: (excluded.id > 1)
+  Rows Removed by Conflict Filter: 1
+  Tuples Inserted: 0
+  Conflicting Tuples: 1
+  ->  Result  (cost=0.00..0.01 rows=1 width=36) (actual time=0.003..0.004 rows=1 loops=1)
+Planning Time: 0.469 ms
+Execution Time: 0.334 ms

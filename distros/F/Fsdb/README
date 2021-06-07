@@ -144,26 +144,13 @@ Fsdb(3)               User Contributed Perl Documentation              Fsdb(3)
        <http://www.isi.edu/~johnh/SOFTWARE/FSDB/index.html>.
 
 [1mWHAT'S NEW[0m
-   [1m2.71, 2020-11-16 Fix a race condition breaking test suites.[0m
-       BUG FIX
-           Suppress a race condition in dbcolmerge was sometimes throwing the
-           error "Fsdb::Support::Freds: ending, but running process:
-           dbmerge:xargs" in the dbmerge_0_xargs test case, on exit.
+   [1m2.73, tbd xxx[0m
+       ENHANCEMENT
+           dbcolpercentile now has a "--weighted" option.
 
        ENHANCEMENT
-           dbcolcreate now supports "--header".
-
-       BUG FIX
-           Fixed several spelling errors in deprecated programs and removed
-           information about the no-longer existing FreeBSD and MacOS ports.
-           Thanks to Calvin Ardi for the patch.
-
-       BUG FIX
-           dbmerge now handles --xargs when only one file is provided (and
-           passes the file through unchanged).  It also throws a clean error
-           with --xargs if zero files are provided.  (To support dbmerge,
-           dbcol now has an internal "--saveoutput" option.)  Thanks to Yuri
-           Pradkin for reporting the unhandled corner-case.
+           The new Fsdb::Support::IPv6 package includes ipv6_zeroize and
+           ipv6_normalize to rewrite ipv6 print addresses.
 
 [1mREADME CONTENTS[0m
        executive summary
@@ -2436,6 +2423,21 @@ Fsdb(3)               User Contributed Perl Documentation              Fsdb(3)
            dbcol now has an internal "--saveoutput" option.)  Thanks to Yuri
            Pradkin for reporting the unhandled corner-case.
 
+   [1m2.71, 2020-11-16 Fix a race condition breaking test suites.[0m
+       BUG FIX
+           Suppress a race condition in dbcolmerge was sometimes throwing the
+           error "Fsdb::Support::Freds: ending, but running process:
+           dbmerge:xargs" in the dbmerge_0_xargs test case, on exit.
+
+   [1m2.72, 2020-12-01 A small bug and a packaging improvement.[0m
+       BUG FIX
+           dbcolhisto now handles the degenerate case where everything has the
+           same value (previously it would throw "illegal division by zero").
+
+       ENHANCEMENT
+           The spec for Fedora now includes "make" as BuildRequires, something
+           required for Fedora 34.
+
 [1mAUTHOR[0m
        John Heidemann, "johnh@isi.edu"
 
@@ -2467,4 +2469,4 @@ Fsdb(3)               User Contributed Perl Documentation              Fsdb(3)
 
 
 
-perl v5.30.3                      2020-11-17                           Fsdb(3)
+perl v5.32.1                      2021-05-15                           Fsdb(3)

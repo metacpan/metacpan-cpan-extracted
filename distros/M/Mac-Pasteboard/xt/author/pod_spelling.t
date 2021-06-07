@@ -25,6 +25,7 @@ badPasteboardIndexErr
 badPasteboardItemErr
 badPasteboardSyncErr
 callback
+Capitan
 CFStringRef
 com
 const
@@ -34,6 +35,7 @@ defaultFlavor
 dualvar
 duplicatePasteboardFlavorErr
 executables
+El
 hoc
 jpeg
 JPEG

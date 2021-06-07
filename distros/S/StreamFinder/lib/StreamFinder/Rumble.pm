@@ -325,96 +325,43 @@ use warnings;
 use URI::Escape;
 use HTML::Entities ();
 use LWP::UserAgent ();
-use vars qw(@ISA @EXPORT);
+use parent 'StreamFinder::_Class';
 
 my $DEBUG = 0;
-my $bummer = ($^O =~ /MSWin/);
-my $YOUTUBE = 'yes';
-my %uops = ();
-my @userAgentOps = ();
-
-require Exporter;
-
-@ISA = qw(Exporter);
-@EXPORT = qw(get getURL getType getID getTitle getIconURL getIconData getImageURL getImageData);
 
 sub new
 {
 	my $class = shift;
 	my $url = shift;
 
-	my $self = {};
 	return undef  unless ($url);
 
-	my $homedir = $bummer ? $ENV{'HOMEDRIVE'} . $ENV{'HOMEPATH'} : $ENV{'HOME'};
-	$homedir ||= $ENV{'LOGDIR'}  if ($ENV{'LOGDIR'});
-	$homedir =~ s#[\/\\]$##;
-	my (@okStreams);
-	foreach my $p ("${homedir}/.config/StreamFinder/config", "${homedir}/.config/StreamFinder/Rumble/config") {
-		if (open IN, $p) {
-			my ($atr, $val);
-			while (<IN>) {
-				chomp;
-				next  if (/^\s*\#/o);
-				($atr, $val) = split(/\s*\=\>\s*/o, $_, 2);
-				eval "\$uops{$atr} = $val";
-			}
-			close IN;
-		}
-	}
-	foreach my $i (qw(agent from conn_cache default_headers local_address ssl_opts max_size
-			max_redirect parse_head protocols_allowed protocols_forbidden requests_redirectable
-			proxy no_proxy)) {
-		push @userAgentOps, $i, $uops{$i}  if (defined $uops{$i});
-	}
-	push (@userAgentOps, 'agent', 'Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101 Firefox/68.0')
-			unless (defined $uops{'agent'});
-	$uops{'timeout'} = 10  unless (defined $uops{'timeout'});
-	$uops{'secure'} = 0    unless (defined $uops{'secure'});
-	$DEBUG = $uops{'debug'}  if (defined $uops{'debug'});
-	$YOUTUBE = $uops{'youtube'}  if (defined $uops{'youtube'});
+	my $self = $class->SUPER::new('Rumble', @_);
+	$DEBUG = $self->{'debug'}  if (defined $self->{'debug'});
 
+	my (@okStreams);
 	while (@_) {
-		if ($_[0] =~ /^\-?debug$/o) {
-			shift;
-			$DEBUG = (defined($_[0]) && $_[0] =~/^[0-9]$/) ? shift : 1;
-		} elsif ($_[0] =~ /^\-?keep$/o) {
+		if ($_[0] =~ /^\-?keep$/o) {
 			shift;
 			if (defined $_[0]) {
 				my $keeporder = shift;
 				@okStreams = (ref($keeporder) =~ /ARRAY/) ? @{$keeporder} : split(/\,\s*/, $keeporder);
 			}
-		} elsif ($_[0] =~ /^\-?secure$/o) {
-			shift;
-			$uops{'secure'} = (defined $_[0]) ? shift : 1;
 		} else {
 			shift;
 		}
 	}
-	if (!defined($okStreams[0]) && defined($uops{'keep'})) {
-		@okStreams = (ref($uops{'keep'}) =~ /ARRAY/) ? @{$uops{'keep'}} : split(/\,\s*/, $uops{'keep'});
+	if (!defined($okStreams[0]) && defined($self->{'keep'})) {
+		@okStreams = (ref($self->{'keep'}) =~ /ARRAY/) ? @{$self->{'keep'}} : split(/\,\s*/, $self->{'keep'});
 	}
 	@okStreams = (qw(mp4 webm any))  unless (defined $okStreams[0]);
 
-	my $ua = LWP::UserAgent->new(@userAgentOps);		
-	$ua->timeout($uops{'timeout'});
+	my $ua = LWP::UserAgent->new(@{$self->{'_userAgentOps'}});		
+	$ua->timeout($self->{'timeout'});
 	$ua->cookie_jar({});
 	$ua->env_proxy;
 	my $response;
-	$self->{'title'} = '';
-	$self->{'artist'} = '';
-	$self->{'album'} = '';
-	$self->{'description'} = '';
-	$self->{'created'} = '';
-	$self->{'year'} = '';
 	$self->{'genre'} = 'Video';
-	$self->{'iconurl'} = '';
-	$self->{'imageurl'} = '';
-	$self->{'streams'} = [];
-	$self->{'cnt'} = 0;
-	$self->{'Url'} = '';
-	$self->{'playlist'} = '';
-	$self->{'albumartist'} = '';
 
 	local *getHtmlPage = sub {
 		my $url = shift;
@@ -455,7 +402,8 @@ sub new
 
 			$self->{'albumartist'} = 'https://rumble.com' . $1  if ($html =~ m#href\=\"([^\"]+)\" rel=author#s);
 
-			$self->{'description'} = $1  if ($html =~ m#\"description\"\:\"([^\"]+)#s);
+			$self->{'description'} = $1  if ($html =~ m#\</span\>\s+\—\s+\<\/span\>(.+?)\<\/div\>#s);
+			$self->{'description'} ||= $1  if ($html =~ m#\"description\"\:\"([^\"]+)#s);
 			$self->{'description'} ||= $1  if ($html =~ m#<meta\s+name\=description\"?\s+content\=\"\:\"([^\"]+)#s);
 			$self->{'description'} ||= $1  if ($html =~ m#<meta\s+property\=\"?og\:description\"?\s+content\=\"\:\"([^\"]+)#s);
 			$self->{'description'} ||= $1  if ($html =~ m#\<meta\s+name\=\"?twitter\:description\"?\s+content\=\"([^\"]+)\"#s);
@@ -522,7 +470,7 @@ sub new
 						if ($streamtype =~ /^any/io || $stream =~ /${streamtype}$/i) {
 							print STDERR "------found stream=$stream=\n"  if ($DEBUG);
 							unless (defined $streamHash{$stream}
-									|| ($uops{'secure'} && $stream !~ /^https/o)) {
+									|| ($self->{'secure'} && $stream !~ /^https/o)) {
 								push @{$self->{'streams'}}, $stream;
 								$streamHash{$stream} = $stream;
 							}
@@ -553,6 +501,7 @@ sub new
 	foreach my $field (qw(description artist title)) {
 		$self->{$field} = HTML::Entities::decode_entities($self->{$field});
 		$self->{$field} = uri_unescape($self->{$field});
+		$self->{$field} =~ s/(?:\%|\\?u?00)([0-9A-Fa-f]{2})/chr(hex($1))/eg;
 	}
 	$self->{'title'} =~ s/\s+\-\s+$self->{'artist'}\s*$//;  #CONVERT "Title - Artist" => "Title"
 	$self->{'imageurl'} = $self->{'iconurl'};
@@ -563,147 +512,6 @@ sub new
 	bless $self, $class;   #BLESS IT!
 
 	return $self;
-}
-
-sub get
-{
-	my $self = shift;
-
-	return wantarray ? @{$self->{'streams'}} : $self->{'Url'};
-}
-
-sub getURL   #LIKE GET, BUT ONLY RETURN THE SINGLE ONE W/BEST BANDWIDTH AND RELIABILITY:
-{
-	my $self = shift;
-	my $arglist = (defined $_[0]) ? join('|',@_) : '';
-	my $idx = ($arglist =~ /\b\-?random\b/) ? int rand scalar @{$self->{'streams'}} : 0;
-	if (($arglist =~ /\b\-?nopls\b/ && ${$self->{'streams'}}[$idx] =~ /\.(pls)$/i)
-			|| ($arglist =~ /\b\-?noplaylists\b/ && ${$self->{'streams'}}[$idx] =~ /\.(pls|m3u8?)$/i)) {
-		my $plType = $1;
-		my $firstStream = ${$self->{'streams'}}[$idx];
-		print STDERR "-getURL($idx): NOPLAYLISTS and (".${$self->{'streams'}}[$idx].")\n"  if ($DEBUG);
-		my $ua = LWP::UserAgent->new(@userAgentOps);		
-		$ua->timeout($uops{'timeout'});
-		$ua->cookie_jar({});
-		$ua->env_proxy;
-		my $html = '';
-		my $response = $ua->get($firstStream);
-		if ($response->is_success) {
-			$html = $response->decoded_content;
-		} else {
-			print STDERR $response->status_line  if ($DEBUG);
-			my $no_wget = system('wget','-V');
-			unless ($no_wget) {
-				print STDERR "\n..trying wget...\n"  if ($DEBUG);
-				$html = `wget -t 2 -T 20 -O- -o /dev/null \"$firstStream\" 2>/dev/null `;
-			}
-		}
-		my @lines = split(/\r?\n/, $html);
-		my @plentries = ();
-		my $firstTitle = '';
-		my $plidx = ($arglist =~ /\b\-?random\b/) ? 1 : 0;
-		if ($plType =~ /pls/i) {  #PLS:
-			foreach my $line (@lines) {
-				if ($line =~ m#^\s*File\d+\=(.+)$#o) {
-					push (@plentries, $1);
-				} elsif ($line =~ m#^\s*Title\d+\=(.+)$#o) {
-					$firstTitle ||= $1;
-				}
-			}
-			$self->{'title'} ||= $firstTitle;
-			$self->{'title'} = HTML::Entities::decode_entities($self->{'title'});
-			$self->{'title'} = uri_unescape($self->{'title'});
-			print STDERR "-getURL(PLS): title=$firstTitle= pl_idx=$plidx=\n"  if ($DEBUG);
-		} elsif ($arglist =~ /\b\-?noplaylists\b/) {  #m3u*:
-			(my $urlpath = ${$self->{'streams'}}[$idx]) =~ s#[^\/]+$##;
-			foreach my $line (@lines) {
-				if ($line =~ m#^\s*([^\#].+)$#o) {
-					my $urlpart = $1;
-					$urlpart =~ s#^\s+##o;
-					$urlpart =~ s#^\/##o;
-					push (@plentries, ($urlpart =~ m#https?\:#) ? $urlpart : ($urlpath . '/' . $urlpart));
-					last  unless ($plidx);
-				}
-			}
-			print STDERR "-getURL(m3u?): pl_idx=$plidx=\n"  if ($DEBUG);
-		}
-		if ($plidx && $#plentries >= 0) {
-			$plidx = int rand scalar @plentries;
-		} else {
-			$plidx = 0;
-		}
-		$firstStream = (defined($plentries[$plidx]) && $plentries[$plidx]) ? $plentries[$plidx]
-				: ${$self->{'streams'}}[$idx];
-
-		return $firstStream;
-	}
-
-	return ${$self->{'streams'}}[$idx];
-}
-
-sub count
-{
-	my $self = shift;
-	return $self->{'total'};  #TOTAL NUMBER OF PLAYABLE STREAM URLS FOUND.
-}
-
-sub getType
-{
-	my $self = shift;
-	return 'Rumble';  #STATION TYPE (FOR PARENT StreamFinder MODULE).
-}
-
-sub getID
-{
-	my $self = shift;
-	return $self->{'id'};  #VIDEO'S RUMBLE-ID.
-}
-
-sub getTitle
-{
-	my $self = shift;
-	return $self->{'description'}  if (defined($_[0]) && $_[0] =~ /^\-?(?:long|desc)/i);
-	return $self->{'title'};  #STATION'S TITLE(DESCRIPTION), IF ANY.
-}
-
-sub getIconURL
-{
-	my $self = shift;
-	return $self->{'iconurl'};  #URL TO THE VIDEO'S THUMBNAIL ICON, IF ANY.
-}
-
-sub getIconData
-{
-	my $self = shift;
-	return ()  unless ($self->{'iconurl'});
-	my $ua = LWP::UserAgent->new(@userAgentOps);		
-	$ua->timeout($uops{'timeout'});
-	$ua->cookie_jar({});
-	$ua->env_proxy;
-	my $art_image = '';
-	my $response = $ua->get($self->{'iconurl'});
-	if ($response->is_success) {
-		$art_image = $response->decoded_content;
-	} else {
-		print STDERR $response->status_line  if ($DEBUG);
-		my $no_wget = system('wget','-V');
-		unless ($no_wget) {
-			print STDERR "\n..trying wget...\n"  if ($DEBUG);
-			my $iconUrl = $self->{'iconurl'};
-			$art_image = `wget -t 2 -T 20 -O- -o /dev/null \"$iconUrl\" 2>/dev/null `;
-		}
-	}
-	return ()  unless ($art_image);
-	(my $image_ext = $self->{'iconurl'}) =~ s/^.+\.//;
-	$image_ext =~ s/[^A-Za-z].*$//;
-
-	return ($image_ext, $art_image);
-}
-
-sub getImageURL
-{
-	my $self = shift;
-	return $self->{'imageurl'};  #URL TO THE VIDEO'S BANNER IMAGE, IF ANY.
 }
 
 sub getImageData

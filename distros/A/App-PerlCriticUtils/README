@@ -2,8 +2,8 @@ NAME
     App::PerlCriticUtils - Command-line utilities related to Perl::Critic
 
 VERSION
-    This document describes version 0.002 of App::PerlCriticUtils (from Perl
-    distribution App-PerlCriticUtils), released on 2018-09-30.
+    This document describes version 0.003 of App::PerlCriticUtils (from Perl
+    distribution App-PerlCriticUtils), released on 2021-05-25.
 
 SYNOPSIS
     This distribution provides the following command-line utilities related
@@ -25,7 +25,7 @@ FUNCTIONS
   pcpcat
     Usage:
 
-     pcpcat(%args) -> [status, msg, result, meta]
+     pcpcat(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
     Print Perl::Critic policy module source code.
 
@@ -43,19 +43,19 @@ FUNCTIONS
 
     Returns an enveloped result (an array).
 
-    First element (status) is an integer containing HTTP status code (200
-    means OK, 4xx caller error, 5xx function error). Second element (msg) is
-    a string containing error message, or 'OK' if status is 200. Third
-    element (result) is optional, the actual result. Fourth element (meta)
-    is called result metadata and is optional, a hash that contains extra
-    information.
+    First element ($status_code) is an integer containing HTTP status code
+    (200 means OK, 4xx caller error, 5xx function error). Second element
+    ($reason) is a string containing error message, or "OK" if status is
+    200. Third element ($payload) is optional, the actual result. Fourth
+    element (%result_meta) is called result metadata and is optional, a hash
+    that contains extra information.
 
     Return value: (any)
 
   pcpdoc
     Usage:
 
-     pcpdoc(%args) -> [status, msg, result, meta]
+     pcpdoc(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
     Show documentation of Perl::Critic policy module.
 
@@ -73,19 +73,19 @@ FUNCTIONS
 
     Returns an enveloped result (an array).
 
-    First element (status) is an integer containing HTTP status code (200
-    means OK, 4xx caller error, 5xx function error). Second element (msg) is
-    a string containing error message, or 'OK' if status is 200. Third
-    element (result) is optional, the actual result. Fourth element (meta)
-    is called result metadata and is optional, a hash that contains extra
-    information.
+    First element ($status_code) is an integer containing HTTP status code
+    (200 means OK, 4xx caller error, 5xx function error). Second element
+    ($reason) is a string containing error message, or "OK" if status is
+    200. Third element ($payload) is optional, the actual result. Fourth
+    element (%result_meta) is called result metadata and is optional, a hash
+    that contains extra information.
 
     Return value: (any)
 
   pcpless
     Usage:
 
-     pcpless(%args) -> [status, msg, result, meta]
+     pcpless(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
     Show Perl::Critic policy module source code with `less`.
 
@@ -103,19 +103,19 @@ FUNCTIONS
 
     Returns an enveloped result (an array).
 
-    First element (status) is an integer containing HTTP status code (200
-    means OK, 4xx caller error, 5xx function error). Second element (msg) is
-    a string containing error message, or 'OK' if status is 200. Third
-    element (result) is optional, the actual result. Fourth element (meta)
-    is called result metadata and is optional, a hash that contains extra
-    information.
+    First element ($status_code) is an integer containing HTTP status code
+    (200 means OK, 4xx caller error, 5xx function error). Second element
+    ($reason) is a string containing error message, or "OK" if status is
+    200. Third element ($payload) is optional, the actual result. Fourth
+    element (%result_meta) is called result metadata and is optional, a hash
+    that contains extra information.
 
     Return value: (any)
 
   pcplist
     Usage:
 
-     pcplist(%args) -> [status, msg, result, meta]
+     pcplist(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
     List installed Perl::Critic policy modules.
 
@@ -137,19 +137,19 @@ FUNCTIONS
 
     Returns an enveloped result (an array).
 
-    First element (status) is an integer containing HTTP status code (200
-    means OK, 4xx caller error, 5xx function error). Second element (msg) is
-    a string containing error message, or 'OK' if status is 200. Third
-    element (result) is optional, the actual result. Fourth element (meta)
-    is called result metadata and is optional, a hash that contains extra
-    information.
+    First element ($status_code) is an integer containing HTTP status code
+    (200 means OK, 4xx caller error, 5xx function error). Second element
+    ($reason) is a string containing error message, or "OK" if status is
+    200. Third element ($payload) is optional, the actual result. Fourth
+    element (%result_meta) is called result metadata and is optional, a hash
+    that contains extra information.
 
     Return value: (any)
 
   pcpman
     Usage:
 
-     pcpman(%args) -> [status, msg, result, meta]
+     pcpman(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
     Show manpage of Perl::Critic policy module.
 
@@ -167,19 +167,19 @@ FUNCTIONS
 
     Returns an enveloped result (an array).
 
-    First element (status) is an integer containing HTTP status code (200
-    means OK, 4xx caller error, 5xx function error). Second element (msg) is
-    a string containing error message, or 'OK' if status is 200. Third
-    element (result) is optional, the actual result. Fourth element (meta)
-    is called result metadata and is optional, a hash that contains extra
-    information.
+    First element ($status_code) is an integer containing HTTP status code
+    (200 means OK, 4xx caller error, 5xx function error). Second element
+    ($reason) is a string containing error message, or "OK" if status is
+    200. Third element ($payload) is optional, the actual result. Fourth
+    element (%result_meta) is called result metadata and is optional, a hash
+    that contains extra information.
 
     Return value: (any)
 
   pcppath
     Usage:
 
-     pcppath(%args) -> [status, msg, result, meta]
+     pcppath(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
     Get path to locally installed Perl::Critic policy module.
 
@@ -197,12 +197,12 @@ FUNCTIONS
 
     Returns an enveloped result (an array).
 
-    First element (status) is an integer containing HTTP status code (200
-    means OK, 4xx caller error, 5xx function error). Second element (msg) is
-    a string containing error message, or 'OK' if status is 200. Third
-    element (result) is optional, the actual result. Fourth element (meta)
-    is called result metadata and is optional, a hash that contains extra
-    information.
+    First element ($status_code) is an integer containing HTTP status code
+    (200 means OK, 4xx caller error, 5xx function error). Second element
+    ($reason) is a string containing error message, or "OK" if status is
+    200. Third element ($payload) is optional, the actual result. Fourth
+    element (%result_meta) is called result metadata and is optional, a hash
+    that contains extra information.
 
     Return value: (any)
 
@@ -225,7 +225,7 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2018, 2017 by perlancar@cpan.org.
+    This software is copyright (c) 2021, 2018, 2017 by perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

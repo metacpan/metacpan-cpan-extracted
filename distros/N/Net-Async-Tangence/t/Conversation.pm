@@ -1,6 +1,6 @@
 package t::Conversation;
 
-use strict;
+use v5.14;
 use warnings;
 
 use Exporter 'import';
@@ -288,3 +288,5 @@ $S2C{UPDATE_S_SCALAR_468} =
 $S2C{DESTROY} = 
    "\x0a" . "\0\0\0\2" .
    "\x02\1";
+
+0x55AA;

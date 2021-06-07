@@ -2,11 +2,11 @@
 
 =encoding utf8
 
-=for HTML <a href="../../actions?query=workflow%3Amacos"><img src="../../workflows/macos/badge.svg"></a>
+=for HTML <a href="https://www.github.com/briandfoy/mojo-promise-role-higherorder/actions?query=workflow%3Amacos"><img src="https://www.github.com/briandfoy/mojo-promise-role-higherorder/workflows/macos/badge.svg"></a>
 
-=for HTML <a href="../../actions?query=workflow%3Aubuntu"><img src="../../workflows/ubuntu/badge.svg"></a>
+=for HTML <a href="https://www.github.com/briandfoy/mojo-promise-role-higherorder/actions?query=workflow%3Aubuntu"><img src="https://www.github.com/briandfoy/mojo-promise-role-higherorder/workflows/ubuntu/badge.svg"></a>
 
-=for HTML <a href="../../actions?query=workflow%3Awindows"><img src="../../workflows/windows/badge.svg"></a>
+=for HTML <a href="https://www.github.com/briandfoy/mojo-promise-role-higherorder/actions?query=workflow%3Awindows"><img src="https://www.github.com/briandfoy/mojo-promise-role-higherorder/workflows/windows/badge.svg"></a>
 
 =for HTML <a href='https://ci.appveyor.com/project/briandfoy/mojo-promise-role-higherorder'><img src='https://ci.appveyor.com/api/projects/status/y6bk6do143gbc5hv' /></a>
 

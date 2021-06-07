@@ -1585,3 +1585,12 @@ Revision history for Graphics-Framebuffer
 
       Pause was whining about the Makefile.PL script.  So it has been fixed
       to accommodate the whining.
+
+6.49  Jun 04, 2021
+
+      Documentation modified to bring up-to-date.
+
+      Bugs in Perl specific ARC routines fixed to match the degree start point
+      as the C accelerated routines.
+
+      Sped up the Splash screen for Perl only drawing.

@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 
-use strict;
+use v5.14;
 use warnings;
 
 use Test::More;
@@ -30,7 +30,7 @@ $loop->add( $client );
 
 my $serverpath = File::Spec->rel2abs( "t/server.pl" );
 
-$client->connect_url( "sshexec://localhost/$serverpath" )->get;
+$client->connect_url( "sshexec://localhost/$^X?$serverpath" )->get;
 pass "Connected via SSHEXEC";
 
 wait_for { defined $client->rootobj };

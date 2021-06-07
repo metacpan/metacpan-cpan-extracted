@@ -8,7 +8,6 @@ do { my $x = {
        'develop' => {
                       'requires' => {
                                       'Test::More' => '0.96',
-                                      'Test::PAUSE::Permissions' => '0',
                                       'Test::Vars' => '0'
                                     }
                     },
@@ -25,6 +24,7 @@ do { my $x = {
                                       'Hash::Merge' => '0',
                                       'JSON' => '0',
                                       'List::AllUtils' => '0',
+                                      'Module::Version' => '0',
                                       'Moo' => '0',
                                       'MooX::Singleton' => '0',
                                       'MooseX::MungeHas' => '0',

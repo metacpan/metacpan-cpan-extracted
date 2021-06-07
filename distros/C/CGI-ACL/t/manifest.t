@@ -4,10 +4,10 @@ use strict;
 use warnings;
 use Test::Most;
 
-unless ( $ENV{RELEASE_TESTING} ) {
-    plan( skip_all => "Author tests not required for installation" );
+if($ENV{AUTHOR_TESTING} ) {
+	eval 'use Test::CheckManifest 0.9';
+	plan(skip_all => 'Test::CheckManifest 0.9 required') if $@;
+	ok_manifest({ filter => [qr/.git/] });
+} else {
+	plan(skip_all => 'Author tests not required for installation');
 }
-
-eval "use Test::CheckManifest 0.9";
-plan skip_all => "Test::CheckManifest 0.9 required" if $@;
-ok_manifest({ filter => [qr/.git/] });

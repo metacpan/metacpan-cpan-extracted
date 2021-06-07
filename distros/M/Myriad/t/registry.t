@@ -37,10 +37,12 @@ sub component_for_method {
     return $METHODS_MAP->{$method};
 }
 
+my $myriad_meta = Object::Pad::MOP::Class->for_class('Myriad');
+my $reg_meta    = Object::Pad::MOP::Class->for_class('Myriad::Registry');
+
 subtest "Adding and viewing components" => sub {
 
     my $registry = new_ok('Myriad::Registry');
-    my $reg_meta = $registry->META;
     is $loop->add($registry), undef, "Registry Notifier class added to Loop just fine.";
 
     my $srv_class = 'Testing::Service';
@@ -77,10 +79,8 @@ subtest "Adding Service" => sub {
 
     my $myriad = new_ok('Myriad');
     my $config = new_ok('Myriad::Config' => [commandline => ['--transport', 'memory']]);
-    my $myriad_meta = $myriad->META;
     $myriad_meta->get_slot('$config')->value($myriad) = $config;
     my $registry = $Myriad::REGISTRY;
-    my $reg_meta = $registry->META;
 
     # Define our testing service
     {
@@ -110,7 +110,7 @@ subtest "Adding Service" => sub {
     my $service_name = $service->service_name;
     like($registry->make_service_name('Testing::Service'), qr/$service_name/, "Service name is set correctly");
 
-    my $srv_meta = $service->META;
+    my $srv_meta = Object::Pad::MOP::Class->for_class(ref $service);
     # Calling empty <component>_for for an added service will not trigger exception. reveiver and emitter in this case.
     my ($rpc, $batch, $receiver, $emitter) = map {my $meth = component_for_method($_); $registry->$meth('Testing::Service')} qw(rpc batch receiver emitter);
     cmp_deeply([map {keys %$_ } ($rpc, $batch, $receiver, $emitter)], ['inc_test', 'batch_test'], 'Registry components configured after service adding');
@@ -126,7 +126,6 @@ subtest "Adding Service" => sub {
 subtest "Service name" => sub {
 
     my $registry = new_ok('Myriad::Registry');
-    my $reg_meta = $registry->META;
     my $reg_srv_name = $registry->make_service_name('Test::Name');
     # Only lower case sepatated by .(dot)
     like ($reg_srv_name, qr/^[a-z']+\.[a-z']+$/, 'passing regex service name');

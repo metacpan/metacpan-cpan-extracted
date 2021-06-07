@@ -1,15 +1,10 @@
 Possible items to do, in no particular order
 
 Feature requests can be entered at 
-http://rt.cpan.org/Public/Dist/Display.html?Name=DBD-Pg
+https://github.com/bucardo/dbdpg/issues
 
-May also be some at
-https://github.com/bucardo/dbdpg
-(although we prefer using cpan.org)
-
-
-- Get a lint checker for the spellcheck words: sorted, non-duplicated, valid, etc.
-- Get the "make fulltest" bit working properly
+- Evaluate if we really need strtod in the code
+- Have docs describe various ways to set client_encoding
 - Change license to Artistic 2
 - Remove the "goto" calls in the tests
 - Force a test database rebuild when a git branch switch is detected

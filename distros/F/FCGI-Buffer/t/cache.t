@@ -2,7 +2,7 @@
 
 use strict;
 use warnings;
-use Test::Most tests => 159;
+use Test::Most tests => 160;
 use Storable;
 use Capture::Tiny ':all';
 use CGI::Info;
@@ -33,7 +33,7 @@ CACHED: {
 
 		if($@) {
 			diag('CHI required to test caching');
-			skip('CHI not installed', 157);
+			skip('CHI not installed', 158);
 		} else {
 			diag("Using CHI $CHI::VERSION");
 		}
@@ -530,6 +530,7 @@ CACHED: {
 
 		($headers, $body) = split /\r?\n\r?\n/, $stdout, 2;
 
+		like($headers, qr/^Last-Modified: /mi, 'Headers include Last-Modified');
 		ok($body =~ /<a href="\?arg2=b">link<\/a>/mi);
 		ok($body =~ /<a href=\"\/\/github.com\/nigelhorne/mi);
 		ok($body =~ /<a href=\"\/cgi-bin\/test4.cgi\?arg3=c">/mi);
@@ -552,7 +553,5 @@ CACHED: {
 		ok($html_file =~ /<a href=\"\/\/github.com\/nigelhorne/mi);
 		ok($html_file =~ /<a href=\"\/cgi-bin\/test4.cgi\?arg3=c">/mi);
 		ok($html_file =~ /"\/cgi-bin\/test4.cgi\?arg1=a&arg2=b">/mi);
-
-
 	}
 }

@@ -84,7 +84,7 @@ while($RUNNING) {
     $bbox->{'x'} = int(rand($width));
     $bbox->{'y'} = int(rand($height)) + (210 * $y_adj);
     $FB->ttf_print($bbox);
-    sleep 2;
+    sleep 1;
     $FB->xor_mode();
     $FB->ttf_print($bbox);
 }

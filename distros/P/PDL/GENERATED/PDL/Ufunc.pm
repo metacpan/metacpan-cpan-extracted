@@ -87,7 +87,7 @@ I<any> dimension.
 
 =for example
 
- $spectrum = prodover $image->xchg(0,1)
+ $spectrum = prodover $image->transpose
 
 
 
@@ -135,7 +135,7 @@ I<any> dimension.
 
 =for example
 
- $spectrum = dprodover $image->xchg(0,1)
+ $spectrum = dprodover $image->transpose
 
 Unlike L<prodover|/prodover>, the calculations are performed in complex double
 precision.
@@ -184,7 +184,7 @@ I<any> dimension.
 
 =for example
 
- $spectrum = dprodover $image->xchg(0,1)
+ $spectrum = dprodover $image->transpose
 
 Unlike L</prodover>, the calculations are performed in double
 precision.
@@ -236,7 +236,7 @@ is the first element of the parameter.
 
 =for example
 
- $spectrum = cumuprodover $image->xchg(0,1)
+ $spectrum = cumuprodover $image->transpose
 
 
 
@@ -287,7 +287,7 @@ is the first element of the parameter.
 
 =for example
 
- $spectrum = cumuprodover $image->xchg(0,1)
+ $spectrum = cumuprodover $image->transpose
 
 Unlike L</cumuprodover>, the calculations are performed in double
 precision.
@@ -336,7 +336,7 @@ I<any> dimension.
 
 =for example
 
- $spectrum = sumover $image->xchg(0,1)
+ $spectrum = sumover $image->transpose
 
 
 
@@ -384,7 +384,7 @@ I<any> dimension.
 
 =for example
 
- $spectrum = dsumover $image->xchg(0,1)
+ $spectrum = dsumover $image->transpose
 
 Unlike L<sumover|/sumover>, the calculations are performed in complex double
 precision.
@@ -433,7 +433,7 @@ I<any> dimension.
 
 =for example
 
- $spectrum = dsumover $image->xchg(0,1)
+ $spectrum = dsumover $image->transpose
 
 Unlike L</sumover>, the calculations are performed in double
 precision.
@@ -485,7 +485,7 @@ is the first element of the parameter.
 
 =for example
 
- $spectrum = cumusumover $image->xchg(0,1)
+ $spectrum = cumusumover $image->transpose
 
 
 
@@ -536,7 +536,7 @@ is the first element of the parameter.
 
 =for example
 
- $spectrum = cumusumover $image->xchg(0,1)
+ $spectrum = cumusumover $image->transpose
 
 Unlike L</cumusumover>, the calculations are performed in double
 precision.
@@ -585,7 +585,7 @@ I<any> dimension.
 
 =for example
 
- $spectrum = andover $image->xchg(0,1)
+ $spectrum = andover $image->transpose
 
 
 
@@ -633,7 +633,7 @@ I<any> dimension.
 
 =for example
 
- $spectrum = bandover $image->xchg(0,1)
+ $spectrum = bandover $image->transpose
 
 
 
@@ -681,7 +681,7 @@ I<any> dimension.
 
 =for example
 
- $spectrum = borover $image->xchg(0,1)
+ $spectrum = borover $image->transpose
 
 
 
@@ -729,7 +729,7 @@ I<any> dimension.
 
 =for example
 
- $spectrum = orover $image->xchg(0,1)
+ $spectrum = orover $image->transpose
 
 
 
@@ -777,7 +777,7 @@ I<any> dimension.
 
 =for example
 
- $spectrum = zcover $image->xchg(0,1)
+ $spectrum = zcover $image->transpose
 
 
 
@@ -825,7 +825,7 @@ I<any> dimension.
 
 =for example
 
- $spectrum = intover $image->xchg(0,1)
+ $spectrum = intover $image->transpose
 
 Notes:
 
@@ -882,7 +882,7 @@ I<any> dimension.
 
 =for example
 
- $spectrum = average $image->xchg(0,1)
+ $spectrum = average $image->transpose
 
 
 
@@ -946,7 +946,7 @@ I<any> dimension.
 
 =for example
 
- $spectrum = daverage $image->xchg(0,1)
+ $spectrum = daverage $image->transpose
 
 Unlike L<average|/average>, the calculation is performed in complex double
 precision.
@@ -995,7 +995,7 @@ I<any> dimension.
 
 =for example
 
- $spectrum = daverage $image->xchg(0,1)
+ $spectrum = daverage $image->transpose
 
 Unlike L</average>, the calculation is performed in double
 precision.
@@ -1060,7 +1060,7 @@ I<any> dimension.
 
 =for example
 
- $spectrum = medover $image->xchg(0,1)
+ $spectrum = medover $image->transpose
 
 
 
@@ -1108,7 +1108,7 @@ I<any> dimension.
 
 =for example
 
- $spectrum = oddmedover $image->xchg(0,1)
+ $spectrum = oddmedover $image->transpose
 
 
 
@@ -1164,7 +1164,7 @@ I<any> dimension.
 
 =for example
 
- $spectrum = modeover $image->xchg(0,1)
+ $spectrum = modeover $image->transpose
 
 
 
@@ -1230,7 +1230,7 @@ I<any> dimension.
 
 =for example
 
- $spectrum = pctover $image->xchg(0,1), $p
+ $spectrum = pctover $image->transpose, $p
 
 
 
@@ -1279,7 +1279,7 @@ I<any> dimension.
 
 =for example
 
- $spectrum = oddpctover $image->xchg(0,1), $p
+ $spectrum = oddpctover $image->transpose, $p
 
 
 
@@ -2058,7 +2058,7 @@ I<any> dimension.
 
 =for example
 
- $spectrum = minimum $image->xchg(0,1)
+ $spectrum = minimum $image->transpose
 
 
 
@@ -2165,7 +2165,7 @@ I<any> dimension.
 
 =for example
 
- $spectrum = maximum $image->xchg(0,1)
+ $spectrum = maximum $image->transpose
 
 
 

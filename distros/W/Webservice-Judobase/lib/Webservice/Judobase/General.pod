@@ -1,0 +1,27 @@
+
+=encoding UTF-8
+
+=head1 NAME
+
+Webservice::Judobase::General - General information from Judobase API.
+
+=head1 ATTRIBUTES
+
+=head2 ua
+
+User agent is passed in from the base class.
+
+=head2 url
+
+URL for the API, passed in from the base class.
+
+
+=head1 METHODS
+
+=head2 competition( id => INT )
+
+TBD.
+
+=head2 competitions()
+
+TBD.

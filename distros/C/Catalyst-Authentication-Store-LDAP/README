@@ -193,7 +193,7 @@ CONFIGURATION OPTIONS
     identifier for the user.
 
   user_search_options
-    This takes a hashref. It will append it's values to the call to
+    This takes a hashref. It will append its values to the call to
     Net::LDAP's "search" method during the initial user lookup. See
     Net::LDAP for valid options.
 
@@ -256,7 +256,7 @@ CONFIGURATION OPTIONS
     role_filter. If this is set to "dn", we will use the User Objects DN.
 
   role_search_options
-    This takes a hashref. It will append it's values to the call to
+    This takes a hashref. It will append its values to the call to
     Net::LDAP's "search" method during the user's role lookup. See Net::LDAP
     for valid options.
 
@@ -287,8 +287,8 @@ CONFIGURATION OPTIONS
         up in the store after login.
 
         NOTE: It's recommended to limit the user attributes fetched from
-        LDAP using user_search_options / attrs to not exhaust the session
-        store.
+        LDAP using "user_search_options" / "attrs" to not exhaust the
+        session store.
 
   entry_class
     The name of the class of LDAP entries returned. This class should exist

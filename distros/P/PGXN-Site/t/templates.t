@@ -22,7 +22,7 @@ use Plack::Request;
 use HTTP::Message::PSGI;
 
 #plan 'no_plan';
-plan tests => 238;
+plan tests => 227;
 
 Template::Declare->init( dispatch_to => ['PGXN::Site::Templates'] );
 
@@ -44,8 +44,11 @@ my $dists = [
     { dist => 'Baz', version => '0.4.0', abstract => 'Pg Baz' },
 ];
 
-ok my $html = Template::Declare->show('home', $req, { cloud => $cloud, dists => $dists }),
-    'Call the home template';
+ok my $html = Template::Declare->show('home', $req, {
+    cloud => $cloud,
+    dists => $dists,
+    base_url => 'https://test.pgxn.org',
+}), 'Call the home template';
 
 is_well_formed_xml $html, 'The HTML should be well-formed';
 
@@ -157,7 +160,7 @@ sub test_wrapper {
 
     # Check the head element.
     $tx->ok('/html/head', 'Test head', sub {
-        $tx->is('count(./*)', 11, qq{Should have 11 elements below "head"});
+        $tx->is('count(./*)', 25, qq{Should have 25 elements below "head"});
         # Title.
         $tx->is(
             './title',
@@ -166,19 +169,33 @@ sub test_wrapper {
         );
 
         # Check the meta tags.
+        my $v = PGXN::Site->version_string;
         for my $spec (
-            ['keywords', 'PostgreSQL, extensions, PGXN, PostgreSQL Extension Network'],
-            ['description', 'Search all indexed extensions, distributions, users, and tags on the PostgreSQL Extension Network.'],
+            ['name', 'viewport', 'width=device-width, initial-scale=1.0'],
+            ['name', 'keywords', 'PostgreSQL, extensions, PGXN, PostgreSQL Extension Network'],
+            ['name', 'description', 'Search all indexed extensions, distributions, users, and tags on the PostgreSQL Extension Network.'],
+            ['name', 'twitter:card', 'summary'],
+            ['name', 'twitter:site', '@pgxn'],
+            ['name', 'twitter:title', 'PGXN: PostgreSQL Extension Network'],
+            ['name', 'twitter:description', 'Search all indexed extensions, distributions, users, and tags on the PostgreSQL Extension Network.'],
+            ['name', 'twitter:image', 'https://test.pgxn.org/ui/img/icon-512.png'],
+            ['name', 'twitter:image:alt', 'PGXN gear logo'],
+            ['name', 'generator', "PGXN::Site $v"],
+            ['property', 'og:type', 'website'],
+            ['property', 'og:url', 'https://test.pgxn.org/'],
+            ['property', 'og:title', 'PGXN: PostgreSQL Extension Network'],
+            ['property', 'og:site_name', 'PGXN: PostgreSQL Extension Network'],
+            ['property', 'og:description', 'Search all indexed extensions, distributions, users, and tags on the PostgreSQL Extension Network.'],
+            ['property', 'og:image', 'https://test.pgxn.org/ui/img/icon-512.png'],
         ) {
             $tx->is(
-                qq{./meta[\@name="$spec->[0]"]/\@content}, $spec->[1],
-                "Should have $spec->[0] keywords meta element",
+                qq{./meta[\@$spec->[0]="$spec->[1]"]/\@content}, $spec->[2],
+                "Should have $spec->[1] meta element",
             );
         }
 
         # Check the stylesheets.
         my $i = 0;
-        my $v = PGXN::Site->version_string;
         for my $spec (
             [ layout => 'screen, projection, tv' ],
             [ print  => 'print'                  ],
@@ -325,10 +342,9 @@ sub test_wrapper {
                 $tx->ok('./ul[@class="floatRight"]', 'Test floatRight ul' => sub {
                     my $i = 0;
                     for my $spec (
-                        [ '/recent/', 'Recent Releases',            'Recent'  ],
-                        [ '/users/',  'PGXN Users',                 'Users'   ],
-                        [ '/about/',  'About PGXN',                 'About'   ],
-                        [ '/faq/',    'Frequently Asked Questions', 'FAQ'     ],
+                        [ '/users/',  'PGXN Users',      'Users'  ],
+                        [ '/tags/',   'Release Tags',    'Tags'   ],
+                        [ '/recent/', 'Recent Releases', 'Recent' ],
                     ) {
                         $i++;
                         $tx->ok("./li[$i]", "Test li $i", sub {
@@ -354,77 +370,53 @@ sub test_wrapper {
             $tx->is('count(./*)', 2, 'Should have 2 elements below #width');
             $tx->is('count(./span)', 2, 'Both should be spans');
             $tx->ok('./span[1]', 'Test the first span' => sub {
-                $tx->is('count(./*)', 6, 'Should have 6elements below #floatLeft');
+                $tx->is('count(./*)', 5, 'Should have 5 elements below #floatLeft');
                 $tx->is('./@class', 'floatLeft', 'Should be floatLeft');
                 my $v = PGXN::Site->version_string;
-                $tx->like('./text()', qr{^\Q$v\E\b}, qq{Text should contain "$v"});
-                $tx->like('./text()', qr{\bcode\b}, 'Text should contain "code"');
-                $tx->like('./text()', qr{\bdesign\b}, 'Text should contain "design"');
-                $tx->like('./text()', qr{\blogo\b}, 'Text should contain "logo"');
                 $tx->ok('./a[1]', 'Test first anchor', sub {
-                    $tx->is('./@href', 'https://www.justatheory.com/', 'Should link to justatheory.com');
-                    $tx->is('./@title', 'Go to Just a Theory', 'Should have link title');
-                    $tx->is('./text()', 'theory', 'Should have text "theory"');
+                    $tx->is('./@href', 'https://blog.pgxn.org/', 'Should link to blog.pgxn.org');
+                    $tx->is('./@title', $mt->maketext('PGXN Blog'), 'Should have link title');
+                    $tx->is('./text()', $mt->maketext('Blog'), 'Should have text "Blog"');
                 });
                 $tx->is('./span[1][@class="grey"]', '|', 'Should have spacer span');
                 $tx->ok('./a[2]', 'Test second anchor', sub {
-                    $tx->is('./@href', 'https://fullahead.org/', 'Should link to fullahead.org');
-                    $tx->is('./@title', 'Go to Fullahead', 'Should have link title');
-                    $tx->is('./text()', 'Fullahead', 'Should have text "Fullahead"');
+                    $tx->is('./@href', 'https://twitter.com/pgxn/', 'Should link to Twitter');
+                    $tx->is('./@title', $mt->maketext('Follow PGXN on Twitter'), 'Should have link title');
+                    $tx->is('./text()', $mt->maketext('Twitter'), 'Should have text "Blog"');
                 });
                 $tx->is('./span[2][@class="grey"]', '|', 'Should have spacer span');
                 $tx->ok('./a[3]', 'Test third anchor', sub {
-                    $tx->is('./@href', 'https://www.strongrrl.com/', 'Should link to strongrrl.com');
-                    $tx->is('./@title', 'Go to Strongrrl', 'Should have link title');
-                    $tx->is('./text()', 'Strongrrl', 'Should have text "Strongrrl"');
+                    $tx->is('./@href', 'https://manager.pgxn.org/', 'Should link to manage.pgxn.org');
+                    $tx->is('./@title', $mt->maketext('Release it on PGXN'), 'Should have link title');
+                    $tx->is('./text()', $mt->maketext('Release It'), 'Should have text "Blog"');
                 });
             }); # /span.floatLeft
 
-                        # [ 'https://blog.pgxn.org/',    'Blog',       'Blog'    ],
-                        # [ 'https://twitter.com/pgxn/', 'Twitter',    'Twitter' ],
-            $tx->ok('./span[2]', 'Test the first span' => sub {
+            $tx->ok('./span[2]', 'Test the second span' => sub {
                 $tx->is('./@class', 'floatRight', 'Should be floatRight');
-                $tx->is('count(./*)', 13, 'Should have 11 elements below #floatRight');
-                $tx->ok('./a[1]', 'Test blog anchor', sub {
-                    $tx->is('./@href', 'https://blog.pgxn.org/', 'Should link to blog');
-                    $tx->is('./@title', 'PGXN Blog', 'Should have link title');
-                    $tx->is('./text()', 'Blog', 'Should have text "Blog"');
+                $tx->is('count(./*)', 7, 'Should have 7 elements below #floatRight');
+                $tx->ok('./a[1]', 'Test about anchor', sub {
+                    $tx->is('./@href', '/about/', 'Should link to about');
+                    $tx->is('./@title', $mt->maketext('About PGXN'), 'Should have link title');
+                    $tx->is('./text()', $mt->maketext('About'), 'Should have text "About"');
                 });
                 $tx->is('./span[1][@class="grey"]', '|', 'Should have spacer span');
-                $tx->ok('./a[2]', 'Test Twitter anchor', sub {
-                    $tx->is('./@href', 'https://twitter.com/pgxn/', 'Should link to /mirroring/');
-                    $tx->is('./@title', 'Follow PGXN on Twitter', 'Should have link title');
-                    $tx->is('./text()', 'Twitter', 'Should have text "Twitter"');
+                $tx->ok('./a[2]', 'Test FAQ anchor', sub {
+                    $tx->is('./@href', '/faq/', 'Should link to about');
+                    $tx->is('./@title', $mt->maketext('Frequently Asked Questions'), 'Should have link title');
+                    $tx->is('./text()', $mt->maketext('FAQ'), 'Should have text "FAQ"');
                 });
-                $tx->is('./span[2][@class="grey"]', '|', 'Should have spacer span');
-                $tx->ok('./a[3]', 'Test PGXN Manager anchor', sub {
-                    $tx->is('./@href', 'https://manager.pgxn.org/', 'Should link to manager');
-                    $tx->is('./@title', 'Release it on PGXN', 'Should have link title');
-                    $tx->is('./text()', 'Release It', 'Should have text "Release It"');
+               $tx->is('./span[2][@class="grey"]', '|', 'Should have spacer span');
+                $tx->ok('./a[3]', 'Test mirroring anchor', sub {
+                    $tx->is('./@href', '/mirroring/', 'Should link to /mirroring/');
+                    $tx->is('./@title', $mt->maketext('Mirroring'), 'Should have link title');
+                    $tx->is('./text()', $mt->maketext('Mirroring'), 'Should have text "Mirroring"');
                 });
                 $tx->is('./span[3][@class="grey"]', '|', 'Should have spacer span');
-                $tx->ok('./a[4]', 'Test mirroring anchor', sub {
-                    $tx->is('./@href', '/mirroring/', 'Should link to /mirroring/');
-                    $tx->is('./@title', 'Mirroring', 'Should have link title');
-                    $tx->is('./text()', 'Mirroring', 'Should have text "Mirroring"');
-                });
-                $tx->is('./span[4][@class="grey"]', '|', 'Should have spacer span');
-                $tx->ok('./a[5]', 'Test donors anchor', sub {
-                    $tx->is('./@href', '/donors/', 'Should link to /donors/');
-                    $tx->is('./@title', 'Donors', 'Should have link title');
-                    $tx->is('./text()', 'Donors', 'Should have text "Donors"');
-                });
-                $tx->is('./span[5][@class="grey"]', '|', 'Should have spacer span');
-                $tx->ok('./a[6]', 'Test art anchor', sub {
-                    $tx->is('./@href', '/art/', 'Should link to /art/');
-                    $tx->is('./@title', 'Identity', 'Should have link title');
-                    $tx->is('./text()', 'Identity', 'Should have text "Identity"');
-                });
-                $tx->is('./span[6][@class="grey"]', '|', 'Should have spacer span');
-                $tx->ok('./a[7]', 'Test feedback anchor', sub {
+                $tx->ok('./a[4]', 'Test feedback anchor', sub {
                     $tx->is('./@href', '/feedback/', 'Should link to /feedback/');
-                    $tx->is('./@title', 'Feedback', 'Should have link title');
-                    $tx->is('./text()', 'Feedback', 'Should have text "Feedback"');
+                    $tx->is('./@title', $mt->maketext('Feedback'), 'Should have link title');
+                    $tx->is('./text()', $mt->maketext('Feedback'), 'Should have text "Feedback"');
                 });
             }) # /span.floatRight
 
@@ -447,7 +439,6 @@ sub test_search_form {
             $tx->is('./@class', 'query', 'Class should be "query"');
             $tx->is('count(./*)', 1, 'Should have 1 sub-element');
             $tx->ok('./input[@type="text"]', 'Test query input' => sub {
-                $tx->is('./@class', 'width50', 'Class should be "width50"');
                 $tx->is('./@name', 'q', 'Name should be "q"');
                 $tx->is('./@value', $q, qq{Value should be "$q"});
                 $tx->is(

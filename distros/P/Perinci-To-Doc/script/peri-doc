@@ -2,8 +2,8 @@
 
 # FRAGMENT id=shcompgen-hint command=peri-doc
 
-our $DATE = '2021-02-21'; # DATE
-our $VERSION = '0.875'; # VERSION
+our $DATE = '2021-05-24'; # DATE
+our $VERSION = '0.877'; # VERSION
 
 use 5.010;
 use strict;
@@ -142,7 +142,7 @@ peri-doc - Display text/POD documentation of Riap function or package
 
 =head1 VERSION
 
-This document describes version 0.875 of peri-doc (from Perl distribution Perinci-To-Doc), released on 2021-02-21.
+This document describes version 0.877 of peri-doc (from Perl distribution Perinci-To-Doc), released on 2021-05-24.
 
 =head1 SYNOPSIS
 

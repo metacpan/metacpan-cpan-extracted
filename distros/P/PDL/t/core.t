@@ -87,7 +87,7 @@ ok (($x->nelem == 3  and  all($x == pdl(1,2,3))), "topdl(1,2,3) returns a 3-ndar
 
 # test $PDL::undefval support in pdl (bug #886263)
 #
-is $PDL::undefval, 0, "default value of $PDL::undefval is 0";
+is $PDL::undefval, 0, "default value of \$PDL::undefval is 0";
 
 $x = [ [ 2, undef ], [3, 4 ] ];
 $y = pdl( $x );
@@ -118,13 +118,9 @@ do {
 $x = pdl(pdl(5));
 ok all( $x== pdl(5)), "pdl() can piddlify an ndarray";
 
-TODO: {
-   local $TODO = 'Known_problems bug sf.net #3011879' if ($PDL::Config{SKIP_KNOWN_PROBLEMS} or exists $ENV{SKIP_KNOWN_PROBLEMS});
-
-   # pdl of mixed-dim pdls: pad within a dimension
-   $x = pdl( zeroes(5), ones(3) );
-   ok all($x == pdl([0,0,0,0,0],[1,1,1,0,0])),"Piddlifying two ndarrays concatenates them and pads to length" or diag("x=$x\n");
-}
+# pdl of mixed-dim pdls: pad within a dimension
+$x = pdl( zeroes(5), ones(3) );
+ok all($x == pdl([0,0,0,0,0],[1,1,1,0,0])),"Piddlifying two ndarrays concatenates them and pads to length" or diag("x=$x\n");
 
 # pdl of mixed-dim pdls: pad a whole dimension
 $x = pdl( [[9,9],[8,8]], xvals(3)+1 );
@@ -137,8 +133,20 @@ ok all($c == pdl([[[1,0,0],[0,0,0]],[[2,3,4],[5,0,0]]])),"Can concatenate mixed-
 # same thing, with undefval set differently
 do {
     local($PDL::undefval) = 99;
+    $c = pdl undef;
+    ok all($c == pdl(99)), "explicit, undefval of 99 works" or diag("c=$c\n");
     $c = pdl [1], pdl[2,3,4], pdl[5];
-    ok all($c == pdl([[[1,99,99],[99,99,99]],[[2,3,4],[5,99,99]]])), "undefval works for padding" or diag("c=$c\n");;
+    ok all($c == pdl([[[1,99,99],[99,99,99]],[[2,3,4],[5,99,99]]])), "implicit, undefval works for padding" or diag("c=$c\n");
+    $PDL::undefval = undef;
+    $c = pdl undef;
+    ok all($c == pdl(0)), "explicit, undefval of undef falls back to 0" or diag("c=$c\n");
+    $c = pdl [1], [2,3,4];
+    ok all($c == pdl([1,0,0],[2,3,4])), "implicit, undefval of undef falls back to 0" or diag("c=$c\n");
+    $PDL::undefval = inf;
+    $c = pdl undef;
+    ok all($c == inf), "explicit, undefval of PDL scalar works" or diag("c=$c\n");
+    $c = pdl [1], [2,3,4];
+    ok all($c == pdl([1,inf,inf],[2,3,4])), "implicit, undefval of a PDL scalar works" or diag("c=$c\n");
 } while(0);
 
 # empty pdl cases
@@ -207,10 +215,20 @@ is($c2->type,'float','concatentating different datatypes returns the highest typ
 my $i=0;
 map{ ok(all($_==$list[$i]),"cat/dog symmetry for values ($i)"); $i++; }$c2->dog;
 
-# new_or_inplace
 $x = sequence(byte,5);
 
+$x->inplace;
+ok($x->is_inplace,"original item inplace-d true inplace flag");
+$y = $x->copy;
+ok($x->is_inplace,"original item true inplace flag after copy");
+ok(!$y->is_inplace,"copy has false inplace flag");
+$y++;
+ok(all($y!=sequence(byte,5)),"copy returns severed copy of the original thing if inplace is set");
+ok($x->is_inplace,"original item still true inplace flag");
+ok(!$y->is_inplace,"copy still false inplace flag");
+ok(all($x==sequence(byte,5)),"copy really is severed");
 
+# new_or_inplace
 $y = $x->new_or_inplace;
 ok( all($y==$x) && ($y->get_datatype ==  $x->get_datatype), "new_or_inplace with no pref returns something like the orig.");
 

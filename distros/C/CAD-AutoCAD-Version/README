@@ -95,10 +95,11 @@ EXAMPLE1
      #     [30] "AC1032",
      #     [31] "AC1033",
      #     [32] "AC1034",
-     #     [33] "AC2.10",
-     #     [34] "AC2.21",
-     #     [35] "AC2.22",
-     #     [36] "MC0.0"
+     #     [33] "AC1035",
+     #     [34] "AC2.10",
+     #     [35] "AC2.21",
+     #     [36] "AC2.22",
+     #     [37] "MC0.0"
      # ]
 
 EXAMPLE2
@@ -156,6 +157,7 @@ EXAMPLE2
      #     [34] "AC1032",
      #     [35] "AC1033",
      #     [36] "AC1034",
+     #     [37] "AC1035",
      # ]
 
 DEPENDENCIES
@@ -177,10 +179,10 @@ AUTHOR
     <http://skim.cz>
 
 LICENSE AND COPYRIGHT
-    © 2020 Michal Josef Špaček
+    © 2020-2021 Michal Josef Špaček
 
     BSD 2-Clause License
 
 VERSION
-    0.04
+    0.05
 

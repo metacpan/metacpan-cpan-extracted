@@ -17,7 +17,7 @@ subtest uid => sub {
 
   my $e = archive_entry_new();
   ok $e, 'archive_entry_new';
-  
+
   $r = archive_match_include_uid($m, 1000);
   is $r, ARCHIVE_OK, 'archive_match_include_uid 1000';
 
@@ -25,7 +25,7 @@ subtest uid => sub {
   is $r, ARCHIVE_OK, 'archive_match_include_uid 1002';
 
   $r = archive_entry_set_uid($e, 0);
-  is $r, ARCHIVE_OK, 'archive_entry_set_uid 0';  
+  is $r, ARCHIVE_OK, 'archive_entry_set_uid 0';
   ok archive_match_owner_excluded($m, $e), 'archive_match_owner_excluded (0)';
   ok archive_match_excluded($m,$e),        'archive_match_excluded (0)';
 
@@ -48,7 +48,7 @@ subtest uid => sub {
   is $r, ARCHIVE_OK, 'archive_entry_set_uid 1002';
   ok archive_match_owner_excluded($m, $e), 'archive_match_owner_excluded (1003)';
   ok archive_match_excluded($m,$e),        'archive_match_excluded (1003)';
-  
+
   $r = archive_match_free($m);
   is $r, ARCHIVE_OK, 'archive_match_free';
 
@@ -63,7 +63,7 @@ subtest gid => sub {
 
   my $e = archive_entry_new();
   ok $e, 'archive_entry_new';
-  
+
   $r = archive_match_include_gid($m, 1000);
   is $r, ARCHIVE_OK, 'archive_match_include_gid 1000';
 
@@ -71,7 +71,7 @@ subtest gid => sub {
   is $r, ARCHIVE_OK, 'archive_match_include_gid 1002';
 
   $r = archive_entry_set_gid($e, 0);
-  is $r, ARCHIVE_OK, 'archive_entry_set_gid 0';  
+  is $r, ARCHIVE_OK, 'archive_entry_set_gid 0';
   ok archive_match_owner_excluded($m, $e), 'archive_match_owner_excluded (0)';
   ok archive_match_excluded($m,$e),        'archive_match_excluded (0)';
 
@@ -94,7 +94,7 @@ subtest gid => sub {
   is $r, ARCHIVE_OK, 'archive_entry_set_gid 1002';
   ok archive_match_owner_excluded($m, $e), 'archive_match_owner_excluded (1003)';
   ok archive_match_excluded($m,$e),        'archive_match_excluded (1003)';
-  
+
   $r = archive_match_free($m);
   is $r, ARCHIVE_OK, 'archive_match_free';
 
@@ -143,7 +143,7 @@ subtest uname => sub {
 
   $r = archive_match_free($m);
   is $r, ARCHIVE_OK, 'archive_match_free';
-  
+
   $r = archive_entry_free($e);
   is $r, ARCHIVE_OK, 'archive_entry_free';
 };
@@ -189,7 +189,7 @@ subtest gname => sub {
 
   $r = archive_match_free($m);
   is $r, ARCHIVE_OK, 'archive_match_free';
-  
+
   $r = archive_entry_free($e);
   is $r, ARCHIVE_OK, 'archive_entry_free';
 };

@@ -2,7 +2,7 @@
 # After "make install" it should work as "perl t/QuickTime.t".
 
 BEGIN {
-    $| = 1; print "1..15\n"; $Image::ExifTool::configFile = '';
+    $| = 1; print "1..17\n"; $Image::ExifTool::configFile = '';
     require './t/TestLib.pm'; t::TestLib->import();
 }
 END {print "not ok 1\n" unless $loaded;}
@@ -210,6 +210,30 @@ my $testnum = 1;
     } else {
         print 'not ';
     }
+    print "ok $testnum\n";
+}
+
+# test 16: Write some Microsoft Xtra tags
+{
+    ++$testnum;
+    my @writeInfo = (
+        ['Microsoft:Director' => 'dir1'],
+        ['Microsoft:Director' => 'dir2'],
+        ['Microsoft:SharedUserRating' => 75],
+    );
+    my @extract = ('Microsoft:all');
+    print 'not ' unless writeCheck(\@writeInfo, $testname, $testnum, 't/images/QuickTime.mov', \@extract);
+    print "ok $testnum\n";
+}
+
+# test 17: Write some 3gp tags
+{
+    ++$testnum;
+    my @writeInfo = (
+        ['UserData:LocationInformation' => 'test comment role=Shooting lat=1.2 lon=-2.3 alt=100 body=earth notes=a note'],
+        ['UserData:Rating' => 'entity=ABCD criteria=1234 a rating'],
+    );
+    print 'not ' unless writeCheck(\@writeInfo, $testname, $testnum, 't/images/QuickTime.mov', 1);
     print "ok $testnum\n";
 }
 

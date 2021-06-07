@@ -1,4 +1,10 @@
-0.011   2018-11-29 (PERLANCAR)
+0.012   2021-05-26  Released-By: PERLANCAR; Urgency: high
+
+	- [build] Rebuild to update Sah coercion module names (old Sah coercion
+          modules have been purged from CPAN).
+
+
+0.011   2018-11-29  Released-By: PERLANCAR
 
 	- Rename App::cryp::Exchange::{gdax,coinbasepro_lite}.
 
@@ -7,24 +13,24 @@
           orderbook.
 
 
-0.010   2018-06-24 (PERLANCAR)
+0.010   2018-06-24  Released-By: PERLANCAR
 
 	- [Bugfix] indodax: get_order: return incorrect filled_base_size
 	  and filled_quote_size because of using wrong hash key.
 
 
-0.009   2018-06-13 (PERLANCAR)
+0.009   2018-06-13  Released-By: PERLANCAR
 
 	- [ux] balance, open-orders, orderbook, pairs: Formatting of
 	  result.
 
 
-0.008   2018-06-13 (PERLANCAR)
+0.008   2018-06-13  Released-By: PERLANCAR
 
         - Add subcommands: ticker, open-orders.
 
 
-0.007   2018-06-11 (PERLANCAR)
+0.007   2018-06-11  Released-By: PERLANCAR
 
 	- [ux] Add coerce rule str_num_en so we can say --price 7,000 etc
 	  instead of just --price 7000.
@@ -32,7 +38,7 @@
 	- [doc] Fix/update Synopsis.
 
 
-0.006   2018-06-11 (PERLANCAR)
+0.006   2018-06-11  Released-By: PERLANCAR
 
 	[INCOMPATIBLE CHANGES]
 
@@ -55,12 +61,12 @@
           App-cryp-exchange-CmdBundle-Whatever.
 
 
-0.005   2018-06-08 (PERLANCAR)
+0.005   2018-06-08  Released-By: PERLANCAR
 
 	- gdax: get_order_book: remove num-orders from GDAX API result.
 
 
-0.004   2018-06-06 (PERLANCAR)
+0.004   2018-06-06  Released-By: PERLANCAR
 
 	[REMOVED]
 
@@ -77,12 +83,12 @@
         - [doc] Add note about extra arguments to new().
 
 
-0.003   2018-05-10 (PERLANCAR)
+0.003   2018-05-10  Released-By: PERLANCAR
 
 	- Rename bitcoin_indonesia to indodax.
 
 
-0.002   2018-04-12 (PERLANCAR)
+0.002   2018-04-12  Released-By: PERLANCAR
 
         - [Incompatible change] Change structure of get_order_book() result to
           make it more similar to native result returned by most exchanges
@@ -99,6 +105,6 @@
         - [doc] Add some description.
 
 
-0.001   2018-04-04 (PERLANCAR)
+0.001   2018-04-04  Released-By: PERLANCAR
 
         - First release.

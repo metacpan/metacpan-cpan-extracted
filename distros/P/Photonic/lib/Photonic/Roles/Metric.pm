@@ -1,5 +1,5 @@
 package Photonic::Roles::Metric;
-$Photonic::Roles::Metric::VERSION = '0.015';
+$Photonic::Roles::Metric::VERSION = '0.016';
 
 =encoding UTF-8
 
@@ -9,7 +9,7 @@ Photonic::Roles::Metric
 
 =head1 VERSION
 
-version 0.015
+version 0.016
 
 =head1 COPYRIGHT NOTICE
 
@@ -67,7 +67,7 @@ $k. $q and $k are real.
 
 =back
 
-=head1 ACCESORS (read only)
+=head1 ACCESSORS (read only)
 
 =over 4
 

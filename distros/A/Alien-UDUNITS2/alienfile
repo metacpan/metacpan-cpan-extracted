@@ -1,28 +1,15 @@
 use alienfile;
 
-use Config;
-
 plugin 'PkgConfig' => 'udunits';
 
 share {
 	requires 'Alien::gmake' => 0.14;
 
 	plugin Download => (
-		url => 'https://www.unidata.ucar.edu/downloads/udunits/',
+		url => 'https://artifacts.unidata.ucar.edu/service/rest/repository/browse/downloads-udunits/',
 		version => qr/udunits-([\d\.]+)\.tar\.gz/,
 	);
 
-	meta->around_hook(
-		prefer => sub {
-			my $orig = shift;
-			my $build = shift;
-			my $data = $orig->($build, @_);
-			@{ $data->{list} } = grep {
-				$_->{url} =~ /^https/;
-			} @{ $data->{list} };
-			$data;
-		},
-	);
 
 	plugin Extract => 'tar.gz';
 
@@ -33,4 +20,28 @@ share {
 		'%{make}',
 		'%{make} install',
 	];
+
+	# There is no pkg-config .pc file in the original upstream version.
+	after 'gather' => sub {
+		my($build) = @_;
+		my $prefix = $build->runtime_prop->{prefix};
+
+		my $cflags = do {
+			'-I' . File::Spec->catfile($prefix, qw(include))
+		};
+		my $libs = do {
+			my $path = '-L' . File::Spec->catfile($prefix, qw(lib));
+
+			join ' ', (
+				$path,
+				'-ludunits2',
+				( $^O eq 'darwin' || $^O eq 'MSWin32' ? '-lexpat' : '')
+			);
+		};
+
+		$build->runtime_prop->{cflags}        = $cflags;
+		$build->runtime_prop->{cflags_static} = $cflags;
+		$build->runtime_prop->{libs}          = $libs;
+		$build->runtime_prop->{libs_static}   = $libs;
+	};
 };

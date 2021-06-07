@@ -7,7 +7,7 @@ use Test::More;
 #use Test::More 'no_plan';
 eval "use PGXN::API::Searcher";
 plan skip_all => "PGXN::API::Searcher required for router testing" if $@;
-plan tests => 369;
+plan tests => 385;
 
 use Plack::Test;
 use HTTP::Request::Common;
@@ -19,10 +19,11 @@ use_ok 'PGXN::Site::Router' or die;
 
 local $@;
 eval { PGXN::Site::Router->app };
-is $@, "Missing required parameters api_url, errors_to, errors_from, and feedback_to\n",
+is $@, "Missing required parameters base_url, api_url, errors_to, errors_from, and feedback_to\n",
     'Should get proper error for missing parameters';
 
 ok my $app = PGXN::Site::Router->app(
+    base_url        => 'https://test.pgxn.org/',
     api_url         => 'https://api.pgxn.org/',
     private_api_url => 'file:t/api',
     errors_to       => 'alerts@pgxn.org',
@@ -231,6 +232,15 @@ test_psgi $app => sub {
         ok $res->is_success, 'Should be a success';
         like $res->content, qr{\Q<h1 class="fn">David E. Wheeler</h1>},
             "The body should have the h1 with user's name";
+        my $grav = Template::Declare::Tags::_postprocess(Gravatar::URL::gravatar_url(
+            rating  => 'pg',
+            email   => 'david@justatheory.com',
+            size    => 80,
+            https   => 1,
+            default => "https://test.pgxn.org/ui/img/shirt.png",
+        ));
+        like $res->content, qr{<img src="\Q$grav" />},
+            'The body should have the full Gravatar URL';
 
         # Make sure we get 404 for nonexistent user.
         (my $bad = $uri) =~ s/theory/nonesuch/;
@@ -239,6 +249,16 @@ test_psgi $app => sub {
         is $res->code, 404, 'Should get 404 response';
         like $res->content, qr/Resource not found\./,
             'The body should have the error';
+    }
+};
+
+# Test /tags/
+test_psgi $app => sub {
+    my $cb = shift;
+    for my $uri ('/tags', '/tags/') {
+        ok my $res = $cb->(GET $uri), "Fetch $uri";
+        is $res->code, 200, 'Should get 200 response';
+        like $res->content, qr{\Q<h1>Release Tags</h1>}, 'The body should look correct';
     }
 };
 
@@ -315,7 +335,7 @@ test_psgi $app => sub {
     my $uri = '/users';
     ok my $res = $cb->(GET $uri), "Fetch $uri";
     is $res->code, 200, 'Should get 200 response';
-    like $res->content, qr{\Q<h1>Users</h1>}, 'The body should look correct';
+    like $res->content, qr{\Q<h1>Search Users</h1>}, 'The body should look correct';
 
     # Try char params with both /users and /users/.
     for my $char ('', qw(a b t)) {
@@ -323,13 +343,29 @@ test_psgi $app => sub {
             my $uri = "/users?c=$char";
             ok my $res = $cb->(GET $uri), "Fetch $uri";
             is $res->code, 200, 'Should get 200 response';
-            like $res->content, qr{\Q<h1>Users</h1>}, 'The body should look correct';
             no utf8;
-            like $res->content,
-                  $char eq 't' ? qr{\Q<a href="/user/theory">theory</a>}
-                : $char eq ''  ? qr{\Q<h3>⬅ Select a letter</h3>}
-                               : qr{<p>\QNo user nicknames found starting with “$char”</p>},
-                'And the content should look correct';
+            if ($char) {
+                like $res->content,
+                    qr{\Q<h1>User nicknames starting with “$char”</h1>},
+                    "The h1 should reference letter $char";
+                if ($char eq 't') {
+                    like $res->content, qr{\Q<a href="/user/theory">theory</a>},
+                        'There should be a user starting with t';
+                } else {
+                    like $res->content,
+                        qr{<h3>\QNone found</h3>},
+                        "Should find no nicknames starting with $char";
+                }
+                unlike $res->content, qr{\Q<form id="homesearch"},
+                    'There should be no search form';
+            } else {
+                like $res->content, qr{\Q<h1>Search Users</h1>},
+                    'The h1 should be “Search Users”';
+                like $res->content, qr{\Q<form id="homesearch"},
+                    'There should be a search form';
+                like $res->content, qr{\Q<h3>Or select a letter</h3>},
+                    'And it should prompt to select a letter';
+            }
         }
     }
 

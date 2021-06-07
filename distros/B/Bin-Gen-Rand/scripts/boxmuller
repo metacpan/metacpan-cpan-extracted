@@ -1,0 +1,285 @@
+#!/usr/bin/perl
+use 5.014 ; use strict ; use warnings ;  # the functions requires 5.10 for "state", 5.14 for srand. 
+use Getopt::Std ; getopts ':.:@:1d:g:Lm:s:v:', \my%o ;  
+use Math::Trig qw/pi/ ; # 5.4から
+use Scalar::Util qw/looks_like_number/ ; # 5.7.3から
+use Term::ANSIColor qw/:constants color/ ;  $Term::ANSIColor::AUTORESET = 1 ;
+use Time::HiRes qw/sleep usleep gettimeofday tv_interval/ ; # 5.7.3から
+
+$SIG{INT} = sub { & SecondInfo ; exit 130 } ;
+
+my $time0 = [ gettimeofday ] ;
+my ( $mu , $sd ) ;  #mu : 平均 , sd : 標準偏差
+my ( $s1 , $s2 )  = (0,0) ; # 1乗和 と 2乗和
+my $count = 0 ; # 出力した個数
+my $upto = $o{g} // 6 ;  # 出力要素数
+& init ; 
+& main ; 
+& SecondInfo ; 
+exit 0 ;
+
+sub init ( ) {   #オプションを使った設定
+   $o{s} = defined $o{s} ? srand $o{s} : srand ; # 乱数シードの保管/設定
+
+   sub LLN ( $ ) ; * LLN = * looks_like_number ; # 関数名が長すぎるので、短くした。
+   sub printErr( $ ){ print STDERR BRIGHT_RED "Option -$_[0] should have a numeric specification.\n" ; exit 1 }
+   $mu = $o{m} ? LLN $o{m} ? $o{m} : printErr "m" : 0 ;  #m : 平均
+   $sd = $o{d} ? LLN $o{d} ? $o{d} : printErr "d" : $o{v} ? LLN $o{v} ? sqrt  $o{v} : printErr "v" : 1 ;  #sd：標準偏差 
+}
+
+sub main ( ) {  #  乱数の出力
+   sub getrand  ;
+   sub boxmuller ( $$ ) ;  #ボックスミュラー法によるガウス乱数の作成
+   * getrand = * boxmuller ; 
+   * getrand = * lognormal if $o{L} ;  # 対数正規分布の指定があった場合。
+
+   while ( $count < $upto ) { 
+   	   sleep $o{'@'} if defined $o{'@'} ;
+       my $x = getrand $mu, $sd ; 
+       $x = sprintf "% .$o{'.'}f" , $x if defined $o{'.'} ; # <-- May be efficientized. 
+       $s1 += $x ; 
+       $s2 += $x ** 2 ; 
+       $count ++ ; # 出力個数を計数するので個々を選んだ。
+       print "$count\t" if $o{':'} ;  # <-- Maybe effiecientized by other code structure.
+       print "$x\n" ; 
+   }
+
+  sub boxmuller ( $$ ) {  #  ガウス乱数の生成
+      state $piW = atan2(1,1)* 8  ;  #6.28=3.14*2
+      state $z = undef ; 
+      do { my $t = $z ; undef $z ; return $t * $_[1] + $_[0] }  if defined $z ; 
+      
+      my $r1 = 1 - rand ; # ; $r1 = rand until $r1 ; 値が0になることを阻止。
+      my $r2 = $piW * rand ;
+      my $r1R = sqrt ( -2 * log $r1 ); 
+      my $r2S = sin $r2 ; 
+      my $r2C = cos $r2 ; 
+      ( my $t , $z ) = ( $r1R * $r2S , $r1R * $r2C ) ; 
+      return $t * $_[1] + $_[0] ; 
+  }
+
+  sub lognormal ( $$ ) { 
+  	return exp boxmuller $_[0], $_[1] ;
+  }
+}
+
+sub SecondInfo( ) {   #  処理したことについての二次情報を出力
+    return if $o{1} ;
+    use FindBin qw [ $Script ] ; 
+    my $cmd = "$Script -m $mu -d $sd" ; 
+    $cmd .= ' -L' if $o{L} ;
+    print STDERR 
+       CYAN "printed lines: ", BRIGHT_CYAN $count ,
+       CYAN " , used random seed: " , BRIGHT_CYAN  $o{s} ,
+       CYAN " , elapsed seconds: " , BRIGHT_CYAN  tv_interval ($time0) ,
+       RESET "\n" , 
+       CYAN "sum = " , BRIGHT_CYAN  sprintf("%g", $s1 ) ,
+       CYAN " , squared sum = " , BRIGHT_CYAN  sprintf( "%g" , $s2 ) , 
+       CYAN " ($cmd) " , RESET "\n" ;
+ }
+
+## ヘルプとバージョン情報
+BEGIN {
+  our $VERSION = 0.24 ;
+  $Getopt::Std::STANDARD_HELP_VERSION = 1 ; 
+  grep { m/--help/} @ARGV and *VERSION_MESSAGE = sub {} ; 
+    # 最初は 0.21 を目安とする。
+    # 1.00 以上とする必要条件は英語版のヘルプをきちんと出すこと。
+    # 2.00 以上とする必要条件はテストコードが含むこと。
+    # 0.22 : -g inf を指定可能とした。
+    # 0.23 : 説明文を分かり安くした。
+    # 0.24 : 英語のマニュアルをPOD化する。
+}  
+
+sub HELP_MESSAGE {
+    use FindBin qw[ $Script $Bin ] ;
+    sub EnvJ ( ) { $ENV{LANG} =~ m/^ja_JP/ ? 1 : 0 } ; # # ja_JP.UTF-8 
+    sub en( ) { grep ( /^en(g(i(sh?)?)?)?/i , @ARGV ) ? 1 : 0 } # English という文字列を先頭から2文字以上を含むか 
+    sub ja( ) { grep ( /^jp$|^ja(p(a(n?)?)?)?/i , @ARGV ) ? 1 : 0 } # jp または japan という文字列を先頭から2文字以上を含むか 
+    sub opt( ) { grep (/^opt(i(o(ns?)?)?)?$/i, @ARGV ) ? 1 : 0 } # options という文字列を先頭から3文字以上含むから
+    sub noPOD ( ) { grep (/^no-?pod\b/i, @ARGV) ? 1 : 0 } # POD を使わないと言う指定がされているかどうか
+    my $jd = "JapaneseManual" ;
+    my $flagE = ! ja && ( en || ! EnvJ ) ; # 英語にするかどうかのフラグ
+
+    exec "perldoc $0" if $flagE &&  ! opt && ! noPOD   ; 
+    $ARGV[1] //= '' ;
+    open my $FH , '<' , $0 ;
+    while(<$FH>){
+        s/\Qboxmuller\E/$Script/gi ;
+        s/\$Bin/$Bin/gi ;
+        if ( s/^=head1\b\s*// .. s/^=cut\b\s*// ) { 
+            if ( s/^=begin\s+$jd\b\s*// .. s/^=end\s+$jd\b\s*// xor $flagE ) {
+                print $_ if ! opt || m/^\s+\-/  ; 
+            }
+        } 
+    }
+    close $FH ;
+    exit 0 ;
+}
+
+=encoding utf8 
+
+=head1 NAME
+
+boxmuller
+
+=head1 VERSION
+
+0.24 -- 2018-07-03
+
+=head1 SYNOPSIS
+
+boxmuller [B<-m> mean] [B<-v> variance | B<-d> standard_deviation] 
+[B<-g> how_many_you_want] [B<-.> digits_after_decimal_point] [B<-s> random_seed] 
+[B<-L>(log normal)] [B<-@> seconds] [B<-1>] [B<-:>]
+
+boxmuller [B<--help> [ja|en] [opt] [nopod]] [B<--version>]
+
+=head1 DESCRIPTION
+
+Generates Gaussian random variables by Box-Muller method.
+The used random seed and the sums of the generated numbers and the square of them are also 
+provided to STDERR.
+
+=head1 OPTION
+
+=over 4
+
+=item -m N 
+
+Population B<Mean (average)>. Default value is 0.
+
+
+=item -d N 
+
+Population B<Standard Deviation>. Default value is 1.
+
+=item -v N 
+
+Population B<Variance>. Default value is 1. If -d is given, -v would be nullified.
+
+=item -. N 
+
+The digits to be shown after the decimal point. Without this specification 
+14 digits after the decimal point may be shown.
+
+=item -g N 
+
+How many numbers to be produced. Default value is 6. "Inf" (Infinity) can be given.
+
+=item -s N 
+
+Random B<seed> specification. The residual divided by 2**32 is essential.
+
+=item -L 
+
+Outputs variables from the B<log normal distribution> instead of the normal distribution.
+
+=item -1
+
+Only output the random number without other secondary information.
+
+=item -: 
+
+Attaches serial number beginning from 1. 
+
+=item -@ N 
+
+Waiting time in B<seconds> for each output line, that can be spedicifed 6 digits after the decimal points
+(microsecond).
+
+=item --help 
+
+Print this online help manual of this command "boxmuller". Similar to "perldoc `which [-t] boxmuller` ".
+
+=item --help opt 
+
+Only shows the option helps. It is easy to read when you are in very necessary.
+
+=item --help ja
+
+Shows Japanese online help manual. 
+
+=item --help nopod 
+
+Print this online manual using the code insdide this program without using the function of Perl POD.
+
+=item --version 
+
+Version information output.
+
+=back
+
+=head1 EXAMPLE
+
+=over 4
+
+=item boxmuller
+
+# Generates some random numbers from the stardard normal distribution.
+
+=item boxmuller -m 10 -d 2 -g 12
+
+# Generates 12 random numbers from the normal distribution with the
+population mean 10, the population variance 2.
+
+=item boxmuller B<-L> -m 3 -d 2
+
+# Generates B<Log normal distribution>. In this case the popular median is exp(3) = 20.09. 
+
+=item boxmuller B<-g Inf -@ 0.3>
+
+# Generate each random number every 0.3 seconds.
+
+=back
+
+
+=head1 AUTHOR
+
+Toshiyuki Shimono
+  bin4tsv@gmail.com
+
+=head1 HISTORY
+
+This program has been made since 2016-07-07 (Thu)
+as a part of TSV hacking toolset for table data.
+
+
+=begin JapaneseManual 
+
+   boxmuller  ($Bin)  ガウス乱数を標準的と考えられるボックス=ミュラー法により生成する。
+
+ 利用例 : 
+    boxmuller  # 単にいくつか乱数を何個か生成する
+    boxmuller  -m 10 -d 2  -g 12 #  母平均10, 母標準偏差2のガウス乱数を12個生成する。
+    boxmuller -L -m 10 -d 2     # -L により対数正規分布に従う乱数を生成する。この場合、中央値はexp(10)。
+    boxmuller -g Inf -@ 0.3  # 0.3秒ごとに１つずつ無限に乱数を生成する。Ctrl+Cで停止する。
+
+ オプション: 
+   -m N : ガウス分布の平均を指定する。未指定なら 0 (Mean)
+   -d N : ガウス分布の標準偏差を指定する。未指定なら 1。 (stardard Deviation)
+   -v N : ガウス分布の分散を指定する。未指定なら 1。-d の指定が優先。(Variance)
+   -. N : 出力する値の小数点以下の桁数を指定する。 (decimal point)
+
+   -g N : 出力するガウス乱数の個数を指定する。未指定の場合 6。無限大を意味する inf も指定可能。(Get)
+   -s N : 乱数シードを指定する(指定した数の 2**32=約43億で割った剰余が渡される)。 (Seed)
+   -L   ; 対数正規分布で出力する様にする。(Logarithmic)
+
+   -1   : 標準エラー出力へ出力される乱数シードなどの情報を表示しない。
+   -:   : 1から順に連番も出力する。
+   -@ N : 1個取り出す為に待つ秒数を指定したい場合に指定。小数点以下6桁迄指定が可能。(まだあまり正確ではない。)
+
+  --help : この $0 のヘルプメッセージを出す。  perldoc -t $0 | cat でもほぼ同じ。
+  --help opt : オプションのみのヘルプを出す。opt以外でも options と先頭が1文字以上一致すれば良い。
+  --help en : 英語版のオンラインヘルプマニュアルを出力。Online help in English version. 
+  --version : このプログラムのバージョン情報を標準出力に出力する。
+
+ 標準出力への出力 :  
+   1. ガウス乱数
+
+ 標準エラー出力への出力 :
+   2. 乱数シード  
+   3. 一乗和と二乗和 
+
+=end JapaneseManual
+=cut

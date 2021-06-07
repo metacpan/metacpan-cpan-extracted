@@ -1,0 +1,12 @@
+
+This module provides a Unix-like command `crosstable'. 
+It outputs the 2-way contingency table from a 2-columned TSV file,
+as well as many related minor functions. 
+
+=head1 DESCRIPTION
+
+
+
+ Copyright (c) 2021 Toshiyuki SHIMONO. All rights reserved.
+ This program is free software; you can redistribute it and/or
+ modify it under the same terms as Perl itself.

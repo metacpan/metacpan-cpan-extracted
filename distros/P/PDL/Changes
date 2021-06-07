@@ -1,3 +1,28 @@
+2.050 2021-06-02
+- fix pdlperl.h build bug - thanks @jplesnik for report
+
+2.049 2021-05-31
+- PDL::Complex->from_native / as_native
+- zap obsolete MatrixOps::eigen_c
+- MatrixOps::identity now preserves higher dims on multi-dim input
+- copy now copies ndarray and leaves original ndarray's inplace alone
+- MatrixOps::lu_decomp now preserves inplace flag on input
+- MatrixOps::lu_backsub now gets output dims right including inplace - thanks @wlmb for report
+
+2.048 2021-05-24
+- remove obsolete and inaccurate doc relating bad values to NaN
+- parse simple complex-number strings
+- SvPDLV gives more comprehensible error if given a hash without "PDL" key
+- drop SKIP_KNOWN_PROBLEMS support
+- drop POGL_VERSION, USE_POGL, WITH_3D config; just try building
+- Inline now not a dep but if installed gets updated to suitable version
+- drop WITH_SLATEC config; just try building
+- new pdlperl.h for Perl-specific functions/macros
+- $PDL::undefval can be ndarray
+- replace PDL::Complex stringification with native-complex version
+- overloading now done in PDL::Ops/Primitive where functions defined
+- overloading honours subclass methods
+
 2.047 2021-05-08
 - add PDL::i2C
 - replace creal, cimag with re, im, for easier PDL::Complex -> native transition

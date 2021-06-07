@@ -48,7 +48,7 @@ for my $infile (@ARGV_infiles) {
     }
     $outfile = secure_outfile($outfile, $ARGV_out_suffix);
     ### Output tree in: $outfile
-    $tree->store($outfile, { -nodelabels => 0 } );
+    $tree->store($outfile);
 }
 
 # TODO: generalize the --ref-tree approach to other programs as this allows
@@ -64,7 +64,7 @@ prune-tree.pl - Prune tips from TREE files based on id lists
 
 =head1 VERSION
 
-version 0.210610
+version 0.211470
 
 =head1 USAGE
 

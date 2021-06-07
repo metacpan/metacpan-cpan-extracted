@@ -10,7 +10,7 @@ use WWW::ClickSource::Request;
 
 use base 'Exporter';
 
-our $VERSION = 0.8;
+our $VERSION = 1.0002;
 
 our @EXPORT_OK = ('detect_source');
 
@@ -20,7 +20,7 @@ WWW::ClickSource - Determine the source of a visit on your website : organic, ad
 
 =head1 VERSION
 
-Version 0.6
+Version 1.0002
 
 =head1 DESCRIPTION
 
@@ -158,30 +158,32 @@ sub detect_click_source {
                 $click_info{category} = 'other';
             }
         }
-        elsif ( $params->{gclid} ) { #gclid is a google adwords specific parameter
+        
+        if ( $params->{gclid} ) { #gclid is a google adwords specific parameter
             if ( $request->{referer} ) {
                 if  ( $request->{referer}->scheme =~ /https?/ ) {
-                    if ( $request->{referer}->host =~ m/(?:google\.(?:com?\.)?\w{2,3}|googleadservices\.com)$/ ) {            
+                    if ( $request->{referer}->host =~ m/(?:google\.(?:com?\.)?\w{2,3}|googleadservices\.com|googleads\.\w+\.doubleclick\.net)$/ ) {
                         %click_info = (
+                                %click_info,
                                 source => 'google',
-                                campaign =>  '',
                                 medium => 'cpc',
                                 category => 'paid',
                         );
                     }
                 } elsif ( $request->{referer}->scheme eq 'android-app' ) {
                         %click_info = (
+                                %click_info,
                                 source => 'android-app',
                                 app => $request->{referer}->authority,
-                                campaign =>  '',
                                 medium => 'cpc',
                                 category => 'paid',
+                                
                         );
                 }
                 else {
                         %click_info = (
+                                %click_info, # utm_* params take precedence over our guess
                                 source => $request->{referer} ."", #stringify
-                                campaign =>  '',
                                 medium => 'cpc',
                                 category => 'paid',
                         );
@@ -189,10 +191,11 @@ sub detect_click_source {
             }
             else { #gclid param without referer - just use defaults for google, since we don't know anything else
                 %click_info = (
+                        %click_info,
                         source => 'google',
-                        campaign =>  '',
                         medium => 'cpc',
                         category => 'paid',
+                        
                 );
             }
         }
@@ -208,8 +211,8 @@ sub detect_click_source {
                 if ( $referer_base_url =~ m/(?:google\.(?:com?\.)?\w{2,3}|googleadservices\.com).*?\/aclk/ ) {
             
                     %click_info = (
+                            %click_info,
                             source => 'google',
-                            campaign =>  '',
                             medium => 'cpc',
                             category => 'paid',
                     );
@@ -217,12 +220,14 @@ sub detect_click_source {
                 else {
                     if ( $request->{referer}->host eq $request->{host} ) {
                         %click_info = (
+                            %click_info,
                             source => $request->{host},
                             category => 'pageview',
                         );
                     }
                     else {
                         %click_info = (
+                            %click_info,
                             source => $request->{referer}->host,
                             category => 'referer',
                         );
@@ -231,6 +236,7 @@ sub detect_click_source {
             } 
             elsif ( $request->{referer}->scheme eq 'android-app' ) {
                 %click_info = (
+                    %click_info,
                     source => 'android-app',
                     app => $request->{referer}->authority,
                     category => 'referer',
@@ -238,6 +244,7 @@ sub detect_click_source {
             }
             else {
                 %click_info = (
+                    %click_info,
                     source => $request->{referer} ."", #stringify
                     category => 'referer',
                 );
@@ -246,10 +253,7 @@ sub detect_click_source {
             
         }
         else {
-            %click_info = (
-                medium => '',
-                category => 'direct',
-            );
+            $click_info{category} = 'direct';
         }
         
         if ( $click_info{source} && $click_info{source} =~ m/l\.facebook\.com/ ) {

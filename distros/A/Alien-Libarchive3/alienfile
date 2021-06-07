@@ -1,8 +1,23 @@
 use alienfile;
+use Config;
+use FFI::CheckLib qw( find_lib_or_die );
+use File::Glob qw( bsd_glob );
+use Env qw( @PKG_CONFIG_PATH );
+
+my @lib;
+
+if($^O eq 'darwin')
+{
+  if(-d '/usr/local/Cellar/libarchive')
+  {
+    push @PKG_CONFIG_PATH, grep { -d $_ } bsd_glob '/usr/local/Cellar/libarchive/*/lib/pkgconfig';
+    push @lib, grep { -d $_ } bsd_glob '/usr/local/Cellar/libarchive/*/lib'
+  }
+}
 
 plugin 'PkgConfig' => (
   pkg_name => 'libarchive',
-  minimum_version => '3.0.0',
+  minimum_version => '3.2.0',
 );
 
 plugin 'Probe::CBuilder' => (
@@ -16,20 +31,33 @@ int main(int argc, char *argv[])
 {
   int r;
   archive_read a;
-  
+
   a = archive_read_new();
   if(a == NULL)
     return 2;
-  
+
   r = archive_read_free(a);
   if(r != ARCHIVE_OK)
     return 2;
-  
+
   printf("version = '%s'\n", ARCHIVE_VERSION_ONLY_STRING);
   return 0;
 }
 },
 );
+
+meta->around_hook('probe' => sub {
+  my $orig = shift;
+  my $build = shift;
+  my $type = $orig->($build, @_);
+  return $type if $type eq 'share';
+  find_lib_or_die lib => 'archive', symbol => [
+    'archive_read_free',
+    'archive_write_free',
+    'archive_free',
+  ], libpath => [@lib];
+  return $type;
+});
 
 share {
 
@@ -43,29 +71,45 @@ share {
 
   plugin Extract => 'tar.gz';
 
-  # TODO: lz4 https://github.com/lz4/lz4/releases 
+  # TODO: lz4 https://github.com/lz4/lz4/releases
   # TODO: http://zlib.net/
   plugin 'Build::SearchDep' => (
     aliens => [ qw( Alien::Nettle Alien::xz Alien::LZO Alien::Libbz2 Alien::Libxml2 ) ],
   );
 
-  plugin 'Build::Autoconf' => ();
-
   my $configure_flags = '--with-lzo2';
-  $configure_flags .= ' --without-iconv' if $^O eq 'darwin';  
-  build [
-    "%{configure} --disable-shared --enable-static $configure_flags",
-    '%{make}',
-    '%{make} install',
-  ];
-  
-  ffi {
+  $configure_flags .= ' --without-iconv' if $^O eq 'darwin';
+
+  if($^O eq 'MSWin32')
+  {
+    plugin 'Build::Autoconf' => ( ffi => 1 );
+
     build [
-      "%{configure} --enable-shared --disable-static --libdir=%{.install.autoconf_prefix}/dynamic $configure_flags",
+      "%{configure} --disable-shared --enable-static $configure_flags",
       '%{make}',
       '%{make} install',
     ];
-  };  
+
+    ffi {
+      build [
+        "%{configure} --enable-shared --disable-static --libdir=%{.install.autoconf_prefix}/dynamic $configure_flags",
+        '%{make}',
+        '%{make} install',
+      ];
+    };
+  }
+  else
+  {
+    plugin 'Build::Autoconf' => ( ffi => 0 );
+
+    build [
+      "%{configure} --enable-shared --enable-static --enable-bsdtar=static --enable-bsdcpio=static --enable-bsdcat=static $configure_flags",
+      '%{make}',
+      '%{make} install',
+    ];
+
+    plugin 'Gather::IsolateDynamic';
+  }
 };
 
 if($^O eq 'netbsd')

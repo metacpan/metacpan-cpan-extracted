@@ -1,5 +1,5 @@
 package Photonic::WE::R2::AllH;
-$Photonic::WE::R2::AllH::VERSION = '0.015';
+$Photonic::WE::R2::AllH::VERSION = '0.016';
 
 =encoding UTF-8
 
@@ -9,7 +9,7 @@ Photonic::WE::R2::AllH
 
 =head1 VERSION
 
-version 0.015
+version 0.016
 
 =head1 COPYRIGHT NOTICE
 
@@ -55,7 +55,6 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA  02110-1301 USA
    my $haydock_cs=$iter->cs;
    my $haydock_bcs=$iter->bcs;
    my $haydock_gs=$iter->gs;
-   my $haydock_states=$iter->states;
 
 =head1 DESCRIPTION
 
@@ -82,7 +81,7 @@ Runs the iteration to completion.
 
 =back
 
-=head1 ACCESORS (read only)
+=head1 ACCESSORS (read only)
 
 =over 4
 
@@ -137,11 +136,6 @@ Array of Haydock g coefficients
 =cut
 
 use namespace::autoclean;
-use Machine::Epsilon;
-use PDL::Lite;
-use PDL::NiceSlice;
-use Photonic::Utils qw(MHProd);
-use Carp;
 use Moose;
 use MooseX::StrictConstructor;
 

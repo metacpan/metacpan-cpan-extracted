@@ -2,58 +2,65 @@
 
 =head1 NAME
 
-Form::Tiny::Manual::Internals - get more out of Form::Tiny
+Form::Tiny::Manual::Internals - details on form implementation
 
 =head1 DESCRIPTION
 
+This guide gets in depth into Form::Tiny metaobject model. This knowledge should not be required to make full use of the module, but is required to extend it or contribute to it.
+
 =head2 How does the module work?
 
-Behind the scenes, the module introduces a couple of class methods that are used to build underlying Moo attributes. These are:
+Behind the scenes, the module stores objects of L<Form::Tiny::Meta> for each package that was turned into a form by a proper Form::Tiny call. Meta object is an object that stores all information about the form layout, but no information about form input or validation state. Each class of L<Form::Tiny::Form> contains the C<form_meta> method, which returns this meta object for the given package.
 
-=over
+Form building is done just by calling methods on the meta object. Each helper of the DSL is just a single call to a metaobject method, for example, the following calls are equivalent:
 
-=item * C<field_defs> attribute, built by C<build_fields> method
+	form_field 'field-name' => %args;
+	__PACKAGE__->form_meta->add_field('field-name' => %args);
 
-=item * C<cleaner> attribute, built by C<build_cleaner> method
+The actual form object only stores data that is relevant to form state, not to form layout. Thanks to this model, the layout needs not to be rebuilt each time a new form object is constructed, which speeds up construction.
 
-=item * C<filters> attribute, built by C<build_filters> method (only with L<Form::Tiny::Filtered>)
+Additional behavior like filtering is implemented by composing new roles to the meta object and declaring new hooks in C<setup> method. Refer to the code of L<Form::Tiny::Meta::Filtered> to see how meta roles may define additional behavior.
 
-=back
+=head3 Why use meta object model at all?
 
-The regular C<form_field>, C<form_filter> and C<form_cleaner> functions are just helpers that allow you to create these builder methods with a sort of I<Domain-Specific Language>. In detail, every call to these helpers is wrapping the corresponding builder method in another method, making it possible to specify form details one step at a time.
-
-=head2 Why use the bare-bones internals instead of the helpers?
-
-One reason for that might be wanting Form::Tiny include Moose instead of Moo. Moo classes can be promoted to Moose without any problem, however you might want to use Moose-specific features like traits, which will likely not be possible.
-
-Another reason might be wanting to squish more out of Form::Tiny, either performance or customizability. You can effectively drop all magic and it becomes a simple Moo/se role with attribute builders (at a cost of little more boilerplate).
+The I<1.00> series of the module did not implement a meta object, and in turn implementing DSL keywords ended up being a hack, abusing Perl's ability to replace symbols in the package with strict mode turned off. New implementation allowed to get rid of all that dark magic, replacing it with something readable and reliable.
 
 =head2 Using the module without the syntactic sugar
 
-To use Form::Tiny as a Moo role you have to declare your own Moo/se class mixing in the I<Form::Tiny> role and define a I<build_fields> sub, returning a list of field definitions for the form. A class containing these two basic requirements is ready to be instantiated and passed input to be validated.
-
-C<build_fields> should return a list of hashrefs, and each which will be coerced to L<Form::Tiny::FieldDefinition>. You can provide an instance of the class yourself instead of hashrefs, which should be helpful if you're willing to use your own definition implementation.
+It is entirely possible, although a bit tedious, to use the module without importing L<Form::Tiny> package. The following example declares a form with a single field taken from the example above.
 
 	package MyForm;
 
-	use Moose;
+	# Moo for easy role mixing and a constructor
+	use Moo;
 
-	with qw(Form::Tiny);
+	# gives us create_form_meta function
+	use Form::Tiny::Utils qw(:meta_handlers);
 
-	sub build_fields {
-		return
-			{name => 'field1'},
-			{name => 'field2', required => 1}
-		;
-	}
+	# we need this role mixed in
+	with qw(Form::Tiny::Form);
 
-To add additional behavior to the form, you can also mix in the L<Form::Tiny::Filtered> and L<Form::Tiny::Strict> roles.
+	# meta roles go into the qw()
+	create_form_meta(__PACKAGE__, qw());
 
-See I<bare_bones_form.pl> example for a full example of this syntax.
+	# add a requried field
+	__PACKAGE__->form_meta->add_field('field-name' => (
+		required => 1,
+	));
 
-=head2 Mixing two types of syntax
+	1;
 
-It is possible to mix I<form_field> helpers with I<build_fields> method, as well as I<form_filter> with I<build_filters>, although the author is not sure what purpose would it serve.
+The code above should result in a form that has the same capabilities as the one below:
+
+	package MyForm;
+
+	use Form::Tiny;
+
+	form_field 'field-name' => (
+		required => 1,
+	);
+
+	1;
 
 =head1 SEE ALSO
 
@@ -61,8 +68,6 @@ It is possible to mix I<form_field> helpers with I<build_fields> method, as well
 
 =item * L<Form::Tiny::Manual>
 
-=item * L<Moose>
-
-=item * L<Moo>
+=item * L<Form::Tiny::Manual::Compatibility>
 
 =back

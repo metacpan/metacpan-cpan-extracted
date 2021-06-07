@@ -33,7 +33,7 @@ resources:
   bugtracker: https://github.com/perlancar/perl-ArrayDataRoles-Standard/issues
   homepage: https://metacpan.org/release/ArrayDataRoles-Standard
   repository: git://github.com/perlancar/perl-ArrayDataRoles-Standard.git
-version: '0.005'
+version: '0.006'
 x_Dist_Zilla:
   perl:
     version: '5.030000'

@@ -5,32 +5,32 @@ WriteMakefile
 (
   'PL_FILES' => {},
   'VERSION_FROM' => 'lib/Crypt/LE.pm',
-  'INSTALLDIRS' => 'site',
+  'PREREQ_PM' => {
+                   'Net::SSLeay' => '1.55',
+                   'Getopt::Long' => '2.33',
+                   'HTTP::Tiny' => '0.042',
+                   'Module::Load' => '0.28',
+                   'Log::Log4perl' => '1.27',
+                   'MIME::Base64' => '3.11',
+                   'Encode' => 0,
+                   'Scalar::Util' => 0,
+                   'IO::File' => '1.13',
+                   'IO::Socket::SSL' => '1.42',
+                   'Time::Piece' => '1.27',
+                   'Convert::ASN1' => '0.2',
+                   'Crypt::OpenSSL::Bignum' => '0.06',
+                   'File::Temp' => 0,
+                   'Time::Seconds' => 0,
+                   'Test::More' => 0,
+                   'Crypt::OpenSSL::RSA' => '0.28',
+                   'Storable' => '2.51',
+                   'Digest::SHA' => 0,
+                   'JSON::MaybeXS' => '1.003005'
+                 },
   'EXE_FILES' => [
                    'script/le.pl'
                  ],
-  'NAME' => 'Crypt::LE',
-  'PREREQ_PM' => {
-                   'Getopt::Long' => '2.33',
-                   'Test::More' => 0,
-                   'Time::Piece' => '1.27',
-                   'IO::Socket::SSL' => '1.42',
-                   'Module::Load' => '0.28',
-                   'File::Temp' => 0,
-                   'Scalar::Util' => 0,
-                   'JSON::MaybeXS' => '1.003005',
-                   'Storable' => '2.51',
-                   'MIME::Base64' => '3.11',
-                   'Log::Log4perl' => '1.27',
-                   'Net::SSLeay' => '1.55',
-                   'Convert::ASN1' => '0.2',
-                   'Crypt::OpenSSL::Bignum' => '0.06',
-                   'Crypt::OpenSSL::RSA' => '0.28',
-                   'Time::Seconds' => 0,
-                   'Digest::SHA' => 0,
-                   'Encode' => 0,
-                   'HTTP::Tiny' => '0.042',
-                   'IO::File' => '1.13'
-                 }
+  'INSTALLDIRS' => 'site',
+  'NAME' => 'Crypt::LE'
 )
 ;

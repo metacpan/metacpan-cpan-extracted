@@ -55,6 +55,6 @@
          "web" : "https://github.com/ssimms/business-us-usps-webtools"
       }
    },
-   "version" : "1.124",
+   "version" : "1.125",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

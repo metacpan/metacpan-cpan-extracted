@@ -1,5 +1,5 @@
 package Photonic::Roles::EpsL;
-$Photonic::Roles::EpsL::VERSION = '0.015';
+$Photonic::Roles::EpsL::VERSION = '0.016';
 
 =encoding UTF-8
 
@@ -9,7 +9,7 @@ Photonic::Roles::EpsL
 
 =head1 VERSION
 
-version 0.015
+version 0.016
 
 =head1 COPYRIGHT NOTICE
 
@@ -52,7 +52,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA  02110-1301 USA
 =item (for developers)
 
     package Photonic::LE::NR2::EpsL;
-    $Photonic::LE::NR2::EpsL::VERSION= '0.015';
+    $Photonic::LE::NR2::EpsL::VERSION= '0.016';
     use namespace::autoclean;
     use Moose;
     with 'Photonic::Roles::EpsL';
@@ -88,7 +88,7 @@ dielectric functions of the host $epsA and the particle $epsB.
 
 =back
 
-=head1 ACCESORS (read only)
+=head1 ACCESSORS (read only)
 
 =over 4
 
@@ -137,9 +137,6 @@ check.
 =cut
 
 use Moose::Role;
-use PDL::Lite;
-use PDL::NiceSlice;
-use PDL::Complex;
 use Photonic::Types;
 
 has 'nr' =>(is=>'ro', isa=>'Photonic::Types::AllH', required=>1);
@@ -147,7 +144,7 @@ has 'nh' =>(is=>'ro', isa=>'Num', required=>1, lazy=>1, builder=>'_nh',
 	    documentation=>'Desired no. of Haydock coefficients');
 has 'smallE'=>(is=>'ro', isa=>'Num', required=>1, default=>1e-7,
     	    documentation=>'Convergence criterium for use of Haydock coeff.');
-has 'epsL'=>(is=>'ro', isa=>'PDL::Complex', init_arg=>undef,
+has 'epsL'=>(is=>'ro', isa=>'Photonic::Types::PDLComplex', init_arg=>undef,
 	     writer=>'_epsL',
 	     documentation=>'Value of dielectric function'  );
 has 'nhActual'=>(is=>'ro', isa=>'Num', init_arg=>undef,

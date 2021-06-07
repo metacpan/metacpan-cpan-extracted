@@ -6,8 +6,8 @@ SPECIFICATION VERSION
     0.2
 
 VERSION
-    This document describes version 0.2.2 of ArrayData (from Perl
-    distribution ArrayData), released on 2021-05-07.
+    This document describes version 0.2.3 of ArrayData (from Perl
+    distribution ArrayData), released on 2021-05-18.
 
 SYNOPSIS
     Use one of the "ArrayData::*" modules.

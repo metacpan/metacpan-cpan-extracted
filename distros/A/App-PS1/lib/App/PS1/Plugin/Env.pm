@@ -12,7 +12,7 @@ use Carp;
 use Data::Dumper qw/Dumper/;
 use English qw/ -no_match_vars /;
 
-our $VERSION = 0.02;
+our $VERSION = 0.08;
 
 sub env {
     my ($self, $options) = @_;
@@ -40,7 +40,7 @@ App::PS1::Plugin::Env - Shows the value/state of requested environment variables
 
 =head1 VERSION
 
-This documentation refers to App::PS1::Plugin::Env version 0.02.
+This documentation refers to App::PS1::Plugin::Env version 0.08.
 
 =head1 SYNOPSIS
 

@@ -18,8 +18,8 @@ my %WriteMakefileArgs = (
   "NAME" => "Complete::File",
   "PREREQ_PM" => {
     "Complete::Common" => "0.22",
-    "Complete::Path" => "0.20",
-    "Complete::Util" => "0.603",
+    "Complete::Path" => "0.251",
+    "Complete::Util" => "0.608",
     "Encode" => 0,
     "Exporter" => "5.57",
     "File::Glob" => 0,
@@ -28,13 +28,13 @@ my %WriteMakefileArgs = (
   },
   "TEST_REQUIRES" => {
     "File::Spec" => 0,
-    "File::Temp" => 0,
+    "File::Temp" => "0.2307",
     "File::chdir" => 0,
     "IO::Handle" => 0,
     "IPC::Open3" => 0,
     "Test::More" => "0.98"
   },
-  "VERSION" => "0.440",
+  "VERSION" => "0.443",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -43,13 +43,13 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "Complete::Common" => "0.22",
-  "Complete::Path" => "0.20",
-  "Complete::Util" => "0.603",
+  "Complete::Path" => "0.251",
+  "Complete::Util" => "0.608",
   "Encode" => 0,
   "Exporter" => "5.57",
   "File::Glob" => 0,
   "File::Spec" => 0,
-  "File::Temp" => 0,
+  "File::Temp" => "0.2307",
   "File::chdir" => 0,
   "IO::Handle" => 0,
   "IPC::Open3" => 0,

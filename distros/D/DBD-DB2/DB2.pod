@@ -28,6 +28,9 @@ supported environments.
 The DB2 Information Center is available at:
 http://publib.boulder.ibm.com/infocenter/db2help/index.jsp
 
+The DB2 GIT Repo is available at:
+https://github.com/ibmdb/perl_DBD-DB2
+
 =head1 EXAMPLE
 
   #!/usr/local/bin/perl

@@ -2,7 +2,7 @@ package Net::Dropbear::SSHd;
 
 use strict;
 use v5.8;
-our $VERSION = '0.13';
+our $VERSION = '0.14';
 
 use Child;
 
@@ -61,6 +61,8 @@ has comm => (
   is => 'rwp',
   isa => GlobRef,
 );
+
+our $_will_run_as_root = 0;
 
 my $tell_parent;
 

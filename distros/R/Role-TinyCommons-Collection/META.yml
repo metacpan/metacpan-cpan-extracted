@@ -23,7 +23,7 @@ resources:
   bugtracker: https://github.com/perlancar/perl-Role-TinyCommons-Collection/issues
   homepage: https://metacpan.org/release/Role-TinyCommons-Collection
   repository: git://github.com/perlancar/perl-Role-TinyCommons-Collection.git
-version: '0.003'
+version: '0.008'
 x_Dist_Zilla:
   perl:
     version: '5.030000'
@@ -384,22 +384,6 @@ x_Dist_Zilla:
           phase: develop
           type: x_spec
       name: DevelopX_spec
-      version: '6.012'
-    -
-      class: Dist::Zilla::Plugin::Prereqs
-      config:
-        Dist::Zilla::Plugin::Prereqs:
-          phase: test
-          type: requires
-      name: TestRequires
-      version: '6.012'
-    -
-      class: Dist::Zilla::Plugin::Prereqs
-      config:
-        Dist::Zilla::Plugin::Prereqs:
-          phase: test
-          type: suggests
-      name: TestSuggests
       version: '6.012'
     -
       class: Dist::Zilla::Plugin::FinderCode

@@ -10,6 +10,11 @@ use testcase "t::structures";
 
 BEGIN { $^H{"t::structures/permit"} = 1; }
 
+# sequence
+{
+   is( structsequence part 123, 123, 'sequence' );
+}
+
 # optional
 {
    is( structoptional part, 1, 'optional present' );
@@ -33,6 +38,12 @@ BEGIN { $^H{"t::structures/permit"} = 1; }
 {
    is( structtagged one, 1, 'tagged choice one' );
    is( structtagged three, 3, 'tagged choice three' );
+}
+
+# comma list
+{
+   is( (structcommalist item), 1, 'comma list with 1 item' );
+   is( (structcommalist item, item, item), 3, 'comma list with 3 items' );
 }
 
 done_testing;

@@ -1,0 +1,215 @@
+<%
+    layout 'zapp';
+    use Mojo::JSON qw( encode_json );
+    my %state_bg = (
+        active => 'list-group-item-primary',
+        finished => 'list-group-item-success',
+        failed => 'list-group-item-danger',
+        stopped => 'list-group-item-warning',
+        killed => 'list-group-item-secondary',
+    );
+    my %btn_state = (
+        start => {
+            disabled => 'btn btn-outline-secondary disabled',
+            enabled => 'btn btn-success',
+        },
+        stop => {
+            disabled => 'btn btn-outline-secondary disabled',
+            enabled => 'btn btn-warning',
+        },
+        kill => {
+            disabled => 'btn btn-outline-secondary disabled',
+            enabled => 'btn btn-danger',
+        },
+    );
+%>
+
+<div class="d-flex justify-content-between mt-2">
+    % if ( my $plan_id = $run->{plan_id} ) {
+        %= link_to 'zapp.get_plan', { plan_id => $plan_id }, class => 'btn btn-outline-secondary', begin
+            <i class="fa fa-arrow-left"></i> Back to Plan
+        % end
+    % }
+    % else {
+        %= link_to 'zapp.list_runs', class => 'btn btn-secondary', begin
+            <i class="fa fa-arrow-left"></i> Back to Runs
+        % end
+    % }
+</div>
+
+<header class="align-items-center">
+    <h1><%= $run->{label} %></h1>
+
+</header>
+
+<div class="d-flex mb-1 justify-content-between">
+    <div class="btn-toolbar" role="toolbar" aria-label="Job control">
+        <div class="btn-group mr-2" role="group">
+            %= form_for 'zapp.start_run_confirm', begin
+                <button data-btn-start <%= $run->{state} ne 'stopped' ? 'disabled' : '' %>
+                    class="<%= $btn_state{start}{ $run->{state} ne 'stopped' ? 'disabled' : 'enabled' } %>"
+                    aria-label="Start job"
+                >
+                    <i class="fa fa-play"></i>
+                </button>
+            % end
+            %= form_for 'zapp.stop_run' => begin
+                <button data-btn-stop <%= $run->{state} =~ /^(?:stopped|killed|failed|finished)$/ ? 'disabled' : '' %>
+                    class="<%= $btn_state{stop}{ $run->{state} =~ /stopped|killed|failed|finished/ ? 'disabled' : 'enabled' } %>"
+                    aria-label="Stop job"
+                >
+                    <i class="fa fa-stop"></i>
+                </button>
+            % end
+        </div>
+        <div class="btn-group" role="group">
+            %= form_for 'zapp.kill_run' => begin
+                <button data-btn-kill <%= $run->{state} =~ /^(?:killed|failed|finished)$/ ? 'disabled' : '' %>
+                    class="<%= $btn_state{kill}{ $run->{state} =~ /killed|failed|finished/ ? 'disabled' : 'enabled' } %>"
+                    aria-label="Kill job"
+                >
+                    <i class="fa fa-times-circle"></i>
+                </button>
+            % end
+        </div>
+    </div>
+    <div class="btn-group" role="group">
+        <button class="btn btn-secondary">Replay</button>
+        <button type="button" class="btn btn-secondary dropdown-toggle dropdown-toggle-split" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            <span class="sr-only">Toggle Dropdown</span>
+        </button>
+        <div class="dropdown-menu dropdown-menu-right">
+            <h6 class="dropdown-header">Start at...</h6>
+            % for my $i ( 0..$#{ $run->{tasks} } ) {
+                % my $task = $run->{tasks}[$i];
+                <%= tag a => href => '#', class => 'dropdown-item', $task->{label} // $task->{name} %>
+            % }
+        </div>
+    </div>
+</div>
+
+% if ( my @actions = @{ stash( 'actions' ) // [] } ) {
+    <h2>Action Required</h2>
+    % for my $action ( @actions ) {
+        <div class="card mb-2 p-2">
+            % if ( my $label = $action->{task}{label} // $action->{task}{name} ) {
+                <h3 class="card-header"><%= $label %></h3>
+            % }
+            %= form_for 'zapp.save_task_action', $action->{task}, begin
+                %== $action->{ action_field }
+            % end
+        </div>
+    % }
+% }
+
+%= include 'zapp/run/task_list'
+
+%= javascript begin
+var stateClass = <%== encode_json \%state_bg %>;
+var btnClass = <%== encode_json \%btn_state %>;
+
+function updateRun( delta ) {
+    for ( var i in delta ) {
+        var el = document.querySelector( '[data-run=' + i + ']' );
+        if ( !el ) continue;
+        el.innerHTML = delta[i];
+    }
+    if ( delta.state ) {
+        // XXX: Add Selenium (or Playwright) tests for this
+        var btn = {
+            start: document.querySelector( '[data-btn-start]' ),
+            stop: document.querySelector( '[data-btn-stop]' ),
+            kill: document.querySelector( '[data-btn-kill]' ),
+        };
+        // Inactive or Active: Play is disabled, Stop/Kill are enabled
+        // Stopped: Play is enabled, Stop is disabled, Kill is enabled
+        // Killed, Failed, or Finished: All buttons are disabled
+        if ( delta.state == "inactive" || delta.state == "active" ) {
+            btn.start.disabled = true;
+            btn.start.className = btnClass.start.disabled;
+            btn.stop.disabled = false;
+            btn.stop.className = btnClass.stop.enabled;
+            btn.kill.disabled = false;
+            btn.kill.className = btnClass.kill.enabled;
+
+            // Also update the info tab
+            var labelEl = document.querySelector( '#tab-info-label' );
+            for ( var k in stateClass ) {
+                labelEl.classList.remove( stateClass[ k ] );
+            }
+            labelEl.classList.add( stateClass[ delta.state == 'active' ? 'finished' : 'active' ] );
+        }
+        else if ( delta.state == "stopped" ) {
+            btn.start.disabled = false;
+            btn.start.className = btnClass.start.enabled;
+            btn.stop.disabled = true;
+            btn.stop.className = btnClass.stop.disabled;
+            btn.kill.disabled = false;
+            btn.kill.className = btnClass.kill.enabled;
+        }
+        else if ( delta.state == "killed" || delta.state == "failed" || delta.state == "finished" ) {
+            btn.start.disabled = true;
+            btn.start.className = btnClass.start.disabled;
+            btn.stop.disabled = true;
+            btn.stop.className = btnClass.stop.disabled;
+            btn.kill.disabled = true;
+            btn.kill.className = btnClass.kill.disabled;
+        }
+    }
+}
+
+function updateTask( delta ) {
+    var labelEl = document.querySelector( '[data-task-label="' + delta.task_id + '"]' );
+    if ( !labelEl ) {
+        console.log( "Could not find label element for task ID " + delta.task_id );
+        return;
+    }
+
+    // Update task bar class
+    if ( delta.state ) {
+        if ( delta.state != "inactive" ) {
+            labelEl.classList.remove( 'disabled' );
+        }
+        for ( var k in stateClass ) {
+            labelEl.classList.remove( stateClass[ k ] );
+        }
+        labelEl.classList.add( stateClass[ delta.state ] );
+    }
+
+    // XXX: Update task pane content
+    var xhr = new XMLHttpRequest();
+    xhr.onreadystatechange = function () {
+        if ( xhr.readyState == XMLHttpRequest.DONE ) {
+            if ( xhr.status != 200 ) {
+                console.log( "Error fetching task output: " + xhr.responseText );
+                return;
+            }
+            var outputEl = document.querySelector( '[data-task-output="' + delta.task_id + '"]' );
+            if ( !outputEl ) {
+                console.log( "Could not find output element for task ID " + delta.task_id );
+                return;
+            }
+            outputEl.innerHTML = xhr.responseText;
+        }
+    };
+    xhr.open( 'GET', '<%= url_for( "zapp.get_run_task" ) %>' + delta.task_id );
+    xhr.send();
+}
+
+%# if ( $run->{state} !~ /^(finished|failed)$/ ) {
+    document.addEventListener('DOMContentLoaded', function ( event ) {
+        var ws = new WebSocket( '<%= url_for( "zapp.feed_run", $run )->to_abs( $c->req->url->base )->scheme( $self->req->is_secure ? "wss" : "ws" ) %>' );
+        ws.onmessage = function ( event ) {
+            var delta = JSON.parse(event.data);
+            var tasks = delta.tasks;
+            delete delta.tasks;
+            updateRun( delta );
+            tasks.forEach( function (t) { updateTask( t ) } );
+            if ( delta.state && ( delta.state == "finished" || delta.state == "failed" ) ) {
+                ws.close();
+            }
+        };
+    } );
+%# }
+
+% end

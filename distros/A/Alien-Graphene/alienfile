@@ -23,7 +23,7 @@ share {
 			'--prefix=%{.install.prefix}',
 			'--libdir=lib',
 			'--buildtype=release',
-			'-Dintrospection=true',
+			'-Dintrospection=enabled',
 			'-Dgobject_types=true',
 			$build_dir ],
 		[ @ninja_run, qw(-C), $build_dir, "test" ],

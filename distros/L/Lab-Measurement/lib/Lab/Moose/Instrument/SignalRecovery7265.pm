@@ -1,5 +1,5 @@
 package Lab::Moose::Instrument::SignalRecovery7265;
-$Lab::Moose::Instrument::SignalRecovery7265::VERSION = '3.750';
+$Lab::Moose::Instrument::SignalRecovery7265::VERSION = '3.751';
 #ABSTRACT: Model 7265 Lock-In Amplifier
 
 use v5.20;
@@ -218,7 +218,7 @@ Lab::Moose::Instrument::SignalRecovery7265 - Model 7265 Lock-In Amplifier
 
 =head1 VERSION
 
-version 3.750
+version 3.751
 
 =head1 SYNOPSIS
 

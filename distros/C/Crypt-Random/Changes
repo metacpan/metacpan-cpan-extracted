@@ -3,6 +3,17 @@
            $Id: Changes,v 1.6 2001/07/12 15:59:46 vipul Exp $
 
 --------------------------------------------------------------------------
+1.54                                                     June 3, 2021
+
+  * Removed a superfluous call to makerandom_itv() thanks to Larry 
+    Leszczynski <larryl@emailplus.org>.
+
+  * Improved makerandom_itv test to ensure generated numbers are in the 
+    intterval. 
+
+  * Actually include t/chisquare.t
+
+
 1.52                                                     December 22, 2018
 
   * Add a chi square statistical test.  t/chisquare.t

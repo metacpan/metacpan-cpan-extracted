@@ -3,13 +3,13 @@ data/black.png
 data/white.png
 examples/LE/NR2/epsM-L.pl
 examples/LE/NR2/field.pl
+examples/LE/NR2/toroid.pl
 examples/mortola.pl
 examples/Ring.pl
 examples/WE/R2/field.pl
 INSTALL
 lib/Photonic.pm
 lib/Photonic/CharacteristicFunctions.pm
-lib/Photonic/ExtraUtils.pm
 lib/Photonic/Geometry/FromB.pm
 lib/Photonic/Geometry/FromEpsilon.pm
 lib/Photonic/Geometry/FromImage2D.pm
@@ -32,6 +32,7 @@ lib/Photonic/LE/S/EpsTensor.pm
 lib/Photonic/LE/S/Field.pm
 lib/Photonic/LE/S/OneH.pm
 lib/Photonic/Roles/AllH.pm
+lib/Photonic/Roles/EpsFromGeometry.pm
 lib/Photonic/Roles/EpsL.pm
 lib/Photonic/Roles/EpsParams.pm
 lib/Photonic/Roles/Geometry.pm
@@ -67,10 +68,9 @@ lib/Photonic/WE/S/WaveP.pm
 LICENSE
 Makefile.PL
 MANIFEST			This list of files
-META.json
-META.yml
-README
+README.md
 t/00-load.t
+t/00-report-prereqs.t
 t/allh-np.t
 t/allh-nr2.t
 t/allh-s.t
@@ -102,7 +102,7 @@ t/oneh-nr2.t
 t/oneh-s.t
 t/oneh-wer2.t
 t/oneh-wes.t
-TAGS
+t/utils.t
 TODO
 xt/author-pod-coverage.t
 xt/author-pod-syntax.t
@@ -110,3 +110,5 @@ xt/manifest.t
 xt/pod-coverage.t
 xt/pod.t
 xt/version.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

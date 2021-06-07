@@ -4,7 +4,7 @@
 ^\.git
 
 # stuff I don't want to release.
-*\+
+.*\+
 ^Fsdb-\.*
 ^Fsdb.spec\+
 lib/boilerplate.pm

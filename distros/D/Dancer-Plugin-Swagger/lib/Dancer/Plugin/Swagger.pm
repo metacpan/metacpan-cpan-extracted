@@ -9,7 +9,7 @@
 package Dancer::Plugin::Swagger;
 our $AUTHORITY = 'cpan:YANICK';
 # ABSTRACT: create Swagger documentation of the app REST interface 
-$Dancer::Plugin::Swagger::VERSION = '0.2.0';
+$Dancer::Plugin::Swagger::VERSION = '0.3.0';
 use strict;
 use warnings;
 
@@ -28,6 +28,7 @@ use Class::Load qw/ load_class /;
 
 use Path::Tiny;
 use File::ShareDir::Tarball;
+use Module::Version qw/ get_version /;
 
 sub import {
     $Dancer::Plugin::Swagger::FIRST_LOADED ||= caller;
@@ -55,10 +56,7 @@ has doc => (
         ) {
             $doc->{info}{description} = $desc;
         }
-
-        $doc->{info}{version} = eval {
-            $self->main_api_module->VERSION
-        } // '0.0.0';
+        $doc->{info}{version} = get_version($self->main_api_module) // '0.0.0';
 
         $doc;
         
@@ -217,12 +215,16 @@ register swagger_path => sub {
                 $value->{name} = $k;
                 $k = $value;
             }
+            if (!exists($k->{schema}) && !exists($k->{type})) {
+                # set a default type iff it's missing and this doesn't reference a schema
+                $k->{type} = 'string';
+            }
             push @p, $k;
         }
         $p = \@p;
 
         # set defaults
-        $p = [ map { +{ in => 'query', type => 'string', %$_ } } @$p ];
+        $p = [ map { +{ in => 'query', %$_ } } @$p ];
         
         $arg->{parameters} = $p;
     }
@@ -295,7 +297,7 @@ Dancer::Plugin::Swagger - create Swagger documentation of the app REST interface
 
 =head1 VERSION
 
-version 0.2.0
+version 0.3.0
 
 =head1 SYNOPSIS
 
@@ -637,7 +639,7 @@ Yanick Champoux <yanick@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by Yanick Champoux.
+This software is copyright (c) 2021, 2016, 2015 by Yanick Champoux.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

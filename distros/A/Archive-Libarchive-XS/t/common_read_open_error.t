@@ -8,7 +8,7 @@ use File::Spec;
 my $filename = File::Spec->catfile($FindBin::Bin, "foo.bogus");
 my $r;
 my $entry;
-    
+
 note "filename = $filename";
 
 my $a = archive_read_new();

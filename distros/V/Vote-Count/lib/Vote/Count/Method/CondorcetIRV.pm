@@ -1,20 +1,21 @@
 use strict;
 use warnings;
-use 5.022;
+use 5.024;
 use feature qw /postderef signatures/;
 
 package Vote::Count::Method::CondorcetIRV;
 use namespace::autoclean;
 use Moose;
 extends 'Vote::Count';
+with 'Vote::Count::BottomRunOff';
 
-our $VERSION='1.10';
+our $VERSION='2.00';
 
 =head1 NAME
 
 Vote::Count::Method::CondorcetIRV
 
-=head1 VERSION 1.10
+=head1 VERSION 2.00
 
 =cut
 
@@ -50,7 +51,7 @@ SmithSetIRV is exported and requires a Vote::Count object, an optional second ar
 
 =head3 Simplicity
 
-SmithSet IRV is easy to understand but requires a full matrix and thus is harder to handcount than Benham. If it desired to handcount, an aggressive Floor Rule like TCA (see Floor module) is recommended, or an Approval or Top Count Floor of up to 15%. 15% Top Count permits at most 6 choices, but 6 choices still require 15 pairings to complete the Matrix.
+SmithSet IRV is easy to understand but requires a full matrix and thus is harder to handcount than Benham or BTR IRV. If it desired to handcount, an aggressive Floor Rule like TCA (see Floor module) is recommended, or an Approval or Top Count Floor of up to 15%. 15% Top Count permits at most 6 choices, but 6 choices still require 15 pairings to complete the Matrix.
 
 =head3 Later Harm
 
@@ -76,9 +77,19 @@ MinMax methods do not meet the Smith Criteria nor the Condorcet Loser Criteria, 
 
 =head1 Method Common Name: Woodhull Method (Currently Unimplemented)
 
-The Woodhull method is similar to Smith Set IRV. The difference is: instead of eliminating the choices outside the Smith Set, Woodhull does not permit them to win. Since, it has to deal with the situation where an ineligible choice wins via IRV, it becomes slightly more complex. In addition, group elimination of unwinnable choices slightly improves consistency, which is another advantage to Smith Set IRV. As for possible differences in Later Harm effect, the Later Harm comes from the restriction of the victor to the Smith Set, which is the same effect for both methods.
+The Woodhull method is similar to Smith Set IRV. The difference is: instead of eliminating the choices outside the Smith Set, Woodhull does not permit them to win. Since, it has to deal with the situation where an ineligible choice wins via IRV, it becomes slightly more complex. In addition, group elimination of unwinnable choices improves consistency, which is another advantage to Smith Set IRV. As for possible differences in Later Harm effect, the Later Harm comes from the restriction of the victor to the Smith Set, which is the same effect for both methods.
 
 The argument in favor of Woodhull over Smith would be that: Anything which alters the dropping order can alter the outcome of IRV, and Woodhull preserves the IRV dropping order. Since, a dropping order change has an equal possiblity of helping or hurting one's preferred choice, this side-effect is a random flaw. Removing the least consequential choices is preventing them from impacting the election (in a random manner), thus this author sees it as an advantage for Smith Set IRV.
+
+=head1 Method Common Name: Bottom Two Runoff IRV, BTR IRV (Implementation Soon)
+
+This is the simplest modification to IRV which meets the Condorcet Winner Criteria. Instead of eliminating the low choice, the lowest two choices enter a virtual runoff, eliminating the loser. This is the easiest Hand Count Condorcet method, there will always be fewer pairings than choices. This method fails LNH, when there is no Condorcet Winner the LNH impact may substantial since it can come into play for each runoff. BTR IRV will only eliminate a member of the Smith Set when both members of the runoff are in it, it can never eliminate the final member of the Smith Set. BTR IRV meets both Condorcet Criteria and the Smith Criteria.
+
+=head1 Method Common Names: Benham, Benham IRV
+
+This method modifies IRV by checking for a Condorcet Winner each round, and then drops the low choice as regular IRV. It is probably the most widely used Condorcet Method for Hand Counting because it does not require a full matrix. For each choice it is only required to determine if they lose to any of the other active choices.
+
+This method is implemented by L<Vote::Count::Method::CondorcetDropping|Vote::Count::Method::CondorcetDropping/Benham>.
 
 =cut
 
@@ -109,6 +120,59 @@ sub SmithSetIRV ( $E, $tiebreaker = 'all' ) {
   }
 }
 
+# sub BTRIRV ( $E ) {
+
+# }
+
+# sub RunIRV ( $self, $active = undef, $tiebreaker = undef ) {
+#   # external $active should not be changed.
+#   if ( defined $active ) { $active = dclone $active }
+#   # Object's active is altered by IRV.
+#   else { $active = dclone $self->Active() }
+#   unless ( defined $tiebreaker ) {
+#     if ( defined $self->TieBreakMethod() ) {
+#       $tiebreaker = $self->TieBreakMethod();
+#     }
+#     else {
+#       $tiebreaker = 'all';
+#     }
+#   }
+#   my $roundctr = 0;
+#   my $maxround = scalar( keys %{$active} );
+#   $self->logt( "Instant Runoff Voting",
+#     'Choices: ', join( ', ', ( sort keys %{$active} ) ) );
+#   # forever loop normally ends with return from $majority
+#   # a tie should be detected and also generate a
+#   # return from the else loop.
+#   # if something goes wrong roundcountr/maxround
+#   # will generate exception.
+# IRVLOOP:
+#   until (0) {
+#     $roundctr++;
+#     die "IRVLOOP infinite stopped at $roundctr" if $roundctr > $maxround;
+#     my $round = $self->TopCount($active);
+#     $self->logv( '---', "IRV Round $roundctr", $round->RankTable() );
+#     my $majority = $self->EvaluateTopCountMajority($round);
+#     if ( defined $majority->{'winner'} ) {
+#       return $majority;
+#     }
+#     else {
+#       my @bottom =
+#         $self->_ResolveTie( $active, $tiebreaker, $round->ArrayBottom()->@* );
+#       if ( scalar(@bottom) == scalar( keys %{$active} ) ) {
+#         # if there is a tie at the end, the finalists should
+#         # be both top and bottom and the active set.
+#         $self->logt( "Tied: " . join( ', ', @bottom ) );
+#         return { tie => 1, tied => \@bottom, winner => 0 };
+#       }
+#       $self->logv( "Eliminating: " . join( ', ', @bottom ) );
+#       for my $b (@bottom) {
+#         delete $active->{$b};
+#       }
+#     }
+#   }
+# }
+
 1;
 
 #FOOTER
@@ -125,11 +189,15 @@ John Karr (BRAINBUZ) brainbuz@cpan.org
 
 CONTRIBUTORS
 
-Copyright 2019-2020 by John Karr (BRAINBUZ) brainbuz@cpan.org.
+Copyright 2019-2021 by John Karr (BRAINBUZ) brainbuz@cpan.org.
 
 LICENSE
 
 This module is released under the GNU Public License Version 3. See license file for details. For more information on this license visit L<http://fsf.org>.
+
+SUPPORT
+
+This software is provided as is, per the terms of the GNU Public License. Professional support and customisation services are available from the author.
 
 =cut
 

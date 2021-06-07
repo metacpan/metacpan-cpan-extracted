@@ -2,22 +2,15 @@ use v5.10;
 use warnings;
 use Test::More;
 
-BEGIN { use_ok('Form::Tiny') }
+BEGIN { require_ok('Form::Tiny') }
 
 {
 
 	package TestForm;
-	use Moo;
+	use Form::Tiny;
 
-	with "Form::Tiny";
-
-	sub build_fields
-	{
-		(
-			{name => "name"},
-			{name => "value"}
-		)
-	}
+	form_field 'name';
+	form_field 'value';
 
 	1;
 }

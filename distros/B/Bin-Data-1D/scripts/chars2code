@@ -1,0 +1,128 @@
+#!/usr/bin/perl
+use 5.014 ; use warnings ; 
+use Getopt::Std ; getopts ":01bnuw" , \my%o ; 
+use Term::ANSIColor qw[ :constants color ] ; $Term::ANSIColor::AUTORESET = 1 ;
+use utf8 ; 
+binmode STDOUT , ":utf8" ; #if ! $o{b} ; 
+use Encode qw [ decode_utf8 encode_utf8 ] ; 
+use FindBin qw [ $Script ] ; 
+my $sdt = sprintf '%04d-%02d-%02d %02d:%02d:%02d', do{my @t= @{[localtime]}[5,4,3,2,1,0]; $t[0]+=1900; $t[1]++; @t } ; 
+eval "use Encode::JP qw[decode encode];1" or die "Encode::JP cannot be loaded, so -w does not work. ($Script, $sdt)\n" if $o{w} ; 
+
+# my $utf8 = Encode::find_encoding('utf8') ;
+sub decode ($) ; 
+sub encode ($) ;
+* decode = $o{b} ? sub ($) { $_[0] } : $o{w} ? sub ($) { Encode::JP::decode('cp932',$_[0]) } : * decode_utf8 ;
+#* encode = $o{b} ? sub ($) { $_[0] } : * encode_utf8 ;
+* encode = $o{w} ? sub($){Encode::JP::encode('cp932',$_[0])} : $o{b} ? sub ($) { $_[0] } : *encode_utf8 ;
+my $h = $o{b} ? '0x' : $o{w}? '0x' : 'u+' ; # 区点番号を出力する時に表示する接頭辞
+
+my $base = $o{0} ? 0 : 1 ; # ゼロオリジンにするか、1オリジンにするか
+if ( $o{n} ) { & CountChars }
+elsif ( $o{1} ) { & OneLineOneChar }
+else { & LinePreserve } ; 
+exit 0 ; 
+
+
+# 1文字を制御文字についてはエスケープ文字を付けた様な形にする。ある種の文字の正規化する。
+sub norChar($){
+  state  $x = \{ 0,'\0',7,'\a',8,'\b',9,'\t',10,'\n',11,'\v',12,'\f',13,'\r',27,'\e'} ; 
+  return $$x->{ ord $_[0] } // $_[0] ;
+}
+
+sub LinePreserve { 
+  say CYAN UNDERLINE +( $o{':'} ? 'lin#:' : '' ) . '#char', DARK '(#bytes)' , RESET UNDERLINE "\tchar ", DARK "u+code .." ;
+  while (<>) { 
+  	my $str = decode ( $_ ) ; 
+  	print CYAN 	+($o{':'}?($.+$base-1).":":''), length $str , DARK '('  , length $_ , ')' , RESET "\t" ;
+    for ( split //, $str , 0 ) { 
+      my @out = ( BOLD sprintf ( '%s' , norChar $_ ) , RESET DARK sprintf ( " $h%02x " , ord $_ ) ) ; 
+      print @out ;
+    }
+    say '' ; 
+  }
+}
+
+#  出力する各行は、入力の各文字に相当させている、動作
+sub OneLineOneChar {
+  my ($posC,$posL) = ($base) x2 ; #文字の先頭からの位置、 行番号
+  * codify = $o{u} ? sub { sprintf 'u+%04x' , ord $_[0] } : sub { sprintf '0x%s', unpack 'H12', encode($_) } ; 
+  for( ; <> ; $posL ++ ){
+    my $posC0 = $posC ;
+    for ( @_ = split //, decode($_), 0 ; defined($_=shift) ; $posC++ ) { 
+      #my @out = ( sprintf ( "$h%04x" , ord encode($_) ) , sprintf ('[%s]' , norChar $_ ) ) ;
+      #my @out = ( sprintf ( "$h%s" , (unpack 'h12' , encode($_) ) ) , sprintf ('[%s]' , norChar $_ ) ) ;
+      my @out = ( &codify ($_) , sprintf ('[%s]' , norChar $_ ) ) ;  
+      #unshift @out , sprintf ("$posC:$posL-$posCL(%s)", encode($_) )  if $o{':'} ;
+      unshift @out , sprintf "%d:%d-%d" , $posC, $posL, $posC - $posC0 + $base if $o{':'} ;
+      say join "\t" , @out ; 
+    }
+    #$posL ++ ;
+  }
+  say STDERR CYAN ITALIC "Lines: " , $. , RESET '' ; 
+}
+
+# 出現した文字の集計表
+sub CountChars {
+  my %chars ;  # 各文字の頻度を格納
+  my %f0l ; # 各文字の最初の出現の行番号
+  my %f1l ; # 各文字の最後の出現の行番号
+  my $line = 0 ;  # 全体の行数
+
+  while( <> ) { 
+    for ( split // , decode ( $_ ) , 0 ) {  
+      $chars{ $_ } ++ ; 
+      $f0l { $_ } //= $line ;
+      $f1l { $_ } = $line ;
+    }
+    $line ++ ; 
+  }
+
+  my @out = ( "freq", "code_point", "char" ) ; 
+  push @out , "linum_first" , "linum_last" if $o{':'} ; 
+  say UNDERLINE join "\t" , @out ; 
+  for( sort {$chars{$b} <=> $chars{$a} } keys %chars ) { 
+    my @out = ( $chars{ $_ } , sprintf( "U+%02X" ,ord $_) , sprintf ('[%s]' , norChar $_ ) ) ; 
+    push @out , $f0l{$_} + $base , $f1l{$_} + $base if $o{':'} ;
+    say join "\t" , @out ;
+  }
+ 
+  say STDERR CYAN ITALIC "Lines: " , $line , RESET '' ; 
+}
+
+
+sub VERSION_MESSAGE {} 
+sub HELP_MESSAGE { $0 =~ s|.*/|| ; while(<DATA>){s/\$0/$0/g;print $_ if s/^=head1// .. s/^=cut// } exit 0 } 
+
+no utf8 ;
+__END__ 
+
+=encoding utf8 
+
+=head1 $0 
+
+(utf8とみなして) 入力データをひとつひとつの文字にばらして、符号位置を表し足り、頻度を数えたりする。
+
+[オプション]
+ -b : utf8ではなくてバイト単位で処理する。
+ -u : 0x 表記ではなく u+ で表示。バイナリで無くて、ユニコードの区点番号となる。
+ -1 : 入力を1文字ずつ出力1行に反映。
+ -: ; 文字の位置を表示
+ -0 : いろいろな位置を表すのに、1始まりではなくて、0始まりにする。
+ -n : 各文字の頻度を数える。 
+ 
+[用途]
+ * 頻出する文字を知る。
+ *  よく似た2行がどこに違いがあるのか見つけたいときに、sdiff で並べる操作の前に使う。
+
+[開発上のメモ]
+ * grep -o . と同じ程度の処理速度があるだろうか。
+ * 頻度の多い順に表示されているが、表示順を選べるようにオプションを作りたい。
+ * 最初の出現順でまずは格納したいかも。
+ * freq, code-point, [normalized-char] 等を先頭に出力すべし。
+ * 最初の出現位値, 最後の出現位値も出力したい。
+ * 非常に長い行を読むときに、途中で結果を表示するようにしたい。
+
+ * このプログラムの名前の候補としてはordcharsとか ordutf8とか  utf8ord を考えたが、2019-10-16にchars2code とした。
+
+=cut

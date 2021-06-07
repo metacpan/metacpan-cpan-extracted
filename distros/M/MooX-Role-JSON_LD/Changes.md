@@ -1,5 +1,17 @@
 # Change Log
 
+## [1.0.1] - 2021-06-06
+
+### Fixed
+
+- Decreased code complexity
+
+- Bring version numbers in line across modules
+
+### Added
+
+- Github Actions CI
+
 ## [1.0.0] - 2020-03-12
 
 ### Fixed

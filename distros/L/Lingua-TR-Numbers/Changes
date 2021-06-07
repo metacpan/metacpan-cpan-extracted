@@ -1,5 +1,8 @@
 Revision history for Perl extension Lingua::TR::Numbers.
 
+0.35 2021-05-31 BURAK
+    - Handle one thousand properly. Reported by trizen
+
 0.34 2018-12-25 BURAK
     - Migrate to dzil.
 

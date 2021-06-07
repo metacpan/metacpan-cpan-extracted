@@ -1,24 +1,30 @@
-0.009   2018-12-03 (PERLANCAR)
+0.010   2021-05-26  Released-By: PERLANCAR; Urgency: high
+
+	- [build] Rebuild to update Sah coercion module names (old Sah coercion
+          modules have been purged from CPAN).
+
+
+0.009   2018-12-03  Released-By: PERLANCAR
 
 	- Bump DB schema version 2->3: Change data type of orderbook_item's
 	  id from int -> bigint.
 
 
-0.008   2018-11-29 (PERLANCAR)
+0.008   2018-11-29  Released-By: PERLANCAR
 
 	- When there is no api_key information for an account in
 	  configuration, instantiate exchange client with public_only=>1 so
 	  we can still do e.g. collect-orderbooks.
 
 
-0.007   2018-11-29 (PERLANCAR)
+0.007   2018-11-29  Released-By: PERLANCAR
 
 	- Add subcommand: collect-orderbooks.
 
 	- Replace old references gdax -> coinbase-pro.
 
 
-0.006   2018-08-11 (PERLANCAR)
+0.006   2018-08-11  Released-By: PERLANCAR
 
         - Add option: --usd-rate (e.g. to assume specific rates when showing
           profit report).
@@ -26,23 +32,23 @@
         - [ux] Only log fiat conversion rate once per new value.
 
 
-0.005   2018-08-07 (PERLANCAR)
+0.005   2018-08-07  Released-By: PERLANCAR
 
 	- Turn on LOG_ADD_TIMESTAMP by default.
 
 
-0.004   2018-08-07 (PERLANCAR)
+0.004   2018-08-07  Released-By: PERLANCAR
 
 	- Use Test::Deeply::Float to work around floating point rounding
 	  [RT#126001].
 
 
-0.003   2018-08-04 (PERLANCAR)
+0.003   2018-08-04  Released-By: PERLANCAR
 
 	- [Bugfix] Missing label.
 
 
-0.002   2018-08-01 (PERLANCAR)
+0.002   2018-08-01  Released-By: PERLANCAR
 
 	- Avoid deref-ing an undef.
 
@@ -52,6 +58,6 @@
 	- [doc] Update example in Synopsis.
 
 
-0.001   2018-06-25 (PERLANCAR)
+0.001   2018-06-25  Released-By: PERLANCAR
 
         - First release.

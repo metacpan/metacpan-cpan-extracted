@@ -1,21 +1,54 @@
-SYNOPSIS
+NAME
+    Pod::Weaver::PluginBundle::Author::PERLANCAR - PERLANCAR's default
+    Pod::Weaver config
 
-    In weaver.ini:
+VERSION
+    This document describes version 0.290 of
+    Pod::Weaver::PluginBundle::Author::PERLANCAR (from Perl distribution
+    Pod-Weaver-PluginBundle-Author-PERLANCAR), released on 2021-06-04.
+
+SYNOPSIS
+    In "weaver.ini":
 
      [@Author::PERLANCAR]
 
-    or in dist.ini:
+    or in "dist.ini":
 
      [PodWeaver]
      config_plugin = @Author::PERLANCAR
 
 DESCRIPTION
-
     Equivalent to (see source code).
 
-SEE ALSO
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Pod-Weaver-PluginBundle-Author-PERLANCAR>.
 
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Pod-Weaver-PluginBundle-Author-PERLAN
+    CAR>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Pod-Weaver-PluginBund
+    le-Author-PERLANCAR>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
     Pod::Weaver
 
     Dist::Zilla::PluginBundle::Author::PERLANCAR
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2021, 2017, 2016, 2015, 2014, 2013 by
+    perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

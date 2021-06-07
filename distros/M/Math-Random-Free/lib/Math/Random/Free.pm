@@ -4,7 +4,7 @@ use strict;
 use warnings;
 
 # ABSTRACT: Free drop-in replacement for Math::Random
-our $VERSION = '0.1.0'; # VERSION
+our $VERSION = '0.2.0'; # VERSION
 
 =pod
 
@@ -37,26 +37,33 @@ use List::Util qw( shuffle );
 require Exporter;
 our @ISA = qw(Exporter);
 our @EXPORT = qw(
+    random_normal
     random_permutation
     random_permuted_index
     random_set_seed_from_phrase
 );
 our @EXPORT_OK = qw(
+    random_exponential
+    random_normal
     random_permutation
     random_permuted_index
     random_set_seed_from_phrase
     random_uniform
     random_uniform_integer
 );
+our $PI = 4 * atan2( 1, 1 );
 
 =head1 SUPPORT
 
     our @EXPORT = qw(
+        random_normal
         random_permutation
         random_permuted_index
         random_set_seed_from_phrase
     );
     our @EXPORT_OK = qw(
+        random_exponential
+        random_normal
         random_permutation
         random_permuted_index
         random_set_seed_from_phrase
@@ -65,6 +72,37 @@ our @EXPORT_OK = qw(
     );
 
 =cut
+
+sub random_exponential
+{
+    my( $n, $rate ) = @_;
+
+    $n    = 1 unless defined $n;
+    $rate = 1 unless defined $rate;
+
+    if( wantarray ) {
+        return map { scalar random_exponential( $n, $rate ) } 1..$n;
+    } else {
+        return log( 1 - rand ) / -$rate;
+    }
+}
+
+sub random_normal
+{
+    my( $n, $mean, $sd ) = @_;
+
+    $n    = 1 unless defined $n;
+    $mean = 0 unless defined $mean;
+    $sd   = 1 unless defined $sd;
+
+    if( wantarray ) {
+        return map { scalar random_normal( $n, $mean, $sd ) } 1..$n;
+    } else {
+        # Box-Muller method
+        return $mean + $sd * cos( 2 * $PI * (1 - rand) )
+                           * sqrt( -2 * log(1 - rand) );
+    }
+}
 
 sub random_permutation
 {

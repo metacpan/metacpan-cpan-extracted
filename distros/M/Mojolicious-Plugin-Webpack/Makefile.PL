@@ -16,6 +16,7 @@ my %WriteMakefileArgs = (
 }
 ,
   PREREQ_PM      => {
+  'File::chdir' => '0.10',
   'Mojolicious' => '8.00'
 }
 ,

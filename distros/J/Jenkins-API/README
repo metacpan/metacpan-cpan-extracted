@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    version 0.17
+    version 0.18
 
 SYNOPSIS
 
@@ -68,8 +68,8 @@ SYNOPSIS
 
     The API token for basic auth. Go to the Jenkins wiki page on
     authenticating scripted clients
-    <https://wiki.jenkins-ci.org/display/JENKINS/Authenticating+scripted+cl
-    ients> for information on getting an API token for your user to use for
+    <https://wiki.jenkins-ci.org/display/JENKINS/Authenticating+scripted+clients>
+    for information on getting an API token for your user to use for
     authentication.
 
 METHODS
@@ -147,7 +147,7 @@ METHODS
     specify the path_parts => ['job', 'Test-Project'] to look at the data
     for that job alone.
 
-        $jenkins->current_status({ 
+        $jenkins->current_status({
             path_parts => [qw/job Test-Project/],
             extra_params => { depth => 1 },
         });
@@ -334,7 +334,7 @@ METHODS
     general_call($url_parts, $args);
 
         my $response = $api->general_call(
-            ['job', $job, 'api', 'json'], 
+            ['job', $job, 'api', 'json'],
             {
                 method => 'GET',
                 extra_params => { tree => 'color,description' },
@@ -373,6 +373,37 @@ METHODS
 
     This method returns the content of the HTTP response from our last
     request to the Jenkins server. This may be useful when an error occurs.
+
+ response_header
+
+    This method returns the specified header of the HTTP response from our
+    last request to the Jenkins server.
+
+    The following example triggers a parameterized build, extracts the
+    'Location' HTTP response header, and selects certain elements of the
+    queue item information
+
+        $success = $jenkins->trigger_build_with_parameters('Test-Project', { Parameter => 'Value' } );
+        if ($success) {
+          my $location = $jenkins->response_header('Location');
+          my $queue_item = $jenkins->general_call(
+            [ URI->new($location)->path_segments, 'api', 'json' ],
+            {
+              extra_params => { tree => 'url,why,executable[url]' }
+            }
+          );
+          # {
+          #   'executable' => {
+          #      'url' => 'http://jenkins:8080/job/Test-Project/136/',
+          #      '_class' => 'org.jenkinsci.plugins.workflow.job.WorkflowRun'
+          #   },
+          #   'url' => 'queue/item/555125/',
+          #   'why' => undef,
+          #   '_class' => 'hudson.model.Queue$LeftItem'
+          # };
+        } else {
+          print $jenkins->response_code;
+        }
 
 BUGS
 
@@ -452,13 +483,15 @@ CONTRIBUTORS
 
       * Dave Horner https://dave.thehorners.com
 
+      * Sven Willenbuecher
+
 AUTHOR
 
     Colin Newell <colin.newell@gmail.com>
 
 COPYRIGHT AND LICENSE
 
-    This software is copyright (c) 2012-2017 by Colin Newell.
+    This software is copyright (c) 2012-2021 by Colin Newell.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

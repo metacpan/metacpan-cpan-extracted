@@ -2,8 +2,8 @@ NAME
     Text::Fragment - Manipulate fragments in text
 
 VERSION
-    This document describes version 0.10 of Text::Fragment (from Perl
-    distribution Text-Fragment), released on 2017-07-10.
+    This document describes version 0.110 of Text::Fragment (from Perl
+    distribution Text-Fragment), released on 2021-03-25.
 
 SYNOPSIS
      use Text::Fragment qw(list_fragments
@@ -56,7 +56,7 @@ SYNOPSIS
 
     To set fragment attributes:
 
-     $res = se_fragment_attrs(text=>$text, id=>'bar', attrs=>{name=>'val', ...});
+     $res = set_fragment_attrs(text=>$text, id=>'bar', attrs=>{name=>'val', ...});
 
 DESCRIPTION
     A fragment is a single line or a group of lines (called payload) with a
@@ -117,7 +117,7 @@ FUNCTIONS
   delete_fragment
     Usage:
 
-     delete_fragment(%args) -> [status, msg, result, meta]
+     delete_fragment(%args) -> [status, msg, payload, meta]
 
     Delete fragment in text.
 
@@ -153,7 +153,7 @@ FUNCTIONS
     First element (status) is an integer containing HTTP status code (200
     means OK, 4xx caller error, 5xx function error). Second element (msg) is
     a string containing error message, or 'OK' if status is 200. Third
-    element (result) is optional, the actual result. Fourth element (meta)
+    element (payload) is optional, the actual result. Fourth element (meta)
     is called result metadata and is optional, a hash that contains extra
     information.
 
@@ -173,7 +173,7 @@ FUNCTIONS
   get_fragment
     Usage:
 
-     get_fragment(%args) -> [status, msg, result, meta]
+     get_fragment(%args) -> [status, msg, payload, meta]
 
     Get fragment with a certain ID in text.
 
@@ -204,7 +204,7 @@ FUNCTIONS
     First element (status) is an integer containing HTTP status code (200
     means OK, 4xx caller error, 5xx function error). Second element (msg) is
     a string containing error message, or 'OK' if status is 200. Third
-    element (result) is optional, the actual result. Fourth element (meta)
+    element (payload) is optional, the actual result. Fourth element (meta)
     is called result metadata and is optional, a hash that contains extra
     information.
 
@@ -219,7 +219,7 @@ FUNCTIONS
   insert_fragment
     Usage:
 
-     insert_fragment(%args) -> [status, msg, result, meta]
+     insert_fragment(%args) -> [status, msg, payload, meta]
 
     Insert or replace a fragment in text.
 
@@ -284,7 +284,7 @@ FUNCTIONS
     First element (status) is an integer containing HTTP status code (200
     means OK, 4xx caller error, 5xx function error). Second element (msg) is
     a string containing error message, or 'OK' if status is 200. Third
-    element (result) is optional, the actual result. Fourth element (meta)
+    element (payload) is optional, the actual result. Fourth element (meta)
     is called result metadata and is optional, a hash that contains extra
     information.
 
@@ -302,7 +302,7 @@ FUNCTIONS
   list_fragments
     Usage:
 
-     list_fragments(%args) -> [status, msg, result, meta]
+     list_fragments(%args) -> [status, msg, payload, meta]
 
     List fragments in text.
 
@@ -327,7 +327,7 @@ FUNCTIONS
     First element (status) is an integer containing HTTP status code (200
     means OK, 4xx caller error, 5xx function error). Second element (msg) is
     a string containing error message, or 'OK' if status is 200. Third
-    element (result) is optional, the actual result. Fourth element (meta)
+    element (payload) is optional, the actual result. Fourth element (meta)
     is called result metadata and is optional, a hash that contains extra
     information.
 
@@ -341,7 +341,7 @@ FUNCTIONS
   set_fragment_attrs
     Usage:
 
-     set_fragment_attrs(%args) -> [status, msg, result, meta]
+     set_fragment_attrs(%args) -> [status, msg, payload, meta]
 
     Set/unset attributes of a fragment.
 
@@ -377,7 +377,7 @@ FUNCTIONS
     First element (status) is an integer containing HTTP status code (200
     means OK, 4xx caller error, 5xx function error). Second element (msg) is
     a string containing error message, or 'OK' if status is 200. Third
-    element (result) is optional, the actual result. Fourth element (meta)
+    element (payload) is optional, the actual result. Fourth element (meta)
     is called result metadata and is optional, a hash that contains extra
     information.
 
@@ -399,7 +399,7 @@ SOURCE
 
 BUGS
     Please report any bugs or feature requests on the bugtracker website
-    <https://rt.cpan.org/Public/Dist/Display.html?Name=Text-Fragment>
+    <https://github.com/perlancar/perl-Text-Fragment/issues>
 
     When submitting a bug or request, please include a test-file or a patch
     to an existing test-file that illustrates the bug or desired feature.
@@ -408,7 +408,7 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2017, 2016, 2015, 2014, 2012 by
+    This software is copyright (c) 2021, 2017, 2016, 2015, 2014, 2012 by
     perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under

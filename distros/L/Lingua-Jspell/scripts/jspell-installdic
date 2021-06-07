@@ -29,7 +29,7 @@ for (@ARGV) {
     } else {
         my $language = lc;
 
-        my $host = 'http://natura.di.uminho.pt/';
+        my $host = 'https://natura.di.uminho.pt/';
         my $url = "${host}download/sources/Dictionaries/jspell/LATEST/jspell.${language}-latest.tar.gz";
 
         fetch_dic($url);

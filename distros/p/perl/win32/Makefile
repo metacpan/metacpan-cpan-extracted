@@ -5,7 +5,7 @@
 #	Windows SDK 64-bit compiler and tools
 #
 # This is set up to build a perl.exe that runs off a shared library
-# (perl532.dll).  Also makes individual DLLs for the XS extensions.
+# (perl534.dll).  Also makes individual DLLs for the XS extensions.
 #
 
 ##
@@ -38,7 +38,7 @@ INST_TOP	= $(INST_DRV)\perl
 # versioned installation can be obtained by setting INST_TOP above to a
 # path that includes an arbitrary version string.
 #
-#INST_VER	= \5.32.1
+#INST_VER	= \5.34.0
 
 #
 # Comment this out if you DON'T want your perl installation to have
@@ -79,13 +79,6 @@ USE_ITHREADS	= define
 # will auto-enable) USE_MULTI above.
 #
 USE_IMP_SYS	= define
-
-#
-# Comment this out if you don't want to enable large file support for
-# some reason.  Should normally only be changed to maintain compatibility
-# with an older release of perl.
-#
-USE_LARGE_FILES	= define
 
 #
 # Uncomment this if you're building a 32-bit perl and want 64-bit integers.
@@ -191,7 +184,7 @@ DEFAULT_INC_EXCLUDES_DOT = define
 # set this to additionally provide a statically linked perl-static.exe.
 # Note that dynamic loading will not work with this perl, so you must
 # include required modules statically using the STATIC_EXT or ALL_STATIC
-# variables below. A static library perl532s.lib will also be created.
+# variables below. A static library perl534s.lib will also be created.
 # Ordinary perl.exe is not affected by this option.
 #
 #BUILD_STATIC	= define
@@ -294,10 +287,6 @@ USE_ITHREADS	= undef
 
 !IF "$(USE_IMP_SYS)" == ""
 USE_IMP_SYS	= undef
-!ENDIF
-
-!IF "$(USE_LARGE_FILES)" == ""
-USE_LARGE_FILES	= undef
 !ENDIF
 
 !IF "$(USE_64_BIT_INT)" == ""
@@ -411,6 +400,11 @@ EMBED_EXE_MANI	= if exist $@.manifest mt -nologo -manifest $@.manifest -outputre
 		  if exist $@.manifest del $@.manifest
 EMBED_DLL_MANI	= if exist $@.manifest mt -nologo -manifest $@.manifest -outputresource:$@;2 && \
 		  if exist $@.manifest del $@.manifest
+# This one is for perl.exe which already has an embedded manifest, so we want to
+# append to it, not replace it.
+APPEND_EXE_MANI	= if exist $@.manifest mt -nologo -manifest $@.manifest -updateresource:$@;1 && \
+		  if exist $@.manifest del $@.manifest
+
 
 # Set the install location of the compiler headers/libraries.
 # These are saved into $Config{incpath} and $Config{libpth}.
@@ -604,11 +598,7 @@ EXEOUT_FLAG	= -Fe
 
 CFLAGS_O	= $(CFLAGS) $(BUILDOPT)
 
-!IF "$(PREMSVC80)" == "undef"
-PRIV_LINK_FLAGS	= $(PRIV_LINK_FLAGS) "/manifestdependency:type='Win32' name='Microsoft.Windows.Common-Controls' version='6.0.0.0' processorArchitecture='*' publicKeyToken='6595b64144ccf1df' language='*'"
-!ELSE
-RSC_FLAGS	= -DINCLUDE_MANIFEST
-!ENDIF
+RSC_FLAGS	=
 
 # VS 2017 (VC++ 14.1) requires at minimum Windows 7 SP1 (with latest Windows Updates)
 
@@ -665,9 +655,9 @@ $(o).dll:
 
 # makedef.pl must be updated if this changes, and this should normally
 # only change when there is an incompatible revision of the public API.
-PERLIMPLIB	= ..\perl532.lib
-PERLSTATICLIB	= ..\perl532s.lib
-PERLDLL		= ..\perl532.dll
+PERLIMPLIB	= ..\perl534.lib
+PERLSTATICLIB	= ..\perl534s.lib
+PERLDLL		= ..\perl534.dll
 
 MINIPERL	= ..\miniperl.exe
 MINIDIR		= .\mini
@@ -774,7 +764,6 @@ MICROCORE_SRC	=		\
 		..\op.c		\
 		..\pad.c	\
 		..\perl.c	\
-		..\perlapi.c	\
 		..\perly.c	\
 		..\pp.c		\
 		..\pp_ctl.c	\
@@ -915,7 +904,6 @@ CFG_VARS	=					\
 		"usemultiplicity=$(USE_MULTI)"		\
 		"use64bitint=$(USE_64_BIT_INT)"		\
 		"uselongdouble=undef"			\
-		"uselargefiles=$(USE_LARGE_FILES)"	\
 		"usesitecustomize=$(USE_SITECUST)"	\
 		"default_inc_excludes_dot=$(DEFAULT_INC_EXCLUDES_DOT)"	\
 		"LINK_FLAGS=$(LINK_FLAGS:"=\")"		\
@@ -966,13 +954,13 @@ perlglob$(o)  : perlglob.c
 # ITHREADS, IMP_SYS and LARGE_FILES off), then make this target
 # to regenerate config_H.vc.
 regen_config_h:
-	$(MINIPERL) -I..\lib config_sh.PL $(CFG_VARS) $(CFGSH_TMPL) > ..\config.sh
+	$(MINIPERL) -I..\lib config_sh.PL --prebuilt $(CFG_VARS) $(CFGSH_TMPL) > ..\config.sh
 	$(MINIPERL) -I..\lib ..\configpm --chdir=..
 	-del /f $(CFGH_TMPL)
 	-$(MINIPERL) -I..\lib config_h.PL
 	rename config.h $(CFGH_TMPL)
 
-$(CONFIGPM) : $(MINIPERL) ..\config.sh config_h.PL
+$(CONFIGPM) : $(MINIPERL) ..\config.sh config_h.PL ..\git_version.h
 	$(MINIPERL) -I..\lib ..\configpm --chdir=..
 	$(XCOPY) ..\*.h $(COREDIR)\*.*
 	$(XCOPY) *.h $(COREDIR)\*.*
@@ -1007,9 +995,6 @@ $(MINIDIR)\.exists : $(CFGH_TMPL)
 	@(echo.&& \
 	echo #ifndef _config_h_footer_&& \
 	echo #define _config_h_footer_&& \
-	echo #undef Off_t&& \
-	echo #undef LSEEKSIZE&& \
-	echo #undef Off_t_size&& \
 	echo #undef PTRSIZE&& \
 	echo #undef SSize_t&& \
 	echo #undef HAS_ATOLL&& \
@@ -1040,15 +1025,6 @@ $(MINIDIR)\.exists : $(CFGH_TMPL)
 	echo #define FILE_base^(fp^) PERLIO_FILE_base^(fp^)&& \
 	echo #define FILE_bufsiz^(fp^) ^(PERLIO_FILE_cnt^(fp^) + PERLIO_FILE_ptr^(fp^) - PERLIO_FILE_base^(fp^)^)&& \
 	echo #define I_STDBOOL)>> config.h
-!ENDIF
-!IF "$(USE_LARGE_FILES)"=="define"
-	@(echo #define Off_t $(INT64)&& \
-	echo #define LSEEKSIZE ^8&& \
-	echo #define Off_t_size ^8)>> config.h
-!ELSE
-	@(echo #define Off_t long&& \
-	echo #define LSEEKSIZE ^4&& \
-	echo #define Off_t_size ^4)>> config.h
 !ENDIF
 !IF "$(WIN64)"=="define"
 	@(echo #define PTRSIZE ^8&& \
@@ -1124,7 +1100,7 @@ $(WIN32_OBJ)	: $(CORE_H)
 $(CORE_OBJ)	: $(CORE_H)
 $(DLL_OBJ)	: $(CORE_H)
 
-perldll.def : $(MINIPERL) $(CONFIGPM) ..\embed.fnc ..\makedef.pl create_perllibst_h.pl
+perldll.def : $(MINIPERL) $(CONFIGPM) ..\embed.fnc ..\makedef.pl create_perllibst_h.pl ..\git_version.h
 	$(MINIPERL) -I..\lib create_perllibst_h.pl
 	$(MINIPERL) -I..\lib -w ..\makedef.pl PLATFORM=win32 $(OPTIMIZE) $(DEFINES) $(BUILDOPT) \
 	    CCTYPE=$(CCTYPE) TARG_DIR=..\ > perldll.def
@@ -1174,14 +1150,14 @@ perlmainst$(o) : perlmainst.c
 $(PERLEXE): $(PERLDLL) $(CONFIGPM) $(PERLEXE_OBJ) $(PERLEXE_RES)
 	$(LINK32) -out:$@ $(BLINK_FLAGS) \
 	    $(PERLEXE_OBJ) $(PERLEXE_RES) $(PERLIMPLIB) $(LIBFILES) $(SETARGV_OBJ)
-	$(EMBED_EXE_MANI)
+	$(APPEND_EXE_MANI)
 	copy $(PERLEXE) $(WPERLEXE)
 	$(MINIPERL) -I..\lib bin\exetype.pl $(WPERLEXE) WINDOWS
 
 $(PERLEXESTATIC): $(PERLSTATICLIB) $(CONFIGPM) $(PERLEXEST_OBJ) $(PERLEXE_RES)
 	$(LINK32) -out:$@ $(BLINK_FLAGS) \
 	    $(PERLEXEST_OBJ) $(PERLEXE_RES) $(PERLSTATICLIB) $(LIBFILES) $(SETARGV_OBJ)
-	$(EMBED_EXE_MANI)
+	$(APPEND_EXE_MANI)
 
 MakePPPort: $(MINIPERL) $(CONFIGPM) Extensions_nonxs
 	$(MINIPERL) -I..\lib ..\mkppport
@@ -1259,13 +1235,12 @@ utils: $(PERLEXE) ..\utils\Makefile
 	copy ..\README.qnx      ..\pod\perlqnx.pod
 	copy ..\README.riscos   ..\pod\perlriscos.pod
 	copy ..\README.solaris  ..\pod\perlsolaris.pod
-	copy ..\README.symbian  ..\pod\perlsymbian.pod
 	copy ..\README.synology ..\pod\perlsynology.pod
 	copy ..\README.tru64    ..\pod\perltru64.pod
 	copy ..\README.tw       ..\pod\perltw.pod
 	copy ..\README.vos      ..\pod\perlvos.pod
 	copy ..\README.win32    ..\pod\perlwin32.pod
-	copy ..\pod\perldelta.pod ..\pod\perl5321delta.pod
+	copy ..\pod\perldelta.pod ..\pod\perl5340delta.pod
 	cd ..\win32
 	$(PERLEXE) $(PL2BAT) $(UTILS)
 	$(MINIPERL) -I..\lib ..\autodoc.pl ..
@@ -1364,16 +1339,15 @@ distclean: realclean
 	-if exist $(LIBDIR)\Win32API rmdir /s /q $(LIBDIR)\Win32API
 	-if exist $(LIBDIR)\XS rmdir /s /q $(LIBDIR)\XS
 	-cd $(PODDIR) && del /f *.html *.bat roffitall \
-	    perl5321delta.pod perlaix.pod perlamiga.pod perlandroid.pod \
+	    perl5340delta.pod perlaix.pod perlamiga.pod perlandroid.pod \
 	    perlapi.pod perlbs2000.pod perlcn.pod perlcygwin.pod \
 	    perldos.pod perlfreebsd.pod perlhaiku.pod perlhpux.pod \
 	    perlhurd.pod perlintern.pod perlirix.pod perljp.pod perlko.pod \
 	    perllinux.pod perlmacos.pod perlmacosx.pod perlmodlib.pod \
 	    perlnetware.pod perlopenbsd.pod perlos2.pod perlos390.pod \
 	    perlos400.pod perlplan9.pod perlqnx.pod perlriscos.pod \
-	    perlsolaris.pod perlsymbian.pod perlsynology.pod perltoc.pod \
-	    perltru64.pod perltw.pod perluniprops.pod perlvos.pod \
-	    perlwin32.pod
+	    perlsolaris.pod perlsynology.pod perltoc.pod perltru64.pod \
+	    perltw.pod perluniprops.pod perlvos.pod perlwin32.pod
 	-cd ..\utils && del /f h2ph splain perlbug pl2pm h2xs \
 	    perldoc perlivp libnetcfg enc2xs encguess piconv cpan streamzip *.bat \
 	    xsubpp pod2html instmodsh json_pp prove ptar ptardiff ptargrep shasum corelist zipdetails

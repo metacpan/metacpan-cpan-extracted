@@ -1,11 +1,18 @@
-SYNOPSIS
+NAME
+    Dist::Zilla::Plugin::Prereqs::EnsureCoreOrPP - Make sure that prereqs
+    (and their deps) are all core/PP modules
 
+VERSION
+    This document describes version 0.100 of
+    Dist::Zilla::Plugin::Prereqs::EnsureCoreOrPP (from Perl distribution
+    Dist-Zilla-Plugin-Prereqs-EnsureCoreOrPP), released on 2021-05-31.
+
+SYNOPSIS
     In dist.ini:
 
      [Prereqs::EnsureCoreOrPP]
 
 DESCRIPTION
-
     This plugin will check that all RuntimeRequires prereqs (and all their
     recursive RuntimeRequires deps) are all core/PP modules. To do this
     checking, all prereqs must be installed during build time and they all
@@ -19,9 +26,27 @@ DESCRIPTION
     before_release because I don't always use "dzil release" (i.e. during
     offline deployment, I "dzil build" and "pause upload" separately.)
 
-SEE ALSO
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Dist-Zilla-Plugin-Prereqs-EnsureCoreOrPP>.
 
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Dist-Zilla-Plugin-Prereqs-EnsureCoreO
+    rPP>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Dist-Zilla-Plugin-Pre
+    reqs-EnsureCoreOrPP>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
     App::FatPacker, App::depak
+
+    Dist::Zilla::Plugin::Prereqs::EnsureCore
 
     Dist::Zilla::Plugin::Prereqs::EnsurePP
 
@@ -30,4 +55,13 @@ SEE ALSO
     Dist::Zilla::Plugin::OnlyCorePrereqs
 
     App::lcpan, lcpan
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2021, 2016, 2015 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

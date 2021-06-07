@@ -2,7 +2,7 @@ NAME
     Log::ger::Format::HashArgs - Log using hash arguments
 
 VERSION
-    version 0.004
+    version 0.005
 
 SYNOPSIS
     To use for the current package:
@@ -58,7 +58,7 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2021, 2020 by perlancar@cpan.org.
+    This software is copyright (c) 2021 by perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

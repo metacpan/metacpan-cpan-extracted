@@ -12,7 +12,7 @@ BEGIN {
 
 use Test::More;
 
-plan tests => 17;
+plan tests => 18;
 
 unless ($^O eq 'linux' || $^O eq 'freebsd') {
     BAIL_OUT "OS unsupported";
@@ -21,7 +21,7 @@ unless ($^O eq 'linux' || $^O eq 'freebsd') {
 use_ok $_ for qw(
     Beekeeper
     Beekeeper::JSONRPC
-    Beekeeper::Bus::STOMP
+    Beekeeper::MQTT
     Beekeeper::Config
     Beekeeper::Logger
     Beekeeper::Client
@@ -36,6 +36,7 @@ use_ok $_ for qw(
     Beekeeper::Service::LogTail::Worker
     Beekeeper::Service::Router
     Beekeeper::Service::Router::Worker
+    Beekeeper::Service::ToyBroker::Worker
 );
 
 diag( "Testing Beekeeper $Beekeeper::VERSION, Perl $]" );

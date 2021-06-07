@@ -1,57 +1,62 @@
 
 function Chat () { return {
 
-    rpc: null,
+    bkpr: null,
 
     connect: function() {
 
-        var This = this;
+        const This = this;
 
-        this.rpc = new JSON_RPC;
-        this.rpc.connect({
+        this.bkpr = new BeekeeperClient;
 
-            url:      CONFIG.url,       // "ws://localhost:15674/ws"
-            login:    CONFIG.login,     // "frontend"
-            password: CONFIG.password,  // "abc123"
-            vhost:    CONFIG.vhost,     // "/frontend"
-            debug:    CONFIG.debug,
-
-            on_ready: function() {
-                This.echo_info( 'Connected to ' + This.rpc.server + ' at ' + This.rpc.stomp.ws.url );
-                This.echo_info( 'Debug enabled, STOMP traffic is being dumped to console' );
-                This.init();
-
-                This.login_user();
-            }
+        this.bkpr.connect({
+            url:        CONFIG.url,       // "ws://localhost:8000/mqtt"
+            username:   CONFIG.username,  // "frontend"
+            password:   CONFIG.password,  // "abc123"
+            debug:      CONFIG.debug,
+            on_connect: function() { This.init() }
         });
     },
 
     init: function() {
 
-        var This = this;
+        this.display_info(`Connected to ${this.bkpr.host}<br/>
+                           JSON-RPC traffic is being dumped to console`);
 
-        this.rpc.accept_notifications({
+        const names = ['Bob','Dave','Paul','Tom','Alice','Lisa','Lucy','Zoe'];
+        document.getElementById('username').value = names[Math.floor(Math.random()*8)];
+        document.getElementById('password').value = '12345';
+        this.login_user();
+
+        const This = this;
+
+        this.bkpr.accept_notifications({
             method: "myapp.chat.message",
             on_receive: function(params) {
-                var msg = params.message;
-                var from = params.from;
-                This.echo_mcast( from ? from + ": " + msg : msg );
+                const msg = params.message;
+                const from = params.from;
+                This.display_message(msg, from);
             }
         });
 
-        this.rpc.accept_notifications({
+        this.bkpr.accept_notifications({
             method: "myapp.chat.pmessage",
             on_receive: function(params) {
-                var msg = params.message;
-                var from = params.from;
-                This.echo_ucast( from ? from + ": " + msg : msg );
+                const msg = params.message;
+                const from = params.from;
+                This.display_private_message(msg, from);
             }
         });
 
-        var cmdInput = document.getElementById('cmd');
+        this.bkpr.on_error = function(error) {
+            const msg = error.constructor === Object ? error.message : error;
+            This.display_error(msg);
+        }
+
+        const cmdInput = document.getElementById('cmd');
         cmdInput.onkeypress = function(e) {
-            var event = e || window.event;
-            var charCode = event.which || event.keyCode;
+            const event = e || window.event;
+            const charCode = event.which || event.keyCode;
             if (charCode == '13') { // Enter
                 This.exec_command();
                 return false;
@@ -59,98 +64,95 @@ function Chat () { return {
         }
     },
 
-    echo: function(msg,style) {
-        var div = document.getElementById('chat');
-        div.innerHTML = div.innerHTML + '<div class="'+style+'">' + msg + '</div>';
+    display_bubble: function(msg, from, style) {
+        const div = document.getElementById('chat');
+        div.innerHTML = div.innerHTML + `<div class="bubble ${style}"><div class="sender">${from}</div>${msg}</div>`;
         div.scrollTop = div.scrollHeight;
     },
 
-    echo_info: function(msg) {
-        this.echo(msg,'info');
+    display_info: function(msg) {
+        this.display_bubble(msg, '', 'incoming info no_sender');
     },
 
-    echo_error: function(msg) {
-        this.echo(msg,'error');
+    display_error: function(msg) {
+        this.display_bubble(msg, '', 'incoming error no_sender');
     },
 
-    echo_mcast: function(msg) {
-        this.echo(msg,'mcast');
+    display_message: function(msg, from) {
+        const style = (from == this.username) ? 'outgoing no_sender' : 'incoming public';
+        this.display_bubble(msg, from, style);
     },
 
-    echo_ucast: function(msg) {
-        this.echo(msg,'ucast');
+    display_private_message: function(msg, from) {
+        const style = (from == null) ? 'incoming private no_sender' : 'incoming private';
+        this.display_bubble(msg, from, style);
     },
 
     login_user: function() {
-        this.rpc.call({
+        const This = this;
+        const user = document.getElementById('username').value;
+        const pass = document.getElementById('password').value;
+        this.bkpr.call_remote_method({
             method: 'myapp.auth.login', 
             params: {
-                "username": document.getElementById('username').value,
-                "password": document.getElementById('password').value
+                "username": user,
+                "password": pass
             },
-            on_error: function(error) {
-                This.echo_error( "Error : " + error.data );
+            on_success: function(params) {
+                This.username = user;
             }
-        });
+        })
     },
 
     exec_command: function() {
 
-        var cmdInput = document.getElementById('cmd');
-        var cmd = cmdInput.value;
+        const cmdInput = document.getElementById('cmd');
+        const cmd = cmdInput.value;
         if (!cmd.length) return;
         cmdInput.value = "";
-        var This = this;
+        const This = this;
+        let params;
 
         if (params = cmd.match(/^\/logout\b/i)) {
-            this.rpc.call({
+            this.bkpr.call_remote_method({
                 method: 'myapp.auth.logout', 
-                params: { },
-                on_error: function(error) {
-                    This.echo_error( "Error : " + error.data );
-                }
+                params: { }
             });
         }
         else if (params = cmd.match(/^\/kick\s+(.*)/i)) {
-            this.rpc.call({
+            this.bkpr.call_remote_method({
                 method: 'myapp.auth.kick', 
-                params: { "username": params[1] },
-                on_error: function(error) {
-                    This.echo_error( "Error : " + error.data );
-                }
+                params: { "username": params[1] }
             });
         }
         else if (params =  cmd.match(/^\/pm\s+(\w+)\s+(.*)/i)) {
-            this.rpc.call({
+            const to_user = params[1];
+            const msg = params[2];
+            this.display_bubble(msg, `To ${to_user}`, 'outgoing');
+            this.bkpr.call_remote_method({
                 method: 'myapp.chat.pmessage', 
-                params: { "to_user": params[1], "message": params[2] },
-                on_error: function(error) {
-                    This.echo_error( "Error : " + error.data );
-                }
+                params: { "to_user": to_user, "message": msg }
             });
         }
         else if (params = cmd.match(/^\/ping\b/i)) {
-            var t0 = performance.now();
-            this.rpc.call({
+            const t0 = performance.now();
+            this.bkpr.call_remote_method({
                 method: 'myapp.chat.ping', 
                 params: { },
                 on_success: function(result) {
-                    var took = Math.round(performance.now() - t0);
-                    This.echo_info( 'Ping: ' + took + " ms" );
-                },
-                on_error: function(error) {
-                    This.echo_error( "Error : " + error.data );
+                    const took = Math.round(performance.now() - t0);
+                    This.display_info( `Ping: ${took} ms` );
                 }
             });
         }
         else {
-            this.rpc.call({
+            this.bkpr.call_remote_method({
                 method: 'myapp.chat.message', 
-                params: { "message": cmd },
-                on_error: function(error) {
-                    This.echo_error( "Error : " + error.data );
-                }
+                params: { "message": cmd }
             });
         }
     }
 }};
+
+const chat = new Chat;
+chat.connect();

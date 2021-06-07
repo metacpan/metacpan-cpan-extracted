@@ -55,12 +55,12 @@ t/hash-key.t
 t/heredoc.t
 t/ignored-modules.t
 t/import-error.t
-t/inner-package.t
 t/interpolation.t
 t/is-ignored.t
 t/lib/TestHelper.pm
 t/meta.t
 t/method.t
+t/module-with-inner-packages.t
 t/moo.t
 t/moose-types.t
 t/moose.t
@@ -74,12 +74,13 @@ t/pragma.t
 t/preserve-spaces.t
 t/quoted-var.t
 t/require.t
+t/script-with-inner-packages.t
+t/signatures.pl
 t/skip-all.t
 t/socket.t
 t/switches-in-import.t
 t/symbol-as-method-call.t
 t/symbol-in-export.t
-t/symbol-in-signature.t
 t/test-most.t
 t/typeglob.t
 t/use-and-require.t
@@ -129,6 +130,7 @@ test-data/lib/Local/UsesTypesStandard.pm
 test-data/lib/Local/UsesUsesImportInto.pm
 test-data/lib/Local/ViaExporter.pm
 test-data/lib/Local/ViaSubExporter.pm
+test-data/lib/Local/WithInnerPkg.pm
 test-data/messy-imports.pl
 test-data/meta.t
 test-data/method.pl
@@ -142,6 +144,7 @@ test-data/preserve-spaces.pl
 test-data/quoted-var.pl
 test-data/require.pl
 test-data/same-import.pl
+test-data/signatures.pl
 test-data/skip-all.t
 test-data/socket.pl
 test-data/stdout.pl

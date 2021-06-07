@@ -39,7 +39,6 @@ use feature qw(say);
 #use DBI;
 
 use Getopt::Long;
-use List::Util;
 
 use lib qw(../../Photonic/lib);
 use Photonic::Geometry::FromEpsilon;

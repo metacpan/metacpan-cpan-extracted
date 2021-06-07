@@ -94,7 +94,7 @@
    "provides" : {
       "Net::Statsd::Lite" : {
          "file" : "lib/Net/Statsd/Lite.pm",
-         "version" : "v0.6.1"
+         "version" : "v0.6.2"
       }
    },
    "release_status" : "stable",
@@ -109,7 +109,7 @@
          "web" : "https://github.com/robrwo/Net-Statsd-Lite"
       }
    },
-   "version" : "v0.6.1",
+   "version" : "v0.6.2",
    "x_authority" : "cpan:RRWO",
    "x_contributors" : [
       "Michael R. Davis <mrdvt@cpan.org>",

@@ -1,5 +1,5 @@
-CGI::AuthRegister version 1.4
-=============================
+CGI::AuthRegister version 1.403
+===============================
 
 The CGI::AuthRegister module provides a simple, transparent, and
 flexible framework for authentication and registration of users
@@ -28,7 +28,7 @@ No significant dependencies.
 
 COPYRIGHT AND LICENCE
 
-Copyright 2012-20 Vlado Keselj http://vlado.ca
+Copyright 2012-21 Vlado Keselj http://vlado.ca
 
 This script is provided "as is" without express or implied warranty.
 This is free software; you can redistribute it and/or modify it under

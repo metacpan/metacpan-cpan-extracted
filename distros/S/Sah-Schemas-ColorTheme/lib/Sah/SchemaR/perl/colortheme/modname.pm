@@ -1,9 +1,9 @@
 package Sah::SchemaR::perl::colortheme::modname;
 
-our $DATE = '2021-01-26'; # DATE
-our $VERSION = '0.002'; # VERSION
+our $DATE = '2021-02-02'; # DATE
+our $VERSION = '0.003'; # VERSION
 
-our $rschema = ["str",[{description=>"\nContains coercion rule so you can also input `Foo-Bar`, `Foo/Bar`, `Foo/Bar.pm`\nor even 'Foo.Bar' and it will be normalized into `Foo::Bar`.\n\n",examples=>[{valid=>0,value=>""},{valid=>1,value=>"Foo::Bar"},{valid=>1,validated_value=>"Foo::Bar",value=>"Foo-Bar"},{valid=>1,validated_value=>"Foo::Bar",value=>"Foo/Bar"},{valid=>1,validated_value=>"Foo::Bar",value=>"Foo/Bar.pm"},{valid=>1,validated_value=>"Foo::Bar",value=>"Foo.Bar"},{valid=>0,value=>"Foo|Bar"}],match=>"[A-Za-z_][A-Za-z_0-9]*(::[A-Za-z_0-9]+)*",summary=>"Perl module name, e.g. Foo::Bar","x.completion"=>"perl_modname","x.perl.coerce_rules"=>["From_str::normalize_perl_modname"]},{summary=>"Perl module in the ColorTheme::* namespace, without the namespace prefix, e.g. \"Test::Random\"","x.completion"=>["perl_modname",{ns_prefix=>"ColorTheme"}]}],["perl::modname","str"]];
+our $rschema = ["str",[{description=>"\nContains coercion rule so you can also input `Foo-Bar`, `Foo/Bar`, `Foo/Bar.pm`\nor even 'Foo.Bar' and it will be normalized into `Foo::Bar`.\n\n",examples=>[{valid=>0,value=>""},{valid=>1,value=>"Foo::Bar"},{valid=>1,validated_value=>"Foo::Bar",value=>"Foo-Bar"},{valid=>1,validated_value=>"Foo::Bar",value=>"Foo/Bar"},{valid=>1,validated_value=>"Foo::Bar",value=>"Foo/Bar.pm"},{valid=>1,validated_value=>"Foo::Bar",value=>"Foo.Bar"},{valid=>0,value=>"Foo|Bar"}],match=>"[A-Za-z_][A-Za-z_0-9]*(::[A-Za-z_0-9]+)*",summary=>"Perl module name, e.g. Foo::Bar","x.completion"=>"perl_modname","x.perl.coerce_rules"=>["From_str::normalize_perl_modname"]},{summary=>"Perl module in the ColorTheme::* namespace, without the namespace prefix, e.g. \"Test::Random\"","x.completion"=>["perl_modname",{ns_prefix=>"ColorTheme",recurse=>1,recurse_matching=>"all-at-once"}]}],["perl::modname","str"]];
 
 1;
 # ABSTRACT: Perl module in the ColorTheme::* namespace, without the namespace prefix, e.g. "Test::Random"
@@ -20,7 +20,7 @@ Sah::SchemaR::perl::colortheme::modname - Perl module in the ColorTheme::* names
 
 =head1 VERSION
 
-This document describes version 0.002 of Sah::SchemaR::perl::colortheme::modname (from Perl distribution Sah-Schemas-ColorTheme), released on 2021-01-26.
+This document describes version 0.003 of Sah::SchemaR::perl::colortheme::modname (from Perl distribution Sah-Schemas-ColorTheme), released on 2021-02-02.
 
 =head1 DESCRIPTION
 

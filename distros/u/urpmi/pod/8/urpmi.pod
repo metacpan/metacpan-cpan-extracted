@@ -350,7 +350,11 @@ Ignore file conflicts.
 This is equivalent to C<rpm --replacefiles>.
 
 
+=item B<--reinstall>
 
+Force installing the packages even though they are already installed.
+This is a saner equivalent to C<rpm --replacepkgs>.
+It acts like an upgrade to the same version (respecting lang, docs, etc.)
 
 =back
 

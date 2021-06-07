@@ -1,11 +1,11 @@
 use strict;
 use warnings;
-package Dist::Zilla::PluginBundle::Author::ETHER; # git description: v0.159-5-gda45ade
+package Dist::Zilla::PluginBundle::Author::ETHER; # git description: v0.160-5-g27b9618
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: A plugin bundle for distributions built by ETHER
 # KEYWORDS: author bundle distribution tool
 
-our $VERSION = '0.160';
+our $VERSION = '0.161';
 
 no if "$]" >= 5.031009, feature => 'indirect';
 no if "$]" >= 5.033001, feature => 'multidimensional';
@@ -190,7 +190,7 @@ sub _pause_config {
     my $cfg = try {
       CPAN::Uploader->read_config_file($file)
     } catch {
-      $self->log("Couldn't load credentials from '$file': $_");
+      warn "[\@Author::ETHER] Couldn't load credentials from '$file': $_";
       {};
     };
     return $cfg;
@@ -346,7 +346,7 @@ sub configure {
         # VersionProvider
         # see [@Git::VersionManager]
 
-        # BeforeBuild
+        # Before Build
         # [ 'EnsurePrereqsInstalled' ], # FIXME: use options to make this less annoying!
         [ 'PromptIfStale' => 'stale modules, build' => { phase => 'build', module => [ $self->meta->name ] } ],
 
@@ -664,7 +664,7 @@ Dist::Zilla::PluginBundle::Author::ETHER - A plugin bundle for distributions bui
 
 =head1 VERSION
 
-version 0.160
+version 0.161
 
 =head1 SYNOPSIS
 
@@ -684,7 +684,7 @@ following F<dist.ini> (following the preamble), minus some optimizations:
     -relationship = recommends
     Dist::Zilla::PluginBundle::Author::ETHER = <current installed version>
 
-    ;;; BeforeBuild
+    ;;; Before Build
     [PromptIfStale / stale modules, build]
     phase = build
     module = Dist::Zilla::Plugin::Author::ETHER
@@ -947,7 +947,7 @@ following F<dist.ini> (following the preamble), minus some optimizations:
     [UploadToCPAN]
 
 
-    ;;; AfterRelease
+    ;;; After Release
     [Run::AfterRelease / remove old LICENCE]    ; if switching from LICENCE -> LICENSE
     :version = 0.038
     quiet = 1
@@ -1322,7 +1322,7 @@ L<http://dzil.org/#mailing-list>.
 There is also an irc channel available for users of this distribution, at
 L<C<#distzilla> on C<irc.perl.org>|irc://irc.perl.org/#distzilla>.
 
-I am also usually active on irc, as 'ether' at C<irc.perl.org> and C<irc.freenode.org>.
+I am also usually active on irc, as 'ether' at C<irc.perl.org> and C<irc.libera.chat>.
 
 =head1 AUTHOR
 

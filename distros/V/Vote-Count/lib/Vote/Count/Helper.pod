@@ -1,0 +1,64 @@
+=pod
+
+=head1 Name
+
+Vote::Count::Helper
+
+=head1 Description
+
+Helpers for Vote::Count.
+
+=head1 Inventory
+
+=head2 Non Object Oriented
+
+These Helpers export methods.
+
+=over 1
+
+=item L<FullCascadeCharge|http://metacpan.org/pod/Vote::Count::Helper::FullCascadeCharge>
+
+=item L<Table|http://metacpan.org/pod/Vote::Count::Helper::Table>
+
+=item L<Table|http://metacpan.org/pod/Vote::Count::Helper::TestBalance>
+
+=back
+
+=head2 Roles
+
+These Helpers provide Moose Roles.
+
+=over 1
+
+=item L<NthApproval|http://metacpan.org/pod/Vote::Count::Helper::NthApproval>
+
+=back
+
+=cut
+
+#FOOTER
+
+=pod
+
+BUG TRACKER
+
+L<https://github.com/brainbuz/Vote-Count/issues>
+
+AUTHOR
+
+John Karr (BRAINBUZ) brainbuz@cpan.org
+
+CONTRIBUTORS
+
+Copyright 2019-2021 by John Karr (BRAINBUZ) brainbuz@cpan.org.
+
+LICENSE
+
+This module is released under the GNU Public License Version 3. See license file for details. For more information on this license visit L<http://fsf.org>.
+
+SUPPORT
+
+This software is provided as is, per the terms of the GNU Public License. Professional support and customisation services are available from the author.
+
+=cut
+

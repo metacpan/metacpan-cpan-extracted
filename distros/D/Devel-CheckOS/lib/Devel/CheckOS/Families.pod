@@ -36,6 +36,22 @@ and user groups.  Permissions may not be supported on all filesystems.
 This includes both ordinary Linux and Android. Plain old Linux will
 match 'Linux'. Android will match both that and 'Android'.
 
+=head1 THE Linux::Debian FAMILY
+
+Up until version 1.84 this wasn't a family, and would match any platform
+which claimed to be Debian via C<lsb_release -i> or on which a file called
+C</etc/debian_version> existed. That meant that as well as matching real
+Debian, it would also match Ubuntu, Raspbian, and so on. As of version 1.85
+C<Linux::Debian> has become a family of all the Debian-based Linuxes. If
+you want to test which particular family member you're on then look at
+C<list_family_members("Linux::Debian")> to see what's available.
+
+NB the difference between C<Linux::RealDebian> (which uses C<lsb_release>
+for identification) and C<Linux::UnknownDebianLike> (which uses the
+existence of C</etc/debian_version> for identification). In particular
+beware that some *very* old Debians don't have C<lsb_release> available
+and so will be detected as C<Linux::UnknownDebianLike>.
+
 =head1 THE MicrosoftWindows FAMILY
 
 This includes any version of Windows and also includes things like

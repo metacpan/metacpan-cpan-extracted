@@ -6,7 +6,6 @@ use warnings;
 use base 'Tests::Service::Base';
 
 use Test::More;
-use Time::HiRes 'sleep';
 
 
 sub start_test_workers : Test(startup => 1) {
@@ -22,77 +21,87 @@ sub test_01_shared_cache_basic : Test(11) {
     my $cli = Beekeeper::Client->instance;
     my $resp;
 
-    $resp = $cli->do_job(
+    $resp = $cli->call_remote(
         method  => 'cache.get',
         params  => { key => 'foo' },
     );
 
     is( $resp->result, undef );
 
-    $resp = $cli->do_job(
+    $resp = $cli->call_remote(
         method  => 'cache.set',
         params  => { key => 'foo', val => 67 },
     );
 
     is( $resp->success, 1 );
 
-    $resp = $cli->do_job(
+    $self->_sleep( 0.1 );
+
+    $resp = $cli->call_remote(
         method  => 'cache.get',
         params  => { key => 'foo' },
     );
 
     is( $resp->result, 67 );
 
-    $resp = $cli->do_job(
+    $resp = $cli->call_remote(
         method  => 'cache.del',
         params  => { key => 'foo' },
     );
 
     is( $resp->success, 1 );
 
-    $resp = $cli->do_job(
+    $self->_sleep( 0.1 );
+
+    $resp = $cli->call_remote(
         method  => 'cache.get',
         params  => { key => 'foo' },
     );
 
     is( $resp->result, undef );
 
-    $resp = $cli->do_job(
+    $resp = $cli->call_remote(
         method  => 'cache.set',
         params  => { key => 'foo', val => 67 },
     );
 
     is( $resp->success, 1 );
 
-    $resp = $cli->do_job(
+    $self->_sleep( 0.1 );
+
+    $resp = $cli->call_remote(
         method  => 'cache.set',
         params  => { key => 'foo', val => undef },
     );
 
     is( $resp->success, 1 );
 
-    $resp = $cli->do_job(
+    $self->_sleep( 0.1 );
+
+    $resp = $cli->call_remote(
         method  => 'cache.get',
         params  => { key => 'foo' },
     );
 
     is( $resp->result, undef );
 
-    $resp = $cli->do_job(
+    $resp = $cli->call_remote(
         method  => 'cache.set',
         params  => { key => 'foo', val => [ 7, undef, { +bar => 'baz' } ] },
     );
 
     is( $resp->success, 1 );
 
-    $resp = $cli->do_job(
+    $self->_sleep( 0.1 );
+
+    $resp = $cli->call_remote(
         method  => 'cache.get',
         params  => { key => 'foo' },
     );
 
     is_deeply( $resp->result, [ 7, undef, { +bar => 'baz' } ] );
 
-    $resp = $cli->do_job(
+    $resp = $cli->call_remote(
         method  => 'cache.set',
         params  => { key => 'foo', val => 48 },
     );
@@ -103,7 +112,7 @@ sub test_01_shared_cache_basic : Test(11) {
 sub test_02_shared_cache_stress : Test(20) {
     my $self = shift;
 
-    if ($ENV{'AUTOMATED_TESTING'} || $ENV{'PERL_BATCH'}) {
+    if ($self->automated_testing) {
         # There is a chance of retrieving stale data from cache,
         # specially when broker is running low of CPU resources
         return "Shared cache stress tests are not deterministic";
@@ -127,7 +136,7 @@ sub test_02_shared_cache_stress : Test(20) {
                       rand() < .1 ?              ""    : undef;
 
             $Data->{$key} = $val;
-            $resp = $cli->do_job(
+            $resp = $cli->call_remote(
                 method  => 'cache.set',
                 params  => { key => $key, val => $val },
             );
@@ -139,7 +148,7 @@ sub test_02_shared_cache_stress : Test(20) {
             my $key = $k[rand @k];
 
             delete $Data->{$key};
-            $resp = $cli->do_job(
+            $resp = $cli->call_remote(
                 method  => 'cache.del',
                 params  => { key => $key },
             );
@@ -153,7 +162,7 @@ sub test_02_shared_cache_stress : Test(20) {
 
     for (1..20) {
 
-        $resp = $cli->do_job(
+        $resp = $cli->call_remote(
             method  => 'cache.raw',
         );
 

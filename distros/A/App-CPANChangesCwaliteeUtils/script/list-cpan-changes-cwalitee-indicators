@@ -1,11 +1,12 @@
 #!perl
 
 # Note: This script is a CLI for Riap function /CPAN/Changes/Cwalitee/list_cpan_changes_cwalitee_indicators
-# and generated automatically using Perinci::CmdLine::Gen version 0.491
+# and generated automatically using Perinci::CmdLine::Gen version 0.498
 
-our $DATE = '2019-08-02'; # DATE
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2021-05-26'; # DATE
 our $DIST = 'App-CPANChangesCwaliteeUtils'; # DIST
-our $VERSION = '0.005'; # VERSION
+our $VERSION = '0.007'; # VERSION
 
 use 5.010001;
 use strict;
@@ -37,13 +38,20 @@ list-cpan-changes-cwalitee-indicators - list-cpan-changes-cwalitee-indicators
 
 =head1 VERSION
 
-This document describes version 0.005 of list-cpan-changes-cwalitee-indicators (from Perl distribution App-CPANChangesCwaliteeUtils), released on 2019-08-02.
+This document describes version 0.007 of list-cpan-changes-cwalitee-indicators (from Perl distribution App-CPANChangesCwaliteeUtils), released on 2021-05-26.
 
 =head1 SYNOPSIS
 
 Usage:
 
- % list-cpan-changes-cwalitee-indicators [options]
+ % list-cpan-changes-cwalitee-indicators [-I=s+] [-X=s+] [--detail]
+     [--exclude-json=s] [--exclude-module-json=s] [--exclude-module=s+]
+     [--exclude-status-json=s] [--exclude-status=s+] [--exclude=s+]
+     [--format=name] [--include-json=s] [--include-module-json=s]
+     [--include-module=s+] [--include-status-json=s] [--include-status=s+]
+     [--include=s+] [--json] [-l] [--max-severity=s] [--min-severity=s]
+     [--(no)naked-res] [--no-detail] [--nodetail] [--page-result[=program]]
+     [--view-result[=program]]
 
 Examples:
 
@@ -222,6 +230,14 @@ you want to pipe the result for more post-processing. In this case you can use
     [1,2,3]
 
 
+=item B<--page-result>
+
+Filter output through a pager.
+
+=item B<--view-result>
+
+View output using a viewer.
+
 =back
 
 =head2 Other options
@@ -282,7 +298,7 @@ Source repository is at L<https://github.com/perlancar/perl-App-CPANChangesCwali
 
 =head1 BUGS
 
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-CPANChangesCwaliteeUtils>
+Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-App-CPANChangesCwaliteeUtils/issues>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
@@ -294,7 +310,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2019 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

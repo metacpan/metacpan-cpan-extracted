@@ -2,7 +2,12 @@
 use warnings;
 use strict;
 
-my $plan; BEGIN { $plan = 5 * 80 + 3 + 5 * 70 }; # Constructs + old + alias
+my $plan;
+BEGIN {
+    my ($constructs, $removed, $alias, $old)
+        = (86,       6,        74,     3);
+    $plan = 5 * $constructs + 3 * $removed + 5 * $alias + $old + 1
+};
 
 use FindBin;
 use Test::More tests => $plan;
@@ -12,7 +17,8 @@ my %constructs;
 
 my $libfile = $INC{'Syntax/Construct.pm'};
 open my $IN, '<', $libfile or die $!;
-my ($version, $in_alias, %aliases);
+my ($version, $in_alias, $pod_construct, %aliases);
+my $count_old = 0;
 while (my $line = <$IN>) {
     if (my ($v) = $line =~ /^=head2 ([.0-9]+|old)/) {
         $version = $v;
@@ -21,10 +27,16 @@ while (my $line = <$IN>) {
         for my $constr (split ' ', $constrs) {
             $constructs{$constr}{pod}++;
             $constructs{$constr}{version}{$version}++;
+            $pod_construct = $constr;
+            ++$count_old if $version eq 'old';
         }
 
     } elsif (my ($aliases) = $line =~ /^Alias(?:es)?: (.*)$/) {
         $aliases{$_}{doc}++ for split ' ', $aliases;
+
+    } elsif (($v) = $line =~ /Removed in ([0-9]\.[0-9]+)/) {
+        ok($pod_construct, 'Removal in a correct section');
+        $constructs{$pod_construct}{podremove}{$v}++;
 
     } elsif ($in_alias
              and my ($alias, $name) = $line =~ /'(\S+)' => ['"](\S+)['"]/
@@ -64,7 +76,6 @@ while (<$TEST>) {
     }
 }
 
-my $count_old = 0;
 for my $constr (sort keys %constructs) {
     is($constructs{$constr}{$_}, 1, "$_ for $constr") for qw( pod code test );
 
@@ -73,11 +84,21 @@ for my $constr (sort keys %constructs) {
     is($constructs{$constr}{version}{ $versions[0] }, 3, "version $constr");
 
     if ('old' eq $versions[0]) {
-        ++$count_old;
+        --$count_old;
         is(keys %{ $constructs{$constr}{removed} }, 1, "$constr removed once");
     }
 
+    if (exists $constructs{$constr}{removed}
+        || exists $constructs{$constr}{podremove}
+    ) {
+        my @podremoved = keys %{ $constructs{$constr}{podremove} };
+        is(@podremoved, 1, "$constr removal documented");
+        is($constructs{$constr}{removed}{ $podremoved[0] }, 1,
+           "$constr removed in correct version");
+    }
 }
+
+is($count_old, 0, 'All old constructs tested');
 
 for my $alias (keys %aliases) {
     ok(exists $aliases{$alias}{doc}, "$alias is documented");

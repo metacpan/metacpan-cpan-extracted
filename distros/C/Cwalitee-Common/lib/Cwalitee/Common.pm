@@ -1,7 +1,7 @@
 package Cwalitee::Common;
 
-our $DATE = '2019-07-19'; # DATE
-our $VERSION = '0.003'; # VERSION
+our $DATE = '2021-06-06'; # DATE
+our $VERSION = '0.004'; # VERSION
 
 use 5.010001;
 use strict 'subs', 'vars';
@@ -368,13 +368,21 @@ sub calc_cwalitee {
 
     }
 
-    push @res, {
-        indicator      => 'Score',
-        result         => sprintf("%.2f", $num_run ? ($num_success / $num_run)*100 : 0),
-        result_summary => "$num_success out of $num_run",
+    my $score = sprintf("%.2f", $num_run ? ($num_success / $num_run)*100 : 0);
+    my $score_summary = "$num_success out of $num_run";
+
+    my $resmeta = {
+        'func.score'         => $score,
+        'func.score_summary' => $score_summary,
     };
 
-    [200, "OK", \@res];
+    push @res, {
+        indicator      => 'Score',
+        result         => $score,
+        result_summary => $score_summary,
+    };
+
+    [200, "OK", \@res, $resmeta];
 }
 
 1;
@@ -392,7 +400,7 @@ Cwalitee::Common - Common Cwalitee routines
 
 =head1 VERSION
 
-This document describes version 0.003 of Cwalitee::Common (from Perl distribution Cwalitee-Common), released on 2019-07-19.
+This document describes version 0.004 of Cwalitee::Common (from Perl distribution Cwalitee-Common), released on 2021-06-06.
 
 =head1 SYNOPSIS
 
@@ -413,7 +421,7 @@ refer to a specific, particular subject. There can be "module abstract cwalitee"
 
 Usage:
 
- calc_cwalitee(%args) -> [status, msg, payload, meta]
+ calc_cwalitee(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 This function is not exported.
 
@@ -455,16 +463,17 @@ Minimum indicator severity.
 
 =item * B<prefix> => I<perl::modprefix> (default: "")
 
+
 =back
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -474,7 +483,7 @@ Return value:  (any)
 
 Usage:
 
- list_cwalitee_indicators(%args) -> [status, msg, payload, meta]
+ list_cwalitee_indicators(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 This function is not exported.
 
@@ -518,16 +527,17 @@ Minimum severity.
 
 =item * B<prefix> => I<perl::modprefix> (default: "")
 
+
 =back
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -561,7 +571,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2019 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -1,5 +1,12 @@
 Revision history for FCGI-Buffer
 
+0.16	Wed Jun  2 09:05:38 EDT 2021
+	Try harder to mkdir the save_to directory
+	Fixed handling when save_to->ttl is not given
+	Fix problem where Last-Modified header not set when no cache
+	Generate 304 on non-cached files
+	Don't warn about ETag not being added when NO_CACHE is set
+
 0.15	Fri  3 Jan 17:05:38 EST 2020
 	IO::Compress:Brotli hasn't been ported to Windows
 	Added sanity checking to the save_to->directory parameter

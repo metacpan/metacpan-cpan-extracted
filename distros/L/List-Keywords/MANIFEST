@@ -15,6 +15,7 @@ t/03all.t
 t/04none.t
 t/05notall.t
 t/10reduce.t
+t/11reductions.t
 t/70deparse.t
 t/95benchmark.t
 t/99pod.t

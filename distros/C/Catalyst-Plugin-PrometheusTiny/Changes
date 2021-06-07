@@ -1,0 +1,19 @@
+Revision history for Catalyst::Plugin::PrometheusTiny
+
+0.004 - 2021-06-06
+
+    * allow simple configuration of endpoint path
+    * bump deps on Prometheus::Tiny and ::Shared
+    * more tests
+
+0.003 - 2021-06-05
+
+    * bump min Perl version to 5.10.1 due to upstream deps
+
+0.002 - 2021-06-05
+
+    * remove a regexp modifier added in Perl 5.22
+
+0.001 - 2021-06-05
+
+    * Initial release

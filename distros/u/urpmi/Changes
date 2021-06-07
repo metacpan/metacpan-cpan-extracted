@@ -1,3 +1,11 @@
+Version 8.126 - 5 June 2021
+
+- Convert from bdb backend to sqlite when using rpm >= 4.16
+
+Version 8.125 - 17 February 2021
+
+- translation updates
+
 Version 8.124 - 24 November 2020
 
 - gurpmi2:

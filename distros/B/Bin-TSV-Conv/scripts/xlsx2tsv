@@ -1,0 +1,114 @@
+#!/usr/bin/perl 
+use 5.014 ; use warnings  ;
+use feature qw [ say ] ;
+use Time::HiRes qw[gettimeofday tv_interval] ; my ${ dt_start } = [ gettimeofday ] ; 
+use Term::ANSIColor qw [ :constants color ] ; $Term::ANSIColor::AUTORESET = 1 ; 
+use Getopt::Std ; getopts '2:d:n:s:x:' , \my%o; 
+
+#use File::Spec::Functions qw[ catfile splitdir rel2abs updir ] ; 
+use POSIX qw[ strftime ] ;
+use Spreadsheet::XLSX ; 
+use Text::Iconv ;
+use Encode qw[ decode encode_utf8 ] ; 
+sub n2Xcol ($) { my $c = $_[0] ; my $t='A' ; $t++ while $c-- ; $t } # 数値をA,..,Z,AA,..ZZ,AAA. に変換する関数。効率は良くない。
+sub nl2some ($)  { ! defined $o{n} ? $_[0] // '' : do { $_ = $_[0] // '' ; s/\r\n/$o{n}/gr } } # セル内改行を適当に置きかえる。
+
+my ${ sheet_num } = 0 ; # シートの枚数
+my ${ sheet_name } = "" ; 
+my ($r1, $r2 , $c1 , $c2 ) ; # 処理したシート内での左上と右下の座標
+my $filename = $o{x} // $ARGV[0] // do { say STDERR BOLD DARK YELLOW "Specify a '.xlsx' file:" ; say glob '*.xlsx' ; exit 1 }  ; 
+END{ 
+  my @out ;
+  push @out , "$sheet_num sheet(s) in '$filename'" ;
+  $r1++; $r2++; $c1++; $c2++ ; # 最後なので破壊的な操作を加えた。
+  $sheet_name = encode_utf8 $sheet_name ; 
+  push @out , "processed sheet: '$sheet_name' with Row: $r1..$r2, Col: $c1..$c2" ;
+  push @out , sprintf "%0.6f sec calculation (%s)." , tv_interval ( $dt_start ) , $0 =~ s/.*\///r ;
+  push @out , sprintf 'done %04d-%02d-%02d %02d:%02d:%02d' , do {my @t = @{[localtime]}[5,4,3,2,1,0] ; $t[0]+=1900 ; $t[1]++ ; @t } ; 
+  say STDERR DARK BOLD ITALIC GREEN join "; " , @out if ! $o{2}//'' eq '0'
+} 
+
+# 文字コードの指定の一覧: 
+##  いろいろな実験をしたので、その時に使った文字コードを残す意味で、配列のような形で実験に使った文字コードを残す。1 で左から2番目を採用していることを示す
+###   ローマ数字 : Ⅰ, Ⅱ, Ⅲ, Ⅴ ; 丸数字 : ①②⑲⑳ ;  全角ハイフンマイナス － ; 
+my ${ cc4out }   = ':utf8' ;
+my ${ cc4iconv } = qw[ shift_jisx0213 cp932 windows-1251 utf-8 ] [1] ; # エクセルファイルを開く際に用いるが、iconv逆方向なのが気になる。
+my ${ cc4sheet } = qw[ Shift_JIS cp932 ] [1]; # シート名の文字列の、文字コード変換に用いる。
+my ${ cc4cell }  = qw[ ms932 cp932 Shift_JIS ] [1] ; # 各セルの文字列の、文字コード変換に用いる。ローマ字、丸数字、全角ハイフンマイナスで..
+
+& main () ; 
+exit ;
+
+sub main () { 
+  my $converter = Text::Iconv -> new ("utf-8", ${ cc4iconv } ); # 1251 ---> 932 (shift_jis)
+  my $excel = Spreadsheet::XLSX -> new ( $filename , $converter ) ; # (1)
+  my @sheets = @{ $excel ->{ Worksheet } } ;  # (2)
+  
+  # シートの枚数を取り出す
+  $o{d} //= '' ;
+  ${ sheet_num } = @sheets ; 
+  do { say scalar @sheets ; exit if ! defined $o{s} } if $o{d} =~ m's'i ; 
+
+  ## まずシートを取り出す。-s が無ければシート名一覧を取得してすぐに終了。
+  binmode STDOUT, ${ cc4out } ; # この分は$filenameの格納する文より後ろに来る。
+
+  $o{s} = $o{s} || do { say for (GREEN 'The sheet names:'), map { decode ${ cc4sheet } , $_ -> { Name } } @sheets ; exit } ; 
+  my $s = $sheets [ $o{s} - 1 ] ; # あるシートを表すオブジェクト
+  ${ sheet_name } =  decode ${ cc4sheet } , $s -> { Name } ;
+  # -dのパラメータに従ってテーブルの行と列の範囲を取り出す。
+  ($r1, $r2 , $c1 , $c2 ) = ( $s->{MinRow} , $s ->{MaxRow} , $s -> {MinCol} , $s -> {MaxCol} ) ; # (3)
+  say $r1+1 , ".." , $r2+1  if $o{d} =~ '1' ; # 行範囲の出力
+  say $c1+1 , ".." , $c2+1  if $o{d} =~ '2' ; # 列範囲の出力
+  say n2Xcol $c1 , ".." , n2Xcol $c2  if $o{d} =~ m'A'i ; # -A指定で、列範囲を A,..,Z,AA..ZZで換算して表示
+  exit if $o{d} =~ m/0/ || defined $o{p} && $o{p} eq '0' ; 
+  
+  # セルの中身を取り出す
+  for my $r ( $r1 .. $r2 ) { 
+    my @line = map { nl2some decode ${ cc4cell } , $_ -> { Val } } map $s->{Cells}[$r][$_] , $c1 .. $c2 ;  # (4)
+    say join "\t" , map $_ // '' , @line ; 
+  }
+}
+ 
+## ヘルプの扱い
+sub VERSION_MESSAGE {}
+sub HELP_MESSAGE {
+    use FindBin qw[ $Script ] ; 
+    $ARGV[1] //= '' ;
+    open my $FH , '<' , $0 ;
+    while(<$FH>){
+        s/\$0/$Script/g ;
+        print $_ if s/^=head1// .. s/^=cut// and $ARGV[1] =~ /^o(p(t(i(o(ns?)?)?)?)?)?$/i ? m/^\s+\-/ : 1;
+    }
+    close $FH ;
+    $o{v} = 0 ;
+    exit 0 ;
+}
+
+=encoding utf8
+=head1
+
+ xlsx2tsv -s シート番号  ファイル.xlsx
+xlsx2tsv -x ファイル.xlsx -s シート番号  
+
+  シート番号は1オリジンとする。
+  0が指定された場合は、シート名の一覧を出力する。
+
+  オプション: 
+    -d STR : dでdimensionを意味する。次の分類を参照↓
+     -d s : シートの枚数を表示する。    
+     -d 1 : 行番号の範囲または最大の行数を表示　-- MinRowとMaxRowを表示。
+     -d 2 : 列番号の範囲または最大の列数を表示　-- MinColとMaxColを表示。
+     -d A : 列番号の範囲または最大の列数をエクセルの形式で表示-- MinRowとMaxRowを表示。
+     -d ??0 : 0が含まれていたら、セルの中身は表示しない。
+    -n "//" ; セルの中の改行を指定した文字(ここでは // )に置きかえる。
+    -s N : 1始まりでシートの番号を指定
+
+    -x file.xlsx : ファイル名のオプションを使う指定。(変数指定の順序の考慮が簡単になる。)
+    -20 : 一行サマリの情報の出力の抑制。
+
+
+  開発メモ: 
+    * 文字コード名をハードコードしている部分を洗練したい。
+    * 次元情報(行数と列数)は、最後に標準エラー出力に表示するオフションが欲しいかも。
+
+=cut

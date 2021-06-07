@@ -1,0 +1,9 @@
+# -*- mode: org -*-
+
+* TODO Check number of dimensions for the various image types.
+
+  Some of those currently stored with 3 dimensions may only actually
+  have 2?  Alternately, suppress trailing [0] dimension specifiers
+  (recursively?) for objects with nothing but [0] at the end…
+
+  

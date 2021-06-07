@@ -1,0 +1,258 @@
+NAME
+
+    Text::Wrap::OO - an object oriented interface to Text::Wrap
+
+VERSION
+
+    version 0.002
+
+SYNOPSIS
+
+        use Text::Wrap::OO;
+    
+        my $wrapper = Text::Wrap::OO->new(init_tab => "\t");
+        $wrapper->columns(70);
+        my $wrapped = $wrapper->wrap($text);
+        my $filled = $wrapper->fill($text);
+
+DESCRIPTION
+
+    Text::Wrap::OO is an object oriented wrapper to the Text::Wrap
+    module.
+
+    Text::Wrap is useful for formatting text, and it is customizable,
+    but it has a drawback: The configuration options are set using
+    global package variables. This means that if a module configures
+    Text::Wrap, it can interfere with other modules that use
+    Text::Wrap. Indeed, the Text::Wrap documentation itself warns
+    against setting these variables, or if you must, to local()ize
+    them first. While this works, it can become cumbersome, and it
+    still does not protect your module against other modules messing
+    with Text::Wrap global variables.
+
+    That's where Text::Wrap::OO comes in. Text::Wrap::OO provides an
+    object oriented interface to Text::Wrap. The Text::Wrap global
+    variables are automatically localized, so you need not worry
+    about that. The defaults are always the same (unless you use the
+    inherit attribute; see ATTRIBUTES) for each new object, so you
+    don't need to worry about other modules messing with the settings
+    either.
+
+    A Text::Wrap::OO object has several attributes that can either be
+    passed to the constructor (discussed later), or through accessor
+    methods. The accessors are methods with the same name as the
+    attributes they access, and can either be called with no
+    arguments to get the value of the attribute, or with one argument
+    to set the value of the attribute.
+
+    Two other types of attribute-related methods are provided as
+    well. For an attribute ATTR, the has_ATTR and clear_ATTR methods
+    are available. has_ATTR will return true if the attribute ATTR is
+    set, and clear_ATTR will unset ATTR, as though it had never been
+    set. Note that if an attribute is unset, the accessor will return
+    the default value of the attribute, so $object->clear_ATTR is not
+    the same thing as $object->ATTR(undef).
+
+    If you have a very old version of Text::Wrap which does not
+    support a certain configuration variable, the corresponding
+    attribute in a Text::Wrap::OO object will warn if you try to set
+    it, and have no effect. You can turn off these warnings by
+    setting the warn attribute to a false value (see the
+    documentation for the warn attribute).
+
+METHODS
+
+ new
+
+        $obj = Text::Wrap::OO->new(\%params|%params);
+
+    Return a new Text::Wrap::OO object. The parameters may be passed
+    as a hash reference, or as a hash. Parameters can be used to set
+    the attributes as described above. Passing attributes as
+    parameters to the constructor is exactly equivalent to using the
+    accessors to set the attributes after creating the object.
+
+ wrap
+
+ fill
+
+        $wrapped = $obj->wrap(@text);
+        $filled = $obj->fill(@text);
+
+    These methods correspond to the Text::Wrap::wrap() and
+    Text::Wrap::fill() subroutines respectively. @text is passed
+    directly to the corresponding Text::Wrap subroutine, which joins
+    them into a string, inserting spaces between the elements if they
+    don't already exist.
+
+    In scalar context, these methods return the wrapped text as a
+    single string, like their Text::Wrap counterparts. However, in
+    list context, a list of lines will be returned, split using the
+    separator and (if defined) separator2 attributes (these are not
+    regexps). Note that trailing separators will cause trailing empty
+    strings to be returned in the list. Also note that any appearance
+    of separator or separator2 already occurring in the input text
+    will also be split on, not just the separators added by these
+    methods. If you require more complicated processing, call these
+    methods in scalar context and perform the splitting yourself.
+
+    If @text is empty, these methods will return an empty list in
+    list context, or an empty string in scalar context.
+
+    In particular, note that push @list, $object->wrap(@text) is not
+    analogous to push @list, Text::Wrap::wrap('', '', @text). If you
+    want to push a single item (the wrapped text) onto @list, use
+    push @list, scalar $object->wrap(@text) instead.
+
+ATTRIBUTES
+
+ inherit
+
+    If this is true (default is false), attributes that correspond to
+    Text::Wrap variables will use the value of the corresponding
+    Text::Wrap variables if the attributes are not set. So, for
+    example, if in object $object inherit is true and columns has
+    never been set (or has been cleared with $object->clear_columns),
+    then $object->columns will return the value of
+    $Text::Wrap::columns rather than the default for that attribute.
+
+    inherit can also be an array reference, containing the names of
+    attributes to inherit. Then, only the specified attributes will
+    be inherited and nothing else.
+
+    This is a powerful feature, and one that should be used
+    sparingly. One situation in which you might want to use it is if
+    you're writing a subroutine in which you want the values of the
+    Text::Wrap variables to be inherited. For example:
+
+        sub my_wrap {
+            my $wrapper = Text::Wrap::OO->new(
+                inherit     => [qw(columns huge)],
+                init_tab    => "\t",
+                tabstop     => 4,
+            );
+            return $wrapper->wrap(@_);
+        }
+    
+        sub process_text {
+            my ($stuff, $text) = @_;
+            # ... do stuff with $text ...
+            return my_wrap $text;
+        }
+    
+        # Later, possibly in another module:
+    
+        local $Text::Wrap::columns = 60;
+        local $Text::Wrap::huge = 'overflow';
+        my $processed_text = process_text $stuff, $text;
+
+    Note that if any of the inherited variables have invalid values
+    (e.g., a non-numeric string for $Text::Wrap::columns), then a
+    warning will be emitted and the default value for the attribute
+    will be used instead.
+
+ warn
+
+    If this is true (the default), then whenever you try to set an
+    attribute corresponding to an unsupported Text::Wrap variable, a
+    warning will be emitted. A warning is also emitted if you try to
+    set the inherit attribute to an array reference containing the
+    name of at least one unsupported Text::Wrap variable, or if you
+    try to set the huge attribute to overflow, but that's not
+    supported.
+
+    The following two attributes are passed to the first and second
+    arguments respectively of Text::Wrap::wrap() and
+    Text::Wrap::fill(). See Text::Wrap for more info.
+
+ init_tab
+
+    String used to indent the first line. Default: empty string.
+
+ subseq_tab
+
+    String used to indent subsequent lines. Default: empty string.
+
+    The following attributes correspond to the Text::Wrap global
+    variables of the same name. So, for example, the columns
+    attribute corresponds to the $Text::Wrap::columns variable. See
+    "OVERRIDES" in Text::Wrap for more info.
+
+ columns
+
+    The number of columns to wrap to. Must be a positive integer.
+    Default: 76.
+
+ break
+
+    Regexp to match word terminators. Can either be a string or a
+    pre-compiled regexp (e.g. qr/\s/). Default: (?=\s)\X.
+
+ huge
+
+    Behavior when words longer than columns are encountered. Can
+    either be wrap, die, or overflow. Default: wrap.
+
+ unexpand
+
+    Whether to turn spaces into tabs in the returned text. Default:
+    1.
+
+ tabstop
+
+    Length of tabstops. Must be a positive integer. Default: 8.
+
+ separator
+
+    Line separator. Default: \n.
+
+ separator2
+
+    If defined, what to add new line breaks with while preserving
+    existing newlines. Default: undef.
+
+BUGS
+
+    Please report any bugs or feature requests on the bugtracker
+    website
+    https://rt.cpan.org/Public/Dist/Display.html?Name=Text-Wrap-OO or
+    by email to bug-Text-Wrap-OO@rt.cpan.org
+    <mailto:bug-Text-Wrap-OO@rt.cpan.org>.
+
+    When submitting a bug or request, please include a test-file or a
+    patch to an existing test-file that illustrates the bug or
+    desired feature.
+
+SEE ALSO
+
+      * Text::Wrap
+
+      * Text::Tabs
+
+ACKNOWLEDGEMENTS
+
+    Text::Wrap::OO relies on Text::Wrap for its main functionality,
+    by David Muir Sharnoff and others. See "AUTHOR" in Text::Wrap.
+
+AUTHOR
+
+    Asher Gordon <AsDaGo@posteo.net>
+
+COPYRIGHT AND LICENSE
+
+    Copyright (C) 2021 Asher Gordon
+
+    This program is free software: you can redistribute it and/or
+    modify it under the terms of the GNU General Public License as
+    published by the Free Software Foundation, either version 3 of
+    the License, or (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+    General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program. If not, see
+    <http://www.gnu.org/licenses/>.
+

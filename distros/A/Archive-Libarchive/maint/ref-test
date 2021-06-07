@@ -1,0 +1,5 @@
+#!/bin/sh
+
+set -ex
+
+exec ./maint/ref-exec perl -Imaint/lib maint/ref-test.pl

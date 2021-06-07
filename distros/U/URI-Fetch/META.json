@@ -4,7 +4,7 @@
       "Benjamin Trott <ben+cpan@stupidfool.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 5.037, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "Dist::Zilla version 6.017, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -19,6 +19,11 @@
             "ExtUtils::MakeMaker" : "0"
          }
       },
+      "develop" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      },
       "runtime" : {
          "requires" : {
             "Carp" : "0",
@@ -28,7 +33,7 @@
             "URI" : "0",
             "base" : "0",
             "constant" : "0",
-            "perl" : "5.008_001",
+            "perl" : "5.008001",
             "strict" : "0",
             "warnings" : "0"
          }
@@ -50,6 +55,9 @@
          "web" : "https://github.com/neilb/URI-Fetch"
       }
    },
-   "version" : "0.13"
+   "version" : "0.15",
+   "x_generated_by_perl" : "v5.28.2",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.24",
+   "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }
 

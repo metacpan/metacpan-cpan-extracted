@@ -3,6 +3,8 @@
 use strict;
 use warnings;
 
+our $VERSION = '0.04';
+
 $ENV{PATH} = '/bin'; # untaint
 
 BEGIN {
@@ -13,8 +15,6 @@ BEGIN {
     }
 }
 
-our $VERSION = '0.01';
-
 use Beekeeper::WorkerPool;
 
 Beekeeper::WorkerPool->new->run;
@@ -22,26 +22,30 @@ Beekeeper::WorkerPool->new->run;
 
 __END__
 
+=pod
+
+=encoding utf8
+
 =head1 NAME
 
 bkpr - Manage worker pools
 
 =head1 VERSION
 
-Version 0.01
+Version 0.04
 
 =head1 SYNOPSIS
 
-  $ bkpr --pool-id MyPool start
+  $ bkpr --pool MyPool start
   Starting pool of MyApp workers: beekeeper-MyPool.
   
-  $ bkpr --pool-id MyPool stop
+  $ bkpr --pool MyPool stop
   Stopping pool of MyApp workers: beekeeper-MyPool.
   
   $ bkpr --help
   Usage: bkpr [options] {start|stop|restart|reload|check}
    --foreground      Run in foreground (do not daemonize)
-   --pool-id    str  Worker pool name (mandatory)
+   --pool       str  Worker pool name (mandatory)
    --user       str  Run as specified user
    --group      str  Run as specified group
    --config-dir str  Path to directory containing config files
@@ -59,14 +63,12 @@ fork all worker processes, then monitor those forked processes and B<immediately
 respawn defunct ones.
 
 Beekeeper applications use config files C<pool.config.json> and C<bus.config.json> to
-define how clients, workers and brokers connect to each other. These files are searched
+define how clients, workers and brokers connect to each other. These files are looked
 for in ENV C<BEEKEEPER_CONFIG_DIR>, C<~/.config/beekeeper>and then C</etc/beekeeper>.
 
 =head1 SEE ALSO
  
 L<Beekeeper::WorkerPool>, L<Beekeeper::Config>.
-
-=encoding utf8
 
 =head1 AUTHOR
 
@@ -74,7 +76,7 @@ José Micó, C<jose.mico@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright 2015 José Micó.
+Copyright 2015-2021 José Micó.
 
 This is free software; you can redistribute it and/or modify it under the same 
 terms as the Perl 5 programming language itself.

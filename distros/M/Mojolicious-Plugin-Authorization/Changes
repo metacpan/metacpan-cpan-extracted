@@ -1,20 +1,25 @@
 Revision history for Mojolicious-Plugin-Authorization
 
 Changes in 1.01
-    Initail version
+    Initial version
 Changes in 1.02
     Fixed the pod
 Changes in 1.03
     3'rd Times a charm
 Changes in 1.03.01
-    Fix up on some the the tests. No no fall though errors
+    Fix up on some of the tests. No no fall though errors
 Changes in 1.03.02
-    Fix up on some the the tests. Hash keys now sorted from Renee https://github.com/reneeb
+    Fix up on some of the tests. Hash keys now sorted from Renee https://github.com/reneeb
 Changes in 1.04
     README Changes from leejo https://github.com/leejo
-    Add is_role helper and condion as well as test for same from leejo https://github.com/leejo
+    Add is_role helper and condition, as well as, test for same from leejo https://github.com/leejo
     Add fail_render option on 404 and test from leejo https://github.com/leejo
     Typo fixes
 Changes in 1.05
     Typo fixes
     Fix for internal calling profile of 'privileges' and 'role'
+    Added extra data via conditional routing by Matt Altus committed on 19 Mar 
+    Remove Build.PL from MANIFEST not needed
+Changes in 1.06
+    Upgrade to mojolicious v9.0 from  Dmitry Karasik https://github.com/dk (over no longer supported)
+    Fixed typos on this page.

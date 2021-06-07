@@ -57,7 +57,7 @@
          "web" : "https://github.com/perlancar/perl-Role-TinyCommons-Collection"
       }
    },
-   "version" : "0.003",
+   "version" : "0.008",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.030000"
@@ -518,28 +518,6 @@
                }
             },
             "name" : "DevelopX_spec",
-            "version" : "6.012"
-         },
-         {
-            "class" : "Dist::Zilla::Plugin::Prereqs",
-            "config" : {
-               "Dist::Zilla::Plugin::Prereqs" : {
-                  "phase" : "test",
-                  "type" : "requires"
-               }
-            },
-            "name" : "TestRequires",
-            "version" : "6.012"
-         },
-         {
-            "class" : "Dist::Zilla::Plugin::Prereqs",
-            "config" : {
-               "Dist::Zilla::Plugin::Prereqs" : {
-                  "phase" : "test",
-                  "type" : "suggests"
-               }
-            },
-            "name" : "TestSuggests",
             "version" : "6.012"
          },
          {

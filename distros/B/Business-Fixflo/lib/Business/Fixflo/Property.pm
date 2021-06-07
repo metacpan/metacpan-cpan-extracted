@@ -38,6 +38,7 @@ extends 'Business::Fixflo::Resource';
     Issues
     IsDeleted
     UpdateDate
+    Warranties
 
 =cut
 
@@ -55,6 +56,7 @@ has [ qw/
     PropertyManager
     KeyReference
     UpdateDate
+    Warranties
     IsDeleted
 / ] => (
     is => 'rw',

@@ -33,7 +33,7 @@
       "runtime" : {
          "requires" : {
             "Import::Into" : "0",
-            "Moo" : "0",
+            "Moo" : "2.000000",
             "Type::Tiny" : "1.004000",
             "namespace::clean" : "0",
             "perl" : "5.010001"
@@ -60,6 +60,6 @@
          "web" : "https://github.com/brtastic/perl-form-tiny"
       }
    },
-   "version" : "1.13",
+   "version" : "2.01",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

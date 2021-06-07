@@ -3,7 +3,7 @@ use warnings;
 use strict;
 use 5.010001;
 
-our $VERSION = '2.263';
+our $VERSION = '2.264';
 
 use Term::Choose::Screen qw( hide_cursor show_cursor clear_to_end_of_screen );
 
@@ -53,7 +53,7 @@ C<db-browser> - Browse C<SQLite>/C<MySQL>/C<PostgreSQL> databases and their tabl
 
 =head1 VERSION
 
-Version 2.263
+Version 2.264
 
 =head1 SYNOPSIS
 
@@ -669,15 +669,12 @@ Expand table rows:
 
 =item C<YES>
 
-if C<Return> is pressed, the selected table row is printed with each column in its own line.
+if C<Return> is pressed, the selected table row is printed with each column in its own line. The first row is not
+expanded if the cursor auto-jumped to the first row.
 
 =item C<NO>
 
 don't expand table rows.
-
-=item C<YES fast back>
-
-do not expand the first row if the cursor auto-jumped to the first row.
 
 =back
 

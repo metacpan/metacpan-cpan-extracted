@@ -2,7 +2,7 @@ package Myriad::Service::Storage::Remote;
 
 use Myriad::Class;
 
-our $VERSION = '0.006'; # VERSION
+our $VERSION = '0.007'; # VERSION
 our $AUTHORITY = 'cpan:DERIV'; # AUTHORITY
 
 =encoding utf8
@@ -32,7 +32,7 @@ BEGIN {
         labels => [qw(method status service)],
     );
 
-    my $meta = Myriad::Service::Storage::Remote->META;
+    my $meta = Object::Pad::MOP::Class->for_class('Myriad::Service::Storage::Remote');
 
     for my $method (@Myriad::Role::Storage::READ_METHODS) {
         $meta->add_method($method, sub {

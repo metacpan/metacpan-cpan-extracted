@@ -8,22 +8,20 @@ fi
 
 case "$1" in
     'start')
-        bkpr --pool-id "broker"  start
-        bkpr --pool-id "myapp-A" start
-        bkpr --pool-id "myapp-B" start
+        bkpr --pool "broker"  start
+        bkpr --pool "myapp-A" start
+        bkpr --pool "myapp-B" start
         ;;
     'stop')
-        bkpr --pool-id "myapp-A" stop
-        bkpr --pool-id "myapp-B" stop
-        bkpr --pool-id "broker"  stop
+        bkpr --pool "myapp-A" stop
+        bkpr --pool "myapp-B" stop
+        bkpr --pool "broker"  stop
         ;;
     'restart')
-        bkpr --pool-id "myapp-A" restart
-        bkpr --pool-id "myapp-B" restart
+        bkpr --pool "myapp-A" restart
+        bkpr --pool "myapp-B" restart
         ;;
     *)
         echo -e "Usage: $0 [start|stop|restart]"
         ;;
 esac
-
-

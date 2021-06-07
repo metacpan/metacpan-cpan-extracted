@@ -1,0 +1,13 @@
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+META.json
+README
+uHTML.pm
+uHTML/ListFuncs.pm
+uHTML/psgi
+uHTML/request.pm
+uHTML/std.pm
+uHTML/uScramble.pm
+uHTML/uTags.pm
+META.yml                                 Module YAML meta-data (added by MakeMaker)

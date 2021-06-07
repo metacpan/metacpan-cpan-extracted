@@ -8,11 +8,30 @@ use PDL::MatrixOps;
 
 sub tapprox {
 	my($pa,$pb,$tol) = @_;
-	$tol = 1e-14 unless defined $tol;
+	$tol //= 1e-14;
 	all approx $pa, $pb, $tol;
 }
 
-my $tol = 1e-14;
+my $tol = 1e-6;
+
+sub check_inplace {
+  my ($in, $cb, $expected, $label) = @_;
+  local $Test::Builder::Level = $Test::Builder::Level + 1;
+  my @expected_dims = $expected->dims;
+  for my $inplace (0, 1) {
+    my $in_copy = $in->copy;
+    my $got;
+    $inplace
+      ? lives_ok { $cb->($in_copy->inplace); $got = $in_copy->copy } "$label inplace=$inplace runs"
+      : lives_ok { $got = $cb->($in_copy) } "$label inplace=$inplace runs";
+    fail("got non-PDL ".explain($got)." back"), next if !UNIVERSAL::isa($got, 'PDL');
+    my @got_dims = $got->dims;
+    is_deeply \@got_dims, \@expected_dims, "got and expected same shape inplace=$inplace"
+      or diag 'got: ', explain \@got_dims, 'expected: ', explain \@expected_dims;
+    ok tapprox($got, $expected, $tol), "$label inplace=$inplace"
+      or diag "got:$got\nexpected:$expected";
+  }
+}
 
 {
 ### Check LU decomposition of a simple matrix
@@ -45,40 +64,55 @@ ok($lu->flat->abs->at(-1) < $tol, "lu_decomp singular matrix small value");
 ### Check inversion -- this also checks lu_backsub
 my $pa = pdl([1,2,3],[4,5,6],[7,1,1]);
 my $opt ={s=>1,lu=>\my @a};
-my $a1 = inv($pa, $opt);
-my $identity = zeroes(3,3); (my $tmp = $identity->diagonal(0,1))++;
-ok(defined $a1, "3x3 inverse: defined");
+my $inv_expected = pdl <<'EOF';
+[
+ [ 0.055555556 -0.055555556   0.16666667]
+ [  -2.1111111    1.1111111  -0.33333333]
+ [   1.7222222  -0.72222222   0.16666667]
+]
+EOF
+check_inplace($pa, sub { inv($_[0], $opt) }, $inv_expected, "inv 3x3");
 ok(ref ($opt->{lu}->[0]) eq 'PDL',"inverse: lu_decomp first entry is an ndarray");
-ok(tapprox(matmult($a1,$pa),$identity,$tol),"matrix mult by its inverse gives identity matrix");
+ok(tapprox(matmult($inv_expected,$pa),identity(3),$tol),"matrix mult by its inverse gives identity matrix");
 }
 
 {
 ### Check inv() with added thread dims (simple check)
 my $C22 = pdl([5,5],[5,7.5]);
-my $C22inv;
-lives_ok { $C22inv = $C22->inv } "2x2 inv ran OK";
-ok(tapprox($C22inv,pdl([0.6, -0.4], [-0.4, 0.4])), "2x2 inv gave correct answer");
-my $C222 = $C22->dummy(2,2);
-my $C222inv;
-lives_ok { $C222inv = $C222->inv } "2x2 w/ dummy dims ran OK";
-ok(tapprox($C222inv,pdl([0.6, -0.4], [-0.4, 0.4])->dummy(2,2)), "2x2 w/ dummy dims correct answer");
+my $inv_expected = pdl([0.6, -0.4], [-0.4, 0.4]);
+check_inplace($C22, sub { $_[0]->inv }, $inv_expected, "inv 2x2");
+check_inplace($C22->dummy(2,2), sub { $_[0]->inv }, $inv_expected->dummy(2,2), "inv 2x2 extra dim");
 }
 
 {
 ### Check inv() for matrices with added thread dims (bug #3172882 on sf.net)
-my $a94 = pdl( [  1,  0,  4, -1, -1, -3,  0,  1,  0 ],
-	       [  4, -4, -5,  1, -5, -3, -1, -2,  0 ],
-	       [ -2,  2, -5, -1,  1, -3, -4,  3, -4 ],
-	       [ -1,  4, -4,  2,  1,  3, -3, -4, -3 ],
-	     );
-my $a334 = $a94->reshape(3,3,4);
+my $a334 = pdl <<'EOF';
+[
+ [
+  [ 1  0  4]
+  [-1 -1 -3]
+  [ 0  1  0]
+ ]
+ [
+  [ 4 -4 -5]
+  [ 1 -5 -3]
+  [-1 -2  0]
+ ]
+ [
+  [-2  2 -5]
+  [-1  1 -3]
+  [-4  3 -4]
+ ]
+ [
+  [-1  4 -4]
+  [ 2  1  3]
+  [-3 -4 -3]
+ ]
+]
+EOF
 my $a334inv;
 lives_ok { $a334inv = $a334->inv } "3x3x4 inv ran OK";
-my $identity = zeroes(3,3); (my $tmp = $identity->diagonal(0,1))++;
-ok(tapprox(matmult($a334,$a334inv),$identity->dummy(2,4)), "3x3x4 inv gave correct answer");
-undef $a94;       # clean up variables
-undef $a334;      # clean up variables
-undef $a334inv;   # clean up variables
+ok(tapprox(matmult($a334,$a334inv),identity(3)->dummy(2,4)), "3x3x4 inv gave correct answer");
 }
 
 {
@@ -89,20 +123,21 @@ lives_ok { ($lu,$perm,$par) = lu_decomp($pa) } "lu_decomp 2x2 ran OK";
 ok($par==1, "lu_decomp 2x2 correct parity");
 ok(all($perm == pdl(0,1)), "lu_decomp 2x2 correct permutation");
 my $bb = pdl([1,0], [3, 4]);
-my $xx;
-lives_ok { $xx = lu_backsub($lu,$perm,$bb) } "lu_backsub ran OK";
-my $xx_shape = pdl($xx->dims);
-my $bb_shape = pdl($bb->dims);
-ok(all($xx_shape == $bb_shape), "lu_backsub solution and input have same shape");
-ok(tapprox($xx->slice(',(0)'),pdl([-1, 1]),$tol), "lu_backsub LU=A (after depermutation)") or diag "got: $xx";
-my $got = $pa x $xx->xchg(0,1);
-ok(tapprox($got,$bb->xchg(0,1),$tol), "A x actually == B") or diag "got: $got";
+my $xx_expected = pdl <<'EOF';
+[
+ [-1  1]
+ [ 5 -1]
+]
+EOF
+check_inplace($bb, sub { lu_backsub($lu,$perm,$_[0]) }, $xx_expected, "lu_backsub");
+my $got = $pa x $xx_expected->transpose;
+ok(tapprox($got,$bb->transpose,$tol), "A x actually == B") or diag "got: $got";
 }
 
 {
 ### Check attempted inversion of a singular matrix
-my $b2 = undef; # avoid warning from compiler
 my $pb = pdl([1,2,3],[4,5,6],[7,8,9]);
+my $b2;
 lives_ok { $b2 = inv($pb,{s=>1}) } "inv of singular matrix should not barf if s=>1";
 ok(!defined $b2, "inv of singular matrix undefined if s=>1");
 }
@@ -132,6 +167,10 @@ ok(all($det == pdl([48,1],[-1,-216])), "threaded determinant");
 {
 ### Check identity and stretcher matrices...
 ok((identity(2)->flat == pdl(1,0,0,1))->all, "identity matrix");
+ok((identity(pdl 2)->flat == pdl(1,0,0,1))->all, "identity matrix with scalar ndarray");
+ok((identity(zeroes 2, 3)->flat == pdl(1,0,0,1))->all, "identity matrix with dimensioned ndarray");
+my @deep_identity_dims = identity(zeroes 2, 3, 4)->dims;
+is_deeply \@deep_identity_dims, [2, 2, 4], "identity matrix with multi-dimensioned ndarray" or diag 'got: ', explain \@deep_identity_dims;
 ok((stretcher(pdl(2,3))->flat == pdl(2,0,0,3))->all, "stretcher 2x2");
 ok((stretcher(pdl([2,3],[3,4]))->flat == pdl(2,0,0,3,3,0,0,4))->all, "stretcher 2x2x2");
 }
@@ -287,6 +326,18 @@ my $pz;
 lives_ok { $pz = pdl(3) x $pb; };
 ok( all approx($pz,$pb * 3));
 }
+}
+
+{
+# test inspired by Luis Mochan
+my $A = sequence(2, 2) + 1;
+my $A1 = $A->slice(',1:0'); # interchange two rows
+my $B = pdl(1,1);
+my $x_expected = pdl([[-1, 1]]);
+check_inplace($B, sub { lu_backsub($A->lu_decomp, $_[0]) }, $x_expected, "lu_backsub dims");
+check_inplace($B, sub { lu_backsub($A1->lu_decomp, $_[0]) }, $x_expected, "lu_backsub dims 2");
+my $got = $A x $x_expected->transpose;
+ok(tapprox($got,$B->transpose,$tol), "A x actually == B") or diag "got: $got";
 }
 
 done_testing;

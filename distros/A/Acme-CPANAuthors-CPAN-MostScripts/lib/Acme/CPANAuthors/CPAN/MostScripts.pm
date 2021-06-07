@@ -1,26 +1,25 @@
 package Acme::CPANAuthors::CPAN::MostScripts;
 
-our $DATE = '2019-12-23'; # DATE
-our $VERSION = '0.002'; # VERSION
+our $DATE = '2021-06-07'; # DATE
+our $VERSION = '0.003'; # VERSION
 
 use strict;
 use warnings;
 
 use Acme::CPANAuthors::Register (
-    "PERLANCAR" => undef,                                   #   1115
-    "RSAVAGE"   => undef,                                   #    375
-    "BDFOY"     => undef,                                   #    174
+    "PERLANCAR" => undef,                                   #   1400
+    "RSAVAGE"   => undef,                                   #    302
+    "TULAMILI"  => undef,                                   #    226
+    "BDFOY"     => undef,                                   #    175
+    "TRIZEN"    => undef,                                   #    173
     "JWB"       => undef,                                   #    166
+    "MRDVT"     => undef,                                   #    157
     "SANTEX"    => undef,                                   #    140
-    "MRDVT"     => undef,                                   #    139
-    "VVELOX"    => undef,                                   #    134
-    "CWEST"     => undef,                                   #    120
-    "SHLOMIF"   => undef,                                   #    112
+    "VVELOX"    => undef,                                   #    137
+    "SHLOMIF"   => undef,                                   #    137
+    "OLIVER"    => undef,                                   #    103
     "LDS"       => undef,                                   #    101
     "TSIBLEY"   => undef,                                   #     95
-    "TULAMILI"  => undef,                                   #     95
-    "SDAGUE"    => undef,                                   #     91
-    "OLIVER"    => undef,                                   #     90
     "LEOCHARRE" => undef,                                   #     88
     "CMUNGALL"  => undef,                                   #     87
     "RDO"       => undef,                                   #     75
@@ -28,37 +27,36 @@ use Acme::CPANAuthors::Register (
     "GSG"       => undef,                                   #     69
     "AMBS"      => undef,                                   #     68
     "BPOSTLE"   => undef,                                   #     63
-    "INGY"      => undef,                                   #     60
+    "INGY"      => undef,                                   #     61
     "IVANWILLS" => undef,                                   #     58
     "TBONE"     => undef,                                   #     57
-    "GROUSSE"   => undef,                                   #     56
+    "TIEDEMANN" => undef,                                   #     56
+    "MOOCOW"    => undef,                                   #     53
     "BRYCE"     => undef,                                   #     53
-    "MOOCOW"    => undef,                                   #     51
-    "KESTEB"    => undef,                                   #     50
-    "NKH"       => undef,                                   #     50
     "WOLDRICH"  => undef,                                   #     50
-    "TIEDEMANN" => undef,                                   #     49
+    "NKH"       => undef,                                   #     50
+    "KESTEB"    => undef,                                   #     50
+    "GROUSSE"   => undef,                                   #     48
+    "CORION"    => undef,                                   #     47
+    "PLICEASE"  => undef,                                   #     46
     "DHARD"     => undef,                                   #     46
-    "PERRAD"    => undef,                                   #     46
-    "BEATNIK"   => undef,                                   #     44
     "YSAS"      => undef,                                   #     44
-    "AJPAGE"    => undef,                                   #     43
-    "MSIMERSON" => undef,                                   #     43
+    "PERRAD"    => undef,                                   #     44
+    "BEATNIK"   => undef,                                   #     44
     "MTW"       => undef,                                   #     43
-    "CORION"    => undef,                                   #     41
-    "JLMARTIN"  => undef,                                   #     41
-    "ADAMK"     => undef,                                   #     40
+    "MSIMERSON" => undef,                                   #     43
+    "AJPAGE"    => undef,                                   #     43
+    "DBAURAIN"  => undef,                                   #     42
+    "GWILLIAMS" => undef,                                   #     41
+    "CJFIELDS"  => undef,                                   #     41
+    "VOJ"       => undef,                                   #     40
     "JILLROWE"  => undef,                                   #     40
-    "PLICEASE"  => undef,                                   #     40
-    "GETTY"     => undef,                                   #     39
-    "JASONS"    => undef,                                   #     39
     "TAPPER"    => undef,                                   #     39
-    "CDOLAN"    => undef,                                   #     38
+    "JASONS"    => undef,                                   #     39
+    "ADAMK"     => undef,                                   #     39
     "JMACFARLA" => undef,                                   #     38
-    "PEVANS"    => undef,                                   #     38
-    "GWILLIAMS" => undef,                                   #     37
-
-
+    "GETTY"     => undef,                                   #     38
+    "CDOLAN"    => undef,                                   #     38
 );
 
 1;
@@ -76,7 +74,7 @@ Acme::CPANAuthors::CPAN::MostScripts - Authors with the most scripts on CPAN
 
 =head1 VERSION
 
-This document describes version 0.002 of Acme::CPANAuthors::CPAN::MostScripts (from Perl distribution Acme-CPANAuthors-CPAN-MostScripts), released on 2019-12-23.
+This document describes version 0.003 of Acme::CPANAuthors::CPAN::MostScripts (from Perl distribution Acme-CPANAuthors-CPAN-MostScripts), released on 2021-06-07.
 
 =head1 SYNOPSIS
 
@@ -87,9 +85,9 @@ This document describes version 0.002 of Acme::CPANAuthors::CPAN::MostScripts (f
 
    my $number   = $authors->count;
    my @ids      = $authors->id;
-   my @distros  = $authors->distributions('RJBS');
-   my $url      = $authors->avatar_url('RJBS');
-   my $kwalitee = $authors->kwalitee('RJBS');
+   my @distros  = $authors->distributions('PERLANCAR');
+   my $url      = $authors->avatar_url('PERLANCAR');
+   my $kwalitee = $authors->kwalitee('PERLANCAR');
 
 =head1 DESCRIPTION
 
@@ -103,10 +101,10 @@ Statistics of the CPAN mirror:
  +---------------------+--------------------------------+
  | key                 | value                          |
  +---------------------+--------------------------------+
- | cpan                | /home/s1/cpan                  |
+ | cpan                | /home/u1/cpan                  |
  | index_name          | /media/minicpan-index/index.db |
- | last_index_time     | 2019-12-22T12:19:08Z           |
- | raw_last_index_time | 1577017148                     |
+ | last_index_time     | 2021-06-06T16:59:14Z           |
+ | raw_last_index_time | 1622998754                     |
  +---------------------+--------------------------------+
 
 Current ranking:
@@ -114,57 +112,63 @@ Current ranking:
  +------+-----------+--------------+
  | rank | id        | script_count |
  +------+-----------+--------------+
- | 1    | PERLANCAR | 1115         |
- | 2    | RSAVAGE   | 375          |
- | 3    | BDFOY     | 174          |
- | 4    | JWB       | 166          |
- | 5    | SANTEX    | 140          |
- | 6    | MRDVT     | 139          |
- | 7    | VVELOX    | 134          |
- | 8    | CWEST     | 120          |
- | 9    | SHLOMIF   | 112          |
- | 10   | LDS       | 101          |
- | 11   | TSIBLEY   | 95           |
- | 12   | TULAMILI  | 95           |
- | 13   | SDAGUE    | 91           |
- | 14   | OLIVER    | 90           |
- | 15   | LEOCHARRE | 88           |
- | 16   | CMUNGALL  | 87           |
- | 17   | RDO       | 75           |
- | 18   | EASR      | 72           |
- | 19   | GSG       | 69           |
- | 20   | AMBS      | 68           |
- | 21   | BPOSTLE   | 63           |
- | 22   | INGY      | 60           |
- | 23   | IVANWILLS | 58           |
- | 24   | TBONE     | 57           |
- | 25   | GROUSSE   | 56           |
+ | 1    | PERLANCAR | 1400         |
+ | 2    | RSAVAGE   | 302          |
+ | 3    | TULAMILI  | 226          |
+ | 4    | BDFOY     | 175          |
+ | 5    | TRIZEN    | 173          |
+ | 6    | JWB       | 166          |
+ | 7    | MRDVT     | 157          |
+ | 8    | SANTEX    | 140          |
+ | 9    | VVELOX    | 137          |
+ | 10   | SHLOMIF   | 137          |
+ | 11   | OLIVER    | 103          |
+ | 12   | LDS       | 101          |
+ | 13   | TSIBLEY   | 95           |
+ | 14   | LEOCHARRE | 88           |
+ | 15   | CMUNGALL  | 87           |
+ | 16   | RDO       | 75           |
+ | 17   | EASR      | 72           |
+ | 18   | GSG       | 69           |
+ | 19   | AMBS      | 68           |
+ | 20   | BPOSTLE   | 63           |
+ | 21   | INGY      | 61           |
+ | 22   | IVANWILLS | 58           |
+ | 23   | TBONE     | 57           |
+ | 24   | TIEDEMANN | 56           |
+ | 25   | MOOCOW    | 53           |
  | 26   | BRYCE     | 53           |
- | 27   | MOOCOW    | 51           |
- | 28   | KESTEB    | 50           |
- | 29   | NKH       | 50           |
- | 30   | WOLDRICH  | 50           |
- | 31   | TIEDEMANN | 49           |
- | 32   | DHARD     | 46           |
- | 33   | PERRAD    | 46           |
- | 34   | BEATNIK   | 44           |
- | 35   | YSAS      | 44           |
- | 36   | AJPAGE    | 43           |
- | 37   | MSIMERSON | 43           |
- | 38   | MTW       | 43           |
- | 39   | CORION    | 41           |
- | 40   | JLMARTIN  | 41           |
- | 41   | ADAMK     | 40           |
- | 42   | JILLROWE  | 40           |
- | 43   | PLICEASE  | 40           |
- | 44   | GETTY     | 39           |
- | 45   | JASONS    | 39           |
- | 46   | TAPPER    | 39           |
- | 47   | CDOLAN    | 38           |
+ | 27   | WOLDRICH  | 50           |
+ | 28   | NKH       | 50           |
+ | 29   | KESTEB    | 50           |
+ | 30   | GROUSSE   | 48           |
+ | 31   | CORION    | 47           |
+ | 32   | PLICEASE  | 46           |
+ | 33   | DHARD     | 46           |
+ | 34   | YSAS      | 44           |
+ | 35   | PERRAD    | 44           |
+ | 36   | BEATNIK   | 44           |
+ | 37   | MTW       | 43           |
+ | 38   | MSIMERSON | 43           |
+ | 39   | AJPAGE    | 43           |
+ | 40   | DBAURAIN  | 42           |
+ | 41   | GWILLIAMS | 41           |
+ | 42   | CJFIELDS  | 41           |
+ | 43   | VOJ       | 40           |
+ | 44   | JILLROWE  | 40           |
+ | 45   | TAPPER    | 39           |
+ | 46   | JASONS    | 39           |
+ | 47   | ADAMK     | 39           |
  | 48   | JMACFARLA | 38           |
- | 49   | PEVANS    | 38           |
- | 50   | GWILLIAMS | 37           |
+ | 49   | GETTY     | 38           |
+ | 50   | CDOLAN    | 38           |
  +------+-----------+--------------+
+
+=head1 CONTRIBUTOR
+
+=for stopwords perlancar (@netbook-zenbook-ux305)
+
+perlancar (@netbook-zenbook-ux305) <perlancar@gmail.com>
 
 =head1 HOMEPAGE
 
@@ -192,7 +196,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019, 2016 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2019, 2016 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -1,12 +1,12 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2020 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2020-2021 -- leonerd@leonerd.org.uk
 
 use v5.26;
-use Object::Pad 0.35;
+use Object::Pad 0.38; # Object::Pad::MOP::Class->for_class
 
-package Device::Chip::Sensor 0.16;
+package Device::Chip::Sensor 0.18;
 
 use strict;
 use warnings;
@@ -121,7 +121,7 @@ sub import ( @opts )
 
 sub declare_into ( $caller )
 {
-   my $classmeta = $caller->META;
+   my $classmeta = Object::Pad::MOP::Class->for_class( $caller );
 
    my $sensors = $SENSORS_FOR_CLASS{$classmeta->name} //= [];
 
@@ -209,11 +209,14 @@ method bind ( $chip )
 Performs an actual read operation on the sensor chip to return the currently
 measured value.
 
+This method always returns a single scalar value, even if the underlying
+method on the sensor chip returned more than one.
+
 =cut
 
 async method read ()
 {
-   return await $_chip->$_method();
+   return scalar await $_chip->$_method();
 }
 
 =head2 format
@@ -226,6 +229,7 @@ Returns a string by formatting an observed value to the required precision.
 
 method format ( $value )
 {
+   return undef if !defined $value;
    return sprintf "%.*f", $_precision, $value;
 }
 

@@ -179,14 +179,16 @@ sub supported_serializers {
 	);
     } # supported_serializers
 
+# Choose a value that works for plain, uselongdouble, and usequadmath
+sub PI { 3.1415926535897931 }
+
 sub deep {
     my ($DBD, $str) = (@_, "");
 
     my %deep = (
 	UND => undef,
 	IV  => 1,
-#	NV  => 3.14159265358979001,
-	NV  => 3.14159265358830452896654605865479,
+	NV  => PI (),
 	PV  => "string",
 	PV8 => "ab\ncd\x{20ac}\t",
 	PVM => $!,

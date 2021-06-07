@@ -8,7 +8,6 @@ Changes
 CONTRIBUTING.md
 hax/perl-backcompat.h
 hax/uv-backcompat.h
-lib/ppport.h
 lib/typemap
 lib/UV.pm
 lib/UV.xs
@@ -78,3 +77,4 @@ t/20-getaddrinfo.t
 t/21-getnameinfo.t
 t/30-process.t
 t/31-process-root.t
+t/lib/UVTestHelpers.pm

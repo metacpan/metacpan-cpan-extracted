@@ -1,108 +1,128 @@
 Revision history for File-Serialize
 
-1.3.0 2019-07-12
-  [ ENHANCEMENTS ]
-    - Add JSON5 serializer.
+1.5.0 2021-06-07
+ [DOCUMENTATION]
+ - Mention Markdown serializer in the main documentation.
 
-  [ STATISTICS ]
-    - code churn: 14 files changed, 184 insertions(+), 47 deletions(-)
+ [ENHANCEMENTS]
+ - transerialize intermediary steps stuff. Lots of it.
+
+ [STATISTICS]
+ - code churn: 4 files changed, 165 insertions(+), 80 deletions(-)
+
+1.4.0 2021-06-06
+ [BUG FIXES]
+ - Mention YAML::XS and potential utf8 snag.
+
+ [ENHANCEMENTS]
+ - Add a Markdown serializer.
+
+ [STATISTICS]
+ - code churn: 21 files changed, 288 insertions(+), 76 deletions(-)
+
+1.3.0 2019-07-12
+ [ENHANCEMENTS]
+ - Add JSON5 serializer.
+
+ [STATISTICS]
+ - code churn: 14 files changed, 184 insertions(+), 47 deletions(-)
 
 1.2.0 2017-10-10
-  [ ENHANCEMENTS ]
-    - Data::Dumper serializer added. (GH#5)
-    - Remove unused dependency to MooX::ClassAttribute.
-    - Go down to Role::Tiny. (GH#3, Jason Hall)
+ [ENHANCEMENTS]
+ - Data::Dumper serializer added. (GH#5)
+ - Remove unused dependency to MooX::ClassAttribute.
+ - Go down to Role::Tiny. (GH#3, Jason Hall)
 
-  [ STATISTICS ]
-    - code churn: 11 files changed, 149 insertions(+), 7 deletions(-)
+ [STATISTICS]
+ - code churn: 11 files changed, 149 insertions(+), 7 deletions(-)
 
 1.1.1 2016-06-28
-  [ BUG FIXES ]
-    - Some tests were failing for perls <= 5.16
+ [BUG FIXES]
+ - Some tests were failing for perls <= 5.16
 
-  [ STATISTICS ]
-    - code churn: 2 files changed, 19 insertions(+), 7 deletions(-)
+ [STATISTICS]
+ - code churn: 2 files changed, 19 insertions(+), 7 deletions(-)
 
 1.1.0 2016-06-27
-  [ DOCUMENTATION ]
-    - Documentation pushed to the serializers.
+ [DOCUMENTATION]
+ - Documentation pushed to the serializers.
 
-  [ ENHANCEMENTS ]
-    - serialize_file/deserialize_file can now take a scalar ref as the
-      "file" to serialize/deserialize.
-    - Added `JSONY` serializer.
-    - Serializers now  have a precedence.
-    - Added `YAML::XS` serializer.
+ [ENHANCEMENTS]
+ - serialize_file/deserialize_file can now take a scalar ref as the "file"
+   to serialize/deserialize.
+ - Added `JSONY` serializer.
+ - Serializers now  have a precedence.
+ - Added `YAML::XS` serializer.
 
-  [ STATISTICS ]
-    - code churn: 14 files changed, 314 insertions(+), 76 deletions(-)
+ [STATISTICS]
+ - code churn: 14 files changed, 314 insertions(+), 76 deletions(-)
 
 1.0.1 2016-02-26
-  [ BUG FIXES ]
-    - FS::Serializer was dying if the required modules are not found.
+ [BUG FIXES]
+ - FS::Serializer was dying if the required modules are not found.
 
-  [ STATISTICS ]
-    - code churn: 4 files changed, 75 insertions(+), 44 deletions(-)
+ [STATISTICS]
+ - code churn: 4 files changed, 75 insertions(+), 44 deletions(-)
 
 1.0.0 2016-02-25
-  [ API CHANGES ]
-    - 'pretty' and 'canonical' true by default.
+ [API CHANGES]
+ - 'pretty' and 'canonical' true by default.
 
-  [ ENHANCEMENTS ]
-    - Allow 'allow_nonref' option for JSON.
-    - New script 'transerialize'.
-    - Serializers moved in their own classes.
+ [ENHANCEMENTS]
+ - Allow 'allow_nonref' option for JSON.
+ - New script 'transerialize'.
+ - Serializers moved in their own classes.
 
-  [ STATISTICS ]
-    - code churn: 17 files changed, 487 insertions(+), 127 deletions(-)
+ [STATISTICS]
+ - code churn: 17 files changed, 487 insertions(+), 127 deletions(-)
 
 0.5.0 2015-03-21
-  [ ENHANCEMENTS ]
-    - add support for XML files.
-    - final link of transerialize_file can be a scalar ref.
+ [ENHANCEMENTS]
+ - add support for XML files.
+ - final link of transerialize_file can be a scalar ref.
 
-  [ STATISTICS ]
-    - code churn: 7 files changed, 54 insertions(+), 5 deletions(-)
+ [STATISTICS]
+ - code churn: 7 files changed, 54 insertions(+), 5 deletions(-)
 
 0.4.1 2015-03-19
-  [ BUG FIXES ]
-    - test transerialize.t made optional to the presence of JSON::MaybeXS.
-    - add JSON/YAML modules as runtime recommendations.
+ [BUG FIXES]
+ - test transerialize.t made optional to the presence of JSON::MaybeXS.
+ - add JSON/YAML modules as runtime recommendations.
 
-  [ STATISTICS ]
-    - code churn: 3 files changed, 16 insertions(+), 1 deletion(-)
+ [STATISTICS]
+ - code churn: 3 files changed, 16 insertions(+), 1 deletion(-)
 
 0.4.0 2015-03-18
-  [ ENHANCEMENTS ]
-    - Use utf8 slurp/spew by default now. (GH#1, genehack)
+ [ENHANCEMENTS]
+ - Use utf8 slurp/spew by default now. (GH#1, genehack)
 
-  [ STATISTICS ]
-    - code churn: 10 files changed, 65 insertions(+), 12 deletions(-)
+ [STATISTICS]
+ - code churn: 10 files changed, 65 insertions(+), 12 deletions(-)
 
 0.3.0 2015-03-16
-  [ ENHANCEMENTS ]
-    - Added 'transerialize_file'. For the lulz.
+ [ENHANCEMENTS]
+ - Added 'transerialize_file'. For the lulz.
 
-  [ STATISTICS ]
-    - code churn: 5 files changed, 237 insertions(+), 5 deletions(-)
+ [STATISTICS]
+ - code churn: 5 files changed, 237 insertions(+), 5 deletions(-)
 
 0.2.0 2015-02-25
-  [ ENHANCEMENTS ]
-    - Change YAML for YAML::Tiny.
-    - Add option 'canonical'.
+ [ENHANCEMENTS]
+ - Change YAML for YAML::Tiny.
+ - Add option 'canonical'.
 
-  [ STATISTICS ]
-    - code churn: 3 files changed, 21 insertions(+), 7 deletions(-)
+ [STATISTICS]
+ - code churn: 3 files changed, 21 insertions(+), 7 deletions(-)
 
 0.1.0 2015-02-19
-  [ ENHANCEMENTS ]
-    - adding 'add_extension'.
+ [ENHANCEMENTS]
+ - adding 'add_extension'.
 
-  [ STATISTICS ]
-    - code churn: 10 files changed, 235 insertions(+), 177 deletions(-)
+ [STATISTICS]
+ - code churn: 10 files changed, 235 insertions(+), 177 deletions(-)
 
 0.0.1 2015-02-18
-  - First version, unleashed on an unsuspecting world.
+ - First version, unleashed on an unsuspecting world.
 
-  [ STATISTICS ]
-    - code churn: 6 files changed, 35 insertions(+), 7 deletions(-)
+ [STATISTICS]
+ - code churn: 6 files changed, 35 insertions(+), 7 deletions(-)

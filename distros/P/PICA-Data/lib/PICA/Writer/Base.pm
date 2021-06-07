@@ -1,7 +1,7 @@
 package PICA::Writer::Base;
 use v5.14.1;
 
-our $VERSION = '1.20';
+our $VERSION = '1.24';
 
 use Scalar::Util qw(blessed openhandle reftype);
 use PICA::Schema qw(clean_pica);
@@ -137,8 +137,6 @@ Use one of the following subclasses instead:
 
 =item L<PICA::Writer::Generic>
 
-=item L<PICA::Writer::Fields>
-
 =back
 
 =head1 METHODS
@@ -179,6 +177,12 @@ L<PICA::Writer::Plus> using color names from L<Term::ANSIColor>, e.g.
       value => 'white',
       syntax => 'yellow',
     })
+
+=head2 annotate
+
+Writer L<PICA::Writer::Plain> includes optional field annotations. Set this
+option to true to enforce field annotations (set to an empty space if missing)
+or to false to ignore them.
 
 =head1 SEE ALSO
 

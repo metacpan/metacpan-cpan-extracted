@@ -1,135 +1,61 @@
 package LyricFinder::Musixmatch;
 
-use 5.008000;
 use strict;
 use warnings;
-use LWP::UserAgent;
-use HTTP::Request;
+use Carp;
 use HTML::Strip;
 use URI::Escape;
-use Carp;
-
-my $Source = 'Musixmatch';
-my $Site   = 'https://www.musixmatch.com';
+use parent 'LyricFinder::_Class';
 
 our $haveLyricsCache;
 BEGIN {
+	$haveLyricsCache = 0;
 	eval "use LyricFinder::Cache; \$haveLyricsCache = 1; 1";
 }
 
-# the Default HTTP User-Agent we'll send:
-our $AGENT = "Mozilla/5.0 (X11; Linux x86_64; rv:80.0) Gecko/20100101 Firefox/80.0";
+my $Source = 'Musixmatch';
+my $Site   = 'https://www.musixmatch.com';
+my $DEBUG  = 0;
 
 sub new
 {
 	my $class = shift;
 
-	my $self = {};
-	$self->{'agent'} = $AGENT;
-	$self->{'cache'} = '';
-	$self->{'Error'} = 'Ok';
-	$self->{'Source'} = $Source;
-	$self->{'Site'} = $Site;
-	$self->{'Url'} = '';
-	$self->{'Credits'} = [];
-
-	my %args = @_;
-	foreach my $i (keys %args) {
-		if ($i =~ s/^\-//) {
-			$self->{$i} = $args{"-$i"};
-		} else {
-			$self->{$i} = $args{$i};
-		}
-	}
+	my $self = $class->SUPER::new($Source, @_);
+	@{$self->{'_fetchers'}} = ($Source);
+	unshift(@{$self->{'_fetchers'}}, 'Cache')  if ($haveLyricsCache
+			&& $self->{'-cache'} && $self->{'-cache'} !~ /^\>/);
 
 	bless $self, $class;   #BLESS IT!
 
 	return $self;
 }
 
-sub source {
-	my $self = shift;
-	return $self->{'Source'};
-}
-
-sub url {
-	my $self = shift;
-	return $self->{'Url'};
-}
-
-sub order {
-	return wantarray ? ($Source) : $Source;
-}
-
-sub tried {
-	return order ();
-}
-
-sub credits {
-	my $self = shift;
-	return wantarray ? @{$self->{'Credits'}} : join(', ', @{$self->{'Credits'}});
-}
-
-sub message {
-	my $self = shift;
-	return $self->{'Error'};
-}
-
-sub site {
-	my $self = shift;
-	return $self->{'Site'};
-}
-
-# Allow user to specify a different user-agent:
-sub agent {
-	my $self = shift;
-
-	if (defined $_[0]) {
-		$self->{'agent'} = $_[0];
-	} else {
-		return $self->{'agent'};
-	}
-}
-
-sub cache {
-	my $self = shift;
-
-	if (defined $_[0]) {
-		$self->{'cache'} = $_[0];
-	} else {
-		return $self->{'cache'};
-	}
-}
-
 sub fetch {
-	my $self = shift;
-	my ($artist_in, $song_in) = @_;
+	my ($self, $artist_in, $song_in) = @_;
 
-	# reset the error var, change it if an error occurs.
-	$self->{'Error'} = 'Ok';
-	$self->{'Url'} = '';
+	$self->_debug("Musixmatch::fetch($artist_in, $song_in)!");
 
-	unless ($artist_in && $song_in) {
-		carp($self->{'Error'} = "e:$Source.fetch() called without artist and song!");
-		return;
-	}
+	return ''  unless ($self->_check_inputs($artist_in, $song_in));
+	return ''  if ($self->{'Error'} ne 'Ok');
 
 	# first, see if we've got it cached:
-	if ($self->{'cache'} && $self->{'cache'} !~ /^\>/ && $haveLyricsCache) {
-		my $cache = new LyricFinder::Cache(-cache => $self->{'cache'});
+	$self->_debug("i:haveCache=$haveLyricsCache= -cachedir=".$self->{'-cache'}."=");
+	if ($haveLyricsCache && $self->{'-cache'} && $self->{'-cache'} !~ /^\>/) {
+		my $cache = new LyricFinder::Cache(%{$self});
 		if ($cache) {
 			my $lyrics = $cache->fetch($artist_in, $song_in);
 			if (defined($lyrics) && $lyrics =~ /\w/) {
-				print "..Got lyrics from cache.\n"  if ($self->{'-debug'});
+				$self->_debug("..Got lyrics from cache.");
 				$self->{'Source'} = 'Cache';
 				$self->{'Site'} = $cache->site();
 				$self->{'Url'} = $cache->url();
+
 				return $lyrics;
 			}
 		}
 	}
 
-	$self->{'Source'} = $Source;
 	$self->{'Site'} = $Site;
 
 	(my $artist = $artist_in) =~ s#\s*\/.*$##;  #ONLY USE 1ST ARTIST, IF MORE THAN ONE!
@@ -147,65 +73,29 @@ sub fetch {
 
 	# Their URLs look like e.g.:
 	#https://www.musixmatch.com/lyrics/Artist-name/Title
-	$self->{'Url'} = 'https://www.musixmatch.com/lyrics/'
+	$self->{'Url'} = $Site . '/lyrics/'
 			. join('/', $artist, $song);
 
-	my $ua = LWP::UserAgent->new(
-		ssl_opts => { verify_hostname => 0, },
-	);
-	$ua->timeout(10);
-	$ua->agent($self->{'agent'});
-	$ua->protocols_allowed(['https']);
-	$ua->cookie_jar( {} );
-	push @{ $ua->requests_redirectable }, 'GET';
-	(my $referer = $self->{'Url'}) =~ s{^(\w+)\:\/\/}{};
-	my $protocol = $1;
-	$referer =~ s{\/.+$}{\/};
-	my $host = $referer;
-	$host =~ s{\/$}{};
-	$referer = $protocol . '://' . $referer;
-	my $req = new HTTP::Request 'GET' => $self->{'Url'};
-	$req->header(
-		'Accept' =>
-			'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
-		'Accept-Language'           => 'en-US,en;q=0.5',
-		'Accept-Encoding'           => 'gzip, deflate',
-		'Connection'                => 'keep-alive',
-		'Upgrade-insecure-requests' => 1,
-		'Host'                      => $host,
-	);
-
-	my $res = $ua->request($req);
-
-	if ($res->is_success) {
-		my $lyrics = $self->_parse($res->decoded_content);
-		if ($self->{'cache'} && $self->{'cache'} !~ /^\</ && $lyrics && $haveLyricsCache) {
-			# cache the fetched lyrics, if we can:
-			my $cache = new LyricFinder::Cache(-cache => $self->{'cache'});
-			$cache->save($artist_in, $song_in, $lyrics)  if ($cache);
-		}
-		return $lyrics;
-	} else {
-		if ($res->status_line =~ /^404/) {
-			$self->{'Error'} = "..$Source - Lyrics not found.";
-		} else {
-			carp($self->{'Error'} = "e:$Source - Failed to retrieve ".$self->{'Url'}
-					.' ('.$res->status_line.').');
-		}
-		return;
+	my $lyrics = $self->_web_fetch($artist_in, $song_in);
+	if ($lyrics && $haveLyricsCache && $self->{'-cache'} && $self->{'-cache'} !~ /^\</) {
+		$self->_debug("=== WILL CACHE LYRICS! ===");
+		# cache the fetched lyrics, if we can:
+		my $cache = new LyricFinder::Cache(%{$self});
+		$cache->save($artist_in, $song_in, $lyrics)  if ($cache);
 	}
+	return $lyrics;
 }
-
-# Internal use only functions:
 
 sub _parse {
 	my $self = shift;
 	my $html = shift;
 
+	$self->_debug("Musixmatch::_parse()!");
 	my $goodbit = '';
 	my $text = '';
 	my $mm_status = '';
 	my $hs   = HTML::Strip->new();
+
 	#METHOD 1:  MERGE LYRICS FROM BOTH (OR MORE?) LYRIC "SPANS" MM LIKES TO BREAK LYRICS UP INTO
 	#2 SEPARATE SPAN TAGS:  A SHORT (ABBREVIATED) PART, FOLLOWED BY THE REST OF THE LYRICS:
 	while ($html =~ s#\<span\s+class\=\"lyrics\_\_content\_\_(ok|warning|error)\"\>(.+?)\<\/span\>##s) {
@@ -223,29 +113,27 @@ sub _parse {
 		}
 	}
 	if ($text =~ /[a-z]/i) {
-		$text .= "\r\n(Musixmatch status: $mm_status)";
-		# normalize Windowsey \r\n sequences:
-		$text =~ s/\r+//gs;
-		# strip off pre & post padding with spaces:
-		$text =~ s/^ +//mg;
-		$text =~ s/ +$//mg;
-		# clear up repeated blank lines:
-		$text =~ s/(\R){2,}/\n\n/gs;
-		# and remove any blank top lines:
-		$text =~ s/^\R+//s;
-		$text =~ s/\R\R+$/\n/s;
-		$text .= "\n"  unless ($text =~ /\n$/s);
-		# now fix up for either Windows or Linux/Unix:
-		$text =~ s/\R/\r\n/gs  if ($^O =~ /Win/);
+		$text .= "\r\n(Musixmatch status: $mm_status)"
+				unless ((defined($self->{'-noextra'}) && $self->{'-noextra'}) || $mm_status !~ /\S/);
 
-		return $text;
+		#WHILE WE'RE AT IT, SEE IF WE HAVE A COVER IMAGE?!:
+		if ($html =~ m#\<div\s+class\=\"banner\-album\-image\"\>(.+?)\<\/div\>#s) {
+			my $imgdiv = $1;
+			if ($imgdiv =~ m#\<img\s+src\=\"([^\"]+)#s) {
+				my $imgurl = $1;
+				$imgurl = 'https:' . $imgurl  if ($imgurl =~ m#^//#);
+				$self->{'image_url'} = $imgurl;
+			}
+		}
+
+		return $self->_normalize_lyric_text($self->_html2text($text));
 	} else {
 		carp($self->{'Error'} = "e:$Source - Failed to identify lyrics on result page.");
 		return '';
 	}
-}   # end of sub parse
+}
 
-1;
+1
 
 __END__
 
@@ -303,12 +191,13 @@ I<"Musixmatch"> as the third argument of the B<fetch>() method.
 
 NOTE:  Musixmatch flags lyrics with a status of either "ok", "warning", or 
 "error".  "warning" seems to mean "pending review", and when flagged "error", 
-thir site says "We detected some issues".  I don't know if this means someone's 
-complained about correctness, profanity, etc.  Therefore, we append:  
-(Musixmatch status: I<status>) to the end of the returned lyrics.  The calling 
-program can grep for and strip this off, if undesired.  There are some 
-rare cases where no lyrics are found the normal way and we have to try a 
-backup method to extract them.  In those cases, we set the status 
+their site says "We detected some issues".  I don't know if this means 
+someone's complained about correctness, profanity, etc.  Therefore, we 
+append:  (Musixmatch status: I<status>) to the end of the returned lyrics.  
+
+This status msg. can be suppressed by passing the option "-noextra" => 1.  
+There are some rare cases where no lyrics are found the normal way and we 
+have to try a backup method to extract them.  In those cases, we set the status 
 to "error!".
 
 In case of problems with fetching lyrics, the error string will be returned by 
@@ -329,7 +218,8 @@ object can be used for multiple fetches, so this normally only needs to be
 called once.
 
 I<options> is a hash of option/value pairs (ie. "-option" => "value").  
-The currently-supported options are:  
+If an "-option" is specified with no "value" given, the default value will 
+be I<1> ("I<true>").  The currently-supported options are:  
 
 =over 4
 
@@ -341,7 +231,7 @@ pass to www.musixmatch.com.  Some sites are pickey about receiving a user-agent
 string that corresponds to a valid / supported web-browser to prevent their 
 sites from being "scraped" by programs, such as this.  
 
-Default:  I<"Mozilla/5.0 (X11; Linux x86_64; rv:80.0) Gecko/20100101 Firefox/80.0">.
+Default:  I<"Mozilla/5.0 (X11; Linux x86_64; rv:84.0) Gecko/20100101 Firefox/84.0">.
 
 NOTE:  This value will be overridden if $founder->agent("agent") is 
 called!
@@ -382,16 +272,25 @@ Specifies whether debug information will be displayed (0: no, >0: yes).
 Default I<0> (no).  I<1> will display debug info.  There is currently only 
 one level of debug verbosity.
 
+=item B<-noextra> => I<0 | 1> (I<false> or I<true>)
+
+Musixmatch returns a (useful to some) "status" reflecting the quality or 
+"status" of the lyrics for each song on their site.  This message is appended 
+to the bottom of the lyrics returned.  If specified or given a I<true> value, 
+the message containing the Musixmatch "status" will NOT be appended below the 
+lyrics text and only the actual lyrics will be returned.  Default I<0> (false) 
+(append the message).
+
 =back 
 
 =item [ I<$current-agent string> = ] $finder->B<agent>( [ I<user-agent string> ] )
 
-Set the desired user-agent (ie. browser name) to pass to www.musixmatch.com.  
-Some sites are pickey about receiving a user-agent 
+Set / get the desired user-agent (ie. browser name) to pass to 
+www.musixmatch.com.  Some sites are pickey about receiving a user-agent 
 string that corresponds to a valid / supported web-browser to prevent their 
 sites from being "scraped" by programs, such as this.  
 
-Default:  I<"Mozilla/5.0 (X11; Linux x86_64; rv:80.0) Gecko/20100101 Firefox/80.0">
+Default:  I<"Mozilla/5.0 (X11; Linux x86_64; rv:84.0) Gecko/20100101 Firefox/84.0">
 
 If no argument is passed, it returns the current GENERAL user-agent string in 
 effect (but a different agent option is specified for a specific module may 
@@ -446,6 +345,12 @@ This is the primary method call, and the only one required to be called
 
 Returns lyrics as a string (includes line-breaks appropriate for the user's 
 operating system), or an empty string, if no lyrics found.
+
+=item I<$scalar> = $finder->B<image_url>()
+
+Returns a URL for a cover-art image, if one found on the lyrics page.  
+If no image is found, an empty string will be returned if this method 
+is called.
 
 =item I<$scalar> = $finder->B<message>()
 
@@ -511,7 +416,7 @@ file fetched.
 
 =head1 DEPENDENCIES
 
-L<HTML::Strip>, L<HTTP::Request>, L<LWP::UserAgent>
+L<HTML::Strip>, L<HTTP::Request>, L<LWP::UserAgent>, L<URI::Escape>
 
 =head1 BUGS
 

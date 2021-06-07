@@ -21,6 +21,10 @@ unless( $ENV{USPS_WEBTOOLS_USERID} and $ENV{USPS_WEBTOOLS_PASSWORD} )
 	"environment variables to run these tests\n";
 	}
 
+my $is_testing = uc($ENV{USPS_WEBTOOLS_ENVIRONMENT}) eq 'TESTING';
+
+my $base = 'https://' . ($is_testing ? 'stg-' : '') . 'production.shippingapis.com/ShippingAPI.dll';
+
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 use_ok( $class );
 
@@ -29,7 +33,7 @@ subtest setup => sub {
 	$verifier = $class->new( {
 		UserID   => $ENV{USPS_WEBTOOLS_USERID},
 		Password => $ENV{USPS_WEBTOOLS_PASSWORD},
-		Testing  => 1,
+                Testing  => $is_testing,
 		} );
 	isa_ok( $verifier, 	$class );
 
@@ -44,7 +48,7 @@ subtest good_response_1 => sub {
 		} );
 	is(
 		$url,
-		qq|http://testing.shippingapis.com/ShippingAPITest.dll?API=CityStateLookup&XML=%3CCityStateLookupRequest+USERID%3D%22$ENV{USPS_WEBTOOLS_USERID}%22+PASSWORD%3D%22$ENV{USPS_WEBTOOLS_PASSWORD}%22%3E%3CZipCode+ID%3D%220%22%3E%3CZip5%3E90210%3C%2FZip5%3E%3C%2FZipCode%3E%3C%2FCityStateLookupRequest%3E|,
+		qq|$base?API=CityStateLookup&XML=%3CCityStateLookupRequest+USERID%3D%22$ENV{USPS_WEBTOOLS_USERID}%22+PASSWORD%3D%22$ENV{USPS_WEBTOOLS_PASSWORD}%22%3E%3CZipCode+ID%3D%220%22%3E%3CZip5%3E90210%3C%2FZip5%3E%3C%2FZipCode%3E%3C%2FCityStateLookupRequest%3E|,
 		"URL for 90210 is correct",
 		);
 
@@ -77,7 +81,7 @@ subtest good_response_2 => sub {
 		} );
 	is(
 		$url,
-		qq|http://testing.shippingapis.com/ShippingAPITest.dll?API=CityStateLookup&XML=%3CCityStateLookupRequest+USERID%3D%22$ENV{USPS_WEBTOOLS_USERID}%22+PASSWORD%3D%22$ENV{USPS_WEBTOOLS_PASSWORD}%22%3E%3CZipCode+ID%3D%220%22%3E%3CZip5%3E20770%3C%2FZip5%3E%3C%2FZipCode%3E%3C%2FCityStateLookupRequest%3E|,
+		qq|$base?API=CityStateLookup&XML=%3CCityStateLookupRequest+USERID%3D%22$ENV{USPS_WEBTOOLS_USERID}%22+PASSWORD%3D%22$ENV{USPS_WEBTOOLS_PASSWORD}%22%3E%3CZipCode+ID%3D%220%22%3E%3CZip5%3E20770%3C%2FZip5%3E%3C%2FZipCode%3E%3C%2FCityStateLookupRequest%3E|,
 		"URL for 20770 is correct",
 		);
 
@@ -110,7 +114,7 @@ subtest good_response_3 => sub {
 		} );
 	is(
 		$url,
-		qq|http://testing.shippingapis.com/ShippingAPITest.dll?API=CityStateLookup&XML=%3CCityStateLookupRequest+USERID%3D%22$ENV{USPS_WEBTOOLS_USERID}%22+PASSWORD%3D%22$ENV{USPS_WEBTOOLS_PASSWORD}%22%3E%3CZipCode+ID%3D%220%22%3E%3CZip5%3E21113%3C%2FZip5%3E%3C%2FZipCode%3E%3C%2FCityStateLookupRequest%3E|,
+		qq|$base?API=CityStateLookup&XML=%3CCityStateLookupRequest+USERID%3D%22$ENV{USPS_WEBTOOLS_USERID}%22+PASSWORD%3D%22$ENV{USPS_WEBTOOLS_PASSWORD}%22%3E%3CZipCode+ID%3D%220%22%3E%3CZip5%3E21113%3C%2FZip5%3E%3C%2FZipCode%3E%3C%2FCityStateLookupRequest%3E|,
 		"URL for 21113 is correct",
 		);
 
@@ -143,7 +147,7 @@ subtest good_response_4 => sub {
 		} );
 	is(
 		$url,
-		qq|http://testing.shippingapis.com/ShippingAPITest.dll?API=CityStateLookup&XML=%3CCityStateLookupRequest+USERID%3D%22$ENV{USPS_WEBTOOLS_USERID}%22+PASSWORD%3D%22$ENV{USPS_WEBTOOLS_PASSWORD}%22%3E%3CZipCode+ID%3D%220%22%3E%3CZip5%3E21032%3C%2FZip5%3E%3C%2FZipCode%3E%3C%2FCityStateLookupRequest%3E|,
+		qq|$base?API=CityStateLookup&XML=%3CCityStateLookupRequest+USERID%3D%22$ENV{USPS_WEBTOOLS_USERID}%22+PASSWORD%3D%22$ENV{USPS_WEBTOOLS_PASSWORD}%22%3E%3CZipCode+ID%3D%220%22%3E%3CZip5%3E21032%3C%2FZip5%3E%3C%2FZipCode%3E%3C%2FCityStateLookupRequest%3E|,
 		"URL for 21032 is correct",
 		);
 
@@ -182,7 +186,7 @@ subtest good_response_5 => sub {
 		} );
 	is(
 		$url,
-		qq|http://testing.shippingapis.com/ShippingAPITest.dll?API=CityStateLookup&XML=%3CCityStateLookupRequest+USERID%3D%22$ENV{USPS_WEBTOOLS_USERID}%22+PASSWORD%3D%22$ENV{USPS_WEBTOOLS_PASSWORD}%22%3E%3CZipCode+ID%3D%220%22%3E%3CZip5%3E21117%3C%2FZip5%3E%3C%2FZipCode%3E%3C%2FCityStateLookupRequest%3E|,
+		qq|$base?API=CityStateLookup&XML=%3CCityStateLookupRequest+USERID%3D%22$ENV{USPS_WEBTOOLS_USERID}%22+PASSWORD%3D%22$ENV{USPS_WEBTOOLS_PASSWORD}%22%3E%3CZipCode+ID%3D%220%22%3E%3CZip5%3E21117%3C%2FZip5%3E%3C%2FZipCode%3E%3C%2FCityStateLookupRequest%3E|,
 		"URL for Sharonwood Road is correct",
 		);
 
@@ -221,7 +225,7 @@ subtest error_response_1 => sub {
 		} );
 	is(
 		$url,
-		qq|http://testing.shippingapis.com/ShippingAPITest.dll?API=CityStateLookup&XML=%3CCityStateLookupRequest+USERID%3D%22$ENV{USPS_WEBTOOLS_USERID}%22+PASSWORD%3D%22$ENV{USPS_WEBTOOLS_PASSWORD}%22%3E%3CZipCode+ID%3D%220%22%3E%3CZip5%3E99999%3C%2FZip5%3E%3C%2FZipCode%3E%3C%2FCityStateLookupRequest%3E|,
+		qq|$base?API=CityStateLookup&XML=%3CCityStateLookupRequest+USERID%3D%22$ENV{USPS_WEBTOOLS_USERID}%22+PASSWORD%3D%22$ENV{USPS_WEBTOOLS_PASSWORD}%22%3E%3CZipCode+ID%3D%220%22%3E%3CZip5%3E99999%3C%2FZip5%3E%3C%2FZipCode%3E%3C%2FCityStateLookupRequest%3E|,
 		"URL for Sharonwood Road Error is correct",
 		);
 

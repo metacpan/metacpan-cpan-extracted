@@ -28,7 +28,7 @@ no_index:
 provides:
   Mac::Pasteboard:
     file: lib/Mac/Pasteboard.pm
-    version: '0.014'
+    version: '0.015'
 requires:
   Carp: '0'
   Encode: '0'
@@ -43,5 +43,5 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Mac-Pasteboard
   license: http://dev.perl.org/licenses/
   repository: git://github.com/trwyant/perl-Mac-Pasteboard.git
-version: '0.014'
+version: '0.015'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

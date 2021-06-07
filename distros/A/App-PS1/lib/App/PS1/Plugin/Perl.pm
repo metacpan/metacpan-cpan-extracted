@@ -11,7 +11,7 @@ use warnings;
 use Carp;
 use English qw/ -no_match_vars /;
 
-our $VERSION     = 0.07;
+our $VERSION     = 0.08;
 our @EXPORT_OK   = qw//;
 our %EXPORT_TAGS = ();
 #our @EXPORT      = qw//;
@@ -39,7 +39,7 @@ App::PS1::Plugin::Perl - Shows current version of Perl if using perlbrew
 
 =head1 VERSION
 
-This documentation refers to App::PS1::Plugin::Perl version 0.07.
+This documentation refers to App::PS1::Plugin::Perl version 0.08.
 
 =head1 SYNOPSIS
 

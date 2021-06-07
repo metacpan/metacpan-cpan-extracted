@@ -13,7 +13,7 @@
     %= javascript '/mojo/bootstrap/bootstrap.js'
     %= stylesheet '/mojo/bootstrap/bootstrap.css'
     %= stylesheet '/mojo/highlight.js/highlight-mojo-dark.css'
-    %= stylesheet '/mojo/fontawesome/fontawesome.css'
+    %= stylesheet 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css'
     %= stylesheet '/mojo/mojo.css'
     <script>
       hljs.initHighlightingOnLoad();
@@ -63,7 +63,7 @@
                 Community
               </a>
               <div class="dropdown-menu" aria-labelledby="communityDropdown">
-                <a class="dropdown-item" href="https://webchat.freenode.net/#mojo">Chat</a>
+                <a class="dropdown-item" href="https://web.libera.chat/#mojo">Chat</a>
                 <a class="dropdown-item" href="https://forum.mojolicious.org">Forum</a>
                 <a class="dropdown-item" href="https://twitter.com/mojolicious_org">Twitter</a>
                 <a class="dropdown-item" href="https://blogs.mojolicious.org">Blogs</a>

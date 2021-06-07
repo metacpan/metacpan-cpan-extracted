@@ -1,0 +1,57 @@
+use strict;
+use warnings;
+
+# this test was generated with Dist::Zilla::Plugin::Test::NoTabs 0.15
+
+use Test::More 0.88;
+use Test::NoTabs;
+
+my @files = (
+    'bin/sql-split',
+    'lib/SQL/SplitStatement.pm',
+    'lib/SQL/SplitStatement/Tokenizer.pm',
+    't/00-compile.t',
+    't/00-load.t',
+    't/00-report-prereqs.dd',
+    't/00-report-prereqs.t',
+    't/80-examples.t',
+    't/81-examples_procedural.t',
+    't/82-synopsis.t',
+    't/92-postgresql_pagila.t',
+    't/94-exception.t',
+    't/95-script.t',
+    't/basic/comments.t',
+    't/basic/empty_statements.t',
+    't/basic/hard.t',
+    't/basic/keywords_as_unquoted_identifiers.t',
+    't/basic/nested_blocks.t',
+    't/basic/placeholders.t',
+    't/basic/placeholders_empty.t',
+    't/basic/simple.t',
+    't/basic/slash_terminates.t',
+    't/basic/transactions.t',
+    't/basic/transactions_and_proc.t',
+    't/data/create_table.sql',
+    't/data/create_table_and_trigger.sql',
+    't/data/pagila-schema.sql',
+    't/data/sakila-schema.sql',
+    't/mysql/delimiter.t',
+    't/mysql/mixed.t',
+    't/mysql/replace.t',
+    't/mysql/sakila.t',
+    't/postgres/dollar_quoted.t',
+    't/postgres/dollar_quoted_w_tranactions.t',
+    't/postgres/pl_perl.t',
+    't/proc/grant.t',
+    't/proc/plsql_RTbug_57971.t',
+    't/proc/plsql_alias.t',
+    't/proc/plsql_function_inside_package.t',
+    't/proc/plsql_mixed.t',
+    't/proc/plsql_mixed_endings.t',
+    't/proc/plsql_nested_functions.t',
+    't/proc/plsql_package.t',
+    't/proc/plsql_slash_endings.t'
+);
+
+notabs_ok($_) foreach @files;
+done_testing;

@@ -1,0 +1,15 @@
+<%
+    my %state_bg = (
+        finished => 'bg-success',
+        failed => 'bg-danger',
+    );
+    my $default_bg = 'bg-secondary';
+%>
+<div class="task-bar">
+    <div data-task-state class="<%= $state_bg{ $task->{state} } // $default_bg %>"><%= $task->{state} %></div>
+    % if ( my $synopsis = stash( 'synopsis' ) ) {
+        <div>
+            %= ref $synopsis eq 'CODE' ? $synopsis->() : $synopsis
+        </div>
+    % }
+</div>

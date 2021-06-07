@@ -1,0 +1,47 @@
+do { my $x = {
+       'configure' => {
+                        'requires' => {
+                                        'Module::Build::Tiny' => '0.034'
+                                      }
+                      },
+       'develop' => {
+                      'requires' => {
+                                      'Test::Pod' => '1.41'
+                                    },
+                      'suggests' => {
+                                      'App::PPI::Dumper' => '0'
+                                    }
+                    },
+       'runtime' => {
+                      'requires' => {
+                                      'Carp' => '0',
+                                      'Exporter' => '0',
+                                      'List::Util' => '1.33',
+                                      'PPI' => '1.254',
+                                      'Path::Tiny' => '0.101',
+                                      'Perl::Critic' => '1.126',
+                                      'Perl::Critic::Policy::Objects::ProhibitIndirectSyntax' => '1.126',
+                                      'Perl::Critic::Policy::Subroutines::ProhibitAmpersandSigils' => '1.126',
+                                      'Perl::Critic::Policy::ValuesAndExpressions::ProhibitArrayAssignAref' => '90',
+                                      'Perl::Critic::Policy::Variables::ProhibitConditionalDeclarations' => '1.126',
+                                      'Perl::Critic::Policy::Variables::ProhibitLoopOnHash' => '0.005',
+                                      'Perl::Critic::Policy::Variables::RequireLexicalLoopIterators' => '1.126',
+                                      'Scalar::Util' => '0',
+                                      'parent' => '0',
+                                      'perl' => '5.010001',
+                                      'version' => '0'
+                                    }
+                    },
+       'test' => {
+                   'recommends' => {
+                                     'CPAN::Meta' => '2.120900'
+                                   },
+                   'requires' => {
+                                   'File::Spec' => '0',
+                                   'Module::Metadata' => '0',
+                                   'Test::More' => '0'
+                                 }
+                 }
+     };
+  $x;
+ }

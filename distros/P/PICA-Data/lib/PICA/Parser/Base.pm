@@ -1,7 +1,7 @@
 package PICA::Parser::Base;
 use v5.14.1;
 
-our $VERSION = '1.20';
+our $VERSION = '1.24';
 
 use Carp qw(croak);
 use Scalar::Util qw(reftype);
@@ -12,10 +12,10 @@ sub _new {
     my (%options) = @_ % 2 ? (fh => @_) : @_;
 
     bless {
-        bless     => !!$options{bless},
-        strict    => !!$options{strict},
-        fh        => defined $options{fh} ? $options{fh} : \*STDIN,
-        annotated => $options{annotated}
+        bless    => !!$options{bless},
+        strict   => !!$options{strict},
+        fh       => defined $options{fh} ? $options{fh} : \*STDIN,
+        annotate => $options{annotate}
     }, $class;
 }
 
@@ -122,7 +122,7 @@ Return records as instances of L<PICA::Data> (disabled by default).
 By default faulty fields in records are skipped with warnings. You can make
 them fatal by setting the I<strict> parameter to 1.
 
-=item annotated
+=item annotate
 
 By default some parsers also support annotated PICA. Set to true to enforce
 field annotations or to false to forbid them.

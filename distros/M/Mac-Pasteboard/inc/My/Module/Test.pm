@@ -16,7 +16,7 @@ no if "$]" >= 5.020, feature => qw{ signatures };
 # This occurs in both inc/My/Module/Meta.pm and inc/My/Module/Test.pm
 use constant CAN_USE_UNICODE	=> "$]" >= 5.008004;
 
-our $VERSION = '0.014';
+our $VERSION = '0.015';
 
 our @EXPORT =		## no critic (ProhibitAutomaticExportation)
 qw{
@@ -79,11 +79,17 @@ sub hex_diag ($;$) {
 	( @_ > 1 ? [ expected => $expect ] : () ),
     ) {
 	my ( $name, $value ) = @{ $_ };
-	use bytes;
-	my $hex = unpack 'H*', $value;
+	my $hex = do {
+	    use bytes;
+	    unpack 'H*', $value;
+	};
 	$hex =~ s/ ( .. ) /$1 /smxg;
 	$hex =~ s/ \s+ \z //smx;
 	diag sprintf '%12s: %s', $name, $hex;
+	if ( $ENV{DEVELOPER_DEBUG} ) {
+	    require Devel::Peek;
+	    Devel::Peek::Dump( $value );
+	}
     }
     return;
 }

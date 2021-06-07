@@ -5,14 +5,13 @@ use utf8;
 #use aliased 'PGXN::Site::Request';
 use Plack::Request;
 use Plack::Response;
-use PGXN::Site::Locale;
 use PGXN::Site::Templates;
 use HTML::TagCloud;
 use Encode;
 use WWW::PGXN;
 use List::MoreUtils qw(any);
 use namespace::autoclean;
-our $VERSION = v0.20.2;
+our $VERSION = v0.22.0;
 
 Template::Declare->init( dispatch_to => ['PGXN::Site::Templates'] );
 
@@ -31,15 +30,17 @@ my %code_for = (
 sub new {
     my ($class, %p) = @_;
 
-    unless ($p{api_url} && $p{errors_to} && $p{errors_from} && $p{feedback_to}) {
-        die "Missing required parameters api_url, errors_to, errors_from, and feedback_to\n";
+    unless ($p{base_url} && $p{api_url} && $p{errors_to} && $p{errors_from} && $p{feedback_to}) {
+        die "Missing required parameters base_url, api_url, errors_to, errors_from, and feedback_to\n";
     }
 
-    (my $api_url = $p{api_url}) =~ s{/$}{};
+    (my $api_url  = $p{api_url})  =~ s{/+$}{};
+    (my $base_url = $p{base_url}) =~ s{/+$}{};
     bless {
         errors_to   => $p{errors_to},
         errors_from => $p{errors_from},
         feedback_to => $p{feedback_to},
+        base_url    => URI->new($base_url),
         api_url     => URI->new($api_url),
         api         => WWW::PGXN->new(
             url   =>  $p{private_api_url} || $api_url,
@@ -49,15 +50,17 @@ sub new {
 }
 
 sub api         { shift->{api}         }
+sub base_url    { shift->{base_url}    }
 sub api_url     { shift->{api_url}     }
 sub errors_to   { shift->{errors_to}   }
 sub errors_from { shift->{errors_from} }
-sub feedback_to { shift->{feedback_to}   }
+sub feedback_to { shift->{feedback_to} }
 
 sub render {
     my ($self, $template, $p) = @_;
     my $req = $p->{req} ||= Plack::Request->new($p->{env});
     my $res = $req->new_response($p->{code} || 200);
+    $p->{vars}{base_url} = $self->base_url;
     my $body = encode_utf8 +Template::Declare->show($template, $p->{req}, $p->{vars});
     $res->body($body);
     $res->content_length(length $body);
@@ -77,18 +80,23 @@ sub missing {
     $self->render('/notfound', { env => $env, code => $code_for{notfound} });
 }
 
-sub home {
-    my $self  = shift;
+sub _cloud {
+    my $self = shift;
     my $cloud = HTML::TagCloud->new(levels => 12);
     my $tags  = $self->api->get_stats('tag');
     $cloud->add($_->{tag}, "/tag/$_->{tag}/", $_->{dists})
         for grep { $_->{tag} = lc $_->{tag} } @{ $tags->{popular} };
+    return $cloud;
+}
+
+sub home {
+    my $self  = shift;
     my $dists = $self->api->get_stats('dist')->{recent};
     splice @{ $dists }, 5;
     $self->render('/home', {
         env => shift,
         vars => {
-            cloud => $cloud,
+            cloud => _cloud($self),
             dists => $dists,
         },
     });
@@ -158,6 +166,7 @@ sub distribution {
         dist      => $dist,
         api_url   => $self->api_url,
         dist_name => $dist->{name} . ($version ? " $version" : ''),
+        user      => $self->api->get_user($dist->user),
     }});
 }
 
@@ -177,6 +186,7 @@ sub document {
         body      => $doc,
         dist_uri  => $dist_uri,
         dist_name => $dist_name,
+        user      => $self->api->get_user($dist->user),
     }});
 }
 
@@ -221,6 +231,14 @@ sub users {
         api   => $self->api,
         users => $char ? $self->api->get_userlist($char) : undef,
     }});
+}
+
+sub tags {
+    my $self = shift;
+    $self->render('/tags', {
+        env  => shift,
+        vars => { cloud => _cloud($self) },
+    });
 }
 
 sub tag {
@@ -393,6 +411,12 @@ Returns the URL used to link to the API in the UI. If C<private_api_url> is
 not passed to C<new()>, this URL is also used for communicating with the API
 via the L<WWW::PGXN> object returned by C<api>.
 
+=head3 C<base_url>
+
+  my $base_url = $controller->base_url;
+
+Returns the base URL for the site. Used for links that must be absolute.
+
 =head3 C<errors_to>
 
   my $errors_to = $controller->errors_to;
@@ -492,6 +516,12 @@ Displays the HTML for the user page.
 
 Displays the HTML for the users search page.
 
+=head3 C<tags>
+
+  PGXN::Site::Controller->tags($env);
+
+Displays the HTML for the tags page, including search form and tag cloud.
+
 =head3 C<tag>
 
   PGXN::Site::Controller->tag($env);
@@ -554,7 +584,7 @@ Handles 404 and 405 errors from Router::Resource.
 
 =head1 Author
 
-David E. Wheeler <david.wheeler@pgexperts.com>
+David E. Wheeler <david@justatheory.com>
 
 =head1 Copyright and License
 

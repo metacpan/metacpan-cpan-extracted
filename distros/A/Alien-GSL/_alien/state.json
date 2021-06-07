@@ -1,0 +1,47 @@
+{
+   "args" : [
+      "root",
+      "_alien",
+      "meta_prop",
+      {}
+   ],
+   "install" : {
+      "mm" : {
+         "distname" : "Alien-GSL"
+      },
+      "old" : {
+         "prefix" : "/home/ollisg/opt/perl/5.34.0/lib/site_perl/5.34.0/x86_64-linux/auto/share/dist/Alien-GSL",
+         "runtime" : {
+            "alien_build_version" : "2.40",
+            "cflags" : "",
+            "cflags_static" : "",
+            "install_type" : "system",
+            "legacy" : {
+               "finished_installing" : 1,
+               "install_type" : "system",
+               "name" : "gsl",
+               "original_prefix" : "/home/ollisg/opt/perl/5.34.0/lib/site_perl/5.34.0/x86_64-linux/auto/share/dist/Alien-GSL",
+               "version" : "2.5"
+            },
+            "libs" : "-lgsl -lgslcblas -lm ",
+            "libs_static" : "-lgsl -lgslcblas -lm ",
+            "perl_module_version" : "1.01",
+            "prefix" : "/home/ollisg/opt/perl/5.34.0/lib/site_perl/5.34.0/x86_64-linux/auto/share/dist/Alien-GSL",
+            "version" : "2.5"
+         }
+      },
+      "patch" : null,
+      "root" : "/home/ollisg/dev/Alien-GSL/_alien",
+      "stage" : "/home/ollisg/dev/Alien-GSL/blib/lib/auto/share/dist/Alien-GSL",
+      "system_probe_class" : "Alien::Build::Plugin::PkgConfig::LibPkgConf",
+      "system_probe_instance_id" : "71387b9465f1e8743dbed138dd448e27b2ec90fd"
+   },
+   "plugin_instance" : {},
+   "runtime" : {
+      "alien_build_version" : "2.40",
+      "install_type" : "system",
+      "legacy" : {
+         "name" : "gsl"
+      }
+   }
+}

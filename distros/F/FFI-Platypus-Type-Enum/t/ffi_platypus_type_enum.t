@@ -1,6 +1,7 @@
 use Test2::V0 -no_srand => 1;
 use FFI::Platypus 1.00;
 use FFI::Platypus::Type::Enum;
+use Scalar::Util qw( isdual );
 
 subtest 'default positive enum' => sub {
   my $ffi = FFI::Platypus->new( api => 1 );
@@ -155,6 +156,16 @@ subtest 'make constants' => sub {
   is(Foo1::NEXT(), 4);
   is(Foo1::FOO(), 4);
   is(Foo1::BAR(), 4);
+
+  $ffi->load_custom_type('::Enum', 'enum2', { package => ['Foo1::Bar1','Foo1::Bar2'] },
+    'one',
+    'two',
+  );
+
+  is(Foo1::Bar1::ONE(), 0);
+  is(Foo1::Bar2::ONE(), 0);
+  is(Foo1::Bar1::TWO(), 1);
+  is(Foo1::Bar2::TWO(), 1);
 };
 
 subtest 'make constants with prefix' => sub {
@@ -174,7 +185,7 @@ subtest 'define errors' => sub {
 
   is(
     dies { $ffi->load_custom_type('::Enum','enum1', { rev => 'foo' }) },
-    match qr/rev must be either 'int', or 'str'/,
+    match qr/rev must be either 'int', 'str', or 'dualvar'/,
   );
 
   is(
@@ -193,6 +204,26 @@ subtest 'define errors' => sub {
   );
 };
 
+sub dv
+{
+  [ isdual $_[0] ? (int($_[0]), "$_[0]") : $_[0] ];
+}
+
+subtest 'dualvar' => sub {
+
+  my $ffi = FFI::Platypus->new( api => 1 );
+
+  $ffi->load_custom_type('::Enum', 'enum1', { rev => 'dualvar', type => 'int' },
+    'zero',
+    'one',
+    'two',
+  );
+
+  is(dv($ffi->cast('int', 'enum1', 0)),  [ 0, 'zero' ]);
+  is(dv($ffi->cast('int', 'enum1', 1)),  [ 1, 'one'  ]);
+  is(dv($ffi->cast('int', 'enum1', 2)),  [ 2, 'two'  ]);
+  is(dv($ffi->cast('int', 'enum1', 3)),  [ 3, 3      ]);
+
+};
+
 done_testing;
-
-

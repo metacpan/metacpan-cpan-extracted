@@ -20,6 +20,6 @@ for my $aref (@data) {
 	ok !$form->valid, "an error occurs (as expected)";
 	my @errors = @{$form->errors};
 	is scalar @errors, 1, "a single error is present";
-	isa_ok $errors[0], $aref->[1], "error type matches";
+	isa_ok $errors[0], $aref->[1];
 }
 done_testing();

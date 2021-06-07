@@ -1,9 +1,11 @@
 package Prometheus::Tiny;
-$Prometheus::Tiny::VERSION = '0.006';
+$Prometheus::Tiny::VERSION = '0.007';
 # ABSTRACT: A tiny Prometheus client
 
 use warnings;
 use strict;
+
+use Carp qw(croak);
 
 my $DEFAULT_BUCKETS = [
                0.005,
@@ -79,6 +81,24 @@ sub histogram_observe {
 
 sub declare {
   my ($self, $name, %meta) = @_;
+
+  if (my $old = $self->{meta}{$name}) {
+    if (
+      ((exists $old->{type} ^ exists $meta{type}) ||
+       (exists $old->{type} && $old->{type} ne $meta{type})) ||
+      ((exists $old->{help} ^ exists $meta{help}) ||
+       (exists $old->{help} && $old->{help} ne $meta{help})) ||
+      ((exists $old->{buckets} ^ exists $meta{buckets}) ||
+       (exists $old->{buckets} && (
+        @{$old->{buckets}} ne @{$meta{buckets}} ||
+        grep { $old->{buckets}[$_] != $meta{buckets}[$_] } (0 .. $#{$meta{buckets}})
+       ))
+      )
+    ) {
+      croak "redeclaration of '$name' with mismatched meta";
+    }
+  }
+
   $self->{meta}{$name} = { %meta };
   return;
 }
@@ -227,16 +247,36 @@ Remove all stored metric values. Metric metadata (set by C<declare>) is preserve
 
 Record a histogram observation. The labels hashref is optional.
 
+You should declare your metric beforehand, using the C<buckets> key to set the
+buckets you want to use. If you don't, the following buckets will be used.
+
+    [ 0.005, 0.01, 0.025, 0.05, 0.075, 0.1, 0.25, 0.5, 0.75, 1.0, 2.5, 5.0, 7.5, 10 ]
+
+
 =head2 declare
 
     $prom->declare($name, help => $help, type => $type, buckets => [...])
 
-"Declare" a metric by setting its help text or type.
+"Declare" a metric by associating metadata with it. Valid keys are:
 
-For histogram metrics, you can optionally specify the buckets to use. If you
-don't, and later call C<histogram_observe>, the following buckets will be used:
+=over 4
 
-    [ 0.005, 0.01, 0.025, 0.05, 0.075, 0.1, 0.25, 0.5, 0.75, 1.0, 2.5, 5.0, 7.5, 10 ]
+=item C<help>
+
+Text describing the metric. This will appear in the formatted output sent to Prometheus.
+
+=item C<type>
+
+Type of the metric, typically C<gauge> or C<counter>.
+
+=item C<buckets>
+
+For C<histogram> metrics, an arrayref of the buckets to use. See C<histogram_observe>.
+
+=back
+
+Declaring a already-declared metric will work, but only if the metadata keys
+and values match the previous call. If not, C<declare> will throw an exception.
 
 =head2 format
 

@@ -8,8 +8,8 @@ require Exporter;
 use warnings;
 use strict;
 use Carp;
-use JSON::Parse 'json_file_to_perl';
-our $VERSION = '0.07';
+use JSON::Parse 'read_json';
+our $VERSION = '0.08';
 require XSLoader;
 XSLoader::load ('HTML::Valid', $VERSION);
 
@@ -28,7 +28,7 @@ sub read_ok_options
 {
     my $ok_options_file = __FILE__;
     $ok_options_file =~ s!Valid\.pm$!Valid/ok-options.json!;
-    return json_file_to_perl ($ok_options_file);
+    return read_json ($ok_options_file);
 }
 
 my $ok_options;

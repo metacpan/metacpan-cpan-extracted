@@ -1,0 +1,30 @@
+%# XXX: This should be moved to Mojolicious::Plugin::Moai
+% if ( !$c->stash->{zapp}{include}{textarea} ) {
+    % content_for after_head => begin
+        <link rel="stylesheet" href="/zapp/textarea.css" type="text/css">
+        <script>
+            document.addEventListener('DOMContentLoaded', function ( event ) {
+                document.querySelectorAll( '.grow-wrap textarea' ).forEach( function (el) {
+                    // This causes a slight blink when the DOM is loaded. It would
+                    // be nice if we could remove this and have the textarea start
+                    // the correct size for the content.
+                    el.parentNode.dataset.replicatedValue = el.value;
+                } );
+            });
+            if ( !window.zapp ) {
+                window.zapp = {};
+            }
+            window.zapp.growTextAreas = true;
+        </script>
+    % end
+    % $c->stash->{zapp}{include}{textarea} = 1;
+% }
+
+<div class="grow-wrap">
+    <!-- XXX: support markdown -->
+    <%= text_area $name, stash( 'value' ) // '',
+        class => 'form-control',
+        oninput => 'this.parentNode.dataset.replicatedValue = this.value',
+        @{ stash( 'args' ) // [] },
+    %>
+</div>

@@ -62,7 +62,7 @@
       },
       "AsposeCellsCloud::CellsApi" : {
          "file" : "lib/AsposeCellsCloud/CellsApi.pm",
-         "version" : "21.1"
+         "version" : "21.5"
       },
       "AsposeCellsCloud::Configuration" : {
          "file" : "lib/AsposeCellsCloud/Configuration.pm"
@@ -139,6 +139,9 @@
       "AsposeCellsCloud::Object::CellsObjectOperateTaskParameter" : {
          "file" : "lib/AsposeCellsCloud/Object/CellsObjectOperateTaskParameter.pm"
       },
+      "AsposeCellsCloud::Object::WorksheetOperateParameter" : {
+         "file" : "lib/AsposeCellsCloud/Object/WorksheetOperateParameter.pm"
+      },      
       "AsposeCellsCloud::Object::ConvertWorksheetTaskParameter" : {
          "file" : "lib/AsposeCellsCloud/Object/ConvertWorksheetTaskParameter.pm"
       },

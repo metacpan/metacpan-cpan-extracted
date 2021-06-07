@@ -1,11 +1,11 @@
 use strict;
 use warnings;
-package JSON::Schema::Tiny; # git description: v0.002-24-g2f7067b
+package JSON::Schema::Tiny; # git description: v0.005-10-ga1acb0b
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Validate data against a schema, minimally
 # KEYWORDS: JSON Schema data validation structure specification tiny
 
-our $VERSION = '0.003';
+our $VERSION = '0.006';
 
 use 5.016;  # for the unicode_strings feature
 no if "$]" >= 5.031009, feature => 'indirect';
@@ -16,12 +16,13 @@ use B;
 use Ref::Util 0.100 qw(is_plain_arrayref is_plain_hashref is_ref);
 use Mojo::URL;
 use Mojo::JSON::Pointer;
-use Carp 'croak';
+use Carp qw(croak carp);
 use Storable 'dclone';
 use JSON::MaybeXS 1.004001 'is_bool';
 use Feature::Compat::Try;
 use JSON::PP ();
 use List::Util 1.33 'any';
+use Scalar::Util 'blessed';
 use namespace::clean;
 use Exporter 5.57 'import';
 
@@ -32,21 +33,34 @@ our $SHORT_CIRCUIT = 0;
 our $MAX_TRAVERSAL_DEPTH = 50;
 our $MOJO_BOOLEANS = 0;
 
-sub evaluate {
-  my ($data, $schema) = @_;
+sub new {
+  my ($class, %args) = @_;
+  bless(\%args, $class);
+}
 
+sub evaluate {
   croak 'evaluate called in void context' if not defined wantarray;
+
+  local $BOOLEAN_RESULT = $_[0]->{boolean_result} // $BOOLEAN_RESULT,
+  local $SHORT_CIRCUIT = $_[0]->{short_circuit} // $SHORT_CIRCUIT,
+  local $MAX_TRAVERSAL_DEPTH = $_[0]->{max_traversal_depth} // $MAX_TRAVERSAL_DEPTH,
+  local $MOJO_BOOLEANS = $_[0]->{mojo_booleans} // $MOJO_BOOLEANS,
+  shift
+    if blessed($_[0]) and blessed($_[0])->isa(__PACKAGE__);
+
+  croak 'insufficient arguments' if @_ < 2;
+  my ($data, $schema) = @_;
 
   my $state = {
     depth => 0,
     data_path => '',
-    traversed_schema_path => '',            # the accumulated path up to the last $ref traversal
-    canonical_schema_uri => Mojo::URL->new, # the canonical path of the last traversed $ref
-    schema_path => '',                      # the rest of the path, since the last traversed $ref
+    traversed_schema_path => '',          # the accumulated traversal path up to the last $ref traversal
+    initial_schema_uri => Mojo::URL->new, # the canonical URI as of the start or the last traversed $ref
+    schema_path => '',                    # the rest of the path, since the start or the last traversed $ref
     errors => [],
     seen => {},
     short_circuit => $BOOLEAN_RESULT || $SHORT_CIRCUIT,
-    root_schema => $schema,
+    root_schema => $schema,                 # so we can do $refs within the same document
   };
 
   my $valid;
@@ -74,7 +88,15 @@ sub evaluate {
 
 ######## NO PUBLIC INTERFACES FOLLOW THIS POINT ########
 
+# keyword => undef, or arrayref of alternatives
+my %removed_keywords = (
+  definitions => [ '$defs' ],
+  dependencies => [ qw(dependentSchemas dependentRequired) ],
+);
+
 sub _eval {
+  croak '_eval called in void context' if not defined wantarray;
+  croak 'insufficient arguments' if @_ < 3;
   my ($data, $schema, $state) = @_;
 
   # do not propagate upwards changes to depth, traversed paths,
@@ -102,11 +124,13 @@ sub _eval {
 
   foreach my $keyword (
     # CORE KEYWORDS
-    qw($schema $ref $defs),
+    qw($id $schema $anchor $recursiveAnchor $ref $recursiveRef $vocabulary $comment $defs),
     # APPLICATOR KEYWORDS
     qw(allOf anyOf oneOf not if dependentSchemas
       items additionalItems contains
       properties patternProperties additionalProperties propertyNames),
+    # UNEVALUATED KEYWORDS
+    qw(unevaluatedItems unevaluatedProperties),
     # VALIDATOR KEYWORDS
     qw(type enum const
       multipleOf maximum exclusiveMaximum minimum exclusiveMinimum
@@ -118,22 +142,30 @@ sub _eval {
     next if not exists $schema->{$keyword};
 
     $state->{keyword} = $keyword;
+    my $error_count = @{$state->{errors}};
 
     my $sub = __PACKAGE__->can('_eval_keyword_'.($keyword =~ s/^\$//r));
-    $valid = 0 if not $sub->($data, $schema, $state);
+    if (not $sub->($data, $schema, $state)) {
+      warn 'result is false but there are no errors (keyword: '.$keyword.')'
+        if $error_count == @{$state->{errors}};
+      $valid = 0;
+    }
 
     last if not $valid and $state->{short_circuit};
   }
 
-  # UNSUPPORTED KEYWORDS
-  foreach my $keyword (
-    # CORE KEYWORDS
-    qw($id $anchor $recursiveAnchor $recursiveRef $vocabulary $dynamicAnchor $dynamicRef definitions),
-    # APPLICATOR KEYWORDS
-    qw(dependencies prefixItems unevaluatedItems unevaluatedProperties),
-  ) {
+  # check for previously-supported but now removed keywords
+  foreach my $keyword (keys %removed_keywords) {
     next if not exists $schema->{$keyword};
-    abort({ %$state, keyword => $keyword }, 'keyword not supported');
+    my $message ='no-longer-supported "'.$keyword.'" keyword present (at location "'
+      .canonical_schema_uri($state).'")';
+    if ($removed_keywords{$keyword}) {
+      my @list = map '"'.$_.'"', @{$removed_keywords{$keyword}};
+      @list = ((map $_.',', @list[0..$#list-1]), $list[-1]) if @list > 2;
+      splice(@list, -1, 0, 'or') if @list > 1;
+      $message .= ': this should be rewritten as '.join(' ', @list);
+    }
+    carp $message;
   }
 
   return $valid;
@@ -158,21 +190,130 @@ sub _eval_keyword_ref {
 
   return if not assert_keyword_type($state, $schema, 'string');
 
-  abort($state, 'only same-document JSON pointers are supported in $ref')
-    if $schema->{'$ref'} !~ m{^#(/(?:[^~]|~[01])*|)$};
+  my $uri = Mojo::URL->new($schema->{'$ref'})->to_abs($state->{initial_schema_uri});
+  abort($state, '$refs to anchors are not supported')
+    if ($uri->fragment//'') !~ m{^(/(?:[^~]|~[01])*|)$};
 
-  my $uri = Mojo::URL->new($schema->{'$ref'});
-  my $fragment = $uri->fragment;
+  # the base of the $ref uri must be the same as the base of the root schema
+  # unfortunately this means that many uses of $ref won't work, because we don't
+  # track the locations of $ids in this or other documents.
+  abort($state, 'only same-document, same-base JSON pointers are supported in $ref')
+    if $uri->clone->fragment(undef) ne Mojo::URL->new($state->{root_schema}{'$id'}//'');
 
-  my $subschema = Mojo::JSON::Pointer->new($state->{root_schema})->get($fragment);
+  my $subschema = Mojo::JSON::Pointer->new($state->{root_schema})->get($uri->fragment);
   abort($state, 'EXCEPTION: unable to find resource %s', $uri) if not defined $subschema;
 
   return _eval($data, $subschema,
     +{ %$state,
       traversed_schema_path => $state->{traversed_schema_path}.$state->{schema_path}.'/$ref',
-      canonical_schema_uri => $uri,
+      initial_schema_uri => $uri,
       schema_path => '',
     });
+}
+
+sub _eval_keyword_recursiveRef {
+  my ($data, $schema, $state) = @_;
+
+  return if not assert_keyword_type($state, $schema, 'string');
+
+  my $uri = Mojo::URL->new($schema->{'$recursiveRef'})->to_abs($state->{canonical_schema_uri});
+
+  abort($state, '$refs to anchors are not supported')
+    if ($uri->fragment//'') !~ m{^(/(?:[^~]|~[01])*|)$};
+
+  # the base of the $ref uri must be the same as the base of the root schema.
+  # unfortunately this means that nearly all usecases of $recursiveRef won't work, because we don't
+  # track the locations of $ids in this or other documents.
+  abort($state, 'only same-document, same-base JSON pointers are supported in $recursiveRef')
+    if $uri->clone->fragment(undef) ne Mojo::URL->new($state->{root_schema}{'$id'}//'');
+
+  my $subschema = Mojo::JSON::Pointer->new($state->{root_schema})->get($uri->fragment);
+  abort($state, 'EXCEPTION: unable to find resource %s', $uri) if not defined $subschema;
+
+  if (is_type('boolean', $subschema->{'$recursiveAnchor'}) and $subschema->{'$recursiveAnchor'}) {
+    $uri = Mojo::URL->new($schema->{'$recursiveRef'})
+      ->to_abs($state->{recursive_anchor_uri} // $state->{initial_schema_uri});
+    $subschema = Mojo::JSON::Pointer->new($state->{root_schema})->get($uri->fragment);
+    abort($state, 'EXCEPTION: unable to find resource %s', $uri) if not defined $subschema;
+  }
+
+  return _eval($data, $subschema,
+    +{ %$state,
+      traversed_schema_path => $state->{traversed_schema_path}.$state->{schema_path}.'/$recursiveRef',
+      initial_schema_uri => $uri,
+      schema_path => '',
+    });
+}
+
+sub _eval_keyword_id {
+  my ($data, $schema, $state) = @_;
+
+  return if not assert_keyword_type($state, $schema, 'string');
+
+  my $uri = Mojo::URL->new($schema->{'$id'});
+  abort($state, '$id value should not equal "%s"', $uri) if $uri eq '' or $uri eq '#';
+  abort($state, '$id value "%s" cannot have a non-empty fragment', $uri) if length $uri->fragment;
+
+  $uri->fragment(undef);
+  $state->{initial_schema_uri} = $uri->is_abs ? $uri : $uri->to_abs($state->{initial_schema_uri});
+  $state->{traversed_schema_path} = $state->{traversed_schema_path}.$state->{schema_path};
+  $state->{schema_path} = '';
+
+  return 1;
+}
+
+sub _eval_keyword_anchor {
+  my ($data, $schema, $state) = @_;
+
+  return if not assert_keyword_type($state, $schema, 'string');
+
+  return 1 if $schema->{'$anchor'} =~ /^[A-Za-z][A-Za-z0-9_:.-]*$/;
+  abort($state, '$anchor value does not match required syntax');
+}
+
+sub _eval_keyword_recursiveAnchor {
+  my ($data, $schema, $state) = @_;
+
+  return if not assert_keyword_type($state, $schema, 'boolean');
+  return 1 if not $schema->{'$recursiveAnchor'};
+
+  # this is required because the location is used as the base URI for future resolution
+  # of $recursiveRef, and the fragment would be disregarded in the base
+  abort($state, '"$recursiveAnchor" keyword used without "$id"')
+    if not exists $schema->{'$id'};
+
+  # record the canonical location of the current position, to be used against future resolution
+  # of a $recursiveRef uri -- as if it was the current location when we encounter a $ref.
+  $state->{recursive_anchor_uri} = canonical_schema_uri($state);
+
+  return 1;
+}
+
+sub _eval_keyword_vocabulary {
+  my ($data, $schema, $state) = @_;
+
+  return if not assert_keyword_type($state, $schema, 'object');
+
+  foreach my $property (sort keys %{$schema->{'$vocabulary'}}) {
+    abort($state, '$vocabulary/%s value is not a boolean', $property)
+      if not is_type('boolean', $schema->{'$vocabulary'}{$property});
+
+    assert_uri($state, $schema, $property);
+  }
+
+  abort($state, '$vocabulary can only appear at the schema resource root')
+    if length($state->{schema_path});
+
+  abort($state, '$vocabulary can only appear at the document root')
+    if length($state->{traversed_schema_path}.$state->{schema_path});
+
+  return 1;
+}
+
+sub _eval_keyword_comment {
+  my ($data, $schema, $state) = @_;
+  return if not assert_keyword_type($state, $schema, 'string');
+  return 1;
 }
 
 sub _eval_keyword_defs {
@@ -411,7 +552,7 @@ sub _eval_keyword_dependentRequired {
 
   return if not assert_keyword_type($state, $schema, 'object');
 
-  foreach my $property (keys %{$schema->{dependentRequired}}) {
+  foreach my $property (sort keys %{$schema->{dependentRequired}}) {
     E({ %$state, _schema_path_suffix => $property }, 'dependentRequired value is not an array'), next
       if not is_type('array', $schema->{dependentRequired}{$property});
 
@@ -427,7 +568,7 @@ sub _eval_keyword_dependentRequired {
   return 1 if not is_type('object', $data);
 
   my $valid = 1;
-  foreach my $property (keys %{$schema->{dependentRequired}}) {
+  foreach my $property (sort keys %{$schema->{dependentRequired}}) {
     next if not exists $data->{$property};
 
     if (my @missing = grep !exists($data->{$_}), @{$schema->{dependentRequired}{$property}}) {
@@ -543,7 +684,7 @@ sub _eval_keyword_dependentSchemas {
     last if $state->{short_circuit};
   }
 
-  return E($state, 'not all subschemas are valid') if not $valid;
+  return E($state, 'not all dependencies are satisfied') if not $valid;
   return 1;
 }
 
@@ -773,6 +914,15 @@ sub _eval_keyword_propertyNames {
   return 1;
 }
 
+sub _eval_keyword_unevaluatedItems {
+  my ($data, $schema, $state) = @_;
+  abort($state, 'keyword not supported');
+}
+
+sub _eval_keyword_unevaluatedProperties {
+  my ($data, $schema, $state) = @_;
+  abort($state, 'keyword not supported');
+}
 
 # UTILITIES
 
@@ -861,7 +1011,7 @@ sub is_equal {
   if ($types[0] eq 'object') {
     return 0 if keys %$x != keys %$y;
     return 0 if not is_equal([ sort keys %$x ], [ sort keys %$y ]);
-    foreach my $property (keys %$x) {
+    foreach my $property (sort keys %$x) {
       $state->{path} = jsonp($path, $property);
       return 0 if not is_equal($x->{$property}, $y->{$property}, $state);
     }
@@ -904,7 +1054,7 @@ sub jsonp {
 sub canonical_schema_uri {
   my ($state, @extra_path) = @_;
 
-  my $uri = $state->{canonical_schema_uri}->clone;
+  my $uri = $state->{initial_schema_uri}->clone;
   $uri->fragment(($uri->fragment//'').jsonp($state->{schema_path}, @extra_path));
   $uri->fragment(undef) if not length($uri->fragment);
   $uri;
@@ -921,7 +1071,7 @@ sub E {
     .jsonp($state->{schema_path}, $state->{keyword}, delete $state->{_schema_path_suffix});
 
   undef $uri if $uri eq '' and $keyword_location eq ''
-    or ($uri->fragment//'') eq $keyword_location;
+    or ($uri->fragment//'') eq $keyword_location and $uri->clone->fragment(undef) eq '';
 
   push @{$state->{errors}}, {
     instanceLocation => $state->{data_path},
@@ -959,6 +1109,25 @@ sub assert_pattern {
   return 1;
 }
 
+sub assert_uri {
+  my ($state, $schema, $override) = @_;
+
+  my $string = $override // $schema->{$state->{keyword}};
+  my $uri = Mojo::URL->new($string);
+
+  abort($state, '"%s" is not a valid URI', $string)
+    # see also uri format sub
+    if fc($uri->to_unsafe_string) ne fc($string)
+      or $string =~ /[^[:ascii:]]/
+      or not $uri->is_abs
+      or $string =~ /#/
+        and $string !~ m{#$}                          # empty fragment
+        and $string !~ m{#[A-Za-z][A-Za-z0-9_:.-]*$}  # plain-name fragment
+        and $string !~ m{#/(?:[^~]|~[01])*$};         # json pointer fragment
+
+  return 1;
+}
+
 sub assert_non_negative_integer {
   my ($schema, $state) = @_;
 
@@ -992,18 +1161,24 @@ JSON::Schema::Tiny - Validate data against a schema, minimally
 
 =head1 VERSION
 
-version 0.003
+version 0.006
 
 =head1 SYNOPSIS
-
-  use JSON::Schema::Tiny qw(evaluate);
 
   my $data = { hello => 1 };
   my $schema = {
     type => "object",
     properties => { hello => { type => "integer" } },
   };
+
+  # functional interface:
+  use JSON::Schema::Tiny qw(evaluate);
   my $result = evaluate($data, $schema); # { valid => true }
+
+  # object-oriented interface:
+  use JSON::Schema::Tiny;
+  my $js = JSON::Schema::Tiny->new;
+  my $result = $js->evaluate($data, $schema); # { valid => true }
 
 =head1 DESCRIPTION
 
@@ -1014,7 +1189,8 @@ specification. (See L</UNSUPPORTED JSON-SCHEMA FEATURES> below for exclusions.)
 =head1 FUNCTIONS
 
 =for Pod::Coverage is_type get_type is_equal is_elements_unique jsonp canonical_schema_uri E abort
-assert_keyword_type assert_pattern assert_non_negative_integer assert_array_schemas
+assert_keyword_type assert_pattern assert_uri assert_non_negative_integer assert_array_schemas
+new
 
 =head2 evaluate
 
@@ -1063,7 +1239,8 @@ failure).
 =head1 OPTIONS
 
 All options are available as package-scoped global variables. Use L<local|perlfunc/local> to
-configure them for a local scope.
+configure them for a local scope. They may also be set via the constructor, as lower-cased values in
+a hash, e.g.: C<< JSON::Schema::Tiny->new(boolean_result => 1, max_traversal_depth => 10); >>
 
 =head2 C<$BOOLEAN_RESULT>
 
@@ -1198,11 +1375,17 @@ L<Understanding JSON Schema|https://json-schema.org/understanding-json-schema>: 
 
 Bugs may be submitted through L<https://github.com/karenetheridge/JSON-Schema-Tiny/issues>.
 
-I am also usually active on irc, as 'ether' at C<irc.perl.org> and C<irc.freenode.org>.
+I am also usually active on irc, as 'ether' at C<irc.perl.org> and C<irc.libera.chat>.
 
 =head1 AUTHOR
 
 Karen Etheridge <ether@cpan.org>
+
+=head1 CONTRIBUTOR
+
+=for stopwords Matt S Trout
+
+Matt S Trout <mst@shadowcat.co.uk>
 
 =head1 COPYRIGHT AND LICENCE
 

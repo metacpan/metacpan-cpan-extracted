@@ -1,3 +1,4 @@
+use v5;
 use strict;
 use warnings;
 
@@ -7,6 +8,8 @@ my $build = Module::Build->new(
    module_name => 'Metrics::Any::Adapter::Statsd',
    requires => {
       'IO::Socket::INET' => 0,
+
+      'perl' => '5.014', # package NAME VERSION
    },
    test_requires => {
       'Metrics::Any' => '0.05',

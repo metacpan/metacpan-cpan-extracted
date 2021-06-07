@@ -2,8 +2,8 @@ NAME
     App::cryp::arbit - Cryptocurrency arbitrage utility
 
 VERSION
-    This document describes version 0.009 of App::cryp::arbit (from Perl
-    distribution App-cryp-arbit), released on 2018-12-03.
+    This document describes version 0.010 of App::cryp::arbit (from Perl
+    distribution App-cryp-arbit), released on 2021-05-26.
 
 SYNOPSIS
     Please see included script cryp-arbit.
@@ -110,7 +110,7 @@ FUNCTIONS
   arbit
     Usage:
 
-     arbit(%args) -> [status, msg, payload, meta]
+     arbit(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
     Perform arbitrage.
 
@@ -264,19 +264,22 @@ FUNCTIONS
 
     Returns an enveloped result (an array).
 
-    First element (status) is an integer containing HTTP status code (200
-    means OK, 4xx caller error, 5xx function error). Second element (msg) is
-    a string containing error message, or 'OK' if status is 200. Third
-    element (payload) is optional, the actual result. Fourth element (meta)
-    is called result metadata and is optional, a hash that contains extra
-    information.
+    First element ($status_code) is an integer containing HTTP-like status
+    code (200 means OK, 4xx caller error, 5xx function error). Second
+    element ($reason) is a string containing error message, or something
+    like "OK" if status is 200. Third element ($payload) is the actual
+    result, but usually not present when enveloped result is an error
+    response ($status_code is not 2xx). Fourth element (%result_meta) is
+    called result metadata and is optional, a hash that contains extra
+    information, much like how HTTP response headers provide additional
+    metadata.
 
     Return value: (any)
 
   check_orders
     Usage:
 
-     check_orders(%args) -> [status, msg, payload, meta]
+     check_orders(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
     Check the orders that have been created.
 
@@ -307,19 +310,22 @@ FUNCTIONS
 
     Returns an enveloped result (an array).
 
-    First element (status) is an integer containing HTTP status code (200
-    means OK, 4xx caller error, 5xx function error). Second element (msg) is
-    a string containing error message, or 'OK' if status is 200. Third
-    element (payload) is optional, the actual result. Fourth element (meta)
-    is called result metadata and is optional, a hash that contains extra
-    information.
+    First element ($status_code) is an integer containing HTTP-like status
+    code (200 means OK, 4xx caller error, 5xx function error). Second
+    element ($reason) is a string containing error message, or something
+    like "OK" if status is 200. Third element ($payload) is the actual
+    result, but usually not present when enveloped result is an error
+    response ($status_code is not 2xx). Fourth element (%result_meta) is
+    called result metadata and is optional, a hash that contains extra
+    information, much like how HTTP response headers provide additional
+    metadata.
 
     Return value: (any)
 
   collect_orderbooks
     Usage:
 
-     collect_orderbooks(%args) -> [status, msg, payload, meta]
+     collect_orderbooks(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
     Collect orderbooks into the database.
 
@@ -373,19 +379,22 @@ FUNCTIONS
 
     Returns an enveloped result (an array).
 
-    First element (status) is an integer containing HTTP status code (200
-    means OK, 4xx caller error, 5xx function error). Second element (msg) is
-    a string containing error message, or 'OK' if status is 200. Third
-    element (payload) is optional, the actual result. Fourth element (meta)
-    is called result metadata and is optional, a hash that contains extra
-    information.
+    First element ($status_code) is an integer containing HTTP-like status
+    code (200 means OK, 4xx caller error, 5xx function error). Second
+    element ($reason) is a string containing error message, or something
+    like "OK" if status is 200. Third element ($payload) is the actual
+    result, but usually not present when enveloped result is an error
+    response ($status_code is not 2xx). Fourth element (%result_meta) is
+    called result metadata and is optional, a hash that contains extra
+    information, much like how HTTP response headers provide additional
+    metadata.
 
     Return value: (any)
 
   dump_cryp_config
     Usage:
 
-     dump_cryp_config() -> [status, msg, payload, meta]
+     dump_cryp_config() -> [$status_code, $reason, $payload, \%result_meta]
 
     This function is not exported.
 
@@ -393,19 +402,22 @@ FUNCTIONS
 
     Returns an enveloped result (an array).
 
-    First element (status) is an integer containing HTTP status code (200
-    means OK, 4xx caller error, 5xx function error). Second element (msg) is
-    a string containing error message, or 'OK' if status is 200. Third
-    element (payload) is optional, the actual result. Fourth element (meta)
-    is called result metadata and is optional, a hash that contains extra
-    information.
+    First element ($status_code) is an integer containing HTTP-like status
+    code (200 means OK, 4xx caller error, 5xx function error). Second
+    element ($reason) is a string containing error message, or something
+    like "OK" if status is 200. Third element ($payload) is the actual
+    result, but usually not present when enveloped result is an error
+    response ($status_code is not 2xx). Fourth element (%result_meta) is
+    called result metadata and is optional, a hash that contains extra
+    information, much like how HTTP response headers provide additional
+    metadata.
 
     Return value: (any)
 
   get_profit_report
     Usage:
 
-     get_profit_report(%args) -> [status, msg, payload, meta]
+     get_profit_report(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
     Get profit report.
 
@@ -435,19 +447,22 @@ FUNCTIONS
 
     Returns an enveloped result (an array).
 
-    First element (status) is an integer containing HTTP status code (200
-    means OK, 4xx caller error, 5xx function error). Second element (msg) is
-    a string containing error message, or 'OK' if status is 200. Third
-    element (payload) is optional, the actual result. Fourth element (meta)
-    is called result metadata and is optional, a hash that contains extra
-    information.
+    First element ($status_code) is an integer containing HTTP-like status
+    code (200 means OK, 4xx caller error, 5xx function error). Second
+    element ($reason) is a string containing error message, or something
+    like "OK" if status is 200. Third element ($payload) is the actual
+    result, but usually not present when enveloped result is an error
+    response ($status_code is not 2xx). Fourth element (%result_meta) is
+    called result metadata and is optional, a hash that contains extra
+    information, much like how HTTP response headers provide additional
+    metadata.
 
     Return value: (any)
 
   list_order_pairs
     Usage:
 
-     list_order_pairs(%args) -> [status, msg, payload, meta]
+     list_order_pairs(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
     List created order pairs.
 
@@ -469,19 +484,22 @@ FUNCTIONS
 
     Returns an enveloped result (an array).
 
-    First element (status) is an integer containing HTTP status code (200
-    means OK, 4xx caller error, 5xx function error). Second element (msg) is
-    a string containing error message, or 'OK' if status is 200. Third
-    element (payload) is optional, the actual result. Fourth element (meta)
-    is called result metadata and is optional, a hash that contains extra
-    information.
+    First element ($status_code) is an integer containing HTTP-like status
+    code (200 means OK, 4xx caller error, 5xx function error). Second
+    element ($reason) is a string containing error message, or something
+    like "OK" if status is 200. Third element ($payload) is the actual
+    result, but usually not present when enveloped result is an error
+    response ($status_code is not 2xx). Fourth element (%result_meta) is
+    called result metadata and is optional, a hash that contains extra
+    information, much like how HTTP response headers provide additional
+    metadata.
 
     Return value: (any)
 
   show_opportunities
     Usage:
 
-     show_opportunities(%args) -> [status, msg, payload, meta]
+     show_opportunities(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
     Show arbitrage opportunities.
 
@@ -596,25 +614,39 @@ FUNCTIONS
 
     Returns an enveloped result (an array).
 
-    First element (status) is an integer containing HTTP status code (200
-    means OK, 4xx caller error, 5xx function error). Second element (msg) is
-    a string containing error message, or 'OK' if status is 200. Third
-    element (payload) is optional, the actual result. Fourth element (meta)
-    is called result metadata and is optional, a hash that contains extra
-    information.
+    First element ($status_code) is an integer containing HTTP-like status
+    code (200 means OK, 4xx caller error, 5xx function error). Second
+    element ($reason) is a string containing error message, or something
+    like "OK" if status is 200. Third element ($payload) is the actual
+    result, but usually not present when enveloped result is an error
+    response ($status_code is not 2xx). Fourth element (%result_meta) is
+    called result metadata and is optional, a hash that contains extra
+    information, much like how HTTP response headers provide additional
+    metadata.
 
     Return value: (any)
 
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/App-cryp-arbit>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-App-cryp-arbit>.
+
 BUGS
-    Please report all bug reports or feature requests to
-    <mailto:stevenharyanto@gmail.com>.
+    Please report any bugs or feature requests on the bugtracker website
+    <https://github.com/perlancar/perl-App-cryp-arbit/issues>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
 
 SEE ALSO
 AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2018 by perlancar@cpan.org.
+    This software is copyright (c) 2021, 2018 by perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

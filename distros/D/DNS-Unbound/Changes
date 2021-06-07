@@ -1,5 +1,9 @@
 Revision history for Perl module DNS::Unbound
 
+0.23 Tue, 1 Jun 2021
+- Make unbound_version() a regular XSUB rather than a constant. This avoids
+  the need to recompile perlcc-compiled binaries when updating Unbound.
+
 0.22 Thu, 25 Feb 2021
 - BUG FIX: Use byte representation to send strings to C. This fixes
   encoding problems with non-ASCII strings.

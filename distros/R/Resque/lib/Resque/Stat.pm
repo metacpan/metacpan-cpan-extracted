@@ -1,6 +1,6 @@
 package Resque::Stat;
 # ABSTRACT: The stat subsystem. Used to keep track of integer counts.
-$Resque::Stat::VERSION = '0.41';
+$Resque::Stat::VERSION = '0.42';
 use Moose;
 
 has resque => (
@@ -12,6 +12,11 @@ has resque => (
 sub get {
     my ($self, $stat) = @_;
     $self->redis->get( $self->key( stat => $stat ) ) || 0;
+}
+
+sub set {
+    my ($self, $stat, $value) = @_;
+    $self->redis->set( $self->key( stat => $stat ), ($value||0)+0 );
 }
 
 sub incr {
@@ -45,7 +50,7 @@ Resque::Stat - The stat subsystem. Used to keep track of integer counts.
 
 =head1 VERSION
 
-version 0.41
+version 0.42
 
 =head1 ATTRIBUTES
 
@@ -58,6 +63,12 @@ version 0.41
 Returns the int value of a stat, given a string stat name.
 
 my $value = $resque_stat->get( 'stat_name' );
+
+=head2 set
+
+Set the int value of a a given stat name.
+
+$resque_stat->set( stat_name => 5 );
 
 =head2 incr
 

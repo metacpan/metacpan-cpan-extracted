@@ -93,6 +93,7 @@ no_index:
     - dist/IO/t/io_poll.t
     - dist/IO/t/io_sel.t
     - dist/IO/t/io_sock.t
+    - dist/IO/t/io_sock_errstr.t
     - dist/IO/t/io_taint.t
     - dist/IO/t/io_tell.t
     - dist/IO/t/io_udp.t
@@ -117,5 +118,5 @@ resources:
   homepage: https://www.perl.org/
   license: https://dev.perl.org/licenses/
   repository: https://github.com/Perl/perl5
-version: '5.032001'
+version: '5.034000'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -3,8 +3,9 @@ use Mojo::Base -strict;
 use Test::More;
 use Test::Mojo;
 use FindBin;
+use lib "$FindBin::Bin/../lib";
 use lib "$FindBin::Bin/blog/lib";
-
+ok(1);
 my $buffer = '';
 {
   local $ENV{MOJO_LOG_LEVEL} = 'warn';
@@ -12,8 +13,8 @@ my $buffer = '';
   local *STDERR = $handle;
   require Blog;
   my $blog = Blog->new;
-  $blog->startup();
 }
+
 like $buffer, qr/"routes" key must point to an ARRAY/,
   'right warning about ARRAY reference';
 
@@ -42,6 +43,7 @@ my $routes_class = 'Mojolicious::Routes::Route';
 isa_ok($routes->find('управление'), $routes_class, 'found /управление');
 isa_ok($routes->find('вход'),       $routes_class, 'found +/вход');
 isa_ok($routes->find('blahid'),     $routes_class, 'found +/blah/id');
+isa_ok($routes->find('posts'),      $routes_class, 'found /posts');
 
 
 done_testing();

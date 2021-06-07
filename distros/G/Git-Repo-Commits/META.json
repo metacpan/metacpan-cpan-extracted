@@ -32,7 +32,11 @@
       },
       "runtime" : {
          "requires" : {
+            "Cwd" : "0",
+            "File::Basename" : "0",
+            "File::Temp" : "0",
             "Git" : "0",
+            "Test::Exception" : "0",
             "Test::More" : "0",
             "Test::Perl::Critic" : "0",
             "version" : "0"
@@ -40,6 +44,16 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.1.0",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/JJ/perl-git-commit/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/JJ/perl-git-commit/",
+         "web" : "https://github.com/JJ/perl-git-commit/"
+      }
+   },
+   "version" : "0.1.1",
    "x_serialization_backend" : "JSON::PP version 2.27400"
 }

@@ -1,32 +1,38 @@
-0.490   2019-06-06 (PERLANCAR)
+0.491   2021-05-25  Released-By: PERLANCAR; Urgency: high
+
+	- [build] Rebuild to update Sah coercion module names (old Sah coercion
+          modules have been purged from CPAN).
+
+
+0.490   2019-06-06  Released-By: PERLANCAR
 
         - No functional changes.
 
         - Update & reupload to CPAN.
 
 
-0.48    2016-06-02 (PERLANCAR)
+0.48    2016-06-02  Released-By: PERLANCAR
 
         - Update to App-pause 0.55.
 
 
-0.47    2015-09-10 (PERLANCAR)
+0.47    2015-09-10  Released-By: PERLANCAR
 
         - Update to App-pause 0.47 & synchronize version number.
 
 
-0.44    2015-07-28 (PERLANCAR)
+0.44    2015-07-28  Released-By: PERLANCAR
 
         - Update to App-pause 0.44 & synchronize version number.
 
 
-0.02    2015-07-07 (PERLANCAR)
+0.02    2015-07-07  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- [dist] Add missing dependency.
 
 
-0.01    2015-07-07 (PERLANCAR)
+0.01    2015-07-07  Released-By: PERLANCAR
 
         - First release.

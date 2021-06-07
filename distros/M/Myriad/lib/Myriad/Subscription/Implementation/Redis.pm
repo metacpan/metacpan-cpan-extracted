@@ -1,6 +1,6 @@
 package Myriad::Subscription::Implementation::Redis;
 
-our $VERSION = '0.006'; # VERSION
+our $VERSION = '0.007'; # VERSION
 our $AUTHORITY = 'cpan:DERIV'; # AUTHORITY
 
 use Myriad::Class extends => qw(IO::Async::Notifier);

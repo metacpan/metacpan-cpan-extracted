@@ -1,3 +1,13 @@
+0.015		2021-05-30	T. R. Wyant
+    Use utf8 plain text in 10.11 El Capitan and later, and provide -t
+    (traditional) and -u (utf-8) options to Makefile.PL and Build.PL.
+
+    Thanks to Gary Greene for bringing the need for utf-8 on older systems
+    to my attention, and helping me to work out the fix.
+
+    Thanks to Neil Bowers for adding a macOS machine to CPAN Testers,
+    with every production Perl back to 5.8.9.
+
 0.014		2021-03-23	T. R. Wyant
     Get more diagnostic information out of tests, so I can have a prayer
     of diagnosing what is going on in smokers that (apparently) do not

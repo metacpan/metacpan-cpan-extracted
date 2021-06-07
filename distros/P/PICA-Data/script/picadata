@@ -1,174 +1,8 @@
 #!/usr/bin/env perl
 use v5.14.1;
+use App::picadata;
 
-use PICA::Data;
-use PICA::Schema;
-use PICA::Schema::Builder;
-use Getopt::Long qw(:config bundling);
-use Pod::Usage;
-use HTTP::Tiny;
-use JSON::PP;
-use List::Util 'sum';
-
-my $number = 0;
-if (my ($i) = grep {$ARGV[$_] =~ /^-(\d+)$/} (0 .. @ARGV - 1)) {
-    $number = -(splice @ARGV, $i, 1);
-}
-
-my $abbrev = grep {$_ eq '-B'} @ARGV;
-my @pathes;
-
-GetOptions(
-    'from|f=s'   => \(my $from),
-    'to|t:s'     => \(my $to),
-    'schema|s=s' => \(my $schema),
-    'build|B|b'  => \(my $build),
-    'unknown|u!' => \(my $report_unknown),
-    'count|c'    => \(my $count),
-    'order|o'    => \(my $order),
-    'path|p=s'   => \@pathes,
-    "n|number:i" => \$number,
-    'color|C'    => \(my $color),
-    'mono|M'     => \(my $nocolor),
-    'help|h|?'   => \(my $help),
-    'version|V'  => \(my $version)
-) or pod2usage(2);
-
-if ($version) {
-    say $PICA::Data::VERSION;
-    exit
-}
-
-pod2usage(-verbose => 99, -sections => "SYNOPSIS|OPTIONS|DESCRIPTION")
-    if $help
-    or (!@ARGV and -t);
-
-my %types = (
-    bin    => 'Binary',
-    dat    => 'Binary',
-    binary => 'Binary',
-    extpp  => 'Binary',
-    ext    => 'Binary',
-    plain  => 'Plain',
-    pp     => 'Plain',
-    plus   => 'Plus',
-    norm   => 'Plus',
-    normpp => 'Plus',
-    xml    => 'XML',
-    ppxml  => 'PPXML',
-    json   => 'JSON',
-    ndjson => 'JSON',
-    fields => 'Fields',
-);
-
-my $input = '-';
-if (!@pathes) {
-    my $pattern = '[012.][0-9.][0-9.][A-Z@.](\$[^|]+)?';
-    while (@ARGV && $ARGV[0] =~ /^$pattern(\s*\|\s*($pattern)?)*$/) {
-        push @pathes, shift @ARGV;
-    }
-}
-
-my $sfpath = 0;
-if (@pathes) {
-    @pathes = map {
-        my $p = eval {PICA::Path->new($_)};
-        $p || die "invalid pica path: $_\n";
-    } grep {$_ ne ""} map {split /\s*\|\s*/, $_} @pathes;
-}
-
-$sfpath = sum map {length $_->subfields > 0} @pathes;
-die "path expressions must either all select fields or select subfields!\n"
-    if $sfpath and $sfpath ne @pathes;
-
-$input = shift @ARGV if @ARGV;
-
-$from = $1 if !$from && $input =~ /\.([a-z]+)$/ && $types{lc $1};
-
-$from = 'plain' unless $from;
-pod2usage("unknown serialization type: $from") unless $types{lc $from};
-
-if ($schema) {
-    my $json;
-    if ($schema =~ qr{^https?://}) {
-        my $res = HTTP::Tiny->new->get($schema);
-        die "HTTP request failed: $schema\n" unless $res->{success};
-        $json = $res->{content};
-    } else {
-        my $fh = IO::File->new($schema);
-        $json = join "\n", <$fh>;
-    }
-    $schema = PICA::Schema->new(decode_json($json));
-}
-
-$to = $from unless ($to or $count or $schema or $build or $sfpath);
-pod2usage("unknown serialization type: $to") unless !$to or $types{lc $to};
-
-$build = PICA::Schema::Builder->new if $build;
-
-$input = *STDIN if $input eq '-';
-my $parser = "PICA::Parser::${types{$from}}"->new($input, bless => 1);
-
-my $writer;
-$color
-    = !$nocolor && ($color || -t *STDOUT)
-    ? {tag => 'blue', occurrence => 'blue', code => 'red', value => 'green'}
-    : undef;
-binmode *STDOUT, ':encoding(UTF-8)';
-if ($to) {
-    $writer = "PICA::Writer::${types{$to}}";
-    $writer = $writer->new(color => $color, schema => $schema);
-}
-
-my %schema_options = (ignore_unknown => !$report_unknown);
-my $stats = {records => 0, holdings => 0, items => 0, fields => 0};
-my $invalid = 0;
-
-while (my $record = $parser->next) {
-    if ($sfpath) {
-        say $_ for map {@{$record->match($_, split => 1) // []}} @pathes;
-    }
-
-    $record = $record->fields(@pathes) if @pathes;
-    $record = $record->sort if $order;
-
-    $writer->write($record) if $writer;
-    if ($schema && $to ne 'fields') {
-        my @errors = $schema->check($record, %schema_options);
-        if (@errors) {
-            for (@errors) {
-                my $msg
-                    = defined $record->{_id} ? $record->{_id} . ": $_" : $_;
-                print "$msg\n";
-            }
-            $invalid++;
-        }
-    }
-    $build->add($record) if $build;
-
-    if ($count) {
-        $stats->{holdings} += @{$record->holdings};
-        $stats->{items}    += @{$record->items};
-        $stats->{fields}   += @{$record->{record}};
-    }
-    $stats->{records}++;
-    last if $number and $stats->{records} >= $number;
-}
-
-$writer->end() if $writer;
-
-if ($count) {
-    $stats->{invalid} = $invalid if defined $invalid;
-    print $stats->{$_} . " $_\n"
-        for grep {defined $stats->{$_}}
-        qw(records invalid holdings items fields);
-}
-
-if ($build) {
-    my $JSON = JSON::PP->new->indent->space_after->canonical->convert_blessed;
-    my $schema = $build->schema;
-    print $JSON->encode($abbrev ? $schema->abbreviated : $schema);
-}
+App::picadata->new(@ARGV)->run;
 
 __END__
 
@@ -178,32 +12,56 @@ picadata - parse and validate PICA+ data
 
 =head1 SYNOPSIS
 
-picadata [--from TYPE] [--schema FILE] [--to TYPE] {OPTIONS} [FILE]
+picadata [<command>] {path} {options} {files}
 
 =head1 DESCRIPTION
 
-Parse, validate and/or serialize PICA+ data from the command line, e.g.:
+Convert, analyze and validate PICA+ data from the command line.
 
-  picadata pica.dat -t xml           # convert binary to XML
-  picadata -c -f plain < pica.plain  # parse and count records
-  picadata -p 003@ pica.xml -t       # extract field 003@
-  picadata pica.xml -s schema.json   # validate against Avram schema
+=head1 COMMANDS
 
-  # document fields used in a record
-  picadata -t fields pica.xml -s https://format.k10plus.de/avram.pl?profile=k10plus
+=head2 convert
+
+Convert between PICA+ serialization formats (the default command).
+
+=head2 split
+
+Split records into multiple records for each level. Implies C<-o>.
+
+=head2 count
+
+Count number of records, holdings, items, and fields.
+
+=head2 fields/subfields/sf
+
+List distinct fields or subfields in the data. Provide an Avram schema 
+(C<-s/--schema>) to include documenation.
+
+=head2 explain
+
+Lookup (sub)fields in an Avram schema given by option or from stdin.
+Optional (C<o>/C<*>), mandatory (C<.>/C<+>), repeatable (C<+>/C<*>).
+
+=head2 validate
+
+Validate data against an Avram schema (C<-s/--schema>).
+
+=head2 build
+
+Build an Avram schema from input data, optionally based on an existing schema
+(C<-s/--schema>).  Add option C<-B/--abbrev> to abbreviate.
 
 =head1 OPTIONS
 
 =head2 --from, -f
 
-PICA serialization type (plain, plus, binary, XML, ppxml) with XML as default.
-Guessed from input filename unless specified. See format documentation at
-L<http://format.gbv.de/pica>
+PICA serialization type (plain, plus, binary, XML, ppxml) with Plain as default.
+Guessed from first input filename unless specified. See format documentation at
+L<http://format.gbv.de/pica>.
 
 =head2 --to, -t
 
-PICA serialization type to enable writing parsed PICA data. Use C<fields> to
-list all fields in the data (with optional schema information).
+PICA serialization type to enable writing parsed PICA data.
 
 =head2 --number, -n
 
@@ -211,11 +69,12 @@ Stop parsing after C<n> records. Can be abbreviated as C<-1>, C<-2>...
 
 =head2 --order, -o
 
-Sort record fields by field identifier or by occurrence for level 2.
+Sort record fields by field identifier and by occurrence at level 2.
 
-=head2 --count, -c
+=head2 --annotate, -a, -A
 
-Count number of records, holdings, items, and fields.
+Enforce annotated PICA as output format or prevent with C<-A>. Combined with
+C<--schema> this will set annotations C<!> and C<?> to mark validation errors.
 
 =head2 --path, -p
 
@@ -231,9 +90,9 @@ against. Can be a file or an URL.
 
 Report unknown fields and subfields on validation (disabled by default).
 
-=head2 --build, -b, -B
+=head2 --abbrev, -B
 
-Build an Avram schema from records. Option C<-B> abbreviates the schema.
+Abbreviate the Avram schema (with command <build>).
 
 =head2 --color, -C
 
@@ -246,6 +105,16 @@ Monochrome (don't colorize output).
 =head2 --version, -V
 
 Print version number and exit.
+
+=head1 EXAMPLES
+
+  picadata pica.dat -t xml                    # convert binary to XML
+  picadata count -f plain < pica.plain        # parse and count records
+  picadata 003@ pica.xml                      # extract field 003@
+  picadata validate pica.xml -s schema.json   # validate against Avram schema
+
+  # document fields used in a record
+  picadata fields pica.xml -s https://format.k10plus.de/avram.pl?profile=k10plus
 
 =head1 SEE ALSO
 

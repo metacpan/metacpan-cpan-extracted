@@ -1,5 +1,20 @@
 Revision history for Test::Needs
 
+0.002009 - 2021-05-25
+  - fix warnings from Test::Builder if Test::Needs is loaded first, and is
+    used to check for a Test module.
+  - fix location in code reported when a module check fails.
+  - support short forms of perl versions
+  - support perl versions greater than 5
+  - fix handling of v-string versions on perl 5.6
+
+0.002_008 - 2019-07-12
+  - fix test compatibility with Windows.
+
+0.002_007 - 2019-07-09
+  - fix tests when @INC includes directories that shouldn't have their
+    archname or version subdirectories added.
+
 0.002006 - 2019-04-04
   - added additional references to related modules in pod
   - various internal cleanups

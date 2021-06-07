@@ -7,7 +7,7 @@ use Data::CompactReadonly::V0::Node;
 
 # Yuck, semver. I give in, the stupid cult that doesn't understand
 # what the *number* bit of *version number* means has won.
-our $VERSION = '0.0.5';
+our $VERSION = '0.0.6';
 
 =head1 NAME
 
@@ -55,14 +55,14 @@ memory. It keeps a cache of everything it has seen while building your
 database, so that it can re-use data by just pointing at it instead of writing
 multiple copies of the same data into the file.
 
-Note that it will carefully preserve things that look like numbers but have
-extraneous leading or trailing zeroes. "007", for instance, is text, not a number,
-the leading zeroes are important. And while 7.10 is a number, the extra zero has
-meaning - it tells you that the value is accurate to three significant figures. If
-it were stored as a number, it would be retrieved as merely 7.1, accurate to only
-two significant figures. We are happy to spend a little extra storage in the
-interested of correctly storing your data. If you then go on to just treat 7.10
-as a number in perl, and so as equivalent to 7.1 that is of course up to you.
+It tries really hard to preserve data types. So for example, C<60000> is stored
+and read back as an integer, but C<"60000"> is stored and read back as a string.
+This means that you can correctly store and retrieve C<"007"> but that C<007>
+will have the leading zeroes removed before Data::CompactReadonly ever sees it
+and so will be treated as exactly equivalent to C<7>. The same applies to floating
+point values too. C<"7.10"> is stored as a four byte string, but C<7.10> is stored
+the same as C<7.1>, as an eight byte IEEE754 double precision float. Note that
+perl parses values like C<7.0> as floating point, and thus so does this module.
 
 Finally, while the file format permits numeric keys in hashes, this method
 always coerces them to text. This is because if you allow numeric keys,

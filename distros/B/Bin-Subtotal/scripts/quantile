@@ -1,0 +1,192 @@
+#!/usr/bin/perl
+use 5.014 ; use strict ; use warnings ; 
+use POSIX qw [ floor ceil ] ; 
+use FindBin qw [ $Script $Bin ] ; 
+use Getopt::Std ; getopts '=@:LIbhi:lp:q:stw02:3' , \my %o ; 
+use List::Util qw[ sum sum0 ] ;
+use Term::ANSIColor qw [ color :constants ] ; $Term::ANSIColor::AUTORESET = 1 ; 
+use Time::HiRes qw[ alarm tv_interval gettimeofday ] ;
+use Scalar::Util qw[ dualvar ] ; 
+sub proc_read ( ) ; # 読取りの処理 
+sub proc_out ( ) ; # 出力の処理
+sub Info2ndry ( ) ; # 2次情報の出力
+sub high_val ( $ ) ; # 0から$Qまでの何番目を表示したいかを引数として受け取り、線形補間した値を返す。
+sub low_val  ( $ ) ; # 0から$Qまでの何番目を表示したいかを引数として受け取り、線形補間した値を返す。
+sub near_val ( $ ) ; # 0から$Qまでの何番目を表示したいかを引数として受け取り、線形補間した値を返す。
+sub intp_val ( $ ) ; # 0から$Qまでの何番目を表示したいかを引数として受け取り、線形補間した値を返す。
+sub midreport ( ) ;
+my $time0 = [gettimeofday] ;
+my $header = <> if $o{'='} ;
+
+my $Q = int ( $o{q} // 4 ) ; # 分位点を求めるのに、何分割をするか。このプログラムの作成者は個人的に六分位数が好きである。
+my @xco = defined $o{p} ? eval $o{p} : 0 .. $Q ;  # どの分位点を出力するか。
+my $sep = $o{i} // "\t" ;
+my $LL = -1 ; # 読み取った行数 マイナス 1 ; 分位点を算出するために、1 を減じるトリックを使っている。 
+my @V = () ; # レコードの数値を格納する。
+my %VV = () ; # 複数列(2列目以降の値で層別するオブシヨン) の時に、@V を格納するような時に用いる。
+
+
+proc_read ; 
+proc_out ; 
+Info2ndry if not 0 eq ($o{2}//1) ; 
+exit 0 ;
+
+# 以下は関数
+
+sub proc_read ( ) {
+  $SIG{ALRM} = sub { & midreport ; alarm $o{'@'}//2 } ;
+  alarm $o{'@'}//2 ; 
+  my $layer ; # 層別の層の値。ただし -2が指定されない場合は 空文字列を使うことになる。
+  * layer = ! $o{3} ? 
+      $o{L} ? sub { ( $_ , $layer ) = split /$sep/ , $_ , 2 } : sub { $layer = '' } : 
+      $o{L} ? sub { my @F = split /$sep/, $_, 3 ; $_ = dualvar $F[0],$F[1] ; $layer = $F[2] } : 
+              sub { my @F = split /$sep/, $_, 2 ; $_ = dualvar $F[0],$F[1] ; $layer = '' } ; 
+  while ( <> ) { 
+    chomp ;
+    & layer ; 
+    push @{ $VV{ $layer } } , $_ ; 
+    $LL ++ ; 
+  }
+  alarm 0 ;
+  do { * STDOUT = * STDERR ; HELP_MESSAGE () ; exit } if $. == 0 ; # 読取りが0行ならば、ヘルプを出す。
+}
+
+sub proc_out ( ) { 
+  say UNDERLINE join "\t" , @xco , 'num' , $o{L} ? 'Layer' : '' ;   # 出力表の表頭
+  do { @V = @{ $VV{$_} } ; LayerOut ( $_ ) } for sort keys %VV ; # 出力表の中身 # <-- - ソートの仕方に数値ソートのオプションが欲しい。
+}
+
+sub LayerOut ( $ ) {  # 出力各行についての処理 :
+  our $layer = $_[0] ; 
+  our $Vd = $#V ; # divisionの数
+  @V = $o{s} ? sort @V : sort { $a <=> $b } @V ;
+
+  sub LineOut ( &$ ) { # 出力1行の処理内容
+    say join "\t", map ( $_[0]->($_) + 0, @xco ) , ($Vd+1) . $_[1] , $layer if!$o{s} ;
+    say join "\t", map ( $_[0]->($_) .'', @xco ) , ($Vd+1) . $_[1] , $layer if $o{s} ; # dualvar 対策で冗長になってしまった。
+  } 
+  # 分位点の計算法 (概念的に考えられる低い方の値、高い方の値、線型補間、単純に近い値)
+  sub low_val  ( $ ) { $V[ floor $_[0] * $Vd / $Q ]       } ; 
+  sub high_val ( $ ) { $V[ ceil  $_[0] * $Vd / $Q ]       } ; 
+  sub near_val ( $ ) { $V[ floor $_[0] * $Vd / $Q + 0.5 ] } ; # 四捨五入法となる.
+  sub intp_val ( $ ) { my $x=$_[0]*$Vd/$Q ; my $x1=floor $x ; my $x2=ceil $x ; my $f1=$x-$x1 ; $V[$x1]*(1-$f1)+$V[$x2]*$f1 } 
+
+  LineOut ( \& high_val , '+' ) if $o{h} ; # 上側の値
+  LineOut ( \& near_val , ''  ) if!$o{0} ; # 通常の中間の値  ( -0が指定されたら、通常の値は出力しない。)
+  LineOut ( \& intp_val , 'i' ) if $o{I} ; # 線型補間値で出力
+  LineOut ( \& low_val ,  '-' ) if $o{l} ; # 下側の値
+
+  say BOLD join "\t" , & SelfWeight() , $layer if $o{w} || $o{3} ;
+  sub SelfWeight () { 
+    #my $total = sum0 @V ; 
+    my $total = sum0 map { $_ . '' } @V ; # dualvarの場合、文字列として格納された方(重み)だけが足される
+    my @ths = map { $total * $_ / $Q } @xco ; # 閾値
+    my ( $t, $t_ ) = ( 0 , 0 )  ; # 途中の合計
+    my @ret ; # 結果の格納用
+    my $i = 0 ; # 引数
+    do { push @ret , $V[0] ; $i++ } if $ths[0] == 0 ; #<-- 0の代わりにV[0]を代入。ここだけ特別で、便宜上のもの。よくない。
+    LOOP : 
+    for ( @V ) { 
+      $t_ = $t ; $t += $_ . '' ; # dualvarの場合、文字列の方が重みであった。
+      while ( $t_ < $ths[$i] && $ths[$i] <= $t ) { 
+        push @ret , $_ + 0 ; # dualvarの場合、数の方(すでにソート済みされる方)を採用 
+        last LOOP if ++ $i > $#ths ; 
+      }
+    }
+    push @ret , $total ;
+    return @ret ;
+  }
+}
+
+
+
+
+sub midreport ( ) {
+  #return if eof ;  # <-- ただコメントアウトしたら、意図通り動作するようになった。これで良かったのか?
+  use FindBin '$Script' ;
+  $| = 1 ; 
+  my $lines = $. ; 
+  $lines =~ s/(?<=\d)(?=(\d\d\d)+($|\D))/,/g ; # 3桁毎にコンマで区切る
+  $lines .= $lines eq "1" ? ' line' : ' lines' ;
+  my @out ; 
+  my @t2 = gettimeofday ; 
+  my @dt = (localtime $t2[0])[5,4,3,2,1,0] ;
+  push @out, "[$Script  ", (sprintf "%02d-%02d-%02d %02d:%02d:%02d.%06d", $dt[0]+1900,$dt[1]+1,@dt[2..5],$t2[1]) , "]" ;  #  <-- 標準出力に書込み
+  push @out, " $lines read" ; 
+  print STDERR GREEN @out , "\n" ;
+}
+
+sub Info2ndry ( ) { 
+  $LL ++ ; 
+  $LL =~ s/(?<=\d)(?=(\d\d\d)+($|\D))/,/g ; # 3桁毎にコンマで区切る
+  my $out = '' ; 
+  $out  = CYAN "[$Script] read lines : " ; 
+  $out .= BRIGHT_CYAN $LL ; 
+  $out .= CYAN "  (" . tv_interval ($time0) . " sec.) " ; 
+  $out .= BRIGHT_CYAN $Q . CYAN " divisions." ;
+  say STDERR $out ; 
+} 
+
+=encoding utf8 
+
+=head1
+
+ $0 -/ 分位分割数 
+
+  分位点を求める。通常の(線形)補間値のみならず、上側の値と下側の値も出力する。
+  2次情報として何個の値を入力から読み取ったかも、標準エラー出力に出力。
+
+ オプション : 
+
+  -= : 最初の行を読み飛ばす。
+  -q N : 分位分割の数Nを指定する。
+  -p 1..5など : 何番目の分位点を出力するかを指定する。小数も指定可能。, や .. が使える。
+
+  -h : 分位点の計算において、考えられる大きい値についても、出力する。
+  -I : 分位点を観測値に存在する値ではなくて、線形補間した値を用いる。
+  -l : 分位点の計算において、考えられる小さい値についても、出力する。
+  -0 : 通常のよく使われる分位点の値を出さない。(-h, -l, -i を使う時に便利。)
+  -s : 入力を数値としてではなく、文字列として処理する。日時を扱う場合などに使う。
+
+  -L ; 層別に分位点を出力する。1列目を値と見なし、タブ区切り2列目以降を層のラベルと見なす。
+  -w ; 分位値を算出する際に、各値を平等に扱うのではなくて、その値自信で重みを付ける。(正の値を仮定する。)
+  -3 : -w で数値が2列とする。左側が昇順ソートされるが、重みは自己重みではなくて、右側の値となる。
+
+  -i str ; 入力の区切り文字をstrとする。
+  -@ N : 一定秒数ごとに、標準エラー出力にレポートを出す。未指定なら、10秒。
+  -2 0 : 2次情報を出力しない。
+
+  --help : ヘルプを出力。(この表示を出力する。)
+  --help opt : $0 の引数の内のオフションスイッチ( - で始まる引数)についての解説を表示。
+  --version : バージョン情報の表示
+
+ 開発メモ : 
+   * 出力する数の桁数の指定が必要そう。sprintf , printf を使わないようにしたい。
+   * 出力出来る数について、 printf書式を指定できるようにしたい。
+   * -@ による一定数行毎のレポートでは無くて、ALRMを使って一定時間おき(10秒ごと)のレポートとしたい。
+   * 数値であるかどうかの判定を入れたい。
+   * 保守のために、関数内の関数を活用しようか。
+   * -w の場合に、 -h, -I, -l も考慮したい。今は単純なもののみである。
+   ** -w 無しの -3 の挙動の設計が不自然なので、再検討 # <--- --  "-w" は自己重み付け , -3 は、重み付け自体を表している
+=cut 
+
+## ヘルプとバージョン情報
+BEGIN {
+  $Getopt::Std::STANDARD_HELP_VERSION = 1 ; 
+  grep { m/--help/} @ARGV and *VERSION_MESSAGE = sub {} ; 
+  our $VERSION = 0.11 ;
+    # 最初は 0.21 を目安とする。
+    # 1.00 以上とする必要条件は英語版のヘルプをきちんと出すこと。
+    # 2.00 以上とする必要条件はテストコードが含むこと。
+}  
+sub HELP_MESSAGE{
+    use FindBin qw[ $Script ] ; 
+    $ARGV[1] //= '' ;
+    open my $FH , '<' , $0 ;
+    while(<$FH>){
+        s/\$0/$Script/g ;
+        print $_ if $ARGV[1] eq 'opt' ? m/^\ +\-/ : s/^=head1// .. s/^=cut// ;
+    }
+    close $FH ;
+    exit 0 ;
+}

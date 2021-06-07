@@ -21,5 +21,6 @@ t/script/default-headers
 MANIFEST.SKIP
 t/unicode.t
 t/lib/Test/Differences/TestUtils/Capture.pm
+t/sub-refs.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

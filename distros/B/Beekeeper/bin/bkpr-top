@@ -3,6 +3,8 @@
 use strict;
 use warnings;
 
+our $VERSION = '0.04';
+
 $ENV{PATH} = '/bin:/usr/bin'; # untaint
 
 BEGIN {
@@ -13,6 +15,7 @@ BEGIN {
     }
 }
 
+use AnyEvent::Impl::Perl;
 use Beekeeper::Service::Supervisor;
 use Term::ReadKey;
 use Getopt::Long;
@@ -42,7 +45,15 @@ Display real-time performance metrics of running workers.
 
 Filters --host, --pool and --class can be combined.
 
-Change sorting field with (M)emory, (C)pu, (L)oad, (N)otifications and (J)obs.
+The metrics displayed are:
+
+   nps:   number of received notifications per second
+   cps:   number of processed calls per second
+   mem:   resident memory size in KB
+   cpu:   percentage of cpu load
+   load:  percentage of busy time
+
+Change sorting pressing (N)otifications, (C)alls, (M)emory, cp(U) or (L)oad.
 
 ";
 
@@ -66,10 +77,10 @@ if ($opt_list) {
         'P' => 'pool',
         'H' => 'host',
         'I' => 'pid',
-        'M' => 'msize',
+        'M' => 'mem',
         'N' => 'nps',
-        'J' => 'jps',
-        'C' => 'cpu',
+        'C' => 'cps',
+        'U' => 'cpu',
         'L' => 'load',
     );
 
@@ -95,7 +106,7 @@ if ($opt_list) {
         print "\033[0;0H";  # jump to 0,0
         print "\033[7m";    # reverse
         printf("%-${w}.${w}s %-8s %-8s %-8s %5s %5s %5s %5s %7s \n",
-               'class','pool','host','pid','mem','nps','jps','cpu','load');
+               'class','pool','host','pid','mem','nps','cps','cpu','load');
         print "\033[0m";    # normal
 
         # Sort
@@ -116,7 +127,7 @@ if ($opt_list) {
                 $worker->{pid},
                 $worker->{mem} || '-',
                 sprintf("%.0f", $worker->{nps}  + .5) || '0',
-                sprintf("%.0f", $worker->{jps}  + .5) || '0',
+                sprintf("%.0f", $worker->{cps}  + .5) || '0',
                 sprintf("%.0f", $worker->{cpu}  + .5) || '0',
                 sprintf("%.0f", $worker->{load} + .5) || '0',
             );
@@ -149,9 +160,10 @@ else {
     my %sort_fields = (
         'S' => 'class',
         'W' => 'count',
+        'M' => 'mem',
         'N' => 'nps',
-        'J' => 'jps',
-        'C' => 'cpu',
+        'C' => 'cps',
+        'U' => 'cpu',
         'L' => 'load',
     );
 
@@ -183,7 +195,7 @@ else {
         print "\033[0;0H";  # jump to 0,0
         print "\033[7m";    # reverse
         printf("%-${w}.${w}s %5s %8s %8s %8s %5s %7s \n",
-               'class','count','MB','nps','jps','cpu','load');
+               'class','count','MB','nps','cps','cpu','load');
         print "\033[0m";    # normal
 
         # Sort
@@ -202,7 +214,7 @@ else {
                 $svc->{count},
                 $svc->{mem} / 1000,
                 $svc->{nps},
-                $svc->{jps},
+                $svc->{cps},
                 $svc->{cpu},
                 $svc->{load},
             );
@@ -226,13 +238,17 @@ else {
 
 __END__
 
+=pod
+
+=encoding utf8
+
 =head1 NAME
 
 bkpr-top - Display real-time performance metrics of running workers
 
 =head1 VERSION
 
-Version 0.01
+Version 0.04
 
 =head1 SYNOPSIS
 
@@ -248,27 +264,27 @@ Version 0.01
   
   Filters --host, --pool and --class can be combined.
   
-  Change sorting field with (M)emory, (C)pu, (L)oad, (N)otifications and (J)obs.
+  The metrics displayed are:
+  
+     nps:   number of received notifications per second
+     cps:   number of processed calls per second
+     mem:   resident memory size in KB
+     cpu:   percentage of cpu load
+     load:  percentage of busy time
+  
+  Change sorting field pressing (N)otifications, (C)alls, (M)emory, cp(U) or (L)oad.
 
 =head1 DESCRIPTION
 
 Display in real-time performance metrics of all running workers connected
 to a logic message bus in a 'top' fashion.
 
- "nps":  number of received notifications per second
- "jps":  number of processed jobs per second
- "mem":  resident memory size in KB
- "cpu":  percentage of cpu load
- "load": percentage of busy time
-
-Sorting order can be changed pressing keys N, J, M, C and L.
+Sorting order can be changed pressing keys N, C, M, U and L.
 Pressing Q quits the program.
 
 =head1 SEE ALSO
 
 L<Beekeeper::Service::Supervisor>.
-
-=encoding utf8
 
 =head1 AUTHOR
 
@@ -276,7 +292,7 @@ José Micó, C<jose.mico@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright 2015 José Micó.
+Copyright 2015-2021 José Micó.
 
 This is free software; you can redistribute it and/or modify it under the same 
 terms as the Perl 5 programming language itself.

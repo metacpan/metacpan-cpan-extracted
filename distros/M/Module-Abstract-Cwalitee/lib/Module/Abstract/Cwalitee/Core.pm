@@ -1,7 +1,9 @@
 package Module::Abstract::Cwalitee::Core;
 
-our $DATE = '2019-09-15'; # DATE
-our $VERSION = '0.006'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2021-06-06'; # DATE
+our $DIST = 'Module-Abstract-Cwalitee'; # DIST
+our $VERSION = '0.008'; # VERSION
 
 use 5.010001;
 use strict;
@@ -162,6 +164,8 @@ sub indicator_not_redundant {
                     (?: \s+ (?:to|for))?
                 )/xi) {
         return [200, "OK", "Saying '$1' is redundant, omit it"];
+    } elsif (defined $r->{module} && $ab =~ /\b\Q$r->{module}\E\b/) {
+        return [200, "OK", "Mentioning the module itself is redundant, omit it"];
     } else {
         [200, "OK", ''];
     }
@@ -256,7 +260,7 @@ Module::Abstract::Cwalitee::Core - A collection of core indicators for module ab
 
 =head1 VERSION
 
-This document describes version 0.006 of Module::Abstract::Cwalitee::Core (from Perl distribution Module-Abstract-Cwalitee), released on 2019-09-15.
+This document describes version 0.008 of Module::Abstract::Cwalitee::Core (from Perl distribution Module-Abstract-Cwalitee), released on 2021-06-06.
 
 =head1 FUNCTIONS
 
@@ -265,7 +269,7 @@ This document describes version 0.006 of Module::Abstract::Cwalitee::Core (from 
 
 Usage:
 
- indicator_language_english() -> [status, msg, payload, meta]
+ indicator_language_english() -> [$status_code, $reason, $payload, \%result_meta]
 
 This function is not exported.
 
@@ -273,12 +277,12 @@ No arguments.
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -288,7 +292,7 @@ Return value:  (any)
 
 Usage:
 
- indicator_no_shouting() -> [status, msg, payload, meta]
+ indicator_no_shouting() -> [$status_code, $reason, $payload, \%result_meta]
 
 This function is not exported.
 
@@ -296,12 +300,12 @@ No arguments.
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -311,7 +315,7 @@ Return value:  (any)
 
 Usage:
 
- indicator_not_empty() -> [status, msg, payload, meta]
+ indicator_not_empty() -> [$status_code, $reason, $payload, \%result_meta]
 
 This function is not exported.
 
@@ -319,12 +323,12 @@ No arguments.
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -334,7 +338,7 @@ Return value:  (any)
 
 Usage:
 
- indicator_not_end_with_dot() -> [status, msg, payload, meta]
+ indicator_not_end_with_dot() -> [$status_code, $reason, $payload, \%result_meta]
 
 This function is not exported.
 
@@ -342,12 +346,12 @@ No arguments.
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -357,7 +361,7 @@ Return value:  (any)
 
 Usage:
 
- indicator_not_module_name() -> [status, msg, payload, meta]
+ indicator_not_module_name() -> [$status_code, $reason, $payload, \%result_meta]
 
 This function is not exported.
 
@@ -365,12 +369,12 @@ No arguments.
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -380,7 +384,7 @@ Return value:  (any)
 
 Usage:
 
- indicator_not_multiline() -> [status, msg, payload, meta]
+ indicator_not_multiline() -> [$status_code, $reason, $payload, \%result_meta]
 
 This function is not exported.
 
@@ -388,12 +392,12 @@ No arguments.
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -403,7 +407,7 @@ Return value:  (any)
 
 Usage:
 
- indicator_not_redundant() -> [status, msg, payload, meta]
+ indicator_not_redundant() -> [$status_code, $reason, $payload, \%result_meta]
 
 This function is not exported.
 
@@ -411,12 +415,12 @@ No arguments.
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -426,7 +430,7 @@ Return value:  (any)
 
 Usage:
 
- indicator_not_start_with_lowercase_letter() -> [status, msg, payload, meta]
+ indicator_not_start_with_lowercase_letter() -> [$status_code, $reason, $payload, \%result_meta]
 
 This function is not exported.
 
@@ -434,12 +438,12 @@ No arguments.
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -449,7 +453,7 @@ Return value:  (any)
 
 Usage:
 
- indicator_not_template() -> [status, msg, payload, meta]
+ indicator_not_template() -> [$status_code, $reason, $payload, \%result_meta]
 
 This function is not exported.
 
@@ -457,12 +461,12 @@ No arguments.
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -472,7 +476,7 @@ Return value:  (any)
 
 Usage:
 
- indicator_not_too_long(%args) -> [status, msg, payload, meta]
+ indicator_not_too_long(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 This function is not exported.
 
@@ -482,16 +486,17 @@ Arguments ('*' denotes required arguments):
 
 =item * B<max_len> => I<uint> (default: 72)
 
+
 =back
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -501,7 +506,7 @@ Return value:  (any)
 
 Usage:
 
- indicator_not_too_short(%args) -> [status, msg, payload, meta]
+ indicator_not_too_short(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 This function is not exported.
 
@@ -511,16 +516,17 @@ Arguments ('*' denotes required arguments):
 
 =item * B<min_len> => I<uint> (default: 10)
 
+
 =back
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -546,7 +552,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2019 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

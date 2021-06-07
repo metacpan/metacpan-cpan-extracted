@@ -8490,6 +8490,9 @@ sub getpasswd
              ."-p RequiredProps=* -o Password";
       }
       if ($ca_host=~/localhost/i or !$ca_host) {
+         unless (keys %{$localhost}) {
+            $localhost=connect_shell();
+         }
          ($stdout,$stderr)=$localhost->cmd($cmd);
       } else {
          # CODE TO ACCESS OTHER SERVERS FOR CYBERARK
@@ -27959,7 +27962,7 @@ print $Net::FullAuto::FA_Core::LOG "WHAT IS THE ERROR=$cmd_errmsg<=== and RETRYS
             ($stdout,$stderr)=&Net::FullAuto::FA_Core::kill(
                $cmd_pid,$kill_arg) if   
                &Net::FullAuto::FA_Core::testpid($cmd_pid);
-            $cmd_handle->close;
+            $cmd_handle->close if $cmd_handle;
          }
          if (!$Net::FullAuto::FA_Core::cron) {
             if ($su_login || $use_su_login) {

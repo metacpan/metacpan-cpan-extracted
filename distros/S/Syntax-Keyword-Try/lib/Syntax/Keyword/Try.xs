@@ -7,6 +7,8 @@
 #include "perl.h"
 #include "XSUB.h"
 
+#include "XSParseKeyword.h"
+
 #include "perl-backcompat.c.inc"
 
 #if HAVE_PERL_VERSION(5,32,0)
@@ -22,12 +24,6 @@ typedef SSize_t array_ix_t;
 #else /* <5.19.4 */
 typedef I32 array_ix_t;
 #endif /* <5.19.4 */
-
-#ifndef wrap_keyword_plugin
-#  include "wrap_keyword_plugin.c.inc"
-#endif
-
-#include "lexer-additions.c.inc"
 
 #include "perl-additions.c.inc"
 
@@ -415,66 +411,37 @@ static OP *pp_isa(pTHX)
 }
 #endif
 
-static int try_keyword(pTHX_ OP **op)
+static int build_try(pTHX_ OP **out, XSParseKeywordPiece *args[], size_t nargs, void *hookdata)
 {
-  OP *try = NULL, *catch = NULL;
-  AV *condcatch = NULL;
-  CV *finally = NULL;
+  U32 argi = 0;
+
+  OP *try = args[argi++]->op;
+
   OP *ret = NULL;
-  bool is_value = FALSE;
   HV *hints = GvHV(PL_hintgv);
-
-  lex_read_space(0);
-
-  if(hints && hv_fetchs(hints, "Syntax::Keyword::Try/try_value", 0) &&
-     lex_consume("do")) {
-    lex_read_space(0);
-    is_value = TRUE;
-
-#ifdef WARN_EXPERIMENTAL
-    if(!hints || !hv_fetchs(hints, "Syntax::Keyword::Try/experimental(try_value)", 0)) {
-      Perl_ck_warner(aTHX_ packWARN(WARN_EXPERIMENTAL),
-        "'try do' syntax is experimental and may be changed or removed without notice");
-    }
-#endif
-
-    Perl_ck_warner(aTHX_ packWARN(WARN_DEPRECATED),
-      "'try do' syntax is deprecated and will be removed. Use  do { try ... }  instead");
-  }
-
-  if(lex_peek_unichar(0) != '{')
-    croak("Expected try to be followed by '{'");
-
-  try = parse_scoped_block(0);
-  lex_read_space(0);
 
   bool require_var = hints && hv_fetchs(hints, "Syntax::Keyword::Try/require_var", 0);
 
-  while(lex_consume("catch")) {
-    OP *assignop = NULL, *condop = NULL;
-    OP *body;
-    I32 save_ix;
+  U32 ncatches = args[argi++]->i;
 
-    if(catch)
-      croak("Already have a default catch {} block");
+  AV *condcatch = NULL;
+  OP *catch = NULL;
+  while(ncatches--) {
+    bool has_catchvar = args[argi++]->i;
+    PADOFFSET catchvar = has_catchvar ? args[argi++]->padix : 0;
+    int catchtype = has_catchvar ? args[argi++]->i : -1;
 
-    save_ix = block_start(TRUE);
-    lex_read_space(0);
+    bool warned = FALSE;
 
-    if(lex_consume("(")) {
-      PADOFFSET catchvar = 0;
-      bool warned = FALSE;
+    OP *condop = NULL;
 
-      lex_read_space(0);
-      catchvar = parse_lexvar();
+    switch(catchtype) {
+      case -1: /* no type */
+        break;
 
-      /* my $var = $@ */
-      assignop = newBINOP(OP_SASSIGN, 0,
-        newGVOP(OP_GVSV, 0, PL_errgv), newPADxVOP(OP_PADSV, catchvar, OPf_MOD, OPpLVAL_INTRO));
-
-      lex_read_space(0);
-      if(lex_consume("isa")) {
-        OP *type = parse_termexpr(0);
+      case 0: /* isa */
+      {
+        OP *type = args[argi++]->op;
 #ifdef HAVE_OP_ISA
         condop = newBINOP(OP_ISA, 0,
           newPADxVOP(OP_PADSV, catchvar, 0, 0), type);
@@ -486,9 +453,12 @@ static int try_keyword(pTHX_ OP **op)
         condop = newBINOP_CUSTOM(&pp_isa, 0,
           newPADxVOP(OP_PADSV, catchvar, 0, 0), type);
 #endif
+        break;
       }
-      else if(lex_consume("=~")) {
-        OP *regexp = parse_termexpr(0);
+
+      case 1: /* =~ */
+      {
+        OP *regexp = args[argi++]->op;
 
         if(regexp->op_type != OP_MATCH || cPMOPx(regexp)->op_first)
           croak("Expected a regexp match");
@@ -501,30 +471,36 @@ static int try_keyword(pTHX_ OP **op)
         regexp->op_flags |= OPf_KIDS|OPf_STACKED;
 #endif
         condop = regexp;
+        break;
       }
+
+      default:
+        croak("TODO\n");
+    }
 
 #ifdef WARN_EXPERIMENTAL
-      if(condop && !warned &&
-        (!hints || !hv_fetchs(hints, "Syntax::Keyword::Try/experimental(typed)", 0))) {
-        warned = true;
-        Perl_ck_warner(aTHX_ packWARN(WARN_EXPERIMENTAL),
-          "typed catch syntax is experimental and may be changed or removed without notice");
-      }
+    if(condop && !warned &&
+      (!hints || !hv_fetchs(hints, "Syntax::Keyword::Try/experimental(typed)", 0))) {
+      warned = true;
+      Perl_ck_warner(aTHX_ packWARN(WARN_EXPERIMENTAL),
+        "typed catch syntax is experimental and may be changed or removed without notice");
+    }
 #endif
 
-      if(!lex_consume(")"))
-        croak("Expected close paren for catch (VAR)");
+    OP *body = args[argi++]->op;
 
-      lex_read_space(0);
-
-      intro_my();
-    }
-    else if(require_var) {
+    if(require_var && !has_catchvar)
       croak("Expected (VAR) for catch");
-    }
 
-    body = block_end(save_ix, parse_block(0));
-    lex_read_space(0);
+    if(catch)
+      croak("Already have a default catch {} block");
+
+    OP *assignop = NULL;
+    if(catchvar) {
+      /* my $var = $@ */
+      assignop = newBINOP(OP_SASSIGN, 0,
+        newGVOP(OP_GVSV, 0, PL_errgv), newPADxVOP(OP_PADSV, catchvar, OPf_MOD, OPpLVAL_INTRO));
+    }
 
     if(condop) {
       if(!condcatch)
@@ -536,8 +512,7 @@ static int try_keyword(pTHX_ OP **op)
     }
     else if(assignop) {
       catch = op_prepend_elem(OP_LINESEQ,
-        assignop,
-        body);
+        assignop, body);
     }
     else
       catch = body;
@@ -564,29 +539,11 @@ static int try_keyword(pTHX_ OP **op)
 
   bool no_finally = hints && hv_fetchs(hints, "Syntax::Keyword::Try/no_finally", 0);
 
-  if(!no_finally && lex_consume("finally")) {
-    I32 floor_ix, save_ix;
-    OP *body;
+  U32 has_finally = args[argi++]->i;
+  CV *finally = has_finally ? args[argi++]->cv : NULL;
 
-#if !HAVE_PERL_VERSION(5,24,0)
-    if(is_value)
-      croak("try do {} finally {} is not supported on this version of perl");
-#endif
-
-    lex_read_space(0);
-
-    floor_ix = start_subparse(FALSE, CVf_ANON);
-    SAVEFREESV(PL_compcv);
-
-    save_ix = block_start(0);
-    body = parse_block(0);
-    SvREFCNT_inc(PL_compcv);
-    body = block_end(save_ix, body);
-
-    finally = newATTRSUB(floor_ix, NULL, NULL, NULL, body);
-
-    lex_read_space(0);
-  }
+  if(no_finally && finally)
+    croak("finally {} is not permitted here");
 
   if(!catch && !finally) {
     op_free(try);
@@ -598,7 +555,7 @@ static int try_keyword(pTHX_ OP **op)
   ret = try;
 
   if(catch) {
-    ret = newENTERTRYCATCHOP(is_value ? OPf_WANT_SCALAR : 0, try, catch);
+    ret = newENTERTRYCATCHOP(0, try, catch);
   }
 
   /* If there's a finally, make
@@ -614,30 +571,35 @@ static int try_keyword(pTHX_ OP **op)
     newOP(OP_ENTER, 0),
     ret);
 
-  if(is_value)
-    ret->op_ppaddr = &pp_leave_keeping_stack;
-
-  *op = ret;
-  return is_value ? KEYWORD_PLUGIN_EXPR : KEYWORD_PLUGIN_STMT;
+  *out = ret;
+  return KEYWORD_PLUGIN_STMT;
 }
 
-static int (*next_keyword_plugin)(pTHX_ char *, STRLEN, OP **);
+static struct XSParseKeywordHooks hooks_try = {
+  .permit_hintkey = "Syntax::Keyword::Try/try",
 
-static int my_keyword_plugin(pTHX_ char *kw, STRLEN kwlen, OP **op)
-{
-  HV *hints;
-  if(PL_parser && PL_parser->error_count)
-    return (*next_keyword_plugin)(aTHX_ kw, kwlen, op);
-
-  if(!(hints = GvHV(PL_hintgv)))
-    return (*next_keyword_plugin)(aTHX_ kw, kwlen, op);
-
-  if(kwlen == 3 && strEQ(kw, "try") &&
-      hv_fetchs(hints, "Syntax::Keyword::Try/try", 0))
-    return try_keyword(aTHX_ op);
-
-  return (*next_keyword_plugin)(aTHX_ kw, kwlen, op);
-}
+  .pieces = (const struct XSParseKeywordPieceType []){
+    XPK_BLOCK,
+    XPK_REPEATED(
+      XPK_LITERAL("catch"),
+      XPK_PREFIXED_BLOCK(
+        /* optionally ($var), ($var isa Type) or ($var =~ m/.../) */
+        XPK_PARENSCOPE_OPT(
+          XPK_LEXVAR_MY(XPK_LEXVAR_SCALAR),
+          XPK_CHOICE(
+            XPK_SEQUENCE(XPK_LITERAL("isa"), XPK_TERMEXPR),
+            XPK_SEQUENCE(XPK_LITERAL("=~"), XPK_TERMEXPR)
+          )
+        )
+      )
+    ),
+    XPK_OPTIONAL(
+      XPK_LITERAL("finally"), XPK_ANONSUB
+    ),
+    {0},
+  },
+  .build = &build_try,
+};
 
 MODULE = Syntax::Keyword::Try    PACKAGE = Syntax::Keyword::Try
 
@@ -661,4 +623,6 @@ BOOT:
   Perl_custom_op_register(aTHX_ &pp_isa, &xop_isa);
 #endif
 
-  wrap_keyword_plugin(&my_keyword_plugin, &next_keyword_plugin);
+  boot_xs_parse_keyword(0.06);
+
+  register_xs_parse_keyword("try", &hooks_try, NULL);

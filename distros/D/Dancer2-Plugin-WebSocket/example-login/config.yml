@@ -1,0 +1,18 @@
+appname: "foo"
+
+engines:
+    session:
+        Simple:
+            cookie_name: example.session
+
+plugins:
+    WebSocket:
+        serializer: 1
+        login: 1
+    Auth::Extensible:
+        realms:
+            config:
+                provider: Config
+                users:
+                    - user: websocket
+                      pass: secret

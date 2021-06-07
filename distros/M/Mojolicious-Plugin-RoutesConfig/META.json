@@ -33,8 +33,7 @@
       },
       "runtime" : {
          "requires" : {
-            "Mojolicious" : "8.13",
-            "Mojolicious::Plugin::PODViewer" : "0.004",
+            "Mojolicious" : "9.17",
             "perl" : "5.020000"
          }
       }
@@ -54,6 +53,6 @@
          "web" : "https://github.com/kberov/Mojolicious-Plugin-RoutesConfig"
       }
    },
-   "version" : 0.06,
+   "version" : 0.07,
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

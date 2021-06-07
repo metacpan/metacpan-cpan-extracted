@@ -1,19 +1,30 @@
-0.052   2019-02-04 (PERLANCAR)
+0.054   2021-05-21  Released-By: PERLANCAR; Urgency: medium
+
+	- [bugfix] Don't add extraneous newline to output.
+
+
+0.053   2021-02-21  Released-By: PERLANCAR; Urgency: medium
+
+	- [bugfix] Use encoded_content() (content as bytes) instead of
+	  content() so we don't have to deal with encodings.
+
+
+0.052   2019-02-04  Released-By: PERLANCAR
 
 	- Derp, didn't do the log commit d6118fe correctly.
 
 
-0.051   2019-02-04 (PERLANCAR)
+0.051   2019-02-04  Released-By: PERLANCAR
 
 	- [ux] Log result of command to log_debug(), not log() [RT#128404].
 
 
-0.050   2018-04-06 (PERLANCAR)
+0.050   2018-04-06  Released-By: PERLANCAR
 
 	- Log output of command for debugging.
 
 
-0.04    2015-05-05 (PERLANCAR)
+0.04    2015-05-05  Released-By: PERLANCAR
 
 	- [Incompatible change] Rename option 'verbatim' to 'make_verbatim' to
           make it less ambiguous.
@@ -21,18 +32,18 @@
         - [Bugfix] The 'verbatim' option (now 'make_verbatim') didn't work :)
 
 
-0.03    2015-01-25 (PERLANCAR)
+0.03    2015-01-25  Released-By: PERLANCAR
 
 	- Add option: verbatim, to allow inserting command output as-is
 	  (e.g. raw POD) when set to 0.
 
 
-0.02     2014-12-12 (PERLANCAR)
+0.02     2014-12-12  Released-By: PERLANCAR
 
          - Rename module/dist from Dist-Zilla-Plugin-InsertCommandResult to
            Dist-Zilla-Plugin-InsertCommandOutput.
 
 
-0.01     2014-12-12 (PERLANCAR)
+0.01     2014-12-12  Released-By: PERLANCAR
 
          - First release.

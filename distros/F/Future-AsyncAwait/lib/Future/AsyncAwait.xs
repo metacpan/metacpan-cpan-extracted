@@ -56,8 +56,6 @@
 
 #include "perl-additions.c.inc"
 
-#include "lexer-additions.c.inc"
-
 /* Currently no version of perl makes this visible, so we always want it. Maybe
  * one day in the future we can make it version-dependent
  */
@@ -2297,7 +2295,6 @@ static void check_await(pTHX_ void *hookdata)
 static int build_await(pTHX_ OP **out, XSParseKeywordPiece arg0, void *hookdata)
 {
   OP *expr = arg0.op;
-  op_contextualize(expr, OP_SCALAR);
 
   if(PL_compcv == PL_main_cv)
     *out = newUNOP_CUSTOM(&pp_await, OPf_SPECIAL, expr);
@@ -2315,7 +2312,7 @@ static int build_await(pTHX_ OP **out, XSParseKeywordPiece arg0, void *hookdata)
 static struct XSParseKeywordHooks hooks_await = {
   .permit_hintkey = "Future::AsyncAwait/async",
   .check = &check_await,
-  .piece1 = XS_PARSE_KEYWORD_TERMEXPR,
+  .piece1 = XPK_TERMEXPR_SCALARCTX,
   .build1 = &build_await,
 };
 
@@ -2358,7 +2355,7 @@ static int build_cancel(pTHX_ OP **out, XSParseKeywordPiece arg0, void *hookdata
 static struct XSParseKeywordHooks hooks_cancel = {
   .permit_hintkey = "Future::AsyncAwait/async",
   .check = &check_cancel,
-  .piece1 = XS_PARSE_KEYWORD_ANONSUB,
+  .piece1 = XPK_ANONSUB,
   .build1 = &build_cancel,
 };
 
@@ -2392,7 +2389,7 @@ BOOT:
   XopENTRY_set(&xop_pushcancel, xop_class, OA_SVOP);
   Perl_custom_op_register(aTHX_ &pp_pushcancel, &xop_pushcancel);
 
-  boot_xs_parse_keyword(0);
+  boot_xs_parse_keyword(0.05);
 
   register_xs_parse_keyword("async", &hooks_async, NULL);
   register_xs_parse_keyword("await", &hooks_await, NULL);

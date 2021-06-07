@@ -1,7 +1,7 @@
 package Complete::File;
 
-our $DATE = '2019-12-18'; # DATE
-our $VERSION = '0.440'; # VERSION
+our $DATE = '2021-02-08'; # DATE
+our $VERSION = '0.443'; # VERSION
 
 use 5.010001;
 use strict;
@@ -104,6 +104,23 @@ _
             schema  => 'bool',
             default => 1,
         },
+        recurse => {
+            schema => 'bool*',
+            cmdline_aliases => {r=>{}},
+        },
+        recurse_matching => {
+            schema => ['str*', in=>['level-by-level', 'all-at-once']],
+            default => 'level-by-level',
+        },
+        exclude_leaf => {
+            schema => 'bool*',
+        },
+        exclude_dir => {
+            schema => 'bool*',
+        },
+    },
+    args_rels => {
+        dep_all => [recurse_matching => ['recurse']],
     },
     result_naked => 1,
     result => {
@@ -261,6 +278,10 @@ sub complete_file {
         filter_func => $final_filter,
         starting_path => $starting_path,
         result_prefix => $result_prefix,
+        recurse => $args{recurse},
+        recurse_matching => $args{recurse_matching},
+        exclude_leaf => $args{exclude_leaf},
+        exclude_nonleaf => $args{exclude_nonleaf} // $args{exclude_dir},
     );
 
     # XXX why doesn't Complete::Path return hash answer with path_sep? we add
@@ -301,7 +322,7 @@ Complete::File - Completion routines related to files
 
 =head1 VERSION
 
-This document describes version 0.440 of Complete::File (from Perl distribution Complete-File), released on 2019-12-18.
+This document describes version 0.443 of Complete::File (from Perl distribution Complete-File), released on 2021-02-08.
 
 =head1 DESCRIPTION
 
@@ -329,6 +350,8 @@ If turned off, will not allow "." or ".." in path.
 This is most useful when combined with C<starting_path> option to prevent user
 going up/outside the starting path.
 
+=item * B<exclude_leaf> => I<bool>
+
 =item * B<filter> => I<str|code>
 
 Only return items matching this filter.
@@ -348,11 +371,16 @@ included.
 
 =item * B<handle_tilde> => I<bool> (default: 1)
 
+=item * B<recurse> => I<bool>
+
+=item * B<recurse_matching> => I<str> (default: "level-by-level")
+
 =item * B<starting_path> => I<str> (default: ".")
 
 =item * B<word>* => I<str> (default: "")
 
 Word to complete.
+
 
 =back
 
@@ -383,10 +411,7 @@ going up/outside the starting path.
 
 =item * B<exclude_dir> => I<bool>
 
-This is also an alternative to specifying full C<filter>. Set this to true if you
-do not want directories.
-
-If you only want directories, take a look at C<complete_dir()>.
+=item * B<exclude_leaf> => I<bool>
 
 =item * B<file_ext_filter> => I<re|array[str]>
 
@@ -421,11 +446,16 @@ included.
 
 =item * B<handle_tilde> => I<bool> (default: 1)
 
+=item * B<recurse> => I<bool>
+
+=item * B<recurse_matching> => I<str> (default: "level-by-level")
+
 =item * B<starting_path> => I<str> (default: ".")
 
 =item * B<word>* => I<str> (default: "")
 
 Word to complete.
+
 
 =back
 
@@ -441,7 +471,7 @@ Source repository is at L<https://github.com/perlancar/perl-Complete-File>.
 
 =head1 BUGS
 
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Complete-File>
+Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-Complete-File/issues>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
@@ -459,7 +489,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019, 2017, 2016, 2015 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2019, 2017, 2016, 2015 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

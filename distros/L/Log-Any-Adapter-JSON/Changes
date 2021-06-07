@@ -1,5 +1,17 @@
 Changes file for Log::Any::Adapter::JSON
 
+1.15      2021-06-05 19:43:37-04:00 America/New_York
+
+  - Update test dependencies
+
+1.14      2021-06-05 14:37:03-04:00 America/New_York
+
+  - Switch to Cpanel::JSON::XS for speed and for allow_stringify
+
+1.13      2021-06-05 14:07:21-04:00 America/New_York
+
+  - Use allow_stringify option to serializer to support scalar refs (eg from logging SQL commands)
+
 1.12      2021-05-02 08:04:20-04:00 America/New_York
 
   - Minor doc fixes

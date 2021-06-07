@@ -1,7 +1,7 @@
 package File::Serialize::Serializer;
 our $AUTHORITY = 'cpan:YANICK';
 # ABSTRACT: Role for defining File::Serialize serializers
-$File::Serialize::Serializer::VERSION = '1.3.0';
+$File::Serialize::Serializer::VERSION = '1.5.0';
 
 use strict;
 use warnings;
@@ -32,6 +32,7 @@ sub does_extension {
 }
 
 sub is_operative {
+    return 1 unless $_[0]->required_modules;
     all { Module::Info->new_from_module($_) } $_[0]->required_modules;
 }
 
@@ -82,7 +83,7 @@ File::Serialize::Serializer - Role for defining File::Serialize serializers
 
 =head1 VERSION
 
-version 1.3.0
+version 1.5.0
 
 =head1 SYNOPSIS
 
@@ -120,7 +121,7 @@ A serializer should implement the following class methods:
 
 =item extensions
 
-Required. Must return a list of all extensions that this serializer can deal with. 
+Required. Must return a list of all extensions that this serializer can deal with.
 
 The first
 extension of the list will be considered the canonical extension.
@@ -135,15 +136,15 @@ that it requires L<YAML::Tiny>.
 
 =item serialize( $data, $options )
 
-Required. Returns the serialized C<$data>. 
+Required. Returns the serialized C<$data>.
 
 =item deserialize
 
-Required. Returns the deserialized C<$data>. 
+Required. Returns the deserialized C<$data>.
 
 =item groom_options( $options )
 
-Takes in the generic serializer options and groom them for 
+Takes in the generic serializer options and groom them for
 this specific one.
 
 =item groom_serialize_options( $options )
@@ -164,7 +165,7 @@ The role provides the following attributes / methods:
 
 =over
 
-=item precedence 
+=item precedence
 
 Returns the serializer's precedence, used to determine which one of the available
 serializer for a format to use. Default to C<100>. A value of C<0> means "don't use".
@@ -177,7 +178,7 @@ Yanick Champoux <yanick@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019, 2017, 2016, 2015 by Yanick Champoux.
+This software is copyright (c) 2021, 2019, 2017, 2016, 2015 by Yanick Champoux.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -1,0 +1,74 @@
+<%
+    use Mojo::Loader qw( data_section );
+    use Mojo::JSON qw( encode_json );
+    use Zapp::Util qw(
+        get_path_from_data prefix_field rename_field
+        parse_zapp_attrs
+    );
+    layout 'zapp';
+    my $plan = stash( 'plan' ) // {};
+%>
+
+%= form_for 'zapp.edit_trigger', method => 'POST', enctype => 'multipart/form-data', begin
+    <input name="type" type="hidden" value="<%= $trigger->{type} %>">
+    <header class="form-row align-items-center">
+        <h1 class="col-auto">Edit Trigger</h1>
+    </header>
+
+    <div class="form-group">
+        <label class="mb-1" for="label">Label</label>
+        <input id="label" class="form-control" name="label" type="text" placeholder="Plan Label" value="<%= $trigger->{label} %>">
+    </div>
+
+    <div class="form-group">
+        <label for="description">Description</label>
+        <%= include 'zapp/textarea',
+            name => 'description',
+            value => $trigger->{description},
+            args => [
+                placeholder => 'Trigger description',
+                id => 'description',
+            ],
+        %>
+    </div>
+
+    <%
+        my $config_form = app->zapp->triggers->{ $trigger->{type} }->config_field( $self, $trigger->{config} );
+        my $config_dom = Mojo::DOM->new( $config_form );
+        $config_dom = parse_zapp_attrs( $config_dom, $trigger->{config} );
+        $config_dom = prefix_field( $config_dom, 'config' );
+    %>
+    <div class="form-group" id="trigger-config">
+        <%== $config_dom %>
+    </div>
+
+    <div id="input-">
+        <h2>Plan Input</h2>
+        %= hidden_field "plan_id", $self->param( 'plan_id' )
+        % if ( my @inputs = @{ stash( 'inputs' ) // [] } ) {
+            % for my $input_num ( 0..$#inputs ) {
+                % my $input = $inputs[ $input_num ];
+                <div class="form-group" data-input="<%= $input_num %>">
+                    <h4 data-input-name><%= $input->{label} // ( $input->{name} =~ s/_/ /gr ) %></h4>
+                    <%
+                        my $type_name = $input->{type};
+                        my $type = $c->zapp->types->{ $type_name }
+                            or die qq{Could not find type "$type_name"};
+                        my $input_field = include inline => $type->input_field( $c, $input->{config}, $input->{value} ), self => $type, input => $input;
+                        my $input_dom = prefix_field( $input_field, "input.$input->{name}" );
+                        $input_dom->children->[0]->attr( 'aria-describedby', "input[$input_num].description" );
+                    %><%== $input_dom %>
+                    <small class="form-text text-break text-pre-wrap" id="input[<%= $input_num %>].description"><%= $input->{description} %></small>
+                </div>
+            % }
+        % }
+
+    </div>
+
+    <button class="btn btn-primary">Save</button>
+% end
+
+
+
+
+

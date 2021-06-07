@@ -3,7 +3,7 @@ NAME
     search
 
 VERSION
-    This document describes version 0.005 of WordListRole::BinarySearch
+    This document describes version 0.006 of WordListRole::BinarySearch
     (from Perl distribution WordListRole-BinarySearch), released on
     2021-04-25.
 

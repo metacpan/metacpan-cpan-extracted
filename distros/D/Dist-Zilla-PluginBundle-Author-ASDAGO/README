@@ -1,0 +1,80 @@
+NAME
+
+    Dist::Zilla::PluginBundle::Author::ASDAGO - ASDAGO's Dist::Zilla
+    plugin bundle
+
+VERSION
+
+    version 0.001
+
+DESCRIPTION
+
+    This is ASDAGO's plugin bundle for Dist::Zilla.
+
+ATTRIBUTES
+
+ sysname
+
+    This is the system name used for the git repository on Savannah
+    <https://savannah.nongnu.org>. It defaults to the distribution
+    name. You can use formatting codes as for
+    Dist::Zilla::Plugin::MetaResourcesFromGit.
+
+ fast_build
+
+    If this is true, then some things will be skipped in order to
+    generate the build faster. Do not use this in releases. The
+    environment variable FAST_BUILD can also be used to set this
+    attribute.
+
+    Things that are skipped are things that should be present in
+    releases, but are not necessary for testing and may slow down the
+    build significantly. For example, auto-generated prerequisites.
+
+ fake_release
+
+    If this is true, then use the FakeRelease plugin instead of
+    UploadToCPAN. The environment variable FAKE_RELEASE can also be
+    used to set this attribute.
+
+ skip_push
+
+    If this is true, then pushing to the git repository will be
+    skipped during release. The environment variable SKIP_PUSH can
+    also be used to set this attribute.
+
+BUGS
+
+    Please report any bugs or feature requests on the bugtracker
+    website
+    https://rt.cpan.org/Public/Dist/Display.html?Name=Dist-Zilla-PluginBundle-Author-ASDAGO
+    or by email to
+    bug-Dist-Zilla-PluginBundle-Author-ASDAGO@rt.cpan.org
+    <mailto:bug-Dist-Zilla-PluginBundle-Author-ASDAGO@rt.cpan.org>.
+
+    When submitting a bug or request, please include a test-file or a
+    patch to an existing test-file that illustrates the bug or
+    desired feature.
+
+AUTHOR
+
+    Asher Gordon <AsDaGo@posteo.net>
+
+COPYRIGHT AND LICENSE
+
+    Copyright (C) 2021 Asher Gordon <AsDaGo@posteo.net>
+
+    This program is free software: you can redistribute it and/or
+    modify it under the terms of the GNU General Public License as
+    published by the Free Software Foundation, either version 3 of
+    the License, or (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+    General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program. If not, see
+    <http://www.gnu.org/licenses/>.
+

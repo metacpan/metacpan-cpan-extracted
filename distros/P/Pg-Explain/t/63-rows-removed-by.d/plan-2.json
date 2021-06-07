@@ -1,0 +1,45 @@
+[
+  {
+    "Plan": {
+      "Node Type": "Bitmap Heap Scan",
+      "Parallel Aware": false,
+      "Async Capable": false,
+      "Relation Name": "part_1",
+      "Alias": "part_1",
+      "Startup Cost": 16.01,
+      "Total Cost": 23.85,
+      "Plan Rows": 2,
+      "Plan Width": 1367,
+      "Actual Startup Time": 0.177,
+      "Actual Total Time": 4.608,
+      "Actual Rows": 26,
+      "Actual Loops": 1,
+      "Recheck Cond": "(plan ~ 'wha'::text)",
+      "Rows Removed by Index Recheck": 4,
+      "Exact Heap Blocks": 29,
+      "Lossy Heap Blocks": 0,
+      "Plans": [
+        {
+          "Node Type": "Bitmap Index Scan",
+          "Parent Relationship": "Outer",
+          "Parallel Aware": false,
+          "Async Capable": false,
+          "Index Name": "part_1_trgm",
+          "Startup Cost": 0.00,
+          "Total Cost": 16.01,
+          "Plan Rows": 2,
+          "Plan Width": 0,
+          "Actual Startup Time": 0.037,
+          "Actual Total Time": 0.037,
+          "Actual Rows": 30,
+          "Actual Loops": 1,
+          "Index Cond": "(plan ~ 'wha'::text)"
+        }
+      ]
+    },
+    "Planning Time": 1.210,
+    "Triggers": [
+    ],
+    "Execution Time": 4.668
+  }
+]

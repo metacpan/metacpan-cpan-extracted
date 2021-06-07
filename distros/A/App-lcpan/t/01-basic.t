@@ -604,7 +604,10 @@ sub run_lcpan_json {
     eval {
         $res->{stdout} = JSON::MaybeXS::decode_json($res->{stdout});
     };
-    warn if $@;
+    if ($@) {
+        diag "stdout is <<$res->{stdout}>>";
+        warn;
+    }
     $res;
 }
 

@@ -1,10 +1,202 @@
-DESCRIPTION
+NAME
+    App::BashHistoryUtils - CLI utilities related to bash history file
 
+VERSION
+    This document describes version 0.070 of App::BashHistoryUtils (from
+    Perl distribution App-BashHistoryUtils), released on 2021-05-26.
+
+DESCRIPTION
     This distribution includes the following CLI utilities:
 
-    #INSERT_EXECS_LIST
+    *   delete-bash-history-entries
+
+    *   each-bash-history-entry
+
+    *   grep-bash-history-entries
+
+FUNCTIONS
+  delete_bash_history_entries
+    Usage:
+
+     delete_bash_history_entries(%args) -> [$status_code, $reason, $payload, \%result_meta]
+
+    Delete matching entries from bash history file.
+
+    This function is not exported.
+
+    This function supports dry-run operation.
+
+    Arguments ('*' denotes required arguments):
+
+    *   histfile => *str* (default: "/home/u1/.bash_history")
+
+    *   ignore_case => *bool*
+
+    *   inplace => *bool*
+
+        Replace original bash history file.
+
+    *   invert_match => *bool*
+
+    *   max_age => *duration*
+
+        Match entries older than a certain age.
+
+    *   min_age => *duration*
+
+        Match entries younger than a certain age.
+
+    *   pattern => *re*
+
+        Match entries using a regex pattern.
+
+    *   strip_timestamp => *bool*
+
+        Strip timestamps.
+
+    Special arguments:
+
+    *   -dry_run => *bool*
+
+        Pass -dry_run=>1 to enable simulation mode.
+
+    Returns an enveloped result (an array).
+
+    First element ($status_code) is an integer containing HTTP-like status
+    code (200 means OK, 4xx caller error, 5xx function error). Second
+    element ($reason) is a string containing error message, or something
+    like "OK" if status is 200. Third element ($payload) is the actual
+    result, but usually not present when enveloped result is an error
+    response ($status_code is not 2xx). Fourth element (%result_meta) is
+    called result metadata and is optional, a hash that contains extra
+    information, much like how HTTP response headers provide additional
+    metadata.
+
+    Return value: (any)
+
+  each_bash_history_entry
+    Usage:
+
+     each_bash_history_entry(%args) -> [$status_code, $reason, $payload, \%result_meta]
+
+    Run Perl code for each bash history entry.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   code* => *str*
+
+        Perl code to run for each entry.
+
+        Inside the code, you can set $PRINT to 0 to suppress the output of
+        the entry. You can modify $_ to modify the entry. $TS (timestamp) is
+        also available.
+
+    *   histfile => *str* (default: "/home/u1/.bash_history")
+
+    *   ignore_case => *bool*
+
+    *   invert_match => *bool*
+
+    *   max_age => *duration*
+
+        Match entries older than a certain age.
+
+    *   min_age => *duration*
+
+        Match entries younger than a certain age.
+
+    *   strip_timestamp => *bool*
+
+        Strip timestamps.
+
+    Returns an enveloped result (an array).
+
+    First element ($status_code) is an integer containing HTTP-like status
+    code (200 means OK, 4xx caller error, 5xx function error). Second
+    element ($reason) is a string containing error message, or something
+    like "OK" if status is 200. Third element ($payload) is the actual
+    result, but usually not present when enveloped result is an error
+    response ($status_code is not 2xx). Fourth element (%result_meta) is
+    called result metadata and is optional, a hash that contains extra
+    information, much like how HTTP response headers provide additional
+    metadata.
+
+    Return value: (any)
+
+  grep_bash_history_entries
+    Usage:
+
+     grep_bash_history_entries(%args) -> [$status_code, $reason, $payload, \%result_meta]
+
+    Show matching entries from bash history file.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   histfile => *str* (default: "/home/u1/.bash_history")
+
+    *   ignore_case => *bool*
+
+    *   invert_match => *bool*
+
+    *   max_age => *duration*
+
+        Match entries older than a certain age.
+
+    *   min_age => *duration*
+
+        Match entries younger than a certain age.
+
+    *   pattern => *re*
+
+        Match entries using a regex pattern.
+
+    *   strip_timestamp => *bool*
+
+        Strip timestamps.
+
+    Returns an enveloped result (an array).
+
+    First element ($status_code) is an integer containing HTTP-like status
+    code (200 means OK, 4xx caller error, 5xx function error). Second
+    element ($reason) is a string containing error message, or something
+    like "OK" if status is 200. Third element ($payload) is the actual
+    result, but usually not present when enveloped result is an error
+    response ($status_code is not 2xx). Fourth element (%result_meta) is
+    called result metadata and is optional, a hash that contains extra
+    information, much like how HTTP response headers provide additional
+    metadata.
+
+    Return value: (any)
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/App-BashHistoryUtils>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-App-BashHistoryUtils>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://github.com/perlancar/perl-App-BashHistoryUtils/issues>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
 
 SEE ALSO
-
     Bash::History::Read
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2021, 2017, 2016, 2015 by
+    perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

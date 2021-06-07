@@ -1,7 +1,9 @@
 package App::cryp::exchange;
 
-our $DATE = '2018-11-29'; # DATE
-our $VERSION = '0.011'; # VERSION
+# AUTHOR
+our $DATE = '2021-05-26'; # DATE
+our $DIST = 'App-cryp-exchange'; # DIST
+our $VERSION = '0.012'; # VERSION
 
 use 5.010001;
 use strict;
@@ -60,7 +62,7 @@ our %arg_req1_pair = (
 
 our %arg_req3_price = (
     price => {
-        schema => ['float*', xmin=>0, 'x.perl.coerce_rules'=>['str_num_en']],
+        schema => ['float*', xmin=>0, 'x.perl.coerce_rules'=>['From_str::num_en']],
         req => 1,
         pos => 3,
     },
@@ -69,11 +71,11 @@ our %arg_req3_price = (
 our %args_size = (
     base_size => {
         summary => 'Order amount, denominated in base currency (first currency of the pair)',
-        schema => ['float*', xmin=>0, 'x.perl.coerce_rules'=>['str_num_en']],
+        schema => ['float*', xmin=>0, 'x.perl.coerce_rules'=>['From_str::num_en']],
     },
     quote_size => {
         summary => 'Order amount, denominated in quote currency (second currency of the pair)',
-        schema => ['float*', xmin=>0, 'x.perl.coerce_rules'=>['str_num_en']],
+        schema => ['float*', xmin=>0, 'x.perl.coerce_rules'=>['From_str::num_en']],
     },
 );
 
@@ -446,7 +448,7 @@ App::cryp::exchange - Interact with cryptoexchanges using a common interface
 
 =head1 VERSION
 
-This document describes version 0.011 of App::cryp::exchange (from Perl distribution App-cryp-exchange), released on 2018-11-29.
+This document describes version 0.012 of App::cryp::exchange (from Perl distribution App-cryp-exchange), released on 2021-05-26.
 
 =head1 SYNOPSIS
 
@@ -459,7 +461,7 @@ Please see included script L<cryp-exchange>.
 
 Usage:
 
- accounts(%args) -> [status, msg, payload, meta]
+ accounts(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 List exchange accounts.
 
@@ -471,25 +473,27 @@ Arguments ('*' denotes required arguments):
 
 =item * B<detail> => I<bool>
 
+
 =back
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
+
 
 
 =head2 balance
 
 Usage:
 
- balance(%args) -> [status, msg, payload, meta]
+ balance(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 List account balance.
 
@@ -501,25 +505,27 @@ Arguments ('*' denotes required arguments):
 
 =item * B<account>* => I<cryptoexchange::account>
 
+
 =back
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
+
 
 
 =head2 cancel_order
 
 Usage:
 
- cancel_order(%args) -> [status, msg, payload, meta]
+ cancel_order(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Cancel an order.
 
@@ -537,25 +543,27 @@ Arguments ('*' denotes required arguments):
 
 =item * B<type>* => I<str>
 
+
 =back
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
+
 
 
 =head2 create_limit_order
 
 Usage:
 
- create_limit_order(%args) -> [status, msg, payload, meta]
+ create_limit_order(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Create a limit order.
 
@@ -581,25 +589,27 @@ Order amount, denominated in quote currency (second currency of the pair).
 
 =item * B<type>* => I<str>
 
+
 =back
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
+
 
 
 =head2 exchanges
 
 Usage:
 
- exchanges(%args) -> [status, msg, payload, meta]
+ exchanges(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 List supported exchanges.
 
@@ -611,25 +621,27 @@ Arguments ('*' denotes required arguments):
 
 =item * B<detail> => I<bool>
 
+
 =back
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
+
 
 
 =head2 get_order
 
 Usage:
 
- get_order(%args) -> [status, msg, payload, meta]
+ get_order(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Get information about an order.
 
@@ -647,25 +659,27 @@ Arguments ('*' denotes required arguments):
 
 =item * B<type>* => I<str>
 
+
 =back
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
+
 
 
 =head2 open_orders
 
 Usage:
 
- open_orders(%args) -> [status, msg, payload, meta]
+ open_orders(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 List open orders.
 
@@ -679,25 +693,27 @@ Arguments ('*' denotes required arguments):
 
 =item * B<pair> => I<str>
 
+
 =back
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
+
 
 
 =head2 orderbook
 
 Usage:
 
- orderbook(%args) -> [status, msg, payload, meta]
+ orderbook(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Get order book on an exchange.
 
@@ -713,25 +729,27 @@ Arguments ('*' denotes required arguments):
 
 =item * B<type> => I<str>
 
+
 =back
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
+
 
 
 =head2 pairs
 
 Usage:
 
- pairs(%args) -> [status, msg, payload, meta]
+ pairs(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 List pairs supported by exchange.
 
@@ -747,25 +765,27 @@ Arguments ('*' denotes required arguments):
 
 =item * B<native> => I<bool>
 
+
 =back
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
+
 
 
 =head2 ticker
 
 Usage:
 
- ticker(%args) -> [status, msg, payload, meta]
+ ticker(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Get a pair's ticker (last 24h price & volume information).
 
@@ -779,16 +799,17 @@ Arguments ('*' denotes required arguments):
 
 =item * B<pair>* => I<str>
 
+
 =back
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -802,7 +823,7 @@ Source repository is at L<https://github.com/perlancar/perl-App-cryp-exchange>.
 
 =head1 BUGS
 
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-cryp-exchange>
+Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-App-cryp-exchange/issues>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
@@ -818,7 +839,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2018 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

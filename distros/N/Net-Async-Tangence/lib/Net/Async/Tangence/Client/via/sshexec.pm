@@ -1,19 +1,21 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2010-2017 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2010-2021 -- leonerd@leonerd.org.uk
 
-package Net::Async::Tangence::Client::via::sshexec;
+package Net::Async::Tangence::Client::via::sshexec 0.16;
 
-use strict;
+use v5.14;
 use warnings;
-
-our $VERSION = '0.15';
 
 sub connect
 {
    my $client = shift;
-   my ( $uri ) = @_;
+   my ( $uri, %args ) = @_;
+
+   my @sshargs;
+   push @sshargs, "-4" if $args{family} and $args{family} eq "inet4";
+   push @sshargs, "-6" if $args{family} and $args{family} eq "inet6";
 
    my $host  = $uri->authority;
 
@@ -26,7 +28,7 @@ sub connect
    # $query will contain args to exec - split them on +
    my @argv = split( m/\+/, $query );
 
-   return $client->connect_exec( [ "ssh", $host, $path, @argv ] );
+   return $client->connect_exec( [ "ssh", @sshargs, $host, $path, @argv ] );
 }
 
 0x55AA;

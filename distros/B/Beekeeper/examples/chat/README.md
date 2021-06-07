@@ -7,7 +7,7 @@ This example implements a real world setup with isolated buses and redundancy:
 
 ## Running this example
 
-To run this example start worker pools:
+To run this example start all worker pools:
 ```
 cd beekeper/examples/chat
 source setup.sh
@@ -18,17 +18,20 @@ Then open `chat.html` in a browser, or use the command line client:
 ```
 ./chat.pl
 ```
-The system can be stressed with:
+The JSON-RPC traffic will be dumped on browser console. You can check the pool status with 
+`bkpr-top` or watch the stream of exceptions that this example may generate with `bkpr-log -f`. 
+
+The system can be stressed generating traffic with:
 ```
 ./flood.pl -c 50 -r 500
 ```
-When done, stop worker pools with:
+Finally stop worker pools with:
 ```
 ./run.sh stop
 ```
-Network traffic can be inspected with:
+MQTT network traffic can be inspected with:
 ```
-tcpflow -i any -C -g port 61613
+tcpflow -i any -C -g port 1883
 ```
 This is `bkpr-top` showing this example running:
 
@@ -36,51 +39,101 @@ This is `bkpr-top` showing this example running:
 
 ---
 
-### ActiveMQ setup
+### Mosquitto setup
 
-This example uses the internal ToyBroker to allow being run out of the box, but to use `chat.html` the WebSockets capabilities of ActiveMQ or RabbitMQ are required (`chat.pl` works fine though).
+This example uses the internal ToyBroker to allow being run out of the box, but to use actual 
+WebSockets from `client.html` a real broker like ![Mosquitto](https://mosquitto.org/) is required
+(`client.pl` works fine with ToyBroker though).
 
-To run this example on a fresh install of ActiveMQ just set `use_toybroker` to false in config file `pool.config.json`. Also ensure that `host` addresses in `bus.config.json` and `config.js` match ActiveMQ one.
+To run this example on a fresh install of Mosquitto set `use_toybroker` to false in config file
+`pool.config.json`. Then follow the instructions below to quickly setup a Mosquitto instance capable 
+of running Beekeper applications with a minimal security. 
 
-Note that ActiveMQ does not support virtual hosts, so this example will not use four different brokers as it should (it works anyway because queue names do not clash).
+Please note that the entire idea is to have the backend and frontend buses serviced by different broker 
+instances, running on isolated servers. This setup uses a single broker instance for simplicity, and works 
+just because topics do not clash (see ![Brokers.md](../../doc/Brokers.md) for a proper configuration).
 
+Create `/etc/mosquitto/conf.d/beekeeper.conf`
+```
+per_listener_settings true
 
-### RabbitMQ setup
+# Backend
+listener 1883 0.0.0.0
+protocol mqtt
+max_qos 1
+persistence false
+retain_available false
+persistent_client_expiration 1h
+max_queued_messages 10000
+allow_anonymous false
+acl_file /etc/mosquitto/conf.d/beekeeper.backend.acl
+password_file /etc/mosquitto/conf.d/beekeeper.users
 
-To run this example on a fresh install of RabbitMQ set `use_toybroker` to false in config file
-`pool.config.json`. Also ensure that `host` addresses in `bus.config.json` and `config.js` match RabbitMQ one.
+# Frontend tcp
+listener 8001 0.0.0.0
+protocol mqtt
+max_qos 1
+persistence false
+retain_available false
+persistent_client_expiration 1h
+max_queued_messages 100
+allow_anonymous false
+acl_file /etc/mosquitto/conf.d/beekeeper.frontend.acl
+password_file /etc/mosquitto/conf.d/beekeeper.users
 
-Then configure RabbitMQ (enable STOMP and create the required users and virtual hosts) with the following commands:
+# Frontend WebSocket
+listener 8000 0.0.0.0
+protocol websockets
+max_qos 1
+persistence false
+retain_available false
+persistent_client_expiration 1h
+max_queued_messages 100
+allow_anonymous false
+acl_file /etc/mosquitto/conf.d/beekeeper.frontend.acl
+password_file /etc/mosquitto/conf.d/beekeeper.users
 
 ```
-rabbitmq-plugins enable rabbitmq_stomp
-rabbitmq-plugins enable rabbitmq_web_stomp
-
-rabbitmqctl add_user frontend abc123
-rabbitmqctl add_user backend def456
-
-rabbitmqctl add_vhost /frontend-A
-rabbitmqctl add_vhost /frontend-B
-rabbitmqctl add_vhost /backend-A
-rabbitmqctl add_vhost /backend-B
-
-rabbitmqctl set_permissions frontend -p /frontend-A ".*" ".*" ".*"
-rabbitmqctl set_permissions frontend -p /frontend-B ".*" ".*" ".*"
-
-rabbitmqctl set_permissions backend -p /backend-A  ".*" ".*" ".*"
-rabbitmqctl set_permissions backend -p /backend-B  ".*" ".*" ".*"
-rabbitmqctl set_permissions backend -p /frontend-A ".*" ".*" ".*"
-rabbitmqctl set_permissions backend -p /frontend-B ".*" ".*" ".*"
-
-rabbitmqctl set_policy expiry -p /backend-A  ".*" '{"expires":60000}' --apply-to queues
-rabbitmqctl set_policy expiry -p /backend-B  ".*" '{"expires":60000}' --apply-to queues
-rabbitmqctl set_policy expiry -p /frontend-A ".*" '{"expires":60000}' --apply-to queues
-rabbitmqctl set_policy expiry -p /frontend-B ".*" '{"expires":60000}' --apply-to queues
-
-rabbitmqctl set_topic_permissions frontend -p /frontend-A amq.topic "" "^msg.frontend.*"
-rabbitmqctl set_topic_permissions frontend -p /frontend-B amq.topic "" "^msg.frontend.*"
+Create `/etc/mosquitto/conf.d/beekeeper.backend.acl`
 ```
+pattern  read   priv/%c
+
+user backend
+
+topic   readwrite   msg/#
+topic   readwrite   req/#
+topic   readwrite   res/#
+topic   readwrite   log/#
+topic   write       priv/#
+```
+Create `/etc/mosquitto/conf.d/beekeeper.frontend.acl`
+```
+pattern  read   priv/%c
+
+user frontend
+
+topic   read    msg/#
+topic   write   req/#
+
+user router
+
+topic   write   msg/#
+topic   read    req/#
+topic   write   priv/#
+```
+Create broker users running the following commands:
+```
+mosquitto_passwd -c -b /etc/mosquitto/conf.d/beekeeper.users  frontend  abc123
+mosquitto_passwd    -b /etc/mosquitto/conf.d/beekeeper.users  backend   def456
+mosquitto_passwd    -b /etc/mosquitto/conf.d/beekeeper.users  router    ghi789
+```
+Then the Mosquitto broker instance can be started with:
+```
+mosquitto -c /etc/mosquitto/conf.d/beekeeper.conf
+```
+If the broker is running elsewhere than localhost edit `bus.config.json` and `config.js` accordingly.
+
 ---
 
-This example uses the STOMP.js library Copyright 2010-2013 [Jeff Mesnil](http://jmesnil.net/), Copyright 2012 [FuseSource, Inc.](http://fusesource.com), Copyright 2017 [Deepak Kumar](https://www.kreatio.com).
-Currently maintained at <https://github.com/stomp-js/stomp-websocket>.
+This example requires the MQTT.js library Copyright 2015-2021 MQTT.js contributors 
+under MIT License (<https://github.com/mqttjs/MQTT.js>).

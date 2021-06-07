@@ -1,16 +1,22 @@
-0.003   2019-06-09 (PERLANCAR)
+0.004   2021-05-25  Released-By: PERLANCAR; Urgency: high
+
+	- [build] Rebuild to update Sah coercion module names (old Sah coercion
+          modules have been purged from CPAN).
+
+
+0.003   2019-06-09  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- Fix module Summary.
 
 
-0.002   2019-06-09 (PERLANCAR)
+0.002   2019-06-09  Released-By: PERLANCAR
 
 	- [ux] image-is-{landscape,portrait}: Add option --quiet (-q) and
 	  add examples.
 
 
-0.001   2019-01-28 (PERLANCAR)
+0.001   2019-01-28  Released-By: PERLANCAR
 
 	- First release.

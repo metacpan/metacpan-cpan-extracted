@@ -1,0 +1,237 @@
+NAME
+
+    Games::Simutrans::Pakset - Represents an entire Pakset for the
+    Simutrans game
+
+VERSION
+
+    version 0.01
+
+SYNOPSIS
+
+      use Games::Simutrans::Pakset;
+    
+      my $g= Games::Simutrans::Pakset->new;
+      $g->path('~/simutrans/sources/simutrans-pak128.britain');
+    
+      use Data::Dumper;
+      print Dumper($g->languages);
+    
+      $g->load;
+    
+      print $g->object('4-wheel-1850s')->to_string;
+
+DESCRIPTION
+
+    Games::Simutrans::Pakset creates objects that represent a Pakset for
+    the Simutrans game. These objects are of type Games::Simutrans::Pak,
+    and are accompanied by various other meta-information like language
+    translations.
+
+    "Each pakset has different objects, buying prices, maintenance costs,
+    themes and a whole unique gameplay. Every pakset is a new game." --
+    https://simutrans.com/.
+
+    Component objects created represent language translations, graphical
+    objects, and so on. As yet the representation in the objects created by
+    the Perl modules are incomplete, but eventually they may be enough to
+    load a pakset into a game engine written entirely in Perl, or to permit
+    editing an entire Pakset while enforcing set-wide consistency (i.e.,
+    timelines will not include eras when no rail vehicles are unbuildable;
+    goods prices or capacity and motive power growth can be tracked over
+    time, etc.)
+
+    Paksets for both the Standard and Extended (formerly "Experimental")
+    versions for Simutrans are supported.
+
+METHODS
+
+ new
+
+      my $pakset = Games::Simutrans::Pakset->new;
+
+    Create a new Pakset object. This module uses objects contructed with
+    Mojo::Base. The following attributes, all optional, may be useful to
+    pass when creating the object:
+
+    path
+
+    name
+
+    language
+
+ name
+
+    An identifying name for the pakset. Not used in any computation; as an
+    identifier only.
+
+ path
+
+    Returns, or sets if an argument is given, the base path on the local
+    filesystem for the pakset root. Tildes are expanded to the user's home
+    directory. After tke pakset is loaded, this will be a Mojo::File object
+    (which, when used in scalar context, reduces to the path string).
+
+ valid
+
+    Returns a nonzero value if the path() appears to contain a valid
+    Simutrans pakset. At the moment it simply verifies that the path
+    exists.
+
+ xlat_root
+
+    Returns, or sets if an argument is given, the base path, usually a
+    subtree under that pakset root, where the language translation files
+    are stored.
+
+ languages
+
+    Returns a Mojo::Collection of available language translations, based on
+    the directories and files that exist in xlat_root.
+
+ language
+
+    Returns, or sets if an argument is given, the current language for
+    translation. Defaults to the environment string LANGUAGE, or LANG, or
+    en otherwise.
+
+ translate ($string, $language)
+
+    Returns the translation of $string in the $language given (or in the
+    current language if $language is undef).
+
+ language_tables
+
+    Returns the actual language translation tables, as used by the
+    translate method.
+
+ objects
+
+    Returns a hash of all the objects defined in the pakset.
+
+ object
+
+      my $obj = $pakset->object($object_name);
+      my $attr = $pakset->object($object_name, $attribute);
+      $pakset->object($object_name, $attribute, $value);
+
+    Returns a hash of the values for the given object, by name. If
+    $attribute is set, returns only that attribute (which may be a scalar,
+    array, or hash) or sets it (if $value is defined).
+
+ imagefiles
+
+    Returns a hash of discovered image files for the Simutrans objects in
+    the pakset. The keys of the hash are the full ocal pathnames of the
+    files, with each value being the matching Games::Simutrans::Image
+    object.
+
+ grep
+
+      my @objects = $pakset->grep( sub { ... } );
+
+    Calls the callback, using List::Util::pairgrep, once for each item in
+    the hash of attributes for each object (the two parameters to the
+    callback being the object name, and its hash of attributes). Returns a
+    list of object names for which the callback returned a nonzero value.
+
+ object_types
+
+      my @obj_types = $pakset->objects_types;
+
+    Returns a list of object types defined in the pakset.
+
+ objects_of_type
+
+      my @obj = $pakset->objects_of_type('vehicle');
+
+    Returns a list of the objects of a given type as defined in the pakset.
+
+ timeline
+
+      my $timeline = $pakset->timeline($type);
+
+    Returns a timeline, in chronological order, of the introduction and
+    retirement dates for each object in the pak, or for objects of the type
+    given.
+
+ save
+
+      $pakset->save($object);
+
+    Saves an attribute hash in the pakset. The attribute name must contain
+    the object name, which will become its key in the pakset's object hash.
+
+ read_dat
+
+      $pakset->read_dat($filename);
+
+    Reads a single *.dat file using Mojo::File::slurp, splits it into
+    individual objects (separated by lines beginning with at least two
+    dashes, as per the *.dat specification), calls the from_string method
+    in Games::Simutrans::Pak to create a Pak object from it, and then the
+    save method in this module to save that Pak in the Pakset object.
+
+ load
+
+      $pakset->load($path);
+
+    Loads an entire pakset, from the path given or from the path at the
+    path attribute.
+
+ dat_files
+
+    Returns a Mojo::Collection list of all the *.dat files loaded via the
+    load() method.
+
+ find_all_images
+
+    For each of the various graphic subimages defined in the pakset,
+    determines in which actual *.png file they are contained, and finds the
+    maximum (x,y) grid locations used in each *.png file.
+
+ find_image_tile_sizes
+
+    Actually loads (using the Imager module) each *.png file which is
+    called for by the pakset, and using the maximum (x,y) grid locations
+    discovered by find_all_images, determines the tile size for each *.png
+    file.
+
+ scan_liveries
+
+    Loads the "convoi" livery files using Games::Simutrans::Livery and
+    keeps track of the period of use of each of them.
+
+ liveries
+
+    Returns a hash, keyed by the name of each livery, of pertinent data.
+
+AUTHOR
+
+    William Lindley <wlindley@cpan.org>
+
+COPYRIGHT
+
+    Copyright 2021 William Lindley
+
+LICENSE
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+SEE ALSO
+
+    Games::Simutrans::Pak, Games::Simutrans::Image,
+    Games::Simutrans::Livery
+
+    Imager
+
+    Simutrans, https://simutrans.com/, is a free-software, open-source
+    transportation simulator.
+
+    The Simutrans Wiki,
+    https://simutrans-germany.com/wiki/wiki/en_dat_Files, explains the
+    format of *.dat files. They are normally fed, along with graphic *.png
+    files, to the makeobj program to make the binary *.dat files that the
+    Simutrans game engines use.
+

@@ -1,7 +1,7 @@
 package App::lcpan::Cmd::deps;
 
-our $DATE = '2020-08-13'; # DATE
-our $VERSION = '1.062'; # VERSION
+our $DATE = '2021-06-05'; # DATE
+our $VERSION = '1.068'; # VERSION
 
 use 5.010;
 use strict;
@@ -29,7 +29,7 @@ App::lcpan::Cmd::deps - List dependencies of distributions
 
 =head1 VERSION
 
-This document describes version 1.062 of App::lcpan::Cmd::deps (from Perl distribution App-lcpan), released on 2020-08-13.
+This document describes version 1.068 of App::lcpan::Cmd::deps (from Perl distribution App-lcpan), released on 2021-06-05.
 
 =head1 FUNCTIONS
 
@@ -38,7 +38,7 @@ This document describes version 1.062 of App::lcpan::Cmd::deps (from Perl distri
 
 Usage:
 
- handle_cmd(%args) -> [status, msg, payload, meta]
+ handle_cmd(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 List dependencies of distributions.
 
@@ -48,19 +48,28 @@ Examples:
 
 =item * List what modules Module-List requires:
 
- handle_cmd( dists => ["Module-List"]);
+ handle_cmd(dists => ["Module-List"]);
 
 =item * List modules Module-List requires (module name will be converted to distro name):
 
- handle_cmd( dists => ["Module::List"]);
+ handle_cmd(dists => ["Module::List"]);
+
+=item * List what distribution that contains Sah::Schema::filename requires:
+
+ handle_cmd(modules => ["Sah::Schema::filename"]);
+
+Sah::Schema::filename is included in Sah-Schemas-Path distribution, so this
+command is equivalent to "lcpan deps Sah-Schemas-Path". You can't do "lcpan deps
+Sah::Schema::filename" because C<lcpan> will assume that you ask "lcpan deps
+Sah-Schema-filename" and there is no Sah-Schema-filename distribution.
 
 =item * List non-core modules Module-List requires:
 
- handle_cmd( dists => ["Module-List"], include_core => 0);
+ handle_cmd(dists => ["Module-List"], include_core => 0);
 
 =item * List dependencies of a specific distribution release:
 
- handle_cmd( dists => ["Module-List\@0.004"]);
+ handle_cmd(dists => ["Module-List\@0.004"]);
 
 =back
 
@@ -112,7 +121,7 @@ Location of your local CPAN mirror, e.g. E<sol>pathE<sol>toE<sol>cpan.
 
 Defaults to C<~/cpan>.
 
-=item * B<dists>* => I<array[perl::distname_with_optional_ver]>
+=item * B<dists> => I<array[perl::distname_with_optional_ver]>
 
 Distribution names (with optional version suffix, e.g. Foo-Bar@1.23).
 
@@ -183,7 +192,9 @@ using the C<index_name>.
 
 Recurse for a number of levels (-1 means unlimited).
 
-=item * B<perl_version> => I<str> (default: "v5.30.0")
+=item * B<modules> => I<array[perl::modname]>
+
+=item * B<perl_version> => I<str> (default: "v5.34.0")
 
 Set base Perl version for determining core modules.
 
@@ -219,12 +230,12 @@ Check each dependency as XSE<sol>PP.
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -250,7 +261,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020, 2019, 2018, 2017, 2016, 2015 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2020, 2019, 2018, 2017, 2016, 2015 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

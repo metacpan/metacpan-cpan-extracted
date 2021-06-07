@@ -149,6 +149,29 @@ the symbols will be defined, else commented.
 
 Added in 0.15.
 
+=head2 cpp_standard_flag
+
+  $guess->cpp_standard_flag( $standard_name )
+
+Given a string C<$standard_name> that is currently one of
+
+=over
+
+=item * C<< C++98 >>
+
+=item * C<< C++11 >>
+
+=item * C<< C++14 >>
+
+=item * C<< C++17 >>
+
+=back
+
+returns a string with a flag that can be used to tell the compiler to support
+that version of the C++ standard or dies if version is not supported.
+
+Added in version v0.22.
+
 =head1 AUTHOR
 
 Mattia Barbon <mbarbon@cpan.org>
@@ -172,7 +195,7 @@ use Capture::Tiny 'capture_merged';
 use File::Spec::Functions qw(catfile);
 use File::Temp qw(tempdir);
 
-our $VERSION = '0.21';
+our $VERSION = '0.23';
 
 sub new {
     my( $class, %args ) = @_;
@@ -389,9 +412,9 @@ sub _cc_is_clang {
     $self->{is_clang} = 0;
     my $cc_version = _capture( "$cc --version" );
     if (
-         $cc_version =~ m/\Aclang/i
+         $cc_version =~ m/\A(?:clang|apple llvm)/i
       || $cc eq 'clang' # because why would they lie?
-      || (($self->_config->{gccversion} || '') =~ /Clang/),
+      || (($self->_config->{gccversion} || '') =~ /Clang|Apple LLVM/),
     ) {
       $self->{is_clang} = 1;
     }
@@ -483,22 +506,30 @@ my $test_cpp          = <<'END_TEST_CPP';
 int main(){ return 0; }
 END_TEST_CPP
 
+# Compile the given code and returns true on success.
+#
+# Can optionally be given compiler flags.
+sub _can_compile_code {
+  my( $self, $cpp_code, $compiler_flags ) = @_;
+  my $dir = tempdir( CLEANUP => 1 );
+  my $file = catfile( $dir, qq{$test_cpp_filename.cpp} );
+  my $exe = catfile( $dir, qq{$test_cpp_filename.exe} );
+  _to_file $file, $cpp_code;
+  my $command = join ' ',
+    $self->compiler_command,
+    @{ defined $compiler_flags ? $compiler_flags : [] },
+    ($self->is_msvc ? qq{-Fe:} : qq{-o }) . $exe,
+    $file,
+    ;
+  return 0 == system $command;
+}
+
 # returns true if compile succeeded, false if failed
 sub _compile_no_h {
   my( $self ) = @_;
   return $self->{no_h_status} if defined $self->{no_h_status};
   $self->guess_compiler || die;
-  my $dir = tempdir( CLEANUP => 1 );
-  my $file = catfile( $dir, qq{$test_cpp_filename.cpp} );
-  my $exe = catfile( $dir, qq{$test_cpp_filename.exe} );
-  _to_file $file, $test_cpp;
-  my $command = join ' ',
-    $self->compiler_command,
-    ($self->is_msvc ? qq{-Fe:} : qq{-o }) . $exe,
-    $file,
-    ;
-  my $result = system $command;
-  $self->{no_h_status} = ($result == 0);
+  $self->{no_h_status} = $self->_can_compile_code( $test_cpp );
 }
 
 sub iostream_fname {
@@ -515,6 +546,72 @@ sub cpp_flavor_defs {
 %s#define __INLINE_CPP_NAMESPACE_STD 1
 
 END_FLAVOR_DEFINITIONS
+}
+
+# Listed in order by year.
+our @CPP_STANDARDS = (
+  'C++98',
+  'C++11',
+  'C++14',
+  'C++17',
+);
+# Hash of flags for each compiler:
+#
+# Structure
+#  Hash:
+#   - key: <detected compiler name string>
+#   - value:
+#       Hash:
+#         - key: <C++ standard name string>
+#         - value:
+#             ArrayRef[Str]
+#               <list of alternative flags, in preferred order>
+our $CPP_STANDARD_FLAGS = {
+  is_gcc => {
+    'C++98' => [ "-std=c++98" ],
+    'C++11' => [ "-std=c++11", "-std=c++0x" ],
+    'C++14' => [ "-std=c++14", "-std=c++1y" ],
+    'C++17' => [ "-std=c++17", "-std=c++1z" ],
+  },
+  is_clang => {
+    'C++98' => [ "-std=c++98", ],
+    'C++11' => [ "-std=c++11", ],
+    'C++14' => [ "-std=c++14", "-std=c++1y" ],
+    'C++17' => [ "-std=c++17", "-std=c++1z" ],
+  },
+  is_msvc => {
+    # Newer MSVC set C++14 as minimum version.
+    'C++98' => [ "" ],
+    'C++11' => [ "" ],
+    'C++14' => [ "-std:c++14" ],
+    'C++17' => [ "-std:c++17" ],
+  },
+  is_sunstudio => {
+    'C++98' => [ "" ],
+    'C++11' => [ "-std=c++11", "-std=c++0x" ],
+    'C++14' => [ "-std=c++14" ],
+    # No mention of C++17 for Oracle Developer Studio 12.6.
+  },
+};
+
+sub cpp_standard_flag {
+  my ($self, $standard_name) = @_;
+
+  $self->guess_compiler || die;
+  my ($detected_compiler) = grep { $self->{$_} } keys %$CPP_STANDARD_FLAGS;
+
+  die "Unknown standard '$standard_name' for compiler '$detected_compiler'"
+    unless exists $CPP_STANDARD_FLAGS->{$detected_compiler}{$standard_name};
+
+  my $test_flags = $CPP_STANDARD_FLAGS->{$detected_compiler}{$standard_name};
+
+  for my $flag (@$test_flags) {
+    return $flag if $self->_can_compile_code( <<EOF, [ $flag ] );
+int main(){ return 0; }
+EOF
+  }
+
+  die "Compiler '$detected_compiler' does not support any flags for standard '$standard_name'";
 }
 
 1;

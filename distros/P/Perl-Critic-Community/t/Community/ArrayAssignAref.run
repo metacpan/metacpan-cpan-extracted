@@ -1,0 +1,34 @@
+## name AssignAref
+## failures 2
+## cut
+
+@arr = [];
+@arr = [1,2,3];
+
+## name AssignList
+## failures 0
+## cut
+
+@arr = ();
+@arr = (1,2,3);
+
+## name AssignArefInList
+## failures 0
+## cut
+
+@arr = ([]);
+@arr = ([1,2,3]);
+
+## name AssignListOfAref
+## failures 0
+## cut
+
+@arr = ([],[],[]);
+
+## name AssignNonAref
+## failures 0
+## cut
+
+@arr = 1;
+@arr = {};
+@arr = 1..10;

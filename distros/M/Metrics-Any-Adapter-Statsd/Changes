@@ -1,5 +1,9 @@
 Revision history for Metrics-Any-Adapter-Statsd
 
+0.03    2021-05-20
+        [BUGFIXES]
+         * Fix DogStatsd tagged packet format (RT136566)
+
 0.02    2020-05-13
         [CHANGES]
          * Updated for Metrics::Any 0.05

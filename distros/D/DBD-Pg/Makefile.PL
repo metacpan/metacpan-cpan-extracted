@@ -5,7 +5,7 @@ use warnings;
 use 5.008001;
 
 ## No version.pm for this one, as the prereqs are not loaded yet.
-my $VERSION = '3.14.2';
+my $VERSION = '3.15.0';
 
 ## App::Info is stored inside t/lib
 ## Create a proper path so we can use it below
@@ -334,15 +334,6 @@ splint: $(H_FILES) $(C_FILES)
 MAKE_SPLINT
 
     $string =~ s/SDEFINES = /SDEFINES =$defines/;
-
-	$string .= <<'MAKE_FULLTEST';
-
-fulltest: RELEASE_TESTING=1
-fulltest: AUTHOR_TESTING=1
-fulltest: $(TEST_TYPE)
-	$(NOECHO) $(NOOP)
-
-MAKE_FULLTEST
 
     return $string;
 }

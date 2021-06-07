@@ -2,9 +2,9 @@ TYPEMAP
 
 TIFF			T_TIFF
 TIFF *                  T_PTRREF
-uint16			T_IV
-uint32			T_IV
-uint64			T_IV
+uint16_t		T_IV
+uint32_t		T_IV
+uint64_t		T_IV
 tmsize_t                T_IV
 toff_t                  T_IV
 void *                  T_PV

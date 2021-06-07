@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-use 5.008000;
+use 5.008009;
 
 use ExtUtils::MakeMaker;
 
@@ -27,24 +27,18 @@ my %WriteMakefileArgs = (
     "bin/bkpr-top"
   ],
   "LICENSE" => "perl",
-  "MIN_PERL_VERSION" => "5.008000",
+  "MIN_PERL_VERSION" => "5.008009",
   "NAME" => "Beekeeper",
   "PREREQ_PM" => {
     "AnyEvent" => 0,
-    "AnyEvent::Handle" => 0,
-    "Carp" => 0,
-    "Getopt::Long" => 0,
     "JSON::XS" => 0,
-    "POSIX" => 0,
-    "Sys::Hostname" => 0,
-    "Term::ReadKey" => 0,
-    "Time::HiRes" => 0
+    "Term::ReadKey" => 0
   },
   "TEST_REQUIRES" => {
     "Test::Class" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.02",
+  "VERSION" => "0.04",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -53,16 +47,10 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "AnyEvent" => 0,
-  "AnyEvent::Handle" => 0,
-  "Carp" => 0,
-  "Getopt::Long" => 0,
   "JSON::XS" => 0,
-  "POSIX" => 0,
-  "Sys::Hostname" => 0,
   "Term::ReadKey" => 0,
   "Test::Class" => 0,
-  "Test::More" => 0,
-  "Time::HiRes" => 0
+  "Test::More" => 0
 );
 
 

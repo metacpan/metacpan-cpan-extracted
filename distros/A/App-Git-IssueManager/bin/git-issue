@@ -1,4 +1,4 @@
-#!perl
+#!/usr/bin/env perl
 # ABSTRACT: subcommand to git for issue management
 # PODNAME: git-issue
 use strict;
@@ -22,7 +22,7 @@ git-issue - subcommand to git for issue management
 
 =head1 VERSION
 
-version 0.1
+version 0.2
 
 =head1 DESCRIPTION
 

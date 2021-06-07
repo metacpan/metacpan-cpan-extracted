@@ -39,6 +39,7 @@
             "Exporter" : "0",
             "IO::String" : "0",
             "IO::Zlib" : "0",
+            "Scalar::Util" : "0",
             "TAP::Parser" : "0",
             "TAP::Parser::Aggregator" : "0",
             "Test::Harness" : "3.0",
@@ -73,7 +74,7 @@
          "web" : "http://github.com/renormalist/tap-dom"
       }
    },
-   "version" : "0.92",
+   "version" : "0.93",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.022000"
@@ -454,7 +455,7 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "v0.92",
+                  "tag" : "v0.93",
                   "tag_format" : "v%v",
                   "tag_message" : "v%v"
                },

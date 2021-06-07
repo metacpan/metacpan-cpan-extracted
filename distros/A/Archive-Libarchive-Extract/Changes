@@ -1,0 +1,10 @@
+Revision history for Archive-Libarchive-Extract},
+
+0.02      2021-06-01 11:25:24 -0600
+  - Improve performance by using data_block methods
+    instead of data methods (gh#2)
+
+0.01      2021-05-31 16:35:37 -0600
+  - initial version
+
+

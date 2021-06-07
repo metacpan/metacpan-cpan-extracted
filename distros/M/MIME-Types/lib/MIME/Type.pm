@@ -8,7 +8,7 @@
 
 package MIME::Type;
 use vars '$VERSION';
-$VERSION = '2.20';
+$VERSION = '2.21';
 
 
 use strict;

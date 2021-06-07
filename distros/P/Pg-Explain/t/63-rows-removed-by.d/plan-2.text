@@ -1,0 +1,8 @@
+Bitmap Heap Scan on part_1  (cost=16.01..23.85 rows=2 width=1367) (actual time=0.185..4.729 rows=26 loops=1)
+  Recheck Cond: (plan ~ 'wha'::text)
+  Rows Removed by Index Recheck: 4
+  Heap Blocks: exact=29
+  ->  Bitmap Index Scan on part_1_trgm  (cost=0.00..16.01 rows=2 width=0) (actual time=0.037..0.037 rows=30 loops=1)
+        Index Cond: (plan ~ 'wha'::text)
+Planning Time: 1.262 ms
+Execution Time: 4.796 ms

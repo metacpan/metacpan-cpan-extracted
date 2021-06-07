@@ -1,2 +1,0 @@
-* Handle g elements
-* Handle transform attributes

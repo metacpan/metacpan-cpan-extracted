@@ -1,5 +1,8 @@
 Revision history for Prometheus-Tiny
 
+0.007     2021-06-04 09:57:21+10:00 Australia/Melbourne
+- Ensure that a metric is not redeclared with different metadata
+
 0.006     2021-04-14 16:25:31+10:00 Australia/Melbourne
 - Add clear method, to remove metric values
 

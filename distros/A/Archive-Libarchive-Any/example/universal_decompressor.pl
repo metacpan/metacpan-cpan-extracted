@@ -19,7 +19,7 @@ if($r != ARCHIVE_OK)
 $r = archive_read_next_header($a, my $ae);
 if($r != ARCHIVE_OK)
 {
-  die archive_error_string($a);     
+  die archive_error_string($a);
 }
 
 while(1)

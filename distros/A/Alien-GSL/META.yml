@@ -1,31 +1,51 @@
 ---
-abstract: 'Easy installation of the GNU Scientific Library'
+abstract: 'Easy installation of the GSL library'
 author:
   - 'Joel A. Berger <joel.a.berger@gmail.com>'
 build_requires:
-  IO::Socket::SSL: '1.56'
-  Net::SSLeay: '1.49'
+  Alien::Build: '0.32'
+  Alien::Build::MM: '0.32'
+  ExtUtils::MakeMaker: '6.52'
+  Test2::V0: '0'
+  Test::Alien: '0'
 configure_requires:
-  Alien::Base::ModuleBuild: '0'
-  Module::Build: '0.38'
+  Alien::Build: '1.19'
+  Alien::Build::MM: '0.32'
+  ExtUtils::MakeMaker: '6.52'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.4224, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: Alien-GSL
-provides:
-  Alien::GSL:
-    file: lib/Alien/GSL.pm
-    version: '1.02'
+no_index:
+  directory:
+    - t
+    - inc
 requires:
-  Alien::Base: '0'
-  parent: '0'
-  perl: v5.8.1
+  Alien::Base: '2.21'
+  Alien::Build: '0.25'
 resources:
-  bugtracker: https://github.com/Perl5-Alien/Alien-GSL/issues
-  license: http://dev.perl.org/licenses/
-  repository: https://github.com/Perl5-Alien/Alien-GSL
-version: '1.02'
+  IRC: irc://irc.perl.org/#native
+  bugtracker: https://github.com/PerlAlien/Alien-GSL/issues
+  homepage: https://metacpan.org/pod/Alien::GSL
+  repository: https://github.com/PerlAlien/Alien-GSL.git
+version: '1.03'
+x_alienfile:
+  generated_by: 'Alien::Build::MM version 2.40'
+  requires:
+    share:
+      Alien::Build::Plugin::Gather::IsolateDynamic: '0.48'
+      Archive::Tar: '0'
+      Config: '0'
+      HTTP::Tiny: '0.044'
+      IO::Socket::SSL: '1.56'
+      IO::Zlib: '0'
+      Mojo::DOM58: '1.00'
+      Net::SSLeay: '1.49'
+      Sort::Versions: '0'
+      URI: '0'
+      URI::Escape: '0'
+    system: {}
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

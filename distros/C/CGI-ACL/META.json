@@ -4,7 +4,7 @@
       "Nigel Horne <njh@bandsman.co.uk>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "open_source"
    ],
@@ -60,14 +60,16 @@
    "resources" : {
       "bugtracker" : {
          "mailto" : "bug-CGI-ACL@rt.cpan.org",
-         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=CGI-ACL"
+         "web" : "https://github.com/nigelhorne/CGI-ACL/issues",
+         "x_url" : "https://github.com/nigelhorne/CGI-ACL/issues"
       },
       "repository" : {
          "type" : "git",
          "url" : "git://github.com/nigelhorne/CGI-ACL.git",
-         "web" : "https://github.com/nigelhorne/CGI-ACL"
+         "web" : "https://github.com/nigelhorne/CGI-ACL",
+         "x_repository" : "https://github.com/nigelhorne/CGI-ACL"
       }
    },
-   "version" : "0.03",
-   "x_serialization_backend" : "JSON::PP version 2.97001"
+   "version" : "0.04",
+   "x_serialization_backend" : "JSON::PP version 4.06"
 }

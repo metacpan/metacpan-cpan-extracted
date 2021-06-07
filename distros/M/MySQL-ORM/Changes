@@ -1,6 +1,8 @@
 Revision history for MySQL-ORM
 
 =======
+0.18    - Support 'limit' option on table select methods.
+
 0.17    - Pass __lite on table creation to avoid excessive dbh->clone calls which
           can result in large numbers of database connections being used.
 

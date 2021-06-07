@@ -29,7 +29,7 @@ name: Alien-TidyHTML5
 provides:
   Alien::TidyHTML5:
     file: lib/Alien/TidyHTML5.pm
-    version: v0.3.2
+    version: v0.3.3
 requires:
   Alien::Base: '0'
   Alien::cmake3: '0'
@@ -43,7 +43,7 @@ requires:
 resources:
   bugtracker: https://github.com/robrwo/Alien-TidyHTML5/issues
   repository: git://github.com/robrwo/Alien-TidyHTML5.git
-version: v0.3.2
+version: v0.3.3
 x_alienfile:
   generated_by: 'Dist::Zilla::Plugin::AlienBuild version 0.29'
   requires:

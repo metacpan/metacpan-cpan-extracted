@@ -1,4 +1,4 @@
-=head1 Name
+=head1 NAME
 
 Starlink::ATL::Region - Tools for AST regions.
 
@@ -22,7 +22,7 @@ use strict;
 use Exporter;
 use Starlink::AST;
 
-our $VERSION = 0.04;
+our $VERSION = 0.05;
 our @ISA = qw/Exporter/;
 our @EXPORT_OK = qw/merge_regions/;
 

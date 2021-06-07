@@ -1,0 +1,25 @@
+<explain xmlns="http://www.postgresql.org/2009/explain">
+  <Query>
+    <Plan>
+      <Node-Type>Seq Scan</Node-Type>
+      <Parallel-Aware>false</Parallel-Aware>
+      <Async-Capable>false</Async-Capable>
+      <Relation-Name>pg_class</Relation-Name>
+      <Alias>pg_class</Alias>
+      <Startup-Cost>0.00</Startup-Cost>
+      <Total-Cost>17.95</Total-Cost>
+      <Plan-Rows>66</Plan-Rows>
+      <Plan-Width>265</Plan-Width>
+      <Actual-Startup-Time>0.009</Actual-Startup-Time>
+      <Actual-Total-Time>0.096</Actual-Total-Time>
+      <Actual-Rows>67</Actual-Rows>
+      <Actual-Loops>1</Actual-Loops>
+      <Filter>(relkind = 'r'::"char")</Filter>
+      <Rows-Removed-by-Filter>330</Rows-Removed-by-Filter>
+    </Plan>
+    <Planning-Time>0.467</Planning-Time>
+    <Triggers>
+    </Triggers>
+    <Execution-Time>0.177</Execution-Time>
+  </Query>
+</explain>

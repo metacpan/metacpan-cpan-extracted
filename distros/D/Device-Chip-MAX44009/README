@@ -1,0 +1,62 @@
+NAME
+
+    Device::Chip::MAX44009 - chip driver for MAX44009
+
+SYNOPSIS
+
+       use Device::Chip::MAX44009;
+       use Future::AsyncAwait;
+    
+       my $chip = Device::Chip::MAX44009->new;
+       await $chip->mount( Device::Chip::Adapter::...->new );
+    
+       await $chip->power(1);
+    
+       sleep 1; # Wait for one integration cycle
+    
+       printf "Current ambient light level is %.2f lux\n",
+          scalar await $chip->read_lux;
+
+DESCRIPTION
+
+    This Device::Chip subclass provides specific communication to a Maxim
+    Integrated MAX44009 ambient light sensor attached to a computer via an
+    I²C adapter.
+
+    The reader is presumed to be familiar with the general operation of
+    this chip; the documentation here will not attempt to explain or define
+    chip-specific concepts or features, only the use of this module to
+    access them.
+
+ read_config
+
+       $config = await $chip->read_config
+
+    Returns a HASH reference containing the chip config, using fields named
+    from the data sheet.
+
+       CONT   => bool
+       MANUAL => bool
+       CDR    => bool
+       TIM    => 800 | 400 | 200 | 100 | 50 | 25 | 12.5 | 6.25
+
+ change_config
+
+       await $chip->change_config( %changes )
+
+    Writes updates to the configuration registers.
+
+    Note that these two methods use a cache of configuration bytes to make
+    subsequent modifications more efficient.
+
+ read_lux
+
+       $lux = await $chip->read_lux
+
+    Reads the latest light level conversion value and returns the value in
+    Lux.
+
+AUTHOR
+
+    Paul Evans <leonerd@leonerd.org.uk>
+

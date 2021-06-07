@@ -26,10 +26,11 @@ sub on_startup {
         'test.*'      => 'catchall',
     );
 
-    $self->accept_jobs(
+    $self->accept_remote_calls(
         'test.signal' => 'signal',
         'test.fail'   => 'fail',
         'test.sleep'  => '_sleep',
+        'test.fact'   => 'factorial',
         'test.fib1'   => 'fibonacci_1',
         'test.fib2'   => 'fibonacci_2',
         'test.echo'   => 'echo',
@@ -39,7 +40,7 @@ sub on_startup {
 sub authorize_request {
     my ($self, $req) = @_;
 
-    return REQUEST_AUTHORIZED;
+    return BKPR_REQUEST_AUTHORIZED;
 }
 
 sub catchall {
@@ -53,7 +54,9 @@ sub signal {
     my ($signal) = $params->{signal} =~ m/(\w+)/;  # untaint
     my ($pid)    = $params->{pid}    =~ m/(\d+)/;
 
-    sleep(rand() / 10); # helps to avoid signal races
+    my $sleep = exists $params->{after} ? $params->{after} : rand() * 2;
+
+    sleep $sleep;
 
     kill( $signal, $pid );
 }
@@ -68,10 +71,30 @@ sub fail {
     die Beekeeper::JSONRPC::Error->server_error( message => $params->{error}) if $params->{error};
 }
 
+sub echo {
+    my ($self, $params) = @_;
+
+    return $params;
+}
+
 sub _sleep {
     my ($self, $params) = @_;
 
     sleep $params;
+}
+
+sub factorial {
+    my ($self, $n) = @_;
+
+    return $n if ($n <= 2);
+
+    my $resp = $self->call_remote(
+        method  => 'test.fact',
+        params  => $n - 1,
+        timeout => 10,
+    );
+
+    return $resp->result * $n;
 }
 
 sub fibonacci_1 {
@@ -79,16 +102,16 @@ sub fibonacci_1 {
 
     return $n if ($n <= 1);
 
-    my $resp1 = $self->do_job(
+    my $resp1 = $self->call_remote(
         method  => 'test.fib1',
         params  => $n - 1,
-        timeout => 3,
+        timeout => 10,
     );
 
-    my $resp2 = $self->do_job(
+    my $resp2 = $self->call_remote(
         method  => 'test.fib1',
         params  => $n - 2,
-        timeout => 3,
+        timeout => 10,
     );
 
     return $resp1->result + $resp2->result; 
@@ -99,27 +122,21 @@ sub fibonacci_2 {
 
     return $n if ($n <= 1);
 
-    my $req1 = $self->do_async_job(
+    my $req1 = $self->call_remote_async(
         method  => 'test.fib2',
         params  => $n - 1,
-        timeout => 3,
+        timeout => 10,
     );
 
-    my $req2 = $self->do_async_job(
+    my $req2 = $self->call_remote_async(
         method  => 'test.fib2',
         params  => $n - 2,
-        timeout => 3,
+        timeout => 10,
     );
 
-    $self->wait_all_jobs;
+    $self->wait_async_calls;
 
     return $req1->result + $req2->result; 
-}
-
-sub echo {
-    my ($self, $params) = @_;
-
-    return $params;
 }
 
 1;

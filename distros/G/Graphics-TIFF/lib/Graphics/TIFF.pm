@@ -208,7 +208,7 @@ our %EXPORT_TAGS = (
 
 our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
 
-our $VERSION = 12;
+our $VERSION = 15;
 
 require XSLoader;
 XSLoader::load( 'Graphics::TIFF', $VERSION );
@@ -246,7 +246,7 @@ Graphics::TIFF - Perl extension for the libtiff library
 
 =head1 VERSION
 
-12
+15
 
 =head1 SYNOPSIS
 
@@ -676,6 +676,21 @@ TIFFPRINT_JPEGDCTABLES
 
 =head1 DEPENDENCIES
 
+=head2 Runtime
+
+The runtime dependencies are just libtiff itself. In Windows this is satisfied
+by Alien::libtiff.
+
+=head2 Build
+
+The build dependencies are additionally the development headers for libtiff
+and Perl.
+
+=head2 Test
+
+In addition to the above, the Perl module Image::Magick is required to run some
+of the tests.
+
 =head1 INCOMPATIBILITIES
 
 =head1 BUGS AND LIMITATIONS
@@ -699,12 +714,3 @@ it under the same terms as Perl itself, either Perl version 5.8.5 or,
 at your option, any later version of Perl 5 you may have available.
 
 =cut
-
-/* http://libtiff.org/man/TIFFReadRGBAImage.3t.html
-   #define TIFFGetR(abgr) ((abgr) & 0xff)
-   #define TIFFGetG(abgr) (((abgr) >> 8) & 0xff)
-   #define TIFFGetB(abgr) (((abgr) >> 16) & 0xff)
-   #define TIFFGetA(abgr) (((abgr) >> 24) & 0xff)
-   int TIFFReadRGBAImage(TIFF *tif, u_long width, u_long height, u_long *raster, int stopOnError)
-   int TIFFReadRGBAImageOriented(TIFF *tif, u_long width, u_long height, u_long *raster, int orientation, int stopOnError)
-*/

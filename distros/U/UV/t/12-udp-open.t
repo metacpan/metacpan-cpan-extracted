@@ -6,41 +6,17 @@ use UV::UDP ();
 
 use Test::More;
 
-use IO::Socket::INET;
 use Socket;
+
+use lib "t/lib";
+use UVTestHelpers qw(socketpair_inet_dgram);
 
 # TODO: This test might not work on MSWin32. We might need to find a different
 #   implementation, or just skip it?
 
-sub socketpair_inet
-{
-    my ($rd, $wr);
-
-    # Maybe socketpair(2) can do it?
-    ($rd, $wr) = IO::Socket->socketpair(AF_INET, SOCK_DGRAM, 0)
-        and return ($rd, $wr);
-
-    # If not, go the long way round
-    $rd = IO::Socket::INET->new(
-        LocalHost => "127.0.0.1",
-        LocalPort => 0,
-        Proto     => "udp",
-    ) or die "Cannot socket - $@";
-
-    $wr = IO::Socket::INET->new(
-        PeerHost => $rd->sockhost,
-        PeerPort => $rd->sockport,
-        Proto    => "udp",
-    ) or die "Cannot socket/connect - $@";
-
-    $rd->connect($wr->sockport, inet_aton($wr->sockhost)) or die "Cannot connect - $!";
-
-    return ($rd, $wr);
-}
-
 # recv
 {
-    my ($rd, $wr) = socketpair_inet();
+    my ($rd, $wr) = socketpair_inet_dgram();
 
     my $udp = UV::UDP->new;
     isa_ok($udp, 'UV::UDP');
@@ -67,7 +43,7 @@ sub socketpair_inet
 
 # send
 {
-    my ($rd, $wr) = socketpair_inet();
+    my ($rd, $wr) = socketpair_inet_dgram();
 
     my $udp = UV::UDP->new;
 

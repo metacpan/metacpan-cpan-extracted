@@ -1,10 +1,10 @@
 use strict;
 use warnings;
-package Test::JSON::Schema::Acceptance; # git description: v1.007-9-g5251850
+package Test::JSON::Schema::Acceptance; # git description: v1.008-6-gc2d2241
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Acceptance testing for JSON-Schema based validators like JSON::Schema
 
-our $VERSION = '1.008';
+our $VERSION = '1.009';
 
 use 5.016;
 no if "$]" >= 5.031009, feature => 'indirect';
@@ -31,6 +31,7 @@ has specification => (
   isa => Str,
   lazy => 1,
   default => 'draft2020-12',
+  predicate => '_has_specification',
 );
 
 # specification version => metaschema URI
@@ -144,7 +145,8 @@ sub acceptance {
     );
   }
 
-  $ctx->note('running tests in '.$self->test_dir.'...');
+  $ctx->note('running tests in '.$self->test_dir.' against '
+    .($self->_has_specification ? $self->specification : 'unknown version').'...');
   my $tests = $self->_test_data;
 
   # [ { file => .., pass => .., fail => .. }, ... ]
@@ -179,7 +181,7 @@ sub acceptance {
 
       if ($self->test_schemas) {
         die 'specification_version unknown: cannot evaluate schema against metaschema'
-          if not $self->specification;
+          if not $self->_has_specification;
 
         my $metaspec_uri = METASCHEMA->{$self->specification};
         my $result = $options->{validate_data}
@@ -395,6 +397,8 @@ sub _build_results_text {
     push @lines, 'from '.$url.':';
   }
 
+  push @lines, 'specification version: '.($self->specification//'unknown');
+
   my $test_dir = $self->test_dir;
   my $orig_dir = $self->_build_test_dir;
   if ($test_dir ne $orig_dir) {
@@ -406,14 +410,11 @@ sub _build_results_text {
     }
     push @lines, 'using custom test directory: '.$test_dir;
   }
-  else {
-    push @lines, 'specification version: '.$self->specification;
-  }
   push @lines, 'optional tests included: '.($self->include_optional ? 'yes' : 'no');
   push @lines, map 'skipping directory: '.$_, @{ $self->skip_dir };
 
   push @lines, '';
-  my $length = max(10, map length $_->{file}, @{$self->results});
+  my $length = max(40, map length $_->{file}, @{$self->results});
 
   push @lines, sprintf('%-'.$length.'s  pass  todo-fail  fail', 'filename');
   push @lines, '-'x($length + 23);
@@ -443,7 +444,7 @@ Test::JSON::Schema::Acceptance - Acceptance testing for JSON-Schema based valida
 
 =head1 VERSION
 
-version 1.008
+version 1.009
 
 =head1 SYNOPSIS
 
@@ -626,6 +627,8 @@ specification metaschema. (When set, C<specification> must also be set.)
 This normally should not be set as the official test suite has already been
 sanity-tested, but you may want to set this in development environments if you
 are using your own test files.
+
+Defaults to false.
 
 =head1 SUBROUTINES/METHODS
 

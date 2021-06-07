@@ -3,23 +3,28 @@ abstract: 'Convert between perl data structures and ASN.1 encoded packets'
 author:
   - 'Graham Barr <gbarr@cpan.org>'
 build_requires:
-  Math::BigInt: 1.997
-  Test::More: 0.90
+  Math::BigInt: '1.997'
+  Test::More: '0.90'
 configure_requires:
-  ExtUtils::MakeMaker: 6.30
+  ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 4.300030, CPAN::Meta::Converter version 2.120921'
+generated_by: 'Dist::Zilla version 6.017, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: Convert-ASN1
 no_index:
   directory:
+    - examples
     - lib/Convert/ASN1
     - t
-    - examples
 resources:
   bugtracker: https://github.com/gbarr/perl-Convert-ASN1/issues
   repository: git://github.com/gbarr/perl-Convert-ASN1.git
-version: 0.27
+version: '0.31'
+x_generated_by_perl: v5.30.3
+x_maintainers:
+  - 'Timothy Legge <timlegge@gmail.com>'
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

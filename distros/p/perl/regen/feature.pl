@@ -14,8 +14,9 @@ BEGIN {
     require './regen/regen_lib.pl';
     push @INC, './lib';
 }
-use strict ;
 
+use strict;
+use warnings;
 
 ###########################################################################
 # Hand-editable data
@@ -37,6 +38,9 @@ my %feature = (
     signatures      => 'signatures',
     isa             => 'isa',
     indirect        => 'indirect',
+    multidimensional => 'multidimensional',
+    bareword_filehandles => 'bareword_filehandles',
+    try             => 'try',
 );
 
 # NOTE: If a feature is ever enabled in a non-contiguous range of Perl
@@ -44,31 +48,36 @@ my %feature = (
 #       be changed to account.
 
 # 5.odd implies the next 5.even, but an explicit 5.even can override it.
+
+# features bundles
+use constant V5_9_5 => sort qw{say state switch indirect multidimensional bareword_filehandles};
+use constant V5_11  => sort ( +V5_9_5, qw{unicode_strings} );
+use constant V5_15  => sort ( +V5_11, qw{unicode_eval evalbytes current_sub fc} );
+use constant V5_23  => sort ( +V5_15, qw{postderef_qq} );
+use constant V5_27  => sort ( +V5_23, qw{bitwise} );
+
 my %feature_bundle = (
-     all     => [ keys %feature ],
-     default =>	[qw(indirect)],
-    "5.9.5"  =>	[qw(say state switch indirect)],
-    "5.10"   =>	[qw(say state switch indirect)],
-    "5.11"   =>	[qw(say state switch unicode_strings indirect)],
-    "5.13"   =>	[qw(say state switch unicode_strings indirect)],
-    "5.15"   =>	[qw(say state switch unicode_strings unicode_eval
-		    evalbytes current_sub fc indirect)],
-    "5.17"   =>	[qw(say state switch unicode_strings unicode_eval
-		    evalbytes current_sub fc indirect)],
-    "5.19"   =>	[qw(say state switch unicode_strings unicode_eval
-		    evalbytes current_sub fc indirect)],
-    "5.21"   =>	[qw(say state switch unicode_strings unicode_eval
-		    evalbytes current_sub fc indirect)],
-    "5.23"   =>	[qw(say state switch unicode_strings unicode_eval
-		    evalbytes current_sub fc postderef_qq indirect)],
-    "5.25"   =>	[qw(say state switch unicode_strings unicode_eval
-		    evalbytes current_sub fc postderef_qq indirect)],
-    "5.27"   =>	[qw(say state switch unicode_strings unicode_eval
-		    evalbytes current_sub fc postderef_qq bitwise indirect)],
-    "5.29"   =>	[qw(say state switch unicode_strings unicode_eval
-		    evalbytes current_sub fc postderef_qq bitwise indirect)],
-    "5.31"   =>	[qw(say state switch unicode_strings unicode_eval
-		    evalbytes current_sub fc postderef_qq bitwise indirect)],
+    all     => [ sort keys %feature ],
+    default => [ qw{indirect multidimensional bareword_filehandles} ],
+    # using 5.9.5 features bundle
+    "5.9.5" => [ +V5_9_5 ],
+    "5.10"  => [ +V5_9_5 ],
+    # using 5.11 features bundle
+    "5.11"  => [ +V5_11 ],
+    "5.13"  => [ +V5_11 ],
+    # using 5.15 features bundle
+    "5.15"  => [ +V5_15 ],
+    "5.17"  => [ +V5_15 ],
+    "5.19"  => [ +V5_15 ],
+    "5.21"  => [ +V5_15 ],
+    # using 5.23 features bundle
+    "5.23"  => [ +V5_23 ],
+    "5.25"  => [ +V5_23 ],
+    # using 5.27 features bundle
+    "5.27"  => [ +V5_27 ],
+    "5.29"  => [ +V5_27 ],
+    "5.31"  => [ +V5_27 ],
+    "5.33"  => [ +V5_27 ],
 );
 
 my @noops = qw( postderef lexical_subs );
@@ -469,7 +478,7 @@ read_only_bottom_close_and_rename($h);
 __END__
 package feature;
 
-our $VERSION = '1.58';
+our $VERSION = '1.64';
 
 FEATURES
 
@@ -482,18 +491,20 @@ feature - Perl pragma to enable new features
 
 =head1 SYNOPSIS
 
-    use feature qw(say switch);
-    given ($foo) {
-        when (1)          { say "\$foo == 1" }
-        when ([2,3])      { say "\$foo == 2 || \$foo == 3" }
-        when (/^a[bc]d$/) { say "\$foo eq 'abd' || \$foo eq 'acd'" }
-        when ($_ > 100)   { say "\$foo > 100" }
-        default           { say "None of the above" }
-    }
+    use feature qw(fc say);
 
-    use feature ':5.10'; # loads all features available in perl 5.10
+    # Without the "use feature" above, this code would not be able to find
+    # the built-ins "say" or "fc":
+    say "The case-folded version of $x is: " . fc $x;
 
-    use v5.10;           # implicitly loads :5.10 feature bundle
+
+    # set features to match the :5.10 bundle, which may turn off or on
+    # multiple features (see below)
+    use feature ':5.10';
+
+
+    # implicitly loads :5.10 feature bundle
+    use v5.10;
 
 =head1 DESCRIPTION
 
@@ -537,7 +548,7 @@ disable I<all> features (an unusual request!) use C<no feature ':all'>.
 
 =head2 The 'say' feature
 
-C<use feature 'say'> tells the compiler to enable the Perl 6 style
+C<use feature 'say'> tells the compiler to enable the Raku-inspired
 C<say> function.
 
 See L<perlfunc/say> for details.
@@ -555,13 +566,13 @@ This feature is available starting with Perl 5.10.
 
 =head2 The 'switch' feature
 
-B<WARNING>: Because the L<smartmatch operator|perlop/"Smartmatch Operator"> is
-experimental, Perl will warn when you use this feature, unless you have
-explicitly disabled the warning:
+B<WARNING>: This feature is still experimental and the implementation may
+change or be removed in future versions of Perl.  For this reason, Perl will
+warn when you use the feature, unless you have explicitly disabled the warning:
 
     no warnings "experimental::smartmatch";
 
-C<use feature 'switch'> tells the compiler to enable the Perl 6
+C<use feature 'switch'> tells the compiler to enable the Raku
 given/when construct.
 
 See L<perlsyn/"Switch Statements"> for details.
@@ -684,9 +695,8 @@ regardless of what feature declarations are in scope.
 =head2 The 'signatures' feature
 
 B<WARNING>: This feature is still experimental and the implementation may
-change in future versions of Perl.  For this reason, Perl will
-warn when you use the feature, unless you have explicitly disabled the
-warning:
+change or be removed in future versions of Perl.  For this reason, Perl will
+warn when you use the feature, unless you have explicitly disabled the warning:
 
     no warnings "experimental::signatures";
 
@@ -704,9 +714,8 @@ This feature is available from Perl 5.20 onwards.
 =head2 The 'refaliasing' feature
 
 B<WARNING>: This feature is still experimental and the implementation may
-change in future versions of Perl.  For this reason, Perl will
-warn when you use the feature, unless you have explicitly disabled the
-warning:
+change or be removed in future versions of Perl.  For this reason, Perl will
+warn when you use the feature, unless you have explicitly disabled the warning:
 
     no warnings "experimental::refaliasing";
 
@@ -741,9 +750,8 @@ category.
 =head2 The 'declared_refs' feature
 
 B<WARNING>: This feature is still experimental and the implementation may
-change in future versions of Perl.  For this reason, Perl will
-warn when you use the feature, unless you have explicitly disabled the
-warning:
+change or be removed in future versions of Perl.  For this reason, Perl will
+warn when you use the feature, unless you have explicitly disabled the warning:
 
     no warnings "experimental::declared_refs";
 
@@ -755,6 +763,12 @@ Reference to a Variable> for examples.
 This feature is available from Perl 5.26 onwards.
 
 =head2 The 'isa' feature
+
+B<WARNING>: This feature is still experimental and the implementation may
+change or be removed in future versions of Perl.  For this reason, Perl will
+warn when you use the feature, unless you have explicitly disabled the warning:
+
+    no warnings "experimental::isa";
 
 This allows the use of the C<isa> infix operator, which tests whether the
 scalar given by the left operand is an object of the class given by the
@@ -773,6 +787,53 @@ This feature is available under this name from Perl 5.32 onwards. In
 previous versions, it was simply on all the time.  To disallow (or
 warn on) indirect object syntax on older Perls, see the L<indirect>
 CPAN module.
+
+=head2 The 'multidimensional' feature
+
+This feature enables multidimensional array emulation, a perl 4 (or
+earlier) feature that was used to emulate multidimensional arrays with
+hashes.  This works by converting code like C<< $foo{$x, $y} >> into
+C<< $foo{join($;, $x, $y)} >>.  It is enabled by default, but can be
+turned off to disable multidimensional array emulation.
+
+When this feature is disabled the syntax that is normally replaced
+will report a compilation error.
+
+This feature is available under this name from Perl 5.34 onwards. In
+previous versions, it was simply on all the time.
+
+You can use the L<multidimensional> module on CPAN to disable
+multidimensional array emulation for older versions of Perl.
+
+=head2 The 'bareword_filehandles' feature.
+
+This feature enables bareword filehandles for builtin functions
+operations, a generally discouraged practice.  It is enabled by
+default, but can be turned off to disable bareword filehandles, except
+for the exceptions listed below.
+
+The perl built-in filehandles C<STDIN>, C<STDOUT>, C<STDERR>, C<DATA>,
+C<ARGV>, C<ARGVOUT> and the special C<_> are always enabled.
+
+This feature is enabled under this name from Perl 5.34 onwards.  In
+previous versions it was simply on all the time.
+
+You can use the L<bareword::filehandles> module on CPAN to disable
+bareword filehandles for older versions of perl.
+
+=head2 The 'try' feature.
+
+B<WARNING>: This feature is still experimental and the implementation may
+change or be removed in future versions of Perl.  For this reason, Perl will
+warn when you use the feature, unless you have explicitly disabled the warning:
+
+    no warnings "experimental::try";
+
+This feature enables the C<try> and C<catch> syntax, which allows exception
+handling, where exceptions thrown from the body of the block introduced with
+C<try> are caught by executing the body of the C<catch> block.
+
+For more information, see L<perlsyn/"Try Catch Exception Handling">.
 
 =head1 FEATURE BUNDLES
 

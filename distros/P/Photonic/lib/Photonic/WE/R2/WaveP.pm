@@ -1,5 +1,5 @@
 package Photonic::WE::R2::WaveP;
-$Photonic::WE::R2::WaveP::VERSION = '0.015';
+$Photonic::WE::R2::WaveP::VERSION = '0.016';
 
 =encoding UTF-8
 
@@ -9,7 +9,7 @@ Photonic::WE::R2::WaveP
 
 =head1 VERSION
 
-version 0.015
+version 0.016
 
 =head1 COPYRIGHT NOTICE
 
@@ -78,7 +78,7 @@ response $epsA is taken from the metric.
 
 =back
 
-=head1 ACCESORS (read only)
+=head1 ACCESSORS (read only)
 
 =over 4
 
@@ -95,19 +95,13 @@ The macroscopic wave operator of the last operation
 
 use namespace::autoclean;
 use PDL::Lite;
-use PDL::NiceSlice;
-use PDL::Complex;
-#use PDL::MatrixOps;
-use Storable qw(dclone);
-use PDL::IO::Storable;
-#use Photonic::WE::R2::AllH;
 use Photonic::Types;
 use Moose;
 use MooseX::StrictConstructor;
 
 extends 'Photonic::WE::R2::GreenP';
 
-has 'waveOperator' =>  (is=>'ro', isa=>'PDL::Complex', init_arg=>undef,
+has 'waveOperator' =>  (is=>'ro', isa=>'Photonic::Types::PDLComplex', init_arg=>undef,
              writer=>'_waveOperator',
              documentation=>'Wave operator from last evaluation');
 

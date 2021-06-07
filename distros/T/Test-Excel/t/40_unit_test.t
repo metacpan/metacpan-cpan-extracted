@@ -91,7 +91,7 @@ eval
                         { name => 'Test Message'});
 };
 $error = $@;
-like($error, qr/ERROR: Invalid key found in the rule definitions./);
+like($error, qr/ERROR: Invalid key 'name' found in the rule definitions./);
 
 eval
 {
@@ -100,7 +100,7 @@ eval
                             { name => 'Test Message'});
 };
 $error = $@;
-like($error, qr/ERROR: Invalid key found in the rule definitions./);
+like($error, qr/ERROR: Invalid key 'name' found in the rule definitions./);
 
 eval
 {

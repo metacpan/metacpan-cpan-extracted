@@ -1,5 +1,5 @@
 package Photonic::Roles::EpsParams;
-$Photonic::Roles::EpsParams::VERSION = '0.015';
+$Photonic::Roles::EpsParams::VERSION = '0.016';
 
 =encoding UTF-8
 
@@ -9,7 +9,7 @@ Photonic::Roles::EpsParams
 
 =head1 VERSION
 
-version 0.015
+version 0.016
 
 =head1 COPYRIGHT NOTICE
 
@@ -54,7 +54,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA  02110-1301 USA
 Object fields that have been factored as they are common in different
 Photonic subpackages to calculate the macroscopic dielectric function.
 
-=head1 ACCESORS (read only)
+=head1 ACCESSORS (read only)
 
 =head2 nh
 
@@ -82,11 +82,8 @@ Spectral variable
 
 =cut
 
-
-
-
-
 use Moose::Role;
+use Photonic::Types;
 
 has 'nh' =>(is=>'ro', isa=>'Num', required=>1,
 	    documentation=>'Desired no. of Haydock coefficients');
@@ -94,11 +91,11 @@ has 'smallH'=>(is=>'ro', isa=>'Num', required=>1, default=>1e-7,
     	    documentation=>'Convergence criterium for Haydock coefficients');
 has 'smallE'=>(is=>'ro', isa=>'Num', required=>1, default=>1e-7,
     	    documentation=>'Convergence criterium for use of Haydock coeff.');
-has 'epsA'=>(is=>'ro', isa=>'PDL::Complex', init_arg=>undef, writer=>'_epsA',
+has 'epsA'=>(is=>'ro', isa=>'Photonic::Types::PDLComplex', init_arg=>undef, writer=>'_epsA',
     documentation=>'Dielectric function of host');
-has 'epsB'=>(is=>'ro', isa=>'PDL::Complex', init_arg=>undef, writer=>'_epsB',
+has 'epsB'=>(is=>'ro', isa=>'Photonic::Types::PDLComplex', init_arg=>undef, writer=>'_epsB',
         documentation=>'Dielectric function of inclusions');
-has 'u'=>(is=>'ro', isa=>'PDL::Complex', init_arg=>undef, writer=>'_u',
+has 'u'=>(is=>'ro', isa=>'Photonic::Types::PDLComplex', init_arg=>undef, writer=>'_u',
     documentation=>'Spectral variable');
 
 no Moose::Role;

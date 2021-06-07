@@ -79,27 +79,6 @@ has [qw/view_message_on last_login_on/] => (is => 'rw');    # date iso8601-ish
 
 has roles => (is => 'rw');
 
-#     password              "$2a$10$JtUctKVsWI1DdFzlMQV4peZsh38nkg2nYU1NuXltjypyoSiWLHYeG",
-#     priv                  "readwrite",
-#     roles                 [
-#         [0] {
-#             description   "Administrator can do everything",
-#             id            1,
-#             name          "administrator",
-#             privileges    []
-#         }
-#     ],
-#     viewPermission        {
-#         Alerts       true,
-#         Dashboards   true,
-#         Hosts        true,
-#         NewUI        true,
-#         Reports      true,
-#         Services     true,
-#         Settings     true
-#     }
-# },
-
 1;
 
 __END__
@@ -114,7 +93,7 @@ WebService::LogicMonitor::Account - A LogicMonitor user account
 
 =head1 VERSION
 
-version 0.153170
+version 0.211560
 
 =head1 AUTHOR
 
@@ -122,7 +101,7 @@ Ioan Rogers <ioan.rogers@sophos.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by Sophos Ltd.
+This software is copyright (c) 2021 by Sophos Ltd.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

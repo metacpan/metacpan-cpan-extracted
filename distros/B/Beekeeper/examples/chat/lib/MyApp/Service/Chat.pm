@@ -24,7 +24,7 @@ sub client {
 sub send_message {
     my ($self, %args) = @_;
 
-    $self->client->do_job(
+    $self->client->call_remote(
         method => 'myapp.chat.message',
         params => {
             message => $args{'message'},
@@ -35,7 +35,7 @@ sub send_message {
 sub send_private_message {
     my ($self, %args) = @_;
 
-    $self->client->do_job(
+    $self->client->call_remote(
         method  => 'myapp.chat.pmessage',
         params  => {
             to_user => $args{'to_user'},
@@ -47,7 +47,7 @@ sub send_private_message {
 sub send_notice {
     my ($self, %args) = @_;
 
-    $self->client->do_job(
+    $self->client->call_remote(
         method  => 'myapp.chat.notice',
         params  => {
             to_uuid => $args{'to_uuid'},
@@ -61,7 +61,7 @@ sub ping {
 
     my $start = time;
 
-    $self->client->do_job( method => 'myapp.chat.ping' );
+    $self->client->call_remote( method => 'myapp.chat.ping' );
 
     my $took = time - $start;
 

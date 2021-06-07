@@ -1,0 +1,31 @@
+
+INSTALL memo for "Bin::File::Dir" : 
+
+1. Probably nothing should be written here rather than the normal CPAN module installation method, hopefully.
+
+2. Still, I have to say somethings here: 
+
+  -- Because the author's intention is that this module can be used at any institutions on the earth,
+     including any government of any country as well as any company that may use old systems. 
+
+  -- The author reuquires Perl 5.14 (published 2011-05-14; just around 10 years ago as of the author is writing this document.)
+
+3. Still and also "Pod::Pod-PerldocJp" is recommendable to install because then the "perldoc" can show you the Japanese characters that 
+   might be provided in each command line program which is provided by this "Bin::File::Dir" module. 
+
+4. The "normal installation method" :
+
+  -- Run the command "cpanm Bin::File::Dir". 
+  -- If you want uninstall : "cpanm -U Bin::File::Dir". 
+
+5. A kind of caveat : 
+  
+  -- If you do want to use neither cpanm (cpanminus) nor cpanplus, and you just want to use "cpan", 
+     the uninstallation of this "Bin::File::Dir" maybe difficult. 
+
+  -- Perhaps in perhaps the names of the scripts which "Bin::File::Dir" provides would collide with the
+     names of other scripts on your calculator environment if the name of programs exactly the same. 
+     The common sense of experts may help you to solve out this situation if it happens.
+     
+
+

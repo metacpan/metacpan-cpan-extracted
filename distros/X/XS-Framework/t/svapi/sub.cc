@@ -1,6 +1,7 @@
 #include "test.h"
 #include <array>
 #include <utility>
+#include <xs/function.h>
 
 #define TEST(name) TEST_CASE("Sub: " name, "[Sub]")
 
@@ -46,20 +47,21 @@ TEST("ctor") {
     SECTION("invalid Sv") { Test::ctor(Sv(vars.gv), behaviour_t::THROWS); }
 
     SECTION("from string") {
-        Sub c("M1::dummy2");
+        static auto _a = eval_pv("package MyTest::Sub::CtorFromString; sub func {}", 1); (void)_a;
+        Sub c("MyTest::Sub::CtorFromString::func");
         REQUIRE(c);
-        REQUIRE(c.get<CV>() == get_cv("M1::dummy2", 0));
-        Sub c2("M1::nonexistent");
+        REQUIRE(c.get<CV>() == get_cv("MyTest::Sub::CtorFromString::func", 0));
+        Sub c2("MyTest::Sub::CtorFromString::nonexistent");
         REQUIRE(!c2);
-        Sub c3("M1::nonexistent", GV_ADD);
+        Sub c3("MyTest::Sub::CtorFromString::nonexistent", GV_ADD);
         REQUIRE(c3);
-        REQUIRE(c3.get<CV>() == get_cv("M1::nonexistent", 0));
+        REQUIRE(c3.get<CV>() == get_cv("MyTest::Sub::CtorFromString::nonexistent", 0));
     }
 }
 
 TEST("operator=") {
     perlvars vars;
-    Sub o("M1::dummy2");
+    auto o = Sub::create("1;");
     SECTION("SV") {
         SECTION("undef SV")  { Test::assign(o, vars.undef, behaviour_t::EMPTY); }
         SECTION("number SV") { Test::assign(o, vars.iv, behaviour_t::THROWS); }
@@ -116,33 +118,47 @@ TEST("get") {
 }
 
 TEST("stash") {
-    Sub o("M1::dummy");
+    static auto _a = eval_pv("package MyTest::Sub::Stash; sub func {}", 1); (void)_a;
+    Sub o("MyTest::Sub::Stash::func");
     REQUIRE(o.stash());
-    REQUIRE(o.stash() == gv_stashpvs("M1", 0));
+    REQUIRE(o.stash() == gv_stashpvs("MyTest::Sub::Stash", 0));
 }
 
 TEST("glob") {
-    Sub o("M1::dummy");
+    static auto _a = eval_pv("package MyTest::Sub::Glob; sub func {}", 1); (void)_a;
+    Sub o("MyTest::Sub::Glob::func");
     REQUIRE(o.glob());
-    REQUIRE(o.glob() == Stash("M1")["dummy"]);
+    REQUIRE(o.glob() == Stash("MyTest::Sub::Glob")["func"]);
 }
 
 TEST("name") {
-    Sub o("M1::dummy");
-    REQUIRE(o.name() == "dummy");
+    static auto _a = eval_pv("package MyTest::Sub::Name; sub func {}", 1); (void)_a;
+    Sub o("MyTest::Sub::Name::func");
+    REQUIRE(o.name() == "func");
 }
 
 TEST("named") {
-    Sub o("M1::dummy");
+    static auto _a = eval_pv("package MyTest::Sub::Named; sub func {}", 1); (void)_a;
+    Sub o("MyTest::Sub::Named::func");
     REQUIRE(!o.named());
 }
 
 TEST("call args") {
-    Stash s("M1");
+    static auto _a = eval_pv(R"EOF(
+        package MyTest::Sub::CallArgs;
+        our $call_cnt = 0;
+
+        sub check_args {
+            $call_cnt++;
+            return [@_]
+        }
+    )EOF", 1); (void)_a;
+
+    Stash s("MyTest::Sub::CallArgs");
+    auto sub        = s.sub("check_args");
     Simple call_cnt = s.scalar("call_cnt");
     call_cnt = 0;
 
-    auto sub = s.sub("check_args");
     SECTION("empty") {
         cmp_array(sub.call(), {});
         CHECK(call_cnt == 1);
@@ -203,12 +219,25 @@ TEST("call args") {
 }
 
 TEST("call context") {
-    Stash s("M1");
+    static auto _a = eval_pv(R"EOF(
+        package MyTest::Sub::CallContext;
+        our $call_cnt = 0;
+        our $call_ret;
+
+        sub check_context {
+            $call_cnt++;
+            return @_ if wantarray();
+            return $_[0] if defined wantarray();
+            $call_ret = $_[0];
+        }
+    )EOF", 1); (void)_a;
+
+    Stash s("MyTest::Sub::CallContext");
+    auto sub        = s.sub("check_context");
     Simple call_cnt = s.scalar("call_cnt");
     Simple call_ret = s.scalar("call_ret");
     call_cnt = 0;
 
-    auto sub = s.sub("check_context");
     SECTION("void") {
         static_assert(std::is_same<decltype(sub.call<void>()),void>::value, "wrong signature");
         sub.call<void>(Simple(333));
@@ -269,18 +298,25 @@ TEST("call context") {
 }
 
 TEST("call result as argument") {
-    Sub sub("M1::check_args");
+    auto sub = Sub::create("[@_]");
     Array ret = sub.call( sub.call(Simple(999)), sub.call(Simple(888), Simple(777)) );
     cmp_array(ret[0], {999});
     cmp_array(ret[1], {888, 777});
 }
 
 TEST("super/super_strict") {
-    Sub sub("M4::meth");
-    sub = sub.SUPER();
-    REQUIRE(sub == Sub("M2::meth"));
-    sub = sub.SUPER_strict();
-    REQUIRE(sub == Sub("M1::meth"));
+    static auto _a = eval_pv(R"EOF(
+        package MyTest::Sub::Super::Parent;
+        sub func {}
+        package MyTest::Sub::Super::Child;
+        our @ISA = 'MyTest::Sub::Super::Parent';
+        sub func {}
+    )EOF", 1); (void)_a;
+
+    auto psub = Sub("MyTest::Sub::Super::Child::func");
+    auto sub = psub.SUPER();
+    REQUIRE(sub == Sub("MyTest::Sub::Super::Parent::func"));
+    REQUIRE(sub == psub.SUPER_strict());
     REQUIRE(!sub.SUPER());
     REQUIRE_THROWS(sub.SUPER_strict());
 }
@@ -289,4 +325,110 @@ TEST("create from code") {
     auto sub = Sub::create("return shift() + 10");
     Simple res = sub.call(Simple(3));
     CHECK(res == 13);
+}
+
+TEST("want") {
+    Sub::Want ret;
+    panda::function<void()> f = [&ret]{ ret = Sub::want(); };
+    auto sub = xs::out(f);
+    SECTION("void") {
+        Sub::create("$_[0]->(); return").call(sub);
+        CHECK(ret == Sub::Want::Void);
+    }
+    SECTION("scalar") {
+        Sub::create("my $a = $_[0]->()").call(sub);
+        CHECK(ret == Sub::Want::Scalar);
+    }
+    SECTION("array") {
+        Sub::create("my @a = $_[0]->()").call(sub);
+        CHECK(ret == Sub::Want::Array);
+    }
+}
+
+TEST("want_count") {
+    int ret;
+    panda::function<void()> f = [&ret]{ ret = Sub::want_count(); };
+    auto sub = xs::out(f);
+    SECTION("void") {
+        Sub::create("$_[0]->(); return").call(sub);
+        CHECK(ret == 0);
+    }
+    SECTION("scalar") {
+        Sub::create("my $a = $_[0]->()").call(sub);
+        CHECK(ret == 1);
+    }
+    SECTION("2-list") {
+        Sub::create("my ($a,$b) = $_[0]->()").call(sub);
+        CHECK(ret == 2);
+        Sub::create("($a,$b) = $_[0]->()").call(sub);
+        CHECK(ret == 2);
+    }
+    SECTION("2-list with junk") {
+        Sub::create("my ($a,$b) = ($_[0]->(), 1)").call(sub);
+        CHECK(ret == 2);
+        Sub::create("my (undef,$b) = ($_[0]->(), 1)").call(sub);
+        CHECK(ret == 2);
+    }
+    SECTION("3-list") {
+        Sub::create("my ($a,$b,$c) = $_[0]->()").call(sub);
+        CHECK(ret == 3);
+    }
+    SECTION("array slice list") {
+        Sub::create("my @a; @a[0,1,2] = $_[0]->()").call(sub);
+        CHECK(ret == 3);
+        Sub::create("my @a; my $i1 = 1; my $i2 = 2; @a[0,$i1,$i2] = $_[0]->()").call(sub);
+        CHECK(ret == 3);
+    }
+    SECTION("arrayref slice list") {
+        Sub::create("my $a = []; @$a[0,1,2] = $_[0]->()").call(sub);
+        CHECK(ret == 3);
+    }
+    SECTION("array slice dia") {
+        Sub::create("my @a; @a[2..4] = $_[0]->()").call(sub);
+        CHECK(ret == 3);
+    }
+    SECTION("array elem") {
+        Sub::create("my @a; ($a[0], $a[1]) = $_[0]->()").call(sub);
+        CHECK(ret == 2);
+        Sub::create("my @a; my ($b,$c) = (0,1); ($a[$b], $a[$c]) = $_[0]->()").call(sub);
+        CHECK(ret == 2);
+    }
+    SECTION("hash elem") {
+        Sub::create("my %a; ($a{0}, $a{1}) = $_[0]->()").call(sub);
+        CHECK(ret == 2);
+        Sub::create("my %a; my ($b,$c) = (0,1); ($a{$b}, $a{$c}) = $_[0]->()").call(sub);
+        CHECK(ret == 2);
+    }
+    SECTION("hash slice list") {
+        Sub::create("my %a; @a{qw/a b c/} = $_[0]->()").call(sub);
+        CHECK(ret == 3);
+    }
+    SECTION("hashref slice list") {
+        Sub::create("my $a = {}; @$a{qw/a b c/} = $_[0]->()").call(sub);
+        CHECK(ret == 3);
+    }
+    SECTION("hash slice dia") {
+        Sub::create("my %a; @a{2..4} = $_[0]->()").call(sub);
+        CHECK(ret == 3);
+    }
+    SECTION("complex") {
+        Sub::create("my ($a, $b, @arr, %hash); ($a, @arr[0,1], @arr[2..4], @hash{qw/a b/}, @hash{0..2}, $b, $arr[5], $hash{10}) = $_[0]->()").call(sub);
+        CHECK(ret == 14);
+    }
+    SECTION("infinite") {
+        Sub::create("my @a = $_[0]->()").call(sub); CHECK(ret == -1);
+        Sub::create("my ($a, @a) = $_[0]->()").call(sub); CHECK(ret == -1);
+        Sub::create("my ($a, @a, $b) = $_[0]->()").call(sub); CHECK(ret == -1);
+        Sub::create("my @a; my $i = 1; my $j = 3; @a[$i..$j] = $_[0]->()").call(sub); CHECK(ret == -1);
+        Sub::create("my @a; my @b; @a[@b] = $_[0]->()").call(sub); CHECK(ret == -1);
+        Sub::create("($a, substr($a,0,1)) = $_[0]->()").call(sub); CHECK(ret == -1);
+        Sub::create("my ($a) = [ 1, $_[0]->() ]").call(sub); CHECK(ret == -1);
+        Sub::create("my ($a) = { key => 'val', $_[0]->() }").call(sub); CHECK(ret == -1);
+        Sub::create("my $a = sub {}; my ($b) = $a->($_[0]->())").call(sub); CHECK(ret == -1);
+    }
+    //SECTION("benchmark") {
+    //    f = []{ for (int i = 0; i < 1000; ++i) Sub::want_count(); };
+    //    auto sub = xs::out(f);
+    //    Sub::create("use Benchmark; my $sub = shift; Benchmark::timethis(-1, sub { my ($a,$b) = $sub->()})").call(sub);
+    //}
 }

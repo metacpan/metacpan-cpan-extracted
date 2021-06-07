@@ -10,7 +10,7 @@ build_requires:
 configure_requires:
   Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v3.0.13, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Minilla/v3.1.12, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -29,7 +29,7 @@ no_index:
 provides:
   App::Prove::Plugin::MySQLPool:
     file: lib/App/Prove/Plugin/MySQLPool.pm
-    version: '0.09'
+    version: '0.10'
   TAP::Formatter::MySQLPool:
     file: lib/App/Prove/Plugin/MySQLPool.pm
   TAP::Formatter::MySQLPool::Session:
@@ -48,11 +48,13 @@ resources:
   bugtracker: https://github.com/mackee/App-Prove-Plugin-MySQLPool/issues
   homepage: https://github.com/mackee/App-Prove-Plugin-MySQLPool
   repository: git://github.com/mackee/App-Prove-Plugin-MySQLPool.git
-version: '0.09'
+version: '0.10'
 x_contributors:
   - 'Ichinose Shogo <shogo82148@gmail.com>'
   - 'Kang-min Liu <gugod@gugod.org>'
   - 'Kenichi Ishigaki <ishigaki@cpan.org>'
+  - 'karupanerura <karupa@cpan.org>'
   - 'mackee <macopy123@gmail.com>'
   - 'skozawa <skozawa@hatena.ne.jp>'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

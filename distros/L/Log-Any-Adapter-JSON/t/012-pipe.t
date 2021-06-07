@@ -2,7 +2,7 @@ use Test::Most 'die';
 
 use Test::More::UTF8;
 use Encode;
-use JSON::MaybeXS;
+use Cpanel::JSON::XS;
 
 my $tempfile;
 my $cat_pipe;

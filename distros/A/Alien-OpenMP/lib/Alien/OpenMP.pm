@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use Config ();
 
-our $VERSION = '0.003001';
+our $VERSION = '0.003002';
 
 # set as package variable since %Config::Config is read only, (per docs and in practice)
 our $CCNAME = $Config::Config{ccname};

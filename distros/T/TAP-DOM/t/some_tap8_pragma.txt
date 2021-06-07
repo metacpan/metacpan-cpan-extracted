@@ -1,0 +1,11 @@
+TAP Version 13
+1..3
+ok foo
+not ok bar # TODO
+ok baz
+# random comment line
+# another comment line
+#
+pragma +tapdom_error
+# Test-tapdom-error-type: unittest
+# Test-tapdom-unittest-code: 42

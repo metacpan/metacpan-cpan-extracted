@@ -1,0 +1,11 @@
+# This file is in relaxed JSON format (it allows comments and trailing commas).
+#
+# This config file is not needed by Beekeeper. It is required only by example
+# clients in order to to get the connection parameters to frontend brokers.
+
+{
+    "host"     : "localhost",
+    "port"     :  8001,
+    "username" : "frontend",
+    "password" : "abc123",
+}

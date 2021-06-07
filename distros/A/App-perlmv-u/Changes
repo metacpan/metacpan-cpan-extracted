@@ -1,4 +1,10 @@
-0.005   2017-08-19 (PERLANCAR)
+0.006   2021-05-25  Released-By: PERLANCAR; Urgency: high
+
+	- [build] Rebuild to update Sah coercion module names (old Sah coercion
+          modules have been purged from CPAN).
+
+
+0.005   2017-08-19  Released-By: PERLANCAR
 
 	- [Incompatible change] [ux] Don't use last value of code because a
 	  common trap is using e 's/.../.../' and user will be surprised that
@@ -6,23 +12,23 @@
 	  of s///); this also makes perlmv-u behave more like perlmv.
 
 
-0.004   2017-08-17 (PERLANCAR)
+0.004   2017-08-17  Released-By: PERLANCAR
 
 	- [Bugfix] Redo (as well as undo) should redo (undo) the most
 	  recently undone (done) action.
 
 
-0.003   2017-08-01 (PERLANCAR)
+0.003   2017-08-01  Released-By: PERLANCAR
 
 	- [Bugfix] Don't rename to NAME.1 if name doesn't change.
 
 
-0.002   2017-08-01 (PERLANCAR)
+0.002   2017-08-01  Released-By: PERLANCAR
 
 	- Use Sereal instead of JSON for faithful bytes serialization (even
 	  YAML::XS uses utf8 transformation).
 
 
-0.001    2017-07-28 (PERLANCAR)
+0.001    2017-07-28  Released-By: PERLANCAR
 
          - First release, without tests.

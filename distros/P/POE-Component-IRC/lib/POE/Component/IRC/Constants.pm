@@ -1,6 +1,6 @@
 package POE::Component::IRC::Constants;
 our $AUTHORITY = 'cpan:HINRIK';
-$POE::Component::IRC::Constants::VERSION = '6.90';
+$POE::Component::IRC::Constants::VERSION = '6.91';
 use strict;
 use warnings FATAL => 'all';
 

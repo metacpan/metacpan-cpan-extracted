@@ -3,28 +3,13 @@ package Beekeeper::JSONRPC;
 use strict;
 use warnings;
 
-our $VERSION = '0.01';
-
-=head1 NAME
-
-Beekeeper::JSONRPC - Representation of JSON-RPC objects
-
-=head1 VERSION
-
-Version 0.01
-
-=head1 DESCRIPTION
-
-All Beekeeper RPC calls follow the JSON-RPC 2.0 specification (see L<http://www.jsonrpc.org/specification>).
-
-Constructors on this class are not actually used and are provided just for completeness.
-
-=cut
+our $VERSION = '0.04';
 
 use Beekeeper::JSONRPC::Request;
 use Beekeeper::JSONRPC::Notification;
 use Beekeeper::JSONRPC::Response;
 use Beekeeper::JSONRPC::Error;
+
 
 sub request {
     my $class = shift;
@@ -48,7 +33,25 @@ sub error {
 
 1;
 
+__END__
+
+=pod
+
 =encoding utf8
+
+=head1 NAME
+
+Beekeeper::JSONRPC - Representation of JSON-RPC objects
+
+=head1 VERSION
+
+Version 0.04
+
+=head1 DESCRIPTION
+
+All Beekeeper RPC calls follow the JSON-RPC 2.0 specification (see L<http://www.jsonrpc.org/specification>).
+
+Constructors on this class are not actually used and are provided just for completeness.
 
 =head1 AUTHOR
 
@@ -56,7 +59,7 @@ José Micó, C<jose.mico@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright 2015 José Micó.
+Copyright 2015-2021 José Micó.
 
 This is free software; you can redistribute it and/or modify it under the same 
 terms as the Perl 5 programming language itself.

@@ -8,7 +8,7 @@ CGI::Tiny - Common Gateway Interface, with no frills
 
 =head1 SYNOPSIS
 
-  #!/usr/bin/perl
+  #!/usr/bin/env perl
   use strict;
   use warnings;
   use utf8;
@@ -42,7 +42,7 @@ CGI::Tiny - Common Gateway Interface, with no frills
     }
     die "Invalid fribble parameter" unless length $fribble;
 
-    if ($cgi->query_param('download')) {
+    if ($cgi->param('download')) {
       $cgi->set_response_disposition(attachment => 'fribble.json');
     }
     $cgi->render(json => {fribble => $fribble});
@@ -100,14 +100,11 @@ applications that don't need to scale.
 
 See L</"COMPARISON TO CGI.PM">.
 
-This module's interface is currently I<EXPERIMENTAL> and may be changed
-incompatibly if needed.
-
 =head1 USAGE
 
 =for Pod::Coverage cgi
 
-CGI::Tiny's interface is a regular function called C<cgi> exported by default.
+CGI::Tiny's interface is the C<cgi> block.
 
   use CGI::Tiny;
   cgi {
@@ -118,22 +115,65 @@ CGI::Tiny's interface is a regular function called C<cgi> exported by default.
     # render response with $cgi->render or $cgi->render_chunk
   };
 
-The code block is immediately run with C<$_> set to a CGI::Tiny object, which
+The block is immediately run with C<$_> set to a CGI::Tiny object, which
 L</"METHODS"> can be called on to read request information and render a
 response.
 
-If an exception is thrown within the code block, or the code block does not
-render a response, it will run the handler set by L</"set_error_handler"> if
-any, or by default emit the error as a warning and (if nothing has been
-rendered yet) render a 500 Internal Server Error. The default server error
-will also be rendered if the process ends abnormally between importing from
-CGI::Tiny and the start of the C<cgi> block.
+If an exception is thrown within the block, or the block does not render a
+response, it will run the handler set by L</"set_error_handler"> if any, or by
+default emit the error as a warning and (if nothing has been rendered yet)
+render a 500 Internal Server Error. The default server error will also be
+rendered if the process ends abnormally between importing from CGI::Tiny and
+the start of the C<cgi> block.
 
 Note that the C<cgi> block's current implementation as a regular exported
 subroutine is an implementation detail, and future implementations reserve the
-right to provide it as an XSUB or keyword for performance reasons. You should
-not rely on C<@_> to be set, and you should not use C<return> to exit the
-block; use C<exit> to end a CGI script early after rendering a response.
+right to provide it as an XSUB or keyword for performance reasons. Don't call
+it as C<CGI::Tiny::cgi>, don't rely on C<@_> being set, and don't use C<return>
+to exit the block; use C<exit> to end a CGI script early after rendering a
+response.
+
+=head1 DATA SAFETY
+
+CGI::Tiny does not provide any special affordances for
+L<taint mode|perlsec/"Taint mode"> as it is overeager, imprecise, and can
+significantly impact performance. Web developers should instead proactively
+take care not to use any request data (including request headers, form fields,
+or other request content) directly in an unsafe manner, as it can make the
+program vulnerable to injections that cause undesired or dangerous behavior.
+The most common risks to watch out for include:
+
+=over
+
+=item * System commands
+
+Do not interpolate arbitrary data into a shell command, such as with C<system>
+or backticks. Data can be safely passed as command arguments using methods that
+bypass the shell, such as the list form of C<system>, or modules like
+L<IPC::System::Simple>, L<IPC::ReadpipeX>, and L<IPC::Run3>. If shell features
+are needed, data can be escaped for bourne-style shells with
+L<String::ShellQuote>.
+
+=item * Database queries
+
+Do not interpolate arbitrary data into database queries. Data can be safely
+passed to database queries using
+L<placeholders|https://metacpan.org/pod/DBI#Placeholders-and-Bind-Values>.
+
+=item * Regex
+
+Do not interpolate arbitrary data into regular expressions, such as the C<m//>
+or C<s///> operators, or the first argument to C<split>. Data can be safely
+included in a regex to match it as an exact string by escaping it with
+the C<quotemeta> function or equivalent C<\Q> escape sequence.
+
+=item * HTML
+
+Do not interpolate arbitrary data into HTML. Data can be safely included in
+HTML by escaping it with L</"escape_html">, or passing it to an HTML template
+engine with an auto-escape feature; see L</"Templating">.
+
+=back
 
 =head1 EXTENDING
 
@@ -175,7 +215,7 @@ CPAN modules provide this capability.
 
 L<Text::Xslate> is an efficient template engine designed for HTML/XML.
 
-  #!/usr/bin/perl
+  #!/usr/bin/env perl
   use strict;
   use warnings;
   use utf8;
@@ -203,7 +243,7 @@ L<Text::Xslate> is an efficient template engine designed for HTML/XML.
 L<Mojo::Template> is a lightweight HTML/XML template engine in the L<Mojo>
 toolkit.
 
-  #!/usr/bin/perl
+  #!/usr/bin/env perl
   use strict;
   use warnings;
   use utf8;
@@ -237,7 +277,7 @@ aware that Perl and some operating systems work with filenames in encoded
 bytes (usually UTF-8), but this module works with parameters in Unicode
 characters, so non-ASCII filenames make things trickier.
 
-  #!/usr/bin/perl
+  #!/usr/bin/env perl
   use strict;
   use warnings;
   use utf8;
@@ -278,6 +318,110 @@ characters, so non-ASCII filenames make things trickier.
     $cgi->set_response_disposition(attachment => $basename)->render(file => $filepath);
   };
 
+=head2 Sessions
+
+Regardless of the session mechanism, login credentials should only be sent over
+HTTPS, and passwords should be stored on the server using a secure one-way
+hash, such as with L<Crypt::Passphrase>.
+
+L<Basic authentication|https://en.wikipedia.org/wiki/Basic_access_authentication>
+has historically been used to provide a simplistic login session mechanism
+which relies on the client to send the credentials with every subsequent
+request in that browser session. However, it does not have a reliable logout or
+session expiration mechanism.
+
+Basic authentication can be handled by the CGI server itself (e.g.
+L<Apache|https://httpd.apache.org/docs/2.4/howto/auth.html>), passing only
+L</"auth_type"> and L</"remote_user"> to the CGI script.
+
+If you want to handle Basic authentication directly in the CGI script, you may
+need to configure the CGI server to forward the C<Authorization> header (e.g.
+L<Apache|https://stackoverflow.com/q/17018586/5848200>), as it is commonly
+stripped from the CGI request.
+
+  #!/usr/bin/env perl
+  use strict;
+  use warnings;
+  use utf8;
+  use CGI::Tiny;
+  use MIME::Base64 qw(encode_base64 decode_base64);
+  use Unicode::UTF8 'decode_utf8';
+
+  cgi {
+    my $cgi = $_;
+
+    my $authed_user;
+    if (defined(my $auth = $cgi->header('Authorization'))) {
+      if (my ($hash) = $auth =~ m/^Basic (\S+)/i) {
+        my ($user, $pass) = split /:/, decode_utf8(decode_base64($hash)), 2;
+        $authed_user = $user if verify_password($user, $pass);
+      }
+    }
+
+    unless (defined $authed_user) {
+      $cgi->add_response_header('WWW-Authenticate' => 'Basic realm="My Website", charset="UTF-8"');
+      $cgi->set_response_status(401)->render;
+      exit;
+    }
+
+    # do authed stuff
+  };
+
+A more sophisticated and modern login session mechanism is to store a session
+cookie in the client, associated with a server-side session stored in a file or
+database. Login credentials only need to be validated once per session, and
+subsequently the session ID stored in the cookie will be sent by the client
+with each request. This type of session can be ended by expiring the session
+cookie and invalidating the session data on the server.
+
+  #!/usr/bin/env perl
+  use strict;
+  use warnings;
+  use utf8;
+  use CGI::Tiny;
+
+  cgi {
+    my $cgi = $_;
+
+    my ($authed_user, $session_id);
+    if ($cgi->path eq '/login') {
+      if ($cgi->method eq 'GET' or $cgi->method eq 'HEAD') {
+        $cgi->render(html => login_form_template(login_failed => 0));
+        exit;
+      } elsif ($cgi->method eq 'POST') {
+        my $user = $cgi->body_param('login_user');
+        my $pass = $cgi->body_param('login_pass');
+        if (verify_password($user, $pass)) {
+          $session_id = store_new_session($user);
+          $authed_user = $user;
+        } else {
+          $cgi->render(html => login_form_template(login_failed => 1));
+          exit;
+        }
+      }
+    } elsif (defined($session_id = $cgi->cookie('myapp_session'))) {
+      if ($cgi->path eq '/logout') {
+        invalidate_session($session_id);
+        # expire session cookie
+        $cgi->add_response_cookie(myapp_session => $session_id, 'Max-Age' => 0, Path => '/', HttpOnly => 1);
+        $cgi->render(redirect => $cgi->script_name . '/login');
+        exit;
+      } else {
+        $authed_user = get_session_user($session_id);
+      }
+    }
+
+    unless (defined $authed_user) {
+      $cgi->render(redirect => $cgi->script_name . '/login');
+      exit;
+    }
+
+    # set/refresh session cookie
+    $cgi->add_response_cookie(myapp_session => $session_id, 'Max-Age' => 3600, Path => '/', HttpOnly => 1);
+
+    # do authed stuff
+  };
+
 =head2 Logging
 
 CGI scripts can usually log errors directly to STDERR with the C<warn>
@@ -290,7 +434,7 @@ encode them to bytes automatically, and also log debugging information when the
 log level is set to C<debug>. Just make sure the CGI server has permission to
 create and write to the logging target.
 
-  #!/usr/bin/perl
+  #!/usr/bin/env perl
   use strict;
   use warnings;
   use utf8;
@@ -332,7 +476,7 @@ application. L<Routes::Tiny> can be used to organize this with CGI::Tiny, using
 C<REQUEST_METHOD> and C<PATH_INFO> (which is the URL path after the CGI script
 name).
 
-  #!/usr/bin/perl
+  #!/usr/bin/env perl
   use strict;
   use warnings;
   use utf8;
@@ -377,7 +521,7 @@ name).
 =head1 METHODS
 
 The following methods can be called on the CGI::Tiny object provided to the
-C<cgi> code block.
+C<cgi> block.
 
 =head2 Setup
 
@@ -436,6 +580,22 @@ C<413 Payload Too Large> and throw an exception if the content length is over
 the limit. Files uploaded through a C<multipartE<sol>form-data> request body
 also count toward this limit, though they are streamed to temporary files when
 parsed.
+
+=head3 set_multipart_form_options
+
+  $cgi = $cgi->set_multipart_form_options({discard_files => 1, tempfile_args => [SUFFIX => '.dat']});
+
+Set a hash reference of options to pass when parsing a
+C<multipartE<sol>form-data> request body with
+L<CGI::Tiny::Multipart/"parse_multipart_form_data">. No effect after the form
+data has been parsed such as by calling L</"body_params"> or L</"uploads"> for
+the first time.
+
+Note that options like C<parse_as_files> and C<on_file_buffer> can alter the
+C<content> and C<file> keys of the form field structure returned by
+L</"body_parts">. Thus L</"uploads"> may not contain C<file> and may instead
+contain C<content>, and L</"body_params"> text field values may be read from
+C<file>, which will be expected to be a seekable filehandle if present.
 
 =head3 set_multipart_form_charset
 
@@ -604,36 +764,6 @@ The name and version of the CGI server.
 
 =head2 Request Parsing
 
-=head3 query_params
-
-  my $pairs = $cgi->query_params;
-
-Retrieve URL query string parameters as an ordered array reference of
-name/value pairs, represented as two-element array references. Names and values
-are decoded to Unicode characters.
-
-=head3 query_param_names
-
-  my $arrayref = $cgi->query_param_names;
-
-Retrieve URL query string parameter names, decoded to Unicode characters, as an
-ordered array reference.
-
-=head3 query_param
-
-  my $value = $cgi->query_param('foo');
-
-Retrieve value of a named URL query string parameter, decoded to Unicode
-characters. If the parameter name was passed multiple times, returns the last
-value. Use L</"query_param_array"> to get multiple values of a parameter.
-
-=head3 query_param_array
-
-  my $arrayref = $cgi->query_param_array('foo');
-
-Retrieve values of a named URL query string parameter, decoded to Unicode
-characters, as an ordered array reference.
-
 =head3 headers
 
   my $hashref = $cgi->headers;
@@ -660,7 +790,8 @@ represented as two-element array references.
 
   my $arrayref = $cgi->cookie_names;
 
-Retrieve request cookie names as an ordered array reference.
+Retrieve request cookie names as an ordered array reference, without
+duplication.
 
 =head3 cookie
 
@@ -675,6 +806,102 @@ multiple values of a cookie name.
   my $arrayref = $cgi->cookie_array('foo');
 
 Retrieve values of a request cookie name as an ordered array reference.
+
+=head3 params
+
+  my $pairs = $cgi->params;
+
+Retrieve URL query string parameters and C<application/x-www-form-urlencoded>
+or C<multipart/form-data> body parameters as an ordered array reference of
+name/value pairs, represented as two-element array references. Names and values
+are decoded to Unicode characters.
+
+Query parameters are returned first, followed by body parameters. Use
+L</"query_params"> or L</"body_params"> to retrieve query or body parameters
+separately.
+
+Note that this will read the text form fields into memory as in
+L</"body_params">.
+
+=head3 param_names
+
+  my $arrayref = $cgi->param_names;
+
+Retrieve URL query string parameter names and
+C<application/x-www-form-urlencoded> or C<multipart/form-data> body parameter
+names, decoded to Unicode characters, as an ordered array reference, without
+duplication.
+
+Query parameter names are returned first, followed by body parameter names. Use
+L</"query_param_names"> or L</"body_param_names"> to retrieve query or body
+parameter names separately.
+
+Note that this will read the text form fields into memory as in
+L</"body_params">.
+
+=head3 param
+
+  my $value = $cgi->param('foo');
+
+Retrieve value of a named URL query string parameter or
+C<application/x-www-form-urlencoded> or C<multipart/form-data> body parameter,
+decoded to Unicode characters.
+
+If the parameter name was passed multiple times, returns the last body
+parameter value if any, otherwise the last query parameter value. Use
+L</"param_array"> to get multiple values of a parameter, or L</"query_param">
+or L</"body_param"> to retrieve the last query or body parameter value
+specifically.
+
+Note that this will read the text form fields into memory as in
+L</"body_params">.
+
+=head3 param_array
+
+  my $arrayref = $cgi->param_array('foo');
+
+Retrieve values of a named URL query string parameter or
+C<application/x-www-form-urlencoded> or C<multipart/form-data> body parameter,
+decoded to Unicode characters, as an ordered array reference.
+
+Query parameter values will be returned first, followed by body parameter
+values. Use L</"query_param_array"> or L</"body_param_array"> to retrieve query
+or body parameter values separately.
+
+Note that this will read the text form fields into memory as in
+L</"body_params">.
+
+=head3 query_params
+
+  my $pairs = $cgi->query_params;
+
+Retrieve URL query string parameters as an ordered array reference of
+name/value pairs, represented as two-element array references. Names and values
+are decoded to Unicode characters.
+
+=head3 query_param_names
+
+  my $arrayref = $cgi->query_param_names;
+
+Retrieve URL query string parameter names, decoded to Unicode characters, as an
+ordered array reference, without duplication.
+
+=head3 query_param
+
+  my $value = $cgi->query_param('foo');
+
+Retrieve value of a named URL query string parameter, decoded to Unicode
+characters.
+
+If the parameter name was passed multiple times, returns the last value. Use
+L</"query_param_array"> to get multiple values of a parameter.
+
+=head3 query_param_array
+
+  my $arrayref = $cgi->query_param_array('foo');
+
+Retrieve values of a named URL query string parameter, decoded to Unicode
+characters, as an ordered array reference.
 
 =head3 body
 
@@ -718,26 +945,23 @@ accessible via L</"uploads"> and related methods.
 
 Retrieve C<applicationE<sol>x-www-form-urlencoded> or
 C<multipartE<sol>form-data> body parameter names, decoded to Unicode
-characters, as an ordered array reference.
+characters, as an ordered array reference, without duplication.
 
-Note that this will read the text form fields into memory, so make sure the
-L</"set_request_body_limit"> can fit well within the available memory.
-C<multipartE<sol>form-data> file uploads will be streamed to temporary files
-accessible via L</"uploads"> and related methods.
+Note that this will read the text form fields into memory as in
+L</"body_params">.
 
 =head3 body_param
 
   my $value = $cgi->body_param('foo');
 
 Retrieve value of a named C<applicationE<sol>x-www-form-urlencoded> or
-C<multipartE<sol>form-data> body parameter, decoded to Unicode characters. If
-the parameter name was passed multiple times, returns the last value. Use
+C<multipartE<sol>form-data> body parameter, decoded to Unicode characters.
+
+If the parameter name was passed multiple times, returns the last value. Use
 L</"body_param_array"> to get multiple values of a parameter.
 
-Note that this will read the text form fields into memory, so make sure the
-L</"set_request_body_limit"> can fit well within the available memory.
-C<multipartE<sol>form-data> file uploads will be streamed to temporary files
-accessible via L</"uploads"> and related methods.
+Note that this will read the text form fields into memory as in
+L</"body_params">.
 
 =head3 body_param_array
 
@@ -747,54 +971,21 @@ Retrieve values of a named C<applicationE<sol>x-www-form-urlencoded> or
 C<multipartE<sol>form-data> body parameter, decoded to Unicode characters, as
 an ordered array reference.
 
-Note that this will read the text form fields into memory, so make sure the
-L</"set_request_body_limit"> can fit well within the available memory.
-C<multipartE<sol>form-data> file uploads will be streamed to temporary files
-accessible via L</"uploads"> and related methods.
+Note that this will read the text form fields into memory as in
+L</"body_params">.
 
 =head3 body_parts
 
   my $parts = $cgi->body_parts;
 
 Retrieve C<multipartE<sol>form-data> request body parts as an ordered array
-reference. Most applications should retrieve multipart form data through
-L</"body_params"> and L</"uploads"> (or related accessors) instead.
+reference using L<CGI::Tiny::Multipart/"parse_multipart_form_data">. Most
+applications should retrieve multipart form data through L</"body_params"> and
+L</"uploads"> (or related accessors) instead.
 
 Note that this will read the text form fields into memory, so make sure the
 L</"set_request_body_limit"> can fit well within the available memory. File
 uploads will be streamed to temporary files.
-
-Body parts are represented as hash references containing:
-
-=over
-
-=item headers
-
-Hash reference of part headers. Header names are represented in lowercase.
-
-=item name
-
-Form field name from C<Content-Disposition> header, undecoded.
-
-=item filename
-
-Filename from C<Content-Disposition> header if present, undecoded.
-
-=item size
-
-Size of part contents in bytes.
-
-=item content
-
-Part contents as undecoded bytes, for parts without a defined C<filename>. File
-uploads are stored in a temporary C<file> instead.
-
-=item file
-
-L<File::Temp> object referencing temporary file containing the part contents,
-for parts with a defined C<filename>.
-
-=back
 
 =head3 uploads
 
@@ -837,10 +1028,9 @@ with the C<seek> pointer at the start of the file for reading.
   my $arrayref = $cgi->upload_names;
 
 Retrieve C<multipartE<sol>form-data> file upload names, decoded to Unicode
-characters, as an ordered array reference.
+characters, as an ordered array reference, without duplication.
 
-Note that this will read the text form fields into memory, so make sure the
-L</"set_request_body_limit"> can fit well within the available memory.
+Note that this will read the text form fields into memory as in L</"uploads">.
 
 =head3 upload
 
@@ -852,8 +1042,7 @@ to get multiple uploads with the same name.
 
 See L</"uploads"> for details on the representation of the upload.
 
-Note that this will read the text form fields into memory, so make sure the
-L</"set_request_body_limit"> can fit well within the available memory.
+Note that this will read the text form fields into memory as in L</"uploads">.
 
 =head3 upload_array
 
@@ -864,8 +1053,7 @@ an ordered array reference.
 
 See L</"uploads"> for details on the representation of the uploads.
 
-Note that this will read the text form fields into memory, so make sure the
-L</"set_request_body_limit"> can fit well within the available memory.
+Note that this will read the text form fields into memory as in L</"uploads">.
 
 =head2 Response
 
@@ -1276,25 +1464,31 @@ L</"set_error_handler">.
 
 =item *
 
-Request query and body parameter accessors in CGI::Tiny are not context
-sensitive, as context sensitivity can lead to surprising behavior and
+Request parameter accessors in CGI::Tiny are not context sensitive, as context
+sensitivity can lead to surprising behavior and
 L<vulnerabilities|https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2014-1572>.
-L</"query_param">, L</"body_param">, and L</"upload"> always return a single
-value; L</"query_param_array">, L</"body_param_array">, and L</"upload_array">
-must be used to retrieve multi-value parameters.
+L</"param">, L</"query_param">, L</"body_param">, and L</"upload"> always
+return a single value; L</"param_array">, L</"query_param_array">,
+L</"body_param_array">, and L</"upload_array"> must be used to retrieve
+multi-value parameters.
 
 =item *
 
-CGI::Tiny does not have a method-sensitive C<param> accessor; query and body
-request parameters are accessed with L</"query_param"> and L</"body_param">
-respectively. Uploaded files and their metadata are accessed with L</"upload">
-and do not affect the text parameter accessors.
+CGI::Tiny's L</"param"> accessor is also not method-sensitive; it accesses
+either query or body request parameters with the same behavior regardless of
+request method, and query and body request parameters can be accessed
+separately with L</"query_param"> and L</"body_param"> respectively.
 
 =item *
 
-CGI::Tiny decodes request query and body parameters to Unicode characters
-automatically, and L</"render">/L</"render_chunk"> provide methods to encode
-response content from Unicode characters to UTF-8 by default.
+CGI::Tiny's L</"param"> accessor only retrieves text parameters; uploaded
+files and their metadata are accessed with L</"upload"> and related methods.
+
+=item *
+
+CGI::Tiny decodes request parameters to Unicode characters automatically, and
+L</"render">/L</"render_chunk"> provide methods to encode response content from
+Unicode characters to UTF-8 by default.
 
 =item *
 

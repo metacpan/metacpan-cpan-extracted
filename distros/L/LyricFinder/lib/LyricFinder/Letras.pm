@@ -1,249 +1,129 @@
 package LyricFinder::Letras;
 
-use 5.008000;
 use strict;
 use warnings;
-use LWP::UserAgent;
-use HTTP::Request;
-use HTML::Strip;
 use Carp;
-
-my $Source = 'Letras';
-my $Site   = 'https://www.letras.mus.br';
+use HTML::Strip;
+use parent 'LyricFinder::_Class';
 
 our $haveLyricsCache;
 BEGIN {
+	$haveLyricsCache = 0;
 	eval "use LyricFinder::Cache; \$haveLyricsCache = 1; 1";
 }
 
-# the Default HTTP User-Agent we'll send:
-our $AGENT = "Mozilla/5.0 (X11; Linux x86_64; rv:80.0) Gecko/20100101 Firefox/80.0";
+my $Source = 'Letras';
+my $Site   = 'https://www.letras.mus.br';
+my $DEBUG  = 0;
 
 sub new
 {
 	my $class = shift;
 
-	my $self = {};
-	$self->{'agent'} = $AGENT;
-	$self->{'cache'} = '';
-	$self->{'Error'} = 'Ok';
-	$self->{'Source'} = $Source;
-	$self->{'Site'} = $Site;
-	$self->{'Url'} = '';
-	$self->{'Credits'} = [];
-
-	my %args = @_;
-	foreach my $i (keys %args) {
-		if ($i =~ s/^\-//) {
-			$self->{$i} = $args{"-$i"};
-		} else {
-			$self->{$i} = $args{$i};
-		}
-	}
+	my $self = $class->SUPER::new($Source, @_);
+	@{$self->{'_fetchers'}} = ($Source);
+	unshift(@{$self->{'_fetchers'}}, 'Cache')  if ($haveLyricsCache
+			&& $self->{'-cache'} && $self->{'-cache'} !~ /^\>/);
 
 	bless $self, $class;   #BLESS IT!
 
 	return $self;
 }
 
-sub source {
-	my $self = shift;
-	return $self->{'Source'};
-}
-
-sub url {
-	my $self = shift;
-	return $self->{'Url'};
-}
-
-sub order {
-	return wantarray ? ($Source) : $Source;
-}
-
-sub tried {
-	return order ();
-}
-
-sub credits {
-	my $self = shift;
-	return wantarray ? @{$self->{'Credits'}} : join(', ', @{$self->{'Credits'}});
-}
-
-sub message {
-	my $self = shift;
-	return $self->{'Error'};
-}
-
-sub site {
-	my $self = shift;
-	return $self->{'Site'};
-}
-
-# Allow user to specify a different user-agent:
-sub agent {
-	my $self = shift;
-
-	if (defined $_[0]) {
-		$self->{'agent'} = $_[0];
-	} else {
-		return $self->{'agent'};
-	}
-}
-
-sub cache {
-	my $self = shift;
-
-	if (defined $_[0]) {
-		$self->{'cache'} = $_[0];
-	} else {
-		return $self->{'cache'};
-	}
-}
-
-#FROM:  https://github.com/clementine-player/Clementine/blob/master/data/lyrics/ultimate_providers.xml
-sub remove_accents {
-	my $str = shift;
-
-	$str =~ tr/\xc4\xc2\xc0\xc1\xc3\xe4\xe2\xe0\xe1\xe3/aaaaaaaaaa/;
-	$str =~ tr/\xcb\xca\xc8\xc9\xeb\xea\xe8\xe9/eeeeeeee/;
-	$str =~ tr/\xcf\xcc\xef\xec/iiii/;
-	$str =~ tr/\xd6\xd4\xd2\xd3\xd5\xf6\xf4\xf2\xf3\xf5/oooooooooo/;
-	$str =~ tr/\xdc\x{0016}\xd9\xda\xfc\x{0016}\xf9\xfa/uuuuuuuu/;
-	$str =~ tr/\x{0178}\xdd\xff\xfd/yyyy/;
-	$str =~ tr/\xd1\xf1/nn/;
-	$str =~ tr/\xc7\xe7/cc/;
-	$str =~ s/\xdf/ss/g;
-	return $str;
-}
-
 sub fetch {
 	my ($self, $artist_in, $song_in) = @_;
 
-	# reset the error var, change it if an error occurs.
-	$self->{'Error'} = 'Ok';
-	$self->{'Url'} = '';
+	$self->_debug("Letras::fetch($artist_in, $song_in)!");
 
-	unless ($artist_in && $song_in) {
-		carp($self->{'Error'} = "e:$Source.fetch() called without artist and song!");
-		return;
-	}
+	return ''  unless ($self->_check_inputs($artist_in, $song_in));
+	return ''  if ($self->{'Error'} ne 'Ok');
 
+	my $artist = $artist_in;
+	my $song = $song_in;
 	# first, see if we've got it cached:
-	if ($self->{'cache'} && $self->{'cache'} !~ /^\>/ && $haveLyricsCache) {
-		my $cache = new LyricFinder::Cache(-cache => $self->{'cache'});
+	$self->_debug("i:haveCache=$haveLyricsCache= -cachedir=".$self->{'-cache'}."=");
+	if ($haveLyricsCache && $self->{'-cache'} && $self->{'-cache'} !~ /^\>/) {
+		my $cache = new LyricFinder::Cache(%{$self});
 		if ($cache) {
-			my $lyrics = $cache->fetch($artist_in, $song_in);
+			my $lyrics = $cache->fetch($artist, $song);
 			if (defined($lyrics) && $lyrics =~ /\w/) {
-				print "..Got lyrics from cache.\n"  if ($self->{'-debug'});
+				$self->_debug("..Got lyrics from cache.");
 				$self->{'Source'} = 'Cache';
 				$self->{'Site'} = $cache->site();
 				$self->{'Url'} = $cache->url();
+
 				return $lyrics;
 			}
 		}
 	}
 
-	$self->{'Source'} = $Source;
 	$self->{'Site'} = $Site;
 
-	$artist_in = &remove_accents($artist_in);
-	$song_in = &remove_accents($song_in);
+	$artist = $self->_remove_accents($artist);
+	$song = $self->_remove_accents($song);
 
 	# Their URLs look like e.g.:
-#1	# https://www.letras.net/read/n/nvdes-lyrics/lightning-flow-lyrics.html
 	# https://www.letras.mus.br/<artist>/<title>
-	($self->{'Url'} = $artist_in) =~ s#\s*\/\s*# and #;  #CONVERT "artist1 / artist2" TO "artist1 and artist2"!
-	$song_in =~ s#\s*\/\s*#\-#g;                  #FIX SONGS WITH "/" IN THEM!
-	$self->{'Url'} .= "/${song_in}-lyrics";
+	($self->{'Url'} = $artist) =~ s#\s*\/\s*# and #;  #CONVERT "artist1 / artist2" TO "artist1 and artist2"!
+	$song =~ s#\s*\/\s*#\-#g;                  #FIX SONGS WITH "/" IN THEM!
+	$self->{'Url'} .= "/${song}-lyrics";
 	$self->{'Url'} =~ s/\&/and/g;
 	$self->{'Url'} =~ s/ +/\-/g;
-#1	$self->{'Url'} =~ s/[^a-zA-Z0-9\-\/]+//g;
-#1	$self->{'Url'} = 'https://www.letras.com/' . $self->{'Url'};
-	$self->{'Url'} = 'https://www.letras.mus.br/' . $self->{'Url'};
+	$self->{'Url'} = $Site . '/' . $self->{'Url'};
 	$self->{'Url'} =~ tr/A-Z/a-z/;
-	my $ua = LWP::UserAgent->new(
-		ssl_opts => { verify_hostname => 0, },
-	);
-	$ua->timeout(10);
-	$ua->agent($self->{'agent'});
-	$ua->protocols_allowed(['https']);
-	$ua->cookie_jar( {} );
-	push @{ $ua->requests_redirectable }, 'GET';
-	(my $referer = $self->{'Url'}) =~ s{^(\w+)\:\/\/}{};
-	my $protocol = $1;
-	$referer =~ s{\/.+$}{\/};
-	my $host = $referer;
-	$host =~ s{\/$}{};
-	$referer = $protocol . '://' . $referer;
-	my $req = new HTTP::Request 'GET' => $self->{'Url'};
-	$req->header(
-		'Accept' =>
-			'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
-		'Accept-Language'           => 'en-US,en;q=0.5',
-		'Accept-Encoding'           => 'gzip, deflate',
-		'Connection'                => 'keep-alive',
-		'Upgrade-insecure-requests' => 1,
-		'Host'                      => $host,
-	);
-
-	my $res = $ua->request($req);
-
-	if ($res->is_success) {
-		my $lyrics = $self->_parse($res->decoded_content);
-		if ($self->{'cache'} && $self->{'cache'} !~ /^\</ && $lyrics && $haveLyricsCache) {
-			# cache the fetched lyrics, if we can:
-			my $cache = new LyricFinder::Cache(-cache => $self->{'cache'});
-			$cache->save($artist_in, $song_in, $lyrics)  if ($cache);
-		}
-		return $lyrics;
-	} else {
-		if ($res->status_line =~ /^404/) {
-			$self->{'Error'} = "..$Source - Lyrics not found.";
-		} else {
-			carp($self->{'Error'} = "e:$Source - Failed to retrieve ".$self->{'Url'}
-					.' ('.$res->status_line.').');
-		}
-		return;
+	$self->{'_confirm_title'} = $song_in;
+	$self->{'_confirm_artist'} = $artist_in;
+	my $lyrics = $self->_web_fetch($artist, $song);
+	if ($lyrics && $haveLyricsCache && $self->{'-cache'} && $self->{'-cache'} !~ /^\</) {
+		$self->_debug("=== WILL CACHE LYRICS! ===");
+		# cache the fetched lyrics, if we can:
+		my $cache = new LyricFinder::Cache(%{$self});
+		$cache->save($artist, $song, $lyrics)  if ($cache);
 	}
+	return $lyrics;
 }
-
-# Internal use only functions:
 
 sub _parse {
 	my $self = shift;
 	my $html = shift;
 
+	$self->_debug("Letras::_parse()!");
 	if (my ($goodbit) = $html =~
-#1		m{\<div\s+id\=[\'\"]?inlyr[\'\"]?\>(.+?)\<\/div\>\<br\>}msi)
-		m{\<div\s+class\=\"cnt\-letra\s+p\d+\_premium\"\>(.+?)\<\/div\>}msi)
+			m{\<div\s+class\=\"cnt\-letra\s+p\d+\_premium\"\>(.+?)\<\/div\>}msi)
 	{
-		my $hs   = HTML::Strip->new();
+		my $hs = HTML::Strip->new();
+
+		#LETRAS SOMETIMES RETURNS "BEST GUESS" (WRONG) SONG LYRICS IF NOT FOUND, AND WE
+		#DON'T WANT THIS, SO WE MUST CONFIRM THAT THE TITLE AND ARTIST MATCH WHAT WE
+		#REQUESTED, AND PUNT IF THEY DON'T!:
+		if ($html =~ m#\<div\s+class\=\"cnt\-head\_title\"\>(.+?)\<\/div\>#msi) {
+			my $headers = $1;
+			my $title = ($headers =~ m#\<h1\>(.+?)\<\/h1\>#si) ? $hs->parse($1) : '';
+			if ($title) {
+				if ($self->{'_confirm_title'} !~ /^${title}$/i) {
+					$self->{'Error'} = "e:$Source - Results did not match title ($title).";
+					return '';
+				}
+				my $artist = ($headers =~ m#\<h2\>(.+?)\<\/h2\>#si) ? $hs->parse($1) : '';
+				if ($artist && $self->{'_confirm_artist'} !~ /^${artist}$/i) {
+					$self->{'Error'} = "e:$Source - Results did not match artist ($artist).";
+					return '';
+				}
+			}
+		}
+
 		$goodbit =~ s#\<\/?p\>#\r\n#gsi;
 		$goodbit =~ s#\<br\/?\>#\r\n#gsi;
 		my $text = $hs->parse($goodbit);
 
-		# normalize Windowsey \r\n sequences:
-		$text =~ s/\r+//gs;
-		# strip off pre & post padding with spaces:
-		$text =~ s/^ +//mg;
-		$text =~ s/ +$//mg;
-		# clear up repeated blank lines:
-		$text =~ s/(\R){2,}/\n\n/gs;
-		# and remove any blank top lines:
-		$text =~ s/^\R+//s;
-		$text =~ s/\R\R+$/\n/s;
-		$text .= "\n"  unless ($text =~ /\n$/s);
-		# now fix up for either Windows or Linux/Unix:
-		$text =~ s/\R/\r\n/gs  if ($^O =~ /Win/);
-
-		return $text;
+		return $self->_normalize_lyric_text($self->_html2text($text));
 	} else {
 		carp($self->{'Error'} = "e:$Source - Failed to identify lyrics on result page.");
 		return '';
 	}
-}   # end of sub parse
+}
 
-1;
+1
 
 __END__
 
@@ -302,6 +182,13 @@ I<"Letras"> as the third argument of the B<fetch>() method.
 In case of problems with fetching lyrics, the error string will be returned by 
 $finder->message().  If all goes well, it will have 'Ok' in it.
 
+NOTE:  When Letras is unable to find lyrics for a specific song title 
+and artist combination, it sometimes returns a best guess (wrong) song 
+title (and incorrect lyrics), therefore, we compare the title and 
+artist on the page with the values being searched for, and if they do 
+not match (case insensitive), we return no lyrics found, rather than 
+the wrong lyrics for a different song!
+
 =head1 INSTALLATION
 
 This module is installed automatically with LyricFinder installation.
@@ -317,7 +204,8 @@ object can be used for multiple fetches, so this normally only needs to be
 called once.
 
 I<options> is a hash of option/value pairs (ie. "-option" => "value").  
-The currently-supported options are:  
+If an "-option" is specified with no "value" given, the default value will 
+be I<1> ("I<true>").  The currently-supported options are:  
 
 =over 4
 
@@ -329,7 +217,7 @@ pass to www.letras.net.  Some sites are pickey about receiving a user-agent
 string that corresponds to a valid / supported web-browser to prevent their 
 sites from being "scraped" by programs, such as this.  
 
-Default:  I<"Mozilla/5.0 (X11; Linux x86_64; rv:80.0) Gecko/20100101 Firefox/80.0">.
+Default:  I<"Mozilla/5.0 (X11; Linux x86_64; rv:84.0) Gecko/20100101 Firefox/84.0">.
 
 NOTE:  This value will be overridden if $founder->agent("agent") is 
 called!

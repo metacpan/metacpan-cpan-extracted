@@ -89,7 +89,7 @@ subtest 'Third header.' => sub {
   is archive_entry_mode($ae), 33188, 'archive_entry_mode = 33188';
   my $br = archive_read_data($a, my $buff, 10224);
   is $br, archive_entry_size($ae), 'br = size';
-  is $buff, "test text document\015\012", 'buff = test text document';      
+  is $buff, "test text document\015\012", 'buff = test text document';
 };
 
 subtest 'Fourth header.' => sub {
@@ -104,7 +104,7 @@ subtest 'Fourth header.' => sub {
   ok eval { archive_entry_atime($ae) }, 'archive_entry_atime';
   diag $@ if $@;
   is archive_entry_size($ae), 0, 'archive_entry_size = 0';
-  is archive_entry_mode($ae), 16877, 'archive_entry_mode = 16877';  
+  is archive_entry_mode($ae), 16877, 'archive_entry_mode = 16877';
 };
 
 subtest 'Fifth header.' => sub {

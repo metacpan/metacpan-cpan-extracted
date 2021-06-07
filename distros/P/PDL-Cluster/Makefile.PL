@@ -21,8 +21,19 @@ $hash{CONFIGURE_REQUIRES} = {
 			    };
 push(@{$hash{LIBS}}, '-lm');
 $hash{DIR} = [];
-#$hash{INC} .= ' -Isrc';
-$hash{OBJECT} .= ' cluster.o';
+#$hash{INC} .= ' -Icluster-1.54';
+$hash{OBJECT} .= ' ccluster.o';
+##
+$hash{META_MERGE} = {
+		     "meta-spec" => { version => 2 },
+		     resources => {
+				   repository => {
+						  type => 'git',
+						  url => 'git://github.com/moocow-the-bovine/PDL-Cluster.git',
+						  web => 'https://github.com/moocow-the-bovine/PDL-Cluster',
+						 },
+				  },
+		    };
 
 
 WriteMakefile(%hash);

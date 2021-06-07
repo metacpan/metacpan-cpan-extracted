@@ -1,4 +1,8 @@
-use Test::More tests => 10; # -*- mode: cperl -*-
+use Test::More tests => 13; # -*- mode: cperl -*-
+use File::Temp qw(tempdir);
+use File::Basename qw(basename);
+use Cwd qw(getcwd);
+use Test::Exception;
 use Git;
 
 use lib qw(../lib lib );
@@ -8,8 +12,12 @@ BEGIN {
 }
 
 # Create test repo
-mkdir "test-repo";
-chdir "test-repo";
+my $cwd = getcwd;
+my $dirname = tempdir(CLEANUP => 1);
+my $basename = basename $dirname;
+diag $dirname;
+mkdir $dirname;
+chdir $dirname;
 Git::command_oneline( 'init' );
 Git::command_oneline( 'config','user.email','jj@merelo.net' );
 Git::command_oneline( 'config','user.name','JJ' );
@@ -25,6 +33,7 @@ $repo->command_oneline( 'commit', '-am', "Second", "--author", $commit_author );
 
 # Now the real thing
 my $commits = new Git::Repo::Commits ".";
+is $commits->name, undef;
 ok ($commits, "Object created");
 my @commit_array = @{$commits->commits()};
 is( $#commit_array, 1, "Correct number of commits");
@@ -40,6 +49,16 @@ my @commit_array = @{$commits->commits()};
 is( $#commit_array, 1, "Correct number of commits");
 is ( @{$commit_array[1]->{'files'}}, 2, "Commit info correct");
 is ( @{$commits->hashes()}, 2, "Commit hashes correct");
+
+subtest lack_of_dir => sub {
+    throws_ok { new Git::Repo::Commits } qr/Need a repo directory/, 'Exception when no repo was provided';
+};
+
+subtest distant => sub {
+    chdir $cwd;
+    my $commits = new Git::Repo::Commits $dirname;
+    is $commits->name, $basename;
+};
 
 diag( "Testing Git::Repo::Commits $Git::Repo::Commits::VERSION" );
 

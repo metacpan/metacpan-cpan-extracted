@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use 5.022;
+use 5.024;
 
 use feature qw /postderef signatures/;
 
@@ -17,41 +17,37 @@ use Storable 'dclone';
 
 # ABSTRACT: TopCount and related methods for Vote::Count. Toolkit for vote counting.
 
-our $VERSION='1.10';
+our $VERSION='2.00';
 
 =head1 NAME
 
 Vote::Count::TopCount
 
-=head1 VERSION 1.10
+=head1 VERSION 2.00
 
 =head1 Synopsis
 
 This Role is consumed by Vote::Count it provides TopCount and related Methods to Vote::Count objects.
 
-=head2 Definition of Top Count
+=head1 Definition of Top Count
 
 Top Count is tabulation of the Top Choice vote on each ballot. As choices are eliminated the first choice on some ballots will be removed, the next highest remaining choice becomes the Top Choice for that ballot. When all choices on a ballot are eliminated it becomes exhausted and is no longer counted.
 
-=head2 Method TopCount
+=head1 TopCount Methods
+
+=head2 TopCount
 
 Takes a hashref of active choices as an optional parameter, if one is not provided it uses the internal active list accessible via the ->Active() method, which itself defaults to the BallotSet's Choices list.
 
-Returns a RankCount object containing the TopCount.
+Returns a L<RankCount|Vote::Count::RankCount> object containing the TopCount.
 
 TopCount supports both Ranked and Range Ballot Types.
 
 For RCV, TopCount respects weighting, 'votevalue' is defaulted to 1 by readballots. Integers or Floating point values may be used.
 
-=head3 LastTopCountUnWeighted
+=head2 LastTopCountUnWeighted
 
 Returns a hashref of the unweighted raw count from the last TopCount operation.
-
-=head3 Top Counting Range Ballots
-
-Since Range Ballots often allow ranking choices equally, those equal votes need to be split. To prevent Rounding errors in the addition on large sets the fractions are added as Rational Numbers. The totals are converted to floating point numbers with a precision of 3 places. Three was arbitrarily chosen because it is reasonable for display, but precise enough as a truncation point to be unlikely to cause an error.
-
-It is recommended to install Math::BigInt::GMP to improve performance on the Rational Number math used for Top Count on Range Ballots.
 
 =cut
 
@@ -81,7 +77,7 @@ TOPCOUNTRANGEBALLOTS:
     for (@top) { $topcount{$_} += $topvalue }
   }
   for my $k ( keys %topcount ) {
-    $topcount{$k} = $topcount{$k}->as_float(3)->numify();
+    $topcount{$k} = $topcount{$k}->as_float(5)->numify();
   }
   return Vote::Count::RankCount->Rank( \%topcount );
 }
@@ -124,9 +120,12 @@ sub TopCount ( $self, $active = undef ) {
   }
 }
 
-=head3 TopChoice( $ballot_identifier )
+=head2 TopChoice
 
-Returns the Top Choice on a ballot from the last TopCount operation
+Returns the Top Choice on a specific ballot from the last TopCount operation. The ballot is identified by it's key in the ballotset.
+
+  $Election->TopCount();
+  my $top = $Election->TopChoice( 'FOO:BAZ:BAR:ZAB');
 
 =cut
 
@@ -134,7 +133,7 @@ sub TopChoice( $self, $ballot ) {
   return $self->BallotSet()->{ballots}{$ballot}{topchoice};
 }
 
-=head2 Method TopCountMajority
+=head2 TopCountMajority
 
   $self->TopCountMajority( $round_topcount )
   or
@@ -174,7 +173,7 @@ sub TopCountMajority ( $self, $topcount = undef, $active = undef ) {
   );
 }
 
-=head2 Method EvaluateTopCountMajority
+=head2 EvaluateTopCountMajority
 
 This method wraps TopCountMajority adding logging, the logging of which would be a lot of boiler plate in round oriented methods. It takes the same parameters and returns the same hashref.
 
@@ -201,7 +200,18 @@ sub EvaluateTopCountMajority ( $self, $topcount = undef, $active = undef ) {
   return $majority;
 }
 
+=pod
+
+=head1 Top Counting Range Ballots
+
+Since Range Ballots often allow ranking choices equally, those equal votes need to be split. The other option is to have a rule that assigns an order among the tied choices in a conversion to Ranked Ballots. To prevent Rounding errors in the addition on large sets the fractions are added as Rational Numbers. The totals are converted to floating point numbers with a precision of 5 places for display.
+
+It is recommended to install Math::BigInt::GMP to improve performance on the Rational Number math used for Top Count on Range Ballots.
+
+=cut
+
 1;
+
 #FOOTER
 
 =pod
@@ -216,10 +226,15 @@ John Karr (BRAINBUZ) brainbuz@cpan.org
 
 CONTRIBUTORS
 
-Copyright 2019 by John Karr (BRAINBUZ) brainbuz@cpan.org.
+Copyright 2019-2021 by John Karr (BRAINBUZ) brainbuz@cpan.org.
 
 LICENSE
 
 This module is released under the GNU Public License Version 3. See license file for details. For more information on this license visit L<http://fsf.org>.
 
+SUPPORT
+
+This software is provided as is, per the terms of the GNU Public License. Professional support and customisation services are available from the author.
+
 =cut
+

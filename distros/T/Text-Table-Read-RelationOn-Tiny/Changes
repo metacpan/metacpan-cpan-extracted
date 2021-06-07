@@ -1,0 +1,45 @@
+Revision history for Text-Table-Read-RelationOn-Tiny
+
+v1.1.1     2021/06/07
+           Corrected version info
+
+v1.1.0     2021/06/07
+           Implemented new feature (duplicates)
+
+v1.0.3     2021/05/28
+           Improved error messages and fixed problem in error case test script.
+
+v1.0.2     2021/05/26
+           Consequently use quotes in error messages
+
+v1.0.1     2021/05/26
+           Switch to modern version string using version 0.77
+
+1.00.00.00 2021/05/25
+           New version number hopefully resolves a versioning problem with PAUSE
+
+0.10.2     2021/05/24
+           Added forgotten META.json to distribution.
+
+0.10.1     2021/05/24
+           Added info about new github repo
+           Use version format m.m.p (major.minor.patch).
+
+0.10       2021/05/24
+           Adapted Makefile.PL: deps, especially min version of perl
+           Version is now artistic_2
+           distribution now contains META.yml and META.json
+
+0.04       2021/05/22
+           Corrected version number
+
+0.03       2021/05/22
+           Sort keys (elements) reported by error message. Should resolve the failed
+           test observed on some systems.
+
+0.02       2021/05/20
+           Added argument 'set' to the constructor.
+
+0.01       2021/05/19
+           First version, released on an unsuspecting world.
+

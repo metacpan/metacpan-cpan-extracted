@@ -1,5 +1,12 @@
 Changes file for Log::Log4perl::Layout::JSON
 
+0.58  2021-05-26
+  - Fix release SIGNATURE
+
+0.57  2021-05-26
+  - Add support for complex fields from log config (Thanks Anton Fedotov)
+  - Bump minimum Perl version to 5.10
+
 0.56  2018-07-21
   - Add "exclude_message" option, which will exclude the message from the JSON
     pattern.  This is useful if you are logging the message in the prefix for

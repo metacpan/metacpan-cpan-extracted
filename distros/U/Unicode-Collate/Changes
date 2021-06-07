@@ -1,5 +1,9 @@
 Revision history for Perl module Unicode::Collate.
 
+1.30  Sun Jun  6 21:33:26 2021
+    - [rt.cpan.org #133952] mkheader subject to "print on closed filehandle"
+      warnings
+
 1.29  Sun Sep 27 08:56:06 2020
     - DUCET is updated (for Unicode 13.0.0) as Collate/allkeys.txt.
     - The default UCA_Version is 43.

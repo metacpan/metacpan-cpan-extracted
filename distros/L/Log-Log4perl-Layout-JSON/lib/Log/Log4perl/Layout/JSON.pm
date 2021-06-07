@@ -1,19 +1,19 @@
 package Log::Log4perl::Layout::JSON;
-$Log::Log4perl::Layout::JSON::VERSION = '0.56';
+$Log::Log4perl::Layout::JSON::VERSION = '0.58';
 # ABSTRACT: Layout a log message as a JSON hash, including MDC data
 
-use 5.008;
+use 5.010;
 use strict;
 use warnings;
 
-use Carp;
-
-use Log::Log4perl ();
-use Log::Log4perl::Level;
-use Log::Log4perl::Layout::PatternLayout;
-use JSON::MaybeXS;
-
 use parent qw(Log::Log4perl::Layout);
+
+use Carp;
+use JSON::MaybeXS;
+use Log::Log4perl ();
+use Log::Log4perl::Layout::PatternLayout;
+use Log::Log4perl::Level;
+use Scalar::Util qw(blessed);
 
 # TODO
 #   add eval around encode
@@ -77,22 +77,6 @@ use Class::Tiny {
     name_for_mdc => undef,
     max_json_length_kb => 20,
 
-    _separator => "\x01\x00\x01",
-
-    _pattern_layout => sub {
-        my $self = shift;
-
-        my $fields = { %{ $self->field } };
-
-        # the lines marked ## are just to ensure message is the first field
-        my $message_pattern = delete $fields->{message}; ##
-        my @field_patterns = map { $_ => $fields->{$_}->{value} } sort keys %$fields;
-        unshift @field_patterns, message => $message_pattern->{value}
-            if $message_pattern;  ##
-
-        return Log::Log4perl::Layout::PatternLayout->new(join $self->_separator, @field_patterns);
-    },
-
     # if format_prefix is true, the prefix is a PatternLayout that itself can be formatted
     _prefix_layout => sub {
         my $self = shift;
@@ -114,7 +98,11 @@ sub BUILD { ## no critic (RequireArgUnpacking)
         $self->codec->canonical($arg->{value});
     }
 
-    $self->field(delete $args->{field}) if $args->{field};
+    if ($args->{field}) {
+        my $field = delete $args->{field};
+        $self->_build_field_values($field);
+        $self->field($field);
+    }
 
     # Optionally override encoding from ascii to utf8
     if (my $arg = $args->{utf8}) {
@@ -145,6 +133,47 @@ sub BUILD { ## no critic (RequireArgUnpacking)
     return $self;
 }
 
+sub _process_field_values {
+    my($self, $m, $category, $priority, $caller_level, $fields, $layed_out) = @_;
+
+    $caller_level++;
+
+    $fields //= $self->field;
+    $layed_out //= {};
+
+    while (my($field, $value) = each %$fields) {
+        if (blessed($value) and blessed($value) eq 'Log::Log4perl::Layout::PatternLayout') {
+            $layed_out->{$field} = $value->render($m, $category, $priority, $caller_level);
+        }
+        elsif (ref($value) eq 'HASH') {
+            $layed_out->{$field} //= {};
+            $self->_process_field_values($m, $category, $priority, $caller_level, $value, $layed_out->{$field});
+        }
+        elsif (ref($value) eq 'CODE') {
+            $layed_out->{$field} = $value->($m, $category, $priority, $caller_level);
+        }
+    }
+
+    return $layed_out;
+}
+
+sub _build_field_values {
+
+    my($self, $field_hash) = @_;
+
+    while (my($key, $value) = each %$field_hash) {
+        if (exists $value->{value} && !ref($value->{value})) {
+            $field_hash->{$key} = Log::Log4perl::Layout::PatternLayout->new($value->{value})
+        }
+        elsif (exists $value->{value} && ref($value->{value}) ne 'HASH') {
+            $field_hash->{$key} = $value->{value}
+        }
+        else {
+            $self->_build_field_values($value)
+        }
+    }
+}
+
 
 sub render {
     my($self, $message, $category, $priority, $caller_level) = @_;
@@ -168,10 +197,10 @@ sub render {
         $m = $message;
     }
 
-    my $layed_out_msg = $self->_pattern_layout->render($m, $category, $priority, $caller_level);
+    my $layed_out_fields = $self->_process_field_values($m, $category, $priority, $caller_level);
 
     my @fields = (
-        split($self->_separator, $layed_out_msg, -1),
+        %$layed_out_fields,
         @data, # append extra fields but before mdc
         $self->mdc_handler->($self) # MDC fields override non-MDC fields (not sure if this is a feature)
     );
@@ -293,7 +322,7 @@ Log::Log4perl::Layout::JSON - Layout a log message as a JSON hash, including MDC
 
 =head1 VERSION
 
-version 0.56
+version 0.58
 
 =head1 SYNOPSIS
 
@@ -354,7 +383,7 @@ pattern layout.
 
 For example:
 
-    log4perl.appender.Example.layout.prefix = %m{chomp} @cee: 
+    log4perl.appender.Example.layout.prefix = %m{chomp} @cee:
     log4perl.appender.Example.layout.format_prefix = 1
 
 Would log C<Hello World> as:

@@ -1,99 +1,37 @@
 package LyricFinder::Cache;
 
-use 5.008000;
 use strict;
 use warnings;
 use Carp;
+use parent 'LyricFinder::_Class';
 
 my $Source = 'Cache';
-
-# the Default HTTP User-Agent we'll send:
-our $AGENT = "Mozilla/5.0 (X11; Linux x86_64; rv:80.0) Gecko/20100101 Firefox/80.0";
 
 sub new
 {
 	my $class = shift;
 
-	my $self = {};
-	$self->{'agent'} = $AGENT;
-	$self->{'cache'} = '';
-	$self->{'Error'} = 'Ok';
-	$self->{'Site'} = '';
-	$self->{'Url'} = '';
-	$self->{'Credits'} = [];
-
-	my %args = @_;
-	foreach my $i (keys %args) {
-		if ($i =~ s/^\-//) {
-			$self->{$i} = $args{"-$i"};
-		} else {
-			$self->{$i} = $args{$i};
-		}
-	}
+	my $self = $class->SUPER::new($Source, @_);
+	@{$self->{'_fetchers'}} = ($Source);
 
 	bless $self, $class;   #BLESS IT!
 
 	return $self;
 }
 
-sub source {
-	return $Source;
-}
-
-sub url {
-	my $self = shift;
-	return $self->{'Url'};
-}
-
-sub order {
-	return wantarray ? ($Source) : $Source;
-}
-
-sub tried {
-	return order ();
-}
-
-sub credits {
-	my $self = shift;
-	return wantarray ? @{$self->{'Credits'}} : join(', ', @{$self->{'Credits'}});
-}
-
-sub message {
-	my $self = shift;
-	return $self->{'Error'};
-}
-
 sub site {
 	my $self = shift;
-	return 'none'  unless (defined($self) && $self->{'cache'});
-	return 'file://'.$self->{'cache'};
+
+	return 'none'  unless ($self->{'-cache'});
+	return 'file://'.$self->{'-cache'};
 }
 
 # Allow user to specify a different user-agent:
-sub agent {
-	my $self = shift;
-
-	if (defined $_[0]) {
-		$self->{'agent'} = $_[0];
-	} else {
-		return $self->{'agent'};
-	}
-}
-
-sub cache {
-	my $self = shift;
-
-	if (defined $_[0]) {
-		$self->{'cache'} = $_[0];
-	} else {
-		return $self->{'cache'};
-	}
-}
-
 sub fetch {
 	my $self = shift;
 	my ($artist, $song) = @_;
 
+	$self->_debug("i:CACHE::fetch($artist, $song)!");
 	# reset the error var, change it if an error occurs.
 	$self->{'Error'} = 'Ok';
 	$self->{'Url'} = '';
@@ -103,12 +41,12 @@ sub fetch {
 		return;
 	}
 
-	unless ($self->{'cache'}) {
+	unless ($self->{'-cache'}) {
 		carp($self->{'Error'} = 'e:Cache.fetch() called without a cache directory specified!');
 		return;
 	}
 
-	if ($self->{'cache'} =~ /^\>/) {
+	if ($self->{'-cache'} =~ /^\>/) {
 		carp($self->{'Error'} = 'e:Cache.fetch() called but cache directory writeonly (">" specified)!');
 		return;
 	}
@@ -118,7 +56,7 @@ sub fetch {
 	# Their URLs look like e.g.:
 	#https://www.musixmatch.com/lyrics/Artist-name/Title
 
-	my $LOCALDIR = $self->{'cache'};
+	my $LOCALDIR = $self->{'-cache'};
 	$LOCALDIR =~ s#^\<##;          #STRIP OFF ANY LEADING DIRECTIONAL INDICATOR.
 	$LOCALDIR =~ s#\\#\/#g;        #DE-DOSIFY WINDOWS FNS.
 	$LOCALDIR .= '/'  unless ($LOCALDIR =~ m#\/#);
@@ -147,9 +85,11 @@ sub fetch {
 sub save {
 	my ($self, $artist, $song, $lyrics) = @_;
 
-	return 0  if ($self->{'cache'} =~ /^\</);  #NO SAVE IF CACHE IS INPUT ONLY.
+	$self->_debug('i:CACHE::save('.$self->{'-cache'}.')!');
+	return 0  if ($self->{'-cache'} =~ /^\</);  #NO SAVE IF CACHE IS INPUT ONLY.
 
-	my $LOCALDIR = $self->{'cache'};
+	my $LOCALDIR = $self->{'-cache'};
+	$LOCALDIR =~ s#^\>##;
 	$LOCALDIR =~ s#\\#\/#g;       #DE-DOSIFY WINDOWS FNS.
 	$LOCALDIR .= '/'  unless ($LOCALDIR =~ m#\/$#);
 	$LOCALDIR =~ s#^file\:\/\/##; #CONVERT TO FILE IF URI
@@ -158,54 +98,43 @@ sub save {
 		mkdir "$artistDir"  unless (-d $artistDir);
 		if (-d "$artistDir") {
 			(my $songFid = $LOCALDIR . $artist . '/' . $song . '.lrc') =~ s/([\&])/\\$1/g;
+			$self->_debug("------songFid=$songFid=");
 			if (open OUT, ">$songFid")
 			{
 				print OUT $lyrics;
+				$self->_debug("------WROTE IT!!!------\n");
 				close OUT;
 				return 1;
 			}
 			else
 			{
-				$self->{'Error'} = "e:$Source - Could not cache lyrics for ($artist, $song) to ($songFid) (could not open file: $!)!\n";
+				carp($self->{'Error'} = "e:$Source - Could not cache lyrics for ($artist, $song) to ($songFid) (could not open file: $!)!");
 			}
 		}
 		else
 		{
-			$self->{'Error'} = "e:$Source - Could not cache lyrics for ($artist, $song) dir ($artistDir) still does not exist?!\n";
+			carp($self->{'Error'} = "e:$Source - Could not cache lyrics for ($artist, $song) dir ($artistDir) still does not exist?!");
 		}
+	} else {
+		carp($self->{'Error'} = "e:$Source - Could not cache lyrics for ($artist, $song): $LOCALDIR is not a directory!");
 	}
 	return 0;
 }
-
-# Internal use only functions:
 
 sub _parse {
 	my $self = shift;
 	my $text = shift;
 
+	$self->_debug("i:CACHE::_parse()!\n");
 	if ($text =~ /\w/) {
-		# normalize Windowsey \r\n sequences:
-		$text =~ s/\r+//gs;
-		# strip off pre & post padding with spaces:
-		$text =~ s/^ +//mg;
-		$text =~ s/ +$//mg;
-		# clear up repeated blank lines:
-		$text =~ s/(\R){2,}/\n\n/gs;
-		# and remove any blank top lines:
-		$text =~ s/^\R+//s;
-		$text =~ s/\R\R+$/\n/s;
-		$text .= "\n"  unless ($text =~ /\n$/s);
-		# now fix up for either Windows or Linux/Unix:
-		$text =~ s/\R/\r\n/gs  if ($^O =~ /Win/);
-
-		return $text;
+		return $self->_normalize_lyric_text($text);
 	} else {
 		carp($self->{'Error'} = "e:$Source - Failed to identify lyrics in cache.");
 		return;
 	}
-}   # end of sub parse
+}
 
-1;
+1
 
 __END__
 
@@ -280,7 +209,8 @@ object can be used for multiple fetches, so this normally only needs to be
 called once.
 
 I<options> is a hash of option/value pairs (ie. "-option" => "value").  
-The currently-supported options are:  
+If an "-option" is specified with no "value" given, the default value will 
+be I<1> ("I<true>").  The currently-supported options are:  
 
 =over 4
 
@@ -326,24 +256,6 @@ Default I<0> (no).  I<1> will display debug info.  There is currently only
 one level of debug verbosity.
 
 =back 
-
-=item [ I<$current-agent string> = ] $finder->B<agent>( [ I<user-agent string> ] )
-
-This method, included here for compatibility only, is only useful for the 
-other site modules that access the internet, but is ignored here.
-
-Set the desired user-agent (ie. browser name) to pass to www.azlyrics.com.  
-Some sites are pickey about receiving a user-agent 
-string that corresponds to a valid / supported web-browser to prevent their 
-sites from being "scraped" by programs, such as this.  
-
-Default:  I<"Mozilla/5.0 (X11; Linux x86_64; rv:80.0) Gecko/20100101 Firefox/80.0">
-
-If no argument is passed, it returns the current GENERAL user-agent string in 
-effect (but a different agent option is specified for a specific module may 
-have been specified and used by THAT module - see B<new>() options above).
-
-NOTE:  This will override any B<-agent> option value specified in B<new>()!
 
 =item [ I<$current-directory> = ] $finder->B<cache>( [ I<$directory> ] )
 

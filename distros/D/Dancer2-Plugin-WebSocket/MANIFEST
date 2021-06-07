@@ -14,6 +14,10 @@ SIGNATURE
 cpanfile
 dist.ini
 doap.xml
+example-login/bin/app.psgi
+example-login/client/websocket-client-login.pl
+example-login/config.yml
+example-login/lib/MyApp.pm
 example/bin/app.psgi
 example/config.yml
 example/lib/MyApp.pm

@@ -1,60 +1,102 @@
 {
    "abstract" : "Split any SQL code into atomic statements",
    "author" : [
+      "Veesh Goldman <veesh@cpan.org>",
       "Emanuele Zeppieri <emazep@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 4.200004, CPAN::Meta::Converter version 2.110580",
+   "generated_by" : "Dist::Zilla version 6.017, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "SQL-SplitStatement",
+   "no_index" : {
+      "directory" : [
+         "eg",
+         "examples",
+         "inc",
+         "share",
+         "t",
+         "xt"
+      ]
+   },
    "prereqs" : {
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "6.31"
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Pod::Coverage::TrustPod" : "0",
+            "Test::CPAN::Meta" : "0",
+            "Test::More" : "0.96",
+            "Test::NoTabs" : "0",
+            "Test::Perl::Critic" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08",
+            "Test::Synopsis" : "0",
+            "Test::Vars" : "0"
          }
       },
       "runtime" : {
          "requires" : {
-            "Carp" : 0,
-            "Class::Accessor::Fast" : 0,
-            "Getopt::Long" : 0,
-            "List::MoreUtils" : 0,
-            "Pod::Usage" : 0,
-            "Regexp::Common" : 0,
-            "SQL::Tokenizer" : "0.22",
-            "constant" : 0,
-            "perl" : "5.008"
+            "Carp" : "0",
+            "Class::Accessor::Fast" : "0",
+            "Exporter" : "0",
+            "Getopt::Long" : "0",
+            "List::MoreUtils" : "0",
+            "Pod::Usage" : "0",
+            "Regexp::Common" : "0",
+            "base" : "0",
+            "constant" : "0",
+            "strict" : "0",
+            "warnings" : "0"
          }
       },
       "test" : {
+         "recommends" : {
+            "CPAN::Meta" : "2.120900"
+         },
          "requires" : {
-            "English" : 0,
-            "File::Find" : 0,
-            "File::Temp" : 0,
+            "ExtUtils::MakeMaker" : "0",
+            "File::Find" : "0",
+            "File::Spec" : "0",
+            "File::Temp" : "0",
+            "Test::Differences" : "0.68",
             "Test::Exception" : "0.27",
             "Test::More" : "0.7"
          }
       }
    },
+   "provides" : {
+      "SQL::SplitStatement" : {
+         "file" : "lib/SQL/SplitStatement.pm",
+         "version" : "1.00023"
+      },
+      "SQL::SplitStatement::Tokenizer" : {
+         "file" : "lib/SQL/SplitStatement/Tokenizer.pm",
+         "version" : "1.00023"
+      }
+   },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "mailto" : "bug-SQL-SplitStatement@rt.cpan.org",
-         "web" : "http://rt.cpan.org/NoAuth/Bugs.html?Dist=SQL-SplitStatement"
+         "web" : "https://github.com/rabbiveesh/SQL-SplitStatement/issues"
       },
-      "homepage" : "http://search.cpan.org/dist/SQL-SplitStatement",
       "repository" : {
          "type" : "git",
-         "url" : "git://github.com/emazep/SQL-SplitStatement.git",
-         "web" : "http://github.com/emazep/SQL-SplitStatement"
+         "url" : "git://github.com/rabbiveesh/SQL-SplitStatement.git",
+         "web" : "https://github.com/rabbiveesh/SQL-SplitStatement"
       }
    },
-   "version" : "1.00020"
+   "version" : "1.00023",
+   "x_generated_by_perl" : "v5.32.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.25",
+   "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }
 

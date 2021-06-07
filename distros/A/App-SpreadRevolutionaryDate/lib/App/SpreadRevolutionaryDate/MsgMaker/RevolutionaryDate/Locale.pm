@@ -10,7 +10,7 @@
 use 5.014;
 use utf8;
 package App::SpreadRevolutionaryDate::MsgMaker::RevolutionaryDate::Locale;
-$App::SpreadRevolutionaryDate::MsgMaker::RevolutionaryDate::Locale::VERSION = '0.29';
+$App::SpreadRevolutionaryDate::MsgMaker::RevolutionaryDate::Locale::VERSION = '0.31';
 # ABSTRACT: Role providing interface for localization of revolutionary date built by L<App::SpreadRevolutionaryDate::MsgMaker::RevolutionaryDate>.
 
 use Moose::Role;
@@ -116,7 +116,7 @@ App::SpreadRevolutionaryDate::MsgMaker::RevolutionaryDate::Locale - Role providi
 
 =head1 VERSION
 
-version 0.29
+version 0.31
 
 =head1 DESCRIPTION
 
@@ -252,6 +252,10 @@ Returns the wikipedia entry (the end of the wikipedia url) corresponding to the 
 =item L<App::SpreadRevolutionaryDate::Target::Freenode>
 
 =item L<App::SpreadRevolutionaryDate::Target::Freenode::Bot>
+
+=item L<App::SpreadRevolutionaryDate::Target::Liberachat>
+
+=item L<App::SpreadRevolutionaryDate::Target::Liberachat::Bot>
 
 =item L<App::SpreadRevolutionaryDate::MsgMaker>
 

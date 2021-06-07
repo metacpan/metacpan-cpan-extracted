@@ -99,8 +99,6 @@ or
 
 You can also look for information at:
 
-* **RT** - CPAN's request tracker (report bugs here) - http://rt.cpan.org/NoAuth/Bugs.html?Dist=Graphics-Framebuffer
-
 * **AnnoCPAN** - Annotated CPAN documentation - http://annocpan.org/dist/Graphics-Framebuffer
 
 * **CPAN Ratings** - http://cpanratings.perl.org/d/Graphics-Framebuffer
@@ -111,7 +109,7 @@ You can also look for information at:
 
 ## LICENSE AND COPYRIGHT
 
-Copyright (C) 2013-2019 Richard Kelsch
+Copyright (C) 2013-2021 Richard Kelsch
 
 This program is free software; you can redistribute it and/or modify it under the terms of either: the GNU General Public License as published by the Free Software Foundation; or the Artistic License.
 

@@ -4,7 +4,7 @@ NAME
 SYNOPSIS
      use CAD::AutoCAD::Detect qw(detect_dwg_file);
 
-     my $dwg_flag = detect_dwg_file($file);
+     my $dwg_magic = detect_dwg_file($file);
 
 DESCRIPTION
     This Perl module detect AutoCAD files through magic string.
@@ -13,11 +13,11 @@ DESCRIPTION
 
 SUBROUTINES
   "detect_dwg_file"
-     my $dwg_flag = detect_dwg_file($file);
+     my $dwg_magic = detect_dwg_file($file);
 
     Detect DWG file.
 
-    Returns 1/0.
+    Returns magic string or undef.
 
 ERRORS
      detect_dwg_file():
@@ -45,17 +45,17 @@ EXAMPLE1
      barf($temp_file, decode_base64($data));
 
      # Check file.
-     my $dwg_flag = detect_dwg_file($temp_file);
+     my $dwg_magic = detect_dwg_file($temp_file);
 
      # Print out.
-     if ($dwg_flag) {
+     if ($dwg_magic) {
              print "File '$temp_file' is DWG file.\n";
      } else {
              print "File '$temp_file' isn't DWG file.\n";
      }
 
      # Output like:
-     # File '%s' isn't DWG file.
+     # File '%s' is DWG file.
 
 EXAMPLE2
      use strict;
@@ -71,10 +71,10 @@ EXAMPLE2
      my $file = $ARGV[0];
 
      # Check DWG file.
-     my $dwg_flag = detect_dwg_file($file);
+     my $dwg_magic = detect_dwg_file($file);
 
      # Print out.
-     if ($dwg_flag) {
+     if ($dwg_magic) {
              print "File '$file' is DWG file.\n";
      } else {
              print "File '$file' isn't DWG file.\n";
@@ -95,10 +95,10 @@ AUTHOR
     <http://skim.cz>
 
 LICENSE AND COPYRIGHT
-    © 2020 Michal Josef Špaček
+    © 2020-2021 Michal Josef Špaček
 
     BSD 2-Clause License
 
 VERSION
-    0.02
+    0.03
 

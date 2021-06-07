@@ -1,6 +1,6 @@
 #!/usr/bin/env perl
 
-use 5.022;
+use 5.024;
 # Using Test2, important to specify which version of Test2
 # since later versions may break things.
 use Test2::V0;
@@ -145,7 +145,7 @@ subtest 'ApplyFloor' => sub {
   my $A4 =
     Vote::Count->new( BallotSet => read_ballots('t/data/biggerset1.txt') );
   my $floor4 = $A4->ApplyFloor( 'TCA', .25 );
-  is_deeply( $floor4, $A4->Active(), 
+  is_deeply( $floor4, $A4->Active(),
     'ApplyFloor should have set the active list it returned');
   my @f4     = sort( keys $floor4->%* );
   is_deeply(
@@ -153,15 +153,15 @@ subtest 'ApplyFloor' => sub {
     [qw/CARAMEL CHOCOLATE MINTCHIP RUMRAISIN STRAWBERRY VANILLA/],
     'TCA Approval on highest TopCount (.25)'
   );
-  is_deeply( 
+  is_deeply(
     [ sort keys $A4->ApplyFloor( 'TopCountFloor' )->%* ],
-    [qw/CHOCOLATE MINTCHIP VANILLA/], 
-    'Apply a TopCount Floor '   
+    [qw/CHOCOLATE MINTCHIP VANILLA/],
+    'Apply a TopCount Floor '
     );
-  is_deeply( 
+  is_deeply(
     [ sort keys $A4->ApplyFloor( 'ApprovalFloor' )->%* ],
-    [qw/CHOCOLATE MINTCHIP VANILLA/], 
-    'Apply Approval Floor '   
+    [qw/CHOCOLATE MINTCHIP VANILLA/],
+    'Apply Approval Floor '
     );
   dies_ok( sub { $A4->ApplyFloor( 'Approval' ) },
     'invalid methodname as rule dies');

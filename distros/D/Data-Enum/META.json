@@ -63,14 +63,15 @@
          "requires" : {
             "File::Spec" : "0",
             "Module::Metadata" : "0",
-            "Test::More" : "0"
+            "Test::More" : "0",
+            "Test::Most" : "0"
          }
       }
    },
    "provides" : {
       "Data::Enum" : {
          "file" : "lib/Data/Enum.pm",
-         "version" : "v0.2.1"
+         "version" : "v0.2.2"
       }
    },
    "release_status" : "stable",
@@ -84,7 +85,7 @@
          "web" : "https://github.com/robrwo/perl-Data-Enum"
       }
    },
-   "version" : "v0.2.1",
+   "version" : "v0.2.2",
    "x_authority" : "cpan:RRWO",
    "x_generated_by_perl" : "v5.28.1",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.11",

@@ -6,6 +6,15 @@ use Test::More;
 my $class  = "Business::US::USPS::WebTools::TrackConfirm";
 my $method = 'track';
 
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+unless( $ENV{USPS_WEBTOOLS_USERID} and $ENV{USPS_WEBTOOLS_PASSWORD} )
+	{
+	plan skip_all =>
+	"You must set the USPS_WEBTOOLS_USERID and USPS_WEBTOOLS_PASSWORD " .
+	"environment variables to run these tests\n";
+	}
+
+my $is_testing = uc($ENV{USPS_WEBTOOLS_ENVIRONMENT}) eq 'TESTING';
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 subtest setup => sub {
@@ -13,17 +22,12 @@ subtest setup => sub {
 	can_ok( $class, $method );
 	};
 
-subtest credentials => sub {
-	ok defined $ENV{USPS_WEBTOOLS_USERID},   'USPS_WEBTOOLS_USERID is not set';
-	ok defined $ENV{USPS_WEBTOOLS_PASSWORD}, 'USPS_WEBTOOLS_PASSWORD is not set';
-	};
-
 my $tracker;
 subtest create_tracker => sub {
 	$tracker = $class->new( {
 		UserID   => $ENV{USPS_WEBTOOLS_USERID},
 		Password => $ENV{USPS_WEBTOOLS_PASSWORD},
-		Testing  => 0,
+		Testing  => $is_testing,
 		} );
 	isa_ok( $tracker, $class );
 	};

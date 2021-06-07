@@ -3,15 +3,13 @@
 #
 #  (C) Paul Evans, 2010-2020 -- leonerd@leonerd.org.uk
 
-package Net::Async::Tangence::ServerProtocol;
+package Net::Async::Tangence::ServerProtocol 0.16;
 
-use strict;
+use v5.14;
 use warnings;
 
 use base qw( Net::Async::Tangence::Protocol Tangence::Server );
 use mro 'c3';
-
-our $VERSION = '0.15';
 
 use Carp;
 

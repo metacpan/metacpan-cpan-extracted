@@ -18,7 +18,7 @@ sub new
   %args = (%args, Alien::Base::Wrapper->mb_args);
   $args{include_dirs} = 'xs';
   $args{c_source}     = 'xs';
-  
+
   my $self = $class->SUPER::new(%args);
 
   $self->add_to_cleanup(
@@ -27,7 +27,7 @@ sub new
     '*.core',
     'test-*',
   );
-  
+
   $self;
 }
 
@@ -36,18 +36,18 @@ sub ACTION_build_prep
   my($self) = shift;
 
   return if -e File::Spec->catfile('xs', 'func.h');
-  
+
   print "creating xs/func.h\n";
-  
+
   open(my $fh, '<', File::Spec->catfile('inc', 'symbols.txt'));
   my @symbols = <$fh>;
   close $fh;
   chomp @symbols;
-    
+
   push @symbols, map { "archive_read_support_compression_$_" } qw( all bzip2 compress gzip lzip lzma none program program_signature rpm uu xz );
   push @symbols, map { "archive_write_set_compression_$_" } qw( bzip2 compress gzip lzip lzma none program xz );
   push @symbols, 'archive_write_set_format_old_tar';
-  
+
   open($fh, '>', File::Spec->catfile('xs', 'func.h.tmp'));
   print $fh "#ifndef FUNC_H\n";
   print $fh "#define FUNC_H\n\n";

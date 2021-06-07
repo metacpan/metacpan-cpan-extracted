@@ -1,9 +1,9 @@
 package TableDataRole::Source::Iterator;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-04-13'; # DATE
+our $DATE = '2021-06-01'; # DATE
 our $DIST = 'TableDataRoles-Standard'; # DIST
-our $VERSION = '0.008'; # VERSION
+our $VERSION = '0.009'; # VERSION
 
 use 5.010001;
 use Role::Tiny;
@@ -23,7 +23,7 @@ sub _new {
         gen_iterator => $gen_iterator,
         gen_iterator_params => $gen_iterator_params,
         iterator => undef,
-        index => 0,
+        pos => 0,
         # buffer => undef,
         # column_names => undef,
         # column_idxs  => undef,
@@ -41,7 +41,7 @@ sub _get_row {
             return $row;
         }
     } else {
-        $self->reset_row_iterator unless $self->{iterator};
+        $self->reset_iterator unless $self->{iterator};
         my $row = $self->{iterator}->();
         return undef unless $row;
         return $row;
@@ -53,7 +53,7 @@ sub _peek_row {
     # content if it exists.
     my $self = shift;
     unless ($self->{buffer}) {
-        $self->reset_row_iterator unless $self->{iterator};
+        $self->reset_iterator unless $self->{iterator};
         $self->{buffer} = $self->{iterator}->() // -1;
     }
     if (!ref($self->{buffer}) && $self->{buffer} == -1) {
@@ -87,32 +87,37 @@ sub get_column_names {
     wantarray ? @{ $self->{column_names} } : $self->{column_names};
 }
 
-sub get_row_arrayref {
+sub has_next_item {
+    my $self = shift;
+    $self->_peek_row ? 1:0;
+}
+
+sub get_next_item {
     my $self = shift;
     $self->get_column_names;
     my $row_hashref = $self->_get_row;
-    return undef unless $row_hashref;
+    die "StopIteration" unless $row_hashref;
     my $row_aryref = [];
     for (keys %$row_hashref) {
         my $idx = $self->{column_idxs}{$_};
         next unless defined $idx;
         $row_aryref->[$idx] = $row_hashref->{$_};
     }
-    $self->{index}++;
+    $self->{pos}++;
     $row_aryref;
 }
 
-sub get_row_hashref {
+sub get_next_row_hashref {
     my $self = shift;
     my $row_hashref = $self->_get_row;
-    return unless $row_hashref;
-    $self->{index}++;
+    die "StopIteration" unless $row_hashref;
+    $self->{pos}++;
     $row_hashref;
 }
 
 sub get_row_count {
     my $self = shift;
-    $self->reset_row_iterator;
+    $self->reset_iterator;
     unless (defined $self->{row_count}) {
         my $i = 0;
         $i++ while $self->_get_row;
@@ -121,16 +126,16 @@ sub get_row_count {
     $self->{row_count};
 }
 
-sub reset_row_iterator {
+sub reset_iterator {
     my $self = shift;
     $self->{iterator} = $self->{gen_iterator}->(%{ $self->{gen_iterator_params} });
     delete $self->{buffer};
-    $self->{index} = 0;
+    $self->{pos} = 0;
 }
 
-sub get_row_iterator_index {
+sub get_iterator_pos {
     my $self = shift;
-    $self->{index};
+    $self->{pos};
 }
 
 1;
@@ -148,7 +153,7 @@ TableDataRole::Source::Iterator - Get table data from an iterator
 
 =head1 VERSION
 
-This document describes version 0.008 of TableDataRole::Source::Iterator (from Perl distribution TableDataRoles-Standard), released on 2021-04-13.
+This document describes version 0.009 of TableDataRole::Source::Iterator (from Perl distribution TableDataRoles-Standard), released on 2021-06-01.
 
 =head1 SYNOPSIS
 
@@ -172,7 +177,7 @@ This document describes version 0.008 of TableDataRole::Source::Iterator (from P
 This role retrieves rows from an iterator. Iterator must return row must return
 hashref row on each call.
 
-C<reset_row_iterator()> will regenerate a new iterator.
+C<reset_iterator()> will regenerate a new iterator.
 
 =for Pod::Coverage ^(.+)$
 
@@ -208,7 +213,7 @@ Source repository is at L<https://github.com/perlancar/perl-TableDataRoles-Stand
 
 =head1 BUGS
 
-Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-TableDataRoles-Standard/issues>
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=TableDataRoles-Standard>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired

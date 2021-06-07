@@ -3,9 +3,9 @@ NAME
     cwalitee
 
 VERSION
-    This document describes version 0.003 of App::lcpan::CmdBundle::cwalitee
+    This document describes version 0.004 of App::lcpan::CmdBundle::cwalitee
     (from Perl distribution App-lcpan-CmdBundle-cwalitee), released on
-    2020-01-19.
+    2021-06-06.
 
 SYNOPSIS
 DESCRIPTION
@@ -19,7 +19,14 @@ DESCRIPTION
 
     *   lcpan cwalitee-of-script-abstract
 
+    *   lcpan mods-with-abstract-cwalitee
+
     *   lcpan cwalitee-of-release-changes
+
+    *   lcpan dists-with-changes-cwalitee
+
+CONTRIBUTOR
+    perlancar (on netbook-dell-xps13) <perlancar@gmail.com>
 
 HOMEPAGE
     Please visit the project's homepage at
@@ -50,7 +57,7 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2020, 2019 by perlancar@cpan.org.
+    This software is copyright (c) 2021, 2020, 2019 by perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

@@ -1,0 +1,184 @@
+NAME
+    Tags::HTML::GradientIndicator - Tags helper for gradient evaluation.
+
+SYNOPSIS
+     use Tags::HTML::GradientIndicator;
+
+     my $obj = Tags::HTML::GradientIndicator->new(%params);
+     $obj->process($stars_hr);
+     $obj->process_css;
+
+METHODS
+  "new"
+     my $obj = Tags::HTML::GradientIndicator->new(%params);
+
+    Constructor.
+
+    *       "css"
+
+            'CSS::Struct::Output' object for process_css processing.
+
+            It's required.
+
+            Default value is undef.
+
+    *       "css_gradient_class"
+
+            CSS class name for gradient.
+
+            Default value is 'gradient'.
+
+    *       "height"
+
+            Indicator height.
+
+            Default value is 30.
+
+    *       "unit"
+
+            Unit for height and width.
+
+            Default value is 'px'.
+
+    *       "width"
+
+            Indicator width.
+
+            Default value is 500.
+
+    *       "tags"
+
+            'Tags::Output' object.
+
+            Default value is undef.
+
+  "process"
+     $obj->process($percent_value);
+
+    Process Tags structure for gradient.
+
+    Returns undef.
+
+  "process_css"
+     $obj->process_css;
+
+    Process CSS::Struct structure for output.
+
+    Returns undef.
+
+ERRORS
+     new():
+             From Class::Utils::set_params():
+                     Unknown parameter '%s'.
+             Parameter 'css' must be a 'CSS::Struct::Output::*' class.
+             Parameter 'tags' must be a 'Tags::Output::*' class.
+
+EXAMPLE1
+     use strict;
+     use warnings;
+
+     use CSS::Struct::Output::Indent;
+     use Tags::HTML::GradientIndicator;
+     use Tags::Output::Indent;
+
+     # Object.
+     my $css = CSS::Struct::Output::Indent->new;
+     my $tags = Tags::Output::Indent->new;
+     my $obj = Tags::HTML::GradientIndicator->new(
+             'css' => $css,
+             'tags' => $tags,
+     );
+
+     # Process indicator.
+     $obj->process_css;
+     $obj->process(50);
+
+     # Print out.
+     print "CSS\n";
+     print $css->flush."\n";
+     print "HTML\n";
+     print $tags->flush."\n";
+
+     # Output:
+     # CSS
+     # .gradient {
+     #         height: 30px;
+     #         width: 500px;
+     #         background-color: red;
+     #         background-image: linear-gradient(to right, red, orange, yellow, green, blue, indigo, violet);
+     # }
+     # HTML
+     # <div style="width: 250px;overflow: hidden;">
+     #   <div class="gradient">
+     #   </div>
+     # </div>
+
+EXAMPLE2
+     use strict;
+     use warnings;
+
+     use CSS::Struct::Output::Indent;
+     use Tags::HTML::GradientIndicator;
+     use Tags::Output::Indent;
+
+     if (@ARGV < 1) {
+             print STDERR "Usage: $0 percent\n";
+             exit 1;
+     }
+     my $percent = $ARGV[0];
+
+     # Object.
+     my $css = CSS::Struct::Output::Indent->new;
+     my $tags = Tags::Output::Indent->new;
+     my $obj = Tags::HTML::GradientIndicator->new(
+             'css' => $css,
+             'tags' => $tags,
+     );
+
+     # Process indicator.
+     $obj->process_css;
+     $obj->process($percent);
+
+     # Print out.
+     print "CSS\n";
+     print $css->flush."\n";
+     print "HTML\n";
+     print $tags->flush."\n";
+
+     # Output for 30:
+     # CSS
+     # .gradient {
+     #         height: 30px;
+     #         width: 500px;
+     #         background-color: red;
+     #         background-image: linear-gradient(to right, red, orange, yellow, green, blue, indigo, violet);
+     # }
+     # HTML
+     # <div style="width: 150px;overflow: hidden;">
+     #   <div class="gradient">
+     #   </div>
+     # </div>
+
+DEPENDENCIES
+    Class::Utils, Error::Pure.
+
+SEE ALSO
+    Tags::HTML::Stars
+        Tags helper for stars evaluation.
+
+REPOSITORY
+    <https://github.com/michal-josef-spacek/Tags-HTML-GradientIndicator>
+
+AUTHOR
+    Michal Josef Špaček <mailto:skim@cpan.org>
+
+    <http://skim.cz>
+
+LICENSE AND COPYRIGHT
+    © Michal Josef Špaček 2021
+
+    BSD 2-Clause License
+
+VERSION
+    0.01
+

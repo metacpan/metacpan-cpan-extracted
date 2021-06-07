@@ -22,6 +22,16 @@ static DISPATCHOP *MY_alloc_DISPATCHOP(pTHX)
 {
   OP *o;
   NewOpSz(1101, o, sizeof(DISPATCHOP));
+  o->op_flags = 0;
+  o->op_private = 0;
+  o->op_targ = 0;
+  o->op_next = NULL;
+#if HAVE_PERL_VERSION(5,26,0)
+  o->op_sibparent = NULL;
+#else
+  o->op_sibling = NULL;
+#endif
+
   return (DISPATCHOP *)o;
 }
 

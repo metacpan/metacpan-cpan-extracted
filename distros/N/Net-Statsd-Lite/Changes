@@ -1,5 +1,11 @@
 Revision history for Net-Statsd-Lite
 
+v0.6.2    2021-05-21 17:00:32+01:00 Europe/London
+  [Documentation]
+  - Fixed POD markup.
+
+  - Note support for tagging extensions.
+
 v0.6.1    2021-04-27 16:53:51+01:00 Europe/London
   [Enhancements]
   - Removed unused stub types library.

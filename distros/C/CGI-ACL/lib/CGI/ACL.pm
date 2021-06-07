@@ -25,11 +25,11 @@ CGI::ACL - Decide whether to allow a client to run this script
 
 =head1 VERSION
 
-Version 0.03
+Version 0.04
 
 =cut
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 =head1 SYNOPSIS
 
@@ -40,7 +40,7 @@ Does what it says on the tin.
 
     my $acl = CGI::ACL->new();
     # ...
-    my $denied = $acl->all_denied(info => CGI::Lingua->new());
+    my $denied = $acl->all_denied(info => CGI::Lingua->new(supported => 'en'));
 
 =head1 SUBROUTINES/METHODS
 
@@ -114,6 +114,7 @@ sub deny_country {
 		%params = %{$_[0]};
 	} elsif(ref($_[0])) {
 		Carp::carp('Usage: deny_country($ip_address)');
+		return;
 	} elsif(@_ % 2 == 0) {
 		%params = @_;
 	} else {
@@ -121,7 +122,7 @@ sub deny_country {
 	}
 
 	if(defined(my $c = $params{'country'})) {
-		# This shenanegans allows country to be a scalar or list
+		# This shenanigans allows country to be a scalar or list
 		if(ref($c) eq 'ARRAY') {
 			foreach my $country(@{$c}) {
 				$self->{_deny_countries}->{lc($country)} = 1;
@@ -143,7 +144,7 @@ Give a country, or a reference to a list of countries, that we will allow to acc
 
     # Allow only the UK and US to connect to us
     my @allow_list = ('GB', 'US');
-    my $acl = CGI::ACL->new()->deny_country->('*')->allow_country(country => \@allow_list);
+    my $acl = CGI::ACL->new()->deny_country('*')->allow_country(country => \@allow_list);
 
 =cut
 
@@ -162,7 +163,7 @@ sub allow_country {
 	}
 
 	if(defined(my $c = $params{'country'})) {
-		# This shenanegans allows country to be a scalar or list
+		# This shenanigans allows country to be a scalar or list
 		if(ref($c) eq 'ARRAY') {
 			foreach my $country(@{$c}) {
 				$self->{_allow_countries}->{lc($country)} = 1;
@@ -178,7 +179,8 @@ sub allow_country {
 
 =head2 all_denied
 
-If any of the restrictions return false then return false, which should allow access
+If any of the restrictions return false then return false, which should allow access.
+Note that by default localhost isn't allowed access, call allow_ip('127.0.0.1') to enable it.
 
     use CGI::Lingua;
     use CGI::ACL;
@@ -234,16 +236,21 @@ sub all_denied {
 			$params{'lingua'} = shift;
 		}
 
-		if(!defined($params{'lingua'})) {
-			Carp::carp 'Usage: all_denied($$lingua)';
-			return 1;
-		}
-
 		if(my $lingua = $params{'lingua'}) {
-			if($self->{_deny_countries}->{'*'}) {
-				return !$self->{_allow_countries}->{$lingua->country()};
+			if($self->{_deny_countries}->{'*'} && !defined($self->{_allow_countries})) {
+				return 0;
 			}
-			return $self->{_deny_countries}->{$lingua->country()};
+			if(my $country = $lingua->country()) {
+				if($self->{_deny_countries}->{'*'}) {
+					# Default deny
+					return !$self->{_allow_countries}->{$country};
+				}
+				# Default allow
+				return $self->{_deny_countries}->{$country};
+			}
+			# Unknown country - disallow access
+		} else {
+			Carp::carp('Usage: all_denied($lingua)');
 		}
 	}
 
@@ -276,26 +283,38 @@ You can also look for information at:
 
 =over 4
 
+=item * MetaCPAN
+
+L<https://metacpan.org/release/CGI-ACL>
+
 =item * RT: CPAN's request tracker
 
-L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=CGI-ACL>
+L<https://rt.cpan.org/NoAuth/Bugs.html?Dist=CGI-ACL>
+
+=item * CPANTS
+
+L<http://cpants.cpanauthors.org/dist/CGI-ACL>
+
+=item * CPAN Testers' Matrix
+
+L<http://matrix.cpantesters.org/?dist=CGI-ACL>
 
 =item * CPAN Ratings
 
 L<http://cpanratings.perl.org/d/CGI-ACL>
 
-=item * Search CPAN
+=item * CPAN Testers Dependencies
 
-L<http://search.cpan.org/dist/CGI-ACL/>
+L<http://deps.cpantesters.org/?module=CGI::ACL>
 
 =back
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2017,2018 Nigel Horne.
+Copyright 2017-2021 Nigel Horne.
 
 This program is released under the following licence: GPL2
 
 =cut
 
-1; # End of CGI::ACL
+1;

@@ -8,7 +8,9 @@ META.json
 META.yml
 README
 t/00-load.t
+t/convert.t
 t/exact_wrap.t
 t/fuzzy_wrap.t
 t/pod-coverage.t
 t/pod.t
+t/trim.t

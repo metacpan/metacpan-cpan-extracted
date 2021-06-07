@@ -20,6 +20,9 @@ X%{head}Y		XyesY
 X%{head=yes}Y		XY
 X%{head=no}Y		XY
 
+# No value is empty string
+X%{headx}Y		XY
+
 # Subtitute the 'true' part
 X%{head|foo}Y		XfooY
 X%{head|fo\|o}Y		Xfo|oY

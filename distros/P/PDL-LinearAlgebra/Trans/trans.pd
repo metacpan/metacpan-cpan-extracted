@@ -388,7 +388,7 @@ pp_def('geexp',
 Computes exp(t*A), the matrix exponential of a general matrix,
 using the irreducible rational Pade approximation to the 
 exponential function exp(x) = r(x) = (+/-)( I + 2*(q(x)/p(x)) ), 
-combined with scaling-and-squaring and optionaly normalization of the trace.
+combined with scaling-and-squaring and optionally normalization of the trace.
 The algorithm is described in Roger B. Sidje (rbs@maths.uq.edu.au)
 "EXPOKIT: Software Package for Computing Matrix Exponentials".
 ACM - Transactions On Mathematical Software, 24(1):130-156, 1998

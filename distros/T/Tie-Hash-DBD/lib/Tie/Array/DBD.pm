@@ -1,6 +1,6 @@
 package Tie::Array::DBD;
 
-our $VERSION = "0.22";
+our $VERSION = "0.23";
 
 use strict;
 use warnings;
@@ -215,7 +215,7 @@ sub TIEARRAY {
 
     my $tbl = $h->{tbl};
 
-    $h->{ins} = $dbh->prepare ("insert into $tbl values (?, ?)");
+    $h->{ins} = $dbh->prepare ("insert into $tbl ($f_k, $f_v) values (?, ?)");
     $h->{del} = $dbh->prepare ("delete from $tbl where $f_k = ?");
     $h->{upd} = $dbh->prepare ("update $tbl set $f_v = ? where $f_k = ?");
     $h->{sel} = $dbh->prepare ("select $f_v from $tbl where $f_k = ?");
@@ -780,7 +780,7 @@ H.Merijn Brand <h.m.brand@xs4all.nl>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2010-2020 H.Merijn Brand
+Copyright (C) 2010-2021 H.Merijn Brand
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself. 

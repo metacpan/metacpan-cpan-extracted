@@ -1,0 +1,6 @@
+
+INSTALL memo for "App::colgrep" : 
+
+   cpanm App::colgrep
+
+   

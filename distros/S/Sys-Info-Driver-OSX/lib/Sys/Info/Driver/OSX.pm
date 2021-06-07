@@ -1,8 +1,8 @@
 package Sys::Info::Driver::OSX;
-$Sys::Info::Driver::OSX::VERSION = '0.7959';
+$Sys::Info::Driver::OSX::VERSION = '0.7960';
 use strict;
 use warnings;
-use base qw( Exporter Sys::Info::Base );
+use parent qw( Exporter Sys::Info::Base );
 use constant SYSCTL_NOT_EXISTS  =>
     qr{top    \s level \s name .+? in .+? is \s invalid}xms,
     qr{second \s level \s name .+? in .+? is \s invalid}xms,
@@ -234,7 +234,7 @@ Sys::Info::Driver::OSX
 
 =head1 VERSION
 
-version 0.7959
+version 0.7960
 
 =head1 SYNOPSIS
 

@@ -5,7 +5,7 @@
 #
 
 use Convert::ASN1;
-BEGIN { require 't/funcs.pl' }
+BEGIN { require './t/funcs.pl' }
 
 print "1..13\n";
 

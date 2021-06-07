@@ -1,16 +1,15 @@
 # -*- perl -*-
-
 use strict;
 use warnings;
-
+use lib './lib';
 use Test::More qw( no_plan );
-
 use Nice::Try;
 
 # Credits to Steve Scaffidi for his test suit
 
 # try can apply loop controls
 {
+    no warnings 'exiting';
     my $count = 0;
     LOOP: {
         try {
@@ -37,6 +36,7 @@ use Nice::Try;
 
 # catch can apply loop controls
 {
+    no warnings 'exiting';
     my $count = 0;
     LOOP: {
         try {

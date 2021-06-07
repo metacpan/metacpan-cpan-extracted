@@ -1,0 +1,243 @@
+#!/usr/bin/perl
+use 5.001 ; use strict ; use warnings ; 
+use Getopt::Std ; getopts ':!=c:e:f:quvy1' , \my%o ; 
+use Encode qw/decode_utf8 encode_utf8/ ;
+use Term::ANSIColor qw/:constants/ ; $Term::ANSIColor::AUTORESET = 1 ;
+use FindBin qw[ $Script ] ;
+
+sub main ; 
+
+main () ; 
+exit 0 ; 
+
+# メインの部分の処理
+
+sub main ( ) {
+
+  sub init ( ) ; 
+  sub Select ( ); 
+  sub LineProc ( $ ) ;
+  sub Match (  ) ;
+  our $search ; 
+  our $lineproc ; # どういう処理をするかを、init関数の中で定義する。
+  our %words ; # 検索パターンを複数。
+  our $flip ; # 反転するかどうか $o{v} と真偽は 一致
+  our $col ; # どの列を検索するか。 -cの指定が1始まりであるのとは異なり、0始まり
+  our @cols ; 
+  our $cstr ; 
+  our $isep = "\t" ; # <-- 指定可能とすることはあり得る。
+
+  init () ; 
+
+  my $oL ; # 条件に適合したので、出力をした行数
+  my $tL ; # 読み込んだ行数
+
+  while ( <> ) { 
+    chomp ; 
+    Select ()  ; # $cstr が操作されていることに注意。$_ から部分列を きりだす。
+    $oL +=  LineProc Match ;
+    $tL ++ ;
+  }
+  #my $mL = $o{v} ? $tL - $oL : $oL ; # 条件にあった数。ただし、-v により条件を反転させる。
+  print STDERR CYAN sprintf "match:%d unmatch:%d total:%d ($Script)\n",$oL,$tL-$oL,$tL unless $o{q} ; 
+  return ;
+
+  sub init ( ) { 
+
+    sub build_range ( ) { 
+      my @ranges = split /,/ , $o{c} // '' , -1 ; 
+      grep { $_ = $_ . ".." . $_ unless m/\.\./ }  @ranges ; # <--
+      do { m/^(.+)\.\.(.+)/ ; push @cols , map { $_ > 0 ? $_ - 1 : $_ } $1 .. $2 } for @ranges ; 
+    }
+
+    $| = 1 if $o{'!'} ;
+    #$col = $o{c} > 0 ? $o{c} - 1 : $o{c} if exists $o{c} ; # 負の数であれば、末尾から列位置を数えることになる。
+    build_range ( ) ;
+    $col = $cols[0] ;
+    $flip = $o{v} ? 1 : 0 ;
+
+    # 行全体から文字列を切り出す関数
+    sub Select0  { $cstr = $_ } ; 
+    sub Select0u { $cstr = decode_utf8 $_ } ; 
+    sub Selectc  { $cstr = [split/$isep/,$_,-1]->[$col] } ;
+    sub Selectcu { $cstr = decode_utf8 [split/$isep/,$_,-1]->[$col] } ;
+    sub SelectC  { $cstr = join $isep, @{[split/$isep/,$_,-1]}[@cols] } ;
+    sub SelectCu { $cstr = decode_utf8 join $isep, @{[split/$isep/,$_,-1]}[@cols] } ;
+    * Select = * Select0 ; 
+    * Select = * Select0u if $o{u} ; 
+    * Select = * Selectc  if @cols == 1 ; 
+    * Select = * Selectcu if @cols == 1 && $o{u} ; 
+    * Select = * SelectC  if @cols >= 2 ;  
+    * Select = * SelectCu if @cols >= 2 && $o{u} ;
+
+    # マッチの判定をする関数
+    sub matchP { $cstr =~ m/$search/ } ; 
+    sub matchN { $cstr !~ m/$search/ } ; 
+    sub matchEP { $words { $cstr } }  ; 
+    sub matchEN { $words { $cstr } ? 0 : 1 } ; 
+    * Match = * matchP ; 
+    * Match = * matchN if $flip ; 
+    * Match = * matchEP if $o{1} ;
+    * Match = * matchEN if $flip && $o{1} ;
+
+    # 下記の関数は printもするし、個数も返す。
+    sub L0  { if ($_[0]) { print encode_utf8($_) , "\n" ; return 1} else { return 0 } } 
+    sub Ll  { if ($_[0]) { print "$.:\t" , encode_utf8($_) , "\n" ; return 1} else { return 0 } } 
+    sub Ly  { my $y =  $_[0] ? 1 : 0 ; print "$y\n" ; return $y } 
+    sub Lly { my $y =  $_[0] ? 1 : 0 ; print "$.:\t$y\n" ; return $y } 
+    * LineProc = * L0 ; 
+    * LineProc = * Ll if $o{':'} ; 
+    * LineProc = * Ly if $o{'y'} ; 
+    * LineProc = * Lly if $o{':'} && $o{'y'} ; 
+
+    # 検索する正規表現の構成
+    $search = decode_utf8 $o{e} if exists $o{e} ;  
+    if ( defined $o{f} ) { 
+      open my $fh , '<' , $o{f} or die "File `$o{f}' including the search words missing.  " , $! ;  
+      while ( <$fh> ) { chomp ; $words{ decode_utf8( $_ ) } = 1 } ; close $fh ; 
+      $search = join '|' , keys %words ; 
+    }
+
+    if ( $o{'='} ) { 
+      my $header = <> ; 
+      print "=:\t" if $o{':'} ;
+      print ! $o{y} ? $header :  "=\n" ;
+      # $. = 0 ; # <- 他のコマンドと一致ないし整合性を図る必要がある。
+    }
+  }
+}
+
+# 主にコマンドの引数の部分の処理
+
+# ヘルプの扱い
+sub VERSION_MESSAGE {}
+sub HELP_MESSAGE {
+    use FindBin qw[ $Script ] ; 
+    my ($a1,$L,$opt,@out) = ($ARGV[1]//'',0,'^o(p(t(i(o(ns?)?)?)?)?)?$') ;
+    open my $FH , '<' , $0 ;
+    while(<$FH>){
+        s/\$0/$Script/g ;
+        $out[$L] .= $_ if s/^=head1\s*(.*)\n/$1/s .. s/^=cut\n//s && ++$L and $a1 =~ /$opt/i ? m/^\s+\-/ : 1 ;
+    }
+    close $FH ;
+    print $ENV{LANG} =~ m/^ja/ ? $out[0] : $out[1] // $out[0] ;
+    exit 0 ;
+}
+
+
+=encoding utf8
+
+=head1
+
+ $0 -e regex   
+
+   指定した列に指定した正規表現が合致する場合に、その行全体を出力する。
+   主要な動作の後に、標準エラー出力に処理した行数などを出力。
+ 
+  $0 -c 列番号  -e 正規表現       # 最も想定されている使い方。
+  $0 -c 列番号 -f ファイル名   # ファイルの各行に検索したい正規表現があると見なされる。
+  $0 正規表現                 #  列を指定しないで、行全体からマッチすれば、その行を出力
+  $0 -v -c 列番号 -e 正規表現     # -v の指定により、マッチしない行を出力する。
+  
+ オプション : 
+  -c num : 検索対象を探す列を1個指定する。最左列は1、最右列は-1であり、右に向かうほど1ずつ増加。 
+  -e str ; 正規表現の指定。grep と違って1回のみ。
+  -f filename : 検索する正規表現が含まれているファイルの指定。各行がOR条件で検索されることになる。
+  -1 ; -f と共に用いる。ファイル filename の各行のどれかと指定列が一致するもののみを取り出す。高速のはず。
+
+  -u ; 文字列の比較は utf8で行う。
+
+  -v : 行の選択が反転する(マッチしない行が選択される)。
+  -y : マッチするかどうかで 1/0のみ各行に出力する。
+  -q : 何行マッチした、などの付加情報を標準エラー出力に出力しない。
+
+  -= ; 先頭行をヘッダと見なし、これに応じた処理をする。
+  -: ; データの番号を出力する。
+
+開発メモ: 
+  * Colgrep がutf8に対応していない colgrep -= -c1 -e '^6307' 1504*c1.csv
+
+
+=cut
+
+=head1 NAME
+
+  $0 - pattern searcher given which column to seek together with regular expression
+
+SYNOPSIS
+  $0 -c $col_num -e $regex  # The most usual usage
+  $0 -c $col_num -f $filename
+  $0 -e $regex 
+  $0 -v -c .. .. # unmatch ; reverse the matching condition.
+
+OPTIONS
+    You can specify the options which appears as follows . 
+
+  -c number 
+      Specify the column number. Note that the leftest column is numbered as 1.
+
+  -f filename       
+      The file specified by filename is regarded to contain elements separated 
+      by line breaks each of which are to specify the pattern to be matched.
+
+=cut
+
+=for comment
+changeset:   318:85a987ce61ff
+user:        Toshiyuki Shimono
+date:        Mon Mar 07 20:00:34 2016 +0900
+summary:     --help で --help opt でオプション指定だけのヘルプを表示する様にした。このことはヘルプの本文に記載していない。また、$ARGV[1]未定義警告が出る可能性が残っている。
+
+=for comment
+changeset:   285:f6fef6826533
+user:        Toshiyuki Shimono
+date:        Wed Mar 02 14:51:45 2016 +0900
+summary:     いくつかのファイルを改名
+
+=for comment
+changeset:   268:31b37274f835
+user:        Toshiyuki Shimono <tulamili@gmail.com>
+date:        Fri Feb 26 07:51:05 2016 +0000
+summary:     colgrep.pl マニュアルの編集
+
+=for comment
+changeset:   266:3318723ff27e
+user:        Toshiyuki Shimono <tulamili@gmail.com>
+date:        Fri Feb 26 07:34:14 2016 +0000
+summary:     colgrep.pl edited online with Bitbucket
+
+=for comment
+changeset:   265:7c3930e1a0d5
+user:        Toshiyuki Shimono <tulamili@gmail.com>
+date:        Thu Feb 25 08:38:58 2016 +0000
+summary:     colgrep.pl edited online with Bitbucket
+
+=for comment
+changeset:   264:388169015481
+user:        Toshiyuki Shimono <tulamili@gmail.com>
+date:        Thu Feb 25 08:37:14 2016 +0000
+summary:     colgrep.pl に -y情報を付加。そして、カラーで処理行数など標準エラー出力に出力するようにした。
+
+=for comment
+changeset:   261:25d722a70050
+user:        Toshiyuki Shimono <tulamili@gmail.com>
+date:        Thu Feb 25 06:10:26 2016 +0000
+summary:     colgrep.pl の使い方がわかるようにマニュアルを書いた。
+
+=for comment
+changeset:   242:69fc8767704f
+user:        Tulamili
+date:        Sat Feb 20 16:01:35 2016 +0900
+summary:     colgrep デバグ
+
+=for comment
+changeset:   241:4a44f1bf06c0
+user:        Toshiyuki Shimono <tulamili@gmail.com>
+date:        Fri Feb 19 13:27:53 2016 +0000
+summary:     colgrep.pl created
+
+
+=cut
+
+
+

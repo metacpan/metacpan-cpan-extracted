@@ -1,9 +1,9 @@
 package App::lcpan;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-08-13'; # DATE
+our $DATE = '2021-06-05'; # DATE
 our $DIST = 'App-lcpan'; # DIST
-our $VERSION = '1.062'; # VERSION
+our $VERSION = '1.068'; # VERSION
 
 use 5.010001;
 use strict;
@@ -48,6 +48,11 @@ my %builtin_file_skip_list_sub = (
 );
 
 our %SPEC;
+
+# BEGIN argument specifications.
+
+# %argspecFOO is the new naming scheme and we will eventually switch to this.
+# %FOO_args is the old naming scheme.
 
 our %common_args = (
     cpan => {
@@ -307,6 +312,24 @@ our %perl_version_args = (
     },
 );
 
+our %random_args = (
+    random => {
+        summary => 'Random sort',
+        schema => 'true*',
+        tags => ['category:ordering'],
+    },
+);
+
+our %sort_args_for_authors = (
+    sort => {
+        summary => 'Sort the result',
+        schema => ['array*', of=>['str*', in=>[map {($_,"-$_")} qw/id name email rec_mtime/]]],
+        default => ['id'],
+        tags => ['category:ordering'],
+    },
+    %random_args,
+);
+
 our %sort_args_for_mods = (
     sort => {
         summary => 'Sort the result',
@@ -314,6 +337,7 @@ our %sort_args_for_mods = (
         default => ['module'],
         tags => ['category:ordering'],
     },
+    %random_args,
 );
 
 our %sort_args_for_dists = (
@@ -323,6 +347,7 @@ our %sort_args_for_dists = (
         default => ['dist'],
         tags => ['category:ordering'],
     },
+    %random_args,
 );
 
 # XXX should it be put in App/lcpan/Cmd/subs.pm?
@@ -332,6 +357,21 @@ our %sort_args_for_subs = (
         schema => ['array*', of=>['str*', in=>[map {($_,"-$_")} qw/sub package linum author/]]],
         default => ['sub'],
         tags => ['category:ordering'],
+    },
+    %random_args,
+);
+
+our %paging_args = (
+    result_limit => {
+        summary => 'Only return a certain number of records',
+        schema => 'uint*',
+        tags => ['category:paging'],
+    },
+    result_start => {
+        summary => 'Only return starting from the n\'th record',
+        schema => 'posint*',
+        default => 1,
+        tags => ['category:paging'],
     },
 );
 
@@ -365,6 +405,25 @@ our %mods_args = (
         pos => 0,
         slurpy => 1,
         cmdline_src => 'stdin_or_args',
+        element_completion => \&_complete_mod,
+    },
+);
+
+our %argspec0opt_modules = (
+    modules => {
+        schema => ['array*', of=>'perl::modname*', min_len=>1],
+        'x.name.is_plural' => 1,
+        pos => 0,
+        slurpy => 1,
+        cmdline_src => 'stdin_or_args',
+        element_completion => \&_complete_mod,
+    },
+);
+
+our %argspecopt_mods = (
+    modules => {
+        schema => ['array*', of=>'perl::modname*', min_len=>1],
+        'x.name.is_plural' => 1,
         element_completion => \&_complete_mod,
     },
 );
@@ -482,12 +541,33 @@ our %dists_args = (
     },
 );
 
+our %argspecopt_dists = (
+    dists => {
+        summary => 'Distribution names (e.g. Foo-Bar)',
+        schema => ['array*', of=>'perl::distname*', min_len=>1],
+        'x.name.is_plural' => 1,
+        element_completion => \&_complete_dist,
+    },
+);
+
 our %dists_with_optional_vers_args = (
     dists => {
         summary => 'Distribution names (with optional version suffix, e.g. Foo-Bar@1.23)',
         schema => ['array*', of=>'perl::distname_with_optional_ver*', min_len=>1],
         'x.name.is_plural' => 1,
         req => 1,
+        pos => 0,
+        slurpy => 1,
+        cmdline_src => 'stdin_or_args',
+        element_completion => \&_complete_dist,
+    },
+);
+
+our %argspec0opt_dists_with_optional_vers = (
+    dists => {
+        summary => 'Distribution names (with optional version suffix, e.g. Foo-Bar@1.23)',
+        schema => ['array*', of=>'perl::distname_with_optional_ver*', min_len=>1],
+        'x.name.is_plural' => 1,
         pos => 0,
         slurpy => 1,
         cmdline_src => 'stdin_or_args',
@@ -519,6 +599,7 @@ our %sort_args_for_rels = (
         default => ['name'],
         tags => ['category:sorting'],
     },
+    %random_args,
 );
 
 our %overwrite_args = (
@@ -617,10 +698,43 @@ sub _dists_with_optional_vers2file_ids {
             ($file_id) = $dbh->selectrow_array("SELECT id FROM file WHERE dist_name=? AND is_latest_dist=1", {}, $dist);
             do { warn "lcpan: No such dist '$dist'\n"; next } unless $file_id;
         }
-        push @$file_ids, $file_id;
+        push @$file_ids, $file_id unless grep { $file_id == $_ } @$file_ids;
     }
 
     $file_ids;
+}
+
+sub _modules2file_ids {
+    my ($dbh, $modules) = @_;
+
+    return [] unless $modules && @$modules;
+    my $file_ids = [];
+    for my $module (@$modules) {
+        my ($file_id) = $dbh->selectrow_array("SELECT file_id FROM module WHERE name=?", {}, $module);
+        do { warn "lcpan: No such module '$module'\n"; next } unless $file_id;
+        push @$file_ids, $file_id unless grep { $file_id == $_ } @$file_ids;
+    }
+
+    $file_ids;
+}
+
+sub _dists2theirmods {
+    my ($dbh, $dists) = @_;
+
+    return [] unless $dists;
+    my $mods = [];
+    for my $dist (@$dists) {
+        my $sth = $dbh->prepare("SELECT name FROM module WHERE file_id IN (SELECT id FROM file WHERE dist_name=? AND is_latest_dist=1)");
+        $sth->execute($dist);
+        my @dist_mods;
+        while (my ($dist_mod) = $sth->fetchrow_array) {
+            push @dist_mods, $dist_mod;
+        }
+        do { warn "lcpan: No such distribution or distribution does not contain any module: '$dist'\n"; next } unless @dist_mods;
+        for my $dist_mod (@dist_mods) { push @$mods, $dist_mod unless grep { $dist_mod eq $_ } @$mods }
+    }
+
+    $mods;
 }
 
 sub _fullpath {
@@ -3309,6 +3423,8 @@ $SPEC{authors} = {
             },
         },
         %fctime_or_mtime_args,
+        %sort_args_for_authors,
+        %paging_args,
     },
     result => {
         description => <<'_',
@@ -3341,6 +3457,7 @@ sub authors {
 
     my $detail = $args{detail};
     my $qt = $args{query_type} // 'any';
+    my $sort = $args{sort} // ['id'];
 
     my @bind;
     my @where;
@@ -3384,13 +3501,18 @@ sub authors {
     _set_since(\%args, $dbh);
     _add_since_where_clause(\%args, \@where, 'author');
 
+    my @order;
+    if ($args{random}) { push @order, "RANDOM()" }
+    for (@$sort) { /\A(-?)(\w+)/ and push @order, $2 . ($1 ? " DESC" : "") }
+
     my $sql = "SELECT
   cpanid id,
   fullname name,
   email
 FROM author".
         (@where ? " WHERE ".join(" AND ", @where) : "").
-            " ORDER BY id";
+        (@order ? " ORDER BY ".join(", ", @order) : "").
+        ($args{result_limit} ? " LIMIT ".($args{result_start} && $args{result_start} > 1 ? ($args{result_start}-1)."," : "").($args{result_limit}+0) : "");
 
     my @res;
     my $sth = $dbh->prepare($sql);
@@ -3464,6 +3586,7 @@ $SPEC{modules} = {
             cmdline_aliases => {N => {}},
         },
         %sort_args_for_mods,
+        %paging_args,
     },
     result => {
         description => <<'_',
@@ -3557,6 +3680,7 @@ sub modules {
     _add_since_where_clause(\%args, \@where, 'module');
 
     my @order;
+    if ($args{random}) { push @order, "RANDOM()" }
     for (@$sort) { /\A(-?)(\w+)/ and push @order, $2 . ($1 ? " DESC" : "") }
 
     my $sql = "SELECT ".join(", ", map {ref($_) ? "$_->[0] AS $_->[1]" : $_} @cols)."
@@ -3564,7 +3688,8 @@ FROM module
 LEFT JOIN file ON module.file_id=file.id
 ".
     (@where ? " WHERE ".join(" AND ", @where) : "").
-    (@order ? " ORDER BY ".join(", ", @order) : "");
+    (@order ? " ORDER BY ".join(", ", @order) : "").
+    ($args{result_limit} ? " LIMIT ".($args{result_start} && $args{result_start} > 1 ? ($args{result_start}-1)."," : "").($args{result_limit}+0) : "");
 
     my @res;
     my $sth = $dbh->prepare($sql);
@@ -3667,6 +3792,7 @@ $SPEC{dists} = {
             tags => ['category:filtering'],
         },
         %sort_args_for_dists,
+        %paging_args,
     },
     result => {
         description => <<'_',
@@ -3816,13 +3942,15 @@ sub dists {
     _add_since_where_clause(\%args, \@where, 'f');
 
     my @order;
+    if ($args{random}) { push @order, "RANDOM()" }
     for (@$sort) { /\A(-?)(\w+)/ and push @order, $2 . ($1 ? " DESC" : "") }
 
     my $sql = "SELECT ".join(", ", @cols)."
 FROM file f
 ".
         (@where ? " WHERE ".join(" AND ", @where) : "").
-        (@order ? " ORDER BY ".join(", ", @order) : "");
+        (@order ? " ORDER BY ".join(", ", @order) : "").
+        ($args{result_limit} ? " LIMIT ".($args{result_start} && $args{result_start} > 1 ? ($args{result_start}-1)."," : "").($args{result_limit}+0) : "");
 
     my @res;
     my $sth = $dbh->prepare($sql);
@@ -3893,6 +4021,7 @@ $SPEC{'releases'} = {
         %full_path_args,
         %no_path_args,
         %sort_args_for_rels,
+        %paging_args,
     },
     args_rels => {
         choose_one => ['full_path', 'no_path'],
@@ -3968,6 +4097,7 @@ sub releases {
     _add_since_where_clause(\%args, \@where, 'f1');
 
     my @order;
+    if ($args{random}) { push @order, "RANDOM()" }
     for (@$sort) { /\A(-?)(\w+)/ and push @order, $2 . ($1 ? " DESC" : "") }
 
     my $sql = "SELECT
@@ -3987,7 +4117,8 @@ sub releases {
 FROM file f1
 ".
     (@where ? " WHERE ".join(" AND ", @where) : "").
-    (@order ? " ORDER BY ".join(", ", @order) : "");
+    (@order ? " ORDER BY ".join(", ", @order) : "").
+    ($args{result_limit} ? " LIMIT ".($args{result_start} && $args{result_start} > 1 ? ($args{result_start}-1)."," : "").($args{result_limit}+0) : "");
 
     my @res;
     my $sth = $dbh->prepare($sql);
@@ -4154,23 +4285,39 @@ sub _get_revdeps {
     log_trace("Finding reverse dependencies for module(s) %s ...", $mods);
 
     # first, check that all modules are listed
-    my @mod_names;
+    my @indexed_mod_names;
+    my @unindexed_mod_names;
     for my $mod0 (@$mods) {
         my ($mod);
         if (ref($mod0) eq 'HASH') {
             $mod = $mod0->{mod};
         } else {
             ($mod) = $dbh->selectrow_array("SELECT name FROM module WHERE name=?", {}, $mod0)
-                or return [404, "No such module: $mod0"];
+                or do {
+                    warn "lcpan: Module is unindexed: $mod0\n";
+                    push @unindexed_mod_names, $mod0;
+                    next;
+                };
         }
         unless ($memory_by_mod_name->{$mod} && $dont_uniquify) {
-            push @mod_names, $mod;
+            push @indexed_mod_names, $mod;
             $memory_by_mod_name->{$mod} = $mod;
         }
     }
-    return [200, "OK", []] unless @mod_names;
+    if (@indexed_mod_names) {
+        if (@unindexed_mod_names) {
+            warn "lcpan: There are unindexed as well as indexed module names, I'm ignoring unindexed module names for now (".join(", ", @unindexed_mod_names)."), this limitation will be rectified in the future.\n";
+            @unindexed_mod_names = ();
+        }
+    } elsif (@unindexed_mod_names) {
+        warn "lcpan: Can't do multilevel rdeps for unindexed modules (".join(", ", @unindexed_mod_names)."), ignoring multilevel request\n"
+            if $max_level > 1;
+        return _get_revdeps_unindexed(\@unindexed_mod_names, $dbh, $filters, $phase, $rel);
+    } else {
+        return [200, "OK", []];
+    }
 
-    my @where = ('module IN ('.join(",", map {$dbh->quote($_)} @mod_names).')');
+    my @where = ('module IN ('.join(",", map {$dbh->quote($_)} @indexed_mod_names).')');
     my @bind  = ();
 
     push @where, "dist IS NOT NULL";
@@ -4248,6 +4395,56 @@ WHERE f.dist_name IN (".join(", ", map {$dbh->quote($_->{dist})} @res).")");
         }
     }
 
+    [200, "OK", \@res];
+}
+
+sub _get_revdeps_unindexed {
+    my ($mods, $dbh, $filters, $phase, $rel) = @_;
+
+    my @where = ('module_name IN ('.join(",", map {$dbh->quote($_)} @$mods).')');
+    my @bind  = ();
+
+    push @where, "dist IS NOT NULL";
+
+    if ($filters->{authors}) {
+        push @where, '('.join(' OR ', ('author=?') x @{$filters->{authors}}).')';
+        push @bind , @{$filters->{authors}};
+    }
+    if ($filters->{authors_arent}) {
+        for (@{ $filters->{authors_arent} }) {
+            push @where, 'author <> ?';
+            push @bind , $_;
+        }
+    }
+
+    _add_since_where_clause($filters, \@where, 'dp');
+
+    # get all dists that depend on that module
+    my $sth = $dbh->prepare("SELECT
+  -- dp.file_id AS _file_id, -- unused, for debugging only
+  -- dp.module_id AS _mod_id,  -- unused, for debugging only
+
+  (SELECT dist_name    FROM file WHERE id=dp.file_id)            AS dist,
+  NULL                                                           AS module_dist,
+  module_name                                                    AS module,
+  (SELECT cpanid       FROM file WHERE dp.file_id=file.id)       AS author,
+  (SELECT dist_version FROM file WHERE dp.file_id=file.id)       AS dist_version,
+  phase,
+  rel,
+  version req_version
+FROM dep dp
+WHERE ".join(" AND ", @where)."
+ORDER BY dist");
+    $sth->execute(@bind);
+    my @res;
+    while (my $row = $sth->fetchrow_hashref) {
+        next unless $phase eq 'ALL' || $row->{phase} eq $phase;
+        next unless $rel   eq 'ALL' || $row->{rel}   eq $rel;
+        delete $row->{phase} unless $phase eq 'ALL';
+        delete $row->{rel} unless $rel eq 'ALL';
+        $row->{level} = 1;
+        push @res, $row;
+    }
     [200, "OK", \@res];
 }
 
@@ -4398,10 +4595,14 @@ dependencies.
 _
     args => {
         %common_args,
-        %dists_with_optional_vers_args,
+        %argspec0opt_dists_with_optional_vers,
+        %argspecopt_mods,
         %deps_args,
     },
-    args_rels => $deps_args_rels,
+    args_rels => {
+        req_one => ['modules', 'dists'],
+        dep_any => [flatten => ['level']],
+    },
     examples => [
         {
             summary => 'List what modules Module-List requires',
@@ -4412,6 +4613,20 @@ _
         {
             summary => 'List modules Module-List requires (module name will be converted to distro name)',
             argv => ['Module::List'],
+            test => 0,
+            'x.doc.show_result' => 0,
+        },
+        {
+            summary => 'List what distribution that contains Sah::Schema::filename requires',
+            description => <<'_',
+
+Sah::Schema::filename is included in Sah-Schemas-Path distribution, so this
+command is equivalent to "lcpan deps Sah-Schemas-Path". You can't do "lcpan deps
+Sah::Schema::filename" because `lcpan` will assume that you ask "lcpan deps
+Sah-Schema-filename" and there is no Sah-Schema-filename distribution.
+
+_
+            argv => ['--module', 'Sah::Schema::filename'],
             test => 0,
             'x.doc.show_result' => 0,
         },
@@ -4436,7 +4651,10 @@ sub deps {
     my $state = _init(\%args, 'ro');
     my $dbh = $state->{dbh};
 
-    my $file_ids = _dists_with_optional_vers2file_ids($dbh, $args{dists});
+    my $file_ids =
+        $args{dists} && !$args{modules} ? _dists_with_optional_vers2file_ids($dbh, $args{dists}) :
+        $args{modules} && !$args{dists} ? _modules2file_ids($dbh, $args{modules}) :
+        (return [400, "Please specify dists OR modules"]);
     my $phase    = $args{phase} // 'runtime';
     my $rel      = $args{rel} // 'requires';
     my $plver    = $args{perl_version} // "$^V";
@@ -4489,7 +4707,8 @@ sub deps {
 
 my %rdeps_args = (
     %common_args,
-    %mods_args,
+    %argspec0opt_modules,
+    %argspecopt_dists,
     %rdeps_rel_args,
     %rdeps_phase_args,
     %rdeps_level_args,
@@ -4548,7 +4767,24 @@ $SPEC{'rdeps'} = {
     args => {
         %rdeps_args,
     },
-    args_rels => $rdeps_args_rels,
+    examples => [
+        {
+            summary => 'List what distributions depend on Sah::Schema::filename',
+            argv => ['Sah::Schema::filename'],
+            test => 0,
+            'x.doc.show_result' => 0,
+        },
+        {
+            summary => 'List what distributions depend on one of the modules in Sah-Schemas-Path',
+            argv => ['--dist', 'Sah-Schemas-Path'],
+            test => 0,
+            'x.doc.show_result' => 0,
+        },
+    ],
+    args_rels => {
+        req_one => ['modules', 'dists'],
+        dep_any => [flatten => ['level']],
+    },
 };
 sub rdeps {
     my %args = @_;
@@ -4556,7 +4792,10 @@ sub rdeps {
     my $state = _init(\%args, 'ro');
     my $dbh = $state->{dbh};
 
-    my $mods    = $args{modules};
+    my $mods    =
+        $args{modules} && !$args{dists} ? $args{modules} :
+        $args{dists} && !$args{modules} ? _dists2theirmods($dbh, $args{dists}) :
+        (return [400, "Please specify modules OR dists"]);
     my $level   = $args{level} // 1;
     my $authors =  $args{authors} ? [map {uc} @{$args{authors}}] : undef;
     my $authors_arent = $args{authors_arent} ? [map {uc} @{$args{authors_arent}}] : undef;
@@ -4723,7 +4962,7 @@ App::lcpan - Manage your local CPAN mirror
 
 =head1 VERSION
 
-This document describes version 1.062 of App::lcpan (from Perl distribution App-lcpan), released on 2020-08-13.
+This document describes version 1.068 of App::lcpan (from Perl distribution App-lcpan), released on 2021-06-05.
 
 =head1 SYNOPSIS
 
@@ -4736,7 +4975,7 @@ See L<lcpan> script.
 
 Usage:
 
- authors(%args) -> [status, msg, payload, meta]
+ authors(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 List authors.
 
@@ -4750,7 +4989,7 @@ Examples:
 
 =item * Find CPAN IDs which start with something:
 
- authors( query => ["MICHAEL%"]); # -> undef
+ authors(query => ["MICHAEL%"]); # -> ["MICHAEL", "MICHAELW", undef, {}]
 
 =back
 
@@ -4799,6 +5038,22 @@ Search query.
 
 =item * B<query_type> => I<str> (default: "any")
 
+=item * B<random> => I<true>
+
+Random sort.
+
+=item * B<result_limit> => I<uint>
+
+Only return a certain number of records.
+
+=item * B<result_start> => I<posint> (default: 1)
+
+Only return starting from the n'th record.
+
+=item * B<sort> => I<array[str]> (default: ["id"])
+
+Sort the result.
+
 =item * B<use_bootstrap> => I<bool> (default: 1)
 
 Whether to use bootstrap database from App-lcpan-Bootstrap.
@@ -4811,12 +5066,12 @@ off.
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -4830,7 +5085,7 @@ return array of records.
 
 Usage:
 
- deps(%args) -> [status, msg, payload, meta]
+ deps(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 List dependencies of distributions.
 
@@ -4840,19 +5095,28 @@ Examples:
 
 =item * List what modules Module-List requires:
 
- deps( dists => ["Module-List"]);
+ deps(dists => ["Module-List"]);
 
 =item * List modules Module-List requires (module name will be converted to distro name):
 
- deps( dists => ["Module::List"]);
+ deps(dists => ["Module::List"]);
+
+=item * List what distribution that contains Sah::Schema::filename requires:
+
+ deps(modules => ["Sah::Schema::filename"]);
+
+Sah::Schema::filename is included in Sah-Schemas-Path distribution, so this
+command is equivalent to "lcpan deps Sah-Schemas-Path". You can't do "lcpan deps
+Sah::Schema::filename" because C<lcpan> will assume that you ask "lcpan deps
+Sah-Schema-filename" and there is no Sah-Schema-filename distribution.
 
 =item * List non-core modules Module-List requires:
 
- deps( dists => ["Module-List"], include_core => 0);
+ deps(dists => ["Module-List"], include_core => 0);
 
 =item * List dependencies of a specific distribution release:
 
- deps( dists => ["Module-List\@0.004"]);
+ deps(dists => ["Module-List\@0.004"]);
 
 =back
 
@@ -4904,7 +5168,7 @@ Location of your local CPAN mirror, e.g. E<sol>pathE<sol>toE<sol>cpan.
 
 Defaults to C<~/cpan>.
 
-=item * B<dists>* => I<array[perl::distname_with_optional_ver]>
+=item * B<dists> => I<array[perl::distname_with_optional_ver]>
 
 Distribution names (with optional version suffix, e.g. Foo-Bar@1.23).
 
@@ -4975,7 +5239,9 @@ using the C<index_name>.
 
 Recurse for a number of levels (-1 means unlimited).
 
-=item * B<perl_version> => I<str> (default: "v5.30.0")
+=item * B<modules> => I<array[perl::modname]>
+
+=item * B<perl_version> => I<str> (default: "v5.34.0")
 
 Set base Perl version for determining core modules.
 
@@ -5011,12 +5277,12 @@ Check each dependency as XSE<sol>PP.
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -5026,7 +5292,7 @@ Return value:  (any)
 
 Usage:
 
- dists(%args) -> [status, msg, payload, meta]
+ dists(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 List distributions.
 
@@ -5036,15 +5302,15 @@ Examples:
 
 =item * List all distributions:
 
- dists( cpan => "/cpan");
+ dists(cpan => "/cpan");
 
 =item * List all distributions (latest version only):
 
- dists( cpan => "/cpan", latest => 1);
+ dists(cpan => "/cpan", latest => 1);
 
 =item * Grep by distribution name, return detailed record:
 
- dists( query => ["data-table"], cpan => "/cpan");
+ dists(query => ["data-table"], cpan => "/cpan");
 
 =back
 
@@ -5121,7 +5387,19 @@ Search query.
 
 =item * B<query_type> => I<str> (default: "any")
 
+=item * B<random> => I<true>
+
+Random sort.
+
 =item * B<rel_mtime_newer_than> => I<date>
+
+=item * B<result_limit> => I<uint>
+
+Only return a certain number of records.
+
+=item * B<result_start> => I<posint> (default: 1)
+
+Only return starting from the n'th record.
 
 =item * B<sort> => I<array[str]> (default: ["dist"])
 
@@ -5151,12 +5429,12 @@ off.
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -5170,7 +5448,7 @@ true, will return array of records.
 
 Usage:
 
- log(%args) -> [status, msg, payload, meta]
+ log(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Show database index log.
 
@@ -5207,12 +5485,12 @@ off.
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -5222,7 +5500,7 @@ Return value:  (any)
 
 Usage:
 
- modules(%args) -> [status, msg, payload, meta]
+ modules(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 List modulesE<sol>packages.
 
@@ -5299,7 +5577,7 @@ Select modules belonging to certain namespace(s).
 
 When there are more than one query, perform OR instead of AND logic.
 
-=item * B<perl_version> => I<str> (default: "v5.30.0")
+=item * B<perl_version> => I<str> (default: "v5.34.0")
 
 Set base Perl version for determining core modules.
 
@@ -5308,6 +5586,18 @@ Set base Perl version for determining core modules.
 Search query.
 
 =item * B<query_type> => I<str> (default: "any")
+
+=item * B<random> => I<true>
+
+Random sort.
+
+=item * B<result_limit> => I<uint>
+
+Only return a certain number of records.
+
+=item * B<result_start> => I<posint> (default: 1)
+
+Only return starting from the n'th record.
 
 =item * B<sort> => I<array[str]> (default: ["module"])
 
@@ -5337,12 +5627,12 @@ off.
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -5356,7 +5646,7 @@ will return array of records.
 
 Usage:
 
- namespaces(%args) -> [status, msg, payload, meta]
+ namespaces(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 List namespaces.
 
@@ -5449,12 +5739,12 @@ off.
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -5464,7 +5754,7 @@ Return value:  (any)
 
 Usage:
 
- packages(%args) -> [status, msg, payload, meta]
+ packages(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 List modulesE<sol>packages.
 
@@ -5541,7 +5831,7 @@ Select modules belonging to certain namespace(s).
 
 When there are more than one query, perform OR instead of AND logic.
 
-=item * B<perl_version> => I<str> (default: "v5.30.0")
+=item * B<perl_version> => I<str> (default: "v5.34.0")
 
 Set base Perl version for determining core modules.
 
@@ -5550,6 +5840,18 @@ Set base Perl version for determining core modules.
 Search query.
 
 =item * B<query_type> => I<str> (default: "any")
+
+=item * B<random> => I<true>
+
+Random sort.
+
+=item * B<result_limit> => I<uint>
+
+Only return a certain number of records.
+
+=item * B<result_start> => I<posint> (default: 1)
+
+Only return starting from the n'th record.
 
 =item * B<sort> => I<array[str]> (default: ["module"])
 
@@ -5579,12 +5881,12 @@ off.
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -5598,9 +5900,23 @@ will return array of records.
 
 Usage:
 
- rdeps(%args) -> [status, msg, payload, meta]
+ rdeps(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 List reverse dependencies.
+
+Examples:
+
+=over
+
+=item * List what distributions depend on Sah::Schema::filename:
+
+ rdeps(modules => ["Sah::Schema::filename"]);
+
+=item * List what distributions depend on one of the modules in Sah-Schemas-Path:
+
+ rdeps(dists => ["Sah-Schemas-Path"]);
+
+=back
 
 This function is not exported by default, but exportable.
 
@@ -5652,6 +5968,10 @@ Location of your local CPAN mirror, e.g. E<sol>pathE<sol>toE<sol>cpan.
 
 Defaults to C<~/cpan>.
 
+=item * B<dists> => I<array[perl::distname]>
+
+Distribution names (e.g. Foo-Bar).
+
 =item * B<dont_uniquify> => I<true>
 
 Allow showing multiple modules for different dists.
@@ -5675,7 +5995,7 @@ using the C<index_name>.
 
 Recurse for a number of levels (-1 means unlimited).
 
-=item * B<modules>* => I<array[perl::modname]>
+=item * B<modules> => I<array[perl::modname]>
 
 =item * B<phase> => I<str> (default: "ALL")
 
@@ -5705,12 +6025,12 @@ off.
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -5720,7 +6040,7 @@ Return value:  (any)
 
 Usage:
 
- releases(%args) -> [status, msg, payload, meta]
+ releases(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 List releasesE<sol>tarballs.
 
@@ -5806,6 +6126,18 @@ Search query.
 
 =item * B<query_type> => I<str> (default: "any")
 
+=item * B<random> => I<true>
+
+Random sort.
+
+=item * B<result_limit> => I<uint>
+
+Only return a certain number of records.
+
+=item * B<result_start> => I<posint> (default: 1)
+
+Only return starting from the n'th record.
+
 =item * B<sort> => I<array[str]> (default: ["name"])
 
 =item * B<updated_since> => I<date>
@@ -5832,12 +6164,12 @@ off.
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -5847,7 +6179,7 @@ Return value:  (any)
 
 Usage:
 
- reset(%args) -> [status, msg, payload, meta]
+ reset(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Reset (empty) the database index.
 
@@ -5891,12 +6223,12 @@ off.
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -5906,7 +6238,7 @@ Return value:  (any)
 
 Usage:
 
- stats(%args) -> [status, msg, payload, meta]
+ stats(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Statistics of your local CPAN mirror.
 
@@ -5943,12 +6275,12 @@ off.
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -5958,7 +6290,7 @@ Return value:  (any)
 
 Usage:
 
- update(%args) -> [status, msg, payload, meta]
+ update(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 CreateE<sol>update local CPAN mirror.
 
@@ -6061,12 +6393,12 @@ off.
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -6113,9 +6445,29 @@ L<CPAN::Mini>
 
 perlancar <perlancar@cpan.org>
 
+=head1 CONTRIBUTORS
+
+=for stopwords Norbert Csongradi perlancar (@pc-office) Steven Haryanto (on Asus Zenbook)
+
+=over 4
+
+=item *
+
+Norbert Csongradi <norbert@csongradi.hu>
+
+=item *
+
+perlancar (@pc-office) <perlancar@gmail.com>
+
+=item *
+
+Steven Haryanto (on Asus Zenbook) <stevenharyanto@gmail.com>
+
+=back
+
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020, 2019, 2018, 2017, 2016, 2015 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2020, 2019, 2018, 2017, 2016, 2015 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

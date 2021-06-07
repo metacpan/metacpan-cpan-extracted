@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20210309172129;
+our $VERSION = 1.20210602223257;
 
 my $formatters = [
                 {
@@ -150,45 +150,45 @@ my $validators = {
         '
               };
 my %areanames = ();
-$areanames{en} = {"267654", "Kgalagadi",
-"26746", "Serowe",
-"267534", "Lobatse",
-"26736", "Gaborone",
+$areanames{en} = {"267390", "Gaborone",
 "26735", "Gaborone",
-"26747", "Mahalapye",
-"26724", "Francistown",
-"267316", "Gaborone",
-"267317", "Gaborone",
-"26757", "Mochudi",
-"267312", "Gaborone",
-"267318", "Gaborone",
-"267395", "Gaborone",
-"26729", "Letlhakane\/Orapa",
-"267390", "Gaborone",
-"267393", "Gaborone",
-"267391", "Gaborone",
-"267538", "Ramotswa",
-"267539", "Ramotswa",
-"267315", "Gaborone",
 "267659", "Gantsi",
-"26759", "Molepolole",
-"267310", "Gaborone\ \(outer\)",
-"267313", "Gaborone",
-"267319", "Gaborone",
-"267392", "Gaborone",
-"26758", "Jwaneng",
-"267530", "Lobatse",
-"267533", "Lobatse",
-"267651", "Kgalagadi",
-"26749", "Palapye",
-"26762", "Kasane",
-"267397", "Gaborone",
-"267394", "Gaborone",
+"26754", "Barolong\/Ngwaketse",
+"267395", "Gaborone",
 "267370", "Gaborone",
+"267539", "Ramotswa",
+"267319", "Gaborone",
+"267313", "Gaborone",
+"267533", "Lobatse",
+"267392", "Gaborone",
+"26746", "Serowe",
+"26759", "Molepolole",
+"267538", "Ramotswa",
+"267397", "Gaborone",
+"267318", "Gaborone",
+"26758", "Jwaneng",
+"267651", "Kgalagadi",
+"267394", "Gaborone",
+"26757", "Mochudi",
 "26726", "Selebi\-Phikwe",
+"267530", "Lobatse",
+"267310", "Gaborone\ \(outer\)",
+"267391", "Gaborone",
+"267654", "Kgalagadi",
+"26736", "Gaborone",
+"26749", "Palapye",
+"26747", "Mahalapye",
+"267315", "Gaborone",
+"26729", "Letlhakane\/Orapa",
 "267371", "Gaborone",
+"26762", "Kasane",
+"267317", "Gaborone",
+"267312", "Gaborone",
+"267393", "Gaborone",
 "26768", "Maun",
-"26754", "Barolong\/Ngwaketse",};
+"26724", "Francistown",
+"267534", "Lobatse",
+"267316", "Gaborone",};
 
     sub new {
       my $class = shift;

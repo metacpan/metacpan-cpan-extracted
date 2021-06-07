@@ -13,7 +13,7 @@ Readonly::Array our @EXPORT_OK => qw(set_params set_params_pub set_split_params
 	split_params);
 
 # Version.
-our $VERSION = 0.09;
+our $VERSION = 0.10;
 
 # Set parameters to user values.
 sub set_params {
@@ -290,6 +290,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.09
+0.10
 
 =cut

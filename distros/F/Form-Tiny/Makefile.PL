@@ -13,7 +13,7 @@ WriteMakefile(
 	},
 
 	PREREQ_PM => {
-		"Moo" => "0",
+		"Moo" => "2.000000",
 		"Type::Tiny" => "1.004000",
 		"Import::Into" => "0",
 		"namespace::clean" => "0",
@@ -33,6 +33,10 @@ WriteMakefile(
 				web => 'https://github.com/brtastic/perl-form-tiny',
 			},
 		},
+	},
+
+	test => {
+		TESTS => "t/*.t t/**/*.t"
 	},
 
 	ABSTRACT_FROM => 'lib/Form/Tiny.pm',

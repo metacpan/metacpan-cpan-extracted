@@ -9,15 +9,16 @@ namespace xs {
 
     template <class T>
     void _expected_to_stack (const T& ret, SV**& sp, I32& ax, std::false_type) {
+        auto wcnt = Sub::want_count();
         if (ret) {
             mXPUSHs(xs::out(ret.value()).detach());
-            if (GIMME_V == G_ARRAY) {
+            if (wcnt == 2) {
                 XPUSHs(&PL_sv_undef);
                 XSRETURN(2);
             }
             XSRETURN(1);
         }
-        if (GIMME_V != G_ARRAY) throw ret.error();
+        if (wcnt != 2) throw ret.error();
         XPUSHs(&PL_sv_undef);
         mXPUSHs(xs::out(ret.error()).detach());
         XSRETURN(2);
@@ -25,12 +26,13 @@ namespace xs {
 
     template <class T>
     void _expected_to_stack (const T& ret, SV**& sp, I32& ax, std::true_type) {
-        if (GIMME_V == G_VOID) {
+        auto wcnt = Sub::want_count();
+        if (wcnt == 0) {
             if (!ret) throw ret.error();
             XSRETURN_EMPTY;
         }
         XPUSHs(boolSV(ret));
-        if (GIMME_V == G_ARRAY) {
+        if (wcnt == 2) {
             if (ret) XPUSHs(&PL_sv_undef);
             else     mXPUSHs(xs::out(ret.error()).detach());
             XSRETURN(2);

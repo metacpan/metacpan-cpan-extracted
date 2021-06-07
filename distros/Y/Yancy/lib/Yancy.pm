@@ -1,5 +1,5 @@
 package Yancy;
-our $VERSION = '1.070';
+our $VERSION = '1.073';
 # ABSTRACT: The Best Web Framework Deserves the Best CMS
 
 # "Mr. Fry: Son, your name is Yancy, just like me and my grandfather and
@@ -88,7 +88,7 @@ Yancy - The Best Web Framework Deserves the Best CMS
 
 =head1 VERSION
 
-version 1.070
+version 1.073
 
 =head1 DESCRIPTION
 
@@ -140,7 +140,7 @@ Doug Bell <preaction@cpan.org>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Boris Däppen Ed J Erik Johansen Josh Rabinowitz Mohammad S Anwar Pavel Serikov Rajesh Mallah Roy Storey William Lindley Wojtek Bażant
+=for stopwords Boris Däppen Ed J Erik Johansen flash548 Josh Rabinowitz Mohammad S Anwar Pavel Serikov Rajesh Mallah Roy Storey William Lindley Wojtek Bażant
 
 =over 4
 
@@ -159,6 +159,10 @@ Erik Johansen <github@uniejo.dk>
 =item *
 
 Erik Johansen <uniejo@users.noreply.github.com>
+
+=item *
+
+flash548 <59771551+flash548@users.noreply.github.com>
 
 =item *
 
@@ -192,7 +196,7 @@ Wojtek Bażant <wojciech.bazant+ebi@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by Doug Bell.
+This software is copyright (c) 2021 by Doug Bell.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

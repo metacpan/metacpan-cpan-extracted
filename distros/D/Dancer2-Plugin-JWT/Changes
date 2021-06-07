@@ -1,3 +1,7 @@
+0.019  2021-05-22
+   - Set authorization header/cookie optional on response
+     (Mikko Koivunalho)
+
 0.018  2020-12-26
    - Support the 'Bearer' keyword in the authorization field.
      (Mikko Koivunalho)

@@ -44,6 +44,7 @@ can_ok(
         Addresses
         Issues
 		PropertyId
+		Warranties
     /,
 );
 

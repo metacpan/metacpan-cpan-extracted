@@ -2,8 +2,9 @@ NAME
     App::ShellCompleter::cpanm - Shell completion for cpanm
 
 VERSION
-    This document describes version 0.20 of App::ShellCompleter::cpanm (from
-    Perl distribution App-ShellCompleter-cpanm), released on 2020-01-15.
+    This document describes version 0.210 of App::ShellCompleter::cpanm
+    (from Perl distribution App-ShellCompleter-cpanm), released on
+    2021-05-22.
 
 SYNOPSIS
     See _cpanm included in this distribution.
@@ -18,8 +19,7 @@ SOURCE
 
 BUGS
     Please report any bugs or feature requests on the bugtracker website
-    <https://rt.cpan.org/Public/Dist/Display.html?Name=App-ShellCompleter-cp
-    anm>
+    <https://github.com/perlancar/perl-App-BashCompleter-cpanm/issues>
 
     When submitting a bug or request, please include a test-file or a patch
     to an existing test-file that illustrates the bug or desired feature.
@@ -33,7 +33,7 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2020, 2017, 2016, 2015, 2014 by
+    This software is copyright (c) 2021, 2020, 2017, 2016, 2015, 2014 by
     perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under

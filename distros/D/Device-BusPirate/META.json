@@ -4,7 +4,7 @@
       "Paul Evans <leonerd@leonerd.org.uk>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4224",
+   "generated_by" : "Module::Build version 0.4231",
    "license" : [
       "perl_5"
    ],
@@ -24,13 +24,14 @@
             "Device::Chip::Adapter" : "0.02",
             "Device::Chip::ProtocolBase::SPI" : "0",
             "Future" : "0",
-            "Future::AsyncAwait" : "0.25",
+            "Future::AsyncAwait" : "0.47",
             "Future::IO" : "0.04",
             "Future::Mutex" : "0",
             "IO::Termios" : "0.07",
             "List::Util" : "1.33",
             "Module::Pluggable" : "0",
-            "Time::HiRes" : "0"
+            "Time::HiRes" : "0",
+            "perl" : "5.014"
          }
       },
       "test" : {
@@ -43,31 +44,31 @@
    "provides" : {
       "Device::BusPirate" : {
          "file" : "lib/Device/BusPirate.pm",
-         "version" : "0.20"
+         "version" : "0.22"
       },
       "Device::BusPirate::Mode" : {
          "file" : "lib/Device/BusPirate/Mode.pm",
-         "version" : "0.20"
+         "version" : "0.22"
       },
       "Device::BusPirate::Mode::BB" : {
          "file" : "lib/Device/BusPirate/Mode/BB.pm",
-         "version" : "0.20"
+         "version" : "0.22"
       },
       "Device::BusPirate::Mode::I2C" : {
          "file" : "lib/Device/BusPirate/Mode/I2C.pm",
-         "version" : "0.20"
+         "version" : "0.22"
       },
       "Device::BusPirate::Mode::SPI" : {
          "file" : "lib/Device/BusPirate/Mode/SPI.pm",
-         "version" : "0.20"
+         "version" : "0.22"
       },
       "Device::BusPirate::Mode::UART" : {
          "file" : "lib/Device/BusPirate/Mode/UART.pm",
-         "version" : "0.20"
+         "version" : "0.22"
       },
       "Device::Chip::Adapter::BusPirate" : {
          "file" : "lib/Device/Chip/Adapter/BusPirate.pm",
-         "version" : "0.20"
+         "version" : "0.22"
       }
    },
    "release_status" : "stable",
@@ -76,6 +77,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.20",
-   "x_serialization_backend" : "JSON::PP version 4.04"
+   "version" : "0.22",
+   "x_serialization_backend" : "JSON::PP version 4.05"
 }

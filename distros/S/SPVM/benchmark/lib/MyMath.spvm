@@ -8,14 +8,4 @@ package MyMath {
     
     return $total;
   }
-  precompile sub spvm_sum_precompile : int ($loop_count : int) {
-    
-    my $total = 0;
-    for (my $i = 0; $i < $loop_count; $i++) {
-      $total += $i;
-    }
-    
-    return $total;
-  }
-  native sub spvm_sum_native : int ($loop_count : int);
 }

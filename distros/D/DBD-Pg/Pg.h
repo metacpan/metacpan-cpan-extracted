@@ -1,5 +1,5 @@
 /*
-   Copyright (c) 2000-2020 Greg Sabino Mullane and others: see the Changes file
+   Copyright (c) 2000-2021 Greg Sabino Mullane and others: see the Changes file
    Copyright (c) 1997-2000 Edmund Mergl
    Portions Copyright (c) 1994-1997 Tim Bunce
 
@@ -67,10 +67,10 @@ DBISTATE_DECLARE;
 #include "dbdimp.h"
 #include "quote.h"
 
-#define TLEVEL_slow	     (DBIS->debug & DBIc_TRACE_LEVEL_MASK)
-#define TFLAGS_slow	     (DBIS->debug & DBIc_TRACE_FLAGS_MASK)
+#define TLEVEL_slow     (DBIS->debug & DBIc_TRACE_LEVEL_MASK)
+#define TFLAGS_slow     (DBIS->debug & DBIc_TRACE_FLAGS_MASK)
 
-#define TSQL	     (TFLAGS_slow & 256) /* Defined in DBI */
+#define TSQL            (TFLAGS_slow & 256) /* Defined in DBI */
 
 #define FLAGS_LIBPQ    0x01000000
 #define FLAGS_START    0x02000000

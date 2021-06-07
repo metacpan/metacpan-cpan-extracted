@@ -1,0 +1,68 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<title>JSON-RPC over MQTT example</title>
+<meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+<script language="Javascript" type="text/javascript" defer src="https://unpkg.com/mqtt@4.2.6/dist/mqtt.min.js"></script>
+<script language="Javascript" type="text/javascript" defer src="js/config.js"></script>
+<script language="Javascript" type="text/javascript" defer src="js/beekeeper.js"></script>
+<script language="Javascript" type="text/javascript" defer src="js/calculator.js"></script>
+<style type="text/css">
+
+body {
+    padding: 10px;
+    font-size: 11pt;
+    font-family: sans-serif;
+}
+
+#expr {
+    font-size: 12pt; font-family: sans-serif;
+    width: 380px;
+    color: #000000;
+    padding: 6px;
+    padding-left: 12px;
+    margin: 6px;
+    border: solid 2px #6699CC;
+    border-radius: 6px;
+}
+ 
+#send {
+    font-size: 12pt; font-family: sans-serif;
+    width: 80px;
+    color: #000000;
+    padding: 6px;
+    margin: 6px;
+    border: solid 2px #6699CC;
+    background-color: #6699CC;
+    border-radius: 6px;
+}
+
+#result {
+    font-size: 16pt; font-family: sans-serif;
+    width: 470px;
+    min-height: 28px;
+    margin: 6px;
+    padding: 12px;
+    border: solid 1px #6699CC;
+    border-radius: 6px;
+}
+
+.result.success {
+    background-color: #A0FFA0;
+}
+
+.result.error {
+    background-color: #FFA0A0;
+}
+
+</style>
+</head>
+
+<body>
+<input type="text" id="expr" value="2 + 2" />
+<input type="button" id="send" value=" = " onclick="Calc.eval_expr()" />
+<div id="result"></div>
+<p>&nbsp; JSON-RPC traffic is being dumped to console.</br />
+&nbsp; "Server error" means that the remote method died.</p>
+</body>
+</html>

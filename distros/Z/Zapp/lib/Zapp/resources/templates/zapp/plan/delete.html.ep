@@ -1,0 +1,15 @@
+% layout 'zapp';
+
+<h1>Delete Plan?</h1>
+<div class="alert alert-danger">
+    <p>Are you sure you want to delete <q><%= $plan->{label} %></q></p>
+    <!-- XXX: Add further details of scheduling and use as a task -->
+    %= form_for 'zapp.delete_plan_confirm', $plan => begin
+        %= link_to 'zapp.list_plans', class => 'btn btn-secondary cancel', begin
+            <i class="fa fa-arrow-left"></i> Cancel
+        % end
+        <button class="btn btn-danger delete">
+            <i class="fa fa-times-circle"></i> Delete
+        </button>
+    % end
+</div>

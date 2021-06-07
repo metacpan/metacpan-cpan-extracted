@@ -1,7 +1,7 @@
 package App::ImageInfoUtils;
 
-our $DATE = '2019-06-09'; # DATE
-our $VERSION = '0.003'; # VERSION
+our $DATE = '2021-05-25'; # DATE
+our $VERSION = '0.004'; # VERSION
 
 use 5.010001;
 use strict;
@@ -187,7 +187,7 @@ App::ImageInfoUtils - Utilities related to getting (metadata) information from i
 
 =head1 VERSION
 
-This document describes version 0.003 of App::ImageInfoUtils (from Perl distribution App-ImageInfoUtils), released on 2019-06-09.
+This document describes version 0.004 of App::ImageInfoUtils (from Perl distribution App-ImageInfoUtils), released on 2021-05-25.
 
 =head1 FUNCTIONS
 
@@ -196,7 +196,7 @@ This document describes version 0.003 of App::ImageInfoUtils (from Perl distribu
 
 Usage:
 
- image_info(%args) -> [status, msg, payload, meta]
+ image_info(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Get information about image files.
 
@@ -208,15 +208,16 @@ Arguments ('*' denotes required arguments):
 
 =item * B<files>* => I<array[filename]>
 
+
 =back
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
+($reason) is a string containing error message, or "OK" if status is
+200. Third element ($payload) is optional, the actual result. Fourth
+element (%result_meta) is called result metadata and is optional, a hash
 that contains extra information.
 
 Return value:  (any)
@@ -227,7 +228,7 @@ Return value:  (any)
 
 Usage:
 
- image_is_landscape(%args) -> [status, msg, payload, meta]
+ image_is_landscape(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Return exit code 0 if image is landscape.
 
@@ -243,15 +244,16 @@ Arguments ('*' denotes required arguments):
 
 Don't output anything on command-line, just return appropriate exit code.
 
+
 =back
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
+($reason) is a string containing error message, or "OK" if status is
+200. Third element ($payload) is optional, the actual result. Fourth
+element (%result_meta) is called result metadata and is optional, a hash
 that contains extra information.
 
 Return value:  (any)
@@ -262,7 +264,7 @@ Return value:  (any)
 
 Usage:
 
- image_is_portrait(%args) -> [status, msg, payload, meta]
+ image_is_portrait(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Return exit code 0 if image is portrait.
 
@@ -278,15 +280,16 @@ Arguments ('*' denotes required arguments):
 
 Don't output anything on command-line, just return appropriate exit code.
 
+
 =back
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
+($reason) is a string containing error message, or "OK" if status is
+200. Third element ($payload) is optional, the actual result. Fourth
+element (%result_meta) is called result metadata and is optional, a hash
 that contains extra information.
 
 Return value:  (any)
@@ -297,7 +300,7 @@ Return value:  (any)
 
 Usage:
 
- image_orientation(%args) -> [status, msg, payload, meta]
+ image_orientation(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Return orientation of image.
 
@@ -309,15 +312,16 @@ Arguments ('*' denotes required arguments):
 
 =item * B<file>* => I<filename>
 
+
 =back
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
+($reason) is a string containing error message, or "OK" if status is
+200. Third element ($payload) is optional, the actual result. Fourth
+element (%result_meta) is called result metadata and is optional, a hash
 that contains extra information.
 
 Return value:  (any)
@@ -344,7 +348,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2019 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

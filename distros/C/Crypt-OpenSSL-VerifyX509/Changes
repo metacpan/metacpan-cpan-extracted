@@ -1,5 +1,9 @@
 Revision history for Crypt-OpenSSL-VerifyX509
 
+0.16 2021-06-03
+  - TBD     Update version and changes
+  - 8ae1bcd Croak message text changed
+
 0.15 2021-04-26
 
   [Change Log]

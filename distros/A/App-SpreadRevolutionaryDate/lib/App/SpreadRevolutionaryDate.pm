@@ -10,8 +10,8 @@
 use 5.014;
 use utf8;
 package App::SpreadRevolutionaryDate;
-$App::SpreadRevolutionaryDate::VERSION = '0.29';
-# ABSTRACT: Spread date and time from Revolutionary (Republican) Calendar on Twitter, Mastodon and Freenode.
+$App::SpreadRevolutionaryDate::VERSION = '0.31';
+# ABSTRACT: Spread date and time from Revolutionary (Republican) Calendar on Twitter, Mastodon, Freenode and Liberachat.
 
 use Moose;
 use App::SpreadRevolutionaryDate::Config;
@@ -103,11 +103,11 @@ __END__
 
 =head1 NAME
 
-App::SpreadRevolutionaryDate - Spread date and time from Revolutionary (Republican) Calendar on Twitter, Mastodon and Freenode.
+App::SpreadRevolutionaryDate - Spread date and time from Revolutionary (Republican) Calendar on Twitter, Mastodon, Freenode and Liberachat.
 
 =head1 VERSION
 
-version 0.29
+version 0.31
 
 =head1 METHODS
 
@@ -140,6 +140,10 @@ Spreads calendar date to configured targets. Takes no argument.
 =item L<App::SpreadRevolutionaryDate::Target::Freenode>
 
 =item L<App::SpreadRevolutionaryDate::Target::Freenode::Bot>
+
+=item L<App::SpreadRevolutionaryDate::Target::Liberachat>
+
+=item L<App::SpreadRevolutionaryDate::Target::Liberachat::Bot>
 
 =item L<App::SpreadRevolutionaryDate::MsgMaker>
 

@@ -1,0 +1,6 @@
+Revision history for the module "Bin::TSV:Util" : 
+
+0.100   2021-05-28T22:400900
+        最初に作成。
+        14個のコマンドを入れた。
+        colchop colgrep colhashS collen colorplus colpairs colsplit colsummary crosstable inarow join2 joinn keyvalues kvcmp

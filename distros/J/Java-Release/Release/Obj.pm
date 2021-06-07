@@ -3,9 +3,11 @@ package Java::Release::Obj;
 use strict;
 use warnings;
 
-use Mo qw(is required);
+use Error::Pure qw(err);
+use List::MoreUtils qw(none);
+use Mo qw(default coerce is required);
 
-our $VERSION = 0.03;
+our $VERSION = 0.06;
 
 # Computer architecture
 has arch => (
@@ -40,6 +42,63 @@ has update => (
 	is => 'ro',
 );
 
+# Version.
+sub version {
+	my ($self, $type) = @_;
+
+	if ($type && none { $type eq $_ } qw(old new)) {
+		err "Bad version type. Possible values are 'new' or 'old'.",
+			'type', $type;
+	}
+	$type //= 'new';
+
+	my $version = $self->release;
+
+	# Version like 'release'.'interim'.'update'.'patch'
+	if ($type eq 'new') {
+		if ($self->update) {
+			if ($self->interim) {
+				$version .= '.'.$self->interim;
+			} else {
+				$version .= '.0';
+			}
+			$version .= '.'.$self->update;
+			if ($self->patch) {
+				$version .= '.'.$self->patch;
+			}
+		}
+
+	# Version like 'release'u'update'
+	} else {
+		if ($self->interim || $self->patch) {
+			err 'Cannot create old version of version with '.
+				'interim or patch value.';
+		}
+		if ($self->update) {
+			$version .= 'u'.$self->update;
+		}
+	}
+
+	return $version;
+}
+
+# Version name.
+sub version_name {
+	my $self = shift;
+
+	my $version_name = 'Java '.$self->release;
+	if ($self->interim) {
+		$version_name .= ' Major '.$self->interim;
+	}
+	if ($self->update) {
+		$version_name .= ' Update '.$self->update;
+	} else {
+		$version_name .= ' GA';
+	}
+
+	return $version_name;
+}
+
 1;
 
 __END__
@@ -63,6 +122,8 @@ Java::Release::Obj - Data object for Java::Release.
  my $patch = $obj->patch;
  my $release = $obj->release;
  my $update = $obj->update;
+ my $version = $obj->version($type);
+ my $version_name = $obj->version_name;
 
 =head1 METHODS
 
@@ -72,9 +133,51 @@ Java::Release::Obj - Data object for Java::Release.
 
 Constructor.
 
-Returns object.
+Returns instance of object.
 
 =over 8
+
+=item * C<arch>
+
+Architecture.
+
+Parameter is required.
+
+=item * C<interim>
+
+Interim version number.
+
+Parameter is optional.
+
+Default values is undef.
+
+=item * C<os>
+
+Operating system.
+
+Parameter is required.
+
+=item * C<patch>
+
+Patch version number.
+
+Parameter is optional.
+
+Default values is undef.
+
+=item * C<release>
+
+Release version number.
+
+Parameter is required.
+
+=item * C<update>
+
+Update version number.
+
+Parameter is optional.
+
+Default values is undef.
 
 =back
 
@@ -126,6 +229,31 @@ Get update version number.
 
 Returns integer.
 
+=head2 C<version>
+
+ my $version = $obj->version($type);
+
+Get version of release in short notation. There are two possibilities for C<$type>: 'new' (12.0.3) and 'old' (12u3)
+string.
+
+Returns string.
+
+=head2 C<version_name>
+
+ my $version_name = $obj->version_name;
+
+Get version of release in character notation. There are two possibilities to write: new and old
+version.
+
+Returns string.
+
+=head1 ERRORS
+
+ version():
+         Bad version type. Possible values are 'new' or 'old'.
+                 type: %s
+         Cannot create old version of version with interim or patch value.
+
 =head1 EXAMPLE
 
  use strict;
@@ -156,6 +284,8 @@ Returns integer.
 
 =head1 DEPENDENCIES
 
+L<Error::Pure>,
+L<List::MoreUtils>,
 L<Mo>.
 
 =head1 REPOSITORY
@@ -170,12 +300,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-© 2020 Michal Josef Špaček
+© 2020-2021 Michal Josef Špaček
 
 BSD 2-Clause License
 
 =head1 VERSION
 
-0.03
+0.06
 
 =cut

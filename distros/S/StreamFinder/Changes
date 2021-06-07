@@ -268,3 +268,21 @@ Revision history for StreamFinder
         - StreamFinder::Youtube - Add fallback ability to check html page for 
         embedded iframe containing a valid StreamFinder page, and new option: 
         "-noiframes" to not do this (if set to 1/true).
+1.48    2021/05/19
+        - StreamFinder::Youtube, StreamFinder::Anystream - Only look for 
+        streams in actual HTML pages, NOT media URLs - to prevent potentially 
+        very long or even infinite delay trying to fetch the URL.
+        - StreamFinder::Spreaker - Unescape artist and album fields, remove 
+        some extraineous debug output.
+1.50    2021/05/22
+        - Refactor all modules to combine all common methods into a separate 
+        internal module:  StreamFinder::_Class to greatly simplify and 
+        eliminate redundant code.  This should make creating new site modules 
+        much simpler (now most if not all functions other than "new()" should 
+        not be required in site modules unless it's necessary to override!
+        - StreamFinder::Tunein - Add "-notrim" option to NOT trim extra "ad", 
+        misc. stuff from stream URLs (previously, and by default URLs are 
+        "trimmed" removing this stuff (after and including the first "?").
+        - StreamFinder::Tunein, StreamFinder::IHeartRadio - Attempt to grab 
+        full description of podcasts (may include HTML, ie. links).
+        - Misc. minor code cleanups found while converting.

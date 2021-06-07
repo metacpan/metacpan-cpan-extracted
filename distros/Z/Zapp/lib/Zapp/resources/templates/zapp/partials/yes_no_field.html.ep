@@ -1,0 +1,9 @@
+<div class="btn-group btn-group-toggle d-block" data-toggle="buttons">
+    <label class="btn btn-outline-success <%= ( $value eq $yes_value ) ? 'active' : '' %>">
+        %= radio_button $name, $yes_value, id => "$name-yes", autocomplete => "off", ( 'checked' => 'checked' )x!!( $value eq $yes_value )
+        Yes
+    </label><label class="btn btn-outline-danger <%= ( $value eq $no_value ) ? 'active' : '' %>">
+        %= radio_button $name, $no_value, id => "$name-no", autocomplete => "off", ( 'checked' => 'checked' )x!!( $value eq $no_value )
+        No
+    </label>
+</div>

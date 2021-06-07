@@ -4,7 +4,6 @@ BEGIN
     use strict;
     use warnings;
     use Test::More qw( no_plan );
-    # use Nice::Try debug => 6, debug_file => './dev/debug_loop.pl', debug_code => 1;
     use Nice::Try;
 };
 
@@ -682,6 +681,125 @@ subtest 'foreach next in list context' => sub
     my $list = $process->();
     is( "@$list", 'John Jack Peter', 'foreach next -> list context' );
 };
+
+# Test above are similar, but we use subtest, which sets inadvertently a subroutine context
+# Here, we do the same test, but with no context, i.e. outside of any subroutine and with
+# no expectation of return value
+# Previously in version v1.0.6 or lower of Nice::Try, we were using a special return statement to
+# catch the next, last, redo statements. This can clash with context.
+{
+    my $c = 0;
+    for( my $i = 1; $i <= 10; $i++ )
+    {
+        try
+        {
+            if( $i == 7 )
+            {
+                next;
+            }
+            $c++;
+        }
+        catch( $e )
+        {
+            print( "Caught exception: $e\n" );
+        }
+    }
+    is( $c, 9, 'context-less: for -> next in try' );
+    
+    $c = 0;
+    for( my $i = 1; $i <= 10; $i++ )
+    {
+        try
+        {
+            if( $i == 7 )
+            {
+                last;
+            }
+            $c++;
+        }
+        catch( $e )
+        {
+            print( "Caught exception: $e\n" );
+        }
+    }
+    is( $c, 6, 'context-less: for -> last in try' );
+    
+    $c = 0;
+    for( my $i = 1; $i <= 10; $i++ )
+    {
+        try
+        {
+            if( $i == 7 )
+            {
+                $i++;
+                redo;
+            }
+            $c++;
+        }
+        catch( $e )
+        {
+            print( "Caught exception: $e\n" );
+        }
+    }
+    is( $c, 9, 'context-less: for -> redo in try' );
+}
+
+{
+    my $c = 0;
+    for( my $i = 1; $i <= 10; $i++ )
+    {
+        try
+        {
+            if( $i == 7 )
+            {
+                die( "Nope\n" );
+            }
+            $c++;
+        }
+        catch( $e )
+        {
+            next;
+        }
+    }
+    is( $c, 9, 'context-less: for -> next in catch' );
+    
+    $c = 0;
+    for( my $i = 1; $i <= 10; $i++ )
+    {
+        try
+        {
+            if( $i == 7 )
+            {
+                die( "Nope\n" );
+            }
+            $c++;
+        }
+        catch( $e )
+        {
+            last;
+        }
+    }
+    is( $c, 6, 'context-less: for -> last in catch' );
+    
+    $c = 0;
+    for( my $i = 1; $i <= 10; $i++ )
+    {
+        try
+        {
+            if( $i == 7 )
+            {
+                $i++;
+                die( "Nope\n" );
+            }
+            $c++;
+        }
+        catch( $e )
+        {
+            redo;
+        }
+    }
+    is( $c, 9, 'context-less: for -> redo in catch' );
+}
 
 done_testing;
 

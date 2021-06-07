@@ -1,5 +1,19 @@
 Revision history for JSON-Schema-Tiny
 
+0.006     2021-06-06 18:20:19Z
+          - properly update initial_schema_uri in the state object while passing
+            through $id keywords, to keep error locations accurate
+
+0.005     2021-06-05 17:56:50Z
+          - errors are no longer generated on the presence of unsupported
+            keywords from other draft specification versions
+          - now checking syntax for the keywords: $id, $anchor,
+            $recursiveAnchor, $vocabulary, $comment
+
+0.004     2021-05-21 05:03:42Z
+          - new optional OO interface for options, as an alternative to global
+            variables
+
 0.003     2021-05-15 18:17:16Z
           - fixed error strings used for failing "dependentRequired"
           - keywords in the applicator vocabulary are now applied before the

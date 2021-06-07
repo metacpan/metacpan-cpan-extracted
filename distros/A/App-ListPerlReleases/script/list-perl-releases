@@ -1,11 +1,12 @@
 #!perl
 
 # Note: This script is a CLI for Riap function /App/ListPerlReleases/list_perl_releases
-# and generated automatically using Perinci::CmdLine::Gen version 0.485
+# and generated automatically using Perinci::CmdLine::Gen version 0.498
 
-our $DATE = '2018-06-24'; # DATE
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2021-05-29'; # DATE
 our $DIST = 'App-ListPerlReleases'; # DIST
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.003'; # VERSION
 
 use 5.010001;
 use strict;
@@ -35,13 +36,29 @@ list-perl-releases - List of Perl releases
 
 =head1 VERSION
 
-This document describes version 0.001 of list-perl-releases (from Perl distribution App-ListPerlReleases), released on 2018-06-24.
+This document describes version 0.003 of list-perl-releases (from Perl distribution App-ListPerlReleases), released on 2021-05-29.
 
 =head1 SYNOPSIS
 
 Usage:
 
- % list-perl-releases [options] [query]
+ % list-perl-releases [--config-path=path | -c] [--config-profile=profile |
+     -P] [--detail] [--exclude-field=s+] [--exclude-fields-json=s]
+     [--field=s+] [--fields-json=s] [--format=name] [--json] [-l]
+     [--(no)naked-res] [--no-config | -C] [--no-detail] [--no-env]
+     [--no-random] [--nodetail] [--norandom] [--page-result[=program]]
+     [--random] [--result-limit=s] [--result-start=s] [--sort-json=s]
+     [--sort=s+] [--tarball-contains=s] [--tarball-in-json=s]
+     [--tarball-in=s+] [--tarball-is=s] [--tarball-isnt=s]
+     [--tarball-max=s] [--tarball-min=s] [--tarball-not-contains=s]
+     [--tarball-not-in-json=s] [--tarball-not-in=s+] [--tarball-xmax=s]
+     [--tarball-xmin=s] [--tarball=s] [--version-arg=s]
+     [--version-contains=s] [--version-in-json=s] [--version-in=s+]
+     [--version-is=s] [--version-isnt=s] [--version-max=s]
+     [--version-min=s] [--version-not-contains=s] [--version-not-in-json=s]
+     [--version-not-in=s+] [--version-xmax=s] [--version-xmin=s]
+     [--view-result[=program]] [--with-field-names] [--without-field-names]
+     [query]
 
 =head1 DESCRIPTION
 
@@ -55,17 +72,15 @@ C<*> marks required options.
 
 =over
 
-=item B<--config-path>=I<filename>
+=item B<--config-path>=I<s>, B<-c>
 
 Set path to configuration file.
 
-Can be specified multiple times.
-
-=item B<--config-profile>=I<s>
+=item B<--config-profile>=I<s>, B<-P>
 
 Set configuration profile to use.
 
-=item B<--no-config>
+=item B<--no-config>, B<-C>
 
 Do not use any configuration file.
 
@@ -91,6 +106,18 @@ Return array of full records instead of just ID fields.
 
 By default, only the key (ID) field is returned per result entry.
 
+
+=item B<--exclude-field>=I<s@>
+
+Select fields to return.
+
+Can be specified multiple times.
+
+=item B<--exclude-fields-json>=I<s>
+
+Select fields to return (JSON-encoded).
+
+See C<--exclude-field>.
 
 =item B<--field>=I<s@>
 
@@ -119,6 +146,10 @@ as list/array (field value, field value, ...).
 
 =over
 
+=item B<--tarball-contains>=I<s>
+
+Only return records where the 'tarball' field contains specified text.
+
 =item B<--tarball-in-json>=I<s>
 
 Only return records where the 'tarball' field is in the specified values (JSON-encoded).
@@ -139,6 +170,18 @@ Only return records where the 'tarball' field equals specified value.
 
 Only return records where the 'tarball' field does not equal specified value.
 
+=item B<--tarball-max>=I<s>
+
+Only return records where the 'tarball' field is less than or equal to specified value.
+
+=item B<--tarball-min>=I<s>
+
+Only return records where the 'tarball' field is greater than or equal to specified value.
+
+=item B<--tarball-not-contains>=I<s>
+
+Only return records where the 'tarball' field does not contain specified text.
+
 =item B<--tarball-not-in-json>=I<s>
 
 Only return records where the 'tarball' field is not in the specified values (JSON-encoded).
@@ -150,6 +193,14 @@ See C<--tarball-not-in>.
 Only return records where the 'tarball' field is not in the specified values.
 
 Can be specified multiple times.
+
+=item B<--tarball-xmax>=I<s>
+
+Only return records where the 'tarball' field is less than specified value.
+
+=item B<--tarball-xmin>=I<s>
+
+Only return records where the 'tarball' field is greater than specified value.
 
 =item B<--tarball>=I<s>
 
@@ -231,6 +282,8 @@ Only return records where the 'version' field is greater than specified value.
 
 Search.
 
+Can also be specified as the 1st command-line argument.
+
 =back
 
 =head2 Ordering options
@@ -295,6 +348,14 @@ you want to pipe the result for more post-processing. In this case you can use
 
     [1,2,3]
 
+
+=item B<--page-result>
+
+Filter output through a pager.
+
+=item B<--view-result>
+
+View output using a viewer.
 
 =back
 
@@ -378,11 +439,27 @@ You can put multiple profiles in a single file by using section names like C<[pr
 
 You can also put configuration for multiple programs inside a single file, and use filter C<program=NAME> in section names, e.g. C<[program=NAME ...]> or C<[SOMESECTION program=NAME]>. The section will then only be used when the reading program matches.
 
-Finally, you can filter a section by environment variable using the filter C<env=CONDITION> in section names. For example if you only want a section to be read if a certain environment variable is true: C<[env=SOMEVAR ...]> or C<[SOMESECTION env=SOMEVAR ...]>. If you only want a section to be read when the value of an environment variable has value equals something: C<[env=HOSTNAME=blink ...]> or C<[SOMESECTION env=HOSTNAME=blink ...]>. If you only want a section to be read when the value of an environment variable does not equal something: C<[env=HOSTNAME!=blink ...]> or C<[SOMESECTION env=HOSTNAME!=blink ...]>. If you only want a section to be read when an environment variable contains something: C<[env=HOSTNAME*=server ...]> or C<[SOMESECTION env=HOSTNAME*=server ...]>. Note that currently due to simplistic parsing, there must not be any whitespace in the value being compared because it marks the beginning of a new section filter or section name.
+You can also filter a section by environment variable using the filter C<env=CONDITION> in section names. For example if you only want a section to be read if a certain environment variable is true: C<[env=SOMEVAR ...]> or C<[SOMESECTION env=SOMEVAR ...]>. If you only want a section to be read when the value of an environment variable equals some string: C<[env=HOSTNAME=blink ...]> or C<[SOMESECTION env=HOSTNAME=blink ...]>. If you only want a section to be read when the value of an environment variable does not equal some string: C<[env=HOSTNAME!=blink ...]> or C<[SOMESECTION env=HOSTNAME!=blink ...]>. If you only want a section to be read when the value of an environment variable includes some string: C<[env=HOSTNAME*=server ...]> or C<[SOMESECTION env=HOSTNAME*=server ...]>. If you only want a section to be read when the value of an environment variable does not include some string: C<[env=HOSTNAME!*=server ...]> or C<[SOMESECTION env=HOSTNAME!*=server ...]>. Note that currently due to simplistic parsing, there must not be any whitespace in the value being compared because it marks the beginning of a new section filter or section name.
+
+To load and configure plugins, you can use either the C<-plugins> parameter (e.g. C<< -plugins=DumpArgs >> or C<< -plugins=DumpArgs@before_validate_args >>), or use the C<[plugin=NAME ...]> sections, for example:
+
+ [plugin=DumpArgs]
+ -event=before_validate_args
+ -prio=99
+ 
+ [plugin=Foo]
+ -event=after_validate_args
+ arg1=val1
+ arg2=val2
+
+ 
+
+which is equivalent to setting C<< -plugins=-DumpArgs@before_validate_args@99,-Foo@after_validate_args,arg1,val1,arg2,val2 >>.
 
 List of available configuration parameters:
 
  detail (see --detail)
+ exclude_fields (see --exclude-field)
  fields (see --field)
  format (see --format)
  naked_res (see --naked-res)
@@ -392,10 +469,16 @@ List of available configuration parameters:
  result_start (see --result-start)
  sort (see --sort)
  tarball (see --tarball)
+ tarball.contains (see --tarball-contains)
  tarball.in (see --tarball-in)
  tarball.is (see --tarball-is)
  tarball.isnt (see --tarball-isnt)
+ tarball.max (see --tarball-max)
+ tarball.min (see --tarball-min)
+ tarball.not_contains (see --tarball-not-contains)
  tarball.not_in (see --tarball-not-in)
+ tarball.xmax (see --tarball-xmax)
+ tarball.xmin (see --tarball-xmin)
  version (see --version-arg)
  version.contains (see --version-contains)
  version.in (see --version-in)
@@ -445,7 +528,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2018 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

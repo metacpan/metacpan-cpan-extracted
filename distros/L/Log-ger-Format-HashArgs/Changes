@@ -1,3 +1,8 @@
+0.005   2021-05-18  Released-By: PERLANCAR; Urgency: medium
+
+	- [bugfix] [testing] Add missing prereq (RT#136529).
+
+
 0.004   2021-05-15  Released-By: PERLANCAR; Urgency: low
 
 	- No functional changes.

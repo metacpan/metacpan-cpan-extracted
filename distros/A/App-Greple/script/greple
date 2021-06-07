@@ -29,13 +29,6 @@ use Data::Dumper;
 }
 
 ##
-## Setting utf8 warnings fatal makes it easy to find code conversion
-## error, so you can choose appropriate file code or automatic code
-## recognition, but loose a chance to find string in unrelated area.
-##
-use warnings FATAL => 'utf8';
-
-##
 ## Setup greple/lib to be a module directory if exists.
 ##
 BEGIN {
@@ -67,7 +60,7 @@ greple - extensible grep with lexical expression and region control
 =head1 VERSION
 
 
-Version 8.4301
+Version 8.4401
 
 
 =head1 SYNOPSIS
@@ -157,6 +150,7 @@ B<greple> [B<-M>I<module>] [ B<-options> ] pattern [ file... ]
     --require=file       include perl program
     --conceal=type       conceal run time errors
     --persist            continue even after encoding error
+    --alert [name=#]     set alert parameter (size/time)
     -d flags             display info (f:file d:dir c:color m:misc s:stat)
 
 =cut
@@ -223,6 +217,7 @@ my $opt_linestyle = 'line';
 my %opt_conceal = (read => 1, skip => 0);
 my $opt_persist = 0;
 my %opt_format = (LINE => '%d:', FILE => '%s:');
+my %opt_alert = (size => 512 * 1024, time => 2);
 my $opt_usage;
 my $opt_exit;
 
@@ -323,6 +318,7 @@ my @optargs = (
     'conceal=i'          => \%opt_conceal,
     'persist!'           => \$opt_persist,
     'format=s'           => \%opt_format,
+    'alert=i'            => \%opt_alert,
     'usage:s'            => \$opt_usage,
     'exit=i'             => \$opt_exit,
     'M:s'                => sub {
@@ -660,6 +656,7 @@ my %colormap = (
     LINE     => "Y",
     TEXT     => "",
     BLOCKEND => "/WE",
+    PROGRESS => "B",
     );
 
 my @colors;
@@ -795,6 +792,7 @@ my %stat = (
     match_positive => 0,
     match_negative => 0,
     match_block => 0,
+    persist => 0,
     time_start => [],
     time_end => [],
     );
@@ -885,12 +883,6 @@ sub close_stdout {
 
 sub read_stdin { <SAVESTDIN> }
 
-my($before_read, $after_read);
-if ($opt_conceal{read}) {
-    $before_read = sub { close STDERR };
-    $after_read  = sub { recover_stderr };
-}
-
 use Getopt::EX::Colormap qw(ansi_code);
 use constant {
     EL  => ansi_code('{EL}'),    # Erase Line
@@ -903,8 +895,11 @@ use constant {
 };
 
 my($progress_show, $progress_reset) = do {
+    use Getopt::EX::Colormap qw(ansi_code);
     my $n;
-    my $print = sub { printflush STDERR DSC, @_, CR, DRC };
+    my($s, $e) = ! $need_color ? ('', '') :
+	( ansi_code $colormap{PROGRESS}, ansi_code 'Z');
+    my $print = sub { printflush STDERR DSC, $s, @_, $e, CR, DRC };
     my $start = do {
 	if ($opt_d{n} and $opt_d{f}) {
 	    sub { $print->(++$n, " ", $current_file, ED) }
@@ -982,18 +977,25 @@ exit($opt_exit // ($stat{match_effective} == 0));
 
 ######################################################################
 
+sub stdin {
+    ##
+    ## Setting utf8 warnings fatal makes it easy to find code conversion
+    ## error, so you can choose appropriate file code or automatic code
+    ## recognition, but loose a chance to find string in unrelated area.
+    ##
+    use warnings FATAL => 'utf8';
+    local $/;
+    <STDIN>;
+}
+
 sub grep_files {
   FILE:
     while (defined($current_file = open_nextfile())) {
-
-	&$before_read() if $before_read;
-	my $content = eval { local $/; <STDIN> };
-	&$after_read() if $after_read;
-
+	my $content = eval { stdin };
 	if (not defined $content) {
-	    warn $@ if $@;
+	    warn $@ if $@ and !$opt_conceal{read};
 	    if (not $opt_persist) {
-		warn "SKIP $current_file\n" unless $opt_conceal{skip};
+		warn "SKIP $current_file\n" if !$opt_conceal{skip};
 		next FILE;
 	    }
 
@@ -1001,14 +1003,15 @@ sub grep_files {
 	    binmode STDIN, ':raw';
 	    seek STDIN, 0, 0 or do {
 		warn "SKIP $current_file (not seekable)\n"
-		    unless $opt_conceal{skip};
+		    if !$opt_conceal{skip};
 		next FILE;
 	    };
-	    $content = eval { local $/; <STDIN> };
+	    $content = eval { stdin };
 	    if (not defined $content) {
-		warn "SKIP* $current_file\n" unless $opt_conceal{skip};
+		warn "SKIP* $current_file\n" if !$opt_conceal{skip};
 		next FILE;
 	    }
+	    $stat{persist}++;
 	    binmode STDOUT, ':raw';
 	}
 
@@ -1022,6 +1025,7 @@ sub grep_files {
 	# recover STDIN for opening '-' and some weird command which needs
 	# STDIN opened (like unzip)
 	recover_stdin;
+	binmode STDOUT, ":encoding($output_code)";
     }
 }
 
@@ -1125,6 +1129,8 @@ sub grep_data {
 	region_index => $opt_regioncolor,
 	stat         => \%stat,
 	callback     => @opt_callback ? $opt_callback[-1] : undef,
+	alert_size   => $opt_alert{size},
+	alert_time   => $opt_alert{time},
 	)->run;
     my $matched = $grep->matched;
 
@@ -1983,6 +1989,7 @@ Another form of colormap option to specify the color for fields:
     LINE      Line number
     TEXT      Unmatched normal text
     BLOCKEND  Block end mark
+    PROGRESS  Progress status with -dnf option
 
 In current release, C<BLOCKEND> mark is colored with C<E> effect
 recently implemented in L<Getopt::EX> module, which allows to fill up
@@ -2563,10 +2570,12 @@ Include arbitrary perl program.
 Display informations.  Various kind of debug, diagnostic, monitor
 information can be display by giving appropriate flag to -d option.
 
+    c: color information
     d: directory information
     e: eval string
     f: processing file name
     m: misc debug information
+    n: number of processing files
     o: option related information
     p: run `ps' command before termination (on Unix)
     s: statistic information
@@ -2611,6 +2620,20 @@ Next command will show strings in binary file.
 
 If you want read all files as binary data, use B<--icode=binary>
 instead.
+
+=item B<--alert> [ I<size>=# | I<time>=# ]
+
+Set alert parameter for large file.  B<Greple> scans whole file
+content to know line borders, and it takes several seconds or more if
+it contains large number of lines.
+
+By default, if the target file contains more than B<512 * 1024
+characters> (I<size>), B<2 seconds> timer is started (I<time>).  Alert
+message is shown when the timer expired.
+
+To disable this alert, set I<size> to 0:
+
+    --alert size=0
 
 =item B<-Mdebug>, B<-d>I<x>
 
@@ -2841,11 +2864,11 @@ You can use the module like this:
 
     greple -Mperl --colorful --code --comment --pod default greple
 
-If special subroutine B<initialize()> and B<finalize()> are defined in
+If special subroutine C<initialize()> and C<finalize()> are defined in
 the module, they are called at the beginning with
-C<Getopt::EX::Module> object as a first argument.  Second argument is
+L<Getopt::EX::Module> object as a first argument.  Second argument is
 the reference to C<@ARGV>, and you can modify actual C<@ARGV> using
-it.  See B<find> module as a sample.
+it.  See L<App::Greple::find> module as an example.
 
 Calling sequence is like this.  See L<Getopt::EX::Module> for detail.
 

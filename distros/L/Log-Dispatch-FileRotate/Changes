@@ -1,5 +1,13 @@
 Revision history for Perl extension Log::Dispatch::FileRotate.
 
+1.38 Wed 14 26 2021
+    - No Changes other than SIGNATURE, v1.37 was missing SIGNATURE
+
+1.37 Wed 58 26 2021
+    - Improve synopsis showing how to use it with Log::Dispatch [Github #23]
+    - Bump minimum version of Log::Dispatch to v2.59 to address minimum
+      List::Util indirect dependency via Specio [Github #26]
+
 1.36 Sun 24 29 2018
     - If the "permissions" param is set, use the same permissions for the lock
       file that the log file will use. [github #21]

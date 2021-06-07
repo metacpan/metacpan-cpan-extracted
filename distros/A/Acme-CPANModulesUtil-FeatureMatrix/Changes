@@ -1,8 +1,18 @@
-0.002   2019-01-12 (PERLANCAR)
+0.004   2021-02-20  Released-By: PERLANCAR; Urgency: medium
+
+	- Support non-boolean feature.
+
+
+0.003   2021-02-20  Released-By: PERLANCAR; Urgency: medium
+
+	- [ux] Reuse note with the same text.
+
+
+0.002   2019-01-12  Released-By: PERLANCAR
 
 	- Accept _list argument.
 
 
-0.001   2019-01-11 (PERLANCAR)
+0.001   2019-01-11  Released-By: PERLANCAR
 
         - First release.

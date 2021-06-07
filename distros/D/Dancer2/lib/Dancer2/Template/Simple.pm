@@ -1,6 +1,6 @@
 package Dancer2::Template::Simple;
 # ABSTRACT: Pure Perl 5 template engine for Dancer2
-$Dancer2::Template::Simple::VERSION = '0.301002';
+$Dancer2::Template::Simple::VERSION = '0.301004';
 use Moo;
 use Dancer2::FileUtils 'read_file_content';
 use Ref::Util qw<is_arrayref is_coderef is_plain_hashref>;
@@ -155,7 +155,7 @@ Dancer2::Template::Simple - Pure Perl 5 template engine for Dancer2
 
 =head1 VERSION
 
-version 0.301002
+version 0.301004
 
 =head1 SYNOPSIS
 
@@ -165,15 +165,14 @@ To use this engine, you may configure L<Dancer2> via C<config.yaml>:
 
 =head1 DESCRIPTION
 
-This template engine is provided as a default one for the Dancer2 micro
-framework.
+This template engine is primarily to serve as a migration path for users of 
+L<Dancer>. It should be fine for development purposes, but you would be 
+better served by using L<Dancer2::Template::TemplateToolkit> or one of the
+many alternatives available on CPAN to power an application with Dancer2 
+in production environment. 
 
-This template engine should be fine for development purposes but is not a
-powerful one, it's written in pure Perl and has no C bindings to accelerate the
-template processing.
-
-If you want to power an application with Dancer2 in production environment, it's
-strongly advised to switch to L<Dancer2::Template::TemplateToolkit>.
+C<Dancer2::Template::Simple> is written in pure Perl and has no C bindings 
+to accelerate the template processing.
 
 =head1 METHODS
 

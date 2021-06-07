@@ -1,5 +1,10 @@
 Revision history for Alien-m4
 
+0.20      2021-05-28 18:28:27 -0600
+  - Remove patch for linux that is no longer needed
+  - black list 1.4.19 on Windows and macOS where m4 no longer
+    builds.
+
 0.19      2020-02-11 21:36:48 -0700
   - Apply patch for macOS share install (gh#6, gh#7)
 

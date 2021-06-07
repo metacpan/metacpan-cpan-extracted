@@ -1,0 +1,153 @@
+#!/usr/bin/perl -T
+use v5.8 ; use strict ; use warnings ; 
+use Getopt::Std ; #getoptions 'l' , \my %o ;
+use Time::Local ; 
+use Term::ANSIColor qw[:constants] ; $Term::ANSIColor::AUTORESET = 1 ;
+
+getopts '~.:0:1dhlmpqsx',  \my %o ; 
+do { select STDERR ; HELP_MESSAGE () } if ! @ARGV && ! $o{x} ; 
+
+$o{0} //= '' ; 
+my $dig = ($o{'.'} // 2) ; # 小数点以下何桁まで表示をするか
+$dig = $& if ($dig =~ /\d+/); #<- 本当は良くない。Taintのじょきょうょ
+my $fmt = "%0.${dig}f" ; # "%.4g" # 出力の printf形式のフォーマット
+my $info= $o{l} ? sub { lstat $_[0] }  : sub ($) { stat $_[0] }  ;
+my $t0 = timelocal ( localtime ) ; # <---- -- ただ今の時刻
+my $div = $o{d} ? 86400 : $o{h} ? 3600 : $o{m} ? 60 : undef ; # 秒数をいくつで割るか
+my $u = $o{d} ? '(d)' : $o{h} ? '(h)' : $o{m} ? '(m)' : '(s)' ; # 単位の表示
+#$"="\t" ;  # print "@out" に似た様な構文が何カ所かで出現する。
+
+my $tz = do {my $now = time();my $off = (timegm(localtime($now))-timegm(gmtime($now)))/ 60; sprintf( "%+03d:%02d", $off/60, $off%60 );} if $o{0} ; # タイムゾーンの抽出
+
+
+print STDERR BRIGHT_RED "Warning: '-0 ", ON_BLUE $o{0} , RESET BRIGHT_RED "' is specified but ",
+ ON_BLUE $o{0}, RESET BRIGHT_RED  " seems like a file.\n" if defined $o{0} && -e $o{0} ; 
+print STDERR BRIGHT_RED "Warning: '-. ", ON_BLUE $o{'.'} , RESET BRIGHT_RED "' is specified but ",
+ ON_BLUE $o{'.'}, RESET BRIGHT_RED  " seems like a file.\n" if defined $o{'.'} && -e $o{'.'} ; 
+
+& main ; 
+exit ; 
+
+sub main { 
+    # 列名の入力
+    if ( ! $o{1} ) {
+		my @out = qw[atime mtime ctime] ;
+		grep { $_ .= $u } @out ; # (d) (h) (s) などの時間を単位を末尾に足す。
+        push @out, qw[per.] if $o{p} ;
+        push @out, qw[size(B)] if $o{s} ;
+		splice @out, ($o{'~'} ? 0 : @out) , 0, qw[filename]; 
+		print join ("\t" , @out), "\n" ;
+	}
+
+    if ( $o{x} ) 
+    { 
+        & eachFile for <> ; 
+    } 
+    else { 
+        & eachFile for @ARGV ; 
+    }  
+}
+
+sub eachFile {
+    chomp ; 
+    do { print STDERR CYAN "'$_' : Not exists.\n" ; next } unless  -e ;
+    my @w=(8,9,10)  ; 
+    #push @w, (7) if $o{s} ;
+    my @infos =  $info->($_) ; 
+    my @out = my @out0 = @infos[ @w ] ; # atime mtime ctime
+    @out = @out0 = map { $t0 - $_ } @out ;
+    @out = map { sprintf $fmt , $_ / $div } @out0  if defined $div ; 
+    @out = map { &dt ($_)} @{[ $info->($_) ]}[ 8,9,10 ]  if $o{0} =~ /[td]/i ;    
+    push @out, sprintf '%04o' , $infos[2] & 0777 if $o{p} ;
+    push @out, $infos[7] if $o{s} ;
+    #@out = map { &ymd ($_)} @{[ $info->($_) ]}[ 8,9,10 ]  if $o{0} =~ /d/i ; 
+
+    $_ .= '/' if -d ; # ディレクトリには 名前の末尾に / を追加。
+    splice @out , ($o{'~'} ? 0 : @out)  , 0 , $_  ; # ファイル名の挿入
+    grep { $_ = qq['$_'] } @out if $o{q} ;
+    print join ("\t" , @out) , "\n" ;
+}
+
+sub dt ( $ ){
+	my @T = $o{0} =~ m/u/i ? gmtime $_[0] : localtime $_[0] ; 
+	my @ret ; 
+    if ( $o{0} =~ /[dT]/ ) { 
+        push @ret , sprintf '%02d-%02d-%02d', $T[5] % 100 , $T[4]+1, $T[3] if $o{0} !~ /[4T]/ ; 
+        push @ret , sprintf '%04d-%02d-%02d', $T[5] + 1900, $T[4]+1, $T[3] if $o{0} =~ /[4T]/ ; 
+    }
+    push @ret , sprintf @{ [qw{Sun Mon Tue Wed Thu Fri Sat}] }[ $T[6] ]  if $o{0} =~ /^[^cj]*y[^cj]*$/i ; 
+    push @ret , sprintf @{ [qw{日 月 火 水 木 金 土}] }[ $T[6] ]  if $o{0} =~ /y.*j|j.*y/i  ; 
+    push @ret , sprintf @{ [qw{日 一 二 三 四 五 六}] }[ $T[6] ]  if $o{0} =~ /y.*c|c.*y/i  ; 
+	push @ret , sprintf '%02d:%02d:%02d' , @T[2,1,0] if $o{0} =~/[tT]/ ; 
+    my $retstr = join ' ' , @ret ;
+    $retstr = "$ret[0]T$ret[1]$tz" if $o{0} =~ m/T/ ;
+    $retstr = qq["$retstr"] if $o{0} =~ m/q/ ;
+	return $retstr ; 
+}
+
+## ヘルプの扱い
+sub VERSION_MESSAGE {}
+sub HELP_MESSAGE {
+    use FindBin qw[ $Script ] ; 
+    $ARGV[1] //= '' ;
+    open my $FH , '<' , $0 ;
+    while(<$FH>){
+        s/\$0/$Script/g ;
+        print $_ if s/^=head1// .. s/^=cut// and $ARGV[1] =~ /^o(p(t(i(o(ns?)?)?)?)?)?$/i ? m/^\s+\-/ : 1;
+    }
+    close $FH ;
+    exit 0 ;
+}
+
+
+=encoding utf8
+
+=head1
+
+ $0 ファイル名のリスト
+ 
+  各ファイルについて、次の時刻から現在までの秒数を出力する。Seconds after the following for each file specified.
+   (1) アクセス access (2) 更新時刻 update (3) i-nodeの変更時刻
+
+ 利用例 usage : 
+
+   $0 -m *    #  分単位でファイルの古さを表示
+   find . | xargs $0  #  ファイル名のリストの中に、空白文字を含む場合はこちらを使う。 
+   find . | $0 -x     #  xargs であふれる場合はこちらを使う。
+   $0 -0 dt *  #  ファイルの時刻情報3個を，現在の日時と比較しないで出力。
+   $0 -x 改行区切りでファイル名を内容に含むファイル
+   $0 -0 dt4  *       # 現在までの経過時間とは関係無く、西暦でファイル情報を表示
+   $0 -0 dy -s -p  *  # 曜日を表示。ファイルサイズとファイルのパーミッションも表示。    
+
+ オプション options :
+
+    -d : 経過時間を日単位で出力する。 in day unit.
+    -h : 経過時間を時間単位で出力する。 in hour unit.
+    -m : 経過時間を分単位で出力する。 in minute unit.
+    -l : シンボリックリンクの先のファイルの情報を取得する。
+    -s : ファイルサイズも出力する。 Also add files byte sizes.
+    -p ; ファイルのパーミッション情報も出力する。 Also outputs File permission. 
+    -x  ; xargs $0 と同じ機能がある。xargs であふれる時に便利。
+    -. N : 小数点以下何桁まで表示をするか(日、時、分単位の時に便利)。 Digits after the decimal point in the output.
+    -~  : ファイル名を各行の先頭に置く。 File names put in the mostleft column.
+
+    -0 str: ファイルの時刻情報について、現在時刻との差分を出さない。下記の様なオプションを持つ。-0 dtのように組みあわせが可能。
+     -0 u : UTC (世界時)で情報を出す。ローカル日時情報では無くなる。
+     -0 d : 年月日の日付を出す
+     -0 d4 : 年の部分を4桁にする。
+     -0 y : 曜日情報を出す
+     -0 yj : 日本語で曜日情報
+     -0 yc : 中国語で曜日(星期の一から六と日)の情報
+     -0 t : 時分秒の時刻情報を出す。
+     -0 q ; ダブルクォーテーションで日時情報を囲む。    
+     -0 T ; 日時情報を日付と時刻の間は空白ではなくて大文字のTが入り、時刻帯情報も入る。ISO 8601拡張形式。
+
+    -1 : 通常の出力の1行目にある、atime, mtime, ctime, filename の情報を出力しない
+    -q : 出力をコピペして，別のコマンドで利用しやすいように、シングルクォーテーションで囲んだ形式で出力する。      
+
+
+  開発上のメモ
+     * -t で基準時刻を指定できる様にしたい。
+     * 日本語のファイル名を持つディレクトリにおいて、"$0 *" (madeafter * ) が動作しない場合もあるが、cat <(echo *) もうまくいかない。zsh/bashでの設定の問題だが、注意を促すメッセージを出しても良い。
+     
+=cut

@@ -1,3 +1,22 @@
+0.2.1   2021-06-01  Released-By: PERLANCAR; Urgency: medium
+
+	- Mention some subnamespaces under TableData::* like TableData::Lingua::
+	  and TableData::Locale::. Add nmespace TableDataBase{,s}. Add nmespace
+	  TableDataRoles, change TableDataCollection -> TableDataBundle.
+
+
+0.2.0   2021-06-01  Released-By: PERLANCAR; Urgency: medium; Backward-Incompatible: yes
+
+        [Incompatible changes]
+
+        - Incorporate Role::TinyCommons::Iterator::Resettable, like HashData and
+          ArrayData. Method names changed/added/removed.
+
+        [Removed]
+
+        - Remove TableDataRole::Spec::Seekable.
+
+
 0.1.5   2021-04-11  Released-By: PERLANCAR; Urgency: medium; Backward-Incompatible: yes
 
 	[Removed]

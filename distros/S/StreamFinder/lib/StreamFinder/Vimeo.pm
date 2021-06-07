@@ -328,63 +328,25 @@ use warnings;
 use URI::Escape;
 use HTML::Entities ();
 use LWP::UserAgent ();
-use vars qw(@ISA @EXPORT);
+use parent 'StreamFinder::_Class';
 
 my $DEBUG = 0;
-my $bummer = ($^O =~ /MSWin/);
-my %uops = ();
-my @userAgentOps = ();
-
-require Exporter;
-
-@ISA = qw(Exporter);
-@EXPORT = qw(get getURL getType getID getTitle getIconURL getIconData getImageURL getImageData);
 
 sub new
 {
 	my $class = shift;
 	my $url = shift;
 
-	my $self = {};
 	return undef  unless ($url);
 #	return undef  if ($url =~ /\bplayer\.vimeo\b/);
 
-	my $homedir = $bummer ? $ENV{'HOMEDRIVE'} . $ENV{'HOMEPATH'} : $ENV{'HOME'};
-	$homedir ||= $ENV{'LOGDIR'}  if ($ENV{'LOGDIR'});
-	$homedir =~ s#[\/\\]$##;
-	foreach my $p ("${homedir}/.config/StreamFinder/config", "${homedir}/.config/StreamFinder/Vimeo/config") {
-		if (open IN, $p) {
-			my ($atr, $val);
-			while (<IN>) {
-				chomp;
-				next  if (/^\s*\#/o);
-				($atr, $val) = split(/\s*\=\>\s*/o, $_, 2);
-				eval "\$uops{$atr} = $val";
-			}
-			close IN;
-		}
-	}
-	foreach my $i (qw(agent from conn_cache default_headers local_address ssl_opts max_size
-			max_redirect parse_head protocols_allowed protocols_forbidden requests_redirectable
-			proxy no_proxy)) {
-		push @userAgentOps, $i, $uops{$i}  if (defined $uops{$i});
-	}
-	push (@userAgentOps, 'agent', 'Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101 Firefox/68.0')
-			unless (defined $uops{'agent'});
-	$uops{'timeout'} = 10  unless (defined $uops{'timeout'});
-	$uops{'secure'} = 0    unless (defined $uops{'secure'});
-	$DEBUG = $uops{'debug'}  if (defined $uops{'debug'});
+	my $self = $class->SUPER::new('Vimeo', @_);
+	$DEBUG = $self->{'debug'}  if (defined $self->{'debug'});
 
 	while (@_) {
-		if ($_[0] =~ /^\-?debug$/o) {
+		if ($_[0] =~ /^\-?quality$/o) {
 			shift;
-			$DEBUG = (defined($_[0]) && $_[0] =~/^[0-9]$/) ? shift : 1;
-		} elsif ($_[0] =~ /^\-?quality$/o) {
-			shift;
-			$uops{'vimeo_quality'} = (defined $_[0]) ? shift : 0;
-		} elsif ($_[0] =~ /^\-?secure$/o) {
-			shift;
-			$uops{'secure'} = (defined $_[0]) ? shift : 1;
+			$self->{'vimeo_quality'} = (defined $_[0]) ? shift : 0;
 		} else {
 			shift;
 		}
@@ -399,25 +361,14 @@ sub new
 	}
 	my $player_url = 'https://player.vimeo.com/video/'. $self->{'id'};
 	print STDERR "-1 FETCHING URL=$player_url= ID=".$self->{'id'}."=\n"  if ($DEBUG);
-	$self->{'title'} = '';
-	$self->{'artist'} = '';
-	$self->{'album'} = '';
-	$self->{'description'} = '';
-	$self->{'created'} = '';
-	$self->{'year'} = '';
 	$self->{'genre'} = 'Video';
-	$self->{'iconurl'} = '';
-	$self->{'streams'} = [];
-	$self->{'cnt'} = 0;
-	$self->{'Url'} = '';
-	$self->{'playlist'} = '';
 	$self->{'albumartist'} = $player_url;
 
 	#VIMEO VIDEOS BEST SCANNED MANUALLY!:
 
 	my $html = '';
-	my $ua = LWP::UserAgent->new(@userAgentOps);		
-	$ua->timeout($uops{'timeout'});
+	my $ua = LWP::UserAgent->new(@{$self->{'_userAgentOps'}});		
+	$ua->timeout($self->{'timeout'});
 	$ua->cookie_jar({});
 	$ua->env_proxy;
 	my $response = $ua->get($player_url);
@@ -440,7 +391,7 @@ sub new
 		eval "\$v = $s";
 		my %streams;
 		my $cnt = 0;
-		my $quality = defined ($uops{'vimeo_quality'}) ? $uops{'vimeo_quality'} : 0;
+		my $quality = defined ($self->{'vimeo_quality'}) ? $self->{'vimeo_quality'} : 0;
 		my $direction = ($quality =~ s/^([\<\=\>])//) ? $1 : '<';
 		print STDERR "--USER-REQ. QUALITY=$quality= DIR=$direction=\n"  if ($DEBUG);
 		foreach my $i (@{$v}) {
@@ -452,7 +403,7 @@ sub new
 		}
 		if ($cnt) {
 			foreach my $i (sort { $a <=> $b } keys %streams) {
-				unless ($uops{'secure'} && $streams{$i} !~ /^https/o) {
+				unless ($self->{'secure'} && $streams{$i} !~ /^https/o) {
 					print STDERR "**** VIMEO STREAM FOUND: QUALITY($i)=$streams{$i}=\n"  if ($DEBUG);
 					unshift @{$self->{'streams'}}, $streams{$i};
 					$self->{'cnt'}++;
@@ -473,15 +424,15 @@ sub new
 		$url2fetch = 'https://www.vimeo.com/' . $url  unless ($url2fetch =~ m#^https?\:#);
 		print STDERR "\n-2 NO STREAMS FOUND IN PLAYER PAGE, TRYING youtube-dl...\n"  if ($DEBUG);
 		my $ytdlArgs = '--get-url --get-thumbnail --get-title --get-description -f "'
-				. ((defined $uops{'format'}) ? $uops{'format'} : 'mp4')
-				. '" ' . ((defined $uops{'youtube-dl-args'}) ? $uops{'youtube-dl-args'} : '');
+				. ((defined $self->{'format'}) ? $self->{'format'} : 'mp4')
+				. '" ' . ((defined $self->{'youtube-dl-args'}) ? $self->{'youtube-dl-args'} : '');
 		my $try = 0;
 		my ($more, @ytdldata, @ytStreams);
 
 RETRYIT:
-		if (defined($uops{'userid'}) && defined($uops{'userpw'})) {  #USER HAS A LOGIN CONFIGURED:
-			my $uid = $uops{'userid'};
-			my $upw = $uops{'userpw'};
+		if (defined($self->{'userid'}) && defined($self->{'userpw'})) {  #USER HAS A LOGIN CONFIGURED:
+			my $uid = $self->{'userid'};
+			my $upw = $self->{'userpw'};
 			$_ = `youtube-dl --username "$uid" --password "$upw" $ytdlArgs "$url2fetch"`;
 		} else {
 			$_ = `youtube-dl $ytdlArgs "$url2fetch"`;
@@ -501,7 +452,7 @@ RETRYIT:
 			$_ = shift @ytdldata;
 			$more = 0  unless (m#^https?\:\/\/#o);
 			if ($more) {
-				push @ytStreams, $_  unless ($uops{'secure'} && $_ !~ /^https/o);
+				push @ytStreams, $_  unless ($self->{'secure'} && $_ !~ /^https/o);
 			} else {
 				$self->{'description'} .= $_ . ' ';
 			}
@@ -516,7 +467,6 @@ RETRYIT:
 		}
 		$self->{'imageurl'} ||= $self->{'iconurl'};
 		print STDERR "-count=".$self->{'cnt'}."= iconurl=".$self->{'iconurl'}."=\n"  if ($DEBUG);
-		print STDERR "--SUCCESS: stream url=".$self->{'Url'}."=\n"  if ($DEBUG);
 		if ($self->{'description'} =~ /\w/) {
 			$self->{'description'} =~ s/\s+$//;
 			$self->{'description'} = HTML::Entities::decode_entities($self->{'description'});
@@ -528,153 +478,14 @@ RETRYIT:
 	$self->{'description'} ||= $self->{'title'};
 	$self->{'iconurl'} ||= $self->{'imageurl'}  if ($self->{'imageurl'});
 	$self->{'total'} = $self->{'cnt'};
-	$self->{'Url'} = ($self->{'cnt'} > 0) ? $self->{'streams'}->[0] : '';
+	$self->{'Url'} = ($self->{'total'} > 0) ? $self->{'streams'}->[0] : '';
+	print STDERR "--SUCCESS: 1st stream=".$self->{'Url'}."= total=".$self->{'total'}."=\n"
+			if ($DEBUG && $self->{'cnt'} > 0);
 	print STDERR "\n--ID=".$self->{'id'}."=\n--TITLE=".$self->{'title'}."=\n--CNT=".$self->{'cnt'}."=\n--ICON=".$self->{'iconurl'}."=\n--1ST=".$self->{'Url'}."=\n--streams=".join('|',@{$self->{'streams'}})."=\n"  if ($DEBUG);
 
 	bless $self, $class;   #BLESS IT!
 
 	return $self;
-}
-
-sub get
-{
-	my $self = shift;
-
-	return wantarray ? @{$self->{'streams'}} : $self->{'Url'};
-}
-
-sub getURL   #LIKE GET, BUT ONLY RETURN THE SINGLE ONE W/BEST BANDWIDTH AND RELIABILITY:
-{
-	my $self = shift;
-	my $arglist = (defined $_[0]) ? join('|',@_) : '';
-	my $idx = ($arglist =~ /\b\-?random\b/) ? int rand scalar @{$self->{'streams'}} : 0;
-	if (($arglist =~ /\b\-?nopls\b/ && ${$self->{'streams'}}[$idx] =~ /\.(pls)$/i)
-			|| ($arglist =~ /\b\-?noplaylists\b/ && ${$self->{'streams'}}[$idx] =~ /\.(pls|m3u8?)$/i)) {
-		my $plType = $1;
-		my $firstStream = ${$self->{'streams'}}[$idx];
-		print STDERR "-getURL($idx): NOPLAYLISTS and (".${$self->{'streams'}}[$idx].")\n"  if ($DEBUG);
-		my $ua = LWP::UserAgent->new(@userAgentOps);		
-		$ua->timeout($uops{'timeout'});
-		$ua->cookie_jar({});
-		$ua->env_proxy;
-		my $html = '';
-		my $response = $ua->get($firstStream);
-		if ($response->is_success) {
-			$html = $response->decoded_content;
-		} else {
-			print STDERR $response->status_line  if ($DEBUG);
-			my $no_wget = system('wget','-V');
-			unless ($no_wget) {
-				print STDERR "\n..trying wget...\n"  if ($DEBUG);
-				$html = `wget -t 2 -T 20 -O- -o /dev/null \"$firstStream\" 2>/dev/null `;
-			}
-		}
-		my @lines = split(/\r?\n/, $html);
-		my @plentries = ();
-		my $firstTitle = '';
-		my $plidx = ($arglist =~ /\b\-?random\b/) ? 1 : 0;
-		if ($plType =~ /pls/i) {  #PLS:
-			foreach my $line (@lines) {
-				if ($line =~ m#^\s*File\d+\=(.+)$#o) {
-					push (@plentries, $1);
-				} elsif ($line =~ m#^\s*Title\d+\=(.+)$#o) {
-					$firstTitle ||= $1;
-				}
-			}
-			$self->{'title'} ||= $firstTitle;
-			$self->{'title'} = HTML::Entities::decode_entities($self->{'title'});
-			$self->{'title'} = uri_unescape($self->{'title'});
-			print STDERR "-getURL(PLS): title=$firstTitle= pl_idx=$plidx=\n"  if ($DEBUG);
-		} elsif ($arglist =~ /\b\-?noplaylists\b/) {  #m3u*:
-			(my $urlpath = ${$self->{'streams'}}[$idx]) =~ s#[^\/]+$##;
-			foreach my $line (@lines) {
-				if ($line =~ m#^\s*([^\#].+)$#o) {
-					my $urlpart = $1;
-					$urlpart =~ s#^\s+##o;
-					$urlpart =~ s#^\/##o;
-					push (@plentries, ($urlpart =~ m#https?\:#) ? $urlpart : ($urlpath . '/' . $urlpart));
-					last  unless ($plidx);
-				}
-			}
-			print STDERR "-getURL(m3u?): pl_idx=$plidx=\n"  if ($DEBUG);
-		}
-		if ($plidx && $#plentries >= 0) {
-			$plidx = int rand scalar @plentries;
-		} else {
-			$plidx = 0;
-		}
-		$firstStream = (defined($plentries[$plidx]) && $plentries[$plidx]) ? $plentries[$plidx]
-				: ${$self->{'streams'}}[$idx];
-
-		return $firstStream;
-	}
-
-	return ${$self->{'streams'}}[$idx];
-}
-
-sub count
-{
-	my $self = shift;
-	return $self->{'total'};  #TOTAL NUMBER OF PLAYABLE STREAM URLS FOUND.
-}
-
-sub getType
-{
-	my $self = shift;
-	return 'Vimeo';  #STATION TYPE (FOR PARENT StreamFinder MODULE).
-}
-
-sub getID
-{
-	my $self = shift;
-	return $self->{'id'};  #VIDEO'S VIMEO-ID.
-}
-
-sub getTitle
-{
-	my $self = shift;
-	return $self->{'description'}  if (defined($_[0]) && $_[0] =~ /^\-?(?:long|desc)/i);
-	return $self->{'title'};  #STATION'S TITLE(DESCRIPTION), IF ANY.
-}
-
-sub getIconURL
-{
-	my $self = shift;
-	return $self->{'iconurl'};  #URL TO THE VIDEO'S THUMBNAIL ICON, IF ANY.
-}
-
-sub getIconData
-{
-	my $self = shift;
-	return ()  unless ($self->{'iconurl'});
-	my $ua = LWP::UserAgent->new(@userAgentOps);		
-	$ua->timeout($uops{'timeout'});
-	$ua->cookie_jar({});
-	$ua->env_proxy;
-	my $art_image = '';
-	my $response = $ua->get($self->{'iconurl'});
-	if ($response->is_success) {
-		$art_image = $response->decoded_content;
-	} else {
-		print STDERR $response->status_line  if ($DEBUG);
-		my $no_wget = system('wget','-V');
-		unless ($no_wget) {
-			print STDERR "\n..trying wget...\n"  if ($DEBUG);
-			my $iconUrl = $self->{'iconurl'};
-			$art_image = `wget -t 2 -T 20 -O- -o /dev/null \"$iconUrl\" 2>/dev/null `;
-		}
-	}
-	return ()  unless ($art_image);
-	(my $image_ext = $self->{'iconurl'}) =~ s/^.+\.//;
-	$image_ext =~ s/[^A-Za-z].*$//;
-
-	return ($image_ext, $art_image);
-}
-
-sub getImageURL
-{
-	my $self = shift;
-	return $self->{'imageurl'};  #URL TO THE VIDEO'S BANNER IMAGE, IF ANY.
 }
 
 sub getImageData

@@ -1,0 +1,171 @@
+## name GoodFeatures
+## failures 0
+## cut
+
+my $x : Foo = 1;
+use UNIVERSAL ();
+UNIVERSAL->can('foo');
+use POSIX ();
+for my $foo (qw(foo bar)) { ... }
+1 for qw(foo bar);
+do { ... };
+do '...';
+do $foo;
+isalnum $foo;
+isalpha $foo;
+iscntrl $foo;
+isdigit $foo;
+isgraph $foo;
+islower $foo;
+isprint $foo;
+ispunct $foo;
+isspace $foo;
+isupper $foo;
+isxdigit $foo;
+tmpnam $foo;
+defined $foo;
+defined $foo[0];
+defined $foo{bar};
+defined &foo;
+$obj->defined(@foo);
+foo ? bar ? 'foo' : 'bar' : 'baz';
+foo ? bar ? foo : bar : baz;
+$foo =~ m?foo?;
+$foo =~ s?foo?bar?;
+"\N{FOO BAR}";
+`\N{FOO BAR}`;
+qx(\N{FOO BAR});
+qq{\N{FOO BAR}};
+qr/\N{FOO BAR}/;
+m'\N{FOO BAR}';
+s{\N{FOO BAR}}{};
+keys %hash;
+keys %$href;
+keys(%{$href});
+keys %{$foo{bar}[5]};
+keys $foo->{bar}[5]->%*;
+keys $foo->{bar}[5]->%* > 4;
+shift(@array);
+shift @$aref;
+shift @{$aref};
+shift(@{$foo->{bar}[5]});
+shift $foo->{bar}[5]->@*;
+shift;
+shift();
+Foo->shift($foo);
+require Foo::Bar;
+use Foo::Bar;
+no Foo::Bar;
+require '::Foo::Bar.pm';
+qr/\cT\\C/;
+m/\cT\\C/;
+chdir;
+chdir();
+chdir 'foo';
+chdir(getcwd);
+<< 'foo';
+foo
+<<'';
+
+<<foo;
+foo
+foo << (bar);
+foo << +bar;
+
+## name BadFeatures
+## failures 51
+## cut
+
+$[ = 1;
+my $x := 1;
+UNIVERSAL->import;
+use UNIVERSAL;
+use UNIVERSAL 'foo';
+for my $foo qw(foo bar) { ... }
+do foo(...);
+do &foo(...);
+do $foo(...);
+POSIX::isalnum($foo);
+POSIX::isalpha($foo);
+POSIX::iscntrl($foo);
+POSIX::isdigit($foo);
+POSIX::isgraph($foo);
+POSIX::islower($foo);
+POSIX::isprint($foo);
+POSIX::ispunct($foo);
+POSIX::isspace($foo);
+POSIX::isupper($foo);
+POSIX::isxdigit($foo);
+POSIX::tmpnam($foo);
+defined @foo;
+defined %foo;
+defined(@foo);
+defined(%foo);
+$foo =~ ?foo?;
+"\N{FOO BAR}";
+`\N{FOO BAR}`;
+qq{\N{FOO BAR}};
+qx(\N{FOO BAR});
+qr^\N{FOO BAR}^;
+m<\N{FOO BAR}>;
+s/\N{FOO BAR}//;
+each $ref;
+keys($ref);
+pop $foo->{bar};
+push $foo{bar}[0];
+shift($foo->[5]);
+splice $foo, $bar, $baz;
+unshift $ref, @bar;
+values $ref;
+require ::Foo::Bar;
+use ::Foo::Bar;
+no ::Foo::Bar;
+qr/\C/;
+m/\C/;
+chdir '';
+chdir(qq());
+chdir undef();
+<<;
+
+(<<);
+
+{<<}
+
+<< . bar;
+
+
+## name POSIXDeprecations
+## failures 12
+## cut
+
+use POSIX;
+isalnum $foo;
+isalpha $foo;
+iscntrl $foo;
+isdigit $foo;
+isgraph $foo;
+islower $foo;
+isprint $foo;
+ispunct $foo;
+isspace $foo;
+isupper $foo;
+isxdigit $foo;
+tmpnam $foo;
+
+## name POSIXDeprecationsImported
+## failures 12
+## cut
+
+use POSIX qw(isalnum isalpha iscntrl isdigit isgraph islower isprint ispunct isspace isupper isxdigit tmpnam);
+isalnum $foo;
+isalpha $foo;
+iscntrl $foo;
+isdigit $foo;
+isgraph $foo;
+islower $foo;
+isprint $foo;
+ispunct $foo;
+isspace $foo;
+isupper $foo;
+isxdigit $foo;
+tmpnam $foo;

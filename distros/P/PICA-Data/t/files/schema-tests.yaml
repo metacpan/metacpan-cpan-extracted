@@ -123,7 +123,7 @@ tests:
   schema: 021A-empty-subfields
   record: 021A
   errors:
-  - message: invalid subfield 021A$a
+  - message: unknown subfield 021A$a
     tag: 021A
     subfields:
       a:
@@ -253,9 +253,8 @@ tests:
   schema: level2
   record: level2notok
   errors:
-  - message: field 200A/001 is not repeatable
+  - message: field 200A is not repeatable
     tag: 200A
-    occurrence: '001'
     repeated: 1
 
 - check: level2 field repeated but different occurrence

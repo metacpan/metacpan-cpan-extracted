@@ -1,7 +1,7 @@
 package Sah::Schemas::ColorTheme;
 
-our $DATE = '2021-01-26'; # DATE
-our $VERSION = '0.002'; # VERSION
+our $DATE = '2021-02-02'; # DATE
+our $VERSION = '0.003'; # VERSION
 
 1;
 # ABSTRACT: Sah schemas related to ColorTheme
@@ -18,7 +18,7 @@ Sah::Schemas::ColorTheme - Sah schemas related to ColorTheme
 
 =head1 VERSION
 
-This document describes version 0.002 of Sah::Schemas::ColorTheme (from Perl distribution Sah-Schemas-ColorTheme), released on 2021-01-26.
+This document describes version 0.003 of Sah::Schemas::ColorTheme (from Perl distribution Sah-Schemas-ColorTheme), released on 2021-02-02.
 
 =head1 DESCRIPTION
 

@@ -59,6 +59,7 @@ lib/Dancer2/Logger/Note.pm
 lib/Dancer2/Logger/Null.pm
 lib/Dancer2/Manual.pod
 lib/Dancer2/Manual/Deployment.pod
+lib/Dancer2/Manual/Keywords.pod
 lib/Dancer2/Manual/Migration.pod
 lib/Dancer2/Manual/Testing.pod
 lib/Dancer2/Plugin.pm
@@ -77,6 +78,8 @@ lib/Dancer2/Template/Tiny.pm
 lib/Dancer2/Test.pm
 lib/Dancer2/Tutorial.pod
 script/dancer2
+share/.gitignore
+share/docker/Dockerfile
 share/skel/.dancer
 share/skel/MANIFEST.SKIP
 share/skel/Makefile.PL
@@ -188,6 +191,7 @@ t/dsl/mime.t
 t/dsl/parameters.t
 t/dsl/pass.t
 t/dsl/path.t
+t/dsl/pod.t
 t/dsl/request.t
 t/dsl/request_data.t
 t/dsl/route_retvals.t

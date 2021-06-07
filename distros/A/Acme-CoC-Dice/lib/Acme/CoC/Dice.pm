@@ -6,7 +6,7 @@ use utf8;
 
 use Carp qw/croak/;
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 sub role {
     my ($self, $command) = @_;
@@ -72,7 +72,7 @@ Acme::CoC::Dice is getting random number like 1d100.
 Gets random number like dice roling.
 Format is "ndm" ("n" and "m" is Natural number). For example, it's like "1d6".
 
-    my $result = Acme::CoC::Dice->role('1d6);
+    my $result = Acme::CoC::Dice->role('1d6');
 
 =head2 C<< role_skill >>
 

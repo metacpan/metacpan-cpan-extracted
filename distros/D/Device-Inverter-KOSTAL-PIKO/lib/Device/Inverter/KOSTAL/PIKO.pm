@@ -4,7 +4,7 @@ use strict;
 use utf8;
 use warnings;
 
-our $VERSION = '0.03';
+our $VERSION = '0.1';
 
 use Mouse;
 use Mouse::Util::TypeConstraints;
@@ -29,19 +29,36 @@ has configfile => (
 
 # Define standard attributes which are read from ~/.pikorc if needed:
 for (
-    [ host => ( last_resort => sub { shift->name }, ), ],
+    [
+        host => (
+            last_resort => sub {
+                'piko';
+            },
+        ),
+    ],
+    [
+        status_url => (
+            coerce      => 1,
+            isa         => 'URI',
+            last_resort => sub {
+                my $self = shift;
+                defined( my $host = $self->host ) or return;
+                "http://$host/";
+            },
+        )
+    ],
     [
         logdata_url => (
             coerce      => 1,
             isa         => 'URI',
             last_resort => sub {
                 my $self = shift;
-                defined( my $host = $self->host ) or return;
-                "http://$host/LogDaten.dat";
+                defined( my $status_url = $self->status_url ) or return;
+                ( my $logdata_url = $status_url->clone )->path('/LogDaten.dat');
+                $logdata_url;
             },
         )
     ],
-    ['name'],
     ['number'],
     [
         password => (
@@ -100,11 +117,16 @@ sub configure {
 }
 
 sub fetch_logdata {
-    my ( $self, %args ) = @_;
-    my $logdata_url = $self->logdata_url;
+    my $self = shift;
+    $self->load( \$self->get( logdata_url => @_ ) );
+}
+
+sub get {
+    my ( $self, $what, %args ) = @_;
+    my $url = $self->$what;
     require HTTP::Request;
     require LWP::UserAgent;
-    ( my $request = HTTP::Request->new( GET => $logdata_url ) )
+    ( my $request = HTTP::Request->new( GET => $url ) )
       ->authorization_basic( $self->username, $self->password );
     my $ua = LWP::UserAgent->new;
     local *STDERR = \*STDERR;
@@ -113,15 +135,22 @@ sub fetch_logdata {
         $ua->show_progress(1);
     }
     my $response = $ua->request($request);
-    croak( "Could not fetch <$logdata_url>: " . $response->status_line )
+    croak( "Could not fetch <$url>: " . $response->status_line )
       unless $response->is_success;
-    $self->load( \$response->decoded_content );
+    $response->decoded_content;
+}
+
+sub get_current_status {
+    my $self = shift;
+    require Device::Inverter::KOSTAL::PIKO::Status;
+    Device::Inverter::KOSTAL::PIKO::Status->new(
+        $self->get( status_url => @_ ) );
 }
 
 sub load {
-    my $self = shift;
+    my $self     = shift;
     my ($source) = validate_pos( @_, 1 );
-    my %param = ( inverter => $self );
+    my %param    = ( inverter => $self );
     unless ( ref $source ) {    # String => filename
         open $param{fh}, '<:crlf', $param{filename} = $source
           or croak(qq(Cannot open file "$source" for reading: $!));
@@ -162,15 +191,12 @@ no Mouse;
 1;
 
 __END__
+
+=encoding UTF-8
+
 =head1 NAME
 
 Device::Inverter::KOSTAL::PIKO - represents a KOSTAL PIKO DC/AC converter
-
-=head1 VERSION
-
-Version 0.01
-
-=cut
 
 =head1 SYNOPSIS
 
@@ -180,25 +206,41 @@ Version 0.01
     my $file = $piko->load($filename_or_handle_or_ref_to_data);
     say $_->timestamp for $file->logdata;
 
-=head1 EXPORT
+=head1 SAMPLE ~/.pikorc
 
-A list of functions that can be exported.  You can delete this section
-if you don't export anything, such as for a purely object-oriented module.
+    [255]
+    host = piko
+    time_offset = 1309160816
 
-=head1 SUBROUTINES/METHODS
+=head1 METHODS
+
+=head1 host
+
+=head1 logdata_url
+
+=head1 status_url
+
+=head1 fetch_logdata
+
+=head1 get_current_status
+
+Fetch current device status and return it as
+L<Device::Inverter::KOSTAL::PIKO::Status> object.
+
+=head1 read_configfile
 
 =head1 AUTHOR
 
-Martin H. Sluka, C<< <fany at cpan.org> >>
+Martin Sluka, C<< <fany at cpan.org> >>
 
 =head1 BUGS
 
-Please report any bugs or feature requests to C<bug-device-inverter-kostal-piko at rt.cpan.org>, or through
-the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Device-Inverter-KOSTAL-PIKO>.  I will be notified, and then you'll
+Please report any bugs or feature requests at
+L<https://github.com/fany/Device-Inverter-KOSTAL-PIKO/issues>.
+L<Pull requests|https://github.com/fany/Device-Inverter-KOSTAL-PIKO/pulls>
+are also welcome.
+I will be notified, and then you'll
 automatically be notified of progress on your bug as I make changes.
-
-
-
 
 =head1 SUPPORT
 
@@ -206,39 +248,30 @@ You can find documentation for this module with the perldoc command.
 
     perldoc Device::Inverter::KOSTAL::PIKO
 
-
 You can also look for information at:
 
 =over 4
 
 =item * RT: CPAN's request tracker (report bugs here)
 
-L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Device-Inverter-KOSTAL-PIKO>
-
-=item * AnnoCPAN: Annotated CPAN documentation
-
-L<http://annocpan.org/dist/Device-Inverter-KOSTAL-PIKO>
+L<https://rt.cpan.org/NoAuth/Bugs.html?Dist=Device-Inverter-KOSTAL-PIKO>
 
 =item * CPAN Ratings
 
-L<http://cpanratings.perl.org/d/Device-Inverter-KOSTAL-PIKO>
+L<https://cpanratings.perl.org/d/Device-Inverter-KOSTAL-PIKO>
 
 =item * Search CPAN
 
-L<http://search.cpan.org/dist/Device-Inverter-KOSTAL-PIKO/>
+L<https://metacpan.org/release/Device-Inverter-KOSTAL-PIKO>
 
 =back
 
-
-=head1 ACKNOWLEDGEMENTS
-
-
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2012 Martin H. Sluka.
+Copyright 2012–2021 Martin Sluka.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of either: the GNU General Public License as published
 by the Free Software Foundation; or the Artistic License.
 
-See http://dev.perl.org/licenses/ for more information.
+See https://dev.perl.org/licenses/ for more information.

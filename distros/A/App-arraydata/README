@@ -1,0 +1,75 @@
+NAME
+    App::arraydata - Show content of ArrayData modules (plus a few other
+    things)
+
+VERSION
+    This document describes version 0.001 of App::arraydata (from Perl
+    distribution App-arraydata), released on 2021-06-07.
+
+SYNOPSIS
+    See the included script arraydata.
+
+FUNCTIONS
+  arraydata
+    Usage:
+
+     arraydata(%args) -> [$status_code, $reason, $payload, \%result_meta]
+
+    Show content of ArrayData modules (plus a few other things).
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   action => *str* (default: "dump")
+
+    *   detail => *bool*
+
+    *   module => *perl::arraydata::modname_with_optional_args*
+
+    *   num => *posint* (default: 1)
+
+        Number of elements to pick (for -R).
+
+    Returns an enveloped result (an array).
+
+    First element ($status_code) is an integer containing HTTP-like status
+    code (200 means OK, 4xx caller error, 5xx function error). Second
+    element ($reason) is a string containing error message, or something
+    like "OK" if status is 200. Third element ($payload) is the actual
+    result, but usually not present when enveloped result is an error
+    response ($status_code is not 2xx). Fourth element (%result_meta) is
+    called result metadata and is optional, a hash that contains extra
+    information, much like how HTTP response headers provide additional
+    metadata.
+
+    Return value: (any)
+
+ENVIRONMENT
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/App-arraydata>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-App-arraydata>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=App-arraydata>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    ArrayData and "ArrayData::*" modules.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2021 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

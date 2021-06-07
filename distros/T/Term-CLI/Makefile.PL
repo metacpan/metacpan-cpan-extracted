@@ -25,7 +25,6 @@ my %WriteMakefileArgs = (
     "List::Util" => "1.38",
     "Locale::Maketext" => "1.25",
     "Locale::Maketext::Lexicon::Gettext" => "1.00",
-    "Modern::Perl" => "1.20140107",
     "Moo" => "1.000001",
     "Moo::Role" => 0,
     "Pod::Text::Termcap" => "2.08",
@@ -36,6 +35,7 @@ my %WriteMakefileArgs = (
     "Types::Standard" => "1.000005",
     "namespace::clean" => "0.25",
     "parent" => "0.228",
+    "strict" => "1.00",
     "subs" => "1.00",
     "warnings" => "1.00"
   },
@@ -52,7 +52,7 @@ my %WriteMakefileArgs = (
     "strict" => "1.00",
     "warnings" => "1.00"
   },
-  "VERSION" => "0.052001",
+  "VERSION" => "0.052003",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -69,7 +69,6 @@ my %FallbackPrereqs = (
   "List::Util" => "1.38",
   "Locale::Maketext" => "1.25",
   "Locale::Maketext::Lexicon::Gettext" => "1.00",
-  "Modern::Perl" => "1.20140107",
   "Moo" => "1.000001",
   "Moo::Role" => 0,
   "Pod::Coverage::TrustPod" => 0,

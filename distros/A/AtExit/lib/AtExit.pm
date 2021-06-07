@@ -3,12 +3,12 @@
 #
 # Copyright (c) 1996 Andrew Langmead. All rights reserved.
 # This file is part of "AtExit". AtExit is free software;
-# you can redistribute it and/or modify it under the same
-# terms as Perl itself.
+# This is free software; you can redistribute it and/or modify it under
+# the terms of the Artistic License 1.0.
 ##############################################################################
 
 package AtExit;
-$AtExit::VERSION = '2.03';
+$AtExit::VERSION = '2.04';
 # ABSTRACT: perform exit processing for a program or object
 
 require 5.002;

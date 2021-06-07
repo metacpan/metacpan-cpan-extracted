@@ -16,10 +16,11 @@ FP::Repl::Repl - read-eval-print loop
  my $repl = new FP::Repl::Repl;
  $repl->set_prompt("foo> ");
  # ^ if left undefined, "$package$perhapslevel> " is used
- $repl->set_historypath("somefile"); # default is ~/.fp-repl_history
+ $repl->set_historypath("path/to/dir"); # default is ~/.fp-repl_history
  $repl->set_env_PATH ($safe_PATH); # default in taint mode is
    # '/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin',
-   # $ENV{PATH} otherwise.
+   # $ENV{PATH} otherwise. Is only used for running tooling for the
+   # repl itself, like the pager.
  $repl->run;
  # or $repl->run($skip)  to skip $skip levels
 
@@ -147,19 +148,47 @@ sub xone_nonwhitespace {
     $1
 }
 
-my $HOME = xsafehome;
-our $maybe_historypath        = "$HOME/.fp-repl_history";
-our $maybe_settingspath       = "$HOME/.fp-repl_settings";
-our $maxHistLen               = 500;
-our $doCatchINT               = 1;
-our $doRepeatWhenEmpty        = 1;
+sub maybe_fp_repl_home {
+    if (my $e = $ENV{FP_REPL_HOME}) {
+
+        # XX todo: properly deal with paths on Windows
+        if (my ($esafe) = $e =~ m{^(/.*)\z}s) {
+            if (-d $esafe) {
+                $esafe
+            } else {
+                warn "Note: ignoring FP_REPL_HOME (dir does not exist)";
+                undef
+            }
+        } else {
+            warn "Note: ignoring FP_REPL_HOME (is non-absolute path)";
+            undef
+        }
+    } else {
+        undef
+    }
+}
+
+# Mis-using lazyLight for impure code here; could be simply a thunk
+# (procedure with no arguments). *Not* using TransparentLazy since we
+# better control explicitly where the exposition to side effects
+# should happen!
+my $HOME = lazyLight { maybe_fp_repl_home() // xsafehome };
+our $maybe_historypath  = lazyLight { force($HOME) . "/.fp-repl_history" };
+our $maybe_settingspath = lazyLight { force($HOME) . "/.fp-repl_settings" };
+our $maxHistLen         = 500;
+our $doCatchINT         = 1;
+our $doRepeatWhenEmpty  = 1;
 our $doKeepResultsInVARX      = 1;
-our $pager                    = $ENV{PAGER} || "less";
+our $pager                    = lazyLight { $ENV{PAGER} || "less" };
 our $mode_context             = 'l';
 our $mode_formatter           = 'd';
 our $mode_viewer              = 'a';
 our $mode_lexical_persistence = 'X';
 our $maybe_env_path
+
+    # only used for running tooling for the repl itself, like the
+    # pager, and only if taint mode is on (see commit
+    # 890020b5ac502fe3fd11bf400c4cba70be5c1ac4)
     = '/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin';
 
 use Chj::Class::Array -fields => -publica => (
@@ -180,18 +209,18 @@ use Chj::Class::Array -fields => -publica => (
 sub new {
     my $class = shift;
     my $self  = $class->SUPER::new;
-    $$self[Maybe_historypath]        = $maybe_historypath;
-    $$self[Maybe_settingspath]       = $maybe_settingspath;
-    $$self[MaxHistLen]               = $maxHistLen;
-    $$self[DoCatchINT]               = $doCatchINT;
-    $$self[DoRepeatWhenEmpty]        = $doRepeatWhenEmpty;
-    $$self[DoKeepResultsInVARX]      = $doKeepResultsInVARX;
-    $$self[Pager]                    = $pager;
-    $$self[Mode_context]             = $mode_context;
-    $$self[Mode_formatter]           = $mode_formatter;
-    $$self[Mode_viewer]              = $mode_viewer;
-    $$self[Mode_lexical_persistence] = $mode_lexical_persistence;
-    $$self[Maybe_env_PATH]           = $maybe_env_path if ${^TAINT};
+    $$self[Maybe_historypath]        = force $maybe_historypath;
+    $$self[Maybe_settingspath]       = force $maybe_settingspath;
+    $$self[MaxHistLen]               = force $maxHistLen;
+    $$self[DoCatchINT]               = force $doCatchINT;
+    $$self[DoRepeatWhenEmpty]        = force $doRepeatWhenEmpty;
+    $$self[DoKeepResultsInVARX]      = force $doKeepResultsInVARX;
+    $$self[Pager]                    = force $pager;
+    $$self[Mode_context]             = force $mode_context;
+    $$self[Mode_formatter]           = force $mode_formatter;
+    $$self[Mode_viewer]              = force $mode_viewer;
+    $$self[Mode_lexical_persistence] = force $mode_lexical_persistence;
+    $$self[Maybe_env_PATH]           = force($maybe_env_path) if ${^TAINT};
     $self
 }
 

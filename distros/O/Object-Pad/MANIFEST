@@ -1,10 +1,8 @@
 Build.PL
 Changes
 hax/dumpers.c.inc
-hax/lexer-additions.c.inc
 hax/perl-additions.c.inc
 hax/perl-backcompat.c.inc
-hax/wrap_keyword_plugin.c.inc
 lib/Object/Pad.pm
 lib/Object/Pad.xs
 lib/Object/Pad/MOP/Class.pm

@@ -12,12 +12,12 @@ build_requires:
   Test::Number::Delta: '0'
   perl: '5.006'
 configure_requires:
-  Alien::Build: '0.32'
+  Alien::Build: '1.40'
   Alien::Build::MM: '0.32'
   ExtUtils::MakeMaker: '6.52'
   perl: '5.006'
 dynamic_config: 1
-generated_by: 'Dist::Zilla version 6.014, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.017, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -37,9 +37,9 @@ requires:
 resources:
   homepage: https://github.com/EntropyOrg/p5-Alien-UDUNITS2
   repository: https://github.com/EntropyOrg/p5-Alien-UDUNITS2.git
-version: '0.007'
+version: '0.008'
 x_alienfile:
-  generated_by: 'Dist::Zilla::Plugin::AlienBuild version 0.29'
+  generated_by: 'Dist::Zilla::Plugin::AlienBuild version 0.31'
   requires:
     share:
       Alien::gmake: '0.14'

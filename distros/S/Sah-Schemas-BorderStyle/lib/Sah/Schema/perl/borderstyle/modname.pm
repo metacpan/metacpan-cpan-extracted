@@ -1,16 +1,16 @@
 package Sah::Schema::perl::borderstyle::modname;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-01-26'; # DATE
+our $DATE = '2021-02-02'; # DATE
 our $DIST = 'Sah-Schemas-BorderStyle'; # DIST
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 
 use Sah::PSchema 'get_schema';
 use Sah::PSchema::perl::modname; # not yet detected automatically by a dzil plugin
 
 our $schema = get_schema(
     'perl::modname',
-    {ns_prefix=>'BorderStyle'},
+    {ns_prefix=>'BorderStyle', complete_recurse=>1},
     {
         summary => 'Perl module in the BorderStyle::* namespace, without the namespace prefix, e.g. "Test::Labeled"',
     }
@@ -31,7 +31,7 @@ Sah::Schema::perl::borderstyle::modname - Perl module in the BorderStyle::* name
 
 =head1 VERSION
 
-This document describes version 0.001 of Sah::Schema::perl::borderstyle::modname (from Perl distribution Sah-Schemas-BorderStyle), released on 2021-01-26.
+This document describes version 0.002 of Sah::Schema::perl::borderstyle::modname (from Perl distribution Sah-Schemas-BorderStyle), released on 2021-02-02.
 
 =head1 SYNOPSIS
 

@@ -1,5 +1,5 @@
 package Photonic::Utils;
-$Photonic::Utils::VERSION = '0.015';
+$Photonic::Utils::VERSION = '0.016';
 
 =encoding UTF-8
 
@@ -37,59 +37,105 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA  02110-1301 USA
 # Collection of subroutines. Thus, no Moose
 require Exporter;
 @ISA=qw(Exporter);
-@EXPORT_OK=qw(vectors2Dlist tile cmatmult  RtoG GtoR LC
-    HProd MHProd EProd VSProd SProd linearCombine
-    linearCombineIt lentzCF);
-use PDL::Lite;
-use PDL::NiceSlice;
+@EXPORT_OK=qw(vectors2Dlist tile RtoG GtoR
+    HProd MHProd EProd VSProd SProd
+    linearCombineIt lentzCF any_complex tensor
+    make_haydock make_greenp
+    wave_operator apply_longitudinal_projection
+    cgtsv lu_decomp lu_solve
+);
+use PDL::LiteF;
 use PDL::FFTW3;
 use PDL::Complex;
+require PDL::MatrixOps;
 use Photonic::Iterator qw(nextval);
 use Carp;
+use Storable qw(dclone);
+require PDL::LinearAlgebra::Real;
+require PDL::LinearAlgebra::Complex;
 use warnings;
 use strict;
-
-sub linearCombine { #complex linear combination of states
-    my $coefficients=shift; #arrayref of complex coefficients
-    my $states=shift; #arrayref of complex states
-    my $numCoeff=@$coefficients;
-    die "More coefficients than states in basis" if
-	$numCoeff>@$states;
-    my $result=0+0*i;
-    foreach(0..$numCoeff-1){
-	$result += $coefficients->[$_]*$states->[$_];
-    }
-    return $result;
-}
 
 sub linearCombineIt { #complex linear combination of states from iterator
     my $coefficients=shift; #arrayref of complex coefficients
     my $stateit=shift; #iterator of complex states
-    my $numCoeff=@$coefficients;
-    my $result=0+0*i;
+    my $numCoeff=$coefficients->dim(-1);
+    my $result=r2C(0);
     foreach(0..$numCoeff-1){
 	my $s=nextval($stateit);
 	croak "More coefficients than states in basis" unless defined $s;
-	$result = $result + $coefficients->[$_]*$s;
+	$result = $result + $coefficients->slice(":,$_")*$s;
     }
     return $result;
+}
+
+sub any_complex {
+    grep ref $_ && (ref $_ eq 'PDL::Complex' or !$_->type->real), @_;
+}
+
+sub wave_operator {
+    my ($green, $nd) = @_;
+    lu_solve([lu_decomp($green)], r2C(PDL::MatrixOps::identity($nd)));
+}
+
+sub tensor {
+    my ($data, $decomp, $nd, $dims, $after_cb) = @_;
+    my $backsub = lu_solve($decomp, $data);
+    $backsub = $after_cb->($backsub) if $after_cb;
+    my $tensor = PDL->zeroes(($nd) x $dims)->r2C;
+    my $n = 0;
+    my $slice_prefix = ':,' x ($dims-1);
+    for my $i(0..$nd-1){
+        for my $j($i..$nd-1){
+            my $bslice = $backsub->slice(":,($n)");
+            $tensor->slice("$slice_prefix($i),($j)") .= $bslice;
+            $tensor->slice("$slice_prefix($j),($i)") .= $bslice;
+            ++$n;
+        }
+    }
+    $tensor;
+}
+
+my @HAYDOCK_PARAMS = qw(
+  nh keepStates smallH reorthogonalize use_mask mask
+);
+sub make_haydock {
+  my ($self, $class, $add_geom, @extra_attributes) = @_;
+  # This must change if G is not symmetric
+  [ map $class->new(
+      _haydock_extra($self, $_, $add_geom),
+      map +($_ => $self->$_), @HAYDOCK_PARAMS, @extra_attributes
+    ), @{$self->geometry->unitPairs}
+  ];
+}
+
+sub _haydock_extra {
+  my ($self, $u, $add_geom) = @_;
+  my $obj = dclone($add_geom ? $self->geometry : $self->metric);
+  $obj->Direction0($u) if $add_geom; #add G0 direction
+  $add_geom ? (geometry=>$obj) : (metric=>$obj, polarization=>$u->r2C);
+}
+
+my @GREENP_PARAMS = qw(nh smallE);
+sub make_greenp {
+  my ($self, $class) = @_;
+  [ map $class->new(
+      haydock=>$_,
+      map +($_ => $self->$_), @GREENP_PARAMS), @{$self->haydock}
+  ];
 }
 
 sub HProd { #Hermitean product between two fields. skip first 'skip' dims
     my $first=shift;
     my $second=shift;
     my $skip=shift//0;
-    my $iscomplex = (ref $first eq 'PDL::Complex' or ref $second eq
-	'PDL::Complex');
     my $ndims=$first->ndims;
-    confess "Dimensions should be equal" unless $ndims == $second->ndims;
-    my $prod=$first->complex->Cconj*$second->complex;
+    confess "Dimensions should be equal, instead: first=", $first->info, " second=", $second->info
+	unless $ndims == $second->ndims;
+    my $prod=$first->Cconj*$second;
     # clump all except skip dimensions, protecto RorI index and sum.
     my $result=$prod->reorder($skip+1..$ndims-1,1..$skip,0)->clump(-1-$skip-1)
 	->mv(-1,0)->sumover;
-    #Note: real does not take the real part, just gives a 2-real
-    #vector view of each complex
-    $result=$result->real unless $iscomplex;
     return $result;
 }
 
@@ -100,20 +146,15 @@ sub MHProd { #Hermitean product between two fields with metric. skip
     my $metric=shift;
     # pass $metric->value  xyz xyz nx ny nz
     my $skip=shift//0;
-    my $iscomplex = (ref $first eq 'PDL::Complex' or ref $second eq
-	'PDL::Complex');
     my $ndims=$first->ndims;
     die "Dimensions should be equal" unless $ndims == $second->ndims;
     carp "We don't trust the skip argument in MHProd yet" if $skip;
     # I'm not sure about the skiped dimensions in the next line. Is it right?
-    my $mprod=($metric*$second(:,:,*1))->sumover;
+    my $mprod=($metric*$second->dummy(2))->sumover;
     die "Dimensions should be equal" unless $ndims == $mprod->ndims;
-    my $prod=$first->complex->Cconj*$mprod->complex;
+    my $prod=$first->Cconj*$mprod;
     my $result=$prod->reorder($skip+1..$ndims-1,1..$skip,0)->clump(-1-$skip-1)
 	->mv(-1,0)->sumover;
-    #Note: real does not take the real part, just gives a 2-real
-    #vector view of each complex
-    $result=$result->real unless $iscomplex;
     return $result;
 }
 
@@ -123,27 +164,25 @@ sub EProd { #Euclidean product between two fields in reciprocal
     my $first=shift;
     my $second=shift;
     my $skip=shift//0;
-    my $iscomplex = (ref $first eq 'PDL::Complex' or ref $second eq
-	'PDL::Complex');
     my $ndims=$first->ndims;
     die "Dimensions should be equal" unless $ndims == $second->ndims;
     #First reverse all reciprocal dimensions
-    my $sl=":" #slice to skip complex dimension
-	. (", :" x $skip) #skip dimensions
-	. (", -1:0" x ($ndims-1-$skip)); #and reverse the rest
+    my $sl=join ',',
+	":", #slice to skip complex dimension
+	((":") x $skip), #skip dimensions
+	(("-1:0") x ($ndims-1-$skip)); #and reverse the rest
     my $first_mG=$first->slice($sl);
     #Then rotate psi_{G=0} to opposite corner with coords. (0,0,...)
     foreach($skip+1..$ndims-1){
 	$first_mG=$first_mG->mv($_,0)->rotate(1)->mv(0,$_);
     }
-    my $prod=$first_mG->complex*$second->complex;
+    my $prod=$first_mG*$second;
     # clump all except skip dimensions, protecto RorI index and sum.
     my $result=$prod #ri:s1:s2:nx:ny
 	->reorder($skip+1..$ndims-1,1..$skip,0) #nx:ny:s1:s2:ri
 	->clump(-1-$skip-1) #nx*ny:s1:s2:ri
 	->mv(-1,0) #ri:nx*ny,s1,s2
 	->sumover; #ri:s1:s2
-    $result=$result->real unless $iscomplex;
     return $result;
 }
 
@@ -153,31 +192,27 @@ sub SProd { #Spinor product between two fields in reciprocal
     my $first=shift;
     my $second=shift;
     my $skip=shift//0;
-    my $iscomplex = (ref $first eq 'PDL::Complex' or ref $second eq
-	'PDL::Complex');
     my $ndims=$first->ndims;
     die "Dimensions should be equal" unless $ndims == $second->ndims;
     #dimensions are like rori, pmk, s1,s2, nx,ny
     #First reverse all reciprocal dimensions
-    my $sl=":" #slice to keep complex dimension
-	. ", -1:0" #interchange spinor components +- to -+
-	. (", :" x $skip) #keep skip dimensions
-	. (", -1:0" x ($ndims-1-1-$skip)); #and reverse G indices
+    my $sl=join ',',
+	":", #slice to keep complex dimension
+	"-1:0", #interchange spinor components +- to -+
+	((":") x $skip), #keep skip dimensions
+	(("-1:0") x ($ndims-1-1-$skip)); #and reverse G indices
     my $first_mG=$first->slice($sl); #rori,pmk,s1,s2,nx,ny
     #Then rotate psi_{G=0} to opposite corner with coords. (0,0,...)
     foreach($skip+2..$ndims-1){
 	$first_mG=$first_mG->mv($_,0)->rotate(1)->mv(0,$_);
     }
-    my $prod=$first_mG->complex*$second->complex; #rori,pmk,s1,s2,nx,ny
+    my $prod=$first_mG*$second; #rori,pmk,s1,s2,nx,ny
     # clump all except skip dimensions, protect RorI index and sum.
     my $result=$prod #rori,pmk, s1,s2,nx,ny
 	->reorder($skip+2..$ndims-1,1..$skip+1,0) #nx,ny,pmk,s1,s2,rori
 	->clump(-1-$skip-1)  #nx*ny*pmk, s1, s2, rori
 	->mv(-1,0) #rori,nx*ny*pmk, s1,s2
 	->sumover; #rori, s1, s2
-    #Note: real does not take the real part, just gives a 2-real
-    #vector view of each complex
-    $result=$result->real unless $iscomplex;
     return $result;
 }
 
@@ -185,43 +220,38 @@ sub VSProd { #Vector-Spinor product between two vector fields in reciprocal
              #space. Indices are ri:xy:pm:nx:ny...
     my $first=shift;
     my $second=shift;
-    my $iscomplex = (ref $first eq 'PDL::Complex' or ref $second eq
-	'PDL::Complex');
     my $ndims=$first->ndims;
     die "Dimensions should be equal" unless $ndims == $second->ndims;
     #dimensions are like ri:xy:pm:nx:ny
     #First reverse all reciprocal dimensions
-    my $sl=":,:" #slice to keep complex and vector dimension
-	. ", -1:0" #interchange spinor components +- to -+
-	. (", -1:0" x ($ndims-3)); #and reverse G indices
+    my $sl=join ',',
+	(":",":"), #slice to keep complex and vector dimension
+	"-1:0", #interchange spinor components +- to -+
+	(("-1:0") x ($ndims-3)); #and reverse G indices
     my $first_mG=$first->slice($sl); #ri:xy:pm:nx:ny
     #Then rotate psi_{G=0} to opposite corner with coords. (0,0,...)
     foreach(3..$ndims-1){ # G indices start after ri:xy:pm
 	$first_mG=$first_mG->mv($_,0)->rotate(1)->mv(0,$_);
     }
-    my $prod=$first_mG->complex*$second->complex; #ri:xy:pm:nx:ny
+    my $prod=$first_mG*$second; #ri:xy:pm:nx:ny
     # clump all except ri:xy.
     my $result=$prod #ri:xy:pm::nx:ny
 	->reorder(3..$ndims-1,1,2,0) #nx:ny:xy:pm:ri
 	->clump(-2)  #nx*ny*xy*pm:ri
 	->mv(-1,0) #ri:nx*ny*xy*pm
 	->sumover; #ri
-    $result=$result->real unless $iscomplex;
     return $result;
 }
-
-
 
 sub RtoG { #transform a 'complex' scalar, vector or tensorial field
 	   #from real to reciprocal space
     my $field=shift; #field to fourier transform
     my $ndims=shift; #number of dimensions to transform
     my $skip=shift; #dimensions to skip
-    my $iscomplex=ref $field eq 'PDL::Complex';
-    my $moved=$iscomplex? $field->real : $field;
+    my $moved=$field;
     $moved=$moved->mv(1,-1) foreach(0..$skip-1);
     my $transformed=fftn($moved, $ndims);
-    my $result= $iscomplex?$transformed->complex : $transformed;
+    my $result=$transformed;
     $result=$result->mv(-1,1) foreach(0..$skip-1);
     return $result;
 }
@@ -231,11 +261,10 @@ sub GtoR { #transform a 'complex' scalar, vector or tensorial field from
     my $field=shift; #field to fourier transform
     my $ndims=shift; #number of dimensions to transform
     my $skip=shift; #dimensions to skip
-    my $iscomplex=ref $field eq 'PDL::Complex';
-    my $moved=$iscomplex? $field->real : $field;
+    my $moved=$field;
     $moved=$moved->mv(1,-1) foreach(0..$skip-1);
     my $transformed=ifftn($moved, $ndims);
-    my $result= $iscomplex?$transformed->complex : $transformed;
+    my $result=$transformed;
     $result=$result->mv(-1,1) foreach(0..$skip-1);
     return $result;
 }
@@ -249,19 +278,19 @@ sub lentzCF {
     my $bs=shift;
     my $max=shift;
     my $small=shift;
-    my $tiny=1.e-30;
+    my $tiny=r2C(1.e-30);
     my $converged=0;
-    my $fn=$as->[0];
-    $fn=r2C($tiny) if $fn->re==0 and $fn->im==0;
+    my $fn=$as->slice(":,0");
+    $fn=$tiny if all($fn==0);
     my $n=1;
     my ($fnm1, $Cnm1, $Dnm1)=($fn, $fn, r2C(0)); #previous coeffs.
     my ($Cn, $Dn); #current coeffs.
     my $Deltan;
     while($n<$max){
-	$Dn=$as->[$n]+$bs->[$n]*$Dnm1;
-	$Dn=r2C($tiny) if $Dn->re==0 and $Dn->im==0;
-	$Cn=$as->[$n]+$bs->[$n]/$Cnm1;
-	$Cn=r2C($tiny) if $Cn->re==0 and $Cn->im==0;
+	$Dn=$as->slice(":,$n")+$bs->slice(":,$n")*$Dnm1;
+	$Dn=$tiny if all($Dn==0);
+	$Cn=$as->slice(":,$n")+$bs->slice(":,$n")/$Cnm1;
+	$Cn=$tiny if all($Cn==0);
 	$Dn=1/$Dn;
 	$Deltan=$Cn*$Dn;
 	$fn=$fnm1*$Deltan;
@@ -271,57 +300,96 @@ sub lentzCF {
 	$Cnm1=$Cn;
 	$n++;
     }
+    $fn = $fn->slice(":,(0)");
     return wantarray? ($fn, $n): $fn;
 }
-
 
 sub tile { # repeat field Nx X Ny X... times
     my $f=shift;
     my @n=@_; #number of repetitions along dimension
-    # Is next comment correct (2 X)?
-    my $dim=0; #field is 2 X dims X nx,ny,nz...
-    my $r=$f; #result
-    for my $n(@n){
-	die "repetition in tile should be >0" unless $n>0;
-	my $r1=$r;
-	$n--;
-	while($n-->0){
-	    $r1=$r1->glue($dim, $r);
-	}
-	$dim++; #prepare for next dimension
-	$r=$r1;
-    }
-    return $r;
+    my $sl = join ',', map ":,*$_", @n; # insert right-size dummy after each real
+    my $r = $f->slice($sl); #result
+    $r = $r->clump($_, $_+1) for 0..$#n;
+    $r;
 }
 
 sub vectors2Dlist { #2D vector fields ready for gnuploting
     my $f=shift; #vector field
     my $s=shift; #scale
     my $d=shift; #decimation
-    my $f1=$s*$f->(:,0:-1:$d, 0:-1:$d); #decimate two dimensions
+    my $f1=$s*$f->slice(":,0:-1:$d, 0:-1:$d"); #decimate two dimensions
     my $coords=$d*PDL::ndcoords(@{[$f1->dims]}[1,2]);
-    return ( #basex, basey, vectorx vectory
-	($coords((0))-.5*$f1((0)))->flat,
-	($coords((1))-.5*$f1((1)))->flat,
-	$f1((0))->flat, $f1((1))->flat);
+    ( #basex, basey, vectorx vectory
+	($coords-.5*$f1)->mv(0,-1)->clump(-2)->dog,
+	$f1->mv(0,-1)->clump(-2)->dog);
 }
 
+sub cgtsv {
+    confess "Wrong number of arguments" unless scalar(@_)==4;
+    my ($c, $d, $e, $b) = @_;
+    my $i = PDL->null;
+    for (grep $_->is_inplace, $c, $d, $e, $b) {
+        $_ = $_->copy;
+        $_->set_inplace(0);
+    }
+    PDL::LinearAlgebra::Complex::cgtsv($c, $d, $e, $b, $i);
+    confess "Error solving tridiag system" unless $i == 0;
+    $b->isa("PDL::Complex") ? $b->complex : $b;
+}
 
-sub cmatmult {
-    my $a=shift;
-    my $b=shift;
-    my $ar=$a((0)); #realpart
-    my $ai=$a((1)); #imaginary part
-    my $br=$b((0)); #realpart
-    my $bi=$b((1)); #imaginary part
-    my $cr=($ar x $br) - ($ai x $bi);
-    my $ci=($ar x $bi) + ($ai x $br);
-    my $c=PDL::cat($cr, $ci)->mv(-1,0);
-    return $c;
+sub lu_decomp {
+    confess "Wrong number of arguments" unless scalar(@_)==1;
+    my ($data) = @_;
+    my ($lu, $perm, $info) = ($data->copy, null, null);
+    if (any_complex($data)) {
+	PDL::LinearAlgebra::Complex::cgetrf($lu, $perm, $info);
+    } else {
+	PDL::LinearAlgebra::Real::getrf($lu, $perm, $info); # uncoverable statement
+    }
+    confess 'Decomposition failed' unless all($info == 0); # can be vector
+    ($lu, $perm);
+}
+
+sub lu_solve {
+    confess "Wrong number of arguments" unless scalar(@_)==2;
+    my ($decomp, $B) = @_;
+    my ($lu, $perm, $info, $x) = (@$decomp, null, $B->copy);
+    if (any_complex($x)) {
+	PDL::LinearAlgebra::Complex::cgetrs($lu, 1, $x, $perm, $info);
+    } else {
+	PDL::LinearAlgebra::Real::getrs($lu, 1, $x, $perm, $info); # uncoverable statement
+    }
+    confess 'Solving failed' unless all($info == 0); # can be vector
+    $x;
+}
+
+sub apply_longitudinal_projection {
+    my ($psi_G, $gnorm, $ndims, $coeff) = @_;
+    #state is ri:nx:ny... gnorm=i:nx:ny...
+    #Multiply by vector ^G.
+    #Have to get cartesian out of the way, thread over it and iterate
+    #over the rest
+    my $Gpsi_G=$psi_G->dummy(1)*$gnorm; #^G |psi>
+    #the result is complex ri:i=cartesian:nx:ny...
+    #Take inverse Fourier transform over all space dimensions,
+    #move cartesian indices, thread, move back
+    my $Gpsi_R=ifftn($Gpsi_G->mv(1,-1), $ndims)->mv(-1,1);
+    # $Gpsi_R is ri:i:nx:ny:...
+    # Multiply by the coefficient in Real Space.
+    my $eGpsi_R=$coeff->dummy(1)*$Gpsi_R;
+    # $eGpsi_R is ri:i:nx:ny...
+    #Transform to reciprocal space
+    #move cartesian indices, thread, move back
+    my $eGpsi_G=fftn($eGpsi_R->mv(1,-1), $ndims)->mv(-1,1);
+    # $eGpsi_G is ri:i:nx:ny:...
+    #Scalar product with Gnorm
+    ($eGpsi_G*$gnorm) #^Ge^G|psi>
+	# ri:i:nx:ny:...
+	->sumover; #^G.epsilon^G|psi>
+    #Result is ^G.epsilon^G|psi>, ri:nx:ny...
 }
 
 1;
-
 
 __END__
 
@@ -332,7 +400,7 @@ Photonic::Utils
 
 =head1 VERSION
 
-version 0.015
+version 0.016
 
 =head1 SYNOPSIS
 
@@ -347,16 +415,10 @@ Utility functions that may be useful.
 
 =over 4
 
-=item * $r=linearCombine($c, $s)
-
-Complex linear combination of states. $c is an arrayref of 'complex' pdl
-scalars and $s is an arrayref of 'complex' states ('complex'
-multidimensional pdl).
-
 =item * $r=linearCombineIt($c, $it)
 
-Complex linear combination of states from iterator. $c is an arrayref
-of 'complex' pdl scalars and $it is an iterator for the corresponding states.
+Complex linear combination of states from iterator. $c is a 'complex'
+ndarray and $it is an iterator for the corresponding states.
 
 =item * $p=HProd($a, $b, $skip)
 
@@ -422,15 +484,55 @@ Returns a 2D vector field ready for gnuplotting from a vector field $f
 scaling the result by $s and decimating the field by $d. The vectors
 are centered on the decimated lattice points.
 
-=item * $c=cmatmult($a, $b)
+=item * any_complex
 
-Returns the matrix product of the complex matrices $a times $b, with
-signatures a(2,j,i), b(2,k,j), c(2,k,i). The first index is 2,
-corresponding to the real and imaginary parts, j denotes columns of a,
-rows of b, i denotes rows of a and of the result c, k denotes columns
-of b and the result c. Recall that in pdl the first (row) index is
-faster. May thread over extra dimensions.
+True if any of the args are a complex PDL.
+
+=item * tensor
+
+Given a complex PDL, an LU decomposition array-ref as returned by
+L</lu_decomp>, and the size of the tensor, returns the tensor.
+
+=item * wave_operator
+
+Given a Green tensor and number of dimension in the geometry, returns
+a wave operator.
+
+=item * make_haydock
+
+=item * make_greenp
+
+Given an object and a classname, construct an array-ref of objects of
+that class, with relevant fields copied from the object.
+
+=item * cgtsv
+
+Solves a general complex tridiagonal system of equations.
+
+       $b = cgtsv($c, $d, $e, $b);
+
+where C<$c(2,0..$n-2)> is the subdiagonal, C<$d(2,0..$n-1)> the diagonal and
+C<$e(2,0..$n-2)> the supradiagonal of an $nX$n tridiagonal complex
+double precision matrix. C<$b(2,0..$n-1)> is the right hand side
+vector. C<$b> is replaced by the solution. Dies if gets an error.
+
+=item * lu_decomp
+
+Uses the appropriate LU decomposition function (real vs complex,
+detected) for L</lu_solve>. Returns list of LU, permutations. Dies if
+decomposition failed.
+
+=item * lu_solve
+
+Uses the appropriate LU solver function (real vs complex,
+detected). Given an array-ref with the return values of L</lu_decomp>, and
+a transposed C<B> matrix, returns transposed C<x>. Dies if solving failed.
+
+=item * apply_longitudinal_projection
+
+Given a C<psi_G> state, a C<GNorm>, the number of dimensions, and a
+real-space coefficient, transforms the C<psi_G> field from reciprocal to
+real space, multiplies by the coefficient, transforms back to reciprocal
+space.
 
 =back
-
-=cut

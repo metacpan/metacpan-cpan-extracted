@@ -1,0 +1,59 @@
+## name WithPrototype
+## failures 1
+## cut
+
+sub foo ($) { ... }
+
+## name WithSignature
+## failures 0
+## cut
+
+use feature 'signatures';
+sub foo ($foo) { ... }
+
+## name ExperimentalSignature
+## failures 0
+## cut
+
+use experimental 'signatures';
+sub foo ($foo) { ... }
+
+## name MojoSignature
+## failures 0
+## cut
+
+use Mojo::Base -base, -signatures;
+sub foo ($foo) { ... }
+
+## name MojoLiteSignature
+## failures 0
+## cut
+
+use Mojolicious::Lite -signatures;
+sub foo ($foo) { ... }
+
+## name CustomSignature
+## failures 0
+## parms { signature_enablers => 'MyApp::Base' }
+## cut
+
+use MyApp::Base;
+sub foo ($foo) { ... }
+
+## name NoPrototype
+## failures 0
+## cut
+
+sub foo { ... }
+
+## name EmptyPrototype
+## failures 0
+## cut
+
+sub foo () { ... }
+
+## name SubPrototype
+## failures 0
+## cut
+
+sub foo (&;@) { ... }

@@ -12,7 +12,7 @@ configure_requires:
   ExtUtils::MakeMaker: 6.36
 distribution_type: module
 dynamic_config: 1
-generated_by: 'Module::Install version 1.16'
+generated_by: 'Module::Install version 1.19'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -24,8 +24,9 @@ no_index:
     - t
 requires:
   Catalyst::Plugin::Authentication: '0.10003'
+  Class::Accessor::Fast: '0.50'
   Net::LDAP: 0
 resources:
   license: http://dev.perl.org/licenses/
   repository: git://git.shadowcat.co.uk/catagits/Catalyst-Authentication-Store-LDAP.git
-version: '1.016'
+version: '1.017'

@@ -3,102 +3,7 @@ package Beekeeper::WorkerPool;
 use strict;
 use warnings;
 
-our $VERSION = '0.01';
-
-=head1 NAME
-
-Beekeeper::WorkerPool - Manage worker pools
-
-=head1 VERSION
- 
-Version 0.01
-
-=head1 SYNOPSIS
-
-  $ bkpr --pool-id MyPool start
-  Starting pool of MyApp workers: beekeeper-MyPool.
-  
-  $ bkpr --pool-id MyPool stop
-  Stopping pool of MyApp workers: beekeeper-MyPool.
-  
-  $ bkpr --help
-  Usage: bkpr [options] {start|stop|restart|reload|check}
-   --foreground      Run in foreground (do not daemonize)
-   --pool-id    str  Worker pool name (mandatory)
-   --user       str  Run as specified user
-   --group      str  Run as specified group
-   --config-dir str  Path to directory containing config files
-   --debug           Turn on workers debug flag
-   --help            Shows this message
-
-=head1 DESCRIPTION
-
-This module contains the core of the command line tool C<bkpr> which is used
-to manage worker pools: it start, stop and monitor pools of persistent
-C<Beekeeper::Worker> processes which receive RPC requests from message bus.
-
-When started it daemonize itself (unless C<--foreground> option is passed) and
-fork all worker processes, then monitor those forked processes and B<immediately>
-respawn defunct ones.
-
-=head1 CONFIGURATION
-
-=head3 pool.config.json
-
-Workers pools are defined into a file named C<pool.config.json>, which is searched
-for into ENV C<BEEKEEPER_CONFIG_DIR>, C<~/.config/beekeeper> and C</etc/beekeeper>.
-The file is in relaxed JSON format (so it allows comments and trailing commas).
-
-All worker pools running on the host must be declared into the file, specifying 
-which logical bus should be used and which services it will run. 
-
-Each entry define a worker pool. Required parameters are:
-
-C<pool-id> An arbitrary identifier for the worker pool.
-
-C<bus-id> An identifier of logical bus used by worker processes.
-
-C<workers> A map of worker classes to (arbitrary) config hashes.
-
-The following example defines "MyApp" as a pool of 2 C<MyApp::Worker> processes:
-
-  [{
-      "pool-id" : "MyApp",
-      "bus-id"  : "backend",
-      "workers" : {
-          "MyApp::Worker" : { "workers_count" : 2 },
-      },
-  }]
-
-=head3 bus.config.json
-
-All logical buses used by your application are defined into a file named 
-C<bus.config.json> and specify the conection parameters to the STOMP brokers
-that will service them.
-
-Each entry define a logical bus. Required parameters are:
-
-C<bus-id> arbitrary identifier of logical bus.
-
-C<host> hostname or IP address of the STOMP broker.
-
-C<user> username used to connect to the STOMP broker.
-
-C<pass> password used to connect to the STOMP broker.
-
-C<vhost> virtual host of STOMP broker (may be omitted).
-
-The following example defines the logical bus "backend":
-
-  [{
-      "bus-id" : "backend",
-      "host"   : "10.0.0.1",
-      "user"   : "username",
-      "pass"   : "password",
-      "vhost"  : "/backend",
-  }]
-
-=cut
+our $VERSION = '0.04';
 
 use base 'Beekeeper::WorkerPool::Daemon';
 use POSIX ":sys_wait_h";
@@ -114,23 +19,23 @@ sub new {
     my $self = $class->SUPER::new(
         daemon_name  => "beekeeper",
         description  => "worker pool",
-        get_options  => [ "pool-id=s", "config-dir=s", "debug" ],
+        get_options  => [ "pool=s", "config-dir=s", "debug" ],
         %args,
     );
 
     $self->parse_options;
 
-    my $pool_id = $self->{options}->{'pool-id'} || '';
+    my $pool_id = $self->{options}->{'pool'} || '';
     ($pool_id) = ($pool_id =~ m/^([\w-]+)$/); # untaint
 
     unless ($pool_id) {
-        print "Mandatory parameter --pool-id was not specified.\n\n";
+        print "Mandatory parameter --pool was not specified.\n\n";
         #ENHACEMENT: list available pools
         $self->cmd_help;
         CORE::exit(1);
     }
 
-    $self->{config}->{'pool-id'}   = $pool_id;
+    $self->{config}->{'pool_id'}   = $pool_id;
     $self->{config}->{daemon_name} = "beekeeper-$pool_id";
     $self->{config}->{description} = "worker pool $pool_id";
 
@@ -148,7 +53,7 @@ sub cmd_help {
 
     print "Usage: $progname [options] {start|stop|restart|reload|check}\n";
     print " --foreground      Run in foreground (do not daemonize)\n";
-    print " --pool-id    str  Worker pool name (mandatory)\n";
+    print " --pool       str  Worker pool name (mandatory)\n";
     print " --user       str  Run as specified user\n";
     print " --group      str  Run as specified group\n";
     print " --config-dir str  Path to directory containing config files\n";
@@ -159,7 +64,7 @@ sub cmd_help {
 sub load_config {
     my $self = shift;
 
-    my $pool_id  = $self->{config}->{'pool-id'};
+    my $pool_id  = $self->{config}->{'pool_id'};
     my $conf_dir = $self->{options}->{'config-dir'};
 
     Beekeeper::Config->set_config_dir($conf_dir) if ($conf_dir);
@@ -172,7 +77,7 @@ sub load_config {
     }
 
     # Ensure that local bus is defined
-    my $bus_id = $pool_cfg->{'bus-id'};
+    my $bus_id = $pool_cfg->{'bus_id'};
 
     unless ($bus_cfg->{$bus_id}) {
         die "Bus '$bus_id' is not defined into config file bus.config.json\n";
@@ -197,7 +102,7 @@ sub main {
     my %workers;     # will hold a pid -> class map of running workers
 
     my $workers_config = $self->{config}->{'workers'};
-    my $pool_id        = $self->{config}->{'pool-id'};
+    my $pool_id        = $self->{config}->{'pool_id'};
 
     my @spawn_workers = (
         # Every pool spawns at least a Supervisor and a Sinkhole
@@ -428,8 +333,8 @@ sub spawn_worker {
         debug       => $self->{options}->{debug},
         bus_config  => $self->{bus_config},
         pool_config => $self->{config},
-        pool_id     => $self->{config}->{'pool-id'},
-        bus_id      => $self->{config}->{'bus-id'},
+        pool_id     => $self->{config}->{'pool_id'},
+        bus_id      => $self->{config}->{'bus_id'},
         config      => $self->{config}->{'workers'}->{$worker_class},
     );
 
@@ -444,7 +349,109 @@ sub spawn_worker {
 
 1;
 
+__END__
+
+=pod
+
 =encoding utf8
+
+=head1 NAME
+
+Beekeeper::WorkerPool - Manage worker pools
+
+=head1 VERSION
+ 
+Version 0.04
+
+=head1 SYNOPSIS
+
+  $ bkpr --pool MyPool start
+  Starting pool of MyApp workers: beekeeper-MyPool.
+  
+  $ bkpr --pool MyPool stop
+  Stopping pool of MyApp workers: beekeeper-MyPool.
+  
+  $ bkpr --help
+  Usage: bkpr [options] {start|stop|restart|reload|check}
+   --foreground      Run in foreground (do not daemonize)
+   --pool       str  Worker pool name (mandatory)
+   --user       str  Run as specified user
+   --group      str  Run as specified group
+   --config-dir str  Path to directory containing config files
+   --debug           Turn on workers debug flag
+   --help            Shows this message
+
+=head1 DESCRIPTION
+
+This module contains the core of the command line tool C<bkpr> which is used
+to manage worker pools: it start, stop and monitor pools of persistent
+C<Beekeeper::Worker> processes which receive RPC requests from message bus.
+
+When started it daemonize itself (unless C<--foreground> option is passed) and
+fork all worker processes, then monitor those forked processes and B<immediately>
+respawn defunct ones.
+
+=head1 CONFIGURATION
+
+=head3 pool.config.json
+
+Workers pools are defined into a file named C<pool.config.json>, which is searched
+for into ENV C<BEEKEEPER_CONFIG_DIR>, C<~/.config/beekeeper> and C</etc/beekeeper>.
+The file is in relaxed JSON format (so it allows comments and trailing commas).
+
+All worker pools running on the host must be declared into the file, specifying 
+which logical bus should be used and which services it will run. 
+
+Each entry define a worker pool. Required parameters are:
+
+C<pool_id> An arbitrary identifier for the worker pool.
+
+C<bus_id> An identifier of logical bus used by worker processes.
+
+C<workers> A map of worker classes to (arbitrary) config hashes.
+
+The following example defines "MyApp" as a pool of 2 C<MyApp::Worker> processes:
+
+  [{
+      "pool_id" : "MyApp",
+      "bus_id"  : "backend",
+      "workers" : {
+          "MyApp::Worker" : { "workers_count" : 2 },
+      },
+  }]
+
+=head3 bus.config.json
+
+All logical buses used by your application are defined into a file named 
+C<bus.config.json> and specify the conection parameters to the MQTT brokers
+that will service them.
+
+Each entry define a logical bus. Required parameters are:
+
+C<bus_id>: unique identifier of the logical bus (required)
+
+C<bus_role>: specifies if the bus is acting as frontend or backend
+
+C<host>: hostname or IP address of the broker
+
+C<port>: port of the broker (default is 1883)
+
+C<tls>: if set to true enables the use of TLS on broker connection
+
+C<username>: username used to connect to the broker
+
+C<password>: password used to connect to the broker
+
+
+The following example defines the logical bus "backend":
+
+  [{
+      "bus_id" : "backend",
+      "host"   : "10.0.0.1",
+      "user"   : "username",
+      "pass"   : "password",
+      "vhost"  : "/backend",
+  }]
 
 =head1 AUTHOR
 
@@ -452,7 +459,7 @@ José Micó, C<jose.mico@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright 2015 José Micó.
+Copyright 2015-2021 José Micó.
 
 This is free software; you can redistribute it and/or modify it under the same 
 terms as the Perl 5 programming language itself.

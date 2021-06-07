@@ -1,0 +1,56 @@
+use alienfile;
+use FFI::CheckLib qw[find_lib_or_die];
+use Config;
+plugin 'PkgConfig' => 'libsdl2';
+
+my $version = $ENV{ALIEN_LIBSDL2_VERSION} || '2.0.14';
+my $arch    = 'x86_64';
+
+meta->around_hook(
+    probe => sub {
+        my $orig  = shift;
+        my $build = shift;
+        my $type  = $orig->( $build, @_ );
+        return $type if $type eq 'share';
+        find_lib_or_die lib => sdl2 => symbol => [qw[SDL_log SDL_rect]];
+        return $type;
+    }
+);
+
+#probe sub {'share'};
+
+share {
+    if ( $^O eq 'MSWin32' ) {
+        plugin 'Download' => start_url(
+            ( $Config{archname} !~ /^MSWin32-x64/ || $Config{ptrsize} != 8 )
+            ? "https://www.libsdl.org/release/SDL2-$version-win32-x86.zip"
+            : "https://www.libsdl.org/release/SDL2-$version-win32-x64.zip"
+        );
+        plugin Extract => 'zip';
+    }
+    else {    # Linux, OSX, etc.
+        plugin 'Download' => ( url => "https://libsdl.org/release/SDL2-$version.tar.gz" );
+        plugin Extract    => 'tar.xz';
+        plugin 'Build::Autoconf';
+        plugin 'Build::Make' => 'gmake';
+        build [
+            'mkdir build',
+            'cd build',
+            '../%{configure}',
+            '%{gmake}',
+            '%{gmake} install',
+        ];
+    }
+
+    plugin 'Build::Copy';
+
+    gather sub {
+        my ($build) = @_;
+        $build->runtime_prop->{version} = $version;
+        $build->runtime_prop->{version} =~ s/^v//;
+        $build->runtime_prop->{cflags} = "-I@{[ $build->runtime_prop->{prefix} ]}/include ";
+        $build->runtime_prop->{libs}   = "-L@{[ $build->runtime_prop->{prefix} ]}/lib -lsdl2 ";
+    };
+
+    plugin 'Gather::IsolateDynamic';
+};

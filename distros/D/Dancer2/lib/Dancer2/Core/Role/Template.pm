@@ -1,7 +1,7 @@
 # ABSTRACT: Role for template engines
 
 package Dancer2::Core::Role::Template;
-$Dancer2::Core::Role::Template::VERSION = '0.301002';
+$Dancer2::Core::Role::Template::VERSION = '0.301004';
 use Dancer2::Core::Types;
 use Dancer2::FileUtils 'path';
 use Carp 'croak';
@@ -237,7 +237,7 @@ Dancer2::Core::Role::Template - Role for template engines
 
 =head1 VERSION
 
-version 0.301002
+version 0.301004
 
 =head1 DESCRIPTION
 

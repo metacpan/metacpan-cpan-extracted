@@ -8,11 +8,10 @@ build_requires:
   IO::Handle: '0'
   IPC::Open3: '0'
   Test::More: '0'
-  blib: '1.01'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.007, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.017, CPAN::Meta::Converter version 2.150010'
 keywords:
   - lingua
   - turkish
@@ -27,8 +26,8 @@ requires:
   Carp: '0'
   Exporter: '0'
   Text::Unidecode: '0.04'
-  base: '0'
   constant: '0'
+  parent: '0'
   perl: '5.010'
   strict: '0'
   subs: '0'
@@ -37,7 +36,9 @@ requires:
 resources:
   bugtracker: https://github.com/burak/CPAN-Lingua-TR-Numbers/issues
   repository: git://github.com/burak/CPAN-Lingua-TR-Numbers.git
-version: '0.34'
+version: '0.35'
 x_contributors:
   - 'Burak Gursoy <burak@cpan.org>'
-x_serialization_backend: 'YAML::Tiny version 1.69'
+x_generated_by_perl: v5.34.0
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

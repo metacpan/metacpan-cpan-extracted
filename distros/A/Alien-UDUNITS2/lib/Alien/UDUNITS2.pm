@@ -1,5 +1,5 @@
 package Alien::UDUNITS2;
-$Alien::UDUNITS2::VERSION = '0.007';
+$Alien::UDUNITS2::VERSION = '0.008';
 use strict;
 use warnings;
 
@@ -12,29 +12,6 @@ use File::Spec;
 
 sub inline_auto_include {
 	[ 'udunits2.h' ];
-}
-
-sub cflags {
-	my ($class) = @_;
-
-	$class->install_type eq 'share'
-		? '-I' . File::Spec->catfile($class->dist_dir, qw(include))
-		: $class->SUPER::cflags;
-}
-
-sub libs {
-	my ($class) = @_;
-
-	my $path = $class->install_type eq 'share'
-		? '-L' . File::Spec->catfile($class->dist_dir, qw(lib))
-		: $class->SUPER::cflags;
-
-	join ' ', (
-		$path,
-		'-ludunits2',
-		( $^O eq 'darwin' || $^O eq 'MSWin32' ? '-lexpat' : '')
-	);
-
 }
 
 sub Inline {
@@ -93,7 +70,7 @@ Alien::UDUNITS2 - Alien package for the UDUNITS-2 physical unit manipulation and
 
 =head1 VERSION
 
-version 0.007
+version 0.008
 
 =head1 Inline support
 

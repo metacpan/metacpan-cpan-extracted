@@ -73,7 +73,7 @@ PDL::LinearAlgebra::Complex - PDL interface to the lapack linear algebra program
 =head1 DESCRIPTION
 
 This module provides an interface to parts of the lapack library (complex numbers).
-These routines accept either float or double piddles.
+These routines accept either float or double ndarrays.
 
 
 
@@ -3588,7 +3588,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for ref
 
-Combine two 3D piddles into a single piddle.
+Combine two 3D ndarrays into a single ndarray.
 This routine does backward and forward dataflow automatically.
 
 

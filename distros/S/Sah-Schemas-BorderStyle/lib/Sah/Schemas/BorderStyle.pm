@@ -1,7 +1,7 @@
 package Sah::Schemas::BorderStyle;
 
-our $DATE = '2021-01-26'; # DATE
-our $VERSION = '0.001'; # VERSION
+our $DATE = '2021-02-02'; # DATE
+our $VERSION = '0.002'; # VERSION
 
 1;
 # ABSTRACT: Sah schemas related to BorderStyle
@@ -18,7 +18,7 @@ Sah::Schemas::BorderStyle - Sah schemas related to BorderStyle
 
 =head1 VERSION
 
-This document describes version 0.001 of Sah::Schemas::BorderStyle (from Perl distribution Sah-Schemas-BorderStyle), released on 2021-01-26.
+This document describes version 0.002 of Sah::Schemas::BorderStyle (from Perl distribution Sah-Schemas-BorderStyle), released on 2021-02-02.
 
 =head1 DESCRIPTION
 

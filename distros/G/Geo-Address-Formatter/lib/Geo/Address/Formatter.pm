@@ -1,7 +1,7 @@
 # ABSTRACT: take structured address data and format it according to the various global/country rules
 
 package Geo::Address::Formatter;
-$Geo::Address::Formatter::VERSION = '1.88';
+$Geo::Address::Formatter::VERSION = '1.93';
 use strict;
 use warnings;
 use feature qw(say);
@@ -10,7 +10,6 @@ use Data::Dumper;
 $Data::Dumper::Sortkeys = 1;
 use File::Basename qw(dirname);
 use File::Find::Rule;
-use List::Util qw(first);
 use Ref::Util qw(is_hashref);
 use Scalar::Util qw(looks_like_number);
 use Text::Hogan::Compiler;
@@ -19,7 +18,6 @@ use YAML::XS qw(LoadFile);
 use utf8;
 
 my $THC = Text::Hogan::Compiler->new;
-my %THT_CACHE; # a place to store Text::Hogan::Template objects
 
 my $debug = 0;
 
@@ -32,13 +30,17 @@ sub new {
     $self->{final_components} = undef;
     bless($self, $class);
 
-    $self->_read_configuration($conf_path);
-    return $self;
+    if ($self->_read_configuration($conf_path)){
+        return $self;
+    }
+    die 'unable to read configuration';
 }
 
 sub _read_configuration {
     my $self = shift;
     my $path = shift;
+
+    return if (! -e $path);
 
     my @a_filenames = File::Find::Rule->file()->name('*.yaml')->in($path . '/countries');
 
@@ -46,6 +48,7 @@ sub _read_configuration {
     $self->{component_aliases} = {};
 
     # read the config file(s)
+    my $loaded = 0;
     foreach my $filename (sort @a_filenames) {
         try {
             my $rh_templates = LoadFile($filename);
@@ -56,14 +59,18 @@ sub _read_configuration {
             foreach (keys %$rh_templates) {
                 $self->{templates}{$_} = $rh_templates->{$_};
             }
+            $loaded = 1;
         } catch {
             warn "error parsing country configuration in $filename: $_";
         };
     }
+    return if ($loaded == 0);
 
     # see if we can load the components
     try {
+        say STDERR "loading components" if ($debug);
         my @c = LoadFile($path . '/components.yaml');
+        #say STDERR Dumper \@c;
 
         foreach my $rh_c (@c) {
             if (defined($rh_c->{aliases})) {
@@ -116,7 +123,7 @@ sub _read_configuration {
     }
     #say Dumper $self->{abbreviations};
     #say Dumper $self->{country2lang};
-    return;
+    return 1;
 }
 
 
@@ -135,6 +142,8 @@ sub format_address {
     my $rh_components = clone(shift) || return;
     my $rh_options    = shift        || {};
 
+    # make sure empty at the beginning
+    $self->{final_components} = undef;    
     # deal with the options
     # country
     my $cc
@@ -196,6 +205,11 @@ sub format_address {
 
     # add the attention, but only if needed
     my $ra_unknown = $self->_find_unknown_components($rh_components);
+    if ($debug){
+        say STDERR "unknown_components:";
+        say STDERR Dumper $ra_unknown;
+    }
+
     if (scalar(@$ra_unknown)) {
         $rh_components->{attention} = join(', ', map { $rh_components->{$_} } @$ra_unknown);
     }
@@ -204,11 +218,11 @@ sub format_address {
         $rh_components = $self->_abbreviate($rh_components);
     }
 
+    $template_text = $self->_replace_template_lambdas($template_text);
+
     # get a compiled template
-    if (!defined($THT_CACHE{$template_text})) {
-        $THT_CACHE{$template_text} = $THC->compile($template_text, {'numeric_string_as_string' => 1});
-    }
-    my $compiled_template = $THT_CACHE{$template_text};
+    my $compiled_template =
+        $THC->compile($template_text, {'numeric_string_as_string' => 1});
 
     if ($debug){
         say STDERR "before _render_template";
@@ -665,14 +679,10 @@ sub _render_template {
 
     # Mustache calls it context
     my $context = clone($components);
-    $context->{first} = sub {
-        my $text     = shift;
-        my $newtext  = $THC->compile($text, {'numeric_string_as_string' => 1})->render($components);
-        my $selected = first { length($_) } split(/\s*\|\|\s*/, $newtext);
-        return $selected;
-    };
-
     my $output = $thtemplate->render($context);
+
+    $output = $self->_evaluate_template_lamdas($output);
+
     say STDERR "in _render pre _clean: $output" if ($debug);
     $output = $self->_clean($output);
 
@@ -687,6 +697,35 @@ sub _render_template {
     }
     return $output;
 }
+
+# Text::Hogan apparently caches lambdas when rendering templates. In the past
+# we needed our lambda 'first', example
+#   {{#first}} {{{city}}} || {{{town}}} {{/first}}
+# to evaluate the componentes. Whenever the lambda was called with different
+# component values it consumed memory. Now replace with a simpler implementation
+#
+sub _replace_template_lambdas {
+    my $self          = shift;
+    my $template_text = shift;
+    $template_text =~ s!\Q{{#first}}\E(.+?)\Q{{/first}}\E!FIRSTSTART${1}FIRSTEND!g;
+    return $template_text;
+}
+
+# We only use a lambda named 'first'
+sub _evaluate_template_lamdas {
+    my $self = shift;
+    my $text = shift;
+    $text =~ s!FIRSTSTART\s*(.+?)\s*FIRSTEND!_select_first($1)!seg;
+    return $text;
+}
+
+# '|| val1 ||  || val3' => 'val1'
+sub _select_first {
+    my $text = shift;
+    my @a_parts = grep { length($_) } split(/\s*\|\|\s*/, $text);
+    return scalar(@a_parts) ? $a_parts[0] : '';
+}
+
 
 # note: unsorted list because $cs is a hash!
 # returns []
@@ -715,7 +754,7 @@ Geo::Address::Formatter - take structured address data and format it according t
 
 =head1 VERSION
 
-version 1.88
+version 1.93
 
 =head1 SYNOPSIS
 

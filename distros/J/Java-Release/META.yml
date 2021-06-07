@@ -6,7 +6,6 @@ build_requires:
   English: 0
   Error::Pure::Utils: 0.22
   ExtUtils::MakeMaker: 6.36
-  File::Object: 0.05
   Test::More: 0
   Test::NoWarnings: 0
 configure_requires:
@@ -26,12 +25,14 @@ no_index:
     - t
     - xt
 requires:
+  Error::Pure: 0
+  List::MoreUtils: 0
   Mo: 0
   Readonly: 0
-  perl: 5.8.0
+  perl: 5.10.0
 resources:
-  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Java-Release
+  bugtracker: https://github.com/michal-josef-spacek/Java-Release/issues
   homepage: https://github.com/michal-josef-spacek/Java-Release
   license: http://opensource.org/licenses/bsd-license.php
   repository: git://github.com/michal-josef-spacek/Java-Release
-version: '0.03'
+version: '0.06'

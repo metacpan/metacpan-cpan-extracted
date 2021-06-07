@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 4;
+use Test::More tests => 2 * 2;
 use Text::Wrap::Smart::XS qw(exact_wrap);
 
 my $join = sub { local $_ = shift; chomp; s/\n/ /g; $_ };
@@ -56,7 +56,7 @@ sub test_wrap
     my @strings = exact_wrap($text, $wrap_at);
 
     my $length = $wrap_at ? $wrap_at : 'default';
-    my $message = "(wrapping length: $length)";
+    my $message = "(wrapping length: $length) [ordinary]";
 
     is(@strings, $count, "$message amount of substrings");
     is_deeply(\@strings, $expected, "$message splitted at offset");

@@ -1,9 +1,9 @@
 package TableData;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-04-11'; # DATE
+our $DATE = '2021-06-01'; # DATE
 our $DIST = 'TableData'; # DIST
-our $VERSION = '0.1.5'; # VERSION
+our $VERSION = '0.2.1'; # VERSION
 
 1;
 # ABSTRACT: Specification for TableData::*, modules that contains table data
@@ -20,11 +20,11 @@ TableData - Specification for TableData::*, modules that contains table data
 
 =head1 SPECIFICATION VERSION
 
-0.1
+0.2
 
 =head1 VERSION
 
-This document describes version 0.1.5 of TableData (from Perl distribution TableData), released on 2021-04-11.
+This document describes version 0.2.1 of TableData (from Perl distribution TableData), released on 2021-06-01.
 
 =head1 SYNOPSIS
 
@@ -61,12 +61,42 @@ C<TableData::*> module.
 
 C<TableData> (this module) is the specification.
 
+All the modules under C<TableData::*> are modules with actual table data. The
+entity mentioned in the module name should be singular, not plural (e.g.
+C<TableData::Person::AcmeInc> instead of C<TableData::Persons::AcmeInc> or
+C<TableData::People::AcmeInc>.
+
+More specific subnamespaces for more specific types of table data:
+
+=over
+
+=item * C<TableData::Locale::*> for locale-related data
+
+Examples: C<TableData::Locale::Country> (list of countries in the world),
+L<TableData::Locale::US::State> (list of US states),
+C<TableData::Locale::ID::Province> (list of Indonesian provinces).
+
+=item * C<TableData::Lingua::*> for human-language-related data
+
+Examples: L<TableData::Lingua::Word::EN::Adjective::TalkEnglish> (list of top
+adjectives from talkenglish.com website, along with some other data like
+frequency). All C<TableData::Lingua::Word::*> modules should contain the column
+C<word> so they are usable from applications like word games.
+
+=back
+
 C<TableDataRole::*> the roles.
 
-All the modules under C<TableData::*> will be modules with actual table data.
+C<TableDataRoles::*> is the name for distribution that contain several role
+modules.
 
-C<TableDataCollection-*> name for distribution that contains several
-C<TableData> modules.
+C<TableDataBase::*> for base classes.
+
+C<TableDataBases::*> is the name for distribution that contain several
+C<TableDataBase> modules.
+
+C<TableDataBundle-*> name for distribution that contains several C<TableData>
+modules.
 
 =head1 FAQ
 

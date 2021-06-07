@@ -21,6 +21,8 @@ share/remotes/folder/folderInteger.json
 share/remotes/integer.json
 share/remotes/name-defs.json
 share/remotes/name.json
+share/remotes/ref-and-definitions.json
+share/remotes/ref-and-defs.json
 share/remotes/subSchemas-defs.json
 share/remotes/subSchemas.json
 share/submodule_status

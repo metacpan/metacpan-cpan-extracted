@@ -1,5 +1,9 @@
 Revision history for Perl extension App::Prove::Plugin::MySQLPool
 
+0.10 2021-05-24T11:01:36Z
+    - restrict execution the forking hook only for the direct children (karupanerura)
+    - fix testing toolchain (karupanerura, shogo82148)
+
 0.09 2018-01-24T11:51:25Z
     - stop mysqld when "prove" is interuppted (gugod)
 

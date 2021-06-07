@@ -29,7 +29,7 @@ sub fail {
 
     my $cli = Beekeeper::Client->instance;
 
-    $cli->do_job(
+    $cli->call_remote(
         method => 'test.fail',
         params => { %args },
     );
@@ -40,7 +40,7 @@ sub sleep {
 
     my $cli = Beekeeper::Client->instance;
 
-    $cli->do_job(
+    $cli->call_remote(
         method => 'test.sleep',
         params => $time,
     );
@@ -51,7 +51,7 @@ sub fibonacci_1 {
 
     my $cli = Beekeeper::Client->instance;
 
-    $cli->do_job(
+    $cli->call_remote(
         method => 'test.fib1',
         params => $n,
     );
@@ -62,7 +62,7 @@ sub fibonacci_2 {
 
     my $cli = Beekeeper::Client->instance;
 
-    $cli->do_job(
+    $cli->call_remote(
         method => 'test.fib2',
         params => $n,
     );
@@ -73,7 +73,7 @@ sub echo {
 
     my $cli = Beekeeper::Client->instance;
 
-    $cli->do_job(
+    $cli->call_remote(
         method => 'test.echo',
         params => $params,
     );

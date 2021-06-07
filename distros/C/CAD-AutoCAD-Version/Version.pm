@@ -18,14 +18,14 @@ Readonly::Hash my %ACADVER => (
 	'AC2.10' => 'Version 2.10',
 	'AC2.21' => 'Version 2.21',
 	'AC2.22' => 'Version 2.22',
-	'AC1001' => 'Version 2.22',
+	'AC1001' => 'Version 2.40',
 	'AC1002' => 'Version 2.50',
 	'AC1003' => 'Version 2.60',
 	'AC1004' => 'Release 9',
 	'AC1006' => 'Release 10',
 	'AC1009' => 'Release 11/12',
 	'AC1012' => 'Release 13',
-	'AC1013' => '??',
+	'AC1013' => 'Release 13c3',
 	'AC1014' => 'Release 14',
 	'AC1015' => 'AutoCAD 2000',
 	'AC1016' => 'AutoCAD 2000i',
@@ -47,9 +47,10 @@ Readonly::Hash my %ACADVER => (
 	'AC1032' => 'AutoCAD 2018',
 	'AC1033' => 'AutoCAD 2019',
 	'AC1034' => 'AutoCAD 2020',
+	'AC1035' => 'AutoCAD 2021',
 );
 
-our $VERSION = 0.04;
+our $VERSION = 0.05;
 
 # Constructor.
 sub new {
@@ -198,10 +199,11 @@ Returns array of identifiers.
  #     [30] "AC1032",
  #     [31] "AC1033",
  #     [32] "AC1034",
- #     [33] "AC2.10",
- #     [34] "AC2.21",
- #     [35] "AC2.22",
- #     [36] "MC0.0"
+ #     [33] "AC1035",
+ #     [34] "AC2.10",
+ #     [35] "AC2.21",
+ #     [36] "AC2.22",
+ #     [37] "MC0.0"
  # ]
 
 =head1 EXAMPLE2
@@ -260,6 +262,7 @@ Returns array of identifiers.
  #     [34] "AC1032",
  #     [35] "AC1033",
  #     [36] "AC1034",
+ #     [37] "AC1035",
  # ]
 
 =head1 DEPENDENCIES
@@ -293,12 +296,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-© 2020 Michal Josef Špaček
+© 2020-2021 Michal Josef Špaček
 
 BSD 2-Clause License
 
 =head1 VERSION
 
-0.04
+0.05
 
 =cut

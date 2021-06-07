@@ -4,7 +4,7 @@ WebService::LogicMonitor - Interact with LogicMonitor's API
 
 # VERSION
 
-version 0.153170
+version 0.211560
 
 # SYNOPSIS
 
@@ -116,13 +116,13 @@ what parameters are available to filter the alerts.
 
 ## `add_host`
 
-Creates and returns a new host. Shortcut for [WebService::LogicMonitor::Host](https://metacpan.org/pod/WebService::LogicMonitor::Host)
+Creates and returns a new host. Shortcut for [WebService::LogicMonitor::Host](https://metacpan.org/pod/WebService%3A%3ALogicMonitor%3A%3AHost)
 `new` and `create`
 
 ## `delete_host(Str displayname)`
 
 Deletes a host identified by its displayname. Convenience wrapper around
-["get\_host" in WebService::LogicMonitor](https://metacpan.org/pod/WebService::LogicMonitor#get_host) and ["delete" in WebService::LogicMonitor::Host](https://metacpan.org/pod/WebService::LogicMonitor::Host#delete).
+["get\_host" in WebService::LogicMonitor](https://metacpan.org/pod/WebService%3A%3ALogicMonitor#get_host) and ["delete" in WebService::LogicMonitor::Host](https://metacpan.org/pod/WebService%3A%3ALogicMonitor%3A%3AHost#delete).
 
 ## `get_host(Str displayname)`
 
@@ -177,7 +177,7 @@ The id for Host can be either an id number or hostname string.
 
 To simplify calling this we take two keys, `start` and `end` which must
 be either [DateTime](https://metacpan.org/pod/DateTime) objects or ISO8601 strings parseable by
-[DateTime::Format::ISO8601](https://metacpan.org/pod/DateTime::Format::ISO8601).
+[DateTime::Format::ISO8601](https://metacpan.org/pod/DateTime%3A%3AFormat%3A%3AISO8601).
 
 [http://help.logicmonitor.com/developers-guide/schedule-down-time/set-sdt-data/](http://help.logicmonitor.com/developers-guide/schedule-down-time/set-sdt-data/)
 
@@ -204,11 +204,11 @@ one unit can be specified.
 
 # AUTHOR
 
-Ioan Rogers &lt;ioan.rogers@sophos.com>
+Ioan Rogers <ioan.rogers@sophos.com>
 
 # COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by Sophos Ltd.
+This software is copyright (c) 2021 by Sophos Ltd.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

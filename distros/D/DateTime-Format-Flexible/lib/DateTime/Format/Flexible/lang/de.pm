@@ -31,60 +31,67 @@ sub months
 
 sub days
 {
-    return (
-        qr{\bMo(?:ntag)?\b}i     => 1, # Monday
-        qr{\bDi(?:enstag)?\b}i   => 2, # Tuesday
-        qr{\bMi(?:ttwoch)?\b}i   => 3, # Wednesday
-        qr{\bDo(?:nnerstag)?\b}i => 4, # Thursday
-        qr{\bFr(?:eitag)?\b}i    => 5, # Friday
-        qr{\bSa(?:mstag)?\b}i    => 6, # Saturday
-        qr{\bSonnabend\b}i       => 6, # Saturday
-        qr{\bSo(?:nntag)?\b}i    => 7, # Sunday
-    );
+    return [
+        {Montag     => 1}, # Monday
+        {Mo         => 1}, # Monday
+        {Dienstag   => 2}, # Tuesday
+        {Di         => 2}, # Tuesday
+        {Mittwoch   => 3}, # Wednesday
+        {Mi         => 3}, # Wednesday
+        {Donnerstag => 4}, # Thursday
+        {Do         => 4}, # Thursday
+        {Freitag    => 5}, # Friday
+        {Fr         => 5}, # Friday
+        {Samstag    => 6}, # Saturday
+        {Sa         => 6}, # Saturday
+        {Sonnabend  => 6}, # Saturday
+        {Sonntag    => 7}, # Sunday
+        {So         => 7}, # Sunday
+    ];
 }
 
 sub day_numbers
 {
     return (
-        qr{erster}i               => 1, # first
-        qr{ersten}i               => 1, # first
-        qr{zweiter}i              => 2, # second
-        qr{dritter}i              => 3, # third
-        qr{vierter}i              => 4, # fourth
-        qr{fünfter}i              => 5, # fifth
-        qr{fuenfter}i             => 5, # fifth
-        qr{sechster}i             => 6, # sixth
-        qr{siebter}i              => 7, # seventh
-        qr{achter}i               => 8, # eighth
-        qr{neunter}i              => 9, # ninth
-        qr{zehnter}i              => 10, # tenth
-        qr{elfter}i               => 11, # eleventh
-        qr{zwölfter}i             => 12, # twelfth
-        qr{zwoelfter}i            => 12, # twelfth
-        qr{dreizehnter}i          => 13, # thirteenth
-        qr{vierzehnter}i          => 14, # fourteenth
-        qr{vierzehnten}i          => 14, # fourteenth
-        qr{fünfzehnter}i          => 15, # fifteenth
-        qr{fuenfzehnter}i         => 15, # fifteenth
-        qr{sechzehnter}i          => 16, # sixteenth
-        qr{siebzehnter}i          => 17, # seventeenth
-        qr{achtzehnter}i          => 18, # eithteenth
-        qr{neunzehnter}i          => 19, # ninteenth
-        qr{zwanzigster}i          => 20, # twentieth
-        qr{einundzwanzigster}i    => 21, # twenty first
-        qr{zweiundzwanzigster}i   => 22, # twenty second
-        qr{dreiundzwanzigster}i   => 23, # twenty third
-        qr{vierundzwanzigster}i   => 24, # twenty fourth
-        qr{fünfundzwanzigster}i   => 25, # twenty fifth
-        qr{fuenfundzwanzigster}i  => 25, # twenty fifth
-        qr{sechsundzwanzigster}i  => 26, # twenty sixth
-        qr{siebenundzwanzigster}i => 27, # twenty seventh
-        qr{achtundzwanzigster}i   => 28, # twenty eighth
-        qr{neunundzwanzigster}i   => 29, # twenty ninth
-        qr{dreißigster}i          => 30, # thirtieth
-        qr{dreissigster}i         => 30, # thirtieth
-        qr{einunddreißigster}i    => 31, # thirty first
-        qr{einunddreissigster}i   => 31, # thirty first
+        q{erster}               => 1, # first
+        q{ersten}               => 1, # first
+        q{zweiter}              => 2, # second
+        q{dritter}              => 3, # third
+        q{vierter}              => 4, # fourth
+        q{fünfter}              => 5, # fifth
+        q{fuenfter}             => 5, # fifth
+        q{sechster}             => 6, # sixth
+        q{siebter}              => 7, # seventh
+        q{achter}               => 8, # eighth
+        q{neunter}              => 9, # ninth
+        q{zehnter}              => 10, # tenth
+        q{elfter}               => 11, # eleventh
+        q{zwölfter}             => 12, # twelfth
+        q{zwoelfter}            => 12, # twelfth
+        q{dreizehnter}          => 13, # thirteenth
+        q{vierzehnter}          => 14, # fourteenth
+        q{vierzehnten}          => 14, # fourteenth
+        q{fünfzehnter}          => 15, # fifteenth
+        q{fuenfzehnter}         => 15, # fifteenth
+        q{sechzehnter}          => 16, # sixteenth
+        q{siebzehnter}          => 17, # seventeenth
+        q{achtzehnter}          => 18, # eithteenth
+        q{neunzehnter}          => 19, # ninteenth
+        q{zwanzigster}          => 20, # twentieth
+        q{einundzwanzigster}    => 21, # twenty first
+        q{zweiundzwanzigster}   => 22, # twenty second
+        q{dreiundzwanzigster}   => 23, # twenty third
+        q{vierundzwanzigster}   => 24, # twenty fourth
+        q{fünfundzwanzigster}   => 25, # twenty fifth
+        q{fuenfundzwanzigster}  => 25, # twenty fifth
+        q{sechsundzwanzigster}  => 26, # twenty sixth
+        q{siebenundzwanzigster} => 27, # twenty seventh
+        q{achtundzwanzigster}   => 28, # twenty eighth
+        q{neunundzwanzigster}   => 29, # twenty ninth
+        q{dreißigster}          => 30, # thirtieth
+        q{dreissigster}         => 30, # thirtieth
+        q{einunddreißigster}    => 31, # thirty first
+        q{einunddreissigster}   => 31, # thirty first
     );
 }
 

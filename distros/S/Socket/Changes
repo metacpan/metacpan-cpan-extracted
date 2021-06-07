@@ -1,5 +1,14 @@
 Revision history for Socket
 
+2.032   2021-06-03
+        [CHANGES]
+         * Attempt to support NetBSD's LOCAL_* constants (RT127989)
+         * Use G_LIST instead of G_ARRAY
+
+        [BUGFIXES]
+         * Support short AF_UNIX addresses on Cygwin (RT135262)
+         * Make sure to use SvPVbyte() and not plain SvPV() (RT134421)
+
 2.031   2021-01-05
         [CHANGES]
          * Warn about truncation of out-of-range port numbers in

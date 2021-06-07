@@ -6,7 +6,7 @@ This test is just here for testing code samples given in the synopsis section or
 
 =cut
 
-use 5.022;
+use 5.024;
 
 # Using Test2, important to specify which version of Test2
 # since later versions may break things.

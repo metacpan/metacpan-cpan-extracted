@@ -1,0 +1,37 @@
+---
+abstract: 'a static image gallery creator'
+author:
+  - 'Alex Schroeder'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::SearchPath: '0'
+  Mojo::DOM58: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '6.52'
+  File::ShareDir::Install: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010'
+license: gpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: App-sitelenmute
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Encode::Locale: '0'
+  File::Copy::Recursive: '0'
+  File::ShareDir: '0'
+  File::Slurper: '0'
+  File::Symlink::Relative: '0'
+  Image::ExifTool: '0'
+  JSON::Tiny: '0'
+  Modern::Perl: '1.20180701'
+  Time::Progress: '0'
+  perl: '5.026000'
+resources:
+  repository: https://alexschroeder.ch/cgit/
+version: 3.02
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

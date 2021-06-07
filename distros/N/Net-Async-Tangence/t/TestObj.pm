@@ -1,6 +1,7 @@
 package t::TestObj;
 
-use strict;
+use v5.14;
+use warnings;
 
 use base qw( Tangence::Object );
 
@@ -86,4 +87,4 @@ sub del_number
    }
 }
 
-1;
+0x55AA;

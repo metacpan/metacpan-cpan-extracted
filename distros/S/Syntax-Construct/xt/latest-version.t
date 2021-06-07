@@ -19,18 +19,40 @@ for my $dependency (qw( File::Fetch YAML )) {
          unless eval "require $dependency";
 }
 
-my $travis = eval { YAML::LoadFile("$FindBin::Bin/../.travis.yml") }
-    or plan(skip_all => "Can't find travis config");
+my $ci = eval { YAML::LoadFile("$FindBin::Bin/../.github/workflows/tester.yaml") }
+    or plan(skip_all => "Can't find github actions config");
 
 my $ff = 'File::Fetch'->new(uri => 'http://perl.org/index.html');
 $ff->fetch(to => \ my $perl_org)
     or plan(skip_all => "Can't fetch perl.org");
 
 my $version_re = qr/5\.[0-9]+\.[0-9]+/;
-my $travis_version = (sort_by_version(map /($version_re)/,
-                                      grep /$version_re/,
-                                      @{ $travis->{perl} }))[-1];
+my $ci_version = (sort_by_version(
+    map /($version_re)/,
+    grep /$version_re/,
+    @{ $ci->{jobs}{'matrix-tests'}{strategy}{matrix}{'perl-version'} }))[-1];
 
-plan(tests => 1);
-ok($perl_org =~ /version-highlight.*\Q$travis_version\E\b/, $travis_version);
+plan(tests => 2);
+ok($perl_org =~ /version-highlight.*\Q$ci_version\E\b/, $ci_version);
 
+my $doc_version = $ci_version;
+$doc_version =~ s/\.[0-9]+$//;
+$doc_version =~ s/\./.0/;
+
+my $current_version = 0;
+my $delta_links = 1;
+open my $src, '<', "$FindBin::Bin/../lib/Syntax/Construct.pm" or die $!;
+while (<$src>) {
+    if (/^=head2 (5\.[0-9]+)/) {
+        $current_version = $1;
+    }
+    if (my ($link) = /(L<.*perldelta.*>)/) {
+        if ($current_version ne $doc_version
+            || $ci_version !~ /\.0$/
+        ) {
+            diag "$link";
+            $delta_links = 0;
+        }
+    }
+}
+ok($delta_links, 'Delta links');

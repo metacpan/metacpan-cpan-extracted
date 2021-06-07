@@ -14,7 +14,7 @@ BEGIN {
 }
 binmode(DATA, ":encoding(UTF-8)");
 
-use Test::More tests => 9;
+use Test::More tests => 11;
 use Test::NoWarnings;
 
 use App::SpreadRevolutionaryDate;
@@ -27,9 +27,11 @@ isa_ok($spread_revolutionary_date->targets->{mastodon}, 'App::SpreadRevolutionar
 isa_ok($spread_revolutionary_date->targets->{mastodon}->obj, 'Mastodon::Client', 'Mastodon object');
 isa_ok($spread_revolutionary_date->targets->{freenode}, 'App::SpreadRevolutionaryDate::Target::Freenode', 'Freenode class constructor');
 isa_ok($spread_revolutionary_date->targets->{freenode}->obj, 'App::SpreadRevolutionaryDate::Target::Freenode::Bot', 'Freenode object');
+isa_ok($spread_revolutionary_date->targets->{liberachat}, 'App::SpreadRevolutionaryDate::Target::Liberachat', 'Liberachat class constructor');
+isa_ok($spread_revolutionary_date->targets->{liberachat}->obj, 'App::SpreadRevolutionaryDate::Target::Liberachat::Bot', 'Liberachat object');
 
 eval { $spread_revolutionary_date->targets->{twitter}->obj->verify_credentials };
-is($@, '401: Authorization Required', 'Twitter no connection with fake credentials');
+like($@, qr/^401: /, 'Twitter no connection with fake credentials');
 
 eval { $spread_revolutionary_date->targets->{mastodon}->obj->get_account };
 like($@, qr/^Could not complete request: (?:500 Can't connect to Instance|599 Internal Exception)/, 'Mastodon no connection with fake credentials');
@@ -54,6 +56,16 @@ access_token    = 'AccessToken'
 
 [freenode]
 # See https://freenode.net/kb/answer/registration to register
+nickname      = 'NickName'
+password      = 'Password'
+test_channels = '#TestChannel1'
+test_channels = '#TestChannel2'
+channels      = '#Channel1'
+channels      = '#Channel2'
+channels      = '#Channel3'
+
+[liberachat]
+# See https://libera.chat/guides/registration to register
 nickname      = 'NickName'
 password      = 'Password'
 test_channels = '#TestChannel1'

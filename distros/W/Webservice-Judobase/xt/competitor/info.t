@@ -25,6 +25,7 @@ subtest info_valid_params => sub {
         birth_date        => E,
         categories        => [''],
         club              => undef,
+        death_age         => undef,
         dob_year          => 1960,
         coach             => '',
         country_short     => 'SLO',

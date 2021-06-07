@@ -5,7 +5,7 @@ use warnings;
 use base qw( Alien::Base );
 
 # ABSTRACT: Find or install libarchive version 3.x or better
-our $VERSION = '0.29'; # VERSION
+our $VERSION = '0.32'; # VERSION
 
 
 
@@ -29,64 +29,61 @@ Alien::Libarchive3 - Find or install libarchive version 3.x or better
 
 =head1 VERSION
 
-version 0.29
+version 0.32
 
 =head1 SYNOPSIS
+
+In your Makefile.PL:
+
+ use ExtUtils::MakeMaker;
+ use Alien::Base::Wrapper ();
+
+ WriteMakefile(
+   Alien::Base::Wrapper->new('Alien::Libarchive3')->mm_args2(
+     # MakeMaker args
+     NAME => 'My::XS',
+     ...
+   ),
+ );
 
 In your Build.PL:
 
  use Module::Build;
- use Alien::Libarchive3;
+ use Alien::Base::Wrapper qw( Alien::Libarchive3 !export );
+
  my $builder = Module::Build->new(
    ...
    configure_requires => {
      'Alien::Libarchive3' => '0',
      ...
    },
-   extra_compiler_flags => Alien::Libarchive3->cflags,
-   extra_linker_flags   => Alien::Libarchive3->libs,
+   Alien::Base::Wrapper->mb_args,
    ...
  );
- 
+
  $build->create_build_script;
-
-In your Makefile.PL:
-
- use ExtUtils::MakeMaker;
- use Config;
- use Alien::Libarchive3;
- 
- WriteMakefile(
-   ...
-   CONFIGURE_REQUIRES => {
-     'Alien::Libarchive3' => '0',
-   },
-   CCFLAGS => Alien::Libarchive3->cflags . " $Config{ccflags}",
-   LIBS    => [ Alien::Libarchive3->libs ],
-   ...
- );
 
 In your script or module:
 
  use Alien::Libarchive3;
  use Env qw( @PATH );
- 
+
  unshift @PATH, Alien::Libarchive3->bin_dir;
 
 In your L<FFI::Platypus> script or module:
 
  use FFI::Platypus;
  use Alien::Libarchive3;
- 
+
  my $ffi = FFI::Platypus->new(
    lib => [ Alien::Libarchive3->dynamic_libs ],
  );
 
 =head1 DESCRIPTION
 
-This distribution provides libarchive so that it can be used by other 
-Perl distributions that are on CPAN.  It does this by first trying to 
-detect an existing install of libarchive on your system.  If found it 
+This distribution provides libarchive so that it can be used by other
+Perl distributions that are on CPAN.  It does this by first trying to
+detect an existing install of libarchive on your system.  If found it
 will use that.  If it cannot be found, the source code will be downloaded
 from the internet and it will be installed in a private share location
 for the use of other modules.

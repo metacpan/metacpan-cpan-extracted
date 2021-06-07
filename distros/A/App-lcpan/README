@@ -2,8 +2,8 @@ NAME
     App::lcpan - Manage your local CPAN mirror
 
 VERSION
-    This document describes version 1.062 of App::lcpan (from Perl
-    distribution App-lcpan), released on 2020-08-13.
+    This document describes version 1.068 of App::lcpan (from Perl
+    distribution App-lcpan), released on 2021-06-05.
 
 SYNOPSIS
     See lcpan script.
@@ -12,7 +12,7 @@ FUNCTIONS
   authors
     Usage:
 
-     authors(%args) -> [status, msg, payload, meta]
+     authors(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
     List authors.
 
@@ -24,7 +24,7 @@ FUNCTIONS
 
     *   Find CPAN IDs which start with something:
 
-         authors( query => ["MICHAEL%"]); # -> undef
+         authors(query => ["MICHAEL%"]); # -> ["MICHAEL", "MICHAELW", undef, {}]
 
     This function is not exported by default, but exportable.
 
@@ -71,6 +71,22 @@ FUNCTIONS
 
     *   query_type => *str* (default: "any")
 
+    *   random => *true*
+
+        Random sort.
+
+    *   result_limit => *uint*
+
+        Only return a certain number of records.
+
+    *   result_start => *posint* (default: 1)
+
+        Only return starting from the n'th record.
+
+    *   sort => *array[str]* (default: ["id"])
+
+        Sort the result.
+
     *   use_bootstrap => *bool* (default: 1)
 
         Whether to use bootstrap database from App-lcpan-Bootstrap.
@@ -80,12 +96,15 @@ FUNCTIONS
 
     Returns an enveloped result (an array).
 
-    First element (status) is an integer containing HTTP status code (200
-    means OK, 4xx caller error, 5xx function error). Second element (msg) is
-    a string containing error message, or 'OK' if status is 200. Third
-    element (payload) is optional, the actual result. Fourth element (meta)
-    is called result metadata and is optional, a hash that contains extra
-    information.
+    First element ($status_code) is an integer containing HTTP-like status
+    code (200 means OK, 4xx caller error, 5xx function error). Second
+    element ($reason) is a string containing error message, or something
+    like "OK" if status is 200. Third element ($payload) is the actual
+    result, but usually not present when enveloped result is an error
+    response ($status_code is not 2xx). Fourth element (%result_meta) is
+    called result metadata and is optional, a hash that contains extra
+    information, much like how HTTP response headers provide additional
+    metadata.
 
     Return value: (any)
 
@@ -95,7 +114,7 @@ FUNCTIONS
   deps
     Usage:
 
-     deps(%args) -> [status, msg, payload, meta]
+     deps(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
     List dependencies of distributions.
 
@@ -103,20 +122,30 @@ FUNCTIONS
 
     *   List what modules Module-List requires:
 
-         deps( dists => ["Module-List"]);
+         deps(dists => ["Module-List"]);
 
     *   List modules Module-List requires (module name will be converted to
         distro name):
 
-         deps( dists => ["Module::List"]);
+         deps(dists => ["Module::List"]);
+
+    *   List what distribution that contains Sah::Schema::filename requires:
+
+         deps(modules => ["Sah::Schema::filename"]);
+
+        Sah::Schema::filename is included in Sah-Schemas-Path distribution,
+        so this command is equivalent to "lcpan deps Sah-Schemas-Path". You
+        can't do "lcpan deps Sah::Schema::filename" because "lcpan" will
+        assume that you ask "lcpan deps Sah-Schema-filename" and there is no
+        Sah-Schema-filename distribution.
 
     *   List non-core modules Module-List requires:
 
-         deps( dists => ["Module-List"], include_core => 0);
+         deps(dists => ["Module-List"], include_core => 0);
 
     *   List dependencies of a specific distribution release:
 
-         deps( dists => ["Module-List\@0.004"]);
+         deps(dists => ["Module-List\@0.004"]);
 
     By default only runtime requires are displayed. To see prereqs for other
     phases (e.g. configure, or build, or ALL) or for other relationships
@@ -166,7 +195,7 @@ FUNCTIONS
 
         Defaults to "~/cpan".
 
-    *   dists* => *array[perl::distname_with_optional_ver]*
+    *   dists => *array[perl::distname_with_optional_ver]*
 
         Distribution names (with optional version suffix, e.g.
         Foo-Bar@1.23).
@@ -242,7 +271,9 @@ FUNCTIONS
 
         Recurse for a number of levels (-1 means unlimited).
 
-    *   perl_version => *str* (default: "v5.30.0")
+    *   modules => *array[perl::modname]*
+
+    *   perl_version => *str* (default: "v5.34.0")
 
         Set base Perl version for determining core modules.
 
@@ -276,19 +307,22 @@ FUNCTIONS
 
     Returns an enveloped result (an array).
 
-    First element (status) is an integer containing HTTP status code (200
-    means OK, 4xx caller error, 5xx function error). Second element (msg) is
-    a string containing error message, or 'OK' if status is 200. Third
-    element (payload) is optional, the actual result. Fourth element (meta)
-    is called result metadata and is optional, a hash that contains extra
-    information.
+    First element ($status_code) is an integer containing HTTP-like status
+    code (200 means OK, 4xx caller error, 5xx function error). Second
+    element ($reason) is a string containing error message, or something
+    like "OK" if status is 200. Third element ($payload) is the actual
+    result, but usually not present when enveloped result is an error
+    response ($status_code is not 2xx). Fourth element (%result_meta) is
+    called result metadata and is optional, a hash that contains extra
+    information, much like how HTTP response headers provide additional
+    metadata.
 
     Return value: (any)
 
   dists
     Usage:
 
-     dists(%args) -> [status, msg, payload, meta]
+     dists(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
     List distributions.
 
@@ -296,15 +330,15 @@ FUNCTIONS
 
     *   List all distributions:
 
-         dists( cpan => "/cpan");
+         dists(cpan => "/cpan");
 
     *   List all distributions (latest version only):
 
-         dists( cpan => "/cpan", latest => 1);
+         dists(cpan => "/cpan", latest => 1);
 
     *   Grep by distribution name, return detailed record:
 
-         dists( query => ["data-table"], cpan => "/cpan");
+         dists(query => ["data-table"], cpan => "/cpan");
 
     This function is not exported by default, but exportable.
 
@@ -379,7 +413,19 @@ FUNCTIONS
 
     *   query_type => *str* (default: "any")
 
+    *   random => *true*
+
+        Random sort.
+
     *   rel_mtime_newer_than => *date*
+
+    *   result_limit => *uint*
+
+        Only return a certain number of records.
+
+    *   result_start => *posint* (default: 1)
+
+        Only return starting from the n'th record.
 
     *   sort => *array[str]* (default: ["dist"])
 
@@ -407,12 +453,15 @@ FUNCTIONS
 
     Returns an enveloped result (an array).
 
-    First element (status) is an integer containing HTTP status code (200
-    means OK, 4xx caller error, 5xx function error). Second element (msg) is
-    a string containing error message, or 'OK' if status is 200. Third
-    element (payload) is optional, the actual result. Fourth element (meta)
-    is called result metadata and is optional, a hash that contains extra
-    information.
+    First element ($status_code) is an integer containing HTTP-like status
+    code (200 means OK, 4xx caller error, 5xx function error). Second
+    element ($reason) is a string containing error message, or something
+    like "OK" if status is 200. Third element ($payload) is the actual
+    result, but usually not present when enveloped result is an error
+    response ($status_code is not 2xx). Fourth element (%result_meta) is
+    called result metadata and is optional, a hash that contains extra
+    information, much like how HTTP response headers provide additional
+    metadata.
 
     Return value: (any)
 
@@ -422,7 +471,7 @@ FUNCTIONS
   log
     Usage:
 
-     log(%args) -> [status, msg, payload, meta]
+     log(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
     Show database index log.
 
@@ -454,19 +503,22 @@ FUNCTIONS
 
     Returns an enveloped result (an array).
 
-    First element (status) is an integer containing HTTP status code (200
-    means OK, 4xx caller error, 5xx function error). Second element (msg) is
-    a string containing error message, or 'OK' if status is 200. Third
-    element (payload) is optional, the actual result. Fourth element (meta)
-    is called result metadata and is optional, a hash that contains extra
-    information.
+    First element ($status_code) is an integer containing HTTP-like status
+    code (200 means OK, 4xx caller error, 5xx function error). Second
+    element ($reason) is a string containing error message, or something
+    like "OK" if status is 200. Third element ($payload) is the actual
+    result, but usually not present when enveloped result is an error
+    response ($status_code is not 2xx). Fourth element (%result_meta) is
+    called result metadata and is optional, a hash that contains extra
+    information, much like how HTTP response headers provide additional
+    metadata.
 
     Return value: (any)
 
   modules
     Usage:
 
-     modules(%args) -> [status, msg, payload, meta]
+     modules(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
     List modules/packages.
 
@@ -543,7 +595,7 @@ FUNCTIONS
 
         When there are more than one query, perform OR instead of AND logic.
 
-    *   perl_version => *str* (default: "v5.30.0")
+    *   perl_version => *str* (default: "v5.34.0")
 
         Set base Perl version for determining core modules.
 
@@ -552,6 +604,18 @@ FUNCTIONS
         Search query.
 
     *   query_type => *str* (default: "any")
+
+    *   random => *true*
+
+        Random sort.
+
+    *   result_limit => *uint*
+
+        Only return a certain number of records.
+
+    *   result_start => *posint* (default: 1)
+
+        Only return starting from the n'th record.
 
     *   sort => *array[str]* (default: ["module"])
 
@@ -579,12 +643,15 @@ FUNCTIONS
 
     Returns an enveloped result (an array).
 
-    First element (status) is an integer containing HTTP status code (200
-    means OK, 4xx caller error, 5xx function error). Second element (msg) is
-    a string containing error message, or 'OK' if status is 200. Third
-    element (payload) is optional, the actual result. Fourth element (meta)
-    is called result metadata and is optional, a hash that contains extra
-    information.
+    First element ($status_code) is an integer containing HTTP-like status
+    code (200 means OK, 4xx caller error, 5xx function error). Second
+    element ($reason) is a string containing error message, or something
+    like "OK" if status is 200. Third element ($payload) is the actual
+    result, but usually not present when enveloped result is an error
+    response ($status_code is not 2xx). Fourth element (%result_meta) is
+    called result metadata and is optional, a hash that contains extra
+    information, much like how HTTP response headers provide additional
+    metadata.
 
     Return value: (any)
 
@@ -594,7 +661,7 @@ FUNCTIONS
   namespaces
     Usage:
 
-     namespaces(%args) -> [status, msg, payload, meta]
+     namespaces(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
     List namespaces.
 
@@ -685,19 +752,22 @@ FUNCTIONS
 
     Returns an enveloped result (an array).
 
-    First element (status) is an integer containing HTTP status code (200
-    means OK, 4xx caller error, 5xx function error). Second element (msg) is
-    a string containing error message, or 'OK' if status is 200. Third
-    element (payload) is optional, the actual result. Fourth element (meta)
-    is called result metadata and is optional, a hash that contains extra
-    information.
+    First element ($status_code) is an integer containing HTTP-like status
+    code (200 means OK, 4xx caller error, 5xx function error). Second
+    element ($reason) is a string containing error message, or something
+    like "OK" if status is 200. Third element ($payload) is the actual
+    result, but usually not present when enveloped result is an error
+    response ($status_code is not 2xx). Fourth element (%result_meta) is
+    called result metadata and is optional, a hash that contains extra
+    information, much like how HTTP response headers provide additional
+    metadata.
 
     Return value: (any)
 
   packages
     Usage:
 
-     packages(%args) -> [status, msg, payload, meta]
+     packages(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
     List modules/packages.
 
@@ -774,7 +844,7 @@ FUNCTIONS
 
         When there are more than one query, perform OR instead of AND logic.
 
-    *   perl_version => *str* (default: "v5.30.0")
+    *   perl_version => *str* (default: "v5.34.0")
 
         Set base Perl version for determining core modules.
 
@@ -783,6 +853,18 @@ FUNCTIONS
         Search query.
 
     *   query_type => *str* (default: "any")
+
+    *   random => *true*
+
+        Random sort.
+
+    *   result_limit => *uint*
+
+        Only return a certain number of records.
+
+    *   result_start => *posint* (default: 1)
+
+        Only return starting from the n'th record.
 
     *   sort => *array[str]* (default: ["module"])
 
@@ -810,12 +892,15 @@ FUNCTIONS
 
     Returns an enveloped result (an array).
 
-    First element (status) is an integer containing HTTP status code (200
-    means OK, 4xx caller error, 5xx function error). Second element (msg) is
-    a string containing error message, or 'OK' if status is 200. Third
-    element (payload) is optional, the actual result. Fourth element (meta)
-    is called result metadata and is optional, a hash that contains extra
-    information.
+    First element ($status_code) is an integer containing HTTP-like status
+    code (200 means OK, 4xx caller error, 5xx function error). Second
+    element ($reason) is a string containing error message, or something
+    like "OK" if status is 200. Third element ($payload) is the actual
+    result, but usually not present when enveloped result is an error
+    response ($status_code is not 2xx). Fourth element (%result_meta) is
+    called result metadata and is optional, a hash that contains extra
+    information, much like how HTTP response headers provide additional
+    metadata.
 
     Return value: (any)
 
@@ -825,9 +910,20 @@ FUNCTIONS
   rdeps
     Usage:
 
-     rdeps(%args) -> [status, msg, payload, meta]
+     rdeps(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
     List reverse dependencies.
+
+    Examples:
+
+    *   List what distributions depend on Sah::Schema::filename:
+
+         rdeps(modules => ["Sah::Schema::filename"]);
+
+    *   List what distributions depend on one of the modules in
+        Sah-Schemas-Path:
+
+         rdeps(dists => ["Sah-Schemas-Path"]);
 
     This function is not exported by default, but exportable.
 
@@ -879,6 +975,10 @@ FUNCTIONS
 
         Defaults to "~/cpan".
 
+    *   dists => *array[perl::distname]*
+
+        Distribution names (e.g. Foo-Bar).
+
     *   dont_uniquify => *true*
 
         Allow showing multiple modules for different dists.
@@ -902,7 +1002,7 @@ FUNCTIONS
 
         Recurse for a number of levels (-1 means unlimited).
 
-    *   modules* => *array[perl::modname]*
+    *   modules => *array[perl::modname]*
 
     *   phase => *str* (default: "ALL")
 
@@ -930,19 +1030,22 @@ FUNCTIONS
 
     Returns an enveloped result (an array).
 
-    First element (status) is an integer containing HTTP status code (200
-    means OK, 4xx caller error, 5xx function error). Second element (msg) is
-    a string containing error message, or 'OK' if status is 200. Third
-    element (payload) is optional, the actual result. Fourth element (meta)
-    is called result metadata and is optional, a hash that contains extra
-    information.
+    First element ($status_code) is an integer containing HTTP-like status
+    code (200 means OK, 4xx caller error, 5xx function error). Second
+    element ($reason) is a string containing error message, or something
+    like "OK" if status is 200. Third element ($payload) is the actual
+    result, but usually not present when enveloped result is an error
+    response ($status_code is not 2xx). Fourth element (%result_meta) is
+    called result metadata and is optional, a hash that contains extra
+    information, much like how HTTP response headers provide additional
+    metadata.
 
     Return value: (any)
 
   releases
     Usage:
 
-     releases(%args) -> [status, msg, payload, meta]
+     releases(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
     List releases/tarballs.
 
@@ -1029,6 +1132,18 @@ FUNCTIONS
 
     *   query_type => *str* (default: "any")
 
+    *   random => *true*
+
+        Random sort.
+
+    *   result_limit => *uint*
+
+        Only return a certain number of records.
+
+    *   result_start => *posint* (default: 1)
+
+        Only return starting from the n'th record.
+
     *   sort => *array[str]* (default: ["name"])
 
     *   updated_since => *date*
@@ -1053,19 +1168,22 @@ FUNCTIONS
 
     Returns an enveloped result (an array).
 
-    First element (status) is an integer containing HTTP status code (200
-    means OK, 4xx caller error, 5xx function error). Second element (msg) is
-    a string containing error message, or 'OK' if status is 200. Third
-    element (payload) is optional, the actual result. Fourth element (meta)
-    is called result metadata and is optional, a hash that contains extra
-    information.
+    First element ($status_code) is an integer containing HTTP-like status
+    code (200 means OK, 4xx caller error, 5xx function error). Second
+    element ($reason) is a string containing error message, or something
+    like "OK" if status is 200. Third element ($payload) is the actual
+    result, but usually not present when enveloped result is an error
+    response ($status_code is not 2xx). Fourth element (%result_meta) is
+    called result metadata and is optional, a hash that contains extra
+    information, much like how HTTP response headers provide additional
+    metadata.
 
     Return value: (any)
 
   reset
     Usage:
 
-     reset(%args) -> [status, msg, payload, meta]
+     reset(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
     Reset (empty) the database index.
 
@@ -1104,19 +1222,22 @@ FUNCTIONS
 
     Returns an enveloped result (an array).
 
-    First element (status) is an integer containing HTTP status code (200
-    means OK, 4xx caller error, 5xx function error). Second element (msg) is
-    a string containing error message, or 'OK' if status is 200. Third
-    element (payload) is optional, the actual result. Fourth element (meta)
-    is called result metadata and is optional, a hash that contains extra
-    information.
+    First element ($status_code) is an integer containing HTTP-like status
+    code (200 means OK, 4xx caller error, 5xx function error). Second
+    element ($reason) is a string containing error message, or something
+    like "OK" if status is 200. Third element ($payload) is the actual
+    result, but usually not present when enveloped result is an error
+    response ($status_code is not 2xx). Fourth element (%result_meta) is
+    called result metadata and is optional, a hash that contains extra
+    information, much like how HTTP response headers provide additional
+    metadata.
 
     Return value: (any)
 
   stats
     Usage:
 
-     stats(%args) -> [status, msg, payload, meta]
+     stats(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
     Statistics of your local CPAN mirror.
 
@@ -1148,19 +1269,22 @@ FUNCTIONS
 
     Returns an enveloped result (an array).
 
-    First element (status) is an integer containing HTTP status code (200
-    means OK, 4xx caller error, 5xx function error). Second element (msg) is
-    a string containing error message, or 'OK' if status is 200. Third
-    element (payload) is optional, the actual result. Fourth element (meta)
-    is called result metadata and is optional, a hash that contains extra
-    information.
+    First element ($status_code) is an integer containing HTTP-like status
+    code (200 means OK, 4xx caller error, 5xx function error). Second
+    element ($reason) is a string containing error message, or something
+    like "OK" if status is 200. Third element ($payload) is the actual
+    result, but usually not present when enveloped result is an error
+    response ($status_code is not 2xx). Fourth element (%result_meta) is
+    called result metadata and is optional, a hash that contains extra
+    information, much like how HTTP response headers provide additional
+    metadata.
 
     Return value: (any)
 
   update
     Usage:
 
-     update(%args) -> [status, msg, payload, meta]
+     update(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
     Create/update local CPAN mirror.
 
@@ -1258,12 +1382,15 @@ FUNCTIONS
 
     Returns an enveloped result (an array).
 
-    First element (status) is an integer containing HTTP status code (200
-    means OK, 4xx caller error, 5xx function error). Second element (msg) is
-    a string containing error message, or 'OK' if status is 200. Third
-    element (payload) is optional, the actual result. Fourth element (meta)
-    is called result metadata and is optional, a hash that contains extra
-    information.
+    First element ($status_code) is an integer containing HTTP-like status
+    code (200 means OK, 4xx caller error, 5xx function error). Second
+    element ($reason) is a string containing error message, or something
+    like "OK" if status is 200. Third element ($payload) is the actual
+    result, but usually not present when enveloped result is an error
+    response ($status_code is not 2xx). Fourth element (%result_meta) is
+    called result metadata and is optional, a hash that contains extra
+    information, much like how HTTP response headers provide additional
+    metadata.
 
     Return value: (any)
 
@@ -1306,9 +1433,16 @@ SEE ALSO
 AUTHOR
     perlancar <perlancar@cpan.org>
 
+CONTRIBUTORS
+    *   Norbert Csongradi <norbert@csongradi.hu>
+
+    *   perlancar (@pc-office) <perlancar@gmail.com>
+
+    *   Steven Haryanto (on Asus Zenbook) <stevenharyanto@gmail.com>
+
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2020, 2019, 2018, 2017, 2016, 2015 by
-    perlancar@cpan.org.
+    This software is copyright (c) 2021, 2020, 2019, 2018, 2017, 2016, 2015
+    by perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

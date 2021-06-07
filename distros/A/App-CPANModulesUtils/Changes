@@ -1,3 +1,8 @@
+0.005   2021-05-19  Released-By: PERLANCAR; Urgency: medium
+
+	- Add CLI: gen-acme-cpanmodules-module-from-webpage.
+
+
 0.004   2020-02-13  Released-By: PERLANCAR; Urgency: low
 
 	- No functional changes.

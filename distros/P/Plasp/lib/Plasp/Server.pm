@@ -160,9 +160,9 @@ efficient, but maybe useful for some. It saves on copying the 100K buffer twice.
 sub HTMLEncode {
     my ( $self, $string ) = @_;
     for ( ref $string ) {
-        if    ( /SCALAR/ ) { return encode_entities( $$string ) }
-        elsif ( /ARRAY/ )  { return \map { encode_entities( $_ ) } @$string }
-        else               { return encode_entities( $string ) }
+        if    ( /SCALAR/ ) { return encode_entities( $$string, q(<>&"') ) }
+        elsif ( /ARRAY/ )  { return \map { encode_entities( $_, q(<>&"') ) } @$string }
+        else               { return encode_entities( $string, q(<>&"') ) }
     }
 }
 

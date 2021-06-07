@@ -25,6 +25,15 @@ use DynaLoader;
 use PDL::Slices;
 use Carp;
 
+{ package PDL;
+  use overload (
+    'x' => sub {
+      PDL::Primitive::matmult(@_[0,1], my $foo=$_[0]->null());
+      $foo;
+    },
+  );
+}
+
 =head1 NAME
 
 PDL::Primitive - primitive operations for pdl

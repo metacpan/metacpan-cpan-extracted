@@ -3,9 +3,9 @@ NAME
     Abstract cwalitee
 
 VERSION
-    This document describes version 0.003 of
+    This document describes version 0.004 of
     App::ModuleAbstractCwaliteeUtils (from Perl distribution
-    App-ModuleAbstractCwaliteeUtils), released on 2019-08-02.
+    App-ModuleAbstractCwaliteeUtils), released on 2021-05-25.
 
 DESCRIPTION
     This distribution includes the following utilities:
@@ -39,7 +39,7 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2019 by perlancar@cpan.org.
+    This software is copyright (c) 2021, 2019 by perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

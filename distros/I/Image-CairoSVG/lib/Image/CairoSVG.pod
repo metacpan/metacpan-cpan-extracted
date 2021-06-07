@@ -32,19 +32,19 @@ This renders the following image:
 </p>
 
 <img width="451.271" height="187.542"
- src='https://fastapi.metacpan.org/source/BKB/Image-CairoSVG-0.21/examples/locust.png'>
+ src='https://fastapi.metacpan.org/source/BKB/Image-CairoSVG-0.22/examples/locust.png'>
 
 =end html
 
 (This example is included as
-L<F<synopsis.pl>|https://fastapi.metacpan.org/source/BKB/Image-CairoSVG-0.21/examples/synopsis.pl> in the distribution. The
-L<input|https://fastapi.metacpan.org/source/BKB/Image-CairoSVG-0.21/examples/locust.svg> and L<output
-files|https://fastapi.metacpan.org/source/BKB/Image-CairoSVG-0.21/examples/locust.png> are also included.)
+L<F<synopsis.pl>|https://fastapi.metacpan.org/source/BKB/Image-CairoSVG-0.22/examples/synopsis.pl> in the distribution. The
+L<input|https://fastapi.metacpan.org/source/BKB/Image-CairoSVG-0.22/examples/locust.svg> and L<output
+files|https://fastapi.metacpan.org/source/BKB/Image-CairoSVG-0.22/examples/locust.png> are also included.)
 
 =head1 VERSION
 
-This documents Image::CairoSVG version 0.21
-corresponding to git commit L<c42b33aba018e51fe57e6efd943267e763cef7bb|https://github.com/benkasminbullock/image-cairosvg/commit/c42b33aba018e51fe57e6efd943267e763cef7bb> released on Mon May 17 10:35:33 2021 +0900. 
+This documents Image::CairoSVG version 0.22
+corresponding to git commit L<dabf8c72540eb32dfde5818982a5e784635f484a|https://github.com/benkasminbullock/image-cairosvg/commit/dabf8c72540eb32dfde5818982a5e784635f484a> released on Mon May 31 09:13:40 2021 +0900. 
 
 =head1 DESCRIPTION
 
@@ -147,15 +147,15 @@ This example shows how to scale the output image using Cairo commands.
 <p>
 The default size looks like this:
 </p>
-<img width="36" height="36" src='https://fastapi.metacpan.org/source/BKB/Image-CairoSVG-0.21/examples/durn.png'>
+<img width="36" height="36" src='https://fastapi.metacpan.org/source/BKB/Image-CairoSVG-0.22/examples/durn.png'>
 <p>
 The scaled image looks like this:
 </p>
-<img width="200" height="200" src='https://fastapi.metacpan.org/source/BKB/Image-CairoSVG-0.21/examples/urn.png'>
+<img width="200" height="200" src='https://fastapi.metacpan.org/source/BKB/Image-CairoSVG-0.22/examples/urn.png'>
 
 =end html
 
-(This example is included as L<F<scale.pl>|https://fastapi.metacpan.org/source/BKB/Image-CairoSVG-0.21/examples/scale.pl> in the
+(This example is included as L<F<scale.pl>|https://fastapi.metacpan.org/source/BKB/Image-CairoSVG-0.22/examples/scale.pl> in the
 distribution. The original image is part of the L<Twitter Emoji
 collection|https://twemoji.twitter.com/>, F<1f3fa.svg>, representing
 C<U+1F3FA AMPHORA>. This illustration is used under the terms of
@@ -266,9 +266,9 @@ XML::Parser is used for parsing SVG files.
 
 L<This demonstration
 website|https://benkasminbullock.github.io/supertinyiconscairosvg/>
-shows the output of Image::CairoSVG on the Super Tiny Icons collection
-and the L<Twitter Emoji
-Collection|https://benkasminbullock.github.io/supertinyiconscairosvg/twemoji/>.
+shows the output of Image::CairoSVG on the Super Tiny Icons
+collection, the L<Twitter Emoji
+Collection|https://benkasminbullock.github.io/supertinyiconscairosvg/twemoji/>, and the L<SVG Test Suite|https://benkasminbullock.github.io/supertinyiconscairosvg/sts.html> (very limited support as yet).
 
 Please see L</BUGS> below for notable errors in the rendering.
 
@@ -294,6 +294,11 @@ correct drawing of circular arcs.
 
 This documents visually the rendering improvements between version
 0.17 and version 0.18.
+
+=item L<For and against muddling booleans|https://benbullock.substack.com/p/for-and-against-muddling-booleans>
+
+This documents an error caused by testing attributes directly, when an
+attribute with value "zero" was ignored, causing a rendering error.
 
 =back
 
@@ -329,7 +334,9 @@ paths.
 
 =item L<Image::SVG::Transform>
 
-Read the "transform" attribute of an SVG element.
+Read the "transform" attribute of an SVG element. It is not a
+dependency of this module, but I used this as a reference when writing
+the transform code in this module.
 
 =item L<MarpaX::Languages::SVG::Parser>
 
@@ -350,6 +357,18 @@ L<https://rt.cpan.org/Ticket/Display.html?id=136404>.
 Rasterize SVG content to pixel graphics. We couldn't get this to
 produce output. See
 L<https://rt.cpan.org/Ticket/Display.html?id=136405>.
+
+=back
+
+=head2 Other CPAN modules
+
+=over
+
+=item L<Image::PNG::Cairo>
+
+This might be useful if you want to do something with the PNG output
+of Cairo other than just write it to a file, for example adding text
+to it.
 
 =back
 
@@ -452,11 +471,8 @@ Output of Image::CairoSVG
 
 =item Gradients
 
-Gradients are not supported.
-
-There is L<support in
-Cairo|https://www.cairographics.org/samples/gradient/> so it should be
-possible to add them.
+Linear and radial gradients are supported since version 0.22, but
+there are some remaining issues.
 
 
 
@@ -466,13 +482,13 @@ possible to add them.
 <tr>
 <td>
 <img height="250"
-     src="https://benkasminbullock.github.io/supertinyiconscairosvg//svg/gandi.svg"
+     src="https://benkasminbullock.github.io/supertinyiconscairosvg//svg/edge.svg"
      width="250">
 </td>
 
 <td>
 <img height="250"
-     src="https://benkasminbullock.github.io/supertinyiconscairosvg//png/gandi.png"
+     src="https://benkasminbullock.github.io/supertinyiconscairosvg//png/edge.png"
      width="250">
 </td>
 </tr>
@@ -498,13 +514,13 @@ Output of Image::CairoSVG
 <tr>
 <td>
 <img height="250"
-     src="https://benkasminbullock.github.io/supertinyiconscairosvg//svg/glitch.svg"
+     src="https://benkasminbullock.github.io/supertinyiconscairosvg//svg/firefox.svg"
      width="250">
 </td>
 
 <td>
 <img height="250"
-     src="https://benkasminbullock.github.io/supertinyiconscairosvg//png/glitch.png"
+     src="https://benkasminbullock.github.io/supertinyiconscairosvg//png/firefox.png"
      width="250">
 </td>
 </tr>
@@ -632,7 +648,8 @@ Output of Image::CairoSVG
 
 =item Units
 
-Currently only pixels, millimetres, and inches are supported. 
+Currently only pixels, millimetres, inches, and percentages are
+supported.
 
 The conversion ratios are one millimetre is 25.4 inches, and one
 inch is 96 pixels.

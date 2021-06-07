@@ -16,7 +16,7 @@ use Syntax::Keyword::Try;
       finally { 456 }
 EOPERL
       'try/finally is forbidden' );
-   like( $@, qr/^Expected try \{\} to be followed by catch \{\} / );
+   like( $@, qr/^finally \{\} is not permitted here / );
 }
 
 # require var

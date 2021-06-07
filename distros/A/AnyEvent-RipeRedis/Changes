@@ -1,5 +1,9 @@
 Revision history for AnyEvent::RipeRedis.
 
+0.48 Mon May 24 17:06:00 MSK 2021
+  - Fixed tests for a different error message from Redis  (Thanks for Jan
+    "Yenya" Kasprzak)
+
 0.46 Tue Dec 5 15:56:58 MSK 2017
   - The client now disconnects if the E_NO_AUTH error was returned.
 

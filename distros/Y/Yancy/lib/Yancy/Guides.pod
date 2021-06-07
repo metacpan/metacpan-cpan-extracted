@@ -11,7 +11,7 @@ Yancy::Guides - Guide to Yancy Documentation
 
 =head1 VERSION
 
-version 1.070
+version 1.073
 
 =head1 BASICS
 
@@ -54,6 +54,10 @@ Configuring and extending the Yancy editor.
 
 User authentication, authorization, and information.
 
+=item L<Yancy::Guides::Model>
+
+Building modules with your application's business logic.
+
 =item L<Yancy::Guides::Cookbook>
 
 Recipes for Yancy applications.
@@ -87,7 +91,7 @@ Doug Bell <preaction@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by Doug Bell.
+This software is copyright (c) 2021 by Doug Bell.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

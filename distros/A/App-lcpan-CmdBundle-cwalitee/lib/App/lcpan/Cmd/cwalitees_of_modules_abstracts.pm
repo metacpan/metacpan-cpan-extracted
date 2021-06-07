@@ -1,7 +1,7 @@
 package App::lcpan::Cmd::cwalitees_of_modules_abstracts;
 
-our $DATE = '2020-01-19'; # DATE
-our $VERSION = '0.003'; # VERSION
+our $DATE = '2021-06-06'; # DATE
+our $VERSION = '0.004'; # VERSION
 
 use 5.010001;
 use strict;
@@ -29,7 +29,6 @@ _
     },
 };
 sub handle_cmd {
-    require App::lcpan::Cmd::changes;
     require Module::Abstract::Cwalitee;
 
     my %args = @_;
@@ -47,6 +46,7 @@ sub handle_cmd {
 
         my $cres = Module::Abstract::Cwalitee::calc_module_abstract_cwalitee(
             abstract => $abstract,
+            module => $mod,
             hash_subset(\%args, \%calc_args),
         );
         unless ($cres->[0] == 200) {
@@ -79,7 +79,7 @@ App::lcpan::Cmd::cwalitees_of_modules_abstracts - Calculate the cwalitees of mod
 
 =head1 VERSION
 
-This document describes version 0.003 of App::lcpan::Cmd::cwalitees_of_modules_abstracts (from Perl distribution App-lcpan-CmdBundle-cwalitee), released on 2020-01-19.
+This document describes version 0.004 of App::lcpan::Cmd::cwalitees_of_modules_abstracts (from Perl distribution App-lcpan-CmdBundle-cwalitee), released on 2021-06-06.
 
 =head1 DESCRIPTION
 
@@ -92,7 +92,7 @@ This module handles the L<lcpan> subcommand C<cwalitees-of-modules-abstracts>.
 
 Usage:
 
- handle_cmd(%args) -> [status, msg, payload, meta]
+ handle_cmd(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Calculate the cwalitees of modules' Abstracts.
 
@@ -104,7 +104,7 @@ Arguments ('*' denotes required arguments):
 
 =item * B<cpan> => I<dirname>
 
-Location of your local CPAN mirror, e.g. /path/to/cpan.
+Location of your local CPAN mirror, e.g. E<sol>pathE<sol>toE<sol>cpan.
 
 Defaults to C<~/cpan>.
 
@@ -154,16 +154,17 @@ Whether to use bootstrap database from App-lcpan-Bootstrap.
 If you are indexing your private CPAN-like repository, you want to turn this
 off.
 
+
 =back
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -189,7 +190,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020, 2019 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2020, 2019 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

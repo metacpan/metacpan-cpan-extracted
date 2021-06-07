@@ -15,8 +15,8 @@ my $build = Module::Build->new(
       'XS::Parse::Keyword::Builder' => 0,
    },
    requires => {
-      'perl' => '5.016',
-      'XS::Parse::Keyword' => 0,
+      'perl' => '5.016', # Perl_do_ncmp(), pad_add_name_pvs()
+      'XS::Parse::Keyword' => '0.04',
    },
    license => 'perl',
    create_license => 1,

@@ -1,0 +1,65 @@
+{
+   "abstract" : "a static image gallery creator",
+   "author" : [
+      "Alex Schroeder"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "gpl_3"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "App-sitelenmute",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.52",
+            "File::ShareDir::Install" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Encode::Locale" : "0",
+            "File::Copy::Recursive" : "0",
+            "File::ShareDir" : "0",
+            "File::Slurper" : "0",
+            "File::Symlink::Relative" : "0",
+            "Image::ExifTool" : "0",
+            "JSON::Tiny" : "0",
+            "Modern::Perl" : "1.20180701",
+            "Time::Progress" : "0",
+            "perl" : "5.026000"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::SearchPath" : "0",
+            "Mojo::DOM58" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "https://alexschroeder.ch/cgit/",
+         "web" : "https://alexschroeder.ch/cgit/sitelen-mute/about/"
+      }
+   },
+   "version" : 3.02,
+   "x_serialization_backend" : "JSON::PP version 4.04"
+}

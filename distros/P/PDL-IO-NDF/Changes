@@ -1,5 +1,8 @@
 Revision history for PDL::IO::NDF
 
+1.07 2021-05-19
+    - Updated for PDL 2.040 or newer.
+
 1.06 2019-08-23
     - Stopped using the private function NDF::pack1Dchar.
 

@@ -8,7 +8,7 @@
 #
 
 package Log::Dispatch::FileRotate::Flock;
-$Log::Dispatch::FileRotate::Flock::VERSION = '1.36';
+$Log::Dispatch::FileRotate::Flock::VERSION = '1.38';
 # ABSTRACT: File Locking Functions for L<Log::Dispatch::FileRotate>
 
 use strict;
@@ -101,7 +101,7 @@ Log::Dispatch::FileRotate::Flock - File Locking Functions for L<Log::Dispatch::F
 
 =head1 VERSION
 
-version 1.36
+version 1.38
 
 =head1 SYNOPSIS
 

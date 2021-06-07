@@ -20,5 +20,5 @@ resources:
   bugtracker: https://github.com/merkys/math-random-free/issues
   homepage: https://search.cpan.org/dist/Math-Random-Free
   repository: git://github.com/merkys/math-random-free.git
-version: 0.1.0
+version: 0.2.0
 x_serialization_backend: 'YAML::Tiny version 1.70'

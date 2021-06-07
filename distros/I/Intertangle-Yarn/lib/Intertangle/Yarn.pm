@@ -1,7 +1,7 @@
 use Modern::Perl;
 package Intertangle::Yarn;
 # ABSTRACT: Geometry primitives for graphics
-$Intertangle::Yarn::VERSION = '0.001';
+$Intertangle::Yarn::VERSION = '0.002';
 use Intertangle::Yarn::Graphene;
 
 1;
@@ -18,7 +18,7 @@ Intertangle::Yarn - Geometry primitives for graphics
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SEE ALSO
 

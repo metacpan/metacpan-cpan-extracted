@@ -147,6 +147,7 @@ To manage the web server with systemd, you can use a unit configuration file lik
 
   [Service]
   Type=simple
+  User=sri
   ExecStart=/home/sri/myapp/script/my_app daemon -m production -l http://*:8080
 
   [Install]
@@ -199,6 +200,7 @@ And to manage the pre-forking web server with systemd, you can use a unit config
 
   [Service]
   Type=simple
+  User=sri
   ExecStart=/home/sri/myapp/script/my_app prefork -m production -l http://*:8080
 
   [Install]
@@ -324,6 +326,7 @@ To manage L<Hypnotoad|Mojo::Server::Hypnotoad> with systemd, you can use a unit 
 
   [Service]
   Type=forking
+  User=sri
   PIDFile=/home/sri/myapp/script/hypnotoad.pid
   ExecStart=/path/to/hypnotoad /home/sri/myapp/script/my_app
   ExecReload=/path/to/hypnotoad /home/sri/myapp/script/my_app
@@ -1294,7 +1297,7 @@ L<Mojo::Message/"save_to">.
 
   # Fetch the latest Mojolicious tarball
   my $ua = Mojo::UserAgent->new(max_redirects => 5);
-  my $tx = $ua->get('https://www.github.com/mojolicious/mojo/tarball/master');
+  my $tx = $ua->get('https://www.github.com/mojolicious/mojo/tarball/main');
   $tx->result->save_to('mojo.tar.gz');
 
 To protect you from excessively large files there is also a limit of 2GiB by default, which you can tweak with the
@@ -1915,7 +1918,7 @@ authors.
 =head1 SUPPORT
 
 If you have any questions the documentation might not yet answer, don't hesitate to ask in the
-L<Forum|https://forum.mojolicious.org> or the official IRC channel C<#mojo> on C<chat.freenode.net>
-(L<chat now!|https://webchat.freenode.net/#mojo>).
+L<Forum|https://forum.mojolicious.org> or the official IRC channel C<#mojo> on C<irc.libera.chat>
+(L<chat now!|https://web.libera.chat/#mojo>).
 
 =cut

@@ -29,6 +29,8 @@ lib/App/SpreadRevolutionaryDate/MsgMaker/RevolutionaryDate/Locale/it.pm
 lib/App/SpreadRevolutionaryDate/Target.pm
 lib/App/SpreadRevolutionaryDate/Target/Freenode.pm
 lib/App/SpreadRevolutionaryDate/Target/Freenode/Bot.pm
+lib/App/SpreadRevolutionaryDate/Target/Liberachat.pm
+lib/App/SpreadRevolutionaryDate/Target/Liberachat/Bot.pm
 lib/App/SpreadRevolutionaryDate/Target/Mastodon.pm
 lib/App/SpreadRevolutionaryDate/Target/Twitter.pm
 lib/LocaleData/de/LC_MESSAGES/App-SpreadRevolutionaryDate.mo
@@ -57,6 +59,9 @@ xt/author/pod-syntax.t
 xt/author/portability.t
 xt/freenode.t
 xt/freenode_fake_credentials.t
+xt/liberachat.t
+xt/liberachat_authentication.t
+xt/liberachat_fake_credentials.t
 xt/release/distmeta.t
 xt/release/kwalitee.t
 xt/release/unused-vars.t

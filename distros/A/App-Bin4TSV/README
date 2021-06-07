@@ -1,0 +1,12 @@
+This module "App::Bin4TSV" provides many useful Unix-like commands to handle
+text data file mainly for tabular shape, especially for TSV format files. 
+The included commands are as follows. 
+
+...
+...
+...
+
+
+ Copyright (c) 2021 Toshiyuki SHIMONO. All rights reserved.
+ This program is free software; you can redistribute it and/or
+ modify it under the same terms as Perl itself.

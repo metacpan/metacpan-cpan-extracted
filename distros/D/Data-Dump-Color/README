@@ -2,8 +2,8 @@ NAME
     Data::Dump::Color - Like Data::Dump, but with color
 
 VERSION
-    This document describes version 0.243 of Data::Dump::Color (from Perl
-    distribution Data-Dump-Color), released on 2021-02-13.
+    This document describes version 0.245 of Data::Dump::Color (from Perl
+    distribution Data-Dump-Color), released on 2021-06-05.
 
 SYNOPSIS
     Use it like you would Data::Dump, e.g.:
@@ -70,8 +70,9 @@ VARIABLES
 
     $COLOR => BOOL (default: undef)
         Whether to force-enable or disable color. If unset, color output
-        will be determined from $ENV{COLOR} or when in interactive terminal
-        (when "-t STDOUT" is true).
+        will be determined from "NO_COLOR", "COLOR" environment variables,
+        or whether running in interactive terminal (when "-t STDOUT" is
+        true).
 
     $COLOR_THEME => str
         Select a color theme, which is a module under
@@ -102,26 +103,23 @@ FAQ
     $Data::Dump::Color::COLOR to 0.
 
   How do I customize colors?
-    Fiddle the colors in %Data::Dump::Color::COLORS. There will probably be
-    proper color theme support in the future (based on
-    SHARYANTO::Role::ColorTheme.
+    Create a color theme and give it a name under
+    "ColorTheme::Data::Dump::Color::*". See an existing color theme for
+    example, e.g. ColorTheme::Data::Dump::Color::Default256.
 
 ENVIRONMENT
-    *   DATA_DUMP_COLOR_THEME
+  DATA_DUMP_COLOR_THEME
+    Set color theme. Name will be searched under
+    "ColorTheme::Data::Dump::Color::*" or "ColorTheme::*".
 
-        Set color theme. Name will be searched under
-        "ColorTheme::Data::Dump::Color::*" or "ColorTheme::*".
+  NO_COLOR
+    Can be used to disable color. Takes precedence over the "COLOR"
+    environment. See <https://no-color.org> for more details.
 
-    *   NO_COLOR
-
-        Can be used to disable color. Takes precedence over the "COLOR"
-        environment. See <https://no-color.org> for more details.
-
-    *   COLOR
-
-        If set, then will force color output on or off. By default, will
-        only output color when in interactive terminal. This is consulted
-        when $COLOR is not set.
+  COLOR
+    If set, then will force color output on or off. By default, will only
+    output color when in interactive terminal. This is consulted when $COLOR
+    is not set.
 
 HOMEPAGE
     Please visit the project's homepage at
@@ -143,6 +141,11 @@ SEE ALSO
 
 AUTHOR
     perlancar <perlancar@cpan.org>
+
+CONTRIBUTORS
+    *   Scott Baker <bakerscot@cpan.org>
+
+    *   Steven Haryanto <sharyanto@cpan.org>
 
 COPYRIGHT AND LICENSE
     This software is copyright (c) 2021, 2018, 2014, 2013, 2012 by

@@ -1,0 +1,126 @@
+#! env perl
+use 5.011 ; use strict ; use warnings ; 
+use List::Util qw[ max min ] ; 
+use Getopt::Std ; getopts "12g:qs=" , \my%o ;
+use Term::ANSIColor qw[ :constants ] ; $Term::ANSIColor::AUTORESET = 1 ;
+use FindBin qw [ $Script ] ; 
+
+my %str2cnt ; #  各文字列から出現回数を参照 ; その文字列が何回出現したか 
+my %cnt2strs ; # @{ $cnt2strs { N } } が出現回数Nの文字列のリスト(配列)
+
+if ( $o{'='} )  {
+	my $header = <> ; 
+	$. = 0 ;
+}
+
+$o{g} //= 3 ;  # 詳細情報のexamplesに出力するデータの個数
+
+sub main ( ) ; 
+sub readingAndCount ( ) ;    # 各文字列ごとに出現回数をカウント
+sub tableOutput ( ) ;   # それ以外の場合の処理：詳細情報作成
+
+main ; 
+exit -1 ;
+
+sub main ( ) { 
+    readingAndCount ; 
+    tableOutput if ! $o{1} ; 
+    exit simpleAllUniq ( ! grep { $_ != 1 } values %str2cnt ) ; # -1 が指定されたら簡単に結果を出力して終了。
+}
+
+sub readingAndCount ( ) { 
+    while( <> ){ 
+        chomp ;
+        $str2cnt {$_} ++ ; 
+    }
+}
+
+# 全てが異なる場合の処置
+sub simpleAllUniq ( $ ) { 
+	if ( $_[0] ) { 
+		print 1 , "\n" if $o{1} ;  # <-- alluniq と聞かれて、Yes だから、ブール値の1 を出力。
+		return 0 if $o{q} ;
+	    print STDERR CYAN "All ". (scalar keys %str2cnt ) . " counted lines are " , BRIGHT_RED "different" , CYAN ". ($Script) \n" ;  
+	    return 0 ;
+	}
+	else { 
+	    print 0 , "\n" if $o{1} ; # <-- alluniq と聞かれて、No だから、ブール値の0 を出力。
+	    return 1 if $o{q} ;
+	    print STDERR # {$o{q} ? \* STDOUT : \*STDERR }
+	      CYAN "Some counted lines are " , BRIGHT_RED "same.  " ,  
+	      CYAN , "Different " , BRIGHT_CYAN (scalar keys %str2cnt) , CYAN " / All " , BRIGHT_CYAN $. . " ; " , 
+	      CYAN ,  "Maximum multiplication : " , BRIGHT_CYAN  max( values %str2cnt ) ,
+	      CYAN "  ($Script)\n"  ;
+	    return 1 ; 
+	}
+}
+
+sub tableOutput( ) { 
+    ## 2. 度数nの異なる文字列が、具体的にどんな値であったか。
+    while ( my( $str, $cnt) = each %str2cnt ) {
+       push @{ $cnt2strs {$cnt} }, $str ; 
+    }
+    my $msep = $o{2} ? "\n" : "\t"  ;
+    print $o{2} ? "mult\tfreq\n" : "mult\tfreq\texamples\n" ;
+
+    for my $count ( sort { $a <=> $b } keys %cnt2strs ) {
+        print "$count\t", scalar @{ $cnt2strs {$count} }, $msep ; 
+        next if $o{2} ; # -2 指定の場合は、該当文字列の例を出力しない。
+        my @L  = @{ $cnt2strs { $count } }  ; 
+        @L = sort @L if $o{s}  ; 
+        my @L2 = splice @L, 0, $o{g} ; 
+        my @L3 = splice @L, - min $o{g}, scalar @L  if $o{s} ;
+        print @L3 ?  join "\n\t\t" , @L2 , @L3 : join "\n\t\t" , @L2 ; # @L2, @L3 の間に ".."がこのコードにあったのを消去
+        print "\n" ;
+    }
+}
+## ヘルプとバージョン情報
+BEGIN {
+  our $VERSION = 0.21 ;
+  $Getopt::Std::STANDARD_HELP_VERSION = 1 ; 
+  grep { m/--help/} @ARGV and *VERSION_MESSAGE = sub {} ; 
+   # 目安: 
+   #   0.21 : 人になんとか提供できる段階で 0.21 を目安とする。
+   #   1.00 以上 : 英語版のヘルプをきちんと出すことが必要条件。
+   #   2.00 以上 : テストコードが含むことが必要条件。
+}  
+sub HELP_MESSAGE{
+    use FindBin qw [ $Script ] ; 
+    $ARGV[1] //= '' ;
+    open my $FH , '<' , $0 ;
+    while(<$FH>){
+        s/\$0/$Script/g ;
+        print $_ if $ARGV[1] eq 'opt' ? m/^\ +\-/ : s/^=head1// .. s/^=cut// ;
+    }
+    close $FH ;
+    exit 0 ;
+}
+
+=encoding utf8
+
+=head1
+
+$0 
+ 
+ 入力の各行が全て異なるか、もしくは、どのような重なり方をするかの判定をする。
+ コマンド $0 の戻り値は、前者の場合0、後者の場合1となる。
+ 重なり方の様子について、$0 は標準出力に出力をする。
+
+オプション : 
+
+ -1   ; 全ての対象行が異なるかどうかだけを 1 または 0 で出力。コマンドの返値 $? はそれぞれ0,1 。
+ -2   : 重複の様子を、度数とそのまた出現回数の2列で出力。（ only 2 columns output )
+ -g num :  各 ”度数” ごとの文字列の例の最大個数を指定。未指定の場合は  3 
+
+ -q   : 標準エラー出力への二次情報の出力をしない。（ quick の q ）
+ -s   :  各 ”度数” ごとの該当文字列リストをソートして、最初と最後の g 個を出力。
+ -=   : 入力の最初の行を処理対象としない。
+
+ --help : このヘルプマニュアルを表示する。
+ --version : このプログラムのバージョン情報を出力する。
+
+$0の動作テストの方法 : 
+
+  seq 10 | $0 ; 
+  ( seq 5 ; seq 3 ; seq 2 ) | $0  ;
+=cut

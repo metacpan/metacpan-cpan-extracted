@@ -1,9 +1,9 @@
 package ArrayDataRole::Source::LinesInDATA;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-05-03'; # DATE
+our $DATE = '2021-05-10'; # DATE
 our $DIST = 'ArrayDataRoles-Standard'; # DIST
-our $VERSION = '0.005'; # VERSION
+our $VERSION = '0.006'; # VERSION
 
 use Role::Tiny;
 use Role::Tiny::With;
@@ -68,6 +68,18 @@ sub has_item_at_pos {
     }
 }
 
+sub fh {
+    my $self = shift;
+    $self->{fh};
+}
+
+sub fh_min_offset {
+    my $self = shift;
+    $self->{fhpos_data_begin};
+}
+
+sub fh_max_offset { undef }
+
 1;
 # ABSTRACT: Role to access array data from DATA section, one line per element
 
@@ -83,7 +95,7 @@ ArrayDataRole::Source::LinesInDATA - Role to access array data from DATA section
 
 =head1 VERSION
 
-This document describes version 0.005 of ArrayDataRole::Source::LinesInDATA (from Perl distribution ArrayDataRoles-Standard), released on 2021-05-03.
+This document describes version 0.006 of ArrayDataRole::Source::LinesInDATA (from Perl distribution ArrayDataRoles-Standard), released on 2021-05-10.
 
 =head1 DESCRIPTION
 
@@ -98,6 +110,20 @@ up.
 =head1 ROLES MIXED IN
 
 L<ArrayDataRole::Spec::Basic>
+
+=head1 PROVIDED METHODS
+
+=head2 fh
+
+Returns the DATA filehandle.
+
+=head2 fh_min_offset
+
+Returns the starting position of DATA.
+
+=head2 fh_max_offset
+
+Returns C<undef>.
 
 =head1 HOMEPAGE
 

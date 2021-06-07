@@ -1,5 +1,5 @@
 package Yancy::Plugin::Form;
-our $VERSION = '1.070';
+our $VERSION = '1.073';
 # ABSTRACT: Generate form HTML using various UI libraries
 
 #pod =head1 SYNOPSIS
@@ -283,7 +283,7 @@ Yancy::Plugin::Form - Generate form HTML using various UI libraries
 
 =head1 VERSION
 
-version 1.070
+version 1.073
 
 =head1 SYNOPSIS
 
@@ -544,7 +544,7 @@ Doug Bell <preaction@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by Doug Bell.
+This software is copyright (c) 2021 by Doug Bell.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -285,6 +285,10 @@ The snappy compressed ELF format
 
 The lzo compressed ELF format
 
+=item Sys::Virt::Domain::CORE_DUMP_FORMAT_WIN_DMP
+
+The Windows dump format
+
 =back
 
 =item $dom->destroy()

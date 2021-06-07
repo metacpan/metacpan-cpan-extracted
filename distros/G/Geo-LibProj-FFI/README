@@ -7,8 +7,7 @@ PROJ library's C function reference
 documentation. You should be able to use those C functions as if they
 were Perl.
 
-This module is very incomplete. Version 0.01 does only little more than
-what is necessary to support Geo::LibProj::cs2cs.
+This module is functional, but incomplete.
 
 INSTALLATION
 

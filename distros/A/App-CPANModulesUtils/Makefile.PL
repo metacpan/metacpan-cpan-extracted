@@ -16,7 +16,8 @@ my %WriteMakefileArgs = (
   "EXE_FILES" => [
     "script/acme-cpanmodules-for",
     "script/draw-feature-matrix-from-acme-cpanmodules-module",
-    "script/gen-acme-cpanmodules-module-from-acme-cpanlists-list"
+    "script/gen-acme-cpanmodules-module-from-acme-cpanlists-list",
+    "script/gen-acme-cpanmodules-module-from-webpage"
   ],
   "LICENSE" => "perl",
   "MIN_PERL_VERSION" => "5.010001",
@@ -24,6 +25,7 @@ my %WriteMakefileArgs = (
   "PREREQ_PM" => {
     "Acme::CPANModulesUtil::FeatureMatrix" => 0,
     "App::lcpan::Call" => "0.11",
+    "CPAN::Module::FromURL" => "0.05",
     "Data::Dump" => 0,
     "Data::Sah::Coerce::perl::To_str::From_str::normalize_perl_modname" => 0,
     "Data::Sah::Compiler::perl::TH::array" => 0,
@@ -34,13 +36,15 @@ my %WriteMakefileArgs = (
     "Data::Sah::Filter::perl::Path::strip_slashes_when_on_unix" => 0,
     "File::Path" => 0,
     "File::Slurper" => 0,
-    "Log::ger" => "0.027",
+    "HTML::LinkExtor" => 0,
+    "HTTP::Tiny" => "0.057",
+    "Log::ger" => "0.038",
     "Perinci::CmdLine::Any" => 0,
-    "Perinci::CmdLine::Lite" => "1.820",
+    "Perinci::CmdLine::Lite" => "1.827",
     "Perinci::Sub::XCompletion::perl_modname" => 0,
     "Sah::Schema::filename" => 0,
     "Sah::Schema::nonnegint" => 0,
-    "Sah::Schema::perl::modname" => 0,
+    "Sah::Schema::perl::modname" => "0.035",
     "Sah::Schema::true" => 0,
     "strict" => 0,
     "warnings" => 0
@@ -51,7 +55,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.004",
+  "VERSION" => "0.005",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -61,6 +65,7 @@ my %WriteMakefileArgs = (
 my %FallbackPrereqs = (
   "Acme::CPANModulesUtil::FeatureMatrix" => 0,
   "App::lcpan::Call" => "0.11",
+  "CPAN::Module::FromURL" => "0.05",
   "Data::Dump" => 0,
   "Data::Sah::Coerce::perl::To_str::From_str::normalize_perl_modname" => 0,
   "Data::Sah::Compiler::perl::TH::array" => 0,
@@ -72,15 +77,17 @@ my %FallbackPrereqs = (
   "File::Path" => 0,
   "File::Slurper" => 0,
   "File::Spec" => 0,
+  "HTML::LinkExtor" => 0,
+  "HTTP::Tiny" => "0.057",
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
-  "Log::ger" => "0.027",
+  "Log::ger" => "0.038",
   "Perinci::CmdLine::Any" => 0,
-  "Perinci::CmdLine::Lite" => "1.820",
+  "Perinci::CmdLine::Lite" => "1.827",
   "Perinci::Sub::XCompletion::perl_modname" => 0,
   "Sah::Schema::filename" => 0,
   "Sah::Schema::nonnegint" => 0,
-  "Sah::Schema::perl::modname" => 0,
+  "Sah::Schema::perl::modname" => "0.035",
   "Sah::Schema::true" => 0,
   "Test::More" => 0,
   "strict" => 0,

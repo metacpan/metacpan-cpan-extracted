@@ -1,7 +1,7 @@
 package Dancer2::Plugin::WebSocket::Connection;
 our $AUTHORITY = 'cpan:YANICK';
 # ABSTRACT: Role tying Plack::App::WebSocket::Connection with the Dancer serializer
-$Dancer2::Plugin::WebSocket::Connection::VERSION = '0.2.0';
+$Dancer2::Plugin::WebSocket::Connection::VERSION = '0.3.1';
 
 
 use Scalar::Util qw/ refaddr /;
@@ -89,7 +89,7 @@ Dancer2::Plugin::WebSocket::Connection - Role tying Plack::App::WebSocket::Conne
 
 =head1 VERSION
 
-version 0.2.0
+version 0.3.1
 
 =head1 DESCRIPTION
 
@@ -98,19 +98,21 @@ L<Plack::App::WebSocket::Connection> objects augmented with this role.
 
 =head2 Attributes
 
-=over serializer
+=over 4
+
+=item serializer
 
 Serializer object used to serialize/deserialize messages. If it's not
-C<undef>, all messages that are not L<AnyEvent::WebSocket::Message> objects 
+C<undef>, all messages that are not L<AnyEvent::WebSocket::Message> objects
 are assumed to be JSON and will be deserialized
 before being passed to the handlers, and will be serialized after being
-give to C<send>. 
+give to C<send>.
 
-=over id
+=item id
 
-A numerical value that is the id of the connection. 
+A numerical value that is the id of the connection.
 
-=item
+=back
 
 =head2 Methods
 
@@ -128,7 +130,7 @@ Add C<@channels> to the list of channels the connection belongs to.
 
 =item in_channel( @channels )
 
-Returns C<true> if the connection belongs to at least one of the 
+Returns C<true> if the connection belongs to at least one of the
 given C<@channels>.
 
 =item to( @channels )
@@ -138,13 +140,15 @@ to all connections belonging to the given C<@channels>.
 
     $conn->to( 'players' )->send( "game about to begin" );
 
+=back
+
 =head1 AUTHOR
 
 Yanick Champoux <yanick@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019, 2017 by Yanick Champoux.
+This software is copyright (c) 2021, 2019, 2017 by Yanick Champoux.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

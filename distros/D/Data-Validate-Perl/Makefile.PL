@@ -18,7 +18,7 @@ WriteMakefile(
         'Test::More' => 0,
     },
     PREREQ_PM => {
-        'Parse::Yapp'       => 1.05,
+        'Parse::Yapp' => 1.05,
     },
     EXE_FILES => [
         'bin/dvp_gen_parser',

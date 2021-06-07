@@ -1,15 +1,28 @@
-0.0.4    2020-05-07
+0.1.1    2021-06-03
+
+- bugfix: all functions require an argument; to not supply one is a fatal error.
+  Previously they would erroneously behave as of you passed in `undef`.
+
+- bugfix: 0 is correctly treated as not being `undef`.
+
+0.1.0    2021-05-25
+
+- type() can return UNDEF
+
+- doco improvements
+
+0.0.4    2021-05-07
 
 - bugfix: internally use the correct sprintf format for stringifying floats
 
 - improvement: switch from Inline::C to XS so built module can be deployed
   to machines without a C compiler
 
-0.0.3    2020-05-06
+0.0.3    2021-05-06
 
 - cope with edge cases where perl fills an IN/NV slot but a variable
   should still be treated as a string
 
-0.0.2    2020-05-01    Fix tests on 32 bit machines
+0.0.2    2021-05-01    Fix tests on 32 bit machines
 
-0.0.1    2020-05-01    Initial release
+0.0.1    2021-05-01    Initial release

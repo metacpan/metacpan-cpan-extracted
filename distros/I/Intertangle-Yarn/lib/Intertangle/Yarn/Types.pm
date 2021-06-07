@@ -1,7 +1,7 @@
 use Modern::Perl;
 package Intertangle::Yarn::Types;
 # ABSTRACT: Types for Yarn
-$Intertangle::Yarn::Types::VERSION = '0.001';
+$Intertangle::Yarn::Types::VERSION = '0.002';
 use Type::Library 0.008 -base,
 	-declare => [qw(
 		Point
@@ -75,7 +75,7 @@ Intertangle::Yarn::Types - Types for Yarn
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 EXTENDS
 

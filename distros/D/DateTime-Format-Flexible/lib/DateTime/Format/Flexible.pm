@@ -2,7 +2,7 @@ package DateTime::Format::Flexible;
 use strict;
 use warnings;
 
-our $VERSION = '0.32';
+our $VERSION = '0.33';
 
 use base 'DateTime::Format::Builder';
 

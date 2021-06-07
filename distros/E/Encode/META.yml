@@ -24,7 +24,7 @@ requires:
   parent: '0.221'
 resources:
   repository: https://github.com/dankogai/p5-encode
-version: '3.09'
+version: '3.10'
 x_contributors:
   - 'Alex Davies <alex.davies@talktalk.net>'
   - 'Alex Kapranoff <alex@kapranoff.ru>'

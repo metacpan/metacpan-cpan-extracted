@@ -1,5 +1,5 @@
 package Photonic::WE::S::EpsilonTensor;
-$Photonic::WE::S::EpsilonTensor::VERSION = '0.015';
+$Photonic::WE::S::EpsilonTensor::VERSION = '0.016';
 
 =encoding UTF-8
 
@@ -9,7 +9,7 @@ Photonic::WE::S::EpsilonTensor
 
 =head1 VERSION
 
-version 0.015
+version 0.016
 
 =head1 COPYRIGHT NOTICE
 
@@ -79,7 +79,7 @@ response $epsA is taken from the metric.
 
 =back
 
-=head1 ACCESORS (read only)
+=head1 ACCESSORS (read only)
 
 =over 4
 
@@ -99,18 +99,16 @@ use PDL::Lite;
 use PDL::NiceSlice;
 use PDL::Complex;
 use PDL::MatrixOps;
-use Storable qw(dclone);
-use PDL::IO::Storable;
 use Photonic::Types;
+use Photonic::Utils qw(any_complex);
 use Moose;
 use MooseX::StrictConstructor;
 
 extends 'Photonic::WE::S::Wave';
 
-has 'epsilonTensor' =>  (is=>'ro', isa=>'PDL::Complex', init_arg=>undef,
+has 'epsilonTensor' =>  (is=>'ro', isa=>'Photonic::Types::PDLComplex', init_arg=>undef,
 			 lazy=>1, builder=>'_build_epsilonTensor',
-			 documentation=>'macroscopit response');
-
+			 documentation=>'macroscopic response');
 
 sub _build_epsilonTensor {
     my $self=shift;
@@ -118,20 +116,18 @@ sub _build_epsilonTensor {
     my $q=$self->metric->wavenumber;
     my $q2=$q*$q;
     my $k=$self->metric->wavevector;
-    if($q->isa('PDL::Complex') || $k->isa('PDL::Complex')){
+    my ($k2, $kk);
+    if(any_complex($q, $k)){
 	#Make both complex
 	$_ = $_->isa('PDL::Complex') ? $_ : r2C($_) for $q, $k;
-	my $k2=($k*$k)->sumover; #inner
-	my $kk=$k->(:,:,*1)*$k->(:,*1,:); #outer
-	my $id=identity($k);
-	my $eps=$wave+$k2/$q2*$id - $kk/$q2;
-	return $eps;
+	$k2=($k*$k)->sumover; #inner
+	$kk=$k->(:,:,*1)*$k->(:,*1,:); #outer
+    } else {
+	$k2=$k->inner($k);
+	$kk=$k->outer($k);
     }
-    my $k2=$k->inner($k);
-    my $kk=$k->outer($k);
     my $id=identity($k);
-    my $eps=$wave+$k2/$q2*$id - $kk/$q2;
-    return $eps;
+    $wave+$k2/$q2*$id - $kk/$q2;
 };
 
 __PACKAGE__->meta->make_immutable;

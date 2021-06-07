@@ -1,6 +1,6 @@
 package Vote::Count::TextTableTiny;
-$Vote::Count::TextTableTiny::VERSION = '1.10';
-use 5.022;
+$Vote::Count::TextTableTiny::VERSION = '2.00';
+use 5.024;
 use strict;
 use warnings;
 use utf8;
@@ -254,326 +254,15 @@ __END__
 
 =head1 NAME
 
-Text::Table::Tiny - generate simple text tables from 2D arrays
+Vote::Count::TextTableTiny
 
 =head1 SYNOPSIS
 
- use Text::Table::Tiny 1.02 qw/ generate_table /;
-
- my $rows = [
-   [qw/ Pokemon     Type     Count /],
-   [qw/ Abra        Psychic      5 /],
-   [qw/ Ekans       Poison     123 /],
-   [qw/ Feraligatr  Water     5678 /],
- ];
-
- print generate_table(rows => $rows, header_row => 1), "\n";
-
-=head1 DESCRIPTION
-
-This module provides a single function, C<generate_table>, which formats
-a two-dimensional array of data as a text table.
-It handles text that includes ANSI escape codes and wide Unicode characters.
-
-There are a number of options for adjusting the output format,
-but the intention is that the default option is good enough for most uses.
-
-The example shown in the SYNOPSIS generates the following table:
-
- +------------+---------+-------+
- | Pokemon    | Type    | Count |
- +------------+---------+-------+
- | Abra       | Psychic | 5     |
- | Ekans      | Poison  | 123   |
- | Feraligatr | Water   | 5678  |
- +------------+---------+-------+
-
-Support for wide characters was added in 1.02,
-so if you need that,
-you should specify that as your minimum required version,
-as per the SYNOPSIS.
-
-The interface changed with version 0.04,
-so if you use the C<generate_table()> function illustrated above,
-then you need to require at least version 0.04 of this module.
-
-Some of the options described below were added in version 1.00,
-so your best bet is to require at least version 1.00.
-
-
-=head2 generate_table()
-
-The C<generate_table> function understands a number of arguments,
-which are passed as a hash.
-The only required argument is B<rows>.
-Where arguments were not supported in the original release,
-the first supporting version is noted.
-
-If you pass an unknown argument,
-C<generate_table> will die with an error message.
-
-=over 4
-
-
-=item *
-
-rows
-
-Takes an array reference which should contain one or more rows
-of data, where each row is an array reference.
-
-
-=item *
-
-header_row
-
-If given a true value, the first row in the data will be interpreted
-as a header row, and separated from the rest of the table with a ruled line.
-
-
-=item *
-
-separate_rows
-
-If given a true value, a separator line will be drawn between every row in
-the table,
-and a thicker line will be used for the header separator.
-
-=item *
-
-top_and_tail
-
-If given a true value, then the top and bottom border lines will be skipped.
-This reduces the vertical height of the generated table.
-
-Added in 0.04.
-
-=item *
-
-align
-
-This takes an array ref with one entry per column,
-to specify the alignment of that column.
-Legal values are 'l', 'c', and 'r'.
-You can also specify a single alignment for all columns.
-ANSI escape codes are handled.
-
-Added in 1.00.
-
-=item *
-
-style
-
-Specifies the format of the output table.
-The default is C<'classic'>,
-but other options are C<'boxrule'>, C<'norule'> and C<'markdown'>.
-
-If you use the C<boxrule> style,
-you'll probably need to run C<binmode(STDOUT, ':utf8')>.
-
-Added in 1.00.
-
-
-=item *
-
-indent
-
-Specify an indent that should be prefixed to every line
-of the generated table.
-This can either be a string of spaces,
-or an integer giving the number of spaces wanted.
-
-Added in 1.00.
-
-=item *
-
-compact
-
-If set to a true value then we omit the single space padding on either
-side of every column.
-
-Added in 1.00.
-
-=back
-
-=head3 Style markdown
-
-Tables are not part of the original Markdown specification but have been adopted by many extended Markdown flavours. The GitHub Flavored Markdown specification is followed, many other implementations are compatible with it.
-
-The markdown style requires that header and top_and_tail be true, and indent should be none while separate_rows should be false. These requirements are all forced when style is set to 'markdown', they will be ignored if specified.
-
-Compatible options are compact and align. When align is not present the delimiter row is formatted like |---|, if alignment is set that would change to |:---|,|:---:|,|---:| depending on alignment.
-
-If any of the data includes the '|' character, it must be escaped as '\|'. Since this would cause invalid Markdown, the error is fatal.
-
-While the GFM spec allows for ragged (not padded to be even) columns, they are not available in Text::Table::Tiny. The spec is silent on leading space (indent), but in practice it often fails to be recognized by GitHub's Markdown display, so it is treated as not allowed. In the spec leading and trailing pipes are optional. If the indent is uneven or there is too much leading whitespace the table won't be displayed correctly. Leading and trailing pipes are treated as mandatory.
-
-Added in 1.03.
-
-=head2 EXAMPLES
-
-If you just pass the data and no other options:
-
- generate_table(rows => $rows);
-
-You get minimal ruling:
-
- +------------+---------+-------+
- | Pokemon    | Type    | Count |
- | Abra       | Psychic | 5     |
- | Ekans      | Poison  | 123   |
- | Feraligatr | Water   | 5678  |
- +------------+---------+-------+
-
-If you want a separate header, set the header_row option to a true value,
-as shown in the SYNOPSIS.
-
-To take up fewer lines,
-you can miss out the top and bottom rules,
-by setting C<top_and_tail> to a true value:
-
- generate_table(rows => $rows, header_row => 1, top_and_tail => 1);
-
-This will generate the following:
-
- | Pokemon    | Type    | Count |
- +------------+---------+-------+
- | Abra       | Psychic | 5     |
- | Ekans      | Poison  | 123   |
- | Feraligatr | Water   | 5678  |
-
-If you want a more stylish looking table,
-set the C<style> parameter to C<'boxrule'>:
-
- binmode(STDOUT,':utf8');
- generate_table(rows => $rows, header_row => 1, style => 'boxrule');
-
-This uses the ANSI box rule characters.
-Note that you will need to ensure UTF output.
-
- ┌────────────┬─────────┬───────┐
- │ Pokemon    │ Type    │ Count │
- ├────────────┼─────────┼───────┤
- │ Abra       │ Psychic │ 5     │
- │ Ekans      │ Poison  │ 123   │
- │ Feraligatr │ Water   │ 5678  │
- └────────────┴─────────┴───────┘
-
-You might want to right-align numeric values:
-
- generate_table( ... , align => [qw/ l l r /] );
-
-The C<align> parameter can either take an arrayref,
-or a string with an alignment to apply to all columns:
-
- ┌────────────┬─────────┬───────┐
- │ Pokemon    │ Type    │ Count │
- ├────────────┼─────────┼───────┤
- │ Abra       │ Psychic │     5 │
- │ Ekans      │ Poison  │   123 │
- │ Feraligatr │ Water   │  5678 │
- └────────────┴─────────┴───────┘
-
-If you're using the boxrule style,
-you might feel you can remove the padding on either side of every column,
-done by setting C<compact> to a true value:
-
- ┌──────────┬───────┬─────┐
- │Pokemon   │Type   │Count│
- ├──────────┼───────┼─────┤
- │Abra      │Psychic│    5│
- │Ekans     │Poison │  123│
- │Feraligatr│Water  │ 5678│
- └──────────┴───────┴─────┘
-
-You can also ask for a rule between each row,
-in which case the header rule becomes stronger.
-This works best when combined with the boxrule style:
-
- generate_table( ... , separate_rows => 1 );
-
-Which results in the following:
-
- ┌────────────┬─────────┬───────┐
- │ Pokemon    │ Type    │ Count │
- ╞════════════╪═════════╪═══════╡
- │ Abra       │ Psychic │     5 │
- ├────────────┼─────────┼───────┤
- │ Ekans      │ Poison  │   123 │
- ├────────────┼─────────┼───────┤
- │ Feraligatr │ Water   │  5678 │
- └────────────┴─────────┴───────┘
-
-You can use this with the other styles,
-but I'm not sure you'd want to.
-
-If you just want columnar output,
-use the C<norule> style:
-
- generate_table( ... , style => 'norule' );
-
-which results in:
-
-
-  Pokemon      Type      Count
-
-  Abra         Psychic       5
-  Ekans        Poison      123
-  Feraligatr   Water      5678
-
-
-Note that everywhere you saw a line on the previous tables,
-there will be a space character in this version.
-So you may want to combine the C<top_and_tail> option,
-to suppress the extra blank lines before and after
-the body of the table.
-
-To get a basic Markdown table:
-
-  generate_table( rows => $rows, style => 'markdown' );
-
-To get something like:
-
-  | Pokemon   | Type           | Seen  |
-  |-----------|----------------|-------|
-  | Rattata   | Normal         | 10199 |
-  | Ekans     | Poison         | 536   |
-  | Vileplume | Grass / Poison | 4     |
-
-If you want to specify alignment you can. Remember, if you need to use '|' in any of your data it must be escaped as '\|', and it will appear in the output that way. Failure to do so will result in invalid Markdown. If you change the Type for Vileplume to 'Grass\|Poison' and then:
-
-  generate_table(
-    rows => $rows,
-    style => 'markdown',
-    align => [ 'l','c','r' ] );
-
-You'll get:
-
-  | Pokemon   |     Type      |  Seen |
-  |:----------|:-------------:|------:|
-  | Rattata   |    Normal     | 10199 |
-  | Ekans     |    Poison     |   536 |
-  | Vileplume | Grass\|Poison |     4 |
-
-=head1 SEE ALSO
-
-My L<blog post|http://neilb.org/2019/08/06/text-table-tiny-changes.html>
-where I described changes to formatting;
-this has more examples.
-
-There are many modules for formatting text tables on CPAN.
-A good number of them are listed in the
-L<See Also|https://metacpan.org/pod/Text::Table::Manifold#See-Also>
-section of the documentation for L<Text::Table::Manifold>.
-
-The specification for tables in GitHub Flavored Markdown is at: L<https://github.github.com/gfm/#tables-extension->
-
-
+ Don't use this module. It is a fork from a pending Pull Request, and will be withdrawn when the PR merges.
 
 =head1 REPOSITORY
 
 L<https://github.com/neilb/Text-Table-Tiny>
-
 
 =head1 AUTHOR
 
@@ -581,7 +270,6 @@ Neil Bowers <neilb@cpan.org>
 
 The original version was written by Creighton Higgins <chiggins@chiggins.com>,
 but the module was entirely rewritten for 0.05_01.
-
 
 =head1 COPYRIGHT AND LICENSE
 
@@ -606,11 +294,15 @@ John Karr (BRAINBUZ) brainbuz@cpan.org
 
 CONTRIBUTORS
 
-Copyright 2019-2020 by John Karr (BRAINBUZ) brainbuz@cpan.org.
+Copyright 2019-2021 by John Karr (BRAINBUZ) brainbuz@cpan.org.
 
 LICENSE
 
 This module is released under the GNU Public License Version 3. See license file for details. For more information on this license visit L<http://fsf.org>.
+
+SUPPORT
+
+This software is provided as is, per the terms of the GNU Public License. Professional support and customisation services are available from the author.
 
 =cut
 

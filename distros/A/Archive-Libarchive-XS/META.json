@@ -1,10 +1,10 @@
 {
-   "abstract" : "Perl bindings to libarchive via XS",
+   "abstract" : "(Deprecated) Perl bindings to libarchive via XS",
    "author" : [
       "Graham Ollis <plicease@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.017, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -35,7 +35,7 @@
             "Test::CPAN::Changes" : "0",
             "Test::EOL" : "0",
             "Test::Fixme" : "0.07",
-            "Test::More" : "0.94",
+            "Test::More" : "0.98",
             "Test::NoTabs" : "0",
             "Test::Pod" : "0",
             "Test::Pod::Coverage" : "0",
@@ -56,7 +56,7 @@
       "test" : {
          "requires" : {
             "Alien::Libarchive3" : "0",
-            "Test::More" : "0.94",
+            "Test::More" : "0.98",
             "perl" : "5.008"
          }
       }
@@ -73,7 +73,11 @@
          "web" : "https://github.com/plicease/Archive-Libarchive-XS"
       }
    },
-   "version" : "0.0902",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0233"
+   "version" : "0.0903",
+   "x_deprecated" : 1,
+   "x_generated_by_perl" : "v5.34.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.26",
+   "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later",
+   "x_use_unsafe_inc" : 0
 }
 

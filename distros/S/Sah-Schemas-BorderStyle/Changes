@@ -1,3 +1,9 @@
+0.002   2021-02-02  Released-By: PERLANCAR; Urgency: medium
+
+	- [ux] Use complete_recurse=1 schema parameter to show all
+	  available border syles during completion.
+
+
 0.001   2021-01-26  Released-By: PERLANCAR
 
         - First release.

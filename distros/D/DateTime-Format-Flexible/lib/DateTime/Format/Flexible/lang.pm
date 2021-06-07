@@ -3,7 +3,6 @@ package DateTime::Format::Flexible::lang;
 use strict;
 use warnings;
 
-use Module::Pluggable require => 1 , search_path => [__PACKAGE__];
 use List::MoreUtils 'any';
 
 sub new
@@ -16,8 +15,21 @@ sub new
         $self->{lang} = [$self->{lang}];
     }
 
+    $self->{_plugins} = [
+        'DateTime::Format::Flexible::lang::de',
+        'DateTime::Format::Flexible::lang::en',
+        'DateTime::Format::Flexible::lang::es',
+    ];
+
+    foreach my $plugin (@{$self->{_plugins}}) {
+        my $path   = $plugin . ".pm";
+        $path =~ s{::}{/}g;
+        require $path;
+    }
     return $self;
 }
+
+sub plugins {return @{$_[0]->{_plugins}}}
 
 sub _cleanup
 {
@@ -35,23 +47,23 @@ sub _cleanup
         }
         printf( "# not skipping %s\n", $plug ) if $ENV{DFF_DEBUG};
 
-        printf( "#   before math: %s\n", $date ) if $ENV{DFF_DEBUG};;
+        printf( "#   before math: %s\n", $date ) if $ENV{DFF_DEBUG};
         $date = $self->_do_math( $plug , $date );
-        printf( "#   before string_dates: %s\n", $date ) if $ENV{DFF_DEBUG};;
+        printf( "#   before string_dates: %s\n", $date ) if $ENV{DFF_DEBUG};
         $date = $self->_string_dates( $plug , $date );
-        printf( "#   before fix_alpha_month: %s\n", $date ) if $ENV{DFF_DEBUG};;
+        printf( "#   before fix_alpha_month: %s\n", $date ) if $ENV{DFF_DEBUG};
         ( $date , $p ) = $self->_fix_alpha_month( $plug , $date , $p );
-        printf( "#   before remove_day_names: %s\n", $date ) if $ENV{DFF_DEBUG};;
+        printf( "#   before remove_day_names: %s\n", $date ) if $ENV{DFF_DEBUG};
         $date = $self->_remove_day_names( $plug , $date );
-        printf( "#   before fix_hours: %s\n", $date ) if $ENV{DFF_DEBUG};;
+        printf( "#   before fix_hours: %s\n", $date ) if $ENV{DFF_DEBUG};
         $date = $self->_fix_hours( $plug , $date );
-        printf( "#   before remove_strings: %s\n", $date ) if $ENV{DFF_DEBUG};;
+        printf( "#   before remove_strings: %s\n", $date ) if $ENV{DFF_DEBUG};
         $date = $self->_remove_strings( $plug , $date );
-        printf( "#   before locate_time: %s\n", $date ) if $ENV{DFF_DEBUG};;
+        printf( "#   before locate_time: %s\n", $date ) if $ENV{DFF_DEBUG};
         $date = $self->_locate_time( $plug , $date );
-        printf( "#   before fix_internal_tz: %s\n", $date ) if $ENV{DFF_DEBUG};;
+        printf( "#   before fix_internal_tz: %s\n", $date ) if $ENV{DFF_DEBUG};
         ( $date , $p ) = $self->_fix_internal_tz( $plug , $date , $p );
-        printf( "#   finished: %s\n", $date ) if $ENV{DFF_DEBUG};;
+        printf( "#   finished: %s\n", $date ) if $ENV{DFF_DEBUG};
     }
     return ( $date , $p );
 }
@@ -77,7 +89,7 @@ sub _do_math
     my ( $self , $plug , $date ) = @_;
 
     my %relative_strings = $plug->relative;
-    my %day_strings = $plug->days;
+    my $day_strings = $plug->days;
     my %month_strings = $plug->months;
 
     my $instructions = {
@@ -98,19 +110,23 @@ sub _do_math
 
         if ( $date =~ m{$rx}mix )
         {
-            $date =~ s{$rx}{}mx;
+            $date =~ s{$rx}{}mix;
             if ($has_units)
             {
                 $date = $self->_set_units( $plug , $date, $direction );
             }
             else
             {
-                foreach my $day (keys %day_strings)
+                foreach my $set (@{$day_strings})
                 {
-                    if ($date =~ m{$day}mix)
+                    foreach my $day (keys %{$set})
                     {
-                        $date = $self->_set_day( $plug , $date , $day , $direction );
-                        $date =~ s{$day}{}mx;
+
+                        if ($date =~ m{$day}mix)
+                        {
+                            $date = $self->_set_day( $plug , $date , $day , $direction );
+                            $date =~ s{$day}{}mix;
+                        }
                     }
                 }
                 foreach my $month (keys %month_strings)
@@ -118,7 +134,7 @@ sub _do_math
                     if ($date =~ m{$month}mix)
                     {
                         $date = $self->_set_month( $plug , $date , $month , $direction );
-                        $date =~ s{$month}{}mx;
+                        $date =~ s{$month}{}mix;
                     }
                 }
             }
@@ -174,11 +190,10 @@ sub _set_day
 {
     my ( $self , $plug , $date , $day , $direction ) = @_;
 
-    my %day_strings = $plug->days;
-
     my $base_dt = DateTime::Format::Flexible->base->clone;
     my $dow = $base_dt->day_of_week;
-    my $date_dow = $day_strings{$day};
+    my $date_dow = $self->_alpha_day_to_int($plug, $day);
+
     if ( $direction eq 'past' )
     {
         my $amount = $dow - $date_dow;
@@ -248,7 +263,7 @@ sub _string_dates
     my %day_numbers = $plug->day_numbers;
     foreach my $key ( keys %day_numbers )
     {
-        if ( $date =~ m{$key}mxi )
+        if (index(lc($date), lc($key)) >= 0)
         {
             my $new_value = $day_numbers{$key};
             $date =~ s{$key}{n${new_value}n}mix;
@@ -295,44 +310,66 @@ sub _fix_alpha_month
 sub _remove_day_names
 {
     my ( $self , $plug , $date ) = @_;
-    my %days = $plug->days;
-    foreach my $day_name ( keys %days )
+    my $days = $plug->days;
+    foreach my $set (@{$days})
     {
-        # if the day name is by itself, make it the upcoming day
-        # eg: monday = next monday
-        if ( $date =~ m{\A$day_name\z}mx or
-             $date =~ m{$day_name\sat}mx )
+        foreach my $day_name ( keys %{$set} )
         {
-            my $dt = $self->{base}->clone->truncate( to => 'day' );
-            if ( $days{$day_name} == $dt->dow )
+            # if the day name is by itself, make it the upcoming day
+            # eg: monday = next monday
+            if (( lc($date) eq lc($day_name)) or (index(lc($date), lc($day_name) . ' at') >= 0 ))
             {
-                my $str = $dt->ymd;
-                $date =~ s{$day_name}{$str};
+                my $dt = $self->{base}->clone->truncate( to => 'day' );
+                my $date_dow = $set->{$day_name};
+
+                if ( $date_dow == $dt->dow )
+                {
+                    my $str = $dt->ymd;
+                    $date =~ s{$day_name}{$str}i;
+                    return $date;
+                }
+                elsif ( $date_dow > $dt->dow )
+                {
+                    $dt->add( days => $date_dow - $dt->dow );
+                    my $str = $dt->ymd;
+                    $date =~ s{$day_name}{$str}i;
+                    return $date;
+                }
+                else
+                {
+                    $dt->add( days => $date_dow - $dt->dow + 7 );
+                    my $str = $dt->ymd;
+                    $date =~ s{$day_name}{$str}i;
+                    return $date;
+                }
+            }
+            # otherwise, just strip it out
+            if ( $date =~ m{\b$day_name\b}mxi )
+            {
+                $date =~ s{$day_name,?}{}gmix;
                 return $date;
             }
-            elsif ( $days{$day_name} > $dt->dow )
-            {
-                $dt->add( days => $days{$day_name} - $dt->dow );
-                my $str = $dt->ymd;
-                $date =~ s{$day_name}{$str};
-                return $date;
-            }
-            else
-            {
-                $dt->add( days => $days{$day_name} - $dt->dow + 7 );
-                my $str = $dt->ymd;
-                $date =~ s{$day_name}{$str};
-                return $date;
-            }
-        }
-        # otherwise, just strip it out
-        if ( $date =~ m{$day_name}mxi )
-        {
-            $date =~ s{$day_name,?}{}gmix;
-            return $date;
         }
     }
     return $date;
+}
+
+sub _alpha_day_to_int
+{
+    my ( $self, $plug, $day ) = @_;
+
+    my $day_strings = $plug->days;
+    foreach my $set (@{$day_strings})
+    {
+        foreach my $key (keys %{$set})
+        {
+            if (lc($key) eq lc($day))
+            {
+                return $set->{$key};
+            }
+        }
+    }
+    return;
 }
 
 # fix noon and midnight, named hours
@@ -396,6 +433,10 @@ You should not need to use this module directly
 =head2 new
 
 Instantiate a new instance of this module.
+
+=head2 plugins
+
+Returns a list of available language plugins.
 
 =head1 AUTHOR
 

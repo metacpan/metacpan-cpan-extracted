@@ -14,6 +14,7 @@ GetOptions(
     'errors-to=s'       => \$opts{errors_to},
     'errors-from=s'     => \$opts{errors_from},
     'feedback-to=s'     => \$opts{feedback_to},
+    'base-url=s'        => \$opts{base_url},
     'api-url=s'         => \$opts{api_url},
     'private-api-url=s' => \$opts{private_api_url},
     'reverse-proxy'     => \$opts{reverse_proxy},
@@ -255,7 +256,7 @@ which options are available.
 
 =head1 Author
 
-David E. Wheeler <david.wheeler@pgexperts.com>
+David E. Wheeler <david@justatheory.com>
 
 =head1 Copyright and License
 

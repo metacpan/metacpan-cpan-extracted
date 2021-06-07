@@ -1,134 +1,60 @@
 package LyricFinder::AZLyrics;
 
-use 5.008000;
 use strict;
 use warnings;
-use LWP::UserAgent;
-use HTTP::Request;
-use HTML::Strip;
 use Carp;
-
-my $Source = 'AZLyrics';
-my $Site   = 'https://www.azlyrics.com';
+use HTML::Strip;
+use parent 'LyricFinder::_Class';
 
 our $haveLyricsCache;
 BEGIN {
+	$haveLyricsCache = 0;
 	eval "use LyricFinder::Cache; \$haveLyricsCache = 1; 1";
 }
 
-# the Default HTTP User-Agent we'll send:
-our $AGENT = "Mozilla/5.0 (X11; Linux x86_64; rv:80.0) Gecko/20100101 Firefox/80.0";
+my $Source = 'AZLyrics';
+my $Site   = 'https://www.azlyrics.com';
+my $DEBUG  = 0;
 
 sub new
 {
 	my $class = shift;
 
-	my $self = {};
-	$self->{'agent'} = $AGENT;
-	$self->{'cache'} = '';
-	$self->{'Error'} = 'Ok';
-	$self->{'Source'} = $Source;
-	$self->{'Site'} = $Site;
-	$self->{'Url'} = '';
-	$self->{'Credits'} = [];
-
-	my %args = @_;
-	foreach my $i (keys %args) {
-		if ($i =~ s/^\-//) {
-			$self->{$i} = $args{"-$i"};
-		} else {
-			$self->{$i} = $args{$i};
-		}
-	}
+	my $self = $class->SUPER::new($Source, @_);
+	@{$self->{'_fetchers'}} = ($Source);
+	unshift(@{$self->{'_fetchers'}}, 'Cache')  if ($haveLyricsCache
+			&& $self->{'-cache'} && $self->{'-cache'} !~ /^\>/);
 
 	bless $self, $class;   #BLESS IT!
 
 	return $self;
 }
 
-sub source {
-	my $self = shift;
-	return $self->{'Source'};
-}
-
-sub url {
-	my $self = shift;
-	return $self->{'Url'};
-}
-
-sub order {
-	return wantarray ? ($Source) : $Source;
-}
-
-sub tried {
-	return order ();
-}
-
-sub credits {
-	my $self = shift;
-	return wantarray ? @{$self->{'Credits'}} : join(', ', @{$self->{'Credits'}});
-}
-
-sub message {
-	my $self = shift;
-	return $self->{'Error'};
-}
-
-sub site {
-	my $self = shift;
-	return $self->{'Site'};
-}
-
-# Allow user to specify a different user-agent:
-sub agent {
-	my $self = shift;
-
-	if (defined $_[0]) {
-		$self->{'agent'} = $_[0];
-	} else {
-		return $self->{'agent'};
-	}
-}
-
-sub cache {
-	my $self = shift;
-
-	if (defined $_[0]) {
-		$self->{'cache'} = $_[0];
-	} else {
-		return $self->{'cache'};
-	}
-}
-
 sub fetch {
 	my ($self, $artist_in, $song_in) = @_;
 
-	# reset the error var, change it if an error occurs.
-	$self->{'Error'} = 'Ok';
-	$self->{'Url'} = '';
-	$self->{'Credits'} = [];
+	$self->_debug("AZLyrics::fetch($artist_in, $song_in)!");
 
-	unless ($artist_in && $song_in) {
-		carp($self->{'Error'} = "e:$Source.fetch() called without artist and song!");
-		return;
-	}
+	return ''  unless ($self->_check_inputs($artist_in, $song_in));
+	return ''  if ($self->{'Error'} ne 'Ok');
 
 	# first, see if we've got it cached:
-	if ($self->{'cache'} && $self->{'cache'} !~ /^\>/ && $haveLyricsCache) {
-		my $cache = new LyricFinder::Cache(-cache => $self->{'cache'});
+	$self->_debug("i:haveCache=$haveLyricsCache= -cachedir=".$self->{'-cache'}."=");
+	if ($haveLyricsCache && $self->{'-cache'} && $self->{'-cache'} !~ /^\>/) {
+		my $cache = new LyricFinder::Cache(%{$self});
 		if ($cache) {
 			my $lyrics = $cache->fetch($artist_in, $song_in);
 			if (defined($lyrics) && $lyrics =~ /\w/) {
-				print "..Got lyrics from cache.\n"  if ($self->{'-debug'});
+				$self->_debug("..Got lyrics from cache.");
 				$self->{'Source'} = 'Cache';
 				$self->{'Site'} = $cache->site();
 				$self->{'Url'} = $cache->url();
+
 				return $lyrics;
 			}
 		}
 	}
 
-	$self->{'Source'} = $Source;
 	$self->{'Site'} = $Site;
 
 	(my $artist = $artist_in) =~ s#\s*\/.*$##;    #ONLY USE 1ST ARTIST, IF MORE THAN ONE!
@@ -137,53 +63,17 @@ sub fetch {
 
 	# Their URLs look like e.g.:
 	# https://www.azlyrics.com/lyrics/direstraits/heavyfuel
-	$self->{'Url'} = 'https://www.azlyrics.com/lyrics/'
+	$self->{'Url'} = $Site . '/lyrics/'
 			. join('/', lc $artist, lc $song) . '.html';
 
-	my $ua = LWP::UserAgent->new(
-		ssl_opts => { verify_hostname => 0, },
-	);
-	$ua->timeout(10);
-	$ua->agent($self->{'agent'});
-	$ua->protocols_allowed(['https']);
-	$ua->cookie_jar( {} );
-	push @{ $ua->requests_redirectable }, 'GET';
-	(my $referer = $self->{'Url'}) =~ s{^(\w+)\:\/\/}{};
-	my $protocol = $1;
-	$referer =~ s{\/.+$}{\/};
-	my $host = $referer;
-	$host =~ s{\/$}{};
-	$referer = $protocol . '://' . $referer;
-	my $req = new HTTP::Request 'GET' => $self->{'Url'};
-	$req->header(
-		'Accept' =>
-			'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
-		'Accept-Language'           => 'en-US,en;q=0.5',
-		'Accept-Encoding'           => 'gzip, deflate',
-		'Connection'                => 'keep-alive',
-		'Upgrade-insecure-requests' => 1,
-		'Host'                      => $host,
-	);
-
-	my $res = $ua->request($req);
-
-	if ($res->is_success) {
-		my $lyrics = $self->_parse($res->decoded_content);
-		if ($self->{'cache'} && $self->{'cache'} !~ /^\</ && $lyrics && $haveLyricsCache) {
-			# cache the fetched lyrics, if we can:
-			my $cache = new LyricFinder::Cache(-cache => $self->{'cache'});
-			$cache->save($artist_in, $song_in, $lyrics)  if ($cache);
-		}
-		return $lyrics;
-	} else {
-		if ($res->status_line =~ /^404/) {
-			$self->{'Error'} = "..$Source - Lyrics not found.";
-		} else {
-			carp($self->{'Error'} = "e:$Source - Failed to retrieve ".$self->{'Url'}
-					.' ('.$res->status_line.').');
-		}
-		return;
+	my $lyrics = $self->_web_fetch($artist_in, $song_in);
+	if ($lyrics && $haveLyricsCache && $self->{'-cache'} && $self->{'-cache'} !~ /^\</) {
+		$self->_debug("=== WILL CACHE LYRICS! ===");
+		# cache the fetched lyrics, if we can:
+		my $cache = new LyricFinder::Cache(%{$self});
+		$cache->save($artist_in, $song_in, $lyrics)  if ($cache);
 	}
+	return $lyrics;
 }
 
 # Internal use only functions:
@@ -192,8 +82,9 @@ sub _parse {
 	my $self = shift;
 	my $html = shift;
 
+	$self->_debug("AZLyrics::_parse()!");
 	if (my ($goodbit) = $html =~
-		m{our licensing agreement. Sorry about that. \-\-\>(.+?)\<\/div\>}msi)
+			m{our licensing agreement. Sorry about that. \-\-\>(.+?)\<\/div\>}msi)
 	{
 		# Scoop out any credits for these lyrics:
 		while ($html =~ s{Thanks\s+to\s+(.+)}{}xi) {
@@ -204,28 +95,14 @@ sub _parse {
 		my $hs   = HTML::Strip->new();
 		my $text = $hs->parse($goodbit);
 
-		# normalize Windowsey \r\n sequences:
-		$text =~ s/\r+//gs;
-		# strip off pre & post padding with spaces:
-		$text =~ s/^ +//mg;
-		$text =~ s/ +$//mg;
-		# clear up repeated blank lines:
-		$text =~ s/(\R){2,}/\n\n/gs;
-		# and remove any blank top lines:
-		$text =~ s/^\R+//s;
-		$text =~ s/\R\R+$/\n/s;
-		$text .= "\n"  unless ($text =~ /\n$/s);
-		# now fix up for either Windows or Linux/Unix:
-		$text =~ s/\R/\r\n/gs  if ($^O =~ /Win/);
-
-		return $text;
+		return $self->_normalize_lyric_text($self->_html2text($text));
 	} else {
 		carp($self->{'Error'} = "e:$Source - Failed to identify lyrics on result page.");
 		return '';
 	}
 }   # end of sub parse
 
-1;
+1
 
 __END__
 
@@ -299,7 +176,8 @@ object can be used for multiple fetches, so this normally only needs to be
 called once.
 
 I<options> is a hash of option/value pairs (ie. "-option" => "value").  
-The currently-supported options are:  
+If an "-option" is specified with no "value" given, the default value will 
+be I<1> ("I<true>").  The currently-supported options are:  
 
 =over 4
 
@@ -311,7 +189,7 @@ pass to www.azlyrics.com.  Some sites are pickey about receiving a user-agent
 string that corresponds to a valid / supported web-browser to prevent their 
 sites from being "scraped" by programs, such as this.  
 
-Default:  I<"Mozilla/5.0 (X11; Linux x86_64; rv:80.0) Gecko/20100101 Firefox/80.0">.
+Default:  I<"Mozilla/5.0 (X11; Linux x86_64; rv:84.0) Gecko/20100101 Firefox/84.0">.
 
 NOTE:  This value will be overridden if $founder->agent("agent") is 
 called!

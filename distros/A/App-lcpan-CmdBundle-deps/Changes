@@ -1,29 +1,50 @@
-0.007   2017-07-28 (PERLANCAR)
+0.010   2021-06-01  Released-By: PERLANCAR; Urgency: medium
+
+	- [subcommand deps-unindexed][bugfix] Fix swapped logic
+	  --exclude-perl vs --include-perl.
+
+
+0.009   2021-05-26  Released-By: PERLANCAR; Urgency: medium
+
+	- [bugfix] [subcommand deps-unindexed] --module was not observed.
+
+
+0.008   2021-05-26  Released-By: PERLANCAR; Urgency: medium
+
+	- Update to newer lcpan (dist table is gone).
+
+	- Add subcommand: deps-unindexed.
+
+	- [ux] Add wording in argument summary/description to make it clear
+	  which one is dependency, which one is dependeny specifier.
+
+
+0.007   2017-07-28  Released-By: PERLANCAR
 
 	- Add subcommands: deps-phases, deps-rels.
 
 
-0.006   2017-07-10 (PERLANCAR)
+0.006   2017-07-10  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- Replace Log::Any with Log::ger.
 
 
-0.005   2017-01-20 (PERLANCAR)
+0.005   2017-01-20  Released-By: PERLANCAR
 
         - No functional changes.
 
         - [dist] Use Pod::Weaver plugin PWP:App::lcpan.
 
 
-0.004   2016-12-28 (PERLANCAR)
+0.004   2016-12-28  Released-By: PERLANCAR
 
 	- [Bugfix] deps-all: Fix typo which makes filtering --rel with SQL
 	  LIKE doesn't work.
 
 
-0.003   2016-12-28 (PERLANCAR)
+0.003   2016-12-28  Released-By: PERLANCAR
 
 	- [dist] Fix expressing follow-spec prereq relationship with
 	  x_spec.
@@ -31,12 +52,12 @@
 	- deps-all: Allow % in --phase and --rel.
 
 
-0.002   2016-12-27 (PERLANCAR)
+0.002   2016-12-27  Released-By: PERLANCAR
 
 	- deps-all: Allow SQL LIKE query for --dist and --module when they
           contain %, fix SQL, change default of --phase & --rel to ALL.
 
 
-0.001   2016-12-27 (PERLANCAR)
+0.001   2016-12-27  Released-By: PERLANCAR
 
         - First release.

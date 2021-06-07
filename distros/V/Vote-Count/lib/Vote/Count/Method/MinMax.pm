@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use 5.022;
+use 5.024;
 use feature qw /postderef signatures/;
 
 package Vote::Count::Method::MinMax;
@@ -9,13 +9,13 @@ use namespace::autoclean;
 use Moose;
 extends 'Vote::Count';
 
-our $VERSION='1.10';
+our $VERSION='2.00';
 
 =head1 NAME
 
 Vote::Count::Method::MinMax
 
-=head1 VERSION 1.10
+=head1 VERSION 2.00
 
 =cut
 
@@ -27,7 +27,7 @@ Vote::Count::Method::MinMax
 
  my $MinMaxElection =
  Vote::Count::Method::MinMax->new( 'BallotSet' => $ballotset );
- 
+
  # $method is one of: winning margin opposition
  my $Winner = $MinMaxElection->MinMax( $method )->{'winner'};
  say $MinMaxElection->logv();
@@ -36,7 +36,7 @@ Vote::Count::Method::MinMax
 
 MinMax (also known as Minimax and Simpson-Kramer) uses a Pairwise comparison Matrix. Instead of looking at wins and losses as with Condorcet Methods, it scores each pairing, the choice with the lowest worst pairing score wins.
 
-=head2 The Three MinMax Scoring Rules 
+=head2 The Three MinMax Scoring Rules
 
 =head3 Winning Votes ('winning')
 
@@ -58,7 +58,7 @@ This scoring method is claimed to meet the Later Harm Criteria, but fails Condor
 
 =head2 Tie Breaker
 
-As a Tie Breaker it is recommended to use the next worst pairing score. Because it follows the method and should resolve well, this Tie Breaker is implemented by Vote::Count within the MinMax method itself. If it returns a tie your implementation can apply another method like Modified Grand-Junction. 
+As a Tie Breaker it is recommended to use the next worst pairing score. Because it follows the method and should resolve well, this Tie Breaker is implemented by Vote::Count within the MinMax method itself. If it returns a tie your implementation can apply another method like Modified Grand-Junction.
 
 =cut
 
@@ -77,7 +77,7 @@ Generate hashref scoring according the requested $method which is one of three s
 
   my $scores = $MinMaxElection->ScoreMinMax( $method );
 
-=cut 
+=cut
 
 sub ScoreMinMax ( $self, $method ) {
   my $scores = {};
@@ -155,7 +155,7 @@ Generate a formatted table of the Pairing Matrix from a set of scores generated 
 
   say $MinMaxElection->MinMaxPairingVotesTable( $scores );
 
-=cut  
+=cut
 
 sub MinMaxPairingVotesTable ( $I, $scores ) {
   my $table1 = $I->_pairmatrixtable1($scores);
@@ -167,14 +167,14 @@ sub MinMaxPairingVotesTable ( $I, $scores ) {
 
 =head2 MinMax
 
-Run and log the election with MinMax according to scoring $method: 'winning', 'margin', 'opposition'. 
+Run and log the election with MinMax according to scoring $method: 'winning', 'margin', 'opposition'.
 
   my $result = $MinMaxElection->MinMax( $method );
 
 The returned value is a HashRef:
 
- { 'tie'    => true or false value, 
-   'winner' => will be false if tie is true -- 
+ { 'tie'    => true or false value,
+   'winner' => will be false if tie is true --
                otherwise the winning choice.
    # tied is only present when tie is true.
    'tied'   => [ array ref of tied choices ],
@@ -190,7 +190,7 @@ sub MinMax ( $self, $method ) {
   my $winner = '';
   my @tied  = ();
   my $round = 0;
-  # round inited to 0. The 7th round is 6. round increments at 
+  # round inited to 0. The 7th round is 6. round increments at
   # end of the loop. this sets correct number of rounds.
   my $roundlimit = scalar(@active) -1;
   LOOPMINMAX: while ( $round < $roundlimit ) {
@@ -232,9 +232,9 @@ sub MinMax ( $self, $method ) {
 
 =head2 Floor Rules
 
-It is recommended to use a low Floor or no Floor Rule at all.
+It is recommended to use a low Floor.
 
-This method specifies that the scores from less worst pairings be used as the tie breaker, removing inconsequential choices can affect both the resolveability of the tie breaker and the outcome. Unlike IRV where the presence of inconsequential choices can be seen as a randomizing factor, and their bulk removal as improving the consistency of the method, there is no benefit gained by this method from a Floor Rule. 
+This method specifies that the scores from less worst pairings be used as the tie breaker, removing inconsequential choices can affect the resolveability of the tie breaker. Unlike IRV where the presence of inconsequential choices can be seen as a randomizing factor, and their bulk removal as improving the consistency of the method, this method does not benefit from that.
 
 =cut
 
@@ -254,10 +254,15 @@ John Karr (BRAINBUZ) brainbuz@cpan.org
 
 CONTRIBUTORS
 
-Copyright 2019 by John Karr (BRAINBUZ) brainbuz@cpan.org.
+Copyright 2019-2021 by John Karr (BRAINBUZ) brainbuz@cpan.org.
 
 LICENSE
 
 This module is released under the GNU Public License Version 3. See license file for details. For more information on this license visit L<http://fsf.org>.
 
+SUPPORT
+
+This software is provided as is, per the terms of the GNU Public License. Professional support and customisation services are available from the author.
+
 =cut
+

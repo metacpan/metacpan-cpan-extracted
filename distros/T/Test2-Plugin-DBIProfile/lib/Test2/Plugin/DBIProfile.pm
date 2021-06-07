@@ -2,10 +2,10 @@ package Test2::Plugin::DBIProfile;
 use strict;
 use warnings;
 
-our $VERSION = '0.002003';
+our $VERSION = '0.002006';
 
 use DBI::Profile qw/dbi_profile_merge_nodes/;
-use Test2::API qw/test2_add_callback_exit/;
+use Test2::API qw/test2_add_callback_exit context/;
 use Test2::Util::Times qw/render_duration/;
 
 my $ADDED_HOOK = 0;
@@ -26,7 +26,16 @@ sub import {
     $DBI::Profile::ON_DESTROY_DUMP = undef;
     $DBI::Profile::ON_FLUSH_DUMP   = undef;
 
-    test2_add_callback_exit(\&send_profile_event);
+    my $ran = 0;
+    my $callback = sub {
+        return if $ran++;
+        send_profile_event(@_);
+    };
+
+    test2_add_callback_exit($callback);
+
+    # Fallback
+    eval 'END { local $?; my $ctx = context(); $callback->($ctx); $ctx->release }; 1' or die $@;
 }
 
 sub send_profile_event {

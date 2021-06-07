@@ -11,7 +11,8 @@ my $VAR1 = {
     'actual_time_last'       => '468.509',
     'extra_info'             => [
         'Index Cond: (source = \'tor\'::ip.proxysource)',
-        'Filter: upper_inf(active_in)'
+        'Filter: upper_inf(active_in)',
+        'Rows Removed by Filter: 1733831'
     ],
     'actual_loops'   => '1',
     'actual_rows'    => '6450',

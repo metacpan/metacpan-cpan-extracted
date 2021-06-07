@@ -146,7 +146,6 @@ $ ccname="DECC"
 $ Dec_C_Version = ""
 $ cxxversion = ""
 $ use_threads = "F"
-$ use_5005_threads = "N"
 $ use_ithreads = "N"
 $!
 $!: option parsing
@@ -342,8 +341,8 @@ $   DECK
  "-r" : reuse C symbols value if possible (skips costly nm extraction).*
  "-s" : silent mode, only echoes questions and essential information.
  -"D" : define symbol to have some value:                              *
-         -"Dsymbol"         symbol gets the value 'define'
-         -"Dsymbol=value"   symbol gets the value 'value'
+         -"Dsymbol"             symbol gets the value 'define'
+         -"Dsymbol=some value"  symbol is set to "some value"
   -E  : stop at the end of questions, after having produced config.sh. *
   -K  : do not use unless you know what you are doing.
   -O  : let -D and -U override definitions from loaded configuration file. *
@@ -2001,18 +2000,9 @@ $     if f$type(useithreads) .nes. ""
 $     then
 $         if useithreads .eqs. "undef" then bool_dflt="n"
 $     endif
-$     if f$type(use5005threads) .nes. ""
-$     then
-$         if use5005threads .or. use5005threads .eqs. "define"
-$         then
-$             echo "5.005 threads are no longer supported"
-$             exit 44
-$         endif
-$     endif
 $     rp = "Use the newer interpreter-based ithreads? [''bool_dflt'] "
 $     GOSUB myread
 $     use_ithreads=ans
-$     use_5005_threads="N"
 $     ! Are they on VMS 7.1 or greater?
 $     IF "''f$extract(1,3, f$getsyi(""version""))'" .GES. "7.1"
 $     THEN
@@ -3437,7 +3427,6 @@ $ ENDIF
 $!
 $! Now some that we build up
 $!
-$ use5005threads = "undef"
 $ d_old_pthread_create_joinable = "undef"
 $ old_pthread_create_joinable = " "
 $ IF use_threads
@@ -5614,6 +5603,7 @@ $ THEN
 $   vms_cc_type="decc"
 $ ENDIF
 $ d_faststdio="define"
+$ d_getenv_preserves_other_thread="define"
 $ d_locconv="define"
 $ d_mblen="define"
 $ d_mbstowcs="define"
@@ -6409,6 +6399,7 @@ $ WC "d_nextafter='" + d_nextafter + "'"
 $ WC "d_nexttoward='" + d_nexttoward + "'"
 $ WC "d_nice='define'"
 $ WC "d_nl_langinfo='" + d_nl_langinfo + "'"
+$ WC "d_getenv_preserves_other_thread='" + d_getenv_preserves_other_thread + "'"
 $ WC "d_nv_preserves_uv='" + d_nv_preserves_uv + "'"
 $ WC "nv_overflows_integers_at='" + nv_overflows_integers_at + "'"
 $ WC "nv_preserves_uv_bits='" + nv_preserves_uv_bits + "'"
@@ -6995,11 +6986,11 @@ $ WC "uidsign='1'"
 $ WC "uidsize='4'"
 $ WC "uidtype='" + uidtype + "'"
 $ WC "uquadtype='" + uquadtype + "'" 
-$ WC "use5005threads='" + use5005threads + "'"
 $ WC "use64bitall='" + use64bitall + "'"
 $ WC "use64bitint='" + use64bitint + "'"
 $ WC "usecasesensitive='" + be_case_sensitive + "'"    ! VMS-specific
 $ WC "usedebugging_perl='"+use_debugging_perl+"'"
+$ WC "usedefaultstrict='undef'"
 $ WC "usedefaulttypes='" + usedefaulttypes + "'"    ! VMS-specific
 $ WC "usecbacktrace='undef'"
 $ WC "usecrosscompile='undef'"
@@ -7284,6 +7275,7 @@ $ IF unlink_all_versions .OR. unlink_all_versions .EQS. "define" THEN -
 $ IF d_sockaddr_sa_len .EQS. "define" then WC "#define _SOCKADDR_LEN 1"
 $ IF ccname .EQS. "CXX" then WC "#define NO_ENVIRON_ARRAY"
 $ IF ccname .EQS. "CXX" then WC "#define VMS" ! only has __VMS by default
+$ WC "#define _PTHREAD_EXC_INCL_CLEAN" ! avoid conflict between DECthreads TRY/CATCH and Perl TRY/CATCH
 $ CLOSE CONFIG
 $!
 $ echo4 "Doing variable substitutions on .SH files..."

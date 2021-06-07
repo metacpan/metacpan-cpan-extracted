@@ -1,7 +1,7 @@
 package App::CPAN::Changes;
 
-our $DATE = '2017-07-14'; # DATE
-our $VERSION = '0.003'; # VERSION
+our $DATE = '2021-05-26'; # DATE
+our $VERSION = '0.004'; # VERSION
 
 #use 5.010001;
 use strict;
@@ -224,7 +224,7 @@ App::CPAN::Changes - CLI for CPAN::Changes
 
 =head1 VERSION
 
-This document describes version 0.003 of App::CPAN::Changes (from Perl distribution App-CPAN-Changes), released on 2017-07-14.
+This document describes version 0.004 of App::CPAN::Changes (from Perl distribution App-CPAN-Changes), released on 2021-05-26.
 
 =head1 SYNOPSIS
 
@@ -237,7 +237,7 @@ See included script L<cpan-changes>.
 
 Usage:
 
- add_release(%args) -> [status, msg, result, meta]
+ add_release(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Add a new release.
 
@@ -256,11 +256,12 @@ Arguments ('*' denotes required arguments):
 
 =item * B<file> => I<str>
 
-If not specified, will look for file called Changes/CHANGELOG/etc in current directory.
+If not specified, will look for file called ChangesE<sol>CHANGELOGE<sol>etc in current directory.
 
 =item * B<note> => I<str>
 
 =item * B<version>* => I<str>
+
 
 =back
 
@@ -270,27 +271,28 @@ Special arguments:
 
 =item * B<-dry_run> => I<bool>
 
-Pass -dry_run=>1 to enable simulation mode.
+Pass -dry_run=E<gt>1 to enable simulation mode.
 
 =back
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
+
 
 
 =head2 check
 
 Usage:
 
- check(%args) -> [status, msg, result, meta]
+ check(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Check for parsing errors in Changes file.
 
@@ -302,27 +304,29 @@ Arguments ('*' denotes required arguments):
 
 =item * B<file> => I<str>
 
-If not specified, will look for file called Changes/CHANGELOG/etc in current directory.
+If not specified, will look for file called ChangesE<sol>CHANGELOGE<sol>etc in current directory.
+
 
 =back
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
+
 
 
 =head2 dump
 
 Usage:
 
- dump(%args) -> [status, msg, result, meta]
+ dump(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Dump Changes as JSON structure.
 
@@ -334,29 +338,31 @@ Arguments ('*' denotes required arguments):
 
 =item * B<file> => I<str>
 
-If not specified, will look for file called Changes/CHANGELOG/etc in current directory.
+If not specified, will look for file called ChangesE<sol>CHANGELOGE<sol>etc in current directory.
+
 
 =back
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
+
 
 
 =head2 preamble
 
 Usage:
 
- preamble(%args) -> [status, msg, result, meta]
+ preamble(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
-Get/set preamble.
+GetE<sol>set preamble.
 
 This function is not exported.
 
@@ -366,31 +372,33 @@ Arguments ('*' denotes required arguments):
 
 =item * B<file> => I<str>
 
-If not specified, will look for file called Changes/CHANGELOG/etc in current directory.
+If not specified, will look for file called ChangesE<sol>CHANGELOGE<sol>etc in current directory.
 
 =item * B<preamble> => I<str>
 
 Set new preamble.
 
+
 =back
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
+
 
 
 =head2 release
 
 Usage:
 
- release(%args) -> [status, msg, result, meta]
+ release(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Return information (JSON object dump) of a specific release.
 
@@ -402,20 +410,21 @@ Arguments ('*' denotes required arguments):
 
 =item * B<file> => I<str>
 
-If not specified, will look for file called Changes/CHANGELOG/etc in current directory.
+If not specified, will look for file called ChangesE<sol>CHANGELOGE<sol>etc in current directory.
 
 =item * B<version>* => I<str>
+
 
 =back
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -429,7 +438,7 @@ Source repository is at L<https://github.com/perlancar/perl-App-CPAN-Changes>.
 
 =head1 BUGS
 
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-CPAN-Changes>
+Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-App-CPAN-Changes/issues>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
@@ -447,7 +456,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017, 2016 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2017, 2016 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

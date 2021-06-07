@@ -1,0 +1,44 @@
+## name ForeachHash
+## failures 4
+## cut
+
+foreach my $foo (%hash) { ... }
+for my $foo (%hash) { ... }
+foo foreach %hash;
+foo for %hash;
+
+## name ForeachKeys
+## failures 0
+## cut
+
+foreach my $foo (keys %hash) { ... }
+for my $foo (keys %hash) { ... }
+foo foreach keys %hash;
+foo for keys %hash;
+
+## name ForeachValues
+## failures 0
+## cut
+
+foreach my $foo (values %hash) { ... }
+for my $foo (values %hash) { ... }
+foo foreach values %hash;
+foo for values %hash;
+
+## name ForeachCopyRef
+## failures 0
+## cut
+
+foreach my $foo (@{[%hash]}) { ... }
+for my $foo (@{[%hash]}) { ... }
+foo foreach @{[%hash]};
+foo for @{[%hash]};
+
+## name ForeachCopyVar
+## failures 0
+## cut
+
+foreach my $foo (my @d = %hash) { ... }
+for my $foo (my @d = %hash) { ... }
+foo foreach my @d = %hash;
+foo for my @d = %hash;

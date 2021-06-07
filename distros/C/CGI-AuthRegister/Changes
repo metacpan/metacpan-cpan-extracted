@@ -1,5 +1,11 @@
 Revision history for Perl extension CGI::Authenticate
 
+1.403 Thu May 27 22:24:16 ADT 2021
+ - better error report if userid is not in users.db
+ - added implementation for registration of new users
+   using variable $AllowSignup in the default require_login
+   setup
+
 1.402 Wed Nov 11 08:57:45 AST 2020
  - bug report: module HTTP::Request::Common is used but not declared
    in Makefile.PL; It is declared now.

@@ -38,9 +38,11 @@
 #	include "mach/cthreads.h"
 #endif
 
+#include <utility>
+
 
 inline static void croak_sv_is_not_an_arrayref (short int pos) {
-    static char* pattern = "The argument at position %i isn't an array reference";
+    static const char* pattern = "The argument at position %i isn't an array reference";
     croak(pattern, pos);
 }
 
@@ -90,16 +92,15 @@ inline static void shuffle_av_last_num_elements (AV *av, SSize_t len, SSize_t nu
         while (cur_index >= 0) {
             rand_index = (cur_index + 1) * Drand01(); // rand() % (cur_index + 1);
             //warn("cur_index = %i\trnd = %i\n", (int)cur_index, (int)rand_index);
-            a = (SV*) pav[rand_index];
-            pav[rand_index] = pav[cur_index];
-            pav[cur_index] = a;
+            a = std::move((SV*) pav[rand_index]);
+            pav[rand_index] = std::move(pav[cur_index]);
+            pav[cur_index] = std::move(a);
             cur_index--;
         }
     }
 }
 
 inline static void shuffle_av_first_num_elements (AV *av, SSize_t len, SSize_t num) {
-
 
     static SSize_t rand_index = 0;
     static SSize_t cur_index  = 0;
@@ -144,9 +145,9 @@ inline static void shuffle_av_first_num_elements (AV *av, SSize_t len, SSize_t n
             rand_index = cur_index + (len - cur_index) * Drand01(); // cur_index + rand() % (len - cur_index);
             //warn("cur_index = %i\trnd = %i\n", (int)cur_index, (int)rand_index);
 
-            a = (SV*) pav[rand_index];
-            pav[rand_index] = pav[cur_index];
-            pav[cur_index] = a;
+            a = std::move((SV*) pav[rand_index]);
+            pav[rand_index] = std::move(pav[cur_index]);
+            pav[cur_index] = std::move(a);
             cur_index++;
         }
     }

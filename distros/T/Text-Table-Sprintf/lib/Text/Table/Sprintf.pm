@@ -1,14 +1,55 @@
 package Text::Table::Sprintf;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-08-10'; # DATE
+our $DATE = '2021-04-06'; # DATE
 our $DIST = 'Text-Table-Sprintf'; # DIST
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.003'; # VERSION
 
 #IFUNBUILT
 # # use strict;
 # # use warnings;
 #END IFUNBUILT
+
+our %FEATURES = (
+    set_v => {
+        TextTable => 1,
+    },
+
+    features => {
+        TextTable => {
+            can_align_cell_containing_wide_character => 0,
+            can_align_cell_containing_color_code     => 0,
+            can_align_cell_containing_newline        => 0,
+            can_use_box_character                    => 0,
+            can_customize_border                     => 0,
+            can_halign                               => 0,
+            can_halign_individual_row                => 0,
+            can_halign_individual_column             => 0,
+            can_halign_individual_cell               => 0,
+            can_valign                               => 0,
+            can_valign_individual_row                => 0,
+            can_valign_individual_column             => 0,
+            can_valign_individual_cell               => 0,
+            can_rowspan                              => 0,
+            can_colspan                              => 0,
+            can_color                                => 0,
+            can_color_theme                          => 0,
+            can_set_cell_height                      => 0,
+            can_set_cell_height_of_individual_row    => 0,
+            can_set_cell_width                       => 0,
+            can_set_cell_width_of_individual_column  => 0,
+            speed                                    => 'fast',
+            can_hpad                                 => 0,
+            can_hpad_individual_row                  => 0,
+            can_hpad_individual_column               => 0,
+            can_hpad_individual_cell                 => 0,
+            can_vpad                                 => 0,
+            can_vpad_individual_row                  => 0,
+            can_vpad_individual_column               => 0,
+            can_vpad_individual_cell                 => 0,
+        },
+    },
+);
 
 sub table {
     my %params = @_;
@@ -75,7 +116,7 @@ Text::Table::Sprintf - Generate simple text tables from 2D arrays using sprintf(
 
 =head1 VERSION
 
-This document describes version 0.001 of Text::Table::Sprintf (from Perl distribution Text-Table-Sprintf), released on 2020-08-10.
+This document describes version 0.003 of Text::Table::Sprintf (from Perl distribution Text-Table-Sprintf), released on 2021-04-06.
 
 =head1 SYNOPSIS
 
@@ -117,6 +158,190 @@ table will not be correctly formatted (cells might move to another row/column).
 
 =for Pod::Coverage ^(max)$
 
+=head1 DECLARED FEATURES
+
+Features declared by this module:
+
+=head2 From feature set TextTable
+
+Features from feature set L<TextTable|Module::Features::TextTable> declared by this module:
+
+=over
+
+=item * can_align_cell_containing_color_code
+
+Value: no.
+
+=item * can_align_cell_containing_newline
+
+Value: no.
+
+=item * can_align_cell_containing_wide_character
+
+Value: no.
+
+=item * can_color
+
+Can produce colored table.
+
+Value: no.
+
+=item * can_color_theme
+
+Allow choosing colors from a named set of palettes.
+
+Value: no.
+
+=item * can_colspan
+
+Value: no.
+
+=item * can_customize_border
+
+Let user customize border character in some way, e.g. selecting from several available borders, disable border.
+
+Value: no.
+
+=item * can_halign
+
+Provide a way for user to specify horizontal alignment (leftE<sol>middleE<sol>right) of cells.
+
+Value: no.
+
+=item * can_halign_individual_cell
+
+Provide a way for user to specify different horizontal alignment (leftE<sol>middleE<sol>right) for individual cells.
+
+Value: no.
+
+=item * can_halign_individual_column
+
+Provide a way for user to specify different horizontal alignment (leftE<sol>middleE<sol>right) for individual columns.
+
+Value: no.
+
+=item * can_halign_individual_row
+
+Provide a way for user to specify different horizontal alignment (leftE<sol>middleE<sol>right) for individual rows.
+
+Value: no.
+
+=item * can_hpad
+
+Provide a way for user to specify horizontal padding of cells.
+
+Value: no.
+
+=item * can_hpad_individual_cell
+
+Provide a way for user to specify different horizontal padding of individual cells.
+
+Value: no.
+
+=item * can_hpad_individual_column
+
+Provide a way for user to specify different horizontal padding of individual columns.
+
+Value: no.
+
+=item * can_hpad_individual_row
+
+Provide a way for user to specify different horizontal padding of individual rows.
+
+Value: no.
+
+=item * can_rowspan
+
+Value: no.
+
+=item * can_set_cell_height
+
+Allow setting height of rows.
+
+Value: no.
+
+=item * can_set_cell_height_of_individual_row
+
+Allow setting height of individual rows.
+
+Value: no.
+
+=item * can_set_cell_width
+
+Allow setting height of rows.
+
+Value: no.
+
+=item * can_set_cell_width_of_individual_column
+
+Allow setting height of individual rows.
+
+Value: no.
+
+=item * can_use_box_character
+
+Can use terminal box-drawing character when drawing border.
+
+Value: no.
+
+=item * can_valign
+
+Provide a way for user to specify vertical alignment (topE<sol>middleE<sol>bottom) of cells.
+
+Value: no.
+
+=item * can_valign_individual_cell
+
+Provide a way for user to specify different vertical alignment (topE<sol>middleE<sol>bottom) for individual cells.
+
+Value: no.
+
+=item * can_valign_individual_column
+
+Provide a way for user to specify different vertical alignment (topE<sol>middleE<sol>bottom) for individual columns.
+
+Value: no.
+
+=item * can_valign_individual_row
+
+Provide a way for user to specify different vertical alignment (topE<sol>middleE<sol>bottom) for individual rows.
+
+Value: no.
+
+=item * can_vpad
+
+Provide a way for user to specify vertical padding of cells.
+
+Value: no.
+
+=item * can_vpad_individual_cell
+
+Provide a way for user to specify different vertical padding of individual cells.
+
+Value: no.
+
+=item * can_vpad_individual_column
+
+Provide a way for user to specify different vertical padding of individual columns.
+
+Value: no.
+
+=item * can_vpad_individual_row
+
+Provide a way for user to specify different vertical padding of individual rows.
+
+Value: no.
+
+=item * speed
+
+Subjective speed rating, relative to other text table modules.
+
+Value: "fast".
+
+=back
+
+For more details on module features, see L<Module::Features>.
+
 =head1 FUNCTIONS
 
 =head2 table
@@ -151,7 +376,7 @@ Source repository is at L<https://github.com/perlancar/perl-Text-Table-Sprintf>.
 
 =head1 BUGS
 
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Text-Table-Sprintf>
+Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-Text-Table-Sprintf/issues>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
@@ -169,7 +394,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2020 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -1,4 +1,5 @@
 Revision history for Data-Validate-Perl
 
-0.01    2014/05/25 initial release.
+0.03    2021/05/31 fix to work with latest Parse::Yapp.
 0.02    2014/05/29 uniformed rule names.
+0.01    2014/05/25 initial release.

@@ -4,7 +4,7 @@
 # Check whether the ANY DEFINED BY syntax is working
 #
 
-BEGIN { require 't/funcs.pl'}
+BEGIN { require './t/funcs.pl'}
 
 use Convert::ASN1;
 

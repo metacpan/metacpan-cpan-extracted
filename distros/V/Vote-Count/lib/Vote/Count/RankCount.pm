@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use 5.022;
+use 5.024;
 
 package Vote::Count::RankCount;
 
@@ -10,13 +10,13 @@ use List::Util qw( min max sum);
 use Vote::Count::TextTableTiny qw/generate_table/;
 use Sort::Hash;
 
-our $VERSION='1.10';
+our $VERSION='2.00';
 
 =head1 NAME
 
 Vote::Count::RankCount
 
-=head1 VERSION 1.10
+=head1 VERSION 2.00
 
 =cut
 
@@ -71,17 +71,15 @@ sub _RankResult ( $rawcount ) {
   };
 }
 
-=head1 Rank
+=head2 Rank
 
 Takes a single argument of a hashref containing Choices as Keys and Votes as Values. Returns an Object. This method is also aliased as new.
 
-=head1 newFromList
+=head2 newFromList
 
-Takes an ordered list and returns a RankCount Object where the RawCount values are the position time -1: Item 3 in the list will have -3 votes while Item 1 have -1.
+Takes an ordered list and returns a RankCount Object where the RawCount values are zero minus the position: Item 3 in the list will have -3 votes while Item 1 will have -1.
 
   my $ordered_rank_count = Vote::Count::RankCount->newFromList( @ordered_list );
-
-
 
 =cut
 
@@ -106,45 +104,57 @@ sub newFromList ( @list ) {
 
 =head2 Methods
 
-=over
+The following Methods are available from RankCount Objects.
 
-=item * RawCount
+=head3 RawCount
 
 Returns the original HashRef used for Object Creation.
 
-=item * HashWithOrder
+=head3 HashWithOrder
 
 Returns a HashRef with the Choices as Keys and the position of the choice, the value for the Leader would be 1 and the Third Place Choice would be 3. If choices are tied they will share the same value for their position.
 
-=item * HashByRank
+=head3 HashByRank
 
 Returns a HashRef where the keys are numbers and the values an ArrayRef of the Choices in that position. The ArrayRefs are sorted alphanumerically.
 
-=item * ArrayTop, ArrayBottom
+=head3 ArrayTop, ArrayBottom
 
 Returns an ArrayRef of the Choices in the Top or Bottom Positions.
 
-=item * OrderedList
+=head3 OrderedList
 
 Returns the array that was to create the RankCount object if it was created from a List. Returns an exception if the object was created from a HashRef, because RankCount does not deal with ties. Returning a list with ties resolved by randomness or a sort would not be correct.
 
-=item * CountVotes
+=head3 CountVotes
 
 Returns the number of votes in the RawCount. This is not the same as the votes in the BallotSet from which that was derived. For TopCount it is the number of non-exhausted ballots in the round that generated RawCount, for Approval and Boorda it is probably not useful.
 
-=item * Leader
+=head3 Leader
 
 Returns a HashRef with the keys tie, tied, winner where winner is the winner, tie is true or false and tied is an array ref of the choices in the tie.
-
-=back
 
 =head3 RankTable
 
 Generates a MarkDown formatted table.
 
+  say $Election->TopCount->RankTable;
+
+  | Rank | Choice     | Votes |
+  |------|------------|-------|
+  | 1    | VANILLA    | 7     |
+  | 2    | MINTCHIP   | 5     |
+
 =head3 RankTableWeighted ($votevalue)
 
 Ranktable for use with weighted votes. Displays both the Vote Value and the Vote Total (rounded to two places). Requires Vote Value as an argument.
+
+  say $WeightedElection->TopCount->RankTableWeighted( 100 );
+
+  | Rank | Choice     | Votes | VoteValue |
+  |:-----|:-----------|------:|----------:|
+  | 1    | VANILLA    |  7.00 |       700 |
+  | 2    | MINTCHIP   |  5.00 |       500 |
 
 =cut
 
@@ -218,11 +228,15 @@ John Karr (BRAINBUZ) brainbuz@cpan.org
 
 CONTRIBUTORS
 
-Copyright 2019 by John Karr (BRAINBUZ) brainbuz@cpan.org.
+Copyright 2019-2021 by John Karr (BRAINBUZ) brainbuz@cpan.org.
 
 LICENSE
 
 This module is released under the GNU Public License Version 3. See license file for details. For more information on this license visit L<http://fsf.org>.
+
+SUPPORT
+
+This software is provided as is, per the terms of the GNU Public License. Professional support and customisation services are available from the author.
 
 =cut
 

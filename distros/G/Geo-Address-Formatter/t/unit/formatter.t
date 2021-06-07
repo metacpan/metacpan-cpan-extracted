@@ -1,6 +1,7 @@
 use strict;
 use warnings;
 use lib 'lib';
+use feature qw(say);
 use Test::More;
 use Test::Warn;
 use Clone qw(clone);
@@ -8,10 +9,18 @@ use File::Basename qw(dirname);
 use Data::Dumper;
 $Data::Dumper::Sortkeys = 1;
 use Text::Hogan::Compiler;
+use Try::Catch;
 use utf8;
 
 my $CLASS = 'Geo::Address::Formatter';
 use_ok($CLASS);
+
+
+try {
+    my $badGAF = $CLASS->new(conf_path => '/tmp');
+} catch {
+    ok($_ =~ m/unable to read configuration/, 'failed to create object with bad conf path');
+};
 
 my $path = dirname(__FILE__) . '/test_conf-general';
 my $GAF  = $CLASS->new(conf_path => $path);
@@ -103,7 +112,8 @@ my $GAF  = $CLASS->new(conf_path => $path);
 
 
 {
-    my $THT = Text::Hogan::Compiler->new->compile('abc {{#first}} {{one}} || {{two}} {{/first}} def');
+    my $template_text = $GAF->_replace_template_lambdas('abc {{#first}} {{one}} || {{two}} {{/first}} def');
+    my $THT = Text::Hogan::Compiler->new->compile($template_text);
     is($GAF->_render_template($THT, {two => 2}), "abc 2 def\n", '_render_template - first');
 }
 

@@ -74,7 +74,7 @@ use base qw( Class::Accessor::Fast );
 use strict;
 use warnings;
 
-our $VERSION = '1.016';
+our $VERSION = '1.017';
 
 use Catalyst::Authentication::Store::LDAP::User;
 use Net::LDAP;
@@ -280,7 +280,7 @@ Given a User ID, this method will:
   A) Bind to the directory using the configured binddn and bindpw
   B) Perform a search for the User Object in the directory, using
      user_basedn, user_filter, and user_scope.
-  C) Assuming we found the object, we will walk it's attributes
+  C) Assuming we found the object, we will walk its attributes
      using L<Net::LDAP::Entry>'s get_value method.  We store the
      results in a hashref. If we do not find the object, then
      undef is returned.
@@ -381,11 +381,11 @@ sub lookup_user {
 
 This method looks up the roles for a given user.  It takes a
 L<Catalyst::Authentication::Store::LDAP::User> object
-as it's first argument, and can optionally take a I<Net::LDAP> object which
+as its first argument, and can optionally take a I<Net::LDAP> object which
 is used rather than the default binding if supplied.
 
 It returns an array containing the role_field attribute from all the
-objects that match it's criteria.
+objects that match its criteria.
 
 =cut
 
@@ -410,7 +410,7 @@ sub lookup_roles {
                 . $userobj->username
                 . " has no "
                 . $self->role_value
-                . " attribute, so I can't look up it's roles!" );
+                . " attribute, so I can't look up its roles!" );
     }
     my $filter = $self->_replace_filter( $self->role_filter, $filter_value );
     push( @searchopts, 'filter' => $filter );

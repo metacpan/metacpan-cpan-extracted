@@ -1,14 +1,12 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2020 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2020-2021 -- leonerd@leonerd.org.uk
 
-package Metrics::Any::Adapter::Statsd;
+package Metrics::Any::Adapter::Statsd 0.03;
 
-use strict;
+use v5.14;
 use warnings;
-
-our $VERSION = '0.02';
 
 use Carp;
 

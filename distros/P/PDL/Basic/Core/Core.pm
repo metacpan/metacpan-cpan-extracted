@@ -275,7 +275,8 @@ respectively.  The default default values are:
 
 =over 4
 
-The value to use instead of C<undef> when creating pdls.
+The value to use instead of C<undef> when creating pdls. If is
+C<undef>, 0 will be used.
 
 =back
 
@@ -742,95 +743,9 @@ sub topdl {PDL->topdl(@_)}
 
 ####################### Overloaded operators #######################
 
-# This is to used warn if an operand is non-numeric or non-PDL.
-sub warn_non_numeric_op_wrapper {
-	my ($cb, $op_name) = @_;
-	return sub {
-		my ($op1, $op2) = @_;
-		unless( Scalar::Util::looks_like_number($op2)
-			|| ( Scalar::Util::blessed($op2) && $op2->isa('PDL') )
-			) {
-			warn "'$op2' is not numeric nor a PDL in operator $op_name";
-		};
-		$cb->(@_);
-	}
-}
-
 { package PDL;
-  # use UNIVERSAL 'isa'; # need that later in info function
-  use Carp;
-
-  use overload (
-		"+"     => \&PDL::plus,     # in1, in2
-		"*"     => \&PDL::mult, # in1, in2
-		"-"     => \&PDL::minus,    # in1, in2, swap if true
-		"/"     => \&PDL::divide,   # in1, in2, swap if true
-
-		"+="    => sub { PDL::plus     ($_[0], $_[1], $_[0], 0); $_[0]; }, # in1, in2, out, swap if true
-		"*="    => sub { PDL::mult ($_[0], $_[1], $_[0], 0); $_[0]; }, # in1, in2, out, swap if true
-		"-="    => sub { PDL::minus    ($_[0], $_[1], $_[0], 0); $_[0]; }, # in1, in2, out, swap if true
-		"/="    => sub { PDL::divide   ($_[0], $_[1], $_[0], 0); $_[0]; }, # in1, in2, out, swap if true
-
-		">"     => \&PDL::gt,       # in1, in2, swap if true
-		"<"     => \&PDL::lt,       # in1, in2, swap if true
-		"<="    => \&PDL::le,       # in1, in2, swap if true
-		">="    => \&PDL::ge,       # in1, in2, swap if true
-		"=="    => \&PDL::eq,       # in1, in2
-		"eq"    => PDL::Core::warn_non_numeric_op_wrapper(\&PDL::eq, 'eq'),
-		                            # in1, in2
-		"!="    => \&PDL::ne,       # in1, in2
-
-		"<<"    => \&PDL::shiftleft,  # in1, in2, swap if true
-		">>"    => \&PDL::shiftright, # in1, in2, swap if true
-		"|"     => \&PDL::or2,        # in1, in2
-		"&"     => \&PDL::and2,       # in1, in2
-		"^"     => \&PDL::xor,        # in1, in2
-
-		"<<="   => sub { PDL::shiftleft ($_[0], $_[1], $_[0], 0); $_[0]; }, # in1, in2, out, swap if true
-		">>="   => sub { PDL::shiftright($_[0], $_[1], $_[0], 0); $_[0]; }, # in1, in2, out, swap if true
-		"|="    => sub { PDL::or2      ($_[0], $_[1], $_[0], 0); $_[0]; }, # in1, in2, out, swap if true
-		"&="    => sub { PDL::and2     ($_[0], $_[1], $_[0], 0); $_[0]; }, # in1, in2, out, swap if true
-		"^="    => sub { PDL::xor       ($_[0], $_[1], $_[0], 0); $_[0]; }, # in1, in2, out, swap if true
-	        "**="   => sub { PDL::power     ($_[0], $_[1], $_[0], 0); $_[0]; }, # in1, in2, out, swap if true
-	        "%="    => sub { PDL::modulo    ($_[0], $_[1], $_[0], 0); $_[0]; }, # in1, in2, out, swap if true
-
-		"sqrt"  => sub { PDL::sqrt ($_[0]); },
-		"abs"   => sub { PDL::abs  ($_[0]); },
-		"sin"   => sub { PDL::sin  ($_[0]); },
-		"cos"   => sub { PDL::cos  ($_[0]); },
-
-		"!"     => sub { PDL::not  ($_[0]); },
-		"~"     => sub { PDL::bitnot ($_[0]); },
-
-		"log"   => sub { PDL::log   ($_[0]); },
-		"exp"   => sub { PDL::exp   ($_[0]); },
-
-	        "**"    => \&PDL::power,          # in1, in2, swap if true
-
-	        "atan2" => \&PDL::atan2,          # in1, in2, swap if true
-	        "%"     => \&PDL::modulo,         # in1, in2, swap if true
-
-	        "<=>"   => \&PDL::spaceship,      # in1, in2, swap if true
-
-		"="     =>  sub {$_[0]},          # Don't deep copy, just copy reference
-
-		".="    => sub {
-						my @args = reverse &PDL::Core::rswap;
-						PDL::Ops::assgn(@args);
-						return $args[1];
-					},
-
-		'x'     =>  sub{my $foo = $_[0]->null();
-				  PDL::Primitive::matmult(@_[0,1],$foo); $foo;},
-
-		'bool'  => sub { return 0 if $_[0]->isnull;
-				 croak("multielement ndarray in conditional expression (see PDL::FAQ questions 6-10 and 6-11)")
-				     unless $_[0]->nelem == 1;
-				 $_[0]->clump(-1)->at(0); },
-		'""'  =>  \&PDL::Core::string   );
+  use overload '""'  =>  \&PDL::Core::string;
 }
-
-sub rswap { if($_[2]) { return @_[1,0]; } else { return @_[0,1]; } }
 
 ##################### Data type/conversion stuff ########################
 
@@ -993,12 +908,13 @@ sub PDL::Core::new_pdl_from_string {
    #  nan => ee
    #  inf => Ee
    #  pi  => eE
+   #  i   => EeE
    # --( Bad )--
    croak("PDL::Core::new_pdl_from_string: found 'bad' as part of a larger word in $original_value")
       if $value =~ /bad\B|\Bbad/;
    my ($has_bad) = ($value =~ s/\bbad\b/EE/gi);
    # --( nan )--
-   my ($has_nan) = 0;
+   my $has_nan = 0;
    croak("PDL::Core::new_pdl_from_string: found 'nan' as part of a larger word in $original_value")
       if $value =~ /\Bnan|nan\B/;
    $has_nan++ if ($value =~ s/\bnan\b/ee/gi);
@@ -1007,7 +923,7 @@ sub PDL::Core::new_pdl_from_string {
       if $value =~ /IND\B/i;
    $has_nan++ if ($value =~ s/1\.\#IND/ee/gi);
    # --( inf )--
-   my ($has_inf) = 0;
+   my $has_inf = 0;
    # Strawberry Perl compatibility:
    croak("PDL::Core::new_pdl_from_string: found '1.#INF' as part of a larger word in $original_value")
       if $value =~ /INF\B/i;
@@ -1020,6 +936,12 @@ sub PDL::Core::new_pdl_from_string {
    croak("PDL::Core::new_pdl_from_string: found 'pi' as part of a larger word in $original_value")
       if $value =~ /pi\B|\Bpi/;
    $value =~ s/\bpi\b/eE/gi;
+   # --( i )--
+   my $has_i = 0;
+   croak("PDL::Core::new_pdl_from_string: found 'i' as part of a larger word ($1) in $original_value")
+      if $value =~ /(i\B|[^\-+\d\s.\[]i)/;
+   $has_i++ if ($value =~ s/([\-+\d]*)i\b/${1}EeE/gi);
+   $type = $types[$type]->complexversion->enum if $has_i;
 
    # Some data types do not support nan and inf, so check for and warn or croak,
    # as appropriate:
@@ -1036,7 +958,7 @@ sub PDL::Core::new_pdl_from_string {
    # present:
    $value =~ s/\s+/ /g;
    if (my ($disallowed) = ($value =~ /([^\[\]\+\-0-9;,.eE ]+)/)) {
-      croak("PDL::Core::new_pdl_from_string: found disallowed character(s) '$disallowed' in $original_value");
+      croak("PDL::Core::new_pdl_from_string: found disallowed character(s) '$disallowed' in '$original_value', value now: '$value'");
    }
 
    # Wrap the string in brackets [], so that the following works:
@@ -1061,15 +983,11 @@ sub PDL::Core::new_pdl_from_string {
    $value =~ s/(\d\.)(z|[^\d])/${1}0$2/g;
    $value =~ s/(\A|[^\d])\./${1}0./g;
 
-   # Remove whitspace between signs and the numbers that follow them:
+   # Remove whitespace between signs and the numbers that follow them:
    $value =~ s/([+\-])\s+/$1/g;
 
-#   # make unambiguous addition/subtraction (white-space on both sides
-#   # of operator) by removing white-space from both sides
-#   $value =~ s/([\dEe])\s+([+\-])\s+(?=[Ee\d])/$1$2/g;
-
-   # Replace white-space separators with commas:
-   $value =~ s/([.\deE])\s+(?=[+\-eE\d])/$1,/g;
+   # Replace whitespace separators with commas:
+   $value =~ s/([.\de])\s+(?=[+\-e\d])/$1,/gi;
 
    # Remove all other white space:
    $value =~ s/\s+//g;
@@ -1087,32 +1005,26 @@ sub PDL::Core::new_pdl_from_string {
    }
 
    # Replace the place-holder strings with strings that will evaluate to their
-   # correct numerical values when we run the eval:
-   $value =~ s/\bEE\b/bad/g;
+   # correct numerical values
    my $bad = $types[$type]->badvalue;
+   $value =~ s/\bEE\b/bad/g;
+   my $nan = PDL::_nan();
    $value =~ s/\bee\b/nan/g;
-   my $inf = -pdl(0)->log;
+   my $i = PDL::_ci();
+   $value =~ s/([-+]*)(\d*)EeE\b/$1 . (length($2) ? $2 : '1') . 'i'/ge
+      if $has_i;
+   my $inf = PDL::_inf();
    $value =~ s/\bEe\b/inf/g;
-   my $nnan = $inf - $inf;
-   my $nan= $this->initialize();
-   $nan->set_datatype($nnan->get_datatype);
-   $nan->setdims([]);
-
-   # pack("d*", "nan") will work here only on perls that numify the string "nan" to a NaN.
-   # pack( "d*", (-1.0) ** 0.5 ) will hopefully work in more places, though it seems both
-   # pack("d*", "nan") and pack( "d*", (-1.0) ** 0.5 ) fail on *old* MS Compilers (MSVC++ 6.0 and earlier).
-   # sisyphus 4 Jan 2013.
-   ${$nan->get_dataref}     = pack( "d*", (-1.0) ** 0.5 );
-
-   $nan->upd_data();
+   my $pi = 4 * atan2(1, 1);
    $value =~ s/\beE\b/pi/g;
+   my $e = exp(1);
 
    my $val = eval {
       # Install the warnings handler:
       my $old_warn_handler = $SIG{__WARN__};
       local $SIG{__WARN__} = sub {
          if ($_[0] =~ /(Argument ".*" isn't numeric)/) {
-            # Send the error through die. This is *always* get caught, so keep
+            # Send the error through die. This *always* gets caught, so keep
             # it simple.
             die "Incorrectly formatted input: $1\n";
          }
@@ -1126,53 +1038,44 @@ sub PDL::Core::new_pdl_from_string {
 
       # Let's see if we can parse it as an array-of-arrays:
       local $_ = $value;
-      PDL::Core::parse_basic_string($inf, $nan, $nnan, $bad);
+      PDL::Core::parse_basic_string($inf, $nan, $bad, $e, $pi, $i, $has_i);
    };
 
-   if (ref $val eq 'ARRAY') {
-      my $to_return = PDL::Core::pdl_avref($val,$this,$type);
-      if( $to_return->dim(-1) == 1 ) {
-	      if( $to_return->dims > 1 ) {
-		      # remove potentially spurious last dimension
-		      $to_return = $to_return->mv(-1,1)->clump(2)->sever;
-	      } elsif( $to_return->dims == 1 ) {
-		      # fix scalar values
-		      $to_return->setdims([]);
-	      }
-      }
-      # Mark bad if appropriate
-      $to_return->badflag($has_bad > 0);
-      return $to_return;
-   }
-   else {
+   if (ref $val ne 'ARRAY') {
       my @message = ("PDL::Core::new_pdl_from_string: string input='$original_value', string output='$value'" );
-      if ($@) {
-         push @message, $@;
-      } else {
-         push @message, "Internal error: unexpected output type ->$val<- is not ARRAY ref";
-      }
+      push @message, $@ ||
+         "Internal error: unexpected output type ->$val<- is not ARRAY ref";
       croak join("\n  ", @message);
    }
+   my $to_return = PDL::Core::pdl_avref($val,$this,$type);
+   if( $to_return->dim(-1) == 1 ) {
+      if( $to_return->dims > 1 ) {
+         # remove potentially spurious last dimension
+         $to_return = $to_return->mv(-1,1)->clump(2)->sever;
+      } elsif( $to_return->dims == 1 ) {
+         # fix scalar values
+         $to_return->setdims([]);
+      }
+   }
+   # Mark bad if appropriate
+   $to_return->badflag($has_bad > 0);
+   return $to_return;
 }
 
+my $NUM_RE = qr/(\d+(?:\.\d+)?(?:e[-+]?\d+)?)/i;
 sub PDL::Core::parse_basic_string {
 	# Assumes $_ holds the string of interest, and modifies that value
 	# in-place.
-
 	use warnings;
-
 	# Takes a string with proper bracketing, etc, and returns an array-of-arrays
 	# filled with numbers, suitable for use with pdl_avref. It uses recursive
 	# descent to handle the nested nature of the data. The string should have
 	# no whitespace and should be something that would evaluate into a Perl
 	# array-of-arrays (except that strings like 'inf', etc, are allowed).
-
-	my ($inf, $nan, $nnan, $bad) = @_;
-
+	my ($inf, $nan, $bad, $e, $pi, $i, $has_i) = @_;
 	# First character should be a bracket:
 	die "Internal error: input string -->$_<-- did not start with an opening bracket\n"
 		unless s/^\[//;
-
 	my @to_return;
 	# Loop until we run into our closing bracket:
 	my $sign = 1;
@@ -1205,27 +1108,30 @@ sub PDL::Core::parse_basic_string {
 			push @to_return, $sign * $inf;
 		}
 		elsif (s/^nan//i or s/^1\.\#IND//i) {
-                        if ($sign == -1) {
-                          push @to_return, $nnan;
-                        } else {
-                          push @to_return, $nan;
-                        }
+			push @to_return, $sign * $nan;
 		}
 		elsif (s/^pi//i) {
-			push @to_return, $sign * 4 * atan2(1, 1);
+			push @to_return, $sign * $pi;
 		}
 		elsif (s/^e//i) {
-			push @to_return, $sign * exp(1);
+			push @to_return, $sign * $e;
 		}
-		elsif (s/^([\d+\-e.]+)//i) {
+		elsif ($has_i and s/^${NUM_RE}i//i) {
+			my $val = $sign * $1 * $i;
+			push @to_return, $val;
+		}
+		elsif ($has_i and s/^$NUM_RE([-+])${NUM_RE}i//i) {
+			my $val = $sign * $1;
+			my $imag = $3 * ($2 eq '-' ? -1 : 1) * $i;
+			push @to_return, $val + $imag;
+		}
+		elsif (s/^$NUM_RE([^e])/$2/i) {
 			# Note that improper numbers are handled by the warning signal
 			# handler
-                        my $val = $1;
-                        my $nval = $val + 0x0;
-                        push @to_return, ($sign>0x0) ? $nval : -$nval;
+			push @to_return, $sign * ($1 + 0x0);
 		}
 		else {
-			die "Incorrectly formatted input at:\n  ", substr ($_, 0, 10), "...\n";
+			die "Incorrectly formatted input at:\n  ", substr($_, 0, 10), "...\n";
 		}
 	}
 	# Strip off any commas
@@ -1234,7 +1140,6 @@ sub PDL::Core::parse_basic_string {
 		$expects_number = 0;
 		s/^,//;
 	}
-
 	return \@to_return;
 }
 
@@ -1256,10 +1161,10 @@ sub PDL::new {
    my $type = ref($_[0]) eq 'PDL::Type' ? shift->enum : undef;
    my $value = (@_ >1 ? [@_] : shift);  # ref thyself
    unless(defined $value) {
-       if($PDL::debug && $PDL::undefval) {
-	   print STDERR "Warning: PDL::new converted undef to $PDL::undefval ($PDL::undefval)\n";
+       if($PDL::debug) {
+	   print STDERR "Warning: PDL::new converted undef to \$PDL::undefval ($PDL::undefval)\n";
        }
-       $value = $PDL::undefval+0
+       $value = ($PDL::undefval//0)+0
    }
    $type = _establish_type($value, $PDL_D) if !defined $type;
 
@@ -1320,23 +1225,11 @@ copies to be made.
 
 =cut
 
-# Inheritable copy method
-#
-# XXX Must be fixed
-# Inplace is handled by the op currently.
-
 sub PDL::copy {
     my $value = shift;
     barf("Argument is an ".ref($value)." not an object") unless blessed($value);
-    my $option  = shift;
-    $option = "" if !defined $option;
-    if ($value->is_inplace) {   # Copy protection
-       $value->set_inplace(0);
-       return $value;
-    }
     # threadI(-1,[]) is just an identity vafftrans with threadId copying ;)
-    my $new = $value->threadI(-1,[])->sever;
-    return $new;
+    $value->threadI(-1,[])->sever;
 }
 
 =head2 hdr_copy
@@ -2611,7 +2504,7 @@ sub nan { ref($_[0]) && ref($_[0]) ne 'PDL::Type' ? PDL::nan($_[0]) : PDL->nan(@
 sub PDL::nan {
     my $class = shift;
     my $pdl = scalar(@_)? $class->new_from_specification(@_) : $class->new_or_inplace;
-    $pdl.='nan';
+    $pdl .= PDL::_nan();
     return $pdl;
 }
 
@@ -2640,7 +2533,7 @@ sub inf { ref($_[0]) && ref($_[0]) ne 'PDL::Type' ? PDL::inf($_[0]) : PDL->inf(@
 sub PDL::inf {
     my $class = shift;
     my $pdl = scalar(@_)? $class->new_from_specification(@_) : $class->new_or_inplace;
-    $pdl.='inf';
+    $pdl .= PDL::_inf();
     return $pdl;
 }
 

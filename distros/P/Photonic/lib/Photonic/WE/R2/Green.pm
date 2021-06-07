@@ -1,5 +1,5 @@
 package Photonic::WE::R2::Green;
-$Photonic::WE::R2::Green::VERSION = '0.015';
+$Photonic::WE::R2::Green::VERSION = '0.016';
 
 =encoding UTF-8
 
@@ -9,7 +9,7 @@ Photonic::WE::R2::Green
 
 =head1 VERSION
 
-version 0.015
+version 0.016
 
 =head1 COPYRIGHT NOTICE
 
@@ -81,7 +81,7 @@ response $epsA is taken from the metric.
 
 =back
 
-=head1 ACCESORS (read only)
+=head1 ACCESSORS (read only)
 
 =over 4
 
@@ -138,9 +138,7 @@ use namespace::autoclean;
 use PDL::Lite;
 use PDL::NiceSlice;
 use PDL::Complex;
-use PDL::MatrixOps;
 use Storable qw(dclone);
-use PDL::IO::Storable;
 use Photonic::WE::R2::AllH;
 use Photonic::WE::R2::GreenP;
 use Photonic::Types;
@@ -186,7 +184,7 @@ around 'evaluate' => sub {
 	for my $j($i+1..$nd-1){
 	    my $pair=$cpairs[$m];
 	    #$asy is ri,xy,xy. First index is column
-	    $asy(:,($i), ($j)).=i*(
+	    $asy(:,($i), ($j)).=i()*(
 		$greenPc[$m]-
 		($pair->Cconj->(:,*1,:) #ri, column, row
 		 *$pair->(:,:,*1)
@@ -221,15 +219,8 @@ sub _build_cHaydock {
 
 sub _build_cGreenP {
     my $self=shift;
-    my @cGreenP;
-    foreach(@{$self->cHaydock}){
-	my $g=Photonic::WE::R2::GreenP->new(
-	    haydock=>$_, nh=>$self->nh, smallE=>$self->smallE);
-	push @cGreenP, $g;
-    }
-    return [@cGreenP]
+    [ map Photonic::WE::R2::GreenP->new(haydock=>$_, nh=>$self->nh, smallE=>$self->smallE), @{$self->cHaydock} ];
 }
-
 
 __PACKAGE__->meta->make_immutable;
 

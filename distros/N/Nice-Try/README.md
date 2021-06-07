@@ -104,10 +104,39 @@ aware:
         # scalar reference context
         my $name = ${$o->info};
 
+And you also have granual power in the catch block to filter which
+exception to handle:
+
+        try
+        {
+            die( Exception->new( "Arghhh" => 401 ) );
+        }
+        catch( $oopsie isa Exception where { $_->message =~ /Arghhh/ && $_->code == 500 } )
+        {
+            # Do something to deal with some server error
+        }
+        catch( $oopsie isa Exception where { $_->message =~ /Arghhh/ && $_->code == 401 } )
+        {
+            # should reach here.
+        }
+        catch( $oh_well isa("Exception") )
+        {
+            # Default using another way to filter by Exception
+        }
+        catch( $oopsie where { /Oh no/ } )
+        {
+            # Do something based on the value of a simple error; not an exception class
+        }
+        # Default
+        catch( $default )
+        {
+            print( "Unknown error: $default\n" );
+        }
+
 VERSION
 =======
 
-        v1.0.0
+        v1.1.0
 
 DESCRIPTION
 ===========
@@ -248,7 +277,7 @@ Here is a list of its distinctive features:
     example
 -   [Nice::Try](https://metacpan.org/pod/Nice::Try){.perl-module} is
     rich context aware, which means it can provide you with a super
-    granual context on how to return data back to the caller based on
+    granular context on how to return data back to the caller based on
     the caller\'s expectation, by using a module like
     [Want](https://metacpan.org/pod/Want){.perl-module}.
 -   Call to [\"caller\" in
@@ -280,7 +309,7 @@ Here is a list of its distinctive features:
                 }
             }
 
-    WIll yield: `Called from package main in file ./test.pl at line 10`
+    Will yield: `Called from package main in file ./test.pl at line 10`
 
 WHY USE IT?
 ===========
@@ -308,8 +337,8 @@ they can be grouped in 4 categories:
 
 :   For example
     [Syntax::Keyword::Try](https://metacpan.org/pod/Syntax::Keyword::Try){.perl-module}
-    and now perl with [version 5.33.7 using experimental
-    feature](https://perldoc.perl.org/blead/perlsyn#Try-Catch-Exception-Handling){.perl-module}.
+    and now perl with [version 5.34.0 using experimental
+    feature](https://perldoc.perl.org/5.34.0/perldelta#Experimental-Try/Catch-Syntax){.perl-module}.
 
 Group 1 requires the use of semi-colons like:
 
@@ -384,6 +413,12 @@ was working wonderfully, but was relying on
 which was doing some esoteric stuff and eventually the version 0.006020
 broke [TryCatch](https://metacpan.org/pod/TryCatch){.perl-module} and
 there seems to be no intention of correcting this breaking change.
+Besides,
+[Devel::Declare](https://metacpan.org/pod/Devel::Declare){.perl-module}
+is now marked as deprecated and its use is officially discouraged.
+
+[TryCatch](https://metacpan.org/pod/TryCatch){.perl-module} does not
+support any `finally` block.
 
 In group 4, there is
 [Syntax::Keyword::Try](https://metacpan.org/pod/Syntax::Keyword::Try){.perl-module},
@@ -441,6 +476,8 @@ outside of a `BEGIN` block indistinctively.
 
 Since [perl version
 5.33.7](https://perldoc.perl.org/blead/perlsyn#Try-Catch-Exception-Handling){.perl-module}
+and now in [perl
+v5.34.0](https://perldoc.perl.org/5.34.0/perldelta#Experimental-Try/Catch-Syntax){.perl-module}
 you can use the try-catch block using an experimental feature which may
 be removed in future versions, by writing:
 
@@ -476,16 +513,24 @@ But **you cannot do**:
             # do some cleanup here
         }
 
+Also, the `use feature 'try'` expression must be in the relevant block
+where you use `try-catch`. You cannot just put it in your `BEGIN` block
+at the beginning of your script. If you have 3 subroutines using
+`try-catch`, you need to put `use feature 'try'` in each of them. See
+[perl documentation on lexical
+effect](https://perldoc.perl.org/feature#Lexical-effect){.perl-module}
+for more explanation on this.
+
 It is probably a matter of time until this is fully implemented in perl
 as a regular non-experimental feature.
 
+See more information about perl\'s featured implementation of try-catch
+in
+[https://perldoc.perl.org/5.34.0/perlsyn\#Try-Catch-Exception-Handling\|perlsyn](https://perldoc.perl.org/5.34.0/perlsyn#Try-Catch-Exception-Handling|perlsyn){.perl-module}
+
 So, [Nice::Try](https://metacpan.org/pod/Nice::Try){.perl-module} is
-quite unique and fill the missing features, but because it is purely in
-perl and not an XS module, it is slower than XS module like
-[Syntax::Keyword::Try](https://metacpan.org/pod/Syntax::Keyword::Try){.perl-module}.
-I am not sure the difference would be that noticeable, since the parsing
-by [PPI](https://metacpan.org/pod/PPI){.perl-module} is now done using
-an XS module, which makes things very fast.
+quite unique and fills the missing features, and since it uses XS
+modules for a one-time filtering, it is quite fast.
 
 FINALLY
 =======
@@ -598,6 +643,80 @@ Since, try-catch block can be nested, the following would work too:
         {
             # do something about it
         }
+
+EXCEPTION CLASS
+===============
+
+As mentioned above, you can use class when raising exceptions and you
+can filter them in a variety of way since version 1.0.7 when you catch
+them.
+
+Here are your options:
+
+1. catch( Exception::Class \$error\_variable ) { }
+
+:   
+
+2. catch( Exception::Class \$error\_variable where { \$condition } ) { }
+
+:   Here `$condition` could be anything that fits in a legitimate
+    perl\'s block, such as:
+
+            try
+            {
+                die( Exception->new( "Oh no!", { code => 401 } ) );
+            }
+            catch( Exception $oopsie where { $_->code >= 400 && $_->code < 499 })
+            {
+                # some more handling here
+            }
+
+    In the condition block `$_` will always be made available and will
+    correspond to the exception object thrown, just like `$oopsie` in
+    this example. `$@` is also availble with the exception object as its
+    value.
+
+3. catch( \$e isa Exception::Class ) { }
+
+:   
+
+4. catch( \$e isa(\'Exception::Class\') ) { }
+
+:   
+
+5. catch( \$e isa(\"Exception::Class\") ) { }
+
+:   
+
+6. catch( \$e isa Exception::Class where { \$condition } ) { }
+
+:   
+
+7. catch( \$e isa(\'Exception::Class\') where { \$condition } ) { }
+
+:   
+
+8. catch( \$e isa(\"Exception::Class\") where { \$condition } ) { }
+
+:   
+
+9. catch( \$e where { \$condition } ) { }
+
+:   This is not a class execption catching, but worse mentioning. For
+    example:
+
+            try
+            {
+                die( "Something bad happened.\n" );
+            }
+            catch( $e where { /something bad/i })
+            {
+                # Do something about it
+            }
+            catch( $e )
+            {
+                # Default here
+            }
 
 LOOPS
 =====
@@ -718,7 +837,7 @@ Normally, you would write something like this, and it works as always:
             }
         }
 
-THe above is nice, but how do you differentiate cases were your caller
+The above is nice, but how do you differentiate cases were your caller
 wants a simple returned value and the one where the caller wants an
 object for chaining purpose, or if the caller wants an hash or array
 reference in return?
@@ -749,12 +868,12 @@ Now, you can do the following:
                 {
                     return( $name ); # regular string
                 }
-                # same as !defined( wantarray() )
+                # same as if( !defined( wantarray() ) )
                 elsif( want('VOID') )
                 {
                     return;
                 }
-                # For the other context below, wantarray is of no help
+                # For the other contexts below, wantarray is of no help
                 if( want('OBJECT') )
                 {
                     return( $obj ); # useful for chaining
@@ -815,6 +934,14 @@ See [Want](https://metacpan.org/pod/Want){.perl-module} for more
 information on how you can benefit from it.
 
 Currently lvalues are no implemented and will be in future releases.
+Also note that [Want](https://metacpan.org/pod/Want){.perl-module} does
+not work within tie-handlers. It would trigger a segmentation fault.
+[Nice::Try](https://metacpan.org/pod/Nice::Try){.perl-module} detects
+this and disable automatically support for
+[Want](https://metacpan.org/pod/Want){.perl-module} if used inside a
+tie-handler, reverting to regular [\"wantarray\" in
+perlfunc](https://metacpan.org/pod/perlfunc#wantarray){.perl-module}
+context.
 
 Also, for this rich context awareness to be used, obviously try-catch
 would need to be inside a subroutine, otherwise there is no rich context
@@ -863,7 +990,7 @@ which I borrowed some code.
 AUTHOR
 ======
 
-Jacques Deguest \<`jack@deguest.jp`{classes="ARRAY(0x56381478d098)"}\>
+Jacques Deguest \<`jack@deguest.jp`{classes="ARRAY(0x557f074ad428)"}\>
 
 SEE ALSO
 ========

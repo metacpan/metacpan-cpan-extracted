@@ -59,5 +59,5 @@ sub test_wrap
     my $message = "(wrapping length: $length) [ordinary]";
 
     is(@strings, $count, "$message amount of substrings");
-    is_deeply(\@strings, $expected, "$message splitted at word boundary");
+    is_deeply(\@strings, $expected, "$message splitted at offset");
 }

@@ -15,7 +15,7 @@ use warnings;
 
 use Test::Perl::Critic (-profile => "") x!! -e "";
 
-my $filenames = ['lib/Role/TinyCommons/Collection.pm','lib/Role/TinyCommons/Collection/FindItem.pm','lib/Role/TinyCommons/Collection/PickItems.pm','lib/Role/TinyCommons/Collection/PickItems/Iterator.pm','lib/Role/TinyCommons/Collection/PickItems/RandomSeek.pm','lib/Role/TinyCommons/Collection/SelectItems.pm'];
+my $filenames = ['lib/Role/TinyCommons/Collection.pm','lib/Role/TinyCommons/Collection/CompareItems.pm','lib/Role/TinyCommons/Collection/FindItem.pm','lib/Role/TinyCommons/Collection/FindItem/Iterator.pm','lib/Role/TinyCommons/Collection/GetItemByKey.pm','lib/Role/TinyCommons/Collection/GetItemByPos.pm','lib/Role/TinyCommons/Collection/PickItems.pm','lib/Role/TinyCommons/Collection/PickItems/Iterator.pm','lib/Role/TinyCommons/Collection/PickItems/RandomPos.pm','lib/Role/TinyCommons/Collection/PickItems/RandomSeekLines.pm','lib/Role/TinyCommons/Collection/SelectItems.pm'];
 unless ($filenames && @$filenames) {
     $filenames = -d "blib" ? ["blib"] : ["lib"];
 }

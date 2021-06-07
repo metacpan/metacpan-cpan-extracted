@@ -25,12 +25,27 @@ sub startup {
   );
 
   $self->routes->any('/cake/make')
-    ->over(has_priv => 'cake:eat')
+    ->requires(has_priv => 'cake:eat')
     ->to('Public#eat_cake')
   ;
 
   $self->routes->any('/cake/eat')
-    ->over(is_role => 'chef')
+    ->requires(is_role => 'chef')
+    ->to('Public#make_cake')
+  ;
+
+  $self->routes->any('/cake/have')
+    ->requires(has_priv => ['cake', { 'and' => 'eat' }])
+    ->to('Public#eat_cake')
+  ;
+
+  $self->routes->any('/cake/eat')
+    ->requires(is_role => 'chef')
+    ->to('Public#make_cake')
+  ;
+
+  $self->routes->any('/cake/letthem')
+    ->requires(is_role => ['chef', {'eat' => 'brioche'}])
     ->to('Public#make_cake')
   ;
 }
@@ -59,7 +74,23 @@ cmp_deeply(
   'has_priv failure renders custom response',
 );
 
+$t->get_ok( '/cake/have' )->status_is( 401 );
+
+cmp_deeply(
+  $t->tx->res->json,
+  { error => 'Denied' },
+  'has_priv failure renders custom response',
+);
+
 $t->get_ok( '/cake/eat' )->status_is( 401 );
+
+cmp_deeply(
+  $t->tx->res->json,
+  { error => 'Denied' },
+  'is_role failure renders custom response',
+);
+
+$t->get_ok( '/cake/letthem' )->status_is( 401 );
 
 cmp_deeply(
   $t->tx->res->json,

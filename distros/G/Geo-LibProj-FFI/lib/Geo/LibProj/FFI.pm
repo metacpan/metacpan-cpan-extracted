@@ -2,12 +2,13 @@ use 5.012;
 use warnings;
 
 # ABSTRACT: Foreign function interface to PROJ coordinate transformation software
-package Geo::LibProj::FFI 0.02;
+package Geo::LibProj::FFI 0.04;
 
 
 use Alien::proj 1.07;
 use FFI::Platypus 1.00;
 use FFI::C 0.08;
+use Convert::Binary::C 0.04;
 
 use Exporter::Easy (TAGS => [
 	context => [qw(
@@ -23,19 +24,46 @@ use Exporter::Easy (TAGS => [
 		proj_normalize_for_visualization
 		proj_destroy
 	)],
+	area => [qw(
+		proj_area_create
+		proj_area_set_bbox
+		proj_area_destroy
+	)],
 	transform => [qw(
 		proj_trans
 	)],
 	error => [qw(
 		proj_context_errno
+		proj_errno
+		proj_errno_set
+		proj_errno_reset
+		proj_errno_restore
 		proj_errno_string
 		proj_context_errno_string
 	)],
 	logging => [qw(
 		proj_log_level
+		proj_log_func
 	)],
 	info => [qw(
 		proj_info
+		proj_pj_info
+		proj_grid_info
+		proj_init_info
+	)],
+	lists => [qw(
+		proj_list_operations
+		proj_list_ellps
+		proj_list_units
+		proj_list_angular_units
+		proj_list_prime_meridians
+	)],
+	distance => [qw(
+		proj_lp_dist
+		proj_lpz_dist
+		proj_xy_dist
+		proj_xyz_dist
+		proj_geod
 	)],
 	misc => [qw(
 		proj_coord
@@ -48,10 +76,13 @@ use Exporter::Easy (TAGS => [
 	all => [qw(
 		:context
 		:setup
+		:area
 		:transform
 		:error
 		:logging
 		:info
+		:lists
+		:distance
 		:misc
 		:const
 		proj_cleanup
@@ -65,6 +96,10 @@ my $ffi = FFI::Platypus->new(
 );
 FFI::C->ffi($ffi);
 
+my $c = Convert::Binary::C->new;
+
+$ffi->load_custom_type('::StringPointer' => 'string_pointer');
+# string* should also work, but doesn't in $ffi->cast
 $ffi->load_custom_type('::StringArray' => 'string_array');
 # string[] should also work, but causes strlen in proj_create_crs_to_crs_from_pj to segfault
 
@@ -102,89 +137,198 @@ $ffi->type('opaque' => 'PJ_AREA');
 # Data type for projection/transformation information
 $ffi->type('opaque' => 'PJ');  # the PJ object herself
 
+# Data types for list of operations, ellipsoids, datums and units used in PROJ.4
+$c->parse(<<ENDC);
+struct PJ_LIST {
+	const char  *id;                /* projection keyword */
+	void        *(*proj)(void *);   /* projection entry point */
+	const char  * const *descr;     /* description text */
+};
+ENDC
+$ffi->custom_type( 'PJ_OPERATIONS' => {
+	native_to_perl => sub {
+		my ($ptr) = @_;
+		my $size = $c->sizeof('PJ_LIST');
+		my @list;
+		while () {
+			$ptr += $size;
+			my $item = $c->unpack('PJ_LIST', $ffi->cast( 'opaque' => "record($size)*", $ptr ));
+			last unless $item->{id};
+			$item->{id} = $ffi->cast( 'opaque' => 'string', $item->{id} );
+			$item->{descr} = $ffi->cast( 'opaque' => 'string_pointer', $item->{descr} );
+			push @list, $item;
+		}
+		return \@list;
+	},
+});
+
+sub _unpack_list {
+	my ($type, $ptr) = @_;
+	my $size = $c->sizeof($type);
+	my @list;
+	while () {
+		my $item = $c->unpack($type, $ffi->cast( 'opaque' => "record($size)*", $ptr ));
+		last unless $item->{id};
+		$item->{$_} = $ffi->cast( 'opaque' => 'string', $item->{$_} )
+			for grep { $c->typeof("$type.$_") eq 'char *' } keys %$item;
+		push @list, $item;
+		$ptr += $size;
+	}
+	return \@list;
+}
+
+$c->parse(<<ENDC);
+struct PJ_ELLPS {
+	const char  *id;    /* ellipse keyword name */
+	const char  *major; /* a= value */
+	const char  *ell;   /* elliptical parameter */
+	const char  *name;  /* comments */
+};
+ENDC
+$ffi->custom_type( 'PJ_ELLPS' => {
+	native_to_perl => sub { _unpack_list(PJ_ELLPS => @_) },
+});
+
+$c->parse(<<ENDC);
+struct PJ_UNITS {
+	const char  *id;        /* units keyword */
+	const char  *to_meter;  /* multiply by value to get meters */
+	const char  *name;      /* comments */
+	double      factor;     /* to_meter factor in actual numbers */
+};
+ENDC
+$ffi->custom_type( 'PJ_UNITS' => {
+	native_to_perl => sub { _unpack_list(PJ_UNITS => @_) },
+});
+
+$c->parse(<<ENDC);
+struct PJ_PRIME_MERIDIANS {
+	const char  *id;        /* prime meridian keyword */
+	const char  *defn;      /* offset from greenwich in DMS format. */
+};
+ENDC
+$ffi->custom_type( 'PJ_PRIME_MERIDIANS' => {
+	native_to_perl => sub { _unpack_list(PJ_PRIME_MERIDIANS => @_) },
+});
+
 
 # Geodetic, mostly spatiotemporal coordinate types
 {
-	package Geo::LibProj::FFI::PJ_XYZT 0.02;
-	FFI::C->struct('PJ_XYZT' => [ 'x' => 'double', 'y' => 'double', 'z' => 'double', 't' => 'double' ]);
-	package Geo::LibProj::FFI::PJ_UVWT 0.02;
-	FFI::C->struct('PJ_UVWT' => [ u => 'double', v => 'double', w => 'double', t => 'double' ]);
-	package Geo::LibProj::FFI::PJ_LPZT 0.02;
-	FFI::C->struct('PJ_LPZT' => [ lam => 'double', phi => 'double', z => 'double', t => 'double' ]);
-	package Geo::LibProj::FFI::PJ_OPK 0.02;
-	FFI::C->struct('PJ_OPK' => [ o => 'double', p => 'double', k => 'double' ]);
+	package Geo::LibProj::FFI::PJ_XYZT 0.04;
+	sub new { Geo::LibProj::FFI::PJ_COORD->_new($_[1], qw{ x y z t }) }
+	package Geo::LibProj::FFI::PJ_UVWT 0.04;
+	sub new { Geo::LibProj::FFI::PJ_COORD->_new($_[1], qw{ u v w t })->uvwt }
+	package Geo::LibProj::FFI::PJ_LPZT 0.04;
+	sub new { Geo::LibProj::FFI::PJ_COORD->_new($_[1], qw{ lam phi z t }) }
+	package Geo::LibProj::FFI::PJ_OPK 0.04;
+	sub new { Geo::LibProj::FFI::PJ_COORD->_new($_[1], qw{ o p k 0 }) }
 	# Rotations: omega, phi, kappa
-	package Geo::LibProj::FFI::PJ_ENU 0.02;
-	FFI::C->struct('PJ_ENU' => [ e => 'double', n => 'double', u => 'double' ]);
+	package Geo::LibProj::FFI::PJ_ENU 0.04;
+	sub new { Geo::LibProj::FFI::PJ_COORD->_new($_[1], qw{ e n u 0 }) }
 	# East, North, Up
-	package Geo::LibProj::FFI::PJ_GEOD 0.02;
-	FFI::C->struct('PJ_GEOD' => [ 's' => 'double', 'a1' => 'double', 'a2' => 'double' ]);
+	package Geo::LibProj::FFI::PJ_GEOD 0.04;
+	sub new { Geo::LibProj::FFI::PJ_COORD->_new($_[1], qw{ s a1 a2 0 }) }
 	# Geodesic length, fwd azi, rev azi
 }
 
 # Classic proj.4 pair/triplet types - moved into the PJ_ name space
 {
-	package Geo::LibProj::FFI::PJ_UV 0.02;
-	FFI::C->struct('PJ_UV' => [ u => 'double', v => 'double' ]);
-	package Geo::LibProj::FFI::PJ_XY 0.02;
-	FFI::C->struct('PJ_XY' => [ 'x' => 'double', 'y' => 'double' ]);
-	package Geo::LibProj::FFI::PJ_LP 0.02;
-	FFI::C->struct('PJ_LP' => [ lam => 'double', phi => 'double' ]);
+	package Geo::LibProj::FFI::PJ_UV 0.04;
+	sub new { Geo::LibProj::FFI::PJ_COORD->_new($_[1], qw{ u v 0 0 })->uv }
+	package Geo::LibProj::FFI::PJ_XY 0.04;
+	sub new { Geo::LibProj::FFI::PJ_COORD->_new($_[1], qw{ x y 0 0 }) }
+	package Geo::LibProj::FFI::PJ_LP 0.04;
+	sub new { Geo::LibProj::FFI::PJ_COORD->_new($_[1], qw{ lam phi 0 0 }) }
 	
-	package Geo::LibProj::FFI::PJ_XYZ 0.02;
-	FFI::C->struct('PJ_XYZ' => [ 'x' => 'double', 'y' => 'double', 'z' => 'double' ]);
-	package Geo::LibProj::FFI::PJ_UVW 0.02;
-	FFI::C->struct('PJ_UVW' => [ u => 'double', v => 'double', w => 'double' ]);
-	package Geo::LibProj::FFI::PJ_LPZ 0.02;
-	FFI::C->struct('PJ_LPZ' => [ lam => 'double', phi => 'double', z => 'double' ]);
+	package Geo::LibProj::FFI::PJ_XYZ 0.04;
+	sub new { Geo::LibProj::FFI::PJ_COORD->_new($_[1], qw{ x y z 0 }) }
+	package Geo::LibProj::FFI::PJ_UVW 0.04;
+	sub new { Geo::LibProj::FFI::PJ_COORD->_new($_[1], qw{ u v w 0 })->uvw }
+	package Geo::LibProj::FFI::PJ_LPZ 0.04;
+	sub new { Geo::LibProj::FFI::PJ_COORD->_new($_[1], qw{ lam phi z 0 }) }
 }
 
 
 # Data type for generic geodetic 3D data plus epoch information
 # Avoid preprocessor renaming and implicit type-punning: Use a union to make it explicit
 {
-	package Geo::LibProj::FFI::PJ_COORD::Union 0.02;
-	FFI::C->union('PJ_COORD_union' => [
-		v    => 'double[4]',  # First and foremost, it really is "just 4 numbers in a vector"
-		xyzt => 'PJ_XYZT',
-		uvwt => 'PJ_UVWT',
-		lpzt => 'PJ_LPZT',
-		geod => 'PJ_GEOD',
-		opk  => 'PJ_OPK',
-		enu  => 'PJ_ENU',
-		xyz  => 'PJ_XYZ',
-		uvw  => 'PJ_UVW',
-		lpz  => 'PJ_LPZ',
-		xy   => 'PJ_XY',
-		uv   => 'PJ_UV',
-		lp   => 'PJ_LP',
-		
-	]);
-	
 	# FFI::C::Union can't be passed by value due to limitations within
-	# FFI::Platypus. Workaround: Convert the Union to a Record with the
-	# same data structure as the union, then the inverse on return.
-	# Unsurprisingly, this is kinda slow in Perl ...
-	# Ideas to maybe make it faster:
-	# - refactor to use different functions from PROJ (where possible)
-	# - FFI::Platypus::Bundle
-	# - XS
-	sub as_record {
-		Geo::LibProj::FFI::PJ_COORD::Record->new( v => [@{shift->v}] );
+	# FFI::Platypus. Workaround: Use a Record with some additional Perl
+	# glue. The performance may not be perfect, but seems satisfactory.
+	
+	package Geo::LibProj::FFI::PJ_COORD 0.04;
+	use FFI::Platypus::Record;
+	record_layout_1(qw{ double x double y double z double t });
+	sub _new {
+		my ($class, $values, @params) = @_;
+		$values //= {};
+		@params = map { $values->{$_} // 0 } @params;
+		return $class->new({ 'x' => $params[0], 'y' => $params[1], 'z' => $params[2], 't' => $params[3] });
+	}
+	sub _set {
+		my ($self, $values, @params) = @_;
+		if (ref $values eq 'HASH') {
+			@params = map { $values->{$_} } @params;
+		}
+		else {
+			@params = map { eval "\$values->$_" } grep !/^0$/, @params;  ## no critic (ProhibitStringyEval)
+		}
+		$self->v(\@params);
 	}
 	
-	package Geo::LibProj::FFI::PJ_COORD::Record 0.02;
-	use FFI::Platypus::Record;
-	record_layout_1(qw{ double[4] v });
-	sub as_union {
-		Geo::LibProj::FFI::PJ_COORD::Union->new({ v => shift->v });
+	# union members:
+	sub v {  # First and foremost, it really is "just 4 numbers in a vector"
+		my ($self, $vector) = @_;
+		return [ $self->x(), $self->y(), $self->z(), $self->t() ] unless $vector;
+		$self->x($vector->[0] // 0);
+		$self->y($vector->[1] // 0);
+		$self->z($vector->[2] // 0);
+		$self->t($vector->[3] // 0);
 	}
+	sub xyzt { $_[1] ? $_[0]->_set($_[1], qw{ x   y   z  t }) : shift }
+	sub uvwt { $_[1] ? $_[0]->_set($_[1], qw{ u   v   w  t }) : Geo::LibProj::FFI::PJ_UVWT->_new(shift) }
+	sub lpzt { $_[1] ? $_[0]->_set($_[1], qw{ lam phi z  t }) : shift }
+	sub geod { $_[1] ? $_[0]->_set($_[1], qw{ s   a1  a2 0 }) : shift }
+	sub opk  { $_[1] ? $_[0]->_set($_[1], qw{ o   p   k  0 }) : shift }
+	sub enu  { $_[1] ? $_[0]->_set($_[1], qw{ e   n   u  0 }) : shift }
+	sub xyz  { $_[1] ? $_[0]->_set($_[1], qw{ x   y   z  0 }) : shift }
+	sub uvw  { $_[1] ? $_[0]->_set($_[1], qw{ u   v   w  0 }) : Geo::LibProj::FFI::PJ_UVWT->_new(shift) }
+	sub lpz  { $_[1] ? $_[0]->_set($_[1], qw{ lam phi z  0 }) : shift }
+	sub xy   { $_[1] ? $_[0]->_set($_[1], qw{ x   y   0  0 }) : shift }
+	sub uv   { $_[1] ? $_[0]->_set($_[1], qw{ u   v   0  0 }) : Geo::LibProj::FFI::PJ_UVWT->_new(shift) }
+	sub lp   { $_[1] ? $_[0]->_set($_[1], qw{ lam phi 0  0 }) : shift }
+	
+	# struct members:
+	# PJ_UV* need their own package due to name collisions.
+	# The other types are implemented by the PJ_COORD package.
+	
+	sub lam { shift->x( @_ ) }
+	sub o   { shift->x( @_ ) }
+	sub e   { shift->x( @_ ) }
+	sub s   { shift->x( @_ ) }
+	
+	sub phi { shift->y( @_ ) }
+	sub p   { shift->y( @_ ) }
+	sub n   { shift->y( @_ ) }
+	sub a1  { shift->y( @_ ) }
+	
+	sub k   { shift->z( @_ ) }
+	sub u   { shift->z( @_ ) }
+	sub a2  { shift->z( @_ ) }
+	
+	package Geo::LibProj::FFI::PJ_UVWT;
+	sub _new { bless \$_[1], $_[0] }
+	sub u { ${shift()}->x( @_ ) }
+	sub v { ${shift()}->y( @_ ) }
+	sub w { ${shift()}->z( @_ ) }
+	sub t { ${shift()}->t( @_ ) }
+	
 }
-$ffi->type('record(Geo::LibProj::FFI::PJ_COORD::Record)' => 'PJ_COORD');
+$ffi->type('record(Geo::LibProj::FFI::PJ_COORD)' => 'PJ_COORD');
 
 
 {
-	package Geo::LibProj::FFI::PJ_INFO 0.02;
+	package Geo::LibProj::FFI::PJ_INFO 0.04;
 	use FFI::Platypus::Record;
 	record_layout_1(
 		int    => 'major',       # Major release number
@@ -201,6 +345,57 @@ $ffi->type('record(Geo::LibProj::FFI::PJ_COORD::Record)' => 'PJ_COORD');
 	);
 }
 $ffi->type('record(Geo::LibProj::FFI::PJ_INFO)' => 'PJ_INFO');
+
+{
+	package Geo::LibProj::FFI::PJ_PROJ_INFO 0.04;
+	use FFI::Platypus::Record;
+	record_layout_1(
+		string => 'id',           # Name of the projection in question
+		string => 'description',  # Description of the projection
+		string => 'definition',   # Projection definition
+		int    => 'has_inverse',  # 1 if an inverse mapping exists, 0 otherwise
+		double => 'accuracy',     # Expected accuracy of the transformation. -1 if unknown.
+	);
+}
+$ffi->type('record(Geo::LibProj::FFI::PJ_PROJ_INFO)' => 'PJ_PROJ_INFO');
+
+{
+	package Geo::LibProj::FFI::PJ_GRID_INFO 0.04;
+	use FFI::Platypus::Record;
+	record_layout_1(
+		'string(32)'  => 'gridname_NUL',         # name of grid
+		'string(260)' => 'filename_NUL',         # full path to grid
+		'string(8)'   => 'format_NUL',           # file format of grid
+		double => 'left',   double => 'lower',   # Coordinates of lower left corner
+		double => 'right',  double => 'upper',   # Coordinates of upper right corner
+		int    => 'n_lon',  int    => 'n_lat',   # Grid size
+		double => 'cs_lon', double => 'cs_lat',  # Cell size of grid
+	);
+	sub gridname { my $s = shift->gridname_NUL; $s =~ s/\0+$//; $s }
+	sub filename { my $s = shift->filename_NUL; $s =~ s/\0+$//; $s }
+	sub format   { my $s = shift->format_NUL;   $s =~ s/\0+$//; $s }
+	sub lowerleft  { Geo::LibProj::FFI::PJ_LP->new({ lam => $_[0]->left,  phi => $_[0]->lower }) }
+	sub upperright { Geo::LibProj::FFI::PJ_LP->new({ lam => $_[0]->right, phi => $_[0]->upper }) }
+}
+$ffi->type('record(Geo::LibProj::FFI::PJ_GRID_INFO)' => 'PJ_GRID_INFO');
+
+{
+	package Geo::LibProj::FFI::PJ_INIT_INFO 0.04;
+	use FFI::Platypus::Record;
+	record_layout_1(
+		'string(32)'  => 'name_NUL',        # name of init file
+		'string(260)' => 'filename_NUL',    # full path to the init file.
+		'string(32)'  => 'version_NUL',     # version of the init file
+		'string(32)'  => 'origin_NUL',      # origin of the file, e.g. EPSG
+		'string(16)'  => 'lastupdate_NUL',  # Date of last update in YYYY-MM-DD format
+	);
+	sub name       { my $s = shift->name_NUL;       $s =~ s/\0+$//; $s }
+	sub filename   { my $s = shift->filename_NUL;   $s =~ s/\0+$//; $s }
+	sub version    { my $s = shift->version_NUL;    $s =~ s/\0+$//; $s }
+	sub origin     { my $s = shift->origin_NUL;     $s =~ s/\0+$//; $s }
+	sub lastupdate { my $s = shift->lastupdate_NUL; $s =~ s/\0+$//; $s }
+}
+$ffi->type('record(Geo::LibProj::FFI::PJ_INIT_INFO)' => 'PJ_INIT_INFO');
 
 FFI::C->enum('PJ_LOG_LEVEL', [
 	[PJ_LOG_NONE  => 0],
@@ -240,6 +435,10 @@ $ffi->attach( proj_normalize_for_visualization => ['PJ_CONTEXT', 'PJ'] => 'PJ');
 $ffi->attach( proj_destroy => ['PJ'] => 'void');
 
 
+$ffi->attach( proj_area_create => [] => 'PJ_AREA');
+$ffi->attach( proj_area_set_bbox => [qw( PJ_AREA double double double double )] => 'void');
+$ffi->attach( proj_area_destroy => [qw( PJ_AREA )] => 'void');
+
 # Apply transformation to observation - in forward or inverse direction
 FFI::C->enum('PJ_DIRECTION', [
 	[PJ_FWD   =>  1],  # Forward
@@ -248,36 +447,68 @@ FFI::C->enum('PJ_DIRECTION', [
 ]);
 
 
-$ffi->attach( proj_trans => ['PJ', 'PJ_DIRECTION', 'PJ_COORD'] => 'PJ_COORD', sub {
-	my ($sub, $pj, $dir, $coord) = @_;
-	$sub->( $pj, $dir, $coord->as_record )->as_union;
-});
+$ffi->attach( proj_trans => ['PJ', 'PJ_DIRECTION', 'PJ_COORD'] => 'PJ_COORD');
 
-# non-standard fast method that avoids PJ_COORD unions entirely
+# non-standard method (now discouraged; originally used by Perl cs2cs)
 # (expects and returns a single point as array ref)
 $ffi->attach( [proj_trans => '_trans'] => ['PJ', 'PJ_DIRECTION', 'PJ_COORD'] => 'PJ_COORD', sub {
 	my ($sub, $pj, $dir, $coord) = @_;
-	$coord = Geo::LibProj::FFI::PJ_COORD::Record->new( v => $coord );
-	$sub->( $pj, $dir, $coord )->v;
+	$sub->( $pj, $dir, proj_coord($coord->[0] // 0, $coord->[1] // 0, $coord->[2] // 0, $coord->[3] // 0) )->v;
 });
 
 
 # Initializers
-$ffi->attach( proj_coord => [qw( double double double double )] => 'PJ_COORD', sub {
-	my $sub = shift;
-	$sub->(@_)->as_union;
-});
+$ffi->attach( proj_coord => [qw( double double double double )] => 'PJ_COORD');
+
+# Geodesic distance between two points with angular 2D coordinates
+$ffi->attach( proj_lp_dist => [qw( PJ PJ_COORD PJ_COORD )] => 'double');
+
+# The geodesic distance AND the vertical offset
+$ffi->attach( proj_lpz_dist => [qw( PJ PJ_COORD PJ_COORD )] => 'double');
+
+# Euclidean distance between two points with linear 2D coordinates
+$ffi->attach( proj_xy_dist => [qw( PJ_COORD PJ_COORD )] => 'double');
+
+# Euclidean distance between two points with linear 3D coordinates
+$ffi->attach( proj_xyz_dist => [qw( PJ_COORD PJ_COORD )] => 'double');
+
+# Geodesic distance (in meter) + fwd and rev azimuth between two points on the ellipsoid
+$ffi->attach( proj_geod => [qw( PJ PJ_COORD PJ_COORD )] => 'PJ_COORD');
 
 # Set or read error level
 $ffi->attach( proj_context_errno => ['PJ_CONTEXT'] => 'int');
+$ffi->attach( proj_errno => ['PJ_CONTEXT'] => 'int');
+$ffi->attach( proj_errno_set => ['PJ_CONTEXT', 'int'] => 'int');
+$ffi->attach( proj_errno_reset => ['PJ_CONTEXT'] => 'int');
+$ffi->attach( proj_errno_restore => ['PJ_CONTEXT', 'int'] => 'int');
 $ffi->attach( proj_errno_string => ['int'] => 'string');  # deprecated. use proj_context_errno_string()
 eval { $ffi->attach( proj_context_errno_string => ['PJ_CONTEXT', 'int'] => 'string'); 1 }
 	or do { *proj_context_errno_string = sub { proj_errno_string($_[1]); } };
 
 $ffi->attach( proj_log_level => ['PJ_CONTEXT', 'PJ_LOG_LEVEL'] => 'PJ_LOG_LEVEL');
+$ffi->attach( proj_log_func => ['PJ_CONTEXT', 'opaque', '(opaque,int,string)->void'] => 'void', sub {
+	my ($sub, $ctx, $app_data, $logf) = @_;
+	my $closure = $ffi->closure( $app_data ? sub {
+		my (undef, $level, $msg) = @_;
+		$logf->($app_data, $level, $msg);
+	} : $logf );
+	$closure->sticky;
+	$sub->($ctx, 0, $closure);
+});
 
 # Info functions - get information about various PROJ.4 entities
 $ffi->attach( proj_info => [] => 'PJ_INFO');
+$ffi->attach( proj_pj_info => ['PJ'] => 'PJ_PROJ_INFO');
+$ffi->attach( proj_grid_info => ['string'] => 'PJ_GRID_INFO');
+$ffi->attach( proj_init_info => ['string'] => 'PJ_INIT_INFO');
+
+# List functions:
+# Get lists of operations, ellipsoids, units and prime meridians.
+$ffi->attach( proj_list_operations => [] => 'PJ_OPERATIONS');
+$ffi->attach( proj_list_ellps => [] => 'PJ_ELLPS');
+$ffi->attach( proj_list_units => [] => 'PJ_UNITS');
+$ffi->attach( proj_list_angular_units => [] => 'PJ_UNITS');
+$ffi->attach( proj_list_prime_meridians => [] => 'PJ_PRIME_MERIDIANS');
 
 $ffi->attach( proj_cleanup => [] => 'void');
 
@@ -295,20 +526,20 @@ Geo::LibProj::FFI - Foreign function interface to PROJ coordinate transformation
 
 =head1 VERSION
 
-version 0.02
+version 0.04
 
 =head1 SYNOPSIS
 
  use Geo::LibProj::FFI qw(:all);
- use Syntax::Keyword::Finally;
+ use Syntax::Keyword::Defer;
  
  my $ctx = proj_context_create()
      or die "Cannot create threading context";
- FINALLY { proj_context_destroy($ctx); }
+ defer { proj_context_destroy($ctx); }
  
  my $pj = proj_create_crs_to_crs($ctx, "EPSG:25833", "EPSG:2198", undef)
      or die "Cannot create proj";
- FINALLY { proj_destroy($pj); }
+ defer { proj_destroy($pj); }
  
  ($easting, $northing) = ( 500_000, 6094_800 );
  $a = proj_coord( $easting, $northing, 0, 'Inf' );
@@ -329,9 +560,7 @@ L<C function reference|https://proj.org/development/reference/functions.html>
 for further documentation. You should be able to use those
 S<C functions> as if they were Perl.
 
-This module is very incomplete. Version 0.01 does
-only little more than what is necessary to support
-L<Geo::LibProj::cs2cs>.
+This module is functional, but incomplete.
 
 =head1 FUNCTIONS
 
@@ -371,6 +600,18 @@ Import all functions and constants by using the tag C<:all>.
 
 =back
 
+=item L<Area of interest|https://proj.org/development/reference/functions.html#area-of-interest>
+
+=over
+
+=item * C<proj_area_create>
+
+=item * C<proj_area_set_bbox>
+
+=item * C<proj_area_destroy>
+
+=back
+
 =item L<Coordinate transformation|https://proj.org/development/reference/functions.html#coordinate-transformation>
 
 =over
@@ -385,6 +626,14 @@ Import all functions and constants by using the tag C<:all>.
 
 =item * C<proj_context_errno>
 
+=item * C<proj_errno>
+
+=item * C<proj_errno_set>
+
+=item * C<proj_errno_reset>
+
+=item * C<proj_errno_restore>
+
 =item * C<proj_errno_string>
 
 =item * C<proj_context_errno_string>
@@ -397,6 +646,8 @@ Import all functions and constants by using the tag C<:all>.
 
 =item * C<proj_log_level>
 
+=item * C<proj_log_func>
+
 =back
 
 =item L<Info functions|https://proj.org/development/reference/functions.html#info-functions>
@@ -404,6 +655,44 @@ Import all functions and constants by using the tag C<:all>.
 =over
 
 =item * C<proj_info>
+
+=item * C<proj_pj_info>
+
+=item * C<proj_grid_info>
+
+=item * C<proj_init_info>
+
+=back
+
+=item L<Lists|https://proj.org/development/reference/functions.html#lists>
+
+=over
+
+=item * C<proj_list_operations>
+
+=item * C<proj_list_ellps>
+
+=item * C<proj_list_units>
+
+=item * C<proj_list_angular_units>
+
+=item * C<proj_list_prime_meridians>
+
+=back
+
+=item L<Distances|https://proj.org/development/reference/functions.html#distances>
+
+=over
+
+=item * C<proj_lp_dist>
+
+=item * C<proj_lpz_dist>
+
+=item * C<proj_xy_dist>
+
+=item * C<proj_xyz_dist>
+
+=item * C<proj_geod>
 
 =back
 
@@ -425,18 +714,53 @@ Import all functions and constants by using the tag C<:all>.
 
 =back
 
+=head1 DATA TYPES
+
+The PROJ library uses numerous composite data types. When
+working with L<Geo::LibProj::FFI>, members of S<C C<struct>>
+and C<union> types may be accessed B<for reading> by calling
+methods on these composites. For example, to output the
+S<X coordinate> of a C<PJ_COORD> value, you could simply
+do C<< print $coord->xyz->x(); >>. Please see the
+L<PROJ data type reference|https://proj.org/development/reference/datatypes.html>
+for further documentation.
+
+As of version 0.04 of this module, the interface I<for modifying>
+values of composite types from Perl is still evolving. Therefore,
+values of S<C C<struct>> and C<union> types are best treated as
+B<immutable> by Perl users. For the same reason, it is not
+recommended to try and create new values of such types using Perl
+constructors; instead, users should use PROJ functions to create
+such values wherever possible.
+
+That said, it is already now fully I<possible> to modify such
+values and to construct them using C<new()>; it's just not yet
+I<recommended> to do so. Consider this code example to create
+and modify a C<PJ_COORD> value:
+
+ # discouraged:
+ # (not guaranteed to work in future versions)
+ $coord = Geo::LibProj::FFI::PJ_COORD->new({
+     xy => { x => 12, y => 34 }
+ });
+ $coord->xyz->z( 100 );
+ 
+ # recommended:
+ $coord = proj_coord( 12, 34, 0, 0 );
+ $vector = $coord->v;
+ $vector->[2] = 100;
+ $coord = proj_coord( @$vector );
+
 =head1 BUGS AND LIMITATIONS
 
-PROJ makes heavy using of C C<union> pass-by-value, which is
-unsupported by L<FFI::Platypus>. I've found a workaround, but
-it's relatively slow. Any code that receives or passes
-C<PJ_COORD> values from or to PROJ functions is affected.
-It should be possible to improve this though. Somehow.
+PROJ makes heavy use of S<C C<union>> pass-by-value, which is
+unsupported by L<FFI::Platypus>. In earlier versions of this module,
+the workaround for working with C<PJ_COORD> values was quite slow.
+This performance issue has been addressed as of S<version 0.03.>
 
 Some implementation details of the glue this module provides
 may change in future, for example to better match the API or to
-increase performance. The C<PJ_COORD> type (incl. C<PJ_XY> etc.)
-in particular may be considered unstable. Should you decide to
+increase performance. Should you decide to
 use this module in production, it would be wise to watch the
 L<GitHub project|https://github.com/johannessen/proj-perl-ffi>
 for changes, at least until the version has reached 1.00.

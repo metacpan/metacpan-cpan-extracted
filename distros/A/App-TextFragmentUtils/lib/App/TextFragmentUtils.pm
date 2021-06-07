@@ -1,7 +1,7 @@
 package App::TextFragmentUtils;
 
-our $DATE = '2016-10-26'; # DATE
-our $VERSION = '0.001'; # VERSION
+our $DATE = '2021-05-25'; # DATE
+our $VERSION = '0.002'; # VERSION
 
 use 5.010001;
 use strict;
@@ -39,7 +39,7 @@ sub _get_tf_args {
 $SPEC{list_fragments} = do {
     my $meta = clone $Text::Fragment::SPEC{list_fragments};
     delete $meta->{args}{text};
-    $meta->{args}{filename} = $filename_arg,
+    $meta->{args}{filename} = $filename_arg;
     $meta;
 };
 sub list_fragments {
@@ -52,7 +52,7 @@ sub list_fragments {
 $SPEC{get_fragment} = do {
     my $meta = clone $Text::Fragment::SPEC{get_fragment};
     delete $meta->{args}{text};
-    $meta->{args}{filename} = $filename_arg,
+    $meta->{args}{filename} = $filename_arg;
     $meta;
 };
 sub get_fragment {
@@ -77,7 +77,7 @@ App::TextFragmentUtils - CLI utilities related to Text::Fragment
 
 =head1 VERSION
 
-This document describes version 0.001 of App::TextFragmentUtils (from Perl distribution App-TextFragmentUtils), released on 2016-10-26.
+This document describes version 0.002 of App::TextFragmentUtils (from Perl distribution App-TextFragmentUtils), released on 2021-05-25.
 
 =head1 DESCRIPTION
 
@@ -95,7 +95,11 @@ text fragment:
 =head1 FUNCTIONS
 
 
-=head2 get_fragment(%args) -> [status, msg, result, meta]
+=head2 get_fragment
+
+Usage:
+
+ get_fragment(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Get fragment with a certain ID in text.
 
@@ -121,15 +125,16 @@ Fragment ID.
 
 Comment label.
 
+
 =back
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
+($reason) is a string containing error message, or "OK" if status is
+200. Third element ($payload) is optional, the actual result. Fourth
+element (%result_meta) is called result metadata and is optional, a hash
 that contains extra information.
 
 Return value: Fragment (array)
@@ -142,7 +147,12 @@ following keys: C<raw> (string), C<payload> (string), C<attrs> (hash), C<id>
 Return 404 if fragment is not found.
 
 
-=head2 list_fragments(%args) -> [status, msg, result, meta]
+
+=head2 list_fragments
+
+Usage:
+
+ list_fragments(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 List fragments in text.
 
@@ -162,15 +172,16 @@ Comment style.
 
 Comment label.
 
+
 =back
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
+($reason) is a string containing error message, or "OK" if status is
+200. Third element ($payload) is optional, the actual result. Fourth
+element (%result_meta) is called result metadata and is optional, a hash
 that contains extra information.
 
 Return value: List of fragments (array)
@@ -207,7 +218,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2016 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

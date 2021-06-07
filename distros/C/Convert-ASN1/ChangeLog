@@ -1,3 +1,26 @@
+0.31 -- Wed Jun 02 22:28:29 ADT 2021
+
+  * Official CPAN release of 0.30
+
+0.30 -- Sat May 29 21:56:29 ADT 2021
+
+  * Fixes #43 - Perl 5.35.1 makes scalar assignment to undef a compile time error
+
+0.29 -- Mon May 24 18:27:46 ADT 2021
+
+  * Release Version no changes from 0.28
+  * Increment Version in Makefile.PL
+
+0.28 -- Sun May 23 18:03:47 ADT 2021
+
+  * Add github actions for repo testing and add new maintainer [Timothy Legge]
+  * typo fix [Adam Leskis]
+  * Fix test failures under Perl 5.26+ without '.' in @INC [Kent Fredric (KENTNL)]
+  * Correct a typo - SYNOPSIS [Shlomi Fish]
+  * unsafe decoding CVE-2013-7488 [Dana Jacobsen]
+  * Typo fixes from dsteinbrunner [David Steinbrunner]
+  * Add files via upload [Peter Sylvester]
+
 0.27 -- Wed Jun 25 13:47:28 CDT 2014
   * Avoid recursion when encountering an invalid tag and length
   * Avoid negative repetition counts (5.22 compatibility) [Alex Vandiver]

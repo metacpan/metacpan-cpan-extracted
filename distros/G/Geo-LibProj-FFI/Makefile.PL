@@ -18,16 +18,20 @@ my %WriteMakefileArgs = (
   "NAME" => "Geo::LibProj::FFI",
   "PREREQ_PM" => {
     "Alien::proj" => "1.07",
+    "Convert::Binary::C" => "0.04",
     "Exporter::Easy" => 0,
     "FFI::C" => "0.08",
     "FFI::Platypus" => "1.00"
   },
   "TEST_REQUIRES" => {
+    "ExtUtils::MakeMaker" => 0,
+    "File::Spec" => 0,
+    "IPC::Run3" => 0,
     "Test::Exception" => 0,
     "Test::More" => 0,
     "Test::Warnings" => 0
   },
-  "VERSION" => "0.02",
+  "VERSION" => "0.04",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -36,9 +40,13 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "Alien::proj" => "1.07",
+  "Convert::Binary::C" => "0.04",
   "Exporter::Easy" => 0,
+  "ExtUtils::MakeMaker" => 0,
   "FFI::C" => "0.08",
   "FFI::Platypus" => "1.00",
+  "File::Spec" => 0,
+  "IPC::Run3" => 0,
   "Test::Exception" => 0,
   "Test::More" => 0,
   "Test::Warnings" => 0

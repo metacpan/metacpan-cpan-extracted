@@ -49,7 +49,7 @@ App::Git::IssueManager::Start - class implementing the start issue command of th
 
 =head1 VERSION
 
-version 0.1
+version 0.2
 
 =head1 AUTHOR
 

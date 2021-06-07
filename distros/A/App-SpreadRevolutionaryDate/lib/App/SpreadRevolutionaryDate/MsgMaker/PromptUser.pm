@@ -10,7 +10,7 @@
 use 5.014;
 use utf8;
 package App::SpreadRevolutionaryDate::MsgMaker::PromptUser;
-$App::SpreadRevolutionaryDate::MsgMaker::PromptUser::VERSION = '0.29';
+$App::SpreadRevolutionaryDate::MsgMaker::PromptUser::VERSION = '0.31';
 # ABSTRACT: MsgMaker class for L<App::SpreadRevolutionaryDate> to build message by prompting user
 
 use Moose;
@@ -103,7 +103,7 @@ App::SpreadRevolutionaryDate::MsgMaker::PromptUser - MsgMaker class for L<App::S
 
 =head1 VERSION
 
-version 0.29
+version 0.31
 
 =head1 METHODS
 
@@ -130,6 +130,10 @@ Prompts user for the message to be spread. Takes no argument. Returns message as
 =item L<App::SpreadRevolutionaryDate::Target::Freenode>
 
 =item L<App::SpreadRevolutionaryDate::Target::Freenode::Bot>
+
+=item L<App::SpreadRevolutionaryDate::Target::Liberachat>
+
+=item L<App::SpreadRevolutionaryDate::Target::Liberachat::Bot>
 
 =item L<App::SpreadRevolutionaryDate::MsgMaker>
 

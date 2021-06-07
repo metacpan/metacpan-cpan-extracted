@@ -1,0 +1,164 @@
+#!/usr/bin/perl
+use 5.001 ; use strict ; use warnings ; 
+use Getopt::Std ; getopts '@:?:=:c:d:f:gr,:' , \my %o ; 
+use PerlIO::gzip ;
+use Term::ANSIColor qw[ :constants color ] ; $Term::ANSIColor::AUTORESET = 1 ;
+use autodie 'open' ; # <-- - 意味を為しているかを確認したい。
+
+sub cyc_rep ( ) ;
+sub main ( ) ; 
+sub mainC ( ) ;
+sub closing ( ) ;  
+
+$/ = "\r\n" if $o{r} ;
+$o{d} //= 1 ; # 出力ファイルの名前に付加する数の最小の桁数の指定。
+my $per_cyc = $o{'@'} // 1e6 ;
+my ($time00, $time0)  = (time) x 2  ; 
+my $bodyname = $o{f} // 'out' ; # 出力するファイル群の名前は、これに、ピリオドと数となる。
+my $isep = do { $o{','} //= $ENV{isep} // "\t" ; eval qq[qq[$o{','}]] } ; # 入力の区切り文字
+
+# ここから4個の変数は -c が指定された時に必要となる。-c が無ければ使われない変数。
+my (%seen,%ofh) ; # 着目した値を見たか、そしてそれに対応するファイルのデスクリプタ
+my $fc = 0 ; # 異なる注目列の個数
+my $fn = 0 ; # 生成出力ファイル数
+my $status = 0 ; # 返すコード。Ctrl+Cで 130 とする。なお、ファイルオープンのエラーはおそらく255となる。
+
+unless ( $o{c} ) { main }
+else { mainC ; closing }
+exit ;
+
+sub main ( ) { 
+  my @ofh ; 
+  my $cols = 0 ;  # 列の個数を格納。最初の行を読み取った時点で確定。
+  my $layer = $o{g} ? '>:gzip' : '>' ; # "レイヤー" の指定
+  my $empty = $o{e} // '?' ; # 列が足りない場合に格納する文字列
+  while ( <> ) {
+    chomp ; 
+    my @F = split /$isep/ , $_ , $cols || -1  ; # <-- 長いものを捨てることの内容にするため || を使う。 
+
+    if ($.==1) { 
+    	for ( @F ){ 
+        $cols ++ ; 
+        my $num = sprintf "%0$o{d}d" , $cols ; 
+        $num .= '.gz' if $o{g} ;
+        open my $ofh , $layer , "$bodyname.$num" or die $! ; 
+        push @ofh , $ofh ; 
+    	}
+    } 
+    print {$_} shift @F // $empty , "\n" for @ofh ; # <-- それぞれのファイルに書き込み
+
+    cyc_rep if $per_cyc && $. % $per_cyc == 0 ; 
+  }
+  grep { close $_ }  @ofh  ;
+}
+
+
+sub mainC ( ) { 
+  my $layer = $o{g} ? '>:gzip' : '>' ; # 出力のIOレイヤーの指定
+  my $tail = $o{g} ? '.gz' : '' ; # 出力ファイル名の末尾
+  my $header = <> if $o{'='} ; 
+  my $loc =  do { $o{c}//=1 ; $o{c} >= 0 ? $o{c} - 1 : $o{c} }  ; # どの列を取り出すか
+  my $maxfc = $o{m} // 200 ; 
+  my $residual = 'residual' ; # 最大個数に達した時に使う文字列<-- - この文字列は指定可能としたい。
+
+  $SIG{INT} = sub { $status = 130 ; closing }  ; 
+
+  while ( <> ) { 
+      chomp ; 
+      my $id = ( split /$isep/, $_ , -1 ) [ $loc ] // 'undef' ; # <-- - このundef の 場合の文字列は指定可能としたい。
+      unless ( $seen{$id} ++ ) { 
+          $fc ++ ; 
+
+          if ( $fc >= $maxfc ) { 
+            print " " x 40 . "$fc $id\r" ; 
+            $id = $residual ; 
+          }
+
+          unless ( exists $ofh{$id} ) { 
+            open my $ofh , $layer , "$bodyname$id$tail" ;
+            $fn ++ ; 
+            $ofh{ $id } = $ofh ;
+            print {$ofh} $header if defined $header ; 
+          }
+      }
+      my $ofh = exists $ofh{$id} ? $ofh { $id } : $ofh { $residual } ; # $ofh{$id}//$ofh{$residual}はうまくいかず。
+      print {$ofh} $_ . "\n" ;
+      cyc_rep if $per_cyc && $. % $per_cyc == 0 ; 
+  }
+}
+
+sub closing ( ) { 
+  use FindBin '$Script' ;
+  my $num = $. ; 
+  $num =~ s/(?<=\d)(?=(\d\d\d)+($|\D))/,/g ; # 3桁毎にコンマで区切る
+  my $sec = time - $time00 ; 
+  print STDERR CYAN "$num lines processed. $fc different remarked column values. $fn output files. ($Script ; $sec sec.)" ; 
+  close $_ for values %ofh ; 
+  exit $status ; 
+}
+
+
+
+sub cyc_rep ( ) {
+  use FindBin '$Script' ;
+  $| = 1 ; 
+  my $num = $. ; 
+  $num =~ s/(?<=\d)(?=(\d\d\d)+($|\D))/,/g ; # 3桁毎にコンマで区切る
+  print STDERR GREEN $num , ":\t" , sprintf "%02d:%02d:%02d" , ( localtime )[2,1,0] ;  #  <-- 標準出力に書込み
+  print STDERR "\t" , GREEN  time - $time0 , " sec.\t($Script)" ; 
+  print STDERR "\t" , BLUE $_ ; 
+  $time0 = time ;
+  print STDERR "\n" ;
+}
+
+
+## ヘルプの扱い
+sub VERSION_MESSAGE {}
+sub HELP_MESSAGE {
+    use FindBin qw[ $Script ] ; 
+    $ARGV[1] //= '' ;
+    open my $FH , '<' , $0 ;
+    while(<$FH>){
+        s/\$0/$Script/g ;
+        print $_ if s/^=head1// .. s/^=cut// and $ARGV[1] =~ /^o(p(t(i(o(ns?)?)?)?)?)?$/i ? m/^\s+\-/ : 1;
+    }
+    close $FH ;
+    exit 0 ;
+}
+
+=encoding utf8
+
+=head1 
+
+  $0 -f out < input  # 表形式の入力を列ごとに、縦にばらばらのファイルにする。
+  $0 -c colnum -f out < input # 注目列の値ごとに分類して、ばらばらのファイルへ。
+
+ 動作 : 
+  入力ファイル file をタブ区切りのtsvファイルであると見なす。
+  -c が無い場合 には、第n列の値を先頭行から最終行まで、file.n のようなファイル名で保存する。
+  -c がある場合は、その数の位置の列の値に応じて、入力各行を分類し(横分割し)、各ファイルに格納。
+
+ オプション: 
+
+  -d num : 桁数を指定。生成されるファイルの名前に使われる数をゼロ埋めにするときに便利。
+  -f str : 出力のファイル群の共通する部分の文字列を指定する。未指定なら "out"。
+  -g    ; gzip 形式で出力する。
+
+  -m num : 出力するファイルの個数の設定。未指定なら 200 。
+  -, str : 入力の区切り文字の指定。未指定なら、\t となる。
+  -r : 入力の改行コードが　\r\n であることの指定。
+  -@ num :　何行ごとに途中のレポートを返すかを指定する。未指定なら10万行。
+  -'?' str ; 列が少なすぎる行があった場合に、出力先に格納する文字を指定。未指定なら?。
+
+  -=   ; 先頭がヘッダ行で始まると仮定する。出力の各ファイルの一行目が入力ファイルの一行目となる。(-cを使う時挙動が変わる。)
+
+  --help : この $0 のヘルプメッセージを出す。  perldoc -t $0 | cat でもほぼ同じ。
+  --help opt : オプションのみのヘルプを出す。opt以外でも options と先頭が1文字以上一致すれば良い。
+
+  環境変数 : 
+    $isep : 入力についての区切り文字の指定。未指定なら、タブ文字。  
+
+ 注意点 : 
+     同時に多数の書込ファイルを開くので、ulimit -n でその数を確認すること。
+
+=cut

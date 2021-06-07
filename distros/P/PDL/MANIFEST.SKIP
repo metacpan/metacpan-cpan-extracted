@@ -53,6 +53,7 @@ RCS
 ^Basic/Core/isbigendian.p$
 ^Basic/Core/pdl\.h$
 ^Basic/Core/pdlcore\.[ch]$
+^Basic/Core/pdlperl\.h$
 ^Basic/Core/pdlsimple\.h$
 ^Basic/Gen/PP/Dump\.pm$
 ^Basic/Gen/PP/Dump\.pm\.tmp$
@@ -164,7 +165,6 @@ RCS
 ^Libtmp/GSL/RNG/.*\.c$
 ^Libtmp/GSL/RNG\.(pm|xs|c)
 ^Libtmp/GSL/SF/.*\.c$
-^Libtmp/Gaussian\.pm
 ^Libtmp/Image2D/Image2D\..*
 ^Libtmp/ImageND/ImageND\..*
 ^Libtmp/ImageRGB/ImageRGB\..*

@@ -6,7 +6,7 @@ package Bio::MUST::Core;
 # CONTRIBUTOR: Valerian LUPO <valerian.lupo@doct.uliege.be>
 # CONTRIBUTOR: Loic MEUNIER <loic.meunier@doct.uliege.be>
 # CONTRIBUTOR: Mick VAN VLIERBERGHE <mvanvlierberghe@doct.uliege.be>
-$Bio::MUST::Core::VERSION = '0.210610';
+$Bio::MUST::Core::VERSION = '0.211470';
 use strict;
 use warnings;
 
@@ -14,6 +14,7 @@ use Bio::MUST::Core::Types;
 use Bio::MUST::Core::SeqId;
 use Bio::MUST::Core::Seq;
 use Bio::MUST::Core::SeqMask;
+use Bio::MUST::Core::SeqMask::Pmsf;
 use Bio::MUST::Core::SeqMask::Profiles;
 use Bio::MUST::Core::IdList;
 use Bio::MUST::Core::IdMapper;
@@ -40,7 +41,7 @@ Bio::MUST::Core - Core classes and utilities for Bio::MUST
 
 =head1 VERSION
 
-version 0.210610
+version 0.211470
 
 =head1 DESCRIPTION
 

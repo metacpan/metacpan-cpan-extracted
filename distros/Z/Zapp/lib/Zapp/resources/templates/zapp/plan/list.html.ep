@@ -1,0 +1,40 @@
+<%
+    layout 'zapp';
+%>
+
+<header>
+    <h1>Plans</h1>
+    %= link_to 'zapp.create_plan', class => 'btn btn-outline-secondary', begin
+        <i class="fa fa-plus"></i> Add Plan
+    % end
+</header>
+
+<div class="plans-list">
+% for my $plan ( @{ $plans // [] } ) {
+    <section data-plan-id="<%= $plan->{plan_id} %>">
+        <h2><%= link_to $plan->{label}, 'zapp.get_plan', $plan %></h2>
+        <p class="description text-pre-wrap text-break"><%= $plan->{description} %></p>
+        <div class="buttons d-flex justify-content-between">
+            <div>
+                %= link_to 'zapp.create_run', $plan, class => 'btn btn-primary run', begin
+                    <i class="fa fa-arrow-right"></i> Run...
+                % end
+                % if ( my $run = $plan->{last_run} ) {
+                    <%= include 'zapp/partials/run', run => $plan->{last_run} %>
+                % }
+            </div>
+            <div>
+                %= link_to 'zapp.edit_plan', $plan, class => 'btn btn-outline-secondary edit', begin
+                    <i class="fa fa-pencil"></i> Edit
+                % end
+                %= link_to 'zapp.delete_plan', $plan, class => 'btn btn-outline-danger delete', begin
+                    <i class="fa fa-times-circle"></i> Delete...
+                % end
+            </div>
+        </div>
+    </section>
+% }
+% if ( !@{ $plans // [] } ) {
+    <p>No plans found. <%= link_to 'Create a new Plan' => 'zapp.create_plan' %>.</p>
+% }
+</div>

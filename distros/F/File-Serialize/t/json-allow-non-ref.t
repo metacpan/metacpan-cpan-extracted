@@ -1,7 +1,9 @@
 use strict;
 use warnings;
 
-use Test::More tests => 2;
+use Test2::V0;
+plan tests => 2;
+
 use Test::Requires;
 use Test::Exception;
 
@@ -16,8 +18,8 @@ no File::Serialize;
 {
     use File::Serialize { allow_nonref => 0 };
 
-    dies_ok { 
-        deserialize_file( 't/corpus/non-ref.json' ) 
+    dies_ok {
+        deserialize_file( 't/corpus/non-ref.json' )
     } 'non-refs dies';
 }
 

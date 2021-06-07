@@ -1,3 +1,11 @@
+0.211470  2021-05-27 22:53:20+02:00 Europe/Brussels
+    - Additions
+      - binaries: split-rates-ali.pl can now analyse pairs of profiles
+      - SeqMask::Pmsf: new class to support IQ-TREE sitefreq files
+      - Taxonomy: added support for GTDB Taxonomy
+    - Changes
+      - binaries: prune-tree.pl now preserves bootstrap values
+
 0.210610  2021-03-02 23:22:29+01:00 Europe/Brussels
     - Additions
       - binaries: new script inst-split-seqs.pl

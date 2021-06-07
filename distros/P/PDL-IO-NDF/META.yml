@@ -9,19 +9,23 @@ build_requires:
 configure_requires:
   Module::Build: '0.3'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.4229, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Module::Build version 0.4231, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: PDL-IO-NDF
+provides:
+  PDL::IO::NDF:
+    file: lib/PDL/IO/NDF.pm
+    version: '1.07'
 requires:
   Astro::FITS::Header: '3'
   NDF: '1.51'
-  PDL: v2.4.0
+  PDL: '2.040'
 resources:
   homepage: https://github.com/Starlink/perl-PDL-IO-NDF
   license: http://dev.perl.org/licenses/
   repository: git://github.com/Starlink/perl-PDL-IO-NDF.git
-version: '1.06'
+version: '1.07'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

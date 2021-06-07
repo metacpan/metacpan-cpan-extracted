@@ -1,0 +1,8 @@
+Revision history for the module "Bin::Text::Color::Plus" : 
+
+0.050   2021-05-26
+        最初に作成。3個のコマンドを入れた。
+        colorplus resistorcc backcolor
+
+0.051   2021-05-26
+        PAUSEからFailedとのお知らせ。*.pm の package の指定が間違っていたので訂正。

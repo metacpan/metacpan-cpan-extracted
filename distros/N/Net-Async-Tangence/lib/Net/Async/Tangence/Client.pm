@@ -1,21 +1,20 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2010-2017 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2010-2021 -- leonerd@leonerd.org.uk
 
-package Net::Async::Tangence::Client;
+package Net::Async::Tangence::Client 0.16;
 
-use strict;
+use v5.14;
 use warnings;
 
 use base qw( Net::Async::Tangence::Protocol Tangence::Client );
-
-our $VERSION = '0.15';
 
 use Carp;
 
 use Future;
 use Scalar::Util qw( blessed );
+use Socket ();
 
 use URI;
 
@@ -138,6 +137,11 @@ Invoked once the registry and root object proxies have been obtained from the
 server. See the documentation the L<Tangence::Client> C<tangence_connected>
 method.
 
+=item family => STRING
+
+Optional. May be set to C<inet4> or C<inet6> to force IPv4 or IPv6 if
+relevant. Ignored by C<exec:> and C<unix:> schemes.
+
 =back
 
 The following URL schemes are recognised:
@@ -175,20 +179,20 @@ sub connect_url
 
    if( $scheme eq "exec" ) {
       # $query will contain args to exec - split them on +
-      $f = $self->connect_exec( [ $path, split m/\+/, $query ] );
+      $f = $self->connect_exec( [ $path, split m/\+/, $query ], %args );
    }
    elsif( $scheme eq "tcp" ) {
-      $f = $self->connect_tcp( $authority );
+      $f = $self->connect_tcp( $authority, %args );
    }
    elsif( $scheme eq "unix" ) {
-      $f = $self->connect_unix( $path );
+      $f = $self->connect_unix( $path, %args );
    }
    else {
       my $connectorpkg = "Net::Async::Tangence::Client::via::$scheme";
       ( my $connectorfile = "$connectorpkg.pm" ) =~ s{::}{/}g;
       if( eval { require $connectorfile } and
             my $code = $connectorpkg->can( 'connect' ) ) {
-         $f = $code->( $self, $uri );
+         $f = $code->( $self, $uri, %args );
       }
       else {
          croak "Unrecognised URL scheme name '$scheme'";
@@ -287,7 +291,11 @@ port number. The other sections of the URL will be ignored.
 sub connect_tcp
 {
    my $self = shift;
-   my ( $authority ) = @_;
+   my ( $authority, %args ) = @_;
+
+   my $family;
+   $family = Socket::PF_INET() if $args{family} and $args{family} eq "inet4";
+   $family = Socket::PF_INET6() if $args{family} and $args{family} eq "inet6";
 
    my ( $host, $port ) = $authority =~ m/^(.*):(.*)$/;
 

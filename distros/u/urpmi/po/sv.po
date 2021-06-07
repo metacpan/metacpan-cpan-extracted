@@ -10,6 +10,7 @@
 # Kristoffer Grundström <lovaren@gmail.com>, 2013-2014
 # Kristoffer Grundström <lovaren@gmail.com>, 2013
 # Kristoffer Grundström <lovaren@gmail.com>, 2014-2015
+# Kristoffer Grundström <lovaren@gmail.com>, 2021
 # Lars Westergren <lars.westergren@home.se>, 2003,2005
 # Mattias Dahlberg <voz@home.se>, 2001-2002
 # Mattias Newzella <newzella@linux.nu>, 2002-2003
@@ -20,8 +21,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Mageia\n"
 "POT-Creation-Date: 2020-07-10 17:41+0100\n"
-"PO-Revision-Date: 2020-07-10 16:45+0000\n"
-"Last-Translator: Yuri Chornoivan <yurchor@ukr.net>\n"
+"PO-Revision-Date: 2021-03-14 03:41+0000\n"
+"Last-Translator: Kristoffer Grundström <lovaren@gmail.com>\n"
 "Language-Team: Swedish (http://www.transifex.com/MageiaLinux/mageia/language/"
 "sv/)\n"
 "Language: sv\n"
@@ -48,7 +49,7 @@ msgstr "Var god vänta..."
 #: ../gurpm/RPMProgressDialog.pm:290
 #, c-format
 msgid "Verifying package signatures..."
-msgstr "Verifierar paketsignaturer..."
+msgstr "Bekräftar paketsignaturer..."
 
 #: ../gurpm/RPMProgressDialog.pm:309 ../urpm/install.pm:108
 #, c-format
@@ -58,7 +59,7 @@ msgstr "Förbereder..."
 #: ../gurpm/RPMProgressDialog.pm:313
 #, c-format
 msgid "Removing package `%s' ..."
-msgstr "Avlägsnar paketet `%s' ..."
+msgstr "Tar bort paketet `%s' ..."
 
 #: ../gurpm/RPMProgressDialog.pm:316
 #, c-format
@@ -80,12 +81,12 @@ msgstr "Avbryt"
 #: ../urpm/media.pm:1833
 #, c-format
 msgid "...retrieving failed: %s"
-msgstr "...hämtning misslyckades: %s"
+msgstr "...hämtningen misslyckades: %s"
 
 #: ../gurpmi:50
 #, c-format
 msgid "RPM installation"
-msgstr "RPM installation"
+msgstr "RPM-installation"
 
 #: ../gurpmi:64
 #, c-format
@@ -330,12 +331,12 @@ msgstr ""
 #: ../gurpmi2:250 ../urpmi:617
 #, c-format
 msgid "%s of additional disk space will be used."
-msgstr "%s mera disk-utrymme kommer att bli använt."
+msgstr "%s ytterligare diskutrymme kommer att användas."
 
 #: ../gurpmi2:251 ../urpmi:618
 #, c-format
 msgid "%s of disk space will be freed."
-msgstr "%s disk-utrymme kommer att frigöras."
+msgstr "%s diskutrymme kommer att frigöras."
 
 #: ../gurpmi2:252 ../urpmi:619
 #, c-format
@@ -395,7 +396,7 @@ msgstr ""
 #: ../gurpmi2:339
 #, c-format
 msgid "You may want to update your urpmi database."
-msgstr "Du behöver nog uppdatera din urpmi-databas."
+msgstr "Du kan nog behöva uppdatera din urpmi-databas."
 
 #: ../gurpmi2:343 ../urpm/main_loop.pm:289 ../urpm/main_loop.pm:581
 #, c-format
@@ -405,12 +406,12 @@ msgstr "Installationen misslyckades:"
 #: ../gurpmi2:348
 #, c-format
 msgid "The package(s) are already installed"
-msgstr "Allt är redan installerat"
+msgstr "Paket(en) är redan installerade"
 
 #: ../gurpmi2:350
 #, c-format
 msgid "Installation finished"
-msgstr "Installation slutförd"
+msgstr "Installationen slutfördes"
 
 #: ../gurpmi2:363 ../urpmi:694
 #, c-format
@@ -1091,6 +1092,8 @@ msgid ""
 "un-ignoring 32bit medium `%s' b/c 32-bit packages are installed or system is "
 "32-bit EFI"
 msgstr ""
+"slutar ignorera 32-bitars medium `%s' eftersom att 32-bitarspaketen är "
+"installerade eller så är systemet 32-bitars EFI"
 
 #: ../urpm/media.pm:844
 #, c-format

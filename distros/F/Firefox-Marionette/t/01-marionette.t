@@ -7,6 +7,7 @@ use MIME::Base64();
 use Test::More;
 use Cwd();
 use Firefox::Marionette qw(:all);
+use Compress::Zlib();
 use Config;
 use HTTP::Daemon();
 use HTTP::Status();
@@ -16,6 +17,11 @@ use IO::Socket::SSL();
 my $segv_detected;
 my $at_least_one_success;
 my $terminated;
+
+if ($ENV{FIREFOX_ALARM}) {
+	$SIG{ALRM} = sub { die "Alarm at time exceeded" };
+	alarm 600; # ten minutes is heaps for bulk testing
+}
 
 my $test_time_limit = 90;
 
@@ -76,10 +82,10 @@ sub start_firefox {
 		$parameters{firefox} = $ENV{FIREFOX_BINARY};
 		diag("Overriding firefox binary to $parameters{firefox}");
 	}
-	if (defined $ca_cert_handle) {
-		my $certutil = `certutil --help 2>/dev/null`;
-		if ($? != 0) {
-		} elsif ($launches % 2) {
+	if ($parameters{manual_certificate_add}) {
+		delete $parameters{manual_certificate_add};
+	} elsif (defined $ca_cert_handle) {
+		if ($launches % 2) {
 			diag("Setting trust to list");
 			$parameters{trust} = [ '/dev/fd/' . fileno $ca_cert_handle ];
 		} else {
@@ -265,6 +271,8 @@ sub start_firefox {
 				$skip_message = "Skip tests that depended on firefox starting successfully:$@";
 			}
 		}
+	} elsif ($exception =~ /^Alarm at time exceeded/) {
+		die $exception;
 	} elsif ($exception) {
 		if (($^O eq 'MSWin32') || ($^O eq 'cygwin') || ($^O eq 'darwin')) {
 			diag("Failed to start in $^O:$exception");
@@ -482,6 +490,35 @@ if (
 	diag("TLS/Network are NOT okay");
 }
 my $skip_message;
+SKIP: {
+	if ($ENV{FIREFOX_HOST}) {
+		skip("No profile testing when the FIREFOX_HOST override is used", 6);
+	}
+	if ($ENV{FIREFOX_BINARY}) {
+		skip("No profile testing when the FIREFOX_BINARY override is used", 6);
+	}
+	if (!$ENV{RELEASE_TESTING}) {
+		skip("No profile testing except for RELEASE_TESTING", 6);
+	}
+	foreach my $name (Firefox::Marionette::Profile->names()) {
+		next unless ($name eq 'throw');
+		($skip_message, $firefox) = start_firefox(0, debug => 1, profile_name => $name );
+		if (!$skip_message) {
+			$at_least_one_success = 1;
+		}
+		if ($skip_message) {
+			skip($skip_message, 6);
+		}
+		ok($firefox, "Firefox loaded with the $name profile");
+		ok($firefox->go('http://example.com'), "firefox with the $name profile loaded example.com");
+		ok($firefox->quit() == 0, "firefox with the $name profile quit successfully");
+		my $profile = Firefox::Marionette::Profile->existing($name);
+		($skip_message, $firefox) = start_firefox(0, debug => 1, profile => $profile );
+		ok($firefox, "Firefox loaded with a profile copied from $name");
+		ok($firefox->go('http://example.com'), "firefox with the copied profile from $name loaded example.com");
+		ok($firefox->quit() == 0, "firefox with the profile copied from $name quit successfully");
+	}
+}
 ok($profile = Firefox::Marionette::Profile->new(), "Firefox::Marionette::Profile->new() correctly returns a new profile");
 ok(((defined $profile->get_value('marionette.port')) && ($profile->get_value('marionette.port') == 0)), "\$profile->get_value('marionette.port') correctly returns 0");
 ok($profile->set_value('browser.link.open_newwindow', 2), "\$profile->set_value('browser.link.open_newwindow', 2) to force new windows to appear");
@@ -585,7 +622,9 @@ SKIP: {
 	my $implicit_timeout = 41_001;
 	$new = Firefox::Marionette::Timeouts->new(page_load => $page_timeout, script => $script_timeout, implicit => $implicit_timeout);
 	my $timeouts = $firefox->timeouts($new);
-	ok((ref $timeouts) eq 'Firefox::Marionette::Timeouts', "\$firefox->timeouts() returns a Firefox::Marionette::Timeouts object");
+	ok((ref $timeouts) eq 'Firefox::Marionette::Timeouts', "\$firefox->timeouts(\$new) returns a Firefox::Marionette::Timeouts object");
+	my $timeouts2 = $firefox->timeouts();
+	ok((ref $timeouts2) eq 'Firefox::Marionette::Timeouts', "\$firefox->timeouts() returns a Firefox::Marionette::Timeouts object");
 	ok($timeouts->page_load() == 300_000, "\$timeouts->page_load() is 5 minutes");
 	ok($timeouts->script() == 30_000, "\$timeouts->script() is 30 seconds");
 	ok(defined $timeouts->implicit() && $timeouts->implicit() == 0, "\$timeouts->implicit() is 0 milliseconds");
@@ -663,12 +702,11 @@ SKIP: {
 if (($^O eq 'MSWin32') || ($^O eq 'cygwin')) {
 } elsif ($ENV{RELEASE_TESTING}) {
 	eval {
-		$ca_cert_handle = File::Temp::tempfile(File::Spec->catfile(File::Spec->tmpdir(), 'firefox_test_ca_private_XXXXXXXXXXX')) or Carp::croak("Failed to open temporary file for writing:$!");
+		$ca_cert_handle = File::Temp->new( TEMPLATE => File::Spec->catfile( File::Spec->tmpdir(), 'firefox_test_ca_cert_XXXXXXXXXXX')) or Firefox::Marionette::Exception->throw( "Failed to open temporary file for writing:$!");
 		fcntl $ca_cert_handle, Fcntl::F_SETFD(), 0 or Carp::croak("Can't clear close-on-exec flag on temporary file:$!");
-		my $ca_private_key_handle = File::Temp::tempfile(File::Spec->catfile(File::Spec->tmpdir(), 'firefox_test_ca_private_XXXXXXXXXXX')) or Carp::croak("Failed to open temporary file for writing:$!");
-		fcntl $ca_private_key_handle, Fcntl::F_SETFD(), 0 or Carp::croak("Can't clear close-on-exec flag on temporary file:$!");
-		system {'openssl'} 'openssl', 'genrsa', '-out' => '/dev/fd/' . fileno $ca_private_key_handle, 4096 and Carp::croak("Failed to generate a private key:$!");
-		my $ca_config_handle = File::Temp::tempfile(File::Spec->catfile(File::Spec->tmpdir(), 'firefox_test_ca_config_XXXXXXXXXXX')) or Carp::croak("Failed to open temporary file for writing:$!");
+		my $ca_private_key_handle = File::Temp->new( TEMPLATE => File::Spec->catfile( File::Spec->tmpdir(), 'firefox_test_ca_private_XXXXXXXXXXX')) or Firefox::Marionette::Exception->throw( "Failed to open temporary file for writing:$!");
+		system {'openssl'} 'openssl', 'genrsa', '-out' => $ca_private_key_handle->filename(), 4096 and Carp::croak("Failed to generate a private key:$!");
+		my $ca_config_handle = File::Temp->new( TEMPLATE => File::Spec->catfile( File::Spec->tmpdir(), 'firefox_test_ca_config_XXXXXXXXXXX')) or Firefox::Marionette::Exception->throw( "Failed to open temporary file for writing:$!");
 		$ca_config_handle->print(<<"_CONFIG_");
 [ req ]
 distinguished_name     = req_distinguished_name
@@ -690,10 +728,10 @@ _CONFIG_
 		fcntl $ca_config_handle, Fcntl::F_SETFD(), 0 or Carp::croak("Can't clear close-on-exec flag on temporary file:$!");
 		system {'openssl'} 'openssl', 'req', '-x509',
 			'-set_serial' => '1',
-			'-config'     => '/dev/fd/' . fileno $ca_config_handle,
+			'-config'     => $ca_config_handle->filename(),
 			'-days'       => 10,
-			'-key'        => '/dev/fd/' . fileno $ca_private_key_handle,
-			'-out'        => '/dev/fd/' . fileno $ca_cert_handle
+			'-key'        => $ca_private_key_handle->filename(),
+			'-out'        => $ca_cert_handle->filename()
 			and Carp::croak("Failed to generate a CA root certificate:$!");
 		1;
 	} or do {
@@ -1722,22 +1760,12 @@ SKIP: {
 	ok($count == 2, "Found elements with wantarray find_partial:$count");
 	my $css_rule;
 	ok($css_rule = $firefox->find('//input[@id="search-input"]')->css('display'), "The value of the css rule 'display' is '$css_rule'");
-	my $result;
-	ok($result = $firefox->find('//input[@id="search-input"]')->is_enabled() =~ /^[01]$/, "is_enabled returns 0 or 1:$result");
-	eval { $firefox->is_enabled({}) };
-	my $eval_string = "$@";
-	chomp $eval_string;
-	ok((ref $@ eq 'Firefox::Marionette::Exception'), "is_enabled throws exception for bad parameters:$eval_string");
-	ok($result = $firefox->find('//input[@id="search-input"]')->is_displayed() =~ /^[01]$/, "is_displayed returns 0 or 1:$result");
-	eval { $firefox->is_displayed({}) };
-	$eval_string = "$@";
-	chomp $eval_string;
-	ok((ref $@ eq 'Firefox::Marionette::Exception'), "is_displayed throws exception for bad parameters:$eval_string");
-	ok($result = $firefox->find('//input[@id="search-input"]')->is_selected() =~ /^[01]$/, "is_selected returns 0 or 1:$result");
-	eval { $firefox->is_selected({}) };
-	$eval_string = "$@";
-	chomp $eval_string;
-	ok((ref $@ eq 'Firefox::Marionette::Exception'), "is_selected throws exception for bad parameters:$eval_string");
+	my $result = $firefox->find('//input[@id="search-input"]')->is_enabled();
+	ok($result =~ /^[01]$/, "is_enabled returns 0 or 1 for //input[\@id=\"search-input\"]:$result");
+	$result = $firefox->find('//input[@id="search-input"]')->is_displayed();
+	ok($result =~ /^[01]$/, "is_displayed returns 0 or 1 for //input[\@id=\"search-input\"]:$result");
+	$result = $firefox->find('//input[@id="search-input"]')->is_selected();
+	ok($result =~ /^[01]$/, "is_selected returns 0 or 1 for //input[\@id=\"search-input\"]:$result");
 	ok($firefox->find('//input[@id="search-input"]')->clear(), "Clearing the element directly");
 	TODO: {
 		local $TODO = $major_version < 50 ? "property and attribute methods can have different values for empty" : undef;
@@ -1926,11 +1954,23 @@ SKIP: {
 	ok($firefox->script('return true', scriptTimeout => 20_000, newSandbox => 0, %additional), "javascript command 'return true' (using scriptTimeout and newSandbox (false) as parameters)");
 	my $cookie = Firefox::Marionette::Cookie->new(name => 'BonusCookie', value => 'who really cares about privacy', expiry => time + 500000);
 	ok($firefox->add_cookie($cookie), "\$firefox->add_cookie() adds a Firefox::Marionette::Cookie without a domain");
-	$cookie = Firefox::Marionette::Cookie->new(name => 'BonusSessionCookie', value => 'will go away anyway');
+	$cookie = Firefox::Marionette::Cookie->new(name => 'BonusSessionCookie', value => 'will go away anyway', sameSite => 0, httpOnly => 0, secure => 0);
 	ok($firefox->add_cookie($cookie), "\$firefox->add_cookie() adds a Firefox::Marionette::Cookie without expiry");
+	$cookie = Firefox::Marionette::Cookie->new(name => 'StartingCookie', value => 'not sure aböut this', httpOnly => 1, secure => 1, sameSite => 1);
+	ok($firefox->add_cookie($cookie), "\$firefox->add_cookie() adds a Firefox::Marionette::Cookie with a domain");
 	ok($firefox->find_id('search-input')->clear()->find_id('search-input')->type('Test::More'), "Sent 'Test::More' to the 'search-input' field directly to the element");
 	if (out_of_time()) {
 		skip("Running out of time.  Trying to shutdown tests as fast as possible", 36);
+	}
+	foreach my $name ('click', 'clear', 'is_selected', 'is_enabled', 'is_displayed', 'type', 'tag_name', 'rect', 'text') {
+		eval {
+			$firefox->$name({});
+		};
+		ok(ref $@ eq 'Firefox::Marionette::Exception', "\$firefox->$name() with a hash parameter produces a Firefox::Marionette::Exception exception");
+		eval {
+			$firefox->$name(q[]);
+		};
+		ok(ref $@ eq 'Firefox::Marionette::Exception', "\$firefox->$name() with a non ref parameter produces a Firefox::Marionette::Exception exception");
 	}
 	ok($firefox->find_name('lucky')->click($element), "Clicked the \"I'm Feeling Lucky\" button");
 	diag("Going to Test::More page with a page load strategy of " . ($capabilities->page_load_strategy() || ''));
@@ -1973,6 +2013,117 @@ SKIP: {
 			}
 			ok($bytes_read > 1_000, "Downloaded file is gzipped");
 		}
+	}
+	foreach my $element ($firefox->find_tag('option')) {
+		my $inner_html;
+		eval {
+			$inner_html = $element->property('innerHTML');
+		};
+		if ((defined $inner_html) && ($inner_html eq 'Jump to version')) {
+			$firefox->script('arguments[0].selected = true', args => $element);
+			ok($element->is_selected(), "\$firefox->is_selected() returns true for a selected item");
+			$firefox->script('arguments[0].disabled = true', args => $element);
+			ok(!$element->is_enabled(), "After script disabled element, \$firefox->is_enabled() correctly reflects disabling");
+		}
+	}
+	$firefox->go('https://metacpan.org');
+	ok(!exists $INC{'Keys.pm'}, "Firefox::Marionette::Keys is not loaded");
+	eval { require Firefox::Marionette::Keys; };
+	ok($@ eq '', "Successfully loaded Firefox::Marionette::Keys");
+	Firefox::Marionette::Keys->import(qw(:all));
+	ok(CANCEL() eq chr 0xE001, "CANCEL() is correct as 0xE001");
+	ok(HELP() eq chr 0xE002, "HELP() is correct as OxE002");
+	ok(BACKSPACE() eq chr 0xE003, "BACKSPACE() is correct as OxE003");
+	ok(TAB() eq chr 0xE004, "TAB() is correct as OxE004");
+	ok(CLEAR() eq chr 0xE005, "CLEAR() is correct as OxE005");
+	ok(ENTER() eq chr 0xE006, "ENTER() is correct as OxE006");
+	ok(SHIFT() eq chr 0xE008, "SHIFT() is correct as OxE008 (Same as SHIFT_LEFT())");
+	ok(SHIFT_LEFT() eq chr 0xE008, "SHIFT_LEFT() is correct as OxE008");
+	ok(CONTROL() eq chr 0xE009, "CONTROL() is correct as OxE009 (Same as CONTROL_LEFT())");
+	ok(CONTROL_LEFT() eq chr 0xE009, "CONTROL_LEFT() is correct as OxE009");
+	ok(ALT() eq chr 0xE00A, "ALT() is correct as OxE00A (Same as ALT_LEFT())");
+	ok(ALT_LEFT() eq chr 0xE00A, "ALT_LEFT() is correct as OxE00A");
+	ok(PAUSE() eq chr 0xE00B, "PAUSE() is correct as OxE00B");
+	ok(ESCAPE() eq chr 0xE00C, "ESCAPE() is correct as OxE00C");
+	ok(SPACE() eq chr 0xE00D, "SPACE() is correct as OxE00D");
+	ok(PAGE_UP() eq chr 0xE00E, "PAGE_UP() is correct as OxE00E");
+	ok(PAGE_DOWN() eq chr 0xE00F, "PAGE_DOWN() is correct as OxE00F");
+	ok(END_KEY() eq chr 0xE010, "END_KEY() is correct as OxE010");
+	ok(HOME() eq chr 0xE011, "HOME() is correct as OxE011");
+	ok(ARROW_LEFT() eq chr 0xE012, "ARROW_LEFT() is correct as OxE012");
+	ok(ARROW_UP() eq chr 0xE013, "ARROW_UP() is correct as OxE013");
+	ok(ARROW_RIGHT() eq chr 0xE014, "ARROW_UP() is correct as OxE014");
+	ok(ARROW_DOWN() eq chr 0xE015, "ARROW_DOWN() is correct as OxE015");
+	ok(INSERT() eq chr 0xE016, "INSERT() is correct as OxE016");
+	ok(DELETE() eq chr 0xE017, "DELETE() is correct as OxE017");
+	ok(F1() eq chr 0xE031, "F1() is correct as OxE031");
+	ok(F2() eq chr 0xE032, "F2() is correct as OxE032");
+	ok(F3() eq chr 0xE033, "F3() is correct as OxE033");
+	ok(F4() eq chr 0xE034, "F4() is correct as OxE034");
+	ok(F5() eq chr 0xE035, "F5() is correct as OxE035");
+	ok(F6() eq chr 0xE036, "F6() is correct as OxE036");
+	ok(F7() eq chr 0xE037, "F7() is correct as OxE037");
+	ok(F8() eq chr 0xE038, "F8() is correct as OxE038");
+	ok(F9() eq chr 0xE039, "F9() is correct as OxE039");
+	ok(F10() eq chr 0xE03A, "F10() is correct as OxE03A");
+	ok(F11() eq chr 0xE03B, "F11() is correct as OxE03B");
+	ok(F12() eq chr 0xE03C, "F12() is correct as OxE03C");
+	ok(META() eq chr 0xE03D, "META() is correct as OxE03D (Same as META_LEFT())");
+	ok(META_LEFT() eq chr 0xE03D, "META_LEFT() is correct as OxE03D");
+	ok(ZENKAKU_HANKAKU() eq chr 0xE040, "ZENKAKU_HANKAKU() is correct as OxE040");
+	ok(SHIFT_RIGHT() eq chr 0xE050, "SHIFT_RIGHT() is correct as OxE050");
+	ok(CONTROL_RIGHT() eq chr 0xE051, "CONTROL_RIGHT() is correct as OxE051");
+	ok(ALT_RIGHT() eq chr 0xE052, "ALT_RIGHT() is correct as OxE052");
+	ok(META_RIGHT() eq chr 0xE053, "META_RIGHT() is correct as OxE053");
+	ok(!exists $INC{'Buttons.pm'}, "Firefox::Marionette::Buttons is not loaded");
+	eval { require Firefox::Marionette::Buttons; };
+	ok($@ eq '', "Successfully loaded Firefox::Marionette::Buttons");
+	Firefox::Marionette::Buttons->import(qw(:all));
+	ok(LEFT_BUTTON() == 0, "LEFT_BUTTON() is correct as O");
+	ok(MIDDLE_BUTTON() == 1, "MIDDLE_BUTTON() is correct as 1");
+	ok(RIGHT_BUTTON() == 2, "RIGHT_BUTTON() is correct as 2");
+	my $help_button = $firefox->find_class('btn search-btn help-btn');
+	ok($help_button, "Found help button on metacpan.org");
+	SKIP: {
+		my $perform_ok;
+		eval {
+			$perform_ok = $firefox->perform(
+						$firefox->key_down('h'),
+						$firefox->pause(2),
+						$firefox->key_up('h'),
+						$firefox->mouse_move($help_button),
+						$firefox->mouse_down(LEFT_BUTTON()),
+						$firefox->pause(1),
+						$firefox->mouse_up(LEFT_BUTTON()),
+						$firefox->key_down(ESCAPE()),
+						$firefox->pause(2),
+						$firefox->key_up(ESCAPE()),
+					);
+		};
+		if ((!$perform_ok) && ($major_version < 60)) {
+			chomp $@;
+			diag("The perform method is not supported for $major_version.$minor_version.$patch_version:$@");
+			skip("The perform method is not supported for $major_version.$minor_version.$patch_version", 5);
+		}
+		ok(ref $perform_ok eq 'Firefox::Marionette', "\$firefox->perform() with a combination of mouse, pause and key actions");
+		my $value = $firefox->find('//input[@id="search-input"]')->property('value');
+		ok($value eq 'h', "\$firefox->find('//input[\@id=\"search-input\"]')->property('value') is equal to 'h' from perform method above:$value");
+		ok($firefox->perform($firefox->pause(2)), "\$firefox->perform() with a single pause action");
+		ok($firefox->perform($firefox->mouse_move(x => 0, y => 0),$firefox->mouse_down(), $firefox->mouse_up()), "\$firefox->perform() with a default mouse button and manual x,y co-ordinates");
+		eval {
+			$firefox->perform({ type => 'unknown' });
+		};
+		ok(ref $@ eq 'Firefox::Marionette::Exception', "\$firefox->perform() throws an exception when passed an unknown action:$@");
+		ok($firefox->release(), "\$firefox->release()");
+	}
+	SKIP: {
+		if ((!$context) && ($major_version < 50)) {
+			chomp $@;
+			diag("\$firefox->context is not supported for $major_version.$minor_version.$patch_version:$@");
+			skip("\$firefox->context is not supported for $major_version.$minor_version.$patch_version", 2);
+		}
+		ok($firefox->chrome()->context() eq 'chrome', "Setting and reading context of the browser as 'chrome'");
+		ok($firefox->content()->context() eq 'content', "Setting and reading context of the browser as 'content'");
 	}
 	$firefox->go('http://www.example.com');
 	my $body = $firefox->find("//body");
@@ -2156,7 +2307,7 @@ SKIP: {
 		$result = undef;
 	}
 	eval {
-		$result = $firefox->accept_connections(0);
+		$result = $firefox->accept_connections(1);
 	};
 	SKIP: {
 		my $exception = "$@";
@@ -2164,6 +2315,8 @@ SKIP: {
 		if ((!$result) && ($major_version < 52)) {
 			skip("Refusing future connections may not be supported in firefox versions less than 52:$exception", 1);
 		}
+		ok($result, "Accepting future connections");
+		$result = $firefox->accept_connections(0);
 		ok($result, "Refusing future connections");
 	}
 	ok($firefox->quit() == $correct_exit_status, "Firefox has closed with an exit status of $correct_exit_status:" . $firefox->child_error());
@@ -2272,9 +2425,14 @@ SKIP: {
 	ok($firefox->quit() == $correct_exit_status, "Firefox has closed with an exit status of $correct_exit_status:" . $firefox->child_error());
 }
 
+sub display_name {
+	my ($certificate) = @_;
+	return $certificate->display_name() || $certificate->nickname();
+}
+
 SKIP: {
 	my $proxy_host = 'all.example.org';
-	($skip_message, $firefox) = start_firefox(1, console => 1, debug => 1, capabilities => Firefox::Marionette::Capabilities->new(moz_headless => 0, accept_insecure_certs => 0, page_load_strategy => 'none', moz_webdriver_click => 0, moz_accessibility_checks => 0, proxy => Firefox::Marionette::Proxy->new(host => $proxy_host)), timeouts => Firefox::Marionette::Timeouts->new(page_load => 78_901, script => 76_543, implicit => 34_567));
+	($skip_message, $firefox) = start_firefox(1, manual_certificate_add => 1, console => 1, debug => 0, capabilities => Firefox::Marionette::Capabilities->new(moz_headless => 0, accept_insecure_certs => 0, page_load_strategy => 'none', moz_webdriver_click => 0, moz_accessibility_checks => 0, proxy => Firefox::Marionette::Proxy->new(host => $proxy_host)), timeouts => Firefox::Marionette::Timeouts->new(page_load => 78_901, script => 76_543, implicit => 34_567));
 	if (!$skip_message) {
 		$at_least_one_success = 1;
 	}
@@ -2375,6 +2533,109 @@ SKIP: {
 		}
 		$firefox->script(qq[alert('$alert_text')]);
 		ok($firefox->accept_alert(), "\$firefox->accept_alert() accepts alert box");
+	}
+	my @certificates;
+	eval { @certificates = $firefox->certificates(); };
+	SKIP: {
+		if ((scalar @certificates == 0) && ($major_version < 50)) {
+			chomp $@;
+			diag("\$firefox->certificates is not supported for $major_version.$minor_version.$patch_version:$@");
+			skip("\$firefox->certificates is not supported for $major_version.$minor_version.$patch_version", 57);
+		}
+		eval { $firefox->add_certificate( ) };
+		ok(ref $@ eq 'Firefox::Marionette::Exception', "\$firefox->add_certificate(path => \$value) throws an exception if nothing is added");
+		eval { $firefox->add_certificate( path => '/this/does/not/exist' ) };
+		ok(ref $@ eq 'Firefox::Marionette::Exception', "\$firefox->add_certificate(path => \$value) throws an exception if a non existent file is added");
+		eval { $firefox->add_certificate( string => 'this is nonsense' ); };
+		ok(ref $@ eq 'Firefox::Marionette::Exception', "\$firefox->add_certificate(string => \$value) throws an exception if nonsense is added");
+		my $handle = File::Temp->new( TEMPLATE => File::Spec->catfile( File::Spec->tmpdir(), 'firefox_test_part_cert_XXXXXXXXXXX')) or Firefox::Marionette::Exception->throw( "Failed to open temporary file for writing:$!");
+		$handle->print(<<'_CERT_') or die "Failed to write to temporary file:$!";
+-----BEGIN CERTIFICATE-----
+MIIFsDC
+_CERT_
+		seek $handle, 0, 0 or Carp::croak("Failed to seek to start of temporary file:$!");
+		eval { $firefox->add_certificate( path => $handle->filename() ); };
+		ok(ref $@ eq 'Firefox::Marionette::Exception', "\$firefox->add_certificate(string => \$value) throws an exception if partial certificate is added");
+		if (defined $ca_cert_handle) {
+			ok($firefox->add_certificate(path => $ca_cert_handle->filename(), trust => ',,,'), "Adding a certificate with no permissions");
+		}
+		my $count = 0;
+		foreach my $certificate (sort { display_name($a) cmp display_name($b) } $firefox->certificates()) {
+			ok($certificate, "Found the " . Encode::encode('UTF-8', display_name($certificate)) . " from the certificate database");
+			ok($firefox->certificate_as_pem($certificate) =~ /BEGIN[ ]CERTIFICATE.*MII.*END[ ]CERTIFICATE\-+\s$/smx, Encode::encode('UTF-8', display_name($certificate)) . " looks like a PEM encoded X.509 certificate");
+			ok(ref $firefox->delete_certificate($certificate) eq 'Firefox::Marionette', "Deleted " . Encode::encode('UTF-8', display_name($certificate)) . " from the certificate database");
+			if ($certificate->is_ca_cert()) {
+				ok(1, Encode::encode('UTF-8', display_name($certificate)) . " is a CA cert");
+			} else {
+				ok(1, Encode::encode('UTF-8', display_name($certificate)) . " is NOT a CA cert");
+			}
+			if ($certificate->is_any_cert()) {
+				ok(1, Encode::encode('UTF-8', display_name($certificate)) . " is any cert");
+			} else {
+				ok(1, Encode::encode('UTF-8', display_name($certificate)) . " is NOT any cert");
+			}
+			if ($certificate->is_unknown_cert()) {
+				ok(1, Encode::encode('UTF-8', display_name($certificate)) . " is an unknown cert");
+			} else {
+				ok(1, Encode::encode('UTF-8', display_name($certificate)) . " is NOT an unknown cert");
+			}
+			if ($certificate->is_built_in_root()) {
+				ok(1, Encode::encode('UTF-8', display_name($certificate)) . " is a built in root cert");
+			} else {
+				ok(1, Encode::encode('UTF-8', display_name($certificate)) . " is NOT a built in root cert");
+			}
+			if ($certificate->is_server_cert()) {
+				ok(1, Encode::encode('UTF-8', display_name($certificate)) . " is a server cert");
+			} else {
+				ok(1, Encode::encode('UTF-8', display_name($certificate)) . " is NOT a server cert");
+			}
+			if ($certificate->is_user_cert()) {
+				ok(1, Encode::encode('UTF-8', display_name($certificate)) . " is a user cert");
+			} else {
+				ok(1, Encode::encode('UTF-8', display_name($certificate)) . " is NOT a user cert");
+			}
+			if ($certificate->is_email_cert()) {
+				ok(1, Encode::encode('UTF-8', display_name($certificate)) . " is an email cert");
+			} else {
+				ok(1, Encode::encode('UTF-8', display_name($certificate)) . " is NOT an email cert");
+			}
+			ok($certificate->issuer_name(), Encode::encode('UTF-8', display_name($certificate)) . " has an issuer_name of " . Encode::encode('UTF-8', $certificate->issuer_name()));
+			ok(defined $certificate->common_name(), Encode::encode('UTF-8', display_name($certificate)) . " has a common_name of " . Encode::encode('UTF-8', $certificate->common_name()));
+			if (defined $certificate->email_address()) {
+				ok($certificate->email_address(), Encode::encode('UTF-8', display_name($certificate)) . " has an email_address of " . $certificate->email_address());
+			} else {
+				ok(1, Encode::encode('UTF-8', display_name($certificate)) . " does not have a specified email_address");
+			}
+			ok($certificate->sha256_subject_public_key_info_digest(), Encode::encode('UTF-8', display_name($certificate)) . " has a sha256_subject_public_key_info_digest of " . $certificate->sha256_subject_public_key_info_digest());
+			ok(defined $certificate->issuer_organization(), Encode::encode('UTF-8', display_name($certificate)) . " has an issuer_organization of " . Encode::encode('UTF-8', $certificate->issuer_organization()));
+			ok($certificate->db_key(), Encode::encode('UTF-8', display_name($certificate)) . " has a db_key of " . $certificate->db_key());
+			ok($certificate->token_name(), Encode::encode('UTF-8', display_name($certificate)) . " has a token_name of " . Encode::encode('UTF-8', $certificate->token_name()));
+			if (defined $certificate->sha256_fingerprint()) {
+				ok($certificate->sha256_fingerprint(), Encode::encode('UTF-8', display_name($certificate)) . " has a sha256_fingerprint of " . $certificate->sha256_fingerprint());
+			} else {
+				ok(1, Encode::encode('UTF-8', display_name($certificate)) . " has a sha256_fingerprint of " . $certificate->sha256_fingerprint());
+			}
+			ok($certificate->subject_name(), Encode::encode('UTF-8', display_name($certificate)) . " has a subject_name of " . Encode::encode('UTF-8', $certificate->subject_name()));
+			if (defined $certificate->key_usages()) {
+				ok(defined $certificate->key_usages(), Encode::encode('UTF-8', display_name($certificate)) . " has a key_usages of " . $certificate->key_usages());
+			} else {
+				ok(1, Encode::encode('UTF-8', display_name($certificate)) . " does not has a key_usage");
+			}
+			ok(defined $certificate->issuer_organization_unit(), Encode::encode('UTF-8', display_name($certificate)) . " has an issuer_organization_unit of " . Encode::encode('UTF-8', $certificate->issuer_organization_unit()));
+			{
+				local $TODO = "Firefox can neglect old certificates.  See https://bugzilla.mozilla.org/show_bug.cgi?id=1710716";
+				ok($certificate->not_valid_after() > time, Encode::encode('UTF-8', display_name($certificate)) . " has a current not_valid_after value of " . localtime $certificate->not_valid_after());
+			}
+			ok($certificate->not_valid_before() < $certificate->not_valid_after(), Encode::encode('UTF-8', display_name($certificate)) . " has a not_valid_before that is before the not_valid_after value");
+			ok($certificate->not_valid_before() < time, Encode::encode('UTF-8', display_name($certificate)) . " has a current not_valid_before value of " . localtime $certificate->not_valid_before());
+			ok($certificate->serial_number(), Encode::encode('UTF-8', display_name($certificate)) . " has a serial_number of " . $certificate->serial_number());
+			ok(defined $certificate->issuer_common_name(), Encode::encode('UTF-8', display_name($certificate)) . " has a issuer_common_name of " . Encode::encode('UTF-8', $certificate->issuer_common_name()));
+			ok(defined $certificate->organization(), Encode::encode('UTF-8', display_name($certificate)) . " has a organization of " . Encode::encode('UTF-8', $certificate->organization()));
+			ok($certificate->sha1_fingerprint(), Encode::encode('UTF-8', display_name($certificate)) . " has a sha1_fingerprint of " . $certificate->sha1_fingerprint());
+			ok(defined $certificate->organizational_unit(), Encode::encode('UTF-8', display_name($certificate)) . " has a organizational_unit of " . Encode::encode('UTF-8', $certificate->organizational_unit()));
+			$count += 1;
+		}
+		ok($count > 0, "There are $count certificates in the firefox database");
 	}
 	ok($firefox->quit() == $correct_exit_status, "Firefox has closed with an exit status of $correct_exit_status:" . $firefox->child_error());
 }

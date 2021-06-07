@@ -541,8 +541,6 @@ S_sortsv_flags_impl(pTHX_ gptr *base, size_t nmemb, SVCOMPARE_t cmp, U32 flags)
 }
 
 /*
-=head1 SV Manipulation Functions
-
 =for apidoc sortsv_flags
 
 In-place sort an array of SV pointers with the given comparison routine,
@@ -669,7 +667,6 @@ sortsv_cmp_locale_desc(pTHX_ gptr *base, size_t nmemb, U32 flags)
 #endif
 
 /*
-=head1 Array Manipulation Functions
 
 =for apidoc sortsv
 

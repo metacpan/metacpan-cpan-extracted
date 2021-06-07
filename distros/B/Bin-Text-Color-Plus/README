@@ -1,0 +1,15 @@
+This module `Bin::Text::Color::Plus'  provides scripts for specific functionalities for putting colors 
+(ANSI Colors) on text data, utilizing Term::ANSI::Color. s
+
+The included commands are as follows. 
+
+(1) colorplus ; with many useful functionalities. You may use as "colorplus -3" or "colorplus -t 5" as well as "colorplus -0". 
+(2) resistorcc ; put colors on each number digit according to the "resistor color coodes".
+(3) backcolor ; put colors on each number (with possibly with many digits) according to their magnitude.
+
+-- As the author's intetion, these 3 commoands above may be unified into "colorplus" in some future. 
+
+
+ Copyright (c) 2021 Toshiyuki SHIMONO. All rights reserved.
+ This program is free software; you can redistribute it and/or
+ modify it under the same terms as Perl itself.

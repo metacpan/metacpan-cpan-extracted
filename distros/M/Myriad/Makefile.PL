@@ -53,7 +53,7 @@ my %WriteMakefileArgs = (
     "Net::Async::OpenTracing" => "1.000",
     "Net::Async::Redis" => "3.013",
     "Net::Async::SMTP" => "0.002",
-    "Object::Pad" => "0.37",
+    "Object::Pad" => "0.38",
     "OpenTracing::Any" => "1.003",
     "Pod::Simple::Text" => 0,
     "Pod::Usage" => 0,
@@ -90,7 +90,7 @@ my %WriteMakefileArgs = (
     "Test::More" => "0.98",
     "Test::NoTabs" => 0
   },
-  "VERSION" => "0.006",
+  "VERSION" => "0.007",
   "test" => {
     "TESTS" => "t/*.t t/RPC/*.t t/transport/*.t t/util/*.t"
   }
@@ -135,7 +135,7 @@ my %FallbackPrereqs = (
   "Net::Async::OpenTracing" => "1.000",
   "Net::Async::Redis" => "3.013",
   "Net::Async::SMTP" => "0.002",
-  "Object::Pad" => "0.37",
+  "Object::Pad" => "0.38",
   "OpenTracing::Any" => "1.003",
   "Pod::Simple::Text" => 0,
   "Pod::Usage" => 0,

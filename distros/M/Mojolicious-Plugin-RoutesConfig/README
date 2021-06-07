@@ -20,7 +20,7 @@ SYNOPSIS
         ],
       }
 
-      # Mojolicious
+      # in YourApp::startup()
       my $config = $app->plugin('Config');
       # or even
       my $config = $app->plugin('RoutesConfig');
@@ -29,7 +29,7 @@ SYNOPSIS
       $app->plugin('RoutesConfig', {file => $app->home->child('etc/routes_admin.conf')});
       $app->plugin('RoutesConfig', {file => $app->home->child('etc/routes_site.conf')});
 
-      # Mojolicious::Lite
+      # in  YourLiteApp
       my $config = plugin 'Config';
       plugin 'RoutesConfig', $config;
       plugin 'RoutesConfig', {file => app->home->child('etc/routes_admin.conf')};
@@ -75,10 +75,6 @@ COPYRIGHT
     with this module.
 
 SEE ALSO
-    Mojolicious::Guides::Routing, Mojolicious::Routes,
-    Mojolicious::Routes::Route, Mojolicious::Plugin::Config
-
-    Slovo has a pretty advanced routes configuration using
-    Mojolicious::Plugin::RoutesConfig. Please look at
-    Slovo/lib/Slovo/resources/etc/routes.conf.
+    Mojolicious::Routes, Mojolicious::Routes::Route,
+    Mojolicious::Plugin::Config
 

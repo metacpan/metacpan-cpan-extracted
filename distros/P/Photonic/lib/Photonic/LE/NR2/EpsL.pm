@@ -1,5 +1,5 @@
 package Photonic::LE::NR2::EpsL;
-$Photonic::LE::NR2::EpsL::VERSION = '0.015';
+$Photonic::LE::NR2::EpsL::VERSION = '0.016';
 
 =encoding UTF-8
 
@@ -9,7 +9,7 @@ Photonic::LE::NR2::EpsL
 
 =head1 VERSION
 
-version 0.015
+version 0.016
 
 =head1 COPYRIGHT NOTICE
 
@@ -75,7 +75,7 @@ dielectric functions of the host $epsA and the particle $epsB.
 
 =back
 
-=head1 ACCESORS (read only)
+=head1 ACCESSORS (read only)
 
 =over 4
 
@@ -136,11 +136,11 @@ use List::Util qw(min);
 use Moose;
 use MooseX::StrictConstructor;
 
-has 'epsA'=>(is=>'ro', isa=>'PDL::Complex', init_arg=>undef, writer=>'_epsA',
+has 'epsA'=>(is=>'ro', isa=>'Photonic::Types::PDLComplex', init_arg=>undef, writer=>'_epsA',
     documentation=>'Dielectric function of host');
-has 'epsB'=>(is=>'ro', isa=>'PDL::Complex', init_arg=>undef, writer=>'_epsB',
+has 'epsB'=>(is=>'ro', isa=>'Photonic::Types::PDLComplex', init_arg=>undef, writer=>'_epsB',
         documentation=>'Dielectric function of inclusions');
-has 'u'=>(is=>'ro', isa=>'PDL::Complex', init_arg=>undef, writer=>'_u',
+has 'u'=>(is=>'ro', isa=>'Photonic::Types::PDLComplex', init_arg=>undef, writer=>'_u',
     documentation=>'Spectral variable');
 with 'Photonic::Roles::EpsL';
 
@@ -149,14 +149,12 @@ sub evaluate {
     $self->_epsA(my $epsA=shift);
     $self->_epsB(my $epsB=shift);
     $self->_u(my $u=1/(1-$epsB/$epsA));
-    my $as=$self->nr->as;
-    my $b2s=$self->nr->b2s;
+    my $as=pdl(map r2C($_), @{$self->nr->as})->cplx;
+    my $b2s=pdl(map r2C($_), @{$self->nr->b2s})->cplx;
     my $min= min($self->nh, $self->nr->iteration);
-    my ($fn, $n)=lentzCF([map {$u-$_} @$as], [map {-$_} @$b2s],
-			 $min, $self->smallE);
+    my ($fn, $n)=lentzCF($u-$as, -$b2s, $min, $self->smallE);
     # Check this logic:
-    my $converged=$n<$min || $self->nr->iteration<=$self->nh;
-    $self->_converged($converged);
+    $self->_converged($n<$min || $self->nr->iteration<=$self->nh);
     $self->_nhActual($n);
     $self->_epsL($epsA*$fn/$u);
     return $self->epsL;

@@ -7,6 +7,7 @@ build_requires:
   IO::Handle: '0'
   IPC::Open3: '0'
   Test::More: '0'
+  WordList::Char::Latin1::UpperCaseLetter: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
@@ -19,13 +20,14 @@ name: WordListRole-BinarySearch
 requires:
   File::SortedSeek::PERLANCAR: '0'
   Role::Tiny: '0'
+  perl: '5.010001'
   strict: '0'
   warnings: '0'
 resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=WordListRole-BinarySearch
   homepage: https://metacpan.org/release/WordListRole-BinarySearch
   repository: git://github.com/perlancar/perl-WordListRole-BinarySearch.git
-version: '0.005'
+version: '0.006'
 x_Dist_Zilla:
   perl:
     version: '5.030002'
@@ -390,6 +392,14 @@ x_Dist_Zilla:
           phase: develop
           type: x_spec
       name: DevelopX_spec
+      version: '6.014'
+    -
+      class: Dist::Zilla::Plugin::Prereqs
+      config:
+        Dist::Zilla::Plugin::Prereqs:
+          phase: test
+          type: requires
+      name: TestRequires
       version: '6.014'
     -
       class: Dist::Zilla::Plugin::FinderCode

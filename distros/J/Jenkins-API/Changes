@@ -1,5 +1,14 @@
 Revision history for Jenkins-API
 
+0.18      2021-05-22 08:50:23+01:00 Europe/London
+
+        Remove leftover trailing spaces
+        Fix indentation at some places
+        Use HTTP status code constants and numeric comparison
+        Increase test coverage
+        Use delegation in Moo
+        Add new method 'response_header' to access 'Location' after 'trigger_build_with_parameters'
+
 0.17      2017-10-21 08:05:34+01:00 Europe/London
 
           Bumped Test2::Suite version to prevent test fail

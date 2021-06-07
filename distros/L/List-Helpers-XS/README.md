@@ -133,12 +133,12 @@ The benchmark results for "shuffle"
 
 ```
                             shuffle_huge_array  List::Helpers::XS::shuffle
-shuffle_huge_array                          --                         -7%
-List::Helpers::XS::shuffle                  7%                          --
+shuffle_huge_array                          --                         -5%
+List::Helpers::XS::shuffle                  5%                          --
 
                             shuffle_array  List::Helpers::XS::shuffle
-shuffle_array                          --                         -8%
-List::Helpers::XS::shuffle             8%                          --
+shuffle_array                          --                         -4%
+List::Helpers::XS::shuffle             4%                          --
 
                             List::Util::shuffle  List::Helpers::XS::shuffle
 List::Util::shuffle                          --                        -63%

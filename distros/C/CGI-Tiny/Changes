@@ -1,3 +1,22 @@
+1.000     2021-05-30 17:09:42 EDT
+  - Remove experimental status
+
+0.020     2021-05-30 00:05:56 EDT
+  - Replace set_discard_form_files method with more generic set_multipart_form_options
+  - Improved test coverage
+
+0.019     2021-05-25 23:52:51 EDT
+  - Add params, param_names, param, and param_array general request parameter accessors
+  - Add on_file_buffer callback option to CGI::Tiny::Multipart::parse_multipart_form_data for custom form parsing
+  - Rename tempfiles option to parse_as_files for CGI::Tiny::Multipart::parse_multipart_form_data
+
+0.018     2021-05-19 18:12:06 EDT
+  - CGI::Tiny::Multipart::parse_multipart_form_data now takes a single tempfiles option instead of all_tempfiles and no_tempfiles
+
+0.017     2021-05-19 01:41:51 EDT
+  - Split multipart/form-data parser into CGI::Tiny::Multipart module, which is reusable and only loaded if needed
+  - Add set_discard_form_files method
+
 0.016     2021-05-05 21:31:12 EDT
   - Add CGI::Tiny::escape_html convenience function
 

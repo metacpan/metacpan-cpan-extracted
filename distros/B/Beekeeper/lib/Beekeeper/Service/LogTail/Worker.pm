@@ -3,34 +3,9 @@ package Beekeeper::Service::LogTail::Worker;
 use strict;
 use warnings;
 
-our $VERSION = '0.01';
+our $VERSION = '0.04';
 
-=head1 NAME
-
-Beekeeper::Service::LogTail::Worker - Buffer log entries
-
-=head1 VERSION
-
-Version 0.01
-
-=head1 SYNOPSIS
-
-=head1 DESCRIPTION
-
-By default all workers use a C<Beekeeper::Logger> logger which logs errors and
-warnings both to files and to a topic C</topic/log> on the message bus.
-
-This worker keeps an in memory buffer of every log entry sent to that topic in
-every broker in a logical message bus.
-
-=head1 METHODS
-
-=head3 tail ( %filters )
-
-Returns all buffered entries that match the filter criteria.
-
-=cut
-
+use AnyEvent::Impl::Perl;
 use Beekeeper::Worker ':log';
 use base 'Beekeeper::Worker';
 
@@ -43,9 +18,9 @@ my @Log_buffer;
 sub authorize_request {
     my ($self, $req) = @_;
 
-    return unless $req->has_auth_tokens('BKPR_ADMIN');
+    return unless $self->__has_authorization_token('BKPR_ADMIN');
 
-    return REQUEST_AUTHORIZED;
+    return BKPR_REQUEST_AUTHORIZED;
 }
 
 sub on_startup {
@@ -55,7 +30,7 @@ sub on_startup {
 
     $self->_connect_to_all_brokers;
 
-    $self->accept_jobs(
+    $self->accept_remote_calls(
         '_bkpr.logtail.tail' => 'tail',
     );
 }
@@ -65,13 +40,13 @@ sub _connect_to_all_brokers {
     weaken($self);
 
     my $own_bus = $self->{_BUS};
-    my $cluster_config = Beekeeper::Config->get_cluster_config( bus_id => $own_bus->bus_id );
+    my $group_config = Beekeeper::Config->get_bus_group_config( bus_id => $own_bus->bus_id );
 
-    $self->{_CLUSTER} = [];
+    $self->{_BUS_GROUP} = [];
 
-    foreach my $config (@$cluster_config) {
+    foreach my $config (@$group_config) {
 
-        my $bus_id = $config->{'bus-id'};
+        my $bus_id = $config->{'bus_id'};
 
         if ($bus_id eq $own_bus->bus_id) {
             # Already connected to our own bus
@@ -79,7 +54,7 @@ sub _connect_to_all_brokers {
             next;
         }
 
-        my $bus; $bus = Beekeeper::Bus::STOMP->new( 
+        my $bus; $bus = Beekeeper::MQTT->new( 
             %$config,
             bus_id     => $bus_id,
             timeout    => 300,
@@ -99,7 +74,7 @@ sub _connect_to_all_brokers {
             },
         );
 
-        push @{$self->{_CLUSTER}}, $bus;
+        push @{$self->{_BUS_GROUP}}, $bus;
 
         $bus->connect;
     }
@@ -109,11 +84,11 @@ sub _collect_log {
     my ($self, $bus) = @_;
     weaken($self);
 
-    # Default logger logs to topics /topic/log.$level.$service
+    # Default logger logs to topic log/$level/$service
 
     $bus->subscribe(
-        destination    => "/topic/log.#",
-        on_receive_msg => sub {
+        topic      => "log/#",
+        on_publish => sub {
             my ($body_ref, $msg_headers) = @_;
 
             my $req = decode_json($$body_ref);
@@ -132,10 +107,10 @@ sub _collect_log {
 sub on_shutdown {
     my ($self, %args) = @_;
 
-     foreach my $bus (@{$self->{_CLUSTER}}) {
+     foreach my $bus (@{$self->{_BUS_GROUP}}) {
 
         next unless ($bus->{is_connected});
-        $bus->disconnect( blocking => 1 );
+        $bus->disconnect;
     }
 }
 
@@ -190,7 +165,39 @@ sub tail {
 
 1;
 
+__END__
+
+=pod
+
 =encoding utf8
+
+=head1 NAME
+
+Beekeeper::Service::LogTail::Worker - Buffer log entries
+
+=head1 VERSION
+
+Version 0.04
+
+=head1 SYNOPSIS
+
+=head1 DESCRIPTION
+
+By default all workers use a C<Beekeeper::Logger> logger which logs errors and
+warnings both to files and to a topic C<log/{level}/{service}> on the message bus.
+
+This worker keeps an in-memory buffer of every log entry sent to that topic in
+every broker in a logical message bus.
+
+Please note that receiving all log traffic on a single process does not scale
+at all, so a better strategy will be needed for inspecting logs of big real world
+applications.
+
+=head1 METHODS
+
+=head3 tail ( %filters )
+
+Returns all buffered entries that match the filter criteria.
 
 =head1 AUTHOR
 
@@ -198,7 +205,7 @@ José Micó, C<jose.mico@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright 2015 José Micó.
+Copyright 2015-2021 José Micó.
 
 This is free software; you can redistribute it and/or modify it under the same 
 terms as the Perl 5 programming language itself.

@@ -7,10 +7,11 @@ dist\.ini
 ^Build$
 ^MYMETA\.(?:json|yml)$
 ^\.git/
+^\.build/
 ^\.gitignore$
 doc/fedora-build-deps.md
 doc/RELEASING
-^Term-CLI-\d+\.\d/
+^Term-CLI-\d+\.\d+/
 ^Term-CLI-\d+\.\d+\.tar\.gz$
 pm_to_blib
 ^_build/

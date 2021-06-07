@@ -15,7 +15,7 @@ use List::Util qw/ first /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v0.3.2';
+our $VERSION = 'v0.3.3';
 
 
 sub exe {
@@ -40,7 +40,7 @@ Alien::TidyHTML5 - Download and install HTML Tidy
 
 =head1 VERSION
 
-version v0.3.2
+version v0.3.3
 
 =head1 DESCRIPTION
 
@@ -64,6 +64,16 @@ the path to the executable.
 L<http://www.html-tidy.org/>
 
 L<Alien::Build::Manual::AlienUser>
+
+=head2 Other CPAN Modules
+
+L<HTML::Tidy5> uses the the tidy library, but may not work well with
+this installation. You may want to use L<HTML::T5> as an alternative.
+
+L<HTML::Valid> includes a version of the tidy library as part of the
+distribution.
+
+L<HTML::Tidy> uses an older (pre-HTML5) version of the tidy library.
 
 =head1 SOURCE
 
@@ -104,7 +114,7 @@ Graham Ollis <plicease@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018,2020 by Robert Rothenberg.
+This software is Copyright (c) 2018-2021 by Robert Rothenberg.
 
 This is free software, licensed under:
 

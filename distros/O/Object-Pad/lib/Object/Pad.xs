@@ -8,6 +8,8 @@
 #include "perl.h"
 #include "XSUB.h"
 
+#include "XSParseKeyword.h"
+
 #include "XSParseSublike.h"
 
 #include "perl-backcompat.c.inc"
@@ -16,18 +18,12 @@
 #  include "DMD_helper.h"
 #endif
 
-#ifndef wrap_keyword_plugin
-#  include "wrap_keyword_plugin.c.inc"
-#endif
-
 #if HAVE_PERL_VERSION(5, 26, 0)
 #  define HAVE_PARSE_SUBSIGNATURE
 #  define HAVE_OP_ARGCHECK
 #endif
 
 #include "perl-additions.c.inc"
-
-#include "lexer-additions.c.inc"
 
 /********************************
  * Some handy utility functions *
@@ -269,6 +265,16 @@ struct AttributeDefinition {
   AttributeHandler *apply;
   void *applydata;
 };
+
+#define lex_consume_unichar(c)  MY_lex_consume_unichar(aTHX_ c)
+static bool MY_lex_consume_unichar(pTHX_ U32 c)
+{
+  if(lex_peek_unichar(0) != c)
+    return FALSE;
+
+  lex_read_unichar(0);
+  return TRUE;
+}
 
 /*********************************
  * Class and Slot Implementation *
@@ -1767,34 +1773,31 @@ static struct AttributeDefinition method_attributes[] = {
  * Custom Keywords *
  *******************/
 
-static int keyword_classlike(pTHX_ enum MetaType type, OP **op_ptr)
+static int build_classlike(pTHX_ OP **out, XSParseKeywordPiece *args[], size_t nargs, void *hookdata)
 {
-  lex_read_space(0);
+  int argi = 0;
 
-  SV *packagename = lex_scan_packagename();
-  if(!packagename)
-    croak("Expected 'class' to be followed by package name");
+  SV *packagename = args[argi++]->sv;
 
-  lex_read_space(0);
-  SV *packagever = lex_scan_version(PARSE_OPTIONAL);
-  lex_read_space(0);
+  enum MetaType type = (enum MetaType)hookdata;
+
+  SV *packagever = args[argi++]->sv;
 
   SV *superclassname = NULL;
 
-  if(lex_consume("extends")) {
+  if(args[argi++]->i) {
+    /* extends */
     if(type != METATYPE_CLASS)
       croak("Only a class may extend another");
 
     if(superclassname)
       croak("Multiple superclasses are not currently supported");
 
-    lex_read_space(0);
-    superclassname = lex_scan_packagename();
+    superclassname = args[argi++]->sv;
     if(!superclassname)
       croak("Expected a superclass name after 'extends'");
 
-    lex_read_space(0);
-    SV *superclassver = lex_scan_version(PARSE_OPTIONAL);
+    SV *superclassver = args[argi++]->sv;
 
     HV *superstash = gv_stashsv(superclassname, 0);
     if(!superstash || !hv_fetchs(superstash, "new", 0)) {
@@ -1813,18 +1816,17 @@ static int keyword_classlike(pTHX_ enum MetaType type, OP **op_ptr)
 
   ClassMeta *meta = mop_create_class(type, packagename, superclassname);
 
-  while(1) {
-    lex_read_space(0);
-
-    if(lex_consume("implements")) {
-      while(1) {
-        lex_read_space(0);
-        SV *rolename = lex_scan_packagename();
+  int nimplements = args[argi++]->i;
+  if(nimplements) {
+    int i;
+    for(i = 0; i < nimplements; i++) {
+      int nroles = args[argi++]->i;
+      while(nroles--) {
+        SV *rolename = args[argi++]->sv;
         if(!rolename)
           croak("Expected a role name after 'implements'");
 
-        lex_read_space(0);
-        SV *rolever = lex_scan_version(PARSE_OPTIONAL);
+        SV *rolever = args[argi++]->sv;
 
         HV *rolestash = gv_stashsv(rolename, 0);
         if(!rolestash || !hv_fetchs(rolestash, "META", 0)) {
@@ -1848,54 +1850,49 @@ static int keyword_classlike(pTHX_ enum MetaType type, OP **op_ptr)
           croak("%" SVf " is not a role", SVfARG(rolename));
 
         mop_class_compose_role(meta, rolemeta);
-
-        if(!lex_consume(","))
-          break;
       }
     }
-
-    else
-      break;
   }
 
   if(superclassname)
     SvREFCNT_dec(superclassname);
 
-  if(lex_consume(":")) {
-    SV *attr = newSV(0), *val = newSV(0);
-    SAVEFREESV(attr); SAVEFREESV(val);
-
-    while(lex_scan_attrval_into(attr, val)) {
-      lex_read_space(0);
+  int nattrs = args[argi++]->i;
+  if(nattrs) {
+    int i;
+    for(i = 0; i < nattrs; i++) {
+      SV *attrname = args[argi]->attr.name;
+      SV *attrval  = args[argi]->attr.value;
 
       struct AttributeDefinition *def;
       for(def = class_attributes; def->attrname; def++) {
-        if(!strEQ(SvPVX(attr), def->attrname))
+        if(!strEQ(SvPVX(attrname), def->attrname))
           continue;
 
-        (*def->apply)(aTHX_ meta, SvPOK(val) ? SvPVX(val) : NULL, def->applydata);
+        (*def->apply)(aTHX_ meta, SvPOK(attrval) ? SvPVX(attrval) : NULL, def->applydata);
 
         goto done;
       }
 
-      croak("Unrecognised class attribute :%" SVf, SVfARG(attr));
+      croak("Unrecognised class attribute :%" SVf, SVfARG(attrname));
 
 done:
-      /* Accept additional colons to prefix additional attrs */
-      if(lex_peek_unichar(0) == ':') {
-        lex_read_unichar(0);
-        lex_read_space(0);
-      }
+      argi++;
     }
   }
 
+  /* At this point XS::Parse::Keyword has parsed all it can. From here we will
+   * take over to perform the odd "block or statement" behaviour of `class`
+   * keywords
+   */
+
   bool is_block;
 
-  if(lex_consume("{")) {
+  if(lex_consume_unichar('{')) {
     is_block = true;
     ENTER;
   }
-  else if(lex_consume(";")) {
+  else if(lex_consume_unichar(';')) {
     is_block = false;
   }
   else
@@ -1940,7 +1937,7 @@ done:
     OP *body = parse_stmtseq(0);
     body = block_end(save_ix, body);
 
-    if(!lex_consume("}"))
+    if(!lex_consume_unichar('}'))
       croak("Expected }");
 
     mop_class_seal(meta);
@@ -1949,7 +1946,9 @@ done:
 
     /* CARGOCULT from perl/perly.y:PACKAGE BAREWORD BAREWORD '{' */
     /* a block is a loop that happens once */
-    *op_ptr = newWHILEOP(0, 1, NULL, NULL, body, NULL, 0);
+    *out = op_append_elem(OP_LINESEQ,
+      newWHILEOP(0, 1, NULL, NULL, body, NULL, 0),
+      newSVOP(OP_CONST, 0, &PL_sv_yes));
     return KEYWORD_PLUGIN_STMT;
   }
   else {
@@ -1958,46 +1957,65 @@ done:
     SAVEHINTS();
     compclassmeta_set(meta);
 
-    *op_ptr = newOP(OP_NULL, 0);
+    *out = newSVOP(OP_CONST, 0, &PL_sv_yes);
     return KEYWORD_PLUGIN_STMT;
   }
 }
 
-static int keyword_has(pTHX_ OP **op_ptr)
+static const struct XSParseKeywordPieceType pieces_classlike[] = {
+  XPK_PACKAGENAME,
+  XPK_VSTRING_OPT,
+  XPK_OPTIONAL( XPK_LITERAL("extends"), XPK_PACKAGENAME, XPK_VSTRING_OPT ),
+  /* This should really a repeated (tagged?) choice of a number of things, but
+   * right now there's only one thing permitted here anyway
+   */
+  XPK_REPEATED(
+    XPK_LITERAL("implements"), XPK_COMMALIST( XPK_PACKAGENAME, XPK_VSTRING_OPT )
+  ),
+  XPK_ATTRIBUTES,
+  {0}
+};
+
+static const struct XSParseKeywordHooks kwhooks_class = {
+  .permit_hintkey = "Object::Pad/class",
+  .pieces = pieces_classlike,
+  .build = &build_classlike,
+};
+static const struct XSParseKeywordHooks kwhooks_role = {
+  .permit_hintkey = "Object::Pad/role",
+  .pieces = pieces_classlike,
+  .build = &build_classlike,
+};
+
+static void check_has(pTHX_ void *hookdata)
 {
   if(!have_compclassmeta)
     croak("Cannot 'has' outside of 'class'");
 
   if(compclassmeta->role_is_invokable)
     croak("Cannot add slot data to an invokable role");
+}
 
-  lex_read_space(0);
-  SV *name = lex_scan_lexvar();
-  if(!name)
-    croak("Expected a slot name");
+static int build_has(pTHX_ OP **out, XSParseKeywordPiece *args[], size_t nargs, void *hookdata)
+{
+  int argi = 0;
 
-  ENTER;
+  SV *name = args[argi++]->sv;
 
   SlotMeta *slotmeta = mop_class_add_slot(compclassmeta, name);
   SvREFCNT_dec(name);
 
-  lex_read_space(0);
-
-  if(lex_peek_unichar(0) == ':') {
-    lex_read_unichar(0);
-    lex_read_space(0);
-
+  int nattrs = args[argi++]->i;
+  if(nattrs) {
     SV *slotmetasv = newSV(0);
     sv_setref_uv(slotmetasv, "Object::Pad::MOP::Slot", PTR2UV(slotmeta));
     SAVEFREESV(slotmetasv);
 
-    SV *attrname = newSV(0), *attrval = newSV(0);
-    SAVEFREESV(attrname); SAVEFREESV(attrval);
-
-    while(lex_scan_attrval_into(attrname, attrval)) {
-      lex_read_space(0);
-
+    while(argi < (nattrs+2)) {
       struct AttributeDefinition *def;
+      SV *attrname = args[argi]->attr.name;
+      SV *attrval  = args[argi]->attr.value;
+
       for(def = slot_attributes; def->attrname; def++) {
         if(!strEQ(SvPVX(attrname), def->attrname))
           continue;
@@ -2010,51 +2028,51 @@ static int keyword_has(pTHX_ OP **op_ptr)
       croak("Unrecognised slot attribute :%" SVf, SVfARG(attrname));
 
 done:
-      /* Accept additional colons to prefix additional attrs */
-      if(lex_peek_unichar(0) == ':') {
-        lex_read_unichar(0);
-        lex_read_space(0);
-      }
+      argi++;
     }
   }
-
-  *op_ptr = NULL;
 
   /* It would be nice to just yield some OP to represent the has slot here
    * and let normal parsing of normal scalar assignment accept it. But we can't
    * because scalar assignment tries to peephole far too deply into us and
    * everything breaks... :/
    */
-  if(lex_peek_unichar(0) == '=') {
-    lex_read_unichar(0);
-    lex_read_space(0);
-
+  bool has_defexpr = args[argi++]->i;
+  if(has_defexpr) {
     if(SvPV_nolen(name)[0] != '$')
       croak("Can only attach a default expression to a 'has' default");
 
-    OP *op = parse_termexpr(0);
+    OP *op = args[argi++]->op;
 
     if(!op || PL_parser->error_count) {
-      LEAVE;
       return 0;
     }
 
-    *op_ptr = newBINOP(OP_SASSIGN, 0,
+    *out = newBINOP(OP_SASSIGN, 0,
       op,
       newSVOP_CUSTOM(&pp_sv, 0, SvREFCNT_inc(slotmeta->defaultsv)));
   }
 
-  if(lex_read_unichar(0) != ';') {
-    croak("Expected default expression or end of statement");
-  }
-
-  if(!*op_ptr)
-    *op_ptr = newOP(OP_NULL, 0);
-
-  LEAVE;
-
   return KEYWORD_PLUGIN_STMT;
 }
+
+static const struct XSParseKeywordHooks kwhooks_has = {
+  .flags = XPK_FLAG_STMT|XPK_FLAG_AUTOSEMI,
+  .permit_hintkey = "Object::Pad/has",
+
+  .check = &check_has,
+
+  .pieces = (const struct XSParseKeywordPieceType []){
+    XPK_LEXVARNAME(XPK_LEXVAR_SCALAR),
+    XPK_ATTRIBUTES,
+    XPK_OPTIONAL(
+      XPK_EQUALS,
+      XPK_TERMEXPR
+    ),
+    {0}
+  },
+  .build = &build_has,
+};
 
 /* We use the method-like keyword parser to parse phaser blocks as well as
  * methods. In order to tell what is going on, hookdata will be an integer
@@ -2369,7 +2387,7 @@ static struct XSParseSublikeHooks parse_BUILD_hooks = {
   .post_newcv      = parse_post_newcv,
 };
 
-static int keyword_BUILD(pTHX_ OP **op_ptr)
+static int parse_BUILD(pTHX_ OP **out, void *hookdata)
 {
   /* For now, `BUILD { ... }` just means the same as `method BUILD { ... }`
    */
@@ -2379,65 +2397,46 @@ static int keyword_BUILD(pTHX_ OP **op_ptr)
   lex_read_space(0);
 
   return xs_parse_sublike(&parse_BUILD_hooks, (void *)PHASER_BUILD,
-    op_ptr);
+    out);
 }
 
-static int keyword_requires(pTHX_ OP **op_ptr)
+static const struct XSParseKeywordHooks kwhooks_BUILD = {
+  .permit_hintkey = "Object::Pad/method",
+  .parse = &parse_BUILD,
+};
+
+static void check_requires(pTHX_ void *hookdata)
 {
   if(!have_compclassmeta)
     croak("Cannot 'requires' outside of 'role'");
 
   if(compclassmeta->type == METATYPE_CLASS)
     croak("A class may not declare required methods");
+}
 
-  lex_read_space(0);
-  SV *mname = lex_scan_ident();
-  if(!mname)
-    croak("Expected a method name");
-
-  if(lex_read_unichar(0) != ';') {
-    croak("Expected end of statement");
-  }
+static int build_requires(pTHX_ OP **out, XSParseKeywordPiece *args[], size_t nargs, void *hookdata)
+{
+  SV *mname = args[0]->sv;
 
   av_push(compclassmeta->requiremethods, mname);
 
-  *op_ptr = newOP(OP_NULL, 0);
+  *out = newOP(OP_NULL, 0);
 
   return KEYWORD_PLUGIN_STMT;
 }
 
-static int (*next_keyword_plugin)(pTHX_ char *, STRLEN, OP **);
+static const struct XSParseKeywordHooks kwhooks_requires = {
+  .flags = XPK_FLAG_STMT|XPK_FLAG_AUTOSEMI,
+  .permit_hintkey = "Object::Pad/requires",
 
-static int my_keyword_plugin(pTHX_ char *kw, STRLEN kwlen, OP **op_ptr)
-{
-  HV *hints = GvHV(PL_hintgv);
+  .check = &check_requires,
 
-  if((PL_parser && PL_parser->error_count) ||
-     !hints)
-    return (*next_keyword_plugin)(aTHX_ kw, kwlen, op_ptr);
-
-  if(kwlen == 5 && strEQ(kw, "class") &&
-      hv_fetchs(hints, "Object::Pad/class", 0))
-    return keyword_classlike(aTHX_ METATYPE_CLASS, op_ptr);
-
-  if(kwlen == 4 && strEQ(kw, "role") &&
-      hv_fetchs(hints, "Object::Pad/role", 0))
-    return keyword_classlike(aTHX_ METATYPE_ROLE, op_ptr);
-
-  if(kwlen == 3 && strEQ(kw, "has") &&
-      hv_fetchs(hints, "Object::Pad/has", 0))
-    return keyword_has(aTHX_ op_ptr);
-
-  if(kwlen == 5 && strEQ(kw, "BUILD") &&
-      hv_fetchs(hints, "Object::Pad/method", 0))
-    return keyword_BUILD(aTHX_ op_ptr);
-
-  if(kwlen == 8 && strEQ(kw, "requires") &&
-      hv_fetchs(hints, "Object::Pad/requires", 0))
-    return keyword_requires(aTHX_ op_ptr);
-
-  return (*next_keyword_plugin)(aTHX_ kw, kwlen, op_ptr);
-}
+  .pieces = (const struct XSParseKeywordPieceType []){
+    XPK_IDENT,
+    {0}
+  },
+  .build = &build_requires,
+};
 
 #ifdef HAVE_DMD_HELPER
 static int dump_slotmeta(pTHX_ const SV *sv, SlotMeta *slotmeta)
@@ -2841,11 +2840,20 @@ BOOT:
   Perl_custom_op_register(aTHX_ &pp_slotpad, &xop_slotpad);
 
   CvLVALUE_on(get_cv("Object::Pad::MOP::Slot::value", 0));
-
-  wrap_keyword_plugin(&my_keyword_plugin, &next_keyword_plugin);
 #ifdef HAVE_DMD_HELPER
   DMD_SET_PACKAGE_HELPER("Object::Pad::MOP::Class", &dumppackage_class);
 #endif
+
+  boot_xs_parse_keyword(0.06);
+
+  register_xs_parse_keyword("class", &kwhooks_class, (void *)METATYPE_CLASS);
+  register_xs_parse_keyword("role",  &kwhooks_role,  (void *)METATYPE_ROLE);
+
+  register_xs_parse_keyword("has", &kwhooks_has, NULL);
+
+  register_xs_parse_keyword("BUILD", &kwhooks_BUILD, NULL);
+
+  register_xs_parse_keyword("requires", &kwhooks_requires, NULL);
 
   boot_xs_parse_sublike(0.10); /* hookdata */
 

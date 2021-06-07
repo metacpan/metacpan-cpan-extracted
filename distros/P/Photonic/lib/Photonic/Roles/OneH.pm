@@ -1,5 +1,5 @@
 package Photonic::Roles::OneH;
-$Photonic::Roles::OneH::VERSION = '0.015';
+$Photonic::Roles::OneH::VERSION = '0.016';
 
 =encoding UTF-8
 
@@ -9,7 +9,7 @@ Photonic::Roles::OneH
 
 =head1 VERSION
 
-version 0.015
+version 0.016
 
 =head1 COPYRIGHT NOTICE
 
@@ -56,7 +56,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA  02110-1301 USA
 =item (for developers)
 
     package Photonic::LE::NR2::OneH.pm;
-    $Photonic::LE::NR2::OneH::VERSION= '0.015';
+    $Photonic::LE::NR2::OneH::VERSION= '0.016';
     use namespace::autoclean;
     use Moose;
     has...
@@ -82,7 +82,7 @@ smallness parameter  $s.
 
 =back
 
-=head1 ACCESORS (read only)
+=head1 ACCESSORS (read only)
 
 =over 4
 
@@ -136,12 +136,8 @@ next_b2, next_state, shifting the current values where necessary. Returns
 use Moose::Role;
 
 use PDL::Lite;
-use PDL::NiceSlice;
-use PDL::FFTW3;
 use PDL::Complex;
-use List::Util;
-use Carp;
-#use Photonic::Types;
+use Photonic::Types;
 use Moose::Util::TypeConstraints;
 
 requires
@@ -151,13 +147,13 @@ requires
     'magnitude', #magnitude of a state
     'complexCoeffs', #Haydock coefficients are complex
     'changesign'; #change sign of $b2
-has 'firstState' =>(is=>'ro', isa=>'PDL::Complex', lazy=>1,
+has 'firstState' =>(is=>'ro', isa=>'Photonic::Types::PDLComplex', lazy=>1,
 		    builder=>'_firstState');
-has 'previousState' =>(is=>'ro', isa=>'PDL::Complex', writer=>'_previousState',
+has 'previousState' =>(is=>'ro', isa=>'Photonic::Types::PDLComplex', writer=>'_previousState',
     init_arg=>undef);
-has 'currentState' => (is=>'ro', isa=>'PDL::Complex', writer=>'_currentState',
-      lazy=>1, init_arg=>undef,  default=>sub {0+i*0});
-has 'nextState' =>(is=>'ro', isa=>maybe_type('PDL::Complex'),
+has 'currentState' => (is=>'ro', isa=>'Photonic::Types::PDLComplex', writer=>'_currentState',
+      lazy=>1, init_arg=>undef,  default=>sub {PDL::r2C(0)});
+has 'nextState' =>(is=>'ro', isa=>maybe_type('Photonic::Types::PDLComplex'),
 		   writer=>'_nextState',  lazy=>1,
 		   builder=>'_firstRState', init_arg=>undef);
 has 'current_a' => (is=>'ro', writer=>'_current_a',  init_arg=>undef);
@@ -223,7 +219,7 @@ sub _iterate_indeed {
     my $c_np1=$g_np1*$g_n*$b_np1;
     my $bc_np1=$g_np1*$g_n*$b2_np1;
     my $psi_np1;
-    $psi_np1=$bpsi_np1/$b_np1 unless $b2_np1->abs<=$self->smallH;
+    $psi_np1=$bpsi_np1/$b_np1 unless PDL::all($b2_np1->abs<=$self->smallH);
     #save values
     $self->_current_a($self->_coerce($a_n));
     $self->_next_b2($self->_coerce($b2_np1));
@@ -251,8 +247,6 @@ sub _firstRState {
     $self->_next_g($g);
     return $phi; #goes into _nextState
 }
-
-
 
 sub _coerce {
     my $self=shift;

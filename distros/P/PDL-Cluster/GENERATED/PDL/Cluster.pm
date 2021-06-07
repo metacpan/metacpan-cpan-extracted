@@ -13,7 +13,7 @@ use DynaLoader;
 
 
 
-   $PDL::Cluster::VERSION = '1.54.001';
+   $PDL::Cluster::VERSION = '1.54.002';
    @ISA    = ( 'PDL::Exporter','DynaLoader' );
    push @PDL::Core::PP, __PACKAGE__;
    bootstrap PDL::Cluster $VERSION;
@@ -27,7 +27,7 @@ use DynaLoader;
 # Author: Bryan Jurish <moocow@cpan.org>
 # Description: PDL wrappers for the C Clustering library.
 #
-# Copyright (c) 2005-2018 Bryan Jurish. All rights reserved.
+# Copyright (c) 2005-2021 Bryan Jurish. All rights reserved.
 # This program is free software.  You may modify and/or
 # distribute it under the same terms as Perl itself.
 #

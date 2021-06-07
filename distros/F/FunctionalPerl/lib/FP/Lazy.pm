@@ -88,9 +88,9 @@ FP::Lazy - lazy evaluation (delayed evaluation, promises)
     };
     like $@, qr/^Illegal division by zero/;
 
-    # Calling methods on promises will automatically force them, which
-    # is normally necessary since there's no way to know the class of
-    # the object otherwise:
+    # Calling methods on those promises will automatically force them,
+    # which is normally necessary since there's no way to know the
+    # class of the object otherwise:
     use FP::Lazy qw(is_forced);
     {
         my $l = lazy { cons(1, null) };
@@ -117,6 +117,47 @@ FP::Lazy - lazy evaluation (delayed evaluation, promises)
         ok !is_forced($l);
     }
 
+    # And `lazyT_if` which is the conditional variant:
+    sub typed_condprom {
+        my ($cond) = @_;
+        lazyT_if { list(1 / 0) } "FP::List::List", $cond
+    }
+    ok is_promise(typed_condprom 1);
+    eval {
+        # immediate division by zero exception (still pays
+        # the overhead of two subroutine calls, though)
+        typed_condprom 0
+    };
+    like $@, qr/^Illegal division by zero/;
+
+    # A `lazyLight` promise is re-evaluated on every access:
+    my $z = 0;
+    my $v = lazyLight { $z++; 3*4 };
+    is force($v), 12;
+    is $z, 1;
+    is force($v), 12;
+    is $z, 2;
+
+    # There are 3 possible motivations for lazyLight: (1) lower
+    # allocation cost (save the wrapper data structure); (2) no risk
+    # for circular references (due to storing the result back into the
+    # wrapper (mutation) that can be used recursively); (3) to get
+    # fresh re-evaluation on every access and thus picking up any
+    # potential side effect.
+
+    # Arguably (3) is against the functional programming idea, and is
+    # a bit of a mis-use of lazyLight. For now, FP::TransparentLazy
+    # still helps this case by not using `FORCE` automatically. (TODO:
+    # provide another type that provides this with a guarantee?)
+
+    # Note that manual use of `FORCE` still stops the re-evalution:
+
+    ok ref $v;
+    is FORCE($v), 12;
+    is $z, 3;
+    is force($v), 12;
+    is $z, 3; # you can see that re-evaluation has stopped
+    ok not ref $v;
 
 =head1 DESCRIPTION
 
@@ -210,7 +251,9 @@ Alternative Scalar::Defer?
 
 L<FP::TransparentLazy>
 
-L<FP::Mixin::Utils> -- Lazy implements this as a fallback (lower priority than forcing the promise and finding the method on the result)
+L<FP::Mixin::Utils> -- Lazy implements this as a fallback (lower
+priority than forcing the promise and finding the method on the
+result)
 
 =head1 NOTE
 
@@ -225,7 +268,7 @@ use warnings;
 use warnings FATAL => 'uninitialized';
 use Exporter "import";
 
-our @EXPORT      = qw(lazy lazyT lazy_if lazyLight force FORCE is_promise);
+our @EXPORT = qw(lazy lazyT lazy_if lazyT_if lazyLight force FORCE is_promise);
 our @EXPORT_OK   = qw(delay force_noeval lazy_backtrace is_forced);
 our %EXPORT_TAGS = (all => [@EXPORT, @EXPORT_OK]);
 
@@ -234,6 +277,7 @@ use FP::Carp;
 use FP::Mixin::Utils;
 use FP::Show;
 use Scalar::Util 'blessed';
+use FP::Docstring;
 
 our $eager = ($ENV{DEBUG_FP_LAZY} and $ENV{DEBUG_FP_LAZY} =~ /^eager$/i);
 our $debug = $ENV{DEBUG_FP_LAZY} ? (not $eager) : '';
@@ -276,6 +320,7 @@ sub lazy_backtrace {    # not a method to avoid shadowing any
 }
 
 sub lazy (&) {
+    __ '`lazy { expr }`: evaluate expr only when forced via `force`';
     $eager ? goto $_[0]
         : $debug
         ? bless([$_[0], undef, undef, FP::Repl::Stack->get(1)->backtrace],
@@ -284,6 +329,8 @@ sub lazy (&) {
 }
 
 sub lazyT (&$) {
+    __ '`lazyT { expr } $classname`: expr must return an object that
+        satisfies ->isa($classname)';
     $eager ? goto $_[0] : bless [
         $_[0], undef,
         $_[1], $debug ? FP::Repl::Stack->get(1)->backtrace : ()
@@ -292,6 +339,8 @@ sub lazyT (&$) {
 }
 
 sub lazy_if (&$) {
+    __ '`lazy_if { expr } $boolean`: evaluate expr immediately if
+       $boolean is false, lazily otherwise';
     (
         ($_[1] and not $eager)
         ? (
@@ -305,6 +354,23 @@ sub lazy_if (&$) {
             @_ = ();
             goto $thunk;
         }
+    )
+}
+
+sub lazyT_if (&$$) {
+    __ '`lazyT_if { expr } $classname, $boolean`: expr must return an
+        object that satisfies ->isa($classname); eager unless $boolean
+        is true.';
+    (
+        ($_[2] and not $eager)
+        ? (
+            bless [
+                $_[0], undef,
+                $_[1], $debug ? FP::Repl::Stack->get(1)->backtrace : ()
+            ],
+            "FP::Lazy::Promise"
+            )
+        : goto $_[0]
     )
 }
 
@@ -324,6 +390,7 @@ sub delay (&);
 sub delayLight (&);
 *delayLight = \&lazyLight;
 
+# (NOTE: there is a COPY-PASTE of this in TransparentLazy)
 sub die_type_error {
     my ($expected, $gotstr, $v) = @_;
     die "promise expected to evaluate to an object "
@@ -336,11 +403,14 @@ sub force {
     my ($perhaps_promise, $nocache) = @_;
 LP: {
         if (defined blessed($perhaps_promise)) {
-            if ($perhaps_promise->isa("FP::Lazy::PromiseLight")) {
+            if ($perhaps_promise->isa("FP::Lazy::PromiseLightBase")) {
                 $perhaps_promise = &$perhaps_promise;
                 redo LP;
             } elsif ($perhaps_promise->isa("FP::Lazy::Promise")) {
-                if (my $thunk = $$perhaps_promise[0]) {
+
+                # NOTE: there is a COPY-PASTE of this part in
+                # TransparentLazy!
+                if (defined(my $thunk = $$perhaps_promise[0])) {
                     my $v = force(&$thunk(), $nocache);
                     if ($$perhaps_promise[2]) {
 
@@ -577,10 +647,11 @@ package FP::Lazy::Promise {
 
 my $lazyLight_thunk_show = subprefix_to_show_coderef("lazyLight ");
 
-package FP::Lazy::PromiseLight {
-    our @ISA = qw(FP::Lazy::AnyPromise);
+package FP::Lazy::PromiseLightBase {
 
-    use overload FP::Lazy::overloads(0);
+    # Things shared with FP::TransparentLazy::PromiseLight
+
+    our @ISA = qw(FP::Lazy::AnyPromise);
 
     sub FP_Lazy_is_forced {
         0
@@ -632,6 +703,11 @@ package FP::Lazy::PromiseLight {
             # except if using a different implementation when $debug
             # is on
     }
+}
+
+package FP::Lazy::PromiseLight {
+    our @ISA = qw(FP::Lazy::PromiseLightBase);
+    use overload FP::Lazy::overloads(0);
 }
 
 1

@@ -11,7 +11,7 @@ sub uppercase {
 
     my $client = Beekeeper::Client->instance;
 
-    my $resp = $client->do_job(
+    my $resp = $client->call_remote(
         method => 'myapp.str.uc',
         params => { string => $str },
     );

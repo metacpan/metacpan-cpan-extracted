@@ -1,3 +1,14 @@
+0.003   2021-05-20  Released-By: PERLANCAR; Urgency: medium
+
+	- [ux] Generate a more useful/compact comment depending on the
+	  object's ability.
+
+
+0.002   2021-05-18  Released-By: PERLANCAR; Urgency: medium
+
+	- Use apply_roles() in generated sample code.
+
+
 0.001   2021-05-11  Released-By: PERLANCAR
 
         - First release.

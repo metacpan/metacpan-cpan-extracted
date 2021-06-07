@@ -1,3 +1,4 @@
+use v5;
 use strict;
 use warnings;
 
@@ -9,6 +10,8 @@ my $build = Module::Build->new(
       'IO::Async' => '0.24',
       'Linux::Epoll' => '0.005',
       'Struct::Dumb' => 0,
+
+      'perl' => '5.014',
    },
    configure_requires => {
       'Module::Build' => '0.4004',  # test_requires

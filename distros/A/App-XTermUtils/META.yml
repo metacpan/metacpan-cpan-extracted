@@ -17,19 +17,19 @@ meta-spec:
   version: '1.4'
 name: App-XTermUtils
 requires:
-  Data::Sah::Coerce::perl::str::str_rgb24_from_colorname_X_or_code: '0'
+  Data::Sah::Coerce::perl::To_str::From_str::rgb24_from_colorname_X_or_code: '0'
   Data::Sah::Compiler::perl::TH::bool: '0'
   Data::Sah::Compiler::perl::TH::str: '0'
   Perinci::CmdLine::Any: '0'
-  Perinci::CmdLine::Lite: '1.820'
+  Perinci::CmdLine::Lite: '1.827'
   Sah::Schema::color::rgb24: '0'
   Sah::Schema::true: '0'
   XTerm::Util: '0.006'
 resources:
-  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-XTermUtils
+  bugtracker: https://github.com/perlancar/perl-App-XTermUtils/issues
   homepage: https://metacpan.org/release/App-XTermUtils
   repository: git://github.com/perlancar/perl-App-XTermUtils.git
-version: '0.006'
+version: '0.007'
 x_Dist_Zilla:
   perl:
     version: '5.030000'
@@ -37,39 +37,43 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::GenPericmdScript
       name: 'GenPericmdScript get-term-bgcolor'
-      version: '0.421'
+      version: '0.423'
     -
       class: Dist::Zilla::Plugin::GenPericmdScript
       name: 'GenPericmdScript get-term-fgcolor'
-      version: '0.421'
+      version: '0.423'
     -
       class: Dist::Zilla::Plugin::GenPericmdScript
       name: 'GenPericmdScript set-term-bgcolor'
-      version: '0.421'
+      version: '0.423'
     -
       class: Dist::Zilla::Plugin::GenPericmdScript
       name: 'GenPericmdScript set-term-fgcolor'
-      version: '0.421'
+      version: '0.423'
     -
       class: Dist::Zilla::Plugin::GenPericmdScript
       name: 'GenPericmdScript term-bgcolor-is-dark'
-      version: '0.421'
+      version: '0.423'
     -
       class: Dist::Zilla::Plugin::GenPericmdScript
       name: 'GenPericmdScript term-bgcolor-is-light'
-      version: '0.421'
+      version: '0.423'
     -
       class: Dist::Zilla::Plugin::GenPericmdScript
       name: 'GenPericmdScript term-fgcolor-is-dark'
-      version: '0.421'
+      version: '0.423'
     -
       class: Dist::Zilla::Plugin::GenPericmdScript
       name: 'GenPericmdScript term-fgcolor-is-light'
-      version: '0.421'
+      version: '0.423'
     -
       class: Dist::Zilla::Plugin::InsertExecsList
       name: InsertExecsList
       version: '0.02'
+    -
+      class: Dist::Zilla::Plugin::PERLANCAR::CheckPendingRelease
+      name: '@Author::PERLANCAR/PERLANCAR::CheckPendingRelease'
+      version: '0.001'
     -
       class: Dist::Zilla::Plugin::GatherDir
       config:
@@ -135,17 +139,13 @@ x_Dist_Zilla:
       name: '@Author::PERLANCAR/@Filter/ConfirmRelease'
       version: '6.012'
     -
-      class: Dist::Zilla::Plugin::FileFinder::ByName
-      name: '@Author::PERLANCAR/FileFinder::ByName PERLANCAR'
-      version: '6.012'
-    -
       class: Dist::Zilla::Plugin::ExecDir
       name: '@Author::PERLANCAR/ExecDir script'
       version: '6.012'
     -
       class: Dist::Zilla::Plugin::PERLANCAR::BeforeBuild
       name: '@Author::PERLANCAR/PERLANCAR::BeforeBuild'
-      version: '0.599'
+      version: '0.603'
     -
       class: Dist::Zilla::Plugin::Rinci::AbstractFromMeta
       name: '@Author::PERLANCAR/Rinci::AbstractFromMeta'
@@ -161,7 +161,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::PERLANCAR::MetaResources
       name: '@Author::PERLANCAR/PERLANCAR::MetaResources'
-      version: '0.040'
+      version: '0.042'
     -
       class: Dist::Zilla::Plugin::CheckChangeLog
       name: '@Author::PERLANCAR/CheckChangeLog'
@@ -184,11 +184,11 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::CopyrightYearFromGit
       name: '@Author::PERLANCAR/CopyrightYearFromGit'
-      version: '0.003'
+      version: '0.006'
     -
       class: Dist::Zilla::Plugin::IfBuilt
       name: '@Author::PERLANCAR/IfBuilt'
-      version: '0.02'
+      version: '0.03'
     -
       class: Dist::Zilla::Plugin::MetaJSON
       name: '@Author::PERLANCAR/MetaJSON'
@@ -198,9 +198,9 @@ x_Dist_Zilla:
       name: '@Author::PERLANCAR/MetaConfig'
       version: '6.012'
     -
-      class: Dist::Zilla::Plugin::Authority
-      name: '@Author::PERLANCAR/Authority'
-      version: '1.009'
+      class: Dist::Zilla::Plugin::PERLANCAR::Authority
+      name: '@Author::PERLANCAR/PERLANCAR::Authority'
+      version: '0.001'
     -
       class: Dist::Zilla::Plugin::OurDate
       name: '@Author::PERLANCAR/OurDate'
@@ -324,7 +324,7 @@ x_Dist_Zilla:
             -
               class: Pod::Weaver::Plugin::PERLANCAR::SortSections
               name: '@Author::PERLANCAR/PERLANCAR::SortSections'
-              version: '0.06'
+              version: '0.082'
       name: '@Author::PERLANCAR/PodWeaver'
       version: '4.008'
     -
@@ -338,7 +338,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::Rinci::AddPrereqs
       name: '@Author::PERLANCAR/Rinci::AddPrereqs'
-      version: '0.142'
+      version: '0.144'
     -
       class: Dist::Zilla::Plugin::Rinci::AddToDb
       name: '@Author::PERLANCAR/Rinci::AddToDb'
@@ -346,7 +346,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::Rinci::EmbedValidator
       name: '@Author::PERLANCAR/Rinci::EmbedValidator'
-      version: '0.250'
+      version: '0.251'
     -
       class: Dist::Zilla::Plugin::SetScriptShebang
       name: '@Author::PERLANCAR/SetScriptShebang'
@@ -374,9 +374,11 @@ x_Dist_Zilla:
       config:
         Dist::Zilla::Plugin::Test::Perl::Critic::Subset:
           finder:
-            - '@Author::PERLANCAR/FileFinder::ByName PERLANCAR'
+            - ':ExecFiles'
+            - ':InstallModules'
+            - ':TestFiles'
       name: '@Author::PERLANCAR/Test::Perl::Critic::Subset'
-      version: 3.001.003
+      version: 3.001.005
     -
       class: Dist::Zilla::Plugin::Test::Rinci
       name: '@Author::PERLANCAR/Test::Rinci'

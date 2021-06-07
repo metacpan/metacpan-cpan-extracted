@@ -1,3 +1,5 @@
+1.4.2  23.05.2021
+           - add SVAPI for simple and advanced determining of sub call context
 1.4.1  15.05.2021
            - change default order of callbacks in callback dispatcher, normalize method names
 1.4.0  13.05.2021

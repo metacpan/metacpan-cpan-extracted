@@ -78,6 +78,14 @@ sub pp_defc {
   $hash2{GenericTypes} = [map $float2native{$_} || $_, @{$hash{GenericTypes}}];
   $hash2{Code} =~ s/\$GENERIC\(\)/\$TFD(float,double)/g;
   $hash2{Code} =~ s/\$TFD\(/\$TGC(/g;
+  if ($hash2{RedoDimsCode}) {
+    # decrement numbers being compared to, or dims offsets
+    $hash2{RedoDimsCode} =~ s/(>\s*)(\d+)|(\[\s*)(\d+)(\s*\])/
+      $1
+        ? $1.($2 - 1)
+        : $3.($4 - 1).$5
+    /ge;
+  }
   pp_def("__Nc$function", %hash2);
   pp_add_exported("c$function");
   pp_addpm(<<EOF);
@@ -152,7 +160,7 @@ PDL::LinearAlgebra::Complex - PDL interface to the lapack linear algebra program
 =head1 DESCRIPTION
 
 This module provides an interface to parts of the lapack library (complex numbers).
-These routines accept either float or double piddles.
+These routines accept either float or double ndarrays.
 
 EOD
 
@@ -5493,7 +5501,7 @@ pp_def(
 
 =for ref
 
-Combine two 3D piddles into a single piddle.
+Combine two 3D ndarrays into a single ndarray.
 This routine does backward and forward dataflow automatically.
 
 =cut

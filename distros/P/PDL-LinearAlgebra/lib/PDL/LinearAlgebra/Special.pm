@@ -41,7 +41,7 @@ This module provides some constructors of well known matrices.
 
 =for ref
 
-Contruct Hilbert matrix from specifications list or template piddle
+Construct Hilbert matrix from specifications list or template ndarray
 
 =for usage
 
@@ -177,7 +177,7 @@ For complex, needs object of type PDL::Complex.
 
  mhankel(c,r), where c and r are vectors, returns matrix whose first column 
  is c and whose last row is r. The last element of c prevails.
- mhankel(c) returns matrix whith element below skew diagonal (anti-diagonal) equals
+ mhankel(c) returns matrix with element below skew diagonal (anti-diagonal) equals
  to zero. If c is a scalar number, make it from sequence beginning at one.
 
 =for ref

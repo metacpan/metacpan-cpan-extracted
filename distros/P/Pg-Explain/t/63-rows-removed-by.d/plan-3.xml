@@ -1,0 +1,59 @@
+<explain xmlns="http://www.postgresql.org/2009/explain">
+  <Query>
+    <Plan>
+      <Node-Type>Nested Loop</Node-Type>
+      <Parallel-Aware>false</Parallel-Aware>
+      <Async-Capable>false</Async-Capable>
+      <Join-Type>Inner</Join-Type>
+      <Startup-Cost>0.00</Startup-Cost>
+      <Total-Cost>22.92</Total-Cost>
+      <Plan-Rows>132</Plan-Rows>
+      <Plan-Width>523</Plan-Width>
+      <Actual-Startup-Time>0.007</Actual-Startup-Time>
+      <Actual-Total-Time>0.645</Actual-Total-Time>
+      <Actual-Rows>1980</Actual-Rows>
+      <Actual-Loops>1</Actual-Loops>
+      <Inner-Unique>false</Inner-Unique>
+      <Join-Filter>(d.oid &gt; c.oid)</Join-Filter>
+      <Rows-Removed-by-Join-Filter>402</Rows-Removed-by-Join-Filter>
+      <Plans>
+        <Plan>
+          <Node-Type>Seq Scan</Node-Type>
+          <Parent-Relationship>Outer</Parent-Relationship>
+          <Parallel-Aware>false</Parallel-Aware>
+          <Async-Capable>false</Async-Capable>
+          <Relation-Name>pg_database</Relation-Name>
+          <Alias>d</Alias>
+          <Startup-Cost>0.00</Startup-Cost>
+          <Total-Cost>1.01</Total-Cost>
+          <Plan-Rows>1</Plan-Rows>
+          <Plan-Width>258</Plan-Width>
+          <Actual-Startup-Time>0.003</Actual-Startup-Time>
+          <Actual-Total-Time>0.003</Actual-Total-Time>
+          <Actual-Rows>6</Actual-Rows>
+          <Actual-Loops>1</Actual-Loops>
+        </Plan>
+        <Plan>
+          <Node-Type>Seq Scan</Node-Type>
+          <Parent-Relationship>Inner</Parent-Relationship>
+          <Parallel-Aware>false</Parallel-Aware>
+          <Async-Capable>false</Async-Capable>
+          <Relation-Name>pg_class</Relation-Name>
+          <Alias>c</Alias>
+          <Startup-Cost>0.00</Startup-Cost>
+          <Total-Cost>16.96</Total-Cost>
+          <Plan-Rows>396</Plan-Rows>
+          <Plan-Width>265</Plan-Width>
+          <Actual-Startup-Time>0.001</Actual-Startup-Time>
+          <Actual-Total-Time>0.020</Actual-Total-Time>
+          <Actual-Rows>397</Actual-Rows>
+          <Actual-Loops>6</Actual-Loops>
+        </Plan>
+      </Plans>
+    </Plan>
+    <Planning-Time>0.536</Planning-Time>
+    <Triggers>
+    </Triggers>
+    <Execution-Time>0.744</Execution-Time>
+  </Query>
+</explain>

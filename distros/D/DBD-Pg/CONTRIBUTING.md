@@ -10,10 +10,6 @@ Bugs and problems can be reported at:
 
 https://github.com/bucardo/dbdpg/issues
 
-You can also report them here if you wish:
-
-https://rt.cpan.org/Dist/Display.html?Name=DBD-Pg
-
 
 ## Questions
 
@@ -21,7 +17,7 @@ Questions about usage can be answered in a number of places:
 
 ### IRC
 
-You may find helpful people at #postgresql on irc.freenode.net
+You may find helpful people at #postgresql on irc.libera.chat
 
 Lower volume but more technical discussions happen at #dbi on irc.perl.org
 

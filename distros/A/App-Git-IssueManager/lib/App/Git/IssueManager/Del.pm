@@ -49,7 +49,7 @@ App::Git::IssueManager::Del - class implementing the del issue command of the GI
 
 =head1 VERSION
 
-version 0.1
+version 0.2
 
 =head1 AUTHOR
 

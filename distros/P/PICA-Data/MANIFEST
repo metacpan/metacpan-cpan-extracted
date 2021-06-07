@@ -7,6 +7,7 @@ META.json
 README.md
 cpanfile
 dist.ini
+lib/App/picadata.pm
 lib/PICA/Data.pm
 lib/PICA/Error.pm
 lib/PICA/Parser/Base.pm
@@ -21,7 +22,6 @@ lib/PICA/Schema.pm
 lib/PICA/Schema/Builder.pm
 lib/PICA/Writer/Base.pm
 lib/PICA/Writer/Binary.pm
-lib/PICA/Writer/Fields.pm
 lib/PICA/Writer/Generic.pm
 lib/PICA/Writer/JSON.pm
 lib/PICA/Writer/PPXML.pm
@@ -42,6 +42,7 @@ t/40-holdings.t
 t/50-schema.t
 t/60-schema-builder.t
 t/70-guess.t
+t/80-picadata.t
 t/files/annotated.pica
 t/files/bgb.example
 t/files/dump.dat

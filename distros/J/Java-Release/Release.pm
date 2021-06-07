@@ -5,61 +5,55 @@ use strict;
 use warnings;
 
 use Error::Pure qw(err);
+use Java::Release::Obj;
 use Readonly;
 
 # Constants.
 Readonly::Array our @EXPORT => qw(parse_java_jdk_release);
 
-our $VERSION = 0.03;
+our $VERSION = 0.06;
 
 # Parse Java JDK release.
 sub parse_java_jdk_release {
 	my $release_name = shift;
 
-	my $release_hr = {};
-	if ($release_name =~ m/^jdk-([0-9]+)(u([0-9]+))?-linux-(i586|x64|amd64|arm-vfp-hflt|arm32-vfp-hflt|arm64-vfp-hflt)\.(bin|tar\.gz)$/ms) {
-		$release_hr->{j2se_release} = $1;
-		$release_hr->{j2se_update} = $3;
-		$release_hr->{j2se_arch} = $4;
-		$release_hr->{j2se_version} = $release_hr->{j2se_release};
-		$release_hr->{j2se_version_name} = $release_hr->{j2se_release};
-		if ($release_hr->{j2se_update}) {
-			$release_hr->{j2se_version_name}
-				.= ' Update '.$release_hr->{j2se_update};
-			$release_hr->{j2se_version}
-				.= 'u'.$release_hr->{j2se_update}
-		} else {
-			$release_hr->{j2se_version_name} .= ' GA';
-		}
-	} elsif ($release_name =~ m/^jdk-([0-9]+)(\.([0-9]+))?(\.([0-9]+))?(\.([0-9]+))?_linux-(i586|x64|amd64|arm-vfp-hflt|arm32-vfp-hflt|arm64-vfp-hflt)_bin.tar.gz$/ms) {
-		$release_hr->{j2se_release} = $1;
-		$release_hr->{j2se_interim} = $3;
-		$release_hr->{j2se_update} = $5;
-		$release_hr->{j2se_patch} = $7;
-		$release_hr->{j2se_arch} = $8;
-		$release_hr->{j2se_version} = $release_hr->{j2se_release};
-		if (defined $release_hr->{j2se_interim}) {
-			$release_hr->{j2se_version} .= '.'.$release_hr->{j2se_interim};
-			if (defined $release_hr->{j2se_update}) {
-				$release_hr->{j2se_version} .= '.'.$release_hr->{j2se_update};
-				if (defined $release_hr->{j2se_patch}) {
-					$release_hr->{j2se_version} .= '.'.$release_hr->{j2se_patch};
-				}
-			}
-		}
-		$release_hr->{j2se_version_name} = $release_hr->{j2se_release};
-		if ($release_hr->{j2se_update}) {
-			$release_hr->{j2se_version_name}
-				.= ' Update '.$release_hr->{j2se_update};
-		} else {
-			$release_hr->{j2se_version_name} .= ' GA';
-		}
+	my $obj;
+
+	# j2sdk-1_3_1_20-linux-i586.bin
+	if ($release_name =~ m/^j2sdk-([0-9]+)_([0-9]+)_([0-9]+)_([0-9]+)-(linux)-(i586).bin$/ms) {
+		$obj = Java::Release::Obj->new(
+			arch => $6,
+			interim => $3,
+			os => $5,
+			release => $2,
+			update => $4,
+		);
+
+	# jdk-8u151-linux-i586.tar.gz
+	} elsif ($release_name =~ m/^jdk-([0-9]+)(u([0-9]+))?-(linux)-(i586|x64|amd64|arm-vfp-hflt|arm32-vfp-hflt|arm64-vfp-hflt)\.(bin|tar\.gz)$/ms) {
+		$obj = Java::Release::Obj->new(
+			arch => $5,
+			os => $4,
+			release => $1,
+			update => $3,
+		);
+
+	# jdk-13.0.2_linux-x64_bin.tar.gz
+	} elsif ($release_name =~ m/^jdk-([0-9]+)(\.([0-9]+))?(\.([0-9]+))?(\.([0-9]+))?_(linux)-(i586|x64|amd64|arm-vfp-hflt|arm32-vfp-hflt|arm64-vfp-hflt)_bin.tar.gz$/ms) {
+		$obj = Java::Release::Obj->new(
+			arch => $9,
+			interim => $3,
+			os => $8,
+			patch => $7,
+			release => $1,
+			update => $5,
+		);
 	} else {
 		err "Unsupported release.",
 			'release_name', $release_name;
 	}
 
-	return $release_hr;
+	return $obj;
 }
 
 1;
@@ -136,7 +130,7 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-© 2020 Michal Josef Špaček
+© 2020-2021 Michal Josef Špaček
 
 BSD 2-Clause License
 
@@ -146,6 +140,6 @@ Thanks for L<java-package|https://salsa.debian.org/java-team/java-package.git> p
 
 =head1 VERSION
 
-0.03
+0.06
 
 =cut

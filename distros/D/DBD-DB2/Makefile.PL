@@ -10,7 +10,7 @@ use Getopt::Std;
 use Config;
 #require 'flush.pl';
 
-use DBI;        # The DBI must be installed before we can build a DBD
+use DBI::DBD;        # The DBI must be installed before we can build a DBD
 
 my %opts = (
     'NAME'         => 'DBD::DB2',
@@ -73,10 +73,16 @@ die "$envvar environment variable ($DB2) not valid.\n" unless -d $DB2;
 print qq(Using DB2 in "$DB2"\n);
 
 # --- Setup include paths and libraries
-$opts{INC} .= qq( -I"$DB2/include" -I"$Config{sitearchexp}/auto/DBI" );
-$opts{INC} .= qq(-I"$Config{installarchlib}/auto/DBI" ) if $Config{installarchlib};
-$opts{INC} .= qq(-I"$Config{installvendorarch}/auto/DBI" ) if $Config{installvendorarch};
-$opts{INC} .= qq(-I"$Config{installsitearch}/auto/DBI" ) if $Config{installsitearch};
+# $opts{INC} .= qq( -I"$DB2/include" -I"$Config{sitearchexp}/auto/DBI" );
+# $opts{INC} .= qq(-I"$Config{installarchlib}/auto/DBI" ) if $Config{installarchlib};
+# $opts{INC} .= qq(-I"$Config{installvendorarch}/auto/DBI" ) if $Config{installvendorarch};
+# $opts{INC} .= qq(-I"$Config{installsitearch}/auto/DBI" ) if $Config{installsitearch};
+
+# DBI migth be installed anywhere in @INC, not just the compiled-in
+# site/vendor/core directories. So instead of trying to guess the header
+# files are based on various %Config values, just ask DBI::DBD
+my $dbd_dbi_arch_dir = dbd_dbi_arch_dir(); 
+$opts{INC} .= qq( -I"$DB2/include" -I"$dbd_dbi_arch_dir");
 $opts{dynamic_lib} = { OTHERLDFLAGS => '$(COMPOBJS) '};
 
 # libraries required to build DBD::DB2 driver

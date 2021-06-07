@@ -12,7 +12,6 @@ WriteMakefile(
         'DateTime::Format::Builder' => 0.74, # length parameter can now be an arrayref
         'DateTime'                  => 0,
         'DateTime::TimeZone'        => 0,
-        'Module::Pluggable'         => 0,
         'List::MoreUtils'           => 0,
     },
     TEST_REQUIRES => {

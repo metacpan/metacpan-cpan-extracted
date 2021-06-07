@@ -1,5 +1,9 @@
 Revision history for Plack-Middleware-AccessLog-Structured
 
+0.002000  2021-05-22 18:42:45+02:00 Europe/Zurich
+
+ - Switch from Time::HiRes and DateTime to Time::Moment (TONKIN)
+
 0.001002  2018-03-04 22:35:37+01:00 Europe/Zurich
 
  - Fix request_duration calculation for delayed responses (nfg)

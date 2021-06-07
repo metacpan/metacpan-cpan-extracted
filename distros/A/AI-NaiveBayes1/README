@@ -1,8 +1,5 @@
-<? read_starfish_conf(); echo &readme_line; !>
-#+
-AI/NaiveBayes1 version 2.007
+AI/NaiveBayes1 version 2.011
 ============================
-#-
 
 This is an implementation of the basic Naive Bayes classification
 algorithm.  Documentation is a part of the file NaiveBayes1.pm in the
@@ -27,10 +24,7 @@ module YAML.
 
 COPYRIGHT AND LICENCE
 
-<? echo "Copyright $Years Vlado Keselj $VladoURL" !>
-#+
-Copyright 2003-20 Vlado Keselj http://web.cs.dal.ca/~vlado
-#-
+Copyright 2003-21 Vlado Keselj https://web.cs.dal.ca/~vlado
 
 This script is provided "as is" without express or implied warranty.
 This is free software; you can redistribute it and/or modify it under

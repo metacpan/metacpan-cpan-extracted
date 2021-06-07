@@ -486,7 +486,7 @@ sub set_options {
             elsif ( $opt eq '_table_expand' ) {
                 my $prompt = 'Choose: ';
                 my $sub_menu = [
-                    [ 'table_expand', "- Expand table rows",   [ $no, $yes . ' - fast back', $yes ] ],
+                    [ 'table_expand', "- Expand table rows",   [ $no, $yes ] ],
                 ];
                 $sf->__settings_menu_wrap( $section, $sub_menu, $prompt );
             }

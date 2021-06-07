@@ -4,7 +4,7 @@ Test2::Plugin::DBIProfile - Plugin to enable and display DBI profiling.
 
 # DESCRIPTION
 
-This will enable [DBI::Profile](https://metacpan.org/pod/DBI::Profile) globally so that DBI profiling data is
+This will enable [DBI::Profile](https://metacpan.org/pod/DBI%3A%3AProfile) globally so that DBI profiling data is
 collected. Once testing is complete an event will be produced which contains
 and displays the profiling data.
 
@@ -12,7 +12,7 @@ Normal output looks like this:
 
     # DBI::Profile: 0.000824s (24 calls) xxx.t @ 2019-08-16 14:24:01
 
-If you use [Test2::Harness](https://metacpan.org/pod/Test2::Harness) aka [App::Yath](https://metacpan.org/pod/App::Yath) detailed profiling data is
+If you use [Test2::Harness](https://metacpan.org/pod/Test2%3A%3AHarness) aka [App::Yath](https://metacpan.org/pod/App%3A%3AYath) detailed profiling data is
 available in the event log.
 
 # SYNOPSIS
@@ -27,7 +27,7 @@ You can also specify a 'path' for DBI::Profile:
 
     use Test2::Plugin::DBIProfile "!MethodClass";
 
-See ["ENABLING A PROFILE" in DBI::Profile](https://metacpan.org/pod/DBI::Profile#ENABLING-A-PROFILE) for path options.
+See ["ENABLING A PROFILE" in DBI::Profile](https://metacpan.org/pod/DBI%3A%3AProfile#ENABLING-A-PROFILE) for path options.
 
 The default is to use whatever is already in `$ENV{DBI_PROFILE}` if it is set,
 and to fallback to `"!MethodClass"` otherwise.

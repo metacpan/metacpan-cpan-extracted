@@ -18,12 +18,13 @@ my %module_build_args = (
     "Vladimir Varlamov <bes.internal\@gmail.com>"
   ],
   "dist_name" => "Date-Holidays-BY",
-  "dist_version" => "0.2021.1",
+  "dist_version" => "1.2021.1",
   "license" => "perl",
   "module_name" => "Date::Holidays::BY",
   "recursive_test_files" => 1,
   "requires" => {
     "Carp" => 0,
+    "Date::Easter" => 0,
     "Exporter" => 0,
     "List::Util" => 0,
     "Time::Piece" => 0,

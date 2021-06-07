@@ -6,7 +6,7 @@ use warnings;
 
 use Test::More;
 
-plan tests => 6 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 8 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'App/lcpan/Cmd/cwalitee_of_module_abstract.pm',
@@ -14,6 +14,8 @@ my @module_files = (
     'App/lcpan/Cmd/cwalitee_of_script_abstract.pm',
     'App/lcpan/Cmd/cwalitees_of_modules_abstracts.pm',
     'App/lcpan/Cmd/cwalitees_of_scripts_abstracts.pm',
+    'App/lcpan/Cmd/dists_with_changes_cwalitee.pm',
+    'App/lcpan/Cmd/mods_with_abstract_cwalitee.pm',
     'App/lcpan/CmdBundle/cwalitee.pm'
 );
 

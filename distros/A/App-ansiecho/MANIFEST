@@ -1,0 +1,16 @@
+Build.PL
+Changes
+LICENSE
+META.json
+README.md
+cpanfile
+eg/colortable
+lib/App/ansiecho.pm
+lib/App/ansiecho/Util.pm
+minil.toml
+script/ansiecho
+t/00_compile.t
+t/02_exec.t
+t/Util.pm
+META.yml
+MANIFEST

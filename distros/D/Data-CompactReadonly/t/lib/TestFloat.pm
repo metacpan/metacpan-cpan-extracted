@@ -16,13 +16,13 @@ sub cmp_float {
     ok(
         (
             $got >= 0 && (
-                $wanted * ( 1 - $fudge) < $got &&
-                $wanted * ( 1 + $fudge) > $got
+                $wanted * ( 1 - $fudge) <= $got &&
+                $wanted * ( 1 + $fudge) >= $got
             )
         ) || (
             $got < 0 && (
-                $wanted * ( 1 - $fudge) > $got &&
-                $wanted * ( 1 + $fudge) < $got
+                $wanted * ( 1 - $fudge) >= $got &&
+                $wanted * ( 1 + $fudge) <= $got
             )
         ),
         $expn

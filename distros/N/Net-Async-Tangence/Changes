@@ -1,5 +1,15 @@
 Revision history for Net-Async-Tangence
 
+0.16    2021-05-26
+        [CHANGES]
+         * Support 'family' argument to force IPv4 or IPv6
+         * General module style updates:
+            + `use v5.14`
+            + Use `package NAME VERSION` syntax
+
+        [BUGFIXES]
+         * Make sure to exec() $^X rather than relying on systemperl (RT131464)
+
 0.15    2020-01-14
         [CHANGES]
          * More unit testing of connection methods

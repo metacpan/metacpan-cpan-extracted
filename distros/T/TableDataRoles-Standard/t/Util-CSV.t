@@ -5,9 +5,9 @@ use strict;
 use warnings;
 use Test::More 0.98;
 
-use TableData::Test::Source::CSVDATA;
+use TableData::Test::Source::CSVInDATA;
 
-my $table = TableData::Test::Source::CSVDATA->new;
+my $table = TableData::Test::Source::CSVInDATA->new;
 Role::Tiny->apply_roles_to_object($table, 'TableDataRole::Util::CSV');
 
 subtest "as_csv" => sub {

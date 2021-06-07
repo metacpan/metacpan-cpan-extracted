@@ -1,0 +1,5 @@
+#!perl
+use Mojolicious::Commands;
+use Mojo::File qw( curfile );
+use lib curfile->dirname->sibling( 'lib' )->to_string;
+Mojolicious::Commands->start_app( 'Zapp' );

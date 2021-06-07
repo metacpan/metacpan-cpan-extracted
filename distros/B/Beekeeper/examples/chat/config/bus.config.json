@@ -1,7 +1,7 @@
 # This file is in relaxed JSON format (it allows comments and trailing commas).
 #
 # Logical buses used in pool.config.json must be defined here, specifying
-# the conection parameters to the STOMP broker that will service them.
+# the conection parameters to the MQTT broker that will service them.
 #
 # In this example four logical buses are defined, all residing in the same
 # local broker. For development purposes is handy to use a single broker to 
@@ -10,54 +10,50 @@
 #
 # Each bus definition accepts the following parameters:
 #
-#  - bus-id  : unique identifier of the logical bus (required)
-#  - cluster : identifier of the cluster of buses that this bus belongs to (if any)
-#  - host    : hostname or IP address of the broker (required)
-#  - port    : port of the broker (default is 61613)
-#  - tls     : if set to true enables the use of TLS on broker connection
-#  - user    : username used to connect to the broker (required)
-#  - pass    : password used to connect to the broker (required)
-#  - vhost   : virtual host on broker (ignored by some brokers)
+#  - bus_id   : unique identifier of the logical bus (required)
+#  - bus_role : specifies if the bus is acting as frontend or backend
+#  - host     : hostname or IP address of the broker (default is localhost)
+#  - port     : port of the broker (default is 1883)
+#  - tls      : if set to true enables the use of TLS on broker connection
+#  - username : username used to connect to the broker
+#  - password : password used to connect to the broker
 
 [
     {
-        "bus-id"  : "backend-A",
-        "cluster" : "backend",
-        "host"    : "localhost",
-        "user"    : "backend",
-        "pass"    : "def456",
-        "vhost"   : "/backend-A",
-        "default" : 1,
+        "bus_id"   : "backend-1",
+        "bus_role" : "backend",
+        "host"     : "localhost",
+        "username" : "backend",
+        "password" : "def456",
+        "default"  : 1,
     },
     {
-        "bus-id"  : "backend-B",
-        "cluster" : "backend",
-        "host"    : "localhost",
-        "user"    : "backend",
-        "pass"    : "def456",
-        "vhost"   : "/backend-B",
+        "bus_id"   : "backend-2",
+        "bus_role" : "backend",
+        "host"     : "localhost",
+        "username" : "backend",
+        "password" : "def456",
     },
     {
-        "bus-id"  : "frontend-A",
-        "cluster" : "frontend",
-        "host"    : "localhost",
-        "user"    : "frontend",
-        "pass"    : "abc123",
-        "vhost"   : "/frontend-A",
+        "bus_id"   : "frontend-1",
+        "bus_role" : "frontend",
+        "host"     : "localhost",
+        "port"     :  8001,
+        "username" : "router",
+        "password" : "ghi789",
     },
 #   {
-#       "bus-id"  : "frontend-B",  # Can be uncommented when using ToyBroker or RabbitMQ
-#       "cluster" : "frontend",    # (ActiveMQ does not support virtual hosts)
-#       "host"    : "localhost",
-#       "user"    : "frontend",
-#       "pass"    : "abc123",
-#       "vhost"   : "/frontend-B",
+#       "bus_id"   : "frontend-2",    # The MQTT topics for receiving notifications
+#       "bus_role" : "frontend",      # will clash when using the same broker for
+#       "host"     : "localhost",     # both 'frontend-1' and 'frontend-2', causing
+#       "port"     :  8001,           # the reception of duplicated notifications.
+#       "username" : "router",        # Uncomment this if 'frontend-2' is actually a
+#       "password" : "ghi789",        # separate broker (as it should be).
 #   },
     {
-        "bus-id"  : "toybroker",
-        "host"    : "localhost",
-        "user"    : "backend",
-        "pass"    : "def456",
-        "vhost"   : "/toybroker",
+        "bus_id"   : "toybroker",
+        "host"     : "localhost",
+        "username" : "backend",
+        "password" : "def456",
     },
 ]

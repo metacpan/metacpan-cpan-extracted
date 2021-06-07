@@ -1,11 +1,18 @@
-0.10    2017-07-10 (PERLANCAR)
+0.110   2021-03-25  Released-By: PERLANCAR; Urgency: low
+
+	- No functional changes.
+
+	- [doc] Fix typo in example in Synopsis.
+
+
+0.10    2017-07-10  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- Replace Log::Any with Log::ger.
 
 
-0.09    2016-01-29 (PERLANCAR)
+0.09    2016-01-29  Released-By: PERLANCAR
 
 	- Support quoted value in attributes, so we can have values that
 	  contain whitespaces.
@@ -13,7 +20,7 @@
 	- Bump prereq version Log::Any::IfLOG to 0.07.
 
 
-0.08    2015-09-06 (PERLANCAR)
+0.08    2015-09-06  Released-By: PERLANCAR
 
 	- No functional changes.
 
@@ -22,14 +29,14 @@
 	  requirement.
 
 
-0.07    2015-08-18 (PERLANCAR)
+0.07    2015-08-18  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- Switch from Log::Any to Log::Any::IfLOG.
 
 
-0.06    2014-11-17 (PERLANCAR)
+0.06    2014-11-17  Released-By: PERLANCAR
 
 	- No functional changes.
 
@@ -37,20 +44,20 @@
 	  name).
 
 
-0.05    2014-11-16 (PERLANCAR)
+0.05    2014-11-16  Released-By: PERLANCAR
 
 	- [Bugfix] Missed a space before attributes when replacing
 	  fragment.
 
 
-0.04    2014-11-09 (PERLANCAR)
+0.04    2014-11-09  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- Remove debugging print statement.
 
 
-0.03    2014-10-31 (PERLANCAR)
+0.03    2014-10-31  Released-By: PERLANCAR
 
 	- No functional changes.
 
@@ -58,7 +65,7 @@
 	  ending newline.
 
 
-0.02    2014-10-31 (PERLANCAR)
+0.02    2014-10-31  Released-By: PERLANCAR
 
 	- [Bugfix] fragment with longer ID e.g. foo-bar will match shorter
 	  ID (e.g. foo).
@@ -67,7 +74,7 @@
 	  colons (I happen to want to use program names as ID's).
 
 
-0.01    2012-09-12 (SHARYANTO)
+0.01    2012-09-12  Released-By: SHARYANTO
 
         - First release, extracted/renamed from Setup-Text-Snippet because
           Text::Snippet was already taken.

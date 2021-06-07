@@ -1,8 +1,14 @@
-0.002   2017-11-06 (PERLANCAR)
+0.003   2021-05-26  Released-By: PERLANCAR; Urgency: high
+
+	- [build] Rebuild to update Sah coercion module names (old Sah coercion
+          modules have been purged from CPAN).
+
+
+0.002   2017-11-06  Released-By: PERLANCAR
 
 	- Remove unneeded script (copy paste mistake).
 
 
-0.001   2017-11-06 (PERLANCAR)
+0.001   2017-11-06  Released-By: PERLANCAR
 
         - First release.

@@ -26,6 +26,8 @@ is_deeply pica_items($items->[0]),       [$items->[0]],    'ibid';
 is scalar @{pica_items($holdings->[0])}, 1, "items (1)";
 is scalar @{pica_items($holdings->[4])}, 2, "items (2)";
 
+is @{[pica_split $record]}, 410, "split";
+
 is_deeply [], pica_holdings([]), "zero holdings";
 is_deeply [], pica_items([]),    "zero items";
 

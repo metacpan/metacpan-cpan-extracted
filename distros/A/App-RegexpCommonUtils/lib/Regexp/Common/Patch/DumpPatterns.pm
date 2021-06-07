@@ -1,15 +1,16 @@
 package Regexp::Common::Patch::DumpPatterns;
 
-our $DATE = '2016-12-31'; # DATE
-our $VERSION = '0.002'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2021-05-25'; # DATE
+our $DIST = 'App-RegexpCommonUtils'; # DIST
+our $VERSION = '0.003'; # VERSION
 
 use 5.010001;
 use strict;
 no warnings;
 
 use Data::Dmp;
-use Module::Patch 0.19 qw();
-use base qw(Module::Patch);
+use parent qw(Module::Patch);
 
 our %config;
 
@@ -60,7 +61,7 @@ Regexp::Common::Patch::DumpPatterns - Patch Regexp::Common's pattern() to collec
 
 =head1 VERSION
 
-This document describes version 0.002 of Regexp::Common::Patch::DumpPatterns (from Perl distribution App-RegexpCommonUtils), released on 2016-12-31.
+This document describes version 0.003 of Regexp::Common::Patch::DumpPatterns (from Perl distribution App-RegexpCommonUtils), released on 2021-05-25.
 
 =head1 HOMEPAGE
 
@@ -84,7 +85,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2016 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

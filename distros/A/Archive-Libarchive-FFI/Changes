@@ -1,5 +1,7 @@
 Revision history for Archive-Libarchive-FFI
 
+0.0902    2021-05-30 19:04:30 -0600
+
 0.0901    2017-08-24 08:23:42 -0400
   - Switch to Alien::Libarchive3
   - Remove accidental requirement for Perl 5.10

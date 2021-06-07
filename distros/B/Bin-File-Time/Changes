@@ -1,0 +1,26 @@
+Revision history for the module "Bin::File::Time" : 
+
+0.200   2021-05-26
+        最初に作成。3個のコマンドを入れた。
+        madeafter lastaccess timeput
+
+0.210   2021-05-29T01:30+09:00
+        madeafter が古かったので新しくした。
+        INSTALLにモジュール名がBin::Liとして書かれていたので、Bin::File::Time に変更。
+        MANIFEST.SKIP や .gitignore を変更。(gitのレポジトリに反映。)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -16,9 +16,6 @@
  */
 
 /*
-=head1 Numeric functions
-
-=cut
 
 This file contains all the stuff needed by perl for manipulating numeric
 values, including such things as replacements for the OS's atof() function
@@ -726,12 +723,12 @@ If an infinity or a not-a-number is recognized, C<*sp> will point to
 one byte past the end of the recognized string.  If the recognition fails,
 zero is returned, and C<*sp> will not move.
 
-=for apidoc Amn|bool|IS_NUMBER_GREATER_THAN_UV_MAX
-=for apidoc Amn|bool|IS_NUMBER_INFINITY
-=for apidoc Amn|bool|IS_NUMBER_IN_UV
-=for apidoc Amn|bool|IS_NUMBER_NAN
-=for apidoc Amn|bool|IS_NUMBER_NEG
-=for apidoc Amn|bool|IS_NUMBER_NOT_INT
+=for apidoc Amnh|bool|IS_NUMBER_GREATER_THAN_UV_MAX
+=for apidoc Amnh|bool|IS_NUMBER_INFINITY
+=for apidoc Amnh|bool|IS_NUMBER_IN_UV
+=for apidoc Amnh|bool|IS_NUMBER_NAN
+=for apidoc Amnh|bool|IS_NUMBER_NEG
+=for apidoc Amnh|bool|IS_NUMBER_NOT_INT
 
 =cut
 */
@@ -997,7 +994,7 @@ C<valuep> is non-C<NULL>, but no actual assignment (or SEGV) will occur.
 C<IS_NUMBER_NOT_INT> will be set with C<IS_NUMBER_IN_UV> if trailing decimals were
 seen (in which case C<*valuep> gives the true value truncated to an integer), and
 C<IS_NUMBER_NEG> if the number is negative (in which case C<*valuep> holds the
-absolute value).  C<IS_NUMBER_IN_UV> is not set if e notation was used or the
+absolute value).  C<IS_NUMBER_IN_UV> is not set if C<e> notation was used or the
 number is larger than a UV.
 
 C<flags> allows only C<PERL_SCAN_TRAILING>, which allows for trailing
@@ -1370,9 +1367,9 @@ S_mulexp10(NV value, I32 exponent)
     I32 bit;
 
     if (exponent == 0)
-	return value;
+        return value;
     if (value == 0)
-	return (NV)0;
+        return (NV)0;
 
     /* On OpenVMS VAX we by default use the D_FLOAT double format,
      * and that format does not have *easy* capabilities [1] for
@@ -1396,24 +1393,24 @@ S_mulexp10(NV value, I32 exponent)
 
 #if ((defined(VMS) && !defined(_IEEE_FP)) || defined(_UNICOS) || defined(DOUBLE_IS_VAX_FLOAT)) && defined(NV_MAX_10_EXP)
     STMT_START {
-	const NV exp_v = log10(value);
-	if (exponent >= NV_MAX_10_EXP || exponent + exp_v >= NV_MAX_10_EXP)
-	    return NV_MAX;
-	if (exponent < 0) {
-	    if (-(exponent + exp_v) >= NV_MAX_10_EXP)
-		return 0.0;
-	    while (-exponent >= NV_MAX_10_EXP) {
-		/* combination does not overflow, but 10^(-exponent) does */
-		value /= 10;
-		++exponent;
-	    }
-	}
+        const NV exp_v = log10(value);
+        if (exponent >= NV_MAX_10_EXP || exponent + exp_v >= NV_MAX_10_EXP)
+            return NV_MAX;
+        if (exponent < 0) {
+            if (-(exponent + exp_v) >= NV_MAX_10_EXP)
+                return 0.0;
+            while (-exponent >= NV_MAX_10_EXP) {
+                /* combination does not overflow, but 10^(-exponent) does */
+                value /= 10;
+                ++exponent;
+            }
+        }
     } STMT_END;
 #endif
 
     if (exponent < 0) {
-	negative = 1;
-	exponent = -exponent;
+        negative = 1;
+        exponent = -exponent;
 #ifdef NV_MAX_10_EXP
         /* for something like 1234 x 10^-309, the action of calculating
          * the intermediate value 10^309 then returning 1234 / (10^309)
@@ -1436,9 +1433,9 @@ S_mulexp10(NV value, I32 exponent)
 #  define FP_OVERFLOWS_TO_ZERO
 #endif
     for (bit = 1; exponent; bit <<= 1) {
-	if (exponent & bit) {
-	    exponent ^= bit;
-	    result *= power;
+        if (exponent & bit) {
+            exponent ^= bit;
+            result *= power;
 #ifdef FP_OVERFLOWS_TO_ZERO
             if (result == 0)
 # ifdef NV_INF
@@ -1447,12 +1444,12 @@ S_mulexp10(NV value, I32 exponent)
                 return value < 0 ? -FLT_MAX : FLT_MAX;
 # endif
 #endif
-	    /* Floating point exceptions are supposed to be turned off,
-	     *  but if we're obviously done, don't risk another iteration.
-	     */
-	     if (exponent == 0) break;
-	}
-	power *= power;
+            /* Floating point exceptions are supposed to be turned off,
+             *  but if we're obviously done, don't risk another iteration.
+             */
+             if (exponent == 0) break;
+        }
+        power *= power;
     }
     return negative ? value / result : value * result;
 }
@@ -1467,7 +1464,18 @@ S_mulexp10(NV value, I32 exponent)
 NV
 Perl_my_atof(pTHX_ const char* s)
 {
-    /* 's' must be NUL terminated */
+
+/*
+=for apidoc my_atof
+
+L<C<atof>(3)>, but properly works with Perl locale handling, accepting a dot
+radix character always, but also the current locale's radix character if and
+only if called from within the lexical scope of a Perl C<use locale> statement.
+
+N.B. C<s> must be NUL terminated.
+
+=cut
+*/
 
     NV x = 0.0;
 
@@ -1638,15 +1646,15 @@ Perl_my_atof3(pTHX_ const char* orig, NV* value, const STRLEN len)
 
     /* leading whitespace */
     while (s < send && isSPACE(*s))
-	++s;
+        ++s;
 
     /* sign */
     switch (*s) {
-	case '-':
-	    negative = 1;
-	    /* FALLTHROUGH */
-	case '+':
-	    ++s;
+        case '-':
+            negative = 1;
+            /* FALLTHROUGH */
+        case '+':
+            ++s;
     }
 #endif
 
@@ -1736,105 +1744,111 @@ Perl_my_atof3(pTHX_ const char* orig, NV* value, const STRLEN len)
      * large, we add the total to NV and start again */
 
     while (s < send) {
-	if (isDIGIT(*s)) {
-	    seen_digit = 1;
-	    old_digit = digit;
-	    digit = *s++ - '0';
-	    if (seen_dp)
-		exp_adjust[1]++;
+        if (isDIGIT(*s)) {
+            seen_digit = 1;
+            old_digit = digit;
+            digit = *s++ - '0';
+            if (seen_dp)
+                exp_adjust[1]++;
 
-	    /* don't start counting until we see the first significant
-	     * digit, eg the 5 in 0.00005... */
-	    if (!sig_digits && digit == 0)
-		continue;
+            /* don't start counting until we see the first significant
+             * digit, eg the 5 in 0.00005... */
+            if (!sig_digits && digit == 0)
+                continue;
 
-	    if (++sig_digits > MAX_SIG_DIGITS) {
-		/* limits of precision reached */
-	        if (digit > 5) {
-		    ++accumulator[seen_dp];
-		} else if (digit == 5) {
-		    if (old_digit % 2) { /* round to even - Allen */
-			++accumulator[seen_dp];
-		    }
-		}
-		if (seen_dp) {
-		    exp_adjust[1]--;
-		} else {
-		    exp_adjust[0]++;
-		}
-		/* skip remaining digits */
-		while (s < send && isDIGIT(*s)) {
-		    ++s;
-		    if (! seen_dp) {
-			exp_adjust[0]++;
-		    }
-		}
-		/* warn of loss of precision? */
-	    }
-	    else {
-		if (accumulator[seen_dp] > MAX_ACCUMULATE) {
-		    /* add accumulator to result and start again */
-		    result[seen_dp] = S_mulexp10(result[seen_dp],
-						 exp_acc[seen_dp])
-			+ (NV)accumulator[seen_dp];
-		    accumulator[seen_dp] = 0;
-		    exp_acc[seen_dp] = 0;
-		}
-		accumulator[seen_dp] = accumulator[seen_dp] * 10 + digit;
-		++exp_acc[seen_dp];
-	    }
-	}
-	else if (!seen_dp && GROK_NUMERIC_RADIX(&s, send)) {
-	    seen_dp = 1;
-	    if (sig_digits > MAX_SIG_DIGITS) {
-		while (s < send && isDIGIT(*s)) {
-		    ++s;
-		}
-		break;
-	    }
-	}
-	else {
-	    break;
-	}
+            if (++sig_digits > MAX_SIG_DIGITS) {
+                /* limits of precision reached */
+                if (digit > 5) {
+                    ++accumulator[seen_dp];
+                } else if (digit == 5) {
+                    if (old_digit % 2) { /* round to even - Allen */
+                        ++accumulator[seen_dp];
+                    }
+                }
+                if (seen_dp) {
+                    exp_adjust[1]--;
+                } else {
+                    exp_adjust[0]++;
+                }
+                /* skip remaining digits */
+                while (s < send && isDIGIT(*s)) {
+                    ++s;
+                    if (! seen_dp) {
+                        exp_adjust[0]++;
+                    }
+                }
+                /* warn of loss of precision? */
+            }
+            else {
+                if (accumulator[seen_dp] > MAX_ACCUMULATE) {
+                    /* add accumulator to result and start again */
+                    result[seen_dp] = S_mulexp10(result[seen_dp],
+                                                 exp_acc[seen_dp])
+                        + (NV)accumulator[seen_dp];
+                    accumulator[seen_dp] = 0;
+                    exp_acc[seen_dp] = 0;
+                }
+                accumulator[seen_dp] = accumulator[seen_dp] * 10 + digit;
+                ++exp_acc[seen_dp];
+            }
+        }
+        else if (!seen_dp && GROK_NUMERIC_RADIX(&s, send)) {
+            seen_dp = 1;
+            if (sig_digits > MAX_SIG_DIGITS) {
+                while (s < send && isDIGIT(*s)) {
+                    ++s;
+                }
+                break;
+            }
+        }
+        else {
+            break;
+        }
     }
 
     result[0] = S_mulexp10(result[0], exp_acc[0]) + (NV)accumulator[0];
     if (seen_dp) {
-	result[1] = S_mulexp10(result[1], exp_acc[1]) + (NV)accumulator[1];
+        result[1] = S_mulexp10(result[1], exp_acc[1]) + (NV)accumulator[1];
     }
 
     if (s < send && seen_digit && (isALPHA_FOLD_EQ(*s, 'e'))) {
-	bool expnegative = 0;
+        bool expnegative = 0;
 
-	++s;
-	switch (*s) {
-	    case '-':
-		expnegative = 1;
-		/* FALLTHROUGH */
-	    case '+':
-		++s;
-	}
-	while (s < send && isDIGIT(*s))
-	    exponent = exponent * 10 + (*s++ - '0');
-	if (expnegative)
-	    exponent = -exponent;
+        ++s;
+        switch (*s) {
+            case '-':
+                expnegative = 1;
+                /* FALLTHROUGH */
+            case '+':
+                ++s;
+        }
+        while (s < send && isDIGIT(*s))
+            exponent = exponent * 10 + (*s++ - '0');
+        if (expnegative)
+            exponent = -exponent;
     }
 
     /* now apply the exponent */
 
     if (seen_dp) {
-	result[2] = S_mulexp10(result[0],exponent+exp_adjust[0])
-		+ S_mulexp10(result[1],exponent-exp_adjust[1]);
+        result[2] = S_mulexp10(result[0],exponent+exp_adjust[0])
+                + S_mulexp10(result[1],exponent-exp_adjust[1]);
     } else {
-	result[2] = S_mulexp10(result[0],exponent+exp_adjust[0]);
+        result[2] = S_mulexp10(result[0],exponent+exp_adjust[0]);
     }
 
     /* now apply the sign */
     if (negative)
-	result[2] = -result[2];
-#endif /* USE_PERL_ATOF */
+        result[2] = -result[2];
     *value = result[2];
     return (char *)s;
+#else  /* USE_PERL_ATOF */
+    /* If you see this error you both don't have strtod (or configured -Ud_strtod or
+       or it's long double/quadmath equivalent) and disabled USE_PERL_ATOF, thus
+       removing any way for perl to convert strings to floating point numbers.
+    */
+# error No mechanism to convert strings to numbers available
+#endif
 }
 
 /*

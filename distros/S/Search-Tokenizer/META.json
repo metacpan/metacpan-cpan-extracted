@@ -27,15 +27,14 @@
       },
       "test" : {
          "requires" : {
-            "Test::More" : "0",
-            "Time::HiRes" : "0"
+            "Test::More" : "0"
          }
       }
    },
    "provides" : {
       "Search::Tokenizer" : {
          "file" : "lib/Search/Tokenizer.pm",
-         "version" : "1.02"
+         "version" : "1.03"
       }
    },
    "release_status" : "stable",
@@ -47,6 +46,6 @@
          "url" : "https://github.com/damil/Search-Tokenizer"
       }
    },
-   "version" : "1.02",
+   "version" : "1.03",
    "x_serialization_backend" : "JSON::PP version 4.05"
 }

@@ -1,0 +1,24 @@
+Revision history for Archive-Libarchive},
+
+0.04      2021-06-01 04:25:46 -0600
+  - Remove deprecated support_compression* methods from
+    ArchiveRead class, and documentation/tests that were
+    using them.  Sorry, they should not have been included
+    in the original release (gh#32)
+  - Some additional, less prominent deprecated methods were
+    also removed (gh#33)
+  - Performance improvements (gh#2, gh#34)
+  - New methods: ArchiveRead#read_data_block,
+    ArchiveWrite#write_data_block,
+    ArchiveRead#read_into_fd (gh#2, gh#34)
+
+0.03      2021-05-31 09:41:12 -0600
+  - Add (full) support for encrypted zip entries (gh#31)
+
+0.02      2021-05-31 05:50:17 -0600
+  - Add support for ArchiveRead#open_filenames (gh#30)
+
+0.01      2021-05-30 18:37:47 -0600
+  - initial version
+
+

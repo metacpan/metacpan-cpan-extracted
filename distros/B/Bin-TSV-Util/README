@@ -1,0 +1,10 @@
+This module "Bin::TSV::Util" provides scripts for specific functions that deals TSV formatted data file. 
+The included commands are as follows. 
+
+colchop colhashS collen colorplus colpairs colsplit colsummary 
+crosstable inarow join2 joinn keyvalues kvcmp
+
+
+ Copyright (c) 2021 Toshiyuki SHIMONO. All rights reserved.
+ This program is free software; you can redistribute it and/or
+ modify it under the same terms as Perl itself.

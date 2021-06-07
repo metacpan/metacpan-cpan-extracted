@@ -59,7 +59,7 @@
          "web" : "https://github.com/perlancar/perl-Log-ger-Output-Screen"
       }
    },
-   "version" : "0.016",
+   "version" : "0.017",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.030000"

@@ -2,30 +2,26 @@ package App::perlimports::Include;
 
 use Moo;
 
-our $VERSION = '0.000006';
+our $VERSION = '0.000007';
 
 use App::perlimports::ExportInspector ();
 use Class::Inspector                  ();
 use Data::Dumper qw( Dumper );
-use Data::Printer;
 use List::Util qw( any none uniq );
+use Memoize qw( memoize );
 use Module::Runtime qw( require_module );
 use MooX::StrictConstructor;
 use Path::Tiny qw( path );
-use Perl::Tidy 20210111 qw( perltidy );
 use PPI::Document 1.270 ();
-use PPIx::Utils::Classification qw(
-    is_function_call
-    is_hash_key
-    is_method_call
-    is_perl_builtin
-);
+use PPIx::Utils::Classification qw( is_function_call is_perl_builtin );
 use Ref::Util qw( is_plain_arrayref is_plain_hashref );
 use Sub::HandlesVia;
 use Try::Tiny qw( catch try );
 use Types::Standard qw(ArrayRef Bool HashRef InstanceOf Maybe Object Str);
 
 with 'App::perlimports::Role::Logger';
+
+memoize('is_function_call');
 
 has _explicit_exports => (
     is          => 'ro',
@@ -144,10 +140,7 @@ has _will_never_export => (
 
 sub _build_export_inspector {
     my $self = shift;
-    return App::perlimports::ExportInspector->new(
-        logger      => $self->logger,
-        module_name => $self->module_name,
-    );
+    return $self->_document->inspector_for( $self->module_name );
 }
 
 # If we have implicit (but not explicit) exports,  we will make a best guess at
@@ -183,43 +176,8 @@ sub _build_imports {
     my %found;
 
     # Stolen from Perl::Critic::Policy::TooMuchCode::ProhibitUnfoundImport
-    for my $word (
-        @{
-            $self->_document->ppi_document->find(
-                sub {
-                    $_[1]->isa('PPI::Token::Word')
-                        || $_[1]->isa('PPI::Token::Symbol')
-                        || $_[1]->isa('PPI::Token::Label');
-                }
-                )
-                || []
-        }
-    ) {
+    for my $word ( @{ $self->_document->possible_imports } ) {
         next if exists $found{"$word"};
-
-        # Without the sub name check, we accidentally turn
-        # use List::Util ();
-        # sub any { }
-        #
-        # into
-        #
-        # use List::Util qw( any );
-        # sub any {}
-        next if $self->_document->is_sub_name("$word");
-
-        # A hash key might, for example, be a variable.
-        if (
-               is_hash_key($word)
-            && !$word->isa('PPI::Token::Symbol')
-            && !(
-                   $word->statement
-                && $word->statement->isa('PPI::Statement::Variable')
-            )
-        ) {
-            next;
-        }
-
-        next if is_method_call($word) && !$word->isa('PPI::Token::Symbol');
 
         # We don't want (for instance) pragma names to be confused with
         # functions.
@@ -235,10 +193,11 @@ sub _build_imports {
         #
         # use Mojo::File qw( curfile );
         # use lib curfile->sibling('lib')->to_string;
+        my $is_function_call = is_function_call($word);
         if (
                $word->parent
             && $word->parent->isa('PPI::Statement::Include')
-            && (   !is_function_call($word)
+            && (   !$is_function_call
                 && !( $word->snext_sibling && $word->snext_sibling eq '->' ) )
         ) {
             next;
@@ -250,25 +209,26 @@ sub _build_imports {
         # then skip this.
         if (   defined $self->_original_imports
             && ( none { $_ eq $word } @{ $self->_original_imports } )
-            && is_function_call($word)
+            && $is_function_call
             && is_perl_builtin($word) ) {
             next;
         }
 
-        my $found_import;
+        my @found_import;
+        my $isa_symbol = $word->isa('PPI::Token::Symbol');
 
         # If a module exports %foo and we find $foo{bar}, $word->canonical
         # returns $foo and $word->symbol returns %foo
-        if (   $word->isa('PPI::Token::Symbol')
+        if (   $isa_symbol
             && $self->_is_importable( $word->symbol ) ) {
-            $found_import = $word->symbol;
+            @found_import = ( $word->symbol );
         }
 
         # Match on \&is_Str as is_Str
-        elsif ($word->isa('PPI::Token::Symbol')
+        elsif ($isa_symbol
             && $word->symbol_type eq '&'
             && $self->_is_importable( substr( $word->symbol, 1 ) ) ) {
-            $found_import = substr( $word->symbol, 1 );
+            @found_import = ( substr( $word->symbol, 1 ) );
         }
 
         # Don't catch ${foo} here and mistake it for "foo". We deal with that
@@ -283,23 +243,23 @@ sub _build_imports {
                 && $word->previous_token->previous_token eq '$'
             )
         ) {
-            $found_import = "$word";
+            @found_import = ("$word");
         }
 
         # Maybe a subroutine ref has been exported. For instance,
         # Getopt::Long exports &GetOptions
-        elsif ( is_function_call($word)
+        elsif ($is_function_call
             && $self->_is_importable( '&' . $word ) ) {
-            $found_import = '&' . "$word";
+            @found_import = ( '&' . "$word" );
         }
 
         # Maybe this is an inner package referencing a function in main.  We
         # don't really deal with inner packages otherwise, so this could break
         # some things.
-        elsif (is_function_call($word)
+        elsif ($is_function_call
             && $word =~ m{^::\w+}
             && $self->_is_importable( substr( $word, 2 ) ) ) {
-            $found_import = substr( $word, 2 );
+            @found_import = ( substr( $word, 2 ) );
         }
 
         # PPI can think that an imported function in a ternary is a label
@@ -309,15 +269,42 @@ sub _build_imports {
             if ( $word->content =~ m{^(\w+)} ) {
                 my $label = $1;
                 if ( $self->_is_importable($label) ) {
-                    $found_import = $label;
+                    @found_import = ($label);
                     $found{$label}++;
                 }
             }
         }
 
-        if ( $found_import
-            && !$self->_is_already_imported($found_import) ) {
-            $found{$found_import}++;
+        # Sometimes an import is only used to set a default value for a
+        # variable in a signature. Without treating a prototype as a signature,
+        # we would miss the import entirely.  I'm not particularly proud of
+        # this, but since PPI doesn't yet support signatures, this will at
+        # least help us cover some cases. If the prototype is actually a
+        # prototype, then this just shouldn't find anything.
+        elsif ( $word->isa('PPI::Token::Prototype') ) {
+            my $prototype = $word->prototype;
+
+            # sometimes closing parens don't get included by PPI.
+            if ( substr( $prototype, -1, 1 ) eq '(' ) {
+                $prototype .= ')';
+            }
+            $prototype =~ s{,}{;}g;
+
+            $prototype .= ';';    # Won't hurt if there's an extra ";"
+            my $new = PPI::Document->new( \$prototype );
+            my $words
+                = $new->find( sub { $_[1]->isa('PPI::Token::Word'); } ) || [];
+            for my $word ( @{$words} ) {
+                if ( $self->_is_importable("$word") ) {
+                    push @found_import, "$word";
+                }
+            }
+        }
+
+        for my $found (@found_import) {
+            if ( !$self->_is_already_imported($found) ) {
+                $found{$found}++;
+            }
         }
     }
 
@@ -521,7 +508,7 @@ sub _build_formatted_ppi_statement {
         ## use critic
 
         if ( !$error && !is_plain_hashref($args) ) {
-            $self->logger->info( 'Not a hashref: ' . np($args) );
+            $self->logger->info( 'Not a hashref: ' . Dumper($args) );
             $error = 1;
         }
 
@@ -554,7 +541,9 @@ sub _build_formatted_ppi_statement {
             $formatted
         );
 
-        perltidy(
+        # save ~60ms in cases where we don't need Perl::Tidy
+        require Perl::Tidy;    ## no perlimports
+        Perl::Tidy::perltidy(
             argv        => '-npro',
             source      => \$statement,
             destination => \$statement
@@ -656,13 +645,14 @@ sub _is_already_imported {
             )
         ) {
             @imports = @{ $self->_document->original_imports->{$module} };
-            $self->logger->debug( 'Explicit imports found: ' . np(@imports) );
+            $self->logger->debug(
+                'Explicit imports found: ' . Dumper(@imports) );
         }
         else {
             if ( my $inspector = $self->_document->inspector_for($module) ) {
                 @imports = $inspector->implicit_export_names;
                 $self->logger->debug(
-                    'Implicit imports found: ' . np(@imports) );
+                    'Implicit imports found: ' . Dumper(@imports) );
             }
         }
 
@@ -692,7 +682,7 @@ App::perlimports::Include - Encapsulate one use statement in a document
 
 =head1 VERSION
 
-version 0.000006
+version 0.000007
 
 =head1 METHODS
 

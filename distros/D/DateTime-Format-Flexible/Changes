@@ -1,5 +1,10 @@
 Revision history for Perl module DateTime::Format::Flexible
 
+0.33 Wed May 26 2021
+  - changes to how some days are parsed to fix memory leaks
+  - remove Module::Pluggable as a dependency
+    - thanks BBKR rt #136597
+
 0.32 Sat Sep 14 2019
   - add support for offset timezones without a space separator and formatted HH:MM '2019-09-03T10:42:00.000-04:00'
     - thanks Stijn Heymans

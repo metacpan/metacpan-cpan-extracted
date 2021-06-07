@@ -24,7 +24,7 @@ my $command_is_called = 0;
 $command_module->mock($command, async sub { my ($self, $param) = @_; $command_is_called = $param; });
 
 my $myriad = new_ok('Myriad');
-my $metaclass = $myriad->META;
+my $metaclass = Object::Pad::MOP::Class->for_class('Myriad');
 my $loop = $myriad->loop;
 testing_loop($loop);
 

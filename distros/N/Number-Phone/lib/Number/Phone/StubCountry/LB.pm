@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20210309172132;
+our $VERSION = 1.20210602223300;
 
 my $formatters = [
                 {
@@ -42,39 +42,43 @@ my $formatters = [
                 },
                 {
                   'format' => '$1 $2 $3',
-                  'leading_digits' => '[7-9]',
+                  'leading_digits' => '[27-9]',
                   'pattern' => '(\\d{2})(\\d{3})(\\d{3})'
                 }
               ];
 
 my $validators = {
                 'fixed_line' => '
+          7(?:
+            62|
+            8[0-7]|
+            9[04-9]
+          )\\d{4}|
           (?:
-            (?:
+            [14-69]\\d|
+            2(?:
               [14-69]\\d|
-              8[02-9]
-            )\\d|
-            7(?:
-              [2-57]\\d|
-              62|
-              8[0-7]|
-              9[04-9]
-            )
-          )\\d{4}
+              [78][1-9]
+            )|
+            7[2-57]|
+            8[02-9]
+          )\\d{5}
         ',
                 'geographic' => '
+          7(?:
+            62|
+            8[0-7]|
+            9[04-9]
+          )\\d{4}|
           (?:
-            (?:
+            [14-69]\\d|
+            2(?:
               [14-69]\\d|
-              8[02-9]
-            )\\d|
-            7(?:
-              [2-57]\\d|
-              62|
-              8[0-7]|
-              9[04-9]
-            )
-          )\\d{4}
+              [78][1-9]
+            )|
+            7[2-57]|
+            8[02-9]
+          )\\d{5}
         ',
                 'mobile' => '
           793(?:
@@ -100,15 +104,23 @@ my $validators = {
                 'toll_free' => '',
                 'voip' => ''
               };
+my %areanames = ();
+$areanames{en} = {"96124", "Metn",
+"96127", "South\ Lebanon",
+"96128", "Bekaa",
+"96126", "North\ Lebanon",
+"96129", "Jbeil\ \&\ Keserwan",
+"96125", "Chouf",
+"96121", "Beirut",};
 
     sub new {
       my $class = shift;
       my $number = shift;
       $number =~ s/(^\+961|\D)//g;
-      my $self = bless({ number => $number, formatters => $formatters, validators => $validators, }, $class);
+      my $self = bless({ number => $number, formatters => $formatters, validators => $validators, areanames => \%areanames}, $class);
       return $self if ($self->is_valid());
       $number =~ s/^(?:0)//;
-      $self = bless({ number => $number, formatters => $formatters, validators => $validators, }, $class);
+      $self = bless({ number => $number, formatters => $formatters, validators => $validators, areanames => \%areanames}, $class);
       return $self->is_valid() ? $self : undef;
     }
 1;

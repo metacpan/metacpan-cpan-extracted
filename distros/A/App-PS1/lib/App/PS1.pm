@@ -17,7 +17,7 @@ use base qw/Class::Accessor::Fast/;
 eval { require Term::Colour256 };
 my $t256 = !$EVAL_ERROR;
 
-our $VERSION = 0.07;
+our $VERSION = 0.08;
 
 __PACKAGE__->mk_accessors(qw/ ps1 cols plugins bw low exit parts safe theme verbose/);
 
@@ -33,7 +33,7 @@ my %theme = (
         date         => [ 'red'   , 'red'    ],
         face_happy   => [ 'green' , 46       ],
         face_sad     => [ 'red'   , 202      ],
-        dir_name     => [ 'blue'  , 'blue'   ],
+        dir_name     => [ 'white' , 'white'  ],
         dir_label    => [ 'black' , 'black'  ],
         dir_size     => [ 'cyan'  , 'cyan'   ],
     },
@@ -236,7 +236,7 @@ App::PS1 - Module to load PS1 status line elements
 
 =head1 VERSION
 
-This documentation refers to App::PS1 version 0.07.
+This documentation refers to App::PS1 version 0.08.
 
 =head1 SYNOPSIS
 

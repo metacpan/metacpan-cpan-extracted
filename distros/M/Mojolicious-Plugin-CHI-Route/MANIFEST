@@ -1,0 +1,9 @@
+lib/Mojolicious/Plugin/CHI/Route.pm
+t/CHI-Route.t
+t/CHI-Route-no.t
+Changes
+MANIFEST
+LICENSE
+Makefile.PL
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

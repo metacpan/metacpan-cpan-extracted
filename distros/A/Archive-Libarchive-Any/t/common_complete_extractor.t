@@ -46,12 +46,12 @@ foreach my $name (qw( foo bar baz ))
     plan tests => 4;
     $r = archive_read_next_header($a, my $entry);
     is $r, ARCHIVE_OK, 'archive_read_next_header';
-    
+
     is archive_entry_pathname($entry), "foo/$name.txt", 'archive_entry_pathname';
-    
+
     $r = archive_write_header($ext, $entry);
     is $r, ARCHIVE_OK, 'archive_write_header';
-    
+
     while(1)
     {
       $r = archive_read_data_block($a, my $buff, my $offset);
@@ -65,10 +65,10 @@ foreach my $name (qw( foo bar baz ))
       if($r != ARCHIVE_OK)
       {
         diag archive_error_string($ext);
-        last;        
+        last;
       }
     }
-    
+
     is $r, ARCHIVE_EOF, 'archive_read_data_block, archive_write_data_block';
   };
 }

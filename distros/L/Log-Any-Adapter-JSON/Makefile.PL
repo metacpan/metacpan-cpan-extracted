@@ -18,7 +18,7 @@ my %WriteMakefileArgs = (
   "NAME" => "Log::Any::Adapter::JSON",
   "PREREQ_PM" => {
     "Carp" => 0,
-    "JSON::MaybeXS" => 0,
+    "Cpanel::JSON::XS" => "4.23",
     "Log::Any::Adapter" => "1.050",
     "Path::Tiny" => 0,
     "Time::Moment" => 0,
@@ -26,13 +26,13 @@ my %WriteMakefileArgs = (
     "strictures" => "2.000006"
   },
   "TEST_REQUIRES" => {
+    "Cpanel::JSON::XS" => "4.23",
     "Encode" => 0,
-    "JSON::MaybeXS" => 0,
     "Test::More::UTF8" => 0,
     "Test::Most" => 0,
     "Test::Pod::Coverage" => 0
   },
-  "VERSION" => "1.12",
+  "VERSION" => "1.15",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -41,8 +41,8 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "Carp" => 0,
+  "Cpanel::JSON::XS" => "4.23",
   "Encode" => 0,
-  "JSON::MaybeXS" => 0,
   "Log::Any::Adapter" => "1.050",
   "Path::Tiny" => 0,
   "Test::More::UTF8" => 0,

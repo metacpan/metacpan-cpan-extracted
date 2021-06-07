@@ -3,6 +3,7 @@ use strict;
 use warnings;
 
 use Module::Build;
+use XS::Parse::Keyword::Builder;
 
 my $build = Module::Build->new(
    module_name => "Syntax::Keyword::Try",
@@ -11,9 +12,11 @@ my $build = Module::Build->new(
    },
    configure_requires => {
       'Module::Build' => '0.4004', # test_requires
+      'XS::Parse::Keyword::Builder' => '0.06',
    },
    requires => {
       'perl' => '5.014', # pluggable keywords, XOP
+      'XS::Parse::Keyword' => '0.06',
    },
    license => 'perl',
    create_license => 1,
@@ -26,5 +29,7 @@ my $build = Module::Build->new(
 
    extra_compiler_flags => [qw( -Ihax )],
 );
+
+XS::Parse::Keyword::Builder->extend_module_build( $build );
 
 $build->create_build_script;

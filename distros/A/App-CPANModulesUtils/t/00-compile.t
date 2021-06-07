@@ -6,7 +6,7 @@ use warnings;
 
 use Test::More;
 
-plan tests => 4 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 5 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'App/CPANModulesUtils.pm'
@@ -15,7 +15,8 @@ my @module_files = (
 my @scripts = (
     'script/acme-cpanmodules-for',
     'script/draw-feature-matrix-from-acme-cpanmodules-module',
-    'script/gen-acme-cpanmodules-module-from-acme-cpanlists-list'
+    'script/gen-acme-cpanmodules-module-from-acme-cpanlists-list',
+    'script/gen-acme-cpanmodules-module-from-webpage'
 );
 
 # no fake home requested

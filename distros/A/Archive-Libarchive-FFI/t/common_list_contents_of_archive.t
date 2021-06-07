@@ -20,11 +20,11 @@ foreach my $mode (qw( memory filename callback fh ))
     my $ok = subtest $testname=> sub {
       plan skip_all => "$format not supported" if $format =~ /(\.gz|\.bz2|xar)$/;
       plan tests => 17;
-    
+
       my $filename = File::Spec->catfile($FindBin::Bin, "foo.$format");
       my $r;
       my $entry;
-    
+
       note "filename = $filename";
 
       my $a = archive_read_new();
@@ -126,7 +126,7 @@ foreach my $mode (qw( memory filename callback fh ))
 
       $r = archive_read_next_header($a, $entry);
       is $r, ARCHIVE_EOF, "r = ARCHIVE_EOF (archive_read_next_header 4)";
- 
+
       $r = archive_read_free($a);
       is $r, ARCHIVE_OK, "r = ARCHIVE_OK (archive_read_free)";
     };

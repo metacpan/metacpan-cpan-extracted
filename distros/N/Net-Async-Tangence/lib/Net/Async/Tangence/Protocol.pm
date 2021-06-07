@@ -3,12 +3,10 @@
 #
 #  (C) Paul Evans, 2010-2011 -- leonerd@leonerd.org.uk
 
-package Net::Async::Tangence::Protocol;
+package Net::Async::Tangence::Protocol 0.16;
 
-use strict;
+use v5.14;
 use warnings;
-
-our $VERSION = '0.15';
 
 use base qw( IO::Async::Stream Tangence::Stream );
 

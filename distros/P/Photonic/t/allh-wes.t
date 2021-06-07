@@ -46,7 +46,7 @@ make_default_store($fn);
 #Check haydock coefficients for simple 1D system
 my ($ea, $eb)=(1+2*i, 3+4*i);
 my $f=6/11;
-my $eps=$ea*(zeroes(11)->xvals<5)+ $eb*(zeroes(11)->xvals>=5)+0*i;
+my $eps=r2C($ea*(zeroes(11)->xvals<5)+ $eb*(zeroes(11)->xvals>=5));
 my $g=Photonic::Geometry::FromEpsilon
     ->new(epsilon=>$eps);
 my $m=Photonic::WE::S::Metric->new(
@@ -67,7 +67,7 @@ ok(Cagree(pdl($b2s)->mv(-1,1)->complex, pdl($bs)->mv(-1,1)->complex**2),
 	"1D L b2==b^2");
 
 #Check haydock coefficients for simple 1D system other longitudinal y
-my $eps1l=$ea*(zeroes(11,1)->xvals<5)+ $eb*(zeroes(11,1)->xvals>=5)+0*i;
+my $eps1l=r2C($ea*(zeroes(11,1)->xvals<5)+ $eb*(zeroes(11,1)->xvals>=5));
 my $g1l=Photonic::Geometry::FromEpsilon
     ->new(epsilon=>$eps1l);
 my $m1l=Photonic::WE::S::Metric->new(
@@ -85,7 +85,7 @@ ok(Cagree(($b2s1l->[0]), 1), "1D L b_0^2");
 ok(Cagree(($as1l->[0]), (1-$ea)*(1-$f)+(1-$eb)*$f), "1D L a_0");
 
 #Check haydock coefficients for simple 1D system transverse prop x pol y
-my $epst=$ea*(zeroes(11,1)->xvals<5)+ $eb*(zeroes(11,1)->xvals>=5)+0*i;
+my $epst=r2C($ea*(zeroes(11,1)->xvals<5)+ $eb*(zeroes(11,1)->xvals>=5));
 my $gt=Photonic::Geometry::FromEpsilon
     ->new(epsilon=>$epst);
 my $mt=Photonic::WE::S::Metric->new(

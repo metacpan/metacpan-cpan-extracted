@@ -1,7 +1,9 @@
 package Perinci::Sub::To::POD;
 
-our $DATE = '2021-02-21'; # DATE
-our $VERSION = '0.875'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2021-05-24'; # DATE
+our $DIST = 'Perinci-To-Doc'; # DIST
+our $VERSION = '0.877'; # VERSION
 
 use 5.010001;
 use Log::ger;
@@ -394,14 +396,14 @@ sub after_gen_doc {
     }
 
     $self->add_doc_lines($self->_md2pod(__(
-"Returns an enveloped result (an array).
+'Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.")), "")
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.')), "")
          unless $orig_result_naked;
 
     $self->add_doc_lines(__("Return value") . ': ' .
@@ -444,7 +446,7 @@ Perinci::Sub::To::POD - Generate POD documentation from Rinci function metadata
 
 =head1 VERSION
 
-This document describes version 0.875 of Perinci::Sub::To::POD (from Perl distribution Perinci-To-Doc), released on 2021-02-21.
+This document describes version 0.877 of Perinci::Sub::To::POD (from Perl distribution Perinci-To-Doc), released on 2021-05-24.
 
 =head1 SYNOPSIS
 

@@ -24,8 +24,6 @@ foreach my $if (qw{Pasteboard.xs constant-c.inc constant-h.inc
 
 my $meta = My::Module::Meta->new();
 
-my @ccflags = $meta->ccflags();
-
 my %args = (
     add_to_cleanup	=> $meta->add_to_cleanup(),
     build_requires	=> $meta->build_requires(),
@@ -37,10 +35,6 @@ my %args = (
     dist_abstract	=> $meta->abstract(),
     dist_author	=> $meta->author(),
     dist_name	=> $meta->dist_name(),
-    ( @ccflags ?
-	( extra_compiler_flags => \@ccflags ) :
-	()
-    ),
     license	=> $meta->license(),
     module_name	=> $meta->module_name(),
     PL_files	=> {
@@ -55,6 +49,8 @@ my %args = (
 $mbv >= 0.26
     and $args{get_options} = {
 	n	=> { type => '!' },
+	t	=> { type => '!' },
+	u	=> { type => '!' },
 	y	=> { type => '!' },
     };
 
@@ -77,6 +73,8 @@ $meta->want_pbtool( \%opt, $bldr )
     and push @exe_files, 'script/pbtool';
 
 $bldr->script_files( \@exe_files );
+
+$bldr->extra_compiler_flags( $meta->ccflags( \%opt ) );
 
 $bldr->create_build_script ();
 

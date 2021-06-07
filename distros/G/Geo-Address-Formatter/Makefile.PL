@@ -21,7 +21,6 @@ my %WriteMakefileArgs = (
     "Data::Dumper" => 0,
     "File::Basename" => 0,
     "File::Find::Rule" => 0,
-    "List::Util" => 0,
     "Ref::Util" => "0.204",
     "Scalar::Util" => 0,
     "Text::Hogan" => "2.03",
@@ -33,10 +32,9 @@ my %WriteMakefileArgs = (
     "File::Spec" => 0,
     "Test::Exception" => 0,
     "Test::More" => "0.88",
-    "Test::Warn" => 0,
-    "Text::Trim" => "1.02"
+    "Test::Warn" => 0
   },
-  "VERSION" => "1.88",
+  "VERSION" => "1.93",
   "test" => {
     "TESTS" => "t/blackbox/*.t t/unit/*.t"
   }
@@ -50,14 +48,12 @@ my %FallbackPrereqs = (
   "File::Find::Rule" => 0,
   "File::Slurper" => 0,
   "File::Spec" => 0,
-  "List::Util" => 0,
   "Ref::Util" => "0.204",
   "Scalar::Util" => 0,
   "Test::Exception" => 0,
   "Test::More" => "0.88",
   "Test::Warn" => 0,
   "Text::Hogan" => "2.03",
-  "Text::Trim" => "1.02",
   "Try::Catch" => 0,
   "YAML::LibYAML" => "0.82"
 );

@@ -1,5 +1,8 @@
 Revision history for NewFangle},
 
+0.07      2021-06-01 07:14:44 -0600
+  - Documentation fixes and improvements (gh#21)
+
 0.06      2021-05-06 10:25:40 -0600
   - Fixed some frankly embarrassing documentation errors (arc++, gh#20)
 

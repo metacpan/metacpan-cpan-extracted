@@ -1,8 +1,14 @@
 ---
+doctype: global
+
+distribution_name: Acme-Resume
+
+---
 doctype: dist
 
 header:
   name: Acme-Resume
+  copyright_year: 2021
 
 prereqs:
   runtime:
@@ -32,3 +38,11 @@ doctype: weaver
 
 plugins:
   - +config: Author::CSSON
+
+---
+doctype: cpanfile
+
+---
+doctype: gitignore
+
+config: Author::CSSON

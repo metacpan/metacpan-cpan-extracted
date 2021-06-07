@@ -3,11 +3,12 @@ abstract: 'Determine whether it is Taiwan Holidays or not.'
 author:
   - 'Kang-min Liu C<< <gugod@gugod.org> >>'
   - 'Wei-Hon Chen'
-build_requires: {}
+build_requires:
+  Test2::V0: '0'
 configure_requires:
   Module::Build::Tiny: '0.034'
 dynamic_config: 0
-generated_by: 'App::ModuleBuildTiny version 0.027, CPAN::Meta::Converter version 2.150010'
+generated_by: 'App::ModuleBuildTiny version 0.029, CPAN::Meta::Converter version 2.150010'
 license: mit
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -16,14 +17,14 @@ name: Date-Holidays-TW
 provides:
   Date::Holidays::TW:
     file: lib/Date/Holidays/TW.pm
-    version: v0.2.0
+    version: v0.3.0
 requires:
   DateTime: '0'
   DateTime::Calendar::Chinese: '0'
 resources:
   bugtracker: https://github.com/perltaiwan/Date-Holidays-TW/issues
   repository: https://github.com/perltaiwan/Date-Holidays-TW.git
-version: v0.2.0
+version: v0.3.0
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_spdx_expression: MIT
 x_static_install: '1'

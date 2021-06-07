@@ -14,6 +14,7 @@ lua.output/globals.txt
 lua.output/hello.txt
 lua.output/life.txt
 lua.output/luac.txt
+lua.output/multi.line.comment.txt
 lua.output/printf.txt
 lua.output/readonly.txt
 lua.output/sieve.txt
@@ -36,6 +37,7 @@ lua.sources/hello.lua
 lua.sources/keyword.as.identifier.lua
 lua.sources/life.lua
 lua.sources/luac.lua
+lua.sources/multi.line.comment.lua
 lua.sources/printf.lua
 lua.sources/readonly.lua
 lua.sources/sieve.lua
@@ -47,13 +49,16 @@ lua.sources/trace-globals.lua
 lua.sources/xd.lua
 Makefile.PL
 MANIFEST			This list of files
-META.json
-META.yml
+MANIFEST.SKIP
 README
 scripts/parse.all.sources.sh
 scripts/parse.file.pl
 scripts/pod2html.sh
 scripts/synopsis.pl
+t/00.versions.t
+t/00.versions.tx
 t/keyword.as.identifier.t
 t/runner.t
 xt/author/pod.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

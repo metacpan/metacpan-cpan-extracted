@@ -1,13 +1,15 @@
 use strict;
 use utf8;
 
-use Test::More;
+use Test2::V0;
 use Test::Warnings 'warning';
 use Test::Requires 'JSON::MaybeXS';
 
 use Path::Tiny;
 
 use File::Serialize;
+
+plan tests => 2;
 
 my $data = { a => "Kohl’s" };
 my $file = Path::Tiny->tempfile( SUFFIX => '.json' );
@@ -19,4 +21,3 @@ like( $warning , qr/Wide character in print/ , 'Expected wide char warning' )
 # just run to verify no warnings with default utf8 => 1
 serialize_file( Path::Tiny->tempfile( SUFFIX => '.json' ) => $data );
 
-done_testing();

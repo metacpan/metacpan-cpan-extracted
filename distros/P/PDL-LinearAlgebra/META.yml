@@ -19,11 +19,11 @@ no_index:
     - t
     - inc
 requires:
-  PDL: '2.034'
+  PDL: '2.047'
 resources:
   bugtracker: https://github.com/PDLPorters/pdl-linearalgebra/issues
   homepage: http://pdl.perl.org/
   repository: git://github.com/PDLPorters/pdl-linearalgebra.git
-version: '0.18'
+version: '0.20'
 x_IRC: irc://irc.perl.org/#pdl
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

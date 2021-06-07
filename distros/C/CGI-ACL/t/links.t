@@ -8,7 +8,7 @@ if(not $ENV{AUTHOR_TESTING}) {
 	plan(skip_all => 'Author tests not required for installation');
 }
 
-eval "use Test::Pod::LinkCheck";
+eval 'use Test::Pod::LinkCheck';
 if($@) {
 	plan(skip_all => 'Test::Pod::LinkCheck required for testing POD');
 } else {

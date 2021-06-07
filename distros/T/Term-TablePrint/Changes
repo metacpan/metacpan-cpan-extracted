@@ -1,6 +1,14 @@
 Revision history for Term::TablePrint
 
 
+0.134   2021-06-04
+        - Code cleanup.
+
+0.133   2021-06-04
+        - Code refactoring.
+        - Removed option 'choose_columns'.
+        - Update option 'table_expand'.
+
 0.132   2021-04-25
         - Replace 'croak' with 'die'.
 

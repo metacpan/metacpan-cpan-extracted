@@ -22,5 +22,6 @@ t/10bbio.t
 t/20spi.t
 t/30i2c.t
 t/40uart.t
+t/71device-chip-i2c.t
 t/99pod.t
 t/lib/TestBusPirate.pm

@@ -1,0 +1,116 @@
+#!/usr/bin/perl
+
+use 5.001 ; use strict ; use warnings ; 
+use Digest::SHA1 qw[ sha1 sha1_hex sha1_base64 ]; 
+use Getopt::Std ; getopts 'p18' , \my %o ; 
+sub output ( )  ;
+sub readsum ( )  ;
+my @O ; # 各列の出力値を格納。$O[$col] = [ h1, h2, h3, h4, h5 ] のような無名配列の配列。
+
+readsum () ; 
+output () ; 
+exit 0 ; 
+
+sub readsum ( ) { 
+	sub colsha ; 
+
+	* colsha = ! $o{ p } ? * colsha_simple : * colsha_xorsum ; 
+	colsha () ;
+	return ;
+
+	sub colsha_simple ( ) { 
+		my @D ; 
+		while ( <> ) { 
+			chomp ; 
+			my @F = split /\t/ , $_ , -1 ; 
+			for ( 0 .. $#{ F } ) { 
+		        $D[$_] = Digest::SHA1 -> new unless defined $D[$_] ; 
+		        $D[$_] -> add ( $o{1} ? "$F[$_]\n" : "$.:$F[$_]\n" ) ; # <-- 列番号も付加することとした。-1指定で解除可能。
+			}
+		}
+		$O[$_] = [unpack 'L5', $D[$_] -> digest ] for 0 .. $#{ D } ;
+	}
+
+	sub colsha_xorsum ( ) { 
+		#sub xor5 ( $$ ) { [ map { $_[0]->[$_] ^ $_[1]->[$_] } 0..4 ] } # 符号無し32ビット整数5個の組の排他的論理和
+		#sub xor5 ( @ ) { return map { $_[$_] ^ $_[$_+5] } 0..4  } # 符号無し32ビット整数5個の組の排他的論理和
+		sub xor5 ( @ ) { return $_[0]^$_[5],$_[1]^$_[6],$_[2]^$_[7],$_[3]^$_[8],$_[4]^$_[9] } # 符号無し32ビット整数5個の組の排他的論理和
+		while ( <> ) { 
+			chomp ; 
+			my @F = split /\t/ , $_ , -1 ; 
+			for ( 0 .. $#{ F } ) { 
+	            $O[$_] = [(0)x5] unless defined $O[$_] ;
+	            $O[$_] = [ xor5 @{$O[$_]} , unpack 'L5' , sha1 $F[$_] ]  ; 
+			}
+		}
+	}
+}
+
+sub output ( ) { 
+
+	sub printing ( ) ; 
+	* printing = $o{8} ? * print_horiz8 : * print_vertical ;
+
+	printing ; 
+	return ;
+
+	sub print_vertical { 
+		for ( 0 .. $#{ O } ) { 
+			my @L8 = map{ join'', reverse m/(..)/g } map{ sprintf '%08x' , $_ } @{ $O[$_] } ; # <-- - shasumコマンドと結果を一致させるため
+			print $_ + 1 , "\t" , join ( ':' , @L8 ) , "\n" ; #map{ sprintf '%08x',$_ } @{ $O[$_] } ; 
+		}
+	}
+
+	sub xorsum ( @ ) { my $tmp = 0 ; $tmp ^= $_ for @_ ; return $tmp } 
+
+	sub print_horiz8 { 
+		my @L8 = map{ join'', reverse m/(..)/g } map { sprintf '%08x' , xorsum @{ $O[$_] } } 0 .. $#{ O } ;
+		print join ( "\t" , @L8 ) , "\n" ; #map{ sprintf '%08x',$_ } @{ $O[$_] } ; 
+	}
+}
+
+
+sub VERSION_MESSAGE {}
+sub HELP_MESSAGE {
+    use FindBin qw[ $Script ] ; 
+    my ($a1,$L,$opt,@out) = ($ARGV[1]//'',0,'^o(p(t(i(o(ns?)?)?)?)?)?$') ;
+    open my $FH , '<' , $0 ;
+    while(<$FH>){
+        s/\$0/$Script/g ;
+        $out[$L] .= $_ if s/^=head1\s*(.*)\n/$1/s .. s/^=cut\n//s && ++$L and $a1 =~ /$opt/i ? m/^\s+\-/ : 1 ;
+    }
+    close $FH ;
+    print $ENV{LANG} =~ m/^ja/ ? $out[0] : $out[1] // $out[0] ;
+    exit 0 ;
+}
+
+=encoding utf8
+
+=head1
+
+$0 
+
+ 入力の各行をタブ文字列で列に分割し、各列の sha1 和を求める。
+ ただし、 sha1和を求める際に、各行について行番号と改行文字を加えている。
+  スイッチオプションとして、-p を用いると、各行の sha1 についての
+  全行に渡る排他的論理和を出力する。
+ 
+   2次情報として、計算にかかった秒数と、読み込んだ行数を出力する。
+   列数が変わる場合も考慮してある。
+
+ 想定されている用途例 : 
+   * いくつかの列が、全く同じ値を取っていることを確認するため。
+   * いくつかの列が、順序を無視すると、全く同じ値を取ることを確認するため。
+   * 大きなデータをソートした後に、欠損や不要な汚染が起きていないことの確認のため。
+
+ オプション: 
+  -p : 各行についてのSHA1ダイジェスト値の全行に渡る排他的論理和を出力する。
+  -8 : 各列について8文字幅(4バイト)に縮約した16進値を表示する。20バイトを5バイトごとに切ってxorを取っている。
+  -1 : 列数が変動する場合に備え、行番号も内部で付加して計算しているが、それを解除する。
+
+  開発上の注意 :
+    sha1値を計算して、符号無し32ビット整数を用いてる。64ビット環境なら問題ないはず。
+    もしも、符号無し16ビット整数に変えるなら下記が必要と考えられる。
+    unpack 'L5' を unpack 'S10' に変え、"%08x" の2箇所を"%04x" に変更。xor5 を xor10に変更。
+
+=cut 

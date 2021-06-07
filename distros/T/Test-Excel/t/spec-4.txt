@@ -1,0 +1,2 @@
+sheet ALL
+ignorerange A1:B1,B2:B4

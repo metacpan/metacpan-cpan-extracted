@@ -1,7 +1,9 @@
 package lib::noop;
 
-our $DATE = '2016-12-27'; # DATE
-our $VERSION = '0.002'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2021-06-07'; # DATE
+our $DIST = 'lib-noop'; # DIST
+our $VERSION = '0.006'; # VERSION
 
 use strict;
 use warnings;
@@ -35,7 +37,7 @@ sub unimport {
 }
 
 1;
-# ABSTRACT: no-op loading some modules
+# ABSTRACT: no-op loading of some modules
 
 __END__
 
@@ -45,11 +47,11 @@ __END__
 
 =head1 NAME
 
-lib::noop - no-op loading some modules
+lib::noop - no-op loading of some modules
 
 =head1 VERSION
 
-This document describes version 0.002 of lib::noop (from Perl distribution lib-noop), released on 2016-12-27.
+This document describes version 0.006 of lib::noop (from Perl distribution lib-noop), released on 2021-06-07.
 
 =head1 SYNOPSIS
 
@@ -86,13 +88,19 @@ entry first:
  BEGIN { print Data::Dumper::Dumper([1,2,3]) }
 
  no lib::noop;
- BEGIN { delete $INC{"Foo/Bar.pm"} }
+ BEGIN { delete $INC{"Data/Dumper.pm"} }
  use Data::Dumper;
 
  # this code now runs ok
  BEGIN { print Data::Dumper::Dumper([1,2,3]) }
 
 =for Pod::Coverage .+
+
+=head1 CONTRIBUTOR
+
+=for stopwords perlancar (on netbook-dell-xps13)
+
+perlancar (on netbook-dell-xps13) <perlancar@gmail.com>
 
 =head1 HOMEPAGE
 
@@ -110,13 +118,21 @@ When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
 
+=head1 SEE ALSO
+
+L<lib::noop::all>
+
+L<lib::noop::except>
+
+L<lib::noop::all_missing>
+
 =head1 AUTHOR
 
 perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2016 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

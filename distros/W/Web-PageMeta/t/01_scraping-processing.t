@@ -5,7 +5,7 @@ use utf8;
 
 use Test::Most;
 use Web::PageMeta;
-use Web::Scraper;
+use Web::Scraper::LibXML;
 
 subtest 'www.meon.eu' => sub {
     my $escraper = scraper {

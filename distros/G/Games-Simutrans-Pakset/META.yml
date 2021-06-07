@@ -1,0 +1,42 @@
+---
+abstract: 'Represents an entire Pakset for the Simutrans game'
+author:
+  - 'William Lindley <wlindley@cpan.org>'
+build_requires:
+  Test::More: '0.96'
+configure_requires:
+  Module::Build::Tiny: '0.034'
+dynamic_config: 0
+generated_by: 'Dist::Milla version v1.0.20, Dist::Zilla version 6.017, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Games-Simutrans-Pakset
+no_index:
+  directory:
+    - eg
+    - examples
+    - inc
+    - share
+    - t
+    - xt
+requires:
+  Data::DeepAccess: '0'
+  Imager: '0'
+  List::Util: '0'
+  Mojo::Base: '0'
+  Mojo::File: '0'
+  Mojo::Path: '0'
+  Path::ExpandTilde: '0'
+  Pod::Simple: '0'
+  perl: '5.032'
+resources:
+  repository: https://wlindley@bitbucket.org/wlindley/games-simutrans-pakset.git
+version: '0.02'
+x_contributors:
+  - 'William Lindley <wlindley@wlindley.com>'
+x_generated_by_perl: v5.34.0
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'
+x_static_install: 0

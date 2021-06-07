@@ -8,6 +8,8 @@ namespace xs {
 using xs::my_perl;
 
 struct Sub : Sv {
+    enum class Want { Void = G_VOID, Scalar = G_SCALAR, Array = G_ARRAY };
+
     static Sub create (panda::string_view code); // create sub by evaling perl code
     static Sub create (XSUBADDR_t);              // create anon XSub
 
@@ -81,6 +83,10 @@ struct Sub : Sv {
         if (!ret) _throw_super();
         return ret;
     }
+
+    static Want want () { return (Want)GIMME_V; }
+
+    static int want_count ();
 
 private:
     struct CallArgs {

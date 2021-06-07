@@ -1,0 +1,179 @@
+#!/usr/bin/perl
+use 5.014;
+use strict;
+use warnings;    # srandのために5.014が必要。
+use List::Util;
+use Term::ANSIColor qw/:constants color/; $Term::ANSIColor::AUTORESET = 1 ;
+use Getopt::Std; getopts ':k:qr:Rs:u:vVx:=.:/:@:' , \my %o;
+
+use FindBin qw[ $Script ];
+
+sub WholeLines ( ) ; # 入力各行の処理
+
+sub DryRun ( ) ; 
+sub rate4print ( $ ) ; # 抽出確率の出力に用いる。
+
+my $in      = 0;    # 入力行数
+my $out     = 0;    # 出力行数
+my $ratesum = 0;    # 全行の抽出確率の総和;  出力行数の期待値の母数になる。
+my ( $isep, $osep ) ;    # 入出力の区切り文字
+
+my $seed ; # ランダムシード
+my $cycSec = $o{'@'} // 15 ;
+& Init ;
+print STDERR "\x1b[33mwaiting from STDIN.. ($Script)  \x1b[0m\n" if -t;
+& DryRun and exit 0 if $o{V} ; # ドライラン ; 本番で抽出される確率を色つきで追加して出力
+& WholeLines ; 
+& Finish ;
+exit 0;
+
+sub Init ( ) {
+    print $o{':'} ? "=:\t" : '' , my $tmp = <> if $o{'='}; # ヘッダの表示
+
+    # 抽出確率の設定
+    $o{r} //= 0.1;    # 抽出確率
+    $o{r} =~ m/(.+)\/(.+)/ and $o{r} = $1 / $2 ; # 分数形式で与えられた場合
+
+    # ランダムシードの設定
+    srand do{ $o{s}//='';my $s=($o{s}=~s/(.*)!$//)?$1:1<<32; $seed = $o{s}||int rand($s) } ;
+    #$o{s} = defined $o{s} ? srand $o{s} : srand;  # 乱数シードの保管/設定。
+
+    # ??
+    $o{x} //= 1;      # 抽出確率の表示の時に、乗じる係数
+
+    # 区切り文字の指定
+    $isep = $o{'/'} //= do { $o{','} //= "\t" ; eval qq[qq[$o{','}]] } ; # 入力の区切り文字 
+    $osep = $o{'.'} //= do { $o{'.'} //= "\t" ; eval qq[qq[$o{'.'}]] } ; # 出力の区切り文字
+
+
+    # シグナルを用いた処理に関して
+
+    $SIG{ALRM} = sub { 
+        (my $n=$.) =~ s/(?<=\d)(?=(\d\d\d)+($|\D))/,/g ; # 3桁ごとに区切る。
+        print STDERR GREEN "$n lines read. " , scalar localtime , " " , RESET "\n" ; 
+        alarm $cycSec 
+    } ; 
+    sub IntFirst {
+        &{ $SIG{ALRM} } ;
+        print STDERR BRIGHT_RED 
+         'Do you want to terminate? Then type Ctrl + C again within 2 Seconds. '. "\n" .
+         'Other options are :  press Ctrl + "\" or Ctrl + Yen-Mark ;Ctrl+Z may be what you want but remember jobs/kill commands ' . RESET "\n" ;
+        local $SIG{QUIT} = sub { select *STDERR ; & Finish () ; select *STDOUT ; sleep 2  } ; 
+        eval { local $SIG{ALRM} = sub { alarm 0 ; alarm $cycSec ; die } ; alarm 2 ;  1 while 1 ;}
+    } ;
+    $SIG{INT} = sub { & IntFirst } ; #$IntFirst ;
+
+    alarm $cycSec ;
+
+}
+
+sub WholeLines ( ) {
+    while (<>) {
+        $in ++ ;
+        chomp;
+        my $coeff = $o{k} ? ( split /$isep/, $_, $o{k} + 1 )[ $o{k} - 1 ] || 0 : 1 ;
+        next if $o{u} && $coeff > $o{u} ; # <-- - 小頻度のものだけを見たい時に使う。$o{u} 以下の場合のみ次に進める。
+        my $rRate = $o{r} * $coeff;    # 各行の実際の抽出率
+        $ratesum += $rRate;    #$maxrate=$maxrate>$rRate? $maxrate:$rRate ;
+        my $quant = $rRate;
+
+        $quant -= rand if ! $o{R} ;
+        $quant += log ( 1-rand ) if $o{R} ;  
+        while ( $quant  > 0 ) {
+            ++ $out;
+            print BRIGHT_BLUE rate4print $rRate , RESET $osep if $o{v} ;
+            print "$in:$osep" if $o{':'} ;
+            print $_ ;
+            print "\n" ;
+            $quant +=  $o{R} ?  log ( 1 - rand ) : -1 ; # -- ;
+        }
+        #if ($intflg) { last }
+    }
+}
+
+sub DryRun ( ) {
+    while (<>) {
+        chomp;
+        my $rRate = ! defined $o{k}? $o{r}  : $o{r} * ( ( split /$osep/ )[ $o{k} - 1 ] || 0 ) ;    # 各行の実際の抽出率
+        print BRIGHT_BLUE rate4print $rRate , RESET $osep, GREEN $., RESET $osep, $_ , "\n" ;
+    }
+    1 ;
+}
+
+# 処理した内容についての二次情報を出力
+sub Finish ( ) {
+
+    sub num4print( $ ) {
+        my $z1 = sprintf "%4.2f", $_[0];
+        my $z2 = sprintf "%1.3e", $_[0];
+        $_[0] >= 0.1 ? length($z1) <= length($z2) ? $z1 : $z2 : $z2;
+    }
+
+    $0 =~ s|.*/||;
+    my @info ;
+    push @info , CYAN "printed lines: " . BRIGHT_CYAN "$out/$in";
+    push @info , CYAN " ; a priori expected line number : " . BRIGHT_CYAN num4print($ratesum) ;
+    push @info , CYAN " ; used random seed: " . BRIGHT_CYAN $seed ; # $o{s};
+    push @info , CYAN " ($0)"  ;
+    push @info, BRIGHT_GREEN sprintf " %02d:%02d:%02d" , @{ [localtime] }[2,1,0] ; 
+    print STDERR @info, "\n" unless $o{q};
+}
+
+sub rate4print ( $ ) { sprintf( "%g", $_[0] * $o{x} ) } # <-- - $3gの数字の3を書かなくても良くしたい。
+
+
+
+# ヘルプの扱い
+sub VERSION_MESSAGE {}
+sub HELP_MESSAGE {
+    use FindBin qw[ $Script ] ; 
+    $ARGV[1] //= '' ;
+    open my $FH , '<' , $0 ;
+    while(<$FH>){
+        s/\$0/$Script/g ;
+        print $_ if s/^=head1// .. s/^=cut// and $ARGV[1] =~ /^o(p(t(i(o(ns?)?)?)?)?)?$/i ? m/^\s+\-/ : 1;
+    }
+    close $FH ;
+    exit 0 ;
+}
+
+=encoding utf8
+
+=head1
+ $0
+
+ -r N : 抽出確率を指定。0.1 や 1e-2 など指定する。0.5 がデフォルトの値。'1/3' のような分数も対応。
+ -k N : 1始まりの列番号を指定することで、その数を -r で指定された数に乗じた数が抽出確率になる。
+ -:   ; 何番目かのデータであるかを付加して表示される。( -= でヘッダ仮定があれば、2行目を1とする。)
+ -q    ; 標準エラー出力に出すことになっている出力行数や乱数シードの情報を出力しない。
+ -u num ; -kの指定がある場合に、その列の値が num 以下のみであれば、出力の対象となる。
+ -v その行の抽出確率の指定値が、行の末尾に表示される。
+
+ -R   : 復元抽出するように抽出する。ある意味において、二項分布をうまくシュミレートする。
+ -V   : 確率的抽出動作はしない。単に各行の末尾に抽出指定値を付加する。
+ -x N : 各行の抽出確率を出力する際に、数字を見やすくするために、N倍したものを出力する。
+ -= 入力の最初の1行目はそのまま出力し、ランダム抽出の対象とはしない。
+ -/ str  : 入力の区切り文字をstr で指定する。未指定ならタブ文字。
+ -. str  : 出力の区切り文字をstr で指定する。未指定ならタブ文字。
+ 
+ [用途と使い方]
+
+ 標準入力の各行を、指定された確率で、標準出力に書き出す。
+ 出力において順番の入れ替えはしない。
+
+  $0 -r 1e-2
+
+   # 標準入力の各行を100個に1個出力。
+
+  $0 -r (rate) -k (key)
+
+ # 各行の抽出確率が タブ区切り key 列目(1始まり)の値の数 を
+ # rate にかけ算した数になる。
+
+ [注意点]
+
+ 各行の抽出確率r の値が0以上1以下の数でない場合の処理について:
+  r>1 の場合は、まずint(r)回同じ行を書き出し、そして、r-int(r)の確率で1回出力する。
+  r<0 の場合は、何も出力をしない。
+ このようにすることで、各行が抽出される回数の期待値が、r>0の場合に r回となる。
+=cut

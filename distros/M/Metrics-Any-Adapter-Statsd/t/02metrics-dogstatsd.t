@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 
-use strict;
+use v5.14;
 use warnings;
 
 use Test::More;
@@ -32,7 +32,7 @@ my $socket = IO::Socket::INET->new(
    $metrics->inc_counter( counter => "labvalue" );
 
    $socket->recv( my $packet, 512 );
-   is( $packet, "the.counter:1|c#label:labvalue",
+   is( $packet, "the.counter:1|c|#label:labvalue",
       '->inc_counter sends statsd packet'
    );
 }
@@ -47,7 +47,7 @@ my $socket = IO::Socket::INET->new(
    $metrics->report_distribution( distribution => 20, "labvalue" );
 
    $socket->recv( my $packet, 512 );
-   is( $packet, "the.distribution:20|h#label:labvalue",
+   is( $packet, "the.distribution:20|h|#label:labvalue",
       '->report_distribution sends statsd packet'
    );
 }
@@ -62,7 +62,7 @@ my $socket = IO::Socket::INET->new(
    $metrics->set_gauge_to( gauge => 123, "labvalue" );
 
    $socket->recv( my $packet, 512 );
-   is( $packet, "the.gauge:123|g#label:labvalue",
+   is( $packet, "the.gauge:123|g|#label:labvalue",
       '->set_gauge_to sends statsd packet'
    );
 }
@@ -77,7 +77,7 @@ my $socket = IO::Socket::INET->new(
    $metrics->report_timer( timer => 0.25, "labvalue" ); # seconds
 
    $socket->recv( my $packet, 512 );
-   is( $packet, "the.timer:250|ms#label:labvalue",
+   is( $packet, "the.timer:250|ms|#label:labvalue",
       '->report_timer sends statsd packet'
    );
 }

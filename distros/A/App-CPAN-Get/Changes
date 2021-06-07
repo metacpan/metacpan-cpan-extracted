@@ -1,0 +1,10 @@
+0.02 2021-05-19T00:49:28+02:00
+ - Add ERRORS section to doc and fix one error.
+ - Add examples/ dir.
+ - Add test for constructor.
+ - Fix EXAMPLE section in doc.
+ - Improve message about saving.
+ - Improve documentation of script (thanks Paul Evans, GT#1).
+
+0.01 2021-05-18T14:20:21+02:00
+ - First version.

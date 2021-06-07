@@ -9,7 +9,6 @@ requires "Getopt::Long" => "2.42";
 requires "List::Util" => "1.38";
 requires "Locale::Maketext" => "1.25";
 requires "Locale::Maketext::Lexicon::Gettext" => "1.00";
-requires "Modern::Perl" => "1.20140107";
 requires "Moo" => "1.000001";
 requires "Moo::Role" => "0";
 requires "Pod::Text::Termcap" => "2.08";
@@ -21,6 +20,7 @@ requires "Types::Standard" => "1.000005";
 requires "namespace::clean" => "0.25";
 requires "parent" => "0.228";
 requires "perl" => "5.014_001";
+requires "strict" => "1.00";
 requires "subs" => "1.00";
 requires "warnings" => "1.00";
 
@@ -34,6 +34,7 @@ on 'test' => sub {
   requires "Test::Output" => "1.03";
   requires "Test::Pod" => "0";
   requires "Test::Pod::Coverage" => "0";
+  requires "perl" => "5.014_001";
   requires "strict" => "1.00";
   requires "warnings" => "1.00";
 };

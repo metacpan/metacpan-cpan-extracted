@@ -9,7 +9,7 @@ use Device::Inverter::KOSTAL::PIKO;
 use Getopt::Long qw(GetOptions);
 
 my %piko_opt = ( max_attempts => \( my $max_attempts = 42 ) );
-GetOptions( \%piko_opt, qw(host=s name=s number=i) ) or exit 1;
+GetOptions( \%piko_opt, qw(host=s number=i) ) or exit 1;
 
 my $piko = Device::Inverter::KOSTAL::PIKO->new(%piko_opt);
 
@@ -30,7 +30,7 @@ Fetch: {
 progress( 'Fetched '
       . $data->logdata_records
       . ' records from '
-      . $piko->name
+      . $piko->host
       . ".\n" );
 
 for (@ARGV) {

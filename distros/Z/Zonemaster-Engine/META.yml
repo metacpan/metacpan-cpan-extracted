@@ -43,10 +43,10 @@ requires:
   Net::IP: 1.26
   Readonly: 0
   Text::CSV: 0
-  Zonemaster::LDNS: 2.001
+  Zonemaster::LDNS: 2.002
   perl: 5.14.2
 resources:
   bugtracker: https://github.com/zonemaster/zonemaster-engine/issues
   license: http://opensource.org/licenses/bsd-license.php
   repository: https://github.com/zonemaster/zonemaster-engine
-version: '4.001001'
+version: '4.002001'

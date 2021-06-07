@@ -1,5 +1,5 @@
 package Photonic::Geometry::FromImage2D;
-$Photonic::Geometry::FromImage2D::VERSION = '0.015';
+$Photonic::Geometry::FromImage2D::VERSION = '0.016';
 
 =encoding UTF-8
 
@@ -9,7 +9,7 @@ Photonic::Geometry::FromImage2D
 
 =head1 VERSION
 
-version 0.015
+version 0.016
 
 =head1 COPYRIGHT NOTICE
 
@@ -75,7 +75,7 @@ inverted: 1 means invert, 0 don't invert. Default: 0
 
 =back
 
-=head1 ACCESORS (read only)
+=head1 ACCESSORS (read only)
 
 =over 4
 

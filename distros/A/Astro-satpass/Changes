@@ -1,3 +1,8 @@
+0.120		2021-05-20	T. R. Wyant
+    Use Heavens-Above intrinsic magnitude for Tianhe and the ISS.
+
+    Tweak Math Doctors acknowledgement for haversine article recovery.
+
 0.119		2021-04-16	T. R. Wyant
     Update haversine link to point to "The Math Doctors" web site
 

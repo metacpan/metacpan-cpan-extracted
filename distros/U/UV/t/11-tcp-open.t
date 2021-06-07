@@ -6,36 +6,13 @@ use UV::TCP ();
 
 use Test::More;
 
-use IO::Socket::INET;
 use Socket;
+
+use lib "t/lib";
+use UVTestHelpers qw(socketpair_inet_stream);
 
 # TODO: This test might not work on MSWin32. We might need to find a different
 #   implementation, or just skip it?
-
-sub socketpair_inet
-{
-    my ($rd, $wr);
-
-    # Maybe socketpair(2) can do it?
-    ($rd, $wr) = IO::Socket->socketpair(AF_INET, SOCK_STREAM, 0)
-        and return ($rd, $wr);
-
-    # If not, go the long way round
-    my $listen = IO::Socket::INET->new(
-        LocalHost => "127.0.0.1",
-        LocalPort => 0,
-        Listen    => 1,
-    ) or die "Cannot listen - $@";
-
-    $rd = IO::Socket::INET->new(
-        PeerHost => $listen->sockhost,
-        PeerPort => $listen->sockport,
-    ) or die "Cannot connect - $@";
-
-    $wr = $listen->accept or die "Cannot accept - $!";
-
-    return ($rd, $wr);
-}
 
 # Launch watchdog on Windows in background
 if( $^O eq 'MSWin32' ) {
@@ -57,7 +34,7 @@ if( $^O eq 'MSWin32' ) {
 
 # read
 {
-    my ($rd, $wr) = socketpair_inet();
+    my ($rd, $wr) = socketpair_inet_stream();
 
     my $tcp = UV::TCP->new;
     isa_ok($tcp, 'UV::TCP');
@@ -84,7 +61,7 @@ if( $^O eq 'MSWin32' ) {
 
 # write
 {
-    my ($rd, $wr) = socketpair_inet();
+    my ($rd, $wr) = socketpair_inet_stream();
 
     my $tcp = UV::TCP->new;
 

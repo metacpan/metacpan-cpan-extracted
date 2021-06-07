@@ -1,9 +1,9 @@
 package Role::TinyCommons::Collection::SelectItems;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-04-20'; # DATE
+our $DATE = '2021-05-20'; # DATE
 our $DIST = 'Role-TinyCommons-Collection'; # DIST
-our $VERSION = '0.003'; # VERSION
+our $VERSION = '0.008'; # VERSION
 
 use Role::Tiny;
 
@@ -40,7 +40,7 @@ Role::TinyCommons::Collection::SelectItems - The search_items() interface
 
 =head1 VERSION
 
-This document describes version 0.003 of Role::TinyCommons::Collection::SelectItems (from Perl distribution Role-TinyCommons-Collection), released on 2021-04-20.
+This document describes version 0.008 of Role::TinyCommons::Collection::SelectItems (from Perl distribution Role-TinyCommons-Collection), released on 2021-05-20.
 
 =head1 SYNOPSIS
 

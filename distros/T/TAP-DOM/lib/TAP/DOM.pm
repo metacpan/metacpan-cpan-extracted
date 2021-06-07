@@ -1,9 +1,9 @@
 package TAP::DOM;
-# git description: v0.91-10-g426c706
+# git description: v0.92-7-gfa0a487
 
 our $AUTHORITY = 'cpan:SCHWIGON';
 # ABSTRACT: TAP as Document Object Model.
-$TAP::DOM::VERSION = '0.92';
+$TAP::DOM::VERSION = '0.93';
 use 5.006;
 use strict;
 use warnings;
@@ -41,6 +41,7 @@ our @tap_dom_args = (qw(ignore
                         document_data_ignore
                         preprocess_ignorelines
                         preprocess_tap
+                        noempty_tap
                         lowercase_fieldnames
                         lowercase_fieldvalues
                         trim_fieldvalues
@@ -76,22 +77,37 @@ our %EXPORT_TAGS = (constants => [ qw( $IS_PLAN
                                        $HAS_TODO
                                     ) ] );
 
+our %mnemonic = (
+  severity => {
+    1 => 'ok',
+    2 => 'ok_todo',
+    3 => 'ok_skip',
+    4 => 'notok_todo',
+    5 => 'notok',
+    6 => 'notok_skip', # forbidden TAP semantic, should never happen
+  },
+);
+
 # TAP severity level definition:
 #
-# |--------+-------+----------+--------------+----------+------------+----------|
-# | *type* | is_ok | has_todo | is_actual_ok | has_skip | *mnemonic* | *tapcon* |
-# |--------+-------+----------+--------------+----------+------------+----------|
-# | plan   | undef |    undef |        undef |        1 | ok_skip    |        3 |
-# |--------+-------+----------+--------------+----------+------------+----------|
-# | test   |     1 |        0 |            0 |        0 | ok         |        1 |
-# | test   |     1 |        1 |            1 |        0 | ok_todo    |        2 |
-# | test   |     1 |        0 |            0 |        1 | ok_skip    |        3 |
-# | test   |     1 |        1 |            0 |        0 | notok_todo |        4 |
-# | test   |     0 |        0 |            0 |        0 | notok      |        5 |
-# | test   |     0 |        0 |            0 |        1 | notok_skip |        6 |
-# |--------+-------+----------+--------------+----------+------------+----------|
-# |        |       |          |              |          | missing    |        0 |
-# |--------+-------+----------+--------------+----------+------------+----------|
+# |--------+---------------+----------+--------------+----------+------------+----------|
+# | *type* |         is_ok | has_todo | is_actual_ok | has_skip | *mnemonic* | *tapcon* |
+# |--------+---------------+----------+--------------+----------+------------+----------|
+# | plan   |         undef |    undef |        undef |        1 | ok_skip    |        3 |
+# |--------+---------------+----------+--------------+----------+------------+----------|
+# | test   |             1 |        0 |            0 |        0 | ok         |        1 |
+# | test   |             1 |        1 |            1 |        0 | ok_todo    |        2 |
+# | test   |             1 |        0 |            0 |        1 | ok_skip    |        3 |
+# | test   |             1 |        1 |            0 |        0 | notok_todo |        4 |
+# | test   |             0 |        0 |            0 |        0 | notok      |        5 |
+# | test   |             0 |        0 |            0 |        1 | notok_skip |        6 |
+# |--------+---------------+----------+--------------+----------+------------+----------|
+# |        |               |          |              |          | missing    |        0 |
+# |--------+---------------+----------+--------------+----------+------------+----------|
+# | *type* |       *value* |          |              |          |            |          |
+# |--------+---------------+----------+--------------+----------+------------+----------|
+# | pragma | +tapdom_error |          |              |          | notok      |        5 |
+# |--------+---------------+----------+--------------+----------+------------+----------|
 
 our $severity = {};
 #
@@ -106,6 +122,8 @@ $severity->{test}     {0}        {0}            {0}        {0} = 5; # notok
 $severity->{test}     {0}        {0}            {0}        {1} = 6; # notok_skip
 
 our $obvious_tap_line = qr/(1\.\.|ok\s|not\s+ok\s|#|\s|tap\s+version|pragma|Bail out!)/i;
+
+our $noempty_tap = "+pragma tapdom_error\n# document was empty";
 
 use Class::XSAccessor
     chained     => 1,
@@ -176,6 +194,15 @@ sub preprocess_tap {
     return %args
 }
 
+# Mark empty TAP with replacement lines
+sub noempty_tap {
+    my %args = @_;
+
+    $args{tap} = $noempty_tap if defined($args{tap}) and $args{tap} eq '';
+
+    return %args
+}
+
 sub new {
         # hash or hash ref
         my $class = shift;
@@ -191,6 +218,7 @@ sub new {
 
         %args = preprocess_ignorelines(%args) if $args{preprocess_ignorelines};
         %args = preprocess_tap(%args)         if $args{preprocess_tap};
+        %args = noempty_tap(%args)            if $args{noempty_tap};
 
         my %IGNORE      = map { $_ => 1 } @{$args{ignore}};
         my $IGNORELINES = $args{ignorelines};
@@ -213,6 +241,7 @@ sub new {
         delete $args{document_data_ignore};
         delete $args{preprocess_ignorelines};
         delete $args{preprocess_tap};
+        delete $args{noempty_tap};
         delete $args{lowercase_fieldnames};
         delete $args{lowercase_fieldvalues};
         delete $args{trim_fieldvalues};
@@ -330,7 +359,7 @@ sub new {
                         # 'kv_data' under their parent line.
                         # That line should be a test or a plan line, so that its
                         # place (or "data path") is structurally always the same.
-                        if ($lines[-1]->is_test or $lines[-1]->is_plan) {
+                        if ($lines[-1]->is_test or $lines[-1]->is_plan or $lines[-1]->is_pragma) {
                             $lines[-1]->{kv_data}{$key} = $value;
                         } else {
                             if (!$plan) {
@@ -354,6 +383,10 @@ sub new {
                     ->{$entry->{has_todo}}
                     ->{$entry->{is_actual_ok}}
                     ->{$entry->{has_skip}};
+                }
+                if ($entry->{is_pragma}) {
+                  no warnings 'uninitialized';
+                  $entry->{severity} = $entry->{raw} =~ /^pragma\s+\+tapdom_error\s*$/ ? 5 : 0;
                 }
                 $entry->{severity} = 0 if not defined $entry->{severity};
 
@@ -994,6 +1027,17 @@ indented YAML with strange multi-line spanning values at line starts,
 or the (non-standardized and unsupported) nested indented TAP. So be
 careful!
 
+=item * noempty_tap
+
+When a document is empty (which can also happen after preprocessing)
+then this option set to 1 triggers to put in some replacement line.
+
+ +pragma tapdom_error
+ # document was empty
+
+which in turn assigns it an error severity, so that these situations
+are no longer invisible.
+
 =back
 
 =head1 USING BITSETS
@@ -1159,7 +1203,10 @@ structure looks like this:
 
 =head2 version
 
-=head1 ATTRIBUTES
+=head1 ADDITIONAL ATTRIBUTES
+
+TAP::DOM creates attributes beyond those from TAP::Parser, usually to
+simplify later processing.
 
 =head2 severity
 
@@ -1167,7 +1214,7 @@ The C<severity> describes the combination of C<ok>/C<not ok> and
 C<todo>/C<skip> directives as one single numeric value.
 
 This allows to handle the otherwise I<nominal> values as I<ordinal>
-value, i.e., with a particular order.
+value, i.e., it provides them with a particular order.
 
 This order is explained as this:
 
@@ -1183,7 +1230,7 @@ and TODO).
 
 =item * 2 - ok with a C<#TODO>
 
-That's slightly worse than a straight ok because of the directive
+That's slightly worse than a straight ok because of the directive.
 
 =item * 3 - ok with a C<#SKIP>
 
@@ -1192,16 +1239,54 @@ execution, as that's what skip means.
 
 =item * 4 - not_ok with a C<#TODO>
 
-That's worse as it represets a fail but it's a known issue.
+That's worse as it represents a fail but it's a known issue.
 
 =item * 5 - straight not_ok.
 
-A straight fail as the worst real-world value.
+A straight fail is the worst real-world value.
 
 =item * 6 - forbidden combination of a not_ok with a C<#SKIP>.
 
 How can it fail when it was skipped? That's why it's even worse than
 worst.
+
+=back
+
+A severity value is set for lines of type C<test> and C<plan>.
+
+Additionally, it is set on the TAP::DOM-specific pragma
+C<+tapdom_error> with a severity value 5 (i.e., I<not_ok>). Because a
+pragma doesn't interfere with C<test>/C<plan> lines you can use this
+to express an out-of-band error situation which would be lost
+otherwise. Read below for more.
+
+=head1 TAP::DOM-SPECIFIC PRAGMAS
+
+Pragmas in TAP are meant to influence the behaviour of the TAP parser.
+
+TAP::DOM recognizes special pragmas. They are all prefixed with
+C<tapdom_>.
+
+So far there is:
+
+=over 4
+
+=item * +tapdom_error - assign this line a severity of 5 (I<not ok>)
+
+You can for instance append this pragma to the TAP document during
+post-processing to express an out-of-band error situation without
+interfering with the existing test lines and plan.
+
+Typical situations can be a an error from C<prove> or other TAP
+processor, and you want to ensure this problem does not get lost when
+storing the document in a database.
+
+Pragmas allow C<kv_data> like in C<test> and C<plan> lines, so you can
+transport additional error details like this:
+
+ pragma +tapdom_error
+ # Test-tapdom-error-type: prove
+ # Test-tapdom-prove-exit: 1
 
 =back
 
@@ -1211,7 +1296,7 @@ Steffen Schwigon <ss5@renormalist.net>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by Steffen Schwigon.
+This software is copyright (c) 2021 by Steffen Schwigon.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

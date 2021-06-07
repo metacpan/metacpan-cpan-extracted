@@ -62,7 +62,7 @@ use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::Exif;
 use Image::ExifTool::GPS;
 
-$VERSION = '3.92';
+$VERSION = '3.96';
 
 sub LensIDConv($$$);
 sub ProcessNikonAVI($$$);
@@ -563,7 +563,7 @@ sub GetAFPointGrid($$;$);
     'F0 3F 2D 8A 2C 40 DF 0E' => 'Tamron AF 18-270mm f/3.5-6.3 Di II VC PZD (B008)',
     'E0 40 2D 98 2C 41 DF 4E' => 'Tamron 18-400mm f/3.5-6.3 Di II VC HLD (B028)', # (removed AF designation, ref 37)
     '07 40 2F 44 2C 34 03 02' => 'Tamron AF 19-35mm f/3.5-4.5 (A10)',
-    '07 40 30 45 2D 35 03 02' => 'Tamron AF 19-35mm f/3.5-4.5 (A10)',
+    '07 40 30 45 2D 35 03 02.1' => 'Tamron AF 19-35mm f/3.5-4.5 (A10)',
     '00 49 30 48 22 2B 00 02' => 'Tamron SP AF 20-40mm f/2.7-3.5 (166D)',
     '0E 4A 31 48 23 2D 0E 02' => 'Tamron SP AF 20-40mm f/2.7-3.5 (166D)',
     'FE 48 37 5C 24 24 DF 0E' => 'Tamron SP 24-70mm f/2.8 Di VC USD (A007)', #24
@@ -640,6 +640,7 @@ sub GetAFPointGrid($$;$);
     '24 44 60 98 34 3C 1A 02' => 'Tokina AT-X 840 AF-II (AF 80-400mm f/4.5-5.6)',
     '00 44 60 98 34 3C 00 02' => 'Tokina AT-X 840 D (AF 80-400mm f/4.5-5.6)',
     '14 48 68 8E 30 30 0B 00' => 'Tokina AT-X 340 AF (AF 100-300mm f/4)',
+    '8C 48 29 3C 24 24 86 06' => 'Tokina opera 16-28mm F2.8 FF', #30
 #
     '06 3F 68 68 2C 2C 06 00' => 'Cosina AF 100mm F3.5 Macro',
     '07 36 3D 5F 2C 3C 03 00' => 'Cosina AF Zoom 28-80mm F3.5-5.6 MC Macro',
@@ -655,6 +656,7 @@ sub GetAFPointGrid($$;$);
     '00 54 48 48 18 18 00 00' => 'Voigtlander Ultron 40mm F2 SLII Aspherical',
     '00 54 55 55 0C 0C 00 00' => 'Voigtlander Nokton 58mm F1.4 SLII',
     '00 40 64 64 2C 2C 00 00' => 'Voigtlander APO-Lanthar 90mm F3.5 SLII Close Focus',
+    '07 40 30 45 2D 35 03 02.2' => 'Voigtlander Ultragon 19-35mm F3.5-4.5 VMV', #NJ
 #
     '00 40 2D 2D 2C 2C 00 00' => 'Carl Zeiss Distagon T* 3.5/18 ZF.2',
     '00 48 27 27 24 24 00 00' => 'Carl Zeiss Distagon T* 2.8/15 ZF.2', #MykytaKozlov
@@ -9466,7 +9468,7 @@ sub GetAFPointGrid($$;$)
         return undef unless $val =~ /^([A-J])(\d+)$/i;
         return (ord(uc($1))-65) * $ncol + $2 - 1;
     } else {
-        my $row = int(($val + 0.5) / $ncol);
+        my $row = int(($val + 0.5) / $ncol) & 0xff;
         my $col = $val - $ncol * $row + 1;
         return chr(65+$row) . $col;
     }
@@ -9945,12 +9947,10 @@ sub PrescanExif($$$)
         $dataLen = length $data;
         $dirStart = 0;
     }
-    # loop through necessary IFD entries
-    my ($lastTag) = sort { $b <=> $a } keys %$tagHash; # (reverse sort)
+    # loop through Nikon MakerNote IFD entries
     for ($index=0; $index<$numEntries; ++$index) {
         my $entry = $dirStart + 2 + 12 * $index;
         my $tagID = Get16u($dataPt, $entry);
-        last if $tagID > $lastTag;  # (assuming tags are in order)
         next unless exists $$tagHash{$tagID};   # only extract required tags
         my $format = Get16u($dataPt, $entry+2);
         next if $format < 1 or $format > 13;

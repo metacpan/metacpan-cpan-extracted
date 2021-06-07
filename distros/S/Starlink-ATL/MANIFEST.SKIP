@@ -1,0 +1,13 @@
+^MYMETA.yml$
+^MYMETA\.json$
+^\.git
+^_build\/
+^blib\/
+^Build$
+^MANIFEST.bak$
+\..*\.swp$
+~$
+^Starlink-ATL-
+(?<!META)\.json
+\.fits
+\.txt

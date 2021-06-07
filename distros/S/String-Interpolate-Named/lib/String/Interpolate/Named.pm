@@ -16,7 +16,7 @@ String::Interpolate::Named - Interpolated named arguments in string
 
 =cut
 
-our $VERSION = '1.00';
+our $VERSION = '1.01';
 
 =head1 SYNOPSIS
 
@@ -34,13 +34,17 @@ our $VERSION = '1.00';
 String::Interpolate::Named provides a function to interpolate named
 I<arguments> by I<target texts> in a template string. The target texts
 are provided to the function via a hash, where the keys correspond to
-the named argument to be replaced.
+the named argument to be replaced, or a subroutine that performs the
+lookup.
 
 =head2 Named Arguments
 
 The arguments to be replaced are marked in the template by enclosing
 them between C<%{> and C<}>. For example, the string C<"The famous
 %{fn} %{ln}."> contains two named arguments, C<fn> and C<ln>.
+
+Note that the activator may be changed from C<%> into something else,
+see below. Throughout this document we use the default value.
 
 =head2 Basic Interpolation
 
@@ -114,9 +118,11 @@ The hash can have the following keys:
 
 =over
 
-=item vars
+=item args
 
-This is the hash that contains replacement texts for the named variables.
+This is either a hash that contains replacement texts for the named
+variables, or a subroutine that gets called with a variable as
+argument and returns a replacement value.
 
 This element should be considered mandatory.
 
@@ -126,6 +132,15 @@ The separator used to concatenate list values, see L<List Values> above.
 
 It defaults to Perl variable C<$"> that, on its turn, defaults to a
 single space.
+
+=item activator
+
+This is a single character that activates interpolation. By default
+this is the percent C<%> character.
+
+=item keypattern
+
+The pattern to match key names. Default is C<qr/\w+[-_\w.]*/>.
 
 =item maxiter
 
@@ -222,6 +237,8 @@ sub interpolate {
     my ( $ctl, $tpl ) = @_;
 
     my $maxiter = $ctl->{maxiter} // 16;
+    my $activator = $ctl->{activator} // '%';
+    my $keypat = $ctl->{keypattern} // qr/\w+[-_\w.]*/;
 
     for ( my $cnt = 1; $cnt <= $maxiter; $cnt++ ) {
 
@@ -232,16 +249,16 @@ sub interpolate {
 	$tpl =~ s/\\\{/\x{fdd1}/g;
 	$tpl =~ s/\\\}/\x{fdd2}/g;
 	$tpl =~ s/\\\|/\x{fdd3}/g;
-	$tpl =~ s/\\\%/\x{fdd4}/g;
+	$tpl =~ s/\\\Q$activator\E/\x{fdd4}/g;
 
 	# Replace some seqs by a single char for easy matching.
-	$tpl =~ s/\%\{\}/\x{fdde}/g;
-	$tpl =~ s/\%\{/\x{fddf}/g;
+	$tpl =~ s/\Q$activator\E\{\}/\x{fdde}/g;
+	$tpl =~ s/\Q$activator\E\{/\x{fddf}/g;
 
 	# %{ key [ .index ] [ = value ] [ | then [ | else ] ] }
 
 	$tpl =~ s; ( \x{fddf}
-		     (?<key>\w+[-_\w.]*)
+		     (?<key> $keypat )
 		     (?: (?<op> \= )
 			 (?<test> [^|}\x{fddf}]*) )?
 		     (?: \| (?<then> [^|}\x{fddf}]*  )
@@ -256,14 +273,14 @@ sub interpolate {
 	$tpl =~ s/\x{fdd1}/\\\{/g;
 	$tpl =~ s/\x{fdd2}/\\\}/g;
 	$tpl =~ s/\x{fdd3}/\\\|/g;
-	$tpl =~ s/\x{fdd4}/\\\%/g;
+	$tpl =~ s/\x{fdd4}/\\$activator/g;
 
 	# Restore (some) seqs.
-	$tpl =~ s/\x{fdde}/%{}/g;
-	$tpl =~ s/\x{fddf}/%{/g;
+	$tpl =~ s/\x{fdde}/$activator."{}"/ge;
+	$tpl =~ s/\x{fddf}/$activator."{"/ge;
 
 	if ( $prev eq $tpl ) {
-	    $tpl =~ s/\\([%{}|])/$1/g;
+	    $tpl =~ s/\\(\Q$activator\E|[%{}|])/$1/g;
 	    return $tpl;
 	}
 	warn("$cnt: $prev -> $tpl\n") if $ctl->{trace};
@@ -285,8 +302,9 @@ sub _interpolate {
 	( $key, $inx ) = ( $1, $2 );
     }
 
-    if ( defined $m->{$key} ) {
-	$val = $m->{$key};
+    my $t = ref($m) eq 'CODE' ? $m->($key) : $m->{$key};
+    if ( defined $t ) {
+	$val = $t;
 
 	if ( UNIVERSAL::isa( $val, 'ARRAY' ) ) {
 	    # 1, 2, ... selects 1st, 2nd value; -1 counts from end.
@@ -319,10 +337,13 @@ sub _interpolate {
 	}
     }
     elsif ( $val ne '' ) {
-	$subst = $i->{then} ? $i->{then} : $i->{else} ? '' : $val;
+	$subst = ($i->{then}//'') ne ''
+	  ? $i->{then}
+	  : ($i->{else}//'') ne ''
+	    ? '' : $val;
     }
     else {
-	$subst = $i->{else} ? $i->{else} : '';
+	$subst = ($i->{else}//'') ne '' ? $i->{else} : '';
     }
 
     $subst =~ s/\x{fdde}/$val/g;

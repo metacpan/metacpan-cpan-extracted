@@ -4,6 +4,6 @@ use strict;
 
 # Dummy package for CPAN testers
 
-our $VERSION = '8.124';
+our $VERSION = '8.126';
 
 1;

@@ -1,4 +1,4 @@
-/* vi: set ft=c */
+/* vi: set ft=c : */
 
 #define HAVE_PERL_VERSION(R, V, S) \
     (PERL_REVISION > (R) || (PERL_REVISION == (R) && (PERL_VERSION > (V) || (PERL_VERSION == (V) && (PERL_SUBVERSION >= (S))))))

@@ -1,0 +1,42 @@
+{
+   "abstract" : "Interact with TELNET port or other TCP ports",
+   "author" : [
+      "Jay Rogers <jay@rgrs.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.58, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Net-Telnet2",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "url" : "https://github.com/dk/Net-Telnet"
+      }
+   },
+   "version" : "3.05",
+   "x_serialization_backend" : "JSON::PP version 4.06"
+}

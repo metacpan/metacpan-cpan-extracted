@@ -52,6 +52,9 @@ $mech->content_is("OK", "No exceptions on defining jwt");
 my $response = $mech->res();
 my $authorization = $response->authorization;
 ok($authorization, "We have something");
+ok($mech->header_exists_ok('Authorization'), 'Has Authorization header');
+ok($mech->header_exists_ok('Set-Cookie'), 'Has Set-Cookie header');
+ok($mech->lacks_header_ok('Location'), 'No Location header');
 my $x = decode_jwt(token => $authorization, key => "secret");
 is_deeply($x, {my => 'data'}, "Got correct data back");
 

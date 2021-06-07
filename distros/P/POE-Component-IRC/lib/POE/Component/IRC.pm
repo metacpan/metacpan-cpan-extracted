@@ -1,6 +1,6 @@
 package POE::Component::IRC;
 our $AUTHORITY = 'cpan:HINRIK';
-$POE::Component::IRC::VERSION = '6.90';
+$POE::Component::IRC::VERSION = '6.91';
 use strict;
 use warnings FATAL => 'all';
 use Carp;
@@ -1090,7 +1090,7 @@ sub sl_prioritized {
         $msg = bytes::substr($msg, 0, $self->{msg_length} - bytes::length($self->nick_name()));
     }
 
-    if (@{ $self->{send_queue} }) {
+    if (!$self->{flood} && @{ $self->{send_queue} }) {
         my $i = @{ $self->{send_queue} };
         $i-- while ($i && $priority < $self->{send_queue}->[$i-1]->[MSG_PRI]);
         splice( @{ $self->{send_queue} }, $i, 0, [ $priority, $msg ] );

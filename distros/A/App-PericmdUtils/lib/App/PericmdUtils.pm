@@ -1,7 +1,7 @@
 package App::PericmdUtils;
 
-our $DATE = '2017-01-13'; # DATE
-our $VERSION = '0.04'; # VERSION
+our $DATE = '2021-05-25'; # DATE
+our $VERSION = '0.050'; # VERSION
 
 use 5.010001;
 
@@ -20,7 +20,7 @@ App::PericmdUtils - Some utilities related to Perinci::CmdLine
 
 =head1 VERSION
 
-This document describes version 0.04 of App::PericmdUtils (from Perl distribution App-PericmdUtils), released on 2017-01-13.
+This document describes version 0.050 of App::PericmdUtils (from Perl distribution App-PericmdUtils), released on 2021-05-25.
 
 =head1 DESCRIPTION
 
@@ -65,7 +65,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2017, 2016, 2015 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

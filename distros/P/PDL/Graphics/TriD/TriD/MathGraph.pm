@@ -26,22 +26,13 @@ conditions. For details, see the file COPYING in the PDL
 distribution. If this file is separated from the PDL distribution,
 the copyright notice should be included in the file.
 
-
 =cut
+
 package PDL::Graphics::TriD::MathGraph;
 use base qw/PDL::Graphics::TriD::GObject/;
 use fields qw/ArrowLen ArrowWidth/;
-
-BEGIN {
-   use PDL::Config;
-   if ( $PDL::Config{USE_POGL} ) {
-      eval "use OpenGL $PDL::Config{POGL_VERSION} qw(:all)";
-      eval 'use PDL::Graphics::OpenGL::Perl::OpenGL';
-   } else {
-      eval 'use PDL::Graphics::OpenGL';
-   }
-}
-
+use OpenGL qw(:all);
+use PDL::Graphics::OpenGL::Perl::OpenGL;
 
 sub gdraw {
 	my($this,$points) = @_;
@@ -105,7 +96,7 @@ sub step {
 	$this->{Velo} *=
 	  ((0.96*50/(50+sqrt(($this->{Velo}**2)->sumover->dummy(0)))))**$tst;
 	$c += $tst * 0.05 * $this->{Velo};
-	(my $tmp = $c->xchg(0,1)->index($this->{FInd}->dummy(0)))
+	(my $tmp = $c->transpose->index($this->{FInd}->dummy(0)))
 		.= $this->{FCoord}
 			if (defined $this->{FInd});
 						print "C: $c\n" if $verbose;
@@ -164,7 +155,7 @@ sub step {
 	$this->{Velo} *=
 	  ((0.92*50/(50+sqrt(($this->{Velo}**2)->sumover->dummy(0)))))**$tst;
 	$c += $tst * 0.05 * $this->{Velo};
-	(my $tmp = $c->xchg(0,1)->index($this->{FInd}->dummy(0)))
+	(my $tmp = $c->transpose->index($this->{FInd}->dummy(0)))
 		.= $this->{FCoord}
 			if (defined $this->{FInd});
 						print "C: $c\n" if $verbose;

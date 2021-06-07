@@ -1,3 +1,7 @@
+1.017 26 May 2021
+  - Minor POD spelling, formatting and link fixes
+  - Add missing dependency on Class::Accessor::Fast (RT#127730)
+
 1.016 11 Februrary 2016
   - Document how to limit the attributes returned from the LDAP search
   - Add persist_in_session config option to allow storing of user and its

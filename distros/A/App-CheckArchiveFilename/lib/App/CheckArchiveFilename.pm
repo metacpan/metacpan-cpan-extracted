@@ -1,7 +1,7 @@
 package App::CheckArchiveFilename;
 
-our $DATE = '2016-09-09'; # DATE
-our $VERSION = '0.003'; # VERSION
+our $DATE = '2021-05-25'; # DATE
+our $VERSION = '0.004'; # VERSION
 
 use 5.010001;
 use strict;
@@ -78,12 +78,16 @@ App::CheckArchiveFilename - Return information about archive & compressor types 
 
 =head1 VERSION
 
-This document describes version 0.003 of App::CheckArchiveFilename (from Perl distribution App-CheckArchiveFilename), released on 2016-09-09.
+This document describes version 0.004 of App::CheckArchiveFilename (from Perl distribution App-CheckArchiveFilename), released on 2021-05-25.
 
 =head1 FUNCTIONS
 
 
-=head2 check_archive_filename(%args) -> [status, msg, result, meta]
+=head2 check_archive_filename
+
+Usage:
+
+ check_archive_filename(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Return information about archive & compressor types from filenames.
 
@@ -95,15 +99,16 @@ Arguments ('*' denotes required arguments):
 
 =item * B<filenames>* => I<array[filename]>
 
+
 =back
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
+($reason) is a string containing error message, or "OK" if status is
+200. Third element ($payload) is optional, the actual result. Fourth
+element (%result_meta) is called result metadata and is optional, a hash
 that contains extra information.
 
 Return value:  (any)
@@ -130,7 +135,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2016 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

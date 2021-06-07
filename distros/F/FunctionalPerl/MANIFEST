@@ -12,6 +12,8 @@ bin/perlrepl
 bin/repl2test
 docs/HACKING.md
 docs/TODO.md
+docs/blog/index.md
+docs/blog/perl-weekly-challenges-113.md
 docs/contact.md
 docs/design.md
 docs/howto.md
@@ -42,6 +44,11 @@ examples/logwatch_exampleconfig.pl
 examples/maplines
 examples/maplines-example.pl
 examples/pdf-to-html
+examples/perl-weekly-challenges/111-1-search_matrix
+examples/perl-weekly-challenges/113-1-represent_integer
+examples/perl-weekly-challenges/113-1-represent_integer_haskell.hs
+examples/perl-weekly-challenges/113-2-recreate_binary_tree
+examples/perl-weekly-challenges/Makefile
 examples/predicates
 examples/primes
 examples/sendprepare
@@ -127,6 +134,7 @@ lib/Chj/xtmpfile.pm
 lib/FP/AST/Perl.pm
 lib/FP/Abstract/Compare.pm
 lib/FP/Abstract/Equal.pm
+lib/FP/Abstract/Id.pm
 lib/FP/Abstract/Interface.pm
 lib/FP/Abstract/Map.pm
 lib/FP/Abstract/Pure.pm
@@ -139,13 +147,16 @@ lib/FP/Array_sort.pm
 lib/FP/BigInt.pm
 lib/FP/Carp.pm
 lib/FP/Char.pm
+lib/FP/Collection.pm
 lib/FP/Combinators.pm
 lib/FP/Combinators2.pm
 lib/FP/Currying.pm
 lib/FP/DBI.pm
 lib/FP/Div.pm
 lib/FP/Docstring.pm
+lib/FP/Docstring/t.pm
 lib/FP/DumperEqual.pm
+lib/FP/Either.pm
 lib/FP/Equal.pm
 lib/FP/Equal/t.pm
 lib/FP/Failure.pm
@@ -153,6 +164,7 @@ lib/FP/Git/Repository.pm
 lib/FP/Hash.pm
 lib/FP/HashSet.pm
 lib/FP/IOStream.pm
+lib/FP/Id.pm
 lib/FP/Interface.pm
 lib/FP/Interfaces.pm
 lib/FP/JSON.pm
@@ -183,6 +195,7 @@ lib/FP/Repl/WithRepl.pm
 lib/FP/Repl/corefuncs.pm
 lib/FP/Show.pm
 lib/FP/Show/t.pm
+lib/FP/SortedPureArray.pm
 lib/FP/Stream.pm
 lib/FP/StrictList.pm
 lib/FP/Struct.pm
@@ -251,6 +264,9 @@ t/examples-fibs.t
 t/examples-functional-classes.t
 t/examples-hiring-without-whiteboards.t
 t/examples-logic.t
+t/examples-perlweekly-111-1.t
+t/examples-perlweekly-113-1.t
+t/examples-perlweekly-113-2.t
 t/examples-primes.t
 t/examples-sendprepare
 t/functional_XML-t-div.t
@@ -262,6 +278,7 @@ t/maintainer/perhaps
 t/perl-goto-leak.t
 t/perl-weaken-coderef-correctness.t
 t/perl-weaken-coderef.t
+t/perl/__SUB__-gc
 t/perl/goto-leak
 t/perl/weaken-coderef
 t/perl/weaken-coderef-alternative

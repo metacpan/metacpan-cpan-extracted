@@ -1,3 +1,7 @@
+0.0.6    2021-06-04
+
+- More accurate detection of int/float/string types when creating a database
+
 2021-04-08    0.0.5    Introduce optional caching for Dictionaries, to make reads faster at the
                          expense of eating more memory;
                        Other speed improvements

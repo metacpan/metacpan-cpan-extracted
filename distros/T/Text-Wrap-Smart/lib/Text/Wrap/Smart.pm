@@ -12,7 +12,7 @@ use Params::Validate ':all';
 our ($VERSION, @EXPORT_OK, %EXPORT_TAGS);
 my @subs;
 
-$VERSION = '0.8';
+$VERSION = '0.9';
 @subs = qw(exact_wrap fuzzy_wrap);
 @EXPORT_OK = @subs;
 %EXPORT_TAGS = ('all' => [ @subs ]);
@@ -28,6 +28,17 @@ validation_options(
 },
     stack_skip => 2,
 );
+
+my $pre_process = sub
+{
+    local $_ = ${$_[0]};
+
+    s/^\s+//;
+    s/\s+$//;
+    s/\s+/ /g;
+
+    ${$_[0]} = $_;
+};
 
 my $calc_average = sub
 {
@@ -49,6 +60,9 @@ sub exact_wrap
     _validate(@_);
     my ($text, $wrap_at) = @_;
 
+    $pre_process->(\$text);
+    return () unless length $text;
+
     $wrap_at ||= WRAP_AT_DEFAULT;
     my $average = $calc_average->($text, $wrap_at);
 
@@ -59,6 +73,9 @@ sub fuzzy_wrap
 {
     _validate(@_);
     my ($text, $wrap_at) = @_;
+
+    $pre_process->(\$text);
+    return () unless length $text;
 
     $wrap_at ||= WRAP_AT_DEFAULT;
     my $average = $calc_average->($text, $wrap_at);
@@ -82,14 +99,6 @@ sub _exact_wrap
 sub _fuzzy_wrap
 {
     my ($text, $average) = @_;
-
-    $text = do {
-        local $_ = $text;
-        s/^\s+//;
-        s/\s+$//;
-        s/\s+/ /g;
-        $_
-    };
 
       my @spaces;
     push @spaces, pos $text while $text =~ /(?= )/g;

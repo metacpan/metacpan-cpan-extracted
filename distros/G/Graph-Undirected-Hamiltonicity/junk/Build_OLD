@@ -1,0 +1,4 @@
+cpanm Dist::Zilla
+dzil authordeps | cpanm
+dzil listdeps | cpanm
+dzil test

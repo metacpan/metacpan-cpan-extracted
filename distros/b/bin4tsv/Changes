@@ -1,0 +1,28 @@
+Revision history for the module "bin4tsv" : 
+
+0.01   2021-05-16 sun
+       Created as the first practice to use ExtUtils::MakeMaker.
+
+0.011  2021-05-18 tue
+       Files `README' and `Changes' added.
+       `bin' direcotry is renamed by `script'.
+  
+0.012  2021-05-22 sat
+       Makefile.PL にて EXE_FILES に少数のファイルを入れて、後でbinに入る様に出来るか試す。
+       ディレクトリを bin ではなくて scripts という名前に変更。(Module::Build に合わせた。)
+
+0.0121 2021-05-23 sun
+       GitHub上のレポジトリからcpanmでインストール出来るか試してみる。
+       lib/Changes という不要なファイルを見付けたので除去。
+
+0.0122 2021-05-23 sun
+       レポジトリにv0.0122というタグを付けてみる実験。
+       
+0.0123 2021-05-23 sun
+       レポジトリに bin4tsv-0.0123 というタグを付けてみた。
+       MANIFEST.SKIP で正規表現が使えるか実験。 
+       INSTALL を数倍に書き足した。
+
+0.0124 2021-05-23 sun
+       LICENSE file to be added or written. 
+       perl -MSoftware::License::Perl_5 -E 'my $L=Software::License::Perl_5 -> new( {holder => "Toshiyuki Shimono <bin4tsv@gmail.com>"}) ; print $L -> fulltext ' > LICENSE で18406バイトのファイル作った。

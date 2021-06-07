@@ -1,5 +1,20 @@
 Revision history for Geo::LibProj::FFI
 
+0.04  2021-05-24
+
+ - Add area of interest functions
+ - Add distances functions
+ - Add error-state manipulation functions
+ - Add info functions
+ - Add lists functions
+ - Add logging functions
+
+0.03  2021-05-21
+
+ - Address performance issues with PJ_COORD values
+ - Add brief description of how to work with PJ_COORD values
+   and other PROJ data types to the documentation
+
 0.02  2021-03-04
 
  - Resolve failures reported in CPAN Testers (GH#1 and others)

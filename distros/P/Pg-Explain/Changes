@@ -1,5 +1,23 @@
 Revision history for Pg-Explain
 
+1.09    2021/06/07
+        - Fix parsing of planning/execution time in case of "quoted" plans and
+          no trailing new line.
+        - Add extraction of:
+          - Conflicting Tuples
+          - Conflict Arbiter Indexes
+          - Conflict Filter
+          - Conflict Resolution
+          - Filter
+          - Join Filter
+          - Recheck Cond
+          - Rows Removed by Conflict Filter
+          - Rows Removed by Filter
+          - Rows Removed by Index Recheck
+          - Rows Removed by Join Filter
+          - Tuples Inserted
+          from non-text plans.
+
 1.08    2021/05/15
         - Provide links to bugtracker and homepage for CPAN
         per report from Eugen Konkov

@@ -1,5 +1,10 @@
 Release history for Zonemaster component Zonemaster-LDNS
 
+2.2.0 2021-05-28
+
+ [Features]
+ - Adds (minimal) support for CDNSKEY records (#113)
+
 
 2.1.0 2020-04-30
 

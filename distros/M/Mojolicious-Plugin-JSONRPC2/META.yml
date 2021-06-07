@@ -28,7 +28,7 @@ no_index:
 provides:
   Mojolicious::Plugin::JSONRPC2:
     file: lib/Mojolicious/Plugin/JSONRPC2.pm
-    version: v2.0.3
+    version: v2.0.4
 requires:
   JSON::RPC2: v0.4.0
   JSON::RPC2::Server: v0.4.0
@@ -40,5 +40,5 @@ resources:
   bugtracker: https://github.com/powerman/perl-Mojolicious-Plugin-JSONRPC2/issues
   homepage: https://github.com/powerman/perl-Mojolicious-Plugin-JSONRPC2
   repository: https://github.com/powerman/perl-Mojolicious-Plugin-JSONRPC2.git
-version: v2.0.3
+version: v2.0.4
 x_serialization_backend: 'YAML::Tiny version 1.73'

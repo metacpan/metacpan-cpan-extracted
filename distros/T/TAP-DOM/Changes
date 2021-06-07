@@ -1,5 +1,14 @@
 Revision history for TAP-DOM
 
+0.93      2021-06-05
+        - provide mnemonics table for severity
+        - evaluate TAP::DOM-specific pragma +tapdom_error
+        - new option 'noempty_tap' to put in replacement lines with a
+          '+pragma tapdom_error' which can be better evaluated by its
+          'severity'
+        - TAP::DOM::Archive allows filehandle as 'source'
+          (requires new dependency to Scalar::Util)
+
 0.92      2020-11-09
         - introduce 'severity' level to represent the combination of
           ok/notok and todo/skip as one ordinal number.

@@ -1,9 +1,9 @@
 package ArrayData::Test::Source::LinesInDATA;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-05-03'; # DATE
+our $DATE = '2021-05-10'; # DATE
 our $DIST = 'ArrayDataRoles-Standard'; # DIST
-our $VERSION = '0.005'; # VERSION
+our $VERSION = '0.006'; # VERSION
 
 use Role::Tiny::With;
 
@@ -22,7 +22,7 @@ ArrayData::Test::Source::LinesInDATA - A test ArrayData module
 
 =head1 VERSION
 
-This document describes version 0.005 of ArrayData::Test::Source::LinesInDATA (from Perl distribution ArrayDataRoles-Standard), released on 2021-05-03.
+This document describes version 0.006 of ArrayData::Test::Source::LinesInDATA (from Perl distribution ArrayDataRoles-Standard), released on 2021-05-10.
 
 =head1 HOMEPAGE
 

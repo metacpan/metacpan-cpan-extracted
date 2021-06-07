@@ -1,5 +1,5 @@
 This file contains message digests of all files listed in MANIFEST,
-signed via the Module::Signature module, version 0.83.
+signed via the Module::Signature module, version 0.87.
 
 To verify the content in this distribution, first make sure you have
 Module::Signature installed, then type:
@@ -12,15 +12,16 @@ the distribution may already have been compromised, and you should
 not run its Makefile.PL or Build.PL.
 
 -----BEGIN PGP SIGNED MESSAGE-----
-Hash: SHA512
+Hash: RIPEMD160
 
-SHA256 bf49fc363eb446869c2e0a653a5e82f37fd588a5b269e733c1d3a669bbae68c6 Changes
-SHA256 dbd33182e425689e16d23ef2e12c46fe117fce3f7e58cda897433a4009cfb67c MANIFEST
-SHA256 f1b277fe25c957f3dc8f4f72a48020f310527aea1ece608ae17fa0d61c0cdd08 META.yml
-SHA256 bf14e16c79c1fb4d3b84d459b4f96b85bffdcd364ee6a49afdb4ef59e21b20aa Makefile.PL
-SHA256 8a70c22d4ae1956df7ddf5a66448ad01f36de9fe32fb06971a96c84b7503378a README
-SHA256 13043b437e1e00fc37a0c47d0164002c7d7a23a3c247a85f6b7b137f800d1c02 Release.pm
-SHA256 9ef024cabae2d67d6ec80b9b15dcd2d30fb929aa2ceab6e09459c57a9aa33bf1 Release/Obj.pm
+SHA256 ecd1763c064e930530903f7d48a4233c794cdc469b1e7c52df9119500a64ded3 Changes
+SHA256 df90c63e005650319cec1060a7a92b33abae8c22de8f95dffee72423c7a80ac8 LICENSE
+SHA256 7e9654d05f4eb2c14efa42982f489cba008050ff068b84795ec93f2764c65681 MANIFEST
+SHA256 97eef308376a2e01575d72f90cdb4c7665f26d3c023e1b970a39b70493030e9b META.yml
+SHA256 c81054556420e161bcbaad80c9d4fd885027dee9a830bd654a333657944d38dd Makefile.PL
+SHA256 3c999c5f2641acf309c9e99aaa4f2319670e42158ac2e44d7afb14ed4cd4afe0 README
+SHA256 f3e3ebbfb5261df1b38c506a2e7f65aee8bfaf72e201104aa47810f63aa3e59c Release.pm
+SHA256 444a6b2d6b050221717c537a09e8806d164b72ab77a2a731ae1fab94b299844e Release/Obj.pm
 SHA256 fe462323d1618413db1335f4c3dcd6027754f48c2b95bee3ac0809d89958a982 examples/ex1.pl
 SHA256 058c975bf6bfec60798b92a9f553c50ce151f96c63b66c299a0598ce2a1a975d examples/ex2.pl
 SHA256 67d139199c03b8bf8447a5a62f0d0b6dc1bd5bf6dbe04de6d21998c577823ed6 inc/Module/Install.pm
@@ -35,7 +36,7 @@ SHA256 53825bc78e4c910b888160bc148c8bc211be58e02b99c8edcbf4854f95faa049 inc/Modu
 SHA256 26b166ff62aacdb55317d1659f160aa4935097eea9810ea980e6d747206b5dc0 inc/Module/Install/Win32.pm
 SHA256 5f73a6851a91ea44e65b924f918743ad6e860620ad7a38a39d0295e0c5652a9f inc/Module/Install/WriteAll.pm
 SHA256 38fac80bee761b93002193ca0648805dadbf44e3da1ff7d0c0cef9215cb7bd8d t/Java-Release-Obj/01-use.t
-SHA256 74ed923a0d4d32d8eb7c252eb9708bd46bea720dd1d9672502fd0113319535ee t/Java-Release-Obj/02-version.t
+SHA256 6e17f92734356f4f7053d33f0c628aa7aa7c84a673441eff9e9b0c3a4a5a2ffa t/Java-Release-Obj/02-version.t
 SHA256 2aa4b844099fbe3dd4b24ac9353ea2ea2cf02a8e2973f64f5fb4ed28724799ae t/Java-Release-Obj/03-new.t
 SHA256 ae8e5ae44e4b0b9779fc4a41493a3ac08f687eefece9aca2f3a2b72db858c1ec t/Java-Release-Obj/04-arch.t
 SHA256 e10cd70e8ee9de6775a0e8dd34a71a4e83e6b6e374624d0668b3e128e11e2d59 t/Java-Release-Obj/05-interim.t
@@ -43,21 +44,26 @@ SHA256 caebe3ebe59929d5f13bb937f81112fb2881142a722baf364ef6d7b18662a092 t/Java-R
 SHA256 d3f40efdd1243737640b1d7228ca577c158318a1591da7e0916d2c11381fd4f2 t/Java-Release-Obj/07-patch.t
 SHA256 d6b2536f785e882a17da548989b9ff167a9f786b149a69f1324421243f604453 t/Java-Release-Obj/08-release.t
 SHA256 d55579d6a55b084c5a36a44fb1f391f7133ae7df5df306acd022e1e1ab2c2202 t/Java-Release-Obj/09-update.t
+SHA256 6ac5f8c07195e81a7eba04fe1fff1c023ebbd12e973eb6305995a0951b2bd086 t/Java-Release-Obj/10-version.t
+SHA256 e62387edc970f2331b3b30dcb15bec0a3ebc77405579644b0e950f07f274bb75 t/Java-Release-Obj/11-version_name.t
 SHA256 ec018a035a16a1dab71675de75ba12472b9c5e97cd6b6ad21c11fb513cbe808b t/Java-Release/01-use.t
-SHA256 4d8c98e995d1c2a14590e8d1d9600dd115bdbcc3a06a5c32ebd031654cb58e75 t/Java-Release/02-version.t
-SHA256 e1843a845176e35571d7e75fd15748d7be2c9a93473ae49e879a4a3e9650450c t/Java-Release/03-parse_java_jdk_release.t
+SHA256 c866068912695cae6c64fabc2be7d3953530d900071d8616da23cb90b5fd63e2 t/Java-Release/02-version.t
+SHA256 28ead08792465694d1c367e12cd77388e9b91a07dbc458ddfe5ddc6f8e975be6 t/Java-Release/03-parse_java_jdk_release.t
 SHA256 6da357ae3d4beb3c58020effb4914d356dd81fee9a4fdcf4781ddc6566d8f84d xt/Java-Release-Obj/01-pod_coverage.t
 SHA256 0d5d519dcec3b34a78b630fdb70ea170db33e1eb87a454c82bfb15e669a8b5b6 xt/Java-Release-Obj/02-pod.t
 SHA256 6765989ec2c1534c60bee78bcc1edc56706dfb0b44c6431777613b2e887fc0a4 xt/Java-Release/01-pod_coverage.t
 SHA256 9d5293380fe42b2fe5163765e60d9b427dfbd8b441e7ec9ed7ab894282fa5069 xt/Java-Release/02-pod.t
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCgAdFiEEAxWqUSy7qDLVZJQKKyiOZjWerHYFAl6XQgAACgkQKyiOZjWe
-rHZ/nwgAkDgEaX8t2lTn/4oHMNSa4GMjIHJjZuYCTcwC+p5OaYXm73f2ftwTY5Yz
-Uni7Q8SViIJso8RjBKsmGOmlisSA0+XfZhu5R/0RVnKW7yOlKuUTgehJAj2X14HO
-QvFA11dwREk68O+oQRCc/9N8P5nuFLHFlG1s2LBKiKmew9jrP+vvM7V0GjZlYVau
-Ij1jQw4kEdAY1ZfOkftXyGuHpJc+aX2dpCQi/KPTy1e7AephJFG3RtZJc+lN0ano
-k+7aqlv9/M+aS42/w2tKnbdlvSQ0LLlGhRnAUihQ8YfwQa7PVTDR/7bUfSMM84LQ
-hSPwz+uEWWx8wr1I/E4ETeofLhWVEw==
-=tahh
+iQGzBAEBAwAdFiEERTLc1QTxqWhVvPeegmqNLzlXaRcFAmCzV7AACgkQgmqNLzlX
+aRdL2AwAsXkKew+Uvj3q929Ihg8obBGmQNqEg1jW6PS50wSOblOfKJd2rtteNjMv
+KTgs5VzX9SYXb+OllFx9lXFHNmNuLM6tdjzwkWjOzQarvIX/Es35LJUbTAvS0wL1
+h171A5SnEPLTmV+uRgFVPm4j12kS7p9vsOiXNPR81VNE/RBsud172GIAqip+/p5T
+BEFtg6XQtg4qZFWUFVgtrKOzntD+rnH4KkiT7+KE45Nso+SSnUh2Jg4nFZJ4r9R2
+gCdIpeEEs3VBNMUbabNBkLxVpKH6f4yV8MsPEYgSbC1Z5qLZTuSqD2vLiNH8APGQ
+PDsFmHZLcRZEy4NwbOik0lyXE0ZF6vSj9VjyffpbqG7pUSwJor0wcEPJl0VU0efX
+TfMuNX8Qfj2+m45mwZFRZjt5X5Oz3JognTK7qvKD0+JSkuvkp3MHt6qm0MFpwyW5
+kMFBAq94ftVq58JDmiQlUqvW9fu10QLnVbdmbhFrVvfcDhPkHxZOZ1mLUJM3//jp
+c7Su3D7t
+=CJHz
 -----END PGP SIGNATURE-----

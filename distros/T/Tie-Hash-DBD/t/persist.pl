@@ -24,8 +24,7 @@ sub persisttests {
     my %data = (
 	UND => undef,
 	IV  => 3,
-#	NV  => 3.14159265358979001,
-	NV  => 3.14159265358830452896654605865479,
+	NV  => PI (),
 	PV  => "pi", # "\xcf\x80" binary is tested elsewhere
 	);
     my $data = _bindata ();

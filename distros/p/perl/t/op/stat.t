@@ -27,6 +27,8 @@ if ($^O eq 'MSWin32') {
     ${^WIN32_SLOPPY_STAT} = 0;
 }
 
+my $Errno_loaded = eval { require Errno };
+
 plan tests => 110;
 
 my $Perl = which_perl();
@@ -147,8 +149,13 @@ SKIP: {
         # expect netware to be the same ...
         skip "No ctime concept on this OS", 2
                                      if $Is_MSWin32 || $ufs_no_ctime;
-
-        if( !ok($mtime, 'hard link mtime') ||
+        my $ok_mtime = ok($mtime, 'hard link mtime');
+        local our $TODO;
+        # https://bugs.dragonflybsd.org/issues/3251
+        # this might be hammer/hammer2 specific
+        $TODO = "DragonFly BSD doesn't touch ctime on link()/chmod"
+            if $^O eq "dragonfly" && $Config{myuname} =~ /5\.8/;
+        if(!$ok_mtime ||
             !isnt($mtime, $ctime, 'hard link ctime != mtime') ) {
             print STDERR <<DIAG;
 # Check if you are on a tmpfs of some sort.  Building in /tmp sometimes
@@ -236,7 +243,10 @@ ok(! -f '.',          '!-f cwd' );
 SKIP: {
     unlink($tmpfile_link);
     my $symlink_rslt = eval { symlink $tmpfile, $tmpfile_link };
+    my $error = 0 + $!;
     skip "symlink not implemented", 3 if $@ =~ /unimplemented/;
+    skip "symlink not available or we can't check", 3
+        if $^O eq "MSWin32" && (!$Errno_loaded || $error == &Errno::ENOSYS || $error == &Errno::EPERM);
 
     is( $@, '',     'symlink() implemented' );
     ok( $symlink_rslt,      'symlink() ok' );
@@ -299,6 +309,11 @@ SKIP: {
     $DEV =~ s{^.+?\s\..+?$}{}m;
     @DEV =  grep { ! m{^\..+$} } @DEV;
 
+    # sometimes files cannot be stat'd on cygwin, making inspecting pointless
+    # remove them from both @DEV and $DEV
+    @DEV = grep $DEV =~ s/^.\?{9}.*\s$_(?: -> .*)?$//m ? () : $_, @DEV
+      if $Is_Cygwin;
+
     # Irix ls -l marks sockets with 'S' while 's' is a 'XENIX semaphore'.
     if ($^O eq 'irix') {
         $DEV =~ s{^S(.+?)}{s$1}mg;
@@ -309,7 +324,8 @@ SKIP: {
 	my @c2 = eval qq[grep { $_[1] "/dev/\$_" } \@DEV];
 	my $c1 = scalar @c1;
 	my $c2 = scalar @c2;
-	is($c1, $c2, "ls and $_[1] agreeing on /dev ($c1 $c2)");
+	diag "= before", $DEV, "-", @DEV, "= after", @c1, "-", @c2, "="
+	  unless is($c1, $c2, "ls and $_[1] agreeing on /dev ($c1 $c2)");
     };
 
 {
@@ -491,14 +507,19 @@ like $@, qr/^The stat preceding lstat\(\) wasn't an lstat at /,
 }
   
 SKIP: {
-    skip "No lstat", 2 unless $Config{d_lstat};
+    skip "No lstat", 2 unless $Config{d_lstat} && $Config{d_symlink};
 
     # bug id 20020124.004 (#8334)
-    # If we have d_lstat, we should have symlink()
     my $linkname = 'stat-' . rand =~ y/.//dr;
     my $target = $Perl;
     $target =~ s/;\d+\z// if $Is_VMS; # symlinks don't like version numbers
-    symlink $target, $linkname or die "# Can't symlink $0: $!";
+    unless (symlink $target, $linkname) {
+        if ($^O eq "MSWin32") {
+            # likely we don't have permission
+            skip "symlink failed: $!", 2;
+        }
+        die "# Can't symlink $0: $!";
+    }
     lstat $linkname;
     -T _;
     eval { lstat _ };
@@ -618,7 +639,6 @@ SKIP:
 {
     skip "There is a file named '2', which invalidates this test", 2 if -e '2';
 
-    my $Errno_loaded = eval { require Errno };
     my @statarg = ($statfile, $statfile);
     no warnings 'syntax';
     ok !stat(@statarg),

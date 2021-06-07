@@ -189,6 +189,20 @@ Returns per-loop L<UniEvent::Resolver> object.
 This resolver object does not hold the loop, so if you keep a reference to it, you must not use it after it's loop death (otherwise exception will be thrown).
 
 
+=head2 track_load_average($seconds)
+
+Starts tracking load average on the loop. Tracked value is the average loop busy load for last C<$seconds>. This value is NOT a CPU load, instead
+it is somewhat more useful. It is wallclock time that was spent on calling user callbacks (and related stuff) during last C<$seconds> divided by
+C<$seconds>. I.e. part of the time, the loop was not in I/O polling, in other words, part of the time the loop was busy and could not receive new events.
+
+This value is more useful than CPU load because even in case of blocking code (waiting for blocking I/O) it will count such time as busy time.
+
+
+=head2 get_load_average()
+
+Returns loop busy load (value between 0 and 1, where 1 means 100% busy). If C<track_load_average()> wasn't previously enabled, returns 0.
+
+
 =head2 start_debug_tracer($callback)
 
 This is debug assistant function. The C<$callback> is always invoked upon new

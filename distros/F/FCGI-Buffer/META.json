@@ -4,7 +4,7 @@
       "Nigel Horne <njh@bandsman.co.uk>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.42, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "open_source"
    ],
@@ -73,14 +73,16 @@
    "resources" : {
       "bugtracker" : {
          "mailto" : "bug-FCGI-Buffer@rt.cpan.org",
-         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=FCGI-Buffer"
+         "web" : "https://github.com/nigelhorne/FCGI-Buffer/issues",
+         "x_url" : "https://github.com/nigelhorne/FCGI-Buffer/issues"
       },
       "repository" : {
          "type" : "git",
          "url" : "git://github.com/nigelhorne/FCGI-Buffer.git",
-         "web" : "https://github.com/nigelhorne/FCGI-Buffer"
+         "web" : "https://github.com/nigelhorne/FCGI-Buffer",
+         "x_repository" : "https://github.com/nigelhorne/FCGI-Buffer"
       }
    },
-   "version" : "0.15",
-   "x_serialization_backend" : "JSON::PP version 4.04"
+   "version" : "0.16",
+   "x_serialization_backend" : "JSON::PP version 4.06"
 }

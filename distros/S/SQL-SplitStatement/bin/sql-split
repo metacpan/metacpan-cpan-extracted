@@ -15,7 +15,7 @@ use warnings;
 
 use SQL::SplitStatement;
 
-our $VERSION = $SQL::SplitStatement::VERSION;
+our $VERSION = '1.00023';
 
 use Getopt::Long;
 Getopt::Long::Configure qw(
@@ -44,10 +44,10 @@ GetOptions(
     'help|h|?' => \$help,
     'man'      => \$man,
     
-    'terminators|T!'            => \$keep_terminators,
-    'extra-spaces|spaces|S!'    => \$keep_extra_spaces,
-    'comments|C!'               => \$keep_comments,
-    'empty-statements|empty|E!' => \$keep_empty_statements,
+    'terminators|t!'            => \$keep_terminators,
+    'extra-spaces|spaces|x!'    => \$keep_extra_spaces,
+    'comments|c!'               => \$keep_comments,
+    'empty-statements|empty|m!' => \$keep_empty_statements,
     'slash-terminates|slash!'   => \$slash_terminates,
     
     'output-statement-separator|oss|s=s' => \$OUTPUT_STATEMENT_SEP,
@@ -121,10 +121,6 @@ __END__
 
 sql-split - SQL splitting command line utility
 
-=head1 VERSION
-
-version 1.00020
-
 =head1 SYNOPSIS
 
     sql-split [ OPTIONS ] [ FILE(S) ]
@@ -150,7 +146,7 @@ SQL code will not be detected (and can even lead to incorrect splitting).
 
 =head1 OPTIONS
 
-=head2 -T, --terminators
+=head2 -t, --terminators
 
 It causes the trailing terminator tokens to be kept in the returned atomic
 statements (by default they are discarded instead).
@@ -178,19 +174,20 @@ The multi-line terminators above are always treated as a single token, that is
 they are discarded (or returned) as a whole (regardless of the
 C<--no-slash-terminates> option value).
 
-=head2 -S, --spaces, --extra-spaces
+=head2 -x, --spaces, --extra-spaces
 
 It causes the space characters around the statements, if any, to be kept in the
-returned atomic statements (by default they are trimmed instead).
+returned atomic statements (by default they are trimmed instead). A mnemonic for the 
+short version is "X-tra spaces".
 
-=head2 -C, --comments
+=head2 -c, --comments
 
 It causes the comments, if any, to be kept in the returned atomic statements
 (by default any comment is discarded instead).
 
 Both SQL and multi-line C-style comments are recognized.
 
-=head2 -E, --empty, --empty-statements
+=head2 -m, --empty, --empty-statements
 
 It causes the empty statements to be returned (by default, they are discarded
 instead).
@@ -200,6 +197,8 @@ terminator and space characters. A statement composed solely of comments is not
 recognized as empty and it is therefore returned, if the C<--comments> option is
 used. Note instead that an empty statement is recognized as such regardless of
 the use of the C<--terminators> and C<--extra-spaces> options.
+
+A mnemonic for this option is keep "M-ty" statements.
 
 =head2 --no-slash, --no-slash-terminates
 

@@ -1,14 +1,12 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2010-2017 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2010-2021 -- leonerd@leonerd.org.uk
 
-package Net::Async::Tangence::Client::via::sshunix;
+package Net::Async::Tangence::Client::via::sshunix 0.16;
 
-use strict;
+use v5.14;
 use warnings;
-
-our $VERSION = '0.15';
 
 # A tiny program we can run remotely to connect STDIN/STDOUT to a UNIX socket
 # given as $ARGV[0]
@@ -40,16 +38,20 @@ EOPERL
 sub connect
 {
    my $client = shift;
-   my ( $uri ) = @_;
+   my ( $uri, %args ) = @_;
 
    my $host = $uri->authority;
    my $path = $uri->path;
    # Path will start with a leading /; we need to trim that
    $path =~ s{^/}{};
 
+   my @sshargs;
+   push @sshargs, "-4" if $args{family} and $args{family} eq "inet4";
+   push @sshargs, "-6" if $args{family} and $args{family} eq "inet6";
+
    return $client->connect_exec(
       # Tell the remote perl we're going to send it a program on STDIN
-      [ 'ssh', $host, 'perl', '-', $path ]
+      [ 'ssh', @sshargs, $host, 'perl', '-', $path ]
    )->then( sub {
       $client->write( _NC_MICRO . "\n__END__\n" );
       my $f = $client->new_future;

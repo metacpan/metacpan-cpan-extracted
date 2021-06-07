@@ -4,7 +4,6 @@ author:
   - 'Laurent Dami <dami.@cpan.org>'
 build_requires:
   Test::More: '0'
-  Time::HiRes: '0'
 configure_requires:
   Module::Build: '0.42'
 dynamic_config: 1
@@ -17,12 +16,12 @@ name: Search-Tokenizer
 provides:
   Search::Tokenizer:
     file: lib/Search/Tokenizer.pm
-    version: '1.02'
+    version: '1.03'
 requires:
   Text::Transliterator::Unaccent: '0'
   Unicode::CaseFold: '0'
 resources:
   license: http://dev.perl.org/licenses/
   repository: https://github.com/damil/Search-Tokenizer
-version: '1.02'
+version: '1.03'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

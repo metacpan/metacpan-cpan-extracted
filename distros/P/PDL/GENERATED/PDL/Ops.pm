@@ -4,7 +4,7 @@
 #
 package PDL::Ops;
 
-our @EXPORT_OK = qw( PDL::PP log10 PDL::PP assgn PDL::PP carg PDL::PP conj PDL::PP czip PDL::PP _ci PDL::PP ipow PDL::PP r2C PDL::PP i2C );
+our @EXPORT_OK = qw( PDL::PP log10 PDL::PP assgn PDL::PP carg PDL::PP conj PDL::PP czip PDL::PP ipow PDL::PP r2C PDL::PP i2C );
 our %EXPORT_TAGS = (Func=>[@EXPORT_OK]);
 
 use PDL::Core;
@@ -24,6 +24,8 @@ use DynaLoader;
 
 use strict;
 use warnings;
+
+my %OVERLOADS;
 
 =head1 NAME
 
@@ -60,6 +62,22 @@ none
 =cut
 
 
+
+
+{
+  my ($foo, $overload_sub);
+  BEGIN { $OVERLOADS{'+'} = $overload_sub = sub(;@) {
+      return PDL::plus(@_) unless ref $_[1]
+              && (ref $_[1] ne 'PDL')
+              && defined($foo = overload::Method($_[1], '+'))
+              && $foo != $overload_sub; # recursion guard
+      $foo->($_[1], $_[0], !$_[2]);
+  }; }
+}
+BEGIN {
+# in1, in2, out, swap if true
+$OVERLOADS{'+='} = sub { PDL::plus($_[0], $_[1], $_[0], 0); $_[0] };
+}
 
 
 
@@ -105,6 +123,22 @@ The state of the bad-value flag of the output ndarrays is unknown.
 
 
 
+{
+  my ($foo, $overload_sub);
+  BEGIN { $OVERLOADS{'*'} = $overload_sub = sub(;@) {
+      return PDL::mult(@_) unless ref $_[1]
+              && (ref $_[1] ne 'PDL')
+              && defined($foo = overload::Method($_[1], '*'))
+              && $foo != $overload_sub; # recursion guard
+      $foo->($_[1], $_[0], !$_[2]);
+  }; }
+}
+BEGIN {
+# in1, in2, out, swap if true
+$OVERLOADS{'*='} = sub { PDL::mult($_[0], $_[1], $_[0], 0); $_[0] };
+}
+
+
 
 
 =head2 mult
@@ -146,6 +180,22 @@ The state of the bad-value flag of the output ndarrays is unknown.
 
 *mult = \&PDL::mult;
 
+
+
+{
+  my ($foo, $overload_sub);
+  BEGIN { $OVERLOADS{'-'} = $overload_sub = sub(;@) {
+      return PDL::minus(@_) unless ref $_[1]
+              && (ref $_[1] ne 'PDL')
+              && defined($foo = overload::Method($_[1], '-'))
+              && $foo != $overload_sub; # recursion guard
+      $foo->($_[1], $_[0], !$_[2]);
+  }; }
+}
+BEGIN {
+# in1, in2, out, swap if true
+$OVERLOADS{'-='} = sub { PDL::minus($_[0], $_[1], $_[0], 0); $_[0] };
+}
 
 
 
@@ -191,6 +241,22 @@ The state of the bad-value flag of the output ndarrays is unknown.
 
 
 
+{
+  my ($foo, $overload_sub);
+  BEGIN { $OVERLOADS{'/'} = $overload_sub = sub(;@) {
+      return PDL::divide(@_) unless ref $_[1]
+              && (ref $_[1] ne 'PDL')
+              && defined($foo = overload::Method($_[1], '/'))
+              && $foo != $overload_sub; # recursion guard
+      $foo->($_[1], $_[0], !$_[2]);
+  }; }
+}
+BEGIN {
+# in1, in2, out, swap if true
+$OVERLOADS{'/='} = sub { PDL::divide($_[0], $_[1], $_[0], 0); $_[0] };
+}
+
+
 
 
 =head2 divide
@@ -232,6 +298,18 @@ The state of the bad-value flag of the output ndarrays is unknown.
 
 *divide = \&PDL::divide;
 
+
+
+{
+  my ($foo, $overload_sub);
+  BEGIN { $OVERLOADS{'>'} = $overload_sub = sub(;@) {
+      return PDL::gt(@_) unless ref $_[1]
+              && (ref $_[1] ne 'PDL')
+              && defined($foo = overload::Method($_[1], '>'))
+              && $foo != $overload_sub; # recursion guard
+      $foo->($_[1], $_[0], !$_[2]);
+  }; }
+}
 
 
 
@@ -277,6 +355,18 @@ The state of the bad-value flag of the output ndarrays is unknown.
 
 
 
+{
+  my ($foo, $overload_sub);
+  BEGIN { $OVERLOADS{'<'} = $overload_sub = sub(;@) {
+      return PDL::lt(@_) unless ref $_[1]
+              && (ref $_[1] ne 'PDL')
+              && defined($foo = overload::Method($_[1], '<'))
+              && $foo != $overload_sub; # recursion guard
+      $foo->($_[1], $_[0], !$_[2]);
+  }; }
+}
+
+
 
 
 =head2 lt
@@ -318,6 +408,18 @@ The state of the bad-value flag of the output ndarrays is unknown.
 
 *lt = \&PDL::lt;
 
+
+
+{
+  my ($foo, $overload_sub);
+  BEGIN { $OVERLOADS{'<='} = $overload_sub = sub(;@) {
+      return PDL::le(@_) unless ref $_[1]
+              && (ref $_[1] ne 'PDL')
+              && defined($foo = overload::Method($_[1], '<='))
+              && $foo != $overload_sub; # recursion guard
+      $foo->($_[1], $_[0], !$_[2]);
+  }; }
+}
 
 
 
@@ -363,6 +465,18 @@ The state of the bad-value flag of the output ndarrays is unknown.
 
 
 
+{
+  my ($foo, $overload_sub);
+  BEGIN { $OVERLOADS{'>='} = $overload_sub = sub(;@) {
+      return PDL::ge(@_) unless ref $_[1]
+              && (ref $_[1] ne 'PDL')
+              && defined($foo = overload::Method($_[1], '>='))
+              && $foo != $overload_sub; # recursion guard
+      $foo->($_[1], $_[0], !$_[2]);
+  }; }
+}
+
+
 
 
 =head2 ge
@@ -404,6 +518,18 @@ The state of the bad-value flag of the output ndarrays is unknown.
 
 *ge = \&PDL::ge;
 
+
+
+{
+  my ($foo, $overload_sub);
+  BEGIN { $OVERLOADS{'=='} = $overload_sub = sub(;@) {
+      return PDL::eq(@_) unless ref $_[1]
+              && (ref $_[1] ne 'PDL')
+              && defined($foo = overload::Method($_[1], '=='))
+              && $foo != $overload_sub; # recursion guard
+      $foo->($_[1], $_[0], !$_[2]);
+  }; }
+}
 
 
 
@@ -449,6 +575,18 @@ The state of the bad-value flag of the output ndarrays is unknown.
 
 
 
+{
+  my ($foo, $overload_sub);
+  BEGIN { $OVERLOADS{'!='} = $overload_sub = sub(;@) {
+      return PDL::ne(@_) unless ref $_[1]
+              && (ref $_[1] ne 'PDL')
+              && defined($foo = overload::Method($_[1], '!='))
+              && $foo != $overload_sub; # recursion guard
+      $foo->($_[1], $_[0], !$_[2]);
+  }; }
+}
+
+
 
 
 =head2 ne
@@ -490,6 +628,22 @@ The state of the bad-value flag of the output ndarrays is unknown.
 
 *ne = \&PDL::ne;
 
+
+
+{
+  my ($foo, $overload_sub);
+  BEGIN { $OVERLOADS{'<<'} = $overload_sub = sub(;@) {
+      return PDL::shiftleft(@_) unless ref $_[1]
+              && (ref $_[1] ne 'PDL')
+              && defined($foo = overload::Method($_[1], '<<'))
+              && $foo != $overload_sub; # recursion guard
+      $foo->($_[1], $_[0], !$_[2]);
+  }; }
+}
+BEGIN {
+# in1, in2, out, swap if true
+$OVERLOADS{'<<='} = sub { PDL::shiftleft($_[0], $_[1], $_[0], 0); $_[0] };
+}
 
 
 
@@ -535,6 +689,22 @@ The state of the bad-value flag of the output ndarrays is unknown.
 
 
 
+{
+  my ($foo, $overload_sub);
+  BEGIN { $OVERLOADS{'>>'} = $overload_sub = sub(;@) {
+      return PDL::shiftright(@_) unless ref $_[1]
+              && (ref $_[1] ne 'PDL')
+              && defined($foo = overload::Method($_[1], '>>'))
+              && $foo != $overload_sub; # recursion guard
+      $foo->($_[1], $_[0], !$_[2]);
+  }; }
+}
+BEGIN {
+# in1, in2, out, swap if true
+$OVERLOADS{'>>='} = sub { PDL::shiftright($_[0], $_[1], $_[0], 0); $_[0] };
+}
+
+
 
 
 =head2 shiftright
@@ -576,6 +746,22 @@ The state of the bad-value flag of the output ndarrays is unknown.
 
 *shiftright = \&PDL::shiftright;
 
+
+
+{
+  my ($foo, $overload_sub);
+  BEGIN { $OVERLOADS{'|'} = $overload_sub = sub(;@) {
+      return PDL::or2(@_) unless ref $_[1]
+              && (ref $_[1] ne 'PDL')
+              && defined($foo = overload::Method($_[1], '|'))
+              && $foo != $overload_sub; # recursion guard
+      $foo->($_[1], $_[0], !$_[2]);
+  }; }
+}
+BEGIN {
+# in1, in2, out, swap if true
+$OVERLOADS{'|='} = sub { PDL::or2($_[0], $_[1], $_[0], 0); $_[0] };
+}
 
 
 
@@ -621,6 +807,22 @@ The state of the bad-value flag of the output ndarrays is unknown.
 
 
 
+{
+  my ($foo, $overload_sub);
+  BEGIN { $OVERLOADS{'&'} = $overload_sub = sub(;@) {
+      return PDL::and2(@_) unless ref $_[1]
+              && (ref $_[1] ne 'PDL')
+              && defined($foo = overload::Method($_[1], '&'))
+              && $foo != $overload_sub; # recursion guard
+      $foo->($_[1], $_[0], !$_[2]);
+  }; }
+}
+BEGIN {
+# in1, in2, out, swap if true
+$OVERLOADS{'&='} = sub { PDL::and2($_[0], $_[1], $_[0], 0); $_[0] };
+}
+
+
 
 
 =head2 and2
@@ -662,6 +864,22 @@ The state of the bad-value flag of the output ndarrays is unknown.
 
 *and2 = \&PDL::and2;
 
+
+
+{
+  my ($foo, $overload_sub);
+  BEGIN { $OVERLOADS{'^'} = $overload_sub = sub(;@) {
+      return PDL::xor(@_) unless ref $_[1]
+              && (ref $_[1] ne 'PDL')
+              && defined($foo = overload::Method($_[1], '^'))
+              && $foo != $overload_sub; # recursion guard
+      $foo->($_[1], $_[0], !$_[2]);
+  }; }
+}
+BEGIN {
+# in1, in2, out, swap if true
+$OVERLOADS{'^='} = sub { PDL::xor($_[0], $_[1], $_[0], 0); $_[0] };
+}
 
 
 
@@ -707,6 +925,9 @@ The state of the bad-value flag of the output ndarrays is unknown.
 
 
 
+BEGIN { $OVERLOADS{'~'} = sub { PDL::bitnot($_[0]) } }
+
+
 
 
 =head2 bitnot
@@ -744,6 +965,22 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 *bitnot = \&PDL::bitnot;
 
+
+
+{
+  my ($foo, $overload_sub);
+  BEGIN { $OVERLOADS{'**'} = $overload_sub = sub(;@) {
+      return PDL::power(@_) unless ref $_[1]
+              && (ref $_[1] ne 'PDL')
+              && defined($foo = overload::Method($_[1], '**'))
+              && $foo != $overload_sub; # recursion guard
+      $foo->($_[1], $_[0], !$_[2]);
+  }; }
+}
+BEGIN {
+# in1, in2, out, swap if true
+$OVERLOADS{'**='} = sub { PDL::power($_[0], $_[1], $_[0], 0); $_[0] };
+}
 
 
 
@@ -789,6 +1026,18 @@ The state of the bad-value flag of the output ndarrays is unknown.
 
 
 
+{
+  my ($foo, $overload_sub);
+  BEGIN { $OVERLOADS{'atan2'} = $overload_sub = sub(;@) {
+      return PDL::atan2(@_) unless ref $_[1]
+              && (ref $_[1] ne 'PDL')
+              && defined($foo = overload::Method($_[1], 'atan2'))
+              && $foo != $overload_sub; # recursion guard
+      $foo->($_[1], $_[0], !$_[2]);
+  }; }
+}
+
+
 
 
 =head2 atan2
@@ -830,6 +1079,22 @@ The state of the bad-value flag of the output ndarrays is unknown.
 
 *atan2 = \&PDL::atan2;
 
+
+
+{
+  my ($foo, $overload_sub);
+  BEGIN { $OVERLOADS{'%'} = $overload_sub = sub(;@) {
+      return PDL::modulo(@_) unless ref $_[1]
+              && (ref $_[1] ne 'PDL')
+              && defined($foo = overload::Method($_[1], '%'))
+              && $foo != $overload_sub; # recursion guard
+      $foo->($_[1], $_[0], !$_[2]);
+  }; }
+}
+BEGIN {
+# in1, in2, out, swap if true
+$OVERLOADS{'%='} = sub { PDL::modulo($_[0], $_[1], $_[0], 0); $_[0] };
+}
 
 
 
@@ -875,6 +1140,18 @@ The state of the bad-value flag of the output ndarrays is unknown.
 
 
 
+{
+  my ($foo, $overload_sub);
+  BEGIN { $OVERLOADS{'<=>'} = $overload_sub = sub(;@) {
+      return PDL::spaceship(@_) unless ref $_[1]
+              && (ref $_[1] ne 'PDL')
+              && defined($foo = overload::Method($_[1], '<=>'))
+              && $foo != $overload_sub; # recursion guard
+      $foo->($_[1], $_[0], !$_[2]);
+  }; }
+}
+
+
 
 
 =head2 spaceship
@@ -918,6 +1195,9 @@ The state of the bad-value flag of the output ndarrays is unknown.
 
 
 
+BEGIN { $OVERLOADS{'sqrt'} = sub { PDL::sqrt($_[0]) } }
+
+
 
 
 =head2 sqrt
@@ -955,6 +1235,9 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 *sqrt = \&PDL::sqrt;
 
+
+
+BEGIN { $OVERLOADS{'sin'} = sub { PDL::sin($_[0]) } }
 
 
 
@@ -996,6 +1279,9 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
+BEGIN { $OVERLOADS{'cos'} = sub { PDL::cos($_[0]) } }
+
+
 
 
 =head2 cos
@@ -1033,6 +1319,9 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 *cos = \&PDL::cos;
 
+
+
+BEGIN { $OVERLOADS{'!'} = sub { PDL::not($_[0]) } }
 
 
 
@@ -1074,6 +1363,9 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
+BEGIN { $OVERLOADS{'exp'} = sub { PDL::exp($_[0]) } }
+
+
 
 
 =head2 exp
@@ -1111,6 +1403,9 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 *exp = \&PDL::exp;
 
+
+
+BEGIN { $OVERLOADS{'log'} = sub { PDL::log($_[0]) } }
 
 
 
@@ -1426,12 +1721,6 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-*_ci = \&PDL::_ci;
-
-
-
-
-
 =head2 ipow
 
 =for sig
@@ -1485,6 +1774,9 @@ Returns the absolute value of a number.
 =cut
 
 sub PDL::abs { $_[0]->type->real ? goto &PDL::_rabs : goto &PDL::_cabs }
+
+
+BEGIN { $OVERLOADS{'abs'} = sub { PDL::abs($_[0]) } }
 
 
 
@@ -1567,6 +1859,41 @@ sub PDL::i2C ($) {
 
 *i2C = \&PDL::i2C;
 
+
+
+# This is to used warn if an operand is non-numeric or non-PDL.
+sub warn_non_numeric_op_wrapper {
+  require Scalar::Util;
+  my ($cb, $op_name) = @_;
+  return sub {
+    my ($op1, $op2) = @_;
+    warn "'$op2' is not numeric nor a PDL in operator $op_name"
+      unless Scalar::Util::looks_like_number($op2)
+            || ( Scalar::Util::blessed($op2) && $op2->isa('PDL') );
+    $cb->(@_);
+  }
+}
+
+{ package PDL;
+  use Carp;
+  use overload %OVERLOADS,
+    "eq"    => PDL::Ops::warn_non_numeric_op_wrapper(\&PDL::eq, 'eq'),
+    "="     => sub {$_[0]},          # Don't deep copy, just copy reference
+    ".="    => sub {
+      my @args = !$_[2] ? @_[1,0] : @_[0,1];
+      PDL::Ops::assgn(@args);
+      return $args[1];
+    },
+    'bool'  => sub {
+      return 0 if $_[0]->isnull;
+      croak("multielement ndarray in conditional expression (see PDL::FAQ questions 6-10 and 6-11)")
+        unless $_[0]->nelem == 1;
+      $_[0]->clump(-1)->at(0);
+    },
+    '++' => sub { $_[0] += 1 },
+    '--' => sub { $_[0] -= 1 },
+  ;
+}
 
 
 ;

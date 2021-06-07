@@ -11,12 +11,13 @@ package Perl7::Handy;
 use 5.00503;    # Universal Consensus 1998 for primetools
 # use 5.008001; # Lancaster Consensus 2013 for toolchains
 
-$VERSION = '0.05';
+$VERSION = '0.06';
 $VERSION = $VERSION;
 
 BEGIN { pop @INC if $INC[-1] eq '.' } # CVE-2016-1238: Important unsafe module load path flaw
 use strict;
 BEGIN { $INC{'warnings.pm'} = '' if $] < 5.006 } use warnings; local $^W=1;
+BEGIN { $INC{'feature.pm'}  = '' if $] < 5.010 } use feature ();
 
 use Fcntl;
 
@@ -265,6 +266,7 @@ sub STORE {
 #   use warnings;
 #   no bareword::filehandles;
 #   no multidimensional;
+#   use feature qw(signatures); no warnings qw(experimental::signatures);
 sub import {
 
     # gives caller package "use strict;"
@@ -273,6 +275,12 @@ sub import {
     # gives caller package "use warnings;" (only perl 5.006 or later)
     if ($] >= 5.006) {
         warnings->import;
+
+        # gives caller package "use feature qw(signatures); no warnings qw(experimental::signatures);" (only perl 5.020 or later)
+        if ($] >= 5.020) {
+            feature->import('signatures');
+            warnings->unimport('experimental::signatures');
+        }
     }
 
     # gives caller package "no bareword::filehandles;"
@@ -322,6 +330,8 @@ Perl7::Handy module provides easy Perl7 scripting environment onto perl
 =item * gives caller package "no bareword::filehandles;"
 
 =item * gives caller package "no multidimensional;"
+
+=item * gives caller package "use feature qw(signatures); no warnings qw(experimental::signatures);" (only perl 5.020 or later)
 
 =item * removes ".(dot)" from @INC (CVE-2016-1238: Important unsafe module load path flaw)
 

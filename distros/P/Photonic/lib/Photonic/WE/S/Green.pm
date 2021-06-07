@@ -1,5 +1,5 @@
 package Photonic::WE::S::Green;
-$Photonic::WE::S::Green::VERSION = '0.015';
+$Photonic::WE::S::Green::VERSION = '0.016';
 
 =encoding UTF-8
 
@@ -9,7 +9,7 @@ Photonic::WE::S::Green
 
 =head1 VERSION
 
-version 0.015
+version 0.016
 
 =head1 COPYRIGHT NOTICE
 
@@ -79,7 +79,7 @@ response $epsA is taken from the metric.
 
 =back
 
-=head1 ACCESORS (read only)
+=head1 ACCESSORS (read only)
 
 =over 4
 
@@ -134,14 +134,11 @@ fraction. 0 means don't check.
 
 use namespace::autoclean;
 use PDL::Lite;
-use PDL::NiceSlice;
-use PDL::Complex;
-use PDL::MatrixOps;
-use Storable qw(dclone);
-use PDL::IO::Storable;
 use Photonic::WE::S::AllH;
 use Photonic::WE::S::GreenP;
 use Photonic::Types;
+use Photonic::Utils qw(tensor make_haydock make_greenp);
+use List::Util qw(all);
 use Moose;
 use MooseX::StrictConstructor;
 
@@ -163,7 +160,7 @@ has 'greenP'=>(is=>'ro', isa=>'ArrayRef[Photonic::WE::S::GreenP]',
 has 'converged'=>(is=>'ro', init_arg=>undef, writer=>'_converged',
              documentation=>
                   'All greenP evaluations converged');
-has 'greenTensor'=>(is=>'ro', isa=>'PDL::Complex', init_arg=>undef,
+has 'greenTensor'=>(is=>'ro', isa=>'Photonic::Types::PDLComplex', init_arg=>undef,
 	      lazy=>1, builder=>'_build_greenTensor',
              documentation=>'Greens Tensor');
 has 'reorthogonalize'=>(is=>'ro', required=>1, default=>0,
@@ -172,59 +169,16 @@ with 'Photonic::Roles::KeepStates', 'Photonic::Roles::UseMask';
 
 sub _build_greenTensor {
     my $self=shift;
-    my @greenP; #array of Green's projections along different directions.
-    my $converged=1;
-    foreach(@{$self->greenP}){
-	push @greenP, $_->Gpp;
-	$converged &&=$_->converged;
-    }
-    $self->_converged($converged);
-    my $reGreenP=PDL->pdl([map {$_->re} @greenP]);
-    my $imGreenP=PDL->pdl([map {$_->im} @greenP]);
-    my ($lu, $perm, $parity)=@{$self->geometry->unitDyadsLU};
-    my $reGreen=lu_backsub($lu, $perm, $parity, $reGreenP);
-    my $imGreen=lu_backsub($lu, $perm, $parity, $imGreenP);
-    my $nd=$self->geometry->ndims;
-    my $greenTensor=PDL->zeroes(2, $nd, $nd)->complex;
-    my $n=0;
-    for my $i(0..$nd-1){
-	for my $j($i..$nd-1){
-	    $greenTensor->(:,($i),($j)).=$reGreen->($n)+i*$imGreen->($n);
-	    $greenTensor->(:,($j),($i)).=$reGreen->($n)+i*$imGreen->($n);
-	    ++$n;
-	}
-    }
-    return $greenTensor;
+    $self->_converged(all { $_->converged } @{$self->greenP});
+    tensor(pdl([map $_->Gpp, @{$self->greenP}])->complex, $self->geometry->unitDyadsLU, $self->geometry->ndims, 2);
 }
 
 sub _build_haydock { # One Haydock coefficients calculator per direction0
-    my $self=shift;
-    my @haydock;
-    # This must change if G is not symmetric
-    foreach(@{$self->geometry->unitPairs}){
-	my $m=dclone($self->metric); #clone metric, to be safe
-	my $e=$_->r2C; #polarization
-	#Build a corresponding Photonic::WE::S::AllH structure
-	my $haydock=Photonic::WE::S::AllH->new(
-	    metric=>$m, polarization=>$e, nh=>$self->nh,
-	    keepStates=>$self->keepStates, smallH=>$self->smallH,
-	    reorthogonalize=>$self->reorthogonalize,
-	    use_mask=>$self->use_mask,
-	    mask=>$self->mask);
-	push @haydock, $haydock;
-    }
-    return [@haydock]
+    make_haydock(shift, 'Photonic::WE::S::AllH');
 }
 
 sub _build_greenP {
-    my $self=shift;
-    my @greenP;
-    foreach(@{$self->haydock}){
-	my $g=Photonic::WE::S::GreenP->new(
-	    haydock=>$_, nh=>$self->nh, smallE=>$self->smallE);
-	push @greenP, $g;
-    }
-    return [@greenP]
+    make_greenp(shift, 'Photonic::WE::S::GreenP');
 }
 
 __PACKAGE__->meta->make_immutable;

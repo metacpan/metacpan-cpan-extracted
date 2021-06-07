@@ -1,0 +1,109 @@
+#!/usr/bin/perl -T 
+
+#  Ldigest 各行を MD5変換する
+#     2016.01 - 2016.05 下野寿之
+#
+
+use 5.001 ; use strict ; use warnings ; # 5.014 で動く事は確認済み
+use Getopt::Std ; getopts 'AaHh:k:nt:w148!,:@:' , \my%o; 
+use Digest::MD5 qw[ md5_hex md5_base64 ] ;
+use Term::ANSIColor qw [ color :constants ] ; $Term::ANSIColor::AUTORESET = 1 ; 
+
+sub midreport ( ) ;
+my $midcycle = $o{'@'} // 1e7 ; # 何行毎にレポートを発生させるか。
+my $time0 = time ; 
+
+$| = 1 if $o{'!'} ; 
+$/ = undef if $o{w} ; # -w で各行では無くて、ファイル全部を MD5変換する。
+$o{h} = do { $o{h} //= '' ; eval qq[qq[$o{h}]] } ; # 変換対象の各文字列の先頭に付加する文字列
+$o{t} = do { $o{t} //= '' ; eval qq[qq[$o{t}]] } ; # 変換対象の各文字列の末尾に付加する文字列
+$o{','} = do { $o{','} //= '\t' ; eval qq[qq[$o{','}]] } ;  # 区切り文字の指定
+$o{4} = 1 unless grep { defined $o{$_} } qw [ 1 4 8 ] ; 
+
+while ( <> ) { 
+    chomp ; 
+    my ( @out0 , @out1 , @out2 ) ; # 出力する文字列を、出力列ごとに格納
+
+    my $str = $o{h} . $_ . $o{t} ; # MD5変換をする対象の文字列; 後で -a指定による元の$_参照が発生ことに注意
+    if ( defined $o{k} ) { 
+    	my @F = split /$o{','}/,$_, $o{k} + 1 ; 
+    	push @out0 , @F[ 0 .. $o{k} - 2 ] ; 
+    	$str = $o{h} . ( $F[ $o{k} -1 ] // '' ) . $o{t} ; 
+    	push @out2 , @F[ $o{k} .. $#F ] ; 
+    	$_ = $str ;
+    }  ;
+
+    push @out1 , $str if $o{1}  ; 
+    push @out1 , md5_hex $str if $o{4}  ; 
+    push @out1 , md5_base64 $str if $o{8} ; 
+    unshift @out2 , $_ if $o{A} ; # -A 指定で元の文字列を列として、変換文字の後に出す
+    unshift @out1 , $_ if $o{a} ; # -a 指定で元の文字列を列として、変換文字の前に出す
+    unshift @out1 , $. if $o{n} ; # -n 指定で行番号 
+    print join ( $o{','} , @out0,  @out1, @out2 ) , "\n" ; 
+    midreport if $midcycle && $. % $midcycle == 1 ; 
+}
+
+sub midreport ( ) {
+	use FindBin '$Script' ;
+	$| = 1 ; 
+	my $num = $. ; 
+  $num =~ s/(?<=\d)(?=(\d\d\d)+($|\D))/,/g ; # 3桁毎にコンマで区切る
+  #1 while $num =~ s/(.*\d)(\d\d\d)/$1,$2/ ; 
+	print STDERR GREEN $num , ":\t" , sprintf "%02d:%02d:%02d" , ( localtime )[2,1,0] ;  #  <-- 標準出力に書込み
+	print STDERR "\t" , GREEN  time - $time0 , " sec.\t($Script)" ; 
+	$time0 = time ;
+	print STDERR "\n" ;
+}
+
+# ヘルプの扱い
+sub VERSION_MESSAGE {}
+sub HELP_MESSAGE {
+    use FindBin qw[ $Script ] ; 
+    $ARGV[1] //= '' ;
+    open my $FH , '<' , $0 ;
+    while(<$FH>){
+        s/\$0/$Script/g ;
+        print $_ if s/^=head1// .. s/^=cut// and $ARGV[1] =~ /^o(p(t(i(o(ns?)?)?)?)?)?$/i ? m/^\s+\-/ : 1;
+    }
+    close $FH ;
+    exit 0 ;
+}
+
+=encoding utf8
+
+=head1
+  $0  [-48] -h ''  -t '' 
+
+  入力の各行について、末尾の改行文字を取り去った後に、
+  -h と -t で指定される文字列をそれぞれ付け加え、
+  md5_hex または、-8 を指定された場合は、md5_base64 変換される文字列(32文字) を出力する。
+
+オプション: 
+
+ (1) 変換の仕方の指定
+  -4 : md5_hex 変換をする。変換後は32文字になる。(-4,-8,-Hいずれも未指定なら、-4指定となる。)
+  -8 : md5_base64 変換をする。変換後は22文字になる。
+  -1 : md5の変換をしない。そのまま出力する。ただし、指定付加文字列は付加する。
+  -w : 各行では無くて、入力全体を md5変換をする。
+
+  -k num : 特定の1列だけを変換。列の位置は左から1始まりで数える。
+
+ (2) セキュリティ考慮などのために変換前文字列の付加をするオプション
+    指定する文字列に \t や \n が含まれていると、タブ文字や改行文字と解釈される。
+  -h str : 文字列の直前に、指定された文字列を付加して、変換する。
+  -t str : 文字列の直後に、指定された文字列を付加して、変換する。
+     
+ (3) 変換後の出力形式
+  -n : 行番号も出力する。
+  -a : 元の変換前の文字列も出力する。
+  -A : 元の変換前の文字列を、変換後の文字列の後の列で出力する。
+  -, str : 区切り文字の指定。
+
+ (4) その他
+  -! : バッファに貯めずにすぐ書き出す。
+  -@ num : 入力を読み取る際に、一定行数を読み取る毎に標準エラー出力にレポートを出す。未指定なら、1000万行。
+  
+=cut
+
+
+

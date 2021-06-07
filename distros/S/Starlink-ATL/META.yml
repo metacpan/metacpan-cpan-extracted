@@ -3,22 +3,27 @@ abstract: "Perl tools for Starlink's AST library"
 author:
   - 'Graham Bell <g.bell@jach.hawaii.edu>'
 build_requires:
-  Astro::Coords: 0.18
+  Astro::Coords: '0.18'
 configure_requires:
-  Module::Build: 0.40
+  Module::Build: '0.42'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.4003, CPAN::Meta::Converter version 2.120921'
-license: open_source
+generated_by: 'Module::Build version 0.4231, CPAN::Meta::Converter version 2.150010'
+license: gpl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: Starlink-ATL
 provides:
+  Starlink::ATL:
+    file: lib/Starlink/ATL.pm
+    version: '0.05'
   Starlink::ATL::Region:
     file: lib/Starlink/ATL/Region.pm
-    version: 0.04
+    version: '0.05'
 requires:
-  Starlink::AST: 1.02
+  Pod::Usage: '0'
+  Starlink::AST: '1.02'
 resources:
-  license: http://www.gnu.org/licenses/gpl-3.0.txt
-version: 0.04
+  license: http://opensource.org/licenses/gpl-3.0.html
+version: '0.05'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

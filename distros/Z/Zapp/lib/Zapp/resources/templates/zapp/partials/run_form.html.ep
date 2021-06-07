@@ -1,0 +1,36 @@
+<%
+    use Mojo::JSON qw( encode_json decode_json );
+    use Zapp::Util qw( prefix_field );
+%>
+%= form_for 'zapp.save_run', enctype => 'multipart/form-data' => begin
+    %= hidden_field "plan_id", param( 'plan_id' )
+    %= hidden_field "run_id", param( 'run_id' )
+    %= hidden_field "task_id", param( 'task_id' )
+    % if ( my @inputs = @{ stash( 'inputs' ) // [] } ) {
+        % for my $input_num ( 0..$#inputs ) {
+            % my $input = $inputs[ $input_num ];
+            <div class="form-group" data-input="<%= $input_num %>">
+                <h4 data-input-name><%= $input->{label} // ( $input->{name} =~ s/_/ /gr ) %></h4>
+                %# These hidden fields will allow us to create runs for
+                %# unsaved, ad-hoc plans
+                %= hidden_field "input[$input_num].type", $input->{type}
+                %= hidden_field "input[$input_num].name", $input->{name}
+                %= hidden_field "input[$input_num].label", $input->{label}
+                %= hidden_field "input[$input_num].config", encode_json $input->{config}
+                <%
+                    my $type_name = $input->{type};
+                    my $type = $c->zapp->types->{ $type_name }
+                        or die qq{Could not find type "$type_name"};
+                    my $input_field = include inline => $type->input_field( $c, $input->{config}, $input->{value} ), self => $type, input => $input;
+                    my $input_dom = prefix_field( $input_field, "input[$input_num]" );
+                    $input_dom->children->[0]->attr( 'aria-describedby', "input[$input_num].description" );
+                %><%== $input_dom %>
+                <small class="form-text text-break text-pre-wrap" id="input[<%= $input_num %>].description"
+                    ><%= $input->{description} %></small>
+            </div>
+        % }
+    % }
+    <div class="buttons">
+        <button class="btn btn-primary"><i class="fa fa-arrow-right"></i> Start</button>
+    </div>
+% end

@@ -1,0 +1,13 @@
+Revision history for Alien::libsdl2
+
+1.02
+
+	- Attempt to build libs on bsd
+
+1.01
+
+	- Attempt to build libs on darwin/OSX
+
+1.0       2021-05-17 20:10:38-04:00 America/New_York
+
+	- Alien::SDL2 has been stalled for nearly a decade and I feel like making some games

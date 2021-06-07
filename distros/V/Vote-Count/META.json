@@ -1,5 +1,5 @@
 {
-   "abstract" : "toolkit for implementing voting methods.",
+   "abstract" : "Toolkit for implementing voting methods.",
    "author" : [
       "John Karr <brainbuz@cpan.org>"
    ],
@@ -13,11 +13,25 @@
       "version" : 2
    },
    "name" : "Vote-Count",
+   "no_index" : {
+      "file" : [
+         "lib/Vote/Count/Charge/TestBalance.pm",
+         "lib/Vote/Count/TextTableTiny.pm",
+         "lib/Vote/Hand_Count.pod"
+      ]
+   },
    "prereqs" : {
       "configure" : {
          "requires" : {
             "ExtUtils::MakeMaker" : "0",
-            "perl" : "5.022"
+            "perl" : "5.024"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test2::Bundle::More" : "0",
+            "Test2::V0" : "0",
+            "Test::Pod" : "0"
          }
       },
       "runtime" : {
@@ -31,6 +45,7 @@
             "List::Util" : "0",
             "Math::BigInt::GMP" : "1.6003",
             "Math::BigRat" : "0",
+            "Mojo::Template" : "0",
             "Moose" : "0",
             "Moose::Role" : "0",
             "Path::Tiny" : "0.108",
@@ -38,13 +53,16 @@
             "Sort::Hash" : "0",
             "Storable" : "3.15",
             "String::TtyLength" : "0.02",
+            "Test2::API" : "0",
             "Time::Piece" : "0",
             "Try::Tiny" : "0",
+            "Vote::Count::Charge::Utility" : "0",
             "YAML::XS" : "0",
+            "base" : "0",
             "feature" : "0",
             "namespace::autoclean" : "0",
             "parent" : "0",
-            "perl" : "5.022",
+            "perl" : "5.024",
             "strict" : "0",
             "utf8" : "0",
             "warnings" : "0"
@@ -62,8 +80,9 @@
             "Test::Exception" : "0",
             "Test::Fatal" : "0",
             "Test::More" : "0",
+            "Vote::Count::Charge::TestBalance" : "0",
             "lib" : "0",
-            "perl" : "5.022"
+            "perl" : "5.024"
          }
       }
    },
@@ -79,9 +98,9 @@
          "web" : "https://github.com/brainbuz/Vote-Count"
       }
    },
-   "version" : "1.10",
+   "version" : "2.00",
    "x_generated_by_perl" : "v5.32.0",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.19",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.26",
    "x_spdx_expression" : "GPL-3.0-only"
 }
 

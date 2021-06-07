@@ -1,3 +1,11 @@
-0.001   2018-01-09 (PERLANCAR)
+0.002   2021-05-22  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+        - [build] Rebuild with updated Pod::Weaver::Plugin::Acme::CPANModules
+          for more informative POD.
+
+
+0.001   2018-01-09  Released-By: PERLANCAR
 
         - First release. From Acme::CPANLists::PERLANCAR::FooThis.

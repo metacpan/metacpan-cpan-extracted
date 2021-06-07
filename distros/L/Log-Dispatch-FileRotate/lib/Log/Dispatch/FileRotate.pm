@@ -1,5 +1,5 @@
 package Log::Dispatch::FileRotate;
-$Log::Dispatch::FileRotate::VERSION = '1.36';
+$Log::Dispatch::FileRotate::VERSION = '1.38';
 # ABSTRACT: Log to Files that Archive/Rotate Themselves
 
 require 5.005;
@@ -681,13 +681,13 @@ Log::Dispatch::FileRotate - Log to Files that Archive/Rotate Themselves
 
 =head1 VERSION
 
-version 1.36
+version 1.38
 
 =head1 SYNOPSIS
 
   use Log::Dispatch::FileRotate;
 
-  my $file = Log::Dispatch::FileRotate->new(
+  my $logger = Log::Dispatch::FileRotate->new(
       name      => 'file1',
       min_level => 'info',
       filename  => 'Somefile.log',
@@ -697,7 +697,7 @@ version 1.36
 
   # or for a time based rotation
 
-  my $file = Log::Dispatch::FileRotate->new(
+  my $logger = Log::Dispatch::FileRotate->new(
       name      => 'file1',
       min_level => 'info',
       filename  => 'Somefile.log',
@@ -705,7 +705,11 @@ version 1.36
       TZ        => 'AEDT',
       DatePattern => 'yyyy-dd-HH');
 
-  $file->log( level => 'info', message => "your comment\n" );
+  # and attach to Log::Dispatch
+  my $dispatcher = Log::Dispatch->new;
+  $dispatcher->add($logger);
+
+  $dispatcher->log( level => 'info', message => "your comment\n" );
 
 =head1 DESCRIPTION
 
@@ -719,7 +723,7 @@ basically a L<Log::Dispatch::File> wrapper with additions.
 There are three different constraints which decide when a file must be
 rotated.
 
-The first is by size: when the log file grows more the a specified
+The first is by size: when the log file grows more than a specified
 size, then it's rotated.
 
 The second constraint is with occurrences. If a L</DatePattern> is defined, a

@@ -10,7 +10,7 @@
 use 5.014;
 use utf8;
 package App::SpreadRevolutionaryDate::MsgMaker::RevolutionaryDate::Calendar;
-$App::SpreadRevolutionaryDate::MsgMaker::RevolutionaryDate::Calendar::VERSION = '0.29';
+$App::SpreadRevolutionaryDate::MsgMaker::RevolutionaryDate::Calendar::VERSION = '0.31';
 # ABSTRACT: Subclass overloading L<DateTime::Calendar::FrenchRevolutionary> to allow language extension
 
 use Moose;
@@ -70,7 +70,7 @@ App::SpreadRevolutionaryDate::MsgMaker::RevolutionaryDate::Calendar - Subclass o
 
 =head1 VERSION
 
-version 0.29
+version 0.31
 
 =head1 METHODS
 
@@ -97,6 +97,10 @@ Overloads L<DateTime::Calendar::FrenchRevolutionary> to allow setting locale, ex
 =item L<App::SpreadRevolutionaryDate::Target::Freenode>
 
 =item L<App::SpreadRevolutionaryDate::Target::Freenode::Bot>
+
+=item L<App::SpreadRevolutionaryDate::Target::Liberachat>
+
+=item L<App::SpreadRevolutionaryDate::Target::Liberachat::Bot>
 
 =item L<App::SpreadRevolutionaryDate::MsgMaker>
 

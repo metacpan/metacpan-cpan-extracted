@@ -18,6 +18,8 @@
 typedef struct dropbear_chansess_accept * Net__Dropbear__XS__SessionAccept;
 typedef struct AuthState * Net__Dropbear__XS__AuthState;
 
+struct dropbear_hooks hooks; /* GLOBAL */
+
 int _get_bool(SV *self, char *method)
 {
         int count;
@@ -289,6 +291,9 @@ BOOT:
     newCONSTSUB(stash, "HOOK_COMPLETE", newSViv (LIBDROPBEAR_HOOK_COMPLETE));
     newCONSTSUB(stash, "HOOK_CONTINUE", newSViv (LIBDROPBEAR_HOOK_CONTINUE));
     newCONSTSUB(stash, "HOOK_FAILURE",  newSViv (LIBDROPBEAR_HOOK_FAILURE));
+
+    seedrandom();
+    crypto_init();
 }
 
 void
@@ -347,6 +352,10 @@ setup_svr_opts(CLASS, options)
         hooks.on_check_pubkey = hooks_on_check_pubkey;
         hooks.on_new_channel = hooks_on_new_channel;
         hooks.on_chansess_command = hooks_on_chansess_command;
+
+        hooks._will_run_as_root = 0;
+        SV* _will_run_as_root = get_sv("Net::Dropbear::SSHd::_will_run_as_root", FALSE);
+        hooks._will_run_as_root = SvTRUE(_will_run_as_root);
 
         int count, i;
         SSize_t len;

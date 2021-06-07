@@ -3,6 +3,8 @@
 use strict;
 use warnings;
 
+our $VERSION = '0.04';
+
 BEGIN {
 
     unless (eval { require Beekeeper }) {
@@ -11,6 +13,7 @@ BEGIN {
     }
 }
 
+use AnyEvent::Impl::Perl;
 use Beekeeper::Service::Supervisor;
 use Getopt::Long;
 
@@ -91,13 +94,17 @@ sub _confirm {
 
 __END__
 
+=pod
+
+=encoding utf8
+
 =head1 NAME
 
 bkpr-restart - Gracefully restart remote pool of workers
 
 =head1 VERSION
 
-Version 0.01
+Version 0.04
 
 =head1 SYNOPSIS
 
@@ -121,15 +128,13 @@ Signal remote workers to finish their current tasks and restart.
 
 L<Beekeeper::Service::Supervisor>
 
-=encoding utf8
-
 =head1 AUTHOR
 
 José Micó, C<jose.mico@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright 2015 José Micó.
+Copyright 2015-2021 José Micó.
 
 This is free software; you can redistribute it and/or modify it under the same 
 terms as the Perl 5 programming language itself.
@@ -139,4 +144,3 @@ provided “as is” and without any express or implied warranties. For details,
 see the full text of the license in the file LICENSE.
 
 =cut
-

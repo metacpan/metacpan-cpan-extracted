@@ -1,3 +1,11 @@
+0.23 2021-05-31
+- added CI - thanks @zmughal
+- now recognises MacOS clang - thanks @xenu
+
+0.22 2021-05-29
+- Add C++ standard support flag detection - thanks @zmughal!
+  See <https://github.com/tsee/extutils-cppguess/pull/24>.
+
 0.21 2020-01-23
 - no give $Config{ccflags} in Module::Build as add not replace - thanks @xenu
 

@@ -1,0 +1,222 @@
+#!/usr/bin/perl 
+use v5.14 ; use warnings ; # Already confirmed that 5.001, v5.8.3, 5.011, 5.018 is ok.
+use Time::HiRes qw [ gettimeofday tv_interval ] ;
+my ${ dt_start } = [ gettimeofday ] ; 
+use List::Util qw[ sum sum0 ] ; 
+use Getopt::Std ; getopts ':0:12:aefi:kl:nrx:y:=%@:' , \my %o  ; 
+use Term::ANSIColor qw[ color :constants ] ; $Term::ANSIColor::AUTORESET = 1 ;
+use FindBin qw[ $Script ] ; 
+use autodie qw [ open ] ;
+#use POSIX qw[ pause ] ;
+
+sub readKeyList ( ) ; # 別ファイルに読み取るべき、行が指定されている場合を想定している。
+sub reading ( ) ; # 1. 読む
+sub output ( ) ; # 2. 出力する
+
+my $time0 = time ; 
+#my $cyc_len = $o{'@'} // 1e7 ; # 何行毎にレポートを発生させるか。
+my %strcnt ; # 数える対象の文字列(各行から最後の改行文字列を取り除いたもの) に対して、数えた数を入れる。
+my %cntX1X2 ; # $cntX1X2 {$_}{$tail} で度数を表す。「X」で切断を意味する。
+my %strfst ; # 最初の出現位置を保持
+my %strlst ; # 最後の出現位置を保持
+my $first = do { $_ = <> ; chomp ; $_ } if $o{q/=/} ;
+my $i = $o{i} // "\t" ; # //= do { $o{','} //= "\t" ; eval qq[qq[$o{','}]] } ; # 入力の区切り文字 
+my $o = "\t" ; # 出力用セパレータ
+my $totalLines ; # 読み取った行数
+my @givenL ;   
+my %gl ; # 個数を数える対象を指定されて場合は、それを読み取る。(Given List)
+
+my ($hTake, $tGet) = $o{x} =~ m/\d+/g if defined $o{x} ; # -xのオプションから数値を最大2個取り出す
+$tGet //= 12 ; ## 画面を溢れないように制限した
+
+my $sec = $o{'@'} // 15 ; # 何秒おきにアラームを発生させるか
+
+$SIG{ALRM} = sub { 
+  my $n = $.  =~ s/(?<=\d)(?=(\d\d\d)+($|\D))/,/gr ; # 3桁ごとに区切る。
+  say STDERR GREEN "$n lines read ($Script). " , scalar localtime ; 
+  alarm $sec 
+} ; 
+sub IntFirst {
+  &{ $SIG{ALRM} } ;
+  print STDERR BRIGHT_RED 
+   'Do you want to get the halfway result? Then type Ctrl + \ again within 2 seconds. '. "\n" .
+   'Really want to Quit? Then press Ctrl + "\" or Ctrl + Yen-Mark after 2 seconds later. ' . RESET "\n" ;
+  local $SIG{QUIT} = sub { select *STDERR ; & output ; select *STDOUT } ;
+  sleep 2 ; # eval { local $SIG{ALRM} = sub { alarm $sec ; die } ; alarm 2 ; 1 while 1  } ; 
+  #$SIG{INT} = 'IntFirst' ;
+  #return ;
+} ;
+$SIG{INT} = 'IntFirst' ;
+
+& readKeyList if $o{l} ;
+alarm $sec ;
+& reading ;  ### 1. 読む
+& output ;  ### 2. 出力する
+exit ;
+
+sub readKeyList ( ) { 
+  open my $FH , '<' , $o{l} ; while ( <$FH> ) { chomp ; push @givenL, $_ ; $gl { $_ } = 1 } ; close $FH ; 
+}
+
+# 読取り
+sub reading ( ) { 
+  our $timec = time ; 
+  our $intflg ;
+  # -x オプションの扱い。 「X」は切断を意味する。
+  sub cutting { 
+    my @F = split /$i/, $_, $hTake+1 ; $_ = join $i, splice @F, 0, $hTake ; $cntX1X2 { $_ }{ join $i, @F } ++ ; 
+  }
+  # [ -: と -lの扱い ; 2 x 2 = 4 通り] 
+  * filtListed = $o{l} ? sub { goto LOOP if ! exists $gl { $_ } } : sub { } ; 
+  * storeRange = $o{':'} ? sub { $strfst { $_ } //= $. ; $strlst { $_ } = $. } : sub { } ;
+  * cutTailing = $hTake ? sub { cutting } : sub { } ;
+  LOOP : while ( <> ) { 
+    chomp ; 
+    & cutTailing ; # -x に対応
+    & filtListed ; # -l に対応
+    $strcnt { $_ } ++  ;
+    & storeRange ; # -: に対応
+  }
+  $totalLines = $. ;
+}
+ 
+sub output ( ) { 
+  our @y_ranges = () ; # 出力される値の範囲が指定された場合の挙動を指定する。
+  # 次の2個の関数は、出力すべき値の範囲をフィルターの様に指定する。
+  sub y_init ( ) { 
+    my @ranges = split /,/ , $o{y} // '' , -1 ; 
+    grep { $_ = $_ . ".." . $_ unless m/\.\./ }  @ranges ; # = split /,/ , $o{y} // '' , -1 ; 
+    do { m/^(\d*)\.\.(\d*)/ ; push @y_ranges , [ $1||1 , $2||'Inf' ] } for @ranges ; 
+  }
+  sub y_filter ( $ ) { 
+    do { return not 0 if $_->[0] <= $_[0] && $_[0] <= $_->[1] } for @y_ranges ; 
+    return @y_ranges ? not 1 : not 0 ; # 指定が無かった場合はとにかく真を返す。
+  }
+  
+  y_init  ; 
+
+  # キー集合、特にその順序の調整 
+  * sorting = sub ($) { 
+    my @k = keys %{ $_[0] } ;
+    @k = sort { $_[0]->{$a} <=> $_[0]->{$b} } @k if $o{f} ;   # -f オプションによりコンテンツの数であらかじめ、ソートする 
+    @k = sort { $a <=> $b } @k if $o{n} ; # -n オプションによりキー文字列であらかじめ、ソートする 
+    @k = sort { $a cmp $b } @k if $o{k} ; # -k オプションによりキー文字列であらかじめ、ソートする 
+    @k = sort @k unless grep $o{$_}, qw [ f n k] ; # 何も指定がなければ、普通にソート。
+    @k = reverse @k if $o{r} ;   # r オプションで逆順ソート
+    return @k ;
+  } ;
+
+  my @K = & sorting ( \%strcnt ); 
+  our $totalSum = sum0 ( values %strcnt ) ; # 総行数の格納。
+  our $outLines = 0 ; # 出力した行数
+  our $cumsum =  0  ; # 累和カウンタ
+
+  # 書き出し
+  #my $header ; 
+  my @cNames ;  # 最初の行に出力するリスト
+  push @cNames , "Lin#Range"  if $o{':'} ; 
+  push @cNames , "CumRat"  if $o{a} && $o{'%'} ;
+  push @cNames , "AccSum"  if $o{a} ;
+  push @cNames , "Ratio"  if $o{'%'} ; 
+  push @cNames , "Freq*" unless $o{1} ;
+  push @cNames , $first // "LinStr" ; # unless defined $first ; 
+  push @cNames , "RIGHT_FIELDS.." if defined $hTake ;
+  say UNDERLINE join $o , @cNames if ($o{0}//'') ne '0' ; 
+
+  * lineRange = sub { $strfst{$_} //= 0 ; $strlst{$_} //= 0 ; "$strfst{$_}-$strlst{$_}:" } ; 
+  * accOutput = sub { $cumsum += $strcnt { $_ } ; $o{'%'} ? $cumsum . sprintf( "\t%5.2f%%", 100.0 * $cumsum / $totalSum) : $cumsum } ;
+
+  for ( @K ) { 
+
+    sub tailx {
+      my @keys = sorting ( $cntX1X2 { $_ } ) ; 
+      @keys = splice @keys , 0, $tGet if defined $tGet ;
+      my $out = '' ; 
+      #say STDERR "@keys" ; # = sort { $cntX1X2{$_}{$a} <=> $cntX1X2{$_}{$b} } @keys 
+      @keys = sort { $cntX1X2{$_}{$b} <=> $cntX1X2{$_}{$a} } @keys ;
+      for my $k ( @keys ) { $out .= "\t[$k]x$cntX1X2{$_}{$k}" } ; 
+      return $out ; 
+    }
+
+    $strcnt{ $_ } //=  0 ;
+    next unless y_filter ( $strcnt{$_} ) ; 
+    print & lineRange, "\t" if exists $o{':'} ; # -: オプションにより、どの行番号で現れたのかを出力。
+    print & accOutput, "\t" if exists $o{a} ; # -s オプションにより、累和を表示。 
+    printf "%5.2f%%$o", 100.0 * $strcnt{$_} / $totalSum if $o{'%'} ;  
+    #print $o{1} ? $_ : "$strcnt{$_}*$o$_" ; # -1オプションがあれば個数を表示しない。
+    print $o{1} ? $_ : "$strcnt{$_}$o$_" ; # -1オプションがあれば個数を表示しない。
+    print tailx()  if defined $hTake ; 
+    print "\n" ;
+    $outLines ++ ; 
+  } 
+
+  my $procsec = tv_interval ${ dt_start } ; #time - $time0 ; # このプログラムの処理にかかった秒数。比較する2個の時刻は秒単位なので、±1秒未満の誤差は発生する。
+  $totalLines //= $. ; # Ctrl+Cの連打で必要となる処理。
+
+  return if ($o{2}//'') eq 0 ; 
+  * d3 = sub { $_[0] =~ s/(?<=\d)(?=(\d\d\d)+($|\D))/,/gr } ;
+  print STDERR BOLD ITALIC DARK CYAN & d3 ( $totalLines ) . " lines processed. " ; 
+  print STDERR BOLD ITALIC DARK CYAN & d3 ( $totalSum ) . " lines are counted. " ; 
+  print STDERR BOLD ITALIC DARK CYAN & d3 ( $outLines ) . " lines output. " ; 
+  print STDERR BOLD ITALIC DARK CYAN "($Script ; " . $procsec . " sec.)\n" ;
+}
+
+## ヘルプの扱い
+sub VERSION_MESSAGE {}
+sub HELP_MESSAGE {
+  use FindBin qw[ $Script ] ; 
+  $ARGV[1] //= '' ;
+  open my $FH , '<' , $0 ;
+  while(<$FH>){
+    s/\$0/$Script/g ;
+    print $_ if s/^=head1// .. s/^=cut// and $ARGV[1] =~ /^o(p(t(i(o(ns?)?)?)?)?)?$/i ? m/^\s+\-/ : 1;
+  }
+  close $FH ;
+  exit 0 ;
+}
+
+=encoding utf8
+=head1
+
+コマンド
+
+  $0 datafile 
+  $0 < datafile 
+  cat datafile | $0 
+
+オプションに関して
+
+ [入力に関係するオプション]
+ 
+  -= : 先頭行をヘッダ(列名の並びなどでありデータでは無い)と見なして処理
+  -@ num : 入力ファイルを読む際に、何行毎に標準エラー出力に報告を出すか。未指定なら1000万行毎。
+  -l ファイル名 : 個数を数える文字列の対象を含んだファイル名を指定する。出力順序がファイルの各行に記載の順序になる。
+  -l は、プロセス置換 <( ) を使うと便利。; -l により、メモリを節約できる。; -l と -@ が共にあると、見つかった行数しかざたない。
+
+ [出力のオプション]
+
+  -f : 出現数で整列する  -fr なら逆順にする
+  -k : キー文字列で整列する  -kr なら逆順にする
+  -n : キー文字列を数と見なして整列する  -nr なら逆順にする
+  -r : 上記を逆順にする。
+  -y 数値範囲 : 頻度が指定回数のもののみ出力。例 -y 1..3 なら3以下。 3.. なら3以上。2,4,6..8 なら2と4と6,7,8。
+
+  -a : 累和を出力 (accumulative sum)
+  -% : データ件数全体に対する割合を出力
+  -0 0 : 出力の先頭行に変数名の並びなどを出力しない。
+  -1 : 個数を出力しない。出現したキー文字列のみ出力。
+  -2 0 : 最後の二次情報を出力しない。
+
+ [派生のオプション]
+   -i str ; 入力区切り文字
+   -x N,M ; Nはカラムの切断位置(左から何番目の区切りで切るか), Mは残った文字列を何通り取り出すか。Mが未指定なら12。
+   -: 文字列の出現行の位置の範囲を出力するようにする。
+ 
+
+その他: 
+  * freqfreq のような、頻度の頻度を出力するオプションを作りたい。オプションは -F で表したい。
+  * Ctrl+Cの挙動を文書化したい。
+  * -1 で動作ミスがある疑いがあったが、-100(-1 -0 0)とオプションを与えると解消した。
+  * -x で、右側文字列のランキングについて、十分なオプションを設計する必要がある。
+  * -x で [..]xN の書式の出力の仕方について、もっと柔軟にしたい。
+=cut

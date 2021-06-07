@@ -12,11 +12,13 @@ my %WriteMakefileArgs = (
   "BUILD_REQUIRES" => {
     "Alien::Build" => "0.32",
     "Alien::Build::MM" => "0.32",
-    "ExtUtils::MakeMaker" => "6.52"
+    "ExtUtils::MakeMaker" => "6.52",
+    "URI" => 0
   },
   "CONFIGURE_REQUIRES" => {
     "Alien::Build" => "0.32",
     "Alien::Build::MM" => "0.32",
+    "ExtUtils::CppGuess" => "0.22",
     "ExtUtils::MakeMaker" => "6.52"
   },
   "DISTNAME" => "Alien-Kiwisolver",
@@ -33,7 +35,7 @@ my %WriteMakefileArgs = (
     "Test::Most" => 0,
     "Test::Needs" => 0
   },
-  "VERSION" => "0.002",
+  "VERSION" => "0.003",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -47,6 +49,7 @@ my %FallbackPrereqs = (
   "ExtUtils::MakeMaker" => "6.52",
   "Test::Most" => 0,
   "Test::Needs" => 0,
+  "URI" => 0,
   "parent" => 0,
   "strict" => 0,
   "warnings" => 0

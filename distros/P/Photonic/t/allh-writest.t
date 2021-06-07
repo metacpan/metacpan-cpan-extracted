@@ -48,6 +48,7 @@ make_default_store($fn);
 	geometry=>$g, nh=>10, stateFN=>$fn, keepStates=>1);
     $ad->run;
     my $itd=$ad->state_iterator;
+    is $itd->iterator, $itd;
     my $am=Photonic::LE::NR2::AllH->new(geometry=>$g, nh=>10, keepStates=>1);
     $am->run;
     my $itm=$am->state_iterator;

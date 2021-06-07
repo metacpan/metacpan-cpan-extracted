@@ -1,9 +1,9 @@
 package TableDataRoles::Standard;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-04-13'; # DATE
+our $DATE = '2021-06-01'; # DATE
 our $DIST = 'TableDataRoles-Standard'; # DIST
-our $VERSION = '0.008'; # VERSION
+our $VERSION = '0.009'; # VERSION
 
 1;
 # ABSTRACT: Standard set of roles for TableData
@@ -20,7 +20,7 @@ TableDataRoles::Standard - Standard set of roles for TableData
 
 =head1 VERSION
 
-This document describes version 0.008 of TableDataRoles::Standard (from Perl distribution TableDataRoles-Standard), released on 2021-04-13.
+This document describes version 0.009 of TableDataRoles::Standard (from Perl distribution TableDataRoles-Standard), released on 2021-06-01.
 
 =head1 HOMEPAGE
 
@@ -32,7 +32,7 @@ Source repository is at L<https://github.com/perlancar/perl-TableDataRoles-Stand
 
 =head1 BUGS
 
-Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-TableDataRoles-Standard/issues>
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=TableDataRoles-Standard>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired

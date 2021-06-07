@@ -39,7 +39,7 @@ static int is_parent_of(pdl *it,pdl_trans *trans) {
 
 pdl *pdl_null() {
 	PDL_Indx d[1] = {0};
-	pdl *it = pdl_new();
+	pdl *it = pdl_create(PDL_PERM);
 	PDL_Anyval zero = { PDL_B, 0 };
 	pdl_makescratchhash(it, zero);
 	pdl_setdims(it,d,1);
@@ -75,23 +75,14 @@ void pdl_allocdata(pdl *it) {
 	it->state |= PDL_ALLOCATED;
 }
 
-/* Wrapper to pdl_create so that the pdl_new and pdl_tmp functions
-   can be stored in the Core struct and exported to external
-   PDL XS modules */
-pdl* pdl_external_new() {
-  return  pdl_new();
+/* Wrapper to pdl_create to be stored in the Core struct and exported
+   to external PDL XS modules */
+pdl* pdl_pdlnew() {
+  return pdl_create(PDL_PERM);
 }
-pdl* pdl_external_tmp() {
-  return pdl_tmp();
-}
-/* Return a new pdl - type is PDL_PERM or PDL_TMP - the latter is auto-freed
+/* Return a new pdl - type is PDL_PERM or PDL_TMP - the latter is fatal error because former uses sv_mortal to be freed
  * when current perl context is left
- *
- * pdl_new() and pdl_tmp() are macroes defined in pdlcore.h
- * which just call this routine.
  */
-
-
 pdl* pdl_create(int type) {
      int i;
      pdl* it;
@@ -174,7 +165,7 @@ void pdl__free(pdl *it) {
 	    SvREFCNT_dec(it->datasv);
 	    it->data=0;
     } else if(it->data) {
-    	    pdl_warn("Warning: special data without datasv is not freed currently!!");
+	    pdl_pdl_warn("Warning: special data without datasv is not freed currently!!");
     }
     if(it->hdrsv) {
     	SvREFCNT_dec(it->hdrsv);
@@ -655,7 +646,7 @@ void pdl__removechildtrans(pdl *it,pdl_trans *trans, PDL_Indx nth,int all)
 	/* this might be due to a croak when performing the trans; so
 	   warn only for now, otherwise we leave trans undestructed ! */
 	if(!flag)
-		pdl_warn("Child not found for pdl %d, %d\n",it, trans);
+		pdl_pdl_warn("Child not found for pdl %d, %d\n",it, trans);
 }
 
 void pdl__removeparenttrans(pdl *it, pdl_trans *trans, PDL_Indx nth)
@@ -891,7 +882,7 @@ void pdl_make_physical(pdl *it) {
          * called for this ndarray and results in associated memory leaks!
          * On the other hand, if I comment out  !(it->state & PDL_ALLOCATED)
          * then we get errors for cases like 
-         *                  $in = $lut->xchg(0,1)->index($im->dummy(0));
+         *                  $in = $lut->transpose->index($im->dummy(0));
          *                  $in .= pdl -5;
          * Currently ugly fix: detect in initthreadstruct that it has been called before
          * and free all pdl_thread related memory before reallocating

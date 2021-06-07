@@ -1,6 +1,6 @@
 package Web::PageMeta;
 
-our $VERSION = '0.04';
+our $VERSION = '0.06';
 
 use 5.010;
 use Moose;
@@ -12,7 +12,7 @@ use Log::Any qw($log);
 use Future '0.44';
 use Future::AsyncAwait;
 use Future::HTTP::AnyEvent;
-use Web::Scraper;
+use Web::Scraper::LibXML;
 use Encode qw(find_mime_encoding);
 use Time::HiRes qw(time);
 use HTTP::Exception;
@@ -358,10 +358,10 @@ Returns hash ref with all open-graph data.
 
 =head2 extra_scraper
 
-L<Web::Scraper> object to fetch image, title or description from different
+L<Web::Scraper::LibXML> object to fetch image, title or description from different
 than default location.
 
-    use Web::Scraper;
+    use Web::Scraper::LibXML;
     use Web::PageMeta;
     my $escraper = scraper {
         process_first '.slider .camera_wrap div', 'image' => '@data-src';

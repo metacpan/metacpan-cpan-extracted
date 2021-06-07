@@ -23,6 +23,7 @@ my %WriteMakefileArgs = (
     "Exporter" => 0,
     "IO::String" => 0,
     "IO::Zlib" => 0,
+    "Scalar::Util" => 0,
     "TAP::Parser" => 0,
     "TAP::Parser::Aggregator" => 0,
     "Test::Harness" => "3.0",
@@ -39,7 +40,7 @@ my %WriteMakefileArgs = (
     "Test::More" => "0.88",
     "blib" => "1.01"
   },
-  "VERSION" => "0.92",
+  "VERSION" => "0.93",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -56,6 +57,7 @@ my %FallbackPrereqs = (
   "IO::String" => 0,
   "IO::Zlib" => 0,
   "IPC::Open3" => 0,
+  "Scalar::Util" => 0,
   "TAP::Parser" => 0,
   "TAP::Parser::Aggregator" => 0,
   "Test::Harness" => "3.0",

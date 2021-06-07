@@ -10,8 +10,8 @@ use Encode qw( decode );
 
 BEGIN {
 
-# ABSTRACT: Perl bindings to libarchive via XS
-our $VERSION = '0.0902'; # VERSION
+# ABSTRACT: (Deprecated) Perl bindings to libarchive via XS
+our $VERSION = '0.0903'; # VERSION
 
   require XSLoader;
   XSLoader::load('Archive::Libarchive::XS', $VERSION);
@@ -92,6 +92,7 @@ eval q{
       ARCHIVE_ENTRY_ACL_ENTRY_DIRECTORY_INHERIT
       ARCHIVE_ENTRY_ACL_ENTRY_FAILED_ACCESS
       ARCHIVE_ENTRY_ACL_ENTRY_FILE_INHERIT
+      ARCHIVE_ENTRY_ACL_ENTRY_INHERITED
       ARCHIVE_ENTRY_ACL_ENTRY_INHERIT_ONLY
       ARCHIVE_ENTRY_ACL_ENTRY_NO_PROPAGATE_INHERIT
       ARCHIVE_ENTRY_ACL_ENTRY_SUCCESSFUL_ACCESS
@@ -110,8 +111,11 @@ eval q{
       ARCHIVE_ENTRY_ACL_READ_ATTRIBUTES
       ARCHIVE_ENTRY_ACL_READ_DATA
       ARCHIVE_ENTRY_ACL_READ_NAMED_ATTRS
+      ARCHIVE_ENTRY_ACL_STYLE_COMPACT
       ARCHIVE_ENTRY_ACL_STYLE_EXTRA_ID
       ARCHIVE_ENTRY_ACL_STYLE_MARK_DEFAULT
+      ARCHIVE_ENTRY_ACL_STYLE_SEPARATOR_COMMA
+      ARCHIVE_ENTRY_ACL_STYLE_SOLARIS
       ARCHIVE_ENTRY_ACL_SYNCHRONIZE
       ARCHIVE_ENTRY_ACL_TYPE_ACCESS
       ARCHIVE_ENTRY_ACL_TYPE_ALARM
@@ -164,6 +168,7 @@ eval q{
       ARCHIVE_FILTER_RPM
       ARCHIVE_FILTER_UU
       ARCHIVE_FILTER_XZ
+      ARCHIVE_FILTER_ZSTD
       ARCHIVE_FORMAT_7ZIP
       ARCHIVE_FORMAT_AR
       ARCHIVE_FORMAT_AR_BSD
@@ -204,6 +209,8 @@ eval q{
       ARCHIVE_OK
       ARCHIVE_READDISK_HONOR_NODUMP
       ARCHIVE_READDISK_MAC_COPYFILE
+      ARCHIVE_READDISK_NO_ACL
+      ARCHIVE_READDISK_NO_FFLAGS
       ARCHIVE_READDISK_NO_TRAVERSE_MOUNTS
       ARCHIVE_READDISK_NO_XATTR
       ARCHIVE_READDISK_RESTORE_ATIME
@@ -230,11 +237,11 @@ __END__
 
 =head1 NAME
 
-Archive::Libarchive::XS - Perl bindings to libarchive via XS
+Archive::Libarchive::XS - (Deprecated) Perl bindings to libarchive via XS
 
 =head1 VERSION
 
-version 0.0902
+version 0.0903
 
 =head1 SYNOPSIS
 
@@ -265,7 +272,7 @@ extract archive
  archive_read_support_filter_all($archive);
  archive_read_support_format_all($archive);
  my $disk = archive_write_disk_new();
- archive_write_disk_set_options($disk, 
+ archive_write_disk_set_options($disk,
    ARCHIVE_EXTRACT_TIME   |
    ARCHIVE_EXTRACT_PERM   |
    ARCHIVE_EXTRACT_ACL    |
@@ -278,9 +285,9 @@ extract archive
  {
    my $r = archive_read_next_header($archive, my $entry);
    last if $r == ARCHIVE_EOF;
-   
+ 
    archive_write_header($disk, $entry);
-   
+ 
    while(1)
    {
      my $r = archive_read_data_block($archive, my $buffer, my $offset);
@@ -321,8 +328,12 @@ write archive
 
 =head1 DESCRIPTION
 
+B<NOTE>: This module has been deprecated in favor of L<Archive::Libarchive>.
+It provides a better thought out object-oriented interface and is easier
+to maintain.
+
 This module provides a functional interface to libarchive.  libarchive is a
-C library that can read and write archives in a variety of formats and with a 
+C library that can read and write archives in a variety of formats and with a
 variety of compression filters, optimized in a stream oriented way.  A familiarity
 with the libarchive documentation would be helpful, but may not be necessary
 for simple tasks.  The documentation for this module is split into four separate
@@ -390,7 +401,7 @@ These examples are also included with the distribution.
  while (archive_read_next_header($a, my $entry) == ARCHIVE_OK)
  {
    print archive_entry_pathname($entry), "\n";
-   archive_read_data_skip($a); 
+   archive_read_data_skip($a);
  }
  
  $r = archive_read_free($a);
@@ -426,7 +437,7 @@ These examples are also included with the distribution.
  
  while (archive_read_next_header($a, my $entry) == ARCHIVE_OK) {
    print archive_entry_pathname($entry), "\n";
-   archive_read_data_skip($a); 
+   archive_read_data_skip($a);
  }
  
  $r = archive_read_free($a);
@@ -498,7 +509,7 @@ These examples are also included with the distribution.
  $r = archive_read_next_header($a, my $ae);
  if($r != ARCHIVE_OK)
  {
-   die archive_error_string($a);     
+   die archive_error_string($a);
  }
  
  while(1)
@@ -531,13 +542,13 @@ These examples are also included with the distribution.
  sub write_archive
  {
    my($outname, @filenames) = @_;
-   
+ 
    my $a = archive_write_new();
-   
+ 
    archive_write_add_filter_gzip($a);
    archive_write_set_format_pax_restricted($a);
    archive_write_open_filename($a, $outname);
-   
+ 
    foreach my $filename (@filenames)
    {
      my $st = stat $filename;
@@ -555,7 +566,7 @@ These examples are also included with the distribution.
        $len = read $fh, $buff, 8192;
      }
      close $fh;
-     
+ 
      archive_entry_free($entry);
    }
    archive_write_close($a);
@@ -698,7 +709,7 @@ current POSIX locale.  Content data for files stored and retrieved from in
 raw bytes.
 
 The usual operational procedure in Perl is to convert everything on input
-into UTF-8, operate on the UTF-8 data and then convert (if necessary) 
+into UTF-8, operate on the UTF-8 data and then convert (if necessary)
 everything on output to the desired output format.
 
 In order to get useful string data out of libarchive, this module translates
@@ -771,7 +782,7 @@ you need to encode them
  
  archive_write_data($archive, encode('UTF-8', "привет.txt");
  # or
- archive_write_data($archive, encode('KOI8-R', "привет.txt"); 
+ archive_write_data($archive, encode('KOI8-R', "привет.txt");
 
 read:
 
@@ -795,10 +806,10 @@ file for traps, hints and pitfalls.
 =head1 CAVEATS
 
 Archive and entry objects are really pointers to opaque C structures
-and need to be freed using one of 
-L<archive_read_free|Archive::Libarchive::XS::Function#archive_read_free>, 
-L<archive_write_free|Archive::Libarchive::XS::Function#archive_write_free> or 
-L<archive_entry_free|Archive::Libarchive::XS::Function#archive_entry_free>, 
+and need to be freed using one of
+L<archive_read_free|Archive::Libarchive::XS::Function#archive_read_free>,
+L<archive_write_free|Archive::Libarchive::XS::Function#archive_write_free> or
+L<archive_entry_free|Archive::Libarchive::XS::Function#archive_entry_free>,
 in order to free the resources associated with those objects.
 
 Proper Unicode (or non-ASCII character support) depends on setting the
@@ -807,58 +818,12 @@ correct POSIX locale, which is system dependent.
 The documentation that comes with libarchive is not that great (by its own
 admission), being somewhat incomplete, and containing a few subtle errors.
 In writing the documentation for this distribution, I borrowed heavily (read:
-stole wholesale) from the libarchive documentation, making changes where 
-appropriate for use under Perl (changing C<NULL> to C<undef> for example, along 
-with the interface change to make that work).  I may and probably have introduced 
+stole wholesale) from the libarchive documentation, making changes where
+appropriate for use under Perl (changing C<NULL> to C<undef> for example, along
+with the interface change to make that work).  I may and probably have introduced
 additional subtle errors.  Patches to the documentation that match the
 implementation, or fixes to the implementation so that it matches the
 documentation (which ever is appropriate) would greatly appreciated.
-
-=head1 SEE ALSO
-
-The intent of this module is to provide a low level fairly thin direct
-interface to libarchive, on which a more Perlish OO layer could easily
-be written.
-
-=over 4
-
-=item L<Archive::Libarchive::XS>
-
-=item L<Archive::Libarchive::FFI>
-
-Both of these provide the same API to libarchive but the bindings are
-implemented in XS for one and via L<FFI::Raw> for the other.
-
-=item L<Archive::Libarchive::Any>
-
-Offers whichever is available, either the XS or FFI version.  The
-actual algorithm as to which is picked is subject to change, depending
-on with version seems to be the most reliable.
-
-=item L<Archive::Peek::Libarchive>
-
-=item L<Archive::Extract::Libarchive>
-
-Both of these provide a higher level, less complete perlish interface
-to libarchive.
-
-=item L<Archive::Tar>
-
-=item L<Archive::Tar::Wrapper>
-
-Just some of the many modules on CPAN that will read/write tar archives.
-
-=item L<Archive::Zip>
-
-Just one of the many modules on CPAN that will read/write zip archives.
-
-=item L<Archive::Any>
-
-A module attempts to read/write multiple formats using different methods
-depending on what perl modules are installed, and preferring pure perl
-modules.
-
-=back
 
 =head1 AUTHOR
 

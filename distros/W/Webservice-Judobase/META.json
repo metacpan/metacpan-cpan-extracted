@@ -4,7 +4,7 @@
       "Lance Wicks <lancew@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.017, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -16,6 +16,7 @@
    "prereqs" : {
       "develop" : {
          "requires" : {
+            "Data::Dumper" : "0",
             "Pod::Coverage::TrustPod" : "0",
             "Test2::V0" : "0",
             "Test::CPAN::Changes" : "0.19",
@@ -61,19 +62,19 @@
    "provides" : {
       "Webservice::Judobase" : {
          "file" : "lib/Webservice/Judobase.pm",
-         "version" : "0.003"
+         "version" : "0.004"
       },
       "Webservice::Judobase::Competitor" : {
          "file" : "lib/Webservice/Judobase/Competitor.pm",
-         "version" : "0.003"
+         "version" : "0.004"
       },
       "Webservice::Judobase::Contests" : {
          "file" : "lib/Webservice/Judobase/Contests.pm",
-         "version" : "0.003"
+         "version" : "0.004"
       },
       "Webservice::Judobase::General" : {
          "file" : "lib/Webservice/Judobase/General.pm",
-         "version" : "0.003"
+         "version" : "0.004"
       }
    },
    "release_status" : "stable",
@@ -87,8 +88,9 @@
          "web" : "https://github.com/lancew/Webservice-Judobase"
       }
    },
-   "version" : "0.003",
-   "x_generated_by_perl" : "v5.28.0",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.06"
+   "version" : "0.004",
+   "x_generated_by_perl" : "v5.33.2",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.24",
+   "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }
 

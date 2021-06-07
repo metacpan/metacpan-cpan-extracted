@@ -1,7 +1,12 @@
   What are ways to use this Acme::CPANModules module?
     Aside from reading this Acme::CPANModules module's POD documentation,
-    you can install all the listed modules (entries) using cpanmodules CLI
-    (from App::cpanmodules distribution):
+    you can install all the listed modules (entries) using cpanm-cpanmodules
+    script (from App::cpanm::cpanmodules distribution):
+
+     % cpanm-cpanmodules -n ).$ac_name.q(
+
+    Alternatively you can use the cpanmodules CLI (from App::cpanmodules
+    distribution):
 
         % cpanmodules ls-entries ).$ac_name.q( | cpanm -n
 
@@ -55,9 +60,9 @@ NAME
     Acme::CPANModules::* distribution
 
 VERSION
-    This document describes version 0.008 of
+    This document describes version 0.009 of
     Pod::Weaver::Plugin::Acme::CPANModules (from Perl distribution
-    Pod-Weaver-Plugin-Acme-CPANModules), released on 2021-02-18.
+    Pod-Weaver-Plugin-Acme-CPANModules), released on 2021-05-22.
 
 SYNOPSIS
     In your weaver.ini:

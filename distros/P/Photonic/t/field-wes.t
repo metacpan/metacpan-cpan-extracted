@@ -40,7 +40,7 @@ use Test::More tests => 2;
 use lib 't/lib';
 use TestUtils;
 
-my $ea=1+0*i;
+my $ea=r2C(1);
 my $eb=3+4*i;
 
 #Check field for simple 1D system. Longitudinal case

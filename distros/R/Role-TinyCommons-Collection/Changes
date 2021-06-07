@@ -1,12 +1,46 @@
+0.008   2021-05-20  Released-By: PERLANCAR; Urgency: medium; Backward-Incompatible: yes
+
+        [Incompatible changes]
+
+        - Rename PickItems::RandomSeek to PickItems::RandomPos.
+
+	[Enhancements]
+
+        - Add PickItems::RandomSeekLines,
+
+	- GetItemByPos: add has_key() as alias for has_item_at_key().
+
+
+0.007   2021-05-07  Released-By: PERLANCAR; Urgency: medium
+
+	- Role::TinyCommons::Collection::FindItem::Iterator: make
+	  cmp_items() an optional depends.
+
+
+0.006   2021-05-03  Released-By: PERLANCAR; Urgency: medium; Backward-Incompatible: yes
+
+	- [incompatible change] Rename roles: Subscript -> GetItemByKey,
+	  Position -> GetItemByPos.
+
+
+0.005   2021-05-03  Released-By: PERLANCAR; Urgency: medium
+
+	- Add role: RTC:Position.
+
+
+0.004   2021-05-03  Released-By: PERLANCAR; Urgency: medium
+
+	- Add roles: RTC:{Subscript,CompareItems,FindItem::Iterator}.
+
+
 0.003   2021-04-20  Released-By: PERLANCAR; Urgency: medium
 
-	- Add roles:
-	  Role::TinyCommons::Collection::PickItems::{Iterator,RandomSeek}.
+	- Add roles: RTC:PickItems::{Iterator,RandomSeek}.
 
 
 0.002   2021-04-20  Released-By: PERLANCAR; Urgency: medium
 
-	- Add role: Role::TinyCommons::Collection::PickItems.
+	- Add role: RTC:PickItems.
 
 
 0.001   2021-04-20  Released-By: PERLANCAR

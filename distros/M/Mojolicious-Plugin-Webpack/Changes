@@ -1,5 +1,21 @@
 Revision history for perl distribution Mojolicious-Plugin-Webpack
 
+1.01 2021-05-25T07:36:24+0900
+ - Removed need for assets/asset_map.mode.json
+ - Add support for mojo webpack --build
+
+1.00 2021-05-24T15:17:08+0900
+ - Add Mojo::Alien::npm
+ - Add Mojo::Alien::rollup
+ - Add Mojo::Alien::webpack
+ - Made Mojo::Alien::npm compatible with https://pnpm.io/
+ - Improved dependency tracking in ./node_modules
+ - Rewrote Plugin::Webpack using new Mojo::Alien:: modules
+ - Updated examples to match "alien" modules
+ - Fix being able to include images and other processed assets #7
+ - Fix vulnerabilities reported by GitHub #12
+ - Fix CI Ubuntu workflow
+
 0.14 2020-12-21T09:42:41+0900
  - Fix route warnings issued by latest Mojolicious
  - Will install new node modules present in "dependencies"

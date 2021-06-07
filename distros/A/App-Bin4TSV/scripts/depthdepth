@@ -1,0 +1,165 @@
+#!/usr/bin/perl 
+use 5.014 ; use strict ; use warnings  ;
+use feature qw [ say ] ;
+use Time::HiRes qw[gettimeofday tv_interval] ; 
+use Term::ANSIColor qw [ :constants color ] ; $Term::ANSIColor::AUTORESET = 1 ; 
+use File::Spec::Functions qw[ catfile splitdir rel2abs updir ] ; 
+use Getopt::Std ; 
+use List::Util qw [ max min sum sum0 reduce ] ;
+use Cwd qw [ getcwd abs_path ] ;
+
+my $time_start = [ gettimeofday ] ; 
+getopts '.:g:x:0:' , \my%o ; 
+push @ARGV , $o{x} if defined $o{x} ; # 引数がオプションで  与えられた場合の処理
+my $start_dir = $ARGV [0] // "." ; # 先頭のディレクトリ 
+my $I = catfile q[] , q[] ;
+my $d0 = ( getcwd ) . $I ;
+chdir $start_dir or do { say STDERR "Seems no such a directory ``$start_dir''" ; exit -1 }  ;
+$d0 = (getcwd ). $I unless exists $o{g} && $o{g} =~ m/a/ ; 
+$d0 = '' if exists $o{g} && $o{g} =~ m/A/ ;
+#say GREEN  getcwd ; 
+
+sub head_trim ( $ ) {
+ (my $t = $_[0]) =~ s/^\Q$d0\E// ;
+  $t =~ s/\ /\\ /g ; # <-- 空白文字をエスケープ xargs に渡せるようになる。
+ $t ;
+}
+
+& main ; 
+exit 0 ;
+
+END{ print RESET "" } ;
+
+
+
+sub open_dir_error_message ( $ ) { 
+  say STDERR FAINT BOLD YELLOW "Cannot open the directory `$_[0]' so skipped." ;
+}
+
+# そのインスタンスの下のディレクトリファイルの一覧を文字列の配列で返す。
+sub get_dirs () { 
+  my @dirs ;
+  #return @dirs = grep { -d $_ } glob '*' ; 
+  opendir my $dh , '.' or do { open_dir_error_message ( abs_path "." ) ; return () } ; 
+  @dirs = grep { ! /\A\.{1,2}\Z/ && -d $_ } readdir $dh ; 
+  @dirs = grep { ! /\A\./ } @dirs if exists $o{'.'} && $o{'.'} eq "0" ; # 隠しファイルに関する処理
+  closedir $dh ;
+  return @dirs ; 
+}
+
+
+sub main () {
+
+  # コンマ区切り ハイフン結合ペアの取り出し
+  my @gg = do { ! exists $o{g} ? () : (my $t = $o{g}) =~ s/[Aadlx]//g ;  map { [ split /-/, $_ ] } split /,/ , $t // '' } ;
+  our %g1 = map { $_ ->[0] , 1 } grep { @ { $_ } == 1 } @gg ; # ペアではないもの
+  our %g2 = map { $_->[0] ."-" .$_->[1] , 1 } grep { @ { $_ } == 2 } @gg ; # ペアのもの
+
+  our @S ; #　$S[depth][maxdepth]の集計表となる。
+  our @Sq ;  # $S_ln [ depth ]
+  $SIG{INT} = sub { say GREEN getcwd ; & output  } ;
+  & node_proc ( 0 ) ; 
+  & output () unless exists $o{g} && $o{g} =~ m/x/ ;
+
+  sub node_proc ( $ )  { 
+    # 第１引数は、元の指定ディレクトリからの深さであり、
+    # 返り値は、そこで経験した最大の深さである。
+    my $dep = $_[0] ; # 深さ
+    my $mdep = $dep ; # 最大深さの記録用。
+    my @dirs ; # = get_dirs () ;
+    opendir my $dh , '.' or do { open_dir_error_message ( abs_path "." ) ; return () } ; 
+    #@dirs = sort grep { ! /\A\.{1,2}\Z/ && -d $_ && ! -l $_ } readdir $dh ;  # <-- - sort は -g が無いときは不要である
+    my @dirs0 = sort grep { ! /\A\.{1,2}\Z/ && -d $_ } readdir $dh ;  # <-- - sort は -g が無いときは不要である
+    for ( @dirs0 ) { #reverse 0 .. $#dirs ) {
+      if ( -l $_ )
+      { 
+        say join "\t" , $o{g} =~ m/d/ ? () : "link", head_trim (getcwd).$I.$_ if exists $o{g} && $o{g} =~ m/l/;
+        #splice @dirs , $_ , 1 ; 
+        ++ $Sq [ $dep + 1 ] ;
+        next ;
+      } 
+      push @dirs , $_ ;
+    }
+    #@dirs = grep { ! ( -l $_ && ++ $Sq[$dep+1]  ) } @dirs ; 
+    #@dirs = grep { ! ( -l $_ ) } @dirs ; 
+    @dirs = grep { ! /\A\./ } @dirs if exists $o{'.'} && $o{'.'} eq "0" ; # 隠しファイルに関する処理
+    #closedir $dh ;
+
+    for ( @dirs ) { 
+      #chdir $dh ;
+      next unless chdir $_ ; 
+      #chdir $_ ;
+      $mdep = max $mdep , & node_proc ( $dep + 1 ) ; # <-- 再帰的な呼び出し
+      chdir $dh or die ; # ここで戻れないのは重大
+    }
+    closedir $dh ;
+    $S [ $dep ] [ $mdep ] ++ ;
+    say join "\t" , $o{g} =~ m/d/ ? () : $dep, head_trim getcwd if $g1{$dep}  ; 
+    say join "\t" , $o{g} =~ m/d/ ? () : "$dep-$mdep", head_trim getcwd if  $g2{"$dep-$mdep"} ; 
+        return $mdep ;
+  }
+
+
+  sub output () { 
+  my $asum = 0 ; # ファイル数の合計
+  my @out = ( '', 0 .. $#S , '+' , '++' ) ;
+  push @out , MAGENTA "Symbolic_link_dir" if sum0 map { $_ // 0 } @Sq ;
+  say join "\t" , @out ;
+  for ( 0 .. $#S ) { 
+    $S[$_][$_] //= 0 ; # unless exists $o{0} && $o{0} eq "." ; # 対角成分に対する処理
+    for my $i ( $_ ..  $#S ) { $S[$_][$i] //= '' } ; 
+    my @out = ( $_ , map { ! defined $_ ? '' : $_ eq '' ? FAINT 0 : $_ } @{$S[$_]} ) ; 
+    push @out , FAINT my $rsum = sum0 map { $_ || 0 } @{$S[$_]}   ; 
+    push @out , $asum += $rsum ;
+    push @out , MAGENTA "+$Sq[ $_ ]" if $Sq [$_] ;
+
+    say join "\t" , @out ; 
+  }
+}
+END{
+  say STDERR " --  " , REVERSE ITALIC " Process time: " , CLEAR " " , 
+     sprintf( "%.6f", tv_interval $time_start , [ gettimeofday ] ) , " second(s)." ;
+   }
+}
+
+
+## ヘルプの扱い
+sub VERSION_MESSAGE {}
+sub HELP_MESSAGE {
+    use FindBin qw[ $Script ] ; 
+    $ARGV[1] //= '' ;
+    open my $FH , '<' , $0 ;
+    while(<$FH>){
+        s/\$0/$Script/g ;
+        print $_ if s/^=head1// .. s/^=cut// and $ARGV[1] =~ /^o(p(t(i(o(ns?)?)?)?)?)?$/i ? m/^\s+\-/ : 1;
+    }
+    close $FH ;
+    exit 0 ;
+}
+
+=encoding utf8
+=head1
+
+　$0 [dirname]
+   
+   指定されたディレクトリから、i階層下に潜ったところに、
+   j階層下までディレクトリを持つディレクトリが何個あるのかを示す。
+   縦方向がiで、横方向がjに対応する。
+   +と表記された列は、i階層の合計値を示す。++は累積和。
+   シンボリックリンクのディレクトリは辿らない。存在する場合は、その数を出力する。
+
+  オプション: 
+
+    -x dirname : 引数dirnameとして与えるディレクトリ名をオプションとして渡す。
+    -. 0 : 隠しファイルを辿らない。
+    -g N1-N2 ; iがN1, jがN2に相当するディレクトリ名を出力する。N1-N2の書式は コンマ(,)で連結が可能
+    -g ...[dx] ; xを指定文字列に含むことで表の出力を抑制する。dがある場合は深さ情報は抑制する。
+    -g ...[Aa] : aの有無でディレクトリの表示が変わる。あれば、指定ディレクトリ名から表示する。Aを含めば、絶対パスとなる。
+    -g ...l  : シンボリックリンクのディレクトリを出力する。 
+
+
+  その他の注意: 
+    - Ctrl+C では途中結果を出すのみで，停止しない。Ctrl+\で停止する。
+
+  開発上の注意 : 
+    * chdir ".." が意図通りに動作しないことがあったので、opendirを使った動作とした。

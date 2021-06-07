@@ -1,3 +1,8 @@
+0.088   2021-06-04  Released-By: PERLANCAR; Urgency: medium
+
+	- [sub pod_section_ala_perlancar] Add CONTRIBUTORS section.
+
+
 0.087   2021-05-01  Released-By: PERLANCAR; Urgency: medium
 
 	- Tweak POD sections: recognize ORIGINAL LICENSE, remove FOO'S

@@ -1,11 +1,11 @@
 package Time::Duration::Parse;
-$Time::Duration::Parse::VERSION = '0.15';
+$Time::Duration::Parse::VERSION = '0.16';
 use 5.006;
 use strict;
 use warnings;
 
 use Carp;
-use Exporter::Lite;
+use Exporter 5.57 qw(import);
 our @EXPORT = qw( parse_duration );
 
 # This map is taken from Cache and Cache::Cache

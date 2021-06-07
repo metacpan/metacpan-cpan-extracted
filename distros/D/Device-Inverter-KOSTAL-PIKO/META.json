@@ -1,16 +1,16 @@
 {
    "abstract" : "unknown",
    "author" : [
-      "Martin H. Sluka <fany@cpan.org>"
+      "Martin Sluka <perl@sluka.de>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Device-Inverter-KOSTAL-PIKO",
    "no_index" : {
@@ -52,6 +52,12 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.03",
-   "x_serialization_backend" : "JSON::PP version 2.27300"
+   "resources" : {
+      "homepage" : "https://github.com/fany/Device-Inverter-KOSTAL-PIKO",
+      "repository" : {
+         "url" : "https://github.com/fany/Device-Inverter-KOSTAL-PIKO.git"
+      }
+   },
+   "version" : 0.12,
+   "x_serialization_backend" : "JSON::PP version 4.06"
 }

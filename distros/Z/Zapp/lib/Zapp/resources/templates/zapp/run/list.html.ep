@@ -1,0 +1,67 @@
+<%
+    use Time::Piece;
+    layout 'zapp';
+    my %state_badge_class = (
+        inactive => 'badge badge-primary',
+        active => 'badge badge-primary',
+        killed => 'badge badge-secondary',
+        failed => 'badge badge-danger',
+        stopped => 'badge badge-warning',
+        finished => 'badge badge-success',
+    );
+    my $since = sub {
+        my ( $dt ) = @_;
+        my $since = time - Time::Piece->strptime( $dt, '%Y-%m-%d %H:%M:%S' )->epoch;
+        return $since < 30 ? 'a few seconds ago'
+            : $since < 90 ? 'a minute ago'
+            : $since < 300 ? 'a few minutes ago'
+            : $since < 3600 ? sprintf( '%d minutes ago', $since / 60 )
+            : $since < 86400 ? sprintf( '%d hours ago', $since / 3600 )
+            : $since < 86400 * 7 ? sprintf( '%d days ago', $since / 86400 )
+            : $since < 86400 * 30 ? sprintf( '%d weeks ago', $since / 86400 * 7 )
+            : $since < 86400 * 365 ? sprintf( '%d months ago', $since / 86400 * 30 )
+            : sprintf( '%d years ago', $since / 3600 * 24 * 365 )
+            ;
+    };
+%>
+
+<header>
+    <h1>Runs</h1>
+</header>
+
+<div class="runs-list list-group" data-runs>
+% for my $run ( @{ $runs // [] } ) {
+    <a href="<%= url_for 'zapp.get_run', $run %>" data-run-id="<%= $run->{run_id} %>" class="d-flex justify-content-between align-items-center list-group-item list-group-item-action">
+        <div>
+            <h2><%= $run->{name} %></h2>
+            % if ( $run->{description} ) {
+                <p class="description text-pre-wrap text-break"><%= $run->{description} %></p>
+            % }
+        </div>
+        <div>
+            % if ( $run->{finished} ) {
+                <time datetime="<%= $run->{finished} %>" data-run-finished>
+                    %= $since->( $run->{finished} )
+                </time>
+            % }
+            % elsif ( $run->{started} ) {
+                <time datetime="<%= $run->{started} %>" data-run-started>
+                    %= $since->( $run->{started} )
+                </time>
+            % }
+            % else {
+                <time datetime="<%= $run->{created} %>" data-run-created>
+                    %= $since->( $run->{created} )
+                </time>
+            % }
+            <span data-last-run-state class="<%= $state_badge_class{ $run->{state} } %>">
+                <%= $run->{state} %>
+            </span>
+        </div>
+    </a>
+% }
+
+% if ( !@{ $runs // [] } ) {
+    <p>No runs found.</p>
+% }
+</div>

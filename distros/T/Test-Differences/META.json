@@ -4,9 +4,11 @@
       "David Cantrell <david@cantrell.org.uk>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.56, CPAN::Meta::Converter version 2.150010",
    "license" : [
-      "unknown"
+      "unknown",
+      "artistic_1",
+      "gpl_1"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
@@ -48,6 +50,6 @@
          "url" : "https://github.com/DrHyde/Test-Differences"
       }
    },
-   "version" : "0.67",
-   "x_serialization_backend" : "JSON::PP version 2.97001"
+   "version" : "0.68",
+   "x_serialization_backend" : "JSON::PP version 4.02"
 }

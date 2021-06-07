@@ -1,5 +1,21 @@
 Revision history for Alien-Libarchive3
 
+0.32      2021-05-26 21:04:50 -0600
+  - Bump required libarchive to 3.2.0 (gh#9)
+    This allows downstream modules to use the
+    *_utf8 functions and the match API
+
+0.31      2021-05-20 16:54:11 -0600
+  - Bump required libarchive to 3.0.2 (3.0.0 and 3.0.1
+    were alpha / beta versions)
+  - Only build libarchive once where possible.  On MSWin32
+    builds two builds are still required to completely
+    support both static and dynamic libraries.
+
+0.30      2021-05-20 09:45:09 -0600
+  - More reliable system installs on macOS
+  - More reliable share installs on windows
+
 0.29      2017-08-24 08:20:55 -0400
   - production release identical to 0.028_06 release
 

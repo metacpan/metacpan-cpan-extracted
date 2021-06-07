@@ -29,7 +29,7 @@ use Math::Trig qw/pi/;
 use DateTime;
 use DateTime::Format::Strptime;
 
-our $VERSION = '1.29';
+our $VERSION = '1.30';
 
 my $locateBug = 0;
 

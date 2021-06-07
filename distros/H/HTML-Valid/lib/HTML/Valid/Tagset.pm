@@ -39,7 +39,7 @@ use utf8;
 use Carp;
 use HTML::Valid;
 
-our $VERSION=$HTML::Valid::VERSION;
+our $VERSION = $HTML::Valid::VERSION;
 
 use vars qw(
     $VERSION

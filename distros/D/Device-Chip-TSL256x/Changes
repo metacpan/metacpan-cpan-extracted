@@ -1,5 +1,10 @@
 Revision history for Device-Chip-TSL256x
 
+0.06    2021-05-27
+        [CHANGES]
+         * Avoid ping-pong behaviour in AGC algorithm
+         * Detect saturation of the sensor and report 50klux instead
+
 0.05    2021-01-02
         [CHANGES]
          * Implement the Device::Chip::Sensor API

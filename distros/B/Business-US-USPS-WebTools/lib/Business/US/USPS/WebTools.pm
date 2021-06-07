@@ -10,7 +10,7 @@ use Carp qw(carp croak);
 use subs qw();
 use vars qw($VERSION);
 
-$VERSION = '1.124';
+$VERSION = '1.125';
 
 =encoding utf8
 
@@ -125,7 +125,7 @@ sub _api_path {
 	$_[0]->_live ?
 		"/ShippingAPI.dll"
 			:
-		"/ShippingAPITest.dll"
+		"/ShippingAPI.dll"
 		}
 
 sub _make_url {
@@ -133,7 +133,7 @@ sub _make_url {
 	my( $self, $hash ) = @_;
 
 	$self->{url} = Mojo::URL->new
-		->scheme('http')
+		->scheme('https')
 		->host( $self->_api_host )
 		->path( $self->_api_path )
 		->query(
@@ -216,7 +216,7 @@ when you have set C<Testing> to a true value.
 =cut
 
 sub live_server_host { "production.shippingapis.com" };
-sub test_server_host { "testing.shippingapis.com" };
+sub test_server_host { "stg-production.shippingapis.com" };
 
 
 =back

@@ -30,4 +30,4 @@ if ($dwg_magic) {
 }
 
 # Output like:
-# File '%s' isn't DWG file.
+# File '%s' is DWG file.

@@ -7,6 +7,7 @@ README
 t/00-report-prereqs.t
 t/001_load.t
 t/002_icpp.t
+t/003_standard_flag.t
 t/010_module_build.t
 t/011_makemaker.t
 t/lib/Guess.pm

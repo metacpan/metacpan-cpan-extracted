@@ -21,12 +21,12 @@ subtest 'example with no sparse stuff' => sub {
 
   is eval { archive_entry_sparse_count($e) }, 0, 'archive_entry_sparse_count = 0';
   diag $@ if $@;
-  
+
   is eval { archive_entry_sparse_reset($e) }, 0, 'archive_entry_sparse_reset = 0';
   diag $@ if $@;
-  
+
   $r = eval { archive_entry_sparse_next($e, my $o, my $l) };
-  
+
   is $r, ARCHIVE_WARN, 'archive_entry_sparse_next';
   diag $@ if $@;
 };
@@ -36,22 +36,22 @@ subtest 'add sparsenesss' => sub {
 
   $r = eval { archive_entry_sparse_add_entry($e, 52, 100) };
   diag $@ if $@;
-  
+
   is $r, ARCHIVE_OK, 'archive_entry_sparse_add_entry(e,52,100)';
 
   $r = eval { archive_entry_sparse_add_entry($e, 512, 87) };
   diag $@ if $@;
-  
+
   is $r, ARCHIVE_OK, 'archive_entry_sparse_add_entry(e,512,87)';
 
 };
 
 subtest 'fetch sparseness' => sub {
   plan tests => 9;
-  
+
   is eval { archive_entry_sparse_count($e) }, 2, 'archive_entry_sparse_count = 2';
   diag $@ if $@;
-  
+
   is eval { archive_entry_sparse_reset($e) }, 2, 'archive_entry_sparse_reset = 2';
   diag $@ if $@;
 
@@ -68,25 +68,25 @@ subtest 'fetch sparseness' => sub {
   }
 
   $r = eval { archive_entry_sparse_next($e, my $o, my $l) };
-  
+
   is $r, ARCHIVE_WARN, 'archive_entry_sparse_next';
   diag $@ if $@;
 };
 
 subtest 'clear sparseness' => sub {
   plan tests => 4;
-  
+
   $r = eval { archive_entry_sparse_clear($e) };
   is $r, ARCHIVE_OK, 'archive_entry_sparse_clear';
 
   is eval { archive_entry_sparse_count($e) }, 0, 'archive_entry_sparse_count = 0';
   diag $@ if $@;
-  
+
   is eval { archive_entry_sparse_reset($e) }, 0, 'archive_entry_sparse_reset = 0';
   diag $@ if $@;
-  
+
   $r = eval { archive_entry_sparse_next($e, my $o, my $l) };
-  
+
   is $r, ARCHIVE_WARN, 'archive_entry_sparse_next';
   diag $@ if $@;
 };

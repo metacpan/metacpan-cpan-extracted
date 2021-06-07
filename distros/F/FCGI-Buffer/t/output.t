@@ -7,11 +7,12 @@
 # TODO: check ETags are correct
 # TODO: Write a test to check that 304 is sent when a cached object
 #	is newer than the IF_MODIFIED_SINCE date
+# TODO: Test HTTP_IF_MODIFIED_SINCE sends 304 when appropriate
 
 use strict;
 use warnings;
 
-use Test::Most tests => 281;
+use Test::Most tests => 282;
 use DateTime;
 use Capture::Tiny ':all';
 use CGI::Info;
@@ -840,6 +841,8 @@ EOF
 	# Check removal of </center><center>
 
 	sub test21 {
+		local $ENV{'SCRIPT_FILENAME'} = '/';
+
 		my $b = new_ok('FCGI::Buffer');
 
 		$b->set_options({ optimise_content => 1, generate_etag => 0 });
@@ -872,6 +875,7 @@ EOF
 	($headers, $body) = split /\r?\n\r?\n/, $stdout, 2;
 
 	ok($headers =~ /^Content-Length:\s+(\d+)/m);
+	like($headers, qr/^Last-Modified: /mi, 'Headers include Last-Modified');
 	$length = $1;
 	ok($headers =~ /MISS/m);
 

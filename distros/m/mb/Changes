@@ -1,5 +1,10 @@
 Revision history for this software.
 
+0.28  2021-05-25 00:00:00
+  - supports die <<HEREDOC, and more
+  - add SEE ALSO of POD
+  - created by INABA Hitoshi
+
 0.27  2021-04-24 00:00:00
   - fix confess() and cluck() messages
   - created by INABA Hitoshi

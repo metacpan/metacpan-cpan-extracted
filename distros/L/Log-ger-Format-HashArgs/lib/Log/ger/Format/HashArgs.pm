@@ -1,9 +1,9 @@
 package Log::ger::Format::HashArgs;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-05-15'; # DATE
+our $DATE = '2021-05-18'; # DATE
 our $DIST = 'Log-ger-Format-HashArgs'; # DIST
-our $VERSION = '0.004'; # VERSION
+our $VERSION = '0.005'; # VERSION
 
 use strict;
 use warnings;
@@ -88,7 +88,7 @@ Log::ger::Format::HashArgs - Log using hash arguments
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 SYNOPSIS
 
@@ -153,7 +153,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021, 2020 by perlancar@cpan.org.
+This software is copyright (c) 2021 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

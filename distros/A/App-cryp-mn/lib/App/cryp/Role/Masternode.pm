@@ -26,7 +26,7 @@ App::cryp::Role::Masternode - Role for Masternode drivers
 
 =head1 VERSION
 
-This document describes version 0.003 of App::cryp::Role::Masternode (from Perl distribution App-cryp-mn), released on 2018-04-06.
+This document describes version 0.004 of App::cryp::Role::Masternode (from Perl distribution App-cryp-mn), released on 2021-05-26.
 
 =head1 PROVIDED METHODS
 
@@ -68,6 +68,15 @@ Record must contain these keys: C<name> (str), C<ip> (IP address, str), C<port>
 C<collateral_oidx> (collateral's output index in collateral transaction, uint).
 Record can contain additional keys.
 
+=item * with_status
+
+Boolean. Default 0. Only relevant when detail=1.
+
+If set to true, method must return additional record keys: C<status> (str).
+
+Querying status requires querying the list/masternode, so this is not done by
+default.
+
 =back
 
 =head1 HOMEPAGE
@@ -80,7 +89,7 @@ Source repository is at L<https://github.com/perlancar/perl-App-cryp-mn>.
 
 =head1 BUGS
 
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-cryp-mn>
+Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-App-cryp-mn/issues>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
@@ -92,7 +101,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2018 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

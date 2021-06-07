@@ -10,13 +10,13 @@ use Archive::Libarchive::Any qw( :all );
 sub write_archive
 {
   my($outname, @filenames) = @_;
-  
+
   my $a = archive_write_new();
-  
+
   archive_write_add_filter_gzip($a);
   archive_write_set_format_pax_restricted($a);
   archive_write_open_filename($a, $outname);
-  
+
   foreach my $filename (@filenames)
   {
     my $st = stat $filename;
@@ -34,7 +34,7 @@ sub write_archive
       $len = read $fh, $buff, 8192;
     }
     close $fh;
-    
+
     archive_entry_free($entry);
   }
   archive_write_close($a);

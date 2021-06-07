@@ -22,36 +22,34 @@ Requests and responses are shoveled between buses by a few router processes.
 
 **Key characteristics:**
 
-- Broker is a messaging server like Apache ActiveMQ or RabbitMQ.
+- The broker is an MQTT messaging server, like Mosquitto, HiveMQ or EMQ X.
 
-- Broker protocol is STOMP (see the [specification](https://stomp.github.io/stomp-specification-1.2.html)).
+- The messaging protocol is MQTT 5 (see the [specification](https://docs.oasis-open.org/mqtt/mqtt/v5.0/mqtt-v5.0.html)).
 
-- RPC protocol is JSON-RPC 2.0 (see the [specification](https://www.jsonrpc.org/specification)).
+- The RPC protocol is JSON-RPC 2.0 (see the [specification](https://www.jsonrpc.org/specification)).
 
-- Message marshalling is JSON.
+- There is no message persistence in the broker, it just passes on messages.
 
-- No message persistence in the broker, it just passes on messages.
+- There is no routing logic defined in the broker.
 
-- No routing logic is defined in the broker.
+- Synchronous and asynchronous workers or clients can be integrated seamlessly.
 
-- Blends synchronous and asynchronous workers or clients.
-
-- Efficient multicast and unicast notifications.
+- Efficient multicast and unicast push notifications.
 
 - Inherent load balancing.
 
 
 **What does this framework provides:**
 
-- `Beekeeper::Worker`, a base class for writing service workers.
+- `Beekeeper::Worker`, to create service workers.
 
-- `Beekeeper::Client`, a class for writing service clients.
+- `Beekeeper::Client`, to create service clients.
 
 - `bkpr` command which spawns and controls worker processes.
 
-- Command line tools for monitoring and controlling remotely worker pools.
+- Command line tools for monitoring and controlling worker pools.
 
-- A simple internal broker handy for development or running tests. 
+- An internal broker suitable for development or running tests. 
 
 - Automatic message routing between frontend and backend buses.
 
@@ -62,9 +60,11 @@ Requests and responses are shoveled between buses by a few router processes.
 
 ## Getting Started
 
-### Writing workers
+### Creating workers
 
-Workers provide a service accepting certain RPC calls from clients. The base class `Beekeeper::Worker` provides all the glue needed to accept requests and communicate trough the message bus with clients or another workers.
+Workers provide a service accepting certain RPC calls from clients. The base class `Beekeeper::Worker` 
+provides all the glue needed to accept requests and communicate trough the message bus with clients 
+or another workers.
 
 A worker class just declares on startup which methods it will accept, then implements them:
 
@@ -76,7 +76,7 @@ use base 'Beekeeper::Worker';
 sub on_startup {
     my $self = shift;
 
-    $self->accept_jobs(
+    $self->accept_remote_calls(
         'myapp.str.uc' => 'uppercase',
     );
 }
@@ -88,9 +88,10 @@ sub uppercase {
 }
 ```
 
-### Writing clients
+### Creating clients
 
-Clients of the service need an interface to use it without knowledge of the underlying RPC mechanisms. The class `Beekeeper::Client` provides simple methods to connect to the broker and make RPC calls.
+Clients of the service need an interface to use it without knowledge of the underlying RPC mechanisms.
+The class `Beekeeper::Client` provides methods to connect to the broker and make RPC calls.
 
 This is the interface of the above service:
 
@@ -104,7 +105,7 @@ sub uppercase {
 
     my $client = Beekeeper::Client->instance;
 
-    my $resp = $client->do_job(
+    my $resp = $client->call_remote(
         method => 'myapp.str.uc',
         params => { string => $str },
     );
@@ -121,150 +122,127 @@ print MyApp::Client->uppercase("hello!");
 
 ### Configuring
 
-Beekeeper applications use two config files to define how clients, workers and brokers connect to each other. These files are searched for in ENV `BEEKEEPER_CONFIG_DIR`, `~/.config/beekeeper` and then `/etc/beekeeper`. File format is relaxed JSON, which allows comments and trailings commas.
+Beekeeper applications use two config files to define how clients, workers and brokers connect to 
+each other. These files are looked for in ENV `BEEKEEPER_CONFIG_DIR`, `~/.config/beekeeper` and 
+then `/etc/beekeeper`. File format is relaxed JSON, which allows comments and trailing commas.
 
-The file `pool.config.json` defines all worker pools running on a host, specifying which logical bus should be used and which services it will run. For example:
+The file `pool.config.json` defines all worker pools running on a host, specifying which logical bus
+should be used and which services it will run. For example:
 
 ```
 [{
-    "pool-id" : "myapp",
-    "bus-id"  : "backend",
+    "pool_id" : "myapp",
+    "bus_id"  : "backend",
     "workers" : {
         "MyApp::Worker" : { "workers_count" : 4 },
     },
 }]
 ```
-The file `bus.config.json` defines all logical buses used by the application, specifying the connection parameters to the brokers that will service them. For example:
+The file `bus.config.json` defines all logical buses used by the application, specifying the connection
+parameters to the brokers that will service them. For example:
 
 ```
 [{
-    "bus-id"  : "backend",
-    "host"    : "localhost",
-    "user"    : "backend",
-    "pass"    : "def456",
-    "vhost"   : "/back",
+    "bus_id"   : "backend",
+    "host"     : "localhost",
+    "username" : "backend",
+    "password" : "def456",
 }]
 ```
-Neither the worker code nor the client code have hardcoded references to the logical message bus or the broker connection parameters, they communicate to each other using the definitions in these two files.
+Neither the worker code nor the client code have hardcoded references to the logical message bus or
+the broker connection parameters, these communicate to each other using the definitions in these two files.
 
 
 ### Running
 
-To start or stop a pool of workers you use the `bkpr` command. Given the above example config, this will start 4 processes running `MyApp::Worker` code:
+To start or stop a pool of workers you use the `bkpr` command. Given the above example config, this 
+will start 4 processes running `MyApp::Worker` code:
 ```
-bkpr --pool-id "myapp" start
+bkpr --pool "myapp" start
 ```
-When started it daemonizes itself and forks all worker processes, then continues monitoring those forked processes and immediately respawns defunct ones.
+When started it daemonizes itself and forks all worker processes, then continues monitoring those forked
+processes and immediately respawns defunct ones.
 
 The framework includes these command line tools to manage worker pools:
 
-- `bkpr-top` allows to monitor in real time the performance of all workers.
+- `bkpr-top` allows to monitor in real time the performance of workers.
 
-- `bkpr-log` allows to monitor in real time the log output of all workers.
+- `bkpr-log` allows to monitor in real time the log output of workers.
 
-- `bkpr-restart` gracefully restarts local or remote worker pools.
+- `bkpr-restart` gracefully restarts worker pools.
 
 
 ## Performance
 
-Beekeeper is pretty lightweight, so the performance depends mostly on *the broker* performance. These are 
-ballpark performance measurements of a local setup running ActiveMQ:
+Beekeeper is pretty lightweight for being pure Perl, but the performance depends mostly on *the broker*
+performance, particularly on the broker introduced latency. These are ballpark performance estimations:
 
-- A `do_job` synchronous call to a remote method adds 1.5 ms of latency and involves 4 network round trips. This implies a maximum of 650 synchronous calls per second.
+- A `call_remote` synchronous call involves 4 MQTT messages. A broker adds around 3 ms of latency 
+  processing these 4 messages, so this limits a single client to make a maximum of 350 synchronous 
+  calls per second. The cpu load will be very low (less than 1%), as the client spends most of the
+  time waiting for messages.
 
-- A `do_async_job` asynchronous call to a remote method takes 0.1 ms. This implies a maximum of 10000 asynchronous calls per second (just the call, then it must wait for responses).
+- A `call_remote_async` asynchronous call to a remote method takes 0.3 ms. This implies a maximum of
+  3500 asynchronous calls per second (just the call, then it must wait for responses).
 
-- Scheduling a remote task with `do_background_job` takes 0.1 ms. This implies a maximum of 10000 calls per second.
+- Launching a remote task with `fire_remote` involves 1 MQTT message and takes 0.1 ms. This implies
+  a maximum of 10000 calls per second.
 
-- Sending a notification with `send_notification` takes 0.1 ms. A worker can emit 10000 notifications per second, even over 15000 if these are smaller than 1 KB.
+- Sending a notification with `send_notification` involves 1 MQTT message and takes 0.1 ms. A worker
+  can emit more than 10000 notifications per second, even 15000 if these are smaller than 1 KB.
 
-- A worker processing remote calls adds 0.3 ms of latency and involves 2 network round trips. So a single worker can handle a maximum of 3300 requests per second.
+- A worker processing remote calls has around 1.5 ms of latency introduced by the 2 MQTT messages
+  involved. So a single worker can handle a maximum of 650 requests per second. The cpu load will
+  be low for simple tasks, as the worker will spend a significant chunk of time waiting for messages.
 
-- A worker adds an overhead of 0,04% CPU load per request.
+- A worker uses 10 MB of resident memory from perl and the few required modules. After adding actual
+  code to do useful work the memory usage will of course increase. As a lot of workers will be required
+  to handle a substantial number of requests, there will be some memory pressure. 
 
-- A worker uses 10 MB of resident memory.
+- A single router can handle around 3000 requests per second.
 
-- Frontend router adds 5 ms of latency and involves 2 additional network round trips.
-
-**Hypothetical example:**
-
-Suppose it is needed to handle 1000 requests per second to a task that takes 25 ms to complete, uses 20 MB of memory and has 10% CPU load. Servers are in the same datacenter and the network roundtrip is 0.1 ms.
-
-Adding framework and network latency, a single worker can handle:
-```
-1000 ms / (25 ms + 0.3 ms + 0.1 ms * 2) = 39 req/s
-```
-In order to handle 1000 requests per second:
-```
-1000 req/s / 39 req/s = 26 workers
-```
-The memory needed is:
-```
-26 workers * (20 MB + 10 MB) = 780 MB
-```
-The CPU needed is:
-```
-26 * 10% + 1000 * 0,04% = 300% = 3 cores
-```
-End user latency is:
-```
-25 ms + 0.3 ms + 5 ms + 0.1 ms * 6 = 31 ms + user latency
-```
-Backend broker receives 2000 msg/s and sends 2000 msg/s, giving a 4000 msg/s total traffic.
-Frontend broker receives 1000 msg/s and sends 1000 msg/s, giving a 2000 msg/s total traffic.
-
-These numbers will improve a bit when running on beefier CPUs, and worsen a lot if broker performance degrades under heavy load.
+- Routers add 2 ms to frontend requests roundtrip.
 
 
 ## Examples
 
-This distribution includes some examples that can be run out of the box using an internal `ToyBroker` (so no install of a proper broker is needed):
+This distribution includes some examples that can be run out of the box using an internal `ToyBroker`
+(so no install of a proper broker is needed):
 
 [examples/basic](./examples/basic) is a barebones example of the usage of Beekeper.
 
 [examples/flood](./examples/flood) allows to estimate the performance of a Beekeper setup.
 
-[examples/webstomp](./examples/webstomp) use a service from a browser using WebSockets.
+[examples/websocket](./examples/websocket) uses a service from a browser using WebSockets.
 
 [examples/chat](./examples/chat) implements a real world setup with isolated buses and redundancy.
 
 
 ## See also
 
-- Notes on [supported brokers](./doc/Brokers.md) configuration.
+- [Notes about supported MQTT brokers](./doc/Brokers.md) configuration.
 
-- Beekeeper [message routing](https://raw.githubusercontent.com/jmico/beekeeper/master/doc/images/routing.svg) diagram.
+- [Diagram of message routing](https://raw.githubusercontent.com/jmico/beekeeper/master/doc/images/routing.svg)
+  between clients, workers and buses.
 
 - https://metacpan.org/release/Beekeeper
 
 
-## TODO
-
-Since this project was started (and even then) STOMP has been completely surpassed 
-as a fast and simple messaging protocol by MQTT. And since 2019, when MQTT
-version 5.0 was released, many brokers started to implement the routing features
-needed by Beekeeper to run.
-
-So the underlying broker protocol should be changed to MQTT, in order to take advantage
-of better supported modern brokers.
-
-
 ## Dependencies
 
-This framework requires `Anyevent`, `JSON::XS`, `Term::ReadKey`, `Test::Class`, and `ps`.
+This framework requires `Anyevent`, `JSON::XS`, `Term::ReadKey`, and `ps`.
 
-To install these dependencies on a Debian system do:
+To install these dependencies on a Debian system run:
 ```
 apt install libanyevent-perl
 apt install libjson-xs-perl
 apt install libterm-readkey-perl
-apt install libtest-class-perl
 apt install procps
 ```
 
 ## License
 
-Copyright 2015 José Micó.
+Copyright 2015-2021 José Micó.
 
 This is free software; you can redistribute it and/or modify it under the same
 terms as the Perl 5 programming language itself.

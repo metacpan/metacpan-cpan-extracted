@@ -1,22 +1,26 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2015-2020 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2015-2021 -- leonerd@leonerd.org.uk
 
 use v5.26;
-use Object::Pad 0.19;
+use Object::Pad 0.38; # Object::Pad::MOP::Class->for_caller
 
-package Test::Device::Chip::Adapter 0.16;
+package Test::Device::Chip::Adapter 0.18;
 class Test::Device::Chip::Adapter
    implements Device::Chip::Adapter;
 
 use Carp;
+
+use Future::AsyncAwait;
 
 use Test::Future::Deferred;
 use List::Util 1.33 qw( first any );
 use Test::Builder;
 
 use Test::ExpectAndCheck::Future;
+
+=encoding UTF-8
 
 =head1 NAME
 
@@ -59,6 +63,7 @@ has $_protocol;
 
 has $_controller;
 has $_obj;
+has $_txn_helper;
 
 BUILD
 {
@@ -119,6 +124,12 @@ invocation should return or throw.
    $exp->returns( $bytes_in )
    $exp->fails( $failure )
 
+Expectations for an atomic I²C transaction are performed inline, using the
+following additional methods:
+
+   $adapter->expect_txn_start()
+   $adapter->expect_txn_stop()
+
 =cut
 
 BEGIN {
@@ -149,10 +160,12 @@ BEGIN {
                            [qw( SPI )] ],
    );
 
+   my $meta = Object::Pad::MOP::Class->for_caller;
+
    foreach my $method ( keys %METHODS ) {
       my ( $canonicalise, $allowed_protos ) = @{ $METHODS{$method} };
 
-      __PACKAGE__->META->add_method(
+      $meta->add_method(
          "expect_$method" => method {
             @_ = $canonicalise->( @_ ) if $canonicalise;
 
@@ -160,7 +173,7 @@ BEGIN {
          }
       );
 
-      __PACKAGE__->META->add_method(
+      $meta->add_method(
          "$method" => method {
             @_ = $canonicalise->( @_ ) if $canonicalise;
 
@@ -173,6 +186,33 @@ BEGIN {
          }
       );
    }
+
+   class Test::Device::Chip::Adapter::_TxnHelper {
+      has $_adapter;
+      BUILD { ( $_adapter ) = @_; }
+
+      async method write { await $_adapter->write( @_ ) }
+      async method read  { return await $_adapter->read( @_ ) }
+   }
+
+   async method txn ( $code )
+   {
+      $_protocol eq "I2C" or
+         croak "Method ->txn not allowed in $_protocol protocol";
+
+      $_txn_helper //= Test::Device::Chip::Adapter::_TxnHelper->new( $self );
+
+      $_obj->txn_start;
+
+      my $result = await $code->( $_txn_helper );
+
+      $_obj->txn_stop;
+
+      return $result;
+   }
+
+   async method expect_txn_start () { $_controller->expect( txn_start => ) }
+   async method expect_txn_stop  () { $_controller->expect( txn_stop => ) }
 }
 
 =head1 METHODS

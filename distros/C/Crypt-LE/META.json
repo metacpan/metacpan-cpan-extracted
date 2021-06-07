@@ -52,15 +52,15 @@
    "provides" : {
       "Crypt::LE" : {
          "file" : "lib/Crypt/LE.pm",
-         "version" : "0.37"
+         "version" : "0.38"
       },
       "Crypt::LE::Challenge::Simple" : {
          "file" : "lib/Crypt/LE/Challenge/Simple.pm",
-         "version" : "0.37"
+         "version" : "0.38"
       },
       "Crypt::LE::Complete::Simple" : {
          "file" : "lib/Crypt/LE/Complete/Simple.pm",
-         "version" : "0.37"
+         "version" : "0.38"
       }
    },
    "release_status" : "stable",
@@ -73,6 +73,6 @@
          "url" : "https://github.com/do-know"
       }
    },
-   "version" : "0.37",
+   "version" : "0.38",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

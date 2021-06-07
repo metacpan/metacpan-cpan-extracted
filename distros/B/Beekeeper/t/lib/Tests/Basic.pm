@@ -50,7 +50,7 @@ sub test_02_sync_jobs : Test(20) {
     
     my $cli = Beekeeper::Client->instance;
 
-    my $resp = $cli->do_job(
+    my $resp = $cli->call_remote(
         method => 'test.echo',
         params => "foo",
     );
@@ -59,7 +59,7 @@ sub test_02_sync_jobs : Test(20) {
     is( $resp->success, 1 );
     is( $resp->result, 'foo');
 
-    $resp = $cli->do_job(
+    $resp = $cli->call_remote(
         method => 'test.echo',
         params => [ 1, { a => 2 }, "" ],
     );
@@ -68,7 +68,7 @@ sub test_02_sync_jobs : Test(20) {
     is_deeply( $resp->result, [ 1, { a => 2 }, "" ]);
 
     # Unhandled exception with no raise_error
-    $resp = $cli->do_job(
+    $resp = $cli->call_remote(
         method => 'test.fail',
         params => { 'die' => "error message 123" },
         raise_error => 0,
@@ -82,7 +82,7 @@ sub test_02_sync_jobs : Test(20) {
 
     # Unhandled exception dies
     $resp = eval {
-        $cli->do_job(
+        $cli->call_remote(
             method => 'test.fail',
             params => { 'die' => "error message 456" },
         );
@@ -93,7 +93,7 @@ sub test_02_sync_jobs : Test(20) {
 
     # Handled exception
     $resp = eval {
-        $cli->do_job(
+        $cli->call_remote(
             method => 'test.fail',
             params => { 'error' => "error message 678" },
         );
@@ -104,7 +104,7 @@ sub test_02_sync_jobs : Test(20) {
 
     # Invalid method
     $resp = eval {
-        $cli->do_job(
+        $cli->call_remote(
             method  => 'test.#@@@@',
         );
     };
@@ -114,7 +114,7 @@ sub test_02_sync_jobs : Test(20) {
 
     # Invalid method
     $resp = eval {
-        $cli->do_job(
+        $cli->call_remote(
             method  => 'test.notfound',
         );
     };
@@ -124,7 +124,7 @@ sub test_02_sync_jobs : Test(20) {
 
     # Timeout
     $resp = eval {
-        $cli->do_job(
+        $cli->call_remote(
             method  => 'test.sleep',
             params  => '0.1',
             timeout => '0.01',
@@ -143,10 +143,11 @@ sub test_03_background_jobs : Test(1) {
 
     $SIG{'USR1'} = sub { $var++ };
 
-    for (1..3) {
-        $cli->do_background_job(
+    foreach my $n (1..3) {
+
+        $cli->fire_remote(
             method => "test.signal",
-            params => { signal => 'USR1', pid => $$ },
+            params => { signal => 'USR1', pid => $$, after => $n/2 },
         );
     }
 
@@ -155,12 +156,12 @@ sub test_03_background_jobs : Test(1) {
     is( $var, $expected, "Background job executed 3 times");
 }
 
-sub test_04_async_jobs : Test(13) {
+sub test_04_async_jobs : Test(18) {
     my $self = shift;
 
     my $cli = Beekeeper::Client->instance;
 
-    my $req = $cli->do_async_job(
+    my $req = $cli->call_remote_async(
         method => 'test.echo',
         params => "baz",
     );
@@ -170,38 +171,39 @@ sub test_04_async_jobs : Test(13) {
     is( $req->success, undef );
     is( $req->result, undef );
 
-    $cli->wait_all_jobs;
+    $cli->wait_async_calls;
 
     isa_ok( $req->response, 'Beekeeper::JSONRPC::Response' );
     is( $req->success, 1 );
     is( $req->result, "baz" );
 
     my @reqs;
+    my $count = 10;
     my $var = 239;
 
-    foreach my $n (0..4) {
-        my $req = $cli->do_async_job(
+    foreach my $n (1..$count) {
+        my $req = $cli->call_remote_async(
             method => 'test.echo',
             params => $var + $n,
         );
         push @reqs, $req;
     }
 
-    $cli->wait_all_jobs;
+    $cli->wait_async_calls;
 
-    foreach my $n (0..4) {
-        is( $reqs[$n]->result, $var + $n );
+    foreach my $n (1..$count) {
+        is( $reqs[$n-1]->result, $var + $n );
     }
 
     # Timeout
     eval {
-        my $req = $cli->do_job(
+        my $req = $cli->call_remote(
             method  => 'test.sleep',
             params  => '0.2',
             timeout => '0.01',
         );
 
-        $cli->wait_all_jobs;
+        $cli->wait_async_calls;
     };
 
     like( $@, qr/Call to 'test.sleep' failed: -31600 Request timeout /);
@@ -215,12 +217,12 @@ sub test_05_client_api : Test(8) {
     my $svc = 'Tests::Service::Client';
     my $var = 52;
 
-    $SIG{'USR1'} = sub { $var = $var + 1 };
+    $SIG{'USR1'} = sub { $var++ };
 
     $svc->signal( 'USR1' => $$ );
 
     my $expected = 54;
-    my $max_wait = 100; while ($max_wait--) { last if $var == $expected; sleep 0.01; }
+    my $max_wait = 10; while ($max_wait--) { sleep 0.5; last if $var == $expected; }
     is( $var, $expected, "Notifications received by 2 workers");
 
 
@@ -231,7 +233,7 @@ sub test_05_client_api : Test(8) {
     is( $resp->result, 'foo');
 
 
-    $resp = $svc->fibonacci_1( 2 );
+    $resp = $svc->fibonacci_1( 1 );
 
     isa_ok($resp, 'Beekeeper::JSONRPC::Response');
     is( $resp->success, 1 );

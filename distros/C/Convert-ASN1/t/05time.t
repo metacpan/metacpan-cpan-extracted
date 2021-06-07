@@ -10,7 +10,7 @@ use Convert::ASN1 qw(:all);
 
 print "1..24\n";
 
-BEGIN { require 't/funcs.pl' }
+BEGIN { require './t/funcs.pl' }
 
 my $t = 1;
 

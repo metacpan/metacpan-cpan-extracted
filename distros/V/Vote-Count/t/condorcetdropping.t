@@ -1,6 +1,6 @@
 #!/usr/bin/env perl
 
-use 5.022;
+use 5.024;
 
 # Using Test2, important to specify which version of Test2
 # since later versions may break things.
@@ -107,11 +107,15 @@ subtest 'Benham' => sub {
   with dataset that will produce different results with the method variation./
   );
   my $B1 = Vote::Count::Method::CondorcetDropping->new(
-    'BallotSet'     => $BB,
-    'DropStyle'     => 'all',
-    'DropRule'      => 'topcount',
-    'SkipLoserDrop' => 1,
+    'BallotSet'      => $BB,
+    'DropStyle'      => 'all',
+    'DropRule'       => 'topcount',
+    'SkipLoserDrop'  => 1,
+    'TieBreakMethod' => 'precedence',
+    'PrecedenceFile' => '/tmp/cdben.txt',
   );
+  $B1->CreatePrecedenceRandom(  '/tmp/cdben.txt' );
+
   my $rB1 = $B1->RunCondorcetDropping();
   is( $rB1->{'winner'}, 'RINGDING', 'Benham Winner' );
   like(

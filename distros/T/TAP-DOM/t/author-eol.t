@@ -36,6 +36,7 @@ my @files = (
     't/some_tap6_autotapversion.txt',
     't/some_tap7_taplevel.txt',
     't/some_tap7_taplevel_skipall.txt',
+    't/some_tap8_pragma.txt',
     't/some_tap_document_data.tap',
     't/some_tap_doublecomments.txt',
     't/some_tap_with_key_values.tap',
@@ -53,6 +54,7 @@ my @files = (
     't/tap_dom_ignore_lines.t',
     't/tap_dom_key_values.t',
     't/tap_dom_key_values_case_insensitive.t',
+    't/tap_dom_pragma.t',
     't/tap_dom_whitespace.t'
 );
 

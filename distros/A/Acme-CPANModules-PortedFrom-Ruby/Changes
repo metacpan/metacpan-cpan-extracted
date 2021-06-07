@@ -1,3 +1,11 @@
+0.006   2021-02-05  Released-By: PERLANCAR; Urgency: low
+
+	- No functional changes.
+
+	- [doc] Mention Acme::CPANModules::PortedFrom::Python & other
+	  Acme::CPANModules::PortedFrom::*.
+
+
 0.005   2021-02-05  Released-By: PERLANCAR; Urgency: medium
 
 	- Add Plack (thanks TOBYINK).

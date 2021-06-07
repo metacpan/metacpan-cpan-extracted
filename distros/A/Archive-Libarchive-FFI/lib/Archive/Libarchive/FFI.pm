@@ -35,8 +35,8 @@ BEGIN {
 
 }
 
-# ABSTRACT: Perl bindings to libarchive via FFI
-our $VERSION = '0.0901'; # VERSION
+# ABSTRACT: (Deprecated) Perl bindings to libarchive via FFI
+our $VERSION = '0.0902'; # VERSION
 
 ffi_lib(\$_) for Alien::Libarchive3->dynamic_libs;
 
@@ -64,7 +64,7 @@ sub _attach ($$$)
     }
     else
     {
-      $name = [ $name => "_$name" ] 
+      $name = [ $name => "_$name" ]
     }
   }
   if($ret == _void)
@@ -190,7 +190,7 @@ _attach 'archive_entry_size',                            [ _ptr ], _int64;
 _attach 'archive_entry_set_size',                        [ _ptr, _int64 ], _void;
 _attach 'archive_entry_set_perm',                        [ _ptr, _int ], _void;
 _attach 'archive_entry_set_filetype',                    [ _ptr, _int ], _void;
-_attach 'archive_entry_set_mtime',                       [ _ptr, _time_t, _long ], _void; 
+_attach 'archive_entry_set_mtime',                       [ _ptr, _time_t, _long ], _void;
 _attach 'archive_entry_set_ctime',                       [ _ptr, _time_t, _long ], _void;
 _attach 'archive_entry_set_atime',                       [ _ptr, _time_t, _long ], _void;
 _attach 'archive_entry_set_birthtime',                   [ _ptr, _time_t, _long ], _void;
@@ -333,10 +333,10 @@ foreach my $type (qw( b64encode bzip2 compress grzip gzip lrzip lzip lzma lzop n
     my $real = "archive_write_set_compression_$type";
     eval { attach_function [ $real => $name ], [ _ptr ], _int };
   }
-}  
+}
 
 _attach "archive_write_set_format_$_", [ _ptr ], _int
-  for qw( 7zip ar_bsd ar_svr4 cpio cpio_newc gnutar iso9660 mtree mtree_classic 
+  for qw( 7zip ar_bsd ar_svr4 cpio cpio_newc gnutar iso9660 mtree mtree_classic
           pax pax_restricted shar shar_dump ustar v7tar xar zip);
 
 _attach_function 'archive_match_include_date', [ _ptr, _int, _str ], _int;
@@ -417,7 +417,7 @@ _attach_function 'archive_entry_acl_next', [ _ptr, _int, _ptr, _ptr, _ptr, _ptr,
   $ret;
 };
 
-_attach_function 'archive_write_data', [ _ptr, _ptr, _size_t ], _int, sub 
+_attach_function 'archive_write_data', [ _ptr, _ptr, _size_t ], _int, sub
 {
   my($cb, $archive, $buffer) = @_;
   my $size = do { use bytes; length($buffer) };
@@ -479,11 +479,11 @@ _attach_function 'archive_entry_xattr_next', [ _ptr, _ptr, _ptr, _ptr ], _int, s
   my $name = FFI::Raw::MemPtr->new_from_ptr(0);
   my $ptr  = FFI::Raw::MemPtr->new_from_ptr(0);
   my $size = FFI::Raw::MemPtr->new_from_ptr(0);
-  
+
   my $ret = $_[0]->($_[1], $name, $ptr, $size);
   $_[2] = deref_str_get($$name);
   $_[3] = buffer_to_scalar(deref_ptr_get($$ptr), deref_size_t_get($$size));
-  
+
   $ret;
 };
 
@@ -583,7 +583,7 @@ else
     {
       0;
     }
-  };  
+  };
 }
 
 require Archive::Libarchive::FFI::Common;
@@ -604,11 +604,11 @@ __END__
 
 =head1 NAME
 
-Archive::Libarchive::FFI - Perl bindings to libarchive via FFI
+Archive::Libarchive::FFI - (Deprecated) Perl bindings to libarchive via FFI
 
 =head1 VERSION
 
-version 0.0901
+version 0.0902
 
 =head1 SYNOPSIS
 
@@ -639,7 +639,7 @@ extract archive
  archive_read_support_filter_all($archive);
  archive_read_support_format_all($archive);
  my $disk = archive_write_disk_new();
- archive_write_disk_set_options($disk, 
+ archive_write_disk_set_options($disk,
    ARCHIVE_EXTRACT_TIME   |
    ARCHIVE_EXTRACT_PERM   |
    ARCHIVE_EXTRACT_ACL    |
@@ -652,9 +652,9 @@ extract archive
  {
    my $r = archive_read_next_header($archive, my $entry);
    last if $r == ARCHIVE_EOF;
-   
+ 
    archive_write_header($disk, $entry);
-   
+ 
    while(1)
    {
      my $r = archive_read_data_block($archive, my $buffer, my $offset);
@@ -695,8 +695,12 @@ write archive
 
 =head1 DESCRIPTION
 
+B<NOTE>: This module has been deprecated in favor of L<Archive::Libarchive>.
+It provides a better thought out object-oriented interface and is easier
+to maintain.
+
 This module provides a functional interface to libarchive.  libarchive is a
-C library that can read and write archives in a variety of formats and with a 
+C library that can read and write archives in a variety of formats and with a
 variety of compression filters, optimized in a stream oriented way.  A familiarity
 with the libarchive documentation would be helpful, but may not be necessary
 for simple tasks.  The documentation for this module is split into four separate
@@ -764,7 +768,7 @@ These examples are also included with the distribution.
  while (archive_read_next_header($a, my $entry) == ARCHIVE_OK)
  {
    print archive_entry_pathname($entry), "\n";
-   archive_read_data_skip($a); 
+   archive_read_data_skip($a);
  }
  
  $r = archive_read_free($a);
@@ -800,7 +804,7 @@ These examples are also included with the distribution.
  
  while (archive_read_next_header($a, my $entry) == ARCHIVE_OK) {
    print archive_entry_pathname($entry), "\n";
-   archive_read_data_skip($a); 
+   archive_read_data_skip($a);
  }
  
  $r = archive_read_free($a);
@@ -872,7 +876,7 @@ These examples are also included with the distribution.
  $r = archive_read_next_header($a, my $ae);
  if($r != ARCHIVE_OK)
  {
-   die archive_error_string($a);     
+   die archive_error_string($a);
  }
  
  while(1)
@@ -905,13 +909,13 @@ These examples are also included with the distribution.
  sub write_archive
  {
    my($outname, @filenames) = @_;
-   
+ 
    my $a = archive_write_new();
-   
+ 
    archive_write_add_filter_gzip($a);
    archive_write_set_format_pax_restricted($a);
    archive_write_open_filename($a, $outname);
-   
+ 
    foreach my $filename (@filenames)
    {
      my $st = stat $filename;
@@ -929,7 +933,7 @@ These examples are also included with the distribution.
        $len = read $fh, $buff, 8192;
      }
      close $fh;
-     
+ 
      archive_entry_free($entry);
    }
    archive_write_close($a);
@@ -1072,7 +1076,7 @@ current POSIX locale.  Content data for files stored and retrieved from in
 raw bytes.
 
 The usual operational procedure in Perl is to convert everything on input
-into UTF-8, operate on the UTF-8 data and then convert (if necessary) 
+into UTF-8, operate on the UTF-8 data and then convert (if necessary)
 everything on output to the desired output format.
 
 In order to get useful string data out of libarchive, this module translates
@@ -1145,7 +1149,7 @@ you need to encode them
  
  archive_write_data($archive, encode('UTF-8', "привет.txt");
  # or
- archive_write_data($archive, encode('KOI8-R', "привет.txt"); 
+ archive_write_data($archive, encode('KOI8-R', "привет.txt");
 
 read:
 
@@ -1169,10 +1173,10 @@ file for traps, hints and pitfalls.
 =head1 CAVEATS
 
 Archive and entry objects are really pointers to opaque C structures
-and need to be freed using one of 
-L<archive_read_free|Archive::Libarchive::FFI::Function#archive_read_free>, 
-L<archive_write_free|Archive::Libarchive::FFI::Function#archive_write_free> or 
-L<archive_entry_free|Archive::Libarchive::FFI::Function#archive_entry_free>, 
+and need to be freed using one of
+L<archive_read_free|Archive::Libarchive::FFI::Function#archive_read_free>,
+L<archive_write_free|Archive::Libarchive::FFI::Function#archive_write_free> or
+L<archive_entry_free|Archive::Libarchive::FFI::Function#archive_entry_free>,
 in order to free the resources associated with those objects.
 
 Proper Unicode (or non-ASCII character support) depends on setting the
@@ -1181,9 +1185,9 @@ correct POSIX locale, which is system dependent.
 The documentation that comes with libarchive is not that great (by its own
 admission), being somewhat incomplete, and containing a few subtle errors.
 In writing the documentation for this distribution, I borrowed heavily (read:
-stole wholesale) from the libarchive documentation, making changes where 
-appropriate for use under Perl (changing C<NULL> to C<undef> for example, along 
-with the interface change to make that work).  I may and probably have introduced 
+stole wholesale) from the libarchive documentation, making changes where
+appropriate for use under Perl (changing C<NULL> to C<undef> for example, along
+with the interface change to make that work).  I may and probably have introduced
 additional subtle errors.  Patches to the documentation that match the
 implementation, or fixes to the implementation so that it matches the
 documentation (which ever is appropriate) would greatly appreciated.

@@ -1,6 +1,6 @@
 package Bio::Palantir::Roles::Clusterable;
 # ABSTRACT: Clusterable Moose role for Cluster and ClusterPlus objects
-$Bio::Palantir::Roles::Clusterable::VERSION = '0.201670';
+$Bio::Palantir::Roles::Clusterable::VERSION = '0.211420';
 use Moose::Role;
 
 use autodie;
@@ -26,7 +26,7 @@ Bio::Palantir::Roles::Clusterable - Clusterable Moose role for Cluster and Clust
 
 =head1 VERSION
 
-version 0.201670
+version 0.211420
 
 =head1 SYNOPSIS
 

@@ -2,7 +2,7 @@ requires   "Carp";
 requires   "DBI"                      => "1.613";
 requires   "Storable";
 
-recommends "DBD::CSV"                 => "0.57";
+recommends "DBD::CSV"                 => "0.58";
 recommends "DBD::Pg"                  => "3.14.2";
 recommends "DBD::SQLite"              => "1.66";
 recommends "DBI"                      => "1.643";

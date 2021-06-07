@@ -3,7 +3,7 @@ use strict;
 use warnings;
 
 # ABSTRACT: This module wraps the www.judobase.org website API.
-our $VERSION = '0.003'; # VERSION
+our $VERSION = '0.004'; # VERSION
 
 use Moo;
 require HTTP::Request;
@@ -15,30 +15,44 @@ use Webservice::Judobase::General;
 
 use namespace::clean;
 
-has 'url' => (
-    is      => 'ro',
-    default => 'http://data.judobase.org/api/',
-);
+my $url = 'http://data.ijf.org/api/get_json';
+my $ua  = LWP::UserAgent->new;
+$ua->agent("WebServiceJudobase/0.1 ");
 
 has 'competitor' => (
     is      => 'ro',
-    default => sub { return Webservice::Judobase::Competitor->new },
+    default => sub {
+        return Webservice::Judobase::Competitor->new(
+            ua  => $ua,
+            url => $url,
+        );
+    },
 );
 
 has 'contests' => (
     is      => 'ro',
-    default => sub { return Webservice::Judobase::Contests->new },
+    default => sub {
+        return Webservice::Judobase::Contests->new(
+            ua  => $ua,
+            url => $url,
+        );
+    },
 );
 
 has 'general' => (
     is      => 'ro',
-    default => sub { return Webservice::Judobase::General->new },
+    default => sub {
+        return Webservice::Judobase::General->new(
+            ua  => $ua,
+            url => $url,
+        );
+    },
 );
 
 sub status {
-    my ($self) = @_;
-    my $ua = LWP::UserAgent->new;
-    my $request = HTTP::Request->new( GET => $self->url );
+    my ($self)  = @_;
+    my $ua      = LWP::UserAgent->new;
+    my $request = HTTP::Request->new( GET => $url );
 
     my $response = $ua->request($request);
 

@@ -1,5 +1,9 @@
 Revision history for this software.
 
+0.06 2021-05-12 00:00:00
+  - gives caller package "use feature qw(signatures); no warnings qw(experimental::signatures);"
+  - created by INABA Hitoshi
+
 0.05 2021-05-08 00:00:00
   - fix confess() messages
   - created by INABA Hitoshi

@@ -1,9 +1,9 @@
 package App::lcpan::Cmd::changes;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-08-13'; # DATE
+our $DATE = '2021-06-05'; # DATE
 our $DIST = 'App-lcpan'; # DIST
-our $VERSION = '1.062'; # VERSION
+our $VERSION = '1.068'; # VERSION
 
 use 5.010001;
 use strict;
@@ -165,7 +165,7 @@ App::lcpan::Cmd::changes - Show Changes of distribution/module
 
 =head1 VERSION
 
-This document describes version 1.062 of App::lcpan::Cmd::changes (from Perl distribution App-lcpan), released on 2020-08-13.
+This document describes version 1.068 of App::lcpan::Cmd::changes (from Perl distribution App-lcpan), released on 2021-06-05.
 
 =head1 FUNCTIONS
 
@@ -174,7 +174,7 @@ This document describes version 1.062 of App::lcpan::Cmd::changes (from Perl dis
 
 Usage:
 
- handle_cmd(%args) -> [status, msg, payload, meta]
+ handle_cmd(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Show Changes of distributionE<sol>module.
 
@@ -184,7 +184,7 @@ Examples:
 
 =item * Use module name:
 
- handle_cmd( module_or_dist_or_script => "Data::CSel::Parser");
+ handle_cmd(module_or_dist_or_script => "Data::CSel::Parser");
 
 =back
 
@@ -228,12 +228,12 @@ off.
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -259,7 +259,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020, 2019, 2018, 2017, 2016, 2015 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2020, 2019, 2018, 2017, 2016, 2015 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

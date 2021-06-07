@@ -1,13 +1,15 @@
 package ArrayData::Word::ID::KBBI;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-05-11'; # DATE
+our $DATE = '2021-05-20'; # DATE
 our $DIST = 'ArrayData-Word-ID-KBBI'; # DIST
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.004'; # VERSION
 
 use Role::Tiny::With;
-#with 'ArrayDataRole::Spec::Basic';
 with 'ArrayDataRole::Source::LinesInDATA';
+with 'ArrayDataRole::BinarySearch::LinesInHandle';                # add has_item() that uses binary search
+with 'Role::TinyCommons::Collection::FindItem::Iterator';         # add find_item() (has_item already added above)
+with 'Role::TinyCommons::Collection::PickItems::RandomSeekLines'; # add pick_items() that uses binary search
 
 # STATS
 
@@ -24,7 +26,7 @@ ArrayData::Word::ID::KBBI - Indonesian words from Kamus Besar Bahasa Indonesia
 
 =head1 VERSION
 
-This document describes version 0.002 of ArrayData::Word::ID::KBBI (from Perl distribution ArrayData-Word-ID-KBBI), released on 2021-05-11.
+This document describes version 0.004 of ArrayData::Word::ID::KBBI (from Perl distribution ArrayData-Word-ID-KBBI), released on 2021-05-20.
 
 =head1 SYNOPSIS
 
@@ -36,7 +38,7 @@ This document describes version 0.002 of ArrayData::Word::ID::KBBI (from Perl di
  $wl->reset_iterator;
  while ($wl->has_next_item) {
      my $word = $wl->get_next_item;
-     ... # do something about the word
+     ... # do something with the word
  }
 
  # Another way to iterate
@@ -52,19 +54,13 @@ This document describes version 0.002 of ArrayData::Word::ID::KBBI (from Perl di
  # Get all words from the list
  my @all_words = $wl->get_all_items;
 
- # Find an item (by iterating). See Role::TinyCommons::Collection::FindItem for more details.
- my @found = ${wl}->find_item(item => 'foo');
- my $has_item = ${wl}->has_item('foo'); # bool
+ # Find an item.
+ my @found = $wl->find_item(item => 'foo');
+ my $has_item = $wl->has_item('foo'); # bool
 
- # Find an item by binary searching (only when data source is filehandle and the data is sorted)
- Role::Tiny->apply_roles_to_object($wl, 'ArrayData::BinarySearch::LinesInHandle');
- my @found = ${wl}->find_item(item => 'foo');
- my $has_item = ${wl}->has_item('foo'); # bool
-
- # Pick one or several random words (apply one of these roles first: Role::TinyCommons::Collection::PickItems::{Iterator,RandomSeek})
- Role::Tiny->apply_roles_to_object($wl, 'Role::TinyCommons::Collection::PickItems::Iterator');
- my $word = ${wl}->pick_item;
- my @words = ${wl}->pick_items(n=>3);
+ # Pick one or several random words.
+ my $word = $wl->pick_item;
+ my @words = $wl->pick_items(n=>3);
 
 =head1 DESCRIPTION
 
@@ -78,7 +74,7 @@ Source repository is at L<https://github.com/perlancar/perl-ArrayData-Word-ID-KB
 
 =head1 BUGS
 
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=ArrayData-Word-ID-KBBI>
+Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-ArrayData-Word-ID-KBBI/issues>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired

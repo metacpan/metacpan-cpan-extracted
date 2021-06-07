@@ -17,7 +17,7 @@ use Module::Build;
 use strict;
 use warnings;
 
-my $libvirtver = "7.3.0";
+my $libvirtver = "7.4.0";
 my $stat = system "pkg-config --atleast-version=$libvirtver libvirt";
 die "cannot run pkg-config to check libvirt version" if $stat == -1;
 die "libvirt >= $libvirtver is required\n" unless $stat == 0;
@@ -67,7 +67,7 @@ my $b = Module::Build->new(
     module_name => "Sys::Virt",
     license => 'gpl',
     configure_requires => {
-	'Module::Build' => 0,
+        'Module::Build' => 0,
     },
     create_makefile_pl => 'small',
     dist_author => 'Daniel Berrange <dan@berrange.com>',
@@ -78,15 +78,15 @@ my $b = Module::Build->new(
     extra_compiler_flags => $GCC_CFLAGS . $LIBVIRT_CFLAGS,
     extra_linker_flags => $LIBVIRT_LIBS,
     build_requires => {
-	'ExtUtils::CBuilder' => 0,
-	'Sys::Hostname' => 0,
-	'Test::CPAN::Changes' => 0,
-	'Test::More' => 0,
-        'Test::Pod' => '0',
-	'Test::Pod::Coverage' => '0',
-	'Time::HiRes' => 0,
-	'XML::XPath' => 0,
-	'XML::XPath::XMLParser' => 0,
+        'ExtUtils::CBuilder' => 0,
+        'Sys::Hostname' => 0,
+        'Test::CPAN::Changes' => 0,
+        'Test::More' => 0,
+        'Test::Pod' => 0,
+        'Test::Pod::Coverage' => 0,
+        'Time::HiRes' => 0,
+        'XML::XPath' => 0,
+        'XML::XPath::XMLParser' => 0,
     },
     script_files => [],
     meta_add => {

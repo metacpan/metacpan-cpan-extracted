@@ -1,7 +1,9 @@
 package Text::Fragment;
 
-our $DATE = '2017-07-10'; # DATE
-our $VERSION = '0.10'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2021-03-25'; # DATE
+our $DIST = 'Text-Fragment'; # DIST
+our $VERSION = '0.110'; # VERSION
 
 use 5.010001;
 use strict;
@@ -692,7 +694,7 @@ Text::Fragment - Manipulate fragments in text
 
 =head1 VERSION
 
-This document describes version 0.10 of Text::Fragment (from Perl distribution Text-Fragment), released on 2017-07-10.
+This document describes version 0.110 of Text::Fragment (from Perl distribution Text-Fragment), released on 2021-03-25.
 
 =head1 SYNOPSIS
 
@@ -746,7 +748,7 @@ To get a fragment:
 
 To set fragment attributes:
 
- $res = se_fragment_attrs(text=>$text, id=>'bar', attrs=>{name=>'val', ...});
+ $res = set_fragment_attrs(text=>$text, id=>'bar', attrs=>{name=>'val', ...});
 
 =head1 DESCRIPTION
 
@@ -811,7 +813,7 @@ Another example (using C<ini>-style comment):
 
 Usage:
 
- delete_fragment(%args) -> [status, msg, result, meta]
+ delete_fragment(%args) -> [status, msg, payload, meta]
 
 Delete fragment in text.
 
@@ -844,6 +846,7 @@ Comment label.
 
 The text to delete fragment from.
 
+
 =back
 
 Returns an enveloped result (an array).
@@ -851,7 +854,7 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
@@ -869,11 +872,12 @@ Will return status 304 if nothing is changed (i.e. when the fragment that needs
 to be deleted already does not exist in the text).
 
 
+
 =head2 get_fragment
 
 Usage:
 
- get_fragment(%args) -> [status, msg, result, meta]
+ get_fragment(%args) -> [status, msg, payload, meta]
 
 Get fragment with a certain ID in text.
 
@@ -901,6 +905,7 @@ Comment label.
 
 The text which contain fragments.
 
+
 =back
 
 Returns an enveloped result (an array).
@@ -908,7 +913,7 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
@@ -922,11 +927,12 @@ following keys: C<raw> (string), C<payload> (string), C<attrs> (hash), C<id>
 Return 404 if fragment is not found.
 
 
+
 =head2 insert_fragment
 
 Usage:
 
- insert_fragment(%args) -> [status, msg, result, meta]
+ insert_fragment(%args) -> [status, msg, payload, meta]
 
 Insert or replace a fragment in text.
 
@@ -986,6 +992,7 @@ Note that this only has effect if C<replace_pattern> is not defined or replace
 pattern is not found in file. Otherwise, fragment will be inserted to replace
 the pattern.
 
+
 =back
 
 Returns an enveloped result (an array).
@@ -993,7 +1000,7 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
@@ -1010,11 +1017,12 @@ Will return status 304 if nothing is changed (i.e. if fragment with the
 same payload that needs to be inserted already exists in the text).
 
 
+
 =head2 list_fragments
 
 Usage:
 
- list_fragments(%args) -> [status, msg, result, meta]
+ list_fragments(%args) -> [status, msg, payload, meta]
 
 List fragments in text.
 
@@ -1036,6 +1044,7 @@ Comment label.
 
 The text which contain fragments.
 
+
 =back
 
 Returns an enveloped result (an array).
@@ -1043,7 +1052,7 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
@@ -1056,13 +1065,14 @@ C<payload> (string), C<attrs> (hash), C<id> (string, can also be found in
 attributes).
 
 
+
 =head2 set_fragment_attrs
 
 Usage:
 
- set_fragment_attrs(%args) -> [status, msg, result, meta]
+ set_fragment_attrs(%args) -> [status, msg, payload, meta]
 
-Set/unset attributes of a fragment.
+SetE<sol>unset attributes of a fragment.
 
 If there are multiple occurences of the fragment with the same ID ,
 
@@ -1092,6 +1102,7 @@ Comment label.
 
 The text which contain fragments.
 
+
 =back
 
 Returns an enveloped result (an array).
@@ -1099,7 +1110,7 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
@@ -1122,7 +1133,7 @@ Source repository is at L<https://github.com/perlancar/perl-Text-Fragment>.
 
 =head1 BUGS
 
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Text-Fragment>
+Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-Text-Fragment/issues>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
@@ -1134,7 +1145,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017, 2016, 2015, 2014, 2012 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2017, 2016, 2015, 2014, 2012 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

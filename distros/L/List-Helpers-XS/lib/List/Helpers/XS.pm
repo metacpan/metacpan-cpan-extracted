@@ -18,7 +18,7 @@ our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
 
 our @EXPORT = qw//;
 
-our $VERSION = '0.15';
+our $VERSION = '0.16';
 
 require XSLoader;
 XSLoader::load('List::Helpers::XS', $VERSION);
@@ -148,12 +148,12 @@ The benchmark code is below:
 The benchmark results for C<shuffle> method
 
                             shuffle_huge_array  List::Helpers::XS::shuffle
-shuffle_huge_array                          --                         -7%
-List::Helpers::XS::shuffle                  7%                          --
+shuffle_huge_array                          --                         -5%
+List::Helpers::XS::shuffle                  5%                          --
 
                             shuffle_array  List::Helpers::XS::shuffle
-shuffle_array                                      --             -8%
-List::Helpers::XS::shuffle                          8%             --
+shuffle_array                                      --             -4%
+List::Helpers::XS::shuffle                          4%             --
 
                             List::Util::shuffle  List::Helpers::XS::shuffle
 List::Util::shuffle                          --                        -63%

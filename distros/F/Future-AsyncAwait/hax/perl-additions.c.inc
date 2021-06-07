@@ -1,4 +1,4 @@
-/* vi: set ft=c inde=: */
+/* vi: set ft=c */
 
 #ifndef av_count
 #  define av_count(av)           (AvFILL(av) + 1)
@@ -224,5 +224,10 @@ static char *PL_savetype_name[] = {
 
 #if HAVE_PERL_VERSION(5,24,0)
   [SAVEt_TMPSFLOOR]           = "TMPSFLOOR",
+#endif
+
+#if HAVE_PERL_VERSION(5,34,0)
+  [SAVEt_STRLEN_SMALL]        = "STRLEN_SMALL",
+  [SAVEt_HINTS_HH]            = "HINTS_HH",
 #endif
 };

@@ -1,9 +1,9 @@
 package Pod::Weaver::Plugin::ArrayData;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-05-11'; # DATE
+our $DATE = '2021-05-20'; # DATE
 our $DIST = 'Pod-Weaver-Plugin-ArrayData'; # DIST
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.003'; # VERSION
 
 use 5.010001;
 use Moose;
@@ -40,6 +40,8 @@ sub _process_module {
         require $temp_fname;
     }
 
+    my $ad = $package->new;
+
     my $ad_name = $package;
     $ad_name =~ s/\AArrayData:://;
     my ($name_entity, $name_entities, $name_mod, $varname);
@@ -70,42 +72,45 @@ sub _process_module {
         push @pod, " \$${varname}->reset_iterator;\n";
         push @pod, " while (\$${varname}->has_next_item) {\n";
         push @pod, "     my \$$name_entity = \$${varname}->get_next_item;\n";
-        push @pod, "     ... # do something about the $name_entity\n";
+        push @pod, "     ... # do something with the $name_entity\n";
         push @pod, " }\n";
         push @pod, "\n";
 
         push @pod, " # Another way to iterate\n";
-        push @pod, " \$${varname}->each_item(sub { my (\$item, \$obj, \$pos) = \@_; ... }); # return false in anonsub to exit early\n";
+        push @pod, " \$$varname\->each_item(sub { my (\$item, \$obj, \$pos) = \@_; ... }); # return false in anonsub to exit early\n";
         push @pod, "\n";
 
         push @pod, " # Get $name_entities by position (array index)\n";
-        push @pod, " my \$$name_entity = \$${varname}->get_item_at_pos(0);  # get the first $name_entity\n";
-        push @pod, " my \$$name_entity = \$${varname}->get_item_at_pos(90); # get the 91th $name_entity, will die if there is no $name_entity at that position.\n";
+        push @pod, " my \$$name_entity = \$$varname\->get_item_at_pos(0);  # get the first $name_entity\n";
+        push @pod, " my \$$name_entity = \$$varname\->get_item_at_pos(90); # get the 91th $name_entity, will die if there is no $name_entity at that position.\n";
         push @pod, "\n";
 
         push @pod, " # Get number of $name_entities in the list\n";
-        push @pod, " my \$count = \$${varname}->get_item_count;\n";
+        push @pod, " my \$count = \$$varname\->get_item_count;\n";
         push @pod, "\n";
 
         push @pod, " # Get all $name_entities from the list\n";
-        push @pod, " my \@all_$name_entities = \$${varname}->get_all_items;\n";
+        push @pod, " my \@all_$name_entities = \$$varname\->get_all_items;\n";
         push @pod, "\n";
 
-        push @pod, " # Find an item (by iterating). See Role::TinyCommons::Collection::FindItem for more details.\n";
-        push @pod, " my \@found = \${$varname}->find_item(item => 'foo');\n";
-        push @pod, " my \$has_item = \${$varname}->has_item('foo'); # bool\n";
+        if ($ad->can('has_item')) {
+            push @pod, " # Find an item.\n";
+        } else {
+            push @pod, " # Find an item (by iterating). See Role::TinyCommons::Collection::FindItem::Iterator for more details.\n";
+            push @pod, " \$$varname\->apply_roles('FindItem::Iterator'); # or: \$$varname = $package->new->apply_roles(...);\n";
+        }
+        push @pod, " my \@found = \$$varname\->find_item(item => 'foo');\n";
+        push @pod, " my \$has_item = \$$varname\->has_item('foo'); # bool\n";
         push @pod, "\n";
 
-        push @pod, " # Find an item by binary searching (only when data source is filehandle and the data is sorted)\n";
-        push @pod, " Role::Tiny->apply_roles_to_object(\$${varname}, 'ArrayData::BinarySearch::LinesInHandle');\n";
-        push @pod, " my \@found = \${$varname}->find_item(item => 'foo');\n";
-        push @pod, " my \$has_item = \${$varname}->has_item('foo'); # bool\n";
-        push @pod, "\n";
-
-        push @pod, " # Pick one or several random $name_entities (apply one of these roles first: Role::TinyCommons::Collection::PickItems::{Iterator,RandomSeek})\n";
-        push @pod, " Role::Tiny->apply_roles_to_object(\$${varname}, 'Role::TinyCommons::Collection::PickItems::Iterator');\n";
-        push @pod, " my \$$name_entity = \${$varname}->pick_item;\n";
-        push @pod, " my \@$name_entities = \${$varname}->pick_items(n=>3);\n\n";
+        if ($ad->can('has_item')) {
+            push @pod, " # Pick one or several random $name_entities.\n";
+        } else {
+            push @pod, " # Pick one or several random $name_entities (apply one of these roles first: Role::TinyCommons::Collection::PickItems::{Iterator,RandomPos,RandomSeekLines})\n";
+            push @pod, " \$$varname\->apply_roles('PickItems::Iterator'); # or: \$$varname = $package->new->apply_roles(...);\n";
+        }
+        push @pod, " my \$$name_entity = \$$varname\->pick_item;\n";
+        push @pod, " my \@$name_entities = \$$varname\->pick_items(n=>3);\n\n";
         push @pod, "\n";
 
         $self->add_text_to_section(
@@ -145,7 +150,7 @@ _
             $args = {foo=>1, bar=>2};
         }
 
-        push @pod, " my \${$varname} = $package\->(".
+        push @pod, " my \$$varname = $package\->(".
             join(", ", map {"$_ => $args->{$_}"} sort keys %$args).");\n\n";
 
         push @pod, <<_;
@@ -238,7 +243,7 @@ Pod::Weaver::Plugin::ArrayData - Plugin to use when building ArrayData::* distri
 
 =head1 VERSION
 
-This document describes version 0.001 of Pod::Weaver::Plugin::ArrayData (from Perl distribution Pod-Weaver-Plugin-ArrayData), released on 2021-05-11.
+This document describes version 0.003 of Pod::Weaver::Plugin::ArrayData (from Perl distribution Pod-Weaver-Plugin-ArrayData), released on 2021-05-20.
 
 =head1 SYNOPSIS
 
@@ -271,7 +276,7 @@ Source repository is at L<https://github.com/perlancar/perl-Pod-Weaver-Plugin-Ar
 
 =head1 BUGS
 
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Pod-Weaver-Plugin-ArrayData>
+Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-Pod-Weaver-Plugin-ArrayData/issues>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired

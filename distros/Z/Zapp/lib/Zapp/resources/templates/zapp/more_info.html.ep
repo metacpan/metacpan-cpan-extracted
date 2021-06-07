@@ -1,0 +1,8 @@
+<p>
+    <a class="btn btn-outline-secondary mt-2" data-toggle="collapse" href="#<%= stash 'id' %>" role="button" aria-expanded="false" aria-controls="<%= stash 'id' %>">
+        More Info...
+    </a>
+</p>
+<div class="collapse mt-0" id="<%= stash 'id' %>">
+    %= ref stash( 'content' ) eq 'CODE' ? stash( 'content' )->() : stash 'content'
+</div>

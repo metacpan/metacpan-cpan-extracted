@@ -5,24 +5,40 @@
       "Fletcher T. Penney <owner@fletcherpenney.net>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 4.300018, CPAN::Meta::Converter version 2.120921",
+   "generated_by" : "Dist::Zilla version 6.017, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "gpl_2"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "WebService-Simplenote",
    "prereqs" : {
       "build" : {
          "requires" : {
-            "Module::Build" : "0.3601"
+            "Module::Build" : "0.28"
          }
       },
       "configure" : {
          "requires" : {
-            "Module::Build" : "0.3601"
+            "Module::Build" : "0.28"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Pod::Coverage::TrustPod" : "0",
+            "Test::CPAN::Changes" : "0.19",
+            "Test::CPAN::Meta::JSON" : "0.16",
+            "Test::Kwalitee" : "1.21",
+            "Test::More" : "0.96",
+            "Test::Perl::Critic" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08",
+            "Test::Pod::LinkCheck" : "0",
+            "Test::Pod::No404s" : "0",
+            "strict" : "0",
+            "warnings" : "0"
          }
       },
       "runtime" : {
@@ -47,8 +63,9 @@
       },
       "test" : {
          "requires" : {
-            "File::Find" : "0",
-            "File::Temp" : "0",
+            "File::Spec" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
             "Test::More" : "0",
             "strict" : "0",
             "warnings" : "0"
@@ -60,49 +77,59 @@
       "bugtracker" : {
          "web" : "https://github.com/ioanrogers/WebService-Simplenote/issues"
       },
-      "homepage" : "http://metacpan.org/release/WebService-Simplenote/",
       "repository" : {
          "type" : "git",
          "url" : "git://github.com/ioanrogers/WebService-Simplenote.git",
          "web" : "https://github.com/ioanrogers/WebService-Simplenote"
       }
    },
-   "version" : "0.2.1",
+   "version" : "0.2.2",
    "x_BuiltWith" : {
       "modules" : {
-         "DateTime" : "0.75",
-         "File::Find" : "1.20",
-         "File::Temp" : "0.22",
-         "HTTP::Cookies" : "6.01",
-         "JSON" : "2.53",
-         "LWP::UserAgent" : "6.04",
-         "Log::Any" : "0.14",
-         "MIME::Base64" : "3.13",
-         "Method::Signatures" : "20120523",
-         "Module::Build" : "0.4",
-         "Moose" : "2.0602",
-         "Moose::Role" : "2.0602",
-         "Moose::Util::TypeConstraints" : "2.0602",
-         "MooseX::Types::DateTime" : "0.07",
-         "MooseX::Types::Path::Class" : "0.06",
-         "Test::More" : "0.98",
-         "Try::Tiny" : "0.11",
-         "namespace::autoclean" : "0.13",
-         "open" : "1.10",
-         "perl" : "NA(skipped: perl)",
-         "strict" : "1.07",
-         "warnings" : "1.13"
+         "DateTime" : "1.52",
+         "File::Spec" : "3.78",
+         "HTTP::Cookies" : "6.08",
+         "IO::Handle" : "1.42",
+         "IPC::Open3" : "1.21",
+         "JSON" : "4.03",
+         "LWP::UserAgent" : "6.49",
+         "Log::Any" : "1.708",
+         "MIME::Base64" : "3.15",
+         "Method::Signatures" : "20170211",
+         "Module::Build" : "0.4231",
+         "Moose" : "2.2013",
+         "Moose::Role" : "2.2013",
+         "Moose::Util::TypeConstraints" : "2.2013",
+         "MooseX::Types::DateTime" : "0.13",
+         "MooseX::Types::Path::Class" : "0.09",
+         "Pod::Coverage::TrustPod" : "0.100005",
+         "Test::CPAN::Changes" : "0.400002",
+         "Test::CPAN::Meta::JSON" : "0.16",
+         "Test::Kwalitee" : "1.28",
+         "Test::More" : "1.302181",
+         "Test::Perl::Critic" : "1.04",
+         "Test::Pod" : "1.52",
+         "Test::Pod::Coverage" : "1.10",
+         "Test::Pod::LinkCheck" : "0.008",
+         "Test::Pod::No404s" : "0.02",
+         "Try::Tiny" : "0.30",
+         "namespace::autoclean" : "0.29",
+         "open" : "1.12",
+         "strict" : "1.11",
+         "warnings" : "1.47"
       },
       "perl" : {
-         "original" : "v5.16.0",
+         "original" : "v5.32.0",
          "qv" : 1,
          "version" : [
             5,
-            16,
+            32,
             0
          ]
       },
       "platform" : "linux"
-   }
+   },
+   "x_generated_by_perl" : "v5.32.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.23",
+   "x_spdx_expression" : "GPL-2.0-only"
 }
-

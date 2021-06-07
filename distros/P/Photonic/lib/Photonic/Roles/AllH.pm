@@ -1,5 +1,5 @@
 package Photonic::Roles::AllH;
-$Photonic::Roles::AllH::VERSION = '0.015';
+$Photonic::Roles::AllH::VERSION = '0.016';
 
 =encoding UTF-8
 
@@ -9,7 +9,7 @@ Photonic::Roles::AllH
 
 =head1 VERSION
 
-version 0.015
+version 0.016
 
 =head1 COPYRIGHT NOTICE
 
@@ -48,14 +48,13 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA  02110-1301 USA
    my $haydock_as=$iter->as;
    my $haydock_bs=$iter->bs;
    my $haydock_b2s=$iter->b2s;
-   my $haydock_states=$iter->states;
 
 =over 4
 
 =item (for developers)
 
     package Photonic::LE::NR2::AllH;
-    $Photonic::LE::NR2::AllH::VERSION= '0.015';
+    $Photonic::LE::NR2::AllH::VERSION= '0.016';
     use namespace::autoclean;
     use Moose;
     has...
@@ -95,7 +94,7 @@ Store final state to file, if provided.
 
 =back
 
-=head1 ACCESORS (read only)
+=head1 ACCESSORS (read only)
 
 =over 4
 
@@ -142,10 +141,8 @@ Array of Haydock b coefficients squared
 =cut
 
 use Fcntl;
-use Machine::Epsilon;
 use Photonic::Iterator qw(:all);
 use PDL::Lite;
-use PDL::Complex;
 use PDL::NiceSlice;
 use IO::File;
 use Storable qw(store_fd fd_retrieve);
@@ -158,7 +155,7 @@ has nh=>(is=>'ro', required=>1,
 # Moved to Role below
 #has 'keepStates'=>(is=>'ro', required=>1, default=>0, writer=> '_keepStates',
 #         documentation=>'flag to keep Haydock states');
-has _states=>(is=>'ro', isa=>'ArrayRef[PDL::Complex]',
+has _states=>(is=>'ro', isa=>'ArrayRef[Photonic::Types::PDLComplex]',
          default=>sub{[]}, init_arg=>undef,
          documentation=>'Saved states');
 # why not pdl?
@@ -229,10 +226,6 @@ sub state_iterator {
     });
 }
 
-sub states {
-    croak "Don't use 'states'. Use state_iterator instead";
-}
-
 sub _build_stateFD {
     my $self=shift;
     my $fn=$self->stateFN;
@@ -245,11 +238,6 @@ sub _build_stateFD {
 
 #I use before and after trick (below), as a[n] is calculated together
 #with b[n+1] in each iteration
-
-#before 'states' => sub {
-#    my $self=shift;
-#    confess "Can't return states unless keepStates!=0" unless $self->keepStates;
-#};
 
 before '_iterate_indeed' => sub {
     my $self=shift;

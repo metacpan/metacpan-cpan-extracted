@@ -11,4 +11,6 @@ lib/Date/Holidays/TW.pm
 metamerge.json
 t/2017.t
 t/2018.t
+t/2021.t
+t/2022.t
 t/simple.t

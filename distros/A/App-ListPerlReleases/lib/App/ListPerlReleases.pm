@@ -1,13 +1,17 @@
 package App::ListPerlReleases;
 
-our $DATE = '2018-06-24'; # DATE
-our $VERSION = '0.001'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2021-05-29'; # DATE
+our $DIST = 'App-ListPerlReleases'; # DIST
+our $VERSION = '0.003'; # VERSION
 
 use 5.010001;
 use strict;
 use warnings;
 
 use Perinci::Sub::Gen::AccessTable qw(gen_read_table_func);
+# undetected
+use Sah::Schema::filename;
 
 use Exporter;
 our @ISA = qw(Exporter);
@@ -68,7 +72,7 @@ App::ListPerlReleases - List Perl releases
 
 =head1 VERSION
 
-This document describes version 0.001 of App::ListPerlReleases (from Perl distribution App-ListPerlReleases), released on 2018-06-24.
+This document describes version 0.003 of App::ListPerlReleases (from Perl distribution App-ListPerlReleases), released on 2021-05-29.
 
 =head1 SYNOPSIS
 
@@ -86,7 +90,7 @@ L<CPAN::Perl::Releases>.
 
 Usage:
 
- list_perl_releases(%args) -> [status, msg, result, meta]
+ list_perl_releases(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 List of Perl releases.
 
@@ -103,6 +107,10 @@ Arguments ('*' denotes required arguments):
 Return array of full records instead of just ID fields.
 
 By default, only the key (ID) field is returned per result entry.
+
+=item * B<exclude_fields> => I<array[str]>
+
+Select fields to return.
 
 =item * B<fields> => I<array[str]>
 
@@ -131,25 +139,49 @@ Order records according to certain field(s).
 A list of field names separated by comma. Each field can be prefixed with '-' to
 specify descending order instead of the default ascending.
 
-=item * B<tarball> => I<filename>
+=item * B<tarball> => I<str>
 
 Only return records where the 'tarball' field equals specified value.
 
-=item * B<tarball.in> => I<array[filename]>
+=item * B<tarball.contains> => I<str>
+
+Only return records where the 'tarball' field contains specified text.
+
+=item * B<tarball.in> => I<array[str]>
 
 Only return records where the 'tarball' field is in the specified values.
 
-=item * B<tarball.is> => I<filename>
+=item * B<tarball.is> => I<str>
 
 Only return records where the 'tarball' field equals specified value.
 
-=item * B<tarball.isnt> => I<filename>
+=item * B<tarball.isnt> => I<str>
 
 Only return records where the 'tarball' field does not equal specified value.
 
-=item * B<tarball.not_in> => I<array[filename]>
+=item * B<tarball.max> => I<str>
+
+Only return records where the 'tarball' field is less than or equal to specified value.
+
+=item * B<tarball.min> => I<str>
+
+Only return records where the 'tarball' field is greater than or equal to specified value.
+
+=item * B<tarball.not_contains> => I<str>
+
+Only return records where the 'tarball' field does not contain specified text.
+
+=item * B<tarball.not_in> => I<array[str]>
 
 Only return records where the 'tarball' field is not in the specified values.
+
+=item * B<tarball.xmax> => I<str>
+
+Only return records where the 'tarball' field is less than specified value.
+
+=item * B<tarball.xmin> => I<str>
+
+Only return records where the 'tarball' field is greater than specified value.
 
 =item * B<version> => I<str>
 
@@ -197,21 +229,22 @@ Only return records where the 'version' field is greater than specified value.
 
 =item * B<with_field_names> => I<bool>
 
-Return field names in each record (as hash/associative array).
+Return field names in each record (as hashE<sol>associative array).
 
 When enabled, function will return each record as hash/associative array
 (field name => value pairs). Otherwise, function will return each record
 as list/array (field value, field value, ...).
 
+
 =back
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
+($reason) is a string containing error message, or "OK" if status is
+200. Third element ($payload) is optional, the actual result. Fourth
+element (%result_meta) is called result metadata and is optional, a hash
 that contains extra information.
 
 Return value:  (any)
@@ -247,7 +280,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2018 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

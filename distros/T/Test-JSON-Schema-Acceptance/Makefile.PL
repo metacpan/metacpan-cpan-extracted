@@ -60,7 +60,7 @@ my %WriteMakefileArgs = (
     "open" => 0,
     "utf8" => 0
   },
-  "VERSION" => "1.008",
+  "VERSION" => "1.009",
   "test" => {
     "TESTS" => "t/*.t"
   }

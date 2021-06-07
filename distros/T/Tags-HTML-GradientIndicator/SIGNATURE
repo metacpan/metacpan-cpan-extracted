@@ -1,0 +1,54 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.87.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: RIPEMD160
+
+SHA256 25e0d852654598fa585c5b62273e739ed01f728b5b923e5923f60bea637197cb Changes
+SHA256 f33f8eb5d35cff4b5112076dfd242cd26621b558fb5a6625a7689cf82a1ecb31 GradientIndicator.pm
+SHA256 3d8aa7a1fd6fcaa5ffa6aa05c58d97639061d0ba5450bc73add5c0dd50136450 LICENSE
+SHA256 75fcc5ee8bde7f406a0cca2c34d02bfd7d89a0742dc42226dfaccd5d14120a9c MANIFEST
+SHA256 9e3930f12adac5c4bae0dd32f8cce1a069aec8fc1c8b4a4ae1c1a7af1a58247f META.yml
+SHA256 db4883f5bbdc83785597d432be999148f6db105b4e5ecf29e7fa66ca78b11463 Makefile.PL
+SHA256 3969094096324cbc292af3021a12d8d67e362be2b5a86b67d0845d66ec05d267 README
+SHA256 9dee9df0b1153faf5fbd70e5b3108e0f9e219d979ea183d560b1c8a552a3c218 examples/ex1.pl
+SHA256 7f515035c883a22ec0da3c40535a146a4099fc24bc81da37cd7c187128073df5 examples/ex2.pl
+SHA256 67d139199c03b8bf8447a5a62f0d0b6dc1bd5bf6dbe04de6d21998c577823ed6 inc/Module/Install.pm
+SHA256 8bd506c33fb78f10f6451413e931ca23541fcc4eebe05fcb7c7c9577341223c4 inc/Module/Install/AuthorRequires.pm
+SHA256 1b5430a46a35142ef8914d8c745196fca825defc9dfa7e389299bf294613825e inc/Module/Install/AuthorTests.pm
+SHA256 6ebcc53a161dd5dc0aae69e4704575f2b00181901d768a82e26722a309cfdbe4 inc/Module/Install/Base.pm
+SHA256 d3f8c839d03fd21c197d05362dbb277cd7cadb15da6390d124b61e851f15146e inc/Module/Install/Can.pm
+SHA256 e9e72e18921c10c87bc4ea4c20af83e52015b9f5775d00ac64073042403717ca inc/Module/Install/Fetch.pm
+SHA256 a7a681bf2c9eee58a372cb642ffe42b0301d1200432ba8de9f7791cd1ecc9827 inc/Module/Install/Makefile.pm
+SHA256 aa887fa65a5eb6bbd1805706ce298b3f3cd55b353ecfd37aa7d35ae419331a49 inc/Module/Install/Metadata.pm
+SHA256 53825bc78e4c910b888160bc148c8bc211be58e02b99c8edcbf4854f95faa049 inc/Module/Install/ReadmeFromPod.pm
+SHA256 26b166ff62aacdb55317d1659f160aa4935097eea9810ea980e6d747206b5dc0 inc/Module/Install/Win32.pm
+SHA256 5f73a6851a91ea44e65b924f918743ad6e860620ad7a38a39d0295e0c5652a9f inc/Module/Install/WriteAll.pm
+SHA256 f758eed3d27ea314bb6587837f917a6e61f63f765d0acd26f8382d613db9da39 t/Tags-HTML-GradientIndicator/01-use.t
+SHA256 a377dd9191beb6c4df5f0e41798c398cf96518d6250f7963fe0ca4d2dcc711bf t/Tags-HTML-GradientIndicator/02-version.t
+SHA256 f3bfb2bcd60624cb09ab1e16932771f2a93d23daf4b232d39de252c42947ca44 xt/Tags-HTML-GradientIndicator/01-pod_coverage.t
+SHA256 e35d09654ce6fa54340770584ebbeb88c0533877932452269200966d0d9557c2 xt/Tags-HTML-GradientIndicator/02-pod.t
+-----BEGIN PGP SIGNATURE-----
+
+iQGzBAEBAwAdFiEERTLc1QTxqWhVvPeegmqNLzlXaRcFAmC79x8ACgkQgmqNLzlX
+aRer/AwAn0HQDnbswxboehakHQguckCKpXNIK7NZiH8cQPFuefSbDvP+/yIw42rf
+0fz8GCLujpEyyKO8G+gV0R26uOksqsFZwU1TJznJBF29CIxjZS86+d3yM982rmd0
+KRfh4xWLIhPI5kUBH4bbuK43IJ97tcsX3f9do+3vm2+6pNOqwacFCNHg8PRpzJpm
+wMPZYKIG9RmIu8gSOZS+vSnUvdSxOdexinuEJlpfIArP0M3PHjtFh9CNvkjOl9Fl
+ADxYorIYMQ/ijilP7YmTn2jFqW822XBkZ6fEaAGr+avfDSvImjur2r8trsJWPgS7
+oPRaEaUW6bueKhVmB/vqH9PL8Vd2CpHmfYddZmUoKLUCbtJ9jJ+UM/oY0C24stS1
+UpRbUlcwuRQ/MBGnjrt8ggLJk/Fdr81n/E1hTcv59fKKjetqiOdty/m2QlK8aVOy
+ZlYfGSjag3yHEJWYQVZcazvdkdr9IXq1cvcur6QtzFru0Q1TcckzOD61n9Q48eXq
+F4oAgRXV
+=CO+2
+-----END PGP SIGNATURE-----

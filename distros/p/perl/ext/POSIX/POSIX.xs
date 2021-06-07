@@ -280,7 +280,7 @@ static int not_here(const char *s);
 #  define c99_rint	rintq
 #  define c99_round	roundq
 #  define c99_scalbn	scalbnq
-#  define c99_signbit	signbitq
+/* We already define Perl_signbit to signbitq in perl.h. */
 #  define c99_tgamma	tgammaq
 #  define c99_trunc	truncq
 #  define bessel_j0 j0q
@@ -331,9 +331,7 @@ static int not_here(const char *s);
 #  define c99_rint	rintl
 #  define c99_round	roundl
 #  define c99_scalbn	scalbnl
-#  ifdef HAS_SIGNBIT /* possibly bad assumption */
-#    define c99_signbit	signbitl
-#  endif
+/* We already define Perl_signbit in perl.h. */
 #  define c99_tgamma	tgammal
 #  define c99_trunc	truncl
 #else
@@ -376,9 +374,6 @@ static int not_here(const char *s);
 #  define c99_round	round
 #  define c99_scalbn	scalbn
 /* We already define Perl_signbit in perl.h. */
-#  ifdef HAS_SIGNBIT
-#    define c99_signbit	signbit
-#  endif
 #  define c99_tgamma	tgamma
 #  define c99_trunc	trunc
 #endif
@@ -420,6 +415,22 @@ static int not_here(const char *s);
 #  undef c99_scalbn
 #  undef c99_tgamma
 #  undef c99_trunc
+#endif
+
+/* The cc with NetBSD 8.0 and 9.0 claims to be a C11 hosted compiler,
+ * but doesn't define several functions required by C99, let alone C11.
+ * http://gnats.netbsd.org/53234
+ */
+#if defined(USE_LONG_DOUBLE) && defined(__NetBSD__) \
+  && !defined(NETBSD_HAVE_FIXED_LONG_DOUBLE_MATH)
+#  undef c99_expm1
+#  undef c99_lgamma
+#  undef c99_log1p
+#  undef c99_log2
+#  undef c99_nexttoward
+#  undef c99_remainder
+#  undef c99_remquo
+#  undef c99_tgamma
 #endif
 
 #ifndef isunordered
@@ -561,9 +572,6 @@ static int not_here(const char *s);
 #endif
 #ifndef HAS_SCALBN
 #  undef c99_scalbn
-#endif
-#ifndef HAS_SIGNBIT
-#  undef c99_signbit
 #endif
 #ifndef HAS_TGAMMA
 #  undef c99_tgamma
@@ -1317,7 +1325,7 @@ static NV_PAYLOAD_TYPE S_getpayload(NV nv)
 #ifdef NV_PAYLOAD_DEBUG
     Perl_warn(aTHX_ "a[%d] = %" UVxf "\n", i, a[i]);
 #endif
-    payload *= UV_MAX;
+    payload *= (NV) UV_MAX;
     payload += a[i];
   }
 #ifdef NV_PAYLOAD_DEBUG
@@ -1408,9 +1416,9 @@ char *tzname[] = { "" , "" };
 #  define setuid(a)		not_here("setuid")
 #  define setgid(a)		not_here("setgid")
 #endif	/* NETWARE */
-#ifndef USE_LONG_DOUBLE
+#if !defined(USE_LONG_DOUBLE) && !defined(USE_QUADMATH)
 #  define strtold(s1,s2)	not_here("strtold")
-#endif  /* USE_LONG_DOUBLE */
+#endif  /* !(USE_LONG_DOUBLE) && !(USE_QUADMATH) */
 #else
 
 #  ifndef HAS_MKFIFO
@@ -1543,13 +1551,13 @@ END_EXTERN_C
 #endif
 
 #if ! defined(HAS_MBLEN) && ! defined(HAS_MBRLEN)
-#define mblen(a,b) not_here("mblen")
+#  define mblen(a,b) not_here("mblen")
 #endif
 #if ! defined(HAS_MBTOWC) && ! defined(HAS_MBRTOWC)
-#define mbtowc(pwc, s, n) not_here("mbtowc")
+#  define mbtowc(pwc, s, n) not_here("mbtowc")
 #endif
-#ifndef HAS_WCTOMB
-#define wctomb(s, wchar) not_here("wctomb")
+#if ! defined(HAS_WCTOMB) && ! defined(HAS_WCRTOMB)
+#  define wctomb(s, wchar) not_here("wctomb")
 #endif
 #if !defined(HAS_MBLEN) && !defined(HAS_MBSTOWCS) && !defined(HAS_MBTOWC) && !defined(HAS_WCSTOMBS) && !defined(HAS_WCTOMB)
 /* If we don't have these functions, then we wouldn't have gotten a typedef
@@ -1562,7 +1570,7 @@ END_EXTERN_C
 #endif
 #endif
 
-#ifndef HAS_LOCALECONV
+#if ! defined(HAS_LOCALECONV) && ! defined(HAS_LOCALECONV_L)
 #   define localeconv() not_here("localeconv")
 #else
 struct lconv_offset {
@@ -1788,6 +1796,7 @@ fix_win32_tzenv(void)
     char* newenv;
     const char* perl_tz_env = win32_getenv("TZ");
     const char* crt_tz_env = getenv("TZ");
+
     if (perl_tz_env == NULL)
         perl_tz_env = "";
     if (crt_tz_env == NULL)
@@ -2158,8 +2167,7 @@ localeconv()
 	sv_2mortal((SV*)RETVAL);
 #  if defined(USE_ITHREADS)                         \
    && defined(HAS_POSIX_2008_LOCALE)                \
-   && defined(HAS_LOCALECONV_L)                     \
-   && defined(HAS_DUPLOCALE)
+   && defined(HAS_LOCALECONV_L)
 
         cur = uselocale((locale_t) 0);
         if (cur == LC_GLOBAL_LOCALE) {
@@ -2169,8 +2177,8 @@ localeconv()
 
         lcbuf = localeconv_l(cur);
 #  else
-        LOCALE_LOCK_V;  /* Prevent interference with other threads using
-                           localeconv() */
+        LOCALECONV_LOCK;    /* Prevent interference with other threads using
+                               localeconv() */
 #    ifdef TS_W32_BROKEN_LOCALECONV
         /* This is a workaround for a Windows bug prior to VS 15, in which
          * localeconv only looks at the global locale.  We toggle to the global
@@ -2255,7 +2263,7 @@ localeconv()
         Safefree(save_global);
         Safefree(save_thread);
 #    endif
-        LOCALE_UNLOCK_V;
+        LOCALECONV_UNLOCK;
 #  endif
         RESTORE_LC_NUMERIC();
 #endif  /* HAS_LOCALECONV */
@@ -2610,16 +2618,7 @@ fpclassify(x)
 	    break;
 	case 8:
 	default:
-#ifdef Perl_signbit
 	    RETVAL = Perl_signbit(x);
-#else
-	    RETVAL = (x < 0);
-#ifdef DOUBLE_IS_IEEE_FORMAT
-            if (x == -0.0) {
-              RETVAL = TRUE;
-            }
-#endif
-#endif
 	    break;
 	}
     OUTPUT:
@@ -2975,7 +2974,6 @@ sigaction(sig, optaction, oldaction = 0)
 # interface look beautiful, which is hard.
 
 	{
-	    dVAR;
 	    POSIX__SigAction action;
 	    GV *siggv = gv_fetchpvs("SIG", GV_ADD, SVt_PVHV);
 	    struct sigaction act;
@@ -3361,9 +3359,9 @@ mblen(s, n = ~0)
             memzero(&PL_mbrlen_ps, sizeof(PL_mbrlen_ps));
             RETVAL = 0;
 #else
-            LOCALE_LOCK;
+            MBLEN_LOCK;
             RETVAL = mblen(NULL, 0);
-            LOCALE_UNLOCK;
+            MBLEN_UNLOCK;
 #endif
         }
         else {  /* Not resetting state */
@@ -3383,9 +3381,9 @@ mblen(s, n = ~0)
 #else
                 /* Locking prevents races, but locales can be switched out
                  * without locking, so this isn't a cure all */
-                LOCALE_LOCK;
+                MBLEN_LOCK;
                 RETVAL = mblen(string, len);
-                LOCALE_UNLOCK;
+                MBLEN_UNLOCK;
 #endif
             }
         }
@@ -3412,9 +3410,9 @@ mbtowc(pwc, s, n = ~0)
             memzero(&PL_mbrtowc_ps, sizeof(PL_mbrtowc_ps));
             RETVAL = 0;
 #else
-            LOCALE_LOCK;
+            MBTOWC_LOCK;
             RETVAL = mbtowc(NULL, NULL, 0);
-            LOCALE_UNLOCK;
+            MBTOWC_UNLOCK;
 #endif
         }
         else {  /* Not resetting state */
@@ -3433,9 +3431,9 @@ mbtowc(pwc, s, n = ~0)
 #else
                 /* Locking prevents races, but locales can be switched out
                  * without locking, so this isn't a cure all */
-                LOCALE_LOCK;
+                MBTOWC_LOCK;
                 RETVAL = mbtowc(&wc, string, len);
-                LOCALE_UNLOCK;
+                MBTOWC_UNLOCK;
 #endif
                 if (RETVAL >= 0) {
                     sv_setiv_mg(pwc, wc);
@@ -3467,9 +3465,9 @@ wctomb(s, wchar)
              * But probably memzero would too */
             RETVAL = wcrtomb(NULL, L'\0', &PL_wcrtomb_ps);
 #else
-            LOCALE_LOCK;
+            WCTOMB_LOCK;
             RETVAL = wctomb(NULL, L'\0');
-            LOCALE_UNLOCK;
+            WCTOMB_UNLOCK;
 #endif
         }
         else {  /* Not resetting state */
@@ -3479,9 +3477,9 @@ wctomb(s, wchar)
 #else
             /* Locking prevents races, but locales can be switched out without
              * locking, so this isn't a cure all */
-            LOCALE_LOCK;
+            WCTOMB_LOCK;
             RETVAL = wctomb(buffer, wchar);
-            LOCALE_UNLOCK;
+            WCTOMB_UNLOCK;
 #endif
             if (RETVAL >= 0) {
                 sv_setpvn_mg(s, buffer, RETVAL);

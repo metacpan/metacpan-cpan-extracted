@@ -10,8 +10,7 @@ our $VERSION = '0.1';
 
 
 
-app_exclude 'App::Git::IssueManager::Config';
-
+app_exclude 'App::Git::IssueManager::Config','App::Git::IssueManager::Webinterface';
 1;
 
 __END__
@@ -26,7 +25,7 @@ App::Git::IssueManager - main MooseX class for git issue manager
 
 =head1 VERSION
 
-version 0.1
+version 0.2
 
 =head1 DESCRIPTION
 

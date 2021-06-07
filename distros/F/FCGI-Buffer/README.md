@@ -9,7 +9,7 @@ FCGI::Buffer - Verify, Cache and Optimise FCGI Output
 
 # VERSION
 
-Version 0.15
+Version 0.16
 
 # SYNOPSIS
 
@@ -65,6 +65,7 @@ But that's simple:
 To temporarily prevent the use of server-side caches, for example whilst
 debugging before publishing a code change, set the NO\_CACHE environment variable
 to any non-zero value.
+This will also stop ETag being added to the header.
 If you get errors about Wide characters in print it means that you've
 forgotten to emit pure HTML on non-ascii characters.
 See [HTML::Entities](https://metacpan.org/pod/HTML%3A%3AEntities).
@@ -294,5 +295,5 @@ The licence for cgi\_buffer is:
 
     This software is provided 'as is' without warranty of any kind."
 
-The rest of the program is Copyright 2015-2020 Nigel Horne,
+The rest of the program is Copyright 2015-2021 Nigel Horne,
 and is released under the following licence: GPL2

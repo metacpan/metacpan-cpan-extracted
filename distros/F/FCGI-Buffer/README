@@ -1,4 +1,4 @@
-FCGI-Buffer Version 0.14
+FCGI-Buffer Version 0.16
 
 INSTALLATION
 
@@ -29,6 +29,6 @@ You can also look for information at:
 
 LICENSE AND COPYRIGHT
 
-Copyright (C) 2015-2020 Nigel Horne
+Copyright (C) 2015-2021 Nigel Horne
 
 This program is released under the following licence: GPL2

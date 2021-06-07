@@ -27,9 +27,10 @@ my %WriteMakefileArgs = (
   "TEST_REQUIRES" => {
     "File::Spec" => 0,
     "Module::Metadata" => 0,
-    "Test::More" => 0
+    "Test::More" => 0,
+    "Test::Most" => 0
   },
-  "VERSION" => "v0.2.1",
+  "VERSION" => "v0.2.2",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -43,6 +44,7 @@ my %FallbackPrereqs = (
   "Package::Stash" => 0,
   "Scalar::Util" => 0,
   "Test::More" => 0,
+  "Test::Most" => 0,
   "overload" => 0,
   "strict" => 0,
   "warnings" => 0

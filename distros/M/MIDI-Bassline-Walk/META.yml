@@ -7,6 +7,7 @@ build_requires:
   IO::Handle: '0'
   IPC::Open3: '0'
   Moo: '2'
+  Music::Chord::Note: '0.10'
   Test::More: '0.88'
   perl: '5.006'
   strict: '0'
@@ -26,7 +27,7 @@ requires:
   Data::Dumper::Compact: '0'
   List::Util: '0'
   Moo: '2'
-  Music::Chord::Note: '0'
+  Music::Chord::Note: '0.10'
   Music::Note: '0'
   Music::Scales: '0'
   Music::VoiceGen: '0'
@@ -36,7 +37,7 @@ requires:
 resources:
   homepage: https://github.com/ology/MIDI-Bassline-Walk
   repository: https://github.com/ology/MIDI-Bassline-Walk.git
-version: '0.0101'
+version: '0.0207'
 x_Dist_Zilla:
   perl:
     version: '5.032001'
@@ -217,8 +218,10 @@ x_Dist_Zilla:
             - lib
           spell_cmd: 'aspell list'
           stopwords:
+            - DAW
             - bassline
             - basslines
+            - pentatonic
           wordlist: Pod::Wordlist
       name: Test::PodSpelling
       version: '2.007005'
@@ -235,7 +238,8 @@ x_Dist_Zilla:
       config:
         Dist::Zilla::Plugin::GatherDir:
           exclude_filename: []
-          exclude_match: []
+          exclude_match:
+            - \.mid
           follow_symlinks: 0
           include_dotfiles: 0
           prefix: ''

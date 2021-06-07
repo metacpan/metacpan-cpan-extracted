@@ -1,3 +1,11 @@
+0.20 2021-05-30
+- also export mpinv
+- fix RedoDimsCode for native-complex
+- fix matrix-multiplication overload to work with native-complex
+
+0.19 2021-05-24
+- change to PDL 2.047 with native complex i()
+
 0.18 2021-05-03
 - stop loading PDL::Complex and overriding PDL:: functions
 

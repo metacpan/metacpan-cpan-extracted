@@ -19,6 +19,7 @@ lib/File/Serialize/Serializer/Data/Dumper.pm
 lib/File/Serialize/Serializer/JSON/MaybeXS.pm
 lib/File/Serialize/Serializer/JSON5.pm
 lib/File/Serialize/Serializer/JSONY.pm
+lib/File/Serialize/Serializer/Markdown.pm
 lib/File/Serialize/Serializer/TOML.pm
 lib/File/Serialize/Serializer/XML/Simple.pm
 lib/File/Serialize/Serializer/YAML/Tiny.pm
@@ -31,6 +32,7 @@ t/basic.t
 t/corpus/foo.json
 t/corpus/foo.json5
 t/corpus/foo.jsony
+t/corpus/foo.md
 t/corpus/foo.pl
 t/corpus/foo.toml
 t/corpus/foo.xml
@@ -40,8 +42,10 @@ t/corpus/non-ref.json
 t/corpus/time.json5
 t/defaults.t
 t/json-allow-non-ref.t
+t/markdown.t
 t/precedence.t
 t/serializer.t
 t/transerialize.t
+t/utf8-yaml.t
 t/utf8.t
 xt/release/unused-vars.t

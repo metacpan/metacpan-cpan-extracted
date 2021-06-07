@@ -4,14 +4,12 @@ BEGIN
     use strict;
     use warnings;
     use Test::More qw( no_plan );
-    # use Nice::Try debug => 6, debug_file => './dev/debug_loop.pl', debug_code => 1;
-    use IO::File;
     use Nice::Try;
     use Want;
     our $DEBUG = 0;
 };
 
-local $check_type = sub{ is( $_[0], $_[1], "context returned type -> $_[0]" ); };
+local $check_type = sub{ is( $_[1], $_[0], "context returned type -> $_[0]" ); };
 my $val = try_me( 'Coucou !', $check_type => 'scalar' );
 is( $val, 'Coucou !', 'scalar context' );
 
@@ -101,7 +99,9 @@ sub try_me
         {
             diag( "Called in glob context" ) if( $DEBUG );
             $cb->( $expect => 'glob' );
-            return( IO::File->new );
+            my $ref;
+            open( my $fh, '>', \$ref );
+            return( $fh );
         }
         elsif( Want::want( 'SCALAR REF' ) )
         {
@@ -176,7 +176,9 @@ sub catch_me
         {
             diag( "Called in glob context" ) if( $DEBUG );
             $cb->( $expect => 'glob' );
-            return( IO::File->new );
+            my $ref;
+            open( my $fh, '>', \$ref );
+            return( $fh );
         }
         elsif( Want::want( 'SCALAR REF' ) )
         {

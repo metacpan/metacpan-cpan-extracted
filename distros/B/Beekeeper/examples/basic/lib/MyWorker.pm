@@ -10,7 +10,7 @@ use base 'Beekeeper::Worker';
 sub on_startup {
     my $self = shift;
 
-    $self->accept_jobs(
+    $self->accept_remote_calls(
         'myapp.str.uc' => 'uppercase',
     );
 }
@@ -18,7 +18,7 @@ sub on_startup {
 sub authorize_request {
     my ($self, $req) = @_;
 
-    return REQUEST_AUTHORIZED;
+    return BKPR_REQUEST_AUTHORIZED;
 }
 
 sub uppercase {

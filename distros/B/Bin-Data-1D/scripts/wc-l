@@ -1,0 +1,213 @@
+#!/usr/bin/perl
+use 5.001 ; use strict ; use warnings ; # 5.014 で動作確認済み
+use autodie qw[ open ] ; 
+use Getopt::Std ; getopts 'bd:gsnrz=~!3":' , \my%o ;
+use Term::ANSIColor qw/:constants color / ; $Term::ANSIColor::AUTORESET = 1 ;
+use Scalar::Util qw[ dualvar ] ; # <-- dualvar の利用は、あまり好ましくない可能性はある。試しに使ってみた。
+use FindBin qw [ $Script ] ; 
+
+use Encode qw[ decode ] ; 
+use Encode::JP ; 
+
+eval "use PerlIO::gzip;1" or die "Can't import PerlIO::gzip despite -z instruction. ($Script)\n" if $o{z} ; 
+
+sub main ( ) ; # 入力を順次処理する
+sub eachFile ( $ ) ; # 引数で指定された各ファイルを処理して、行数を返す。
+sub lineNum ( $ ) ; # (各ファイルから与えられる) ファイルハンドルから、行数を返す。
+sub sigint ( ) ; # Ctrl-C が押下された時の処理
+sub hhmmss ( ) ; # 現在時刻を yyyy-mm-dd HH:MM:SS の形で返す。
+sub cyc_rep ( ) ;
+
+$/ = "\r\n" if $o{r} ;
+#$/ = "" ;
+$| = 1 if $o{'!'} ; 
+* CYAN = * BRIGHT_CYAN = * BLUE = * BRIGHT_BLUE = sub { @_ } if $o{b} ; # <-- TRICKY A LITTLE.
+
+my ($time0, $time00) = (time) x 2 ; 
+my $cyc_sec = $o{'"'} // 10 ; # 何行毎にレポートを発生させるか。
+my $cyc_last_line  ; # 
+
+my $noLineEnd = 0 ; # 行末の文字が改行(正確には $/ ) に一致しなかったファイルの個数
+my $dirnum = 0 ; # ディレクトリの個数
+my $fn ; # 読んでいるファイルの名前
+my $FH ; # ファイルハンドル
+
+main ;
+exit 0 ;
+
+sub main ( ) { 
+  my $time00 = time ; 
+  my $total_lines = 0  ; # 全ファイルの行数の合計
+  @ARGV = ( '-' ) unless @ARGV ; 
+
+  $SIG{INT} = \& sigint ; ## \sigint
+  $total_lines += eachFile $_ for @ARGV ; 
+  * BLUE = * BRIGHT_BLUE ; # <-- - TRICKY ! 
+  #my $fn ; # 合計の項目であることを表す文字列
+  $fn = (scalar @ARGV - $dirnum). " files" ; 
+  $fn .= " plus $dirnum directories" if $dirnum > 0 ;
+  $fn = "[- $fn -]" ;
+  out1line ( dualvar ($total_lines , -"$noLineEnd" )  , $fn , $time00 ) if @ARGV >= 2 ; # 1個しか入力が無い場合は出さない。
+}    
+
+# 各ファイルに対し、dualvarで行数とEOF状態を返す。ファイル名から行数を返す関数を起動し、それを出力する関数を起動する。
+sub eachFile ( $ ) { 
+  my $time0 = time ; 
+  $fn = $_[0] ;
+
+  # ファイルハンドラを設定。"-" なら標準入力。 
+  if ( $_[0] ne "-" )  {
+    if ( ! $o{g} ) { 
+        open $FH , '<' , $_[0] 
+      } else { 
+        open $FH , '-|' , 'gzcat' , $_[0] ; 
+        #open $FH [ $_ ] , '-|' , 'gzcat' , $ARGV[$_] ; # open $FH, "gzcat '$ARGV[$_]' |" より良いと思った
+      }
+  } else { 
+    $FH = * STDIN 
+  } ; 
+
+  binmode $FH , ":gzip(gzip)" if $o{z} ; 
+
+  my $header = <$FH> if $o{'='} ; # <-- 一応意味はある。-+ スイッチオプションで対応できないか? 
+  my $ret = lineNum $FH ; 
+  out1line ( $ret , $fn , $time0 ) ; 
+  return $ret  ; 
+}
+
+#  ファイルハンドラから行数を返す。
+sub lineNum ( $ )  {
+  my $last_count = $. ; 
+  my $FH = $_[0] ;
+  my $count = 0 ;
+  my $final_line = '' ; # 次の行で何も読み取れない場合の対策として、 ''  を代入。
+  if ( -d $_[0] ) { $dirnum++ ; return dualvar (0, 'dir.') } ; 
+  $SIG{ALRM} = sub { cyc_rep ; alarm $cyc_sec } ; 
+  alarm $cyc_sec ; 
+  while ( <$FH> ) { $final_line = $_ }; 
+  $count = $. - $last_count ; # 高速化のため、直前のループで数えることはやめた。
+  alarm 0 ;
+  #$cyc_last_line = 0 ; # <-- 場所はここで良かったのだろうか
+  #$. = 0 ;
+  unless ( chomp $final_line ) { $noLineEnd ++ ; return dualvar $count , $count ? '-1' : '-0'  } ; 
+  return dualvar $count , '' ; # <-- 改行で終わっていれば、空文字を文字列コンテクストの部分に与える。
+}
+
+# 出力する各行についての処理。
+sub out1line ( $$$ ) { # 引数は、$ret , $fn , $time0 
+  my @out ; 
+  my $lines = $_[0] + 0 ; # Util::Scalar による dualvar 形式の値から、数コンテキストで数を取り出す。
+  $lines =~ s/(?<=\d)(?=(\d\d\d)+($|\D))/,/g if $o{3} ; # 3桁毎にコンマで区切る
+  $lines = substr ( ' ' x $o{d} . $lines , - $o{d} , $o{d} ) if $o{d} ;
+  push @out , $lines if ! $o{'~'} ; 
+  push @out , $_[1]       if ! $o{n}  ; # ファイル名
+  push @out , $lines if $ o{'~'} ; 
+  do { my $sec = time - $_[2] ; my $dt = hhmmss ; push @out , BLUE "[${sec} sec. $dt]" } if ! $o{s} ; 
+  push @out , $_[0] . '' if $_[0] ne "0" ; # dualvar だから .'' の操作で文字列を抽出する必要がある。 
+  print join ( "\t" , grep { $_ ne '' } @out ) , "\n" ; 
+}
+
+# Ctrl-C が押下された時の処理
+sub sigint ( ) {
+  alarm 0 ;
+  print STDERR YELLOW sprintf ( "  [ %0.3e ]-th line in [ $fn ]", $. ) , " read by '$Script'. " . hhmmss . "\n" ;
+  $SIG{INT} = sub { print STDERR BRIGHT_YELLOW "  $. [ $fn ] " , "'$Script' " , hhmmss , "\n" ; close $FH ; exit 130 } ;
+  alarm 1 ;
+  my $tmp = $SIG{ALRM} ; 
+  $SIG{ALRM} = sub { $SIG{INT} = \& sigint ; $SIG{ALRM} = $tmp ; alarm $cyc_sec } ; # <-- perl 由来のトラブルが起きませんように。
+}
+
+# 現在時刻を HH:MM:SS の形で返す。
+sub hhmmss ( ) {
+  my @f = @{[localtime]}[5,4,3,2,1,0] ;
+  $f[0] += 1900 ;
+  $f[1] += 1 ;
+  return sprintf ( "%02u:%02u:%02u" , @f[3..5] ) ;
+  #return sprintf ( "%04u-%02u-%02u %02u:%02u:%02u" , @f ) ;
+}
+
+sub cyc_rep ( ) {
+    use FindBin '$Script' ;
+    $| = 1 ; 
+    my $num = $. ; 
+    my $diff = ' (+' . ( $num - $cyc_last_line )  . ')' if defined $cyc_last_line ; 
+    $cyc_last_line = $num ; 
+    $num =~ s/(?<=\d)(?=(\d\d\d)+($|\D))/,/g ; # 3桁毎にコンマで区切る
+    $diff =~ s/(?<=\d)(?=(\d\d\d)+($|\D))/,/g if defined $diff ; 
+    $diff //= '' ; 
+    print STDERR GREEN $num , $diff , ":\t" , sprintf "%02d:%02d:%02d" , ( localtime )[2,1,0] ;  #  <-- 標準出力に書込み
+    print STDERR "\t" , GREEN  time - $time0 , " sec.\t($Script)" ; 
+    chomp (my $line_tmp = $_ ) ; 
+    print STDERR BLUE "\t Read Input:\t" , $line_tmp ; 
+    $time0 = time ;
+    print STDERR "\n" ;
+}
+
+## ヘルプの扱い
+sub VERSION_MESSAGE {}
+sub HELP_MESSAGE {
+    use FindBin qw[ $Script ] ; 
+    $ARGV[1] //= '' ;
+    open my $FH , '<' , $0 ;
+    while(<$FH>){
+        s/\$0/$Script/g ;
+        print $_ if s/^=head1// .. s/^=cut// and $ARGV[1] =~ /^o(p(t(i(o(ns?)?)?)?)?)?$/i ? m/^\s+\-/ : 1;
+    }
+    close $FH ;
+    exit 0 ;
+}
+
+=encoding utf8
+
+=head1
+
+  $0
+
+  Unix の  wc -l の代替。行数を出力する。
+
+  引数などで指定されたファイルが、改行区切り文字無しで終了していた場合は-1
+  を各行末に追加で出力する。ただし、空文字列で改行なしの場合は-0を出力に追加する。
+  これは、分割されたファイルの合計行数を計算したい時に使える機能である。
+
+  なお、Ctrl+C が押下された場合、途中の状態を表示して、元に戻る。
+  1秒以内に再び、Ctrl+C が押下された場合のみ、プログラムは停止する。
+
+ オプション:
+
+  [行数の出力の数としての書式]
+    -3 ; 行数の出力に3桁毎にコンマを挿入する。
+    -d num ; 行数を出力する列の幅を指定する。そして、右詰めにして読みやすくする。
+
+  [出力する他の情報と色]
+    -b : 色を付けない
+    -n : 各入力を処理する際に、ファイル名や標準入力の別を表示しない。(Number only)
+    -s : ファイル名と行数は表示するが、時刻情報は出さない。(Simple)
+    -! ; 出力をバッファに貯めない。
+    -\" num ; num秒ごとに何行を読み取ったかを標準エラー出力に出力する。未指定なら10秒。0を指定すると非出力。
+
+  [入力の仕方の指定]
+    -= : 最初の行を計数対象としない。
+    -r ; 改行文字を "\r\n" に変更。エクセルからエクスポートした時に便利。(未指定なら、"\n"。)
+    -z : 入力を gzip 圧縮の形式として処理する。
+    -g ; 入力を gzcat コマンドを利用して処理する。-z より高速だが、標準入力には現状使えない。
+
+    --help : この $0 のヘルプメッセージを出す。  perldoc -t $0 | cat でもほぼ同じ。
+    --help opt : オプションのみのヘルプを出す。opt以外でも options と先頭が1文字以上一致すれば良い。
+ 
+ テスト:
+    seq 10 | gzip -c | $0
+      # -z 指定で　gzip 圧縮を受け取れるか試験。
+    $0  <( yes )
+      #  上記のコマンドを実行する。Ctrl-Cを続けて2秒以内に押下すると、止まる。
+      #  yes | $0  だと、うまくいかない。
+      # Ctrl-C の受け取り方が、パイプの前のコマンドと
+      # プロセス置換 <( ) とで異なるため。
+
+  注意点: 
+   * Unixコマンドは、最後に改行文字で終了しない行は数えない。
+    このコマンド $0 はそのような行も数える。従って、その場合、数に違いが出るる
+  開発上のメモ: 
+   * 全体の合計値において、改行で終わらなかったファイルの個数と、concat した場合の差はまた別のロジックを
+     要する。-1 または -0 を出力した値のそれらの合計と共に出すようにする必要がある。
+
+=cut

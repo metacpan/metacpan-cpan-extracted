@@ -3,8 +3,8 @@ NAME
     Acme::CPANModules
 
 VERSION
-    This document describes version 0.004 of App::CPANModulesUtils (from
-    Perl distribution App-CPANModulesUtils), released on 2020-02-13.
+    This document describes version 0.005 of App::CPANModulesUtils (from
+    Perl distribution App-CPANModulesUtils), released on 2021-05-19.
 
 SYNOPSIS
 DESCRIPTION
@@ -16,6 +16,8 @@ DESCRIPTION
     *   draw-feature-matrix-from-acme-cpanmodules-module
 
     *   gen-acme-cpanmodules-module-from-acme-cpanlists-list
+
+    *   gen-acme-cpanmodules-module-from-webpage
 
 FUNCTIONS
   acme_cpanmodules_for
@@ -97,6 +99,45 @@ FUNCTIONS
 
     Return value: (any)
 
+  gen_acme_cpanmodules_module_from_webpage
+    Usage:
+
+     gen_acme_cpanmodules_module_from_webpage(%args) -> [status, msg, payload, meta]
+
+    Generate an Acme::CPANModules module file a webpage.
+
+    This routine will download the webpage, extract the links in it, extract
+    the CPAN modules mentioned in the links, and use the extracted CPAN
+    modules as entries for the Acme::CPANModules module.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   output_file => *filename*
+
+        will default to "lib/Acme/CPANModules/<YourModuleName>.pm
+
+    *   output_module* => *perl::modname*
+
+        "Acme::CPANModules::" will be prepended if module name does not
+        begin with it.
+
+    *   overwrite => *true*
+
+    *   url* => *str*
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (payload) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
 HOMEPAGE
     Please visit the project's homepage at
     <https://metacpan.org/release/App-CPANModulesUtils>.
@@ -107,7 +148,7 @@ SOURCE
 
 BUGS
     Please report any bugs or feature requests on the bugtracker website
-    <https://rt.cpan.org/Public/Dist/Display.html?Name=App-CPANModulesUtils>
+    <https://github.com/perlancar/perl-App-CPANModulesUtils/issues>
 
     When submitting a bug or request, please include a test-file or a patch
     to an existing test-file that illustrates the bug or desired feature.
@@ -119,7 +160,8 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2020, 2019, 2018 by perlancar@cpan.org.
+    This software is copyright (c) 2021, 2020, 2019, 2018 by
+    perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

@@ -1,0 +1,1 @@
+[% IF binding.incomplete %]#[% END %]$ffi->attach( [% IF binding.perl_name %][[% binding.name %] => '[% binding.perl_name %]'][% ELSE %][% binding.name %][% END %] => [[% FOREACH arg IN binding.arg_types %][% arg | type %][% UNLESS loop.last %], [% END %][% END %]][% IF binding.ret_type != 'void' %] => [% binding.ret_type | type %][% END %] );

@@ -1,5 +1,5 @@
 package Photonic::WE::S::Metric;
-$Photonic::WE::S::Metric::VERSION = '0.015';
+$Photonic::WE::S::Metric::VERSION = '0.016';
 
 =encoding UTF-8
 
@@ -9,7 +9,7 @@ Photonic::WE::S::Metric
 
 =head1 VERSION
 
-version 0.015
+version 0.016
 
 =head1 COPYRIGHT NOTICE
 
@@ -66,7 +66,7 @@ $k. $q and $k are real.
 
 =back
 
-=head1 ACCESORS (read only)
+=head1 ACCESSORS (read only)
 
 =over 4
 
@@ -86,9 +86,9 @@ use PDL::Lite;
 use PDL::MatrixOps;
 use PDL::NiceSlice;
 use PDL::Complex;
-use List::Util;
 use Carp;
 use Photonic::Types;
+use Photonic::Utils qw(any_complex);
 use Moose;
 use MooseX::StrictConstructor;
 
@@ -107,12 +107,11 @@ sub _value {
     my $q=$self->wavenumber;
     my $eps=$self->epsilon;
     my $k=$self->wavevector;
-    if($eps->isa('PDL::Complex') || $k->isa('PDL::Complex')
-       || $q->isa('PDL::Complex')) { #complex metric
+    if(any_complex($eps, $k, $q)) { #complex metric
 	#Make all complex
 	$_ = $_->isa('PDL::Complex') ? $_ : r2C($_) for $q, $k, $eps;
 	croak "Wave vector must be ".$self->ndims."-dimensional vector" unless
-	    [$k->dims]->[1]==$self->ndims and $k->ndims==2;
+	    $k->dim(1)==$self->ndims and $k->ndims==2;
 	my ($kPG, $kMG) = ($k+$G, $k-$G); #ri:xy:nx:ny
 	# (k+G)(k+G) diad
 	my ($kPGkPG, $kMGkMG) = map {$_->(:,:,*1)*$_->(:,*1,:)}
@@ -129,7 +128,7 @@ sub _value {
 	return $gGG;
     }
     croak "Wave vector must be ".$self->ndims."-dimensional vector" unless
-	[$k->dims]->[0]==$self->ndims and $k->ndims==1;
+	$k->dim(0)==$self->ndims and $k->ndims==1;
     #might generalize to complex k
     my ($kPG, $kMG) = ($k+$G, $k-$G); #xy:nx:ny
     # (k+G)(k+G) diad

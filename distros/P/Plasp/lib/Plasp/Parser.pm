@@ -301,7 +301,7 @@ sub _code_tag_encode {
 
     if ( defined $data ) {
         $data =~ s@\<\%(.*?)\%\>
-            @ { '[-AsP-[' . encode_entities( $1 ) . ']-AsP-]'; } @esgx;
+            @ { '[-AsP-[' . encode_entities( $1, q(<>&"') ) . ']-AsP-]'; } @esgx;
     }
     return $data;
 }

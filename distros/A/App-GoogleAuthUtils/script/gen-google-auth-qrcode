@@ -1,11 +1,12 @@
 #!perl
 
 # Note: This script is a CLI for Riap function /App/GoogleAuthUtils/gen_google_auth_qrcode
-# and generated automatically using Perinci::CmdLine::Gen version 0.485
+# and generated automatically using Perinci::CmdLine::Gen version 0.498
 
-our $DATE = '2018-04-18'; # DATE
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2021-05-25'; # DATE
 our $DIST = 'App-GoogleAuthUtils'; # DIST
-our $VERSION = '0.004'; # VERSION
+our $VERSION = '0.005'; # VERSION
 
 use 5.010001;
 use strict;
@@ -37,13 +38,15 @@ gen-google-auth-qrcode - Generate Google authenticator QR code (barcode) from a 
 
 =head1 VERSION
 
-This document describes version 0.004 of gen-google-auth-qrcode (from Perl distribution App-GoogleAuthUtils), released on 2018-04-18.
+This document describes version 0.005 of gen-google-auth-qrcode (from Perl distribution App-GoogleAuthUtils), released on 2021-05-25.
 
 =head1 SYNOPSIS
 
 Usage:
 
- % gen-google-auth-qrcode [options] <secret_key> <issuer> [account]
+ % gen-google-auth-qrcode [--format=name] [--json] [--(no)naked-res] [-o=s]
+     [--output=s] [--page-result[=program]] [--view-result[=program]]
+     <secret_key> <issuer> [account]
 
 Examples:
 
@@ -71,11 +74,17 @@ C<*> marks required options.
 
 =item B<--account>=I<s>
 
+Can also be specified as the 3rd command-line argument.
+
 =item B<--issuer>=I<s>*
+
+Can also be specified as the 2nd command-line argument.
 
 =item B<--output>=I<s>, B<-o>
 
 =item B<--secret-key>=I<s>*
+
+Can also be specified as the 1st command-line argument.
 
 =back
 
@@ -115,6 +124,14 @@ you want to pipe the result for more post-processing. In this case you can use
 
     [1,2,3]
 
+
+=item B<--page-result>
+
+Filter output through a pager.
+
+=item B<--view-result>
+
+View output using a viewer.
 
 =back
 
@@ -188,7 +205,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2018 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

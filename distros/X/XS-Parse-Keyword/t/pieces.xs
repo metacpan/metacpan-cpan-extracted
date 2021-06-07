@@ -23,6 +23,22 @@ static int build_expr(pTHX_ OP **out, XSParseKeywordPiece arg0, void *hookdata)
   return KEYWORD_PLUGIN_EXPR;
 }
 
+static int build_prefixedblock(pTHX_ OP **out, XSParseKeywordPiece *args[], size_t nargs, void *hookdata)
+{
+  PADOFFSET padix = args[0]->padix;
+  OP *value       = args[1]->op;
+  OP *body        = args[2]->op;
+
+  OP *padsvop = newOP(OP_PADSV, OPf_MOD|(OPpLVAL_INTRO<<8));
+  padsvop->op_targ = padix;
+
+  *out = op_prepend_elem(OP_LINESEQ,
+    newBINOP(OP_SASSIGN, 0, value, padsvop),
+    body);
+
+  return KEYWORD_PLUGIN_EXPR;
+}
+
 static int build_anonsub(pTHX_ OP **out, XSParseKeywordPiece arg0, void *hookdata)
 {
   *out = newSVOP(OP_CONST, 0, newRV_noinc((SV *)cv_clone(arg0.cv)));
@@ -59,6 +75,21 @@ static int build_constsv(pTHX_ OP **out, XSParseKeywordPiece arg0, void *hookdat
   return KEYWORD_PLUGIN_EXPR;
 }
 
+static int build_constsv_or_undef(pTHX_ OP **out, XSParseKeywordPiece arg0, void *hookdata)
+{
+  if(arg0.sv)
+    *out = newSVOP(OP_CONST, 0, arg0.sv);
+  else
+    *out = newOP(OP_UNDEF, OPf_WANT_SCALAR);
+  return KEYWORD_PLUGIN_EXPR;
+}
+
+static int build_constpadix(pTHX_ OP **out, XSParseKeywordPiece arg0, void *hookdata)
+{
+  *out = newSVOP(OP_CONST, 0, newSVuv(arg0.padix));
+  return KEYWORD_PLUGIN_EXPR;
+}
+
 static int build_literal(pTHX_ OP **out, XSParseKeywordPiece arg0, void *hookdata)
 {
   /* ignore arg0 */
@@ -68,11 +99,50 @@ static int build_literal(pTHX_ OP **out, XSParseKeywordPiece arg0, void *hookdat
   return KEYWORD_PLUGIN_EXPR;
 }
 
+static int build_attrs(pTHX_ OP **out, XSParseKeywordPiece *args[], size_t nargs, void *hookdata)
+{
+  int nattrs = args[0]->i;
+
+  SV *retsv = newSV(0);
+  sv_setpvs(retsv, "");
+
+  int argi;
+  for(argi = 0; argi < nattrs; argi++)
+    sv_catpvf(retsv, ":%s(%s)",
+      SvPV_nolen(args[argi+1]->attr.name),
+      SvPOK(args[argi+1]->attr.value) ? SvPV_nolen(args[argi+1]->attr.value) : "");
+
+  *out = newSVOP(OP_CONST, 0, retsv);
+  return KEYWORD_PLUGIN_EXPR;
+}
+
 static const struct XSParseKeywordHooks hooks_block = {
   .permit_hintkey = hintkey,
 
   .piece1 = XPK_BLOCK,
   .build1 = &build_expr,
+};
+static const struct XSParseKeywordHooks hooks_block_scalar = {
+  .permit_hintkey = hintkey,
+
+  .piece1 = XPK_BLOCK_SCALARCTX,
+  .build1 = &build_list,
+};
+static const struct XSParseKeywordHooks hooks_block_list = {
+  .permit_hintkey = hintkey,
+
+  .piece1 = XPK_BLOCK_LISTCTX,
+  .build1 = &build_list,
+};
+
+static const struct XSParseKeywordHooks hooks_prefixedblock = {
+  .permit_hintkey = hintkey,
+
+  .pieces = (const struct XSParseKeywordPieceType []){
+    XPK_PREFIXED_BLOCK( XPK_LEXVAR_MY(XPK_LEXVAR_SCALAR), XPK_EQUALS, XPK_TERMEXPR_SCALARCTX, XPK_COMMA ),
+    {0}
+  },
+  .build = &build_prefixedblock,
 };
 
 static const struct XSParseKeywordHooks hooks_anonsub = {
@@ -110,6 +180,44 @@ static const struct XSParseKeywordHooks hooks_packagename = {
   .build1 = &build_constsv,
 };
 
+static const struct XSParseKeywordHooks hooks_lexvar_name = {
+  .permit_hintkey = hintkey,
+
+  .piece1 = XPK_LEXVARNAME(XPK_LEXVAR_ANY),
+  .build1 = &build_constsv,
+};
+
+static const struct XSParseKeywordHooks hooks_lexvar_my = {
+  .permit_hintkey = hintkey,
+
+  .piece1 = XPK_LEXVAR_MY(XPK_LEXVAR_ANY),
+  .build1 = &build_constpadix,
+};
+
+static const struct XSParseKeywordHooks hooks_attrs = {
+  .permit_hintkey = hintkey,
+
+  .pieces = (const struct XSParseKeywordPieceType []){
+    XPK_ATTRIBUTES,
+    {0},
+  },
+  .build = &build_attrs,
+};
+
+static const struct XSParseKeywordHooks hooks_vstring = {
+  .permit_hintkey = hintkey,
+
+  .piece1 = XPK_VSTRING,
+  .build1 = &build_constsv,
+};
+
+static const struct XSParseKeywordHooks hooks_vstring_opt = {
+  .permit_hintkey = hintkey,
+
+  .piece1 = XPK_VSTRING_OPT,
+  .build1 = &build_constsv_or_undef,
+};
+
 static const struct XSParseKeywordHooks hooks_colon = {
   .permit_hintkey = hintkey,
 
@@ -120,7 +228,7 @@ static const struct XSParseKeywordHooks hooks_colon = {
 static const struct XSParseKeywordHooks hooks_str = {
   .permit_hintkey = hintkey,
 
-  .piece1 = XPK_STRING("foo"),
+  .piece1 = XPK_LITERAL("foo"),
   .build1 = &build_literal,
 };
 
@@ -130,12 +238,25 @@ BOOT:
   boot_xs_parse_keyword(0);
 
   register_xs_parse_keyword("pieceblock", &hooks_block, NULL);
+  register_xs_parse_keyword("pieceblock_scalar", &hooks_block_scalar, NULL);
+  register_xs_parse_keyword("pieceblock_list",   &hooks_block_list,   NULL);
+
+  register_xs_parse_keyword("pieceprefixedblock", &hooks_prefixedblock, NULL);
+
   register_xs_parse_keyword("pieceanonsub", &hooks_anonsub, NULL);
   register_xs_parse_keyword("piecetermexpr", &hooks_termexpr, NULL);
   register_xs_parse_keyword("piecelistexpr", &hooks_listexpr, NULL);
 
   register_xs_parse_keyword("pieceident", &hooks_ident, NULL);
   register_xs_parse_keyword("piecepkg", &hooks_packagename, NULL);
+
+  register_xs_parse_keyword("piecelexvarname", &hooks_lexvar_name, NULL);
+  register_xs_parse_keyword("piecelexvarmy",   &hooks_lexvar_my,   NULL);
+
+  register_xs_parse_keyword("pieceattrs", &hooks_attrs, NULL);
+
+  register_xs_parse_keyword("piecevstring",     &hooks_vstring,     NULL);
+  register_xs_parse_keyword("piecevstring_opt", &hooks_vstring_opt, NULL);
 
   register_xs_parse_keyword("piececolon", &hooks_colon, newSVpvs("colon"));
 

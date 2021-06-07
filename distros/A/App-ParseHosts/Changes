@@ -1,11 +1,15 @@
-Revision history for App-ParseHosts
+0.003   2021-05-25  Released-By: PERLANCAR; Urgency: high
 
-0.002   2016-10-17 (PERLANCAR)
+	- [build] Rebuild to update Sah coercion module names (old Sah coercion
+          modules have been purged from CPAN).
+
+
+0.002   2016-10-17  Released-By: PERLANCAR
 
         - [Bugfix] Fix interface (optional --filename/-f interface to customize
           /etc/hosts location).
 
 
-0.001   2016-10-17 (PERLANCAR)
+0.001   2016-10-17  Released-By: PERLANCAR
 
         - First release.

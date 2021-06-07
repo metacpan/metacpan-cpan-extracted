@@ -1,0 +1,78 @@
+#!/usr/bin/perl
+use 5.001 ; use strict ; use warnings ; 
+use Getopt::Std ; getopts ':~+12f' , \my %o ; 
+use autodie qw[ open ] ; 
+
+my %first ; # 最初に見た
+my %last ; 
+
+unshift @ARGV  , splice @ARGV , 1 , 1 if $o{'~'} ; # 条件次第で先頭とその次を入れ替える。
+open my $FH , '<' , shift @ARGV ; 
+$SIG{ INT } = sub { close $FH ; exit 130 } ; 
+
+while ( <$FH> ) { 
+    chomp ; 
+    $first { $_ }  //= $. ;
+    $last { $_ }  = $. unless $o{f} ;
+}
+
+close $FH ; 
+#$. = 0 ;
+
+while ( <> ) { 
+    chomp ; 
+    if ( exists $first { $_ } ) { 
+      delete $first { $_ } 
+    }
+    elsif ( $o{'+'} ) { 
+      $first { $_ } = "+$." ;
+    }
+}
+
+
+unless ( $o{':'} ) 
+{ 
+  for ( sort keys %first ) {
+  	print "$_\n" ;
+  }
+} 
+else 
+{ 
+  for ( sort { $first{$a} <=> $first{$b} } keys %first ) { 
+    my $prefix = do { ! exists $last{$_} || $o{1} && $first{$_} eq $last{$_} ? "$first{$_}" : "$first{$_}-$last{$_}" } ;
+  	print "$prefix:\t$_\n" ;
+  }
+}
+
+=encoding utf8
+=head1
+  $0 file1 file2 
+  $0 file1 < file2 
+  cat file2 | $0 file1 
+  file1 のどこかの行にあって、file2 にないものを抽出する。
+  メモリの消費は、file1の各行の異なる行の数に応じたものになる。
+ オプション : 
+  -~  : file1 と file2 の順序を交換する。
+  -:  : 出力の際に、各要素が最後に何行目に現れたかを出力する。
+  -1  ; 出力の各要素の、出現行番号の最初と最後が一致する場合は、ひとつにまとめる。
+  -f  ; 最初意外は見ないことで、メモリの消費を抑制する。
+  -+  ; file2 にあって、file1 にはなかった行要素も抽出する。この場合は、-: の行番号出力指定時に、+記号を付加する。
+  開発上のメモ : 
+    -2 で、標準エラー出力に、逆の差分の結果を出したい。
+=cut
+
+## ヘルプの扱い
+sub VERSION_MESSAGE {}
+sub HELP_MESSAGE {
+    use FindBin qw[ $Script ] ; 
+    $ARGV[1] //= '' ;
+    open my $FH , '<' , $0 ;
+    while(<$FH>){
+        s/\$0/$Script/g ;
+        print $_ if s/^=head1// .. s/^=cut// and $ARGV[1] =~ /^o(p(t(i(o(ns?)?)?)?)?)?$/i ? m/^\s+\-/ : 1;
+    }
+    close $FH ;
+    exit 0 ;
+}
+
+

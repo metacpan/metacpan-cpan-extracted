@@ -1,5 +1,5 @@
 package Photonic::Geometry::FromB;
-$Photonic::Geometry::FromB::VERSION = '0.015';
+$Photonic::Geometry::FromB::VERSION = '0.016';
 
 =encoding UTF-8
 
@@ -55,7 +55,7 @@ Photonic::Geometry::FromB
 
 =head1 VERSION
 
-version 0.015
+version 0.016
 
 =head1 SYNOPSIS
 
@@ -88,7 +88,7 @@ default, it is the number of pixels.
 
 =back
 
-=head1 ACCESORS (read only)
+=head1 ACCESSORS (read only)
 
 =over 4
 

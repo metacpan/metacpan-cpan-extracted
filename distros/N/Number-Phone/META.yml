@@ -27,6 +27,7 @@ no_index:
 requires:
   Cwd: '0'
   DBM::Deep: '2.0008'
+  Data::Dumper::Concise: '0'
   Devel::CheckOS: '1.83'
   Digest::MD5: '0'
   File::Basename: '0'
@@ -38,9 +39,10 @@ requires:
   Scalar::Util: '1.48'
   Test::Differences: '0.62'
   Test::More: '0.96'
+  Test::Warnings: '0'
   Test::utf8: '0'
 resources:
   bugtracker: https://github.com/DrHyde/perl-modules-Number-Phone/issues
   repository: https://github.com/DrHyde/perl-modules-Number-Phone
-version: '3.7002'
+version: '3.7003'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

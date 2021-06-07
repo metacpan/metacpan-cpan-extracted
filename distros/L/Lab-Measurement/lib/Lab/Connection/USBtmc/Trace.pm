@@ -1,6 +1,6 @@
 package Lab::Connection::USBtmc::Trace;
 #ABSTRACT: ???
-$Lab::Connection::USBtmc::Trace::VERSION = '3.750';
+$Lab::Connection::USBtmc::Trace::VERSION = '3.751';
 use v5.20;
 
 use warnings;
@@ -33,7 +33,7 @@ Lab::Connection::USBtmc::Trace - ???
 
 =head1 VERSION
 
-version 3.750
+version 3.751
 
 =head1 COPYRIGHT AND LICENSE
 

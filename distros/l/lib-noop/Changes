@@ -1,12 +1,34 @@
-Revision history for lib-noop
+0.006   2021-06-07  Released-By: PERLANCAR; Urgency: medium
 
-0.002   2016-12-27 (PERLANCAR)
+	- Require 5.18 because it doesn't work in older perls; perl will
+	  still die with 'require Foo::Bar', it doesn't get successfully
+	  trapped by the hook.
+
+
+0.005   2021-05-20  Released-By: PERLANCAR; Urgency: medium
+
+	- Add lib::noop::except.
+
+
+0.004   2021-05-20  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+	- [doc] Mention lib::disallow.
+
+
+0.003   2021-05-19  Released-By: PERLANCAR; Urgency: medium
+
+	- Add pragmas: lib::noop::all, lib::noop::missing.
+
+
+0.002   2016-12-27  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- Add more documentation.
 
 
-0.001   2016-12-27 (PERLANCAR)
+0.001   2016-12-27  Released-By: PERLANCAR
 
         - First release.

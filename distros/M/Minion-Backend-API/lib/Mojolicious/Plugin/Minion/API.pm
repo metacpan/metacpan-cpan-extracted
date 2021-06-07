@@ -1,9 +1,9 @@
 package Mojolicious::Plugin::Minion::API;
 use Mojo::Base 'Mojolicious::Plugin';
-
+use List::Util qw/first/;
 use Carp 'croak';
 
-our $VERSION = 0.05;
+our $VERSION = 0.06;
 
 sub register {
     my ($self, $app, $config) = @_;
@@ -34,7 +34,9 @@ sub register {
     $app->hook(before_render => sub {
         my $c = shift;
 
-        $c->res->headers->header('Access-Control-Allow-Origin' => '*') if $c->req->method ne 'OPTIONS';
+        if ($c->req->method ne 'OPTIONS') {
+            $c->res->headers->header('Access-Control-Allow-Origin' => '*');
+        }
     });
 
     # global
@@ -52,7 +54,24 @@ sub register {
     });
 
     # router api
-    my $api = $app->routes->under($config->{pattern} ? $config->{pattern} : '/');
+    my $pattern = $config->{pattern} ? $config->{pattern} : '/';
+    $pattern = '/' . $pattern unless $pattern =~ /^\//;
+    my $api = $app->routes->under($pattern => sub {
+        my $c = shift;
+
+        # valid ips enabled
+        if ($config->{ips_enabled}) {
+            my $ip = $c->tx->remote_address || $c->tx->original_remote_address;
+
+            unless (first { $ip eq $_ } @{$config->{ips_enabled}}) {
+                $c->render(text => 'This IP is not allowed!', status => 404);
+
+                return;
+            }
+        }
+
+        return 1;
+    });
 
     # broadcast
     $api->put('/broadcast' => sub {
@@ -311,6 +330,19 @@ L<Minion> object to handle backend, this option is mandatory.
     };
 
 This option is to set pattern in url, see more L<Mojolicious::Routes::Route#under>
+
+=head2 ips_enabled
+
+    # Mojolicious::Lite
+    plugin 'Minion::API' => {
+        ips_enabled => [
+            '127.0.0.1',
+            '172.16.0.1',
+            '192.168.0.1'
+        ]
+    };
+
+This options is to the security of your application, validating ips enabled.
 
 =head1 SEE ALSO
 

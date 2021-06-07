@@ -1,5 +1,5 @@
 package Lab::XPRESS::Sweep::Voltage;
-$Lab::XPRESS::Sweep::Voltage::VERSION = '3.750';
+$Lab::XPRESS::Sweep::Voltage::VERSION = '3.751';
 #ABSTRACT: Voltage sweep
 
 use v5.20;
@@ -169,7 +169,7 @@ Lab::XPRESS::Sweep::Voltage - Voltage sweep
 
 =head1 VERSION
 
-version 3.750
+version 3.751
 
 =head1 SYNOPSIS
 

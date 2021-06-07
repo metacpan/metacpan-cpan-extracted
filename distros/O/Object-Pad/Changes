@@ -1,5 +1,16 @@
 Revision history for Object-Pad
 
+0.40    2021-06-02
+        [CHANGES]
+         * Updated for XS::Parse::Keyword v0.06
+         * Silence the -Wunused-variable warning about PL_savetype_name
+         * Yield PL_sv_yes from `class` statements so as to keep `require`
+           happy (RT136701)
+
+0.39    2021-05-24
+        [CHANGES]
+         * Update parsing logic to use XS::Parse::Keyword
+
 0.38    2021-05-14
         [CHANGES]
          * Added Object::Pad::MOP::Class->for_class and ->for_caller

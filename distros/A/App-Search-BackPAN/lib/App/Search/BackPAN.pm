@@ -1,6 +1,6 @@
 package App::Search::BackPAN;
 
-$App::Search::BackPAN::VERSION   = '0.05';
+$App::Search::BackPAN::VERSION   = '0.06';
 $App::Search::BackPAN::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ App::Search::BackPAN - Command Line Interface for backpan.perl.org.
 
 =head1 VERSION
 
-Version 0.05
+Version 0.06
 
 =cut
 
@@ -153,7 +153,7 @@ sub _fetch_authors {
     my $content  = $response->{content};
     my $authors  = {};
     foreach my $line (split /\n/,$content) {
-        if ($line =~ /\<img.*?\<a href=\"([A-Z]+)\/\"\>/) {
+        if ($line =~ /\<td\>\<a href=\"([A-Z]+)\/\"\>/) {
             $authors->{$1} = 1;
         }
     }
@@ -175,7 +175,7 @@ sub _fetch_distributions {
     my $content  = $response->{content};
     my $dists    = [];
     foreach my $line (split /\n/,$content) {
-        if ($line =~ /\<img.*?\<a href=\"(.*\.gz)\"\>.*<\/a>/) {
+        if ($line =~ /\<td\><a href=\"(.*\.gz)\"\>.*<\/a>/) {
             push @$dists, $1;
         }
     }

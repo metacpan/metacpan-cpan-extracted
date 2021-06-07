@@ -1,6 +1,6 @@
 #!/usr/bin/env perl
 # PODNAME: setup-taxdir.pl
-# ABSTRACT: Setup a local mirror of the NCBI Taxonomy database
+# ABSTRACT: Setup a local mirror of the NCBI Taxonomy (or GTDB) database
 
 use Modern::Perl '2011';
 use autodie;
@@ -11,10 +11,10 @@ use Smart::Comments;
 use Bio::MUST::Core;
 use aliased 'Bio::MUST::Core::Taxonomy';
 
-
 unless ($ARGV_update_cache) {
     my %args;
     $args{gi_mapper} = 1 if $ARGV_gi_mapper;
+    $args{source   } = $ARGV_source;
     Taxonomy->setup_taxdir($ARGV_taxdir, \%args);
 }
 
@@ -27,11 +27,11 @@ __END__
 
 =head1 NAME
 
-setup-taxdir.pl - Setup a local mirror of the NCBI Taxonomy database
+setup-taxdir.pl - Setup a local mirror of the NCBI Taxonomy (or GTDB) database
 
 =head1 VERSION
 
-version 0.210610
+version 0.211470
 
 =head1 USAGE
 
@@ -53,16 +53,26 @@ Path to the directory to be created.
 
 =over
 
+=item --source=<str>
+
+Source database from where to download taxonomy files (either NCBI or GTDB,
+respectively designated as C<ncbi> and C<gtdb>) [default: ncbi].
+
+=for Euclid: str.type:       /ncbi|gtdb/
+    str.type.error: <str> must be on ncbi or gtdb (not str)
+    str.default:    "ncbi"
+
 =item --update-cache
 
-Rebuild the binary cache file (C<cachedb.bin>) without re-downloading NCBI
-Taxonomy files. This is useful to enable custom C<.dmp> files (e.g.,
+Rebuild the binary cache file (C<cachedb.bin>) without re-downloading NCBI (or
+GTDB) Taxonomy files. This is useful to enable custom C<.dmp> files (e.g.,
 C<misleading.dmp>) that were manually added to the directory [default: no].
 
 =item --gi-mapper
 
-Additionally setup optional mapper file associating taxids to GI numbers for
-all nucleotide and protein sequences stored in GenBank [default: no].
+[Deprecated] Additionally setup optional mapper file associating taxids to GI
+numbers for all nucleotide and protein sequences stored in GenBank [default:
+no].
 
 This file is compiled from two large NCBI archives (1GB and 388 MB as of
 12/2014) that can be lengthy to download. Once built, the GI-to-taxid mapper

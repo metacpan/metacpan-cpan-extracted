@@ -4,7 +4,7 @@
       "Justin Simoni"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.1.9",
+   "generated_by" : "Minilla/v3.1.12",
    "license" : [
       "perl_5"
    ],
@@ -58,7 +58,7 @@
    "provides" : {
       "Google::reCAPTCHA::v3" : {
          "file" : "lib/Google/reCAPTCHA/v3.pm",
-         "version" : "v0.1.0"
+         "version" : "v0.1.1"
       }
    },
    "release_status" : "stable",
@@ -72,10 +72,11 @@
          "web" : "https://github.com/justingit/Google-reCAPTCHA-v3"
       }
    },
-   "version" : "0.1.0",
+   "version" : "0.1.1",
    "x_contributors" : [
+      "Justin Simoni <justin@Dancing-Indigo-Child.local>",
       "justingit <perl@justinsimoni.com>"
    ],
-   "x_serialization_backend" : "JSON::PP version 2.27300",
+   "x_serialization_backend" : "JSON::PP version 4.05",
    "x_static_install" : 1
 }

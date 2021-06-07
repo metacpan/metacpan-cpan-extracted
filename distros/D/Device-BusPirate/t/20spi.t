@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 
-use strict;
+use v5.14;
 use warnings;
 
 use Test::More;
@@ -86,6 +86,45 @@ my $spi;
       '->writeread_cs yields bytes' );
 
    check_and_clear '->writeread_cs';
+}
+
+# 2x concurrent writeread
+{
+   expect_write "\x11AA";
+   expect_read "\x01CC";
+   expect_write "\x11BB";
+   expect_read "\x01DD";
+
+   is_deeply( [ Future->needs_all(
+      $spi->writeread( "AA" ),
+      $spi->writeread( "BB" ),
+   )->get ], [qw( CC DD )], 'concurrent ->writeread yields results' );
+
+   check_and_clear 'concurrent ->writeread';
+}
+
+# 2x concurrent writeread_cs
+{
+   expect_write "\x02";
+   expect_read "\x01";
+   expect_write "\x11EE";
+   expect_read "\x01GG";
+   expect_write "\x03";
+   expect_read "\x01";
+
+   expect_write "\x02";
+   expect_read "\x01";
+   expect_write "\x11FF";
+   expect_read "\x01HH";
+   expect_write "\x03";
+   expect_read "\x01";
+
+   is_deeply( [ Future->needs_all(
+      $spi->writeread_cs( "EE" ),
+      $spi->writeread_cs( "FF" ),
+   )->get ], [qw( GG HH )], 'concurrent ->writeread_cs yields results' );
+
+   check_and_clear 'concurrent ->writeread_cs';
 }
 
 # aux

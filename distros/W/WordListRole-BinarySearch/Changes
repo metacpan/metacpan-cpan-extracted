@@ -1,3 +1,10 @@
+0.006   2021-04-25  Released-By: PERLANCAR; Urgency: low
+
+	- No functional changes.
+
+	- Add tests.
+
+
 0.005   2021-04-25  Released-By: PERLANCAR; Urgency: high
 
 	- [bugfix] Previous version doesn't work because it didn't use

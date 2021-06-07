@@ -1,6 +1,9 @@
 Revision history for Web-PageMeta
 
-0.04    2021
+0.06    21.05.2021
+    - use Web::Scraper::LibXML = LibXML instead of HTML::TreeBuilder::XPath
+
+0.04    03.04.2021
     - dependency fix (#2 thanks to Slaven Rezić)
     - add option to set extra http request headers
     - throw 404 if there is no image

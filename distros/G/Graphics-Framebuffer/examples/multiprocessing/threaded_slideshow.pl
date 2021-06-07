@@ -13,7 +13,7 @@ use threads (
 use threads::shared;
 use Graphics::Framebuffer;
 use Time::HiRes qw(sleep time alarm);
-use List::Util qw(shuffle);
+use List::Util qw(shuffle min);
 use Getopt::Long;
 use Pod::Usage;
 use Sys::CPU;
@@ -102,6 +102,7 @@ if ($errors) {
 my @thrd;
 
 $threads /= scalar(@devs);
+$threads = min(20,$threads);
 
 # Run the slides in threads and have the main thread do housekeeping.
 my $showit = $splash;
@@ -191,7 +192,7 @@ sub calculate_window {
         ],
         [ # 2 2x0
             [0,0,($width/2),$height],
-            [($width/2),0,($width/2),$height]
+            [($width/2),0,($width/2),$height],
         ],
         [ # 3 3x0
             [0,0,($width/3),$height],
@@ -374,7 +375,102 @@ sub calculate_window {
             [(2 * ($width/4)), (3 * ($height/4)), ($width/4), ($height/4)],
             [(3 * ($width/4)), (3 * ($height/4)), ($width/4), ($height/4)],
         ],
+        [ # 17 5x4x4x4
+            [0, 0, ($width/5), ($height/4)],
+            [($width/5), 0, ($width/5), ($height/4)],
+            [(2 * ($width/5)), 0, ($width/5), ($height/4)],
+            [(3 * ($width/5)), 0, ($width/5), ($height/4)],
+            [(4 * ($width/5)), 0, ($width/5), ($height/4)],
+
+            [0, ($height/4), ($width/4), ($height/4)],
+            [($width/4), ($height/4), ($width/4), ($height/4)],
+            [(2 * ($width/4)), ($height/4), ($width/4), ($height/4)],
+            [(3 * ($width/4)), ($height/4), ($width/4), ($height/4)],
+
+            [0, (2 * ($height/4)), ($width/4), ($height/4)],
+            [($width/4), (2 * ($height/4)), ($width/4), ($height/4)],
+            [(2 * ($width/4)), (2 * ($height/4)), ($width/4), ($height/4)],
+            [(3 * ($width/4)), (2 * ($height/4)), ($width/4), ($height/4)],
+
+            [0, (3 * ($height/4)), ($width/4), ($height/4)],
+            [($width/4), (3 * ($height/4)), ($width/4), ($height/4)],
+            [(2 * ($width/4)), (3 * ($height/4)), ($width/4), ($height/4)],
+            [(3 * ($width/4)), (3 * ($height/4)), ($width/4), ($height/4)],
+        ],
+        [ # 18 5x5x4x4
+            [0, 0, ($width/5), ($height/4)],
+            [($width/5), 0, ($width/5), ($height/4)],
+            [(2 * ($width/5)), 0, ($width/5), ($height/4)],
+            [(3 * ($width/5)), 0, ($width/5), ($height/4)],
+            [(4 * ($width/5)), 0, ($width/5), ($height/4)],
+
+            [0, ($height/4), ($width/5), ($height/4)],
+            [($width/5), ($height/4), ($width/5), ($height/4)],
+            [(2 * ($width/5)), ($height/4), ($width/5), ($height/4)],
+            [(3 * ($width/5)), ($height/4), ($width/5), ($height/4)],
+            [(4 * ($width/5)), ($height/4), ($width/5), ($height/4)],
+
+            [0, (2 * ($height/4)), ($width/4), ($height/4)],
+            [($width/4), (2 * ($height/4)), ($width/4), ($height/4)],
+            [(2 * ($width/4)), (2 * ($height/4)), ($width/4), ($height/4)],
+            [(3 * ($width/4)), (2 * ($height/4)), ($width/4), ($height/4)],
+
+            [0, (3 * ($height/4)), ($width/4), ($height/4)],
+            [($width/4), (3 * ($height/4)), ($width/4), ($height/4)],
+            [(2 * ($width/4)), (3 * ($height/4)), ($width/4), ($height/4)],
+            [(3 * ($width/4)), (3 * ($height/4)), ($width/4), ($height/4)],
+        ],
+        [ # 19 5x5x5x4
+            [0, 0, ($width/5), ($height/4)],
+            [($width/5), 0, ($width/5), ($height/4)],
+            [(2 * ($width/5)), 0, ($width/5), ($height/4)],
+            [(3 * ($width/5)), 0, ($width/5), ($height/4)],
+            [(4 * ($width/5)), 0, ($width/5), ($height/4)],
+
+            [0, ($height/4), ($width/5), ($height/4)],
+            [($width/5), ($height/4), ($width/5), ($height/4)],
+            [(2 * ($width/5)), ($height/4), ($width/5), ($height/4)],
+            [(3 * ($width/5)), ($height/4), ($width/5), ($height/4)],
+            [(4 * ($width/5)), ($height/4), ($width/5), ($height/4)],
+
+            [0, (2 * ($height/4)), ($width/5), ($height/4)],
+            [($width/5), (2 * ($height/4)), ($width/5), ($height/4)],
+            [(2 * ($width/5)), (2 * ($height/4)), ($width/5), ($height/4)],
+            [(3 * ($width/5)), (2 * ($height/4)), ($width/5), ($height/4)],
+            [(4 * ($width/5)), (2 * ($height/4)), ($width/5), ($height/4)],
+
+            [0, (3 * ($height/4)), ($width/4), ($height/4)],
+            [($width/4), (3 * ($height/4)), ($width/4), ($height/4)],
+            [(2 * ($width/4)), (3 * ($height/4)), ($width/4), ($height/4)],
+            [(3 * ($width/4)), (3 * ($height/4)), ($width/4), ($height/4)],
+        ],
+        [ # 20 5x5x5x5
+            [0, 0, ($width/5), ($height/4)],
+            [($width/5), 0, ($width/5), ($height/4)],
+            [(2 * ($width/5)), 0, ($width/5), ($height/4)],
+            [(3 * ($width/5)), 0, ($width/5), ($height/4)],
+            [(4 * ($width/5)), 0, ($width/5), ($height/4)],
+
+            [0, ($height/4), ($width/5), ($height/4)],
+            [($width/5), ($height/4), ($width/5), ($height/4)],
+            [(2 * ($width/5)), ($height/4), ($width/5), ($height/4)],
+            [(3 * ($width/5)), ($height/4), ($width/5), ($height/4)],
+            [(4 * ($width/5)), ($height/4), ($width/5), ($height/4)],
+
+            [0, (2 * ($height/4)), ($width/5), ($height/4)],
+            [($width/5), (2 * ($height/4)), ($width/5), ($height/4)],
+            [(2 * ($width/5)), (2 * ($height/4)), ($width/5), ($height/4)],
+            [(3 * ($width/5)), (2 * ($height/4)), ($width/5), ($height/4)],
+            [(4 * ($width/5)), (2 * ($height/4)), ($width/5), ($height/4)],
+
+            [0, (3 * ($height/4)), ($width/5), ($height/4)],
+            [($width/5), (3 * ($height/4)), ($width/5), ($height/4)],
+            [(2 * ($width/5)), (3 * ($height/4)), ($width/5), ($height/4)],
+            [(3 * ($width/5)), (3 * ($height/4)), ($width/5), ($height/4)],
+            [(4 * ($width/5)), (3 * ($height/4)), ($width/5), ($height/4)],
+        ],
     ];
+#    print STDERR "MAX = $max, CURRENT $current\n"; sleep 10;
     return (@{$cr->[$max - 1]->[$current - 1]});
 } ## end sub calculate_window
 

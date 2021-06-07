@@ -1,10 +1,11 @@
 NAME
 
-    Archive::Libarchive::XS - Perl bindings to libarchive via XS
+    Archive::Libarchive::XS - (Deprecated) Perl bindings to libarchive via
+    XS
 
 VERSION
 
-    version 0.0902
+    version 0.0903
 
 SYNOPSIS
 
@@ -35,7 +36,7 @@ SYNOPSIS
      archive_read_support_filter_all($archive);
      archive_read_support_format_all($archive);
      my $disk = archive_write_disk_new();
-     archive_write_disk_set_options($disk, 
+     archive_write_disk_set_options($disk,
        ARCHIVE_EXTRACT_TIME   |
        ARCHIVE_EXTRACT_PERM   |
        ARCHIVE_EXTRACT_ACL    |
@@ -48,9 +49,9 @@ SYNOPSIS
      {
        my $r = archive_read_next_header($archive, my $entry);
        last if $r == ARCHIVE_EOF;
-       
+     
        archive_write_header($disk, $entry);
-       
+     
        while(1)
        {
          my $r = archive_read_data_block($archive, my $buffer, my $offset);
@@ -90,6 +91,10 @@ SYNOPSIS
      archive_write_free($archive);
 
 DESCRIPTION
+
+    NOTE: This module has been deprecated in favor of Archive::Libarchive.
+    It provides a better thought out object-oriented interface and is
+    easier to maintain.
 
     This module provides a functional interface to libarchive. libarchive
     is a C library that can read and write archives in a variety of formats
@@ -158,7 +163,7 @@ EXAMPLES
      while (archive_read_next_header($a, my $entry) == ARCHIVE_OK)
      {
        print archive_entry_pathname($entry), "\n";
-       archive_read_data_skip($a); 
+       archive_read_data_skip($a);
      }
      
      $r = archive_read_free($a);
@@ -194,7 +199,7 @@ EXAMPLES
      
      while (archive_read_next_header($a, my $entry) == ARCHIVE_OK) {
        print archive_entry_pathname($entry), "\n";
-       archive_read_data_skip($a); 
+       archive_read_data_skip($a);
      }
      
      $r = archive_read_free($a);
@@ -266,7 +271,7 @@ EXAMPLES
      $r = archive_read_next_header($a, my $ae);
      if($r != ARCHIVE_OK)
      {
-       die archive_error_string($a);     
+       die archive_error_string($a);
      }
      
      while(1)
@@ -299,13 +304,13 @@ EXAMPLES
      sub write_archive
      {
        my($outname, @filenames) = @_;
-       
+     
        my $a = archive_write_new();
-       
+     
        archive_write_add_filter_gzip($a);
        archive_write_set_format_pax_restricted($a);
        archive_write_open_filename($a, $outname);
-       
+     
        foreach my $filename (@filenames)
        {
          my $st = stat $filename;
@@ -323,7 +328,7 @@ EXAMPLES
            $len = read $fh, $buff, 8192;
          }
          close $fh;
-         
+     
          archive_entry_free($entry);
        }
        archive_write_close($a);
@@ -538,7 +543,7 @@ EXAMPLES
      
      archive_write_data($archive, encode('UTF-8', "привет.txt");
      # or
-     archive_write_data($archive, encode('KOI8-R', "привет.txt"); 
+     archive_write_data($archive, encode('KOI8-R', "привет.txt");
 
     read:
 
@@ -580,50 +585,6 @@ CAVEATS
     the documentation that match the implementation, or fixes to the
     implementation so that it matches the documentation (which ever is
     appropriate) would greatly appreciated.
-
-SEE ALSO
-
-    The intent of this module is to provide a low level fairly thin direct
-    interface to libarchive, on which a more Perlish OO layer could easily
-    be written.
-
-    Archive::Libarchive::XS
-
-    Archive::Libarchive::FFI
-
-      Both of these provide the same API to libarchive but the bindings are
-      implemented in XS for one and via FFI::Raw for the other.
-
-    Archive::Libarchive::Any
-
-      Offers whichever is available, either the XS or FFI version. The
-      actual algorithm as to which is picked is subject to change,
-      depending on with version seems to be the most reliable.
-
-    Archive::Peek::Libarchive
-
-    Archive::Extract::Libarchive
-
-      Both of these provide a higher level, less complete perlish interface
-      to libarchive.
-
-    Archive::Tar
-
-    Archive::Tar::Wrapper
-
-      Just some of the many modules on CPAN that will read/write tar
-      archives.
-
-    Archive::Zip
-
-      Just one of the many modules on CPAN that will read/write zip
-      archives.
-
-    Archive::Any
-
-      A module attempts to read/write multiple formats using different
-      methods depending on what perl modules are installed, and preferring
-      pure perl modules.
 
 AUTHOR
 

@@ -1,7 +1,9 @@
 package App::lcpan::Cmd::deps_all;
 
-our $DATE = '2017-07-28'; # DATE
-our $VERSION = '0.007'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2021-06-01'; # DATE
+our $DIST = 'App-lcpan-CmdBundle-deps'; # DIST
+our $VERSION = '0.010'; # VERSION
 
 use 5.010001;
 use strict;
@@ -16,38 +18,44 @@ our %SPEC;
 
 $SPEC{handle_cmd} = {
     v => 1.1,
-    summary => 'List all dependencies',
+    summary => 'List all (indexed) dependencies',
     description => <<'_',
 
 This subcommand lists dependencies. It does not require you to specify a
-distribution name, so you can view all dependencies in the `dep` table.
+distribution name, so you can view all dependencies in the `dep` table. Only
+"indexed dependencies" are listed though, meaning modules that are currently
+indexed by `02packages.details.txt.gz` and are listed in the `module` table.
+Distributions will sometimes also specify dependencies to modules that are
+(currently) unindexed. To list those, use the `deps-unindexed` subcommand.
 
 _
     args => {
         %{( modclone {
-            # can contain %, so anything
             delete $_->{phase}{schema}[1]{match};
+            $_->{phase}{summary} = 'Phase (can contain % for SQL LIKE query)';
         } \%App::lcpan::rdeps_phase_args )},
         %{( modclone {
-            # can contain %, so anything
             delete $_->{rel}{schema}[1]{match};
+            $_->{rel}{summary} = 'Relationship (can contain % for SQL LIKE query)';
         } \%App::lcpan::rdeps_rel_args )},
         module => {
-            summary => 'Module name (can contain % for SQL LIKE query)',
+            summary => 'Module name that is depended upon (can contain % for SQL LIKE query)',
             schema => 'str*',
             tags => ['category:filtering'],
         },
         dist => {
-            summary => 'Distribution name (can contain % for SQL LIKE query)',
+            summary => 'Distribution name that specifies the dependency (can contain % for SQL LIKE query)',
             schema => 'str*',
             tags => ['category:filtering'],
         },
         module_author => {
+            summary => 'The ID of author that releases the module that is depended upon',
             schema => 'str*',
             completion => \&App::lcpan::_complete_cpanid,
             tags => ['category:filtering'],
         },
         dist_author => {
+            summary => 'The ID of author that releases the distribution that specifies the distribution',
             schema => 'str*',
             completion => \&App::lcpan::_complete_cpanid,
             tags => ['category:filtering'],
@@ -77,14 +85,14 @@ sub handle_cmd {
     }
     if ($args{dist}) {
         if ($args{dist} =~ /%/) {
-            push @wheres, "d.name LIKE ?";
+            push @wheres, "df.dist_name LIKE ?";
         } else {
-            push @wheres, "d.name=?";
+            push @wheres, "df.dist_name=?";
         }
         push @binds, $args{dist};
     }
     if ($args{dist_author}) {
-        push @wheres, "d.cpanid=?";
+        push @wheres, "df.cpanid=?";
         push @binds, uc $args{dist_author};
     }
     if ($args{phase} && $args{phase} ne 'ALL') {
@@ -108,13 +116,13 @@ sub handle_cmd {
     my $sth = $dbh->prepare("SELECT
   m.name module,
   m.cpanid module_author,
-  d.name dist,
-  d.cpanid dist_author,
+  df.dist_name dist,
+  df.cpanid dist_author,
   phase,
   rel
 FROM dep
 LEFT JOIN module m ON module_id=m.id
-LEFT JOIN dist d ON dist_id=d.id
+LEFT JOIN file df ON dep.file_id=df.id
 ".
     (@wheres ? "WHERE ".join(" AND ", @wheres) : ""),
                         );
@@ -129,7 +137,7 @@ LEFT JOIN dist d ON dist_id=d.id
 }
 
 1;
-# ABSTRACT: List all dependencies
+# ABSTRACT: List all (indexed) dependencies
 
 __END__
 
@@ -139,11 +147,11 @@ __END__
 
 =head1 NAME
 
-App::lcpan::Cmd::deps_all - List all dependencies
+App::lcpan::Cmd::deps_all - List all (indexed) dependencies
 
 =head1 VERSION
 
-This document describes version 0.007 of App::lcpan::Cmd::deps_all (from Perl distribution App-lcpan-CmdBundle-deps), released on 2017-07-28.
+This document describes version 0.010 of App::lcpan::Cmd::deps_all (from Perl distribution App-lcpan-CmdBundle-deps), released on 2021-06-01.
 
 =head1 DESCRIPTION
 
@@ -156,12 +164,16 @@ This module handles the L<lcpan> subcommand C<deps-all>.
 
 Usage:
 
- handle_cmd(%args) -> [status, msg, result, meta]
+ handle_cmd(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
-List all dependencies.
+List all (indexed) dependencies.
 
 This subcommand lists dependencies. It does not require you to specify a
-distribution name, so you can view all dependencies in the C<dep> table.
+distribution name, so you can view all dependencies in the C<dep> table. Only
+"indexed dependencies" are listed though, meaning modules that are currently
+indexed by C<02packages.details.txt.gz> and are listed in the C<module> table.
+Distributions will sometimes also specify dependencies to modules that are
+(currently) unindexed. To list those, use the C<deps-unindexed> subcommand.
 
 This function is not exported.
 
@@ -171,30 +183,39 @@ Arguments ('*' denotes required arguments):
 
 =item * B<dist> => I<str>
 
-Distribution name (can contain % for SQL LIKE query).
+Distribution name that specifies the dependency (can contain % for SQL LIKE query).
 
 =item * B<dist_author> => I<str>
 
+The ID of author that releases the distribution that specifies the distribution.
+
 =item * B<module> => I<str>
 
-Module name (can contain % for SQL LIKE query).
+Module name that is depended upon (can contain % for SQL LIKE query).
 
 =item * B<module_author> => I<str>
 
+The ID of author that releases the module that is depended upon.
+
 =item * B<phase> => I<str> (default: "ALL")
 
+Phase (can contain % for SQL LIKE query).
+
 =item * B<rel> => I<str> (default: "ALL")
+
+Relationship (can contain % for SQL LIKE query).
+
 
 =back
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -220,7 +241,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017, 2016 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2017, 2016 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

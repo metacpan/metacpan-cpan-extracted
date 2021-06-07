@@ -20,6 +20,7 @@ all_pod_files_spelling_ok( qw( bin lib ) );
 __DATA__
 Bassline
 Boggs
+DAW
 Gene
 MIDI
 Walk
@@ -27,3 +28,4 @@ bassline
 basslines
 gene
 lib
+pentatonic

@@ -1,5 +1,8 @@
 # Changes for Mojo::Promise::Role::Any
 
+1.005 2021-05-25T16:51:59Z
+	* Fix warnings with unhandled rejected promises (GitHub #1, poti1)
+
 1.004 2021-01-13T05:24:00Z
 	* freshen distro, dump Travis CI, add Github Actions
 

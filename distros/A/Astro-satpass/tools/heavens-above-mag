@@ -1,0 +1,208 @@
+#!/usr/bin/env perl
+
+use 5.010;
+
+use strict;
+use warnings;
+
+use Getopt::Long 2.33 qw{ :config auto_version };
+use HTML::TreeBuilder;
+use LWP::UserAgent;
+use Pod::Usage;
+
+our $VERSION = '0.120';
+
+my %opt;
+
+GetOptions( \%opt,
+    qw{ open! },
+    help => sub { pod2usage( { -verbose => 2 } ) },
+) and @ARGV or pod2usage( { -verbose => 0 } );
+
+if ( $opt{open} ) {
+    process_open( @ARGV );
+} else {
+    process_parse( @ARGV );
+}
+
+# This mess exists because Heavens-Above enclosed multiple table rows in
+# a <span>..</span>. This is a standards violation which (e.g.) Firefox
+# tolerates, but HTML::TreeBuilder's parse emits such spans as empty
+# tags before the table containing them. Unless this is fixed, we will
+# have to step forward to the relevant table and then find the datum on
+# its own merits.
+sub find_intrinsic_magnitude {
+    my ( $tree ) = @_;
+
+    my $mag_ele = $tree->look_down( id => 'ctl00_cph1_lblBrightness' );
+    if ( my @mag_content = $mag_ele->content_list() ) {
+	die 'Bug - Not expecting content in span ctl00_cph1_lblBrightness';
+    }
+
+    my $right = $mag_ele;
+    while ( my $right = $right->right() ) {
+
+	warn 'Debug - right ele ', $right->tag();
+
+	'span' eq $right->tag()
+	    and next;
+
+	$mag_ele = $right->look_down( _tag => 'td', sub {
+		( local $_ ) = $_[0]->content_list();
+		return m/ \b at \s+ 1000 \s* km \s+ distance /smxi;
+	    } );
+	my ( $mag ) = $mag_ele->content_list();
+	$mag =~ s/ \A \s+ //smx;
+	$mag =~ s/ \s+ .* //smx;
+	return $mag;
+    }
+
+    die 'Bug - span ctl00_cph1_lblBrightness has no right ele';
+}
+
+sub find_td_by_content {
+    my ( $tree, $re ) = @_;
+
+    my $ele = $tree->look_down( _tag => 'td', sub {
+	    ( local $_ ) = $_[0]->content_list();
+	    return $_ =~ $re;
+	} );
+
+    my ( $val ) = $ele->content_list();
+    $val =~ s/ \A \s+ //smx;
+    $val =~ s/ \s+ .* //smx;
+    return $val;
+}
+
+sub find_span {
+    my ( $tree, $id ) = @_;
+    my $ele = $tree->look_down( _tag => 'span', id => $id )
+	or die "Bug - span id='$id' not found";
+    my ( $val ) = $ele->content_list();
+    $val =~ s/ \A \s+ //smx;
+    $val =~ s/ \s+ \z //smx;
+    return $val;
+}
+
+sub get_file {
+    my ( $fn ) = @_;
+    local $/ = undef;
+    open my $fh, '<:encoding(utf-8)', $fn
+	or die "Unable to open $fn: $!\n";
+    my $content = <$fh>;
+    close $fh;
+    return $content;
+}
+
+sub get_html {
+    my ( $oid ) = @_;
+    my $url = heavens_above_url( $oid );
+    state $ua = LWP::UserAgent->new();
+    my $resp = $ua->get( $url );
+    $resp->is_success()
+	or die "Failed to fetch $url: ", $resp->status_line(), "\n";
+    return $resp->decoded_content();
+}
+
+sub heavens_above_url {
+    my ( $oid ) = @_;
+    $oid =~ m/ \A [0-9]+ \z /smx
+	or die "OID '$oid' not numeric\n";
+    return sprintf 'https://www.heavens-above.com/SatInfo.aspx?satid=%05d', $oid;
+}
+
+sub process_open {
+    my @arg = @_;
+    require Browser::Open;
+    my $cmd = Browser::Open::open_browser_cmd();
+    foreach my $oid ( @arg ) {
+	my $url = heavens_above_url( $oid );
+	system { $cmd } $cmd, $url;
+    }
+    return;
+}
+
+sub process_parse {
+    my @arg = @_;
+    foreach my $spec ( @arg ) {
+	my $get = $spec =~ m/ \A [0-9]+ \z /smx ? \&get_html : \&get_file;
+	my $tree = HTML::TreeBuilder->new_from_content( $get->( $spec ) );
+	# print $tree->as_HTML();
+	# Should return a <span>..</span> containing the OID
+	my $oid = find_span( $tree, 'ctl00_cph1_lblSatID' );
+	# Should return a <span>..</span> containing the name
+	my $name = find_span( $tree, 'ctl00_cph1_lblOIGName' );
+	# See the subroutine below for why it is needed.
+	# my $mag = find_intrinsic_magnitude( $tree );
+	# We would like to look for id ctl00_cph1_lblBrightness here, but it
+	# contains table rows (which it should not), so HTML::TreeBuilder
+	# spits it out any old where. Sometimes before the table, sometimes
+	# in the middle of it (but still empty). So we just have to hope the
+	# default display is English.
+	my $mag = find_td_by_content( $tree,
+	    qr< \b at \s+ 1000 \s* km \s+ distance \b >smxi );
+	die "Debug - $oid ($name) '$mag'";
+
+    }
+    return;
+}
+
+__END__
+
+=head1 TITLE
+
+heavens-above-mag - Get magnitudes from Heavens Above
+
+=head1 SYNOPSIS
+
+ heavens-above-mag 25544
+ heavens-above-mag --help
+ heavens-above-mag --version
+
+=head1 OPTIONS
+
+=head2 --help
+
+This option displays the documentation for this script. The script then
+exits.
+
+=head2 --open
+
+If this Boolean option is asserted, a web browser is spawned, displaying
+the Heavens-Above web page of the OIDs specified. You cannot specify
+file names if you specify this option.
+
+=head2 --version
+
+This option displays the version of this script. The script then exits.
+
+=head1 DETAILS
+
+This Perl script parses intrinsic magnitude data out of Heavens Above
+data. You can specify either an OID (which is fetched) or a file name
+(which is read) or a mixture of the two.
+
+Heavens Above defines intrinsic magnitude as the magnitude at a range of
+1000km, and 50% illuminated.
+
+=head1 AUTHOR
+
+Thomas R. Wyant, III F<wyant at cpan dot org>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2021 by Thomas R. Wyant, III
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl 5.10.0. For more details, see the Artistic
+License 1.0 at
+L<https://www.perlfoundation.org/artistic-license-10.html>, and/or the
+Gnu GPL at L<http://www.gnu.org/licenses/old-licenses/gpl-1.0.txt>.
+
+This program is distributed in the hope that it will be useful, but
+without any warranty; without even the implied warranty of
+merchantability or fitness for a particular purpose.
+
+=cut
+
+# ex: set textwidth=72 :

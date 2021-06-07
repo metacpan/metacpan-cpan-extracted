@@ -17,6 +17,7 @@
     The Application Development Client can be downloaded here:
 
     http://www.ibm.com/software/data/db2/udb/support/
+	GIT REPO: https://github.com/ibmdb/perl_DBD-DB2
 
 
 
@@ -24,7 +25,7 @@
 
     On UNIX:
 	export DB2_HOME=<path to CLI DRIVER installation>/clidriver
-	export PERL5LIB=~/lib/perl5/lib/perl5/site_perl:$HOME/DBD-DB2-1.85/tests:$HOME/DBD-DB2-1.85/Constants
+	export PERL5LIB=~/lib/perl5/lib/perl5/site_perl:$HOME/DBD-DB2-1.89/tests:$HOME/DBD-DB2-1.89/Constants
 	
     perl Makefile.PL            # use a perl that's in your PATH
     make
@@ -45,6 +46,161 @@
     nmake
     nmake test
     nmake install
+	
+*** BUILDING on AIX(tested on 1.86)
+
+Installation instruction for DBD::DB2 on AIX, with Perl 5.28.1:
+
+NOTE: I started with perl.rte 5.28.1.2 which was in 7200 TL4 SP2. I am using xlccmp.13.1.3 compiler.
+
+1)  UNPACK REQUIRED FILES
+
+Unpacked the following to /tmp/perl
+
+v10.5fp11_aix64_odbc_cli_32.tar
+DBI DBI-1.643.tar
+DBD-DB2-1.86.tar
+
+2) BUILD AND INSTALL DBI:
+
+# cd /tmp/perl/DBI-1.643
+
+# perl Makefile.PL
+# make
+This is OK, but: 
+# make test fails. 
+ Can't locate Test2/Util/ExternalMeta.pm in @INC
+
+ *** ExternalMeta.pm was created as a directory instead of a file, this issue is fixed in perl.rte 5.28.1.3
+ 
+ I updated perl.rte to perl.rte 5.28.1.3 and tried again:
+ 
+# perl Makefile.PL 
+<...>
+Generating a Unix-style Makefile
+Writing Makefile for DBI
+Writing MYMETA.yml and MYMETA.json
+
+# make 
+<...>
+Running Mkbootstrap for DBI ()
+        chmod 644 "DBI.bs"
+         "/usr/bin/perl" -MExtUtils::Command::MM -e 'cp_nonempty' -- DBI.bs blib/arch/auto/DBI/DBI.bs 644
+        xlc_r -c    -D_ALL_SOURCE -D_ANSI_C_SOURCE -D_POSIX_SOURCE -qmaxmem=-1 -qnoansialias -qlanglvl=extc99 -DUSE_NATIVE_DLOPEN -DNEED_PTHREAD_INIT -q32 -D_LARGE_FILES -O    -DVERSION=\"1.643\"  -DXS_VERSION=\"1.643\"  "-I/usr/opt/perl5/lib/5.28.1/aix-thread-multi/CORE"   DBI.c
+"/usr/opt/perl5/lib/5.28.1/aix-thread-multi/CORE/perl.h", line 4401.15: 1506-963 (W) The attribute "deprecated" is not a valid variable attribute and is ignored.
+        rm -f blib/arch/auto/DBI/DBI.so
+        ld  -bhalt:4 -G -bI:/usr/opt/perl5/lib/5.28.1/aix-thread-multi/CORE/perl.exp  -bnoentry -lpthreads -lc -lm -bE:DBI.exp DBI.o  -o blib/arch/auto/DBI/DBI.so
+        chmod 755 blib/arch/auto/DBI/DBI.so
+        "/usr/bin/perl" "-Iblib/arch" "-Iblib/lib" dbilogstrip.PL dbilogstrip
+Extracted dbilogstrip from dbilogstrip.PL with variable substitutions.
+        "/usr/bin/perl" "-Iblib/arch" "-Iblib/lib" dbiprof.PL dbiprof
+Extracted dbiprof from dbiprof.PL with variable substitutions.
+        "/usr/bin/perl" "-Iblib/arch" "-Iblib/lib" dbiproxy.PL dbiproxy
+Extracted dbiproxy from dbiproxy.PL with variable substitutions.
+        cp dbilogstrip blib/script/dbilogstrip
+        "/usr/bin/perl" -MExtUtils::MY -e 'MY->fixin(shift)' -- blib/script/dbilogstrip
+        cp dbiprof blib/script/dbiprof
+        "/usr/bin/perl" -MExtUtils::MY -e 'MY->fixin(shift)' -- blib/script/dbiprof
+        cp dbiproxy blib/script/dbiproxy
+        "/usr/bin/perl" -MExtUtils::MY -e 'MY->fixin(shift)' -- blib/script/dbiproxy
+Manifying 3 pod documents
+Manifying 49 pod documents
+
+# make test 
+<...>
+All tests successful.
+Files=202, Tests=9379, 230 wallclock secs ( 1.70 usr  0.31 sys + 76.27 cusr 17.30 csys = 95.58 CPU)
+Result: PASS
+
+# make install 
+<...>
+         "/usr/bin/perl" -MExtUtils::Command::MM -e 'cp_nonempty' -- DBI.bs blib/arch/auto/DBI/DBI.bs 644
+Manifying 3 pod documents
+Manifying 49 pod documents
+Files found in blib/arch: installing files in blib/lib into architecture dependent library tree
+Installing /usr/opt/perl5/lib/site_perl/5.28.1/aix-thread-multi/auto/DBI/DBI.so
+Appending installation info to /usr/opt/perl5/lib/5.28.1/aix-thread-multi/perllocal.pod
+
+ 
+3) BUILD AND INSTALL DBD::DB2
+
+# cd  /tmp/perl/DBD-DB2-1.86
+
+# export DB2_HOME=/tmp/perl/odbc_cli_32/clidriver
+# export PERL5LIB=/usr/opt/perl5/lib/site_perl/5.28.1/aix-thread-multi/:/tmp/perl/DBD/DBD-DB2-1.86/tests:/tmp/perl/DBD/DBD-DB2-1.86/Constants
+
+# perl Makefile.PL 
+<...>
+Using DB2 in "/tmp/perl/odbc_cli_32/clidriver"
+System: perl5.028001 DBI1.643 aix fvt-p7a2-lp2 1 7 0000668a7a00  aix-thread-multi dl_aix.xs
+Compiler: xlc_r -O -D_ALL_SOURCE -D_ANSI_C_SOURCE -D_POSIX_SOURCE -qmaxmem=-1 -qnoansialias -qlanglvl=extc99 -DUSE_NATIVE_DLOPEN -DNEED_PTHREAD_INIT -q32 -D_LARGE_FILES
+Includes:  -I"/tmp/perl/odbc_cli_32/clidriver/include" -I"/usr/opt/perl5/lib/site_perl/5.28.1/aix-thread-multi/auto/DBI" -I"/usr/opt/perl5/lib/5.28.1/aix-thread-multi/auto/DBI" -I"/usr/opt/perl5/lib/site_perl/5.28.1/aix-thread-multi/auto/DBI"
+Libraries: -L/tmp/perl/odbc_cli_32/clidriver/lib -ldb2
+Checking if your kit is complete...
+Looks good
+Checking if your kit is complete...
+Looks good
+Writing MYMETA.yml and MYMETA.json
+Generating a Unix-style Makefile
+Writing Makefile for DBD::DB2
+Writing MYMETA.yml and MYMETA.json
+
+# make 
+<...>
+        xlc_r -c  -I"/tmp/perl/odbc_cli_32/clidriver/include" -I"/usr/opt/perl5/lib/site_perl/5.28.1/aix-thread-multi/auto/DBI" -I"/usr/opt/perl5/lib/5.28.1/aix-thread-multi/auto/DBI" -I"/usr/opt/perl5/lib/site_perl/5.28.1/aix-thread-multi/auto/DBI"   -D_ALL_SOURCE -D_ANSI_C_SOURCE -D_POSIX_SOURCE -qmaxmem=-1 -qnoansialias -qlanglvl=extc99 -DUSE_NATIVE_DLOPEN -DNEED_PTHREAD_INIT -q32 -D_LARGE_FILES -O    -DVERSION=\"1.85\"  -DXS_VERSION=\"1.85\"  "-I/usr/opt/perl5/lib/5.28.1/aix-thread-multi/CORE"  -DDB2_CACHE_FIX  DB2.c
+"DB2.h", line 11.10: 1506-296 (S) #include file <sqlcli.h> not found.
+"DB2.h", line 13.10: 1506-296 (S) #include file <sqlcli1.h> not found.
+"DB2.h", line 14.10: 1506-296 (S) #include file <sqlext.h> not found.
+"DB2.h", line 16.10: 1506-296 (S) #include file <sqlstate.h> not found.
+"/usr/opt/perl5/lib/5.28.1/aix-thread-multi/CORE/perl.h", line 4401.15: 1506-963 (W) The attribute "deprecated" is not a valid variable attribute and is ignored.
+"dbdimp.h", line 33.9: 1506-046 (S) Syntax error.
+"dbdimp.h", line 41.9: 1506-046 (S) Syntax error.
+"dbdimp.h", line 50.9: 1506-046 (S) Syntax error.
+"dbdimp.h", line 80.9: 1506-046 (S) Syntax error.
+"dbdimp.h", line 92.9: 1506-046 (S) Syntax error.
+make: 1254-004 The error code from the last command is 1.
+
+I located APPLICATION_DEVELOPMENT_TOOLS_10.5.0.11_aix64_ppc.tar.gz (part of v10.5fp11_aix64_client.tar) and  extracted the include directory to /tmp/perl/clidriver, then tried make again:
+
+# make 
+<...>
+         "/usr/bin/perl" -MExtUtils::Command::MM -e 'cp_nonempty' -- DB2.bs blib/arch/auto/DBD/DB2/DB2.bs 644
+        xlc_r -c  -I"/tmp/perl/odbc_cli_32/clidriver/include" -I"/usr/opt/perl5/lib/site_perl/5.28.1/aix-thread-multi/auto/DBI" -I"/usr/opt/perl5/lib/5.28.1/aix-thread-multi/auto/DBI" -I"/usr/opt/perl5/lib/site_perl/5.28.1/aix-thread-multi/auto/DBI"   -D_ALL_SOURCE -D_ANSI_C_SOURCE -D_POSIX_SOURCE -qmaxmem=-1 -qnoansialias -qlanglvl=extc99 -DUSE_NATIVE_DLOPEN -DNEED_PTHREAD_INIT -q32 -D_LARGE_FILES -O    -DVERSION=\"1.85\"  -DXS_VERSION=\"1.85\"  "-I/usr/opt/perl5/lib/5.28.1/aix-thread-multi/CORE"  -DDB2_CACHE_FIX  DB2.c
+"/usr/opt/perl5/lib/5.28.1/aix-thread-multi/CORE/perl.h", line 4401.15: 1506-963 (W) The attribute "deprecated" is not a valid variable attribute and is ignored.
+        xlc_r -c  -I"/tmp/perl/odbc_cli_32/clidriver/include" -I"/usr/opt/perl5/lib/site_perl/5.28.1/aix-thread-multi/auto/DBI" -I"/usr/opt/perl5/lib/5.28.1/aix-thread-multi/auto/DBI" -I"/usr/opt/perl5/lib/site_perl/5.28.1/aix-thread-multi/auto/DBI"   -D_ALL_SOURCE -D_ANSI_C_SOURCE -D_POSIX_SOURCE -qmaxmem=-1 -qnoansialias -qlanglvl=extc99 -DUSE_NATIVE_DLOPEN -DNEED_PTHREAD_INIT -q32 -D_LARGE_FILES -O    -DVERSION=\"1.85\"  -DXS_VERSION=\"1.85\"  "-I/usr/opt/perl5/lib/5.28.1/aix-thread-multi/CORE"  -DDB2_CACHE_FIX  dbdimp.c
+"/usr/opt/perl5/lib/5.28.1/aix-thread-multi/CORE/perl.h", line 4401.15: 1506-963 (W) The attribute "deprecated" is not a valid variable attribute and is ignored.
+        rm -f blib/arch/auto/DBD/DB2/DB2.so
+        ld  -bhalt:4 -G -bI:/usr/opt/perl5/lib/5.28.1/aix-thread-multi/CORE/perl.exp  -bnoentry -lpthreads -lc -lm -bE:DB2.exp DB2.o  dbdimp.o   -o blib/arch/auto/DBD/DB2/DB2.so    -L/tmp/perl/odbc_cli_32/clidriver/lib -ldb2
+        chmod 755 blib/arch/auto/DBD/DB2/DB2.so
+         "/usr/bin/perl" -MExtUtils::Command::MM -e 'cp_nonempty' -- Constants.bs ../blib/arch/auto/DBD/DB2/Constants/Constants.bs 644
+Manifying 2 pod documents
+Target "default_target" is up to date.
+
+# make test 
+<...>
+All tests successful.
+Files=2, Tests=6,  1 wallclock secs ( 0.03 usr  0.00 sys +  0.07 cusr  0.02 csys =  0.12 CPU)
+Result: PASS
+
+# make install 
+<...>
+         "/usr/bin/perl" -MExtUtils::Command::MM -e 'cp_nonempty' -- DB2.bs blib/arch/auto/DBD/DB2/DB2.bs 644
+         "/usr/bin/perl" -MExtUtils::Command::MM -e 'cp_nonempty' -- Constants.bs ../blib/arch/auto/DBD/DB2/Constants/Constants.bs 644
+Manifying 2 pod documents
+Files found in blib/arch: installing files in blib/lib into architecture dependent library tree
+Installing /usr/opt/perl5/lib/site_perl/5.28.1/aix-thread-multi/auto/DBD/DB2/DB2.so
+Installing /usr/opt/perl5/lib/site_perl/5.28.1/aix-thread-multi/auto/DBD/DB2/Constants/Constants.so
+Appending installation info to /usr/opt/perl5/lib/5.28.1/aix-thread-multi/perllocal.pod
+ 
+In summary, I was able to build and install the modules, with the following versions of filesets/files:
+
+AIX:   xlccmp.13.1.3 
+AIX:   perl.rte 5.28.1.3
+DB2:  v10.5fp11_aix64_odbc_cli_32.tar
+DB2:  v10.5fp11_aix64_client.tar
+CPAN: DBI DBI-1.643.tar
+CPAN: DBD-DB2-1.86.tar 
+
 
 *** TESTING:
 

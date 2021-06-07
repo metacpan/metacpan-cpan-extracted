@@ -10,7 +10,7 @@ use strict;
 use warnings;
 use English qw/ -no_match_vars /;
 
-our $VERSION     = 0.07;
+our $VERSION     = 0.08;
 our @EXPORT_OK   = qw//;
 our %EXPORT_TAGS = ();
 
@@ -46,7 +46,7 @@ App::PS1::Plugin::Node - Shows current version of node if using nave
 
 =head1 VERSION
 
-This documentation refers to App::PS1::Plugin::Node version 0.07.
+This documentation refers to App::PS1::Plugin::Node version 0.08.
 
 =head1 SYNOPSIS
 

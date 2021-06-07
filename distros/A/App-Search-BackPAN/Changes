@@ -1,5 +1,8 @@
 Revision history for App::Search::BackPAN
 
+0.06  Mon May 31 21:55:00 2021
+      - Proposed fix for the issue RT# 136670.
+
 0.05  Tue Oct 30 17:30:00 2018
       - Added test scripts (t/meta-json.t and t/meta-yml.t).
 

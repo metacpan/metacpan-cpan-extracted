@@ -2,7 +2,7 @@ package PICA::Parser::Plain;
 use v5.14.1;
 use utf8;
 
-our $VERSION = '1.20';
+our $VERSION = '1.24';
 
 use charnames ':full';
 use Carp qw(carp croak);
@@ -14,10 +14,16 @@ sub END_OF_FIELD {"\N{LINE FEED}"}
 sub _next_record {
     my ($self) = @_;
 
-    my $plain  = undef;
     my $reader = $self->{reader};
-    while (my $line = <$reader>) {
-        last if $line =~ /^\s*$/;
+    my $plain;
+
+    my $blank = $self->{strict} ? '\s*' : '((SET|Eingabe|Warnung):.*)?\s*';
+    do {
+        $plain = readline($reader);
+    } while (defined $plain && $plain =~ /^$blank$/);
+
+    while (defined(my $line = readline($reader))) {
+        last if $line =~ /^$blank$/;
         $plain .= $line;
     }
     return unless defined $plain;
@@ -29,11 +35,11 @@ sub _next_record {
     for my $field (@fields) {
         my ($annotation, $tag, $occ, $data);
 
-        unless (defined $self->{annotated} && !$self->{annotated}) {
+        unless (defined $self->{annotate} && !$self->{annotate}) {
             if ($field =~ s/^([^a-z0-9]) (.+)/\2/) {
                 $annotation = $1;
             }
-            elsif ($self->{annotated}) {
+            elsif ($self->{annotate}) {
                 croak "ERROR: expected field annotation at field \"$field\"";
             }
         }
@@ -109,8 +115,7 @@ can be used to enforce or forbid annotations.
 
 See L<PICA::Parser::Base> for synopsis and configuration.
 
-In addition to the C<$> this parser also allows C<ƒ> as subfield indicator,
-unless option C<strict> is enabled.
+In addition to the C<$> this parser also allows C<ƒ> as subfield indicator and it skips lines with WinIBW download messages, unless option C<strict> is enabled.
 
 The counterpart of this module is L<PICA::Writer::Plain>.
 

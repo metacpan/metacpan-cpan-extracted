@@ -3,7 +3,7 @@ package Myriad::Service;
 use strict;
 use warnings;
 
-our $VERSION = '0.006'; # VERSION
+our $VERSION = '0.007'; # VERSION
 our $AUTHORITY = 'cpan:DERIV'; # AUTHORITY
 
 use utf8;

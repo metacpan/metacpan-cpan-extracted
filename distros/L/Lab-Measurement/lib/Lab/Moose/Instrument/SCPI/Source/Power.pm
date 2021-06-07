@@ -1,6 +1,6 @@
 package Lab::Moose::Instrument::SCPI::Source::Power;
 #ABSTRACT: Role for the SCPI SOURce:POWer subsystem
-$Lab::Moose::Instrument::SCPI::Source::Power::VERSION = '3.750';
+$Lab::Moose::Instrument::SCPI::Source::Power::VERSION = '3.751';
 use v5.20;
 
 use Moose::Role;
@@ -49,7 +49,7 @@ Lab::Moose::Instrument::SCPI::Source::Power - Role for the SCPI SOURce:POWer sub
 
 =head1 VERSION
 
-version 3.750
+version 3.751
 
 =head1 METHODS
 

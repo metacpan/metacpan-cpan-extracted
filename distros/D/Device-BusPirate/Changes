@@ -1,5 +1,17 @@
 Revision history for Device-BusPirate
 
+0.22    2021-06-04
+        [CHANGES]
+         * Implement the helper-based Device::Chip::Adapter v0.18 ->txn API
+
+        [BUGFIXES]
+         * Fix concurrency of multiple I²C transactions
+
+0.21    2021-06-03
+        [CHANGES]
+         * Unit-test various SPI concurrency scenarios
+         * Implement the Device::Chip::Adapter I²C ->txn API
+
 0.20    2020-06-19
         [CHANGES]
          * Support UART protocol, transmit-only

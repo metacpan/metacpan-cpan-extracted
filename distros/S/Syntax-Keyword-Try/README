@@ -30,11 +30,10 @@ DESCRIPTION
     and behaviours for perl code.
 
     Syntax similar to this module has now been added to core perl, starting
-    at development version 5.33.7, and is expected to become generally
-    available when perl 5.34 is released. If you are writing new code, it
-    is suggested that you instead use the Feature::Compat::Try module
-    instead, as that will enable the core feature on those supported perl
-    versions, falling back to Syntax::Keyword::Try on older perls.
+    at version 5.34.0. If you are writing new code, it is suggested that
+    you instead use the Feature::Compat::Try module instead, as that will
+    enable the core feature on those supported perl versions, falling back
+    to Syntax::Keyword::Try on older perls.
 
 Experimental Features
 
@@ -49,8 +48,6 @@ Experimental Features
     selectively:
 
        use Syntax::Keyword::Try qw( try :experimental(typed) );
-    
-       use Syntax::Keyword::Try qw( try :experimental(try_value) ); # deprecated
     
        use Syntax::Keyword::Try qw( try :experimental );  # all of the above
 
@@ -220,51 +217,6 @@ KEYWORDS
     with that feature instead, you should consider using
     Syntax::Keyword::Defer rather than using finally statements.
 
-VALUE SEMANTICS
-
-      Warning: the feature described in this section was experimental and
-      is now deprecated. This experiment has existed for a while, though
-      given that since version 0.22 the regular try syntax already behaves
-      fine inside a do block, there is no longer any reason for this
-      experimental feature to exist. It will print a deprecation warning,
-      and eventually will be removed in a later version. You should use do
-      { try ... } instead.
-
-      Additionally, on perl versions 5.18 and later, it will produce a
-      warning in the experimental category.
-
-    The syntax provided by this module may be used as a value-yielding
-    expression. Because this syntax is new, experimental, and somewhat
-    surprising, it must be specifically requested by name try_value:
-
-       use Syntax::Keyword::Try qw( try try_value );
-    
-       my $result = try do { ... } catch { ... };
-
-    Also, on Perl versions 5.24 and later:
-
-       my $result = try do { ... } finally { ... };
-    
-       my $result = try do { ... } catch { ... } finally { ... };
-
-    Specifically, note that the expression must be spelled as try do { ...
-    } so that the syntax is distinct from that used by control-flow
-    statements. The interposed do keyword reminds the reader, and instructs
-    the syntax parser, that this will be an expression, not a statement. It
-    is not necessary to similarly notate the catch or finally blocks.
-
-    In this case, the syntax behaves syntactically like an expression, and
-    may appear anywhere a normal expression is allowed. It follows similar
-    semantics to the purely control-flow case; if the code in the try block
-    does not throw an exception, then the expression as a whole yields
-    whatever value the try expression did. If it fails, then the catch
-    block is executed and the expression yields its resulting value
-    instead. A finally block, if present, will be evaluated for
-    side-effects before the rest of the expression returns.
-
-    Remember that, as in the control-flow case, the return keyword will
-    cause the entire containing function to return, not just the try block.
-
 OTHER MODULES
 
     There are already quite a number of modules on CPAN that provide a
@@ -279,9 +231,7 @@ OTHER MODULES
       * Syntax::Feature::Try
 
     In addition, core perl itself gained a try/catch syntax based on this
-    module at developemnt version 5.33.7, and should become generally
-    available when 5.34 is released. It will be available as use feature
-    'try'.
+    module at version 5.34.0. It is available as use feature 'try'.
 
     They are compared here, by feature:
 
@@ -337,10 +287,9 @@ OTHER MODULES
  Value Semantics
 
     Like Try and Syntax::Feature::Try, the syntax provided by this module
-    only works as a syntax-level statement and not an expression when the
-    experimental try_value feature described above has not been enabled.
-    You cannot assign from the result of a try block. A common workaround
-    is to wrap the try/catch statement inside a do block, where its final
+    only works as a syntax-level statement and not an expression. You
+    cannot assign from the result of a try block. A common workaround is to
+    wrap the try/catch statement inside a do block, where its final
     expression can be captured and used as a value.
 
     The same do block wrapping also works for the core feature 'try'.

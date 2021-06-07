@@ -1,6 +1,6 @@
 {
     "name" : "Perl7-Handy",
-    "version" : "0.05",
+    "version" : "0.06",
     "abstract" : "Handy Perl7 scripting environment on Perl5",
     "author" : [
         "ina <ina@cpan.org>"

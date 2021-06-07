@@ -2,28 +2,20 @@ use v5.10;
 use warnings;
 use Test::More;
 use Data::Dumper;
-use Form::Tiny;
 
 {
 
 	package TestForm;
-	use Moo;
+	use Form::Tiny -filtered;
 	use Types::Standard qw(Int);
 
-	with qw(
-		Form::Tiny
-		Form::Tiny::Filtered
+	form_trim_strings;
+
+	form_field 'name.*' => (
+		type => Int
 	);
 
-	sub build_fields
-	{
-		(
-			{name => 'name.*', type => Int},
-		)
-	}
-
-	sub pre_validate
-	{
+	form_hook 'before_validate' => sub {
 		my ($self, $input) = @_;
 
 		if (ref $input->{name} eq ref []) {
@@ -31,22 +23,42 @@ use Form::Tiny;
 		}
 
 		return $input;
-	}
+	};
 
-	sub pre_mangle
-	{
+	form_hook 'after_validate' => sub {
+		my ($self, $fields) = @_;
+
+		$fields->{no_data} = 1
+			if !$fields->{name} || !scalar @{$fields->{name}};
+	};
+
+	form_hook 'before_mangle' => sub {
 		my ($self, $definition, $value) = @_;
 
 		return $value . 1;
-	}
+	};
+
+	form_hook reformat => sub {
+		my ($self, $input) = @_;
+
+		return ref $input eq '' ? {} : $input;
+	};
+
+	form_hook after_error => sub {
+		my ($self, $error) = @_;
+
+		$error->set_error('error got overwritten');
+	};
 }
 
 my @data = (
-	[1, {}, {}],
+	[1, {}, {no_data => 1}],
+	[1, '', {no_data => 1}],
 	[1, {name => [2, 3]}, {name => [21, 31]}],
 	[1, {name => [0, undef, 3]}, {name => ["01", 31]}],
 	[1, {name => [" 2 "]}, {name => ["21"]}],
-	[1, {name => [undef, undef, undef]}, {name => []}],
+	[1, {name => [undef, undef, undef]}, {name => [], no_data => 1}],
+	[0, {name => ['that is not an integer']}],
 );
 
 for my $aref (@data) {
@@ -59,6 +71,7 @@ for my $aref (@data) {
 	}
 	for my $error (@{$form->errors}) {
 		is($error->field, "name.*", "error namespace valid");
+		is($error->error, "error got overwritten", "error message ok");
 	}
 
 	note Dumper($input);

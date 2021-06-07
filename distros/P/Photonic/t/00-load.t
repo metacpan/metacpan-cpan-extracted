@@ -1,6 +1,3 @@
-#!perl -T
-# should have used or not !perl -T?
-
 =head1 COPYRIGHT NOTICE
 
 Photonic - A perl package for calculations on photonics and
@@ -35,8 +32,6 @@ use 5.006;
 use strict;
 use warnings;
 use Test::More;
-
-plan tests => 65;
 
 BEGIN {
     my @mods= qw(
@@ -101,7 +96,6 @@ BEGIN {
 	     Photonic::Roles::UseMask
 	     Photonic::Roles::Metric
 	     Photonic::Roles::AllH
-	     Photonic::ExtraUtils
 	     Photonic::WE
 	     Photonic::Types
 	     Photonic::AllH

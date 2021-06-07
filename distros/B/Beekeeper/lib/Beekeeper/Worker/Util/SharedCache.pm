@@ -3,48 +3,7 @@ package Beekeeper::Worker::Util::SharedCache;
 use strict;
 use warnings;
 
-our $VERSION = '0.01';
-
-=head1 NAME
-
-Beekeeper::Worker::Util::SharedCache - Locally mirrored shared cache
-
-=head1 VERSION
-
-Version 0.01
-
-=head1 SYNOPSIS
-
-  use Beekeeper::Worker::Util 'shared_cache'
-  
-  my $c = $self->shared_cache(
-      id      => "mycache",
-      max_age => 300,
-      persist => 1,
-  );
-  
-  $c->set( $key => $value );
-  $c->get( $key );
-  $c->delete( $key );
-  $c->touch( $key );
-
-=head1 DESCRIPTION
-
-This module implements a locally mirrored shared cache: each worker keeps a
-copy of all cached data, and all copies are synced through message bus.
-
-Access operations are essentially free, as data is held locally. But changes 
-are expensive as they need to be propagated to every worker, and memory usage
-is high due to data cloning.
-
-Keep in mind that retrieved data may be stale due to latency in changes 
-propagation through the bus (which involves two network operations).
-
-Even if you are using this cache for small data sets that do not change very
-often, please consider if a distributed memory cache like Redis or such (or 
-even a plain DB) is a better alternative.
-
-=cut
+our $VERSION = '0.04';
 
 use Beekeeper::Worker ':log';
 use AnyEvent;
@@ -74,7 +33,7 @@ sub new {
         vers      => {},
         time      => {},
         _BUS      => undef,
-        _CLUSTER  => undef,
+        _BUS_GROUP=> undef,
     };
 
     bless $self, $class;
@@ -110,16 +69,16 @@ sub _connect_to_all_brokers {
     my ($self, $worker) = @_;
     weaken($self);
 
-    #TODO: using multiple shared_cache from the same worker will cause multiple cluster connections
+    #TODO: using multiple shared_cache from the same worker will cause multiple bus connections
 
     my $worker_bus = $worker->{_BUS};
-    my $cluster_config = Beekeeper::Config->get_cluster_config( bus_id => $worker_bus->bus_id );
+    my $group_config = Beekeeper::Config->get_bus_group_config( bus_id => $worker_bus->bus_id );
 
-    my $cluster = $self->{_CLUSTER} = [];
+    my $bus_group = $self->{_BUS_GROUP} = [];
 
-    foreach my $config (@$cluster_config) {
+    foreach my $config (@$group_config) {
 
-        my $bus_id = $config->{'bus-id'};
+        my $bus_id = $config->{'bus_id'};
 
         if ($bus_id eq $worker_bus->bus_id) {
             # Already connected to our own bus
@@ -130,16 +89,10 @@ sub _connect_to_all_brokers {
             next;
         }
 
-        my $bus; $bus = Beekeeper::Bus::STOMP->new( 
+        my $bus; $bus = Beekeeper::MQTT->new( 
             %$config,
-            bus_id     => $bus_id,
-            timeout    => 300,
-            on_connect => sub {
-                # Setup
-                log_debug "Connected to $bus_id";
-                $self->_setup_sync_listeners($bus);
-                $self->_accept_sync_requests($bus) if $self->{synced};
-            },
+            bus_id   => $bus_id,
+            timeout  => 300,
             on_error => sub {
                 # Reconnect
                 my $errmsg = $_[0] || ""; $errmsg =~ s/\s+/ /sg;
@@ -152,9 +105,16 @@ sub _connect_to_all_brokers {
             },
         );
 
-        push @$cluster, $bus;
+        push @$bus_group, $bus;
 
-        $bus->connect;
+        $bus->connect(
+            on_connack => sub {
+                # Setup
+                log_debug "Connected to $bus_id";
+                $self->_setup_sync_listeners($bus);
+                $self->_accept_sync_requests($bus) if $self->{synced};
+            },
+        );
     }
 }
 
@@ -164,11 +124,11 @@ sub _setup_sync_listeners {
 
     my $cache_id  = $self->{id};
     my $uid       = $self->{uid};
-    my $local_bus = $bus->{cluster};
+    my $local_bus = $bus->{bus_role};
 
     $bus->subscribe(
-        destination    => "/topic/msg.$local_bus._sync.$cache_id.set",
-        on_receive_msg => sub {
+        topic      => "msg/$local_bus/_sync/$cache_id/set",
+        on_publish => sub {
             my ($body_ref, $msg_headers) = @_;
 
             my $entry = decode_json($$body_ref);
@@ -178,8 +138,8 @@ sub _setup_sync_listeners {
     );
 
     $bus->subscribe(
-        destination    => "/temp-queue/reply-$uid",
-        on_receive_msg => sub {
+        topic      => "priv/reply-$uid",
+        on_publish => sub {
             my ($body_ref, $msg_headers) = @_;
 
             my $dump = decode_json($$body_ref);
@@ -200,12 +160,11 @@ sub _send_sync_request {
 
     my $cache_id  = $self->{id};
     my $uid       = $self->{uid};
-    my $local_bus = $bus->{cluster};
+    my $local_bus = $bus->{bus_role};
 
-    $bus->send(
-        destination => "/queue/req.$local_bus._sync.$cache_id.dump",
-       'reply-to'   => "/temp-queue/reply-$uid",
-        body        => "",
+    $bus->publish(
+        topic          => "req/$local_bus/_sync/$cache_id/dump",
+        response_topic => "priv/reply-$uid",
     );
 
     # When a fresh cluster is started nobody will answer, and determining which
@@ -237,11 +196,11 @@ sub _sync_completed {
 
     # On a fresh cluster, the first worker to timeout the sync request
     # will act as a master and relpy all sync requests remaining
-    log_debug( $success ? "Sync completed" : "Acting as master" );
+    log_debug( "Shared cache '$self->{id}': " . ($success ? "Sync completed" : "Acting as master"));
 
     $self->{synced} = 1;
 
-    foreach my $bus ( @{$self->{_CLUSTER}} ) {
+    foreach my $bus ( @{$self->{_BUS_GROUP}} ) {
 
         # Connections to other buses could have failed or be in progress
         next unless $bus->{is_connected};
@@ -258,28 +217,20 @@ sub _accept_sync_requests {
     my $cache_id  = $self->{id};
     my $uid       = $self->{uid};
     my $bus_id    = $bus->{bus_id};
-    my $local_bus = $bus->{cluster};
+    my $local_bus = $bus->{bus_role};
 
-    log_debug "Accepting $cache_id sync requests from $local_bus";
+    log_debug "Shared cache '$self->{id}': Accepting sync requests from $local_bus";
 
     $bus->subscribe(
-        destination     => "/queue/req.$local_bus._sync.$cache_id.dump",
-        ack             => 'client', # manual ack
-       'prefetch-count' => '1',
-        on_receive_msg  => sub {
+        topic      => "\$share/BKPR/req/$local_bus/_sync/$cache_id/dump",
+        on_publish => sub {
             my ($body_ref, $msg_headers) = @_;
 
             my $dump = encode_json( $self->dump );
 
-            $bus->send(
-                destination => $msg_headers->{'reply-to'},
-                body        => \$dump,
-            );
-
-            $bus->ack(
-                id           => $msg_headers->{'ack'},
-               'message-id'  => $msg_headers->{'message-id'},
-                subscription => $msg_headers->{'subscription'}, 
+            $bus->publish(
+                topic   => $msg_headers->{'response_topic'},
+                payload => \$dump,
             );
         }
     );
@@ -310,17 +261,17 @@ sub set {
     $self->{on_update}->($key, $value, $old) if $self->{on_update};
 
     # Notify all workers in every cluster about the change
-    my @cluster = grep { $_->{is_connected} } @{$self->{_CLUSTER}};
+    my @bus_group = grep { $_->{is_connected} } @{$self->{_BUS_GROUP}};
 
-    unshift @cluster, $self->{_BUS};
+    unshift @bus_group, $self->{_BUS};
 
-    foreach my $bus (@cluster) {
-        my $local_bus = $bus->{cluster};
-        my $cache_id = $self->{id};
+    foreach my $bus (@bus_group) {
+        my $local_bus = $bus->{bus_role};
+        my $cache_id  = $self->{id};
 
-        $bus->send(
-            destination => "/topic/msg.$local_bus._sync.$cache_id.set",
-            body        => \$json,
+        $bus->publish(
+            topic    => "msg/$local_bus/_sync/$cache_id/set",
+            payload  => \$json,
         );
     }
 
@@ -546,10 +497,10 @@ sub disconnect {
 
     $self->_save_state if $self->{persist};
 
-    foreach my $bus (@{$self->{_CLUSTER}}) {
+    foreach my $bus (@{$self->{_BUS_GROUP}}) {
 
         next unless ($bus->{is_connected});
-        $bus->disconnect( blocking => 1 );
+        $bus->disconnect;
     }
 }
 
@@ -562,7 +513,52 @@ sub DESTROY {
 
 1;
 
+__END__
+
+=pod
+
 =encoding utf8
+
+=head1 NAME
+
+Beekeeper::Worker::Util::SharedCache - Locally mirrored shared cache
+
+=head1 VERSION
+
+Version 0.04
+
+=head1 SYNOPSIS
+
+  use Beekeeper::Worker::Util 'shared_cache'
+  
+  my $c = $self->shared_cache(
+      id      => "mycache",
+      max_age => 300,
+      persist => 1,
+  );
+  
+  $c->set( $key => $value );
+  $c->get( $key );
+  $c->delete( $key );
+  $c->touch( $key );
+
+=head1 DESCRIPTION
+
+This module implements a locally mirrored shared cache: each worker keeps a
+copy of all cached data, and all copies are synced through message bus.
+
+Access operations are essentially free, as data is held locally. But changes 
+are expensive as they need to be propagated to every worker, and overall 
+memory usage is high due to data cloning.
+
+Keep in mind that retrieved data may be stale due to latency in the propagation
+of changes through the bus which involves two MQTT messages.
+
+Even if you are using this cache for small data sets that do not change very
+often, please consider if a distributed memory cache (or even a plain DB) is 
+a better alternative.
+
+Due to propagation costs, B<this cache does not scale>.
 
 =head1 AUTHOR
 
@@ -570,7 +566,7 @@ José Micó, C<jose.mico@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright 2015 José Micó.
+Copyright 2015-2021 José Micó.
 
 This is free software; you can redistribute it and/or modify it under the same 
 terms as the Perl 5 programming language itself.

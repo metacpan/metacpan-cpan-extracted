@@ -1,10 +1,14 @@
-Revision history for App-RegexpCommonUtils
+0.003   2021-05-25  Released-By: PERLANCAR; Urgency: high
 
-0.002   2016-12-31 (PERLANCAR)
+	- [build] Rebuild to update Sah coercion module names (old Sah coercion
+          modules have been purged from CPAN).
+
+
+0.002   2016-12-31  Released-By: PERLANCAR
 
 	- Add utilities: get-regex-common-pattern, list-regexp-common-patterns.
 
 
-0.001   2016-12-31 (PERLANCAR)
+0.001   2016-12-31  Released-By: PERLANCAR
 
         - First early release, expect more utilities to be added.

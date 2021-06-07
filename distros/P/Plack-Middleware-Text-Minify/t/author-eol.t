@@ -24,6 +24,7 @@ my @files = (
     't/03-type-callback.t',
     't/03-type-regex.t',
     't/04-empty.t',
+    't/05-psgi-no-minify.t',
     't/author-critic.t',
     't/author-eof.t',
     't/author-eol.t',

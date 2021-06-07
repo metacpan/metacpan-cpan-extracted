@@ -1,5 +1,9 @@
 Revision history for Starlink::ATL
 
+0.05 2021-05-21
+    - Add placeholder top level Starlink::ATL module.
+    - Add astmoctool script.
+
 0.04 2014-07-17
     - Add Changes file.
 

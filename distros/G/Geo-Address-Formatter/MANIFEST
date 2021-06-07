@@ -305,6 +305,7 @@ t/unit/abbreviate.t
 t/unit/countries.t
 t/unit/critic.t
 t/unit/formatter.t
+t/unit/memory_use.t
 t/unit/perlcriticrc
 t/unit/test_conf-abbreviate/abbreviations/ca.yaml
 t/unit/test_conf-abbreviate/abbreviations/en.yaml

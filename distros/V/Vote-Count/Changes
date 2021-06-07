@@ -1,4 +1,6 @@
 Revision history for Vote::Count
+2.00  May  23, 2021 Added STV Support
+                    Minimum Perl now 5.24
 1.10  Mar  11, 2021 Extraction of changes from the stv branch.
                     fixup to tiebreaker, weighted votes approval matrix topcount,
                     precedence fallback, Choices method, WithdrawalList, UntieList.

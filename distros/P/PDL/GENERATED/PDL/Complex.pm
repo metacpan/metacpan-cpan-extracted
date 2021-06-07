@@ -21,6 +21,9 @@ BEGIN {
 
 
 
+use strict;
+use warnings;
+use Carp;
 our $VERSION = '2.009';
    use PDL::Slices;
    use PDL::Types;
@@ -233,8 +236,11 @@ Comparing complex numbers other than for equality is a fatal error.
 
 my $i;
 BEGIN { $i = bless pdl 0,1 }
-undef *PDL::i;
+undef &PDL::i;
+{
+no warnings 'redefine';
 sub i { $i->copy + (@_ ? $_[0] : 0) };
+}
 
 
 
@@ -250,6 +256,42 @@ sub i { $i->copy + (@_ ? $_[0] : 0) };
 
 
 
+
+=head2 from_native
+
+=for ref
+
+Class method to convert a native-complex ndarray to a PDL::Complex object.
+
+=for usage
+
+ PDL::Complex->from_native($native_complex_ndarray)
+
+=cut
+
+sub from_native {
+  my ($class, $ndarray) = @_;
+  return $ndarray if UNIVERSAL::isa($ndarray,'PDL::Complex'); # NOOP if P:C
+  croak "not an ndarray" if !UNIVERSAL::isa($ndarray,'PDL');
+  croak "not a native complex ndarray" if $ndarray->type->real;
+  bless PDL::append($ndarray->re->dummy(0),$ndarray->im->dummy(0)), $class;
+}
+
+=head2 as_native
+
+=for ref
+
+Object method to convert a PDL::Complex object to a native-complex ndarray.
+
+=for usage
+
+ $pdl_complex_obj->as_native
+
+=cut
+
+sub as_native {
+  PDL::Ops::czip(map $_[0]->slice("($_)"), 0..1);
+}
 
 =head2 cplx
 
@@ -296,7 +338,6 @@ result if you don't want this.
 
 =cut
 
-use Carp;
 sub cplx($) {
    return $_[0] if UNIVERSAL::isa($_[0],'PDL::Complex'); # NOOP if just ndarray
    croak "first dimsize must be 2" unless $_[0]->dims > 0 && $_[0]->dim(0) == 2;
@@ -343,8 +384,9 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
+undef &PDL::r2C;
 *PDL::r2C = \&PDL::Complex::r2C;
-sub PDL::Complex::r2C($) {
+sub PDL::Complex::r2C {
   return $_[0] if UNIVERSAL::isa($_[0],'PDL::Complex');
   my $r = __PACKAGE__->initialize;
   &PDL::Complex::_r2C_int($_[0], $r);
@@ -379,7 +421,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-*PDL::i2C = \&PDL::Complex::i2C; sub PDL::Complex::i2C($) { my $r = __PACKAGE__->initialize; &PDL::Complex::_i2C_int($_[0], $r); $r }
+undef &PDL::i2C; *PDL::i2C = \&PDL::Complex::i2C; sub PDL::Complex::i2C { my $r = __PACKAGE__->initialize; &PDL::Complex::_i2C_int($_[0], $r); $r }
 
 BEGIN {*i2C = \&PDL::Complex::i2C;
 }
@@ -595,7 +637,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 sub PDL::Complex::Ceq {
-    my @args = reverse &PDL::Core::rswap;
+    my @args = !$_[2] ? @_[1,0] : @_[0,1];
     $args[1] = r2C($args[1]) if ref $args[1] ne __PACKAGE__;
     PDL::Complex::_Ceq_int($args[0], $args[1], my $r = PDL->null);
     $r;
@@ -1255,12 +1297,15 @@ imaginary parts are returned as ndarrays (ref eq PDL).
 sub re($) { $_[0]->slice("(0)") }
 sub im($) { $_[0]->slice("(1)") }
 
+{
+no warnings 'redefine';
 # if the argument does anything other than pass through 0-th dim, re-bless
 sub slice (;@) :lvalue {
   my $first = ref $_[1] ? $_[1][0] : (split ',', $_[1])[0];
-  my $class = $first =~ /^[:x]?$/i ? ref($_[0]) : 'PDL';
+  my $class = ($first//'') =~ /^[:x]?$/i ? ref($_[0]) : 'PDL';
   my $ret = bless $_[0]->SUPER::slice(@_[1..$#_]), $class;
   $ret;
+}
 }
 
 
@@ -1320,14 +1365,11 @@ is ('+') or is not ('-') commutative. See the discussion of argument
 swapping in the section "Calling Conventions and Magic Autogeneration"
 in "perldoc overload".
 
-This is a great example of taking almost as many lines to write cute
-generating code as it would take to just clearly and explicitly write
-down the overload.
-
 =end comment
 
 =cut
 
+my %NO_MUTATE; BEGIN { @NO_MUTATE{qw(atan2 .= ==)} = (); }
 sub _gen_biop {
    local $_ = shift;
    my $sub;
@@ -1339,12 +1381,13 @@ sub _gen_biop {
    } else {
       die;
    }
-   if($1 eq "atan2") { return ($1, $sub) }
+   return ($1, $sub) if exists $NO_MUTATE{$1};
    ($1, $sub, "$1=", $sub);
 }
 
 sub _gen_unop {
    my ($op, $func) = ($_[0] =~ /(.+)@(\w+)/);
+   no strict 'refs';
    *$op = \&$func if $op =~ /\w+/; # create an alias
    ($op, eval 'sub { '.$func.' $_[0] }');
 }
@@ -1357,7 +1400,7 @@ sub initialize {
 
 # so threading doesn't also assign the real value into the imaginary
 sub Cassgn {
-    my @args = reverse &PDL::Core::rswap;
+    my @args = !$_[2] ? @_[1,0] : @_[0,1];
     $args[1] = r2C($args[1]) if ref $args[1] ne __PACKAGE__;
     PDL::Ops::assgn(@args);
     $args[1];
@@ -1366,361 +1409,32 @@ sub Cassgn {
 use overload
    (map _gen_biop($_), qw(++Cadd --Csub *+Cmul /-Cdiv **-Cpow atan2-Catan2 ==+Ceq .=-Cassgn)),
    (map _gen_unop($_), qw(sin@Csin cos@Ccos exp@Cexp abs@Cabs log@Clog sqrt@Csqrt)),
-#final ternary used to make result a scalar, not a PDL:::Complex (thx CED!)
-    "<" => sub { confess "Can't compare complex numbers" },
-    "<=" => sub { confess "Can't compare complex numbers" },
-    ">=" => sub { confess "Can't compare complex numbers" },
-    ">" => sub { confess "Can't compare complex numbers" },
-    "!=" => sub { !($_[0] == $_[1]) },
-   '++' => sub { $_[0] += 1 },
-   '--' => sub { $_[0] -= 1 },
-   '""' => \&PDL::Complex::string
+   (map +($_ => sub { confess "Can't compare complex numbers" }), qw(< > <= >=)),
+   "!=" => sub { !($_[0] == $_[1]) },
+   '""' => sub { $_[0]->as_native->string },
 ;
 
-# overwrite PDL's overloading to honour subclass methods in + - * /
-{ package PDL;
-        my $warningFlag;
-        # This strange usage of BEGINs is to ensure the
-        # warning messages get disabled and enabled in the
-        # proper order. Without the BEGIN's the 'use overload'
-        #  would be called first.
-        BEGIN {$warningFlag = $^W; # Temporarily disable warnings caused by
-               $^W = 0;            # redefining PDL's subs
-              }
-
-
-sub cp(;@) {
-	my $foo;
-	if (ref $_[1]
-		&& (ref $_[1] ne 'PDL')
-		&& defined ($foo = overload::Method($_[1],'+')))
-		{ &$foo($_[1], $_[0], !$_[2])}
-	else { PDL::plus (@_)}
+sub sum {
+  my($x) = @_;
+  return $x if $x->dims==1;
+  my $tmp = $x->mv(0,-1)->clump(-2)->mv(1,0)->sumover;
+  return $tmp;
 }
 
-sub cm(;@) {
-	my $foo;
-	if (ref $_[1]
-		&& (ref $_[1] ne 'PDL')
-		&& defined ($foo = overload::Method($_[1],'*')))
-		{ &$foo($_[1], $_[0], !$_[2])}
-	else { PDL::mult (@_)}
+sub sumover{
+  my $m = shift;
+  PDL::Ufunc::sumover($m->transpose);
 }
 
-sub cmi(;@) {
-	my $foo;
-	if (ref $_[1]
-		&& (ref $_[1] ne 'PDL')
-		&& defined ($foo = overload::Method($_[1],'-')))
-		{ &$foo($_[1], $_[0], !$_[2])}
-	else { PDL::minus (@_)}
-}
+*PDL::Complex::Csumover=\&sumover; # define through alias
 
-sub cd(;@) {
-	my $foo;
-	if (ref $_[1]
-		&& (ref $_[1] ne 'PDL')
-		&& defined ($foo = overload::Method($_[1],'/')))
-		{ &$foo($_[1], $_[0], !$_[2])}
-	else { PDL::divide (@_)}
-}
+*PDL::Complex::prodover=\&Cprodover; # define through alias
 
-
-  # Used in overriding standard PDL +, -, *, / ops in the complex subclass.
-  use overload (
-		 '+' => \&cp,
-		 '*' => \&cm,
-	         '-' => \&cmi,
-		 '/' => \&cd,
-		);
-
-
-
-        BEGIN{ $^W = $warningFlag;} # Put Back Warnings
-};
-
-
-{
-
-   our $floatformat  = "%4.4g";    # Default print format for long numbers
-   our $doubleformat = "%6.6g";
-
-   $PDL::Complex::_STRINGIZING = 0;
-
-   sub PDL::Complex::string {
-      my($self,$format1,$format2)=@_;
-      my @dims = $self->dims;
-      return PDL::string($self) if ($dims[0] != 2);
-
-      if($PDL::Complex::_STRINGIZING) {
-         return "ALREADY_STRINGIZING_NO_LOOPS";
-      }
-      local $PDL::Complex::_STRINGIZING = 1;
-      my $ndims = $self->getndims;
-      if($self->nelem > $PDL::toolongtoprint) {
-         return "TOO LONG TO PRINT";
-      }
-      if ($ndims==0){
-         PDL::Core::string($self,$format1);
-      }
-      return "Null" if $self->isnull;
-      return "Empty" if $self->isempty; # Empty ndarray
-      local $sep  = $PDL::use_commas ? ", " : "  ";
-      local $sep2 = $PDL::use_commas ? ", " : "";
-      if ($ndims < 3) {
-         return str1D($self,$format1,$format2);
-      }
-      else{
-         return strND($self,$format1,$format2,0);
-      }
-   }
-
-
-   sub sum {
-      my($x) = @_;
-      return $x if $x->dims==1;
-      my $tmp = $x->mv(0,-1)->clump(-2)->mv(1,0)->sumover;
-      return $tmp;
-   }
-
-   sub sumover{
-      my $m = shift;
-      PDL::Ufunc::sumover($m->xchg(0,1));
-   }
-
-   *PDL::Complex::Csumover=\&sumover; # define through alias
-
-   *PDL::Complex::prodover=\&Cprodover; # define through alias
-
-   sub prod {
-      my($x) = @_;
-      return $x if $x->dims==1;
-      my $tmp = $x->mv(0,-1)->clump(-2)->mv(1,0)->prodover;
-      return $tmp;
-   }
-
-
-
-   sub strND {
-      my($self,$format1,$format2,$level)=@_;
-      my @dims = $self->dims;
-
-      if ($#dims==2) {
-         return str2D($self,$format1,$format2,$level);
-      }
-      else {
-         my $secbas = join '',map {":,"} @dims[0..$#dims-1];
-         my $ret="\n"." "x$level ."["; my $j;
-         for ($j=0; $j<$dims[$#dims]; $j++) {
-            my $sec = $secbas . "($j)";
-
-            $ret .= strND($self->slice($sec),$format1,$format2, $level+1);
-            chop $ret; $ret .= $sep2;
-         }
-         chop $ret if $PDL::use_commas;
-         $ret .= "\n" ." "x$level ."]\n";
-         return $ret;
-      }
-   }
-
-
-   # String 1D array in nice format
-   #
-   sub str1D {
-      my($self,$format1,$format2)=@_;
-      barf "Not 1D" if $self->getndims() > 2;
-      my $x = PDL::Core::listref_c($self);
-      my ($ret,$dformat,$t, $i);
-
-      my $dtype = $self->get_datatype();
-      $dformat = $PDL::Complex::floatformat  if $dtype == $PDL_F;
-      $dformat = $PDL::Complex::doubleformat if $dtype == $PDL_D;
-
-      $ret = "[" if $self->getndims() > 1;
-      my $badflag = $self->badflag();
-      for($i=0; $i<=$#$x; $i++){
-         $t = $$x[$i];
-         if ( $badflag and $t eq "BAD" ) {
-            # do nothing
-         } elsif ($format1) {
-            $t =  sprintf $format1,$t;
-         } else{ # Default
-            if ($dformat && length($t)>7) { # Try smaller
-               $t = sprintf $dformat,$t;
-            }
-         }
-         $ret .= $i % 2 ?
-         $i<$#$x ? $t."i$sep" : $t."i"
-         : substr($$x[$i+1],0,1) eq "-" ?  "$t " : $t." +";
-      }
-      $ret.="]" if $self->getndims() > 1;
-      return $ret;
-   }
-
-
-   sub str2D {
-      my($self,$format1,$format2,$level)=@_;
-      my @dims = $self->dims();
-      barf "Not 2D" if scalar(@dims)!=3;
-      my $x = PDL::Core::listref_c($self);
-      my ($i, $f, $t, $len1, $len2, $ret);
-
-      my $dtype = $self->get_datatype();
-      my $badflag = $self->badflag();
-
-      my $findmax = 0;
-
-      if (!defined $format1 || !defined $format2 ||
-         $format1 eq '' || $format2 eq '') {
-         $len1= $len2 = 0;
-
-         if ( $badflag ) {
-            for ($i=0; $i<=$#$x; $i++) {
-               if ( $$x[$i] eq "BAD" ) {
-                  $f = 3;
-               }
-               else {
-                  $f = length($$x[$i]);
-               }
-               if ($i % 2) {
-                  $len2 = $f if $f > $len2;
-               }
-               else {
-                  $len1 = $f if $f > $len1;
-               }
-            }
-         } else {
-            for ($i=0; $i<=$#$x; $i++) {
-               $f = length($$x[$i]);
-               if ($i % 2){
-                  $len2 = $f if $f > $len2;
-               }
-               else{
-                  $len1 = $f if $f > $len1;
-               }
-            }
-         }
-
-         $format1 = '%'.$len1.'s';
-         $format2 = '%'.$len2.'s';
-
-         if ($len1 > 5){
-            if ($dtype == $PDL_F) {
-               $format1 = $PDL::Complex::floatformat;
-               $findmax = 1;
-            } elsif ($dtype == $PDL_D) {
-               $format1 = $PDL::Complex::doubleformat;
-               $findmax = 1;
-            } else {
-               $findmax = 0;
-            }
-         }
-         if($len2 > 5){
-            if ($dtype == $PDL_F) {
-               $format2 = $PDL::Complex::floatformat;
-               $findmax = 1;
-            } elsif ($dtype == $PDL_D) {
-               $format2 = $PDL::Complex::doubleformat;
-               $findmax = 1;
-            } else {
-               $findmax = 0 unless $findmax;
-            }
-         }
-      }
-
-      if($findmax) {
-         $len1 = $len2=0;
-
-         if ( $badflag ) {
-            for($i=0; $i<=$#$x; $i++){
-               $findmax = $i % 2;
-               if ( $$x[$i] eq 'BAD' ){
-                  $f = 3;
-               }
-               else{
-                  $f = $findmax ? length(sprintf $format2,$$x[$i]) :
-                  length(sprintf $format1,$$x[$i]);
-               }
-               if ($findmax){
-                  $len2 = $f if $f > $len2;
-               }
-               else{
-                  $len1 = $f if $f > $len1;
-               }
-            }
-         } else {
-            for ($i=0; $i<=$#$x; $i++) {
-               if ($i % 2){
-                  $f = length(sprintf $format2,$$x[$i]);
-                  $len2 = $f if $f > $len2;
-               }
-               else{
-                  $f = length(sprintf $format1,$$x[$i]);
-                  $len1 = $f if $f > $len1;
-               }
-            }
-         }
-
-
-      } # if: $findmax
-
-      $ret = "\n" . ' 'x$level . "[\n";
-      {
-         my $level = $level+1;
-         $ret .= ' 'x$level .'[';
-         $len2 += 2;
-
-         for ($i=0; $i<=$#$x; $i++) {
-            $findmax = $i % 2;
-            if ($findmax){
-               if ( $badflag and  $$x[$i] eq 'BAD' ){
-                  #||
-                  #($findmax && $$x[$i - 1 ] eq 'BAD') ||
-                  #(!$findmax && $$x[$i +1 ] eq 'BAD')){
-                  $f = "BAD";
-               }
-               else{
-                  $f = sprintf $format2, $$x[$i];
-                  if (substr($$x[$i],0,1) eq '-'){
-                     $f.='i';
-                  }
-                  else{
-                     $f =~ s/(\s*)(.*)/+$2i/;
-                  }
-               }
-               $t = $len2-length($f);
-            }
-            else{
-               if ( $badflag and  $$x[$i] eq 'BAD' ){
-                  $f = "BAD";
-               }
-               else{
-                  $f = sprintf $format1, $$x[$i];
-                  $t =  $len1-length($f);
-               }
-            }
-
-            $f = ' 'x$t.$f if $t>0;
-
-            $ret .= $f;
-            if (($i+1)%($dims[1]*2)) {
-               $ret.=$sep if $findmax;
-            }
-            else{ # End of output line
-               $ret.=']';
-               if ($i==$#$x) { # very last number
-                  $ret.="\n";
-               }
-               else{
-                  $ret.= $sep2."\n" . ' 'x$level .'[';
-               }
-            }
-         }
-      }
-      $ret .= ' 'x$level."]\n";
-      return $ret;
-   }
-
+sub prod {
+  my($x) = @_;
+  return $x if $x->dims==1;
+  my $tmp = $x->mv(0,-1)->clump(-2)->mv(1,0)->prodover;
+  return $tmp;
 }
 
 =head1 AUTHOR

@@ -11,11 +11,11 @@ BEGIN {
 use strict;
 use warnings;
 
-# this test was generated with Dist::Zilla::Plugin::Test::Perl::Critic::Subset 3.001.003
+# this test was generated with Dist::Zilla::Plugin::Test::Perl::Critic::Subset 3.001.005
 
 use Test::Perl::Critic (-profile => "") x!! -e "";
 
-my $filenames = ['lib/App/CPANModulesUtils.pm','script/acme-cpanmodules-for','script/draw-feature-matrix-from-acme-cpanmodules-module','script/gen-acme-cpanmodules-module-from-acme-cpanlists-list'];
+my $filenames = ['lib/App/CPANModulesUtils.pm','script/acme-cpanmodules-for','script/draw-feature-matrix-from-acme-cpanmodules-module','script/gen-acme-cpanmodules-module-from-acme-cpanlists-list','script/gen-acme-cpanmodules-module-from-webpage'];
 unless ($filenames && @$filenames) {
     $filenames = -d "blib" ? ["blib"] : ["lib"];
 }

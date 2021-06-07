@@ -1,0 +1,11 @@
+Revision history for Games-Simutrans-Pakset
+
+0.02  2021-06-02 08:21:46 EDT
+        - The path parameter may be passed to new().
+        - Language 'en' is assumed when none is given even when no
+          system environment variables exist (e.g., Win, FreeBSD)
+        - Images with a subscript of '[-]' are parsed and saved.
+        - A remnant bareword filehandle was replaced with modern code.
+
+0.01  2021-05-28 20:59:06 EDT
+        - Initial release

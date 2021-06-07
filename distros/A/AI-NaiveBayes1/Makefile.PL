@@ -19,9 +19,8 @@ WriteMakefile
   'PL_FILES' => {},
   ($] >= 5.005 ?    ## Add these new keywords supported since 5.005
    (ABSTRACT_FROM => $name, # retrieve abstract from module
-   # <? echo "   AUTHOR => 'Vlado Keselj $VladoURL')" !>
-   #+
-      AUTHOR => 'Vlado Keselj http://web.cs.dal.ca/~vlado')
+   # <? echo "   AUTHOR => 'Vlado Keselj $VladoURL')" !>#+
+      AUTHOR => 'Vlado Keselj https://web.cs.dal.ca/~vlado')
    #-
    : ()
    ),

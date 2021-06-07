@@ -1,8 +1,8 @@
 use strict;
 use warnings;
 use Test::More;
-BEGIN { 
-  plan skip_all => 'test requires Test::Strict' 
+BEGIN {
+  plan skip_all => 'test requires Test::Strict'
     unless eval q{ use Test::Strict; 1 };
 };
 use Test::Strict;

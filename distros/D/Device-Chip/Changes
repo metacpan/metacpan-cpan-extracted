@@ -1,5 +1,17 @@
 Revision history for Device-Chip
 
+0.18    2021-06-04
+        [BUGFIXES]
+         * Fix I²C ->txn API for concurrency: pass a "helper" instance on
+           which to call ->write/->read methods
+
+0.17    2021-06-03
+        [CHANGES]
+         * Added I²C protocol ->txn method
+         * Updated for Object::Pad 0.38
+         * Make Sensor->format( undef ) return undef
+         * Return just the first scalar from list-returning sensor methods
+
 0.16    2021-01-01
         [CHANGES]
          * Initial implementation of Device::Chip::Sensor API
