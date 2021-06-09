@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+
+if [ -f ~/.bash_profile ]; then
+    grep --color=always $@ ~/.bash_profile
+elif [ -f ~/.bashrc ]; then
+    grep --color=always $@ ~/.bashrc
+fi 
+

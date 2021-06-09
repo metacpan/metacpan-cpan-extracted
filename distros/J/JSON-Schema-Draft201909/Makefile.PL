@@ -12,7 +12,6 @@ use ExtUtils::MakeMaker;
 BEGIN {
 my %configure_requires = (
     'ExtUtils::MakeMaker' => '0',
-    'File::ShareDir::Install' => '0.06',
     'Module::Build::Tiny' => '0.034',
 );
 
@@ -71,17 +70,11 @@ EOW
 }
 } # end BEGIN
 
-use File::ShareDir::Install;
-$File::ShareDir::Install::INCLUDE_DOTFILES = 1;
-$File::ShareDir::Install::INCLUDE_DOTDIRS = 1;
-install_share dist => "share";
-
 my %WriteMakefileArgs = (
-  "ABSTRACT" => "Validate data against a schema",
+  "ABSTRACT" => "(DEPRECATED) Validate data against a schema",
   "AUTHOR" => "Karen Etheridge <ether\@cpan.org>",
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0,
-    "File::ShareDir::Install" => "0.06",
     "Module::Build::Tiny" => "0.034"
   },
   "DISTNAME" => "JSON-Schema-Draft201909",
@@ -90,99 +83,89 @@ my %WriteMakefileArgs = (
   "NAME" => "JSON::Schema::Draft201909",
   "PL_FILES" => {},
   "PREREQ_PM" => {
-    "B" => 0,
-    "Carp" => 0,
-    "Exporter" => 0,
-    "Feature::Compat::Try" => 0,
-    "File::ShareDir" => 0,
-    "JSON::MaybeXS" => "1.004001",
-    "JSON::PP" => 0,
-    "List::Util" => "1.55",
-    "Module::Runtime" => 0,
-    "Mojo::JSON::Pointer" => 0,
-    "Mojo::URL" => 0,
-    "Mojolicious" => "7.23",
+    "Import::Into" => 0,
+    "JSON::Schema::Modern" => 0,
+    "JSON::Schema::Modern::Annotation" => 0,
+    "JSON::Schema::Modern::Document" => 0,
+    "JSON::Schema::Modern::Error" => 0,
+    "JSON::Schema::Modern::Result" => 0,
+    "JSON::Schema::Modern::Utilities" => 0,
+    "JSON::Schema::Modern::Vocabulary" => 0,
+    "JSON::Schema::Modern::Vocabulary::Applicator" => 0,
+    "JSON::Schema::Modern::Vocabulary::Content" => 0,
+    "JSON::Schema::Modern::Vocabulary::Core" => 0,
+    "JSON::Schema::Modern::Vocabulary::Format" => 0,
+    "JSON::Schema::Modern::Vocabulary::MetaData" => 0,
+    "JSON::Schema::Modern::Vocabulary::Validation" => 0,
     "Moo" => 0,
-    "Moo::Object" => 0,
     "Moo::Role" => 0,
-    "MooX::HandlesVia" => 0,
-    "MooX::TypeTiny" => "0.002002",
-    "Path::Tiny" => 0,
-    "Ref::Util" => "0.100",
-    "Safe::Isa" => 0,
-    "Storable" => 0,
-    "Types::Standard" => "1.010002",
-    "constant" => 0,
     "if" => 0,
     "namespace::clean" => 0,
-    "overload" => 0,
     "strict" => 0,
     "strictures" => 2,
     "warnings" => 0
   },
   "TEST_REQUIRES" => {
+    "Feature::Compat::Try" => 0,
     "File::Spec" => 0,
+    "JSON::MaybeXS" => 0,
+    "JSON::PP" => 0,
+    "List::Util" => "1.50",
     "Module::Metadata" => 0,
-    "Scalar::Util" => 0,
+    "Path::Tiny" => 0,
+    "Safe::Isa" => 0,
     "Test::Deep" => 0,
-    "Test::Deep::UnorderedPairs" => 0,
-    "Test::Fatal" => 0,
-    "Test::File::ShareDir" => 0,
     "Test::JSON::Schema::Acceptance" => "1.008",
     "Test::Memory::Cycle" => 0,
     "Test::More" => "0.96",
+    "Test::Warnings" => 0,
+    "constant" => 0,
     "lib" => 0,
-    "open" => 0,
-    "utf8" => 0
+    "open" => 0
   },
-  "VERSION" => "0.027",
+  "VERSION" => "0.128",
   "test" => {
     "TESTS" => "t/*.t"
   }
 );
 
 my %FallbackPrereqs = (
-  "B" => 0,
-  "Carp" => 0,
-  "Exporter" => 0,
   "Feature::Compat::Try" => 0,
-  "File::ShareDir" => 0,
   "File::Spec" => 0,
-  "JSON::MaybeXS" => "1.004001",
+  "Import::Into" => 0,
+  "JSON::MaybeXS" => 0,
   "JSON::PP" => 0,
-  "List::Util" => "1.55",
+  "JSON::Schema::Modern" => 0,
+  "JSON::Schema::Modern::Annotation" => 0,
+  "JSON::Schema::Modern::Document" => 0,
+  "JSON::Schema::Modern::Error" => 0,
+  "JSON::Schema::Modern::Result" => 0,
+  "JSON::Schema::Modern::Utilities" => 0,
+  "JSON::Schema::Modern::Vocabulary" => 0,
+  "JSON::Schema::Modern::Vocabulary::Applicator" => 0,
+  "JSON::Schema::Modern::Vocabulary::Content" => 0,
+  "JSON::Schema::Modern::Vocabulary::Core" => 0,
+  "JSON::Schema::Modern::Vocabulary::Format" => 0,
+  "JSON::Schema::Modern::Vocabulary::MetaData" => 0,
+  "JSON::Schema::Modern::Vocabulary::Validation" => 0,
+  "List::Util" => "1.50",
   "Module::Metadata" => 0,
-  "Module::Runtime" => 0,
-  "Mojo::JSON::Pointer" => 0,
-  "Mojo::URL" => 0,
-  "Mojolicious" => "7.23",
   "Moo" => 0,
-  "Moo::Object" => 0,
   "Moo::Role" => 0,
-  "MooX::HandlesVia" => 0,
-  "MooX::TypeTiny" => "0.002002",
   "Path::Tiny" => 0,
-  "Ref::Util" => "0.100",
   "Safe::Isa" => 0,
-  "Scalar::Util" => 0,
-  "Storable" => 0,
   "Test::Deep" => 0,
-  "Test::Deep::UnorderedPairs" => 0,
-  "Test::Fatal" => 0,
-  "Test::File::ShareDir" => 0,
   "Test::JSON::Schema::Acceptance" => "1.008",
   "Test::Memory::Cycle" => 0,
   "Test::More" => "0.96",
-  "Types::Standard" => "1.010002",
+  "Test::Warnings" => 0,
   "constant" => 0,
   "if" => 0,
   "lib" => 0,
   "namespace::clean" => 0,
   "open" => 0,
-  "overload" => 0,
   "strict" => 0,
   "strictures" => 2,
-  "utf8" => 0,
   "warnings" => 0
 );
 
@@ -196,9 +179,3 @@ delete $WriteMakefileArgs{CONFIGURE_REQUIRES}
   unless eval { ExtUtils::MakeMaker->VERSION(6.52) };
 
 WriteMakefile(%WriteMakefileArgs);
-
-{
-package
-MY;
-use File::ShareDir::Install qw(postamble);
-}

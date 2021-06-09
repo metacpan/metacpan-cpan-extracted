@@ -76,7 +76,7 @@
          "web" : "http://github.com/bingos/poe-component-irc"
       }
    },
-   "version" : "6.91",
+   "version" : "6.92",
    "x_authority" : "cpan:HINRIK",
    "x_generated_by_perl" : "v5.34.0",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.26",

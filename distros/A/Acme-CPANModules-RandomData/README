@@ -1,0 +1,90 @@
+NAME
+    Acme::CPANModules::RandomData - Generating random person (name, title,
+    age, etc)
+
+VERSION
+    This document describes version 0.001 of Acme::CPANModules::RandomData
+    (from Perl distribution Acme-CPANModules-RandomData), released on
+    2021-05-26.
+
+DESCRIPTION
+    Generating
+
+    Data::Random generates random number, random generated word, random
+    dictionary word (default wordlist provided), date (in YYYY-MM-DD
+    format), time (in HH::MM:SS format), datetime, image (just a blank PNG
+    with random size and background color).
+
+    For more specific types of random data (person, password, etc), see
+    other lists mentioned below.
+
+    Keywords: random data.
+
+ACME::MODULES ENTRIES
+    *   Data::Random
+
+FAQ
+  What is an Acme::CPANModules::* module?
+    An Acme::CPANModules::* module, like this module, contains just a list
+    of module names that share a common characteristics. It is a way to
+    categorize modules and document CPAN. See Acme::CPANModules for more
+    details.
+
+  What are ways to use this Acme::CPANModules module?
+    Aside from reading this Acme::CPANModules module's POD documentation,
+    you can install all the listed modules (entries) using cpanm-cpanmodules
+    script (from App::cpanm::cpanmodules distribution):
+
+     % cpanm-cpanmodules -n RandomData
+
+    Alternatively you can use the cpanmodules CLI (from App::cpanmodules
+    distribution):
+
+        % cpanmodules ls-entries RandomData | cpanm -n
+
+    or Acme::CM::Get:
+
+        % perl -MAcme::CM::Get=RandomData -E'say $_->{module} for @{ $LIST->{entries} }' | cpanm -n
+
+    or directly:
+
+        % perl -MAcme::CPANModules::RandomData -E'say $_->{module} for @{ $Acme::CPANModules::RandomData::LIST->{entries} }' | cpanm -n
+
+    This Acme::CPANModules module also helps lcpan produce a more meaningful
+    result for "lcpan related-mods" command when it comes to finding related
+    modules for the modules listed in this Acme::CPANModules module.
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Acme-CPANModules-RandomData>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Acme-CPANModules-RandomData>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Acme-CPANModules-Rand
+    omData>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    Acme::CPANModules::RandomPerson
+
+    Acme::CPANModules::RandomPassword
+
+    Acme::CPANModules - about the Acme::CPANModules namespace
+
+    cpanmodules - CLI tool to let you browse/view the lists
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2021 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

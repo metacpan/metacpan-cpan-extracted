@@ -1,25 +1,27 @@
 ---
-abstract: 'Validate data against a schema'
+abstract: '(DEPRECATED) Validate data against a schema'
 author:
   - 'Karen Etheridge <ether@cpan.org>'
 build_requires:
+  Feature::Compat::Try: '0'
   File::Spec: '0'
+  JSON::MaybeXS: '0'
+  JSON::PP: '0'
+  List::Util: '1.50'
   Module::Metadata: '0'
-  Scalar::Util: '0'
+  Path::Tiny: '0'
+  Safe::Isa: '0'
   Test::Deep: '0'
-  Test::Deep::UnorderedPairs: '0'
-  Test::Fatal: '0'
-  Test::File::ShareDir: '0'
   Test::JSON::Schema::Acceptance: '1.008'
   Test::Memory::Cycle: '0'
   Test::More: '0.96'
+  Test::Warnings: '0'
+  constant: '0'
   lib: '0'
   open: '0'
   perl: '5.016'
-  utf8: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
-  File::ShareDir::Install: '0.06'
   Module::Build::Tiny: '0.034'
   perl: '5.016'
 dynamic_config: 0
@@ -38,76 +40,67 @@ meta-spec:
 name: JSON-Schema-Draft201909
 no_index:
   directory:
-    - share
     - t
     - xt
 provides:
   JSON::Schema::Draft201909:
     file: lib/JSON/Schema/Draft201909.pm
-    version: '0.027'
+    version: '0.128'
   JSON::Schema::Draft201909::Annotation:
     file: lib/JSON/Schema/Draft201909/Annotation.pm
-    version: '0.027'
+    version: '0.128'
   JSON::Schema::Draft201909::Document:
     file: lib/JSON/Schema/Draft201909/Document.pm
-    version: '0.027'
+    version: '0.128'
   JSON::Schema::Draft201909::Error:
     file: lib/JSON/Schema/Draft201909/Error.pm
-    version: '0.027'
+    version: '0.128'
   JSON::Schema::Draft201909::Result:
     file: lib/JSON/Schema/Draft201909/Result.pm
-    version: '0.027'
+    version: '0.128'
   JSON::Schema::Draft201909::Utilities:
     file: lib/JSON/Schema/Draft201909/Utilities.pm
-    version: '0.027'
+    version: '0.128'
   JSON::Schema::Draft201909::Vocabulary:
     file: lib/JSON/Schema/Draft201909/Vocabulary.pm
-    version: '0.027'
+    version: '0.128'
   JSON::Schema::Draft201909::Vocabulary::Applicator:
     file: lib/JSON/Schema/Draft201909/Vocabulary/Applicator.pm
-    version: '0.027'
+    version: '0.128'
   JSON::Schema::Draft201909::Vocabulary::Content:
     file: lib/JSON/Schema/Draft201909/Vocabulary/Content.pm
-    version: '0.027'
+    version: '0.128'
   JSON::Schema::Draft201909::Vocabulary::Core:
     file: lib/JSON/Schema/Draft201909/Vocabulary/Core.pm
-    version: '0.027'
+    version: '0.128'
   JSON::Schema::Draft201909::Vocabulary::Format:
     file: lib/JSON/Schema/Draft201909/Vocabulary/Format.pm
-    version: '0.027'
+    version: '0.128'
   JSON::Schema::Draft201909::Vocabulary::MetaData:
     file: lib/JSON/Schema/Draft201909/Vocabulary/MetaData.pm
-    version: '0.027'
+    version: '0.128'
   JSON::Schema::Draft201909::Vocabulary::Validation:
     file: lib/JSON/Schema/Draft201909/Vocabulary/Validation.pm
-    version: '0.027'
+    version: '0.128'
 requires:
-  B: '0'
-  Carp: '0'
-  Exporter: '0'
-  Feature::Compat::Try: '0'
-  File::ShareDir: '0'
-  JSON::MaybeXS: '1.004001'
-  JSON::PP: '0'
-  List::Util: '1.55'
-  Module::Runtime: '0'
-  Mojo::JSON::Pointer: '0'
-  Mojo::URL: '0'
-  Mojolicious: '7.23'
+  Import::Into: '0'
+  JSON::Schema::Modern: '0'
+  JSON::Schema::Modern::Annotation: '0'
+  JSON::Schema::Modern::Document: '0'
+  JSON::Schema::Modern::Error: '0'
+  JSON::Schema::Modern::Result: '0'
+  JSON::Schema::Modern::Utilities: '0'
+  JSON::Schema::Modern::Vocabulary: '0'
+  JSON::Schema::Modern::Vocabulary::Applicator: '0'
+  JSON::Schema::Modern::Vocabulary::Content: '0'
+  JSON::Schema::Modern::Vocabulary::Core: '0'
+  JSON::Schema::Modern::Vocabulary::Format: '0'
+  JSON::Schema::Modern::Vocabulary::MetaData: '0'
+  JSON::Schema::Modern::Vocabulary::Validation: '0'
   Moo: '0'
-  Moo::Object: '0'
   Moo::Role: '0'
-  MooX::HandlesVia: '0'
-  MooX::TypeTiny: '0.002002'
-  Path::Tiny: '0'
-  Ref::Util: '0.100'
-  Safe::Isa: '0'
-  Storable: '0'
-  Types::Standard: '1.010002'
-  constant: '0'
   if: '0'
   namespace::clean: '0'
-  overload: '0'
   perl: '5.016'
   strict: '0'
   strictures: '2'
@@ -116,22 +109,11 @@ resources:
   bugtracker: https://github.com/karenetheridge/JSON-Schema-Draft201909/issues
   homepage: https://github.com/karenetheridge/JSON-Schema-Draft201909
   repository: https://github.com/karenetheridge/JSON-Schema-Draft201909.git
-version: '0.027'
+version: '0.128'
 x_Dist_Zilla:
   perl:
-    version: '5.033009'
+    version: '5.034000'
   plugins:
-    -
-      class: Dist::Zilla::Plugin::Run::BeforeRelease
-      config:
-        Dist::Zilla::Plugin::Run::Role::Runner:
-          eval:
-            - "do './update-schemas'; die $@ if $@"
-          fatal_errors: 1
-          quiet: 0
-          version: '0.048'
-      name: Run::BeforeRelease
-      version: '0.048'
     -
       class: Dist::Zilla::Plugin::Prereqs
       config:
@@ -166,8 +148,6 @@ x_Dist_Zilla:
             - INSTALL
             - LICENCE
             - README.pod
-            - TODO
-            - pull_request_template.md
           exclude_match: []
           follow_symlinks: 0
           include_dotfiles: 0
@@ -649,7 +629,7 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::EnsureLatestPerl
       config:
         Dist::Zilla::Plugin::EnsureLatestPerl:
-          Module::CoreList: '5.20210420'
+          Module::CoreList: '5.20210521'
       name: '@Author::ETHER/EnsureLatestPerl'
       version: '0.008'
     -
@@ -813,7 +793,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v0.027
+          tag: v0.128
           tag_format: v%V
           tag_message: v%v%t
         Dist::Zilla::Role::Git::Repo:
@@ -922,40 +902,13 @@ x_Dist_Zilla:
       name: '@Author::ETHER/prereqs for @Author::ETHER'
       version: '6.018'
     -
-      class: Dist::Zilla::Plugin::ShareDir
-      name: ShareDir
-      version: '6.018'
-    -
-      class: Dist::Zilla::Plugin::Prereqs
+      class: Dist::Zilla::Plugin::Deprecated
       config:
-        Dist::Zilla::Plugin::Prereqs:
-          phase: runtime
-          type: requires
-      name: RuntimeRequires
-      version: '6.018'
-    -
-      class: Dist::Zilla::Plugin::Prereqs
-      config:
-        Dist::Zilla::Plugin::Prereqs:
-          phase: runtime
-          type: suggests
-      name: RuntimeSuggests
-      version: '6.018'
-    -
-      class: Dist::Zilla::Plugin::Prereqs::Soften
-      config:
-        Dist::Zilla::Plugin::Prereqs::Soften:
-          copy_to:
-            - develop.requires
-          modules:
-            - Time::Moment
-            - Data::Validate::Domain
-            - Email::Address::XS
-            - Net::IDN::Encode
-          modules_from_features: ~
-          to_relationship: suggests
-      name: Prereqs::Soften
-      version: '0.006003'
+        Dist::Zilla::Plugin::Deprecated:
+          all: 1
+          modules: []
+      name: Deprecated
+      version: '0.007'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':InstallModules'
@@ -1006,7 +959,8 @@ x_Dist_Zilla:
       is_trial: '0'
     version: '6.018'
 x_authority: cpan:ETHER
-x_generated_by_perl: v5.33.9
+x_deprecated: 1
+x_generated_by_perl: v5.34.0
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'
 x_static_install: 1

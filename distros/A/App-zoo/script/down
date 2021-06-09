@@ -1,0 +1,8 @@
+#!/usr/bin/env perl
+use Modern::Perl;
+
+$_ = $ARGV[0];
+chomp;
+say "Downloading $_";
+`time curl -O "http://ali.ddot.cc:51179/$_" | tee /dev/null`
+

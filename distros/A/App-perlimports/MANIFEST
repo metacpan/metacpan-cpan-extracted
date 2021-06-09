@@ -73,6 +73,7 @@ t/perl.t
 t/pragma.t
 t/preserve-spaces.t
 t/quoted-var.t
+t/re-export-via-sub-exporter.t
 t/require.t
 t/script-with-inner-packages.t
 t/signatures.pl
@@ -119,6 +120,7 @@ test-data/lib/Local/CustomImport.pm
 test-data/lib/Local/MooseTypeLibrary.pm
 test-data/lib/Local/MyOwnMoo.pm
 test-data/lib/Local/MyOwnMoose.pm
+test-data/lib/Local/ReExportViaSubExporter.pm
 test-data/lib/Local/RequireExporter.pm
 test-data/lib/Local/STDOUT.pm
 test-data/lib/Local/SymbolInExport.pm

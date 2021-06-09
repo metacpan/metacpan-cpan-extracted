@@ -97,6 +97,12 @@ CONFIGURATION
     if there is a match then the request is not added to default
     request/response metrics.
 
+  include_action_labels
+        include_action_labels => 0      # default
+
+    If set to a true value, adds "controller" and "action" labels to the
+    default metrics, in addition to the "code" and "method" labels.
+
   metrics
         metrics => {
             $metric_name => {

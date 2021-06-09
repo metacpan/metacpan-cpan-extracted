@@ -65,6 +65,7 @@ my @files = (
     't/pragma.t',
     't/preserve-spaces.t',
     't/quoted-var.t',
+    't/re-export-via-sub-exporter.t',
     't/require.t',
     't/script-with-inner-packages.t',
     't/signatures.pl',

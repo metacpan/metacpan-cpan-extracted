@@ -1,7 +1,7 @@
 This archive contains the distribution JSON-Schema-Draft201909,
-version 0.027:
+version 0.128:
 
-  Validate data against a schema
+  (DEPRECATED) Validate data against a schema
 
 This software is copyright (c) 2020 by Karen Etheridge.
 

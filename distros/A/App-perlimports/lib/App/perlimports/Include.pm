@@ -2,7 +2,7 @@ package App::perlimports::Include;
 
 use Moo;
 
-our $VERSION = '0.000007';
+our $VERSION = '0.000008';
 
 use App::perlimports::ExportInspector ();
 use Class::Inspector                  ();
@@ -28,10 +28,11 @@ has _explicit_exports => (
     isa         => HashRef,
     handles_via => 'Hash',
     handles     => {
-        _delete_export        => 'delete',
-        _has_explicit_exports => 'count',
-        _is_importable        => 'exists',
-        _import_name          => 'get',
+        _delete_export         => 'delete',
+        _explicit_export_count => 'count',
+        _has_explicit_exports  => 'count',
+        _import_name           => 'get',
+        _is_importable         => 'exists',
     },
     lazy    => 1,
     builder => '_build_explicit_exports',
@@ -92,6 +93,7 @@ has _isa_test_builder_module => (
     isa     => Bool,
     lazy    => 1,
     builder => '_build_isa_test_builder_module',
+    default => sub { shift->_export_inspector->isa_test_builder },
 );
 
 has _is_translatable => (
@@ -152,20 +154,6 @@ sub _build_explicit_exports {
         : $self->_export_inspector->implicit_exports;
 }
 
-sub _build_isa_test_builder_module {
-    my $self = shift;
-    $self->_maybe_require_module( $self->module_name );
-
-## no critic (TestingAndDebugging::ProhibitNoStrict)
-    no strict 'refs';
-    my $isa_test_builder = any { $_ eq 'Test::Builder::Module' }
-    @{ $self->module_name . '::ISA' };
-    use strict;
-## use critic
-
-    return $isa_test_builder ? 1 : 0;
-}
-
 sub _build_imports {
     my $self = shift;
 
@@ -178,6 +166,10 @@ sub _build_imports {
     # Stolen from Perl::Critic::Policy::TooMuchCode::ProhibitUnfoundImport
     for my $word ( @{ $self->_document->possible_imports } ) {
         next if exists $found{"$word"};
+
+        # No need to keep looking if we've found everything that can be
+        # imported
+        last unless $self->_imports_remain( \%found );
 
         # We don't want (for instance) pragma names to be confused with
         # functions.
@@ -291,9 +283,13 @@ sub _build_imports {
             $prototype =~ s{,}{;}g;
 
             $prototype .= ';';    # Won't hurt if there's an extra ";"
-            my $new = PPI::Document->new( \$prototype );
-            my $words
-                = $new->find( sub { $_[1]->isa('PPI::Token::Word'); } ) || [];
+            my $new   = PPI::Document->new( \$prototype );
+            my $words = $new->find(
+                sub {
+                    $_[1]->isa('PPI::Token::Word')
+                        || $_[1]->isa('PPI::Token::Symbol');
+                }
+            ) || [];
             for my $word ( @{$words} ) {
                 if ( $self->_is_importable("$word") ) {
                     push @found_import, "$word";
@@ -309,15 +305,18 @@ sub _build_imports {
     }
 
     #  A used import might be a variable interpolated into quotes.
-    for my $var ( keys %{ $self->_document->interpolated_symbols } ) {
-        if ( $self->_is_importable($var) ) {
-            $found{$var} = 1;
+    if ( $self->_imports_remain( \%found ) ) {
+        for my $var ( keys %{ $self->_document->interpolated_symbols } ) {
+            if ( $self->_is_importable($var) ) {
+                $found{$var} = 1;
+            }
         }
     }
 
     #  A used import might be just be a symbol that just gets exported.  ie. If
     #  it appears as @EXPORT = ( 'SOME_SYMBOL') we don't want to miss it.
-    if (   $self->_document->my_own_inspector
+    if (   $self->_imports_remain( \%found )
+        && $self->_document->my_own_inspector
         && $self->_document->my_own_inspector->is_exporter ) {
         for my $symbol (
             uniq(
@@ -327,6 +326,16 @@ sub _build_imports {
         ) {
             if ( $self->_is_importable($symbol) ) {
                 $found{$symbol} = 1;
+            }
+        }
+    }
+
+    # A used import might just be something that gets re-exported by
+    # Sub::Exporter
+    if ( $self->_imports_remain( \%found ) ) {
+        for my $func ( $self->_document->sub_exporter_export_list ) {
+            if ( $self->_is_importable($func) ) {
+                $found{$func}++;
             }
         }
     }
@@ -369,23 +378,11 @@ sub _build_is_ignored {
 
     return 0 if $self->_export_inspector->is_oo_class;
 
-    if ( $self->_export_inspector->is_moose_class ) {
-        return 1;
-    }
+    return 1 if $self->_export_inspector->is_moose_class;
 
-    # This should catch Moose classes
-    if ( $self->_maybe_require_module('Moose::Util')
-        && Moose::Util::find_meta( $self->module_name ) ) {
-        return 1;
-    }
+    return 1 if $self->_export_inspector->uses_moose;
 
-    # This should catch Moo classes
-    if ( $self->_maybe_require_module('Class::Inspector') ) {
-        return 1
-            if any { $_ eq 'Moo::is_class' }
-        @{ Class::Inspector->methods( $self->module_name, 'full', 'public' )
-                || [] };
-    }
+    return 1 if $self->_export_inspector->is_moo_class;
 
     return 1
         if any { $_ eq 'Moo::Object' } @{ $self->_export_inspector->pkg_isa };
@@ -422,8 +419,8 @@ sub _build_is_translatable {
         return 0;
     }
 
-    # Any other case of "require Foo;" should be translate to "use Foo ();"
-    # as those are functionally equivalent."
+    # Any other case of "require Foo;" should be translated to "use Foo ();"
+    # as those are functionally equivalent.
     return 1;
 }
 
@@ -573,7 +570,7 @@ sub _build_formatted_ppi_statement {
         );
     }
 
-    # Don't deal with Test::Builder classes here to keep is simple for now
+    # Don't deal with Test::Builder classes here to keep it simple for now
     if ( length($statement) > 78 && !$self->_isa_test_builder_module ) {
         $statement = sprintf( "use %s qw(\n", $self->module_name );
         for ( @{ $self->_imports } ) {
@@ -583,6 +580,12 @@ sub _build_formatted_ppi_statement {
     }
 
     return $self->_maybe_get_new_include($statement);
+}
+
+sub _imports_remain {
+    my $self  = shift;
+    my $found = shift;
+    return keys %{$found} < $self->_explicit_export_count;
 }
 
 sub _maybe_get_new_include {
@@ -602,22 +605,6 @@ sub _maybe_get_new_include {
     # naive, but should be good enough for now. It should reduce the churn
     # created by this script.
     return ( "$rewrite" eq $check_string ) ? $self->_include : $rewrite;
-}
-
-sub _maybe_require_module {
-    my $self              = shift;
-    my $module_to_require = shift;
-
-    my $success;
-    try {
-        require_module($module_to_require);
-        $success = 1;
-    }
-    catch {
-        $self->logger->info("$module_to_require error. $_");
-    };
-
-    return $success;
 }
 
 # If there's a different module in this document which has already imported
@@ -646,13 +633,13 @@ sub _is_already_imported {
         ) {
             @imports = @{ $self->_document->original_imports->{$module} };
             $self->logger->debug(
-                'Explicit imports found: ' . Dumper(@imports) );
+                'Explicit imports found: ' . Dumper( [ sort @imports ] ) );
         }
         else {
             if ( my $inspector = $self->_document->inspector_for($module) ) {
                 @imports = $inspector->implicit_export_names;
-                $self->logger->debug(
-                    'Implicit imports found: ' . Dumper(@imports) );
+                $self->logger->debug( 'Implicit imports found: '
+                        . Dumper( [ sort @imports ] ) );
             }
         }
 
@@ -682,7 +669,7 @@ App::perlimports::Include - Encapsulate one use statement in a document
 
 =head1 VERSION
 
-version 0.000007
+version 0.000008
 
 =head1 METHODS
 

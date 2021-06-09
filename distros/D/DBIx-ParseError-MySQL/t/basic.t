@@ -12,15 +12,19 @@ use DBIx::ParseError::MySQL;
 our %ERRORS = (
     lock => [
         'Deadlock found when trying to get lock; try restarting transaction',
+        'Deadlock found when trying to get user-level lock; try rolling back transaction/releasing locks and restarting lock acquisition',
+        'Deadlock found when trying to get locking service lock; try releasing locks and restarting lock acquisition',
         'Lock wait timeout exceeded; try restarting transaction',
+        'Service lock wait timeout exceeded',
         'WSREP detected deadlock/conflict and aborted the transaction. Try restarting the transaction',
     ],
     connection => [
         'MySQL server has gone away',
         'Lost connection to MySQL server during query',
-        "Host 'example.com' is blocked because of many connection errors",
-        "Can't connect to local MySQL server",
-        "Can't connect to MySQL server",
+        "Lost connection to MySQL server at 'reading initial communication packet', system error: 0",
+        "Host 'example.com' is blocked because of many connection errors; unblock with 'mysqladmin flush-hosts'",
+        "Can't connect to local MySQL server through socket '/var/mysql/mysql.sock' (38)",
+        "Can't connect to MySQL server on 'host_name' (111)",
         'Got an error reading communication packets',
         'Got an error writing communication packets',
         'Got timeout reading communication packets',

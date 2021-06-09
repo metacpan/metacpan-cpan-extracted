@@ -4,13 +4,13 @@
       "Steven Schubiger <schubiger@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4224",
+   "generated_by" : "Module::Build version 0.4229",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "LUGS-Events-Parser",
    "prereqs" : {
@@ -42,7 +42,7 @@
    "provides" : {
       "LUGS::Events::Parser" : {
          "file" : "lib/LUGS/Events/Parser.pm",
-         "version" : "0.11"
+         "version" : "0.12"
       },
       "LUGS::Events::Parser::Event" : {
          "file" : "lib/LUGS/Events/Parser/Event.pm",
@@ -50,7 +50,7 @@
       },
       "LUGS::Events::Parser::Filter" : {
          "file" : "lib/LUGS/Events/Parser/Filter.pm",
-         "version" : "0.06"
+         "version" : "0.07"
       }
    },
    "release_status" : "stable",
@@ -62,6 +62,6 @@
          "url" : "https://github.com/stsc/LUGS-Events-Parser"
       }
    },
-   "version" : "0.11",
-   "x_serialization_backend" : "JSON::PP version 2.27300_01"
+   "version" : "0.12",
+   "x_serialization_backend" : "JSON::PP version 2.97001"
 }

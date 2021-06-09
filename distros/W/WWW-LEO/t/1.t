@@ -21,7 +21,7 @@ ok(not defined $leo->num_results);
 # sincerely hoping that this word will get no more translations :)
 $leo->query('Selbstfangfadenführung');
 # 4)
-ok($leo->num_results == 1);
+ok(defined $leo->num_results && $leo->num_results == 1);
 # the results array should contain 1 element
 # 5)
 ok(@{$leo->en_de} == 1);
@@ -29,7 +29,7 @@ ok(@{$leo->en_de} == 1);
 # this query should not produce any hits
 $leo->query('adsflkjadsflkjfdgjhsdfg');
 # 6)
-ok($leo->num_results == 0);
+ok(defined $leo->num_results && $leo->num_results == 0);
 
 # this should reset the object to the state before the first query
 $leo->reset;
@@ -39,6 +39,6 @@ ok(not defined $leo->num_results);
 # this query should produce a maximum number of results (100)
 $leo->query('car');
 # 8)
-ok($leo->num_results == 100);
+ok(defined $leo->num_results && $leo->num_results == 100);
 
 # vim:ft=perl

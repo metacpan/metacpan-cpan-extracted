@@ -15,7 +15,6 @@ use Path::Tiny;
 use if $ENV{AUTHOR_TESTING}, 'Test::Warnings' => ':fail_on_warning';
 use Test::JSON::Schema::Acceptance 1.008;
 use Test::Memory::Cycle;
-use Test::File::ShareDir -share => { -dist => { 'JSON-Schema-Draft201909' => 'share' } };
 use JSON::Schema::Draft201909;
 
 foreach my $env (qw(AUTHOR_TESTING AUTOMATED_TESTING EXTENDED_TESTING NO_TODO TEST_DIR NO_SHORT_CIRCUIT)) {
@@ -26,7 +25,7 @@ note '';
 sub acceptance_tests {
   my (%options) = @_;
 
-
+  local $Test::Builder::Level = $Test::Builder::Level + 1;
   my $accepter = Test::JSON::Schema::Acceptance->new(
     include_optional => 1,
     verbose => 1,

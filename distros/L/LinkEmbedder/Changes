@@ -1,5 +1,16 @@
 Revision history for perl distribution LinkEmbedder
 
+1.19 2021-06-09T09:32:08+0900
+ - Fix Mojolicious version after v1.18 #23
+ - Fix direct video links not rendering correctly #26
+   Contributor: Bruno Ramos
+ - Fix Metacpan author_name detection and tests #29
+   Contributor: Bruno Ramos
+ - Add paste.debian.net support #19 #28
+   Contributor: Bruno Ramos
+ - Add support for https://youtu.be links #25 #27
+   Contributor: Bruno Ramos
+
 1.18 2021-03-24T09:29:43+0900
  - Fix compatibility with Mojolicious 9.11
 

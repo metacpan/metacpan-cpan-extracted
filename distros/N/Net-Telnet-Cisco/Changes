@@ -86,3 +86,6 @@ Revision history for Perl extension Net::Telnet::Cisco.
         Changed prompt_append() to _prompt_append() [private].
         Changed re_sans_delims() to _re_sans_delims() [private].
     - test.pl: make Term::ReadKey conditional.
+
+1.12  Tue Jun  8 08:00:00 EDT 2021
+    - Fix https://rt.cpan.org/Public/Bug/Display.html?id=136763

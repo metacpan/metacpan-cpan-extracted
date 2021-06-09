@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+
+echo -e "Terminating process by keyword: $1"
+pids=$(ps aux|grep $1|grep -v grep|awk '{print $2}')
+for i in $pids; do 
+    echo "Terminate" $i ": ok"; 
+    kill -9 $i 
+done
+

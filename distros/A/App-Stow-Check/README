@@ -1,0 +1,50 @@
+NAME
+    stow-check - Tool to check for which stow dist command is.
+
+SYNOPSIS
+     stow-check [-h] [--version] command
+
+DESCRIPTION
+    Tool is checking:
+
+     If command stands in /usr/local/bin
+     If links to /usr/local/stow/__DIST__/[s]bin/__COMMAND__
+
+    If yes, returns __DIST__ name and exit code 0. If no, returns error
+    message to STDERR and exit code 1.
+
+ARGUMENTS
+    *       "-h"
+
+            Print help.
+
+    *       "--version"
+
+            Print version of script.
+
+    *       "command"
+
+            Command name (e.g. openssl).
+
+EXAMPLE1
+     stow-check -h
+
+EXAMPLE2
+     stow-check __COMMAND_IN_STOW_DIR__
+
+REPOSITORY
+    <https://github.com/michal-josef-spacek/App-Stow-Check>
+
+AUTHOR
+    Michal Josef Špaček <mailto:skim@cpan.org>
+
+    <http://skim.cz>
+
+LICENSE AND COPYRIGHT
+    © 2021 Michal Josef Špaček
+
+    BSD 2-Clause License
+
+VERSION
+    0.01
+

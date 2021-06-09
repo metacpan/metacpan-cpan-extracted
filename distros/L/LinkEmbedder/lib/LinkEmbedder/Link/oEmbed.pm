@@ -10,6 +10,7 @@ our %API = (
   'ted.com'     => 'https://www.ted.com/services/v1/oembed.json',
   'vimeo.com'   => 'https://vimeo.com/api/oembed.json',
   'youtube.com' => 'https://www.youtube.com/oembed',
+  'youtu.be'    => 'https://www.youtube.com/oembed',
 );
 
 has html => sub { shift->SUPER::html };

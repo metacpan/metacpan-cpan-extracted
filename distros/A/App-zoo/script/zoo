@@ -1,0 +1,51 @@
+#!perl
+use strict;
+use warnings;
+use DateTime;
+
+my $text = 'bar';
+my $dt = DateTime->now;
+
+if ($dt->mon == 1 && $dt->day == 31) {
+   $text = reverse $text;
+}
+
+print "$text\n";
+exit 0;
+
+=head1 NAME
+
+foo - print bar, usually
+
+=head1 DESCRIPTION
+
+A simple script which usually prints C<bar>. On national backwards day
+(January 31), it prints C<rab>. This distribution is used to show others
+how to prepare a script for CPAN.
+
+=head1 SYNOPSIS
+
+  $ foo
+  bar
+
+=head1 AUTHOR
+
+David Farrell
+
+=head1 LICENSE
+
+FreeBSD
+
+=head1 INSTALLATION
+
+Using C<cpan>:
+
+    $ cpan App::foo
+
+Manual install:
+
+    $ perl Makefile.PL
+    $ make
+    $ make install
+
+=cut

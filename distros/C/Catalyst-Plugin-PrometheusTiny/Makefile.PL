@@ -21,4 +21,19 @@ WriteMakefile(
         'Prometheus::Tiny'         => '0.006',
         'Prometheus::Tiny::Shared' => '0.021',
     },
+    META_MERGE => {
+        resources => {
+            repository => {
+                url =>
+                  'git@github.com:SysPete/Catalyst-Plugin-PrometheusTiny.git',
+                web =>
+                  'https://github.com/SysPete/Catalyst-Plugin-PrometheusTiny',
+                type => 'git',
+            },
+            bugtracker =>
+              'https://github.com/SysPete/Catalyst-Plugin-PrometheusTiny/issues',
+            IRC     => 'irc://irc.perl.org/#catalyst',
+            license => ['http://dev.perl.org/licenses/'],
+        },
+    },
 );

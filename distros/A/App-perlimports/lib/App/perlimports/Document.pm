@@ -3,7 +3,7 @@ package App::perlimports::Document;
 use Moo;
 use utf8;
 
-our $VERSION = '0.000007';
+our $VERSION = '0.000008';
 
 use App::perlimports::Annotations ();
 use App::perlimports::Include     ();
@@ -14,6 +14,7 @@ use MooX::StrictConstructor;
 use Path::Tiny qw( path );
 use PPI::Document 1.270 ();
 use PPIx::Utils::Classification qw( is_hash_key is_method_call );
+use Ref::Util qw( is_plain_arrayref is_plain_hashref );
 use String::InterpolatedVariables ();
 use Sub::HandlesVia;
 use Try::Tiny qw( catch try );
@@ -44,17 +45,6 @@ has _cache_dir => (
     isa     => InstanceOf ['Path::Tiny'],
     lazy    => 1,
     builder => '_build_cache_dir',
-);
-
-has _export_list => (
-    is          => 'ro',
-    isa         => ArrayRef,
-    handles_via => 'Array',
-    handles     => {
-        all_document_exports => 'elements',
-    },
-    lazy    => 1,
-    builder => '_build_export_list',
 );
 
 has _filename => (
@@ -178,6 +168,17 @@ has _preserve_unused => (
     default  => 1,
 );
 
+has _sub_exporter_export_list => (
+    is          => 'ro',
+    isa         => ArrayRef,
+    handles_via => 'Array',
+    handles     => {
+        sub_exporter_export_list => 'elements',
+    },
+    lazy    => 1,
+    builder => '_build_sub_exporter_export_list',
+);
+
 has _sub_names => (
     is          => 'ro',
     isa         => HashRef,
@@ -219,39 +220,48 @@ around BUILDARGS => sub {
 };
 
 my %default_ignore = (
-    'Data::Printer'                  => 1,
-    'DDP'                            => 1,
-    'Devel::Confess'                 => 1,
-    'Exception::Class'               => 1,
-    'Exporter'                       => 1,
-    'Feature::Compat::Try'           => 1,
-    'Mojolicious::Lite'              => 1,
-    'Moo'                            => 1,
-    'Moo::Role'                      => 1,
-    'Moose'                          => 1,
-    'Moose::Exporter'                => 1,
-    'MooseX::SemiAffordanceAccessor' => 1,
-    'MooseX::StrictConstructor'      => 1,
-    'MooseX::Types'                  => 1,
-    'MooX::StrictConstructor'        => 1,
-    'namespace::autoclean'           => 1,
-    'Regexp::Common'                 => 1,
-    'Sub::Exporter'                  => 1,
-    'Sub::Exporter::Progressive'     => 1,
-    'Sub::HandlesVia'                => 1,
-    'Syntax::Keyword::Try'           => 1,
-    'Test2::Util::HashBase'          => 1,
-    'Test::Exception'                => 1,
-    'Test::Needs'                    => 1,
-    'Test::Number::Delta'            => 1,
-    'Test::Pod'                      => 1,
-    'Test::Pod::Coverage'            => 1,
-    'Test::Requires::Git'            => 1,
-    'Test::RequiresInternet'         => 1,
-    'Test::Warnings'                 => 1,
-    'Test::Whitespaces'              => 1,
-    'Test::XML'                      => 1,
-    'Types::Standard'                => 1,
+    'Data::Printer'                                       => 1,
+    'DDP'                                                 => 1,
+    'Devel::Confess'                                      => 1,
+    'Encode::Guess'                                       => 1,
+    'Exception::Class'                                    => 1,
+    'Exporter'                                            => 1,
+    'Exporter::Lite'                                      => 1,
+    'Feature::Compat::Try'                                => 1,
+    'Mojo::Base'                                          => 1,
+    'Mojolicious::Lite'                                   => 1,
+    'Moo'                                                 => 1,
+    'Moo::Role'                                           => 1,
+    'Moose'                                               => 1,
+    'Moose::Exporter'                                     => 1,
+    'Moose::Role'                                         => 1,
+    'MooseX::NonMoose'                                    => 1,
+    'MooseX::Role::Parameterized'                         => 1,
+    'MooseX::SemiAffordanceAccessor'                      => 1,
+    'MooseX::StrictConstructor'                           => 1,
+    'MooseX::TraitFor::Meta::Class::BetterAnonClassNames' => 1,
+    'MooseX::Types'                                       => 1,
+    'MooX::StrictConstructor'                             => 1,
+    'namespace::autoclean'                                => 1,
+    'Regexp::Common'                                      => 1,
+    'Struct::Dumb'                                        => 1,
+    'Sub::Exporter'                                       => 1,
+    'Sub::Exporter::Progressive'                          => 1,
+    'Sub::HandlesVia'                                     => 1,
+    'Syntax::Keyword::Try'                                => 1,
+    'Test2::Util::HashBase'                               => 1,
+    'Test::Exception'                                     => 1,
+    'Test::Needs'                                         => 1,
+    'Test::Number::Delta'                                 => 1,
+    'Test::Pod'                                           => 1,
+    'Test::Pod::Coverage'                                 => 1,
+    'Test::Requires::Git'                                 => 1,
+    'Test::RequiresInternet'                              => 1,
+    'Test::Warnings'                                      => 1,
+    'Test::Whitespaces'                                   => 1,
+    'Test::XML'                                           => 1,
+    'Types::Standard'                                     => 1,
+    'URI::QueryParam'                                     => 1,
 );
 
 # Funky stuff could happen with inner packages.
@@ -279,16 +289,6 @@ sub _build_my_own_inspector {
         logger      => $self->logger,
         module_name => $pkg->namespace,
     );
-}
-
-sub _build_export_list {
-    my $self = shift;
-    my $i    = $self->my_own_inspector;
-
-    return [
-        uniq values %{ $i->all_exports },
-        values %{ $i->default_exports }
-    ];
 }
 
 sub _build_includes {
@@ -420,6 +420,37 @@ sub _build_original_imports {
     }
 
     return \%imports;
+}
+
+sub _build_sub_exporter_export_list {
+    my $self = shift;
+
+    my $sub_ex = $self->ppi_document->find(
+        sub {
+            $_[1]->isa('PPI::Statement::Include')
+                && $_[1]->module eq 'Sub::Exporter';
+        }
+    ) || [];
+    $self->logger->error( $sub_ex->[0] );
+    return [] unless @{$sub_ex};
+
+    my @found;
+    for my $include ( @{$sub_ex} ) {
+        my @arguments = $include->arguments;
+        for my $arg (@arguments) {
+            if ( $arg->isa('PPI::Structure::Constructor') ) {
+                ## no critic (BuiltinFunctions::ProhibitStringyEval)
+                my $thing = eval $arg;
+                if ( is_plain_hashref($thing) ) {
+                    if ( is_plain_arrayref( $thing->{exports} ) ) {
+                        push @found, @{ $thing->{exports} };
+                    }
+                }
+            }
+        }
+    }
+
+    return [ uniq @found ];
 }
 
 sub _imports_for_include {
@@ -618,7 +649,7 @@ sub _is_used_fully_qualified {
                     )
                 )
                 || ( $_[1]->isa('PPI::Token::Symbol')
-                && $_[1] =~ m{\A[*]+${module_name}::[a-zA-Z_]} );
+                && $_[1] =~ m{\A[*\$\@\%]+${module_name}::[a-zA-Z_]} );
         }
     );
 }
@@ -659,6 +690,7 @@ sub inspector_for {
             };
             if ($inspector) {
                 $self->logger->info("Using cached version of $module");
+                $inspector->set_logger( $self->logger );
                 return $inspector;
             }
         }
@@ -718,6 +750,8 @@ sub _build_tidied_document {
             $self->logger->error( 'Error is: ' . $error );
         };
 
+        next unless $elem;
+
         # If this is a module with bare imports which is not used anywhere,
         # maybe we can just remove it.
         if ( !$self->_preserve_unused ) {
@@ -734,9 +768,7 @@ sub _build_tidied_document {
             }
         }
 
-        next unless $elem;
-
-        # https://github.com/adamkennedy/PPI/issues/189
+        # https://github.com/Perl-Critic/PPI/issues/189
         my $inserted = $include->insert_before($elem);
         if ( !$inserted ) {
             $self->logger->error( 'Could not insert ' . $elem );
@@ -826,8 +858,10 @@ sub _maybe_cache_inspectors {
         { croak_on_bless => 0, undef_unknown => 1, } );
 
     for my $name ( $self->all_inspector_names ) {
-        $self->logger->info("I would like to cache $name");
         my $file = $self->_cache_file_for_module($name);
+        next if -e $file;
+
+        $self->logger->info("I would like to cache $name at $file");
         $encoder->encode_to_file(
             $file,
             $self->inspector_for($name),
@@ -853,7 +887,7 @@ App::perlimports::Document - Make implicit imports explicit
 
 =head1 VERSION
 
-version 0.000007
+version 0.000008
 
 =head2 inspector_for( $module_name )
 

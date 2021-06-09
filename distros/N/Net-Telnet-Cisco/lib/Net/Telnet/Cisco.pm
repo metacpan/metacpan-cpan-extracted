@@ -22,7 +22,7 @@ use Carp;
 use vars qw($AUTOLOAD @ISA $VERSION $DEBUG);
 
 @ISA      = qw(Net::Telnet);
-$VERSION  = '1.11';
+$VERSION  = '1.12';
 $^W       = 1;
 $DEBUG    = 0;
 $|++;
@@ -54,7 +54,7 @@ sub new {
             |^%IP routing table VRF.* does not exist. Create first$
             |^%No CEF interface information
             |^%No matching route to delete$
-            |^%Not all config may be removed and may reappear after reactivating/
+            |^%Not all config may be removed and may reappear after reactivating
         )/',
     );
 

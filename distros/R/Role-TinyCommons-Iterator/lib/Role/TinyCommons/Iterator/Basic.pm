@@ -1,9 +1,9 @@
 package Role::TinyCommons::Iterator::Basic;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-04-19'; # DATE
+our $DATE = '2021-06-08'; # DATE
 our $DIST = 'Role-TinyCommons-Iterator'; # DIST
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.003'; # VERSION
 
 use Role::Tiny;
 
@@ -14,6 +14,15 @@ requires 'has_next_item';
 requires 'get_iterator_pos';
 
 ### provided
+
+sub get_coderef_iterator {
+    my ($self, $dies) = @_;
+    if ($dies) {
+        return sub { $self->get_next_item };
+    } else {
+        return sub { $self->has_next_item ? $self->get_next_item : undef };
+    }
+}
 
 1;
 # ABSTRACT: A basic iterator
@@ -30,7 +39,7 @@ Role::TinyCommons::Iterator::Basic - A basic iterator
 
 =head1 VERSION
 
-This document describes version 0.002 of Role::TinyCommons::Iterator::Basic (from Perl distribution Role-TinyCommons-Iterator), released on 2021-04-19.
+This document describes version 0.003 of Role::TinyCommons::Iterator::Basic (from Perl distribution Role-TinyCommons-Iterator), released on 2021-06-08.
 
 =head1 SYNOPSIS
 
@@ -102,7 +111,28 @@ first item has the position 0.
 
 =head1 PROVIDED METHODS
 
-None.
+=head2 get_coderef_iterator
+
+Usage:
+
+ my $iterator = $obj->get_coderef_iterator($dies); # => coderef
+
+Return a coderef that can be called repeatedly to get items. There are two kinds
+of coderef iterator that can be returned. If C<$dies> is set to to true, will
+return a code that dies when there is no more item. If C<$dies> is set to false
+(the default), will return a coderef that does not die but instead returns
+C<undef> when there is no more item. If you have a collection that has an
+C<undef> item, you will not be able to tell whether the C<undef> that the
+coderef iterator returns is a sign of exhaustion of items or is an actual
+C<undef> item.
+
+Basically this method is just a shortcut for:
+
+ if ($dies) {
+     return sub { $self->get_next_item };
+ } else {
+     return sub { $self->has_next_item ? $self->get_next_item :
+ }
 
 =head1 HOMEPAGE
 
@@ -114,7 +144,7 @@ Source repository is at L<https://github.com/perlancar/perl-Role-TinyCommons-Ite
 
 =head1 BUGS
 
-Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-Role-TinyCommons-Iterator/issues>
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Role-TinyCommons-Iterator>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
@@ -124,9 +154,7 @@ feature.
 
 This role is loosely based on L<Array::Iterator>, but the method names have been
 made with "verb"+"object" naming style to be more verbose and less likely clash
-with your other methods. Both exception-based and undef-based signalling of out
-of items are provided for convenience. The "StopIteration" name comes from
-Python.
+with your other methods. The "StopIteration" name comes from Python.
 
 =head1 AUTHOR
 

@@ -1,6 +1,6 @@
 package Catmandu::Exporter::BibTeX;
 
-our $VERSION = '0.20';
+our $VERSION = '0.21';
 
 use namespace::clean;
 use Catmandu::Sane;
@@ -70,7 +70,7 @@ sub add {
 
     for my $tag (@$TAGS) {
         if (my $val = $data->{$tag}) {
-            printf $fh "  %-12s = {%s},\n", $tag, $val;
+            printf $fh "  %-12s = {{%s}},\n", $tag, $val;
         }
     }
 

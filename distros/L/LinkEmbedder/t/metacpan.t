@@ -22,12 +22,14 @@ my @tests = (
     url           => 'https://metacpan.org/pod/Mojolicious',
   },
   {
+    author_name   => 'Jan Henning Thorsen',
     html          => qr{CPAN Author},
     thumbnail_url => qr{/806800a3aeddbad6af673dade958933b},
     title         => 'Jan Henning Thorsen',
     url           => 'https://metacpan.org/author/JHTHORSEN',
   },
   {
+    author_name   => 'Jan Henning Thorsen',
     html          => qr{oEmbed resources and other URL},
     thumbnail_url => qr{https://www\.gravatar\.com/avatar/\w+},
     title         => 'LinkEmbedder',

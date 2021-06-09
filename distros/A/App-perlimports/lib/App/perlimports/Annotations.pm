@@ -4,7 +4,7 @@ package App::perlimports::Annotations;
 
 use Moo;
 
-our $VERSION = '0.000007';
+our $VERSION = '0.000008';
 
 use Types::Standard qw( ArrayRef Object );
 
@@ -28,10 +28,8 @@ sub _build_annotations {
     my @found = ();
     my $comments
         = $self->_ppi_document->find('PPI::Token::Comment') || return [];
-    my $disable_rx
-        = qr{\A (?: [#]! .*? )? \s* [#][#] \s* no  \s+ perlimports}xms;
-    my $enable_rx
-        = qr{\A (?: [#]! .*? )? \s* [#][#] \s* use  \s+ perlimports}xms;
+    my $disable_rx = qr{[#][#] \s* no  \s+ perlimports}xms;
+    my $enable_rx  = qr{[#][#] \s* use \s+ perlimports}xms;
 
     my @enabled = ( grep { $_ =~ $enable_rx } @{$comments} );
 
@@ -101,7 +99,7 @@ App::perlimports::Annotations - Find line ranges where perlimports has been disa
 
 =head1 VERSION
 
-version 0.000007
+version 0.000008
 
 =head1 SYNOPSIS
 

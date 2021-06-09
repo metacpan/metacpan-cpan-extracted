@@ -197,7 +197,7 @@ my $configure_emailserver=sub {
       ($stdout,$stderr)=$handle->cmd($sudo.
          "yum -y groupinstall 'Development tools'",'__display__');
       ($stdout,$stderr)=$handle->cmd($sudo.
-         'yum -y install icu cyrus-sasl '.
+         'yum -y install icu cyrus-sasl openssl-devel '.
          ' cyrus-sasl-devel libtool-ltdl-devel libjpeg-turbo-devel'.
          ' freetype-devel libpng-devel java-1.7.0-openjdk-devel'.
          ' unixODBC unixODBC-devel libtool-ltdl libtool-ltdl-devel'.
@@ -641,24 +641,6 @@ if ($do==1) {
       'make install','__display__');
    ($stdout,$stderr)=$handle->cwd('/opt/source');
    ($stdout,$stderr)=$handle->cmd($sudo.
-      'git clone --recursive https://github.com/openssl/openssl.git',
-      '__display__');
-   ($stdout,$stderr)=$handle->cwd('openssl');
-   ($stdout,$stderr)=$handle->cmd($sudo.'git -P tag -l');
-   $stdout=~s/^.*(OpenSSL_1_1_1.)\n.*$/$1/s;
-   ($stdout,$stderr)=$handle->cmd($sudo.
-      "git checkout $stdout",'__display__');
-   ($stdout,$stderr)=$handle->cmd($sudo.
-      './config','__display__');
-   ($stdout,$stderr)=$handle->cmd($sudo.
-      'make install','__display__');
-   ($stdout,$stderr)=$handle->cmd($sudo.
-      'cp -v *.pc /usr/local/lib/pkgconfig',
-      '__display__');
-   ($stdout,$stderr)=$handle->cmd($sudo.
-      'ldconfig -v','__display__');
-   ($stdout,$stderr)=$handle->cwd('/opt/source');
-   ($stdout,$stderr)=$handle->cmd($sudo.
       'git clone https://gitlab.gnome.org/GNOME/libxml2.git',
       '__display__');
    ($stdout,$stderr)=$handle->cwd('libxml2');
@@ -728,6 +710,24 @@ if ($do==1) {
          'make install','__display__');
    }
 }
+($stdout,$stderr)=$handle->cwd('/opt/source');
+($stdout,$stderr)=$handle->cmd($sudo.
+   'git clone --recursive https://github.com/openssl/openssl.git',
+   '__display__');
+($stdout,$stderr)=$handle->cwd('openssl');
+($stdout,$stderr)=$handle->cmd($sudo.'git -P tag -l');
+$stdout=~s/^.*(OpenSSL_1_1_1.)\n.*$/$1/s;
+($stdout,$stderr)=$handle->cmd($sudo.
+   "git checkout $stdout",'__display__');
+($stdout,$stderr)=$handle->cmd($sudo.
+   './config','__display__');
+($stdout,$stderr)=$handle->cmd($sudo.
+   'make install','__display__');
+($stdout,$stderr)=$handle->cmd($sudo.
+   'cp -v *.pc /usr/local/lib/pkgconfig',
+   '__display__');
+($stdout,$stderr)=$handle->cmd($sudo.
+   'ldconfig -v','__display__');
 $do=1;
 if ($do==1) { # INSTALL LATEST VERSION OF PYTHON
    ($stdout,$stderr)=$handle->cwd('/opt/source');
@@ -1884,6 +1884,7 @@ END
          './configure --prefix=/usr/local/php'.$vn.' '.
          '--with-config-file-path=/usr/local/php'.$vn.'/etc '.
          '--with-config-file-scan-dir=/usr/local/php'.$vn.'/etc/conf.d '.
+         '--with-fpm-systemd '.
          '--enable-bcmath '.
          '--with-bz2 '.
          '--with-curl '.
@@ -3454,6 +3455,9 @@ END
       'make','3600','__display__');
    ($stdout,$stderr)=$handle->cmd($sudo.
       'make install','__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'cp -v ./contrib/libunbound.pc /usr/local/lib/pkgconfig',
+      '__display__');
    ($stdout,$stderr)=$handle->cmd($sudo.
       'cp -v ./contrib/unbound.service /etc/systemd/system',
       '__display__');

@@ -52,6 +52,12 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.004",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/SysPete/Catalyst-Plugin-PrometheusTiny/issues"
+      },
+      "x_IRC" : "irc://irc.perl.org/#catalyst"
+   },
+   "version" : "0.005",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

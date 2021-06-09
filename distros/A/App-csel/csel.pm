@@ -1,6 +1,6 @@
 package App::csel ;  
-our $VERSION = '0.100' ; 
-our $DATE = '2021-06-07T01:10+09:00' ; 
+our $VERSION = '0.110' ; 
+our $DATE = '2021-06-08T19:56+09:00' ; 
 
 =encoding utf8
 

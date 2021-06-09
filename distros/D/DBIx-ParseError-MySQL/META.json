@@ -48,7 +48,7 @@
    "provides" : {
       "DBIx::ParseError::MySQL" : {
          "file" : "lib/DBIx/ParseError/MySQL.pm",
-         "version" : "v1.0.1"
+         "version" : "v1.0.2"
       }
    },
    "release_status" : "stable",
@@ -62,7 +62,7 @@
          "web" : "https://github.com/GrantStreetGroup/DBIx-ParseError-MySQL"
       }
    },
-   "version" : "v1.0.1",
+   "version" : "v1.0.2",
    "x_generated_by_perl" : "v5.18.2",
    "x_serialization_backend" : "JSON::XS version 4.02",
    "x_spdx_expression" : "Artistic-2.0",

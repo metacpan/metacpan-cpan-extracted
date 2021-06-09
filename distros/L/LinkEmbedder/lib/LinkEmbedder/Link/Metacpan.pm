@@ -8,6 +8,9 @@ sub _learn_from_dom {
   my ($self, $dom) = @_;
   $self->SUPER::_learn_from_dom($dom);
 
+  my $author_element = $dom->at('.author-name');
+  $self->author_name($author_element->text) if defined $author_element;
+
   my $img = $dom->at('.author-pic > a > img') || $dom->at('link[rel="apple-touch-icon"]') or return;
   my $url = $img->{src}                       || $img->{href};
   $self->thumbnail_url(Mojo::URL->new($url =~ /^https?:/ ? $url : "//metacpan.org$url"));

@@ -1,23 +1,20 @@
 ---
-abstract: 'A random number (matrix) generator of uniform distributions. Saikoro is a Japanese dice.'
+abstract: unknown
 author:
-  - '"Toshiyuki Shimono" <bin4tsv@gmail.com>'
+  - 'Toshiyuki SHIMONO (bin4tsv at gmail.com)'
 build_requires:
-  Test::More: '0'
+  ExtUtils::MakeMaker: '0'
 configure_requires:
-  Module::Build: '0'
+  ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.4224, CPAN::Meta::Converter version 2.150010'
-license: gpl
+generated_by: 'ExtUtils::MakeMaker version 7.48, CPAN::Meta::Converter version 2.143240'
+license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: App-saikoro
-provides:
-  App::saikoro:
-    file: lib/App/saikoro.pm
-    version: '0.24'
-resources:
-  license: http://www.gnu.org/licenses/gpl-3.0.txt
-version: '0.24'
-x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+no_index:
+  directory:
+    - t
+    - inc
+version: '0.300'

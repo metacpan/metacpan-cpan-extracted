@@ -109,6 +109,21 @@ sub test_all {
             args    => { param  => 'q', keep_spaces => 1 },
             expect  => '  foo ',
         },
+        t40 => {
+            set     => { q      => "abc\x00\x00" },
+            args    => { param  => 'q' },
+            expect  => 'abc',
+        },
+        t41 => {
+            set     => { q      => "abc\x00\x00" },
+            args    => { param  => 'q', keep_zeros => 1 },
+            expect  => "abc\x00\x00",
+        },
+        t42 => {
+            set     => { q      => "abc\x00\x00" },
+            args    => { param  => 'q', keep_spaces => 1 },
+            expect  => 'abc  ',
+        },
     );
 
     foreach my $tname (keys %matrix) {

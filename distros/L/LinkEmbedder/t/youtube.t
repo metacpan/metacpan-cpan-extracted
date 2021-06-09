@@ -21,4 +21,20 @@ LinkEmbedder->new->test_ok(
   }
 );
 
+LinkEmbedder->new->test_ok(
+    'https://youtu.be/v4Ijkq6Myfc' => {
+        isa           => 'LinkEmbedder::Link::oEmbed',
+        author_name   => 'Continuous Delivery',
+        author_url    => 'https://www.youtube.com/c/ContinuousDelivery',
+        cache_age     => 0,
+        html          => qr{iframe.*src="},
+        provider_name => 'YouTube',
+        provider_url  => 'https://www.youtube.com/',
+        title         => "Continuous Integration vs Feature Branch Workflow",
+        type          => 'video',
+        url           => 'https://youtu.be/v4Ijkq6Myfc',
+        version       => '1.0',
+    }
+);
+
 done_testing;

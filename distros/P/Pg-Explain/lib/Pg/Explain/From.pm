@@ -26,11 +26,11 @@ Pg::Explain::From - Base class for parsers of non-text explain formats.
 
 =head1 VERSION
 
-Version 1.09
+Version 1.10
 
 =cut
 
-our $VERSION = '1.09';
+our $VERSION = '1.10';
 
 =head1 SYNOPSIS
 

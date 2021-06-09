@@ -1,0 +1,39 @@
+---
+abstract: 'Distribution for stow-check script.'
+author:
+  - 'Michal Josef Spacek <skim@cpan.org>'
+build_requires:
+  English: 0
+  Error::Pure::Utils: 0
+  ExtUtils::MakeMaker: 6.59
+  Test::More: 0
+  Test::NoWarnings: 0
+  Test::Output: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.59
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.19'
+license: bsd
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: App-Stow-Check
+no_index:
+  directory:
+    - examples
+    - inc
+    - t
+    - xt
+requires:
+  Cwd: 0
+  File::Spec::Functions: 0
+  File::Which: 0
+  Getopt::Std: 0
+  perl: 5.6.0
+resources:
+  bugtracker: https://github.com/michal-josef-spacek/App-Stow-Check/issues
+  homepage: https://github.com/michal-josef-spacek/App-Stow-Check
+  license: http://opensource.org/licenses/bsd-license.php
+  repository: git://github.com/michal-josef-spacek/App-Stow-Check
+version: '0.01'

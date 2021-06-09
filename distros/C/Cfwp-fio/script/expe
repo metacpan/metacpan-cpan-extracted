@@ -1,0 +1,6 @@
+#!/usr/bin/perl 
+use cfwp::fio;
+use Modern::Perl;
+
+
+say 'SUCCESS';

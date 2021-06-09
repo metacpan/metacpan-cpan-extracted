@@ -140,7 +140,8 @@ FILTERING AND REWRITING
     The order of processing is: HTML markup is filtered first and then being
     rewritten by the according tag handlers. Next tags are purged if
     requested. Then literal strings as specified are stripped from the
-    content. Finally, HTML entities are unconditionally decoded.
+    content. Finally, HTML entities are unconditionally decoded and
+    furthermore, some field values encoded to UTF-8.
 
     "LUGS::Events::Parser" internally uses HTML::Parser to push tags and
     text on a stack. If tags are nested, the innermost tag will be retrieved

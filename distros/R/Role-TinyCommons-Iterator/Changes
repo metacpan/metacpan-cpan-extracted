@@ -1,3 +1,8 @@
+0.003   2021-06-08  Released-By: PERLANCAR; Urgency: medium
+
+	- [role Iterator::Basic] Provide get_coderef_iterator().
+
+
 0.002   2021-04-19  Released-By: PERLANCAR; Urgency: medium; Bacward-Incompatible: yes
 
 	- [incompatible change] Move Role::TinyCommons::Iterator to

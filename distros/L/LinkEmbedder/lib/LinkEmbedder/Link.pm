@@ -26,6 +26,7 @@ has description     => '';
 has error           => undef;                                                # {message => "", code => ""}
 has force_secure    => 0;
 has height          => sub { $_[0]->type =~ /^photo|video$/ ? 0 : undef };
+has mimetype        => '';
 has placeholder_url => '';
 
 has provider_name => sub {
@@ -241,6 +242,10 @@ This attribute is EXPERIMENTAL. Feeback appreciated.
 
 The height of L</html> in pixels. Might be C<undef>.
 
+=head2 mimetype
+
+  $str = $self->mimetype;
+
 =head2 provider_name
 
   $str = $self->provider_name;
@@ -382,9 +387,9 @@ __DATA__
 <a class="le-<%= $l->type %> le-provider-<%= lc $l->provider_name %>" href="<%= $l->url %>"><%= Mojo::Util::url_unescape($l->url) %></a>
 % }
 @@ video.html.ep
-<video class="le-<%= $l->type %> le-provider-<%= lc $l->provider_name %>" height="640" width="480" preload="metadata" controls>
-% for my $s (@{$l->{sources} || []}) {
-  <source src="<%= $s->{url} %>" type="<%= $s->{type} || '' %>">
-% }
-  <p>Your browser does not support the video tag.</p>
-</video>
+<div class="le-<%= $l->type %> le-provider-<%= lc $l->provider_name %>">
+  <video preload="metadata" controls>
+    <source src="<%= $l->url %>" type="<%= $l->mimetype || '' %>">
+    <p>Your browser is unable to play <%= $l->mimetype || 'video' %> content.</p>
+  </video>
+</div>

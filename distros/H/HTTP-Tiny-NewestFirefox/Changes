@@ -1,3 +1,11 @@
-0.001    2019-05-08 (PERLANCAR)
+0.002   2021-06-08  Released-By: PERLANCAR; Urgency: low
+
+	- No functional changes.
+
+	- [doc] Mention HTTP::Tiny::Plugin::NewestFirefox.
+
+
+0.001    2019-05-08  Released-By: PERLANCAR
 
          - First release.
+

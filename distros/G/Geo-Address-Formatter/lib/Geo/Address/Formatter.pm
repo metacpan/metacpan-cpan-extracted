@@ -1,7 +1,7 @@
 # ABSTRACT: take structured address data and format it according to the various global/country rules
 
 package Geo::Address::Formatter;
-$Geo::Address::Formatter::VERSION = '1.93';
+$Geo::Address::Formatter::VERSION = '1.94';
 use strict;
 use warnings;
 use feature qw(say);
@@ -18,7 +18,6 @@ use YAML::XS qw(LoadFile);
 use utf8;
 
 my $THC = Text::Hogan::Compiler->new;
-
 my $debug = 0;
 
 
@@ -142,12 +141,15 @@ sub format_address {
     my $rh_components = clone(shift) || return;
     my $rh_options    = shift        || {};
 
-    # make sure empty at the beginning
+    # 1. make sure empty at the beginning
     $self->{final_components} = undef;    
-    # deal with the options
-    # country
-    my $cc
-        = $rh_options->{country}
+
+    # 2. deal with the options
+
+    # 2a. which country format will we use?
+    #     might have been specified in options
+    #     otherwise look at components
+    my $cc = $rh_options->{country}
         || $self->_determine_country_code($rh_components)
         || '';
 
@@ -155,7 +157,7 @@ sub format_address {
         $rh_components->{country_code} = $cc;
     }
 
-    # abbreviate
+    # 2b. should we abbreviate?
     my $abbrv = $rh_options->{abbreviate} // 0;
 
     # set the aliases, unless this would overwrite something
@@ -167,13 +169,18 @@ sub format_address {
             $rh_components->{$self->{component_aliases}->{$alias}} = $rh_components->{$alias};
         }
     }
+
+    # 3. deal wtih terrible inputs
     $self->_sanity_cleaning($rh_components);
 
-    # determine the template
+    # 4. determine the template
+    my $template_text;
     my $rh_config = $self->{templates}{uc($cc)} || $self->{templates}{default};
     
-    my $template_text;
-    if (defined($rh_config->{address_template})) {
+    if (defined($rh_options->{address_template})) {
+        $template_text = $rh_options->{address_template};
+    }
+    elsif (defined($rh_config->{address_template})) {
         $template_text = $rh_config->{address_template};
     } elsif (defined($self->{templates}{default}{address_template})) {
         $template_text = $self->{templates}{default}{address_template};
@@ -190,9 +197,10 @@ sub format_address {
         }
         # no fallback
     }
+
     say STDERR 'template text: ' . $template_text if ($debug);
 
-    # clean up the components
+    # 5. clean up the components, possibly add codes
     $self->_fix_country($rh_components);
     $self->_apply_replacements($rh_components, $rh_config->{replace});
     $self->_add_state_code($rh_components);
@@ -203,7 +211,7 @@ sub format_address {
         say STDERR Dumper $rh_components;
     }
 
-    # add the attention, but only if needed
+    # 6. add the attention, but only if needed
     my $ra_unknown = $self->_find_unknown_components($rh_components);
     if ($debug){
         say STDERR "unknown_components:";
@@ -214,13 +222,15 @@ sub format_address {
         $rh_components->{attention} = join(', ', map { $rh_components->{$_} } @$ra_unknown);
     }
 
+    # 7. abbreviate
     if ($abbrv) {
         $rh_components = $self->_abbreviate($rh_components);
     }
 
+    # 8. prepare the template
     $template_text = $self->_replace_template_lambdas($template_text);
 
-    # get a compiled template
+    # 9. compiled the template
     my $compiled_template =
         $THC->compile($template_text, {'numeric_string_as_string' => 1});
 
@@ -231,16 +241,16 @@ sub format_address {
         say STDERR Dumper $compiled_template;
     }
 
-    # render it
-    my $text;
-    $text = $self->_render_template($compiled_template, $rh_components);
-
+    # 10. render the template
+    my $text = $self->_render_template($compiled_template, $rh_components);
     say STDERR "text after _render_template $text" if ($debug);
 
+    # 11. postformatting
     $text = $self->_postformat($text, $rh_config->{postformat_replace});
+    # 12. clean again
     $text = $self->_clean($text);
 
-    # set final components
+    # 13. set final components
     $self->{final_components} = $rh_components;
 
     # all done
@@ -329,7 +339,6 @@ sub _sanity_cleaning {
 
     # catch values containing URLs
     foreach my $c (keys %$rh_components) {
-
         if ($rh_components->{$c} =~ m|https?://|) {
             delete $rh_components->{$c};
         }
@@ -402,9 +411,6 @@ sub _determine_country_code {
                 }
             }
         }
-
-        #        warn "cc $cc";
-        #        warn Dumper $rh_components;
 
         if ($cc eq 'NL') {
             if (defined($rh_components->{state})) {
@@ -683,7 +689,7 @@ sub _render_template {
 
     $output = $self->_evaluate_template_lamdas($output);
 
-    say STDERR "in _render pre _clean: $output" if ($debug);
+    say STDERR "in _render before _clean: $output" if ($debug);
     $output = $self->_clean($output);
 
     # is it empty?
@@ -754,7 +760,7 @@ Geo::Address::Formatter - take structured address data and format it according t
 
 =head1 VERSION
 
-version 1.93
+version 1.94
 
 =head1 SYNOPSIS
 
@@ -799,6 +805,9 @@ Possible options you are:
 
     'abbreviate', if supplied common abbreviations are applied
     to the resulting output.
+
+    'address_template', a mustache format template to be used instead of the template
+    defined in the configuration
 
 =head1 DESCRIPTION
 

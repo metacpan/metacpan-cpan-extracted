@@ -4,6 +4,7 @@ use strict;
 use warnings;
 use boolean qw(true);
 
+use Encode qw(encode);
 use File::Spec;
 use FindBin qw($Bin);
 use LUGS::Events::Parser;
@@ -85,7 +86,7 @@ EOT
       '19:15',
       'LUGS Treff',
       'treff',
-      $join->(<<'EOT'),
+      $join->(encode('UTF-8', <<'EOT')),
 ETH Zürich, HG G 26.5 -
 http://www.rauminfo.ethz.ch/grundrissplan.gif?region=Z&areal=Z&gebaeude=HG&geschoss=G&raumNr=26.5
 (anderer Raum!)
@@ -105,12 +106,12 @@ EOT
       'ab 17:00',
       'LUGS Grillabend',
       'spec',
-      $join->(<<'EOT'),
+      $join->(encode('UTF-8', <<'EOT')),
 Hütte/Areal des Schäferhundeclubs Winterthur (Anreise -
 http://neil.franklin.ch/Info_Texts/Anreise_SCOG_Clubhaus.html)
 EOT
       'Neil Franklin - neil@franklin.ch',
-      $join->(<<'EOT'),
+      $join->(encode('UTF-8', <<'EOT')),
 Wie schon die letzten Jahre werden wir auch dieses Jahr wieder eine LUGS-Grillparty
 durchführen. Teilnehmer: LUGS Mitglieder (und werdende), Familie (Freund(in), Kinder,
 Geschwister, ...), Freunde, ... Mehr Infos -
@@ -127,11 +128,11 @@ EOT
       '22',
       'Sa',
       '19:00 - 23:00',
-      'Französischer Neujahrsmampf 2012',
+      encode('UTF-8', 'Französischer Neujahrsmampf 2012'),
       'spec',
       'Standort noch unbekannt',
-      'Martin Ebnöther - ceo@fress-und-sauf-verein.ch',
-      $join->(<<'EOT'),
+      encode('UTF-8', 'Martin Ebnöther - ceo@fress-und-sauf-verein.ch'),
+      $join->(encode('UTF-8', <<'EOT')),
 Ideen / Vorschläge bitte per E-Mail an den CEO - ceo@fress-und-sauf-verein.ch?subject=Vorschlag
 Französischer Neujahrsmampf 2012 senden.
 EOT
@@ -147,11 +148,11 @@ EOT
       '19:15',
       'LUGS Treff - Voodoo, Schwarze Magie und Internet per UMTS',
       'treff',
-      $join->(<<'EOT'),
+      $join->(encode('UTF-8', <<'EOT')),
 Solino - http://www.solino.ch/, Am Schanzengraben 15, 8002 Zürich (Karte -
 http://map.search.ch/zuerich/am-schanzengraben-15)
 EOT
-      'Martin Ebnöther - ventilator@semmel.ch',
+      encode('UTF-8', 'Martin Ebnöther - ventilator@semmel.ch'),
       undef,
       '20100212_0_treff',
     ],

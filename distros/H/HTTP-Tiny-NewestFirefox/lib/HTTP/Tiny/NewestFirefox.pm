@@ -1,7 +1,7 @@
 package HTTP::Tiny::NewestFirefox;
 
-our $DATE = '2019-05-08'; # DATE
-our $VERSION = '0.001'; # VERSION
+our $DATE = '2021-06-08'; # DATE
+our $VERSION = '0.002'; # VERSION
 
 use 5.010001;
 use strict;
@@ -28,7 +28,7 @@ HTTP::Tiny::NewestFirefox - HTTP::Tiny + set User-Agent to newest Firefox
 
 =head1 VERSION
 
-This document describes version 0.001 of HTTP::Tiny::NewestFirefox (from Perl distribution HTTP-Tiny-NewestFirefox), released on 2019-05-08.
+This document describes version 0.002 of HTTP::Tiny::NewestFirefox (from Perl distribution HTTP-Tiny-NewestFirefox), released on 2021-06-08.
 
 =head1 SYNOPSIS
 
@@ -63,7 +63,7 @@ feature.
 
 =head1 SEE ALSO
 
-L<HTTP::Tiny>
+L<HTTP::Tiny::Plugin::NewestFirefox>, plugin version.
 
 =head1 AUTHOR
 
@@ -71,7 +71,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2019 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

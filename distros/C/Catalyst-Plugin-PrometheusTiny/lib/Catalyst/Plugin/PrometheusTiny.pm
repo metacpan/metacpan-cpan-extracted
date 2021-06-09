@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use v5.10.1;
 
-our $VERSION = '0.004';
+our $VERSION = '0.005';
 
 $VERSION = eval $VERSION;
 
@@ -38,6 +38,7 @@ my $defaults = {
 
 my ($prometheus,               # instance
     $ignore_path_regexp,       # set from config
+    $include_action_labels,    # set from config
     $metrics_endpoint,         # set from config with default
     $no_default_controller,    # set from config
     $request_path              # derived from $metrics_endpoint
@@ -50,11 +51,13 @@ sub _clear_prometheus {
 
 sub prometheus {
     my $c = shift;
-    $prometheus ||= do {
+    $prometheus //= do {
         my $config = Catalyst::Utils::merge_hashes(
             $defaults,
-            $c->config->{'Plugin::PrometheusTiny'} || {}
+            $c->config->{'Plugin::PrometheusTiny'} // {}
         );
+
+        $include_action_labels = $config->{include_action_labels};
 
         $metrics_endpoint = $config->{endpoint};
         if ($metrics_endpoint) {
@@ -111,26 +114,35 @@ after finalize => sub {
       && $request->path =~ $ignore_path_regexp;
 
     my $response = $c->response;
-    my $code     = $response->code;
-    my $method   = $request->method;
+    my $action   = $c->action;
+
+    my $labels = {
+        code   => $response->code,
+        method => $request->method,
+        $include_action_labels
+        ? ( controller => $action->class,
+            action     => $action->name
+          )
+        : ()
+    };
 
     $prometheus->histogram_observe(
         'http_request_size_bytes',
         $request->content_length // 0,
-        { method => $method, code => $code }
+        $labels
     );
     $prometheus->histogram_observe(
         'http_response_size_bytes',
         $response->has_body ? length( $response->body ) : 0,
-        { method => $method, code => $code }
+        $labels
     );
     $prometheus->inc(
         'http_requests_total',
-        { method => $method, code => $code }
+        $labels
     );
     $prometheus->histogram_observe(
         'http_request_duration_seconds',
-        $c->stats->elapsed, { method => $method, code => $code }
+        $c->stats->elapsed, $labels
     );
 };
 
@@ -287,6 +299,13 @@ value.
 A regular expression against which C<< $c->request->path >> is checked, and
 if there is a match then the request is not added to default request/response
 metrics.
+
+=head2 include_action_labels
+
+    include_action_labels => 0      # default
+
+If set to a true value, adds C<controller> and C<action> labels to the
+default metrics, in addition to the C<code> and C<method> labels.
 
 =head2 metrics
 

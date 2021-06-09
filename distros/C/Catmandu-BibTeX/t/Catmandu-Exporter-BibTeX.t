@@ -6,12 +6,12 @@ use Catmandu::Exporter::BibTeX;
 # don't touch this! Exporter adds newline at the end.
 my $bibtex = <<TEX;
 \@inproceedings{2602779,
-  author       = {Boukricha, Hana and Wachsmuth, Ipke and Carminati, Maria Nella and Knoeferle, Pia and Müller-Leßmann, Stephan},
-  keywords     = {computer science},
-  language     = {English},
-  publisher    = {IEEE},
-  title        = {A Computational Model of Empathy: Empirical Evaluation},
-  year         = {2013},
+  author       = {{Boukricha, Hana and Wachsmuth, Ipke and Carminati, Maria Nella and Knoeferle, Pia and Müller-Leßmann, Stephan}},
+  keywords     = {{computer science}},
+  language     = {{English}},
+  publisher    = {{IEEE}},
+  title        = {{A Computational Model of Empathy: Empirical Evaluation}},
+  year         = {{2013}},
 }
 
 TEX

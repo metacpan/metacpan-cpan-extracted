@@ -54,6 +54,7 @@ app->defaults(
     "https://www.aftenposten.no/kultur/Kunstig-intelligens-ma-ikke-lenger-trenes-av-mennesker-617794b.html",
     "spotify:track:0aBi2bHHOf3ZmVjt3x00wv",
     "https://www.nhl.com/video/top-10-of-2018-19-ovechkin/t-277350912/c-68680503",
+    "https://youtu.be/v4Ijkq6Myfc",
   ]
 );
 

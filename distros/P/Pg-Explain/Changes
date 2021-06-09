@@ -1,5 +1,15 @@
 Revision history for Pg-Explain
 
+1.10    2021/06/08
+        - Add a way to get total number of rows returned by node over multiple
+          loops or workers ($node->total_rows)
+        - Add method (total_removed_rows) which shows how many rows were
+          removed in given node by one of:
+            - Conflict Filter
+            - Filter
+            - Index Recheck
+            - Join Filter
+
 1.09    2021/06/07
         - Fix parsing of planning/execution time in case of "quoted" plans and
           no trailing new line.

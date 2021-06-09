@@ -25,6 +25,17 @@ subtest 'Moo' => sub {
     script_stderr_is( q{}, 'no errors' );
 };
 
+subtest 'Local::ViaExporter' => sub {
+    script_runs(
+        [
+            'script/dump-perl-exports',
+            '--libs',   'test-data/lib',
+            '--module', 'Local::ViaExporter'
+        ]
+    );
+    script_stderr_is( q{}, 'no errors' );
+};
+
 subtest 'Not Found' => sub {
     script_runs(
         [

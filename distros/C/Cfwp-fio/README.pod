@@ -1,0 +1,35 @@
+=head1 NAME
+
+Code Fast With Perl !
+
+=head1 DESCRIPTION
+
+A pack of scripts to accelerate Perl coding. 
+
+=head1 SYNOPSIS
+
+  $ expe
+  SUCCESS
+
+=head1 AUTHOR
+
+Gaoang Lau
+
+=head1 LICENSE
+
+FreeBSD
+
+=head1 INSTALLATION
+
+Using C<cpan>:
+
+    $ cpan Cfwp::fio
+
+Manual install:
+
+    $ perl Makefile.PL
+    $ make
+    $ make install
+
+=cut
+

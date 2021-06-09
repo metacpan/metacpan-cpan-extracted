@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+
+perl Makefile.PL verbose
+make manifest
+make 
+sudo make install
+make dist
+make clean
+
+# cpan-upload -u DFARRELL App-foo-0.01.tar.gz

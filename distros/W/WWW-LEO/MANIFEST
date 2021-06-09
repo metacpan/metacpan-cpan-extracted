@@ -1,5 +1,5 @@
 Changes
-LEO.pm
+lib/WWW/LEO.pm
 Makefile.PL
 MANIFEST
 README
@@ -7,3 +7,5 @@ TODO
 t/1.t
 eg/leo.pl
 eg/simpleclient.pl
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

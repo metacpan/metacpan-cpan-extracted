@@ -6,18 +6,16 @@
 # podDocumentation
 # cd /home/phil/perl/cpan/DataTableText/; perl Build.PL && perl Build test && sudo perl Build install
 # To escape an open parenthesis in a regular expression use: \x28, for close use: \x29
-# document and test foot option for format table
 # E for exportable methods
 # write binary data without complaints about wide characters
-# ddd, eee, lll methods
 # formatTableHH hash with sub hash of {} fails to print see svgToDita
 # runInParallel - processing statistics
 # formatTable should optionally clear left columns identical to previous line
 # checkKeys information should be formatted so it can be referred to in sub descriptions
-# updateDocumentation - detect parameter type mismatch between prototype and specified parameter
+# updateDocumentation - mark synopsis tests with #S an place in synopsis
 package Data::Table::Text;
 use v5.26;
-our $VERSION = 20210531;                                                        # Version
+our $VERSION = 20210606;                                                        # Version
 use warnings FATAL => qw(all);
 use strict;
 use Carp qw(confess carp cluck);
@@ -6250,7 +6248,9 @@ sub wellKnownUrls                                                               
     cpu             => [q(CPU),                                                 "https://en.wikipedia.org/wiki/Central_processing_unit"                                                                           ], #
     c               => [q(The C Programming Language),                          "https://1lib.eu/book/633119/db5c78"                                                                                              ], #
     co2             => [q(Carbon Dioxide),                                      "https://en.wikipedia.org/wiki/Carbon_dioxide"                                                                                    ], #
+    css             => [q(Cascading Style Sheets),                              "https://en.wikipedia.org/wiki/CSS"                                                                                               ], #
     csv             => [q(csv),                                                 "https://en.wikipedia.org/wiki/Comma-separated_values"                                                                            ], #
+    cv              => [q(Curriculum Vitae),                                    "https://en.wikipedia.org/wiki/Curriculum_vitae"                                                                                  ], #
     curl            => [q(curl),                                                "https://linux.die.net/man/1/curl"                                                                                                ], #
     dataStructure   => [q(data structure),                                      "https://en.wikipedia.org/wiki/Data_structure"                                                                                    ], #
     db2             => [q(DB2),                                                 "https://en.wikipedia.org/wiki/IBM_Db2_Family"                                                                                    ], #
@@ -6283,6 +6283,7 @@ sub wellKnownUrls                                                               
     ec2Console      => [q(EC2 Console),                                         "https://us-east-1.console.aws.amazon.com/ec2/"                                                                                   ], #
     ec2             => [q(EC2),                                                 "https://aws.amazon.com/ec2/"                                                                                                     ], #
     eff             => [q(The Electronic Frontier Foundation),                  "https://en.wikipedia.org/wiki/Electronic_Frontier_Foundation"                                                                    ], #
+    electrons       => [q(electrons),                                           "https://en.wikipedia.org/wiki/Electron"                                                                                          ], #
     english         => [q(English),                                             "https://en.wikipedia.org/wiki/English_language"                                                                                  ], #
     eval            => [q(eval),                                                "http://perldoc.perl.org/functions/eval.html"                                                                                     ], #
     extensions      => [q(file name extensions),                                "https://en.wikipedia.org/wiki/List_of_filename_extensions"                                                                       ], #
@@ -6295,6 +6296,7 @@ sub wellKnownUrls                                                               
     fork            => [q(fork),                                                "https://en.wikipedia.org/wiki/Fork_(system_call)"                                                                                ], #
     frontend        => [q(front end),                                           "https://en.wikipedia.org/wiki/Front_end_and_back_end"                                                                            ], #
     fsf             => [q(Free Software Foundation),                            "https://www.fsf.org/"                                                                                                            ], #
+    future          => [q(future),                                              "https://en.wikipedia.org/wiki/Future"                                                                                            ], #
     gbstandard      => [q(GB Standard),                                         "http://metacpan.org/pod/Dita::GB::Standard"                                                                                      ], #
     gdpr            => [q(European Directive on Data Protection),               "https://gdpr.eu"                                                                                                                 ], #
     geany           => [q(Geany),                                               "https://www.geany.org"                                                                                                           ], #
@@ -6333,6 +6335,7 @@ sub wellKnownUrls                                                               
     ide             => [q(Integrated Development Environment),                  "https://en.wikipedia.org/wiki/Integrated_development_environment"                                                                ], #
     ietf            => [q(Internet Engineering Task Force),                     "https://en.wikipedia.org/wiki/Internet_Engineering_Task_Force"                                                                   ], #
     imagemagick     => [q(Imagemagick),                                         "https://www.imagemagick.org/script/index.php"                                                                                    ], #
+    infix           => [q(infix),                                               "https://en.wikipedia.org/wiki/Infix_notation"                                                                                    ], #
     install         => [q(install),                                             "https://en.wikipedia.org/wiki/Installation_(computer_programs)"                                                                  ], #
     intelsde        => [q(Intel Software Development Emulator),                 "https://software.intel.com/content/www/us/en/develop/articles/intel-software-development-emulator.html"                          ], #
     internet        => [q(Internet),                                            "https://en.wikipedia.org/wiki/Internet"                                                                                          ], #
@@ -6366,6 +6369,7 @@ sub wellKnownUrls                                                               
     mdnfetch        => [q(the Javascript Fetch API),                            "https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API"                                                                      ], #
     mideast         => [q(Middle East),                                         "https://en.wikipedia.org/wiki/Middle_East"                                                                                       ], #
     meme            => [q(Meme),                                                "https://en.wikipedia.org/wiki/Meme"                                                                                              ], #
+    memory          => [q(memory),                                              "https://en.wikipedia.org/wiki/Computer_memory"                                                                                   ], #
     mentor          => [q(mentor),                                              "https://en.wikipedia.org/wiki/Mentorship"                                                                                        ], #
     metadata        => [q(metadata),                                            "https://en.wikipedia.org/wiki/Metadata"                                                                                          ], #
     mfa             => [q(Multi-factor authentication),                         "https://en.wikipedia.org/wiki/Multi-factor_authentication"                                                                       ], #
@@ -6409,6 +6413,7 @@ sub wellKnownUrls                                                               
     pli             => [q(Programming Language One),                            "https://en.wikipedia.org/wiki/PL/I"                                                                                              ], #
     pod             => [q(POD),                                                 "https://perldoc.perl.org/perlpod.html"                                                                                           ], #
     poppler         => [q(Poppler),                                             "https://poppler.freedesktop.org/"                                                                                                ], #
+    portugal        => [q(Portugal),                                            "https://en.wikipedia.org/wiki/Portugal"                                                                                          ], #
     postgres        => [q(Postgres),                                            "https://github.com/philiprbrenan/postgres"                                                                                       ], #
     prb             => [q(prb),                                                 "http://philiprbrenan.appaapps.com/"                                                                                              ], #
     preprocessor    => [q(preprocessor),                                        "https://en.wikipedia.org/wiki/Preprocessor"                                                                                      ], #
@@ -6481,6 +6486,7 @@ sub wellKnownUrls                                                               
     undef           => [q(undef),                                               "https://perldoc.perl.org/functions/undef.html"                                                                                   ], #
     unicode         => [q(Unicode),                                             "https://en.wikipedia.org/wiki/Unicode"                                                                                           ], #
     unixHaters      => [q(Unix Haters Handbook),                                "https://1lib.eu/book/750790/8f3128"                                                                                              ], #
+    universe        => [q(Universe),                                            "https://en.wikipedia.org/wiki/Universe"                                                                                          ], #
     unix            => [q(Unix),                                                "https://en.wikipedia.org/wiki/Unix"                                                                                              ], #
     unoconv         => [q(unoconv),                                             "https://github.com/unoconv/unoconv"                                                                                              ], #
     uow             => [q(Ubuntu on Windows),                                   "http://philiprbrenan.appaapps.com/UbuntuOnWindows"                                                                               ], #

@@ -1,6 +1,6 @@
 package POE::Component::IRC::State;
 our $AUTHORITY = 'cpan:HINRIK';
-$POE::Component::IRC::State::VERSION = '6.91';
+$POE::Component::IRC::State::VERSION = '6.92';
 use strict;
 use warnings FATAL => 'all';
 use IRC::Utils qw(uc_irc parse_mode_line normalize_mask);

@@ -3,7 +3,7 @@ use ExtUtils::MakeMaker;
 
 WriteMakefile(
 	      'NAME'		=> 'WWW::LEO',
-	      'VERSION_FROM'	=> 'LEO.pm',
+	      'VERSION_FROM'	=> 'lib/WWW/LEO.pm',
 	      'PREREQ_PM'		=> {
 					    LWP::UserAgent   => 0,
 					    HTML::TokeParser => 0,

@@ -27,11 +27,11 @@ Pg::Explain::Node - Class representing single node from query plan
 
 =head1 VERSION
 
-Version 1.09
+Version 1.10
 
 =cut
 
-our $VERSION = '1.09';
+our $VERSION = '1.10';
 
 =head1 SYNOPSIS
 
@@ -530,6 +530,52 @@ sub total_inclusive_time {
     return unless defined $self->actual_time_last;
     return unless defined $self->actual_loops;
     return $self->actual_loops * $self->actual_time_last / $self->workers;
+}
+
+=head2 total_rows
+
+Method for getting total number of rows returned by current node. This takes into account parallelization and multiple loops.
+
+=cut
+
+sub total_rows {
+    my $self = shift;
+    return unless defined $self->actual_time_last;
+    return unless defined $self->actual_loops;
+    return $self->actual_loops * $self->actual_rows if 1 == $self->workers;
+    return $self->workers * $self->actual_rows;
+}
+
+=head2 total_rows_removed
+
+Sum of rows removed by:
+
+=over
+
+=item * Conflict Filter
+
+=item * Filter
+
+=item * Index Recheck
+
+=item * Join Filter
+
+=back
+
+in given node.
+
+=cut
+
+sub total_rows_removed {
+    my $self = shift;
+    return 0 unless $self->extra_info;
+    my $removed = 0;
+    for my $line ( @{ $self->extra_info } ) {
+        next unless $line =~ m{^Rows Removed by (?:Conflict Filter|Filter|Index Recheck|Join Filter): (\d+)$};
+        $removed += $1;
+    }
+    return $self->actual_loops * $removed if 1 == $self->workers;
+    return $self->workers * $removed;
 }
 
 =head2 total_exclusive_time

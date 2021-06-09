@@ -32,5 +32,5 @@ requires:
   XML::LibXSLT: '0'
   XML::Parser: '0'
   perl: '5.01'
-version: '0.97'
+version: '0.98'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

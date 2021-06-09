@@ -1,0 +1,89 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+use App::Stow::Check;
+
+our $VERSION = 0.01;
+
+# Run.
+exit App::Stow::Check->new->run;
+
+# Print version.
+sub VERSION_MESSAGE {
+	print $VERSION."\n";
+	exit 0;
+}
+
+__END__
+
+=pod
+
+=encoding utf8
+
+=head1 NAME
+
+stow-check - Tool to check for which stow dist command is.
+
+=head1 SYNOPSIS
+
+ stow-check [-h] [--version] command
+
+=head1 DESCRIPTION
+
+Tool is checking:
+
+ If command stands in /usr/local/bin
+ If links to /usr/local/stow/__DIST__/[s]bin/__COMMAND__
+
+If yes, returns __DIST__ name and exit code 0.
+If no, returns error message to STDERR and exit code 1.
+
+=head1 ARGUMENTS
+
+=over 8
+
+=item * C<-h>
+
+Print help.
+
+=item * C<--version>
+
+Print version of script.
+
+=item * C<command>
+
+Command name (e.g. openssl).
+
+=back
+
+=head1 EXAMPLE1
+
+ stow-check -h
+
+=head1 EXAMPLE2
+
+ stow-check __COMMAND_IN_STOW_DIR__
+
+=head1 REPOSITORY
+
+L<https://github.com/michal-josef-spacek/App-Stow-Check>
+
+=head1 AUTHOR
+
+Michal Josef Špaček L<mailto:skim@cpan.org>
+
+L<http://skim.cz>
+
+=head1 LICENSE AND COPYRIGHT
+
+© 2021 Michal Josef Špaček
+
+BSD 2-Clause License
+
+=head1 VERSION
+
+0.01
+
+=cut

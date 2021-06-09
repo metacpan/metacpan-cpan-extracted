@@ -44,6 +44,17 @@ sub display ($;%) {
         $text=~s/[<>]/ /sg;
     }
 
+    # Zero bytes trigger a strange bug in at least some combinations of
+    # Apache and XAO::Web. Repeated requests that send something like
+    # ?foo=bar%00 that use CgiParam sometimes result in Apache hanging
+    # even though processing is done. There is almost never a real need
+    # to send a zero byte as an inline CGI parameter, so filtering it
+    # out.
+    #
+    if(!$args->{'keep_zeros'}) {
+        $text=~s/\x00/ /sg;
+    }
+
     # Trimming spaces
     #
     if(!$args->{'keep_spaces'}) {

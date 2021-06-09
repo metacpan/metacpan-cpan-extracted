@@ -1,0 +1,274 @@
+#!/usr/bin/perl
+
+#  colsummary : TSVまたはCSVファイルの各列の値の様子を表示する。とても便利。
+#   2015/05/11 - 2016/07/05 , 2018-03-28 . Shimono Toshiyuki 
+#   2019/10/24, 2021/06/08 さらに大幅に書き替え 
+
+use 5.014 ; 
+use strict ; 
+use warnings ; # also confirmed on 5.011 5.014 5.018  
+use autodie qw [ open ] ; 
+use Encode qw[ decode_utf8 encode_utf8 ] ; 
+use FindBin qw [ $Script ] ; 
+use Getopt::Std ; getopts 'R:g:i:jl:m:suz=!@:#:0:2:' => \my %o ;
+use List::Util qw/max min maxstr minstr/ ; 
+use POSIX qw/strtod/;
+use Scalar::Util qw/looks_like_number/;
+use Term::ANSIColor qw/:constants color/ ; $Term::ANSIColor::AUTORESET = 1 ; 
+use Time::HiRes qw [ gettimeofday tv_interval ] ; my ${ dt_start } = [ gettimeofday ] ; 
+
+my $sdt = sprintf '%04d-%02d-%02d %02d:%02d:%02d', do{my @t= @{[localtime]}[5,4,3,2,1,0]; $t[0]+=1900; $t[1]++; @t } ; 
+eval "use PerlIO::gzip;1" or die "PerlIO::gzip cannot be loaded, so -z does not work. ($Script, $sdt)\n" if $o{z} ; 
+
+sub AlignOut ( @ ) ; # 出力 ; eachFileでもColstatでも使う。
+sub ColStat ( $$ ) ; # $colvals->[列番] と 列名を 渡す。そして、その中身が表示される。; eachFileでもColstatでも使う。
+sub d3 ($) { $_[0] =~ s/(?<=\d)(?=(\d\d\d)+($|\D))/,/gr } ; # 数を3桁区切りに変換する。
+sub eachFile ( $ ) ; 
+  # 以下3個はeachFileから呼ばれる。
+  sub colnames( $ ) ; # -=の時に先頭行の情報を取り出す
+  sub filePinfo ; # ファイル毎の2次情報(一行サマリ)
+  sub ColFreq ( $$ ) ; # 第１変数はファイルハンドル 第２変数は参照 ;  各列の値の分布を取り出す
+
+## 全体で使う変数
+* decode = $o{u} ? * decode_utf8 : sub ($){ $_[0] } ; #* encode = $o{u} ? * encode_utf8 : sub ($){ $_[0] } ; 
+my $optR0 = defined $o{R} && $o{R} eq 0 ;
+* R0proc = $optR0 ? sub {} : sub { s/\r$// } ;  # -R0 が指定された時の処理
+binmode *STDOUT , ':utf8' if $o{u} ; # これだけ全体で使う変数とは言いがたいかもしれないが、オプションの処理はこの節の前半にあるので。
+$| = 1 if $o{'!'} ;
+$o{g} //= 6 ; # if ( ! defined $o{g} ) ; # 取り出す数
+$o{'#'} = decode ( $o{'#'} ) if defined $o{'#'} ; 
+push @ARGV , '-' unless @ARGV ; # 標準入力の追加
+my $isep = $o{i} // "\t" ;  # 入力の区切り文字 $o{','} = do { $o{','} //= "\t" ; eval qq[qq[$o{','}]] } ;
+my $sec = $o{'@'} // 15 ; # 何秒ごとにレポートを表示させるか
+my $L = ',' ; # 出力によく現れる区切り文字列
+my $nc = 0 ; # 計数対象としなかったセルの数をカウント。
+my $rl ; # 各ファイルの読んだ行数を格納。
+my %fOut = (
+j =>  [ map {UNDERLINE decode($_)} qw[列番号 値の異なり 数値化平均 列名 値の範囲 最頻値 最頻値の度数 ..テールの度数(重なり) 桁数範囲 ] ] ,
+e =>  [ map {UNDERLINE $_ } qw[ cpos diff ave. name range frequent frequency ..lower(x_mul) digits] ] ) ; 
+
+## シグナルに対する設定
+my ${ INT1 } = sub {
+  &{ $SIG{ALRM} } ;
+  print STDERR BRIGHT_RED 
+   'Do you want to get the halfway result? Then type Ctrl + C again within 2 seconds. '. "\n" .
+   'Really want to Quit? Then press Ctrl + "\" or Ctrl + Yen-Mark. (Ctrl+Z may be what you want.) ' . RESET "\n" ;
+  $SIG{INT} = sub { select *STDERR ; & ColStat ; select *STDOUT ; return } ; 
+  sleep 2 ; 
+  return ;
+} ;
+$SIG{ INT } = ${ INT1 } ;
+$SIG{ ALRM } = sub { say STDERR GREEN + (d3 $rl) . " lines read. " , scalar localtime ; alarm $sec } ; 
+alarm $sec ; 
+
+eachFile $_ for @ARGV ;
+exit 0 ;
+
+## 1個ずつファイルを読み取る。
+sub eachFile ( $ ) {
+  my $FH = do { my $t = *STDIN if $_[0] eq '-' ; open $t, '<', $_[0] if!$t ; binmode $t , ':gzip(gzip)' if $o{z} ; $t } ; # ファイルハンドルの取得
+  $rl = 0 ; # 各ファイルの読み取った行数
+  # 1. 最初の列名の並びを読み取り: 
+  my @colnames =  colnames $FH if $o{'='} ; 
+  # 2. データの中身を読み取りつつ、返る値は「列数」。
+  my $maxCols = ColFreq $FH, my $colvals ; #my $colvals ; 各列の各データ値の度数を集計;$colvals->[列番-1]{データ値}=度数 
+  close $FH  ;
+  # 3. 出力をする
+  AlignOut @{ $fOut{$o{j}?'j':'e'} } if 0 ne ($o{0}//'') ; 
+  defined $colvals->[$_] and ColStat $colvals->[ $_ ] , $colnames[$_] for 0 .. $maxCols - 1  ; # オプション -0 により全ての値が除外されることは起こりうる。 
+  # 4. 2次情報を出力する。
+  filePinfo ;
+}
+
+### ヘッダから列名を取得する。 -= が指定された場合のみ
+sub colnames ( $ ) { 
+  my $FH = $_[0] ; 
+  $_ = <$FH> ; 
+  $rl ++ if defined $_ ; 
+  $_ //= '' ; 
+  & R0proc ; # <-- R0procで行末の\r対策。
+  chomp $_ ; 
+  decode ($_) ; 
+  my @F = split /$isep/, decode ($_) , -1 ; 
+  #my @F =  split /$isep/, do { my $FH = $_[0] ; my $t = <$FH> ; $rl++ if defined $t ; $t //= '' ; chomp $t ; decode ($t) } , -1 
+} 
+
+###
+sub filePinfo {
+  exit if ($o{2}//'') eq 0 ;
+  $rl = d3 ($rl // 0) ; # read lines
+  my $procsec = tv_interval ${ dt_start } ;
+  my $out = "$rl line(s) read; "; 
+  $out .= "$nc cells are not counted; " if $nc ;
+  $out .= sprintf '%0.6f seconds (colsummary)', $procsec ; # たまにマイクロ秒単位の$procsecが15桁くらいで表示されるのでsprintf。
+  say STDERR BOLD DARK ITALIC CYAN $out ;
+}
+
+### 各列の値の分布を取り出す
+sub ColFreq ( $$ ) { # 第１変数はファイルハンドル 第２変数は参照
+  #my %zstr ; # 除外された文字列の出現頻度。(点検用でもある。)     #my $intflg ; #$SIG{INT} = sub { $intflg = 1 } ; 
+  my $maxCols = 0 ;
+  my $col = undef ; # 0オリジンのカラム番号
+  * lenlim = defined $o{l} ? sub { grep { $_ = substr $_, 0, $o{l} } @_ } : sub {} ; # -l で長さ制限
+  * tailspacetrim = defined $o{s} ? sub { grep { s/\s+$// } @_ } : sub {} ; 
+  * negcell = defined $o{'#'} ? sub { if (m/$o{'#'}/ ) { $col ++ ; $nc ++ ; goto EACH_CELL } }  : sub {} ; # o{'0'} をやめた
+  for ( my $FH = $_[0] ; <$FH> ; $rl ++ ) {  # <-- - よくこんなコードを書いたと自分で思っている(2021-06-08)
+    chomp ; 
+    & R0proc ; 
+    my @F = map { decode ( $_ ) } split /$isep/ , $_ , -1 ; 
+    & lenlim ( @F ) ; # 各セルの長さ制限
+    & tailspacetrim ( @F ) ;
+    $col = 0 ;
+    EACH_CELL : 
+    while ( defined ($_ = shift @F) ) { 
+      #do { $zstr { $F[$_] } ++ ; next } if exists $o{'0'} && $F[$_] =~ m/$o{'0'}/ ; 
+      & negcell ; #next if exists $o{'0'} && $F[$_] =~ m/$o{'0'}/ ; 
+      ++ $_[1] -> [ $col ] { $_ } ; # 各列の各データ値の度数を集計
+      $col ++ ;
+    }
+    $maxCols = $col if $maxCols < $col ; 
+  }
+  # 除去された値の頻度一覧。
+  #if ( $o{'0'} ) { 
+  #  print ON_WHITE BLACK "\t Suppressed cell value : " if keys %zstr; 
+  #  print ON_WHITE BLACK "\t $zstr{$_} : $_ " for keys %zstr 
+  #} ; 
+  return $maxCols ;
+}
+
+## $colvals->[列番] と 列名を 渡す。そして、その中身が表示される。
+sub ColStat ( $$ ) { 
+  sub aveft ( $$ ) ; # 各列の平均値を計算する処理をする。
+  sub MultSpec ( $$ ) ; # 度数(頻出上位の個数及びテールの様子) について表示文字列を準備する(..の前後で2回呼び出される)
+  sub minmaxstr ( $ ) ; # 配列参照から、最小値最大値を取り出す 
+  my %thash = %{ $_[0] } ; #$colvals -> [$_] } ;  # 各列について、値の度数のハッシュをここで格納。
+  my @vals  = keys %thash ;  # その列で1回以上出現した具体的なデータ値を可能。
+  my @skeys = splice @{[ sort{ $thash{$b} <=> $thash{$a} } @vals ]} , 0, $o{g} ; #高速化の対象か? 
+  my %cct ; $cct{$_} ++ foreach values %thash ; # 度数のそのまた度数を格納するための変数
+  my @kcct =  sort {$b <=> $a} keys %cct ;
+  my @kcct1 = splice @kcct , 0,  min(  $o{g} ,$#kcct+1 ) ; # <- tricky! 
+  my @kcct2 = splice @kcct , - min(  $o{g} ,$#kcct+1 ) ; # <- tricky! 
+  my @out ; 
+  push @out, $_ + 1, scalar @vals, aveft ( \%thash , \@vals ), $_[1]//($_+1) ; 
+  push @out ,  (join $L, minmaxstr \@vals) , (join$L, @skeys) ;
+  push @out ,  (join $L, MultSpec \@kcct1, \%cct) , (@kcct2? @kcct? '..' : $L : '' ) . (join $L , MultSpec \@kcct2, \%cct)  ; 
+  push @out ,  minmaxstr( \@{[map { length decode ($_) } @vals ]}  ) ;
+  AlignOut @out; # <-- この1行で、元の入力の1列の銃砲を出力
+  return ;
+}
+
+## 出力
+sub AlignOut ( @ ) { 
+  my @p = @_ ; 
+  my @P ; 
+  push @P , $p[0] ;  ## (1) 列番号の表示1から
+  push @P , GREEN BOLD $p[1] ; ## (2) 何通りの値が出現したかを表示 
+  push @P , BRIGHT_BLUE $p[2] if ($o{m}//'') ne 0 ; ## (3) 平均値の表示 (加算と減算の関係を把握する目的があるので、値が無いところは0と見なす)
+  push @P , BRIGHT_YELLOW $p[3] ;## (4) 列の名前(列名)を表示
+  push @P , BRIGHT_WHITE $p[4] ; ## (5) 値の最大と最小を取り出す。
+  push @P , $p[5] ;## (6)  具体的な値の表示 (出現度数の多い順に $o{g} 個 ) 
+  push @P , BRIGHT_GREEN $p[6] . GREEN $p[7] ;## ## (7) 最頻度数の分布## (7) 中点(なかてん)の処理 (7) テール度数の分布
+  push @P , BRIGHT_BLUE $p[8] ;  ## (8) 値の文字列長の範囲の表示
+  say join "\t" , @P ;
+}
+
+# 平均値を計算する処理をする。
+sub aveft ( $$ ) {
+  my ($rHash,$rKeys) = @_ ;
+  my ($tval, $freq, $asum, $afreq ) ; 
+  for( @{$rKeys} ) { 
+    ( my $num = $_ ) =~ s/(\d),/$1/g ; #s/,//g ; # 3桁区切りに現れる区切りコンマを消去する
+    $tval = POSIX::strtod ( $num ) ; 
+    $freq = $rHash->{ $_ }  ; 
+    $asum += $tval * $freq ; 
+    $afreq += $freq ; 
+  }
+  return sprintf '%5.3f',$asum/$afreq;  
+}
+
+# 度数(頻出上位の個数及びテールの様子) について表示文字列を準備する(..の前後で2回呼び出される)
+sub  MultSpec ( $$ ) {
+  my ( $p_kc , $p_ccount )  =  @_;
+  my @ostr ;
+  my $c=0 ; 
+  while ( my $t  = shift @$p_kc )  { 
+    $c++ ; 
+    push @ostr , $t if ( $p_ccount->{$t} == 1 ) ; 
+    push @ostr , $t.'(x'.$p_ccount->{$t} .')' if ( $p_ccount->{$t} >= 2 ) ; 
+    last if ( $c >= $o{g} ) ;
+  } 
+  return @ostr ;
+} ;
+
+# 配列参照から、最小値最大値を取り出す 
+sub minmaxstr ( $ ) {
+  sub part ( &@ ) ; 
+  sub RangeStr ( $$ ) ;
+  my @gps = part {$_ eq '' ? 0 : looks_like_number $_ ? 1 : 2}  @{ $_[0] } ; 
+  my @ostr ; 
+  push @ostr, '' if $gps[0] ;  # 空文字列があるときの処理  
+  push @ostr, RangeStr( min(@{$gps[1]}), max(@{$gps[1]}) ) if $gps[1] ;  # 数に見える値があるときの処理 
+  push @ostr, RangeStr( minstr(@{$gps[2]}), maxstr(@{$gps[2]}) ) if $gps[2] ; # 数に見えない値があるときの処理 
+  return @ostr; 
+} ; 
+sub part ( &@ ) { my ($cd, @l) = @_ ; my @p ; push @{ $p[ $cd->($_) ] } , $_ for @l ; @p } ;  # この関数は List::MoreUtils 
+sub RangeStr ( $$ ) { $_[0] eq $_[1] ? "$_[0]" : "$_[0]..$_[1]" } # 2個の数or文字列から 1..2のような文字列を生成
+
+
+## ヘルプの扱い
+sub VERSION_MESSAGE {}
+sub HELP_MESSAGE {
+  use FindBin qw[ $Script ] ; 
+  $ARGV[1] //= '' ;
+  open my $FH , '<' , $0 ;
+  while(<$FH>){
+    s/\$0/$Script/g ;
+    print $_ if s/^=head1// .. s/^=cut// and $ARGV[1] =~ /^o(p(t(i(o(ns?)?)?)?)?)?$/i ? m/^\s+\-/ : 1;
+  }
+  close $FH ;
+  exit 0 ;
+}
+=encoding utf8
+
+=head1 $0 
+
+ データファイル(TSV形式、一行目はヘッダ)について、各列の有用な情報を出力する。
+
+ 出力項目:
+   1. 列番号 ; 白
+   2. 異なり数(各列に異なる値が何個出現したか) ; 明るい緑
+   3. 平均値 ( -m で平均値の出力は抑制可能) ; 青
+   4. 列名 (ヘッダから取り出す) ; 黄色
+   5. 値の範囲 ; 明るい白
+   6. 値の頻出ランキング ; 暗い白
+   7. 頻出上位と下位についての出現回数 ; 明るい緑
+   8. 値の文字列長の範囲 ; 青
+
+ [オプション] :
+
+   (入力オプション)
+  -=     ; 入力の最初の行が列名の並びと仮定。この指定をしない場合は列名は連番になる。
+  -i STR : 区切り文字をタブ文字ではなくて、 str  に変更。
+  -l 10  ; 各セルの値の長さを指定文字数に制限する。(列名には適用されない。)
+  -s     ; 各セルの末尾の空白を除去。-uがあると半角空白だけで無くて全角空白も除去。
+  -u     ; utf-8 として処理することとする。 -u が指定されないと、バイト単位の処理となる。
+  -z     ; 入力は gzip 圧縮されていることを仮定。
+  -\# REGEX ; 除外する値の正規表現の指定。 '^部分正規表現$' のような指定の仕方をよく使うことになるだろう。 
+  -@ N : N 秒ごとに，何行を読んだかを報告する。 Report how many have read every N seconds.  
+
+  -R 0   ; 改行区切りが\r\nであっても何もオプション指定せずに対処しているが、不具合があれば使う。
+
+   (出力オブション)
+  -0 0 : 出力の変数の名前の並びを出力しない。   
+  -g N ;  具体的な値を何個表示させるか指定する。未指定なら6。
+  -j : 出力の各列の名前を日本語で出力する。
+  -m 0 ; 平均値を表示しない。(平均値は strtod を使っている。) 
+   
+  --help : この $0 のヘルプメッセージを出す。  perldoc -t $0 | cat でもほぼ同じ。
+  --help opt : オプションのみのヘルプを出す。opt以外でも options と先頭が1文字以上一致すれば良い。
+
+  開発メモ: 
+   * 文字コードの扱いが若干不透明
+   * シグナルに対する挙動が不透明なのでよく確認したい。
+
+=cut

@@ -2,7 +2,7 @@ package App::perlimports::Role::Logger;
 
 use Moo::Role;
 
-our $VERSION = '0.000007';
+our $VERSION = '0.000008';
 
 use Types::Standard qw( InstanceOf );
 
@@ -10,6 +10,7 @@ has logger => (
     is        => 'ro',
     isa       => InstanceOf ['Log::Dispatch'],
     predicate => '_has_logger',
+    writer    => 'set_logger',
 );
 
 1;
@@ -28,7 +29,7 @@ App::perlimports::Role::Logger - Provide a logger attribute to App::perlimports 
 
 =head1 VERSION
 
-version 0.000007
+version 0.000008
 
 =head1 AUTHOR
 

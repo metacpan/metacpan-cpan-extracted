@@ -1,9 +1,9 @@
 package Role::TinyCommons::Iterator::Bidirectional;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-04-19'; # DATE
+our $DATE = '2021-06-08'; # DATE
 our $DIST = 'Role-TinyCommons-Iterator'; # DIST
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.003'; # VERSION
 
 use Role::Tiny;
 use Role::Tiny::With;
@@ -32,7 +32,7 @@ Role::TinyCommons::Iterator::Bidirectional - A bidirectional iterator
 
 =head1 VERSION
 
-This document describes version 0.002 of Role::TinyCommons::Iterator::Bidirectional (from Perl distribution Role-TinyCommons-Iterator), released on 2021-04-19.
+This document describes version 0.003 of Role::TinyCommons::Iterator::Bidirectional (from Perl distribution Role-TinyCommons-Iterator), released on 2021-06-08.
 
 =head1 DESCRIPTION
 
@@ -65,7 +65,7 @@ Source repository is at L<https://github.com/perlancar/perl-Role-TinyCommons-Ite
 
 =head1 BUGS
 
-Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-Role-TinyCommons-Iterator/issues>
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Role-TinyCommons-Iterator>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired

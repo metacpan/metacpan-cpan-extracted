@@ -45,5 +45,5 @@ requires:
   strict: '0'
   utf8: '0'
   warnings: '0'
-version: 1.0.44
+version: 1.0.45
 x_serialization_backend: 'YAML::Tiny version 1.70'

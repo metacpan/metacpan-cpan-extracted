@@ -1,9 +1,9 @@
 package TablesRole::Spec::Basic;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-06-01'; # DATE
+our $DATE = '2021-03-05'; # DATE
 our $DIST = 'Tables'; # DIST
-our $VERSION = '0.1.1'; # VERSION
+our $VERSION = '0.1.2'; # VERSION
 
 use Role::Tiny;
 
@@ -32,7 +32,7 @@ TablesRole::Spec::Basic - Required methods for all Tables::* modules
 
 =head1 VERSION
 
-This document describes version 0.1.1 of TablesRole::Spec::Basic (from Perl distribution Tables), released on 2020-06-01.
+This document describes version 0.1.2 of TablesRole::Spec::Basic (from Perl distribution Tables), released on 2021-03-05.
 
 =head1 REQUIRED METHODS
 
@@ -130,7 +130,7 @@ Source repository is at L<https://github.com/perlancar/perl-Tables>.
 
 =head1 BUGS
 
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Tables>
+Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-Tables/issues>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
@@ -142,7 +142,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by perlancar@cpan.org.
+This software is copyright (c) 2021 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

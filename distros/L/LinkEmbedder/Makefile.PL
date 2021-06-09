@@ -3,7 +3,7 @@ use utf8;
 use ExtUtils::MakeMaker;
 my %WriteMakefileArgs = (
   NAME           => 'LinkEmbedder',
-  AUTHOR         => 'Jan Henning Thorsen <jhthorsen@cpan.org>',
+  AUTHOR         => 'Bruno Ramos <brunoramos.lu@gmail.com>',
   LICENSE        => 'artistic_2',
   ABSTRACT_FROM  => 'lib/LinkEmbedder.pm',
   VERSION_FROM   => 'lib/LinkEmbedder.pm',
@@ -16,7 +16,7 @@ my %WriteMakefileArgs = (
 }
 ,
   PREREQ_PM      => {
-  'Mojolicious' => '8.00'
+  'Mojolicious' => '9.11'
 }
 ,
   META_MERGE     => {

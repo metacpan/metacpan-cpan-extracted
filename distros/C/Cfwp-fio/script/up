@@ -1,0 +1,7 @@
+#!/usr/bin/env perl
+use Modern::Perl;
+
+$_ = $ARGV[0];
+chomp;
+say "Uploading $_";
+`time curl --progress-bar -F "file=\@$_" 'http://ali.ddot.cc:51179' | tee /dev/null`

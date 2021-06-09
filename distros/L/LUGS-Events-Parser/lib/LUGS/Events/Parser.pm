@@ -11,7 +11,7 @@ use List::MoreUtils qw(all);
 use LUGS::Events::Parser::Event ();
 use Params::Validate ':all';
 
-our $VERSION = '0.11';
+our $VERSION = '0.12';
 
 validation_options(
     on_fail => sub
@@ -160,6 +160,7 @@ sub _parse_content
             $self->_rewrite_tags(\%fields);
             $self->_purge_tags(\%fields);
             $self->_decode_entities(\%fields);
+            $self->_encode_safe(\%fields);
         }
 
         my ($year, $month, $day) = $fields{event} =~ /^(\d{4})(\d{2})(\d{2})$/;
@@ -360,7 +361,8 @@ rewritten content.
 The order of processing is: HTML markup is filtered first and then being
 rewritten by the according tag handlers. Next tags are purged if requested.
 Then literal strings as specified are stripped from the content. Finally,
-HTML entities are unconditionally decoded.
+HTML entities are unconditionally decoded and furthermore, some field values
+encoded to UTF-8.
 
 C<LUGS::Events::Parser> internally uses L<HTML::Parser> to push tags and text
 on a stack. If tags are nested, the innermost tag will be retrieved first and

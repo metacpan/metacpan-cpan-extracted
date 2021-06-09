@@ -20,7 +20,7 @@ sub has_next_item {
 
 sub get_next_item {
     my $self = shift;
-    $self->{pos} < @{ $self->{array} } or die "StopIterator";
+    $self->{pos} < @{ $self->{array} } or die "StopIteration";
     $self->{array}[ $self->{pos}++ ];
 }
 

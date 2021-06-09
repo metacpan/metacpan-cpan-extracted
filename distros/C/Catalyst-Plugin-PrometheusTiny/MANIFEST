@@ -3,9 +3,12 @@ lib/Catalyst/Plugin/PrometheusTiny.pm
 maint/Makefile.PL.include
 Makefile.PL
 MANIFEST			This list of files
-t/app.t
+t/default_config.t
+t/endpoint.t
+t/include_action_labels.t
 t/lib/TestApp.pm
 t/lib/TestApp/Controller/Root.pm
+t/lib/TestApp/Helper.pm
 t/prometheus.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

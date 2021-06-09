@@ -1,0 +1,12 @@
+requires 'perl', '5.18.0';
+requires 'Moo';
+requires 'REST::Client';
+requires 'JSON::Parse';
+requires 'Try::Catch';
+requires 'URI::Escape';
+
+# requires 'Some::Module', 'VERSION';
+
+on test => sub {
+    requires 'Test::More', '0.96';
+};

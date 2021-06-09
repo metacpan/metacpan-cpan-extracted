@@ -1,5 +1,8 @@
 Revision history for Perl extension POE::Component::IRC.
 
+6.92  Tue Jun 8 14:31:39 BST 2021
+    - v5.8.9 didn't have '>' pack() modifier, switch to use 'N'
+
 6.91  Sat Jun 5 13:54:11 BST 2021
     - Don't queue messages if $self->{flood}
     - Fix issue with DCC on OpenBSD with newer Socket >= 2.031

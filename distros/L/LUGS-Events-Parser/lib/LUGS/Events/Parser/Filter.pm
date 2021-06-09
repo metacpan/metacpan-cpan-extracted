@@ -4,10 +4,11 @@ use strict;
 use warnings;
 use boolean qw(true);
 
+use Encode qw(decode encode);
 use HTML::Entities qw(decode_entities);
 use HTML::Parser ();
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 my (@tags, @stack);
 
@@ -225,6 +226,23 @@ sub _decode_entities
 
     foreach my $field (grep !/^\_/, keys %$fields) {
         decode_entities($fields->{$field});
+    }
+}
+
+sub _encode_safe
+{
+    my $self = shift;
+    my ($fields) = @_;
+
+    my $encode = sub
+    {
+        my $f;
+        $f = eval { decode('UTF-8', $_[0], Encode::FB_CROAK) } or $f = $_[0];
+        return encode('UTF-8', $f);
+    };
+
+    foreach my $field (grep exists $fields->{$_}, qw(title location responsible more)) {
+        $fields->{$field} = $encode->($fields->{$field});
     }
 }
 

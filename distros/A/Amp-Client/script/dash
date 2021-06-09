@@ -1,0 +1,74 @@
+#!/usr/bin/env perl
+use strict;
+use warnings FATAL => 'all';
+use FindBin;
+use lib "$FindBin::Bin/../lib";
+use Amp::Client;
+use Data::Dumper;
+use feature 'say';
+use JSON;
+
+my $instance = $ARGV[0];
+
+$instance //= 'test';
+
+$ENV{AMP_CONFIG} = "/Volumes/Sidecar/prod/internal/Amp-Client/config/environments.json";
+
+my $amp = Amp::Client->new();
+
+my $client = $amp->writeClient($instance);
+
+my $rows = $client->getEnvConfig;
+
+say Dumper $rows;
+
+# testInsert();
+sub testInsert {
+    my $sql = "INSERT INTO automation.job (data) VALUES ";
+
+    my $job_json = getData();
+
+    $sql .= "(" . $client->quote($job_json) . ")";
+
+    say "\n\n$sql\n\n";
+
+    $client->do($sql);
+}
+
+sub getData {
+    my $hash = {
+        "args"     => [
+            "x = 1\nif x == 1:\n    # indented four spaces\n    print(\"x is 1.\")\n\nprint(\"Goodbye, World!\")\n"
+        ],
+        "attempts" => 1,
+        "children" => [],
+        "created"  => "2021-05-03T14:45:33.66733Z",
+        "delayed"  => "2021-05-03T14:45:33.66733Z",
+        "expires"  => undef,
+        "finished" => "2021-05-03T14:45:34.00075Z",
+        "id"       => 176,
+        "lax"      => 0,
+        "notes"    => {},
+        "parents"  => [],
+        "priority" => 0,
+        "queue"    => "low",
+        "result"   => {
+            "status" => "Completed successfully",
+            "stderr" => "",
+            "stdout" => "x is 1.\nGoodbye, World!\n"
+        },
+        "retried"  => undef,
+        "retries"  => 0,
+        "started"  => "2021-05-03T14:45:33.66996Z",
+        "state"    => "finished",
+        "task"     => "python_task",
+        "time"     => "2021-05-03T15:11:38.46974Z",
+        "worker"   => 57
+    };
+    my $enable = 1;
+    my $json = JSON->new->allow_nonref;
+    $json = $json->utf8([ $enable ]);
+    my $json_txt = $json->encode($hash);
+    $json_txt =~ s/\\n/<br\/>/g;
+    return $json_txt;
+}

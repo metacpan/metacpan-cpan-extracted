@@ -9,7 +9,7 @@ use strict;
 use warnings;
 use Carp;
 
-our $VERSION = "1.07";
+our $VERSION = "1.08";
 
 use Cwd;
 use Term::ReadLine;
@@ -246,23 +246,31 @@ sub run {
             $App_PerlShell_Shell->{shellCmdComplete}->{brace} -= scalar(@c);
         }
 
-        if (( ( $App_PerlShell_Shell->{shellCmdLine} =~ /,\s*$/ )
+        if ( ( $App_PerlShell_Shell->{shellCmdLine} =~ /,\s*$/ )
               or ( $App_PerlShell_Shell->{shellCmdComplete}->{parenthesis} != 0 )
               or ( $App_PerlShell_Shell->{shellCmdComplete}->{bracket} != 0 )
               or ( $App_PerlShell_Shell->{shellCmdComplete}->{brace} != 0 )
-            )
-            or
-
-            # valid endings are ; or }, but only if all groupings are closed
-            ( ( $App_PerlShell_Shell->{shellCmdLine} !~ /(;|\})\s*$/ )
-              and ( $App_PerlShell_Shell->{shellCmdComplete}->{parenthesis} == 0 )
-              and ( $App_PerlShell_Shell->{shellCmdComplete}->{bracket} == 0 )
-              and ( $App_PerlShell_Shell->{shellCmdComplete}->{brace} == 0 )
-            )
-          ) {
+            ) {
             if ( $App_PerlShell_Shell->{shellCmdLine} !~ /\n;$/ ) {
                 $App_PerlShell_Shell->{shellCmdLine} .= "\n";
                 next;
+            }
+        }
+
+        # if all groupings are closed
+        if ( ( $App_PerlShell_Shell->{shellCmdComplete}->{parenthesis} == 0 )
+              and ( $App_PerlShell_Shell->{shellCmdComplete}->{bracket} == 0 )
+              and ( $App_PerlShell_Shell->{shellCmdComplete}->{brace} == 0 )
+            ) {
+            # valid endings are ; or }
+            if ( $App_PerlShell_Shell->{shellCmdLine} !~ /(;|\})\s*$/ ) {
+                # unless PERLSHELL_SEMIOFF, we can add it and continue
+                if ( $ENV{PERLSHELL_SEMIOFF} ) {
+                    $App_PerlShell_Shell->{shellCmdLine} .= ";";
+                } else {
+                    $App_PerlShell_Shell->{shellCmdLine} .= "\n";
+                    next;
+                }
             }
         }
 

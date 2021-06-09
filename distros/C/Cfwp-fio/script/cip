@@ -1,0 +1,4 @@
+#!/usr/bin/env perl
+use Modern::Perl;
+
+say `curl -s cip.cc`; 

@@ -63,6 +63,7 @@ my %WriteMakefileArgs = (
     "Getopt::Long" => "2.40",
     "LWP::UserAgent" => "6.49",
     "Sub::Exporter" => 0,
+    "Test::Differences" => 0,
     "Test::More" => 0,
     "Test::Most" => 0,
     "Test::Needs" => 0,
@@ -71,7 +72,7 @@ my %WriteMakefileArgs = (
     "Test::Warnings" => 0,
     "lib" => 0
   },
-  "VERSION" => "0.000007",
+  "VERSION" => "0.000008",
   "test" => {
     "TESTS" => "t/*.t t/ExportInspector/*.t t/cpan-modules/*.t"
   }
@@ -112,6 +113,7 @@ my %FallbackPrereqs = (
   "Sub::Exporter" => 0,
   "Sub::HandlesVia" => 0,
   "Symbol::Get" => "0.10",
+  "Test::Differences" => 0,
   "Test::More" => 0,
   "Test::Most" => 0,
   "Test::Needs" => 0,

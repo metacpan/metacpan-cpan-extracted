@@ -1,0 +1,142 @@
+NAME
+    Acme::CPANModules::RandomPerson - Generating random person (name, title,
+    age, etc)
+
+VERSION
+    This document describes version 0.001 of Acme::CPANModules::RandomPerson
+    (from Perl distribution Acme-CPANModules-RandomPerson), released on
+    2021-05-26.
+
+DESCRIPTION
+    Generating
+
+    Data::RandomPerson can generate random name, title, age, gender dob for
+    several "types" (language or geographic area): Arabic, Dutch, English,
+    ModernGreek, Spanish. There are data for other types included in the
+    distribution though: AncientGreek, Basque, Celtic, Hindi, Japanese,
+    Latvian, Thai, Viking. At the time of this writing (v0.60), there are
+    140 English female first names to choose from, 130 English male first
+    names, and 1003 English last names.
+
+    The Mock::Person namespace contains several modules to generate random
+    person names. The modules here are not exactly part of a single
+    framework so the interface might slightly differ from one another:
+    Mock::Person::CZ (Czech), Mock::Person::DE (German), Mock::Person::EN
+    (English), Mock::Person::ID (Indonesian), Mock::Person::JP (Japanese),
+    Mock::Person::JV (Javanese), Mock::Person::RU (Russian),
+    Mock::Person::SK (Slovak), Mock::Person::SK::ROM (Romani),
+    Mock::Person::SV (Swedish), Mock::Person::US (American).
+
+    Data::Faker is a plugin-based framework to generate random person name,
+    company name, phone number, street address, email, domain name, IP
+    address, and so on. The included name plugin only generates English
+    names and there is no option to pick male/female. At the time of this
+    writing (v0.10), there are 474 last names and 3007 first names. It can
+    also add suffixes like II, III, Jr., Sr.
+
+    Faker is another plugin-based random data generator. The included
+    plugins can generate random street address, color, company name, company
+    jargon/tagline, buzzwords, IP address, email address, domain name, text
+    ("lorem ipsum ..."), credit card number, phone number, software name,
+    username. However, some plugins are currently empty. The name plugin
+    contains 3007 first names and 474 last names (probably copied from
+    Data::Faker). There is no option to pick male/female names.
+
+    Keywords: date of birth, mock person, fake data, fake person.
+
+ACME::MODULES ENTRIES
+    *   Data::RandomPerson
+
+    *   Mock::Person
+
+    *   Mock::Person::CZ
+
+    *   Mock::Person::DE
+
+    *   Mock::Person::EN
+
+    *   Mock::Person::ID
+
+    *   Mock::Person::JP
+
+    *   Mock::Person::JV
+
+    *   Mock::Person::RU
+
+    *   Mock::Person::SK
+
+    *   Mock::Person::SK::ROM
+
+    *   Mock::Person::SV
+
+    *   Mock::Person::US
+
+    *   Data::Faker
+
+    *   Faker
+
+FAQ
+  What is an Acme::CPANModules::* module?
+    An Acme::CPANModules::* module, like this module, contains just a list
+    of module names that share a common characteristics. It is a way to
+    categorize modules and document CPAN. See Acme::CPANModules for more
+    details.
+
+  What are ways to use this Acme::CPANModules module?
+    Aside from reading this Acme::CPANModules module's POD documentation,
+    you can install all the listed modules (entries) using cpanm-cpanmodules
+    script (from App::cpanm::cpanmodules distribution):
+
+     % cpanm-cpanmodules -n RandomPerson
+
+    Alternatively you can use the cpanmodules CLI (from App::cpanmodules
+    distribution):
+
+        % cpanmodules ls-entries RandomPerson | cpanm -n
+
+    or Acme::CM::Get:
+
+        % perl -MAcme::CM::Get=RandomPerson -E'say $_->{module} for @{ $LIST->{entries} }' | cpanm -n
+
+    or directly:
+
+        % perl -MAcme::CPANModules::RandomPerson -E'say $_->{module} for @{ $Acme::CPANModules::RandomPerson::LIST->{entries} }' | cpanm -n
+
+    This Acme::CPANModules module also helps lcpan produce a more meaningful
+    result for "lcpan related-mods" command when it comes to finding related
+    modules for the modules listed in this Acme::CPANModules module.
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Acme-CPANModules-RandomPerson>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Acme-CPANModules-RandomPerson>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Acme-CPANModules-Rand
+    omPerson>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    Acme::CPANModules::RandomData
+
+    Acme::CPANModules::RandomPassword
+
+    Acme::CPANModules - about the Acme::CPANModules namespace
+
+    cpanmodules - CLI tool to let you browse/view the lists
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2021 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

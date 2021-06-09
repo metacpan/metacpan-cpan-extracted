@@ -1,6 +1,6 @@
 package MARC::Moose::Parser::MarcxmlSax;
 # ABSTRACT: Parser for MARXML records using SAX parser
-$MARC::Moose::Parser::MarcxmlSax::VERSION = '1.0.44';
+$MARC::Moose::Parser::MarcxmlSax::VERSION = '1.0.45';
 use Moose;
 
 extends 'MARC::Moose::Parser';
@@ -51,7 +51,7 @@ MARC::Moose::Parser::MarcxmlSax - Parser for MARXML records using SAX parser
 
 =head1 VERSION
 
-version 1.0.44
+version 1.0.45
 
 =head1 DESCRIPTION
 
@@ -81,7 +81,7 @@ Frédéric Demians <f.demians@tamil.fr>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021 by Frédéric Demians.
+This software is copyright (c) 2022 by Frédéric Demians.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

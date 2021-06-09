@@ -1,5 +1,8 @@
 ##-*- Mode: ChangeLog; coding: utf-8; -*-
 
+v0.98 Wed, 09 Jun 2021 11:22:05 +0200 moocow
+	* fixed bogus trimming of initial single-character directories with -basename option (missing escape in regex)
+
 v0.97 Wed, 10 Feb 2021 14:39:05 +0100 moocow
 	* dtatw-sanitize-header.perl: add https variants for //classCode[@scheme="http://..."] attributes
 	  - ddcTextClassDWDS, ddcTextClassDTA, ddcTextClassCorpus

@@ -1,5 +1,9 @@
 Revision history for Perl Shell.
 
+1.08  Tue Apr  7 10:05:00 2021
+    - .plshrc file in $HOME
+    - Semicolon not required with environment variable PERLSHELL_SEMIOFF=1
+
 1.07  Thu Mar 26 10:05:00 2020
     - `perldoc` command added and `ls` updated for multiple options
     - Better COMMAND definition in hash for EXPORT and `help`

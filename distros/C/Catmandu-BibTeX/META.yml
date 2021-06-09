@@ -34,7 +34,7 @@ resources:
   bugtracker: https://github.com/LibreCat/Catmandu-BibTeX/issues
   homepage: https://github.com/LibreCat/Catmandu-BibTeX
   repository: https://github.com/LibreCat/Catmandu-BibTeX.git
-version: '0.20'
+version: '0.21'
 x_contributors:
   - 'Christian Pietsch <christian.pietsch@uni-bielefeld.de>'
   - 'Jakob Voss <voss@gbv.de>'

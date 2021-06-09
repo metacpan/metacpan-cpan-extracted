@@ -1,0 +1,27 @@
+NAME
+
+    Amp::Client - Blah blah blah
+
+SYNOPSIS
+
+      use Amp::Client;
+
+DESCRIPTION
+
+    Amp::Client is
+
+AUTHOR
+
+    Russell Shingleton <reshingleton@gmail.com>
+
+COPYRIGHT
+
+    Copyright 2021- Russell Shingleton
+
+LICENSE
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+SEE ALSO
+

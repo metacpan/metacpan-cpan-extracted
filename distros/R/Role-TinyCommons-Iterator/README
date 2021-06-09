@@ -2,9 +2,12 @@ NAME
     Role::TinyCommons::Iterator - Iterator roles
 
 VERSION
-    This document describes version 0.002 of Role::TinyCommons::Iterator
+    This document describes version 0.003 of Role::TinyCommons::Iterator
     (from Perl distribution Role-TinyCommons-Iterator), released on
-    2021-04-19.
+    2021-06-08.
+
+CONTRIBUTOR
+    perlancar (on netbook-dell-xps13) <perlancar@gmail.com>
 
 HOMEPAGE
     Please visit the project's homepage at
@@ -16,7 +19,8 @@ SOURCE
 
 BUGS
     Please report any bugs or feature requests on the bugtracker website
-    <https://github.com/perlancar/perl-Role-TinyCommons-Iterator/issues>
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Role-TinyCommons-Iter
+    ator>
 
     When submitting a bug or request, please include a test-file or a patch
     to an existing test-file that illustrates the bug or desired feature.

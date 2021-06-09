@@ -853,9 +853,9 @@ maintainer-clean-generic:
 	@echo "This command is intended for maintainers to use"
 	@echo "it deletes files that may require special tools to rebuild."
 	-test -z "$(MAINTAINERCLEANFILES)" || rm -f $(MAINTAINERCLEANFILES)
-@ENABLE_PERL_MODULES_FALSE@clean-local:
 @ENABLE_PERL_MODULES_FALSE@distclean-local:
 @ENABLE_PERL_MODULES_FALSE@install-exec-local:
+@ENABLE_PERL_MODULES_FALSE@clean-local:
 clean: clean-recursive
 
 clean-am: clean-generic clean-local mostlyclean-am

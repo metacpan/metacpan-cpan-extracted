@@ -221,6 +221,8 @@ sub get_fullauto_instance {
    $error=~s/^\s*//;
    $error=~s/: /:\n   /;
    &exit_on_error($error) if $error;
+   &exit_on_error($output)
+     if $output=~/Could not connect to the endpoint URL/s;
    my ($stdout,$stderr)=('','');
    my $handle=connect_shell();
    ($stdout,$stderr)=$handle->cmd(

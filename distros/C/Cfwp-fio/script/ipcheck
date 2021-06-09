@@ -1,0 +1,29 @@
+#!/usr/bin/env perl
+use Modern::Perl;
+use Net::Ping;
+use Term::ANSIColor qw(:constants);
+
+my ( $ip, $port ) = @ARGV;
+$ip   = '127.0.0.1' if not defined $ip;
+$port = 80          if not defined $port;
+
+$_ = `ping -c1 -W1 -i 0.2 $ip > /dev/null 2>&1 && echo "LIVE"`;
+
+if (/live/i) {
+    printf "%-22s", $ip;
+    say ':', GREEN, BOLD, " ALIVE", RESET;
+    $_ = `nc -zw3 $ip $port && echo "LIVE"`;
+    if (/live/i) {
+        printf "%-22s", $port;
+        say ':', GREEN, BOLD, " ALIVE", RESET;
+    }
+    else {
+        printf "%-22s", $port;
+        say ':', RED, BOLD, " DEAD", RESET;
+    }
+}
+else {
+    printf "%-22s", $ip;
+    say ':', RED, BOLD, " DEAD", RESET;
+}
+

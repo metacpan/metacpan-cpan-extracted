@@ -1,0 +1,56 @@
+{
+   "environments" : [
+      {
+         "url" : "http://dashboard-mat.dev.oclc.org",
+         "id" : "test"
+      },
+      {
+         "url" : "http://dashboard-m1.dev.oclc.org",
+         "id" : "dev"
+      },
+      {
+         "url" : "http://dashboard-m1.nit.oclc.org",
+         "id" : "nit"
+      },
+      {
+         "id" : "nat",
+         "url" : "http://dashboard-m1.nat.oclc.org"
+      },
+      {
+         "id" : "dxr1",
+         "url" : "http://dashboard-r1.dev.oclc.org"
+      },
+      {
+         "id" : "mxr1",
+         "url" : "http://dashboard-r1.nit.oclc.org"
+      },
+      {
+         "id" : "nxr1",
+         "url" : "http://dashboard-r1.nat.oclc.org"
+      },
+      {
+         "url" : "http://dashboard-h1.csb.oclc.org",
+         "id" : "csb"
+      },
+      {
+         "url" : "http://dashboard-h4.csb.oclc.org",
+         "id" : "csbh4"
+      },
+      {
+         "id" : "sxr3",
+         "url" : "http://dashboard-r3.shr.oclc.org"
+      },
+      {
+         "url" : "http://dashboard-r2.shr.oclc.org",
+         "id" : "sxr2"
+      },
+      {
+         "url" : "http://dashboard-r1.shr.oclc.org",
+         "id" : "sxr1"
+      },
+      {
+         "id" : "dsdc",
+         "url" : "http://dashboard-m1.shr.oclc.org"
+      }
+   ]
+}

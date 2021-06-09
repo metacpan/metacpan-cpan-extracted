@@ -1,6 +1,12 @@
 https://github.com/amaltsev/XAO-Web
 -----------------------------------
 
+commit 888d6b90c512e5f0e62f96a1fd7f7fd2e471f37a
+Author: Andrew Maltsev <am@ejelta.com>
+Date:   Tue Jun 8 14:53:36 2021 -0700
+
+    1.87 Filtering out %00 in CgiParam
+
 commit 7211a2637c489b576834c2d60154b0358f2dae5b
 Author: Andrew Maltsev <am@ejelta.com>
 Date:   Tue Sep 22 17:47:52 2020 -0700
@@ -76,12 +82,4 @@ Date:   Tue Feb 11 19:04:24 2020 -0800
     Better format for benchmark dprint() output
     
     Easier to read when it forms columns and the total is first.
-
-commit 95bd15cafb168eb85f45fdc37bb5dab88be7da21
-Author: Andrew Maltsev <am@ejelta.com>
-Date:   Mon Jan 13 15:19:08 2020 -0800
-
-    POD warning fixes
-    
-    Thanks to @manwar for the tip.
 

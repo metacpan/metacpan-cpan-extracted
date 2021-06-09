@@ -1,6 +1,12 @@
 Changelog for DBIx-ParseError-MySQL
 
-v1.0.1 2021-02-17T20:22:31
+v1.0.2 2021-06-07T22:15:14
+ - Update README (Brendan Byrd)
+ - Pull request #3: SM-3107 (Brendan Byrd)
+ - Add support for other "Deadlock found" errors and "Service lock wait
+   timeout exceeded" (Brendan Byrd)
+
+v1.0.1 2021-02-17T20:22:21
  - Update README (Brendan Byrd)
  - Add test dep for Test2::Bundle::More (Brendan Byrd)
 

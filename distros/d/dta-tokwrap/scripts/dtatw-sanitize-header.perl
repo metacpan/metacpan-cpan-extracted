@@ -252,9 +252,9 @@ BEGIN { *wsnorm = \&normalize_space; }
 ##-- default: basename
 if (!defined($basename)) {
   $basename = basename($infile);
-  $basename =~ s/\..*$//;
+  $basename =~ s/\..*$// if (!$foreign); ##-- auto-trim dta basenames
 }
-$basename =~ s{^./}{};
+$basename =~ s{^\./}{};
 $basename =~ s/\..*$// if (!$foreign); ##-- auto-trim dta basenames
 
 ##-- maybe open aux db

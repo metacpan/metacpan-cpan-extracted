@@ -11,7 +11,7 @@ use constant TLS => eval { require IO::Socket::SSL; IO::Socket::SSL->VERSION('2.
 
 use constant DEBUG => $ENV{LINK_EMBEDDER_DEBUG} || 0;
 
-our $VERSION = '1.18';
+our $VERSION = '1.19';
 
 my $PROTOCOL_RE = qr!^(\w+):\w+!i;    # Examples: mail:, spotify:, ...
 
@@ -45,6 +45,7 @@ has url_to_link => sub {
     'webex.com'          => 'LinkEmbedder::Link::Webex',
     'whereby.com'        => 'LinkEmbedder::Link::Whereby',
     'youtube.com'        => 'LinkEmbedder::Link::oEmbed',
+    'youtu.be'           => 'LinkEmbedder::Link::oEmbed',
   };
 };
 

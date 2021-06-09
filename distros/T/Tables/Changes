@@ -1,3 +1,10 @@
+0.1.2   2021-03-05  Released-By: PERLANCAR; Urgency: low
+
+	- No spec changes.
+
+	- Introduce TablesCollection::* namespace.
+
+
 0.1.1   2020-06-01  Released-By: PERLANCAR; Urgency: medium
 
         [SPEC]

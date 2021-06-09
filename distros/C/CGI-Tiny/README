@@ -4,7 +4,7 @@ NAME
 
 SYNOPSIS
 
-      #!/usr/bin/env perl
+      #!/usr/bin/perl
       use strict;
       use warnings;
       use utf8;
@@ -113,16 +113,23 @@ USAGE
     If an exception is thrown within the block, or the block does not
     render a response, it will run the handler set by "set_error_handler"
     if any, or by default emit the error as a warning and (if nothing has
-    been rendered yet) render a 500 Internal Server Error. The default
-    server error will also be rendered if the process ends abnormally
-    between importing from CGI::Tiny and the start of the cgi block.
+    been rendered yet) render a 500 Internal Server Error.
 
-    Note that the cgi block's current implementation as a regular exported
+    The default server error will also be rendered if the process ends
+    abnormally between importing from CGI::Tiny and the start of the cgi
+    block. To load CGI::Tiny without triggering this cleanup mechanism or
+    making the cgi block available (such as to use convenience "FUNCTIONS"
+    in non-CGI code), load the module with use CGI::Tiny (); or require
+    CGI::Tiny;.
+
+    NOTE: The cgi block's current implementation as a regular exported
     subroutine is an implementation detail, and future implementations
     reserve the right to provide it as an XSUB or keyword for performance
     reasons. Don't call it as CGI::Tiny::cgi, don't rely on @_ being set,
     and don't use return to exit the block; use exit to end a CGI script
     early after rendering a response.
+
+    See CGI::Tiny::Cookbook for advanced usage examples.
 
 DATA SAFETY
 
@@ -161,356 +168,8 @@ DATA SAFETY
 
       Do not interpolate arbitrary data into HTML. Data can be safely
       included in HTML by escaping it with "escape_html", or passing it to
-      an HTML template engine with an auto-escape feature; see
-      "Templating".
-
-EXTENDING
-
-    CGI::Tiny is a minimal interface to the CGI protocol, but can be
-    extended with the use of other CPAN modules.
-
- Fatpacking
-
-    App::FatPacker can be used to pack CGI::Tiny, as well as any other
-    pure-perl dependencies, into a CGI script so that it can be deployed to
-    other systems without having to install the dependencies there. As a
-    bonus, this means the script doesn't have to load those modules
-    separately from disk on every execution.
-
-    Just keep in mind that the script will have to be repacked to update
-    those dependencies, and CGI scripts greatly benefit from efficient XS
-    tools which cannot be packed this way.
-
-      $ fatpack pack script.source.cgi > script.cgi
-
-    To pack in optional modules, such as JSON support for Perls older than
-    5.14:
-
-      $ fatpack trace --use=JSON::PP script.source.cgi
-      $ fatpack packlists-for $(cat fatpacker.trace) > packlists
-      $ fatpack tree $(cat packlists)
-      $ fatpack file script.source.cgi > script.cgi
-
- JSON
-
-    CGI::Tiny has built in support for parsing and rendering JSON content
-    with JSON::PP. CGI scripts that deal with JSON content will greatly
-    benefit from installing Cpanel::JSON::XS version 4.09 or newer for
-    efficient encoding and decoding, which will be used automatically if
-    available.
-
- Templating
-
-    HTML and XML responses are most easily managed with templating. A
-    number of CPAN modules provide this capability.
-
-    Text::Xslate is an efficient template engine designed for HTML/XML.
-
-      #!/usr/bin/env perl
-      use strict;
-      use warnings;
-      use utf8;
-      use CGI::Tiny;
-      use Text::Xslate;
-      use Data::Section::Simple 'get_data_section';
-    
-      cgi {
-        my $cgi = $_;
-        my $foo = $cgi->query_param('foo');
-        my $tx = Text::Xslate->new(path => ['templates'], cache => 0);
-    
-        # from templates/
-        $cgi->render(html => $tx->render('index.tx', {foo => $foo}));
-    
-        # or from __DATA__
-        my $template = get_data_section 'index.tx';
-        $cgi->render(html => $tx->render_string($template, {foo => $foo}));
-      };
-    
-      __DATA__
-      @@ index.tx
-      <html><body><h1><: $foo :></h1></body></html>
-
-    Mojo::Template is a lightweight HTML/XML template engine in the Mojo
-    toolkit.
-
-      #!/usr/bin/env perl
-      use strict;
-      use warnings;
-      use utf8;
-      use CGI::Tiny;
-      use Mojo::Template;
-      use Mojo::File 'curfile';
-      use Mojo::Loader 'data_section';
-    
-      cgi {
-        my $cgi = $_;
-        my $foo = $cgi->query_param('foo');
-        my $mt = Mojo::Template->new(auto_escape => 1, vars => 1);
-    
-        # from templates/
-        my $template_path = curfile->sibling('templates', 'index.html.ep');
-        $cgi->render(html => $mt->render_file($template_path, {foo => $foo}));
-    
-        # or from __DATA__
-        my $template = data_section __PACKAGE__, 'index.html.ep';
-        $cgi->render(html => $mt->render($template, {foo => $foo}));
-      };
-    
-      __DATA__
-      @@ index.html.ep
-      <html><body><h1><%= $foo %></h1></body></html>
-
- Files
-
-    Modules like Path::Tiny and MIME::Types can help with file responses.
-    Be aware that Perl and some operating systems work with filenames in
-    encoded bytes (usually UTF-8), but this module works with parameters in
-    Unicode characters, so non-ASCII filenames make things trickier.
-
-      #!/usr/bin/env perl
-      use strict;
-      use warnings;
-      use utf8;
-      use CGI::Tiny;
-      use Path::Tiny;
-      use MIME::Types;
-      use Unicode::UTF8 qw(encode_utf8 decode_utf8);
-    
-      cgi {
-        my $cgi = $_;
-    
-        my $filename = $cgi->query_param('filename');
-        unless (length $filename) {
-          $cgi->set_response_status(404)->render(text => 'Not Found');
-          exit;
-        }
-    
-        # get files from public/ next to cgi-bin/
-        my $public_dir = path(__FILE__)->realpath->parent->sibling('public');
-        my $encoded_filename = encode_utf8 $filename;
-        my $filepath = $public_dir->child($encoded_filename);
-    
-        # ensure file exists, is readable, and is not a directory
-        unless (-r $filepath and !-d _) {
-          $cgi->set_response_status(404)->render(text => 'Not Found');
-          exit;
-        }
-    
-        # ensure file path doesn't escape the public/ directory
-        unless ($public_dir->subsumes($filepath->realpath)) {
-          $cgi->set_response_status(404)->render(text => 'Not Found');
-          exit;
-        }
-    
-        my $basename = decode_utf8 $filepath->basename;
-        my $mime = MIME::Types->new->mimeTypeOf($basename);
-        $cgi->set_response_type($mime->type) if defined $mime;
-        $cgi->set_response_disposition(attachment => $basename)->render(file => $filepath);
-      };
-
- Sessions
-
-    Regardless of the session mechanism, login credentials should only be
-    sent over HTTPS, and passwords should be stored on the server using a
-    secure one-way hash, such as with Crypt::Passphrase.
-
-    Basic authentication
-    <https://en.wikipedia.org/wiki/Basic_access_authentication> has
-    historically been used to provide a simplistic login session mechanism
-    which relies on the client to send the credentials with every
-    subsequent request in that browser session. However, it does not have a
-    reliable logout or session expiration mechanism.
-
-    Basic authentication can be handled by the CGI server itself (e.g.
-    Apache <https://httpd.apache.org/docs/2.4/howto/auth.html>), passing
-    only "auth_type" and "remote_user" to the CGI script.
-
-    If you want to handle Basic authentication directly in the CGI script,
-    you may need to configure the CGI server to forward the Authorization
-    header (e.g. Apache <https://stackoverflow.com/q/17018586/5848200>), as
-    it is commonly stripped from the CGI request.
-
-      #!/usr/bin/env perl
-      use strict;
-      use warnings;
-      use utf8;
-      use CGI::Tiny;
-      use MIME::Base64 qw(encode_base64 decode_base64);
-      use Unicode::UTF8 'decode_utf8';
-    
-      cgi {
-        my $cgi = $_;
-    
-        my $authed_user;
-        if (defined(my $auth = $cgi->header('Authorization'))) {
-          if (my ($hash) = $auth =~ m/^Basic (\S+)/i) {
-            my ($user, $pass) = split /:/, decode_utf8(decode_base64($hash)), 2;
-            $authed_user = $user if verify_password($user, $pass);
-          }
-        }
-    
-        unless (defined $authed_user) {
-          $cgi->add_response_header('WWW-Authenticate' => 'Basic realm="My Website", charset="UTF-8"');
-          $cgi->set_response_status(401)->render;
-          exit;
-        }
-    
-        # do authed stuff
-      };
-
-    A more sophisticated and modern login session mechanism is to store a
-    session cookie in the client, associated with a server-side session
-    stored in a file or database. Login credentials only need to be
-    validated once per session, and subsequently the session ID stored in
-    the cookie will be sent by the client with each request. This type of
-    session can be ended by expiring the session cookie and invalidating
-    the session data on the server.
-
-      #!/usr/bin/env perl
-      use strict;
-      use warnings;
-      use utf8;
-      use CGI::Tiny;
-    
-      cgi {
-        my $cgi = $_;
-    
-        my ($authed_user, $session_id);
-        if ($cgi->path eq '/login') {
-          if ($cgi->method eq 'GET' or $cgi->method eq 'HEAD') {
-            $cgi->render(html => login_form_template(login_failed => 0));
-            exit;
-          } elsif ($cgi->method eq 'POST') {
-            my $user = $cgi->body_param('login_user');
-            my $pass = $cgi->body_param('login_pass');
-            if (verify_password($user, $pass)) {
-              $session_id = store_new_session($user);
-              $authed_user = $user;
-            } else {
-              $cgi->render(html => login_form_template(login_failed => 1));
-              exit;
-            }
-          }
-        } elsif (defined($session_id = $cgi->cookie('myapp_session'))) {
-          if ($cgi->path eq '/logout') {
-            invalidate_session($session_id);
-            # expire session cookie
-            $cgi->add_response_cookie(myapp_session => $session_id, 'Max-Age' => 0, Path => '/', HttpOnly => 1);
-            $cgi->render(redirect => $cgi->script_name . '/login');
-            exit;
-          } else {
-            $authed_user = get_session_user($session_id);
-          }
-        }
-    
-        unless (defined $authed_user) {
-          $cgi->render(redirect => $cgi->script_name . '/login');
-          exit;
-        }
-    
-        # set/refresh session cookie
-        $cgi->add_response_cookie(myapp_session => $session_id, 'Max-Age' => 3600, Path => '/', HttpOnly => 1);
-    
-        # do authed stuff
-      };
-
- Logging
-
-    CGI scripts can usually log errors directly to STDERR with the warn
-    function, and rely on the CGI server to log them to a file, but you
-    will likely need to encode errors to UTF-8 if you expect them to
-    contain non-ASCII text.
-
-    Minimal loggers like Log::Any can also be used to redirect errors and
-    warnings to a file or other logging mechanism specific to the CGI
-    script, encode them to bytes automatically, and also log debugging
-    information when the log level is set to debug. Just make sure the CGI
-    server has permission to create and write to the logging target.
-
-      #!/usr/bin/env perl
-      use strict;
-      use warnings;
-      use utf8;
-      use CGI::Tiny;
-      use Log::Any;
-      use Log::Any::Adapter
-        {category => 'cgi-script'}, # only log our category here
-        File => '/path/to/log/file.log',
-        binmode => ':encoding(UTF-8)',
-        log_level => $ENV{MY_CGI_LOG_LEVEL} || 'info';
-    
-      my $log = Log::Any->get_logger(category => 'cgi-script');
-    
-      local $SIG{__WARN__} = sub {
-        my ($warning) = @_;
-        chomp $warning;
-        $log->warn($warning);
-      };
-    
-      cgi {
-        my $cgi = $_;
-    
-        $cgi->set_error_handler(sub {
-          my ($cgi, $error, $rendered) = @_;
-          chomp $error;
-          $log->error($error);
-        });
-    
-        # only logged if MY_CGI_LOG_LEVEL=debug set in CGI server environment
-        $log->debugf('Method: %s, Path: %s, Query: %s', $cgi->method, $cgi->path, $cgi->query);
-    
-        # handle the actual request
-      };
-
- Routing
-
-    Web applications use routing to serve multiple types of requests from
-    one application. Routes::Tiny can be used to organize this with
-    CGI::Tiny, using REQUEST_METHOD and PATH_INFO (which is the URL path
-    after the CGI script name).
-
-      #!/usr/bin/env perl
-      use strict;
-      use warnings;
-      use utf8;
-      use CGI::Tiny;
-      use Routes::Tiny;
-    
-      my %dispatch = (
-        foos => sub {
-          my ($cgi) = @_;
-          my $method = $cgi->method;
-          ...
-        },
-        get_foo => sub {
-          my ($cgi, $captures) = @_;
-          my $id = $captures->{id};
-          ...
-        },
-        put_foo => sub {
-          my ($cgi, $captures) = @_;
-          my $id = $captures->{id};
-          ...
-        },
-      );
-    
-      cgi {
-        my $cgi = $_;
-    
-        my $routes = Routes::Tiny->new;
-        # /script.cgi/foo
-        $routes->add_route('/foo', name => 'foos');
-        # /script.cgi/foo/42
-        $routes->add_route('/foo/:id', method => 'GET', name => 'get_foo');
-        $routes->add_route('/foo/:id', method => 'PUT', name => 'put_foo');
-    
-        if (defined(my $match = $routes->match($cgi->path, method => $cgi->method))) {
-          $dispatch{$match->name}->($cgi, $match->captures);
-        } else {
-          $cgi->set_response_status(404)->render(text => 'Not Found');
-        }
-      };
+      an HTML template engine with an auto-escape feature; see "Templating"
+      in CGI::Tiny::Cookbook.
 
 METHODS
 
@@ -546,8 +205,8 @@ METHODS
     rendered after the error handler completes or dies, a default error
     response will be rendered.
 
-    Note that the error handler is only meant for logging and customization
-    of the final error response in a failed request dispatch; to handle
+    NOTE: The error handler is only meant for logging and customization of
+    the final error response in a failed request dispatch; to handle
     exceptions within standard application flow without causing an error
     response, use an exception handling mechanism such as
     Syntax::Keyword::Try or Feature::Compat::Try (which will use the new
@@ -587,7 +246,7 @@ METHODS
     CGI::Tiny::Multipart. No effect after the form data has been parsed
     such as by calling "body_params" or "uploads" for the first time.
 
-    Note that options like parse_as_files and on_file_buffer can alter the
+    NOTE: Options like parse_as_files and on_file_buffer can alter the
     content and file keys of the form field structure returned by
     "body_parts". Thus "uploads" may not contain file and may instead
     contain content, and "body_params" text field values may be read from
@@ -819,7 +478,7 @@ METHODS
     "query_params" or "body_params" to retrieve query or body parameters
     separately.
 
-    Note that this will read the text form fields into memory as in
+    NOTE: This will read the text form fields into memory as in
     "body_params".
 
   param_names
@@ -835,7 +494,7 @@ METHODS
     names. Use "query_param_names" or "body_param_names" to retrieve query
     or body parameter names separately.
 
-    Note that this will read the text form fields into memory as in
+    NOTE: This will read the text form fields into memory as in
     "body_params".
 
   param
@@ -852,7 +511,7 @@ METHODS
     or "body_param" to retrieve the last query or body parameter value
     specifically.
 
-    Note that this will read the text form fields into memory as in
+    NOTE: This will read the text form fields into memory as in
     "body_params".
 
   param_array
@@ -868,7 +527,7 @@ METHODS
     parameter values. Use "query_param_array" or "body_param_array" to
     retrieve query or body parameter values separately.
 
-    Note that this will read the text form fields into memory as in
+    NOTE: This will read the text form fields into memory as in
     "body_params".
 
   query_params
@@ -909,9 +568,8 @@ METHODS
 
     Retrieve the request body as bytes.
 
-    Note that this will read the whole request body into memory, so make
-    sure the "set_request_body_limit" can fit well within the available
-    memory.
+    NOTE: This will read the whole request body into memory, so make sure
+    the "set_request_body_limit" can fit well within the available memory.
 
     Not available after calling "body_parts", "body_params", or "uploads"
     (or related accessors) on a multipart/form-data request, since this
@@ -923,9 +581,8 @@ METHODS
 
     Decode an application/json request body from UTF-8-encoded JSON.
 
-    Note that this will read the whole request body into memory, so make
-    sure the "set_request_body_limit" can fit well within the available
-    memory.
+    NOTE: This will read the whole request body into memory, so make sure
+    the "set_request_body_limit" can fit well within the available memory.
 
   body_params
 
@@ -936,8 +593,8 @@ METHODS
     represented as two-element array references. Names and values are
     decoded to Unicode characters.
 
-    Note that this will read the text form fields into memory, so make sure
-    the "set_request_body_limit" can fit well within the available memory.
+    NOTE: This will read the text form fields into memory, so make sure the
+    "set_request_body_limit" can fit well within the available memory.
     multipart/form-data file uploads will be streamed to temporary files
     accessible via "uploads" and related methods.
 
@@ -949,7 +606,7 @@ METHODS
     parameter names, decoded to Unicode characters, as an ordered array
     reference, without duplication.
 
-    Note that this will read the text form fields into memory as in
+    NOTE: This will read the text form fields into memory as in
     "body_params".
 
   body_param
@@ -962,7 +619,7 @@ METHODS
     If the parameter name was passed multiple times, returns the last
     value. Use "body_param_array" to get multiple values of a parameter.
 
-    Note that this will read the text form fields into memory as in
+    NOTE: This will read the text form fields into memory as in
     "body_params".
 
   body_param_array
@@ -973,7 +630,7 @@ METHODS
     multipart/form-data body parameter, decoded to Unicode characters, as
     an ordered array reference.
 
-    Note that this will read the text form fields into memory as in
+    NOTE: This will read the text form fields into memory as in
     "body_params".
 
   body_parts
@@ -985,9 +642,9 @@ METHODS
     Most applications should retrieve multipart form data through
     "body_params" and "uploads" (or related accessors) instead.
 
-    Note that this will read the text form fields into memory, so make sure
-    the "set_request_body_limit" can fit well within the available memory.
-    File uploads will be streamed to temporary files.
+    NOTE: This will read the text form fields into memory, so make sure the
+    "set_request_body_limit" can fit well within the available memory. File
+    uploads will be streamed to temporary files.
 
   uploads
 
@@ -997,8 +654,8 @@ METHODS
     of name/upload pairs, represented as two-element array references.
     Names are decoded to Unicode characters.
 
-    Note that this will read the text form fields into memory, so make sure
-    the "set_request_body_limit" can fit well within the available memory.
+    NOTE: This will read the text form fields into memory, so make sure the
+    "set_request_body_limit" can fit well within the available memory.
 
     File uploads are represented as a hash reference containing the
     following keys:
@@ -1030,8 +687,7 @@ METHODS
     Retrieve multipart/form-data file upload names, decoded to Unicode
     characters, as an ordered array reference, without duplication.
 
-    Note that this will read the text form fields into memory as in
-    "uploads".
+    NOTE: This will read the text form fields into memory as in "uploads".
 
   upload
 
@@ -1043,8 +699,7 @@ METHODS
 
     See "uploads" for details on the representation of the upload.
 
-    Note that this will read the text form fields into memory as in
-    "uploads".
+    NOTE: This will read the text form fields into memory as in "uploads".
 
   upload_array
 
@@ -1055,8 +710,7 @@ METHODS
 
     See "uploads" for details on the representation of the uploads.
 
-    Note that this will read the text form fields into memory as in
-    "uploads".
+    NOTE: This will read the text form fields into memory as in "uploads".
 
  Response
 
@@ -1134,11 +788,11 @@ METHODS
     Adds a custom response header. No effect after response headers have
     been rendered.
 
-    Note that header names are case insensitive and CGI::Tiny does not
-    attempt to deduplicate or munge headers that have been added manually.
-    Headers are printed in the response in the same order added, and adding
-    the same header multiple times will result in multiple instances of
-    that response header.
+    NOTE: Header names are case insensitive and CGI::Tiny does not attempt
+    to deduplicate or munge headers that have been added manually. Headers
+    are printed in the response in the same order added, and adding the
+    same header multiple times will result in multiple instances of that
+    response header.
 
   add_response_cookie
 
@@ -1154,42 +808,23 @@ METHODS
     Adds a Set-Cookie response header. No effect after response headers
     have been rendered.
 
-    Note that cookie values should only consist of ASCII characters and may
-    not contain any control characters, space characters, or the characters
-    ",;\. More complex values can be encoded to UTF-8 and base64 for
-    transport.
-
-      use Unicode::UTF8 'encode_utf8';
-      use MIME::Base64 'encode_base64';
-      my $encoded_value = encode_base64 encode_utf8($value), '';
-      $cgi->add_response_cookie(foo => $encoded_value, %attrs);
-    
-      use Unicode::UTF8 'decode_utf8';
-      use MIME::Base64 'decode_base64';
-      my $value = decode_utf8 decode_base64 $cgi->cookie('foo');
-
-    Data structures can be encoded to JSON and base64 for transport.
-
-      use Cpanel::JSON::XS 'encode_json';
-      use MIME::Base64 'encode_base64';
-      my $encoded_value = encode_base64 encode_json(\%hash), '';
-      $cgi->add_response_cookie(foo => $encoded_value, %attrs);
-    
-      use Cpanel::JSON::XS 'decode_json';
-      use MIME::Base64 'decode_base64';
-      my $hashref = decode_json decode_base64 $cgi->cookie('foo');
+    Cookie values should consist only of simple ASCII text; see "Cookies"
+    in CGI::Tiny::Cookbook for methods of storing more complex strings and
+    data structures.
 
     Optional cookie attributes are specified in key-value pairs after the
     cookie name and value. Cookie attribute names are case-insensitive.
 
     Domain
 
-      Domain for which cookie is valid.
+      Domain for which cookie is valid. Defaults to the host of the current
+      document URL, not including subdomains.
 
     Expires
 
-      Expiration date string for cookie. "epoch_to_date" can be used to
-      generate the appropriate date string format.
+      Expiration date string for cookie. Defaults to persisting for the
+      current browser session. "epoch_to_date" can be used to generate the
+      appropriate date string format.
 
     HttpOnly
 
@@ -1368,8 +1003,8 @@ FUNCTIONS
     character reference (HTML entity).
 
     This functionality is built into most HTML template engines; see
-    "Templating". For more general HTML entity escaping and unescaping use
-    HTML::Entities.
+    "Templating" in CGI::Tiny::Cookbook. For more general HTML entity
+    escaping and unescaping use HTML::Entities.
 
 ENVIRONMENT
 
@@ -1503,7 +1138,7 @@ COMPARISON TO CGI.PM
 
       * CGI::Tiny does not provide any HTML generation helpers, as this
       functionality is much better implemented by other robust
-      implementations on CPAN; see "Templating".
+      implementations on CPAN; see "Templating" in CGI::Tiny::Cookbook.
 
       * CGI::Tiny does not do any implicit encoding of cookie values or the
       Expires header or cookie attribute. The "epoch_to_date" convenience

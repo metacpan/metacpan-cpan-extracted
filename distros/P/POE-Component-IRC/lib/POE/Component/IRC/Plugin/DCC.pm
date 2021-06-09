@@ -1,6 +1,6 @@
 package POE::Component::IRC::Plugin::DCC;
 our $AUTHORITY = 'cpan:HINRIK';
-$POE::Component::IRC::Plugin::DCC::VERSION = '6.91';
+$POE::Component::IRC::Plugin::DCC::VERSION = '6.92';
 use strict;
 use warnings FATAL => 'all';
 use Carp;
@@ -264,7 +264,7 @@ sub _U_dcc_accept {
     }
 
     my $factory = POE::Wheel::SocketFactory->new(
-        RemoteAddress => sprintf("%vd", pack("L>", $cookie->{addr})),
+        RemoteAddress => sprintf("%vd", pack("N", $cookie->{addr})),
         RemotePort    => $cookie->{port},
         SuccessEvent  => '_dcc_up',
         FailureEvent  => '_dcc_failed',

@@ -1,6 +1,6 @@
 package App::crosstable ;  
-our $VERSION = '0.100' ; 
-our $DATE = '2021-06-07T01:47+09:00' ; 
+our $VERSION = '0.110' ; 
+our $DATE = '2021-06-08T19:42+09:00' ; 
 
 =encoding utf8
 

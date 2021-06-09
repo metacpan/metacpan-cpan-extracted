@@ -47,6 +47,7 @@ t/metacpan.t
 t/mojopaste.t
 t/nhl.t
 t/opensuse.t
+t/paste-debian.t
 t/pastebin.t
 t/perlbot.t
 t/serve.t

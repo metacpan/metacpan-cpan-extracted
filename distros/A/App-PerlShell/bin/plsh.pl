@@ -6,13 +6,15 @@ use Getopt::Long qw(:config no_ignore_case);
 use Pod::Usage;
 
 use App::PerlShell;
+
 #use Text::ParseWords;    # quotewords()
 
 my %opt;
 my ( $opt_help, $opt_man, $opt_versions );
 
 GetOptions(
-#    '' => \$opt{interact},    # lonesome dash is interactive test from STDIN
+
+    #    '' => \$opt{interact},    # lonesome dash is interactive test from STDIN
     'e|execute=s@' => \$opt{execute},
     'E|exit!'      => \$opt{exit},
     'Include=s@'   => \$opt{include},
@@ -20,7 +22,8 @@ GetOptions(
     'P|package=s'  => \$opt{package},
     'p|prompt=s'   => \$opt{prompt},
     'session=s'    => \$opt{session},
-#    'words!'       => \$opt{words},
+
+    #    'words!'       => \$opt{words},
     'help!'     => \$opt_help,
     'man!'      => \$opt_man,
     'versions!' => \$opt_versions
@@ -41,7 +44,7 @@ if ( defined $opt_versions ) {
 ##################################################
       # Start Additional USE
 ##################################################
-#      "    Text::ParseWords    $Text::ParseWords::VERSION\n",
+      #      "    Text::ParseWords    $Text::ParseWords::VERSION\n",
 ##################################################
       # End Additional USE
 ##################################################
@@ -66,6 +69,25 @@ if ( defined $opt{package} ) {
     $params{execute} = "use $params{package};\n";
 }
 
+my $homedir = $ENV{HOME};
+if ( $^O eq 'MSWin32' ) {
+    $homedir = $ENV{USERPROFILE};
+}
+if ( -e "$homedir/.plshrc" ) {
+    open my $fh, '<', "$homedir/.plshrc"
+      or die "$0: cannot open `$homedir/.plshrc': $!";
+    my @lines = <$fh>;
+    close $fh;
+    for (@lines) {
+        chomp $_;
+        $params{execute} .= $_;
+        if ( $params{execute} !~ /;$/ ) {
+            $params{execute} .= ';';
+        }
+        $params{execute} .= "\n";
+    }
+}
+
 if ( defined $opt{execute} ) {
     for ( @{$opt{execute}} ) {
         $params{execute} .= $_;
@@ -76,7 +98,7 @@ if ( defined $opt{execute} ) {
     }
 }
 
-$params{execute} .= 'exit;'      if defined $opt{exit};
+$params{execute} .= 'exit;' if defined $opt{exit};
 $params{lexical} = 1             if defined $opt{lexical};
 $params{prompt}  = $opt{prompt}  if defined $opt{prompt};
 $params{session} = $opt{session} if defined $opt{session};
@@ -102,8 +124,7 @@ $params{session} = $opt{session} if defined $opt{session};
 # }
 
 my $shell = App::PerlShell->new( %params,
-    skipvars => [qw(%LexPersist:: %ModRefresh:: %Plugin:: $AUTOLOAD)]
-);
+    skipvars => [qw(%LexPersist:: %ModRefresh:: %Plugin:: $AUTOLOAD)] );
 $shell->run();
 
 __END__
@@ -122,18 +143,21 @@ PLSH - Perl Shell
 
 =head1 DESCRIPTION
 
-Creates an interactive Perl shell.
+Creates an interactive Perl shell.  Startup configuration commands written
+in Perl syntax can be stored in '.plshrc' file in HOME directory (e.g., $HOME 
+on Linxu, %USERPROFILE% on Windows) which will initialize the Perl Shell on 
+every startup.
 
 =head1 OPTIONS
 
  -E                   Exit after -e commands complete.
  --exit
 
- -e                   Valid Perl to execute.  Multiple valid Perl  
- --execute            statements (semicolon-separated) and multiple 
+ -e                   Valid Perl to execute.  Multiple valid Perl
+ --execute            statements (semicolon-separated) and multiple
                       -e allowed.
 
- -I dir               Specify directory to prepend @INC.  Multiple 
+ -I dir               Specify directory to prepend @INC.  Multiple
  --Include            -I allowed.
 
  -l                   Require "my" for all variables.
@@ -151,7 +175,7 @@ Creates an interactive Perl shell.
 
 =cut
 
- -w                   Treat each element of args as a separate 
+ -w                   Treat each element of args as a separate
  --words              entry for @ARGV.
 
 =pod
@@ -174,9 +198,13 @@ Set -P package.  If provided, set -e to "use E<lt>packageE<gt>".
 
 =item 3
 
-Add any additional -e arguments to -e.
+Add any commmands from '.plshrc' file if exists in HOME directory.
 
 =item 4
+
+Add any additional -e arguments to -e.
+
+=item 5
 
 If -E, add "exit;" to end of -e.
 

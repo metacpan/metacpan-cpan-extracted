@@ -4,6 +4,7 @@ use strict;
 use warnings;
 use boolean qw(true);
 
+use Encode qw(encode);
 use File::Temp qw(tempfile);
 use LUGS::Events::Parser;
 use Test::More tests => 2;
@@ -40,7 +41,7 @@ my @expected = (
     [
       'Standort unbekannt',
       'LUGS - <lugsvs@lugs.ch>',
-      $join->(<<'EOT'),
+      $join->(encode('UTF-8', <<'EOT')),
 Spezial-Event: Ideen / Vorschläge bitte per E-Mail an den
 <a href="lugsvs@lugs.ch?subject=Vorschlag Spezial-Event 03.05.2012">Vorstand</a>
 senden.

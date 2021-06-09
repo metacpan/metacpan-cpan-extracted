@@ -1,3 +1,9 @@
+0.008   2021-06-08  Released-By: PERLANCAR; Urgency: medium
+
+	- Switch from HTTP::Tiny to Firefox::Marionette to work around
+          Cloudfare/CAPTCHA verification.
+
+
 0.007   2021-01-18  Released-By: PERLANCAR; Urgency: medium
 
 	- get_idx_daily_trading_summary(): Implement paging because turns

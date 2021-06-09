@@ -1,0 +1,173 @@
+Revision history for JSON-Schema-Modern
+
+0.512     2021-06-09 02:29:23Z
+          - distribution has been renamed from JSON-Schema-Draft201909 to
+            JSON-Schema-Modern. JSON::Schema::Draft201909 lives on as a
+            compatibility wrapper.
+
+0.028     2021-06-08 02:48:07Z
+          - fix validation regex for the $anchor keyword
+          - unevaluatedItems and unevaluatedProperties keywords are now
+            applied after all other keywords in the applicator vocabulary
+            (true/false results are not affected, but the order of annotations
+            and errors will change)
+          - calculate the canonical uri correctly after navigating a $ref:
+            using the closest resource identifier to the destination, not the
+            one that was used in the $ref
+
+0.027     2021-05-15 18:13:21Z
+          - fixed error strings used for failing "dependentRequired"
+          - in terse output format, do not discard non-summary errors from
+            schema-form of items
+          - keywords in the applicator vocabulary are now applied before the
+            keywords in the validation vocabulary (true/false results are not
+            affected, but the order of annotations and errors will change)
+          - improved validation of the "date-time", "date" and "time" formats
+
+0.026     2021-04-08 20:13:27Z
+          - fix scoping of annotations from uncle keywords (siblings of the
+            schema's parent) that were improperly visible to unevaluatedItems,
+            unevaluatedProperties
+          - 'result' attribute in JSON::Schema::Draft201909::Result has been
+            renamed to 'valid', to better match what it represents (a boolean)
+
+0.025     2021-03-30 05:36:14Z
+          - minor changes to error strings to distinguish between issues that
+            can be determined from static inspection of schema(s), and those
+            that only arise during runtime evaluation (such as URIs that
+            map to missing schema documents, or inconsistent configuration
+            values).
+          - more validity checks at traversal time of $ref, $schema,
+            $vocabulary values
+          - update ipv4 format validation to reject leading zeroes in octets,
+            helping avoid a newly-discovered vulnerability in netmasks
+
+0.024     2021-03-23 21:53:42Z
+          - the default value for "validate_formats" is once again false (it
+            became true in v0.020), to properly conform to the specification
+
+0.023     2021-02-21 18:36:32Z
+          - fix "try/catch is experimental" warnings in perl 5.33.7
+
+0.022     2021-02-07 17:33:14Z
+          - fix erroneous use of postfix dereference (closes #42).
+
+0.021     2021-02-06 18:50:42Z
+          - [Pp]roperties$ keywords now always produce annotations when
+            evaluating successfully, even if there were no matching properties
+          - added the "strict_basic" output format, for strict (but incorrect)
+            adherence to the draft 2019-09 specification
+
+0.020     2021-01-02 17:12:09Z
+          - the default value for "validate_formats" is now true, to reflect
+            the most typical usecase.
+          - gracefully handle the erroneous schema { "type": null }
+          - fixes to relative-json-pointer format validation
+          - new "annotate_unknown_keywords" config option
+
+0.019     2020-12-08 18:40:10Z
+          - further improvements to the "terse" output format
+          - add_schema will now die with a Result object rather than a
+            listref of Error objects, when the document contains errors.
+
+0.018     2020-12-07 18:22:07Z
+          - now can correctly evaluate schemas containing unevaluatedItems,
+            unevaluatedProperties keywords without the user having to
+            explicitly set collect_annotations => 1 in the constructor
+          - fix error in "terse" output formatting that mistakenly dropped
+            some unevaluatedProperties errors
+
+0.017     2020-11-24 19:15:18Z
+          - refactor keyword implementations into separate vocabulary classes,
+            to faciliate future support for custom vocabularies
+          - traverse the schema before evaluation, for more correct
+            and complete extraction of identifiers and invalid syntax
+          - add callbacks to traverse(), to easily find keywords of interest
+
+0.016     2020-11-18 18:18:40Z
+          - further fixes to infinite loop detection
+          - fix dereference error when evaluating "definitions",
+            "dependencies"
+          - when adding two schema documents with no canonical uri, preserve
+            knowledge of other identifiers found in the first document
+          - add_schema() no longer adds additional URIs to the document
+            object, only the evaluator
+
+0.015     2020-10-20 03:08:36Z
+          - fixed infinity/overflow checks for older perls
+
+0.014     2020-10-16 19:21:17Z
+          - ensure "enum" value is an array
+          - do not evaluate non-arrays against "unevaluatedItems"
+          - fix detection of bad $recursiveAnchor
+          - fix canonical uri calculation for $schema, $recursiveAnchor, and
+            infinite loop detection
+          - for output_format=terse, do not omit the important errors for
+            unevaluated* when annotation collection is disabled
+
+0.013     2020-09-15 19:14:53Z
+          - detect more cases of resource identifier collisions
+          - fix resolution of relative $ids
+          - new "terse" output format
+
+0.012     2020-08-13 20:23:21Z
+          - now using unicode semantics for pattern matching
+
+0.011     2020-08-04 22:16:46Z
+          - better normalization of uris in errors
+          - now detecting infinite loops separately from deep traversal
+          - optionally collect annotations
+          - support for the "unevaluatedItems" and "unevaluatedProperties"
+            keywords
+
+0.010     2020-07-23 16:50:18Z
+          - fixed error generation for validator keywords with numeric
+            arguments (e.g. minimum, multipleOf)
+          - new "get" method for fetching the schema found at a URI
+          - improved "ipv6" format validation
+
+0.009     2020-07-07 19:54:44Z
+          - no longer allowing adding another schema document with a duplicate
+            uri but different schema content (some collision checks were too
+            lax).
+          - fix behaviour of $recursiveRef without an $recursiveAnchor in the
+            initial target scope
+
+0.008     2020-06-22 04:24:06Z
+          - fix bad syntax used in a test
+
+0.007     2020-06-21 21:20:33Z
+          - raise some inadequate prereq declarations
+          - fix incorrect canonical uri when evaluating a (sub)schema using a
+            non-canonical uri
+
+0.006     2020-06-19 20:54:40Z
+          - add support for evaluation against a uri
+          - add "add_schema" interface for using additional schema documents
+            within the implementation
+          - support using the "format" keyword as an assertion, with the
+            "validate_formats" option
+
+0.005     2020-06-09 01:54:05Z
+          - fix some edge cases with usage of $recursiveAnchor, $recursiveRef
+          - fixed several issues with resource identification within schema
+            documents
+
+0.004     2020-06-02 19:14:32Z
+          - add support for $recursiveAnchor and $recursiveRef
+          - support use of "$ref":"https://json-schema.org/draft/2019-09/schema"
+            by loading common metaschemas from a local cache
+
+0.003     2020-05-31 20:10:02Z
+          - add infinite recursion detection
+          - process properties in sorted order, for consistent ordering of
+            results
+          - mark a numeric comparison test as TODO on 32-bit machines (see
+            GHI #10)
+
+0.002     2020-05-27 22:28:15Z
+          - fix incorrect prereq needed for tests
+          - add support for $id and $anchor in single schema documents
+
+0.001     2020-05-21 15:51:00Z
+          - Initial release.

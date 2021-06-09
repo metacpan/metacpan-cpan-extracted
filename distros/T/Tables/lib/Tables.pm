@@ -1,9 +1,9 @@
 package Tables;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-06-01'; # DATE
+our $DATE = '2021-03-05'; # DATE
 our $DIST = 'Tables'; # DIST
-our $VERSION = '0.1.1'; # VERSION
+our $VERSION = '0.1.2'; # VERSION
 
 1;
 # ABSTRACT: Specification for Tables::*, modules that contains table data
@@ -24,7 +24,7 @@ Tables - Specification for Tables::*, modules that contains table data
 
 =head1 VERSION
 
-This document describes version 0.1.1 of Tables (from Perl distribution Tables), released on 2020-06-01.
+This document describes version 0.1.2 of Tables (from Perl distribution Tables), released on 2021-03-05.
 
 =head1 SYNOPSIS
 
@@ -65,6 +65,9 @@ C<TablesRole::*> the roles.
 
 All the modules under C<Tables::*> will be modules with actual table data.
 
+C<TablesCollection-*> name for distribution that contains several C<Tables>
+modules.
+
 =head1 FAQ
 
 =head1 HOMEPAGE
@@ -77,7 +80,7 @@ Source repository is at L<https://github.com/perlancar/perl-Tables>.
 
 =head1 BUGS
 
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Tables>
+Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-Tables/issues>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
@@ -97,7 +100,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by perlancar@cpan.org.
+This software is copyright (c) 2021 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

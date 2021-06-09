@@ -4,6 +4,7 @@ use strict;
 use warnings;
 use boolean qw(true);
 
+use Encode qw(encode);
 use File::Temp qw(tempfile);
 use LUGS::Events::Parser;
 use Test::More tests => 3;
@@ -12,7 +13,7 @@ my $join = sub { local $_ = shift; chomp; s/\n/ /g; $_ };
 
 my $data = do { local $/; <DATA> };
 
-my @expected = (
+my @expected = (map encode('UTF-8', $_),
     $join->(<<'EOT'),
 Ideen / Vorschläge bitte per E-Mail an den CEO -
 mailto:ceo@fress-und-sauf-verein.ch?subject=Vorschlag Thailändischer

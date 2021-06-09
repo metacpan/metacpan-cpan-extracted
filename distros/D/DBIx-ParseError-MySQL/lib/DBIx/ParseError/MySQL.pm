@@ -11,7 +11,7 @@ use Types::Standard qw( Str Bool Object );
 
 # ABSTRACT: Error parser for MySQL
 use version;
-our $VERSION = 'v1.0.1'; # VERSION
+our $VERSION = 'v1.0.2'; # VERSION
 
 #pod =head1 SYNOPSIS
 #pod
@@ -99,8 +99,13 @@ sub _build_error_type {
 
     # Locks
     return 'lock' if $error =~ m<
-        (?-x:Deadlock found when trying to get lock; try restarting transaction)|
+        (?-x:Deadlock found when trying to get (?:user-level |locking service )?lock; try )(?:
+            (?-x:restarting transaction)|
+            (?-x:rolling back transaction/releasing locks and restarting lock acquisition)|
+            (?-x:releasing locks and restarting lock acquisition)
+        )|
         (?-x:Lock wait timeout exceeded; try restarting transaction)|
+        (?-x:Service lock wait timeout exceeded)|
         (?-x:WSREP detected deadlock/conflict and aborted the transaction.\s+Try restarting the transaction)
     >x;
 
@@ -210,7 +215,7 @@ DBIx::ParseError::MySQL - Error parser for MySQL
 
 =head1 VERSION
 
-version v1.0.1
+version v1.0.2
 
 =head1 SYNOPSIS
 

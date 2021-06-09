@@ -1,5 +1,8 @@
 Revision history for Perl module Net::Dict
 
+2.22 2021-06-08 NEILB
+    - Updated tests to reflect changes in the dict.org databases
+
 2.21 2016-03-01 NEILB
     - Use Test::RequiresInternet to skip tests if you don't have
       an internet connection and ability to connect to dict.org's
