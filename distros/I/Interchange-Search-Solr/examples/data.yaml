@@ -8,6 +8,7 @@
    size: XL
    color: blue
    inactive: 0
+   price: 10
 -  sku: 1111300
    title: shirt
    category: shirts
@@ -18,7 +19,7 @@
    size: M
    color: rose
    inactive: 0
-
+   price: 15
 -  sku: 1111301
    title: shirt
    category: shirts
@@ -29,6 +30,7 @@
    size: M
    color: rose
    inactive: 0
+   price: 20
 -  sku: 1111302
    title: shirt
    category: shirts
@@ -39,6 +41,7 @@
    size: M
    color: rose
    inactive: 0
+   price: 30
 -  sku: 1111303
    title: shirt
    category: shirts
@@ -49,6 +52,7 @@
    size: M
    color: rose
    inactive: 0
+   price: 60
 -  sku: 1111304
    title: shirt
    category: shirts
@@ -59,6 +63,7 @@
    size: M
    color: rose
    inactive: 0
+   price: 120
 -  sku: 1111305
    title: shirt
    category: shirts
@@ -69,9 +74,7 @@
    size: M
    color: rose
    inactive: 0
-
-
-
+   price: 240
 -  sku: 1111400
    title: hat
    category: hats
@@ -82,6 +85,7 @@
    size: M
    color: blue
    inactive: 0
+   price: 10
 -  sku: 1111500
    title: boot
    category: boots
@@ -92,6 +96,7 @@
    size: XL
    color: rose
    inactive: 0
+   price: 20
 -  sku: 1111600
    title: hat
    category: hats
@@ -102,6 +107,7 @@
    size: XL
    color: blue
    inactive: 0
+   price: 150
 -  sku: 1111700
    title: hat
    category: hats
@@ -112,6 +118,7 @@
    size: XL
    color: rose
    inactive: 0
+   price: 150
 -  sku: 1111800
    title: hat
    category: hats
@@ -122,6 +129,7 @@
    size: XL
    color: blue
    inactive: 0
+   price: 150
 -  sku: 1111900
    title: hat
    category: hats
@@ -132,6 +140,7 @@
    size: XL
    color: rose
    inactive: 0
+   price: 150
 -  sku: 1113200
    title: hat
    category: hats
@@ -142,6 +151,7 @@
    size: XL
    color: blue
    inactive: 0
+   price: 150
 -  sku: 1114200
    title: hat
    category: hats
@@ -152,6 +162,7 @@
    size: XL
    color: yellow
    inactive: 0
+   price: 150
 -  sku: 1115200
    title: hat
    category: hats
@@ -162,6 +173,7 @@
    size: XL
    color: yellow
    inactive: 0
+   price: 150
 -  sku: 1116200
    title: boot
    category: boots
@@ -172,6 +184,7 @@
    size: XL
    color: yellow
    inactive: 0
+   price: 150
 -  sku: 1116200
    title: hat
    category: hats
@@ -182,6 +195,7 @@
    size: XL
    color: yellow
    inactive: 0
+   price: 150
 -  sku: 1118200
    title: hat
    category: hats
@@ -192,6 +206,7 @@
    size: XL
    color: yellow
    inactive: 0
+   price: 150
 -  sku: 1119200
    title: hat
    category: hats
@@ -202,6 +217,7 @@
    size: XL
    color: yellow
    inactive: 0
+   price: 150
 -  sku: 1121200
    title: hat
    category: hats
@@ -212,6 +228,7 @@
    size: XL
    color: blue
    inactive: 0
+   price: 150
 -  sku: 1131200
    title: hat
    category: hats
@@ -222,6 +239,7 @@
    size: XL
    color: blue
    inactive: 0
+   price: 150
 -  sku: 1141200
    title: hat
    category: hats
@@ -232,6 +250,7 @@
    size: XL
    color: blue
    inactive: 0
+   price: 150
 -  sku: 1151200
    title: hat
    category: hats
@@ -242,6 +261,7 @@
    size: XL
    color: blue
    inactive: 0
+   price: 150
 -  sku: 1161200
    title: hat
    category: hats
@@ -252,6 +272,7 @@
    size: XL
    color: blue
    inactive: 0
+   price: 150
 -  sku: 1171200
    title: hat
    category: hats
@@ -262,6 +283,7 @@
    size: XL
    color: blue
    inactive: 0
+   price: 150
 -  sku: 1181200
    title: hat
    category: hats
@@ -272,6 +294,7 @@
    size: XL
    color: blue
    inactive: 0
+   price: 150
 -  sku: 1191200
    title: hat
    category: hats
@@ -282,6 +305,7 @@
    size: L
    color: blue
    inactive: 1
+   price: 150
 -  sku: 1211200
    title: hat
    category: hats
@@ -292,6 +316,7 @@
    size: XL
    color: blue
    inactive: 1
+   price: 150
 
 -  sku: 1211201
    title: knitted hat
@@ -303,6 +328,7 @@
    size: XL
    color: blue
    inactive: 0
+   price: 150
 
 -  sku: 1211202
    title: knitted hat
@@ -314,4 +340,5 @@
    size: XL
    color: blue
    inactive: 1
+   price: 50
 

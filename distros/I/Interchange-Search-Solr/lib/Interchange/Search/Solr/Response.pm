@@ -109,7 +109,7 @@ Stefan Hornburg (Racke), C<< <racke at linuxia.de> >>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2015-2019 Marco Pessotto, Stefan Hornburg (Racke).
+Copyright 2015-2021 Marco Pessotto, Stefan Hornburg (Racke).
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of either: the GNU General Public License as published

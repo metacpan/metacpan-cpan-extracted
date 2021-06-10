@@ -1,6 +1,6 @@
 package Bitcoin::Crypto::Exception;
 
-our $VERSION = "0.996";
+our $VERSION = "0.997";
 
 use v5.10;
 use warnings;
@@ -96,13 +96,6 @@ sub as_string
 	package Bitcoin::Crypto::Exception::Sign;
 	use parent -norequire, "Bitcoin::Crypto::Exception";
 
-}
-
-{
-
-	# old form - deprecated
-	package Bitcoin::Crypto::Exception::KeySign;
-	use parent -norequire, "Bitcoin::Crypto::Exception::Sign";
 }
 
 {

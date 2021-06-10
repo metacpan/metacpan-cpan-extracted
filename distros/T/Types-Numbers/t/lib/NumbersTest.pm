@@ -17,31 +17,31 @@ use Math::BigInt;
 use Math::BigFloat;
 
 use constant {
-   _BASE2_LOG     => log(2) / log(10),
-   _SAFE_NUM_MIN  => Data::Integer::min_signed_natint   < Data::Float::max_integer * -1 ?
-                     Data::Integer::min_signed_natint   : Data::Float::max_integer * -1,
-   _SAFE_NUM_MAX  => Data::Integer::max_unsigned_natint > Data::Float::max_integer *  1 ?
-                     Data::Integer::max_unsigned_natint : Data::Float::max_integer *  1,
+    _BASE2_LOG     => log(2) / log(10),
+    _SAFE_NUM_MIN  => Data::Integer::min_signed_natint   < Data::Float::max_integer * -1 ?
+                      Data::Integer::min_signed_natint   : Data::Float::max_integer * -1,
+    _SAFE_NUM_MAX  => Data::Integer::max_unsigned_natint > Data::Float::max_integer *  1 ?
+                      Data::Integer::max_unsigned_natint : Data::Float::max_integer *  1,
 };
 
 our @EXPORT = qw(
-   numbers_test ceil blessed _BASE2_LOG _SAFE_NUM_MIN _SAFE_NUM_MAX
-   $bigtwo $bigten
-                                             $nan  $pinf  $ninf
-   $I1 $I0 $I_1                 $IMAX $IMIN $Inan $Ipinf $Ininf
-   $F1 $F0 $F_1 $F05 $F15 $F_25 $FMAX $FMIN $Fnan $Fpinf $Fninf
+    numbers_test ceil blessed _BASE2_LOG _SAFE_NUM_MIN _SAFE_NUM_MAX
+    $bigtwo $bigten
+                                              $nan  $pinf  $ninf
+    $I1 $I0 $I_1                 $IMAX $IMIN $Inan $Ipinf $Ininf
+    $F1 $F0 $F_1 $F05 $F15 $F_25 $FMAX $FMIN $Fnan $Fpinf $Fninf
 );
 
 # configure some basic big number stuff
 Math::BigInt  ->config({
-   round_mode => 'common',
-   trap_nan   => 0,
-   trap_inf   => 0,
+    round_mode => 'common',
+    trap_nan   => 0,
+    trap_inf   => 0,
 });
 Math::BigFloat->config({
-   round_mode => 'common',
-   trap_nan   => 0,
-   trap_inf   => 0,
+    round_mode => 'common',
+    trap_nan   => 0,
+    trap_inf   => 0,
 });
 
 our $bigtwo = Math::BigFloat->new(2);
@@ -80,55 +80,55 @@ our $Fpinf = Math::BigFloat->binf('+');
 our $Fninf = Math::BigFloat->binf('-');
 
 sub numbers_test {
-   my ($val, $type, $is_pass) = @_;
-   no warnings 'uninitialized';
-   my $class = blessed $val;
+    my ($val, $type, $is_pass) = @_;
+    no warnings 'uninitialized';
+    my $class = blessed $val;
 
-   # turn -1 into a fail
-   $is_pass = 0 if ($is_pass == -1);
+    # turn -1 into a fail
+    $is_pass = 0 if ($is_pass == -1);
 
-   # Parameterized integer tests only: Extra check with unblessed numbers and _SAFE_NUM_MIN/MAX
-   $is_pass = 0 unless (
-      $type->display_name !~ /Int\[/ || !$is_pass || $class ||
-      $val < _SAFE_NUM_MAX && $val > _SAFE_NUM_MIN
-   );
+    # Parameterized integer tests only: Extra check with unblessed numbers and _SAFE_NUM_MIN/MAX
+    $is_pass = 0 unless (
+        $type->display_name !~ /Int\[/ || !$is_pass || $class ||
+        $val < _SAFE_NUM_MAX && $val > _SAFE_NUM_MIN
+    );
 
-   # TODO these tests
-   local $TODO = 'Problems with Win32, INF, and looks_like_number (see RT#89423)'
-      if ($^O eq 'MSWin32' && $val =~ /IN[DF]/i && Data::Float::float_is_infinite($val));
+    # TODO these tests
+    local $TODO = 'Problems with Win32, INF, and looks_like_number (see RT#89423)'
+        if ($^O eq 'MSWin32' && $val =~ /IN[DF]/i && Data::Float::float_is_infinite($val));
 
-   my $num_length = $val =~ /^-?(\d+)(?:\.(\d+))?$/ ?
-      join '.', length $1, (length $2 || 0) :
-      0
-   ;
+    my $num_length = $val =~ /^-?(\d+)(?:\.(\d+))?$/ ?
+        join '.', length $1, (length $2 || 0) :
+        0
+    ;
 
-   my $sval = "$val";
-   $sval =~ s/^(-?\d{50})\d+(\d{8})/$1...$2/;
+    my $sval = "$val";
+    $sval =~ s/^(-?\d{50})\d+(\d{8})/$1...$2/;
 
-   my $msg = sprintf("%s: %s %6s%s%s",
-      $type->display_name,
-      ($is_pass ? 'accepts' : 'rejects'),
-      $sval,
-      ($class ? " ($class)" : ''),
-      ($num_length >= 20 ? " [$num_length]" : ''),
-   );
+    my $msg = sprintf("%s: %s %6s%s%s",
+        $type->display_name,
+        ($is_pass ? 'accepts' : 'rejects'),
+        $sval,
+        ($class ? " ($class)" : ''),
+        ($num_length >= 20 ? " [$num_length]" : ''),
+    );
 
-   my $result = $is_pass ?
-      Test::TypeTiny::should_pass($val, $type, $msg) :
-      Test::TypeTiny::should_fail($val, $type, $msg)
-   ;
+    my $result = $is_pass ?
+        Test::TypeTiny::should_pass($val, $type, $msg) :
+        Test::TypeTiny::should_fail($val, $type, $msg)
+    ;
 
-   my $error_msg;
-   if ($type->can('validate_explain')) {
-      my $errors = $type->validate_explain($val);
-      $error_msg = join "\n", @{ $type->validate_explain($val) } if ($errors);
-   }
-   else {
-      $error_msg = $type->validate;
-   }
+    my $error_msg;
+    if ($type->can('validate_explain')) {
+        my $errors = $type->validate_explain($val);
+        $error_msg = join "\n", @{ $type->validate_explain($val) } if ($errors);
+    }
+    else {
+        $error_msg = $type->validate;
+    }
 
-   diag $error_msg if ($error_msg && !$result);
-   #diag $error_msg if ($error_msg);
+    diag $error_msg if ($error_msg && !$result);
+    #diag $error_msg if ($error_msg);
 }
 
 1;

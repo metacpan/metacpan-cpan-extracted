@@ -27,7 +27,7 @@ ok( $item->cart->id eq $cart->id, 'cart relation ok' );
 ok( $item->properties     && ref $item->properties eq 'HASH',      'properties ok' );
 ok( $item->configurations && ref $item->configurations eq 'ARRAY', 'configurations ok' );
 ok( $item->duration, 'duration ok' );
-ok( $item->offer_id, 'offer_id ok' );
+#ok( $item->offer_id, 'offer_id ok' );
 ok( $item->options && ref $item->options eq 'ARRAY', 'options ok' );
 ok( $item->prices  && ref $item->prices eq 'ARRAY',  'prices ok' );
 ok( $item->product_id, 'product_id ok' );

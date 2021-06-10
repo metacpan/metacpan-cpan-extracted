@@ -16,7 +16,7 @@ sub do_http {
 	$headers{"referer"}    = $$opt{referer} if $$opt{referer};
 
 	if ($$opt{gzip}) {
-		$headers{'Accept-Encoding'} = 'gzip';
+		$headers{'Accept-Encoding'} = 'gzip, deflate';
 		require Compress::Raw::Zlib;
 	}
 
@@ -70,16 +70,21 @@ sub do_http {
 			$headers_got              = 1;
 			my ($is_success, $status, $h, $redirects) = headers($headers);
 			$content_encoding = $$h{'content-encoding'};
-			if ($$opt{gzip} and $content_encoding and $content_encoding eq 'gzip') {
-				$inflate = Compress::Raw::Zlib::Inflate->new(-WindowBits => Compress::Raw::Zlib::WANT_GZIP());
+			if ($$opt{gzip} and $content_encoding) {
+				if ($content_encoding eq 'deflate') {
+					$inflate = Compress::Raw::Zlib::Inflate->new();
+				} elsif ($content_encoding eq 'gzip') {
+					$inflate = Compress::Raw::Zlib::Inflate->new(-WindowBits => Compress::Raw::Zlib::WANT_GZIP());
+				}
 			}
+
 
 			if ($on_header) {
 				$on_header->($is_success, $h, $redirects) or return;
 			}
 			return 1;
 		};
-		
+
 		$args{on_body} = sub {
 			my ($partial_body, $headers) = @_;
 			$body_from_on_body_length += length $partial_body;
@@ -131,12 +136,13 @@ sub do_http {
 			$$h{Protocol} = "HTTP/" . $$h{HTTPVersion};
 
 			my $content_encoding = $$h{'content-encoding'};
-			if ($body and $$opt{gzip} and $content_encoding and $content_encoding eq 'gzip') {
-				require Compress::Raw::Zlib;
-				my $inflate = Compress::Raw::Zlib::Inflate->new(-WindowBits => Compress::Raw::Zlib::WANT_GZIP());
-				my $status = $inflate->inflate($body, my $output);
-				$status == Compress::Raw::Zlib::Z_OK() or $status == Compress::Raw::Zlib::Z_STREAM_END() or warn "inflation failed: $status\n";
-				$cb->($is_success, $output, $h, $redirects);
+			if ($body and $$opt{gzip} and $content_encoding) {
+				if ($content_encoding eq 'deflate' or $content_encoding eq 'gzip') {
+					my $inflate = Compress::Raw::Zlib::Inflate->new($content_encoding eq 'gzip' ? (-WindowBits => Compress::Raw::Zlib::WANT_GZIP()) : ());
+					my $status = $inflate->inflate($body, my $output);
+					$status == Compress::Raw::Zlib::Z_OK() or $status == Compress::Raw::Zlib::Z_STREAM_END() or warn "inflation failed: $status\n";
+					$cb->($is_success, $output, $h, $redirects);
+				}
 			} else {
 				$cb->($is_success, $body, $h, $redirects);
 			}

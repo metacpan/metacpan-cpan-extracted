@@ -4,7 +4,7 @@ Plack::Middleware::TrafficAdvice - handle requests for /.well-known/traffic-advi
 
 # VERSION
 
-version v0.1.0
+version v0.2.0
 
 # SYNOPSIS
 
@@ -46,6 +46,13 @@ The data will be saved as a temporary ["file"](#file).
 ## file
 
 This is a file containing the JSON string to return.
+
+# KNOWN ISSUES
+
+The `/.well-known/traffic-advice` specification is new and may be subject to change.
+
+This does not validate that the ["data"](#data) string or ["file"](#file) contains
+valid JSON, or that the JSON conforms to the specification.
 
 # SEE ALSO
 

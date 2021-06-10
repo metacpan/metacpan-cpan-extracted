@@ -1,6 +1,6 @@
 package Bitcoin::Crypto;
 
-our $VERSION = "0.996";
+our $VERSION = "0.997";
 
 use v5.10;
 use warnings;
@@ -100,7 +100,7 @@ This module allows you to do basic tasks for Bitcoin such as:
 
 =back
 
-This package won't help you with:
+This module won't help you with:
 
 =over 2
 
@@ -114,7 +114,7 @@ This package won't help you with:
 
 =head1 WHERE TO START?
 
-Documentation and examples in this module assump that you're already familiar with the basics of Bitcoin protocol and asymmetric cryptography. If that's not the case, start with learning about those topics.
+Documentation and examples in this module assume you're already familiar with the basics of Bitcoin protocol and asymmetric cryptography. If that's not the case, start with learning about those topics.
 
 If you like to learn by example, dive right into the examples directory.
 
@@ -128,7 +128,7 @@ Start with L<Bitcoin::Crypto::Key::Private> if you already have some data you wa
 
 =item * generate many keys at once
 
-L<Bitcoin::Crypto::Key::ExtPrivate> will allow you to derive as many keys as you want from a master key, so you won't have to store multiple private key seeds. L<Bitcoin::Crypto::Key::ExtPublic> can be stored in a "hot" storage - a place which can be hacked into, like a website's database - and used to derive public keys lazily.
+L<Bitcoin::Crypto::Key::ExtPrivate> will allow you to derive as many keys as you want from a master key, so you won't have to store multiple private key seeds. L<Bitcoin::Crypto::Key::ExtPublic> can be then used to derive public keys lazily. I<(Note: storing extended public keys together with private keys in a hot storage will put your extended private key at risk!)>
 
 =item * work with other cryptocurrencies
 
@@ -156,7 +156,7 @@ Most packages in this module have the types of their thrown exceptions documente
 
 =head1 SHORTCUT FUNCTIONS
 
-This package exports the following function when asked for them. They are shourtcut functions and will load needed packages and return their names. You can then use names of loaded packages to instantiate them however you want. You can also load all of them with the I<:all> tag in import. These functions can be used as follows:
+This package exports the following functions when asked for them. They are shourtcut functions and will load needed packages and return their names. You can then use names of loaded packages to instantiate them however you want. You can also load all of them with the I<:all> tag in import. These functions can be used as follows:
 
 	use Bitcoin::Crypto qw(btc_pub);
 
@@ -216,6 +216,16 @@ The module have a little bit of startup time because of Moo and Type::Tiny, meas
 =item * Live testing
 
 =item * Better test coverage
+
+=back
+
+=head1 SEE ALSO
+
+=over
+
+=item L<Bitcoin::RPC::Client>
+
+=item L<https://github.com/bitcoin/bips>
 
 =back
 

@@ -1,6 +1,9 @@
 Revision history for Term::TablePrint
 
 
+0.135   2021-06-10
+        - Bugfix option 'grid'.
+
 0.134   2021-06-04
         - Code cleanup.
 

@@ -21,7 +21,7 @@ has missing_after                  => 1800;
 has [qw(remove_after stuck_after)] => 172800;
 has tasks                          => sub { {} };
 
-our $VERSION = '10.21';
+our $VERSION = '10.22';
 
 sub add_task {
   my ($self, $name, $task) = @_;
@@ -103,12 +103,8 @@ sub new {
   return $self->backend($class->new(@_)->minion($self));
 }
 
-sub perform_jobs {
-  my ($self, $options) = @_;
-  my $worker = $self->worker;
-  while (my $job = $worker->register->dequeue(0, $options)) { $job->perform }
-  $worker->unregister;
-}
+sub perform_jobs               { _perform_jobs(0, @_) }
+sub perform_jobs_in_foreground { _perform_jobs(1, @_) }
 
 sub repair { shift->_delegate('repair') }
 
@@ -167,6 +163,18 @@ sub _iterator {
 
 sub _info { shift->backend->list_jobs(0, 1, {ids => [shift]})->{jobs}[0] }
 
+sub _perform_jobs {
+  my ($foreground, $minion, $options) = @_;
+
+  my $worker = $minion->worker;
+  while (my $job = $worker->register->dequeue(0, $options)) {
+    if    (!$foreground)                     { $job->perform }
+    elsif (defined(my $err = $job->execute)) { $job->fail($err) }
+    else                                     { $job->finish }
+  }
+  $worker->unregister;
+}
+
 sub _result {
   my ($self, $promise, $id) = @_;
   return $promise->resolve unless my $job = $self->_info($id);
@@ -213,8 +221,7 @@ Minion - Job queue
 =begin html
 
 <p>
-  <img alt="Screenshot" src="https://raw.github.com/mojolicious/minion/master/examples/admin.png?raw=true"    
-    width="600px">
+  <img alt="Screenshot" src="https://raw.github.com/mojolicious/minion/main/examples/admin.png?raw=true" width="600px">
 </p>
 
 =end html
@@ -234,7 +241,7 @@ Take a look at our excellent documentation in L<Minion::Guide>!
 =head1 EXAMPLES
 
 This distribution also contains a great example application you can use for inspiration. The L<link
-checker|https://github.com/mojolicious/minion/tree/master/examples/linkcheck> will show you how to integrate background
+checker|https://github.com/mojolicious/minion/tree/main/examples/linkcheck> will show you how to integrate background
 jobs into well-structured L<Mojolicious> applications.
 
 =head1 EVENTS
@@ -807,6 +814,13 @@ Reset everything.
 Reset only locks.
 
 =back
+
+=head2 perform_jobs_in_foreground
+
+  $minion->perform_jobs_in_foreground;
+  $minion->perform_jobs_in_foreground({queues => ['important']});
+
+Same as L</"perform_jobs">, but all jobs are performed in the current process, without spawning new processes.
 
 =head2 result_p
 

@@ -1,53 +1,53 @@
-Revision History for Types-Numbers
-==================================
+Changelog for Types-Numbers
 
-v0.94 2014-10-18
-----------------
+v1.0.0 2021-06-10T19:13:01
+ - Update README / LICENSE (Brendan Byrd)
+ - Pull request #1: SM-3106 (Brendan Byrd)
+ - Add a small POD correction (Brendan Byrd)
+ - Add Types::Common::Numeric analogues, with blessed number support
+   (Brendan Byrd)
+ - Avoid an potential "uninitialized value" warning (Brendan Byrd)
+ - Add perl to cpanfile (Brendan Byrd)
+ - Encourage more list notation for constraint/inline returns (Brendan
+   Byrd)
+ - Remove leftover hidden files (Brendan Byrd)
+ - Update README (Andrew Hewus Fresh)
+ - Pull in extra ignores from our MintingProfile (Andrew Hewus Fresh)
+ - Unignore and commit Makefile (Andrew Hewus Fresh)
+ - Fix PerlNum unit test failure on blessed numbers while using
+   _strict_check (Brendan Byrd)
+ - Switch from 3->4 spaces per indent (Brendan Byrd)
+ - Convert module to use GSG DZIL framework (Brendan Byrd)
 
-[d83b874]
-* Author: Brendan Byrd <Perl@ResonatorSoft.org>
-* Date:   2014-10-01 23:38:13 -0400 (2 weeks ago)
+v0.940.0 2014-10-02T03:38:13
+ - No changes found
 
-Minor DZIL fixes, including IRC resource (fixes #1)
+v0.94 2014-10-02T03:38:13
+ - Minor DZIL fixes, including IRC resource (fixes #1) (Brendan Byrd)
+ - Minor cleanup (Brendan Byrd)
 
-[742b3f8]
-* Author: Brendan Byrd <Perl@ResonatorSoft.org>
-* Date:   2013-10-25 08:08:14 -0400 (12 months ago)
+v0.93 2013-10-20T18:07:54
+ - Change inf tests to TODO tests for Win32/INF/looks_like_number bug Fix
+   up some v-string requirement errors (Brendan Byrd)
+ - Convert lower priority and/or to &&/|| Fix uninitialized warnings from
+   perl -w and BlessedNum (Brendan Byrd)
+ - Upgrade Math::BigFloat version to v1.65 Fix docs (sprintf + parens
+   around param types) (Brendan Byrd)
 
-Minor cleanup
+v0.92 2013-10-13T03:33:24
+ - Convert docs to use header hieriarchy + some additions (Brendan Byrd)
+ - Fix all of the "long double" E notation issues (Brendan Byrd)
+ - Move SAFE_NUM_* constants directly to Math::BigInt Remove incorrect
+   documentation on Char about UTF-8 / Latin1 (Brendan Byrd)
+ - Fix E notation problems with 64-bit integers and $_NumRange_perlsafe
+   (Brendan Byrd)
 
+v0.91 2013-10-06T20:54:13
+ - Fix IntLike with 64-bit safe integers that are still displayed in E
+   notation (Brendan Byrd)
 
-v0.93 2013-10-20
-----------------
-
-[8e53c1b]
-* Author: Brendan Byrd <Perl@ResonatorSoft.org>
-* Date:   2013-10-20 11:25:37 -0400 (12 months ago)
-
-Change inf tests to TODO tests for Win32/INF/looks_like_number bug
-Fix up some v-string requirement errors
-
-[720b62d]
-* Author: Brendan Byrd <Perl@ResonatorSoft.org>
-* Date:   2013-10-20 10:58:16 -0400 (12 months ago)
-
-Convert lower priority and/or to &&/||
-Fix uninitialized warnings from perl -w and BlessedNum
-
-[8406218]
-* Author: Brendan Byrd <Perl@ResonatorSoft.org>
-* Date:   2013-10-15 09:21:41 -0400 (1 year ago)
-
-Release v0.92_01
-
-[f48c8e4]
-* Author: Brendan Byrd <Perl@ResonatorSoft.org>
-* Date:   2013-10-15 09:01:56 -0400 (1 year ago)
-
-Upgrade Math::BigFloat version to v1.65
-Fix docs (sprintf + parens around param types)
-
-
-===================================
-End of changes in the last 365 days
-===================================
+v0.90 2013-10-06T05:52:22
+ - Initial, finished version (Brendan Byrd)
+ - Completely working (sans docs) (Brendan Byrd)
+ - Initial draft (Brendan Byrd)
+ - Initial commit (Brendan Byrd)

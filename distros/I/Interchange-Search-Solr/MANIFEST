@@ -26,6 +26,7 @@ t/mouse.t
 t/pod-coverage.t
 t/pod.t
 t/query.t
+t/ranges.t
 t/serialize-data.t
 t/sorting.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)

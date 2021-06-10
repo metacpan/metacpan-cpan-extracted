@@ -1,6 +1,6 @@
 package Bitcoin::Crypto::Key::ExtPrivate;
 
-our $VERSION = "0.996";
+our $VERSION = "0.997";
 
 use v5.10;
 use warnings;
@@ -12,6 +12,7 @@ use Bitcoin::BIP39 qw(gen_bip39_mnemonic bip39_mnemonic_to_entropy entropy_to_bi
 use Crypt::KeyDerivation qw(pbkdf2);
 use Scalar::Util qw(blessed);
 
+use Bitcoin::Crypto::BIP44;
 use Bitcoin::Crypto::Key::ExtPublic;
 use Bitcoin::Crypto::Config;
 use Bitcoin::Crypto::Helpers qw(new_bigint pad_hex ensure_length verify_bytestring);
@@ -117,6 +118,17 @@ sub get_public_key
 	return $public;
 }
 
+sub derive_key_bip44
+{
+	my ($self, %data) = @_;
+	my $path = Bitcoin::Crypto::BIP44->new(
+		%data,
+		coin_type => $self,
+	);
+
+	return $self->derive_key($path);
+}
+
 sub _derive_key_partial
 {
 	my ($self, $child_num, $hardened) = @_;
@@ -128,7 +140,7 @@ sub _derive_key_partial
 		$hmac_data .= "\x00";
 
 		# key data - 32 bytes
-		$hmac_data .= ensure_length $self->raw_key, $config{key_max_length};
+		$hmac_data .= ensure_length $self->raw_key, Bitcoin::Crypto::Config::key_max_length;
 	}
 	else {
 		# public key data - SEC compressed form
@@ -322,6 +334,14 @@ Performs extended key derivation as specified in BIP32 on the current key with $
 See BIP32 document for details on derivation paths and methods.
 
 Returns a new extended key instance - result of a derivation.
+
+=head2 derive_key_bip44
+
+	sig: derive_key_bip44($self, %data)
+
+A helper that constructs a L<Bitcoin::Crypto::BIP44> path from C<%data> and calls L</derive_key> with it. Refer to L<Bitcoin::Crypto::BIP44/PROPERTIES> to see what you can include in C<%data>.
+
+I<Note: coin_type parameter will be ignored, and the current network configuration set in the extended key will be used.>
 
 =head2 get_fingerprint
 

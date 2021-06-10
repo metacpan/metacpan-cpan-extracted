@@ -1,4 +1,18 @@
 Revision history for Plack-Middleware-TrafficAdvice:
 
+v0.2.0    2021-06-09 16:48:18+01:00 Europe/London
+ [Enhancements]
+ - Respond to HEAD requests.
+
+ [Bug Fixes]
+ - Specified minimum version of JSON::MaybeXS so that SYNOPSIS and
+   tests work properly.
+
+ [Documentation]
+ - Add KNOWN ISSUES section.
+
+ [Tests]
+ - Add more tests.
+
 v0.1.0    2021-06-08 17:15:00+01:00 Europe/London
  - Initial version.

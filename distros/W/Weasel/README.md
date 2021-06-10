@@ -8,7 +8,7 @@ Weasel - Perl's php/Mink-inspired abstracted web-driver framework
 
 # VERSION
 
-0.27
+0.29
 
 # SYNOPSIS
 

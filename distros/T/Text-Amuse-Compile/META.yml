@@ -35,5 +35,5 @@ resources:
   WebIRC: https://webchat.freenode.net/?channels=#amusewiki
   homepage: http://amusewiki.org
   repository: https://github.com/melmothx/text-amuse-compile
-version: '1.62'
+version: '1.63'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

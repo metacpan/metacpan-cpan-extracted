@@ -2,6 +2,10 @@ NAME
 
     Types::Numbers - Type constraints for numbers
 
+VERSION
+
+    version v1.0.0
+
 DESCRIPTION
 
     Because we deal with numbers every day in our programs and modules,
@@ -19,34 +23,45 @@ TYPES
 
     The hierarchy of the types is as follows:
 
-        (T:S = From Types::Standard)
-     
+        (T:S    = From Types::Standard)
+        (~T:C:N = Based on Types::Common::Numeric types)
+    
         Item (T:S)
-           Defined (T:S)
-              NumLike
-                 NumRange[`n, `p]
-                 IntLike
-                    SignedInt[`b]
-                    UnsignedInt[`b]
-                 PerlNum
-                    PerlSafeInt
-                    PerlSafeFloat
-                 BlessedNum[`d]
-                    BlessedInt[`d]
-                    BlessedFloat[`d]
-                 NaN
-                 Inf[`s]
-                 FloatSafeNum
-                    FloatBinary[`b, `e]
-                    FloatDecimal[`d, `e]
-                 RealNum
-                    RealSafeNum
-                       FixedBinary[`b, `s]
-                       FixedDecimal[`d, `s]
-     
-              Value (T:S)
-                 Str (T:S)
-                    Char[`b]
+            Defined (T:S)
+                NumLike
+                    NumRange[`n, `p] (~T:C:N)
+                        PositiveNum (~T:C:N)
+                        PositiveOrZeroNum (~T:C:N)
+                        NegativeNum (~T:C:N)
+                        NegativeOrZeroNum (~T:C:N)
+                    IntLike
+                        SignedInt[`b]
+                        UnsignedInt[`b]
+                        IntRange[`n, `p] (~T:C:N)
+                            PositiveInt (~T:C:N)
+                            PositiveOrZeroInt (~T:C:N)
+                            NegativeInt (~T:C:N)
+                            NegativeOrZeroInt (~T:C:N)
+                            SingleDigit (~T:C:N)
+                    PerlNum
+                        PerlSafeInt
+                        PerlSafeFloat
+                    BlessedNum[`d]
+                        BlessedInt[`d]
+                        BlessedFloat[`d]
+                    NaN
+                    Inf[`s]
+                    FloatSafeNum
+                        FloatBinary[`b, `e]
+                        FloatDecimal[`d, `e]
+                    RealNum
+                        RealSafeNum
+                            FixedBinary[`b, `s]
+                            FixedDecimal[`d, `s]
+    
+                Value (T:S)
+                    Str (T:S)
+                        Char[`b]
 
  Basic types
 
@@ -57,8 +72,23 @@ TYPES
 
   NumRange[`n, `p]
 
-    Only accepts numbers within a certain range. The two parameters are the
-    minimums and maximums, inclusive.
+    Only accepts numbers within a certain range. By default, the two
+    parameters are the minimums and maximums, inclusive. However, this type
+    is also compatible with a few different parameter styles, a la
+    Types::Common::Numeric.
+
+    The minimum/maximums can be omitted or undefined. Or two extra boolean
+    parameters can be added to specify exclusivity:
+
+        NumRange[0.1, 10.0, 0, 0]  # both inclusive
+        NumRange[0.1, 10.0, 0, 1]  # exclusive maximum, so 10.0 is invalid
+        NumRange[0.1, 10.0, 1, 0]  # exclusive minimum, so 0.1 is invalid
+        NumRange[0.1, 10.0, 1, 1]  # both exclusive
+    
+        NumRange[0.1]                # lower bound check only
+        NumRange[undef, 10.0]        # upper bound check only
+        NumRange[0.1, undef, 1]      # lower bound check only, exclusively
+        NumRange[undef, 10.0, 1, 1]  # upper bound check only, exclusively (third param ignored)
 
   PerlNum
 
@@ -92,8 +122,8 @@ TYPES
 
   Inf[`s]
 
-        Inf['+']
-        Inf['-']
+       Inf['+']
+       Inf['-']
 
     An infinity value with a certain sign, either embedded into the Perl
     native float or a blessed Inf, checked via is_inf. The parameter must
@@ -111,6 +141,12 @@ TYPES
     Behaves like Int from Types::Standard, but will also accept blessed
     number types and integers in E notation. There are no expectations of
     storage limitations here. (See "SignedInt" for that.)
+
+  IntRange[`n, `p]
+
+    Only accepts integers within a certain range. By default, the two
+    parameters are the minimums and maximums, inclusive. Though, the
+    minimum/maximums can be omitted or undefined.
 
   PerlSafeInt
 
@@ -155,8 +191,8 @@ TYPES
   SignedInt
 
     A signed integer (blessed or otherwise) that can safely hold its own
-    number. This is different than IntLike, which doesn't check for storage
-    limitations.
+    number. This is different than "IntLike", which doesn't check for
+    storage limitations.
 
   SignedInt[`b]
 
@@ -214,22 +250,22 @@ TYPES
     example:
 
         FloatBinary[32, 8] =
-           32 bits total (`b)
-           23 bit  mantissa (significand precision)
-            8 bit  exponent (`e)
-            1 bit  sign (+/-)
+            32 bits total (`b)
+            23 bit  mantissa (significand precision)
+             8 bit  exponent (`e)
+             1 bit  sign (+/-)
 
-    Unlike the *Int types, if Perl's native number cannot support all
+    Unlike the *Int types, if Perl's native NV cannot support all
     dimensions of the floating-point number without losing information,
     then unblessed numbers are completely off the table. For example,
     assuming a 32-bit machine:
 
-        (UnsignedInt[64])->check( 0 )        # pass
-        (UnsignedInt[64])->check( 2 ** 30 )  # pass
-        (UnsignedInt[64])->check( 2 ** 60 )  # fail, because 32-bit NVs can't safely hold it
-     
-        (FloatBinary[64, 11])->check( 0 )    # fail
-        (FloatBinary[64, 11])->check( $any_unblessed_number )  # fail
+       (UnsignedInt[64])->check( 0 )        # pass
+       (UnsignedInt[64])->check( 2 ** 30 )  # pass
+       (UnsignedInt[64])->check( 2 ** 60 )  # fail, because 32-bit NVs can't safely hold it
+    
+       (FloatBinary[64, 11])->check( 0 )    # fail
+       (FloatBinary[64, 11])->check( $any_unblessed_number )  # fail
 
   FloatDecimal[`d, `e]
 
@@ -277,41 +313,59 @@ TYPES
     A single character that fits within `b bits. Unicode is supported, but
     it must be decoded first.
 
-AVAILABILITY
+ Types::Common::Numeric analogues
 
-    The project homepage is https://github.com/SineSwiper/Types-Numbers.
+    The Types::Common::Numeric module has a lot of useful types, but none
+    of them are compatible with blessed numbers. This module re-implements
+    them to be grandchildren of "NumLike" and "IntLike", which allows
+    blessed numbers.
 
-    The latest version of this module is available from the Comprehensive
-    Perl Archive Network (CPAN). Visit http://www.perl.com/CPAN/ to find a
-    CPAN site near you, or see https://metacpan.org/module/Types::Numbers/.
+    Furthermore, the "NumRange" and "IntRange" checks are already
+    implemented and described above.
 
-SUPPORT
+  PositiveNum
 
- Internet Relay Chat
+    Accepts non-zero numbers in the positive range.
 
-    You can get live help by using IRC ( Internet Relay Chat ). If you
-    don't know what IRC is, please read this excellent guide:
-    http://en.wikipedia.org/wiki/Internet_Relay_Chat. Please be courteous
-    and patient when talking to us, as we might be busy or sleeping! You
-    can join those networks/channels and get help:
+  PositiveOrZeroNum
 
-      * irc.perl.org
+    Accepts numbers in the positive range, or zero.
 
-      You can connect to the server at 'irc.perl.org' and talk to this
-      person for help: SineSwiper.
+  PositiveInt
 
- Bugs / Feature Requests
+    Accepts non-zero integers in the positive range.
 
-    Please report any bugs or feature requests via
-    https://github.com/SineSwiper/Types-Numbers/issues.
+  PositiveOrZeroInt
+
+    Accepts integers in the positive range, or zero.
+
+  NegativeNum
+
+    Accepts non-zero numbers in the negative range.
+
+  NegativeOrZeroNum
+
+    Accepts numbers in the negative range, or zero.
+
+  NegativeInt
+
+    Accepts non-zero integers in the negative range.
+
+  NegativeOrZeroInt
+
+    Accepts integers in the negative range, or zero.
+
+  SingleDigit
+
+    Accepts integers between -9 and 9.
 
 AUTHOR
 
-    Brendan Byrd <BBYRD@CPAN.org>
+    Grant Street Group <developers@grantstreet.com>
 
 COPYRIGHT AND LICENSE
 
-    This software is Copyright (c) 2013 by Brendan Byrd.
+    This software is Copyright (c) 2013 - 2021 by Grant Street Group.
 
     This is free software, licensed under:
 

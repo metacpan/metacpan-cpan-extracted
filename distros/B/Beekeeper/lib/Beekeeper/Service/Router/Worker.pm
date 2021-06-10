@@ -3,7 +3,7 @@ package Beekeeper::Service::Router::Worker;
 use strict;
 use warnings;
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 use AnyEvent::Impl::Perl;
 use Beekeeper::Worker ':log';
@@ -536,7 +536,7 @@ Beekeeper::Service::Router::Worker - Route messages between backend and frontend
 
 =head1 VERSION
  
-Version 0.04
+Version 0.05
 
 =head1 SYNOPSIS
 

@@ -2,7 +2,7 @@
 
 #  colsummary : TSVまたはCSVファイルの各列の値の様子を表示する。とても便利。
 #   2015/05/11 - 2016/07/05 , 2018-03-28 . Shimono Toshiyuki 
-#   2019/10/24, 2021/06/08 さらに大幅に書き替え 
+#   2019/10/24, 2021/06/08, 2021/06/11 さらに大幅に書き替え 
 
 use 5.014 ; 
 use strict ; 
@@ -10,7 +10,7 @@ use warnings ; # also confirmed on 5.011 5.014 5.018
 use autodie qw [ open ] ; 
 use Encode qw[ decode_utf8 encode_utf8 ] ; 
 use FindBin qw [ $Script ] ; 
-use Getopt::Std ; getopts 'R:g:i:jl:m:suz=!@:#:0:2:' => \my %o ;
+use Getopt::Std ; getopts 'R:c:g:i:jm:r:suv:z=!@:#:0:2:' => \my %o ;
 use List::Util qw/max min maxstr minstr/ ; 
 use POSIX qw/strtod/;
 use Scalar::Util qw/looks_like_number/;
@@ -36,16 +36,17 @@ my $optR0 = defined $o{R} && $o{R} eq 0 ;
 binmode *STDOUT , ':utf8' if $o{u} ; # これだけ全体で使う変数とは言いがたいかもしれないが、オプションの処理はこの節の前半にあるので。
 $| = 1 if $o{'!'} ;
 $o{g} //= 6 ; # if ( ! defined $o{g} ) ; # 取り出す数
-$o{'#'} = decode ( $o{'#'} ) if defined $o{'#'} ; 
+$o{r} //= "~" ; # 範囲を表す記号(出力で使う)
+$o{c} //= '|'  ; # 範囲を示す表示を複数繋げる記号(出力で使う)
+$o{'#'} = decode ( $o{'#'} ) if defined $o{'#'} ; # 除外する正規表現
 push @ARGV , '-' unless @ARGV ; # 標準入力の追加
 my $isep = $o{i} // "\t" ;  # 入力の区切り文字 $o{','} = do { $o{','} //= "\t" ; eval qq[qq[$o{','}]] } ;
 my $sec = $o{'@'} // 15 ; # 何秒ごとにレポートを表示させるか
-my $L = ',' ; # 出力によく現れる区切り文字列
 my $nc = 0 ; # 計数対象としなかったセルの数をカウント。
 my $rl ; # 各ファイルの読んだ行数を格納。
 my %fOut = (
-j =>  [ map {UNDERLINE decode($_)} qw[列番号 値の異なり 数値化平均 列名 値の範囲 最頻値 最頻値の度数 ..テールの度数(重なり) 桁数範囲 ] ] ,
-e =>  [ map {UNDERLINE $_ } qw[ cpos diff ave. name range frequent frequency ..lower(x_mul) digits] ] ) ; 
+j =>  [ map {UNDERLINE decode($_)} qw[列番号 値の異なり 数値化平均 列名 値の範囲 最頻値 最頻値の度数 $o{r}テールの度数(重なり) 桁数範囲 ] ] ,
+e =>  [ map {UNDERLINE $_ } qw[ cpos diff ave. name range frequent frequency ] , "$o{r}lower(x_mul)",  "digits" ] ) ; 
 
 ## シグナルに対する設定
 my ${ INT1 } = sub {
@@ -109,14 +110,14 @@ sub ColFreq ( $$ ) { # 第１変数はファイルハンドル 第２変数は�
   #my %zstr ; # 除外された文字列の出現頻度。(点検用でもある。)     #my $intflg ; #$SIG{INT} = sub { $intflg = 1 } ; 
   my $maxCols = 0 ;
   my $col = undef ; # 0オリジンのカラム番号
-  * lenlim = defined $o{l} ? sub { grep { $_ = substr $_, 0, $o{l} } @_ } : sub {} ; # -l で長さ制限
+  ## * lenlim = defined $o{v} ? sub { grep { $_ = substr $_, 0, $o{v} } @_ } : sub {} ; # -v で長さ制限 ## -v の制限は別の所で。
   * tailspacetrim = defined $o{s} ? sub { grep { s/\s+$// } @_ } : sub {} ; 
   * negcell = defined $o{'#'} ? sub { if (m/$o{'#'}/ ) { $col ++ ; $nc ++ ; goto EACH_CELL } }  : sub {} ; # o{'0'} をやめた
   for ( my $FH = $_[0] ; <$FH> ; $rl ++ ) {  # <-- - よくこんなコードを書いたと自分で思っている(2021-06-08)
     chomp ; 
     & R0proc ; 
     my @F = map { decode ( $_ ) } split /$isep/ , $_ , -1 ; 
-    & lenlim ( @F ) ; # 各セルの長さ制限
+    #& lenlim ( @F ) ; # 各セルの長さ制限
     & tailspacetrim ( @F ) ;
     $col = 0 ;
     EACH_CELL : 
@@ -143,17 +144,20 @@ sub ColStat ( $$ ) {
   sub minmaxstr ( $ ) ; # 配列参照から、最小値最大値を取り出す 
   my %thash = %{ $_[0] } ; #$colvals -> [$_] } ;  # 各列について、値の度数のハッシュをここで格納。
   my @vals  = keys %thash ;  # その列で1回以上出現した具体的なデータ値を可能。
+  my $last = join $o{c} , minmaxstr( \@{[map { length decode ($_) } @vals ]}  ) ; # 桁数範囲
+  push my @out, $_ + 1, scalar @vals, aveft ( \%thash , \@vals ), $_[1]//($_+1) ; # 列番号,濃度, 平均値, 列名(//列番号)
   my @skeys = splice @{[ sort{ $thash{$b} <=> $thash{$a} } @vals ]} , 0, $o{g} ; #高速化の対象か? 
+  if ( exists $o{v} ) { @vals = map { substr $_,0,$o{v} } @vals ; @skeys = map { substr $_,0,$o{v} } @skeys } ; # <-- -
   my %cct ; $cct{$_} ++ foreach values %thash ; # 度数のそのまた度数を格納するための変数
   my @kcct =  sort {$b <=> $a} keys %cct ;
   my @kcct1 = splice @kcct , 0,  min(  $o{g} ,$#kcct+1 ) ; # <- tricky! 
   my @kcct2 = splice @kcct , - min(  $o{g} ,$#kcct+1 ) ; # <- tricky! 
-  my @out ; 
-  push @out, $_ + 1, scalar @vals, aveft ( \%thash , \@vals ), $_[1]//($_+1) ; 
-  push @out ,  (join $L, minmaxstr \@vals) , (join$L, @skeys) ;
-  push @out ,  (join $L, MultSpec \@kcct1, \%cct) , (@kcct2? @kcct? '..' : $L : '' ) . (join $L , MultSpec \@kcct2, \%cct)  ; 
-  push @out ,  minmaxstr( \@{[map { length decode ($_) } @vals ]}  ) ;
-  AlignOut @out; # <-- この1行で、元の入力の1列の銃砲を出力
+  push @out , join $o{c}, minmaxstr \@vals ; # 出現値の範囲
+  push @out , join$o{c}, @skeys ; # 最頻値いくつか
+  push @out , join $o{c}, MultSpec \@kcct1, \%cct ; # 頻度の高い方
+  push @out , (@kcct2? @kcct? $o{r} : $o{c} : '' ) . (join $o{c} , MultSpec \@kcct2, \%cct)  ; # 頻度の低い方
+  push @out , $last ; # 桁数範囲
+  AlignOut @out; # <-- 元の入力の1列の情報が、出力1行に相当する。
   return ;
 }
 
@@ -204,15 +208,15 @@ sub  MultSpec ( $$ ) {
 sub minmaxstr ( $ ) {
   sub part ( &@ ) ; 
   sub RangeStr ( $$ ) ;
-  my @gps = part {$_ eq '' ? 0 : looks_like_number $_ ? 1 : 2}  @{ $_[0] } ; 
+  my @gps = part {$_ eq '' || $_ eq 0 ? 0 : looks_like_number $_ ? 1 : 2}  @{ $_[0] } ; 
   my @ostr ; 
-  push @ostr, '' if $gps[0] ;  # 空文字列があるときの処理  
+  push @ostr, join $o{r}, @{$gps[0]} if $gps[0] ;  # 空文字列があるときの処理  
   push @ostr, RangeStr( min(@{$gps[1]}), max(@{$gps[1]}) ) if $gps[1] ;  # 数に見える値があるときの処理 
   push @ostr, RangeStr( minstr(@{$gps[2]}), maxstr(@{$gps[2]}) ) if $gps[2] ; # 数に見えない値があるときの処理 
   return @ostr; 
 } ; 
 sub part ( &@ ) { my ($cd, @l) = @_ ; my @p ; push @{ $p[ $cd->($_) ] } , $_ for @l ; @p } ;  # この関数は List::MoreUtils 
-sub RangeStr ( $$ ) { $_[0] eq $_[1] ? "$_[0]" : "$_[0]..$_[1]" } # 2個の数or文字列から 1..2のような文字列を生成
+sub RangeStr ( $$ ) { $_[0] eq $_[1] ? "$_[0]" : "$_[0]$o{r}$_[1]" } # 2個の数or文字列から 1..2のような文字列を生成
 
 
 ## ヘルプの扱い
@@ -249,7 +253,7 @@ sub HELP_MESSAGE {
    (入力オプション)
   -=     ; 入力の最初の行が列名の並びと仮定。この指定をしない場合は列名は連番になる。
   -i STR : 区切り文字をタブ文字ではなくて、 str  に変更。
-  -l 10  ; 各セルの値の長さを指定文字数に制限する。(列名には適用されない。)
+  -v 10  ; 各セルの値の長さを指定文字数に制限する。(列名には適用されない。)
   -s     ; 各セルの末尾の空白を除去。-uがあると半角空白だけで無くて全角空白も除去。
   -u     ; utf-8 として処理することとする。 -u が指定されないと、バイト単位の処理となる。
   -z     ; 入力は gzip 圧縮されていることを仮定。
@@ -263,6 +267,8 @@ sub HELP_MESSAGE {
   -g N ;  具体的な値を何個表示させるか指定する。未指定なら6。
   -j : 出力の各列の名前を日本語で出力する。
   -m 0 ; 平均値を表示しない。(平均値は strtod を使っている。) 
+  -r str : 範囲を表す記号(未指定なら"~"の1文字)。-r ".." などと指定する。(rはRangeのつもり。)
+  -c str : 範囲を示す表示を複数を束ねるときに使う記号。未指定なら"|"。-c ','などとする。
    
   --help : この $0 のヘルプメッセージを出す。  perldoc -t $0 | cat でもほぼ同じ。
   --help opt : オプションのみのヘルプを出す。opt以外でも options と先頭が1文字以上一致すれば良い。

@@ -25,11 +25,11 @@ Interchange::Search::Solr -- Solr query encapsulation
 
 =head1 VERSION
 
-Version 0.20
+Version 0.21
 
 =cut
 
-our $VERSION = '0.20';
+our $VERSION = '0.21';
 
 =head1 DESCRIPTION
 
@@ -100,10 +100,34 @@ An arrayref of indexed fields to return. All by default.
 
 =head2 facets
 
-A string or an arrayref with the fields which will generate a facet.
+An arrayref with the fields which will generate a facet.
 Defaults to
 
  [qw/suchbegriffe manufacturer/]
+
+=head2 facet_ranges
+
+An optional arrayref of hashrefs with the facet ranges (tipically, a price).
+
+The structure must have these these keys:
+
+  {
+   name => String,
+   start => Int,
+   end => Int,
+   gap => Int,
+  }
+
+Name is the name of the field which needs to generate a range facet.
+start, end and gap are, in this order, lower bound, upper bound, span
+of each range.
+
+See: L<https://solr.apache.org/guide/8_8/faceting.html#range-faceting>
+
+When searching, the field should have exactly two numeric arguments,
+e.g. "/price/1/100" (from 1 to 100).
+
+So far only integers are supported.
 
 =head2 start
 
@@ -160,6 +184,11 @@ The url fragment to toggle this filter.
 True if currently in use (to be used for, e.g., checkboxes)
 
 =back
+
+=head2 facet_ranges_found
+
+Return the range facets, same as for the C<facets_found> method, but
+in the structure only name and count are found.
 
 =head2 search_string
 
@@ -274,6 +303,20 @@ has facets => (is => 'rw',
                    return [qw/suchbegriffe manufacturer/];
                });
 
+has facet_ranges => (is => 'rw',
+                     isa => sub {
+                         die "not an arrayref" unless ref($_[0]) eq 'ARRAY';
+                         foreach my $i (@{$_[0]}) {
+                             die "Missing name in facet range definition" unless $i->{name};
+                         }
+                     },
+                     default => sub { [] },
+                    );
+
+sub _facet_range_names {
+    return map { $_->{name} } @{ shift->facet_ranges };
+}
+
 has rows => (is => 'rw',
              default => sub { 10 });
 
@@ -371,7 +414,7 @@ sub builder_object {
     return Interchange::Search::Solr::Builder->new(
         terms   => $terms,
         filters => $filters,
-        facets  => $self->facets,
+        facets  => [ @{$self->facets}, $self->_facet_range_names ],
         page    => $page
     );
 }
@@ -521,9 +564,9 @@ sub execute_query {
         my $res = $self->solr_object->search($querystring, \%params);
         $our_res = Interchange::Search::Solr::Response->new($res->raw_response);
 
-	if ($our_res->solr_status != 0) {
-	    die "Solr failure: ".$our_res->raw_response->message;
-	}
+        unless ( $our_res->success ) {
+            die "Solr failure: " . $our_res->exception_message;
+        }
     }
     $self->_set_response($our_res);
     $self->permit_empty_search(0);
@@ -544,7 +587,7 @@ sub construct_params {
                   rows => $self->_rows
                  );
 
-
+    my @fq;
     if (my $facet_field = $self->facets) {
         $params{facet} = 'true';
         $params{'facet.field'} = $facet_field;
@@ -552,7 +595,6 @@ sub construct_params {
 
         # see if we have filters set
         if (my $filters = $self->filters) {
-            my @fq;
             foreach my $facet (@{ $self->facets }) {
                 if (my $condition = $filters->{$facet}) {
                     push @fq,
@@ -561,11 +603,47 @@ sub construct_params {
                                                    });
                 }
             }
-            if (@fq) {
-                $params{fq} = \@fq;
+        }
+    }
+
+    if (my $facet_ranges = $self->facet_ranges) {
+        # these are the settings for the ranges.
+        my @ranges;
+        foreach my $fr (@$facet_ranges) {
+            my $f = $fr->{name};
+            die "Facet range must have a name!" unless $f;
+            foreach my $k (qw/start end gap method/) {
+                if (defined $fr->{$k}) {
+                    $params{"f.$f.facet.range.$k"} = $fr->{$k};
+                }
+            }
+            push @ranges, $f;
+        }
+        if (@ranges) {
+            $params{facet} = 'true';
+            $params{'facet.range'} = \@ranges;
+            # see if we have filters set
+            if (my $filters = $self->filters) {
+                foreach my $facet (@ranges) {
+                    if (my $condition = $filters->{$facet}) {
+                        my ($from, $to) = @$condition;
+                        if (defined $from and
+                            defined $to and
+                            $from =~ m/\A[1-9][0-9]*\z/ and
+                            $to   =~ m/\A[1-9][0-9]*\z/) {
+                            my $range = "[${from} TO ${to}]";
+                            push @fq, "$facet:$range";
+                        }
+                    }
+                }
             }
         }
     }
+    if (@fq) {
+        $params{fq} = \@fq;
+    }
+
+
     if (my $sort_by = $self->sorting) {
         my $sort_by_struct;
         if (ref($sort_by)) {
@@ -650,6 +728,32 @@ sub facets_found {
     return \%out;
 }
 
+sub facet_ranges_found {
+    my $self = shift;
+    my %out;
+    if (my $facets = $self->response->content->{facet_counts}->{facet_ranges}) {
+        foreach my $field (keys %$facets) {
+            if (my $range = $facets->{$field}) {
+                if (my $counts = $range->{counts}) {
+                    if (ref($counts) eq 'ARRAY') {
+                        my @items;
+                        my @list = @$counts;
+                        while (@list > 1) {
+                            my $value = shift @list;
+                            my $count = shift @list;
+                            push @items, {
+                                          name => $value,
+                                          count => $count,
+                                         };
+                        }
+                        $out{$field} = [ sort { $a->{name} <=> $b->{name} } @items ];
+                    }
+                }
+            }
+        }
+    }
+    return \%out;
+}
 
 sub has_more {
     my $self = shift;
@@ -848,6 +952,10 @@ Reset the leftovers of a possible previous search.
 
 Parse the url provided and do the search.
 
+=head2 safe_search_from_url($url)
+
+Same as above, but safe from crashes (wrapped in eval)
+
 =cut
 
 sub reset_object {
@@ -870,6 +978,21 @@ sub search_from_url {
     # at this point, all the parameters are set after the url parsing
     return $self->_do_search;
 }
+
+sub safe_search_from_url {
+    my ($self, $url) = @_;
+    my $res;
+    eval { $res = $self->search_from_url($url) };
+    return $res;
+}
+
+
+=head2 reset_facet_url($facet_name)
+
+Return an URL which should reset the facet passed as argument.
+
+See you searched for "/color/blue/price/1/12", this would return
+"/color/blue"
 
 =head2 add_terms_to_url($url, $string)
 
@@ -967,7 +1090,7 @@ sub _parse_url {
 sub _fragment_is_keyword {
     my ($self, $fragment) = @_;
     return unless defined $fragment;
-    return grep { $_ eq $fragment } @{ $self->facets };
+    return grep { $_ eq $fragment } (@{ $self->facets }, $self->_facet_range_names);
 }
 
 
@@ -998,6 +1121,16 @@ sub current_search_to_url {
     return $builder->url_builder;
 }
 
+sub reset_facet_url {
+    my ($self, $facet) = @_;
+    my @terms = @{ $self->search_terms };
+    my $filters = $self->filters;
+    # copy
+    my %toggled_filters = %{ $self->filters };
+    delete $toggled_filters{$facet};
+    return $self->builder_object(\@terms, \%toggled_filters)->url_builder;
+}
+
 sub _build_facet_url {
     my ($self, $field, $name) = @_;
     # get the current filters
@@ -1012,7 +1145,7 @@ sub _build_facet_url {
     my $filters = $self->filters;
 
     # loop over the facets we defined
-    foreach my $facet (@{ $self->facets }) {
+    foreach my $facet (@{ $self->facets }, $self->_facet_range_names) {
 
         # copy of the active filters
         my @active = @{ $filters->{$facet} || [] };
@@ -1252,6 +1385,19 @@ sub breadcrumbs {
                 }
             }
         }
+        foreach my $facet ($self->_facet_range_names) {
+            if (my $terms = $filters->{$facet}) {
+                my ($start, $end) = @$terms;
+                $start ||= '*';
+                $end ||= '*';
+                $current_uri .= "/$facet/$start/$end";
+                push @pieces, {
+                               uri => $current_uri,
+                               label => "$start-$end",
+                               facet => $facet,
+                              };
+            }
+        }
     }
     return @pieces;
 }
@@ -1417,7 +1563,7 @@ Mohammad S Anwar (GH #14).
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2014-2019 Marco Pessotto, Stefan Hornburg (Racke).
+Copyright 2014-2021 Marco Pessotto, Stefan Hornburg (Racke).
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of the the Artistic License (2.0). You may obtain a

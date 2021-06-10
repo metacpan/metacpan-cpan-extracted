@@ -1,3 +1,10 @@
+
+** 0.29 / 2021-06-09
+   - Update version number everywhere instead of just in dist.ini
+
+** 0.28 / 2021-06-09
+   - Use a javascript workaround to get textarea value to fix Firefox problem
+
 ** 0.27 / 2020-12-19
    - Rely on driver to get input checkbox & radio selected state
 

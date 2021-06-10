@@ -4,8 +4,6 @@ use Test::More;
 use Bitcoin::Crypto::Helpers qw(pad_hex);
 use Bitcoin::Crypto::Config;
 
-$config{compress_public_point} = 0;
-
 BEGIN { use_ok('Bitcoin::Crypto::Key::Public') }
 
 my $PublicKey = "Bitcoin::Crypto::Key::Public";
@@ -89,7 +87,7 @@ my $pub_compressed =
 my $random_pub = $PublicKey->from_hex((keys %cases)[0]);
 my $sig = pack "H*",
 	pad_hex(
-		"3044022031731fbf940cffc6b72298b8775b12603fe16844a65983fb46b5fa8cf5d9e9bd022064625366f834314f8aef02aedc241a9b393d1f43887875f663b1be7080bae5c5"
+	"3044022031731fbf940cffc6b72298b8775b12603fe16844a65983fb46b5fa8cf5d9e9bd022064625366f834314f8aef02aedc241a9b393d1f43887875f663b1be7080bae5c5"
 	);
 
 ok($pub->verify_message($message, $sig), "verified message correctly");

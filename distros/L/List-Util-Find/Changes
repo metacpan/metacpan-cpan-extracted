@@ -1,0 +1,17 @@
+0.003   2021-06-10  Released-By: PERLANCAR; Urgency: low
+
+	- No functional changes.
+
+	- [doc] Mention short-circuiting.
+
+
+0.002   2021-05-26  Released-By: PERLANCAR; Urgency: medium
+
+        - No functional changes.
+
+	- Forgot to check in some code (documentation).
+
+
+0.001   2021-05-26  Released-By: PERLANCAR
+
+        - First version.

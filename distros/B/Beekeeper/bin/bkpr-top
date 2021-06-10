@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 $ENV{PATH} = '/bin:/usr/bin'; # untaint
 
@@ -248,7 +248,7 @@ bkpr-top - Display real-time performance metrics of running workers
 
 =head1 VERSION
 
-Version 0.04
+Version 0.05
 
 =head1 SYNOPSIS
 

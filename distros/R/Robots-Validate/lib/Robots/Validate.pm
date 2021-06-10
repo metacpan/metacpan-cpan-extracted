@@ -17,7 +17,7 @@ use Types::Standard -types;
 
 use namespace::autoclean;
 
-our $VERSION = 'v0.2.2';
+our $VERSION = 'v0.2.3';
 
 
 has resolver => (
@@ -108,6 +108,18 @@ sub _build_robots {
             name   => 'Mojeek',
             agent  => qr/\bMojeekBot\b/,
             domain => qr/\.mojeek\.com$/,
+        },
+
+        {
+            name   => 'Neevabot',
+            agent  => qr/\bNeevabot\b/,
+            domain => qr/\.neevabot\.com$/,
+        },
+
+        {
+            name   => 'PetalBot',
+            agent  => qr/\bPetalBot\b/,
+            domain => qr/\.petalsearch\.com$/,
         },
 
         {
@@ -230,7 +242,7 @@ Robots::Validate - Validate that IP addresses are associated with known robots
 
 =head1 VERSION
 
-version v0.2.2
+version v0.2.3
 
 =head1 SYNOPSIS
 

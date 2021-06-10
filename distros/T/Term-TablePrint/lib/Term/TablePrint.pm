@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.008003;
 
-our $VERSION = '0.134';
+our $VERSION = '0.135';
 use Exporter 'import';
 our @EXPORT_OK = qw( print_table );
 
@@ -292,6 +292,9 @@ sub __write_table {
             elsif ( $self->{grid} == 2 ) {
                 push @{$vw->{header}}, $header_sep, $col_names, $header_sep;
             }
+            else {
+                push @{$vw->{header}},              $col_names;
+            }
         }
         else {
             if ( $self->{grid} == 1 ) {
@@ -299,6 +302,9 @@ sub __write_table {
             }
             elsif ( $self->{grid} == 2 ) {
                 unshift @{$vw->{print_table}}, $header_sep, $col_names, $header_sep;
+            }
+            else {
+                unshift @{$vw->{print_table}},              $col_names;
             }
         }
         if ( $cc->{info_row} ) {
@@ -324,6 +330,9 @@ sub __write_table {
                 }
                 elsif ( $self->{grid} == 2 ) {
                     unshift @filtered_idxs_print_table, 0, 1, 2;
+                }
+                else {
+                    unshift @filtered_idxs_print_table, 0;
                 }
             }
         }
@@ -392,7 +401,7 @@ sub __write_table {
                         if ( $row_is_expanded ) {
                             return $return;
                         }
-                        if ( $auto_jumped_to_first_row == 1 ) { # && $self->{tbl_exp_fast_back} ) {
+                        if ( $auto_jumped_to_first_row == 1 ) {
                             return $return;
                         }
                     }
@@ -883,7 +892,7 @@ Term::TablePrint - Print a table to the terminal and browse it interactively.
 
 =head1 VERSION
 
-Version 0.134
+Version 0.135
 
 =cut
 
@@ -1018,14 +1027,12 @@ enabled.
 
 =back
 
-If the size of the window is changed, the screen is rewritten as soon as the user presses a key.
+If the size of the window has changed, the screen is rewritten as soon as the user presses a key.
 
 The C<F3> key opens a prompt. A regular expression is expected as input. This enables one to only display rows where at
 least one column matches the entered pattern. See option L</f3>.
 
 =head2 OPTIONS
-
-Defaults may change in a future release.
 
 =head3 prompt
 

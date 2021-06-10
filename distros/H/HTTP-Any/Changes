@@ -1,6 +1,9 @@
 Revision history for Perl extension HTTP::Any.
 
-0.12  20211-01-11
+0.13  2021-06-10
+    - deflate
+
+0.12  2021-01-11
 	- fix eval for curl perform
 	- remove bad fix for bad server headers
 

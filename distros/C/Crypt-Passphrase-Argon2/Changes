@@ -1,5 +1,8 @@
 Revision history for Crypt-Passphrase-Argon2
 
+0.003     2021-06-10 21:37:41+02:00 Europe/Amsterdam
+          - Improved documentation.
+
 0.002     2021-03-08 18:39:54+01:00 Europe/Amsterdam
           - Explicitly require Crypt::Argon2 0.009
 

@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 BEGIN {
 
@@ -104,7 +104,7 @@ bkpr-restart - Gracefully restart remote pool of workers
 
 =head1 VERSION
 
-Version 0.04
+Version 0.05
 
 =head1 SYNOPSIS
 

@@ -1,0 +1,16 @@
+use warnings;
+use strict;
+
+use IPC::Shareable;
+
+IPC::Shareable->spawn(
+    key     => 'aaaa'
+);
+
+sleep 1;
+
+tie my %h, 'IPC::Shareable', {
+    key => 'aaaa',
+};
+
+$h{t70}->[1] = 5;

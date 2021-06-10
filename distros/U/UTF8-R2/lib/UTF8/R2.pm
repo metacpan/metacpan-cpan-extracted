@@ -11,7 +11,7 @@ package UTF8::R2;
 use 5.00503;    # Universal Consensus 1998 for primetools
 # use 5.008001; # Lancaster Consensus 2013 for toolchains
 
-$VERSION = '0.18';
+$VERSION = '0.19';
 $VERSION = $VERSION;
 
 use strict;
@@ -139,7 +139,7 @@ sub confess {
     }
     print STDERR "\n", @_, "\n";
     print STDERR CORE::reverse @confess;
-    exit;
+    die;
 }
 
 #---------------------------------------------------------------------
@@ -252,24 +252,9 @@ sub UTF8::R2::ord (;$) {
 }
 
 #---------------------------------------------------------------------
-# qr/ \x{UTF8hex} / for UTF-8 codepoint string
-sub _utf8_hex {
-    my($codepoint) = @_;
-
-    # \x{UTF8hex}
-    if ((my($hexcode) = $codepoint =~ /\A \\x \{ ([01234567890ABCDEFabcdef]+) \} \z/x)) {
-        return UTF8::R2::chr(hex $hexcode);
-    }
-    else {
-        return $codepoint;
-    }
-}
-
-#---------------------------------------------------------------------
 # qr/ [A-Z] / for UTF-8 codepoint string
-sub _list_all_by_hyphen_utf8_like {
-    my($a,$b) = map { _utf8_hex($_) } @_;
-
+sub list_all_by_hyphen_utf8_like {
+    my($a, $b) = @_;
     my @a = (undef, unpack 'C*', $a);
     my @b = (undef, unpack 'C*', $b);
 
@@ -407,14 +392,14 @@ sub UTF8::R2::qr ($) {
 
     my @after_subregex = ();
     while ($before_regex =~ s! \A
-        (?> \[ (?: \[:[^:]+?:\] | \\x\{[01234567890ABCDEFabcdef]+\} | \\c[\x00-\xFF] | (?>\\$x) | $x )+? \] ) |
-                                  \\x\{[01234567890ABCDEFabcdef]+\} | \\c[\x00-\xFF] | (?>\\$x) | $x
+        (?> \[ (?: \[:[^:]+?:\] | \\x\{[0123456789ABCDEFabcdef]+\} | \\c[\x00-\xFF] | (?>\\$x) | $x )+? \] ) |
+                                  \\x\{[0123456789ABCDEFabcdef]+\} | \\c[\x00-\xFF] | (?>\\$x) | $x
     !!x) {
         my $before_subregex = $&;
 
         # [^...] or [...]
         if (my($negative,$before_class) = $before_subregex =~ /\A \[ (\^?) ((?>\\$x|$x)+?) \] \z/x) {
-            my @before_subclass = $before_class =~ /\G (?: \[:.+?:\] | \\x\{[01234567890ABCDEFabcdef]+\} | (?>\\$x) | $x ) /xg;
+            my @before_subclass = $before_class =~ /\G (?: \[:.+?:\] | \\x\{[0123456789ABCDEFabcdef]+\} | (?>\\$x) | $x ) /xg;
             my @sbcs = ();
             my @mbcs = ();
 
@@ -423,14 +408,19 @@ sub UTF8::R2::qr ($) {
 
                 # hyphen of [A-Z] or [^A-Z]
                 if (($i < $#before_subclass) and ($before_subclass[$i+1] eq '-')) {
-                    push @mbcs, _list_all_by_hyphen_utf8_like($before_subclass[$i], $before_subclass[$i+2]);
+                    my $a = ($before_subclass[$i+0] =~ /\A \\x \{ ([0123456789ABCDEFabcdef]+) \} \z/x) ? UTF8::R2::chr(hex $1) : $before_subclass[$i+0];
+                    my $b = ($before_subclass[$i+2] =~ /\A \\x \{ ([0123456789ABCDEFabcdef]+) \} \z/x) ? UTF8::R2::chr(hex $1) : $before_subclass[$i+2];
+                    push @mbcs, list_all_by_hyphen_utf8_like($a, $b);
                     $i += 3;
                 }
 
                 # any "one"
                 else {
-                    $before_subclass = _utf8_hex($before_subclass);
-                    if (0) { }
+
+                    # \x{UTF8hex}
+                    if ($before_subclass =~ /\A \\x \{ ([0123456789ABCDEFabcdef]+) \} \z/x) {
+                        push @mbcs, UTF8::R2::chr(hex $1);
+                    }
 
                     # \any
                     elsif ($before_subclass eq '\D'         ) { push @mbcs, "(?:(?![$bare_d])$x)"  }
@@ -544,8 +534,15 @@ sub UTF8::R2::qr ($) {
             push @after_subregex, $before_subregex;
         }
 
+        # \x{UTF8hex}
+        elsif ($before_subregex =~ /\A \\x \{ ([0123456789ABCDEFabcdef]+) \} \z/x) {
+            push @after_subregex, UTF8::R2::chr(hex $1);
+        }
+
         # else
-        else { push @after_subregex, _utf8_hex($before_subregex) }
+        else {
+            push @after_subregex, $before_subregex;
+        }
     }
 
     my $after_regex = join '', @after_subregex;
@@ -682,7 +679,7 @@ END
 
 #---------------------------------------------------------------------
 # tr/A-C/1-3/ for UTF-8 codepoint
-sub _list_all_ASCII_by_hyphen {
+sub list_all_ASCII_by_hyphen {
     my @hyphened = @_;
     my @list_all = ();
     for (my $i=0; $i <= $#hyphened; ) {
@@ -690,6 +687,8 @@ sub _list_all_ASCII_by_hyphen {
             ($i+1 < $#hyphened)      and
             ($hyphened[$i+1] eq '-') and
         1) {
+            $hyphened[$i+0] = ($hyphened[$i+0] eq '\\-') ? '-' : $hyphened[$i+0];
+            $hyphened[$i+2] = ($hyphened[$i+2] eq '\\-') ? '-' : $hyphened[$i+2];
             if (0) { }
             elsif ($hyphened[$i+0] !~ m/\A [\x00-\x7F] \z/oxms) {
                 confess sprintf(qq{@{[__FILE__]}: "$hyphened[$i+0]-$hyphened[$i+2]" in tr/// is not ASCII});
@@ -706,7 +705,12 @@ sub _list_all_ASCII_by_hyphen {
             }
         }
         else {
-            push @list_all, $hyphened[$i];
+            if ($hyphened[$i] eq '\\-') {
+                push @list_all, '-';
+            }
+            else {
+                push @list_all, $hyphened[$i];
+            }
             $i++;
         }
     }
@@ -717,8 +721,8 @@ sub _list_all_ASCII_by_hyphen {
 # tr/// for UTF-8 codepoint string
 sub UTF8::R2::tr ($$$;$) {
     my @x           = $_[0] =~ /\G$x/g;
-    my @search      = _list_all_ASCII_by_hyphen($_[1] =~ /\G$x/g);
-    my @replacement = _list_all_ASCII_by_hyphen($_[2] =~ /\G$x/g);
+    my @search      = list_all_ASCII_by_hyphen($_[1] =~ /\G(\\-|$x)/xmsg);
+    my @replacement = list_all_ASCII_by_hyphen($_[2] =~ /\G(\\-|$x)/xmsg);
     my %modifier    = (defined $_[3]) ? (map { $_ => 1 } CORE::split //, $_[3]) : ();
 
     my %tr = ();

@@ -1,5 +1,5 @@
 package Crypt::Passphrase::Argon2;
-$Crypt::Passphrase::Argon2::VERSION = '0.002';
+$Crypt::Passphrase::Argon2::VERSION = '0.003';
 use strict;
 use warnings;
 
@@ -70,7 +70,13 @@ Crypt::Passphrase::Argon2 - An Argon2 encoder for Crypt::Passphrase
 
 =head1 VERSION
 
-version 0.002
+version 0.003
+
+=head1 DESCRIPTION
+
+This class implements an Argon2 encoder for Crypt::Passphrase. It is the recommended password encoder as of 2021.
+
+The default settings are taken from the intermediate profile of libsodium's password hashing. You are highly encouraged to come up with your own settings: Crypt::Argon2 contains a C<argon2-calibrate> tool to assist you in this.
 
 =head1 METHODS
 

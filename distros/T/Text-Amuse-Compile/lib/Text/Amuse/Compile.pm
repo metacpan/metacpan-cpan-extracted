@@ -31,11 +31,11 @@ Text::Amuse::Compile - Compiler for Text::Amuse
 
 =head1 VERSION
 
-Version 1.62
+Version 1.63
 
 =cut
 
-our $VERSION = '1.62';
+our $VERSION = '1.63';
 
 =head1 SYNOPSIS
 
@@ -634,7 +634,7 @@ sub _compile_file {
 # write the  status file and unlock it after that.
 
 sub _write_status_file {
-    my ($self, $fh, $status) = @_;
+    my ($self, $fh, $status, @diagnostics) = @_;
     my $localtime = localtime();
     my %avail = (
                  FAILED => 1,
@@ -643,6 +643,12 @@ sub _write_status_file {
                 );
     die unless $avail{$status};
     print $fh "$status $$ $localtime\n";
+    if (@diagnostics) {
+        print $fh "\n";
+        foreach my $diag (@diagnostics) {
+            print $fh "$diag\n";
+        }
+    }
     flock($fh, LOCK_UN) or die "Cannot unlock status file\n";
     close $fh;
 }
@@ -689,7 +695,7 @@ sub _muse_compile {
         }
     }
     if (@fatals) {
-        $self->_write_status_file($fhlock, 'FAILED');
+        $self->_write_status_file($fhlock, 'FAILED', @fatals);
         die join(" ", @fatals);
     }
     else {

@@ -2,7 +2,7 @@ package App::perlimports::Role::Logger;
 
 use Moo::Role;
 
-our $VERSION = '0.000008';
+our $VERSION = '0.000009';
 
 use Types::Standard qw( InstanceOf );
 
@@ -29,7 +29,7 @@ App::perlimports::Role::Logger - Provide a logger attribute to App::perlimports 
 
 =head1 VERSION
 
-version 0.000008
+version 0.000009
 
 =head1 AUTHOR
 

@@ -41,6 +41,7 @@ t/epub-meta.t
 t/epub-toc.t
 t/epub.t
 t/failures-2.t
+t/failures-3.t
 t/failures.t
 t/filenames.t
 t/fonts-compat.t

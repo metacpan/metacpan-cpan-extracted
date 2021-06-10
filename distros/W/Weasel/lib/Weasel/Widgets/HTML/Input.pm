@@ -5,7 +5,7 @@ Weasel::Widgets::HTML::Input - Parent of the INPUT, OPTION, TEXTAREA and BUTTON 
 
 =head1 VERSION
 
-0.02
+0.28
 
 =head1 SYNOPSIS
 
@@ -81,7 +81,12 @@ sub value {
         $self->clear;
         $self->send_keys($value);
     }
-
+    if ( $self->tag_name eq 'textarea') {
+        return $self->session->driver->execute_script(qq{
+            var elem = arguments[0];
+            return elem.value;
+        },$self->_id);
+    }
     return $self->session->get_attribute($self, 'value');
 }
 
@@ -126,4 +131,3 @@ Licensed under the same terms as Perl.
 __PACKAGE__->meta->make_immutable;
 
 1;
-

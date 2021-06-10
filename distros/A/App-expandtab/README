@@ -1,0 +1,12 @@
+
+This module provides a Unix-like command `expandtab'.
+
+=head1 DESCRIPTION
+
+
+Text::VisualWidth を利用して、全角文字が混ざっていても、さらにはASCIIカラーコード付きの文字が混ざっていても、TSV形式(タブ区切り)のテキストデータに対して、各列が同じ位置に揃うように出力する。
+
+
+ Copyright (c) 2021 Toshiyuki SHIMONO. All rights reserved.
+ This program is free software; you can redistribute it and/or
+ modify it under the same terms as Perl itself.

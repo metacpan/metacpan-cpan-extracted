@@ -1,0 +1,79 @@
+#!/usr/bin/env perl
+use warnings;
+use strict;
+use App::Dex;
+use Pod::Usage qw(pod2usage);
+
+if ( @ARGV && ( $ARGV[0] eq '--help' || $ARGV[0] eq '-h' ) ) {
+    pod2usage( -verbose => 2 );
+}
+
+my $app = App::Dex->new;
+
+if ( @ARGV ) {
+    $app->process_block( $app->resolve_block( [ @ARGV ] ) );
+} else {
+    $app->display_menu;
+}
+
+=pod
+
+=encoding utf8
+
+=head1 NAME
+
+dex - Directory Exec
+
+=head1 DESCRIPTION
+
+B<dex> is a command line utility to simply repeative tasks by defining them in
+the specific directory you should be in when running them.
+
+Running dex from a directory with a F<.dex.yaml> or F<dex.yaml> file will
+present you with the list of named commands.
+
+
+ dev                     : Control a local development server.
+     start                   : Start a local development server on docker.
+     stop                    : Stop a local development server on docker.
+     status                  : Show the status of the local development server.
+     reset                   : Delete the database volume.
+ test                    : Run the tests.
+
+
+Top level commands have no indentation. Each level of indentation is a child 
+command.  For instance you would run C<dex dev start> to trigger 
+I<Start a local development server on docker>, but only C<dex test> to trigger 
+I<Run the tests>.
+
+=head1 DEX FILE SPEC
+
+Dex uses YAML and expects the following format:
+
+ ---
+ - name: CommandName
+   desc: CommandDescription
+   shell:
+     - Shell String    
+     - Shell String  
+   children:  
+     - name: SubCommandName
+       desc: SubCommandDescription
+       shell:
+         - Shell String
+
+The structure is infinitely nestable by adding a C<children> attribute, the
+following are supported attributes:
+
+=over 4
+
+=item * name: The name that can be used on the command line to invoke the block
+
+=item * desc: The description given in the menu
+
+=item * shell: An array of shell commands to run
+
+=item * children: An array that takes all of the same arguments, use for subcommands
+
+=back
+

@@ -3,7 +3,7 @@ package Beekeeper::Service::Router;
 use strict;
 use warnings;
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 use Exporter 'import';
 
@@ -74,7 +74,7 @@ Beekeeper::Service::Router - Route messages between backend and frontend buses
 
 =head1 VERSION
 
-Version 0.04
+Version 0.05
 
 =head1 SYNOPSIS
 

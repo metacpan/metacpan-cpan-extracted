@@ -1,42 +1,36 @@
 {
-   "abstract" : "A command transforming from CSV to TSV handling tab/line-ends with escaping, durable for reverse operation.",
+   "abstract" : "unknown",
    "author" : [
-      "\"Toshiyuki Shimono\" <bin4tsv@gmail.com>"
+      "Toshiyuki SHIMONO (bin4tsv at gmail.com)"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4224",
+   "generated_by" : "ExtUtils::MakeMaker version 7.48, CPAN::Meta::Converter version 2.143240",
    "license" : [
-      "gpl_3"
+      "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
       "version" : 2
    },
    "name" : "App-csv2tsv",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
    "prereqs" : {
       "build" : {
          "requires" : {
-            "Test::More" : "0"
+            "ExtUtils::MakeMaker" : "0"
          }
       },
       "configure" : {
          "requires" : {
-            "Module::Build" : "0"
+            "ExtUtils::MakeMaker" : "0"
          }
       }
    },
-   "provides" : {
-      "App::csv2tsv" : {
-         "file" : "lib/App/csv2tsv.pm",
-         "version" : "0.56"
-      }
-   },
    "release_status" : "stable",
-   "resources" : {
-      "license" : [
-         "http://www.gnu.org/licenses/gpl-3.0.txt"
-      ]
-   },
-   "version" : "0.56",
-   "x_serialization_backend" : "JSON::PP version 2.97001"
+   "version" : "0.58"
 }

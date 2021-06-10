@@ -2,13 +2,13 @@
 
 % content_for head => begin
   <script>
-    var chart;
-    var historychart;
-    var backlog = 0;
+    let chart;
+    let historychart;
+    let backlog = 0;
     function pageStats(data) {
       $('.minion-stats-uptime').text(Math.round(data.uptime / 86400));
       $('.minion-stats-delayed-jobs').text(data.delayed_jobs);
-      var proc = data.enqueued_jobs - (data.inactive_jobs + data.active_jobs);
+      const proc = data.enqueued_jobs - (data.inactive_jobs + data.active_jobs);
       $('.minion-stats-processed-jobs').text(proc);
       backlog = data.active_jobs + (data.inactive_jobs - data.delayed_jobs);
     }
@@ -19,9 +19,7 @@
           axes: ['bottom', 'left'],
           windowSize: 120,
           historySize: 0,
-          tickFormats: {
-            bottom: function (d) { return moment(d).format('HH:mm') }
-          },
+          tickFormats: { bottom: d => moment(d).format('HH:mm') },
           data: [{
             label: 'Inactive Jobs',
             values: [{time: new Date().getTime(), y: backlog}]
@@ -35,8 +33,8 @@
     }
     function updateHistoryChart() {
       $.get('<%= url_for 'minion_history' %>').done(function (data) {
-        var hour;
-        var historylog = [];
+        let hour;
+        let historylog = [];
         for (hour = 0; hour < data.daily.length; hour++) { 
           historylog.push({
             x: new Date(data.daily[hour].epoch * 1000).getTime(),
@@ -47,7 +45,7 @@
           historychart = $('#history-chart').epoch({
             type: 'bar',
             tickFormats: {
-              bottom: function (d) { return moment(d).format('HH:00') }
+              bottom: d => moment(d).format('HH:00')
             },
             data: [{
               label: 'processed',
@@ -55,11 +53,11 @@
             }]
           });
         }
-        else { historychart.update([{label: 'processed', values: historylog}]) }
+        else { historychart.update([{ label: 'processed', values: historylog }]) }
         setTimeout(updateHistoryChart, 1000 * 60 * 10);
-      }).fail(function () { setTimeout(updateHistoryChart, 1000 * 60) });
+      }).fail(() => { setTimeout(updateHistoryChart, 1000 * 60) })
     }
-    $(function () {
+    $(() => {
       updateBacklogChart();
       updateHistoryChart();
     });

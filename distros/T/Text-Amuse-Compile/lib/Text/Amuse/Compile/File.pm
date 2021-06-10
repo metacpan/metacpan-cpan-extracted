@@ -1071,7 +1071,7 @@ HTML
 
     # attachments
     foreach my $att ($text->attachments) {
-        $self->log_fatal("$att doesn't exist!") unless -f $att;
+        $self->log_fatal("Referenced file $att does not exist!") unless -f $att;
         $epub->copy_file($att, $att, $self->_mime_for_attachment($att));
     }
     # finish
@@ -1181,7 +1181,8 @@ sub log_info {
 sub log_fatal {
     my ($self, @info) = @_;
     $self->log_info(@info);
-    die "Fatal exception\n";
+    my $failure = join("\n", @info) || "Fatal exception";
+    die "$failure\n";
 }
 
 sub parse_tex_log_file {

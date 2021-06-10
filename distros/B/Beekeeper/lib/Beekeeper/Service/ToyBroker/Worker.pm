@@ -3,7 +3,7 @@ package Beekeeper::Service::ToyBroker::Worker;
 use strict;
 use warnings;
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 use AnyEvent::Impl::Perl;
 use Beekeeper::Worker ':log';
@@ -107,7 +107,7 @@ sub start_listener {
     my ($self, $listener) = @_;
     weaken($self);
 
-    my $max_packet_size = $listener->{'max_packet_size'} || 65536;
+    my $max_packet_size = $listener->{'max_packet_size'};
 
     my $addr = $listener->{'listen_addr'} || '127.0.0.1';  # Must be an IPv4 or IPv6 address
     my $port = $listener->{'listen_port'} ||  1883;
@@ -157,7 +157,7 @@ sub start_listener {
                             redo if ($offs < 5);
                         }
 
-                        if ($packet_len > $max_packet_size) {
+                        if ($max_packet_size && $packet_len > $max_packet_size) {
                             $self->disconnect($fh, reason_code => 0x95);
                             return;
                         }
@@ -1265,7 +1265,8 @@ sub unsubscribe_client {
 }
 
 
-package Beekeeper::Service::ToyBroker::Client;
+package
+    Beekeeper::Service::ToyBroker::Client;   # hide from PAUSE
 
 sub new {
     my ($class, %args) = @_;
@@ -1331,7 +1332,8 @@ sub resend_unacked_messages {
 }
 
 
-package Beekeeper::Service::ToyBroker::TopicFilter;
+package
+    Beekeeper::Service::ToyBroker::TopicFilter;   # hide from PAUSE
 
 sub new {
     my ($class, $topic_filter) = @_;
@@ -1397,7 +1399,8 @@ sub remove_shared_subscription {
 }
 
 
-package Beekeeper::Service::ToyBroker::Subscription;
+package
+    Beekeeper::Service::ToyBroker::Subscription;   # hide from PAUSE
 
 sub new {
     my $class = shift;
@@ -1436,7 +1439,8 @@ sub send_message {
 }
 
 
-package Beekeeper::Service::ToyBroker::SharedSubscription;
+package
+    Beekeeper::Service::ToyBroker::SharedSubscription;   # hide from PAUSE
 
 sub new {
     my ($class, %args) = @_;
@@ -1505,7 +1509,7 @@ Beekeeper::Service::ToyBroker::Worker - Basic MQTT 5 broker
 
 =head1 VERSION
 
-Version 0.04
+Version 0.05
 
 =head1 DESCRIPTION
 

@@ -30,22 +30,45 @@ test_psgi
   client => sub {
     my ($cb) = @_;
 
-    my $req = GET '/.well-known/traffic-advice';
-    my $res = $cb->($req);
+    subtest "GET" => sub {
 
-    is $res->code, HTTP_OK, 'HTTP OK';
-    is $res->content_type, 'application/trafficadvice+json', 'Content-Type';
+        my $req = GET '/.well-known/traffic-advice';
+        my $res = $cb->($req);
 
-    my $data = decode_json( $res->decoded_content );
+        is $res->code, HTTP_OK, 'HTTP OK';
+        is $res->content_type, 'application/trafficadvice+json', 'Content-Type';
 
-    cmp_deeply $data,
-      [
-        {
-            user_agent => "prefetch-proxy",
-            disallow   => bool(1),
-        }
-      ],
-      "expected data";
+        my $data = decode_json( $res->decoded_content );
+
+        cmp_deeply $data,
+            [
+             {
+                 user_agent => "prefetch-proxy",
+                 disallow   => bool(1),
+             }
+            ],
+            "expected data";
+
+    };
+
+    subtest "HEAD" => sub {
+
+        my $req = HEAD '/.well-known/traffic-advice';
+        my $res = $cb->($req);
+
+        is $res->code, HTTP_OK, 'HTTP OK';
+        is $res->content_type, 'application/trafficadvice+json', 'Content-Type';
+
+    };
+
+    subtest "POST" => sub {
+
+        my $req = POST '/.well-known/traffic-advice';
+        my $res = $cb->($req);
+
+        is $res->code, HTTP_METHOD_NOT_ALLOWED, 'HTTP OK';
+
+    };
 
   };
 

@@ -3,7 +3,7 @@ package App::perlimports::Document;
 use Moo;
 use utf8;
 
-our $VERSION = '0.000008';
+our $VERSION = '0.000009';
 
 use App::perlimports::Annotations ();
 use App::perlimports::Include     ();
@@ -59,6 +59,13 @@ has _ignore_modules => (
     isa      => HashRef,
     init_arg => 'ignore_modules',
     default  => sub { +{} },
+);
+
+has _ignore_modules_pattern => (
+    is       => 'ro',
+    isa      => ArrayRef [Str],
+    init_arg => 'ignore_modules_pattern',
+    default  => sub { [] },
 );
 
 has includes => (
@@ -431,7 +438,7 @@ sub _build_sub_exporter_export_list {
                 && $_[1]->module eq 'Sub::Exporter';
         }
     ) || [];
-    $self->logger->error( $sub_ex->[0] );
+    $self->logger->error( $sub_ex->[0] ) if defined $sub_ex->[0];
     return [] unless @{$sub_ex};
 
     my @found;
@@ -621,10 +628,13 @@ sub _has_import_switches {
     # tag, but instead it's something entirely different.
     #
     # use Getopt::Long qw(:config no_ignore_case bundling);
+    #
+    # We will leave this case as broken for the time being. I'm not sure how
+    # common that invocation is.
 
     if (
         exists $self->original_imports->{$module_name}
-        && any { $_ =~ m{^[\-:]} }
+        && any { $_ =~ m{^[\-]} }
         @{ $self->original_imports->{$module_name} || [] }
     ) {
         return 1;
@@ -658,10 +668,13 @@ sub _is_ignored {
     my $self    = shift;
     my $element = shift;
 
-    return
-           exists $default_ignore{ $element->module }
+    my $res
+        = exists $default_ignore{ $element->module }
         || exists $self->_ignore_modules->{ $element->module }
-        || $self->_annotations->is_ignored($element);
+        || $self->_annotations->is_ignored($element)
+        || any { $element->module =~ /$_/ }
+    grep { $_ } @{ $self->_ignore_modules_pattern || [] };
+    return $res;
 }
 
 sub inspector_for {
@@ -887,7 +900,7 @@ App::perlimports::Document - Make implicit imports explicit
 
 =head1 VERSION
 
-version 0.000008
+version 0.000009
 
 =head2 inspector_for( $module_name )
 

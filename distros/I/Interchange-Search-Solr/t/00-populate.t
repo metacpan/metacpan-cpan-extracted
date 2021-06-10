@@ -46,9 +46,11 @@ Then create a core:
  solr create_core -c icsearch -d sample_techproducts_configs -p 9999
 
 Copy the example/schema.xml found in this distribution to
-$HOME/solr/solr/icsearch/conf/schema.xml
+$HOME/solr/solr/icsearch/conf/schema.xml (or
+$HOME/solr/solr/icsearch/conf/managed-schema)
 
  cp examples/schema.xml $HOME/solr/solr/icsearch/conf/schema.xml
+ cp examples/schema.xml $HOME/solr/solr/icsearch/conf/managed-schema
  solr restart
 
 And export SOLR_TEST_URL with the path:

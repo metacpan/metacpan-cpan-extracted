@@ -1,6 +1,6 @@
 package Bitcoin::Crypto::Helpers;
 
-our $VERSION = "0.996";
+our $VERSION = "0.997";
 
 use v5.10;
 use warnings;
@@ -87,8 +87,8 @@ sub add_ec_points
 {
 	my ($point1, $point2) = @_;
 
-	my $curve_size = $config{key_max_length};
-	my $curve_data = Crypt::PK::ECC->new->generate_key($config{curve_name})->curve2hash;
+	my $curve_size = Bitcoin::Crypto::Config::key_max_length;
+	my $curve_data = Crypt::PK::ECC->new->generate_key(Bitcoin::Crypto::Config::curve_name)->curve2hash;
 	my $p = new_bigint(pack "H*", $curve_data->{prime});
 	my $a = new_bigint(pack "H*", $curve_data->{A});
 

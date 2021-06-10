@@ -30,7 +30,7 @@ use strict;
 use warnings;
 use Carp qw{ carp croak };
 
-our $VERSION = 0.42;
+our $VERSION = 0.43;
 
 use Webservice::OVH::Order::Cart::Item;
 
@@ -376,7 +376,7 @@ sub offers_domain {
     return $response->content;
 }
 
-=head2 offers_domain
+=head2 add_domain
 
 Adds a domain request to a cart.
 
@@ -444,6 +444,79 @@ sub add_domain {
 
     return $item;
 }
+
+=head2 offer_dns
+
+Returns an Hash with information for dns Zone pricing
+A Domain must be added before requestion info
+
+=over
+
+=item * Parameter: $dns - domain name
+
+=item * Return: L<HASHREF>
+
+=item * Synopsis: my $offer = $cart->offers_dns;
+
+=back
+
+=cut
+
+sub offer_dns {
+
+    my ( $self, $domain ) = @_;
+
+    return unless $self->_is_valid;
+
+    my $api     = $self->{_api_wrapper};
+    my $cart_id = $self->id;
+
+    my $response = $api->rawCall( method => 'get', path => sprintf( "/order/cart/%s/dns?domain=%s", $cart_id, $domain ), noSignature => 0 );
+    croak $response->error if $response->error;
+
+    return $response->content;
+}
+
+=head2 add_dns
+
+Adds a dns Zone to a cart.
+
+=over
+
+=item * Return: L<Webservice::OVH::Order::Cart::Item>
+
+=item * Synopsis: my $item = $cart->add_dns;
+
+=back
+
+=cut
+
+sub add_dns {
+
+    my ( $self, $domain, %params ) = @_;
+
+    return unless $self->_is_valid;
+
+    my $api     = $self->{_api_wrapper};
+    my $cart_id = $self->id;
+
+    my $body = {};
+    $body->{duration} = $params{duration} if exists $params{duration};
+    $body->{planCode} = $params{plan_code} if exists $params{plan_code};
+    $body->{pricingMode} = $params{pricing_mode} if exists $params{pricing_mode};
+    $body->{quantity} = $params{quantity} if exists $params{quantity};
+    $body->{domain}   = $domain;
+
+    my $response = $api->rawCall( method => 'post', path => "/order/cart/$cart_id/dns", body => $body, noSignature => 0 );
+    croak $response->error if $response->error;
+
+    my $item_id = $response->content->{itemId};
+    my $item = Webservice::OVH::Order::Cart::Item->_new( wrapper => $api, cart => $self, id => $item_id, module => $self->{_module} );
+
+    return $item;
+}
+
+
 
 =head2 offers_domain_transfer
 

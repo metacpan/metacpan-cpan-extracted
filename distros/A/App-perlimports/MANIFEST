@@ -27,7 +27,6 @@ script/perlimports
 t/00-report-prereqs.dd
 t/00-report-prereqs.t
 t/Document.t
-t/ExportInspector/DDP.t
 t/ExportInspector/SubExporter.t
 t/ExportInspector/load.t
 t/after.t
@@ -44,6 +43,7 @@ t/do-block.t
 t/dump-perl-exports.t
 t/dupes.t
 t/english.t
+t/export-tags.t
 t/exported-variables.t
 t/find-bin.t
 t/fully-qualified.t
@@ -100,6 +100,7 @@ test-data/cast.pl
 test-data/config-in-import.pl
 test-data/dupes.pl
 test-data/english.pl
+test-data/export-tags.pl
 test-data/exported-variables.pl
 test-data/find-bin.pl
 test-data/foo.pl
@@ -109,6 +110,7 @@ test-data/func-in-use-2.pl
 test-data/func-in-use.pl
 test-data/func-in-var.pl
 test-data/geo-ip.pl
+test-data/getopt-long.pl
 test-data/getopt.pl
 test-data/hash-in-regex.pl
 test-data/heredoc.pl

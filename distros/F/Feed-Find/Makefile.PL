@@ -10,7 +10,7 @@ requires 'URI';
 
 test_requires 'Test::More';
 
-use_test_base;
+# use_test_base;
 auto_include_deps;
 author_tests('xt');
 auto_set_repository;

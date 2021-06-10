@@ -15,9 +15,9 @@ use Cwd;
 use File::Temp qw/ tempfile /;
 use HTTP::Date;
 use HTTP::Status qw/ :constants /;
-use JSON::MaybeXS;
+use JSON::MaybeXS 1.004000;
 
-our $VERSION = 'v0.1.0';
+our $VERSION = 'v0.2.0';
 
 
 sub prepare_app {
@@ -66,7 +66,7 @@ sub call {
         return $self->app->($env);
     }
 
-    unless ( $env->{REQUEST_METHOD} eq 'GET' ) {
+    unless ( $env->{REQUEST_METHOD} =~ /^(GET|HEAD)$/ ) {
         return $self->error( HTTP_METHOD_NOT_ALLOWED, "Not Allowed" );
     }
 
@@ -113,7 +113,7 @@ Plack::Middleware::TrafficAdvice - handle requests for /.well-known/traffic-advi
 
 =head1 VERSION
 
-version v0.1.0
+version v0.2.0
 
 =head1 SYNOPSIS
 
@@ -155,6 +155,13 @@ The data will be saved as a temporary L</file>.
 This is a file containing the JSON string to return.
 
 =for Pod::Coverage error
+
+=head1 KNOWN ISSUES
+
+The C</.well-known/traffic-advice> specification is new and may be subject to change.
+
+This does not validate that the L</data> string or L</file> contains
+valid JSON, or that the JSON conforms to the specification.
 
 =head1 SEE ALSO
 

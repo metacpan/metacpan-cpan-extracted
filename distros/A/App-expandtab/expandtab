@@ -1,0 +1,90 @@
+#!/usr/bin/perl
+
+#  expandtab
+#   2021-06-11
+
+use 5.014 ; 
+use strict ; 
+use warnings ; # also confirmed on 5.011 5.014 5.018  
+#use Encode qw[ decode_utf8 encode_utf8 ] ; 
+use FindBin qw [ $Script ] ; 
+use Getopt::Std ; getopts 's:x' => \my %o ;
+use Term::ANSIColor qw [ :constants color ]  ; $Term::ANSIColor::AUTORESET = 1 ; 
+#use Time::HiRes qw [ gettimeofday tv_interval ] ; my ${ dt_start } = [ gettimeofday ] ; 
+use Text::VisualWidth::UTF8 qw[ trim width ] ;
+use List::Util qw [ min max ] ; 
+
+sub dc ($) {  $_[0] =~ s{ \e\[ [\d;]* m }{}xmsgr }  # Delete Color の頭文字を取った。
+
+#my $sdt = sprintf '%04d-%02d-%02d %02d:%02d:%02d', do{my @t= @{[localtime]}[5,4,3,2,1,0]; $t[0]+=1900; $t[1]++; @t } ; 
+
+## 値の読取り
+my @C ; # セルの値
+my @L ; # ビジュアルな長さ
+my $rcnt = 0 ; # 行番号
+my $cmax = 0 ; # 最大の列数
+while ( <> ) { 
+  chomp ; 
+  #delcolor ;
+  $C [ $rcnt ] = [ my @F = split /\t/, $_ , -1 ] ; 
+  $L [ $rcnt ] = [ map { Text::VisualWidth::UTF8::width dc $_ } @F ]  ; 
+
+  $cmax = @F if @F > $cmax ; 
+  $rcnt ++ 
+}
+
+## 各列のVisual幅を算出する。 cmw は The Column's Max Widthのつもり(やや強引だが)
+my @cmw = map { my $c = $_ ; max map { $L[$_][$c] } 0 .. $rcnt - 1 }  0 .. $cmax - 1 ; 
+
+
+if ( $o{x} ) { my $s = 0 ; say "-x",join "," , map {$s += $_ + 1 } @cmw ; exit } 
+
+## 出力
+for my $r ( 0 .. $rcnt -1 ) { 
+  my @out ; 
+  my $spare0 = 0 ; 
+  for my $c ( 0 .. $cmax -1 ) { 
+    my $spare = exists $o{s} ? min $cmw[$c]  , $o{s} : $cmw[$c] ;
+    my $addlen = $spare -$L[$r][$c] + $spare0 ; # if $cmw[$c] > $o{s}
+    $spare0 = 0 + min 0 , $addlen ; 
+    my $tmp = $C[$r][$c] . ' ' x max 0, $addlen  ; 
+    push @out, $tmp ; 
+  }
+  say join " " , @out ; 
+}
+
+exit 0 ;
+
+## ヘルプの扱い
+sub VERSION_MESSAGE {}
+sub HELP_MESSAGE {
+  use FindBin qw[ $Script ] ; 
+  $ARGV[1] //= '' ;
+  open my $FH , '<' , $0 ;
+  while(<$FH>){
+    s/\$0/$Script/g ;
+    print $_ if s/^=head1// .. s/^=cut// and $ARGV[1] =~ /^o(p(t(i(o(ns?)?)?)?)?)?$/i ? m/^\s+\-/ : 1;
+  }
+  close $FH ;
+  exit 0 ;
+}
+=encoding utf8
+
+=head1 $0 
+
+  入力をTSVと見なして、同じ列は縦に揃えて空白文字で埋めて出力する。
+ 
+ [オプション] :
+
+  -s N : 出力の各セルにおいて、埋めた空白をさらに幅何文字分(半角相当)まで縮めるか指定。
+  -x : less に渡す引数(-xによるタブ位置の指定)のみを出力して終了。特に便利。
+
+  --help : この $0 のヘルプメッセージを出す。  perldoc -t $0 | cat でもほぼ同じ。
+  --help opt : オプションのみのヘルプを出す。opt以外でも options と先頭が1文字以上一致すれば良い。
+
+  開発メモ: 
+   * 右揃えのオプションが欲しいかも。
+   * 行列として変数Cを参照するときに値が未定義の時にどうする。
+
+  Text::VisualWidth のインスートルがあらかじめ必要である。
+=cut

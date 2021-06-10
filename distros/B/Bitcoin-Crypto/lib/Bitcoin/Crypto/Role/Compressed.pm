@@ -1,6 +1,6 @@
 package Bitcoin::Crypto::Role::Compressed;
 
-our $VERSION = "0.996";
+our $VERSION = "0.997";
 
 use v5.10;
 use warnings;
@@ -13,7 +13,7 @@ has "compressed" => (
 	is => "rw",
 	isa => Bool,
 	coerce => 1,
-	default => $config{compress_public_point},
+	default => Bitcoin::Crypto::Config::compress_public_point,
 	writer => "_set_compressed"
 );
 

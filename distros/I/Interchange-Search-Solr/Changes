@@ -1,5 +1,11 @@
 Revision history for Interchange-Search-Solr
 
+0.21 Thu Jun 10 13:28:42 2021 CEST
+
+     [ENHANCEMENTS]
+
+     * Implement facet ranges (Marco Pessotto)
+
 0.20 Wed Dec 25 13:45:38 2019 CET
 
      All changes done by Stefan Hornburg (Racke).

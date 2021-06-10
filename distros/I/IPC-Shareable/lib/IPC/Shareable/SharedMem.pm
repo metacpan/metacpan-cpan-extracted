@@ -1,54 +1,39 @@
 package IPC::Shareable::SharedMem;
 
+use warnings;
 use strict;
-use constant DEBUGGING => ($ENV{SHM_DEBUG} or 0);
+
+use Carp qw(carp croak confess);
 use IPC::SysV qw(IPC_RMID);
 
-my $Def_Size = 1024;
+our $VERSION = '1.00';
 
-sub _trace {
-    require Carp;
-    require Data::Dumper;
-    my $caller = '    ' . (caller(1))[3] . " called with:\n";
-    my $i = -1;
-    my @msg = map {
-        ++$i;
-        '        ' . Data::Dumper->Dump( [ $_ ] => [ "\_[$i]" ]);
-    }  @_;
-    Carp::carp "IPC::SharedMem debug:\n", $caller, @msg;
-}
+use constant DEBUGGING => ($ENV{SHM_DEBUG} or 0);
 
-sub _debug {
-    require Carp;
-    require Data::Dumper;
-    local $Data::Dumper::Terse = 1;
-    my $caller = '    ' . (caller(1))[3] . " tells us that:\n";
-    my @msg = map { '        ' . Data::Dumper::Dumper($_) } @_;
-    Carp::carp "IPC::SharedMem debug:\n", $caller, @msg;
-};
+my $default_size = 1024;
 
 sub default_size {
-    _trace @_                                                   if DEBUGGING;
     my $class = shift;
-    $Def_Size = shift if @_;
-    return $Def_Size;
+    $default_size = shift if @_;
+    return $default_size;
 }
 
 sub new {
-    _trace @_                                                   if DEBUGGING;
-    my($class, $key, $size, $flags) = @_;
+    my($class, $key, $size, $flags, $type) = @_;
     defined $key or do {
-        require Carp;
-        Carp::croak "usage: IPC::SharedMem->new(KEY, [ SIZE,  [ FLAGS ] ])";
+        croak "usage: IPC::SharedMem->new(KEY, [ SIZE,  [ FLAGS ] ])";
     };
-    $size  ||= $Def_Size;
+    $size  ||= $default_size;
     $flags ||= 0;
-    
-    _debug "calling shmget() on ", $key, $size, $flags          if DEBUGGING;
+
     my $id = shmget($key, $size, $flags);
+
     defined $id or do {
-        require Carp;
-        Carp::carp "IPC::Shareable::SharedMem: shmget: $!\n";
+        if ($! =~ /File exists/){
+            croak "\nERROR: IPC::Shareable::SharedMem: shmget $key: $!\n\n" .
+                  "Are you using exclusive, but trying to create multiple " .
+                  "instances?\n\n";
+        }
         return undef;
     };
 
@@ -56,63 +41,53 @@ sub new {
         _id    => $id,
         _size  => $size,
         _flags => $flags,
+        _type  => $type,
     };
-    
+
     return bless $sh => $class;
 }
-
 sub id {
-    _trace @_                                                   if DEBUGGING;
     my $self = shift;
 
     $self->{_id} = shift if @_;
     return $self->{_id};
 }
-
 sub flags {
-    _trace @_                                                   if DEBUGGING;
     my $self = shift;
 
     $self->{_flags} = shift if @_;
     return $self->{_flags};
 }
-
 sub size {
-    _trace @_                                                   if DEBUGGING;
     my $self = shift;
 
     $self->{_size} = shift if @_;
     return $self->{_size};
 }
-
 sub shmwrite {
-    _trace @_                                                   if DEBUGGING;
     my($self, $data) = @_;
-
-    _debug "calling shmwrite() on ", $self->{_id}, $data,
-                                     0, $self->{_size}          if DEBUGGING;
     return shmwrite($self->{_id}, $data, 0, $self->{_size});
 }
-
 sub shmread {
-    _trace @_                                                   if DEBUGGING;
     my $self = shift;
 
     my $data = '';
-    _debug "calling shread() on ", $self->{_id}, $data,
-                                   0, $self->{_size}            if DEBUGGING;
     shmread($self->{_id}, $data, 0, $self->{_size}) or return;
-    _debug "got ", $data, " from shm segment $self->{_id}"      if DEBUGGING;
     return $data;
 }
-
 sub remove {
-    _trace @_                                                   if DEBUGGING;
-    my $self = shift;
-    my $op = shift;
+    my $to_remove = shift;
+
+    my $id;
+
+    if (ref $to_remove eq __PACKAGE__){
+        $id = $to_remove->{_id};
+    }
+
     my $arg = 0;
 
-    return shmctl($self->{_id}, IPC_RMID, $arg);
+    my $ret = shmctl($id, IPC_RMID, $arg);
+    return $ret;
 }
 
 1;
@@ -120,6 +95,11 @@ sub remove {
 =head1 NAME
 
 IPC::Shareable::SharedMem - Object oriented interface to shared memory
+
+=for html
+<a href="https://github.com/stevieb9/ipc-shareable/actions"><img src="https://github.com/stevieb9/ipc-shareable/workflows/CI/badge.svg"/></a>
+<a href='https://coveralls.io/github/stevieb9/ipc-shareable?branch=master'><img src='https://coveralls.io/repos/stevieb9/ipc-shareable/badge.svg?branch=master&service=github' alt='Coverage Status' /></a>
+
 
 =head1 SYNOPSIS
 
@@ -144,4 +124,4 @@ Ben Sugars (bsugars@canoe.ca)
 
 =head1 SEE ALSO
 
-IPC::Shareable, IPC::SharedLite
+L<IPC::Shareable>, L<IPC::ShareLite>

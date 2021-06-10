@@ -3,7 +3,7 @@ package Beekeeper::WorkerPool;
 use strict;
 use warnings;
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 use base 'Beekeeper::WorkerPool::Daemon';
 use POSIX ":sys_wait_h";
@@ -361,7 +361,7 @@ Beekeeper::WorkerPool - Manage worker pools
 
 =head1 VERSION
  
-Version 0.04
+Version 0.05
 
 =head1 SYNOPSIS
 

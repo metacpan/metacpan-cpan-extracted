@@ -1,6 +1,6 @@
 package Bitcoin::Crypto::Network;
 
-our $VERSION = "0.996";
+our $VERSION = "0.997";
 
 use v5.10;
 use warnings;
@@ -240,7 +240,7 @@ with custom network without segwit_hrp field set.
 
 	sig: register($self, %config)
 
-Calls Moose's new with keys present in $config hash when called in static context.
+Calls Moose's new with keys present in C<$config> hash when called in static context.
 Adds the newly created network instance or the one that the method was called on to a list of known networks.
 The hash %config is ignored in object context.
 

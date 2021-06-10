@@ -44,7 +44,7 @@ use strict;
 use warnings;
 use Carp qw{ carp croak };
 
-our $VERSION = 0.42;
+our $VERSION = 0.43;
 
 # api module provided by ovh
 use OVH::OvhApi;
@@ -94,7 +94,7 @@ sub new_from_json {
     my ( $class, $file_json ) = @_;
 
     # slurp file
-    my $json = read_file $file_json, { binmode => ':utf8' };
+    my $json = read_file($file_json, { binmode => ':raw' });
 
     # decode json
     my $Json = JSON->new->allow_nonref;

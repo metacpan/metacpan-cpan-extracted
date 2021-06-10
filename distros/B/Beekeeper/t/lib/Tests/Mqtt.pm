@@ -470,4 +470,124 @@ sub test_05_shared_topic_queuing : Test(7) {
     $bus2->disconnect;
 }
 
+sub test_06_utf8 : Test(11) {
+    my $self = shift;
+
+    my $bus = Beekeeper::MQTT->new( %$bus_config );
+
+    $bus->connect( blocking => 1 );
+
+    my @received;
+
+    $bus->subscribe(
+        topic => 'msg/bar',
+        on_publish => sub {
+            my ($payload, $properties) = @_;
+            push @received, {
+                properties => { %$properties },
+                payload    => $$payload,
+            };
+        },
+    );
+
+    $self->async_wait( 0.2 );
+
+    my $utf8_string = "\x{263A}";
+
+    my $binary_blob = $utf8_string;
+    utf8::encode($binary_blob);
+
+    ok( utf8::is_utf8($utf8_string), 'String is utf8' );
+    ok(!utf8::is_utf8($binary_blob), 'Blob is not utf8' );
+
+    is( length($utf8_string), 1, 'String length is 1 char' );
+    is( length($binary_blob), 3, 'Blob length is 3 bytes' );
+
+    $bus->publish(
+        topic   => 'msg/bar',
+        payload => $utf8_string,
+    );
+
+    $bus->publish(
+        topic   => 'msg/bar',
+        payload => $binary_blob,
+    );
+
+    $bus->publish(
+        topic      => 'msg/bar',
+        payload    => '',
+        utf8_value => $utf8_string,
+    );
+
+    $bus->publish(
+        topic        => 'msg/bar',
+        payload      => '',
+        $utf8_string => 'utf8_key',
+    );
+
+    $self->async_wait( 0.2 );
+
+    is( scalar(@received), 4, "Received 4 messages from topic");
+
+    ok( utf8::is_utf8($received[0]->{payload}), 'Received string is utf8' );
+    ok(!utf8::is_utf8($received[1]->{payload}), 'Received blob is not utf8' );
+
+    is( $received[0]->{payload}, $utf8_string, "Got utf8 string");
+    is( $received[1]->{payload}, $binary_blob, "Got binary blob");
+
+    is( $received[2]->{properties}->{'utf8_value'}, $utf8_string, "Got utf8 property value");
+    is( $received[3]->{properties}->{$utf8_string}, 'utf8_key',   "Got utf8 property key");
+
+    # $DEBUG && diag Dumper \@received;
+
+    $bus->disconnect;
+}
+
+sub test_07_big_message : Test(4) {
+    my $self = shift;
+
+    my $bus = Beekeeper::MQTT->new( %$bus_config );
+
+    $bus->connect( blocking => 1 );
+
+    my @received;
+
+    $bus->subscribe(
+        topic => 'msg/bar',
+        on_publish => sub {
+            my ($payload, $properties) = @_;
+            push @received, {
+                properties => { %$properties },
+                payload    => $$payload,
+            };
+        },
+    );
+
+    my $data = 'X' x 1048576;
+
+    $bus->publish(
+        topic      => 'msg/bar',
+        payload    => \$data,
+    );
+
+    $self->async_wait( 0.2 );
+
+    is( scalar(@received), 1, "Received 1 message from topic");
+    is( length( $received[0]->{payload} ), 1048576, "Got a 1 MiB message");
+
+    $data = 'X' x 10485760;
+
+    $bus->publish(
+        topic      => 'msg/bar',
+        payload    => \$data,
+    );
+
+    $self->async_wait( 0.2 );
+
+    is( scalar(@received), 2, "Received 1 message from topic");
+    is( length( $received[1]->{payload} ), 10485760, "Got a 10 MiB message");
+
+    $bus->disconnect;
+}
+
 1;

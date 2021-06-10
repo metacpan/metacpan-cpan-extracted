@@ -1,0 +1,14 @@
+    - Added documentation for man dex and perldoc dex
+    - Updated t/01_* to use a tempdir
+
+0.2.0
+    - Rewrote it as a library
+    - Added tests
+    - Added Changes file
+    - Added README.md 
+
+0.1.0 Inital Version
+
+    - Runs shell commands defined in .dex.yaml or dex.yaml.
+    - Provides a menu with the description of commands.
+    - This repo dog-foods itself.

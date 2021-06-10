@@ -14,7 +14,7 @@
     %= stylesheet '/minion/app.css'
     %= javascript '/minion/app.js'
     <script>
-      $(function () {
+      $(() => {
         checkAll();
         humanTime();
         pollStats('<%= url_for "minion_stats" %>');

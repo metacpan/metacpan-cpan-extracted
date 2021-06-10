@@ -34,18 +34,14 @@ my $toybroker_config_json = qq<
     },
 ]>;
 
-my $TEST_PORT;
+#TODO: Find an unused port
+our $TEST_PORT = 50000 + int(rand(10000));
 
 sub read_config_file {
     my ($class, $file) = @_;
 
     my $data = $file eq "bus.config.json"       ? $bus_config_json       : 
                $file eq "toybroker.config.json" ? $toybroker_config_json : '';
-
-    unless ($TEST_PORT) {
-        #TODO: Find an unused port
-        $TEST_PORT = 50000 + int(rand(10000));
-    }
 
     $data =~ s/%PORT%/$TEST_PORT/;
 

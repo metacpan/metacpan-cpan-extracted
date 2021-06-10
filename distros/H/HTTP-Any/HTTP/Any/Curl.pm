@@ -78,7 +78,7 @@ sub do_http {
 		$easy->setopt(CURLOPT_PROXY, $proxy);
 	}
 
-	$easy->setopt(CURLOPT_ACCEPT_ENCODING, "gzip") if $$opt{gzip};
+	$easy->setopt(CURLOPT_ACCEPT_ENCODING, "gzip, deflate") if $$opt{gzip};
 
 	$easy->setopt(CURLOPT_FORBID_REUSE, $$opt{persistent} ? 0 : 1) if exists $$opt{persistent};
 

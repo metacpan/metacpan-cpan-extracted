@@ -1,0 +1,71 @@
+NAME
+    List::Util::Find - List utilities related to finding items
+
+VERSION
+    This document describes version 0.003 of List::Util::Find (from Perl
+    distribution List-Util-Find), released on 2021-06-10.
+
+SYNOPSIS
+     use List::Util::Find qw(hasnum hasstr);
+
+     my @ary = (1,3,"foo",7,2,"bar",10,"baz");
+
+     if (hasnum 3, @ary) {
+         ...
+     }
+
+     if (hasstr "baz", @ary) {
+         ...
+     }
+
+DESCRIPTION
+    Experimental.
+
+FUNCTIONS
+    Not exported by default but exportable.
+
+  hasnum
+    Usage:
+
+     hasnum $num, ...
+
+    Like "grep { $_ == $num } ..." except: 1) it short-circuits (exits early
+    as soon as an item is found); 2) it makes sure "undef" does not match;
+    3) it makes sure non-numeric scalars don't match when $num is zero.
+
+  hasstr
+    Usage:
+
+     hasstr $str, ...
+
+    Like "grep { $_ eq $num } ..." except: 1) it short-circuits (exits early
+    as soon as an item is found); 2) it makes sure "undef" does not match
+    empty string.
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/List-Util-Find>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-List-Util-Find>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=List-Util-Find>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    List::Util
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2021 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

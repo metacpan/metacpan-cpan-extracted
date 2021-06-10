@@ -1,0 +1,190 @@
+# ABSTRACT: A collection of cases where core Perl fails its "easy things should be easy" mantra (plus their remedies)
+# PODNAME: perleasyfail
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+perleasyfail - A collection of cases where core Perl fails its "easy things should be easy" mantra (plus their remedies)
+
+=head1 VERSION
+
+This document describes version 0.000002 of perleasyfail (from Perl distribution perleasyfail), released on 2021-06-10.
+
+=head1 DESCRIPTION
+
+B<NOTE: This is an early release. Comments and suggestions highly appreciated,
+particularly in these areas: 1) adding more cases; 2) adding Raku solutions; 3)
+adding more discussion for each case.>
+
+This document lists tasks which might be simple to do in other programming
+languages or tools, but more verbose or complicated in Perl. To be fair, no
+tools are perfect. While Perl has the motto "easy things should be easy, and
+hard things possible" [1] the creator had a set of cases to optimize and not
+other cases. The latter cases are the focus of this document.
+
+[1] Wall, L., Christiansen T., Schwartz, R., "Programming Perl", 2e, 1996.
+
+=head1 ARY (Arrays)
+
+=head2 ARY/IDENTIFY/1 (Check if something is an array)
+
+JavaScript:
+
+ foo instanceof Array
+ Array.isArray(foo)
+
+PHP:
+
+ is_array($foo)
+
+Python:
+
+ type(foo) is list
+ isinstance(foo, list)
+
+Ruby:
+
+ foo.kind_of? Array
+
+Perl:
+
+ ref($foo) eq 'ARRAY'
+
+The Perl version is not so bad brevity-wise, but: 1) a typo when typing
+C<'ARRAY'> will not be caught in compile-time; 2) it's slower (though in most
+cases it won't matter); 3) it fails to recognize blessed array or tied array.
+
+Perl alternative #1:
+
+ use Scalar::Util qw(reftype);
+ reftype($foo) eq 'ARRAY'
+
+This can handle blessed array.
+
+Perl alternative #2 (uses L<Ref::Util>):
+
+ use Ref::Util qw(is_arrayref);
+ is_arrayref($foo);
+
+This can handle blessed array.
+
+=head2 ARY/FINDELEM/1 (Check whether an item is in an array)
+
+JavaScript:
+
+ ary.includes(value)
+
+PHP:
+
+ in_array($value, $ary)
+ in_array($value, $ary, $strict)  # also check types, so 123 will not match "123"
+
+Python:
+
+ element in list
+
+Ruby:
+
+ ary.include? value
+
+Perl:
+
+ grep { $_ eq 'value' } @ary  # for string comparison
+ grep { $_ ==  value  } @ary  # for numeric comparison
+
+This is one of the cases where strongly-typed languages have an advantage
+because the user does not need to explicitly specify the operator to use. Perl
+has multiple equality operators and the user needs to specify which one she
+wants because the scalar can both be a number of a string.
+
+True, the Perl's C<grep> version is more flexible, but we're talking about easy
+things here. Plus there's another problem with C<grep>: it does not
+short-circuit. If you have a million-element array and the value you want is
+found in the first element, Perl will still continue to the end of the array.
+
+Alternative #1 (uses L<List::Util>):
+
+ use List::Util qw(first);
+ first { $_ eq 'value' } @ary
+
+This solution solves the non-short-circuiting problem, but does not provide
+syntax brevity.
+
+Alternative #2 (uses L<List::Util::Find>):
+
+ use List::Util::Find qw(hasnum hasstr);
+ hasnum $num, @ary;
+ hasstr $str, @ary;
+
+=head1 HASH (Hashes)
+
+=head2 HASH/IDENTIFY/1 (Check if something is a hash)
+
+PHP:
+
+ is_array($foo)     # in PHP, hash (associative array) is still an array
+
+Python:
+
+ type(foo) is dict
+ isinstance(foo, dict)
+
+Ruby:
+
+ foo.kind_of? Hash
+
+Perl:
+
+ ref($foo) eq 'HASH'
+
+The Perl version is not so bad brevity-wise, but: 1) a typo when typing
+C<'HASH'> will not be caught in compile-time; 2) it's slower; 3) it fails to
+recognize blessed hash or tied hash.
+
+Alternative #1 (uses L<Scalar::Util>):
+
+ use Scalar::Util qw(reftype);
+ reftype($foo) eq 'HASH'
+
+This can handle blessed hash.
+
+Alternative #2 (uses L<Ref::Util>):
+
+ use Ref::Util qw(is_hashref);
+ is_hashref($foo);
+
+This can handle blessed hash.
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/perleasyfail>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-perleasyfail>.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=perleasyfail>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2021 by perlancar@cpan.org.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

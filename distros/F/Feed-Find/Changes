@@ -1,5 +1,14 @@
 Revision history for Feed::Find
 
+0.09  2021.06.10
+    - Remove "use_test_base" from Makefile.pm (Test::Base wasn't
+      used and it brought in a copy of Test::Builder that seems
+      to break stuff).
+
+0.08  2021.06.09
+    - Add .atom as a possible feed extension.
+    - Temp fix to the tests (because the original domain has gone).
+
 0.07  2011.01.28
     - Use $ua->env_proxy to load local proxy settings. (RT 53817)
     - Fixed documentation for find_in_html. (RT 19183)

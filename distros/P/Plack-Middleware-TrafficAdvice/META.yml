@@ -30,13 +30,13 @@ name: Plack-Middleware-TrafficAdvice
 provides:
   Plack::Middleware::TrafficAdvice:
     file: lib/Plack/Middleware/TrafficAdvice.pm
-    version: v0.1.0
+    version: v0.2.0
 requires:
   Cwd: '0'
   File::Temp: '0'
   HTTP::Date: '0'
   HTTP::Status: '0'
-  JSON::MaybeXS: '0'
+  JSON::MaybeXS: '1.004000'
   Plack::Middleware: '0'
   parent: '0'
   perl: v5.8.5
@@ -45,7 +45,7 @@ requires:
 resources:
   bugtracker: https://github.com/robrwo/Plack-Middleware-TrafficAdvice/issues
   repository: git://github.com/robrwo/Plack-Middleware-TrafficAdvice.git
-version: v0.1.0
+version: v0.2.0
 x_authority: cpan:RRWO
 x_generated_by_perl: v5.28.1
 x_serialization_backend: 'YAML::Tiny version 1.73'

@@ -32,7 +32,7 @@ use Carp qw{ carp croak };
 use DateTime;
 use JSON;
 
-our $VERSION = 0.42;
+our $VERSION = 0.43;
 
 use Webservice::OVH::Helper;
 use Webservice::OVH::Me::Contact;

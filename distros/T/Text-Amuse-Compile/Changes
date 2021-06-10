@@ -1,5 +1,9 @@
 Revision history for perl module Text::Amuse::Compile
 
+1.63 2021-06-10
+
+ - On failure, store the reason in the status file
+
 1.62 2021-04-13
 
  - Fix missing file in MANIFEST

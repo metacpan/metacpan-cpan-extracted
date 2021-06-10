@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    Version 0.20
+    Version 0.21
 
 DESCRIPTION
 
@@ -74,10 +74,34 @@ ACCESSORS
 
  facets
 
-    A string or an arrayref with the fields which will generate a facet.
-    Defaults to
+    An arrayref with the fields which will generate a facet. Defaults to
 
      [qw/suchbegriffe manufacturer/]
+
+ facet_ranges
+
+    An optional arrayref of hashrefs with the facet ranges (tipically, a
+    price).
+
+    The structure must have these these keys:
+
+      {
+       name => String,
+       start => Int,
+       end => Int,
+       gap => Int,
+      }
+
+    Name is the name of the field which needs to generate a range facet.
+    start, end and gap are, in this order, lower bound, upper bound, span
+    of each range.
+
+    See: https://solr.apache.org/guide/8_8/faceting.html#range-faceting
+
+    When searching, the field should have exactly two numeric arguments,
+    e.g. "/price/1/100" (from 1 to 100).
+
+    So far only integers are supported.
 
  start
 
@@ -130,6 +154,11 @@ ACCESSORS
     active
 
       True if currently in use (to be used for, e.g., checkboxes)
+
+ facet_ranges_found
+
+    Return the range facets, same as for the facets_found method, but in
+    the structure only name and count are found.
 
  search_string
 
@@ -278,6 +307,17 @@ METHODS
 
     Parse the url provided and do the search.
 
+ safe_search_from_url($url)
+
+    Same as above, but safe from crashes (wrapped in eval)
+
+ reset_facet_url($facet_name)
+
+    Return an URL which should reset the facet passed as argument.
+
+    See you searched for "/color/blue/price/1/12", this would return
+    "/color/blue"
+
  add_terms_to_url($url, $string)
 
     Parse the url, and return a new one with the additional words added.
@@ -415,7 +455,7 @@ ACKNOWLEDGEMENTS
 
 LICENSE AND COPYRIGHT
 
-    Copyright 2014-2019 Marco Pessotto, Stefan Hornburg (Racke).
+    Copyright 2014-2021 Marco Pessotto, Stefan Hornburg (Racke).
 
     This program is free software; you can redistribute it and/or modify it
     under the terms of the the Artistic License (2.0). You may obtain a

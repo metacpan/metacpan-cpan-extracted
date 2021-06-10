@@ -1,175 +1,518 @@
-----------------------------------------------------------------------
-    This is free software; you can redistribute it and/or modify it
-    under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License , or
-    (at your option) any later version.
- 
-    This software is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
- 
-    You should have received a copy of the GNU General Public License
-    along with this software. If not, write to the Free Software
-    Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
-----------------------------------------------------------------------
+NAME
 
-	*** This is beta software -- use at your own risks ***
+    IPC::Shareable - Use shared memory backed variables across processes
 
+SYNOPSIS
 
-Introduction
-------------
-IPC::Shareable allows you to tie a variable to shared memory making it
-easy to share the contents of that variable with other Perl processes.
-Scalars, arrays, and hashes can be tied.  The variable being tied may
-contain arbitrarily complex data structures - including references to
-arrays, hashes of hashes, etc.
+DESCRIPTION
 
+    IPC::Shareable allows you to tie a variable to shared memory making it
+    easy to share the contents of that variable with other Perl processes.
 
-Installation
-------------
-0.  Prerequisites:
-	-Perl version 5.005_03 or more recent.
-	-System V IPC (shmget(2), shmctl(2), etc).
-	-Storable.pm, version 0.6 or more recent.
+    Scalars, arrays, and hashes and even objects can be tied. The variable
+    being tied may contain arbitrarily complex data structures - including
+    references to arrays, hashes of hashes, etc.
 
-1.  Installation steps:
-	-from the directory where this file is located, type:
-	perl Makefile.PL
-	make
-	make test
-	make install
+    The association between variables in distinct processes is provided by
+    GLUE (aka "key"). This is an integer number or 4 character string[1]
+    that serves as a common identifier for data across process space. Hence
+    the statement
 
+     tie my $scalar, 'IPC::Shareable', 'data';
 
-Incompatibility Alert
----------------------
+    in program one and the statement
 
-This version contains some incompatiblities from earlier versions of
-IPC::Shareable.  Here's a list of them.
+     tie my $variable, 'IPC::Shareable', 'data';
 
-1. Earlier versions allowed you to use the word B<yes> for true and
-the word B<no> for false as elements in the options hash.  Support for
-this "feature" is being removed.  B<yes> will still act as true (since
-it is true, in the Perl sense), but use of the word B<no> now emits an
-(optional) warning and then revert to a false value.  This warning
-will become mandatory in a future release and then at some later date
-stop working altogether.
+    in program two will bind $scalar in program one and $variable in
+    program two.
 
-2. Earlier versions used to accept upper-case values of YES/NO as
-elements in the options hash in addition to yes/no.  Support for this
-has been entirely removed.
+    There is no pre-set limit to the number of processes that can bind to
+    data; nor is there a pre-set limit to the complexity of the underlying
+    data of the tied variables[2]. The amount of data that can be shared
+    within a single bound variable is limited by the system's maximum size
+    for a shared memory segment (the exact value is system-dependent).
 
-3. Earlier versions would try to allow data of arbitrary length to be
-tied to shared memory.  This well-intentioned (but misguided) approach
-convoluted the code.  Current versions of IPC::Shareable do not allow
-data of arbitrary length.  Each individual tied variable may not have
-a serialized length greater than the system's maximum shared memory
-segment size.
+    The bound data structures are all linearized (using Raphael Manfredi's
+    Storable module) before being slurped into shared memory. Upon
+    retrieval, the original format of the data structure is recovered.
+    Semaphore flags can be used for locking data between competing
+    processes.
 
-4. This version of IPC::Shareable does not understand the format of
-shared memory segments created versions prior to 0.60.  If you try to
-tie to such segments, you will get an error.  The only work around is
-to clear the shared memory segments and start with a fresh set.
+OPTIONS
 
-The benefits afforded in terms of code simplication and performance on
-shorter segments more than make up for the above incompatibilities.
+    Options are specified by passing a reference to a hash as the fourth
+    argument to the tie() function that enchants a variable. Alternatively
+    you can pass a reference to a hash as the third argument;
+    IPC::Shareable will then look at the field named key in this hash for
+    the value of GLUE. So,
 
-Documentation
--------------
+     tie my %variable, 'IPC::Shareable', 'data', \%options;
 
-The man page for IPC::Shareable is embedded in IPC::Shareable.pm.
-Copies of this document in various formats can be found in the doc
-directory of the distribution.  In there will you find information
-about usage, pitfalls, etc.
+    is equivalent to
 
-Known Problems
---------------
+     tie my %variable, 'IPC::Shareable', { key => 'data', ... };
 
-1. Running out of semaphores
+    The following fields are recognized in the options hash.
 
-    make test may fail with the message
+ key
 
-	Could not create semaphore set: No space left on device
+    The key field is used to determine the GLUE when using the
+    three-argument form of the call to tie(). This argument is then, in
+    turn, used as the KEY argument in subsequent calls to shmget() and
+    semget().
 
-    This is because the test suite has used up all of the allowed
-    number of semaphore sets and/or semaphores (SEMMNI and/or SEMMNS
-    respectively).  This seems to happen often on FreeBSD, where the
-    default value is rather low.  The only solution is to increase
-    SEMMNI and/or SEMMNS for the system.  Consult your system
-    documentation for how to do this.
+    The default value is IPC_PRIVATE, meaning that your variables cannot be
+    shared with other processes.
 
-2. Running out of shared memory
+    Default: IPC_PRIVATE
 
-    make test may fail with the message
+ create
 
-	Munged shared memory segment (size exceeded?)
+    create is used to control whether calls to tie() create new shared
+    memory segments or not. If create is set to a true value,
+    IPC::Shareable will create a new binding associated with GLUE as
+    needed. If create is false, IPC::Shareable will not attempt to create a
+    new shared memory segment associated with GLUE. In this case, a shared
+    memory segment associated with GLUE must already exist or the call to
+    tie() will fail and return undef.
 
-    This is likely because the tests are exceeding the maximum size of
-    a shared memory segment (SHMMAX) or the system-wide limit on
-    shared memory size (SHMALL).  The only solution is to increase
-    SHMMAX and/or SHMALL for the system.  Consult your system
-    documentation for how to do this.
+    Default: false
 
-    This failure could also mean that IPC::Shareable doesn't like your
-    version of Storable (IPC::Shareable makes some assumptions about
-    the structure of serialized data).  This message would happen, for
-    instance, when version 0.53 of IPC::Shareable was used in
-    conjunction with 1.0.x versions of Storable.  If you're having
-    problems, try using Storable 1.0.7 which is known to work with
-    IPC::Shareable 0.54.
+ exclusive
 
-3. Array operations on references
+    If exclusive field is set to a true value, calls to tie() will fail
+    (returning undef) if a data binding associated with GLUE already
+    exists. If set to a false value, calls to tie() will succeed even if a
+    shared memory segment associated with GLUE already exists.
 
-    Generally, when a reference is assigned to a shared variable, the
-    referenced data is also supposed to be shared.  However, this
-    currently is not the case for references assigned to an array via
-    push(), splice(), and such.  Suppose for example, you do
+    Default: false
 
-	@shared = ();
-	push @shared, { %hv };
+ mode
 
-    then the assignment
+    The mode argument is an octal number specifying the access permissions
+    when a new data binding is being created. These access permission are
+    the same as file access permissions in that 0666 is world readable,
+    0600 is readable only by the effective UID of the process creating the
+    shared variable, etc.
 
-	$shared->[0]->{foo} = "bar";
+    Default: 0666 (world read and writeable)
 
-    will not be shared with other processes since %hv is not shared.
-    As a workaround you'll have to use array index operations:
+ destroy
 
-	@shared = ();
-	$shared[0] = { %hv };
-	$shared->[0]->{foo} = "bar";
+    If set to a true value, the shared memory segment underlying the data
+    binding will be removed when the process calling tie() exits
+    (gracefully)[3].
 
-    Note that push(), splice(), et al. work fine for non-references.
+    Only those memory segments that were created by the current process
+    will be removed.
 
-    This bug will be fixed in a future release.
+    Use this option with care. In particular you should not use this option
+    in a program that will fork after binding the data. On the other hand,
+    shared memory is a finite resource and should be released if it is not
+    needed.
 
-Etc
----
+    Default: false
 
-I have tested this on Linux only. YMMV may vary on other systems.
+ size
 
-The two-year hiatus between releases of IPC::Shareable is symptomatic
-of the amount of time I have to contribute to this project.  Help save
-the world! Submit me patches and improvements.
+    This field may be used to specify the size of the shared memory segment
+    allocated.
 
-Also, don't be alarmed if I can't answer support emails.  If this
-bothers you, you can always ask for your money back :-)
+    Default: IPC::Shareable::SHM_BUFSIZ() (ie. 65536)
 
-For a more light-weight, non-tie()-based interface to shared memory
-see Maurice Aubrey's IPC::ShareLite.
+ Default Option Values
 
---
-Ben Sugars (bsugars@canoe.ca)
-March 5, 2001
+    Default values for options are:
 
-New co-maintainer
------------------
+         key       => IPC_PRIVATE,
+         create    => 0,
+         exclusive => 0,
+         destroy   => 0,
+         mode      => 0,
+         size      => IPC::Shareable::SHM_BUFSIZ(),
 
-October 8, 2012
+METHODS
 
-I became co-maintainer so that I could apply some patches that had
-been sitting around on rt.cpan.org for a few years.  Let me know
-if there is some way I can help, but understand that I have little
-experience with the module itself.
+ spawn(%opts)
 
-Mike South (msouth@gmail.com)
+    Spawns a forked process running in the background that holds the shared
+    memory segments backing your variable open.
+
+    Parameters:
+
+    Paremters are sent in as a hash.
+
+        key => $glue
+
+    Mandatory, String/Integer: The glue that you will be accessing your
+    data as.
+
+        mode => 0666
+
+    Optional, Integer: The read/write permissions on the variable. Defaults
+    to 0666.
+
+    Example:
+
+        use IPC::Shareable;
+    
+        # following line sets things up and returns
+    
+        IPC::Shareable->spawn(key => 'abcd');
+
+    Now, either within the same script, or any other script on the system,
+    your data will be available at the key/glue abcd. Call unspawn() to
+    remove it.
+
+ unspawn($key, $destroy)
+
+    This method will kill off the background process created with spawn().
+
+    Parameters:
+
+        $key
+
+    Mandatory, String/Integer: The glue (aka key) used in the call to
+    spawn().
+
+        $destroy
+
+    Optional, Bool. If set to a true value, we will remove all semaphores
+    and memory segments related to your data, thus removing the data in its
+    entirety. If not set to a true value, we'll leave the memory segments
+    in place, and you'll be able to re-attach to the data at any time.
+    Defaults to false (0).
+
+ lock($flags)
+
+    Obtains a lock on the shared memory. $flags specifies the type of lock
+    to acquire. If $flags is not specified, an exclusive read/write lock is
+    obtained. Acceptable values for $flags are the same as for the flock()
+    system call.
+
+    Returns true on success, and undef on error. For non-blocking calls
+    (see below), the method returns 0 if it would have blocked.
+
+    Obtain an exclusive lock like this:
+
+            tied(%var)->lock(LOCK_EX); # same as default
+
+    Only one process can hold an exclusive lock on the shared memory at a
+    given time.
+
+    Obtain a shared (read) lock:
+
+            tied(%var)->lock(LOCK_SH);
+
+    Multiple processes can hold a shared (read) lock at a given time. If a
+    process attempts to obtain an exclusive lock while one or more
+    processes hold shared locks, it will be blocked until they have all
+    finished.
+
+    Either of the locks may be specified as non-blocking:
+
+            tied(%var)->lock( LOCK_EX|LOCK_NB );
+            tied(%var)->lock( LOCK_SH|LOCK_NB );
+
+    A non-blocking lock request will return 0 if it would have had to wait
+    to obtain the lock.
+
+    Note that these locks are advisory (just like flock), meaning that all
+    cooperating processes must coordinate their accesses to shared memory
+    using these calls in order for locking to work. See the flock() call
+    for details.
+
+    Locks are inherited through forks, which means that two processes
+    actually can possess an exclusive lock at the same time. Don't do that.
+
+    The constants LOCK_EX, LOCK_SH, LOCK_NB, and LOCK_UN are available for
+    import using any of the following export tags:
+
+            use IPC::Shareable qw(:lock);
+            use IPC::Shareable qw(:flock);
+            use IPC::Shareable qw(:all);
+
+    Or, just use the flock constants available in the Fcntl module.
+
+    See "LOCKING" for further details.
+
+ unlock
+
+    Removes a lock. Takes no parameters, returns true on success.
+
+    This is equivalent of calling shlock(LOCK_UN).
+
+    See "LOCKING" for further details.
+
+ seg
+
+    Called on either the tied variable or the tie object, returns the
+    shared memory segment object currently in use.
+
+ sem
+
+    Called on either the tied variable or the tie object, returns the
+    semaphore object related to the memory segment currently in use.
+
+ global_register
+
+    Returns a hash reference of hashes of all in-use shared memory segments
+    across all processes. The key is the memory segment ID, and the value
+    is the segment and semaphore objects.
+
+ process_register
+
+    Returns a hash reference of hashes of all in-use shared memory segments
+    created by the calling process. The key is the memory segment ID, and
+    the value is the segment and semaphore objects.
+
+LOCKING
+
+    IPC::Shareable provides methods to implement application-level advisory
+    locking of the shared data structures. These methods are called
+    shlock() and shunlock(). To use them you must first get the object
+    underlying the tied variable, either by saving the return value of the
+    original call to tie() or by using the built-in tied() function.
+
+    To lock and subsequently unlock a variable, do this:
+
+        my $knot = tie my %hash, 'IPC::Shareable', $glue, { %options };
+    
+        $knot->lock;
+        $hash{a} = 'foo';
+        $knot->unlock;
+
+    or equivalently, if you've decided to throw away the return of tie():
+
+        tie my %hash, 'IPC::Shareable', $glue, { %options };
+    
+        tied(%hash)->shlock;
+        $hash{a} = 'foo';
+        tied(%hash)->unlock;
+
+    This will place an exclusive lock on the data of $scalar. You can also
+    get shared locks or attempt to get a lock without blocking.
+
+    IPC::Shareable makes the constants LOCK_EX, LOCK_SH, LOCK_UN, and
+    LOCK_NB exportable to your address space with the export tags :lock,
+    :flock, or :all. The values should be the same as the standard flock
+    option arguments.
+
+        if (tied(%hash)->lock(LOCK_SH|LOCK_NB)){
+            print "The value is $hash{a}\n";
+            tied(%hash)->unlock;
+        } else {
+            print "Another process has an exlusive lock.\n";
+        }
+
+    If no argument is provided to lock, it defaults to LOCK_EX. To unlock a
+    variable do this:
+
+    There are some pitfalls regarding locking and signals about which you
+    should make yourself aware; these are discussed in "NOTES".
+
+    Note that in the background, we perform lock optimization when reading
+    and writing to the shared storage even if the advisory locks aren't
+    being used.
+
+    Using the advisory locks can speed up processes that are doing several
+    writes/ reads at the same time.
+
+REFERENCES
+
+    Although references can reside within a shared data structure, the tied
+    variable can not be a reference itself.
+
+DESTRUCTION
+
+    perl(1) will destroy the object underlying a tied variable when then
+    tied variable goes out of scope. Unfortunately for IPC::Shareable, this
+    may not be desirable: other processes may still need a handle on the
+    relevant shared memory segment.
+
+    IPC::Shareable therefore provides several options to control the timing
+    of removal of shared memory segments.
+
+ destroy Option
+
+    As described in "OPTIONS", specifying the destroy option when tie()ing
+    a variable coerces IPC::Shareable to remove the underlying shared
+    memory segment when the process calling tie() exits gracefully.
+
+    NOTE: The destruction is handled in an END block. Only those memory
+    segments that are tied to the current process will be removed.
+
+ remove()
+
+        $knot->remove;
+    
+        # or
+    
+        tied($var)->remove;
+
+    Calling remove() on the object underlying a tie()d variable removes the
+    associated shared memory segments. The segment is removed irrespective
+    of whether it has the destroy option set or not and irrespective of
+    whether the calling process created the segment.
+
+ clean_up()
+
+        IPC::Shareable->clean_up;
+    
+        # or
+    
+        tied($var)->clean_up;
+    
+        # or
+    
+        $knot->clean_up;
+
+    This is a class method that provokes IPC::Shareable to remove all
+    shared memory segments created by the process. Segments not created by
+    the calling process are not removed.
+
+ clean_up_all()
+
+        IPC::Shareable->clean_up_all;
+    
+        # or
+    
+        tied($var)->clean_up_all;
+    
+        # or
+    
+        $knot->clean_up_all
+
+    This is a class method that provokes IPC::Shareable to remove all
+    shared memory segments encountered by the process. Segments are removed
+    even if they were not created by the calling process.
+
+RETURN VALUES
+
+    Calls to tie() that try to implement IPC::Shareable will return an
+    instance of IPC::Shareable on success, and undef otherwise.
+
+AUTHOR
+
+    Benjamin Sugars <bsugars@canoe.ca>
+
+NOTES
+
+ Footnotes from the above sections
+
+      1. If GLUE is longer than 4 characters, only the 4 most significant
+      characters are used. These characters are turned into integers by
+      unpack()ing them. If GLUE is less than 4 characters, it is space
+      padded.
+
+      2. IPC::Shareable provides no pre-set limits, but the system does.
+      Namely, there are limits on the number of shared memory segments that
+      can be allocated and the total amount of memory usable by shared
+      memory.
+
+      3. If the process has been smoked by an untrapped signal, the binding
+      will remain in shared memory. If you're cautious, you might try
+
+       $SIG{INT} = \&catch_int;
+       sub catch_int {
+           die;
+       }
+       ...
+       tie $variable, IPC::Shareable, 'data', { 'destroy' => 1 };
+
+      which will at least clean up after your user hits CTRL-C because
+      IPC::Shareable's END method will be called. Or, maybe you'd like to
+      leave the binding in shared memory, so subsequent process can recover
+      the data...
+
+ General Notes
+
+    o
+
+      When using lock() to lock a variable, be careful to guard against
+      signals. Under normal circumstances, IPC::Shareable's END method
+      unlocks any locked variables when the process exits. However, if an
+      untrapped signal is received while a process holds an exclusive lock,
+      DESTROY will not be called and the lock may be maintained even though
+      the process has exited. If this scares you, you might be better off
+      implementing your own locking methods.
+
+      One advantage of using flock on some known file instead of the
+      locking implemented with semaphores in IPC::Shareable is that when a
+      process dies, it automatically releases any locks. This only happens
+      with IPC::Shareable if the process dies gracefully.
+
+      The alternative is to attempt to account for every possible
+      calamitous ending for your process (robust signal handling in Perl is
+      a source of much debate, though it usually works just fine) or to
+      become familiar with your system's tools for removing shared memory
+      and semaphores. This concern should be balanced against the
+      significant performance improvements you can gain for larger data
+      structures by using the locking mechanism implemented in
+      IPC::Shareable.
+
+    o
+
+      There is a program called ipcs(1/8) (and ipcrm(1/8)) that is
+      available on at least Solaris and Linux that might be useful for
+      cleaning moribund shared memory segments or semaphore sets produced
+      by bugs in either IPC::Shareable or applications using it.
+
+      Examples:
+
+          # list all semaphores and memory segments in use on the system
+      
+          ipcs -a
+      
+          # list all memory segments along with each one's associated process ID
+      
+          ipcs -ap
+      
+          # remove *all* semaphores and memory segments
+      
+          ipcrm -a
+
+    o
+
+      This version of IPC::Shareable does not understand the format of
+      shared memory segments created by versions prior to 0.60. If you try
+      to tie to such segments, you will get an error. The only work around
+      is to clear the shared memory segments and start with a fresh set.
+
+    o
+
+      Iterating over a hash causes a special optimization if you have not
+      obtained a lock (it is better to obtain a read (or write) lock before
+      iterating over a hash tied to IPC::Shareable, but we attempt this
+      optimization if you do not).
+
+      The fetch/thaw operation is performed when the first key is accessed.
+      Subsequent key and and value accesses are done without accessing
+      shared memory. Doing an assignment to the hash or fetching another
+      value between key accesses causes the hash to be replaced from shared
+      memory. The state of the iterator in this case is not defined by the
+      Perl documentation. Caveat Emptor.
+
+CREDITS
+
+    Thanks to all those with comments or bug fixes, especially
+
+        Steve Bertrand      <steveb@cpan.org>
+        Maurice Aubrey      <maurice@hevanet.com>
+        Stephane Bortzmeyer <bortzmeyer@pasteur.fr>
+        Doug MacEachern     <dougm@telebusiness.co.nz>
+        Robert Emmery       <roberte@netscape.com>
+        Mohammed J. Kabir   <kabir@intevo.com>
+        Terry Ewing         <terry@intevo.com>
+        Tim Fries           <timf@dicecorp.com>
+        Joe Thomas          <jthomas@women.com>
+        Paul Makepeace      <Paul.Makepeace@realprogrammers.com>
+        Raphael Manfredi    <Raphael_Manfredi@pobox.com>
+        Lee Lindley         <Lee.Lindley@bigfoot.com>
+        Dave Rolsky         <autarch@urth.org>
+
+SEE ALSO
+
+    perltie, Storable, shmget, ipcs, ipcrm and other SysV IPC manual pages.
+

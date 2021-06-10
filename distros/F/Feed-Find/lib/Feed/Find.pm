@@ -8,7 +8,7 @@ use HTML::Parser;
 use URI;
 
 use vars qw( $VERSION );
-$VERSION = '0.07';
+$VERSION = '0.09';
 
 use constant FEED_MIME_TYPES => [
     'application/x.atom+xml',
@@ -19,7 +19,7 @@ use constant FEED_MIME_TYPES => [
     'application/rdf+xml',
 ];
 
-our $FEED_EXT = qr/\.(?:rss|xml|rdf)$/;
+our $FEED_EXT = qr/\.(?:rss|xml|rdf|atom)$/;
 our %IsFeed = map { $_ => 1 } @{ FEED_MIME_TYPES() };
 
 sub find {

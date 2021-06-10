@@ -1,12 +1,11 @@
-Build.PL
+App-csv2tsv-0.58/META.json
+App-csv2tsv-0.58/META.yml
 Changes
-lib/App/csv2tsv.pm
+csv2tsv
+csv2tsv.pm
+INSTALL
+Makefile.PL
 MANIFEST			This list of files
 README
-t/00-load.t
-t/manifest.t
-t/pod-coverage.t
-t/pod.t
-scripts/csv2tsv
-META.yml
-META.json
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

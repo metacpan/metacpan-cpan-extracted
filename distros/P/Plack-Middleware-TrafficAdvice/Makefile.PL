@@ -21,7 +21,7 @@ my %WriteMakefileArgs = (
     "File::Temp" => 0,
     "HTTP::Date" => 0,
     "HTTP::Status" => 0,
-    "JSON::MaybeXS" => 0,
+    "JSON::MaybeXS" => "1.004000",
     "Plack::Middleware" => 0,
     "parent" => 0,
     "strict" => 0,
@@ -39,7 +39,7 @@ my %WriteMakefileArgs = (
     "Test::Most" => 0,
     "utf8" => 0
   },
-  "VERSION" => "v0.1.0",
+  "VERSION" => "v0.2.0",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -53,7 +53,7 @@ my %FallbackPrereqs = (
   "HTTP::Date" => 0,
   "HTTP::Request::Common" => 0,
   "HTTP::Status" => 0,
-  "JSON::MaybeXS" => 0,
+  "JSON::MaybeXS" => "1.004000",
   "Module::Metadata" => 0,
   "Plack::Builder" => 0,
   "Plack::Middleware" => 0,
