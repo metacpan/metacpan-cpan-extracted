@@ -143,7 +143,7 @@ __DATA__
     alt = STRING :array
     files = STRING
     key-size = NUMBER
-    postrenew = STRING
+    postrenew = STRING :array
 
     
 

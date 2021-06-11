@@ -1,9 +1,9 @@
 package Acme::CPANModules::RandomData;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-05-26'; # DATE
+our $DATE = '2021-06-09'; # DATE
 our $DIST = 'Acme-CPANModules-RandomData'; # DIST
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 
 use strict;
 use Acme::CPANModulesUtil::Misc;
@@ -24,14 +24,14 @@ Keywords: random data.
 _
 
 our $LIST = {
-    summary => 'Generating random person (name, title, age, etc)',
+    summary => 'Generating random data',
     description => $text,
 };
 
 Acme::CPANModulesUtil::Misc::populate_entries_from_module_links_in_description;
 
 1;
-# ABSTRACT: Generating random person (name, title, age, etc)
+# ABSTRACT: Generating random data
 
 __END__
 
@@ -41,11 +41,11 @@ __END__
 
 =head1 NAME
 
-Acme::CPANModules::RandomData - Generating random person (name, title, age, etc)
+Acme::CPANModules::RandomData - Generating random data
 
 =head1 VERSION
 
-This document describes version 0.001 of Acme::CPANModules::RandomData (from Perl distribution Acme-CPANModules-RandomData), released on 2021-05-26.
+This document describes version 0.002 of Acme::CPANModules::RandomData (from Perl distribution Acme-CPANModules-RandomData), released on 2021-06-09.
 
 =head1 DESCRIPTION
 

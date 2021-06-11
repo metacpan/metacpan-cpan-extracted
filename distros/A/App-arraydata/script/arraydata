@@ -4,9 +4,9 @@
 # and generated automatically using Perinci::CmdLine::Gen version 0.498
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-06-07'; # DATE
+our $DATE = '2021-06-11'; # DATE
 our $DIST = 'App-arraydata'; # DIST
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.003'; # VERSION
 
 use 5.010001;
 use strict;
@@ -39,16 +39,16 @@ arraydata - Show content of ArrayData modules (plus a few other things)
 
 =head1 VERSION
 
-This document describes version 0.001 of arraydata (from Perl distribution App-arraydata), released on 2021-06-07.
+This document describes version 0.003 of arraydata (from Perl distribution App-arraydata), released on 2021-06-11.
 
 =head1 SYNOPSIS
 
 Usage:
 
- % arraydata [-C] [-L] [-R] [--action=s] [--config-path=path | -c]
+ % arraydata [-L] [-R] [--action=s] [--config-path=path | -c]
      [--config-profile=profile | -P] [--debug] [--detail] [--format=name]
      [--json] [-l] [--log-level=level] [-n=s] [--(no)naked-res]
-     [--no-config] [--no-detail] [--no-env] [--nodetail] [--num=s]
+     [--no-config | -C] [--no-detail] [--no-env] [--nodetail] [--num=s]
      [--page-result[=program]] [--quiet] [--trace] [--verbose]
      [--view-result[=program]] [module]
 
@@ -84,12 +84,6 @@ Default value:
 
  1
 
-=item B<-C>
-
-List ArrayData::* on CPAN.
-
-See C<--action>.
-
 =item B<-L>
 
 List installed ArrayData::*.
@@ -116,7 +110,7 @@ Set path to configuration file.
 
 Set configuration profile to use.
 
-=item B<--no-config>
+=item B<--no-config>, B<-C>
 
 Do not use any configuration file.
 

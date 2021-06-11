@@ -4,6 +4,7 @@ author:
   - Benjamin
 build_requires:
   ExtUtils::MakeMaker: 6.59
+  Test::LWP::UserAgent: 0
   Test::More: 0
 configure_requires:
   ExtUtils::MakeMaker: 6.59
@@ -29,4 +30,4 @@ requires:
 resources:
   license: http://dev.perl.org/licenses/
   repository: git://github.com/davorg/Feed-Find.git
-version: '0.09'
+version: '0.10'

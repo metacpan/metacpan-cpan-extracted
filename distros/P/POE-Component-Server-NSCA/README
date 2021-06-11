@@ -5,7 +5,7 @@ NAME
 
 VERSION
 
-    version 0.10
+    version 0.12
 
 SYNOPSIS
 
@@ -209,7 +209,7 @@ AUTHOR
 
 COPYRIGHT AND LICENSE
 
-    This software is copyright (c) 2017 by Chris Williams, P Kent and Ethan
+    This software is copyright (c) 2021 by Chris Williams, P Kent and Ethan
     Galstad.
 
     This is free software; you can redistribute it and/or modify it under

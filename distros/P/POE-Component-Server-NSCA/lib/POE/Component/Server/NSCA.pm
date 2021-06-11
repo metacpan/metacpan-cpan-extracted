@@ -1,5 +1,5 @@
 package POE::Component::Server::NSCA;
-$POE::Component::Server::NSCA::VERSION = '0.10';
+$POE::Component::Server::NSCA::VERSION = '0.12';
 #ABSTRACT: a POE Component that implements NSCA daemon functionality
 
 use strict;
@@ -8,7 +8,7 @@ use Socket;
 use Carp;
 use Net::Netmask;
 use Math::Random;
-use POE qw(Wheel::SocketFactory Wheel::ReadWrite Filter::Stream);
+use POE qw(Wheel::SocketFactory Wheel::ReadWrite Filter::Block);
 
 use constant MAX_INPUT_BUFFER =>        2048    ; # /* max size of most buffers we use */
 use constant MAX_HOST_ADDRESS_LENGTH => 256     ; # /* max size of a host address */
@@ -96,7 +96,7 @@ sub spawn {
   my %opts = @_;
   $opts{lc $_} = delete $opts{$_} for keys %opts;
   croak "$package requires a 'password' argument\n"
-	unless $opts{password};
+	unless defined $opts{password};
   croak "$package requires an 'encryption' argument\n"
 	unless defined $opts{encryption};
   croak "'encryption' argument must be a valid numeric\n"
@@ -144,6 +144,30 @@ sub getsockname {
   return $_[0]->{listener}->getsockname();
 }
 
+sub _length_encoder {
+  my $stuff = shift;
+  return;
+}
+
+sub _length_decoder {
+  my $stuff = shift;
+  my $expected;
+
+  if (length($$stuff) <= 0) {
+     # not sure what the expected package size will be
+     return;
+  } elsif (length($$stuff) % SIZEOF_OLD_PACKET == 0) {
+     # buffer size divisible by old packet size
+     return SIZEOF_OLD_PACKET;
+  } elsif (length($$stuff) % SIZEOF_DATA_PACKET == 0) {
+     # buffer size divisible by the new packet size
+     return SIZEOF_DATA_PACKET;
+  } else {
+     # buffer size not divisible, let it fill a little more
+     return;
+  }
+}
+
 sub _start {
   my ($kernel,$self,$sender) = @_[KERNEL,OBJECT,SENDER];
   $self->{session_id} = $_[SESSION]->ID();
@@ -153,8 +177,7 @@ sub _start {
   else {
 	$kernel->refcount_increment( $self->{session_id} => __PACKAGE__ );
   }
-  #$self->{filter} = POE::Filter::Block->new( BlockSize => SIZEOF_DATA_PACKET );
-  $self->{filter} = POE::Filter::Stream->new();
+  $self->{filter} = POE::Filter::Block->new(LengthCodec => [ \&_length_encoder, \&_length_decoder ]);
   $self->{listener} = POE::Wheel::SocketFactory->new(
       ( defined $self->{address} ? ( BindAddress => $self->{address} ) : () ),
       ( defined $self->{port} ? ( BindPort => $self->{port} ) : ( BindPort => 5667 ) ),
@@ -296,10 +319,7 @@ sub _conn_input {
   return unless $self->_conn_exists( $id );
   my $client = $self->{clients}->{ $id };
   $kernel->alarm_remove( delete $client->{alarm} );
-  my $data_packet_length = SIZEOF_DATA_PACKET;
-  if ( length( $packet ) == SIZEOF_OLD_PACKET ) {
-    $data_packet_length = SIZEOF_OLD_PACKET;
-  }
+  my $data_packet_length = length($packet);
   my $input = _decrypt( $packet, $self->{encryption}, $client->{iv}, $self->{password}, $data_packet_length );
   return unless $input; # something wrong with the decryption
   my $version = unpack 'n', substr $input, 0, 4;
@@ -398,15 +418,17 @@ sub _decrypt_xor {
      $x++;
   }
 
-  #/* rotate over password... */
-  $y=0;
-  $x=0;
-  while ($y < $data_packet_length){
-     #/* keep rotating over password */
-     $out[$y] = $out[$y] ^ $salt_pw[$x % scalar(@salt_pw)];
+  if (scalar(@salt_pw) > 0) {
+    #/* rotate over password... */
+    $y=0;
+    $x=0;
+    while ($y < $data_packet_length){
+        #/* keep rotating over password */
+        $out[$y] = $out[$y] ^ $salt_pw[$x % scalar(@salt_pw)];
 
-     $y++;
-     $x++;
+        $y++;
+        $x++;
+    }
   }
   return join '', @out;
 }
@@ -456,7 +478,7 @@ POE::Component::Server::NSCA - a POE Component that implements NSCA daemon funct
 
 =head1 VERSION
 
-version 0.10
+version 0.12
 
 =head1 SYNOPSIS
 
@@ -670,7 +692,7 @@ Chris Williams <chris@bingosnet.co.uk>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Chris Williams, P Kent and Ethan Galstad.
+This software is copyright (c) 2021 by Chris Williams, P Kent and Ethan Galstad.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

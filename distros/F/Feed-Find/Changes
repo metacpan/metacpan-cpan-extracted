@@ -1,5 +1,9 @@
 Revision history for Feed::Find
 
+0.10  2021.06.11
+    - Switch to using Test::LWP::UserAgent so we don't require
+      an internet connection for the tests.
+
 0.09  2021.06.10
     - Remove "use_test_base" from Makefile.pm (Test::Base wasn't
       used and it brought in a copy of Test::Builder that seems

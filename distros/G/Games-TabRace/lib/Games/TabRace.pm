@@ -1,7 +1,7 @@
 package Games::TabRace;
 
 our $DATE = '2021-03-05'; # DATE
-our $VERSION = '0.004'; # VERSION
+our $VERSION = '0.005'; # VERSION
 
 1;
 # ABSTRACT: A game played using shell tab completion
@@ -18,7 +18,7 @@ Games::TabRace - A game played using shell tab completion
 
 =head1 VERSION
 
-This document describes version 0.004 of Games::TabRace (from Perl distribution Games-TabRace), released on 2021-03-05.
+This document describes version 0.005 of Games::TabRace (from Perl distribution Games-TabRace), released on 2021-03-05.
 
 =head1 SYNOPSIS
 

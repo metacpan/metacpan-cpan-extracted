@@ -25,7 +25,7 @@ use Text::ParseWords;
 use App::Acmeman::Log qw(:all :sysexits);
 use feature 'state';
 
-our $VERSION = '3.07';
+our $VERSION = '3.08';
 
 my $progdescr = "manages ACME certificates";
 
@@ -321,12 +321,14 @@ sub renew {
     foreach my $vhost ($self->selected_domains) {
 	if ($self->force_option || $self->domain_cert_expires($vhost)) {
 	    if ($self->register_domain_certificate($vhost)) {
-		if (my $cmd = $vhost->postrenew) {
+		if (my $postrenew = $vhost->postrenew) {
 		    local $ENV{ACMEMAN_CERTIFICATE_FILE} =
 			$vhost->certificate_file;
 		    local $ENV{ACMEMAN_DOMAIN_NAME} = $vhost;
 		    local $ENV{ACMEMAN_ALT_NAMES} = join(' ', $vhost->alt);
-		    $self->runcmd($cmd, $vhost);
+	    	    foreach my $cmd (@$postrenew) {
+			$self->runcmd($cmd, $vhost);
+		    }
 		} else {
 		    push @renewed, $vhost;
 		}

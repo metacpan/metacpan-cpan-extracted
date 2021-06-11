@@ -1,0 +1,60 @@
+{
+   "abstract" : "unknown",
+   "author" : [
+      "Красимир Беров <berov@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Mojolicious-Plugin-Obrazi",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc",
+         "t"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Imager" : "1.012",
+            "Mojolicious" : "9.17",
+            "Text::CSV_XS" : "1.46",
+            "perl" : "5.026000"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/kberov/Mojolicious-Plugin-Obrazi/issues"
+      },
+      "homepage" : "https://github.com/kberov/Mojolicious-Plugin-Obrazi",
+      "license" : [
+         "http://www.opensource.org/licenses/artistic-license-2.0"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/kberov/Mojolicious-Plugin-Obrazi.git",
+         "web" : "https://github.com/kberov/Mojolicious-Plugin-Obrazi"
+      }
+   },
+   "version" : "0.11",
+   "x_serialization_backend" : "JSON::PP version 2.97001"
+}

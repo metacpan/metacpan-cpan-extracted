@@ -1,7 +1,7 @@
 #!perl
 
 our $DATE = '2021-03-05'; # DATE
-our $VERSION = '0.004'; # VERSION
+our $VERSION = '0.005'; # VERSION
 
 # FRAGMENT id=shcompgen-hint command=tabrace
 
@@ -116,7 +116,7 @@ if ($ENV{COMP_LINE} || $ENV{COMMAND_LINE}) {
     my $compres;
 
     if ($State->{state} eq 'uninit') {
-        $compres = ['0:Please-run-tabrace-first-to-init.', '9:'];
+        $compres = {message=>'Please run tabrace first to init the game.'};
     } else {
         $State->{start_time} //= time();
 
@@ -300,7 +300,7 @@ tabrace - A game played by shell tab completion
 
 =head1 VERSION
 
-This document describes version 0.004 of tabrace (from Perl distribution Games-TabRace), released on 2021-03-05.
+This document describes version 0.005 of tabrace (from Perl distribution Games-TabRace), released on 2021-03-05.
 
 =head1 SYNOPSIS
 

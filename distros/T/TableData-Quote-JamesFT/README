@@ -1,0 +1,39 @@
+NAME
+    TableData::Quote::JamesFT - Quotes from JamesFT github repository
+
+VERSION
+    This document describes version 0.002 of TableData::Quote::JamesFT (from
+    Perl distribution TableData-Quote-JamesFT), released on 2021-06-11.
+
+CONTRIBUTOR
+    perlancar (on netbook-dell-xps13) <perlancar@gmail.com>
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/TableData-Quote-JamesFT>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Tables-Quotes-JamesFT>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=TableData-Quote-James
+    FT>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    Source: <https://github.com/JamesFT/Database-Quotes-JSON> (Jan 23, 2017
+    version).
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2021, 2020 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

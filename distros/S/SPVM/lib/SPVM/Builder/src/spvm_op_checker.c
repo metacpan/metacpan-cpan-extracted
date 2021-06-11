@@ -217,77 +217,57 @@ void SPVM_OP_CHECKER_check_tree(SPVM_COMPILER* compiler, SPVM_OP* op_root, SPVM_
               SPVM_OP* op_stab = SPVM_OP_cut_op(compiler, op_cur);
               
               SPVM_OP* op_list_elements = op_array_init->first;
-              SPVM_OP* op_type_new_default = op_array_init->last;
               
               const char* file = op_list_elements->file;
               int32_t line = op_list_elements->line;
               
               SPVM_OP* op_new = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_NEW, file, line);
 
-              SPVM_OP* op_type_new = NULL;
-              SPVM_OP* op_type_element = NULL;
-              
-              if (op_type_new_default->id == SPVM_OP_C_ID_TYPE) {
-                op_type_new = op_type_new_default;
-                
-                // Create element type
-                SPVM_TYPE* type_element = SPVM_TYPE_new(compiler);
-                type_element->basic_type = op_type_new->uv.type->basic_type;
-                type_element->dimension = op_type_new->uv.type->dimension - 1;
-                type_element->flag = op_type_new->uv.type->flag;
-                op_type_element = SPVM_OP_new_op_type(compiler, type_element, op_type_new_default->file, op_type_new_default->line);
-              }
-              
               SPVM_OP* op_sequence = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_SEQUENCE, file, line);
               op_cur = op_sequence;
               SPVM_OP* op_assign_new = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_ASSIGN, file, line);
               
-              // Resolve array type and element type
+              // Array length
               int32_t length = 0;
               {
                 SPVM_OP* op_term_element = op_list_elements->first;
                 int32_t index = 0;
                 while ((op_term_element = SPVM_OP_sibling(compiler, op_term_element))) {
-                  if (index == 0) {
-                    if (op_term_element->id == SPVM_OP_C_ID_UNDEF) {
-                      SPVM_COMPILER_error(compiler, "Array initialization first element must not be undef at %s line %d\n", file, line);
-                      return;
-                    }
-
-                    SPVM_TYPE* type_term_element = SPVM_OP_get_type(compiler, op_term_element);
-                    
-                    op_term_element->no_need_check = 1;
-
-                    // Create element type
-                    if (op_type_element == NULL) {
-                      SPVM_TYPE* type_element = SPVM_TYPE_new(compiler);
-                      type_element->basic_type = type_term_element->basic_type;
-                      type_element->dimension = type_term_element->dimension;
-                      op_type_element = SPVM_OP_new_op_type(compiler, type_element, file, line);
-                    }
-                    
-                    if (!SPVM_TYPE_is_numeric_type(compiler, op_type_element->uv.type->basic_type->id,op_type_element->uv.type->dimension, op_type_element->uv.type->flag)) {
-                      {
-                        SPVM_OP* op_type_tmp = op_type_element;
-
-                        SPVM_OP_CHECKER_add_no_dup_basic_type(compiler, package->op_package, op_type_tmp);
-                      }
-                    }
-                                            
-                    // Create array type
-                    if (op_type_new == NULL) {
-                      SPVM_TYPE* type_new = SPVM_TYPE_new(compiler);
-                      type_new->basic_type = type_term_element->basic_type;
-                      type_new->dimension = type_term_element->dimension + 1;
-                      op_type_new = SPVM_OP_new_op_type(compiler, type_new, file, line);
-                    }
-                  }
                   index++;
                 }
                 length = index;
               }
-              
-              if (length == 0 || op_array_init->flag & SPVM_OP_C_FLAG_ARRAY_INIT_IS_KEY_VALUES) {
+
+              SPVM_OP* op_type_element = NULL;
+              SPVM_OP* op_type_new = NULL;
+              if (length > 0) {
+                SPVM_OP* op_term_element = op_list_elements->first;
+
+                op_term_element = SPVM_OP_sibling(compiler, op_term_element);
+                if (op_term_element->id == SPVM_OP_C_ID_UNDEF) {
+                  SPVM_COMPILER_error(compiler, "Array initialization first element must not be undef at %s line %d\n", file, line);
+                  return;
+                }
+                SPVM_TYPE* type_term_element = SPVM_OP_get_type(compiler, op_term_element);
+
+                // Create element type
+                SPVM_TYPE* type_element = SPVM_TYPE_new(compiler);
+                type_element->basic_type = type_term_element->basic_type;
+                type_element->dimension = type_term_element->dimension;
+                op_type_element = SPVM_OP_new_op_type(compiler, type_element, file, line);
+                
+                // Register basic type
+                if (!SPVM_TYPE_is_numeric_type(compiler, op_type_element->uv.type->basic_type->id,op_type_element->uv.type->dimension, op_type_element->uv.type->flag)) {
+                  SPVM_OP_CHECKER_add_no_dup_basic_type(compiler, package->op_package, op_type_element);
+                }
+                                        
+                // Create array type
+                SPVM_TYPE* type_new = SPVM_TYPE_new(compiler);
+                type_new->basic_type = type_term_element->basic_type;
+                type_new->dimension = type_term_element->dimension + 1;
+                op_type_new = SPVM_OP_new_op_type(compiler, type_new, file, line);
+              }
+              else if (length == 0) {
                 op_type_element = SPVM_OP_new_op_any_object_type(compiler, op_cur->file, op_cur->line);
                 SPVM_TYPE* type_element = op_type_element->uv.type;
                 SPVM_TYPE* type_new = SPVM_TYPE_new(compiler);
@@ -295,7 +275,10 @@ void SPVM_OP_CHECKER_check_tree(SPVM_COMPILER* compiler, SPVM_OP* op_root, SPVM_
                 type_new->dimension = type_element->dimension + 1;
                 op_type_new = SPVM_OP_new_op_type(compiler, type_new, file, line);
               }
-
+              else {
+                assert(0);
+              }
+              
               SPVM_TYPE* type_var_tmp_new = SPVM_TYPE_new(compiler);
               type_var_tmp_new->basic_type =op_type_new->uv.type->basic_type;
               type_var_tmp_new->dimension = op_type_new->uv.type->dimension;

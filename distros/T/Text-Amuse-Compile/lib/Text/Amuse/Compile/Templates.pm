@@ -748,10 +748,20 @@ sub latex {
                [% safe_options.paging %],%
                paper=[% safe_options.papersize %]]%
                {[% safe_options.class %]}
+[% IF safe_options.use_geometry %]
+\usepackage[%
+  top=[% safe_options.geometry_top_margin %],%
+  outer=[% safe_options.geometry_outer_margin %],[% IF safe_options.headings %]includehead,[% END %]%
+  width=[% safe_options.areaset_width %],%
+  height=[% safe_options.areaset_height %]%
+  ]{geometry}
+[% ELSE %]
 [% IF safe_options.areaset_width %]
 [% IF safe_options.areaset_height %]
 \areaset[current]{[% safe_options.areaset_width %]}{[% safe_options.areaset_height %]}
 [% END %]
+[% END %]
+
 [% END %]
 
 [% IF tex_indexes %]

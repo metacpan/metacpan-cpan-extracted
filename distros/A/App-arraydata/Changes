@@ -1,3 +1,14 @@
+0.003   2021-06-11  Released-By: PERLANCAR; Urgency: medium
+
+	- [ux] Don't downgrade output format to text-simple by default,
+	  this is appropriate for 'wordlist' CLI but not us.
+
+
+0.002   2021-06-11  Released-By: PERLANCAR; Urgency: medium
+
+	- [bugfix] Remove unused option -C.
+
+
 0.001   2021-06-07  Released-By: PERLANCAR
 
         - First, early release.

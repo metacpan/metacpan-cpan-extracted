@@ -1,3 +1,8 @@
+0.005   2021-03-05  Released-By: PERLANCAR; Urgency: low
+
+	- Use proper message format in completion response.
+
+
 0.004   2021-03-05  Released-By: PERLANCAR; Urgency: medium
 
 	- Avoid perl undef warnings.

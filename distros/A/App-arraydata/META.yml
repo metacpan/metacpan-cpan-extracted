@@ -27,7 +27,6 @@ requires:
   Module::Load::Util: '0.004'
   Perinci::CmdLine::Any: '0'
   Perinci::CmdLine::Lite: '1.827'
-  Perinci::Sub::Property::cmdline: '0'
   Sah::Schema::perl::arraydata::modname_with_optional_args: '0'
   Sah::Schema::posint: '0'
   perl: '5.010001'
@@ -37,7 +36,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-arraydata
   homepage: https://metacpan.org/release/App-arraydata
   repository: git://github.com/perlancar/perl-App-arraydata.git
-version: '0.001'
+version: '0.003'
 x_Dist_Zilla:
   perl:
     version: '5.034000'

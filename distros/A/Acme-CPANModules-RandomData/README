@@ -1,11 +1,10 @@
 NAME
-    Acme::CPANModules::RandomData - Generating random person (name, title,
-    age, etc)
+    Acme::CPANModules::RandomData - Generating random data
 
 VERSION
-    This document describes version 0.001 of Acme::CPANModules::RandomData
+    This document describes version 0.002 of Acme::CPANModules::RandomData
     (from Perl distribution Acme-CPANModules-RandomData), released on
-    2021-05-26.
+    2021-06-09.
 
 DESCRIPTION
     Generating

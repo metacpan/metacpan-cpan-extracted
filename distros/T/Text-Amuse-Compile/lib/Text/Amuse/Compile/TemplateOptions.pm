@@ -60,8 +60,22 @@ doc. Sensible values are from 9 to 15. 15 has narrow margins, while in
 =item * areaset_height 50mm
 
 Usually you want to use the DIV factor, but you can also set the type
-area manually specifying the dimensions. The dimensions can be in mm,
-cm, in and pt, separated by a colon.
+area manually specifying the text block dimensions. The dimensions can
+be in mm, cm, in and pt.
+
+Both need to be set to have an effect.
+
+=item * geometry_top_margin 1in
+
+=item * geometry_outer_margin 1in
+
+Usually you want to use the DIV factor, but you can also set the type
+area manually specifying the top and outer margins. The dimensions can
+be in mm, cm, in and pt.
+
+You also need to set C<areaset_width> and C<areaset_height> to use
+these custom margins (inner and bottom margins are calculated using
+the text block dimensions).
 
 =item * oneside (boolean)
 
@@ -148,6 +162,12 @@ has areaset_width => (is => 'rw',
 
 has areaset_height => (is => 'rw',
                        isa => \&_is_tex_measure_or_false);
+
+has geometry_top_margin => (is => 'rw',
+                            isa => \&_is_tex_measure_or_false);
+
+has geometry_outer_margin => (is => 'rw',
+                              isa => \&_is_tex_measure_or_false);
 
 has bcor => (is => 'rw',
              isa => \&_is_tex_measure,
@@ -739,6 +759,8 @@ sub config_setters {
     return (qw/papersize bcor division oneside twoside
                areaset_width
                areaset_height
+               geometry_top_margin
+               geometry_outer_margin
                mainfont sansfont monofont fontsize
                sitename siteslogan site logo
                tex_emergencystretch
@@ -759,10 +781,24 @@ sub config_setters {
                opening beamertheme beamercolortheme/);
 }
 
+sub _use_geometry {
+    my $self = shift;
+    if ($self->areaset_height &&
+        $self->areaset_width &&
+        $self->geometry_outer_margin &&
+        $self->geometry_top_margin) {
+        return 1;
+    }
+    else {
+        return 0;
+    }
+}
+
 sub config_output {
     my $self = shift;
     my %out = (
                paging => $self->paging,
+               use_geometry => $self->_use_geometry,
               );
     my %replace = (papersize => 'tex_papersize');
     foreach my $method ($self->config_setters) {

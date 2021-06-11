@@ -1,0 +1,23 @@
+.perltidyrc
+lib/Mojolicious/Command/Author/generate/obrazi.pm
+lib/Mojolicious/Plugin/Obrazi.pm
+Makefile.PL
+MANIFEST			This list of files
+t/basic.t
+t/command.t
+t/data/from/icons/24-30.JPG
+t/data/from/icons/DSCN0726.JPG
+t/data/from/icons/Untitled-2.jpg
+t/data/from/index.csv
+t/data/from/loga/loga11.png
+t/data/from/loga/loga16.png
+t/data/from/loga/loga4.png
+t/data/from/some.txt
+t/data/from/изображение.png
+t/data/from/мозайки/1.jpg
+t/data/from/мозайки/13.jpg
+t/data/from/мозайки/2.jpg
+t/data/from/монограм1.png
+t/pod.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

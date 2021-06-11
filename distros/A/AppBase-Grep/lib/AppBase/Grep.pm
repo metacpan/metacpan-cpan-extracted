@@ -1,20 +1,15 @@
 package AppBase::Grep;
 
-our $DATE = '2020-11-07'; # DATE
-our $VERSION = '0.007'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2021-06-09'; # DATE
+our $DIST = 'AppBase-Grep'; # DIST
+our $VERSION = '0.008'; # VERSION
 
 use 5.010001;
 use strict;
 use warnings;
 
 our %SPEC;
-
-our %Colors = (
-    label     => "\e[35m",   # magenta
-    separator => "\e[36m",   # cyan
-    linum     => "\e[32m",   # green
-    match     => "\e[1;31m", # bold red
-);
 
 $SPEC{grep} = {
     v => 1.1,
@@ -90,6 +85,7 @@ _
         },
         color => {
             schema => ['str*', in=>[qw/never always auto/]],
+            default => 'auto',
             tags => ['category:general-output-control'],
         },
         quiet => {
@@ -112,6 +108,9 @@ _
     },
 };
 sub grep {
+    require ColorThemeUtil::ANSI;
+    require Module::Load::Util;
+
     my %args = @_;
 
     my $opt_ci     = $args{ignore_case};
@@ -120,30 +119,11 @@ sub grep {
     my $opt_quiet  = $args{quiet};
     my $opt_linum  = $args{line_number};
 
-    if ($ENV{COLOR_THEME}) {
-        require Color::Theme::Util;
-        my $theme = Color::Theme::Util::get_color_theme(
-            {module_prefixes => [qw/AppBase::Grep::ColorTheme Generic::ColorTheme/]}, $ENV{COLOR_THEME});
-        require Color::Theme::Util::ANSI;
-        if ($theme->{colors}{label}) {
-            for my $c (keys %Colors) {
-                $Colors{$c} = Color::Theme::Util::ANSI::theme_color_to_ansi($theme, $c);
-            }
-        } elsif ($theme->{colors}{color1}) {
-            my %map = (
-                label     => 'color1',
-                separator => 'color2',
-                linum     => 'color3',
-                match     => 'color4',
-            );
-            for my $c (keys %Colors) {
-                $Colors{$c} = Color::Theme::Util::ANSI::theme_color_to_ansi(
-                    $theme, $map{$c});
-            }
-        } else {
-            warn "Unsuitable color theme '$ENV{COLOR_THEME}', ignored";
-        }
-    }
+    my $ct = $ENV{APPBASE_GREP_COLOR_THEME} // 'Light';
+
+    require Module::Load::Util;
+    my $ct_obj = Module::Load::Util::instantiate_class_with_optional_args(
+        {ns_prefixes=>['ColorTheme::Search','ColorTheme','']}, $ct);
 
     my (@str_patterns, @re_patterns);
     for my $p ( grep {defined} $args{pattern}, @{ $args{regexps} // [] }) {
@@ -157,17 +137,12 @@ sub grep {
     my $re_pat = join('|', @str_patterns);
     $re_pat = $opt_ci ? qr/$re_pat/i : qr/$re_pat/;
 
-    my $color = $args{color} //
-        (defined $ENV{COLOR} ? ($ENV{COLOR} ? 'always' : 'never') : undef) //
-        'auto';
-    my $use_color;
-    if ($color eq 'always') {
-        $use_color = 1;
-    } elsif ($color eq 'never') {
-        $use_color = 0;
-    } else {
-        $use_color = (-t STDOUT);
-    }
+    my $color = $args{color} // 'auto';
+    my $use_color =
+        ($color eq 'always' ? 1 : $color eq 'never' ? 0 : undef) //
+        (defined $ENV{NO_COLOR} ? 0 : undef) //
+        ($ENV{COLOR} ? 1 : defined($ENV{COLOR}) ? 0 : undef) //
+        (-t STDOUT);
 
     my $source = $args{_source};
 
@@ -177,10 +152,11 @@ sub grep {
     my $num_matches = 0;
     my ($line, $label, $linum, $chomp);
 
+    my $ansi_highlight = ColorThemeUtil::ANSI::item_color_to_ansi($ct_obj->get_item_color('highlight'));
     my $code_print = sub {
         if (defined $label && length $label) {
             if ($use_color) {
-                print "$Colors{label}$label\e[0m$Colors{separator}:\e[0m";
+                print ColorThemeUtil::ANSI::item_color_to_ansi($ct_obj->get_item_color('location')) . $label . "\e[0m:"; # XXX separator color?
             } else {
                 print $label, ":";
             }
@@ -188,14 +164,14 @@ sub grep {
 
         if ($opt_linum) {
             if ($use_color) {
-                print "$Colors{linum}$linum\e[0m$Colors{separator}:\e[0m";
+                print ColorThemeUtil::ANSI::item_color_to_ansi($ct_obj->get_item_color('location')) . $linum . "\e[0m:";
             } else {
                 print $linum, ":";
             }
         }
 
         if ($use_color) {
-            $line =~ s/($re_pat)/$Colors{match}$1\e[0m/g;
+            $line =~ s/($re_pat)/$ansi_highlight$1\e[0m/g;
             print $line;
         } else {
             print $line;
@@ -285,7 +261,13 @@ AppBase::Grep - A base for grep-like CLI utilities
 
 =head1 VERSION
 
-This document describes version 0.007 of AppBase::Grep (from Perl distribution AppBase-Grep), released on 2020-11-07.
+This document describes version 0.008 of AppBase::Grep (from Perl distribution AppBase-Grep), released on 2021-06-09.
+
+=head1 CONTRIBUTOR
+
+=for stopwords perlancar (on pc-office)
+
+perlancar (on pc-office) <perlancar@gmail.com>
 
 =head1 FUNCTIONS
 
@@ -294,7 +276,7 @@ This document describes version 0.007 of AppBase::Grep (from Perl distribution A
 
 Usage:
 
- grep(%args) -> [status, msg, payload, meta]
+ grep(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 A base for grep-like CLI utilities.
 
@@ -332,7 +314,7 @@ Arguments ('*' denotes required arguments):
 
 Require all patterns to match, instead of just one.
 
-=item * B<color> => I<str>
+=item * B<color> => I<str> (default: "auto")
 
 =item * B<count> => I<true>
 
@@ -366,16 +348,20 @@ Invert the sense of matching.
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
 =head1 ENVIRONMENT
+
+=head2 NO_COLOR
+
+If set, will disable color. Takes precedence over L</COLOR> but not C<--color>.
 
 =head2 COLOR
 
@@ -410,7 +396,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020, 2018 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2020, 2018 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

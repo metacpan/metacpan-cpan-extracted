@@ -1,6 +1,33 @@
 ==================================================
-Changes from 2012-05-06 00:00:00 +0000 to present.
+Changes from 2016-06-12 00:00:00 +0000 to present.
 ==================================================
+
+-----------------------------------------
+version 0.12 at 2021-06-11 08:23:22 +0000
+-----------------------------------------
+
+  Change: a17f5f94006b959dd5620ba3927f8afebedcdaaa
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2021-06-11 09:23:22 +0000
+
+    Release engineering 
+
+  Change: a2a0c3bbc40357df26431c240a809a11c3d6fe33
+  Author: Chris Williams <chris@bingosnet.co.uk>
+  Date : 2021-06-11 09:08:28 +0000
+
+    Merge pull request #4 from arjanoosting/support-two-package-sizes
+
+    Use Filter::Block with an heuristic LengthCodec to support both
+    package 
+
+  Change: fae74a5db3fc6a5eaa129ba31a8da6203d2a8e6c
+  Author: Arjan Oosting <arjan@helix-nebula.org>
+  Date : 2021-06-10 09:53:48 +0000
+
+    Use Filter::Block with an heuristic LengthCodec to support both
+    package sizes. Also the password can be empty with xor encoding, thus
+    support this as well 
 
 -----------------------------------------
 version 0.10 at 2017-05-05 11:32:49 +0000
@@ -63,5 +90,5 @@ version 0.10 at 2017-05-05 11:32:49 +0000
     Removed the test kwalitee test 
 
 ===============================================
-Plus 1 release after 2012-05-06 00:00:00 +0000.
+Plus 1 release after 2016-06-12 00:00:00 +0000.
 ===============================================

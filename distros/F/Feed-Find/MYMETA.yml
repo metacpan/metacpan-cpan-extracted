@@ -1,0 +1,33 @@
+---
+abstract: 'Syndication feed auto-discovery'
+author:
+  - Benjamin
+build_requires:
+  ExtUtils::MakeMaker: '6.59'
+  Test::LWP::UserAgent: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Module::Install version 1.19, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Feed-Find
+no_index:
+  directory:
+    - inc
+    - t
+    - xt
+requires:
+  Class::ErrorHandler: '0'
+  HTML::Parser: '0'
+  LWP: '0'
+  URI: '0'
+  perl: '5.008001'
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/davorg/Feed-Find.git
+version: '0.10'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

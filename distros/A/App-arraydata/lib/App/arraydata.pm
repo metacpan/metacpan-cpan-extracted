@@ -1,9 +1,9 @@
 package App::arraydata;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-06-07'; # DATE
+our $DATE = '2021-06-11'; # DATE
 our $DIST = 'App-arraydata'; # DIST
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.003'; # VERSION
 
 use 5.010001;
 use strict;
@@ -70,11 +70,11 @@ $SPEC{arraydata} = {
                     is_flag => 1,
                     code => sub { my $args=shift; $args->{action} = 'list_installed' },
                 },
-                C => {
-                    summary=>'List ArrayData::* on CPAN',
-                    is_flag => 1,
-                    code => sub { my $args=shift; $args->{action} = 'list_installed' },
-                },
+                #C => {
+                #    summary=>'List ArrayData::* on CPAN',
+                #    is_flag => 1,
+                #    code => sub { my $args=shift; $args->{action} = 'list_cpan' },
+                #},
                 R => {
                     summary=>'Pick random elements from an ArrayData module',
                     is_flag => 1,
@@ -104,7 +104,6 @@ $SPEC{arraydata} = {
     },
     examples => [
     ],
-    'cmdline.default_format' => 'text-simple',
 };
 sub arraydata {
     my %args = @_;
@@ -149,7 +148,7 @@ App::arraydata - Show content of ArrayData modules (plus a few other things)
 
 =head1 VERSION
 
-This document describes version 0.001 of App::arraydata (from Perl distribution App-arraydata), released on 2021-06-07.
+This document describes version 0.003 of App::arraydata (from Perl distribution App-arraydata), released on 2021-06-11.
 
 =head1 SYNOPSIS
 

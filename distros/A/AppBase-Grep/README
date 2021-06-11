@@ -2,14 +2,17 @@ NAME
     AppBase::Grep - A base for grep-like CLI utilities
 
 VERSION
-    This document describes version 0.007 of AppBase::Grep (from Perl
-    distribution AppBase-Grep), released on 2020-11-07.
+    This document describes version 0.008 of AppBase::Grep (from Perl
+    distribution AppBase-Grep), released on 2021-06-09.
+
+CONTRIBUTOR
+    perlancar (on pc-office) <perlancar@gmail.com>
 
 FUNCTIONS
   grep
     Usage:
 
-     grep(%args) -> [status, msg, payload, meta]
+     grep(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
     A base for grep-like CLI utilities.
 
@@ -42,7 +45,7 @@ FUNCTIONS
 
         Require all patterns to match, instead of just one.
 
-    *   color => *str*
+    *   color => *str* (default: "auto")
 
     *   count => *true*
 
@@ -75,16 +78,23 @@ FUNCTIONS
 
     Returns an enveloped result (an array).
 
-    First element (status) is an integer containing HTTP status code (200
-    means OK, 4xx caller error, 5xx function error). Second element (msg) is
-    a string containing error message, or 'OK' if status is 200. Third
-    element (payload) is optional, the actual result. Fourth element (meta)
-    is called result metadata and is optional, a hash that contains extra
-    information.
+    First element ($status_code) is an integer containing HTTP-like status
+    code (200 means OK, 4xx caller error, 5xx function error). Second
+    element ($reason) is a string containing error message, or something
+    like "OK" if status is 200. Third element ($payload) is the actual
+    result, but usually not present when enveloped result is an error
+    response ($status_code is not 2xx). Fourth element (%result_meta) is
+    called result metadata and is optional, a hash that contains extra
+    information, much like how HTTP response headers provide additional
+    metadata.
 
     Return value: (any)
 
 ENVIRONMENT
+  NO_COLOR
+    If set, will disable color. Takes precedence over "COLOR" but not
+    "--color".
+
   COLOR
     Boolean. If set to true, will set default "--color" to "always" instead
     of "auto". If set to false, will set default "--color" to "never"
@@ -113,7 +123,7 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2020, 2018 by perlancar@cpan.org.
+    This software is copyright (c) 2021, 2020, 2018 by perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

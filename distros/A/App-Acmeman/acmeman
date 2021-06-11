@@ -531,6 +531,9 @@ setting is used.
 Run I<CMD> after successful update. If not given, the B<core.postrenew>
 commands will be run.
 
+If more than one B<postrenew> statements are defined, they will be run in
+sequence, in the same order as they appeared in the configuration file.
+
 I<CMD> is run in the environment inherited from the calling B<acmeman>
 process with the following additional variables defined:
 

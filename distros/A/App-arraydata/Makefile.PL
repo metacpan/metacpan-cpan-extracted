@@ -30,7 +30,6 @@ my %WriteMakefileArgs = (
     "Module::Load::Util" => "0.004",
     "Perinci::CmdLine::Any" => 0,
     "Perinci::CmdLine::Lite" => "1.827",
-    "Perinci::Sub::Property::cmdline" => 0,
     "Sah::Schema::perl::arraydata::modname_with_optional_args" => 0,
     "Sah::Schema::posint" => 0,
     "strict" => 0,
@@ -42,7 +41,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.001",
+  "VERSION" => "0.003",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -63,7 +62,6 @@ my %FallbackPrereqs = (
   "Module::Load::Util" => "0.004",
   "Perinci::CmdLine::Any" => 0,
   "Perinci::CmdLine::Lite" => "1.827",
-  "Perinci::Sub::Property::cmdline" => 0,
   "Sah::Schema::perl::arraydata::modname_with_optional_args" => 0,
   "Sah::Schema::posint" => 0,
   "Test::More" => 0,

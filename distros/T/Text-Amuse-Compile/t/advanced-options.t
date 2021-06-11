@@ -6,7 +6,7 @@ use warnings;
 use Text::Amuse::Compile;
 use Path::Tiny;
 use Data::Dumper;
-use Test::More tests => 99;
+use Test::More tests => 109;
 
 my $muse = <<"MUSE";
 #title My title
@@ -133,7 +133,14 @@ foreach my $options ({
                      },
                      {
                       ignore_cover => 1,
-                     }) {
+                     },
+                     {
+                      geometry_top_margin => '2cm',
+                      geometry_outer_margin => '2cm',
+                      areaset_height => '8cm',
+                      areaset_width => '50mm',
+                     },
+                    ) {
     my $wd = Path::Tiny->tempdir(CLEANUP => !$ENV{NOCLEANUP});
     path(qw/t resources test.png/)->copy($wd->child('test.png')) or die;
     diag "Working on $wd for " . Dumper($options);
@@ -153,7 +160,7 @@ foreach my $options ({
         ok $pdf->exists;
     }
     my $tex = $wd->child("text.tex")->slurp_utf8;
-    if ($options->{areaset_width} && $options->{areaset_height}) {
+    if ($options->{areaset_width} && $options->{areaset_height} && !$options->{geometry_outer_margin}) {
         like($tex, qr/\\areaset\[current\]\{\Q$options->{areaset_width}\E\}\{\Q$options->{areaset_height}\E\}/,
              "options are fine") or diag $tex;
     }
@@ -195,5 +202,13 @@ foreach my $options ({
     }
     else {
         unlike $tex, qr{^\% No format ID passed\.}ms;
+    }
+    if ($options->{geometry_outer_margin}) {
+        like $tex, qr{\\usepackage\[%\s*
+                      top=\Q$options->{geometry_top_margin}\E,%\s+
+                      outer=\Q$options->{geometry_outer_margin}\E,%\s+
+                      width=\Q$options->{areaset_width}\E,%\s+
+                      height=\Q$options->{areaset_height}\E%\s+\]\{geometry\}
+                 }sx;
     }
 }
